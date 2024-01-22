@@ -19,7 +19,6 @@
 
 .sun-editor * {
 	box-sizing: border-box;
-	-webkit-user-drag: none;
 	overflow: visible;
 }
 
@@ -2199,7 +2198,7 @@
 	-moz-backface-visibility: hidden;
 }
 
-.sun-editor .se-resizing-container .se-drag-dot {
+.sun-editor .se-resizing-container .se-drag-handle {
 	position: relative;
 	pointer-events: auto;
 	top: -18px;
@@ -2211,7 +2210,7 @@
 	border: 1px solid #80bdff;
 	color: #fff;
 }
-.sun-editor .se-resizing-container .se-drag-dot > svg {
+.sun-editor .se-resizing-container .se-drag-handle > svg {
 	pointer-events: none;
 }
 
@@ -2824,6 +2823,10 @@
 	background-size: cover;
 }
 
+.sun-editor .se-visible-hidden {
+	visibility: hidden;
+}
+
 /** --- selected class */
 /* -- table */
 .sun-editor .sun-editor-editable table td.se-selected-table-cell::after,
@@ -3074,7 +3077,7 @@
 }
 
 /* controller - figure - drag handle */
-.sun-editor.se-rtl .se-resizing-container .se-drag-dot {
+.sun-editor.se-rtl .se-resizing-container .se-drag-handle {
 	left: 12px;
 }
 

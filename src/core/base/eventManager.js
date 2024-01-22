@@ -39,6 +39,8 @@ const EventManager = function (editor) {
 	this.__inputPlugin = null;
 	this.__inputBlurEvent = null;
 	this.__inputKeyEvent = null;
+	// drag, paste members
+	this.__dragContainer = null;
 };
 
 EventManager.prototype = {

@@ -2516,6 +2516,7 @@ function CreateHTML() {
 
 function CreateHTML_controller_table({ lang, icons }) {
 	const html = /*html*/ `
+	<div class="se-arrow se-arrow-down se-visible-hidden"></div>
 	<div class="se-btn-group">
 		<button type="button" data-command="openTableProperties" class="se-btn se-tooltip">
 			${icons.table_properties}
@@ -2560,7 +2561,7 @@ function CreateHTML_controller_table({ lang, icons }) {
 
 function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
 	const html = /*html*/ `
-    ${cellControllerTop ? '' : '<div class="se-arrow se-arrow-up"></div>'}
+	<div class="se-arrow se-arrow-${cellControllerTop ? 'down se-visible-hidden' : 'up'}"></div>
     <div class="se-btn-group">
 		<button type="button" data-command="openCellProperties" class="se-btn se-tooltip">
 			${icons.cell_properties}

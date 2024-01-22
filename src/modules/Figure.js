@@ -85,6 +85,9 @@ const Figure = function (inst, controls, params) {
 			});
 			e.get('wrapper').appendChild(main);
 			this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
+
+			// drag
+			this._setDragEvent(main.querySelector('.se-drag-handle'));
 		}
 	});
 };
@@ -312,7 +315,7 @@ Figure.prototype = {
 			if (this.autoRatio) this._setPercentSize(100, this.autoRatio.default || this.autoRatio.current);
 			else this._setAutoSize();
 		} else {
-			this._applySize(w, h, false, '');
+			this._applySize(w, h, '');
 		}
 	},
 
@@ -470,7 +473,7 @@ Figure.prototype = {
 		element.style.transformOrigin = '';
 
 		this._deleteCaptionPosition(element);
-		this._applySize(size[0] || 'auto', size[1] || '', true, '');
+		this._applySize(size[0] || 'auto', size[1] || '', '');
 	},
 
 	/**
@@ -506,7 +509,7 @@ Figure.prototype = {
 				const h = (isVertical ? offsetW : offsetH) + 'px';
 
 				this._deletePercentSize();
-				this._applySize(offsetW + 'px', offsetH + 'px', true, '');
+				this._applySize(offsetW + 'px', offsetH + 'px', '');
 
 				figureInfo.cover.style.width = w;
 				figureInfo.cover.style.height = figureInfo.caption ? '' : h;
@@ -564,7 +567,7 @@ Figure.prototype = {
 		element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
 	},
 
-	_applySize(w, h, notResetPercentage, direction) {
+	_applySize(w, h, direction) {
 		const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(this._element.style.height);
 		const onlyH = /^(th|bh)$/.test(direction) && /\d+/.test(this._element.style.width);
 		h = h || (this.autoRatio ? this.autoRatio.current || this.autoRatio.default : h);
@@ -655,6 +658,12 @@ Figure.prototype = {
 		domUtils.changeElement(this.alignButton.firstElementChild, this._alignIcons[this.align]);
 	},
 
+	_setDragEvent(dragHandle) {
+		if (!dragHandle) return;
+		this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
+		this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
+	},
+
 	_saveCurrentSize() {
 		if (this.__preventSizechange) return;
 
@@ -713,6 +722,26 @@ Figure.prototype = {
 
 	constructor: Figure
 };
+
+function OnDragStart(e) {
+	const container = this._container || Figure.__figureControllerInst._container;
+	const cover = this._cover || Figure.__figureControllerInst._cover || container;
+
+	if (!cover) {
+		e.preventDefault();
+		return;
+	}
+
+	this.editor._lineBreaker_t.style.display = 'none';
+	this.editor._lineBreaker_b.style.display = 'none';
+
+	this.eventManager.__dragContainer = container;
+	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : 0, 0);
+}
+
+function OnDragEnd() {
+	this.component._setComponentLineBreaker(this.eventManager.__dragContainer);
+}
 
 function GetRotateValue(element) {
 	const transform = element.style.transform;
@@ -796,7 +825,7 @@ function ContainerResizingOff() {
 		}
 	}
 
-	this._applySize(w, h, false, this._resize_direction);
+	this._applySize(w, h, this._resize_direction);
 	if (this.isVertical) this.setTransform(this._element, w, h, 0);
 
 	this.history.push(false);
@@ -906,11 +935,8 @@ function OnClick_resizeButton() {
 
 function CreateHTML_resizeDot({ icons, lang }) {
 	const html = /*html*/ `
-		<div class="se-drag-dot se-tooltip" draggable="true">
+		<div class="se-drag-handle se-tooltip" draggable="true" title="${lang.drag}">
 			${icons.selection}
-			<span class="se-tooltip-inner">
-				<span class="se-tooltip-text">${lang.drag}</span>
-			</span>
 		</div>
 		<div class="se-resize-dot">
 			<span class="tl"></span>
