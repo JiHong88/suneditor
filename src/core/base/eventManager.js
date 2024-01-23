@@ -4,6 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
+import { Figure } from '../../modules';
 
 const _w = env._w;
 const DIRECTION_KEYCODE = /^(8|3[2-9]|40|46)$/;
@@ -39,8 +40,8 @@ const EventManager = function (editor) {
 	this.__inputPlugin = null;
 	this.__inputBlurEvent = null;
 	this.__inputKeyEvent = null;
-	// drag, paste members
-	this.__dragContainer = null;
+	// drag
+	this.__dragCursor = editor.carrierWrapper.querySelector('.se-drag-cursor');
 };
 
 EventManager.prototype = {
@@ -81,6 +82,7 @@ EventManager.prototype = {
 	/**
 	 * @description Remove event
 	 * @param {object} params { target, type, listener, useCapture } = this.addEvent()
+	 * @returns {null}
 	 */
 	removeEvent(params) {
 		if (!params) return;
@@ -97,6 +99,8 @@ EventManager.prototype = {
 		for (let i = 0, len = target.length; i < len; i++) {
 			target[i].removeEventListener(type, listener, useCapture);
 		}
+
+		return null;
 	},
 
 	/**
@@ -654,6 +658,7 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'dragover', OnDragOver_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), false);
 		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, fc), false);
@@ -1991,6 +1996,22 @@ function OnCopy_wysiwyg(frameContext, e) {
 	}
 }
 
+function OnDragOver_wysiwyg(frameContext, e) {
+	e.preventDefault();
+
+	const dragCursor = this.__dragCursor;
+	const { sc, so, ec, eo } = this.selection.getEventLocationRange(e);
+
+	const cursorRange = this._d.createRange();
+	cursorRange.setStart(sc, so);
+	cursorRange.setEnd(ec, eo);
+
+	const rect = cursorRange.getBoundingClientRect();
+	dragCursor.style.left = `${rect.right + this._w.scrollX}px`;
+	dragCursor.style.top = `${rect.top + this._w.scrollY}px`;
+	dragCursor.style.height = `${rect.height}px`;
+}
+
 function OnDrop_wysiwyg(frameContext, e) {
 	if (frameContext.get('isReadOnly')) {
 		e.preventDefault();
@@ -2001,8 +2022,18 @@ function OnDrop_wysiwyg(frameContext, e) {
 	const dataTransfer = e.dataTransfer;
 	if (!dataTransfer) return true;
 
+	const { sc, so, ec, eo } = this.selection.getEventLocationRange(e);
+
+	if (Figure.__dragContainer) {
+		this.selection.setRange(sc, so, ec, eo);
+		this.html.insertNode(Figure.__dragContainer, null, true);
+		this.component.select(Figure.__dragTarget, Figure.__dragPluginName, false);
+		Figure.prototype._removeDragEvent.call(this.editor);
+	}
+
 	this.html.remove();
-	this._setDropLocationSelection(e);
+	this.selection.setRange(sc, so, ec, eo);
+	Figure.prototype._removeDragEvent.call(this.editor);
 	return this._dataTransferAction('drop', e, dataTransfer, frameContext);
 }
 

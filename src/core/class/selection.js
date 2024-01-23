@@ -222,6 +222,40 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @description Get the custom range object of the event.
+	 * @returns {Event} e Event object
+	 * @returns {Object} {sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}
+	 */
+	getEventLocationRange(e) {
+		let sc, so, ec, eo;
+		if (e.rangeParent) {
+			sc = e.rangeParent;
+			so = e.rangeOffset;
+			ec = e.rangeParent;
+			eo = e.rangeOffset;
+		} else if (this.editor.frameContext.get('_wd').caretRangeFromPoint) {
+			const r = this.editor.frameContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
+			sc = r.startContainer;
+			so = r.startOffset;
+			ec = r.endContainer;
+			eo = r.endOffset;
+		} else {
+			const r = this.selection.getRange();
+			sc = r.startContainer;
+			so = r.startOffset;
+			ec = r.endContainer;
+			eo = r.endOffset;
+		}
+
+		return {
+			sc,
+			so,
+			ec,
+			eo
+		};
+	},
+
+	/**
 	 * @description Returns true if there is no valid selection.
 	 * @param {Object} range selection.getRange()
 	 * @returns {boolean}

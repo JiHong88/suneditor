@@ -75,7 +75,7 @@ const Figure = function (inst, controls, params) {
 	this.editor.applyFrameRoots((e) => {
 		if (!e.get('wrapper').querySelector('.se-controller.se-resizing-container')) {
 			// resizing
-			const main = CreateHTML_resizeDot(this);
+			const main = CreateHTML_resizeDot();
 			const handles = main.querySelectorAll('.se-resize-dot > span');
 			e.set('_figure', {
 				main: main,
@@ -85,14 +85,16 @@ const Figure = function (inst, controls, params) {
 			});
 			e.get('wrapper').appendChild(main);
 			this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
-
-			// drag
-			this._setDragEvent(main.querySelector('.se-drag-handle'));
 		}
 	});
 };
 
 Figure.__figureControllerInst = null;
+Figure.__dragHandler = null;
+Figure.__dragContainer = null;
+Figure.__dragTarget = null;
+Figure.__dragPluginName = '';
+Figure.__dragEvents = { start: null, end: null };
 
 /**
  * @description Create a container for the resizing component and insert the element.
@@ -202,6 +204,9 @@ Figure.prototype = {
 		this.editor._antiBlur = false;
 		domUtils.removeClass(this._cover, 'se-figure-selected');
 		this.controller.close();
+
+		if (domUtils.hasClass(this._w.event?.target, 'se-drag-handle')) return;
+		this._removeDragEvent();
 	},
 
 	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
@@ -304,6 +309,9 @@ Figure.prototype = {
 
 		// align button
 		this._setAlignIcon();
+
+		// drag
+		this._setDragEvent(_figure.main);
 
 		return targetInfo;
 	},
@@ -658,12 +666,6 @@ Figure.prototype = {
 		domUtils.changeElement(this.alignButton.firstElementChild, this._alignIcons[this.align]);
 	},
 
-	_setDragEvent(dragHandle) {
-		if (!dragHandle) return;
-		this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
-		this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
-	},
-
 	_saveCurrentSize() {
 		if (this.__preventSizechange) return;
 
@@ -711,6 +713,7 @@ Figure.prototype = {
 	},
 
 	_offResizeEvent() {
+		this._removeDragEvent();
 		this.eventManager.removeGlobalEvent(this.__onContainerEvent);
 		this.eventManager.removeGlobalEvent(this.__offContainerEvent);
 		this.eventManager.removeGlobalEvent(this.__onResizeESCEvent);
@@ -718,6 +721,32 @@ Figure.prototype = {
 		this._displayResizeHandles(true);
 		this.editor._offCurrentController();
 		this.editor.disableBackWrapper();
+	},
+
+	_setDragEvent(figureMain) {
+		domUtils.removeItem(Figure.__dragHandler);
+		const dragHandle = domUtils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true', title: this.lang.drag }, this.icons.selection);
+		this.editor.frameContext.get('eventWysiwyg').appendChild(dragHandle);
+
+		Figure.__dragHandler = dragHandle;
+		Figure.__dragContainer = this._container;
+		Figure.__dragTarget = this._element;
+		Figure.__dragPluginName = this.kind;
+
+		const offset = this.offset.get(figureMain);
+		dragHandle.style.left = offset.left + figureMain.offsetWidth - dragHandle.offsetWidth * 1.5 + 'px';
+		dragHandle.style.top = offset.top - dragHandle.offsetHeight - 2 + 'px';
+
+		Figure.__dragEvents.start = this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
+		Figure.__dragEvents.end = this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
+	},
+
+	_removeDragEvent() {
+		this.carrierWrapper.querySelector('.se-drag-cursor').style.left = '-10000px';
+		domUtils.removeItem(Figure.__dragHandler);
+		Figure.__dragEvents.start = this.eventManager.removeEvent(Figure.__dragEvents.start);
+		Figure.__dragEvents.end = this.eventManager.removeEvent(Figure.__dragEvents.end);
+		Figure.__dragPluginName = Figure.__dragTarget = Figure.__dragContainer = Figure.__dragHandler = null;
 	},
 
 	constructor: Figure
@@ -732,15 +761,11 @@ function OnDragStart(e) {
 		return;
 	}
 
-	this.editor._lineBreaker_t.style.display = 'none';
-	this.editor._lineBreaker_b.style.display = 'none';
-
-	this.eventManager.__dragContainer = container;
 	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : 0, 0);
 }
 
 function OnDragEnd() {
-	this.component._setComponentLineBreaker(this.eventManager.__dragContainer);
+	this._removeDragEvent();
 }
 
 function GetRotateValue(element) {
@@ -933,11 +958,8 @@ function OnClick_resizeButton() {
 	this.selectMenu_resize.open('', '[data-command="' + command + '"]');
 }
 
-function CreateHTML_resizeDot({ icons, lang }) {
+function CreateHTML_resizeDot() {
 	const html = /*html*/ `
-		<div class="se-drag-handle se-tooltip" draggable="true" title="${lang.drag}">
-			${icons.selection}
-		</div>
 		<div class="se-resize-dot">
 			<span class="tl"></span>
 			<span class="tr"></span>

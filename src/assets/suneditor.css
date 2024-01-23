@@ -2198,11 +2198,10 @@
 	-moz-backface-visibility: hidden;
 }
 
-.sun-editor .se-resizing-container .se-drag-handle {
-	position: relative;
+.sun-editor .se-drag-handle {
+	position: absolute;
 	pointer-events: auto;
-	top: -18px;
-	left: calc(100% - 24px);
+	left: -10000px;
 	cursor: move;
 	width: 17px;
 	height: 16px;
@@ -2210,7 +2209,7 @@
 	border: 1px solid #80bdff;
 	color: #fff;
 }
-.sun-editor .se-resizing-container .se-drag-handle > svg {
+.sun-editor .se-drag-handle > svg {
 	pointer-events: none;
 }
 
@@ -3214,11 +3213,11 @@ textarea.se-error:focus {
 }
 .sun-editor.sun-editor-carrier-wrapper .se-drag-cursor {
 	position: absolute;
-	display: none;
-	width: 10px;
-	height: 10px;
-	background-color: red;
-	border-radius: 50%;
+	display: block;
+    left: -10000px;
+    width: 2px;
+    background-color: #1275ff;
+	z-index: 2147483647;
 }
 
 /** animation */
