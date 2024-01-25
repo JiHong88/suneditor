@@ -788,6 +788,8 @@ EventManager.prototype = {
 		if (!openCont.length) return;
 		if (this.__scrollID) _w.clearTimeout(this.__scrollID);
 
+		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
+
 		for (let i = 0; i < openCont.length; i++) {
 			if (openCont[i].notInCarrier) continue;
 			openCont[i].inst?.hide();
@@ -796,6 +798,7 @@ EventManager.prototype = {
 		this.__scrollID = _w.setTimeout(() => {
 			_w.clearTimeout(this.__scrollID);
 			this.__scrollID = '';
+			if (Figure.__dragHandler) Figure.__dragMove();
 			for (let i = 0; i < openCont.length; i++) {
 				if (openCont[i].notInCarrier) continue;
 				openCont[i].inst?.show();

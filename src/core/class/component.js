@@ -305,8 +305,13 @@ Component.prototype = {
 };
 
 function CloseListener_mousedown({ target }) {
-	if (this.currentTarget?.contains(target) || domUtils.getParentElement(target, '.se-controller') || (this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target))))
+	if (
+		this.currentTarget?.contains(target) ||
+		domUtils.getParentElement(target, '.se-controller') ||
+		(this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target)))
+	) {
 		return;
+	}
 	this.deselect();
 }
 

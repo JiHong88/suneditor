@@ -1486,8 +1486,8 @@
 }
 
 .sun-editor .se-wrapper .se-code-wrapper .se-code-view-line {
-	background-color: #222;
-	color: #fff;
+	background-color: #f5f5f5;
+	color: #222;
 	text-align: right;
 	width: 50px;
 	font-size: 13px;
@@ -1497,7 +1497,7 @@
 
 .sun-editor .se-wrapper .se-code-viewer {
 	background-color: #222;
-	color: #fff;
+	color: #f5f5f5;
 	font-size: 13px;
 	word-break: break-all;
 	padding: 4px;
@@ -2203,10 +2203,11 @@
 	pointer-events: auto;
 	left: -10000px;
 	cursor: move;
-	width: 17px;
-	height: 16px;
+	width: 18px;
+	height: 18px;
 	background-color: #80bdff;
-	border: 1px solid #80bdff;
+	border: 0;
+	padding: 1px;
 	color: #fff;
 }
 .sun-editor .se-drag-handle > svg {
@@ -3214,9 +3215,9 @@ textarea.se-error:focus {
 .sun-editor.sun-editor-carrier-wrapper .se-drag-cursor {
 	position: absolute;
 	display: block;
-    left: -10000px;
-    width: 2px;
-    background-color: #1275ff;
+	left: -10000px;
+	width: 2px;
+	background-color: #1275ff;
 	z-index: 2147483647;
 }
 

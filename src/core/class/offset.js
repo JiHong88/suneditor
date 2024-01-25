@@ -323,7 +323,7 @@ Offset.prototype = {
 			addOffset.left *= -1;
 		}
 
-		const isWWTarget = this.editor.frameContext.get('wysiwyg').contains(target) || params.isWWTarget;
+		const isWWTarget = this.editor.frameContext.get('wrapper').contains(target) || params.isWWTarget;
 		const viewportSize = getViewportSize();
 		const wwScroll = isWWTarget ? this.getWWScroll() : this._getWindowScroll();
 		const targetRect = this.editor.selection.getRects(target, 'start').rects;

@@ -93,6 +93,7 @@ Figure.__figureControllerInst = null;
 Figure.__dragHandler = null;
 Figure.__dragContainer = null;
 Figure.__dragTarget = null;
+Figure.__dragMove = null;
 Figure.__dragPluginName = '';
 Figure.__dragEvents = { start: null, end: null };
 
@@ -205,7 +206,7 @@ Figure.prototype = {
 		domUtils.removeClass(this._cover, 'se-figure-selected');
 		this.controller.close();
 
-		if (domUtils.hasClass(this._w.event?.target, 'se-drag-handle')) return;
+		if (domUtils.hasClass(this._w.event?.target, 'se-drag-handle|sun-editor-editable')) return;
 		this._removeDragEvent();
 	},
 
@@ -732,11 +733,9 @@ Figure.prototype = {
 		Figure.__dragContainer = this._container;
 		Figure.__dragTarget = this._element;
 		Figure.__dragPluginName = this.kind;
+		Figure.__dragMove = OnScrollDragHandler.bind(this, dragHandle, figureMain);
 
-		const offset = this.offset.get(figureMain);
-		dragHandle.style.left = offset.left + figureMain.offsetWidth - dragHandle.offsetWidth * 1.5 + 'px';
-		dragHandle.style.top = offset.top - dragHandle.offsetHeight - 2 + 'px';
-
+		Figure.__dragMove();
 		Figure.__dragEvents.start = this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
 		Figure.__dragEvents.end = this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
 	},
@@ -746,11 +745,18 @@ Figure.prototype = {
 		domUtils.removeItem(Figure.__dragHandler);
 		Figure.__dragEvents.start = this.eventManager.removeEvent(Figure.__dragEvents.start);
 		Figure.__dragEvents.end = this.eventManager.removeEvent(Figure.__dragEvents.end);
-		Figure.__dragPluginName = Figure.__dragTarget = Figure.__dragContainer = Figure.__dragHandler = null;
+		Figure.__dragPluginName = Figure.__dragTarget = Figure.__dragContainer = Figure.__dragHandler = Figure.__dragMove = null;
 	},
 
 	constructor: Figure
 };
+
+function OnScrollDragHandler(dragHandle, figureMain) {
+	const offset = this.offset.get(figureMain);
+	dragHandle.style.display = 'block';
+	dragHandle.style.left = offset.left + figureMain.offsetWidth - dragHandle.offsetWidth * 1.5 + 'px';
+	dragHandle.style.top = offset.top - dragHandle.offsetHeight - 2 + 'px';
+}
 
 function OnDragStart(e) {
 	const container = this._container || Figure.__figureControllerInst._container;
@@ -761,10 +767,12 @@ function OnDragStart(e) {
 		return;
 	}
 
-	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : 0, 0);
+	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
+	this.editor._offCurrentController();
 }
 
 function OnDragEnd() {
+	this.component.select(Figure.__dragTarget, Figure.__dragPluginName, false);
 	this._removeDragEvent();
 }
 

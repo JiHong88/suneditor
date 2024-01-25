@@ -106,6 +106,7 @@ Controller.prototype = {
 
 		if (this.parents.length > 0) return;
 		if (typeof this.inst.close === 'function') this.inst.close();
+		this.component.deselect();
 	},
 
 	/**
