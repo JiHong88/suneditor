@@ -85,6 +85,11 @@ const Figure = function (inst, controls, params) {
 			});
 			e.get('wrapper').appendChild(main);
 			this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
+			// drag
+			const dragHandle = domUtils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true', title: this.lang.drag }, this.icons.selection);
+			e.get('wrapper').appendChild(dragHandle);
+			this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
+			this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
 		}
 	});
 };
@@ -95,7 +100,6 @@ Figure.__dragContainer = null;
 Figure.__dragTarget = null;
 Figure.__dragMove = null;
 Figure.__dragPluginName = '';
-Figure.__dragEvents = { start: null, end: null };
 
 /**
  * @description Create a container for the resizing component and insert the element.
@@ -725,9 +729,8 @@ Figure.prototype = {
 	},
 
 	_setDragEvent(figureMain) {
-		domUtils.removeItem(Figure.__dragHandler);
-		const dragHandle = domUtils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true', title: this.lang.drag }, this.icons.selection);
-		this.editor.frameContext.get('eventWysiwyg').appendChild(dragHandle);
+		const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
+		dragHandle.style.display = 'block';
 
 		Figure.__dragHandler = dragHandle;
 		Figure.__dragContainer = this._container;
@@ -736,15 +739,13 @@ Figure.prototype = {
 		Figure.__dragMove = OnScrollDragHandler.bind(this, dragHandle, figureMain);
 
 		Figure.__dragMove();
-		Figure.__dragEvents.start = this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
-		Figure.__dragEvents.end = this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
 	},
 
 	_removeDragEvent() {
 		this.carrierWrapper.querySelector('.se-drag-cursor').style.left = '-10000px';
-		domUtils.removeItem(Figure.__dragHandler);
-		Figure.__dragEvents.start = this.eventManager.removeEvent(Figure.__dragEvents.start);
-		Figure.__dragEvents.end = this.eventManager.removeEvent(Figure.__dragEvents.end);
+		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
+		domUtils.removeClass(Figure.__dragHandler, 'se-dragging');
+		domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
 		Figure.__dragPluginName = Figure.__dragTarget = Figure.__dragContainer = Figure.__dragHandler = Figure.__dragMove = null;
 	},
 
@@ -767,11 +768,15 @@ function OnDragStart(e) {
 		return;
 	}
 
+	domUtils.addClass(Figure.__dragHandler, 'se-dragging');
+	domUtils.addClass(Figure.__dragContainer, 'se-dragging');
 	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
 	this.editor._offCurrentController();
 }
 
 function OnDragEnd() {
+	domUtils.removeClass(Figure.__dragHandler, 'se-dragging');
+	domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
 	this.component.select(Figure.__dragTarget, Figure.__dragPluginName, false);
 	this._removeDragEvent();
 }

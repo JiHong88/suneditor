@@ -230,6 +230,8 @@ Controller.prototype = {
 	},
 
 	_checkForm(target) {
+		if (domUtils.hasClass(target, 'se-drag-handle')) return true;
+
 		let isParentForm = false;
 		if (this.isInsideForm && this.parents?.length > 0) {
 			this.parents.some((e) => {

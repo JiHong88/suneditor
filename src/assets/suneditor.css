@@ -2064,6 +2064,7 @@
 	outline: 1px dashed #e1e1e1;
 }
 
+.sun-editor .sun-editor-editable[contenteditable='true'] .se-component.se-dragging > figure,
 .sun-editor .sun-editor-editable[contenteditable='true'] .se-component > figure:hover,
 .sun-editor .sun-editor-editable[contenteditable='true'] .se-component.se-component-selected > figure {
 	outline: 2px solid #80bdff;
@@ -2212,6 +2213,9 @@
 }
 .sun-editor .se-drag-handle > svg {
 	pointer-events: none;
+}
+.sun-editor .se-drag-handle.se-dragging {
+	opacity: 0;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot {
