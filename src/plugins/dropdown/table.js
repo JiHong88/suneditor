@@ -2,6 +2,8 @@ import EditorInjector from '../../editorInjector';
 import { domUtils, numbers, converter, env } from '../../helper';
 import { Controller, SelectMenu, ColorPicker } from '../../modules';
 
+const { _w } = env;
+
 const ROW_SELECT_MARGIN = 5;
 const CELL_SELECT_MARGIN = 2;
 const CELL_DECIMAL_END = 0;
@@ -1159,7 +1161,7 @@ Table.prototype = {
 				let totalW = 0;
 				for (let i = 0, len = cols.length, w; i < len; i++) {
 					w = numbers.get(cols[i].style.width);
-					w -= Math.round((w * len * 0.1) / 2, CELL_DECIMAL_END);
+					w -= _w.Math.round((w * len * 0.1) / 2, CELL_DECIMAL_END);
 					totalW += w;
 					cols[i].style.width = `${w}%`;
 				}
@@ -2053,7 +2055,7 @@ function CheckCellEdge(event, tableCell) {
 	const startX = event.clientX;
 	const startWidth = numbers.get(env._w.getComputedStyle(tableCell).width, CELL_DECIMAL_END);
 	const rect = tableCell.getBoundingClientRect();
-	const offsetX = Math.round(startX - rect.left);
+	const offsetX = _w.Math.round(startX - rect.left);
 	const isLeft = offsetX <= CELL_SELECT_MARGIN;
 	const is = isLeft || startWidth - offsetX <= CELL_SELECT_MARGIN;
 
@@ -2068,7 +2070,7 @@ function CheckRowEdge(event, tableCell) {
 	const startY = event.clientY;
 	const startHeight = numbers.get(env._w.getComputedStyle(tableCell).height, CELL_DECIMAL_END);
 	const rect = tableCell.getBoundingClientRect();
-	const is = Math.ceil(startHeight + rect.top - startY) <= ROW_SELECT_MARGIN;
+	const is = _w.Math.ceil(startHeight + rect.top - startY) <= ROW_SELECT_MARGIN;
 
 	return {
 		is,
@@ -2092,7 +2094,7 @@ function OnSplitCells(direction) {
 
 		// colspan > 1
 		if (currentColSpan > 1) {
-			newCell.colSpan = Math.floor(currentColSpan / 2);
+			newCell.colSpan = _w.Math.floor(currentColSpan / 2);
 			currentCell.colSpan = currentColSpan - newCell.colSpan;
 			currentRow.insertBefore(newCell, currentCell.nextElementSibling);
 		} else {
@@ -2167,7 +2169,7 @@ function OnSplitCells(direction) {
 
 		// rowspan > 1
 		if (currentRowSpan > 1) {
-			newCell.rowSpan = Math.floor(currentRowSpan / 2);
+			newCell.rowSpan = _w.Math.floor(currentRowSpan / 2);
 			const newRowSpan = currentRowSpan - newCell.rowSpan;
 
 			const rowSpanArr = [];
@@ -2289,8 +2291,8 @@ function OnRowEdit(command) {
 function OnMouseMoveTablePicker(e) {
 	e.stopPropagation();
 
-	let x = Math.ceil(e.offsetX / 18);
-	let y = Math.ceil(e.offsetY / 18);
+	let x = _w.Math.ceil(e.offsetX / 18);
+	let y = _w.Math.ceil(e.offsetY / 18);
 	x = x < 1 ? 1 : x;
 	y = y < 1 ? 1 : y;
 
@@ -2387,7 +2389,7 @@ function GetMaxColumns(table) {
 		for (let cell of row.cells) {
 			columnCount += cell.colSpan;
 		}
-		maxColumns = Math.max(maxColumns, columnCount);
+		maxColumns = _w.Math.max(maxColumns, columnCount);
 	}
 
 	return maxColumns;

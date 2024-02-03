@@ -346,7 +346,7 @@ function OnClick_relbutton() {
 }
 
 function SetHeaderBookmark(item) {
-	const id = item.id || 'h_' + Math.random().toString().replace(/.+\./, '');
+	const id = item.id || 'h_' + this._w.Math.random().toString().replace(/.+\./, '');
 	item.id = id;
 	this.urlInput.value = '#' + id;
 

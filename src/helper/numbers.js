@@ -1,3 +1,5 @@
+import { _w } from './env';
+
 /**
  * @description Checks for numeric (with decimal point).
  * @param {string|number} text Text string or number
@@ -20,7 +22,7 @@ export function get(value, maxDec) {
 	if (!number || !number[0]) return 0;
 
 	number = number[0];
-	return maxDec < 0 ? number * 1 : maxDec === 0 ? Math.round(number * 1) : (number * 1).toFixed(maxDec) * 1;
+	return maxDec < 0 ? number * 1 : maxDec === 0 ? _w.Math.round(number * 1) : (number * 1).toFixed(maxDec) * 1;
 }
 
 /**

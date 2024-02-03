@@ -325,7 +325,7 @@ Toolbar.prototype = {
 	_setBalloonPosition(isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop) {
 		const padding = 1;
 		const arrow = this.context.get(this.keyName + '._arrow');
-		const arrowMargin = Math.round(arrow.offsetWidth / 2);
+		const arrowMargin = this._w.Math.round(arrow.offsetWidth / 2);
 		const toolbarWidth = toolbarEl.offsetWidth;
 		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbarEl.offsetHeight;
 
@@ -347,8 +347,8 @@ Toolbar.prototype = {
 
 		if (resetTop) t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
 
-		toolbarEl.style.left = Math.floor(l) + 'px';
-		toolbarEl.style.top = Math.floor(t) + 'px';
+		toolbarEl.style.left = this._w.Math.floor(l) + 'px';
+		toolbarEl.style.top = this._w.Math.floor(t) + 'px';
 
 		if (isDirTop) {
 			domUtils.removeClass(arrow, 'se-arrow-up');
@@ -358,7 +358,7 @@ Toolbar.prototype = {
 			domUtils.addClass(arrow, 'se-arrow-up');
 		}
 
-		const arrow_left = Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
+		const arrow_left = this._w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
 		arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
 	},
 

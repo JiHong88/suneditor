@@ -1,5 +1,7 @@
-import { domUtils } from '../helper';
+import { domUtils, env } from '../helper';
 import Controller from './Controller';
+
+const { _w } = env;
 
 const SIZE = 240;
 const BAR_H = 28;
@@ -208,11 +210,11 @@ function updatePointer_wheel(x, y) {
 	x = x - rect.left - MIDDLE;
 	y = y - rect.top - MIDDLE;
 
-	const angle = (Math.atan2(y, x) * 180) / Math.PI;
-	const distance = Math.min(Math.sqrt(x * x + y * y), MIDDLE);
+	const angle = (_w.Math.atan2(y, x) * 180) / _w.Math.PI;
+	const distance = _w.Math.min(_w.Math.sqrt(x * x + y * y), MIDDLE);
 
-	const posX = MIDDLE + distance * Math.cos((angle * Math.PI) / 180);
-	const posY = MIDDLE + distance * Math.sin((angle * Math.PI) / 180);
+	const posX = MIDDLE + distance * _w.Math.cos((angle * _w.Math.PI) / 180);
+	const posY = MIDDLE + distance * _w.Math.sin((angle * _w.Math.PI) / 180);
 
 	wheelPointer.style.left = `${posX}px`;
 	wheelPointer.style.top = `${posY}px`;
@@ -224,7 +226,7 @@ function updatePointer_wheel(x, y) {
 function updatePointer_bar(x) {
 	const rect = gradientBar.getBoundingClientRect();
 	let posX = x - rect.left;
-	posX = Math.max(GRADIENT_RADIUS, Math.min(posX, rect.width - GRADIENT_RADIUS));
+	posX = _w.Math.max(GRADIENT_RADIUS, _w.Math.min(posX, rect.width - GRADIENT_RADIUS));
 
 	gradientPointer.style.left = `${posX}px`;
 
@@ -269,7 +271,7 @@ function getWheelColor(wheelCtx) {
 	// Calculate distance from the center of the wheel
 	const dx = wheelX - MIDDLE;
 	const dy = wheelY - MIDDLE;
-	const distance = Math.sqrt(dx * dx + dy * dy);
+	const distance = _w.Math.sqrt(dx * dx + dy * dy);
 
 	if (distance < CLOSE_TO_CENTER_THRESHOLD) {
 		l = 1 - LIGHTNESS;
@@ -332,7 +334,7 @@ function drawWheelGradient() {
 	wheelCtx.globalAlpha = LIGHTNESS; // 0: white, 1: black
 	wheelCtx.fillStyle = 'black';
 	wheelCtx.beginPath();
-	wheelCtx.arc(MIDDLE, MIDDLE, MIDDLE, 0, 2 * Math.PI);
+	wheelCtx.arc(MIDDLE, MIDDLE, MIDDLE, 0, 2 * _w.Math.PI);
 	wheelCtx.fill();
 	wheelCtx.globalAlpha = 1.0;
 }
@@ -350,17 +352,17 @@ function drawColorWheelToContext(context) {
 
 			context.fillStyle = `hsl(${h}, ${fixedSaturation}%, ${dynamicLightness}%)`;
 
-			const posX = MIDDLE + Math.cos(degreeToRadian(h)) * distance;
-			const posY = MIDDLE - Math.sin(degreeToRadian(h)) * distance;
+			const posX = MIDDLE + _w.Math.cos(degreeToRadian(h)) * distance;
+			const posY = MIDDLE - _w.Math.sin(degreeToRadian(h)) * distance;
 
-			context.arc(posX, posY, 1.5, 0, 2 * Math.PI);
+			context.arc(posX, posY, 1.5, 0, 2 * _w.Math.PI);
 			context.fill();
 		}
 	}
 }
 
 function degreeToRadian(deg) {
-	return (deg * Math.PI) / 180;
+	return (deg * _w.Math.PI) / 180;
 }
 
 function rgbToHsl([r, g, b]) {
@@ -368,8 +370,8 @@ function rgbToHsl([r, g, b]) {
 	g /= 255;
 	b /= 255;
 
-	let max = Math.max(r, g, b),
-		min = Math.min(r, g, b);
+	let max = _w.Math.max(r, g, b),
+		min = _w.Math.min(r, g, b);
 	let h,
 		s,
 		l = (max + min) / 2;
@@ -421,25 +423,25 @@ function hslToRgb([h, s, l]) {
 	}
 
 	return {
-		r: Math.round(r * 255),
-		g: Math.round(g * 255),
-		b: Math.round(b * 255)
+		r: _w.Math.round(r * 255),
+		g: _w.Math.round(g * 255),
+		b: _w.Math.round(b * 255)
 	};
 }
 
 function rgbToHex({ r, g, b }) {
-	let hexR = Math.floor(r).toString(16);
+	let hexR = _w.Math.floor(r).toString(16);
 	if (r < 16) hexR = `0${hexR}`;
-	let hexG = Math.floor(g).toString(16);
+	let hexG = _w.Math.floor(g).toString(16);
 	if (g < 16) hexG = `0${hexG}`;
-	let hexB = Math.floor(b).toString(16);
+	let hexB = _w.Math.floor(b).toString(16);
 	if (b < 16) hexB = `0${hexB}`;
 	return `${hexR}${hexG}${hexB}`.toUpperCase();
 }
 
 function roundNumber(num) {
-	const factor = Math.pow(10, FIXED_DEC);
-	return Math.round(num * factor) / factor;
+	const factor = _w.Math.pow(10, FIXED_DEC);
+	return _w.Math.round(num * factor) / factor;
 }
 
 // create

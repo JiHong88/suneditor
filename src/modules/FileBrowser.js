@@ -128,7 +128,7 @@ FileBrowser.prototype = {
 		const _tags = [];
 		const len = items.length;
 		const columnSize = this.columnSize;
-		const splitSize = columnSize <= 1 ? 1 : Math.round(len / columnSize) || 1;
+		const splitSize = columnSize <= 1 ? 1 : this._w.Math.round(len / columnSize) || 1;
 		const drawItemHandler = this.drawItemHandler;
 
 		let tagsHTML = '';

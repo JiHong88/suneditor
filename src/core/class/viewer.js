@@ -560,7 +560,7 @@ Viewer.prototype = {
 		if (!lineNumbers) return;
 
 		const lineHeight = GetLineHeight(lineNumbers);
-		const numberOfLinesNeeded = Math.ceil(code.scrollHeight / lineHeight);
+		const numberOfLinesNeeded = this._w.Math.ceil(code.scrollHeight / lineHeight);
 
 		const currentLineCount = (lineNumbers.value.match(/\n/g) || []).length;
 		if (numberOfLinesNeeded > currentLineCount) {
