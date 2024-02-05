@@ -88,6 +88,8 @@ const Figure = function (inst, controls, params) {
 			// drag
 			const dragHandle = domUtils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true', title: this.lang.drag }, this.icons.selection);
 			e.get('wrapper').appendChild(dragHandle);
+			this.eventManager.addEvent(dragHandle, 'mouseenter', OnDragEnter.bind(this));
+			this.eventManager.addEvent(dragHandle, 'mouseleave', OnDragLeave.bind(this));
 			this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
 			this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
 		}
@@ -97,6 +99,7 @@ const Figure = function (inst, controls, params) {
 Figure.__figureControllerInst = null;
 Figure.__dragHandler = null;
 Figure.__dragContainer = null;
+Figure.__dragCover = null;
 Figure.__dragTarget = null;
 Figure.__dragMove = null;
 Figure.__dragPluginName = '';
@@ -129,10 +132,11 @@ Figure.CreateCaption = function (cover, text) {
  * @returns {object} {container, cover, caption}
  */
 Figure.GetContainer = function (element) {
+	const cover = domUtils.getParentElement(element, 'FIGURE');
 	return {
 		target: element,
-		container: domUtils.getParentElement(element, Figure.__is),
-		cover: domUtils.getParentElement(element, 'FIGURE'),
+		container: domUtils.getParentElement(element, Figure.__is) || cover,
+		cover: cover,
 		caption: domUtils.getEdgeChild(element.parentElement, 'FIGCAPTION')
 	};
 };
@@ -734,6 +738,7 @@ Figure.prototype = {
 
 		Figure.__dragHandler = dragHandle;
 		Figure.__dragContainer = this._container;
+		Figure.__dragCover = this._cover;
 		Figure.__dragTarget = this._element;
 		Figure.__dragPluginName = this.kind;
 		Figure.__dragMove = OnScrollDragHandler.bind(this, dragHandle, figureMain);
@@ -746,6 +751,7 @@ Figure.prototype = {
 		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
 		domUtils.removeClass(Figure.__dragHandler, 'se-dragging');
 		domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
+		domUtils.removeClass(Figure.__dragCover, 'se-drag-hover');
 		Figure.__dragPluginName = Figure.__dragTarget = Figure.__dragContainer = Figure.__dragHandler = Figure.__dragMove = null;
 	},
 
@@ -757,6 +763,16 @@ function OnScrollDragHandler(dragHandle, figureMain) {
 	dragHandle.style.display = 'block';
 	dragHandle.style.left = offset.left + figureMain.offsetWidth - dragHandle.offsetWidth * 1.5 + 'px';
 	dragHandle.style.top = offset.top - dragHandle.offsetHeight - 2 + 'px';
+}
+
+function OnDragEnter() {
+	this.editor._visibleControllers(false);
+	domUtils.addClass(Figure.__dragCover, 'se-drag-hover');
+}
+
+function OnDragLeave() {
+	this.editor._visibleControllers(true);
+	domUtils.removeClass(Figure.__dragCover, 'se-drag-hover');
 }
 
 function OnDragStart(e) {
@@ -778,6 +794,7 @@ function OnDragEnd() {
 	domUtils.removeClass(Figure.__dragHandler, 'se-dragging');
 	domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
 	this.component.select(Figure.__dragTarget, Figure.__dragPluginName, false);
+	this.editor._visibleControllers(true);
 	this._removeDragEvent();
 }
 
@@ -1057,37 +1074,41 @@ function GET_CONTROLLER_BUTTONS(group) {
 }
 
 function CreateHTML_controller(inst, controls) {
-	const { lang, icons } = inst;
-	let html = '<div class="se-arrow se-arrow-up"></div>';
-	for (let i = 0, group; i < controls.length; i++) {
-		group = controls[i];
-		html += '<div class="se-btn-group">';
-		for (let j = 0, len = group.length, m; j < len; j++) {
-			m = group[j];
+	let html = null;
 
-			if (typeof m?.action === 'function') {
-				const g = m;
-				m = {
-					c: `__c__${g.command}`,
-					l: g.title,
-					i: g.icon
-				};
-				inst._action[m.c] = g.action;
-			} else {
-				m = GET_CONTROLLER_BUTTONS(m);
-				if (!m) continue;
+	if (controls?.length > 0) {
+		const { lang, icons } = inst;
+		html = '<div class="se-arrow se-arrow-up"></div>';
+		for (let i = 0, group; i < controls.length; i++) {
+			group = controls[i];
+			html += '<div class="se-btn-group">';
+			for (let j = 0, len = group.length, m; j < len; j++) {
+				m = group[j];
+
+				if (typeof m?.action === 'function') {
+					const g = m;
+					m = {
+						c: `__c__${g.command}`,
+						l: g.title,
+						i: g.icon
+					};
+					inst._action[m.c] = g.action;
+				} else {
+					m = GET_CONTROLLER_BUTTONS(m);
+					if (!m) continue;
+				}
+
+				html += /*html*/ `
+					<button type="button" data-command="${m.c}" data-value="${m.v}" class="${m.t ? 'se-btn-w-auto ' : ''}se-btn se-tooltip">
+						${icons[m.i] || m.t || m.i}
+						<span class="se-tooltip-inner"><span class="se-tooltip-text">${lang[m.l] || m.l}</span></span>
+					</button>`;
 			}
-
-			html += /*html*/ `
-				<button type="button" data-command="${m.c}" data-value="${m.v}" class="${m.t ? 'se-btn-w-auto ' : ''}se-btn se-tooltip">
-					${icons[m.i] || m.t || m.i}
-					<span class="se-tooltip-inner"><span class="se-tooltip-text">${lang[m.l] || m.l}</span></span>
-				</button>`;
+			html += '</div>';
 		}
-		html += '</div>';
 	}
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-resizing' }, html);
+	return domUtils.createElement('DIV', { class: 'se-controller se-controller-resizing' + (!html ? ' se-empty-controller' : '') }, html);
 }
 
 export default Figure;

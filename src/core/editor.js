@@ -1027,6 +1027,24 @@ Editor.prototype = {
 	},
 
 	/**
+	 * @description visible controllers
+	 * @param {boolean} value hidden/show
+	 * @private
+	 */
+	_visibleControllers(value) {
+		const visible = value ? '' : 'hidden';
+
+		const cont = this.opendControllers;
+		for (let i = 0, c; i < cont.length; i++) {
+			c = cont[i];
+			if (c.form) c.form.style.visibility = visible;
+		}
+
+		this._lineBreaker_t.style.visibility = visible;
+		this._lineBreaker_b.style.visibility = visible;
+	},
+
+	/**
 	 * @description Off current controllers
 	 * @private
 	 */

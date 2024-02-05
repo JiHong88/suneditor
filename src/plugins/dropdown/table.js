@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils, numbers, converter, env } from '../../helper';
-import { Controller, SelectMenu, ColorPicker } from '../../modules';
+import { Controller, SelectMenu, ColorPicker, Figure } from '../../modules';
 
 const { _w } = env;
 
@@ -113,6 +113,8 @@ const Table = function (editor, pluginOptions) {
 			domUtils.removeClass(this.controller_colorPicker.currentTarget, 'on');
 		}
 	});
+
+	this.figure = new Figure(this, null, {});
 
 	this.sliderType = '';
 
@@ -671,7 +673,7 @@ Table.prototype = {
 
 		this._figure = null;
 		this._element = null;
-		this._tdElement = null;
+		// this._tdElement = null;
 		this._trElement = null;
 		this._trElements = null;
 		this._tableXY = [];
@@ -729,6 +731,7 @@ Table.prototype = {
 
 	setCellInfo(tdElement, reset) {
 		const table = this.seTableInfo(tdElement);
+		this._trElement = tdElement.parentNode;
 
 		// hedaer
 		if (table.querySelector('thead')) domUtils.addClass(this.headerButton, 'active');
@@ -1353,28 +1356,37 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @override fileManager
+	 * @param {Element} target Target element
+	 */
+	select(target) {
+		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
+
+		this._maxWidth = domUtils.hasClass(target, 'se-table-size-100') || target.style.width === '100%' || (!target.style.width && !domUtils.hasClass(target, 'se-table-size-auto'));
+		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
+		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
+
+		this.setCellInfo(this._tdElement, this._shift);
+
+		// controller open
+		const figureEl = domUtils.getParentElement(target, domUtils.isFigure);
+		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null });
+
+		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
+		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset });
+	},
+
 	setController(tdElement) {
 		if (!this.selection.get().isCollapsed && !this._selectedCell) {
 			this._deleteStyleSelectedCells();
 			return;
 		}
 
+		this._tdElement = tdElement;
 		domUtils.addClass(tdElement, 'se-selected-cell-focus');
 		const tableElement = this._element || this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, true);
-
-		this._maxWidth = domUtils.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !domUtils.hasClass(tableElement, 'se-table-size-auto'));
-		this._fixedColumn = domUtils.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
-		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
-
-		this.setCellInfo(tdElement, this._shift);
-
-		// controller open
-		const figureEl = domUtils.getParentElement(tableElement, domUtils.isFigure);
-		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null });
-
-		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
-		this.controller_cell.open(tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset });
 	},
 
 	setCellControllerPosition(tdElement, reset) {

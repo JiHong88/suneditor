@@ -4,6 +4,7 @@
 /* blue color #eaf3ff, #dbeaff(shadow: #b7ccf2, #e6f2ff), #c4ddff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, #3288ff, #1275ff */
 /* red color #b94a48 , #f2dede , #eed3d7, #d9534f */
 /* green color #008000 */
+/* yellow color #f0c20a */
 
 /** --- suneditor main */
 .sun-editor {
@@ -2023,6 +2024,11 @@
 	line-break: auto;
 }
 
+.sun-editor .se-controller.se-empty-controller {
+	border: none;
+	padding: 0;
+}
+
 .sun-editor .se-controller:not(.se-resizing-container) {
 	-webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -2082,8 +2088,11 @@
 	transition: box-shadow 0.15s ease-in-out;
 }
 
-.sun-editor .sun-editor-editable[contenteditable='true'] .se-component:not(.se-file-figure) figure.se-figure-selected {
+.sun-editor .sun-editor-editable[contenteditable='true'] figure.se-figure-selected {
 	outline: 2px solid #80bdff;
+}
+.sun-editor .sun-editor-editable[contenteditable='true'] figure.se-figure-selected.se-drag-hover {
+	outline: 2px solid #f0c20a;
 }
 
 /* controller - button group */
@@ -2213,6 +2222,9 @@
 }
 .sun-editor .se-drag-handle > svg {
 	pointer-events: none;
+}
+.sun-editor .se-drag-handle:hover {
+	background-color: #f0c20a;
 }
 .sun-editor .se-drag-handle.se-dragging {
 	opacity: 0;
