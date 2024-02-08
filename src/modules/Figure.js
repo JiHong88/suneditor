@@ -751,7 +751,7 @@ Figure.prototype = {
 		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
 		domUtils.removeClass(Figure.__dragHandler, 'se-dragging');
 		domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
-		domUtils.removeClass(Figure.__dragCover, 'se-drag-hover');
+		domUtils.removeClass(Figure.__dragCover, 'se-drag-over');
 		Figure.__dragPluginName = Figure.__dragTarget = Figure.__dragContainer = Figure.__dragHandler = Figure.__dragMove = null;
 	},
 
@@ -767,12 +767,12 @@ function OnScrollDragHandler(dragHandle, figureMain) {
 
 function OnDragEnter() {
 	this.editor._visibleControllers(false);
-	domUtils.addClass(Figure.__dragCover, 'se-drag-hover');
+	domUtils.addClass(Figure.__dragCover, 'se-drag-over');
 }
 
 function OnDragLeave() {
 	this.editor._visibleControllers(true);
-	domUtils.removeClass(Figure.__dragCover, 'se-drag-hover');
+	domUtils.removeClass(Figure.__dragCover, 'se-drag-over');
 }
 
 function OnDragStart(e) {

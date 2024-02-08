@@ -19,7 +19,15 @@ const FileUpload = function (editor, pluginOptions) {
 	this._element = null;
 
 	// figure
-	const downloadCustom = { command: 'download', title: this.lang.download, icon: 'download', action: (target) => target.click() };
+	const downloadCustom = {
+		command: 'download',
+		title: this.lang.download,
+		icon: 'download',
+		action: (target) => {
+			const url = target.getAttribute('href');
+			if (url) domUtils.createElement('A', { href: url }, null).click();
+		}
+	};
 	let figureControls = pluginOptions.controls || [['edit', 'align', 'remove', 'download']];
 	figureControls = figureControls.map((subArray) => subArray.map((item) => (item === 'download' ? downloadCustom : item)));
 	this.figure = new Figure(this, figureControls, {});
@@ -133,7 +141,6 @@ FileUpload.prototype = {
 				href: url,
 				title: name,
 				download: name,
-				target: '_blank',
 				'data-se-file-download': '',
 				contenteditable: 'false',
 				'data-se-non-focus': 'true'
@@ -144,7 +151,7 @@ FileUpload.prototype = {
 		this.fileManager.setFileData(a, file);
 
 		const figure = Figure.CreateContainer(a);
-		domUtils.addClass(figure.container, 'se-file-figure se-non-select-figure');
+		domUtils.addClass(figure.container, 'se-file-figure se-non-resize-figure');
 
 		if (!this.component.insert(figure.container, false, !this.options.get('mediaAutoSelect'))) {
 			this.editor.focus();

@@ -2053,7 +2053,7 @@
 	box-shadow: 0 0 0 0.2rem #c7deff;
 }
 
-.sun-editor .sun-editor-editable[contenteditable='true']:not(.se-read-only) figure:not(.se-non-select-figure)::after {
+.sun-editor .sun-editor-editable[contenteditable='true']:not(.se-read-only) figure:not(.se-non-resize-figure)::after {
 	position: absolute;
 	content: '';
 	z-index: 1;
@@ -2091,7 +2091,7 @@
 .sun-editor .sun-editor-editable[contenteditable='true'] figure.se-figure-selected {
 	outline: 2px solid #80bdff;
 }
-.sun-editor .sun-editor-editable[contenteditable='true'] figure.se-figure-selected.se-drag-hover {
+.sun-editor .sun-editor-editable[contenteditable='true'] figure.se-figure-selected.se-drag-over {
 	outline: 2px solid #f0c20a;
 }
 
@@ -3223,6 +3223,8 @@ textarea.se-error:focus {
 	margin: 0 !important;
 	padding: 0 !important;
 }
+
+/* drag cursor */
 .sun-editor.sun-editor-carrier-wrapper .se-drag-cursor {
 	position: absolute;
 	display: block;
@@ -3230,6 +3232,32 @@ textarea.se-error:focus {
 	width: 2px;
 	background-color: #1275ff;
 	z-index: 2147483647;
+}
+.sun-editor.sun-editor-carrier-wrapper .se-drag-cursor::before {
+	content: '';
+	top: -3px;
+	position: absolute;
+	background-color: transparent;
+	width: 0;
+	height: 0;
+	border: 0px solid transparent;
+	margin-right: 0;
+	margin-left: -4px;
+	border-width: 6px 5px 0 5px;
+	border-color: #1275ff transparent transparent transparent;
+}
+.sun-editor.sun-editor-carrier-wrapper .se-drag-cursor::after {
+	content: '';
+	bottom: -3px;
+	position: absolute;
+	background-color: transparent;
+	width: 0;
+	height: 0;
+	border: 0px solid transparent;
+	margin-right: 0;
+	margin-left: -4px;
+	border-width: 0 5px 5px 5px;
+	border-color: transparent transparent #1275ff transparent;
 }
 
 /** animation */

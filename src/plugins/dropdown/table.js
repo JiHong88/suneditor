@@ -260,7 +260,7 @@ Table.prototype = {
 		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
 		oTable.innerHTML = colGroup + body;
 
-		const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure' });
+		const figure = domUtils.createElement('FIGURE', { class: 'se-non-resize-figure' });
 		figure.appendChild(oTable);
 
 		if (this.component.insert(figure, false, false)) {
@@ -291,11 +291,11 @@ Table.prototype = {
 
 				// figure
 				if (!FigureEl) {
-					FigureEl = domUtils.createElement('FIGURE', { class: 'se-non-select-figure' });
+					FigureEl = domUtils.createElement('FIGURE', { class: 'se-non-resize-figure' });
 					element.parentNode.insertBefore(FigureEl, element);
 					FigureEl.appendChild(element);
 				} else {
-					domUtils.addClass(FigureEl, 'se-non-select-figure');
+					domUtils.addClass(FigureEl, 'se-non-resize-figure');
 				}
 
 				// scroll

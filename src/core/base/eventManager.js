@@ -40,8 +40,6 @@ const EventManager = function (editor) {
 	this.__inputPlugin = null;
 	this.__inputBlurEvent = null;
 	this.__inputKeyEvent = null;
-	// drag
-	this.__dragCursor = editor.carrierWrapper.querySelector('.se-drag-cursor');
 };
 
 EventManager.prototype = {
@@ -658,7 +656,7 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this, fc), false);
-		this.addEvent(eventWysiwyg, 'dragover', OnDragOver_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'dragover', OnDragOver_wysiwyg.bind(this, this.editor.carrierWrapper.querySelector('.se-drag-cursor')), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), false);
 		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, fc), false);
@@ -1999,10 +1997,9 @@ function OnCopy_wysiwyg(frameContext, e) {
 	}
 }
 
-function OnDragOver_wysiwyg(frameContext, e) {
+function OnDragOver_wysiwyg(dragCursor, e) {
 	e.preventDefault();
 
-	const dragCursor = this.__dragCursor;
 	const { sc, so, ec, eo } = this.selection.getEventLocationRange(e);
 
 	const cursorRange = this._d.createRange();
@@ -2011,8 +2008,8 @@ function OnDragOver_wysiwyg(frameContext, e) {
 
 	const rect = cursorRange.getBoundingClientRect();
 	dragCursor.style.left = `${rect.right + this._w.scrollX}px`;
-	dragCursor.style.top = `${rect.top + this._w.scrollY}px`;
-	dragCursor.style.height = `${rect.height}px`;
+	dragCursor.style.top = `${rect.top + this._w.scrollY - 5}px`;
+	dragCursor.style.height = `${rect.height + 10}px`;
 }
 
 function OnDrop_wysiwyg(frameContext, e) {
@@ -2132,7 +2129,8 @@ function OnMouseMove_wysiwyg(frameContext, e) {
 	const info = this.component.get(e.target);
 	const lineBreakerStyle = frameContext.get('lineBreaker').style;
 
-	if (info && !domUtils.hasClass(info.cover, 'se-non-select-figure')) {
+	// set line breaker
+	if (info && !domUtils.hasClass(info.cover, 'se-non-resize-figure')) {
 		const container = info.container;
 		if (container && !this.editor.currentControllerName) {
 			let scrollTop = 0;
