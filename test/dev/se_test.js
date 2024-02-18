@@ -432,7 +432,7 @@ window.editor_root = suneditor.create(
 		// codeMirror: {
 		// 	src: Codemirror5
 		// },
-		iframe: false,
+		iframe: true,
 		// defaultLine: 'div',
 		toolbar_sticky: 0,
 		lineAttrReset: 'id',
@@ -466,7 +466,7 @@ window.editor_root = suneditor.create(
 			]
 		},
 		link: {
-			uploadUrl: 'http://localhost:3000/editor/upload'
+			uploadUrl: 'http://localhost:3000/editor/files/upload'
 		},
 		video: {
 			uploadUrl: 'http://localhost:3000/editor/upload',
@@ -501,9 +501,9 @@ window.editor_root = suneditor.create(
 			// showDefaultSizeLabel:true
 		},
 		events: {
-			onFileAction: (data) => {
-				console.log('fileaa', data);
-			},
+			// onFileAction: (data) => {
+			// 	// console.log('fileaa', data);
+			// },
 			onVideoUploadBefore: ({ handler, info, files, file, url }) => {
 				console.log('urlurl', files);
 				return true;
@@ -582,7 +582,7 @@ function loadEvent() {
 }
 
 editor_root.events.onload = () => {
-	loadEvent();
+	// loadEvent();
 };
 
 // editor_root.events.onBlur = (rootKey, e, htmlFrame) => {

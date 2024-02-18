@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 import { Figure } from '../../modules';
 
-const _w = env._w;
+const { _w, ON_OVER_COMPONENT } = env;
 const DIRECTION_KEYCODE = /^(8|3[2-9]|40|46)$/;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const SPACE_DEL_DIR_KEYCODE = /^(8|13|3[2-9]|40|46)$/;
@@ -40,6 +40,8 @@ const EventManager = function (editor) {
 	this.__inputPlugin = null;
 	this.__inputBlurEvent = null;
 	this.__inputKeyEvent = null;
+	// hover
+	this.__overInfo = null;
 };
 
 EventManager.prototype = {
@@ -640,7 +642,8 @@ EventManager.prototype = {
 	},
 
 	_addFrameEvents(fc) {
-		const eventWysiwyg = fc.get('options').get('iframe') ? fc.get('_ww') : fc.get('wysiwyg');
+		const isIframe = fc.get('options').get('iframe');
+		const eventWysiwyg = isIframe ? fc.get('_ww') : fc.get('wysiwyg');
 		fc.set('eventWysiwyg', eventWysiwyg);
 		const codeArea = fc.get('code');
 
@@ -656,7 +659,7 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this, fc), false);
-		this.addEvent(eventWysiwyg, 'dragover', OnDragOver_wysiwyg.bind(this, this.editor.carrierWrapper.querySelector('.se-drag-cursor')), false);
+		this.addEvent(eventWysiwyg, 'dragover', OnDragOver_wysiwyg.bind(this, this.editor.carrierWrapper.querySelector('.se-drag-cursor'), isIframe ? this.editor.frameContext.get('topArea') : null), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), false);
 		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, fc), false);
@@ -666,14 +669,13 @@ EventManager.prototype = {
 		/** line breaker */
 		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this, fc), false);
 		this.addEvent(
-			[fc.get('lineBreaker').querySelector('button'), fc.get('lineBreaker_t'), fc.get('lineBreaker_b')],
+			[fc.get('lineBreaker_t'), fc.get('lineBreaker_b')],
 			'mousedown',
-			function (e) {
+			(e) => {
 				e.preventDefault();
 			},
 			false
 		);
-		this.addEvent(fc.get('lineBreaker').querySelector('button'), 'click', DisplayLineBreak.bind(this, ''), false);
 		this.addEvent(fc.get('lineBreaker_t'), 'mousedown', DisplayLineBreak.bind(this, 't'), false);
 		this.addEvent(fc.get('lineBreaker_b'), 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
 
@@ -853,6 +855,22 @@ EventManager.prototype = {
 			if (eventPlugins[i](e) === false) return false;
 		}
 	},
+
+	_overComponentSelect(target) {
+		const figure = domUtils.getParentElement(target, domUtils.isFigure);
+		if (figure) {
+			const info = this.component.get(figure);
+			if (info && domUtils.isFigure(info.cover) && !domUtils.hasClass(info.cover, 'se-figure-selected')) {
+				this.editor._offCurrentController();
+				this.__overInfo = ON_OVER_COMPONENT;
+				this.component.select(info.target, info.pluginName, false);
+			}
+		} else if (this.__overInfo !== null && !domUtils.hasClass(target, 'se-drag-handle')) {
+			this.component.deselect();
+			this.__overInfo = null;
+		}
+	},
+
 	__removeInput() {
 		this._inputFocus = this.editor._antiBlur = false;
 		this.__inputBlurEvent = this.removeEvent(this.__inputBlurEvent);
@@ -1015,13 +1033,11 @@ function OnClick_wysiwyg(frameContext, e) {
 	// plugin event
 	if (this._callPluginEvent('onClick', { frameContext, event: e }) === false) return;
 
-	const fileComponentInfo = this.component.get(targetElement);
-	if (fileComponentInfo) {
+	const componentInfo = this.component.get(targetElement);
+	if (componentInfo) {
 		e.preventDefault();
-		this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false);
+		this.component.select(componentInfo.target, componentInfo.pluginName, false);
 		return;
-	} else {
-		this.component.currentTarget = null;
 	}
 
 	this.selection._init();
@@ -1842,6 +1858,8 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 		this.applyTagEffect();
 	}
 
+	if (keyCode === 13) this.html.scrollTo(range);
+
 	// next component
 	if (!DIR_KEYCODE.test(keyCode)) return;
 
@@ -1997,7 +2015,7 @@ function OnCopy_wysiwyg(frameContext, e) {
 	}
 }
 
-function OnDragOver_wysiwyg(dragCursor, e) {
+function OnDragOver_wysiwyg(dragCursor, _iframe, e) {
 	e.preventDefault();
 
 	const { sc, so, ec, eo } = this.selection.getEventLocationRange(e);
@@ -2006,10 +2024,22 @@ function OnDragOver_wysiwyg(dragCursor, e) {
 	cursorRange.setStart(sc, so);
 	cursorRange.setEnd(ec, eo);
 
+	const _offset = { y: 0, x: 0 };
+	if (_iframe) {
+		const iframeOffset = this.offset.getGlobal(this.editor.frameContext.get('topArea'));
+		_offset.y = iframeOffset.top - this._w.scrollY;
+		_offset.x = iframeOffset.left - this._w.scrollX;
+	}
+
 	const rect = cursorRange.getBoundingClientRect();
-	dragCursor.style.left = `${rect.right + this._w.scrollX}px`;
-	dragCursor.style.top = `${rect.top + this._w.scrollY - 5}px`;
-	dragCursor.style.height = `${rect.height + 10}px`;
+	if (rect.height > 0) {
+		dragCursor.style.left = `${rect.right + this._w.scrollX + _offset.x}px`;
+		dragCursor.style.top = `${rect.top + this._w.scrollY + _offset.y - 5}px`;
+		dragCursor.style.height = `${rect.height + 10}px`;
+		dragCursor.style.display = 'block';
+	} else {
+		dragCursor.style.display = 'none';
+	}
 }
 
 function OnDrop_wysiwyg(frameContext, e) {
@@ -2025,15 +2055,16 @@ function OnDrop_wysiwyg(frameContext, e) {
 	const { sc, so, ec, eo } = this.selection.getEventLocationRange(e);
 
 	if (Figure.__dragContainer) {
+		e.preventDefault();
+		const dragContainer = Figure.__dragContainer;
+		this.component.deselect();
 		this.selection.setRange(sc, so, ec, eo);
-		this.html.insertNode(Figure.__dragContainer, null, true);
-		this.component.select(Figure.__dragTarget, Figure.__dragPluginName, false);
-		Figure.prototype._removeDragEvent.call(this.editor);
+		this.html.insertNode(dragContainer, null, true);
+		return;
 	}
 
 	this.html.remove();
 	this.selection.setRange(sc, so, ec, eo);
-	Figure.prototype._removeDragEvent.call(this.editor);
 	return this._dataTransferAction('drop', e, dataTransfer, frameContext);
 }
 
@@ -2126,53 +2157,9 @@ function OnBlur_wysiwyg(frameContext, e) {
 function OnMouseMove_wysiwyg(frameContext, e) {
 	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return false;
 
-	const info = this.component.get(e.target);
-	const lineBreakerStyle = frameContext.get('lineBreaker').style;
-
-	// set line breaker
-	if (info && !domUtils.hasClass(info.cover, 'se-non-resize-figure')) {
-		const container = info.container;
-		if (container && !this.editor.currentControllerName) {
-			let scrollTop = 0;
-			let el = frameContext.get('wysiwyg');
-			do {
-				scrollTop += el.scrollTop;
-				el = el.parentElement;
-			} while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
-
-			const toolbarH = this.editor.isClassic && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0;
-			const wScroll = frameContext.get('wysiwyg').scrollTop;
-			const offsets = this.offset.getGlobal(frameContext.get('topArea'));
-			const componentTop = this.offset.get(container).top + wScroll - toolbarH;
-			const y = e.pageY + scrollTop + (this.editor.frameOptions.get('iframe') && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0);
-			const c = componentTop + (this.editor.frameOptions.get('iframe') ? scrollTop : offsets.top);
-
-			const isList = domUtils.isListCell(container.parentNode);
-			let dir = '',
-				top = '';
-			if ((isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) && y < c + toolbarH + 20) {
-				top = componentTop - 1;
-				dir = 't';
-			} else if ((isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) && y > c + container.offsetHeight + toolbarH - 20) {
-				top = componentTop + container.offsetHeight - 1;
-				dir = 'b';
-			} else {
-				lineBreakerStyle.display = 'none';
-				return;
-			}
-
-			this._lineBreakComp = container;
-			this._lineBreakDir = dir;
-			lineBreakerStyle.top = top - wScroll + 'px';
-			this.editor._lineBreakerButton.style.left = this.offset.get(container).left + container.offsetWidth / 2 - 15 + 'px';
-			lineBreakerStyle.display = 'block';
-
-			return;
-		}
-	}
-
-	if (lineBreakerStyle.display !== 'none') {
-		lineBreakerStyle.display = 'none';
+	// over component
+	if (this.__overInfo !== false) {
+		this._overComponentSelect(e.target);
 	}
 
 	this._callPluginEvent('onMouseMove', { frameContext, event: e });
@@ -2215,8 +2202,6 @@ function DisplayLineBreak(dir, e) {
 	if (this.editor.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
-	this.editor.frameContext.get('lineBreaker').style.display = 'none';
-
 	this.component.deselect();
 
 	const focusEl = isList ? format : format.firstChild;

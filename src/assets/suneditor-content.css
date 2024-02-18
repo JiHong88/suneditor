@@ -458,7 +458,7 @@
 	padding: 1em;
 	outline: 1px solid #bbb;
 }
-.sun-editor-editable .se-component.se-file-figure > figure::before {
+.sun-editor-editable .se-component.se-file-figure > figure > a::before {
 	content: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIwLDE4SDRWOEgyME0yMCw2SDEyTDEwLDRINEMyLjg5LDQgMiw0Ljg5IDIsNlYxOEEyLDIgMCAwLDAgNCwyMEgyMEEyLDIgMCAwLDAgMjIsMThWOEMyMiw2Ljg5IDIxLjEsNiAyMCw2WiIgLz48L3N2Zz4=');
 	display: inline-block;
 	width: 1.5em;
@@ -514,8 +514,11 @@
 .sun-editor-editable figure {
 	display: block;
 	outline: none;
-	padding: 0;
+	padding: 1px;
 	margin: 0;
+}
+.sun-editor-editable .se-component figure {
+	padding: 0;
 }
 
 .sun-editor-editable figure.se-non-resize-figure {
@@ -524,18 +527,13 @@
 
 .sun-editor-editable figure.se-scroll-figure-x {
 	overflow-x: auto;
-	padding-left: 1px;
-	padding-right: 1px;
 }
 .sun-editor-editable figure.se-scroll-figure-y {
 	overflow-y: auto;
-	padding-top: 1px;
-	padding-bottom: 1px;
 }
 .sun-editor-editable figure.se-scroll-figure-xy {
 	overflow-x: auto;
 	overflow-y: auto;
-	padding: 1px;
 }
 
 .sun-editor-editable .__se__float-left figure,

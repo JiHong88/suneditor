@@ -50,6 +50,7 @@ const SelectMenu = function (inst, params) {
 
 SelectMenu.prototype = {
 	create(items, menus) {
+		this.form.firstElementChild.innerHTML = '';
 		menus = menus || items;
 		let html = '';
 		for (let i = 0, len = menus.length; i < len; i++) {
@@ -175,7 +176,7 @@ SelectMenu.prototype = {
 		}
 
 		// set top position
-		const globalTarget = this.editor.offset.getGlobal(target);
+		const globalTarget = this.editor.offset.get(target);
 		const targetOffsetTop = target.offsetTop;
 		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;

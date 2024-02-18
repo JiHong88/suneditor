@@ -168,11 +168,9 @@ const Constructor = function (editorTargets, options) {
 		let textarea = initElements.codeView;
 
 		// line breaker
-		const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker', title: lang.insertLine }, '<button class="se-btn">' + icons.line_break + '</button>');
 		const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t', title: lang.insertLine }, icons.line_break);
 		const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b', title: lang.insertLine }, icons.line_break);
 
-		editor_div.appendChild(line_breaker);
 		editor_div.appendChild(line_breaker_t);
 		editor_div.appendChild(line_breaker_b);
 

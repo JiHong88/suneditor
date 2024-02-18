@@ -1,6 +1,8 @@
 import EditorInjector from '../editorInjector';
 import { Controller, SelectMenu } from '../modules';
-import { domUtils, numbers } from '../helper';
+import { domUtils, numbers, env } from '../helper';
+
+const { ON_OVER_COMPONENT } = env;
 
 const Figure = function (inst, controls, params) {
 	EditorInjector.call(this, inst.editor);
@@ -100,9 +102,7 @@ Figure.__figureControllerInst = null;
 Figure.__dragHandler = null;
 Figure.__dragContainer = null;
 Figure.__dragCover = null;
-Figure.__dragTarget = null;
 Figure.__dragMove = null;
-Figure.__dragPluginName = '';
 
 /**
  * @description Create a container for the resizing component and insert the element.
@@ -219,7 +219,12 @@ Figure.prototype = {
 	},
 
 	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
-		this.editor._offCurrentController();
+		if (this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
+			this.editor._offCurrentController();
+		} else {
+			nonBorder = true;
+		}
+
 		const figureInfo = Figure.GetContainer(target);
 		if (!figureInfo.container) return { container: null, cover: null };
 
@@ -281,10 +286,6 @@ Figure.prototype = {
 			notInCarrier: true
 		});
 
-		const size = this.getSize(target);
-		domUtils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.w + ', ' + size.h + ')');
-		this._displayResizeHandles(!nonResizing);
-
 		// percentage active
 		const value = /%$/.test(target.style.width) && /%$/.test(figureInfo.container.style.width) ? numbers.get(figureInfo.container.style.width, 0) / 100 + '' : '';
 		for (let i = 0, len = this.percentageButtons.length; i < len; i++) {
@@ -307,10 +308,23 @@ Figure.prototype = {
 		_figure.display.style.display = nonSizeInfo ? 'none' : '';
 		_figure.border.style.display = nonBorder ? 'none' : '';
 		_figure.main.style.display = 'block';
-		this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
+
+		if (this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
+			this.editor._visibleControllers(true);
+			// size
+			const size = this.getSize(target);
+			domUtils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.w + ', ' + size.h + ')');
+			this._displayResizeHandles(!nonResizing);
+			// selecte
+			domUtils.removeClass(this._cover, 'se-figure-over-selected');
+			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
+			this._w.setTimeout(() => (this.eventManager.__overInfo = false));
+		} else {
+			domUtils.addClass(this._cover, 'se-figure-over-selected');
+		}
 
 		// set members
-		this._w.setTimeout(domUtils.addClass.bind(null, this._cover, 'se-figure-selected'));
+		domUtils.addClass(this._cover, 'se-figure-selected');
 		this._element_w = this._resize_w = w;
 		this._element_h = this._resize_h = h;
 		this._element_l = l;
@@ -739,8 +753,6 @@ Figure.prototype = {
 		Figure.__dragHandler = dragHandle;
 		Figure.__dragContainer = this._container;
 		Figure.__dragCover = this._cover;
-		Figure.__dragTarget = this._element;
-		Figure.__dragPluginName = this.kind;
 		Figure.__dragMove = OnScrollDragHandler.bind(this, dragHandle, figureMain);
 
 		Figure.__dragMove();
@@ -752,7 +764,8 @@ Figure.prototype = {
 		domUtils.removeClass(Figure.__dragHandler, 'se-dragging');
 		domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
 		domUtils.removeClass(Figure.__dragCover, 'se-drag-over');
-		Figure.__dragPluginName = Figure.__dragTarget = Figure.__dragContainer = Figure.__dragHandler = Figure.__dragMove = null;
+		Figure.__dragHandler = Figure.__dragContainer = Figure.__dragCover = Figure.__dragMove = null;
+		this.eventManager.__overInfo = undefined;
 	},
 
 	constructor: Figure
@@ -761,40 +774,40 @@ Figure.prototype = {
 function OnScrollDragHandler(dragHandle, figureMain) {
 	const offset = this.offset.get(figureMain);
 	dragHandle.style.display = 'block';
-	dragHandle.style.left = offset.left + figureMain.offsetWidth - dragHandle.offsetWidth * 1.5 + 'px';
-	dragHandle.style.top = offset.top - dragHandle.offsetHeight - 2 + 'px';
+	dragHandle.style.left = offset.left + (this.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
+	dragHandle.style.top = offset.top - dragHandle.offsetHeight + 'px';
 }
 
 function OnDragEnter() {
+	this.editor._antiBlur = true;
 	this.editor._visibleControllers(false);
 	domUtils.addClass(Figure.__dragCover, 'se-drag-over');
 }
 
 function OnDragLeave() {
+	this.editor._antiBlur = false;
 	this.editor._visibleControllers(true);
 	domUtils.removeClass(Figure.__dragCover, 'se-drag-over');
 }
 
 function OnDragStart(e) {
-	const container = this._container || Figure.__figureControllerInst._container;
-	const cover = this._cover || Figure.__figureControllerInst._cover || container;
+	const cover = Figure.__dragCover || Figure.__dragContainer;
 
 	if (!cover) {
 		e.preventDefault();
 		return;
 	}
 
+	this.editor._antiBlur = false;
 	domUtils.addClass(Figure.__dragHandler, 'se-dragging');
 	domUtils.addClass(Figure.__dragContainer, 'se-dragging');
 	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
-	this.editor._offCurrentController();
 }
 
 function OnDragEnd() {
+	this.editor._antiBlur = false;
 	domUtils.removeClass(Figure.__dragHandler, 'se-dragging');
 	domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
-	this.component.select(Figure.__dragTarget, Figure.__dragPluginName, false);
-	this.editor._visibleControllers(true);
 	this._removeDragEvent();
 }
 

@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { domUtils, numbers, converter, env } from '../../helper';
 import { Controller, SelectMenu, ColorPicker, Figure } from '../../modules';
 
-const { _w } = env;
+const { _w, ON_OVER_COMPONENT } = env;
 
 const ROW_SELECT_MARGIN = 5;
 const CELL_SELECT_MARGIN = 2;
@@ -389,7 +389,7 @@ Table.prototype = {
 				}
 
 				const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
-				this._startCellResizing(col, cellEdge.startX, numbers.get(env._w.getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
+				this._startCellResizing(col, cellEdge.startX, numbers.get(_w.getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
 				this.__removeGlobalEvents();
@@ -418,7 +418,7 @@ Table.prototype = {
 				if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
 				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
 
-				this._startRowResizing(row, rowEdge.startY, numbers.get(env._w.getComputedStyle(row).height, CELL_DECIMAL_END));
+				this._startRowResizing(row, rowEdge.startY, numbers.get(_w.getComputedStyle(row).height, CELL_DECIMAL_END));
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
 				this.__removeGlobalEvents();
@@ -745,8 +745,9 @@ Table.prototype = {
 			if (this._tdElement !== tdElement) {
 				this._tdElement = tdElement;
 				this._trElement = tdElement.parentNode;
-				if (!this._selectedCells || this._selectedCells.length === 0) this._selectedCells = [tdElement];
 			}
+
+			if (!this._selectedCells || this._selectedCells.length === 0) this._selectedCells = [tdElement];
 
 			const rows = (this._trElements = table.rows);
 			const cellIndex = tdElement.cellIndex;
@@ -1367,6 +1368,9 @@ Table.prototype = {
 		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
 		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
 
+		if (this.eventManager.__overInfo === ON_OVER_COMPONENT) return;
+
+		if (!this._tdElement) return;
 		this.setCellInfo(this._tdElement, this._shift);
 
 		// controller open
@@ -1554,7 +1558,7 @@ Table.prototype = {
 		if (!targets || targets.length === 0) return;
 
 		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
-		const { border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = env._w.getComputedStyle(targets[0]);
+		const { border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = _w.getComputedStyle(targets[0]);
 		const cellBorder = this._getBorderStyle(border);
 
 		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
@@ -1682,7 +1686,7 @@ Table.prototype = {
 			const isTable = this.controller_props.currentTarget === this.controller_table.form;
 			const targets = isTable ? [this._element] : this._selectedCells;
 			const tr = targets[0];
-			const trStyles = env._w.getComputedStyle(tr);
+			const trStyles = _w.getComputedStyle(tr);
 			const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment } = this.propTargets;
 
 			const borderFormat = border_format.getAttribute('se-border-format') || '';
@@ -2065,7 +2069,7 @@ function IsResizeEls(node) {
 
 function CheckCellEdge(event, tableCell) {
 	const startX = event.clientX;
-	const startWidth = numbers.get(env._w.getComputedStyle(tableCell).width, CELL_DECIMAL_END);
+	const startWidth = numbers.get(_w.getComputedStyle(tableCell).width, CELL_DECIMAL_END);
 	const rect = tableCell.getBoundingClientRect();
 	const offsetX = _w.Math.round(startX - rect.left);
 	const isLeft = offsetX <= CELL_SELECT_MARGIN;
@@ -2080,7 +2084,7 @@ function CheckCellEdge(event, tableCell) {
 
 function CheckRowEdge(event, tableCell) {
 	const startY = event.clientY;
-	const startHeight = numbers.get(env._w.getComputedStyle(tableCell).height, CELL_DECIMAL_END);
+	const startHeight = numbers.get(_w.getComputedStyle(tableCell).height, CELL_DECIMAL_END);
 	const rect = tableCell.getBoundingClientRect();
 	const is = _w.Math.ceil(startHeight + rect.top - startY) <= ROW_SELECT_MARGIN;
 

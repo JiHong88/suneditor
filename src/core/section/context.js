@@ -24,7 +24,6 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeWrap
 		['codeWrapper', codeWrapper],
 		['code', codeFrame],
 		['codeNumbers', codeWrapper?.querySelector('.se-code-view-line')],
-		['lineBreaker', top.querySelector('.se-line-breaker')],
 		['lineBreaker_t', top.querySelector('.se-line-breaker-component-t')],
 		['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],
 		['_stickyDummy', top.querySelector('.se-toolbar-sticky-dummy')],

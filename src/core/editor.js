@@ -44,6 +44,8 @@ const Editor = function (multiTargets, options) {
 	this.context = product.context;
 	this.frameContext = new Map();
 	this.frameOptions = new Map();
+	this._lineBreaker_t = null;
+	this._lineBreaker_b = null;
 
 	/**
 	 * @description Document object
@@ -1021,7 +1023,6 @@ Editor.prototype = {
 		this.frameContext = rt;
 		this.frameOptions = rt.get('options');
 		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
-		this._lineBreakerButton = rt.get('lineBreaker').querySelector('button');
 		this._lineBreaker_t = rt.get('lineBreaker_t');
 		this._lineBreaker_b = rt.get('lineBreaker_b');
 	},

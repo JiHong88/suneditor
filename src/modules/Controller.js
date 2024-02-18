@@ -281,7 +281,6 @@ function CloseListener_keydown(e) {
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	if (ctrl || !NON_RESPONSE_KEYCODE.test(keyCode)) return;
 
-	this.editor.frameContext.get('lineBreaker').style.display = 'none';
 	if (this.form.contains(e.target) || this._checkForm(e.target)) return;
 	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
 

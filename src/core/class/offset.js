@@ -3,8 +3,8 @@
  */
 
 import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getViewportSize } from '../../helper/domUtils';
-import { numbers } from '../../helper';
-import { _w } from '../../helper/env';
+import { domUtils, numbers } from '../../helper';
+import { _w, _d } from '../../helper/env';
 
 const Offset = function (editor) {
 	this.editor = editor;
@@ -206,7 +206,7 @@ Offset.prototype = {
 		oh = heightEditorRefer ? topArea.clientHeight : oh;
 		ow = widthEditorRefer ? topArea.clientWidth : ow;
 
-		const viewportSize = getViewportSize();
+		const viewportSize = getViewportSize(this.editor.frameContext.get('_wd'));
 		return {
 			top: t,
 			ts: ts,
@@ -230,14 +230,17 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean}}
 	 */
 	getWWScroll() {
-		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
+		const eventWysiwyg = this.editor.frameContext.get('wysiwyg');
 		const rects = this.editor.selection.getRects(eventWysiwyg, 'start').rects;
+		const top = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
+		const height = eventWysiwyg.scrollHeight || 0;
 
 		return {
-			top: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0,
+			top,
 			left: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
 			width: eventWysiwyg.scrollWidth || 0,
-			height: eventWysiwyg.scrollHeight || 0,
+			height,
+			bottom: top + height,
 			rects
 		};
 	},
@@ -286,7 +289,7 @@ Offset.prototype = {
 			offsetEl = offsetEl.offsetParent;
 		}
 
-		const menuHeight_bottom = getViewportSize().h - (containerTop - scrollTop + bt + target.offsetHeight);
+		const menuHeight_bottom = getViewportSize(this.editor.frameContext.get('_wd')).h - (containerTop - scrollTop + bt + target.offsetHeight);
 		if (menuHeight_bottom < elHeight) {
 			let menuTop = -1 * (elHeight - bt + 3);
 			const insTop = containerTop - scrollTop + menuTop;
@@ -324,11 +327,13 @@ Offset.prototype = {
 		}
 
 		const isWWTarget = this.editor.frameContext.get('wrapper').contains(target) || params.isWWTarget;
-		const viewportSize = getViewportSize();
-		const wwScroll = isWWTarget ? this.getWWScroll() : this._getWindowScroll();
-		const targetRect = this.editor.selection.getRects(target, 'start').rects;
+		const isCtrlTarget = domUtils.getParentElement(target, '.se-controller');
+		const viewportSize = getViewportSize(_d);
+		const wwScroll = isWWTarget && !isCtrlTarget ? this.getWWScroll() : this._getWindowScroll();
+		const targetRect = isCtrlTarget ? target.getBoundingClientRect() : this.editor.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
+		const isIframe = isWWTarget && !isCtrlTarget && this.editor.frameOptions.get('iframe');
 
 		// top ----------------------------------------------------------------------------------------------------
 		const ah = arrow ? arrow.offsetHeight : 0;
@@ -345,8 +350,19 @@ Offset.prototype = {
 		} else {
 			const tMargin = targetRect.top;
 			const bMargin = viewportSize.h - targetRect.bottom;
-			rmt = targetRect.top - wwScroll.rects.top;
-			rmb = wwScroll.rects.bottom - targetRect.bottom;
+
+			if (isIframe) {
+				const editorOffset = this.getGlobal();
+				const editorScroll = this.getGlobalScroll();
+				const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
+				const editorH = this.editor.frameContext.get('topArea').offsetHeight;
+				rmt = targetRect.top - emt;
+				rmb = bMargin - (editorScroll.oh - (editorH + emt) + (this.editor.frameContext.get('statusbar')?.offsetHeight || 0));
+			} else {
+				rmt = targetRect.top - wwScroll.rects.top;
+				rmb = wwScroll.rects.bottom - targetRect.bottom;
+			}
+
 			// display margin
 			rmt = rmt > 0 ? tMargin : rmt;
 			rmb = rmb > 0 ? bMargin : rmb;

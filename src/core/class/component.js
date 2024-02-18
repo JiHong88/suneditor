@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env, numbers } from '../../helper';
 import Figure from '../../modules/Figure';
 
-const { _w } = env;
+const { _w, ON_OVER_COMPONENT } = env;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DIR_UP_KEYCODE = /^3[7-8]$/;
 
@@ -145,36 +145,35 @@ Component.prototype = {
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
 
-		if (!isInput) {
+		if (!isInput && this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
 			this.editor._antiBlur = true;
 			this.selection.setRange(info.container, 0, info.container, 0);
 			this.editor.blur();
 		}
 
 		this.isSelected = true;
+		_w.setTimeout(() => (this.eventManager.__overInfo = undefined));
 
-		this._w.setTimeout(
-			() => {
-				if (typeof plugin.select === 'function') plugin.select(element);
-				this._setComponentLineBreaker(info.container || info.cover || element);
-				this.__addGlobalEvent();
-				if (!this.info.isFile) this.__addNotFileGlobalEvent();
-				this.currentTarget = element;
-				this.currentPlugin = plugin;
-				this.currentPluginName = pluginName;
-				this.currentInfo = info;
-				domUtils.addClass(info.container, 'se-component-selected');
-			},
-			this.editor.frameOptions.get('iframe') ? 100 : 0
-		);
+		if (typeof plugin.select === 'function') plugin.select(element);
+
+		this._setComponentLineBreaker(info.container || info.cover || element);
+		this.__addGlobalEvent();
+		if (!this.info.isFile) this.__addNotFileGlobalEvent();
+		this.currentTarget = element;
+		this.currentPlugin = plugin;
+		this.currentPluginName = pluginName;
+		this.currentInfo = info;
+		domUtils.addClass(info.container, 'se-component-selected');
 	},
 
 	deselect() {
 		this.editor._antiBlur = false;
+		this.eventManager.__overInfo = null;
+		Figure.prototype._removeDragEvent.call(this);
 		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected');
 
 		const { frameContext } = this.editor;
-		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = frameContext.get('lineBreaker').style.display = 'none';
+		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = 'none';
 
 		if (this.currentPlugin && typeof this.currentPlugin.deselect === 'function') {
 			this.currentPlugin.deselect(this.currentTarget);
@@ -217,7 +216,6 @@ Component.prototype = {
 		this.eventManager._lineBreakComp = null;
 		const fc = this.editor.frameContext;
 		const wysiwyg = fc.get('wysiwyg');
-		fc.get('lineBreaker').style.display = 'none';
 
 		const info = this.get(element);
 		if (!info) return;
@@ -237,14 +235,15 @@ Component.prototype = {
 
 		// top
 		let componentTop, w;
-		const dir = this.options.get('_rtl') ? ['right', 'left'] : ['left', 'right'];
+		const isRtl = this.options.get('_rtl');
+		const dir = isRtl ? ['right', 'left'] : ['left', 'right'];
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
 			const tH = numbers.get(_w.getComputedStyle(lb_t).height, 1);
 			this.eventManager._lineBreakComp = container;
 			componentTop = this.offset.get(offsetTarget).top + yScroll;
 			w = target.offsetWidth / 2 / 2;
 			t_style.top = componentTop - yScroll - toolbarH - tH / 2 + 'px';
-			t_style[dir[0]] = (isNonSelected ? 0 : this.offset.get(target).left + w) + 'px';
+			t_style[dir[0]] = (isNonSelected ? 4 : this.offset.get(target).left + w) + 'px';
 			t_style[dir[1]] = '';
 			lb_t.setAttribute('data-offset', yScroll + ',' + wScroll);
 			t_style.display = 'block';
@@ -266,7 +265,7 @@ Component.prototype = {
 
 			b_style.top = componentTop + target.offsetHeight - yScroll - toolbarH - bH / 2 + 'px';
 			b_style.right = '';
-			b_style.left = this.offset.get(target).left + target.offsetWidth - (isNonSelected ? 0 : w) - (isNonSelected ? bW / 2 : bW) + 'px';
+			b_style.left = this.offset.get(target).left + (isRtl ? 0 : target.offsetWidth) - (isNonSelected ? 0 : w) - (isNonSelected ? bW / 2 : bW) + 'px';
 
 			const bDir = 'left';
 			lb_b.setAttribute('data-offset', yScroll + ',' + bDir + ',' + wScroll);

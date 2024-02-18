@@ -803,7 +803,7 @@ export function isEdgePoint(container, offset, dir) {
  * @returns {boolean}
  */
 export function isWysiwygFrame(element) {
-	return element?.nodeType === 1 && (hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName));
+	return element?.nodeType === 1 && (hasClass(element, 'se-wrapper-wysiwyg|sun-editor-carrier-wrapper') || /^BODY$/i.test(element.nodeName));
 }
 
 /**
@@ -978,12 +978,13 @@ export function getScrollParent(element) {
 
 /**
  * @description Gets the size of the window viewport excluding the width of the scrollbar.
+ * @param {Document} _d Document object
  * @returns {{w, h}}
  */
-export function getViewportSize() {
+export function getViewportSize(_d = document) {
 	return {
-		w: document.documentElement.clientWidth,
-		h: document.documentElement.clientHeight
+		w: _d.documentElement.clientWidth,
+		h: _d.documentElement.clientHeight
 	};
 }
 

@@ -2,6 +2,7 @@ export const _w = window;
 export const _d = document;
 
 export const NO_EVENT = Symbol('noEventHandler');
+export const ON_OVER_COMPONENT = Symbol('onOverComponent');
 
 const userAgent = _w.navigator.userAgent.toLowerCase();
 
@@ -216,6 +217,7 @@ const env = {
 	_w,
 	_d,
 	NO_EVENT,
+	ON_OVER_COMPONENT,
 	getValues,
 	camelToKebabCase,
 	kebabToCamelCase,

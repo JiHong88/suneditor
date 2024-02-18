@@ -161,19 +161,19 @@ Selection.prototype = {
 
 	/**
 	 * @description  Get hte clientRects object.
-	 * @param {Range|Element|null} range Range object
+	 * @param {Range|Element|null} target Range object | Element | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
 	 * @returns
 	 */
-	getRects(range, position) {
-		const targetAbs = range?.nodeType === 1 ? this._w.getComputedStyle(range).position === 'absolute' : false;
-		range = range || this.getRange();
+	getRects(target, position) {
+		const targetAbs = target?.nodeType === 1 ? this._w.getComputedStyle(target).position === 'absolute' : false;
+		target = target || this.getRange();
 		const globalScroll = this.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
 		let scrollLeft = globalScroll.left;
 		let scrollTop = globalScroll.top;
 
-		let rects = range.getClientRects();
+		let rects = target.getClientRects();
 		rects = rects[isStartPosition ? 0 : rects.length - 1];
 
 		if (!rects) {
@@ -234,7 +234,8 @@ Selection.prototype = {
 			ec = e.rangeParent;
 			eo = e.rangeOffset;
 		} else if (this.editor.frameContext.get('_wd').caretRangeFromPoint) {
-			const r = this.editor.frameContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
+			let r = this.editor.frameContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
+			if (!r) r = this.selection.getRange();
 			sc = r.startContainer;
 			so = r.startOffset;
 			ec = r.endContainer;

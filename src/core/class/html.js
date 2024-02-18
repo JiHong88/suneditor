@@ -266,7 +266,7 @@ HTML.prototype = {
 			ref = ref.getRangeAt(0);
 		} else if (ref instanceof Node) {
 			ref = this.selection.setRange(ref, 1, ref, 1);
-		} else if (!(ref instanceof Range)) {
+		} else if (typeof ref?.startContainer === 'undefined') {
 			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
 		}
 
@@ -275,7 +275,7 @@ HTML.prototype = {
 
 		if (isVisible) return;
 
-		ref.startContainer?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
+		ref.startContainer?.scrollIntoView?.({ behavior: 'auto', block: 'nearest' });
 	},
 
 	/**
