@@ -157,7 +157,7 @@ Component.prototype = {
 		if (typeof plugin.select === 'function') plugin.select(element);
 
 		this._setComponentLineBreaker(info.container || info.cover || element);
-		this.__addGlobalEvent();
+		if (this.eventManager.__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
 		if (!this.info.isFile) this.__addNotFileGlobalEvent();
 		this.currentTarget = element;
 		this.currentPlugin = plugin;

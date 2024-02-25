@@ -1,5 +1,6 @@
 import CoreInjector from '../editorInjector/_core';
-import { domUtils, env } from '../helper';
+import { domUtils } from '../helper';
+import ApiManager from './ApiManager';
 
 /**
  * @param {*} inst
@@ -39,13 +40,14 @@ const FileBrowser = function (inst, params) {
 
 	this.items = [];
 	this.selectedTags = [];
-	this._xhr = null;
 	this._closeSignal = false;
 	this._bindClose = null;
 	this.__globalEventHandler = (e) => {
 		if (!/27/.test(e.keyCode)) return;
 		this.close();
 	};
+	// api manager
+	this.apiManager = new ApiManager(this, { method: 'GET' });
 
 	// init
 	browserFrame.appendChild(domUtils.createElement('DIV', { class: 'se-file-browser-back' }));
@@ -85,7 +87,7 @@ FileBrowser.prototype = {
 	 */
 	close() {
 		this.__removeGlobalEvent();
-		if (this._xhr) this._xhr.abort();
+		this.apiManager.cancel();
 
 		this.area.style.display = 'none';
 		this.selectedTags = [];
@@ -110,17 +112,7 @@ FileBrowser.prototype = {
 	},
 
 	_drawFileList(url, urlHeader) {
-		const xhr = (this._xhr = env.getXMLHttpRequest());
-
-		xhr.onreadystatechange = CallBackGet.bind(this, xhr);
-		xhr.open('get', url, true);
-		if (urlHeader !== null && typeof urlHeader === 'object' && Object.keys(urlHeader).length > 0) {
-			for (let key in urlHeader) {
-				xhr.setRequestHeader(key, urlHeader[key]);
-			}
-		}
-		xhr.send(null);
-
+		this.apiManager.call('GET', url, urlHeader, null, CallBackGet.bind(this), CallBackError.bind(this));
 		this.showBrowserLoading();
 	},
 
@@ -180,31 +172,24 @@ FileBrowser.prototype = {
 };
 
 function CallBackGet(xmlHttp) {
-	if (xmlHttp.readyState === 4) {
-		this._xhr = null;
-		if (xmlHttp.status === 200) {
-			try {
-				const res = JSON.parse(xmlHttp.responseText);
-				if (res.result.length > 0) {
-					this._drawListItem(res.result, true);
-				} else if (res.nullMessage) {
-					this.list.innerHTML = res.nullMessage;
-				}
-			} catch (e) {
-				throw Error(`[SUNEDITOR.fileBrowser.drawList.fail] cause: "${e.message}"`);
-			} finally {
-				this.closeBrowserLoading();
-				this.body.style.maxHeight = this._w.innerHeight - this.header.offsetHeight - 50 + 'px';
-			}
-		} else {
-			// exception
-			this.closeBrowserLoading();
-			if (xmlHttp.status !== 0) {
-				const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
-				throw Error(`[SUNEDITOR.fileBrowser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`);
-			}
+	try {
+		const res = JSON.parse(xmlHttp.responseText);
+		if (res.result.length > 0) {
+			this._drawListItem(res.result, true);
+		} else if (res.nullMessage) {
+			this.list.innerHTML = res.nullMessage;
 		}
+	} catch (e) {
+		throw Error(`[SUNEDITOR.fileBrowser.drawList.fail] cause: "${e.message}"`);
+	} finally {
+		this.closeBrowserLoading();
+		this.body.style.maxHeight = this._w.innerHeight - this.header.offsetHeight - 50 + 'px';
 	}
+}
+
+function CallBackError(res, xmlHttp) {
+	this.closeBrowserLoading();
+	throw Error(`[SUNEDITOR.fileBrowser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`);
 }
 
 function OnClickTag(e) {

@@ -195,7 +195,7 @@ const bb = [
 	['imageGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
-	['save', 'template', 'layout', 'fileUpload']
+	['save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention'],
 ];
 
 const begContent = `
@@ -432,12 +432,12 @@ window.editor_root = suneditor.create(
 		// codeMirror: {
 		// 	src: Codemirror5
 		// },
-		iframe: true,
+		// iframe: true,
 		// defaultLine: 'div',
 		toolbar_sticky: 0,
 		lineAttrReset: 'id',
 		height: '400px',
-		buttonList: bl,
+		buttonList: bb,
 		subToolbar: {
 			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
 			width: 'auto',

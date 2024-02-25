@@ -3,7 +3,9 @@ import blockquote from './command/blockquote';
 import fileUpload from './command/fileUpload';
 import list_bulleted from './command/list_bulleted';
 import list_numbered from './command/list_numbered';
-import mention from './command/mention';
+
+// field
+import mention from './field/mention';
 
 // dropdown
 import align from './dropdown/align';

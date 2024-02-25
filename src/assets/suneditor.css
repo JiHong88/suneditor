@@ -801,6 +801,10 @@
 	margin: 0;
 }
 
+.sun-editor .se-menu-list li.se-toolbar-hidden-btn {
+	display: none;
+}
+
 .sun-editor .se-menu-list li .se-toolbar-btn:not(input) {
 	border-color: transparent;
 }

@@ -897,7 +897,7 @@ function _createModuleGroup() {
 function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, icons) {
 	const oLi = domUtils.createElement('LI');
 	const label = title || '';
-	const oButton = domUtils.createElement(/^INPUT$/i.test(dataType) ? 'DIV' : 'BUTTON', {
+	const oButton = domUtils.createElement(/^INPUT|FIELD$/i.test(dataType) ? 'DIV' : 'BUTTON', {
 		type: 'button',
 		class: 'se-toolbar-btn se-btn se-tooltip' + (className ? ' ' + className : ''),
 		'data-command': dataCommand,
@@ -915,6 +915,8 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 	}
 
 	if (_disabled) oButton.setAttribute('disabled', true);
+
+	if (/^FIELD$/i.test(dataType)) domUtils.addClass(oLi, 'se-toolbar-hidden-btn');
 
 	if (label) innerHTML += `<span class="se-tooltip-inner"><span class="se-tooltip-text">${label}</span></span>`;
 	if (innerHTML) oButton.innerHTML = innerHTML;

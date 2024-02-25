@@ -1,6 +1,7 @@
 import CoreInjector from '../editorInjector/_core';
-import { domUtils, env } from '../helper';
+import { domUtils } from '../helper';
 import Figure from './Figure';
+import ApiManager from './ApiManager';
 
 /**
  *
@@ -25,6 +26,8 @@ const FileManager = function (inst, params) {
 	this.infoIndex = 0;
 	this.uploadFileLength = 0;
 	this.__updateTags = [];
+	// api manager
+	this.apiManager = new ApiManager(this, null);
 };
 
 FileManager.prototype = {
@@ -52,16 +55,32 @@ FileManager.prototype = {
 			this.uploadFileLength = data.size;
 		}
 
-		const xmlHttp = env.getXMLHttpRequest();
-		xmlHttp.onreadystatechange = CallBackUpload.bind(this, xmlHttp, callBack, errorCallBack);
-		xmlHttp.open('post', uploadUrl, true);
-		if (uploadHeader !== null && typeof uploadHeader === 'object' && Object.keys(uploadHeader).length > 0) {
-			for (let key in uploadHeader) {
-				xmlHttp.setRequestHeader(key, uploadHeader[key]);
+		this.apiManager.call('POST', uploadUrl, uploadHeader, formData, callBack, errorCallBack);
+	},
+
+	/**
+	 * @description Upload the file to the server.
+	 * @param {string} uploadUrl Upload server url
+	 * @param {Object|null} uploadHeader Request header
+	 * @param {Files|{FormData, size}} data FormData in body or Files array
+	 */
+	async asyncUpload(uploadUrl, uploadHeader, data) {
+		this.editor.showLoading();
+
+		let formData = null;
+		// create formData
+		if (data.length) {
+			formData = new FormData();
+			for (let i = 0, len = data.length; i < len; i++) {
+				formData.append('file-' + i, data[i]);
 			}
+			this.uploadFileLength = data.length;
+		} else {
+			formData = data.formData;
+			this.uploadFileLength = data.size;
 		}
 
-		xmlHttp.send(formData);
+		return await this.apiManager.asyncCall('POST', uploadUrl, uploadHeader, formData);
 	},
 
 	setFileData(element, { name, size }) {
@@ -310,35 +329,5 @@ FileManager.prototype = {
 
 	constructor: FileManager
 };
-
-async function CallBackUpload(xmlHttp, callBack, errorCallBack) {
-	if (xmlHttp.readyState === 4) {
-		if (xmlHttp.status === 200) {
-			try {
-				await callBack(xmlHttp);
-			} catch (error) {
-				throw Error(`[SUNEDITOR.FileManager[${this.kind}].upload.callBack.fail] ${error.message}`);
-			} finally {
-				this.editor.hideLoading();
-			}
-		} else {
-			// exception
-			console.error(`[SUNEDITOR.FileManager[${this.kind}].upload.serverException]`, xmlHttp);
-			try {
-				const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
-				let message = '';
-				if (typeof errorCallBack === 'function') {
-					message = await errorCallBack(res);
-				}
-				const err = `[SUNEDITOR.FileManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${message || res.errorMessage || xmlHttp.responseText}`;
-				this.editor.notice.open(err);
-			} catch (error) {
-				throw Error(`[SUNEDITOR.FileManager[${this.kind}].upload.errorCallBack.fail] ${error.message}`);
-			} finally {
-				this.editor.hideLoading();
-			}
-		}
-	}
-}
 
 export default FileManager;

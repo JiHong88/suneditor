@@ -302,6 +302,15 @@ ModalAnchorEditor.prototype = {
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	},
 
+	_uploadCallBack(xmlHttp) {
+		const response = JSON.parse(xmlHttp.responseText);
+		if (response.errorMessage) {
+			this._error(response);
+		} else {
+			this._register(response);
+		}
+	},
+
 	constructor: ModalAnchorEditor
 };
 
@@ -315,9 +324,10 @@ async function OnChangeFile(e) {
 		files
 	};
 
-	const handler = function (infos, newInfos) {
+	const handler = async function (infos, newInfos) {
 		infos = newInfos || infos;
-		this.fileManager.upload(infos.url, infos.uploadHeaders, infos.files, UploadCallBack.bind(this), this._error.bind(this));
+		const xmlHttp = await this.fileManager.asyncUpload(infos.url, infos.uploadHeaders, infos.files);
+		this._uploadCallBack(xmlHttp);
 	}.bind(this, fileInfo);
 
 	const result = await this.triggerEvent('onFileUploadBefore', {
@@ -330,15 +340,6 @@ async function OnChangeFile(e) {
 	if (result !== null && typeof result === 'object') handler(result);
 
 	if (result === true || result === NO_EVENT) handler(null);
-}
-
-async function UploadCallBack(xmlHttp) {
-	const response = JSON.parse(xmlHttp.responseText);
-	if (response.errorMessage) {
-		this._error(response);
-	} else {
-		this._register(response);
-	}
 }
 
 function OnClick_relbutton() {

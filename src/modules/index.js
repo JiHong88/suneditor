@@ -1,3 +1,4 @@
+import ApiManager from './ApiManager';
 import ColorPicker from './ColorPicker';
 import Controller from './Controller';
 import Figure from './Figure';
@@ -8,5 +9,5 @@ import Modal from './Modal';
 import ModalAnchorEditor from './ModalAnchorEditor';
 import SelectMenu from './SelectMenu';
 
-export { ColorPicker, Controller, FileBrowser, FileManager, HueSlider, Figure, Modal, ModalAnchorEditor, SelectMenu };
-export default { ColorPicker, Controller, FileBrowser, FileManager, HueSlider, Figure, Modal, ModalAnchorEditor, SelectMenu };
+export { ApiManager, ColorPicker, Controller, FileBrowser, FileManager, HueSlider, Figure, Modal, ModalAnchorEditor, SelectMenu };
+export default { ApiManager, ColorPicker, Controller, FileBrowser, FileManager, HueSlider, Figure, Modal, ModalAnchorEditor, SelectMenu };

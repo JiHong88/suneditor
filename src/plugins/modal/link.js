@@ -42,7 +42,7 @@ Link.prototype = {
 	 * @override core
 	 */
 	active(element) {
-		if (domUtils.isAnchor(element) && element?.hasAttribute('data-se-file-download')) {
+		if (domUtils.isAnchor(element) && !element?.hasAttribute('data-se-file-download')) {
 			const tempLink = this.controller.form.querySelector('a');
 			tempLink.href = element.href;
 			tempLink.title = element.textContent;
