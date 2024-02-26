@@ -152,12 +152,16 @@ Component.prototype = {
 		}
 
 		this.isSelected = true;
-		_w.setTimeout(() => (this.eventManager.__overInfo = undefined));
+
+		const __overInfo = this.eventManager.__overInfo;
+		_w.setTimeout(() => {
+			this.eventManager.__overInfo = undefined;
+			if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
+		});
 
 		if (typeof plugin.select === 'function') plugin.select(element);
 
 		this._setComponentLineBreaker(info.container || info.cover || element);
-		if (this.eventManager.__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
 		if (!this.info.isFile) this.__addNotFileGlobalEvent();
 		this.currentTarget = element;
 		this.currentPlugin = plugin;
@@ -393,12 +397,20 @@ function OnKeyDown_component(e) {
 
 		this.deselect();
 
-		const focusEl = this.eventManager.applyTagEffect(el);
-		if (focusEl) {
+		const elComp = this.get(el);
+		if (elComp?.container) {
 			e.stopPropagation();
 			e.preventDefault();
-			this.selection.setRange(focusEl, 0, focusEl, 0);
+			this.select(elComp.target, elComp.pluginName);
+		} else {
+			const focusEl = this.eventManager.applyTagEffect(el);
+			if (focusEl) {
+				e.stopPropagation();
+				e.preventDefault();
+				this.selection.setRange(focusEl, 0, focusEl, 0);
+			}
 		}
+
 		return;
 	}
 

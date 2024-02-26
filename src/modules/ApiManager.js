@@ -99,6 +99,9 @@ ApiManager.prototype = {
 		});
 	},
 
+	/**
+	 * @description Cancel API (xhr.abort())
+	 */
 	cancel() {
 		if (this._xhr) this._xhr.abort();
 	},
