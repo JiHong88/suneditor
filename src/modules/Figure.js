@@ -387,6 +387,7 @@ Figure.prototype = {
 	 */
 	setAlign(target, align) {
 		if (!target) target = this._element;
+		align = align || 'none';
 
 		const figure = Figure.GetContainer(target);
 		const cover = figure.cover;

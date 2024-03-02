@@ -104,8 +104,8 @@
 	color: inherit;
 }
 
-.sun-editor-editable a:not([data-se-file-download]):hover,
-.sun-editor-editable a:not([data-se-file-download]):focus {
+.sun-editor-editable a:hover,
+.sun-editor-editable a:focus {
 	cursor: pointer;
 	color: var(--se-edit-anchor-on-font);
 	text-decoration: underline;

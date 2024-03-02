@@ -497,53 +497,57 @@ Editor.prototype = {
 		const rtl = dir === 'rtl';
 		if (this.options.get('_rtl') === rtl) return;
 
-		this._offCurrentController();
+		try {
+			this.options.set('_rtl', rtl);
+			this._offCurrentController();
 
-		const fc = this.frameContext;
-		this.options.set('_rtl', rtl);
-
-		const plugins = this.plugins;
-		for (let k in plugins) {
-			if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
-		}
-
-		const toolbarWrapper = this.context.get('toolbar._wrapper');
-		const statusbarWrapper = this.context.get('statusbar._wrapper');
-		if (rtl) {
-			this.applyFrameRoots((e) => {
-				domUtils.addClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
-			});
-			domUtils.addClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
-		} else {
-			this.applyFrameRoots((e) => {
-				domUtils.removeClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
-			});
-			domUtils.removeClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
-		}
-
-		const lineNodes = domUtils.getListChildren(fc.wysiwyg, (current) => {
-			return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
-		});
-
-		for (let i = 0, n, l, r; (n = lineNodes[i]); i++) {
-			n = lineNodes[i];
-			// indent margin
-			r = n.style.marginRight;
-			l = n.style.marginLeft;
-			if (r || l) {
-				n.style.marginRight = l;
-				n.style.marginLeft = r;
+			const fc = this.frameContext;
+			const plugins = this.plugins;
+			for (let k in plugins) {
+				if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
 			}
-			// text align
-			r = n.style.textAlign;
-			if (r === 'left') n.style.textAlign = 'right';
-			else if (r === 'right') n.style.textAlign = 'left';
+
+			const toolbarWrapper = this.context.get('toolbar._wrapper');
+			const statusbarWrapper = this.context.get('statusbar._wrapper');
+			if (rtl) {
+				this.applyFrameRoots((e) => {
+					domUtils.addClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
+				});
+				domUtils.addClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
+			} else {
+				this.applyFrameRoots((e) => {
+					domUtils.removeClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
+				});
+				domUtils.removeClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
+			}
+
+			const lineNodes = domUtils.getListChildren(fc.wysiwyg, (current) => {
+				return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
+			});
+
+			for (let i = 0, n, l, r; (n = lineNodes[i]); i++) {
+				n = lineNodes[i];
+				// indent margin
+				r = n.style.marginRight;
+				l = n.style.marginLeft;
+				if (r || l) {
+					n.style.marginRight = l;
+					n.style.marginLeft = r;
+				}
+				// text align
+				r = n.style.textAlign;
+				if (r === 'left') n.style.textAlign = 'right';
+				else if (r === 'right') n.style.textAlign = 'left';
+			}
+
+			DIR_BTN_ACTIVE(this, rtl);
+
+			if (this.isBalloon) this.toolbar._showBalloon();
+			else if (this.isSubBalloon) this.subToolbar._showBalloon();
+		} catch (e) {
+			this.options.set('_rtl', !rtl);
+			console.warn(`[SUNEDITOR.setDir.fail] ${e.toString()}`);
 		}
-
-		DIR_BTN_ACTIVE(this, rtl);
-
-		if (this.isBalloon) this.toolbar._showBalloon();
-		else if (this.isSubBalloon) this.subToolbar._showBalloon();
 
 		this.effectNode = null;
 		this.eventManager.applyTagEffect();

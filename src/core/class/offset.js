@@ -55,7 +55,7 @@ Offset.prototype = {
 		let targetAbs = false;
 		if (!element) element = topArea;
 		if (element === topArea) isTop = true;
-		if (!isTop) {
+		if (!isTop && element.nodeType === 1) {
 			targetAbs = _w.getComputedStyle(element).position === 'absolute';
 		}
 
@@ -104,7 +104,7 @@ Offset.prototype = {
 		let targetAbs = false;
 		if (!element) element = topArea;
 		if (element === topArea) isTop = true;
-		if (!isTop) {
+		if (!isTop && element.nodeType === 1) {
 			targetAbs = _w.getComputedStyle(element).position === 'absolute';
 		}
 
@@ -405,7 +405,7 @@ Offset.prototype = {
 		element.style.top = `${t}px`;
 
 		// left ----------------------------------------------------------------------------------------------------
-		const radius = numbers.get(_w.getComputedStyle(element).borderRadius) || 0;
+		const radius = (element.nodeType === 1 ? numbers.get(_w.getComputedStyle(element).borderRadius) : 0) || 0;
 		const targetW = targetOffset.width;
 		const elW = element.offsetWidth;
 		const aw = arrow ? arrow.offsetWidth : 0;

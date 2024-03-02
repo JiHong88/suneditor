@@ -74,6 +74,11 @@ ApiManager.prototype = {
 		const xhr = this._xhr;
 		return new Promise((resolve, reject) => {
 			xhr.open(method, url, true);
+			if (headers !== null && typeof headers === 'object' && Object.keys(headers).length > 0) {
+				for (let key in headers) {
+					xhr.setRequestHeader(key, headers[key]);
+				}
+			}
 			xhr.onload = () => {
 				if (xhr.status === 200) {
 					try {

@@ -31,6 +31,8 @@ const SelectMenu = function (inst, params) {
 	this._textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
 	this.splitNum = params.splitNum || 0;
 	this.horizontal = !!this.splitNum;
+	this.openMethod = params.openMethod;
+	this.closeMethod = params.closeMethod;
 	this._refer = null;
 	this._keydownTarget = null;
 	this._selectMethod = null;
@@ -90,6 +92,7 @@ SelectMenu.prototype = {
 	 */
 	open(position, onItemQuerySelector) {
 		this.editor.selectMenuOn = true;
+		if (typeof this.openMethod === 'function') this.openMethod();
 		this.__addEvents();
 		this.__addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
@@ -105,10 +108,15 @@ SelectMenu.prototype = {
 		this._init();
 		if (this.form) this.form.style.cssText = '';
 		this.isOpen = false;
+		if (typeof this.closeMethod === 'function') this.closeMethod();
 	},
 
 	getItem(index) {
 		return this.items[index];
+	},
+
+	setItem(index) {
+		this._selectItem(index);
 	},
 
 	_createFormat(html) {
@@ -127,11 +135,17 @@ SelectMenu.prototype = {
 	},
 
 	_moveItem(num) {
-		domUtils.removeClass(this.form, 'se-select-menu-mouse-move');
 		num = this.index + num;
 		const len = this.menuLen;
 		const selectIndex = (this.index = num >= len ? 0 : num < 0 ? len - 1 : num);
 
+		this._selectItem(selectIndex);
+	},
+
+	_selectItem(selectIndex) {
+		domUtils.removeClass(this.form, 'se-select-menu-mouse-move');
+
+		const len = this.menuLen;
 		for (let i = 0; i < len; i++) {
 			if (i === selectIndex) {
 				domUtils.addClass(this.menus[i], 'active');
@@ -140,6 +154,7 @@ SelectMenu.prototype = {
 			}
 		}
 
+		this.index = selectIndex;
 		this.item = this.items[selectIndex];
 	},
 
@@ -369,6 +384,8 @@ function OnKeyDown_refer(e) {
 				e.preventDefault();
 				e.stopPropagation();
 				this._select(this.index);
+			} else {
+				this.close();
 			}
 			break;
 	}

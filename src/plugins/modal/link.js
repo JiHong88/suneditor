@@ -31,7 +31,7 @@ const Link = function (editor, pluginOptions) {
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl, this.pluginOptions);
 	this.modal = new Modal(this, modalEl);
-	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
+	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: false });
 };
 
 Link.key = 'link';
@@ -42,7 +42,7 @@ Link.prototype = {
 	 * @override core
 	 */
 	active(element) {
-		if (domUtils.isAnchor(element) && !element?.hasAttribute('data-se-file-download')) {
+		if (domUtils.isAnchor(element) && !Array.from(element.attributes).some((attr) => attr.name.startsWith('data-se-'))) {
 			const tempLink = this.controller.form.querySelector('a');
 			tempLink.href = element.href;
 			tempLink.title = element.textContent;

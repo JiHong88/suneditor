@@ -1,6 +1,8 @@
 import EditorInjector from '../../editorInjector';
-import { ApiManager, SelectMenu } from '../../modules';
-import { domUtils } from '../../helper';
+import { ApiManager, SelectMenu, Controller } from '../../modules';
+import { domUtils, env } from '../../helper';
+
+const { _w } = env;
 
 const Mention = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
@@ -8,21 +10,39 @@ const Mention = function (editor, pluginOptions) {
 	this.title = this.lang.mention;
 	this.icon = 'mention';
 
-	// field plugin options
-	this.triggerText = pluginOptions.triggerText || '@';
-
 	// members
+	this.triggerText = pluginOptions.triggerText || '@';
 	this.limitSize = pluginOptions.limitSize || 5;
-	this.searchStartLength = pluginOptions.searchStartLength || 1;
+	this.searchStartLength = pluginOptions.searchStartLength || 0;
 	this.delayTime = pluginOptions.delayTime || 300;
-	// members - controller
-	this.selectMenu = new SelectMenu(this, { position: 'right-bottom', dir: 'ltr' });
-	this.selectMention = SelectMention.bind(this);
-	// members - trigger regExp
-	this.triggerKeyRegExp = new RegExp(`\\s*${this.triggerText}(.+)\\b`);
+	this.apiUrl = pluginOptions.apiUrl;
+	this._delay = 0;
+	this._lastAtPos = 0;
+	this._anchorOffset = 0;
+	this._anchorNode = null;
 	// members - api, caching
-	this.apiManager = new ApiManager(this, { url: pluginOptions.apiUrl, headers: pluginOptions.apiHeaders });
+	this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
 	this.chchingData = [];
+
+	// controller
+	const controllerEl = CreateHTML_controller();
+	this.selectMenu = new SelectMenu(this, { position: 'right-bottom', dir: 'ltr', closeMethod: () => this.controller.close() });
+	this.controller = new Controller(
+		this,
+		controllerEl,
+		{
+			position: 'bottom',
+			initMethod: () => {
+				this.apiManager.cancel();
+				this.selectMenu.close();
+			}
+		},
+		null
+	);
+	this.selectMenu.on(controllerEl.firstElementChild, SelectMention.bind(this));
+
+	// onInput debounce
+	this.onInput = Debounce(this.onInput.bind(this), this.delayTime);
 };
 
 Mention.key = 'mention';
@@ -32,46 +52,122 @@ Mention.prototype = {
 	/**
 	 * @override core
 	 */
-	triggerHandler(targetNode) {
+	async onInput() {
 		this.apiManager.cancel();
 
-		const value = targetNode.textContent.match(this.triggerKeyRegExp)?.[1];
-		if (!value) return;
+		const sel = this.selection.get();
+		if (!sel.rangeCount) {
+			this.selectMenu.close();
+			return;
+		}
 
-		const { list, menu } = this._createMentionList(value);
-		if (!list?.length) return;
+		const anchorNode = sel.anchorNode;
+		const anchorOffset = sel.anchorOffset;
+		const textBeforeCursor = anchorNode.textContent.substring(0, anchorOffset);
+		const lastAtPos = textBeforeCursor.lastIndexOf(this.triggerText);
 
-		this.selectMenu.on(targetNode, this.selectMention);
-		this.selectMenu.create(list, menu);
+		if (lastAtPos > -1) {
+			const mentionQuery = textBeforeCursor.substring(lastAtPos + 1, anchorOffset);
+			const beforeText = textBeforeCursor[lastAtPos - 1]?.trim();
+			if (!/\s/.test(mentionQuery) && (!beforeText || domUtils.isZeroWith(beforeText))) {
+				if (mentionQuery.length < this.searchStartLength) return true;
+
+				const anchorParent = anchorNode.parentNode;
+				if (domUtils.isAnchor(anchorParent) && !anchorParent.getAttribute('data-se-mention')) {
+					return true;
+				}
+
+				try {
+					const result = await this._createMentionList(mentionQuery, anchorNode);
+					this._lastAtPos = lastAtPos;
+					this._anchorNode = anchorNode;
+					this._anchorOffset = anchorOffset;
+					return !result;
+				} catch (error) {
+					console.warn('[SUNEDITOR.mention.api.file] ', error);
+				}
+			}
+		}
+
+		this.selectMenu.close();
+		return true;
 	},
 
-	async _createMentionList(value) {
-		const xmlHttp = await this.apiManager.asyncCall('GET', `${this.apiUrl}/${value}`, null);
+	async _createMentionList(value, targetNode) {
+		const xmlHttp = await this.apiManager.asyncCall('GET', `${this.apiUrl}/${value}?limit=${this.limitSize}`, null);
 		const response = JSON.parse(xmlHttp.responseText);
-		if (response.errorMessage || !response.length) {
-			return;
+		if (!response?.length) {
+			this.selectMenu.close();
+			return false;
 		}
 
 		const list = [];
 		const menus = [];
-
 		for (let i = 0, len = response.length, v; i < len; i++) {
 			v = response[i];
 			list.push(v);
-			menus.push('<div>' + v.name + '</div>');
+			menus.push(`<div class="se-mention-item"><span>${v.key}</span><span>${v.name}</span></div>`);
 		}
 
 		if (list.length === 0) {
 			this.selectMenu.close();
+			return false;
 		} else {
+			// controller open
+			this.controller.open(targetNode, null, { isWWTarget: true, initMethod: null, addOffset: null });
+			// select menu create
 			this.selectMenu.create(list, menus);
-			this.selectMenu.open(this.options.get('_rtl') ? 'bottom-right' : '');
+			this.selectMenu.open();
+			this.selectMenu.setItem(0);
+			return true;
 		}
 	},
 
 	constructor: Mention
 };
 
-function SelectMention() {}
+function SelectMention(item) {
+	if (!item) return false;
+
+	let oA = null;
+	const { key, name, url } = item;
+	const anchorParent = this._anchorNode.parentNode;
+
+	if (domUtils.isAnchor(anchorParent)) {
+		oA = anchorParent;
+		oA.setAttribute('data-se-mention', key);
+		oA.setAttribute('href', url);
+		oA.setAttribute('title', name);
+		oA.textContent = this.triggerText + key;
+	} else {
+		this.selection.setRange(this._anchorNode, this._lastAtPos, this._anchorNode, this._anchorOffset);
+		oA = domUtils.createElement('A', { 'data-se-mention': key, href: url, title: name }, this.triggerText + key);
+		if (!this.html.insertNode(oA, null, false)) return false;
+	}
+
+	this.selectMenu.close();
+
+	const space = domUtils.createTextNode('\u00A0');
+	oA.parentNode.insertBefore(space, oA.nextSibling);
+	this.selection.setRange(space, 1, space, 1);
+}
+
+function Debounce(func, wait) {
+	let timeout;
+
+	return function executedFunction() {
+		const later = () => {
+			_w.clearTimeout(timeout);
+			func();
+		};
+
+		_w.clearTimeout(timeout);
+		timeout = _w.setTimeout(later, wait);
+	};
+}
+
+function CreateHTML_controller() {
+	return domUtils.createElement('DIV', { class: 'se-controller se-empty-controller' }, '<div></div>');
+}
 
 export default Mention;

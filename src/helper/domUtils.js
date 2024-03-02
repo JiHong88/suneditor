@@ -742,7 +742,7 @@ export function addClass(element, className) {
 
 	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
 	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
-		if (!e) continue;
+		if (!e || e.nodeType !== 1) continue;
 		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
 	}
 }
@@ -757,7 +757,7 @@ export function removeClass(element, className) {
 
 	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
 	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
-		if (!e) continue;
+		if (!e || e.nodeType !== 1) continue;
 		e.className = e.className.replace(check, ' ').trim();
 		if (!e.className.trim()) e.removeAttribute('class');
 	}
@@ -771,6 +771,8 @@ export function removeClass(element, className) {
  */
 export function toggleClass(element, className) {
 	if (!element) return;
+	if (element.nodeType !== 1) return;
+
 	let result = false;
 
 	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);

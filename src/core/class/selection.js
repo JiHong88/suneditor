@@ -167,7 +167,7 @@ Selection.prototype = {
 	 */
 	getRects(target, position) {
 		const targetAbs = target?.nodeType === 1 ? this._w.getComputedStyle(target).position === 'absolute' : false;
-		target = target || this.getRange();
+		target = !target || target.nodeType === 3 ? this.getRange() : target;
 		const globalScroll = this.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
 		let scrollLeft = globalScroll.left;

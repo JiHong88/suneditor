@@ -175,10 +175,40 @@
 	transition: box-shadow 0.1s ease-in-out;
 }
 
-.sun-editor .se-menu-list li:hover .se-toolbar-btn:not(.on):not(.active):enabled,
+/*  after, before button : hover */
+.sun-editor .se-menu-list li:hover .se-side-btn-a:not(.on):not(.active):enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-b:not(.on):not(.active):enabled,
 .sun-editor .se-menu-list li:hover .se-side-btn-after:not(.on):not(.active):enabled,
 .sun-editor .se-menu-list li:hover .se-side-btn-before:not(.on):not(.active):enabled {
-	border-color: #e1e1e1;
+	border: 1px solid #e1e1e1;
+}
+
+/* after, before button - on, active */
+.sun-editor .se-menu-list li .se-side-btn-after.on:enabled,
+.sun-editor .se-menu-list li .se-side-btn-before.on:enabled,
+.sun-editor .se-menu-list li .se-side-btn-after.active:enabled,
+.sun-editor .se-menu-list li .se-side-btn-before.active:enabled {
+	border-color: #80bdff;
+}
+
+/* after, before button : hover - on, active - border */
+.sun-editor .se-menu-list li .se-side-btn-after.on:enabled,
+.sun-editor .se-menu-list li .se-side-btn-after.active:enabled {
+	border-right: 0;
+	border-left: 1px solid;
+}
+.sun-editor .se-menu-list li .se-side-btn-before.on:enabled,
+.sun-editor .se-menu-list li .se-side-btn-before.active:enabled {
+	border-left: 0;
+	border-right: 1px solid;
+}
+
+/* after, before button : hover - on, active */
+.sun-editor .se-menu-list li:hover .se-side-btn-after.on:enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-before.on:enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-after.active:enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-before.active:enabled {
+	border-color: #3f9dff;
 }
 
 /* se-btn.on */
@@ -2037,7 +2067,7 @@
 
 .sun-editor-editable[contenteditable='true'] figure.se-component-selected,
 .sun-editor-editable[contenteditable='true'] .se-component.se-component-selected > figure {
-	outline: 2px solid #80bdff;
+	outline: 3px solid #80bdff;
 }
 
 .sun-editor-editable .se-component figure.se-figure-selected:not(.se-figure-over-selected)::after {
@@ -2053,7 +2083,7 @@
 }
 
 .sun-editor-editable[contenteditable='true'] figure.se-figure-selected.se-drag-over {
-	outline: 2px solid #f0c20a;
+	outline: 3px solid #f0c20a;
 }
 
 /* controller - button group */
@@ -2876,6 +2906,18 @@
 	border-radius: 0 2px 2px 0;
 }
 
+/* after, before button:hover - on, active - border */
+.sun-editor.se-rtl .se-menu-list li .se-side-btn-after.on:enabled,
+.sun-editor.se-rtl .se-menu-list li .se-side-btn-after.active:enabled {
+	border-left: 0;
+	border-right: 1px solid;
+}
+.sun-editor.se-rtl .se-menu-list li .se-side-btn-before.on:enabled,
+.sun-editor.se-rtl .se-menu-list li .se-side-btn-before.active:enabled {
+	border-right: 0;
+	border-left: 1px solid;
+}
+
 /* button - se-menu-list */
 .sun-editor.se-rtl .se-btn-list {
 	text-align: right;
@@ -3099,6 +3141,12 @@ textarea.se-error:focus {
 
 .sun-editor hr.__se__dashed {
 	border-style: dashed none none;
+}
+
+/** mention  */
+.sun-editor .se-select-menu .se-select-item .se-mention-item span + span {
+	margin: 0 4px;
+	opacity: 0.5;
 }
 
 /** ---------------------------------------------------------- show blocks mode ----------------------------------------------------- */

@@ -510,11 +510,6 @@ EventManager.prototype = {
 
 		if (domUtils.isBreak(format.nextSibling)) domUtils.removeItem(format.nextSibling);
 		if (domUtils.isBreak(format.previousSibling)) domUtils.removeItem(format.previousSibling);
-		if (domUtils.isBreak(focusNode)) {
-			const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-			focusNode.parentNode.insertBefore(zeroWidth, focusNode);
-			focusNode = zeroWidth;
-		}
 
 		this.editor.effectNode = null;
 		this.editor._nativeFocus();
@@ -1858,6 +1853,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 		this.applyTagEffect();
 	}
 
+	// enter scroll
 	if (keyCode === 13) this.html.scrollTo(range);
 
 	// next component
