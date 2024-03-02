@@ -38,7 +38,7 @@ const util = {
      * @private
      */
     _HTMLConvertor: function (contents) {
-        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&apos;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
+        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&apos;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
         return contents.replace(/&|\u00A0|'|"|<|>/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
@@ -170,7 +170,7 @@ const util = {
      * @returns {String}
      */
     HTMLEncoder: function (contents) {
-        const ec = {'<': '$lt;', '>': '$gt;'};
+        const ec = {'<': '$lt;', '>': '$gt;'};
         return contents.replace(/<|>/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
@@ -184,7 +184,7 @@ const util = {
      * @returns {String}
      */
     HTMLDecoder: function (contents) {
-        const ec = {'$lt;': '<', '$gt;': '>'};
+        const ec = {'$lt;': '<', '$gt;': '>'};
         return contents.replace(/\$lt;|\$gt;/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
@@ -1782,6 +1782,23 @@ const util = {
             return a > b ? t : a < b ? f : 0;
         }.bind(this));
     },
+
+	/**
+	 * @description Escape a string for safe use in regular expressions.
+	 * @param {String} string String to escape
+	 * @returns {String}
+	 */
+	escapeStringRegexp: function (string) {
+		if (typeof string !== 'string') {
+			throw new TypeError('Expected a string');
+		}
+	
+		// Escape characters with special meaning either inside or outside character sets.
+		// Use a simple backslash escape when it’s always valid, and a `\xnn` escape when the simpler form would be disallowed by Unicode patterns’ stricter grammar.
+		return string
+			.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+			.replace(/-/g, '\\x2d');
+	},
 
     _isExcludeSelectionElement: function (element) {
         return !/FIGCAPTION/i.test(element.nodeName) && (this.isComponent(element) || /FIGURE/i.test(element.nodeName));

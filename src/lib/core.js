@@ -475,7 +475,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _cleanStyleRegExp: {
             span: new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color)\\s*:[^;]+(?!;)*', 'ig'),
-            format: new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right)\\s*:[^;]+(?!;)*', 'ig'),
+            format: new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right|width)\\s*:[^;]+(?!;)*', 'ig'),
             fontSizeUnit: new _w.RegExp('\\d+' + options.fontSizeUnit + '$', 'i'),
         },
 
@@ -1162,10 +1162,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Node}
          */
         getSelectionNode: function () {
-            if (!context.element.wysiwyg.contains(this._variable._selectionNode)) this._editorRange();
+            if (!context.element.wysiwyg.contains(this._variable._selectionNode)) this._editorRange();
             if (!this._variable._selectionNode) {
                 const selectionNode = util.getChildElement(context.element.wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
-                if (!selectionNode) {
+                if (!selectionNode) {
                     this._editorRange();
                 } else {
                     this._variable._selectionNode = selectionNode;
@@ -2143,7 +2143,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let endNextEl = null;
             if (isStartEdge) {
                 startPrevEl = util.getFormatElement(range.startContainer);
-                prevContainer = startPrevEl.previousElementSibling;
+                if (startPrevEl) {
+                	prevContainer = startPrevEl.previousElementSibling;
+                }
                 startPrevEl = startPrevEl ? prevContainer : startPrevEl;
             }
             if (isEndEdge) {
@@ -4517,6 +4519,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
                 case 'selectAll':
                     this.containerOff();
+                    this.controllersOff();
                     const wysiwyg = context.element.wysiwyg;
                     let first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
                     let last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
@@ -5659,7 +5662,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Remove events from document.
-         * When created as an Iframe, the event of the document inside the Iframe is also removed.
+         * When created as an Iframe, the event of the document inside the Iframe is also removed.
          * @param {String} type Event type
          * @param {Function} listener Event listener
          */
@@ -6812,6 +6815,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onInput_wysiwyg: function (e) {
+            if (!document.body.contains(core.currentControllerTarget)) core.controllersOff();
+
             if (core.isReadOnly || core.isDisabled) {
                 e.preventDefault();
                 e.stopPropagation();

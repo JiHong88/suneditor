@@ -606,7 +606,7 @@ interface Core {
 
     /**
      * @description Remove events from document.
-     * When created as an Iframe, the event of the document inside the Iframe is also removed.
+     * When created as an Iframe, the event of the document inside the Iframe is also removed.
      * @param type Event type
      * @param listener Event listener
      */
