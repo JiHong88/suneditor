@@ -1108,6 +1108,8 @@ function OnInput_wysiwyg(frameContext, e) {
 }
 
 function OnKeyDown_wysiwyg(frameContext, e) {
+	if (this.editor.selectMenuOn) return;
+
 	let selectionNode = this.selection.getNode();
 	if (domUtils.isInputElement(selectionNode)) return;
 	if (this.menu.currentDropdownName) return;
