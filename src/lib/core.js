@@ -7386,7 +7386,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
 
                             temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
-                            core.setRange(temp, 0, temp, 0);
+                            if (util.isBreak(temp)) {
+                                const zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                                temp.parentNode.insertBefore(zeroWidth, temp);
+                                core.setRange(zeroWidth, 1, zeroWidth, 1);
+                            } else {
+                                core.setRange(temp, 0, temp, 0);
+                            }
                             break;
                         } else if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                             const range = core.getRange();
@@ -7654,7 +7660,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const range = core.getRange();
+            console.log("range", range)
             let selectionNode = core.getSelectionNode();
+            console.log("range", selectionNode)
 
             if (core._isBalloon && ((core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
                 if (core._isBalloonAlways) {

@@ -307,6 +307,7 @@ export default {
         
         if (!options.iframe) {
             wysiwygDiv.setAttribute('contenteditable', true);
+            wysiwygDiv.setAttribute('autocorrect', "off");
             wysiwygDiv.setAttribute('scrolling', 'auto');
             for (let key in options.iframeAttributes) {
                 wysiwygDiv.setAttribute(key, options.iframeAttributes[key]);

@@ -2029,6 +2029,7 @@ const util = {
             this._setIframeCssTags(options);
         frame.contentDocument.body.className = options._editableClass;
         frame.contentDocument.body.setAttribute('contenteditable', true);
+        frame.contentDocument.body.setAttribute('autocorrect', "off");
     },
 
     _setIframeCssTags: function (options) {

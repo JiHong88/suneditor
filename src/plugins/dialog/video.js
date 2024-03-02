@@ -568,7 +568,7 @@ export default {
                     newTag.src = src;
                     oFrame.parentNode.replaceChild(newTag, oFrame);
                     contextVideo._element = oFrame = newTag;
-                } else if (!isYoutube && !isVimeo && !/^videoo$/i.test(oFrame.nodeName)) {
+                } else if (!isYoutube && !isVimeo && !/^video$/i.test(oFrame.nodeName)) {
                     const newTag = this.plugins.video.createVideoTag.call(this);
                     newTag.src = src;
                     oFrame.parentNode.replaceChild(newTag, oFrame);
