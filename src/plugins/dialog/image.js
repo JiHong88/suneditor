@@ -516,6 +516,12 @@ export default {
 
     setup_reader: function (files, anchor, width, height, align, alt, filesLen, isUpdate) {
         try {
+            if (filesLen === 0) {
+                this.closeLoading();
+                console.warn('[SUNEDITOR.image.base64.fail] cause : No applicable files');
+                return;
+            }
+
             this.context.image.base64RenderIndex = filesLen;
             const wFileReader = this._w.FileReader;
             const filesStack = [filesLen];

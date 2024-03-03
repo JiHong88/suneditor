@@ -1026,7 +1026,8 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
         }
     ],
     addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
-    lineAttrReset: 'class'
+    lineAttrReset: 'class',
+    imageAccept: '*/*',
 });
 
 s2.core._cleanStyleRegExp.span = new RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color|background-image)\\s*:[^;]+(?!;)*', 'ig'),
