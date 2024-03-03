@@ -178,7 +178,7 @@ Video.prototype = {
 			result = await this._submitURL(this._linkValue);
 		}
 
-		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, 'video'));
+		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, 'video'), 0);
 
 		return result;
 	},

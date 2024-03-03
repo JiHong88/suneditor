@@ -318,7 +318,7 @@ Figure.prototype = {
 			// selecte
 			domUtils.removeClass(this._cover, 'se-figure-over-selected');
 			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
-			this._w.setTimeout(() => (this.eventManager.__overInfo = false));
+			this._w.setTimeout(() => (this.eventManager.__overInfo = false), 0);
 		} else {
 			domUtils.addClass(this._cover, 'se-figure-over-selected');
 		}
@@ -453,7 +453,7 @@ Figure.prototype = {
 					this.controller.close();
 				} else {
 					domUtils.removeItem(this._caption);
-					this._w.setTimeout(this.component.select.bind(this.component, element, this.kind));
+					this._w.setTimeout(this.component.select.bind(this.component, element, this.kind), 0);
 				}
 
 				this._caption = !this._caption;

@@ -268,7 +268,7 @@ Toolbar.prototype = {
 
 		this._w.setTimeout(() => {
 			toolbar.style.visibility = '';
-		});
+		}, 0);
 	},
 
 	_setBalloonOffset(positionTop, range) {

@@ -1150,7 +1150,7 @@ Editor.prototype = {
 		if (autoFrame) {
 			this._w.setTimeout(() => {
 				fc.get('wysiwygFrame').style.height = autoFrame.offsetHeight + 'px';
-			});
+			}, 0);
 		}
 
 		if (autoFrame) {
@@ -1158,7 +1158,7 @@ Editor.prototype = {
 				const h = autoFrame.offsetHeight;
 				fc.get('wysiwygFrame').style.height = h + 'px';
 				if (!env.isResizeObserverSupported) this.__callResizeFunction(fc, h, null);
-			});
+			}, 0);
 		} else if (!env.isResizeObserverSupported) {
 			this.__callResizeFunction(fc, fc.get('wysiwygFrame').offsetHeight, null);
 		}
@@ -1239,7 +1239,7 @@ Editor.prototype = {
 			this.history.reset();
 			// user event
 			this.triggerEvent('onload', {});
-		});
+		}, 0);
 	},
 
 	/**

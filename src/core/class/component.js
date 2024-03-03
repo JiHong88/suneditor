@@ -157,7 +157,7 @@ Component.prototype = {
 		_w.setTimeout(() => {
 			this.eventManager.__overInfo = undefined;
 			if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
-		});
+		}, 0);
 
 		if (typeof plugin.select === 'function') plugin.select(element);
 
@@ -326,7 +326,7 @@ function OnCopy_component(e) {
 	SetClipboardComponent(e, info.container, e.clipboardData);
 	domUtils.addClass(info.container, 'se-copy');
 	// copy effect
-	this._w.setTimeout(() => {
+	_w.setTimeout(() => {
 		domUtils.removeClass(info.container, 'se-copy');
 	}, 120);
 }

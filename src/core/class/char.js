@@ -79,7 +79,7 @@ Char.prototype = {
 		if (this.editor.frameContext.has('charCounter')) {
 			this._w.setTimeout(() => {
 				this.editor.frameContext.get('charCounter').textContent = this.getLength();
-			});
+			}, 0);
 		}
 	},
 
@@ -137,7 +137,7 @@ Char.prototype = {
 function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, 'se-blink')) {
 		addClass(charWrapper, 'se-blink');
-		setTimeout(() => {
+		this._w.setTimeout(() => {
 			removeClass(charWrapper, 'se-blink');
 		}, 600);
 	}

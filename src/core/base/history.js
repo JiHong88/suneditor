@@ -168,7 +168,7 @@ export default function (editor) {
 			rootKey = rootKey || editor.status.rootKey;
 			const range = editor.status._range;
 
-			_w.setTimeout(editor._resourcesStateChange.bind(editor, frameRoots.get(rootKey)));
+			_w.setTimeout(editor._resourcesStateChange.bind(editor, frameRoots.get(rootKey)), 0);
 			const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
 
 			if (!time || pushDelay) {

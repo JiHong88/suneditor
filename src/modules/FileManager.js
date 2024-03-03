@@ -157,7 +157,7 @@ FileManager.prototype = {
 		}.bind(this, element);
 		info.select = function (element) {
 			element.scrollIntoView(true);
-			if (typeof this.inst.select === 'function') this._w.setTimeout(this.inst.select.bind(this.inst, element));
+			if (typeof this.inst.select === 'function') this._w.setTimeout(this.inst.select.bind(this.inst, element), 0);
 		}.bind(this, element);
 
 		// figure

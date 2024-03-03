@@ -926,7 +926,7 @@ function ButtonsHandler(e) {
 					const value = eventTarget.value.trim();
 					if (typeof plugin.onInputChange === 'function' && value !== this.__inputPlugin.value) plugin.onInputChange({ target: eventTarget, value, event: e });
 				} finally {
-					this._w.setTimeout(() => (this._inputFocus = false));
+					this._w.setTimeout(() => (this._inputFocus = false), 0);
 					this.__removeInput();
 				}
 			});
@@ -993,7 +993,7 @@ function OnMouseDown_wysiwyg(frameContext, e) {
 
 	this._setSelectionSync();
 
-	this._w.setTimeout(this.selection._init.bind(this.selection));
+	this._w.setTimeout(this.selection._init.bind(this.selection), 0);
 
 	// user event
 	if (this.triggerEvent('onMouseDown', { frameContext, event: e }) === false) return;
@@ -1073,7 +1073,7 @@ function OnClick_wysiwyg(frameContext, e) {
 		this.applyTagEffect();
 	}
 
-	if (this.editor.isBalloon || this.editor.isSubBalloon) this._w.setTimeout(this._toggleToolbarBalloon.bind(this));
+	if (this.editor.isBalloon || this.editor.isSubBalloon) this._w.setTimeout(this._toggleToolbarBalloon.bind(this), 0);
 }
 
 function OnMouseLeave_wysiwyg(frameContext, e) {
@@ -2078,7 +2078,7 @@ function OnCut_wysiwyg(frameContext, e) {
 
 	this._w.setTimeout(() => {
 		this.history.push(false);
-	});
+	}, 0);
 }
 
 function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
@@ -2099,7 +2099,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 		this._w.setTimeout(() => {
 			this.applyTagEffect();
 			if (this.editor.isInline) this.toolbar._showInline();
-		});
+		}, 0);
 		return;
 	}
 
@@ -2123,7 +2123,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 		this.triggerEvent('onFocus', { frameContext, event: e });
 		// plugin event
 		this._callPluginEvent('onFocus', { frameContext, event: e });
-	});
+	}, 0);
 }
 
 function OnBlur_wysiwyg(frameContext, e) {
