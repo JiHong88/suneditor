@@ -7355,6 +7355,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     
                     break;
                 case 13: /** enter key */
+                    // Force stop IME composition
+                    _w.setTimeout(function () {
+                        _d.dispatchEvent(new _w.Event('compositionend'));
+                    }, 0);
+
+                    // enter login start
                     const freeFormatEl = util.getFreeFormatElement(selectionNode, null);
 
                     if (core._charTypeHTML) {
