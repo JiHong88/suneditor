@@ -15,7 +15,7 @@ const Mention = function (editor, pluginOptions) {
 	this.limitSize = pluginOptions.limitSize || 5;
 	this.searchStartLength = pluginOptions.searchStartLength || 0;
 	this.delayTime = pluginOptions.delayTime || 300;
-	this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace('{{limitSize}}', this.limitSize) || '';
+	this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace(/\{limitSize\}/i, this.limitSize) || '';
 	this._delay = 0;
 	this._lastAtPos = 0;
 	this._anchorOffset = 0;
@@ -124,7 +124,7 @@ Mention.prototype = {
 	},
 
 	_createUrl(key) {
-		return this.apiUrl.replace('{{key}}', key);
+		return this.apiUrl.replace(/\{key\}/i, key);
 	},
 
 	constructor: Mention

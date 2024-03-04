@@ -293,7 +293,7 @@ Viewer.prototype = {
 		const iframe = domUtils.createElement('IFRAME', { style: 'display: none;' });
 		this._d.body.appendChild(iframe);
 
-		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*content\s*\}\}/i, this.html.get(true)) : this.html.get(true);
+		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\s*content\s*\}/i, this.html.get(true)) : this.html.get(true);
 		const printDocument = domUtils.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
 
@@ -361,7 +361,7 @@ Viewer.prototype = {
 		this.editor._offCurrentController();
 		this.editor._offCurrentModal();
 
-		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*content\s*\}\}/i, this.html.get(true)) : this.html.get(true);
+		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\s*content\s*\}/i, this.html.get(true)) : this.html.get(true);
 		const windowObject = this._w.open('', '_blank');
 		windowObject.mimeType = 'text/html';
 		const wDoc = this.editor.frameContext.get('_wd');

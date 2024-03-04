@@ -435,11 +435,11 @@ iframe_cssFileName : Name or Array of the CSS file to apply inside the iframe.
                     or put the URL value (".css" can be omitted).   default: 'suneditor' {Array|String}
                     ex) '.+' or ['suneditor', 'http://suneditor.com/sample/css/sample.css', '.+\\.min\\.css']
 previewTemplate : A template of the "preview".
-                  The {{content}} part in the HTML string is replaced with the content of the editor. default: null {string}
-                  ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Preview Template</h1> {{content}} <div>_Footer_</div></div>"
+                  The {content} part in the HTML string is replaced with the content of the editor. default: null {string}
+                  ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Preview Template</h1> {content} <div>_Footer_</div></div>"
 printTemplate   : A template of the "print".
-                  The {{content}} part in the HTML string is replaced with the content of the editor. default: null {string}
-                  ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Print Template</h1> {{content}} <div>_Footer_</div></div>"
+                  The {content} part in the HTML string is replaced with the content of the editor. default: null {string}
+                  ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Print Template</h1> {content} <div>_Footer_</div></div>"
 codeMirror     : https://codemirror.net/try/
 codeMirror     : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   Use version 5.x.x // https://github.com/codemirror/CodeMirror
