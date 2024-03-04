@@ -1,4 +1,4 @@
-import { _d } from './env';
+import { _d, _w } from './env';
 import { onlyZeroWidthRegExp, zeroWidthRegExp } from './unicode';
 
 /**
@@ -740,8 +740,9 @@ export function hasClass(element, className) {
 export function addClass(element, className) {
 	if (!element) return;
 
+	const elements = element instanceof _w.HTMLCollection || element instanceof _w.NodeList || element instanceof _w.Array ? element : [element];
 	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
-	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
+	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;
 		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
 	}
@@ -755,8 +756,9 @@ export function addClass(element, className) {
 export function removeClass(element, className) {
 	if (!element) return;
 
+	const elements = element instanceof _w.HTMLCollection || element instanceof _w.NodeList || element instanceof _w.Array ? element : [element];
 	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
-	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
+	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;
 		e.className = e.className.replace(check, ' ').trim();
 		if (!e.className.trim()) e.removeAttribute('class');

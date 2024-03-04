@@ -103,7 +103,9 @@ Menu.prototype = {
 			this.currentDropdownType = '';
 			this.currentDropdown.style.display = 'none';
 			this.currentDropdown = null;
-			domUtils.removeClass(this.currentDropdownActiveButton, 'on');
+			if (this.currentDropdownActiveButton) {
+				domUtils.removeClass(this.currentDropdownActiveButton.parentElement.children, 'on');
+			}
 			this.currentDropdownActiveButton = null;
 			this.editor._notHideToolbar = false;
 		}
@@ -156,7 +158,7 @@ Menu.prototype = {
 		menu.style.visibility = 'hidden';
 		menu.style.display = 'block';
 		menu.style.height = '';
-		domUtils.addClass(element, 'on');
+		domUtils.addClass(element.parentElement.children, 'on');
 
 		this.offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, domUtils.getParentElement(element, '.se-toolbar'), false);
 

@@ -3237,8 +3237,8 @@ textarea.se-error:focus {
 /* drag cursor */
 .sun-editor.sun-editor-carrier-wrapper .se-drag-cursor {
 	position: absolute;
-	display: block;
-	left: -10000px;
+	display: none;
+	pointer-events: none;
 	width: 2px;
 	background-color: #1275ff;
 	z-index: 2147483647;
