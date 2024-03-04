@@ -15,7 +15,7 @@ const Mention = function (editor, pluginOptions) {
 	this.limitSize = pluginOptions.limitSize || 5;
 	this.searchStartLength = pluginOptions.searchStartLength || 0;
 	this.delayTime = pluginOptions.delayTime || 300;
-	this.apiUrl = pluginOptions.apiUrl;
+	this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace('{{limitSize}}', this.limitSize) || '';
 	this._delay = 0;
 	this._lastAtPos = 0;
 	this._anchorOffset = 0;
@@ -94,7 +94,7 @@ Mention.prototype = {
 	},
 
 	async _createMentionList(value, targetNode) {
-		const xmlHttp = await this.apiManager.asyncCall('GET', `${this.apiUrl}/${value}?limit=${this.limitSize}`, null);
+		const xmlHttp = await this.apiManager.asyncCall('GET', this._createUrl(value), null);
 		const response = JSON.parse(xmlHttp.responseText);
 		if (!response?.length) {
 			this.selectMenu.close();
@@ -121,6 +121,10 @@ Mention.prototype = {
 			this.selectMenu.setItem(0);
 			return true;
 		}
+	},
+
+	_createUrl(key) {
+		return this.apiUrl.replace('{{key}}', key);
 	},
 
 	constructor: Mention

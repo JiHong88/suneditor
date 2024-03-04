@@ -56,7 +56,7 @@ const bl = [
 	['imageGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
-	['save', 'template', 'layout', 'fileUpload'],
+	['save', 'template', 'layout', 'fileUpload', 'mention'],
 	// (min-width: 1565)
 	[
 		'%1565',
@@ -72,7 +72,7 @@ const bl = [
 			['table', 'link', 'image', 'video', 'audio', 'math'],
 			['imageGallery'],
 			['fullScreen', 'showBlocks', 'codeView'],
-			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload']
+			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
 		]
 	],
 	// (min-width: 1455)
@@ -89,7 +89,7 @@ const bl = [
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'audio', 'math'],
 			['imageGallery'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
 		]
 	],
 	// (min-width: 1326)
@@ -104,7 +104,7 @@ const bl = [
 			['removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
 		]
 	],
@@ -119,7 +119,7 @@ const bl = [
 			['removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
 		]
 	],
@@ -134,7 +134,7 @@ const bl = [
 			['removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
 		]
 	],
@@ -149,7 +149,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
 		]
 	],
 	// (min-width: 525)
@@ -163,7 +163,7 @@ const bl = [
 			['outdent', 'indent'],
 			[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
 		]
 	],
 	// (min-width: 420)
@@ -175,7 +175,7 @@ const bl = [
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
 		]
 	]
 ];
@@ -404,7 +404,11 @@ window.editor_root = suneditor.create(
 		// editorStyle: 'font-size:40px',
 		allowedExtraTags: { script: true },
 		tagStyles: { '.+': '.+' },
-		strictMode: true,
+		strictMode: {
+			format: true,
+			style: true,
+			pluginTag: true
+		},
 		value: `<figure class="se-non-resize-figure se-scroll-figure-x"><table class="se-table-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
 		value: `<p>sadas1<span class="__se__katex katex" data-se-value="l;l;;l" data-se-type="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>l</mi><mo separator="true">;</mo><mi>l</mi><mo separator="true">;</mo><mo separator="true">;</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">l;l;;l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span>​​<br></p><p>sadas2</p><figure class="se-non-resize-figure"><table style=""><colgroup><col style="width: 33%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup><tbody><tr><td><div>sdd<br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><div class="se-component se-file-figure se-non-resize-figure"><figure><a href="https://link.testfile.org/30MB" title="document.pdf" download="document.pdf" data-se-file-download="" data-se-file-name="document.pdf" data-se-file-size="124826" data-se-index="0" data-se-size="auto,auto" contenteditable="false">document.pdf</a></figure></div><p>sadas3<br></p><p>sadas4<br></p><p>sadas5<br></p><p>sadas6<br></p><p>dsads<a href="http://localhost:3000/public/files/d5d13802a01dd4dea399c912f7b31e5e.png" download="1571311368279.png" name="1571311368279.png">1571311368279.png</a>​<br></p><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0"></figure></div><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p>`,
 		value: `<p>sadas1<span class="__se__katex katex" data-se-value="l;l;;l" data-se-type="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>l</mi><mo separator="true">;</mo><mi>l</mi><mo separator="true">;</mo><mo separator="true">;</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">l;l;;l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span>​​<br></p><p>sadas2</p><figure class="se-non-resize-figure"><table style=""><colgroup><col style="width: 33%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup><tbody><tr><td><div>sdd<br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><div class="se-component se-file-figure se-non-resize-figure"><figure><a href="http://localhost:3000/editor/files/download/public/files/d31ed6f9e11d1661406efe5ed34328e5.pdf" title="document.pdf" download="document.pdf" data-se-file-download="" data-se-file-name="document.pdf" data-se-file-size="124826" data-se-index="0" data-se-size="auto,auto" contenteditable="false">document.pdf</a></figure></div><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0"></figure></div>`,
@@ -501,7 +505,7 @@ window.editor_root = suneditor.create(
 			// showDefaultSizeLabel:true
 		},
 		mention: {
-			apiUrl: 'http://localhost:3000/editor/mention',
+			apiUrl: 'http://localhost:3000/editor/mention/{{ key }}?limit={{limitSize}}',
 		},
 		events: {
 			// onFileAction: (data) => {
