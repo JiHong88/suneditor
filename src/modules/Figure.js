@@ -218,7 +218,12 @@ Figure.prototype = {
 		this._removeDragEvent();
 	},
 
-	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
+	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, disabledButtons, __fileManagerInfo }) {
+		if (!target) {
+			console.warn('[SUNEDITOR.modules.Figure.open] The target element is null.');
+			return;
+		}
+
 		if (this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
 			this.editor._offCurrentController();
 		} else {
@@ -317,7 +322,7 @@ Figure.prototype = {
 			this._displayResizeHandles(!nonResizing);
 			// selecte
 			domUtils.removeClass(this._cover, 'se-figure-over-selected');
-			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
+			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null, disabled: disabledButtons });
 			this._w.setTimeout(() => (this.eventManager.__overInfo = false), 0);
 		} else {
 			domUtils.addClass(this._cover, 'se-figure-over-selected');

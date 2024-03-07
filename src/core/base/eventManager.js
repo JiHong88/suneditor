@@ -948,9 +948,13 @@ function ButtonsHandler(e) {
 			this.__removeInput();
 			return;
 		} else if (!this.editor.frameContext.get('isCodeView')) {
-			e.preventDefault();
-			if (env.isGecko && command) {
-				this._injectActiveEvent(target);
+			if (env.isMobile) {
+				this.editor._antiBlur = true;
+			} else {
+				e.preventDefault();
+				if (env.isGecko && command) {
+					this._injectActiveEvent(target);
+				}
 			}
 		}
 
@@ -975,7 +979,6 @@ function OnClick_menuTray(e) {
 	const plugin = this.plugins[k];
 	if (!plugin || typeof plugin.action !== 'function') return;
 
-	e.preventDefault();
 	e.stopPropagation();
 	plugin.action(target);
 }
@@ -2094,6 +2097,7 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 
 function OnFocus_wysiwyg(frameContext, e) {
 	const rootKey = frameContext.get('key');
+	document.getElementById('console_ltr').innerHTML += `<p>${rootKey}</p>`;
 
 	if (this._inputFocus) {
 		this._w.setTimeout(() => {

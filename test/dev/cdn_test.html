@@ -83,7 +83,7 @@
 				</textarea>
 			</div>
 		</div>
-
+		<div id="console_ltr"></div>
 		<!-- suneditor -->
 		<script src="./dist/suneditor.min.js"></script>
 		<!-- codeMirror -->
@@ -95,155 +95,144 @@
 		<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
 		<script>
 			const bl = [
-				['undo', 'redo', 'dir'],
-				['dir_ltr', 'dir_rtl'],
-				['font', 'fontSize', 'formatBlock'],
-				['paragraphStyle', 'blockquote'],
-				['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-				['fontColor', 'backgroundColor', 'textStyle'],
-				['removeFormat'],
-				'/',
-				['outdent', 'indent'],
-				['align', 'hr', 'list', 'lineHeight'],
-				['table', 'link', 'image', 'video', 'audio', 'math'],
-				['imageGallery'],
-				['fullScreen', 'showBlocks', 'codeView'],
-				['preview', 'print'],
-				['save', 'template', 'layout'],
-				// (min-width: 1565)
-				[
-					'%1565',
-					[
-						['undo', 'redo'],
-						['font', 'fontSize', 'formatBlock'],
-						['paragraphStyle', 'blockquote'],
-						['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-						['fontColor', 'backgroundColor', 'textStyle'],
-						['removeFormat'],
-						['outdent', 'indent'],
-						['align', 'hr', 'list', 'lineHeight'],
-						['table', 'link', 'image', 'video', 'audio', 'math'],
-						['imageGallery'],
-						['fullScreen', 'showBlocks', 'codeView'],
-						['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout']
-					]
-				],
-				// (min-width: 1455)
-				[
-					'%1455',
-					[
-						['undo', 'redo'],
-						['font', 'fontSize', 'formatBlock'],
-						['paragraphStyle', 'blockquote'],
-						['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-						['fontColor', 'backgroundColor', 'textStyle'],
-						['removeFormat'],
-						['outdent', 'indent'],
-						['align', 'hr', 'list', 'lineHeight'],
-						['table', 'link', 'image', 'video', 'audio', 'math'],
-						['imageGallery'],
-						['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
-					]
-				],
-				// (min-width: 1326)
-				[
-					'%1326',
-					[
-						['undo', 'redo'],
-						['font', 'fontSize', 'formatBlock'],
-						['paragraphStyle', 'blockquote'],
-						['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-						['fontColor', 'backgroundColor', 'textStyle'],
-						['removeFormat'],
-						['outdent', 'indent'],
-						['align', 'hr', 'list', 'lineHeight'],
-						['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
-						['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
-					]
-				],
-				// (min-width: 1123)
-				[
-					'%1123',
-					[
-						['undo', 'redo'],
-						[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-						['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-						['fontColor', 'backgroundColor', 'textStyle'],
-						['removeFormat'],
-						['outdent', 'indent'],
-						['align', 'hr', 'list', 'lineHeight'],
-						['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
-						['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
-					]
-				],
-				// (min-width: 817)
-				[
-					'%817',
-					[
-						['undo', 'redo'],
-						[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-						['bold', 'underline', 'italic', 'strike'],
-						[':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
-						['removeFormat'],
-						['outdent', 'indent'],
-						['align', 'hr', 'list', 'lineHeight'],
-						['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
-						['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
-					]
-				],
-				// (min-width: 673)
-				[
-					'%673',
-					[
-						['undo', 'redo'],
-						[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-						[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
-						['removeFormat'],
-						['outdent', 'indent'],
-						['align', 'hr', 'list', 'lineHeight'],
-						[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-						['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
-					]
-				],
-				// (min-width: 525)
-				[
-					'%525',
-					[
-						['undo', 'redo'],
-						[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-						[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
-						['removeFormat'],
-						['outdent', 'indent'],
-						[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'lineHeight'],
-						[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-						['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
-					]
-				],
-				// (min-width: 420)
-				[
-					'%420',
-					[
-						['undo', 'redo'],
-						[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-						[
-							':More Text-default.more_text',
-							'bold',
-							'underline',
-							'italic',
-							'strike',
-							'subscript',
-							'superscript',
-							'fontColor',
-							'backgroundColor',
-							'textStyle',
-							'removeFormat'
-						],
-						[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'lineHeight'],
-						[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-						['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
-					]
-				]
-			];
+	['selectAll', 'newDocument', 'undo', 'redo', 'dir'],
+	['dir_ltr', 'dir_rtl'],
+	['font', 'fontSize', 'formatBlock'],
+	['paragraphStyle', 'blockquote'],
+	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+	['fontColor', 'backgroundColor', 'textStyle'],
+	['removeFormat'],
+	'/',
+	['outdent', 'indent'],
+	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+	['table', 'link', 'image', 'video', 'audio', 'math'],
+	['imageGallery'],
+	['fullScreen', 'showBlocks', 'codeView'],
+	['preview', 'print'],
+	['save', 'template', 'layout', 'fileUpload', 'mention'],
+	// (min-width: 1565)
+	[
+		'%1565',
+		[
+			['selectAll', 'newDocument', 'undo', 'redo'],
+			['font', 'fontSize', 'formatBlock'],
+			['paragraphStyle', 'blockquote'],
+			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+			['fontColor', 'backgroundColor', 'textStyle'],
+			['removeFormat'],
+			['outdent', 'indent'],
+			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+			['table', 'link', 'image', 'video', 'audio', 'math'],
+			['imageGallery'],
+			['fullScreen', 'showBlocks', 'codeView'],
+			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+		]
+	],
+	// (min-width: 1455)
+	[
+		'%1455',
+		[
+			['selectAll', 'newDocument', 'undo', 'redo'],
+			['font', 'fontSize', 'formatBlock'],
+			['paragraphStyle', 'blockquote'],
+			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+			['fontColor', 'backgroundColor', 'textStyle'],
+			['removeFormat'],
+			['outdent', 'indent'],
+			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+			['table', 'link', 'image', 'video', 'audio', 'math'],
+			['imageGallery'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+		]
+	],
+	// (min-width: 1326)
+	[
+		'%1326',
+		[
+			['selectAll', 'newDocument', 'undo', 'redo'],
+			['font', 'fontSize', 'formatBlock'],
+			['paragraphStyle', 'blockquote'],
+			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+			['fontColor', 'backgroundColor', 'textStyle'],
+			['removeFormat'],
+			['outdent', 'indent'],
+			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention'],
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
+		]
+	],
+	// (min-width: 1123)
+	[
+		'%1123',
+		[
+			['selectAll', 'newDocument', 'undo', 'redo'],
+			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+			['fontColor', 'backgroundColor', 'textStyle'],
+			['removeFormat'],
+			['outdent', 'indent'],
+			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention'],
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
+		]
+	],
+	// (min-width: 817)
+	[
+		'%817',
+		[
+			['selectAll', 'newDocument', 'undo', 'redo'],
+			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+			['bold', 'underline', 'italic', 'strike'],
+			[':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
+			['removeFormat'],
+			['outdent', 'indent'],
+			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention'],
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
+		]
+	],
+	// (min-width: 673)
+	[
+		'%673',
+		[
+			['selectAll', 'newDocument', 'undo', 'redo'],
+			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
+			['removeFormat'],
+			['outdent', 'indent'],
+			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+		]
+	],
+	// (min-width: 525)
+	[
+		'%525',
+		[
+			['selectAll', 'newDocument', 'undo', 'redo'],
+			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
+			['removeFormat'],
+			['outdent', 'indent'],
+			[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+		]
+	],
+	// (min-width: 420)
+	[
+		'%420',
+		[
+			['selectAll', 'newDocument', 'undo', 'redo'],
+			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
+			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+		]
+	]
+];
+
 			const editorInstance = SUNEDITOR.create(document.querySelector('#editor_classic'), {
 				plugins: SUNEDITOR.plugins,
 				allowedClassName: '.+',
@@ -301,6 +290,9 @@
 				},
 				image: {
 					uploadUrl: 'http://localhost:3000/editor/upload'
+				},
+				mention: {
+					apiUrl: ''
 				}
 			});
 		</script>

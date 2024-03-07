@@ -51,11 +51,11 @@ Controller.prototype = {
 	/**
 	 * @description Open a modal plugin
 	 */
-	open(target, positionTarget, { isWWTarget, initMethod, addOffset }) {
+	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset }) {
 		if (this.editor.isBalloon) this.toolbar.hide();
 		else if (this.editor.isSubBalloon) this.subToolbar.hide();
 
-		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+		if (disabled ?? this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
 
 		this.currentTarget = target;
 		this.currentPositionTarget = positionTarget || target;
@@ -288,7 +288,16 @@ function CloseListener_keydown(e) {
 }
 
 function CloseListener_mousedown({ target }) {
-	if (target === this.inst._element || target === this.currentTarget || this._checkFixed() || this.form.contains(target) || this._checkForm(target)) return;
+	if (this.inst?._element.contains(target)) {
+		this.isOpen = false;
+		return;
+	}
+
+	this.isOpen = true;
+	if (target === this.inst._element || target === this.currentTarget || this._checkFixed() || this.form.contains(target) || this._checkForm(target)) {
+		return;
+	}
+
 	this.close(true);
 }
 

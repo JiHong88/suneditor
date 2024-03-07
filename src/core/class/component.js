@@ -234,7 +234,6 @@ Component.prototype = {
 		const b_style = lb_b.style;
 		const offsetTarget = container.offsetWidth < element.offsetWidth ? container : element;
 		const target = this.editor._figureContainer?.style.display === 'block' ? this.editor._figureContainer : offsetTarget;
-		const toolbarH = this.editor.isClassic && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0;
 		const isList = domUtils.isListCell(container.parentNode);
 
 		// top
@@ -246,7 +245,7 @@ Component.prototype = {
 			this.eventManager._lineBreakComp = container;
 			componentTop = this.offset.get(offsetTarget).top + yScroll;
 			w = target.offsetWidth / 2 / 2;
-			t_style.top = componentTop - yScroll - toolbarH - tH / 2 + 'px';
+			t_style.top = componentTop - yScroll - tH / 2 + 'px';
 			t_style[dir[0]] = (isNonSelected ? 4 : this.offset.get(target).left + w) + 'px';
 			t_style[dir[1]] = '';
 			lb_t.setAttribute('data-offset', yScroll + ',' + wScroll);
@@ -267,7 +266,7 @@ Component.prototype = {
 				w = target.offsetWidth / 2 / 2;
 			}
 
-			b_style.top = componentTop + target.offsetHeight - yScroll - toolbarH - bH / 2 + 'px';
+			b_style.top = componentTop + target.offsetHeight - yScroll - bH / 2 + 'px';
 			b_style.right = '';
 			b_style.left = this.offset.get(target).left + (isRtl ? 0 : target.offsetWidth) - (isNonSelected ? 0 : w) - (isNonSelected ? bW / 2 : bW) + 'px';
 

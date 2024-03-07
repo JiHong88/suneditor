@@ -429,6 +429,7 @@ Table.prototype = {
 
 		if (!(target !== this._fixedCell && !this._shift)) return;
 
+		this._deleteStyleSelectedCells();
 		this.selectCells(/^TR$/i.test(target.nodeName) ? domUtils.getParentElement(event.target, domUtils.isTableCell) : target, false);
 	},
 
@@ -1362,7 +1363,7 @@ Table.prototype = {
 	 * @param {Element} target Target element
 	 */
 	select(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
+		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, disabledButtons: false, __fileManagerInfo: false });
 
 		this._maxWidth = domUtils.hasClass(target, 'se-table-size-100') || target.style.width === '100%' || (!target.style.width && !domUtils.hasClass(target, 'se-table-size-auto'));
 		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';

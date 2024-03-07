@@ -192,6 +192,14 @@ function isSafari() {
 }
 
 /**
+ * @description Check if User Agent is Mobile device.
+ * @returns {boolean} Whether User Agent is Mobile or not.
+ */
+function isMobile() {
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+}
+
+/**
  * @description Check if User Agent is Android mobile device.
  * @returns {boolean} Whether User Agent is Android or not.
  */
@@ -232,6 +240,7 @@ const env = {
 	isSafari: isSafari(),
 	isOSX_IOS: isOSX_IOS(),
 	isAndroid: isAndroid(),
+	isMobile: isMobile(),
 	cmdIcon,
 	shiftIcon,
 	_allowedEmptyNodeList

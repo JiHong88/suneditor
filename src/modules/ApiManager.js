@@ -39,7 +39,7 @@ ApiManager.prototype = {
 	 */
 	call(method, url, headers, data, callBack, errorCallBack) {
 		method = method || this.method;
-		url = url || this.url;
+		url = this._normalizeUrl(url || this.url);
 		headers = headers || this.headers;
 		data = data || this.data;
 		callBack = callBack || this.callBack;
@@ -67,7 +67,7 @@ ApiManager.prototype = {
 	 */
 	asyncCall(method, url, headers, data) {
 		method = method || this.method;
-		url = url || this.url;
+		url = this._normalizeUrl(url || this.url);
 		headers = headers || this.headers;
 		data = data || this.data;
 
@@ -109,6 +109,15 @@ ApiManager.prototype = {
 	 */
 	cancel() {
 		if (this._xhr) this._xhr.abort();
+	},
+
+	/**
+	 * @description Remove unnecessary slashes in API URL.
+	 * @param {string} url url
+	 * @returns
+	 */
+	_normalizeUrl(url) {
+		return url.replace(/([^:])\/+/g, '$1/').replace(/\/(\?|#|$)/, '$1');
 	},
 
 	constructor: ApiManager

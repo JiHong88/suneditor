@@ -73,6 +73,7 @@ function SetImage(target) {
 		this.inputTarget(target);
 	} else {
 		const file = { name: target.getAttribute('data-value'), size: 0 };
+		this.plugins.image.init();
 		this.plugins.image.create(target.getAttribute('data-command'), null, this.width, this.height, 'none', file, target.alt);
 	}
 }
