@@ -169,6 +169,48 @@ export function rgb2hex(rgba) {
 }
 
 /**
+ * @description Copies the "wwTarget" element and returns it with inline all styles applied.
+ * @param {*} wwTarget
+ * @returns
+ */
+export function applyInlineStylesAll(wwTarget) {
+	if (!wwTarget) {
+		console.warn('wwTarget is not exist');
+		return null;
+	}
+
+	const tempTarget = _d.createElement('DIV');
+	tempTarget.style.display = 'none';
+
+	if (/body/i.test(wwTarget.nodeName)) {
+		const wwDiv = _d.createElement('DIV');
+		const attrs = wwTarget.attributes;
+		for (let i = 0, len = attrs.length; i < len; i++) {
+			wwDiv.setAttribute(attrs[i].name, attrs[i].value);
+		}
+		wwDiv.innerHTML = wwTarget.innerHTML;
+		wwTarget = wwDiv;
+	} else {
+		wwTarget = wwTarget.cloneNode(true);
+	}
+
+	tempTarget.appendChild(wwTarget);
+	_d.body.appendChild(tempTarget);
+
+	const elements = tempTarget.querySelectorAll('*');
+	for (let i = 0, el; (el = elements[i]); i++) {
+		const computedStyle = _w.getComputedStyle(el);
+		for (let props of computedStyle) {
+			el.style[props] = computedStyle.getPropertyValue(props);
+		}
+	}
+
+	_d.body.removeChild(tempTarget);
+
+	return wwTarget;
+}
+
+/**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Object.<string, any>} fo frameOptions
  * @param {string} cssText Style string
@@ -229,7 +271,7 @@ export function _setIframeStyleLinks(linkNames) {
 				path.push(linkNames[f]);
 			} else {
 				const CSSFileName = new RegExp(`(^|.*[\\/])${linkNames[f]}(\\..+)?.css((\\??.+?)|\\b)$`, 'i');
-				for (let c = _d.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
+				for (let c = _d.getElementsByTagName('link'), i = 0, cLen = c.length, styleTag; i < cLen; i++) {
 					styleTag = c[i].href.match(CSSFileName);
 					if (styleTag) path.push(styleTag[0]);
 				}
@@ -238,7 +280,7 @@ export function _setIframeStyleLinks(linkNames) {
 			if (!path || path.length === 0)
 				throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.';
 
-			for (let i = 0, len = path.length; i < len; i++) {
+			for (let i = 0, pLen = path.length; i < pLen; i++) {
 				tagString += '<link href="' + path[i] + '" rel="stylesheet">';
 			}
 		}
@@ -266,6 +308,7 @@ const converter = {
 	createElementBlacklist,
 	isHexColor,
 	rgb2hex,
+	applyInlineStylesAll,
 	_setDefaultOptionStyle,
 	_setIframeStyleLinks,
 	_setAutoHeightStyle

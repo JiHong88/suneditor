@@ -1,0 +1,27 @@
+{
+	"parserOptions": {
+		"ecmaVersion": 2020,
+		"sourceType": "module"
+	},
+	"env": {
+		"browser": true,
+		"node": true,
+		"es6": true
+	},
+	"rules": {
+		"semi": ["error", "always"],
+		"eqeqeq": "error",
+		"strict": ["error", "safe"],
+		"no-undef": "error",
+		"no-unused-vars": "error",
+		"no-loop-func": "off",
+		"no-shadow": "error",
+		"no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }]
+	},
+	"globals": {
+		"ActiveXObject": "writable",
+		"Selection": "writable",
+		"Node": "writable",
+		"Range": "writable"
+	}
+}

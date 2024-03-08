@@ -1,6 +1,5 @@
 # Guidelines For Contributing
 
-Written in javascript syntax compatible with at least 2018 version browsers.
 Coded based on Nodejs@v18 and written in "prototype" syntax.
 Nodejs version14 or higher is required to build or test this project.
 

@@ -249,8 +249,8 @@ Video.prototype = {
 		this.inputX.value = w === 'auto' ? '' : w;
 
 		if (!this._onlyPercentage) {
-			const h = percentageRotation ? '' : figureInfo.height;
-			this.inputY.value = h === 'auto' ? '' : h;
+			const infoH = percentageRotation ? '' : figureInfo.height;
+			this.inputY.value = infoH === 'auto' ? '' : infoH;
 		}
 
 		if (!this._setVideoRatioSelect(h)) this.inputY.value = this._onlyPercentage ? numbers.get(h, 2) : h;
@@ -494,8 +494,7 @@ Video.prototype = {
 
 		const handler = function (infos, newInfos) {
 			infos = newInfos || infos;
-			const url = infos.url;
-			this.create(this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](), url, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate, infos.files);
+			this.create(this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](), infos.url, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate, infos.files);
 		}.bind(this, videoInfo);
 
 		const result = await this.triggerEvent('onVideoUploadBefore', {

@@ -3,4 +3,4 @@ dist
 sample
 test
 karma.conf.js
-webpack.*.js
+webpack/**/*

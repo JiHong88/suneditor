@@ -136,27 +136,40 @@ HTML.prototype = {
 	 * @returns {string}
 	 */
 	clean(html, requireFormat, whitelist, blacklist) {
+		const { pluginPattern, tagFilter, formatFilter, classFilter, styleNodeFilter, attrFilter, styleFilter } = this.options.get('strictMode');
 		let cleanData = '';
 
-		if (!this.options.get('strictMode')) {
-			html = this._deleteDisallowedTags(this.compress(html), this._elementWhitelistRegExp, this._elementBlacklistRegExp)
-				.replace(/<br\/?>$/i, '')
-				.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this));
+		html = this.compress(html);
 
-			const dom = this._d.createRange().createContextualFragment(html, true);
+		if (tagFilter) {
+			html = this._deleteDisallowedTags(html, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/<br\/?>$/i, '');
+		}
+
+		if (attrFilter || styleFilter) {
+			html = html.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, attrFilter, styleFilter));
+		}
+
+		// get dom tree
+		const dom = this._d.createRange().createContextualFragment(html, true);
+
+		if (tagFilter) {
 			try {
-				this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp);
+				this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter);
 			} catch (error) {
 				console.warn('[SUNEDITOR.html.clean.fail]', error.message);
 			}
+		}
 
+		if (pluginPattern) {
 			this.editor._MELInfo.forEach((method, query) => {
 				const infoLst = dom.querySelectorAll(query);
 				for (let i = 0, len = infoLst.length; i < len; i++) {
 					method(infoLst[i]);
 				}
 			});
+		}
 
+		if (formatFilter) {
 			let domTree = dom.childNodes;
 			if (!requireFormat) requireFormat = this._isFormatData(domTree);
 			if (requireFormat) domTree = this._editFormat(dom).childNodes;
@@ -171,13 +184,20 @@ HTML.prototype = {
 			}
 		}
 
+		// set clean data
 		if (!cleanData) cleanData = html;
 
 		// whitelist, blacklist
-		if (whitelist) cleanData = cleanData.replace(typeof whitelist === 'string' ? converter.createElementWhitelist(whitelist) : whitelist, '');
-		if (blacklist) cleanData = cleanData.replace(typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist, '');
+		if (tagFilter) {
+			if (whitelist) cleanData = cleanData.replace(typeof whitelist === 'string' ? converter.createElementWhitelist(whitelist) : whitelist, '');
+			if (blacklist) cleanData = cleanData.replace(typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist, '');
+		}
 
-		return this._tagConvertor(cleanData);
+		if (styleNodeFilter) {
+			cleanData = this._styleNodeConvertor(cleanData);
+		}
+
+		return cleanData;
 	},
 
 	/**
@@ -228,14 +248,11 @@ HTML.prototype = {
 				if (prev?.nodeType === 3 && a?.nodeType === 1) a = prev;
 				const offset = a.nodeType === 3 ? t.endOffset || a.textContent.length : a.childNodes.length;
 
-				let range = null;
 				if (rangeSelection) {
-					range = this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
+					this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
 				} else {
-					range = this.selection.setRange(a, offset, a, offset);
+					this.selection.setRange(a, offset, a, offset);
 				}
-
-				this.scrollTo(range);
 			} catch (error) {
 				if (this.editor.frameContext.get('isReadOnly') || this.editor.frameContext.get('isDisabled')) return;
 				throw Error('[SUNEDITOR.html.insert.error]', error.message);
@@ -864,8 +881,8 @@ HTML.prototype = {
 				return current.hasAttribute('contenteditable');
 			});
 
-			for (let i = 0, len = editableEls.length; i < len; i++) {
-				editableEls[i].removeAttribute('contenteditable');
+			for (let j = 0, jlen = editableEls.length; j < jlen; j++) {
+				editableEls[j].removeAttribute('contenteditable');
 			}
 
 			const content = this.clean(renderHTML.innerHTML, false, null, null);
@@ -930,9 +947,9 @@ HTML.prototype = {
 				const temp = domUtils.createElement('DIV', null, convertValue);
 				const children = temp.children;
 				const len = children.length;
-				for (let i = 0; i < len; i++) {
-					if (!children[i]) continue;
-					this.editor.frameContext.get('wysiwyg').appendChild(children[i]);
+				for (let j = 0; j < len; j++) {
+					if (!children[j]) continue;
+					this.editor.frameContext.get('wysiwyg').appendChild(children[j]);
 				}
 				this.history.push(false, rootKey[i]);
 				this.scrollTo(children[len - 1]);
@@ -1128,7 +1145,7 @@ HTML.prototype = {
 	 * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist
 	 * @private
 	 */
-	_consistencyCheckOfHTML(documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp) {
+	_consistencyCheckOfHTML(documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter) {
 		const removeTags = [],
 			emptyTags = [],
 			wrongList = [],
@@ -1136,51 +1153,65 @@ HTML.prototype = {
 
 		// wrong position
 		const wrongTags = domUtils.getListChildNodes(documentFragment, (current) => {
-			if (current.nodeType !== 1) {
+			if (formatFilter && current.nodeType !== 1) {
 				if (domUtils.isList(current.parentElement)) removeTags.push(current);
 				return false;
 			}
 
-			// white list
-			if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && domUtils.isExcludeFormat(current))) {
-				removeTags.push(current);
-				return false;
-			}
-
-			// empty tags
-			const nrtag = !domUtils.getParentElement(current, domUtils.isExcludeFormat);
-			if (
-				!domUtils.isTableElements(current) &&
-				!domUtils.isListCell(current) &&
-				!domUtils.isAnchor(current) &&
-				(this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) &&
-				current.childNodes.length === 0 &&
-				nrtag
-			) {
-				emptyTags.push(current);
-				return false;
-			}
-
-			// wrong list
-			if (domUtils.isList(current.parentNode) && !domUtils.isList(current) && !domUtils.isListCell(current)) {
-				wrongList.push(current);
-				return false;
-			}
-
-			// table cells
-			if (domUtils.isTableCell(current)) {
-				const fel = current.firstElementChild;
-				if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
-					withoutFormatCells.push(current);
+			// tag filter
+			if (tagFilter) {
+				// white list
+				if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && domUtils.isExcludeFormat(current))) {
+					removeTags.push(current);
 					return false;
 				}
 			}
 
+			const nrtag = !domUtils.getParentElement(current, domUtils.isExcludeFormat);
+
+			// formatFilter
+			if (formatFilter) {
+				// empty tags
+				if (
+					!domUtils.isTableElements(current) &&
+					!domUtils.isListCell(current) &&
+					!domUtils.isAnchor(current) &&
+					(this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) &&
+					current.childNodes.length === 0 &&
+					nrtag
+				) {
+					emptyTags.push(current);
+					return false;
+				}
+
+				// wrong list
+				if (domUtils.isList(current.parentNode) && !domUtils.isList(current) && !domUtils.isListCell(current)) {
+					wrongList.push(current);
+					return false;
+				}
+
+				// table cells
+				if (domUtils.isTableCell(current)) {
+					const fel = current.firstElementChild;
+					if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
+						withoutFormatCells.push(current);
+						return false;
+					}
+				}
+			}
+
 			// class filter
-			if (nrtag && current.className) {
-				const className = new Array(current.classList).map(this._isAllowedClassName).join(' ').trim();
-				if (className) current.className = className;
-				else current.removeAttribute('class');
+			if (classFilter) {
+				if (nrtag && current.className) {
+					const className = new Array(current.classList).map(this._isAllowedClassName).join(' ').trim();
+					if (className) current.className = className;
+					else current.removeAttribute('class');
+				}
+			}
+
+			// format filter
+			if (!formatFilter) {
+				return false;
 			}
 
 			const result =
@@ -1260,7 +1291,7 @@ HTML.prototype = {
 	 * @returns {string} HTML string
 	 * @private
 	 */
-	_tagConvertor(html) {
+	_styleNodeConvertor(html) {
 		if (!this._disallowedStyleNodesRegExp) return html;
 
 		const ec = this.options.get('_defaultStyleTagMap');
@@ -1378,7 +1409,7 @@ HTML.prototype = {
 				r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"]+)/);
 				if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
 					const k = env.kebabToCamelCase(r[1].trim());
-					const v = this.editor.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
+					const cs = this.editor.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
 					const c = r[3].trim();
 					switch (k) {
 						case 'fontFamily':
@@ -1398,7 +1429,7 @@ HTML.prototype = {
 							break;
 					}
 
-					if (v !== c) {
+					if (cs !== c) {
 						allowedStyle.push(r[0]);
 					}
 				}
@@ -1487,22 +1518,26 @@ HTML.prototype = {
  * @returns {string}
  * @private
  */
-function CleanElements(m, t) {
+function CleanElements(attrFilter, styleFilter, m, t) {
 	if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
 
 	let v = null;
 	const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
 
-	// blacklist
-	const bAttr = this._attributeBlacklist[tagName];
-	m = m.replace(/\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/gi, '');
-	if (bAttr) m = m.replace(bAttr, '');
-	else m = m.replace(this._attributeBlacklistRegExp, '');
+	if (attrFilter) {
+		// blacklist
+		const bAttr = this._attributeBlacklist[tagName];
+		m = m.replace(/\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/gi, '');
+		if (bAttr) m = m.replace(bAttr, '');
+		else m = m.replace(this._attributeBlacklistRegExp, '');
 
-	// whitelist
-	const wAttr = this._attributeWhitelist[tagName];
-	if (wAttr) v = m.match(wAttr);
-	else v = m.match(this._attributeWhitelistRegExp);
+		// whitelist
+		const wAttr = this._attributeWhitelist[tagName];
+		if (wAttr) v = m.match(wAttr);
+		else v = m.match(this._attributeWhitelistRegExp);
+	}
+
+	if (!styleFilter) return m;
 
 	// attribute
 	if (tagName === 'a') {

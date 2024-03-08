@@ -367,9 +367,9 @@ Image_.prototype = {
 
 		const handler = function (infos, newInfos) {
 			infos = newInfos || infos;
-			const url = infos.url;
-			if (this.modal.isUpdate) this._updateSrc(url, infos.element, infos.files);
-			else this.create(url, infos.anchor, infos.inputWidth, infos.inputHeight, infos.align, infos.files, infos.alt);
+			const infoUrl = infos.url;
+			if (this.modal.isUpdate) this._updateSrc(infoUrl, infos.element, infos.files);
+			else this.create(infoUrl, infos.anchor, infos.inputWidth, infos.inputHeight, infos.align, infos.files, infos.alt);
 		}.bind(this, imgInfo);
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
@@ -657,10 +657,10 @@ Image_.prototype = {
 				reader = new FileReader();
 				file = files[i];
 
-				reader.onload = function (reader, update, updateElement, file, index) {
+				reader.onload = function (on_reader, update, updateElement, on_file, index) {
 					filesStack[index] = {
-						result: reader.result,
-						file: file
+						result: on_reader.result,
+						file: on_file
 					};
 
 					if (--this._base64RenderIndex === 0) {

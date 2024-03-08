@@ -317,8 +317,18 @@ export function InitOptions(options, editorTargets) {
 	}
 
 	/** Base */
+	const defaultMode = options.strictMode !== false;
+	o.set('strictMode', {
+		pluginPattern: defaultMode,
+		tagFilter: defaultMode,
+		formatFilter: defaultMode,
+		classFilter: defaultMode,
+		styleNodeFilter: defaultMode,
+		attrFilter: defaultMode,
+		styleFilter: defaultMode,
+		...options.strictMode
+	});
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
-	o.set('strictMode', options.strictMode ?? true);
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
@@ -405,7 +415,7 @@ export function InitOptions(options, editorTargets) {
 	o.set('defaultLine', typeof options.defaultLine === 'string' && options.defaultLine.length > 0 ? options.defaultLine : 'p');
 	// element
 	o.set('elementWhitelist', (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase() + (o.get('_allowedExtraTag') ? '|' + o.get('_allowedExtraTag') : ''));
-	o.set('elementBlacklist', _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLine'))) + (o.get('_disallowedExtraTag') ? '|' + o.get('_disallowedExtraTag') : '');
+	o.set('elementBlacklist', _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLine')) + (o.get('_disallowedExtraTag') ? '|' + o.get('_disallowedExtraTag') : ''));
 	// attribute
 	o.set('attributeWhitelist', !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist);
 	o.set('attributeBlacklist', !options.attributeBlacklist || typeof options.attributeBlacklist !== 'object' ? null : options.attributeBlacklist);
@@ -690,8 +700,8 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 		wysiwygDiv.style.cssText = editorStyles.frame + editorStyles.editor;
 	} else {
 		const frameAttrs = targetOptions.get('iframe_attributes');
-		for (let key in frameAttrs) {
-			wysiwygDiv.setAttribute(key, frameAttrs[key]);
+		for (let frameKey in frameAttrs) {
+			wysiwygDiv.setAttribute(frameKey, frameAttrs[frameKey]);
 		}
 		wysiwygDiv.allowFullscreen = true;
 		wysiwygDiv.frameBorder = 0;

@@ -94,9 +94,11 @@ function CreateHTML({ lang }, items) {
 	const styleList = items || Object.keys(defaultList);
 
 	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
-	for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value, _class; i < len; i++) {
+	for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value; i < len; i++) {
 		t = styleList[i];
-		(attrs = ''), (value = ''), (command = []);
+		attrs = '';
+		value = '';
+		command = [];
 
 		if (typeof t === 'string') {
 			const cssText = defaultList[t.toLowerCase()];
@@ -106,7 +108,6 @@ function CreateHTML({ lang }, items) {
 
 		name = t.name;
 		tag = t.tag || 'span';
-		_class = t.class;
 
 		attrs += ` class="${t.class}"`;
 		value += `.${t.class.trim().replace(/\s+/g, ',.')}`;

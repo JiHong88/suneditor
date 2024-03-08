@@ -1003,7 +1003,8 @@ Table.prototype = {
 						colSpan += cell.colSpan - 1;
 
 						if (logcalIndex >= spanCell.index) {
-							i--, colSpan--;
+							i--;
+							colSpan--;
 							colSpan += spanCell.cell.colSpan - 1;
 							next.insertBefore(spanCell.cell, cell);
 							spanCell = spanCells.shift();
@@ -1250,11 +1251,11 @@ Table.prototype = {
 					continue;
 				}
 
-				for (let c = 0, cLen = cells.length, cell, rs; c < cLen; c++) {
+				for (let c = 0, cLen = cells.length, cell, rs2; c < cLen; c++) {
 					cell = cells[c];
-					rs = cell.rowSpan - 1;
-					if (rs > 0 && i + rs >= rowIndexFirst) {
-						cell.rowSpan -= numbers.getOverlapRangeAtIndex(rowIndexFirst, rowIndexLast, i, i + rs);
+					rs2 = cell.rowSpan - 1;
+					if (rs2 > 0 && i + rs2 >= rowIndexFirst) {
+						cell.rowSpan -= numbers.getOverlapRangeAtIndex(rowIndexFirst, rowIndexLast, i, i + rs2);
 					}
 				}
 			}
@@ -1577,6 +1578,7 @@ Table.prototype = {
 		this._propsCache = [];
 
 		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
+			// eslint-disable-next-line no-shadow
 			let { cssText, border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = t.style;
 			this._propsCache.push([t, cssText]);
 			if (isBreak) continue;
@@ -1684,7 +1686,7 @@ Table.prototype = {
 		try {
 			target.setAttribute('disabled', true);
 
-			const isTable = this.controller_props.currentTarget === this.controller_table.form;
+			const isTable = this.controller_table.form.contains(this.controller_props.currentTarget);
 			const targets = isTable ? [this._element] : this._selectedCells;
 			const tr = targets[0];
 			const trStyles = _w.getComputedStyle(tr);
@@ -1819,6 +1821,14 @@ Table.prototype = {
 			}
 
 			this._historyPush();
+
+			// set cells style
+			this.controller_props.close();
+			if (this._tdElement) {
+				this._recallStyleSelectedCells();
+				this.setCellInfo(this._tdElement, false);
+				domUtils.addClass(this._tdElement, 'se-selected-cell-focus');
+			}
 		} catch (err) {
 			console.warn('[SUNEDITOR.plugins.table.setProps.error]', err);
 		} finally {

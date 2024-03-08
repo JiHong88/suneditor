@@ -288,7 +288,7 @@ function CloseListener_keydown(e) {
 }
 
 function CloseListener_mousedown({ target }) {
-	if (this.inst?._element.contains(target)) {
+	if (this.inst?._element?.contains(target)) {
 		this.isOpen = false;
 		return;
 	}

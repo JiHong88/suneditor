@@ -919,12 +919,12 @@ function ButtonsHandler(e) {
 
 			// blur event
 			if (typeof plugin.onInputChange === 'function') this.__inputPlugin = { obj: plugin, target: eventTarget, value: eventTarget.value };
-			this.__inputBlurEvent = this.addEvent(eventTarget, 'blur', (e) => {
+			this.__inputBlurEvent = this.addEvent(eventTarget, 'blur', (ev) => {
 				if (plugin.isInputActive) return;
 
 				try {
 					const value = eventTarget.value.trim();
-					if (typeof plugin.onInputChange === 'function' && value !== this.__inputPlugin.value) plugin.onInputChange({ target: eventTarget, value, event: e });
+					if (typeof plugin.onInputChange === 'function' && value !== this.__inputPlugin.value) plugin.onInputChange({ target: eventTarget, value, event: ev });
 				} finally {
 					this._w.setTimeout(() => (this._inputFocus = false), 0);
 					this.__removeInput();
@@ -1625,8 +1625,8 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 					this.selection.setRange(temp, 0, temp, 0);
 					break;
 				} else if (rangeEl && formatEl && !domUtils.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
-					const range = this.selection.getRange();
-					if (domUtils.isEdgePoint(range.endContainer, range.endOffset) && domUtils.isList(selectionNode.nextSibling)) {
+					const rangeEnt = this.selection.getRange();
+					if (domUtils.isEdgePoint(rangeEnt.endContainer, rangeEnt.endOffset) && domUtils.isList(selectionNode.nextSibling)) {
 						e.preventDefault();
 						const br = domUtils.createElement('BR');
 						const newEl = domUtils.createElement('LI', null, br);
@@ -1638,7 +1638,11 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 						break;
 					}
 
-					if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && domUtils.isZeroWith(formatEl.innerText.trim()) && !domUtils.isListCell(formatEl.nextElementSibling)) {
+					if (
+						(rangeEnt.commonAncestorContainer.nodeType === 3 ? !rangeEnt.commonAncestorContainer.nextElementSibling : true) &&
+						domUtils.isZeroWith(formatEl.innerText.trim()) &&
+						!domUtils.isListCell(formatEl.nextElementSibling)
+					) {
 						e.preventDefault();
 						let newEl = null;
 
@@ -1771,10 +1775,10 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 						const isMultiLine = this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null);
 						const newFormat = formatEl.cloneNode(false);
 						newFormat.innerHTML = '<br>';
-						const r = this.html.remove();
-						newEl = this.format.getLine(r.container, null);
+						const rcon = this.html.remove();
+						newEl = this.format.getLine(rcon.container, null);
 						if (!newEl) {
-							if (domUtils.isWysiwygFrame(r.container)) {
+							if (domUtils.isWysiwygFrame(rcon.container)) {
 								e.preventDefault();
 								frameContext.get('wysiwyg').appendChild(newFormat);
 								newEl = newFormat;
@@ -1784,15 +1788,15 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 							break;
 						}
 
-						const innerRange = this.format.getBlock(r.container);
+						const innerRange = this.format.getBlock(rcon.container);
 						newEl = newEl.contains(innerRange) ? domUtils.getEdgeChild(innerRange, this.format.getLine.bind(this.format)) : newEl;
 						if (isMultiLine) {
 							if (formatEndEdge && !formatStartEdge) {
-								newEl.parentNode.insertBefore(newFormat, !r.prevContainer || r.container === r.prevContainer ? newEl.nextElementSibling : newEl);
+								newEl.parentNode.insertBefore(newFormat, !rcon.prevContainer || rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl);
 								newEl = newFormat;
 								offset = 0;
 							} else {
-								offset = r.offset;
+								offset = rcon.offset;
 								if (formatStartEdge) {
 									const tempEl = newEl.parentNode.insertBefore(newFormat, newEl);
 									if (formatEndEdge) {
@@ -1803,11 +1807,11 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 							}
 						} else {
 							if (formatEndEdge && formatStartEdge) {
-								newEl.parentNode.insertBefore(newFormat, r.prevContainer && r.container === r.prevContainer ? newEl.nextElementSibling : newEl);
+								newEl.parentNode.insertBefore(newFormat, rcon.prevContainer && rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl);
 								newEl = newFormat;
 								offset = 0;
 							} else {
-								newEl = this.nodeTransform.split(r.container, r.offset, domUtils.getNodeDepth(formatEl));
+								newEl = this.nodeTransform.split(rcon.container, rcon.offset, domUtils.getNodeDepth(formatEl));
 							}
 						}
 					} else {
@@ -2144,8 +2148,8 @@ function OnBlur_wysiwyg(frameContext, e) {
 	this.status.currentNodes = [];
 	this.status.currentNodesMap = [];
 
-	this.editor.applyFrameRoots((e) => {
-		if (e.get('navigation')) e.get('navigation').textContent = '';
+	this.editor.applyFrameRoots((root) => {
+		if (root.get('navigation')) root.get('navigation').textContent = '';
 	});
 
 	this.history.check(frameContext.get('key'), this.status._range);

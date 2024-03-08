@@ -562,9 +562,9 @@ Editor.prototype = {
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
 
-		const newKeys = _keys(newOptions);
-		CheckResetKeys(newKeys, this.plugins, '');
-		if (newKeys.length === 0) return;
+		const newOptionKeys = _keys(newOptions);
+		CheckResetKeys(newOptionKeys, this.plugins, '');
+		if (newOptionKeys.length === 0) return;
 
 		// option merge
 		const rootDiff = {};
@@ -600,24 +600,24 @@ Editor.prototype = {
 		const options = this.options;
 		const newMap = InitOptions(this._originOptions, newRoots).o;
 		/** --------- root start --------- */
-		for (let i = 0, k; (k = newKeys[i]); i++) {
+		for (let i = 0, k; (k = newOptionKeys[i]); i++) {
 			if (newRootKeys[k]) {
 				const diff = rootDiff[k];
 				const fc = frameRoots.get(k);
 				const originOptions = fc.get('options');
-				const newOptions = newRootKeys[k].options;
+				const newRootOptions = newRootKeys[k].options;
 
 				// statusbar
 				if (diff.has('statusbar')) {
 					domUtils.removeItem(fc.get('statusbar'));
-					if (newOptions.get('statusbar')) {
-						const statusbar = CreateStatusbar(newOptions, null).statusbar;
+					if (newRootOptions.get('statusbar')) {
+						const statusbar = CreateStatusbar(newRootOptions, null).statusbar;
 						fc.get('container').appendChild(statusbar);
 						UpdateStatusbarContext(statusbar, fc);
-						this.eventManager.__addStatusbarEvent(fc, newOptions);
+						this.eventManager.__addStatusbarEvent(fc, newRootOptions);
 					} else {
 						this.eventManager.removeEvent(originOptions.get('__statusbarEvent'));
-						newOptions.set('__statusbarEvent', null);
+						newRootOptions.set('__statusbarEvent', null);
 						UpdateStatusbarContext(null, fc);
 					}
 				}
@@ -626,32 +626,32 @@ Editor.prototype = {
 				if (diff.has('iframe_attributes')) {
 					const frame = fc.get('wysiwygFrame');
 					const originAttr = originOptions.get('iframe_attributes');
-					const newAttr = newOptions.get('iframe_attributes');
-					for (let k in originAttr) frame.removeAttribute(k, originAttr[k]);
-					for (let k in newAttr) frame.setAttribute(k, newAttr[k]);
+					const newAttr = newRootOptions.get('iframe_attributes');
+					for (let origin_k in originAttr) frame.removeAttribute(origin_k, originAttr[origin_k]);
+					for (let new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
 				}
 				if (diff.has('iframe_cssFileName')) {
 					const docHead = fc.get('_wd').head;
 					const links = docHead.getElementsByTagName('link');
 					while (links[0]) docHead.removeChild(links[0]);
-					const parseDocument = new DOMParser().parseFromString(converter._setIframeStyleLinks(newOptions.get('iframe_cssFileName')), 'text/html');
+					const parseDocument = new DOMParser().parseFromString(converter._setIframeStyleLinks(newRootOptions.get('iframe_cssFileName')), 'text/html');
 					const newLinks = parseDocument.head.children;
 					const sTag = docHead.querySelector('style');
 					while (newLinks[0]) docHead.insertBefore(newLinks[0], sTag);
 				}
 
 				// --- options set ---
-				fc.set('options', newOptions);
+				fc.set('options', newRootOptions);
 
 				// frame styles
-				this.setEditorStyle(newOptions.get('_defaultStyles'), fc);
+				this.setEditorStyle(newRootOptions.get('_defaultStyles'), fc);
 
 				// frame attributes
 				const frame = fc.get('wysiwyg');
 				const originAttr = originOptions.get('editableFrameAttributes');
-				const newAttr = newOptions.get('editableFrameAttributes');
-				for (let k in originAttr) frame.removeAttribute(k, originAttr[k]);
-				for (let k in newAttr) frame.setAttribute(k, newAttr[k]);
+				const newAttr = newRootOptions.get('editableFrameAttributes');
+				for (let origin_k in originAttr) frame.removeAttribute(origin_k, originAttr[origin_k]);
+				for (let new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
 
 				continue;
 			}
@@ -676,7 +676,7 @@ Editor.prototype = {
 		// toolbar
 		const toolbar = this.context.get('toolbar.main');
 		// width
-		if (/inline|balloon/i.test(options.get('mode')) && newKeys.includes('toolbar_width')) {
+		if (/inline|balloon/i.test(options.get('mode')) && newOptionKeys.includes('toolbar_width')) {
 			toolbar.style.width = options.get('toolbar_width');
 		}
 		// hide

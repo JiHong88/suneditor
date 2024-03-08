@@ -153,34 +153,11 @@ HueSlider.prototype = {
 		}
 
 		// event
-		this.__globalMouseDown = this.eventManager.addGlobalEvent(
-			'mousedown',
-			({ target, clientX, clientY }) => {
-				if (target === wheel) {
-					isBarDragging = false;
-					isWheelragging = true;
-					updatePointer_wheel(clientX, clientY);
-				} else if (target === gradientBar) {
-					isBarDragging = true;
-					isWheelragging = false;
-					updatePointer_bar(clientX);
-				}
-			},
-			true
-		);
-		this.__globalMouseMove = this.eventManager.addGlobalEvent(
-			'mousemove',
-			({ clientX, clientY }) => {
-				if (isWheelragging) {
-					updatePointer_wheel(clientX, clientY);
-				} else if (isBarDragging) {
-					updatePointer_bar(clientX);
-				}
-			},
-			true
-		);
+		const isMobile = env.isMobile;
+		this.__globalMouseDown = this.eventManager.addGlobalEvent(isMobile ? 'touchstart' : 'mousedown', isMobile ? OnTouchstart : OnMousedown, true);
+		this.__globalMouseMove = this.eventManager.addGlobalEvent(isMobile ? 'touchmove' : 'mousemove', isMobile ? OnTouchmove : OnMousemove, true);
 		this.__globalMouseUp = this.eventManager.addGlobalEvent(
-			'mouseup',
+			isMobile ? 'touchend' : 'mouseup',
 			() => {
 				isWheelragging = false;
 				isBarDragging = false;
@@ -204,6 +181,53 @@ HueSlider.prototype = {
 
 // init
 const { slider, offscreenCanvas, offscreenCtx, wheel, wheelCtx, wheelPointer, gradientBar, gradientPointer, fanalColorHex, fanalColorBackground } = CreateSliderCtx();
+
+// mobile
+function OnTouchstart(event) {
+	const { target, clientX, clientY } = event;
+
+	if (target === wheel) {
+		isBarDragging = false;
+		isWheelragging = true;
+		updatePointer_wheel(clientX, clientY);
+	} else if (target === gradientBar) {
+		isBarDragging = true;
+		isWheelragging = false;
+		updatePointer_bar(clientX);
+	}
+}
+
+function OnTouchmove(event) {
+	const { clientX, clientY } = event;
+	event.preventDefault();
+
+	if (isWheelragging) {
+		updatePointer_wheel(clientX, clientY);
+	} else if (isBarDragging) {
+		updatePointer_bar(clientX);
+	}
+}
+
+// pc
+function OnMousedown({ target, clientX, clientY }) {
+	if (target === wheel) {
+		isBarDragging = false;
+		isWheelragging = true;
+		updatePointer_wheel(clientX, clientY);
+	} else if (target === gradientBar) {
+		isBarDragging = true;
+		isWheelragging = false;
+		updatePointer_bar(clientX);
+	}
+}
+
+function OnMousemove({ clientX, clientY }) {
+	if (isWheelragging) {
+		updatePointer_wheel(clientX, clientY);
+	} else if (isBarDragging) {
+		updatePointer_bar(clientX);
+	}
+}
 
 function updatePointer_wheel(x, y) {
 	const rect = wheel.getBoundingClientRect();
@@ -264,8 +288,8 @@ function setHex(hex) {
 	fanalColorBackground.style.backgroundColor = fanalColorHex.textContent = hex;
 }
 
-function getWheelColor(wheelCtx) {
-	const pixel = wheelCtx.getImageData(wheelX, wheelY, 1, 1).data;
+function getWheelColor(wCtx) {
+	const pixel = wCtx.getImageData(wheelX, wheelY, 1, 1).data;
 	let [h, s, l] = rgbToHsl(pixel);
 
 	// Calculate distance from the center of the wheel

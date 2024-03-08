@@ -151,13 +151,13 @@ FileManager.prototype = {
 
 		// method bind
 		info.element = element;
-		info.delete = function (element) {
-			if (typeof this.inst.destroy === 'function') this.inst.destroy.call(this.inst, element);
-			this._deleteInfo(element.getAttribute('data-se-index') * 1);
+		info.delete = function (el) {
+			if (typeof this.inst.destroy === 'function') this.inst.destroy.call(this.inst, el);
+			this._deleteInfo(el.getAttribute('data-se-index') * 1);
 		}.bind(this, element);
-		info.select = function (element) {
-			element.scrollIntoView(true);
-			if (typeof this.inst.select === 'function') this._w.setTimeout(this.inst.select.bind(this.inst, element), 0);
+		info.select = function (el) {
+			el.scrollIntoView(true);
+			if (typeof this.inst.select === 'function') this._w.setTimeout(this.inst.select.bind(this.inst, el), 0);
 		}.bind(this, element);
 
 		// figure

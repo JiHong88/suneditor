@@ -255,7 +255,6 @@ Viewer.prototype = {
 			const expansionIcon = this.icons.expansion;
 			this.editor.applyCommandTargets('fullScreen', (e) => {
 				domUtils.changeElement(e.firstElementChild, expansionIcon);
-				fc;
 				domUtils.removeClass(e, 'active');
 			});
 		}
@@ -504,7 +503,8 @@ Viewer.prototype = {
 				for (let i = 0, len = headChildren.length; i < len; i++) {
 					if (/^script$/i.test(headChildren[i].tagName)) {
 						parseDocument.head.removeChild(headChildren[i]);
-						i--, len--;
+						i--;
+						len--;
 					}
 				}
 			}

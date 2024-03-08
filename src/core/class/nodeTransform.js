@@ -158,7 +158,10 @@ NodeTransform.prototype = {
 						for (let n = 0; n < nodePathLen; n++) {
 							path = nodePathArray[n];
 							if (path && path[depth] === i) {
-								(c = child), (p = current), (cDepth = depth), (spliceDepth = true);
+								c = child;
+								p = current;
+								cDepth = depth;
+								spliceDepth = true;
 								while (cDepth >= 0) {
 									if (domUtils.getArrayIndex(p.childNodes, c) !== path[cDepth]) {
 										spliceDepth = false;

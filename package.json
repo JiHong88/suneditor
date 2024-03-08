@@ -13,8 +13,9 @@
 		"start": "npm run dev",
 		"build:dev": "cross-env NODE_ENV=development webpack --config webpack/builder.js",
 		"build:prod": "cross-env NODE_ENV=production webpack --config webpack/builder.js",
-		"lint": "jshint src",
-		"test": "karma start"
+		"lint": "eslint src",
+		"test": "karma start",
+		"update-browserslist": "npx browserslist@latest --update-db"
 	},
 	"bugs": {
 		"url": "https://github.com/JiHong88/SunEditor/issues"
@@ -46,11 +47,11 @@
 		"css-minimizer-webpack-plugin": "^5.0.0",
 		"csstype": "^3.1.2",
 		"eslint-config-prettier": "^8.8.0",
+		"eslint-plugin-compat": "^4.2.0",
 		"eslint-plugin-prettier": "^4.2.1",
 		"file-loader": "^6.2.0",
 		"html-webpack-plugin": "^5.5.1",
 		"jasmine": "^5.0.0",
-		"jshint": "^2.13.6",
 		"karma": "^6.4.2",
 		"karma-chrome-launcher": "^3.2.0",
 		"karma-firefox-launcher": "^2.1.2",
@@ -67,6 +68,12 @@
 		"webpack-dev-server": "^4.15.0",
 		"webpack-merge": "^5.9.0"
 	},
+	"browserslist": [
+		"last 2 versions",
+		"not dead",
+		"not < 1%",
+		"not ie <= 11"
+	],
 	"keywords": [
 		"wysiwyg",
 		"wysiwyg editor",

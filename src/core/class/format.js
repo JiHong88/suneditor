@@ -71,7 +71,7 @@ Format.prototype = {
 
 		while (node) {
 			if (domUtils.isWysiwygFrame(node)) return null;
-			if (this.isBlock(node)) node.firstElementChild;
+			if (this.isBlock(node)) return node.firstElementChild;
 			if (this.isLine(node) && validation(node)) return node;
 
 			node = node.parentNode;
@@ -439,14 +439,14 @@ Format.prototype = {
 		let reset = false;
 		let moveComplete = false;
 
-		function appendNode(parent, insNode, sibling, originNode) {
+		function appendNode(parentEl, insNode, sibling, originNode) {
 			if (domUtils.isZeroWith(insNode)) {
 				insNode.innerHTML = unicode.zeroWidthSpace;
 				so = eo = 1;
 			}
 
 			if (insNode.nodeType === 3) {
-				parent.insertBefore(insNode, sibling);
+				parentEl.insertBefore(insNode, sibling);
 				return insNode;
 			}
 
@@ -460,10 +460,10 @@ Format.prototype = {
 				if (inst._notTextNode(c) && !domUtils.isBreak(c) && !domUtils.isListCell(format)) {
 					if (format.childNodes.length > 0) {
 						if (!first) first = format;
-						parent.insertBefore(format, sibling);
+						parentEl.insertBefore(format, sibling);
 						format = insNode.cloneNode(false);
 					}
-					parent.insertBefore(c, sibling);
+					parentEl.insertBefore(c, sibling);
 					if (!first) first = c;
 				} else {
 					format.appendChild(c);
@@ -471,14 +471,14 @@ Format.prototype = {
 			}
 
 			if (format.childNodes.length > 0) {
-				if (domUtils.isListCell(parent) && domUtils.isListCell(format) && domUtils.isList(sibling)) {
+				if (domUtils.isListCell(parentEl) && domUtils.isListCell(format) && domUtils.isList(sibling)) {
 					if (newList) {
 						first = sibling;
 						while (sibling) {
 							format.appendChild(sibling);
 							sibling = sibling.nextSibling;
 						}
-						parent.parentNode.insertBefore(format, parent.nextElementSibling);
+						parentEl.parentNode.insertBefore(format, parentEl.nextElementSibling);
 					} else {
 						const originNext = originNode.nextElementSibling;
 						const detachRange = this._removeNestedList(originNode, false);
@@ -493,7 +493,7 @@ Format.prototype = {
 						}
 					}
 				} else {
-					parent.insertBefore(format, sibling);
+					parentEl.insertBefore(format, sibling);
 				}
 
 				if (!first) first = format;
@@ -771,9 +771,9 @@ Format.prototype = {
 
 			let list = mergeTop ? topEl : domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 			let firstList = null;
-			let lastList = null;
 			let topNumber = null;
-			let bottomNumber = null;
+			// let lastList = null;
+			// let bottomNumber = null;
 
 			const passComponent = (current) => {
 				return !this.component.is(current) && !domUtils.isList(current);
@@ -808,7 +808,7 @@ Format.prototype = {
 				}
 				list.appendChild(newCell);
 
-				if (!next) lastList = list;
+				// if (!next) lastList = list;
 				if (!next || parentTag !== nextParent || this.isBlock(siblingTag)) {
 					if (!firstList) firstList = list;
 					if ((!mergeTop || !next || parentTag !== nextParent) && !(next && domUtils.isList(nextParent) && nextParent === originParent)) {
@@ -834,9 +834,9 @@ Format.prototype = {
 			}
 
 			if (mergeBottom) {
-				bottomNumber = list.children.length - 1;
+				// bottomNumber = list.children.length - 1;
 				list.innerHTML += bottomEl.innerHTML;
-				lastList = list.children[bottomNumber] || lastList;
+				// lastList = list.children[bottomNumber] || lastList;
 				domUtils.removeItem(bottomEl);
 			}
 		}
@@ -2131,8 +2131,8 @@ Format.prototype = {
 
 					if (anchorNode && child.nodeType === 3) {
 						if (_getMaintainedNode(child)) {
-							const ancestorAnchorNode = domUtils.getParentElement(ancestor, function (current) {
-								return inst._isNonSplitNode(current.parentNode) || current.parentNode === pNode;
+							const ancestorAnchorNode = domUtils.getParentElement(ancestor, (c) => {
+								return inst._isNonSplitNode(c.parentNode) || c.parentNode === pNode;
 							});
 							anchorNode.appendChild(ancestorAnchorNode);
 							newInnerNode = ancestorAnchorNode.cloneNode(false);
@@ -2388,8 +2388,8 @@ Format.prototype = {
 
 					if (anchorNode && child.nodeType === 3) {
 						if (_getMaintainedNode(child)) {
-							const ancestorAnchorNode = domUtils.getParentElement(ancestor, function (current) {
-								return inst._isNonSplitNode(current.parentNode) || current.parentNode === pNode;
+							const ancestorAnchorNode = domUtils.getParentElement(ancestor, (c) => {
+								return inst._isNonSplitNode(c.parentNode) || c.parentNode === pNode;
 							});
 							anchorNode.appendChild(ancestorAnchorNode);
 							newInnerNode = ancestorAnchorNode.cloneNode(false);
@@ -2816,8 +2816,8 @@ Format.prototype = {
 
 					if (anchorNode && child.nodeType === 3) {
 						if (_getMaintainedNode(child)) {
-							const ancestorAnchorNode = domUtils.getParentElement(ancestor, function (current) {
-								return inst._isNonSplitNode(current.parentNode) || current.parentNode === pNode;
+							const ancestorAnchorNode = domUtils.getParentElement(ancestor, (c) => {
+								return inst._isNonSplitNode(c.parentNode) || c.parentNode === pNode;
 							});
 							anchorNode.appendChild(ancestorAnchorNode);
 							newInnerNode = ancestorAnchorNode.cloneNode(false);
