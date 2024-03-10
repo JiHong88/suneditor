@@ -503,7 +503,7 @@ Editor.prototype = {
 
 			const fc = this.frameContext;
 			const plugins = this.plugins;
-			for (let k in plugins) {
+			for (const k in plugins) {
 				if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
 			}
 
@@ -573,7 +573,7 @@ Editor.prototype = {
 		const newRoots = [];
 		const newRootKeys = {};
 		this._originOptions = [newOptions, this._originOptions].reduce(function (init, option) {
-			for (let key in option) {
+			for (const key in option) {
 				if (rootKeys.includes(key) && option[key]) {
 					const nro = option[key];
 					const newKeys = _keys(nro);
@@ -582,7 +582,7 @@ Editor.prototype = {
 
 					rootDiff[key] = new Map();
 					const o = frameRoots.get(key).get('options').get('_origin');
-					for (let rk in nro) {
+					for (const rk in nro) {
 						const roV = nro[rk];
 						if (!newKeys.includes(rk) || o[rk] === roV) continue;
 						rootDiff[key].set(GetResetDiffKey(rk), true);
@@ -627,8 +627,8 @@ Editor.prototype = {
 					const frame = fc.get('wysiwygFrame');
 					const originAttr = originOptions.get('iframe_attributes');
 					const newAttr = newRootOptions.get('iframe_attributes');
-					for (let origin_k in originAttr) frame.removeAttribute(origin_k, originAttr[origin_k]);
-					for (let new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
+					for (const origin_k in originAttr) frame.removeAttribute(origin_k, originAttr[origin_k]);
+					for (const new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
 				}
 				if (diff.has('iframe_cssFileName')) {
 					const docHead = fc.get('_wd').head;
@@ -650,8 +650,8 @@ Editor.prototype = {
 				const frame = fc.get('wysiwyg');
 				const originAttr = originOptions.get('editableFrameAttributes');
 				const newAttr = newRootOptions.get('editableFrameAttributes');
-				for (let origin_k in originAttr) frame.removeAttribute(origin_k, originAttr[origin_k]);
-				for (let new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
+				for (const origin_k in originAttr) frame.removeAttribute(origin_k, originAttr[origin_k]);
+				for (const new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
 
 				continue;
 			}
@@ -983,35 +983,35 @@ Editor.prototype = {
 		this.context.clear();
 
 		let obj = this.plugins;
-		for (let k in obj) {
+		for (const k in obj) {
 			const p = obj[k];
 			if (typeof p._destroy === 'function') p._destroy();
-			for (let pk in p) {
+			for (const pk in p) {
 				delete p[pk];
 			}
 			delete obj[k];
 		}
 		obj = this.events;
-		for (let k in obj) {
+		for (const k in obj) {
 			delete obj[k];
 		}
 
 		obj = ['eventManager', 'char', 'component', 'format', 'html', 'menu', 'nodeTransform', 'notice', 'offset', 'selection', 'shortcuts', 'toolbar', 'viewer'];
 		for (let i = 0, len = obj.length, c; i < len; i++) {
 			c = this[obj[i]];
-			for (let k in c) {
+			for (const k in c) {
 				delete c[k];
 			}
 		}
 		obj = this.subToolbar;
 		if (obj) {
-			for (let k in obj) {
+			for (const k in obj) {
 				delete obj[k];
 			}
 		}
 
 		obj = null;
-		for (let k in this) {
+		for (const k in this) {
 			delete this[k];
 		}
 
@@ -1275,9 +1275,9 @@ Editor.prototype = {
 		const plugins = this.plugins;
 		const isArray = Array.isArray;
 		const shortcuts = this.options.get('shortcuts');
-		let filePluginRegExp = [];
+		const filePluginRegExp = [];
 		let plugin;
-		for (let key in plugins) {
+		for (const key in plugins) {
 			this.registerPlugin(key, this._pluginCallButtons[key], options[key], shortcuts[key]);
 			this.registerPlugin(key, this._pluginCallButtons_sub[key], options[key], shortcuts[key]);
 			plugin = this.plugins[key];
@@ -1430,7 +1430,7 @@ Editor.prototype = {
 
 		// wisywig attributes
 		const attr = frameOptions.get('editableFrameAttributes');
-		for (let k in attr) {
+		for (const k in attr) {
 			e.get('wysiwyg').setAttribute(k, attr[k]);
 		}
 
@@ -1531,10 +1531,9 @@ Editor.prototype = {
 		this.__registerClass();
 
 		// init
-		const inst = this;
 		let iframeRootSize = 0;
 		let iframeIndex = 0;
-		this.applyFrameRoots(function (e) {
+		this.applyFrameRoots((e) => {
 			const o = e.get('originElement');
 			const t = e.get('topArea');
 			o.style.display = 'none';
@@ -1544,8 +1543,8 @@ Editor.prototype = {
 			if (e.get('options').get('iframe')) {
 				iframeRootSize++;
 				e.get('wysiwygFrame').addEventListener('load', function () {
-					inst.__setIframeDocument(this, inst.options, e.get('options'));
-					if (iframeRootSize === ++iframeIndex) inst.__editorInit(originOptions);
+					this.__setIframeDocument(this, this.options, e.get('options'));
+					if (iframeRootSize === ++iframeIndex) this.__editorInit(originOptions);
 				});
 			}
 

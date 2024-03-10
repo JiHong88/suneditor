@@ -250,7 +250,7 @@ Controller.prototype = {
 
 // @todo
 Controller.CreateHTML = function () {
-	let html = '';
+	const html = '';
 	return domUtils.createElement('DIV', { class: '' }, html);
 };
 

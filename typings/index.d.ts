@@ -1,8 +1,8 @@
-import Env from "./env";
-import Unicode from "./unicode";
-import Converter from "./converter";
-import DomUtils from "./domUtils";
-import Numbers from "./numbers";
+import Env from './env';
+import Unicode from './unicode';
+import Converter from './converter';
+import DomUtils from './domUtils';
+import Numbers from './numbers';
 
 export const env = Env;
 export const unicode = Unicode;
@@ -16,6 +16,6 @@ class helper {
 	converter: converter;
 	domUtils: domUtils;
 	numbers: numbers;
-};
+}
 
 export default helper;

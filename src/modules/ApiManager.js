@@ -49,7 +49,7 @@ ApiManager.prototype = {
 		xhr.onreadystatechange = CallBackApi.bind(this, xhr, callBack, errorCallBack);
 		xhr.open(method, url, true);
 		if (headers !== null && typeof headers === 'object' && Object.keys(headers).length > 0) {
-			for (let key in headers) {
+			for (const key in headers) {
 				xhr.setRequestHeader(key, headers[key]);
 			}
 		}
@@ -75,7 +75,7 @@ ApiManager.prototype = {
 		return new Promise((resolve, reject) => {
 			xhr.open(method, url, true);
 			if (headers !== null && typeof headers === 'object' && Object.keys(headers).length > 0) {
-				for (let key in headers) {
+				for (const key in headers) {
 					xhr.setRequestHeader(key, headers[key]);
 				}
 			}

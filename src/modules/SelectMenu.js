@@ -199,7 +199,7 @@ SelectMenu.prototype = {
 		const sideAddH = side ? targetHeight : 0;
 		let overH = 10000;
 		switch (position) {
-			case 'middle':
+			case 'middle': {
 				let h = form.offsetHeight;
 				const th = targetHeight / 2;
 				t = targetOffsetTop - h / 2 + th;
@@ -223,6 +223,7 @@ SelectMenu.prototype = {
 				}
 				form.style.height = h + 'px';
 				break;
+			}
 			case 'top':
 				if (targetGlobalTop < form.offsetHeight - sideAddH) {
 					if (!_re) {
@@ -278,13 +279,14 @@ SelectMenu.prototype = {
 				overW = this._w.innerWidth - (fl + formW);
 				if (overW < 0) l = targetL - formW - 1;
 				break;
-			case 'false-center':
+			case 'false-center': {
 				overW = this._w.innerWidth - (fl + formW);
 				if (overW < 0) l += overW - 4;
 				form.style.left = l + 'px';
 				const centerfl = this.editor.offset.getGlobal(form).left;
 				if (centerfl < 0) l -= centerfl - 4;
 				break;
+			}
 			case 'false-left':
 				overW = this._w.innerWidth - (globalTarget.left - this._w.scrollX + formW);
 				if (overW < 0) l += overW - 4;

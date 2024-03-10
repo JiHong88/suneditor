@@ -312,7 +312,7 @@ Image_.prototype = {
 		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
-		let files = [];
+		const files = [];
 		for (let i = 0, len = fileList.length; i < len; i++) {
 			if (/image/i.test(fileList[i].type)) {
 				files.push(fileList[i]);
@@ -538,16 +538,16 @@ Image_.prototype = {
 
 		// Declare all variables
 		const tabName = targetElement.getAttribute('data-tab-link');
-		let i, tabContent, tabLinks;
+		let i;
 
 		// Get all elements with class="tabcontent" and hide them
-		tabContent = modalForm.getElementsByClassName('_se_tab_content');
+		const tabContent = modalForm.getElementsByClassName('_se_tab_content');
 		for (i = 0; i < tabContent.length; i++) {
 			tabContent[i].style.display = 'none';
 		}
 
 		// Get all elements with class="tablinks" and remove the class "active"
-		tabLinks = modalForm.getElementsByClassName('_se_tab_link');
+		const tabLinks = modalForm.getElementsByClassName('_se_tab_link');
 		for (i = 0; i < tabLinks.length; i++) {
 			domUtils.removeClass(tabLinks[i], 'active');
 		}
@@ -579,7 +579,7 @@ Image_.prototype = {
 	},
 
 	create(src, anchor, width, height, align, file, alt) {
-		let oImg = domUtils.createElement('IMG');
+		const oImg = domUtils.createElement('IMG');
 		oImg.src = src;
 		oImg.alt = alt;
 		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);

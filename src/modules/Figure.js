@@ -426,7 +426,7 @@ Figure.prototype = {
 		if (/^(onalign|onresize)$/.test(command)) return;
 
 		switch (command) {
-			case 'mirror':
+			case 'mirror': {
 				const info = GetRotateValue(element);
 				let x = info.x;
 				let y = info.y;
@@ -439,6 +439,7 @@ Figure.prototype = {
 
 				this._setRotate(element, info.r, x, y);
 				break;
+			}
 			case 'rotate':
 				this.setTransform(element, null, null, value);
 				break;
@@ -552,8 +553,8 @@ Figure.prototype = {
 				figureInfo.cover.style.height = figureInfo.caption ? '' : h;
 
 				if (isVertical) {
-					let transW = offsetW / 2 + 'px ' + offsetW / 2 + 'px 0';
-					let transH = offsetH / 2 + 'px ' + offsetH / 2 + 'px 0';
+					const transW = offsetW / 2 + 'px ' + offsetW / 2 + 'px 0';
+					const transH = offsetH / 2 + 'px ' + offsetH / 2 + 'px 0';
 					transOrigin = deg === 90 || deg === -270 ? transH : transW;
 				}
 			}
@@ -852,8 +853,8 @@ function ContainerResizing(e) {
 	let resultW = this._element_w;
 	let resultH = this._element_h;
 
-	let w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
-	let h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
+	const w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
+	const h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
 	const wh = (resultH / resultW) * w;
 	const resizeBorder = this.editor.frameContext.get('_figure').border;
 

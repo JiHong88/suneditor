@@ -37,7 +37,7 @@ class Events extends EditorInterface {
 	 * @param controllers Array of Controller elements
 	 * @param core Core object
 	 */
-	onShowController: (name: String, controllers: Controllers) => void;
+	onShowController: (name: string, controllers: Controllers) => void;
 
 	/**
 	 * @description It replaces the default callback function of the image upload

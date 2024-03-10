@@ -27,7 +27,7 @@ const Modal = function (inst, element) {
 };
 
 Modal.CreateBasic = function () {
-	let html = '';
+	const html = '';
 	return domUtils.createElement('DIV', { class: '' }, html);
 };
 

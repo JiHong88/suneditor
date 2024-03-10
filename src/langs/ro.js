@@ -137,7 +137,7 @@
 		video_modal_file: 'Selectează',
 		video_modal_title: 'Inserează video',
 		video_modal_url: 'Include URL, youtube/vimeo',
-		width: 'Lățime',
+		width: 'Lățime'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

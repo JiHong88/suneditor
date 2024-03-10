@@ -270,7 +270,7 @@ Format.prototype = {
 			}
 		}
 
-		let last = rangeLines[rangeLines.length - 1];
+		const last = rangeLines[rangeLines.length - 1];
 		let standTag, beforeTag, pElement;
 
 		if (this.isBlock(last) || this.isLine(last)) {
@@ -420,7 +420,6 @@ Format.prototype = {
 	 * @returns {Object}
 	 */
 	removeBlock(rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
-		const inst = this;
 		const range = this.selection.getRange();
 		let so = range.startOffset;
 		let eo = range.endOffset;
@@ -439,7 +438,7 @@ Format.prototype = {
 		let reset = false;
 		let moveComplete = false;
 
-		function appendNode(parentEl, insNode, sibling, originNode) {
+		const appendNode = (parentEl, insNode, sibling, originNode) => {
 			if (domUtils.isZeroWith(insNode)) {
 				insNode.innerHTML = unicode.zeroWidthSpace;
 				so = eo = 1;
@@ -457,7 +456,7 @@ Format.prototype = {
 
 			while (insChildren[0]) {
 				c = insChildren[0];
-				if (inst._notTextNode(c) && !domUtils.isBreak(c) && !domUtils.isListCell(format)) {
+				if (this._notTextNode(c) && !domUtils.isBreak(c) && !domUtils.isListCell(format)) {
 					if (format.childNodes.length > 0) {
 						if (!first) first = format;
 						parentEl.insertBefore(format, sibling);
@@ -500,7 +499,7 @@ Format.prototype = {
 			}
 
 			return first;
-		}
+		};
 
 		// detach loop
 		for (let i = 0, len = children.length, insNode, lineIndex, next; i < len; i++) {
@@ -672,8 +671,8 @@ Format.prototype = {
 		domUtils.sortNodeByDepth(selectedFormats, true);
 
 		// merge
-		let firstSel = selectedFormats[0];
-		let lastSel = selectedFormats[selectedFormats.length - 1];
+		const firstSel = selectedFormats[0];
+		const lastSel = selectedFormats[selectedFormats.length - 1];
 		let topEl = (domUtils.isListCell(firstSel) || this.component.is(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
 		let bottomEl = (domUtils.isListCell(lastSel) || this.component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
@@ -1436,8 +1435,8 @@ Format.prototype = {
 		if (!domUtils.isWysiwygFrame(commonCon) && !this.isBlock(commonCon)) lineNodes.unshift(this.getLine(commonCon, null));
 		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
 
-		let startLine = this.getLine(startCon, null);
-		let endLine = this.getLine(endCon, null);
+		const startLine = this.getLine(startCon, null);
+		const endLine = this.getLine(endCon, null);
 		let startIdx = null;
 		let endIdx = null;
 
@@ -1860,6 +1859,7 @@ Format.prototype = {
 
 		// add tag
 		_removeCheck.v = false;
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		const el = element;
 		const nNodeArray = [newInnerNode];
@@ -1889,7 +1889,7 @@ Format.prototype = {
 			const childNodes = current.childNodes;
 
 			for (let i = 0, len = childNodes.length, vNode; i < len; i++) {
-				let child = childNodes[i];
+				const child = childNodes[i];
 				if (!child) continue;
 				let coverNode = ancestor;
 				let cloneNode;
@@ -2167,7 +2167,7 @@ Format.prototype = {
 
 		if (isRemoveFormat) {
 			for (let i = 0; i < nNodeArray.length; i++) {
-				let removeNode = nNodeArray[i];
+				const removeNode = nNodeArray[i];
 				let textNode, textNode_s, textNode_e;
 
 				if (collapsed) {
@@ -2300,6 +2300,7 @@ Format.prototype = {
 
 		// add tag
 		_removeCheck.v = false;
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		const el = element;
 		const nNodeArray = [newInnerNode];
@@ -2494,7 +2495,7 @@ Format.prototype = {
 
 		if (isRemoveFormat) {
 			for (let i = 0; i < nNodeArray.length; i++) {
-				let removeNode = nNodeArray[i];
+				const removeNode = nNodeArray[i];
 
 				const rChildren = removeNode.childNodes;
 				const textNode = rChildren[0];
@@ -2607,6 +2608,7 @@ Format.prototype = {
 
 		// add tag
 		_removeCheck.v = false;
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		const pNode = element.cloneNode(false);
 		const nNodeArray = [newInnerNode];
@@ -2616,7 +2618,7 @@ Format.prototype = {
 			const childNodes = current.childNodes;
 
 			for (let i = 0, len = childNodes.length, vNode, cloneChild; i < len; i++) {
-				let child = childNodes[i];
+				const child = childNodes[i];
 				if (!child) continue;
 				let coverNode = ancestor;
 
@@ -2663,7 +2665,7 @@ Format.prototype = {
 
 		if (isRemoveFormat && isRemoveNode) {
 			for (let i = 0; i < nNodeArray.length; i++) {
-				let removeNode = nNodeArray[i];
+				const removeNode = nNodeArray[i];
 
 				const rChildren = removeNode.childNodes;
 				while (rChildren[0]) {
@@ -2733,6 +2735,7 @@ Format.prototype = {
 
 		// add tag
 		_removeCheck.v = false;
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		const el = element;
 		const nNodeArray = [newInnerNode];
@@ -2928,7 +2931,7 @@ Format.prototype = {
 
 		if (isRemoveFormat) {
 			for (let i = 0; i < nNodeArray.length; i++) {
-				let removeNode = nNodeArray[i];
+				const removeNode = nNodeArray[i];
 
 				const rChildren = removeNode.childNodes;
 				let textNode = null;

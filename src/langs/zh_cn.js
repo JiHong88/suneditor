@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-				if (!w.document) {
-					throw new Error('SUNEDITOR_LANG a window with a document');
-				}
-				return factory(w);
-			};
+					if (!w.document) {
+						throw new Error('SUNEDITOR_LANG a window with a document');
+					}
+					return factory(w);
+			  };
 	} else {
 		factory(global);
 	}
@@ -137,7 +137,7 @@
 		video_modal_file: '上传图片',
 		video_modal_title: '插入视频',
 		video_modal_url: '嵌入网址, Youtube,Vimeo',
-		width: '宽度',
+		width: '宽度'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

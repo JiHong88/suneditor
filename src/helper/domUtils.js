@@ -23,7 +23,7 @@ export function createElement(elementName, attributes, inner) {
 	const el = _d.createElement(elementName);
 
 	if (attributes) {
-		for (let key in attributes) {
+		for (const key in attributes) {
 			if (attributes[key] !== undefined && attributes[key] !== null) el.setAttribute(key, attributes[key]);
 		}
 	}
@@ -409,14 +409,12 @@ export function getParentElements(element, query) {
  * @returns {Element|null}
  */
 export function getCommandTarget(target) {
-	let command = target.getAttribute('data-command');
-
-	while (!command && !/^(UL|DIV)$/i.test(target.tagName)) {
+	while (!/^(UL|DIV)$/i.test(target.tagName)) {
+		if (target.hasAttribute('data-command')) return target;
 		target = target.parentNode;
-		if (target.getAttribute('data-command')) return target;
 	}
 
-	return command ? target : null;
+	return null;
 }
 
 /**
@@ -559,7 +557,7 @@ export function getArrayIndex(array, node) {
  * @returns {number}
  */
 export function nextIndex(array, item) {
-	let idx = getArrayIndex(array, item);
+	const idx = getArrayIndex(array, item);
 	if (idx === -1) return -1;
 	return idx + 1;
 }
@@ -571,7 +569,7 @@ export function nextIndex(array, item) {
  * @returns {number}
  */
 export function prevIndex(array, item) {
-	let idx = getArrayIndex(array, item);
+	const idx = getArrayIndex(array, item);
 	if (idx === -1) return -1;
 	return idx - 1;
 }
@@ -708,7 +706,7 @@ export function setStyle(elements, styleName, value) {
  */
 export function setDisabled(buttonList, disabled, important) {
 	for (let i = 0, len = buttonList.length; i < len; i++) {
-		let button = buttonList[i];
+		const button = buttonList[i];
 		if (important || !isImportantDisabled(button)) button.disabled = disabled;
 		if (important) {
 			if (disabled) {

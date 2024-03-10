@@ -234,7 +234,7 @@ Video.prototype = {
 		this._origin_h = figureInfo.height || figureInfo.originHeight || figureInfo.h || '';
 
 		let w = figureInfo.width || figureInfo.w || this._origin_w || '';
-		let h = figureInfo.height || figureInfo.h || this._origin_h || '';
+		const h = figureInfo.height || figureInfo.h || this._origin_h || '';
 
 		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || (this._element.querySelector('source') || '').src || '';
 		(this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
@@ -431,7 +431,7 @@ Video.prototype = {
 		if (fileList.length === 0) return;
 
 		let fileSize = 0;
-		let files = [];
+		const files = [];
 		for (let i = 0, len = fileList.length; i < len; i++) {
 			if (/video/i.test(fileList[i].type)) {
 				files.push(fileList[i]);
@@ -598,7 +598,7 @@ Video.prototype = {
 		const attrs = this.pluginOptions.videoTagAttributes;
 		if (!attrs) return;
 
-		for (let key in attrs) {
+		for (const key in attrs) {
 			element.setAttribute(key, attrs[key]);
 		}
 	},
@@ -610,7 +610,7 @@ Video.prototype = {
 		const attrs = this.pluginOptions.iframeTagAttributes;
 		if (!attrs) return;
 
-		for (let key in attrs) {
+		for (const key in attrs) {
 			element.setAttribute(key, attrs[key]);
 		}
 	},

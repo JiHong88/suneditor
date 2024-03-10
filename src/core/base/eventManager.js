@@ -528,9 +528,8 @@ EventManager.prototype = {
 	},
 
 	_dataTransferAction(type, e, data, frameContext) {
-		let plainText, cleanData;
-		plainText = data.getData('text/plain');
-		cleanData = data.getData('text/html');
+		const plainText = data.getData('text/plain');
+		const cleanData = data.getData('text/html');
 		try {
 			this._setClipboardData(type, e, plainText, cleanData, data, frameContext);
 			e.preventDefault();
@@ -547,7 +546,7 @@ EventManager.prototype = {
 		const onlyText = !cleanData;
 
 		if (!onlyText) {
-			cleanData = cleanData.replace(/^<html>\r?\n?<body>\r?\n?\x3C!--StartFragment--\>|\x3C!--EndFragment-->\r?\n?<\/body\>\r?\n?<\/html>$/g, '');
+			cleanData = cleanData.replace(/^<html>\r?\n?<body>\r?\n?\x3C!--StartFragment-->|\x3C!--EndFragment-->\r?\n?<\/body>\r?\n?<\/html>$/g, '');
 			if (MSData) {
 				cleanData = cleanData.replace(/\n/g, ' ');
 				plainText = plainText.replace(/\n/g, ' ');
@@ -1159,7 +1158,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 	if (this._callPluginEvent('onKeyDown', { frameContext, event: e, range, line: formatEl }) === false) return;
 
 	switch (keyCode) {
-		case 8 /** backspace key */:
+		case 8 /** backspace key */: {
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -1360,7 +1359,8 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 			}
 
 			break;
-		case 46 /** delete key */:
+		}
+		case 46 /** delete key */: {
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -1474,7 +1474,8 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 			}
 
 			break;
-		case 9 /** tab key */:
+		}
+		case 9 /** tab key */: {
 			if (this.options.get('tabDisable')) break;
 			e.preventDefault();
 			if (ctrl || alt || domUtils.isWysiwygFrame(selectionNode)) break;
@@ -1483,8 +1484,8 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 			const selectedFormats = this.format.getLines(null);
 			selectionNode = this.selection.getNode();
 			const cells = [];
-			let lines = [];
-			let fc = domUtils.isListCell(selectedFormats[0]),
+			const lines = [];
+			const fc = domUtils.isListCell(selectedFormats[0]),
 				lc = domUtils.isListCell(selectedFormats[selectedFormats.length - 1]);
 			let r = {
 				sc: range.startContainer,
@@ -1585,7 +1586,8 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 			this.history.push(false);
 
 			break;
-		case 13 /** enter key */:
+		}
+		case 13 /** enter key */: {
 			const brBlock = this.format.getBrLine(selectionNode, null);
 
 			if (this.editor.frameOptions.get('charCounter_type') === 'byte-html') {
@@ -1655,15 +1657,18 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 								newEl = newListCell;
 							}
 						} else {
-							const newFormat = domUtils.isTableCell(rangeEl.parentNode)
-								? 'DIV'
-								: domUtils.isList(rangeEl.parentNode)
-								? 'LI'
-								: this.format.isLine(rangeEl.nextElementSibling) && !this.format.isBlock(rangeEl.nextElementSibling)
-								? rangeEl.nextElementSibling.nodeName
-								: this.format.isLine(rangeEl.previousElementSibling) && !this.format.isBlock(rangeEl.previousElementSibling)
-								? rangeEl.previousElementSibling.nodeName
-								: this.options.get('defaultLine');
+							let newFormat;
+							if (domUtils.isTableCell(rangeEl.parentNode)) {
+								newFormat = 'DIV';
+							} else if (domUtils.isList(rangeEl.parentNode)) {
+								newFormat = 'LI';
+							} else if (this.format.isLine(rangeEl.nextElementSibling) && !this.format.isBlock(rangeEl.nextElementSibling)) {
+								newFormat = rangeEl.nextElementSibling.nodeName;
+							} else if (this.format.isLine(rangeEl.previousElementSibling) && !this.format.isBlock(rangeEl.previousElementSibling)) {
+								newFormat = rangeEl.previousElementSibling.nodeName;
+							} else {
+								newFormat = this.options.get('defaultLine');
+							}
 
 							newEl = domUtils.createElement(newFormat);
 							const edge = this.format.removeBlock(rangeEl, [formatEl], null, true, true);
@@ -1839,6 +1844,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 			}
 
 			break;
+		}
 	}
 
 	if (shift && (env.isOSX_IOS ? alt : ctrl) && keyCode === 32) {

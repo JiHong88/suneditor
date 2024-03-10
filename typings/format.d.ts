@@ -1,4 +1,4 @@
-import EditorInterface from "../../interface/editor";
+import EditorInterface from '../../interface/editor';
 
 class Format extends EditorInterface {
 	/**
@@ -129,7 +129,7 @@ class Format extends EditorInterface {
 	 * @param dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
 	 * @returns
 	 */
-	isEdgeLine(container: Node, offset: number, dir: "front" | "end"): boolean;
+	isEdgeLine(container: Node, offset: number, dir: 'front' | 'end'): boolean;
 
 	/**
 	 * @description It is judged whether it is a node related to the text style.

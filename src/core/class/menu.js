@@ -229,7 +229,7 @@ function OnKeyDown_dropdown(e) {
 			this._moveItem(1);
 			break;
 		case 13:
-		case 32: // enter, space
+		case /* enter, space */ 32: {
 			if (this.index < 0) break;
 
 			const target = this.menus[this.index];
@@ -240,6 +240,7 @@ function OnKeyDown_dropdown(e) {
 			this.plugins[this.currentDropdownName].action(target);
 			this.dropdownOff();
 			break;
+		}
 	}
 }
 

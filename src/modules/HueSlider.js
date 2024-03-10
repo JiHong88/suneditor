@@ -290,6 +290,7 @@ function setHex(hex) {
 
 function getWheelColor(wCtx) {
 	const pixel = wCtx.getImageData(wheelX, wheelY, 1, 1).data;
+	// eslint-disable-next-line prefer-const
 	let [h, s, l] = rgbToHsl(pixel);
 
 	// Calculate distance from the center of the wheel
@@ -372,7 +373,7 @@ function drawColorWheelToContext(context) {
 		for (let distance = 0; distance <= MIDDLE; distance += 1) {
 			context.beginPath();
 
-			let dynamicLightness = LIGHTNESS_CONT_VALUE + ((MIDDLE - distance) / MIDDLE) * 50;
+			const dynamicLightness = LIGHTNESS_CONT_VALUE + ((MIDDLE - distance) / MIDDLE) * 50;
 
 			context.fillStyle = `hsl(${h}, ${fixedSaturation}%, ${dynamicLightness}%)`;
 
@@ -394,16 +395,15 @@ function rgbToHsl([r, g, b]) {
 	g /= 255;
 	b /= 255;
 
-	let max = _w.Math.max(r, g, b),
+	const max = _w.Math.max(r, g, b),
 		min = _w.Math.min(r, g, b);
-	let h,
-		s,
-		l = (max + min) / 2;
+	let h, s;
+	const l = (max + min) / 2;
 
 	if (max === min) {
 		h = s = 0; // achromatic
 	} else {
-		let d = max - min;
+		const d = max - min;
 		s = l > 0.5 ? d / (2.0 - max - min) : d / (max + min);
 
 		switch (max) {
@@ -439,8 +439,8 @@ function hslToRgb([h, s, l]) {
 			return p;
 		};
 
-		let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-		let p = 2 * l - q;
+		const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+		const p = 2 * l - q;
 		r = hue2rgb(p, q, h + 1 / 3);
 		g = hue2rgb(p, q, h);
 		b = hue2rgb(p, q, h - 1 / 3);

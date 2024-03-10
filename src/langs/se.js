@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-				if (!w.document) {
-					throw new Error('SUNEDITOR_LANG a window with a document');
-				}
-				return factory(w);
-			};
+					if (!w.document) {
+						throw new Error('SUNEDITOR_LANG a window with a document');
+					}
+					return factory(w);
+			  };
 	} else {
 		factory(global);
 	}
@@ -137,7 +137,7 @@
 		video_modal_file: 'Lägg till från fil',
 		video_modal_title: 'Lägg till video',
 		video_modal_url: 'Bädda in video / YouTube,Vimeo',
-		width: 'Bredd',
+		width: 'Bredd'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

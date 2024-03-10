@@ -1,7 +1,7 @@
 class env {
 	_w: Window;
 	_d: Document;
-  
+
 	/**
 	 * @description Gets XMLHttpRequest object
 	 * @returns

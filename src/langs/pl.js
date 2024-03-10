@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-				if (!w.document) {
-					throw new Error('SUNEDITOR_LANG a window with a document');
-				}
-				return factory(w);
-			};
+					if (!w.document) {
+						throw new Error('SUNEDITOR_LANG a window with a document');
+					}
+					return factory(w);
+			  };
 	} else {
 		factory(global);
 	}
@@ -137,7 +137,7 @@
 		video_modal_file: 'Wybierz plik',
 		video_modal_title: 'Wstaw wideo',
 		video_modal_url: 'Adres URL video, np. YouTube/Vimeo',
-		width: 'Szerokość',
+		width: 'Szerokość'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

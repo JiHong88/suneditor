@@ -29,7 +29,7 @@ const HTML = function (editor) {
 	// clean styles
 	const tagStyles = this.options.get('tagStyles');
 	const splitTagStyles = {};
-	for (let k in tagStyles) {
+	for (const k in tagStyles) {
 		const s = k.split('|');
 		for (let i = 0, len = s.length, n; i < len; i++) {
 			n = s[i];
@@ -38,7 +38,7 @@ const HTML = function (editor) {
 			splitTagStyles[n] += tagStyles[k];
 		}
 	}
-	for (let k in splitTagStyles) {
+	for (const k in splitTagStyles) {
 		splitTagStyles[k] = new RegExp(`\\s*[^-a-zA-Z](${splitTagStyles[k]})\\s*:[^;]+(?!;)*`, 'gi');
 	}
 
@@ -48,7 +48,7 @@ const HTML = function (editor) {
 		span: options.get('_spanStylesRegExp'),
 		line: options.get('_lineStylesRegExp')
 	};
-	for (let key in stylesObj) {
+	for (const key in stylesObj) {
 		stylesMap.set(new RegExp(`^(${key})$`), stylesObj[key]);
 	}
 	this._cleanStyleTagKeyRegExp = new RegExp(`^(${Object.keys(stylesObj).join('|')})$`, 'i');
@@ -93,7 +93,7 @@ const HTML = function (editor) {
 	let tagsAttr = {};
 	let allAttr = '';
 	if (_wAttr) {
-		for (let k in _wAttr) {
+		for (const k in _wAttr) {
 			if (/^on[a-z]+$/i.test(_wAttr[k])) continue;
 			if (k === '*') {
 				allAttr = GetRegList(_wAttr[k], defaultAttr);
@@ -111,7 +111,7 @@ const HTML = function (editor) {
 	tagsAttr = {};
 	allAttr = '';
 	if (_bAttr) {
-		for (let k in _bAttr) {
+		for (const k in _bAttr) {
 			if (k === '*') {
 				allAttr = GetRegList(_bAttr[k], '');
 			} else {
@@ -146,7 +146,7 @@ HTML.prototype = {
 		}
 
 		if (attrFilter || styleFilter) {
-			html = html.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, attrFilter, styleFilter));
+			html = html.replace(/(<[a-zA-Z0-9-]+)[^>]*(?=>)/g, CleanElements.bind(this, attrFilter, styleFilter));
 		}
 
 		// get dom tree
@@ -305,8 +305,9 @@ HTML.prototype = {
 	 * @returns {Object|Node|null}
 	 */
 	insertNode(oNode, afterNode, notCheckCharCount) {
+		let result = null;
 		if (this.editor.frameContext.get('isReadOnly') || (!notCheckCharCount && !this.char.check(oNode, null))) {
-			return null;
+			return result;
 		}
 
 		let range = this.selection.getRange();
@@ -404,7 +405,7 @@ HTML.prototype = {
 						else afterNode = commonCon.nextSibling;
 					} else {
 						if (!domUtils.isBreak(parentNode)) {
-							let c = parentNode.childNodes[startOff];
+							const c = parentNode.childNodes[startOff];
 							const focusNode = c?.nodeType === 3 && domUtils.isZeroWith(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
 							if (focusNode) {
 								if (!focusNode.nextSibling && domUtils.isBreak(focusNode)) {
@@ -632,7 +633,7 @@ HTML.prototype = {
 
 					this.selection.setRange(oNode, newRange.startOffset, oNode, newRange.endOffset);
 
-					return newRange;
+					result = newRange;
 				} else if (!domUtils.isBreak(oNode) && !domUtils.isListCell(oNode) && this.format.isLine(parentNode)) {
 					let zeroWidth = null;
 					if (!oNode.previousSibling || domUtils.isBreak(oNode.previousSibling)) {
@@ -649,15 +650,18 @@ HTML.prototype = {
 						oNode = oNode.nextSibling;
 						offset = 0;
 					}
-				}
 
-				this.selection.setRange(oNode, offset, oNode, offset);
+					this.selection.setRange(oNode, offset, oNode, offset);
+				}
 			}
 
-			this.history.push(true);
-
-			return oNode;
+			if (!result) {
+				this.history.push(true);
+				result = oNode;
+			}
 		}
+
+		return result;
 	},
 
 	/**
@@ -1393,7 +1397,7 @@ HTML.prototype = {
 			if (!v) v = [];
 
 			let mv;
-			for (let [key, value] of this._cleanStyleRegExpMap) {
+			for (const [key, value] of this._cleanStyleRegExpMap) {
 				if (key.test(name)) {
 					mv = value;
 					break;
@@ -1456,6 +1460,7 @@ HTML.prototype = {
 	},
 
 	_checkDuplicateNode(oNode, parentNode) {
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		(function recursionFunc(current) {
 			inst._dupleCheck(current, parentNode);
@@ -1519,10 +1524,10 @@ HTML.prototype = {
  * @private
  */
 function CleanElements(attrFilter, styleFilter, m, t) {
-	if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
+	if (/^<[a-z0-9]+:[a-z0-9]+/i.test(m)) return m;
 
 	let v = null;
-	const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
+	const tagName = t.match(/(?!<)[a-zA-Z0-9-]+/)[0].toLowerCase();
 
 	if (attrFilter) {
 		// blacklist
@@ -1565,7 +1570,7 @@ function CleanElements(attrFilter, styleFilter, m, t) {
 
 	if (v) {
 		for (let i = 0, len = v.length, a; i < len; i++) {
-			a = /^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i];
+			a = /^(?:href|src)\s*=\s*('|"|\s)*javascript\s*:/i.test(v[i].trim()) ? '' : v[i];
 			t += (/^\s/.test(a) ? '' : ' ') + a;
 		}
 	}

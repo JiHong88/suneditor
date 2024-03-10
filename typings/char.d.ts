@@ -1,4 +1,4 @@
-import EditorDependency from "../src/editorInjector";
+import EditorDependency from '../src/editorInjector';
 
 class Char extends EditorDependency {
 	/**

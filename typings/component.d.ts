@@ -1,4 +1,4 @@
-import EditorInterface from "../../interface/editor";
+import EditorInterface from '../../interface/editor';
 
 class Component extends EditorInterface {
 	/**

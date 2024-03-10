@@ -18,7 +18,28 @@ export type fileInfo = {
 	src: string;
 };
 export type seledtedFileInfo = { target: Element; component: Element; pluginName: string };
-export type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript' | 'copy' | 'cut' | 'paste';
+export type commands =
+	| 'selectAll'
+	| 'codeView'
+	| 'fullScreen'
+	| 'indent'
+	| 'outdent'
+	| 'undo'
+	| 'redo'
+	| 'removeFormat'
+	| 'print'
+	| 'preview'
+	| 'showBlocks'
+	| 'save'
+	| 'bold'
+	| 'underline'
+	| 'italic'
+	| 'strike'
+	| 'subscript'
+	| 'superscript'
+	| 'copy'
+	| 'cut'
+	| 'paste';
 export type status = {};
 
 export interface Core {

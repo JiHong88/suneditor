@@ -226,8 +226,8 @@ function CheckKatex(katex) {
 			throwOnError: false
 		},
 		katex.options || {}
-	].reduce(function (init, option) {
-		for (let key in option) {
+	].reduce((init, option) => {
+		for (const key in option) {
 			init[key] = option[key];
 		}
 		return init;

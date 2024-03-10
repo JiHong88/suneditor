@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-				if (!w.document) {
-					throw new Error('SUNEDITOR_LANG a window with a document');
-				}
-				return factory(w);
-			};
+					if (!w.document) {
+						throw new Error('SUNEDITOR_LANG a window with a document');
+					}
+					return factory(w);
+			  };
 	} else {
 		factory(global);
 	}
@@ -136,7 +136,7 @@
 		video_modal_file: 'Indsæt fra fil',
 		video_modal_title: 'Indsæt Video',
 		video_modal_url: 'Indlejr video / YouTube,Vimeo',
-		width: 'Bredde',
+		width: 'Bredde'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

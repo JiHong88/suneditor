@@ -58,6 +58,7 @@
 		download: 'Download',
 		drag: 'Drag',
 		edit: 'Edit',
+		exportPdf: 'Export to PDF',
 		decrease: 'Decrease',
 		increase: 'Increase',
 		fileUpload: 'File upload',

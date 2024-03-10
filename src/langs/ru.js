@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-				if (!w.document) {
-					throw new Error('SUNEDITOR_LANG a window with a document');
-				}
-				return factory(w);
-			};
+					if (!w.document) {
+						throw new Error('SUNEDITOR_LANG a window with a document');
+					}
+					return factory(w);
+			  };
 	} else {
 		factory(global);
 	}
@@ -137,7 +137,7 @@
 		video_modal_file: 'Выберите файл',
 		video_modal_title: 'Вставить видео',
 		video_modal_url: 'Ссылка на видео, Youtube,Vimeo',
-		width: 'Ширина',
+		width: 'Ширина'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

@@ -1,4 +1,7 @@
 {
+	"plugins": ["prettier", "@typescript-eslint"],
+	"extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
+	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
 		"ecmaVersion": 2020,
 		"sourceType": "module"
@@ -8,20 +11,32 @@
 		"node": true,
 		"es6": true
 	},
-	"rules": {
-		"semi": ["error", "always"],
-		"eqeqeq": "error",
-		"strict": ["error", "safe"],
-		"no-undef": "error",
-		"no-unused-vars": "error",
-		"no-loop-func": "off",
-		"no-shadow": "error",
-		"no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }]
-	},
 	"globals": {
 		"ActiveXObject": "writable",
 		"Selection": "writable",
 		"Node": "writable",
 		"Range": "writable"
-	}
+	},
+	"rules": {
+		"prettier/prettier": ["error", { "useTabs": true, "tabWidth": 4 }],
+		"eqeqeq": "error",
+		"strict": ["error", "safe"],
+		"no-undef": "error",
+		"no-unused-vars": "warn",
+		"no-loop-func": "off",
+		"no-shadow": "error",
+		"no-unused-expressions": "off",
+		"curly": "off",
+		"prefer-const": "error",
+		"no-var": "error"
+	},
+	"overrides": [
+		{
+			"files": ["*.ts", "*.d.ts"],
+			"rules": {
+				"no-unused-vars": "off", // JavaScript 규칙 비활성화
+				"@typescript-eslint/no-unused-vars": "off" // TypeScript 규칙 비활성화
+			}
+		}
+	]
 }

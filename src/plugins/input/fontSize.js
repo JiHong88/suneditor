@@ -122,14 +122,14 @@ const FontSize = function (editor, pluginOptions) {
 	} else if (!disableInput) {
 		this.afterButton = domUtils.createElement(
 			'button',
-			{ class: `se-btn se-tooltip se-sub-arrow-btn`, 'data-command': FontSize.key, 'data-type': 'dropdown' },
+			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': FontSize.key, 'data-type': 'dropdown' },
 			`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
 		);
 		this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
 	} else if (disableInput && !showIncDec) {
 		this.replaceButton = domUtils.createElement(
 			'button',
-			{ class: `se-btn se-tooltip se-btn-select se-btn-tool-font-size`, 'data-command': FontSize.key, 'data-type': 'dropdown' },
+			{ class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size', 'data-command': FontSize.key, 'data-type': 'dropdown' },
 			`<span class="se-txt __se__font_size">${this.lang.fontSize}</span>${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
 		);
 		this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
@@ -219,6 +219,7 @@ FontSize.prototype = {
 		try {
 			this.isInputActive = true;
 
+			// eslint-disable-next-line prefer-const
 			let { value, unit } = this._getSize(changeValue);
 			const { max, min } = this.unitMap[unit];
 			value = value > max ? max : value < min ? min : value;

@@ -342,7 +342,7 @@ Offset.prototype = {
 		// margin
 		const tmtw = targetRect.top;
 		const tmbw = viewportSize.h - targetRect.bottom;
-		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.get('toolbar_container')) ? 0 : this.context.get('toolbar.main').offsetHeight;
+		const toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.get('toolbar_container')) ? 0 : this.context.get('toolbar.main').offsetHeight;
 		let rmt, rmb;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rmt = tmtw - toolbarH;

@@ -35,7 +35,7 @@ Notice.prototype = {
 };
 
 function CreateHTML({ lang, icons }) {
-	let html = '<div><button class="close" data-command="close" title="' + lang.close + '">' + icons.cancel + '</button></div><div><span></span></div>';
+	const html = '<div><button class="close" data-command="close" title="' + lang.close + '">' + icons.cancel + '</button></div><div><span></span></div>';
 	return domUtils.createElement('DIV', { class: 'se-notice' }, html);
 }
 

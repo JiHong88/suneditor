@@ -237,7 +237,7 @@ ModalAnchorEditor.prototype = {
 		const preview = this.preview;
 		const protocol = this.options.get('defaultUrlProtocol');
 		const noPrefix = this.noAutoPrefix;
-		const reservedProtocol = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value) || value.indexOf(protocol) === 0;
+		const reservedProtocol = /^(mailto:|tel:|sms:|https*:\/\/|#)/.test(value) || value.indexOf(protocol) === 0;
 		const sameProtocol = !protocol ? false : RegExp('^' + value.substr(0, protocol.length)).test(protocol);
 		value =
 			this.linkValue =
@@ -263,8 +263,8 @@ ModalAnchorEditor.prototype = {
 		const current = this.currentRel;
 		if (!relAttr) return current.join(' ');
 
-		if (/^only\:/.test(relAttr)) {
-			relAttr = relAttr.replace(/^only\:/, '').trim();
+		if (/^only:/.test(relAttr)) {
+			relAttr = relAttr.replace(/^only:/, '').trim();
 			this.currentRel = relAttr.split(' ');
 			return relAttr;
 		}
@@ -279,7 +279,7 @@ ModalAnchorEditor.prototype = {
 
 	_relDelete(relAttr) {
 		if (!relAttr) return this.currentRel.join(' ');
-		if (/^only\:/.test(relAttr)) relAttr = relAttr.replace(/^only\:/, '').trim();
+		if (/^only:/.test(relAttr)) relAttr = relAttr.replace(/^only:/, '').trim();
 
 		const rels = this.currentRel.join(' ').replace(RegExp(relAttr + '\\s*'), '');
 		this.currentRel = rels.split(' ');
@@ -315,7 +315,7 @@ ModalAnchorEditor.prototype = {
 };
 
 async function OnChangeFile(e) {
-	let files = e.target.files;
+	const files = e.target.files;
 	if (!files[0]) return;
 
 	const fileInfo = {
@@ -422,7 +422,7 @@ function OnChange_downloadCheck(e) {
 		this.download.style.display = 'block';
 		this.bookmark.style.display = 'none';
 		domUtils.removeClass(this.bookmarkButton, 'active');
-		this.linkValue = this.preview.textContent = this.urlInput.value = this.urlInput.value.replace(/^\#+/, '');
+		this.linkValue = this.preview.textContent = this.urlInput.value = this.urlInput.value.replace(/^#+/, '');
 		if (typeof this.defaultRel.check_bookmark === 'string') {
 			this._setRel(this._relMerge(this.defaultRel.check_bookmark));
 		}

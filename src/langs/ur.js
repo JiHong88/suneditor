@@ -1,13 +1,13 @@
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
-		module.exports = global.document ?
-			factory(global, true) :
-			function (w) {
-				if (!w.document) {
-					throw new Error('SUNEDITOR_LANG a window with a document');
-				}
-				return factory(w);
-			};
+		module.exports = global.document
+			? factory(global, true)
+			: function (w) {
+					if (!w.document) {
+						throw new Error('SUNEDITOR_LANG a window with a document');
+					}
+					return factory(w);
+			  };
 	} else {
 		factory(global);
 	}
@@ -137,7 +137,7 @@
 		video_modal_file: 'فائلوں سے منتخب کریں',
 		video_modal_title: 'ویڈیو داخل کریں',
 		video_modal_url: 'ذرائع ابلاغ کا یو آر ایل، یوٹیوب/ویمیو',
-		width: 'چوڑائی',
+		width: 'چوڑائی'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

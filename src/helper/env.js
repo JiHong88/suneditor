@@ -116,7 +116,7 @@ export function getIncludePath(nameArray, extension) {
 	}
 
 	for (let i = 0; i < pathList.length; i++) {
-		let editorTag = pathList[i][src].match(regExp);
+		const editorTag = pathList[i][src].match(regExp);
 		if (editorTag) {
 			path = editorTag[0];
 			break;
@@ -126,7 +126,7 @@ export function getIncludePath(nameArray, extension) {
 	if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
 
 	if (!path.includes(':/') && '//' !== path.slice(0, 2)) {
-		path = 0 === path.includes('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path;
+		path = 0 === path.includes('/') ? location.href.match(/^.*?:\/\/[^/]*/)[0] + path : location.href.match(/^[^?]*\/(?:)/)[0] + path;
 	}
 
 	if (!path) {

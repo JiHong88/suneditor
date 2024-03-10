@@ -45,7 +45,7 @@ export function entityToHTML(content) {
 		'&lt;': '<',
 		'&gt;': '>'
 	};
-	return content.replace(/\&amp;|\&nbsp;|\&apos;|\&quot;|\$lt;|\$gt;/g, function (m) {
+	return content.replace(/&amp;|&nbsp;|&apos;|&quot;|\$lt;|\$gt;/g, function (m) {
 		return typeof ec[m] === 'string' ? ec[m] : m;
 	});
 }
@@ -103,7 +103,7 @@ export function swapKeyValue(obj) {
 	const swappedObj = {};
 
 	for (const key in obj) {
-		if (obj.hasOwnProperty(key)) {
+		if (Object.prototype.hasOwnProperty.call(obj, key)) {
 			swappedObj[obj[key]] = key;
 		}
 	}
@@ -200,7 +200,7 @@ export function applyInlineStylesAll(wwTarget) {
 	const elements = tempTarget.querySelectorAll('*');
 	for (let i = 0, el; (el = elements[i]); i++) {
 		const computedStyle = _w.getComputedStyle(el);
-		for (let props of computedStyle) {
+		for (const props of computedStyle) {
 			el.style[props] = computedStyle.getPropertyValue(props);
 		}
 	}

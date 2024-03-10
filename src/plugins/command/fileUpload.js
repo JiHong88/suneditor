@@ -187,7 +187,7 @@ FileUpload.prototype = {
 };
 
 async function OnChangeFile(e) {
-	let files = e.target.files;
+	const files = e.target.files;
 	if (!files[0]) return;
 
 	const fileInfo = {
@@ -215,7 +215,7 @@ async function OnChangeFile(e) {
 }
 
 function CreateHTML_controller({ lang, icons }) {
-	let html = /*html*/ `
+	const html = /*html*/ `
 		<div class="se-arrow se-arrow-up"></div>
 		<form>
 			<div class="se-btn-group se-form-group">

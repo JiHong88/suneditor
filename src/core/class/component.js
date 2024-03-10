@@ -49,8 +49,8 @@ Component.prototype = {
 
 		const r = this.html.remove();
 		this.selection.getRangeAndAddLine(this.selection.getRange(), r.container);
+		const selectionNode = this.selection.getNode();
 		let oNode = null;
-		let selectionNode = this.selection.getNode();
 		let formatEl = this.format.getLine(selectionNode, null);
 
 		if (domUtils.isListCell(formatEl)) {

@@ -38,8 +38,8 @@ export default {
 				return [_init_options, options].reduce((init, option) => {
 					Object.entries(option).forEach(([key, value]) => {
 						if (key === 'plugins' && value && init[key]) {
-							let i = Array.isArray(init[key]) ? init[key] : Object.values(init[key]);
-							let o = Array.isArray(value) ? value : Object.values(value);
+							const i = Array.isArray(init[key]) ? init[key] : Object.values(init[key]);
+							const o = Array.isArray(value) ? value : Object.values(value);
 							init[key] = [...o.filter((val) => !i.includes(val)), ...i];
 						} else {
 							init[key] = value;
@@ -57,9 +57,9 @@ export default {
 			multiTargets.push({ target: target });
 		} else {
 			let props;
-			for (let key in target) {
+			for (const key in target) {
 				props = target[key];
-				if (!props.target || props.target.nodeType !== 1) throw Error(`[SUNEDITOR.create.fail] suneditor multi root requires textarea's element at the "target" property.`);
+				if (!props.target || props.target.nodeType !== 1) throw Error('[SUNEDITOR.create.fail] suneditor multi root requires textarea\'s element at the "target" property.');
 				props.key = key;
 				multiTargets.push(props);
 			}

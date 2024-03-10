@@ -1,4 +1,4 @@
-import EditorInterface from "../../interface/editor";
+import EditorInterface from '../../interface/editor';
 
 class Offset extends EditorInterface {
 	/**
@@ -13,12 +13,12 @@ class Offset extends EditorInterface {
 	 * @param container Target element
 	 * @returns
 	 */
-  getGlobal(container: Element): { left: number; top: number; scroll: number };
-  
-  /**
-   * @description Gets the current editor-relative scroll offset.
-   */
-  getGlobalScroll(): {top: number; left: number};
+	getGlobal(container: Element): { left: number; top: number; scroll: number };
+
+	/**
+	 * @description Gets the current editor-relative scroll offset.
+	 */
+	getGlobalScroll(): { top: number; left: number };
 }
 
 export default Offset;

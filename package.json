@@ -14,6 +14,9 @@
 		"build:dev": "cross-env NODE_ENV=development webpack --config webpack/builder.js",
 		"build:prod": "cross-env NODE_ENV=production webpack --config webpack/builder.js",
 		"lint": "eslint src",
+		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
+		"lint:fix-ts": "npx eslint \"typings/**/*.ts\" --fix",
+		"lint:fix-all": "npx eslint \"src/**/*.js\" \"typings/**/*.ts\" --fix",
 		"test": "karma start",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},
@@ -37,6 +40,8 @@
 		"@babel/core": "^7.22.1",
 		"@codemirror/lang-html": "^6.4.3",
 		"@codemirror/lang-javascript": "^6.1.8",
+		"@typescript-eslint/eslint-plugin": "^7.1.1",
+		"@typescript-eslint/parser": "^7.1.1",
 		"@webpack-cli/serve": "^2.0.4",
 		"babel-loader": "^9.1.2",
 		"clean-webpack-plugin": "^4.0.0",

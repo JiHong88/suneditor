@@ -200,7 +200,7 @@ Audio_.prototype = {
 		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
-		let files = [];
+		const files = [];
 		for (let i = 0, len = fileList.length; i < len; i++) {
 			if (/audio/i.test(fileList[i].type)) {
 				files.push(fileList[i]);
@@ -316,7 +316,7 @@ Audio_.prototype = {
 		const attrs = this.pluginOptions.audioTagAttributes;
 		if (!attrs) return;
 
-		for (let key in attrs) {
+		for (const key in attrs) {
 			element.setAttribute(key, attrs[key]);
 		}
 	},

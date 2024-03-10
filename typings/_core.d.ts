@@ -1,10 +1,10 @@
-import { Core, status } from "../lib/core.d";
-import { Lang } from "../langs/Lang.d";
-import { Plugin } from "../plugins/Plugin.d";
-import { SunEditorOptions } from "../options.d";
-import { Context } from "../lib/context.d";
-import { History } from "../lib/history.d";
-import Helper from "../helper/index.d";
+import { Core, status } from '../lib/core.d';
+import { Lang } from '../langs/Lang.d';
+import { Plugin } from '../plugins/Plugin.d';
+import { SunEditorOptions } from '../options.d';
+import { Context } from '../lib/context.d';
+import { History } from '../lib/history.d';
+import Helper from '../helper/index.d';
 
 class CoreInterface {
 	editor: Core;

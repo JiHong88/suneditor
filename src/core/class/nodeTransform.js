@@ -130,6 +130,7 @@ NodeTransform.prototype = {
 	 * @returns {Array} [offset, ..]
 	 */
 	mergeSameTags(element, nodePathArray, onlyText) {
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		const nodePathLen = nodePathArray ? nodePathArray.length : 0;
 		let offsets = null;
@@ -338,6 +339,7 @@ NodeTransform.prototype = {
 	 * @param {boolean} forceDelete When all child nodes are deleted, the parent node is also deleted.
 	 */
 	removeEmptyNode(element, notRemoveNode, forceDelete) {
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 
 		if (notRemoveNode) {

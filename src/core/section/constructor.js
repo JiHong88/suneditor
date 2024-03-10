@@ -294,7 +294,7 @@ function _addTooltip(tooptipBtn, shift, shortcut) {
  */
 function _mergeObject(a, b) {
 	return [a, b].reduce((_default, _new) => {
-		for (let key in _new) {
+		for (const key in _new) {
 			_default[key] = (_new[key] || '').toLowerCase();
 		}
 		return _default;
@@ -516,7 +516,7 @@ export function InitOptions(options, editorTargets) {
 				},
 				options.shortcuts || {}
 		  ].reduce(function (_default, _new) {
-				for (let key in _new) {
+				for (const key in _new) {
 					_default[key] = _new[key];
 				}
 				return _default;
@@ -556,7 +556,7 @@ export function InitOptions(options, editorTargets) {
 		!options.icons || typeof options.icons !== 'object'
 			? _icons
 			: [_icons, options.icons].reduce(function (_default, _new) {
-					for (let key in _new) {
+					for (const key in _new) {
 						_default[key] = _new[key];
 					}
 					return _default;
@@ -700,7 +700,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 		wysiwygDiv.style.cssText = editorStyles.frame + editorStyles.editor;
 	} else {
 		const frameAttrs = targetOptions.get('iframe_attributes');
-		for (let frameKey in frameAttrs) {
+		for (const frameKey in frameAttrs) {
 			wysiwygDiv.setAttribute(frameKey, frameAttrs[frameKey]);
 		}
 		wysiwygDiv.allowFullscreen = true;
@@ -759,7 +759,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 			},
 			codeMirror.options || {}
 		].reduce(function (init, option) {
-			for (let key in option) {
+			for (const key in option) {
 				init[key] = option[key];
 			}
 			return init;
@@ -1036,7 +1036,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 				moreButton = false;
 				plugin = plugins[button];
 
-				if (/^\%\d+/.test(button) && j === 0) {
+				if (/^%\d+/.test(button) && j === 0) {
 					buttonGroup[0] = button.replace(/[^\d]/g, '');
 					responsiveButtons.push(buttonGroup);
 					buttonList.splice(i--, 1);
@@ -1049,23 +1049,23 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 					modules = [plugin.className || originFnc.className, plugin.title || originFnc.title, button, plugin.type || originFnc.type, plugin.innerHTML || originFnc.innerHTML, plugin._disabled || originFnc._disabled];
 				} else {
 					// align
-					if (/^\-/.test(button)) {
+					if (/^-/.test(button)) {
 						align = button.substr(1);
 						moduleElement.div.className += ' module-float-' + align;
 						continue;
 					}
 
 					// rtl fix
-					if (/^\#/.test(button)) {
+					if (/^#/.test(button)) {
 						const option = button.substr(1);
 						if (option === 'fix') moduleElement.ul.className += ' se-menu-dir-fix';
 						continue;
 					}
 
 					// more button
-					if (/^\:/.test(button)) {
+					if (/^:/.test(button)) {
 						moreButton = true;
-						const matched = button.match(/^\:([^\-]+)\-([^\-]+)/);
+						const matched = button.match(/^:([^-]+)-([^-]+)/);
 						moreCommand = '__se__more_' + i;
 						const title = matched[1].trim();
 						const innerHTML = matched[2].trim();

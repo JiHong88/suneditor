@@ -1,5 +1,5 @@
 class unicode {
-  /**
+	/**
 	 * @description Unicode Character 'ZERO WIDTH SPACE' (\u200B)
 	 */
 	zeroWidthSpace: string;

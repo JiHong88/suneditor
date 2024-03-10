@@ -285,7 +285,7 @@ Table.prototype = {
 				// create colgroup
 				if (!ColgroupEl) {
 					const maxCount = GetMaxColumns(element);
-					const colGroup = domUtils.createElement(`colgroup`, null, `<col style="width: ${numbers.get(100 / maxCount, CELL_DECIMAL_END)}%;">`.repeat(maxCount));
+					const colGroup = domUtils.createElement('colgroup', null, `<col style="width: ${numbers.get(100 / maxCount, CELL_DECIMAL_END)}%;">`.repeat(maxCount));
 					element.insertBefore(colGroup, element.firstElementChild);
 				}
 
@@ -459,7 +459,7 @@ Table.prototype = {
 				const shift = event.shiftKey;
 				const table = domUtils.getParentElement(tableCell, 'table');
 				const cells = domUtils.getListChildren(table, domUtils.isTableCell);
-				let idx = shift ? domUtils.prevIndex(cells, tableCell) : domUtils.nextIndex(cells, tableCell);
+				const idx = shift ? domUtils.prevIndex(cells, tableCell) : domUtils.nextIndex(cells, tableCell);
 
 				if (idx === cells.length && !shift) {
 					if (!domUtils.getParentElement(tableCell, 'thead')) {
@@ -604,7 +604,7 @@ Table.prototype = {
 			case 'props_submit':
 				this._submitProps(target);
 				break;
-			case 'revert':
+			case 'revert': {
 				const propsCache = this._propsCache;
 				for (let i = 0, len = propsCache.length; i < len; i++) {
 					propsCache[i][0].style.cssText = propsCache[i][1];
@@ -615,6 +615,7 @@ Table.prototype = {
 					this._figure.style.float = this._propsAlignCache;
 				}
 				break;
+			}
 			case 'close_props':
 				this.controller_props.close();
 				break;
@@ -637,8 +638,8 @@ Table.prototype = {
 				this._historyPush();
 
 				break;
-			case 'remove':
-				const emptyDiv = this._figure.parentNode;
+			case 'remove': {
+				const emptyDiv = this._figure?.parentNode;
 				domUtils.removeItem(this._figure);
 				this._closeController();
 
@@ -652,6 +653,7 @@ Table.prototype = {
 					);
 				this.editor.focus();
 				this.history.push(false);
+			}
 		}
 
 		if (!/(^props_|^revert|Properties$)/.test(command)) {
@@ -1212,7 +1214,7 @@ Table.prototype = {
 
 		let emptyRowFirst = null;
 		let emptyRowLast = null;
-		let cs = ref.ce - ref.cs + 1;
+		const cs = ref.ce - ref.cs + 1;
 		let rs = ref.re - ref.rs + 1;
 		let mergeHTML = '';
 		let row = null;
@@ -1579,7 +1581,7 @@ Table.prototype = {
 
 		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
 			// eslint-disable-next-line no-shadow
-			let { cssText, border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = t.style;
+			const { cssText, border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = t.style;
 			this._propsCache.push([t, cssText]);
 			if (isBreak) continue;
 
@@ -1627,7 +1629,7 @@ Table.prototype = {
 	},
 
 	_setAlignProps(el, align, reset) {
-		domUtils.removeClass(el.querySelectorAll(`button`), 'on');
+		domUtils.removeClass(el.querySelectorAll('button'), 'on');
 
 		if (!reset && el.getAttribute('se-cell-align') === align) {
 			el.setAttribute('se-cell-align', '');
@@ -2331,8 +2333,8 @@ function OnMouseMoveTablePicker(e) {
 	this.tableHighlight.style.width = x + 'em';
 	this.tableHighlight.style.height = y + 'em';
 
-	let x_u = x < 5 ? 5 : x > 8 ? 10 : x + 2;
-	let y_u = y < 5 ? 5 : y > 8 ? 10 : y + 2;
+	const x_u = x < 5 ? 5 : x > 8 ? 10 : x + 2;
+	const y_u = y < 5 ? 5 : y > 8 ? 10 : y + 2;
 	this.tableUnHighlight.style.width = x_u + 'em';
 	this.tableUnHighlight.style.height = y_u + 'em';
 
@@ -2411,9 +2413,9 @@ function OffCellTouch() {
 function GetMaxColumns(table) {
 	let maxColumns = 0;
 
-	for (let row of table.rows) {
+	for (const row of table.rows) {
 		let columnCount = 0;
-		for (let cell of row.cells) {
+		for (const cell of row.cells) {
 			columnCount += cell.colSpan;
 		}
 		maxColumns = _w.Math.max(maxColumns, columnCount);
@@ -2514,7 +2516,7 @@ function CreateBorderFormatMenu(langs, icons, indideFormats) {
 	const items = [];
 	let html = '';
 
-	for (let k in BORDER_FORMATS) {
+	for (const k in BORDER_FORMATS) {
 		if (indideFormats.includes(k)) continue;
 		const s = BORDER_FORMATS[k];
 		items.push(k);

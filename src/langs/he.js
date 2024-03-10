@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-				if (!w.document) {
-					throw new Error('SUNEDITOR_LANG a window with a document');
-				}
-				return factory(w);
-			};
+					if (!w.document) {
+						throw new Error('SUNEDITOR_LANG a window with a document');
+					}
+					return factory(w);
+			  };
 	} else {
 		factory(global);
 	}
@@ -137,7 +137,7 @@
 		video_modal_file: 'בחר מקובץ',
 		video_modal_title: 'הכנס סרטון',
 		video_modal_url: 'כתובת הטמעה YouTube/Vimeo',
-		width: 'רוחב',
+		width: 'רוחב'
 	};
 
 	if (typeof noGlobal === typeof undefined) {
