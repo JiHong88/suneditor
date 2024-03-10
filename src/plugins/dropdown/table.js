@@ -1375,7 +1375,7 @@ Table.prototype = {
 		if (this.eventManager.__overInfo === ON_OVER_COMPONENT) return;
 
 		if (!this._tdElement) return;
-		this.setCellInfo(this._tdElement, this._shift);
+		this.setCellInfo(this._tdElement, true);
 
 		// controller open
 		const figureEl = domUtils.getParentElement(target, domUtils.isFigure);
@@ -1828,7 +1828,7 @@ Table.prototype = {
 			this.controller_props.close();
 			if (this._tdElement) {
 				this._recallStyleSelectedCells();
-				this.setCellInfo(this._tdElement, false);
+				this.setCellInfo(this._tdElement, true);
 				domUtils.addClass(this._tdElement, 'se-selected-cell-focus');
 			}
 		} catch (err) {
@@ -2397,9 +2397,10 @@ function OffCellMultiSelect(e) {
 
 	this.setActiveButton(this._fixedCell, this._selectedCell);
 	this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
-	if (this._selectedCell && this._fixedCell) this.editor.focusEdge(this._selectedCell);
 
-	this.setController(this._selectedCell || this._fixedCell);
+	const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
+	this.editor.focusEdge(focusCell);
+	this.setController(focusCell);
 }
 
 function OffCellShift() {
