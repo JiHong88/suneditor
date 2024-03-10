@@ -780,24 +780,33 @@ EventManager.prototype = {
 	_scrollContainer() {
 		const openCont = this.editor.opendControllers;
 		if (!openCont.length) return;
-		if (this.__scrollID) _w.clearTimeout(this.__scrollID);
 
-		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
+		if (env.isMobile) {
+			this.__rePositionController(openCont);
+		} else {
+			if (this.__scrollID) _w.clearTimeout(this.__scrollID);
 
-		for (let i = 0; i < openCont.length; i++) {
-			if (openCont[i].notInCarrier) continue;
-			openCont[i].inst?.hide();
-		}
+			if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
 
-		this.__scrollID = _w.setTimeout(() => {
-			_w.clearTimeout(this.__scrollID);
-			this.__scrollID = '';
-			if (Figure.__dragHandler) Figure.__dragMove();
 			for (let i = 0; i < openCont.length; i++) {
 				if (openCont[i].notInCarrier) continue;
-				openCont[i].inst?.show();
+				openCont[i].inst?.hide();
 			}
-		}, 250);
+
+			this.__scrollID = _w.setTimeout(() => {
+				_w.clearTimeout(this.__scrollID);
+				this.__scrollID = '';
+				this.__rePositionController(openCont);
+			}, 250);
+		}
+	},
+
+	__rePositionController(cont) {
+		if (Figure.__dragHandler) Figure.__dragMove();
+		for (let i = 0; i < cont.length; i++) {
+			if (cont[i].notInCarrier) continue;
+			cont[i].inst?.show();
+		}
 	},
 
 	_resetFrameStatus() {
