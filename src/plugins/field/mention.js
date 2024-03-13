@@ -14,7 +14,7 @@ const Mention = function (editor, pluginOptions) {
 	this.triggerText = pluginOptions.triggerText || '@';
 	this.limitSize = pluginOptions.limitSize || 5;
 	this.searchStartLength = pluginOptions.searchStartLength || 0;
-	this.delayTime = pluginOptions.delayTime || 300;
+	this.delayTime = typeof pluginOptions.delayTime === 'number' ? pluginOptions.delayTime : 200;
 	this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace(/\{limitSize\}/i, this.limitSize) || '';
 	this._delay = 0;
 	this._lastAtPos = 0;

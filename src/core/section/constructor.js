@@ -446,6 +446,12 @@ export function InitOptions(options, editorTargets) {
 			o.get('elementBlacklist')
 		)
 	);
+
+	// Error - default line
+	if (!o.get('formatLine').reg.test(o.get('defaultLine'))) {
+		throw Error(`[SUNEDITOR.create.fail] The "defaultLine(${o.get('defaultLine')})" option must be included in the "formatLine(${o.get('formatLine').str})" option.`);
+	}
+
 	o.set(
 		'formatClosureBlock',
 		_createFormatInfo(
@@ -819,12 +825,11 @@ function _createBlacklist(blacklist, defaultLine) {
  * @returns {{reg: RegExp, str: string}}
  */
 function _createFormatInfo(value, defaultValue, blacklist) {
+	const blist = blacklist.split('|');
 	const str = (defaultValue + '|' + (typeof value === 'string' ? value.toLowerCase() : ''))
 		.replace(/^\||\|$/g, '')
 		.split('|')
-		.filter(function (v) {
-			return v && !blacklist.includes(v);
-		})
+		.filter((v) => v && !blist.includes(v))
 		.join('|');
 	return {
 		reg: new RegExp(`^(${str})$`, 'i'),
@@ -842,9 +847,7 @@ function _createWhitelist(o) {
 	const whitelist = (o.get('__defaultElementWhitelist') + '|' + o.get('elementWhitelist') + '|' + o.get('formatLine').str + '|' + o.get('formatBrLine').str + '|' + o.get('formatClosureBlock').str + '|' + o.get('formatClosureBrLine').str)
 		.replace(/(^\||\|$)/g, '')
 		.split('|')
-		.filter(function (v, i, a) {
-			return v && a.indexOf(v) === i && !blacklist.includes(v);
-		});
+		.filter((v, i, a) => v && a.indexOf(v) === i && !blacklist.includes(v));
 
 	return whitelist.join('|');
 }

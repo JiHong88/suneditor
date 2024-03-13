@@ -748,7 +748,6 @@ Editor.prototype = {
 			}
 		}
 
-		this.eventManager.applyTagEffect();
 		if (this.isBalloon) this.eventManager._toggleToolbarBalloon();
 	},
 

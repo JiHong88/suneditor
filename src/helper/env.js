@@ -141,83 +141,85 @@ export function getIncludePath(nameArray, extension) {
  * @description Check if support ResizeObserver function
  * @returns {boolean} Whether support ResizeObserver function or not.
  */
-function isResizeObserverSupported() {
+export const isResizeObserverSupported = (() => {
 	return typeof _w.ResizeObserver === 'function';
-}
+})();
 
 /**
  * @description Check if User Agent is Edge
  * @returns {boolean} Whether User Agent is Edge or not.
  */
-function isEdge() {
+export const isEdge = (() => {
 	return navigator.appVersion.includes('Edge');
-}
+})();
 
 /**
  * @description Check if platform is OSX or IOS
- * @returns {boolean} Whether platform is (OSX || IOS) or not.
+ * @type {boolean}
  */
-function isOSX_IOS() {
+export const isOSX_IOS = (() => {
 	return /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
-}
+})();
 
 /**
  * @description Check if User Agent Blink engine.
- * @returns {boolean} Whether User Agent is Blink engine or not.
+ * @type {boolean}
  */
-function isBlink() {
+export const isBlink = (() => {
 	return userAgent.includes('chrome/') && !userAgent.includes('edge/');
-}
+})();
 
 /**
  * @description Check if User Agent is Firefox (Gecko).
- * @returns {boolean} Whether User Agent is Firefox or not.
+ * @type {boolean}
  */
-function isGecko() {
+export const isGecko = (() => {
 	return !!userAgent.match(/gecko\/\d+/);
-}
+})();
 
 /**
  * @description Check if User Agent is Chromium browser.
- * @returns {boolean} Whether User Agent is Chromium browser.
+ * @type {boolean}
  */
-function isChromium() {
+export const isChromium = (() => {
 	return !!window.chrome;
-}
+})();
 
 /**
  * @description Check if User Agent is Safari.
- * @returns {boolean} Whether User Agent is Safari or not.
+ * @type {boolean}
  */
-function isSafari() {
+export const isSafari = (() => {
 	return userAgent.includes('applewebkit/') && !userAgent.includes('chrome');
-}
+})();
 
 /**
  * @description Check if User Agent is Mobile device.
- * @returns {boolean} Whether User Agent is Mobile or not.
+ * @type {boolean}
  */
-function isMobile() {
+export const isMobile = (() => {
 	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-}
+})();
 
 /**
  * @description Check if User Agent is Android mobile device.
- * @returns {boolean} Whether User Agent is Android or not.
+ * @type {boolean}
  */
-function isAndroid() {
+export const isAndroid = (() => {
 	return userAgent.includes('android');
-}
+})();
 
 /**
  * @description Command(Mac) or CTRL(Window) icon.
+ * @type {string}
  */
-export const cmdIcon = isOSX_IOS() ? '⌘' : 'CTRL';
+export const cmdIcon = isOSX_IOS ? '⌘' : 'CTRL';
 
 /**
  * @description SHIFT(Mac, Window) icon.
+ * @type {string}
  */
-export const shiftIcon = isOSX_IOS() ? '⇧' : '+SHIFT';
+export const shiftIcon = isOSX_IOS ? '⇧' : '+SHIFT';
 
 /** --- editor env --- */
 export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';
@@ -234,15 +236,15 @@ const env = {
 	getXMLHttpRequest,
 	getPageStyle,
 	getIncludePath,
-	isResizeObserverSupported: isResizeObserverSupported(),
-	isEdge: isEdge(),
-	isBlink: isBlink(),
-	isGecko: isGecko(),
-	isChromium: isChromium(),
-	isSafari: isSafari(),
-	isOSX_IOS: isOSX_IOS(),
-	isAndroid: isAndroid(),
-	isMobile: isMobile(),
+	isResizeObserverSupported,
+	isEdge,
+	isBlink,
+	isGecko,
+	isChromium,
+	isSafari,
+	isOSX_IOS,
+	isAndroid,
+	isMobile,
 	cmdIcon,
 	shiftIcon,
 	_allowedEmptyNodeList

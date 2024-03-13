@@ -6,13 +6,12 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 import { Figure } from '../../modules';
 
-const { _w, ON_OVER_COMPONENT } = env;
+const { _w, _d, ON_OVER_COMPONENT } = env;
 const DIRECTION_KEYCODE = /^(8|3[2-9]|40|46)$/;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
-const SPACE_DEL_DIR_KEYCODE = /^(8|13|3[2-9]|40|46)$/;
 const DELETE_KEYCODE = /^(8|46)$/;
-const NON_TEXT_KEYCODE = /^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$/;
-const HISTORY_IGNORE_KEYCODE = /^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$/;
+const NON_TEXT_KEYCODE = /^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145|229)$/;
+const HISTORY_IGNORE_KEYCODE = /^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145|229)$/;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 
 const EventManager = function (editor) {
@@ -631,8 +630,11 @@ EventManager.prototype = {
 		}
 
 		/** window event */
-		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
+		if (!env.isMobile) this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
+
+		/** document event */
+		this.addEvent(_d, 'selectionchange', OnSelectionchange_document.bind(this), false);
 	},
 
 	_addFrameEvents(fc) {
@@ -642,11 +644,11 @@ EventManager.prototype = {
 		const codeArea = fc.get('code');
 
 		/** editor area */
-		const wwMouseDown = OnMouseDown_wysiwyg.bind(this, fc);
-		const wwClickEvent = OnClick_wysiwyg.bind(this, fc);
-		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
-		this.addEvent(eventWysiwyg, 'click', wwClickEvent, false);
+		const wwMouseMove = OnMouseMove_wysiwyg.bind(this, fc);
+		this.addEvent(eventWysiwyg, 'mousemove', wwMouseMove, false);
+		this.addEvent(eventWysiwyg, 'mousedown', OnMouseDown_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'mouseleave', OnMouseLeave_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'input', OnInput_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this, fc), false);
@@ -655,13 +657,12 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'dragover', OnDragOver_wysiwyg.bind(this, this.editor.carrierWrapper.querySelector('.se-drag-cursor'), isIframe ? this.editor.frameContext.get('topArea') : null), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc), false);
-		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), false);
+		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), { passive: true, useCapture: false });
 		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this, fc), false);
 		this.addEvent(codeArea, 'mousedown', OnFocus_code.bind(this, fc), false);
 
 		/** line breaker */
-		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this, fc), false);
 		this.addEvent(
 			[fc.get('lineBreaker_t'), fc.get('lineBreaker_b')],
 			'mousedown',
@@ -674,14 +675,12 @@ EventManager.prototype = {
 		this.addEvent(fc.get('lineBreaker_b'), 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
 
 		/** Events are registered mobile. */
-		this.addEvent(eventWysiwyg, 'touchstart', wwMouseDown, {
-			passive: true,
-			useCapture: false
-		});
-		this.addEvent(eventWysiwyg, 'touchend', wwClickEvent, {
-			passive: true,
-			useCapture: false
-		});
+		if (env.isMobile) {
+			this.addEvent(eventWysiwyg, 'touchstart', wwMouseMove, {
+				passive: true,
+				useCapture: false
+			});
+		}
 
 		/** code view area auto line */
 		if (!this.options.get('hasCodeMirror')) {
@@ -1076,12 +1075,8 @@ function OnClick_wysiwyg(frameContext, e) {
 			) {
 				e.preventDefault();
 				this.editor.focus();
-			} else {
-				this.applyTagEffect();
 			}
 		}
-	} else {
-		this.applyTagEffect();
 	}
 
 	if (this.editor.isBalloon || this.editor.isSubBalloon) this._w.setTimeout(this._toggleToolbarBalloon.bind(this), 0);
@@ -1872,11 +1867,6 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
 
-	if (SPACE_DEL_DIR_KEYCODE.test(keyCode) && !(this.options.get('keepStyleOnDelete') && DELETE_KEYCODE.test(keyCode) && frameContext.get('wysiwyg').textContent.length > 0)) {
-		this.selection._init();
-		this.applyTagEffect();
-	}
-
 	// enter scroll
 	if (keyCode === 13) this.html.scrollTo(range);
 
@@ -1919,13 +1909,6 @@ function OnKeyUp_wysiwyg(frameContext, e) {
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	const alt = e.altKey;
-
-	this.selection._init();
-
-	if (!ctrl && DIRECTION_KEYCODE.test(keyCode)) {
-		this.selection._init();
-		this.applyTagEffect();
-	}
 
 	if (frameContext.get('isReadOnly')) return;
 
@@ -2119,10 +2102,11 @@ function OnFocus_wysiwyg(frameContext, e) {
 	document.getElementById('console_ltr').innerHTML += `<p>${rootKey}</p>`;
 
 	if (this._inputFocus) {
-		this._w.setTimeout(() => {
-			this.applyTagEffect();
-			if (this.editor.isInline) this.toolbar._showInline();
-		}, 0);
+		if (this.editor.isInline) {
+			this._w.setTimeout(() => {
+				this.toolbar._showInline();
+			}, 0);
+		}
 		return;
 	}
 
@@ -2138,8 +2122,6 @@ function OnFocus_wysiwyg(frameContext, e) {
 	this.history.resetButtons(rootKey, null);
 
 	this._w.setTimeout(() => {
-		this.applyTagEffect();
-
 		if (this.editor.isInline) this.toolbar._showInline();
 
 		// user event
@@ -2249,6 +2231,18 @@ function OnScroll_window() {
 	}
 
 	this._scrollContainer();
+}
+
+function OnSelectionchange_document() {
+	const selection = _d.getSelection();
+	let anchorNode = selection.anchorNode;
+	this.editor.applyFrameRoots((root) => {
+		if (anchorNode && root.get('wysiwyg').contains(anchorNode)) {
+			anchorNode = null;
+			this.selection._init();
+			this.applyTagEffect();
+		}
+	});
 }
 
 function OnScroll_Abs() {

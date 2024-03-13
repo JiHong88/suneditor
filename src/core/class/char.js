@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import env from '../../helper/env';
+import { _w, isEdge } from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 const Char = function (editor) {
@@ -51,7 +51,7 @@ Char.prototype = {
 		text = text.toString();
 
 		let cr, cl;
-		if (env.isEdge) {
+		if (isEdge) {
 			cl = decodeURIComponent(encodeURIComponent(text)).length;
 			cr = 0;
 
@@ -77,7 +77,7 @@ Char.prototype = {
 	 */
 	display() {
 		if (this.editor.frameContext.has('charCounter')) {
-			this._w.setTimeout(() => {
+			_w.setTimeout(() => {
 				this.editor.frameContext.get('charCounter').textContent = this.getLength();
 			}, 0);
 		}
@@ -137,7 +137,7 @@ Char.prototype = {
 function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, 'se-blink')) {
 		addClass(charWrapper, 'se-blink');
-		this._w.setTimeout(() => {
+		_w.setTimeout(() => {
 			removeClass(charWrapper, 'se-blink');
 		}, 600);
 	}

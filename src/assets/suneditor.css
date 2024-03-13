@@ -2379,7 +2379,7 @@
 	left: 0px;
 	z-index: 2147483647;
 	display: none;
-	width: auto;
+	width: max-content;
 	height: auto;
 	overflow-y: visible;
 	overflow-x: visible;

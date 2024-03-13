@@ -18,7 +18,6 @@
 		"Range": "writable"
 	},
 	"rules": {
-		"prettier/prettier": ["error", { "useTabs": true, "tabWidth": 4 }],
 		"eqeqeq": "error",
 		"strict": ["error", "safe"],
 		"no-undef": "error",
@@ -28,14 +27,36 @@
 		"no-unused-expressions": "off",
 		"curly": "off",
 		"prefer-const": "error",
-		"no-var": "error"
+		"no-var": "error",
+		"prettier/prettier": [
+			"error",
+			{
+				"arrowParens": "always",
+				"bracketSpacing": true,
+				"endOfLine": "auto",
+				"htmlWhitespaceSensitivity": "css",
+				"insertPragma": false,
+				"jsxBracketSameLine": false,
+				"jsxSingleQuote": true,
+				"printWidth": 240,
+				"proseWrap": "preserve",
+				"quoteProps": "as-needed",
+				"requirePragma": false,
+				"semi": true,
+				"singleQuote": true,
+				"tabWidth": 4,
+				"trailingComma": "none",
+				"useTabs": true,
+				"vueIndentScriptAndStyle": false
+			}
+		]
 	},
 	"overrides": [
 		{
-			"files": ["*.ts", "*.d.ts"],
+			"files": ["*.d.ts"],
 			"rules": {
-				"no-unused-vars": "off", // JavaScript 규칙 비활성화
-				"@typescript-eslint/no-unused-vars": "off" // TypeScript 규칙 비활성화
+				"no-unused-vars": "off",
+				"@typescript-eslint/no-unused-vars": "off"
 			}
 		}
 	]
