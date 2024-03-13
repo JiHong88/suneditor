@@ -267,7 +267,6 @@ Table.prototype = {
 			this._resetTablePicker();
 			const target = oTable.querySelector('td div');
 			this.selection.setRange(target, 0, target, 0);
-			this.eventManager.applyTagEffect();
 		}
 	},
 
@@ -2386,10 +2385,11 @@ function OnCellMultiSelect(e) {
 function OffCellMultiSelect(e) {
 	e.stopPropagation();
 
-	if (!this._shift) {
-		this.__removeGlobalEvents();
-		this._toggleEditor(true);
-	} else if (this.__globalEvents.touchOff) {
+	this._shift = false;
+	this.__removeGlobalEvents();
+	this._toggleEditor(true);
+
+	if (this.__globalEvents.touchOff) {
 		this.__globalEvents.touchOff = this.eventManager.removeGlobalEvent(this.__globalEvents.touchOff);
 	}
 
