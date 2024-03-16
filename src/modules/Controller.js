@@ -52,6 +52,11 @@ Controller.prototype = {
 	 * @description Open a modal plugin
 	 */
 	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset }) {
+		if (!target) {
+			console.warn('[SUNEDITOR.Controller.open.fail] The target element is required.');
+			return;
+		}
+
 		if (this.editor.isBalloon) this.toolbar.hide();
 		else if (this.editor.isSubBalloon) this.subToolbar.hide();
 

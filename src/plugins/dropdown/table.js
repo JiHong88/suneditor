@@ -366,6 +366,7 @@ Table.prototype = {
 	 * @param {any} event Event object
 	 */
 	onMouseDown({ event }) {
+		this._ref = null;
 		const target = domUtils.getParentElement(event.target, IsResizeEls);
 		if (!target) return;
 
@@ -435,6 +436,13 @@ Table.prototype = {
 	/**
 	 * @override core
 	 */
+	onMouseUp() {
+		this._shift = false;
+	},
+
+	/**
+	 * @override core
+	 */
 	onMouseLeave() {
 		this.__hideResizeLine();
 	},
@@ -446,6 +454,7 @@ Table.prototype = {
 	 * @param {Element} line Current line element
 	 */
 	onKeyDown({ event, range, line }) {
+		this._ref = null;
 		if (this.editor.selectMenuOn || this._resizing) return;
 
 		const keyCode = event.keyCode;
@@ -508,7 +517,7 @@ Table.prototype = {
 		if (cell) {
 			this._fixedCell = cell;
 			this._closeController();
-			this.selectCells(cell, true);
+			this.selectCells(cell, event.shiftKey);
 			return false;
 		}
 	},
@@ -521,11 +530,11 @@ Table.prototype = {
 	 */
 	onKeyUp({ line }) {
 		if (this._shift && domUtils.getParentElement(line, domUtils.isTableCell) === this._fixedCell) {
-			this._shift = false;
 			this._deleteStyleSelectedCells();
 			this._toggleEditor(true);
 			this.__removeGlobalEvents();
 		}
+		this._shift = false;
 	},
 
 	/**
@@ -1910,8 +1919,9 @@ Table.prototype = {
 		this._deleteStyleSelectedCells();
 
 		if (startCell === endCell) {
-			domUtils.addClass(startCell, 'se-selected-table-cell');
 			if (!this._shift) return;
+		} else {
+			domUtils.addClass(startCell, 'se-selected-table-cell');
 		}
 
 		let findSelectedCell = true;
@@ -2385,17 +2395,17 @@ function OnCellMultiSelect(e) {
 function OffCellMultiSelect(e) {
 	e.stopPropagation();
 
-	this._shift = false;
-	this.__removeGlobalEvents();
-	this._toggleEditor(true);
-
-	if (this.__globalEvents.touchOff) {
+	if (!this._shift) {
+		this.__removeGlobalEvents();
+		this._toggleEditor(true);
+	} else if (this.__globalEvents.touchOff) {
 		this.__globalEvents.touchOff = this.eventManager.removeGlobalEvent(this.__globalEvents.touchOff);
 	}
 
 	if (!this._fixedCell || !this._selectedTable) return;
 
 	this.setActiveButton(this._fixedCell, this._selectedCell);
+	// this.setActiveButton(this._fixedCell, domUtils.getParentElement(e.target, domUtils.isTableCell));
 	this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 
 	const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;

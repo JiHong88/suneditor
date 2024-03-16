@@ -1,7 +1,7 @@
 import { domUtils, env } from '../helper';
 import Controller from './Controller';
 
-const { _w } = env;
+const { _w, isMobile } = env;
 
 const SIZE = 240;
 const BAR_H = 28;
@@ -153,17 +153,29 @@ HueSlider.prototype = {
 		}
 
 		// event
-		const isMobile = env.isMobile;
-		this.__globalMouseDown = this.eventManager.addGlobalEvent(isMobile ? 'touchstart' : 'mousedown', isMobile ? OnTouchstart : OnMousedown, true);
-		this.__globalMouseMove = this.eventManager.addGlobalEvent(isMobile ? 'touchmove' : 'mousemove', isMobile ? OnTouchmove : OnMousemove, true);
-		this.__globalMouseUp = this.eventManager.addGlobalEvent(
-			isMobile ? 'touchend' : 'mouseup',
-			() => {
+		const downEvent = { name: 'mousedown', func: OnMousedown };
+		const moveEvent = { name: 'mousemove', func: OnMousemove, option: true };
+		const upEvent = {
+			name: 'mouseup',
+			func: () => {
 				isWheelragging = false;
 				isBarDragging = false;
-			},
-			true
-		);
+			}
+		};
+
+		if (isMobile) {
+			// mobile name
+			downEvent.name = 'touchstart';
+			moveEvent.name = 'touchmove';
+			upEvent.name = 'touchend';
+			// mobile func
+			downEvent.func = OnTouchstart;
+			moveEvent.func = OnTouchmove;
+		}
+
+		this.__globalMouseDown = this.eventManager.addGlobalEvent(downEvent.name, downEvent.func, true);
+		this.__globalMouseMove = this.eventManager.addGlobalEvent(moveEvent.name, moveEvent.func, true);
+		this.__globalMouseUp = this.eventManager.addGlobalEvent(upEvent.name, upEvent.func, true);
 		this.isOpen = true;
 	},
 
@@ -184,7 +196,9 @@ const { slider, offscreenCanvas, offscreenCtx, wheel, wheelCtx, wheelPointer, gr
 
 // mobile
 function OnTouchstart(event) {
-	const { target, clientX, clientY } = event;
+	const { target, touches } = event;
+	const clientX = touches[0].pageX;
+	const clientY = touches[0].pageY;
 
 	if (target === wheel) {
 		isBarDragging = false;
@@ -198,8 +212,11 @@ function OnTouchstart(event) {
 }
 
 function OnTouchmove(event) {
-	const { clientX, clientY } = event;
 	event.preventDefault();
+
+	const { touches } = event;
+	const clientX = touches[0].pageX;
+	const clientY = touches[0].pageY;
 
 	if (isWheelragging) {
 		updatePointer_wheel(clientX, clientY);

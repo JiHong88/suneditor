@@ -195,10 +195,11 @@ export const isSafari = (() => {
 
 /**
  * @description Check if User Agent is Mobile device.
+ * when the device is touchable, it is judged as a mobile device.
  * @type {boolean}
  */
 export const isMobile = (() => {
-	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) || 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
 })();
 
 /**

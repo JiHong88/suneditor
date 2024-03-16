@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 import { Figure } from '../../modules';
 
-const { _w, _d, ON_OVER_COMPONENT } = env;
+const { _w, _d, ON_OVER_COMPONENT, isMobile } = env;
 const DIRECTION_KEYCODE = /^(8|3[2-9]|40|46)$/;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DELETE_KEYCODE = /^(8|46)$/;
@@ -630,7 +630,7 @@ EventManager.prototype = {
 		}
 
 		/** window event */
-		if (!env.isMobile) this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
+		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
 
 		/** document event */
@@ -646,8 +646,9 @@ EventManager.prototype = {
 		/** editor area */
 		const wwMouseMove = OnMouseMove_wysiwyg.bind(this, fc);
 		this.addEvent(eventWysiwyg, 'mousemove', wwMouseMove, false);
-		this.addEvent(eventWysiwyg, 'mousedown', OnMouseDown_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'mouseleave', OnMouseLeave_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'mousedown', OnMouseDown_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'mouseup', OnMouseUp_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'input', OnInput_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this, fc), false);
@@ -675,7 +676,7 @@ EventManager.prototype = {
 		this.addEvent(fc.get('lineBreaker_b'), 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
 
 		/** Events are registered mobile. */
-		if (env.isMobile) {
+		if (isMobile) {
 			this.addEvent(eventWysiwyg, 'touchstart', wwMouseMove, {
 				passive: true,
 				useCapture: false
@@ -780,7 +781,7 @@ EventManager.prototype = {
 		const openCont = this.editor.opendControllers;
 		if (!openCont.length) return;
 
-		if (env.isMobile) {
+		if (isMobile) {
 			this.__rePositionController(openCont);
 		} else {
 			if (this.__scrollID) _w.clearTimeout(this.__scrollID);
@@ -955,7 +956,7 @@ function ButtonsHandler(e) {
 			this.__removeInput();
 			return;
 		} else if (!this.editor.frameContext.get('isCodeView')) {
-			if (env.isMobile) {
+			if (isMobile) {
 				this.editor._antiBlur = true;
 			} else {
 				e.preventDefault();
@@ -1018,6 +1019,14 @@ function OnMouseDown_wysiwyg(frameContext, e) {
 	}
 
 	if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
+}
+
+function OnMouseUp_wysiwyg(frameContext, e) {
+	// user event
+	if (this.triggerEvent('onMouseUp', { frameContext, event: e }) === false) return;
+
+	// plugin event
+	if (this._callPluginEvent('onMouseUp', { frameContext, event: e }) === false) return;
 }
 
 function OnClick_wysiwyg(frameContext, e) {
@@ -2099,7 +2108,6 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 
 function OnFocus_wysiwyg(frameContext, e) {
 	const rootKey = frameContext.get('key');
-	document.getElementById('console_ltr').innerHTML += `<p>${rootKey}</p>`;
 
 	if (this._inputFocus) {
 		if (this.editor.isInline) {
@@ -2213,7 +2221,12 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
-	this.editor._offCurrentController();
+	if (isMobile) {
+		this._scrollContainer();
+	} else {
+		this.editor._offCurrentController();
+	}
+
 	if (this.editor.isBalloon) this.toolbar.hide();
 	else if (this.editor.isSubBalloon) this.subToolbar.hide();
 	else this._resetFrameStatus();
@@ -2236,6 +2249,7 @@ function OnScroll_window() {
 function OnSelectionchange_document() {
 	const selection = _d.getSelection();
 	let anchorNode = selection.anchorNode;
+
 	this.editor.applyFrameRoots((root) => {
 		if (anchorNode && root.get('wysiwyg').contains(anchorNode)) {
 			anchorNode = null;

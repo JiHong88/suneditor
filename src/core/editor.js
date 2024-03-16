@@ -1257,8 +1257,9 @@ Editor.prototype = {
 		this.activeCommands = ACTIVE_EVENT_COMMANDS;
 		this._onPluginEvents = new Map([
 			['onMouseMove', []],
-			['onMouseDown', []],
 			['onMouseLeave', []],
+			['onMouseDown', []],
+			['onMouseUp', []],
 			['onScroll', []],
 			['onClick', []],
 			['onInput', []],
