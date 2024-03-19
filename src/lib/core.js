@@ -7366,7 +7366,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     }
 
-                    if (!shift) {
+                    if (!shift && !fileComponentName) {
                         const formatEndEdge = core._isEdgeFormat(range.endContainer, range.endOffset, 'end');
                         const formatStartEdge = core._isEdgeFormat(range.startContainer, range.startOffset, 'start');
 
@@ -7577,6 +7577,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (fileComponentName) {
                         e.preventDefault();
                         e.stopPropagation();
+
+                        core.containerOff();
+                        core.controllersOff();
+
                         const compContext = context[fileComponentName];
                         const container = compContext._container;
                         const sibling = container.previousElementSibling || container.nextElementSibling;
@@ -7589,11 +7593,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             newEl.innerHTML = '<br>';
                         }
 
-                        container.parentNode.insertBefore(newEl, container);
-
-                        core.callPlugin(fileComponentName, function () {
-                            if (core.selectComponent(compContext._element, fileComponentName) === false) core.blur();
-                        }, null);
+                        if (shift) container.parentNode.insertBefore(newEl, container);
+                        else container.parentNode.insertBefore(newEl, container.nextElementSibling);
+                        core.setRange(newEl, 0, newEl, newEl.textContent.length);
                     }
 
                     break;
@@ -7638,6 +7640,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 core._editorRange();
                 event._applyTagEffects();
             }
+
+            const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
+            if (textKey && !selectRange && fileComponentName) {
+                core.containerOff();
+                core.controllersOff();
+
+                const compContext = context[fileComponentName];
+                const container = compContext._container;
+
+                const br = util.createElement('BR');
+                const format = util.createElement(options.defaultTag);
+                format.appendChild(br);
+
+                util.changeElement(container, format);
+                core.setRange(format, 0, format, format.textContent.length);
+            }
+
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -8942,7 +8961,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         readOnly: function (value) {
             core.isReadOnly = value;
 
-            util.setDisabledButtons(!!value, core.resizingDisabledButtons, true);
+            util.setDisabledButtons(!!value, core.resizingDisabledButtons);
 
             if (value) {
                 /** off menus */
@@ -8955,7 +8974,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.code.setAttribute("readOnly", "true");
                 util.addClass(context.element.wysiwygFrame, 'se-read-only');
             } else {
-                core.history._resetCachingButton();
                 context.element.code.removeAttribute("readOnly");
                 util.removeClass(context.element.wysiwygFrame, 'se-read-only');
             }
