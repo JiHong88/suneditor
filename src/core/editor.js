@@ -810,11 +810,6 @@ Editor.prototype = {
 		const code = fc.get('code');
 		code.style.cssText = fo.get('_defaultStyles').frame;
 		code.style.display = 'none';
-		if (fo.get('height') === 'auto') {
-			code.style.overflow = 'hidden';
-		} else {
-			code.style.overflow = '';
-		}
 
 		// wysiwyg frame
 		if (!fo.get('iframe')) {

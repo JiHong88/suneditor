@@ -2,9 +2,11 @@
  * @fileoverview Toolbar class
  */
 
-import { domUtils } from '../../helper';
+import { domUtils, env } from '../../helper';
 import CoreInjector from '../../editorInjector/_core';
 import { CreateToolBar, UpdateButton } from '../section/constructor';
+
+const { _w, _d } = env;
 
 const Toolbar = function (editor, { keyName, balloon, inline, balloonAlways, res }) {
 	CoreInjector.call(this, editor);
@@ -21,6 +23,7 @@ const Toolbar = function (editor, { keyName, balloon, inline, balloonAlways, res
 	this._rButtonArray = res;
 	this._rButtonsize = null;
 	this._sticky = false;
+	this._isViewPortSize = 'visualViewport' in _w;
 	this._inlineToolbarAttr = {
 		top: '',
 		width: '',
@@ -161,21 +164,23 @@ Toolbar.prototype = {
 		const toolbar = this.context.get(this.keyName + '.main');
 		if (this.editor.frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || this.options.get('toolbar_sticky') < 0) return;
 
+		const currentScrollY = this._isViewPortSize ? _w.visualViewport.pageTop : _w.scrollY;
+
 		const minHeight = this.editor.frameContext.get('_minHeight');
 		const editorHeight = this.editor.frameContext.get('wrapper').offsetHeight;
 		const editorOffset = this.offset.getGlobal(this.editor.frameContext.get('topArea'));
-		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.get('toolbar_sticky');
+		const y = currentScrollY + this.options.get('toolbar_sticky');
 		const t = (this._isBalloon || this._isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this._isInline ? toolbar.offsetHeight : 0);
 		const inlineOffset = 1;
 
 		const offSticky = !this.options.get('toolbar_container')
 			? editorHeight + t + this.options.get('toolbar_sticky') - y - minHeight
-			: editorOffset.top - this._w.scrollY + editorHeight - minHeight - this.options.get('toolbar_sticky') - toolbar.offsetHeight;
+			: editorOffset.top - currentScrollY + editorHeight - minHeight - this.options.get('toolbar_sticky') - toolbar.offsetHeight;
 		if (y < t) {
 			this._offSticky();
 		} else if (offSticky < 0) {
 			if (!this._sticky) this._onSticky(inlineOffset);
-			toolbar.style.top = inlineOffset + offSticky + 'px';
+			toolbar.style.top = inlineOffset + offSticky + this.__getViewportTop() + 'px';
 		} else {
 			this._onSticky(inlineOffset);
 		}
@@ -190,10 +195,18 @@ Toolbar.prototype = {
 			stickyDummy.style.display = 'block';
 		}
 
-		toolbar.style.top = this.options.get('toolbar_sticky') + inlineOffset + 'px';
+		const toolbarTopPosition = this.options.get('toolbar_sticky') + inlineOffset + this.__getViewportTop();
+		toolbar.style.top = `${toolbarTopPosition}px`;
 		toolbar.style.width = this._isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
 		domUtils.addClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = true;
+	},
+
+	__getViewportTop() {
+		if (this._isViewPortSize) {
+			return _w.visualViewport.offsetTop;
+		}
+		return 0;
 	},
 
 	_offSticky() {
@@ -266,7 +279,7 @@ Toolbar.prototype = {
 
 		this.triggerEvent('onShowToolbar', { toolbar, mode: 'balloon', frameContext: this.editor.frameContext });
 
-		this._w.setTimeout(() => {
+		_w.setTimeout(() => {
 			toolbar.style.visibility = '';
 		}, 0);
 	},
@@ -325,7 +338,7 @@ Toolbar.prototype = {
 	_setBalloonPosition(isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop) {
 		const padding = 1;
 		const arrow = this.context.get(this.keyName + '._arrow');
-		const arrowMargin = this._w.Math.round(arrow.offsetWidth / 2);
+		const arrowMargin = _w.Math.round(arrow.offsetWidth / 2);
 		const toolbarWidth = toolbarEl.offsetWidth;
 		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbarEl.offsetHeight;
 
@@ -340,15 +353,15 @@ Toolbar.prototype = {
 		if (!isDirTop && space > 0 && this._getPageBottomSpace() < space) {
 			isDirTop = true;
 			resetTop = true;
-		} else if (isDirTop && this._d.documentElement.offsetTop > space) {
+		} else if (isDirTop && _d.documentElement.offsetTop > space) {
 			isDirTop = false;
 			resetTop = true;
 		}
 
 		if (resetTop) t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
 
-		toolbarEl.style.left = this._w.Math.floor(l) + 'px';
-		toolbarEl.style.top = this._w.Math.floor(t) + 'px';
+		toolbarEl.style.left = _w.Math.floor(l) + 'px';
+		toolbarEl.style.top = _w.Math.floor(t) + 'px';
 
 		if (isDirTop) {
 			domUtils.removeClass(arrow, 'se-arrow-up');
@@ -358,13 +371,13 @@ Toolbar.prototype = {
 			domUtils.addClass(arrow, 'se-arrow-up');
 		}
 
-		const arrow_left = this._w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
+		const arrow_left = _w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
 		arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
 	},
 
 	_getPageBottomSpace() {
 		const topArea = this.editor.frameContext.get('topArea');
-		return this._d.documentElement.scrollHeight - (this.offset.getGlobal(topArea).top + topArea.offsetHeight);
+		return _d.documentElement.scrollHeight - (this.offset.getGlobal(topArea).top + topArea.offsetHeight);
 	},
 
 	_showInline() {

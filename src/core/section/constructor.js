@@ -718,8 +718,6 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 
 	// textarea for code view
 	const textarea = domUtils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-code-viewer', style: editorStyles.frame });
-	if (targetOptions.get('height') === 'auto') textarea.style.overflow = 'hidden';
-
 	let placeholder = null;
 	if (targetOptions.get('placeholder')) {
 		placeholder = domUtils.createElement('SPAN', { class: 'se-placeholder' });

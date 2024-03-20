@@ -246,15 +246,19 @@ Offset.prototype = {
 	},
 
 	setRelPosition(element, e_container, target, t_container, _reload) {
+		this._scrollY = _w.scrollY;
+		let wy = 0;
+		let tCon = t_container;
+		do {
+			if ((this._isFixed = /^fixed$/i.test(_w.getComputedStyle(tCon).position))) {
+				wy += this._scrollY;
+				break;
+			}
+		} while (!domUtils.hasClass(tCon, 'sun-editor') && (tCon = tCon.parentElement));
+
 		if (!_reload) {
 			this.__removeGlobalEvent();
 			this._scrollEvent = this.editor.eventManager.addGlobalEvent('scroll', FixedScroll.bind(this, element, e_container, target, t_container), false);
-		}
-
-		this._scrollY = _w.scrollY;
-		let wy = 0;
-		if ((this._isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position))) {
-			wy += this._scrollY;
 		}
 
 		const ew = element.offsetWidth;
@@ -308,7 +312,7 @@ Offset.prototype = {
 			element.style.top = `${bt + target.offsetHeight}px`;
 		}
 
-		if (/^fixed$/i.test(_w.getComputedStyle(t_container).position)) {
+		if (this._isFixed) {
 			this._elTop = element.offsetTop;
 		}
 	},
@@ -488,11 +492,12 @@ Offset.prototype = {
 	},
 
 	_getWindowScroll() {
+		const viewPort = domUtils.getViewportSize();
 		return {
 			top: _w.scrollY,
 			left: _w.scrollX,
-			width: _w.innerWidth,
-			height: _w.innerHeight,
+			width: viewPort.w,
+			height: viewPort.h,
 			rects: {
 				left: 0,
 				top: 0,

@@ -14,7 +14,7 @@ module.exports = merge(common, {
 	devtool: 'eval-source-map',
 	devServer: {
 		compress: true,
-		host: 'localhost',
+		host: '0.0.0.0',
 		port: 8088
 	},
 	plugins: [

@@ -632,6 +632,7 @@ EventManager.prototype = {
 		/** window event */
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
+		this.addEvent(_w.visualViewport, 'scroll', OnScroll_viewport.bind(this), false);
 
 		/** document event */
 		this.addEvent(_d, 'selectionchange', OnSelectionchange_document.bind(this), false);
@@ -822,7 +823,7 @@ EventManager.prototype = {
 		const fc = this.editor.frameContext;
 		const fileBrowser = fc.get('fileBrowser');
 		if (fileBrowser && fileBrowser.area.style.display === 'block') {
-			fileBrowser.body.style.maxHeight = _w.innerHeight - fileBrowser.header.offsetHeight - 50 + 'px';
+			fileBrowser.body.style.maxHeight = domUtils.getViewportSize().h - fileBrowser.header.offsetHeight - 50 + 'px';
 		}
 
 		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
@@ -2229,7 +2230,14 @@ function OnResize_window() {
 
 	if (this.editor.isBalloon) this.toolbar.hide();
 	else if (this.editor.isSubBalloon) this.subToolbar.hide();
-	else this._resetFrameStatus();
+
+	this._resetFrameStatus();
+}
+
+function OnScroll_viewport() {
+	if (this.options.get('toolbar_sticky') > -1) {
+		this.toolbar._resetSticky();
+	}
 }
 
 function OnScroll_window() {
