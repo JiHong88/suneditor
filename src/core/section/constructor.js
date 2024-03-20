@@ -329,6 +329,7 @@ export function InitOptions(options, editorTargets) {
 		...options.strictMode
 	});
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
+	o.set('externalLibs', options.externalLibs || {});
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
@@ -544,14 +545,15 @@ export function InitOptions(options, editorTargets) {
 
 	/** External library */
 	// CodeMirror
-	if (options.codeMirror) {
-		o.set('codeMirror', options.codeMirror);
-		if (options.codeMirror.EditorView) {
+	const cm = o.get('externalLibs').codeMirror;
+	if (cm) {
+		o.set('codeMirror', cm);
+		if (cm.EditorView) {
 			o.set('codeMirror6Editor', true);
-		} else if (options.codeMirror.src) {
+		} else if (cm.src) {
 			o.set('codeMirror5Editor', true);
 		} else {
-			console.warn('[SUNEDITOR.options.codeMirror.fail] The codeMirror option is set incorrectly.');
+			console.warn('[SUNEDITOR.options.externalLibs.codeMirror.fail] The codeMirror option is set incorrectly.');
 			o.set('codeMirror', null);
 		}
 	}

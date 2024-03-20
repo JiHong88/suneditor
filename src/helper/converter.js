@@ -26,7 +26,7 @@ export function htmlToEntity(content) {
 		'<': '&lt;',
 		'>': '&gt;'
 	};
-	return content.replace(/&|\u00A0|'|"|<|>/g, function (m) {
+	return content.replace(/&|\u00A0|'|"|<|>/g, (m) => {
 		return typeof ec[m] === 'string' ? ec[m] : m;
 	});
 }
@@ -45,7 +45,7 @@ export function entityToHTML(content) {
 		'&lt;': '<',
 		'&gt;': '>'
 	};
-	return content.replace(/&amp;|&nbsp;|&apos;|&quot;|\$lt;|\$gt;/g, function (m) {
+	return content.replace(/&amp;|&nbsp;|&apos;|&quot;|\$lt;|\$gt;/g, (m) => {
 		return typeof ec[m] === 'string' ? ec[m] : m;
 	});
 }

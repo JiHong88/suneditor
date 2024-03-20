@@ -4,7 +4,7 @@ import { domUtils, env, converter, unicode } from '../../helper';
 
 const Math_ = function (editor, pluginOptions) {
 	// exception
-	if (!(this.katex = CheckKatex(pluginOptions.katex))) {
+	if (!(this.katex = CheckKatex(editor.options.get('externalLibs').katex))) {
 		console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need the "KaTeX" library, Please add the katex option.');
 	}
 
@@ -74,11 +74,14 @@ Math_.prototype = {
 		return {
 			query: '.katex',
 			method: (element) => {
-				if (!element.getAttribute('data-se-value') || !this.katex) return;
-				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(element.getAttribute('data-se-value'))));
+				if (!this.katex) return;
+
+				const value = element.getAttribute('data-se-value');
+				if (!value) return;
+
+				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
 				element.setAttribute('contenteditable', false);
-				// element.removeAttribute('contenteditable');
 			}
 		};
 	},
@@ -99,8 +102,9 @@ Math_.prototype = {
 		if (!isUpdate) {
 			this.init();
 		} else if (this.controller.currentTarget) {
-			const exp = converter.entityToHTML(this.controller.currentTarget.getAttribute('data-se-value'));
-			const fontSize = this.controller.currentTarget.getAttribute('data-se-type') || '1em';
+			const currentTarget = this.controller.currentTarget;
+			const exp = converter.entityToHTML(this._escapeBackslashes(currentTarget.getAttribute('data-se-value'), true));
+			const fontSize = currentTarget.getAttribute('data-se-type') || '1em';
 			this.textArea.value = exp;
 			this.fontSizeElement.value = fontSize;
 			this.previewElement.innerHTML = this._renderer(exp);
@@ -121,7 +125,7 @@ Math_.prototype = {
 		if (!katexEl) return false;
 		katexEl.className = '__se__katex ' + katexEl.className;
 		katexEl.setAttribute('contenteditable', false);
-		katexEl.setAttribute('data-se-value', converter.htmlToEntity(mathExp));
+		katexEl.setAttribute('data-se-value', converter.htmlToEntity(this._escapeBackslashes(mathExp, false)));
 		katexEl.setAttribute('data-se-type', this.fontSizeElement.value);
 		katexEl.style.fontSize = this.fontSizeElement.value;
 
@@ -189,6 +193,10 @@ Math_.prototype = {
 			console.warn('[SUNEDITOR.math.Katex.error] ', error.message);
 		}
 		return result;
+	},
+
+	_escapeBackslashes(str, decode) {
+		return str.replace(/\\{2}/g, decode ? '\\' : '\\\\');
 	},
 
 	constructor: Math_

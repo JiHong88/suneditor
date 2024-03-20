@@ -17,7 +17,7 @@ export default function (editor) {
 		editor.history.resetButtons(fc.get('key'), index);
 
 		// user event
-		editor.triggerEvent('onChange', { frameContext: fc, data: editor.html.get() });
+		editor.triggerEvent('onChange', { frameContext: fc, data: fc.get('wysiwyg').innerHTML });
 		if (editor.context.get('toolbar.main').style.display === 'block') editor.toolbar._showBalloon();
 		else if (editor.isSubBalloon && editor.context.get('toolbar.sub.main').style.display === 'block') editor.subToolbar._showBalloon();
 	}
