@@ -171,9 +171,10 @@ export function rgb2hex(rgba) {
 /**
  * @description Copies the "wwTarget" element and returns it with inline all styles applied.
  * @param {*} wwTarget
+ * @param {string[]} styles Style list - kamel case
  * @returns
  */
-export function applyInlineStylesAll(wwTarget) {
+export function applyInlineStylesAll(wwTarget, styles = []) {
 	if (!wwTarget) {
 		console.warn('wwTarget is not exist');
 		return null;
@@ -200,7 +201,7 @@ export function applyInlineStylesAll(wwTarget) {
 	const elements = tempTarget.querySelectorAll('*');
 	for (let i = 0, el; (el = elements[i]); i++) {
 		const computedStyle = _w.getComputedStyle(el);
-		for (const props of computedStyle) {
+		for (const props of styles || computedStyle) {
 			el.style[props] = computedStyle.getPropertyValue(props);
 		}
 	}

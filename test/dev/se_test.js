@@ -56,7 +56,7 @@ const bl = [
 	['imageGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
-	['save', 'template', 'layout', 'fileUpload', 'mention'],
+	['save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention'],
 	// (min-width: 1565)
 	[
 		'%1565',
@@ -72,7 +72,7 @@ const bl = [
 			['table', 'link', 'image', 'video', 'audio', 'math'],
 			['imageGallery'],
 			['fullScreen', 'showBlocks', 'codeView'],
-			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention']
 		]
 	],
 	// (min-width: 1455)
@@ -89,7 +89,7 @@ const bl = [
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'audio', 'math'],
 			['imageGallery'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention']
 		]
 	],
 	// (min-width: 1326)
@@ -104,7 +104,7 @@ const bl = [
 			['removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
 		]
 	],
@@ -119,7 +119,7 @@ const bl = [
 			['removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
 		]
 	],
@@ -134,7 +134,7 @@ const bl = [
 			['removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
 		]
 	],
@@ -149,7 +149,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention']
 		]
 	],
 	// (min-width: 525)
@@ -163,7 +163,7 @@ const bl = [
 			['outdent', 'indent'],
 			[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention']
 		]
 	],
 	// (min-width: 420)
@@ -175,7 +175,7 @@ const bl = [
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'mention']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPdf', 'mention']
 		]
 	]
 ];
@@ -536,18 +536,18 @@ window.editor_root = suneditor.create(
 				src: Katex
 			},
 			// codemirror
-			codeMirror: {
-				EditorView: EditorView,
-				extensions: [
-					basicSetup,
-					html({
-						matchClosingTags: true,
-						autoCloseTags: true
-					}),
-					javascript()
-				],
-				minimalSetup: minimalSetup
-			},
+			// codeMirror: {
+			// 	EditorView: EditorView,
+			// 	extensions: [
+			// 		basicSetup,
+			// 		html({
+			// 			matchClosingTags: true,
+			// 			autoCloseTags: true
+			// 		}),
+			// 		javascript()
+			// 	],
+			// 	minimalSetup: minimalSetup
+			// },
 		},
 		events: {
 			// onFileAction: (data) => {
