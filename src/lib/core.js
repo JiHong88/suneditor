@@ -6845,6 +6845,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onInput_wysiwyg: function (e) {
+            if (/AUDIO/.test(e.target.nodeName)) return false;
             if (core.isReadOnly || core.isDisabled) {
                 e.preventDefault();
                 e.stopPropagation();
