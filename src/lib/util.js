@@ -17,7 +17,7 @@ const util = {
     isIE_Edge: null,
     isOSX_IOS: null,
     isChromium: null,
-    isResizeObserverSupported: null, 
+    isResizeObserverSupported: null,
     _propertiesInit: function () {
         if (this._d) return;
         this._d =  document;
@@ -214,7 +214,7 @@ const util = {
         const pathList = [];
         const tagName = extension === 'js' ? 'script' : 'link';
         const src = extension === 'js' ? 'src' : 'href';
-        
+
         let fileName = '(?:';
         for (let i = 0, len = nameArray.length; i < len; i++) {
             fileName += nameArray[i] + (i < len - 1 ? '|' : ')');
@@ -222,7 +222,7 @@ const util = {
 
         const regExp = new this._w.RegExp('(^|.*[\\/])' + fileName + '(\\.[^\\/]+)?\.' + extension + '(?:\\?.*|;.*)?$', 'i');
         const extRegExp = new this._w.RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
-            
+
         for (let c = this._d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
             if (extRegExp.test(c[i][src])) {
                 pathList.push(c[i]);
@@ -255,14 +255,14 @@ const util = {
     getPageStyle: function (doc) {
         let cssText = '';
         const sheets = (doc || this._d).styleSheets;
-        
+
         for (let i = 0, len = sheets.length, rules; i < len; i++) {
             try {
                 rules = sheets[i].cssRules;
             } catch (e) {
                 continue;
             }
-            
+
             if (rules) {
                 for (let c = 0, cLen = rules.length; c < cLen; c++) {
                     cssText += rules[c].cssText;
@@ -488,7 +488,7 @@ const util = {
 
             element = element.parentNode;
         }
-        
+
         return null;
     },
 
@@ -531,7 +531,7 @@ const util = {
 
             element = element.parentNode;
         }
-        
+
         return null;
     },
 
@@ -553,7 +553,7 @@ const util = {
 
             element = element.parentNode;
         }
-        
+
         return null;
     },
 
@@ -603,7 +603,7 @@ const util = {
 
         validation = validation || function () { return true; };
         const arr = [];
-        
+
         for (let i = 0, len = array.length, a; i < len; i++) {
             a = array[i];
             if (validation(a)) {
@@ -733,7 +733,7 @@ const util = {
             }
             return false;
         }.bind(this));
-        
+
         return path.map(this.getPositionIndex).reverse();
     },
 
@@ -899,7 +899,7 @@ const util = {
      */
     getNumber: function (text, maxDec) {
         if (!text) return 0;
-        
+
         let number = (text + '').match(/-?\d+(\.\d+)?/);
         if (!number || !number[0]) return 0;
 
@@ -1052,6 +1052,54 @@ const util = {
         }
 
         return element;
+    },
+
+    /**
+     * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child
+     * Returns null if not found.
+     * @param {Node} node Reference element
+     * @param {Node|null} ceiling Highest boundary allowed
+     * @returns {Node|null}
+     */
+    getPreviousDeepestNode: function (node, ceiling) {
+        let previousNode = node.previousSibling;
+        if (!previousNode) {
+            for (let parentNode = node.parentNode; parentNode; parentNode = parentNode.parentNode) {
+                if (parentNode === ceiling) return null;
+                if (parentNode.previousSibling) {
+                    previousNode = parentNode.previousSibling;
+                    break;
+                };
+            }
+            if (!previousNode) return null;
+        }
+        while (previousNode.lastChild) previousNode = previousNode.lastChild;
+
+        return previousNode;
+    },
+
+    /**
+     * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child
+     * Returns null if not found.
+     * @param {Node} node Reference element
+     * @param {Node|null} ceiling Highest boundary allowed
+     * @returns {Node|null}
+     */
+    getNextDeepestNode: function (node, ceiling) {
+        let nextNode = node.nextSibling;
+        if (!nextNode) {
+            for (let parentNode = node.parentNode; parentNode; parentNode = parentNode.parentNode) {
+                if (parentNode === ceiling) return null;
+                if (parentNode.nextSibling) {
+                    nextNode = parentNode.nextSibling;
+                    break;
+                };
+            }
+            if (!nextNode) return null;
+        }
+        while (nextNode.firstChild) nextNode = nextNode.firstChild;
+
+        return nextNode;
     },
 
     /**
@@ -1291,7 +1339,7 @@ const util = {
             let button = buttonList[i];
             if (important || !this.isImportantDisabled(button)) button.disabled = disabled;
             if (important) {
-                if (disabled) { 
+                if (disabled) {
                     button.setAttribute('data-important-disabled', '');
                 } else {
                     button.removeAttribute('data-important-disabled');
@@ -1368,7 +1416,7 @@ const util = {
         } else {
             rangeElement = baseNode;
         }
-        
+
         let rChildren;
         if (!all) {
             const depth = this.getElementDepth(baseNode) + 2;
@@ -1380,7 +1428,7 @@ const util = {
         for (let i = 0, len = rChildren.length; i < len; i++) {
             this._deleteNestedList(rChildren[i]);
         }
-        
+
         if (rNode) {
             rNode.parentNode.insertBefore(rangeElement, rNode.nextSibling);
             if (cNodes && cNodes.length === 0) this.removeItem(rNode);
@@ -1398,7 +1446,7 @@ const util = {
         let sibling = baseParent;
         let parent = sibling.parentNode;
         let liSibling, liParent, child, index, c;
-        
+
         while (this.isListCell(parent)) {
             index = this.getPositionIndex(baseNode);
             liSibling = parent.nextElementSibling;
@@ -1522,7 +1570,7 @@ const util = {
 
         this.mergeSameTags(newEl, null, false);
         this.mergeNestedTags(newEl, function (current) { return this.isList(current); }.bind(this));
-        
+
         if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
         else newEl = depthEl;
 
@@ -1548,14 +1596,14 @@ const util = {
         const inst = this;
         const nodePathLen = nodePathArray ? nodePathArray.length : 0;
         let offsets = null;
-        
+
         if (nodePathLen) {
             offsets = this._w.Array.apply(null, new this._w.Array(nodePathLen)).map(this._w.Number.prototype.valueOf, 0);
         }
 
         (function recursionFunc(current, depth, depthIndex) {
             const children = current.childNodes;
-            
+
             for (let i = 0, len = children.length, child, next; i < len; i++) {
                 child = children[i];
                 next = children[i + 1];
@@ -1628,7 +1676,7 @@ const util = {
                                 path = nodePathArray[n];
                                 if (path && path[depth] > i) {
                                     if (depth > 0 && path[depth - 1] !== depthIndex) continue;
-    
+
                                     path[depth] -= 1;
                                     if (path[depth + 1] >= 0 && path[depth] === i) {
                                         path[depth + 1] += childLength;
@@ -1652,7 +1700,7 @@ const util = {
                                 path = nodePathArray[n];
                                 if (path && path[depth] > i) {
                                     if (depth > 0 && path[depth - 1] !== depthIndex) continue;
-    
+
                                     path[depth] -= 1;
                                     if (path[depth + 1] >= 0 && path[depth] === i) {
                                         path[depth + 1] += childLength;
@@ -1664,7 +1712,7 @@ const util = {
                     } else {
                         child.innerHTML += next.innerHTML;
                     }
-                    
+
                     inst.removeItem(next);
                     i--;
                 } else if (child.nodeType === 1) {
@@ -1687,7 +1735,7 @@ const util = {
         } else if (typeof validation !== 'function') {
             validation = function () { return true; };
         }
-        
+
         (function recursionFunc(current) {
             let children = current.children;
             if (children.length === 1 && children[0].nodeName === current.nodeName && validation(current)) {
@@ -1719,7 +1767,7 @@ const util = {
                 return element === current.parentElement;
             });
         }
-        
+
         (function recursionFunc(current) {
             if (inst._notTextNode(current) || current === notRemoveNode || inst.isNonEditable(current)) return 0;
             if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && (!current.firstChild || !inst.isBreak(current.firstChild)) && !current.querySelector(inst._allowedEmptyNodeList)) {
@@ -1758,13 +1806,13 @@ const util = {
     },
 
     /**
-	 * @description HTML code compression
-	 * @param {string} html HTML string
-	 * @returns {string} HTML string
-	 */
-	htmlCompress: function (html) {
-		return html.replace(/\n/g, '').replace(/(>)(?:\s+)(<)/g, '$1$2');
-	},
+     * @description HTML code compression
+     * @param {string} html HTML string
+     * @returns {string} HTML string
+     */
+    htmlCompress: function (html) {
+        return html.replace(/\n/g, '').replace(/(>)(?:\s+)(<)/g, '$1$2');
+    },
 
     /**
      * @description Sort a element array by depth of element.
@@ -1782,23 +1830,23 @@ const util = {
             return a > b ? t : a < b ? f : 0;
         }.bind(this));
     },
+    
+    /**
+     * @description Escape a string for safe use in regular expressions.
+     * @param {String} string String to escape
+     * @returns {String}
+     */
+    escapeStringRegexp: function (string) {
+        if (typeof string !== 'string') {
+            throw new TypeError('Expected a string');
+        }
 
-	/**
-	 * @description Escape a string for safe use in regular expressions.
-	 * @param {String} string String to escape
-	 * @returns {String}
-	 */
-	escapeStringRegexp: function (string) {
-		if (typeof string !== 'string') {
-			throw new TypeError('Expected a string');
-		}
-	
-		// Escape characters with special meaning either inside or outside character sets.
-		// Use a simple backslash escape when it’s always valid, and a `\xnn` escape when the simpler form would be disallowed by Unicode patterns’ stricter grammar.
-		return string
-			.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
-			.replace(/-/g, '\\x2d');
-	},
+        // Escape characters with special meaning either inside or outside character sets.
+        // Use a simple backslash escape when it’s always valid, and a `\xnn` escape when the simpler form would be disallowed by Unicode patterns’ stricter grammar.
+        return string
+            .replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+            .replace(/-/g, '\\x2d');
+    },
 
     _isExcludeSelectionElement: function (element) {
         return !/FIGCAPTION/i.test(element.nodeName) && (this.isComponent(element) || /FIGURE/i.test(element.nodeName));
@@ -1933,8 +1981,8 @@ const util = {
             }
 
             const result = current.parentNode !== documentFragment && nrtag &&
-             ((this.isListCell(current) && !this.isList(current.parentNode)) ||
-              ((this.isFormatElement(current) || this.isComponent(current)) && !this.isRangeFormatElement(current.parentNode) && !this.getParentElement(current, this.isComponent)));
+                ((this.isListCell(current) && !this.isList(current.parentNode)) ||
+                    ((this.isFormatElement(current) || this.isComponent(current)) && !this.isRangeFormatElement(current.parentNode) && !this.getParentElement(current, this.isComponent)));
 
             return result;
         }.bind(this));
@@ -1942,7 +1990,7 @@ const util = {
         for (let i = 0, len = removeTags.length; i < len; i++) {
             this.removeItem(removeTags[i]);
         }
-        
+
         const checkTags = [];
         for (let i = 0, len = wrongTags.length, t, p; i < len; i++) {
             t = wrongTags[i];
