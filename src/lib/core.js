@@ -2136,6 +2136,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._resetRangeToTextNode();
 
             const range = this.getRange();
+
+            if (range.startContainer === range.endContainer) {
+                const fileComponent = util.getParentElement(range.startContainer, util.isMediaComponent);
+                if (fileComponent) {
+                    const br = util.createElement('BR');
+                    const format = util.createElement(options.defaultTag);
+                    format.appendChild(br);
+
+                    util.changeElement(fileComponent, format);
+
+                    core.setRange(format, 0, format, 0);
+                    this.history.push(true);
+
+                    return {
+                        container: format,
+                        offset: 0,
+                        prevContainer: null
+                    };
+                }
+            }
+
             const isStartEdge = range.startOffset === 0;
             const isEndEdge = core.isEdgePoint(range.endContainer, range.endOffset, 'end');
             let prevContainer = null;
@@ -2143,8 +2164,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let endNextEl = null;
             if (isStartEdge) {
                 startPrevEl = util.getFormatElement(range.startContainer);
-                prevContainer = startPrevEl.previousElementSibling;
-                startPrevEl = startPrevEl ? prevContainer : startPrevEl;
+                if (startPrevEl) {
+                    prevContainer = startPrevEl.previousElementSibling;
+                    startPrevEl = prevContainer;
+                }
             }
             if (isEndEdge) {
                 endNextEl = util.getFormatElement(range.endContainer);
@@ -7577,7 +7600,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (fileComponentName) {
                         e.preventDefault();
                         e.stopPropagation();
-
                         core.containerOff();
                         core.controllersOff();
 
@@ -7595,7 +7617,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                         if (shift) container.parentNode.insertBefore(newEl, container);
                         else container.parentNode.insertBefore(newEl, container.nextElementSibling);
-                        core.setRange(newEl, 0, newEl, newEl.textContent.length);
+
+                        core.callPlugin(fileComponentName, function () {
+                            if (core.selectComponent(compContext._element, fileComponentName) === false) core.blur();
+                        }, null);
                     }
 
                     break;
