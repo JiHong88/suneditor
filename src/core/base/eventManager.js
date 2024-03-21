@@ -2242,7 +2242,7 @@ function OnResize_window() {
 function OnScroll_window() {
 	if (this.options.get('toolbar_sticky') > -1) {
 		if (this._vitualKeyboardHeight && this.toolbar._sticky) {
-			this.toolbar.visible(false);
+			this.toolbar._visible(false);
 		} else {
 			this.toolbar._resetSticky();
 		}
@@ -2264,7 +2264,7 @@ function OnResize_viewport() {
 function OnScroll_viewport() {
 	if (this.options.get('toolbar_sticky') > -1) {
 		if (this._vitualKeyboardHeight && this.toolbar._sticky) {
-			this.toolbar.visible(false);
+			this.toolbar._visible(false);
 		} else {
 			this.toolbar._resetSticky();
 		}
@@ -2272,8 +2272,8 @@ function OnScroll_viewport() {
 }
 
 function OnScroll_viewport_onKeyboardOn() {
+	this.toolbar._visible(true);
 	if (this._vitualKeyboardHeight && this.options.get('toolbar_sticky') > -1) {
-		this.toolbar.visible(true);
 		this.toolbar._resetSticky();
 	}
 }

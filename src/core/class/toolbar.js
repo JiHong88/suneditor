@@ -95,10 +95,15 @@ Toolbar.prototype = {
 	/**
 	 * @desscription Show or hide the toolbar
 	 * @param {boolean} isShow Show or hide
+	 * @private
 	 */
-	visible(isShow) {
+	_visible(isShow) {
 		const toolbar = this.context.get(this.keyName + '.main');
-		toolbar.style.visibility = isShow ? '' : 'hidden';
+		if (isShow) {
+			domUtils.removeClass(toolbar, 'se-toolbar-onscroll-hide');
+		} else {
+			domUtils.addClass(toolbar, 'se-toolbar-onscroll-hide');
+		}
 	},
 
 	/**
