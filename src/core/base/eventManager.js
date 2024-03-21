@@ -41,6 +41,7 @@ const EventManager = function (editor) {
 	this.__inputKeyEvent = null;
 	// hover
 	this.__overInfo = null;
+	this._vitualKeyboardHeight = 0;
 };
 
 EventManager.prototype = {
@@ -632,7 +633,11 @@ EventManager.prototype = {
 		/** window event */
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
-		this.addEvent(_w.visualViewport, 'scroll', OnScroll_viewport.bind(this), false);
+		if (env.isMobile) {
+			this.addEvent(_w.visualViewport, 'resize', OnResize_viewport.bind(this), false);
+			this.addEvent(_w.visualViewport, 'scroll', OnScroll_viewport.bind(this), false);
+			this.addEvent(_w.visualViewport, 'scroll', env.debounce(OnScroll_viewport_onKeyboardOn.bind(this), 200), false);
+		}
 
 		/** document event */
 		this.addEvent(_d, 'selectionchange', OnSelectionchange_document.bind(this), false);
@@ -2234,15 +2239,13 @@ function OnResize_window() {
 	this._resetFrameStatus();
 }
 
-function OnScroll_viewport() {
-	if (this.options.get('toolbar_sticky') > -1) {
-		this.toolbar._resetSticky();
-	}
-}
-
 function OnScroll_window() {
 	if (this.options.get('toolbar_sticky') > -1) {
-		this.toolbar._resetSticky();
+		if (this._vitualKeyboardHeight && this.toolbar._sticky) {
+			this.toolbar.visible(false);
+		} else {
+			this.toolbar._resetSticky();
+		}
 	}
 
 	if (this.editor.isBalloon && this.context.get('toolbar.main').style.display === 'block') {
@@ -2252,6 +2255,27 @@ function OnScroll_window() {
 	}
 
 	this._scrollContainer();
+}
+
+function OnResize_viewport() {
+	this._vitualKeyboardHeight = _w.innerHeight - _w.visualViewport.height;
+}
+
+function OnScroll_viewport() {
+	if (this.options.get('toolbar_sticky') > -1) {
+		if (this._vitualKeyboardHeight && this.toolbar._sticky) {
+			this.toolbar.visible(false);
+		} else {
+			this.toolbar._resetSticky();
+		}
+	}
+}
+
+function OnScroll_viewport_onKeyboardOn() {
+	if (this._vitualKeyboardHeight && this.options.get('toolbar_sticky') > -1) {
+		this.toolbar.visible(true);
+		this.toolbar._resetSticky();
+	}
 }
 
 function OnSelectionchange_document() {

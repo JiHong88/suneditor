@@ -98,7 +98,9 @@ Component.prototype = {
 
 		if (this.is(element)) {
 			if (/se-component/.test(element.className)) element = element.firstElementChild;
-			if (/^FIGURE$/i.test(element.nodeName)) element = element.firstElementChild;
+			if (/^FIGURE$/i.test(element.nodeName)) element = element?.firstElementChild;
+			if (!element) return null;
+
 			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
 			if (!comp) return null;
 			target = comp.target;

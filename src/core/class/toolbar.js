@@ -93,6 +93,15 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @desscription Show or hide the toolbar
+	 * @param {boolean} isShow Show or hide
+	 */
+	visible(isShow) {
+		const toolbar = this.context.get(this.keyName + '.main');
+		toolbar.style.visibility = isShow ? '' : 'hidden';
+	},
+
+	/**
 	 * @description Reset buttons of the responsive toolbar.
 	 */
 	resetResponsiveToolbar() {
