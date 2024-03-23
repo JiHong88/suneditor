@@ -33,7 +33,7 @@ export function OnInput_wysiwyg(frameContext, e) {
 }
 
 export function OnKeyDown_wysiwyg(frameContext, e) {
-	if (this.editor.selectMenuOn) return;
+	if (this.editor.selectMenuOn || !e.isTrusted) return;
 
 	let selectionNode = this.selection.getNode();
 	if (domUtils.isInputElement(selectionNode)) return;
@@ -533,7 +533,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 				// add default format line
 				if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
-					e.preventDefault();
+					this.__enterPrevent(e);
 					let temp = null;
 					const newFormat = this.format.addLine(formatEl, this.options.get('defaultLine'));
 
@@ -552,7 +552,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				} else if (rangeEl && formatEl && !domUtils.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
 					const rangeEnt = this.selection.getRange();
 					if (domUtils.isEdgePoint(rangeEnt.endContainer, rangeEnt.endOffset) && domUtils.isList(selectionNode.nextSibling)) {
-						e.preventDefault();
+						this.__enterPrevent(e);
 						const br = domUtils.createElement('BR');
 						const newEl = domUtils.createElement('LI', null, br);
 
@@ -568,7 +568,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						domUtils.isZeroWith(formatEl.innerText.trim()) &&
 						!domUtils.isListCell(formatEl.nextElementSibling)
 					) {
-						e.preventDefault();
+						this.__enterPrevent(e);
 						let newEl = null;
 
 						if (domUtils.isListCell(rangeEl.parentNode)) {
@@ -606,7 +606,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				}
 
 				if (brBlock) {
-					e.preventDefault();
+					this.__enterPrevent(e);
 					const selectionFormat = selectionNode === brBlock;
 					const wSelection = this.selection.get();
 					const children = selectionNode.childNodes,
@@ -669,7 +669,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 				// set format attrs - edge
 				if (range.collapsed && (formatStartEdge || formatEndEdge)) {
-					e.preventDefault();
+					this.__enterPrevent(e);
 					const focusBR = domUtils.createElement('BR');
 					const newFormat = domUtils.createElement(formatEl.nodeName, null, focusBR);
 
@@ -707,7 +707,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						newEl = this.format.getLine(rcon.container, null);
 						if (!newEl) {
 							if (domUtils.isWysiwygFrame(rcon.container)) {
-								e.preventDefault();
+								this.__enterPrevent(e);
 								frameContext.get('wysiwyg').appendChild(newFormat);
 								newEl = newFormat;
 								domUtils.copyTagAttributes(newEl, formatEl, this.options.get('lineAttrReset'));
@@ -750,7 +750,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						}
 					}
 
-					e.preventDefault();
+					this.__enterPrevent(e);
 					domUtils.copyTagAttributes(newEl, formatEl, this.options.get('lineAttrReset'));
 					this.selection.setRange(newEl, offset, newEl, offset);
 
@@ -761,7 +761,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			if (selectRange) break;
 
 			if (rangeEl && domUtils.getParentElement(rangeEl, 'FIGCAPTION') && domUtils.getParentElement(rangeEl, domUtils.isList)) {
-				e.preventDefault();
+				this.__enterPrevent(e);
 				formatEl = this.format.addLine(formatEl, null);
 				this.selection.setRange(formatEl, 0, formatEl, 0);
 			}

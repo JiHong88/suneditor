@@ -42,7 +42,9 @@ const EventManager = function (editor) {
 	this.__inputKeyEvent = null;
 	// hover
 	this.__overInfo = null;
+	// viewport
 	this._vitualKeyboardHeight = 0;
+	this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
 };
 
 EventManager.prototype = {
@@ -886,6 +888,13 @@ EventManager.prototype = {
 		this.__inputBlurEvent = this.removeEvent(this.__inputBlurEvent);
 		this.__inputKeyEvent = this.removeEvent(this.__inputKeyEvent);
 		this.__inputPlugin = null;
+	},
+
+	__enterPrevent(e) {
+		e.preventDefault();
+		if (!isMobile) return;
+
+		this.__focusTemp.focus();
 	},
 
 	constructor: EventManager
