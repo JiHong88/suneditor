@@ -273,6 +273,10 @@ export default {
         const imageEl = element || this.context.image._element;
         const imageContainer = this.util.getParentElement(imageEl, this.util.isMediaComponent) || imageEl;
         const dataIndex = imageEl.getAttribute('data-index') * 1;
+
+        // event
+        if (typeof this.functions.onImageDeleteBefore === 'function' && (this.functions.onImageDeleteBefore(imageEl, imageContainer, dataIndex, this) === false)) return;
+
         let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
         const emptyDiv = imageContainer.parentNode;
