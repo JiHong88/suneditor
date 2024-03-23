@@ -987,6 +987,7 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
 // </ul>
 
 //     `,
+    strictMode: false,
     allowedClassNames: '.',
     width: '100%',
     // fontSizeUnit: 'em',

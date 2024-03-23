@@ -408,6 +408,7 @@ export default {
         }
         options.plugins = plugins;
         /** Values */
+        options.strictMode = options.strictMode === false ? false : true;
         options.lang = options.lang || _defaultLang;
         options.value = typeof options.value === 'string' ? options.value : null;
         options.allowedClassNames = new util._w.RegExp((options.allowedClassNames && typeof options.allowedClassNames === 'string' ? options.allowedClassNames + '|' : '') + '^__se__|se-|katex');

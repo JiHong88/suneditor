@@ -5475,6 +5475,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist, blacklist) {
+            if (!options.strictMode) return html;
+
             html = this._deleteDisallowedTags(this._parser.parseFromString(util.htmlCompress(html), 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/<br\/?>$/i, '');
             const dom = _d.createRange().createContextualFragment(html);
             try {
@@ -5531,6 +5533,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
+            if (!options.strictMode) return contents;
             contents = this._deleteDisallowedTags(this._parser.parseFromString(util.htmlCompress(contents), 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
             const dom = _d.createRange().createContextualFragment(contents);
 
