@@ -17,6 +17,7 @@ const util = {
     isIE_Edge: null,
     isOSX_IOS: null,
     isChromium: null,
+    isMobile: null,
     isResizeObserverSupported: null, 
     _propertiesInit: function () {
         if (this._d) return;
@@ -27,6 +28,7 @@ const util = {
         this.isOSX_IOS = /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
         this.isChromium = !!window.chrome;
         this.isResizeObserverSupported = (typeof ResizeObserver === 'function');
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     },
 
     _allowedEmptyNodeList: '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas',

@@ -7355,11 +7355,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     
                     break;
                 case 13: /** enter key */
-                    // Force stop IME composition
-                    _w.setTimeout(function () {
-                        _d.dispatchEvent(new _w.Event('compositionend'));
-                    }, 0);
-
                     // enter login start
                     const freeFormatEl = util.getFreeFormatElement(selectionNode, null);
 
@@ -7383,7 +7378,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                         // add default format line
                         if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
-                            e.preventDefault();
+                            event._enterPrevent(e);
                             let temp = null;
                             const newFormat = core.appendFormatTag(formatEl, options.defaultTag);
 
@@ -7408,7 +7403,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         } else if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                             const range = core.getRange();
                             if(core.isEdgePoint(range.endContainer, range.endOffset) && util.isList(selectionNode.nextSibling)) {
-                                e.preventDefault();
+                                event._enterPrevent(e);
                                 const newEl = util.createElement('LI');
                                 const br = util.createElement('BR');
                                 newEl.appendChild(br);
@@ -7421,7 +7416,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
     
                             if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && util.onlyZeroWidthSpace(formatEl.innerText.trim()) && !util.isListCell(formatEl.nextElementSibling)) {
-                                e.preventDefault();
+                                event._enterPrevent(e);
                                 let newEl = null;
     
                                 if (util.isListCell(rangeEl.parentNode)) {
@@ -7450,7 +7445,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
 
                         if (freeFormatEl) {
-                            e.preventDefault();
+                            event._enterPrevent(e);
                             const selectionFormat = selectionNode === freeFormatEl;
                             const wSelection = core.getSelection();
                             const children = selectionNode.childNodes, offset = wSelection.focusOffset, prev = selectionNode.previousElementSibling, next = selectionNode.nextSibling;
@@ -7495,7 +7490,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         
                         // set format attrs - edge
                         if (range.collapsed && (formatStartEdge || formatEndEdge)) {
-                            e.preventDefault();
+                            event._enterPrevent(e);
                             const focusBR = util.createElement('BR');
                             const newFormat = util.createElement(formatEl.nodeName);
                             util.copyTagAttributes(newFormat, formatEl, options.lineAttrReset);
@@ -7532,7 +7527,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 newEl = util.getFormatElement(r.container, null);
                                 if (!newEl) {
                                     if (util.isWysiwygDiv(r.container)) {
-                                        e.preventDefault();
+                                        event._enterPrevent(e);
                                         context.element.wysiwyg.appendChild(newFormat);
                                         newEl = newFormat;
                                         util.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
@@ -7575,7 +7570,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 }
                             }
 
-                            e.preventDefault();
+                            event._enterPrevent(e);
                             util.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
                             core.setRange(newEl, offset, newEl, offset);
 
@@ -7586,7 +7581,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (selectRange) break;
                     
                     if (rangeEl && util.getParentElement(rangeEl, 'FIGCAPTION') && util.getParentElement(rangeEl, util.isList)) {
-                        e.preventDefault();
+                        event._enterPrevent(e);
                         formatEl = core.appendFormatTag(formatEl, null);
                         core.setRange(formatEl, 0, formatEl, 0);
                     }
@@ -7671,9 +7666,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const range = core.getRange();
-            console.log("range", range)
             let selectionNode = core.getSelectionNode();
-            console.log("range", selectionNode)
 
             if (core._isBalloon && ((core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
                 if (core._isBalloonAlways) {
@@ -8174,6 +8167,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             else if (lineBreakerStyle.display !== 'none') {
                 lineBreakerStyle.display = 'none';
             }
+        },
+
+        _enterPrevent(e) {
+            e.preventDefault();
+            if (!util.isMobile) return;
+
+            this.__focusTemp.focus();
         },
 
         _onMouseDown_lineBreak: function (e) {
