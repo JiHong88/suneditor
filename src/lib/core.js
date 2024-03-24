@@ -5785,7 +5785,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _setCharCount: function () {
             if (context.element.charCounter) {
-                _w.setTimeout(function () { context.element.charCounter.textContent = functions.getCharCount(options.charCounterType); });
+                _w.setTimeout(function (functions, options) {
+                    if (this.textContent && functions) {
+                        this.textContent = functions.getCharCount(options.charCounterType);
+                    }
+                }.bind(context.element.charCounter, functions, options), 0);
             }
         },
 
