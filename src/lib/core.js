@@ -6209,25 +6209,26 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return;
             }
 
-            this.execCommand('formatBlock', false, (formatName || options.defaultTag));
-            focusNode = util.getEdgeChildNodes(commonCon, commonCon);
-            focusNode = focusNode ? focusNode.ec : commonCon;
-
-            format = util.getFormatElement(focusNode, null);
-            if (!format) {
+            try {
+                if (commonCon.nodeType === 3) {
+                    format = util.createElement(formatName || options.defaultTag);
+                    commonCon.parentNode.insertBefore(format, commonCon);
+                    format.appendChild(commonCon);
+                }
+                
+                if (util.isBreak(format.nextSibling)) util.removeItem(format.nextSibling);
+                if (util.isBreak(format.previousSibling)) util.removeItem(format.previousSibling);
+                if (util.isBreak(focusNode)) {
+                    const zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                    focusNode.parentNode.insertBefore(zeroWidth, focusNode);
+                    focusNode = zeroWidth;
+                }
+            } catch (e) {
+                this.execCommand('formatBlock', false, (formatName || options.defaultTag));
                 this.removeRange();
                 this._editorRange();
-                return;
             }
             
-            if (util.isBreak(format.nextSibling)) util.removeItem(format.nextSibling);
-            if (util.isBreak(format.previousSibling)) util.removeItem(format.previousSibling);
-            if (util.isBreak(focusNode)) {
-                const zeroWidth = util.createTextNode(util.zeroWidthSpace);
-                focusNode.parentNode.insertBefore(zeroWidth, focusNode);
-                focusNode = zeroWidth;
-            }
-
             this.effectNode = null;
             this.nativeFocus();
         },
@@ -7424,15 +7425,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 let newEl = null;
     
                                 if (util.isListCell(rangeEl.parentNode)) {
-                                    rangeEl = formatEl.parentNode.parentNode.parentNode;
-                                    newEl = util.splitElement(formatEl, null, util.getElementDepth(formatEl) - 2);
-                                    if (!newEl) {
-                                        const newListCell = util.createElement('LI');
-                                        newListCell.innerHTML = '<br>';
-                                        util.copyTagAttributes(newListCell, formatEl, options.lineAttrReset);
-                                        rangeEl.insertBefore(newListCell, newEl);
-                                        newEl = newListCell;
-                                    }
+                                    const parentLi = formatEl.parentNode.parentNode;
+                                    rangeEl = parentLi.parentNode;
+                                    const newListCell = util.createElement('LI');
+                                    newListCell.innerHTML = '<br>';
+                                    util.copyTagAttributes(newListCell, formatEl, options.lineAttrReset);
+                                    newEl = newListCell;
+                                    rangeEl.insertBefore(newEl, parentLi.nextElementSibling);
                                 } else {
                                     const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : (util.isFormatElement(rangeEl.nextElementSibling) && !util.isRangeFormatElement(rangeEl.nextElementSibling)) ? rangeEl.nextElementSibling.nodeName : (util.isFormatElement(rangeEl.previousElementSibling) && !util.isRangeFormatElement(rangeEl.previousElementSibling)) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
                                     newEl = util.createElement(newFormat);
