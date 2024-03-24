@@ -5194,7 +5194,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     ch[i].outerHTML = ch[i].innerHTML;
                 }
 
-                if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
+                if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isFigures(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
                     return util.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML;
                 } else {
                     return '<' + defaultTag + '>' + (util.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultTag + '>';
@@ -5568,7 +5568,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     continue;
                 }
 
-                if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t) && t.nodeType !== 8 && !/__se__tag/.test(t.className)) {
+                if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isFigures(t) && t.nodeType !== 8 && !/__se__tag/.test(t.className)) {
                     if (!p) p = util.createElement(options.defaultTag);
                     p.appendChild(t);
                     i--;

@@ -803,6 +803,7 @@ export default {
                     formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
                     if (contextImage.__updateTags.map(function (current) { return existElement.contains(current); }).length === 0) this.util.removeItem(existElement);
                 } else {
+                    existElement = this.util.isFigures(existElement.parentNode) ? existElement.parentNode : existElement;
                     existElement.parentNode.replaceChild(container, existElement);
                 }
             }
