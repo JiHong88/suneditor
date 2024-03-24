@@ -613,13 +613,15 @@ Figure.prototype = {
 
 		if (!/%$/.test(w) && !/%$/.test(h) && !onlyW && !onlyH) this._deletePercentSize();
 
+		const sizeTarget = this._cover || this._element;
+
 		if (this.autoRatio) this._cover.style.width = w;
 		if (!onlyH) {
-			this._element.style.width = w;
+			sizeTarget.style.width = this._element.style.width = w;
 		}
 		if (!onlyW) {
 			h = numbers.is(h) ? h + this.sizeUnit : h;
-			this._element.style.height = this.autoRatio && !this.isVertical ? '100%' : h;
+			sizeTarget.style.height = this._element.style.height = this.autoRatio && !this.isVertical ? '100%' : h;
 			if (this.autoRatio) {
 				this._cover.style.paddingBottom = h;
 				this._cover.style.height = h;

@@ -2072,7 +2072,7 @@
 
 .sun-editor-editable[contenteditable='true'] figure.se-component-selected,
 .sun-editor-editable[contenteditable='true'] .se-component.se-component-selected > figure {
-	outline: 3px solid #80bdff;
+	outline: 2px solid #80bdff;
 }
 
 .sun-editor-editable .se-component figure.se-figure-selected:not(.se-figure-over-selected)::after {
@@ -2088,7 +2088,7 @@
 }
 
 .sun-editor-editable[contenteditable='true'] figure.se-figure-selected.se-drag-over {
-	outline: 3px solid #f0c20a;
+	outline: 2px solid #f0c20a;
 }
 
 /* controller - button group */
@@ -2236,7 +2236,7 @@
 }
 
 .sun-editor .se-resizing-container.se-resize-ing .se-resize-dot {
-	outline: 3px solid #4592ff;
+	outline: 2px solid #4592ff;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span {

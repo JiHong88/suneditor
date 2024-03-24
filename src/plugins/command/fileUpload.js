@@ -1,7 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils, env } from '../../helper';
 import { FileManager, Figure, Controller } from '../../modules';
-const { NO_EVENT } = env;
+const { NO_EVENT, _w } = env;
 
 const FileUpload = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
@@ -42,7 +42,7 @@ const FileUpload = function (editor, pluginOptions) {
 	});
 
 	// controller
-	if (figureControls.includes('edit')) {
+	if (/\bedit\b/.test(_w.JSON.stringify(figureControls))) {
 		const controllerEl = CreateHTML_controller(this);
 		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, FileUpload.key);
 		this.editInput = controllerEl.querySelector('input');

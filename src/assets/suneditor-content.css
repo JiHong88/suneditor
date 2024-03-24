@@ -514,7 +514,7 @@
 .sun-editor-editable figure {
 	display: block;
 	outline: none;
-	padding: 1px;
+	padding: 0;
 	margin: 0;
 }
 .sun-editor-editable .se-component figure {

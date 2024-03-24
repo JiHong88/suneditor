@@ -392,7 +392,7 @@ Image_.prototype = {
 
 		let imageEl = this._element;
 		let cover = this._cover;
-		let container = this._container;
+		let container = this._container === this._cover ? null : this._container;
 		let isNewContainer = false;
 
 		if (!cover || !container) {
@@ -420,7 +420,7 @@ Image_.prototype = {
 		// caption
 		let modifiedCaption = false;
 		if (this.captionCheckEl.checked) {
-			if (!this._caption) {
+			if (!this._caption || isNewContainer) {
 				this._caption = Figure.CreateCaption(cover, this.lang.caption);
 				modifiedCaption = true;
 			}
@@ -484,6 +484,7 @@ Image_.prototype = {
 					)
 						domUtils.removeItem(existElement);
 				} else {
+					existElement = domUtils.isFigure(existElement.parentNode) ? existElement.parentNode : existElement;
 					existElement.parentNode.replaceChild(container, existElement);
 				}
 			}

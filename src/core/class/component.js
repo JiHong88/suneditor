@@ -149,7 +149,6 @@ Component.prototype = {
 
 		if (!isInput && this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
 			this.editor._antiBlur = true;
-			this.selection.setRange(info.container, 0, info.container, 0);
 			this.editor.blur();
 		}
 

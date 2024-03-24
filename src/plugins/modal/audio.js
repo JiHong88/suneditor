@@ -257,7 +257,7 @@ Audio_.prototype = {
 		const handler = function (newInfos, infos) {
 			infos = newInfos || infos;
 			this._createComp(infos.element, infos.url, infos.files, infos.isUpdate);
-		}.bind(this, url);
+		}.bind(this, audioInfo);
 
 		const result = await this.triggerEvent('onAudioUploadBefore', {
 			...audioInfo,

@@ -98,7 +98,7 @@ const Constructor = function (editorTargets, options) {
 	const menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
 	editor_carrier_wrapper.appendChild(menuTray);
 	// focus temp element
-	const focusTemp = domUtils.createElement('INPUT', { class: '__se__focus__temp__', style: 'width: 0; height: 0;', tabIndex: 0 });
+	const focusTemp = domUtils.createElement('INPUT', { class: '__se__focus__temp__', style: 'width: 0 !important; height: 0 !important;', tabIndex: 0 });
 	focusTemp.tabIndex = 0;
 	editor_carrier_wrapper.appendChild(focusTemp);
 
@@ -321,15 +321,15 @@ export function InitOptions(options, editorTargets) {
 	}
 
 	/** Base */
-	const defaultMode = options.strictMode !== false;
+	const modeValue = options.strictMode !== false;
 	o.set('strictMode', {
-		pluginPattern: defaultMode,
-		tagFilter: defaultMode,
-		formatFilter: defaultMode,
-		classFilter: defaultMode,
-		styleNodeFilter: defaultMode,
-		attrFilter: defaultMode,
-		styleFilter: defaultMode,
+		pluginPattern: modeValue,
+		tagFilter: modeValue,
+		formatFilter: modeValue,
+		classFilter: modeValue,
+		styleNodeFilter: modeValue,
+		attrFilter: modeValue,
+		styleFilter: modeValue,
 		...options.strictMode
 	});
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always

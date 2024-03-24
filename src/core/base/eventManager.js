@@ -451,23 +451,6 @@ EventManager.prototype = {
 		const rangeEl = this.format.getBlock(commonCon, null);
 		let focusNode, offset, format;
 
-		const fileComponent = domUtils.getParentElement(commonCon, this.component.is.bind(this.component));
-		if (fileComponent && commonCon.nodeType === 3) {
-			const siblingEl = commonCon.nextElementSibling ? fileComponent : fileComponent.nextElementSibling;
-			const el = domUtils.createElement(this.options.get('defaultLine'), null, commonCon);
-			fileComponent.parentElement.insertBefore(el, siblingEl);
-			this.editor.focusEdge(el);
-			return;
-		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
-			let el = commonCon.nextElementSibling;
-			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.get('defaultLine'));
-			this.selection.setRange(el.firstChild, 0, el.firstChild, 0);
-			return;
-		}
-
-		if ((this.format.isBlock(startCon) || domUtils.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
-		if (domUtils.getParentElement(commonCon, domUtils.isExcludeFormat)) return null;
-
 		if (rangeEl) {
 			format = domUtils.createElement(formatName || this.options.get('defaultLine'));
 			format.innerHTML = rangeEl.innerHTML;
@@ -486,6 +469,23 @@ EventManager.prototype = {
 			this.selection.setRange(focusNode, offset, focusNode, offset);
 			return;
 		}
+
+		const fileComponent = domUtils.getParentElement(commonCon, this.component.is.bind(this.component));
+		if (fileComponent && commonCon.nodeType === 3) {
+			const siblingEl = commonCon.nextElementSibling ? fileComponent : fileComponent.nextElementSibling;
+			const el = domUtils.createElement(this.options.get('defaultLine'), null, commonCon);
+			fileComponent.parentElement.insertBefore(el, siblingEl);
+			this.editor.focusEdge(el);
+			return;
+		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
+			let el = commonCon.nextElementSibling;
+			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.get('defaultLine'));
+			this.selection.setRange(el.firstChild, 0, el.firstChild, 0);
+			return;
+		}
+
+		if ((this.format.isBlock(startCon) || domUtils.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
+		if (domUtils.getParentElement(commonCon, domUtils.isExcludeFormat)) return null;
 
 		if (this.format.isBlock(commonCon) && commonCon.childNodes.length <= 1) {
 			let br = null;
@@ -872,7 +872,7 @@ EventManager.prototype = {
 		const figure = domUtils.getParentElement(target, domUtils.isFigure);
 		if (figure) {
 			const info = this.component.get(figure);
-			if (info && domUtils.isFigure(info.cover) && !domUtils.hasClass(info.cover, 'se-figure-selected')) {
+			if (info && domUtils.isFigure(info.cover) && !domUtils.hasClass(info.cover, 'se-component-selected|se-figure-selected')) {
 				this.editor._offCurrentController();
 				this.__overInfo = ON_OVER_COMPONENT;
 				this.component.select(info.target, info.pluginName, false);
