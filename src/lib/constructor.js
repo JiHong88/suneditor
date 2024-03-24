@@ -84,6 +84,12 @@ export default {
         const resize_back = doc.createElement('DIV');
         resize_back.className = 'se-resizing-back';
 
+        /// focus temp
+        const focusTemp = doc.createElement('INPUT');
+        focusTemp.tabIndex = -0;
+        focusTemp.style.width = '0 !important';
+        focusTemp.style.height = '0 !important';
+
         // toolbar container
         const toolbarContainer = options.toolbarContainer;
         if (toolbarContainer) {
@@ -109,6 +115,7 @@ export default {
         relative.appendChild(line_breaker);
         relative.appendChild(line_breaker_t);
         relative.appendChild(line_breaker_b);
+        relative.appendChild(focusTemp);
         if (resizing_bar && !resizingBarContainer) relative.appendChild(resizing_bar);
         top_div.appendChild(relative);
 
@@ -135,7 +142,8 @@ export default {
                 _lineBreaker_b: line_breaker_b,
                 _resizeBack: resize_back,
                 _stickyDummy: sticky_dummy,
-                _arrow: arrow
+                _arrow: arrow,
+                _focusTemp: focusTemp
             },
             options: options,
             plugins: tool_bar.plugins,

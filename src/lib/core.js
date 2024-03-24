@@ -44,6 +44,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _editorHeightPadding: 0,
         _listCamel: options.__listCommonStyle,
         _listKebab: util.camelToKebabCase(options.__listCommonStyle),
+        __focusTemp: context.element._focusTemp,
 
         /**
          * @description Document object of the iframe if created as an iframe || _d
@@ -8176,7 +8177,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             e.preventDefault();
             if (!util.isMobile) return;
 
-            this.__focusTemp.focus();
+            core.__focusTemp.focus();
         },
 
         _onMouseDown_lineBreak: function (e) {
