@@ -98,7 +98,7 @@ const Constructor = function (editorTargets, options) {
 	const menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
 	editor_carrier_wrapper.appendChild(menuTray);
 	// focus temp element
-	const focusTemp = domUtils.createElement('INPUT', { class: '__se__focus__temp__', style: 'width: 0 !important; height: 0 !important;', tabIndex: 0 });
+	const focusTemp = domUtils.createElement('INPUT', { class: '__se__focus__temp__', tabIndex: 0 });
 	focusTemp.tabIndex = 0;
 	editor_carrier_wrapper.appendChild(focusTemp);
 

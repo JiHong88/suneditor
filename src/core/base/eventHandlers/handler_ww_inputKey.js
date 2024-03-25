@@ -689,6 +689,9 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 					formatEl.parentNode.insertBefore(newFormat, formatStartEdge && !formatEndEdge ? formatEl : formatEl.nextElementSibling);
 					if (formatEndEdge) {
 						this.selection.setRange(focusBR, 1, focusBR, 1);
+					} else {
+						const firstEl = formatEl.firstChild || formatEl;
+						this.selection.setRange(firstEl, 0, firstEl, 0);
 					}
 
 					break;

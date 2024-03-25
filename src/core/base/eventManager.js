@@ -178,7 +178,7 @@ EventManager.prototype = {
 			selectionNode = selectionNode.firstChild;
 		}
 
-		if (this.component.is(selectionNode)) {
+		if (this.component.is(selectionNode) && !this.component.__selectionSelected) {
 			const component = this.component.get(selectionNode);
 			this.component.select(component.target, component.pluginName, false);
 			return;
@@ -713,6 +713,9 @@ EventManager.prototype = {
 			this.__scrollparents.push(scrollParent);
 			this.addEvent(scrollParent, 'scroll', OnScrollAbs, false);
 		}
+
+		/** focus temp (mobile) */
+		this.addEvent(this.__focusTemp, 'focus', (e) => e.preventDefault(), false);
 	},
 
 	__addStatusbarEvent(fc, fo) {
@@ -872,7 +875,7 @@ EventManager.prototype = {
 		const figure = domUtils.getParentElement(target, domUtils.isFigure);
 		if (figure) {
 			const info = this.component.get(figure);
-			if (info && domUtils.isFigure(info.cover) && !domUtils.hasClass(info.cover, 'se-component-selected|se-figure-selected')) {
+			if (info && domUtils.isFigure(info.cover) && !domUtils.hasClass(info.container, 'se-component-selected')) {
 				this.editor._offCurrentController();
 				this.__overInfo = ON_OVER_COMPONENT;
 				this.component.select(info.target, info.pluginName, false);

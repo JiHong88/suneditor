@@ -31,6 +31,7 @@ const Component = function (editor) {
 	this._bindClose_keydown = null;
 	this._bindClose_mousedown = null;
 	this._bindClose_touchstart = null;
+	this.__selectionSelected = false;
 };
 
 Component.prototype = {
@@ -149,7 +150,12 @@ Component.prototype = {
 
 		if (!isInput && this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
 			this.editor._antiBlur = true;
+			this.__selectionSelected = true;
+			this.selection.setRange(info.container, 0, info.container, 0);
 			this.editor.blur();
+			_w.setTimeout(() => {
+				this.__selectionSelected = false;
+			});
 		}
 
 		this.isSelected = true;
@@ -176,6 +182,7 @@ Component.prototype = {
 		this.eventManager.__overInfo = null;
 		Figure.prototype._removeDragEvent.call(this);
 		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected');
+		domUtils.removeClass(this.currentInfo?.cover, 'se-figure-over-selected');
 
 		const { frameContext } = this.editor;
 		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = 'none';
