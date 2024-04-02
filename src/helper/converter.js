@@ -169,6 +169,21 @@ export function rgb2hex(rgba) {
 }
 
 /**
+ * @description Computes the width as a percentage of the parent's width, and returns this value rounded to two decimal places.
+ * @param {Element} target
+ * @returns {number}
+ */
+export function getWidthInPercentage(target) {
+	const parent = target.parentElement;
+	const parentStyle = _w.getComputedStyle(parent);
+	const parentPaddingLeft = _w.parseFloat(parentStyle.paddingLeft);
+	const parentPaddingRight = _w.parseFloat(parentStyle.paddingRight);
+	const parentWidth = parent.offsetWidth - parentPaddingLeft - parentPaddingRight;
+	const widthInPercentage = (target.offsetWidth / parentWidth) * 100;
+	return widthInPercentage;
+}
+
+/**
  * @description Copies the "wwTarget" element and returns it with inline all styles applied.
  * @param {*} wwTarget
  * @param {string[]} styles Style list - kamel case
@@ -309,6 +324,7 @@ const converter = {
 	createElementBlacklist,
 	isHexColor,
 	rgb2hex,
+	getWidthInPercentage,
 	applyInlineStylesAll,
 	_setDefaultOptionStyle,
 	_setIframeStyleLinks,

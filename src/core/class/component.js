@@ -99,7 +99,9 @@ Component.prototype = {
 
 		if (this.is(element)) {
 			if (/se-component/.test(element.className)) element = element.firstElementChild;
-			if (/^FIGURE$/i.test(element.nodeName)) element = element?.firstElementChild;
+			if (!element) return null;
+
+			if (/^FIGURE$/i.test(element.nodeName)) element = element.firstElementChild;
 			if (!element) return null;
 
 			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
@@ -235,7 +237,7 @@ Component.prototype = {
 		const yScroll = wysiwyg.scrollY || wysiwyg.scrollTop || 0;
 		const wScroll = wysiwyg.scrollX || wysiwyg.scrollLeft || 0;
 		const container = info.container;
-		const isNonSelected = domUtils.hasClass(container, 'se-non-resize-figure');
+		const isNonSelected = domUtils.hasClass(container, 'se-flex-component');
 		const lb_t = fc.get('lineBreaker_t');
 		const lb_b = fc.get('lineBreaker_b');
 		const t_style = lb_t.style;

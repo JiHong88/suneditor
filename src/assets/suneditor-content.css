@@ -420,18 +420,6 @@
 }
 
 /** table style class */
-.sun-editor-editable table.se-table-size-auto {
-	width: auto !important;
-}
-
-.sun-editor-editable table.se-table-size-100 {
-	width: 100% !important;
-}
-
-.sun-editor-editable table.se-table-layout-auto {
-	table-layout: auto !important;
-}
-
 .sun-editor-editable table.se-table-layout-fixed {
 	table-layout: fixed !important;
 }
@@ -514,6 +502,7 @@
 .sun-editor-editable figure {
 	display: block;
 	outline: none;
+	min-width: 20px;
 	padding: 0;
 	margin: 0;
 }
@@ -521,7 +510,10 @@
 	padding: 0;
 }
 
-.sun-editor-editable figure.se-non-resize-figure {
+.sun-editor-editable .se-flex-component {
+	width: 100%;
+	min-width: min-content;
+	max-width: 100%;
 	margin: 0 0 10px;
 }
 

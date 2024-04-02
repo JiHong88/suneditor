@@ -260,7 +260,7 @@ Table.prototype = {
 		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
 		oTable.innerHTML = colGroup + body;
 
-		const figure = domUtils.createElement('FIGURE', { class: 'se-non-resize-figure' });
+		const figure = domUtils.createElement('FIGURE', { class: 'se-flex-component' });
 		figure.appendChild(oTable);
 
 		if (this.component.insert(figure, false, false)) {
@@ -290,11 +290,11 @@ Table.prototype = {
 
 				// figure
 				if (!FigureEl) {
-					FigureEl = domUtils.createElement('FIGURE', { class: 'se-non-resize-figure' });
+					FigureEl = domUtils.createElement('FIGURE', { class: 'se-flex-component' });
 					element.parentNode.insertBefore(FigureEl, element);
 					FigureEl.appendChild(element);
 				} else {
-					domUtils.addClass(FigureEl, 'se-non-resize-figure');
+					domUtils.addClass(FigureEl, 'se-flex-component');
 				}
 
 				// scroll
@@ -635,16 +635,14 @@ Table.prototype = {
 				break;
 			case 'resize':
 				this._maxWidth = !this._maxWidth;
-				this.setTableStyle('width');
+				this.setTableStyle('width', false);
 				this.controller_table.resetPosition();
-
 				break;
 			case 'layout':
 				this._fixedColumn = !this._fixedColumn;
-				this.setTableStyle('column');
+				this.setTableStyle('column', false);
 				this.controller_table.resetPosition();
 				this._historyPush();
-
 				break;
 			case 'remove': {
 				const emptyDiv = this._figure?.parentNode;
@@ -688,7 +686,7 @@ Table.prototype = {
 		this._trElement = null;
 		this._trElements = null;
 		this._tableXY = [];
-		this._maxWidth = true;
+		this._maxWidth = false;
 		this._fixedColumn = false;
 		this._physical_cellCnt = 0;
 		this._logical_cellCnt = 0;
@@ -1325,21 +1323,20 @@ Table.prototype = {
 		this.setCellControllerPosition(this._tdElement, false);
 	},
 
-	setTableStyle(styles) {
+	setTableStyle(styles, ondisplay) {
 		if (styles.includes('width')) {
+			const targets = this._figure;
+			if (!targets) return;
+
 			let sizeIcon, text;
 			if (!this._maxWidth) {
 				sizeIcon = this.icons.expansion;
 				text = this.maxText;
-				this.columnFixedButton.style.display = 'none';
-				domUtils.removeClass(this._element, 'se-table-size-100');
-				domUtils.addClass(this._element, 'se-table-size-auto');
+				if (!ondisplay) targets.style.width = 'min-content';
 			} else {
 				sizeIcon = this.icons.reduction;
 				text = this.minText;
-				this.columnFixedButton.style.display = 'block';
-				domUtils.removeClass(this._element, 'se-table-size-auto');
-				domUtils.addClass(this._element, 'se-table-size-100');
+				if (!ondisplay) targets.style.width = '100%';
 			}
 
 			domUtils.changeElement(this.resizeButton.firstElementChild, sizeIcon);
@@ -1374,11 +1371,12 @@ Table.prototype = {
 	 * @param {Element} target Target element
 	 */
 	select(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, disabledButtons: false, __fileManagerInfo: false });
+		this._figureOpen(target);
 
-		this._maxWidth = domUtils.hasClass(target, 'se-table-size-100') || target.style.width === '100%' || (!target.style.width && !domUtils.hasClass(target, 'se-table-size-auto'));
+		const targetWidth = this._figure?.style.width || '100%';
+		this._maxWidth = targetWidth === '100%';
 		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
-		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
+		this.setTableStyle(this._maxWidth ? 'width|column' : 'width', true);
 
 		if (this.eventManager.__overInfo === ON_OVER_COMPONENT) return;
 
@@ -1416,12 +1414,17 @@ Table.prototype = {
 		this._recallStyleSelectedCells();
 	},
 
+	_figureOpen(target) {
+		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, disabledButtons: false, __fileManagerInfo: false });
+	},
+
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
 		this._setResizeLinePosition(this._figure, this._tdElement, this._resizeLinePrev, isLeftEdge);
 		this._resizeLinePrev.style.display = 'block';
 		const prevValue = col.style.width;
 		const nextCol = col.nextElementSibling;
 		const nextColPrevValue = nextCol.style.width;
+		const realWidth = domUtils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(col);
 
 		this._addResizeGlobalEvents(
 			this._cellResize.bind(
@@ -1435,7 +1438,7 @@ Table.prototype = {
 				startX,
 				startWidth,
 				numbers.get(prevValue, CELL_DECIMAL_END),
-				numbers.get(nextColPrevValue, CELL_DECIMAL_END),
+				numbers.get(realWidth, CELL_DECIMAL_END),
 				this._element.offsetWidth
 			),
 			() => {
@@ -1489,8 +1492,9 @@ Table.prototype = {
 		this._setResizeLinePosition(figure, figure, this._resizeLinePrev, isLeftEdge);
 		this._resizeLinePrev.style.display = 'block';
 
+		const realWidth = converter.getWidthInPercentage(figure);
 		this._addResizeGlobalEvents(
-			this._figureResize.bind(this, figure, this._resizeLine, isLeftEdge, startX, figure.offsetWidth, /%$/.test(figure.style.width) ? numbers.get(figure.style.width, CELL_DECIMAL_END) : 100),
+			this._figureResize.bind(this, figure, this._resizeLine, isLeftEdge, startX, figure.offsetWidth, numbers.get(realWidth, CELL_DECIMAL_END)),
 			this.__removeGlobalEvents.bind(this),
 			this._stopResize.bind(this, figure, figure.style.width, 'width')
 		);
@@ -2585,9 +2589,9 @@ function CreateHTML_controller_table({ lang, icons }) {
 			</span>
 		</button>
 		<button type="button" data-command="resize" class="se-btn se-tooltip _se_table_resize">
-			${icons.expansion}
+			${icons.reduction}
 			<span class="se-tooltip-inner">
-				<span class="se-tooltip-text">${lang.maxSize}</span>
+				<span class="se-tooltip-text">${lang.minSize}</span>
 			</span>
 		</button>
 		<button type="button" data-command="remove" class="se-btn se-tooltip">

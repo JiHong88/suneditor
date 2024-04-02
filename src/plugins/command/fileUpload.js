@@ -151,7 +151,7 @@ FileUpload.prototype = {
 		this.fileManager.setFileData(a, file);
 
 		const figure = Figure.CreateContainer(a);
-		domUtils.addClass(figure.container, 'se-file-figure se-non-resize-figure');
+		domUtils.addClass(figure.container, 'se-file-figure se-flex-component');
 
 		if (!this.component.insert(figure.container, false, !this.options.get('mediaAutoSelect'))) {
 			this.editor.focus();

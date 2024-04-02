@@ -1,7 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller, FileManager, Figure } from '../../modules';
 import { domUtils, numbers, env } from '../../helper';
-const { NO_EVENT } = env;
+const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 const Audio_ = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -39,6 +39,7 @@ const Audio_ = function (editor, pluginOptions) {
 	});
 
 	// members
+	this.figure = new Figure(this, null, {});
 	this.audioInputFile = modalEl.querySelector('._se_audio_files');
 	this.audioUrlFile = modalEl.querySelector('.se-input-url');
 	this.preview = modalEl.querySelector('.se-link-preview');
@@ -142,6 +143,7 @@ Audio_.prototype = {
 	 * @param {Element} element Target element
 	 */
 	select(element) {
+		this.figure.open(element, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, disabledButtons: false, __fileManagerInfo: false });
 		this.ready(element);
 	},
 
@@ -149,6 +151,7 @@ Audio_.prototype = {
 	 * @override fileManager
 	 */
 	ready(target) {
+		if (this.eventManager.__overInfo === ON_OVER_COMPONENT) return;
 		domUtils.addClass(target, 'active');
 		domUtils.addClass(target.parentElement, 'se-figure-selected');
 		this._element = target;
@@ -278,7 +281,7 @@ Audio_.prototype = {
 		if (!isUpdate) {
 			this.fileManager.setFileData(element, file);
 			element.src = src;
-			const figure = Figure.CreateContainer(element);
+			const figure = Figure.CreateContainer(element, 'se-flex-component');
 			if (!this.component.insert(figure.container, false, !this.options.get('mediaAutoSelect'))) {
 				this.editor.focus();
 				return;
@@ -347,7 +350,7 @@ function FileCheckHandler(element) {
 	// clone element
 	const prevElement = element;
 	this._element = element = element.cloneNode(false);
-	const figure = Figure.CreateContainer(element);
+	const figure = Figure.CreateContainer(element, 'se-flex-component');
 
 	try {
 		if (domUtils.getParentElement(prevElement, domUtils.isExcludeFormat)) {
