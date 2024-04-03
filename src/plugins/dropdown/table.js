@@ -636,13 +636,14 @@ Table.prototype = {
 			case 'resize':
 				this._maxWidth = !this._maxWidth;
 				this.setTableStyle('width', false);
-				this.controller_table.resetPosition();
+				this._historyPush();
+				this.component.select(this._element, Table.key, true);
 				break;
 			case 'layout':
 				this._fixedColumn = !this._fixedColumn;
 				this.setTableStyle('column', false);
-				this.controller_table.resetPosition();
 				this._historyPush();
+				this.component.select(this._element, Table.key, true);
 				break;
 			case 'remove': {
 				const emptyDiv = this._figure?.parentNode;
@@ -1426,6 +1427,7 @@ Table.prototype = {
 		const nextColPrevValue = nextCol.style.width;
 		const realWidth = domUtils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(col);
 
+		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
 		this._addResizeGlobalEvents(
 			this._cellResize.bind(
 				this,
@@ -1444,6 +1446,8 @@ Table.prototype = {
 			() => {
 				this.__removeGlobalEvents();
 				this.history.push(true);
+				// figure reopen
+				this.component.select(this._element, Table.key, true);
 			},
 			(e) => {
 				this._stopResize(col, prevValue, 'width', e);
@@ -1491,11 +1495,16 @@ Table.prototype = {
 		const figure = this._figure;
 		this._setResizeLinePosition(figure, figure, this._resizeLinePrev, isLeftEdge);
 		this._resizeLinePrev.style.display = 'block';
-
 		const realWidth = converter.getWidthInPercentage(figure);
+
+		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
 		this._addResizeGlobalEvents(
 			this._figureResize.bind(this, figure, this._resizeLine, isLeftEdge, startX, figure.offsetWidth, numbers.get(realWidth, CELL_DECIMAL_END)),
-			this.__removeGlobalEvents.bind(this),
+			() => {
+				this.__removeGlobalEvents();
+				// figure reopen
+				this.component.select(this._element, Table.key, true);
+			},
 			this._stopResize.bind(this, figure, figure.style.width, 'width')
 		);
 	},
@@ -1531,6 +1540,10 @@ Table.prototype = {
 		if (e.keyCode !== 27) return;
 		this.__removeGlobalEvents();
 		target.style[styleProp] = prevValue;
+		// figure reopen
+		if (styleProp === 'width') {
+			this.component.select(this._element, Table.key, true);
+		}
 	},
 
 	_deleteStyleSelectedCells() {

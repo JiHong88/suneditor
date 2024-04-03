@@ -178,7 +178,8 @@ export function getWidthInPercentage(target) {
 	const parentStyle = _w.getComputedStyle(parent);
 	const parentPaddingLeft = _w.parseFloat(parentStyle.paddingLeft);
 	const parentPaddingRight = _w.parseFloat(parentStyle.paddingRight);
-	const parentWidth = parent.offsetWidth - parentPaddingLeft - parentPaddingRight;
+	const scrollbarWidth = parent.offsetWidth - parent.clientWidth;
+	const parentWidth = parent.offsetWidth - parentPaddingLeft - parentPaddingRight - scrollbarWidth;
 	const widthInPercentage = (target.offsetWidth / parentWidth) * 100;
 	return widthInPercentage;
 }
