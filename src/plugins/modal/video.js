@@ -266,11 +266,14 @@ Video.prototype = {
 	/**
 	 * @override fileManager
 	 */
-	destroy(element) {
+	async destroy(element) {
 		const targetEl = element || this._element;
 		const container = domUtils.getParentElement(targetEl, Figure.__is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
+
+		const message = await this.triggerEvent('onVideoDeleteBefore', { target: targetEl, container, align: this._align, url: this._linkValue });
+		if (message === false) return;
 
 		domUtils.removeItem(container);
 		this.init();

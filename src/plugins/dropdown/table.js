@@ -1597,6 +1597,8 @@ Table.prototype = {
 		const cellBorder = this._getBorderStyle(border);
 
 		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
+		if (isTable) cell_alignment_vertical.style.display = 'none';
+		else cell_alignment_vertical.style.display = '';
 
 		let b_color = converter.rgb2hex(cellBorder.c),
 			b_style = cellBorder.s,
@@ -2436,11 +2438,9 @@ function OffCellMultiSelect(e) {
 	if (!this._fixedCell || !this._selectedTable) return;
 
 	this.setActiveButton(this._fixedCell, this._selectedCell);
-	// this.setActiveButton(this._fixedCell, domUtils.getParentElement(e.target, domUtils.isTableCell));
 	this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 
 	const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
-	this.editor.focusEdge(focusCell);
 	this.setController(focusCell);
 }
 

@@ -161,11 +161,14 @@ Audio_.prototype = {
 	/**
 	 * @override fileManager
 	 */
-	destroy(element) {
+	async destroy(element) {
 		element = element || this._element;
 		const figure = Figure.GetContainer(element);
 		const container = figure.container || element;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
+
+		const message = await this.triggerEvent('onAudioDeleteBefore', { target: element, container: figure, url: this.urlValue });
+		if (message === false) return;
 
 		const emptyDiv = container.parentNode;
 		domUtils.removeItem(container);

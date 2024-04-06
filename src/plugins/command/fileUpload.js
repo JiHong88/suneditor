@@ -109,10 +109,15 @@ FileUpload.prototype = {
 	 * @override fileManager, Figure
 	 * @param {Element} target Target element
 	 */
-	destroy(target) {
+	async destroy(target) {
 		if (!target) return;
 
 		target = domUtils.getParentElement(target, '.se-component') || target;
+		const figure = Figure.GetContainer(target);
+
+		const message = await this.triggerEvent('onFileDeleteBefore', { target: figure.target, container: figure, url: figure.target.getAttribute('href') });
+		if (message === false) return;
+
 		const focusEl = target.previousElementSibling || target.nextElementSibling;
 		domUtils.removeItem(target);
 		this.editor._offCurrentController();

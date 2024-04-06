@@ -567,6 +567,10 @@ window.editor_root = suneditor.create(
 			},
 			onFocus() {
 				console.log('focus');
+			},
+			onVideoDeleteBefore(arg) {
+				console.log('delete', arg);
+				return false;
 			}
 		}
 	}

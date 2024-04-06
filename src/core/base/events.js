@@ -133,6 +133,11 @@ export default function () {
 		onImageUploadBefore: null,
 
 		/**
+		 * @description Called before the image is deleted
+		 */
+		onImageDeleteBefore: null,
+
+		/**
 		 * @description Called when the editor loaded, file Current editor value
 		 * -- arguments is same "Image info object" --
 		 */
@@ -225,6 +230,11 @@ export default function () {
 		onVideoAction: null,
 
 		/**
+		 * @description Called before the video is deleted
+		 */
+		onVideoDeleteBefore: null,
+
+		/**
 		 * @description It replaces the default callback function of the audio upload
 		 * @param xmlHttp xmlHttpRequest object
 		 * @param info Input information
@@ -272,6 +282,11 @@ export default function () {
 		onAudioAction: null,
 
 		/**
+		 * @description Called before the audio is deleted
+		 */
+		onAudioDeleteBefore: null,
+
+		/**
 		 * @description Called when the editor loaded, file Current editor value
 		 * -- arguments is same "Image info object" --
 		 */
@@ -282,6 +297,11 @@ export default function () {
 		 * -- arguments is same "onImageUpload" --
 		 */
 		onFileAction: null,
+
+		/**
+		 * @description Called before the file is deleted
+		 */
+		onFileDeleteBefore: null,
 
 		/**
 		 * @description Called when the editor loaded, file Current editor value
