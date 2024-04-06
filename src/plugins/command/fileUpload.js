@@ -112,8 +112,8 @@ FileUpload.prototype = {
 	async destroy(target) {
 		if (!target) return;
 
-		target = domUtils.getParentElement(target, '.se-component') || target;
 		const figure = Figure.GetContainer(target);
+		target = domUtils.getParentElement(target, '.se-component') || target;
 
 		const message = await this.triggerEvent('onFileDeleteBefore', { target: figure.target, container: figure, url: figure.target.getAttribute('href') });
 		if (message === false) return;

@@ -167,7 +167,7 @@ Audio_.prototype = {
 		const container = figure.container || element;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 
-		const message = await this.triggerEvent('onAudioDeleteBefore', { target: element, container: figure, url: this.urlValue });
+		const message = await this.triggerEvent('onAudioDeleteBefore', { target: element, container: figure, url: element.getAttribute('src') });
 		if (message === false) return;
 
 		const emptyDiv = container.parentNode;
