@@ -162,7 +162,8 @@ const Table = function (editor, pluginOptions) {
 	this.maxText = this.lang.maxSize;
 	this.minText = this.lang.minSize;
 	this.propTargets = {
-		cell_alignment: controller_props.querySelector('.se-table-props-align'),
+		cell_alignment: controller_props.querySelector('.se-table-props-align > .__se__a_h'),
+		cell_alignment_vertical: controller_props.querySelector('.se-table-props-align > .__se__a_v'),
 		border_format: borderFormatButton,
 		border_style: controller_props.querySelector('[data-command="props_onborder_style"] .se-txt'),
 		border_color: controller_props.querySelector('.__se_border_color'),
@@ -178,6 +179,7 @@ const Table = function (editor, pluginOptions) {
 	this._propsCache = [];
 	this._currentFontStyles = [];
 	this._propsAlignCache = '';
+	this._propsVerticalAlignCache = '';
 	this._typeCache = '';
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
 	this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
@@ -619,6 +621,7 @@ Table.prototype = {
 				}
 				// alignment
 				this._setAlignProps(this.propTargets.cell_alignment, this._propsAlignCache, true);
+				this._setAlignProps(this.propTargets.cell_alignment_vertical, this._propsVerticalAlignCache, true);
 				if (domUtils.isTable(propsCache[0][0]) && this._figure) {
 					this._figure.style.float = this._propsAlignCache;
 				}
@@ -629,6 +632,9 @@ Table.prototype = {
 				break;
 			case 'props_align':
 				this._setAlignProps(this.propTargets.cell_alignment, target.getAttribute('data-value'), false);
+				break;
+			case 'props_align_vertical':
+				this._setAlignProps(this.propTargets.cell_alignment_vertical, target.getAttribute('data-value'), false);
 				break;
 			case 'merge':
 				this.mergeCells();
@@ -707,8 +713,8 @@ Table.prototype = {
 		this._selectedCell = null;
 		this._fixedCellName = null;
 
-		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
-		domUtils.removeClass([border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, font_bold, font_underline, font_italic, font_strike], 'on');
+		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
+		domUtils.removeClass([border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike], 'on');
 	},
 
 	selectCells(tdElement, shift) {
@@ -1586,8 +1592,8 @@ Table.prototype = {
 		const targets = isTable ? [this._element] : this._selectedCells;
 		if (!targets || targets.length === 0) return;
 
-		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
-		const { border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = _w.getComputedStyle(targets[0]);
+		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
+		const { border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = _w.getComputedStyle(targets[0]);
 		const cellBorder = this._getBorderStyle(border);
 
 		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
@@ -1601,12 +1607,13 @@ Table.prototype = {
 			underline = /underline/i.test(textDecoration),
 			strike = /line-through/i.test(textDecoration),
 			italic = /italic/i.test(fontStyle),
-			align = isTable ? this._figure?.style.float : textAlign;
+			align = isTable ? this._figure?.style.float : textAlign,
+			align_v = verticalAlign;
 		this._propsCache = [];
 
 		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
 			// eslint-disable-next-line no-shadow
-			const { cssText, border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = t.style;
+			const { cssText, border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = t.style;
 			this._propsCache.push([t, cssText]);
 			if (isBreak) continue;
 
@@ -1618,6 +1625,7 @@ Table.prototype = {
 			if (backColor !== converter.rgb2hex(backgroundColor)) backColor = '';
 			if (fontColor !== converter.rgb2hex(color)) fontColor = '';
 			if (align !== (isTable ? this._figure?.style.float : textAlign)) align = '';
+			if (align_v && align_v !== verticalAlign) align_v = '';
 			if (bold && bold !== /.+/.test(fontWeight)) bold = '';
 			if (underline && underline !== /underline/i.test(textDecoration)) underline = false;
 			if (strike && strike !== /line-through/i.test(textDecoration)) strike = false;
@@ -1651,6 +1659,7 @@ Table.prototype = {
 
 		// align
 		this._setAlignProps(cell_alignment, (this._propsAlignCache = align), true);
+		this._setAlignProps(cell_alignment_vertical, (this._propsVerticalAlignCache = align_v), true);
 	},
 
 	_setAlignProps(el, align, reset) {
@@ -1717,7 +1726,7 @@ Table.prototype = {
 			const targets = isTable ? [this._element] : this._selectedCells;
 			const tr = targets[0];
 			const trStyles = _w.getComputedStyle(tr);
-			const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment } = this.propTargets;
+			const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical } = this.propTargets;
 
 			const borderFormat = border_format.getAttribute('se-border-format') || '';
 			const hasFormat = borderFormat !== 'all';
@@ -1725,6 +1734,7 @@ Table.prototype = {
 			const isNoneFormat = borderFormat === 'none' || !borderStyle;
 
 			const cellAlignment = cell_alignment.getAttribute('se-cell-align') || '';
+			const cellAlignmentVertical = cell_alignment_vertical.getAttribute('se-cell-align') || '';
 			const borderColor = isNoneFormat ? '' : border_color.value.trim() || trStyles.borderColor;
 			let borderWidth = isNoneFormat ? '' : border_width.value.trim() || trStyles.borderWidth;
 			borderWidth = borderWidth + (numbers.is(borderWidth) ? DEFAULT_BORDER_UNIT : '');
@@ -1797,6 +1807,7 @@ Table.prototype = {
 					es = e.style;
 					// alignment
 					es.textAlign = cellAlignment;
+					es.verticalAlign = cellAlignmentVertical;
 					// back
 					es.backgroundColor = backColor;
 					// font
@@ -1820,7 +1831,10 @@ Table.prototype = {
 				// -- table styles
 				const es = tr.style;
 				// alignment
-				if (this._figure) this._figure.style.float = cellAlignment;
+				if (this._figure) {
+					this._figure.style.float = cellAlignment;
+					this._figure.style.verticalAlign = cellAlignmentVertical;
+				}
 				// back
 				es.backgroundColor = backColor;
 				// font
@@ -2674,6 +2688,23 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 		</li>`;
 	}
 
+	// vertical align html
+	const verticalAligns = ['top', 'middle', 'bottom'];
+	let verticalAlignHtml = '';
+	for (let i = 0, item, text; i < verticalAligns.length; i++) {
+		item = verticalAligns[i];
+		text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
+		verticalAlignHtml += /*html*/ `
+		<li>
+			<button type="button" class="se-btn se-btn-list se-tooltip" data-command="props_align_vertical" data-value="${item}" title="${text}" aria-label="${text}">
+				${icons['align_' + item]}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${text}</span>
+				</span>
+			</button>
+		</li>`;
+	}
+
 	const html = /*html*/ `
 		<div class="se-controller-content">
 			<div class="se-controller-header">
@@ -2755,8 +2786,11 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 
 				<div class="se-table-props-align">
 					<label>${lang.align}</label>
-					<div class="se-form-group se-form-w0 se-list-inner">
+					<div class="se-form-group se-form-w0 se-list-inner __se__a_h">
 						<ul class="se-form-group se-form-w0">${alignHtml}</ul>
+					</div>
+					<div class="se-form-group se-form-w0 se-list-inner __se__a_v">
+						<ul class="se-form-group se-form-w0">${verticalAlignHtml}</ul>
 					</div>
 				</div>
 			</div>

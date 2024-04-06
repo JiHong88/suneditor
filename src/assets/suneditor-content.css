@@ -417,6 +417,7 @@
 	padding: 0.4em;
 	background-clip: padding-box;
 	background-color: inherit;
+	vertical-align: middle;
 }
 
 /** table style class */
