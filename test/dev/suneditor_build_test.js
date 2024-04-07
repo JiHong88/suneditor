@@ -1027,6 +1027,7 @@ imageUploadUrl: 'http://localhost:3000/editor/upload',
             html: '<p>Template 1</p>'
         }
     ],
+    imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
     lineAttrReset: 'class',
     imageAccept: '*/*',

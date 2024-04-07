@@ -243,7 +243,7 @@ export default {
 
     _setUrlInput: function (target) {
         this.altText.value = target.alt;
-        this._v_src._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.src;
+        this._v_src._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.getAttribute('data-value') || target.src;
         this.imgUrlFile.focus();
     },
 
