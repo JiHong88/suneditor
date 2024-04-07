@@ -84,6 +84,7 @@ Controller.prototype = {
 		this.__addGlobalEvent();
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 		this._controllerOn(this.form, target);
+		this.eventManager.__overInfo = false;
 	},
 
 	/**
@@ -235,6 +236,7 @@ Controller.prototype = {
 	},
 
 	_checkForm(target) {
+		if (domUtils.isWysiwygFrame(target)) return false;
 		if (domUtils.hasClass(target, 'se-drag-handle')) return true;
 
 		let isParentForm = false;

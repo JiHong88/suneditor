@@ -162,21 +162,25 @@ Component.prototype = {
 
 		this.isSelected = true;
 
-		const __overInfo = this.eventManager.__overInfo;
-		_w.setTimeout(() => {
-			this.eventManager.__overInfo = undefined;
-			if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
-		}, 0);
+		let isNonFigureComponent;
+		if (typeof plugin.select === 'function') isNonFigureComponent = plugin.select(element);
 
-		if (typeof plugin.select === 'function') plugin.select(element);
+		if (!isNonFigureComponent) this._setComponentLineBreaker(info.container || info.cover || element);
 
-		this._setComponentLineBreaker(info.container || info.cover || element);
 		if (!this.info.isFile) this.__addNotFileGlobalEvent();
 		this.currentTarget = element;
 		this.currentPlugin = plugin;
 		this.currentPluginName = pluginName;
 		this.currentInfo = info;
-		domUtils.addClass(info.container, 'se-component-selected');
+
+		if (!isNonFigureComponent) {
+			const __overInfo = this.eventManager.__overInfo;
+			_w.setTimeout(() => {
+				this.eventManager.__overInfo = __overInfo === ON_OVER_COMPONENT ? undefined : false;
+				if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
+			}, 0);
+			domUtils.addClass(info.container, 'se-component-selected');
+		}
 	},
 
 	deselect() {

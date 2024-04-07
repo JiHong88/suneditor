@@ -40,7 +40,7 @@ Selection.prototype = {
 				const compInfo = this.component.get(range.startContainer);
 				const container = compInfo?.container;
 				if (!container) return range;
-				return this.setRange(container, 0, container, 0);
+				return this.setRange(container, 0, container, 1);
 			}
 
 			return range;

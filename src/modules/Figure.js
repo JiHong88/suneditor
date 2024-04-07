@@ -344,6 +344,19 @@ Figure.prototype = {
 		return targetInfo;
 	},
 
+	controllerHide() {
+		this.controller.hide();
+	},
+
+	controllerShow() {
+		this.controller.show();
+	},
+
+	controllerOpen(target, args) {
+		this._element = target;
+		this.controller.open(target, null, args);
+	},
+
 	setSize(w, h) {
 		if (/%$/.test(w)) {
 			this._setPercentSize(w, h);
@@ -484,7 +497,7 @@ Figure.prototype = {
 		}
 
 		if (/^__c__/.test(command)) {
-			this._action[command](element);
+			this._action[command](element, value, target);
 			return;
 		}
 
@@ -774,7 +787,7 @@ Figure.prototype = {
 		domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
 		domUtils.removeClass(Figure.__dragCover, 'se-drag-over');
 		Figure.__dragHandler = Figure.__dragContainer = Figure.__dragCover = Figure.__dragMove = null;
-		this.eventManager.__overInfo = undefined;
+		this.eventManager.__overInfo = null;
 	},
 
 	constructor: Figure
@@ -1111,6 +1124,7 @@ function CreateHTML_controller(inst, controls) {
 					const g = m;
 					m = {
 						c: `__c__${g.command}`,
+						v: g.value || '',
 						l: g.title,
 						i: g.icon
 					};

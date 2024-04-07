@@ -698,10 +698,28 @@ HTML.prototype = {
 		if (commonCon === startCon && commonCon === endCon) {
 			if (this.component.is(commonCon)) {
 				const compInfo = this.component.get(commonCon);
-				return {
-					container: compInfo.container,
-					offset: 0
-				};
+				const parent = compInfo.container.parentNode;
+				const next = compInfo.container.nextSibling;
+				domUtils.removeItem(compInfo.container);
+				if (this.format.isLine(parent)) {
+					if (parent.childNodes.length === 0) {
+						domUtils.removeItem(parent);
+						return {
+							container: parent.nextElementSibling,
+							offset: 0
+						};
+					} else {
+						return {
+							container: next,
+							offset: 0
+						};
+					}
+				} else {
+					return {
+						container: parent.nextElementSibling,
+						offset: 0
+					};
+				}
 			} else {
 				startCon = commonCon.children[startOff];
 				endCon = commonCon.children[endOff];

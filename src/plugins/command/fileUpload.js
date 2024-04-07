@@ -1,4 +1,5 @@
 import EditorInjector from '../../editorInjector';
+import { CreateTooltipInner } from '../../core/section/constructor';
 import { domUtils, env } from '../../helper';
 import { FileManager, Figure, Controller } from '../../modules';
 const { NO_EVENT, _w } = env;
@@ -19,17 +20,53 @@ const FileUpload = function (editor, pluginOptions) {
 	this._element = null;
 
 	// figure
-	const downloadCustom = {
-		command: 'download',
-		title: this.lang.download,
-		icon: 'download',
-		action: (target) => {
-			const url = target.getAttribute('href');
-			if (url) domUtils.createElement('A', { href: url }, null).click();
+	const customItems = {
+		'custom-download': {
+			command: 'download',
+			title: this.lang.download,
+			icon: 'download',
+			action: (target) => {
+				const url = target.getAttribute('href');
+				if (url) domUtils.createElement('A', { href: url }, null).click();
+			}
+		},
+		'custom-as': {
+			command: 'as',
+			value: 'link', // 'box' or 'link'
+			title: this.lang.asLink,
+			icon: 'reduction',
+			action: (target, value) => {
+				if (value === 'link') {
+					this.figure.close();
+					const { container } = Figure.GetContainer(target);
+					const next = container.nextElementSibling;
+					const parent = container.parentElement;
+
+					target.removeAttribute('contenteditable');
+					target.removeAttribute('data-se-non-focus');
+
+					const line = domUtils.createElement(this.options.get('defaultLine'), null, target);
+					parent.insertBefore(line, next);
+					domUtils.removeItem(container);
+				} else {
+					this.selection.setRange(target, 0, target, 1);
+					const r = this.html.remove();
+					const s = this.nodeTransform.split(r.container, r.offset, null);
+
+					target.setAttribute('contenteditable', 'true');
+					target.setAttribute('data-se-non-focus', 'true');
+
+					const figure = Figure.CreateContainer(target, 'se-file-figure se-flex-component');
+					s.parentElement.insertBefore(figure.container, s);
+				}
+
+				this.editor.focus();
+				this.component.select(target, FileUpload.key, false);
+			}
 		}
 	};
-	let figureControls = pluginOptions.controls || [['edit', 'align', 'remove', 'download']];
-	figureControls = figureControls.map((subArray) => subArray.map((item) => (item === 'download' ? downloadCustom : item)));
+	let figureControls = pluginOptions.controls || [['custom-as', 'edit', 'align', 'remove', 'custom-download']];
+	figureControls = figureControls.map((subArray) => subArray.map((item) => (item.startsWith('custom-') ? customItems[item] : item)));
 	this.figure = new Figure(this, figureControls, {});
 
 	// file manager
@@ -73,7 +110,17 @@ FileUpload.prototype = {
 	 */
 	select(target) {
 		this._element = target;
-		this._figureOpen(target);
+		const asBtn = this.figure.controller.form.querySelector('[data-command="__c__as"]');
+		if (domUtils.isFigure(target.parentElement)) {
+			asBtn.innerHTML = this.icons.reduction + CreateTooltipInner(this.lang.asLink);
+			asBtn.setAttribute('data-value', 'link');
+			this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
+		} else {
+			asBtn.innerHTML = this.icons.expansion + CreateTooltipInner(this.lang.asBox);
+			asBtn.setAttribute('data-value', 'box');
+			this.figure.controllerOpen(target, { isWWTarget: true });
+			return true;
+		}
 	},
 
 	/**
@@ -82,8 +129,8 @@ FileUpload.prototype = {
 	 */
 	edit(target) {
 		this.editInput.value = target.textContent;
-		this.figure.close();
-		this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
+		this.figure.controllerHide();
+		this.controller.open(target, null, { isWWTarget: !domUtils.isFigure(target.parentElement), initMethod: null, addOffset: null });
 		this.editInput.focus();
 	},
 
@@ -102,7 +149,7 @@ FileUpload.prototype = {
 		}
 
 		this.controller.close();
-		this._figureOpen(this._element);
+		this.component.select(this._element, FileUpload.key, false);
 	},
 
 	/**
@@ -124,10 +171,6 @@ FileUpload.prototype = {
 
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
-	},
-
-	_figureOpen(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
 	},
 
 	_register(response) {
