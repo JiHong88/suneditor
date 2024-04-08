@@ -1071,7 +1071,7 @@ const util = {
                 if (parentNode.previousSibling) {
                     previousNode = parentNode.previousSibling;
                     break;
-                };
+                }
             }
             if (!previousNode) return null;
         }
@@ -1095,7 +1095,7 @@ const util = {
                 if (parentNode.nextSibling) {
                     nextNode = parentNode.nextSibling;
                     break;
-                };
+                }
             }
             if (!nextNode) return null;
         }

@@ -377,6 +377,9 @@
         _module_saveCurrentSize: function (contextPlugin) {
             const x = this.plugins.resizing._module_getSizeX.call(this, contextPlugin);
             const y = this.plugins.resizing._module_getSizeY.call(this, contextPlugin);
+            // add too width, height attribute
+            contextPlugin._element.setAttribute('width', x.replace('px', ''));
+            contextPlugin._element.setAttribute('height', y.replace('px', ''));
             contextPlugin._element.setAttribute('data-size', x + ',' + y);
             if (!!contextPlugin._videoRatio) contextPlugin._videoRatio = y;
         },

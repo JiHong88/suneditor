@@ -7721,7 +7721,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     core.setRange(node, offset, node, offset);
                     core.controllersOff();
                 }
-            }
+            };
 
             const table = util.getParentElement(selectionNode, 'table');
             if (table) {
