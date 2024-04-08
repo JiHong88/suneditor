@@ -42,7 +42,6 @@ const FileUpload = function (editor, pluginOptions) {
 					const next = container.nextElementSibling;
 					const parent = container.parentElement;
 
-					target.removeAttribute('contenteditable');
 					target.removeAttribute('data-se-non-focus');
 
 					const line = domUtils.createElement(this.options.get('defaultLine'), null, target);
@@ -57,7 +56,6 @@ const FileUpload = function (editor, pluginOptions) {
 						domUtils.removeItem(s.previousElementSibling);
 					}
 
-					target.setAttribute('contenteditable', 'true');
 					target.setAttribute('data-se-non-focus', 'true');
 
 					const figure = Figure.CreateContainer(target, 'se-file-figure se-flex-component');

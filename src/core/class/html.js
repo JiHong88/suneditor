@@ -696,7 +696,7 @@ HTML.prototype = {
 		let endOff = range.endOffset;
 		const commonCon = range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode ? startCon.parentNode : range.commonAncestorContainer;
 		if (commonCon === startCon && commonCon === endCon) {
-			if (this.component.is(commonCon)) {
+			if (this.component.is(commonCon) && domUtils.isFigure(commonCon.parentElement)) {
 				const compInfo = this.component.get(commonCon);
 				const compContainer = compInfo.container;
 				const parent = compContainer.parentNode;
