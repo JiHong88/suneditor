@@ -19,7 +19,7 @@ NodeTransform.prototype = {
 	 * @returns {Element}
 	 */
 	split(baseNode, offset, depth) {
-		if (domUtils.isWysiwygFrame(baseNode)) return baseNode;
+		if (domUtils.isWysiwygFrame(baseNode) || this.component.is(baseNode) || !baseNode) return baseNode;
 
 		if (offset && !numbers.is(offset)) {
 			const children = baseNode.childNodes;

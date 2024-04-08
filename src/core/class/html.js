@@ -698,26 +698,33 @@ HTML.prototype = {
 		if (commonCon === startCon && commonCon === endCon) {
 			if (this.component.is(commonCon)) {
 				const compInfo = this.component.get(commonCon);
-				const parent = compInfo.container.parentNode;
-				const next = compInfo.container.nextSibling;
-				domUtils.removeItem(compInfo.container);
+				const compContainer = compInfo.container;
+				const parent = compContainer.parentNode;
+
+				const next = compContainer.nextSibling || compContainer.previousSibling;
+				const nextOffset = next === compContainer.previousSibling ? next?.textContent?.length || 1 : 0;
+				const parentNext = parent.nextElementSibling || parent.previousElementSibling;
+				const parentNextOffset = parentNext === parent.previousElementSibling ? parentNext?.textContent?.length || 1 : 0;
+
+				domUtils.removeItem(compContainer);
+
 				if (this.format.isLine(parent)) {
 					if (parent.childNodes.length === 0) {
 						domUtils.removeItem(parent);
 						return {
-							container: parent.nextElementSibling,
-							offset: 0
+							container: parentNext,
+							offset: parentNextOffset
 						};
 					} else {
 						return {
 							container: next,
-							offset: 0
+							offset: nextOffset
 						};
 					}
 				} else {
 					return {
-						container: parent.nextElementSibling,
-						offset: 0
+						container: parentNext,
+						offset: parentNextOffset
 					};
 				}
 			} else {

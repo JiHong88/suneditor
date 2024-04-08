@@ -51,13 +51,17 @@ const FileUpload = function (editor, pluginOptions) {
 				} else {
 					this.selection.setRange(target, 0, target, 1);
 					const r = this.html.remove();
-					const s = this.nodeTransform.split(r.container, r.offset, null);
+					const s = this.nodeTransform.split(r.container, r.offset, 0);
+
+					if (s?.previousElementSibling && domUtils.isZeroWith(s.previousElementSibling)) {
+						domUtils.removeItem(s.previousElementSibling);
+					}
 
 					target.setAttribute('contenteditable', 'true');
 					target.setAttribute('data-se-non-focus', 'true');
 
 					const figure = Figure.CreateContainer(target, 'se-file-figure se-flex-component');
-					s.parentElement.insertBefore(figure.container, s);
+					(s || r.container).parentElement.insertBefore(figure.container, s);
 				}
 
 				this.editor.focus();
