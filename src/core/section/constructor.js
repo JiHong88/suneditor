@@ -359,9 +359,9 @@ export function InitOptions(options, editorTargets) {
 		options.textTags || {}
 	);
 	o.set('textTags', textTags);
-	o.set('_textStyleTags', Object.values(textTags).concat(['span']));
+	o.set('_textStyleTags', Object.values(textTags).concat(['span', 'li']));
 	o.set('tagStyles', { ...DEFAULT_TABLE_STYLES, ...(options.tagStyles || {}) });
-	o.set('_spanStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](font-family|font-size|color|background-color${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
+	o.set('_textStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](font-family|font-size|color|background-color${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](text-align|margin-left|margin-right${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,

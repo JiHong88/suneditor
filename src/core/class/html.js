@@ -25,9 +25,10 @@ const HTML = function (editor) {
 	this._attributeWhitelistRegExp = null;
 	this._attributeBlacklist = null;
 	this._attributeBlacklistRegExp = null;
+	this._textStyleTags = options.get('_textStyleTags');
 
 	// clean styles
-	const tagStyles = this.options.get('tagStyles');
+	const tagStyles = options.get('tagStyles');
 	const splitTagStyles = {};
 	for (const k in tagStyles) {
 		const s = k.split('|');
@@ -45,9 +46,12 @@ const HTML = function (editor) {
 	const stylesMap = new Map();
 	const stylesObj = {
 		...splitTagStyles,
-		span: options.get('_spanStylesRegExp'),
 		line: options.get('_lineStylesRegExp')
 	};
+	this._textStyleTags.forEach((v) => {
+		stylesObj[v] = options.get('_textStylesRegExp');
+	});
+
 	for (const key in stylesObj) {
 		stylesMap.set(new RegExp(`^(${key})$`), stylesObj[key]);
 	}
@@ -1409,7 +1413,7 @@ HTML.prototype = {
 
 	_cleanStyle(m, v, name) {
 		let sv = (m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/) || [])[0];
-		if (/span/i.test(name) && !sv && (m.match(/<span\s(.+)/) || [])[1]) {
+		if (this._textStyleTags.includes(name) && !sv && (m.match(/<[^\s]+\s(.+)/) || [])[1]) {
 			const size = (m.match(/\ssize="([^"]+)"/i) || [])[1];
 			const face = (m.match(/\sface="([^"]+)"/i) || [])[1];
 			const color = (m.match(/\scolor="([^"]+)"/i) || [])[1];
@@ -1577,8 +1581,8 @@ function CleanElements(attrFilter, styleFilter, m, t) {
 			v.push(sv[0]);
 		}
 	} else if (!v || !/style=/i.test(v.toString())) {
-		if (tagName === 'span') {
-			v = this._cleanStyle(m, v, 'span');
+		if (this._textStyleTags.includes(tagName)) {
+			v = this._cleanStyle(m, v, tagName);
 		} else if (this.format.isLine(tagName)) {
 			v = this._cleanStyle(m, v, 'line');
 		} else if (this._cleanStyleTagKeyRegExp.test(tagName)) {
