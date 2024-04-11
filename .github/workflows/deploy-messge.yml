@@ -40,3 +40,10 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Execute script for milestone
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_NAME: ${{ steps.check-version.outputs.package_version }}
+        run: node .github/scripts/manage-deploy.js $VERSION_NAME
+  
