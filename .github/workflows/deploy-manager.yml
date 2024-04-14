@@ -28,7 +28,8 @@ jobs:
             exit 1
           else
             echo "Package version has been updated to $PACKAGE_VERSION."
-          fi
+            echo "::set-output name=package_version::$PACKAGE_VERSION"
+          fi  
 
       - name: Install dependencies
         run: npm install && npm audit fix
