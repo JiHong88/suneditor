@@ -475,8 +475,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _cleanStyleRegExp: {
+            div: new _w.RegExp('\\s*[^-a-zA-Z](.+)\\s*:[^;]+(?!;)*', 'ig'),
             span: new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color)\\s*:[^;]+(?!;)*', 'ig'),
-            format: new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right)\\s*:[^;]+(?!;)*', 'ig'),
+            format: new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right|width|height)\\s*:[^;]+(?!;)*', 'ig'),
             fontSizeUnit: new _w.RegExp('\\d+' + options.fontSizeUnit + '$', 'i'),
         },
 
@@ -5377,7 +5378,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             else v = m.match(lowLevelCheck ? this._attributesWhitelistRegExp : this._attributesWhitelistRegExp_all_data);
 
             // attribute
-            if (lowLevelCheck || tagName === 'span' || tagName === 'li') {
+            if (lowLevelCheck || tagName === 'span' || tagName === 'li' ||  this._cleanStyleRegExp[tagName]) {
                 if (tagName === 'a') {
                     const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
                     if (sv) {
@@ -5387,6 +5388,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 } else if (!v || !/style=/i.test(v.toString())) {
                     if (tagName === 'span' || tagName === 'li') {
                         v = this._cleanStyle(m, v, 'span');
+                    } if (this._cleanStyleRegExp[tagName]) {
+                        v = this._cleanStyle(m, v, tagName);
                     } else if (/^(P|DIV|H[1-6]|PRE)$/i.test(tagName)) {
                         v = this._cleanStyle(m, v, 'format');
                     }
