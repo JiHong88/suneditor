@@ -1,6 +1,6 @@
 {
   "name": "suneditor",
-  "version": "2.45.1",
+  "version": "2.46.0",
   "description": "Vanilla javascript based WYSIWYG web editor, with no dependencies",
   "author": "JiHong.Lee",
   "license": "MIT",
@@ -30,12 +30,14 @@
   ],
   "devDependencies": {
     "@babel/core": "^7.21.3",
+    "@octokit/rest": "^20.1.0",
     "@webpack-cli/init": "^0.2.2",
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^0.1.19",
     "codemirror": "^5.61.0",
     "css-loader": "^1.0.1",
     "csstype": "^2.6.13",
+    "dotenv": "^16.4.5",
     "file-loader": "^2.0.0",
     "html-webpack-plugin": "^3.2.0",
     "jasmine": "^2.99.0",
@@ -53,7 +55,6 @@
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^4.2.2"
   },
-  "dependencies": {},
   "keywords": [
     "wysiwyg",
     "wysiwyg editor",

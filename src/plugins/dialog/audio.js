@@ -208,8 +208,10 @@ export default {
         element = element || this.context.audio._element;
         const container = this.util.getParentElement(element, this.util.isComponent) || element;
         const dataIndex = element.getAttribute('data-index') * 1;
+        
+        if (typeof this.functions.onAudioDeleteBefore === 'function' && (this.functions.onAudioDeleteBefore(element, container, dataIndex, this) === false)) return;
+        
         const focusEl = (container.previousElementSibling || container.nextElementSibling);
-
         const emptyDiv = container.parentNode;
         this.util.removeItem(container);
         this.plugins.audio.init.call(this);

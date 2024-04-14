@@ -277,8 +277,10 @@ export default {
         const frame = element || this.context.video._element;
         const container = this.context.video._container;
         const dataIndex = frame.getAttribute('data-index') * 1;
-        let focusEl = (container.previousElementSibling || container.nextElementSibling);
 
+        if (typeof this.functions.onVideoDeleteBefore === 'function' && (this.functions.onVideoDeleteBefore(frame, container, dataIndex, this) === false)) return;
+
+        let focusEl = (container.previousElementSibling || container.nextElementSibling);
         const emptyDiv = container.parentNode;
         this.util.removeItem(container);
         this.plugins.video.init.call(this);
@@ -568,7 +570,7 @@ export default {
                     newTag.src = src;
                     oFrame.parentNode.replaceChild(newTag, oFrame);
                     contextVideo._element = oFrame = newTag;
-                } else if (!isYoutube && !isVimeo && !/^videoo$/i.test(oFrame.nodeName)) {
+                } else if (!isYoutube && !isVimeo && !/^video$/i.test(oFrame.nodeName)) {
                     const newTag = this.plugins.video.createVideoTag.call(this);
                     newTag.src = src;
                     oFrame.parentNode.replaceChild(newTag, oFrame);

@@ -243,7 +243,7 @@ export default {
 
     _setUrlInput: function (target) {
         this.altText.value = target.alt;
-        this._v_src._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.src;
+        this._v_src._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.getAttribute('data-value') || target.src;
         this.imgUrlFile.focus();
     },
 
@@ -273,6 +273,10 @@ export default {
         const imageEl = element || this.context.image._element;
         const imageContainer = this.util.getParentElement(imageEl, this.util.isMediaComponent) || imageEl;
         const dataIndex = imageEl.getAttribute('data-index') * 1;
+
+        // event
+        if (typeof this.functions.onImageDeleteBefore === 'function' && (this.functions.onImageDeleteBefore(imageEl, imageContainer, dataIndex, this) === false)) return;
+
         let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
         const emptyDiv = imageContainer.parentNode;
@@ -516,6 +520,12 @@ export default {
 
     setup_reader: function (files, anchor, width, height, align, alt, filesLen, isUpdate) {
         try {
+            if (filesLen === 0) {
+                this.closeLoading();
+                console.warn('[SUNEDITOR.image.base64.fail] cause : No applicable files');
+                return;
+            }
+
             this.context.image.base64RenderIndex = filesLen;
             const wFileReader = this._w.FileReader;
             const filesStack = [filesLen];
@@ -793,6 +803,7 @@ export default {
                     formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
                     if (contextImage.__updateTags.map(function (current) { return existElement.contains(current); }).length === 0) this.util.removeItem(existElement);
                 } else {
+                    existElement = this.util.isFigures(existElement.parentNode) ? existElement.parentNode : existElement;
                     existElement.parentNode.replaceChild(container, existElement);
                 }
             }

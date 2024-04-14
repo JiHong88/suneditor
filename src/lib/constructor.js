@@ -84,6 +84,12 @@ export default {
         const resize_back = doc.createElement('DIV');
         resize_back.className = 'se-resizing-back';
 
+        /// focus temp
+        const focusTemp = doc.createElement('INPUT');
+        focusTemp.tabIndex = -1;
+        focusTemp.style.width = '0 !important';
+        focusTemp.style.height = '0 !important';
+
         // toolbar container
         const toolbarContainer = options.toolbarContainer;
         if (toolbarContainer) {
@@ -109,6 +115,7 @@ export default {
         relative.appendChild(line_breaker);
         relative.appendChild(line_breaker_t);
         relative.appendChild(line_breaker_b);
+        relative.appendChild(focusTemp);
         if (resizing_bar && !resizingBarContainer) relative.appendChild(resizing_bar);
         top_div.appendChild(relative);
 
@@ -135,7 +142,8 @@ export default {
                 _lineBreaker_b: line_breaker_b,
                 _resizeBack: resize_back,
                 _stickyDummy: sticky_dummy,
-                _arrow: arrow
+                _arrow: arrow,
+                _focusTemp: focusTemp
             },
             options: options,
             plugins: tool_bar.plugins,
@@ -307,6 +315,7 @@ export default {
         
         if (!options.iframe) {
             wysiwygDiv.setAttribute('contenteditable', true);
+            wysiwygDiv.setAttribute('autocorrect', "off");
             wysiwygDiv.setAttribute('scrolling', 'auto');
             for (let key in options.iframeAttributes) {
                 wysiwygDiv.setAttribute(key, options.iframeAttributes[key]);
@@ -407,6 +416,7 @@ export default {
         }
         options.plugins = plugins;
         /** Values */
+        options.strictMode = options.strictMode !== false;
         options.lang = options.lang || _defaultLang;
         options.value = typeof options.value === 'string' ? options.value : null;
         options.allowedClassNames = new util._w.RegExp((options.allowedClassNames && typeof options.allowedClassNames === 'string' ? options.allowedClassNames + '|' : '') + '^__se__|se-|katex');

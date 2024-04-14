@@ -1,6 +1,7 @@
 # SunEditor
 Vanilla javascript based WYSIWYG web editor, with no dependencies.
 SunEditor supports IE11 and all modern browsers with no dependencies and polyfill.
+Coded based on ES5 in supported by IE11.
 
 #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
@@ -390,6 +391,7 @@ plugins: [
 // * {custom_plugin, ...plugins}
 
 // Values
+strictMode      : Option to disable clean mode, which checks the styles, classes, etc. of the editor content.   default : false {Boolean}
 lang            : language object.   default : en {Object}
 defaultTag      : Specifies default tag name of the editor.     default: 'p' {String}
 textTags        : You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }

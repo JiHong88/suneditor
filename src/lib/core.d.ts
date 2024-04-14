@@ -606,7 +606,7 @@ interface Core {
 
     /**
      * @description Remove events from document.
-     * When created as an Iframe, the event of the document inside the Iframe is also removed.
+     * When created as an Iframe, the event of the document inside the Iframe is also removed.
      * @param type Event type
      * @param listener Event listener
      */
@@ -919,6 +919,39 @@ export default class SunEditor {
      * @returns
      */
     onAudioUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+
+    /**
+     * @description Called when the audio image delete before.
+     * "false" is returned, the event will be aborted.
+     * @param targetElement target element
+     * @param container target's container
+     * @param dataIndex target's dataIndex
+     * @param core Core object
+     * @returns {boolean|undefined}
+     */
+    onAudioDeleteBefore: (targetElement: Element, container: Element, dataIndex: number, core: Core) => boolean;
+
+    /**
+     * @description Called when the image image delete before.
+     * "false" is returned, the event will be aborted.
+     * @param targetElement target element
+     * @param container target's container
+     * @param dataIndex target's dataIndex
+     * @param core Core object
+     * @returns {boolean|undefined}
+     */
+    onImageDeleteBefore: (targetElement: Element, container: Element, dataIndex: number, core: Core) => boolean;
+
+    /**
+     * @description Called when the image image delete before.
+     * "false" is returned, the event will be aborted.
+     * @param targetElement target element
+     * @param container target's container
+     * @param dataIndex target's dataIndex
+     * @param core Core object
+     * @returns {boolean|undefined}
+     */
+    onVideoDeleteBefore: (targetElement: Element, container: Element, dataIndex: number, core: Core) => boolean;
 
     /**
      * @description Called when the audio upload failed

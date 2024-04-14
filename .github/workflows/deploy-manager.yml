@@ -1,0 +1,49 @@
+name: Deploy Management Action
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "12"
+          registry-url: "https://registry.npmjs.org/"
+
+      - name: Check if version has been updated
+        id: check-version
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          LAST_GIT_TAG=$(git describe --tags --abbrev=0)
+          if [ "v$PACKAGE_VERSION" == "$LAST_GIT_TAG" ]; then
+            echo "Package version ($PACKAGE_VERSION) has not been updated since the last tag ($LAST_GIT_TAG)."
+            exit 1
+          else
+            echo "Package version has been updated to $PACKAGE_VERSION."
+          fi
+
+      - name: Install dependencies
+        run: npm install && npm audit fix
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Execute script for milestone
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_NAME: ${{ steps.check-version.outputs.package_version }}
+        run: node .github/scripts/manage-deploy.js $VERSION_NAME
+  

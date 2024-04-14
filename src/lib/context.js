@@ -40,7 +40,8 @@ const _Context = function (element, cons, options) {
             lineBreaker_b: cons._lineBreaker_b,
             resizeBackground: cons._resizeBack,
             _stickyDummy: cons._stickyDummy,
-            _arrow: cons._arrow
+            _arrow: cons._arrow,
+            _focusTemp: cons._focusTemp
         },
         tool: {
             cover: cons._toolBar.querySelector('.se-toolbar-cover'),
