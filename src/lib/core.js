@@ -6542,6 +6542,32 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
+        addGlobalEvent(type, listener, useCapture) {
+            if (options.iframe) {
+                core._ww.addEventListener(type, listener, useCapture);
+            }
+            core._w.addEventListener(type, listener, useCapture);
+            return {
+                type: type,
+                listener: listener,
+                useCapture: useCapture
+            };
+        },
+    
+        removeGlobalEvent(type, listener, useCapture) {
+            if (!type) return;
+    
+            if (typeof type === 'object') {
+                listener = type.listener;
+                useCapture = type.useCapture;
+                type = type.type;
+            }
+            if (options.iframe) {
+                core._ww.removeEventListener(type, listener, useCapture);
+            }
+            core._w.removeEventListener(type, listener, useCapture);
+        },
+
         onClick_toolbar: function (e) {
             let target = e.target;
             let display = target.getAttribute('data-display');
@@ -6562,6 +6588,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.actionCall(command, display, target);
         },
 
+        __selectionSyncEvent: null,
         onMouseDown_wysiwyg: function (e) {
             if (core.isReadOnly || util.isNonEditable(context.element.wysiwyg)) return;
             if (util._isExcludeSelectionElement(e.target)) {
@@ -6569,7 +6596,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return;
             }
 
-            _w.setTimeout(core._editorRange.bind(core));
+            event.removeGlobalEvent(event.__selectionSyncEvent);
+            event.__selectionSyncEvent = event.addGlobalEvent('mouseup', function() {
+                core._editorRange();
+                event.removeGlobalEvent(event.__selectionSyncEvent);
+            });
 
             // user event
             if (typeof functions.onMouseDown === 'function' && functions.onMouseDown(e, core) === false) return;
