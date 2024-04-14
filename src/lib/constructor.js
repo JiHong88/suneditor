@@ -86,7 +86,7 @@ export default {
 
         /// focus temp
         const focusTemp = doc.createElement('INPUT');
-        focusTemp.tabIndex = -0;
+        focusTemp.tabIndex = -1;
         focusTemp.style.width = '0 !important';
         focusTemp.style.height = '0 !important';
 
