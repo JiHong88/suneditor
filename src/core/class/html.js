@@ -1439,7 +1439,7 @@ HTML.prototype = {
 
 			const allowedStyle = [];
 			for (let i = 0, len = style.length, r; i < len; i++) {
-				r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"]+)/);
+				r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"']+)/);
 				if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
 					const k = env.kebabToCamelCase(r[1].trim());
 					const cs = this.editor.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
