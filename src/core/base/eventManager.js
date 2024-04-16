@@ -500,34 +500,36 @@ EventManager.prototype = {
 			return;
 		}
 
-		this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
-		focusNode = domUtils.getEdgeChildNodes(commonCon, commonCon);
-		focusNode = focusNode ? focusNode.ec : commonCon;
+		try {
+			if (commonCon.nodeType === 3) {
+				format = domUtils.createElement(formatName || this.options.get('defaultLine'));
+				commonCon.parentNode.insertBefore(format, commonCon);
+				format.appendChild(commonCon);
+			}
 
-		format = this.format.getLine(focusNode, null);
-		if (!format) {
+			if (domUtils.isBreak(format.nextSibling)) domUtils.removeItem(format.nextSibling);
+			if (domUtils.isBreak(format.previousSibling)) domUtils.removeItem(format.previousSibling);
+			if (domUtils.isBreak(focusNode)) {
+				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+				focusNode.parentNode.insertBefore(zeroWidth, focusNode);
+				focusNode = zeroWidth;
+			}
+		} catch (e) {
+			this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
 			this.selection.removeRange();
 			this.selection._init();
-			return;
 		}
 
 		if (domUtils.isBreak(format.nextSibling)) domUtils.removeItem(format.nextSibling);
 		if (domUtils.isBreak(format.previousSibling)) domUtils.removeItem(format.previousSibling);
+		if (domUtils.isBreak(focusNode)) {
+			const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+			focusNode.parentNode.insertBefore(zeroWidth, focusNode);
+			focusNode = zeroWidth;
+		}
 
 		this.editor.effectNode = null;
 		this.editor._nativeFocus();
-	},
-
-	_setDropLocationSelection(e) {
-		if (e.rangeParent) {
-			this.selection.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
-		} else if (this.editor.frameContext.get('_wd').caretRangeFromPoint) {
-			const r = this.editor.frameContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
-			this.selection.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
-		} else {
-			const r = this.selection.getRange();
-			this.selection.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
-		}
 	},
 
 	_dataTransferAction(type, e, data, frameContext) {

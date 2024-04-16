@@ -990,6 +990,54 @@ export function getViewportSize(doc = _d) {
 	};
 }
 
+/**
+ * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child
+ * Returns null if not found.
+ * @param {Node} node Reference element
+ * @param {Node|null} ceiling Highest boundary allowed
+ * @returns {Node|null}
+ */
+export function getPreviousDeepestNode(node, ceiling) {
+	let previousNode = node.previousSibling;
+	if (!previousNode) {
+		for (let parentNode = node.parentNode; parentNode; parentNode = parentNode.parentNode) {
+			if (parentNode === ceiling) return null;
+			if (parentNode.previousSibling) {
+				previousNode = parentNode.previousSibling;
+				break;
+			}
+		}
+		if (!previousNode) return null;
+	}
+	while (previousNode.lastChild) previousNode = previousNode.lastChild;
+
+	return previousNode;
+}
+
+/**
+ * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child
+ * Returns null if not found.
+ * @param {Node} node Reference element
+ * @param {Node|null} ceiling Highest boundary allowed
+ * @returns {Node|null}
+ */
+export function getNextDeepestNode(node, ceiling) {
+	let nextNode = node.nextSibling;
+	if (!nextNode) {
+		for (let parentNode = node.parentNode; parentNode; parentNode = parentNode.parentNode) {
+			if (parentNode === ceiling) return null;
+			if (parentNode.nextSibling) {
+				nextNode = parentNode.nextSibling;
+				break;
+			}
+		}
+		if (!nextNode) return null;
+	}
+	while (nextNode.firstChild) nextNode = nextNode.firstChild;
+
+	return nextNode;
+}
+
 const domUtils = {
 	isZeroWith,
 	createElement,
@@ -1046,7 +1094,9 @@ const domUtils = {
 	isImportantDisabled,
 	isExcludeFormat,
 	getScrollParent,
-	getViewportSize
+	getViewportSize,
+	getPreviousDeepestNode,
+	getNextDeepestNode
 };
 
 export default domUtils;

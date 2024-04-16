@@ -652,6 +652,13 @@ Image_.prototype = {
 	_setBase64(files, anchor, width, height, align, alt, isUpdate) {
 		try {
 			const filesLen = this.modal.isUpdate ? 1 : files.length;
+
+			if (filesLen === 0) {
+				this.editor.hideLoading();
+				console.warn('[SUNEDITOR.image.base64.fail] cause : No applicable files');
+				return;
+			}
+
 			this._base64RenderIndex = filesLen;
 			const filesStack = [filesLen];
 			this.inputX.value = width;
@@ -798,7 +805,7 @@ function OpenGallery() {
 
 function _setUrlInput(target) {
 	this.altText.value = target.alt;
-	this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.src;
+	this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.getAttribute('data-value') || target.src;
 	this.imgUrlFile.focus();
 }
 

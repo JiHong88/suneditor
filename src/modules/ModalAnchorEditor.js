@@ -1,8 +1,8 @@
 import EditorInjector from '../editorInjector';
 import SelectMenu from './SelectMenu';
 import FileManager from './FileManager';
-import { domUtils, numbers, env } from '../helper';
-const { NO_EVENT } = env;
+import { domUtils, numbers, env, unicode } from '../helper';
+const { NO_EVENT, _w } = env;
 
 /**
  * @param {*} inst
@@ -215,7 +215,7 @@ ModalAnchorEditor.prototype = {
 		});
 		if (headers.length === 0) return;
 
-		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');
+		const valueRegExp = new _w.RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');
 		const list = [];
 		const menus = [];
 		for (let i = 0, len = headers.length, v; i < len; i++) {
@@ -238,7 +238,8 @@ ModalAnchorEditor.prototype = {
 		const protocol = this.options.get('defaultUrlProtocol');
 		const noPrefix = this.noAutoPrefix;
 		const reservedProtocol = /^(mailto:|tel:|sms:|https*:\/\/|#)/.test(value) || value.indexOf(protocol) === 0;
-		const sameProtocol = !protocol ? false : RegExp('^' + value.substr(0, protocol.length)).test(protocol);
+		const sameProtocol = !protocol ? false : _w.RegExp('^' + unicode.escapeStringRegexp(value.substr(0, protocol.length))).test(protocol);
+
 		value =
 			this.linkValue =
 			preview.textContent =
@@ -281,7 +282,7 @@ ModalAnchorEditor.prototype = {
 		if (!relAttr) return this.currentRel.join(' ');
 		if (/^only:/.test(relAttr)) relAttr = relAttr.replace(/^only:/, '').trim();
 
-		const rels = this.currentRel.join(' ').replace(RegExp(relAttr + '\\s*'), '');
+		const rels = this.currentRel.join(' ').replace(_w.RegExp(relAttr + '\\s*'), '');
 		this.currentRel = rels.split(' ');
 		return rels;
 	},

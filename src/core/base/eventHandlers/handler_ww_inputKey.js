@@ -547,7 +547,13 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 					}
 
 					temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
-					this.selection.setRange(temp, 0, temp, 0);
+					if (domUtils.isBreak(temp)) {
+						const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+						temp.parentNode.insertBefore(zeroWidth, temp);
+						this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
+					} else {
+						this.selection.setRange(temp, 0, temp, 0);
+					}
 					break;
 				} else if (rangeEl && formatEl && !domUtils.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
 					const rangeEnt = this.selection.getRange();
@@ -572,13 +578,13 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						let newEl = null;
 
 						if (domUtils.isListCell(rangeEl.parentNode)) {
-							rangeEl = formatEl.parentNode.parentNode.parentNode;
-							newEl = this.nodeTransform.split(formatEl, null, domUtils.getNodeDepth(formatEl) - 2);
-							if (!newEl) {
-								const newListCell = domUtils.createElement('LI', null, '<br>');
-								rangeEl.insertBefore(newListCell, newEl);
-								newEl = newListCell;
-							}
+							const parentLi = formatEl.parentNode.parentNode;
+							rangeEl = parentLi.parentNode;
+							const newListCell = domUtils.createElement('LI');
+							newListCell.innerHTML = '<br>';
+							domUtils.copyTagAttributes(newListCell, formatEl, this.options.get('lineAttrReset'));
+							newEl = newListCell;
+							rangeEl.insertBefore(newEl, parentLi.nextElementSibling);
 						} else {
 							let newFormat;
 							if (domUtils.isTableCell(rangeEl.parentNode)) {

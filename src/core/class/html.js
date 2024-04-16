@@ -1146,7 +1146,15 @@ HTML.prototype = {
 				ch[i].outerHTML = ch[i].innerHTML;
 			}
 
-			if (!requireFormat || this.format.isLine(node) || this.format.isBlock(node) || this.component.is(node) || domUtils.isMedia(node) || (domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))) {
+			if (
+				!requireFormat ||
+				this.format.isLine(node) ||
+				this.format.isBlock(node) ||
+				this.component.is(node) ||
+				domUtils.isMedia(node) ||
+				domUtils.isFigure(node) ||
+				(domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))
+			) {
 				return domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML;
 			} else {
 				return '<' + defaultLine + '>' + (domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultLine + '>';

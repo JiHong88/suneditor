@@ -719,6 +719,9 @@ Figure.prototype = {
 		this.__revertSize.h = dataSize[1];
 
 		const size = this.getSize(this._element);
+		// add too width, height attribute
+		this._element.setAttribute('width', size.w.replace('px', ''));
+		this._element.setAttribute('height', size.h.replace('px', ''));
 		this._element.setAttribute('data-se-size', size.w + ',' + size.h);
 		if (this.autoRatio) {
 			this.autoRatio.current = /%$/.test(size.h) ? size.h : '';
