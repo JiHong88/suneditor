@@ -170,13 +170,13 @@ FileManager.prototype = {
 			}
 
 			const figureInfo = Figure.GetContainer(element);
-			if (!figureInfo.container) {
+			if (!figureInfo.container && typeof this.inst?.ready === 'function') {
 				try {
 					const size = (element.getAttribute('data-se-size') || ',').split(',');
 					this.figure.__fileManagerInfo = true;
 					this.inst.ready(element, null);
 					this.figure.setSize(size[0], size[1]);
-					this.inst.init();
+					this.inst.init?.();
 				} catch (error) {
 					console.warn(`[SUNEDITOR.FileManager[${this.kind}].setInfo.error]`, error.message);
 				} finally {
@@ -258,7 +258,7 @@ FileManager.prototype = {
 						console.warn(`[SUNEDITOR.FileManager[${this.kind}].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).`);
 					} else {
 						this._setInfo(tag, null);
-						this.inst.init();
+						this.inst.init?.();
 					}
 				} catch (error) {
 					console.warn(`[SUNEDITOR.FileManager[${this.kind}].checkHandler.error]`, error.message);

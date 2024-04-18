@@ -153,7 +153,6 @@ Component.prototype = {
 		if (!isInput && this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
 			this.editor._antiBlur = true;
 			this.__selectionSelected = true;
-			this.selection.setRange(info.container, 0, info.container, 0);
 			this.editor.blur();
 			_w.setTimeout(() => {
 				this.__selectionSelected = false;
@@ -216,6 +215,23 @@ Component.prototype = {
 
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) return true;
 		if (this.editor._componentManager.find((f) => f(element))) return true;
+
+		return false;
+	},
+
+	/**
+	 * @description It is judged whether it is the inline component (.se-inline-component)
+	 * @param {Node} element The node to check
+	 * @returns {boolean}
+	 */
+	isInline(element) {
+		if (!element) return false;
+
+		if (/^FIGURE$/i.test(element.nodeName)) element = element.parentElement;
+		if (domUtils.hasClass(element, 'se-inline-component')) return true;
+
+		const container = this.editor._componentManager.find((f) => f(element));
+		if (container && domUtils.hasClass(element, 'se-inline-component')) return true;
 
 		return false;
 	},

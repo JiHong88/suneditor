@@ -394,6 +394,89 @@ Image_.prototype = {
 		if (!height) height = this.inputY.value || 'auto';
 
 		let imageEl = this._element;
+		const cover = this._cover;
+		const container = this._container === this._cover ? null : this._container;
+
+		// check size
+		let changeSize;
+		const x = numbers.is(width) ? width + this.sizeUnit : width;
+		const y = numbers.is(height) ? height + this.sizeUnit : height;
+		if (/%$/.test(imageEl.style.width)) {
+			changeSize = x !== container.style.width || y !== container.style.height;
+		} else {
+			changeSize = x !== imageEl.style.width || y !== imageEl.style.height;
+		}
+
+		// alt
+		imageEl.alt = this.altText.value;
+
+		// caption
+		let modifiedCaption = false;
+		if (this.captionCheckEl.checked) {
+			if (!this._caption) {
+				this._caption = Figure.CreateCaption(cover, this.lang.caption);
+				modifiedCaption = true;
+			}
+		} else {
+			if (this._caption) {
+				domUtils.removeItem(this._caption);
+				this._caption = null;
+				modifiedCaption = true;
+			}
+		}
+
+		// link
+		let isNewAnchor = false;
+		const anchor = this.anchor.create(true);
+		if (anchor) {
+			if (this._linkElement !== anchor || !container.contains(anchor)) {
+				this._linkElement = anchor.cloneNode(false);
+				cover.insertBefore(this._setAnchor(imageEl, this._linkElement), this._caption);
+				isNewAnchor = true;
+			}
+		} else if (this._linkElement !== null) {
+			if (cover.contains(this._linkElement)) {
+				const newEl = imageEl.cloneNode(true);
+				cover.removeChild(this._linkElement);
+				cover.insertBefore(newEl, this._caption);
+				imageEl = newEl;
+			}
+		}
+
+		// size
+		if (this._resizing && changeSize) {
+			this.applySize(width, height);
+		}
+
+		if (isNewAnchor) {
+			domUtils.removeItem(anchor);
+		}
+
+		// transform
+		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
+			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
+				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
+					this.figure.deleteTransform(imageEl);
+				} else {
+					this.figure.setTransform(imageEl, width, height, 0);
+				}
+			}
+		}
+
+		// align
+		this.figure.setAlign(imageEl, this._align);
+
+		// select
+		imageEl.onload = () => {
+			this.select(imageEl);
+		};
+	},
+
+	_fileCheck(width, height) {
+		if (!width) width = this.inputX.value || 'auto';
+		if (!height) height = this.inputY.value || 'auto';
+
+		let imageEl = this._element;
 		let cover = this._cover;
 		let container = this._container === this._cover ? null : this._container;
 		let isNewContainer = false;
@@ -719,7 +802,7 @@ Image_.prototype = {
 
 function FileCheckHandler(element) {
 	this.ready(element);
-	this._update(this._origin_w, this._origin_h);
+	this._fileCheck(this._origin_w, this._origin_h);
 	return element;
 }
 
@@ -804,8 +887,8 @@ function OpenGallery() {
 }
 
 function _setUrlInput(target) {
-	this.altText.value = target.alt;
-	this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.getAttribute('data-value') || target.src;
+	this.altText.value = target.getAttribute('data-value') || target.alt;
+	this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.getAttribute('data-command') || target.src;
 	this.imgUrlFile.focus();
 }
 

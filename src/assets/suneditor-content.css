@@ -518,6 +518,13 @@
 	margin: 0 0 10px;
 }
 
+.sun-editor-editable .se-inline-component {
+	display: inline-block;
+	width: auto;
+	min-width: min-content;
+	max-width: max-content;
+}
+
 .sun-editor-editable figure.se-scroll-figure-x {
 	overflow-x: auto;
 	padding: 0 1px;
