@@ -98,9 +98,7 @@ Component.prototype = {
 		let isFile = false;
 
 		if (this.is(element)) {
-			if (/se-component/.test(element.className)) element = element.firstElementChild;
-			if (!element) return null;
-
+			if (/se-component/.test(element.className)) element = element.firstElementChild || element;
 			if (/^FIGURE$/i.test(element.nodeName)) element = element.firstElementChild;
 			if (!element) return null;
 
@@ -206,9 +204,11 @@ Component.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
+	 * @description Determines if the specified node is a block component (e.g., img, iframe, video, audio, table) with the class "se-component"
+	 * or a direct FIGURE node. This function checks if the node itself is a component
+	 * or if it belongs to any components identified by the component manager.
+	 * @param {Node} element The DOM node to check.
+	 * @returns {boolean} True if the node is a block component or part of it, otherwise false.
 	 */
 	is(element) {
 		if (!element) return false;
@@ -220,9 +220,11 @@ Component.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the inline component (.se-inline-component)
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
+	 * @description Checks if the given node is an inline component (class "se-inline-component").
+	 * If the node is a FIGURE, it checks the parent element instead.
+	 * It also verifies whether the node is part of an inline component recognized by the component manager.
+	 * @param {Node} element The DOM node to check.
+	 * @returns {boolean} True if the node is an inline component or part of it, otherwise false.
 	 */
 	isInline(element) {
 		if (!element) return false;
@@ -234,6 +236,17 @@ Component.prototype = {
 		if (container && domUtils.hasClass(element, 'se-inline-component')) return true;
 
 		return false;
+	},
+
+	/**
+	 * @description Checks if the specified node qualifies as a basic component within the editor.
+	 * This function verifies whether the node is recognized as a component by the `is` function, while also ensuring that it is not an inline component as determined by the `isInline` function.
+	 * This is used to identify block-level elements or standalone components that are not part of the inline component classification.
+	 * @param {Node} element The DOM node to check.
+	 * @returns {boolean} True if the node is a basic (non-inline) component, otherwise false.
+	 */
+	isBasic(element) {
+		return this.is(element) && !this.isInline(element);
 	},
 
 	__isFiles(element) {

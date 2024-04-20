@@ -523,6 +523,7 @@
 	width: auto;
 	min-width: min-content;
 	max-width: max-content;
+	margin: 0 2px;
 }
 
 .sun-editor-editable figure.se-scroll-figure-x {

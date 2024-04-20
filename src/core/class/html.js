@@ -732,6 +732,27 @@ HTML.prototype = {
 					};
 				}
 			} else {
+				if ((commonCon.nodeType === 1 && startOff === 0 && endOff === 1) || (commonCon.nodeType === 3 && startOff === 0 && endOff === commonCon.textContent.length)) {
+					const nextEl = domUtils.getNextDeepestNode(commonCon, this.editor.frameContext.get('wysiwygFrame'));
+					const prevEl = domUtils.getPreviousDeepestNode(commonCon, this.editor.frameContext.get('wysiwygFrame'));
+					const line = this.format.getLine(commonCon);
+					domUtils.removeItem(commonCon);
+
+					let rEl = nextEl || prevEl;
+					let rOffset = nextEl ? 0 : rEl?.nodeType === 3 ? rEl.textContent.length : 1;
+
+					const npEl = this.format.getLine(rEl) || this.component.get(rEl);
+					if (line !== npEl) {
+						rEl = npEl;
+						rOffset = rOffset === 0 ? 0 : 1;
+					}
+
+					return {
+						container: rEl,
+						offset: rOffset
+					};
+				}
+
 				startCon = commonCon.children[startOff];
 				endCon = commonCon.children[endOff];
 				startOff = endOff = 0;
@@ -882,7 +903,6 @@ HTML.prototype = {
 
 		// set range
 		this.selection.setRange(container, offset, container, offset);
-		this.history.push(true);
 
 		return {
 			container: container,
