@@ -764,13 +764,15 @@ Editor.prototype = {
 		if (fileComponentInfo) {
 			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false);
 		} else if (focusEl) {
-			focusEl = domUtils.getEdgeChild(
-				focusEl,
-				function (current) {
-					return current.childNodes.length === 0 || current.nodeType === 3;
-				},
-				true
-			);
+			if (focusEl.nodeType !== 3) {
+				focusEl = domUtils.getEdgeChild(
+					focusEl,
+					function (current) {
+						return current.childNodes.length === 0 || current.nodeType === 3;
+					},
+					true
+				);
+			}
 			if (!focusEl) this._nativeFocus();
 			else this.selection.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
 		} else {

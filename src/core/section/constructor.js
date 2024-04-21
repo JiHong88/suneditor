@@ -14,6 +14,8 @@ const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|download|rel|sr
 const DEFAULT_TABLE_STYLES = {
 	'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style'
 };
+const DEFAULT_TEXT_STYLES = 'font-family|font-size|color|background-color';
+const DEFAULT_LINE_STYLES = 'text-align|margin-left|margin-right';
 
 const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';
 const DEFAULT_FORMAT_BR_LINE = 'PRE';
@@ -25,6 +27,22 @@ const DEFAULT_SIZE_UNITS = ['px', 'pt', 'em', 'rem'];
 
 const DEFAULT_CLASS_NAME = '^__se__|^se-|^katex';
 const DEFAULT_EXTRA_TAG_MAP = { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false };
+
+const DEFAULT_CONTENT_STYLES =
+	'-moz-box-sizing|-webkit-box-shadow|-webkit-box-sizing|' +
+	'background|background-clip|background-color|border|border-bottom|border-collapse|border-color|border-image|border-left-width|border-radius|border-right-width|border-spacing|border-style|border-top|border-width|box-shadow|box-sizing|' +
+	'caption-side|color|content|' +
+	'direction|display|' +
+	'float|font-family|font-size|font-style|font-weight|' +
+	'height|' +
+	'left|letter-spacing|line-height|list-style-position|list-style-type|' +
+	'margin|margin-block-end|margin-block-start|margin-bottom|margin-inline-end|margin-inline-start|margin-left|margin-right|margin-top|max-width|min-width|' +
+	'outline|overflow|' +
+	'padding|padding-bottom|padding-inline-start|padding-leftpadding-right|padding-top|' +
+	'rotate|rotateX|rotateY|' +
+	'table-layout|text-align|text-decoration|text-shadow|text-transform|top|' +
+	'vertical-align|visibility|' +
+	'white-space|width|word-break|word-wrap';
 
 export const RO_UNAVAILABD = [
 	'mode',
@@ -361,8 +379,8 @@ export function InitOptions(options, editorTargets) {
 	o.set('textTags', textTags);
 	o.set('_textStyleTags', Object.values(textTags).concat(['span', 'li']));
 	o.set('tagStyles', { ...DEFAULT_TABLE_STYLES, ...(options.tagStyles || {}) });
-	o.set('_textStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](font-family|font-size|color|background-color${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
-	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](text-align|margin-left|margin-right${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
+	o.set('_textStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULT_TEXT_STYLES}${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
+	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULT_LINE_STYLES}${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
 		b: textTags.bold,
@@ -576,6 +594,32 @@ export function InitOptions(options, editorTargets) {
 					return _default;
 			  }, {});
 	o.set('icons', icons);
+
+	/** Create all used styles  */
+	const allUsedStyles = new Set(DEFAULT_CONTENT_STYLES.split('|'));
+	const _ss = options.spanStyles?.split('|') || [];
+	const _ls = o.get('__listCommonStyle');
+	const _dts = DEFAULT_TEXT_STYLES.split('|');
+	for (let i = 0, len = _dts.length; i < len; i++) {
+		allUsedStyles.add(_dts[i]);
+	}
+	for (const _ts of Object.values(o.get('tagStyles'))) {
+		const _tss = _ts.split('|');
+		for (let i = 0, len = _tss.length; i < len; i++) {
+			allUsedStyles.add(_tss[i]);
+		}
+	}
+	for (let i = 0, len = _ss.length; i < len; i++) {
+		allUsedStyles.add(_ss[i]);
+	}
+	for (let i = 0, len = _ls.length; i < len; i++) {
+		allUsedStyles.add(_ls[i]);
+	}
+	const _aus = (typeof options.allUsedStyles === 'string' ? options.allUsedStyles.split('|') : options.allUsedStyles) || [];
+	for (let i = 0, len = _aus.length; i < len; i++) {
+		allUsedStyles.add(_aus[i]);
+	}
+	o.set('allUsedStyles', allUsedStyles);
 
 	return {
 		o: o,

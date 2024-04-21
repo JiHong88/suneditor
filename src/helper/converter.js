@@ -185,49 +185,6 @@ export function getWidthInPercentage(target) {
 }
 
 /**
- * @description Copies the "wwTarget" element and returns it with inline all styles applied.
- * @param {*} wwTarget
- * @param {string[]} styles Style list - kamel case
- * @returns
- */
-export function applyInlineStylesAll(wwTarget, styles = []) {
-	if (!wwTarget) {
-		console.warn('wwTarget is not exist');
-		return null;
-	}
-
-	const tempTarget = _d.createElement('DIV');
-	tempTarget.style.display = 'none';
-
-	if (/body/i.test(wwTarget.nodeName)) {
-		const wwDiv = _d.createElement('DIV');
-		const attrs = wwTarget.attributes;
-		for (let i = 0, len = attrs.length; i < len; i++) {
-			wwDiv.setAttribute(attrs[i].name, attrs[i].value);
-		}
-		wwDiv.innerHTML = wwTarget.innerHTML;
-		wwTarget = wwDiv;
-	} else {
-		wwTarget = wwTarget.cloneNode(true);
-	}
-
-	tempTarget.appendChild(wwTarget);
-	_d.body.appendChild(tempTarget);
-
-	const elements = tempTarget.querySelectorAll('*');
-	for (let i = 0, el; (el = elements[i]); i++) {
-		const computedStyle = _w.getComputedStyle(el);
-		for (const props of styles || computedStyle) {
-			el.style[props] = computedStyle.getPropertyValue(props);
-		}
-	}
-
-	_d.body.removeChild(tempTarget);
-
-	return wwTarget;
-}
-
-/**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Object.<string, any>} fo frameOptions
  * @param {string} cssText Style string
@@ -326,7 +283,6 @@ const converter = {
 	isHexColor,
 	rgb2hex,
 	getWidthInPercentage,
-	applyInlineStylesAll,
 	_setDefaultOptionStyle,
 	_setIframeStyleLinks,
 	_setAutoHeightStyle

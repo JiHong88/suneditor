@@ -1,3 +1,5 @@
+import { domUtils } from '../src/helper';
+
 function root(root) {}
 
 function math() {
@@ -12,6 +14,12 @@ function math() {
 			if (element.hasAttribute('data-font-size')) {
 				element.setAttribute('data-se-type', element.getAttribute('data-font-size'));
 				element.removeAttribute('data-font-size');
+			}
+			if (!domUtils.hasClass(element, 'se-component')) {
+				domUtils.addClass(element, 'se-component');
+			}
+			if (!domUtils.hasClass(element, 'se-inline-component')) {
+				domUtils.addClass(element, 'se-inline-component');
 			}
 		}
 	};

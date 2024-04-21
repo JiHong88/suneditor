@@ -1038,6 +1038,49 @@ export function getNextDeepestNode(node, ceiling) {
 	return nextNode;
 }
 
+/**
+ * @description Copies the "parentTarget" element and returns it with inline all styles applied.
+ * @param {Element} parentTarget  Parent element to copy
+ * @param {string[]} styles Style list - kamel case
+ * @returns
+ */
+export function applyInlineStylesAll(parentTarget, styles = []) {
+	if (!parentTarget) {
+		console.warn('"parentTarget" is not exist');
+		return null;
+	}
+
+	const tempTarget = _d.createElement('DIV');
+	tempTarget.style.display = 'none';
+
+	if (/body/i.test(parentTarget.nodeName)) {
+		const wwDiv = _d.createElement('DIV');
+		const attrs = parentTarget.attributes;
+		for (let i = 0, len = attrs.length; i < len; i++) {
+			wwDiv.setAttribute(attrs[i].name, attrs[i].value);
+		}
+		wwDiv.innerHTML = parentTarget.innerHTML;
+		parentTarget = wwDiv;
+	} else {
+		parentTarget = parentTarget.cloneNode(true);
+	}
+
+	tempTarget.appendChild(parentTarget);
+	_d.body.appendChild(tempTarget);
+
+	const elements = tempTarget.querySelectorAll('div > *');
+	for (let i = 0, el; (el = elements[i]); i++) {
+		const computedStyle = _w.getComputedStyle(el);
+		for (const props of styles || computedStyle) {
+			el.style[props] = computedStyle.getPropertyValue(props) || '';
+		}
+	}
+
+	_d.body.removeChild(tempTarget);
+
+	return parentTarget;
+}
+
 const domUtils = {
 	isZeroWith,
 	createElement,
@@ -1096,7 +1139,8 @@ const domUtils = {
 	getScrollParent,
 	getViewportSize,
 	getPreviousDeepestNode,
-	getNextDeepestNode
+	getNextDeepestNode,
+	applyInlineStylesAll
 };
 
 export default domUtils;

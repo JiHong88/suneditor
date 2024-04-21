@@ -173,7 +173,8 @@ FileUpload.prototype = {
 		const message = await this.triggerEvent('onFileDeleteBefore', { target: figure.target, container: figure, url: figure.target.getAttribute('href') });
 		if (message === false) return;
 
-		const focusEl = target.previousElementSibling || target.nextElementSibling;
+		const isInlineComp = this.component.isInline(target);
+		const focusEl = isInlineComp ? target.previousSibling || target.nextSibling : target.previousElementSibling || target.nextElementSibling;
 		domUtils.removeItem(target);
 		this.editor._offCurrentController();
 

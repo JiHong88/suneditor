@@ -43,6 +43,9 @@ const Math_ = function (editor, pluginOptions) {
 Math_.key = 'math';
 Math_.type = 'modal';
 Math_.className = '';
+Math_.component = function (node) {
+	return domUtils.hasClass(node, 'katex') ? node : null;
+};
 Math_.prototype = {
 	/**
 	 * @override core
@@ -57,6 +60,15 @@ Math_.prototype = {
 
 		this.controller.close();
 		return false;
+	},
+
+	/**
+	 * @override component, fileManager
+	 * @description Called when a container is selected.
+	 * @param {Element} element Target element
+	 */
+	select(element) {
+		this.active(element);
 	},
 
 	/**

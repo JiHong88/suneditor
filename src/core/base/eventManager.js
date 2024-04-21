@@ -9,7 +9,7 @@ import { Figure } from '../../modules';
 // event handlers
 import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from './eventHandlers/handler_toolbar';
 import { OnMouseDown_wysiwyg, OnMouseUp_wysiwyg, OnClick_wysiwyg, OnMouseMove_wysiwyg, OnMouseLeave_wysiwyg } from './eventHandlers/handler_ww_mouse';
-import { OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './eventHandlers/handler_ww_inputKey';
+import { OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './eventHandlers/handler_ww_key_input';
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './eventHandlers/handler_ww_clipboard';
 import { OnDragOver_wysiwyg, OnDrop_wysiwyg } from './eventHandlers/handler_ww_dragDrop';
 

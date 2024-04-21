@@ -98,7 +98,7 @@ Component.prototype = {
 		let isFile = false;
 
 		if (this.is(element)) {
-			if (/se-component/.test(element.className)) element = element.firstElementChild || element;
+			if (/se-component/.test(element.className) && !/se-inline-component/.test(element.className)) element = element.firstElementChild || element;
 			if (/^FIGURE$/i.test(element.nodeName)) element = element.firstElementChild;
 			if (!element) return null;
 
@@ -162,7 +162,7 @@ Component.prototype = {
 		let isNonFigureComponent;
 		if (typeof plugin.select === 'function') isNonFigureComponent = plugin.select(element);
 
-		if (!isNonFigureComponent) this._setComponentLineBreaker(info.container || info.cover || element);
+		if (!isNonFigureComponent && !domUtils.hasClass(info.container, 'se-inline-component')) this._setComponentLineBreaker(info.container || info.cover || element);
 
 		if (!this.info.isFile) this.__addNotFileGlobalEvent();
 		this.currentTarget = element;
@@ -170,14 +170,12 @@ Component.prototype = {
 		this.currentPluginName = pluginName;
 		this.currentInfo = info;
 
-		if (!isNonFigureComponent) {
-			const __overInfo = this.eventManager.__overInfo;
-			_w.setTimeout(() => {
-				this.eventManager.__overInfo = __overInfo === ON_OVER_COMPONENT ? undefined : false;
-				if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
-			}, 0);
-			domUtils.addClass(info.container, 'se-component-selected');
-		}
+		const __overInfo = this.eventManager.__overInfo;
+		_w.setTimeout(() => {
+			this.eventManager.__overInfo = __overInfo === ON_OVER_COMPONENT ? undefined : false;
+			if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
+		}, 0);
+		domUtils.addClass(info.container, 'se-component-selected');
 	},
 
 	deselect() {
@@ -429,12 +427,50 @@ function OnKeyDown_component(e) {
 		this.deselect();
 		container.parentNode.insertBefore(newEl, container);
 		if (this.select(compContext.target, pluginName) === false) this.editor.blur();
+		this.history.push(false);
+
+		return;
 	}
 
-	// up down
+	// up down, left right
 	if (DIR_KEYCODE.test(keyCode)) {
-		const compContext = this.get(this.currentTarget);
-		const el = DIR_UP_KEYCODE.test(keyCode) ? compContext.container.previousElementSibling : compContext.container.nextElementSibling;
+		const { container } = this.get(this.currentTarget);
+		const isInline = this.isInline(this.currentTarget);
+
+		let el = null;
+		let offset = 1;
+		if (isInline) {
+			switch (keyCode) {
+				case 37: // left
+					el = container.previousSibling;
+					offset = el?.nodeType === 3 ? el.textContent.length : 1;
+					break;
+				case 39: // right
+					el = container.nextSibling;
+					break;
+				case 38: {
+					// up
+					const line = this.format.getLine(container, null);
+					el = line?.previousElementSibling;
+					offset = 0;
+					break;
+				}
+				case 40: {
+					// down
+					const line = this.format.getLine(container, null);
+					el = line?.nextElementSibling;
+					break;
+				}
+			}
+		} else {
+			if (DIR_UP_KEYCODE.test(keyCode)) {
+				el = container.previousElementSibling;
+				offset = 0;
+			} else {
+				el = container.nextElementSibling;
+			}
+		}
+
 		if (!el) return;
 
 		this.deselect();
@@ -449,7 +485,7 @@ function OnKeyDown_component(e) {
 			if (focusEl) {
 				e.stopPropagation();
 				e.preventDefault();
-				this.selection.setRange(focusEl, 0, focusEl, 0);
+				this.selection.setRange(focusEl, offset, focusEl, offset);
 			}
 		}
 
