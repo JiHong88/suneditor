@@ -94,7 +94,7 @@ Mention.prototype = {
 	},
 
 	async _createMentionList(value, targetNode) {
-		const xmlHttp = await this.apiManager.asyncCall('GET', this._createUrl(value), null);
+		const xmlHttp = await this.apiManager.asyncCall({ method: 'GET', url: this._createUrl(value) });
 		const response = JSON.parse(xmlHttp.responseText);
 		if (!response?.length) {
 			this.selectMenu.close();

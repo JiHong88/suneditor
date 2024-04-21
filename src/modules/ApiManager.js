@@ -37,7 +37,7 @@ ApiManager.prototype = {
 	 * @param {Function|null=} params.callBack - API success callback
 	 * @param {Function|null=} params.errorCallBack - API fail callback
 	 */
-	call(method, url, headers, data, callBack, errorCallBack) {
+	call({ method, url, headers, data, callBack, errorCallBack }) {
 		method = method || this.method;
 		url = this._normalizeUrl(url || this.url);
 		headers = headers || this.headers;
@@ -65,7 +65,7 @@ ApiManager.prototype = {
 	 * @param {Object|null=} params.headers - HTTP headers
 	 * @param {Object|null=} params.data - API data
 	 */
-	asyncCall(method, url, headers, data) {
+	asyncCall({ method, url, headers, data }) {
 		method = method || this.method;
 		url = this._normalizeUrl(url || this.url);
 		headers = headers || this.headers;

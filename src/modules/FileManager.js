@@ -55,7 +55,7 @@ FileManager.prototype = {
 			this.uploadFileLength = data.size;
 		}
 
-		this.apiManager.call('POST', uploadUrl, uploadHeader, formData, callBack, errorCallBack);
+		this.apiManager.call({ method: 'POST', url: uploadUrl, headers: uploadHeader, data: formData, callBack, errorCallBack });
 	},
 
 	/**
@@ -80,7 +80,7 @@ FileManager.prototype = {
 			this.uploadFileLength = data.size;
 		}
 
-		return await this.apiManager.asyncCall('POST', uploadUrl, uploadHeader, formData);
+		return await this.apiManager.asyncCall({ method: 'POST', url: uploadUrl, headers: uploadHeader, data: formData });
 	},
 
 	setFileData(element, { name, size }) {

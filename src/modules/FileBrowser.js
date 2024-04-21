@@ -112,7 +112,7 @@ FileBrowser.prototype = {
 	},
 
 	_drawFileList(url, urlHeader) {
-		this.apiManager.call('GET', url, urlHeader, null, CallBackGet.bind(this), CallBackError.bind(this));
+		this.apiManager.call({ method: 'GET', url, headers: urlHeader, callBack: CallBackGet.bind(this), errorCallBack: CallBackError.bind(this) });
 		this.showBrowserLoading();
 	},
 
