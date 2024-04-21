@@ -41,7 +41,7 @@ import { jsPDF } from 'jspdf';
 // import image from '../../src/plugins/modal/image';
 // import video from '../../src/plugins/modal/video';
 // import imageGallery from '../../src/plugins/fileBrowser/imageGallery';
-import plugins, { audio } from '../../src/plugins';
+import plugins, { audio, exportPdf } from '../../src/plugins';
 
 const bl = [
 	['selectAll', 'newDocument', 'undo', 'redo', 'dir'],
@@ -423,7 +423,7 @@ window.editor_root = suneditor.create(
 <pre>Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.</pre>
 <blockquote><p>Supports Chrome, Safari, Opera, Firefox, Edge, IE11, Mobile web browser.</p></blockquote>
 <p><strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a> license.</p>
-<div class="se-component se-flex-component"><figure><audio style="" controls="true" data-se-file-name="ssss" data-se-file-size="0" src="/ssss" data-se-index="0"></audio></figure></div>
+<div class="se-component se-flex-component"><figure><audio style="" controls="true" data-se-file-name="ssss.mp3" data-se-file-size="0" src="http://localhost:3000/editor/files/download/public/files/ssss.mp3" data-se-index="0"></audio></figure></div>
 <p><hr class="dashed"></p>
 <p><span style="font-size: 16px;"><span style="font-family: Impact;">Table</span></span></p>
 <table class="se-table-size-auto"><thead><tr><th><div>Column_1</div></th><th><div>Column_2</div></th><th><div>Column_3</div></th><th><div>Column_4</div></th><th><div>Column_5</div></th></tr></thead><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table>
@@ -530,6 +530,9 @@ window.editor_root = suneditor.create(
 		fileUpload: {
 			uploadUrl: 'http://localhost:3000/editor/files/upload'
 		},
+		exportPdf: {
+			apiUrl: 'http://localhost:3000/editor/download-pdf'
+		},
 		fontSize: {
 			showIncDecControls: true
 			// disableInput: true,
@@ -573,6 +576,9 @@ window.editor_root = suneditor.create(
 			},
 			onFocus() {
 				console.log('focus');
+			},
+			onExportPdfBefore(params) {
+				console.log('pdfbefore', params);
 			},
 			// onFileDeleteBefore(arg) {
 			// 	console.log('delete file', arg);

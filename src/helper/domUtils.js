@@ -1039,13 +1039,14 @@ export function getNextDeepestNode(node, ceiling) {
 }
 
 /**
- * @description Copies the "parentTarget" element and returns it with inline all styles applied.
- * @param {Element} parentTarget  Parent element to copy
+ * @description Copies the "wwTarget" element and returns it with inline all styles applied.
+ * @param {Element} wwTarget Target element to copy(.sun-editor.sun-editor-editable)
+ * @param {Boolean} includeWW Include the "wwTarget" element in the copy
  * @param {string[]} styles Style list - kamel case
  * @returns
  */
-export function applyInlineStylesAll(parentTarget, styles = []) {
-	if (!parentTarget) {
+export function applyInlineStylesAll(wwTarget, includeWW, styles) {
+	if (!wwTarget) {
 		console.warn('"parentTarget" is not exist');
 		return null;
 	}
@@ -1053,23 +1054,23 @@ export function applyInlineStylesAll(parentTarget, styles = []) {
 	const tempTarget = _d.createElement('DIV');
 	tempTarget.style.display = 'none';
 
-	if (/body/i.test(parentTarget.nodeName)) {
+	if (/body/i.test(wwTarget.nodeName)) {
 		const wwDiv = _d.createElement('DIV');
-		const attrs = parentTarget.attributes;
+		const attrs = wwTarget.attributes;
 		for (let i = 0, len = attrs.length; i < len; i++) {
 			wwDiv.setAttribute(attrs[i].name, attrs[i].value);
 		}
-		wwDiv.innerHTML = parentTarget.innerHTML;
-		parentTarget = wwDiv;
+		wwDiv.innerHTML = wwTarget.innerHTML;
+		wwTarget = wwDiv;
 	} else {
-		parentTarget = parentTarget.cloneNode(true);
+		wwTarget = wwTarget.cloneNode(true);
 	}
 
-	tempTarget.appendChild(parentTarget);
+	tempTarget.appendChild(wwTarget);
 	_d.body.appendChild(tempTarget);
 
-	const elements = tempTarget.querySelectorAll('div > *');
-	for (let i = 0, el; (el = elements[i]); i++) {
+	const elements = wwTarget.querySelectorAll('*');
+	for (let i = includeWW ? 0 : 1, el; (el = elements[i]); i++) {
 		const computedStyle = _w.getComputedStyle(el);
 		for (const props of styles || computedStyle) {
 			el.style[props] = computedStyle.getPropertyValue(props) || '';
@@ -1078,7 +1079,7 @@ export function applyInlineStylesAll(parentTarget, styles = []) {
 
 	_d.body.removeChild(tempTarget);
 
-	return parentTarget;
+	return wwTarget;
 }
 
 const domUtils = {

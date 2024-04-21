@@ -10,6 +10,7 @@ import { env } from '../helper';
  * @param {Object|null=} params.data - API data
  * @param {Function|null=} params.callBack - API success callback
  * @param {Function|null=} params.errorCallBack - API fail callback
+ * @param {string|null=} params.responseType - XMLHttpRequest.responseType
  */
 const ApiManager = function (inst, params) {
 	this.editor = inst.editor;
@@ -24,6 +25,7 @@ const ApiManager = function (inst, params) {
 	this.data = params?.data;
 	this.callBack = params?.callBack;
 	this.errorCallBack = params?.errorCallBack;
+	this.responseType = params?.responseType;
 };
 
 ApiManager.prototype = {
@@ -36,16 +38,21 @@ ApiManager.prototype = {
 	 * @param {Object|null=} params.data - API data
 	 * @param {Function|null=} params.callBack - API success callback
 	 * @param {Function|null=} params.errorCallBack - API fail callback
+	 * @param {string|null=} params.responseType - XMLHttpRequest.responseType
 	 */
-	call({ method, url, headers, data, callBack, errorCallBack }) {
+	call({ method, url, headers, data, callBack, errorCallBack, responseType }) {
+		this.cancel();
+
 		method = method || this.method;
 		url = this._normalizeUrl(url || this.url);
 		headers = headers || this.headers;
 		data = data || this.data;
 		callBack = callBack || this.callBack;
 		errorCallBack = errorCallBack || this.errorCallBack;
+		responseType = responseType || this.responseType;
 
 		const xhr = this._xhr;
+		if (responseType) xhr.responseType = responseType;
 		xhr.onreadystatechange = CallBackApi.bind(this, xhr, callBack, errorCallBack);
 		xhr.open(method, url, true);
 		if (headers !== null && typeof headers === 'object' && Object.keys(headers).length > 0) {
@@ -64,14 +71,19 @@ ApiManager.prototype = {
 	 * @param {string|null=} params.url - API's URL
 	 * @param {Object|null=} params.headers - HTTP headers
 	 * @param {Object|null=} params.data - API data
+	 * @param {string|null=} params.responseType - XMLHttpRequest.responseType
 	 */
-	asyncCall({ method, url, headers, data }) {
+	asyncCall({ method, url, headers, data, responseType }) {
+		this.cancel();
+
 		method = method || this.method;
 		url = this._normalizeUrl(url || this.url);
 		headers = headers || this.headers;
 		data = data || this.data;
+		responseType = responseType || this.responseType;
 
 		const xhr = this._xhr;
+		if (responseType) xhr.responseType = responseType;
 		return new Promise((resolve, reject) => {
 			xhr.open(method, url, true);
 			if (headers !== null && typeof headers === 'object' && Object.keys(headers).length > 0) {
