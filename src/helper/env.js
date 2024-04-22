@@ -57,7 +57,7 @@ export function kebabToCamelCase(param) {
  * @returns {XMLHttpRequest|ActiveXObject}
  */
 export function getXMLHttpRequest() {
-	return new _w.XMLHttpRequest();
+	return new XMLHttpRequest();
 }
 
 /**
@@ -162,7 +162,7 @@ export function debounce(func, wait) {
  * @returns {boolean} Whether support ResizeObserver function or not.
  */
 export const isResizeObserverSupported = (() => {
-	return typeof _w.ResizeObserver === 'function';
+	return typeof ResizeObserver === 'function';
 })();
 
 /**

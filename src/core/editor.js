@@ -1411,13 +1411,13 @@ Editor.prototype = {
 
 		e.set('wwComputedStyle', _w.getComputedStyle(e.get('wysiwyg')));
 
-		if (!frameOptions.get('iframe') && typeof _w.ShadowRoot === 'function') {
+		if (!frameOptions.get('iframe') && typeof ShadowRoot === 'function') {
 			let child = e.get('wysiwygFrame');
 			while (child) {
 				if (child.shadowRoot) {
 					this._shadowRoot = child.shadowRoot;
 					break;
-				} else if (child instanceof _w.ShadowRoot) {
+				} else if (child instanceof ShadowRoot) {
 					this._shadowRoot = child;
 					break;
 				}

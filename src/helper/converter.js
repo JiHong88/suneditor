@@ -63,9 +63,9 @@ export function fontSize(to, size) {
 	let pxSize = sizeNum;
 
 	if (/em/.test(from)) {
-		pxSize = _w.Math.round(sizeNum / 0.0625);
+		pxSize = Math.round(sizeNum / 0.0625);
 	} else if (from === 'pt') {
-		pxSize = _w.Math.round(sizeNum * 1.333);
+		pxSize = Math.round(sizeNum * 1.333);
 	} else if (from === '%') {
 		pxSize = sizeNum / 100;
 	}
@@ -77,7 +77,7 @@ export function fontSize(to, size) {
 		case '%':
 			return (pxSize * 0.0625).toFixed(2) * 100 + to;
 		case 'pt':
-			return _w.Math.floor(pxSize / 1.333) + to;
+			return Math.floor(pxSize / 1.333) + to;
 		default:
 			// px
 			return pxSize + to;
@@ -158,7 +158,7 @@ export function rgb2hex(rgba) {
 		if (rgba.includes('rgba')) {
 			const alphaMatch = rgba.match(/[\s+]?([\d]+\.?[\d]*)[\s+]?/i);
 			if (alphaMatch) {
-				a = ('0' + _w.Math.round(parseFloat(alphaMatch[1]) * 255).toString(16)).slice(-2);
+				a = ('0' + Math.round(parseFloat(alphaMatch[1]) * 255).toString(16)).slice(-2);
 			}
 		}
 

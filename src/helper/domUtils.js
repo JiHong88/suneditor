@@ -738,7 +738,7 @@ export function hasClass(element, className) {
 export function addClass(element, className) {
 	if (!element) return;
 
-	const elements = element instanceof _w.HTMLCollection || element instanceof _w.NodeList || element instanceof _w.Array ? element : [element];
+	const elements = element instanceof HTMLCollection || element instanceof NodeList || element instanceof Array ? element : [element];
 	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
 	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;
@@ -754,7 +754,7 @@ export function addClass(element, className) {
 export function removeClass(element, className) {
 	if (!element) return;
 
-	const elements = element instanceof _w.HTMLCollection || element instanceof _w.NodeList || element instanceof _w.Array ? element : [element];
+	const elements = element instanceof HTMLCollection || element instanceof NodeList || element instanceof Array ? element : [element];
 	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
 	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;

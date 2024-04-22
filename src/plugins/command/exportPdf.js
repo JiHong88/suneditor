@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { domUtils, env } from '../../helper';
 import { ApiManager } from '../../modules';
 
-const { _d, _w } = env;
+const { _d } = env;
 
 const ExportPdf = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
@@ -158,7 +158,7 @@ ExportPdf.prototype = {
 		} finally {
 			setTimeout(() => {
 				domUtils.removeItem(a);
-				_w.URL.revokeObjectURL(downloadUrl);
+				URL.revokeObjectURL(downloadUrl);
 			}, 100);
 		}
 	},

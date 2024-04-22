@@ -239,7 +239,7 @@ Figure.prototype = {
 		this._caption = figureInfo.caption;
 		this._element = target;
 		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || target.style.float || 'none';
-		this.isVertical = /^(90|270)$/.test(this._w.Math.abs(GetRotateValue(target).r).toString());
+		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(target).r).toString());
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		const sizeTarget = figureTarget ? this._cover || this._container || target : target;
@@ -538,8 +538,8 @@ Figure.prototype = {
 			this.__preventSizechange = true;
 			const info = GetRotateValue(element);
 			const slope = info.r + (deg || 0) * 1;
-			deg = this._w.Math.abs(slope) >= 360 ? 0 : slope;
-			const isVertical = (this.isVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString()));
+			deg = Math.abs(slope) >= 360 ? 0 : slope;
+			const isVertical = (this.isVertical = /^(90|270)$/.test(Math.abs(deg).toString()));
 
 			width = numbers.get(width, 0);
 			height = numbers.get(height, 0);
@@ -892,8 +892,8 @@ function ContainerResizing(e) {
 		resultH = h;
 	}
 
-	this._resize_w = /h$/.test(direction) ? this._width : this._w.Math.round(resultW);
-	this._resize_h = /w$/.test(direction) ? this._height : this._w.Math.round(resultH);
+	this._resize_w = /h$/.test(direction) ? this._width : Math.round(resultW);
+	this._resize_h = /w$/.test(direction) ? this._height : Math.round(resultH);
 	domUtils.changeTxt(this.editor.frameContext.get('_figure').display, this._resize_w + ' x ' + this._resize_h);
 }
 
@@ -903,8 +903,8 @@ function ContainerResizingOff() {
 	// set size
 	let w = this.isVertical ? this._resize_h : this._resize_w;
 	let h = this.isVertical ? this._resize_w : this._resize_h;
-	w = this._w.Math.round(w) || w;
-	h = this._w.Math.round(h) || h;
+	w = Math.round(w) || w;
+	h = Math.round(h) || h;
 
 	if (!this.isVertical && !/%$/.test(w)) {
 		const limit =
@@ -913,7 +913,7 @@ function ContainerResizingOff() {
 			numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) -
 			2;
 		if (numbers.get(w, 0) > limit) {
-			h = this._w.Math.round((h / w) * limit);
+			h = Math.round((h / w) * limit);
 			w = limit;
 		}
 	}

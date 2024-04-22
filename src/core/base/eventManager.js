@@ -625,10 +625,10 @@ EventManager.prototype = {
 
 		/** observer */
 		if (env.isResizeObserverSupported) {
-			this._toolbarObserver = new _w.ResizeObserver(() => {
+			this._toolbarObserver = new ResizeObserver(() => {
 				this.toolbar.resetResponsiveToolbar();
 			});
-			this._wwFrameObserver = new _w.ResizeObserver((entries) => {
+			this._wwFrameObserver = new ResizeObserver((entries) => {
 				entries.forEach((e) => {
 					this.editor.__callResizeFunction(this.editor.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
 				});
