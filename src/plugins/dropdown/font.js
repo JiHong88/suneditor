@@ -54,7 +54,7 @@ Font.prototype = {
 
 		if (currentFont !== this.currentFont) {
 			for (let i = 0, len = fontList.length; i < len; i++) {
-				if (currentFont === fontList[i].getAttribute('data-command')) {
+				if (currentFont === (fontList[i].getAttribute('data-command') || '').replace(/'|"/g, '')) {
 					domUtils.addClass(fontList[i], 'active');
 				} else {
 					domUtils.removeClass(fontList[i], 'active');
@@ -70,8 +70,11 @@ Font.prototype = {
 	 * @param {Element} target Target command button
 	 */
 	action(target) {
-		const value = target.getAttribute('data-command');
+		let value = target.getAttribute('data-command');
 		if (value) {
+			if (/[\s\d\W]/.test(value) && !/^['"].*['"]$/.test(value)) {
+				value = `"${value}"`;
+			}
 			const newNode = domUtils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['font-family'], null, null);
 		} else {

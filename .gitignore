@@ -13,5 +13,4 @@ node_modules/**
 
 #dev
 .git/**
-package-lock.json
 /.vs
