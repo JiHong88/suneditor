@@ -6,7 +6,7 @@ const Modal = function (inst, element) {
 
 	// members
 	this.inst = inst;
-	this.kind = inst.constructor.key;
+	this.kind = inst.constructor.key || inst.constructor.name;
 	this.form = element;
 	this.focusElement = element.querySelector('[data-focus]');
 	this.isUpdate = false;

@@ -307,6 +307,12 @@ export default function () {
 		 * @description Called when the editor loaded, file Current editor value
 		 * -- arguments is same "Image info object" --
 		 */
-		onFileLoad: null
+		onFileLoad: null,
+
+		onFileUploadBefore: null,
+
+		onFileUploadError: null,
+
+		onExportPdfBefore: null
 	};
 }

@@ -74,7 +74,7 @@ const ColorPicker = function (inst, styles, params) {
 	CoreInjector.call(this, editor);
 
 	// members
-	this.kind = inst.constructor.key;
+	this.kind = inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
 	this.target = CreateHTML(editor, params);
 	this.targetButton = null;

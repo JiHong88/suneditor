@@ -1,7 +1,8 @@
 import EditorInjector from '../../editorInjector';
 import { CreateTooltipInner } from '../../core/section/constructor';
-import { domUtils, env } from '../../helper';
+import { domUtils, env, numbers } from '../../helper';
 import { FileManager, Figure, Controller } from '../../modules';
+
 const { NO_EVENT } = env;
 
 const FileUpload = function (editor, pluginOptions) {
@@ -15,8 +16,14 @@ const FileUpload = function (editor, pluginOptions) {
 	// members
 	this.uploadUrl = pluginOptions.uploadUrl;
 	this.uploadHeaders = pluginOptions.uploadHeaders;
+	this.uploadSizeLimit = /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null;
+	this.allowMultiple = !!pluginOptions.allowMultiple;
 	this.acceptedFormats = typeof pluginOptions.acceptedFormats !== 'string' ? '*' : pluginOptions.acceptedFormats.trim() || '*';
+	this.as = pluginOptions.as || 'box';
 	this.input = domUtils.createElement('input', { type: 'file', accept: this.acceptedFormats });
+	if (this.allowMultiple) {
+		this.input.setAttribute('multiple', 'multiple');
+	}
 	this._element = null;
 
 	// figure
@@ -62,13 +69,13 @@ const FileUpload = function (editor, pluginOptions) {
 					target.setAttribute('data-se-non-focus', 'true');
 					target.removeAttribute('contenteditable');
 					domUtils.removeClass(target, 'se-component');
+					domUtils.removeClass(target, 'se-component-selected');
 					domUtils.removeClass(target, 'se-inline-component');
 
 					const figure = Figure.CreateContainer(target, 'se-file-figure se-flex-component');
 					(s || r.container).parentElement.insertBefore(figure.container, s);
 				}
 
-				this.editor.focus();
 				this.component.select(target, FileUpload.key, false);
 			}
 		}
@@ -183,14 +190,19 @@ FileUpload.prototype = {
 	},
 
 	_register(response) {
-		const file = response.result[0];
-		this._create(file.url, {
-			name: file.name,
-			size: file.size
+		response.result.forEach((file, i, a) => {
+			this._create(
+				file.url,
+				{
+					name: file.name,
+					size: file.size
+				},
+				i === a.length - 1
+			);
 		});
 	},
 
-	_create(url, file) {
+	_create(url, file, isLast) {
 		const name = file.name || url;
 		const a = domUtils.createElement(
 			'A',
@@ -207,13 +219,21 @@ FileUpload.prototype = {
 
 		this.fileManager.setFileData(a, file);
 
+		if (this.as === 'link') {
+			a.className = 'se-component se-inline-component';
+			this.component.insert(a, false, false);
+			return;
+		}
+
 		const figure = Figure.CreateContainer(a);
 		domUtils.addClass(figure.container, 'se-file-figure se-flex-component');
 
-		if (!this.component.insert(figure.container, false, !this.options.get('mediaAutoSelect'))) {
+		if (!this.component.insert(figure.container, false, isLast ? !this.options.get('mediaAutoSelect') : true)) {
 			this.editor.focus();
 			return;
 		}
+
+		if (!isLast) return;
 
 		if (!this.options.get('mediaAutoSelect')) {
 			const line = this.format.addLine(figure.container, null);
@@ -244,8 +264,31 @@ FileUpload.prototype = {
 };
 
 async function OnChangeFile(e) {
-	const files = e.target.files;
-	if (!files[0]) return;
+	const fileList = e.target.files;
+	if (fileList.length === 0) return;
+
+	let fileSize = 0;
+	const files = [];
+	for (let i = 0, len = fileList.length; i < len; i++) {
+		files.push(fileList[i]);
+		fileSize += fileList[i].size;
+	}
+
+	const limitSize = this.uploadSizeLimit;
+	const currentSize = this.fileManager.getSize();
+	if (limitSize > 0 && fileSize + currentSize > limitSize) {
+		const err = '[SUNEDITOR.fileUpload.fail] Size of uploadable total files: ' + limitSize / 1000 + 'KB';
+		const message = await this.triggerEvent('onFileUploadError', {
+			error: err,
+			limitSize,
+			currentSize,
+			uploadSize: fileSize
+		});
+
+		this.notice.open(message === NO_EVENT ? err : message || err);
+
+		return false;
+	}
 
 	const fileInfo = {
 		url: this.uploadUrl,

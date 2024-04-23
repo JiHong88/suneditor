@@ -13,7 +13,7 @@ const SelectMenu = function (inst, params) {
 	CoreInjector.call(this, inst.editor);
 
 	// members
-	this.kink = inst.constructor.key;
+	this.kink = inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
 	const positionItems = params.position.split('-');
 	this.form = null;

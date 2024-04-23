@@ -29,18 +29,20 @@ const DEFAULT_CLASS_NAME = '^__se__|^se-|^katex';
 const DEFAULT_EXTRA_TAG_MAP = { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false };
 
 const DEFAULT_CONTENT_STYLES =
-	'-moz-box-sizing|-webkit-box-shadow|-webkit-box-sizing|' +
-	'background|background-clip|background-color|border|border-bottom|border-collapse|border-color|border-image|border-left-width|border-radius|border-right-width|border-spacing|border-style|border-top|border-width|box-shadow|box-sizing|' +
+	'background|background-clip|background-color|' +
+	'border|border-bottom|border-collapse|border-color|border-image|border-left-width|border-radius|border-right-width|border-spacing|border-style|border-top|border-width|' +
+	'box-shadow|box-sizing|' +
 	'caption-side|color|content|' +
 	'direction|display|' +
-	'float|font-family|font-size|font-style|font-weight|' +
+	'float|font|font-family|font-size|font-style|font-weight|' +
 	'height|' +
 	'left|letter-spacing|line-height|list-style-position|list-style-type|' +
 	'margin|margin-block-end|margin-block-start|margin-bottom|margin-inline-end|margin-inline-start|margin-left|margin-right|margin-top|max-width|min-width|' +
 	'outline|overflow|' +
-	'padding|padding-bottom|padding-inline-start|padding-leftpadding-right|padding-top|' +
+	'position|padding|padding-bottom|padding-inline-start|padding-left|padding-right|padding-top|' +
 	'rotate|rotateX|rotateY|' +
 	'table-layout|text-align|text-decoration|text-shadow|text-transform|top|' +
+	'text-indent|text-rendering|' +
 	'vertical-align|visibility|' +
 	'white-space|width|word-break|word-wrap';
 
@@ -116,7 +118,10 @@ const Constructor = function (editorTargets, options) {
 	const menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
 	editor_carrier_wrapper.appendChild(menuTray);
 	// focus temp element
-	const focusTemp = domUtils.createElement('INPUT', { class: '__se__focus__temp__', tabIndex: 0 });
+	const focusTemp = domUtils.createElement('INPUT', {
+		class: '__se__focus__temp__',
+		style: 'position: absolute !important; top: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;'
+	});
 	focusTemp.tabIndex = 0;
 	editor_carrier_wrapper.appendChild(focusTemp);
 

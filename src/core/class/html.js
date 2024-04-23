@@ -254,7 +254,7 @@ HTML.prototype = {
 
 				if (rangeSelection) {
 					this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
-				} else {
+				} else if (!this.component.is(a)) {
 					this.selection.setRange(a, offset, a, offset);
 				}
 			} catch (error) {
@@ -323,14 +323,14 @@ HTML.prototype = {
 			tempAfterNode,
 			tempParentNode = null;
 		const freeFormat = this.format.isBrLine(line);
-		const isFormats = (!freeFormat && (this.format.isLine(oNode) || this.format.isBlock(oNode))) || this.component.is(oNode);
+		const isFormats = (!freeFormat && (this.format.isLine(oNode) || this.format.isBlock(oNode))) || this.component.isBasic(oNode);
 
 		if (insertListCell) {
 			tempAfterNode = afterNode || domUtils.isList(oNode) ? line.lastChild : line.nextElementSibling;
 			tempParentNode = domUtils.isList(oNode) ? line : (tempAfterNode || line).parentNode;
 		}
 
-		if (!afterNode && (isFormats || this.component.is(oNode) || domUtils.isMedia(oNode))) {
+		if (!afterNode && (isFormats || this.component.isBasic(oNode) || domUtils.isMedia(oNode))) {
 			const isEdge = domUtils.isEdgePoint(range.endContainer, range.endOffset, 'end');
 			const r = this.remove();
 			const container = r.container;
@@ -500,7 +500,7 @@ HTML.prototype = {
 					afterNode = null;
 				}
 
-				if (this.format.isLine(oNode) || this.format.isBlock(oNode) || (!domUtils.isListCell(parentNode) && this.component.is(oNode))) {
+				if (this.format.isLine(oNode) || this.format.isBlock(oNode) || (!domUtils.isListCell(parentNode) && this.component.isBasic(oNode))) {
 					const oldParent = parentNode;
 					if (domUtils.isList(afterNode)) {
 						parentNode = afterNode;
@@ -600,7 +600,7 @@ HTML.prototype = {
 				}
 			}
 
-			if ((this.format.isLine(oNode) || this.component.is(oNode)) && startCon === endCon) {
+			if ((this.format.isLine(oNode) || this.component.isBasic(oNode)) && startCon === endCon) {
 				const cItem = this.format.getLine(commonCon, null);
 				if (cItem?.nodeType === 1 && domUtils.isEmptyLine(cItem)) {
 					domUtils.removeItem(cItem);
@@ -611,7 +611,7 @@ HTML.prototype = {
 				oNode = this._setIntoFreeFormat(oNode);
 			}
 
-			if (!this.component.is(oNode)) {
+			if (!this.component.isBasic(oNode)) {
 				let offset = 1;
 				if (oNode.nodeType === 3) {
 					const previous = oNode.previousSibling;
@@ -700,7 +700,7 @@ HTML.prototype = {
 		let endOff = range.endOffset;
 		const commonCon = range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode ? startCon.parentNode : range.commonAncestorContainer;
 		if (commonCon === startCon && commonCon === endCon) {
-			if (this.component.is(commonCon) && domUtils.isFigure(commonCon.parentElement)) {
+			if (this.component.isBasic(commonCon)) {
 				const compInfo = this.component.get(commonCon);
 				const compContainer = compInfo.container;
 				const parent = compContainer.parentNode;

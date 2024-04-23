@@ -73,11 +73,11 @@ Selection.prototype = {
 		if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
 		if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
 		if (this.format.isLine(startCon)) {
-			startCon = startCon.childNodes[startOff] || startCon.childNodes[startOff - 1] || startCon;
+			startCon = startCon.childNodes[startOff > 0 ? startCon.childNodes.length - 1 : 0] || startCon;
 			startOff = startOff > 0 ? (startCon.nodeType === 1 && !domUtils.isBreak(startCon) ? 1 : startCon.textContent ? startCon.textContent.length : 0) : 0;
 		}
 		if (this.format.isLine(endCon)) {
-			endCon = endCon.childNodes[endOff] || endCon.childNodes[endOff - 1] || endCon;
+			endCon = endCon.childNodes[endOff > 0 ? endCon.childNodes.length - 1 : 0] || endCon;
 			endOff = endOff > 0 ? (endCon.nodeType === 1 && !domUtils.isBreak(endCon) ? 1 : endCon.textContent ? endCon.textContent.length : 0) : 0;
 		}
 

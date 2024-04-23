@@ -14,7 +14,7 @@ import { env } from '../helper';
  */
 const ApiManager = function (inst, params) {
 	this.editor = inst.editor;
-	this.kind = inst.constructor.key;
+	this.kind = inst.constructor.key || inst.constructor.name;
 
 	// members
 	this._xhr = env.getXMLHttpRequest();

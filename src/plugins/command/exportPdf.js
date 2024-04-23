@@ -46,9 +46,13 @@ ExportPdf.prototype = {
 		try {
 			const topArea = this.editor.frameContext.get('topArea');
 			const editableDiv = domUtils.createElement('div', { class: this.editor.frameContext.get('wysiwygFrame').className }, this.html.get());
-			const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
 			ww = domUtils.createElement('div', { style: `position: absolute; left: -10000px; width: ${topArea.clientWidth}px; height: auto;` }, editableDiv);
-			ww.innerHTML = inlineWW.outerHTML;
+
+			if (this.apiUrl) {
+				const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
+				ww.innerHTML = inlineWW.outerHTML;
+			}
+
 			_d.body.appendChild(ww);
 
 			// before event
@@ -91,12 +95,7 @@ ExportPdf.prototype = {
 				});
 
 				await Promise.all(resourcesLoaded);
-
-				if (this.apiUrl) {
-					await this._createByServer(ww);
-				} else {
-					await this._createByHtml2canvas(ww);
-				}
+				await this._createByHtml2canvas(ww);
 			};
 
 			// run observer
@@ -107,7 +106,7 @@ ExportPdf.prototype = {
 		} catch (error) {
 			console.error(`[SUNEDITOR.plugins.exportPdf.error] ${error.message}`);
 		} finally {
-			domUtils.removeItem(ww);
+			// domUtils.removeItem(ww);
 			this.editor.hideLoading();
 		}
 	},

@@ -21,6 +21,7 @@ const FileBrowser = function (inst, params) {
 	const content = domUtils.createElement('DIV', { class: 'se-file-browser-inner' }, CreateHTML(inst.editor));
 
 	// members
+	this.kind = inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
 	this.area = browserFrame;
 	this.header = content.querySelector('.se-file-browser-header');

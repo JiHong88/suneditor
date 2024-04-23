@@ -3274,16 +3274,6 @@ textarea.se-error:focus {
 	border-color: transparent transparent #1275ff transparent;
 }
 
-.sun-editor.sun-editor-carrier-wrapper .__se__focus__temp__ {
-	position: absolute !important;
-	top: -10000px !important;
-	display: block !important;
-	width: 0 !important;
-	height: 0 !important;
-	margin: 0 !important;
-	padding: 0 !important;
-}
-
 /** animation */
 @keyframes blinker {
 	50% {

@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, env, numbers } from '../../helper';
+import { domUtils, env, numbers, unicode } from '../../helper';
 import Figure from '../../modules/Figure';
 
 const { _w, ON_OVER_COMPONENT } = env;
@@ -49,22 +49,28 @@ Component.prototype = {
 		}
 
 		const r = this.html.remove();
+		const isInline = this.isInline(element);
 		this.selection.getRangeAndAddLine(this.selection.getRange(), r.container);
 		const selectionNode = this.selection.getNode();
 		let oNode = null;
 		let formatEl = this.format.getLine(selectionNode, null);
 
 		if (domUtils.isListCell(formatEl)) {
-			this.html.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, true);
-			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
+			this.html.insertNode(element, isInline ? null : selectionNode === formatEl ? null : r.container.nextSibling, true);
+			if (!isInline && !element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
 		} else {
 			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
 				const depthFormat = domUtils.getParentElement(r.container, this.format.isBlock.bind(this.format));
 				oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
-			this.html.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, true);
-			if (formatEl && domUtils.isZeroWith(formatEl)) domUtils.removeItem(formatEl);
+			this.html.insertNode(element, isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, true);
+			if (!isInline && formatEl && domUtils.isZeroWith(formatEl)) domUtils.removeItem(formatEl);
+		}
+
+		if (isInline) {
+			const empty = domUtils.createTextNode(unicode.zeroWidthSpace);
+			element.parentNode.insertBefore(empty, element.nextSibling);
 		}
 
 		this.history.push(false);
@@ -98,7 +104,7 @@ Component.prototype = {
 		let isFile = false;
 
 		if (this.is(element)) {
-			if (/se-component/.test(element.className) && !/se-inline-component/.test(element.className)) element = element.firstElementChild || element;
+			if (domUtils.hasClass(element, 'se-component') && !domUtils.hasClass(element, 'se-inline-component')) element = element.firstElementChild || element;
 			if (/^FIGURE$/i.test(element.nodeName)) element = element.firstElementChild;
 			if (!element) return null;
 
@@ -151,6 +157,9 @@ Component.prototype = {
 		if (!isInput && this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
 			this.editor._antiBlur = true;
 			this.__selectionSelected = true;
+			if (this.isInline(info.container)) {
+				this.selection.setRange(info.container, 0, info.container, 0);
+			}
 			this.editor.blur();
 			_w.setTimeout(() => {
 				this.__selectionSelected = false;
@@ -211,7 +220,7 @@ Component.prototype = {
 	is(element) {
 		if (!element) return false;
 
-		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) return true;
+		if (/^FIGURE$/i.test(element.nodeName) || domUtils.hasClass(element, 'se-component')) return true;
 		if (this.editor._componentManager.find((f) => f(element))) return true;
 
 		return false;
@@ -360,6 +369,8 @@ function CloseListener_mousedown({ target }) {
 }
 
 function OnCopy_component(e) {
+	if (domUtils.isInputElement(e.target) && domUtils.getParentElement(e.target, '.se-modal')) return;
+
 	const info = this.info;
 	if (!info) return;
 
@@ -465,9 +476,9 @@ function OnKeyDown_component(e) {
 		} else {
 			if (DIR_UP_KEYCODE.test(keyCode)) {
 				el = container.previousElementSibling;
-				offset = 0;
 			} else {
 				el = container.nextElementSibling;
+				offset = 0;
 			}
 		}
 
@@ -481,12 +492,9 @@ function OnKeyDown_component(e) {
 			e.preventDefault();
 			this.select(elComp.target, elComp.pluginName);
 		} else {
-			const focusEl = this.eventManager.applyTagEffect(el);
-			if (focusEl) {
-				e.stopPropagation();
-				e.preventDefault();
-				this.selection.setRange(focusEl, offset, focusEl, offset);
-			}
+			e.stopPropagation();
+			e.preventDefault();
+			this.selection.setRange(el, offset, el, offset);
 		}
 
 		return;
@@ -502,7 +510,10 @@ function OnKeyDown_component(e) {
 function SetClipboardComponent(e, container, clipboardData) {
 	e.preventDefault();
 	e.stopPropagation();
-	clipboardData.setData('text/html', container.outerHTML);
+	const pasteContainer = container.cloneNode(true);
+	domUtils.removeClass(pasteContainer, 'se-component-selected');
+	pasteContainer.querySelectorAll('.se-figure-selected').forEach((el) => domUtils.removeClass(el, 'se-figure-selected'));
+	clipboardData.setData('text/html', pasteContainer.outerHTML);
 }
 
 export default Component;

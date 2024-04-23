@@ -18,7 +18,7 @@ const Controller = function (inst, element, params, _name) {
 	EditorInjector.call(this, inst.editor);
 
 	// members
-	this.kind = _name || inst.constructor.key;
+	this.kind = _name || inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
 	this.form = element;
 	this.isOpen = false;

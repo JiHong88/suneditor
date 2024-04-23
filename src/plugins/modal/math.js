@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller } from '../../modules';
-import { domUtils, env, converter, unicode } from '../../helper';
+import { domUtils, env, converter } from '../../helper';
 
 const Math_ = function (editor, pluginOptions) {
 	// exception
@@ -44,7 +44,7 @@ Math_.key = 'math';
 Math_.type = 'modal';
 Math_.className = '';
 Math_.component = function (node) {
-	return domUtils.hasClass(node, 'katex') ? node : null;
+	return domUtils.hasClass(node, 'katex') && domUtils.hasClass(node, 'se-component') ? node : null;
 };
 Math_.prototype = {
 	/**
@@ -94,6 +94,8 @@ Math_.prototype = {
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
 				element.setAttribute('contenteditable', false);
+				domUtils.addClass(element, 'se-component');
+				domUtils.addClass(element, 'se-inline-component');
 			}
 		};
 	},
@@ -135,7 +137,7 @@ Math_.prototype = {
 		const katexEl = this.previewElement.querySelector('.katex');
 
 		if (!katexEl) return false;
-		katexEl.className = '__se__katex ' + katexEl.className;
+		katexEl.className = 'se-component se-inline-component __se__katex ' + katexEl.className;
 		katexEl.setAttribute('contenteditable', false);
 		katexEl.setAttribute('data-se-value', converter.htmlToEntity(this._escapeBackslashes(mathExp, false)));
 		katexEl.setAttribute('data-se-type', this.fontSizeElement.value);
@@ -146,18 +148,15 @@ Math_.prototype = {
 
 			if (selectedFormats.length > 1) {
 				const oFormat = domUtils.createElement(selectedFormats[0].nodeName, null, katexEl);
-				if (!this.html.insertNode(oFormat, null, false)) return false;
+				this.component.insert(oFormat, false, false);
 			} else {
-				if (!this.html.insertNode(katexEl, null, false)) return false;
+				this.component.insert(katexEl, false, false);
 			}
-
-			const empty = domUtils.createTextNode(unicode.zeroWidthSpace);
-			katexEl.parentNode.insertBefore(empty, katexEl.nextSibling);
-			this.selection.setRange(katexEl, 0, katexEl, 1);
 		} else {
 			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.katex');
 			containerEl.parentNode.replaceChild(katexEl, containerEl);
-			this.selection.setRange(katexEl, 0, katexEl, 1);
+			const compInfo = this.component.get(katexEl);
+			this.component.select(compInfo.target, compInfo.pluginName, false);
 		}
 
 		return true;
@@ -167,7 +166,6 @@ Math_.prototype = {
 	 * @override modal
 	 */
 	init() {
-		this.controller.close();
 		this.textArea.value = '';
 		this.previewElement.innerHTML = '';
 	},

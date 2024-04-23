@@ -528,7 +528,9 @@ window.editor_root = suneditor.create(
 			items: [{ name: 'red', value: '#ff0000' }, '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000']
 		},
 		fileUpload: {
-			uploadUrl: 'http://localhost:3000/editor/files/upload'
+			uploadUrl: 'http://localhost:3000/editor/files/upload',
+			// as: 'link',
+			allowMultiple: true
 		},
 		exportPdf: {
 			apiUrl: 'http://localhost:3000/editor/download-pdf'

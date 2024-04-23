@@ -6,11 +6,12 @@ const { ON_OVER_COMPONENT } = env;
 
 const Figure = function (inst, controls, params) {
 	EditorInjector.call(this, inst.editor);
+	this.kind = inst.constructor.key || inst.constructor.name;
 
 	// modules
 	this._action = {};
 	const controllerEl = CreateHTML_controller(this, controls || []);
-	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, inst.constructor.key);
+	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, this.kind);
 	// align selectmenu
 	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
 	const alignMenus = CreateAlign(this, this.alignButton);
@@ -29,7 +30,6 @@ const Figure = function (inst, controls, params) {
 	}
 
 	// members
-	this.kind = inst.constructor.key;
 	this.inst = inst;
 	this.sizeUnit = params.sizeUnit || 'px';
 	this.autoRatio = params.autoRatio;
@@ -202,7 +202,7 @@ Figure.CalcRatio = function (w, h, defaultSizeUnit, ratio) {
  * @private
  */
 Figure.__is = function (element) {
-	return /se-component/.test(element?.className) || /^(HR)$/.test(element?.nodeName);
+	return domUtils.hasClass(element, 'se-component') || /^(HR)$/.test(element?.nodeName);
 };
 
 Figure.prototype = {

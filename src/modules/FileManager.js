@@ -13,8 +13,9 @@ const FileManager = function (inst, params) {
 
 	// members
 	inst.__fileManagement = this;
-	this.kind = inst.constructor.key;
+	this.kind = inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
+	this.component = inst.editor.component;
 	this.tagNames = params.tagNames;
 	this.tagAttrs = params.tagAttrs || [];
 	this._tagAttrStr = this.tagAttrs.length > 0 ? `[${this.tagAttrs.join('][')}]` : '';
@@ -161,7 +162,7 @@ FileManager.prototype = {
 		}.bind(this, element);
 
 		// figure
-		if (this.figure) {
+		if (this.figure && this.component.isBasic(element)) {
 			if (!element.getAttribute('data-se-size')) {
 				const size = this.figure.getSize(element);
 				const w = element.naturalWidth || size.w;
