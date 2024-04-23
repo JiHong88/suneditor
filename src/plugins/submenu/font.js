@@ -88,7 +88,7 @@ export default {
 
         if (currentFont !== fontContext.currentFont) {
             for (let i = 0, len = fontList.length; i < len; i++) {
-                if (currentFont === fontList[i].getAttribute('data-value')) {
+                if (currentFont === (fontList[i].getAttribute('data-value') || '').replace(/'|"/g, '')) {
                     this.util.addClass(fontList[i], 'active');
                 } else {
                     this.util.removeClass(fontList[i], 'active');
@@ -105,10 +105,13 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        const value = e.target.getAttribute('data-value');
+        let value = e.target.getAttribute('data-value');
 
         if (value) {
             const newNode = this.util.createElement('SPAN');
+            if (/[\s\d\W]/.test(value) && !/^['"].*['"]$/.test(value)) {
+                value = '"' + value + '"';
+            }
             newNode.style.fontFamily = value;
             this.nodeChange(newNode, ['font-family'], null, null);
         } else {

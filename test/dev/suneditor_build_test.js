@@ -1027,6 +1027,7 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
             html: '<p>Template 1</p>'
         }
     ],
+    // font: ['\'Exo 2\'', 'Sans-serif', 'Exo 2'],
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     // addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
     lineAttrReset: 'class',
