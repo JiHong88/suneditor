@@ -119,6 +119,10 @@ ColorPicker.prototype = {
 		}
 	},
 
+	hueSliderClose() {
+		this.hueSlider.off();
+	},
+
 	/**
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|String} nodeOrColor Current Selected node

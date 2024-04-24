@@ -117,7 +117,7 @@ HueSlider.prototype = {
 		this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
 	},
 
-	close() {
+	off() {
 		this.ctx = {
 			gradientPointerX: gradientPointer.style.left,
 			wheelPointerX: wheelPointer.style.left,
@@ -130,7 +130,10 @@ HueSlider.prototype = {
 
 		this.controller.close();
 		this.init();
+	},
 
+	close() {
+		this.off();
 		this.inst.hueSliderCancelAction();
 	},
 

@@ -36,6 +36,13 @@ FontColor.prototype = {
 	},
 
 	/**
+	 * @Override dropdown
+	 */
+	onDropdownClose() {
+		this.colorPicker.hueSliderClose();
+	},
+
+	/**
 	 *  @override ColorPicker
 	 */
 	colorPickerAction(value) {

@@ -36,6 +36,13 @@ BackgroundColor.prototype = {
 	},
 
 	/**
+	 * @Override dropdown
+	 */
+	off() {
+		this.colorPicker.hueSliderClose();
+	},
+
+	/**
 	 *  @override ColorPicker
 	 */
 	colorPickerAction(value) {
