@@ -36,6 +36,7 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 		this.uploadUrl = typeof params.uploadUrl === 'string' ? params.uploadUrl : null;
 		this.uploadHeaders = params.uploadHeaders || null;
 		this.uploadSizeLimit = /\d+/.test(params.uploadSizeLimit) ? numbers.get(params.uploadSizeLimit, 0) : null;
+		this.uploadSingleSizeLimit = /\d+/.test(params.uploadSingleSizeLimit) ? numbers.get(params.uploadSingleSizeLimit, 0) : null;
 		this.input = domUtils.createElement('input', { type: 'file', accept: params.acceptedFormats || '*' });
 		this.eventManager.addEvent(this.input, 'change', OnChangeFile.bind(this));
 		// file manager

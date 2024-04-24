@@ -24,6 +24,7 @@ const Link = function (editor, pluginOptions) {
 		uploadUrl,
 		uploadHeaders: pluginOptions.uploadHeaders || null,
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
 		acceptedFormats: typeof pluginOptions.acceptedFormats === 'string' ? pluginOptions.acceptedFormats.trim() : null,
 		enableFileUpload: !!uploadUrl
 	};

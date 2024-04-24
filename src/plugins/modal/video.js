@@ -21,6 +21,7 @@ const Video = function (editor, pluginOptions) {
 		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 		uploadHeaders: pluginOptions.uploadHeaders || null,
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
 		allowMultiple: !!pluginOptions.allowMultiple,
 		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'video/*' : pluginOptions.acceptedFormats.trim() || 'video/*',
 		defaultRatio: numbers.get(pluginOptions.defaultRatio, 4) || 0.5625,
@@ -435,17 +436,33 @@ Video.prototype = {
 
 		let fileSize = 0;
 		const files = [];
-		for (let i = 0, len = fileList.length; i < len; i++) {
+		const slngleSizeLimit = this.uploadSingleSizeLimit;
+		for (let i = 0, len = fileList.length, s; i < len; i++) {
 			if (/video/i.test(fileList[i].type)) {
+				s = fileList[i].size;
+				if (slngleSizeLimit && slngleSizeLimit > s) {
+					const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
+					const message = await this.triggerEvent('onVideoUploadError', {
+						error: err,
+						limitSize: slngleSizeLimit,
+						uploadSize: s,
+						isSingle: true
+					});
+
+					this.notice.open(message === NO_EVENT ? err : message || err);
+
+					return false;
+				}
+
 				files.push(fileList[i]);
-				fileSize += fileList[i].size;
+				fileSize += s;
 			}
 		}
 
 		const limitSize = this.pluginOptions.uploadSizeLimit;
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
-			const err = '[SUNEDITOR.video.submitFile.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
+			const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
 			const message = await this.triggerEvent('onVideoUploadError', { error: err, limitSize, currentSize, uploadSize: fileSize });
 
 			this.notice.open(message === NO_EVENT ? err : message || err);

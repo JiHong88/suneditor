@@ -17,6 +17,7 @@ const FileUpload = function (editor, pluginOptions) {
 	this.uploadUrl = pluginOptions.uploadUrl;
 	this.uploadHeaders = pluginOptions.uploadHeaders;
 	this.uploadSizeLimit = /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null;
+	this.uploadSingleSizeLimit = /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null;
 	this.allowMultiple = !!pluginOptions.allowMultiple;
 	this.acceptedFormats = typeof pluginOptions.acceptedFormats !== 'string' ? '*' : pluginOptions.acceptedFormats.trim() || '*';
 	this.as = pluginOptions.as || 'box';
@@ -266,9 +267,25 @@ async function OnChangeFile(e) {
 
 	let fileSize = 0;
 	const files = [];
-	for (let i = 0, len = fileList.length; i < len; i++) {
+	const slngleSizeLimit = this.uploadSingleSizeLimit;
+	for (let i = 0, len = fileList.length, s; i < len; i++) {
+		s = fileList[i].size;
+		if (slngleSizeLimit && slngleSizeLimit > s) {
+			const err = '[SUNEDITOR.fileUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
+			const message = await this.triggerEvent('onFileUploadError', {
+				error: err,
+				limitSize: slngleSizeLimit,
+				uploadSize: s,
+				isSingle: true
+			});
+
+			this.notice.open(message === NO_EVENT ? err : message || err);
+
+			return false;
+		}
+
 		files.push(fileList[i]);
-		fileSize += fileList[i].size;
+		fileSize += s;
 	}
 
 	const limitSize = this.uploadSizeLimit;
