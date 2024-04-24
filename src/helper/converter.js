@@ -51,6 +51,26 @@ export function entityToHTML(content) {
 }
 
 /**
+ * @description Debounce function
+ * @param {Function} func function
+ * @param {number} wait delay ms
+ * @returns
+ */
+export function debounce(func, wait) {
+	let timeout;
+
+	return function executedFunction(...args) {
+		const later = () => {
+			_w.clearTimeout(timeout);
+			func(...args);
+		};
+
+		_w.clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+	};
+}
+
+/**
  *
  * @param {"em"|"rem"|"%"|"pt"|"px"} to Size units to be converted
  * @param {string} size siSize to convert with units (ex: "15rem")
@@ -275,6 +295,7 @@ export function _setAutoHeightStyle(frameHeight) {
 const converter = {
 	htmlToEntity,
 	entityToHTML,
+	debounce,
 	fontSize,
 	nodeListToArray,
 	swapKeyValue,

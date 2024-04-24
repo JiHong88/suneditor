@@ -1,8 +1,8 @@
 import EditorInjector from '../../editorInjector';
 import { ApiManager, SelectMenu, Controller } from '../../modules';
-import { domUtils, env } from '../../helper';
+import { domUtils, converter } from '../../helper';
 
-const { _w } = env;
+const { debounce } = converter;
 
 const Mention = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
@@ -42,7 +42,7 @@ const Mention = function (editor, pluginOptions) {
 	this.selectMenu.on(controllerEl.firstElementChild, SelectMention.bind(this));
 
 	// onInput debounce
-	this.onInput = Debounce(this.onInput.bind(this), this.delayTime);
+	this.onInput = debounce(this.onInput.bind(this), this.delayTime);
 };
 
 Mention.key = 'mention';
@@ -154,20 +154,6 @@ function SelectMention(item) {
 	const space = domUtils.createTextNode('\u00A0');
 	oA.parentNode.insertBefore(space, oA.nextSibling);
 	this.selection.setRange(space, 1, space, 1);
-}
-
-function Debounce(func, wait) {
-	let timeout;
-
-	return function executedFunction() {
-		const later = () => {
-			_w.clearTimeout(timeout);
-			func();
-		};
-
-		_w.clearTimeout(timeout);
-		timeout = _w.setTimeout(later, wait);
-	};
 }
 
 function CreateHTML_controller() {

@@ -136,26 +136,6 @@ export function getIncludePath(nameArray, extension) {
 	return path;
 }
 
-/**
- * @description Debounce function
- * @param {Function} func function
- * @param {number} wait delay ms
- * @returns
- */
-export function debounce(func, wait) {
-	let timeout;
-
-	return function executedFunction(...args) {
-		const later = () => {
-			_w.clearTimeout(timeout);
-			func(...args);
-		};
-
-		_w.clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
-	};
-}
-
 /** --- Check browser --- */
 /**
  * @description Check if support ResizeObserver function
@@ -258,7 +238,6 @@ const env = {
 	getPageStyle,
 	getIncludePath,
 	isResizeObserverSupported,
-	debounce,
 	isEdge,
 	isBlink,
 	isGecko,

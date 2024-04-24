@@ -641,7 +641,7 @@ EventManager.prototype = {
 		if (env.isMobile) {
 			this.addEvent(_w.visualViewport, 'resize', OnResize_viewport.bind(this), false);
 			this.addEvent(_w.visualViewport, 'scroll', OnScroll_viewport.bind(this), false);
-			this.addEvent(_w.visualViewport, 'scroll', env.debounce(OnScroll_viewport_onKeyboardOn.bind(this), 200), false);
+			this.addEvent(_w.visualViewport, 'scroll', converter.debounce(OnScroll_viewport_onKeyboardOn.bind(this), 200), false);
 		}
 
 		/** document event */
