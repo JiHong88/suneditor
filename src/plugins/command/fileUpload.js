@@ -51,8 +51,7 @@ const FileUpload = function (editor, pluginOptions) {
 
 					target.removeAttribute('data-se-non-focus');
 					target.setAttribute('contenteditable', false);
-					domUtils.addClass(target, 'se-component');
-					domUtils.addClass(target, 'se-inline-component');
+					domUtils.addClass(target, 'se-component|se-inline-component');
 
 					const line = domUtils.createElement(this.options.get('defaultLine'), null, target);
 					parent.insertBefore(line, next);
@@ -68,9 +67,7 @@ const FileUpload = function (editor, pluginOptions) {
 
 					target.setAttribute('data-se-non-focus', 'true');
 					target.removeAttribute('contenteditable');
-					domUtils.removeClass(target, 'se-component');
-					domUtils.removeClass(target, 'se-component-selected');
-					domUtils.removeClass(target, 'se-inline-component');
+					domUtils.removeClass(target, 'se-component|se-component-selected|se-inline-component');
 
 					const figure = Figure.CreateContainer(target, 'se-file-figure se-flex-component');
 					(s || r.container).parentElement.insertBefore(figure.container, s);

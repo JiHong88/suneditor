@@ -747,6 +747,10 @@ HTML.prototype = {
 						rOffset = rOffset === 0 ? 0 : 1;
 					}
 
+					if (domUtils.isZeroWith(line)) {
+						domUtils.removeItem(line);
+					}
+
 					return {
 						container: rEl,
 						offset: rOffset

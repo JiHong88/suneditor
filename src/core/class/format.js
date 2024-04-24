@@ -1355,7 +1355,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isLine(element) {
-		return element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this._nonFormat(element);
+		return element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1367,7 +1367,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isBrLine(element) {
-		return element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this._nonFormat(element);
+		return element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1377,7 +1377,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isBlock(element) {
-		return element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_.+(\\s|$)')) && !this._nonFormat(element);
+		return element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__block_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1390,7 +1390,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isClosureBlock(element) {
-		return element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_closure_.+(\\s|$)')) && !this._nonFormat(element);
+		return element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__block_closure_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1403,7 +1403,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isClosureBrLine(element) {
-		return element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line__closure_.+(\\s|$)')) && !this._nonFormat(element);
+		return element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__br_line__closure_.+')) && !this._nonFormat(element);
 	},
 
 	/**

@@ -196,8 +196,7 @@ Menu.prototype = {
 		if (this._bindClose_dropdown_key) {
 			this._bindClose_dropdown_key = this.eventManager.removeGlobalEvent(this._bindClose_dropdown_key);
 			domUtils.removeClass(this.menus, 'on');
-			domUtils.removeClass(this.currentDropdown, 'se-select-menu-key-action');
-			domUtils.removeClass(this.currentDropdown, 'se-select-menu-mouse-move');
+			domUtils.removeClass(this.currentDropdown, 'se-select-menu-key-action|se-select-menu-mouse-move');
 			this.currentDropdown.removeEventListener('mousemove', this.__globalEventHandler.mousemove, false);
 			this.currentDropdown.removeEventListener('mouseout', this.__globalEventHandler.mouseout, false);
 		}

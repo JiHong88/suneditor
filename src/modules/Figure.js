@@ -786,8 +786,7 @@ Figure.prototype = {
 	_removeDragEvent() {
 		this.carrierWrapper.querySelector('.se-drag-cursor').style.left = '-10000px';
 		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
-		domUtils.removeClass(Figure.__dragHandler, 'se-dragging');
-		domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
+		domUtils.removeClass([Figure.__dragHandler, Figure.__dragContainer], 'se-dragging');
 		domUtils.removeClass(Figure.__dragCover, 'se-drag-over');
 		Figure.__dragHandler = Figure.__dragContainer = Figure.__dragCover = Figure.__dragMove = null;
 		this.eventManager.__overInfo = null;
@@ -831,8 +830,7 @@ function OnDragStart(e) {
 
 function OnDragEnd() {
 	this.editor._antiBlur = false;
-	domUtils.removeClass(Figure.__dragHandler, 'se-dragging');
-	domUtils.removeClass(Figure.__dragContainer, 'se-dragging');
+	domUtils.removeClass([Figure.__dragHandler, Figure.__dragContainer], 'se-dragging');
 	this._removeDragEvent();
 }
 

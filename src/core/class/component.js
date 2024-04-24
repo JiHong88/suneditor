@@ -173,7 +173,6 @@ Component.prototype = {
 
 		if (!isNonFigureComponent && !domUtils.hasClass(info.container, 'se-inline-component')) this._setComponentLineBreaker(info.container || info.cover || element);
 
-		if (!this.info.isFile) this.__addNotFileGlobalEvent();
 		this.currentTarget = element;
 		this.currentPlugin = plugin;
 		this.currentPluginName = pluginName;
@@ -183,6 +182,7 @@ Component.prototype = {
 		_w.setTimeout(() => {
 			this.eventManager.__overInfo = __overInfo === ON_OVER_COMPONENT ? undefined : false;
 			if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
+			if (!info.isFile) this.__addNotFileGlobalEvent();
 		}, 0);
 		domUtils.addClass(info.container, 'se-component-selected');
 	},

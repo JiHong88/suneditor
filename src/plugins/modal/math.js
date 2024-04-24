@@ -44,7 +44,7 @@ Math_.key = 'math';
 Math_.type = 'modal';
 Math_.className = '';
 Math_.component = function (node) {
-	return domUtils.hasClass(node, 'katex') && domUtils.hasClass(node, 'se-component') ? node : null;
+	return domUtils.hasClass(node, 'katex|se-component') ? node : null;
 };
 Math_.prototype = {
 	/**
@@ -94,8 +94,7 @@ Math_.prototype = {
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
 				element.setAttribute('contenteditable', false);
-				domUtils.addClass(element, 'se-component');
-				domUtils.addClass(element, 'se-inline-component');
+				domUtils.addClass(element, 'se-component|se-inline-component');
 			}
 		};
 	},

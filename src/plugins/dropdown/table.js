@@ -1553,8 +1553,7 @@ Table.prototype = {
 	},
 
 	_deleteStyleSelectedCells() {
-		domUtils.removeClass(this._fixedCell, 'se-selected-cell-focus');
-		domUtils.removeClass(this._selectedCell, 'se-selected-cell-focus');
+		domUtils.removeClass([this._fixedCell, this._selectedCell], 'se-selected-cell-focus');
 		if (this._selectedTable) {
 			const selectedCells = this._selectedTable.querySelectorAll('.se-selected-table-cell');
 			for (let i = 0, len = selectedCells.length; i < len; i++) {

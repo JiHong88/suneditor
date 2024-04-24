@@ -739,10 +739,13 @@ export function addClass(element, className) {
 	if (!element) return;
 
 	const elements = element instanceof HTMLCollection || element instanceof NodeList || element instanceof Array ? element : [element];
-	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
+	const classNames = className.split('|');
+
 	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;
-		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
+		for (const c of classNames) {
+			e.classList.add(c);
+		}
 	}
 }
 
@@ -755,11 +758,13 @@ export function removeClass(element, className) {
 	if (!element) return;
 
 	const elements = element instanceof HTMLCollection || element instanceof NodeList || element instanceof Array ? element : [element];
-	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
+	const classNames = className.split('|');
+
 	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;
-		e.className = e.className.replace(check, ' ').trim();
-		if (!e.className.trim()) e.removeAttribute('class');
+		for (const c of classNames) {
+			e.classList.remove(c);
+		}
 	}
 }
 
