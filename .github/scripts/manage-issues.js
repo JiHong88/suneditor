@@ -1,8 +1,7 @@
-require("dotenv").config();
 const { Octokit } = require("@octokit/rest");
 
 const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN,
+  auth: process.env.GITHUB_TOKEN, // 직접 환경 변수 사용
 });
 
 async function closeOldIssues() {
