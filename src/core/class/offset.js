@@ -2,7 +2,7 @@
  * @fileoverview Offset class
  */
 
-import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getViewportSize } from '../../helper/domUtils';
+import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getClientSize } from '../../helper/domUtils';
 import { domUtils, numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
@@ -206,7 +206,7 @@ Offset.prototype = {
 		oh = heightEditorRefer ? topArea.clientHeight : oh;
 		ow = widthEditorRefer ? topArea.clientWidth : ow;
 
-		const viewportSize = getViewportSize(this.editor.frameContext.get('_wd'));
+		const clientSize = getClientSize(this.editor.frameContext.get('_wd'));
 		return {
 			top: t,
 			ts: ts,
@@ -218,8 +218,8 @@ Offset.prototype = {
 			y: y,
 			ohOffsetEl: targetAbs ? window : ohOffsetEl,
 			owOffsetEl: targetAbs ? window : owOffsetEl,
-			oh: targetAbs ? viewportSize.h : oh,
-			ow: targetAbs ? viewportSize.w : ow,
+			oh: targetAbs ? clientSize.h : oh,
+			ow: targetAbs ? clientSize.w : ow,
 			heightEditorRefer: heightEditorRefer,
 			widthEditorRefer: widthEditorRefer
 		};
@@ -293,7 +293,7 @@ Offset.prototype = {
 			offsetEl = offsetEl.offsetParent;
 		}
 
-		const menuHeight_bottom = getViewportSize(this.editor.frameContext.get('_wd')).h - (containerTop - scrollTop + bt + target.offsetHeight);
+		const menuHeight_bottom = getClientSize(this.editor.frameContext.get('_wd')).h - (containerTop - scrollTop + bt + target.offsetHeight);
 		if (menuHeight_bottom < elHeight) {
 			let menuTop = -1 * (elHeight - bt + 3);
 			const insTop = containerTop - scrollTop + menuTop;
@@ -332,7 +332,7 @@ Offset.prototype = {
 
 		const isWWTarget = this.editor.frameContext.get('wrapper').contains(target) || params.isWWTarget;
 		const isCtrlTarget = domUtils.getParentElement(target, '.se-controller');
-		const viewportSize = getViewportSize(_d);
+		const clientSize = getClientSize(_d);
 		const wwScroll = isWWTarget && !isCtrlTarget ? this.getWWScroll() : this._getWindowScroll();
 		const targetRect = isCtrlTarget ? target.getBoundingClientRect() : this.editor.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
@@ -345,7 +345,7 @@ Offset.prototype = {
 		const targetH = target.offsetHeight;
 		// margin
 		const tmtw = targetRect.top;
-		const tmbw = viewportSize.h - targetRect.bottom;
+		const tmbw = clientSize.h - targetRect.bottom;
 		const toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar.main').offsetHeight;
 		let rmt, rmb;
 		if (this.editor.frameContext.get('isFullScreen')) {
@@ -353,7 +353,7 @@ Offset.prototype = {
 			rmb = tmbw;
 		} else {
 			const tMargin = targetRect.top;
-			const bMargin = viewportSize.h - targetRect.bottom;
+			const bMargin = clientSize.h - targetRect.bottom;
 
 			if (isIframe) {
 				const editorOffset = this.getGlobal();
@@ -415,14 +415,14 @@ Offset.prototype = {
 		const aw = arrow ? arrow.offsetWidth : 0;
 		// margin
 		const tmlw = targetRect.left;
-		const tmrw = viewportSize.w - targetRect.right;
+		const tmrw = clientSize.w - targetRect.right;
 		let rml, rmr;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rml = tmlw;
 			rmr = tmrw;
 		} else {
 			rml = targetRect.left;
-			rmr = viewportSize.w - targetRect.right;
+			rmr = clientSize.w - targetRect.right;
 		}
 
 		if (isWWTarget && (rml + targetW <= 0 || rmr + targetW <= 0)) return;
@@ -492,7 +492,7 @@ Offset.prototype = {
 	},
 
 	_getWindowScroll() {
-		const viewPort = domUtils.getViewportSize();
+		const viewPort = domUtils.getClientSize();
 		return {
 			top: _w.scrollY,
 			left: _w.scrollX,

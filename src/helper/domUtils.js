@@ -984,14 +984,34 @@ export function getScrollParent(element) {
 }
 
 /**
- * @description Gets the size of the window viewport excluding the width of the scrollbar.
+ * @description Gets the size of the documentElement client size.
  * @param {Document} doc Document object
  * @returns {{w, h}}
  */
-export function getViewportSize(doc = _d) {
+export function getClientSize(doc = _d) {
 	return {
 		w: doc.documentElement.clientWidth,
 		h: doc.documentElement.clientHeight
+	};
+}
+
+/**
+ * @description Gets the size of the window visualViewport size
+ * @returns {{top: number, left: number, scale: number}}
+ */
+export function getViewportSize() {
+	if ('visualViewport' in _w) {
+		return {
+			top: _w.visualViewport.pageTop,
+			left: _w.visualViewport.pageLeft,
+			scale: _w.visualViewport.scale
+		};
+	}
+
+	return {
+		top: 0,
+		left: 0,
+		scale: 1
 	};
 }
 
@@ -1143,6 +1163,7 @@ const domUtils = {
 	isImportantDisabled,
 	isExcludeFormat,
 	getScrollParent,
+	getClientSize,
 	getViewportSize,
 	getPreviousDeepestNode,
 	getNextDeepestNode,

@@ -184,7 +184,7 @@ function CallBackGet(xmlHttp) {
 		throw Error(`[SUNEDITOR.fileBrowser.drawList.fail] cause: "${e.message}"`);
 	} finally {
 		this.closeBrowserLoading();
-		this.body.style.maxHeight = domUtils.getViewportSize().h - this.header.offsetHeight - 50 + 'px';
+		this.body.style.maxHeight = domUtils.getClientSize().h - this.header.offsetHeight - 50 + 'px';
 	}
 }
 

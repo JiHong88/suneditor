@@ -195,7 +195,7 @@ SelectMenu.prototype = {
 		const targetOffsetTop = target.offsetTop;
 		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;
-		const wbottom = domUtils.getViewportSize().h - (targetGlobalTop - this._w.scrollY + targetHeight);
+		const wbottom = domUtils.getClientSize().h - (targetGlobalTop - this._w.scrollY + targetHeight);
 		const sideAddH = side ? targetHeight : 0;
 		let overH = 10000;
 		switch (position) {

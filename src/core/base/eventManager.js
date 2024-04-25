@@ -836,7 +836,7 @@ EventManager.prototype = {
 		const fc = this.editor.frameContext;
 		const fileBrowser = fc.get('fileBrowser');
 		if (fileBrowser && fileBrowser.area.style.display === 'block') {
-			fileBrowser.body.style.maxHeight = domUtils.getViewportSize().h - fileBrowser.header.offsetHeight - 50 + 'px';
+			fileBrowser.body.style.maxHeight = domUtils.getClientSize().h - fileBrowser.header.offsetHeight - 50 + 'px';
 		}
 
 		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {

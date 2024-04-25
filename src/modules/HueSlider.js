@@ -176,7 +176,7 @@ HueSlider.prototype = {
 			moveEvent.func = OnTouchmove;
 		}
 
-		this.__globalMouseDown = this.eventManager.addGlobalEvent(downEvent.name, downEvent.func, true);
+		this.__globalMouseDown = this.eventManager.addGlobalEvent(downEvent.name, downEvent.func, { passive: false, useCapture: true });
 		this.__globalMouseMove = this.eventManager.addGlobalEvent(moveEvent.name, moveEvent.func, true);
 		this.__globalMouseUp = this.eventManager.addGlobalEvent(upEvent.name, upEvent.func, true);
 		this.isOpen = true;
@@ -200,14 +200,16 @@ const { slider, offscreenCanvas, offscreenCtx, wheel, wheelCtx, wheelPointer, gr
 // mobile
 function OnTouchstart(event) {
 	const { target, touches } = event;
-	const clientX = touches[0].pageX;
-	const clientY = touches[0].pageY;
+	const clientX = touches[0].clientX;
+	const clientY = touches[0].clientY;
 
 	if (target === wheel) {
+		event.preventDefault();
 		isBarDragging = false;
 		isWheelragging = true;
 		updatePointer_wheel(clientX, clientY);
 	} else if (target === gradientBar) {
+		event.preventDefault();
 		isBarDragging = true;
 		isWheelragging = false;
 		updatePointer_bar(clientX);
@@ -218,8 +220,8 @@ function OnTouchmove(event) {
 	event.preventDefault();
 
 	const { touches } = event;
-	const clientX = touches[0].pageX;
-	const clientY = touches[0].pageY;
+	const clientX = touches[0].clientX;
+	const clientY = touches[0].clientY;
 
 	if (isWheelragging) {
 		updatePointer_wheel(clientX, clientY);
