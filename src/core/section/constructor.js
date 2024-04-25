@@ -10,12 +10,8 @@ const REQUIRED_FORMAT_LINE = 'div';
 const REQUIRED_ELEMENT_WHITELIST = 'br|div';
 const DEFAULT_ELEMENT_WHITELIST =
 	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
+const DEFAULT_TEXT_STYLE_TAGS = 'strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|download|rel|src|alt|class|type|controls|colspan|rowspan';
-const DEFAULT_TABLE_STYLES = {
-	'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style'
-};
-const DEFAULT_TEXT_STYLES = 'font-family|font-size|color|background-color';
-const DEFAULT_LINE_STYLES = 'text-align|margin-left|margin-right';
 
 const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';
 const DEFAULT_FORMAT_BR_LINE = 'PRE';
@@ -28,6 +24,11 @@ const DEFAULT_SIZE_UNITS = ['px', 'pt', 'em', 'rem'];
 const DEFAULT_CLASS_NAME = '^__se__|^se-|^katex';
 const DEFAULT_EXTRA_TAG_MAP = { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false };
 
+const DEFAULT_TABLE_STYLES = {
+	'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style'
+};
+const DEFAULT_TEXT_STYLES = 'font-family|font-size|color|background-color';
+const DEFAULT_LINE_STYLES = 'text-align|margin-left|margin-right|line-height';
 const DEFAULT_CONTENT_STYLES =
 	'background|background-clip|background-color|' +
 	'border|border-bottom|border-collapse|border-color|border-image|border-left-width|border-radius|border-right-width|border-spacing|border-style|border-top|border-width|' +
@@ -48,9 +49,11 @@ const DEFAULT_CONTENT_STYLES =
 
 export const RO_UNAVAILABD = [
 	'mode',
+	'externalLibs',
 	'keepStyleOnDelete',
 	'iframe',
-	'textTags',
+	'convertTextTags',
+	'textStyleTags',
 	'fontSizeUnits',
 	'spanStyles',
 	'lineStyles',
@@ -369,7 +372,9 @@ export function InitOptions(options, editorTargets) {
 	o.set('_disallowedExtraTag', disallowedKeys);
 
 	o.set('events', options.events || {});
+
 	// text style tags
+	o.set('textStyleTags', (typeof options.__textStyleTags === 'string' ? options.__textStyleTags : DEFAULT_TEXT_STYLE_TAGS) + (options.textStyleTags ? '|' + options.textStyleTags : ''));
 	const textTags = _mergeObject(
 		{
 			bold: 'strong',
@@ -379,9 +384,9 @@ export function InitOptions(options, editorTargets) {
 			subscript: 'sub',
 			superscript: 'sup'
 		},
-		options.textTags || {}
+		options.convertTextTags || {}
 	);
-	o.set('textTags', textTags);
+	o.set('convertTextTags', textTags);
 	o.set('_textStyleTags', Object.values(textTags).concat(['span', 'li']));
 	o.set('tagStyles', { ...DEFAULT_TABLE_STYLES, ...(options.tagStyles || {}) });
 	o.set('_textStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULT_TEXT_STYLES}${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));

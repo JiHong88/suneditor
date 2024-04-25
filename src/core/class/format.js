@@ -16,6 +16,7 @@ const Format = function (editor) {
 	this._formatBlockCheck = this.options.get('formatBlock').reg;
 	this._formatClosureBlockCheck = this.options.get('formatClosureBlock').reg;
 	this._formatClosureBrLineCheck = this.options.get('formatClosureBrLine').reg;
+	this._textStyleTagsCheck = new RegExp('^(' + this.options.get('textStyleTags') + ')$', 'i');
 };
 
 Format.prototype = {
@@ -1340,22 +1341,23 @@ Format.prototype = {
 
 	/**
 	 * @description It is judged whether it is a node related to the text style.
-	 * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)
 	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
 	isTextStyleNode(element) {
-		return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)$/i.test(element.nodeName || element);
+		return typeof element === 'string' ? this._textStyleTagsCheck.test(element) : element && element.nodeType === 1 && this._textStyleTagsCheck.test(element.nodeName);
 	},
 
 	/**
 	 * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
 	 * Format element also contain "free format Element"
-	 * @param {Node} element The node to check
+	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
 	isLine(element) {
-		return element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this._nonFormat(element);
+		return typeof element === 'string'
+			? this._formatLineCheck.test(element)
+			: element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1363,21 +1365,25 @@ Format.prototype = {
 	 * Free format elements is included in the format element.
 	 * Free format elements's line break is "BR" tag.
 	 * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
-	 * @param {Node} element The node to check
+	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
 	isBrLine(element) {
-		return element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element);
+		return typeof element === 'string'
+			? this._formatBrLineCheck.test(element)
+			: element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element);
 	},
 
 	/**
 	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
 	 * Range format element is wrap the "format element" and "component"
-	 * @param {Node} element The node to check
+	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
 	isBlock(element) {
-		return element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__block_.+')) && !this._nonFormat(element);
+		return typeof element === 'string'
+			? this._formatBlockCheck.test(element)
+			: element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__block_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1386,11 +1392,13 @@ Format.prototype = {
 	 *  - Closure range format element is wrap the "format element" and "component"
 	 * ※ You cannot exit this format with the Enter key or Backspace key.
 	 * ※ Use it only in special cases. ([ex] format of table cells)
-	 * @param {Node} element The node to check
+	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
 	isClosureBlock(element) {
-		return element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__block_closure_.+')) && !this._nonFormat(element);
+		return typeof element === 'string'
+			? this._formatClosureBlockCheck.test(element)
+			: element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__block_closure_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1399,11 +1407,13 @@ Format.prototype = {
 	 *  - Closure free format elements's line break is "BR" tag.
 	 * ※ You cannot exit this format with the Enter key or Backspace key.
 	 * ※ Use it only in special cases. ([ex] format of table cells)
-	 * @param {Node} element The node to check
+	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
 	isClosureBrLine(element) {
-		return element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__br_line__closure_.+')) && !this._nonFormat(element);
+		return typeof element === 'string'
+			? this._formatClosureBrLineCheck.test(element)
+			: element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__br_line__closure_.+')) && !this._nonFormat(element);
 	},
 
 	/**

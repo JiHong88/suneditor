@@ -364,7 +364,7 @@ plugins: [
 strictMode      : Option to disable clean mode, which checks the styles, classes, etc. of the editor content.   default : false {Boolean}
 lang            : language object.   default : en {Object}
 defaultLine      : Specifies default tag name of the editor.     default: 'p' {string}
-textTags        : You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
+convertTextTags        : You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
                   ex) {
                       bold: 'b',
                       strike: 's'

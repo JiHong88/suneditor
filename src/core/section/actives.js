@@ -92,7 +92,7 @@ export async function SAVE(editor) {
 
 export function FONT_STYLE(editor, command) {
 	command = editor.options.get('_defaultTagCommand')[command.toLowerCase()] || command;
-	let nodeName = editor.options.get('textTags')[command] || command;
+	let nodeName = editor.options.get('convertTextTags')[command] || command;
 	const nodesMap = editor.status.currentNodesMap;
 	const el = nodesMap.includes(editor.options.get('_styleCommandMap')[nodeName]) ? null : domUtils.createElement(nodeName);
 
