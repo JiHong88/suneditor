@@ -477,7 +477,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _cleanStyleRegExp: {
             div: new _w.RegExp('\\s*[^-a-zA-Z](.+)\\s*:[^;]+(?!;)*', 'ig'),
             span: new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color)\\s*:[^;]+(?!;)*', 'ig'),
-            format: new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right|width|height)\\s*:[^;]+(?!;)*', 'ig'),
+            format: new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right|width|height|line-height)\\s*:[^;]+(?!;)*', 'ig'),
             fontSizeUnit: new _w.RegExp('\\d+' + options.fontSizeUnit + '$', 'i'),
         },
 
