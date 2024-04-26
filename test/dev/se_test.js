@@ -536,7 +536,7 @@ window.editor_root = suneditor.create(
 			apiUrl: 'http://localhost:3000/editor/download-pdf'
 		},
 		fontSize: {
-			showIncDecControls: true
+			// showIncDecControls: true
 			// disableInput: true,
 			// sizeUnit: 'text',
 			// showDefaultSizeLabel:true

@@ -432,7 +432,9 @@ Table.prototype = {
 		if (!(target !== this._fixedCell && !this._shift)) return;
 
 		this._deleteStyleSelectedCells();
-		this.selectCells(/^TR$/i.test(target.nodeName) ? domUtils.getParentElement(event.target, domUtils.isTableCell) : target, false);
+		if (/^TR$/i.test(target.nodeName)) return;
+
+		this.selectCells(target, false);
 	},
 
 	/**

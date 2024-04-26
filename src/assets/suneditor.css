@@ -179,7 +179,8 @@
 .sun-editor .se-menu-list li:hover .se-side-btn-a:not(.on):not(.active):enabled,
 .sun-editor .se-menu-list li:hover .se-side-btn-b:not(.on):not(.active):enabled,
 .sun-editor .se-menu-list li:hover .se-side-btn-after:not(.on):not(.active):enabled,
-.sun-editor .se-menu-list li:hover .se-side-btn-before:not(.on):not(.active):enabled {
+.sun-editor .se-menu-list li:hover .se-side-btn-before:not(.on):not(.active):enabled,
+.sun-editor .se-menu-list li:hover .se-btn-input input:not(.on):not(.active):enabled {
 	border: 1px solid #e1e1e1;
 }
 

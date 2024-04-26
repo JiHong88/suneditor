@@ -520,12 +520,14 @@ EventManager.prototype = {
 			this.selection._init();
 		}
 
-		if (domUtils.isBreak(format.nextSibling)) domUtils.removeItem(format.nextSibling);
-		if (domUtils.isBreak(format.previousSibling)) domUtils.removeItem(format.previousSibling);
-		if (domUtils.isBreak(focusNode)) {
-			const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-			focusNode.parentNode.insertBefore(zeroWidth, focusNode);
-			focusNode = zeroWidth;
+		if (format) {
+			if (domUtils.isBreak(format.nextSibling)) domUtils.removeItem(format.nextSibling);
+			if (domUtils.isBreak(format.previousSibling)) domUtils.removeItem(format.previousSibling);
+			if (domUtils.isBreak(focusNode)) {
+				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+				focusNode.parentNode.insertBefore(zeroWidth, focusNode);
+				focusNode = zeroWidth;
+			}
 		}
 
 		this.editor.effectNode = null;
@@ -586,10 +588,10 @@ EventManager.prototype = {
 		// files
 		const files = data.files;
 		if (files.length > 0 && !MSData) {
-			if (/^image/.test(files[0].type) && this.plugins.image) {
-				this.plugins.image.submitAction(files);
-				this.editor.focus();
+			for (let i = 0, len = files.length; i < len; i++) {
+				this._callPluginEvent('onPastAndDrop', { frameContext, event: e, file: files[i] });
 			}
+
 			return false;
 		}
 

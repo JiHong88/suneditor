@@ -1207,6 +1207,9 @@ Editor.prototype = {
 		// initialize core and add event listeners
 		this._setFrameInfo(this.frameRoots.get(this.status.rootKey));
 		this.__init(options);
+		for (const v of this._onPluginEvents.values()) {
+			v.sort((a, b) => a.index - b.index);
+		}
 
 		this.applyFrameRoots((e) => {
 			this._initWysiwygArea(e, e.get('options').get('value'));
@@ -1263,7 +1266,8 @@ Editor.prototype = {
 			['onKeyDown', []],
 			['onKeyUp', []],
 			['onFocus', []],
-			['onBlur', []]
+			['onBlur', []],
+			['onPastAndDrop', []]
 		]);
 		this._fileManager.tags = [];
 		this._fileManager.pluginMap = {};
@@ -1313,9 +1317,12 @@ Editor.prototype = {
 			}
 
 			// plugin event
+			const pluginOptions = plugin.constructor.options || {};
 			this._onPluginEvents.forEach((v, k) => {
 				if (typeof plugin[k] === 'function') {
-					v.push(plugin[k].bind(plugin));
+					const f = plugin[k].bind(plugin);
+					f.index = pluginOptions[`eventIndex_${k}`] || pluginOptions.eventIndex || 0;
+					v.push(f);
 				}
 			});
 

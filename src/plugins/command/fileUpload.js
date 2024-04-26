@@ -20,6 +20,7 @@ const FileUpload = function (editor, pluginOptions) {
 	this.uploadSingleSizeLimit = /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null;
 	this.allowMultiple = !!pluginOptions.allowMultiple;
 	this.acceptedFormats = typeof pluginOptions.acceptedFormats !== 'string' ? '*' : pluginOptions.acceptedFormats.trim() || '*';
+	this._acceptedCheck = this.acceptedFormats.split(', ');
 	this.as = pluginOptions.as || 'box';
 	this.input = domUtils.createElement('input', { type: 'file', accept: this.acceptedFormats });
 	if (this.allowMultiple) {
@@ -105,6 +106,7 @@ const FileUpload = function (editor, pluginOptions) {
 FileUpload.key = 'fileUpload';
 FileUpload.type = 'command';
 FileUpload.className = '';
+FileUpload.options = { eventIndex: 10000 };
 FileUpload.component = function (node) {
 	return domUtils.isAnchor(node) && node.hasAttribute('download') && node.hasAttribute('data-se-file-download') ? node : null;
 };
@@ -129,11 +131,32 @@ FileUpload.prototype = {
 			asBtn.setAttribute('data-value', 'link');
 			this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
 		} else {
-			asBtn.innerHTML = this.icons.expansion + CreateTooltipInner(this.lang.asBox);
+			asBtn.innerHTML = this.icons.expansion + CreateTooltipInner(this.lang.asBlock);
 			asBtn.setAttribute('data-value', 'box');
 			this.figure.controllerOpen(target, { isWWTarget: true });
 			return true;
 		}
+	},
+
+	/**
+	 * @description On paste or drop
+	 * @param {*} params { frameContext, event, file }
+	 */
+	onPastAndDrop({ file }) {
+		const fileType = file.type;
+		if (
+			!this._acceptedCheck.some((format) => {
+				if (format.startsWith('*')) return true;
+				if (format.startsWith(fileType)) return true;
+			})
+		) {
+			return;
+		}
+
+		this._submitFile([file]);
+		this.editor.focus();
+
+		return false;
 	},
 
 	/**
@@ -163,6 +186,73 @@ FileUpload.prototype = {
 
 		this.controller.close();
 		this.component.select(this._element, FileUpload.key, false);
+	},
+
+	async _submitFile(fileList) {
+		if (fileList.length === 0) return;
+
+		let fileSize = 0;
+		const files = [];
+		const slngleSizeLimit = this.uploadSingleSizeLimit;
+		for (let i = 0, len = fileList.length, f, s; i < len; i++) {
+			f = fileList[i];
+			s = f.size;
+			if (slngleSizeLimit && slngleSizeLimit > s) {
+				const err = '[SUNEDITOR.fileUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
+				const message = await this.triggerEvent('onFileUploadError', {
+					error: err,
+					limitSize: slngleSizeLimit,
+					uploadSize: s,
+					file: f
+				});
+
+				this.notice.open(message === NO_EVENT ? err : message || err);
+
+				return false;
+			}
+
+			files.push(f);
+			fileSize += s;
+		}
+
+		const limitSize = this.uploadSizeLimit;
+		const currentSize = this.fileManager.getSize();
+		if (limitSize > 0 && fileSize + currentSize > limitSize) {
+			const err = '[SUNEDITOR.fileUpload.fail] Size of uploadable total files: ' + limitSize / 1000 + 'KB';
+			const message = await this.triggerEvent('onFileUploadError', {
+				error: err,
+				limitSize,
+				currentSize,
+				uploadSize: fileSize
+			});
+
+			this.notice.open(message === NO_EVENT ? err : message || err);
+
+			return false;
+		}
+
+		const fileInfo = {
+			url: this.uploadUrl,
+			uploadHeaders: this.uploadHeaders,
+			files
+		};
+
+		const handler = async function (infos, newInfos) {
+			infos = newInfos || infos;
+			const xmlHttp = await this.fileManager.asyncUpload(infos.url, infos.uploadHeaders, infos.files);
+			this._uploadCallBack(xmlHttp);
+		}.bind(this, fileInfo);
+
+		const result = await this.triggerEvent('onFileUploadBefore', {
+			...fileInfo,
+			handler
+		});
+
+		if (result === undefined) return true;
+		if (result === false) return false;
+		if (result !== null && typeof result === 'object') handler(result);
+
+		if (result === true || result === NO_EVENT) handler(null);
 	},
 
 	/**
@@ -224,7 +314,7 @@ FileUpload.prototype = {
 		}
 
 		const figure = Figure.CreateContainer(a);
-		domUtils.addClass(figure.container, 'se-file-figure se-flex-component');
+		domUtils.addClass(figure.container, 'se-file-figure|se-flex-component');
 
 		if (!this.component.insert(figure.container, false, isLast ? !this.options.get('mediaAutoSelect') : true)) {
 			this.editor.focus();
@@ -262,70 +352,7 @@ FileUpload.prototype = {
 };
 
 async function OnChangeFile(e) {
-	const fileList = e.target.files;
-	if (fileList.length === 0) return;
-
-	let fileSize = 0;
-	const files = [];
-	const slngleSizeLimit = this.uploadSingleSizeLimit;
-	for (let i = 0, len = fileList.length, s; i < len; i++) {
-		s = fileList[i].size;
-		if (slngleSizeLimit && slngleSizeLimit > s) {
-			const err = '[SUNEDITOR.fileUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
-			const message = await this.triggerEvent('onFileUploadError', {
-				error: err,
-				limitSize: slngleSizeLimit,
-				uploadSize: s,
-				isSingle: true
-			});
-
-			this.notice.open(message === NO_EVENT ? err : message || err);
-
-			return false;
-		}
-
-		files.push(fileList[i]);
-		fileSize += s;
-	}
-
-	const limitSize = this.uploadSizeLimit;
-	const currentSize = this.fileManager.getSize();
-	if (limitSize > 0 && fileSize + currentSize > limitSize) {
-		const err = '[SUNEDITOR.fileUpload.fail] Size of uploadable total files: ' + limitSize / 1000 + 'KB';
-		const message = await this.triggerEvent('onFileUploadError', {
-			error: err,
-			limitSize,
-			currentSize,
-			uploadSize: fileSize
-		});
-
-		this.notice.open(message === NO_EVENT ? err : message || err);
-
-		return false;
-	}
-
-	const fileInfo = {
-		url: this.uploadUrl,
-		uploadHeaders: this.uploadHeaders,
-		files
-	};
-
-	const handler = async function (infos, newInfos) {
-		infos = newInfos || infos;
-		const xmlHttp = await this.fileManager.asyncUpload(infos.url, infos.uploadHeaders, infos.files);
-		this._uploadCallBack(xmlHttp);
-	}.bind(this, fileInfo);
-
-	const result = await this.triggerEvent('onFileUploadBefore', {
-		...fileInfo,
-		handler
-	});
-
-	if (result === undefined) return true;
-	if (result === false) return false;
-	if (result !== null && typeof result === 'object') handler(result);
-
-	if (result === true || result === NO_EVENT) handler(null);
+	await this._submitFile(e.target.files);
 }
 
 function CreateHTML_controller({ lang, icons }) {

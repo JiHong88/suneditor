@@ -22,7 +22,7 @@
 		alignMiddle: 'Align middle',
 		alignRight: 'Align right',
 		alignTop: 'Align top',
-		asBox: 'As a box',
+		asBlock: 'As a block',
 		asLink: 'As a link',
 		audio: 'Audio',
 		audio_modal_file: 'Select from files',

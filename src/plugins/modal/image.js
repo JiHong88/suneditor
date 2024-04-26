@@ -158,6 +158,19 @@ Image_.prototype = {
 	},
 
 	/**
+	 * @description On paste or drop
+	 * @param {*} params { frameContext, event, file }
+	 */
+	onPastAndDrop({ file }) {
+		if (!/^image/.test(file.type)) return;
+
+		this._submitFile([file]);
+		this.editor.focus();
+
+		return false;
+	},
+
+	/**
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
@@ -318,26 +331,27 @@ Image_.prototype = {
 		let fileSize = 0;
 		const files = [];
 		const slngleSizeLimit = this.uploadSingleSizeLimit;
-		for (let i = 0, len = fileList.length, s; i < len; i++) {
-			if (/image/i.test(fileList[i].type)) {
-				s = fileList[i].size;
-				if (slngleSizeLimit && slngleSizeLimit > s) {
-					const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
-					const message = await this.triggerEvent('onImageUploadError', {
-						error: err,
-						limitSize: slngleSizeLimit,
-						uploadSize: s,
-						isSingle: true
-					});
+		for (let i = 0, len = fileList.length, f, s; i < len; i++) {
+			f = fileList[i];
+			if (!/image/i.test(f.type)) continue;
 
-					this.notice.open(message === NO_EVENT ? err : message || err);
+			s = f.size;
+			if (slngleSizeLimit && slngleSizeLimit > s) {
+				const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
+				const message = await this.triggerEvent('onImageUploadError', {
+					error: err,
+					limitSize: slngleSizeLimit,
+					uploadSize: s,
+					file: f
+				});
 
-					return false;
-				}
+				this.notice.open(message === NO_EVENT ? err : message || err);
 
-				files.push(fileList[i]);
-				fileSize += s;
+				return false;
 			}
+
+			files.push(f);
+			fileSize += s;
 		}
 
 		const limitSize = this.pluginOptions.uploadSizeLimit;
