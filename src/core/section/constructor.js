@@ -932,7 +932,7 @@ function _defaultButtons(options, icons, lang) {
 		strike: ['', lang.strike, 'strike', '', icons.strike],
 		subscript: ['', lang.subscript, 'subscript', '', icons.subscript],
 		superscript: ['', lang.superscript, 'superscript', '', icons.superscript],
-		removeFormat: ['', lang.removeFormat, 'removeFormat', '', icons.erase],
+		removeFormat: ['', lang.removeFormat, 'removeFormat', '', icons.remove_format],
 		indent: ['se-icon-flip-rtl', lang.indent, 'indent', '', isRTL ? icons.outdent : icons.indent],
 		outdent: ['se-icon-flip-rtl', lang.outdent, 'outdent', '', isRTL ? icons.indent : icons.outdent],
 		fullScreen: ['se-code-view-enabled se-component-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],

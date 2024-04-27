@@ -268,7 +268,7 @@ function CreateHTML({ lang, icons }, { colorList, disableHEXInput, disableRemove
 			${disableHEXInput ? '' : `<button type="button" class="se-btn se-btn-info" title="${lang.colorPicker}" aria-label="${lang.colorPicker}">${icons.color_palette}</button>`}
 			<input type="text" class="se-color-input" ${disableHEXInput ? 'readonly' : ''} placeholder="${lang.color}" />
 			${disableHEXInput ? '' : `<button type="submit" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>`}
-			${disableRemove ? '' : `<button type="button" class="se-btn __se_remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.erase}</button>`}
+			${disableRemove ? '' : `<button type="button" class="se-btn __se_remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.remove_color}</button>`}
 		</form>`;
 
 	return domUtils.createElement('DIV', { class: 'se-list-inner' }, list);

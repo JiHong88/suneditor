@@ -790,7 +790,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 				<div class="se-modal-form-files">
 					<input class="se-input-form _se_video_file" type="file" data-focus accept="${pluginOptions.acceptedFormats}"${pluginOptions.allowMultiple ? ' multiple="multiple"' : ''}/>
 					<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">
-						${icons.cancel}
+						${icons.selection_remove}
 					</button>
 				</div>
 			</div>`;

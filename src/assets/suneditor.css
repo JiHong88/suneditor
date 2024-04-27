@@ -1812,15 +1812,10 @@
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-modal-form-files .se-modal-files-edge-button {
-	flex: auto;
+	flex: none;
 	opacity: 0.8;
 	border: 1px solid #ccc;
 	margin-left: 1px;
-}
-
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-modal-form-files .se-modal-files-edge-button.se-file-remove > svg {
-	width: 8px;
-	height: 8px;
 }
 
 /* modal - modal - input */

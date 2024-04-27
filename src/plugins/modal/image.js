@@ -944,7 +944,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<label>${lang.image_modal_file}</label>
 			<div class="se-modal-form-files">
 				<input class="se-input-form _se_image_file" data-focus type="file" accept="${pluginOptions.acceptedFormats}"${pluginOptions.allowMultiple ? ' multiple="multiple"' : ''}/>
-				<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.cancel}</button>
+				<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.selection_remove}</button>
 			</div>
 		</div>`;
 
