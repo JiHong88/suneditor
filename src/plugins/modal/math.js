@@ -51,7 +51,7 @@ Math_.prototype = {
 	 * @override core
 	 */
 	active(element) {
-		if (domUtils.hasClass(element, 'katex') && element?.getAttribute('data-se-value')) {
+		if (domUtils.hasClass(element, 'katex') && getValue(element)) {
 			this._element = element;
 			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
 			domUtils.addClass(element, 'se-focus');
@@ -82,13 +82,13 @@ Math_.prototype = {
 	/**
 	 * @override core
 	 */
-	maintainPattern() {
+	retainFormat() {
 		return {
 			query: '.katex',
 			method: (element) => {
 				if (!this.katex) return;
 
-				const value = element.getAttribute('data-se-value');
+				const value = getValue(element);
 				if (!value) return;
 
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
@@ -116,8 +116,8 @@ Math_.prototype = {
 			this.init();
 		} else if (this.controller.currentTarget) {
 			const currentTarget = this.controller.currentTarget;
-			const exp = converter.entityToHTML(this._escapeBackslashes(currentTarget.getAttribute('data-se-value'), true));
-			const fontSize = currentTarget.getAttribute('data-se-type') || '1em';
+			const exp = converter.entityToHTML(this._escapeBackslashes(getValue(currentTarget), true));
+			const fontSize = getType(currentTarget) || '1em';
 			this.textArea.value = exp;
 			this.fontSizeElement.value = fontSize;
 			this.previewElement.innerHTML = this._renderer(exp);
@@ -215,7 +215,7 @@ async function copyTextToClipboard(element) {
 	if (!navigator.clipboard || !element) return;
 
 	try {
-		const text = element.getAttribute('data-se-value');
+		const text = getValue(element);
 		await navigator.clipboard.writeText(text);
 		domUtils.addClass(element, 'se-copy');
 		// copy effect
@@ -342,6 +342,14 @@ function CreateHTML_controller({ lang, icons }) {
     </div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
+}
+
+function getValue(element) {
+	return !element ? null : element.getAttribute('data-se-value') || element.getAttribute('data-exp');
+}
+
+function getType(element) {
+	return !element ? null : element?.getAttribute('data-se-type') || element?.getAttribute('data-font-size');
 }
 
 export default Math_;

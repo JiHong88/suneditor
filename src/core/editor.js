@@ -238,7 +238,7 @@ const Editor = function (multiTargets, options) {
 	this._componentsInfoReset = false;
 
 	/**
-	 * @description plugin maintainPattern info Map()
+	 * @description plugin retainFormat info Map()
 	 * @private
 	 */
 	this._MELInfo = null;
@@ -1327,8 +1327,8 @@ Editor.prototype = {
 			});
 
 			// plugin maintain
-			if (plugin.maintainPattern) {
-				const info = plugin.maintainPattern();
+			if (plugin.retainFormat) {
+				const info = plugin.retainFormat();
 				this._MELInfo.set(info.query, info.method);
 			}
 		}

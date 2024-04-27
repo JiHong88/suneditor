@@ -1361,6 +1361,16 @@ Format.prototype = {
 	},
 
 	/**
+	 * @description It is judged whether it is the only format element, not block (td, th, li)
+	 * Format element also contain "free format Element"
+	 * @param {Node|string} element The node to check
+	 * @returns {boolean}
+	 */
+	isLineOnly(element) {
+		return this._formatLineCheck.test(element) && !this._formatBlockCheck.test(element);
+	},
+
+	/**
 	 * @description It is judged whether it is the free format element. (PRE | class="__se__format__br_line_xxx")
 	 * Free format elements is included in the format element.
 	 * Free format elements's line break is "BR" tag.

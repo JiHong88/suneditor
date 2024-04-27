@@ -1,12 +1,13 @@
 import { domUtils, env, unicode } from '../../../helper';
 
-const { isOSX_IOS } = env;
+const { _w, isOSX_IOS } = env;
 const DIRECTION_KEYCODE = /^(8|3[2-9]|40|46)$/;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DELETE_KEYCODE = /^(8|46)$/;
 const NON_TEXT_KEYCODE = /^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145|229)$/;
 const HISTORY_IGNORE_KEYCODE = /^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145|229)$/;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
+let _styleNodes = null;
 
 export function OnInput_wysiwyg(frameContext, e) {
 	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
@@ -82,6 +83,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 	switch (keyCode) {
 		case 8 /** backspace key */: {
+			_styleNodes = this.__cacheStyleNodes;
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -131,7 +133,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 			// clean remove tag
 			const startCon = range.startContainer;
-			if (formatEl && !formatEl.previousElementSibling && range.startOffset === 0 && startCon.nodeType === 3 && !this.format.isLine(startCon.parentNode)) {
+			if (formatEl && !formatEl.previousElementSibling && range.startOffset === 0 && startCon.nodeType === 3 && domUtils.isZeroWith(startCon)) {
 				let prev = startCon.parentNode.previousSibling;
 				const next = startCon.parentNode.nextSibling;
 				if (!prev) {
@@ -284,6 +286,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			break;
 		}
 		case 46 /** delete key */: {
+			_styleNodes = this.__cacheStyleNodes;
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -870,7 +873,7 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 
 		selectionNode.innerHTML = '';
 
-		const oFormatTag = domUtils.createElement(this.format.isLine(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.get('defaultLine'), null, '<br>');
+		const oFormatTag = domUtils.createElement(this.format.isLine(this.status.currentNodes[0]) && !domUtils.isListCell(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.get('defaultLine'), null, '<br>');
 		selectionNode.appendChild(oFormatTag);
 		this.selection.setRange(oFormatTag, 0, oFormatTag, 0);
 		this.applyTagEffect();
@@ -909,22 +912,26 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 		this.selection.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
 	}
 
-	if (DELETE_KEYCODE.test(keyCode) && this.__cacheStyleNodes?.length > 0 && domUtils.isZeroWith(formatEl?.textContent) && !formatEl.previousElementSibling) {
-		const sNode = this.__cacheStyleNodes;
-		const el = sNode[0].cloneNode(false);
-		let n = el;
-		for (let i = 1, len = sNode.length, t; i < len; i++) {
-			t = sNode[i].cloneNode(false);
-			n.appendChild(t);
-			n = t;
+	if (DELETE_KEYCODE.test(keyCode) && domUtils.isZeroWith(formatEl?.textContent) && !formatEl.previousElementSibling) {
+		const rsMode = this.options.get('retainStyleMode');
+		if (rsMode !== 'none' && _styleNodes?.length > 0) {
+			if (rsMode === 'repeat') {
+				if (this.__retainTimer) {
+					this.__retainTimer = _w.clearTimeout(this.__retainTimer);
+					this._clearRetainStyleNodes(formatEl);
+				} else {
+					this.__retainTimer = _w.setTimeout(() => {
+						this.__retainTimer = null;
+					}, 0);
+					this._retainStyleNodes(formatEl, _styleNodes);
+				}
+			} else {
+				this.__retainTimer = null;
+				this._retainStyleNodes(formatEl, _styleNodes);
+			}
+		} else {
+			this._clearRetainStyleNodes(formatEl);
 		}
-
-		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-		formatEl.innerHTML = n.innerHTML = '';
-		n.appendChild(zeroWidth);
-		formatEl.appendChild(el);
-
-		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
 
 	this.char.test('');

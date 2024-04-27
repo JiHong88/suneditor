@@ -744,7 +744,7 @@ export function addClass(element, className) {
 	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;
 		for (const c of classNames) {
-			e.classList.add(c);
+			if (c) e.classList.add(c);
 		}
 	}
 }
@@ -763,7 +763,7 @@ export function removeClass(element, className) {
 	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;
 		for (const c of classNames) {
-			e.classList.remove(c);
+			if (c) e.classList.remove(c);
 		}
 	}
 }

@@ -396,7 +396,7 @@ function FileCheckHandler(element) {
 			existElement.insertBefore(figure.container, refer);
 			domUtils.removeItem(prevElement);
 			this.nodeTransform.removeEmptyNode(refer, null, true);
-		} else if (this.format.isLine(existElement)) {
+		} else if (this.format.isLineOnly(existElement)) {
 			const refer = domUtils.getParentElement(prevElement, function (current) {
 				return current.parentNode === existElement;
 			});

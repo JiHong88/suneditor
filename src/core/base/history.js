@@ -13,7 +13,7 @@ export default function (editor) {
 	let stackIndex, stack, rootStack, rootInitContents;
 
 	function change(fc, index) {
-		if (editor.status.hasFocus) editor.eventManager.applyTagEffect(null, true);
+		if (editor.status.hasFocus) editor.eventManager.applyTagEffect();
 		editor.history.resetButtons(fc.get('key'), index);
 
 		// user event

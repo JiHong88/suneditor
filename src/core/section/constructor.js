@@ -47,6 +47,8 @@ const DEFAULT_CONTENT_STYLES =
 	'vertical-align|visibility|' +
 	'white-space|width|word-break|word-wrap';
 
+const RETAIN_STYLE_MODE = ['repeat', 'always', 'none'];
+
 export const RO_UNAVAILABD = [
 	'mode',
 	'externalLibs',
@@ -349,7 +351,7 @@ export function InitOptions(options, editorTargets) {
 	/** Base */
 	const modeValue = options.strictMode !== false;
 	o.set('strictMode', {
-		pluginPattern: modeValue,
+		pluginRetainFormat: modeValue,
 		tagFilter: modeValue,
 		formatFilter: modeValue,
 		classFilter: modeValue,
@@ -363,6 +365,13 @@ export function InitOptions(options, editorTargets) {
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
+
+	let retainStyleMode = options.retainStyleMode;
+	if (typeof retainStyleMode === 'string' && !RETAIN_STYLE_MODE.includes(retainStyleMode)) {
+		console.error(`Invalid retainStyleMode: ${retainStyleMode}. Valid options are ${RETAIN_STYLE_MODE.join(', ')}. Using default 'once'.`);
+		retainStyleMode = 'repeat';
+	}
+	o.set('retainStyleMode', retainStyleMode);
 
 	const allowedExtraTags = { ...DEFAULT_EXTRA_TAG_MAP, ...options.allowedExtraTags, '-': true };
 	const extraKeys = Object.keys(allowedExtraTags);

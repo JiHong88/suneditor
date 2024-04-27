@@ -591,7 +591,7 @@ Image_.prototype = {
 				domUtils.removeItem(imageEl);
 				this.nodeTransform.removeEmptyNode(existElement, null, true);
 			} else {
-				if (this.format.isLine(existElement.parentNode)) {
+				if (this.format.isLineOnly(existElement.parentNode)) {
 					const formats = existElement.parentNode;
 					formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
 					if (

@@ -5,7 +5,8 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
-const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
+// data-exp, data-font-size - v2 math plugin migration
+const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+|data-exp|data-font-size';
 
 const HTML = function (editor) {
 	CoreInjector.call(this, editor);
@@ -140,7 +141,7 @@ HTML.prototype = {
 	 * @returns {string}
 	 */
 	clean(html, requireFormat, whitelist, blacklist) {
-		const { pluginPattern, tagFilter, formatFilter, classFilter, styleNodeFilter, attrFilter, styleFilter } = this.options.get('strictMode');
+		const { pluginRetainFormat, tagFilter, formatFilter, classFilter, styleNodeFilter, attrFilter, styleFilter } = this.options.get('strictMode');
 		let cleanData = '';
 
 		html = this.compress(html);
@@ -164,7 +165,7 @@ HTML.prototype = {
 			}
 		}
 
-		if (pluginPattern) {
+		if (pluginRetainFormat) {
 			this.editor._MELInfo.forEach((method, query) => {
 				const infoLst = dom.querySelectorAll(query);
 				for (let i = 0, len = infoLst.length; i < len; i++) {

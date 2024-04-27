@@ -588,7 +588,7 @@ Video.prototype = {
 			existElement.insertBefore(container, refer);
 			domUtils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(refer, null, true);
-		} else if (this.format.isLine(existElement)) {
+		} else if (this.format.isLineOnly(existElement)) {
 			const refer = domUtils.getParentElement(prevFrame, function (current) {
 				return current.parentNode === existElement;
 			});

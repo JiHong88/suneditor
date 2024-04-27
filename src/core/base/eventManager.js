@@ -45,6 +45,7 @@ const EventManager = function (editor) {
 	// viewport
 	this._vitualKeyboardHeight = 0;
 	this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
+	this.__retainTimer = null;
 };
 
 EventManager.prototype = {
@@ -151,10 +152,9 @@ EventManager.prototype = {
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
 	 * @param {Node|null} selectionNode selectionNode
-	 * @param {boolean|null} styleChanged styleChanged
 	 * @returns {Node|undefined} selectionNode
 	 */
-	applyTagEffect(selectionNode, styleChanged) {
+	applyTagEffect(selectionNode) {
 		selectionNode = selectionNode || this.selection.getNode();
 		if (selectionNode === this.editor.effectNode) return;
 		this.editor.effectNode = selectionNode;
@@ -196,7 +196,7 @@ EventManager.prototype = {
 
 			nodeName = element.nodeName.toLowerCase();
 			currentNodes.push(nodeName);
-			if (styleTags.includes(nodeName)) styleNodes.push(element);
+			if (styleTags.includes(nodeName) && !this.format.isLine(nodeName)) styleNodes.push(element);
 
 			/* Active plugins */
 			if (notReadonly) {
@@ -260,9 +260,7 @@ EventManager.prototype = {
 		this._setKeyEffect(commandMapNodes);
 
 		// cache style nodes
-		if (styleChanged || !this.__cacheStyleNodes?.length) {
-			this.__cacheStyleNodes = styleNodes.reverse();
-		}
+		this.__cacheStyleNodes = styleNodes.reverse();
 
 		/** save current nodes */
 		this.status.currentNodes = currentNodes.reverse();
@@ -866,6 +864,28 @@ EventManager.prototype = {
 			this.selection._init();
 			this.removeGlobalEvent(this.__selectionSyncEvent);
 		});
+	},
+
+	_retainStyleNodes(formatEl, _styleNodes) {
+		const el = _styleNodes[0].cloneNode(false);
+		let n = el;
+		for (let i = 1, len = _styleNodes.length, t; i < len; i++) {
+			t = _styleNodes[i].cloneNode(false);
+			n.appendChild(t);
+			n = t;
+		}
+
+		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+		formatEl.innerHTML = n.innerHTML = '';
+		n.appendChild(zeroWidth);
+		formatEl.appendChild(el);
+
+		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
+	},
+
+	_clearRetainStyleNodes(formatEl) {
+		formatEl.innerHTML = '<br>';
+		this.selection.setRange(formatEl, 0, formatEl, 0);
 	},
 
 	_callPluginEvent(name, e) {

@@ -469,6 +469,7 @@ window.editor_root = suneditor.create(
 		// iframe: true,
 		// defaultLine: 'p',
 		// __defaultFormatLine: 'H[1-6]|LI|TH|TD|DETAILS',
+		retainStyleMode: 'repeat', // repeat, always, none
 		toolbar_sticky: 0,
 		lineAttrReset: 'id',
 		height: '600px',

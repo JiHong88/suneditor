@@ -275,7 +275,7 @@ Table.prototype = {
 	/**
 	 * @override core
 	 */
-	maintainPattern() {
+	retainFormat() {
 		return {
 			query: 'table',
 			method: (element) => {
