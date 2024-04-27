@@ -436,10 +436,10 @@ window.editor_root = suneditor.create(
 </ul>
 <p><br></p>
 		`,
-// 		value: `<figure>
-//     <img src="https://blog.kakaocdn.net/dn/0QCnX/btqU7cMuFOZ/uVPVj1aIBNqINLQZGkuwa0/img.png" alt="">
-//     <figcaption>Home Edge Logo</figcaption>
-// </figure>`,
+		// 		value: `<figure>
+		//     <img src="https://blog.kakaocdn.net/dn/0QCnX/btqU7cMuFOZ/uVPVj1aIBNqINLQZGkuwa0/img.png" alt="">
+		//     <figcaption>Home Edge Logo</figcaption>
+		// </figure>`,
 		// value: `<p><span style="color: #ff5e00;"><del><strong>fdsfdsafa</strong></del></span><br></p>`,
 		plugins: plugins,
 		allowedClassName: '.+',
@@ -503,7 +503,9 @@ window.editor_root = suneditor.create(
 			]
 		},
 		link: {
-			uploadUrl: 'http://localhost:3000/editor/files/upload'
+			uploadUrl: 'http://localhost:3000/editor/files/upload',
+			relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
+			defaultRel: 'tag'
 		},
 		video: {
 			uploadUrl: 'http://localhost:3000/editor/upload',
@@ -551,7 +553,7 @@ window.editor_root = suneditor.create(
 				src: Katex
 			},
 			html2canvas: html2canvas,
-			jsPDF: jsPDF,
+			jsPDF: jsPDF
 			// codemirror
 			// codeMirror: {
 			// 	EditorView: EditorView,
@@ -582,7 +584,7 @@ window.editor_root = suneditor.create(
 			},
 			onExportPdfBefore(params) {
 				console.log('pdfbefore', params);
-			},
+			}
 			// onFileDeleteBefore(arg) {
 			// 	console.log('delete file', arg);
 			// 	return false;

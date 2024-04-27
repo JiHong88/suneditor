@@ -185,6 +185,8 @@ Component.prototype = {
 			if (!info.isFile) this.__addNotFileGlobalEvent();
 		}, 0);
 		domUtils.addClass(info.container, 'se-component-selected');
+
+		if (__overInfo !== ON_OVER_COMPONENT) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
 	},
 
 	deselect() {
@@ -208,6 +210,8 @@ Component.prototype = {
 		this.currentInfo = null;
 		this.__removeGlobalEvent();
 		this.editor.__offControllers();
+
+		domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 	},
 
 	/**

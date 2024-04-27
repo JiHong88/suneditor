@@ -25,7 +25,7 @@ import Viewer from './class/viewer';
 
 const COMMAND_BUTTONS = '.se-menu-list .se-toolbar-btn[data-command]';
 const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-enabled"]):not([data-type="MORE"])`;
-const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-resizing-enabled"]):not([data-type="MORE"])`;
+const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
 
 /**
  * @description SunEditor constructor function.

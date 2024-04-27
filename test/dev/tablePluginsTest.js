@@ -13,7 +13,7 @@ export const add_pricing_table_plugin = {
     innerHTML: "+Click",
     // The class of the button. - default: "se-btn"
     // "se-code-view-enabled": It is not disable when on code view mode.
-    // "se-resizing-enabled": It is not disable when on using resizing module.
+    // "se-component-enabled": It is not disable when on using resizing module.
     buttonClass: "",
   
     // @Required

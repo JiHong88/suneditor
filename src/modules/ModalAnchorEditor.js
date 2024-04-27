@@ -84,7 +84,7 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 					'BUTTON',
 					{
 						type: 'button',
-						class: 'se-btn se-btn-list' + (defaultRel.includes(rel) ? ' se-checked' : ''),
+						class: 'se-btn-list' + (defaultRel.includes(rel) ? ' se-checked' : ''),
 						'data-command': rel,
 						title: rel,
 						'aria-label': rel

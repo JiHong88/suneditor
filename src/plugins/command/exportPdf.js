@@ -33,7 +33,7 @@ const ExportPdf = function (editor, pluginOptions) {
 
 ExportPdf.key = 'exportPdf';
 ExportPdf.type = 'command';
-ExportPdf.className = '';
+ExportPdf.className = 'se-component-enabled';
 ExportPdf.prototype = {
 	/**
 	 * @override core

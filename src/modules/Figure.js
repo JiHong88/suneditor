@@ -7,6 +7,12 @@ const { ON_OVER_COMPONENT } = env;
 const Figure = function (inst, controls, params) {
 	EditorInjector.call(this, inst.editor);
 	this.kind = inst.constructor.key || inst.constructor.name;
+	this._alignIcons = {
+		none: this.icons.format_float_none,
+		left: this.icons.format_float_left,
+		right: this.icons.format_float_right,
+		center: this.icons.format_float_center
+	};
 
 	// modules
 	this._action = {};
@@ -53,12 +59,6 @@ const Figure = function (inst, controls, params) {
 	this._resizeClientY = 0;
 	this._resize_direction = '';
 	this._floatClassRegExp = '__se__float\\-[a-z]+';
-	this._alignIcons = {
-		none: this.icons.align_justify,
-		left: this.icons.align_left,
-		right: this.icons.align_right,
-		center: this.icons.align_center
-	};
 	this.__preventSizechange = false;
 	this.__revertSize = { w: '', h: '' };
 	this.__offset = {};
@@ -218,7 +218,7 @@ Figure.prototype = {
 		this._removeDragEvent();
 	},
 
-	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, disabledButtons, __fileManagerInfo }) {
+	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
 		if (!target) {
 			console.warn('[SUNEDITOR.modules.Figure.open] The target element is null.');
 			return;
@@ -322,7 +322,7 @@ Figure.prototype = {
 			this._displayResizeHandles(!nonResizing);
 			// selecte
 			domUtils.removeClass(this._cover, 'se-figure-over-selected');
-			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null, disabled: disabledButtons });
+			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
 			this._w.setTimeout(() => (this.eventManager.__overInfo = false), 0);
 		} else {
 			domUtils.addClass(this._cover, 'se-figure-over-selected');
@@ -954,11 +954,11 @@ function SetResize(value) {
 	this.component.select(this._element, this.kind, false);
 }
 
-function CreateAlign(editor, button) {
+function CreateAlign(inst, button) {
 	if (!button) return null;
 
-	const icons = [editor.icons.align_justify, editor.icons.align_left, editor.icons.align_center, editor.icons.align_right];
-	const langs = [editor.lang.basic, editor.lang.left, editor.lang.center, editor.lang.right];
+	const icons = [inst._alignIcons.none, inst._alignIcons.left, inst._alignIcons.center, inst._alignIcons.right];
+	const langs = [inst.lang.basic, inst.lang.left, inst.lang.center, inst.lang.right];
 	const commands = ['none', 'left', 'center', 'right'];
 	const html = [];
 	const items = [];

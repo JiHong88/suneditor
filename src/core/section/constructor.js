@@ -935,19 +935,19 @@ function _defaultButtons(options, icons, lang) {
 		removeFormat: ['', lang.removeFormat, 'removeFormat', '', icons.erase],
 		indent: ['se-icon-flip-rtl', lang.indent, 'indent', '', isRTL ? icons.outdent : icons.indent],
 		outdent: ['se-icon-flip-rtl', lang.outdent, 'outdent', '', isRTL ? icons.indent : icons.outdent],
-		fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],
+		fullScreen: ['se-code-view-enabled se-component-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],
 		showBlocks: ['', lang.showBlocks, 'showBlocks', '', icons.show_blocks],
-		codeView: ['se-code-view-enabled se-resizing-enabled', lang.codeView, 'codeView', '', icons.code_view],
-		undo: ['se-resizing-enabled', lang.undo, 'undo', '', icons.undo],
-		redo: ['se-resizing-enabled', lang.redo, 'redo', '', icons.redo],
-		preview: ['se-resizing-enabled', lang.preview, 'preview', '', icons.preview],
-		print: ['se-resizing-enabled', lang.print, 'print', '', icons.print],
+		codeView: ['se-code-view-enabled se-component-enabled', lang.codeView, 'codeView', '', icons.code_view],
+		undo: ['se-component-enabled', lang.undo, 'undo', '', icons.undo],
+		redo: ['se-component-enabled', lang.redo, 'redo', '', icons.redo],
+		preview: ['se-component-enabled', lang.preview, 'preview', '', icons.preview],
+		print: ['se-component-enabled', lang.print, 'print', '', icons.print],
 		dir: ['', lang[isRTL ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[isRTL ? 'dir_ltr' : 'dir_rtl']],
 		dir_ltr: ['', lang.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
-		save: ['se-resizing-enabled', lang.save, 'save', '', icons.save],
-		newDocument: ['se-resizing-enabled', lang.newDocument, 'newDocument', '', icons.new_document],
-		selectAll: ['se-resizing-enabled', lang.selectAll, 'selectAll', '', icons.select_all]
+		save: ['se-component-enabled', lang.save, 'save', '', icons.save],
+		newDocument: ['se-component-enabled', lang.newDocument, 'newDocument', '', icons.new_document],
+		selectAll: ['se-component-enabled', lang.selectAll, 'selectAll', '', icons.select_all]
 	};
 }
 

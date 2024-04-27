@@ -481,6 +481,10 @@
 	text-align: center;
 	float: none;
 }
+.sun-editor button > svg.se-mdi {
+	width: 20px;
+	height: 20px;
+}
 
 /* sub button size */
 .sun-editor button.se-sub-arrow-btn {

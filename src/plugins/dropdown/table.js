@@ -262,7 +262,7 @@ Table.prototype = {
 		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
 		oTable.innerHTML = colGroup + body;
 
-		const figure = domUtils.createElement('FIGURE', { class: 'se-flex-component' });
+		const figure = domUtils.createElement('FIGURE', { class: 'se-flex-component se-input-component' });
 		figure.appendChild(oTable);
 
 		if (this.component.insert(figure, false, false)) {
@@ -292,11 +292,11 @@ Table.prototype = {
 
 				// figure
 				if (!FigureEl) {
-					FigureEl = domUtils.createElement('FIGURE', { class: 'se-flex-component' });
+					FigureEl = domUtils.createElement('FIGURE', { class: 'se-flex-component se-input-component' });
 					element.parentNode.insertBefore(FigureEl, element);
 					FigureEl.appendChild(element);
 				} else {
-					domUtils.addClass(FigureEl, 'se-flex-component');
+					domUtils.addClass(FigureEl, 'se-flex-component|se-input-component');
 				}
 
 				// scroll
@@ -1424,7 +1424,7 @@ Table.prototype = {
 	},
 
 	_figureOpen(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, disabledButtons: false, __fileManagerInfo: false });
+		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
 	},
 
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
@@ -2717,7 +2717,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 				<label>${lang.border}</label>
 				<div class="se-form-group se-form-w0">
 					<button type="button" data-command="props_onborder_format" class="se-btn se-tooltip">
-						<span class="se-svg">${icons[BORDER_FORMATS.all]}</span>
+						${icons[BORDER_FORMATS.all]}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.border}</span>
 						</span>

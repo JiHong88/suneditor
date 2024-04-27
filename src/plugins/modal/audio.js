@@ -157,7 +157,7 @@ Audio_.prototype = {
 	 * @param {Element} element Target element
 	 */
 	select(element) {
-		this.figure.open(element, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, disabledButtons: false, __fileManagerInfo: false });
+		this.figure.open(element, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
 		this.ready(element);
 	},
 
