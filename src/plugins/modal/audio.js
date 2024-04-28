@@ -41,7 +41,8 @@ const Audio_ = function (editor, pluginOptions) {
 
 	// members
 	this.figure = new Figure(this, null, {});
-	this.audioInputFile = modalEl.querySelector('._se_audio_files');
+	this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
+	this.audioInputFile = modalEl.querySelector('.__se__file_input');
 	this.audioUrlFile = modalEl.querySelector('.se-input-url');
 	this.preview = modalEl.querySelector('.se-link-preview');
 	this.defaultWidth = this.pluginOptions.defaultWidth;
@@ -120,6 +121,7 @@ Audio_.prototype = {
 	 * @override modal
 	 */
 	init() {
+		Modal.OnChangeFile(this.fileModalWrapper, []);
 		if (this.audioInputFile) this.audioInputFile.value = '';
 		if (this.audioUrlFile) this.urlValue = this.preview.textContent = this.audioUrlFile.value = '';
 		if (this.audioInputFile && this.audioUrlFile) {
@@ -450,10 +452,13 @@ function RemoveSelectedFiles(urlInput, preview) {
 		urlInput.removeAttribute('disabled');
 		preview.style.textDecoration = '';
 	}
+
+	// inputFile check
+	Modal.OnChangeFile(this.fileModalWrapper, []);
 }
 
 // Disable url input when uploading files
-function FileInputChange() {
+function FileInputChange({ target }) {
 	if (!this.audioInputFile.value) {
 		this.audioUrlFile.removeAttribute('disabled');
 		this.preview.style.textDecoration = '';
@@ -461,6 +466,9 @@ function FileInputChange() {
 		this.audioUrlFile.setAttribute('disabled', true);
 		this.preview.style.textDecoration = 'line-through';
 	}
+
+	// inputFile check
+	Modal.OnChangeFile(this.fileModalWrapper, target.files);
 }
 
 function CreateHTML_modal({ lang, icons }, pluginOptions) {
@@ -477,12 +485,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		html += /*html*/ `
         <div class="se-modal-form">
             <label>${lang.audio_modal_file}</label>
-            <div class="se-modal-form-files">
-                <input class="se-input-form _se_audio_files" data-focus type="file" accept="${pluginOptions.acceptedFormats}"${pluginOptions.allowMultiple ? ' multiple="multiple"' : ''}/>
-                <button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">
-                    ${icons.selection_remove}
-                </button>
-            </div>
+            ${Modal.CreateFileInput({ lang, icons }, pluginOptions)}
         </div>`;
 	}
 	if (pluginOptions.createUrlInput) {

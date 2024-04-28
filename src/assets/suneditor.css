@@ -1837,6 +1837,59 @@
 	line-height: 1.42857143;
 }
 
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper {
+	display: block;
+	position: relative;
+	width: 100%;
+	height: auto;
+	padding: 0;
+}
+
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs {
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	background-color: #f9f9f9;
+	border: 2px dashed #ccc;
+	pointer-events: none;
+}
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs * {
+	pointer-events: none;
+	vertical-align: middle;
+}
+
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div {
+	display: block;
+	position: relative;
+	padding-top: 5px;
+	width: 100%;
+	height: 100%;
+	margin: auto;
+}
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-w {
+	width: max-content;
+    max-width: 100%;
+	margin: auto;
+	padding: 0 4px;
+}
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-icon-up,
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-icon-files {
+	display: inline-block;
+	width: 20px;
+}
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-icon-files {
+	display: none;
+}
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper > .se-input-form-abs > div .se-input-file-cnt {
+	display: inline;
+	white-space: nowrap;
+	overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-input-form {
 	display: block;
 	width: 100%;

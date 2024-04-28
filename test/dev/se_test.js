@@ -516,7 +516,8 @@ window.editor_root = suneditor.create(
 		},
 		image: {
 			uploadUrl: 'http://localhost:3000/editor/upload',
-			linkEnableFileUpload: true
+			linkEnableFileUpload: true,
+			allowMultiple: true,
 		},
 		audio: {
 			uploadUrl: 'http://localhost:3000/editor/upload',

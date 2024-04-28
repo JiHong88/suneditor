@@ -64,7 +64,8 @@ const Image_ = function (editor, pluginOptions) {
 	});
 
 	// members
-	this.imgInputFile = modalEl.querySelector('._se_image_file');
+	this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
+	this.imgInputFile = modalEl.querySelector('.__se__file_input');
 	this.imgUrlFile = modalEl.querySelector('._se_image_url');
 	this.focusElement = this.imgInputFile || this.imgUrlFile;
 	this.altText = modalEl.querySelector('._se_image_alt');
@@ -195,6 +196,7 @@ Image_.prototype = {
 	 * @override modal
 	 */
 	init() {
+		Modal.OnChangeFile(this.fileModalWrapper, []);
 		if (this.imgInputFile) this.imgInputFile.value = '';
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = '';
 		if (this.imgInputFile && this.imgUrlFile) {
@@ -854,6 +856,9 @@ function RemoveSelectedFiles() {
 		this.imgUrlFile.removeAttribute('disabled');
 		this.previewSrc.style.textDecoration = '';
 	}
+
+	// inputFile check
+	Modal.OnChangeFile(this.fileModalWrapper, []);
 }
 
 function OnInputSize(xy, e) {
@@ -903,7 +908,7 @@ function OnLinkPreview(e) {
 		: value;
 }
 
-function OnfileInputChange() {
+function OnfileInputChange({ target }) {
 	if (!this.imgInputFile.value) {
 		this.imgUrlFile.removeAttribute('disabled');
 		this.previewSrc.style.textDecoration = '';
@@ -911,6 +916,9 @@ function OnfileInputChange() {
 		this.imgUrlFile.setAttribute('disabled', true);
 		this.previewSrc.style.textDecoration = 'line-through';
 	}
+
+	// inputFile check
+	Modal.OnChangeFile(this.fileModalWrapper, target.files);
 }
 
 function OpenGallery() {
@@ -942,10 +950,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 		: /*html*/ `
 		<div class="se-modal-form">
 			<label>${lang.image_modal_file}</label>
-			<div class="se-modal-form-files">
-				<input class="se-input-form _se_image_file" data-focus type="file" accept="${pluginOptions.acceptedFormats}"${pluginOptions.allowMultiple ? ' multiple="multiple"' : ''}/>
-				<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.selection_remove}</button>
-			</div>
+			${Modal.CreateFileInput({ icons, lang }, pluginOptions)}
 		</div>`;
 
 	const createUrlInputHtml = !pluginOptions.createUrlInput

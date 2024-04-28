@@ -1,4 +1,3 @@
-import { domUtils } from '../helper';
 import CoreInjector from '../editorInjector/_core';
 
 const Modal = function (inst, element) {
@@ -24,11 +23,6 @@ const Modal = function (inst, element) {
 	// init
 	this.eventManager.addEvent(element.querySelector('form'), 'submit', Action.bind(this));
 	this._closeSignal = !this.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
-};
-
-Modal.CreateBasic = function () {
-	const html = '';
-	return domUtils.createElement('DIV', { class: '' }, html);
 };
 
 Modal.prototype = {
@@ -129,5 +123,49 @@ function CloseListener(e) {
 	if (!/27/.test(e.keyCode)) return;
 	this.close();
 }
+
+// HTML Creator ======================================================================================================
+
+// Create a file input tag
+Modal.CreateFileInput = function ({ icons, lang }, { acceptedFormats, allowMultiple }) {
+	return /*html*/ `
+	<div class="se-modal-form-files">
+		<div class="se-flex-input-wrapper">
+			<div class="se-input-form-abs">
+				<div>
+					<div class="se-input-file-w">
+						<div class="se-input-file-icon-up">${icons.upload_tray}</div>
+						<div class="se-input-file-icon-files">${icons.file_plus}</div>
+						<span class="se-input-file-cnt"></span>
+					</div>
+				</div>
+			</div>
+			<input class="se-input-form __se__file_input" data-focus type="file" accept="${acceptedFormats}"${allowMultiple ? ' multiple="multiple"' : ''}/>
+		</div>
+		<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.selection_remove}</button>
+	</div>`;
+};
+Modal.OnChangeFile = function (wrapper, files) {
+	const fileCnt = wrapper.querySelector('.se-input-file-cnt');
+	const fileUp = wrapper.querySelector('.se-input-file-icon-up');
+	const fileSelected = wrapper.querySelector('.se-input-file-icon-files');
+
+	if (files.length > 1) {
+		fileUp.style.display = 'none';
+		fileSelected.style.display = 'inline-block';
+		fileCnt.style.display = '';
+		fileCnt.textContent = ` ..${files.length}`;
+	} else if (files.length > 0) {
+		fileUp.style.display = 'none';
+		fileSelected.style.display = 'none';
+		fileCnt.style.display = 'block';
+		fileCnt.textContent = files[0].name;
+	} else {
+		fileUp.style.display = 'inline-block';
+		fileSelected.style.display = 'none';
+		fileCnt.style.display = '';
+		fileCnt.textContent = '';
+	}
+};
 
 export default Modal;
