@@ -12,3 +12,7 @@ function table() {
 		}
 	};
 }
+
+function dataAttr() {
+	'|data-exp|data-font-size'
+}

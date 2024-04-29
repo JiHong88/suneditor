@@ -185,11 +185,6 @@ Viewer.prototype = {
 
 			// code
 			code.style.height = '';
-			if (codeNumbers) {
-				env._w.setTimeout(() => {
-					codeNumbers.style.height = code.clientHeight;
-				}, 0);
-			}
 
 			// toolbar, editor area
 			toolbar.style.width = wysiwygFrame.style.height = '100%';

@@ -353,10 +353,6 @@ function SetHeaderBookmark(item) {
 	item.id = id;
 	this.urlInput.value = '#' + id;
 
-	if (!this.displayText.value.trim() || !this._change) {
-		this.displayText.value = item.textContent;
-	}
-
 	this._setLinkPreview(this.urlInput.value);
 	this.selectMenu_bookmark.close();
 	this.urlInput.focus();

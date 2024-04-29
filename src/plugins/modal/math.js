@@ -345,11 +345,11 @@ function CreateHTML_controller({ lang, icons }) {
 }
 
 function getValue(element) {
-	return !element ? null : element.getAttribute('data-se-value') || element.getAttribute('data-exp');
+	return !element ? null : element.getAttribute('data-se-value');
 }
 
 function getType(element) {
-	return !element ? null : element?.getAttribute('data-se-type') || element?.getAttribute('data-font-size');
+	return !element ? null : element?.getAttribute('data-se-type');
 }
 
 export default Math_;

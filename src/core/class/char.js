@@ -108,7 +108,7 @@ Char.prototype = {
 					const range = this.selection.getRange();
 					const endOff = range.endOffset - 1;
 					const text = this.selection.getNode().textContent;
-					const slicePosition = range.endOffset - (count - maxCharCount);
+					const slicePosition = range.endOffset - (this.options.get('forceCharClean') ? count - maxCharCount : 1);
 
 					this.selection.getNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
 					this.selection.setRange(range.endContainer, endOff, range.endContainer, endOff);

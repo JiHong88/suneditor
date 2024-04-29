@@ -5,8 +5,7 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
-// data-exp, data-font-size - v2 math plugin migration
-const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+|data-exp|data-font-size';
+const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 
 const HTML = function (editor) {
 	CoreInjector.call(this, editor);

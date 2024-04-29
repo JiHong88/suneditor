@@ -146,6 +146,8 @@ Modal.CreateFileInput = function ({ icons, lang }, { acceptedFormats, allowMulti
 	</div>`;
 };
 Modal.OnChangeFile = function (wrapper, files) {
+	if (!wrapper || !files) return;
+
 	const fileCnt = wrapper.querySelector('.se-input-file-cnt');
 	const fileUp = wrapper.querySelector('.se-input-file-icon-up');
 	const fileSelected = wrapper.querySelector('.se-input-file-icon-files');

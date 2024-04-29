@@ -96,9 +96,9 @@ export function FONT_STYLE(editor, command) {
 	const nodesMap = editor.status.currentNodesMap;
 	const el = nodesMap.includes(editor.options.get('_styleCommandMap')[nodeName]) ? null : domUtils.createElement(nodeName);
 
-	if (/^sub$/i.test(nodeName) && nodesMap.includes('sup')) {
+	if (/^sub$/i.test(nodeName) && nodesMap.includes('superscript')) {
 		nodeName = 'sup';
-	} else if (/^sup$/i.test(nodeName) && nodesMap.includes('sub')) {
+	} else if (/^sup$/i.test(nodeName) && nodesMap.includes('subscript')) {
 		nodeName = 'sub';
 	}
 

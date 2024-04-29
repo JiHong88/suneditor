@@ -626,12 +626,16 @@ EventManager.prototype = {
 		/** observer */
 		if (env.isResizeObserverSupported) {
 			this._toolbarObserver = new ResizeObserver(() => {
-				this.toolbar.resetResponsiveToolbar();
+				_w.setTimeout(() => {
+					this.toolbar.resetResponsiveToolbar();
+				}, 0);
 			});
 			this._wwFrameObserver = new ResizeObserver((entries) => {
-				entries.forEach((e) => {
-					this.editor.__callResizeFunction(this.editor.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
-				});
+				_w.setTimeout(() => {
+					entries.forEach((e) => {
+						this.editor.__callResizeFunction(this.editor.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
+					});
+				}, 0);
 			});
 		}
 

@@ -59,7 +59,7 @@ TextStyle.prototype = {
 	 * @param {Element} target Target command button
 	 */
 	action(target) {
-		const tempElement = target.firstChild;
+		const tempElement = target.firstElementChild;
 		const checkStyles = tempElement.style.cssText.replace(/:.+(;|$)/g, ',').split(',');
 		checkStyles.pop();
 

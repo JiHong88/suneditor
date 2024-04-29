@@ -18,7 +18,7 @@ const ExportPdf = function (editor, pluginOptions) {
 
 	// option check
 	if (!this.apiUrl && !this.options.get('externalLibs').html2canvas && !this.options.get('externalLibs').jsPDF) {
-		throw Error('[SUNEDITOR.plugins.exportPdf.error] Requires "apiUrl" or externalLibs.html2canvas and externalLibs.jsPDF options.');
+		console.warn('[SUNEDITOR.plugins.exportPdf.error] Requires "apiUrl" or externalLibs.html2canvas and externalLibs.jsPDF options.');
 	} else if (this.apiUrl) {
 		this.apiManager = new ApiManager(this, {
 			method: 'POST',

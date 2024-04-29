@@ -336,6 +336,8 @@ Editor.prototype = {
 					toolInst._showBalloon();
 					toolInst._showInline();
 				}
+
+				this.viewer._resetFullScreenHeight();
 				return;
 			}
 

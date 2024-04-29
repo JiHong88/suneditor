@@ -24,8 +24,9 @@ const DEFAULT_SIZE_UNITS = ['px', 'pt', 'em', 'rem'];
 const DEFAULT_CLASS_NAME = '^__se__|^se-|^katex';
 const DEFAULT_EXTRA_TAG_MAP = { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false };
 
-const DEFAULT_TABLE_STYLES = {
-	'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style'
+const DEFAULT_TAG_STYLES = {
+	'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style',
+	'ol|ul': 'list-style-type'
 };
 const DEFAULT_TEXT_STYLES = 'font-family|font-size|color|background-color';
 const DEFAULT_LINE_STYLES = 'text-align|margin-left|margin-right|line-height';
@@ -365,6 +366,7 @@ export function InitOptions(options, editorTargets) {
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
+	o.set('forceCharClean', !!options.forceCharClean);
 
 	let retainStyleMode = options.retainStyleMode;
 	if (typeof retainStyleMode === 'string' && !RETAIN_STYLE_MODE.includes(retainStyleMode)) {
@@ -397,7 +399,15 @@ export function InitOptions(options, editorTargets) {
 	);
 	o.set('convertTextTags', textTags);
 	o.set('_textStyleTags', Object.values(textTags).concat(['span', 'li']));
-	o.set('tagStyles', { ...DEFAULT_TABLE_STYLES, ...(options.tagStyles || {}) });
+	o.set(
+		'tagStyles',
+		[{ ...DEFAULT_TAG_STYLES, ...(options.__tagStyles || {}) }, options.tagStyles || {}].reduce((_default, _new) => {
+			for (const key in _new) {
+				_default[key] = _new[key];
+			}
+			return _default;
+		}, {})
+	);
 	o.set('_textStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULT_TEXT_STYLES}${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULT_LINE_STYLES}${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_defaultStyleTagMap', {
@@ -565,7 +575,7 @@ export function InitOptions(options, editorTargets) {
 					link: ['75', 'K']
 				},
 				options.shortcuts || {}
-		  ].reduce(function (_default, _new) {
+		  ].reduce((_default, _new) => {
 				for (const key in _new) {
 					_default[key] = _new[key];
 				}
@@ -606,7 +616,7 @@ export function InitOptions(options, editorTargets) {
 	const icons =
 		!options.icons || typeof options.icons !== 'object'
 			? _icons
-			: [_icons, options.icons].reduce(function (_default, _new) {
+			: [_icons, options.icons].reduce((_default, _new) => {
 					for (const key in _new) {
 						_default[key] = _new[key];
 					}
@@ -833,7 +843,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 				lineWrapping: true
 			},
 			codeMirror.options || {}
-		].reduce(function (init, option) {
+		].reduce((init, option) => {
 			for (const key in option) {
 				init[key] = option[key];
 			}
