@@ -41,41 +41,11 @@ const FileUpload = function (editor, pluginOptions) {
 		},
 		'custom-as': {
 			command: 'as',
-			value: 'link', // 'box' or 'link'
+			value: 'link', // 'block' or 'link'
 			title: this.lang.asLink,
 			icon: 'reduction',
 			action: (target, value) => {
-				if (value === 'link') {
-					this.figure.close();
-					const { container } = Figure.GetContainer(target);
-					const next = container.nextElementSibling;
-					const parent = container.parentElement;
-
-					target.removeAttribute('data-se-non-focus');
-					target.setAttribute('contenteditable', false);
-					domUtils.addClass(target, 'se-component|se-inline-component');
-
-					const line = domUtils.createElement(this.options.get('defaultLine'), null, target);
-					parent.insertBefore(line, next);
-					domUtils.removeItem(container);
-				} else {
-					this.selection.setRange(target, 0, target, 1);
-					const r = this.html.remove();
-					const s = this.nodeTransform.split(r.container, r.offset, 0);
-
-					if (s?.previousElementSibling && domUtils.isZeroWith(s.previousElementSibling)) {
-						domUtils.removeItem(s.previousElementSibling);
-					}
-
-					target.setAttribute('data-se-non-focus', 'true');
-					target.removeAttribute('contenteditable');
-					domUtils.removeClass(target, 'se-component|se-component-selected|se-inline-component');
-
-					const figure = Figure.CreateContainer(target, 'se-file-figure se-flex-component');
-					(s || r.container).parentElement.insertBefore(figure.container, s);
-				}
-
-				this.component.select(target, FileUpload.key, false);
+				this.convertFormat(target, value);
 			}
 		}
 	};
@@ -275,6 +245,47 @@ FileUpload.prototype = {
 
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
+	},
+
+	/**
+	 * @description Convert format to link or block
+	 * @param {Element} target Target element
+	 * @param {string} value 'link' or 'block'
+	 */
+	convertFormat(target, value) {
+		if (value === 'link') {
+			this.figure.close();
+			const { container } = Figure.GetContainer(target);
+			const next = container.nextElementSibling;
+			const parent = container.parentElement;
+
+			target.removeAttribute('data-se-non-focus');
+			target.setAttribute('contenteditable', false);
+			domUtils.addClass(target, 'se-component|se-inline-component');
+
+			const line = domUtils.createElement(this.options.get('defaultLine'), null, target);
+			parent.insertBefore(line, next);
+			domUtils.removeItem(container);
+		} else {
+			// block
+			this.selection.setRange(target, 0, target, 1);
+			const r = this.html.remove();
+			const s = this.nodeTransform.split(r.container, r.offset, 0);
+
+			if (s?.previousElementSibling && domUtils.isZeroWith(s.previousElementSibling)) {
+				domUtils.removeItem(s.previousElementSibling);
+			}
+
+			target.setAttribute('data-se-non-focus', 'true');
+			target.removeAttribute('contenteditable');
+			domUtils.removeClass(target, 'se-component|se-component-selected|se-inline-component');
+
+			const figure = Figure.CreateContainer(target, 'se-file-figure se-flex-component');
+			(s || r.container).parentElement.insertBefore(figure.container, s);
+		}
+
+		this.history.push(false);
+		this.component.select(target, FileUpload.key, false);
 	},
 
 	_register(response) {

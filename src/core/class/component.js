@@ -421,6 +421,7 @@ function OnKeyDown_component(e) {
 		if (typeof this.currentPlugin?.destroy === 'function') {
 			this.currentPlugin.destroy(this.currentTarget);
 			this.deselect();
+			this.editor.focus();
 			return;
 		}
 	}

@@ -157,6 +157,25 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				}
 			}
 
+			// line component
+			if (!selectRange && formatEl) {
+				const sel =
+					selectionNode === formatEl
+						? formatEl.childNodes[range.startOffset] || formatEl.childNodes[range.startOffset - 1]
+						: domUtils.isEdgePoint(range.startContainer, range.startOffset)
+						? range.startContainer.previousSibling
+						: null;
+				if (this.component.is(sel)) {
+					const fileComponentInfo = this.component.get(sel);
+					if (fileComponentInfo) {
+						e.preventDefault();
+						e.stopPropagation();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false) === false) this.editor.blur();
+						break;
+					}
+				}
+			}
+
 			// tag[contenteditable='false']
 			if (this._isUneditableNode(range, true)) {
 				e.preventDefault();
@@ -291,6 +310,20 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				e.preventDefault();
 				e.stopPropagation();
 				break;
+			}
+
+			// line component
+			if (!selectRange && formatEl) {
+				const sel = selectionNode === formatEl ? formatEl.childNodes[range.endOffset] || formatEl.childNodes[range.endOffset + 1] : domUtils.isEdgePoint(range.endContainer, range.endOffset) ? range.endContainer.nextSibling : null;
+				if (this.component.is(sel)) {
+					const fileComponentInfo = this.component.get(sel);
+					if (fileComponentInfo) {
+						e.preventDefault();
+						e.stopPropagation();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false) === false) this.editor.blur();
+						break;
+					}
+				}
 			}
 
 			// tag[contenteditable='false']
