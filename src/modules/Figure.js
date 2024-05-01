@@ -1,8 +1,15 @@
 import EditorInjector from '../editorInjector';
 import { Controller, SelectMenu } from '../modules';
-import { domUtils, numbers, env } from '../helper';
+import { domUtils, numbers, env, converter } from '../helper';
 
 const { ON_OVER_COMPONENT } = env;
+const DIRECTION_CURSOR_MAP = { tl: 'nw-resize', tr: 'ne-resize', bl: 'sw-resize', br: 'se-resize', lw: 'w-resize', th: 'n-resize', rw: 'e-resize', bh: 's-resize' };
+const DIR_DIAGONAL = 'tl|bl|tr|br';
+const DIR_W = 'lw|rw';
+let __resizing_p_wh = false;
+let __resizing_p_ow = false;
+let __resizing_cw = 0;
+let __resizing_sw = 0;
 
 const Figure = function (inst, controls, params) {
 	EditorInjector.call(this, inst.editor);
@@ -844,7 +851,6 @@ function GetRotateValue(element) {
 	};
 }
 
-const DIRECTION_CURSOR_MAP = { tl: 'nw-resize', tr: 'ne-resize', bl: 'sw-resize', br: 'se-resize', lw: 'w-resize', th: 'n-resize', rw: 'e-resize', bh: 's-resize' };
 function OnResizeContainer(e) {
 	e.stopPropagation();
 	e.preventDefault();
@@ -855,6 +861,25 @@ function OnResizeContainer(e) {
 	inst._resizeClientY = e.clientY;
 	inst.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 	this.editor.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
+
+	const { w, h } = this.getSize(inst._element);
+	__resizing_p_wh = __resizing_p_ow = false;
+	__resizing_cw = __resizing_sw = 0;
+	if (!this.isVertical) {
+		const pw = !w || /auto|%$/.test(w);
+		const ph = !h || /auto|%$/.test(h);
+		if (DIR_DIAGONAL.includes(direction) && pw && ph) {
+			__resizing_p_wh = true;
+		} else if (DIR_W.includes(direction) && pw) {
+			__resizing_p_ow = true;
+		}
+
+		if (__resizing_p_wh || __resizing_p_ow) {
+			const sizeTarget = inst._cover || inst._element;
+			__resizing_sw = sizeTarget.offsetWidth;
+			__resizing_cw = converter.getWidthInPercentage(sizeTarget, this.editor.frameContext.get('wysiwygFrame')) / 100;
+		}
+	}
 
 	inst.__onContainerEvent = inst.eventManager.addGlobalEvent('mousemove', inst.__containerResizing);
 	inst.__offContainerEvent = inst.eventManager.addGlobalEvent('mouseup', inst.__containerResizingOff);
@@ -892,7 +917,8 @@ function ContainerResizing(e) {
 
 	this._resize_w = /h$/.test(direction) ? this._width : Math.round(resultW);
 	this._resize_h = /w$/.test(direction) ? this._height : Math.round(resultH);
-	domUtils.changeTxt(this.editor.frameContext.get('_figure').display, this._resize_w + ' x ' + this._resize_h);
+	const rw = __resizing_cw ? (this._resize_w / __resizing_sw) * __resizing_cw * 100 : this._resize_w;
+	domUtils.changeTxt(this.editor.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' x ' + this._resize_h);
 }
 
 function ContainerResizingOff() {
@@ -916,8 +942,15 @@ function ContainerResizingOff() {
 		}
 	}
 
-	this._applySize(w, h, this._resize_direction);
-	if (this.isVertical) this.setTransform(this._element, w, h, 0);
+	if (__resizing_p_wh || __resizing_p_ow) {
+		const sizeTarget = this._cover || this._element;
+		w = (w / sizeTarget.offsetWidth) * __resizing_cw * 100;
+		w = numbers.get(w > 100 ? 100 : w, 2) + '%';
+		this._setPercentSize(w, __resizing_p_ow ? this.getSize(this._element).h : '');
+	} else {
+		this._applySize(w, h, this._resize_direction);
+		if (this.isVertical) this.setTransform(this._element, w, h, 0);
+	}
 
 	this.history.push(false);
 	this.component.select(this._element, this.kind, false);

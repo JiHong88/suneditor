@@ -191,10 +191,11 @@ export function rgb2hex(rgba) {
 /**
  * @description Computes the width as a percentage of the parent's width, and returns this value rounded to two decimal places.
  * @param {Element} target
+ * @param {Element|null} parentTarget
  * @returns {number}
  */
-export function getWidthInPercentage(target) {
-	const parent = target.parentElement;
+export function getWidthInPercentage(target, parentTarget) {
+	const parent = parentTarget || target.parentElement;
 	const parentStyle = _w.getComputedStyle(parent);
 	const parentPaddingLeft = _w.parseFloat(parentStyle.paddingLeft);
 	const parentPaddingRight = _w.parseFloat(parentStyle.paddingRight);
