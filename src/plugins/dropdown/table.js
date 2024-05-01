@@ -93,6 +93,7 @@ const Table = function (editor, pluginOptions) {
 	// props
 	const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
 	this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
+	this.controller_props_title = controller_props.querySelector('.se-controller-title');
 	// color picker
 	const colorForm = domUtils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
 	this.colorPicker = new ColorPicker(this, '', {
@@ -189,7 +190,7 @@ const Table = function (editor, pluginOptions) {
 	this.columnFixedButton = controller_table.querySelector('._se_table_fixed_column');
 	this.headerButton = controller_table.querySelector('._se_table_header');
 	this.captionButton = controller_table.querySelector('._se_table_caption');
-	this.mergeButton = controller_cell.querySelector('._se_table_merge_button');
+	this.mergeButton = controller_cell.querySelector('[data-command="merge"]');
 
 	// members - private
 	this._resizing = false;
@@ -585,6 +586,7 @@ Table.prototype = {
 				if (this.controller_props.currentTarget === target && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
+					this.controller_props_title.textContent = this.lang.tableProperties;
 					this._setCtrlProps('table');
 					this.controller_props.open(target, this.controller_table.form, { isWWTarget: false, initMethod: null, addOffset: null });
 				}
@@ -593,6 +595,7 @@ Table.prototype = {
 				if (this.controller_props.currentTarget === target && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
+					this.controller_props_title.textContent = this.lang.cellProperties;
 					this._setCtrlProps('cell');
 					this.controller_props.open(target, this.controller_cell.form, { isWWTarget: false, initMethod: null, addOffset: null });
 				}
@@ -1286,7 +1289,7 @@ Table.prototype = {
 		mergeCell.colSpan = cs;
 		mergeCell.rowSpan = rs;
 
-		this.setActiveButton(true, false);
+		this.setMergeSplitButton(true, false);
 		this.setController(mergeCell);
 
 		this.editor.focusEdge(mergeCell);
@@ -1365,8 +1368,8 @@ Table.prototype = {
 		}
 	},
 
-	setActiveButton(fixedCell, selectedCell) {
-		if (!selectedCell || fixedCell === selectedCell) {
+	setMergeSplitButton(fixedCell, selectedCell) {
+		if (!selectedCell || !selectedCell || fixedCell === selectedCell) {
 			this.splitButton.style.display = 'block';
 			this.mergeButton.style.display = 'none';
 		} else {
@@ -2438,7 +2441,7 @@ function OffCellMultiSelect(e) {
 
 	if (!this._fixedCell || !this._selectedTable) return;
 
-	this.setActiveButton(this._fixedCell, this._selectedCell);
+	this.setMergeSplitButton(this._fixedCell, this._selectedCell);
 	this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 
 	const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
@@ -2655,7 +2658,7 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
                 <span class="se-tooltip-text">${lang.row}</span>
             </span>
         </button>
-        <button type="button" data-command="merge" class="_se_table_merge_button se-btn se-tooltip" style="display: none;">
+        <button type="button" data-command="merge" class="se-btn se-tooltip" style="display: none;">
             ${icons.merge_cell}
             <span class="se-tooltip-inner">
                 <span class="se-tooltip-text">${lang.mergeCells}</span>

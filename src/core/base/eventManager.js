@@ -561,7 +561,7 @@ EventManager.prototype = {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, '<br>');
 		}
 
-		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
+		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText, false);
 		// user event - paste
 		if (type === 'paste') {
 			const value = await this.triggerEvent('onPaste', { frameContext, event: e, cleanData, maxCharCount });

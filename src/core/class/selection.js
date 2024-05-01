@@ -407,8 +407,10 @@ Selection.prototype = {
 			if (!onlyBreak) {
 				const tempConCache = tempCon;
 				while (tempCon && !domUtils.isBreak(tempCon) && tempCon.nodeType === 1) {
-					tempCon = tempCon.childNodes[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
-					tempOffset = 0;
+					tempChild = tempCon.childNodes;
+					if (tempChild.length === 0) break;
+					tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : tempCon.previousElementSibling || tempCon.previousSibling || startCon;
+					tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
 				}
 
 				let format = this.format.getLine(tempCon, null);

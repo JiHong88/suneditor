@@ -284,6 +284,39 @@ Viewer.prototype = {
 		this.editor._resourcesStateChange(fc);
 	},
 
+	_setButtonsActive() {
+		const fc = this.editor.frameContext;
+
+		// codeView
+		if (fc.get('isCodeView')) {
+			domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');
+		} else {
+			domUtils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
+		}
+
+		// fullScreen
+		if (fc.get('isFullScreen')) {
+			const reductionIcon = this.icons.reduction;
+			this.editor.applyCommandTargets('fullScreen', (e) => {
+				domUtils.changeElement(e.firstElementChild, reductionIcon);
+				domUtils.addClass(e, 'active');
+			});
+		} else {
+			const expansionIcon = this.icons.expansion;
+			this.editor.applyCommandTargets('fullScreen', (e) => {
+				domUtils.changeElement(e.firstElementChild, expansionIcon);
+				domUtils.removeClass(e, 'active');
+			});
+		}
+
+		// showBlocks
+		if (fc.get('isShowBlocks')) {
+			domUtils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
+		} else {
+			domUtils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
+		}
+	},
+
 	/**
 	 * @description Prints the current content of the editor.
 	 */

@@ -168,6 +168,7 @@ Toolbar.prototype = {
 		this._resetSticky();
 
 		this.editor.effectNode = null;
+		this.viewer._setButtonsActive();
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		if (this.editor.frameContext.get('isReadOnly')) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
 

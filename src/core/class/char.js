@@ -90,7 +90,7 @@ Char.prototype = {
 	 * @param {string} inputText Text added.
 	 * @returns {boolean}
 	 */
-	test(inputText) {
+	test(inputText, _fromInputEvent) {
 		let nextCharCount = 0;
 		if (inputText) nextCharCount = this.getLength(inputText);
 
@@ -103,12 +103,12 @@ Char.prototype = {
 
 			if (count > maxCharCount) {
 				over = true;
-				if (nextCharCount > 0) {
+				if (nextCharCount > 0 && _fromInputEvent) {
 					this.selection._init();
 					const range = this.selection.getRange();
 					const endOff = range.endOffset - 1;
 					const text = this.selection.getNode().textContent;
-					const slicePosition = range.endOffset - (count - maxCharCount);
+					const slicePosition = range.endOffset - 1; // (count - maxCharCount);
 
 					this.selection.getNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
 					this.selection.setRange(range.endContainer, endOff, range.endContainer, endOff);

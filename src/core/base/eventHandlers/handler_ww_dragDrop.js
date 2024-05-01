@@ -41,6 +41,11 @@ export function OnDrop_wysiwyg(frameContext, e) {
 
 	if (Figure.__dragContainer) {
 		e.preventDefault();
+		if (Figure.__dragContainer.contains(e.target)) {
+			this.component.deselect();
+			return;
+		}
+
 		const dragContainer = Figure.__dragContainer;
 		this.component.deselect();
 		this.selection.setRange(sc, so, ec, eo);

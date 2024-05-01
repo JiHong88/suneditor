@@ -8,8 +8,8 @@ const StyleMap = {
 	strike: ['text-decoration']
 };
 
-export const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'indent', 'outdent', 'fullScreen', 'showBlocks', 'codeView'];
-export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'dir', 'dir_ltr', 'dir_rtl']);
+export const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'indent', 'outdent'];
+export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl']);
 
 export function SELECT_ALL(editor) {
 	editor._offCurrentController();

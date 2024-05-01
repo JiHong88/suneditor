@@ -19,7 +19,7 @@ export function OnInput_wysiwyg(frameContext, e) {
 	this.selection._init();
 
 	const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
-	if (!this.char.test(data)) {
+	if (!this.char.test(data, true)) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -934,7 +934,7 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 		}
 	}
 
-	this.char.test('');
+	this.char.test('', false);
 
 	// user event
 	if (this.triggerEvent('onKeyUp', { frameContext, event: e }) === false) return;
