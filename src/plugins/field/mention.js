@@ -154,7 +154,7 @@ function SelectMention(item) {
 		oA.textContent = this.triggerText + key;
 	} else {
 		this.selection.setRange(this._anchorNode, this._lastAtPos, this._anchorNode, this._anchorOffset);
-		oA = domUtils.createElement('A', { 'data-se-mention': key, href: url, title: name }, this.triggerText + key);
+		oA = domUtils.createElement('A', { 'data-se-mention': key, href: url, title: name, target: '_blank' }, this.triggerText + key);
 		if (!this.html.insertNode(oA, null, false)) return false;
 	}
 

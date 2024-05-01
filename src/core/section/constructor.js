@@ -11,7 +11,7 @@ const REQUIRED_ELEMENT_WHITELIST = 'br|div';
 const DEFAULT_ELEMENT_WHITELIST =
 	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_TEXT_STYLE_TAGS = 'strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary';
-const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|download|rel|src|alt|class|type|controls|colspan|rowspan';
+const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|title|download|rel|src|alt|class|type|controls|colspan|rowspan';
 
 const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';
 const DEFAULT_FORMAT_BR_LINE = 'PRE';
