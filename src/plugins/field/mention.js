@@ -22,7 +22,7 @@ const Mention = function (editor, pluginOptions) {
 	this._anchorNode = null;
 	// members - api, caching
 	this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
-	this.chchingData = [];
+	this.cachingData = pluginOptions.useCachingData ?? true ? new Map() : null;
 
 	// controller
 	const controllerEl = CreateHTML_controller();
@@ -94,8 +94,16 @@ Mention.prototype = {
 	},
 
 	async _createMentionList(value, targetNode) {
-		const xmlHttp = await this.apiManager.asyncCall({ method: 'GET', url: this._createUrl(value) });
-		const response = JSON.parse(xmlHttp.responseText);
+		let response = null;
+		if (this.cachingData) {
+			response = this.cachingData.get(value);
+		}
+
+		if (!response) {
+			const xmlHttp = await this.apiManager.asyncCall({ method: 'GET', url: this._createUrl(value) });
+			response = JSON.parse(xmlHttp.responseText);
+		}
+
 		if (!response?.length) {
 			this.selectMenu.close();
 			return false;
@@ -119,6 +127,7 @@ Mention.prototype = {
 			this.selectMenu.create(list, menus);
 			this.selectMenu.open();
 			this.selectMenu.setItem(0);
+			if (this.cachingData) this.cachingData.set(value, list);
 			return true;
 		}
 	},
