@@ -101,6 +101,7 @@ const Figure = function (inst, controls, params) {
 			this.eventManager.addEvent(dragHandle, 'mouseleave', OnDragLeave.bind(this));
 			this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
 			this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
+			this.eventManager.addEvent(dragHandle, 'click', OnDragClick.bind(this));
 		}
 	});
 };
@@ -248,14 +249,9 @@ Figure.prototype = {
 		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || target.style.float || 'none';
 		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(target).r).toString());
 
-		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		const sizeTarget = figureTarget ? this._cover || this._container || target : target;
-		const offset = this.offset.get(sizeTarget);
-		const frameOffset = this.offset.get(this.editor.frameContext.get('wysiwygFrame'));
-		const w = sizeTarget.offsetWidth - 1;
-		const h = sizeTarget.offsetHeight - 1;
-		const t = offset.top - (this.editor.frameOptions.get('iframe') ? frameOffset.top : 0);
-		const l = offset.left - (this.editor.frameOptions.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.editor.frameContext.get('wysiwygFrame').scrollLeft;
+		const { w, h, t, l, scrollX, scrollY } = this.offset.getSize(sizeTarget);
+
 		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
 		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
 		const targetInfo = {
@@ -289,7 +285,7 @@ Figure.prototype = {
 		_figure.border.style.width = (this.isVertical ? h : w) + 'px';
 		_figure.border.style.height = (this.isVertical ? w : h) + 'px';
 
-		this.__offset = { left: l + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0), top: t + (eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0) };
+		this.__offset = { left: l + scrollX, top: t + scrollY };
 		this.editor.opendControllers.push({
 			position: 'none',
 			form: _figure.main,
@@ -346,7 +342,9 @@ Figure.prototype = {
 		this._setAlignIcon();
 
 		// drag
-		this._setDragEvent(_figure.main);
+		if (this.eventManager.__overInfo !== ON_OVER_COMPONENT || domUtils.hasClass(figureInfo.container, 'se-input-component')) {
+			this._setDragEvent(_figure.main);
+		}
 
 		return targetInfo;
 	},
@@ -780,7 +778,11 @@ Figure.prototype = {
 
 	_setDragEvent(figureMain) {
 		const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
-		dragHandle.style.display = 'block';
+		domUtils.removeClass(dragHandle, 'se-drag-handle-full');
+
+		dragHandle.style.opacity = '';
+		dragHandle.style.width = '';
+		dragHandle.style.height = '';
 
 		Figure.__dragHandler = dragHandle;
 		Figure.__dragContainer = this._container;
@@ -788,6 +790,8 @@ Figure.prototype = {
 		Figure.__dragMove = OnScrollDragHandler.bind(this, dragHandle, figureMain);
 
 		Figure.__dragMove();
+
+		dragHandle.style.display = 'block';
 	},
 
 	_removeDragEvent() {
@@ -839,6 +843,11 @@ function OnDragEnd() {
 	this.editor._antiBlur = false;
 	domUtils.removeClass([Figure.__dragHandler, Figure.__dragContainer], 'se-dragging');
 	this._removeDragEvent();
+}
+
+function OnDragClick({ target }) {
+	if (!domUtils.hasClass(target, 'se-drag-handle-full')) return;
+	this.component.select(Figure.__figureControllerInst._element, Figure.__figureControllerInst.kind, false);
 }
 
 function GetRotateValue(element) {

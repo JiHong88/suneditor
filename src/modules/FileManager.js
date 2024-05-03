@@ -254,7 +254,7 @@ FileManager.prototype = {
 				currentTags.push(this.infoIndex);
 				try {
 					if (this.figure) this.figure.__fileManagerInfo = true;
-					if (typeof this.checkHandler === 'function' && this.options.get('strictMode').pluginRetainFormat) tag = this.checkHandler(tag);
+					if (typeof this.checkHandler === 'function') tag = this.checkHandler(tag);
 					if (!tag) {
 						console.warn(`[SUNEDITOR.FileManager[${this.kind}].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).`);
 					} else {

@@ -1214,8 +1214,8 @@ Editor.prototype = {
 		}
 
 		this.applyFrameRoots((e) => {
-			this._initWysiwygArea(e, e.get('options').get('value'));
 			this.eventManager._addFrameEvents(e);
+			this._initWysiwygArea(e, e.get('options').get('value'));
 		});
 
 		this._componentsInfoInit = false;
@@ -1548,8 +1548,8 @@ Editor.prototype = {
 
 			if (e.get('options').get('iframe')) {
 				iframeRootSize++;
-				e.get('wysiwygFrame').addEventListener('load', function () {
-					this.__setIframeDocument(this, this.options, e.get('options'));
+				e.get('wysiwygFrame').addEventListener('load', ({ target }) => {
+					this.__setIframeDocument(target, this.options, e.get('options'));
 					if (iframeRootSize === ++iframeIndex) this.__editorInit(originOptions);
 				});
 			}

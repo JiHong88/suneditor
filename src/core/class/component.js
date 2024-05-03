@@ -186,7 +186,28 @@ Component.prototype = {
 		}, 0);
 		domUtils.addClass(info.container, 'se-component-selected');
 
-		if (__overInfo !== ON_OVER_COMPONENT) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+		if (__overInfo !== ON_OVER_COMPONENT) {
+			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+		} else if (!domUtils.hasClass(info.container, 'se-input-component')) {
+			const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
+			// domUtils.addClass(info.cover, 'se-figure-seleted');
+			domUtils.addClass(dragHandle, 'se-drag-handle-full');
+
+			const sizeTarget = info.caption ? info.target : info.cover || info.container || info.target;
+			const { w, h, t, l } = this.offset.getSize(sizeTarget);
+
+			dragHandle.style.opacity = 0.5;
+			dragHandle.style.width = w + 'px';
+			dragHandle.style.height = h + 'px';
+			dragHandle.style.top = t + 'px';
+			dragHandle.style.left = l + 'px';
+
+			Figure.__dragHandler = dragHandle;
+			Figure.__dragContainer = info.container;
+			Figure.__dragCover = info.cover;
+
+			dragHandle.style.display = 'block';
+		}
 	},
 
 	deselect() {

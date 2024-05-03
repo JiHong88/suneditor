@@ -140,7 +140,7 @@ HTML.prototype = {
 	 * @returns {string}
 	 */
 	clean(html, requireFormat, whitelist, blacklist) {
-		const { pluginRetainFormat, tagFilter, formatFilter, classFilter, styleNodeFilter, attrFilter, styleFilter } = this.options.get('strictMode');
+		const { tagFilter, formatFilter, classFilter, styleNodeFilter, attrFilter, styleFilter } = this.options.get('strictMode');
 		let cleanData = '';
 
 		html = this.compress(html);
@@ -164,14 +164,12 @@ HTML.prototype = {
 			}
 		}
 
-		if (pluginRetainFormat) {
-			this.editor._MELInfo.forEach((method, query) => {
-				const infoLst = dom.querySelectorAll(query);
-				for (let i = 0, len = infoLst.length; i < len; i++) {
-					method(infoLst[i]);
-				}
-			});
-		}
+		this.editor._MELInfo.forEach((method, query) => {
+			const infoLst = dom.querySelectorAll(query);
+			for (let i = 0, len = infoLst.length; i < len; i++) {
+				method(infoLst[i]);
+			}
+		});
 
 		if (formatFilter) {
 			let domTree = dom.childNodes;

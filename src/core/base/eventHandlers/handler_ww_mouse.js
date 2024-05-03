@@ -6,10 +6,6 @@ export function OnMouseDown_wysiwyg(frameContext, e) {
 	if (frameContext.get('isReadOnly') || domUtils.isNonEditable(frameContext.get('wysiwyg'))) return;
 	if (this.format._isExcludeSelectionElement(e.target)) {
 		e.preventDefault();
-		const componentInfo = this.component.get(e.target);
-		if (componentInfo) {
-			this.component.select(componentInfo.target, componentInfo.pluginName, false);
-		}
 		return;
 	}
 
@@ -58,8 +54,10 @@ export function OnClick_wysiwyg(frameContext, e) {
 	// plugin event
 	if (this._callPluginEvent('onClick', { frameContext, event: e }) === false) return;
 
-	if (this.component.is(targetElement)) {
+	const componentInfo = this.component.get(targetElement);
+	if (componentInfo) {
 		e.preventDefault();
+		this.component.select(componentInfo.target, componentInfo.pluginName, false);
 		return;
 	}
 

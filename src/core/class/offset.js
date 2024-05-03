@@ -18,6 +18,30 @@ const Offset = function (editor) {
 
 Offset.prototype = {
 	/**
+	 * @description Returns the offset and size of the argument, "target" relative to the editor.
+	 * @param {Node} target Target node
+	 * @returns {{w:number, h:number, t:number, l:number, scrollX:number, scrollY:number}}
+	 */
+	getSize(target) {
+		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
+		const offset = this.get(target);
+		const frameOffset = this.get(this.editor.frameContext.get('wysiwygFrame'));
+		const w = target.offsetWidth - 1;
+		const h = target.offsetHeight - 1;
+		const t = offset.top - (this.editor.frameOptions.get('iframe') ? frameOffset.top : 0);
+		const l = offset.left - (this.editor.frameOptions.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.editor.frameContext.get('wysiwygFrame').scrollLeft;
+
+		return {
+			w,
+			h,
+			t,
+			l,
+			scrollX: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
+			scrollY: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0
+		};
+	},
+
+	/**
 	 * @description Returns the position of the argument, "this.editor.frameContext.get('wrapper')" to inside the editor.Returns the position of the element in "this.editor.frameContext.get('wrapper')".
 	 * @param {Node} node Target node
 	 * @returns {{top:boolean, left:boolean}}

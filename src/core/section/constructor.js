@@ -352,7 +352,6 @@ export function InitOptions(options, editorTargets) {
 	/** Base */
 	const modeValue = options.strictMode !== false;
 	o.set('strictMode', {
-		pluginRetainFormat: modeValue,
 		tagFilter: modeValue,
 		formatFilter: modeValue,
 		classFilter: modeValue,

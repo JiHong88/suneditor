@@ -91,12 +91,10 @@ Math_.prototype = {
 				const value = getValue(element);
 				if (!value) return;
 
-				if (element.querySelector('.katex-html')) return;
-
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
 				element.setAttribute('contenteditable', false);
-				domUtils.addClass(element, 'se-component|se-inline-component');
+				domUtils.addClass(element, 'se-component|se-inline-component|se-disable-pointer');
 			}
 		};
 	},
