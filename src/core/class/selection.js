@@ -257,6 +257,27 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @description Scroll to the corresponding selection or range position.
+	 * @param {Selection|Range|Node} ref selection or range object
+	 */
+	scrollTo(ref) {
+		if (ref instanceof Selection) {
+			ref = ref.getRangeAt(0);
+		} else if (ref instanceof Node) {
+			ref = this.selection.setRange(ref, 1, ref, 1);
+		} else if (typeof ref?.startContainer === 'undefined') {
+			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
+		}
+
+		const rect = ref.getBoundingClientRect();
+		const isVisible = rect.top >= 0 && rect.bottom <= this.editor.frameContext.get('wysiwygFrame').innerHeight;
+
+		if (isVisible) return;
+
+		ref.startContainer?.scrollIntoView?.({ behavior: 'auto', block: 'nearest' });
+	},
+
+	/**
 	 * @description Returns true if there is no valid selection.
 	 * @param {Object} range selection.getRange()
 	 * @returns {boolean}

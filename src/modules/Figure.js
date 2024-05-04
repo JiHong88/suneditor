@@ -1,5 +1,5 @@
 import EditorInjector from '../editorInjector';
-import { Controller, SelectMenu } from '../modules';
+import { Controller, SelectMenu, _DragHandle } from '../modules';
 import { domUtils, numbers, env, converter } from '../helper';
 
 const { ON_OVER_COMPONENT } = env;
@@ -94,23 +94,9 @@ const Figure = function (inst, controls, params) {
 			});
 			e.get('wrapper').appendChild(main);
 			this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
-			// drag
-			const dragHandle = domUtils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true', title: this.lang.drag }, this.icons.selection);
-			e.get('wrapper').appendChild(dragHandle);
-			this.eventManager.addEvent(dragHandle, 'mouseenter', OnDragEnter.bind(this));
-			this.eventManager.addEvent(dragHandle, 'mouseleave', OnDragLeave.bind(this));
-			this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
-			this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
-			this.eventManager.addEvent(dragHandle, 'click', OnDragClick.bind(this));
 		}
 	});
 };
-
-Figure.__figureControllerInst = null;
-Figure.__dragHandler = null;
-Figure.__dragContainer = null;
-Figure.__dragCover = null;
-Figure.__dragMove = null;
 
 /**
  * @description Create a container for the resizing component and insert the element.
@@ -223,7 +209,7 @@ Figure.prototype = {
 		this.controller.close();
 
 		if (domUtils.hasClass(this._w.event?.target, 'se-drag-handle|sun-editor-editable')) return;
-		this._removeDragEvent();
+		this.component._removeDragEvent();
 	},
 
 	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
@@ -232,7 +218,7 @@ Figure.prototype = {
 			return;
 		}
 
-		if (this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
+		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
 			this.editor._offCurrentController();
 		} else {
 			nonBorder = true;
@@ -241,7 +227,8 @@ Figure.prototype = {
 		const figureInfo = Figure.GetContainer(target);
 		if (!figureInfo.container) return { container: null, cover: null };
 
-		Figure.__figureControllerInst = this;
+		_DragHandle.set('__figureInst', this);
+
 		this._cover = figureInfo.cover;
 		this._container = figureInfo.container;
 		this._caption = figureInfo.caption;
@@ -317,8 +304,8 @@ Figure.prototype = {
 		_figure.border.style.display = nonBorder ? 'none' : '';
 		_figure.main.style.display = 'block';
 
-		if (this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
-			this.editor._visibleControllers(true);
+		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
+			this.editor._visibleControllers(true, true);
 			// size
 			const size = this.getSize(target);
 			domUtils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.w + ', ' + size.h + ')');
@@ -326,7 +313,7 @@ Figure.prototype = {
 			// selecte
 			domUtils.removeClass(this._cover, 'se-figure-over-selected');
 			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
-			this._w.setTimeout(() => (this.eventManager.__overInfo = false), 0);
+			this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 		} else {
 			domUtils.addClass(this._cover, 'se-figure-over-selected');
 		}
@@ -342,7 +329,7 @@ Figure.prototype = {
 		this._setAlignIcon();
 
 		// drag
-		if (this.eventManager.__overInfo !== ON_OVER_COMPONENT || domUtils.hasClass(figureInfo.container, 'se-input-component')) {
+		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || domUtils.hasClass(figureInfo.container, 'se-input-component')) {
 			this._setDragEvent(_figure.main);
 		}
 
@@ -766,7 +753,7 @@ Figure.prototype = {
 	},
 
 	_offResizeEvent() {
-		this._removeDragEvent();
+		this.component._removeDragEvent();
 		this.eventManager.removeGlobalEvent(this.__onContainerEvent);
 		this.eventManager.removeGlobalEvent(this.__offContainerEvent);
 		this.eventManager.removeGlobalEvent(this.__onResizeESCEvent);
@@ -784,23 +771,14 @@ Figure.prototype = {
 		dragHandle.style.width = '';
 		dragHandle.style.height = '';
 
-		Figure.__dragHandler = dragHandle;
-		Figure.__dragContainer = this._container;
-		Figure.__dragCover = this._cover;
-		Figure.__dragMove = OnScrollDragHandler.bind(this, dragHandle, figureMain);
+		_DragHandle.set('__dragHandler', dragHandle);
+		_DragHandle.set('__dragContainer', this._container);
+		_DragHandle.set('__dragCover', this._cover);
+		_DragHandle.set('__dragMove', OnScrollDragHandler.bind(this, dragHandle, figureMain));
 
-		Figure.__dragMove();
+		_DragHandle.get('__dragMove')();
 
 		dragHandle.style.display = 'block';
-	},
-
-	_removeDragEvent() {
-		this.carrierWrapper.querySelector('.se-drag-cursor').style.left = '-10000px';
-		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
-		domUtils.removeClass([Figure.__dragHandler, Figure.__dragContainer], 'se-dragging');
-		domUtils.removeClass(Figure.__dragCover, 'se-drag-over');
-		Figure.__dragHandler = Figure.__dragContainer = Figure.__dragCover = Figure.__dragMove = null;
-		this.eventManager.__overInfo = null;
 	},
 
 	constructor: Figure
@@ -811,43 +789,6 @@ function OnScrollDragHandler(dragHandle, figureMain) {
 	dragHandle.style.display = 'block';
 	dragHandle.style.left = offset.left + (this.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
 	dragHandle.style.top = offset.top - dragHandle.offsetHeight + 'px';
-}
-
-function OnDragEnter() {
-	this.editor._antiBlur = true;
-	this.editor._visibleControllers(false);
-	domUtils.addClass(Figure.__dragCover, 'se-drag-over');
-}
-
-function OnDragLeave() {
-	this.editor._antiBlur = false;
-	this.editor._visibleControllers(true);
-	domUtils.removeClass(Figure.__dragCover, 'se-drag-over');
-}
-
-function OnDragStart(e) {
-	const cover = Figure.__dragCover || Figure.__dragContainer;
-
-	if (!cover) {
-		e.preventDefault();
-		return;
-	}
-
-	this.editor._antiBlur = false;
-	domUtils.addClass(Figure.__dragHandler, 'se-dragging');
-	domUtils.addClass(Figure.__dragContainer, 'se-dragging');
-	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
-}
-
-function OnDragEnd() {
-	this.editor._antiBlur = false;
-	domUtils.removeClass([Figure.__dragHandler, Figure.__dragContainer], 'se-dragging');
-	this._removeDragEvent();
-}
-
-function OnDragClick({ target }) {
-	if (!domUtils.hasClass(target, 'se-drag-handle-full')) return;
-	this.component.select(Figure.__figureControllerInst._element, Figure.__figureControllerInst.kind, false);
 }
 
 function GetRotateValue(element) {
@@ -864,7 +805,7 @@ function OnResizeContainer(e) {
 	e.stopPropagation();
 	e.preventDefault();
 
-	const inst = Figure.__figureControllerInst;
+	const inst = _DragHandle.get('__figureInst');
 	const direction = (inst._resize_direction = e.target.classList[0]);
 	inst._resizeClientX = e.clientX;
 	inst._resizeClientY = e.clientY;
@@ -1037,7 +978,6 @@ function CreateResize(editor, button) {
 function OffFigureContainer() {
 	this.editor.frameContext.get('_figure').main.style.display = 'none';
 	this.editor._figureContainer = null;
-	Figure.__figureControllerInst = null;
 }
 
 function OnClick_alignButton() {

@@ -48,27 +48,17 @@ Math_.component = function (node) {
 };
 Math_.prototype = {
 	/**
-	 * @override core
-	 */
-	active(element) {
-		if (domUtils.hasClass(element, 'katex') && getValue(element)) {
-			this._element = element;
-			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
-			domUtils.addClass(element, 'se-focus');
-			return true;
-		}
-
-		this.controller.close();
-		return false;
-	},
-
-	/**
 	 * @override component, fileManager
 	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */
 	select(element) {
-		this.active(element);
+		if (domUtils.hasClass(element, 'katex') && getValue(element)) {
+			this._element = element;
+			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
+			domUtils.addClass(element, 'se-focus');
+			return;
+		}
 	},
 
 	/**

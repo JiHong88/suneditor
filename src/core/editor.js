@@ -1032,10 +1032,12 @@ Editor.prototype = {
 	/**
 	 * @description visible controllers
 	 * @param {boolean} value hidden/show
+	 * @param {boolean?} lineBreakShow Line break hidden/show (default: Follows the value "value".)
 	 * @private
 	 */
-	_visibleControllers(value) {
+	_visibleControllers(value, lineBreakShow) {
 		const visible = value ? '' : 'hidden';
+		const breakerVisible = lineBreakShow ?? visible ? '' : 'hidden';
 
 		const cont = this.opendControllers;
 		for (let i = 0, c; i < cont.length; i++) {
@@ -1043,8 +1045,8 @@ Editor.prototype = {
 			if (c.form) c.form.style.visibility = visible;
 		}
 
-		this._lineBreaker_t.style.visibility = visible;
-		this._lineBreaker_b.style.visibility = visible;
+		this._lineBreaker_t.style.visibility = breakerVisible;
+		this._lineBreaker_b.style.visibility = breakerVisible;
 	},
 
 	/**
@@ -1523,7 +1525,7 @@ Editor.prototype = {
 		this._responsiveButtons = this._responsiveButtons_res = null;
 	},
 
-	__Create(originOptions) {
+	async __Create(originOptions) {
 		// set modes
 		this.isInline = /inline/i.test(this.options.get('mode'));
 		this.isBalloon = /balloon/i.test(this.options.get('mode'));
@@ -1537,8 +1539,7 @@ Editor.prototype = {
 		this.__registerClass();
 
 		// init
-		let iframeRootSize = 0;
-		let iframeIndex = 0;
+		const iframePromises = [];
 		this.applyFrameRoots((e) => {
 			const o = e.get('originElement');
 			const t = e.get('topArea');
@@ -1547,19 +1548,25 @@ Editor.prototype = {
 			o.parentNode.insertBefore(t, o.nextElementSibling);
 
 			if (e.get('options').get('iframe')) {
-				iframeRootSize++;
-				e.get('wysiwygFrame').addEventListener('load', ({ target }) => {
-					this.__setIframeDocument(target, this.options, e.get('options'));
-					if (iframeRootSize === ++iframeIndex) this.__editorInit(originOptions);
+				const iframeLoaded = new Promise((resolve) => {
+					e.get('wysiwygFrame').addEventListener('load', ({ target }) => {
+						this.__setIframeDocument(target, this.options, e.get('options'));
+						resolve();
+					});
 				});
+				iframePromises.push(iframeLoaded);
 			}
+		});
 
+		this.applyFrameRoots((e) => {
 			e.get('wrapper').appendChild(e.get('wysiwygFrame'));
 		});
 
-		if (!iframeRootSize) {
-			this.__editorInit(originOptions);
+		if (iframePromises.length > 0) {
+			await Promise.all(iframePromises);
 		}
+
+		this.__editorInit(originOptions);
 	},
 
 	Constructor: Editor

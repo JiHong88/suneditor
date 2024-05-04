@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils, numbers, converter, env } from '../../helper';
-import { Controller, SelectMenu, ColorPicker, Figure } from '../../modules';
+import { Controller, SelectMenu, ColorPicker, Figure, _DragHandle } from '../../modules';
 
 const { _w, ON_OVER_COMPONENT } = env;
 
@@ -1390,7 +1390,7 @@ Table.prototype = {
 		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
 		this.setTableStyle(this._maxWidth ? 'width|column' : 'width', true);
 
-		if (this.eventManager.__overInfo === ON_OVER_COMPONENT) return;
+		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
 
 		if (!this._tdElement) return;
 		this.setCellInfo(this._tdElement, true);
@@ -1438,7 +1438,7 @@ Table.prototype = {
 		const nextColPrevValue = nextCol.style.width;
 		const realWidth = domUtils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(col);
 
-		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
+		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 		this._addResizeGlobalEvents(
 			this._cellResize.bind(
 				this,
@@ -1508,7 +1508,7 @@ Table.prototype = {
 		this._resizeLinePrev.style.display = 'block';
 		const realWidth = converter.getWidthInPercentage(figure);
 
-		if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
+		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 		this._addResizeGlobalEvents(
 			this._figureResize.bind(this, figure, this._resizeLine, isLeftEdge, startX, figure.offsetWidth, numbers.get(realWidth, CELL_DECIMAL_END)),
 			() => {

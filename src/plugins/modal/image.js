@@ -23,7 +23,9 @@ const Image_ = function (editor, pluginOptions) {
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
 		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
 		allowMultiple: !!pluginOptions.allowMultiple,
-		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*'
+		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
+		useFormatType: !!pluginOptions.useFormatType,
+		defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block'
 	};
 
 	// create HTML
@@ -981,6 +983,16 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<button type="button" title="${lang.revert}" aria-label="${lang.revert}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
 		</div>`;
 
+	const useFormatTypeHtml = !pluginOptions.useFormatType
+		? ''
+		: /*html*/ `
+		<div class="se-modal-form">
+			<div class="se-modal-flex-form">
+				<button type="button" data-command="asBlock" class="se-btn" title="${lang.blockStyle}" aria-label="${lang.inlineStyle}">${icons.component_outline}</button>
+				<button type="button" data-command="asInline" class="se-btn" title="${lang.inlineStyle}" aria-label="${lang.inlineStyle}">${icons.component_inline}</button>
+			</div>
+		</div>`;
+
 	const html = /*html*/ `
 		<div class="se-modal-header">
 			<button type="button" data-command="close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
@@ -1000,6 +1012,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 						<label>${lang.image_modal_altText}</label><input class="se-input-form _se_image_alt" type="text" />
 					</div>
 					${canResizeHtml}
+					${useFormatTypeHtml}
 					<div class="se-modal-form se-modal-form-footer">
 						<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;${lang.caption}</label>
 					</div>

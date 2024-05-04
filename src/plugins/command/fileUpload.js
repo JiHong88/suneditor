@@ -311,7 +311,8 @@ FileUpload.prototype = {
 				download: name,
 				'data-se-file-download': '',
 				contenteditable: 'false',
-				'data-se-non-focus': 'true'
+				'data-se-non-focus': 'true',
+				'data-se-non-link': 'true'
 			},
 			name
 		);

@@ -4,7 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env, numbers, unicode } from '../../helper';
-import Figure from '../../modules/Figure';
+import { Figure, _DragHandle } from '../../modules';
 
 const { _w, ON_OVER_COMPONENT } = env;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
@@ -32,6 +32,17 @@ const Component = function (editor) {
 	this._bindClose_mousedown = null;
 	this._bindClose_touchstart = null;
 	this.__selectionSelected = false;
+
+	this.editor.applyFrameRoots((e) => {
+		// drag
+		const dragHandle = domUtils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true' }, this.icons.selection);
+		e.get('wrapper').appendChild(dragHandle);
+		this.eventManager.addEvent(dragHandle, 'mouseenter', OnDragEnter.bind(this));
+		this.eventManager.addEvent(dragHandle, 'mouseleave', OnDragLeave.bind(this));
+		this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
+		this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
+		this.eventManager.addEvent(dragHandle, 'click', OnDragClick.bind(this));
+	});
 };
 
 Component.prototype = {
@@ -154,7 +165,7 @@ Component.prototype = {
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
 
-		if (!isInput && this.eventManager.__overInfo !== ON_OVER_COMPONENT) {
+		if (!isInput && _DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
 			this.editor._antiBlur = true;
 			this.__selectionSelected = true;
 			if (this.isInline(info.container)) {
@@ -178,9 +189,11 @@ Component.prototype = {
 		this.currentPluginName = pluginName;
 		this.currentInfo = info;
 
-		const __overInfo = this.eventManager.__overInfo;
+		_DragHandle.set('__dragInst', this);
+
+		const __overInfo = _DragHandle.get('__overInfo');
 		_w.setTimeout(() => {
-			this.eventManager.__overInfo = __overInfo === ON_OVER_COMPONENT ? undefined : false;
+			_DragHandle.set('__overInfo', __overInfo === ON_OVER_COMPONENT ? undefined : false);
 			if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
 			if (!info.isFile) this.__addNotFileGlobalEvent();
 		}, 0);
@@ -190,21 +203,21 @@ Component.prototype = {
 			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
 		} else if (!domUtils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
-			// domUtils.addClass(info.cover, 'se-figure-seleted');
 			domUtils.addClass(dragHandle, 'se-drag-handle-full');
+			this.editor._visibleControllers(false, false);
 
 			const sizeTarget = info.caption ? info.target : info.cover || info.container || info.target;
 			const { w, h, t, l } = this.offset.getSize(sizeTarget);
 
-			dragHandle.style.opacity = 0.5;
+			dragHandle.style.opacity = 0;
 			dragHandle.style.width = w + 'px';
 			dragHandle.style.height = h + 'px';
 			dragHandle.style.top = t + 'px';
 			dragHandle.style.left = l + 'px';
 
-			Figure.__dragHandler = dragHandle;
-			Figure.__dragContainer = info.container;
-			Figure.__dragCover = info.cover;
+			_DragHandle.set('__dragHandler', dragHandle);
+			_DragHandle.set('__dragContainer', info.container);
+			_DragHandle.set('__dragCover', info.cover);
 
 			dragHandle.style.display = 'block';
 		}
@@ -212,9 +225,9 @@ Component.prototype = {
 
 	deselect() {
 		this.editor._antiBlur = false;
-		this.eventManager.__overInfo = null;
-		Figure.prototype._removeDragEvent.call(this);
-		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected');
+		_DragHandle.set('__overInfo', null);
+		this._removeDragEvent(this);
+		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected|');
 		domUtils.removeClass(this.currentInfo?.cover, 'se-figure-over-selected');
 
 		const { frameContext } = this.editor;
@@ -378,8 +391,62 @@ Component.prototype = {
 		if (this._bindClose_touchstart) this._bindClose_touchstart = this.eventManager.removeGlobalEvent(this._bindClose_touchstart);
 	},
 
+	_removeDragEvent() {
+		this.carrierWrapper.querySelector('.se-drag-cursor').style.left = '-10000px';
+		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
+
+		domUtils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
+		domUtils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
+
+		_DragHandle.set('__figureInst', null);
+		_DragHandle.set('__dragInst', null);
+		_DragHandle.set('__dragHandler', null);
+		_DragHandle.set('__dragContainer', null);
+		_DragHandle.set('__dragCover', null);
+		_DragHandle.set('__dragMove', null);
+		_DragHandle.set('__overInfo', null);
+	},
+
 	constructor: Component
 };
+
+function OnDragEnter() {
+	this.editor._antiBlur = true;
+	this.editor._visibleControllers(false, domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
+	domUtils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
+}
+
+function OnDragLeave() {
+	this.editor._antiBlur = false;
+	if (!domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.editor._visibleControllers(true, true);
+	domUtils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
+}
+
+function OnDragStart(e) {
+	const cover = _DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer');
+
+	if (!cover) {
+		e.preventDefault();
+		return;
+	}
+
+	this.editor._antiBlur = false;
+	domUtils.addClass(_DragHandle.get('__dragHandler'), 'se-dragging');
+	domUtils.addClass(_DragHandle.get('__dragContainer'), 'se-dragging');
+	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
+}
+
+function OnDragEnd() {
+	this.editor._antiBlur = false;
+	domUtils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
+	this._removeDragEvent();
+}
+
+function OnDragClick({ target }) {
+	if (!domUtils.hasClass(target, 'se-drag-handle-full')) return;
+	const dragInst = _DragHandle.get('__dragInst');
+	this.select(dragInst.currentTarget, dragInst.currentPluginName, false);
+}
 
 function CloseListener_mousedown({ target }) {
 	if (

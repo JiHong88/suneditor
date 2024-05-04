@@ -1,4 +1,4 @@
-import { Figure } from '../../../modules';
+import { _DragHandle } from '../../../modules';
 
 export function OnDragOver_wysiwyg(dragCursor, _iframe, e) {
 	e.preventDefault();
@@ -39,14 +39,14 @@ export function OnDrop_wysiwyg(frameContext, e) {
 
 	const { sc, so, ec, eo } = this.selection.getEventLocationRange(e);
 
-	if (Figure.__dragContainer) {
+	if (_DragHandle.get('__dragContainer')) {
 		e.preventDefault();
-		if (Figure.__dragContainer.contains(e.target)) {
+		if (_DragHandle.get('__dragContainer').contains(e.target)) {
 			this.component.deselect();
 			return;
 		}
 
-		const dragContainer = Figure.__dragContainer;
+		const dragContainer = _DragHandle.get('__dragContainer');
 		this.component.deselect();
 		this.selection.setRange(sc, so, ec, eo);
 		this.html.insertNode(dragContainer, null, true);

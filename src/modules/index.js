@@ -1,3 +1,4 @@
+import _DragHandle from './_DragHandle';
 import ApiManager from './ApiManager';
 import ColorPicker from './ColorPicker';
 import Controller from './Controller';
@@ -9,5 +10,5 @@ import Modal from './Modal';
 import ModalAnchorEditor from './ModalAnchorEditor';
 import SelectMenu from './SelectMenu';
 
-export { ApiManager, ColorPicker, Controller, FileBrowser, FileManager, HueSlider, Figure, Modal, ModalAnchorEditor, SelectMenu };
-export default { ApiManager, ColorPicker, Controller, FileBrowser, FileManager, HueSlider, Figure, Modal, ModalAnchorEditor, SelectMenu };
+export { _DragHandle, ApiManager, ColorPicker, Controller, FileBrowser, FileManager, HueSlider, Figure, Modal, ModalAnchorEditor, SelectMenu };
+export default { _DragHandle, ApiManager, ColorPicker, Controller, FileBrowser, FileManager, HueSlider, Figure, Modal, ModalAnchorEditor, SelectMenu };

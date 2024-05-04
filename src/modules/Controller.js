@@ -1,5 +1,6 @@
 import EditorInjector from '../editorInjector';
 import { domUtils } from '../helper';
+import { _DragHandle } from '../modules';
 
 const NON_RESPONSE_KEYCODE = /^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$/;
 const INDEX_0 = 2147483647;
@@ -84,7 +85,7 @@ Controller.prototype = {
 		this.__addGlobalEvent();
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 		this._controllerOn(this.form, target);
-		this.eventManager.__overInfo = false;
+		this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 	},
 
 	/**

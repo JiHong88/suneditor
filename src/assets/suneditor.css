@@ -689,8 +689,8 @@
 	display: none;
 	width: 24px;
 	height: 24px;
-	color: #fff;
-	background-color: #4592ff;
+	color: #3288ff;
+	background-color: #fff;
 	border: 1px solid #3288ff;
 	opacity: 0.75;
 	border-radius: 2px;
@@ -700,6 +700,8 @@
 
 .sun-editor .se-line-breaker-component:hover {
 	opacity: 0.9;
+	color: #fff;
+	background-color: #4592ff;
 }
 
 /** --- toolbar ---------------------------------------------------------- */
@@ -2148,6 +2150,7 @@
 	outline: 1px dashed #e1e1e1;
 }
 
+.sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected,
 .sun-editor-editable[contenteditable='true'] figure.se-component-selected,
 .sun-editor-editable[contenteditable='true'] .se-component.se-component-selected > figure {
 	outline: 2px solid #80bdff;
@@ -2165,6 +2168,7 @@
 	transition: box-shadow 0.15s ease-in-out;
 }
 
+.sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected.se-drag-over,
 .sun-editor-editable[contenteditable='true'] figure.se-figure-selected.se-drag-over {
 	outline: 2px solid #f0c20a;
 }
@@ -2284,6 +2288,7 @@
 
 .sun-editor .se-drag-handle {
 	position: absolute;
+	z-index: 2147483647;
 	display: none;
 	pointer-events: auto;
 	cursor: move;

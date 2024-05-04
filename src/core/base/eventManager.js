@@ -4,7 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
-import { Figure } from '../../modules';
+import { _DragHandle } from '../../modules';
 
 // event handlers
 import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from './eventHandlers/handler_toolbar';
@@ -13,7 +13,7 @@ import { OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './eventHand
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './eventHandlers/handler_ww_clipboard';
 import { OnDragOver_wysiwyg, OnDrop_wysiwyg } from './eventHandlers/handler_ww_dragDrop';
 
-const { _w, _d, ON_OVER_COMPONENT, isMobile } = env;
+const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
 const EventManager = function (editor) {
 	CoreInjector.call(this, editor);
@@ -40,12 +40,11 @@ const EventManager = function (editor) {
 	this.__inputPlugin = null;
 	this.__inputBlurEvent = null;
 	this.__inputKeyEvent = null;
-	// hover
-	this.__overInfo = null;
 	// viewport
 	this._vitualKeyboardHeight = 0;
 	this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
 	this.__retainTimer = null;
+	this.__eventDoc = null;
 };
 
 EventManager.prototype = {
@@ -648,8 +647,8 @@ EventManager.prototype = {
 			this.addEvent(_w.visualViewport, 'scroll', converter.debounce(OnScroll_viewport_onKeyboardOn.bind(this), 200), false);
 		}
 
-		/** document event */
-		this.addEvent(_d, 'selectionchange', OnSelectionchange_document.bind(this), false);
+		// init
+		this.__eventDoc = null;
 	},
 
 	_addFrameEvents(fc) {
@@ -722,6 +721,12 @@ EventManager.prototype = {
 
 		/** focus temp (mobile) */
 		this.addEvent(this.__focusTemp, 'focus', (e) => e.preventDefault(), false);
+
+		/** document event */
+		if (this.__eventDoc !== fc.get('_wd')) {
+			this.__eventDoc = fc.get('_wd');
+			this.addEvent(this.__eventDoc, 'selectionchange', OnSelectionchange_document.bind(this, this.__eventDoc), false);
+		}
 	},
 
 	__addStatusbarEvent(fc, fo) {
@@ -804,7 +809,7 @@ EventManager.prototype = {
 		} else {
 			if (this.__scrollID) _w.clearTimeout(this.__scrollID);
 
-			if (Figure.__dragHandler) Figure.__dragHandler.style.display = 'none';
+			if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 
 			for (let i = 0; i < openCont.length; i++) {
 				if (openCont[i].notInCarrier) continue;
@@ -820,7 +825,7 @@ EventManager.prototype = {
 	},
 
 	__rePositionController(cont) {
-		if (Figure.__dragHandler) Figure.__dragMove();
+		if (_DragHandle.get('__dragMove')) _DragHandle.get('__dragMove')();
 		for (let i = 0; i < cont.length; i++) {
 			if (cont[i].notInCarrier) continue;
 			cont[i].inst?.show();
@@ -901,16 +906,17 @@ EventManager.prototype = {
 
 	_overComponentSelect(target) {
 		const figure = domUtils.getParentElement(target, domUtils.isFigure);
-		if (figure) {
-			const info = this.component.get(figure);
-			if (info && domUtils.isFigure(info.cover) && !domUtils.hasClass(info.container, 'se-component-selected')) {
+		let info = this.component.get(target);
+		if (info || figure) {
+			if (!info) info = this.component.get(figure);
+			if (info && !domUtils.hasClass(info.container, 'se-component-selected')) {
 				this.editor._offCurrentController();
-				this.__overInfo = ON_OVER_COMPONENT;
+				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
 				this.component.select(info.target, info.pluginName, false);
 			}
-		} else if (this.__overInfo !== null && !domUtils.hasClass(target, 'se-drag-handle')) {
+		} else if (_DragHandle.get('__overInfo') !== null && !domUtils.hasClass(target, 'se-drag-handle')) {
 			this.component.deselect();
-			this.__overInfo = null;
+			_DragHandle.set('__overInfo', null);
 		}
 	},
 
@@ -1097,8 +1103,8 @@ function OnScroll_viewport_onKeyboardOn() {
 	}
 }
 
-function OnSelectionchange_document() {
-	const selection = _d.getSelection();
+function OnSelectionchange_document(_wd) {
+	const selection = _wd.getSelection();
 	let anchorNode = selection.anchorNode;
 
 	this.editor.applyFrameRoots((root) => {

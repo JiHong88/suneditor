@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { Modal, Controller, FileManager, Figure } from '../../modules';
+import { Modal, Controller, FileManager, Figure, _DragHandle } from '../../modules';
 import { domUtils, numbers, env } from '../../helper';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
@@ -167,7 +167,7 @@ Audio_.prototype = {
 	 * @override fileManager
 	 */
 	ready(target) {
-		if (this.eventManager.__overInfo === ON_OVER_COMPONENT) return;
+		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
 		domUtils.addClass(target, 'active');
 		domUtils.addClass(target.parentElement, 'se-figure-selected');
 		this._element = target;

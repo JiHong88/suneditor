@@ -1,4 +1,5 @@
 import { domUtils, env } from '../../../helper';
+import { _DragHandle } from '../../../modules';
 
 const { _w } = env;
 
@@ -102,7 +103,7 @@ export function OnMouseMove_wysiwyg(frameContext, e) {
 	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return false;
 
 	// over component
-	if (this.__overInfo !== false) {
+	if (_DragHandle.get('__overInfo') !== false) {
 		this._overComponentSelect(e.target);
 	}
 

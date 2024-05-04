@@ -132,7 +132,7 @@ Toolbar.prototype = {
 			if (this._responsiveCurrentSize !== responsiveWidth) {
 				this._responsiveCurrentSize = responsiveWidth;
 				this.setButtons(this._rButtonArray[responsiveWidth]);
-				this.viewer._resetFullScreenHeight();
+				// this.viewer._resetFullScreenHeight();
 			}
 		}
 	},

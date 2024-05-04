@@ -832,7 +832,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	}
 
 	// enter scroll
-	if (keyCode === 13) this.html.scrollTo(range);
+	if (keyCode === 13) this.selection.scrollTo(range);
 
 	// next component
 	if (!DIR_KEYCODE.test(keyCode)) return;

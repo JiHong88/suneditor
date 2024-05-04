@@ -43,7 +43,7 @@ Link.prototype = {
 	 * @override core
 	 */
 	active(element) {
-		if (domUtils.isAnchor(element) && !Array.from(element.attributes).some((attr) => attr.name.startsWith('data-se-'))) {
+		if (domUtils.isAnchor(element) && !element.hasAttribute('data-se-non-link')) {
 			const tempLink = this.controller.form.querySelector('a');
 			tempLink.href = element.href;
 			tempLink.title = element.textContent;

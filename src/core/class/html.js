@@ -277,27 +277,6 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @description Scroll to the corresponding selection or range position.
-	 * @param {Selection|Range|Node} ref selection or range object
-	 */
-	scrollTo(ref) {
-		if (ref instanceof Selection) {
-			ref = ref.getRangeAt(0);
-		} else if (ref instanceof Node) {
-			ref = this.selection.setRange(ref, 1, ref, 1);
-		} else if (typeof ref?.startContainer === 'undefined') {
-			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
-		}
-
-		const rect = ref.getBoundingClientRect();
-		const isVisible = rect.top >= 0 && rect.bottom <= this.editor.frameContext.get('wysiwygFrame').innerHeight;
-
-		if (isVisible) return;
-
-		ref.startContainer?.scrollIntoView?.({ behavior: 'auto', block: 'nearest' });
-	},
-
-	/**
 	 * @description Delete selected node and insert argument value node and return.
 	 * If the "afterNode" exists, it is inserted after the "afterNode"
 	 * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
@@ -1007,7 +986,7 @@ HTML.prototype = {
 					this.editor.frameContext.get('wysiwyg').appendChild(children[j]);
 				}
 				this.history.push(false, rootKey[i]);
-				this.scrollTo(children[len - 1]);
+				this.selection.scrollTo(children[len - 1]);
 			} else {
 				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertToCode(convertValue, false));
 			}
