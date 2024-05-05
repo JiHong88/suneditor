@@ -1226,7 +1226,7 @@ Editor.prototype = {
 
 		this.eventManager._addCommonEvents();
 
-		setTimeout(() => {
+		this._w.setTimeout(() => {
 			// toolbar visibility
 			this.context.get('toolbar.main').style.visibility = '';
 			// roots

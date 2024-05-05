@@ -1528,10 +1528,6 @@
 	display: block;
 }
 
-.sun-editor-editable[contenteditable='true'] .katex.se-focus {
-	outline: 1px solid #80bdff;
-}
-
 .sun-editor-editable[contenteditable='true'] .se-disable-pointer *,
 .sun-editor-editable[contenteditable='true'] .katex * {
 	pointer-events: none;
@@ -2133,7 +2129,7 @@
 	box-shadow: 0 0 0 0.2rem #c7deff;
 }
 
-.sun-editor-editable[contenteditable='true']:not(.se-read-only) figure:not(.se-flex-component)::after {
+.sun-editor-editable[contenteditable='true']:not(.se-read-only) figure:not(.se-input-component)::after {
 	position: absolute;
 	content: '';
 	z-index: 1;
@@ -2171,6 +2167,9 @@
 .sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected.se-drag-over,
 .sun-editor-editable[contenteditable='true'] figure.se-figure-selected.se-drag-over {
 	outline: 2px solid #f0c20a;
+}
+.sun-editor-editable[contenteditable='true'] figure.se-drag-over > iframe {
+	pointer-events: none;
 }
 
 /* controller - button group */

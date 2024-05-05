@@ -356,12 +356,13 @@ Offset.prototype = {
 
 		const isWWTarget = this.editor.frameContext.get('wrapper').contains(target) || params.isWWTarget;
 		const isCtrlTarget = domUtils.getParentElement(target, '.se-controller');
+		const isTargetAbs = isWWTarget && !isCtrlTarget;
 		const clientSize = getClientSize(_d);
-		const wwScroll = isWWTarget && !isCtrlTarget ? this.getWWScroll() : this._getWindowScroll();
+		const wwScroll = isTargetAbs ? this.getWWScroll() : this._getWindowScroll();
 		const targetRect = isCtrlTarget ? target.getBoundingClientRect() : this.editor.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
-		const isIframe = isWWTarget && !isCtrlTarget && this.editor.frameOptions.get('iframe');
+		const isIframe = isTargetAbs && this.editor.frameOptions.get('iframe');
 
 		// top ----------------------------------------------------------------------------------------------------
 		const ah = arrow ? arrow.offsetHeight : 0;
@@ -370,7 +371,7 @@ Offset.prototype = {
 		// margin
 		const tmtw = targetRect.top;
 		const tmbw = clientSize.h - targetRect.bottom;
-		const toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar.main').offsetHeight;
+		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar.main').offsetHeight;
 		let rmt, rmb;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rmt = tmtw - toolbarH;
@@ -387,7 +388,20 @@ Offset.prototype = {
 				rmt = targetRect.top - emt;
 				rmb = bMargin - (editorScroll.oh - (editorH + emt) + (this.editor.frameContext.get('statusbar')?.offsetHeight || 0));
 			} else {
-				rmt = targetRect.top - wwScroll.rects.top;
+				const wst = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? this.getGlobal(this.editor.frameContext.get('topArea')).top - _w.scrollY : 0;
+				let st = wst;
+				if (toolbarH > wst) {
+					if (this.editor.toolbar._sticky) {
+						st = toolbarH;
+						toolbarH = 0;
+					} else {
+						st = wst + toolbarH;
+					}
+				} else if (this.options.get('toolbar_container')) {
+					toolbarH = 0;
+				}
+
+				rmt = targetRect.top - st;
 				rmb = wwScroll.rects.bottom - targetRect.bottom;
 			}
 

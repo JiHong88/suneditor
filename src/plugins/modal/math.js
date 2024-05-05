@@ -56,7 +56,6 @@ Math_.prototype = {
 		if (domUtils.hasClass(element, 'katex') && getValue(element)) {
 			this._element = element;
 			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
-			domUtils.addClass(element, 'se-focus');
 			return;
 		}
 	},
@@ -65,7 +64,6 @@ Math_.prototype = {
 	 * @override controller
 	 */
 	close() {
-		domUtils.removeClass(this._element, 'se-focus');
 		this._element = null;
 	},
 

@@ -350,7 +350,7 @@ EventManager.prototype = {
 	},
 
 	_hideToolbar_sub() {
-		if (this.subToolbar && !this.editor._notHideToolbar && !this.editor.frameContext.get('isFullScreen')) {
+		if (this.subToolbar && !this.editor._notHideToolbar) {
 			this.subToolbar.hide();
 		}
 	},

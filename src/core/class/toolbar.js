@@ -300,14 +300,15 @@ Toolbar.prototype = {
 	},
 
 	_setBalloonOffset(positionTop, range) {
+		const isFullScreen = this.editor.frameContext.get('isFullScreen');
 		range = range || this.selection.getRange();
 		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
 		positionTop = rectsObj.position === 'start';
 		const toolbar = this.context.get(this.keyName + '.main');
 		const topArea = this.editor.frameContext.get('topArea');
 		const rects = rectsObj.rects;
-		const scrollLeft = rectsObj.scrollLeft;
-		const scrollTop = rectsObj.scrollTop;
+		const scrollLeft = isFullScreen ? 0 : rectsObj.scrollLeft;
+		const scrollTop = isFullScreen ? 0 : rectsObj.scrollTop;
 		const editorWidth = topArea.offsetWidth;
 		const offsets = this.offset.getGlobal(topArea);
 		const stickyTop = offsets.top;
