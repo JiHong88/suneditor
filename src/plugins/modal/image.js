@@ -58,11 +58,9 @@ const Image_ = function (editor, pluginOptions) {
 		sizeUnit: sizeUnit
 	});
 	this.fileManager = new FileManager(this, {
-		tagNames: ['img'],
+		query: 'img',
 		loadHandler: this.events.onImageLoad,
-		eventHandler: this.events.onImageAction,
-		checkHandler: FileCheckHandler.bind(this),
-		figure: this.figure
+		eventHandler: this.events.onImageAction
 	});
 
 	// members
@@ -192,6 +190,22 @@ Image_.prototype = {
 		}
 
 		return false;
+	},
+
+	/**
+	 * @override core
+	 */
+	retainFormat() {
+		return {
+			query: 'img',
+			method: (element) => {
+				const figureInfo = Figure.GetContainer(element);
+				if (figureInfo && figureInfo.container && figureInfo.cover) return;
+
+				this.ready(element);
+				this._fileCheck(this._origin_w, this._origin_h);
+			}
+		};
 	},
 
 	/**
@@ -834,12 +848,6 @@ Image_.prototype = {
 
 	constructor: Image_
 };
-
-function FileCheckHandler(element) {
-	this.ready(element);
-	this._fileCheck(this._origin_w, this._origin_h);
-	return element;
-}
 
 async function UploadCallBack(info, xmlHttp) {
 	if ((await this.triggerEvent('imageUploadHandler', { xmlHttp, info })) === NO_EVENT) {

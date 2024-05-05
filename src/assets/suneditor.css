@@ -2288,7 +2288,7 @@
 
 .sun-editor .se-drag-handle {
 	position: absolute;
-	z-index: 2147483647;
+	z-index: 2147483646;
 	display: none;
 	pointer-events: auto;
 	cursor: move;

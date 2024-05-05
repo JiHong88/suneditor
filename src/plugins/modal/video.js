@@ -50,11 +50,9 @@ const Video = function (editor, pluginOptions) {
 	this.modal = new Modal(this, modalEl);
 	this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
 	this.fileManager = new FileManager(this, {
-		tagNames: ['iframe', 'video'],
+		query: 'iframe, video',
 		loadHandler: this.events.onVideoLoad,
-		eventHandler: this.events.onVideoAction,
-		checkHandler: FileCheckHandler.bind(this),
-		figure: this.figure
+		eventHandler: this.events.onVideoAction
 	});
 
 	// members
@@ -196,6 +194,25 @@ Video.prototype = {
 		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, 'video'), 0);
 
 		return result;
+	},
+
+	/**
+	 * @override core
+	 */
+	retainFormat() {
+		return {
+			query: 'iframe, video',
+			method: (element) => {
+				const figureInfo = Figure.GetContainer(element);
+				if (figureInfo && figureInfo.container && figureInfo.cover) return;
+
+				this.ready(element);
+				const line = this.format.getLine(element);
+				if (line) this._align = line.style.textAlign || line.style.float;
+
+				this._update(element);
+			}
+		};
 	},
 
 	/**
@@ -678,14 +695,6 @@ Video.prototype = {
 
 	constructor: Video
 };
-
-function FileCheckHandler(element) {
-	this.ready(element);
-	const line = this.format.getLine(element);
-	if (line) this._align = line.style.textAlign || line.style.float;
-
-	return this._update(element) || element;
-}
 
 async function UploadCallBack(info, xmlHttp) {
 	if ((await this.triggerEvent('videoUploadHandler', { xmlHttp, info })) === NO_EVENT) {

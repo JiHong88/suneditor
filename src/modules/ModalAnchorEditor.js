@@ -41,8 +41,7 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 		this.eventManager.addEvent(this.input, 'change', OnChangeFile.bind(this));
 		// file manager
 		this.fileManager = new FileManager(this, {
-			tagNames: ['a'],
-			tagAttrs: ['download', ':not(data-se-file-download)'],
+			query: 'a[download]:not([data-se-file-download])',
 			loadHandler: this.events.onFileLoad,
 			eventHandler: this.events.onFileAction
 		});

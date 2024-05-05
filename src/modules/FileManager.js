@@ -1,12 +1,10 @@
 import CoreInjector from '../editorInjector/_core';
-import { domUtils } from '../helper';
-import Figure from './Figure';
 import ApiManager from './ApiManager';
 
 /**
  *
  * @param {*} inst
- * @param {{ tagNames: array, loadHandler: Function, eventHandler: Function, checkHandler: Function, figure: Figure instance | null }} params
+ * @param {{ query: string, loadHandler: Function, eventHandler: Function, figure: Figure instance | null }} params
  */
 const FileManager = function (inst, params) {
 	CoreInjector.call(this, inst.editor);
@@ -16,13 +14,9 @@ const FileManager = function (inst, params) {
 	this.kind = inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
 	this.component = inst.editor.component;
-	this.tagNames = params.tagNames;
-	this.tagAttrs = params.tagAttrs || [];
-	this._tagAttrStr = this.tagAttrs.length > 0 ? `[${this.tagAttrs.join('][')}]` : '';
+	this.query = params.query;
 	this.loadHandler = params.loadHandler;
 	this.eventHandler = params.eventHandler;
-	this.checkHandler = params.checkHandler;
-	this.figure = params.figure;
 	this.infoList = [];
 	this.infoIndex = 0;
 	this.uploadFileLength = 0;
@@ -161,31 +155,6 @@ FileManager.prototype = {
 			if (typeof this.inst.select === 'function') this._w.setTimeout(this.inst.select.bind(this.inst, el), 0);
 		}.bind(this, element);
 
-		// figure
-		if (this.figure && this.component.isBasic(element)) {
-			if (!element.getAttribute('data-se-size')) {
-				const size = this.figure.getSize(element);
-				const w = element.naturalWidth || size.w;
-				const h = element.naturalHeight || size.h;
-				if (!element.getAttribute('data-se-size')) element.setAttribute('data-se-size', w + ',' + h);
-			}
-
-			const figureInfo = Figure.GetContainer(element);
-			if (!figureInfo.container && typeof this.inst?.ready === 'function') {
-				try {
-					const size = (element.getAttribute('data-se-size') || ',').split(',');
-					this.figure.__fileManagerInfo = true;
-					this.inst.ready(element, null);
-					this.figure.setSize(size[0], size[1]);
-					this.inst.init?.();
-				} catch (error) {
-					console.warn(`[SUNEDITOR.FileManager[${this.kind}].setInfo.error]`, error.message);
-				} finally {
-					this.figure.__fileManagerInfo = false;
-				}
-			}
-		}
-
 		if (typeof this.eventHandler === 'function') {
 			this.eventHandler({ editor: this.editor, element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength });
 		}
@@ -208,11 +177,7 @@ FileManager.prototype = {
 	 * @private
 	 */
 	_checkInfo(loaded) {
-		let tags = [];
-		for (let i = 0, len = this.tagNames.length; i < len; i++) {
-			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + this._tagAttrStr + ':not([data-se-embed="true"])')));
-		}
-
+		const tags = [].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.query));
 		const infoList = this.infoList;
 		if (tags.length === infoList.length) {
 			// reset
@@ -249,24 +214,8 @@ FileManager.prototype = {
 		this.__updateTags = tags;
 
 		while (tags.length > 0) {
-			let tag = tags.shift();
-			if (!domUtils.getParentElement(tag, Figure.__is)) {
-				currentTags.push(this.infoIndex);
-				try {
-					if (this.figure) this.figure.__fileManagerInfo = true;
-					if (typeof this.checkHandler === 'function') tag = this.checkHandler(tag);
-					if (!tag) {
-						console.warn(`[SUNEDITOR.FileManager[${this.kind}].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).`);
-					} else {
-						this._setInfo(tag, null);
-						this.inst.init?.();
-					}
-				} catch (error) {
-					console.warn(`[SUNEDITOR.FileManager[${this.kind}].checkHandler.error]`, error.message);
-				} finally {
-					if (this.figure) this.figure.__fileManagerInfo = false;
-				}
-			} else if (!tag.getAttribute('data-se-index') || !infoIndex.includes(tag.getAttribute('data-se-index') * 1)) {
+			const tag = tags.shift();
+			if (!tag.getAttribute('data-se-index') || !infoIndex.includes(tag.getAttribute('data-se-index') * 1)) {
 				currentTags.push(this.infoIndex);
 				tag.removeAttribute('data-se-index');
 				this._setInfo(tag, null);
