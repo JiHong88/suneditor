@@ -640,11 +640,7 @@ Image_.prototype = {
 				domUtils.removeItem(anchor);
 			} else {
 				domUtils.removeItem(isNewAnchor);
-				if (
-					domUtils.getListChildren(anchor, function (current) {
-						return /IMG/i.test(current.tagName);
-					}).length === 0
-				) {
+				if (domUtils.getListChildren(anchor, (current) => /IMG/i.test(current.tagName)).length === 0) {
 					domUtils.removeItem(anchor);
 				}
 			}

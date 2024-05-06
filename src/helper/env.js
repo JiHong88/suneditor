@@ -25,9 +25,7 @@ export function getValues(obj) {
  */
 export function camelToKebabCase(param) {
 	if (typeof param === 'string') {
-		return param.replace(/[A-Z]/g, function (letter) {
-			return '-' + letter.toLowerCase();
-		});
+		return param.replace(/[A-Z]/g, (letter) => '-' + letter.toLowerCase());
 	} else {
 		return param.map(function (str) {
 			return camelToKebabCase(str);
@@ -42,9 +40,7 @@ export function camelToKebabCase(param) {
  */
 export function kebabToCamelCase(param) {
 	if (typeof param === 'string') {
-		return param.replace(/-[a-zA-Z]/g, function (letter) {
-			return letter.replace('-', '').toUpperCase();
-		});
+		return param.replace(/-[a-zA-Z]/g, (letter) => letter.replace('-', '').toUpperCase());
 	} else {
 		return param.map(function (str) {
 			return camelToKebabCase(str);

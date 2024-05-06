@@ -159,9 +159,7 @@ Controller.prototype = {
 
 		form.style.display = 'block';
 		if (this._shadowRoot) {
-			form.addEventListener('mousedown', function (e) {
-				e.stopPropagation();
-			});
+			form.addEventListener('mousedown', (e) => e.stopPropagation());
 		}
 
 		this.editor._controllerTargetContext = this.editor.frameContext.get('topArea');

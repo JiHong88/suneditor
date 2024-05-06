@@ -1,3 +1,4 @@
+import { domUtils } from '../../../helper';
 import { _DragHandle } from '../../../modules';
 
 export function OnDragOver_wysiwyg(dragCursor, _iframe, e) {
@@ -27,33 +28,42 @@ export function OnDragOver_wysiwyg(dragCursor, _iframe, e) {
 	}
 }
 
-export function OnDrop_wysiwyg(frameContext, e) {
-	if (frameContext.get('isReadOnly')) {
-		e.preventDefault();
-		e.stopPropagation();
-		return false;
-	}
+export function OnDrop_wysiwyg(frameContext, dragCursor, e) {
+	try {
+		if (frameContext.get('isReadOnly')) {
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
 
-	const dataTransfer = e.dataTransfer;
-	if (!dataTransfer) return true;
+		const dataTransfer = e.dataTransfer;
+		if (!dataTransfer) return true;
 
-	const { sc, so, ec, eo } = this.selection.getEventLocationRange(e);
+		const { sc, so, ec, eo } = this.selection.getEventLocationRange(e);
 
-	if (_DragHandle.get('__dragContainer')) {
-		e.preventDefault();
-		if (_DragHandle.get('__dragContainer').contains(e.target)) {
-			this.component.deselect();
+		if (domUtils.getParentElement(sc, '.se-disable-pointer')) {
+			e.preventDefault();
 			return;
 		}
 
-		const dragContainer = _DragHandle.get('__dragContainer');
-		this.component.deselect();
-		this.selection.setRange(sc, so, ec, eo);
-		this.html.insertNode(dragContainer, null, true);
-		return;
-	}
+		if (_DragHandle.get('__dragContainer')) {
+			e.preventDefault();
+			if (_DragHandle.get('__dragContainer').contains(e.target)) {
+				this.component.deselect();
+				return;
+			}
 
-	this.html.remove();
-	this.selection.setRange(sc, so, ec, eo);
-	return this._dataTransferAction('drop', e, dataTransfer, frameContext);
+			const dragContainer = _DragHandle.get('__dragContainer');
+			this.component.deselect();
+			this.selection.setRange(sc, so, ec, eo);
+			this.html.insertNode(dragContainer, null, true);
+			return;
+		}
+
+		this.html.remove();
+		this.selection.setRange(sc, so, ec, eo);
+		return this._dataTransferAction('drop', e, dataTransfer, frameContext);
+	} finally {
+		dragCursor.style.display = 'none';
+	}
 }

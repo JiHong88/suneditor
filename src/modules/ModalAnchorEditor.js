@@ -216,9 +216,7 @@ ModalAnchorEditor.prototype = {
 	},
 
 	_createHeaderList(urlValue) {
-		const headers = domUtils.getListChildren(this.editor.frameContext.get('wysiwyg'), function (current) {
-			return /h[1-6]/i.test(current.nodeName);
-		});
+		const headers = domUtils.getListChildren(this.editor.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName));
 		if (headers.length === 0) return;
 
 		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');

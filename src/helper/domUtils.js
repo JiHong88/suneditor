@@ -459,9 +459,7 @@ export function getEdgeChild(node, query, last) {
 		};
 	}
 
-	const childList = getListChildNodes(node, function (current) {
-		return check(current);
-	});
+	const childList = getListChildNodes(node, (current) => check(current));
 
 	return childList[last ? childList.length - 1 : 0];
 }

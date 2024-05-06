@@ -2166,7 +2166,8 @@
 }
 
 .sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected.se-drag-over,
-.sun-editor-editable[contenteditable='true'] figure.se-figure-selected.se-drag-over {
+.sun-editor-editable[contenteditable='true'] figure.se-figure-selected.se-drag-over,
+.sun-editor-editable[contenteditable='true'] hr.se-component-selected.se-drag-over {
 	outline: 2px solid #f0c20a;
 }
 .sun-editor-editable[contenteditable='true'] figure.se-drag-over > iframe {

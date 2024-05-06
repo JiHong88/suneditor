@@ -451,9 +451,7 @@ Figure.prototype = {
 			case 'caption':
 				if (!this._caption) {
 					const caption = Figure.CreateCaption(this._cover, this.lang.caption);
-					const captionText = domUtils.getEdgeChild(caption, function (current) {
-						return current.nodeType === 3;
-					});
+					const captionText = domUtils.getEdgeChild(caption, (current) => current.nodeType === 3);
 
 					if (!captionText) {
 						caption.focus();

@@ -911,9 +911,7 @@ HTML.prototype = {
 
 			const fc = this.editor.frameContext;
 			const renderHTML = domUtils.createElement('DIV', null, this._convertToCode(fc.get('wysiwyg'), true));
-			const editableEls = domUtils.getListChildren(renderHTML, function (current) {
-				return current.hasAttribute('contenteditable');
-			});
+			const editableEls = domUtils.getListChildren(renderHTML, (current) => current.hasAttribute('contenteditable'));
 
 			for (let j = 0, jlen = editableEls.length; j < jlen; j++) {
 				editableEls[j].removeAttribute('contenteditable');
@@ -1140,7 +1138,7 @@ HTML.prototype = {
 			if (domUtils.isExcludeFormat(node)) return node.outerHTML;
 
 			const ch =
-				domUtils.getListChildNodes(node, function (current) {
+				domUtils.getListChildNodes(node, (current) => {
 					return domUtils.isSpanWithoutAttr(current) && !domUtils.getParentElement(current, domUtils.isExcludeFormat);
 				}) || [];
 			for (let i = ch.length - 1; i >= 0; i--) {
@@ -1337,7 +1335,7 @@ HTML.prototype = {
 		if (!this._disallowedStyleNodesRegExp) return html;
 
 		const ec = this.options.get('_defaultStyleTagMap');
-		return html.replace(this._disallowedStyleNodesRegExp, function (m, t, n, p) {
+		return html.replace(this._disallowedStyleNodesRegExp, (m, t, n, p) => {
 			return t + (typeof ec[n] === 'string' ? ec[n] : n) + (p ? ' ' + p : '');
 		});
 	},

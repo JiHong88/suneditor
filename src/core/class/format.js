@@ -102,9 +102,7 @@ Format.prototype = {
 
 			isComp = this.component.is(f);
 			html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
-			before = domUtils.getParentElement(f, function (current) {
-				return current.parentNode === parentNode;
-			});
+			before = domUtils.getParentElement(f, (current) => current.parentNode === parentNode);
 
 			if (parentNode !== f.parentNode || isComp) {
 				if (this.isLine(parentNode)) {
@@ -382,15 +380,11 @@ Format.prototype = {
 
 		this.editor.effectNode = null;
 		this.nodeTransform.mergeSameTags(block, null, false);
-		this.nodeTransform.mergeNestedTags(block, function (current) {
-			return domUtils.isList(current);
-		});
+		this.nodeTransform.mergeNestedTags(block, (current) => domUtils.isList(current));
 
 		// Nested list
 		if (beforeTag && domUtils.getNodeDepth(beforeTag) > 0 && (domUtils.isList(beforeTag.parentNode) || domUtils.isList(beforeTag.parentNode.parentNode))) {
-			const depthFormat = domUtils.getParentElement(beforeTag, (current) => {
-				return this.isBlock(current) && !domUtils.isList(current);
-			});
+			const depthFormat = domUtils.getParentElement(beforeTag, (current) => this.isBlock(current) && !domUtils.isList(current));
 			const splitRange = this.nodeTransform.split(beforeTag, null, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 			splitRange.parentNode.insertBefore(block, splitRange);
 		} else {
@@ -425,9 +419,7 @@ Format.prototype = {
 		let so = range.startOffset;
 		let eo = range.endOffset;
 
-		let children = domUtils.getListChildNodes(rangeElement, function (current) {
-			return current.parentNode === rangeElement;
-		});
+		let children = domUtils.getListChildNodes(rangeElement, (current) => current.parentNode === rangeElement);
 		let parent = rangeElement.parentNode;
 		let firstNode = null;
 		let lastNode = null;
@@ -582,9 +574,7 @@ Format.prototype = {
 
 					if (reset) {
 						reset = moveComplete = false;
-						children = domUtils.getListChildNodes(rangeElement, function (current) {
-							return current.parentNode === rangeElement;
-						});
+						children = domUtils.getListChildNodes(rangeElement, (current) => current.parentNode === rangeElement);
 						rangeEl = rangeElement.cloneNode(false);
 						parent = rangeElement.parentNode;
 						i = -1;
@@ -1797,11 +1787,11 @@ Format.prototype = {
 		let rChildren;
 		if (!all) {
 			const depth = domUtils.getNodeDepth(baseNode) + 2;
-			rChildren = domUtils.getListChildren(baseNode, function (current) {
+			rChildren = domUtils.getListChildren(baseNode, (current) => {
 				return domUtils.isListCell(current) && !current.previousElementSibling && domUtils.getNodeDepth(current) === depth;
 			});
 		} else {
-			rChildren = domUtils.getListChildren(rangeElement, function (current) {
+			rChildren = domUtils.getListChildren(rangeElement, (current) => {
 				return domUtils.isListCell(current) && !current.previousElementSibling;
 			});
 		}

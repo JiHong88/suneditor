@@ -343,9 +343,7 @@ NodeTransform.prototype = {
 		const inst = this;
 
 		if (notRemoveNode) {
-			notRemoveNode = domUtils.getParentElement(notRemoveNode, function (current) {
-				return element === current.parentElement;
-			});
+			notRemoveNode = domUtils.getParentElement(notRemoveNode, (current) => element === current.parentElement);
 		}
 
 		(function recursionFunc(current) {

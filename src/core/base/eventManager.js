@@ -403,23 +403,11 @@ EventManager.prototype = {
 		const ancestor = range.commonAncestorContainer;
 		if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
 			if (!sIsCell) {
-				domUtils.removeItem(
-					domUtils.getParentElement(eCell, function (current) {
-						return ancestor === current.parentNode;
-					})
-				);
+				domUtils.removeItem(domUtils.getParentElement(eCell, (current) => ancestor === current.parentNode));
 			} else if (!eIsCell) {
-				domUtils.removeItem(
-					domUtils.getParentElement(sCell, function (current) {
-						return ancestor === current.parentNode;
-					})
-				);
+				domUtils.removeItem(domUtils.getParentElement(sCell, (current) => ancestor === current.parentNode));
 			} else {
-				domUtils.removeItem(
-					domUtils.getParentElement(sCell, function (current) {
-						return ancestor === current.parentNode;
-					})
-				);
+				domUtils.removeItem(domUtils.getParentElement(sCell, (current) => ancestor === current.parentNode));
 				this.editor._nativeFocus();
 				return true;
 			}
@@ -653,6 +641,7 @@ EventManager.prototype = {
 		const eventWysiwyg = isIframe ? fc.get('_ww') : fc.get('wysiwyg');
 		fc.set('eventWysiwyg', eventWysiwyg);
 		const codeArea = fc.get('code');
+		const dragCursor = this.editor.carrierWrapper.querySelector('.se-drag-cursor');
 
 		/** editor area */
 		const wwMouseMove = OnMouseMove_wysiwyg.bind(this, fc);
@@ -667,8 +656,8 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this, fc), false);
-		this.addEvent(eventWysiwyg, 'dragover', OnDragOver_wysiwyg.bind(this, this.editor.carrierWrapper.querySelector('.se-drag-cursor'), isIframe ? this.editor.frameContext.get('topArea') : null), false);
-		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'dragover', OnDragOver_wysiwyg.bind(this, dragCursor, isIframe ? this.editor.frameContext.get('topArea') : null), false);
+		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc, dragCursor), false);
 		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), { passive: true, useCapture: false });
 		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this, fc), false);

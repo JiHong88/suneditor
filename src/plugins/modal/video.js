@@ -601,16 +601,12 @@ Video.prototype = {
 		if (domUtils.getParentElement(prevFrame, domUtils.isExcludeFormat)) {
 			prevFrame.parentNode.replaceChild(container, prevFrame);
 		} else if (domUtils.isListCell(existElement)) {
-			const refer = domUtils.getParentElement(prevFrame, function (current) {
-				return current.parentNode === existElement;
-			});
+			const refer = domUtils.getParentElement(prevFrame, (current) => current.parentNode === existElement);
 			existElement.insertBefore(container, refer);
 			domUtils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(refer, null, true);
 		} else if (this.format.isLineOnly(existElement)) {
-			const refer = domUtils.getParentElement(prevFrame, function (current) {
-				return current.parentNode === existElement;
-			});
+			const refer = domUtils.getParentElement(prevFrame, (current) => current.parentNode === existElement);
 			existElement = this.nodeTransform.split(existElement, refer);
 			existElement.parentNode.insertBefore(container, existElement);
 			domUtils.removeItem(prevFrame);
