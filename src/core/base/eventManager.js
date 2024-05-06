@@ -646,9 +646,6 @@ EventManager.prototype = {
 			this.addEvent(_w.visualViewport, 'scroll', OnScroll_viewport.bind(this), false);
 			this.addEvent(_w.visualViewport, 'scroll', converter.debounce(OnScroll_viewport_onKeyboardOn.bind(this), 200), false);
 		}
-
-		// init
-		this.__eventDoc = null;
 	},
 
 	_addFrameEvents(fc) {

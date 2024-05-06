@@ -24,12 +24,13 @@ Offset.prototype = {
 	 */
 	getSize(target) {
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
+		const wFrame = this.editor.frameContext.get('wysiwygFrame');
 		const offset = this.get(target);
-		const frameOffset = this.get(this.editor.frameContext.get('wysiwygFrame'));
+		const frameOffset = this.get(wFrame);
 		const w = target.offsetWidth - 1;
 		const h = target.offsetHeight - 1;
 		const t = offset.top - (this.editor.frameOptions.get('iframe') ? frameOffset.top : 0);
-		const l = offset.left - (this.editor.frameOptions.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.editor.frameContext.get('wysiwygFrame').scrollLeft;
+		const l = offset.left - (this.editor.frameOptions.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - wFrame.scrollLeft;
 
 		return {
 			w,
@@ -75,6 +76,8 @@ Offset.prototype = {
 	 */
 	getGlobal(element) {
 		const topArea = this.editor.frameContext.get('topArea');
+		const wFrame = this.editor.frameContext.get('wysiwygFrame');
+
 		let isTop = false;
 		let targetAbs = false;
 		if (!element) element = topArea;
@@ -98,7 +101,7 @@ Offset.prototype = {
 			element = element.offsetParent;
 		}
 
-		if (!targetAbs && !isTop && /^iframe$/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName)) {
+		if (!targetAbs && !isTop && /^iframe$/i.test(wFrame.nodeName) && wFrame.contains(element)) {
 			element = this.editor.frameContext.get('wrapper');
 			while (element) {
 				t += element.offsetTop;

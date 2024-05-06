@@ -438,7 +438,7 @@ window.editor_root = suneditor.create(
 </ul>
 <p><br></p>
 		`,
-		// iframe: true,
+		iframe: true,
 		iframe_cssFileName: ['suneditor', 'katex'],
 		// 		value: `<figure>
 		//     <img src="https://blog.kakaocdn.net/dn/0QCnX/btqU7cMuFOZ/uVPVj1aIBNqINLQZGkuwa0/img.png" alt="">

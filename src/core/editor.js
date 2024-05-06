@@ -1220,11 +1220,10 @@ Editor.prototype = {
 			this._initWysiwygArea(e, e.get('options').get('value'));
 		});
 
+		this.eventManager.__eventDoc = null;
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
 		this._checkComponents(true);
-
-		this.eventManager._addCommonEvents();
 
 		this._w.setTimeout(() => {
 			// toolbar visibility
@@ -1537,6 +1536,9 @@ Editor.prototype = {
 
 		// register class
 		this.__registerClass();
+
+		// common events
+		this.eventManager._addCommonEvents();
 
 		// init
 		const iframePromises = [];
