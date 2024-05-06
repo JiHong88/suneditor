@@ -591,7 +591,10 @@ window.editor_root = suneditor.create(
 			},
 			onExportPdfBefore(params) {
 				console.log('pdfbefore', params);
-			}
+			},
+			onFileManagerAction(data) {
+				console.log('image', data);
+			},
 			// onFileDeleteBefore(arg) {
 			// 	console.log('delete file', arg);
 			// 	return false;

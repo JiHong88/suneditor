@@ -155,9 +155,11 @@ FileManager.prototype = {
 			if (typeof this.inst.select === 'function') this._w.setTimeout(this.inst.select.bind(this.inst, el), 0);
 		}.bind(this, element);
 
+		const params = { editor: this.editor, element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength };
 		if (typeof this.eventHandler === 'function') {
-			this.eventHandler({ editor: this.editor, element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength });
+			this.eventHandler(params);
 		}
+		this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
 	},
 
 	/**
@@ -235,9 +237,13 @@ FileManager.prototype = {
 			if (currentTags.includes(dataIndex)) continue;
 
 			infoList.splice(i, 1);
+
+			const params = { editor: this.editor, element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0 };
 			if (typeof this.eventHandler === 'function') {
-				this.eventHandler({ editor: this.editor, element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0 });
+				this.eventHandler(params);
 			}
+			this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
+
 			i--;
 		}
 	},
@@ -248,10 +254,11 @@ FileManager.prototype = {
 	 * @private
 	 */
 	_resetInfo() {
-		if (typeof this.eventHandler === 'function') {
-			for (let i = 0, len = this.infoList.length; i < len; i++) {
-				this.eventHandler.call(this.events, { editor: this.editor, element: null, index: this.infoList[i].index, state: 'delete', info: null, remainingFilesCount: 0 });
-			}
+		const eh = typeof this.eventHandler === 'function';
+		const params = { editor: this.editor, element: null, state: 'delete', info: null, remainingFilesCount: 0 };
+		for (let i = 0, len = this.infoList.length; i < len; i++) {
+			if (eh) this.eventHandler({ ...params, index: this.infoList[i].index, pluginName: this.kind });
+			this.triggerEvent('onFileManagerAction', { ...params, index: this.infoList[i].index, pluginName: this.kind });
 		}
 
 		this.infoList = [];
