@@ -104,6 +104,7 @@
 		link_modal_text: 'Text to display',
 		link_modal_title: 'Insert Link',
 		link_modal_url: 'URL to link',
+		link_modal_relAttribute: 'Rel attribute',
 		list: 'List',
 		math: 'Math',
 		math_modal_fontSizeLabel: 'Font Size',

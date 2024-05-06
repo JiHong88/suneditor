@@ -172,11 +172,15 @@ Math_.prototype = {
 				copyTextToClipboard(this._element);
 				break;
 			case 'delete':
-				domUtils.removeItem(this.controller.currentTarget);
-				this.controller.close();
-				this.editor.focus();
-				this.history.push(false);
+				this.destroy(this.controller.currentTarget);
 		}
+	},
+
+	destroy(element) {
+		domUtils.removeItem(element);
+		this.controller.close();
+		this.editor.focus();
+		this.history.push(false);
 	},
 
 	_renderer(exp) {

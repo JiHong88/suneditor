@@ -1,4 +1,5 @@
 import CoreInjector from '../editorInjector/_core';
+import { CreateTooltipInner } from '../core/section/constructor';
 
 const Modal = function (inst, element) {
 	CoreInjector.call(this, inst.editor);
@@ -142,7 +143,10 @@ Modal.CreateFileInput = function ({ icons, lang }, { acceptedFormats, allowMulti
 			</div>
 			<input class="se-input-form __se__file_input" data-focus type="file" accept="${acceptedFormats}"${allowMultiple ? ' multiple="multiple"' : ''}/>
 		</div>
-		<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.selection_remove}</button>
+		<button type="button" class="se-btn se-modal-files-edge-button se-file-remove se-tooltip" aria-label="${lang.remove}">
+			${icons.selection_remove}
+			${CreateTooltipInner(lang.remove)}
+		</button>
 	</div>`;
 };
 Modal.OnChangeFile = function (wrapper, files) {

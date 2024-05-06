@@ -3,7 +3,7 @@ import { domUtils, env } from '../helper';
 import { _DragHandle } from '../modules';
 
 const { ON_OVER_COMPONENT } = env;
-const NON_RESPONSE_KEYCODE = /^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$/;
+const NON_RESPONSE_KEYCODE = /^(13|1[7-9]|20|27|45|11[2-9]|12[0-3]|144|145)$/;
 const INDEX_0 = 2147483647;
 const INDEX_1 = 2147483646;
 const INDEX_2 = 2147483645;

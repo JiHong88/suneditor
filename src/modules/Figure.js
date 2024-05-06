@@ -400,10 +400,10 @@ Figure.prototype = {
 		align = align || 'none';
 
 		const figure = Figure.GetContainer(target);
-		const cover = figure.cover;
 		const container = figure.container;
 
-		if (/%$/.test(target.style.width) && align === 'center') {
+		const cover = figure.cover;
+		if (/%$/.test(target.style.width) && align === 'center' && !this.component.isInline(container)) {
 			container.style.minWidth = '100%';
 			cover.style.width = container.style.width;
 		} else {
@@ -779,6 +779,35 @@ Figure.prototype = {
 		_DragHandle.get('__dragMove')();
 
 		dragHandle.style.display = 'block';
+	},
+
+	_retainFigureFormat(container, originEl, anchorCover) {
+		let existElement = this.format.isBlock(originEl.parentNode) || domUtils.isWysiwygFrame(originEl.parentNode) ? originEl : domUtils.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
+
+		if (domUtils.getParentElement(originEl, domUtils.isExcludeFormat)) {
+			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
+			existElement.parentNode.replaceChild(container, existElement);
+		} else if (domUtils.isListCell(existElement)) {
+			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
+			existElement.insertBefore(container, refer);
+			domUtils.removeItem(originEl);
+			this.nodeTransform.removeEmptyNode(refer, null, true);
+		} else if (this.format.isLine(existElement)) {
+			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
+			existElement = this.nodeTransform.split(existElement, refer);
+			existElement.parentNode.insertBefore(container, existElement);
+			domUtils.removeItem(originEl);
+			this.nodeTransform.removeEmptyNode(existElement, null, true);
+		} else {
+			if (this.format.isLineOnly(existElement.parentNode)) {
+				const formats = existElement.parentNode;
+				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
+				if (this.fileManager.__updateTags.map((current) => existElement.contains(current)).length === 0) domUtils.removeItem(existElement);
+			} else {
+				existElement = domUtils.isFigure(existElement.parentNode) ? domUtils.getParentElement(existElement.parentNode, Figure.__is) : existElement;
+				existElement.parentNode.replaceChild(container, existElement);
+			}
+		}
 	},
 
 	constructor: Figure

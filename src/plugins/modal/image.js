@@ -1,6 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
 import { domUtils, numbers, env } from '../../helper';
+import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 const Image_ = function (editor, pluginOptions) {
@@ -23,9 +24,9 @@ const Image_ = function (editor, pluginOptions) {
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
 		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
 		allowMultiple: !!pluginOptions.allowMultiple,
-		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
-		useFormatType: !!pluginOptions.useFormatType,
-		defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block'
+		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*'
+		// useFormatType: pluginOptions.useFormatType ?? false,
+		// defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block'
 	};
 
 	// create HTML
@@ -40,7 +41,8 @@ const Image_ = function (editor, pluginOptions) {
 			  ];
 
 	// show align
-	if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.querySelector('.se-figure-align').style.display = 'none';
+	this.alignForm = modalEl.querySelector('.se-figure-align');
+	if (!figureControls.some((subArray) => subArray.includes('align'))) this.alignForm.style.display = 'none';
 
 	// modules
 	const Link = this.plugins.link ? this.plugins.link.pluginOptions : {};
@@ -117,6 +119,13 @@ const Image_ = function (editor, pluginOptions) {
 		this.eventManager.addEvent(this.inputY, 'change', ratioChange);
 		this.eventManager.addEvent(this.proportion, 'change', ratioChange);
 		this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
+	}
+
+	if (this.pluginOptions.useFormatType) {
+		this.as = this.pluginOptions.defaultFormatType;
+		this.asBlock = modalEl.querySelector('[data-command="asBlock"]');
+		this.asInline = modalEl.querySelector('[data-command="asInline"]');
+		this.eventManager.addEvent([this.asBlock, this.asInline], 'click', OnClickAsButton.bind(this));
 	}
 };
 
@@ -236,6 +245,10 @@ Image_.prototype = {
 			this.proportion.checked = true;
 		}
 
+		if (this.pluginOptions.useFormatType) {
+			this._activeAsInline(this.pluginOptions.defaultFormatType === 'inline');
+		}
+
 		this.anchor.init();
 	},
 
@@ -299,6 +312,10 @@ Image_.prototype = {
 					w: 1,
 					h: 1
 			  };
+
+		if (this.pluginOptions.useFormatType) {
+			this._activeAsInline(this.component.isInline(figureInfo.container));
+		}
 	},
 
 	/**
@@ -341,6 +358,26 @@ Image_.prototype = {
 			isUpdate: this.modal.isUpdate,
 			alt: this.altText.value
 		};
+	},
+
+	_activeAsInline(isInline) {
+		const ctrlAlignBtn = this.figure.controller.form.querySelector('[data-command="onalign"]');
+
+		if (isInline) {
+			domUtils.addClass(this.asInline, 'on');
+			domUtils.removeClass(this.asBlock, 'on');
+			this.as = 'inline';
+			// buttns
+			if (this.alignForm) this.alignForm.style.display = 'none';
+			if (ctrlAlignBtn) ctrlAlignBtn.style.display = 'none';
+		} else {
+			domUtils.addClass(this.asBlock, 'on');
+			domUtils.removeClass(this.asInline, 'on');
+			this.as = 'block';
+			// buttns
+			if (this.alignForm) this.alignForm.style.display = '';
+			if (ctrlAlignBtn) ctrlAlignBtn.style.display = '';
+		}
 	},
 
 	async _submitFile(fileList) {
@@ -585,45 +622,9 @@ Image_.prototype = {
 			}
 		}
 
-		let existElement = null;
 		if (isNewContainer) {
 			imageEl = this._element;
-			existElement = this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode) ? imageEl : domUtils.isAnchor(imageEl.parentNode) ? imageEl.parentNode : this.format.getLine(imageEl) || imageEl;
-
-			if (domUtils.getParentElement(this._element, domUtils.isExcludeFormat)) {
-				existElement = isNewAnchor ? anchor : this._element;
-				existElement.parentNode.replaceChild(container, existElement);
-			} else if (domUtils.isListCell(existElement)) {
-				const refer = domUtils.getParentElement(imageEl, function (current) {
-					return current.parentNode === existElement;
-				});
-				existElement.insertBefore(container, refer);
-				domUtils.removeItem(imageEl);
-				this.nodeTransform.removeEmptyNode(refer, null, true);
-			} else if (this.format.isLine(existElement)) {
-				const refer = domUtils.getParentElement(imageEl, function (current) {
-					return current.parentNode === existElement;
-				});
-				existElement = this.nodeTransform.split(existElement, refer);
-				existElement.parentNode.insertBefore(container, existElement);
-				domUtils.removeItem(imageEl);
-				this.nodeTransform.removeEmptyNode(existElement, null, true);
-			} else {
-				if (this.format.isLineOnly(existElement.parentNode)) {
-					const formats = existElement.parentNode;
-					formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-					if (
-						this.fileManager.__updateTags.map(function (current) {
-							return existElement.contains(current);
-						}).length === 0
-					)
-						domUtils.removeItem(existElement);
-				} else {
-					existElement = domUtils.isFigure(existElement.parentNode) ? existElement.parentNode : existElement;
-					existElement.parentNode.replaceChild(container, existElement);
-				}
-			}
-
+			this.figure._retainFigureFormat(container, this._element, isNewAnchor ? anchor : null);
 			this._element = imageEl = container.querySelector('img');
 			this._cover = cover;
 			this._container = container;
@@ -907,6 +908,10 @@ function OnClickRevert() {
 	}
 }
 
+function OnClickAsButton({ target }) {
+	this._activeAsInline(target.getAttribute('data-command') === 'asInline');
+}
+
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();
 	this._linkValue = this.previewSrc.textContent = !value
@@ -970,7 +975,14 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<label>${lang.image_modal_url}</label>
 			<div class="se-modal-form-files">
 				<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />
-				${plugins.imageGallery ? `<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="${lang.imageGallery}" aria-label="${lang.imageGallery}">${icons.image_gallery}</button>` : ''}
+				${
+					plugins.imageGallery
+						? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button __se__gallery" aria-label="${lang.imageGallery}">
+							${icons.image_gallery}
+							${CreateTooltipInner(lang.imageGallery)}
+							</button>`
+						: ''
+				}
 			</div>
 			<pre class="se-link-preview"></pre>
 		</div>`;
@@ -988,7 +1000,10 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<label class="se-modal-size-x">x</label>
 			<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" />
 			<label><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;${lang.proportion}</label>
-			<button type="button" title="${lang.revert}" aria-label="${lang.revert}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
+			<button type="button" aria-label="${lang.revert}" class="se-btn se-tooltip se-modal-btn-revert">
+				${icons.revert}
+				${CreateTooltipInner(lang.revert)}
+			</button>
 		</div>`;
 
 	const useFormatTypeHtml = !pluginOptions.useFormatType
@@ -996,8 +1011,14 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 		: /*html*/ `
 		<div class="se-modal-form">
 			<div class="se-modal-flex-form">
-				<button type="button" data-command="asBlock" class="se-btn" title="${lang.blockStyle}" aria-label="${lang.inlineStyle}">${icons.component_outline}</button>
-				<button type="button" data-command="asInline" class="se-btn" title="${lang.inlineStyle}" aria-label="${lang.inlineStyle}">${icons.component_inline}</button>
+				<button type="button" data-command="asBlock" class="se-btn se-tooltip" aria-label="${lang.inlineStyle}">
+					${icons.component_outline}
+					${CreateTooltipInner(lang.blockStyle)}
+				</button>
+				<button type="button" data-command="asInline" class="se-btn se-tooltip" aria-label="${lang.inlineStyle}">
+					${icons.component_inline}
+					${CreateTooltipInner(lang.inlineStyle)}
+				</button>
 			</div>
 		</div>`;
 

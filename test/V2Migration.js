@@ -14,5 +14,5 @@ function table() {
 }
 
 function dataAttr() {
-	'|data-exp|data-font-size'
+	'|data-exp|data-font-size|data-size'
 }

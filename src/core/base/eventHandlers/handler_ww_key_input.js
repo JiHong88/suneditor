@@ -158,13 +158,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			}
 
 			// line component
-			if (!selectRange && formatEl) {
-				const sel =
-					selectionNode === formatEl
-						? formatEl.childNodes[range.startOffset] || formatEl.childNodes[range.startOffset - 1]
-						: domUtils.isEdgePoint(range.startContainer, range.startOffset)
-						? range.startContainer.previousSibling
-						: null;
+			if (!selectRange && formatEl && (range.startOffset === 0 || selectionNode === formatEl)) {
+				const sel = selectionNode === formatEl ? this._isUneditableNode(range, true) : domUtils.isEdgePoint(range.startContainer, range.startOffset) ? domUtils.getPreviousDeepestNode(range.startContainer) : null;
 				if (this.component.is(sel)) {
 					const fileComponentInfo = this.component.get(sel);
 					if (fileComponentInfo) {
@@ -313,8 +308,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			}
 
 			// line component
-			if (!selectRange && formatEl) {
-				const sel = selectionNode === formatEl ? formatEl.childNodes[range.endOffset] || formatEl.childNodes[range.endOffset + 1] : domUtils.isEdgePoint(range.endContainer, range.endOffset) ? range.endContainer.nextSibling : null;
+			if (!selectRange && formatEl && (range.endOffset === range.endContainer.textContent.length || selectionNode === formatEl)) {
+				const sel = selectionNode === formatEl ? this._isUneditableNode(range, false) : domUtils.isEdgePoint(range.endContainer, range.endOffset) ? domUtils.getNextDeepestNode(range.endContainer, null) : null;
 				if (this.component.is(sel)) {
 					const fileComponentInfo = this.component.get(sel);
 					if (fileComponentInfo) {

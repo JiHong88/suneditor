@@ -2019,15 +2019,16 @@
 	height: auto;
 	max-height: 18px;
 	font-size: 13px;
-	padding-top: 2px;
 	font-weight: normal;
 	font-family: inherit;
 	color: #666;
 	background-color: transparent;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	word-break: break-all;
-	white-space: pre;
+	word-break: break-word;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	max-height: none;
 }
 
 /* modal - modal - anchor module */
@@ -2055,16 +2056,16 @@
 	position: relative;
 	height: 34px;
 }
-
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel-btn {
-	width: 46px;
-	color: #3f9dff;
+	border-width: 1px;
 }
 
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel-wrapper {
 	display: flex;
+	height: 34px;
 	line-height: 1;
-	padding: 6px 6px 0 3px;
+	padding: 0 6px;
+	align-items: center;
 }
 
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel-preview {

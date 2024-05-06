@@ -161,40 +161,9 @@ Audio_.prototype = {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
-				try {
-					this._setTagAttrs(element);
-
-					// find component element
-					let existElement = this.format.isBlock(element.parentNode) || domUtils.isWysiwygFrame(element.parentNode) ? element : this.format.getLine(element) || element;
-
-					// clone element
-					const prevElement = element;
-					this._element = element = element.cloneNode(false);
-
-					const figure = Figure.CreateContainer(element, 'se-flex-component');
-					if (domUtils.getParentElement(prevElement, domUtils.isExcludeFormat)) {
-						prevElement.parentNode.replaceChild(figure.container, prevElement);
-					} else if (domUtils.isListCell(existElement)) {
-						const refer = domUtils.getParentElement(prevElement, function (current) {
-							return current.parentNode === existElement;
-						});
-						existElement.insertBefore(figure.container, refer);
-						domUtils.removeItem(prevElement);
-						this.nodeTransform.removeEmptyNode(refer, null, true);
-					} else if (this.format.isLineOnly(existElement)) {
-						const refer = domUtils.getParentElement(prevElement, function (current) {
-							return current.parentNode === existElement;
-						});
-						existElement = this.nodeTransform.split(existElement, refer);
-						existElement.parentNode.insertBefore(figure.container, existElement);
-						domUtils.removeItem(prevElement);
-						this.nodeTransform.removeEmptyNode(existElement, null, true);
-					} else {
-						existElement.parentNode.replaceChild(figure.container, existElement);
-					}
-				} catch (error) {
-					console.warn('[SUNEDITOR.audio.error] Maybe the audio tag is nested.', error);
-				}
+				this._setTagAttrs(element);
+				const figure = Figure.CreateContainer(element.cloneNode(true), 'se-flex-component');
+				this.figure._retainFigureFormat(figure.container, element, null);
 			}
 		};
 	},

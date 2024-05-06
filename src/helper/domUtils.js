@@ -1034,6 +1034,9 @@ export function getPreviousDeepestNode(node, ceiling) {
 		}
 		if (!previousNode) return null;
 	}
+
+	if (isNonEditable(previousNode)) return previousNode;
+
 	while (previousNode.lastChild) previousNode = previousNode.lastChild;
 
 	return previousNode;
@@ -1058,6 +1061,9 @@ export function getNextDeepestNode(node, ceiling) {
 		}
 		if (!nextNode) return null;
 	}
+
+	if (isNonEditable(nextNode)) return nextNode;
+
 	while (nextNode.firstChild) nextNode = nextNode.firstChild;
 
 	return nextNode;

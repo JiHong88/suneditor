@@ -201,6 +201,21 @@ Component.prototype = {
 
 		if (__overInfo !== ON_OVER_COMPONENT) {
 			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+
+			// set zero width space
+			if (!this.isInline(info.container)) return;
+
+			const oNode = info.container;
+			let zeroWidth = null;
+			if (!oNode.previousSibling || domUtils.isBreak(oNode.previousSibling)) {
+				zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+				oNode.parentNode.insertBefore(zeroWidth, oNode);
+			}
+
+			if (!oNode.nextSibling || domUtils.isBreak(oNode.nextSibling)) {
+				zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+				oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
+			}
 		} else if (!domUtils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
 			domUtils.addClass(dragHandle, 'se-drag-handle-full');
@@ -539,7 +554,7 @@ function OnKeyDown_component(e) {
 	// up down, left right
 	if (DIR_KEYCODE.test(keyCode)) {
 		const { container } = this.get(this.currentTarget);
-		const isInline = this.isInline(this.currentTarget);
+		const isInline = this.isInline(container || this.currentTarget);
 
 		let el = null;
 		let offset = 1;

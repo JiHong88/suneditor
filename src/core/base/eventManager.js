@@ -368,10 +368,10 @@ EventManager.prototype = {
 
 		if (isElement) {
 			siblingNode = this._isUneditableNode_getSibling(container.childNodes[offset], siblingKey, container);
-			return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false';
+			return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false' ? siblingNode : null;
 		} else {
 			siblingNode = this._isUneditableNode_getSibling(container, siblingKey, container);
-			return domUtils.isEdgePoint(container, offset, isFront ? 'front' : 'end') && siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false';
+			return domUtils.isEdgePoint(container, offset, isFront ? 'front' : 'end') && siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false' ? siblingNode : null;
 		}
 	},
 
@@ -809,7 +809,7 @@ EventManager.prototype = {
 		} else {
 			if (this.__scrollID) _w.clearTimeout(this.__scrollID);
 
-			if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
+			if (_DragHandle.get('__dragHandler') && !domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) _DragHandle.get('__dragHandler').style.display = 'none';
 
 			for (let i = 0; i < openCont.length; i++) {
 				if (openCont[i].notInCarrier) continue;
