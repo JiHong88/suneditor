@@ -387,8 +387,10 @@ Selection.prototype = {
 		let rangeObj = this.getRange();
 		if (this._isNone(rangeObj)) {
 			if (!domUtils.isWysiwygFrame(rangeObj.startContainer) || !domUtils.isWysiwygFrame(rangeObj.endContainer)) return false;
-			const ww = rangeObj.startContainer;
-			rangeObj = this.setRange(ww.firstElementChild, 0, ww.lastElementChild, 1);
+			const ww = rangeObj.commonAncestorContainer;
+			const first = ww.children[rangeObj.startOffset];
+			const end = ww.children[rangeObj.endOffset];
+			rangeObj = this.setRange(first, 0, end, first === end ? 0 : 1);
 		}
 
 		const range = rangeObj;
