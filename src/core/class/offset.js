@@ -382,16 +382,18 @@ Offset.prototype = {
 		} else {
 			const tMargin = targetRect.top;
 			const bMargin = clientSize.h - targetRect.bottom;
+			const editorOffset = this.getGlobal();
+			const editorScroll = this.getGlobalScroll();
+			const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
 
 			if (isIframe) {
-				const editorOffset = this.getGlobal();
-				const editorScroll = this.getGlobalScroll();
 				const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
 				const editorH = this.editor.frameContext.get('topArea').offsetHeight;
 				rmt = targetRect.top - emt;
-				rmb = bMargin - (editorScroll.oh - (editorH + emt) + (this.editor.frameContext.get('statusbar')?.offsetHeight || 0));
+				rmb = bMargin - (editorScroll.oh - (editorH + emt) + statusBarH);
 			} else {
-				const wst = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? this.getGlobal(this.editor.frameContext.get('topArea')).top - _w.scrollY : 0;
+				const wst = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? editorOffset.top - _w.scrollY : 0;
+				const wsb = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? _w.innerHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
 				let st = wst;
 				if (toolbarH > wst) {
 					if (this.editor.toolbar._sticky) {
@@ -402,10 +404,12 @@ Offset.prototype = {
 					}
 				} else if (this.options.get('toolbar_container')) {
 					toolbarH = 0;
+				} else {
+					st = wst + (this.editor.toolbar._sticky ? toolbarH : 0);
 				}
 
 				rmt = targetRect.top - st;
-				rmb = wwScroll.rects.bottom - targetRect.bottom;
+				rmb = wwScroll.rects.bottom - targetRect.bottom - wsb - statusBarH;
 			}
 
 			// display margin
