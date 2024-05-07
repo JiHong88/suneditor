@@ -143,15 +143,6 @@ Audio_.prototype = {
 	},
 
 	/**
-	 * @override controller
-	 */
-	close() {
-		if (!this._element) return;
-		domUtils.removeClass(this._element, 'active');
-		domUtils.removeClass(this._element.parentElement, 'se-figure-selected');
-	},
-
-	/**
 	 * @override core
 	 */
 	retainFormat() {
@@ -183,10 +174,8 @@ Audio_.prototype = {
 	 */
 	ready(target) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
-		domUtils.addClass(target, 'active');
-		domUtils.addClass(target.parentElement, 'se-figure-selected');
 		this._element = target;
-		this.controller.open(target, null, { isWWTarget: false, initMethod: UnSelect.bind(null, target), addOffset: null });
+		this.controller.open(target, null, { isWWTarget: false, addOffset: null });
 	},
 
 	/**
@@ -391,13 +380,6 @@ Audio_.prototype = {
 
 	constructor: Audio_
 };
-
-function UnSelect(target) {
-	if (target) {
-		domUtils.removeClass(target, 'active');
-		domUtils.removeClass(target.parentElement, 'se-figure-selected');
-	}
-}
 
 async function UploadCallBack(info, xmlHttp) {
 	if ((await this.triggerEvent('audioUploadHandler', { xmlHttp, info })) === NO_EVENT) {

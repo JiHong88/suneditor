@@ -83,6 +83,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 	switch (keyCode) {
 		case 8 /** backspace key */: {
+			this.component.deselect();
 			_styleNodes = this.__cacheStyleNodes;
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
@@ -300,6 +301,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			break;
 		}
 		case 46 /** delete key */: {
+			this.component.deselect();
 			_styleNodes = this.__cacheStyleNodes;
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
@@ -542,6 +544,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			break;
 		}
 		case 13 /** enter key */: {
+			this.component.deselect();
 			const brBlock = this.format.getBrLine(selectionNode, null);
 
 			if (this.editor.frameOptions.get('charCounter_type') === 'byte-html') {

@@ -321,14 +321,10 @@ Component.prototype = {
 	 */
 	_setComponentLineBreaker(element) {
 		this.eventManager._lineBreakComp = null;
-		const fc = this.editor.frameContext;
-		const wysiwyg = fc.get('wysiwyg');
-
 		const info = this.get(element);
 		if (!info) return;
 
-		const yScroll = wysiwyg.scrollY || wysiwyg.scrollTop || 0;
-		const wScroll = wysiwyg.scrollX || wysiwyg.scrollLeft || 0;
+		const fc = this.editor.frameContext;
 		const container = info.container;
 		const isNonSelected = domUtils.hasClass(container, 'se-flex-component');
 		const lb_t = fc.get('lineBreaker_t');
@@ -343,15 +339,16 @@ Component.prototype = {
 		let componentTop, w;
 		const isRtl = this.options.get('_rtl');
 		const dir = isRtl ? ['right', 'left'] : ['left', 'right'];
+		const { t, scrollX, scrollY } = this.offset.getSize(offsetTarget);
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
 			const tH = numbers.get(_w.getComputedStyle(lb_t).height, 1);
 			this.eventManager._lineBreakComp = container;
-			componentTop = this.offset.get(offsetTarget).top + yScroll;
+			componentTop = t + scrollY;
 			w = target.offsetWidth / 2 / 2;
-			t_style.top = componentTop - yScroll - tH / 2 + 'px';
+			t_style.top = componentTop - scrollY - tH / 2 + 'px';
 			t_style[dir[0]] = (isNonSelected ? 4 : this.offset.get(target).left + w) + 'px';
 			t_style[dir[1]] = '';
-			lb_t.setAttribute('data-offset', yScroll + ',' + wScroll);
+			lb_t.setAttribute('data-offset', scrollY + ',' + scrollX);
 			t_style.display = 'block';
 		} else {
 			t_style.display = 'none';
@@ -365,16 +362,16 @@ Component.prototype = {
 
 			if (!componentTop) {
 				this.eventManager._lineBreakComp = container;
-				componentTop = this.offset.get(offsetTarget).top + yScroll;
+				componentTop = t + scrollY;
 				w = target.offsetWidth / 2 / 2;
 			}
 
-			b_style.top = componentTop + target.offsetHeight - yScroll - bH / 2 + 'px';
+			b_style.top = componentTop + target.offsetHeight - scrollY - bH / 2 + 'px';
 			b_style.right = '';
 			b_style.left = this.offset.get(target).left + (isRtl ? 0 : target.offsetWidth) - (isNonSelected ? 0 : w) - (isNonSelected ? bW / 2 : bW) + 'px';
 
 			const bDir = 'left';
-			lb_b.setAttribute('data-offset', yScroll + ',' + bDir + ',' + wScroll);
+			lb_b.setAttribute('data-offset', scrollY + ',' + bDir + ',' + scrollX);
 			b_style.display = 'block';
 		} else {
 			b_style.display = 'none';

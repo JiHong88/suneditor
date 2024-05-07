@@ -1147,11 +1147,6 @@ Editor.prototype = {
 	 */
 	_iframeAutoHeight(fc) {
 		const autoFrame = fc.get('_iframeAuto');
-		if (autoFrame) {
-			this._w.setTimeout(() => {
-				fc.get('wysiwygFrame').style.height = autoFrame.offsetHeight + 'px';
-			}, 0);
-		}
 
 		if (autoFrame) {
 			this._w.setTimeout(() => {

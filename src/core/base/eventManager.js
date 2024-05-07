@@ -32,7 +32,6 @@ const EventManager = function (editor) {
 	this.__close_move = null;
 	this.__geckoActiveEvent = null;
 	this.__scrollparents = [];
-	this.__scrollID = '';
 	this.__cacheStyleNodes = [];
 	this.__selectionSyncEvent = null;
 	// input plugins
@@ -45,6 +44,7 @@ const EventManager = function (editor) {
 	this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
 	this.__retainTimer = null;
 	this.__eventDoc = null;
+	// this.__scrollID = '';
 };
 
 EventManager.prototype = {
@@ -663,6 +663,18 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this, fc), false);
 		this.addEvent(codeArea, 'mousedown', OnFocus_code.bind(this, fc), false);
 
+		/** drag handle */
+		const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
+		this.addEvent(
+			dragHandle,
+			'wheel',
+			(event) => {
+				event.preventDefault();
+				this.component.deselect();
+			},
+			false
+		);
+
 		/** line breaker */
 		this.addEvent(
 			[fc.get('lineBreaker_t'), fc.get('lineBreaker_b')],
@@ -790,24 +802,26 @@ EventManager.prototype = {
 		const openCont = this.editor.opendControllers;
 		if (!openCont.length) return;
 
-		if (isMobile) {
-			this.__rePositionController(openCont);
-		} else {
-			if (this.__scrollID) _w.clearTimeout(this.__scrollID);
+		this.__rePositionController(openCont);
 
-			if (_DragHandle.get('__dragHandler') && !domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) _DragHandle.get('__dragHandler').style.display = 'none';
+		// if (isMobile) {
+		// 	this.__rePositionController(openCont);
+		// } else {
+		// 	if (this.__scrollID) _w.clearTimeout(this.__scrollID);
 
-			for (let i = 0; i < openCont.length; i++) {
-				if (openCont[i].notInCarrier) continue;
-				openCont[i].inst?.hide();
-			}
+		// 	if (_DragHandle.get('__dragHandler') && !domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) _DragHandle.get('__dragHandler').style.display = 'none';
 
-			this.__scrollID = _w.setTimeout(() => {
-				_w.clearTimeout(this.__scrollID);
-				this.__scrollID = '';
-				this.__rePositionController(openCont);
-			}, 250);
-		}
+		// 	for (let i = 0; i < openCont.length; i++) {
+		// 		if (openCont[i].notInCarrier) continue;
+		// 		openCont[i].inst?.hide();
+		// 	}
+
+		// 	this.__scrollID = _w.setTimeout(() => {
+		// 		_w.clearTimeout(this.__scrollID);
+		// 		this.__scrollID = '';
+		// 		this.__rePositionController(openCont);
+		// 	}, 250);
+		// }
 	},
 
 	__rePositionController(cont) {

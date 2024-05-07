@@ -33,9 +33,6 @@
 		"node_modules"
 	],
 	"types": "typings/index.d.ts",
-	"engines": {
-		"node": ">=14.21.3"
-	},
 	"devDependencies": {
 		"@babel/core": "^7.22.1",
 		"@codemirror/lang-html": "^6.4.3",

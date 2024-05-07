@@ -65,7 +65,7 @@ const Figure = function (inst, controls, params) {
 	this._resizeClientX = 0;
 	this._resizeClientY = 0;
 	this._resize_direction = '';
-	this._floatClassRegExp = '__se__float\\-[a-z]+';
+	this._floatClassStr = '__se__float-none|__se__float-left|__se__float-center|__se__float-right';
 	this.__preventSizechange = false;
 	this.__revertSize = { w: '', h: '' };
 	this.__offset = {};
@@ -305,6 +305,8 @@ Figure.prototype = {
 		_figure.main.style.display = 'block';
 
 		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
+			// align button
+			this._setAlignIcon();
 			this.editor._visibleControllers(true, true);
 			// size
 			const size = this.getSize(target);
@@ -324,9 +326,6 @@ Figure.prototype = {
 		this._element_h = this._resize_h = h;
 		this._element_l = l;
 		this._element_t = t;
-
-		// align button
-		this._setAlignIcon();
 
 		// drag
 		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || domUtils.hasClass(figureInfo.container, 'se-input-component')) {
@@ -397,7 +396,7 @@ Figure.prototype = {
 	 */
 	setAlign(target, align) {
 		if (!target) target = this._element;
-		align = align || 'none';
+		this.align = align = align || 'none';
 
 		const figure = Figure.GetContainer(target);
 		const container = figure.container;
@@ -412,8 +411,13 @@ Figure.prototype = {
 		}
 
 		if (!domUtils.hasClass(container, '__se__float-' + align)) {
-			domUtils.removeClass(container, this._floatClassRegExp);
+			domUtils.removeClass(container, this._floatClassStr);
 			domUtils.addClass(container, '__se__float-' + align);
+		}
+
+		if (this.autoRatio) {
+			const { w, h } = this.getSize(this._element);
+			this.__setCoverPaddingBottom(w, h);
 		}
 
 		this._setAlignIcon();
@@ -626,8 +630,8 @@ Figure.prototype = {
 			h = numbers.is(h) ? h + this.sizeUnit : h;
 			sizeTarget.style.height = this._element.style.height = this.autoRatio && !this.isVertical ? '100%' : h;
 			if (this.autoRatio) {
-				this._cover.style.paddingBottom = h;
 				this._cover.style.height = h;
+				this.__setCoverPaddingBottom(w, h);
 			}
 		}
 
@@ -635,6 +639,15 @@ Figure.prototype = {
 
 		// save current size
 		this._saveCurrentSize();
+	},
+
+	__setCoverPaddingBottom(w, h) {
+		this._cover.style.height = h;
+		if (/%$/.test(w) && this.align === 'center') {
+			this._cover.style.paddingBottom = !/%$/.test(h) ? h : numbers.get((numbers.get(h, 2) / 100) * numbers.get(w, 2), 2) + '%';
+		} else {
+			this._cover.style.paddingBottom = h;
+		}
 	},
 
 	_setAutoSize() {
@@ -671,8 +684,10 @@ Figure.prototype = {
 		this._element.style.maxWidth = '';
 		this._element.style.height = this.autoRatio ? '100%' : heightPercentage ? '' : h;
 
-		if (this.autoRatio) this._cover.style.paddingBottom = h;
 		if (this.align === 'center') this.setAlign(this._element, this.align);
+		if (this.autoRatio) {
+			this.__setCoverPaddingBottom(w, h);
+		}
 
 		this._setCaptionPosition(this._element);
 
@@ -686,7 +701,7 @@ Figure.prototype = {
 		this._container.style.width = '';
 		this._container.style.height = '';
 
-		domUtils.removeClass(this._container, this._floatClassRegExp);
+		domUtils.removeClass(this._container, this._floatClassStr);
 		domUtils.addClass(this._container, '__se__float-' + this.align);
 
 		if (this.align === 'center') this.setAlign(this._element, this.align);
@@ -812,10 +827,9 @@ Figure.prototype = {
 };
 
 function OnScrollDragHandler(dragHandle, figureMain) {
-	const offset = this.offset.get(figureMain);
 	dragHandle.style.display = 'block';
-	dragHandle.style.left = offset.left + (this.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
-	dragHandle.style.top = offset.top - dragHandle.offsetHeight + 'px';
+	dragHandle.style.left = figureMain.offsetLeft + (this.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
+	dragHandle.style.top = figureMain.offsetTop - dragHandle.offsetHeight + 'px';
 }
 
 function GetRotateValue(element) {
