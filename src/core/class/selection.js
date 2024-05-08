@@ -235,13 +235,13 @@ Selection.prototype = {
 			eo = e.rangeOffset;
 		} else if (this.editor.frameContext.get('_wd').caretRangeFromPoint) {
 			let r = this.editor.frameContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
-			if (!r) r = this.selection.getRange();
+			if (!r) r = this.getRange();
 			sc = r.startContainer;
 			so = r.startOffset;
 			ec = r.endContainer;
 			eo = r.endOffset;
 		} else {
-			const r = this.selection.getRange();
+			const r = this.getRange();
 			sc = r.startContainer;
 			so = r.startOffset;
 			ec = r.endContainer;
@@ -264,7 +264,7 @@ Selection.prototype = {
 		if (ref instanceof Selection) {
 			ref = ref.getRangeAt(0);
 		} else if (ref instanceof Node) {
-			ref = this.selection.setRange(ref, 1, ref, 1);
+			ref = this.setRange(ref, 1, ref, 1);
 		} else if (typeof ref?.startContainer === 'undefined') {
 			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
 		}

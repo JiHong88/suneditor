@@ -11,7 +11,7 @@ import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from './eventHandle
 import { OnMouseDown_wysiwyg, OnMouseUp_wysiwyg, OnClick_wysiwyg, OnMouseMove_wysiwyg, OnMouseLeave_wysiwyg } from './eventHandlers/handler_ww_mouse';
 import { OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './eventHandlers/handler_ww_key_input';
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './eventHandlers/handler_ww_clipboard';
-import { OnDragOver_wysiwyg, OnDrop_wysiwyg } from './eventHandlers/handler_ww_dragDrop';
+import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHandlers/handler_ww_dragDrop';
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
@@ -656,7 +656,13 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this, fc), false);
-		this.addEvent(eventWysiwyg, 'dragover', OnDragOver_wysiwyg.bind(this, dragCursor, isIframe ? this.editor.frameContext.get('topArea') : null), false);
+		this.addEvent(
+			eventWysiwyg,
+			'dragover',
+			OnDragOver_wysiwyg.bind(this, fc, dragCursor, isIframe ? this.editor.frameContext.get('topArea') : null, !this.options.get('toolbar_container') && !this.editor.isBalloon && !this.editor.isInline),
+			false
+		);
+		this.addEvent(eventWysiwyg, 'dragend', OnDragEnd_wysiwyg.bind(this, dragCursor), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc, dragCursor), false);
 		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), { passive: true, useCapture: false });
 		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, fc), false);

@@ -376,6 +376,7 @@ Offset.prototype = {
 		const tmbw = clientSize.h - targetRect.bottom;
 		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar.main').offsetHeight;
 		let rmt, rmb;
+		let rt = 0;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rmt = tmtw - toolbarH;
 			rmb = tmbw;
@@ -392,7 +393,8 @@ Offset.prototype = {
 				rmt = targetRect.top - emt;
 				rmb = bMargin - (editorScroll.oh - (editorH + emt) + statusBarH);
 			} else {
-				const wst = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? editorOffset.top - _w.scrollY : 0;
+				rt = !this.editor.toolbar._sticky && !this.options.get('toolbar_container') ? toolbarH : 0;
+				const wst = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? editorOffset.top - _w.scrollY + rt : 0;
 				const wsb = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? _w.innerHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
 				let st = wst;
 				if (toolbarH > wst) {
@@ -417,7 +419,7 @@ Offset.prototype = {
 			rmb = rmb > 0 ? bMargin : rmb;
 		}
 
-		if (isWWTarget && (rmb + targetH <= 0 || rmt + targetH <= 0)) return;
+		if (isWWTarget && (rmb + targetH <= 0 || rmt + rt + targetH <= 0)) return;
 
 		let t = addOffset.top;
 		let y = 0;
@@ -429,7 +431,7 @@ Offset.prototype = {
 			if (y < 0) {
 				arrowDir = 'down';
 				t -= targetH + elH + ah * 2;
-				y = rmt - (elH + ah);
+				y = toolbarH + rmt - (elH + ah);
 				if (y < 0) {
 					arrowDir = '';
 					t -= y;

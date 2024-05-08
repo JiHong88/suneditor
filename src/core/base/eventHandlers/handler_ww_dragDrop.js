@@ -1,19 +1,20 @@
 import { domUtils } from '../../../helper';
 import { _DragHandle } from '../../../modules';
 
-export function OnDragOver_wysiwyg(dragCursor, _iframe, e) {
+export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar, e) {
 	e.preventDefault();
 
 	const { sc, so, ec, eo } = this.selection.getEventLocationRange(e);
 
-	const cursorRange = this._d.createRange();
+	const cursorRange = fc.get('_wd').createRange();
 	cursorRange.setStart(sc, so);
 	cursorRange.setEnd(ec, eo);
 
 	const _offset = { y: 0, x: 0 };
-	if (_iframe) {
-		const iframeOffset = this.offset.getGlobal(this.editor.frameContext.get('topArea'));
-		_offset.y = iframeOffset.top - this._w.scrollY;
+	if (_iframeTopArea) {
+		const iframeOffset = this.offset.getGlobal(_iframeTopArea);
+		const toolbarH = _innerToolbar ? this.context.get('toolbar.main').offsetHeight : 0;
+		_offset.y = iframeOffset.top + toolbarH - this._w.scrollY;
 		_offset.x = iframeOffset.left - this._w.scrollX;
 	}
 
@@ -26,6 +27,10 @@ export function OnDragOver_wysiwyg(dragCursor, _iframe, e) {
 	} else {
 		dragCursor.style.display = 'none';
 	}
+}
+
+export function OnDragEnd_wysiwyg(dragCursor) {
+	dragCursor.style.display = 'none';
 }
 
 export function OnDrop_wysiwyg(frameContext, dragCursor, e) {

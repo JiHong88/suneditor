@@ -447,7 +447,7 @@ window.editor_root = suneditor.create(
 		// value: `<p><span style="color: #ff5e00;"><del><strong>fdsfdsafa</strong></del></span><br></p>`,
 		plugins: plugins,
 		allowedClassName: '.+',
-		toolbar_container: '#root_toolbar_container',
+		// toolbar_container: '#root_toolbar_container',
 		attributeWhitelist: { '*': 'class' },
 		// statusbar_container: '#root_statusbar_container',
 		// shortcutsHint: false,
@@ -592,8 +592,8 @@ window.editor_root = suneditor.create(
 			onExportPdfBefore(params) {
 				console.log('pdfbefore', params);
 			},
-			onFileManagerAction(data) {
-				console.log('image', data);
+			onImageAction(data) {
+				console.log('ima', data);
 			},
 			// onFileDeleteBefore(arg) {
 			// 	console.log('delete file', arg);
