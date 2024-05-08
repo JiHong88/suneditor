@@ -8,6 +8,9 @@
 	"sideEffects": [
 		"./src/assets/css/*.css"
 	],
+	"engines": {
+		"node": ">=14.0.0"
+	},
 	"scripts": {
 		"dev": "webpack-dev-server --config webpack/dev.js",
 		"start": "npm run dev",
