@@ -514,7 +514,7 @@ function OnKeyDown_component(e) {
 		return;
 	}
 
-	// backspace, delete
+	// backspace key, delete key
 	if (keyCode === 8 || keyCode === 46) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -526,7 +526,7 @@ function OnKeyDown_component(e) {
 		}
 	}
 
-	// enter
+	// enter key
 	if (keyCode === 13) {
 		e.preventDefault();
 		const compContext = this.currentInfo || this.get(this.currentTarget);

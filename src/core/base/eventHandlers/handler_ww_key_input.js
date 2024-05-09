@@ -588,6 +588,9 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 					} else {
 						this.selection.setRange(temp, 0, temp, 0);
 					}
+
+					// enter scroll
+					this.selection.scrollTo(range);
 					break;
 				} else if (rangeEl && formatEl && !domUtils.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
 					const rangeEnt = this.selection.getRange();
@@ -600,6 +603,9 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						newEl.appendChild(selectionNode.nextSibling);
 
 						this.selection.setRange(br, 1, br, 1);
+
+						// enter scroll
+						this.selection.scrollTo(range);
 						break;
 					}
 
@@ -675,6 +681,9 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						const newEl = this.format.addLine(brBlock, this.format.isLine(brBlock.nextElementSibling) && !this.format.isBlock(brBlock.nextElementSibling) ? brBlock.nextElementSibling : null);
 						domUtils.copyFormatAttributes(newEl, brBlock);
 						this.selection.setRange(newEl, 1, newEl, 1);
+
+						// enter scroll
+						this.selection.scrollTo(range);
 						break;
 					}
 
@@ -704,6 +713,9 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 					}
 
 					this._onShortcutKey = true;
+
+					// enter scroll
+					this.selection.scrollTo(range);
 					break;
 				}
 
@@ -734,6 +746,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						this.selection.setRange(firstEl, 0, firstEl, 0);
 					}
 
+					// enter scroll
+					this.selection.scrollTo(range);
 					break;
 				}
 
@@ -756,6 +770,9 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 								domUtils.copyTagAttributes(newEl, formatEl, this.options.get('lineAttrReset'));
 								this.selection.setRange(newEl, offset, newEl, offset);
 							}
+
+							// enter scroll
+							this.selection.scrollTo(range);
 							break;
 						}
 
@@ -797,16 +814,25 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 					domUtils.copyTagAttributes(newEl, formatEl, this.options.get('lineAttrReset'));
 					this.selection.setRange(newEl, offset, newEl, offset);
 
+					// enter scroll
+					this.selection.scrollTo(range);
 					break;
 				}
 			}
 
-			if (selectRange) break;
+			if (selectRange) {
+				// enter scroll
+				this.selection.scrollTo(range);
+				break;
+			}
 
 			if (rangeEl && domUtils.getParentElement(rangeEl, 'FIGCAPTION') && domUtils.getParentElement(rangeEl, domUtils.isList)) {
 				this.__enterPrevent(e);
 				formatEl = this.format.addLine(formatEl, null);
 				this.selection.setRange(formatEl, 0, formatEl, 0);
+
+				// enter scroll
+				this.selection.scrollTo(range);
 			}
 
 			break;
@@ -828,9 +854,6 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 		this.html.insertNode(zeroWidth, null, true);
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
-
-	// enter scroll
-	if (keyCode === 13) this.selection.scrollTo(range);
 
 	// next component
 	if (!DIR_KEYCODE.test(keyCode)) return;

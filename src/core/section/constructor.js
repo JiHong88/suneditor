@@ -98,12 +98,9 @@ const Constructor = function (editorTargets, options) {
 	/** --- Plugins ------------------------------------------------------------------------------------------ */
 	const plugins = {};
 	if (options.plugins) {
+		const excludedPlugins = options.excludedPlugins || [];
 		const originPlugins = options.plugins;
-		const pluginsValues = Array.isArray(originPlugins.length)
-			? originPlugins
-			: Object.keys(originPlugins).map(function (name) {
-					return originPlugins[name];
-			  });
+		const pluginsValues = (Array.isArray(originPlugins) ? originPlugins : Object.keys(originPlugins)).filter((name) => !excludedPlugins.includes(name)).map((name) => originPlugins[name]);
 
 		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
 			p = pluginsValues[i].default || pluginsValues[i];
