@@ -171,7 +171,7 @@ Video.prototype = {
 	onPastAndDrop({ file }) {
 		if (!/^video/.test(file.type)) return;
 
-		this._submitFile([file]);
+		this.submitFile([file]);
 		this.editor.focus();
 
 		return false;
@@ -186,9 +186,9 @@ Video.prototype = {
 
 		let result = false;
 		if (this.videoInputFile && this.videoInputFile.files.length > 0) {
-			result = await this._submitFile(this.videoInputFile.files);
+			result = await this.submitFile(this.videoInputFile.files);
 		} else if (this.videoUrlFile && this._linkValue.length > 0) {
-			result = await this._submitURL(this._linkValue);
+			result = await this.submitURL(this._linkValue);
 		}
 
 		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, 'video'), 0);
@@ -463,7 +463,7 @@ Video.prototype = {
 		};
 	},
 
-	async _submitFile(fileList) {
+	async submitFile(fileList) {
 		if (fileList.length === 0) return;
 
 		let fileSize = 0;
@@ -526,7 +526,7 @@ Video.prototype = {
 		if (result === true || result === NO_EVENT) handler(null);
 	},
 
-	async _submitURL(url) {
+	async submitURL(url) {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
 

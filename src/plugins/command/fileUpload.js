@@ -121,7 +121,7 @@ FileUpload.prototype = {
 			return;
 		}
 
-		this._submitFile([file]);
+		this.submitFile([file]);
 		this.editor.focus();
 
 		return false;
@@ -156,7 +156,7 @@ FileUpload.prototype = {
 		this.component.select(this._element, FileUpload.key, false);
 	},
 
-	async _submitFile(fileList) {
+	async submitFile(fileList) {
 		if (fileList.length === 0) return;
 
 		let fileSize = 0;
@@ -362,7 +362,7 @@ FileUpload.prototype = {
 };
 
 async function OnChangeFile(e) {
-	await this._submitFile(e.target.files);
+	await this.submitFile(e.target.files);
 }
 
 function CreateHTML_controller({ lang, icons }) {

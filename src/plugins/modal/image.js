@@ -174,7 +174,7 @@ Image_.prototype = {
 	onPastAndDrop({ file }) {
 		if (!/^image/.test(file.type)) return;
 
-		this._submitFile([file]);
+		this.submitFile([file]);
 		this.editor.focus();
 
 		return false;
@@ -193,9 +193,9 @@ Image_.prototype = {
 		}
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
-			return await this._submitFile(this.imgInputFile.files);
+			return await this.submitFile(this.imgInputFile.files);
 		} else if (this.imgUrlFile && this._linkValue.length > 0) {
-			return await this._submitURL(this._linkValue);
+			return await this.submitURL(this._linkValue);
 		}
 
 		return false;
@@ -380,7 +380,7 @@ Image_.prototype = {
 		}
 	},
 
-	async _submitFile(fileList) {
+	async submitFile(fileList) {
 		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
@@ -443,7 +443,7 @@ Image_.prototype = {
 		if (result === true || result === NO_EVENT) handler(null);
 	},
 
-	async _submitURL(url) {
+	async submitURL(url) {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
 

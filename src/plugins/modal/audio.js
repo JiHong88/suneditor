@@ -96,7 +96,7 @@ Audio_.prototype = {
 	onPastAndDrop({ file }) {
 		if (!/^audio/.test(file.type)) return;
 
-		this._submitFile([file]);
+		this.submitFile([file]);
 		this.editor.focus();
 
 		return false;
@@ -108,9 +108,9 @@ Audio_.prototype = {
 	 */
 	modalAction() {
 		if (this.audioInputFile && this.audioInputFile?.files.length > 0) {
-			return this._submitFile(this.audioInputFile.files);
+			return this.submitFile(this.audioInputFile.files);
 		} else if (this.audioUrlFile && this.urlValue.length > 0) {
-			return this._submitURL(this.urlValue);
+			return this.submitURL(this.urlValue);
 		}
 		return false;
 	},
@@ -222,7 +222,7 @@ Audio_.prototype = {
 		}
 	},
 
-	async _submitFile(fileList) {
+	async submitFile(fileList) {
 		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
@@ -286,7 +286,7 @@ Audio_.prototype = {
 		return true;
 	},
 
-	async _submitURL(url) {
+	async submitURL(url) {
 		if (url.length === 0) return false;
 
 		const file = { name: url.split('/').pop(), size: 0 };

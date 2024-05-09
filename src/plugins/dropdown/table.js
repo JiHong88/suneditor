@@ -1532,16 +1532,16 @@ Table.prototype = {
 	},
 
 	_setResizeLinePosition(figure, target, resizeLine, isLeftEdge) {
-		const tdOffset = this.offset.get(target);
-		const tableOffset = this.offset.get(figure);
+		const tdOffset = this.offset.getLocal(target);
+		const tableOffset = this.offset.getLocal(figure);
 		resizeLine.style.left = `${tdOffset.left + (isLeftEdge ? 0 : target.offsetWidth)}px`;
 		resizeLine.style.top = `${tableOffset.top}px`;
 		resizeLine.style.height = `${figure.offsetHeight}px`;
 	},
 
 	_setResizeRowPosition(figure, target, resizeLine) {
-		const rowOffset = this.offset.get(target);
-		const tableOffset = this.offset.get(figure);
+		const rowOffset = this.offset.getLocal(target);
+		const tableOffset = this.offset.getLocal(figure);
 		resizeLine.style.top = `${rowOffset.top + target.offsetHeight}px`;
 		resizeLine.style.left = `${tableOffset.left}px`;
 		resizeLine.style.width = `${figure.offsetWidth}px`;

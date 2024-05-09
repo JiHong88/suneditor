@@ -1,5 +1,5 @@
 require('../src/assets/suneditor.css');
-require('../src/assets/suneditor-content.css');
+require('../src/assets/suneditor-contents.css');
 
 import suneditor, { editorInjector, plugins, modules, helper } from '../src/suneditor';
 

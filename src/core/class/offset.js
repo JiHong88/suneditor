@@ -43,11 +43,27 @@ Offset.prototype = {
 	},
 
 	/**
-	 * @description Returns the position of the argument, "this.editor.frameContext.get('wrapper')" to inside the editor.Returns the position of the element in "this.editor.frameContext.get('wrapper')".
+	 * @description Gets the position just outside the argument's internal editor(wysiwygFrame). [getLocal() + iframe offset]
 	 * @param {Node} node Target node
 	 * @returns {{top:boolean, left:boolean}}
 	 */
 	get(node) {
+		const wFrame = this.editor.frameContext.get('wysiwygFrame');
+		const iframe = /iframe/i.test(wFrame?.nodeName);
+		const off = this.getLocal(node);
+
+		return {
+			left: off.left + (iframe ? wFrame.parentElement.offsetLeft : 0),
+			top: off.top + (iframe ? wFrame.parentElement.offsetTop : 0)
+		};
+	},
+
+	/**
+	 * @description Gets the position in the internal editor of the argument.
+	 * @param {Node} node Target node
+	 * @returns {{top:boolean, left:boolean}}
+	 */
+	getLocal(node) {
 		let offsetLeft = 0;
 		let offsetTop = 0;
 		let offsetElement = node.nodeType === 3 ? node.parentElement : node;
@@ -60,12 +76,9 @@ Offset.prototype = {
 			offsetElement = offsetElement.offsetParent;
 		}
 
-		const wFrame = this.editor.frameContext.get('wysiwygFrame');
-		const iframe = /iframe/i.test(wFrame?.nodeName);
-
 		return {
-			left: offsetLeft + (iframe ? wFrame.parentElement.offsetLeft : 0),
-			top: offsetTop - (wysiwyg ? wysiwyg.scrollTop : 0) + (iframe ? wFrame.parentElement.offsetTop : 0)
+			left: offsetLeft,
+			top: offsetTop - (wysiwyg ? wysiwyg.scrollTop : 0)
 		};
 	},
 

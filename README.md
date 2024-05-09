@@ -30,7 +30,7 @@ $ npm install suneditor --save
 ``` html
 <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
 <!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor.css" rel="stylesheet"> -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor-content.css" rel="stylesheet"> -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor-contents.css" rel="stylesheet"> -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <!-- languages (Basic Language: English/en) -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/langs/ko.js"></script>
