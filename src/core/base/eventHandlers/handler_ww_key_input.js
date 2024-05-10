@@ -317,6 +317,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 					if (fileComponentInfo) {
 						e.preventDefault();
 						e.stopPropagation();
+						if (domUtils.isZeroWith(formatEl.textContent)) domUtils.removeItem(formatEl);
 						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false) === false) this.editor.blur();
 						break;
 					}
