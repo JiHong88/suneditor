@@ -337,11 +337,27 @@ function CreateHTML_controller({ lang, icons }) {
 }
 
 function getValue(element) {
-	return !element ? null : element.getAttribute('data-se-value');
+	const seAttr = element.getAttribute('data-se-value');
+	if (seAttr) return seAttr;
+
+	// v2-migration
+	const v2SeAttr = element.getAttribute(`data-exp`);
+	if (!v2SeAttr) return null;
+	element.removeAttribute(`data-exp`);
+	element.setAttribute(`data-se-value`, v2SeAttr);
+	return v2SeAttr;
 }
 
 function getType(element) {
-	return !element ? null : element?.getAttribute('data-se-type');
+	const seAttr = element.getAttribute('data-se-type');
+	if (seAttr) return seAttr;
+
+	// v2-migration
+	const v2SeAttr = element.getAttribute(`data-exp`);
+	if (!v2SeAttr) return null;
+	element.removeAttribute(`data-font-size`);
+	element.setAttribute(`data-se-type`, v2SeAttr);
+	return v2SeAttr;
 }
 
 export default Math_;

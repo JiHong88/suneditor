@@ -166,7 +166,7 @@
 		subscript: '아래 첨자',
 		superscript: '위 첨자',
 		table: '테이블',
-		tableHeader: '테이블 제목',
+		tableHeader: '테이블 헤더',
 		tableProperties: '테이블 속성',
 		tags: '태그',
 		tag_blockquote: '인용문',

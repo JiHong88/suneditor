@@ -14,5 +14,11 @@ function table() {
 }
 
 function dataAttr() {
-	'|data-exp|data-font-size|data-size'
+	const attr = {
+		'data-index': 'data-se-index',
+		'data-file-size': 'data-se-file-size',
+		'data-file-name': 'data-se-file-name',
+		'data-exp': 'data-se-value',
+		'data-font-size': 'data-se-type'
+	};
 }

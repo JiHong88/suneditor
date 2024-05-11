@@ -6,6 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
+const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
 
 const HTML = function (editor) {
 	CoreInjector.call(this, editor);
@@ -107,7 +108,7 @@ const HTML = function (editor) {
 		}
 	}
 
-	this._attributeWhitelistRegExp = new RegExp('\\s(?:' + (allAttr || defaultAttr) + '|' + REQUIRED_DATA_ATTRS + ')' + regEndStr, 'ig');
+	this._attributeWhitelistRegExp = new RegExp('\\s(?:' + (allAttr || defaultAttr) + '|' + REQUIRED_DATA_ATTRS + (this.options.get('v2Migration') ? V2_MIG_DATA_ATTRS : '') + ')' + regEndStr, 'ig');
 	this._attributeWhitelist = tagsAttr;
 
 	// blacklist

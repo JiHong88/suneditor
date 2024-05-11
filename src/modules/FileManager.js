@@ -91,14 +91,14 @@ FileManager.prototype = {
 	 * @param {Object|null} file
 	 */
 	_setInfo(element, file) {
-		let dataIndex = element.getAttribute('data-se-index');
+		let dataIndex = GetAttr(element, 'index');
 		let info = null;
 		let state = '';
 
 		if (!file) {
 			file = {
-				name: element.getAttribute('data-se-file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
-				size: element.getAttribute('data-se-file-size') || 0
+				name: GetAttr(element, 'file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
+				size: GetAttr(element, 'file-size') || 0
 			};
 		}
 
@@ -140,15 +140,15 @@ FileManager.prototype = {
 			}
 
 			info.src = element.src;
-			info.name = element.getAttribute('data-se-file-name');
-			info.size = element.getAttribute('data-se-file-size') * 1;
+			info.name = GetAttr(element, 'file-name');
+			info.size = GetAttr(element, 'file-size') * 1;
 		}
 
 		// method bind
 		info.element = element;
 		info.delete = function (el) {
 			if (typeof this.inst.destroy === 'function') this.inst.destroy.call(this.inst, el);
-			this._deleteInfo(el.getAttribute('data-se-index') * 1);
+			this._deleteInfo(GetAttr(el, 'index') * 1);
 		}.bind(this, element);
 		info.select = function (el) {
 			el.scrollIntoView(true);
@@ -194,7 +194,7 @@ FileManager.prototype = {
 					info = infoList[i];
 					if (
 						tags.filter(function (t) {
-							return info.src === t.src && info.index.toString() === t.getAttribute('data-se-index');
+							return info.src === t.src && info.index.toString() === GetAttr(t, 'index');
 						}).length === 0
 					) {
 						infoUpdate = true;
@@ -217,12 +217,12 @@ FileManager.prototype = {
 
 		while (tags.length > 0) {
 			const tag = tags.shift();
-			if (!tag.getAttribute('data-se-index') || !infoIndex.includes(tag.getAttribute('data-se-index') * 1)) {
+			if (!GetAttr(tag, 'index') || !infoIndex.includes(GetAttr(tag, 'index') * 1)) {
 				currentTags.push(this.infoIndex);
 				tag.removeAttribute('data-se-index');
 				this._setInfo(tag, null);
 			} else {
-				currentTags.push(tag.getAttribute('data-se-index') * 1);
+				currentTags.push(GetAttr(tag, 'index') * 1);
 			}
 		}
 
@@ -286,5 +286,17 @@ FileManager.prototype = {
 
 	constructor: FileManager
 };
+
+function GetAttr(element, name) {
+	const seAttr = element.getAttribute(`data-se-${name}`);
+	if (seAttr) return seAttr;
+
+	// v2-migration
+	const v2SeAttr = element.getAttribute(`data-${name}`);
+	if (!v2SeAttr) return null;
+	element.removeAttribute(`data-${name}`);
+	element.setAttribute(`data-se-${name}`, v2SeAttr);
+	return v2SeAttr;
+}
 
 export default FileManager;

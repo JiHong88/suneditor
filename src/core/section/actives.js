@@ -72,13 +72,16 @@ export async function SAVE(editor) {
 	if (!fc.get('isChanged')) return;
 
 	const data = editor.html.get();
-	if ((await editor.triggerEvent('onSave', { frameContext: fc, data })) === NO_EVENT) {
+	const saved = await editor.triggerEvent('onSave', { frameContext: fc, data });
+	if (saved === NO_EVENT) {
 		const origin = fc.get('originElement');
 		if (/^TEXTAREA$/i.test(origin.nodeName)) {
 			origin.value = data;
 		} else {
 			origin.innerHTML = data;
 		}
+	} else if (saved === false) {
+		return;
 	}
 
 	fc.set('isChanged', false);

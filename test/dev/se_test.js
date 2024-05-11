@@ -44,7 +44,7 @@ import langs from '../../src/langs';
 import plugins, { audio, exportPdf } from '../../src/plugins';
 
 const bl = [
-	['selectAll', 'newDocument', 'undo', 'redo', 'dir'],
+	['newDocument', 'selectAll', 'undo', 'redo', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'formatBlock'],
 	['paragraphStyle', 'blockquote'],
@@ -63,7 +63,7 @@ const bl = [
 	[
 		'%1565',
 		[
-			['selectAll', 'newDocument', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -81,7 +81,7 @@ const bl = [
 	[
 		'%1455',
 		[
-			['selectAll', 'newDocument', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -98,7 +98,7 @@ const bl = [
 	[
 		'%1326',
 		[
-			['selectAll', 'newDocument', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -114,7 +114,7 @@ const bl = [
 	[
 		'%1123',
 		[
-			['selectAll', 'newDocument', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
 			['fontColor', 'backgroundColor', 'textStyle'],
@@ -129,7 +129,7 @@ const bl = [
 	[
 		'%817',
 		[
-			['selectAll', 'newDocument', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike'],
 			[':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
@@ -144,7 +144,7 @@ const bl = [
 	[
 		'%673',
 		[
-			['selectAll', 'newDocument', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
@@ -158,7 +158,7 @@ const bl = [
 	[
 		'%525',
 		[
-			['selectAll', 'newDocument', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
@@ -172,7 +172,7 @@ const bl = [
 	[
 		'%420',
 		[
-			['selectAll', 'newDocument', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo'],
 			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
@@ -183,7 +183,7 @@ const bl = [
 ];
 
 const bb = [
-	['selectAll', 'newDocument', 'undo', 'redo', 'dir'],
+	['newDocument', 'selectAll', 'undo', 'redo', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'formatBlock'],
 	['paragraphStyle', 'blockquote'],
