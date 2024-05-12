@@ -480,7 +480,8 @@
 /* default svg */
 .sun-editor svg {
 	fill: currentColor;
-	vertical-align: baseline;
+	vertical-align: super;
+
 }
 
 .sun-editor button > svg,
