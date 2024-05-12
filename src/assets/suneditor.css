@@ -2026,9 +2026,8 @@
 	background-color: transparent;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	word-break: break-word;
-	white-space: pre-wrap;
-	overflow-wrap: break-word;
+	word-break: break-all;
+	white-space: pre;
 	max-height: none;
 }
 
@@ -2048,7 +2047,7 @@
 }
 
 .sun-editor .se-modal .se-modal-inner .se-anchor-preview-form .se-link-preview {
-	flex: auto;
+	flex: 1;
 	margin: 0;
 }
 
@@ -2070,6 +2069,9 @@
 }
 
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel-preview {
+	word-break: break-word;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
 	text-align: left;
 }
 
