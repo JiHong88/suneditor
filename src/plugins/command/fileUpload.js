@@ -76,7 +76,7 @@ FileUpload.type = 'command';
 FileUpload.className = '';
 FileUpload.options = { eventIndex: 10000 };
 FileUpload.component = function (node) {
-	return domUtils.isAnchor(node) && node.hasAttribute('download') && node.hasAttribute('data-se-file-download') ? node : null;
+	return domUtils.isAnchor(node) && node.hasAttribute('data-se-file-download') ? node : null;
 };
 FileUpload.prototype = {
 	/**
