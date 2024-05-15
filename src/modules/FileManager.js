@@ -151,8 +151,13 @@ FileManager.prototype = {
 			this._deleteInfo(GetAttr(el, 'index') * 1);
 		}.bind(this, element);
 		info.select = function (el) {
-			el.scrollIntoView(true);
-			if (typeof this.inst.select === 'function') this._w.setTimeout(this.inst.select.bind(this.inst, el), 0);
+			el.scrollIntoView({ behavior: 'auto', block: 'center' });
+			const comp = this.component.get(el);
+			if (comp) {
+				this.component.select(comp.target, comp.pluginName, false);
+			} else if (typeof this.inst.select === 'function') {
+				this.inst.select(el);
+			}
 		}.bind(this, element);
 
 		const params = { editor: this.editor, element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength };
