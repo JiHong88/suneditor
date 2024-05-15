@@ -519,11 +519,11 @@ EventManager.prototype = {
 		this.editor._nativeFocus();
 	},
 
-	_dataTransferAction(type, e, data, frameContext) {
-		const plainText = data.getData('text/plain');
-		const cleanData = data.getData('text/html');
+	_dataTransferAction(type, e, clipboardData, frameContext) {
+		const plainText = clipboardData.getData('text/plain');
+		const cleanData = clipboardData.getData('text/html');
 		try {
-			this._setClipboardData(type, e, plainText, cleanData, data, frameContext);
+			this._setClipboardData(type, e, plainText, cleanData, clipboardData, frameContext);
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
@@ -532,10 +532,15 @@ EventManager.prototype = {
 		}
 	},
 
-	async _setClipboardData(type, e, plainText, cleanData, data, frameContext) {
+	async _setClipboardData(type, e, plainText, cleanData, clipboardData, frameContext) {
+		const onlyText = !cleanData;
+
+		// SE copy data
+		const SEData = !!clipboardData.getData('application/se-copy-data');
 		// MS word, OneNode, Excel
 		const MSData = /class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData) || /content=["']*Excel.Sheet/i.test(cleanData);
-		const onlyText = !cleanData;
+		// from
+		const from = SEData ? 'SE' : MSData ? 'MS' : '';
 
 		if (!onlyText) {
 			cleanData = cleanData.replace(/^<html>\r?\n?<body>\r?\n?\x3C!--StartFragment-->|\x3C!--EndFragment-->\r?\n?<\/body>\r?\n?<\/html>$/g, '');
@@ -551,7 +556,7 @@ EventManager.prototype = {
 		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText, false);
 		// user event - paste
 		if (type === 'paste') {
-			const value = await this.triggerEvent('onPaste', { frameContext, event: e, cleanData, maxCharCount });
+			const value = await this.triggerEvent('onPaste', { frameContext, event: e, html: cleanData, maxCharCount, from });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -561,7 +566,7 @@ EventManager.prototype = {
 		}
 		// user event - drop
 		if (type === 'drop') {
-			const value = await this.triggerEvent('onDrop', { frameContext, event: e, cleanData, maxCharCount });
+			const value = await this.triggerEvent('onDrop', { frameContext, event: e, html: cleanData, maxCharCount, from });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -571,7 +576,7 @@ EventManager.prototype = {
 		}
 
 		// files
-		const files = data.files;
+		const files = clipboardData.files;
 		if (files.length > 0 && !MSData) {
 			for (let i = 0, len = files.length; i < len; i++) {
 				this._callPluginEvent('onPastAndDrop', { frameContext, event: e, file: files[i] });
@@ -670,7 +675,7 @@ EventManager.prototype = {
 		this.addEvent(codeArea, 'mousedown', OnFocus_code.bind(this, fc), false);
 
 		/** drag handle */
-		const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
+		const dragHandle = fc.get('wrapper').querySelector('.se-drag-handle');
 		this.addEvent(
 			dragHandle,
 			'wheel',

@@ -76,9 +76,10 @@ Char.prototype = {
 	 * @description Set the char count to charCounter element textContent.
 	 */
 	display() {
-		if (this.editor.frameContext.has('charCounter')) {
+		const charCounter = this.editor.frameContext.get('charCounter');
+		if (charCounter) {
 			_w.setTimeout(() => {
-				this.editor.frameContext.get('charCounter').textContent = this.getLength();
+				charCounter.textContent = this.getLength();
 			}, 0);
 		}
 	},

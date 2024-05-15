@@ -357,6 +357,7 @@ export function InitOptions(options, editorTargets) {
 		styleFilter: modeValue,
 		...options.strictMode
 	});
+	o.set('__pluginRetainFilter', options.__pluginRetainFilter ?? true);
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	o.set('externalLibs', options.externalLibs || {});
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);

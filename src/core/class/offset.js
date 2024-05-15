@@ -18,31 +18,6 @@ const Offset = function (editor) {
 
 Offset.prototype = {
 	/**
-	 * @description Returns the offset and size of the argument, "target" relative to the editor.
-	 * @param {Node} target Target node
-	 * @returns {{w:number, h:number, t:number, l:number, scrollX:number, scrollY:number}}
-	 */
-	getSize(target) {
-		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
-		const wFrame = this.editor.frameContext.get('wysiwygFrame');
-		const offset = this.get(target);
-		const frameOffset = this.get(wFrame);
-		const w = target.offsetWidth - 1;
-		const h = target.offsetHeight - 1;
-		const t = offset.top - (this.editor.frameOptions.get('iframe') ? frameOffset.top : 0);
-		const l = offset.left - (this.editor.frameOptions.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - wFrame.scrollLeft;
-
-		return {
-			w,
-			h,
-			t,
-			l,
-			scrollX: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
-			scrollY: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0
-		};
-	},
-
-	/**
 	 * @description Gets the position just outside the argument's internal editor(wysiwygFrame). [getLocal() + iframe offset]
 	 * @param {Node} node Target node
 	 * @returns {{top:boolean, left:boolean}}
@@ -76,9 +51,12 @@ Offset.prototype = {
 			offsetElement = offsetElement.offsetParent;
 		}
 
+		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		return {
 			left: offsetLeft,
-			top: offsetTop - (wysiwyg ? wysiwyg.scrollTop : 0)
+			top: offsetTop - (wysiwyg ? wysiwyg.scrollTop : 0),
+			scrollX: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
+			scrollY: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0
 		};
 	},
 
@@ -333,7 +311,7 @@ Offset.prototype = {
 			offsetEl = offsetEl.offsetParent;
 		}
 
-		const menuHeight_bottom = getClientSize(this.editor.frameContext.get('_wd')).h - (containerTop - scrollTop + bt + target.offsetHeight);
+		const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
 		if (menuHeight_bottom < elHeight) {
 			let menuTop = -1 * (elHeight - bt + 3);
 			const insTop = containerTop - scrollTop + menuTop;
@@ -552,7 +530,7 @@ Offset.prototype = {
 	},
 
 	_getWindowScroll() {
-		const viewPort = domUtils.getClientSize();
+		const viewPort = domUtils.getClientSize(_d);
 		return {
 			top: _w.scrollY,
 			left: _w.scrollX,

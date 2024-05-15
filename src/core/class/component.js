@@ -222,13 +222,15 @@ Component.prototype = {
 			this.editor._visibleControllers(false, false);
 
 			const sizeTarget = info.caption ? info.target : info.cover || info.container || info.target;
-			const { w, h, t, l } = this.offset.getSize(sizeTarget);
+			const w = sizeTarget.offsetWidth;
+			const h = sizeTarget.offsetHeight;
+			const { top, left } = this.offset.getLocal(sizeTarget);
 
 			dragHandle.style.opacity = 0;
 			dragHandle.style.width = w + 'px';
 			dragHandle.style.height = h + 'px';
-			dragHandle.style.top = t + 'px';
-			dragHandle.style.left = l + 'px';
+			dragHandle.style.top = top + 'px';
+			dragHandle.style.left = left + 'px';
 
 			_DragHandle.set('__dragHandler', dragHandle);
 			_DragHandle.set('__dragContainer', info.container);
@@ -339,11 +341,13 @@ Component.prototype = {
 		let componentTop, w;
 		const isRtl = this.options.get('_rtl');
 		const dir = isRtl ? ['right', 'left'] : ['left', 'right'];
-		const { t, scrollX, scrollY } = this.offset.getSize(offsetTarget);
+		const top = offsetTarget.offsetTop;
+		const { scrollX, scrollY } = this.offset.getLocal(offsetTarget);
+
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
 			const tH = numbers.get(_w.getComputedStyle(lb_t).height, 1);
 			this.eventManager._lineBreakComp = container;
-			componentTop = t + scrollY;
+			componentTop = top;
 			w = target.offsetWidth / 2 / 2;
 			t_style.top = componentTop - scrollY - tH / 2 + 'px';
 			t_style[dir[0]] = (isNonSelected ? 4 : this.offset.get(target).left + w) + 'px';
@@ -362,7 +366,7 @@ Component.prototype = {
 
 			if (!componentTop) {
 				this.eventManager._lineBreakComp = container;
-				componentTop = t + scrollY;
+				componentTop = top;
 				w = target.offsetWidth / 2 / 2;
 			}
 

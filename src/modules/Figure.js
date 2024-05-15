@@ -237,7 +237,9 @@ Figure.prototype = {
 		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(target).r).toString());
 
 		const sizeTarget = figureTarget ? this._cover || this._container || target : target;
-		const { w, h, t, l, scrollX, scrollY } = this.offset.getSize(sizeTarget);
+		const w = sizeTarget.offsetWidth;
+		const h = sizeTarget.offsetHeight;
+		const { top, left, scrollX, scrollY } = this.offset.getLocal(sizeTarget);
 
 		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
 		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
@@ -249,8 +251,8 @@ Figure.prototype = {
 			ratio: ratio,
 			w: w,
 			h: h,
-			t: t,
-			l: l,
+			t: top,
+			l: left,
 			width: dataSize[0] || 'auto',
 			height: dataSize[1] || 'auto',
 			originWidth: target.naturalWidth || target.offsetWidth,
@@ -263,8 +265,8 @@ Figure.prototype = {
 
 		const _figure = this.editor.frameContext.get('_figure');
 		this.editor._figureContainer = _figure.main;
-		_figure.main.style.top = t + 'px';
-		_figure.main.style.left = l + 'px';
+		_figure.main.style.top = top + 'px';
+		_figure.main.style.left = left + 'px';
 		_figure.main.style.width = (this.isVertical ? h : w) + 'px';
 		_figure.main.style.height = (this.isVertical ? w : h) + 'px';
 		_figure.border.style.top = '0px';
@@ -272,7 +274,7 @@ Figure.prototype = {
 		_figure.border.style.width = (this.isVertical ? h : w) + 'px';
 		_figure.border.style.height = (this.isVertical ? w : h) + 'px';
 
-		this.__offset = { left: l + scrollX, top: t + scrollY };
+		this.__offset = { left: left + scrollX, top: top + scrollY };
 		this.editor.opendControllers.push({
 			position: 'none',
 			form: _figure.main,
@@ -324,8 +326,8 @@ Figure.prototype = {
 		domUtils.addClass(this._cover, 'se-figure-selected');
 		this._element_w = this._resize_w = w;
 		this._element_h = this._resize_h = h;
-		this._element_l = l;
-		this._element_t = t;
+		this._element_l = left;
+		this._element_t = top;
 
 		// drag
 		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || domUtils.hasClass(figureInfo.container, 'se-input-component')) {

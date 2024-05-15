@@ -131,6 +131,20 @@ const HTML = function (editor) {
 
 HTML.prototype = {
 	/**
+	 * @description Check if the node is a format node.
+	 * @param {string} html HTML string
+	 * @param {object} params
+	 * @param {string} params.whitelist Whitelist of allowed tags. ex) tag|tag
+	 * @param {string} params.blacklist Blacklist of disallowed tags. ex) tag|tag
+	 * @returns {string}
+	 */
+	filterTags(html, { whitelist, blacklist }) {
+		html = whitelist ? html.replace(converter.createElementWhitelist(whitelist), '') : html;
+		html = blacklist ? html.replace(converter.createElementBlacklist(blacklist), '') : html;
+		return html;
+	},
+
+	/**
 	 * @description Clean and compress the HTML code to suit the editor format.
 	 * @param {string} html HTML string
 	 * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
@@ -147,6 +161,7 @@ HTML.prototype = {
 		html = this.compress(html);
 
 		if (tagFilter) {
+			html = html.replace(this.__disallowedTagsRegExp, '');
 			html = this._deleteDisallowedTags(html, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/<br\/?>$/i, '');
 		}
 
@@ -165,12 +180,14 @@ HTML.prototype = {
 			}
 		}
 
-		this.editor._MELInfo.forEach((method, query) => {
-			const infoLst = dom.querySelectorAll(query);
-			for (let i = 0, len = infoLst.length; i < len; i++) {
-				method(infoLst[i]);
-			}
-		});
+		if (this.options.get('__pluginRetainFilter')) {
+			this.editor._MELInfo.forEach((method, query) => {
+				const infoLst = dom.querySelectorAll(query);
+				for (let i = 0, len = infoLst.length; i < len; i++) {
+					method(infoLst[i]);
+				}
+			});
+		}
 
 		if (formatFilter) {
 			let domTree = dom.childNodes;
@@ -1488,7 +1505,6 @@ HTML.prototype = {
 	 * @private
 	 */
 	_deleteDisallowedTags(html, whitelistRegExp, blacklistRegExp) {
-		html = html.replace(this.__disallowedTagsRegExp, '');
 		if (whitelistRegExp.test('<font>')) {
 			html = html.replace(/(<\/?)font(\s?)/gi, '$1span$2');
 		}

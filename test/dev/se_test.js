@@ -444,7 +444,7 @@ window.editor_root = suneditor.create(
 </ul>
 <p><br></p>
 		`,
-		iframe: true,
+		// iframe: true,
 		iframe_cssFileName: ['suneditor', 'katex'],
 		// 		value: `<figure>
 		//     <img src="https://blog.kakaocdn.net/dn/0QCnX/btqU7cMuFOZ/uVPVj1aIBNqINLQZGkuwa0/img.png" alt="">
@@ -600,6 +600,10 @@ window.editor_root = suneditor.create(
 			},
 			onImageAction(data) {
 				console.log('ima', data);
+			},
+			onPaste(params) {
+				console.log('paste', params);
+				return params.editor.html.filterTags(params.html, { blacklist: 'span' })
 			},
 			// onFileDeleteBefore(arg) {
 			// 	console.log('delete file', arg);
