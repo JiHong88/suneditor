@@ -266,7 +266,7 @@ export default function (editor) {
 
 			const savedIndex = target.get('savedIndex');
 			const historyIndex = target.get('historyIndex');
-			const isChanged = savedIndex > -1 ? savedIndex !== index : isReset ? root.length > 0 : index > 0 && historyIndex !== index;
+			const isChanged = savedIndex > -1 ? savedIndex !== index : isReset ? root.index > 0 : index > 0 && historyIndex !== index;
 
 			target.set('historyIndex', index);
 			target.set('isChanged', isChanged);

@@ -288,7 +288,7 @@ EventManager.prototype = {
 
 	/**
 	 * @description remove class, display text.
-	 * @param {Array|null} ignoredList Igonred button list
+	 * @param {Array} ignoredList Igonred button list
 	 * @private
 	 */
 	_setKeyEffect(ignoredList) {
