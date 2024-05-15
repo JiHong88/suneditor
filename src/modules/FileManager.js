@@ -151,7 +151,7 @@ FileManager.prototype = {
 			this._deleteInfo(GetAttr(el, 'index') * 1);
 		}.bind(this, element);
 		info.select = function (el) {
-			el.scrollIntoView({ behavior: 'auto', block: 'center' });
+			el.scrollIntoView(this.options.get('componentScrollToOptions'));
 			const comp = this.component.get(el);
 			if (comp) {
 				this.component.select(comp.target, comp.pluginName, false);

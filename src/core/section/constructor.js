@@ -363,6 +363,8 @@ export function InitOptions(options, editorTargets) {
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
+	o.set('scrollToOptions', { behavior: 'auto', block: 'nearest', ...options.scrollToOptions });
+	o.set('componentScrollToOptions', { behavior: 'smooth', block: 'center', ...options.componentScrollToOptions });
 	o.set('v2Migration', !!options.v2Migration);
 
 	let retainStyleMode = options.retainStyleMode;

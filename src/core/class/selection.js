@@ -274,7 +274,7 @@ Selection.prototype = {
 
 		if (isVisible) return;
 
-		ref.startContainer?.scrollIntoView?.({ behavior: 'auto', block: 'nearest' });
+		ref.startContainer?.scrollIntoView?.(this.options.get('scrollToOptions'));
 	},
 
 	/**

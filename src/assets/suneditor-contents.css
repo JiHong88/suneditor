@@ -11,6 +11,7 @@
 	--se-edit-anchor: #004cff;
 	--se-edit-anchor-on-back: #e8f7ff;
 	--se-edit-anchor-on-font: #0093ff;
+	--se-edit-hr-color: #333;
 	--se-edit-hr-on-back: #c7deff;
 	--se-edit-active: #4592ff;
 	--se-edit-hover: #80bdff;
@@ -315,7 +316,7 @@
 .sun-editor-editable hr {
 	display: flex;
 	border-width: 1px 0 0;
-	border-color: black;
+	border-color: var(--se-edit-hr-color);
 	border-image: initial;
 	height: 20px;
 	margin-top: 20px;

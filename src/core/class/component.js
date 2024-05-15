@@ -216,6 +216,8 @@ Component.prototype = {
 				zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
 				oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
 			}
+
+			this.editor.status.componentSelected = true;
 		} else if (!domUtils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
 			domUtils.addClass(dragHandle, 'se-drag-handle-full');
@@ -241,27 +243,8 @@ Component.prototype = {
 	},
 
 	deselect() {
-		this.editor._antiBlur = false;
-		_DragHandle.set('__overInfo', null);
-		this._removeDragEvent(this);
-		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected|');
-		domUtils.removeClass(this.currentInfo?.cover, 'se-figure-over-selected');
-
-		const { frameContext } = this.editor;
-		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = 'none';
-
-		if (this.currentPlugin && typeof this.currentPlugin.deselect === 'function') {
-			this.currentPlugin.deselect(this.currentTarget);
-		}
-
-		this.isSelected = false;
-		this.currentPlugin = null;
-		this.currentTarget = null;
-		this.currentPluginName = '';
-		this.currentInfo = null;
-		this.__removeGlobalEvent();
-		this.editor.__offControllers();
-
+		this.editor.status.componentSelected = false;
+		this.__deselect();
 		domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 	},
 
@@ -314,6 +297,29 @@ Component.prototype = {
 	__isFiles(element) {
 		const nodeName = element.nodeName.toLowerCase();
 		return this.editor._fileManager.regExp.test(nodeName) && (!this.editor._fileManager.tagAttrs[nodeName] || this.editor._fileManager.tagAttrs[nodeName]?.every((v) => element.hasAttribute(v)));
+	},
+
+	__deselect() {
+		this.editor._antiBlur = false;
+		_DragHandle.set('__overInfo', null);
+		this._removeDragEvent(this);
+		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected|');
+		domUtils.removeClass(this.currentInfo?.cover, 'se-figure-over-selected');
+
+		const { frameContext } = this.editor;
+		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = 'none';
+
+		if (this.currentPlugin && typeof this.currentPlugin.deselect === 'function') {
+			this.currentPlugin.deselect(this.currentTarget);
+		}
+
+		this.isSelected = false;
+		this.currentPlugin = null;
+		this.currentTarget = null;
+		this.currentPluginName = '';
+		this.currentInfo = null;
+		this.__removeGlobalEvent();
+		this.editor.__offControllers();
 	},
 
 	/**

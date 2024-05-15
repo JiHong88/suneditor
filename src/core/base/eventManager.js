@@ -218,7 +218,7 @@ EventManager.prototype = {
 				/* Outdent */
 				if (!commandMapNodes.includes('outdent') && commandTargets.has('outdent') && (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
 					if (
-						commandTargets.get('outdent').filter(function (e) {
+						commandTargets.get('outdent').filter((e) => {
 							if (domUtils.isImportantDisabled(e)) return false;
 							e.removeAttribute('disabled');
 							return true;
@@ -231,7 +231,7 @@ EventManager.prototype = {
 				if (!commandMapNodes.includes('indent') && commandTargets.has('indent')) {
 					const indentDisable = domUtils.isListCell(element) && !element.previousElementSibling;
 					if (
-						commandTargets.get('indent').filter(function (e) {
+						commandTargets.get('indent').filter((e) => {
 							if (domUtils.isImportantDisabled(e)) return false;
 							if (indentDisable) {
 								e.setAttribute('disabled', true);
@@ -926,7 +926,7 @@ EventManager.prototype = {
 				this.component.select(info.target, info.pluginName, false);
 			}
 		} else if (_DragHandle.get('__overInfo') !== null && !domUtils.hasClass(target, 'se-drag-handle')) {
-			this.component.deselect();
+			this.component.__deselect();
 			_DragHandle.set('__overInfo', null);
 		}
 	},
@@ -973,6 +973,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 
 	if (this.status.rootKey === rootKey && this.editor._antiBlur) return;
 
+	const componentSelected = this.editor.status.componentSelected;
 	this.editor._offCurrentController();
 	this.status.hasFocus = true;
 
@@ -981,6 +982,10 @@ function OnFocus_wysiwyg(frameContext, e) {
 
 	this.editor.changeFrameContext(rootKey);
 	this.history.resetButtons(rootKey, null);
+
+	if (componentSelected) {
+		this.applyTagEffect();
+	}
 
 	this._w.setTimeout(() => {
 		if (this.editor.isInline) this.toolbar._showInline();

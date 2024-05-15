@@ -293,7 +293,7 @@ Offset.prototype = {
 				element.style.left = tcleft + 'px';
 			}
 		} else {
-			const cw = t_container.offsetWidth;
+			const cw = t_container.offsetWidth + tcleft;
 			const overLeft = cw <= ew ? 0 : cw - (tl + ew);
 			if (overLeft < 0) element.style.left = `${tl + overLeft + tcleft}px`;
 			else element.style.left = `${tl}px`;
