@@ -363,7 +363,10 @@ export function InitOptions(options, editorTargets) {
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
+
+	// auto convert on paste
 	o.set('autoLinkify', options.autoLinkify ?? true);
+	o.set('autoStyleify', options.autoStyleify ?? true);
 
 	// scroll options
 	o.set('scrollToOptions', { behavior: 'auto', block: 'nearest', ...options.scrollToOptions });

@@ -551,15 +551,37 @@ EventManager.prototype = {
 				cleanData = cleanData.replace(/\n/g, ' ');
 				plainText = plainText.replace(/\n/g, ' ');
 			}
-			cleanData = this.html.clean(cleanData, false, null, null);
 		}
 
-		if (!SEData && this.options.get('autoLinkify')) {
-			const dom = new DOMParser().parseFromString(cleanData, 'text/html');
-			domUtils.getListChildNodes(dom, (current) => {
-				converter.textToAnchor(current);
-			});
-			cleanData = dom.body.innerHTML;
+		if (!SEData) {
+			const autoLinkify = this.options.get('autoLinkify');
+			const autoStyleify = this.options.get('autoStyleify');
+			if (autoLinkify || autoStyleify) {
+				const convertTextTags = this.options.get('convertTextTags');
+				const styleToTag = {
+					bold: { regex: /font-weight\s*:\s*bold/i, tag: convertTextTags.bold },
+					italic: { regex: /font-style\s*:\s*italic/i, tag: convertTextTags.italic },
+					underline: { regex: /text-decoration\s*:\s*underline/i, tag: convertTextTags.underline },
+					strike: { regex: /text-decoration\s*:\s*line-through/i, tag: convertTextTags.strike }
+				};
+
+				const validate =
+					autoLinkify && autoStyleify
+						? (current) => {
+								converter.textToAnchor(current);
+								converter.spanToStyleNode(styleToTag, current);
+						  }
+						: autoLinkify
+						? converter.textToAnchor
+						: converter.spanToStyleNode.bind(null, styleToTag);
+				const dom = new DOMParser().parseFromString(cleanData, 'text/html');
+				domUtils.getListChildNodes(dom.body, validate);
+				cleanData = dom.body.innerHTML;
+			}
+		}
+
+		if (!onlyText) {
+			cleanData = this.html.clean(cleanData, false, null, null);
 		}
 
 		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText, false);

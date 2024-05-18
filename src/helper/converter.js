@@ -234,6 +234,51 @@ export function textToAnchor(node) {
 }
 
 /**
+ * Converts styles within a <span> tag to corresponding HTML tags (e.g., <strong>, <em>, <u>, <s>).
+ * Maintains the original <span> tag and wraps its content with the new tags.
+ * @param {Object} styleToTag An object mapping style properties to HTML tags. ex) {bold: { regex: /font-weight\s*:\s*bold/i, tag: 'strong' },}
+ * @param {Node} node Node
+ */
+export function spanToStyleNode(styleToTag, node) {
+	if (node.nodeType === 1 && /^SPAN$/i.test(node.nodeName) && node.hasAttribute('style')) {
+		const style = node.getAttribute('style');
+		const tags = [];
+		Object.keys(styleToTag).forEach((key) => {
+			if (styleToTag[key].regex.test(style)) {
+				const tag = _d.createElement(styleToTag[key].tag);
+				tags.push(tag);
+			}
+		});
+
+		if (tags.length > 0) {
+			const temp = _d.createElement('span');
+			let currentNode = node.firstChild;
+
+			tags.forEach((tag, index) => {
+				if (index === 0) {
+					temp.appendChild(tag);
+				} else {
+					tags[index - 1].appendChild(tag);
+				}
+			});
+
+			const parent = tags[tags.length - 1];
+			while (currentNode) {
+				const nextNode = currentNode.nextSibling;
+				parent.appendChild(currentNode);
+				currentNode = nextNode;
+			}
+
+			while (node.firstChild) {
+				node.removeChild(node.firstChild);
+			}
+
+			node.appendChild(temp);
+		}
+	}
+}
+
+/**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Object.<string, any>} fo frameOptions
  * @param {string} cssText Style string
@@ -334,6 +379,7 @@ const converter = {
 	rgb2hex,
 	getWidthInPercentage,
 	textToAnchor,
+	spanToStyleNode,
 	_setDefaultOptionStyle,
 	_setIframeStyleLinks,
 	_setAutoHeightStyle

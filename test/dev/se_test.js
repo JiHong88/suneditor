@@ -611,6 +611,7 @@ window.editor_root = suneditor.create(
 			]
 		},
 		// autoLinkify: false,
+		// autoStyleify: false,
 		link: {
 			uploadUrl: 'http://localhost:3000/editor/files/upload',
 			relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],

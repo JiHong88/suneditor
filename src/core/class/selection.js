@@ -390,7 +390,7 @@ Selection.prototype = {
 			const ww = rangeObj.commonAncestorContainer;
 			const first = ww.children[rangeObj.startOffset];
 			const end = ww.children[rangeObj.endOffset];
-			rangeObj = this.setRange(first, 0, end, first === end ? 0 : 1);
+			if (!(rangeObj = this.setRange(first, 0, end, first === end ? 0 : 1))) return false;
 		}
 
 		const range = rangeObj;
