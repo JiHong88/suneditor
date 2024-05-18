@@ -131,16 +131,58 @@ const HTML = function (editor) {
 
 HTML.prototype = {
 	/**
-	 * @description Check if the node is a format node.
-	 * @param {string} html HTML string
-	 * @param {object} params
-	 * @param {string} params.whitelist Whitelist of allowed tags. ex) tag|tag
-	 * @param {string} params.blacklist Blacklist of disallowed tags. ex) tag|tag
-	 * @returns {string}
+	 * @description Filter HTML by whitelist, blacklist, and validate.
+	 * @param {string} html HTML string to be filtered.
+	 * @param {object} params Filtering parameters.
+	 * @param {string} params.tagWhitelist Whitelist of allowed tags, specified as a string with tags separated by '|'. ex) "div|p|span".
+	 * @param {string} params.tagBlacklist Blacklist of disallowed tags, specified as a string with tags separated by '|'. ex) "script|iframe".
+	 * @param {function} params.validate Function to validate or replace individual elements based on custom conditions. Should return a new node for replacement, a string for outerHTML replacement, or null to remove the node.
+	 * @param {function} params.validateAll Function to validate or replace all elements based on custom conditions. Should return a new node for replacement, a string for outerHTML replacement, or null to remove the node.
+	 * @returns {string} Filtered HTML string.
 	 */
-	filterTags(html, { whitelist, blacklist }) {
-		html = whitelist ? html.replace(converter.createElementWhitelist(whitelist), '') : html;
-		html = blacklist ? html.replace(converter.createElementBlacklist(blacklist), '') : html;
+	filter(html, { tagWhitelist, tagBlacklist, validate, validateAll }) {
+		if (tagWhitelist) {
+			html = html.replace(converter.createElementWhitelist(tagWhitelist), '');
+		}
+		if (tagBlacklist) {
+			html = html.replace(converter.createElementBlacklist(tagBlacklist), '');
+		}
+		if (validate) {
+			const parseDocument = new DOMParser().parseFromString(html, 'text/html');
+			parseDocument.body.querySelectorAll('*').forEach((node) => {
+				if (!node.closest('.se-component') && !node.closest('.se-flex-component')) {
+					const result = validate(node);
+					if (result === null) {
+						node.remove();
+					} else if (result instanceof Node) {
+						node.replaceWith(result);
+					} else if (typeof result === 'string') {
+						node.outerHTML = result;
+					}
+				}
+			});
+			html = parseDocument.body.innerHTML;
+		} else if (validateAll) {
+			const parseDocument = new DOMParser().parseFromString(html, 'text/html');
+			const compClass = ['.se-component', '.se-flex-component'];
+			const closestAny = function (element) {
+				return compClass.some((selector) => element.closest(selector));
+			};
+			parseDocument.body.querySelectorAll('*').forEach((node) => {
+				if (!closestAny(node)) {
+					const result = validate(node);
+					if (result === null) {
+						node.remove();
+					} else if (result instanceof Node) {
+						node.replaceWith(result);
+					} else if (typeof result === 'string') {
+						node.outerHTML = result;
+					}
+				}
+			});
+			html = parseDocument.body.innerHTML;
+		}
+
 		return html;
 	},
 

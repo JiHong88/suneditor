@@ -44,6 +44,7 @@ const EventManager = function (editor) {
 	this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
 	this.__retainTimer = null;
 	this.__eventDoc = null;
+	this.__secopy = null;
 	// this.__scrollID = '';
 };
 
@@ -520,10 +521,8 @@ EventManager.prototype = {
 	},
 
 	_dataTransferAction(type, e, clipboardData, frameContext) {
-		const plainText = clipboardData.getData('text/plain');
-		const cleanData = clipboardData.getData('text/html');
 		try {
-			this._setClipboardData(type, e, plainText, cleanData, clipboardData, frameContext);
+			this._setClipboardData(type, e, clipboardData, frameContext);
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
@@ -532,11 +531,13 @@ EventManager.prototype = {
 		}
 	},
 
-	async _setClipboardData(type, e, plainText, cleanData, clipboardData, frameContext) {
+	async _setClipboardData(type, e, clipboardData, frameContext) {
+		let plainText = clipboardData.getData('text/plain');
+		let cleanData = clipboardData.getData('text/html');
 		const onlyText = !cleanData;
 
 		// SE copy data
-		const SEData = !!clipboardData.getData('application/se-copy-data');
+		const SEData = this.__secopy === plainText;
 		// MS word, OneNode, Excel
 		const MSData = /class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData) || /content=["']*Excel.Sheet/i.test(cleanData);
 		// from

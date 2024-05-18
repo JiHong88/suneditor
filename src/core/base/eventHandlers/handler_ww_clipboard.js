@@ -13,6 +13,9 @@ export function OnCopy_wysiwyg(frameContext, e) {
 		e.stopPropagation();
 		return false;
 	}
+
+	const fcSelection = frameContext.get('_ww').getSelection();
+	this.__secopy = fcSelection.toString();
 }
 
 export function OnCut_wysiwyg(frameContext, e) {
@@ -24,6 +27,9 @@ export function OnCut_wysiwyg(frameContext, e) {
 		e.stopPropagation();
 		return false;
 	}
+
+	const fcSelection = frameContext.get('_ww').getSelection();
+	this.__secopy = fcSelection.toString();
 
 	this._w.setTimeout(() => {
 		this.history.push(false);

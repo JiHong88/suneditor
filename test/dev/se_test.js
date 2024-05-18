@@ -702,7 +702,15 @@ window.editor_root = suneditor.create(
 			},
 			onPaste(params) {
 				console.log('paste', params);
-				return params.editor.html.filterTags(params.html, { blacklist: 'span' })
+				return params.editor.html.filter(params.html, { validate: (el) => {
+					console.log('el-----------------------------ㅗ', el);
+					if (el.nodeName === 'SPAN') {
+						if (el.className.includes('katex')) {
+							return;
+						}
+						return el.innerHTML;
+					}
+				} })
 			},
 			// onFileDeleteBefore(arg) {
 			// 	console.log('delete file', arg);
