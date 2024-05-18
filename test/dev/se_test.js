@@ -482,9 +482,107 @@ window.editor_root = suneditor.create(
 		retainStyleMode: 'repeat', // repeat, always, none
 		toolbar_sticky: 0,
 		lineAttrReset: 'id',
-		height: '600px',
+		// height: '600px',
 		// charCounter_max: 1400,
-		buttonList: bl,
+		// buttonList: bl,
+		buttonList: [
+			// default
+			["newDocument", "selectAll", "undo", "redo"],
+			["font", "fontSize", "formatBlock"],
+			["paragraphStyle", "blockquote"],
+			["bold", "underline", "italic", "strike", "subscript", "superscript"],
+			["fontColor", "backgroundColor", "textStyle"],
+			["removeFormat"],
+			["outdent", "indent"],
+			["align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
+			["table", "link", "image", "video", "fileUpload"],
+			["fullScreen", "showBlocks", "codeView"],
+			["preview"],
+			["save"],
+			// responsive
+			[
+				"%1028",
+				[
+					["newDocument", "selectAll", "undo", "redo"],
+					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
+					["bold", "underline", "italic", "strike", "subscript", "superscript"],
+					["fontColor", "backgroundColor", "textStyle"],
+					["removeFormat"],
+					["outdent", "indent"],
+					["align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
+					["-right", "save"],
+					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
+					["-right", ":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
+				],
+			],
+			[
+				"%984",
+				[
+					["newDocument", "selectAll", "undo", "redo"],
+					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
+					["bold", "underline", "italic", "strike"],
+					[":글자 스타일-default.more_text", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle"],
+					["removeFormat"],
+					["outdent", "indent"],
+					["align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
+					["-right", "save"],
+					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
+					["-right", ":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
+				],
+			],
+			[
+				"%840",
+				[
+					["newDocument", "selectAll", "undo", "redo"],
+					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
+					[":글자 스타일-default.more_text", "bold", "underline", "italic", "strike", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle"],
+					["removeFormat"],
+					["outdent", "indent"],
+					["align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
+					[":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
+					["-right", "save"],
+					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
+				],
+			],
+			[
+				"%700",
+				[
+					["newDocument", "selectAll", "undo", "redo"],
+					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
+					[":글자 스타일-default.more_text", "bold", "underline", "italic", "strike", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle"],
+					["removeFormat"],
+					["outdent", "indent"],
+					[":리스트&라인-default.more_horizontal", "align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
+					[":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
+					["-right", "save"],
+					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
+				],
+			],
+			[
+				"%512",
+				[
+					["newDocument", "selectAll", "undo", "redo"],
+					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
+					[":글자 스타일-default.more_text", "bold", "underline", "italic", "strike", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle", "removeFormat"],
+					[":리스트&라인-default.more_horizontal", "outdent", "indent", "align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
+					[":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
+					["-right", "save"],
+					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
+				],
+			],
+			[
+				"%440",
+				[
+					["newDocument", "selectAll", "undo", "redo"],
+					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
+					[":글자 스타일-default.more_text", "bold", "underline", "italic", "strike", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle", "removeFormat"],
+					[":리스트&라인-default.more_horizontal", "outdent", "indent", "align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
+					[":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
+					["save"],
+					[":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
+				],
+			],
+		],
 		subToolbar: {
 			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
 			width: 'auto',
@@ -558,7 +656,8 @@ window.editor_root = suneditor.create(
 			// showDefaultSizeLabel:true
 		},
 		mention: {
-			apiUrl: 'https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/{ key }?limit={limitSize}'
+			apiUrl: 'https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/{ key }?limit={limitSize}',
+			useCachingFieldData: true,
 		},
 		externalLibs: {
 			// math

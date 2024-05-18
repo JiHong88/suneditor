@@ -23,6 +23,7 @@ const Mention = function (editor, pluginOptions) {
 	// members - api, caching
 	this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
 	this.cachingData = pluginOptions.useCachingData ?? true ? new Map() : null;
+	this.cachingFieldData = pluginOptions.useCachingFieldData ?? true ? new Map([['', []]]) : null;
 
 	// controller
 	const controllerEl = CreateHTML_controller();
@@ -104,6 +105,10 @@ Mention.prototype = {
 			response = JSON.parse(xmlHttp.responseText);
 		}
 
+		if (this.cachingFieldData) {
+			response = this.cachingFieldData.get('').concat(response).splice(0, this.limitSize);
+		}
+
 		if (!response?.length) {
 			this.selectMenu.close();
 			return false;
@@ -163,6 +168,10 @@ function SelectMention(item) {
 	const space = domUtils.createTextNode('\u00A0');
 	oA.parentNode.insertBefore(space, oA.nextSibling);
 	this.selection.setRange(space, 1, space, 1);
+
+	if (this.cachingFieldData) {
+		this.cachingFieldData.get('').push(item);
+	}
 }
 
 function CreateHTML_controller() {
