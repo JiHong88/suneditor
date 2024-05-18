@@ -1,5 +1,6 @@
 import { _d, _w } from './env';
 
+const URLPattern = /https?:\/\/[^\s]+/g;
 const FONT_VALUES_MAP = {
 	'xx-small': 1,
 	'x-small': 2,
@@ -206,6 +207,33 @@ export function getWidthInPercentage(target, parentTarget) {
 }
 
 /**
+ * @description Convert url pattern text node to anchor node
+ * @param {Node} node Text node
+ */
+export function textToAnchor(node) {
+	if (node.nodeType === 3 && URLPattern.test(node.textContent) && !/^A$/i.test(node.parentNode?.nodeName)) {
+		const textContent = node.textContent;
+		const fragment = _d.createDocumentFragment();
+		let lastIndex = 0;
+		textContent.replace(URLPattern, (match, offset) => {
+			if (offset > 0) {
+				fragment.appendChild(_d.createTextNode(textContent.slice(0, offset)));
+			}
+			const anchor = _d.createElement('a');
+			anchor.href = match;
+			anchor.target = '_blank';
+			anchor.textContent = match;
+			fragment.appendChild(anchor);
+			lastIndex = offset + match.length;
+			if (lastIndex < textContent.length) {
+				fragment.appendChild(_d.createTextNode(textContent.slice(lastIndex)));
+			}
+		});
+		node.parentNode.replaceChild(fragment, node);
+	}
+}
+
+/**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Object.<string, any>} fo frameOptions
  * @param {string} cssText Style string
@@ -305,6 +333,7 @@ const converter = {
 	isHexColor,
 	rgb2hex,
 	getWidthInPercentage,
+	textToAnchor,
 	_setDefaultOptionStyle,
 	_setIframeStyleLinks,
 	_setAutoHeightStyle

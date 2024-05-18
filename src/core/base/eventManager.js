@@ -543,15 +543,23 @@ EventManager.prototype = {
 		// from
 		const from = SEData ? 'SE' : MSData ? 'MS' : '';
 
-		if (!onlyText) {
+		if (onlyText) {
+			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, '<br>');
+		} else {
 			cleanData = cleanData.replace(/^<html>\r?\n?<body>\r?\n?\x3C!--StartFragment-->|\x3C!--EndFragment-->\r?\n?<\/body>\r?\n?<\/html>$/g, '');
 			if (MSData) {
 				cleanData = cleanData.replace(/\n/g, ' ');
 				plainText = plainText.replace(/\n/g, ' ');
 			}
 			cleanData = this.html.clean(cleanData, false, null, null);
-		} else {
-			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, '<br>');
+		}
+
+		if (!SEData && this.options.get('autoLinkify')) {
+			const dom = new DOMParser().parseFromString(cleanData, 'text/html');
+			domUtils.getListChildNodes(dom, (current) => {
+				converter.textToAnchor(current);
+			});
+			cleanData = dom.body.innerHTML;
 		}
 
 		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText, false);

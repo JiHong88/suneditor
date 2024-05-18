@@ -610,6 +610,7 @@ window.editor_root = suneditor.create(
 				}
 			]
 		},
+		// autoLinkify: false,
 		link: {
 			uploadUrl: 'http://localhost:3000/editor/files/upload',
 			relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
@@ -700,18 +701,18 @@ window.editor_root = suneditor.create(
 			onImageAction(data) {
 				console.log('ima', data);
 			},
-			onPaste(params) {
-				console.log('paste', params);
-				return params.editor.html.filter(params.html, { validate: (el) => {
-					console.log('el-----------------------------ㅗ', el);
-					if (el.nodeName === 'SPAN') {
-						if (el.className.includes('katex')) {
-							return;
-						}
-						return el.innerHTML;
-					}
-				} })
-			},
+			// onPaste(params) {
+			// 	console.log('paste', params);
+			// 	return params.editor.html.filter(params.html, { validate: (el) => {
+			// 		console.log('el-----------------------------', el);
+			// 		if (el.nodeName === 'SPAN') {
+			// 			if (el.className.includes('katex')) {
+			// 				return;
+			// 			}
+			// 			return el.innerHTML;
+			// 		}
+			// 	} })
+			// },
 			// onFileDeleteBefore(arg) {
 			// 	console.log('delete file', arg);
 			// 	return false;
