@@ -1548,7 +1548,7 @@ Editor.prototype = {
 
 			if (e.get('options').get('iframe')) {
 				const iframeLoaded = new Promise((resolve) => {
-					e.get('wysiwygFrame').addEventListener('load', ({ target }) => {
+					this.eventManager.addEvent(e.get('wysiwygFrame'), 'load', ({ target }) => {
 						this.__setIframeDocument(target, this.options, e.get('options'));
 						resolve();
 					});

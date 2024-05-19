@@ -39,6 +39,8 @@ const Controller = function (inst, element, params, _name) {
 	this._bindClose_mouse = null;
 	this.__offset = {};
 	this.__addOffset = { left: 0, top: 0 };
+	this.__shadowRootEventForm = null;
+	this.__shadowRootEventListener = null;
 
 	// add element
 	this.carrierWrapper.appendChild(element);
@@ -159,7 +161,9 @@ Controller.prototype = {
 
 		form.style.display = 'block';
 		if (this._shadowRoot) {
-			form.addEventListener('mousedown', (e) => e.stopPropagation());
+			this.__shadowRootEventForm = form;
+			this.__shadowRootEventListener = (e) => e.stopPropagation();
+			form.addEventListener('mousedown', this.__shadowRootEventListener);
 		}
 
 		this.editor._controllerTargetContext = this.editor.frameContext.get('topArea');
@@ -194,6 +198,10 @@ Controller.prototype = {
 		this.editor.currentControllerName = '';
 		this.editor._antiBlur = false;
 		this.editor._controllerTargetContext = null;
+		if (this.__shadowRootEventForm) {
+			this.__shadowRootEventForm.removeEventListener('mousedown', this.__shadowRootEventListener);
+			this.__shadowRootEventForm = this.__shadowRootEventListener = null;
+		}
 		if (typeof this.inst.reset === 'function') this.inst.reset();
 	},
 

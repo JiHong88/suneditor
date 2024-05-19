@@ -96,9 +96,9 @@ const Video = function (editor, pluginOptions) {
 	};
 
 	// init
-	if (this.videoInputFile) modalEl.querySelector('.se-file-remove').addEventListener('click', RemoveSelectedFiles.bind(this));
-	if (this.videoUrlFile) this.videoUrlFile.addEventListener('input', OnLinkPreview.bind(this));
-	if (this.videoInputFile && this.videoUrlFile) this.videoInputFile.addEventListener('change', OnfileInputChange.bind(this));
+	if (this.videoInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', RemoveSelectedFiles.bind(this));
+	if (this.videoUrlFile) this.eventManager.addEvent(this.videoUrlFile, 'input', OnLinkPreview.bind(this));
+	if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', OnfileInputChange.bind(this));
 
 	if (this._resizing) {
 		this.proportion = modalEl.querySelector('._se_video_check_proportion');
@@ -109,13 +109,13 @@ const Video = function (editor, pluginOptions) {
 		this.inputY.value = this.pluginOptions.defaultHeight;
 
 		const ratioChange = OnChangeRatio.bind(this);
-		this.inputX.addEventListener('keyup', OnInputSize.bind(this, 'x'));
-		this.inputY.addEventListener('keyup', OnInputSize.bind(this, 'y'));
-		this.inputX.addEventListener('change', ratioChange);
-		this.inputY.addEventListener('change', ratioChange);
-		this.proportion.addEventListener('change', ratioChange);
-		this.videoRatioOption.addEventListener('change', SetVideoRatio.bind(this));
-		modalEl.querySelector('.se-modal-btn-revert').addEventListener('click', OnClickRevert.bind(this));
+		this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
+		this.eventManager.addEvent(this.inputY, 'keyup', OnInputSize.bind(this, 'y'));
+		this.eventManager.addEvent(this.inputX, 'change', ratioChange);
+		this.eventManager.addEvent(this.inputY, 'change', ratioChange);
+		this.eventManager.addEvent(this.proportion, 'change', ratioChange);
+		this.eventManager.addEvent(this.videoRatioOption, 'change', SetVideoRatio.bind(this));
+		this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
 	}
 };
 

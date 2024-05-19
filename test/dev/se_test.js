@@ -444,7 +444,7 @@ window.editor_root = suneditor.create(
 </ul>
 <p><br></p>
 		`,
-		// iframe: true,
+		iframe: true,
 		iframe_cssFileName: ['suneditor', 'katex'],
 		// 		value: `<figure>
 		//     <img src="https://blog.kakaocdn.net/dn/0QCnX/btqU7cMuFOZ/uVPVj1aIBNqINLQZGkuwa0/img.png" alt="">
@@ -734,6 +734,21 @@ window.editor_root = suneditor.create(
 	}
 );
 
+window.countEventListeners = function () {
+    const elements = document.querySelectorAll('*');
+    let totalListeners = 0;
+
+    elements.forEach(element => {
+        const listeners = getEventListeners(element);
+        for (let type in listeners) {
+            totalListeners += listeners[type].length;
+        }
+    });
+
+    return totalListeners;
+}
+
+
 editor_root.onload = () => {
 	// editor_root.events.onFileAction = () => {
 	// 	console.log('arguems', arguments);
@@ -742,6 +757,12 @@ editor_root.onload = () => {
 
 window.aaa = function () {
 	editor_root.html.insert('<p>aaaaaaaaa</p>');
+};
+window.create = function () {
+	window.editor_root = suneditor.create(document.querySelector('#multi_editor_1'));
+};
+window.destroy = function () {
+	editor_root.destroy();
 };
 
 window.r = () => {

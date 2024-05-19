@@ -50,13 +50,13 @@ const Audio_ = function (editor, pluginOptions) {
 
 	// init
 	if (this.audioInputFile) {
-		modalEl.querySelector('.se-modal-files-edge-button').addEventListener('click', RemoveSelectedFiles.bind(this.audioInputFile, this.audioUrlFile, this.preview));
+		this.eventManager.addEvent(modalEl.querySelector('.se-modal-files-edge-button'), 'click', RemoveSelectedFiles.bind(this.audioInputFile, this.audioUrlFile, this.preview));
 		if (this.audioUrlFile) {
-			this.audioInputFile.addEventListener('change', FileInputChange.bind(this));
+			this.eventManager.addEvent(this.audioInputFile, 'change', FileInputChange.bind(this));
 		}
 	}
 	if (this.audioUrlFile) {
-		this.audioUrlFile.addEventListener('input', OnLinkPreview.bind(this));
+		this.eventManager.addEvent(this.audioUrlFile, 'input', OnLinkPreview.bind(this));
 	}
 };
 

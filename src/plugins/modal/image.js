@@ -97,13 +97,13 @@ const Image_ = function (editor, pluginOptions) {
 	this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
 
 	// init
-	modalEl.querySelector('.se-modal-tabs').addEventListener('click', this._openTab.bind(this));
-	if (this.imgInputFile) modalEl.querySelector('.se-file-remove').addEventListener('click', RemoveSelectedFiles.bind(this));
-	if (this.imgUrlFile) this.imgUrlFile.addEventListener('input', OnLinkPreview.bind(this));
-	if (this.imgInputFile && this.imgUrlFile) this.imgInputFile.addEventListener('change', OnfileInputChange.bind(this));
+	this.eventManager.addEvent(modalEl.querySelector('.se-modal-tabs'), 'click', this._openTab.bind(this));
+	if (this.imgInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', RemoveSelectedFiles.bind(this));
+	if (this.imgUrlFile) this.eventManager.addEvent(this.imgUrlFile, 'input', OnLinkPreview.bind(this));
+	if (this.imgInputFile && this.imgUrlFile) this.eventManager.addEvent(this.imgInputFile, 'change', OnfileInputChange.bind(this));
 
 	const imageGalleryButton = modalEl.querySelector('.__se__gallery');
-	if (imageGalleryButton) imageGalleryButton.addEventListener('click', OpenGallery.bind(this));
+	if (imageGalleryButton) this.eventManager.addEvent(imageGalleryButton, 'click', OpenGallery.bind(this));
 
 	if (this._resizing) {
 		this.proportion = modalEl.querySelector('._se_image_check_proportion');
