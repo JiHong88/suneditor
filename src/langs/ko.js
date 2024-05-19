@@ -58,7 +58,7 @@
 		commentAdd: '코멘트 추가',
 		commentShow: '코멘트 보기',
 		copy: '복사',
-		copyFormatting: '서식 복사',
+		copyFormat: '서식 복사',
 		cut: '잘라내기',
 		default: '기본값',
 		deleteColumn: '열 삭제',

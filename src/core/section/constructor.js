@@ -109,7 +109,7 @@ const Constructor = function (editorTargets, options) {
 	}
 
 	/** --- options --------------------------------------------------------------- */
-	const optionMap = InitOptions(options, editorTargets);
+	const optionMap = InitOptions(options, editorTargets, plugins);
 	const o = optionMap.o;
 	const icons = optionMap.i;
 	const lang = optionMap.l;
@@ -335,9 +335,10 @@ function _mergeObject(a, b) {
  * @description Initialize options
  * @param {Object} options Options object
  * @param {Array.<Element>} editorTargets Target textarea
+ * @param {Object} plugins Plugins object
  * @returns {o:Map, p:Map} {{o: options map, p: plugins map}}
  */
-export function InitOptions(options, editorTargets) {
+export function InitOptions(options, editorTargets, plugins) {
 	const buttonList = options.buttonList || DEFAULT_BUTTON_LIST;
 	const o = new Map();
 
@@ -365,8 +366,8 @@ export function InitOptions(options, editorTargets) {
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
 
 	// auto convert on paste
-	o.set('autoLinkify', options.autoLinkify ?? true);
-	o.set('autoStyleify', options.autoStyleify ?? true);
+	o.set('autoLinkify', options.autoLinkify ?? !!plugins.link);
+	o.set('autoStyleify', Array.isArray(options.autoStyleify) ? options.autoStyleify : ['bold', 'underline', 'italic', 'strike']);
 
 	// scroll options
 	o.set('scrollToOptions', { behavior: 'auto', block: 'nearest', ...options.scrollToOptions });
@@ -950,6 +951,7 @@ function _defaultButtons(options, icons, lang) {
 		subscript: ['', lang.subscript, 'subscript', '', icons.subscript],
 		superscript: ['', lang.superscript, 'superscript', '', icons.superscript],
 		removeFormat: ['', lang.removeFormat, 'removeFormat', '', icons.remove_format],
+		copyFormat: ['', lang.copyFormat, 'copyFormat', '', icons.format_paint],
 		indent: ['se-icon-flip-rtl', lang.indent, 'indent', '', isRTL ? icons.outdent : icons.indent],
 		outdent: ['se-icon-flip-rtl', lang.outdent, 'outdent', '', isRTL ? icons.indent : icons.outdent],
 		fullScreen: ['se-code-view-enabled se-component-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],

@@ -58,7 +58,7 @@
 		commentAdd: 'Add comment',
 		commentShow: 'Show comments',
 		copy: 'Copy',
-		copyFormatting: 'Copy formatting',
+		copyFormat: 'Paint Formatting',
 		cut: 'Cut',
 		default: 'Default',
 		deleteColumn: 'Delete column',
