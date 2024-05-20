@@ -27,6 +27,7 @@ const HTML = function (editor) {
 	this._attributeBlacklist = null;
 	this._attributeBlacklistRegExp = null;
 	this._textStyleTags = options.get('_textStyleTags');
+	this._autoStyleify = null;
 
 	// clean styles
 	const tagStyles = options.get('tagStyles');
@@ -127,6 +128,29 @@ const HTML = function (editor) {
 
 	this._attributeBlacklistRegExp = new RegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
 	this._attributeBlacklist = tagsAttr;
+
+	// autoStyleify
+	if (this.options.get('autoStyleify').length > 0) {
+		const convertTextTags = this.options.get('convertTextTags');
+		const styleToTag = {};
+		this.options.get('autoStyleify').forEach((style) => {
+			switch (style) {
+				case 'bold':
+					styleToTag.bold = { regex: /font-weight\s*:\s*bold/i, tag: convertTextTags.bold };
+					break;
+				case 'italic':
+					styleToTag.italic = { regex: /font-style\s*:\s*italic/i, tag: convertTextTags.italic };
+					break;
+				case 'underline':
+					styleToTag.underline = { regex: /text-decoration\s*:\s*underline/i, tag: convertTextTags.underline };
+					break;
+				case 'strike':
+					styleToTag.strike = { regex: /text-decoration\s*:\s*line-through/i, tag: convertTextTags.strike };
+					break;
+			}
+		});
+		this._autoStyleify = styleToTag;
+	}
 };
 
 HTML.prototype = {
@@ -205,6 +229,12 @@ HTML.prototype = {
 		if (tagFilter) {
 			html = html.replace(this.__disallowedTagsRegExp, '');
 			html = this._deleteDisallowedTags(html, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/<br\/?>$/i, '');
+		}
+
+		if (this._autoStyleify) {
+			const dom = new DOMParser().parseFromString(html, 'text/html');
+			domUtils.getListChildNodes(dom.body, converter.spanToStyleNode.bind(null, this._autoStyleify));
+			html = dom.body.innerHTML;
 		}
 
 		if (attrFilter || styleFilter) {

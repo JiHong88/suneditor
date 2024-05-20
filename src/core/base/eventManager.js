@@ -28,7 +28,6 @@ const EventManager = function (editor) {
 	this._lineBreakComp = null;
 	this._formatAttrsTemp = null;
 	this._resizeClientY = 0;
-	this._autoStyleify = null;
 	this.__resize_editor = null;
 	this.__close_move = null;
 	this.__geckoActiveEvent = null;
@@ -47,19 +46,6 @@ const EventManager = function (editor) {
 	this.__eventDoc = null;
 	this.__secopy = null;
 	// this.__scrollID = '';
-
-	// autoStyleify
-	if (this.options.get('autoStyleify').length > 0) {
-		const convertTextTags = this.options.get('convertTextTags');
-		const styleToTag = {};
-		this.options.get('autoStyleify').forEach((style) => {
-			if (style === 'bold') styleToTag.bold = { regex: /font-weight\s*:\s*bold/i, tag: convertTextTags.bold };
-			else if (style === 'italic') styleToTag.italic = { regex: /font-style\s*:\s*italic/i, tag: convertTextTags.italic };
-			else if (style === 'underline') styleToTag.underline = { regex: /text-decoration\s*:\s*underline/i, tag: convertTextTags.underline };
-			else if (style === 'strike') styleToTag.strike = { regex: /text-decoration\s*:\s*line-through/i, tag: convertTextTags.strike };
-		});
-		this._autoStyleify = styleToTag;
-	}
 };
 
 EventManager.prototype = {
@@ -569,19 +555,9 @@ EventManager.prototype = {
 
 		if (!SEData) {
 			const autoLinkify = this.options.get('autoLinkify');
-			const autoStyleify = this._autoStyleify;
-			if (autoLinkify || autoStyleify) {
-				const validate =
-					autoLinkify && autoStyleify
-						? (current) => {
-								converter.textToAnchor(current);
-								converter.spanToStyleNode(autoStyleify, current);
-						  }
-						: autoLinkify
-						? converter.textToAnchor
-						: converter.spanToStyleNode.bind(null, autoStyleify);
+			if (autoLinkify) {
 				const dom = new DOMParser().parseFromString(cleanData, 'text/html');
-				domUtils.getListChildNodes(dom.body, validate);
+				domUtils.getListChildNodes(dom.body, converter.textToAnchor);
 				cleanData = dom.body.innerHTML;
 			}
 		}
