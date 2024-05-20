@@ -908,10 +908,12 @@ EventManager.prototype = {
 			n = t;
 		}
 
+		const { parent, inner } = this.nodeTransform.createNestedNode(_styleNodes);
 		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-		formatEl.innerHTML = n.innerHTML = '';
-		n.appendChild(zeroWidth);
-		formatEl.appendChild(el);
+		inner.appendChild(zeroWidth);
+
+		formatEl.innerHTML = '';
+		formatEl.appendChild(parent);
 
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	},

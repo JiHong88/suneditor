@@ -373,6 +373,28 @@ NodeTransform.prototype = {
 		}
 	},
 
+	/**
+	 * @description Creates a nested node structure from the given array of nodes.
+	 * @param {Array} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
+	 * @returns {{ parent: Element, inner: Element }} An object containing the top-level parent node and the innermost child node.
+	 */
+	createNestedNode(nodeArray) {
+		const el = nodeArray[0].cloneNode(false);
+		let n = el;
+		for (let i = 1, len = nodeArray.length, t; i < len; i++) {
+			t = nodeArray[i].cloneNode(false);
+			n.appendChild(t);
+			n = t;
+		}
+
+		n.innerHTML = '';
+
+		return {
+			parent: el,
+			inner: n
+		};
+	},
+
 	constructor: NodeTransform
 };
 
