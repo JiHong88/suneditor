@@ -29,6 +29,23 @@ BackgroundColor.type = 'dropdown-free';
 BackgroundColor.className = '';
 BackgroundColor.prototype = {
 	/**
+	 * @override core
+	 */
+	active(element, target) {
+		const colorHelper = target.querySelector('.se-svg-color-helper');
+		if (!colorHelper) return false;
+
+		if (!element) {
+			colorHelper.style.color = '';
+		} else if (element?.style.backgroundColor.length > 0) {
+			colorHelper.style.color = element.style.backgroundColor;
+			return true;
+		}
+
+		return false;
+	},
+
+	/**
 	 * @override dropdown
 	 */
 	on(target) {

@@ -358,6 +358,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		styleFilter: modeValue,
 		...options.strictMode
 	});
+	o.set('__lineFormatFilter', options.__lineFormatFilter ?? true);
 	o.set('__pluginRetainFilter', options.__pluginRetainFilter ?? true);
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	o.set('externalLibs', options.externalLibs || {});
@@ -597,7 +598,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('printTemplate', typeof options.printTemplate === 'string' ? options.printTemplate : null);
 
 	/** --- Media select */
-	o.set('mediaAutoSelect', options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect);
+	o.set('componentAutoSelect', options.componentAutoSelect === undefined ? false : !!options.componentAutoSelect);
 
 	/** --- Url input protocol */
 	o.set('defaultUrlProtocol', typeof options.defaultUrlProtocol === 'string' ? options.defaultUrlProtocol : null);

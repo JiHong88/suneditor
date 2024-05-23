@@ -969,6 +969,7 @@ Format.prototype = {
 	 * @param {Array|null} styleArray The style or className attribute name Array to check (['font-size'], ['.className'], ['font-family', 'color', '.className']...])
 	 * @param {Array|null} removeNodeArray An array of node names to remove types from, remove all formats when "styleNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
 	 * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
+	 * @returns {Element} The element that was added to the selection.
 	 */
 	applyTextStyle(styleNode, styleArray, removeNodeArray, strictRemove) {
 		if (domUtils.getParentElement(this.selection.getNode(), domUtils.isNonEditable)) return;
@@ -1296,6 +1297,8 @@ Format.prototype = {
 		this.editor._offCurrentController();
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
 		this.history.push(false);
+
+		return newNode;
 	},
 
 	/**

@@ -8,6 +8,15 @@ const StyleMap = {
 	strike: ['text-decoration']
 };
 
+let __globalEventKeydown = null;
+let __globalEventMousedown = null;
+const __RemoveCopyformt = function (editor, ww) {
+	__globalEventKeydown = editor.eventManager.removeGlobalEvent('keydown', __globalEventKeydown);
+	__globalEventMousedown = editor.eventManager.removeGlobalEvent('mousedown', __globalEventMousedown);
+	editor._onCopyFormatInfo = null;
+	domUtils.removeClass(ww, 'se-copy-format-cursor');
+};
+
 export const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'indent', 'outdent'];
 export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl']);
 
@@ -90,6 +99,20 @@ export async function SAVE(editor) {
 	// set save button disable
 	editor.applyCommandTargets('save', (e) => {
 		e.setAttribute('disabled', true);
+	});
+}
+
+export function COPY_FORMAT(editor) {
+	editor._onCopyFormatInfo = [...editor.eventManager.__cacheStyleNodes];
+	const ww = editor.frameContext.get('wysiwyg');
+	domUtils.addClass(ww, 'se-copy-format-cursor');
+	__globalEventKeydown = editor.eventManager.addGlobalEvent('keydown', (e) => {
+		if (e.keyCode !== 27) return;
+		__RemoveCopyformt(editor, ww);
+	});
+	__globalEventMousedown = editor.eventManager.addGlobalEvent('mousedown', (e) => {
+		if (ww.contains(e.target)) return;
+		__RemoveCopyformt(editor, ww);
 	});
 }
 

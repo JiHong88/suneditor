@@ -322,11 +322,11 @@ Audio_.prototype = {
 			this.fileManager.setFileData(element, file);
 			element.src = src;
 			const figure = Figure.CreateContainer(element, 'se-flex-component');
-			if (!this.component.insert(figure.container, false, !this.options.get('mediaAutoSelect'))) {
+			if (!this.component.insert(figure.container, false, !this.options.get('componentAutoSelect'))) {
 				this.editor.focus();
 				return;
 			}
-			if (!this.options.get('mediaAutoSelect')) {
+			if (!this.options.get('componentAutoSelect')) {
 				const line = this.format.addLine(figure.container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);
 			}

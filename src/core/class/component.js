@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env, numbers, unicode } from '../../helper';
 import { Figure, _DragHandle } from '../../modules';
 
-const { _w, ON_OVER_COMPONENT } = env;
+const { _w, ON_OVER_COMPONENT, isMobile } = env;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DIR_UP_KEYCODE = /^3[7-8]$/;
 
@@ -404,8 +404,8 @@ Component.prototype = {
 
 	__addNotFileGlobalEvent() {
 		this.__removeNotFileGlobalEvent();
-		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents.mousedown, true);
-		this._bindClose_touchstart = this.eventManager.addGlobalEvent('touchstart', this.__globalEvents.mousedown, true);
+		if (!isMobile) this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents.mousedown, true);
+		else this._bindClose_touchstart = this.eventManager.addGlobalEvent('touchstart', this.__globalEvents.mousedown, true);
 	},
 
 	__removeNotFileGlobalEvent() {

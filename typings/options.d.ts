@@ -570,7 +570,7 @@ export interface SunEditorOptions {
 	/**
 	 * Activate the media[image, video, audio] selection status immediately after inserting the media tag. (default: true)
 	 */
-	mediaAutoSelect?: boolean;
+	componentAutoSelect?: boolean;
 	/**
 	 * You can redefine icons.
 	 */

@@ -29,6 +29,23 @@ FontColor.type = 'dropdown-free';
 FontColor.className = '';
 FontColor.prototype = {
 	/**
+	 * @override core
+	 */
+	active(element, target) {
+		const colorHelper = target.querySelector('.se-svg-color-helper');
+		if (!colorHelper) return false;
+
+		if (!element) {
+			colorHelper.style.color = '';
+		} else if (element?.style.color.length > 0) {
+			colorHelper.style.color = element.style.color;
+			return true;
+		}
+
+		return false;
+	},
+
+	/**
 	 * @override dropdown
 	 */
 	on(target) {

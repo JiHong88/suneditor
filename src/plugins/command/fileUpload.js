@@ -326,14 +326,14 @@ FileUpload.prototype = {
 		const figure = Figure.CreateContainer(a);
 		domUtils.addClass(figure.container, 'se-file-figure|se-flex-component');
 
-		if (!this.component.insert(figure.container, false, isLast ? !this.options.get('mediaAutoSelect') : true)) {
+		if (!this.component.insert(figure.container, false, isLast ? !this.options.get('componentAutoSelect') : true)) {
 			this.editor.focus();
 			return;
 		}
 
 		if (!isLast) return;
 
-		if (!this.options.get('mediaAutoSelect')) {
+		if (!this.options.get('componentAutoSelect')) {
 			const line = this.format.addLine(figure.container, null);
 			if (line) this.selection.setRange(line, 0, line, 0);
 		} else {

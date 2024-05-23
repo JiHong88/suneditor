@@ -945,12 +945,14 @@ function _setUrlInput(target) {
 function OnloadImg(oImg, _svgDefaultSize, container) {
 	// svg exception handling
 	if (oImg.offsetWidth === 0) this.applySize(_svgDefaultSize, '');
-	if (this.options.get('mediaAutoSelect')) {
+	if (this.options.get('componentAutoSelect')) {
 		this.component.select(oImg, Image_.key, false);
 	} else {
 		const line = this.format.addLine(container, null);
-		if (line) this.setRange(line, 0, line, 0);
+		if (line) this.selection.setRange(line, 0, line, 0);
 	}
+
+	this.editor._iframeAutoHeight(this.editor.frameContext);
 
 	delete oImg.onload;
 }

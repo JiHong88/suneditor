@@ -430,7 +430,7 @@ Video.prototype = {
 
 		if (!isUpdate) {
 			this.component.insert(container, false, true);
-			if (!this.options.get('mediaAutoSelect')) {
+			if (!this.options.get('componentAutoSelect')) {
 				const line = this.format.addLine(container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);
 			}

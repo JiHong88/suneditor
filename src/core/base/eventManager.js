@@ -174,14 +174,14 @@ EventManager.prototype = {
 		const cLen = activeCommands.length;
 		let nodeName = '';
 
-		while (selectionNode.firstChild) {
-			selectionNode = selectionNode.firstChild;
-		}
-
 		if (this.component.is(selectionNode) && !this.component.__selectionSelected) {
 			const component = this.component.get(selectionNode);
 			this.component.select(component.target, component.pluginName, false);
 			return;
+		}
+
+		while (selectionNode.firstChild) {
+			selectionNode = selectionNode.firstChild;
 		}
 
 		const fc = this.editor.frameContext;
@@ -429,6 +429,7 @@ EventManager.prototype = {
 	 * @private
 	 */
 	_setDefaultLine(formatName) {
+		if (!this.options.get('__lineFormatFilter')) return null;
 		if (this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName)) return;
 
 		const range = this.selection.getRange();
@@ -700,16 +701,17 @@ EventManager.prototype = {
 		);
 
 		/** line breaker */
+		const lineBreakEventName = isMobile ? 'touchstart' : 'mousedown';
 		this.addEvent(
 			[fc.get('lineBreaker_t'), fc.get('lineBreaker_b')],
-			'mousedown',
+			lineBreakEventName,
 			(e) => {
 				e.preventDefault();
 			},
 			false
 		);
-		this.addEvent(fc.get('lineBreaker_t'), 'mousedown', DisplayLineBreak.bind(this, 't'), false);
-		this.addEvent(fc.get('lineBreaker_b'), 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
+		this.addEvent(fc.get('lineBreaker_t'), lineBreakEventName, DisplayLineBreak.bind(this, 't'), false);
+		this.addEvent(fc.get('lineBreaker_b'), lineBreakEventName, DisplayLineBreak.bind(this, 'b'), false);
 
 		/** Events are registered mobile. */
 		if (isMobile) {
@@ -827,25 +829,6 @@ EventManager.prototype = {
 		if (!openCont.length) return;
 
 		this.__rePositionController(openCont);
-
-		// if (isMobile) {
-		// 	this.__rePositionController(openCont);
-		// } else {
-		// 	if (this.__scrollID) _w.clearTimeout(this.__scrollID);
-
-		// 	if (_DragHandle.get('__dragHandler') && !domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) _DragHandle.get('__dragHandler').style.display = 'none';
-
-		// 	for (let i = 0; i < openCont.length; i++) {
-		// 		if (openCont[i].notInCarrier) continue;
-		// 		openCont[i].inst?.hide();
-		// 	}
-
-		// 	this.__scrollID = _w.setTimeout(() => {
-		// 		_w.clearTimeout(this.__scrollID);
-		// 		this.__scrollID = '';
-		// 		this.__rePositionController(openCont);
-		// 	}, 250);
-		// }
 	},
 
 	__rePositionController(cont) {
@@ -998,7 +981,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 	this.editor.changeFrameContext(rootKey);
 	this.history.resetButtons(rootKey, null);
 
-	if (componentSelected) {
+	if (!componentSelected) {
 		this.applyTagEffect();
 	}
 
