@@ -10,11 +10,15 @@ const StyleMap = {
 
 let __globalEventKeydown = null;
 let __globalEventMousedown = null;
-const __RemoveCopyformt = function (editor, ww) {
-	__globalEventKeydown = editor.eventManager.removeGlobalEvent('keydown', __globalEventKeydown);
-	__globalEventMousedown = editor.eventManager.removeGlobalEvent('mousedown', __globalEventMousedown);
-	editor._onCopyFormatInfo = null;
+const __RemoveCopyformt = function (ww, button) {
+	__globalEventKeydown = this.eventManager.removeGlobalEvent('keydown', __globalEventKeydown);
+	__globalEventMousedown = this.eventManager.removeGlobalEvent('mousedown', __globalEventMousedown);
+	this._onCopyFormatInfo = null;
+	this._onCopyFormatInitMethod = null;
 	domUtils.removeClass(ww, 'se-copy-format-cursor');
+	domUtils.removeClass(button, 'on');
+
+	return true;
 };
 
 export const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'indent', 'outdent'];
@@ -102,17 +106,25 @@ export async function SAVE(editor) {
 	});
 }
 
-export function COPY_FORMAT(editor) {
-	editor._onCopyFormatInfo = [...editor.eventManager.__cacheStyleNodes];
+export function COPY_FORMAT(editor, button) {
+	if (typeof editor._onCopyFormatInitMethod === 'function') {
+		editor._onCopyFormatInitMethod();
+		return;
+	}
+
 	const ww = editor.frameContext.get('wysiwyg');
+	editor._onCopyFormatInfo = [...editor.eventManager.__cacheStyleNodes];
+	editor._onCopyFormatInitMethod = __RemoveCopyformt.bind(editor, ww, button);
 	domUtils.addClass(ww, 'se-copy-format-cursor');
+	domUtils.addClass(button, 'on');
+
 	__globalEventKeydown = editor.eventManager.addGlobalEvent('keydown', (e) => {
 		if (e.keyCode !== 27) return;
-		__RemoveCopyformt(editor, ww);
+		editor._onCopyFormatInitMethod?.();
 	});
 	__globalEventMousedown = editor.eventManager.addGlobalEvent('mousedown', (e) => {
-		if (ww.contains(e.target)) return;
-		__RemoveCopyformt(editor, ww);
+		if (ww.contains(e.target) || e.target === button) return;
+		editor._onCopyFormatInitMethod?.();
 	});
 }
 

@@ -366,6 +366,9 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
 
+	// format
+	o.set('copyFormatKeepOn', !!options.copyFormatKeepOn);
+
 	// auto convert on paste
 	o.set('autoLinkify', options.autoLinkify ?? !!plugins.link);
 	o.set('autoStyleify', Array.isArray(options.autoStyleify) ? options.autoStyleify : ['bold', 'underline', 'italic', 'strike']);

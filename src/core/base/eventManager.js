@@ -891,7 +891,7 @@ EventManager.prototype = {
 			n = t;
 		}
 
-		const { parent, inner } = this.nodeTransform.createNestedNode(_styleNodes);
+		const { parent, inner } = this.nodeTransform.createNestedNode(_styleNodes, null);
 		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
 		inner.appendChild(zeroWidth);
 

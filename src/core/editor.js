@@ -1,7 +1,7 @@
 import { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, RO_UNAVAILABD } from './section/constructor';
 import { UpdateStatusbarContext } from './section/context';
-import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
+import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
 import Events from './base/events';
@@ -198,6 +198,13 @@ const Editor = function (multiTargets, options) {
 	this._onPluginEvents = null;
 
 	/**
+	 * @description Copy format info
+	 * @private
+	 */
+	this._onCopyFormatInfo = null;
+	this._onCopyFormatInitMethod = null;
+
+	/**
 	 * @description Controller, modal relative
 	 * @private
 	 */
@@ -361,7 +368,7 @@ Editor.prototype = {
 				this.plugins[command].open(null);
 			}
 		} else if (command) {
-			this.commandHandler(command);
+			this.commandHandler(command, button);
 		}
 
 		if (/dropdown/.test(type)) {
@@ -376,8 +383,9 @@ Editor.prototype = {
 	 * @description Execute default command of command button
 	 * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
+	 * @param {Element} button Command button
 	 */
-	async commandHandler(command) {
+	async commandHandler(command, button) {
 		if (this.frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
 
 		switch (command) {
@@ -438,6 +446,9 @@ Editor.prototype = {
 				break;
 			case 'save':
 				await SAVE(this);
+				break;
+			case 'copyFormat':
+				COPY_FORMAT(this, button);
 				break;
 			default:
 				FONT_STYLE(this, command);
@@ -602,7 +613,7 @@ Editor.prototype = {
 
 		// init options
 		const options = this.options;
-		const newMap = InitOptions(this._originOptions, newRoots).o;
+		const newMap = InitOptions(this._originOptions, newRoots, this.plugins).o;
 		/** --------- root start --------- */
 		for (let i = 0, k; (k = newOptionKeys[i]); i++) {
 			if (newRootKeys[k]) {

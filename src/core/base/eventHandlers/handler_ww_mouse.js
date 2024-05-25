@@ -96,6 +96,35 @@ export function OnClick_wysiwyg(frameContext, e) {
 		}
 	}
 
+	// copy format
+	if (this.editor._onCopyFormatInfo) {
+		try {
+			const _styleNode = [...this.editor._onCopyFormatInfo];
+			const n = _styleNode.pop();
+
+			this.format.removeTextStyle();
+
+			if (n) {
+				const insertedNode = this.format.applyTextStyle(n, null, [n.nodeName], false);
+				const { parent, inner } = this.nodeTransform.createNestedNode(_styleNode);
+				insertedNode.parentNode.insertBefore(parent, insertedNode);
+				inner.appendChild(insertedNode);
+
+				this.selection.setRange(insertedNode, domUtils.isZeroWith(insertedNode) ? 1 : 0, insertedNode, 1);
+			}
+
+			if (this.options.get('copyFormatKeepOn')) return;
+
+			this.editor._onCopyFormatInitMethod();
+		} catch (err) {
+			console.warn('[SUNEDITOR.copyFormat.error] ', err);
+			if (!this.editor._onCopyFormatInitMethod?.()) {
+				this.editor._onCopyFormatInfo = null;
+				this.editor._onCopyFormatInitMethod = null;
+			}
+		}
+	}
+
 	if (this.editor.isBalloon || this.editor.isSubBalloon) this._w.setTimeout(this._toggleToolbarBalloon.bind(this), 0);
 }
 
