@@ -457,13 +457,20 @@ EventManager.prototype = {
 			return;
 		}
 
-		const fileComponent = domUtils.getParentElement(commonCon, this.component.is.bind(this.component));
-		if (fileComponent && commonCon.nodeType === 3) {
-			const siblingEl = commonCon.nextElementSibling ? fileComponent : fileComponent.nextElementSibling;
-			const el = domUtils.createElement(this.options.get('defaultLine'), null, commonCon);
-			fileComponent.parentElement.insertBefore(el, siblingEl);
-			this.editor.focusEdge(el);
-			return;
+		if (commonCon.nodeType === 3 && this.component.is(commonCon.parentElement)) {
+			const compInfo = this.component.get(commonCon.parentElement);
+			const container = compInfo.container;
+
+			if (commonCon.parentElement === container) {
+				const siblingEl = commonCon.nextElementSibling ? container : container.nextElementSibling;
+				const el = domUtils.createElement(this.options.get('defaultLine'), null, commonCon);
+				container.parentElement.insertBefore(el, siblingEl);
+				this.editor.focusEdge(el);
+				return;
+			}
+
+			this.component.select(compInfo.target, compInfo.pluginName, false);
+			return null;
 		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
 			let el = commonCon.nextElementSibling;
 			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.get('defaultLine'));
@@ -982,6 +989,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 	this.history.resetButtons(rootKey, null);
 
 	if (!componentSelected) {
+		this.selection.removeRange();
 		this.applyTagEffect();
 	}
 
@@ -1060,9 +1068,14 @@ function DisplayLineBreak(dir, e) {
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 	this.component.deselect();
 
-	const focusEl = isList ? format : format.firstChild;
-	this.selection.setRange(focusEl, 1, focusEl, 1);
-	this.history.push(false);
+	try {
+		this.editor._antiBlur = true;
+		const focusEl = isList ? format : format.firstChild;
+		this.selection.setRange(focusEl, 1, focusEl, 1);
+		this.history.push(false);
+	} finally {
+		this.editor._antiBlur = false;
+	}
 }
 
 function OnResize_window() {

@@ -35,7 +35,7 @@ export function SELECT_ALL(editor) {
 
 	if (!first || !last) return;
 
-	if (domUtils.isMedia(first) || domUtils.isTableElements(first)) {
+	if (domUtils.isMedia(first) || editor.component.is(first.parentElement) || domUtils.isTableElements(first)) {
 		const info = editor.component.get(first);
 		const br = domUtils.createElement('BR');
 		const format = domUtils.createElement(editor.options.get('defaultLine'), null, br);
@@ -44,7 +44,7 @@ export function SELECT_ALL(editor) {
 		first = br;
 	}
 
-	if (domUtils.isMedia(last) || domUtils.isTableElements(last)) {
+	if (domUtils.isMedia(last) || editor.component.is(last.parentElement) || domUtils.isTableElements(last)) {
 		last = domUtils.createElement('BR');
 		selectArea.appendChild(domUtils.createElement(editor.options.get('defaultLine'), null, last));
 	}

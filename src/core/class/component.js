@@ -505,7 +505,7 @@ function OnCut_component(e) {
 	domUtils.removeItem(info.container);
 }
 
-function OnKeyDown_component(e) {
+async function OnKeyDown_component(e) {
 	if (this.editor.selectMenuOn) return;
 
 	const keyCode = e.keyCode;
@@ -529,7 +529,7 @@ function OnKeyDown_component(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		if (typeof this.currentPlugin?.destroy === 'function') {
-			this.currentPlugin.destroy(this.currentTarget);
+			await this.currentPlugin.destroy(this.currentTarget);
 			this.deselect();
 			this.editor.focus();
 			return;
@@ -607,9 +607,14 @@ function OnKeyDown_component(e) {
 			e.preventDefault();
 			this.select(elComp.target, elComp.pluginName);
 		} else {
-			e.stopPropagation();
-			e.preventDefault();
-			this.selection.setRange(el, offset, el, offset);
+			try {
+				this.editor._antiBlur = true;
+				e.stopPropagation();
+				e.preventDefault();
+				this.selection.setRange(el, offset, el, offset);
+			} finally {
+				this.editor._antiBlur = false;
+			}
 		}
 
 		return;

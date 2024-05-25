@@ -113,6 +113,7 @@ Selection.prototype = {
 	removeRange() {
 		this.status._range = null;
 		this.selectionNode = null;
+		this.editor.effectNode = null;
 		if (this.status.hasFocus) this.get().removeAllRanges();
 		this.eventManager._setKeyEffect([]);
 	},
