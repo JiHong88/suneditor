@@ -1106,7 +1106,10 @@ HTML.prototype = {
 	 * @returns {string} HTML string
 	 */
 	compress(html) {
-		return html.replace(/\n/g, '').replace(/(>)(?:\s+)(<)/g, '$1$2');
+		return html
+			.replace(/\n/g, '')
+			.replace(/(>)(?:\s+)(<)/g, '$1$2')
+			.trim();
 	},
 
 	/**
