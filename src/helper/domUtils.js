@@ -1068,6 +1068,71 @@ export function getNextDeepestNode(node, ceiling) {
 }
 
 /**
+ * @description Find the index of the text node in the line element.
+ * @param {Element} line Line element (p, div, etc.)
+ * @param {Node} offsetContainer Base node to start searching
+ * @param {number} offset Base offset to start searching
+ * @param {Function} validate Validation function
+ * @returns {number}
+ */
+export function findTextIndexOnLine(line, offsetContainer, offset, validate) {
+	if (!line) return 0;
+	if (!validate) validate = () => true;
+
+	let index = 0;
+	let found = false;
+
+	(function recursionFunc(node) {
+		if (found || node.nodeType === 8) return;
+		if (validate(node)) return; //  component.is
+
+		if (node.nodeType === 3) {
+			if (node === offsetContainer) {
+				index += offset;
+				found = true;
+				return;
+			}
+			index += node.textContent.length;
+		} else if (node.nodeType === 1) {
+			for (const child of node.childNodes) {
+				recursionFunc(child);
+				if (found) return;
+			}
+		}
+	})(line);
+
+	return index;
+}
+
+/**
+ * @description Find the end index of a sequence of at least minTabSize consecutive non-breaking spaces or spaces
+ * which are interpreted as a tab key, occurring after a given base index in a text string.
+ * @param {Element} line Line element (p, div, etc.)
+ * @param {number} baseIndex Base index to start searching
+ * @param {number} minTabSize Minimum number of consecutive spaces to consider as a tab
+ * @returns {number} The adjusted index within the line element accounting for non-space characters
+ */
+export function findTabEndIndex(line, baseIndex, minTabSize) {
+	if (!line) return 0;
+	const innerText = line.innerText;
+	const regex = new RegExp(`((\\u00A0|\\s){${minTabSize},})`, 'g');
+	let match;
+
+	regex.lastIndex = baseIndex;
+
+	while ((match = regex.exec(innerText)) !== null) {
+		if (match.index >= baseIndex) {
+			const spaceEndIndex = match.index + match[0].length - 1;
+			const precedingText = innerText.slice(0, spaceEndIndex + 1);
+			const nonSpaceCharCount = (precedingText.match(/[^\u00A0\s]/g) || []).length;
+			return spaceEndIndex + nonSpaceCharCount;
+		}
+	}
+
+	return 0;
+}
+
+/**
  * @description Copies the "wwTarget" element and returns it with inline all styles applied.
  * @param {Element} wwTarget Target element to copy(.sun-editor.sun-editor-editable)
  * @param {Boolean} includeWW Include the "wwTarget" element in the copy
@@ -1171,6 +1236,8 @@ const domUtils = {
 	getViewportSize,
 	getPreviousDeepestNode,
 	getNextDeepestNode,
+	findTextIndexOnLine,
+	findTabEndIndex,
 	applyInlineStylesAll
 };
 

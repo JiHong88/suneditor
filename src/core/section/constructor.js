@@ -368,6 +368,7 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	// format
 	o.set('copyFormatKeepOn', !!options.copyFormatKeepOn);
+	o.set('syncTab', options.syncTab ?? true);
 
 	// auto convert on paste
 	o.set('autoLinkify', options.autoLinkify ?? !!plugins.link);

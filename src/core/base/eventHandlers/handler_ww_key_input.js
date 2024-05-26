@@ -468,11 +468,13 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				r = this.format._applyNestedList(cells, shift);
 			}
 
-			// Lines tab(4)
+			// Lines tab
 			if (lines.length > 0) {
 				if (!shift) {
-					const tabText = domUtils.createTextNode(new Array(this.status.tabSize + 1).join('\u00A0'));
 					if (lines.length === 1) {
+						const baseIndex = domUtils.findTextIndexOnLine(formatEl, range.startContainer, range.startOffset, this.component.is.bind(this.component));
+						const prevTabEndIndex = this.format.isLine(formatEl.previousElementSibling) ? domUtils.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2) : 0;
+						const tabText = domUtils.createTextNode(new Array(prevTabEndIndex > baseIndex ? prevTabEndIndex - baseIndex : this.status.tabSize + 1).join('\u00A0'));
 						const textRange = this.html.insertNode(tabText, null, false);
 						if (!textRange) return false;
 						if (!fc) {
@@ -484,6 +486,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 							r.eo = textRange.endOffset;
 						}
 					} else {
+						const tabText = domUtils.createTextNode(new Array(this.status.tabSize + 1).join('\u00A0'));
 						const len = lines.length - 1;
 						for (let i = 0, child; i <= len; i++) {
 							child = lines[i].firstChild;
