@@ -1125,7 +1125,7 @@ export function findTabEndIndex(line, baseIndex, minTabSize) {
 			const spaceEndIndex = match.index + match[0].length - 1;
 			const precedingText = innerText.slice(0, spaceEndIndex + 1);
 			const nonSpaceCharCount = (precedingText.match(/[^\u00A0\s]/g) || []).length;
-			return spaceEndIndex + nonSpaceCharCount;
+			return spaceEndIndex + nonSpaceCharCount + minTabSize;
 		}
 	}
 

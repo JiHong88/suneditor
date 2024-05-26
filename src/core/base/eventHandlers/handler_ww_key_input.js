@@ -4,7 +4,7 @@ const { _w, isOSX_IOS } = env;
 const DIRECTION_KEYCODE = /^(8|3[2-9]|40|46)$/;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DELETE_KEYCODE = /^(8|46)$/;
-const NON_TEXT_KEYCODE = /^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145|229)$/;
+const NON_TEXT_KEYCODE = /^(8|9|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145|229)$/;
 const HISTORY_IGNORE_KEYCODE = /^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145|229)$/;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 let _styleNodes = null;
@@ -472,9 +472,16 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			if (lines.length > 0) {
 				if (!shift) {
 					if (lines.length === 1) {
-						const baseIndex = domUtils.findTextIndexOnLine(formatEl, range.startContainer, range.startOffset, this.component.is.bind(this.component));
-						const prevTabEndIndex = this.format.isLine(formatEl.previousElementSibling) ? domUtils.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2) : 0;
-						const tabText = domUtils.createTextNode(new Array(prevTabEndIndex > baseIndex ? prevTabEndIndex - baseIndex : this.status.tabSize + 1).join('\u00A0'));
+						let tabSize = this.status.tabSize + 1;
+						if (this.options.get('syncTab')) {
+							const baseIndex = domUtils.findTextIndexOnLine(formatEl, range.startContainer, range.startOffset, this.component.is.bind(this.component));
+							const prevTabEndIndex = this.format.isLine(formatEl.previousElementSibling) ? domUtils.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2) : 0;
+							if (prevTabEndIndex > baseIndex) {
+								tabSize = prevTabEndIndex - baseIndex + 1;
+							}
+						}
+
+						const tabText = domUtils.createTextNode(new Array(tabSize).join('\u00A0'));
 						const textRange = this.html.insertNode(tabText, null, false);
 						if (!textRange) return false;
 						if (!fc) {
