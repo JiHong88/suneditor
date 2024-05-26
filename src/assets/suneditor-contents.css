@@ -499,7 +499,7 @@
 
 .sun-editor-editable .se-flex-component {
 	width: 100%;
-	min-width: min-content;
+	min-width: auto;
 	max-width: 100%;
 	margin: 0 0 10px;
 }

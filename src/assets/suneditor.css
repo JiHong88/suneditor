@@ -1,7 +1,7 @@
 /* used color #000 , #fff , #CCC, #f5f5f5, #f9f9f9 */
 /* font color #333, background color: #fff */
 /* grey color #e1e1e1, #ececec, #d1d1d1 ,#bdbdbd, #c1c1c1 ,#b1b1b1 */
-/* blue color #eaf3ff, #dbeaff(shadow: #b7ccf2, #e6f2ff), #c4ddff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, #3288ff, #1275ff */
+/* blue color #eaf3ff, #dbeaff(shadow: #b7ccf2, #e6f2ff), #c4ddff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, #3288ff, #1275ff, #07d */
 /* red color #b94a48 , #f2dede , #eed3d7, #d9534f */
 /* green color #008000 */
 /* yellow color #f0c20a */
@@ -145,6 +145,7 @@
 	border-style: solid;
 	border-color: #ccc;
 	border-radius: 2px;
+	transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
 .sun-editor .se-form-group button.se-btn {
@@ -280,6 +281,7 @@
 	border: 1px solid #1275ff;
 	border-radius: 2px;
 	outline: 0 none;
+	transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
 .sun-editor .se-btn-primary:hover,
@@ -677,8 +679,9 @@
 	left: 50%;
 	height: 44px;
 	width: 44px;
+	border: 2px solid transparent;
 	border-top: 2px solid #07d;
-	border-right: 2px solid transparent;
+	border-right: 2px solid #07d;
 	border-radius: 50%;
 	animation: spinner 0.8s linear infinite;
 	margin: -25px 0 0 -25px;
@@ -697,6 +700,7 @@
 	border-radius: 2px;
 	cursor: pointer;
 	z-index: 2147483647;
+	transition: opacity 0.3s ease, color 0.3s ease, background-color 0.3s ease;
 }
 
 .sun-editor .se-line-breaker-component:hover {
@@ -2133,13 +2137,6 @@
 	z-index: 2;
 }
 
-.sun-editor-editable[contenteditable='true'] figure figcaption:focus {
-	border-color: #80bdff;
-	outline: 0;
-	-webkit-box-shadow: 0 0 0 0.2rem #c7deff;
-	box-shadow: 0 0 0 0.2rem #c7deff;
-}
-
 .sun-editor-editable[contenteditable='true']:not(.se-read-only) figure:not(.se-input-component)::after {
 	position: absolute;
 	content: '';
@@ -2155,6 +2152,12 @@
 
 .sun-editor-editable[contenteditable='true'] .se-component {
 	outline: 1px dashed #e1e1e1;
+}
+
+.sun-editor-editable[contenteditable='true'] figure,
+.sun-editor-editable[contenteditable='true'] hr {
+	outline: 2px solid transparent;
+	transition: outline-color 0.2s ease-in-out, outline-width 0.2s ease-in-out;
 }
 
 .sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected,
@@ -2199,7 +2202,6 @@
 	min-width: auto;
 	width: max-content;
 	display: none;
-	/* display: inline-table; */
 }
 
 .sun-editor .se-controller .se-btn-group .se-btn-group-sub button {
