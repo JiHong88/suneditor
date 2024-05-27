@@ -652,6 +652,20 @@ EventManager.prototype = {
 			});
 		}
 
+		/** modal outside click */
+		if (this.options.get('closeModalOutsideClick')) {
+			this.addEvent(
+				this.carrierWrapper.querySelector('.se-modal-inner'),
+				'click',
+				(e) => {
+					if (e.target === this.carrierWrapper.querySelector('.se-modal-inner')) {
+						this.editor._offCurrentModal();
+					}
+				},
+				false
+			);
+		}
+
 		/** window event */
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);

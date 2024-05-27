@@ -405,6 +405,7 @@ window.editor_root = suneditor.create(
 		// value: 'Common value',
 		// editorStyle: 'font-size:40px',
 		allowedExtraTags: { script: true },
+		// closeModalOutsideClick: true,
 		previewTemplate: `
                 <div style="width:auto; max-width:1136px; min-height:400px; margin:auto;">
                 {{ contents }}

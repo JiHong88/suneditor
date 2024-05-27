@@ -347,6 +347,9 @@ export function InitOptions(options, editorTargets, plugins) {
 		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode)) throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
 	}
 
+	// migration data-.+
+	o.set('v2Migration', !!options.v2Migration);
+
 	/** Base */
 	const modeValue = options.strictMode !== false;
 	o.set('strictMode', {
@@ -365,6 +368,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
+	o.set('closeModalOutsideClick', !!options.closeModalOutsideClick);
 
 	// format
 	o.set('copyFormatKeepOn', !!options.copyFormatKeepOn);
@@ -377,9 +381,6 @@ export function InitOptions(options, editorTargets, plugins) {
 	// scroll options
 	o.set('scrollToOptions', { behavior: 'auto', block: 'nearest', ...options.scrollToOptions });
 	o.set('componentScrollToOptions', { behavior: 'smooth', block: 'center', ...options.componentScrollToOptions });
-
-	// migration data-.+
-	o.set('v2Migration', !!options.v2Migration);
 
 	let retainStyleMode = options.retainStyleMode;
 	if (typeof retainStyleMode === 'string' && !RETAIN_STYLE_MODE.includes(retainStyleMode)) {
