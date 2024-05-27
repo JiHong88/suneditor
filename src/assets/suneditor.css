@@ -1323,18 +1323,23 @@
 
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button {
 	display: block;
+	cursor: default;
 	width: 28px;
 	height: 28px;
 	margin: 0;
 	border-radius: 0;
-	border: 1px solid #fff;
+	border: 0;
 	text-indent: -9999px;
+	transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button.active,
-.sun-editor .se-list-layer .se-selector-color .se-color-pallet button:hover,
-.sun-editor .se-list-layer .se-selector-color .se-color-pallet button:focus {
-	border: 3px solid #fff;
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button:hover {
+	box-shadow: 0 0 0 1px transparent inset;
+	transform: scale(0.8);
+}
+.sun-editor .se-list-layer .se-selector-color .se-color-pallet button.active > svg {
+	color: #fff;
 }
 
 /* --- hue slider -------------------------------------------------------------- */
@@ -2164,6 +2169,7 @@
 .sun-editor-editable[contenteditable='true'] figure.se-component-selected,
 .sun-editor-editable[contenteditable='true'] .se-component.se-component-selected > figure {
 	outline: 2px solid #80bdff;
+	transition: outline-color 0.2s ease-in-out, outline-width 0.2s ease-in-out;
 }
 
 .sun-editor-editable[contenteditable='true'] .se-component figure.se-figure-selected:not(.se-figure-over-selected)::after {

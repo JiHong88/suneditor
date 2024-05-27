@@ -89,6 +89,11 @@ const ColorPicker = function (inst, styles, params) {
 	this.colorList = this.target.querySelectorAll('li button') || [];
 	this.hueSlider = null;
 
+	// check icon
+	const parser = new DOMParser();
+	const svgDoc = parser.parseFromString(this.icons.checked_outline, 'image/svg+xml');
+	this.checkedIcon = svgDoc.documentElement;
+
 	// modules - hex, hue slider
 	if (!params.disableHEXInput) {
 		this.hueSlider = new HueSlider(this, params.hueSliderOptions, 'se-dropdown');
@@ -138,11 +143,14 @@ ColorPicker.prototype = {
 		fillColor = converter.isHexColor(fillColor) ? fillColor : converter.rgb2hex(fillColor) || fillColor || '';
 
 		const colorList = this.colorList;
-		for (let i = 0, len = colorList.length; i < len; i++) {
-			if (fillColor.toLowerCase() === colorList[i].getAttribute('data-value').toLowerCase()) {
-				domUtils.addClass(colorList[i], 'active');
+		for (let i = 0, len = colorList.length, c; i < len; i++) {
+			c = colorList[i];
+			if (fillColor.toLowerCase() === c.getAttribute('data-value').toLowerCase()) {
+				c.appendChild(this.checkedIcon);
+				domUtils.addClass(c, 'active');
 			} else {
-				domUtils.removeClass(colorList[i], 'active');
+				domUtils.removeClass(c, 'active');
+				if (c.contains(this.checkedIcon)) domUtils.removeItem(this.checkedIcon);
 			}
 		}
 
