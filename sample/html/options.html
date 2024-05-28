@@ -68,7 +68,7 @@
     <article class="markdown-body entry-content">
         <div style="background-color: #f3f3f3; padding: 4px 20px 20px 20px;">
             <h4 style="color: #b94a48;">--Value</h4>
-            <label><input type="checkbox" id="strictMode">&nbsp;&nbsp;strictMode&nbsp;&nbsp;&nbsp;</label><br><br>
+            <label><input type="checkbox" id="strictMode" checked>&nbsp;&nbsp;strictMode&nbsp;&nbsp;&nbsp;</label><br><br>
             <label><input type="checkbox" id="defaultTag">&nbsp;&nbsp;defaultTag&nbsp;&nbsp;&nbsp;</label>
             <input type="text" id="defaultTag_value" placeholder="String ('p', 'div'..)"></input>
             <br><br>
@@ -609,7 +609,7 @@ function sun_create () {
     imageTable.innerHTML = '';
 
     var options = {
-        strictMode: document.getElementById('strictMode').checked ? true : undefined,
+        strictMode: document.getElementById('strictMode').checked ? undefined : false,
         defaultTag: document.getElementById('defaultTag').checked ? document.getElementById('defaultTag_value').value : undefined,
         textTags: document.getElementById('textTags').checked ? {
             bold: 'b',

@@ -6256,12 +6256,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 this._editorRange();
             }
 
-            if (util.isBreak(format.nextSibling)) util.removeItem(format.nextSibling);
-            if (util.isBreak(format.previousSibling)) util.removeItem(format.previousSibling);
-            if (util.isBreak(focusNode)) {
-                const zeroWidth = util.createTextNode(util.zeroWidthSpace);
-                focusNode.parentNode.insertBefore(zeroWidth, focusNode);
-                focusNode = zeroWidth;
+            if (format) {
+                if (util.isBreak(format.nextSibling)) util.removeItem(format.nextSibling);
+                if (util.isBreak(format.previousSibling)) util.removeItem(format.previousSibling);
+                if (util.isBreak(focusNode)) {
+                    const zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                    focusNode.parentNode.insertBefore(zeroWidth, focusNode);
+                    focusNode = zeroWidth;
+                }
             }
 
             this.effectNode = null;
