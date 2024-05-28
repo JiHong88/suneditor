@@ -487,17 +487,17 @@
 
 .sun-editor button > svg,
 .sun-editor .se-svg {
-	width: 15px;
-	height: 15px;
+	width: 20px;
+	height: 20px;
 	margin: auto;
 	fill: currentColor;
 	display: block;
 	text-align: center;
 	float: none;
 }
-.sun-editor button > svg.se-mdi {
-	width: 20px;
-	height: 20px;
+.sun-editor button > svg.se-ci {
+	width: 15px;
+	height: 15px;
 }
 
 /* sub button size */
@@ -1340,6 +1340,8 @@
 }
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button.active > svg {
 	color: #fff;
+	stroke: #000;
+	stroke-width: 2px;
 }
 
 /* --- hue slider -------------------------------------------------------------- */

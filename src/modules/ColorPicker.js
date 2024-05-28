@@ -91,7 +91,7 @@ const ColorPicker = function (inst, styles, params) {
 
 	// check icon
 	const parser = new DOMParser();
-	const svgDoc = parser.parseFromString(this.icons.checked, 'image/svg+xml');
+	const svgDoc = parser.parseFromString(this.icons.color_checked, 'image/svg+xml');
 	this.checkedIcon = svgDoc.documentElement;
 
 	// modules - hex, hue slider
