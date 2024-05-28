@@ -2,6 +2,7 @@
 This is just a simple example and is not a complete answer.
 If there are any examples or errors in other frameworks, please participate and correct them.
 - [React](#react-component)
+- [React class](#react-class)
 - [Vue](#vue-component)
 
 
