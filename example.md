@@ -1,7 +1,15 @@
+# Example usage in the framework
+This is just a simple example and is not a complete answer.
+If there are any examples or errors in other frameworks, please participate and correct them.
+- [React](#react-component)
+- [Vue](#vue-component)
 
-1. React Component sample(class) - This is a simple React example.
 
-1-1. Editor.tsx
+## React Component
+
+### React class
+
+### 1. Editor.tsx
 ```typescript
 import React, { Component, createRef } from "react";
 import suneditor from "suneditor";
@@ -283,7 +291,7 @@ class Editor extends Component<Props, State> {
 export default Editor;
 ```
 
-1.2 PostEdit.tsx
+### 2 PostEdit.tsx
 ```typescript
 import React, { Component, createRef } from "react";
 import Editor from "./Editor";
@@ -326,7 +334,7 @@ export default PostEdit;
 
 ```
 
-1-3. Editor file component Scss
+### 3. Editor file component Scss
 ```scss
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-content {
 	margin: 100px auto !important;
@@ -573,3 +581,6 @@ export default PostEdit;
 }
 
 ```
+
+
+## Vue Component
