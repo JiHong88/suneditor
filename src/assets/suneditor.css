@@ -551,13 +551,6 @@
 	opacity: 0.5;
 }
 
-/* close class icon */
-.sun-editor .close > svg,
-.sun-editor .se-close-btn > svg {
-	width: 10px;
-	height: 10px;
-}
-
 /* se-select-btn icon */
 .sun-editor .se-btn-select > svg {
 	float: right;
