@@ -146,7 +146,7 @@ export const isResizeObserverSupported = (() => {
  * @returns {boolean} Whether User Agent is Edge or not.
  */
 export const isEdge = (() => {
-	return navigator.appVersion.includes('Edge');
+	return /Edg/.test(navigator.userAgent);
 })();
 
 /**
@@ -154,7 +154,7 @@ export const isEdge = (() => {
  * @type {boolean}
  */
 export const isOSX_IOS = (() => {
-	return /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
+	return /(Mac|iPhone|iPod|iPad)/.test(navigator.userAgent);
 })();
 
 /**
