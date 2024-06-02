@@ -6,7 +6,7 @@ import { domUtils, env } from '../../helper';
 import CoreInjector from '../../editorInjector/_core';
 import { CreateToolBar, UpdateButton } from '../section/constructor';
 
-const { _w, _d } = env;
+const { _w } = env;
 
 const Toolbar = function (editor, { keyName, balloon, inline, balloonAlways, res }) {
 	CoreInjector.call(this, editor);
@@ -284,47 +284,18 @@ Toolbar.prototype = {
 			isDirTop = domUtils.getArrayIndex(childNodes, selection.focusNode) < domUtils.getArrayIndex(childNodes, selection.anchorNode);
 		}
 
-		toolbar.style.top = '-10000px';
-		if (toolbar.style.display !== 'block') {
-			toolbar.style.visibility = 'hidden';
-			toolbar.style.display = 'block';
-		}
-
 		this._setBalloonOffset(isDirTop, range);
 
 		this.triggerEvent('onShowToolbar', { toolbar, mode: 'balloon', frameContext: this.editor.frameContext });
-
-		_w.setTimeout(() => {
-			toolbar.style.visibility = '';
-		}, 0);
 	},
 
 	_setBalloonOffset(positionTop, range) {
-		const isFullScreen = this.editor.frameContext.get('isFullScreen');
-		range = range || this.selection.getRange();
-		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
-		positionTop = rectsObj.position === 'start';
 		const toolbar = this.context.get(this.keyName + '.main');
 		const topArea = this.editor.frameContext.get('topArea');
-		const rects = rectsObj.rects;
-		const scrollLeft = isFullScreen ? 0 : rectsObj.scrollLeft;
-		const scrollTop = isFullScreen ? 0 : rectsObj.scrollTop;
-		const editorWidth = topArea.offsetWidth;
 		const offsets = this.offset.getGlobal(topArea);
 		const stickyTop = offsets.top;
-		const editorLeft = offsets.left;
-		const toolbarWidth = toolbar.offsetWidth;
-		const toolbarHeight = toolbar.offsetHeight;
 
-		this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
-		if (this.isSub && this.offset.getGlobal(toolbar).top - offsets.top < 0) {
-			positionTop = !positionTop;
-			this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
-		}
-
-		if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
-			this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
-		}
+		this.offset.setRangePosition(toolbar, range, { position: positionTop ? 'top' : 'bottom', addTop: stickyTop });
 
 		if (this.options.get('toolbar_container')) {
 			const editorParent = topArea.parentElement;
@@ -349,51 +320,6 @@ Toolbar.prototype = {
 			left: toolbar.offsetLeft + wwScroll.left,
 			position: positionTop ? 'top' : 'bottom'
 		};
-	},
-
-	_setBalloonPosition(isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop) {
-		const padding = 1;
-		const arrow = this.context.get(this.keyName + '._arrow');
-		const arrowMargin = Math.round(arrow.offsetWidth / 2);
-		const toolbarWidth = toolbarEl.offsetWidth;
-		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbarEl.offsetHeight;
-
-		const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - toolbarWidth / 2 + scrollLeft;
-		const overRight = absoluteLeft + toolbarWidth - editorWidth;
-
-		let t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
-		const l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
-
-		let resetTop = false;
-		const space = t + (isDirTop ? this.offset.getGlobal(this.editor.frameContext.get('topArea')).top : toolbarEl.offsetHeight - this.editor.frameContext.get('wysiwyg').offsetHeight);
-		if (!isDirTop && space > 0 && this._getPageBottomSpace() < space) {
-			isDirTop = true;
-			resetTop = true;
-		} else if (isDirTop && _d.documentElement.offsetTop > space) {
-			isDirTop = false;
-			resetTop = true;
-		}
-
-		if (resetTop) t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
-
-		toolbarEl.style.left = Math.floor(l) + 'px';
-		toolbarEl.style.top = Math.floor(t) + 'px';
-
-		if (isDirTop) {
-			domUtils.removeClass(arrow, 'se-arrow-up');
-			domUtils.addClass(arrow, 'se-arrow-down');
-		} else {
-			domUtils.removeClass(arrow, 'se-arrow-down');
-			domUtils.addClass(arrow, 'se-arrow-up');
-		}
-
-		const arrow_left = Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
-		arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
-	},
-
-	_getPageBottomSpace() {
-		const topArea = this.editor.frameContext.get('topArea');
-		return _d.documentElement.scrollHeight - (this.offset.getGlobal(topArea).top + topArea.offsetHeight);
 	},
 
 	_showInline() {

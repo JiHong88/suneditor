@@ -150,7 +150,7 @@ export const isEdge = (() => {
 })();
 
 /**
- * @description Check if platform is OSX or IOS
+ * @description Check if User Agent is OSX or IOS
  * @type {boolean}
  */
 export const isOSX_IOS = (() => {

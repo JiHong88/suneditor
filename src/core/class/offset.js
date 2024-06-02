@@ -2,14 +2,15 @@
  * @fileoverview Offset class
  */
 
+import CoreInjector from '../../editorInjector/_core';
 import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getClientSize } from '../../helper/domUtils';
 import { domUtils, numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
 const Offset = function (editor) {
-	this.editor = editor;
-	this.options = editor.options;
-	this.context = editor.context;
+	CoreInjector.call(this, editor);
+
+	// members
 	this._scrollEvent = null;
 	this._elTop = 0;
 	this._scrollY = 0;
@@ -249,7 +250,7 @@ Offset.prototype = {
 	 */
 	getWWScroll() {
 		const eventWysiwyg = this.editor.frameContext.get('wysiwyg');
-		const rects = this.editor.selection.getRects(eventWysiwyg, 'start').rects;
+		const rects = this.selection.getRects(eventWysiwyg, 'start').rects;
 		const top = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
 		const height = eventWysiwyg.scrollHeight || 0;
 
@@ -353,7 +354,7 @@ Offset.prototype = {
 		const isTargetAbs = isWWTarget && !isCtrlTarget;
 		const clientSize = getClientSize(_d);
 		const wwScroll = isTargetAbs ? this.getWWScroll() : this._getWindowScroll();
-		const targetRect = isCtrlTarget ? target.getBoundingClientRect() : this.editor.selection.getRects(target, 'start').rects;
+		const targetRect = isCtrlTarget ? target.getBoundingClientRect() : this.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
 		const isIframe = isTargetAbs && this.editor.frameOptions.get('iframe');
@@ -513,6 +514,87 @@ Offset.prototype = {
 		};
 
 		return true;
+	},
+
+	setRangePosition(element, range, { position, addTop } = {}) {
+		element.style.top = '-10000px';
+		element.style.visibility = 'hidden';
+		element.style.display = 'block';
+
+		let positionTop = position === 'top';
+		range = range || this.selection.getRange();
+		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
+		positionTop = rectsObj.position === 'start';
+
+		const isFullScreen = this.editor.frameContext.get('isFullScreen');
+		const topArea = this.editor.frameContext.get('topArea');
+		const rects = rectsObj.rects;
+		const scrollLeft = isFullScreen ? 0 : rectsObj.scrollLeft;
+		const scrollTop = isFullScreen ? 0 : rectsObj.scrollTop;
+		const editorWidth = topArea.offsetWidth;
+		const offsets = this.getGlobal(topArea);
+		const editorLeft = offsets.left;
+		const toolbarWidth = element.offsetWidth;
+		const toolbarHeight = element.offsetHeight;
+
+		this._setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
+		if (this.isSub && this.getGlobal(element).top - offsets.top < 0) {
+			positionTop = !positionTop;
+			this._setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
+		}
+
+		if (toolbarWidth !== element.offsetWidth || toolbarHeight !== element.offsetHeight) {
+			this._setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
+		}
+
+		_w.setTimeout(() => {
+			element.style.visibility = '';
+		}, 0);
+	},
+
+	_setOffsetOnRange(isDirTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop = 0) {
+		const padding = 1;
+		const arrow = element.querySelector('.se-arrow ');
+		const arrowMargin = Math.round(arrow.offsetWidth / 2);
+		const elW = element.offsetWidth;
+		const elH = rects.noText && !isDirTop ? 0 : element.offsetHeight;
+
+		const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - elW / 2 + scrollLeft;
+		const overRight = absoluteLeft + elW - editorWidth;
+
+		let t = (isDirTop ? rects.top - elH - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : addTop) + scrollTop;
+		const l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
+
+		let resetTop = false;
+		const space = t + (isDirTop ? this.getGlobal(this.editor.frameContext.get('topArea')).top : element.offsetHeight - this.editor.frameContext.get('wysiwyg').offsetHeight);
+		if (!isDirTop && space > 0 && this._getPageBottomSpace() < space) {
+			isDirTop = true;
+			resetTop = true;
+		} else if (isDirTop && _d.documentElement.offsetTop > space) {
+			isDirTop = false;
+			resetTop = true;
+		}
+
+		if (resetTop) t = (isDirTop ? rects.top - elH - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : addTop) + scrollTop;
+
+		element.style.left = Math.floor(l) + 'px';
+		element.style.top = Math.floor(t) + 'px';
+
+		if (isDirTop) {
+			domUtils.removeClass(arrow, 'se-arrow-up');
+			domUtils.addClass(arrow, 'se-arrow-down');
+		} else {
+			domUtils.removeClass(arrow, 'se-arrow-down');
+			domUtils.addClass(arrow, 'se-arrow-up');
+		}
+
+		const arrow_left = Math.floor(elW / 2 + (absoluteLeft - l));
+		arrow.style.left = (arrow_left + arrowMargin > element.offsetWidth ? element.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
+	},
+
+	_getPageBottomSpace() {
+		const topArea = this.editor.frameContext.get('topArea');
+		return _d.documentElement.scrollHeight - (this.getGlobal(topArea).top + topArea.offsetHeight);
 	},
 
 	_setArrow(arrow, key) {

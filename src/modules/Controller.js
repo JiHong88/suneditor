@@ -55,7 +55,7 @@ Controller.prototype = {
 	/**
 	 * @description Open a modal plugin
 	 */
-	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset }) {
+	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset } = {}) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) {
 			return;
 		}
@@ -90,7 +90,15 @@ Controller.prototype = {
 		}
 
 		this.__addGlobalEvent();
-		this._setControllerPosition(this.form, this.currentPositionTarget);
+
+		// display controller
+		if (target instanceof Range) {
+			this.currentTarget = this.currentPositionTarget = this.form;
+			this.offset.setRangePosition(this.form, target, { position: 'bottom' });
+		} else {
+			this._setControllerPosition(this.form, this.currentPositionTarget);
+		}
+
 		this._controllerOn(this.form, target);
 		this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 	},
@@ -103,7 +111,6 @@ Controller.prototype = {
 		if (!this.isOpen) return;
 
 		this.isOpen = false;
-		this.editor._antiBlur = false;
 		this.__offset = {};
 		this.__addOffset = { left: 0, top: 0 };
 
