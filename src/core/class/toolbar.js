@@ -295,7 +295,10 @@ Toolbar.prototype = {
 		const offsets = this.offset.getGlobal(topArea);
 		const stickyTop = offsets.top;
 
-		this.offset.setRangePosition(toolbar, range, { position: positionTop ? 'top' : 'bottom', addTop: stickyTop });
+		if (!this.offset.setRangePosition(toolbar, range, { position: positionTop ? 'top' : 'bottom', addTop: stickyTop })) {
+			this.hide();
+			return;
+		}
 
 		if (this.options.get('toolbar_container')) {
 			const editorParent = topArea.parentElement;

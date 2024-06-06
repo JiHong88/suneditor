@@ -383,7 +383,7 @@ function CreateHTML_controller({ lang, icons }) {
 		</form>
 		`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-resizing' }, html);
+	return domUtils.createElement('DIV', { class: 'se-controller se-controller-simple-input' }, html);
 }
 
 export default FileUpload;

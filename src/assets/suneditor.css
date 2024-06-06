@@ -2119,6 +2119,9 @@
 	border: none;
 	padding: 0;
 }
+.sun-editor .se-controller.se-controller-simple-input {
+	padding: 4px 3px 0 3px;
+}
 
 .sun-editor .se-controller:not(.se-resizing-container) {
 	-webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);

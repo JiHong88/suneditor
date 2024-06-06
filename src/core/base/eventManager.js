@@ -1022,7 +1022,6 @@ function OnBlur_wysiwyg(frameContext, e) {
 
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;
-	this.editor._offCurrentController();
 	if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
 	if (this.editor.isSubBalloon) this._hideToolbar_sub();
 

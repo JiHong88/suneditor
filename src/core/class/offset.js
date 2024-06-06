@@ -357,7 +357,6 @@ Offset.prototype = {
 		const targetRect = isCtrlTarget ? target.getBoundingClientRect() : this.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
-		const isIframe = isTargetAbs && this.editor.frameOptions.get('iframe');
 
 		// top ----------------------------------------------------------------------------------------------------
 		const ah = arrow ? arrow.offsetHeight : 0;
@@ -366,51 +365,10 @@ Offset.prototype = {
 		// margin
 		const tmtw = targetRect.top;
 		const tmbw = clientSize.h - targetRect.bottom;
-		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar.main').offsetHeight;
-		let rmt, rmb;
-		let rt = 0;
-		if (this.editor.frameContext.get('isFullScreen')) {
-			rmt = tmtw - toolbarH;
-			rmb = tmbw;
-		} else {
-			const tMargin = targetRect.top;
-			const bMargin = clientSize.h - targetRect.bottom;
-			const editorOffset = this.getGlobal();
-			const editorScroll = this.getGlobalScroll();
-			const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
+		const toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar.main').offsetHeight;
 
-			if (isIframe) {
-				const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
-				const editorH = this.editor.frameContext.get('topArea').offsetHeight;
-				rmt = targetRect.top - emt;
-				rmb = bMargin - (editorScroll.oh - (editorH + emt) + statusBarH);
-			} else {
-				rt = !this.editor.toolbar._sticky && !this.options.get('toolbar_container') ? toolbarH : 0;
-				const wst = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? editorOffset.top - _w.scrollY + rt : 0;
-				const wsb = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? _w.innerHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
-				let st = wst;
-				if (toolbarH > wst) {
-					if (this.editor.toolbar._sticky) {
-						st = toolbarH;
-						toolbarH = 0;
-					} else {
-						st = wst + toolbarH;
-					}
-				} else if (this.options.get('toolbar_container')) {
-					toolbarH = 0;
-				} else {
-					st = wst + (this.editor.toolbar._sticky ? toolbarH : 0);
-				}
-
-				rmt = targetRect.top - st;
-				rmb = wwScroll.rects.bottom - targetRect.bottom - wsb - statusBarH;
-			}
-
-			// display margin
-			rmt = (rmt > 0 ? tMargin : rmt) - toolbarH;
-			rmb = rmb > 0 ? bMargin : rmb;
-		}
-
+		// check margin
+		const { rmt, rmb, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll);
 		if (isWWTarget && (rmb + targetH <= 0 || rmt + rt + targetH <= 0)) return;
 
 		let t = addOffset.top;
@@ -547,9 +505,23 @@ Offset.prototype = {
 			this._setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
 		}
 
+		// check margin
+		const isTargetAbs = !this.carrierWrapper.contains(element);
+		const clientSize = getClientSize(_d);
+		const wwScroll = isTargetAbs ? this.getWWScroll() : this._getWindowScroll();
+		const targetH = rects.height;
+		const tmtw = rects.top;
+		const tmbw = clientSize.h - rects.bottom;
+		const toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar.main').offsetHeight;
+
+		const { rmt, rmb, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, rects, isTargetAbs, wwScroll);
+		if (rmb + targetH <= 0 || rmt + rt + targetH <= 0) return;
+
 		_w.setTimeout(() => {
 			element.style.visibility = '';
 		}, 0);
+
+		return true;
 	},
 
 	_setOffsetOnRange(isDirTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop = 0) {
@@ -595,6 +567,60 @@ Offset.prototype = {
 	_getPageBottomSpace() {
 		const topArea = this.editor.frameContext.get('topArea');
 		return _d.documentElement.scrollHeight - (this.getGlobal(topArea).top + topArea.offsetHeight);
+	},
+
+	_getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll) {
+		let rmt = 0;
+		let rmb = 0;
+		let rt = 0;
+		if (this.editor.frameContext.get('isFullScreen')) {
+			rmt = tmtw - toolbarH;
+			rmb = tmbw;
+		} else {
+			const isIframe = isTargetAbs && this.editor.frameOptions.get('iframe');
+			const tMargin = targetRect.top;
+			const bMargin = clientSize.h - targetRect.bottom;
+			const editorOffset = this.getGlobal();
+			const editorScroll = this.getGlobalScroll();
+			const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
+
+			if (isIframe) {
+				const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
+				const editorH = this.editor.frameContext.get('topArea').offsetHeight;
+				rmt = targetRect.top - emt;
+				rmb = bMargin - (editorScroll.oh - (editorH + emt) + statusBarH);
+			} else {
+				rt = !this.editor.toolbar._sticky && !this.options.get('toolbar_container') ? toolbarH : 0;
+				const wst = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? editorOffset.top - _w.scrollY + rt : 0;
+				const wsb = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? _w.innerHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
+				let st = wst;
+				if (toolbarH > wst) {
+					if (this.editor.toolbar._sticky) {
+						st = toolbarH;
+						toolbarH = 0;
+					} else {
+						st = wst + toolbarH;
+					}
+				} else if (this.options.get('toolbar_container')) {
+					toolbarH = 0;
+				} else {
+					st = wst + (this.editor.toolbar._sticky ? toolbarH : 0);
+				}
+
+				rmt = targetRect.top - st;
+				rmb = wwScroll.rects.bottom - targetRect.bottom - wsb - statusBarH;
+			}
+
+			// display margin
+			rmt = (rmt > 0 ? tMargin : rmt) - toolbarH;
+			rmb = rmb > 0 ? bMargin : rmb;
+		}
+
+		return {
+			rmt,
+			rmb,
+			rt
+		};
 	},
 
 	_setArrow(arrow, key) {

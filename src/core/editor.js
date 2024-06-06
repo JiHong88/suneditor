@@ -366,6 +366,8 @@ Editor.prototype = {
 				this.plugins[command].action(button);
 			} else if (/fileBrowser/.test(type)) {
 				this.plugins[command].open(null);
+			} else if (/popup/.test(type)) {
+				this.plugins[command].show();
 			}
 		} else if (command) {
 			this.commandHandler(command, button);
@@ -1067,7 +1069,6 @@ Editor.prototype = {
 	 * @private
 	 */
 	_offCurrentController() {
-		this.__offControllers();
 		this.component.__deselect();
 	},
 
@@ -1512,6 +1513,7 @@ Editor.prototype = {
 		ClassInjector.call(this.html, this);
 		ClassInjector.call(this.menu, this);
 		ClassInjector.call(this.nodeTransform, this);
+		ClassInjector.call(this.offset, this);
 		ClassInjector.call(this.selection, this);
 		ClassInjector.call(this.toolbar, this);
 		ClassInjector.call(this.viewer, this);
@@ -1524,6 +1526,7 @@ Editor.prototype = {
 		delete this.html.html;
 		delete this.menu.menu;
 		delete this.nodeTransform.nodeTransform;
+		delete this.offset.offset;
 		delete this.selection.selection;
 		delete this.toolbar.toolbar;
 		delete this.viewer.viewer;

@@ -92,14 +92,10 @@ Controller.prototype = {
 		this.__addGlobalEvent();
 
 		// display controller
-		if (target instanceof Range) {
-			this.currentTarget = this.currentPositionTarget = this.form;
-			this.offset.setRangePosition(this.form, target, { position: 'bottom' });
-		} else {
-			this._setControllerPosition(this.form, this.currentPositionTarget);
-		}
+		this._setControllerPosition(this.form, this.currentPositionTarget);
 
-		this._controllerOn(this.form, target);
+		const isRangeTarget = /Range/.test(Object.prototype.toString.call(target.__proto__));
+		this._controllerOn(this.form, target, isRangeTarget);
 		this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 	},
 
@@ -154,14 +150,18 @@ Controller.prototype = {
 
 	/**
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
-	 * @param {any} arguments controller elements, function..
+	 * @param {Element} form Controller element
+	 * @param {Element|Range} target Controller target element
+	 * @param {Boolean} isRangeTarget If the target is a Range, set it to true.
 	 */
-	_controllerOn(form, target) {
+	_controllerOn(form, target, isRangeTarget) {
 		const params = {
 			position: this.position,
-			form: form,
-			target: target,
-			inst: this
+			inst: this,
+			form,
+			target,
+			isRangeTarget,
+			notInCarrier: !this.carrierWrapper.contains(form)
 		};
 
 		if (this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.editor.frameContext, params }) === false) return;
@@ -176,12 +176,7 @@ Controller.prototype = {
 		this.editor._controllerTargetContext = this.editor.frameContext.get('topArea');
 
 		if (!this.isOpen) {
-			this.editor.opendControllers.push({
-				position: this.position,
-				form: form,
-				target: target,
-				inst: this
-			});
+			this.editor.opendControllers.push(params);
 		}
 
 		this.isOpen = true;
@@ -215,16 +210,23 @@ Controller.prototype = {
 	/**
 	 * @description Specify the position of the controller.
 	 * @param {Element} controller Controller element.
-	 * @param {Element} referEl Element that is the basis of the controller's position.
+	 * @param {Element|Range} refer Element or Range that is the basis of the controller's position.
 	 */
-	_setControllerPosition(controller, referEl) {
+	_setControllerPosition(controller, refer) {
 		controller.style.zIndex = INDEX_1;
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
-		if (!this.offset.setAbsPosition(controller, referEl, { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
-			this.hide();
-			return;
+		if (/Range/.test(Object.prototype.toString.call(refer.__proto__))) {
+			if (!this.offset.setRangePosition(this.form, refer, { position: 'bottom' })) {
+				this.hide();
+				return;
+			}
+		} else {
+			if (!this.offset.setAbsPosition(controller, refer, { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
+				this.hide();
+				return;
+			}
 		}
 
 		controller.style.visibility = '';
