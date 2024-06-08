@@ -29,6 +29,15 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @description Check if the range object is valid
+	 * @param {Range|null|undefined} range Range object
+	 * @returns {Boolean}
+	 */
+	isRange(range) {
+		return /Range/.test(Object.prototype.toString.call(range?.__proto__));
+	},
+
+	/**
 	 * @description Get current editor's range object
 	 * @returns {Object}
 	 */
@@ -62,13 +71,21 @@ Selection.prototype = {
 
 	/**
 	 * @description Set current editor's range object and return.
-	 * @param {Node} startCon The startContainer property of the selection object.
+	 * @param {Node|Range} startCon The startContainer property of the selection object.
 	 * @param {number} startOff The startOffset property of the selection object.
 	 * @param {Node} endCon The endContainer property of the selection object.
 	 * @param {number} endOff The endOffset property of the selection object.
 	 * @returns {Object} Range object.
 	 */
 	setRange(startCon, startOff, endCon, endOff) {
+		if (this.isRange(startCon)) {
+			const r = startCon;
+			startCon = r.startContainer;
+			startOff = r.startOffset;
+			endCon = r.endContainer;
+			endOff = r.endOffset;
+		}
+
 		if (!startCon || !endCon) return;
 		if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
 		if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
@@ -116,6 +133,31 @@ Selection.prototype = {
 		this.editor.effectNode = null;
 		if (this.status.hasFocus) this.get().removeAllRanges();
 		this.eventManager._setKeyEffect([]);
+	},
+
+	/**
+	 * @description Returns the range (container and offset) near the given target node.
+	 * If the target node has a next sibling, it returns the next sibling with an offset of 0.
+	 * If there is no next sibling but a previous sibling exists, it returns the previous sibling with an offset of 1.
+	 * @param {Node} target Target node whose neighboring range is to be determined.
+	 * @returns {Object|null} An object containing the nearest container node and its offset.
+	 */
+	getNearRange(target) {
+		const next = target.nextSibling;
+		const prev = target.previousSibling;
+		if (next) {
+			return {
+				container: next,
+				offset: 0
+			};
+		} else if (prev) {
+			return {
+				container: prev,
+				offset: 1
+			};
+		}
+
+		return null;
 	},
 
 	/**

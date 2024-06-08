@@ -70,7 +70,7 @@ Component.prototype = {
 			this.html.insertNode(element, isInline ? null : selectionNode === formatEl ? null : r.container.nextSibling, true);
 			if (!isInline && !element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
 		} else {
-			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
+			if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
 				const depthFormat = domUtils.getParentElement(r.container, this.format.isBlock.bind(this.format));
 				oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
@@ -217,7 +217,7 @@ Component.prototype = {
 				oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
 			}
 
-			this.editor.status.componentSelected = true;
+			this.editor.status.onSelected = true;
 		} else if (!domUtils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
 			domUtils.addClass(dragHandle, 'se-drag-handle-full');
@@ -243,7 +243,7 @@ Component.prototype = {
 	},
 
 	deselect() {
-		this.editor.status.componentSelected = false;
+		this.editor.status.onSelected = false;
 		this.__deselect();
 		domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 	},

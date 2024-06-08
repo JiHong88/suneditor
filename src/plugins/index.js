@@ -36,6 +36,9 @@ import imageGallery from './fileBrowser/imageGallery';
 // input
 import fontSize from './input/fontSize';
 
+// popup
+import anchor from './popup/anchor';
+
 export {
 	blockquote,
 	exportPdf,
@@ -62,7 +65,8 @@ export {
 	audio,
 	math,
 	imageGallery,
-	fontSize
+	fontSize,
+	anchor
 };
 export default {
 	blockquote,
@@ -90,5 +94,6 @@ export default {
 	audio,
 	math,
 	imageGallery,
-	fontSize
+	fontSize,
+	anchor
 };

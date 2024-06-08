@@ -108,7 +108,7 @@ const Editor = function (multiTargets, options) {
 	 * @property {number} codeIndentSize Indent size of Code view mode (2)
 	 * @property {Array} currentNodes  An element array of the current cursor's node structure
 	 * @property {Array} currentNodesMap  An element name array of the current cursor's node structure
-	 * @property {boolean} componentSelected Boolean value of whether component is selected
+	 * @property {boolean} onSelected Boolean value of whether component is selected
 	 * @property {number} rootKey Current root key
 	 */
 	this.status = {
@@ -118,7 +118,7 @@ const Editor = function (multiTargets, options) {
 		codeIndentSize: 2,
 		currentNodes: [],
 		currentNodesMap: [],
-		componentSelected: false,
+		onSelected: false,
 		rootKey: product.rootId,
 		_range: null
 	};

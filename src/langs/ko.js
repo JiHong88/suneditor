@@ -22,6 +22,7 @@
 		alignMiddle: '중간 정렬',
 		alignRight: '오른쪽 정렬',
 		alignTop: '위쪽 정렬',
+		anchor: '북마크',
 		asBlock: '블록으로 보기',
 		asLink: '링크로 보기',
 		audio: '오디오',

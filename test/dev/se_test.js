@@ -415,7 +415,7 @@ window.editor_root = suneditor.create(
 		// strictMode: {
 		// 	styleFilter: false
 		// },
-		lang: langs.ko,
+		// lang: langs.ko,
 		value: `<figure class="se-flex-component se-scroll-figure-x"><table class="se-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
 		value: `<p>sadas1<span class="__se__katex katex" data-se-value="l;l;;l" data-se-type="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>l</mi><mo separator="true">;</mo><mi>l</mi><mo separator="true">;</mo><mo separator="true">;</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">l;l;;l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span>​​<br></p><p>sadas2</p><figure class="se-flex-component"><table style=""><colgroup><col style="width: 33%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup><tbody><tr><td><div>sdd<br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><div class="se-component se-file-figure se-flex-component"><figure><a href="https://link.testfile.org/30MB" title="document.pdf" download="document.pdf" data-se-file-download="" data-se-non-link="true" data-se-file-name="document.pdf" data-se-file-size="124826" data-se-size="auto,auto" contenteditable="false">document.pdf</a></figure></div><p>sadas3<br></p><p>sadas4<br></p><p>sadas5<br></p><p>sadas6<br></p><p>dsads<a href="http://localhost:3000/public/files/d5d13802a01dd4dea399c912f7b31e5e.png" download="1571311368279.png" name="1571311368279.png">1571311368279.png</a>​<br></p><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0"></figure></div><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p>`,
 		value: `<p>sadas1<span class="__se__katex katex" data-se-value="l;l;;l" data-se-type="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>l</mi><mo separator="true">;</mo><mi>l</mi><mo separator="true">;</mo><mo separator="true">;</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">l;l;;l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span>​​<br></p><p>sadas2</p><figure class="se-flex-component"><table style=""><colgroup><col style="width: 33%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup><tbody><tr><td><div>sdd<br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><div class="se-component se-file-figure se-flex-component"><figure><a href="http://localhost:3000/editor/files/download/public/files/d31ed6f9e11d1661406efe5ed34328e5.pdf" title="document.pdf" download="document.pdf" data-se-file-download="" data-se-non-link="true" data-se-file-name="document.pdf" data-se-file-size="124826" data-se-index="0" data-se-size="auto,auto" contenteditable="false">document.pdf</a></figure></div><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0"></figure></div>`,
@@ -445,23 +445,24 @@ window.editor_root = suneditor.create(
 </ul>
 <p><br></p>
 		`,
-// 		value: `<div class="se-component se-image-container __se__float-none"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat.jpg" data-align="right" alt="Tabby" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="transform: rotate(0deg);" data-index="0" data-file-name="cat.jpg" data-file-size="0" data-size="," data-percentage="auto,auto"><figcaption style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>`,
-// 		value: `<div class="se-component se-image-container __se__float-none"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat.jpg" data-align="right" alt="Tabby" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="transform: rotate(0deg);" data-index="0" data-file-name="cat.jpg" data-file-size="0" data-size="," data-percentage="auto,auto"></figure></div>`,
-// 		value: `<p>dsa<strong>dsa</strong><u><strong>dsadsadsa</strong></u><span style="color: #ff0000;"><u><strong>dsadasdsa</strong></u></span><br></p><p>test abc  sss</p>`,
-// 		// value: `<p>ㅁㄴㅇ d</p>
-// 		// <div class="se-component se-file-figure se-flex-component">
-// 		//   <figure class="">
-// 		// 	<a href="http://local.apim.skcloud.io:3000/main/files/download/uploads/readme/adf2fe5a-c651-43ca-a4b8-1b8b274a082b.jpg" title="0eb2ea0060997f63dd4544419eec6980.jpg" download="0eb2ea0060997f63dd4544419eec6980.jpg" data-se-file-download="" data-se-non-focus="true" data-se-non-link="true" data-se-file-name="0eb2ea0060997f63dd4544419eec6980.jpg" data-se-file-size="74182" name="0eb2ea0060997f63dd4544419eec6980.jpg" data-se-index="0">0eb2ea0060997f63dd4544419eec6980.jpg</a>
-// 		//   </figure>
-// 		// </div>`,
-// 		value: `
-// 		<p>dsa<strong>d&nbsp;&nbsp;&nbsp;&nbsp;sa</strong><u><strong>dsadsadsa</strong></u><span style="color: #ff0000"><u><strong>dsadasdsa</strong></u></span><br>
-// </p>
+		// 		value: `<div class="se-component se-image-container __se__float-none"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat.jpg" data-align="right" alt="Tabby" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="transform: rotate(0deg);" data-index="0" data-file-name="cat.jpg" data-file-size="0" data-size="," data-percentage="auto,auto"><figcaption style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>`,
+		// 		value: `<div class="se-component se-image-container __se__float-none"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat.jpg" data-align="right" alt="Tabby" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="transform: rotate(0deg);" data-index="0" data-file-name="cat.jpg" data-file-size="0" data-size="," data-percentage="auto,auto"></figure></div>`,
+		// 		value: `<p>dsa<strong>dsa</strong><u><strong>dsadsadsa</strong></u><span style="color: #ff0000;"><u><strong>dsadasdsa</strong></u></span><br></p><p>test abc  sss</p>`,
+		// 		// value: `<p>ㅁㄴㅇ d</p>
+		// 		// <div class="se-component se-file-figure se-flex-component">
+		// 		//   <figure class="">
+		// 		// 	<a href="http://local.apim.skcloud.io:3000/main/files/download/uploads/readme/adf2fe5a-c651-43ca-a4b8-1b8b274a082b.jpg" title="0eb2ea0060997f63dd4544419eec6980.jpg" download="0eb2ea0060997f63dd4544419eec6980.jpg" data-se-file-download="" data-se-non-focus="true" data-se-non-link="true" data-se-file-name="0eb2ea0060997f63dd4544419eec6980.jpg" data-se-file-size="74182" name="0eb2ea0060997f63dd4544419eec6980.jpg" data-se-index="0">0eb2ea0060997f63dd4544419eec6980.jpg</a>
+		// 		//   </figure>
+		// 		// </div>`,
+		// 		value: `
+		// 		<p>dsa<strong>d&nbsp;&nbsp;&nbsp;&nbsp;sa</strong><u><strong>dsadsadsa</strong></u><span style="color: #ff0000"><u><strong>dsadasdsa</strong></u></span><br>
+		// </p>
 
-// <p>test abc  sss</p>
-// 		`,
+		// <p>test abc  sss</p>
+		// 		`,
 		// syncTab: true,
 		// iframe: true,
+		height: '600px',
 		iframe_cssFileName: ['suneditor', 'katex'],
 		copyFormatKeepOn: true,
 		// 		value: `<figure>
@@ -504,102 +505,13 @@ window.editor_root = suneditor.create(
 		// charCounter_max: 1400,
 		// buttonList: bl,
 		buttonList: [
-			// default
-			["newDocument", "selectAll", "undo", "redo"],
-			["font", "fontSize", "formatBlock"],
-			["paragraphStyle", "blockquote"],
-			["bold", "underline", "italic", "strike", "subscript", "superscript"],
-			["fontColor", "backgroundColor", "textStyle"],
-			["copyFormat", "removeFormat"],
-			["outdent", "indent"],
-			["align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
-			["table", "link", "image", "video", "fileUpload"],
-			["fullScreen", "showBlocks", "codeView"],
-			["preview"],
-			["save"],
-			// responsive
-			[
-				"%1028",
-				[
-					["newDocument", "selectAll", "undo", "redo"],
-					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
-					["bold", "underline", "italic", "strike", "subscript", "superscript"],
-					["fontColor", "backgroundColor", "textStyle"],
-					["copyFormat", "removeFormat"],
-					["outdent", "indent"],
-					["align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
-					["-right", "save"],
-					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
-					["-right", ":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
-				],
-			],
-			[
-				"%984",
-				[
-					["newDocument", "selectAll", "undo", "redo"],
-					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
-					["bold", "underline", "italic", "strike"],
-					[":글자 스타일-default.more_text", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle"],
-					["copyFormat", "removeFormat"],
-					["outdent", "indent"],
-					["align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
-					["-right", "save"],
-					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
-					["-right", ":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
-				],
-			],
-			[
-				"%840",
-				[
-					["newDocument", "selectAll", "undo", "redo"],
-					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
-					[":글자 스타일-default.more_text", "bold", "underline", "italic", "strike", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle"],
-					["copyFormat", "removeFormat"],
-					["outdent", "indent"],
-					["align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
-					[":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
-					["-right", "save"],
-					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
-				],
-			],
-			[
-				"%700",
-				[
-					["newDocument", "selectAll", "undo", "redo"],
-					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
-					[":글자 스타일-default.more_text", "bold", "underline", "italic", "strike", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle"],
-					["copyFormat", "removeFormat"],
-					["outdent", "indent"],
-					[":리스트&라인-default.more_horizontal", "align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
-					[":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
-					["-right", "save"],
-					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
-				],
-			],
-			[
-				"%512",
-				[
-					["newDocument", "selectAll", "undo", "redo"],
-					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
-					[":글자 스타일-default.more_text", "bold", "underline", "italic", "strike", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle", "copyFormat", "removeFormat"],
-					[":리스트&라인-default.more_horizontal", "outdent", "indent", "align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
-					[":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
-					["-right", "save"],
-					["-right", ":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
-				],
-			],
-			[
-				"%440",
-				[
-					["newDocument", "selectAll", "undo", "redo"],
-					[":문단&글꼴-default.more_paragraph", "font", "fontSize", "formatBlock", "paragraphStyle", "blockquote"],
-					[":글자 스타일-default.more_text", "bold", "underline", "italic", "strike", "subscript", "superscript", "fontColor", "backgroundColor", "textStyle", "copyFormat", "removeFormat"],
-					[":리스트&라인-default.more_horizontal", "outdent", "indent", "align", "hr", "list_numbered", "list_bulleted", "lineHeight"],
-					[":테이블&미디어-default.more_plus", "table", "link", "image", "video", "fileUpload"],
-					["save"],
-					[":기타-default.more_vertical", "fullScreen", "showBlocks", "codeView", "preview"],
-				],
-			],
+			['newDocument', 'selectAll', 'undo', 'redo'],
+			[':문단&글꼴-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+			[':글자 스타일-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
+			[':리스트&라인-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list_numbered', 'list_bulleted', 'lineHeight'],
+			[':테이블&미디어-default.more_plus', 'table', 'link', 'image', 'video', 'fileUpload', 'anchor'],
+			['save'],
+			[':기타-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview']
 		],
 		subToolbar: {
 			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
@@ -647,7 +559,7 @@ window.editor_root = suneditor.create(
 			linkEnableFileUpload: true,
 			allowMultiple: true,
 			useFormatType: true,
-			defaultFormatType: 'block',
+			defaultFormatType: 'block'
 		},
 		audio: {
 			uploadUrl: 'http://localhost:3000/editor/upload',
@@ -677,7 +589,7 @@ window.editor_root = suneditor.create(
 		},
 		mention: {
 			apiUrl: 'https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/{ key }?limit={limitSize}',
-			useCachingFieldData: true,
+			useCachingFieldData: true
 		},
 		externalLibs: {
 			// math
@@ -719,7 +631,7 @@ window.editor_root = suneditor.create(
 			},
 			onImageAction(data) {
 				console.log('ima', data);
-			},
+			}
 			// onPaste(params) {
 			// 	console.log('paste', params);
 			// 	return params.editor.html.filter(params.html, { validate: (el) => {
@@ -753,19 +665,18 @@ window.editor_root = suneditor.create(
 );
 
 window.countEventListeners = function () {
-    const elements = document.querySelectorAll('*');
-    let totalListeners = 0;
+	const elements = document.querySelectorAll('*');
+	let totalListeners = 0;
 
-    elements.forEach(element => {
-        const listeners = getEventListeners(element);
-        for (let type in listeners) {
-            totalListeners += listeners[type].length;
-        }
-    });
+	elements.forEach((element) => {
+		const listeners = getEventListeners(element);
+		for (let type in listeners) {
+			totalListeners += listeners[type].length;
+		}
+	});
 
-    return totalListeners;
-}
-
+	return totalListeners;
+};
 
 editor_root.onload = () => {
 	// editor_root.events.onFileAction = () => {

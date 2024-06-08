@@ -88,7 +88,7 @@ FileUpload.prototype = {
 	},
 
 	/**
-	 * @override fileManager
+	 * @override component
 	 * @param {Element} target Target element
 	 */
 	select(target) {

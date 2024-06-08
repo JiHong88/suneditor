@@ -94,7 +94,7 @@ Controller.prototype = {
 		// display controller
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 
-		const isRangeTarget = /Range/.test(Object.prototype.toString.call(target.__proto__));
+		const isRangeTarget = this.selection.isRange(target);
 		this._controllerOn(this.form, target, isRangeTarget);
 		this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 	},
@@ -181,6 +181,7 @@ Controller.prototype = {
 
 		this.isOpen = true;
 		this.editor._antiBlur = true;
+		this.editor.status.onSelected = true;
 		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.editor.frameContext, params });
 	},
 
@@ -199,6 +200,7 @@ Controller.prototype = {
 		this.editor.effectNode = null;
 		this.editor.currentControllerName = '';
 		this.editor._antiBlur = false;
+		this.editor.status.onSelected = false;
 		this.editor._controllerTargetContext = null;
 		if (this.__shadowRootEventForm) {
 			this.__shadowRootEventForm.removeEventListener('mousedown', this.__shadowRootEventListener);
@@ -217,7 +219,7 @@ Controller.prototype = {
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
-		if (/Range/.test(Object.prototype.toString.call(refer.__proto__))) {
+		if (this.selection.isRange(refer)) {
 			if (!this.offset.setRangePosition(this.form, refer, { position: 'bottom' })) {
 				this.hide();
 				return;

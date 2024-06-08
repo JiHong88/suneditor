@@ -992,7 +992,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 
 	if (this.status.rootKey === rootKey && this.editor._antiBlur) return;
 
-	const componentSelected = this.editor.status.componentSelected;
+	const onSelected = this.editor.status.onSelected;
 	this.editor._offCurrentController();
 	this.status.hasFocus = true;
 
@@ -1002,7 +1002,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 	this.editor.changeFrameContext(rootKey);
 	this.history.resetButtons(rootKey, null);
 
-	if (!componentSelected) {
+	if (!onSelected) {
 		this.selection.removeRange();
 		this.applyTagEffect();
 	}

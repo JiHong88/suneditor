@@ -499,6 +499,14 @@
 	width: 15px;
 	height: 15px;
 }
+.sun-editor .se-text-prefix-icon {
+	width: 20px;
+	height: 20px;
+	float: left;
+}
+.sun-editor .se-text-prefix-icon svg {
+	vertical-align: middle;
+}
 
 /* sub button size */
 .sun-editor button.se-sub-arrow-btn {
@@ -2029,7 +2037,7 @@
 .sun-editor .se-modal .se-modal-inner .se-link-preview {
 	display: block;
 	height: auto;
-	max-height: 18px;
+	padding-top: 4px;
 	font-size: 13px;
 	font-weight: normal;
 	font-family: inherit;
@@ -2189,6 +2197,13 @@
 }
 .sun-editor-editable[contenteditable='true'] figure.se-drag-over > iframe {
 	pointer-events: none;
+}
+
+/* controller - display span */
+.sun-editor .se-controller .se-controller-display {
+	padding: 0 10px;
+	margin: 4px 0;
+	font-size: 13px;
 }
 
 /* controller - button group */
@@ -2966,6 +2981,10 @@
 .sun-editor.se-rtl .se-icon-flip-rtl svg,
 .sun-editor.se-rtl .se-icon-flip-rtl .se-svg {
 	transform: scaleX(-1);
+}
+
+.sun-editor.se-rtl .se-text-prefix-icon {
+	float: right;
 }
 
 .sun-editor.se-rtl .se-btn-select svg {

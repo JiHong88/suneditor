@@ -215,8 +215,8 @@ ModalAnchorEditor.prototype = {
 		}
 	},
 
-	_createHeaderList(urlValue) {
-		const headers = domUtils.getListChildren(this.editor.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName));
+	_createBookmarkList(urlValue) {
+		const headers = domUtils.getListChildren(this.editor.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (domUtils.isAnchor(current) && current.id));
 		if (headers.length === 0) return;
 
 		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');
@@ -226,7 +226,7 @@ ModalAnchorEditor.prototype = {
 			v = headers[i];
 			if (!valueRegExp.test(v.textContent)) continue;
 			list.push(v);
-			menus.push('<div style="' + v.style.cssText + '">' + v.textContent + '</div>');
+			menus.push(domUtils.isAnchor(v) ? `<div><span class="se-text-prefix-icon">${this.icons.bookmark_anchor}</span>${v.id}</div>` : `<div style="${v.style.cssText}">${v.textContent}</div>`);
 		}
 
 		if (list.length === 0) {
@@ -380,13 +380,13 @@ function OnChange_displayInput(e) {
 function OnChange_urlInput(e) {
 	const value = e.target.value.trim();
 	this._setLinkPreview(value);
-	if (this._selfPathBookmark(value)) this._createHeaderList(value);
+	if (this._selfPathBookmark(value)) this._createBookmarkList(value);
 	else this.selectMenu_bookmark.close();
 }
 
 function OnFocus_urlInput() {
 	const value = this.urlInput.value;
-	if (this._selfPathBookmark(value)) this._createHeaderList(value);
+	if (this._selfPathBookmark(value)) this._createBookmarkList(value);
 }
 
 function OnClick_bookmarkButton() {
@@ -401,7 +401,7 @@ function OnClick_bookmarkButton() {
 		domUtils.addClass(this.bookmarkButton, 'active');
 		this.downloadCheck.checked = false;
 		this.download.style.display = 'none';
-		this._createHeaderList(url);
+		this._createBookmarkList(url);
 	}
 
 	this.urlInput.value = url;
