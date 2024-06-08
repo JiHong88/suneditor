@@ -76,9 +76,9 @@ Font.prototype = {
 				value = `"${value}"`;
 			}
 			const newNode = domUtils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
-			this.format.applyTextStyle(newNode, ['font-family'], null, null);
+			this.format.applyInlineElement(newNode, ['font-family'], null, null);
 		} else {
-			this.format.applyTextStyle(null, ['font-family'], ['span'], true);
+			this.format.applyInlineElement(null, ['font-family'], ['span'], true);
 		}
 
 		this.menu.dropdownOff();

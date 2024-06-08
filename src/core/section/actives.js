@@ -140,6 +140,6 @@ export function FONT_STYLE(editor, command) {
 		nodeName = 'sub';
 	}
 
-	editor.format.applyTextStyle(el, StyleMap[command] || null, [nodeName], false);
+	editor.format.applyInlineElement(el, StyleMap[command] || null, [nodeName], false);
 	editor.focus();
 }

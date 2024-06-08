@@ -425,7 +425,7 @@ Editor.prototype = {
 				this.history.redo();
 				break;
 			case 'removeFormat':
-				this.format.removeTextStyle();
+				this.format.removeInlineElement();
 				this.focus();
 				break;
 			case 'print':

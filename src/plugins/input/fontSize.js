@@ -202,7 +202,7 @@ FontSize.prototype = {
 			if (this._disableInput) return;
 
 			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + size + ';' });
-			this.format.applyTextStyle(newNode, ['font-size'], null, null);
+			this.format.applyInlineElement(newNode, ['font-size'], null, null);
 
 			if (keyCode !== 13) target.focus();
 		} finally {
@@ -225,7 +225,7 @@ FontSize.prototype = {
 			value = value > max ? max : value < min ? min : value;
 
 			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + this._setSize(target, value + unit) + ';' });
-			this.format.applyTextStyle(newNode, ['font-size'], null, null);
+			this.format.applyInlineElement(newNode, ['font-size'], null, null);
 		} finally {
 			this.isInputActive = false;
 			event.preventDefault();
@@ -268,12 +268,12 @@ FontSize.prototype = {
 			newSize = newSize < min ? min : newSize > max ? max : newSize;
 
 			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + newSize + unit + ';' });
-			this.format.applyTextStyle(newNode, ['font-size'], null, null);
+			this.format.applyInlineElement(newNode, ['font-size'], null, null);
 		} else if (commandValue) {
 			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + commandValue + ';' });
-			this.format.applyTextStyle(newNode, ['font-size'], null, null);
+			this.format.applyInlineElement(newNode, ['font-size'], null, null);
 		} else {
-			this.format.applyTextStyle(null, ['font-size'], ['span'], true);
+			this.format.applyInlineElement(null, ['font-size'], ['span'], true);
 		}
 
 		this.menu.dropdownOff();

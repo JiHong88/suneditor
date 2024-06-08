@@ -971,7 +971,7 @@ Format.prototype = {
 	 * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
 	 * @returns {Element} The element that was added to the selection.
 	 */
-	applyTextStyle(styleNode, styleArray, removeNodeArray, strictRemove) {
+	applyInlineElement(styleNode, styleArray, removeNodeArray, strictRemove) {
 		if (domUtils.getParentElement(this.selection.getNode(), domUtils.isNonEditable)) return;
 
 		this.selection._resetRangeToTextNode();
@@ -1304,8 +1304,8 @@ Format.prototype = {
 	/**
 	 * @description Remove format of the currently selected text.
 	 */
-	removeTextStyle() {
-		this.applyTextStyle(null, null, null, null);
+	removeInlineElement() {
+		this.applyInlineElement(null, null, null, null);
 	},
 
 	/**

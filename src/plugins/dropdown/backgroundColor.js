@@ -72,9 +72,9 @@ BackgroundColor.prototype = {
 	action(value) {
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'background-color: ' + value + ';' });
-			this.format.applyTextStyle(newNode, ['background-color'], null, null);
+			this.format.applyInlineElement(newNode, ['background-color'], null, null);
 		} else {
-			this.format.applyTextStyle(null, ['background-color'], ['span'], true);
+			this.format.applyInlineElement(null, ['background-color'], ['span'], true);
 		}
 
 		this.menu.dropdownOff();

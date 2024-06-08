@@ -138,7 +138,7 @@ Link.prototype = {
 				true
 			);
 			this.selection.setRange(sc, 0, ec, ec.textContent.length);
-			this.format.applyTextStyle(null, null, ['A'], false);
+			this.format.applyInlineElement(null, null, ['A'], false);
 		} else {
 			/** delete */
 			domUtils.removeItem(this.controller.currentTarget);

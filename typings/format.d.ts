@@ -115,12 +115,12 @@ class Format extends EditorInterface {
 	 * @param removeNodeArray An array of node names to remove types from, remove all formats when "styleNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
 	 * @param strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
 	 */
-	applyTextStyle(styleNode?: Element, styleArray?: string[], removeNodeArray?: string[], strictRemove?: boolean): void;
+	applyInlineElement(styleNode?: Element, styleArray?: string[], removeNodeArray?: string[], strictRemove?: boolean): void;
 
 	/**
 	 * @description Remove format of the currently selected text
 	 */
-	removeTextStyle(): void;
+	removeInlineElement(): void;
 
 	/**
 	 * @description Check if the container and offset values are the edges of the "line"

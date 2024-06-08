@@ -72,9 +72,9 @@ FontColor.prototype = {
 	action(value) {
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'color: ' + value + ';' });
-			this.format.applyTextStyle(newNode, ['color'], null, null);
+			this.format.applyInlineElement(newNode, ['color'], null, null);
 		} else {
-			this.format.applyTextStyle(null, ['color'], ['span'], true);
+			this.format.applyInlineElement(null, ['color'], ['span'], true);
 		}
 
 		this.menu.dropdownOff();

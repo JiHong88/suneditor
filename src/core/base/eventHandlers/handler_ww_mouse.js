@@ -102,10 +102,10 @@ export function OnClick_wysiwyg(frameContext, e) {
 			const _styleNode = [...this.editor._onCopyFormatInfo];
 			const n = _styleNode.pop();
 
-			this.format.removeTextStyle();
+			this.format.removeInlineElement();
 
 			if (n) {
-				const insertedNode = this.format.applyTextStyle(n, null, [n.nodeName], false);
+				const insertedNode = this.format.applyInlineElement(n, null, [n.nodeName], false);
 				const { parent, inner } = this.nodeTransform.createNestedNode(_styleNode);
 				insertedNode.parentNode.insertBefore(parent, insertedNode);
 				inner.appendChild(insertedNode);
