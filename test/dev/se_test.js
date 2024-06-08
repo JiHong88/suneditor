@@ -631,7 +631,10 @@ window.editor_root = suneditor.create(
 			},
 			onImageAction(data) {
 				console.log('ima', data);
-			}
+			},
+			onFontActionBefore(data) {
+				console.log('fontbefore', data);
+			},
 			// onPaste(params) {
 			// 	console.log('paste', params);
 			// 	return params.editor.html.filter(params.html, { validate: (el) => {

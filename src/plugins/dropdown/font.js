@@ -69,12 +69,16 @@ Font.prototype = {
 	 * @override core
 	 * @param {Element} target Target command button
 	 */
-	action(target) {
+	async action(target) {
 		let value = target.getAttribute('data-command');
 		if (value) {
 			if (/[\s\d\W]/.test(value) && !/^['"].*['"]$/.test(value)) {
 				value = `"${value}"`;
 			}
+
+			// before event
+			if ((await this.triggerEvent('onFontActionBefore', { value })) === false) return;
+
 			const newNode = domUtils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
 			this.format.applyInlineElement(newNode, ['font-family'], null, null);
 		} else {
