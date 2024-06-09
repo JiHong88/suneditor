@@ -3,18 +3,22 @@ import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter } from '../../helper';
 
 const Math_ = function (editor, pluginOptions) {
+	// external library
+	this.katex = null;
+	this.mathjax = null;
+
 	// exception
-	if (!(this.katex = CheckKatex(editor.options.get('externalLibs').katex))) {
-		console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need the "KaTeX" library, Please add the katex option.');
+	if (!(this.katex = CheckKatex(editor.options.get('externalLibs').katex)) && !(this.mathjax = CheckMathJax(editor.options.get('externalLibs').mathjax))) {
+		console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need either "KaTeX" or "MathJax" library. Please add the katex or mathjax option.');
 	}
 
-	// plugin bisic properties
+	// plugin basic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.math;
 	this.icon = 'math';
 
 	// create HTML
-	const modalEl = CreateHTML_modal(editor, this, pluginOptions.fontSizeList);
+	const modalEl = CreateHTML_modal(editor, this, pluginOptions.fontSizeList, this.katex);
 	const controllerEl = CreateHTML_controller(editor);
 
 	// modules
@@ -44,7 +48,7 @@ Math_.key = 'math';
 Math_.type = 'modal';
 Math_.className = '';
 Math_.component = function (node) {
-	return domUtils.hasClass(node, 'katex') && domUtils.hasClass(node, 'se-component') ? node : null;
+	return domUtils.hasClass(node, 'se-math|katex') && domUtils.hasClass(node, 'se-component') ? node : null;
 };
 Math_.prototype = {
 	/**
@@ -53,7 +57,7 @@ Math_.prototype = {
 	 * @param {Element} element Target element
 	 */
 	select(element) {
-		if (domUtils.hasClass(element, 'katex') && getValue(element)) {
+		if (domUtils.hasClass(element, 'se-math|katex') && getValue(element)) {
 			this._element = element;
 			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
 			return;
@@ -72,17 +76,18 @@ Math_.prototype = {
 	 */
 	retainFormat() {
 		return {
-			query: '.katex',
+			query: '.se-math, .katex, .MathJax',
 			method: (element) => {
-				if (!this.katex) return;
+				if (!this.katex && !this.mathjax) return;
 
 				const value = getValue(element);
 				if (!value) return;
 
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
-				element.innerHTML = dom.querySelector('.katex').innerHTML;
+				element.innerHTML = dom.querySelector('.katex, .MathJax')[this.katex ? 'innerHTML' : 'outerHTML'];
 				element.setAttribute('contenteditable', false);
-				domUtils.addClass(element, 'se-component|se-inline-component|se-disable-pointer');
+				domUtils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
+				if (this.mathjax) renderMathJax(this.mathjax);
 			}
 		};
 	},
@@ -121,29 +126,45 @@ Math_.prototype = {
 		if (this.textArea.value.trim().length === 0) return false;
 
 		const mathExp = this.textArea.value;
-		const katexEl = this.previewElement.querySelector('.katex');
+		const mathEl = this.previewElement.querySelector('.katex, .se-math-preview > span');
 
-		if (!katexEl) return false;
-		katexEl.className = 'se-component se-inline-component __se__katex ' + katexEl.className;
-		katexEl.setAttribute('contenteditable', false);
-		katexEl.setAttribute('data-se-value', converter.htmlToEntity(this._escapeBackslashes(mathExp, false)));
-		katexEl.setAttribute('data-se-type', this.fontSizeElement.value);
-		katexEl.style.fontSize = this.fontSizeElement.value;
+		if (!mathEl) return false;
+		domUtils.addClass(mathEl, 'se-component|se-inline-component|se-disable-pointer|se-math');
+		mathEl.setAttribute('contenteditable', false);
+		mathEl.setAttribute('data-se-value', converter.htmlToEntity(this._escapeBackslashes(mathExp, false)));
+		mathEl.setAttribute('data-se-type', this.fontSizeElement.value);
+		mathEl.style.fontSize = this.fontSizeElement.value;
+
+		if (this.katex) {
+			domUtils.addClass(mathEl, 'katex');
+			domUtils.removeClass(mathEl, 'MathJax');
+		} else {
+			domUtils.removeClass(mathEl, 'katex');
+		}
 
 		if (!this.isUpdateState) {
 			const selectedFormats = this.format.getLines();
 
 			if (selectedFormats.length > 1) {
-				const oFormat = domUtils.createElement(selectedFormats[0].nodeName, null, katexEl);
-				this.component.insert(oFormat, false, false);
+				const oFormat = domUtils.createElement(selectedFormats[0].nodeName, null, mathEl);
+				this.component.insert(oFormat, false, true);
 			} else {
-				this.component.insert(katexEl, false, false);
+				this.component.insert(mathEl, false, true);
 			}
 		} else {
-			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.katex');
-			containerEl.parentNode.replaceChild(katexEl, containerEl);
-			const compInfo = this.component.get(katexEl);
+			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.katex, .MathJax');
+			containerEl.parentNode.replaceChild(mathEl, containerEl);
+			const compInfo = this.component.get(mathEl);
 			this.component.select(compInfo.target, compInfo.pluginName, false);
+		}
+
+		if (this.mathjax) renderMathJax(this.mathjax);
+
+		const r = this.selection.getNearRange(mathEl);
+		if (r) {
+			this.selection.setRange(r.container, r.offset, r.container, r.offset);
+		} else {
+			this.component.select(mathEl, Math_.key, false);
 		}
 
 		return true;
@@ -187,11 +208,15 @@ Math_.prototype = {
 		let result = '';
 		try {
 			domUtils.removeClass(this.textArea, 'se-error');
-			result = this.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
+			if (this.katex) {
+				result = this.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
+			} else if (this.mathjax) {
+				result = this.mathjax.convert(exp).outerHTML;
+			}
 		} catch (error) {
 			domUtils.addClass(this.textArea, 'se-error');
-			result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + env.KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
-			console.warn('[SUNEDITOR.math.Katex.error] ', error.message);
+			result = '<span class="se-math-error">Math syntax error. (Refer <a href="' + (this.katex ? env.KATEX_WEBSITE : env.MATHJAX_WEBSITE) + '" target="_blank">MathJax</a>)</span>';
+			console.warn('[SUNEDITOR.math.error] ', error.message);
 		}
 		return result;
 	},
@@ -220,7 +245,14 @@ async function copyTextToClipboard(element) {
 }
 
 function RenderMathExp(e) {
-	this.previewElement.innerHTML = this._renderer(e.target.value);
+	const mathExp = this._renderer(e.target.value);
+	this.previewElement.innerHTML = this.mathjax ? `<span>${mathExp}</span>` : mathExp;
+	if (this.mathjax) renderMathJax(this.mathjax);
+}
+
+function renderMathJax(mathjax) {
+	mathjax.clear();
+	mathjax.updateDocument();
 }
 
 function CheckKatex(katex) {
@@ -246,7 +278,27 @@ function CheckKatex(katex) {
 	return katex;
 }
 
-function CreateHTML_modal({ lang, icons }, math, fontSizeList) {
+function CheckMathJax(mathjax) {
+	if (!mathjax) return null;
+
+	try {
+		const adaptor = mathjax.browserAdaptor();
+		mathjax.RegisterHTMLHandler(adaptor);
+
+		const tex = new mathjax.TeX();
+		const chtml = new mathjax.CHTML();
+
+		return mathjax.src.document(document, {
+			InputJax: tex,
+			OutputJax: chtml
+		});
+	} catch (error) {
+		console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is set incorrectly.');
+		return null;
+	}
+}
+
+function CreateHTML_modal({ lang, icons }, math, fontSizeList, isKatex) {
 	const fontSize = fontSizeList || [
 		{
 			text: '1',
@@ -276,7 +328,7 @@ function CreateHTML_modal({ lang, icons }, math, fontSizeList) {
         </div>
         <div class="se-modal-body">
             <div class="se-modal-form">
-                <label>${lang.math_modal_inputLabel} (<a href="${env.KATEX_WEBSITE}" target="_blank">KaTeX</a>)</label>
+                <label>${lang.math_modal_inputLabel} ${isKatex ? `(<a href="${env.KATEX_WEBSITE}" target="_blank">KaTeX</a>)` : `(<a href="${env.MATHJAX_WEBSITE}" target="_blank">MathJax</a>)`}</label>
                 <textarea class="se-input-form se-math-exp" type="text" data-focus></textarea>
             </div>
             <div class="se-modal-form">

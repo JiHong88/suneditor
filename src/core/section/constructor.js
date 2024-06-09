@@ -21,7 +21,8 @@ const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
 const DEFAULT_SIZE_UNITS = ['px', 'pt', 'em', 'rem'];
 
-const DEFAULT_CLASS_NAME = '^__se__|^se-|^katex';
+const DEFAULT_CLASS_NAME = '^__se__|^se-|^katex|^MathJax';
+const DEFAULT_CLASS_MJX = 'mjx-container|mjx-math|mjx-mrow|mjx-mi|mjx-mo|mjx-mn|mjx-msup|mjx-mfrac|mjx-munderover';
 const DEFAULT_EXTRA_TAG_MAP = { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false };
 
 const DEFAULT_TAG_STYLES = {
@@ -481,7 +482,8 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('defaultLine', typeof options.defaultLine === 'string' && options.defaultLine.length > 0 ? options.defaultLine : 'p');
 	// element
 	const elw = (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase();
-	o.set('elementWhitelist', elw + (elw ? '|' : '') + o.get('_allowedExtraTag'));
+	const mjxEls = o.get('externalLibs').mathjax ? DEFAULT_CLASS_MJX + '|' : '';
+	o.set('elementWhitelist', elw + (elw ? '|' : '') + mjxEls + o.get('_allowedExtraTag'));
 	const elb = _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLine'));
 	o.set('elementBlacklist', elb + (elb ? '|' : '') + o.get('_disallowedExtraTag'));
 	// attribute

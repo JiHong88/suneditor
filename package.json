@@ -67,6 +67,7 @@
 		"karma-safari-launcher": "^1.0.0",
 		"karma-webpack": "^5.0.0",
 		"katex": "^0.16.7",
+		"mathjax-full": "^3.2.2",
 		"mini-css-extract-plugin": "^2.7.6",
 		"prettier": "^2.8.8",
 		"url-loader": "^4.1.1",

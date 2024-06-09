@@ -69,13 +69,16 @@
 	padding: 0;
 }
 
-/* katex */
-.sun-editor-editable span.katex {
+/* math */
+.sun-editor-editable span.se-math {
 	display: inline-block;
 }
-
-.sun-editor-editable span.katex * {
+.sun-editor-editable span.se-math * {
 	direction: ltr;
+}
+/* mathjax */
+.sun-editor-editable span > .MathJax {
+	margin: 4px 2px !important;
 }
 
 /* a */

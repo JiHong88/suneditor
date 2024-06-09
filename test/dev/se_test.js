@@ -7,6 +7,13 @@ require('../../src/assets/suneditor-contents.css');
 import Katex from 'katex';
 require('katex/dist/katex.css');
 
+// MathJax
+import { mathjax } from 'mathjax-full/js/mathjax.js';
+import { TeX } from 'mathjax-full/js/input/tex.js';
+import { CHTML } from 'mathjax-full/js/output/chtml.js';
+import { browserAdaptor } from 'mathjax-full/js/adaptors/browserAdaptor.js';
+import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
+
 // codemirror6
 import { EditorView, basicSetup, minimalSetup } from 'codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -511,7 +518,7 @@ window.editor_root = suneditor.create(
 			[':리스트&라인-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':테이블&미디어-default.more_plus', 'table', 'link', 'image', 'video', 'fileUpload', 'anchor'],
 			['save'],
-			[':기타-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview']
+			[':기타-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'math']
 		],
 		subToolbar: {
 			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
@@ -593,8 +600,15 @@ window.editor_root = suneditor.create(
 		},
 		externalLibs: {
 			// math
-			katex: {
-				src: Katex
+			// katex: {
+			// 	src: Katex
+			// },
+			mathjax: {
+				src: mathjax,
+				TeX,
+				CHTML,
+				browserAdaptor,
+				RegisterHTMLHandler
 			},
 			html2canvas: html2canvas,
 			jsPDF: jsPDF

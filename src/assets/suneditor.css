@@ -1549,6 +1549,7 @@
 }
 
 .sun-editor-editable[contenteditable='true'] .se-disable-pointer *,
+.sun-editor-editable[contenteditable='true'] .se-math *,
 .sun-editor-editable[contenteditable='true'] .katex * {
 	pointer-events: none;
 }

@@ -956,12 +956,12 @@ export function isImportantDisabled(element) {
 }
 
 /**
- * @description It is judged whether it is the not checking node. (class="katex", "se-exclude-format")
+ * @description It is judged whether it is the not checking node. (class="katex", "MathJax", "se-exclude-format")
  * @param {Node} element The node to check
  * @returns {boolean}
  */
 export function isExcludeFormat(element) {
-	return /(\s|^)(katex|se-exclude-format)(\s|$)/.test(element?.className);
+	return /(\s|^)(katex|MathJax|se-exclude-format)(\s|$)/.test(element?.className);
 }
 
 /**
