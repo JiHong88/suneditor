@@ -87,6 +87,13 @@ Math_.prototype = {
 				element.innerHTML = dom.querySelector('.katex, .MathJax')[this.katex ? 'innerHTML' : 'outerHTML'];
 				element.setAttribute('contenteditable', false);
 				domUtils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
+
+				if (this.katex) {
+					domUtils.addClass(element, 'katex');
+				} else {
+					domUtils.removeClass(element, 'katex');
+				}
+
 				if (this.mathjax) renderMathJax(this.mathjax);
 			}
 		};
