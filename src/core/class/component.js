@@ -466,7 +466,9 @@ function OnDragEnd() {
 
 function OnDragClick({ target }) {
 	if (!domUtils.hasClass(target, 'se-drag-handle-full')) return;
+
 	const dragInst = _DragHandle.get('__dragInst');
+	this._removeDragEvent();
 	this.select(dragInst.currentTarget, dragInst.currentPluginName, false);
 }
 
