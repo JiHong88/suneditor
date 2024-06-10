@@ -2034,7 +2034,7 @@
 	color: #b94a48;
 }
 
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .MathJax {
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview .MathJax {
 	margin: 2px !important;
 	line-height: unset;
 }
