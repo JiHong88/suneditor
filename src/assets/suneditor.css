@@ -2035,8 +2035,7 @@
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview .MathJax {
-	margin: 2px !important;
-	line-height: unset;
+	margin: 0.5em 0 !important;
 }
 
 /* modal - modal - link preview */
