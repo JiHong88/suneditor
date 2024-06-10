@@ -78,8 +78,7 @@
 }
 /* mathjax */
 .sun-editor-editable span > .MathJax {
-	margin: 2px !important;
-	line-height: unset;
+	margin: 0.5em 0 !important;
 }
 
 /* a */
