@@ -992,7 +992,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 
 	if (this.status.rootKey === rootKey && this.editor._antiBlur) return;
 
-	const onSelected = this.editor.status.onSelected;
+	const onSelected = this.editor.status.onSelected || this.editor.opendModal;
 	this.editor._offCurrentController();
 	this.status.hasFocus = true;
 

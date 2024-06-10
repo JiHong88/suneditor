@@ -221,7 +221,7 @@ export const shiftIcon = isOSX_IOS ? '⇧' : '+SHIFT';
 /** --- editor env --- */
 export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';
 export const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
-export const MATHJAX_WEBSITE = 'httphttps://www.mathjax.org/';
+export const MATHJAX_WEBSITE = 'https://www.mathjax.org/';
 
 const env = {
 	_w,

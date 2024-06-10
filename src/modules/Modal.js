@@ -1,5 +1,8 @@
 import CoreInjector from '../editorInjector/_core';
 import { CreateTooltipInner } from '../core/section/constructor';
+import { env } from '../helper';
+
+const { _w } = env;
 
 const Modal = function (inst, element) {
 	CoreInjector.call(this, inst.editor);
@@ -57,7 +60,9 @@ Modal.prototype = {
 	 */
 	close() {
 		this._fixCurrentController(false);
-		this.editor.opendModal = null;
+		_w.setTimeout(() => {
+			this.editor.opendModal = null;
+		}, 0);
 
 		if (this._closeSignal) this._modalInner.removeEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);

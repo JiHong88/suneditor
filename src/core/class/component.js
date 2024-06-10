@@ -243,7 +243,9 @@ Component.prototype = {
 	},
 
 	deselect() {
-		this.editor.status.onSelected = false;
+		_w.setTimeout(() => {
+			this.editor.status.onSelected = false;
+		}, 0);
 		this.__deselect();
 		domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 	},
@@ -466,7 +468,9 @@ function OnDragEnd() {
 
 function OnDragClick({ target }) {
 	if (!domUtils.hasClass(target, 'se-drag-handle-full')) return;
+
 	const dragInst = _DragHandle.get('__dragInst');
+	this._removeDragEvent();
 	this.select(dragInst.currentTarget, dragInst.currentPluginName, false);
 }
 

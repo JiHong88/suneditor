@@ -84,7 +84,7 @@ Math_.prototype = {
 				if (!value) return;
 
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
-				element.innerHTML = dom.querySelector('.katex, .MathJax')[this.katex ? 'innerHTML' : 'outerHTML'];
+				element.innerHTML = dom.querySelector('.se-math, .katex').innerHTML;
 				element.setAttribute('contenteditable', false);
 				domUtils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
 
@@ -130,10 +130,13 @@ Math_.prototype = {
 	 * @returns {boolean | undefined}
 	 */
 	modalAction() {
-		if (this.textArea.value.trim().length === 0) return false;
+		if (this.textArea.value.trim().length === 0 || domUtils.hasClass(this.textArea, 'se-error')) {
+			this.textArea.focus();
+			return false;
+		}
 
 		const mathExp = this.textArea.value;
-		const mathEl = this.previewElement.querySelector('.katex, .se-math-preview > span');
+		const mathEl = this.previewElement.querySelector('.se-math, .katex');
 
 		if (!mathEl) return false;
 		domUtils.addClass(mathEl, 'se-component|se-inline-component|se-disable-pointer|se-math');
@@ -159,10 +162,11 @@ Math_.prototype = {
 				this.component.insert(mathEl, false, true);
 			}
 		} else {
-			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.katex, .MathJax');
+			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.se-component');
 			containerEl.parentNode.replaceChild(mathEl, containerEl);
 			const compInfo = this.component.get(mathEl);
 			this.component.select(compInfo.target, compInfo.pluginName, false);
+			return true;
 		}
 
 		if (this.mathjax) renderMathJax(this.mathjax);
@@ -183,6 +187,7 @@ Math_.prototype = {
 	init() {
 		this.textArea.value = '';
 		this.previewElement.innerHTML = '';
+		domUtils.removeClass(this.textArea, 'se-error');
 	},
 
 	/**
@@ -219,10 +224,16 @@ Math_.prototype = {
 				result = this.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
 			} else if (this.mathjax) {
 				result = this.mathjax.convert(exp).outerHTML;
+				if (/<mjx-merror/.test(result)) {
+					domUtils.addClass(this.textArea, 'se-error');
+					result = `<span class="se-math-error">${result}</span>`;
+				} else {
+					result = `<span class="se-math">${result}</span>`;
+				}
 			}
 		} catch (error) {
 			domUtils.addClass(this.textArea, 'se-error');
-			result = '<span class="se-math-error">Math syntax error. (Refer <a href="' + (this.katex ? env.KATEX_WEBSITE : env.MATHJAX_WEBSITE) + '" target="_blank">MathJax</a>)</span>';
+			result = `<span class="se-math-error">Math syntax error. (Refer ${this.katex ? `<a href="${env.KATEX_WEBSITE}" target="_blank">KaTeX</a>` : `<a href="${env.MATHJAX_WEBSITE}" target="_blank">MathJax</a>`})</span>`;
 			console.warn('[SUNEDITOR.math.error] ', error.message);
 		}
 		return result;
@@ -252,8 +263,7 @@ async function copyTextToClipboard(element) {
 }
 
 function RenderMathExp(e) {
-	const mathExp = this._renderer(e.target.value);
-	this.previewElement.innerHTML = this.mathjax ? `<span>${mathExp}</span>` : mathExp;
+	this.previewElement.innerHTML = this._renderer(e.target.value);
 	if (this.mathjax) renderMathJax(this.mathjax);
 }
 

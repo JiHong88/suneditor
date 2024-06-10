@@ -2,7 +2,7 @@ import EditorInjector from '../editorInjector';
 import { domUtils, env } from '../helper';
 import { _DragHandle } from '../modules';
 
-const { ON_OVER_COMPONENT } = env;
+const { _w, ON_OVER_COMPONENT } = env;
 const NON_RESPONSE_KEYCODE = /^(1[7-9]|20|27|45|11[2-9]|12[0-3]|144|145)$/;
 const INDEX_0 = 2147483647;
 const INDEX_1 = 2147483646;
@@ -200,8 +200,10 @@ Controller.prototype = {
 		this.editor.effectNode = null;
 		this.editor.currentControllerName = '';
 		this.editor._antiBlur = false;
-		this.editor.status.onSelected = false;
 		this.editor._controllerTargetContext = null;
+		_w.setTimeout(() => {
+			this.editor.status.onSelected = false;
+		}, 0);
 		if (this.__shadowRootEventForm) {
 			this.__shadowRootEventForm.removeEventListener('mousedown', this.__shadowRootEventListener);
 			this.__shadowRootEventForm = this.__shadowRootEventListener = null;
