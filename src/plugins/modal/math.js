@@ -84,7 +84,7 @@ Math_.prototype = {
 				if (!value) return;
 
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
-				element.innerHTML = dom.querySelector('.katex, .MathJax').innerHTML;
+				element.innerHTML = dom.querySelector('se-math, .katex').innerHTML;
 				element.setAttribute('contenteditable', false);
 				domUtils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
 
@@ -136,7 +136,7 @@ Math_.prototype = {
 		}
 
 		const mathExp = this.textArea.value;
-		const mathEl = this.previewElement.querySelector('.katex, .se-math-preview > span');
+		const mathEl = this.previewElement.querySelector('.se-math, .katex');
 
 		if (!mathEl) return false;
 		domUtils.addClass(mathEl, 'se-component|se-inline-component|se-disable-pointer|se-math');
@@ -162,10 +162,11 @@ Math_.prototype = {
 				this.component.insert(mathEl, false, true);
 			}
 		} else {
-			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.katex, .MathJax');
+			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.se-component, .katex');
 			containerEl.parentNode.replaceChild(mathEl, containerEl);
 			const compInfo = this.component.get(mathEl);
 			this.component.select(compInfo.target, compInfo.pluginName, false);
+			return true;
 		}
 
 		if (this.mathjax) renderMathJax(this.mathjax);
@@ -227,7 +228,7 @@ Math_.prototype = {
 					domUtils.addClass(this.textArea, 'se-error');
 					result = `<span class="se-math-error">${result}</span>`;
 				} else {
-					result = `<span>${result}</span>`;
+					result = `<span class="se-math">${result}</span>`;
 				}
 			}
 		} catch (error) {
