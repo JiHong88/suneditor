@@ -2022,16 +2022,21 @@
 	direction: ltr;
 }
 
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .se-math-katex-error {
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .se-math-error {
 	color: #b94a48;
 	-webkit-box-shadow: 0 0 0 0.1rem #f2dede;
 	box-shadow: 0 0 0 0.1rem #f2dede;
 }
 
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .se-math-katex-error svg {
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .se-math-error svg {
 	width: auto;
 	height: 30px;
 	color: #b94a48;
+}
+
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .MathJax {
+	margin: 2px !important;
+	line-height: unset;
 }
 
 /* modal - modal - link preview */
@@ -3255,10 +3260,16 @@
 	color: #d9534f;
 }
 
+.sun-editor input.se-error,
+.sun-editor select.se-error,
+.sun-editor textarea.se-error {
+	border: 1px solid #db8d8c !important;
+}
+
 .sun-editor input.se-error:focus,
-select.se-error:focus,
-textarea.se-error:focus {
-	border: 1px solid #f2dede;
+sun-editor select.se-error:focus,
+sun-editor textarea.se-error:focus {
+	border: 1px solid #e46765 !important;
 	outline: 0;
 	-webkit-box-shadow: 0 0 0 0.2rem #eed3d7;
 	box-shadow: 0 0 0 0.2rem #eed3d7;
