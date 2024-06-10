@@ -186,7 +186,7 @@ Math_.prototype = {
 	init() {
 		this.textArea.value = '';
 		this.previewElement.innerHTML = '';
-		domUtils.removeClass(this.textArea, 'se-error')
+		domUtils.removeClass(this.textArea, 'se-error');
 	},
 
 	/**
@@ -224,7 +224,7 @@ Math_.prototype = {
 			} else if (this.mathjax) {
 				result = this.mathjax.convert(exp).outerHTML;
 				if (/<mjx-merror/.test(result)) {
-					domUtils.addClass(this.textArea, 'se-error')
+					domUtils.addClass(this.textArea, 'se-error');
 					result = `<span class="se-math-error">${result}</span>`;
 				} else {
 					result = `<span>${result}</span>`;
