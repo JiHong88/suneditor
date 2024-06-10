@@ -84,7 +84,7 @@ Math_.prototype = {
 				if (!value) return;
 
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
-				element.innerHTML = dom.querySelector('se-math, .katex').innerHTML;
+				element.innerHTML = dom.querySelector('.se-math, .katex').innerHTML;
 				element.setAttribute('contenteditable', false);
 				domUtils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
 
@@ -162,7 +162,7 @@ Math_.prototype = {
 				this.component.insert(mathEl, false, true);
 			}
 		} else {
-			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.se-component, .katex');
+			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.se-component');
 			containerEl.parentNode.replaceChild(mathEl, containerEl);
 			const compInfo = this.component.get(mathEl);
 			this.component.select(compInfo.target, compInfo.pluginName, false);
