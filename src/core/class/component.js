@@ -148,6 +148,7 @@ Component.prototype = {
 			options,
 			container: figureInfo.container || figureInfo.cover || target,
 			cover: figureInfo.cover,
+			inlineCover: figureInfo.inlineCover,
 			caption: figureInfo.caption,
 			isFile: isFile
 		});

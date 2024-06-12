@@ -52,6 +52,7 @@ const Figure = function (inst, controls, params) {
 	this.align = 'none';
 	this._element = null;
 	this._cover = null;
+	this._inlineCover = null;
 	this._container = null;
 	this._caption = null;
 	this._width = 0;
@@ -109,6 +110,12 @@ Figure.CreateContainer = function (element, className) {
 	return Figure.GetContainer(element);
 };
 
+// @todo
+Figure.CreateInlineContainer = function (element, className) {
+	domUtils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
+	return Figure.GetContainer(element);
+};
+
 /**
  * @description Return HTML string of caption(FIGCAPTION) element
  * @param {Element} cover Cover element(FIGURE). "CreateContainer().cover"
@@ -127,10 +134,12 @@ Figure.CreateCaption = function (cover, text) {
  */
 Figure.GetContainer = function (element) {
 	const cover = domUtils.getParentElement(element, 'FIGURE');
+	const inlineCover = domUtils.getParentElement(element, 'SPAN');
 	return {
 		target: element,
 		container: domUtils.getParentElement(element, Figure.__is) || cover,
 		cover: cover,
+		inlineCover: domUtils.hasClass(inlineCover, 'se-inline-component') ? inlineCover : null,
 		caption: domUtils.getEdgeChild(element.parentElement, 'FIGCAPTION')
 	};
 };
@@ -229,7 +238,8 @@ Figure.prototype = {
 
 		_DragHandle.set('__figureInst', this);
 
-		this._cover = figureInfo.cover;
+		this._inlineCover = figureInfo.inlineCover;
+		this._cover = figureInfo.cover || this._inlineCover;
 		this._container = figureInfo.container;
 		this._caption = figureInfo.caption;
 		this._element = target;
@@ -379,12 +389,13 @@ Figure.prototype = {
 		}
 
 		const w = !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%';
-		const h =
-			numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !this.isVertical
-				? figure.cover.style.height
-				: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
-				? target.style.height
-				: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
+		const h = figure.inlineCover
+			? figure.inlineCover.style.height
+			: numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !this.isVertical
+			? figure.cover.style.height
+			: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
+			? target.style.height
+			: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
 		return {
 			w: w || 'auto',
 			h: h || 'auto'
@@ -401,8 +412,9 @@ Figure.prototype = {
 		this.align = align = align || 'none';
 
 		const figure = Figure.GetContainer(target);
-		const container = figure.container;
+		if (!figure.cover) return;
 
+		const container = figure.container;
 		const cover = figure.cover;
 		if (/%$/.test(target.style.width) && align === 'center' && !this.component.isInline(container)) {
 			container.style.minWidth = '100%';
@@ -431,6 +443,7 @@ Figure.prototype = {
 	 * @returns
 	 */
 	controllerAction(target) {
+		// @todo
 		const command = target.getAttribute('data-command');
 		const value = target.getAttribute('data-value');
 		const element = this._element;
@@ -502,6 +515,35 @@ Figure.prototype = {
 		this.history.push(false);
 		if (!/^remove|caption$/.test(command)) {
 			this.component.select(element, this.kind, false);
+		}
+	},
+
+	retainFigureFormat(container, originEl, anchorCover) {
+		let existElement = this.format.isBlock(originEl.parentNode) || domUtils.isWysiwygFrame(originEl.parentNode) ? originEl : domUtils.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
+
+		if (domUtils.getParentElement(originEl, domUtils.isExcludeFormat)) {
+			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
+			existElement.parentNode.replaceChild(container, existElement);
+		} else if (domUtils.isListCell(existElement)) {
+			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
+			existElement.insertBefore(container, refer);
+			domUtils.removeItem(originEl);
+			this.nodeTransform.removeEmptyNode(refer, null, true);
+		} else if (this.format.isLine(existElement)) {
+			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
+			existElement = this.nodeTransform.split(existElement, refer);
+			existElement.parentNode.insertBefore(container, existElement);
+			domUtils.removeItem(originEl);
+			this.nodeTransform.removeEmptyNode(existElement, null, true);
+		} else {
+			if (this.format.isLineOnly(existElement.parentNode)) {
+				const formats = existElement.parentNode;
+				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
+				if (this.fileManager.__updateTags.map((current) => existElement.contains(current)).length === 0) domUtils.removeItem(existElement);
+			} else {
+				existElement = domUtils.isFigure(existElement.parentNode) ? domUtils.getParentElement(existElement.parentNode, Figure.__is) : existElement;
+				existElement.parentNode.replaceChild(container, existElement);
+			}
 		}
 	},
 
@@ -794,35 +836,6 @@ Figure.prototype = {
 		_DragHandle.get('__dragMove')();
 
 		dragHandle.style.display = 'block';
-	},
-
-	_retainFigureFormat(container, originEl, anchorCover) {
-		let existElement = this.format.isBlock(originEl.parentNode) || domUtils.isWysiwygFrame(originEl.parentNode) ? originEl : domUtils.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
-
-		if (domUtils.getParentElement(originEl, domUtils.isExcludeFormat)) {
-			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
-			existElement.parentNode.replaceChild(container, existElement);
-		} else if (domUtils.isListCell(existElement)) {
-			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
-			existElement.insertBefore(container, refer);
-			domUtils.removeItem(originEl);
-			this.nodeTransform.removeEmptyNode(refer, null, true);
-		} else if (this.format.isLine(existElement)) {
-			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
-			existElement = this.nodeTransform.split(existElement, refer);
-			existElement.parentNode.insertBefore(container, existElement);
-			domUtils.removeItem(originEl);
-			this.nodeTransform.removeEmptyNode(existElement, null, true);
-		} else {
-			if (this.format.isLineOnly(existElement.parentNode)) {
-				const formats = existElement.parentNode;
-				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-				if (this.fileManager.__updateTags.map((current) => existElement.contains(current)).length === 0) domUtils.removeItem(existElement);
-			} else {
-				existElement = domUtils.isFigure(existElement.parentNode) ? domUtils.getParentElement(existElement.parentNode, Figure.__is) : existElement;
-				existElement.parentNode.replaceChild(container, existElement);
-			}
-		}
 	},
 
 	constructor: Figure

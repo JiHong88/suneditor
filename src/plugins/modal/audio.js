@@ -154,7 +154,7 @@ Audio_.prototype = {
 
 				this._setTagAttrs(element);
 				const figure = Figure.CreateContainer(element.cloneNode(true), 'se-flex-component');
-				this.figure._retainFigureFormat(figure.container, element, null);
+				this.figure.retainFigureFormat(figure.container, element, null);
 			}
 		};
 	},

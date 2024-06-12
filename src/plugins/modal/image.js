@@ -24,9 +24,9 @@ const Image_ = function (editor, pluginOptions) {
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
 		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
 		allowMultiple: !!pluginOptions.allowMultiple,
-		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*'
-		// useFormatType: pluginOptions.useFormatType ?? false,
-		// defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block'
+		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
+		useFormatType: pluginOptions.useFormatType ?? false,
+		defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block'
 	};
 
 	// create HTML
@@ -72,8 +72,10 @@ const Image_ = function (editor, pluginOptions) {
 	this.focusElement = this.imgInputFile || this.imgUrlFile;
 	this.altText = modalEl.querySelector('._se_image_alt');
 	this.captionCheckEl = modalEl.querySelector('._se_image_check_caption');
+	this.captionEl = this.captionCheckEl?.parentElement;
 	this.previewSrc = modalEl.querySelector('._se_tab_content_image .se-link-preview');
 	this.sizeUnit = sizeUnit;
+	this.as = 'block';
 	this.proportion = {};
 	this.inputX = {};
 	this.inputY = {};
@@ -132,7 +134,7 @@ const Image_ = function (editor, pluginOptions) {
 Image_.key = 'image';
 Image_.type = 'modal';
 Image_.component = function (node) {
-	node = domUtils.isFigure(node) ? node.firstElementChild : node;
+	node = domUtils.isFigure(node) || (/^span$/i.test(node.nodeName) && domUtils.hasClass(node, 'se-component')) ? node.firstElementChild : node;
 	return /^IMG$/i.test(node?.nodeName) ? node : domUtils.isAnchor(node) && /^IMG$/i.test(node?.firstElementChild?.nodeName) ? node?.firstElementChild : null;
 };
 Image_.className = '';
@@ -370,6 +372,8 @@ Image_.prototype = {
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = 'none';
 			if (ctrlAlignBtn) ctrlAlignBtn.style.display = 'none';
+			// caption
+			if (this.captionEl) this.captionEl.style.display = 'none';
 		} else {
 			domUtils.addClass(this.asBlock, 'on');
 			domUtils.removeClass(this.asInline, 'on');
@@ -377,6 +381,8 @@ Image_.prototype = {
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = '';
 			if (ctrlAlignBtn) ctrlAlignBtn.style.display = '';
+			// caption
+			if (this.captionEl) this.captionEl.style.display = '';
 		}
 	},
 
@@ -458,7 +464,7 @@ Image_.prototype = {
 			infos = newInfos || infos;
 			const infoUrl = infos.url;
 			if (this.modal.isUpdate) this._updateSrc(infoUrl, infos.element, infos.files);
-			else this.create(infoUrl, infos.anchor, infos.inputWidth, infos.inputHeight, infos.align, infos.files, infos.alt);
+			else this._produce(infoUrl, infos.anchor, infos.inputWidth, infos.inputHeight, infos.align, infos.files, infos.alt);
 		}.bind(this, imgInfo);
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
@@ -624,7 +630,7 @@ Image_.prototype = {
 
 		if (isNewContainer) {
 			imageEl = this._element;
-			this.figure._retainFigureFormat(container, this._element, isNewAnchor ? anchor : null);
+			this.figure.retainFigureFormat(container, this._element, isNewAnchor ? anchor : null);
 			this._element = imageEl = container.querySelector('img');
 			this._cover = cover;
 			this._container = container;
@@ -701,6 +707,14 @@ Image_.prototype = {
 		return false;
 	},
 
+	_produce(src, anchor, width, height, align, file, alt) {
+		if (this.as !== 'inline') {
+			this.create(src, anchor, width, height, align, file, alt);
+		} else {
+			this.createInline(src, anchor, width, height, file, alt);
+		}
+	},
+
 	applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
 		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
@@ -743,6 +757,28 @@ Image_.prototype = {
 		this.component.insert(container, false, true);
 	},
 
+	createInline(src, anchor, width, height, file, alt) {
+		const oImg = domUtils.createElement('IMG');
+		oImg.src = src;
+		oImg.alt = alt;
+		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
+
+		const figureInfo = Figure.CreateInlineContainer(anchor, 'se-image-container');
+		const container = figureInfo.container;
+
+		this._element = oImg;
+		this._container = container;
+		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
+
+		// set size
+		this.applySize(width, height);
+
+		this.fileManager.setFileData(oImg, file);
+
+		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
+		this.component.insert(container, false, true);
+	},
+
 	_updateSrc(src, element, file) {
 		element.src = src;
 		this.fileManager.setFileData(element, file);
@@ -761,7 +797,7 @@ Image_.prototype = {
 				this._updateSrc(fileList[i].url, info.element, file);
 				break;
 			} else {
-				this.create(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
+				this._produce(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
 			}
 		}
 	},
@@ -822,7 +858,7 @@ Image_.prototype = {
 			if (update) {
 				this._updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
 			} else {
-				this.create(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
+				this._produce(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
 			}
 		}
 	},
@@ -948,8 +984,17 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 	if (this.options.get('componentAutoSelect')) {
 		this.component.select(oImg, Image_.key, false);
 	} else {
-		const line = this.format.addLine(container, null);
-		if (line) this.selection.setRange(line, 0, line, 0);
+		if (!this.component.isInline(container)) {
+			const line = this.format.addLine(container, null);
+			if (line) this.selection.setRange(line, 0, line, 0);
+		} else {
+			const r = this.selection.getNearRange(container);
+			if (r) {
+				this.selection.setRange(r.container, r.offset, r.container, r.offset);
+			} else {
+				this.component.select(oImg, Image_.key, false);
+			}
+		}
 	}
 
 	this.editor._iframeAutoHeight(this.editor.frameContext);
