@@ -24,6 +24,7 @@
 		alignTop: 'Align top',
 		anchor: 'Anchor',
 		asBlock: 'As a block',
+		asInline: 'As a inline',
 		asLink: 'As a link',
 		audio: 'Audio',
 		audio_modal_file: 'Select from files',

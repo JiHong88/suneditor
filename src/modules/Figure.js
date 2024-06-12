@@ -30,8 +30,16 @@ const Figure = function (inst, controls, params) {
 	const alignMenus = CreateAlign(this, this.alignButton);
 	if (alignMenus) {
 		this.selectMenu_align = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-		this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
+		this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-figure-select-list' });
 		this.selectMenu_align.create(alignMenus.items, alignMenus.html);
+	}
+	// as [block, inline] selectmenu
+	this.asButton = controllerEl.querySelector('[data-command="onas"]');
+	const asMenus = CreateAs(this, this.asButton);
+	if (asMenus) {
+		this.selectMenu_as = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_as.on(this.asButton, SetMenuAs.bind(this), { class: 'se-figure-select-list' });
+		this.selectMenu_as.create(asMenus.items, asMenus.html);
 	}
 	// resize selectmenu
 	this.resizeButton = controllerEl.querySelector('[data-command="onresize"]');
@@ -50,8 +58,10 @@ const Figure = function (inst, controls, params) {
 	this.percentageButtons = controllerEl.querySelectorAll('[data-command="resize_percent"]');
 	this.captionButton = controllerEl.querySelector('[data-command="caption"]');
 	this.align = 'none';
+	this.as = 'block';
 	this._element = null;
 	this._cover = null;
+	this._inlineCover = null;
 	this._container = null;
 	this._caption = null;
 	this._width = 0;
@@ -80,6 +90,7 @@ const Figure = function (inst, controls, params) {
 
 	// init
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
+	this.eventManager.addEvent(this.asButton, 'click', OnClick_asButton.bind(this));
 	this.eventManager.addEvent(this.resizeButton, 'click', OnClick_resizeButton.bind(this));
 	this.editor.applyFrameRoots((e) => {
 		if (!e.get('wrapper').querySelector('.se-controller.se-resizing-container')) {
@@ -109,6 +120,12 @@ Figure.CreateContainer = function (element, className) {
 	return Figure.GetContainer(element);
 };
 
+// @todo
+Figure.CreateInlineContainer = function (element, className) {
+	domUtils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
+	return Figure.GetContainer(element);
+};
+
 /**
  * @description Return HTML string of caption(FIGCAPTION) element
  * @param {Element} cover Cover element(FIGURE). "CreateContainer().cover"
@@ -127,10 +144,12 @@ Figure.CreateCaption = function (cover, text) {
  */
 Figure.GetContainer = function (element) {
 	const cover = domUtils.getParentElement(element, 'FIGURE');
+	const inlineCover = domUtils.getParentElement(element, 'SPAN');
 	return {
 		target: element,
 		container: domUtils.getParentElement(element, Figure.__is) || cover,
 		cover: cover,
+		inlineCover: domUtils.hasClass(inlineCover, 'se-inline-component') ? inlineCover : null,
 		caption: domUtils.getEdgeChild(element.parentElement, 'FIGCAPTION')
 	};
 };
@@ -229,11 +248,13 @@ Figure.prototype = {
 
 		_DragHandle.set('__figureInst', this);
 
-		this._cover = figureInfo.cover;
+		this._inlineCover = figureInfo.inlineCover;
+		this._cover = figureInfo.cover || this._inlineCover;
 		this._container = figureInfo.container;
 		this._caption = figureInfo.caption;
 		this._element = target;
 		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || target.style.float || 'none';
+		this.as = this._inlineCover ? 'inline' : 'block';
 		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(target).r).toString());
 
 		const sizeTarget = figureTarget ? this._cover || this._container || target : target;
@@ -309,6 +330,8 @@ Figure.prototype = {
 		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
 			// align button
 			this._setAlignIcon();
+			// as button
+			this._setAsIcon();
 			this.editor._visibleControllers(true, true);
 			// size
 			const size = this.getSize(target);
@@ -379,12 +402,13 @@ Figure.prototype = {
 		}
 
 		const w = !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%';
-		const h =
-			numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !this.isVertical
-				? figure.cover.style.height
-				: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
-				? target.style.height
-				: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
+		const h = figure.inlineCover
+			? figure.inlineCover.style.height
+			: numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !this.isVertical
+			? figure.cover.style.height
+			: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
+			? target.style.height
+			: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
 		return {
 			w: w || 'auto',
 			h: h || 'auto'
@@ -401,8 +425,9 @@ Figure.prototype = {
 		this.align = align = align || 'none';
 
 		const figure = Figure.GetContainer(target);
-		const container = figure.container;
+		if (!figure.cover) return;
 
+		const container = figure.container;
 		const cover = figure.cover;
 		if (/%$/.test(target.style.width) && align === 'center' && !this.component.isInline(container)) {
 			container.style.minWidth = '100%';
@@ -426,15 +451,65 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @description As style[block, inline] the component
+	 * @param {Element|null} target Target element
+	 * @param {"block"|"inline"} formatStyle Format style
+	 */
+	convertAsFormat(target, formatStyle) {
+		if (!target) target = this._element;
+		this.as = formatStyle || 'block';
+		const { container, inlineCover } = Figure.GetContainer(target);
+		// @todo getSize
+
+		const newTarget = target.cloneNode(false);
+		switch (formatStyle) {
+			case 'inline': {
+				if (inlineCover) break;
+
+				const next = container.nextElementSibling;
+				const parent = container.parentElement;
+
+				const newContainer = Figure.CreateInlineContainer(newTarget);
+
+				const line = domUtils.createElement(this.options.get('defaultLine'), null, newContainer.container);
+				parent.insertBefore(line, next);
+				domUtils.removeItem(container);
+
+				this._element = newTarget;
+				break;
+			}
+			case 'block': {
+				if (!inlineCover) break;
+
+				// @todo
+				this.selection.setRange(container, 0, container, 1);
+				const r = this.html.remove();
+				const s = this.nodeTransform.split(r.container, r.offset, 0);
+
+				if (s?.previousElementSibling && domUtils.isZeroWith(s.previousElementSibling)) {
+					domUtils.removeItem(s.previousElementSibling);
+				}
+
+				const figure = Figure.CreateContainer(newTarget);
+				(s || r.container).parentElement.insertBefore(figure.container, s);
+
+				this._element = newTarget;
+				break;
+			}
+		}
+	},
+
+	/**
 	 * @override controller
 	 * @param {Element} target Target button element
 	 * @returns
 	 */
 	controllerAction(target) {
+		// @todo
 		const command = target.getAttribute('data-command');
 		const value = target.getAttribute('data-value');
 		const element = this._element;
-		if (/^(onalign|onresize)$/.test(command)) return;
+		if (/^on.+/.test(command)) return;
 
 		switch (command) {
 			case 'mirror': {
@@ -502,6 +577,35 @@ Figure.prototype = {
 		this.history.push(false);
 		if (!/^remove|caption$/.test(command)) {
 			this.component.select(element, this.kind, false);
+		}
+	},
+
+	retainFigureFormat(container, originEl, anchorCover) {
+		let existElement = this.format.isBlock(originEl.parentNode) || domUtils.isWysiwygFrame(originEl.parentNode) ? originEl : domUtils.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
+
+		if (domUtils.getParentElement(originEl, domUtils.isExcludeFormat)) {
+			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
+			existElement.parentNode.replaceChild(container, existElement);
+		} else if (domUtils.isListCell(existElement)) {
+			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
+			existElement.insertBefore(container, refer);
+			domUtils.removeItem(originEl);
+			this.nodeTransform.removeEmptyNode(refer, null, true);
+		} else if (this.format.isLine(existElement)) {
+			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
+			existElement = this.nodeTransform.split(existElement, refer);
+			existElement.parentNode.insertBefore(container, existElement);
+			domUtils.removeItem(originEl);
+			this.nodeTransform.removeEmptyNode(existElement, null, true);
+		} else {
+			if (this.format.isLineOnly(existElement.parentNode)) {
+				const formats = existElement.parentNode;
+				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
+				if (this.fileManager.__updateTags.map((current) => existElement.contains(current)).length === 0) domUtils.removeItem(existElement);
+			} else {
+				existElement = domUtils.isFigure(existElement.parentNode) ? domUtils.getParentElement(existElement.parentNode, Figure.__is) : existElement;
+				existElement.parentNode.replaceChild(container, existElement);
+			}
 		}
 	},
 
@@ -644,6 +748,8 @@ Figure.prototype = {
 	},
 
 	__setCoverPaddingBottom(w, h) {
+		if (this._inlineCover === this._cover) return;
+
 		this._cover.style.height = h;
 		if (/%$/.test(w) && this.align === 'center') {
 			this._cover.style.paddingBottom = !/%$/.test(h) ? h : numbers.get((numbers.get(h, 2) / 100) * numbers.get(w, 2), 2) + '%';
@@ -680,8 +786,10 @@ Figure.prototype = {
 		const heightPercentage = /%$/.test(h);
 		this._container.style.width = numbers.is(w) ? w + '%' : w;
 		this._container.style.height = '';
-		this._cover.style.width = '100%';
-		this._cover.style.height = h;
+		if (this._inlineCover !== this._cover) {
+			this._cover.style.width = '100%';
+			this._cover.style.height = h;
+		}
 		this._element.style.width = '100%';
 		this._element.style.maxWidth = '';
 		this._element.style.height = this.autoRatio ? '100%' : heightPercentage ? '' : h;
@@ -716,6 +824,11 @@ Figure.prototype = {
 	_setAlignIcon() {
 		if (!this.alignButton) return;
 		domUtils.changeElement(this.alignButton.firstElementChild, this._alignIcons[this.align]);
+	},
+
+	_setAsIcon() {
+		if (!this.asButton) return;
+		domUtils.changeElement(this.asButton.firstElementChild, this.icons[`as_${this.as}`]);
 	},
 
 	_saveCurrentSize() {
@@ -794,35 +907,6 @@ Figure.prototype = {
 		_DragHandle.get('__dragMove')();
 
 		dragHandle.style.display = 'block';
-	},
-
-	_retainFigureFormat(container, originEl, anchorCover) {
-		let existElement = this.format.isBlock(originEl.parentNode) || domUtils.isWysiwygFrame(originEl.parentNode) ? originEl : domUtils.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
-
-		if (domUtils.getParentElement(originEl, domUtils.isExcludeFormat)) {
-			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
-			existElement.parentNode.replaceChild(container, existElement);
-		} else if (domUtils.isListCell(existElement)) {
-			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
-			existElement.insertBefore(container, refer);
-			domUtils.removeItem(originEl);
-			this.nodeTransform.removeEmptyNode(refer, null, true);
-		} else if (this.format.isLine(existElement)) {
-			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
-			existElement = this.nodeTransform.split(existElement, refer);
-			existElement.parentNode.insertBefore(container, existElement);
-			domUtils.removeItem(originEl);
-			this.nodeTransform.removeEmptyNode(existElement, null, true);
-		} else {
-			if (this.format.isLineOnly(existElement.parentNode)) {
-				const formats = existElement.parentNode;
-				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-				if (this.fileManager.__updateTags.map((current) => existElement.contains(current)).length === 0) domUtils.removeItem(existElement);
-			} else {
-				existElement = domUtils.isFigure(existElement.parentNode) ? domUtils.getParentElement(existElement.parentNode, Figure.__is) : existElement;
-				existElement.parentNode.replaceChild(container, existElement);
-			}
-		}
 	},
 
 	constructor: Figure
@@ -961,6 +1045,12 @@ function SetMenuAlign(value) {
 	this.component.select(this._element, this.kind, false);
 }
 
+function SetMenuAs(value) {
+	this.convertAsFormat(this._element, value);
+	this.selectMenu_as.close();
+	this.component.select(this._element, this.kind, false);
+}
+
 function SetResize(value) {
 	if (value === 'auto') {
 		this.deleteTransform();
@@ -1002,6 +1092,28 @@ function CreateAlign(inst, button) {
 	return { html: html, items: items };
 }
 
+function CreateAs(inst, button) {
+	if (!button) return null;
+
+	const icons = [inst.icons.as_block, inst.icons.as_inline];
+	const langs = [inst.lang.asBlock, inst.lang.asInline];
+	const commands = ['block', 'inline'];
+	const html = [];
+	const items = [];
+	for (let i = 0; i < commands.length; i++) {
+		html.push(/*html*/ `
+		<button type="button" class="se-btn-list se-tooltip" data-command="${commands[i]}">
+			${icons[i]}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${langs[i]}</span>
+			</span>
+		</button>`);
+		items.push(commands[i]);
+	}
+
+	return { html: html, items: items };
+}
+
 function CreateResize(editor, button) {
 	if (!button) return null;
 
@@ -1025,6 +1137,10 @@ function OffFigureContainer() {
 
 function OnClick_alignButton() {
 	this.selectMenu_align.open('', '[data-command="' + this.align + '"]');
+}
+
+function OnClick_asButton() {
+	this.selectMenu_as.open('', '[data-command="' + this.as + '"]');
 }
 
 function OnClick_resizeButton() {
@@ -1115,6 +1231,11 @@ function GET_CONTROLLER_BUTTONS(group) {
 			c = 'edit';
 			l = 'edit';
 			i = 'edit';
+			break;
+		case 'as':
+			c = 'onas';
+			l = 'blockStyle';
+			i = 'as_block';
 			break;
 		case 'remove':
 			c = 'remove';
