@@ -35,10 +35,10 @@ const Image_ = function (editor, pluginOptions) {
 	const ctrlAs = this.pluginOptions.useFormatType ? 'as' : '';
 	const figureControls =
 		pluginOptions.controls || !this.pluginOptions.canResize
-			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', ctrlAs, 'remove']]
+			? [[ctrlAs, 'mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
 			: [
-					['resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-					['edit', ctrlAs, 'align', 'caption', 'revert', 'remove']
+					[ctrlAs, 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
+					['edit', 'align', 'caption', 'revert', 'remove']
 			  ];
 
 	// show align
@@ -364,15 +364,12 @@ Image_.prototype = {
 	},
 
 	_activeAsInline(isInline) {
-		const ctrlAlignBtn = this.figure.controller.form.querySelector('[data-command="onalign"]');
-
 		if (isInline) {
 			domUtils.addClass(this.asInline, 'on');
 			domUtils.removeClass(this.asBlock, 'on');
 			this.as = 'inline';
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = 'none';
-			if (ctrlAlignBtn) ctrlAlignBtn.style.display = 'none';
 			// caption
 			if (this.captionEl) this.captionEl.style.display = 'none';
 		} else {
@@ -381,7 +378,6 @@ Image_.prototype = {
 			this.as = 'block';
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = '';
-			if (ctrlAlignBtn) ctrlAlignBtn.style.display = '';
 			// caption
 			if (this.captionEl) this.captionEl.style.display = '';
 		}

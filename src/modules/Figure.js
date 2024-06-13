@@ -113,14 +113,19 @@ const Figure = function (inst, controls, params) {
  * @description Create a container for the resizing component and insert the element.
  * @param {Element} element Target element
  * @param {string} className Class name of container (fixed: se-component)
- * @returns {object} {container, cover, caption}
+ * @returns {object} {target, container, cover, inlineCover, caption}
  */
 Figure.CreateContainer = function (element, className) {
 	domUtils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : '') }, domUtils.createElement('FIGURE', null, element));
 	return Figure.GetContainer(element);
 };
 
-// @todo
+/**
+ * @description Create a container for the inline resizing component and insert the element.
+ * @param {Element} element Target element
+ * @param {string} className Class name of container (fixed: se-component se-inline-component)
+ * @returns {object} {target, container, cover, inlineCover, caption}
+ */
 Figure.CreateInlineContainer = function (element, className) {
 	domUtils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
 	return Figure.GetContainer(element);
@@ -248,14 +253,7 @@ Figure.prototype = {
 
 		_DragHandle.set('__figureInst', this);
 
-		this._inlineCover = figureInfo.inlineCover;
-		this._cover = figureInfo.cover || this._inlineCover;
-		this._container = figureInfo.container;
-		this._caption = figureInfo.caption;
-		this._element = target;
-		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || target.style.float || 'none';
-		this.as = this._inlineCover ? 'inline' : 'block';
-		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(target).r).toString());
+		this._setFigureInfo(figureInfo);
 
 		const sizeTarget = figureTarget ? this._cover || this._container || target : target;
 		const w = sizeTarget.offsetWidth;
@@ -323,7 +321,7 @@ Figure.prototype = {
 			}
 		}
 
-		_figure.display.style.display = nonSizeInfo ? 'none' : '';
+		_figure.display.style.display = nonSizeInfo || this._inlineCover ? 'none' : '';
 		_figure.border.style.display = nonBorder ? 'none' : '';
 		_figure.main.style.display = 'block';
 
@@ -337,6 +335,14 @@ Figure.prototype = {
 			const size = this.getSize(target);
 			domUtils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.w + ', ' + size.h + ')');
 			this._displayResizeHandles(!nonResizing);
+			// rotate, aption, align, onresize - display;
+			const transformButtons = this.controller.form.querySelectorAll(
+				'[data-command="rotate"][data-value="90"], [data-command="rotate"][data-value="-90"], [data-command="caption"], [data-command="onalign"], [data-command="onresize"]'
+			);
+			const display = this._inlineCover ? 'none' : '';
+			transformButtons.forEach((button) => {
+				button.style.display = display;
+			});
 			// selecte
 			domUtils.removeClass(this._cover, 'se-figure-over-selected');
 			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
@@ -353,7 +359,7 @@ Figure.prototype = {
 		this._element_t = top;
 
 		// drag
-		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || domUtils.hasClass(figureInfo.container, 'se-input-component')) {
+		if (!this._inlineCover && (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || domUtils.hasClass(figureInfo.container, 'se-input-component'))) {
 			this._setDragEvent(_figure.main);
 		}
 
@@ -459,29 +465,41 @@ Figure.prototype = {
 		if (!target) target = this._element;
 		this.as = formatStyle || 'block';
 		const { container, inlineCover } = Figure.GetContainer(target);
-		// @todo getSize
+		const { w, h } = this.getSize(target);
 
 		const newTarget = target.cloneNode(false);
+
 		switch (formatStyle) {
 			case 'inline': {
 				if (inlineCover) break;
+				this.component.deselect();
 
 				const next = container.nextElementSibling;
 				const parent = container.parentElement;
 
-				const newContainer = Figure.CreateInlineContainer(newTarget);
+				newTarget.style.width = '';
+				newTarget.style.height = '';
+				const figure = Figure.CreateInlineContainer(newTarget);
+				domUtils.addClass(
+					figure.container,
+					container.className
+						.split(' ')
+						.filter((v) => v !== 'se-figure-selected' && v !== 'se-component-selected')
+						.join('|')
+				);
 
-				const line = domUtils.createElement(this.options.get('defaultLine'), null, newContainer.container);
+				this._asFormatChange(figure, w, h);
+
+				const line = domUtils.createElement(this.options.get('defaultLine'), null, figure.container);
 				parent.insertBefore(line, next);
 				domUtils.removeItem(container);
 
-				this._element = newTarget;
 				break;
 			}
 			case 'block': {
 				if (!inlineCover) break;
+				this.component.deselect();
 
-				// @todo
 				this.selection.setRange(container, 0, container, 1);
 				const r = this.html.remove();
 				const s = this.nodeTransform.split(r.container, r.offset, 0);
@@ -490,13 +508,38 @@ Figure.prototype = {
 					domUtils.removeItem(s.previousElementSibling);
 				}
 
+				newTarget.style.width = '';
+				newTarget.style.height = '';
 				const figure = Figure.CreateContainer(newTarget);
+				domUtils.addClass(
+					figure.container,
+					container.className
+						.split(' ')
+						.filter((v) => v !== 'se-inline-component' && v !== 'se-figure-selected' && v !== 'se-component-selected')
+						.join('|')
+				);
+
+				this._asFormatChange(figure, w, h);
+
 				(s || r.container).parentElement.insertBefore(figure.container, s);
 
-				this._element = newTarget;
 				break;
 			}
 		}
+	},
+
+	_asFormatChange(figureinfo, w, h) {
+		const kind = this.kind;
+		figureinfo.target.onload = () => this.component.select(figureinfo.target, kind, false);
+
+		this._setFigureInfo(figureinfo);
+
+		if (figureinfo.inlineCover) {
+			this.setAlign(figureinfo.target, 'none');
+			this.deleteTransform();
+		}
+
+		this.setSize(w, h);
 	},
 
 	/**
@@ -505,11 +548,11 @@ Figure.prototype = {
 	 * @returns
 	 */
 	controllerAction(target) {
-		// @todo
 		const command = target.getAttribute('data-command');
 		const value = target.getAttribute('data-value');
+		const type = target.getAttribute('data-type');
 		const element = this._element;
-		if (/^on.+/.test(command)) return;
+		if (/^on.+/.test(command) || type === 'selectMenu') return;
 
 		switch (command) {
 			case 'mirror': {
@@ -682,6 +725,17 @@ Figure.prototype = {
 		} finally {
 			this.__preventSizechange = false;
 		}
+	},
+
+	_setFigureInfo(figureInfo) {
+		this._inlineCover = figureInfo.inlineCover;
+		this._cover = figureInfo.cover || this._inlineCover;
+		this._container = figureInfo.container;
+		this._caption = figureInfo.caption;
+		this._element = figureInfo.target;
+		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || figureInfo.target.style.float || 'none';
+		this.as = this._inlineCover ? 'inline' : 'block';
+		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(figureInfo.target).r).toString());
 	},
 
 	_setRotate(element, r, x, y) {
@@ -961,6 +1015,10 @@ function OnResizeContainer(e) {
 	inst.__onContainerEvent = inst.eventManager.addGlobalEvent('mousemove', inst.__containerResizing);
 	inst.__offContainerEvent = inst.eventManager.addGlobalEvent('mouseup', inst.__containerResizingOff);
 	inst._displayResizeHandles(false);
+
+	const _display = this.editor.frameContext.get('_figure').display;
+	_display.style.display = 'block';
+	domUtils.changeTxt(_display, w + ' x ' + h);
 }
 
 function ContainerResizing(e) {
@@ -1048,7 +1106,6 @@ function SetMenuAlign(value) {
 function SetMenuAs(value) {
 	this.convertAsFormat(this._element, value);
 	this.selectMenu_as.close();
-	this.component.select(this._element, this.kind, false);
 }
 
 function SetResize(value) {
@@ -1080,7 +1137,7 @@ function CreateAlign(inst, button) {
 	const items = [];
 	for (let i = 0; i < commands.length; i++) {
 		html.push(/*html*/ `
-		<button type="button" class="se-btn-list se-tooltip" data-command="${commands[i]}">
+		<button type="button" class="se-btn-list se-tooltip" data-command="${commands[i]}" data-type="selectMenu" >
 			${icons[i]}
 			<span class="se-tooltip-inner">
 				<span class="se-tooltip-text">${langs[i]}</span>
@@ -1102,7 +1159,7 @@ function CreateAs(inst, button) {
 	const items = [];
 	for (let i = 0; i < commands.length; i++) {
 		html.push(/*html*/ `
-		<button type="button" class="se-btn-list se-tooltip" data-command="${commands[i]}">
+		<button type="button" class="se-btn-list se-tooltip" data-command="${commands[i]}" data-type="selectMenu" >
 			${icons[i]}
 			<span class="se-tooltip-inner">
 				<span class="se-tooltip-text">${langs[i]}</span>

@@ -87,8 +87,8 @@ Selection.prototype = {
 		}
 
 		if (!startCon || !endCon) return;
-		if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
-		if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
+		if (startCon.nodeType === 3 && startOff > startCon.textContent.length) startOff = startCon.textContent.length;
+		if (endCon.nodeType === 3 && endOff > endCon.textContent.length) endOff = endCon.textContent.length;
 		if (this.format.isLine(startCon)) {
 			startCon = startCon.childNodes[startOff > 0 ? startCon.childNodes.length - 1 : 0] || startCon;
 			startOff = startOff > 0 ? (startCon.nodeType === 1 && !domUtils.isBreak(startCon) ? 1 : startCon.textContent ? startCon.textContent.length : 0) : 0;

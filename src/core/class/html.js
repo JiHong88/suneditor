@@ -814,7 +814,7 @@ HTML.prototype = {
 						rOffset = rOffset === 0 ? 0 : 1;
 					}
 
-					if (domUtils.isZeroWith(line)) {
+					if (domUtils.isZeroWith(line) && !line.contains(rEl)) {
 						domUtils.removeItem(line);
 					}
 
