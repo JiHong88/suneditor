@@ -25,18 +25,19 @@ const Image_ = function (editor, pluginOptions) {
 		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
 		allowMultiple: !!pluginOptions.allowMultiple,
 		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
-		useFormatType: pluginOptions.useFormatType ?? false,
+		useFormatType: pluginOptions.useFormatType ?? true,
 		defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block'
 	};
 
 	// create HTML
 	const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
+	const ctrlAs = this.pluginOptions.useFormatType ? 'as' : '';
 	const figureControls =
 		pluginOptions.controls || !this.pluginOptions.canResize
-			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
+			? [[ctrlAs, 'mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
 			: [
-					['resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
+					[ctrlAs, 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
 					['edit', 'align', 'caption', 'revert', 'remove']
 			  ];
 
@@ -363,15 +364,12 @@ Image_.prototype = {
 	},
 
 	_activeAsInline(isInline) {
-		const ctrlAlignBtn = this.figure.controller.form.querySelector('[data-command="onalign"]');
-
 		if (isInline) {
 			domUtils.addClass(this.asInline, 'on');
 			domUtils.removeClass(this.asBlock, 'on');
 			this.as = 'inline';
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = 'none';
-			if (ctrlAlignBtn) ctrlAlignBtn.style.display = 'none';
 			// caption
 			if (this.captionEl) this.captionEl.style.display = 'none';
 		} else {
@@ -380,7 +378,6 @@ Image_.prototype = {
 			this.as = 'block';
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = '';
-			if (ctrlAlignBtn) ctrlAlignBtn.style.display = '';
 			// caption
 			if (this.captionEl) this.captionEl.style.display = '';
 		}
@@ -1055,11 +1052,11 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 		<div class="se-modal-form">
 			<div class="se-modal-flex-form">
 				<button type="button" data-command="asBlock" class="se-btn se-tooltip" aria-label="${lang.inlineStyle}">
-					${icons.component_outline}
+					${icons.as_block}
 					${CreateTooltipInner(lang.blockStyle)}
 				</button>
 				<button type="button" data-command="asInline" class="se-btn se-tooltip" aria-label="${lang.inlineStyle}">
-					${icons.component_inline}
+					${icons.as_inline}
 					${CreateTooltipInner(lang.inlineStyle)}
 				</button>
 			</div>

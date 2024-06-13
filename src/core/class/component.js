@@ -331,6 +331,7 @@ Component.prototype = {
 	 * @private
 	 */
 	_setComponentLineBreaker(element) {
+		const _overInfo = _DragHandle.get('__overInfo') === ON_OVER_COMPONENT;
 		this.eventManager._lineBreakComp = null;
 		const info = this.get(element);
 		if (!info) return;
@@ -361,7 +362,11 @@ Component.prototype = {
 			t_style.top = componentTop - scrollY - tH / 2 + 'px';
 			t_style[dir[0]] = (isNonSelected ? 4 : this.offset.get(target).left + w) + 'px';
 			t_style[dir[1]] = '';
+
 			lb_t.setAttribute('data-offset', scrollY + ',' + scrollX);
+			if (_overInfo) domUtils.removeClass(lb_t, 'se-on-selected');
+			else domUtils.addClass(lb_t, 'se-on-selected');
+
 			t_style.display = 'block';
 		} else {
 			t_style.display = 'none';
@@ -385,6 +390,9 @@ Component.prototype = {
 
 			const bDir = 'left';
 			lb_b.setAttribute('data-offset', scrollY + ',' + bDir + ',' + scrollX);
+			if (_overInfo) domUtils.removeClass(lb_b, 'se-on-selected');
+			else domUtils.addClass(lb_b, 'se-on-selected');
+
 			b_style.display = 'block';
 		} else {
 			b_style.display = 'none';

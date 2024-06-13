@@ -694,20 +694,26 @@
 	display: none;
 	width: 24px;
 	height: 24px;
-	color: #3288ff;
+	color: #f0c20a;
 	background-color: #fff;
-	border: 1px solid #3288ff;
-	opacity: 0.75;
+	border: 1px solid #f0c20a;
+	opacity: 0.95;
 	border-radius: 2px;
 	cursor: pointer;
 	z-index: 2147483647;
 	transition: opacity 0.3s ease, color 0.3s ease, background-color 0.3s ease;
+}
+.sun-editor .se-line-breaker-component.se-on-selected {
+	color: #3288ff;
+	background-color: #fff;
+	border: 1px solid #3288ff;
 }
 
 .sun-editor .se-line-breaker-component:hover {
 	opacity: 0.9;
 	color: #fff;
 	background-color: #4592ff;
+	border-color: #3288ff;
 }
 
 /** --- toolbar ---------------------------------------------------------- */
@@ -2588,7 +2594,7 @@
 	height: auto;
 }
 
-.sun-editor .se-select-menu.se-resizing-align-list {
+.sun-editor .se-select-menu.se-figure-select-list {
 	width: 74px;
 }
 
