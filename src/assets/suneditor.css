@@ -562,8 +562,8 @@
 /* se-select-btn icon */
 .sun-editor .se-btn-select > svg {
 	float: right;
-	width: 8px;
-	height: 8px;
+	width: 8px !important;
+	height: 8px !important;
 }
 
 /* se-btn-list inner icon */
