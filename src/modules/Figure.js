@@ -255,15 +255,15 @@ Figure.prototype = {
 		}
 
 		const figureInfo = Figure.GetContainer(target);
-		if (!figureInfo.container) return { container: null, cover: null };
+		if (!figureInfo.container) return { container: null, cover: null, width: target.style.width || target.width || '', height: target.style.height || target.height || '' };
 
 		_DragHandle.set('__figureInst', this);
 
 		this._setFigureInfo(figureInfo);
 
 		const sizeTarget = figureTarget ? this._cover || this._container || target : target;
-		const w = sizeTarget.offsetWidth;
-		const h = sizeTarget.offsetHeight;
+		const w = sizeTarget.offsetWidth || '';
+		const h = sizeTarget.offsetHeight || '';
 		const { top, left, scrollX, scrollY } = this.offset.getLocal(sizeTarget);
 
 		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
@@ -631,11 +631,15 @@ Figure.prototype = {
 	},
 
 	retainFigureFormat(container, originEl, anchorCover) {
+		const isInline = this.component.isInline(container);
 		let existElement = this.format.isBlock(originEl.parentNode) || domUtils.isWysiwygFrame(originEl.parentNode) ? originEl : domUtils.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
 
 		if (domUtils.getParentElement(originEl, domUtils.isExcludeFormat)) {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
 			existElement.parentNode.replaceChild(container, existElement);
+		} else if (isInline && this.format.isLine(existElement)) {
+			const refer = isInline && /^SPAN$/i.test(originEl.parentElement) ? originEl.parentElement : originEl;
+			refer.parentElement.replaceChild(container, refer);
 		} else if (domUtils.isListCell(existElement)) {
 			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
 			existElement.insertBefore(container, refer);

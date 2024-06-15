@@ -567,15 +567,20 @@ Image_.prototype = {
 
 		let imageEl = this._element;
 		let cover = this._cover;
+		let inlineCover = null;
 		let container = this._container === this._cover ? null : this._container;
 		let isNewContainer = false;
 
 		if (!cover || !container) {
 			isNewContainer = true;
 			imageEl = this._element.cloneNode(true);
-			const figureInfo = Figure.CreateContainer(imageEl, 'se-image-container');
+			const figureInfo =
+				this.pluginOptions.useFormatType && width !== 'auto' && (/^span$/i.test(this._element.parentElement?.nodeName) || this.format.isLine(this._element.parentElement))
+					? Figure.CreateInlineContainer(imageEl, 'se-image-container')
+					: Figure.CreateContainer(imageEl, 'se-image-container');
 			cover = figureInfo.cover;
 			container = figureInfo.container;
+			inlineCover = figureInfo.inlineCover;
 			this.figure.open(imageEl, { nonResizing: true, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 		}
 
@@ -594,16 +599,18 @@ Image_.prototype = {
 
 		// caption
 		let modifiedCaption = false;
-		if (this.captionCheckEl.checked) {
-			if (!this._caption || isNewContainer) {
-				this._caption = Figure.CreateCaption(cover, this.lang.caption);
-				modifiedCaption = true;
-			}
-		} else {
-			if (this._caption) {
-				domUtils.removeItem(this._caption);
-				this._caption = null;
-				modifiedCaption = true;
+		if (!inlineCover) {
+			if (this.captionCheckEl.checked) {
+				if (!this._caption || isNewContainer) {
+					this._caption = Figure.CreateCaption(cover, this.lang.caption);
+					modifiedCaption = true;
+				}
+			} else {
+				if (this._caption) {
+					domUtils.removeItem(this._caption);
+					this._caption = null;
+					modifiedCaption = true;
+				}
 			}
 		}
 
