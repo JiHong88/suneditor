@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager } from '../../modules';
-import { domUtils, numbers, env } from '../../helper';
+import { domUtils, numbers, env, converter } from '../../helper';
 const { NO_EVENT } = env;
 
 const Video = function (editor, pluginOptions) {
@@ -28,7 +28,9 @@ const Video = function (editor, pluginOptions) {
 		showRatioOption: pluginOptions.showRatioOption === undefined ? true : !!pluginOptions.showRatioOption,
 		ratioOptions: !pluginOptions.ratioOptions ? null : pluginOptions.ratioOptions,
 		videoTagAttributes: pluginOptions.videoTagAttributes || null,
-		iframeTagAttributes: pluginOptions.iframeTagAttributes || null
+		iframeTagAttributes: pluginOptions.iframeTagAttributes || null,
+		query_youtube: pluginOptions.query_youtube || '',
+		query_vimeo: pluginOptions.query_vimeo || ''
 	};
 
 	// create HTML
@@ -84,12 +86,18 @@ const Video = function (editor, pluginOptions) {
 	this.query = {
 		youtube: {
 			pattern: /youtu\.?be/i,
-			action: this.convertUrlYoutube.bind(this),
+			action: (url) => {
+				url = this.convertUrlYoutube(url);
+				return converter.addUrlQuery(url, this.pluginOptions.query_youtube);
+			},
 			tag: 'iframe'
 		},
 		vimeo: {
 			pattern: /vimeo\.com/i,
-			action: this.convertUrlVimeo.bind(this),
+			action: (url) => {
+				url = this.convertUrlVimeo(url);
+				return converter.addUrlQuery(url, this.pluginOptions.query_vimeo);
+			},
 			tag: 'iframe'
 		},
 		...pluginOptions.embedQuery
@@ -356,6 +364,18 @@ Video.prototype = {
 			url = url.slice(0, -1);
 		}
 		url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
+		return url;
+	},
+
+	addQuery(url, query) {
+		if (query.length > 0) {
+			if (/\?/.test(url)) {
+				const splitUrl = url.split('?');
+				url = splitUrl[0] + '?' + query + '&' + splitUrl[1];
+			} else {
+				url += '?' + query;
+			}
+		}
 		return url;
 	},
 
