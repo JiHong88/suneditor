@@ -279,6 +279,24 @@ export function spanToStyleNode(styleToTag, node) {
 }
 
 /**
+ * Adds a query string to a URL. If the URL already contains a query string, the new query is appended to the existing one.
+ * @param {string} url The original URL to which the query string will be added.
+ * @param {string} query The query string to be added to the URL.
+ * @returns {string} The updated URL with the query string appended.
+ */
+export function addUrlQuery(url, query) {
+	if (query.length > 0) {
+		if (/\?/.test(url)) {
+			const splitUrl = url.split('?');
+			url = splitUrl[0] + '?' + query + '&' + splitUrl[1];
+		} else {
+			url += '?' + query;
+		}
+	}
+	return url;
+}
+
+/**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Object.<string, any>} fo frameOptions
  * @param {string} cssText Style string
@@ -380,6 +398,7 @@ const converter = {
 	getWidthInPercentage,
 	textToAnchor,
 	spanToStyleNode,
+	addUrlQuery,
 	_setDefaultOptionStyle,
 	_setIframeStyleLinks,
 	_setAutoHeightStyle

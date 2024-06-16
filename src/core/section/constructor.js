@@ -1006,14 +1006,21 @@ function _createModuleGroup() {
 function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, icons) {
 	const oLi = domUtils.createElement('LI');
 	const label = title || '';
-	const oButton = domUtils.createElement(/^INPUT|FIELD$/i.test(dataType) ? 'DIV' : 'BUTTON', {
-		type: 'button',
-		class: 'se-toolbar-btn se-btn se-tooltip' + (className ? ' ' + className : ''),
-		'data-command': dataCommand,
-		'data-type': dataType,
-		'aria-label': label.replace(/<span .+<\/span>/, ''),
-		tabindex: '-1'
-	});
+	const isDiv = /^INPUT|FIELD$/i.test(dataType);
+	const oButton =
+		'se-toolbar-separator-vertical' === className
+			? domUtils.createElement('DIV', { class: className, tabindex: '-1' }, null)
+			: domUtils.createElement(isDiv ? 'DIV' : 'BUTTON', {
+					class: 'se-toolbar-btn se-btn se-tooltip' + (className ? ' ' + className : ''),
+					'data-command': dataCommand,
+					'data-type': dataType,
+					'aria-label': label.replace(/<span .+<\/span>/, ''),
+					tabindex: '-1'
+			  });
+
+	if (!isDiv) {
+		oButton.setAttribute('type', 'button');
+	}
 
 	if (/^default\./i.test(innerHTML)) {
 		innerHTML = icons[innerHTML.replace(/^default\./i, '')];
@@ -1120,7 +1127,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 	let plugin = null;
 	let moduleElement = null;
 	let buttonElement = null;
-	let vertical = false;
+	// let vertical = false;
 	const moreLayer = domUtils.createElement('DIV', { class: 'se-toolbar-more-layer' });
 	const buttonTray = domUtils.createElement('DIV', { class: 'se-btn-tray' });
 	const separator_vertical = domUtils.createElement('DIV', { class: 'se-toolbar-separator-vertical' });
@@ -1173,6 +1180,9 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 						const title = matched[1].trim();
 						const innerHTML = matched[2].trim();
 						modules = ['se-btn-more', /^lang\./i.test(title) ? lang[title.replace(/^lang\./i, '')] : title, moreCommand, 'MORE', innerHTML];
+					} else if (button === '|') {
+						// separator vertical
+						modules = ['se-toolbar-separator-vertical', '', '', 'separator', ''];
 					} else {
 						// default command
 						modules = defaultButtonList[button];
@@ -1212,18 +1222,23 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 				}
 			}
 
-			if (vertical) {
-				const sv = separator_vertical.cloneNode(false);
-				buttonTray.appendChild(sv);
-			}
+			// if (vertical) {
+			// 	const sv = separator_vertical.cloneNode(false);
+			// 	buttonTray.appendChild(sv);
+			// }
 
 			buttonTray.appendChild(moduleElement.div);
-			vertical = true;
+			// vertical = true;
+		} else if (buttonGroup === '|') {
+			// // separator vertical
+			const sv = separator_vertical.cloneNode(false);
+			buttonTray.appendChild(sv);
+			continue;
 		} else if (/^\/$/.test(buttonGroup)) {
 			/** line break  */
 			const enterDiv = domUtils.createElement('DIV', { class: 'se-btn-module-enter' });
 			buttonTray.appendChild(enterDiv);
-			vertical = false;
+			// vertical = false;
 		}
 	}
 

@@ -520,12 +520,12 @@ window.editor_root = suneditor.create(
 		// charCounter_max: 1400,
 		// buttonList: bl,
 		buttonList: [
-			['newDocument', 'selectAll', 'undo', 'redo'],
-			[':문단&글꼴-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-			[':글자 스타일-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
-			[':리스트&라인-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':테이블&미디어-default.more_plus', 'table', 'link', 'image', 'video', 'fileUpload', 'anchor'],
-			['save'],
+			['newDocument', 'selectAll', 'undo', 'redo'], '|',
+			[':문단&글꼴-default.more_paragraph', 'font', 'fontSize', 'formatBlock', '|', 'paragraphStyle', 'blockquote'], '|',
+			[':글자 스타일-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'], '|',
+			[':리스트&라인-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list_numbered', 'list_bulleted', 'lineHeight'], '|',
+			[':테이블&미디어-default.more_plus', 'table', 'link', 'image', 'video', 'fileUpload', 'anchor'], '|',
+			['save'], '|',
 			[':기타-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'math']
 		],
 		subToolbar: {

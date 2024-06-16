@@ -745,14 +745,6 @@
 	z-index: 0 !important;
 }
 
-.sun-editor .se-toolbar-separator-vertical {
-	display: inline-block;
-	height: 38px;
-	width: 0px;
-	margin: 0px;
-	vertical-align: top;
-}
-
 /* inline toolbar */
 .sun-editor .se-toolbar.se-toolbar-inline {
 	display: none;
@@ -812,11 +804,22 @@
 	display: inline-block;
 }
 
+/* button group */
 .sun-editor .se-btn-module-border {
 	border: 1px solid #e1e1e1;
+	border: none;
 	border-radius: 2px;
 	margin-left: 1px;
 	margin-right: 1px;
+}
+/* separator vertical */
+.sun-editor .se-toolbar-separator-vertical {
+	display: inline-block;
+	height: 34px;
+	width: 1px;
+	margin: 1px;
+	vertical-align: top;
+	background-color: #e1e1e1;
 }
 
 .sun-editor .se-btn-module-enter {
