@@ -255,7 +255,9 @@ Figure.prototype = {
 		}
 
 		const figureInfo = Figure.GetContainer(target);
-		if (!figureInfo.container) return { container: null, cover: null, width: target.style.width || target.width || '', height: target.style.height || target.height || '' };
+		if (!figureInfo.container) {
+			return { container: null, cover: null, width: target.style.width || (!numbers.is(target.width) ? target.width : '') || '', height: target.style.height || (!numbers.is(target.height) ? target.height : '') || '' };
+		}
 
 		_DragHandle.set('__figureInst', this);
 
@@ -708,6 +710,7 @@ Figure.prototype = {
 				}
 			} else {
 				const figureInfo = Figure.GetContainer(element);
+				const cover = figureInfo.cover || figureInfo.inlineCover;
 				const offsetW = width || element.offsetWidth;
 				const offsetH = height || element.offsetHeight;
 				const w = (isVertical ? offsetH : offsetW) + 'px';
@@ -716,8 +719,8 @@ Figure.prototype = {
 				this._deletePercentSize();
 				this._applySize(offsetW + 'px', offsetH + 'px', '');
 
-				figureInfo.cover.style.width = w;
-				figureInfo.cover.style.height = figureInfo.caption ? '' : h;
+				cover.style.width = w;
+				cover.style.height = figureInfo.caption || figureInfo.inlineCover ? '' : h;
 
 				if (isVertical) {
 					const transW = offsetW / 2 + 'px ' + offsetW / 2 + 'px 0';
