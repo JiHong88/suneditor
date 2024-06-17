@@ -167,6 +167,8 @@ Component.prototype = {
 		if (!plugin) return;
 
 		if (!isInput && _DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
+			if (this.editor.status._onMousedown) return;
+
 			this.editor._antiBlur = true;
 			this.__selectionSelected = true;
 			if (this.isInline(info.container)) {

@@ -3,7 +3,17 @@ import { _DragHandle } from '../../../modules';
 
 const { _w } = env;
 
+let _onDownEv = null;
+function _offDownFn() {
+	this.editor.status._onMousedown = false;
+	_onDownEv = this.removeGlobalEvent(_onDownEv);
+}
+
 export function OnMouseDown_wysiwyg(frameContext, e) {
+	this.editor.status._onMousedown = true;
+	if (_onDownEv) _offDownFn.call(this);
+	_onDownEv = this.addGlobalEvent('mouseup', _offDownFn.bind(this));
+
 	if (frameContext.get('isReadOnly') || domUtils.isNonEditable(frameContext.get('wysiwyg'))) return;
 	if (this.format._isExcludeSelectionElement(e.target)) {
 		e.preventDefault();

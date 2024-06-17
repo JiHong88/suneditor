@@ -120,7 +120,8 @@ const Editor = function (multiTargets, options) {
 		currentNodesMap: [],
 		onSelected: false,
 		rootKey: product.rootId,
-		_range: null
+		_range: null,
+		_onMousedown: false
 	};
 
 	/**
