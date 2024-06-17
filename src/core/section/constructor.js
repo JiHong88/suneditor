@@ -186,7 +186,7 @@ const Constructor = function (editorTargets, options) {
 		const to = editTarget.options;
 		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (to.get('_rtl') ? ' se-rtl' : '') });
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
-		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
+		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' + (o.get('_type_document') ? ' se-type-document' : '') });
 
 		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
@@ -365,6 +365,8 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('__lineFormatFilter', options.__lineFormatFilter ?? true);
 	o.set('__pluginRetainFilter', options.__pluginRetainFilter ?? true);
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
+	o.set('type', options.type || 'none'); // none, document
+	o.set('_type_document', options.type === 'document');
 	o.set('externalLibs', options.externalLibs || {});
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);

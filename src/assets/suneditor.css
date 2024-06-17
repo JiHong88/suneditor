@@ -5,30 +5,34 @@
 /* red color #b94a48 , #f2dede , #eed3d7, #d9534f */
 /* green color #008000 */
 /* yellow color #f0c20a */
+:root {
+	--se-main-out-color: #dadada;
+	--se-main-font-family: Helvetica Neue;
+	--se-main-font-color: #000;
+	--se-main-font-size: 16px;
+	--se-main-background: #fff;
+	--se-doc-min-padding: 1rem;
+	--se-doc-max-padding: 1.5rem;
+	--se-doc-padding-factor: 0.5;
+	--se-doc-background: #e1e1e1;
+	--se-border-radius: 2px;
+}
 
 /** --- suneditor main */
 .sun-editor {
 	width: auto;
 	height: auto;
 	box-sizing: border-box;
-	font-family: Helvetica Neue;
-	border: 1px solid #dadada;
-	background-color: #fff;
-	color: #000;
-	font-size: 16px;
+	font-family: var(--se-main-font-family);
+	border: 1px solid var(--se-main-out-color);
+	background-color: var(--se-main-background);
+	color: var(--se-main-font-color);
+	font-size: var(--se-main-font-size);
 }
 
 .sun-editor * {
 	box-sizing: border-box;
 	overflow: visible;
-}
-
-.sun-editor-common input,
-.sun-editor-common select,
-.sun-editor-common textarea,
-.sun-editor-common button {
-	font-size: 14px;
-	line-height: 1.5;
 }
 
 .sun-editor-common body,
@@ -112,6 +116,17 @@
 	max-height: 24px;
 }
 
+/** --- se-type-document ---------------------------------------------------------- */
+.sun-editor .se-wrapper.se-type-document {
+	padding: clamp(var(--se-doc-min-padding), var(--se-doc-min-padding) + calc(var(--se-doc-padding-factor) * 1vw), var(--se-doc-max-padding));
+	background-color: var(--se-doc-background);
+	box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.sun-editor .se-wrapper.se-type-document > .se-wrapper-inner {
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+/** --- se-type-document end ---------------------------------------------------------- */
+
 .sun-editor .se-wrapper .se-code-viewer-mirror,
 .sun-editor .se-wrapper .cm-editor,
 .sun-editor .se-wrapper .CodeMirror {
@@ -144,7 +159,7 @@
 	border-width: 0;
 	border-style: solid;
 	border-color: #ccc;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -279,7 +294,7 @@
 .sun-editor .se-btn-primary {
 	background-color: #eaf3ff;
 	border: 1px solid #1275ff;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	outline: 0 none;
 	transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
@@ -449,7 +464,7 @@
 .sun-editor textarea {
 	color: #000;
 	border: 1px solid #ccc;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 }
 
 /* disabled buttons, icon blur */
@@ -530,22 +545,22 @@
 }
 .sun-editor button.se-side-btn-a {
 	float: left;
-	border-radius: 2px 0 0 2px;
+	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
 	margin-right: 0;
 }
 .sun-editor button.se-side-btn-b {
 	float: left;
-	border-radius: 0 2px 2px 0;
+	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
 	margin-left: 0;
 }
 .sun-editor button.se-side-btn-before {
 	float: left;
 	margin-right: 0;
-	border-radius: 2px 0 0 2px;
+	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
 }
 .sun-editor button.se-side-btn-after {
 	margin-left: 0;
-	border-radius: 0 2px 2px 0;
+	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
 }
 
 /* list button icons */
@@ -698,7 +713,7 @@
 	background-color: #fff;
 	border: 1px solid #f0c20a;
 	opacity: 0.95;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	cursor: pointer;
 	z-index: 2147483647;
 	transition: opacity 0.3s ease, color 0.3s ease, background-color 0.3s ease;
@@ -808,7 +823,7 @@
 .sun-editor .se-btn-module-border {
 	border: 1px solid #e1e1e1;
 	border: none;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	margin-left: 1px;
 	margin-right: 1px;
 }
@@ -971,7 +986,7 @@
 	height: auto;
 	z-index: 5;
 	border: 1px solid #e1e1e1;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	padding: 4px;
 	background-color: #fff;
 	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
@@ -1159,7 +1174,7 @@
 	margin: 0;
 	background-color: #f9f9f9;
 	border: 1px solid #e1e1e1;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 }
 
 .sun-editor .sun-editor-editable[contenteditable='true'].se-copy-format-cursor {
@@ -1261,7 +1276,7 @@
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	border: 1px solid #ccc;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
 	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
 }
@@ -1708,7 +1723,7 @@
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	outline: 0;
 	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
@@ -1739,7 +1754,7 @@
 	vertical-align: middle;
 	-ms-touch-action: manipulation;
 	touch-action: manipulation;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-header {
@@ -2247,7 +2262,7 @@
 	min-height: 34px;
 	height: auto;
 	border: none;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	margin: 1px;
 	font-size: 12px;
 	line-height: 1.5;
@@ -2442,7 +2457,7 @@
 	font-size: 12px;
 	color: #fff;
 	background-color: #333;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	opacity: 0.75;
 }
 
@@ -2524,7 +2539,7 @@
 	overflow-x: visible;
 	overflow: visible;
 	background-color: #fff;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	padding: 2px 0;
 	margin: 0;
 	border: 1px solid #bababa;
@@ -2650,7 +2665,7 @@
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	outline: 0;
 	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
@@ -2786,7 +2801,7 @@
 	cursor: pointer;
 	width: 100%;
 	height: auto;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	outline: 0;
 	margin: 10px 0;
 }
@@ -2801,7 +2816,7 @@
 	position: relative;
 	display: block;
 	width: 100%;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	outline: 0;
 	height: auto;
 }
@@ -2837,7 +2852,7 @@
 	width: auto;
 	height: auto;
 	margin: 1.75rem auto;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	word-break: break-all;
@@ -2902,7 +2917,7 @@
 	font-size: 0.9em;
 	margin: 0;
 	padding: 4px 6px;
-	border-radius: 2px;
+	border-radius: var(--se-border-radius);
 	background-color: #333;
 	color: #fff;
 	text-align: center;
@@ -3026,21 +3041,21 @@
 .sun-editor.se-rtl button.se-side-btn-b {
 	float: right;
 	margin-right: 0;
-	border-radius: 2px 0 0 2px;
+	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
 }
 .sun-editor.se-rtl button.se-side-btn-a {
 	float: right;
 	margin-left: 0;
-	border-radius: 0 2px 2px 0;
+	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
 }
 .sun-editor.se-rtl button.se-side-btn-after {
 	margin-right: 0;
-	border-radius: 2px 0 0 2px;
+	border-radius: var(--se-border-radius) 0 0 var(--se-border-radius);
 }
 .sun-editor.se-rtl button.se-side-btn-before {
 	float: right;
 	margin-left: 0;
-	border-radius: 0 2px 2px 0;
+	border-radius: 0 var(--se-border-radius) var(--se-border-radius) 0;
 }
 
 /* after, before button:hover - on, active - border */
