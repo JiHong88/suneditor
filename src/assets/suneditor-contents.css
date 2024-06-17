@@ -1,9 +1,10 @@
 :root {
 	--se-edit-font-size: 13px;
-	--se-edit-font: #333;
-	--se-edit-font-sub: #666;
-	--se-edit-background: #fff;
-	--se-edit-background-sub: #f9f9f9;
+	--se-edit-font-color: #333;
+	--se-edit-font-pre-color: #666;
+	--se-edit-font-quote-color: #999;
+	--se-edit-background-color: #fff;
+	--se-edit-background-pre-color: #f9f9f9;
 	--se-edit-border-light: #e1e1e1;
 	--se-edit-border-dark: #b1b1b1;
 	--se-edit-border-dark-n1: #c1c1c1;
@@ -21,8 +22,8 @@
 .sun-editor-editable {
 	font-family: Helvetica Neue;
 	font-size: var(--se-edit-font-size);
-	color: var(--se-edit-font);
-	background-color: var(--se-edit-background);
+	color: var(--se-edit-font-color);
+	background-color: var(--se-edit-background-color);
 	line-height: 1.5;
 	word-break: normal;
 	word-wrap: break-word;
@@ -121,9 +122,9 @@
 	padding: 8px;
 	margin: 0 0 10px;
 	font-family: monospace;
-	color: var(--se-edit-font-sub);
+	color: var(--se-edit-font-pre-color);
 	line-height: 1.45;
-	background-color: var(--se-edit-background-sub);
+	background-color: var(--se-edit-background-pre-color);
 	border: 1px solid var(--se-edit-border-light);
 	border-radius: 2px;
 	white-space: pre-wrap !important;
@@ -224,7 +225,7 @@
 	display: block;
 	font-family: inherit;
 	font-size: inherit;
-	color: #999;
+	color: var(--se-edit-font-quote-color);
 	margin-block-start: 1em;
 	margin-block-end: 1em;
 	margin-inline-start: 0;
@@ -365,7 +366,7 @@
 	width: 100%;
 	max-width: 100%;
 	margin: 0;
-	background-color: var(--se-edit-background);
+	background-color: var(--se-edit-background-color);
 	border-spacing: 0;
 	border-collapse: collapse;
 }
@@ -373,7 +374,7 @@
 /* RTL - table */
 .sun-editor-editable.se-rtl table {
 	margin: 0 0 10px auto;
-	background-color: var(--se-edit-background);
+	background-color: var(--se-edit-background-color);
 	border-collapse: separate;
 }
 
@@ -382,7 +383,7 @@
 	text-align: unset;
 	padding: 0.5em;
 	margin: 0;
-	background-color: var(--se-edit-background-sub);
+	background-color: var(--se-edit-background-pre-color);
 	border: 1px solid var(--se-edit-border-light);
 	outline: none;
 }
@@ -396,7 +397,7 @@
 }
 
 .sun-editor-editable table thead {
-	border-bottom: 2px solid var(--se-edit-font);
+	border-bottom: 2px solid var(--se-edit-font-color);
 }
 
 .sun-editor-editable table tr {
@@ -465,7 +466,7 @@
 }
 
 .sun-editor-editable .se-component.se-file-figure > figure > a[data-se-file-download] {
-	color: var(--se-edit-font);
+	color: var(--se-edit-font-color);
 	margin: 0 4px;
 }
 .sun-editor-editable .se-component.se-file-figure > figure > a::before {
@@ -567,7 +568,7 @@
 .sun-editor-editable figure figcaption {
 	padding: 1em 0.5em;
 	margin: 0;
-	background-color: var(--se-edit-background-sub);
+	background-color: var(--se-edit-background-pre-color);
 	outline: none;
 }
 
@@ -607,12 +608,12 @@
 	height: 54px;
 }
 
-/** -- Paragraph styles custom -- */
+/** ---------- Paragraph styles custom ---------- */
 /* Bordered */
 .sun-editor-editable .__se__p-bordered,
 .sun-editor .__se__p-bordered {
-	border-top: solid 1px var(--se-edit-border-dark);
-	border-bottom: solid 1px var(--se-edit-border-dark);
+	border-top: solid 1px #b1b1b1;
+	border-bottom: solid 1px #b1b1b1;
 	padding: 4px 0;
 }
 
@@ -660,14 +661,14 @@
 /* Shadow */
 .sun-editor-editable .__se__t-shadow,
 .sun-editor .__se__t-shadow {
-	text-shadow: -0.2rem -0.2rem 1rem var(--se-edit-background, 0.2rem 0.2rem 1rem --se-edit-background, 0 0 0.2rem #999, 0 0 0.4rem #888, 0 0 0.6rem #777) 0 0 0.8rem var(--se-edit-font-sub, 0 0 1rem #555);
+	text-shadow: -0.2rem -0.2rem 1rem #fff, 0.2rem 0.2rem 1rem #fff, 0 0 0.2rem #999, 0 0 0.4rem #888, 0 0 0.6rem #777, 0 0 0.8rem #666, 0 0 1rem #555;
 }
 
 /* Code */
 .sun-editor-editable .__se__t-code,
 .sun-editor .__se__t-code {
 	font-family: monospace;
-	color: var(--se-edit-font-sub);
+	color: #666;
 	background-color: rgba(27, 31, 35, 0.05);
 	border-radius: 6px;
 	padding: 0.2em 0.4em;

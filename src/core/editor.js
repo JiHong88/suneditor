@@ -392,13 +392,6 @@ Editor.prototype = {
 		if (this.frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
 
 		switch (command) {
-			case 'copy':
-			case 'cut':
-				this.execCommand(command);
-				break;
-			case 'paste':
-				// @todo
-				break;
 			case 'selectAll':
 				SELECT_ALL(this);
 				break;
