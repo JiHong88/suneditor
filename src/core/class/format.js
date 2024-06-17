@@ -1562,7 +1562,7 @@ Format.prototype = {
 	 * @private
 	 */
 	_isIgnoreNodeChange(element) {
-		return element && element.nodeType !== 3 && (domUtils.isNonEditable(element) || !this.isTextStyleNode(element));
+		return element && element.nodeType !== 3 && (domUtils.isNonEditable(element) || !this.isTextStyleNode(element) || this.component.is(element));
 	},
 
 	/**
@@ -3035,7 +3035,7 @@ Format.prototype = {
 	 */
 	_sn_getMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove) return null;
-		return domUtils.getParentElement(element, this._isNonSplitNode) || (!_isSizeNode ? domUtils.getParentElement(element, this._sn_isSizeNode.bind(this)) : null);
+		return domUtils.getParentElement(element, this._isNonSplitNode.bind(this)) || (!_isSizeNode ? domUtils.getParentElement(element, this._sn_isSizeNode.bind(this)) : null);
 	},
 
 	/**
@@ -3047,7 +3047,7 @@ Format.prototype = {
 	_sn_isMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
 		const anchor = this._isNonSplitNode(element);
-		return domUtils.getParentElement(element, this._isNonSplitNode) ? anchor : anchor || (!_isSizeNode ? this._sn_isSizeNode(element) : false);
+		return domUtils.getParentElement(element, this._isNonSplitNode.bind(this)) ? anchor : anchor || (!_isSizeNode ? this._sn_isSizeNode(element) : false);
 	},
 
 	/**
@@ -3117,13 +3117,7 @@ Format.prototype = {
 		if (!domUtils.isListCell(el)) return;
 		if (!styleArray) styleArray = this._listKebab;
 
-		const children = domUtils.getArrayItem(
-			el.childNodes,
-			function (current) {
-				return !domUtils.isBreak(current);
-			},
-			true
-		);
+		const children = domUtils.getArrayItem(el.childNodes, (current) => !domUtils.isBreak(current), true);
 		const elStyles = el.style;
 
 		const ec = [],
