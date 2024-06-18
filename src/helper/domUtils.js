@@ -799,7 +799,7 @@ export function toggleClass(element, className) {
  * @returns {boolean}
  */
 export function isEdgePoint(container, offset, dir) {
-	return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && container.nodeValue && offset === container.nodeValue.length);
+	return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && container.nodeValue && offset >= container.nodeValue.length);
 }
 
 /**

@@ -878,7 +878,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			break;
 		case 37 /** left key */:
 			if (domUtils.isEdgePoint(selectionNode, range.startOffset, 'front')) {
-				const prevEl = selectionNode.previousElementSibling;
+				const prevEl = selectionNode.previousElementSibling || domUtils.getPreviousDeepestNode(selectionNode);
 				if (prevEl && this.component.is(prevEl)) {
 					cmponentInfo = this.component.get(prevEl);
 				} else if (this.component.is(formatEl.previousElementSibling)) {
@@ -893,7 +893,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			break;
 		case 39 /** right key */:
 			if (domUtils.isEdgePoint(selectionNode, range.endOffset, 'end')) {
-				const nextEl = selectionNode.nextElementSibling;
+				const nextEl = selectionNode.nextElementSibling || domUtils.getNextDeepestNode(selectionNode);
 				if (nextEl && this.component.is(nextEl)) {
 					cmponentInfo = this.component.get(nextEl);
 				} else if (this.component.is(formatEl.nextElementSibling)) {

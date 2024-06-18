@@ -588,6 +588,7 @@ async function OnKeyDown_component(e) {
 					break;
 				case 39: // right
 					el = container.nextSibling;
+					offset = 0;
 					break;
 				case 38: {
 					// up
