@@ -1,23 +1,30 @@
 /* used color #000 , #fff , #CCC, #f5f5f5, #f9f9f9 */
 /* font color #333, background color: #fff */
 /* grey color #e1e1e1, #ececec, #d1d1d1 ,#bdbdbd, #c1c1c1 ,#b1b1b1 */
-/* blue color #eaf3ff, #dbeaff(shadow: #b7ccf2, #e6f2ff), #c4ddff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, #3288ff, #1275ff, #07d */
+/* blue color #eaf3ff, #dbeaff(shadow: #b7ccf2, #e6f2ff), #c4ddff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, var(--se-active-color), #1275ff, #07d */
 /* red color #b94a48 , #f2dede , #eed3d7, #d9534f */
 /* green color #008000 */
 /* yellow color #f0c20a */
 :root {
-	/** main, commin */
+	/** main, common */
 	--se-main-out-color: #dadada;
 	--se-main-font-family: Helvetica Neue;
 	--se-main-font-color: #000;
-	--se-main-font-size: 16px;
 	--se-main-background: #fff;
-	--se-common-font-size: 13px;
-	--se-btn-font-size: 12px;
 	--se-border-radius: 2px;
+	--se-main-font-size: 13px;
+	--se-btn-font-size: 12px;
+	--se-statusbar-font-size: 10px;
+	/* hover, active */
 	--se-active-color: #3288ff;
 	/** component */
 	--se-drag-over-color: #f0c20a;
+	/** modal, browser */
+	--se-modal-title-font-size: 15px;
+	--se-modal-input-font-size: 14px;
+	--se-browser-title-font-size: 16px;
+	/** controller */
+	--se-controller-font-size: 14px;
 	/** button group */
 	--se-btn-success-color-0: #008000;
 	--se-doc-min-padding: 1rem;
@@ -138,7 +145,7 @@
 .sun-editor .se-wrapper .se-code-viewer-mirror,
 .sun-editor .se-wrapper .cm-editor,
 .sun-editor .se-wrapper .CodeMirror {
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 }
 
 /* button children are pointer event none */
@@ -162,7 +169,7 @@
 	height: 34px;
 	margin: 1px;
 	padding: 0;
-	font-size: 12px;
+	font-size: var(--se-btn-font-size);
 	line-height: 1.8;
 	border-width: 0;
 	border-style: solid;
@@ -176,7 +183,7 @@
 }
 
 .sun-editor .se-btn.se-btn-info {
-	color: #3288ff;
+	color: var(--se-active-color);
 }
 
 .sun-editor .se-btn-w-auto {
@@ -264,10 +271,10 @@
 .sun-editor .se-btn:enabled.on:active,
 .sun-editor .se-btn:enabled.on.__se__active {
 	background-color: #d0e3ff;
-	color: #3288ff;
+	color: var(--se-active-color);
 	border-color: #d0e3ff !important;
-	outline: 1px solid #3288ff !important;
-	color: 1px solid #3288ff;
+	outline: 1px solid var(--se-active-color) !important;
+	color: 1px solid var(--se-active-color);
 	-webkit-box-shadow: 0 0 0 0.3rem #d0e3ff;
 	box-shadow: 0 0 0 0.3rem #d0e3ff;
 	transition: box-shadow 0.1s ease-in-out;
@@ -490,7 +497,7 @@
 	min-height: 32px;
 	padding: 0 14px;
 	cursor: pointer;
-	font-size: 12px;
+	font-size: var(--se-btn-font-size);
 	line-height: normal;
 	text-indent: 0;
 	text-decoration: none;
@@ -615,7 +622,7 @@
 	font-style: normal;
 	font-variant: normal;
 	text-rendering: auto;
-	font-size: 15px;
+	font-size: var(--se-modal-title-font-size);
 	line-height: 2;
 }
 
@@ -727,16 +734,16 @@
 	transition: opacity 0.3s ease, color 0.3s ease, background-color 0.3s ease;
 }
 .sun-editor .se-line-breaker-component.se-on-selected {
-	color: #3288ff;
+	color: var(--se-active-color);
 	background-color: #fff;
-	border: 1px solid #3288ff;
+	border: 1px solid var(--se-active-color);
 }
 
 .sun-editor .se-line-breaker-component:hover {
 	opacity: 0.9;
 	color: #fff;
 	background-color: #4592ff;
-	border-color: #3288ff;
+	border-color: var(--se-active-color);
 }
 
 /** --- toolbar ---------------------------------------------------------- */
@@ -945,7 +952,7 @@
 	border: 0 !important;
 }
 .sun-editor .se-btn-input input {
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	height: 34px;
 	border: 0;
 }
@@ -953,7 +960,7 @@
 	border: 1px solid #c1c1c1;
 }
 .sun-editor .se-btn-input input:focus {
-	border: 1px solid #3288ff !important;
+	border: 1px solid var(--se-active-color) !important;
 	outline: 0;
 }
 
@@ -1123,11 +1130,11 @@
 }
 
 .sun-editor .se-list-layer.se-list-format ul p {
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 }
 
 .sun-editor .se-list-layer.se-list-format ul div {
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	padding: 4px 2px;
 }
 
@@ -1162,7 +1169,7 @@
 }
 
 .sun-editor .se-list-layer.se-list-format ul blockquote {
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	color: #999;
 	height: 22px;
 	margin: 0;
@@ -1176,7 +1183,7 @@
 }
 
 .sun-editor .se-list-layer.se-list-format ul pre {
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	color: #666;
 	padding: 4px 11px;
 	margin: 0;
@@ -1277,7 +1284,7 @@
 	padding: 5px 0;
 	float: left;
 	margin: 2px 0 0;
-	font-size: 14px;
+	font-size: var(--se-main-font-size);
 	text-align: left;
 	list-style: none;
 	background-color: #fff;
@@ -1471,7 +1478,7 @@
 	display: inline-block;
 	width: auto;
 	height: 34px;
-	font-size: 12px;
+	font-size: var(--se-btn-font-size);
 	margin: 1px 0 1px 0;
 	padding: 0 4px;
 	/* border-radius: 0.25rem; */
@@ -1514,7 +1521,7 @@
 }
 
 .sun-editor .se-form-group-label label {
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	font-weight: bold;
 }
 
@@ -1561,7 +1568,7 @@
 	color: #222;
 	text-align: right;
 	width: 50px;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	padding-right: 6px;
 	overflow: hidden;
 }
@@ -1569,7 +1576,7 @@
 .sun-editor .se-wrapper .se-code-viewer {
 	background-color: #222;
 	color: #f5f5f5;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	word-break: break-all;
 	padding: 4px;
 	margin: 0;
@@ -1594,7 +1601,7 @@
 	text-overflow: ellipsis;
 	z-index: 1;
 	color: #b1b1b1;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	line-height: 1.5;
 	top: 0;
 	left: 0;
@@ -1654,7 +1661,7 @@
 	color: #666;
 	margin: 0;
 	padding: 0;
-	font-size: 10px;
+	font-size: var(--se-statusbar-font-size);
 	line-height: 1.5;
 	background: transparent;
 }
@@ -1669,7 +1676,7 @@
 	margin: 0;
 	padding: 0;
 	color: #999;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	background: transparent;
 }
 
@@ -1696,7 +1703,7 @@
 .sun-editor .se-modal label,
 .sun-editor .se-modal input,
 .sun-editor .se-modal button {
-	font-size: 14px;
+	font-size: var(--se-modal-input-font-size);
 	line-height: 1.5;
 	color: #111;
 	margin: 0;
@@ -1754,9 +1761,9 @@
 	display: inline-block;
 	padding: 5px 11px;
 	margin: 0 0 10px 0 !important;
-	font-size: 14px;
+	font-size: var(--se-modal-input-font-size);
 	font-weight: normal;
-	line-height: 1.42857143;
+	line-height: 1.4;
 	text-align: center;
 	white-space: nowrap;
 	vertical-align: middle;
@@ -1781,7 +1788,7 @@
 
 .sun-editor .se-modal .se-modal-inner .se-modal-header .se-modal-title {
 	float: left;
-	font-size: 15px;
+	font-size: var(--se-modal-title-font-size);
 	font-weight: bold;
 	margin: 0;
 	padding: 0;
@@ -1899,18 +1906,18 @@
 	display: inline-block;
 	width: auto;
 	height: 34px;
-	font-size: 14px;
+	font-size: var(--se-modal-input-font-size);
 	text-align: center;
-	line-height: 1.42857143;
+	line-height: 1.4;
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-input-control {
 	display: inline-block;
 	width: 70px;
 	height: 34px;
-	font-size: 14px;
+	font-size: var(--se-modal-input-font-size);
 	text-align: center;
-	line-height: 1.42857143;
+	line-height: 1.4;
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-flex-input-wrapper {
@@ -1970,8 +1977,8 @@
 	display: block;
 	width: 100%;
 	height: 34px;
-	font-size: 14px;
-	line-height: 1.42857143;
+	font-size: var(--se-modal-input-font-size);
+	line-height: 1.4;
 	padding: 0 4px;
 }
 
@@ -2029,7 +2036,7 @@
 	resize: vertical;
 	height: 14em;
 	border: 1px solid #3f9dff;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	padding: 4px;
 	direction: ltr;
 }
@@ -2041,7 +2048,7 @@
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview {
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > span {
@@ -2075,7 +2082,7 @@
 	display: block;
 	height: auto;
 	padding-top: 4px;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	font-weight: normal;
 	font-family: inherit;
 	color: #666;
@@ -2240,7 +2247,7 @@
 .sun-editor .se-controller .se-controller-display {
 	padding: 0 10px;
 	margin: 4px 0;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 }
 
 /* controller - button group */
@@ -2272,7 +2279,7 @@
 	border: none;
 	border-radius: var(--se-border-radius);
 	margin: 1px;
-	font-size: 12px;
+	font-size: var(--se-btn-font-size);
 	line-height: 1.5;
 	display: inline-block;
 	font-weight: normal;
@@ -2302,7 +2309,7 @@
 /* controller - controller-content - body */
 .sun-editor .se-controller .se-controller-body {
 	position: relative;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	width: 100%;
 	padding: 4px 4px 1px 4px;
 }
@@ -2326,7 +2333,7 @@
 
 .sun-editor .se-controller .se-controller-header .se-controller-title {
 	float: left;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	font-weight: bold;
 	margin: 0;
 	padding: 0;
@@ -2335,10 +2342,10 @@
 
 /* controller - resizing(image, iframe) */
 .sun-editor .se-controller-resizing {
-	font-size: 14px;
+	font-size: var(--se-controller-font-size);
 	font-style: normal;
 	font-weight: normal;
-	line-height: 1.42857143;
+	line-height: 1.4;
 }
 
 .sun-editor .se-resizing-container {
@@ -2462,7 +2469,7 @@
 	bottom: 0;
 	padding: 5px;
 	margin: 2px;
-	font-size: 12px;
+	font-size: var(--se-btn-font-size);
 	color: #fff;
 	background-color: #333;
 	border-radius: var(--se-border-radius);
@@ -2476,18 +2483,18 @@
 /* controller - table */
 .sun-editor .se-controller-table {
 	width: auto;
-	font-size: 14px;
+	font-size: var(--se-controller-font-size);
 	font-style: normal;
 	font-weight: normal;
-	line-height: 1.42857143;
+	line-height: 1.4;
 }
 
 .sun-editor .se-controller-table-cell {
 	width: auto;
-	font-size: 14px;
+	font-size: var(--se-controller-font-size);
 	font-style: normal;
 	font-weight: normal;
-	line-height: 1.42857143;
+	line-height: 1.4;
 }
 
 /* controller - table - props */
@@ -2504,10 +2511,10 @@
 
 /* controller - link */
 .sun-editor .se-controller-link {
-	font-size: 14px;
+	font-size: var(--se-controller-font-size);
 	font-style: normal;
 	font-weight: normal;
-	line-height: 1.42857143;
+	line-height: 1.4;
 }
 
 .sun-editor .se-controller-link::before,
@@ -2576,7 +2583,7 @@
 	list-style: none;
 	line-height: 28px;
 	min-height: 28px;
-	font-size: 12px;
+	font-size: var(--se-btn-font-size);
 	padding: 0 6px;
 	margin: 2px 0;
 	cursor: pointer;
@@ -2599,7 +2606,7 @@
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:hover,
 .sun-editor .se-select-menu:not(.se-select-menu-mouse-move) .se-select-item.active {
 	border-color: #d0e3ff !important;
-	outline: 1px solid #3288ff !important;
+	outline: 1px solid var(--se-active-color) !important;
 	-webkit-box-shadow: 0 0 0 0.3rem #d0e3ff;
 	box-shadow: 0 0 0 0.3rem #d0e3ff;
 	transition: box-shadow 0.1s ease-in-out;
@@ -2609,7 +2616,7 @@
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item.__se__active {
 	background-color: #dbeaff;
 	border-color: #dbeaff !important;
-	outline: 1px solid #3288ff !important;
+	outline: 1px solid var(--se-active-color) !important;
 	-webkit-box-shadow: inset 2px 2px 5px #b7ccf2, inset -2px -2px 5px #e6f2ff;
 	box-shadow: inset 2px 2px 5px #b7ccf2, inset -2px -2px 5px #e6f2ff;
 	transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
@@ -2638,7 +2645,7 @@
 .sun-editor .se-file-browser label,
 .sun-editor .se-file-browser input,
 .sun-editor .se-file-browser button {
-	font-size: 14px;
+	font-size: var(--se-modal-input-font-size);
 	line-height: 1.5;
 	color: #111;
 	margin: 0;
@@ -2696,7 +2703,7 @@
 }
 
 .sun-editor .se-file-browser .se-file-browser-header .se-file-browser-title {
-	font-size: 16px;
+	font-size: var(--se-browser-title-font-size);
 	font-weight: bold;
 	margin: 0;
 	padding: 0;
@@ -2706,7 +2713,7 @@
 /* --- browser - header - tags */
 .sun-editor .se-file-browser .se-file-browser-tags {
 	display: block;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	width: 100%;
 	padding: 0;
 	text-align: left;
@@ -2816,8 +2823,8 @@
 
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img:hover {
 	opacity: 0.8;
-	-webkit-box-shadow: 0 0 0 0.2rem #3288ff;
-	box-shadow: 0 0 0 0.2rem #3288ff;
+	-webkit-box-shadow: 0 0 0 0.2rem var(--se-active-color);
+	box-shadow: 0 0 0 0.2rem var(--se-active-color);
 }
 
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > img {
@@ -2832,7 +2839,7 @@
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > .se-file-name-image {
 	position: absolute;
 	z-index: 1;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 	color: #fff;
 	left: 0px;
 	bottom: 0;
@@ -2890,7 +2897,7 @@
 .sun-editor .se-tooltip {
 	position: relative;
 	overflow: visible;
-	font-size: 13px;
+	font-size: var(--se-main-font-size);
 }
 
 .sun-editor .se-tooltip .se-tooltip-inner {
