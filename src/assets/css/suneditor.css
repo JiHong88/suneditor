@@ -97,7 +97,7 @@
 .sun-editor .se-toolbar .se-arrow.se-arrow-down::after {border-top-color:#fafafa;}
 
 /** --- container */
-.sun-editor .se-container {position:relative; width:100%; height:100%;}
+.sun-editor .se-container {position:relative; width:auto; height:auto;}
 
 /** button */
 .sun-editor button {color:#000;}
