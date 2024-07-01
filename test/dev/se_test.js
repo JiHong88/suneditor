@@ -472,7 +472,32 @@ window.editor_root = suneditor.create(
 		<img src="http://suneditor.com/docs/welsh Corgi.jpg">
 		</span>
 		sss</p>`,
-
+		value: `
+		<h1>Header~1</h1>
+		<p>test fdste text</p>
+		<h2>header 22222</h2>
+		<p>2222222</p>
+		<p>2222222aa</p>
+		<p>2222222sadsa</p>
+		<p>2222222sadsa</p>
+		<p>2222222sadsa</p>
+		<p>2222222sadsa</p>
+		<p>2222222sadsa</p>
+		<h3>header33333</h3>
+		<p>33333</p>
+		<p>aafffff</p>
+		<h4>hdaedde444</h4>
+		<p>4894984o8p</p>
+		<p>4894984o8p</p>
+		<p>4894984o8p</p>
+		<p>4894984o8p</p>
+		<h5>header55555</h5>
+		<p>ndfjsjio;dfsaji;fads</p>
+		<p>dfs78oyfeaw</p>
+		<h6>header66666</h6>
+		<p>asfhjfds</p>
+		<p>fdsaa99999</p>
+		`,
 		// <p>test abc  sss</p>
 		// 		`,
 		// syncTab: true,

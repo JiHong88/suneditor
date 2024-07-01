@@ -25,6 +25,7 @@ export default function (editor) {
 	function setContentFromStack(increase) {
 		const prevKey = stack[stackIndex];
 		const prevRoot = rootStack[prevKey];
+		const fc = editor.frameContext;
 
 		stackIndex += increase;
 		const rootKey = increase < 0 && prevKey !== stack[stackIndex] && prevRoot.index > 0 ? prevKey : stack[stackIndex];
@@ -63,10 +64,15 @@ export default function (editor) {
 		editor._offCurrentController();
 		editor._checkComponents();
 		editor.char.display();
-		editor._resourcesStateChange(editor.frameContext);
+		editor._resourcesStateChange(fc);
+
+		// document type
+		if (editor.documentType) {
+			editor.documentType.reset(fc);
+		}
 
 		// onChange
-		change(editor.frameContext, root.index);
+		change(fc, root.index);
 	}
 
 	function setStack(content, range, rootKey, increase) {

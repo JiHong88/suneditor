@@ -1152,6 +1152,10 @@ function OnSelectionchange_document(_wd) {
 			anchorNode = null;
 			this.selection._init();
 			this.applyTagEffect();
+			if (this.editor.documentType) {
+				const el = domUtils.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
+				this.editor.documentType.on(el);
+			}
 		}
 	});
 }

@@ -1,5 +1,7 @@
 :root {
 	--se-edit-font-size: 13px;
+	--se-edit-inner-padding: 16px;
+	--se-edit-line-height: 1.5;
 	--se-edit-font-color: #333;
 	--se-edit-font-pre: #666;
 	--se-edit-font-quote: #999;
@@ -25,10 +27,10 @@
 	font-size: var(--se-edit-font-size);
 	color: var(--se-edit-font-color);
 	background-color: var(--se-edit-background-color);
-	line-height: 1.5;
+	line-height: var(--se-edit-line-height);
 	word-break: normal;
 	word-wrap: break-word;
-	padding: 16px;
+	padding: var(--se-edit-inner-padding);
 	margin: 0;
 }
 

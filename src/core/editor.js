@@ -5,6 +5,7 @@ import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE
 import History from './base/history';
 import EventManager from './base/eventManager';
 import Events from './base/events';
+import DocumentType from './section/documentType';
 
 // class injector
 import ClassInjector from '../editorInjector/_classes';
@@ -1138,6 +1139,7 @@ Editor.prototype = {
 			'<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 
 		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
+		if (this.options.get('type') === 'document') this.documentType.init(e);
 	},
 
 	/**
@@ -1481,7 +1483,7 @@ Editor.prototype = {
 		this.notice = new Notice(this);
 		// main classes
 		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
-		if (this.options.has('_subMode'))
+		if (this.options.has('_subMode')) {
 			this.subToolbar = new Toolbar(this, {
 				keyName: 'toolbar.sub',
 				balloon: this.isSubBalloon,
@@ -1489,6 +1491,7 @@ Editor.prototype = {
 				inline: false,
 				res: this._responsiveButtons_sub
 			});
+		}
 		this.selection = new Selection(this);
 		this.html = new HTML(this);
 		this.nodeTransform = new NodeTransform(this);
@@ -1527,6 +1530,11 @@ Editor.prototype = {
 		if (this.subToolbar) delete this.subToolbar.subToolbar;
 
 		this._responsiveButtons = this._responsiveButtons_res = null;
+
+		// document type
+		if (this.options.get('type') === 'document') {
+			this.documentType = new DocumentType(this);
+		}
 	},
 
 	async __Create(originOptions) {

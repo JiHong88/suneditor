@@ -6,6 +6,7 @@ const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DELETE_KEYCODE = /^(8|46)$/;
 const NON_TEXT_KEYCODE = /^(8|9|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145|229)$/;
 const HISTORY_IGNORE_KEYCODE = /^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145|229)$/;
+const DOCUMENT_TYPE_OBSERVER_KEYCODE = /^(8|13|46)$/;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 let _styleNodes = null;
 
@@ -866,9 +867,15 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
 
-	// next component
-	if (!DIR_KEYCODE.test(keyCode)) return;
+	if (!DIR_KEYCODE.test(keyCode)) {
+		// document type
+		if (!range.collapsed && this.editor.documentType) {
+			this.editor.documentType.reset(frameContext);
+		}
+		return;
+	}
 
+	// next component
 	let cmponentInfo = null;
 	switch (keyCode) {
 		case 38 /** up key */:
@@ -944,6 +951,10 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 		this.applyTagEffect();
 
 		this.history.push(false);
+
+		// document type
+		if (this.editor.documentType) this.editor.documentType.reset(frameContext);
+
 		return;
 	}
 
@@ -1000,6 +1011,16 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 	}
 
 	this.char.test('', false);
+
+	// document type
+	if (this.editor.documentType) {
+		if (DOCUMENT_TYPE_OBSERVER_KEYCODE.test(keyCode)) {
+			this.editor.documentType.reset(frameContext);
+		} else {
+			const el = domUtils.getParentElement(selectionNode, (current) => current.nodeType === 1);
+			this.editor.documentType.onChangeText(el);
+		}
+	}
 
 	// user event
 	if (this.triggerEvent('onKeyUp', { frameContext, event: e }) === false) return;
