@@ -1314,7 +1314,7 @@ Editor.prototype = {
 			if (typeof plugin.constructor.component === 'function') {
 				this._componentManager.push(
 					function (launcher, element) {
-						if (!(element = launcher.component?.call(this, element))) return null;
+						if (!element || !(element = launcher.component?.call(this, element))) return null;
 						return {
 							target: element,
 							pluginName: launcher.key,
