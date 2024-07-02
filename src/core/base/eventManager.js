@@ -612,6 +612,10 @@ EventManager.prototype = {
 
 		if (cleanData) {
 			this.html.insert(cleanData, false, true, true);
+			// document type
+			if (frameContext.has('documentType')) {
+				frameContext.get('documentType').reset();
+			}
 			return false;
 		}
 	},
@@ -1152,9 +1156,9 @@ function OnSelectionchange_document(_wd) {
 			anchorNode = null;
 			this.selection._init();
 			this.applyTagEffect();
-			if (this.editor.documentType) {
+			if (root.has('documentType')) {
 				const el = domUtils.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
-				this.editor.documentType.on(el);
+				root.get('documentType').on(el);
 			}
 		}
 	});

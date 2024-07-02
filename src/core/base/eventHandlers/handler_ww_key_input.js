@@ -867,11 +867,9 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
 
-	if (!DIR_KEYCODE.test(keyCode)) {
-		// document type
-		if (!range.collapsed && this.editor.documentType) {
-			this.editor.documentType.reset(frameContext);
-		}
+	// document type
+	if (frameContext.has('documentType') && !range.collapsed && !ctrl && !alt && !shift && !DIR_KEYCODE.test(keyCode)) {
+		frameContext.get('documentType').reset();
 		return;
 	}
 
@@ -953,7 +951,9 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 		this.history.push(false);
 
 		// document type
-		if (this.editor.documentType) this.editor.documentType.reset(frameContext);
+		if (frameContext.has('documentType')) {
+			frameContext.get('documentType').reset();
+		}
 
 		return;
 	}
@@ -1013,12 +1013,14 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 	this.char.test('', false);
 
 	// document type
-	if (this.editor.documentType) {
+	if (frameContext.has('documentType')) {
 		if (DOCUMENT_TYPE_OBSERVER_KEYCODE.test(keyCode)) {
-			this.editor.documentType.reset(frameContext);
+			frameContext.get('documentType').reset();
+			const el = domUtils.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
+			frameContext.get('documentType').on(el);
 		} else {
 			const el = domUtils.getParentElement(selectionNode, (current) => current.nodeType === 1);
-			this.editor.documentType.onChangeText(el);
+			frameContext.get('documentType').onChangeText(el);
 		}
 	}
 

@@ -76,9 +76,9 @@
 	--se-doc-info-inner-line-indent-h5: 1.6em;
 	--se-doc-info-inner-line-indent-h6: 2em;
 	/* document type indent - weight */
-	--se-doc-info-inner-line-weight-h1: 500;
-	--se-doc-info-inner-line-weight-h2: 400;
-	--se-doc-info-inner-line-weight-h3: 300;
+	--se-doc-info-inner-line-weight-h1: 700;
+	--se-doc-info-inner-line-weight-h2: 500;
+	--se-doc-info-inner-line-weight-h3: 400;
 	--se-doc-info-inner-line-weight-h4: 300;
 	--se-doc-info-inner-line-weight-h5: 300;
 	--se-doc-info-inner-line-weight-h6: 300;

@@ -2,60 +2,60 @@
  * @fileoverview DocumentType class
  */
 
-import EditorInjector from '../../editorInjector';
 import { domUtils, numbers } from '../../helper';
 
-const DocumentType = function (editor) {
-	EditorInjector.call(this, editor);
-
+const DocumentType = function (editor, fc) {
 	// members
-	this.ww = null;
+	this.editor = editor;
+	this.fc = fc;
+	this.ww = fc.get('wysiwyg');
 	this.innerHeaders = [];
+	this.inner = null;
+
+	// init
+	const headers = this._getHeaders();
+	const inner = (this.inner = fc.get('typeDocumentInner'));
+	let headerHTML = '';
+	for (let i = 0, len = headers.length, h; i < len; i++) {
+		h = headers[i];
+		headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}">${h.textContent}</div>`;
+	}
+	inner.innerHTML = headerHTML;
+	this.innerHeaders = inner.querySelectorAll('div');
+
+	// Event
+	this.editor.eventManager.addEvent(inner, 'click', OnClickHeader.bind(this, this.ww));
 };
 
 DocumentType.prototype = {
-	init(fc) {
-		this.ww = fc.get('wysiwyg');
+	reset() {
 		const headers = this._getHeaders();
-		const inner = fc.get('typeDocumentInner');
-		let headerHTML = '';
-		for (let i = 0, len = headers.length, h; i < len; i++) {
-			h = headers[i];
-			headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}">${h.textContent}</div>`;
-		}
-		inner.innerHTML = headerHTML;
-		this.innerHeaders = inner.querySelectorAll('div');
-
-		// Event
-		this.eventManager.addEvent(inner, 'click', OnClickHeader.bind(this, this.ww));
-	},
-
-	reset(fc) {
-		const headers = this._getHeaders();
-		const inner = fc.get('typeDocumentInner');
+		const inner = this.inner;
+		const innerHeaders = this.innerHeaders;
 
 		// update or new headers
-		for (let i = 0, len = headers.length, h; i < len; i++) {
+		for (let i = 0, len = headers.length, h, hClass, innerH; i < len; i++) {
 			h = headers[i];
-			const headerClass = `se-doc-h${numbers.get(h.nodeName)}`;
+			hClass = `se-doc-h${numbers.get(h.nodeName)}`;
+			innerH = innerHeaders[i];
 
-			if (i < this.innerHeaders.length) {
-				if (!this.innerHeaders[i].classList.contains(headerClass) || this.innerHeaders[i].textContent !== h.textContent) {
-					this.innerHeaders[i].textContent = h.textContent;
-					this.innerHeaders[i].className = headerClass;
+			if (i < innerHeaders.length) {
+				if (!innerH.classList.contains(hClass) || innerH.textContent !== h.textContent) {
+					innerH.textContent = h.textContent;
+					innerH.className = `se-doc-item ${hClass}`;
 				}
 			} else {
 				const newHeader = document.createElement('div');
-				newHeader.className = headerClass;
+				newHeader.className = `se-doc-item ${hClass}`;
 				newHeader.textContent = h.textContent;
 				inner.appendChild(newHeader);
 			}
 		}
 
 		// remove
-		if (this.innerHeaders.length > headers.length) {
-			for (let i = headers.length; i < this.innerHeaders.length; i++) {
-				inner.removeChild(this.innerHeaders[i]);
+		if (innerHeaders.length > headers.length) {
+			for (let i = headers.length; i < innerHeaders.length; i++) {
+				inner.removeChild(innerHeaders[i]);
 			}
 		}
 
@@ -66,7 +66,7 @@ DocumentType.prototype = {
 		if (!this._is(line)) line = this._findLinesHeader(line);
 		if (!line) return;
 
-		const item = this.findItem(line);
+		const item = this._findItem(line);
 		if (!item) return;
 
 		domUtils.removeClass(this.innerHeaders, 'active');
@@ -75,12 +75,12 @@ DocumentType.prototype = {
 
 	onChangeText(header) {
 		if (!this._is(header)) return;
-		const item = this.findItem(header);
+		const item = this._findItem(header);
 		if (!item) return;
 		item.textContent = header.textContent;
 	},
 
-	findItem(header) {
+	_findItem(header) {
 		const headers = this._getHeaders();
 		const index = Array.prototype.indexOf.call(headers, header);
 
@@ -92,11 +92,11 @@ DocumentType.prototype = {
 	},
 
 	_findLinesHeader(line) {
-		while (line) {
+		while (line && line !== this.ww) {
 			if (this._is(line)) {
 				return line;
 			}
-			line = line.previousElementSibling;
+			line = line.previousElementSibling || line.parentElement;
 		}
 
 		return null;

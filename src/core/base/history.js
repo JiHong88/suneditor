@@ -67,8 +67,8 @@ export default function (editor) {
 		editor._resourcesStateChange(fc);
 
 		// document type
-		if (editor.documentType) {
-			editor.documentType.reset(fc);
+		if (fc.has('documentType')) {
+			fc.get('documentType').reset();
 		}
 
 		// onChange

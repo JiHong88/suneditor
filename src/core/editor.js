@@ -1134,12 +1134,18 @@ Editor.prototype = {
 	 * @private
 	 */
 	_initWysiwygArea(e, value) {
+		// set content
 		e.get('wysiwyg').innerHTML =
 			this.html.clean(typeof value === 'string' ? value : (/^TEXTAREA$/i.test(e.get('originElement').nodeName) ? e.get('originElement').value : e.get('originElement').innerHTML) || '', true, null, null) ||
 			'<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 
+		// char counter
 		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
-		if (this.options.get('type') === 'document') this.documentType.init(e);
+
+		// document type
+		if (this.options.get('type') === 'document') {
+			e.set('documentType', new DocumentType(this, e));
+		}
 	},
 
 	/**
@@ -1530,11 +1536,6 @@ Editor.prototype = {
 		if (this.subToolbar) delete this.subToolbar.subToolbar;
 
 		this._responsiveButtons = this._responsiveButtons_res = null;
-
-		// document type
-		if (this.options.get('type') === 'document') {
-			this.documentType = new DocumentType(this);
-		}
 	},
 
 	async __Create(originOptions) {
