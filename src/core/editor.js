@@ -1145,6 +1145,7 @@ Editor.prototype = {
 		// document type
 		if (this.options.get('type') === 'document') {
 			e.set('documentType', new DocumentType(this, e));
+			if (e.get('documentType').useHeader) e.set('documentType-use-header', true);
 		}
 	},
 

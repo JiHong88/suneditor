@@ -11,24 +11,29 @@ const DocumentType = function (editor, fc) {
 	this.ww = fc.get('wysiwyg');
 	this.innerHeaders = [];
 	this.inner = null;
+	this.useHeader = editor.options.get('type-options').includes('header');
+	this.usePage = editor.options.get('type-options').includes('page');
 
-	// init
-	const headers = this._getHeaders();
-	const inner = (this.inner = fc.get('typeDocumentInner'));
-	let headerHTML = '';
-	for (let i = 0, len = headers.length, h; i < len; i++) {
-		h = headers[i];
-		headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}">${h.textContent}</div>`;
+	// init header
+	if (this.useHeader) {
+		const headers = this._getHeaders();
+		const inner = (this.inner = fc.get('typeDocumentInner'));
+		let headerHTML = '';
+		for (let i = 0, len = headers.length, h; i < len; i++) {
+			h = headers[i];
+			headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}">${h.textContent}</div>`;
+		}
+		inner.innerHTML = headerHTML;
+		this.innerHeaders = inner.querySelectorAll('div');
+
+		this.editor.eventManager.addEvent(inner, 'click', OnClickHeader.bind(this, this.ww));
 	}
-	inner.innerHTML = headerHTML;
-	this.innerHeaders = inner.querySelectorAll('div');
-
-	// Event
-	this.editor.eventManager.addEvent(inner, 'click', OnClickHeader.bind(this, this.ww));
 };
 
 DocumentType.prototype = {
 	reset() {
+		if (!this.useHeader) return;
+
 		const headers = this._getHeaders();
 		const inner = this.inner;
 		const innerHeaders = this.innerHeaders;
@@ -63,6 +68,8 @@ DocumentType.prototype = {
 	},
 
 	on(line) {
+		if (!this.useHeader) return;
+
 		if (!this._is(line)) line = this._findLinesHeader(line);
 		if (!line) return;
 
@@ -74,6 +81,8 @@ DocumentType.prototype = {
 	},
 
 	onChangeText(header) {
+		if (!this.useHeader) return;
+
 		if (!this._is(header)) return;
 		const item = this._findItem(header);
 		if (!item) return;

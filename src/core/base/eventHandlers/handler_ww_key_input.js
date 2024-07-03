@@ -914,7 +914,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	}
 
 	// document type
-	if (frameContext.has('documentType') && !range.collapsed && !ctrl && !alt && !shift && !DIR_KEYCODE.test(keyCode)) {
+	if (frameContext.has('documentType-use-header') && !range.collapsed && !ctrl && !alt && !shift && !DIR_KEYCODE.test(keyCode)) {
 		frameContext.get('documentType').reset();
 		return;
 	}
@@ -997,7 +997,7 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 		this.history.push(false);
 
 		// document type
-		if (frameContext.has('documentType')) {
+		if (frameContext.has('documentType-use-header')) {
 			frameContext.get('documentType').reset();
 		}
 
@@ -1059,7 +1059,7 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 	this.char.test('', false);
 
 	// document type
-	if (frameContext.has('documentType')) {
+	if (frameContext.has('documentType-use-header')) {
 		if (DOCUMENT_TYPE_OBSERVER_KEYCODE.test(keyCode)) {
 			frameContext.get('documentType').reset();
 			const el = domUtils.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));

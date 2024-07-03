@@ -189,7 +189,7 @@ const Constructor = function (editorTargets, options) {
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') });
 		// document type
-		if (o.get('type') === 'document') {
+		if (o.get('type-options').includes('header')) {
 			const docLines = domUtils.createElement('DIV', { class: 'se-document-lines' }, '<div class="se-document-lines-inner"></div>');
 			editor_div.appendChild(docLines);
 		}
@@ -371,7 +371,8 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('__lineFormatFilter', options.__lineFormatFilter ?? true);
 	o.set('__pluginRetainFilter', options.__pluginRetainFilter ?? true);
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
-	o.set('type', options.type || 'none'); // none, document
+	o.set('type', options.type?.split(':')[0] || ''); // document:header|page
+	o.set('type-options', options.type?.split(':')[1] || '');
 	o.set('externalLibs', options.externalLibs || {});
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);

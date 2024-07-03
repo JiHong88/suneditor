@@ -67,7 +67,7 @@ export default function (editor) {
 		editor._resourcesStateChange(fc);
 
 		// document type
-		if (fc.has('documentType')) {
+		if (fc.has('documentType-use-header')) {
 			fc.get('documentType').reset();
 		}
 
