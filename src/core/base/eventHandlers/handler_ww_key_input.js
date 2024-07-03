@@ -98,6 +98,31 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				return false;
 			}
 
+			// line delete
+			if (this.format.isLine(formatEl) && domUtils.isEdgePoint(range.endContainer, range.endOffset, 'front') && !range.endContainer.previousSibling && this.format.isLine(formatEl.previousElementSibling)) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				const prev = formatEl.previousElementSibling;
+				const formatChild = formatEl.childNodes;
+				const focusNode = formatChild[0];
+
+				if (domUtils.isZeroWith(prev)) {
+					domUtils.removeItem(prev);
+					this.selection.setRange(focusNode, 0, focusNode, 0);
+					return;
+				}
+
+				while (formatChild[0]) {
+					prev.appendChild(formatChild[0]);
+				}
+
+				domUtils.removeItem(formatEl);
+				this.selection.setRange(focusNode, 0, focusNode, 0);
+
+				return;
+			}
+
 			if (
 				!selectRange &&
 				!formatEl.previousElementSibling &&
@@ -308,6 +333,27 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				e.preventDefault();
 				e.stopPropagation();
 				break;
+			}
+
+			// line delete
+			if (this.format.isLine(formatEl) && domUtils.isEdgePoint(range.startContainer, range.endOffset, 'end') && !range.startContainer.nextSibling && this.format.isLine(formatEl.nextElementSibling)) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				const next = formatEl.nextElementSibling;
+				if (domUtils.isZeroWith(next)) {
+					domUtils.removeItem(next);
+					return;
+				}
+
+				const nextChild = next.childNodes;
+				while (nextChild[0]) {
+					formatEl.appendChild(nextChild[0]);
+				}
+
+				domUtils.removeItem(next);
+
+				return;
 			}
 
 			// line component
