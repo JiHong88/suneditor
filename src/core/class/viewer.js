@@ -107,6 +107,16 @@ Viewer.prototype = {
 		this.editor._checkPlaceholder();
 		domUtils.setDisabled(this.editor._codeViewDisabledButtons, value);
 
+		// document type
+		if (fc.has('documentType-use-header')) {
+			if (value) {
+				fc.get('documentTypeInner').style.display = 'none';
+			} else {
+				fc.get('documentTypeInner').style.display = '';
+				fc.get('documentType').reset();
+			}
+		}
+
 		// user event
 		this.triggerEvent('onToggleCodeView', { frameContext: fc, is: fc.get('isCodeView') });
 	},

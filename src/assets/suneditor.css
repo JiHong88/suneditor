@@ -1668,6 +1668,9 @@
 	outline: none;
 }
 
+.sun-editor .se-wrapper .se-code-wrapper {
+	width: 100%;
+}
 .sun-editor .se-wrapper .se-code-wrapper .se-code-view-line {
 	background-color: var(--se-main-background-color2);
 	color: #222;

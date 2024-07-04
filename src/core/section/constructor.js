@@ -248,7 +248,7 @@ const Constructor = function (editorTargets, options) {
 		// document type
 		let documentTypeInner = null;
 		if (o.get('type-options').includes('header')) {
-			documentTypeInner = domUtils.createElement('DIV', { class: 'se-document-lines' }, '<div class="se-document-lines-inner"></div>');
+			documentTypeInner = domUtils.createElement('DIV', { class: 'se-document-lines', style: `height: ${to.get('height')};` }, '<div class="se-document-lines-inner"></div>');
 		}
 
 		// set container
@@ -372,7 +372,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('__lineFormatFilter', options.__lineFormatFilter ?? true);
 	o.set('__pluginRetainFilter', options.__pluginRetainFilter ?? true);
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
-	o.set('type', options.type?.split(':')[0] || ''); // document:header|page
+	o.set('type', options.type?.split(':')[0] || ''); // document:header,page
 	o.set('type-options', options.type?.split(':')[1] || '');
 	o.set('externalLibs', options.externalLibs || {});
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
