@@ -188,11 +188,6 @@ const Constructor = function (editorTargets, options) {
 		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (to.get('_rtl') ? ' se-rtl' : '') });
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') });
-		// document type
-		if (o.get('type-options').includes('header')) {
-			const docLines = domUtils.createElement('DIV', { class: 'se-document-lines' }, '<div class="se-document-lines-inner"></div>');
-			editor_div.appendChild(docLines);
-		}
 
 		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
@@ -250,10 +245,16 @@ const Constructor = function (editorTargets, options) {
 			textarea = codeMirrorEl;
 		}
 
+		// document type
+		let documentTypeInner = null;
+		if (o.get('type-options').includes('header')) {
+			documentTypeInner = domUtils.createElement('DIV', { class: 'se-document-lines' }, '<div class="se-document-lines-inner"></div>');
+		}
+
 		// set container
 		top_div.appendChild(container);
 		rootKeys.push(key);
-		frameRoots.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, codeWrapper, textarea, default_status_bar || statusbar, key));
+		frameRoots.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, codeWrapper, textarea, default_status_bar || statusbar, documentTypeInner, key));
 	}
 	/** frame - root set - end -------------------------------------------------------------- */
 

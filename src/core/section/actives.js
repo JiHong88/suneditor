@@ -71,6 +71,7 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 		domUtils.changeTxt(e.querySelector('.se-tooltip-text'), editor.lang[rtl ? 'dir_ltr' : 'dir_rtl']);
 		domUtils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
 	});
+
 	if (rtl) {
 		domUtils.addClass(commandTargets.get('dir_rtl'), 'active');
 		domUtils.removeClass(commandTargets.get('dir_ltr'), 'active');

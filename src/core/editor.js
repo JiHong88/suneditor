@@ -554,6 +554,12 @@ Editor.prototype = {
 
 			DIR_BTN_ACTIVE(this, rtl);
 
+			// document type
+			if (fc.has('documentType-use-header')) {
+				if (rtl) fc.get('wrapper').appendChild(fc.get('documentTypeInner'));
+				else fc.get('wrapper').insertBefore(fc.get('documentTypeInner'), fc.get('wysiwygFrame'));
+			}
+
 			if (this.isBalloon) this.toolbar._showBalloon();
 			else if (this.isSubBalloon) this.subToolbar._showBalloon();
 		} catch (e) {
@@ -1577,6 +1583,10 @@ Editor.prototype = {
 
 		this.applyFrameRoots((e) => {
 			e.get('wrapper').appendChild(e.get('wysiwygFrame'));
+			if (e.get('documentTypeInner')) {
+				if (this.options.get('_rtl')) e.get('wrapper').appendChild(e.get('documentTypeInner'));
+				else e.get('wrapper').insertBefore(e.get('documentTypeInner'), e.get('wysiwygFrame'));
+			}
 		});
 
 		if (iframePromises.length > 0) {

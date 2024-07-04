@@ -17,7 +17,7 @@ const DocumentType = function (editor, fc) {
 	// init header
 	if (this.useHeader) {
 		const headers = this._getHeaders();
-		const inner = (this.inner = fc.get('typeDocumentInner'));
+		const inner = (this.inner = fc.get('documentTypeInner').querySelector('.se-document-lines-inner'));
 		let headerHTML = '';
 		for (let i = 0, len = headers.length, h; i < len; i++) {
 			h = headers[i];

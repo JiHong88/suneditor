@@ -7,11 +7,12 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {Element} wwFrame Editor wysiwyg frame
  * @param {Element} codeWrapper Editor code view wrapper
  * @param {Element} codeFrame Editor code view frame
+ * @param {Element} documentTypeInner Document type inner
  * @param {Element|null} statusbar Editor statusbar
  * @param {any} key root key
  * @returns {Map}
  */
-export const CreateFrameContext = function (editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, key) {
+export const CreateFrameContext = function (editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, documentTypeInner, key) {
 	const m = new Map([
 		['key', key],
 		['options', editorTarget.options],
@@ -19,7 +20,7 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeWrap
 		['topArea', top],
 		['container', top.querySelector('.se-container')],
 		['wrapper', top.querySelector('.se-wrapper')],
-		['typeDocumentInner', top.querySelector('.se-document-lines-inner')],
+		['documentTypeInner', documentTypeInner],
 		['wysiwygFrame', wwFrame],
 		['wysiwyg', wwFrame], // options.iframe ? wwFrame.contentDocument.body : wwFrame
 		['codeWrapper', codeWrapper],

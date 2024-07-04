@@ -3393,28 +3393,28 @@
 	padding: var(--se-doc-info-inner-padding) 0 var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h1 {
-	padding-left: var(--se-doc-info-inner-line-padding);
-	padding-right: var(--se-doc-info-inner-line-indent-h1);
+	padding-right: var(--se-doc-info-inner-line-padding);
+	padding-left: var(--se-doc-info-inner-line-indent-h1);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h2 {
-	padding-left: var(--se-doc-info-inner-line-padding);
-	padding-right: var(--se-doc-info-inner-line-indent-h2);
+	padding-right: var(--se-doc-info-inner-line-padding);
+	padding-left: var(--se-doc-info-inner-line-indent-h2);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h3 {
-	padding-left: var(--se-doc-info-inner-line-padding);
-	padding-right: var(--se-doc-info-inner-line-indent-h3);
+	padding-right: var(--se-doc-info-inner-line-padding);
+	padding-left: var(--se-doc-info-inner-line-indent-h3);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h4 {
-	padding-left: var(--se-doc-info-inner-line-padding);
-	padding-right: var(--se-doc-info-inner-line-indent-h4);
+	padding-right: var(--se-doc-info-inner-line-padding);
+	padding-left: var(--se-doc-info-inner-line-indent-h4);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h5 {
-	padding-left: var(--se-doc-info-inner-line-padding);
-	padding-right: var(--se-doc-info-inner-line-indent-h5);
+	padding-right: var(--se-doc-info-inner-line-padding);
+	padding-left: var(--se-doc-info-inner-line-indent-h5);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h6 {
-	padding-left: var(--se-doc-info-inner-line-padding);
-	padding-right: var(--se-doc-info-inner-line-indent-h6);
+	padding-right: var(--se-doc-info-inner-line-padding);
+	padding-left: var(--se-doc-info-inner-line-indent-h6);
 }
 
 /** --- RTL end -------------------------------------------------------------------------------------------------------------------------------------------------- */
