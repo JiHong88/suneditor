@@ -12,6 +12,7 @@ const DocumentType = function (editor, fc) {
 	this.innerHeaders = [];
 	this._wwHeaders = [];
 	this.inner = null;
+	this.page = null;
 	this.useHeader = editor.options.get('type-options').includes('header');
 	this.usePage = editor.options.get('type-options').includes('page');
 
@@ -28,6 +29,11 @@ const DocumentType = function (editor, fc) {
 		this.innerHeaders = inner.querySelectorAll('div');
 
 		this.editor.eventManager.addEvent(inner, 'click', OnClickHeader.bind(this, this.ww));
+	}
+
+	// init page
+	if (this.usePage) {
+		this.page = fc.get('documentTypePage');
 	}
 };
 
@@ -68,6 +74,31 @@ DocumentType.prototype = {
 		this.innerHeaders = inner.querySelectorAll('div');
 	},
 
+	rePage(height) {
+		if (!this.page) return;
+
+		const page = this.page;
+
+		// DPI
+		const dpi = window.devicePixelRatio;
+		const A4_HEIGHT_INCHES = 11.7; // A4 height(inches)
+		const A4_HEIGHT = A4_HEIGHT_INCHES * dpi * 96; // 1 inch = 96px
+
+		const totalPages = Math.ceil(height / A4_HEIGHT);
+
+		this.page.innerHTML = '';
+		const pageHeights = [];
+		for (let i = 0; i < totalPages; i++) {
+			const pageNumber = document.createElement('div');
+			pageNumber.style.position = 'absolute';
+			pageNumber.style.top = `${i * A4_HEIGHT}px`;
+			pageNumber.innerText = `${i + 1}`;
+			page.appendChild(pageNumber);
+		}
+
+		console.log(`Total pages: ${totalPages}`);
+		console.log(`Page heights: ${pageHeights}`);
+	},
 	on(line) {
 		if (!this.useHeader) return;
 
