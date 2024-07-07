@@ -614,7 +614,7 @@ EventManager.prototype = {
 			this.html.insert(cleanData, false, true, true);
 			// document type
 			if (frameContext.has('documentType-use-header')) {
-				frameContext.get('documentType').reset();
+				frameContext.get('documentType').reHeader();
 			}
 			return false;
 		}
@@ -1156,6 +1156,8 @@ function OnSelectionchange_document(_wd) {
 			anchorNode = null;
 			this.selection._init();
 			this.applyTagEffect();
+
+			// document type
 			if (root.has('documentType-use-header')) {
 				const el = domUtils.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
 				root.get('documentType').on(el);

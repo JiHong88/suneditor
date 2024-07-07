@@ -32,7 +32,7 @@ const DocumentType = function (editor, fc) {
 };
 
 DocumentType.prototype = {
-	reset() {
+	reHeader() {
 		if (!this.useHeader) return;
 
 		const headers = this._getHeaders();

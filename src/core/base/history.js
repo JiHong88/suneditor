@@ -68,7 +68,7 @@ export default function (editor) {
 
 		// document type
 		if (fc.has('documentType-use-header')) {
-			fc.get('documentType').reset();
+			fc.get('documentType').reHeader();
 		}
 
 		// onChange

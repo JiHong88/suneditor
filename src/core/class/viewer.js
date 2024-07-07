@@ -113,7 +113,7 @@ Viewer.prototype = {
 				fc.get('documentTypeInner').style.display = 'none';
 			} else {
 				fc.get('documentTypeInner').style.display = '';
-				fc.get('documentType').reset();
+				fc.get('documentType').reHeader();
 			}
 		}
 

@@ -10,6 +10,44 @@ const DOCUMENT_TYPE_OBSERVER_KEYCODE = /^(13)$/;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 let _styleNodes = null;
 
+function LineDelete_next(formatEl) {
+	const focusNode = formatEl.lastChild;
+
+	const next = formatEl.nextElementSibling;
+	if (domUtils.isZeroWith(next)) {
+		domUtils.removeItem(next);
+		return focusNode;
+	}
+
+	const nextChild = next.childNodes;
+	while (nextChild[0]) {
+		formatEl.appendChild(nextChild[0]);
+	}
+
+	domUtils.removeItem(next);
+
+	return focusNode;
+}
+
+function LineDelete_prev(formatEl) {
+	const formatChild = formatEl.childNodes;
+	const prev = formatEl.previousElementSibling;
+	const focusNode = formatChild[0];
+
+	if (domUtils.isZeroWith(prev)) {
+		domUtils.removeItem(prev);
+		return focusNode;
+	}
+
+	while (formatChild[0]) {
+		prev.appendChild(formatChild[0]);
+	}
+
+	domUtils.removeItem(formatEl);
+
+	return focusNode;
+}
+
 export function OnInput_wysiwyg(frameContext, e) {
 	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
 		e.preventDefault();
@@ -99,26 +137,27 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			}
 
 			// line delete
-			if (this.format.isLine(formatEl) && domUtils.isEdgePoint(range.endContainer, range.endOffset, 'front') && !range.endContainer.previousSibling && this.format.isLine(formatEl.previousElementSibling)) {
+			if (this.format.isLine(formatEl) && (!range.collapsed || domUtils.isEdgePoint(range.endContainer, range.endOffset, 'front')) && !range.endContainer.previousSibling && this.format.isLine(formatEl.previousElementSibling)) {
 				e.preventDefault();
 				e.stopPropagation();
 
-				const prev = formatEl.previousElementSibling;
-				const formatChild = formatEl.childNodes;
-				const focusNode = formatChild[0];
-
-				if (domUtils.isZeroWith(prev)) {
-					domUtils.removeItem(prev);
-					this.selection.setRange(focusNode, 0, focusNode, 0);
+				let focusNode;
+				if (!range.collapsed) {
+					this.html.remove();
+					if (formatEl.contains(range.startContainer)) {
+						focusNode = LineDelete_next(formatEl);
+						this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
+					} else {
+						focusNode = LineDelete_prev(formatEl);
+						this.selection.setRange(focusNode, 0, focusNode, 0);
+					}
+					this.history.push(true);
 					return;
 				}
 
-				while (formatChild[0]) {
-					prev.appendChild(formatChild[0]);
-				}
-
-				domUtils.removeItem(formatEl);
+				focusNode = LineDelete_prev(formatEl);
 				this.selection.setRange(focusNode, 0, focusNode, 0);
+				this.history.push(true);
 
 				return;
 			}
@@ -336,22 +375,26 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			}
 
 			// line delete
-			if (this.format.isLine(formatEl) && domUtils.isEdgePoint(range.startContainer, range.endOffset, 'end') && !range.startContainer.nextSibling && this.format.isLine(formatEl.nextElementSibling)) {
+			if (this.format.isLine(formatEl) && (!range.collapsed || domUtils.isEdgePoint(range.startContainer, range.endOffset, 'end')) && !range.startContainer.nextSibling && this.format.isLine(formatEl.nextElementSibling)) {
 				e.preventDefault();
 				e.stopPropagation();
 
-				const next = formatEl.nextElementSibling;
-				if (domUtils.isZeroWith(next)) {
-					domUtils.removeItem(next);
+				let focusNode;
+				if (!range.collapsed) {
+					this.html.remove();
+					if (formatEl.contains(range.startContainer)) {
+						focusNode = LineDelete_next(formatEl);
+						this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
+					} else {
+						focusNode = LineDelete_prev(formatEl);
+						this.selection.setRange(focusNode, 0, focusNode, 0);
+					}
+					this.history.push(true);
 					return;
 				}
 
-				const nextChild = next.childNodes;
-				while (nextChild[0]) {
-					formatEl.appendChild(nextChild[0]);
-				}
-
-				domUtils.removeItem(next);
+				LineDelete_next(formatEl);
+				this.history.push(true);
 
 				return;
 			}
@@ -916,7 +959,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	// document type
 	if (frameContext.has('documentType-use-header') && !range.collapsed && !ctrl && !alt && !shift && !DIR_KEYCODE.test(keyCode)) {
 		_w.setTimeout(() => {
-			frameContext.get('documentType').reset();
+			frameContext.get('documentType').reHeader();
 		});
 		return;
 	}
@@ -1058,7 +1101,7 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 	// document type
 	if (frameContext.has('documentType-use-header')) {
 		if (DOCUMENT_TYPE_OBSERVER_KEYCODE.test(keyCode)) {
-			frameContext.get('documentType').reset();
+			frameContext.get('documentType').reHeader();
 			const el = domUtils.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
 			frameContext.get('documentType').on(el);
 		} else {
