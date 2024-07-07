@@ -246,9 +246,12 @@ const Constructor = function (editorTargets, options) {
 		}
 
 		// document type
-		let documentTypeInner = null;
+		const documentTypeInner = {};
 		if (o.get('type-options').includes('header')) {
-			documentTypeInner = domUtils.createElement('DIV', { class: 'se-document-lines', style: `height: ${to.get('height')};` }, '<div class="se-document-lines-inner"></div>');
+			documentTypeInner.inner = domUtils.createElement('DIV', { class: 'se-document-lines', style: `height: ${to.get('height')};` }, '<div class="se-document-lines-inner"></div>');
+		}
+		if (o.get('type-options').includes('page')) {
+			documentTypeInner.page = domUtils.createElement('DIV', { class: 'se-document-page' }, null);
 		}
 
 		// set container

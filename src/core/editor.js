@@ -1148,10 +1148,11 @@ Editor.prototype = {
 		// char counter
 		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 
-		// document type
+		// document type init
 		if (this.options.get('type') === 'document') {
 			e.set('documentType', new DocumentType(this, e));
 			if (e.get('documentType').useHeader) e.set('documentType-use-header', true);
+			if (e.get('documentType').usePage) e.set('documentType-use-page', true);
 		}
 	},
 
@@ -1179,6 +1180,15 @@ Editor.prototype = {
 			}, 0);
 		} else if (!env.isResizeObserverSupported) {
 			this.__callResizeFunction(fc, fc.get('wysiwygFrame').offsetHeight, null);
+		}
+
+		// document type
+		if (fc.has('documentType-use-page')) {
+			const h = fc.get('wysiwygFrame').scrollHeight;
+			if (fc.get('_documentType-page-h') !== h) {
+				fc.get('documentType').rePage(h);
+				fc.set('_documentType-page-h', h);
+			}
 		}
 	},
 
@@ -1586,6 +1596,9 @@ Editor.prototype = {
 			if (e.get('documentTypeInner')) {
 				if (this.options.get('_rtl')) e.get('wrapper').appendChild(e.get('documentTypeInner'));
 				else e.get('wrapper').insertBefore(e.get('documentTypeInner'), e.get('wysiwygFrame'));
+			}
+			if (e.get('documentTypePage')) {
+				e.get('wrapper').appendChild(e.get('documentTypePage'));
 			}
 		});
 

@@ -45,7 +45,6 @@ const EventManager = function (editor) {
 	this.__retainTimer = null;
 	this.__eventDoc = null;
 	this.__secopy = null;
-	// this.__scrollID = '';
 };
 
 EventManager.prototype = {
@@ -1060,7 +1059,7 @@ function __resizeEditor(e) {
 	const h = resizeInterval < fc.get('_minHeight') ? fc.get('_minHeight') : resizeInterval;
 	fc.get('wysiwygFrame').style.height = fc.get('code').style.height = h + 'px';
 	this._resizeClientY = e.clientY;
-	if (!env.isResizeObserverSupported) this.editor.__callResizeFunction(h, null);
+	if (!env.isResizeObserverSupported) this.editor.__callResizeFunction(fc, h, null);
 }
 
 function __closeMove() {
