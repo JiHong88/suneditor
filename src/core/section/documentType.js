@@ -10,6 +10,7 @@ const DocumentType = function (editor, fc) {
 	this.fc = fc;
 	this.ww = fc.get('wysiwyg');
 	this.innerHeaders = [];
+	this._wwHeaders = [];
 	this.inner = null;
 	this.useHeader = editor.options.get('type-options').includes('header');
 	this.usePage = editor.options.get('type-options').includes('page');
@@ -90,7 +91,7 @@ DocumentType.prototype = {
 	},
 
 	_findItem(header) {
-		const headers = this._getHeaders();
+		const headers = this._wwHeaders;
 		const index = Array.prototype.indexOf.call(headers, header);
 
 		if (index !== -1 && this.innerHeaders[index]) {
@@ -116,7 +117,7 @@ DocumentType.prototype = {
 	},
 
 	_getHeaders() {
-		return this.ww.querySelectorAll('h1, h2, h3, h4, h5, h6');
+		return (this._wwHeaders = this.ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));
 	},
 
 	constructor: DocumentType
@@ -132,7 +133,7 @@ function OnClickHeader(ww, e) {
 			const innerIndex = Array.prototype.indexOf.call(this.innerHeaders, clickedHeader);
 			if (innerIndex === -1) return;
 
-			const header = this._getHeaders(ww)[innerIndex];
+			const header = this._wwHeaders[innerIndex];
 			if (header) {
 				this.editor.selection.scrollTo(header);
 			}

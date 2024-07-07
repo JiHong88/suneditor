@@ -6,7 +6,7 @@ const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DELETE_KEYCODE = /^(8|46)$/;
 const NON_TEXT_KEYCODE = /^(8|9|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145|229)$/;
 const HISTORY_IGNORE_KEYCODE = /^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145|229)$/;
-const DOCUMENT_TYPE_OBSERVER_KEYCODE = /^(8|13|46)$/;
+const DOCUMENT_TYPE_OBSERVER_KEYCODE = /^(13)$/;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 let _styleNodes = null;
 
@@ -915,7 +915,9 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 	// document type
 	if (frameContext.has('documentType-use-header') && !range.collapsed && !ctrl && !alt && !shift && !DIR_KEYCODE.test(keyCode)) {
-		frameContext.get('documentType').reset();
+		_w.setTimeout(() => {
+			frameContext.get('documentType').reset();
+		});
 		return;
 	}
 
@@ -995,11 +997,6 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 		this.applyTagEffect();
 
 		this.history.push(false);
-
-		// document type
-		if (frameContext.has('documentType-use-header')) {
-			frameContext.get('documentType').reset();
-		}
 
 		return;
 	}
