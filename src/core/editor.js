@@ -559,6 +559,10 @@ Editor.prototype = {
 				if (rtl) fc.get('wrapper').appendChild(fc.get('documentTypeInner'));
 				else fc.get('wrapper').insertBefore(fc.get('documentTypeInner'), fc.get('wysiwygFrame'));
 			}
+			if (fc.has('documentType-use-page')) {
+				if (rtl) fc.get('wrapper').insertBefore(fc.get('documentTypePage'), fc.get('wysiwygFrame'));
+				else fc.get('wrapper').appendChild(fc.get('documentTypePage'));
+			}
 
 			if (this.isBalloon) this.toolbar._showBalloon();
 			else if (this.isSubBalloon) this.subToolbar._showBalloon();
@@ -1593,12 +1597,15 @@ Editor.prototype = {
 
 		this.applyFrameRoots((e) => {
 			e.get('wrapper').appendChild(e.get('wysiwygFrame'));
+
+			// document type
 			if (e.get('documentTypeInner')) {
 				if (this.options.get('_rtl')) e.get('wrapper').appendChild(e.get('documentTypeInner'));
 				else e.get('wrapper').insertBefore(e.get('documentTypeInner'), e.get('wysiwygFrame'));
 			}
 			if (e.get('documentTypePage')) {
-				e.get('wrapper').appendChild(e.get('documentTypePage'));
+				if (this.options.get('_rtl')) e.get('wrapper').insertBefore(e.get('documentTypePage'), e.get('wysiwygFrame'));
+				else e.get('wrapper').appendChild(e.get('documentTypePage'));
 			}
 		});
 
