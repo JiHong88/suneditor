@@ -2,17 +2,24 @@
  * @fileoverview DocumentType class
  */
 
-import { domUtils, numbers } from '../../helper';
+import { domUtils, numbers, env } from '../../helper';
+
+const dpi = env._w.devicePixelRatio;
+const A4_HEIGHT_INCHES = 11.7; // A4 height(inches)
+const A4_HEIGHT = A4_HEIGHT_INCHES * dpi * 96; // 1 inch = 96px
 
 const DocumentType = function (editor, fc) {
 	// members
 	this.editor = editor;
 	this.fc = fc;
 	this.ww = fc.get('wysiwyg');
+	this.wwFrame = fc.get('wysiwygFrame');
 	this.innerHeaders = [];
 	this._wwHeaders = [];
 	this.inner = null;
 	this.page = null;
+	this.pageHeight = -1;
+	this.pages = [];
 	this.useHeader = editor.options.get('type-options').includes('header');
 	this.usePage = editor.options.get('type-options').includes('page');
 
@@ -74,31 +81,36 @@ DocumentType.prototype = {
 		this.innerHeaders = inner.querySelectorAll('div');
 	},
 
-	rePage(height) {
+	rePage() {
 		if (!this.page) return;
 
+		const height = this.wwFrame.scrollHeight;
+		if (this.pageHeight === height) return;
+		this.pageHeight = height;
+
 		const page = this.page;
-
-		// DPI
-		const dpi = window.devicePixelRatio;
-		const A4_HEIGHT_INCHES = 11.7; // A4 height(inches)
-		const A4_HEIGHT = A4_HEIGHT_INCHES * dpi * 96; // 1 inch = 96px
-
+		const scrollTop = this.ww.scrollTop;
 		const totalPages = Math.ceil(height / A4_HEIGHT);
 
 		this.page.innerHTML = '';
-		const pageHeights = [];
+		this.pages = [];
 		for (let i = 0; i < totalPages; i++) {
 			const pageNumber = document.createElement('div');
 			pageNumber.style.position = 'absolute';
-			pageNumber.style.top = `${i * A4_HEIGHT}px`;
+			pageNumber.style.top = `${i * A4_HEIGHT + scrollTop}px`;
 			pageNumber.innerText = `${i + 1}`;
 			page.appendChild(pageNumber);
+			this.pages.push(pageNumber);
 		}
-
-		console.log(`Total pages: ${totalPages}`);
-		console.log(`Page heights: ${pageHeights}`);
 	},
+
+	scrollPage() {
+		const scrollTop = this.wwFrame.scrollTop;
+		for (let i = 0, len = this.pages.length; i < len; i++) {
+			this.pages[i].style.top = `${i * A4_HEIGHT - scrollTop}px`;
+		}
+	},
+
 	on(line) {
 		if (!this.useHeader) return;
 

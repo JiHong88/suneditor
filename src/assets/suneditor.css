@@ -66,6 +66,9 @@
 	--se-doc-info-min-width: 16ch;
 	--se-doc-info-inner-padding: 2ch;
 	--se-doc-info-inner-line-padding: 0.5ch;
+	--se-doc-info-page-width: 16px;
+	--se-doc-info-page-font-color: #f5f5f5;
+	--se-doc-info-page-background-color: #b1b1b1;
 	/* document type - active */
 	--se-doc-info-active-color: #4a32ff;
 	/* document type indent - padding */
@@ -247,6 +250,16 @@
 /* se-type-document - page */
 .sun-editor .se-wrapper.se-type-document .se-document-page {
 	position: relative;
+	text-align: center;
+}
+.sun-editor .se-wrapper.se-type-document .se-document-page > div {
+	width: var(--se-doc-info-page-width);
+	color: var(--se-doc-info-page-font-color);
+	background-color: var(--se-doc-info-page-background-color);
+	font-size: inherit;
+	left: 0px;
+	padding: 1px 0;
+	margin-left: 1px;
 }
 /** --- se-type-document end ---------------------------------------------------------- */
 
@@ -3395,33 +3408,43 @@
 		text;
 }
 
-/** document type  */
+/** se-type-document - header  */
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner {
 	padding: var(--se-doc-info-inner-padding) 0 var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding);
+	direction: rtl;
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h1 {
-	padding-right: var(--se-doc-info-inner-line-padding);
-	padding-left: var(--se-doc-info-inner-line-indent-h1);
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h1);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h2 {
-	padding-right: var(--se-doc-info-inner-line-padding);
-	padding-left: var(--se-doc-info-inner-line-indent-h2);
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h2);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h3 {
-	padding-right: var(--se-doc-info-inner-line-padding);
-	padding-left: var(--se-doc-info-inner-line-indent-h3);
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h3);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h4 {
-	padding-right: var(--se-doc-info-inner-line-padding);
-	padding-left: var(--se-doc-info-inner-line-indent-h4);
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h4);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h5 {
-	padding-right: var(--se-doc-info-inner-line-padding);
-	padding-left: var(--se-doc-info-inner-line-indent-h5);
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h5);
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h6 {
-	padding-right: var(--se-doc-info-inner-line-padding);
-	padding-left: var(--se-doc-info-inner-line-indent-h6);
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-line-indent-h6);
+}
+/* se-type-document - page */
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page {
+	direction: rtl;
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page > div {
+	right: 0px;
+	margin-left: 0;
+	margin-right: 1px;
 }
 
 /** --- RTL end -------------------------------------------------------------------------------------------------------------------------------------------------- */

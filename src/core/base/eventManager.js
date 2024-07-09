@@ -977,6 +977,11 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 	// plugin event
 	this._callPluginEvent('onScroll', { frameContext, event: e });
 
+	// document type page
+	if (frameContext.has('documentType-use-page')) {
+		frameContext.get('documentType').scrollPage();
+	}
+
 	// user event
 	this.triggerEvent('onScroll', { frameContext, event: e });
 }

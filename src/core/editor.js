@@ -1186,13 +1186,9 @@ Editor.prototype = {
 			this.__callResizeFunction(fc, fc.get('wysiwygFrame').offsetHeight, null);
 		}
 
-		// document type
+		// document type page
 		if (fc.has('documentType-use-page')) {
-			const h = fc.get('wysiwygFrame').scrollHeight;
-			if (fc.get('_documentType-page-h') !== h) {
-				fc.get('documentType').rePage(h);
-				fc.set('_documentType-page-h', h);
-			}
+			fc.get('documentType').rePage();
 		}
 	},
 
