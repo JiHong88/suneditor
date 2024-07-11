@@ -4,9 +4,8 @@
 
 import { domUtils, numbers, env } from '../../helper';
 
-const dpi = env._w.devicePixelRatio;
 const A4_HEIGHT_INCHES = 11.7; // A4 height(inches)
-const A4_HEIGHT = A4_HEIGHT_INCHES * dpi * 96; // 1 inch = 96px
+const A4_HEIGHT = A4_HEIGHT_INCHES * env.DPI * 96; // 1 inch = 96px
 
 const DocumentType = function (editor, fc) {
 	// members
@@ -14,12 +13,14 @@ const DocumentType = function (editor, fc) {
 	this.fc = fc;
 	this.ww = fc.get('wysiwyg');
 	this.wwFrame = fc.get('wysiwygFrame');
+	this.wwWidth = -1;
 	this.innerHeaders = [];
 	this._wwHeaders = [];
 	this.inner = null;
 	this.page = null;
 	this.pageHeight = -1;
 	this.pages = [];
+	this.pages_line = [];
 	this.useHeader = editor.options.get('type-options').includes('header');
 	this.usePage = editor.options.get('type-options').includes('page');
 
@@ -90,24 +91,36 @@ DocumentType.prototype = {
 
 		const page = this.page;
 		const scrollTop = this.ww.scrollTop;
+		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const totalPages = Math.ceil(height / A4_HEIGHT);
 
 		this.page.innerHTML = '';
 		this.pages = [];
 		for (let i = 0; i < totalPages; i++) {
-			const pageNumber = document.createElement('div');
-			pageNumber.style.position = 'absolute';
-			pageNumber.style.top = `${i * A4_HEIGHT + scrollTop}px`;
-			pageNumber.innerText = `${i + 1}`;
+			const pageNumber = domUtils.createElement('DIV', { style: `top:${i * A4_HEIGHT + scrollTop}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
 			page.appendChild(pageNumber);
 			this.pages.push(pageNumber);
 		}
+
+		this.pages_line = this.page.querySelectorAll('.se-document-page-line');
 	},
 
 	scrollPage() {
 		const scrollTop = this.wwFrame.scrollTop;
-		for (let i = 0, len = this.pages.length; i < len; i++) {
-			this.pages[i].style.top = `${i * A4_HEIGHT - scrollTop}px`;
+		const pages = this.pages;
+		for (let i = 0, len = pages.length; i < len; i++) {
+			pages[i].style.top = `${i * A4_HEIGHT - scrollTop}px`;
+		}
+	},
+
+	resizePage() {
+		const wwWidth = this.wwFrame.offsetWidth + 1;
+		if (wwWidth === this.wwWidth) return;
+
+		this.wwWidth = wwWidth;
+		const pages_line = this.pages_line;
+		for (let i = 0, len = pages_line.length; i < len; i++) {
+			pages_line[i].style.width = `${wwWidth}px`;
 		}
 	},
 

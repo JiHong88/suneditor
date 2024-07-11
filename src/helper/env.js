@@ -218,6 +218,12 @@ export const cmdIcon = isOSX_IOS ? '⌘' : 'CTRL';
  */
 export const shiftIcon = isOSX_IOS ? '⇧' : '+SHIFT';
 
+/**
+ * @description Device pixel ratio
+ * @type {number}
+ */
+export const DPI = _w.devicePixelRatio;
+
 /** --- editor env --- */
 export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';
 export const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
@@ -245,6 +251,7 @@ const env = {
 	isMobile,
 	cmdIcon,
 	shiftIcon,
+	DPI,
 	_allowedEmptyNodeList,
 	KATEX_WEBSITE,
 	MATHJAX_WEBSITE

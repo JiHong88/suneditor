@@ -1203,6 +1203,11 @@ Editor.prototype = {
 			this.triggerEvent('onResizeEditor', { height: h, prevHeight: fc.get('_editorHeight'), frameContext: fc, observerEntry: resizeObserverEntry });
 			fc.set('_editorHeight', h);
 		}
+
+		// document type page
+		if (fc.has('documentType-use-page')) {
+			fc.get('documentType').resizePage();
+		}
 	},
 
 	/**

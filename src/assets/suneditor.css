@@ -197,12 +197,15 @@
 	box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
+/* se-type-document - header */
 .sun-editor .se-wrapper.se-type-document .se-document-lines {
 	width: var(--se-doc-info-width);
 	min-width: var(--se-doc-info-min-width);
 	font-size: var(--se-doc-info-font-size);
 	overflow-y: auto;
 	overflow-x: hidden;
+	background-color: transparent;
+	z-index: 1;
 }
 .sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner {
 	padding: var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding) 0;
@@ -251,8 +254,11 @@
 .sun-editor .se-wrapper.se-type-document .se-document-page {
 	position: relative;
 	text-align: center;
+	pointer-events: none;
 }
+
 .sun-editor .se-wrapper.se-type-document .se-document-page > div {
+	position: absolute;
 	width: var(--se-doc-info-page-width);
 	color: var(--se-doc-info-page-font-color);
 	background-color: var(--se-doc-info-page-background-color);
@@ -260,6 +266,14 @@
 	left: 0px;
 	padding: 1px 0;
 	margin-left: 1px;
+}
+.sun-editor .se-wrapper.se-type-document .se-document-page > div > div.se-document-page-line {
+	position: absolute;
+	display: block;
+	height: 0px;
+	border-bottom: 1px dashed var(--se-doc-info-page-background-color);
+	top: 0px;
+	right: 100%;
 }
 /** --- se-type-document end ---------------------------------------------------------- */
 
@@ -3445,6 +3459,10 @@
 	right: 0px;
 	margin-left: 0;
 	margin-right: 1px;
+}
+.sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page > div > div.se-document-page-line {
+	right: unset;
+	left: 100%;
 }
 
 /** --- RTL end -------------------------------------------------------------------------------------------------------------------------------------------------- */
