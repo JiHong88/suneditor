@@ -4,6 +4,7 @@ const { merge } = require('webpack-merge');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const common = require('./_common');
 const env = require('./_env');
 
@@ -15,6 +16,10 @@ module.exports = merge(common, {
 		filename: 'suneditor.min.js',
 		environment: env,
 		path: path.resolve(__dirname, '../dist')
+	},
+	optimization: {
+		minimize: true,
+		minimizer: [new TerserPlugin()]
 	},
 	plugins: [
 		// new webpack.SourceMapDevToolPlugin(),
