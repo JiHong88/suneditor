@@ -1413,6 +1413,7 @@
 .sun-editor .se-selector-table {
 	display: none;
 	position: absolute;
+	overflow: hidden;
 	top: var(--se-input-btn-size);
 	left: 1px;
 	z-index: 5;
