@@ -1166,8 +1166,9 @@ export function applyInlineStylesAll(wwTarget, includeWW, styles) {
 	const elements = includeWW ? [wwTarget].concat(Array.from(wwTarget.querySelectorAll('*'))) : wwTarget.querySelectorAll('*');
 	for (let i = 0, el; (el = elements[i]); i++) {
 		const computedStyle = _w.getComputedStyle(el);
-		for (const props of styles || computedStyle) {
-			el.style[props] = computedStyle.getPropertyValue(props) || '';
+		const els = el.style;
+		for (const props of styles) {
+			els.setProperty(props, computedStyle.getPropertyValue(props) || '');
 		}
 	}
 

@@ -14,6 +14,7 @@ const DocumentType = function (editor, fc) {
 	this.ww = fc.get('wysiwyg');
 	this.wwFrame = fc.get('wysiwygFrame');
 	this.wwWidth = -1;
+	this.wwHeight = -1;
 	this.innerHeaders = [];
 	this._wwHeaders = [];
 	this.inner = null;
@@ -109,23 +110,36 @@ DocumentType.prototype = {
 		this.totalPages = totalPages;
 	},
 
+	resizePage() {
+		const wwWidth = this.wwFrame.offsetWidth + 1;
+		const wwHeight = this.wwFrame.offsetHeight + 1;
+		if (wwWidth === this.wwWidth || wwHeight === this.wwHeight) return;
+
+		this.wwWidth = wwWidth;
+		this.wwHeight = wwHeight;
+		const pages_line = this.pages_line;
+		for (let i = 0, len = pages_line.length; i < len; i++) {
+			pages_line[i].style.width = `${wwWidth}px`;
+		}
+
+		this._displayCurrentPage();
+	},
+
 	scrollPage() {
 		const scrollTop = this.wwFrame.scrollTop;
 		const pages = this.pages;
 		for (let i = 0, len = pages.length; i < len; i++) {
 			pages[i].style.top = `${i * A4_HEIGHT - scrollTop}px`;
 		}
+
+		this._displayCurrentPage();
 	},
 
-	resizePage() {
-		const wwWidth = this.wwFrame.offsetWidth + 1;
-		if (wwWidth === this.wwWidth) return;
+	getCurrentPageNumber() {
+		if (this.totalPages <= 1) return 1;
 
-		this.wwWidth = wwWidth;
-		const pages_line = this.pages_line;
-		for (let i = 0, len = pages_line.length; i < len; i++) {
-			pages_line[i].style.width = `${wwWidth}px`;
-		}
+		const scrollTop = this.wwFrame.scrollTop + this.wwHeight / 2;
+		return Math.floor(scrollTop / A4_HEIGHT) + 1;
 	},
 
 	on(line) {
@@ -148,6 +162,11 @@ DocumentType.prototype = {
 		const item = this._findItem(header);
 		if (!item) return;
 		item.textContent = header.textContent;
+	},
+
+	_displayCurrentPage() {
+		const pageNum = this.getCurrentPageNumber();
+		console.log('pageNum', pageNum);
 	},
 
 	_findItem(header) {
