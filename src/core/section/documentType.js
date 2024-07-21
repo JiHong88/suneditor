@@ -18,6 +18,7 @@ const DocumentType = function (editor, fc) {
 	this._wwHeaders = [];
 	this.inner = null;
 	this.page = null;
+	this.totalPages = 0;
 	this.pageHeight = -1;
 	this.pages = [];
 	this.pages_line = [];
@@ -89,20 +90,23 @@ DocumentType.prototype = {
 		if (this.pageHeight === height) return;
 		this.pageHeight = height;
 
-		const page = this.page;
-		const scrollTop = this.ww.scrollTop;
-		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const totalPages = Math.ceil(height / A4_HEIGHT);
+		if (this.totalPages === totalPages) return;
+
+		const page = this.page;
+		const scrollTop = this.wwFrame.scrollTop;
+		const wwWidth = this.wwFrame.offsetWidth + 1;
 
 		this.page.innerHTML = '';
 		this.pages = [];
 		for (let i = 0; i < totalPages; i++) {
-			const pageNumber = domUtils.createElement('DIV', { style: `top:${i * A4_HEIGHT + scrollTop}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
+			const pageNumber = domUtils.createElement('DIV', { style: `top:${i * A4_HEIGHT - scrollTop}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
 			page.appendChild(pageNumber);
 			this.pages.push(pageNumber);
 		}
 
 		this.pages_line = this.page.querySelectorAll('.se-document-page-line');
+		this.totalPages = totalPages;
 	},
 
 	scrollPage() {
