@@ -419,7 +419,7 @@ Viewer.prototype = {
 					<head>
 						${wDoc.head.innerHTML}
 						<style>
-							body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}
+							body {overflow:auto !important; height:auto !important;}
 						</style>
 					</head>
 					<body ${arrts}>
@@ -445,7 +445,7 @@ Viewer.prototype = {
 						<title>${this.lang.preview}</title>
 						${linkHTML}
 					</head>
-					<body class="${this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')}" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">
+					<body class="${this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')}" style="height:auto">
 						${contentHTML}
 					</body>
 				</html>`);
