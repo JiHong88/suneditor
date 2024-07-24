@@ -362,6 +362,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('v2Migration', !!options.v2Migration);
 
 	/** Base */
+	o.set('buttons', new Set(buttonList.toString().split(',')));
 	const modeValue = options.strictMode !== false;
 	o.set('strictMode', {
 		tagFilter: modeValue,
@@ -571,6 +572,7 @@ export function InitOptions(options, editorTargets, plugins) {
 			o.set('_subMode', subbar.mode || 'balloon');
 			o.set('toolbar.sub_width', subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto');
 			subButtons = o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList;
+			o.set('buttons_sub', new Set(subButtons.toString().split(',')));
 		}
 	}
 
