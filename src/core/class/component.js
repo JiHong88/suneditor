@@ -113,6 +113,7 @@ Component.prototype = {
 		let pluginName = '';
 		let options = {};
 		let isFile = false;
+		let launcher = null;
 
 		if (this.is(element)) {
 			if (domUtils.hasClass(element, 'se-component') && !domUtils.hasClass(element, 'se-inline-component')) element = element.firstElementChild || element;
@@ -124,6 +125,7 @@ Component.prototype = {
 			target = comp.target;
 			pluginName = comp.pluginName;
 			options = comp.options;
+			launcher = comp.launcher;
 		}
 
 		if (!target && element.nodeName) {
@@ -135,6 +137,7 @@ Component.prototype = {
 			target = comp.target;
 			pluginName = comp.pluginName;
 			options = comp.options;
+			launcher = comp.launcher;
 		}
 
 		if (!target) {
@@ -150,7 +153,8 @@ Component.prototype = {
 			cover: figureInfo.cover,
 			inlineCover: figureInfo.inlineCover,
 			caption: figureInfo.caption,
-			isFile: isFile
+			isFile,
+			launcher
 		});
 	},
 
