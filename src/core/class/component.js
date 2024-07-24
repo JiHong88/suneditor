@@ -167,7 +167,7 @@ Component.prototype = {
 		const info = this.get(element);
 		if (!info || domUtils.isUneditable(domUtils.getParentElement(element, this.is.bind(this))) || domUtils.isUneditable(element)) return false;
 
-		const plugin = this.plugins[pluginName];
+		const plugin = info.launcher || this.plugins[pluginName];
 		if (!plugin) return;
 
 		if (!isInput && _DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
