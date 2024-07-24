@@ -1369,6 +1369,16 @@ Editor.prototype = {
 			}
 		}
 
+		if (this.options.get('buttons').has('pageBreak') || this.options.get('buttons_sub')?.has('pageBreak')) {
+			this._componentManager.push(function (element) {
+				if (!element || !domUtils.hasClass(element, 'se-page-break')) return null;
+				return {
+					target: element,
+					launcher: {}
+				};
+			});
+		}
+
 		this._fileManager.regExp = new RegExp(`^(${this._fileManager.tags.join('|') || '\\^'})$`, 'i');
 		this._fileManager.pluginRegExp = new RegExp(`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`, 'i');
 
