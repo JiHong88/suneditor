@@ -4,6 +4,7 @@
 	--se-main-out-color: #dadada;
 	--se-main-font-family: Helvetica Neue;
 	--se-main-color: #000;
+	--se-main-color-lighter: rgba(0, 0, 0, 0.7);
 	--se-main-background-color: #fff;
 	--se-main-background-color2: #f5f5f5;
 	--se-main-background-color3: #f9f9f9;
@@ -3637,6 +3638,39 @@
 	margin-left: -4px;
 	border-width: 0 5px 5px 5px;
 	border-color: transparent transparent var(--se-active-dark5-color) transparent;
+}
+
+/** page break */
+.sun-editor .sun-editor-editable[contenteditable='true'] .se-page-break {
+	display: flex;
+	visibility: visible !important;
+	position: relative;
+	align-items: center;
+	justify-content: center;
+	clear: both;
+	width: 100%;
+	height: 24px;
+	margin: 0;
+	padding: 5px 0;
+}
+
+.sun-editor .sun-editor-editable[contenteditable='true'] .se-page-break::before {
+	content: '';
+	display: block;
+	width: 100%;
+	border-top: 1px dashed var(--se-main-color-lighter);
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+.sun-editor .sun-editor-editable[contenteditable='true'] .se-page-break::after {
+	content: 'Page Break';
+	position: absolute;
+	top: 0px;
+	background: var(--se-main-background-color);
+	padding: 0 5px;
+	color: var(--se-main-color-lighter);
+	font-size: var(--se-main-font-size);
 }
 
 /** animation */

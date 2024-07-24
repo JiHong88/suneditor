@@ -137,6 +137,8 @@
 		numberedList: 'Numbered list',
 		outdent: 'Outdent',
 		pageBreak: 'Page break',
+		pageDown: 'Page down',
+		pageUp: 'Page up',
 		paragraphStyle: 'Paragraph style',
 		preview: 'Preview',
 		print: 'print',

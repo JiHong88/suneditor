@@ -1,7 +1,7 @@
 import { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, RO_UNAVAILABD } from './section/constructor';
 import { UpdateStatusbarContext } from './section/context';
-import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE } from './section/actives';
+import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
 import Events from './base/events';
@@ -446,6 +446,9 @@ Editor.prototype = {
 				break;
 			case 'copyFormat':
 				COPY_FORMAT(this, button);
+				break;
+			case 'pageBreak':
+				PAGE_BREAK(this);
 				break;
 			default:
 				FONT_STYLE(this, command);
@@ -1370,11 +1373,19 @@ Editor.prototype = {
 		}
 
 		if (this.options.get('buttons').has('pageBreak') || this.options.get('buttons_sub')?.has('pageBreak')) {
-			this._componentManager.push(function (element) {
+			this._componentManager.push((element) => {
 				if (!element || !domUtils.hasClass(element, 'se-page-break')) return null;
 				return {
 					target: element,
-					launcher: {}
+					launcher: {
+						destroy: (target) => {
+							const focusEl = target.previousElementSibling || target.nextElementSibling;
+							domUtils.removeItem(target);
+							// focus
+							this.focusEdge(focusEl);
+							this.history.push(false);
+						}
+					}
 				};
 			});
 		}

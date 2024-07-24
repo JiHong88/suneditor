@@ -988,7 +988,12 @@ function _defaultButtons(options, icons, lang) {
 		dir_rtl: ['', lang.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-component-enabled', lang.save, 'save', '', icons.save],
 		newDocument: ['se-component-enabled', lang.newDocument, 'newDocument', '', icons.new_document],
-		selectAll: ['se-component-enabled', lang.selectAll, 'selectAll', '', icons.select_all]
+		selectAll: ['se-component-enabled', lang.selectAll, 'selectAll', '', icons.select_all],
+		pageBreak: ['se-component-enabled', lang.pageBreak, 'pageBreak', '', icons.page_break],
+		// document type buttons
+		pageUp: ['se-component-enabled', lang.pageUp, 'pageUp', '', icons.page_up],
+		pageDown: ['se-component-enabled', lang.pageDown, 'pageDown', '', icons.page_down],
+		pageNavigator: ['se-component-enabled', '', 'pageNavigator', 'input', '']
 	};
 }
 

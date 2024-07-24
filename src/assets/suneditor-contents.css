@@ -611,6 +611,14 @@
 	height: 54px;
 }
 
+/** page break */
+.sun-editor-editable.se-page-break {
+	visibility: hidden;
+	page-break-before: always;
+	margin: 0;
+	padding: 0;
+}
+
 /** ---------- Paragraph styles custom ---------- */
 /* Bordered */
 .sun-editor-editable .__se__p-bordered,

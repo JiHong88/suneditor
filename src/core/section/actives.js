@@ -144,3 +144,8 @@ export function FONT_STYLE(editor, command) {
 	editor.format.applyInlineElement(el, StyleMap[command] || null, [nodeName], false);
 	editor.focus();
 }
+
+export function PAGE_BREAK(editor) {
+	const pageBreak = domUtils.createElement('DIV', { class: 'se-component se-page-break' });
+	editor.component.insert(pageBreak, true, false);
+}
