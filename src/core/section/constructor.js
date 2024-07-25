@@ -43,6 +43,7 @@ const DEFAULT_CONTENT_STYLES =
 	'margin|margin-block-end|margin-block-start|margin-bottom|margin-inline-end|margin-inline-start|margin-left|margin-right|margin-top|max-width|min-width|' +
 	'outline|overflow|' +
 	'position|padding|padding-bottom|padding-inline-start|padding-left|padding-right|padding-top|' +
+	'page-break-before|page-break-after|page-break-inside|' +
 	'rotate|rotateX|rotateY|' +
 	'table-layout|text-align|text-decoration|text-shadow|text-transform|top|' +
 	'text-indent|text-rendering|' +
