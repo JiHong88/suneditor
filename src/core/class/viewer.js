@@ -5,8 +5,6 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env, converter, numbers } from '../../helper';
 
-const { _w } = env;
-
 const Viewer = function (editor) {
 	CoreInjector.call(this, editor);
 
@@ -339,17 +337,11 @@ Viewer.prototype = {
 		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get()) : this.html.get();
 		const printDocument = domUtils.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
-		const { paddingTop, paddingBottom, paddingLeft, paddingRight } = _w.getComputedStyle(this.editor.frameContext.get('wysiwyg'));
 		const pageCSS = /*html*/ `
 			<style>
 				@page {
 					size: A4;
 					margin: 0;
-					padding: ${paddingTop} ${paddingBottom};
-				}
-				body {
-					margin: 0;
-					padding: 0 ${paddingRight} 0 ${paddingLeft} !important;
 				}
 			</style>`;
 

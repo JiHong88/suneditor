@@ -633,7 +633,7 @@ window.editor_root = suneditor.create(
 			[':기타-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'math', 'exportPdf', 'print'],
 			'|'
 		],
-		iframe: true,
+		// iframe: true,
 		subToolbar: {
 			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
 			width: 'auto',
