@@ -2,10 +2,10 @@
  * @fileoverview DocumentType class
  */
 
-import { domUtils, numbers, env } from '../../helper';
+import { domUtils, numbers } from '../../helper';
 
 const A4_HEIGHT_INCHES = 11.7; // A4 height(inches)
-const A4_HEIGHT = A4_HEIGHT_INCHES * env.DPI * 96; // 1 inch = 96px
+const A4_HEIGHT = A4_HEIGHT_INCHES * 96; // 1 inch = 96px
 
 const DocumentType = function (editor, fc) {
 	// members
@@ -23,6 +23,7 @@ const DocumentType = function (editor, fc) {
 	this.pageHeight = -1;
 	this.pages = [];
 	this.pages_line = [];
+	this.prevScrollTop = 0;
 	this.useHeader = editor.options.get('type-options').includes('header');
 	this.usePage = editor.options.get('type-options').includes('page');
 
@@ -87,22 +88,42 @@ DocumentType.prototype = {
 	rePage() {
 		if (!this.page) return;
 
-		const height = this.wwFrame.scrollHeight;
+		const height = this.ww.scrollHeight;
 		if (this.pageHeight === height) return;
 		this.pageHeight = height;
 
 		const totalPages = Math.ceil(height / A4_HEIGHT);
-		if (this.totalPages === totalPages) return;
-
-		const page = this.page;
-		const scrollTop = this.wwFrame.scrollTop;
+		const scrollTop = (this.prevScrollTop = this.ww.scrollTop);
 		const wwWidth = this.wwFrame.offsetWidth + 1;
+		const pageBreaks = this.ww.querySelectorAll('.se-page-break');
 
+		const pages = [];
+		const pageTop = this.page.offsetTop;
+		for (let i = 0, len = pageBreaks.length; i < len; i++) {
+			pages.push({ number: i, top: pageBreaks[i].offsetTop - pageTop + pageBreaks[i].offsetHeight / 2 - scrollTop });
+		}
+
+		for (let i = 0, t; i < totalPages; i++) {
+			t = i * A4_HEIGHT - scrollTop;
+			let inserted = false;
+			for (let j = 0, jLen = pages.length; j < jLen; j++) {
+				if (t < pages[j].top) {
+					pages.splice(j, 0, { number: i + pageBreaks.length, top: t });
+					inserted = true;
+					break;
+				}
+			}
+			if (!inserted) {
+				pages.push({ number: i + pageBreaks.length, top: t });
+			}
+		}
+
+		// set page number
 		this.page.innerHTML = '';
 		this.pages = [];
-		for (let i = 0; i < totalPages; i++) {
-			const pageNumber = domUtils.createElement('DIV', { style: `top:${i * A4_HEIGHT - scrollTop}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
-			page.appendChild(pageNumber);
+		for (let i = 0, len = pages.length; i < len; i++) {
+			const pageNumber = domUtils.createElement('DIV', { style: `top:${pages[i].top}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
+			this.page.appendChild(pageNumber);
 			this.pages.push(pageNumber);
 		}
 
@@ -112,7 +133,7 @@ DocumentType.prototype = {
 
 	resizePage() {
 		const wwWidth = this.wwFrame.offsetWidth + 1;
-		const wwHeight = this.wwFrame.offsetHeight + 1;
+		const wwHeight = this.ww.offsetHeight + 1;
 		if (wwWidth === this.wwWidth || wwHeight === this.wwHeight) return;
 
 		this.wwWidth = wwWidth;
@@ -126,19 +147,23 @@ DocumentType.prototype = {
 	},
 
 	scrollPage() {
-		const scrollTop = this.wwFrame.scrollTop;
+		const prevScrollTop = this.prevScrollTop;
+		const scrollTop = this.ww.scrollTop;
+		if (prevScrollTop === scrollTop) return;
+
 		const pages = this.pages;
 		for (let i = 0, len = pages.length; i < len; i++) {
-			pages[i].style.top = `${i * A4_HEIGHT - scrollTop}px`;
+			pages[i].style.top = `${numbers.get(pages[i].style.top) - (scrollTop - prevScrollTop)}px`;
 		}
 
+		this.prevScrollTop = scrollTop;
 		this._displayCurrentPage();
 	},
 
 	getCurrentPageNumber() {
 		if (this.totalPages <= 1) return 1;
 
-		const scrollTop = this.wwFrame.scrollTop + this.wwHeight / 2;
+		const scrollTop = this.ww.scrollTop + this.wwHeight / 2;
 		return Math.floor(scrollTop / A4_HEIGHT) + 1;
 	},
 

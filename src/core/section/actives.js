@@ -146,6 +146,6 @@ export function FONT_STYLE(editor, command) {
 }
 
 export function PAGE_BREAK(editor) {
-	const pageBreak = domUtils.createElement('DIV', { class: 'se-component se-page-break' });
+	const pageBreak = domUtils.createElement('DIV', { class: 'se-component se-component-line-break se-page-break' });
 	editor.component.insert(pageBreak, true, false);
 }

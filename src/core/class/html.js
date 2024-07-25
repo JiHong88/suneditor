@@ -301,7 +301,7 @@ HTML.prototype = {
 	 * @param {boolean} notCleanData If true, inserts the HTML string without refining it with html.clean.
 	 */
 	insert(html, rangeSelection, notCheckCharCount, notCleanData) {
-		if (!this.editor.frameContext.get('wysiwygFrame').contains(this.selection.get().focusNode)) this.editor.focus();
+		if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.get().focusNode)) this.editor.focus();
 
 		if (typeof html === 'string') {
 			if (!notCleanData) html = this.clean(html, false, null, null);
@@ -800,8 +800,8 @@ HTML.prototype = {
 				}
 			} else {
 				if ((commonCon.nodeType === 1 && startOff === 0 && endOff === 1) || (commonCon.nodeType === 3 && startOff === 0 && endOff === commonCon.textContent.length)) {
-					const nextEl = domUtils.getNextDeepestNode(commonCon, this.editor.frameContext.get('wysiwygFrame'));
-					const prevEl = domUtils.getPreviousDeepestNode(commonCon, this.editor.frameContext.get('wysiwygFrame'));
+					const nextEl = domUtils.getNextDeepestNode(commonCon, this.editor.frameContext.get('wysiwyg'));
+					const prevEl = domUtils.getPreviousDeepestNode(commonCon, this.editor.frameContext.get('wysiwyg'));
 					const line = this.format.getLine(commonCon);
 					domUtils.removeItem(commonCon);
 
@@ -1011,12 +1011,12 @@ HTML.prototype = {
 			if (this.editor.frameOptions.get('iframe_fullPage')) {
 				if (includeFullPage) {
 					const attrs = domUtils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
-					r = '<!DOCTYPE html><html>' + fc.get('_wd').head.outerHTML + '<body ' + attrs + '>' + content + '</body></html>';
+					r = `<!DOCTYPE html><html>${fc.get('_wd').head.outerHTML}<body ${attrs}>${content}</body></html>`;
 				} else {
 					r = content;
 				}
 			} else {
-				r = withFrame ? '<div class="sun-editor-editable' + (this.options.get('_rtl') ? ' se-rtl' : '') + '">' + content + '</div>' : renderHTML.innerHTML;
+				r = withFrame ? `<div class="${this.options.get('_editableClass') + '' + (this.options.get('_rtl') ? ' se-rtl' : '')}">${content}</div>` : renderHTML.innerHTML;
 			}
 
 			resultValue[rootKey[i]] = r;

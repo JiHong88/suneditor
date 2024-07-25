@@ -45,7 +45,7 @@ ExportPdf.prototype = {
 
 		try {
 			const topArea = this.editor.frameContext.get('topArea');
-			const editableDiv = domUtils.createElement('div', { class: this.editor.frameContext.get('wysiwygFrame').className }, this.html.get());
+			const editableDiv = domUtils.createElement('div', { class: this.editor.frameContext.get('wysiwyg').className }, this.html.get());
 			ww = domUtils.createElement('div', { style: `position: absolute; left: -10000px; width: ${topArea.clientWidth}px; height: auto;` }, editableDiv);
 
 			if (this.apiUrl) {

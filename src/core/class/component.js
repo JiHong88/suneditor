@@ -189,7 +189,8 @@ Component.prototype = {
 		let isNonFigureComponent;
 		if (typeof plugin.select === 'function') isNonFigureComponent = plugin.select(element);
 
-		if (!isNonFigureComponent && !domUtils.hasClass(info.container, 'se-inline-component')) this._setComponentLineBreaker(info.container || info.cover || element);
+		const isBreakComponent = domUtils.hasClass(info.target, 'se-component-line-break');
+		if (isBreakComponent || (!isNonFigureComponent && !domUtils.hasClass(info.container, 'se-inline-component'))) this._setComponentLineBreaker(info.container || info.cover || element);
 
 		this.currentTarget = element;
 		this.currentPlugin = plugin;
@@ -206,7 +207,7 @@ Component.prototype = {
 		}, 0);
 		domUtils.addClass(info.container, 'se-component-selected');
 
-		if (__overInfo !== ON_OVER_COMPONENT) {
+		if (!isBreakComponent && __overInfo !== ON_OVER_COMPONENT) {
 			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
 
 			// set zero width space
@@ -225,7 +226,7 @@ Component.prototype = {
 			}
 
 			this.editor.status.onSelected = true;
-		} else if (!domUtils.hasClass(info.container, 'se-input-component')) {
+		} else if (isBreakComponent || !domUtils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
 			domUtils.addClass(dragHandle, 'se-drag-handle-full');
 			this.editor._visibleControllers(false, false);

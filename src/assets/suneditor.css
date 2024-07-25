@@ -3651,25 +3651,25 @@
 	width: 100%;
 	height: 24px;
 	margin: 0;
-	padding: 5px 0;
+	padding: 0;
+	z-index: 1;
 }
 
 .sun-editor .sun-editor-editable[contenteditable='true'] .se-page-break::before {
 	content: '';
 	display: block;
 	width: 100%;
-	border-top: 1px dashed var(--se-main-color-lighter);
+	border-top: 1px dashed var(--se-doc-info-page-background-color);
 	position: absolute;
 	top: 50%;
 	transform: translateY(-50%);
 }
 .sun-editor .sun-editor-editable[contenteditable='true'] .se-page-break::after {
-	content: 'Page Break';
+	content: '⎯⎯⎯⎯⎯⎯';
 	position: absolute;
-	top: 0px;
 	background: var(--se-main-background-color);
 	padding: 0 5px;
-	color: var(--se-main-color-lighter);
+	color: var(--se-doc-info-page-background-color);
 	font-size: var(--se-main-font-size);
 }
 

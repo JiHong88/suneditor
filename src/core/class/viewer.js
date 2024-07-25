@@ -5,6 +5,8 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env, converter, numbers } from '../../helper';
 
+const { _w } = env;
+
 const Viewer = function (editor) {
 	CoreInjector.call(this, editor);
 
@@ -334,9 +336,22 @@ Viewer.prototype = {
 		const iframe = domUtils.createElement('IFRAME', { style: 'display: none;' });
 		this._d.body.appendChild(iframe);
 
-		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get(true)) : this.html.get(true);
+		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get()) : this.html.get();
 		const printDocument = domUtils.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
+		const { paddingTop, paddingBottom, paddingLeft, paddingRight } = _w.getComputedStyle(this.editor.frameContext.get('wysiwyg'));
+		const pageCSS = /*html*/ `
+			<style>
+				@page {
+					size: A4;
+					margin: 0;
+					padding: ${paddingTop} ${paddingBottom};
+				}
+				body {
+					margin: 0;
+					padding: 0 ${paddingRight} 0 ${paddingLeft} !important;
+				}
+			</style>`;
 
 		if (this.editor.frameOptions.get('iframe')) {
 			const arrts = this.options.get('printClass')
@@ -345,7 +360,17 @@ Viewer.prototype = {
 				? domUtils.getAttributesToString(wDoc.body, ['contenteditable'])
 				: 'class="' + this.options.get('_editableClass') + '"';
 
-			printDocument.write('' + '<!DOCTYPE html><html>' + '<head>' + wDoc.head.innerHTML + '</head>' + '<body ' + arrts + '>' + contentHTML + '</body>' + '</html>');
+			printDocument.write(/*html*/ `
+				<!DOCTYPE html>
+				<html>
+					<head>
+						${wDoc.head.innerHTML}
+						${pageCSS}
+					</head>
+					<body ${arrts}>
+						${contentHTML}
+					</body>
+				</html>`);
 		} else {
 			const links = this._d.head.getElementsByTagName('link');
 			const styles = this._d.head.getElementsByTagName('style');
@@ -357,13 +382,15 @@ Viewer.prototype = {
 				linkHTML += styles[i].outerHTML;
 			}
 
-			printDocument.write(/*html*/ `<!DOCTYPE html>
+			printDocument.write(/*html*/ `
+				<!DOCTYPE html>
 				<html>
 					<head>
 						${linkHTML}
+						${pageCSS}
 					</head>
-					<body class="${this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')}">
-						${contentHTML} 
+					<body class="${this.options.get('printClass') || this.options.get('_editableClass')}">
+						${contentHTML}
 					</body>
 				</html>`);
 		}
