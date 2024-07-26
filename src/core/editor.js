@@ -450,6 +450,12 @@ Editor.prototype = {
 			case 'pageBreak':
 				PAGE_BREAK(this);
 				break;
+			case 'pageUp':
+				this.frameContext.get('documentType').pageUp();
+				break;
+			case 'pageDown':
+				this.frameContext.get('documentType').pageDown();
+				break;
 			default:
 				FONT_STYLE(this, command);
 		}
