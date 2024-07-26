@@ -53,7 +53,7 @@ const DocumentType = function (editor, fc) {
 		this.page = fc.get('documentTypePage');
 		// page navigator
 		if (editor.options.get('buttons').has('pageNavigator') || editor.options.get('buttons_sub')?.has('pageNavigator')) {
-			
+			//
 		}
 	}
 };
@@ -174,20 +174,17 @@ DocumentType.prototype = {
 		if (this.totalPages <= 1) return 1;
 
 		const scrollTop = this.isAutoHeight ? _w.scrollY + this.wwHeight / 2 - this._getGlobalTop() : this._getWWScrollTop() + this.wwHeight / 2;
-		let pageNum = Math.floor(scrollTop / A4_HEIGHT);
-		if (this.isAutoHeight) pageNum--;
-		this.pageNum = pageNum < 0 ? 0 : pageNum > this.pages.length - 1 ? this.pages.length - 1 : pageNum;
-
-		return pageNum + 1;
+		const pageNum = Math.floor(scrollTop / A4_HEIGHT);
+		return (this.pageNum = pageNum < 1 ? 1 : pageNum > this.pages.length ? this.pages.length : pageNum);
 	},
 
 	pageUp() {
-		const pageNum = this.pageNum - 1 <= 0 ? 0 : this.pageNum - 1;
+		const pageNum = this.pageNum - 1 <= 1 ? 1 : this.pageNum - 1;
 		this._movePage(pageNum);
 	},
 
 	pageDown() {
-		const pageNum = this.pageNum + 1 > this.pages.length - 1 ? this.pageNum : this.pageNum + 1;
+		const pageNum = this.pageNum + 1 > this.pages.length ? this.pages.length : this.pageNum + 1;
 		this._movePage(pageNum);
 	},
 
@@ -229,21 +226,38 @@ DocumentType.prototype = {
 
 	_movePage(pageNum) {
 		if (this.pageNum === pageNum) return;
-		this.pageNum = pageNum;
 
 		const globalTop = this._getGlobalTop();
 		const children = converter.nodeListToArray(this.ww.children);
-		const globalScrollTop = this.isAutoHeight ? _w.scrollY - globalTop : 0;
-		const pageTop = this.page.offsetTop + numbers.get(this.pages[pageNum].style.top) + this._getWWScrollTop() + globalTop;
+		const pageTop = this.page.offsetTop + numbers.get(this.pages[pageNum - 1].style.top) + this._getWWScrollTop();
 		for (let i = 0, len = children.length, c; i < len; i++) {
 			c = children[i];
-			if (c.offsetTop + globalScrollTop >= pageTop) {
+			if (c.offsetTop >= pageTop) {
 				this.selection.setRange(c, 0, c, 0);
-				const scrollTop = i === 0 && !this.isAutoHeight ? 0 : c.offsetTop - this.page.offsetTop - c.offsetHeight + globalScrollTop;
-				this.displayPage.scrollTo({ top: scrollTop, behavior: 'smooth' });
+				const scrollTop = i === 0 && !this.isAutoHeight ? 0 : c.offsetTop - this.page.offsetTop - c.offsetHeight + globalTop;
+				this._applyPageScroll(scrollTop, () => {
+					if (this.editor.toolbar._sticky) {
+						this.displayPage.scrollTo({ top: scrollTop - this.editor.context.get('toolbar.main').offsetHeight, behavior: 'smooth' });
+					}
+				});
+
+				this.pageNum = pageNum;
 				break;
 			}
 		}
+	},
+
+	_applyPageScroll(top, callback) {
+		this.displayPage.scrollTo({ top, behavior: 'smooth' });
+		const checkScrollEnd = () => {
+			if (Math.abs((this.displayPage.scrollY ?? this.displayPage.scrollTop) - top) < 1) {
+				callback();
+			} else {
+				_w.requestAnimationFrame(checkScrollEnd);
+			}
+		};
+
+		_w.requestAnimationFrame(checkScrollEnd);
 	},
 
 	_getGlobalTop() {

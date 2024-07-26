@@ -302,7 +302,7 @@ Selection.prototype = {
 	/**
 	 * @description Scroll to the corresponding selection or range position.
 	 * @param {Selection|Range|Node} ref selection or range object
-		* @param {Object?} scrollOption option of scrollTo
+	 * @param {Object?} scrollOption option of scrollTo
 	 */
 	scrollTo(ref, scrollOption) {
 		if (ref instanceof Selection) {

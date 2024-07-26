@@ -51,7 +51,7 @@ import langs from '../../src/langs';
 import plugins, { audio, exportPdf } from '../../src/plugins';
 
 const bl = [
-	['newDocument', 'selectAll', 'undo', 'redo', 'dir'],
+	['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'formatBlock'],
 	['paragraphStyle', 'blockquote'],
@@ -70,7 +70,7 @@ const bl = [
 	[
 		'%1565',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -88,7 +88,7 @@ const bl = [
 	[
 		'%1455',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -105,7 +105,7 @@ const bl = [
 	[
 		'%1326',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -121,7 +121,7 @@ const bl = [
 	[
 		'%1123',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
 			['fontColor', 'backgroundColor', 'textStyle'],
@@ -136,7 +136,7 @@ const bl = [
 	[
 		'%817',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike'],
 			[':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
@@ -151,7 +151,7 @@ const bl = [
 	[
 		'%673',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['copyFormat', 'removeFormat'],
@@ -165,7 +165,7 @@ const bl = [
 	[
 		'%525',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['copyFormat', 'removeFormat'],
@@ -179,7 +179,7 @@ const bl = [
 	[
 		'%420',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo'],
+			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
@@ -190,7 +190,7 @@ const bl = [
 ];
 
 const bb = [
-	['newDocument', 'selectAll', 'undo', 'redo', 'dir'],
+	['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'formatBlock'],
 	['paragraphStyle', 'blockquote'],
@@ -574,7 +574,7 @@ window.editor_root = suneditor.create(
 		// 		`,
 		// syncTab: true,
 		// iframe: true,
-		height: '600px',
+		height: 'auto',
 		type: 'document:header,page',
 		iframe_cssFileName: ['suneditor', 'katex'],
 		copyFormatKeepOn: true,
@@ -617,22 +617,22 @@ window.editor_root = suneditor.create(
 		// height: '600px',
 		// charCounter_max: 1400,
 		buttonList: bl,
-		buttonList: [
-			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
-			'|',
-			[':문단&글꼴-default.more_paragraph', 'font', 'fontSize', 'formatBlock', '|', 'paragraphStyle', 'blockquote'],
-			'|',
-			[':글자 스타일-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
-			'|',
-			[':리스트&라인-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			'|',
-			[':테이블&미디어-default.more_plus', 'table', 'link', 'image', 'video', 'fileUpload', 'anchor'],
-			'|',
-			['save'],
-			'|',
-			[':기타-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'math', 'exportPdf', 'print'],
-			'|'
-		],
+		// buttonList: [
+		// 	['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+		// 	'|',
+		// 	[':문단&글꼴-default.more_paragraph', 'font', 'fontSize', 'formatBlock', '|', 'paragraphStyle', 'blockquote'],
+		// 	'|',
+		// 	[':글자 스타일-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
+		// 	'|',
+		// 	[':리스트&라인-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list_numbered', 'list_bulleted', 'lineHeight'],
+		// 	'|',
+		// 	[':테이블&미디어-default.more_plus', 'table', 'link', 'image', 'video', 'fileUpload', 'anchor'],
+		// 	'|',
+		// 	['save'],
+		// 	'|',
+		// 	[':기타-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'math', 'exportPdf', 'print'],
+		// 	'|'
+		// ],
 		// iframe: true,
 		subToolbar: {
 			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
