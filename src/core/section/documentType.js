@@ -223,7 +223,7 @@ DocumentType.prototype = {
 		console.log('pageNum', pageNum);
 	},
 
-	_getWWScrollPage() {
+	_getWWScrollTop() {
 		return this.displayPage.scrollTop || 0;
 	},
 
