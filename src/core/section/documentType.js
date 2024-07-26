@@ -2,24 +2,30 @@
  * @fileoverview DocumentType class
  */
 
-import { domUtils, numbers } from '../../helper';
+import { domUtils, numbers, converter, env } from '../../helper';
 
+const { _w } = env;
 const A4_HEIGHT_INCHES = 11.7; // A4 height(inches)
 const A4_HEIGHT = A4_HEIGHT_INCHES * 96; // 1 inch = 96px
 
 const DocumentType = function (editor, fc) {
 	// members
 	this.editor = editor;
+	this.selection = editor.selection;
+	this.offset = editor.offset;
 	this.fc = fc;
 	this.ww = fc.get('wysiwyg');
 	this.wwFrame = fc.get('wysiwygFrame');
 	this.wwWidth = -1;
 	this.wwHeight = -1;
+	this.isAutoHeight = fc.get('options').get('height') === 'auto';
+	this.displayPage = this.isAutoHeight ? _w : fc.get('wysiwyg');
 	this.innerHeaders = [];
 	this._wwHeaders = [];
 	this.inner = null;
 	this.page = null;
 	this.totalPages = 0;
+	this.pageNum = 0;
 	this.pageHeight = -1;
 	this.pages = [];
 	this.pages_line = [];
@@ -45,6 +51,10 @@ const DocumentType = function (editor, fc) {
 	// init page
 	if (this.usePage) {
 		this.page = fc.get('documentTypePage');
+		// page navigator
+		if (editor.options.get('buttons').has('pageNavigator') || editor.options.get('buttons_sub')?.has('pageNavigator')) {
+			
+		}
 	}
 };
 
@@ -88,12 +98,12 @@ DocumentType.prototype = {
 	rePage() {
 		if (!this.page) return;
 
-		const height = this.ww.scrollHeight;
+		const height = this.displayPage.scrollHeight ?? this.ww.scrollHeight;
 		if (this.pageHeight === height) return;
 		this.pageHeight = height;
 
 		const totalPages = Math.ceil(height / A4_HEIGHT);
-		const scrollTop = (this.prevScrollTop = this.ww.scrollTop);
+		const scrollTop = (this.prevScrollTop = this._getWWScrollTop());
 		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const pageBreaks = this.ww.querySelectorAll('.se-page-break');
 
@@ -148,7 +158,7 @@ DocumentType.prototype = {
 
 	scrollPage() {
 		const prevScrollTop = this.prevScrollTop;
-		const scrollTop = this.ww.scrollTop;
+		const scrollTop = this._getWWScrollTop();
 		if (prevScrollTop === scrollTop) return;
 
 		const pages = this.pages;
@@ -163,8 +173,22 @@ DocumentType.prototype = {
 	getCurrentPageNumber() {
 		if (this.totalPages <= 1) return 1;
 
-		const scrollTop = this.ww.scrollTop + this.wwHeight / 2;
-		return Math.floor(scrollTop / A4_HEIGHT) + 1;
+		const scrollTop = this.isAutoHeight ? _w.scrollY + this.wwHeight / 2 - this._getGlobalTop() : this._getWWScrollTop() + this.wwHeight / 2;
+		let pageNum = Math.floor(scrollTop / A4_HEIGHT);
+		if (this.isAutoHeight) pageNum--;
+		this.pageNum = pageNum < 0 ? 0 : pageNum > this.pages.length - 1 ? this.pages.length - 1 : pageNum;
+
+		return pageNum + 1;
+	},
+
+	pageUp() {
+		const pageNum = this.pageNum - 1 <= 0 ? 0 : this.pageNum - 1;
+		this._movePage(pageNum);
+	},
+
+	pageDown() {
+		const pageNum = this.pageNum + 1 > this.pages.length - 1 ? this.pageNum : this.pageNum + 1;
+		this._movePage(pageNum);
 	},
 
 	on(line) {
@@ -189,9 +213,41 @@ DocumentType.prototype = {
 		item.textContent = header.textContent;
 	},
 
+	scrollWindow() {
+		if (!this.isAutoHeight) return;
+		this._displayCurrentPage();
+	},
+
 	_displayCurrentPage() {
 		const pageNum = this.getCurrentPageNumber();
 		console.log('pageNum', pageNum);
+	},
+
+	_getWWScrollPage() {
+		return this.displayPage.scrollTop || 0;
+	},
+
+	_movePage(pageNum) {
+		if (this.pageNum === pageNum) return;
+		this.pageNum = pageNum;
+
+		const globalTop = this._getGlobalTop();
+		const children = converter.nodeListToArray(this.ww.children);
+		const globalScrollTop = this.isAutoHeight ? _w.scrollY - globalTop : 0;
+		const pageTop = this.page.offsetTop + numbers.get(this.pages[pageNum].style.top) + this._getWWScrollTop() + globalTop;
+		for (let i = 0, len = children.length, c; i < len; i++) {
+			c = children[i];
+			if (c.offsetTop + globalScrollTop >= pageTop) {
+				this.selection.setRange(c, 0, c, 0);
+				const scrollTop = i === 0 && !this.isAutoHeight ? 0 : c.offsetTop - this.page.offsetTop - c.offsetHeight + globalScrollTop;
+				this.displayPage.scrollTo({ top: scrollTop, behavior: 'smooth' });
+				break;
+			}
+		}
+	},
+
+	_getGlobalTop() {
+		return this.isAutoHeight ? this.offset.getGlobal(this.wwFrame).top : 0;
 	},
 
 	_findItem(header) {
@@ -239,7 +295,7 @@ function OnClickHeader(ww, e) {
 
 			const header = this._wwHeaders[innerIndex];
 			if (header) {
-				this.editor.selection.scrollTo(header);
+				this.selection.scrollTo(header);
 			}
 		}
 	} finally {
