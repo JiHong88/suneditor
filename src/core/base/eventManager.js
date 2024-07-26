@@ -1128,6 +1128,11 @@ function OnScroll_window() {
 	}
 
 	this._scrollContainer();
+
+	// document type page
+	if (this.editor.frameContext.has('documentType-use-page')) {
+		this.editor.frameContext.get('documentType').scrollWindow();
+	}
 }
 
 function OnResize_viewport() {
