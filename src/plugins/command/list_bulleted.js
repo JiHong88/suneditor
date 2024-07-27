@@ -8,7 +8,7 @@ const List_bulleted = function (editor) {
 	EditorInjector.call(this, editor);
 	this.title = this.lang.bulletedList;
 	this.icon = 'list_bulleted';
-	this.afterButton = domUtils.createElement(
+	this.afterItem = domUtils.createElement(
 		'button',
 		{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': List_bulleted.key, 'data-type': 'dropdown' },
 		`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.bulletedList}</span></span>`

@@ -257,11 +257,7 @@ Toolbar.prototype = {
 			buttonsObj[size] = buttonGroup[1];
 		}
 
-		_rButtonsize
-			.sort(function (a, b) {
-				return a - b;
-			})
-			.unshift('default');
+		_rButtonsize.sort((a, b) => a - b).unshift('default');
 	},
 
 	_showBalloon(rangeObj) {

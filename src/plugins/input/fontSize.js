@@ -109,18 +109,18 @@ const FontSize = function (editor, pluginOptions) {
 
 	// increase, decrease buttons
 	if (showIncDec) {
-		this.beforeButton = domUtils.createElement(
+		this.beforeItem = domUtils.createElement(
 			'button',
 			{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'dec' },
 			`${this.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.decrease}</span></span>`
 		);
-		this.afterButton = domUtils.createElement(
+		this.afterItem = domUtils.createElement(
 			'button',
 			{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'inc' },
 			`${this.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.increase}</span></span>`
 		);
 	} else if (!disableInput) {
-		this.afterButton = domUtils.createElement(
+		this.afterItem = domUtils.createElement(
 			'button',
 			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': FontSize.key, 'data-type': 'dropdown' },
 			`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`

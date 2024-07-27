@@ -1089,24 +1089,24 @@ export function UpdateButton(element, plugin, icons, lang) {
 	}
 
 	// side, replace button
-	if (plugin.afterButton) {
-		domUtils.addClass(plugin.afterButton, 'se-toolbar-btn');
-		element.parentElement.appendChild(plugin.afterButton);
+	if (plugin.afterItem) {
+		domUtils.addClass(plugin.afterItem, 'se-toolbar-btn');
+		element.parentElement.appendChild(plugin.afterItem);
 
 		domUtils.addClass(element, 'se-side-btn-a');
-		domUtils.addClass(plugin.afterButton, 'se-side-btn-after');
+		domUtils.addClass(plugin.afterItem, 'se-side-btn-after');
 	}
-	if (plugin.beforeButton) {
-		domUtils.addClass(plugin.beforeButton, 'se-toolbar-btn');
-		element.parentElement.insertBefore(plugin.beforeButton, element);
+	if (plugin.beforeItem) {
+		domUtils.addClass(plugin.beforeItem, 'se-toolbar-btn');
+		element.parentElement.insertBefore(plugin.beforeItem, element);
 
-		if (plugin.afterButton) {
+		if (plugin.afterItem) {
 			domUtils.addClass(element, 'se-side-btn');
 			domUtils.removeClass(element, 'se-side-btn-a');
 		} else {
 			domUtils.addClass(element, 'se-side-btn-b');
 		}
-		domUtils.addClass(plugin.beforeButton, 'se-side-btn-before');
+		domUtils.addClass(plugin.beforeItem, 'se-side-btn-before');
 	}
 	if (plugin.replaceButton) {
 		element.parentElement.appendChild(plugin.replaceButton);

@@ -8,7 +8,7 @@ const List_numbered = function (editor) {
 	EditorInjector.call(this, editor);
 	this.title = this.lang.numberedList;
 	this.icon = 'list_numbered';
-	this.afterButton = domUtils.createElement(
+	this.afterItem = domUtils.createElement(
 		'button',
 		{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': List_numbered.key, 'data-type': 'dropdown' },
 		`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.numberedList}</span></span>`

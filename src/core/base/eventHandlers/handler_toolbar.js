@@ -40,6 +40,7 @@ export function ButtonsHandler(e) {
 			if (!domUtils.isInputElement(eventTarget) || eventTarget.disabled) return;
 
 			const plugin = this.plugins[command];
+			if (!plugin) return;
 
 			if (this.__inputBlurEvent) this.__removeInput();
 

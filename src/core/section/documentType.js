@@ -32,6 +32,8 @@ const DocumentType = function (editor, fc) {
 	this.prevScrollTop = 0;
 	this.useHeader = editor.options.get('type-options').includes('header');
 	this.usePage = editor.options.get('type-options').includes('page');
+	this.navigatorButtons = [];
+	this.pageNavigator = null;
 
 	// init header
 	if (this.useHeader) {
@@ -51,10 +53,7 @@ const DocumentType = function (editor, fc) {
 	// init page
 	if (this.usePage) {
 		this.page = fc.get('documentTypePage');
-		// page navigator
-		if (editor.options.get('buttons').has('pageNavigator') || editor.options.get('buttons_sub')?.has('pageNavigator')) {
-			//
-		}
+		this.pageNavigator = editor.plugins.pageNavigator;
 	}
 };
 
@@ -217,7 +216,7 @@ DocumentType.prototype = {
 
 	_displayCurrentPage() {
 		const pageNum = this.getCurrentPageNumber();
-		console.log('pageNum', pageNum);
+		this.pageNavigator?.display(pageNum, this.totalPages);
 	},
 
 	_getWWScrollTop() {
