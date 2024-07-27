@@ -239,7 +239,7 @@ Component.prototype = {
 			dragHandle.style.opacity = 0;
 			dragHandle.style.width = w + 'px';
 			dragHandle.style.height = h + 'px';
-			dragHandle.style.top = top + 'px';
+			dragHandle.style.top = top - 1 + 'px';
 			dragHandle.style.left = left + 'px';
 
 			_DragHandle.set('__dragHandler', dragHandle);
