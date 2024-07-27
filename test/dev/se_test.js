@@ -574,7 +574,7 @@ window.editor_root = suneditor.create(
 		// 		`,
 		// syncTab: true,
 		// iframe: true,
-		height: 'auto',
+		height: '600px',
 		type: 'document:header,page',
 		iframe_cssFileName: ['suneditor', 'katex'],
 		copyFormatKeepOn: true,

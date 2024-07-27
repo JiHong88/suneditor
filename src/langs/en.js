@@ -138,6 +138,7 @@
 		outdent: 'Outdent',
 		pageBreak: 'Page break',
 		pageDown: 'Page down',
+		pageNumber: 'Page number',
 		pageUp: 'Page up',
 		paragraphStyle: 'Paragraph style',
 		preview: 'Preview',

@@ -35,6 +35,7 @@ import imageGallery from './fileBrowser/imageGallery';
 
 // input
 import fontSize from './input/fontSize';
+import pageNavigator from './input/pageNavigator';
 
 // popup
 import anchor from './popup/anchor';
@@ -66,6 +67,7 @@ export {
 	math,
 	imageGallery,
 	fontSize,
+	pageNavigator,
 	anchor
 };
 export default {
@@ -95,5 +97,6 @@ export default {
 	math,
 	imageGallery,
 	fontSize,
+	pageNavigator,
 	anchor
 };

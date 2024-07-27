@@ -4,7 +4,7 @@
 	--se-main-out-color: #dadada;
 	--se-main-font-family: Helvetica Neue;
 	--se-main-color: #000;
-	--se-main-color-lighter: rgba(0, 0, 0, 0.7);
+	--se-main-color-lighter: #4c4c4d;
 	--se-main-background-color: #fff;
 	--se-main-background-color2: #f5f5f5;
 	--se-main-background-color3: #f9f9f9;
@@ -642,6 +642,30 @@
 
 .sun-editor .se-btn-list.default_value {
 	border: 1px dashed var(--se-main-outline-color);
+}
+
+/* page navigator */
+.sun-editor .se-btn.se-btn-tool-pageNavigator > input {
+	width: var(--se-input-btn-size);
+	text-align: center;
+	color: var(--se-main-color-lighter);
+}
+.sun-editor .se-btn.se-btn-tool-pageNavigator > input[type='number'] {
+	appearance: textfield;
+}
+.sun-editor .se-btn.se-btn-tool-pageNavigator > input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+.sun-editor .se-btn.se-btn-tool-pageNavigator ~ span {
+	text-align: center;
+	font-size: var(--se-main-font-size);
+	align-content: center;
+	margin-left: -10px;
+}
+.sun-editor .se-btn.se-btn-tool-pageNavigator ~ span::before {
+	content: '/';
+	margin: 0 0.6em;
 }
 
 /** --- Icons ---------------------------------------------------------- */

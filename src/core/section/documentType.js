@@ -179,12 +179,19 @@ DocumentType.prototype = {
 
 	pageUp() {
 		const pageNum = this.pageNum - 1 <= 1 ? 1 : this.pageNum - 1;
-		this._movePage(pageNum);
+		this._movePage(pageNum, false);
 	},
 
 	pageDown() {
 		const pageNum = this.pageNum + 1 > this.pages.length ? this.pages.length : this.pageNum + 1;
-		this._movePage(pageNum);
+		this._movePage(pageNum, false);
+	},
+
+	pageGo(pageNum) {
+		if (pageNum < 1) pageNum = 1;
+		else if (pageNum > this.pages.length) pageNum = this.pages.length;
+
+		this._movePage(pageNum, true);
 	},
 
 	on(line) {
@@ -223,8 +230,8 @@ DocumentType.prototype = {
 		return this.displayPage.scrollTop || 0;
 	},
 
-	_movePage(pageNum) {
-		if (this.pageNum === pageNum) return;
+	_movePage(pageNum, force) {
+		if (!force && this.pageNum === pageNum) return;
 
 		const globalTop = this._getGlobalTop();
 		const children = converter.nodeListToArray(this.ww.children);
@@ -232,7 +239,7 @@ DocumentType.prototype = {
 		for (let i = 0, len = children.length, c; i < len; i++) {
 			c = children[i];
 			if (c.offsetTop >= pageTop) {
-				this.selection.setRange(c, 0, c, 0);
+				if (!force) this.selection.setRange(c, 0, c, 0);
 				const scrollTop = i === 0 && !this.isAutoHeight ? 0 : c.offsetTop - this.page.offsetTop - c.offsetHeight + globalTop;
 				this._applyPageScroll(scrollTop, () => {
 					if (this.editor.toolbar._sticky) {

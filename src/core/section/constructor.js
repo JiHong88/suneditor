@@ -1024,6 +1024,8 @@ function _createModuleGroup() {
  * @returns {Object}
  */
 function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, icons) {
+	if (!innerHTML) innerHTML = '';
+
 	const oLi = domUtils.createElement('LI');
 	const label = title || '';
 	const isDiv = /^INPUT|FIELD$/i.test(dataType);
@@ -1074,9 +1076,13 @@ export function UpdateButton(element, plugin, icons, lang) {
 
 	const noneInner = plugin.inner === false;
 
-	element.innerHTML = noneInner
-		? ''
-		: (plugin.inner || icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (lang[plugin.title] || plugin.title) + '</span></span>';
+	if (plugin.inner?.nodeType === 1) {
+		element.appendChild(plugin.inner);
+	} else {
+		element.innerHTML = noneInner
+			? ''
+			: (plugin.inner || icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (lang[plugin.title] || plugin.title) + '</span></span>';
+	}
 
 	element.setAttribute('aria-label', plugin.title);
 
