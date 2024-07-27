@@ -174,7 +174,7 @@ DocumentType.prototype = {
 		if (this.totalPages <= 1) return 1;
 
 		const scrollTop = this.isAutoHeight ? _w.scrollY + this.wwHeight / 2 - this._getGlobalTop() : this._getWWScrollTop() + this.wwHeight / 2;
-		const pageNum = Math.floor(scrollTop / A4_HEIGHT);
+		const pageNum = this.isAutoHeight ? Math.floor(scrollTop / A4_HEIGHT) : Math.ceil(scrollTop / A4_HEIGHT);
 		return (this.pageNum = pageNum < 1 ? 1 : pageNum > this.pages.length ? this.pages.length : pageNum);
 	},
 
