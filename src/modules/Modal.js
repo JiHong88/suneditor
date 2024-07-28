@@ -3,6 +3,7 @@ import { CreateTooltipInner } from '../core/section/constructor';
 import { env } from '../helper';
 
 const { _w } = env;
+const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize' };
 
 const Modal = function (inst, element) {
 	CoreInjector.call(this, inst.editor);
@@ -20,6 +21,8 @@ const Modal = function (inst, element) {
 	this._bindClose = null;
 	this._onClickEvent = null;
 	this._closeSignal = false;
+	// resie
+	this._resizeBody = null;
 
 	// add element
 	this._modalInner.appendChild(element);
@@ -27,6 +30,25 @@ const Modal = function (inst, element) {
 	// init
 	this.eventManager.addEvent(element.querySelector('form'), 'submit', Action.bind(this));
 	this._closeSignal = !this.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
+
+	// resize
+	if (element.querySelector('.se-modal-resize-handle-w') || element.querySelector('.se-modal-resize-handle-h') || element.querySelector('.se-modal-resize-handle-c')) {
+		if ((this._resizeBody = element.querySelector('.se-modal-body'))) {
+			this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-w'), 'mousedown', OnResizeMouseDown.bind(this, 'w'));
+			this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-h'), 'mousedown', OnResizeMouseDown.bind(this, 'h'));
+			this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-c'), 'mousedown', OnResizeMouseDown.bind(this, 'c'));
+
+			this.__resizeDir = '';
+			this.__offetTop = 0;
+			this.__offetLeft = 0;
+			this.__globalEventHandlers = {
+				mousemove: OnResize.bind(this),
+				mouseup: OnResizeMouseUp.bind(this)
+			};
+			this._bindClose_mousemove = null;
+			this._bindClose_mouseup = null;
+		}
+	}
 };
 
 Modal.prototype = {
@@ -51,6 +73,12 @@ Modal.prototype = {
 		this._modalInner.style.display = 'block';
 		this.form.style.display = 'block';
 
+		if (this._resizeBody) {
+			const offset = this.editor.offset.getGlobal(this._resizeBody);
+			this.__offetTop = offset.top;
+			this.__offetLeft = offset.left;
+		}
+
 		if (this.focusElement) this.focusElement.focus();
 	},
 
@@ -59,6 +87,7 @@ Modal.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	close() {
+		this.__removeGlobalEvent();
 		this._fixCurrentController(false);
 		_w.setTimeout(() => {
 			this.editor.opendModal = null;
@@ -73,6 +102,7 @@ Modal.prototype = {
 		this._modalArea.style.display = 'none';
 
 		if (typeof this.inst.init === 'function') this.inst.init();
+		if (typeof this.inst.off === 'function') this.inst.off(this.isUpdate);
 		this.editor.focus();
 	},
 
@@ -82,6 +112,19 @@ Modal.prototype = {
 			cont[i].fixed = fixed;
 			cont[i].form.style.display = fixed ? 'none' : 'block';
 		}
+	},
+
+	__addGlobalEvent(dir) {
+		this.__removeGlobalEvent();
+		this.editor.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
+		this._bindClose_mousemove = this.eventManager.addGlobalEvent('mousemove', this.__globalEventHandlers.mousemove, true);
+		this._bindClose_mouseup = this.eventManager.addGlobalEvent('mouseup', this.__globalEventHandlers.mouseup, true);
+	},
+
+	__removeGlobalEvent() {
+		this.editor.disableBackWrapper();
+		if (this._bindClose_mousemove) this._bindClose_mousemove = this.eventManager.removeGlobalEvent(this._bindClose_mousemove);
+		if (this._bindClose_mouseup) this._bindClose_mouseup = this.eventManager.removeGlobalEvent(this._bindClose_mouseup);
 	},
 
 	constructor: Modal
@@ -128,6 +171,43 @@ function OnClick_dialog(e) {
 function CloseListener(e) {
 	if (!/27/.test(e.keyCode)) return;
 	this.close();
+}
+
+/** Resize events */
+function OnResizeMouseDown(dir) {
+	this.__addGlobalEvent((this.__resizeDir = dir));
+}
+
+function OnResize(e) {
+	switch (this.__resizeDir) {
+		case 'w': {
+			const h = e.clientY - this.__offetTop - this._resizeBody.offsetHeight;
+			this._resizeBody.style.height = this._resizeBody.offsetHeight + h + 'px';
+			break;
+		}
+		case 'h': {
+			const w = e.clientX - this.__offetLeft - this._resizeBody.offsetWidth;
+			this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
+			break;
+		}
+		case 'c': {
+			const w = e.clientX - this.__offetLeft - this._resizeBody.offsetWidth;
+			const h = e.clientY - this.__offetTop - this._resizeBody.offsetHeight;
+			this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
+			this._resizeBody.style.height = this._resizeBody.offsetHeight + h + 'px';
+			break;
+		}
+	}
+
+	const offset = this.editor.offset.getGlobal(this._resizeBody);
+	this.__offetTop = offset.top;
+	this.__offetLeft = offset.left;
+
+	if (typeof this.inst.modalResize === 'function') this.inst.modalResize();
+}
+
+function OnResizeMouseUp() {
+	this.__removeGlobalEvent();
 }
 
 // HTML Creator ======================================================================================================

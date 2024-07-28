@@ -1,0 +1,314 @@
+import EditorInjector from '../../editorInjector';
+import { Modal } from '../../modules';
+import { domUtils } from '../../helper';
+
+const Drawing = function (editor, pluginOptions) {
+	// plugin basic properties
+	EditorInjector.call(this, editor);
+	this.title = this.lang.drawing;
+	this.icon = 'drawing';
+	this.pluginOptions = {
+		outputFormat: pluginOptions.outputFormat || 'dataurl', // dataurl, svg
+		size: pluginOptions.size || 5,
+		lineReconnect: !!pluginOptions.lineReconnect,
+		lineCap: ['butt', 'round', 'square'].includes(pluginOptions.lineCap) ? pluginOptions.lineCap : 'round',
+		modalSizeWidth: pluginOptions.canvasSizeWidth || '750px',
+		modalSizeHeight: pluginOptions.canvasSizeHeight || '50vh'
+	};
+
+	// exception
+	if (!this.plugins.image) {
+		console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need either "image" plugin. Please add the "image" plugin.');
+	} else if (this.pluginOptions.outputFormat === 'svg' && !this.plugins.image.pluginOptions.uploadUrl) {
+		console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need the "image" plugin with the "uploadUrl" option. Please add the "image" plugin with the "uploadUrl" option.');
+	}
+
+	// create HTML
+	const modalEl = CreateHTML_modal(this);
+
+	// modules
+	this.modal = new Modal(this, modalEl);
+
+	// members
+	this.canvas = null;
+	this.ctx = null;
+	this.isDrawing = false;
+	this.points = [];
+	this.paths = [];
+	this.resizeObserver = null;
+	this.__events = {
+		mousedown: OnCanvasMouseDown.bind(this),
+		mousemove: OnCanvasMouseMove.bind(this),
+		mouseup: OnCanvasMouseUp.bind(this),
+		mouseleave: OnCanvasMouseLeave.bind(this),
+		mouseenter: OnCanvasMouseEnter.bind(this)
+	};
+	this.__eventsRegister = {
+		mousedown: null,
+		mousemove: null,
+		mouseup: null,
+		mouseleave: null,
+		mouseenter: null
+	};
+
+	// init
+	this.eventManager.addEvent(modalEl.querySelector('[data-command="remove"]'), 'click', OnRemove.bind(this));
+};
+
+Drawing.key = 'drawing';
+Drawing.type = 'modal';
+Drawing.className = '';
+Drawing.prototype = {
+	/**
+	 * @override type = "modal"
+	 */
+	open() {
+		this.modal.open();
+		this._initDrawing();
+	},
+
+	/**
+	 * @override modal
+	 */
+	off() {
+		this._destroyDrawing();
+	},
+
+	/**
+	 * @override modal
+	 * @returns {string}
+	 */
+	modalAction() {
+		if (this.pluginOptions.outputFormat === 'svg') {
+			const files = this._getSVGFileList();
+			this.plugins.image.init();
+			this.plugins.image.submitFile(files);
+		} else {
+			// dataurl
+			const data = this.canvas.toDataURL();
+			const file = { name: 'drawing', size: 0 };
+			this.plugins.image.init();
+			this.plugins.image.create(data, null, 'auto', '', 'none', file, '');
+		}
+
+		return true;
+	},
+
+	_initDrawing() {
+		const canvas = (this.canvas = this.modal.form.querySelector('.se-drawing-canvas'));
+		this.ctx = canvas.getContext('2d');
+		canvas.width = canvas.offsetWidth;
+		canvas.height = canvas.offsetHeight;
+
+		this.points = [];
+		this.paths = [];
+
+		this.ctx.lineWidth = this.pluginOptions.size;
+		this.ctx.lineCap = this.pluginOptions.lineCap;
+
+		this.__eventsRegister.mousedown = this.eventManager.addEvent(canvas, 'mousedown', this.__events.mousedown);
+		this.__eventsRegister.mousemove = this.eventManager.addEvent(canvas, 'mousemove', this.__events.mousemove);
+		this.__eventsRegister.mouseup = this.eventManager.addEvent(canvas, 'mouseup', this.__events.mouseup);
+		this.__eventsRegister.mouseleave = this.eventManager.addEvent(canvas, 'mouseleave', this.__events.mouseleave);
+		this.__eventsRegister.mouseenter = this.eventManager.addEvent(canvas, 'mouseenter', this.__events.mouseenter);
+
+		if (this.resizeObserver) {
+			this.resizeObserver.disconnect();
+			this.resizeObserver = null;
+		}
+
+		this.resizeObserver = new ResizeObserver(() => {
+			const prevWidth = canvas.width;
+			const prevHeight = canvas.height;
+			const newWidth = canvas.offsetWidth;
+			const newHeight = canvas.offsetHeight;
+			canvas.width = newWidth;
+			canvas.height = newHeight;
+			if (prevWidth !== canvas.width || prevHeight !== canvas.height) {
+				this._adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight);
+				this._drawAll();
+			}
+		});
+
+		this.resizeObserver.observe(canvas);
+	},
+
+	_destroyDrawing() {
+		if (this.resizeObserver) {
+			this.resizeObserver.disconnect();
+			this.resizeObserver = null;
+		}
+
+		if (this.canvas) {
+			this.eventManager.removeEvent(this.__eventsRegister.mousedown);
+			this.eventManager.removeEvent(this.__eventsRegister.mousemove);
+			this.eventManager.removeEvent(this.__eventsRegister.mouseup);
+			this.eventManager.removeEvent(this.__eventsRegister.mouseleave);
+			this.eventManager.removeEvent(this.__eventsRegister.mouseenter);
+		}
+
+		this.canvas = null;
+		this.ctx = null;
+		this.points = [];
+		this.paths = [];
+		this.isDrawing = false;
+	},
+
+	_draw() {
+		this.ctx.lineWidth = this.pluginOptions.size;
+		this.ctx.lineCap = this.pluginOptions.lineCap;
+		this.ctx.beginPath();
+		this.points.forEach(([x, y], i) => {
+			if (i === 0) {
+				this.ctx.moveTo(x, y);
+			} else {
+				this.ctx.lineTo(x, y);
+			}
+		});
+		this.ctx.stroke();
+	},
+
+	_drawAll() {
+		this.ctx.lineWidth = this.pluginOptions.size;
+		this.ctx.lineCap = this.pluginOptions.lineCap;
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		this.paths.forEach((path) => {
+			this.points = path;
+			this._draw();
+		});
+		this.points = [];
+	},
+
+	_adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight) {
+		const xRatio = newWidth / prevWidth;
+		const yRatio = newHeight / prevHeight;
+
+		this.paths = this.paths.map((path) => path.map(([x, y]) => [x * xRatio, y * yRatio]));
+	},
+
+	_clearCanvas() {
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		this.points = [];
+		this.paths = [];
+	},
+
+	_getSVG() {
+		const svgNS = 'http://www.w3.org/2000/svg';
+		const svg = document.createElementNS(svgNS, 'svg');
+		svg.setAttribute('width', this.canvas.width);
+		svg.setAttribute('height', this.canvas.height);
+		svg.setAttribute('viewBox', `0 0 ${this.canvas.width} ${this.canvas.height}`);
+		svg.setAttribute('xmlns', svgNS);
+
+		this.paths.forEach((path) => {
+			const pathData = path.reduce((acc, [x, y], i) => {
+				return acc + (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
+			}, '');
+			const svgPath = document.createElementNS(svgNS, 'path');
+			svgPath.setAttribute('d', pathData);
+			svgPath.setAttribute('fill', 'none');
+			svgPath.setAttribute('stroke', 'black');
+			svgPath.setAttribute('stroke-width', this.pluginOptions.size);
+			svg.appendChild(svgPath);
+		});
+
+		return svg;
+	},
+
+	_getSVGFileList() {
+		const svgElement = this._getSVG();
+		const serializer = new XMLSerializer();
+		const svgString = serializer.serializeToString(svgElement);
+		const blob = new Blob([svgString], { type: 'image/svg+xml' });
+		const file = new File([blob], 'drawing.svg', { type: 'image/svg+xml' });
+
+		// Creating a FileList
+		const dataTransfer = new DataTransfer();
+		dataTransfer.items.add(file);
+
+		return dataTransfer.files;
+	},
+
+	constructor: Drawing
+};
+
+function CreateHTML_modal({ lang, icons, pluginOptions }) {
+	const html = /*html*/ `
+    <form>
+        <div class="se-modal-header">
+            <button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
+                ${icons.cancel}
+            </button>
+            <span class="se-modal-title">${lang.drawing_modal_title}</span>
+        </div>
+        <div class="se-modal-body" style="width: ${pluginOptions.modalSizeWidth}; height: ${pluginOptions.modalSizeHeight};">
+            <canvas class="se-drawing-canvas" style="width: 100%; height: 100%;"></canvas>
+            <div class="se-modal-resize-handle-w"></div>
+            <div class="se-modal-resize-handle-h"></div>
+            <div class="se-modal-resize-handle-c"></div>
+        </div>
+        <div class="se-modal-footer">
+            <button type="button" class="se-btn" title="${lang.remove}" aria-label="${lang.remove}" data-command="remove">
+                ${icons.eraser}
+            </button>
+            <button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
+                <span>${lang.submitButton}</span>
+            </button>
+        </div>
+    </form>`;
+
+	return domUtils.createElement('DIV', { class: 'se-modal-content se-modal-responsive' }, html);
+}
+
+// canvas events
+function OnCanvasMouseDown(e) {
+	this.isDrawing = true;
+	this.points.push([e.offsetX, e.offsetY]);
+	this._draw();
+}
+
+function OnCanvasMouseMove(e) {
+	if (!this.isDrawing) return;
+	this.points.push([e.offsetX, e.offsetY]);
+	this._draw();
+}
+
+function OnCanvasMouseUp() {
+	this.isDrawing = false;
+	if (this.points.length > 0) {
+		this.paths.push([...this.points]);
+		this.points = [];
+	}
+}
+
+function OnCanvasMouseLeave() {
+	if (this.isDrawing) {
+		this.paths.push([...this.points]);
+		if (!this.pluginOptions.lineReconnect) {
+			this.points = [];
+			this.isDrawing = false;
+		}
+	}
+}
+
+function OnCanvasMouseEnter(e) {
+	if (e.buttons === 1) {
+		this.isDrawing = true;
+		if (!this.pluginOptions.lineReconnect) {
+			this.points.push([e.offsetX, e.offsetY]);
+		} else {
+			const lastPath = this.paths[this.paths.length - 1];
+			const lastPoint = lastPath[lastPath.length - 1];
+			this.points.push([lastPoint[0], lastPoint[1]]);
+			this.points.push([e.offsetX, e.offsetY]);
+		}
+		this._draw();
+	}
+}
+
+// clear button event
+function OnRemove() {
+	this._clearCanvas();
+}
+
+export default Drawing;

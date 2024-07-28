@@ -26,6 +26,9 @@ import { jsPDF } from 'jspdf';
 // require('codemirror5/lib/codemirror.css');
 // require('codemirror5/mode/htmlmixed/htmlmixed');
 
+// perfect-freehand
+// import PerfectFreehand from 'perfect-freehand';
+
 import langs from '../../src/langs';
 // import blockquote from '../../src/plugins/command/blockquote';
 // import align from '../../src/plugins/dropdown/align';
@@ -51,7 +54,7 @@ import langs from '../../src/langs';
 import plugins, { audio, exportPdf } from '../../src/plugins';
 
 const bl = [
-	['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
+	['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'formatBlock'],
 	['paragraphStyle', 'blockquote'],
@@ -70,7 +73,7 @@ const bl = [
 	[
 		'%1565',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -88,7 +91,7 @@ const bl = [
 	[
 		'%1455',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -105,7 +108,7 @@ const bl = [
 	[
 		'%1326',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -121,7 +124,7 @@ const bl = [
 	[
 		'%1123',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
 			['fontColor', 'backgroundColor', 'textStyle'],
@@ -136,7 +139,7 @@ const bl = [
 	[
 		'%817',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike'],
 			[':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
@@ -151,7 +154,7 @@ const bl = [
 	[
 		'%673',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['copyFormat', 'removeFormat'],
@@ -165,7 +168,7 @@ const bl = [
 	[
 		'%525',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['copyFormat', 'removeFormat'],
@@ -179,7 +182,7 @@ const bl = [
 	[
 		'%420',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
@@ -190,7 +193,7 @@ const bl = [
 ];
 
 const bb = [
-	['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
+	['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'formatBlock'],
 	['paragraphStyle', 'blockquote'],
@@ -712,6 +715,14 @@ window.editor_root = suneditor.create(
 			apiUrl: 'https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/{ key }?limit={limitSize}',
 			useCachingFieldData: true
 		},
+		drawing: {
+			// size: 22,
+			// outputFormat: 'svg'
+			// lineReconnect: true,
+			// lineCap: 'square',  // butt, round, square
+			// modalSizeWidth: '750px',
+			// modalSizeHeight: '50vh'
+		},
 		externalLibs: {
 			// math
 			// katex: {
@@ -724,6 +735,7 @@ window.editor_root = suneditor.create(
 				browserAdaptor,
 				RegisterHTMLHandler
 			},
+			// perfectFreehand: PerfectFreehand,
 			html2canvas: html2canvas,
 			jsPDF: jsPDF
 			// codemirror

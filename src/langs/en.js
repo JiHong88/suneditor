@@ -69,6 +69,8 @@
 		dir_rtl: 'Right to left',
 		download: 'Download',
 		drag: 'Drag',
+		drawing: 'Drawing',
+		drawing_modal_title: 'Drawing',
 		edit: 'Edit',
 		exportPdf: 'Export to PDF',
 		exportWord: 'Export to Word',
