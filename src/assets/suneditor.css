@@ -1969,13 +1969,13 @@
 }
 .sun-editor .se-modal .se-modal-inner .se-modal-content .se-modal-resize-handle-c::before {
 	width: 100%;
-	height: 1px;
+	height: 2px;
 	top: 50%;
 	left: 0;
 	transform: translateY(-50%);
 }
 .sun-editor .se-modal .se-modal-inner .se-modal-content .se-modal-resize-handle-c::after {
-	width: 1px;
+	width: 2px;
 	height: 100%;
 	left: 50%;
 	top: 0;
@@ -2109,6 +2109,10 @@
 	padding: 10px 15px 0px 15px;
 	text-align: right;
 	border-top: 1px solid #e5e5e5;
+}
+
+.sun-editor .se-modal .se-modal-inner .se-modal-footer .se-btn {
+	float: left;
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-footer > div {
@@ -3590,6 +3594,24 @@
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page > div > div.se-document-page-line {
 	right: unset;
 	left: 100%;
+}
+
+/* modal - footer */
+.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-footer .se-btn {
+	float: right;
+}
+
+/* modal - resize handle */
+/* modal - resize handle - h */
+.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-content .se-modal-resize-handle-h {
+	left: 0;
+	right: unset;
+}
+/* modal - resize handle - c */
+.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-content .se-modal-resize-handle-c {
+	cursor: nesw-resize;
+	left: 4px;
+	right: unset;
 }
 
 /** --- RTL end -------------------------------------------------------------------------------------------------------------------------------------------------- */
