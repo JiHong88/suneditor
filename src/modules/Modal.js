@@ -3,10 +3,11 @@ import { CreateTooltipInner } from '../core/section/constructor';
 import { env } from '../helper';
 
 const { _w } = env;
-const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize' };
+const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize', wRTL: 'ns-resize', hRTL: 'ew-resize', cRTL: 'nesw-resize' };
 
 const Modal = function (inst, element) {
 	CoreInjector.call(this, inst.editor);
+	this.offset = this.editor.offset;
 
 	// members
 	this.inst = inst;
@@ -74,9 +75,7 @@ Modal.prototype = {
 		this.form.style.display = 'block';
 
 		if (this._resizeBody) {
-			const offset = this.editor.offset.getGlobal(this._resizeBody);
-			this.__offetTop = offset.top;
-			this.__offetLeft = offset.left;
+			this._saveOffset();
 		}
 
 		if (this.focusElement) this.focusElement.focus();
@@ -112,6 +111,12 @@ Modal.prototype = {
 			cont[i].fixed = fixed;
 			cont[i].form.style.display = fixed ? 'none' : 'block';
 		}
+	},
+
+	_saveOffset() {
+		const offset = this.offset.getGlobal(this._resizeBody);
+		this.__offetTop = offset.top;
+		this.__offetLeft = offset.left;
 	},
 
 	__addGlobalEvent(dir) {
@@ -175,18 +180,24 @@ function CloseListener(e) {
 
 /** Resize events */
 function OnResizeMouseDown(dir) {
-	this.__addGlobalEvent((this.__resizeDir = dir));
+	this.__addGlobalEvent((this.__resizeDir = dir + (this.options.get('_rtl') ? 'RTL' : '')));
 }
 
 function OnResize(e) {
 	switch (this.__resizeDir) {
-		case 'w': {
+		case 'w':
+		case 'wRTL': {
 			const h = e.clientY - this.__offetTop - this._resizeBody.offsetHeight;
 			this._resizeBody.style.height = this._resizeBody.offsetHeight + h + 'px';
 			break;
 		}
 		case 'h': {
 			const w = e.clientX - this.__offetLeft - this._resizeBody.offsetWidth;
+			this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
+			break;
+		}
+		case 'hRTL': {
+			const w = this.__offetLeft - e.clientX;
 			this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
 			break;
 		}
@@ -197,11 +208,16 @@ function OnResize(e) {
 			this._resizeBody.style.height = this._resizeBody.offsetHeight + h + 'px';
 			break;
 		}
+		case 'c': {
+			const w = this.__offetLeft - e.clientX;
+			const h = e.clientY - this.__offetTop - this._resizeBody.offsetHeight;
+			this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
+			this._resizeBody.style.height = this._resizeBody.offsetHeight + h + 'px';
+			break;
+		}
 	}
 
-	const offset = this.editor.offset.getGlobal(this._resizeBody);
-	this.__offetTop = offset.top;
-	this.__offetLeft = offset.left;
+	this._saveOffset();
 
 	if (typeof this.inst.modalResize === 'function') this.inst.modalResize();
 }
