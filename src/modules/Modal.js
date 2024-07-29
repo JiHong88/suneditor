@@ -208,7 +208,7 @@ function OnResize(e) {
 			this._resizeBody.style.height = this._resizeBody.offsetHeight + h + 'px';
 			break;
 		}
-		case 'c': {
+		case 'cRTL': {
 			const w = this.__offetLeft - e.clientX;
 			const h = e.clientY - this.__offetTop - this._resizeBody.offsetHeight;
 			this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
