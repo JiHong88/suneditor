@@ -17,8 +17,43 @@ const Math_ = function (editor, pluginOptions) {
 	this.title = this.lang.math;
 	this.icon = 'math';
 
+	this.pluginOptions = {
+		formSize: {
+			width: '460px',
+			height: '14em',
+			maxWidth: '',
+			maxHeight: '',
+			minWidth: '400px',
+			minHeight: '40px',
+			...pluginOptions.formSize
+		},
+		canResize: pluginOptions.canResize ?? true,
+		autoHeight: !!pluginOptions.autoHeight,
+		fontSizeList: pluginOptions.fontSizeList || || [
+			{
+				text: '1',
+				value: '1em'
+			},
+			{
+				text: '1.5',
+				value: '1.5em'
+			},
+			{
+				text: '2',
+				value: '2em'
+			},
+			{
+				text: '2.5',
+				value: '2.5em'
+			}
+		]
+	};
+	if (this.pluginOptions.autoHeight) {
+		this.pluginOptions.formSize.height = this.pluginOptions.formSize.minHeight;
+	}
+
 	// create HTML
-	const modalEl = CreateHTML_modal(editor, this, pluginOptions.fontSizeList, this.katex);
+	const modalEl = CreateHTML_modal(this);
 	const controllerEl = CreateHTML_controller(editor);
 
 	// modules
@@ -262,8 +297,13 @@ async function copyTextToClipboard(element) {
 	}
 }
 
-function RenderMathExp(e) {
-	this.previewElement.innerHTML = this._renderer(e.target.value);
+function RenderMathExp({ target }) {
+	if (this.pluginOptions.autoHeight) {
+		target.style.height = '5px';
+		target.style.height = target.scrollHeight + 5 + 'px';
+	}
+
+	this.previewElement.innerHTML = this._renderer(target.value);
 	if (this.mathjax) renderMathJax(this.mathjax);
 }
 
@@ -315,26 +355,13 @@ function CheckMathJax(mathjax) {
 	}
 }
 
-function CreateHTML_modal({ lang, icons }, math, fontSizeList, isKatex) {
-	const fontSize = fontSizeList || [
-		{
-			text: '1',
-			value: '1em'
-		},
-		{
-			text: '1.5',
-			value: '1.5em'
-		},
-		{
-			text: '2',
-			value: '2em'
-		},
-		{
-			text: '2.5',
-			value: '2.5em'
-		}
-	];
-	let defaultFontSize = fontSize[0].value;
+function CreateHTML_modal(inst) {
+	const { lang, icons, pluginOptions, katex } = inst;
+	const { formSize, fontSizeList, canResize, autoHeight } = pluginOptions;
+	const { width, height, maxWidth, maxHeight, maxWidth, maxHeight } = formSize;
+	const resizeType = !canResize ? 'none' : autoHeight ? 'horizontal' : 'auto';
+
+	let defaultFontSize = fontSizeList[0].value;
 	let html = /*html*/ `
     <form>
         <div class="se-modal-header">
@@ -345,15 +372,15 @@ function CreateHTML_modal({ lang, icons }, math, fontSizeList, isKatex) {
         </div>
         <div class="se-modal-body">
             <div class="se-modal-form">
-                <label>${lang.math_modal_inputLabel} ${isKatex ? `(<a href="${env.KATEX_WEBSITE}" target="_blank">KaTeX</a>)` : `(<a href="${env.MATHJAX_WEBSITE}" target="_blank">MathJax</a>)`}</label>
-                <textarea class="se-input-form se-math-exp" type="text" data-focus></textarea>
+                <label>${lang.math_modal_inputLabel} ${katex ? `(<a href="${env.KATEX_WEBSITE}" target="_blank">KaTeX</a>)` : `(<a href="${env.MATHJAX_WEBSITE}" target="_blank">MathJax</a>)`}</label>
+                <textarea class="se-input-form se-math-exp se-modal-resize-form" type="text" data-focus style="width: ${width}; height: ${height}; min-width: ${minWidth}; min-height: ${minHeight}; resize: ${resizeType};"></textarea>
             </div>
             <div class="se-modal-form">
                 <label>${lang.math_modal_fontSizeLabel}</label>
                 <select class="se-input-select se-math-size">`;
 
-	for (let i = 0, len = fontSize.length, f; i < len; i++) {
-		f = fontSize[i];
+	for (let i = 0, len = fontSizeList.length, f; i < len; i++) {
+		f = fontSizeList[i];
 		if (f.default) defaultFontSize = f.value;
 		html += /*html*/ `<option value="${f.value}"${f.default ? ' selected' : ''}>${f.text}</option>`;
 	}
@@ -372,8 +399,8 @@ function CreateHTML_modal({ lang, icons }, math, fontSizeList, isKatex) {
         </div>
     </form>`;
 
-	math.defaultFontSize = defaultFontSize;
-	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
+	inst.defaultFontSize = defaultFontSize;
+	return domUtils.createElement('DIV', { class: 'se-modal-content se-modal-responsive', style: `max-width: ${maxWidth}; max-height: ${maxHeight};` }, html);
 }
 
 function CreateHTML_controller({ lang, icons }) {
