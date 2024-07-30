@@ -1,0 +1,136 @@
+:root {
+	/** --------- editable - styles --------- */
+	--se-edit-font-size: 13px;
+	--se-edit-inner-padding: 16px;
+	--se-edit-line-height: 1.5;
+	--se-edit-font-color: #333;
+	--se-edit-font-pre: #666;
+	--se-edit-font-quote: #999;
+	--se-edit-background-color: #fff;
+	--se-edit-background-pre: #f9f9f9;
+	--se-edit-border-light: #e1e1e1;
+	--se-edit-border-dark: #b1b1b1;
+	--se-edit-border-dark-n1: #c1c1c1;
+	--se-edit-border-dark-n2: #d1d1d1;
+	--se-edit-anchor: #004cff;
+	--se-edit-anchor-on-back: #e8f7ff;
+	--se-edit-anchor-on-font: #0093ff;
+	--se-edit-hr-color: #333;
+	--se-edit-hr-on-back: #c7deff;
+	--se-edit-active: #4592ff;
+	--se-edit-hover: #80bdff;
+	--se-edit-outline: #9e9e9e;
+
+	/** --------- editor - styles --------- */
+	/** main, common */
+	--se-min-height: 65px;
+	--se-main-out-color: #dadada;
+	--se-main-font-family: Helvetica Neue;
+	--se-main-color: #000;
+	--se-main-color-lighter: #4c4c4d;
+	--se-main-background-color: #fff;
+	--se-main-background-color2: #f5f5f5;
+	--se-main-background-color3: #f9f9f9;
+	--se-main-font-color: #333;
+	--se-main-font-color2: #222;
+	--se-main-font-size: 13px;
+	--se-main-divider-color: #e1e1e1;
+	--se-main-border-color: #d1d1d1;
+	--se-main-outline-color: #b1b1b1;
+	--se-main-shadow-color: #ececec;
+	--se-border-radius: 2px;
+	--se-btn-font-size: 12px;
+	--se-statusbar-font-size: 10px;
+	--se-statusbar-font-color: #666;
+	--se-overlay-background-color: #222;
+	/* hover, active */
+	--se-active-color: #3288ff;
+	--se-active-dark-color: #80bdff;
+	--se-active-dark2-color: #407dd1;
+	--se-active-dark3-color: #4592ff;
+	--se-active-dark4-color: #3f9dff;
+	--se-active-dark5-color: #1275ff;
+	--se-active-light-color: #e6f2ff;
+	--se-active-light2-color: #eaf3ff;
+	--se-active-light3-color: #d0e3ff;
+	--se-active-light4-color: #dbeaff;
+	--se-active-light5-color: #c4ddff;
+	--se-active-light6-color: #b7ccf2;
+	/* drag */
+	--se-drag-over-color: #f0c20a;
+	/* modal, browser, dropdown */
+	--se-modal-title-font-size: 15px;
+	--se-modal-input-font-size: 14px;
+	--se-modal-input-width: 70px;
+	--se-modal-border-color: #e5e5e5;
+	--se-modal-anchor-color: #004cff;
+	--se-modal-preview-color: #666;
+	--se-modal-input-disabled-color: #999;
+	--se-modal-input-disabled-background-color: #f3f3f3;
+	/* browser */
+	--se-browser-title-font-size: 16px;
+	/* dropdown, selectMenu */
+	--se-dropdown-font-color: #555;
+	/* controller */
+	--se-controller-font-size: 14px;
+	--se-controller-border-color: #999;
+	/* input:btn */
+	--se-input-btn-size: 34px;
+	--se-input-btn-border-color: #ccc;
+	--se-input-btn-disabled-color: #bdbdbd;
+	/* btn - success */
+	--se-success-color: #008000;
+	--se-success-dark-color: #628562;
+	--se-success-dark2-color: #419c41;
+	--se-success-dark3-color: #006c00;
+	--se-success-light-color: #dff4e6;
+	--se-success-light2-color: #d5f3e0;
+	--se-success-light3-color: #c1f4d3;
+	--se-success-light4-color: #769c76;
+	--se-success-light5-color: #89b589;
+	/* error */
+	--se-error-color: #b94a48;
+	--se-error-dark-color: #e1a6a2;
+	--se-error-dark2-color: #db8d8c;
+	--se-error-dark3-color: #d17872;
+	--se-error-light-color: #f5d0c8;
+	--se-error-light2-color: #eed3d7;
+	--se-error-light3-color: #f2dede;
+	--se-error-light4-color: #f7deda;
+	--se-error-light5-color: #f8e3e1;
+	/* document type */
+	--se-doc-min-padding: 1rem;
+	--se-doc-max-padding: 1.5rem;
+	--se-doc-padding-factor: 0.5;
+	--se-doc-background: #d2d8e1d1;
+	--se-doc-info-font-size: 14px;
+	--se-doc-info-width: 18%;
+	--se-doc-info-min-width: 16ch;
+	--se-doc-info-inner-padding: 2ch;
+	--se-doc-info-inner-line-padding: 0.5ch;
+	--se-doc-info-page-width: 16px;
+	--se-doc-info-page-font-color: #f5f5f5;
+	--se-doc-info-page-background-color: #b1b1b1;
+	/* document type - active */
+	--se-doc-info-active-color: #4a32ff;
+	/* document type indent - padding */
+	--se-doc-info-inner-line-indent-h1: 0em;
+	--se-doc-info-inner-line-indent-h2: 0.4em;
+	--se-doc-info-inner-line-indent-h3: 0.8em;
+	--se-doc-info-inner-line-indent-h4: 1.2em;
+	--se-doc-info-inner-line-indent-h5: 1.6em;
+	--se-doc-info-inner-line-indent-h6: 2em;
+	/* document type indent - weight */
+	--se-doc-info-inner-line-weight-h1: 700;
+	--se-doc-info-inner-line-weight-h2: 500;
+	--se-doc-info-inner-line-weight-h3: 400;
+	--se-doc-info-inner-line-weight-h4: 300;
+	--se-doc-info-inner-line-weight-h5: 300;
+	--se-doc-info-inner-line-weight-h6: 300;
+	/* loading */
+	--se-loading-color: #07d;
+	/* show blocks */
+	--se-show-blocks-color: #3f9dff;
+	--se-show-blocks-li-color: #d539ff;
+	--se-show-blocks-pre-color: #27c022;
+}

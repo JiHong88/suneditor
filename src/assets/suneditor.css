@@ -1,94 +1,4 @@
-:root {
-	/** main, common */
-	--se-min-height: 65px;
-	--se-main-out-color: #dadada;
-	--se-main-font-family: Helvetica Neue;
-	--se-main-color: #000;
-	--se-main-color-lighter: #4c4c4d;
-	--se-main-background-color: #fff;
-	--se-main-background-color2: #f5f5f5;
-	--se-main-background-color3: #f9f9f9;
-	--se-main-font-color: #333;
-	--se-main-font-size: 13px;
-	--se-main-divider-color: #e1e1e1;
-	--se-main-border-color: #d1d1d1;
-	--se-main-outline-color: #b1b1b1;
-	--se-main-shadow-color: #ececec;
-	--se-border-radius: 2px;
-	--se-btn-font-size: 12px;
-	--se-statusbar-font-size: 10px;
-	/* hover, active */
-	--se-active-color: #3288ff;
-	--se-active-dark-color: #80bdff;
-	--se-active-dark2-color: #407dd1;
-	--se-active-dark3-color: #4592ff;
-	--se-active-dark4-color: #3f9dff;
-	--se-active-dark5-color: #1275ff;
-	--se-active-light-color: #e6f2ff;
-	--se-active-light2-color: #eaf3ff;
-	--se-active-light3-color: #d0e3ff;
-	--se-active-light4-color: #dbeaff;
-	--se-active-light5-color: #c4ddff;
-	--se-active-light6-color: #b7ccf2;
-	/* drag */
-	--se-drag-over-color: #f0c20a;
-	/* modal, browser */
-	--se-modal-title-font-size: 15px;
-	--se-modal-input-font-size: 14px;
-	--se-modal-input-width: 70px;
-	--se-browser-title-font-size: 16px;
-	/* controller */
-	--se-controller-font-size: 14px;
-	/* input:btn */
-	--se-input-btn-size: 34px;
-	--se-input-btn-border-color: #ccc;
-	--se-input-btn-disabled-color: #bdbdbd;
-	/* btn - success */
-	--se-success-color: #008000;
-	--se-success-dark-color: #628562;
-	--se-success-dark2-color: #419c41;
-	--se-success-dark3-color: #006c00;
-	--se-success-light-color: #dff4e6;
-	--se-success-light2-color: #d5f3e0;
-	--se-success-light3-color: #c1f4d3;
-	--se-success-light4-color: #769c76;
-	--se-success-light5-color: #89b589;
-	/* error */
-	--se-error-font-color: #b94a48;
-	--se-error-shadow-color: #eed3d7;
-	--se-error-shadow-color2: #f2dede;
-	/* document type */
-	--se-doc-min-padding: 1rem;
-	--se-doc-max-padding: 1.5rem;
-	--se-doc-padding-factor: 0.5;
-	--se-doc-background: #d2d8e1d1;
-	--se-doc-info-font-size: 14px;
-	--se-doc-info-width: 18%;
-	--se-doc-info-min-width: 16ch;
-	--se-doc-info-inner-padding: 2ch;
-	--se-doc-info-inner-line-padding: 0.5ch;
-	--se-doc-info-page-width: 16px;
-	--se-doc-info-page-font-color: #f5f5f5;
-	--se-doc-info-page-background-color: #b1b1b1;
-	/* document type - active */
-	--se-doc-info-active-color: #4a32ff;
-	/* document type indent - padding */
-	--se-doc-info-inner-line-indent-h1: 0em;
-	--se-doc-info-inner-line-indent-h2: 0.4em;
-	--se-doc-info-inner-line-indent-h3: 0.8em;
-	--se-doc-info-inner-line-indent-h4: 1.2em;
-	--se-doc-info-inner-line-indent-h5: 1.6em;
-	--se-doc-info-inner-line-indent-h6: 2em;
-	/* document type indent - weight */
-	--se-doc-info-inner-line-weight-h1: 700;
-	--se-doc-info-inner-line-weight-h2: 500;
-	--se-doc-info-inner-line-weight-h3: 400;
-	--se-doc-info-inner-line-weight-h4: 300;
-	--se-doc-info-inner-line-weight-h5: 300;
-	--se-doc-info-inner-line-weight-h6: 300;
-	/* loading */
-	--se-loading-color: #07d;
-}
+@import url('root.css');
 
 /** --- suneditor main */
 .sun-editor {
@@ -335,8 +245,8 @@
 .sun-editor .se-btn:not(.on):not(.active):enabled:active,
 .sun-editor .se-btn:not(.on):not(.active):enabled.__se__active {
 	background-color: var(--se-main-shadow-color);
-	border-color: #ececec !important;
-	outline: 1px solid #b1b1b1 !important;
+	border-color: var(--se-main-shadow-color) !important;
+	outline: 1px solid var(--se-main-outline-color) !important;
 	-webkit-box-shadow: 0 0 0 0.3rem var(--se-main-shadow-color);
 	box-shadow: 0 0 0 0.3rem var(--se-main-shadow-color);
 	transition: box-shadow 0.1s ease-in-out;
@@ -539,73 +449,73 @@
 
 /* --- se-btn.danger */
 .sun-editor .se-btn.se-btn-danger {
-	color: var(--se-error-font-color);
-	border-color: #e1a6a2;
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark-color);
 }
 
 .sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled:hover,
 .sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled:focus {
-	background-color: #f8e3e1;
-	border-color: #e1a6a2;
+	background-color: var(--se-error-light5-color);
+	border-color: var(--se-error-dark-color);
 }
 
 .sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled:active,
 .sun-editor .se-btn.se-btn-danger:not(.on):not(.active):enabled.__se__active {
-	background-color: #f8e3e1;
-	border-color: #f8e3e1 !important;
-	outline: 1px solid #e1a6a2 !important;
-	-webkit-box-shadow: 0 0 0 0.3rem #f8e3e1;
-	box-shadow: 0 0 0 0.3rem #f8e3e1;
+	background-color: var(--se-error-light5-color);
+	border-color: var(--se-error-light5-color) !important;
+	outline: 1px solid var(--se-error-dark-color) !important;
+	-webkit-box-shadow: 0 0 0 0.3rem var(--se-error-light5-color);
+	box-shadow: 0 0 0 0.3rem var(--se-error-light5-color);
 	transition: box-shadow 0.1s ease-in-out;
 }
 
 /* se-btn.danger.on */
 .sun-editor .se-btn.se-btn-danger:enabled.on {
-	background-color: #f8e6e4;
-	color: var(--se-error-font-color);
-	border-color: #d8a6a0;
+	background-color: var(--se-error-light5-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark-color);
 }
 
 .sun-editor .se-btn.se-btn-danger:enabled.on:hover,
 .sun-editor .se-btn.se-btn-danger:enabled.on:focus {
-	background-color: #f7deda;
-	color: var(--se-error-font-color);
-	border-color: #c8958f;
+	background-color: var(--se-error-light4-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark-color);
 }
 
 .sun-editor .se-btn.se-btn-danger:enabled.on:active,
 .sun-editor .se-btn.se-btn-danger:enabled.on.__se__active {
-	background-color: #f5d0c8;
-	color: var(--se-error-font-color);
-	border-color: #f5d0c8 !important;
-	outline: 1px solid #a37068 !important;
-	-webkit-box-shadow: 0 0 0 0.3rem #f7deda;
-	box-shadow: 0 0 0 0.3rem #f7deda;
+	background-color: var(--se-error-light-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-light-color) !important;
+	outline: 1px solid var(--se-error-dark3-color) !important;
+	-webkit-box-shadow: 0 0 0 0.3rem var(--se-error-light4-color);
+	box-shadow: 0 0 0 0.3rem var(--se-error-light4-color);
 	transition: box-shadow 0.1s ease-in-out;
 }
 
 /* se-btn.danger.active */
 .sun-editor .se-btn.se-btn-danger:enabled.active {
-	background-color: #f7deda;
-	color: var(--se-error-font-color);
-	border-color: #d17872;
+	background-color: var(--se-error-light4-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark3-color);
 }
 
 .sun-editor .se-btn.se-btn-danger:enabled.active:hover,
 .sun-editor .se-btn.se-btn-danger:enabled.active:focus {
-	background-color: #f5d0c8;
-	color: #a65242;
-	border-color: #d17872;
+	background-color: var(--se-error-light-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-dark3-color);
 }
 
 .sun-editor .se-btn.se-btn-danger:enabled.active:active,
 .sun-editor .se-btn.se-btn-danger:enabled.active.__se__active {
-	background-color: #f5d0c8;
-	color: #a65242;
-	border-color: #f5d0c8 !important;
-	outline: 1px solid #d17872 !important;
-	-webkit-box-shadow: 0 0 0 0.3rem #f5d0c8;
-	box-shadow: 0 0 0 0.3rem #f5d0c8;
+	background-color: var(--se-error-light-color);
+	color: var(--se-error-color);
+	border-color: var(--se-error-light-color) !important;
+	outline: 1px solid var(--se-error-dark3-color) !important;
+	-webkit-box-shadow: 0 0 0 0.3rem var(--se-error-light-color);
+	box-shadow: 0 0 0 0.3rem var(--se-error-light-color);
 	transition: box-shadow 0.1s ease-in-out;
 }
 
@@ -814,7 +724,7 @@
 .sun-editor .se-arrow.se-arrow-up {
 	top: -12px;
 	border-top-width: 0;
-	border-bottom-color: #999;
+	border-bottom-color: var(--se-controller-border-color);
 }
 
 .sun-editor .se-arrow.se-arrow-up::after {
@@ -828,7 +738,7 @@
 .sun-editor .se-arrow.se-arrow-down {
 	bottom: -12px;
 	border-bottom-width: 0;
-	border-top-color: #999;
+	border-top-color: var(--se-controller-border-color);
 }
 
 .sun-editor .se-arrow.se-arrow-down::after {
@@ -1259,7 +1169,7 @@
 .sun-editor .se-list-layer.se-list-line hr {
 	border-width: 1px 0 0;
 	height: 1px;
-	border-color: var(--se-main-font-color);
+	border-color: var(--se-edit-hr-color);
 }
 
 /* dropdown layer - align */
@@ -1330,13 +1240,13 @@
 
 .sun-editor .se-list-layer.se-list-format ul blockquote {
 	font-size: var(--se-main-font-size);
-	color: #999;
+	color: var(--se-edit-font-quote);
 	height: 22px;
 	margin: 0;
 	background-color: transparent;
 	line-height: 1.5;
 	border-style: solid;
-	border-color: var(--se-main-outline-color);
+	border-color: var(--se-edit-border-dark);
 	padding: 0 0 0 7px;
 	border-width: 0;
 	border-left-width: 5px;
@@ -1344,11 +1254,11 @@
 
 .sun-editor .se-list-layer.se-list-format ul pre {
 	font-size: var(--se-main-font-size);
-	color: #666;
+	color: var(--se-edit-font-pre);
 	padding: 4px 11px;
 	margin: 0;
-	background-color: var(--se-main-background-color3);
-	border: 1px solid var(--se-main-divider-color);
+	background-color: var(--se-edit-background-pre);
+	border: 1px solid var(--se-edit-border-light);
 	border-radius: var(--se-border-radius);
 }
 
@@ -1689,7 +1599,7 @@
 /** form group - dropdown input */
 .sun-editor .se-dropdown .se-form-group input {
 	height: var(--se-input-btn-size);
-	color: #555;
+	color: var(--se-dropdown-font-color);
 }
 
 .sun-editor .se-dropdown .se-form-group .se-color-input:focus {
@@ -1730,7 +1640,7 @@
 }
 .sun-editor .se-wrapper .se-code-wrapper .se-code-view-line {
 	background-color: var(--se-main-background-color2);
-	color: #222;
+	color: var(--se-main-font-color2);
 	text-align: right;
 	width: 50px;
 	font-size: var(--se-main-font-size);
@@ -1739,7 +1649,7 @@
 }
 
 .sun-editor .se-wrapper .se-code-viewer {
-	background-color: #222;
+	background-color: var(--se-main-font-color2);
 	color: var(--se-main-background-color2);
 	font-size: var(--se-main-font-size);
 	word-break: break-all;
@@ -1823,7 +1733,7 @@
 	position: relative;
 	width: auto;
 	height: auto;
-	color: #666;
+	color: var(--se-statusbar-font-color);
 	margin: 0;
 	padding: 0;
 	font-size: var(--se-statusbar-font-size);
@@ -1840,13 +1750,13 @@
 	height: auto;
 	margin: 0;
 	padding: 0;
-	color: #999;
+	color: var(--se-statusbar-font-color);
 	font-size: var(--se-main-font-size);
 	background: transparent;
 }
 
 .sun-editor .se-status-bar .se-char-counter-wrapper.se-blink {
-	color: var(--se-error-font-color);
+	color: var(--se-error-color);
 	animation: blinker 0.2s linear infinite;
 }
 
@@ -1870,7 +1780,7 @@
 .sun-editor .se-modal button {
 	font-size: var(--se-modal-input-font-size);
 	line-height: 1.5;
-	color: #111;
+	color: var(--se-main-color);
 	margin: 0;
 }
 
@@ -1880,7 +1790,7 @@
 	height: 100%;
 	top: 0;
 	left: 0;
-	background-color: #222;
+	background-color: var(--se-overlay-background-color);
 	opacity: 0.5;
 }
 
@@ -2048,7 +1958,7 @@
 .sun-editor .se-modal .se-modal-inner .se-modal-header {
 	height: 50px;
 	padding: 6px 15px;
-	border-bottom: 1px solid #e5e5e5;
+	border-bottom: 1px solid var(--se-modal-border-color);
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-header .se-close-btn {
@@ -2092,7 +2002,7 @@
 }
 
 .sun-editor .se-modal .se-modal-inner input:disabled {
-	background-color: #f3f3f3;
+	background-color: var(--se-modal-input-disabled-background-color);
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-size-text {
@@ -2120,7 +2030,7 @@
 	min-height: 55px;
 	padding: 10px 15px 0px 15px;
 	text-align: right;
-	border-top: 1px solid #e5e5e5;
+	border-top: 1px solid var(--se-modal-border-color);
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-footer .se-btn {
@@ -2147,7 +2057,7 @@
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-btn-check:disabled + span {
-	color: #999;
+	color: var(--se-modal-input-disabled-color);
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form-footer .se-modal-btn-check {
@@ -2265,7 +2175,7 @@
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-input-form.se-input-url:disabled {
 	text-decoration: line-through;
-	color: #999;
+	color: var(--se-modal-input-disabled-color);
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-video-ratio {
@@ -2274,7 +2184,7 @@
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form a {
-	color: #004cff;
+	color: var(--se-modal-anchor-color);
 }
 
 /* modal - revert button */
@@ -2287,12 +2197,12 @@
 .sun-editor .se-modal-tabs {
 	width: 100%;
 	height: 25px;
-	border-bottom: 1px solid #e5e5e5;
+	border-bottom: 1px solid var(--se-modal-border-color);
 }
 
 .sun-editor .se-modal-tabs button {
-	background-color: #e5e5e5;
-	border-right: 1px solid #e5e5e5;
+	background-color: var(--se-modal-border-color);
+	border-right: 1px solid var(--se-modal-border-color);
 	float: left;
 	outline: none;
 	padding: 2px 13px;
@@ -2337,15 +2247,15 @@
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .se-math-error {
-	color: var(--se-error-font-color);
-	-webkit-box-shadow: 0 0 0 0.1rem var(--se-error-shadow-color2);
-	box-shadow: 0 0 0 0.1rem var(--se-error-shadow-color2);
+	color: var(--se-error-color);
+	-webkit-box-shadow: 0 0 0 0.1rem var(--se-error-light3-color);
+	box-shadow: 0 0 0 0.1rem var(--se-error-light3-color);
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .se-math-error svg {
 	width: auto;
 	height: 30px;
-	color: var(--se-error-font-color);
+	color: var(--se-error-color);
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview .MathJax {
@@ -2360,7 +2270,7 @@
 	font-size: var(--se-main-font-size);
 	font-weight: normal;
 	font-family: inherit;
-	color: #666;
+	color: var(--se-modal-preview-color);
 	background-color: transparent;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -2418,11 +2328,6 @@
 	outline: 1px solid var(--se-main-outline-color);
 }
 
-/* .sun-editor .se-modal .se-modal-inner .se-modal-form .se-mention-item {line-height:28px;min-height:25px;padding:0 5px;cursor:pointer;}
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-mention-item:hover {background-color:#e1e1e1}
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-mention-item.se-mention-active {background-color: var(--se-main-border-color); border-radius:3px;}
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-mention-search {margin-bottom: 10px;} */
-
 /** --- controller ---------------------------------------------------------- */
 .sun-editor .se-controller {
 	position: absolute;
@@ -2431,7 +2336,7 @@
 	z-index: 2147483646;
 	padding: 2px 2px 0 2px;
 	margin: 0;
-	border: 1px solid #999;
+	border: 1px solid var(--se-controller-border-color);
 	text-align: start;
 	text-decoration: none;
 	text-shadow: none;
@@ -2583,7 +2488,7 @@
 	width: 100%;
 	height: 38px;
 	padding: 4px;
-	border-bottom: 1px solid #e5e5e5;
+	border-bottom: 1px solid var(--se-modal-border-color);
 }
 
 /* controller - controller-content - body */
@@ -2837,7 +2742,7 @@
 	border-radius: var(--se-border-radius);
 	padding: 2px 0;
 	margin: 0;
-	border: 1px solid #bababa;
+	border: 1px solid var(--se-main-outline-color);
 	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	outline: 0 none;
@@ -2927,7 +2832,7 @@
 .sun-editor .se-file-browser button {
 	font-size: var(--se-modal-input-font-size);
 	line-height: 1.5;
-	color: #111;
+	color: var(--se-main-color);
 	margin: 0;
 }
 
@@ -2938,7 +2843,7 @@
 	height: 100%;
 	top: 0;
 	left: 0;
-	background-color: #222;
+	background-color: var(--se-overlay-background-color);
 	opacity: 0.5;
 }
 
@@ -2971,7 +2876,7 @@
 	height: auto;
 	min-height: 50px;
 	padding: 6px 15px 6px 15px;
-	border-bottom: 1px solid #e5e5e5;
+	border-bottom: 1px solid var(--se-modal-border-color);
 }
 
 .sun-editor .se-file-browser .se-file-browser-header .se-file-browser-close {
@@ -3025,16 +2930,16 @@
 }
 
 .sun-editor .se-file-browser .se-file-browser-tags a.on {
-	background-color: #ebf3fe;
+	background-color: var(--se-active-light3-color);
 	color: var(--se-active-dark3-color);
 }
 
 .sun-editor .se-file-browser .se-file-browser-tags a.on:hover {
-	background-color: #d8e8fe;
+	background-color: var(--se-active-light5-color);
 }
 
 .sun-editor .se-file-browser .se-file-browser-tags a.on:active {
-	background-color: var(--se-active-light3-color);
+	background-color: var(--se-active-light5-color);
 }
 
 /* --- browser - body */
@@ -3151,7 +3056,7 @@
 	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	word-break: break-all;
-	color: var(--se-error-font-color);
+	color: var(--se-error-color);
 	background-color: var(--se-main-background-color);
 	padding: 15px;
 	border: 1px solid rgba(0, 0, 0, 0.2);
@@ -3637,22 +3542,22 @@
 
 /** --- error ---------------------------------------------------------- */
 .sun-editor .se-error {
-	color: var(--se-error-font-color);
+	color: var(--se-error-color);
 }
 
 .sun-editor input.se-error,
 .sun-editor select.se-error,
 .sun-editor textarea.se-error {
-	border: 1px solid #db8d8c !important;
+	border: 1px solid var(--se-error-dark2-color) !important;
 }
 
 .sun-editor input.se-error:focus,
 .sun-editor select.se-error:focus,
 .sun-editor textarea.se-error:focus {
-	border: 1px solid #e46765 !important;
+	border: 1px solid var(--se-error-color) !important;
 	outline: 0;
-	-webkit-box-shadow: 0 0 0 0.2rem var(--se-error-shadow-color);
-	box-shadow: 0 0 0 0.2rem var(--se-error-shadow-color);
+	-webkit-box-shadow: 0 0 0 0.2rem var(--se-error-light2-color);
+	box-shadow: 0 0 0 0.2rem var(--se-error-light2-color);
 	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
@@ -3689,17 +3594,17 @@
 .sun-editor .se-show-block ol,
 .sun-editor .se-show-block ul,
 .sun-editor .se-show-block pre {
-	border: 1px dashed var(--se-active-dark4-color) !important;
+	border: 1px dashed var(--se-show-blocks-color) !important;
 	padding: 14px 8px 8px 8px !important;
 }
 
 .sun-editor .se-show-block ol,
 .sun-editor .se-show-block ul {
-	border: 1px dashed #d539ff !important;
+	border: 1px dashed var(--se-show-blocks-li-color) !important;
 }
 
 .sun-editor .se-show-block pre {
-	border: 1px dashed #27c022 !important;
+	border: 1px dashed var(--se-show-blocks-pre-color) !important;
 }
 
 .sun-editor .se-show-block p {
