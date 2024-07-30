@@ -119,7 +119,7 @@ const Constructor = function (editorTargets, options) {
 	const loadingBox = domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
-	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper sun-editor-common' + (o.get('_rtl') ? ' se-rtl' : '') });
+	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper sun-editor-common' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
 	// menuTray
 	const menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
 	editor_carrier_wrapper.appendChild(menuTray);
@@ -186,7 +186,7 @@ const Constructor = function (editorTargets, options) {
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
 		const to = editTarget.options;
-		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (to.get('_rtl') ? ' se-rtl' : '') });
+		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (to.get('_rtl') ? ' se-rtl' : '') });
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') });
 
@@ -216,7 +216,7 @@ const Constructor = function (editorTargets, options) {
 		if (statusbar) {
 			if (statusbarContainer) {
 				if (!default_status_bar) {
-					statusbarContainer.appendChild(domUtils.createElement('DIV', { class: 'sun-editor' }, statusbar));
+					statusbarContainer.appendChild(domUtils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') }, statusbar));
 					default_status_bar = statusbar;
 				}
 			} else {
@@ -265,7 +265,7 @@ const Constructor = function (editorTargets, options) {
 	// toolbar container
 	const toolbar_container = o.get('toolbar_container');
 	if (toolbar_container) {
-		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (o.get('_rtl') ? ' se-rtl' : '') });
+		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		container.appendChild(toolbar);
 		if (subbar) container.appendChild(subbar);
@@ -378,6 +378,8 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('__pluginRetainFilter', options.__pluginRetainFilter ?? true);
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	o.set('type', options.type?.split(':')[0] || ''); // document:header,page
+	o.set('theme', options.theme || '');
+	o.set('_themeClass', options.theme ? ` se-theme-${options.theme}` : '');
 	o.set('type-options', options.type?.split(':')[1] || '');
 	o.set('externalLibs', options.externalLibs || {});
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
@@ -487,7 +489,7 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
-	o.set('_editableClass', 'sun-editor-editable' + (o.get('_rtl') ? ' se-rtl' : ''));
+	o.set('_editableClass', 'sun-editor-editable' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : ''));
 	o.set('lineAttrReset', ['id'].concat(options.lineAttrReset && typeof options.lineAttrReset === 'string' ? options.lineAttrReset.toLowerCase().split('|') : []));
 	o.set('printClass', typeof options.printClass === 'string' ? options.printClass + ' ' + o.get('_editableClass') : null);
 

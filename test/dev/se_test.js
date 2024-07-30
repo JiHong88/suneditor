@@ -1,7 +1,7 @@
 import suneditor from '../../src/suneditor';
 require('../../src/assets/suneditor.css');
 require('../../src/assets/suneditor-contents.css');
-// require('../../src/themes/test.css');
+require('../../src/themes/dark-variables.css');
 
 // katex
 import Katex from 'katex';
@@ -649,6 +649,7 @@ window.editor_root = suneditor.create(
 			image: ['73', 'I'],
 			list: ['76', 'L']
 		},
+		theme: 'dark',
 		math: {
 			// katex: {
 			// 	src: Katex

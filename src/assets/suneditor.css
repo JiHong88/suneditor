@@ -1,4 +1,4 @@
-@import url('root.css');
+@import url('variables.css');
 
 /** --- suneditor main */
 .sun-editor {
@@ -36,7 +36,6 @@
 .sun-editor-common form,
 .sun-editor-common fieldset,
 .sun-editor-common legend,
-.sun-editor-common textarea,
 .sun-editor-common p,
 .sun-editor-common blockquote,
 .sun-editor-common th,
@@ -48,6 +47,12 @@
 	margin: 0;
 	padding: 0;
 	border: 0;
+}
+
+.sun-editor-common input,
+.sun-editor-common select,
+.sun-editor-common textarea {
+	background-color: inherit;
 }
 
 .sun-editor-common dl,
@@ -1725,6 +1730,7 @@
 	-webkit-user-select: none;
 	-ms-user-select: none;
 	z-index: 2147483647;
+	background-color: transparent;
 }
 
 /** status bar - nabigation */

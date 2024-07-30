@@ -721,8 +721,41 @@ Editor.prototype = {
 			domUtils.addClass(toolbar, 'se-shortcut-hide');
 		}
 
+		// theme
+		if (this._originOptions.theme !== (newOptions.theme ?? this._originOptions.theme)) {
+			this.setTheme(newOptions.theme);
+		}
+
 		this.effectNode = null;
 		this._setFrameInfo(this.frameRoots.get(this.status.rootKey));
+	},
+
+	/**
+	 * @description Set the theme to the editor
+	 * @param {string} theme Theme name
+	 */
+	setTheme(theme) {
+		if (typeof theme !== 'string') return;
+		const o = this.options;
+		const prevTheme = o.get('_themeClass').trim();
+		o.set('theme', theme || '');
+		o.set('_themeClass', theme ? ` se-theme-${theme}` : '');
+		theme = o.get('_themeClass').trim();
+
+		const applyTheme = (target) => {
+			if (!target) return;
+			if (prevTheme) domUtils.removeClass(target, prevTheme);
+			if (theme) domUtils.addClass(target, theme);
+		};
+
+		applyTheme(this.carrierWrapper);
+		this.applyFrameRoots((e) => {
+			applyTheme(e.get('topArea'));
+			applyTheme(e.get('wysiwyg'));
+		});
+
+		applyTheme(this.context.get('statusbar._wrapper'));
+		applyTheme(this.context.get('toolbar._wrapper'));
 	},
 
 	/**
