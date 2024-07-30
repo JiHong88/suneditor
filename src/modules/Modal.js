@@ -1,6 +1,6 @@
 import CoreInjector from '../editorInjector/_core';
 import { CreateTooltipInner } from '../core/section/constructor';
-import { env } from '../helper';
+import { domUtils, env } from '../helper';
 
 const { _w } = env;
 const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize', wRTL: 'ns-resize', hRTL: 'ew-resize', cRTL: 'nesw-resize' };
@@ -33,12 +33,13 @@ const Modal = function (inst, element) {
 	this._closeSignal = !this.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
 
 	// resize
-	if (element.querySelector('.se-modal-resize-handle-w') || element.querySelector('.se-modal-resize-handle-h') || element.querySelector('.se-modal-resize-handle-c')) {
-		if ((this._resizeBody = element.querySelector('.se-modal-body'))) {
+	if (element.querySelector('.se-modal-resize-handle-w') || element.querySelector('.se-modal-resize-handle-h') || element.querySelector('.se-modal-resize-handle-c') || element.querySelector('.se-modal-resize-form')) {
+		if (!(this._resizeBody = element.querySelector('.se-modal-resize-form')) && (this._resizeBody = element.querySelector('.se-modal-body'))) {
 			this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-w'), 'mousedown', OnResizeMouseDown.bind(this, 'w'));
 			this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-h'), 'mousedown', OnResizeMouseDown.bind(this, 'h'));
 			this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-c'), 'mousedown', OnResizeMouseDown.bind(this, 'c'));
 
+			this._currentHandle = null;
 			this.__resizeDir = '';
 			this.__offetTop = 0;
 			this.__offetLeft = 0;
@@ -75,7 +76,13 @@ Modal.prototype = {
 		this.form.style.display = 'block';
 
 		if (this._resizeBody) {
-			this._saveOffset();
+			const offset = this._saveOffset();
+			const { maxWidth, maxHeight } = _w.getComputedStyle(this.form);
+			const mw = `${this.form.offsetWidth - offset.width}px`;
+			const mh = `${this.form.offsetTop + (this.form.offsetHeight - this._resizeBody.offsetHeight)}px`;
+			// set max
+			if (maxWidth && typeof this.__resizeDir === 'string') domUtils.setStyle(this._resizeBody, 'max-width', `calc(${maxWidth} - ${mw})`);
+			if (maxHeight) domUtils.setStyle(this._resizeBody, 'max-height', `calc(${maxHeight} - ${mh})`);
 		}
 
 		if (this.focusElement) this.focusElement.focus();
@@ -117,6 +124,7 @@ Modal.prototype = {
 		const offset = this.offset.getGlobal(this._resizeBody);
 		this.__offetTop = offset.top;
 		this.__offetLeft = offset.left;
+		return offset;
 	},
 
 	__addGlobalEvent(dir) {
@@ -179,7 +187,8 @@ function CloseListener(e) {
 }
 
 /** Resize events */
-function OnResizeMouseDown(dir) {
+function OnResizeMouseDown(dir, e) {
+	domUtils.addClass((this._currentHandle = e.target), 'active');
 	this.__addGlobalEvent((this.__resizeDir = dir + (this.options.get('_rtl') ? 'RTL' : '')));
 }
 
@@ -223,6 +232,8 @@ function OnResize(e) {
 }
 
 function OnResizeMouseUp() {
+	domUtils.removeClass(this._currentHandle, 'active');
+	this._currentHandle = null;
 	this.__removeGlobalEvent();
 }
 
