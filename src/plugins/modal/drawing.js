@@ -1,6 +1,8 @@
 import EditorInjector from '../../editorInjector';
 import { Modal } from '../../modules';
-import { domUtils } from '../../helper';
+import { domUtils, env } from '../../helper';
+
+const { isMobile } = env;
 
 const Drawing = function (editor, pluginOptions) {
 	// plugin basic properties
@@ -12,8 +14,17 @@ const Drawing = function (editor, pluginOptions) {
 		size: pluginOptions.size || 5,
 		lineReconnect: !!pluginOptions.lineReconnect,
 		lineCap: ['butt', 'round', 'square'].includes(pluginOptions.lineCap) ? pluginOptions.lineCap : 'round',
-		modalSizeWidth: pluginOptions.canvasSizeWidth || '750px',
-		modalSizeHeight: pluginOptions.canvasSizeHeight || '50vh'
+		formSize: {
+			width: '750px',
+			height: '50vh',
+			maxWidth: '',
+			maxHeight: '',
+			minWidth: '150px',
+			minHeight: '150px',
+			...pluginOptions.formSize
+		},
+		canResize: pluginOptions.canResize ?? true,
+		maintainRatio: pluginOptions.maintainRatio ?? true
 	};
 
 	// exception
@@ -37,8 +48,8 @@ const Drawing = function (editor, pluginOptions) {
 	this.paths = [];
 	this.resizeObserver = null;
 	this.__events = {
-		mousedown: OnCanvasMouseDown.bind(this),
-		mousemove: OnCanvasMouseMove.bind(this),
+		mousedown: isMobile ? OnCanvasTouchStart.bind(this) : OnCanvasMouseDown.bind(this),
+		mousemove: isMobile ? OnCanvasTouchMove.bind(this) : OnCanvasMouseMove.bind(this),
 		mouseup: OnCanvasMouseUp.bind(this),
 		mouseleave: OnCanvasMouseLeave.bind(this),
 		mouseenter: OnCanvasMouseEnter.bind(this)
@@ -49,6 +60,13 @@ const Drawing = function (editor, pluginOptions) {
 		mouseup: null,
 		mouseleave: null,
 		mouseenter: null
+	};
+	this.__eventNameMap = {
+		mousedown: isMobile ? 'touchstart' : 'mousedown',
+		mousemove: isMobile ? 'touchmove' : 'mousemove',
+		mouseup: isMobile ? 'touchend' : 'mouseup',
+		mouseleave: 'mouseleave',
+		mouseenter: 'mouseenter',
 	};
 
 	// init
@@ -106,11 +124,11 @@ Drawing.prototype = {
 		this.ctx.lineWidth = this.pluginOptions.size;
 		this.ctx.lineCap = this.pluginOptions.lineCap;
 
-		this.__eventsRegister.mousedown = this.eventManager.addEvent(canvas, 'mousedown', this.__events.mousedown);
-		this.__eventsRegister.mousemove = this.eventManager.addEvent(canvas, 'mousemove', this.__events.mousemove);
-		this.__eventsRegister.mouseup = this.eventManager.addEvent(canvas, 'mouseup', this.__events.mouseup);
-		this.__eventsRegister.mouseleave = this.eventManager.addEvent(canvas, 'mouseleave', this.__events.mouseleave);
-		this.__eventsRegister.mouseenter = this.eventManager.addEvent(canvas, 'mouseenter', this.__events.mouseenter);
+		this.__eventsRegister.mousedown = this.eventManager.addEvent(canvas, this.__eventNameMap.mousedown, this.__events.mousedown, { passive: false, useCapture: true });
+		this.__eventsRegister.mousemove = this.eventManager.addEvent(canvas, this.__eventNameMap.mousemove, this.__events.mousemove, true);
+		this.__eventsRegister.mouseup = this.eventManager.addEvent(canvas, this.__eventNameMap.mouseup, this.__events.mouseup, true);
+		this.__eventsRegister.mouseleave = this.eventManager.addEvent(canvas, this.__eventNameMap.mouseleave, this.__events.mouseleave);
+		this.__eventsRegister.mouseenter = this.eventManager.addEvent(canvas, this.__eventNameMap.mouseenter, this.__events.mouseenter);
 
 		if (this.resizeObserver) {
 			this.resizeObserver.disconnect();
@@ -125,7 +143,7 @@ Drawing.prototype = {
 			canvas.width = newWidth;
 			canvas.height = newHeight;
 			if (prevWidth !== canvas.width || prevHeight !== canvas.height) {
-				this._adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight);
+				if (this.pluginOptions.maintainRatio) this._adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight);
 				this._drawAll();
 			}
 		});
@@ -229,10 +247,19 @@ Drawing.prototype = {
 		return dataTransfer.files;
 	},
 
+	_getCanvasTouchPointer(e) {
+		const { touches } = e;
+		const rect = this.canvas.getBoundingClientRect();
+		const x = touches[0].clientX - rect.left;
+		const y = touches[0].clientY - rect.top;
+		return { x, y };
+	},
+
 	constructor: Drawing
 };
 
 function CreateHTML_modal({ lang, icons, pluginOptions }) {
+	const { width, height, maxWidth, maxHeight, minWidth, minHeight, canResize } = pluginOptions.formSize;
 	const html = /*html*/ `
     <form>
         <div class="se-modal-header">
@@ -241,11 +268,9 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
             </button>
             <span class="se-modal-title">${lang.drawing_modal_title}</span>
         </div>
-        <div class="se-modal-body" style="width: ${pluginOptions.modalSizeWidth}; height: ${pluginOptions.modalSizeHeight};">
+        <div class="se-modal-body" style="width: ${width}; height: ${height}; min-width: ${minWidth}; min-height: ${minHeight};">
             <canvas class="se-drawing-canvas" style="width: 100%; height: 100%;"></canvas>
-            <div class="se-modal-resize-handle-w"></div>
-            <div class="se-modal-resize-handle-h"></div>
-            <div class="se-modal-resize-handle-c"></div>
+												${canResize ? '<div class="se-modal-resize-handle-w"></div><div class="se-modal-resize-handle-h"></div><div class="se-modal-resize-handle-c"></div>' : ''}
         </div>
         <div class="se-modal-footer">
             <button type="button" class="se-btn" title="${lang.remove}" aria-label="${lang.remove}" data-command="remove">
@@ -257,19 +282,44 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
         </div>
     </form>`;
 
-	return domUtils.createElement('DIV', { class: 'se-modal-content se-modal-responsive' }, html);
+	return domUtils.createElement(
+		'DIV',
+		{ 
+			class: 'se-modal-content se-modal-responsive' 
+			style: `max-width: ${maxWidth}; max-height: ${maxHeight};`
+		},
+		html
+	);
 }
 
 // canvas events
 function OnCanvasMouseDown(e) {
+	e.preventDefault();
 	this.isDrawing = true;
 	this.points.push([e.offsetX, e.offsetY]);
 	this._draw();
 }
 
 function OnCanvasMouseMove(e) {
+	e.preventDefault();
 	if (!this.isDrawing) return;
 	this.points.push([e.offsetX, e.offsetY]);
+	this._draw();
+}
+
+function OnCanvasTouchStart(e) {
+	e.preventDefault();
+	const { x, y } = this._getCanvasTouchPointer(e);
+	this.isDrawing = true;
+	this.points.push([x, y]);
+	this._draw();
+}
+
+function OnCanvasTouchMove(e) {
+	e.preventDefault();
+	const { x, y } = this._getCanvasTouchPointer(e);
+	if (!this.isDrawing) return;
+	this.points.push([x, y]);
 	this._draw();
 }
 
