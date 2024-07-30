@@ -66,7 +66,7 @@ const Drawing = function (editor, pluginOptions) {
 		mousemove: isMobile ? 'touchmove' : 'mousemove',
 		mouseup: isMobile ? 'touchend' : 'mouseup',
 		mouseleave: 'mouseleave',
-		mouseenter: 'mouseenter',
+		mouseenter: 'mouseenter'
 	};
 
 	// init
@@ -259,7 +259,7 @@ Drawing.prototype = {
 };
 
 function CreateHTML_modal({ lang, icons, pluginOptions }) {
-	const { width, height, maxWidth, maxHeight, minWidth, minHeight, canResize } = pluginOptions.formSize;
+	const { width, height, maxWidth, maxHeight, minWidth, minHeight } = pluginOptions.formSize;
 	const html = /*html*/ `
     <form>
         <div class="se-modal-header">
@@ -270,7 +270,7 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
         </div>
         <div class="se-modal-body" style="width: ${width}; height: ${height}; min-width: ${minWidth}; min-height: ${minHeight};">
             <canvas class="se-drawing-canvas" style="width: 100%; height: 100%;"></canvas>
-												${canResize ? '<div class="se-modal-resize-handle-w"></div><div class="se-modal-resize-handle-h"></div><div class="se-modal-resize-handle-c"></div>' : ''}
+			${pluginOptions.canResize ? '<div class="se-modal-resize-handle-w"></div><div class="se-modal-resize-handle-h"></div><div class="se-modal-resize-handle-c"></div>' : ''}
         </div>
         <div class="se-modal-footer">
             <button type="button" class="se-btn" title="${lang.remove}" aria-label="${lang.remove}" data-command="remove">
@@ -284,8 +284,8 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
 
 	return domUtils.createElement(
 		'DIV',
-		{ 
-			class: 'se-modal-content se-modal-responsive' 
+		{
+			class: 'se-modal-content se-modal-responsive',
 			style: `max-width: ${maxWidth}; max-height: ${maxHeight};`
 		},
 		html
