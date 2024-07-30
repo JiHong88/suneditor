@@ -29,7 +29,7 @@ const Math_ = function (editor, pluginOptions) {
 		},
 		canResize: pluginOptions.canResize ?? true,
 		autoHeight: !!pluginOptions.autoHeight,
-		fontSizeList: pluginOptions.fontSizeList || || [
+		fontSizeList: pluginOptions.fontSizeList || [
 			{
 				text: '1',
 				value: '1em'
@@ -358,7 +358,7 @@ function CheckMathJax(mathjax) {
 function CreateHTML_modal(inst) {
 	const { lang, icons, pluginOptions, katex } = inst;
 	const { formSize, fontSizeList, canResize, autoHeight } = pluginOptions;
-	const { width, height, maxWidth, maxHeight, maxWidth, maxHeight } = formSize;
+	const { width, height, maxWidth, maxHeight, minWidth, minHeight } = formSize;
 	const resizeType = !canResize ? 'none' : autoHeight ? 'horizontal' : 'auto';
 
 	let defaultFontSize = fontSizeList[0].value;
