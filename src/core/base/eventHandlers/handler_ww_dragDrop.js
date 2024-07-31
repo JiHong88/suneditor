@@ -20,8 +20,15 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 
 	const rect = cursorRange.getBoundingClientRect();
 	if (rect.height > 0) {
-		dragCursor.style.left = `${rect.right + this._w.scrollX + _offset.x}px`;
-		dragCursor.style.top = `${rect.top + this._w.scrollY + _offset.y - 5}px`;
+		const wwFrame = fc.get('wysiwygFrame');
+		let frameX = 0;
+		let frameY = 0;
+		if(/^iframe$/i.test(wwFrame.nodeName)) {
+			frameX = wwFrame.offsetLeft;
+			frameY = wwFrame.offsetTop;
+		}
+		dragCursor.style.left = `${rect.right + this._w.scrollX + _offset.x + frameX}px`;
+		dragCursor.style.top = `${rect.top + this._w.scrollY + _offset.y - 5 + frameY}px`;
 		dragCursor.style.height = `${rect.height + 10}px`;
 		dragCursor.style.display = 'block';
 	} else {
