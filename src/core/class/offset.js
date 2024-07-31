@@ -42,6 +42,8 @@ Offset.prototype = {
 	getLocal(node) {
 		let offsetLeft = 0;
 		let offsetTop = 0;
+		let l = 0;
+		let t = 0;
 		let offsetElement = node.nodeType === 3 ? node.parentElement : node;
 		const wysiwyg = getParentElement(node, isWysiwygFrame.bind(this));
 		const self = offsetElement;
@@ -52,10 +54,16 @@ Offset.prototype = {
 			offsetElement = offsetElement.offsetParent;
 		}
 
+		const wwFrame = this.editor.frameContext.get('wysiwygFrame');
+		if (/^iframe$/i.test(wwFrame.nodeName) && this.editor.frameContext.get('wysiwyg').contains(node)) {
+			l = wwFrame.offsetLeft;
+			t = weFrame.offsetTop;
+		}
+
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		return {
-			left: offsetLeft,
-			top: offsetTop - (wysiwyg ? wysiwyg.scrollTop : 0),
+			left: offsetLeft + l,
+			top: offsetTop + t - (wysiwyg ? wysiwyg.scrollTop : 0),
 			scrollX: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
 			scrollY: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0
 		};
@@ -93,7 +101,7 @@ Offset.prototype = {
 			element = element.offsetParent;
 		}
 
-		if (!targetAbs && !isTop && /^iframe$/i.test(wFrame.nodeName) && wFrame.contains(element)) {
+		if (!targetAbs && !isTop && /^iframe$/i.test(wFrame.nodeName) && this.editor.frameContext.get('wysiwyg').contains(element)) {
 			element = this.editor.frameContext.get('wrapper');
 			while (element) {
 				t += element.offsetTop;
