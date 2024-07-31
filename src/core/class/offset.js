@@ -57,7 +57,7 @@ Offset.prototype = {
 		const wwFrame = this.editor.frameContext.get('wysiwygFrame');
 		if (/^iframe$/i.test(wwFrame.nodeName) && this.editor.frameContext.get('wysiwyg').contains(node)) {
 			l = wwFrame.offsetLeft;
-			t = weFrame.offsetTop;
+			t = wwFrame.offsetTop;
 		}
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
