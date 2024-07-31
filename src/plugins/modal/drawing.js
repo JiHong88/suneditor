@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { Modal } from '../../modules';
 import { domUtils, env } from '../../helper';
 
-const { isMobile } = env;
+const { _w, isMobile } = env;
 
 const Drawing = function (editor, pluginOptions) {
 	// plugin basic properties
@@ -11,9 +11,10 @@ const Drawing = function (editor, pluginOptions) {
 	this.icon = 'drawing';
 	this.pluginOptions = {
 		outputFormat: pluginOptions.outputFormat || 'dataurl', // dataurl, svg
-		size: pluginOptions.size || 5,
+		lineWidth: pluginOptions.lineWidth || 5,
 		lineReconnect: !!pluginOptions.lineReconnect,
 		lineCap: ['butt', 'round', 'square'].includes(pluginOptions.lineCap) ? pluginOptions.lineCap : 'round',
+		lineColor: pluginOptions.lineColor || '',
 		formSize: {
 			width: '750px',
 			height: '50vh',
@@ -121,8 +122,7 @@ Drawing.prototype = {
 		this.points = [];
 		this.paths = [];
 
-		this.ctx.lineWidth = this.pluginOptions.size;
-		this.ctx.lineCap = this.pluginOptions.lineCap;
+		this._setCtx();
 
 		this.__eventsRegister.mousedown = this.eventManager.addEvent(canvas, this.__eventNameMap.mousedown, this.__events.mousedown, { passive: false, useCapture: true });
 		this.__eventsRegister.mousemove = this.eventManager.addEvent(canvas, this.__eventNameMap.mousemove, this.__events.mousemove, true);
@@ -172,9 +172,14 @@ Drawing.prototype = {
 		this.isDrawing = false;
 	},
 
-	_draw() {
-		this.ctx.lineWidth = this.pluginOptions.size;
+	_setCtx() {
+		this.ctx.lineWidth = this.pluginOptions.lineWidth;
 		this.ctx.lineCap = this.pluginOptions.lineCap;
+		this.ctx.lineColor = this.pluginOptions.lineColor || _w.getComputedStyle(this.carrierWrapper).color;
+	},
+
+	_draw() {
+		this._setCtx();
 		this.ctx.beginPath();
 		this.points.forEach(([x, y], i) => {
 			if (i === 0) {
@@ -187,8 +192,7 @@ Drawing.prototype = {
 	},
 
 	_drawAll() {
-		this.ctx.lineWidth = this.pluginOptions.size;
-		this.ctx.lineCap = this.pluginOptions.lineCap;
+		this._setCtx();
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.paths.forEach((path) => {
 			this.points = path;
@@ -225,8 +229,8 @@ Drawing.prototype = {
 			const svgPath = document.createElementNS(svgNS, 'path');
 			svgPath.setAttribute('d', pathData);
 			svgPath.setAttribute('fill', 'none');
-			svgPath.setAttribute('stroke', 'black');
-			svgPath.setAttribute('stroke-width', this.pluginOptions.size);
+			svgPath.setAttribute('stroke', this.ctx.strokeStyle);
+			svgPath.setAttribute('stroke-width', this.ctx.lineWidth);
 			svg.appendChild(svgPath);
 		});
 
