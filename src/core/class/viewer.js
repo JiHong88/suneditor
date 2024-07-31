@@ -41,6 +41,7 @@ Viewer.prototype = {
 		const codeWrapper = fc.get('codeWrapper');
 		const codeFrame = fc.get('code');
 		const wysiwygFrame = fc.get('wysiwygFrame');
+		const wrapper = fc.get('wrapper');
 
 		if (value) {
 			this._setEditorDataToCodeView();
@@ -77,6 +78,7 @@ Viewer.prototype = {
 			this.status._range = null;
 			codeFrame.focus();
 			domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');
+			domUtils.addClass(wrapper, 'se-code-view-status');
 		} else {
 			if (!domUtils.isNonEditable(wysiwygFrame)) this._setCodeDataToEditor();
 			wysiwygFrame.scrollTop = 0;
@@ -102,6 +104,7 @@ Viewer.prototype = {
 				this.history.push(false);
 				this.history.resetButtons(fc.get('key'), null);
 			}
+			domUtils.removeClass(wrapper, 'se-code-view-status');
 		}
 
 		this.editor._checkPlaceholder();
