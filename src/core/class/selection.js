@@ -307,7 +307,7 @@ Selection.prototype = {
 	scrollTo(ref, scrollOption) {
 		if (ref instanceof Selection) {
 			ref = ref.getRangeAt(0);
-		} else if (ref instanceof Node) {
+		} else if (ref instanceof Node || /^(1|3)$/.test(ref?.nodeType)) {
 			ref = this.setRange(ref, 1, ref, 1);
 		} else if (typeof ref?.startContainer === 'undefined') {
 			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
