@@ -358,8 +358,7 @@ Component.prototype = {
 		let componentTop, w;
 		const isRtl = this.options.get('_rtl');
 		const dir = isRtl ? ['right', 'left'] : ['left', 'right'];
-		const top = offsetTarget.offsetTop;
-		const { scrollX, scrollY } = this.offset.getLocal(offsetTarget);
+		const { top, scrollX, scrollY } = this.offset.getLocal(offsetTarget);
 
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
 			const tH = numbers.get(_w.getComputedStyle(lb_t).height, 1);
