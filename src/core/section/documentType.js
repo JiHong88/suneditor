@@ -142,7 +142,7 @@ DocumentType.prototype = {
 
 	resizePage() {
 		const wwWidth = this.wwFrame.offsetWidth + 1;
-		const wwHeight = this.ww.offsetHeight + 1;
+		const wwHeight = this.wwFrame.offsetHeight + 1;
 		if (wwWidth === this.wwWidth || wwHeight === this.wwHeight) return;
 
 		this.wwWidth = wwWidth;
