@@ -636,7 +636,7 @@ window.editor_root = suneditor.create(
 		// 	[':기타-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'math', 'exportPdf', 'print'],
 		// 	'|'
 		// ],
-		// iframe: true,
+		iframe: true,
 		subToolbar: {
 			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
 			width: 'auto',
@@ -649,7 +649,7 @@ window.editor_root = suneditor.create(
 			image: ['73', 'I'],
 			list: ['76', 'L']
 		},
-		theme: 'dark',
+		// theme: 'dark',
 		math: {
 			// katex: {
 			// 	src: Katex
@@ -667,6 +667,7 @@ window.editor_root = suneditor.create(
 		},
 		// autoLinkify: false,
 		// autoStyleify: [],
+		// componentAutoSelect: true,
 		link: {
 			uploadUrl: 'http://localhost:3000/editor/files/upload',
 			relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],

@@ -119,7 +119,7 @@ Selection.prototype = {
 		this.status._range = range;
 		this._rangeInfo(range, this.get());
 
-		if (this.editor.frameOptions.get('iframe')) this.__focus();
+		// if (this.editor.frameOptions.get('iframe')) this.__focus();
 
 		return range;
 	},

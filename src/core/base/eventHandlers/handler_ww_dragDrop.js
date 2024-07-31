@@ -23,7 +23,7 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 		const wwFrame = fc.get('wysiwygFrame');
 		let frameX = 0;
 		let frameY = 0;
-		if(/^iframe$/i.test(wwFrame.nodeName)) {
+		if (/^iframe$/i.test(wwFrame.nodeName)) {
 			frameX = wwFrame.offsetLeft;
 			frameY = wwFrame.offsetTop;
 		}

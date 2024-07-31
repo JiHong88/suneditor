@@ -2,6 +2,8 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter } from '../../helper';
 
+const { _w } = env;
+
 const Math_ = function (editor, pluginOptions) {
 	// external library
 	this.katex = null;
@@ -129,7 +131,10 @@ Math_.prototype = {
 					domUtils.removeClass(element, 'katex');
 				}
 
-				if (this.mathjax) renderMathJax(this.mathjax);
+				if (this.mathjax) {
+					renderMathJax(this.mathjax);
+					this._applyMathJaxStyleOnIframe();
+				}
 			}
 		};
 	},
@@ -204,7 +209,10 @@ Math_.prototype = {
 			return true;
 		}
 
-		if (this.mathjax) renderMathJax(this.mathjax);
+		if (this.mathjax) {
+			renderMathJax(this.mathjax);
+			this._applyMathJaxStyleOnIframe();
+		}
 
 		const r = this.selection.getNearRange(mathEl);
 		if (r) {
@@ -289,7 +297,7 @@ async function copyTextToClipboard(element) {
 		await navigator.clipboard.writeText(text);
 		domUtils.addClass(element, 'se-copy');
 		// copy effect
-		env._w.setTimeout(() => {
+		_w.setTimeout(() => {
 			domUtils.removeClass(element, 'se-copy');
 		}, 120);
 	} catch (err) {
@@ -337,6 +345,9 @@ function CheckKatex(katex) {
 
 function CheckMathJax(mathjax) {
 	if (!mathjax) return null;
+	if (this.editor.frameOptions.get('iframe')) {
+		console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is not supported in the iframe.');
+	}
 
 	try {
 		const adaptor = mathjax.browserAdaptor();
