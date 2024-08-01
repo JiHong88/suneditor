@@ -4,7 +4,19 @@ import { CreateContext, CreateFrameContext } from './context';
 import { domUtils, numbers, converter, env } from '../../helper';
 
 const _d = env._d;
-const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
+const DEFAULT_BUTTON_LIST = [
+	['undo', 'redo'],
+	'|',
+	['bold', 'underline', 'italic', 'strike', '|', 'subscript', 'superscript'],
+	'|',
+	['removeFormat'],
+	'|',
+	['outdent', 'indent'],
+	'|',
+	['fullScreen', 'showBlocks', 'codeView'],
+	'|',
+	['preview', 'print']
+];
 
 const REQUIRED_FORMAT_LINE = 'div';
 const REQUIRED_ELEMENT_WHITELIST = 'br|div';
