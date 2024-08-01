@@ -26,6 +26,40 @@ suneditor.create({
 
 [Plugin options](#user-content-plugin-options)
 
+#### Buttons
+```javascript
+[
+  "bold",
+  "underline",
+  "italic",
+  "strike",
+  "subscript",
+  "superscript",
+  "removeFormat",
+  "copyFormat",
+  "indent",
+  "outdent",
+  "fullScreen",
+  "showBlocks",
+  "codeView",
+  "undo",
+  "redo",
+  "preview",
+  "print",
+  "dir",
+  "dir_ltr",
+  "dir_rtl",
+  "save",
+  "newDocument",
+  "selectAll",
+  "pageBreak",
+  "pageUp",
+  "pageDown",
+  "pageNavigator",
+//  [pluginName],
+]
+```
+
 #### Main options
 ```javascript
 const DEFAULT_BUTTON_LIST = [
