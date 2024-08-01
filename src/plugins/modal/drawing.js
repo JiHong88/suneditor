@@ -1,6 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal } from '../../modules';
 import { domUtils, env } from '../../helper';
+import { CreatTooltipInner } from '../../core/section/constructor';
 
 const { _w, isMobile } = env;
 
@@ -11,6 +12,9 @@ const Drawing = function (editor, pluginOptions) {
 	this.icon = 'drawing';
 	this.pluginOptions = {
 		outputFormat: pluginOptions.outputFormat || 'dataurl', // dataurl, svg
+		useFormatType: pluginOptions.useFormatType ?? false,
+		defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
+		keepFormatType: pluginOptions.keepFormatType ?? false,
 		lineWidth: pluginOptions.lineWidth || 5,
 		lineReconnect: !!pluginOptions.lineReconnect,
 		lineCap: ['butt', 'round', 'square'].includes(pluginOptions.lineCap) ? pluginOptions.lineCap : 'round',
@@ -21,7 +25,7 @@ const Drawing = function (editor, pluginOptions) {
 			maxWidth: '',
 			maxHeight: '',
 			minWidth: '150px',
-			minHeight: '150px',
+			minHeight: '100px',
 			...pluginOptions.formSize
 		},
 		canResize: pluginOptions.canResize ?? true,
@@ -42,6 +46,13 @@ const Drawing = function (editor, pluginOptions) {
 	this.modal = new Modal(this, modalEl);
 
 	// members
+	this.as = this.pluginOptions.defaultFormatType;
+	if (this.pluginOptions.useFormatType) {
+		this.asBlock = modalEl.querySelector('[data-command="asBlock"]');
+		this.asInline = modalEl.querySelector('[data-command="asInline"]');
+		this.eventManager.addEvent([this.asBlock, this.asInline], 'click', OnClickAsButton.bind(this));
+	}
+
 	this.canvas = null;
 	this.ctx = null;
 	this.isDrawing = false;
@@ -82,6 +93,9 @@ Drawing.prototype = {
 	 * @override type = "modal"
 	 */
 	open() {
+		if (this.pluginOptions.useFormatType) {
+			this._activeAsInline((this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline');
+		}
 		this.modal.open();
 		this._initDrawing();
 	},
@@ -103,11 +117,15 @@ Drawing.prototype = {
 			this.plugins.image.init();
 			this.plugins.image.submitFile(files);
 		} else {
-			// dataurl
+			// dataurl | svg
 			const data = this.canvas.toDataURL();
 			const file = { name: 'drawing', size: 0 };
 			this.plugins.image.init();
-			this.plugins.image.create(data, null, 'auto', '', 'none', file, '');
+			if (this.as !== 'inline') {
+				this.plugins.image.create(data, null, 'auto', '', 'none', file, '');
+			} else {
+				this.plugins.image.createInline(data, null, 'auto', '', 'none', file, '');
+			}
 		}
 
 		return true;
@@ -259,6 +277,18 @@ Drawing.prototype = {
 		return { x, y };
 	},
 
+	_activeAsInline(isInline) {
+		if (isInline) {
+			domUtils.addClass(this.asInline, 'on');
+			domUtils.removeClass(this.asBlock, 'on');
+			this.as = 'inline';
+		} else {
+			domUtils.addClass(this.asBlock, 'on');
+			domUtils.removeClass(this.asInline, 'on');
+			this.as = 'block';
+		}
+	},
+
 	constructor: Drawing
 };
 
@@ -275,11 +305,35 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
         <div class="se-modal-body" style="width: ${width}; height: ${height}; min-width: ${minWidth}; min-height: ${minHeight};">
             <canvas class="se-drawing-canvas" style="width: 100%; height: 100%;"></canvas>
 			${pluginOptions.canResize ? '<div class="se-modal-resize-handle-w"></div><div class="se-modal-resize-handle-h"></div><div class="se-modal-resize-handle-c"></div>' : ''}
-        </div>
+		</div>
+		<div class="se-modal-body-bottom">
+			<div class="se-modal-form">
+				<div class="se-modal-flex-form">
+					${
+						pluginOptions.useFormatType
+							? /*html*/ `
+							<div class="se-modal-flex-group">
+								<button type="button" class="se-btn se-tooltip" data-command="asBlock" aria-label="${lang.blockStyle}">
+									${icons.as_block}
+									${CreatTooltipInner(lang.blockStyle)}
+								</button>
+								<button type="button" class="se-btn se-tooltip" data-command="asInline" aria-label="${lang.inlineStyle}">
+									${icons.as_inline}
+									${CreatTooltipInner(lang.inlineStyle)}
+								</button>
+							</div>`
+							: ''
+					}
+					<div class="se-modal-flex-group">
+						<button type="button" class="se-btn se-tooltip" data-command="remove" aria-label="${lang.remove}">
+							${icons.eraser}
+							${CreatTooltipInner(lang.remove)}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
         <div class="se-modal-footer">
-            <button type="button" class="se-btn" title="${lang.remove}" aria-label="${lang.remove}" data-command="remove">
-                ${icons.eraser}
-            </button>
             <button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
                 <span>${lang.submitButton}</span>
             </button>
@@ -360,9 +414,13 @@ function OnCanvasMouseEnter(e) {
 	}
 }
 
-// clear button event
+// button events
 function OnRemove() {
 	this._clearCanvas();
+}
+
+function OnClickAsButton({ target }) {
+	this._activeAsInline(target.getAttribute('data-command') === 'asInline');
 }
 
 export default Drawing;
