@@ -1,7 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal } from '../../modules';
 import { domUtils, env } from '../../helper';
-import { CreatTooltipInner } from '../../core/section/constructor';
+import { CreateTooltipInner } from '../../core/section/constructor';
 
 const { _w, isMobile } = env;
 
@@ -315,11 +315,11 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
 							<div class="se-modal-flex-group">
 								<button type="button" class="se-btn se-tooltip" data-command="asBlock" aria-label="${lang.blockStyle}">
 									${icons.as_block}
-									${CreatTooltipInner(lang.blockStyle)}
+									${CreateTooltipInner(lang.blockStyle)}
 								</button>
 								<button type="button" class="se-btn se-tooltip" data-command="asInline" aria-label="${lang.inlineStyle}">
 									${icons.as_inline}
-									${CreatTooltipInner(lang.inlineStyle)}
+									${CreateTooltipInner(lang.inlineStyle)}
 								</button>
 							</div>`
 							: ''
@@ -327,16 +327,16 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
 					<div class="se-modal-flex-group">
 						<button type="button" class="se-btn se-tooltip" data-command="remove" aria-label="${lang.remove}">
 							${icons.eraser}
-							${CreatTooltipInner(lang.remove)}
+							${CreateTooltipInner(lang.remove)}
 						</button>
 					</div>
 				</div>
 			</div>
 		</div>
         <div class="se-modal-footer">
-            <button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
-                <span>${lang.submitButton}</span>
-            </button>
+		<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
+			<span>${lang.submitButton}</span>
+		</button>
         </div>
     </form>`;
 
