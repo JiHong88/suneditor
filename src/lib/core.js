@@ -5320,7 +5320,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"']+)/);
                         if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
                             const k = util.kebabToCamelCase(r[1].trim());
-                            const v = this.wwComputedStyle[k].replace(/"/g, '');
+                            const v = this.wwComputedStyle[k]?.replace?.(/"/g, '');
                             const c = r[3].trim();
                             switch (k) {
                                 case 'fontFamily':
