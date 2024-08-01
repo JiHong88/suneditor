@@ -334,9 +334,9 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
 			</div>
 		</div>
         <div class="se-modal-footer">
-		<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
-			<span>${lang.submitButton}</span>
-		</button>
+			<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
+				<span>${lang.submitButton}</span>
+			</button>
         </div>
     </form>`;
 
