@@ -1988,6 +1988,14 @@
 	position: relative;
 	padding: 15px 15px 10px 15px;
 }
+.sun-editor .se-modal .se-modal-inner .se-modal-body-top {
+	position: relative;
+	padding: 0px 15px 5px 15px;
+}
+.sun-editor .se-modal .se-modal-inner .se-modal-body-bottom {
+	position: relative;
+	padding: 5px 15px 0px 15px;
+}
 
 .sun-editor .se-modal .se-modal-inner .se-modal-form {
 	margin-bottom: 10px;
@@ -1995,6 +2003,12 @@
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-modal-flex-form {
 	position: relative;
 	display: flex;
+}
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-modal-flex-form .se-modal-flex-group {
+	border: 1px dashed var(--se-modal-border-color);
+	padding: 4px;
+	padding-right: 0;
+	margin-right: 4px;
 }
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-modal-flex-form .se-btn {
 	margin-right: 4px;
@@ -3376,6 +3390,14 @@
 
 .sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-size-text {
 	padding-right: var(--se-input-btn-size);
+}
+
+/* modal - flex-group */
+.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-form .se-modal-flex-form .se-modal-flex-group {
+	margin-right: 4px;
+	margin-left: 0;
+	padding-right: 4px;
+	padding-left: 0;
 }
 
 /* modal - footer */
