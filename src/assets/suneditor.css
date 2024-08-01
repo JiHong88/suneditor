@@ -3394,8 +3394,8 @@
 
 /* modal - flex-group */
 .sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-form .se-modal-flex-form .se-modal-flex-group {
-	margin-right: 4px;
-	margin-left: 0;
+	margin-right: 0;
+	margin-left: 4px;
 	padding-right: 4px;
 	padding-left: 0;
 }
