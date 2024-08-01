@@ -133,10 +133,43 @@ const DEFAULT_CONTENT_STYLES =
 	},
 	__lineFormatFilter: true, // Line format filter
 	__pluginRetainFilter: true, // Plugin retain filter
-	type: '', // Document type: header, page
+	type: '', // Document type: header, page (ex) 'document:header,page'
 	theme: '', // Theme for the editor
-	'type-options': '', // Additional type options
 	externalLibs: {}, // External libraries
+	/** (ex)
+	// math - katex
+	katex: {
+		src: Katex
+	},
+	// math - mathjax (Not supported if using the iframe option.)
+	mathjax: {
+		src: mathjax,
+		TeX,
+		CHTML,
+		browserAdaptor,
+		RegisterHTMLHandler
+	},
+	// exportPdf (Rather than using the library below, I recommend processing it on the server.)
+	html2canvas: html2canvas,
+	jsPDF: jsPDF
+	// codeMirror6
+	codeMirror: {
+		EditorView: EditorView,
+		extensions: [
+			basicSetup,
+			html({
+				matchClosingTags: true,
+				autoCloseTags: true
+			}),
+			javascript()
+		],
+		minimalSetup: minimalSetup
+	},
+	// codeMirror5
+	codeMirror: {
+		src: Codemirror5
+	},
+	*/
 	keepStyleOnDelete: false, // Keep style on delete
 	fontSizeUnits: ['px', 'pt', 'em', 'rem'], // Font size units
 	allowedClassName: DEFAULT_CLASS_NAME, // Allowed class names
