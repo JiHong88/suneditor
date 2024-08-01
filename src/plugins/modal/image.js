@@ -26,7 +26,8 @@ const Image_ = function (editor, pluginOptions) {
 		allowMultiple: !!pluginOptions.allowMultiple,
 		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
 		useFormatType: pluginOptions.useFormatType ?? true,
-		defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block'
+		defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
+		keepFormatType: pluginOptions.keepFormatType ?? false
 	};
 
 	// create HTML
@@ -249,7 +250,7 @@ Image_.prototype = {
 		}
 
 		if (this.pluginOptions.useFormatType) {
-			this._activeAsInline(this.pluginOptions.defaultFormatType === 'inline');
+			this._activeAsInline((this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline');
 		}
 
 		this.anchor.init();
