@@ -10,7 +10,7 @@ const Math_ = function (editor, pluginOptions) {
 	this.mathjax = null;
 
 	// exception
-	if (!(this.katex = CheckKatex(editor.options.get('externalLibs').katex)) && !(this.mathjax = CheckMathJax(editor.options.get('externalLibs').mathjax))) {
+	if (!(this.katex = CheckKatex(editor.options.get('externalLibs').katex)) && !(this.mathjax = CheckMathJax(editor.options.get('externalLibs').mathjax, editor))) {
 		console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need either "KaTeX" or "MathJax" library. Please add the katex or mathjax option.');
 	}
 
@@ -343,9 +343,9 @@ function CheckKatex(katex) {
 	return katex;
 }
 
-function CheckMathJax(mathjax) {
+function CheckMathJax(mathjax, editor) {
 	if (!mathjax) return null;
-	if (this.editor.frameOptions.get('iframe')) {
+	if (editor.frameOptions.get('iframe')) {
 		console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is not supported in the iframe.');
 	}
 
