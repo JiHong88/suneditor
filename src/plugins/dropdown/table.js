@@ -430,7 +430,7 @@ Table.prototype = {
 			return;
 		}
 
-		if (!(target !== this._fixedCell && !this._shift)) return;
+		if (this._shift && target !== this._fixedCell) return;
 
 		this._deleteStyleSelectedCells();
 		if (/^TR$/i.test(target.nodeName)) return;
