@@ -6,6 +6,17 @@ https://www.npmjs.com/package/suneditor?activeTab=versions
 
 ### create
 ```javascript
+import suneditor from 'suneditor';
+import langs, { ko } from 'suneditor/src/langs';
+import plugins from 'suneditor/src/plugins';
+
+// editor style
+import 'suneditor/src/assets/suneditor.css;
+// editable area style
+import 'suneditor/src/assets/suneditor-contents.css;
+// suneditor.css + suneditor-contents.css
+import 'suneditor/dist/suneditor.min.css';
+
 // single
 suneditor.create(document.querySelector('#editor_1'), mainOptions)
 // multi root
