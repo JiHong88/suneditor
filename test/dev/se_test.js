@@ -1,7 +1,7 @@
 import suneditor from '../../src/suneditor';
 require('../../src/assets/suneditor.css');
 require('../../src/assets/suneditor-contents.css');
-require('../../src/themes/dark-variables.css');
+require('../../src/themes/dark.css');
 
 // katex
 import Katex from 'katex';
@@ -576,7 +576,7 @@ window.editor_root = suneditor.create(
 		// <p>test abc  sss</p>
 		// 		`,
 		// syncTab: true,
-		// iframe: true,
+		iframe: true,
 		height: '600px',
 		type: 'document:header,page',
 		iframe_cssFileName: ['suneditor', 'katex'],

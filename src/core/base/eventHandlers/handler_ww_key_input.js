@@ -1,7 +1,6 @@
 import { domUtils, env, unicode } from '../../../helper';
 
 const { _w, isOSX_IOS } = env;
-const DIRECTION_KEYCODE = /^(8|3[2-9]|40|46)$/;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DELETE_KEYCODE = /^(8|46)$/;
 const NON_TEXT_KEYCODE = /^(8|9|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145|229)$/;
@@ -85,7 +84,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	const alt = e.altKey;
 	this.isComposing = keyCode === 229;
 
-	if (!ctrl && frameContext.get('isReadOnly') && !DIRECTION_KEYCODE.test(keyCode)) {
+	if (!ctrl && frameContext.get('isReadOnly') && !DIR_KEYCODE.test(keyCode)) {
 		e.preventDefault();
 		return false;
 	}

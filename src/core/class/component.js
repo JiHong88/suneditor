@@ -358,15 +358,16 @@ Component.prototype = {
 		let componentTop, w;
 		const isRtl = this.options.get('_rtl');
 		const dir = isRtl ? ['right', 'left'] : ['left', 'right'];
-		const { top, scrollX, scrollY } = this.offset.getLocal(offsetTarget);
+		const { top, left, scrollX, scrollY } = this.offset.getLocal(offsetTarget);
 
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
-			const tH = numbers.get(_w.getComputedStyle(lb_t).height, 1);
+			const tlComputedStyle = _w.getComputedStyle(lb_t);
+			const tH = numbers.get(tlComputedStyle.height, 1);
 			this.eventManager._lineBreakComp = container;
 			componentTop = top;
 			w = target.offsetWidth / 2 / 2;
 			t_style.top = componentTop - scrollY - tH / 2 + 'px';
-			t_style[dir[0]] = (isNonSelected ? 4 : this.offset.get(target).left + w) + 'px';
+			t_style[dir[0]] = (isNonSelected ? left - numbers.get(tlComputedStyle.height, 0) / 2 : left + w) + 'px';
 			t_style[dir[1]] = '';
 
 			lb_t.setAttribute('data-offset', scrollY + ',' + scrollX);
@@ -392,7 +393,7 @@ Component.prototype = {
 
 			b_style.top = componentTop + target.offsetHeight - scrollY - bH / 2 + 'px';
 			b_style.right = '';
-			b_style.left = this.offset.get(target).left + (isRtl ? 0 : target.offsetWidth) - (isNonSelected ? 0 : w) - (isNonSelected ? bW / 2 : bW) + 'px';
+			b_style.left = left + (isRtl ? 0 : target.offsetWidth) - (isNonSelected ? 0 : w) - (isNonSelected ? bW / 2 : bW) + 'px';
 
 			const bDir = 'left';
 			lb_b.setAttribute('data-offset', scrollY + ',' + bDir + ',' + scrollX);

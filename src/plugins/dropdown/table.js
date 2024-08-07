@@ -163,8 +163,8 @@ const Table = function (editor, pluginOptions) {
 	this.maxText = this.lang.maxSize;
 	this.minText = this.lang.minSize;
 	this.propTargets = {
-		cell_alignment: controller_props.querySelector('.se-table-props-align > .__se__a_h'),
-		cell_alignment_vertical: controller_props.querySelector('.se-table-props-align > .__se__a_v'),
+		cell_alignment: controller_props.querySelector('.se-table-props-align .__se__a_h'),
+		cell_alignment_vertical: controller_props.querySelector('.se-table-props-align .__se__a_v'),
 		border_format: borderFormatButton,
 		border_style: controller_props.querySelector('[data-command="props_onborder_style"] .se-txt'),
 		border_color: controller_props.querySelector('.__se_border_color'),
@@ -1585,7 +1585,6 @@ Table.prototype = {
 
 	_toggleEditor(enabled) {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');
-		wysiwyg.setAttribute('contenteditable', enabled);
 		if (enabled) domUtils.removeClass(wysiwyg, 'se-disabled');
 		else domUtils.addClass(wysiwyg, 'se-disabled');
 	},
@@ -2682,14 +2681,12 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 		item = alignItems[i];
 		text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
 		alignHtml += /*html*/ `
-		<li>
-			<button type="button" class="se-btn se-btn-list se-tooltip" data-command="props_align" data-value="${item}" title="${text}" aria-label="${text}">
-				${icons['align_' + item]}
-				<span class="se-tooltip-inner">
-					<span class="se-tooltip-text">${text}</span>
-				</span>
-			</button>
-		</li>`;
+		<button type="button" class="se-btn se-tooltip" data-command="props_align" data-value="${item}" title="${text}" aria-label="${text}">
+			${icons['align_' + item]}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${text}</span>
+			</span>
+		</button>`;
 	}
 
 	// vertical align html
@@ -2699,14 +2696,12 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 		item = verticalAligns[i];
 		text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
 		verticalAlignHtml += /*html*/ `
-		<li>
-			<button type="button" class="se-btn se-btn-list se-tooltip" data-command="props_align_vertical" data-value="${item}" title="${text}" aria-label="${text}">
-				${icons['align_' + item]}
-				<span class="se-tooltip-inner">
-					<span class="se-tooltip-text">${text}</span>
-				</span>
-			</button>
-		</li>`;
+		<button type="button" class="se-btn se-tooltip" data-command="props_align_vertical" data-value="${item}" title="${text}" aria-label="${text}">
+			${icons['align_' + item]}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${text}</span>
+			</span>
+		</button>`;
 	}
 
 	const html = /*html*/ `
@@ -2790,11 +2785,13 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 
 				<div class="se-table-props-align">
 					<label>${lang.align}</label>
-					<div class="se-form-group se-form-w0 se-list-inner __se__a_h">
-						<ul class="se-form-group se-form-w0">${alignHtml}</ul>
-					</div>
-					<div class="se-form-group se-form-w0 se-list-inner __se__a_v">
-						<ul class="se-form-group se-form-w0">${verticalAlignHtml}</ul>
+					<div class="se-form-group se-form-w0 se-list-inner">
+						<div class="__se__a_h">
+							${alignHtml}
+						</div>
+						<div class="__se__a_v">
+							${verticalAlignHtml}
+						</div>
 					</div>
 				</div>
 			</div>

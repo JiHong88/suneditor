@@ -991,8 +991,10 @@
 
 .sun-editor .se-btn-select .se-txt {
 	flex: auto;
+	display: flex;
 	text-align: left;
 	margin-right: 4px;
+	align-items: center;
 }
 
 .sun-editor .se-btn-select .se-not-arrow-text {
@@ -2712,6 +2714,10 @@
 }
 .sun-editor .se-controller.se-table-props .se-table-props-align li {
 	margin-right: 2px;
+}
+.sun-editor .se-controller.se-table-props .se-table-props-align .se-form-group div:last-child {
+	flex: auto;
+	margin: 0 8px;
 }
 
 /* controller - link */

@@ -987,6 +987,11 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 }
 
 function OnFocus_wysiwyg(frameContext, e) {
+	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
+		e.preventDefault();
+		return false;
+	}
+
 	const rootKey = frameContext.get('key');
 
 	if (this._inputFocus) {

@@ -1552,6 +1552,8 @@ Editor.prototype = {
 		// use events
 		this.events = { ...Events(), ...this.options.get('events') };
 		this.triggerEvent = async (eventName, eventData) => {
+			// [iframe] wysiwyg is disabled, the event is not called.
+			if (eventData?.frameContext?.get('wysiwyg').getAttribute('contenteditable') === 'false') return false;
 			const eventHandler = this.events[eventName];
 			if (typeof eventHandler === 'function') {
 				return await eventHandler({ editor: this, ...eventData });
