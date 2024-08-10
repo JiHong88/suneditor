@@ -12,8 +12,6 @@ const ImageGallery = function (editor, pluginOptions) {
 		title: this.lang.imageGallery,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
-		listClass: 'se-image-list',
-		drawItemHandler: DrawItems,
 		selectorHandler: SetImage.bind(this),
 		columnSize: 4
 	});
@@ -45,28 +43,6 @@ ImageGallery.prototype = {
 
 	constructor: ImageGallery
 };
-
-/**
- * @Required @override fileBrowser
- * @description Define the HTML of the item to be put in "div.se-file-item-column".
- * Format: [
- *      { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" }
- * ]
- * @param {Object} item Item of the response data's array
- */
-function DrawItems(item) {
-	const srcName = item.src.split('/').pop();
-	return /*html*/ `
-		<div class="se-file-item-img">
-			<img 
-				src="${item.thumbnail || item.src}" 
-				alt="${item.alt || srcName}" 
-				data-command="${item.src || item.thumbnail}" 
-				data-value="${item.name || srcName}">
-			<div class="se-file-name-image se-file-name-back"></div>
-			<div class="se-file-name-image">${item.name || srcName}</div>
-		</div>`;
-}
 
 function SetImage(target) {
 	if (this.inputTarget) {

@@ -176,13 +176,16 @@ Toolbar.prototype = {
 	},
 
 	_resetSticky() {
+		const wrapper = this.editor.frameContext.get('wrapper');
+		if (!wrapper) return;
+
 		const toolbar = this.context.get(this.keyName + '.main');
 		if (this.editor.frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || this.options.get('toolbar_sticky') < 0) return;
 
 		const currentScrollY = this._isViewPortSize ? _w.visualViewport.pageTop : _w.scrollY;
 
 		const minHeight = this.editor.frameContext.get('_minHeight');
-		const editorHeight = this.editor.frameContext.get('wrapper').offsetHeight;
+		const editorHeight = wrapper.offsetHeight;
 		const editorOffset = this.offset.getGlobal(this.editor.frameContext.get('topArea'));
 		const y = currentScrollY + this.options.get('toolbar_sticky');
 		const t = (this._isBalloon || this._isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this._isInline ? toolbar.offsetHeight : 0);

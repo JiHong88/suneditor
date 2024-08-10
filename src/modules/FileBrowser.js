@@ -8,8 +8,8 @@ import ApiManager from './ApiManager';
  * @param {string} params.title - File browser window title. Required. Can be overridden in fileBrowser.
  * @param {string} params.url - File server url. Required. Can be overridden in fileBrowser.
  * @param {Object} params.headers - File server http header. Required. Can be overridden in fileBrowser.
- * @param {string} params.listClass - Class name of list div. Required. Can be overridden in fileBrowser.
- * @param {function} params.drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in fileBrowser.
+ * @param {string?} params.listClass - Class name of list div. Required. Can be overridden in fileBrowser.
+ * @param {function?} params.drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in fileBrowser.
  * @param {function} params.selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in fileBrowser.
  * @param {number} params.columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in fileBrowser. Default: 4.
  */
@@ -32,10 +32,10 @@ const FileBrowser = function (inst, params) {
 	this._loading = content.querySelector('.se-loading-box');
 
 	this.title = params.title;
-	this.listClass = params.listClass;
+	this.listClass = params.listClass || 'se-preview-list';
 	this.url = params.url;
 	this.urlHeader = params.headers;
-	this.drawItemHandler = params.drawItemHandler;
+	this.drawItemHandler = params.drawItemHandler || DrawItems;
 	this.selectorHandler = params.selectorHandler;
 	this.columnSize = params.columnSize || 4;
 
@@ -265,6 +265,28 @@ function CreateHTML({ lang, icons }) {
 				<div class="se-loading-box sun-editor-common"><div class="se-loading-effect"></div></div>
 				<div class="se-file-browser-list"></div>
 			</div>
+		</div>`;
+}
+
+/**
+ * @Required @override fileBrowser
+ * @description Define the HTML of the item to be put in "div.se-file-item-column".
+ * Format: [
+ *      { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" }
+ * ]
+ * @param {Object} item Item of the response data's array
+ */
+function DrawItems(item) {
+	const srcName = item.src.split('/').pop();
+	return /*html*/ `
+		<div class="se-file-item-img">
+			<img 
+				src="${item.thumbnail || item.src}" 
+				alt="${item.alt || srcName}" 
+				data-command="${item.src || item.thumbnail}" 
+				data-value="${item.name || srcName}">
+			<div class="se-file-name-image se-file-name-back"></div>
+			<div class="se-file-name-image">${item.name || srcName}</div>
 		</div>`;
 }
 

@@ -3002,26 +3002,26 @@
 	float: left;
 }
 
-/* --- browser --- custom - "se-image-list" - column */
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {
+/* --- browser ---  */
+.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-column {
 	width: calc(25% - 20px);
 	margin: 0 10px;
 }
 
 @media screen and (max-width: 992px) {
-	.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {
+	.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-column {
 		width: calc(33% - 20px);
 	}
 }
 
 @media screen and (max-width: 768px) {
-	.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {
+	.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-column {
 		width: calc(50% - 20px);
 	}
 }
 
-/* --- browser --- custom - "se-image-list" - item */
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img {
+/* --- browser --- item */
+.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img {
 	position: relative;
 	display: block;
 	cursor: pointer;
@@ -3032,13 +3032,13 @@
 	margin: 10px 0;
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img:hover {
+.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img:hover {
 	opacity: 0.8;
 	-webkit-box-shadow: 0 0 0 0.2rem var(--se-active-color);
 	box-shadow: 0 0 0 0.2rem var(--se-active-color);
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > img {
+.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > img {
 	position: relative;
 	display: block;
 	width: 100%;
@@ -3047,7 +3047,7 @@
 	height: auto;
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > .se-file-name-image {
+.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > .se-file-name-image {
 	position: absolute;
 	z-index: 1;
 	font-size: var(--se-main-font-size);
@@ -3063,7 +3063,7 @@
 	pointer-events: none;
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > .se-file-name-image.se-file-name-back {
+.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > .se-file-name-image.se-file-name-back {
 	background-color: var(--se-main-font-color);
 	opacity: 0.6;
 	pointer-events: none;
