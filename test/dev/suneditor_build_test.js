@@ -1089,6 +1089,11 @@ s2.onClick = (event, core) => {
     }
 }
 
+s2.onPasteMath = (event, core) => {
+    console.log("target", event);
+    event.preventDefault();
+}
+
 s2.onKeyDown = (event, core) => {
     const range = core.getRange();
     if(core.util.hasClass(range.commonAncestorContainer, "metaData")){

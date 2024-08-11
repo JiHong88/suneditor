@@ -25,6 +25,11 @@ export default {
         context.math.focusElement = math_dialog.querySelector('.se-math-exp');
         context.math.previewElement = math_dialog.querySelector('.se-math-preview');
         context.math.fontSizeElement = math_dialog.querySelector('.se-math-size');
+        context.math.focusElement.addEventListener('paste', function (e) {
+            if (typeof core.functions.onPasteMath === 'function') {
+                core.functions.onPasteMath(e, core);
+            }
+        }, false);
         context.math.focusElement.addEventListener(core.util.isIE ? 'textinput' : 'input', this._renderMathExp.bind(core, context.math), false);
         context.math.fontSizeElement.addEventListener('change', function (e) { this.fontSize = e.target.value; }.bind(context.math.previewElement.style), false);
 

@@ -1176,6 +1176,13 @@ editor.onload = function (core, reload) {
  */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
 
+/**
+ * paste event on math plugin
+ * e: Event object
+ * core: Core object
+ */
+editor.onPasteMath = function (e, core) { console.log('onPasteMath', e) }
+
 // Copy event.
 // Called before the editor's default event action.
 // If it returns false, it stops without executing the rest of the action.
