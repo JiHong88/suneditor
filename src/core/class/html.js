@@ -381,6 +381,7 @@ HTML.prototype = {
 			return result;
 		}
 
+		let fNode = null;
 		let range = this.selection.getRange();
 		let line = domUtils.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : this.format.getLine(this.selection.getNode(), null);
 		let insertListCell = domUtils.isListCell(line) && (domUtils.isListCell(oNode) || domUtils.isList(oNode));
@@ -591,8 +592,9 @@ HTML.prototype = {
 				}
 
 				if (domUtils.isWysiwygFrame(parentNode) && (oNode.nodeType === 3 || domUtils.isBreak(oNode))) {
-					const fNode = domUtils.createElement(this.options.get('defaultLine'), null, oNode);
-					oNode = fNode;
+					const formatNode = domUtils.createElement(this.options.get('defaultLine'), null, oNode);
+					fNode = oNode;
+					oNode = formatNode;
 				}
 			}
 
@@ -650,6 +652,8 @@ HTML.prototype = {
 			parentNode.appendChild(oNode);
 			console.warn('[SUNEDITOR.html.insertNode.warn]', error);
 		} finally {
+			if (fNode) oNode = fNode;
+
 			const dupleNodes = parentNode.querySelectorAll('[data-duple]');
 			if (dupleNodes.length > 0) {
 				for (let i = 0, len = dupleNodes.length, d, c, ch, parent; i < len; i++) {
@@ -681,30 +685,8 @@ HTML.prototype = {
 			if (!this.component.isBasic(oNode)) {
 				let offset = 1;
 				if (oNode.nodeType === 3) {
-					const previous = oNode.previousSibling;
-					const next = oNode.nextSibling;
-					const previousText = !previous || previous.nodeType === 1 || domUtils.isZeroWith(previous) ? '' : previous.textContent;
-					const nextText = !next || next.nodeType === 1 || domUtils.isZeroWith(next) ? '' : next.textContent;
-
-					if (previous && previousText.length > 0) {
-						oNode.textContent = previousText + oNode.textContent;
-						domUtils.removeItem(previous);
-					}
-
-					if (next && nextText.length > 0) {
-						oNode.textContent += nextText;
-						domUtils.removeItem(next);
-					}
-
-					const newRange = {
-						container: oNode,
-						startOffset: previousText.length,
-						endOffset: oNode.textContent.length - nextText.length
-					};
-
-					this.selection.setRange(oNode, newRange.startOffset, oNode, newRange.endOffset);
-
-					result = newRange;
+					offset = oNode.textContent.length;
+					this.selection.setRange(oNode, offset, oNode, offset);
 				} else if (!domUtils.isBreak(oNode) && !domUtils.isListCell(oNode) && this.format.isLine(parentNode)) {
 					let zeroWidth = null;
 					if (!oNode.previousSibling || domUtils.isBreak(oNode.previousSibling)) {
@@ -726,10 +708,7 @@ HTML.prototype = {
 				}
 			}
 
-			if (!result) {
-				this.history.push(true);
-				result = oNode;
-			}
+			result = oNode;
 		}
 
 		return result;
@@ -1542,7 +1521,7 @@ HTML.prototype = {
 				r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"']+)/);
 				if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
 					const k = env.kebabToCamelCase(r[1].trim());
-					const cs = this.editor.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
+					const cs = this.editor.frameContext.get('wwComputedStyle')[k]?.replace(/"/g, '');
 					const c = r[3].trim();
 					switch (k) {
 						case 'fontFamily':

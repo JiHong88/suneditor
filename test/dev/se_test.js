@@ -573,6 +573,14 @@ window.editor_root = suneditor.create(
 		<p>asfhjfds</p>
 		<p>fdsaa99999</p>
 		`,
+		value: `<div class="se-component se-video-container __se__float-none" style="width: 100%;">
+  <figure style="width: 100%; height: 56.25%; padding-bottom: 56.25%;" class="">
+    <video controls="true" src="http://localhost:3000/public/files/d55bddf8d62910879ed9f605522149a8.mp4" width="100%" height="56.25%" data-se-size="100%,56.25%" data-se-file-name="SampleVideo_1280x720_1mb.mp4" data-se-file-size="1055736" data-se-index="0" style="width: 100%; height: 100%;"></video>
+  </figure>
+</div>
+<p><br>
+</p>
+`,
 		// <p>test abc  sss</p>
 		// 		`,
 		// syncTab: true,

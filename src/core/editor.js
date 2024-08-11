@@ -908,10 +908,10 @@ Editor.prototype = {
 			if (this.modalForm) this.plugins.modal.close.call(this);
 
 			fc.get('code').setAttribute('readOnly', 'true');
-			domUtils.addClass(fc.get('wysiwygFrame'), 'se-read-only');
+			domUtils.addClass(fc.get('wysiwyg'), 'se-read-only');
 		} else {
 			fc.get('code').removeAttribute('readOnly');
-			domUtils.removeClass(fc.get('wysiwygFrame'), 'se-read-only');
+			domUtils.removeClass(fc.get('wysiwyg'), 'se-read-only');
 		}
 
 		if (this.options.get('hasCodeMirror')) {

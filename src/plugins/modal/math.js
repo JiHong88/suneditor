@@ -48,7 +48,8 @@ const Math_ = function (editor, pluginOptions) {
 				text: '2.5',
 				value: '2.5em'
 			}
-		]
+		],
+		onPaste: typeof pluginOptions.onPaste === 'function' ? pluginOptions.onPaste : null
 	};
 	if (this.pluginOptions.autoHeight) {
 		this.pluginOptions.formSize.height = this.pluginOptions.formSize.minHeight;
@@ -79,6 +80,9 @@ const Math_ = function (editor, pluginOptions) {
 			this.fontSize = e.target.value;
 		}.bind(this.previewElement.style)
 	);
+	if (this.pluginOptions.onPaste) {
+		this.eventManager.addEvent(this.textArea, 'paste', this.pluginOptions.onPaste.bind(this));
+	}
 };
 
 Math_.key = 'math';

@@ -1031,7 +1031,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 }
 
 function OnBlur_wysiwyg(frameContext, e) {
-	if (this._inputFocus || this.editor._antiBlur || frameContext.get('isCodeView')) return;
+	if (this._inputFocus || this.editor._antiBlur || frameContext.get('isCodeView') || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return;
 
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;
@@ -1167,6 +1167,8 @@ function OnSelectionchange_document(_wd) {
 
 	this.editor.applyFrameRoots((root) => {
 		if (anchorNode && root.get('wysiwyg').contains(anchorNode)) {
+			if (root.get('isReadOnly') || root.get('isDisabled')) return;
+
 			anchorNode = null;
 			this.selection._init();
 			this.applyTagEffect();

@@ -23,7 +23,10 @@ const REQUIRED_ELEMENT_WHITELIST = 'br|div';
 const DEFAULT_ELEMENT_WHITELIST =
 	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_TEXT_STYLE_TAGS = 'strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary';
-const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|title|download|rel|src|alt|class|type|controls|colspan|rowspan';
+
+const _video_audio_attr = '|controls|autoplay|loop|muted|poster|preload|playsinline|volume|crossorigin|disableRemotePlayback|controlsList';
+const _iframe_attr = '|allowfullscreen|sandbox|loading|allow|referrerpolicy|frameborder|scrolling';
+const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|title|download|rel|src|alt|class|type|colspan|rowspan' + _video_audio_attr + _iframe_attr;
 
 const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';
 const DEFAULT_FORMAT_BR_LINE = 'PRE';
@@ -138,7 +141,7 @@ const Constructor = function (editorTargets, options) {
 	// focus temp element
 	const focusTemp = domUtils.createElement('INPUT', {
 		class: '__se__focus__temp__',
-		style: 'position: absolute !important; top: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;'
+		style: 'position: fixed !important; top: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;'
 	});
 	focusTemp.tabIndex = 0;
 	editor_carrier_wrapper.appendChild(focusTemp);
