@@ -2884,7 +2884,7 @@
 
 .sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {
 	position: relative;
-	width: 960px;
+	width: 1024px;
 	max-width: 100%;
 	margin: 20px auto;
 	background-color: var(--se-main-background-color);
@@ -2945,6 +2945,43 @@
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	cursor: pointer;
+}
+
+/* --- browser - header - search */
+.sun-editor .se-file-browser .se-file-browser-search {
+	display: flex;
+	font-size: var(--se-main-font-size);
+	width: 100%;
+	padding: 0;
+	text-align: left;
+	margin: 0 -15px;
+}
+
+.sun-editor .se-file-browser .se-file-browser-search .se-file-browser-search-form {
+	width: 400px;
+	max-width: 100%;
+	display: flex;
+}
+.sun-editor .se-file-browser .se-file-browser-search .se-file-browser-search-form > * {
+	margin: 8px 0 8px 8px;
+}
+
+.sun-editor .se-file-browser .se-file-browser-search input {
+	flex: auto;
+	background-color: transparent;
+	padding: 3px 6px;
+	color: var(--se-main-font-color);
+	text-decoration: none;
+	border-radius: var(--se-border-radius);
+	-moz-border-radius: var(--se-border-radius);
+	-webkit-border-radius: var(--se-border-radius);
+	-moz-background-clip: padding;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+}
+
+.sun-editor .se-file-browser .se-file-browser-search button {
+	float: none;
 }
 
 .sun-editor .se-file-browser .se-file-browser-tags a:hover {

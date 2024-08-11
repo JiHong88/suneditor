@@ -8,17 +8,21 @@ import ApiManager from './ApiManager';
  * @param {string} params.title - File browser window title. Required. Can be overridden in fileBrowser.
  * @param {string} params.url - File server url. Required. Can be overridden in fileBrowser.
  * @param {Object} params.headers - File server http header. Required. Can be overridden in fileBrowser.
+ * @param {function} params.selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in fileBrowser.
+ * @param {boolean?} params.useSearch - Whether to use the search function. Optional. Default: true.
+ * @param {string?} params.searchUrl - File server search url. Optional. Can be overridden in fileBrowser.
+ * @param {Object?} params.searchUrlHeader - File server search http header. Optional. Can be overridden in fileBrowser.
  * @param {string?} params.listClass - Class name of list div. Required. Can be overridden in fileBrowser.
  * @param {function?} params.drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in fileBrowser.
- * @param {function} params.selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in fileBrowser.
- * @param {number} params.columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in fileBrowser. Default: 4.
+ * @param {number?} params.columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in fileBrowser. Default: 4.
  */
 const FileBrowser = function (inst, params) {
 	CoreInjector.call(this, inst.editor);
 
 	// create HTML
+	this.useSearch = params.useSearch ?? true;
 	const browserFrame = domUtils.createElement('DIV', { class: 'se-file-browser sun-editor-common' });
-	const content = domUtils.createElement('DIV', { class: 'se-file-browser-inner' }, CreateHTML(inst.editor));
+	const content = domUtils.createElement('DIV', { class: 'se-file-browser-inner' }, CreateHTML(inst.editor, this.useSearch));
 
 	// members
 	this.kind = inst.constructor.key || inst.constructor.name;
@@ -35,6 +39,8 @@ const FileBrowser = function (inst, params) {
 	this.listClass = params.listClass || 'se-preview-list';
 	this.url = params.url;
 	this.urlHeader = params.headers;
+	this.searchUrl = params.searchUrl;
+	this.searchUrlHeader = params.searchUrlHeader;
 	this.drawItemHandler = params.drawItemHandler || DrawItems;
 	this.selectorHandler = params.selectorHandler;
 	this.columnSize = params.columnSize || 4;
@@ -59,6 +65,7 @@ const FileBrowser = function (inst, params) {
 	this.eventManager.addEvent(this.list, 'click', OnClickFile.bind(this));
 	this.eventManager.addEvent(content, 'mousedown', OnMouseDown_browser.bind(this));
 	this.eventManager.addEvent(content, 'click', OnClick_browser.bind(this));
+	this.eventManager.addEvent(browserFrame.querySelector('form.se-file-browser-search-form'), 'submit', Search.bind(this));
 };
 
 FileBrowser.prototype = {
@@ -96,6 +103,18 @@ FileBrowser.prototype = {
 		this.list.innerHTML = this.tagArea.innerHTML = this.titleArea.textContent = '';
 
 		if (typeof this.inst.init === 'function') this.inst.init();
+	},
+
+	search(keyword) {
+		if (this.searchUrl) {
+			this._drawFileList(this.searchUrl + '?keyword=' + keyword, this.searchUrlHeader);
+		} else {
+			keyword = keyword.toLowerCase();
+			this._drawListItem(
+				this.items.filter((item) => item.name.toLowerCase().indexOf(keyword) > -1),
+				false
+			);
+		}
 	},
 
 	/**
@@ -251,7 +270,12 @@ function OnClick_browser(e) {
 	}
 }
 
-function CreateHTML({ lang, icons }) {
+function Search(e) {
+	e.preventDefault();
+	this.search(e.currentTarget.querySelector('input[type="text"]').value);
+}
+
+function CreateHTML({ lang, icons }, useSearch) {
 	return /*html*/ `
 		<div class="se-file-browser-content">
 			<div class="se-file-browser-header">
@@ -260,6 +284,18 @@ function CreateHTML({ lang, icons }) {
 				</button>
 				<span class="se-file-browser-title"></span>
 				<div class="se-file-browser-tags"></div>
+				${
+					useSearch
+						? /*html*/ `
+						<div class="se-file-browser-search">
+							<form class="se-file-browser-search-form">
+								<input type="text" class="se-input-form" placeholder="${lang.search}" aria-label="${lang.search}">
+								<button type="submit" class="se-btn" title="${lang.search}" aria-label="${lang.search}">${icons.search}</button>
+							</form>
+						</div>`
+						: ''
+				}
+				
 			</div>
 			<div class="se-file-browser-body">
 				<div class="se-loading-box sun-editor-common"><div class="se-loading-effect"></div></div>
