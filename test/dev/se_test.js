@@ -584,7 +584,7 @@ window.editor_root = suneditor.create(
 		// <p>test abc  sss</p>
 		// 		`,
 		// syncTab: true,
-		iframe: true,
+		// iframe: true,
 		height: '600px',
 		type: 'document:header,page',
 		iframe_cssFileName: ['suneditor', 'katex'],

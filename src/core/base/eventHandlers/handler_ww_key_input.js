@@ -959,7 +959,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	if (frameContext.has('documentType-use-header') && !range.collapsed && !ctrl && !alt && !shift && !DIR_KEYCODE.test(keyCode)) {
 		_w.setTimeout(() => {
 			frameContext.get('documentType').reHeader();
-		});
+		}, 0);
 		return;
 	}
 

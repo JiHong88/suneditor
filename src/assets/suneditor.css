@@ -123,6 +123,11 @@
 	background-color: transparent;
 	z-index: 1;
 }
+@media screen and (max-width: 509px) {
+	.sun-editor .se-wrapper.se-type-document .se-document-lines {
+		min-width: unset !important;
+	}
+}
 .sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner {
 	padding: var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding) 0;
 }

@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, unicode } from '../../helper';
+import { domUtils, unicode, env } from '../../helper';
 
 const Selection = function (editor) {
 	CoreInjector.call(this, editor);
@@ -11,6 +11,7 @@ const Selection = function (editor) {
 	// members
 	this.range = null;
 	this.selectionNode = null;
+	this.__iframeFocus = false;
 };
 
 Selection.prototype = {
@@ -119,7 +120,7 @@ Selection.prototype = {
 		this.status._range = range;
 		this._rangeInfo(range, this.get());
 
-		// if (this.editor.frameOptions.get('iframe')) this.__focus();
+		if (this.editor.frameOptions.get('iframe')) this.__focus();
 
 		return range;
 	},
@@ -415,11 +416,16 @@ Selection.prototype = {
 	 * @private
 	 */
 	__focus() {
-		const caption = domUtils.getParentElement(this.getNode(), 'figcaption');
-		if (caption) {
-			caption.focus();
-		} else {
-			this.editor.frameContext.get('wysiwyg').focus();
+		try {
+			this.__iframeFocus = true;
+			const caption = domUtils.getParentElement(this.getNode(), 'figcaption');
+			if (caption) {
+				caption.focus();
+			} else {
+				this.editor.frameContext.get('wysiwyg').focus();
+			}
+		} finally {
+			env._w.setTimeout(() => (this.__iframeFocus = false), 0);
 		}
 	},
 

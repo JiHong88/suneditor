@@ -263,7 +263,13 @@ Table.prototype = {
 		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
 		oTable.innerHTML = colGroup + body;
 
-		const figure = domUtils.createElement('FIGURE', { class: 'se-flex-component se-input-component' });
+		// scroll
+		let scrollTypeClass = '';
+		if (this.figureScroll) {
+			scrollTypeClass = ` se-scroll-figure-${this.figureScroll}`;
+		}
+
+		const figure = domUtils.createElement('FIGURE', { class: 'se-flex-component se-input-component' + scrollTypeClass });
 		figure.appendChild(oTable);
 
 		if (this.component.insert(figure, false, false)) {

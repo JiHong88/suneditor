@@ -54,6 +54,11 @@ Format.prototype = {
 
 		this.selection.setRange(domUtils.getNodeFromPath(info.firstPath, first), info.startOffset, domUtils.getNodeFromPath(info.lastPath, last), info.endOffset);
 		this.history.push(false);
+
+		// document type
+		if (this.editor.frameContext.has('documentType-use-header')) {
+			this.editor.frameContext.get('documentType').reHeader();
+		}
 	},
 
 	/**
