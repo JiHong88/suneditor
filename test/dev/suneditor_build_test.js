@@ -1027,14 +1027,24 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
             html: '<p>Template 1</p>'
         }
     ],
+    videoUploadUrl: 'http://localhost:3000/editor/upload',
+    videoFileInput: true,
     // font: ['\'Exo 2\'', 'Sans-serif', 'Exo 2'],
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
+    videoTagAttrs: {
+        autoplay: true,
+        muted: true,
+    },
     // addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
     lineAttrReset: 'class',
     imageAccept: '*/*',
-    value: `<p>Ôtez la <span style="color: rgb(235, 141, 117)">complexité</span>,<br>
-M.Biz vous apporte des solutions utiles<br>
-</p>`,
+    value: `<div class="se-component se-video-container __se__float-none" style="width: 100%;">
+  <figure style="width: 100%; height: 56.25%; padding-bottom: 56.25%;">
+    <video controls="true" autoplay="true" muted="true" src="http://localhost:3000/public/files/d55bddf8d62910879ed9f605522149a8.mp4" data-proportion="true" style="width: 100%; height: 100%;" data-percentage="100%,56.25%" width="100%" height="56.25%" data-size="100%,56.25%" data-align="none" data-index="0" data-file-name="SampleVideo_1280x720_1mb.mp4" data-file-size="1055736" data-origin="100%,56.25%"></video>
+  </figure>
+</div>
+
+<p>aaa</p>`,
     // attributesWhitelist: {
     //     all: 'style|class',
     // },

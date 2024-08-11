@@ -5922,7 +5922,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // set whitelist
             const getRegList = function (str, str2) { return !str ? '^' : (str === '*' ? '[a-z-]+' : (!str2 ? str : (str + '|' + str2))); };
             // tags
-            const defaultAttr = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|origin-size';
+            const videoAttr = '|controls|autoplay|loop|muted|poster|preload|playsinline';
+            const iframeAttr = '|allowfullscreen|sandbox|loading|allow|referrerpolicy|frameborder|scrolling';
+            const defaultAttr = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|origin-size' + videoAttr + iframeAttr;
             const dataAttr = 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1 || options._editorTagsWhitelist === '*';
             // html check
