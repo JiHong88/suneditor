@@ -6426,6 +6426,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _applyTagEffects: function () {
+            if (util.hasClass(context.element.wysiwyg, 'se-read-only')) {
+                return false;
+            }
+
             let selectionNode = core.getSelectionNode();
             if (selectionNode === core.effectNode) return;
             core.effectNode = selectionNode;
@@ -6607,6 +6611,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onClick_wysiwyg: function (e) {
+            // if (util.hasClass(context.element.wysiwyg, 'se-read-only')) {
+            //     e.preventDefault();
+            //     return false;
+            // }
+
             const targetElement = e.target;
 
             if (core.isReadOnly) {
