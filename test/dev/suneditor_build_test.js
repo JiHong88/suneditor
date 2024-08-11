@@ -1032,10 +1032,9 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     // addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
     lineAttrReset: 'class',
     imageAccept: '*/*',
-    value: `<figure>
-    <img src="https://blog.kakaocdn.net/dn/0QCnX/btqU7cMuFOZ/uVPVj1aIBNqINLQZGkuwa0/img.png" alt="">
-    <figcaption>Home Edge Logo</figcaption>
-</figure>`,
+    value: `<p>Ôtez la <span style="color: rgb(235, 141, 117)">complexité</span>,<br>
+M.Biz vous apporte des solutions utiles<br>
+</p>`,
     // attributesWhitelist: {
     //     all: 'style|class',
     // },
