@@ -87,7 +87,7 @@ export default {
         /// focus temp
         const focusTemp = doc.createElement('INPUT');
         focusTemp.tabIndex = -1;
-        focusTemp.style.cssText = 'position: absolute !important; top: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;';
+        focusTemp.style.cssText = 'position: fixed !important; top: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;';
 
         // toolbar container
         const toolbarContainer = options.toolbarContainer;
