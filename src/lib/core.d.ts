@@ -693,6 +693,7 @@ export default class SunEditor {
     onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => boolean | string;
     onCopy: (e: Event, clipboardData: any, core: Core) => boolean;
     onCut: (e: Event, clipboardData: any, core: Core) => boolean;
+    onPasteMath: (e: Event, core: Core) => void;
 
     /**
      * @description Called just after the save was executed.

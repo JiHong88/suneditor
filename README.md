@@ -739,6 +739,10 @@ youtubeQuery    : The query string of a YouTube embedded URL.        default: ''
                   It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
                     // https://developers.google.com/youtube/player_parameters
+vimeoQuery      : The query string of a Vimeo embedded URL.            default: '' {String}
+                  It takes precedence over the value user entered.
+                  ex) 'autoplay=1&muted=1'
+                    // https://help.vimeo.com/hc/en-us/articles/12426260232977-Player-parameters-overview
 videoFileInput  : Choose whether to create a file input tag in the video upload window.  default: false {Boolean}
 videoUrlInput   : Choose whether to create a video url input tag in the video upload window.
                   If the value of videoFileInput is false, it will be unconditionally.   default: true {Boolean}
@@ -1175,6 +1179,13 @@ editor.onload = function (core, reload) {
  * core: Core object
  */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
+
+/**
+ * paste event on math plugin
+ * e: Event object
+ * core: Core object
+ */
+editor.onPasteMath = function (e, core) { console.log('onPasteMath', e) }
 
 // Copy event.
 // Called before the editor's default event action.

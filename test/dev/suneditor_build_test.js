@@ -1027,15 +1027,20 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
             html: '<p>Template 1</p>'
         }
     ],
+    videoUploadUrl: 'http://localhost:3000/editor/upload',
+    videoFileInput: true,
     // font: ['\'Exo 2\'', 'Sans-serif', 'Exo 2'],
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
+    videoTagAttrs: {
+        autoplay: true,
+        muted: true,
+    },
     // addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
     lineAttrReset: 'class',
     imageAccept: '*/*',
-    value: `<figure>
-    <img src="https://blog.kakaocdn.net/dn/0QCnX/btqU7cMuFOZ/uVPVj1aIBNqINLQZGkuwa0/img.png" alt="">
-    <figcaption>Home Edge Logo</figcaption>
-</figure>`,
+    value: `<p>Ôtez la <span style="color: rgb(235, 141, 117)">complexité</span>,<br>
+M.Biz vous apporte des solutions utiles<br>
+</p>`,
     // attributesWhitelist: {
     //     all: 'style|class',
     // },
@@ -1088,6 +1093,11 @@ s2.onClick = (event, core) => {
     if(core.util.hasClass(element, "metaData")){
         core.setRange(element, 0, element, 1);
     }
+}
+
+s2.onPasteMath = (event, core) => {
+    console.log("target", event);
+    event.preventDefault();
 }
 
 s2.onKeyDown = (event, core) => {
