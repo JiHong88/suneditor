@@ -29,6 +29,7 @@ export default {
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _youtubeQuery: options.youtubeQuery,
+            _vimeoQuery: options.vimeoQuery,
             _videoRatio: (options.videoRatio * 100) + '%',
             _defaultRatio: (options.videoRatio * 100) + '%',
             _linkValue: '',
@@ -540,6 +541,15 @@ export default {
                     url = url.slice(0, -1);
                 }
                 url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
+
+                if (contextVideo._vimeoQuery.length > 0) {
+                    if (/\?/.test(url)) {
+                        const splitUrl = url.split('?');
+                        url = splitUrl[0] + '?' + contextVideo._vimeoQuery + '&' + splitUrl[1];
+                    } else {
+                        url += '?' + contextVideo._vimeoQuery;
+                    }
+                }
             }
 
             this.plugins.video.create_video.call(this, this.plugins.video[(!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? "createVideoTag" : "createIframeTag")].call(this), url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.dialog.updateModal);

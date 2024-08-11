@@ -557,6 +557,7 @@ export default {
         options.videoRatio = (util.getNumber(options.videoRatio, 4) || 0.5625);
         options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
+        options.vimeoQuery = (options.vimeoQuery || '').replace('?', '');
         options.videoFileInput = !!options.videoFileInput;
         options.videoUrlInput = (options.videoUrlInput === undefined || !options.videoFileInput) ? true : options.videoUrlInput;
         options.videoUploadHeader = options.videoUploadHeader || null;
