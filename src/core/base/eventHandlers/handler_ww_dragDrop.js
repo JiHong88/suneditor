@@ -69,6 +69,12 @@ export function OnDrop_wysiwyg(frameContext, dragCursor, e) {
 			this.component.deselect();
 			this.selection.setRange(sc, so, ec, eo);
 			this.html.insertNode(dragContainer, null, true);
+
+			// document type page
+			if (frameContext.has('documentType-use-page')) {
+				frameContext.get('documentType').rePage(true);
+			}
+
 			return;
 		}
 

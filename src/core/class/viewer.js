@@ -337,14 +337,18 @@ Viewer.prototype = {
 		const iframe = domUtils.createElement('IFRAME', { style: 'display: none;' });
 		this._d.body.appendChild(iframe);
 
+		const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;
 		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get()) : this.html.get();
 		const printDocument = domUtils.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
 		const pageCSS = /*html*/ `
 			<style>
+				.sun-editor-editable {
+					padding: 0 !important;
+				}
 				@page {
 					size: A4;
-					margin: 0;
+					margin: ${innerPadding};
 				}
 			</style>`;
 

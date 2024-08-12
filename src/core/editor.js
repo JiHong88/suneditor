@@ -1230,7 +1230,7 @@ Editor.prototype = {
 
 		// document type page
 		if (fc.has('documentType-use-page')) {
-			fc.get('documentType').rePage();
+			fc.get('documentType').rePage(false);
 		}
 	},
 

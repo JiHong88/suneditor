@@ -27,6 +27,7 @@ const DocumentType = function (editor, fc) {
 	this.totalPages = 0;
 	this.pageNum = 0;
 	this.pageHeight = -1;
+	this.pageBreaksCnt = 0;
 	this.pages = [];
 	this.pages_line = [];
 	this.prevScrollTop = 0;
@@ -94,56 +95,80 @@ DocumentType.prototype = {
 		this.innerHeaders = inner.querySelectorAll('div');
 	},
 
-	rePage() {
+	rePage(force) {
 		if (!this.page) return;
 
 		const height = this.displayPage.scrollHeight ?? this.ww.scrollHeight;
-		if (this.pageHeight === height) return;
+		const pageBreaks = this.ww.querySelectorAll('.se-page-break');
+		if (!force && this.pageHeight === height && this.pageBreaksCnt === pageBreaks.length) return;
 		this.pageHeight = height;
+		this.pageBreaksCnt = pageBreaks.length;
 
-		const totalPages = Math.ceil(height / A4_HEIGHT);
+		// page break info
+		let pageBreakHeight = 0;
+		let lastBreakPosition = 0;
+		let additionalPages = 0;
+		if (pageBreaks.length > 0) {
+			pageBreakHeight = pageBreaks[0].offsetHeight / 2;
+			for (let i = 0; i < pageBreaks.length; i++) {
+				const breakPosition = pageBreaks[i].offsetTop;
+				const sectionHeight = breakPosition - lastBreakPosition;
+
+				if (sectionHeight % A4_HEIGHT !== 0) {
+					additionalPages++;
+				}
+
+				lastBreakPosition = breakPosition;
+			}
+
+			const lastSectionHeight = height - lastBreakPosition;
+			if (lastSectionHeight > 0 && lastSectionHeight % A4_HEIGHT !== 0) {
+				additionalPages++;
+			}
+		}
+
+		const totalPages = Math.ceil(height / A4_HEIGHT) + additionalPages;
 		const scrollTop = (this.prevScrollTop = this._getWWScrollTop());
 		const wwWidth = this.wwFrame.offsetWidth + 1;
-		const pageBreaks = this.ww.querySelectorAll('.se-page-break');
-
-		const pages = [];
 		const pageTop = this.page.offsetTop;
-		for (let i = 0, len = pageBreaks.length; i < len; i++) {
-			pages.push({ number: i, top: pageBreaks[i].offsetTop - pageTop + pageBreaks[i].offsetHeight / 2 - scrollTop });
+		const pages = [];
+
+		// pageBreak position
+		for (let i = 0; i < pageBreaks.length; i++) {
+			pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight - pageTop - scrollTop });
 		}
 
-		for (let i = 0, t; i < totalPages; i++) {
-			t = i * A4_HEIGHT - scrollTop;
-			let inserted = false;
-			for (let j = 0, jLen = pages.length; j < jLen; j++) {
-				if (t < pages[j].top) {
-					pages.splice(j, 0, { number: i + pageBreaks.length, top: t });
-					inserted = true;
-					break;
-				}
-			}
-			if (!inserted) {
-				pages.push({ number: i + pageBreaks.length, top: t });
+		// A4 position
+		for (let i = 0; i < totalPages; i++) {
+			const t = i * A4_HEIGHT - scrollTop;
+			if (!pages.some((p) => Math.abs(p.top - t) < 1)) {
+				pages.push({ number: i, top: t });
 			}
 		}
 
-		// set page number
+		// sort
+		pages.sort((a, b) => a.top - b.top);
+
+		// numbering
 		this.page.innerHTML = '';
 		this.pages = [];
-		for (let i = 0, len = pages.length; i < len; i++) {
-			const pageNumber = domUtils.createElement('DIV', { style: `top:${pages[i].top}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
+		for (let i = 0, t; i < totalPages; i++) {
+			t = pages[i].top;
+			if (height < scrollTop + pageTop + t) break;
+			const pageNumber = domUtils.createElement('DIV', { style: `top:${t}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
 			this.page.appendChild(pageNumber);
 			this.pages.push(pageNumber);
 		}
 
 		this.pages_line = this.page.querySelectorAll('.se-document-page-line');
-		this.totalPages = totalPages;
+		this.totalPages = this.pages.length;
+		this._displayCurrentPage();
 	},
 
 	resizePage() {
 		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const wwHeight = this.wwFrame.offsetHeight + 1;
-		if (wwWidth === this.wwWidth || wwHeight === this.wwHeight) return;
+		if (wwWidth === this.wwWidth && wwHeight === this.wwHeight) return;
 
 		this.wwWidth = wwWidth;
 		this.wwHeight = wwHeight;

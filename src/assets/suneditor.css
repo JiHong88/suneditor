@@ -3802,15 +3802,6 @@
 	z-index: 1;
 }
 
-.sun-editor-editable[contenteditable='true'] .se-page-break::before {
-	content: '';
-	display: block;
-	width: 100%;
-	border-top: 1px dashed var(--se-doc-info-page-background-color);
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-}
 .sun-editor-editable[contenteditable='true'] .se-page-break::after {
 	content: '⎯⎯⎯⎯⎯⎯';
 	position: absolute;
