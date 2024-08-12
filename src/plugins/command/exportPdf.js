@@ -13,13 +13,11 @@ const ExportPdf = function (editor, pluginOptions) {
 	// plugin options
 	this.apiUrl = pluginOptions.apiUrl;
 	this.fileName = pluginOptions.fileName || 'suneditor-pdf';
-	this.jsPDFOptions = pluginOptions.jsPDFOptions || {};
-	this.html2canvasOptions = pluginOptions.html2canvasOptions || {};
 
 	// option check
-	if (!this.apiUrl && !this.options.get('externalLibs').html2canvas && !this.options.get('externalLibs').jsPDF) {
-		console.warn('[SUNEDITOR.plugins.exportPdf.error] Requires "apiUrl" or externalLibs.html2canvas and externalLibs.jsPDF options.');
-	} else if (this.apiUrl) {
+	if (!this.apiUrl) {
+		console.warn('[SUNEDITOR.plugins.exportPdf.error] Requires exportPdf."apiUrl" options.');
+	} else {
 		this.apiManager = new ApiManager(this, {
 			method: 'POST',
 			url: this.apiUrl,
@@ -59,77 +57,14 @@ ExportPdf.prototype = {
 			if ((await this.triggerEvent('onExportPdfBefore', { editableDiv })) === false) return;
 
 			// at server
-			if (this.apiUrl) {
-				await this._createByServer(ww);
-				return;
-			}
-
-			// at client
-			const checkAndProcessResources = async () => {
-				const resources = ww.querySelectorAll('img, audio, video');
-				const resourcesLoaded = Array.from(resources).map((resource) => {
-					switch (resource.tagName.toLowerCase()) {
-						case 'img':
-							return new Promise((resolve) => {
-								if (resource.complete && resource.naturalHeight !== 0) {
-									resolve();
-								} else {
-									resource.onload = resolve;
-									resource.onerror = () => resolve();
-								}
-							});
-						case 'audio':
-						case 'video':
-							return new Promise((resolve) => {
-								if (resource.readyState >= 4) {
-									// HAVE_ENOUGH_DATA
-									resolve();
-								} else {
-									resource.onloadeddata = resolve;
-									resource.onerror = () => resolve();
-								}
-							});
-						default:
-							return Promise.resolve();
-					}
-				});
-
-				await Promise.all(resourcesLoaded);
-				await this._createByHtml2canvas(ww);
-			};
-
-			// run observer
-			const observer = new MutationObserver(checkAndProcessResources);
-			observer.observe(ww, { childList: true, subtree: true, attributes: true });
-
-			await checkAndProcessResources();
+			await this._createByServer(ww);
+			return;
 		} catch (error) {
 			console.error(`[SUNEDITOR.plugins.exportPdf.error] ${error.message}`);
 		} finally {
 			// domUtils.removeItem(ww);
 			this.editor.hideLoading();
 		}
-	},
-
-	async _createByHtml2canvas(ww) {
-		const canvas = await this.options.get('externalLibs').html2canvas(ww, {
-			useCORS: true,
-			logging: true,
-			...this.html2canvasOptions
-		});
-		const imageData = canvas.toDataURL('image/png');
-
-		const pdf = new (this.options.get('externalLibs').jsPDF)({
-			orientation: 'portrait',
-			unit: 'px',
-			format: [canvas.width, canvas.height],
-			...this.jsPDFOptions
-		});
-
-		pdf.addImage(imageData, 'PNG', 0, 0, canvas.width, canvas.height);
-
-		// save PDF file
-		pdf.save(`${this.fileName}.pdf`);
 	},
 
 	async _createByServer(ww) {
