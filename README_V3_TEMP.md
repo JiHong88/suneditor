@@ -224,21 +224,62 @@ const DEFAULT_CONTENT_STYLES =
 	tabDisable: false, // Disable tab
 	shortcutsHint: true, // Show shortcuts hint
 	shortcutsDisable: false, // Disable shortcuts
+	/**
+	The array is divided into even units.
+	Input a command in the first value.
+	Input the character to be displayed in the tooltip in the second value. (ctrl, shift, etc. are automatically entered.)
+	How to enter a command
+	The key value of the object is the basic command or plugin name.
+	The "+" delimiter is required.
+	Starts with "c" or "!".
+	
+	- Command shortcut
+	c = ctrl | command
+	s = shift
+	number = key code
+
+	 - text shortcut
+	"!" = Valid when starting from the first of a paragraph.
+	The character following "!" is the key value.
+	"=" The shortcut key is executed when the key value character is completed without any other input.
+	It is executed when the space key is entered after the "_" character.
+	It is executed when the enter key is entered after the "/" character.
+
+	---
+	-- Plugin method 
+	"~methodName" The method name of the plugin to be executed.
+
+	-- Custom shortcut keys must start with "_".
+	"p~pluginName.pluginMethod" It is valid when the key value is not a plugin or a basic command. The plugin name and the method name of the plugin.
+
+	-- Registering a function directly
+	"$" If you put "$" as the last value, the function in the third value of the array will be executed.
+	- function arg ({ range, line, info, event, keyCode, editor: this.editor })
+	 */
 	shortcuts: {
-		// Shortcuts configuration
-		selectAll: ['65', 'A'],
-		bold: ['66', 'B'],
-		strike: ['s83', 'S'],
-		underline: ['85', 'U'],
-		italic: ['73', 'I'],
-		redo: ['89', 'Y', 's90', 'Z'],
-		undo: ['90', 'Z'],
-		indent: ['221', ']'],
-		outdent: ['219', '['],
-		sup: ['187', '='],
-		sub: ['s187', '='],
-		save: ['83', 'S'],
-		link: ['75', 'K']
+		// default command
+		selectAll: ['c+65', 'A'],
+		bold: ['c+66', 'B'],
+		strike: ['c+s+83', 'S'],
+		underline: ['c+85', 'U'],
+		italic: ['c+73', 'I'],
+		redo: ['c+89', 'Y', 'c+s+90', 'Z'],
+		undo: ['c+90', 'Z'],
+		indent: ['c+221', ']'],
+		outdent: ['c+219', '['],
+		save: ['c+83', 'S'],
+		// plugins
+		link: ['c+75', 'K'],
+		hr: ['!+---+=+~shortcut', ''],
+		list_numbered: ['!+1.+_+~shortcut', ''],
+		list_bulleted: ['!+*.+_+~shortcut', ''],
+		// custom
+		_h1: ['c+s+49+p~formatBlock.createHeader', ''],
+		_h2: ['c+s+50+p~formatBlock.createHeader', ''],
+		_h3: ['c+s+51+p~formatBlock.createHeader', ''],
+		_h4: ['c+s+52+p~formatBlock.createHeader', ''],
+		_h5: ['c+s+53+p~formatBlock.createHeader', ''],
+		_h6: ['c+s+54+p~formatBlock.createHeader', '']
 	},
 	fullScreenOffset: 0, // Fullscreen offset
 	previewTemplate: null, // Preview template

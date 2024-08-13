@@ -666,12 +666,10 @@ export function InitOptions(options, editorTargets, plugins) {
 					hr: ['!+---+=+~shortcut', ''],
 					list_numbered: ['!+1.+_+~shortcut', ''],
 					list_bulleted: ['!+*.+_+~shortcut', ''],
+					// custom
 					_h1: ['c+s+49+p~formatBlock.createHeader', ''],
 					_h2: ['c+s+50+p~formatBlock.createHeader', ''],
-					_h3: ['c+s+51+p~formatBlock.createHeader', ''],
-					_h4: ['c+s+52+p~formatBlock.createHeader', ''],
-					_h5: ['c+s+53+p~formatBlock.createHeader', ''],
-					_h6: ['c+s+54+p~formatBlock.createHeader', '']
+					_h3: ['c+s+51+p~formatBlock.createHeader', '']
 				},
 				options.shortcuts || {}
 		  ].reduce((_default, _new) => {
