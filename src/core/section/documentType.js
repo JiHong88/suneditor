@@ -35,6 +35,7 @@ const DocumentType = function (editor, fc) {
 	this.usePage = editor.options.get('type-options').includes('page');
 	this.navigatorButtons = [];
 	this.pageNavigator = null;
+	this._mirror = fc.get('documentTypePageMirror');
 
 	// init header
 	if (this.useHeader) {

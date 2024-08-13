@@ -72,7 +72,7 @@
 		drawing: 'Drawing',
 		drawing_modal_title: 'Drawing',
 		edit: 'Edit',
-		exportPdf: 'Export to PDF',
+		exportPDF: 'Export to PDF',
 		exportWord: 'Export to Word',
 		find: 'Find',
 		decrease: 'Decrease',

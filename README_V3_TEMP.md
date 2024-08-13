@@ -160,7 +160,7 @@ const DEFAULT_CONTENT_STYLES =
 		browserAdaptor,
 		RegisterHTMLHandler
 	},
-	// exportPdf (Rather than using the library below, I recommend processing it on the server.)
+	// exportPDF (Rather than using the library below, I recommend processing it on the server.)
 	html2canvas: html2canvas,
 	jsPDF: jsPDF
 	// codeMirror6
@@ -328,7 +328,7 @@ const DEFAULT_CONTENT_STYLES =
 {
 	// --------- command
 	blockquote: null, // no options.
-	exportPdf: {
+	exportPDF: {
 		apiUrl: null, // API URL for exporting PDF
 		fileName: 'suneditor-pdf', // Default file name for the exported PDF
 		jsPDFOptions: {}, // Default options for jsPDF

@@ -1,6 +1,6 @@
 // command
 import blockquote from './command/blockquote';
-import exportPdf from './command/exportPdf';
+import exportPDF from './command/exportPDF';
 import fileUpload from './command/fileUpload';
 import list_bulleted from './command/list_bulleted';
 import list_numbered from './command/list_numbered';
@@ -43,7 +43,7 @@ import anchor from './popup/anchor';
 
 export {
 	blockquote,
-	exportPdf,
+	exportPDF,
 	fileUpload,
 	list_bulleted,
 	list_numbered,
@@ -74,7 +74,7 @@ export {
 };
 export default {
 	blockquote,
-	exportPdf,
+	exportPDF,
 	fileUpload,
 	list_bulleted,
 	list_numbered,

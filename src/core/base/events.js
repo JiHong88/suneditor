@@ -313,7 +313,7 @@ export default function () {
 
 		onFileUploadError: null,
 
-		onExportPdfBefore: null,
+		onExportPDFBefore: null,
 
 		onFileManagerAction: null
 	};

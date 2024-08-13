@@ -4,11 +4,11 @@ import { ApiManager } from '../../modules';
 
 const { _d } = env;
 
-const ExportPdf = function (editor, pluginOptions) {
+const ExportPDF = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
-	this.title = this.lang.exportPdf;
-	this.icon = 'pdf';
+	this.title = this.lang.exportPDF;
+	this.icon = 'PDF';
 
 	// plugin options
 	this.apiUrl = pluginOptions.apiUrl;
@@ -16,7 +16,7 @@ const ExportPdf = function (editor, pluginOptions) {
 
 	// option check
 	if (!this.apiUrl) {
-		console.warn('[SUNEDITOR.plugins.exportPdf.error] Requires exportPdf."apiUrl" options.');
+		console.warn('[SUNEDITOR.plugins.exportPDF.error] Requires exportPDF."apiUrl" options.');
 	} else {
 		this.apiManager = new ApiManager(this, {
 			method: 'POST',
@@ -29,10 +29,10 @@ const ExportPdf = function (editor, pluginOptions) {
 	}
 };
 
-ExportPdf.key = 'exportPdf';
-ExportPdf.type = 'command';
-ExportPdf.className = 'se-component-enabled';
-ExportPdf.prototype = {
+ExportPDF.key = 'exportPDF';
+ExportPDF.type = 'command';
+ExportPDF.className = 'se-component-enabled';
+ExportPDF.prototype = {
 	/**
 	 * @override core
 	 * @param {Element} target Target command button
@@ -42,9 +42,8 @@ ExportPdf.prototype = {
 		let ww = null;
 
 		try {
-			const topArea = this.editor.frameContext.get('topArea');
 			const editableDiv = domUtils.createElement('div', { class: this.editor.frameContext.get('wysiwyg').className }, this.html.get());
-			ww = domUtils.createElement('div', { style: `position: absolute; left: -10000px; width: ${topArea.clientWidth}px; height: auto;` }, editableDiv);
+			ww = domUtils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
 
 			if (this.apiUrl) {
 				const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
@@ -54,13 +53,13 @@ ExportPdf.prototype = {
 			_d.body.appendChild(ww);
 
 			// before event
-			if ((await this.triggerEvent('onExportPdfBefore', { editableDiv })) === false) return;
+			if ((await this.triggerEvent('onExportPDFBefore', { editableDiv })) === false) return;
 
 			// at server
 			await this._createByServer(ww);
 			return;
 		} catch (error) {
-			console.error(`[SUNEDITOR.plugins.exportPdf.error] ${error.message}`);
+			console.error(`[SUNEDITOR.plugins.exportPDF.error] ${error.message}`);
 		} finally {
 			// domUtils.removeItem(ww);
 			this.editor.hideLoading();
@@ -77,7 +76,7 @@ ExportPdf.prototype = {
 
 		if (xhr.status !== 200) {
 			const res = !xhr.responseText ? xhr : JSON.parse(xhr.responseText);
-			throw Error(`[SUNEDITOR.plugins.exportPdf.error] ${res.errorMessage}`);
+			throw Error(`[SUNEDITOR.plugins.exportPDF.error] ${res.errorMessage}`);
 		}
 
 		const blob = new Blob([xhr.response], { type: 'application/pdf' });
@@ -97,7 +96,7 @@ ExportPdf.prototype = {
 		}
 	},
 
-	constructor: ExportPdf
+	constructor: ExportPDF
 };
 
-export default ExportPdf;
+export default ExportPDF;

@@ -1197,8 +1197,13 @@ Editor.prototype = {
 		// document type init
 		if (this.options.get('type') === 'document') {
 			e.set('documentType', new DocumentType(this, e));
-			if (e.get('documentType').useHeader) e.set('documentType-use-header', true);
-			if (e.get('documentType').usePage) e.set('documentType-use-page', true);
+			if (e.get('documentType').useHeader) {
+				e.set('documentType-use-header', true);
+			}
+			if (e.get('documentType').usePage) {
+				e.set('documentType-use-page', true);
+				e.get('documentTypePageMirror').innerHTML = e.get('wysiwyg').innerHTML;
+			}
 		}
 	},
 
@@ -1209,6 +1214,9 @@ Editor.prototype = {
 	_resourcesStateChange(fc) {
 		this._iframeAutoHeight(fc);
 		this._checkPlaceholder(fc);
+		if (fc.get('documentType').usePage) {
+			fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
+		}
 	},
 
 	/**
@@ -1681,6 +1689,8 @@ Editor.prototype = {
 			if (e.get('documentTypePage')) {
 				if (this.options.get('_rtl')) e.get('wrapper').insertBefore(e.get('documentTypePage'), e.get('wysiwygFrame'));
 				else e.get('wrapper').appendChild(e.get('documentTypePage'));
+				// page mirror
+				e.get('wrapper').appendChild(e.get('documentTypePageMirror'));
 			}
 		});
 

@@ -69,7 +69,7 @@
 		download: '다운로드',
 		drag: '드래그',
 		edit: '편집',
-		exportPdf: 'PDF로 내보내기',
+		exportPDF: 'PDF로 내보내기',
 		exportWord: 'Word로 내보내기',
 		find: '찾기',
 		decrease: '내리기',

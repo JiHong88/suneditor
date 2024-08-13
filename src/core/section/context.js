@@ -22,6 +22,7 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeWrap
 		['wrapper', top.querySelector('.se-wrapper')],
 		['documentTypeInner', documentTypeInner.inner],
 		['documentTypePage', documentTypeInner.page],
+		['documentTypePageMirror', documentTypeInner.pageMirror],
 		['wysiwygFrame', wwFrame],
 		['wysiwyg', wwFrame], // options.iframe ? wwFrame.contentDocument.body : wwFrame
 		['codeWrapper', codeWrapper],

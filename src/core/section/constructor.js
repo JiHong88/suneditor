@@ -141,7 +141,7 @@ const Constructor = function (editorTargets, options) {
 	// focus temp element
 	const focusTemp = domUtils.createElement('INPUT', {
 		class: '__se__focus__temp__',
-		style: 'position: fixed !important; top: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;'
+		style: 'position: fixed !important; top: -10000px !important; left: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;'
 	});
 	focusTemp.tabIndex = 0;
 	editor_carrier_wrapper.appendChild(focusTemp);
@@ -268,6 +268,14 @@ const Constructor = function (editorTargets, options) {
 		}
 		if (o.get('type-options').includes('page')) {
 			documentTypeInner.page = domUtils.createElement('DIV', { class: 'se-document-page' }, null);
+			documentTypeInner.pageMirror = domUtils.createElement(
+				'DIV',
+				{
+					class: 'sun-editor-editable se-document-page-mirror-a4',
+					style: `position: absolute; width: 21cm; columns: 21cm; padding: 16px; border: 0; margin: 0; box-sizing: border-box; overflow: hidden; height: auto; top: -10000px; left: -10000px;`
+				},
+				null
+			);
 		}
 
 		// set container
