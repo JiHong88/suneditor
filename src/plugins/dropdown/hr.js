@@ -58,13 +58,24 @@ HR.prototype = {
 	 * @param {Element} target Target command button
 	 */
 	action(target) {
-		const hr = target.firstElementChild.cloneNode(false);
-		this.editor.focus();
-		this.component.insert(hr, false, false);
-		this.menu.dropdownOff();
-
+		const hr = this.submit(target.firstElementChild.className);
 		const line = this.format.addLine(hr);
 		this.selection.setRange(line, 1, line, 1);
+		this.menu.dropdownOff();
+	},
+
+	submit(className) {
+		const hr = domUtils.createElement('hr', { class: className });
+		this.editor.focus();
+		this.component.insert(hr, false, true);
+		return hr;
+	},
+
+	shortcut({ line, range }) {
+		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);
+		this.submit('__se__solid');
+		domUtils.removeItem(line);
+		this.selection.setRange(newLine, 0, newLine, 0);
 	},
 
 	constructor: HR

@@ -65,18 +65,31 @@ List_bulleted.prototype = {
 	 */
 	action(target) {
 		const el = this.format.getBlock(this.selection.getNode());
-		const type = target?.querySelector('ul')?.style.listStyleType || '';
+		const type = target?.querySelector('ul')?.style.listStyleType;
 
 		if (domUtils.isList(el) && type) {
 			el.style.listStyleType = type;
 		} else {
-			const range = this.format.applyList(`ul:${type}`, null, false);
-			if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
+			this.submit(type);
 		}
 
 		this.menu.dropdownOff();
+	},
+
+	submit(type) {
+		const range = this.format.applyList(`ul:${type || ''}`, null, false);
+		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
 		this.editor.focus();
 		this.history.push(false);
+	},
+
+	shortcut({ range, info }) {
+		const { startContainer } = range;
+		if (startContainer.nodeType === 3) {
+			const newText = startContainer.substringData(info.key.length, startContainer.textContent.length - 1);
+			startContainer.textContent = newText;
+		}
+		this.submit();
 	},
 
 	constructor: List_bulleted

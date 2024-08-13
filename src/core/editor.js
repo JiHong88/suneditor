@@ -1436,6 +1436,7 @@ Editor.prototype = {
 		delete this._pluginCallButtons_sub;
 
 		this.__cachingButtons();
+		this.__cachingShortcuts();
 	},
 
 	/**
@@ -1482,6 +1483,17 @@ Editor.prototype = {
 			this.__setCommandTargets(c, e);
 			// shortcuts
 			CreateShortcuts(c, e, shortcuts[c], keyMap, reverseCommandArray, reverseKeys);
+		}
+	},
+
+	__cachingShortcuts() {
+		const shortcuts = this.options.get('shortcuts');
+		const reverseCommandArray = this.options.get('_reverseCommandArray');
+		const keyMap = this.shortcutsKeyMap;
+		const reverseKeys = this.reverseKeys;
+		for (const key of Object.keys(shortcuts)) {
+			if (!key.startsWith('_')) continue;
+			CreateShortcuts('', null, shortcuts[key], keyMap, reverseCommandArray, reverseKeys);
 		}
 	},
 

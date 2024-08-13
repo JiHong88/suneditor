@@ -10,17 +10,28 @@ const Shortcuts = function (editor) {
 Shortcuts.prototype = {
 	/**
 	 * @description If there is a shortcut function, run it.
-	 * @param {number} keyCode event.keyCode
-	 * @param {boolean} shift Whether to press shift key
 	 * @returns {boolean} Whether to execute shortcuts
 	 */
-	command(keyCode, shift) {
+	command(event, ctrl, shift, keyCode, text, edge, line, range) {
 		if (this.isDisabled) return false;
 
-		const info = this.editor.shortcutsKeyMap.get(keyCode + (shift ? 1000 : 0));
-		if (!info || (!shift && info.s)) return false;
+		let info = null;
+		if (ctrl) {
+			info = this.editor.shortcutsKeyMap.get(keyCode + (shift ? 1000 : 0));
+		} else {
+			info = this.editor.shortcutsKeyMap.get(text) || this.editor.shortcutsKeyMap.get(text + event.key);
+		}
 
-		this.editor.run(info.c, info.t, info.e);
+		if (!info || (!shift && info.s) || (info.space && keyCode !== 32) || (info.enter && keyCode !== 13) || (info.textTrigger && !event.key.trim()) || (info.edge && !edge)) return false;
+
+		if (info.plugin) {
+			this.editor.plugins[info.plugin][info.method]?.({ range, line, info, event, keyCode });
+		} else if (info.method) {
+			info.method({ range, line, info, event, keyCode, editor: this.editor });
+		} else {
+			this.editor.run(info.command, info.type, info.button);
+		}
+
 		return true;
 	},
 

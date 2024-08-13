@@ -1,6 +1,15 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
+const HEADER_KEYCODE = new Map([
+	[49, 'h1'],
+	[50, 'h2'],
+	[51, 'h3'],
+	[52, 'h4'],
+	[53, 'h5'],
+	[54, 'h6']
+]);
+
 const FormatBlock = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
@@ -93,6 +102,12 @@ FormatBlock.prototype = {
 		}
 
 		this.menu.dropdownOff();
+	},
+
+	createHeader({ keyCode }) {
+		const headerName = HEADER_KEYCODE.get(keyCode);
+		const tag = domUtils.createElement(headerName);
+		this.format.setLine(tag);
 	},
 
 	constructor: FormatBlock

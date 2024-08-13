@@ -315,24 +315,68 @@ const Constructor = function (editorTargets, options) {
  * @description Create shortcuts desc span.
  * @param {string} command Command string
  * @param {Array.<string>} values options.shortcuts[command]
- * @param {Element} button Command button element
+ * @param {Element|null} button Command button element
  * @param {Map} keyMap Map to store shortcut key info
  * @param {Array} rc "_reverseCommandArray" option
  * @param {Array} reverseKeys Reverse key array
  */
 export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys) {
 	if (!values || values.length < 2) return;
-	const tooptip = button.querySelector('.se-tooltip-text');
+	const tooptip = button?.querySelector('.se-tooltip-text');
 
-	for (let i = 0, v, s, t, k, r; i < values.length; i += 2) {
-		v = values[i];
-		s = /^s/i.test(v);
-		k = numbers.get(v) + (s ? 1000 : 0);
+	for (let i = 0, a, v, c, s, edge, space, enter, textTrigger, plugin, method, t, k, r, _i; i < values.length; i += 2 + _i) {
+		_i = 0;
+		a = values[i].split('+');
+
+		plugin = null;
+		method = a.at(-1).trim?.();
+		if (method.startsWith('~')) {
+			plugin = command;
+			method = a.pop().trim().substring(1);
+		} else if (method.startsWith('p~')) {
+			const a_ = a.pop().trim().substring(2).split('.');
+			plugin = a_[0];
+			method = a_[1];
+		} else if (method.startsWith('$')) {
+			_i = 1;
+			method = values[i + 2];
+		} else {
+			method = '';
+		}
+
+		c = s = edge = space = enter = textTrigger = v = null;
+		for (const a_ of a) {
+			switch (a_.trim()) {
+				case 'c':
+					c = true;
+					break;
+				case '!':
+					edge = true;
+					break;
+				case 's':
+					s = true;
+					break;
+				case '_':
+					space = true;
+					break;
+				case '=':
+					textTrigger = true;
+					break;
+				case '/':
+					enter = true;
+					break;
+				default:
+					v = a_;
+			}
+		}
+
+		k = c ? numbers.get(v) + (s ? 1000 : 0) : v;
 		if (!keyMap.has(k)) {
 			r = rc.indexOf(command);
 			r = r === -1 ? '' : numbers.isOdd(r) ? rc[r + 1] : rc[r - 1];
 			if (r) reverseKeys.push(k);
-			keyMap.set(k, { c: command, r: r, t: button.getAttribute('data-type'), e: button });
+
+			keyMap.set(k, { c, s, edge, space, enter, textTrigger, plugin, command, method, r, type: button?.getAttribute('data-type'), button, key: k });
 		}
 
 		if (!(t = values[i + 1])) continue;
@@ -607,20 +651,27 @@ export function InitOptions(options, editorTargets, plugins) {
 		: [
 				{
 					// default command
-					selectAll: ['65', 'A'],
-					bold: ['66', 'B'],
-					strike: ['s83', 'S'],
-					underline: ['85', 'U'],
-					italic: ['73', 'I'],
-					redo: ['89', 'Y', 's90', 'Z'],
-					undo: ['90', 'Z'],
-					indent: ['221', ']'],
-					outdent: ['219', '['],
-					sup: ['187', '='],
-					sub: ['s187', '='],
-					save: ['83', 'S'],
+					selectAll: ['c+65', 'A'],
+					bold: ['c+66', 'B'],
+					strike: ['c+s+83', 'S'],
+					underline: ['c+85', 'U'],
+					italic: ['c+73', 'I'],
+					redo: ['c+89', 'Y', 'c+s+90', 'Z'],
+					undo: ['c+90', 'Z'],
+					indent: ['c+221', ']'],
+					outdent: ['c+219', '['],
+					save: ['c+83', 'S'],
 					// plugins
-					link: ['75', 'K']
+					link: ['c+75', 'K'],
+					hr: ['!+---+=+~shortcut', ''],
+					list_numbered: ['!+1.+_+~shortcut', ''],
+					list_bulleted: ['!+*.+_+~shortcut', ''],
+					_h1: ['c+s+49+p~formatBlock.createHeader', ''],
+					_h2: ['c+s+50+p~formatBlock.createHeader', ''],
+					_h3: ['c+s+51+p~formatBlock.createHeader', ''],
+					_h4: ['c+s+52+p~formatBlock.createHeader', ''],
+					_h5: ['c+s+53+p~formatBlock.createHeader', ''],
+					_h6: ['c+s+54+p~formatBlock.createHeader', '']
 				},
 				options.shortcuts || {}
 		  ].reduce((_default, _new) => {

@@ -100,21 +100,29 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	// user event
 	if (this.triggerEvent('onKeyDown', { frameContext, event: e }) === false) return;
 
-	/** Shortcuts */
-	if (ctrl && this.shortcuts.command(keyCode, shift)) {
-		this._onShortcutKey = true;
-		e.preventDefault();
-		e.stopPropagation();
-		return false;
-	} else if (this._onShortcutKey) {
-		this._onShortcutKey = false;
-	}
-
 	/** default key action */
 	const range = this.selection.getRange();
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
 	let rangeEl = this.format.getBlock(formatEl, null);
+
+	/** Shortcuts */
+	if (ctrl && !NON_TEXT_KEYCODE.test(keyCode) && this.shortcuts.command(e, ctrl, shift, keyCode, '', false, null, null)) {
+		this._onShortcutKey = true;
+		e.preventDefault();
+		e.stopPropagation();
+		return false;
+	} else if (!ctrl && !NON_TEXT_KEYCODE.test(keyCode) && this.format.isLine(formatEl) && range.collapsed && domUtils.isEdgePoint(range.startContainer, 0, 'front')) {
+		const keyword = range.startContainer?.substringData?.(0, range.startOffset);
+		if (keyword && this.shortcuts.command(e, false, shift, keyCode, keyword, true, formatEl, range)) {
+			this._onShortcutKey = true;
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
+	} else if (this._onShortcutKey) {
+		this._onShortcutKey = false;
+	}
 
 	// plugin event
 	if (this._callPluginEvent('onKeyDown', { frameContext, event: e, range, line: formatEl }) === false) return;
