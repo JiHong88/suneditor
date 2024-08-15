@@ -150,4 +150,5 @@ export function PAGE_BREAK(editor) {
 	editor.component.insert(pageBreak, true, true);
 	const line = pageBreak.nextElementSibling || editor.format.addLine(pageBreak);
 	editor.selection.setRange(line, 1, line, 1);
+	editor.history.push(false);
 }
