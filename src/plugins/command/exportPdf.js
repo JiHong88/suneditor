@@ -46,8 +46,16 @@ ExportPDF.prototype = {
 			ww = domUtils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
 
 			if (this.apiUrl) {
+				const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;
 				const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
-				ww.innerHTML = inlineWW.outerHTML;
+				ww.innerHTML = `
+				<style>
+					@page {
+						size: A4;
+						margin: ${innerPadding};
+					}
+				</style>
+				${inlineWW.outerHTML}`;
 			}
 
 			_d.body.appendChild(ww);
