@@ -210,6 +210,7 @@ const DEFAULT_CONTENT_STYLES =
 	elementBlacklist: '', // Element blacklist
 	attributeWhitelist: null, // Attribute whitelist
 	attributeBlacklist: null, // Attribute blacklist
+	allowedEmptyTags: null, // Allowd empty tags ('.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details')
 	formatClosureBrLine: DEFAULT_FORMAT_CLOSURE_BR_LINE, // Format closure BR line
 	formatBrLine: DEFAULT_FORMAT_BR_LINE, // Format BR line
 	formatLine: DEFAULT_FORMAT_LINE, // Format line

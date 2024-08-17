@@ -34,6 +34,8 @@ const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
+const DEFAULT_ALLOWED_EMPTY_NODE_LIST = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';
+
 const DEFAULT_SIZE_UNITS = ['px', 'pt', 'em', 'rem'];
 
 const DEFAULT_CLASS_NAME = '^__se__|^se-|^katex|^MathJax';
@@ -619,6 +621,8 @@ export function InitOptions(options, editorTargets, plugins) {
 			o.get('elementBlacklist')
 		)
 	);
+
+	o.set('allowedEmptyTags', DEFAULT_ALLOWED_EMPTY_NODE_LIST + (options.allowedEmptyTags ? ', ' + options.allowedEmptyTags : ''));
 
 	/** __defaults */
 	o.set('__defaultElementWhitelist', REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase());

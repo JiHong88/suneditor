@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, unicode, env, numbers } from '../../helper';
+import { domUtils, unicode, numbers } from '../../helper';
 
 const NodeTransform = function (editor) {
 	CoreInjector.call(this, editor);
@@ -341,6 +341,7 @@ NodeTransform.prototype = {
 	removeEmptyNode(element, notRemoveNode, forceDelete) {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
+		const allowedEmptyTags = this.options.get('allowedEmptyTags');
 
 		if (notRemoveNode) {
 			notRemoveNode = domUtils.getParentElement(notRemoveNode, (current) => element === current.parentElement);
@@ -348,7 +349,7 @@ NodeTransform.prototype = {
 
 		(function recursionFunc(current) {
 			if (inst.format._notTextNode(current) || current === notRemoveNode || domUtils.isNonEditable(current)) return 0;
-			if (current !== element && domUtils.isZeroWith(current.textContent) && (!current.firstChild || !domUtils.isBreak(current.firstChild)) && !current.querySelector(env._allowedEmptyNodeList)) {
+			if (current !== element && domUtils.isZeroWith(current.textContent) && (!current.firstChild || !domUtils.isBreak(current.firstChild)) && !current.querySelector(allowedEmptyTags)) {
 				if (current.parentNode) {
 					current.parentNode.removeChild(current);
 					return -1;
