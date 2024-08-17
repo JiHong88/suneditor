@@ -644,8 +644,39 @@ const DEFAULT_CONTENT_STYLES =
 				},
 				tag: 'iframe'
 			}
-		} // Query parameters for video
+		}, // Query parameters for video
+		extensions: ['.mp4', '.avi', '.mov', '.webm', '.flv', '.mkv', '.m4v', '.ogv']
+		urlPatterns: [
+			/youtu\.?be/,
+			/vimeo\.com\//,
+			/dailymotion\.com\/video\//,
+			/facebook\.com\/.+\/videos\//,
+			/facebook\.com\/watch\/\?v=/,
+			/twitter\.com\/.+\/status\//,
+			/twitch\.tv\/videos\//,
+			/twitch\.tv\/[^/]+$/,
+			/tiktok\.com\/@[^/]+\/video\//,
+			/instagram\.com\/p\//,
+			/instagram\.com\/tv\//,
+			/instagram\.com\/reel\//,
+			/linkedin\.com\/posts\//,
+			/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
+			/loom\.com\/share\//
+		];
 	},
+	embed: {
+		urlPatterns: [
+			/dailymotion\.com\/embed\/video\//,
+			/facebook\.com\/plugins\/video\.php/,
+			/facebook\.com\/plugins\/post\.php/,
+			/twitter\.com\/i\/videos\//,
+			/player\.twitch\.tv\//,
+			/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
+			/\.vidyard\.com\/embed\//,
+			/tiktok\.com\/embed\//,
+			/\.jumpshare\.com\/embed\//
+		],
+	}
 
 	// --------- popup
 	anchor: null // no options

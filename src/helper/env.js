@@ -57,72 +57,6 @@ export function getXMLHttpRequest() {
 }
 
 /**
- * @description Check the content type of the URL
- * @param {string} url Source URL
- * @returns {string} video, audio, embed, unknown
- */
-export function checkContentType(url) {
-	url = url.toLowerCase();
-
-	// ----------------- video -----------------
-	// Direct video file extensions
-	const videoExtensions = ['.mp4', '.avi', '.mov', '.webm', '.flv', '.mkv', '.m4v', '.ogv'];
-	if (videoExtensions.some((ext) => url.endsWith(ext))) {
-		return 'video';
-	}
-
-	// Known video hosting patterns (potential embeds)
-	const videoHostPatterns = [
-		/youtu\.?be/,
-		/vimeo\.com\//,
-		/dailymotion\.com\/video\//,
-		/facebook\.com\/.+\/videos\//,
-		/facebook\.com\/watch\/\?v=/,
-		/twitter\.com\/.+\/status\//,
-		/twitch\.tv\/videos\//,
-		/twitch\.tv\/[^/]+$/,
-		/tiktok\.com\/@[^/]+\/video\//,
-		/instagram\.com\/p\//,
-		/instagram\.com\/tv\//,
-		/instagram\.com\/reel\//,
-		/linkedin\.com\/posts\//,
-		/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
-		/loom\.com\/share\//
-	];
-
-	if (videoHostPatterns.some((pattern) => pattern.test(url))) {
-		return 'video';
-	}
-
-	// ----------------- audio -----------------
-	// Audio file extensions
-	const audioExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.aac'];
-	if (audioExtensions.some((ext) => url.endsWith(ext))) {
-		return 'audio';
-	}
-
-	// ----------------- embed -----------------
-	const embedPatterns = [
-		/dailymotion\.com\/embed\/video\//,
-		/facebook\.com\/plugins\/video\.php/,
-		/facebook\.com\/plugins\/post\.php/,
-		/twitter\.com\/i\/videos\//,
-		/player\.twitch\.tv\//,
-		/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
-		/\.vidyard\.com\/embed\//,
-		/tiktok\.com\/embed\//,
-		/\.jumpshare\.com\/embed\//
-	];
-
-	if (embedPatterns.some((pattern) => pattern.test(url))) {
-		return 'embed';
-	}
-
-	// If we can't determine, return unknown
-	return 'unknown';
-}
-
-/**
  * @deprecated
  * @description Returns the CSS text that has been applied to the current page.
  * @param {Document|null} doc To get the CSS text of an document. If null get the current document.
@@ -303,7 +237,6 @@ const env = {
 	camelToKebabCase,
 	kebabToCamelCase,
 	getXMLHttpRequest,
-	checkContentType,
 	getPageStyle,
 	getIncludePath,
 	isResizeObserverSupported,

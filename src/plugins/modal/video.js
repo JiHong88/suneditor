@@ -65,13 +65,13 @@ const Video = function (editor, pluginOptions) {
 	this.previewSrc = modalEl.querySelector('.se-link-preview');
 	this._linkValue = '';
 	this._align = 'none';
-	this._videoRatio = defaultRatio;
+	this._frameRatio = defaultRatio;
 	this._defaultRatio = defaultRatio;
 	this._defaultSizeX = '100%';
 	this._defaultSizeY = this.pluginOptions.defaultRatio * 100 + '%';
 	this.sizeUnit = sizeUnit;
 	this.proportion = {};
-	this.videoRatioOption = {};
+	this.frameRatioOption = {};
 	this.inputX = {};
 	this.inputY = {};
 	this._element = null;
@@ -102,6 +102,24 @@ const Video = function (editor, pluginOptions) {
 		},
 		...pluginOptions.embedQuery
 	};
+	this.extensions = ['.mp4', '.avi', '.mov', '.webm', '.flv', '.mkv', '.m4v', '.ogv'].concat(this.pluginOptions.extensions || []);
+	this.urlPatterns = [
+		/youtu\.?be/,
+		/vimeo\.com\//,
+		/dailymotion\.com\/video\//,
+		/facebook\.com\/.+\/videos\//,
+		/facebook\.com\/watch\/\?v=/,
+		/twitter\.com\/.+\/status\//,
+		/twitch\.tv\/videos\//,
+		/twitch\.tv\/[^/]+$/,
+		/tiktok\.com\/@[^/]+\/video\//,
+		/instagram\.com\/p\//,
+		/instagram\.com\/tv\//,
+		/instagram\.com\/reel\//,
+		/linkedin\.com\/posts\//,
+		/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
+		/loom\.com\/share\//
+	].concat(this.pluginOptions.urlPatterns || []);
 
 	// init
 	if (this.videoInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', RemoveSelectedFiles.bind(this));
@@ -110,7 +128,7 @@ const Video = function (editor, pluginOptions) {
 
 	if (this._resizing) {
 		this.proportion = modalEl.querySelector('._se_video_check_proportion');
-		this.videoRatioOption = modalEl.querySelector('.se-video-ratio');
+		this.frameRatioOption = modalEl.querySelector('.se-video-ratio');
 		this.inputX = modalEl.querySelector('._se_video_size_x');
 		this.inputY = modalEl.querySelector('._se_video_size_y');
 		this.inputX.value = this.pluginOptions.defaultWidth;
@@ -122,7 +140,7 @@ const Video = function (editor, pluginOptions) {
 		this.eventManager.addEvent(this.inputX, 'change', ratioChange);
 		this.eventManager.addEvent(this.inputY, 'change', ratioChange);
 		this.eventManager.addEvent(this.proportion, 'change', ratioChange);
-		this.eventManager.addEvent(this.videoRatioOption, 'change', SetVideoRatio.bind(this));
+		this.eventManager.addEvent(this.frameRatioOption, 'change', SetVideoRatio.bind(this));
 		this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
 	}
 };
@@ -134,7 +152,7 @@ Video.component = function (node) {
 	if (/^(VIDEO)$/i.test(node?.nodeName)) {
 		return node;
 	} else if (/^(IFRAME)$/i.test(node?.nodeName)) {
-		return this.findProcessUrl(node.src) ? node : null;
+		return this.checkContentType(node.src) ? node : null;
 	}
 	return null;
 };
@@ -212,8 +230,7 @@ Video.prototype = {
 			query: 'iframe, video',
 			method: async (element) => {
 				if (/^(iframe)$/i.test(element?.nodeName)) {
-					const contentType = env.checkContentType(element.src || '');
-					if (contentType !== 'video') return;
+					if (!this.checkContentType(element.src)) return;
 				}
 
 				const figureInfo = Figure.GetContainer(element);
@@ -339,6 +356,15 @@ Video.prototype = {
 		this.history.push(false);
 	},
 
+	checkContentType(url) {
+		url = url?.toLowerCase() || '';
+		if (this.extensions.some((ext) => url.endsWith(ext)) || this.urlPatterns.some((pattern) => pattern.test(url))) {
+			return true;
+		}
+
+		return false;
+	},
+
 	findProcessUrl(url) {
 		const query = this.query;
 		for (const key in query) {
@@ -435,7 +461,7 @@ Video.prototype = {
 		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 
 		width = width || this._defaultSizeX;
-		height = height || this._videoRatio;
+		height = height || this._frameRatio;
 		const size = this.figure.getSize(oFrame);
 		const inputUpdate = size.w !== width || size.h !== height;
 		const changeSize = !isUpdate || inputUpdate;
@@ -691,7 +717,7 @@ Video.prototype = {
 
 	_setVideoRatioSelect(value) {
 		let ratioSelected = false;
-		const ratioOption = this.videoRatioOption.options;
+		const ratioOption = this.frameRatioOption.options;
 
 		if (/%$/.test(value) || this._onlyPercentage) value = numbers.get(value, 2) / 100 + '';
 		else if (!numbers.is(value) || value * 1 >= 1) value = '';
@@ -779,7 +805,7 @@ function OnClickRevert() {
 
 function SetVideoRatio(e) {
 	const value = e.target.options[e.target.selectedIndex].value;
-	this._defaultSizeY = this.figure.autoRatio.current = this._videoRatio = !value ? this._defaultSizeY : value * 100 + '%';
+	this._defaultSizeY = this.figure.autoRatio.current = this._frameRatio = !value ? this._defaultSizeY : value * 100 + '%';
 	this.inputY.placeholder = !value ? '' : value * 100 + '%';
 	this.inputY.value = '';
 }
