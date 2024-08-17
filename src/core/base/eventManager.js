@@ -175,6 +175,7 @@ EventManager.prototype = {
 
 		if (this.component.is(selectionNode) && !this.component.__selectionSelected) {
 			const component = this.component.get(selectionNode);
+			if (!component) return;
 			this.component.select(component.target, component.pluginName, false);
 			return;
 		}

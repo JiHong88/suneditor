@@ -22,6 +22,7 @@ const DocumentType = function (editor, fc) {
 	this.displayPage = this.isAutoHeight ? _w : fc.get('wysiwyg');
 	this.innerHeaders = [];
 	this._wwHeaders = [];
+	this.documentTypeInner = fc.get('documentTypeInner');
 	this.inner = null;
 	this.page = null;
 	this.totalPages = 0;
@@ -40,7 +41,7 @@ const DocumentType = function (editor, fc) {
 	// init header
 	if (this.useHeader) {
 		const headers = this._getHeaders();
-		const inner = (this.inner = fc.get('documentTypeInner').querySelector('.se-document-lines-inner'));
+		const inner = (this.inner = this.documentTypeInner.querySelector('.se-document-lines-inner'));
 		let headerHTML = '';
 		for (let i = 0, len = headers.length, h; i < len; i++) {
 			h = headers[i];
@@ -170,6 +171,12 @@ DocumentType.prototype = {
 		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const wwHeight = this.wwFrame.offsetHeight + 1;
 		if (wwWidth === this.wwWidth && wwHeight === this.wwHeight) return;
+
+		if (wwWidth > 800) {
+			domUtils.removeClass(this.documentTypeInner, 'se-document-responsible');
+		} else {
+			domUtils.addClass(this.documentTypeInner, 'se-document-responsible');
+		}
 
 		this.wwWidth = wwWidth;
 		this.wwHeight = wwHeight;

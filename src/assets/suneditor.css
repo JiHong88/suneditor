@@ -123,11 +123,10 @@
 	background-color: transparent;
 	z-index: 1;
 }
-@media screen and (max-width: 509px) {
-	.sun-editor .se-wrapper.se-type-document .se-document-lines {
-		min-width: unset !important;
-	}
+.sun-editor .se-wrapper.se-type-document .se-document-lines.se-document-responsible {
+	min-width: unset !important;
 }
+
 .sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner {
 	padding: var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding) 0;
 }
@@ -3044,7 +3043,6 @@
 	float: left;
 }
 
-/* --- browser ---  */
 .sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-column {
 	width: calc(25% - 20px);
 	margin: 0 10px;
