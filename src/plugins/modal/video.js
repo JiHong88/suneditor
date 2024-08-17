@@ -210,7 +210,12 @@ Video.prototype = {
 	retainFormat() {
 		return {
 			query: 'iframe, video',
-			method: (element) => {
+			method: async (element) => {
+				if (/^(iframe)$/i.test(element?.nodeName)) {
+					const contentType = env.checkContentType(element.src || '');
+					if (contentType !== 'video') return;
+				}
+
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
@@ -837,7 +842,8 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		const ratioList = pluginOptions.ratioOptions || [
 			{ name: '16:9', value: 0.5625 },
 			{ name: '4:3', value: 0.75 },
-			{ name: '21:9', value: 0.4285 }
+			{ name: '21:9', value: 0.4285 },
+			{ name: '9:16', value: 1.78 }
 		];
 		const ratio = pluginOptions.defaultRatio;
 		const onlyPercentage = pluginOptions.percentageOnlySize;

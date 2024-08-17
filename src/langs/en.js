@@ -72,6 +72,7 @@
 		drawing: 'Drawing',
 		drawing_modal_title: 'Drawing',
 		edit: 'Edit',
+		embed: 'Embed URL',
 		exportPDF: 'Export to PDF',
 		exportWord: 'Export to Word',
 		find: 'Find',
