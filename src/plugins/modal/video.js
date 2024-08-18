@@ -36,13 +36,7 @@ const Video = function (editor, pluginOptions) {
 	// create HTML
 	const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-	const figureControls =
-		pluginOptions.controls || !this.pluginOptions.canResize
-			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
-			: [
-					['resize_auto,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-					['edit', 'align', 'revert', 'remove']
-			  ];
+	const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'revert', 'edit', 'remove']] : [['resize_auto,75,50', 'edit', 'align', 'revert', 'remove']];
 
 	// show align
 	if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.querySelector('.se-figure-align').style.display = 'none';
