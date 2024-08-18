@@ -133,12 +133,13 @@ DocumentType.prototype = {
 			}
 		}
 
+		const scrollTop = this._getWWScrollTop();
 		const totalPages = Math.ceil(mirrorHeight / A4_HEIGHT) + additionalPages;
 		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const pages = [];
 
 		for (let i = 0; i < pageBreaks.length; i++) {
-			pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight });
+			pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight - scrollTop });
 		}
 
 		// A4 position
@@ -157,7 +158,7 @@ DocumentType.prototype = {
 		for (let i = 0, t; i < totalPages; i++) {
 			t = pages[i].top;
 			if (mirrorHeight < t) break;
-			const pageNumber = domUtils.createElement('DIV', { style: `top:${t}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
+			const pageNumber = domUtils.createElement('DIV', { style: `top:${t - scrollTop}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
 			this.page.appendChild(pageNumber);
 			this.pages.push(pageNumber);
 		}
@@ -205,17 +206,14 @@ DocumentType.prototype = {
 	getCurrentPageNumber() {
 		if (this.totalPages <= 1) return 1;
 
-		const mirrorScrollTop = this._mirror.scrollTop;
-		const mirrorHeight = this._mirror.clientHeight;
-		const scrollMiddle = mirrorScrollTop + mirrorHeight / 2;
-
+		const targetPosition = this.wwHeight / 3;
 		for (let i = 0; i < this.pages.length; i++) {
-			if (scrollMiddle < this.pages[i].offsetTop) {
-				return Math.max(1, i) - 1;
+			if (this.pages[i].offsetTop > targetPosition) {
+				return (this.pageNum = i);
 			}
 		}
 
-		return this.pages.length - 1;
+		return (this.pageNum = this.totalPages);
 	},
 
 	pageUp() {
