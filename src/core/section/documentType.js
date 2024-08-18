@@ -45,7 +45,7 @@ const DocumentType = function (editor, fc) {
 		let headerHTML = '';
 		for (let i = 0, len = headers.length, h; i < len; i++) {
 			h = headers[i];
-			headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}">${h.textContent}</div>`;
+			headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}" title="${h.textContent}">${h.textContent}</div>`;
 		}
 		inner.innerHTML = headerHTML;
 		this.innerHeaders = inner.querySelectorAll('div');
@@ -80,13 +80,13 @@ DocumentType.prototype = {
 
 			if (i < innerHeaders.length) {
 				if (!innerH.classList.contains(hClass) || innerH.textContent !== h.textContent) {
-					innerH.textContent = h.textContent;
+					innerH.textContent = innerH.title = h.textContent;
 					innerH.className = `se-doc-item ${hClass}`;
 				}
 			} else {
 				const newHeader = document.createElement('div');
 				newHeader.className = `se-doc-item ${hClass}`;
-				newHeader.textContent = h.textContent;
+				newHeader.textContent = newHeader.title = h.textContent;
 				inner.appendChild(newHeader);
 			}
 		}
