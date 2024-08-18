@@ -133,7 +133,7 @@ DocumentType.prototype = {
 			}
 		}
 
-		const scrollTop = this._getWWScrollTop();
+		const scrollTop = this.isAutoHeight ? 0 : this._getWWScrollTop();
 		const totalPages = Math.ceil(mirrorHeight / A4_HEIGHT) + additionalPages;
 		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const pages = [];
@@ -203,12 +203,25 @@ DocumentType.prototype = {
 		this._displayCurrentPage();
 	},
 
+	scrollWindow() {
+		if (!this.isAutoHeight) return;
+		this._displayCurrentPage();
+	},
+
 	getCurrentPageNumber() {
 		if (this.totalPages <= 1) return 1;
 
-		const targetPosition = this.wwHeight / 3;
-		for (let i = 0; i < this.pages.length; i++) {
-			if (this.pages[i].offsetTop > targetPosition) {
+		let targetPosition = 0;
+		if (this.isAutoHeight) {
+			targetPosition = this._getWWScrollTop() - this.wwHeight;
+			if (targetPosition <= 0) return 1;
+		} else {
+			targetPosition = this.wwHeight / 3;
+		}
+
+		const pages = this.pages;
+		for (let i = 0, len = pages.length; i < len; i++) {
+			if (pages[i].offsetTop >= targetPosition) {
 				return (this.pageNum = i);
 			}
 		}
@@ -255,18 +268,13 @@ DocumentType.prototype = {
 		item.textContent = header.textContent;
 	},
 
-	scrollWindow() {
-		if (!this.isAutoHeight) return;
-		this._displayCurrentPage();
-	},
-
 	_displayCurrentPage() {
 		const pageNum = this.getCurrentPageNumber();
 		this.pageNavigator?.display(pageNum, this.totalPages);
 	},
 
 	_getWWScrollTop() {
-		return this.displayPage.scrollTop || 0;
+		return this.displayPage.scrollTop || this.displayPage.scrollY || 0;
 	},
 
 	_movePage(pageNum, force) {

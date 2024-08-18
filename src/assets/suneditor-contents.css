@@ -22,6 +22,11 @@
 	color: inherit;
 }
 
+.sun-editor .se-wrapper .se-wrapper-inner.sun-editor-editable.se-type-document-editable,
+.sun-editor-editable.se-type-document-editable {
+	width: 21cm;
+}
+
 /* RTL - editable */
 .sun-editor-editable.se-rtl,
 .sun-editor-editable.se-rtl * {

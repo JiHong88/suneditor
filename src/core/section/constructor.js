@@ -273,7 +273,7 @@ const Constructor = function (editorTargets, options) {
 			documentTypeInner.pageMirror = domUtils.createElement(
 				'DIV',
 				{
-					class: 'sun-editor-editable se-document-page-mirror-a4',
+					class: 'sun-editor-editable se-type-document-editable se-document-page-mirror-a4',
 					style: `position: absolute; width: 21cm; columns: 21cm; padding: 16px; border: 0; margin: 0; box-sizing: border-box; overflow: hidden; height: auto; top: -10000px; left: -10000px;`
 				},
 				null
@@ -558,7 +558,7 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
-	o.set('_editableClass', 'sun-editor-editable' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : ''));
+	o.set('_editableClass', 'sun-editor-editable' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') + (o.get('type') === 'document' ? ' se-type-document-editable' : ''));
 	o.set('lineAttrReset', ['id'].concat(options.lineAttrReset && typeof options.lineAttrReset === 'string' ? options.lineAttrReset.toLowerCase().split('|') : []));
 	o.set('printClass', typeof options.printClass === 'string' ? options.printClass + ' ' + o.get('_editableClass') : null);
 

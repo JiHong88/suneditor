@@ -1214,7 +1214,7 @@ Editor.prototype = {
 	_resourcesStateChange(fc) {
 		this._iframeAutoHeight(fc);
 		this._checkPlaceholder(fc);
-		if (fc.get('documentType').usePage) {
+		if (this.options.get('type') === 'document' && fc.get('documentType').usePage) {
 			fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
 		}
 	},
