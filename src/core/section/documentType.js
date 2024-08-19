@@ -282,7 +282,7 @@ DocumentType.prototype = {
 
 		const globalTop = this._getGlobalTop();
 		const children = converter.nodeListToArray(this.ww.children);
-		const pageTop = this.page.offsetTop + numbers.get(this.pages[pageNum - 1].style.top) + this._getWWScrollTop();
+		const pageTop = this.page.offsetTop + numbers.get(this.pages[pageNum - 1].style.top) + (this.isAutoHeight ? 0 : this._getWWScrollTop());
 		for (let i = 0, len = children.length, c; i < len; i++) {
 			c = children[i];
 			if (c.offsetTop >= pageTop) {
