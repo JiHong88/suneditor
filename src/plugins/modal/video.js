@@ -121,10 +121,10 @@ const Video = function (editor, pluginOptions) {
 	if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', OnfileInputChange.bind(this));
 
 	if (this._resizing) {
-		this.proportion = modalEl.querySelector('._se_video_check_proportion');
+		this.proportion = modalEl.querySelector('._se_check_proportion');
 		this.frameRatioOption = modalEl.querySelector('.se-modal-ratio');
-		this.inputX = modalEl.querySelector('._se_video_size_x');
-		this.inputY = modalEl.querySelector('._se_video_size_y');
+		this.inputX = modalEl.querySelector('._se_size_x');
+		this.inputY = modalEl.querySelector('._se_size_y');
 		this.inputX.value = this.pluginOptions.defaultWidth;
 		this.inputY.value = this.pluginOptions.defaultHeight;
 
@@ -134,7 +134,7 @@ const Video = function (editor, pluginOptions) {
 		this.eventManager.addEvent(this.inputX, 'change', ratioChange);
 		this.eventManager.addEvent(this.inputY, 'change', ratioChange);
 		this.eventManager.addEvent(this.proportion, 'change', ratioChange);
-		this.eventManager.addEvent(this.frameRatioOption, 'change', SetVideoRatio.bind(this));
+		this.eventManager.addEvent(this.frameRatioOption, 'change', SetRatio.bind(this));
 		this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
 	}
 };
@@ -180,7 +180,7 @@ Video.prototype = {
 		}
 
 		if (this._resizing) {
-			this._setVideoRatioSelect(this._origin_h || this._defaultRatio);
+			this._setRatioSelect(this._origin_h || this._defaultRatio);
 		}
 	},
 
@@ -260,7 +260,7 @@ Video.prototype = {
 			this.inputY.value = this.pluginOptions.defaultHeight === this._defaultSizeY ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.checked = false;
 			this.proportion.disabled = true;
-			this._setVideoRatioSelect(this._defaultRatio);
+			this._setRatioSelect(this._defaultRatio);
 		}
 	},
 
@@ -310,7 +310,7 @@ Video.prototype = {
 			this.inputY.value = infoH === 'auto' ? '' : infoH;
 		}
 
-		if (!this._setVideoRatioSelect(h)) this.inputY.value = this._onlyPercentage ? numbers.get(h, 2) : h;
+		if (!this._setRatioSelect(h)) this.inputY.value = this._onlyPercentage ? numbers.get(h, 2) : h;
 
 		this.proportion.checked = true;
 		this.inputX.disabled = percentageRotation ? true : false;
@@ -709,7 +709,7 @@ Video.prototype = {
 		}
 	},
 
-	_setVideoRatioSelect(value) {
+	_setRatioSelect(value) {
 		let ratioSelected = false;
 		const ratioOption = this.frameRatioOption.options;
 
@@ -797,7 +797,7 @@ function OnClickRevert() {
 	}
 }
 
-function SetVideoRatio(e) {
+function SetRatio(e) {
 	const value = e.target.options[e.target.selectedIndex].value;
 	this._defaultSizeY = this.figure.autoRatio.current = this._frameRatio = !value ? this._defaultSizeY : value * 100 + '%';
 	this.inputY.placeholder = !value ? '' : value * 100 + '%';
@@ -826,7 +826,7 @@ function OnInputSize(xy, e) {
 	}
 
 	if (xy === 'y') {
-		this._setVideoRatioSelect(e.target.value || this._defaultRatio);
+		this._setRatioSelect(e.target.value || this._defaultRatio);
 	}
 }
 
@@ -879,9 +879,9 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 					<label class="size-h"${heightDisplay}>${lang.height}</label>
 					<label class="size-h"${ratioDisplay}>(${lang.ratio})</label>
 				</div>
-				<input class="se-input-control _se_video_size_x" placeholder="100%"${onlyPercentage ? ' type="number" min="1"' : 'type="text"'}${onlyPercentage ? ' max="100"' : ''}/>
+				<input class="se-input-control _se_size_x" placeholder="100%"${onlyPercentage ? ' type="number" min="1"' : 'type="text"'}${onlyPercentage ? ' max="100"' : ''}/>
 				<label class="se-modal-size-x"${onlyWidthDisplay}>${onlyPercentage ? '%' : 'x'}</label>
-				<input class="se-input-control _se_video_size_y" placeholder="${pluginOptions.defaultRatio * 100}%"
+				<input class="se-input-control _se_size_y" placeholder="${pluginOptions.defaultRatio * 100}%"
 				${onlyPercentage ? ' type="number" min="1"' : 'type="text"'}${onlyPercentage ? ' max="100"' : ''}${heightDisplay}/>
 				<select class="se-input-select se-modal-ratio" title="${lang.ratio}" aria-label="${lang.ratio}"${ratioDisplay}>
 					${!heightDisplay ? '<option value=""> - </option>' : ''} 
@@ -891,7 +891,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 			</div>
 			<div class="se-modal-form se-modal-form-footer"${onlyPercentDisplay}${onlyWidthDisplay}>
 				<label>
-					<input type="checkbox" class="se-modal-btn-check _se_video_check_proportion" />&nbsp;
+					<input type="checkbox" class="se-modal-btn-check _se_check_proportion" />&nbsp;
 					<span>${lang.proportion}</span>
 				</label>
 			</div>`;

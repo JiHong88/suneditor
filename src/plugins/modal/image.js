@@ -70,7 +70,7 @@ const Image_ = function (editor, pluginOptions) {
 	// members
 	this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
 	this.imgInputFile = modalEl.querySelector('.__se__file_input');
-	this.imgUrlFile = modalEl.querySelector('._se_image_url');
+	this.imgUrlFile = modalEl.querySelector('.se-input-url');
 	this.focusElement = this.imgInputFile || this.imgUrlFile;
 	this.altText = modalEl.querySelector('._se_image_alt');
 	this.captionCheckEl = modalEl.querySelector('._se_image_check_caption');
@@ -110,9 +110,9 @@ const Image_ = function (editor, pluginOptions) {
 	if (imageGalleryButton) this.eventManager.addEvent(imageGalleryButton, 'click', OpenGallery.bind(this));
 
 	if (this._resizing) {
-		this.proportion = modalEl.querySelector('._se_image_check_proportion');
-		this.inputX = modalEl.querySelector('._se_image_size_x');
-		this.inputY = modalEl.querySelector('._se_image_size_y');
+		this.proportion = modalEl.querySelector('._se_check_proportion');
+		this.inputX = modalEl.querySelector('._se_size_x');
+		this.inputY = modalEl.querySelector('._se_size_y');
 		this.inputX.value = this.pluginOptions.defaultWidth;
 		this.inputY.value = this.pluginOptions.defaultHeight;
 
@@ -1022,7 +1022,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 		<div class="se-modal-form">
 			<label>${lang.image_modal_url}</label>
 			<div class="se-modal-form-files">
-				<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />
+				<input class="se-input-form se-input-url" data-focus type="text" />
 				${
 					plugins.imageGallery
 						? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button __se__gallery" aria-label="${lang.imageGallery}">
@@ -1044,10 +1044,10 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 				<label class="se-modal-size-x">&nbsp;</label>
 				<label class="size-h">${lang.height}</label>
 			</div>
-			<input class="se-input-control _se_image_size_x" placeholder="auto" type="text" />
+			<input class="se-input-control _se_size_x" placeholder="auto" type="text" />
 			<label class="se-modal-size-x">x</label>
-			<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" />
-			<label><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;${lang.proportion}</label>
+			<input type="text" class="se-input-control _se_size_y" placeholder="auto" />
+			<label><input type="checkbox" class="se-modal-btn-check _se_check_proportion" checked/>&nbsp;${lang.proportion}</label>
 			<button type="button" aria-label="${lang.revert}" class="se-btn se-tooltip se-modal-btn-revert">
 				${icons.revert}
 				${CreateTooltipInner(lang.revert)}
