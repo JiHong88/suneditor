@@ -2205,7 +2205,7 @@
 	color: var(--se-modal-input-disabled-color);
 }
 
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-video-ratio {
+.sun-editor .se-modal .se-modal-inner .se-modal-form .se-modal-ratio {
 	width: var(--se-modal-input-width);
 	margin-left: 4px;
 }
@@ -3404,7 +3404,7 @@
 	direction: rtl;
 }
 
-.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-form .se-video-ratio {
+.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-form .se-modal-ratio {
 	margin-left: 0;
 	margin-right: 4px;
 }

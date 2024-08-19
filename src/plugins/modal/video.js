@@ -122,7 +122,7 @@ const Video = function (editor, pluginOptions) {
 
 	if (this._resizing) {
 		this.proportion = modalEl.querySelector('._se_video_check_proportion');
-		this.frameRatioOption = modalEl.querySelector('.se-video-ratio');
+		this.frameRatioOption = modalEl.querySelector('.se-modal-ratio');
 		this.inputX = modalEl.querySelector('._se_video_size_x');
 		this.inputY = modalEl.querySelector('._se_video_size_y');
 		this.inputX.value = this.pluginOptions.defaultWidth;
@@ -883,7 +883,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 				<label class="se-modal-size-x"${onlyWidthDisplay}>${onlyPercentage ? '%' : 'x'}</label>
 				<input class="se-input-control _se_video_size_y" placeholder="${pluginOptions.defaultRatio * 100}%"
 				${onlyPercentage ? ' type="number" min="1"' : 'type="text"'}${onlyPercentage ? ' max="100"' : ''}${heightDisplay}/>
-				<select class="se-input-select se-video-ratio" title="${lang.ratio}" aria-label="${lang.ratio}"${ratioDisplay}>
+				<select class="se-input-select se-modal-ratio" title="${lang.ratio}" aria-label="${lang.ratio}"${ratioDisplay}>
 					${!heightDisplay ? '<option value=""> - </option>' : ''} 
 					${ratioList.map((ratioOption) => `<option value="${ratioOption.value}"${ratio.toString() === ratioOption.value.toString() ? ' selected' : ''}>${ratioOption.name}</option>`).join('')}
 				</select>
