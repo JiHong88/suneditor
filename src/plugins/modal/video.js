@@ -96,24 +96,31 @@ const Video = function (editor, pluginOptions) {
 		},
 		...pluginOptions.embedQuery
 	};
+
+	const urlPatterns = [];
+	for (const key in this.query) {
+		urlPatterns.push(this.query[key].pattern);
+	}
 	this.extensions = ['.mp4', '.avi', '.mov', '.webm', '.flv', '.mkv', '.m4v', '.ogv'].concat(this.pluginOptions.extensions || []);
-	this.urlPatterns = [
-		/youtu\.?be/,
-		/vimeo\.com\//,
-		/dailymotion\.com\/video\//,
-		/facebook\.com\/.+\/videos\//,
-		/facebook\.com\/watch\/\?v=/,
-		/twitter\.com\/.+\/status\//,
-		/twitch\.tv\/videos\//,
-		/twitch\.tv\/[^/]+$/,
-		/tiktok\.com\/@[^/]+\/video\//,
-		/instagram\.com\/p\//,
-		/instagram\.com\/tv\//,
-		/instagram\.com\/reel\//,
-		/linkedin\.com\/posts\//,
-		/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
-		/loom\.com\/share\//
-	].concat(this.pluginOptions.urlPatterns || []);
+	this.urlPatterns = urlPatterns
+		.concat([
+			/youtu\.?be/,
+			/vimeo\.com\//,
+			/dailymotion\.com\/video\//,
+			/facebook\.com\/.+\/videos\//,
+			/facebook\.com\/watch\/\?v=/,
+			/twitter\.com\/.+\/status\//,
+			/twitch\.tv\/videos\//,
+			/twitch\.tv\/[^/]+$/,
+			/tiktok\.com\/@[^/]+\/video\//,
+			/instagram\.com\/p\//,
+			/instagram\.com\/tv\//,
+			/instagram\.com\/reel\//,
+			/linkedin\.com\/posts\//,
+			/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
+			/loom\.com\/share\//
+		])
+		.concat(this.pluginOptions.urlPatterns || []);
 
 	// init
 	if (this.videoInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', RemoveSelectedFiles.bind(this));
