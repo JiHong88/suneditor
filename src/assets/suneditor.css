@@ -1672,6 +1672,7 @@
 
 .sun-editor .se-wrapper .se-wrapper-wysiwyg {
 	display: block;
+	position: relative;
 }
 
 .sun-editor-editable[contenteditable='true'] .se-disable-pointer *,

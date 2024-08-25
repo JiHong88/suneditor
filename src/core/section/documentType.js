@@ -37,6 +37,7 @@ const DocumentType = function (editor, fc) {
 	this.navigatorButtons = [];
 	this.pageNavigator = null;
 	this._mirror = fc.get('documentTypePageMirror');
+	this._mirrorCache = 0;
 
 	// init header
 	if (this.useHeader) {
@@ -57,10 +58,6 @@ const DocumentType = function (editor, fc) {
 	if (this.usePage) {
 		this.page = fc.get('documentTypePage');
 		this.pageNavigator = editor.plugins.pageNavigator;
-		_w.setTimeout(() => {
-			const innerPadding = _w.getComputedStyle(fc.get('wysiwyg')).padding;
-			this._mirror.style.padding = innerPadding;
-		}, 100);
 	}
 };
 
@@ -143,10 +140,13 @@ DocumentType.prototype = {
 		}
 
 		// A4 position
+		this._mirrorCache = 0;
+		const chr = this.ww.children;
 		for (let i = 0; i < totalPages; i++) {
 			const t = i * A4_HEIGHT;
 			if (!pages.some((p) => Math.abs(p.top - t) < 1)) {
-				pages.push({ number: i, top: t });
+				const pt = this._getElementAtPosition(t);
+				pages.push({ number: i, top: pt === 0 ? 0 : chr[pt].offsetTop + chr[pt].offsetHeight });
 			}
 		}
 
@@ -168,10 +168,37 @@ DocumentType.prototype = {
 		this._displayCurrentPage();
 	},
 
+	_getElementAtPosition(top) {
+		const chr = this._mirror.children;
+		let start = this._mirrorCache;
+		let end = chr.length - 1;
+
+		while (start <= end) {
+			const mid = Math.floor((start + end) / 2);
+			const element = chr[mid];
+			const elementTop = element.offsetTop;
+			const elementBottom = elementTop + element.offsetHeight;
+
+			if (top >= elementTop && top <= elementBottom) {
+				return (this._mirrorCache = mid);
+			}
+
+			if (top < elementTop) {
+				end = mid - 1;
+			} else {
+				start = mid + 1;
+			}
+		}
+
+		const closestIndex = chr[start] ? start : end;
+		return (this._mirrorCache = closestIndex);
+	},
+
 	resizePage() {
 		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const wwHeight = this.wwFrame.offsetHeight + 1;
-		if (wwWidth === this.wwWidth && wwHeight === this.wwHeight) return;
+		let rh = false;
+		if (wwWidth === this.wwWidth && (rh = wwHeight === this.wwHeight)) return;
 
 		if (wwWidth > 800) {
 			domUtils.removeClass(this.documentTypeInner, 'se-document-responsible');
@@ -186,6 +213,7 @@ DocumentType.prototype = {
 			pages_line[i].style.width = `${wwWidth}px`;
 		}
 
+		if (!rh) this.rePage(true);
 		this._displayCurrentPage();
 	},
 
@@ -216,7 +244,7 @@ DocumentType.prototype = {
 			targetPosition = this._getWWScrollTop() - this.wwHeight;
 			if (targetPosition <= 0) return 1;
 		} else {
-			targetPosition = this.wwHeight / 3;
+			targetPosition = this.wwHeight / 2;
 		}
 
 		const pages = this.pages;
