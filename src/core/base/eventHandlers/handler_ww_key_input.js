@@ -11,8 +11,10 @@ let _styleNodes = null;
 
 function LineDelete_next(formatEl) {
 	const focusNode = formatEl.lastChild;
-
 	const next = formatEl.nextElementSibling;
+
+	if (!next) return focusNode;
+
 	if (domUtils.isZeroWith(next)) {
 		domUtils.removeItem(next);
 		return focusNode;
@@ -32,6 +34,8 @@ function LineDelete_prev(formatEl) {
 	const formatChild = formatEl.childNodes;
 	const prev = formatEl.previousElementSibling;
 	const focusNode = formatChild[0];
+
+	if (!prev) return focusNode;
 
 	if (domUtils.isZeroWith(prev)) {
 		domUtils.removeItem(prev);

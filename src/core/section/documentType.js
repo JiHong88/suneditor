@@ -278,8 +278,6 @@ DocumentType.prototype = {
 	},
 
 	_movePage(pageNum, force) {
-		if (!force && this.pageNum === pageNum) return;
-
 		const globalTop = this._getGlobalTop();
 		const children = converter.nodeListToArray(this.ww.children);
 		const pageTop = this.page.offsetTop + numbers.get(this.pages[pageNum - 1].style.top) + (this.isAutoHeight ? 0 : this._getWWScrollTop());

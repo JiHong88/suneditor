@@ -274,7 +274,7 @@ const Constructor = function (editorTargets, options) {
 				'DIV',
 				{
 					class: 'sun-editor-editable se-type-document-editable se-document-page-mirror-a4',
-					style: `position: absolute; width: 21cm; columns: 21cm; padding: 16px; border: 0; margin: 0; box-sizing: border-box; overflow: hidden; height: auto; top: -10000px; left: -10000px;`
+					style: `position: absolute; width: 21cm; columns: 21cm; border: 0; overflow: hidden; height: auto; top: -10000px; left: -10000px;`
 				},
 				null
 			);
