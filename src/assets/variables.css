@@ -3,7 +3,7 @@
 	/** --------- editable - styles --------- */
 	--se-edit-font-size: 13px;
 	--se-edit-inner-padding: 16px;
-	--se-edit-line-height: 1.5;
+	--se-edit-line-height: 1.5em;
 	--se-edit-font-color: #333;
 	--se-edit-font-pre: #666;
 	--se-edit-font-quote: #999;

@@ -96,7 +96,7 @@ function CreateHTML({ lang }, fontList) {
 	<div class="se-list-inner">
 		<ul class="se-list-basic">
 			<li>
-				<button type="button" class="se-btn se-btn-list default_value" title="${lang.default}" aria-label="${lang.default}">(${lang.default})</button>
+				<button type="button" class="se-btn se-btn-list default_value" data-command="" title="${lang.default}" aria-label="${lang.default}">(${lang.default})</button>
 			</li>`;
 
 	for (let i = 0, len = fontList.length, font, text; i < len; i++) {

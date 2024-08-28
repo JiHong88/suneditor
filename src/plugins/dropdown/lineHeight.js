@@ -79,17 +79,17 @@ LineHeight.prototype = {
 
 function CreateHTML({ lang }, items) {
 	const sizeList = items || [
-		{ text: '1', value: 1 },
-		{ text: '1.15', value: 1.15 },
-		{ text: '1.5', value: 1.5 },
-		{ text: '2', value: 2 }
+		{ text: '1', value: '1em' },
+		{ text: '1.2', value: '1.2em' },
+		{ text: '1.7', value: '1.7em' },
+		{ text: '2', value: '2em' }
 	];
 
 	let list = /*html*/ `
 	<div class="se-list-inner">
 		<ul class="se-list-basic">
 			<li>
-				<button type="button" class="default_value se-btn-list" title="${lang.default}" aria-label="${lang.default}">
+				<button type="button" class="se-btn se-btn-list default_value" data-command="" title="${lang.default}" aria-label="${lang.default}">
 					(${lang.default})
 				</button>
 			</li>`;

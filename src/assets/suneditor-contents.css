@@ -6,7 +6,6 @@
 	font-size: var(--se-edit-font-size);
 	color: var(--se-edit-font-color);
 	background-color: var(--se-edit-background-color);
-	line-height: var(--se-edit-line-height);
 	word-break: normal;
 	word-wrap: break-word;
 	padding: var(--se-edit-inner-padding);
@@ -20,6 +19,7 @@
 	font-family: inherit;
 	font-size: inherit;
 	color: inherit;
+	line-height: var(--se-edit-line-height);
 }
 
 .sun-editor .se-wrapper .se-wrapper-inner.sun-editor-editable.se-type-document-editable,
