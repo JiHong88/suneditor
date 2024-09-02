@@ -2619,37 +2619,37 @@
 .sun-editor .se-resizing-container .se-resize-dot > span {
 	position: absolute;
 	pointer-events: auto;
-	width: 8px;
-	height: 8px;
+	width: 7px;
+	height: 7px;
 	border-radius: 1px;
 	background-color: var(--se-active-dark3-color);
 	border: 1px solid var(--se-active-dark3-color);
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.tl {
-	top: -7px;
-	left: -7px;
+	top: -6px;
+	left: -6px;
 	border-radius: 4px;
 	cursor: nwse-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.tr {
-	top: -7px;
-	right: -7px;
+	top: -6px;
+	right: -6px;
 	border-radius: 4px;
 	cursor: nesw-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.bl {
-	bottom: -7px;
-	left: -7px;
+	bottom: -6px;
+	left: -6px;
 	border-radius: 4px;
 	cursor: nesw-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.br {
-	right: -7px;
-	bottom: -7px;
+	right: -6px;
+	bottom: -6px;
 	border-radius: 4px;
 	cursor: nwse-resize;
 }

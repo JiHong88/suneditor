@@ -986,8 +986,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 		case 37 /** left key */:
 			if (domUtils.isEdgePoint(selectionNode, range.startOffset, 'front')) {
 				const prevEl = selectionNode.previousElementSibling || domUtils.getPreviousDeepestNode(selectionNode);
-				if (prevEl && this.component.is(prevEl)) {
-					cmponentInfo = this.component.get(prevEl);
+				if (prevEl) {
+					if (this.component.is(prevEl)) cmponentInfo = this.component.get(prevEl);
 				} else if (this.component.is(formatEl.previousElementSibling)) {
 					cmponentInfo = this.component.get(formatEl.previousElementSibling);
 				}
@@ -1001,8 +1001,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 		case 39 /** right key */:
 			if (domUtils.isEdgePoint(selectionNode, range.endOffset, 'end')) {
 				const nextEl = selectionNode.nextElementSibling || domUtils.getNextDeepestNode(selectionNode);
-				if (nextEl && this.component.is(nextEl)) {
-					cmponentInfo = this.component.get(nextEl);
+				if (nextEl) {
+					if (this.component.is(nextEl)) cmponentInfo = this.component.get(nextEl);
 				} else if (this.component.is(formatEl.nextElementSibling)) {
 					cmponentInfo = this.component.get(formatEl.nextElementSibling);
 				}

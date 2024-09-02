@@ -3,7 +3,7 @@ import { Controller, SelectMenu, _DragHandle } from '../modules';
 import { domUtils, numbers, env, converter } from '../helper';
 
 const { ON_OVER_COMPONENT } = env;
-const DIRECTION_CURSOR_MAP = { tl: 'nw-resize', tr: 'ne-resize', bl: 'sw-resize', br: 'se-resize', lw: 'w-resize', th: 'n-resize', rw: 'e-resize', bh: 's-resize' };
+const DIRECTION_CURSOR_MAP = { tl: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize', br: 'nwse-resize', lw: 'ew-resize', th: 'ns-resize', rw: 'ew-resize', bh: 'ns-resize' };
 const DIR_DIAGONAL = 'tl|bl|tr|br';
 const DIR_W = 'lw|rw';
 let __resizing_p_wh = false;
