@@ -2627,51 +2627,59 @@
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.tl {
-	top: -6px;
-	left: -6px;
-	cursor: nw-resize;
+	top: -7px;
+	left: -7px;
+	border-radius: 4px;
+	cursor: nwse-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.tr {
-	top: -6px;
-	right: -6px;
-	cursor: ne-resize;
+	top: -7px;
+	right: -7px;
+	border-radius: 4px;
+	cursor: nesw-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.bl {
-	bottom: -6px;
-	left: -6px;
-	cursor: sw-resize;
+	bottom: -7px;
+	left: -7px;
+	border-radius: 4px;
+	cursor: nesw-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.br {
-	right: -6px;
-	bottom: -6px;
-	cursor: se-resize;
+	right: -7px;
+	bottom: -7px;
+	border-radius: 4px;
+	cursor: nwse-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.lw {
-	left: -8px;
+	left: -7px;
+	width: 5px;
 	bottom: calc(50% - 4px);
-	cursor: w-resize;
+	cursor: ew-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.th {
 	left: calc(50% - 4px);
-	top: -8px;
-	cursor: n-resize;
+	top: -7px;
+	height: 5px;
+	cursor: ns-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.rw {
-	right: -8px;
+	right: -7px;
+	width: 5px;
 	bottom: calc(50% - 4px);
-	cursor: e-resize;
+	cursor: ew-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-dot > span.bh {
 	right: calc(50% - 4px);
-	bottom: -8px;
-	cursor: s-resize;
+	bottom: -7px;
+	height: 5px;
+	cursor: ns-resize;
 }
 
 .sun-editor .se-resizing-container .se-resize-display {

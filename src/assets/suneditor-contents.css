@@ -22,7 +22,6 @@
 	line-height: var(--se-edit-line-height);
 }
 
-.sun-editor .se-wrapper .se-wrapper-inner.sun-editor-editable.se-type-document-editable,
 .sun-editor-editable.se-type-document-editable {
 	width: 21cm;
 }
