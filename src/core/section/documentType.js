@@ -6,7 +6,8 @@ import { domUtils, numbers, converter, env } from '../../helper';
 
 const { _w } = env;
 const A4_HEIGHT_INCHES = 11.7; // A4 height(inches)
-let A4_HEIGHT = A4_HEIGHT_INCHES * 96; // 1 inch = 96px
+const A4_HEIGHT = A4_HEIGHT_INCHES * 96; // 1 inch = 96px
+let A4_PAGE_HEIGHT = 0;
 
 const DocumentType = function (editor, fc) {
 	// members
@@ -41,7 +42,7 @@ const DocumentType = function (editor, fc) {
 	this._positionCache = new Map();
 
 	const mirrorStyles = _w.getComputedStyle(this._mirror);
-	A4_HEIGHT = A4_HEIGHT - numbers.get(mirrorStyles.paddingTop) - numbers.get(mirrorStyles.paddingBottom);
+	A4_PAGE_HEIGHT = A4_HEIGHT - numbers.get(mirrorStyles.paddingTop) - numbers.get(mirrorStyles.paddingBottom);
 
 	// init header
 	if (this.useHeader) {
@@ -121,7 +122,7 @@ DocumentType.prototype = {
 				const breakPosition = pageBreaks[i].offsetTop;
 				const sectionHeight = breakPosition - lastBreakPosition;
 
-				if (sectionHeight % A4_HEIGHT !== 0) {
+				if (sectionHeight % A4_PAGE_HEIGHT !== 0) {
 					additionalPages++;
 				}
 
@@ -129,13 +130,13 @@ DocumentType.prototype = {
 			}
 
 			const lastSectionHeight = mirrorHeight - lastBreakPosition;
-			if (lastSectionHeight > 0 && lastSectionHeight % A4_HEIGHT !== 0) {
+			if (lastSectionHeight > 0 && lastSectionHeight % A4_PAGE_HEIGHT !== 0) {
 				additionalPages++;
 			}
 		}
 
 		const scrollTop = this.isAutoHeight ? 0 : this._getWWScrollTop();
-		const totalPages = Math.ceil(mirrorHeight / A4_HEIGHT) + additionalPages;
+		const totalPages = Math.ceil(mirrorHeight / A4_PAGE_HEIGHT) + additionalPages;
 		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const pages = [];
 
@@ -149,7 +150,7 @@ DocumentType.prototype = {
 		const mChr = this._mirror.children;
 		this._initializeCache(mChr);
 		for (let i = 0; i < totalPages; i++) {
-			const t = i * A4_HEIGHT;
+			const t = i * A4_PAGE_HEIGHT;
 			if (!pages.some((p) => Math.abs(p.top - t) < 1)) {
 				const pt = this._getElementAtPosition(t, mChr);
 				pages.push({ number: i, top: pt === 0 ? 0 : chr[pt].offsetTop + chr[pt].offsetHeight });
@@ -261,7 +262,8 @@ DocumentType.prototype = {
 
 		let targetPosition = 0;
 		if (this.isAutoHeight) {
-			targetPosition = this._getWWScrollTop() - this.wwHeight;
+			const globalTop = this._getGlobalTop();
+			targetPosition = _w.scrollY - globalTop + A4_PAGE_HEIGHT / 2;
 			if (targetPosition <= 0) return 1;
 		} else {
 			targetPosition = this.wwHeight / 2;
