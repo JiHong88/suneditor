@@ -1235,11 +1235,6 @@ Editor.prototype = {
 		} else if (!env.isResizeObserverSupported) {
 			this.__callResizeFunction(fc, fc.get('wysiwygFrame').offsetHeight, null);
 		}
-
-		// document type page
-		if (fc.has('documentType-use-page')) {
-			fc.get('documentType').rePage(false);
-		}
 	},
 
 	__callResizeFunction(fc, h, resizeObserverEntry) {

@@ -6,7 +6,7 @@ import { domUtils, numbers, converter, env } from '../../helper';
 
 const { _w } = env;
 const A4_HEIGHT_INCHES = 11.7; // A4 height(inches)
-const A4_HEIGHT = A4_HEIGHT_INCHES * 96; // 1 inch = 96px
+let A4_HEIGHT = A4_HEIGHT_INCHES * 96; // 1 inch = 96px
 
 const DocumentType = function (editor, fc) {
 	// members
@@ -38,6 +38,10 @@ const DocumentType = function (editor, fc) {
 	this.pageNavigator = null;
 	this._mirror = fc.get('documentTypePageMirror');
 	this._mirrorCache = 0;
+	this._positionCache = new Map();
+
+	const mirrorStyles = _w.getComputedStyle(this._mirror);
+	A4_HEIGHT = A4_HEIGHT - numbers.get(mirrorStyles.paddingTop) - numbers.get(mirrorStyles.paddingBottom);
 
 	// init header
 	if (this.useHeader) {
@@ -142,10 +146,12 @@ DocumentType.prototype = {
 		// A4 position
 		this._mirrorCache = 0;
 		const chr = this.ww.children;
+		const mChr = this._mirror.children;
+		this._initializeCache(mChr);
 		for (let i = 0; i < totalPages; i++) {
 			const t = i * A4_HEIGHT;
 			if (!pages.some((p) => Math.abs(p.top - t) < 1)) {
-				const pt = this._getElementAtPosition(t);
+				const pt = this._getElementAtPosition(t, mChr);
 				pages.push({ number: i, top: pt === 0 ? 0 : chr[pt].offsetTop + chr[pt].offsetHeight });
 			}
 		}
@@ -168,18 +174,32 @@ DocumentType.prototype = {
 		this._displayCurrentPage();
 	},
 
-	_getElementAtPosition(top) {
-		const chr = this._mirror.children;
+	_initializeCache(mChr) {
+		this._positionCache.clear();
+		for (let i = 0, len = mChr.length; i < len; i++) {
+			const element = mChr[i];
+			const top = element.offsetTop;
+			const height = element.offsetHeight;
+			const bottom = top + height;
+
+			this._positionCache.set(i, {
+				top,
+				height,
+				bottom: bottom
+			});
+		}
+	},
+
+	_getElementAtPosition(top, mChr) {
 		let start = this._mirrorCache;
-		let end = chr.length - 1;
+		let end = mChr.length - 1;
 
 		while (start <= end) {
 			const mid = Math.floor((start + end) / 2);
-			const element = chr[mid];
-			const elementTop = element.offsetTop;
-			const elementBottom = elementTop + element.offsetHeight;
+			const element = this._positionCache.get(mid);
+			const elementTop = element.top;
 
-			if (top >= elementTop && top <= elementBottom) {
+			if (top >= elementTop && top <= element.bottom) {
 				return (this._mirrorCache = mid);
 			}
 
@@ -190,7 +210,7 @@ DocumentType.prototype = {
 			}
 		}
 
-		const closestIndex = chr[start] ? start : end;
+		const closestIndex = mChr[start] ? start : end;
 		return (this._mirrorCache = closestIndex);
 	},
 

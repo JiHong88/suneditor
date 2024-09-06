@@ -2,7 +2,8 @@
 .sun-editor-editable {
 	/** --------- editable - styles --------- */
 	--se-edit-font-size: 13px;
-	--se-edit-inner-padding: 16px;
+	--se-edit-inner-padding: 1.5em 1.5em;
+	--se-edit-inner-padding-doc-type: 10mm 10mm;
 	--se-edit-line-height: 1.5em;
 	--se-edit-font-color: #333;
 	--se-edit-font-pre: #666;

@@ -48,6 +48,7 @@ ExportPDF.prototype = {
 			if (this.apiUrl) {
 				const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;
 				const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
+				inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '';
 				ww.innerHTML = `
 				<style>
 					@page {

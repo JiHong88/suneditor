@@ -343,9 +343,6 @@ Viewer.prototype = {
 		const wDoc = this.editor.frameContext.get('_wd');
 		const pageCSS = /*html*/ `
 			<style>
-				.sun-editor-editable {
-					padding: 0 !important;
-				}
 				@page {
 					size: A4;
 					margin: ${innerPadding};

@@ -23,7 +23,14 @@
 }
 
 .sun-editor-editable.se-type-document-editable {
+	padding: var(--se-edit-inner-padding-doc-type);
+}
+.sun-editor-editable.se-document-page-mirror-a4 {
 	width: 21cm;
+	@page {
+		size: A4;
+		margin: var(--se-edit-inner-padding);
+	}
 }
 
 /* RTL - editable */
