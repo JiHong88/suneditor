@@ -800,7 +800,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 					}
 
 					if (selectionFormat) {
-						this.html.insert(range.collapsed && domUtils.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>', false, true, true);
+						this.html.insert(range.collapsed && domUtils.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>', { selectInserted: false, skipCharCount: true, skipCleaning: true });
 
 						let focusNode = wSelection.focusNode;
 						const wOffset = wSelection.focusOffset;

@@ -211,16 +211,17 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @description Clean and compress the HTML code to suit the editor format.
-	 * @param {string} html HTML string
-	 * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
-	 * @param {string|RegExp|null} whitelist Regular expression of allowed tags.
-	 * RegExp object is create by helper.converter.createElementWhitelist method.
-	 * @param {string|RegExp|null} blacklist Regular expression of disallowed tags.
-	 * RegExp object is create by helper.converter.createElementBlacklist method.
-	 * @returns {string}
+	 * @description Cleans and compresses HTML code to suit the editor format.
+	 * @param {string} html HTML string to clean and compress
+	 * @param {Object} [options] Cleaning options
+	 * @param {boolean} [options.forceFormat=false] If true, wraps text nodes without a format node in the format tag.
+	 * @param {string|RegExp|null} [options.whitelist=null] Regular expression of allowed tags.
+	 * Create RegExp object using helper.converter.createElementWhitelist method.
+	 * @param {string|RegExp|null} [options.blacklist=null] Regular expression of disallowed tags.
+	 * Create RegExp object using helper.converter.createElementBlacklist method.
+	 * @returns {string} Cleaned and compressed HTML string
 	 */
-	clean(html, requireFormat, whitelist, blacklist) {
+	clean(html, { forceFormat, whitelist, blacklist } = {}) {
 		const { tagFilter, formatFilter, classFilter, styleNodeFilter, attrFilter, styleFilter } = this.options.get('strictMode');
 		let cleanData = '';
 
@@ -263,8 +264,8 @@ HTML.prototype = {
 
 		if (formatFilter) {
 			let domTree = dom.childNodes;
-			if (!requireFormat) requireFormat = this._isFormatData(domTree);
-			if (requireFormat) domTree = this._editFormat(dom).childNodes;
+			if (!forceFormat) forceFormat = this._isFormatData(domTree);
+			if (forceFormat) domTree = this._editFormat(dom).childNodes;
 
 			for (let i = 0, len = domTree.length, t; i < len; i++) {
 				t = domTree[i];
@@ -272,7 +273,7 @@ HTML.prototype = {
 					cleanData += t.outerHTML;
 					continue;
 				}
-				cleanData += this._makeLine(t, requireFormat);
+				cleanData += this._makeLine(t, forceFormat);
 			}
 		}
 
@@ -293,18 +294,20 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @description Insert an (HTML element / HTML string / plain string) at selection range.
+	 * @description Inserts an (HTML element / HTML string / plain string) at the selection range.
 	 * If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
-	 * @param {Element|String} html HTML Element or HTML string or plain string
-	 * @param {boolean} rangeSelection If true, range select the inserted node.
-	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
-	 * @param {boolean} notCleanData If true, inserts the HTML string without refining it with html.clean.
+	 * @param {Element|string} html HTML Element or HTML string or plain string
+	 * @param {Object} [options] Options
+	 * @param {boolean} [options.selectInserted=false] If true, selects the range of the inserted node.
+	 * @param {boolean} [options.skipCharCount=false] If true, inserts even if "frameOptions.get('charCounter_max')" is exceeded.
+	 * @param {boolean} [options.skipCleaning=false] If true, inserts the HTML string without refining it with html.clean.
+	 * @returns {Element|null} The inserted element or null if insertion failed
 	 */
-	insert(html, rangeSelection, notCheckCharCount, notCleanData) {
+	insert(html, { selectInserted, skipCharCount, skipCleaning } = {}) {
 		if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.get().focusNode)) this.editor.focus();
 
 		if (typeof html === 'string') {
-			if (!notCleanData) html = this.clean(html, false, null, null);
+			if (!skipCleaning) html = this.clean(html, { forceFormat: false, whitelist: null, blacklist: null });
 			try {
 				if (domUtils.isListCell(this.format.getLine(this.selection.getNode(), null))) {
 					const dom = this._d.createRange().createContextualFragment(html);
@@ -315,7 +318,7 @@ HTML.prototype = {
 				const dom = this._d.createRange().createContextualFragment(html);
 				const domTree = dom.childNodes;
 
-				if (!notCheckCharCount) {
+				if (!skipCharCount) {
 					const type = this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
 					let checkHTML = '';
 					for (let i = 0, len = domTree.length; i < len; i++) {
@@ -340,7 +343,7 @@ HTML.prototype = {
 				if (prev?.nodeType === 3 && a?.nodeType === 1) a = prev;
 				const offset = a.nodeType === 3 ? t.endOffset || a.textContent.length : a.childNodes.length;
 
-				if (rangeSelection) {
+				if (selectInserted) {
 					this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
 				} else if (!this.component.is(a)) {
 					this.selection.setRange(a, offset, a, offset);
@@ -351,13 +354,13 @@ HTML.prototype = {
 			}
 		} else {
 			if (this.component.is(html)) {
-				this.component.insert(html, notCheckCharCount, false);
+				this.component.insert(html, { skipCharCount, skipSelection: false, skipHistory: false });
 			} else {
 				let afterNode = null;
 				if (this.format.isLine(html) || domUtils.isMedia(html)) {
 					afterNode = this.format.getLine(this.selection.getNode(), null);
 				}
-				this.insertNode(html, afterNode, notCheckCharCount);
+				this.insertNode(html, afterNode, skipCharCount);
 			}
 		}
 
@@ -372,12 +375,12 @@ HTML.prototype = {
 	 * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
 	 * @param {Node} oNode Node to be inserted
 	 * @param {Node|null} afterNode If the node exists, it is inserted after the node
-	 * @param {boolean|null} notCheckCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
+	 * @param {boolean|null} skipCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @returns {Object|Node|null}
 	 */
-	insertNode(oNode, afterNode, notCheckCharCount) {
+	insertNode(oNode, afterNode, skipCharCount) {
 		let result = null;
-		if (this.editor.frameContext.get('isReadOnly') || (!notCheckCharCount && !this.char.check(oNode, null))) {
+		if (this.editor.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(oNode, null))) {
 			return result;
 		}
 
@@ -986,7 +989,7 @@ HTML.prototype = {
 				editableEls[j].removeAttribute('contenteditable');
 			}
 
-			const content = this.clean(renderHTML.innerHTML, false, null, null);
+			const content = this.clean(renderHTML.innerHTML, { forceFormat: false, whitelist: null, blacklist: null });
 			if (this.editor.frameOptions.get('iframe_fullPage')) {
 				if (includeFullPage) {
 					const attrs = domUtils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
@@ -1012,7 +1015,7 @@ HTML.prototype = {
 	 */
 	set(html, rootKey) {
 		this.selection.removeRange();
-		const convertValue = html === null || html === undefined ? '' : this.clean(html, true, null, null);
+		const convertValue = html === null || html === undefined ? '' : this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
 
 		if (!rootKey) rootKey = [this.status.rootKey];
 		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
@@ -1042,7 +1045,7 @@ HTML.prototype = {
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
-			const convertValue = this.clean(content, true, null, null);
+			const convertValue = this.clean(content, { forceFormat: true, whitelist: null, blacklist: null });
 
 			if (!this.editor.frameContext.get('isCodeView')) {
 				const temp = domUtils.createElement('DIV', null, convertValue);
@@ -1074,7 +1077,7 @@ HTML.prototype = {
 		for (let i = 0; i < rootKey.length; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
 			if (ctx.head) this.editor.frameContext.get('_wd').head.innerHTML = ctx.head.replace(this.__disallowedTagsRegExp, '');
-			if (ctx.body) this.editor.frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, true, null, null);
+			if (ctx.body) this.editor.frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, { forceFormat: true, whitelist: null, blacklist: null });
 			this.editor._resetComponents();
 		}
 	},
@@ -1199,10 +1202,10 @@ HTML.prototype = {
 	/**
 	 * @description Returns HTML string according to tag type and configurati isExcludeFormat.
 	 * @param {Node} node Node
-	 * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
+	 * @param {boolean} forceFormat If true, text nodes that do not have a format node is wrapped with the format tag.
 	 * @private
 	 */
-	_makeLine(node, requireFormat) {
+	_makeLine(node, forceFormat) {
 		const defaultLine = this.options.get('defaultLine');
 		// element
 		if (node.nodeType === 1) {
@@ -1218,7 +1221,7 @@ HTML.prototype = {
 			}
 
 			if (
-				!requireFormat ||
+				!forceFormat ||
 				this.format.isLine(node) ||
 				this.format.isBlock(node) ||
 				this.component.is(node) ||
@@ -1233,7 +1236,7 @@ HTML.prototype = {
 		}
 		// text
 		if (node.nodeType === 3) {
-			if (!requireFormat) return converter.htmlToEntity(node.textContent);
+			if (!forceFormat) return converter.htmlToEntity(node.textContent);
 			const textArray = node.textContent.split(/\n/g);
 			let html = '';
 			for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {

@@ -201,9 +201,9 @@ Math_.prototype = {
 
 			if (selectedFormats.length > 1) {
 				const oFormat = domUtils.createElement(selectedFormats[0].nodeName, null, mathEl);
-				this.component.insert(oFormat, false, true);
+				this.component.insert(oFormat, { skipCharCount: false, skipSelection: true, skipHistory: false });
 			} else {
-				this.component.insert(mathEl, false, true);
+				this.component.insert(mathEl, { skipCharCount: false, skipSelection: true, skipHistory: false });
 			}
 		} else {
 			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.se-component');

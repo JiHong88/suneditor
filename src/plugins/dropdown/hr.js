@@ -67,7 +67,7 @@ HR.prototype = {
 	submit(className) {
 		const hr = domUtils.createElement('hr', { class: className });
 		this.editor.focus();
-		this.component.insert(hr, false, true);
+		this.component.insert(hr, { skipCharCount: false, skipSelection: true, skipHistory: false });
 		return hr;
 	},
 

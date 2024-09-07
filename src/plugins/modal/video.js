@@ -481,7 +481,7 @@ Video.prototype = {
 		this.fileManager.setFileData(oFrame, file);
 
 		if (!isUpdate) {
-			this.component.insert(container, false, true);
+			this.component.insert(container, { skipCharCount: false, skipSelection: true, skipHistory: false });
 			if (!this.options.get('componentAutoSelect')) {
 				const line = this.format.addLine(container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);

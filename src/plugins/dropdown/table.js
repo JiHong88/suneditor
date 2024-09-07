@@ -272,7 +272,7 @@ Table.prototype = {
 		const figure = domUtils.createElement('FIGURE', { class: 'se-flex-component se-input-component' + scrollTypeClass });
 		figure.appendChild(oTable);
 
-		if (this.component.insert(figure, false, false)) {
+		if (this.component.insert(figure, { skipCharCount: false, skipSelection: false, skipHistory: false })) {
 			this._resetTablePicker();
 			const target = oTable.querySelector('td div');
 			this.selection.setRange(target, 0, target, 0);

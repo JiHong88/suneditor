@@ -322,7 +322,7 @@ Audio_.prototype = {
 			this.fileManager.setFileData(element, file);
 			element.src = src;
 			const figure = Figure.CreateContainer(element, 'se-flex-component');
-			if (!this.component.insert(figure.container, false, !this.options.get('componentAutoSelect'))) {
+			if (!this.component.insert(figure.container, { skipCharCount: false, skipSelection: !this.options.get('componentAutoSelect'), skipHistory: false })) {
 				this.editor.focus();
 				return;
 			}

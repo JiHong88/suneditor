@@ -580,7 +580,7 @@ Viewer.prototype = {
 			}
 
 			wDoc.head.innerHTML = headers;
-			wDoc.body.innerHTML = this.html.clean(parseDocument.body.innerHTML, true, null, null);
+			wDoc.body.innerHTML = this.html.clean(parseDocument.body.innerHTML, { forceFormat: true, whitelist: null, blacklist: null });
 
 			const attrs = parseDocument.body.attributes;
 			for (let i = 0, len = attrs.length; i < len; i++) {
@@ -594,7 +594,8 @@ Viewer.prototype = {
 				}
 			}
 		} else {
-			this.editor.frameContext.get('wysiwyg').innerHTML = code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
+			this.editor.frameContext.get('wysiwyg').innerHTML =
+				code_html.length > 0 ? this.html.clean(code_html, { forceFormat: true, whitelist: null, blacklist: null }) : '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 		}
 	},
 

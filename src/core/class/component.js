@@ -47,15 +47,17 @@ const Component = function (editor) {
 
 Component.prototype = {
 	/**
-	 * @description The method to insert a element and return. (used elements : table, hr, image, video)
-	 * If "element" is "HR", insert and return the new line.
+	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)
+	 * If "element" is "HR", inserts and returns the new line.
 	 * @param {Element} element Element to be inserted
-	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
-	 * @param {boolean} notSelect If true, Do not automatically select the inserted component.
-	 * @returns {Element}
+	 * @param {Object} [options] Options
+	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
+	 * @param {boolean} [options.skipSelection=false] If true, do not automatically select the inserted component.
+	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
+	 * @returns {Element} The inserted element or new line (for HR)
 	 */
-	insert(element, notCheckCharCount, notSelect) {
-		if (this.editor.frameContext.get('isReadOnly') || (!notCheckCharCount && !this.char.check(element))) {
+	insert(element, { skipCharCount, skipSelection, skipHistory } = {}) {
+		if (this.editor.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(element))) {
 			return null;
 		}
 
@@ -84,9 +86,9 @@ Component.prototype = {
 			element.parentNode.insertBefore(empty, element.nextSibling);
 		}
 
-		this.history.push(false);
+		if (!skipHistory) this.history.push(false);
 
-		if (!notSelect) {
+		if (!skipSelection) {
 			this.selection.setRange(element, 0, element, 0);
 			const fileComponentInfo = this.get(element);
 			if (fileComponentInfo) {

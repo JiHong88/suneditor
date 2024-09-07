@@ -571,7 +571,7 @@ EventManager.prototype = {
 		}
 
 		if (!onlyText) {
-			cleanData = this.html.clean(cleanData, false, null, null);
+			cleanData = this.html.clean(cleanData, { forceFormat: false, whitelist: null, blacklist: null });
 		}
 
 		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText, false);
@@ -611,7 +611,7 @@ EventManager.prototype = {
 		}
 
 		if (cleanData) {
-			this.html.insert(cleanData, false, true, true);
+			this.html.insert(cleanData, { selectInserted: false, skipCharCount: true, skipCleaning: true });
 			// document type
 			if (frameContext.has('documentType-use-header')) {
 				frameContext.get('documentType').reHeader();

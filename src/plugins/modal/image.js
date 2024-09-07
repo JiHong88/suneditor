@@ -759,7 +759,7 @@ Image_.prototype = {
 		this.fileManager.setFileData(oImg, file);
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		this.component.insert(container, false, true);
+		this.component.insert(container, { skipCharCount: false, skipSelection: true, skipHistory: false });
 	},
 
 	createInline(src, anchor, width, height, file, alt) {
@@ -781,7 +781,7 @@ Image_.prototype = {
 		this.fileManager.setFileData(oImg, file);
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		this.component.insert(container, false, true);
+		this.component.insert(container, { skipCharCount: false, skipSelection: true, skipHistory: false });
 	},
 
 	_updateSrc(src, element, file) {

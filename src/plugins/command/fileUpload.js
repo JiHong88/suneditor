@@ -319,14 +319,14 @@ FileUpload.prototype = {
 
 		if (this.as === 'link') {
 			a.className = 'se-component se-inline-component';
-			this.component.insert(a, false, false);
+			this.component.insert(a, { skipCharCount: false, skipSelection: false, skipHistory: false });
 			return;
 		}
 
 		const figure = Figure.CreateContainer(a);
 		domUtils.addClass(figure.container, 'se-file-figure|se-flex-component');
 
-		if (!this.component.insert(figure.container, false, isLast ? !this.options.get('componentAutoSelect') : true)) {
+		if (!this.component.insert(figure.container, { skipCharCount: false, skipSelection: isLast ? !this.options.get('componentAutoSelect') : true, skipHistory: false })) {
 			this.editor.focus();
 			return;
 		}

@@ -30,7 +30,7 @@ Template.prototype = {
 		const temp = this.items[(this.selectedIndex = index)];
 
 		if (temp.html) {
-			this.html.insert(temp.html);
+			this.html.insert(temp.html, { selectInserted: false, skipCharCount: false, skipCleaning: false });
 		} else {
 			this.menu.dropdownOff();
 			throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');

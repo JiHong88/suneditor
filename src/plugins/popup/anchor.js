@@ -87,7 +87,7 @@ Anchor.prototype = {
 						class: 'se-component se-inline-component'
 					});
 
-					this.component.insert(a, false, true);
+					this.component.insert(a, { skipCharCount: false, skipSelection: true, skipHistory: false });
 
 					const r = this.selection.getNearRange(a);
 					if (r) {
