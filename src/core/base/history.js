@@ -11,6 +11,8 @@ export default function (editor) {
 	let delayTime = editor.options.get('historyStackDelayTime');
 	let pushDelay = null;
 	let stackIndex, stack, rootStack, rootInitContents;
+	let waiting = false;
+	let waitingTime = null;
 
 	function change(fc, index) {
 		if (editor.status.hasFocus) editor.eventManager.applyTagEffect();
@@ -171,6 +173,8 @@ export default function (editor) {
 		 * @param {Boolean|Number} delay If true, Add stack without delay time.
 		 */
 		push(delay, rootKey) {
+			if (waiting) return;
+
 			rootKey = rootKey || editor.status.rootKey;
 			const range = editor.status._range;
 
@@ -222,6 +226,27 @@ export default function (editor) {
 			setStack(frameRoots.get(rootKey || editor.status.rootKey).get('wysiwyg').innerHTML, null, editor.status.rootKey, 0);
 		},
 
+		pause() {
+			waiting = true;
+
+			// max 5 seconds
+			if (waitingTime) {
+				_w.clearTimeout(waitingTime);
+				waitingTime = null;
+			}
+			waitingTime = _w.setTimeout(() => {
+				waiting = false;
+			}, 5000);
+		},
+
+		resume() {
+			if (waitingTime) {
+				_w.clearTimeout(waitingTime);
+				waitingTime = null;
+			}
+			waiting = false;
+		},
+
 		/**
 		 * @description Reset the history object
 		 */
@@ -244,6 +269,7 @@ export default function (editor) {
 			stack = [];
 			rootStack = {};
 			rootInitContents = {};
+			waiting = false;
 
 			const rootKeys = editor.rootKeys;
 			for (let i = 0, len = rootKeys.length; i < len; i++) {
