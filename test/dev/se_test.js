@@ -64,7 +64,7 @@ const bl = [
 	'/',
 	['outdent', 'indent'],
 	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-	['table', 'link', 'image', 'video', 'audio', 'math'],
+	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 	['imageGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
@@ -81,7 +81,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['table', 'link', 'image', 'video', 'audio', 'math'],
+			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 			['imageGallery'],
 			['fullScreen', 'showBlocks', 'codeView'],
 			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
@@ -99,7 +99,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['table', 'link', 'image', 'video', 'audio', 'math'],
+			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 			['imageGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
@@ -117,7 +117,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery']
 		]
 	],
 	// (min-width: 1123)
@@ -132,7 +132,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery']
 		]
 	],
 	// (min-width: 817)
@@ -147,7 +147,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery']
 		]
 	],
 	// (min-width: 673)
@@ -160,7 +160,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
@@ -174,7 +174,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
@@ -186,7 +186,7 @@ const bl = [
 			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	]
@@ -203,7 +203,7 @@ const bb = [
 	'/',
 	['outdent', 'indent'],
 	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-	['table', 'link', 'image', 'video', 'audio', 'math'],
+	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 	['imageGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
@@ -478,6 +478,7 @@ window.editor_root = suneditor.create(
 		value: `
 		<h1>Header~1</h1>
 		<p>test fdste text</p>
+		<div class="se-component se-image-container __se__float-none se-component-selected"><figure style="" class="se-figure-over-selected se-figure-selected"><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" style="" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Welsh Corgi" data-se-file-size="0" data-se-index="0"></figure></div>
 		<h2>header 22222</h2>
 		<p>2222222</p>
 		<p>2222222aa</p>
@@ -573,19 +574,20 @@ window.editor_root = suneditor.create(
 		<p>asfhjfds</p>
 		<p>fdsaa99999</p>
 		`,
-// 		value: `<div class="se-component se-video-container __se__float-none" style="width: 100%;">
-//   <figure style="width: 100%; height: 56.25%; padding-bottom: 56.25%;" class="">
-//     <video controls="true" src="http://localhost:3000/public/files/d55bddf8d62910879ed9f605522149a8.mp4" width="100%" height="56.25%" data-se-size="100%,56.25%" data-se-file-name="SampleVideo_1280x720_1mb.mp4" data-se-file-size="1055736" data-se-index="0" style="width: 100%; height: 100%;"></video>
-//   </figure>
-// </div>
-// <p><br>
-// </p>
-// `,
+		// 		value: `<div class="se-component se-video-container __se__float-none" style="width: 100%;">
+		//   <figure style="width: 100%; height: 56.25%; padding-bottom: 56.25%;" class="">
+		//     <video controls="true" src="http://localhost:3000/public/files/d55bddf8d62910879ed9f605522149a8.mp4" width="100%" height="56.25%" data-se-size="100%,56.25%" data-se-file-name="SampleVideo_1280x720_1mb.mp4" data-se-file-size="1055736" data-se-index="0" style="width: 100%; height: 100%;"></video>
+		//   </figure>
+		// </div>
+		// <p><br>
+		// </p>
+		// `,
 		// <p>test abc  sss</p>
 		// 		`,
 		// syncTab: true,
 		// iframe: true,
-		height: '600px',
+		// height: '600px',
+		// maxWidth: '1000px',
 		type: 'document:header,page',
 		iframe_cssFileName: ['suneditor', 'katex'],
 		copyFormatKeepOn: true,
@@ -637,14 +639,14 @@ window.editor_root = suneditor.create(
 		// 	'|',
 		// 	[':리스트&라인-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list_numbered', 'list_bulleted', 'lineHeight'],
 		// 	'|',
-		// 	[':테이블&미디어-default.more_plus', 'table', 'link', 'image', 'video', 'fileUpload', 'anchor'],
+		// 	[':테이블&미디어-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'fileUpload', 'anchor'],
 		// 	'|',
 		// 	['save'],
 		// 	'|',
 		// 	[':기타-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'math', 'exportPDF', 'print'],
 		// 	'|'
 		// ],
-		iframe: true,
+		// iframe: true,
 		subToolbar: {
 			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
 			width: 'auto',
@@ -684,6 +686,9 @@ window.editor_root = suneditor.create(
 		video: {
 			uploadUrl: 'http://localhost:3000/editor/upload',
 			createFileInput: true
+		},
+		embed: {
+
 		},
 		imageGallery: {
 			url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'

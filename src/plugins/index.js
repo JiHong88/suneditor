@@ -28,6 +28,7 @@ import link from './modal/link';
 import image from './modal/image';
 import video from './modal/video';
 import audio from './modal/audio';
+import embed from './modal/embed';
 import math from './modal/math';
 import drawing from './modal/drawing';
 
@@ -65,6 +66,7 @@ export {
 	image,
 	video,
 	audio,
+	embed,
 	math,
 	drawing,
 	imageGallery,
@@ -96,6 +98,7 @@ export default {
 	image,
 	video,
 	audio,
+	embed,
 	math,
 	drawing,
 	imageGallery,
