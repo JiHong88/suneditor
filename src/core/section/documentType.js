@@ -153,13 +153,20 @@ DocumentType.prototype = {
 			const t = i * A4_PAGE_HEIGHT;
 			if (!pages.some((p) => Math.abs(p.top - t) < 1)) {
 				const pt = this._getElementAtPosition(t, mChr);
+				if (!chr[pt]) break;
 				pages.push({ number: i, top: pt === 0 ? 0 : chr[pt].offsetTop + chr[pt].offsetHeight });
 			}
 		}
 
-		pages.sort((a, b) => a.top - b.top);
+		if (pages.length === 0) {
+			this.pages_line = [];
+			this.totalPages = 1;
+			this._displayCurrentPage();
+			return;
+		}
 
 		// numbering
+		pages.sort((a, b) => a.top - b.top);
 		this.page.innerHTML = '';
 		this.pages = [];
 		for (let i = 0, t; i < totalPages; i++) {
