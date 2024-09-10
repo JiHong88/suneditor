@@ -572,8 +572,11 @@
 .sun-editor .se-btn.se-btn-tool-pageNavigator > input[type='number'] {
 	appearance: textfield;
 }
+.sun-editor .se-btn.se-btn-tool-pageNavigator > input[type='number']::-webkit-inner-spin-button,
 .sun-editor .se-btn.se-btn-tool-pageNavigator > input[type='number']::-webkit-outer-spin-button {
 	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
 	margin: 0;
 }
 .sun-editor .se-btn.se-btn-tool-pageNavigator ~ span {
