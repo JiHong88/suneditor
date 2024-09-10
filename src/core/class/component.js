@@ -69,7 +69,7 @@ Component.prototype = {
 		let formatEl = this.format.getLine(selectionNode, null);
 
 		if (domUtils.isListCell(formatEl)) {
-			this.html.insertNode(element, isInline ? null : selectionNode === formatEl ? null : r.container.nextSibling, true);
+			this.html.insertNode(element, { afterNode: isInline ? null : selectionNode === formatEl ? null : r.container.nextSibling, skipCharCount: true });
 			if (!isInline && !element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
 		} else {
 			if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
@@ -77,7 +77,7 @@ Component.prototype = {
 				oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
-			this.html.insertNode(element, isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, true);
+			this.html.insertNode(element, { afterNode: isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
 			if (!isInline && formatEl && domUtils.isZeroWith(formatEl)) domUtils.removeItem(formatEl);
 		}
 

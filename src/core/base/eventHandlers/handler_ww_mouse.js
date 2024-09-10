@@ -115,7 +115,7 @@ export function OnClick_wysiwyg(frameContext, e) {
 			this.format.removeInlineElement();
 
 			if (n) {
-				const insertedNode = this.format.applyInlineElement(n, null, [n.nodeName], false);
+				const insertedNode = this.format.applyInlineElement(n, { stylesToModify: null, nodesToRemove: [n.nodeName], strictRemove: false });
 				const { parent, inner } = this.nodeTransform.createNestedNode(_styleNode);
 				insertedNode.parentNode.insertBefore(parent, insertedNode);
 				inner.appendChild(insertedNode);

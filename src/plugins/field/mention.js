@@ -160,7 +160,7 @@ function SelectMention(item) {
 	} else {
 		this.selection.setRange(this._anchorNode, this._lastAtPos, this._anchorNode, this._anchorOffset);
 		oA = domUtils.createElement('A', { 'data-se-mention': key, href: url, title: name, target: '_blank' }, this.triggerText + key);
-		if (!this.html.insertNode(oA, null, false)) return false;
+		if (!this.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return false;
 	}
 
 	this.selectMenu.close();

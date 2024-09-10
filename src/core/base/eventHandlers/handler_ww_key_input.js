@@ -338,7 +338,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 					if (detach && rangeEl.parentNode) {
 						e.preventDefault();
-						this.format.removeBlock(rangeEl, domUtils.isListCell(formatEl) ? [formatEl] : null, null, false, false);
+						this.format.removeBlock(rangeEl, { selectedFormats: domUtils.isListCell(formatEl) ? [formatEl] : null, newBlockElement: null, shouldDelete: false, skipHistory: false });
 						this.history.push(true);
 						break;
 					}
@@ -583,7 +583,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						}
 
 						const tabText = domUtils.createTextNode(new Array(tabSize).join('\u00A0'));
-						const textRange = this.html.insertNode(tabText, null, false);
+						const textRange = this.html.insertNode(tabText, { afterNode: null, skipCharCount: false });
 						if (!textRange) return false;
 						if (!fc) {
 							r.sc = tabText;
@@ -752,7 +752,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 							}
 
 							newEl = domUtils.createElement(newFormat);
-							const edge = this.format.removeBlock(rangeEl, [formatEl], null, true, true);
+							const edge = this.format.removeBlock(rangeEl, { selectedFormats: [formatEl], newBlockElement: null, shouldDelete: true, skipHistory: true });
 							edge.cc.insertBefore(newEl, edge.ec);
 						}
 
@@ -812,7 +812,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 					} else {
 						const focusNext = wSelection.focusNode.nextSibling;
 						const br = domUtils.createElement('BR');
-						this.html.insertNode(br, null, true);
+						this.html.insertNode(br, { afterNode: null, skipCharCount: true });
 
 						const brPrev = br.previousSibling,
 							brNext = br.nextSibling;
@@ -954,7 +954,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	if (shift && (isOSX_IOS ? alt : ctrl) && keyCode === 32) {
 		e.preventDefault();
 		e.stopPropagation();
-		const nbsp = this.html.insertNode(domUtils.createTextNode('\u00a0'), null, true);
+		const nbsp = this.html.insertNode(domUtils.createTextNode('\u00a0'), { afterNode: null, skipCharCount: true });
 		if (nbsp && nbsp.container) {
 			this.selection.setRange(nbsp.container, nbsp.endOffset, nbsp.container, nbsp.endOffset);
 			return;
@@ -963,7 +963,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 	if (!ctrl && !alt && !selectRange && !NON_TEXT_KEYCODE.test(keyCode) && domUtils.isBreak(range.commonAncestorContainer)) {
 		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-		this.html.insertNode(zeroWidth, null, true);
+		this.html.insertNode(zeroWidth, { afterNode: null, skipCharCount: true });
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
 

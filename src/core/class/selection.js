@@ -224,7 +224,7 @@ Selection.prototype = {
 			const node = this.getNode();
 			if (this.format.isLine(node)) {
 				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-				this.html.insertNode(zeroWidth, null, true);
+				this.html.insertNode(zeroWidth, { afterNode: null, skipCharCount: true });
 				this.setRange(zeroWidth, 1, zeroWidth, 1);
 				this._init();
 				rects = this.getRange().getClientRects();

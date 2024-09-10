@@ -341,7 +341,7 @@ Format.prototype = {
 						list = list.parentNode;
 					}
 
-					const edge = this.removeBlock(originParent, lineArr, null, true, true);
+					const edge = this.removeBlock(originParent, { selectedFormats: lineArr, newBlockElement: null, shouldDelete: true, skipHistory: true });
 
 					if (parentDepth >= depth) {
 						parentDepth = depth;
@@ -409,29 +409,30 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)
+	 * @description The elements of the "selectedFormats" array are detached from the "blockElement" element. ("LI" tags are converted to "P" tags)
 	 * When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling, removeArray: [Array of removed elements]}.
-	 * @param {Element} rangeElement Range format element (PRE, BLOCKQUOTE, OL, UL...)
-	 * @param {Array|null} selectedFormats Array of format elements (P, DIV, LI...) to remove.
+	 * @param {Element} blockElement Range format element (PRE, BLOCKQUOTE, OL, UL...)
+	 * @param {Object} [options] Options
+	 * @param {Array} [options.selectedFormats=null] Array of format elements (P, DIV, LI...) to remove.
 	 * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
-	 * @param {Element|null} newRangeElement The node(rangeElement) to replace the currently wrapped node.
-	 * @param {boolean} remove If true, deleted without detached.
-	 * @param {boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
+	 * @param {Element} [options.newBlockElement=null] The node(blockElement) to replace the currently wrapped node.
+	 * @param {boolean} [options.shouldDelete=false] If true, deleted without detached.
+	 * @param {boolean} [options.skipHistory=false] When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
 	 * @returns {Object}
 	 */
-	removeBlock(rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
+	removeBlock(blockElement, { selectedFormats, newBlockElement, shouldDelete, skipHistory } = {}) {
 		const range = this.selection.getRange();
 		let so = range.startOffset;
 		let eo = range.endOffset;
 
-		let children = domUtils.getListChildNodes(rangeElement, (current) => current.parentNode === rangeElement);
-		let parent = rangeElement.parentNode;
+		let children = domUtils.getListChildNodes(blockElement, (current) => current.parentNode === blockElement);
+		let parent = blockElement.parentNode;
 		let firstNode = null;
 		let lastNode = null;
-		let rangeEl = rangeElement.cloneNode(false);
+		let rangeEl = blockElement.cloneNode(false);
 
 		const removeArray = [];
-		const newList = domUtils.isList(newRangeElement);
+		const newList = domUtils.isList(newBlockElement);
 		let insertedNew = false;
 		let reset = false;
 		let moveComplete = false;
@@ -479,13 +480,13 @@ Format.prototype = {
 					} else {
 						const originNext = originNode.nextElementSibling;
 						const detachRange = this._removeNestedList(originNode, false);
-						if (rangeElement !== detachRange || originNext !== originNode.nextElementSibling) {
+						if (blockElement !== detachRange || originNext !== originNode.nextElementSibling) {
 							const fChildren = format.childNodes;
 							while (fChildren[0]) {
 								originNode.appendChild(fChildren[0]);
 							}
 
-							rangeElement = detachRange;
+							blockElement = detachRange;
 							reset = true;
 						}
 					}
@@ -505,9 +506,9 @@ Format.prototype = {
 			if (insNode.nodeType === 3 && domUtils.isList(rangeEl)) continue;
 
 			moveComplete = false;
-			if (remove && i === 0) {
+			if (shouldDelete && i === 0) {
 				if (!selectedFormats || selectedFormats.length === len || selectedFormats[0] === insNode) {
-					firstNode = rangeElement.previousSibling;
+					firstNode = blockElement.previousSibling;
 				} else {
 					firstNode = rangeEl;
 				}
@@ -515,12 +516,12 @@ Format.prototype = {
 
 			if (selectedFormats) lineIndex = selectedFormats.indexOf(insNode);
 			if (selectedFormats && lineIndex === -1) {
-				if (!rangeEl) rangeEl = rangeElement.cloneNode(false);
+				if (!rangeEl) rangeEl = blockElement.cloneNode(false);
 				rangeEl.appendChild(insNode);
 			} else {
 				if (selectedFormats) next = selectedFormats[lineIndex + 1];
 				if (rangeEl && rangeEl.children.length > 0) {
-					parent.insertBefore(rangeEl, rangeElement);
+					parent.insertBefore(rangeEl, blockElement);
 					rangeEl = null;
 				}
 
@@ -528,14 +529,20 @@ Format.prototype = {
 					if (next && domUtils.getNodeDepth(insNode) !== domUtils.getNodeDepth(next) && (domUtils.isListCell(parent) || domUtils.getArrayItem(insNode.children, domUtils.isList, false))) {
 						const insNext = insNode.nextElementSibling;
 						const detachRange = this._removeNestedList(insNode, false);
-						if (rangeElement !== detachRange || insNext !== insNode.nextElementSibling) {
-							rangeElement = detachRange;
+						if (blockElement !== detachRange || insNext !== insNode.nextElementSibling) {
+							blockElement = detachRange;
 							reset = true;
 						}
 					} else {
 						const inner = insNode;
 						insNode = domUtils.createElement(
-							remove ? inner.nodeName : domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode) ? 'LI' : domUtils.isTableCell(rangeElement.parentNode) ? 'DIV' : this.options.get('defaultLine')
+							shouldDelete
+								? inner.nodeName
+								: domUtils.isList(blockElement.parentNode) || domUtils.isListCell(blockElement.parentNode)
+								? 'LI'
+								: domUtils.isTableCell(blockElement.parentNode)
+								? 'DIV'
+								: this.options.get('defaultLine')
 						);
 						const isCell = domUtils.isListCell(insNode);
 						const innerChildren = inner.childNodes;
@@ -551,15 +558,15 @@ Format.prototype = {
 				}
 
 				if (!reset) {
-					if (!remove) {
-						if (newRangeElement) {
+					if (!shouldDelete) {
+						if (newBlockElement) {
 							if (!insertedNew) {
-								parent.insertBefore(newRangeElement, rangeElement);
+								parent.insertBefore(newBlockElement, blockElement);
 								insertedNew = true;
 							}
-							insNode = appendNode(newRangeElement, insNode, null, children[i]);
+							insNode = appendNode(newBlockElement, insNode, null, children[i]);
 						} else {
-							insNode = appendNode(parent, insNode, rangeElement, children[i]);
+							insNode = appendNode(parent, insNode, blockElement, children[i]);
 						}
 
 						if (!reset) {
@@ -579,9 +586,9 @@ Format.prototype = {
 
 					if (reset) {
 						reset = moveComplete = false;
-						children = domUtils.getListChildNodes(rangeElement, (current) => current.parentNode === rangeElement);
-						rangeEl = rangeElement.cloneNode(false);
-						parent = rangeElement.parentNode;
+						children = domUtils.getListChildNodes(blockElement, (current) => current.parentNode === blockElement);
+						rangeEl = blockElement.cloneNode(false);
+						parent = blockElement.parentNode;
 						i = -1;
 						len = children.length;
 						continue;
@@ -590,24 +597,24 @@ Format.prototype = {
 			}
 		}
 
-		const rangeParent = rangeElement.parentNode;
-		let rangeRight = rangeElement.nextSibling;
+		const rangeParent = blockElement.parentNode;
+		let rangeRight = blockElement.nextSibling;
 		if (rangeEl?.children.length > 0) {
 			rangeParent.insertBefore(rangeEl, rangeRight);
 		}
 
-		if (newRangeElement) firstNode = newRangeElement.previousSibling;
-		else if (!firstNode) firstNode = rangeElement.previousSibling;
-		rangeRight = rangeElement.nextSibling !== rangeEl ? rangeElement.nextSibling : rangeEl ? rangeEl.nextSibling : null;
+		if (newBlockElement) firstNode = newBlockElement.previousSibling;
+		else if (!firstNode) firstNode = blockElement.previousSibling;
+		rangeRight = blockElement.nextSibling !== rangeEl ? blockElement.nextSibling : rangeEl ? rangeEl.nextSibling : null;
 
-		if (rangeElement.children.length === 0 || rangeElement.textContent.length === 0) {
-			domUtils.removeItem(rangeElement);
+		if (blockElement.children.length === 0 || blockElement.textContent.length === 0) {
+			domUtils.removeItem(blockElement);
 		} else {
-			this.nodeTransform.removeEmptyNode(rangeElement, null, false);
+			this.nodeTransform.removeEmptyNode(blockElement, null, false);
 		}
 
 		let edge = null;
-		if (remove) {
+		if (shouldDelete) {
 			edge = {
 				cc: rangeParent,
 				sc: firstNode,
@@ -631,9 +638,9 @@ Format.prototype = {
 		}
 
 		this.editor.effectNode = null;
-		if (notHistoryPush) return edge;
+		if (skipHistory) return edge;
 
-		if (!remove && edge) {
+		if (!shouldDelete && edge) {
 			if (!selectedFormats) {
 				this.selection.setRange(edge.sc, 0, edge.sc, 0);
 			} else {
@@ -729,7 +736,7 @@ Format.prototype = {
 						if (nested && domUtils.isListCell(o.parentNode)) {
 							this._detachNested(rangeArr.f);
 						} else {
-							afterRange = this.removeBlock(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+							afterRange = this.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
 						}
 
 						o = selectedFormats[i].parentNode;
@@ -751,7 +758,7 @@ Format.prototype = {
 					if (nested && domUtils.isListCell(o.parentNode)) {
 						this._detachNested(rangeArr.f);
 					} else {
-						afterRange = this.removeBlock(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+						afterRange = this.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
 					}
 				}
 			}
@@ -844,10 +851,10 @@ Format.prototype = {
 	 * @description "selectedCells" array are detached from the list element.
 	 * The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
 	 * @param {Array} selectedCells Array of format elements (LI, P...) to remove.
-	 * @param {boolean} remove If true, It does not just remove the list, it deletes the content.
+	 * @param {boolean} shouldDelete If true, It does not just remove the list, it deletes the content.
 	 * @returns {Object} {sc: <LI>, ec: <LI>}.
 	 */
-	removeList(selectedCells, remove) {
+	removeList(selectedCells, shouldDelete) {
 		let rangeArr = {};
 		let listFirst = false;
 		let listLast = false;
@@ -870,7 +877,7 @@ Format.prototype = {
 				if (i === 0) listFirst = true;
 			} else if (r && isList) {
 				if (r !== o) {
-					const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, remove, true);
+					const edge = this.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: null, shouldDelete, skipHistory: true });
 					o = selectedCells[i].parentNode;
 					if (listFirst) {
 						first = edge.sc;
@@ -895,7 +902,7 @@ Format.prototype = {
 			}
 
 			if (lastIndex && domUtils.isList(r)) {
-				const edge = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, null, remove, true);
+				const edge = this.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: null, shouldDelete, skipHistory: true });
 				if (listLast || len === 1) last = edge.ec;
 				if (listFirst) first = edge.sc || last;
 			}
@@ -956,36 +963,40 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description Add, update, and delete style node from selected text. (a, span, strong, ect.)
-	 * 1. If there is a node in the "styleNode" argument, a node with the same tags and attributes as "styleNode" is added to the selection text.
-	 * 2. If it is in the same tag, only the tag's attributes are changed without adding a tag.
-	 * 3. If the "styleNode" argument is null, the node of the selection is update or remove without adding a new node.
-	 * 4. The same style as the style attribute of the "styleArray" argument is deleted.
-	 *    (Styles should be put with attribute names from css. ["background-color"])
-	 * 5. The same class name as the class attribute of the "styleArray" argument is deleted.
-	 *    (The class name is preceded by "." [".className"])
-	 * 6. Use a list of styles and classes of "styleNode" in "styleArray" to avoid duplicate property values.
-	 * 7. If a node with all styles and classes removed has the same tag name as "styleNode" or "removeNodeArray", or "styleNode" is null, that node is deleted.
-	 * 8. Regardless of the style and class of the node, the tag with the same name as the "removeNodeArray" argument value is deleted.
-	 * 9. If the "strictRemove" argument is true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
-	 *10. It won't work if the parent node has the same class and same value style.
-	 *    However, if there is a value in "removeNodeArray", it works and the text node is separated even if there is no node to replace.
-	 * @param {Element|null} styleNode The element to be added to the selection. If it is null, only delete the node.
-	 * @param {Array|null} styleArray The style or className attribute name Array to check (['font-size'], ['.className'], ['font-family', 'color', '.className']...])
-	 * @param {Array|null} removeNodeArray An array of node names to remove types from, remove all formats when "styleNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
-	 * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
-	 * @returns {Element} The element that was added to the selection.
+	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
+	 * @param {Element|null} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
+	 * @param {Object} [options] Options
+	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
+	 *        (e.g., ['font-size'], ['.className'], ['font-family', 'color', '.className'])
+	 * @param {Array<string>} [options.nodesToRemove=null] Array of node names to remove.
+	 *        If empty array or null when styleNode is null, all formats are removed.
+	 *        (e.g., ['span'], ['strong', 'em'])
+	 * @param {boolean} [options.strictRemove=false] If true, only removes nodes from nodesToRemove if all styles and classes are removed.
+	 * @returns {Element} The element that was added to or modified in the selection.
+	 *
+	 * @details
+	 * 1. If styleNode is provided, a node with the same tags and attributes is added to the selected text.
+	 * 2. If the same tag already exists, only its attributes are updated.
+	 * 3. If styleNode is null, existing nodes are updated or removed without adding new ones.
+	 * 4. Styles matching those in stylesToModify are removed. (Use CSS attribute names, e.g., "background-color")
+	 * 5. Classes matching those in stylesToModify (prefixed with ".") are removed.
+	 * 6. stylesToModify is used to avoid duplicate property values from styleNode.
+	 * 7. Nodes with all styles and classes removed are deleted if they match styleNode, are in nodesToRemove, or if styleNode is null.
+	 * 8. Tags matching names in nodesToRemove are deleted regardless of their style and class.
+	 * 9. If strictRemove is true, nodes in nodesToRemove are only removed if all their styles and classes are removed.
+	 * 10. The function won't modify nodes if the parent has the same class and style values.
+	 *     However, if nodesToRemove has values, it will work and separate text nodes even if there's no node to replace.
 	 */
-	applyInlineElement(styleNode, styleArray, removeNodeArray, strictRemove) {
+	applyInlineElement(styleNode, { stylesToModify, nodesToRemove, strictRemove } = {}) {
 		if (domUtils.getParentElement(this.selection.getNode(), domUtils.isNonEditable)) return;
 
 		this.selection._resetRangeToTextNode();
 		let range = this.selection.getRangeAndAddLine(this.selection.getRange(), null);
-		styleArray = styleArray?.length > 0 ? styleArray : false;
-		removeNodeArray = removeNodeArray?.length > 0 ? removeNodeArray : false;
+		stylesToModify = stylesToModify?.length > 0 ? stylesToModify : false;
+		nodesToRemove = nodesToRemove?.length > 0 ? nodesToRemove : false;
 
 		const isRemoveNode = !styleNode;
-		const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
+		const isRemoveFormat = isRemoveNode && !nodesToRemove && !stylesToModify;
 		let startCon = range.startContainer;
 		let startOff = range.startOffset;
 		let endCon = range.endContainer;
@@ -1045,7 +1056,7 @@ Format.prototype = {
 		const newNodeName = styleNode.nodeName;
 
 		/* checked same style property */
-		if (!isRemoveFormat && startCon === endCon && !removeNodeArray && styleNode) {
+		if (!isRemoveFormat && startCon === endCon && !nodesToRemove && styleNode) {
 			let sNode = startCon;
 			let checkCnt = 0;
 			const checkAttrs = [];
@@ -1088,9 +1099,9 @@ Format.prototype = {
 			classRegExp = '',
 			removeNodeRegExp = null;
 
-		if (styleArray) {
-			for (let i = 0, len = styleArray.length, s; i < len; i++) {
-				s = styleArray[i];
+		if (stylesToModify) {
+			for (let i = 0, len = stylesToModify.length, s; i < len; i++) {
+				s = stylesToModify[i];
 				if (/^\./.test(s)) {
 					classRegExp += (classRegExp ? '|' : '\\s*(?:') + s.replace(/^\./, '');
 				} else {
@@ -1109,10 +1120,10 @@ Format.prototype = {
 			}
 		}
 
-		if (removeNodeArray) {
-			removeNodeRegExp = '^(?:' + removeNodeArray[0];
-			for (let i = 1; i < removeNodeArray.length; i++) {
-				removeNodeRegExp += '|' + removeNodeArray[i];
+		if (nodesToRemove) {
+			removeNodeRegExp = '^(?:' + nodesToRemove[0];
+			for (let i = 1; i < nodesToRemove.length; i++) {
+				removeNodeRegExp += '|' + nodesToRemove[i];
 			}
 			removeNodeRegExp += ')$';
 			removeNodeRegExp = new wRegExp(removeNodeRegExp, 'i');
@@ -1232,7 +1243,7 @@ Format.prototype = {
 						if (inst._isNonSplitNode(arr[n]) || inst._sn_isSizeNode(arr[n])) return true;
 					}
 					return false;
-				})(this, removeNodeArray));
+				})(this, nodesToRemove));
 
 		const isSizeNode = isRemoveNode || this._sn_isSizeNode(newNode);
 		const _getMaintainedNode = this._sn_getMaintainedNode.bind(this, isRemoveAnchor, isSizeNode);
@@ -1240,7 +1251,7 @@ Format.prototype = {
 
 		// one line
 		if (oneLine) {
-			if (this._sn_resetCommonListCell(lineNodes[0], styleArray)) range = this.selection.setRange(startCon, startOff, endCon, endOff);
+			if (this._sn_resetCommonListCell(lineNodes[0], stylesToModify)) range = this.selection.setRange(startCon, startOff, endCon, endOff);
 
 			const newRange = this._setNode_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
 			start.container = newRange.startContainer;
@@ -1255,8 +1266,8 @@ Format.prototype = {
 		} else {
 			// multi line
 			let appliedCommonList = false;
-			if (endLength > 0 && this._sn_resetCommonListCell(lineNodes[endLength], styleArray)) appliedCommonList = true;
-			if (this._sn_resetCommonListCell(lineNodes[0], styleArray)) appliedCommonList = true;
+			if (endLength > 0 && this._sn_resetCommonListCell(lineNodes[endLength], stylesToModify)) appliedCommonList = true;
+			if (this._sn_resetCommonListCell(lineNodes[0], stylesToModify)) appliedCommonList = true;
 			if (appliedCommonList) this.selection.setRange(startCon, startOff, endCon, endOff);
 
 			// end
@@ -1267,7 +1278,7 @@ Format.prototype = {
 
 			// mid
 			for (let i = endLength - 1, newRange; i > 0; i--) {
-				this._sn_resetCommonListCell(lineNodes[i], styleArray);
+				this._sn_resetCommonListCell(lineNodes[i], stylesToModify);
 				newNode = styleNode.cloneNode(false);
 				newRange = this._setNode_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
 				if (newRange.endContainer && newRange.ancestor.contains(newRange.endContainer)) {
@@ -1310,7 +1321,7 @@ Format.prototype = {
 	 * @description Remove format of the currently selected text.
 	 */
 	removeInlineElement() {
-		this.applyInlineElement(null, null, null, null);
+		this.applyInlineElement(null, { stylesToModify: null, nodesToRemove: null, strictRemove: null });
 	},
 
 	/**

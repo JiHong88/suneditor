@@ -35,7 +35,7 @@ Blockquote.prototype = {
 		const currentBlockquote = domUtils.getParentElement(this.selection.getNode(), 'blockquote');
 
 		if (currentBlockquote) {
-			this.format.removeBlock(currentBlockquote, null, null, false, false);
+			this.format.removeBlock(currentBlockquote, { selectedFormats: null, newBlockElement: null, shouldDelete: false, skipHistory: false });
 		} else {
 			this.format.applyBlock(this.quoteTag.cloneNode(false));
 		}

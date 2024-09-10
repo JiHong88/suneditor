@@ -89,9 +89,9 @@ Link.prototype = {
 		if (!this.isUpdateState) {
 			const selectedFormats = this.format.getLines();
 			if (selectedFormats.length > 1) {
-				if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), null, false)) return true;
+				if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), { afterNode: null, skipCharCount: false })) return true;
 			} else {
-				if (!this.html.insertNode(oA, null, false)) return true;
+				if (!this.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return true;
 			}
 
 			this.selection.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
@@ -138,7 +138,7 @@ Link.prototype = {
 				true
 			);
 			this.selection.setRange(sc, 0, ec, ec.textContent.length);
-			this.format.applyInlineElement(null, null, ['A'], false);
+			this.format.applyInlineElement(null, { stylesToModify: null, nodesToRemove: ['A'], strictRemove: false });
 		} else {
 			/** delete */
 			domUtils.removeItem(this.controller.currentTarget);

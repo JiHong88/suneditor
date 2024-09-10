@@ -425,7 +425,7 @@ Viewer.prototype = {
 		this.editor._offCurrentController();
 		this.editor._offCurrentModal();
 
-		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get(true)) : this.html.get(true);
+		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get({ withFrame: true })) : this.html.get({ withFrame: true });
 		const windowObject = this._w.open('', '_blank');
 		windowObject.mimeType = 'text/html';
 		const wDoc = this.editor.frameContext.get('_wd');

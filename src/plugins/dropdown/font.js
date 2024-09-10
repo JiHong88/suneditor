@@ -80,9 +80,9 @@ Font.prototype = {
 			if ((await this.triggerEvent('onFontActionBefore', { value })) === false) return;
 
 			const newNode = domUtils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
-			this.format.applyInlineElement(newNode, ['font-family'], null, null);
+			this.format.applyInlineElement(newNode, { stylesToModify: ['font-family'], nodesToRemove: null, strictRemove: null });
 		} else {
-			this.format.applyInlineElement(null, ['font-family'], ['span'], true);
+			this.format.applyInlineElement(null, { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true });
 		}
 
 		this.menu.dropdownOff();

@@ -334,7 +334,7 @@ HTML.prototype = {
 						domUtils.removeItem(c);
 						continue;
 					}
-					t = this.insertNode(c, a, true);
+					t = this.insertNode(c, { afterNode: a, skipCharCount: true });
 					a = t.container || t;
 					if (!firstCon) firstCon = t;
 					prev = c;
@@ -360,7 +360,7 @@ HTML.prototype = {
 				if (this.format.isLine(html) || domUtils.isMedia(html)) {
 					afterNode = this.format.getLine(this.selection.getNode(), null);
 				}
-				this.insertNode(html, afterNode, skipCharCount);
+				this.insertNode(html, { afterNode, skipCharCount });
 			}
 		}
 
@@ -374,11 +374,12 @@ HTML.prototype = {
 	 * If the "afterNode" exists, it is inserted after the "afterNode"
 	 * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
 	 * @param {Node} oNode Node to be inserted
-	 * @param {Node|null} afterNode If the node exists, it is inserted after the node
-	 * @param {boolean|null} skipCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
+	 * @param {Object} [options] Options
+	 * @param {Node} [options.afterNode=null] If the node exists, it is inserted after the node
+	 * @param {boolean} [options.skipCharCount=null] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @returns {Object|Node|null}
 	 */
-	insertNode(oNode, afterNode, skipCharCount) {
+	insertNode(oNode, { afterNode, skipCharCount } = {}) {
 		let result = null;
 		if (this.editor.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(oNode, null))) {
 			return result;
@@ -966,13 +967,14 @@ HTML.prototype = {
 
 	/**
 	 * @description Gets the current content
-	 * @param {boolean} withFrame Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
+	 * @param {Object} [options] Options
+	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
 	 * Ignored for targetOptions.get('iframe_fullPage') is true.
-	 * @param {boolean} includeFullPage Return only the content of the body without headers when the "iframe_fullPage" option is true
-	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 * @param {boolean} [options.includeFullPage=false] Return only the content of the body without headers when the "iframe_fullPage" option is true
+	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 * @returns {string|Array.<string>}
 	 */
-	get(withFrame, includeFullPage, rootKey) {
+	get({ withFrame, includeFullPage, rootKey } = {}) {
 		if (!rootKey) rootKey = [this.status.rootKey];
 		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
 
@@ -1010,10 +1012,11 @@ HTML.prototype = {
 
 	/**
 	 * @description Sets the HTML string
-	 * @param {string|undefined} html HTML string
-	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 * @param {string} html HTML string
+	 * @param {Object} [options] Options
+	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 */
-	set(html, rootKey) {
+	set(html, { rootKey } = {}) {
 		this.selection.removeRange();
 		const convertValue = html === null || html === undefined ? '' : this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
 
@@ -1036,16 +1039,17 @@ HTML.prototype = {
 
 	/**
 	 * @description Add content to the end of content.
-	 * @param {string} content Content to Input
-	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 * @param {string} html Content to Input
+	 * @param {Object} [options] Options
+	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 */
-	add(content, rootKey) {
+	add(html, { rootKey } = {}) {
 		if (!rootKey) rootKey = [this.status.rootKey];
 		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
-			const convertValue = this.clean(content, { forceFormat: true, whitelist: null, blacklist: null });
+			const convertValue = this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
 
 			if (!this.editor.frameContext.get('isCodeView')) {
 				const temp = domUtils.createElement('DIV', null, convertValue);
@@ -1066,9 +1070,10 @@ HTML.prototype = {
 	/**
 	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
 	 * @param {Object} ctx { head: HTML string, body: HTML string}
-	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 * @param {Object} [options] Options
+	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 */
-	setFullPage(ctx, rootKey) {
+	setFullPage(ctx, { rootKey } = {}) {
 		if (!this.editor.frameOptions.get('iframe')) return false;
 
 		if (!rootKey) rootKey = [this.status.rootKey];

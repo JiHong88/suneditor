@@ -70,7 +70,7 @@ TextStyle.prototype = {
 
 		const newNode = domUtils.hasClass(target, 'active') ? null : tempElement.cloneNode(false);
 		const removeNodes = newNode ? null : [tempElement.nodeName];
-		this.format.applyInlineElement(newNode, checkStyles, removeNodes, true);
+		this.format.applyInlineElement(newNode, { stylesToModify: checkStyles, nodesToRemove: removeNodes, strictRemove: true });
 
 		this.menu.dropdownOff();
 	},
