@@ -154,11 +154,11 @@ Figure.CreateCaption = function (cover, text) {
  * @returns {object} {container, cover, caption}
  */
 Figure.GetContainer = function (element) {
-	const cover = domUtils.getParentElement(element, 'FIGURE');
-	const inlineCover = domUtils.getParentElement(element, 'SPAN');
+	const cover = domUtils.getParentElement(element, 'FIGURE', 2);
+	const inlineCover = domUtils.getParentElement(element, 'SPAN', 2);
 	return {
 		target: element,
-		container: domUtils.getParentElement(element, Figure.__is) || cover,
+		container: domUtils.getParentElement(element, Figure.__is, 2) || cover,
 		cover: cover,
 		inlineCover: domUtils.hasClass(inlineCover, 'se-inline-component') ? inlineCover : null,
 		caption: domUtils.getEdgeChild(element.parentElement, 'FIGCAPTION')
