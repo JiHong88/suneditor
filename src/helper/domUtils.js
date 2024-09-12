@@ -308,9 +308,10 @@ export function compareElements(a, b) {
  * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
+	* @param {number?} depth Number of parent levels to depth.
  * @returns {Element|null}
  */
-export function getParentElement(element, query) {
+export function getParentElement(element, query, depth) {
 	let check;
 
 	if (typeof query === 'function') {
@@ -341,11 +342,14 @@ export function getParentElement(element, query) {
 		};
 	}
 
+	if (!depth) depth = Infinity;
+	let index = 0;
 	while (element && !check(element)) {
-		if (isWysiwygFrame(element)) {
+		if (index >= depth || isWysiwygFrame(element)) {
 			return null;
 		}
 		element = element.parentNode;
+		index++;
 	}
 
 	return element;
@@ -359,9 +363,10 @@ export function getParentElement(element, query) {
  * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
+	* @param {number?} depth Number of parent levels to depth.
  * @returns {Element|null}
  */
-export function getParentElements(element, query) {
+export function getParentElements(element, query, depth) {
 	let check;
 
 	if (typeof query === 'function') {
@@ -393,11 +398,14 @@ export function getParentElements(element, query) {
 	}
 
 	const elementList = [];
-	while (element && !isWysiwygFrame(element)) {
+	if (!depth) depth = Infinity;
+	let index = 0;
+	while (index <= depth && element && !isWysiwygFrame(element)) {
 		if (check(element)) {
 			elementList.push(element);
 		}
 		element = element.parentNode;
+		index++;
 	}
 
 	return elementList;
