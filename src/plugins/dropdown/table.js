@@ -758,6 +758,7 @@ Table.prototype = {
 
 	setCellInfo(tdElement, reset) {
 		const table = this.seTableInfo(tdElement);
+		if (!table) return;
 		this._trElement = tdElement.parentNode;
 
 		// hedaer
