@@ -1052,6 +1052,13 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 
 		this.history.push(false);
 
+		// document type
+		if (frameContext.has('documentType-use-header')) {
+			if (DOCUMENT_TYPE_OBSERVER_KEYCODE.test(keyCode)) {
+				frameContext.get('documentType').reHeader();
+			}
+		}
+
 		return;
 	}
 
