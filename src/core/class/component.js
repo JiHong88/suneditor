@@ -99,6 +99,11 @@ Component.prototype = {
 			}
 		}
 
+		// document type
+		if (this.editor.frameContext.has('documentType-use-header')) {
+			this.editor.frameContext.get('documentType').reHeader();
+		}
+
 		return oNode || element;
 	},
 

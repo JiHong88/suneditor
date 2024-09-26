@@ -216,6 +216,7 @@ const Table = function (editor, pluginOptions) {
 	// member - multi selecte
 	this._selectedCells = null;
 	this._shift = false;
+	this.__s = false;
 	this._fixedCell = null;
 	this._fixedCellName = null;
 	this._selectedCell = null;
@@ -466,9 +467,10 @@ Table.prototype = {
 	 */
 	onKeyDown({ event, range, line }) {
 		this._ref = null;
-		if (this.editor.selectMenuOn || this._resizing) return;
+		if (this.editor.selectMenuOn || this._resizing || this.__s) return;
 
 		const keyCode = event.keyCode;
+		this.__s = event.shiftKey;
 		// table tabkey
 		if (keyCode === 9) {
 			const tableCell = domUtils.getParentElement(line, domUtils.isTableCell);
@@ -526,6 +528,7 @@ Table.prototype = {
 
 		cell = cell || domUtils.getParentElement(line, domUtils.isTableCell);
 		if (cell) {
+			this.__s = false;
 			this._fixedCell = cell;
 			this._closeController();
 			this.selectCells(cell, event.shiftKey);
@@ -540,6 +543,7 @@ Table.prototype = {
 	 * @param {Element} line Current line element
 	 */
 	onKeyUp({ line }) {
+		this.__s = false;
 		if (this._shift && domUtils.getParentElement(line, domUtils.isTableCell) === this._fixedCell) {
 			this._deleteStyleSelectedCells();
 			this._toggleEditor(true);
@@ -729,6 +733,7 @@ Table.prototype = {
 	},
 
 	selectCells(tdElement, shift) {
+		this.__s = shift;
 		if (!this._shift && !this._ref) this.__removeGlobalEvents();
 
 		this._shift = shift;
