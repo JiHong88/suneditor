@@ -1356,11 +1356,11 @@ Table.prototype = {
 			if (!this._maxWidth) {
 				sizeIcon = this.icons.expansion;
 				text = this.maxText;
-				if (!ondisplay) targets.style.width = 'min-content';
+				targets.style.width = 'min-content';
 			} else {
 				sizeIcon = this.icons.reduction;
 				text = this.minText;
-				if (!ondisplay) targets.style.width = '100%';
+				targets.style.width = '100%';
 			}
 
 			domUtils.changeElement(this.resizeButton.firstElementChild, sizeIcon);
@@ -1396,6 +1396,7 @@ Table.prototype = {
 	 */
 	select(target) {
 		this._figureOpen(target);
+		if (!this._figure) this.seTableInfo(target);
 
 		const targetWidth = this._figure?.style.width || '100%';
 		this._maxWidth = targetWidth === '100%';
