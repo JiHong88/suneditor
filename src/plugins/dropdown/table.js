@@ -656,13 +656,13 @@ Table.prototype = {
 				break;
 			case 'resize':
 				this._maxWidth = !this._maxWidth;
-				this.setTableStyle('width', false);
+				this.setTableStyle('width');
 				this._historyPush();
 				this.component.select(this._element, Table.key, true);
 				break;
 			case 'layout':
 				this._fixedColumn = !this._fixedColumn;
-				this.setTableStyle('column', false);
+				this.setTableStyle('column');
 				this._historyPush();
 				this.component.select(this._element, Table.key, true);
 				break;
@@ -1347,7 +1347,7 @@ Table.prototype = {
 		this.setCellControllerPosition(this._tdElement, false);
 	},
 
-	setTableStyle(styles, ondisplay) {
+	setTableStyle(styles) {
 		if (styles.includes('width')) {
 			const targets = this._figure;
 			if (!targets) return;
@@ -1401,7 +1401,7 @@ Table.prototype = {
 		const targetWidth = this._figure?.style.width || '100%';
 		this._maxWidth = targetWidth === '100%';
 		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
-		this.setTableStyle(this._maxWidth ? 'width|column' : 'width', true);
+		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
 
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
 
