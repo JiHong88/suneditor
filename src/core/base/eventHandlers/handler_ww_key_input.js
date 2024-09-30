@@ -33,7 +33,8 @@ function LineDelete_next(formatEl) {
 function LineDelete_prev(formatEl) {
 	const formatChild = formatEl.childNodes;
 	const prev = formatEl.previousElementSibling;
-	const focusNode = formatChild[0];
+	let focusNode = formatChild[0];
+	let focusOffset = 0;
 
 	if (!prev) return focusNode;
 
@@ -42,13 +43,18 @@ function LineDelete_prev(formatEl) {
 		return focusNode;
 	}
 
-	while (formatChild[0]) {
-		prev.appendChild(formatChild[0]);
+	if (formatChild.length > 1 || formatChild[0]?.textContent.length > 0) {
+		while (formatChild[0]) {
+			prev.appendChild(formatChild[0]);
+		}
+	} else {
+		focusNode = prev.lastChild;
+		focusOffset = focusNode.textContent.length;
 	}
 
 	domUtils.removeItem(formatEl);
 
-	return focusNode;
+	return { focusNode, focusOffset };
 }
 
 export function OnInput_wysiwyg(frameContext, e) {
@@ -159,15 +165,15 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						focusNode = LineDelete_next(formatEl);
 						this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
 					} else {
-						focusNode = LineDelete_prev(formatEl);
-						this.selection.setRange(focusNode, 0, focusNode, 0);
+						const prevInfo = LineDelete_prev(formatEl);
+						this.selection.setRange(prevInfo.focusNode, prevInfo.focusOffset, prevInfo.focusNode, prevInfo.focusOffset);
 					}
 					this.history.push(true);
 					return;
 				}
 
-				focusNode = LineDelete_prev(formatEl);
-				this.selection.setRange(focusNode, 0, focusNode, 0);
+				const prevInfo = LineDelete_prev(formatEl);
+				this.selection.setRange(prevInfo.focusNode, prevInfo.focusOffset, prevInfo.focusNode, prevInfo.focusOffset);
 				this.history.push(true);
 
 				return;
@@ -397,8 +403,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						focusNode = LineDelete_next(formatEl);
 						this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
 					} else {
-						focusNode = LineDelete_prev(formatEl);
-						this.selection.setRange(focusNode, 0, focusNode, 0);
+						const prevInfo = LineDelete_prev(formatEl);
+						this.selection.setRange(prevInfo.focusNode, prevInfo.focusOffset, prevInfo.focusNode, prevInfo.focusOffset);
 					}
 					this.history.push(true);
 					return;

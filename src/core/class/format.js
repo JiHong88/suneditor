@@ -1334,14 +1334,14 @@ Format.prototype = {
 	isEdgeLine(node, offset, dir) {
 		if (!domUtils.isEdgePoint(node, offset, dir)) return false;
 
-		const result = [];
+		let result = false;
 		dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
 		while (node && !this.isLine(node) && !domUtils.isWysiwygFrame(node)) {
 			if (!node[dir] || (domUtils.isBreak(node[dir]) && !node[dir][dir])) {
-				if (node.nodeType === 1) result.push(node.cloneNode(false));
+				if (node.nodeType === 1) result = true;
 				node = node.parentNode;
 			} else {
-				return null;
+				return false;
 			}
 		}
 
