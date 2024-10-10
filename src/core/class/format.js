@@ -1338,7 +1338,7 @@ Format.prototype = {
 		dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
 		while (node && !this.isLine(node) && !domUtils.isWysiwygFrame(node)) {
 			if (!node[dir] || (domUtils.isBreak(node[dir]) && !node[dir][dir])) {
-				if (node.nodeType === 1) result = true;
+				result = true;
 				node = node.parentNode;
 			} else {
 				return false;
