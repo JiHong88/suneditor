@@ -656,13 +656,13 @@ Table.prototype = {
 				break;
 			case 'resize':
 				this._maxWidth = !this._maxWidth;
-				this.setTableStyle('width');
+				this.setTableStyle('width', false);
 				this._historyPush();
 				this.component.select(this._element, Table.key, true);
 				break;
 			case 'layout':
 				this._fixedColumn = !this._fixedColumn;
-				this.setTableStyle('column');
+				this.setTableStyle('column', false);
 				this._historyPush();
 				this.component.select(this._element, Table.key, true);
 				break;
@@ -1347,7 +1347,7 @@ Table.prototype = {
 		this.setCellControllerPosition(this._tdElement, false);
 	},
 
-	setTableStyle(styles) {
+	setTableStyle(styles, ondisplay) {
 		if (styles.includes('width')) {
 			const targets = this._figure;
 			if (!targets) return;
@@ -1356,11 +1356,11 @@ Table.prototype = {
 			if (!this._maxWidth) {
 				sizeIcon = this.icons.expansion;
 				text = this.maxText;
-				targets.style.width = 'min-content';
+				if (!ondisplay) targets.style.width = 'min-content';
 			} else {
 				sizeIcon = this.icons.reduction;
 				text = this.minText;
-				targets.style.width = '100%';
+				if (!ondisplay) targets.style.width = '100%';
 			}
 
 			domUtils.changeElement(this.resizeButton.firstElementChild, sizeIcon);
@@ -1401,7 +1401,7 @@ Table.prototype = {
 		const targetWidth = this._figure?.style.width || '100%';
 		this._maxWidth = targetWidth === '100%';
 		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
-		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
+		this.setTableStyle(this._maxWidth ? 'width|column' : 'width', true);
 
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
 
