@@ -161,12 +161,14 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				let focusNode;
 				if (!range.collapsed) {
 					this.html.remove();
-					if (formatEl.contains(range.startContainer)) {
-						focusNode = LineDelete_next(formatEl);
-						this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
-					} else {
-						const prevInfo = LineDelete_prev(formatEl);
-						this.selection.setRange(prevInfo.focusNode, prevInfo.focusOffset, prevInfo.focusNode, prevInfo.focusOffset);
+					if (formatEl.parentElement) {
+						if (formatEl.contains(range.startContainer)) {
+							focusNode = LineDelete_next(formatEl);
+							this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
+						} else {
+							const prevInfo = LineDelete_prev(formatEl);
+							this.selection.setRange(prevInfo.focusNode, prevInfo.focusOffset, prevInfo.focusNode, prevInfo.focusOffset);
+						}
 					}
 					this.history.push(true);
 					return;
@@ -399,12 +401,14 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				let focusNode;
 				if (!range.collapsed) {
 					this.html.remove();
-					if (formatEl.contains(range.startContainer)) {
-						focusNode = LineDelete_next(formatEl);
-						this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
-					} else {
-						const prevInfo = LineDelete_prev(formatEl);
-						this.selection.setRange(prevInfo.focusNode, prevInfo.focusOffset, prevInfo.focusNode, prevInfo.focusOffset);
+					if (formatEl.parentElement) {
+						if (formatEl.contains(range.startContainer)) {
+							focusNode = LineDelete_next(formatEl);
+							this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
+						} else {
+							const prevInfo = LineDelete_prev(formatEl);
+							this.selection.setRange(prevInfo.focusNode, prevInfo.focusOffset, prevInfo.focusNode, prevInfo.focusOffset);
+						}
 					}
 					this.history.push(true);
 					return;
