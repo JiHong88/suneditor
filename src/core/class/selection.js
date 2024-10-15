@@ -469,7 +469,7 @@ Selection.prototype = {
 			while (endCon?.nodeType === 1 && endCon.lastChild) {
 				endCon = endCon.lastChild;
 			}
-			endOff = endCon.textContent.length;
+			if (endOff > 0) endOff = endCon.textContent.length;
 		}
 
 		// startContainer
