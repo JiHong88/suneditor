@@ -38,6 +38,11 @@ ExportPDF.prototype = {
 	 * @param {Element} target Target command button
 	 */
 	async action() {
+		if (!this.apiUrl) {
+			console.warn('[SUNEDITOR.plugins.exportPDF.error] Requires exportPDF."apiUrl" options.');
+			return;
+		}
+
 		this.editor.showLoading();
 		let ww = null;
 
@@ -45,11 +50,10 @@ ExportPDF.prototype = {
 			const editableDiv = domUtils.createElement('div', { class: this.editor.frameContext.get('wysiwyg').className }, this.html.get());
 			ww = domUtils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
 
-			if (this.apiUrl) {
-				const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;
-				const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
-				inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '';
-				ww.innerHTML = `
+			const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;
+			const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
+			inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '';
+			ww.innerHTML = `
 				<style>
 					@page {
 						size: A4;
@@ -57,7 +61,6 @@ ExportPDF.prototype = {
 					}
 				</style>
 				${inlineWW.outerHTML}`;
-			}
 
 			_d.body.appendChild(ww);
 
@@ -70,7 +73,7 @@ ExportPDF.prototype = {
 		} catch (error) {
 			console.error(`[SUNEDITOR.plugins.exportPDF.error] ${error.message}`);
 		} finally {
-			// domUtils.removeItem(ww);
+			domUtils.removeItem(ww);
 			this.editor.hideLoading();
 		}
 	},
