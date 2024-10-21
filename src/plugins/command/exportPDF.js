@@ -47,10 +47,11 @@ ExportPDF.prototype = {
 		let ww = null;
 
 		try {
-			const editableDiv = domUtils.createElement('div', { class: this.editor.frameContext.get('wysiwyg').className }, this.html.get());
+			const standardWW = this.editor.frameContext.get('documentTypePageMirror') || this.editor.frameContext.get('wysiwygFrame');
+			const editableDiv = domUtils.createElement('div', { class: standardWW.className }, standardWW.innerHTML);
 			ww = domUtils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
 
-			const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;
+			const innerPadding = this._w.getComputedStyle(standardWW).padding;
 			const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
 			inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '';
 			ww.innerHTML = `

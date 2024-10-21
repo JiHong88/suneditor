@@ -42,7 +42,9 @@ const DocumentType = function (editor, fc) {
 	this._positionCache = new Map();
 
 	const mirrorStyles = _w.getComputedStyle(this._mirror);
-	A4_PAGE_HEIGHT = A4_HEIGHT - numbers.get(mirrorStyles.paddingTop) - numbers.get(mirrorStyles.paddingBottom);
+	this._paddingTop = numbers.get(mirrorStyles.paddingTop);
+	this._paddingBottom = numbers.get(mirrorStyles.paddingBottom);
+	A4_PAGE_HEIGHT = A4_HEIGHT + this._paddingTop + this._paddingBottom;
 
 	// init header
 	if (this.useHeader) {
@@ -149,12 +151,21 @@ DocumentType.prototype = {
 		const chr = this.ww.children;
 		const mChr = this._mirror.children;
 		this._initializeCache(mChr);
-		for (let i = 0; i < totalPages; i++) {
-			const t = i * A4_PAGE_HEIGHT;
+		pages.push({ number: 0, top: 0 });
+		for (let i = 1, t = 0; i < totalPages; i++) {
+			t += A4_PAGE_HEIGHT + (i === 1 ? this._paddingTop : 0);
 			if (!pages.some((p) => Math.abs(p.top - t) < 1)) {
-				const pt = this._getElementAtPosition(t, mChr);
-				if (!chr[pt]) break;
-				pages.push({ number: i, top: pt === 0 ? 0 : chr[pt].offsetTop + chr[pt].offsetHeight });
+				const { ci, cm, ch } = this._getElementAtPosition(t, mChr);
+				const el = chr[ci];
+				if (!el) break;
+
+				if (chr[this._mirrorCache]) {
+					t += numbers.get(_w.getComputedStyle(chr[this._mirrorCache]).marginBottom);
+				}
+
+				const elBottom = el.offsetTop + el.offsetHeight;
+				const top = elBottom + cm + (el.offsetHeight - ch);
+				pages.push({ number: i, top });
 			}
 		}
 
@@ -198,20 +209,20 @@ DocumentType.prototype = {
 		}
 	},
 
-	_getElementAtPosition(top, mChr) {
+	_getElementAtPosition(pageTop, mChr) {
 		let start = this._mirrorCache;
 		let end = mChr.length - 1;
 
 		while (start <= end) {
 			const mid = Math.floor((start + end) / 2);
-			const element = this._positionCache.get(mid);
-			const elementTop = element.top;
+			const { top, height, bottom } = this._positionCache.get(mid);
 
-			if (top >= elementTop && top <= element.bottom) {
-				return (this._mirrorCache = mid);
+			if (pageTop >= top && pageTop <= bottom) {
+				this._mirrorCache = mid;
+				return { ci: mid, cm: pageTop - bottom, ch: height };
 			}
 
-			if (top < elementTop) {
+			if (pageTop < top) {
 				end = mid - 1;
 			} else {
 				start = mid + 1;
@@ -219,7 +230,9 @@ DocumentType.prototype = {
 		}
 
 		const closestIndex = mChr[start] ? start : end;
-		return (this._mirrorCache = closestIndex);
+		this._mirrorCache = closestIndex;
+		const iElement = this._positionCache.get(closestIndex);
+		return { ci: closestIndex, cm: pageTop - iElement.bottom, ch: iElement.height };
 	},
 
 	resizePage() {
