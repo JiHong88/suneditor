@@ -767,18 +767,21 @@ HTML.prototype = {
 						domUtils.removeItem(parent);
 						return {
 							container: parentNext,
-							offset: parentNextOffset
+							offset: parentNextOffset,
+							commonCon
 						};
 					} else {
 						return {
 							container: next,
-							offset: nextOffset
+							offset: nextOffset,
+							commonCon
 						};
 					}
 				} else {
 					return {
 						container: parentNext,
-						offset: parentNextOffset
+						offset: parentNextOffset,
+						commonCon
 					};
 				}
 			} else {
@@ -803,7 +806,8 @@ HTML.prototype = {
 
 					return {
 						container: rEl,
-						offset: rOffset
+						offset: rOffset,
+						commonCon
 					};
 				}
 
@@ -816,7 +820,8 @@ HTML.prototype = {
 		if (!startCon || !endCon)
 			return {
 				container: commonCon,
-				offset: 0
+				offset: 0,
+				commonCon
 			};
 
 		if (startCon === endCon && range.collapsed) {
@@ -824,7 +829,8 @@ HTML.prototype = {
 				return {
 					container: startCon,
 					offset: startOff,
-					prevContainer: startCon && startCon.parentNode ? startCon : null
+					prevContainer: startCon && startCon.parentNode ? startCon : null,
+					commonCon
 				};
 			}
 		}
@@ -856,12 +862,14 @@ HTML.prototype = {
 				if (this.format.isLine(commonCon) || this.format.isBlock(commonCon) || domUtils.isWysiwygFrame(commonCon) || domUtils.isBreak(commonCon) || domUtils.isMedia(commonCon)) {
 					return {
 						container: commonCon,
-						offset: 0
+						offset: 0,
+						commonCon
 					};
 				} else if (commonCon.nodeType === 3) {
 					return {
 						container: commonCon,
-						offset: endOff
+						offset: endOff,
+						commonCon
 					};
 				}
 				childNodes.push(commonCon);
@@ -871,7 +879,8 @@ HTML.prototype = {
 				if (domUtils.isBreak(startCon) || domUtils.isZeroWith(startCon)) {
 					return {
 						container: domUtils.isMedia(commonCon) ? commonCon : startCon,
-						offset: 0
+						offset: 0,
+						commonCon
 					};
 				}
 			}
@@ -937,7 +946,18 @@ HTML.prototype = {
 			offset = container.textContent.length;
 		} else {
 			container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : range.endContainer || range.startContainer;
-			offset = !isStartEdge && !isEndEdge ? offset : isEndEdge ? container.textContent.length : 0;
+			if (isStartEdge || isEndEdge) {
+				if (isEndEdge) {
+					if (container.nodeType === 1 && container.childNodes.length === 0) {
+						container.appendChild(domUtils.createElement('BR'));
+						offset = 1;
+					} else {
+						offset = container.textContent.length;
+					}
+				} else {
+					offset = 0;
+				}
+			}
 		}
 
 		if (!this.format.getLine(container) && !(startCon && startCon.parentNode)) {
@@ -959,9 +979,10 @@ HTML.prototype = {
 		this.selection.setRange(container, offset, container, offset);
 
 		return {
-			container: container,
-			offset: offset,
-			prevContainer: prevContainer
+			container,
+			offset,
+			prevContainer,
+			commonCon
 		};
 	},
 
