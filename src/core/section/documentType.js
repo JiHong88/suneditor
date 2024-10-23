@@ -105,8 +105,10 @@ DocumentType.prototype = {
 		this.innerHeaders = inner.querySelectorAll('div');
 	},
 
-	rePage(force) {
+	async rePage(force) {
 		if (!this.page) return;
+
+		await domUtils.waitForMediaLoad(this._mirror, 1500);
 
 		const mirrorHeight = this._mirror.scrollHeight;
 		const pageBreaks = this._mirror.querySelectorAll('.se-page-break');

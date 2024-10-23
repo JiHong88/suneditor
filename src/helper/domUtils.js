@@ -1185,6 +1185,44 @@ export function applyInlineStylesAll(wwTarget, includeWW, styles) {
 	return wwTarget;
 }
 
+/**
+ * @description Wait for media elements to load
+ * @param {number} timeout Timeout milliseconds
+ * @param {Element} target Target element
+ * @returns {Promise<void>}
+ */
+function waitForMediaLoad(target, timeout = 2500) {
+	const doc = target || _d;
+	return new Promise((resolveAll) => {
+		const selectors = ['img', 'video', 'audio', 'iframe'];
+		const mediaElements = selectors.flatMap((selector) => Array.from(doc.querySelectorAll(selector)));
+
+		if (mediaElements.length === 0) {
+			resolveAll();
+			return;
+		}
+
+		// media promise
+		const mediaPromises = mediaElements.map((element) => {
+			// already loaded - resolve
+			if (element.complete !== false && element.readyState >= 2) {
+				return Promise.resolve();
+			}
+
+			// load event
+			return new Promise((resolve) => {
+				element.addEventListener('load', resolve, { once: true });
+				element.addEventListener('error', resolve, { once: true });
+			});
+		});
+
+		// Promise.race
+		Promise.race([Promise.all(mediaPromises), new Promise((resolve) => setTimeout(resolve, timeout))]).then(() => {
+			resolveAll();
+		});
+	});
+}
+
 const domUtils = {
 	isZeroWith,
 	createElement,
@@ -1247,7 +1285,8 @@ const domUtils = {
 	getNextDeepestNode,
 	findTextIndexOnLine,
 	findTabEndIndex,
-	applyInlineStylesAll
+	applyInlineStylesAll,
+	waitForMediaLoad
 };
 
 export default domUtils;
