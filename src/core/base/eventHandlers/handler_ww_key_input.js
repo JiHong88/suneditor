@@ -684,8 +684,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			}
 
 			if (!shift) {
-				const formatEndEdge = this.format.isEdgeLine(range.endContainer, range.endOffset, 'end');
-				const formatStartEdge = this.format.isEdgeLine(range.startContainer, range.startOffset, 'start');
+				const formatEndEdge = !range.endContainer.nextSibling && this.format.isEdgeLine(range.endContainer, range.endOffset, 'end');
+				const formatStartEdge = !range.startContainer.previousSibling && this.format.isEdgeLine(range.startContainer, range.startOffset, 'start');
 
 				// add default format line
 				if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
