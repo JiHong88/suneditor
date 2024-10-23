@@ -160,8 +160,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 				let focusNode;
 				if (!range.collapsed) {
-					this.html.remove();
-					if (formatEl.parentElement) {
+					const rInfo = this.html.remove();
+					if (rInfo.commonCon !== rInfo.container && formatEl.parentElement) {
 						if (formatEl.contains(range.startContainer)) {
 							focusNode = LineDelete_next(formatEl);
 							this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
@@ -400,8 +400,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 				let focusNode;
 				if (!range.collapsed) {
-					this.html.remove();
-					if (formatEl.parentElement) {
+					const rInfo = this.html.remove();
+					if (rInfo.commonCon !== rInfo.container && formatEl.parentElement) {
 						if (formatEl.contains(range.startContainer)) {
 							focusNode = LineDelete_next(formatEl);
 							this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
