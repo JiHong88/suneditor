@@ -1191,7 +1191,7 @@ export function applyInlineStylesAll(wwTarget, includeWW, styles) {
  * @param {Element} target Target element
  * @returns {Promise<void>}
  */
-function waitForMediaLoad(target, timeout = 2500) {
+function waitForMediaLoad(target, timeout = 5000) {
 	const doc = target || _d;
 	return new Promise((resolveAll) => {
 		const selectors = ['img', 'video', 'audio', 'iframe'];
@@ -1202,11 +1202,28 @@ function waitForMediaLoad(target, timeout = 2500) {
 			return;
 		}
 
-		// media promise
 		const mediaPromises = mediaElements.map((element) => {
-			// already loaded - resolve
-			if (element.complete !== false && element.readyState >= 2) {
-				return Promise.resolve();
+			// image
+			if (element instanceof HTMLImageElement) {
+				if (element.complete) {
+					return Promise.resolve();
+				}
+			}
+			// video, audio
+			else if (element instanceof HTMLMediaElement) {
+				if (element.readyState >= 2) {
+					return Promise.resolve();
+				}
+			}
+			// iframe
+			else if (element instanceof HTMLIFrameElement) {
+				try {
+					if (element.contentDocument?.readyState === 'complete') {
+						return Promise.resolve();
+					}
+				} catch (e) {
+					console.warn(['[SUNEDITOR] Iframe load error', e]);
+				}
 			}
 
 			// load event
@@ -1216,7 +1233,6 @@ function waitForMediaLoad(target, timeout = 2500) {
 			});
 		});
 
-		// Promise.race
 		Promise.race([Promise.all(mediaPromises), new Promise((resolve) => setTimeout(resolve, timeout))]).then(() => {
 			resolveAll();
 		});
