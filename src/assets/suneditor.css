@@ -3596,6 +3596,7 @@
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-page > div > div.se-document-page-line {
 	right: unset;
 	left: 100%;
+	z-index: 1;
 }
 
 /* modal - footer */

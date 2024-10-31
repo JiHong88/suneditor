@@ -341,6 +341,7 @@ Viewer.prototype = {
 		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get()) : this.html.get();
 		const printDocument = domUtils.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
+		const rtlClass = this.options.get('_rtl') ? '' : ' se-rtl';
 		const pageCSS = /*html*/ `
 			<style>
 				@page {
@@ -351,10 +352,10 @@ Viewer.prototype = {
 
 		if (this.editor.frameOptions.get('iframe')) {
 			const arrts = this.options.get('printClass')
-				? 'class="' + this.options.get('printClass') + '"'
+				? 'class="' + this.options.get('printClass') + rtlClass + '"'
 				: this.editor.frameOptions.get('iframe_fullPage')
 				? domUtils.getAttributesToString(wDoc.body, ['contenteditable'])
-				: 'class="' + this.options.get('_editableClass') + '"';
+				: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
 
 			printDocument.write(/*html*/ `
 				<!DOCTYPE html>
@@ -385,7 +386,7 @@ Viewer.prototype = {
 						${linkHTML}
 						${pageCSS}
 					</head>
-					<body class="${this.options.get('printClass') || this.options.get('_editableClass')}" style="padding: 0; padding-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0;">
+					<body class="${(this.options.get('printClass') || this.options.get('_editableClass')) + rtlClass}" style="padding: 0; padding-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0;">
 						${contentHTML}
 					</body>
 				</html>`);
@@ -429,13 +430,14 @@ Viewer.prototype = {
 		const windowObject = this._w.open('', '_blank');
 		windowObject.mimeType = 'text/html';
 		const wDoc = this.editor.frameContext.get('_wd');
+		const rtlClass = this.options.get('_rtl') ? '' : ' se-rtl';
 
 		if (this.editor.frameOptions.get('iframe')) {
 			const arrts = this.options.get('printClass')
-				? 'class="' + this.options.get('printClass') + '"'
+				? 'class="' + this.options.get('printClass') + rtlClass + '"'
 				: this.editor.frameOptions.get('iframe_fullPage')
 				? domUtils.getAttributesToString(wDoc.body, ['contenteditable'])
-				: 'class="' + this.options.get('_editableClass') + '"';
+				: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
 
 			windowObject.document.write(/*html*/ `<!DOCTYPE html>
 				<html>
@@ -468,7 +470,7 @@ Viewer.prototype = {
 						<title>${this.lang.preview}</title>
 						${linkHTML}
 					</head>
-					<body class="${this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')}" style="height:auto">
+					<body class="${(this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')) + rtlClass}" style="height:auto">
 						${contentHTML}
 					</body>
 				</html>`);

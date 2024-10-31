@@ -532,17 +532,17 @@ Editor.prototype = {
 			const statusbarWrapper = this.context.get('statusbar._wrapper');
 			if (rtl) {
 				this.applyFrameRoots((e) => {
-					domUtils.addClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
+					domUtils.addClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
 				});
 				domUtils.addClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			} else {
 				this.applyFrameRoots((e) => {
-					domUtils.removeClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
+					domUtils.removeClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
 				});
 				domUtils.removeClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			}
 
-			const lineNodes = domUtils.getListChildren(fc.wysiwyg, (current) => {
+			const lineNodes = domUtils.getListChildren(fc.get('wysiwyg'), (current) => {
 				return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
 			});
 

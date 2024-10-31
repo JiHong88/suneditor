@@ -12,7 +12,7 @@ const ImageGallery = function (editor, pluginOptions) {
 		title: this.lang.imageGallery,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
-		selectorHandler: SetImage.bind(this),
+		selectorHandler: SetItem.bind(this),
 		columnSize: 4
 	});
 
@@ -44,7 +44,7 @@ ImageGallery.prototype = {
 	constructor: ImageGallery
 };
 
-function SetImage(target) {
+function SetItem(target) {
 	if (this.inputTarget) {
 		this.inputTarget(target);
 	} else {
