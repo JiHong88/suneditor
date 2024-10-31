@@ -493,14 +493,24 @@ Video.prototype = {
 		this.history.push(false);
 	},
 
-	createIframeTag() {
+	createIframeTag(props) {
 		const iframeTag = domUtils.createElement('IFRAME');
+		if (props) {
+			for (const key in props) {
+				iframeTag[key] = props[key];
+			}
+		}
 		this._setIframeAttrs(iframeTag);
 		return iframeTag;
 	},
 
-	createVideoTag: function () {
+	createVideoTag(props) {
 		const videoTag = domUtils.createElement('VIDEO');
+		if (props) {
+			for (const key in props) {
+				videoTag[key] = props[key];
+			}
+		}
 		this._setTagAttrs(videoTag);
 		return videoTag;
 	},
