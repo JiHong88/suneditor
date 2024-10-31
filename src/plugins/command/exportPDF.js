@@ -53,7 +53,7 @@ ExportPDF.prototype = {
 
 			const innerPadding = this._w.getComputedStyle(standardWW).padding;
 			const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
-			inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '';
+			inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '0';
 			ww.innerHTML = `
 				<style>
 					@page {
@@ -66,7 +66,7 @@ ExportPDF.prototype = {
 			_d.body.appendChild(ww);
 
 			// before event
-			if ((await this.triggerEvent('onExportPDFBefore', { editableDiv })) === false) return;
+			if ((await this.triggerEvent('onExportPDFBefore', { target: ww })) === false) return;
 
 			// at server
 			await this._createByServer(ww);

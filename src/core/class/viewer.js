@@ -363,7 +363,7 @@ Viewer.prototype = {
 						${wDoc.head.innerHTML}
 						${pageCSS}
 					</head>
-					<body ${arrts}>
+					<body ${arrts} style="padding: 0; padding-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0;">
 						${contentHTML}
 					</body>
 				</html>`);
@@ -385,7 +385,7 @@ Viewer.prototype = {
 						${linkHTML}
 						${pageCSS}
 					</head>
-					<body class="${this.options.get('printClass') || this.options.get('_editableClass')}">
+					<body class="${this.options.get('printClass') || this.options.get('_editableClass')}" style="padding: 0; padding-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0;">
 						${contentHTML}
 					</body>
 				</html>`);

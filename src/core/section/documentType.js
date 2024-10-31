@@ -5,9 +5,12 @@
 import { domUtils, numbers, converter, env } from '../../helper';
 
 const { _w } = env;
-const A4_HEIGHT_INCHES = 11.7; // A4 height(inches)
-const A4_HEIGHT = A4_HEIGHT_INCHES * 96; // 1 inch = 96px
-let A4_PAGE_HEIGHT = 0;
+
+// A4 constants in points (72 dpi - PDF standard)
+const MM_TO_POINTS = 2.83465; // 1mm = 2.83465pt
+const POINTS_TO_PIXELS = 96 / 72; // convert PDF points to screen pixels
+const A4_HEIGHT_MM = 297;
+const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS);
 
 const DocumentType = function (editor, fc) {
 	// members
@@ -40,11 +43,11 @@ const DocumentType = function (editor, fc) {
 	this._mirror = fc.get('documentTypePageMirror');
 	this._mirrorCache = 0;
 	this._positionCache = new Map();
+	this._rePageTimeout = null;
 
 	const mirrorStyles = _w.getComputedStyle(this._mirror);
 	this._paddingTop = numbers.get(mirrorStyles.paddingTop);
 	this._paddingBottom = numbers.get(mirrorStyles.paddingBottom);
-	A4_PAGE_HEIGHT = A4_HEIGHT + this._paddingTop + this._paddingBottom;
 
 	// init header
 	if (this.useHeader) {
@@ -107,92 +110,95 @@ DocumentType.prototype = {
 
 	async rePage(force) {
 		if (!this.page) return;
+		if (this._rePageTimeout) clearTimeout(this._rePageTimeout);
 
-		await domUtils.waitForMediaLoad(this._mirror, 1500);
+		this._rePageTimeout = setTimeout(async () => {
+			await domUtils.waitForMediaLoad(this._mirror, 1500);
 
-		const mirrorHeight = this._mirror.scrollHeight;
-		const pageBreaks = this._mirror.querySelectorAll('.se-page-break');
-		if (!force && this.pageHeight === mirrorHeight && this.pageBreaksCnt === pageBreaks.length) return;
-		this.pageHeight = mirrorHeight;
-		this.pageBreaksCnt = pageBreaks.length;
+			const mirrorHeight = this._mirror.scrollHeight;
+			const pageBreaks = this._mirror.querySelectorAll('.se-page-break');
+			if (!force && this.pageHeight === mirrorHeight && this.pageBreaksCnt === pageBreaks.length) return;
+			this.pageHeight = mirrorHeight;
+			this.pageBreaksCnt = pageBreaks.length;
 
-		// page break
-		let pageBreakHeight = 0;
-		let lastBreakPosition = 0;
-		let additionalPages = 0;
-		if (pageBreaks.length > 0) {
-			pageBreakHeight = pageBreaks[0].offsetHeight;
-			for (let i = 0; i < pageBreaks.length; i++) {
-				const breakPosition = pageBreaks[i].offsetTop;
-				const sectionHeight = breakPosition - lastBreakPosition;
+			// page break
+			let pageBreakHeight = 0;
+			let lastBreakPosition = 0;
+			let additionalPages = 0;
+			if (pageBreaks.length > 0) {
+				pageBreakHeight = pageBreaks[0].offsetHeight;
+				for (let i = 0; i < pageBreaks.length; i++) {
+					const breakPosition = pageBreaks[i].offsetTop;
+					const sectionHeight = breakPosition - lastBreakPosition;
 
-				if (sectionHeight % A4_PAGE_HEIGHT !== 0) {
+					if (sectionHeight % A4_PAGE_HEIGHT !== 0) {
+						additionalPages++;
+					}
+
+					lastBreakPosition = breakPosition;
+				}
+
+				const lastSectionHeight = mirrorHeight - lastBreakPosition;
+				if (lastSectionHeight > 0 && lastSectionHeight % A4_PAGE_HEIGHT !== 0) {
 					additionalPages++;
 				}
-
-				lastBreakPosition = breakPosition;
 			}
 
-			const lastSectionHeight = mirrorHeight - lastBreakPosition;
-			if (lastSectionHeight > 0 && lastSectionHeight % A4_PAGE_HEIGHT !== 0) {
-				additionalPages++;
+			const scrollTop = this.isAutoHeight ? 0 : this._getWWScrollTop();
+			const totalPages = Math.ceil(mirrorHeight / A4_PAGE_HEIGHT) + additionalPages;
+			const wwWidth = this.wwFrame.offsetWidth + 1;
+			const pages = [];
+
+			for (let i = 0; i < pageBreaks.length; i++) {
+				pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight - scrollTop });
 			}
-		}
 
-		const scrollTop = this.isAutoHeight ? 0 : this._getWWScrollTop();
-		const totalPages = Math.ceil(mirrorHeight / A4_PAGE_HEIGHT) + additionalPages;
-		const wwWidth = this.wwFrame.offsetWidth + 1;
-		const pages = [];
+			// A4 position
+			this._mirrorCache = 0;
+			const chr = this.ww.children;
+			const mChr = this._mirror.children;
+			this._initializeCache(mChr);
+			pages.push({ number: 0, top: 0 });
+			for (let i = 1, t = 0; i < totalPages; i++) {
+				t += A4_PAGE_HEIGHT + (i === 1 ? this._paddingTop + this._paddingBottom : this._paddingTop);
+				if (!pages.some((p) => Math.abs(p.top - t) < 1)) {
+					const { ci, cm, ch } = this._getElementAtPosition(t, mChr);
+					const el = chr[ci];
+					if (!el) break;
 
-		for (let i = 0; i < pageBreaks.length; i++) {
-			pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight - scrollTop });
-		}
+					if (chr[this._mirrorCache]) {
+						t += numbers.get(_w.getComputedStyle(chr[this._mirrorCache]).marginBottom);
+					}
 
-		// A4 position
-		this._mirrorCache = 0;
-		const chr = this.ww.children;
-		const mChr = this._mirror.children;
-		this._initializeCache(mChr);
-		pages.push({ number: 0, top: 0 });
-		for (let i = 1, t = 0; i < totalPages; i++) {
-			t += A4_PAGE_HEIGHT + (i === 1 ? this._paddingTop : 0);
-			if (!pages.some((p) => Math.abs(p.top - t) < 1)) {
-				const { ci, cm, ch } = this._getElementAtPosition(t, mChr);
-				const el = chr[ci];
-				if (!el) break;
-
-				if (chr[this._mirrorCache]) {
-					t += numbers.get(_w.getComputedStyle(chr[this._mirrorCache]).marginBottom);
+					const elBottom = el.offsetTop + el.offsetHeight;
+					const top = elBottom + cm + (el.offsetHeight - ch);
+					pages.push({ number: i, top });
 				}
-
-				const elBottom = el.offsetTop + el.offsetHeight;
-				const top = elBottom + cm + (el.offsetHeight - ch);
-				pages.push({ number: i, top });
 			}
-		}
 
-		if (pages.length === 0) {
-			this.pages_line = [];
-			this.totalPages = 1;
+			if (pages.length === 0) {
+				this.pages_line = [];
+				this.totalPages = 1;
+				this._displayCurrentPage();
+				return;
+			}
+
+			// numbering
+			pages.sort((a, b) => a.top - b.top);
+			this.page.innerHTML = '';
+			this.pages = [];
+			for (let i = 0, t; i < totalPages; i++) {
+				t = pages[i].top;
+				if (mirrorHeight < t) break;
+				const pageNumber = domUtils.createElement('DIV', { style: `top:${t - scrollTop}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
+				this.page.appendChild(pageNumber);
+				this.pages.push(pageNumber);
+			}
+
+			this.pages_line = this.page.querySelectorAll('.se-document-page-line');
+			this.totalPages = this.pages.length;
 			this._displayCurrentPage();
-			return;
-		}
-
-		// numbering
-		pages.sort((a, b) => a.top - b.top);
-		this.page.innerHTML = '';
-		this.pages = [];
-		for (let i = 0, t; i < totalPages; i++) {
-			t = pages[i].top;
-			if (mirrorHeight < t) break;
-			const pageNumber = domUtils.createElement('DIV', { style: `top:${t - scrollTop}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
-			this.page.appendChild(pageNumber);
-			this.pages.push(pageNumber);
-		}
-
-		this.pages_line = this.page.querySelectorAll('.se-document-page-line');
-		this.totalPages = this.pages.length;
-		this._displayCurrentPage();
+		}, 400);
 	},
 
 	_initializeCache(mChr) {
