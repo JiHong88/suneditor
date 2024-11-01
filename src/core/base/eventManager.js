@@ -40,7 +40,6 @@ const EventManager = function (editor) {
 	this.__inputBlurEvent = null;
 	this.__inputKeyEvent = null;
 	// viewport
-	this._vitualKeyboardHeight = 0;
 	this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
 	this.__retainTimer = null;
 	this.__eventDoc = null;
@@ -674,9 +673,7 @@ EventManager.prototype = {
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
 		if (env.isMobile) {
-			this.addEvent(_w.visualViewport, 'resize', OnResize_viewport.bind(this), false);
 			this.addEvent(_w.visualViewport, 'scroll', OnScroll_viewport.bind(this), false);
-			this.addEvent(_w.visualViewport, 'scroll', converter.debounce(OnScroll_viewport_onKeyboardOn.bind(this), 200), false);
 		}
 	},
 
@@ -966,6 +963,7 @@ EventManager.prototype = {
 		if (!isMobile) return;
 
 		this.__focusTemp.focus();
+		this.editor.frameContext.get('wysiwyg').focus();
 	},
 
 	constructor: EventManager
@@ -1120,11 +1118,7 @@ function OnResize_window() {
 
 function OnScroll_window() {
 	if (this.options.get('toolbar_sticky') > -1) {
-		if (this._vitualKeyboardHeight && this.toolbar._sticky) {
-			this.toolbar._visible(false);
-		} else {
-			this.toolbar._resetSticky();
-		}
+		this.toolbar._resetSticky();
 	}
 
 	if (this.editor.isBalloon && this.context.get('toolbar.main').style.display === 'block') {
@@ -1141,23 +1135,8 @@ function OnScroll_window() {
 	}
 }
 
-function OnResize_viewport() {
-	this._vitualKeyboardHeight = _w.innerHeight - _w.visualViewport.height;
-}
-
 function OnScroll_viewport() {
 	if (this.options.get('toolbar_sticky') > -1) {
-		if (this._vitualKeyboardHeight && this.toolbar._sticky) {
-			this.toolbar._visible(false);
-		} else {
-			this.toolbar._resetSticky();
-		}
-	}
-}
-
-function OnScroll_viewport_onKeyboardOn() {
-	this.toolbar._visible(true);
-	if (this._vitualKeyboardHeight && this.options.get('toolbar_sticky') > -1) {
 		this.toolbar._resetSticky();
 	}
 }

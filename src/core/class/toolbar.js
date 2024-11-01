@@ -93,20 +93,6 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @desscription Show or hide the toolbar
-	 * @param {boolean} isShow Show or hide
-	 * @private
-	 */
-	_visible(isShow) {
-		const toolbar = this.context.get(this.keyName + '.main');
-		if (isShow) {
-			domUtils.removeClass(toolbar, 'se-toolbar-onscroll-hide');
-		} else {
-			domUtils.addClass(toolbar, 'se-toolbar-onscroll-hide');
-		}
-	},
-
-	/**
 	 * @description Reset buttons of the responsive toolbar.
 	 */
 	resetResponsiveToolbar() {

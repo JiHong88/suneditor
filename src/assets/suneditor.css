@@ -905,11 +905,6 @@
 	border-top-color: var(--se-main-background-color);
 }
 
-/* toolbar visible on scroll */
-.sun-editor .se-toolbar.se-toolbar-onscroll-hide {
-	visibility: hidden !important;
-}
-
 /** --- tool bar --- module --- button, module, group ----------------------------------------------------------  */
 /* module */
 .sun-editor .se-btn-module {
