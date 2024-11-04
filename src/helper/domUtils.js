@@ -417,7 +417,7 @@ export function getParentElements(element, query, depth) {
  * @returns {Element|null}
  */
 export function getCommandTarget(target) {
-	while (!/^(UL|DIV)$/i.test(target.tagName)) {
+	while (target && !/^(UL)$/i.test(target.tagName) && !hasClass(target, 'sun-editor')) {
 		if (target.hasAttribute('data-command')) return target;
 		target = target.parentNode;
 	}

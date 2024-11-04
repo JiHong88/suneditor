@@ -65,7 +65,7 @@ const bl = [
 	['outdent', 'indent'],
 	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-	['imageGallery'],
+	['imageGallery', 'videoGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
 	['save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
@@ -82,7 +82,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-			['imageGallery'],
+			['imageGallery', 'videoGallery'],
 			['fullScreen', 'showBlocks', 'codeView'],
 			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
@@ -100,7 +100,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-			['imageGallery'],
+			['imageGallery', 'videoGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
@@ -117,7 +117,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery']
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery']
 		]
 	],
 	// (min-width: 1123)
@@ -132,7 +132,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery']
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery']
 		]
 	],
 	// (min-width: 817)
@@ -147,7 +147,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery']
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery']
 		]
 	],
 	// (min-width: 673)
@@ -160,7 +160,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
@@ -174,7 +174,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
@@ -186,7 +186,7 @@ const bl = [
 			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	]
@@ -204,7 +204,7 @@ const bb = [
 	['outdent', 'indent'],
 	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-	['imageGallery'],
+	['imageGallery', 'videoGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
 	['save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
@@ -687,6 +687,9 @@ window.editor_root = suneditor.create(
 		video: {
 			uploadUrl: 'http://localhost:3000/editor/upload',
 			createFileInput: true
+		},
+		videoGallery: {
+			url: 'http://localhost:3000/editor/gallery/video'
 		},
 		embed: {
 

@@ -341,7 +341,7 @@ Viewer.prototype = {
 		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get()) : this.html.get();
 		const printDocument = domUtils.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
-		const rtlClass = this.options.get('_rtl') ? '' : ' se-rtl';
+		const rtlClass = this.options.get('_rtl') ? ' se-rtl' : '';
 		const pageCSS = /*html*/ `
 			<style>
 				@page {
@@ -430,7 +430,7 @@ Viewer.prototype = {
 		const windowObject = this._w.open('', '_blank');
 		windowObject.mimeType = 'text/html';
 		const wDoc = this.editor.frameContext.get('_wd');
-		const rtlClass = this.options.get('_rtl') ? '' : ' se-rtl';
+		const rtlClass = this.options.get('_rtl') ? ' se-rtl' : '';
 
 		if (this.editor.frameOptions.get('iframe')) {
 			const arrts = this.options.get('printClass')

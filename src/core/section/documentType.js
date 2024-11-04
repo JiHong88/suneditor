@@ -188,6 +188,7 @@ DocumentType.prototype = {
 			this.page.innerHTML = '';
 			this.pages = [];
 			for (let i = 0, t; i < totalPages; i++) {
+				if (!pages[i]) continue;
 				t = pages[i].top;
 				if (mirrorHeight < t) break;
 				const pageNumber = domUtils.createElement('DIV', { style: `top:${t - scrollTop}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);

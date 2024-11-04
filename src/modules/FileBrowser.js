@@ -21,7 +21,7 @@ const FileBrowser = function (inst, params) {
 
 	// create HTML
 	this.useSearch = params.useSearch ?? true;
-	const browserFrame = domUtils.createElement('DIV', { class: 'se-file-browser sun-editor-common' });
+	const browserFrame = domUtils.createElement('DIV', { class: 'se-file-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
 	const content = domUtils.createElement('DIV', { class: 'se-file-browser-inner' }, CreateHTML(inst.editor, this.useSearch));
 
 	// members
@@ -41,7 +41,7 @@ const FileBrowser = function (inst, params) {
 	this.urlHeader = params.headers;
 	this.searchUrl = params.searchUrl;
 	this.searchUrlHeader = params.searchUrlHeader;
-	this.drawItemHandler = params.drawItemHandler || DrawItems;
+	this.drawItemHandler = (params.drawItemHandler || DrawItems).bind(params.emptyImage);
 	this.selectorHandler = params.selectorHandler;
 	this.columnSize = params.columnSize || 4;
 
@@ -314,13 +314,11 @@ function CreateHTML({ lang, icons }, useSearch) {
  */
 function DrawItems(item) {
 	const srcName = item.src.split('/').pop();
+	const src = item.thumbnail || item.src;
+	const props = `class="${item.thumbnail || 'se-browser-empty-image'}" src="${src}" alt="${item.alt || srcName}" data-command="${item.src}" data-value="${item.name || srcName}" data-thumbnail="${item.thumbnail}"`;
 	return /*html*/ `
 		<div class="se-file-item-img">
-			<img 
-				src="${item.thumbnail || item.src}" 
-				alt="${item.alt || srcName}" 
-				data-command="${item.src || item.thumbnail}" 
-				data-value="${item.name || srcName}">
+			${this && !item.thumbnail ? `<div class="se-browser-empty-thumbnail" ${props}>${this}</div>` : `<img class="${item.thumbnail || 'se-browser-empty-image'}" ${props}">`}
 			<div class="se-file-name-image se-file-name-back"></div>
 			<div class="se-file-name-image">${item.name || srcName}</div>
 		</div>`;

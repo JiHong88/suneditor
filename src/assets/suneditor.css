@@ -3117,6 +3117,28 @@
 	pointer-events: none;
 }
 
+.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > * {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* --- browser - item - video */
+.sun-editor .se-file-browser.se-video-gallery .se-file-browser-list.se-preview-list .se-file-item-img > .se-browser-empty-thumbnail {
+	width: 100%;
+	height: 170px;
+	max-height: 100%;
+	background-color: var(--se-main-shadow-color);
+	border-radius: var(--se-border-radius);
+}
+.sun-editor .se-file-browser.se-video-gallery .se-file-browser-list.se-preview-list .se-file-item-img > .se-browser-empty-thumbnail > svg {
+	width: 90px;
+	max-width: 100%;
+	height: auto;
+	margin-bottom: 30px;
+	color: var(--se-main-color-lighter);
+}
+
 /** --- notice */
 .sun-editor .se-notice {
 	position: relative;
