@@ -41,7 +41,7 @@ const FileBrowser = function (inst, params) {
 	this.urlHeader = params.headers;
 	this.searchUrl = params.searchUrl;
 	this.searchUrlHeader = params.searchUrlHeader;
-	this.drawItemHandler = (params.drawItemHandler || DrawItems).bind(params.emptyImage);
+	this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({ thumbnail: params.thumbnail });
 	this.selectorHandler = params.selectorHandler;
 	this.columnSize = params.columnSize || 4;
 
@@ -314,11 +314,12 @@ function CreateHTML({ lang, icons }, useSearch) {
  */
 function DrawItems(item) {
 	const srcName = item.src.split('/').pop();
-	const src = item.thumbnail || item.src;
-	const props = `class="${item.thumbnail || 'se-browser-empty-image'}" src="${src}" alt="${item.alt || srcName}" data-command="${item.src}" data-value="${item.name || srcName}" data-thumbnail="${item.thumbnail}"`;
+	const thumbnail = item.thumbnail || '';
+	const src = thumbnail || item.src;
+	const props = `class="${thumbnail || 'se-browser-empty-image'}" src="${src}" alt="${item.alt || srcName}" data-command="${item.src}" data-value="${item.name || srcName}" data-thumbnail="${thumbnail}"`;
 	return /*html*/ `
 		<div class="se-file-item-img">
-			${this && !item.thumbnail ? `<div class="se-browser-empty-thumbnail" ${props}>${this}</div>` : `<img class="${item.thumbnail || 'se-browser-empty-image'}" ${props}">`}
+			${this.thumbnail && !thumbnail ? `<div class="se-browser-empty-thumbnail" ${props}>${this.thumbnail}</div>` : `<img class="${thumbnail || 'se-browser-empty-image'}" ${props}>`}
 			<div class="se-file-name-image se-file-name-back"></div>
 			<div class="se-file-name-image">${item.name || srcName}</div>
 		</div>`;

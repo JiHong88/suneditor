@@ -13,7 +13,8 @@ const ImageGallery = function (editor, pluginOptions) {
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
 		selectorHandler: SetItem.bind(this),
-		columnSize: 4
+		columnSize: 4,
+		className: 'se-image-gallery'
 	});
 
 	// members

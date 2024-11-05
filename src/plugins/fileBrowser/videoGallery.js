@@ -15,7 +15,7 @@ const VideoGallery = function (editor, pluginOptions) {
 		selectorHandler: SetItem.bind(this),
 		columnSize: 4,
 		className: 'se-video-gallery',
-		emptyImage: pluginOptions.emptyImage || this.icons.video_empty
+		thumbnail: pluginOptions.thumbnail || this.icons.video_thumbnail
 	});
 
 	// members
