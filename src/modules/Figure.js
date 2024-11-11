@@ -255,8 +255,15 @@ Figure.prototype = {
 		}
 
 		const figureInfo = Figure.GetContainer(target);
+		let exceptionFormat = false;
 		if (!figureInfo.container) {
-			return { container: null, cover: null, width: target.style.width || (!numbers.is(target.width) ? target.width : '') || '', height: target.style.height || (!numbers.is(target.height) ? target.height : '') || '' };
+			if (!this.options.get('strictMode').formatFilter) {
+				figureInfo.container = target;
+				figureInfo.cover = target;
+				exceptionFormat = true;
+			} else {
+				return { container: null, cover: null, width: target.style.width || (!numbers.is(target.width) ? target.width : '') || '', height: target.style.height || (!numbers.is(target.height) ? target.height : '') || '' };
+			}
 		}
 
 		_DragHandle.set('__figureInst', this);
@@ -347,10 +354,15 @@ Figure.prototype = {
 			const transformButtons = this.controller.form.querySelectorAll(
 				'[data-command="rotate"][data-value="90"], [data-command="rotate"][data-value="-90"], [data-command="caption"], [data-command="onalign"], [data-command="onresize"]'
 			);
-			const display = this._inlineCover ? 'none' : '';
+			const display = this._inlineCover || exceptionFormat ? 'none' : '';
 			transformButtons.forEach((button) => {
 				button.style.display = display;
 			});
+			// onas
+			const onas = this.controller.form.querySelector('[data-command="onas"]');
+			if (onas) {
+				onas.style.display = exceptionFormat ? 'none' : '';
+			}
 			// selecte
 			domUtils.removeClass(this._cover, 'se-figure-over-selected');
 			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
@@ -409,6 +421,13 @@ Figure.prototype = {
 
 		const figure = Figure.GetContainer(target);
 		if (!figure.container) {
+			// exceptionFormat
+			if (!this.options.get('strictMode').formatFilter) {
+				return {
+					w: target.style.width || 'auto',
+					h: target.style.height || 'auto'
+				};
+			}
 			return {
 				w: '',
 				h: target.style.height
@@ -854,6 +873,13 @@ Figure.prototype = {
 		const heightPercentage = /%$/.test(h);
 		this._container.style.width = numbers.is(w) ? w + '%' : w;
 		this._container.style.height = '';
+
+		// exceptionFormat
+		if (this._element === this._cover && !this.options.get('strictMode').formatFilter) {
+			this._saveCurrentSize();
+			return;
+		}
+
 		if (this._inlineCover !== this._cover) {
 			this._cover.style.width = '100%';
 			this._cover.style.height = h;
