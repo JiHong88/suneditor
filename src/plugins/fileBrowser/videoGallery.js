@@ -8,6 +8,7 @@ const VideoGallery = function (editor, pluginOptions) {
 	this.icon = 'video_gallery';
 
 	// modules
+	const thumbnail = pluginOptions.thumbnail || this.icons.video_thumbnail;
 	this.fileBrowser = new FileBrowser(this, {
 		title: this.lang.videoGallery,
 		url: pluginOptions.url,
@@ -15,7 +16,7 @@ const VideoGallery = function (editor, pluginOptions) {
 		selectorHandler: SetItem.bind(this),
 		columnSize: 4,
 		className: 'se-video-gallery',
-		thumbnail: pluginOptions.thumbnail || this.icons.video_thumbnail
+		thumbnail: () => thumbnail
 	});
 
 	// members

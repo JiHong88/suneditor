@@ -35,6 +35,7 @@ import drawing from './modal/drawing';
 // file browser
 import imageGallery from './fileBrowser/imageGallery';
 import videoGallery from './fileBrowser/videoGallery';
+import audioGallery from './fileBrowser/audioGallery';
 
 // input
 import fontSize from './input/fontSize';
@@ -72,6 +73,7 @@ export {
 	drawing,
 	imageGallery,
 	videoGallery,
+	audioGallery,
 	fontSize,
 	pageNavigator,
 	anchor
@@ -105,6 +107,7 @@ export default {
 	drawing,
 	imageGallery,
 	videoGallery,
+	audioGallery,
 	fontSize,
 	pageNavigator,
 	anchor

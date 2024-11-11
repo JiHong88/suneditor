@@ -65,7 +65,7 @@ const bl = [
 	['outdent', 'indent'],
 	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-	['imageGallery', 'videoGallery'],
+	['imageGallery', 'videoGallery', 'audioGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
 	['save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
@@ -82,7 +82,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-			['imageGallery', 'videoGallery'],
+			['imageGallery', 'videoGallery', 'audioGallery'],
 			['fullScreen', 'showBlocks', 'codeView'],
 			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
@@ -100,7 +100,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-			['imageGallery', 'videoGallery'],
+			['imageGallery', 'videoGallery', 'audioGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
@@ -117,7 +117,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery']
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery']
 		]
 	],
 	// (min-width: 1123)
@@ -132,7 +132,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery']
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery']
 		]
 	],
 	// (min-width: 817)
@@ -147,7 +147,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery']
+			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery']
 		]
 	],
 	// (min-width: 673)
@@ -160,7 +160,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
@@ -174,7 +174,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
@@ -186,7 +186,7 @@ const bl = [
 			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery'],
+			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	]
@@ -204,7 +204,7 @@ const bb = [
 	['outdent', 'indent'],
 	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-	['imageGallery', 'videoGallery'],
+	['imageGallery', 'videoGallery', 'audioGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
 	['save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
@@ -425,10 +425,11 @@ window.editor_root = suneditor.create(
 		// strictMode: {
 		// 	styleFilter: false
 		// },
+		strictMode: false,
 		// lang: langs.ko,
-		value: `<figure class="se-flex-component se-scroll-figure-x"><table class="se-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
-		value: `<p>sadas1<span class="__se__katex katex" data-se-value="l;l;;l" data-se-type="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>l</mi><mo separator="true">;</mo><mi>l</mi><mo separator="true">;</mo><mo separator="true">;</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">l;l;;l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span>​​<br></p><p>sadas2</p><figure class="se-flex-component"><table style=""><colgroup><col style="width: 33%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup><tbody><tr><td><div>sdd<br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><div class="se-component se-file-figure se-flex-component"><figure><a href="https://link.testfile.org/30MB" title="document.pdf" download="document.pdf" data-se-file-download="" data-se-non-link="true" data-se-file-name="document.pdf" data-se-file-size="124826" data-se-size="auto,auto" contenteditable="false">document.pdf</a></figure></div><p>sadas3<br></p><p>sadas4<br></p><p>sadas5<br></p><p>sadas6<br></p><p>dsads<a href="http://localhost:3000/public/files/d5d13802a01dd4dea399c912f7b31e5e.png" download="1571311368279.png" name="1571311368279.png">1571311368279.png</a>​<br></p><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0"></figure></div><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p>`,
-		value: `<p>sadas1<span class="__se__katex katex" data-se-value="l;l;;l" data-se-type="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>l</mi><mo separator="true">;</mo><mi>l</mi><mo separator="true">;</mo><mo separator="true">;</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">l;l;;l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span>​​<br></p><p>sadas2</p><figure class="se-flex-component"><table style=""><colgroup><col style="width: 33%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup><tbody><tr><td><div>sdd<br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><div class="se-component se-file-figure se-flex-component"><figure><a href="http://localhost:3000/editor/files/download/public/files/d31ed6f9e11d1661406efe5ed34328e5.pdf" title="document.pdf" download="document.pdf" data-se-file-download="" data-se-non-link="true" data-se-file-name="document.pdf" data-se-file-size="124826" data-se-index="0" data-se-size="auto,auto" contenteditable="false">document.pdf</a></figure></div><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0"></figure></div>`,
+		// value: `<figure class="se-flex-component se-scroll-figure-x"><table class="se-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
+		// value: `<p>sadas1<span class="__se__katex katex" data-se-value="l;l;;l" data-se-type="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>l</mi><mo separator="true">;</mo><mi>l</mi><mo separator="true">;</mo><mo separator="true">;</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">l;l;;l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span>​​<br></p><p>sadas2</p><figure class="se-flex-component"><table style=""><colgroup><col style="width: 33%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup><tbody><tr><td><div>sdd<br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><div class="se-component se-file-figure se-flex-component"><figure><a href="https://link.testfile.org/30MB" title="document.pdf" download="document.pdf" data-se-file-download="" data-se-non-link="true" data-se-file-name="document.pdf" data-se-file-size="124826" data-se-size="auto,auto" contenteditable="false">document.pdf</a></figure></div><p>sadas3<br></p><p>sadas4<br></p><p>sadas5<br></p><p>sadas6<br></p><p>dsads<a href="http://localhost:3000/public/files/d5d13802a01dd4dea399c912f7b31e5e.png" download="1571311368279.png" name="1571311368279.png">1571311368279.png</a>​<br></p><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0"></figure></div><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p>`,
+		// value: `<p>sadas1<span class="__se__katex katex" data-se-value="l;l;;l" data-se-type="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>l</mi><mo separator="true">;</mo><mi>l</mi><mo separator="true">;</mo><mo separator="true">;</mo><mi>l</mi></mrow><annotation encoding="application/x-tex">l;l;;l</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mpunct">;;</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span>​​<br></p><p>sadas2</p><figure class="se-flex-component"><table style=""><colgroup><col style="width: 33%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup><tbody><tr><td><div>sdd<br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><div class="se-component se-file-figure se-flex-component"><figure><a href="http://localhost:3000/editor/files/download/public/files/d31ed6f9e11d1661406efe5ed34328e5.pdf" title="document.pdf" download="document.pdf" data-se-file-download="" data-se-non-link="true" data-se-file-name="document.pdf" data-se-file-size="124826" data-se-index="0" data-se-size="auto,auto" contenteditable="false">document.pdf</a></figure></div><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0"></figure></div>`,
 		// 		value: `
 		// <p>SunEditor</p>
 		// <video controls="true" src="http://localhost:3000/public/files/d55bddf8d62910879ed9f605522149a8.mp4" width="100%" height="56.25%" data-se-size="100%,56.25%" data-se-file-name="SampleVideo_1280x720_1mb.mp4" data-se-file-size="1055736" data-se-index="1" style="width: 100%; height: 100%;"></video>
@@ -589,6 +590,141 @@ window.editor_root = suneditor.create(
 		// iframe: true,
 		// height: '600px',
 		// maxWidth: '1000px',
+		// value: `<div class="wrap_800 article_type_1"><br />
+		// 	<div class="section section_01">
+		// 		<div class="detail_cont_box">
+		// 			<h3 class="first_h3">
+		// 				<img class="emoji like_pin" alt="📍" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f4cd.svg" />
+
+		// 				"상큼한 레몬수로 건강하고 활기찬 일상 시작하기!"
+		// 			</h3>
+		// 			<div class="img_box">
+		// 				<img src="https://i.imgur.com/hfHHulc.png" alt="레몬수" title="컵에 담긴 레몬수 사진" />
+
+		// 			</div>
+		// 			<div class="text_box">
+		// 				<span>
+		// 					레몬수가 요즘 핫한 웰빙 트렌드로 자리 잡고 있습니다.
+		// 					새콤달콤한 레몬으로 만든 시원한 음료 한 잔이 더위를 날려줄 뿐만 아니라, 건강까지 챙길 수 있다면?<br />
+		// 					오늘은 레몬수의 놀라운 효능과 함께, 레몬을 다양하게 활용할 수 있는 레몬큐브 만드는 법을 소개합니다.<br />
+		// 					또한, 모든 과정에서 최고의 성능을 자랑하는 테팔 블렌드포스 믹서기의 활용법까지! 건강과 맛을 모두 잡는 방법, 지금부터
+		// 					만나보세요.
+		// 				</span>
+		// 			</div>
+
+		// 		</div>
+		// 		<hr />
+		// 		<div class="detail_cont_box">
+		// 			<h3>이 아티클은 이런 분들에게 유용합니다!</h3>
+		// 			<div class="text_box">
+		// 				<span class="contain_img"><img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" /> 새로운 주방용품 구입을 고민하는 분들</span>
+		// 				<span class="contain_img"><img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" /> 품질 좋은 주방용품을 오랫동안 사용하고 싶은 분들</span>
+		// 				<span class="contain_img"><img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" /> 환경보호를 생각하며 지속 가능한 소비를 추구하는 분들</span>
+
+		// 			</div>
+
+		// 		</div>
+		// 		<hr />
+		// 		<div class="detail_cont_box">
+		// 			<h3>레몬수를 왜 먹을까요? 효능에 대한 모든 것!</h3>
+		// 			<div class="text_box">
+		// 				<span>레몬수는 단순히 상큼한 맛을 즐기기 위한 음료가 아닙니다.</span>
+		// 				<span>하루 한 잔의 레몬수는 피부부터 신장까지 관리할 수 있는 '마법의 음료'라 불리는 이유가 따로 있죠.</span>
+		// 				<span>그 안에 숨겨진 놀라운 건강 효능을 살펴보겠습니다. 레몬수를 마시면 어떤 효과를 기대할 수 있을까요?</span>
+		// 			</div>
+
+		// 		</div>
+		// 	</div>
+		// 	<div class="section section_02">
+		// 		<div class="img_box">
+		// 			<img src="https://i.imgur.com/Z4gQNYt.png" alt="레몬수" title="컵에 레몬수를 따르는 사진" />
+
+		// 		</div>
+		// 		<div class="text_box">
+		// 			<span class="mini_title">1. 비타민 C 폭탄! 피부와 면역력을 동시에</span>
+		// 			<span>레몬수 한 잔에 담긴 비타민 C는 피로 해소는 물론, 피부를 더욱 맑고 투명하게 가꿔줍니다.</span>
+		// 			<span>하루 한 잔의 레몬수가 우리 몸의 항산화 작용을 촉진하고, 스트레스와 노화를 예방해 줍니다.</span>
+		// 			<span>일상의 활력을 채워주는 비타민 C 폭탄을 경험해 보세요.</span>
+		// 		</div>
+		// 		<div class="text_box">
+		// 			<span class="mini_title">2. 다이어트의 비밀, 체중 감소와 소화 개선</span>
+		// 			<span>다이어트를 하고 있다면 레몬수를 절대 놓치지 마세요!</span>
+		// 			<span>레몬수는 소화를 돕고 장운동을 촉진해 복부 팽만감을 해소해 줍니다.</span>
+		// 			<span>또한, 칼륨이 나트륨을 조절해 부기를 완화해 주므로, 규칙적인 섭취로 체중 감소의 효과까지 기대할 수 있습니다..</span>
+		// 		</div>
+		// 		<div class="text_box">
+		// 			<span class="mini_title">3. 심혈관 건강을 지키는 든든한 수호자</span>
+		// 			<span>레몬에는 혈관을 강화해 주는 펙틴과 몸속 노폐물을 제거하는 구연산이 풍부합니다.</span>
+		// 			<span>이러한 성분들은 혈압을 낮추고 심혈관 질환을 예방하는 데 탁월한 효과가 있어,</span>
+		// 			<span>레몬수를 매일 마시는 것만으로도 심장 건강을 챙길 수 있습니다.</span>
+		// 		</div>
+		// 		<div class="text_box">
+		// 			<span class="mini_title">4. 신장 결석 예방, 상큼한 디톡스 효과</span>
+		// 			<span>신장 결석을 예방하고 싶은 분들에게도 레몬수는 훌륭한 해결책입니다.</span>
+		// 			<span>레몬에 함유된 구연산이 체액을 증가시켜 소변을 중화하고, 요로에 노폐물이 쌓이지 않도록 도와줍니다.</span>
+		// 			<span>간단하게 레몬수로 디톡스 하세요!</span>
+		// 		</div>
+		// 	</div>
+		// 	<div class="section section_03">
+		// 		<div class="img_box">
+		// 			<img src="https://i.imgur.com/GKQEJZP.png" alt="대용량 레몬즙, 레몬즙 스틱, 직접 레몬즙 착즙하기" />
+
+		// 		</div>
+		// 		<hr />
+		// 		<div class="text_box">
+		// 			<h3>레몬수는 어떻게 음용할 수 있을까요? 간편하게 즐기는 레몬수 섭취 방법!</h3>
+		// 			<div class="h3_des">
+		// 				<span>레몬수는 상쾌한 맛과 함께 건강 효과를 제공하는 훌륭한 음료이지만, 매일 꾸준히 마시는 게 생각보다 어려울 수 있죠.</span>
+		// 				<span>그렇다면 여러분의 라이프스타일에 맞는 섭취 방법을 찾아보세요!</span>
+		// 				<span>오늘은 레몬수를 즐길 수 있는 세 가지 간편한 음용 방식을 소개해 드리겠습니다.</span>
+		// 				<span>어떤 방법이 여러분에게 가장 잘 맞을까요?</span>
+		// 			</div>
+		// 		</div>
+		// 		<div class="text_box">
+		// 			<span class="mini_title">1. 레몬즙 스틱: 언제 어디서나 간편하게!</span>
+		// 			<span>레몬즙 스틱은 바쁜 일상에서도 쉽게 레몬수를 섭취할 수 있는 최고의 방법입니다. 출근길이나 여행 중에도 물만 있으면 상쾌한 레몬수를 빠르게 만들 수 있어 휴대가 간편하고 위생적이죠. 언제 어디서나 빠르고 간편하게 레몬수를 즐길 수 있습니다.</span>
+		// 		</div>
+		// 		<div class="text_box">
+		// 			<span class="mini_title">2. 대용량 레몬즙 통: 자유로운 양 조절과 경제성!</span>
+		// 			<span>레몬수를 자주 마시거나 요리에도 활용하고 싶다면 대용량 레몬즙이 좋은 선택입니다. 자유롭게 양을 조절할 수 있어 다용도로 활용할 수 있으며, 경제적인 면에서도 유리합니다. 보관 시 신선도를 유지하기에 어려움이 있지만, 꾸준히 섭취하고자 하신다면 효율적인 선택입니다.</span>
+		// 		</div>
+		// 		<div class="text_box">
+		// 			<span class="mini_title">3. 직접 레몬즙 착즙하기: 신선함은 그대로!</span>
+		// 			<span>가장 신선하고 건강한 방법을 찾고 있다면, 직접 레몬을 착즙해 섭취하는 것이 답입니다. 방부제나 첨가물 없이 레몬 본연의 영양을 그대로 섭취할 수 있죠. 시간과 노력이 들어가지만, 최고의 신선함을 원한다면 직접 착즙이 가장 좋은 방법입니다.</span>
+		// 		</div>
+		// 	</div>
+		// 	<div class="section section_04">
+		// 		<div class="img_box">
+		// 			<img src="https://i.imgur.com/IU0cWFV.png" alt="테팔 블렌드포스 믹서기" />
+
+		// 		</div>
+		// 		<hr />
+		// 		<div class="detail_cont_box">
+		// 			<h3>테팔 블렌드포스 믹서기로 일상을 더 편리하게 만드는 이유!”</h3>
+		// 			<div class="text_box">
+		// 				<span class="mini_title contain_img"><img class="emoji_rhombus" alt="🔸" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f538.svg" /> 강력한 성능과 간편한 사용성</span>
+		// 				<span>테팔 블렌드포스 믹서기는 강력한 22000RPM 모터와 파워엘릭스 기술로 단단한 재료도 손쉽게 분쇄합니다.
+		// 					편리하게 분리할 수 있는 칼날 덕분에 세척이 간편하며, 1.75L 대용량 내열 유리 용기로 많은 양을 한 번에 블렌딩할 수 있어
+		// 					요리에 더욱 유용합니다.
+		// 				</span>
+		// 			</div>
+		// 			<div class="text_box">
+		// 				<span class="mini_title contain_img"><img class="emoji_rhombus" alt="🔸" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f538.svg" /> 이중 잠금으로 안전하게</span>
+		// 				<span>스마트 잠금 방식으로 안전하게 사용할 수 있어, 언제나 안심하고 요리할 수 있습니다. 안전을 고려한 설계로, 블렌딩이 더욱 즐거워집니다.</span>
+
+		// 			</div>
+
+		// 		</div>
+		// 		<hr />
+		// 		<div class="text_box">
+		// 			<h3>레몬수와 레몬큐브로 매일 상쾌하고 건강하게 살아가는 법!</h3>
+		// 			<span>레몬수와 레몬큐브는 단순한 음료를 넘어, 상큼함과 건강을 동시에 잡을 수 있는 최고의 아이템입니다.</span>
+		// 			<span>특히 테팔 블렌드포스 믹서기를 사용하면 간편하게 레몬큐브를 만들어 매일매일 신선한 맛과 영양을 즐길 수 있습니다.</span>
+		// 			<span>이제부터는 매일 아침 상큼한 레몬수로 건강을 챙기고, 레몬큐브로 다양한 요리에 생기를 불어넣어 보세요.</span>
+		// 			<span>이 작은 변화가 당신의 하루를 얼마나 상쾌하고 특별하게 만들지 기대해 보세요!</span>
+		// 		</div>
+		// 	</div>
+		// </div>`,
 		type: 'document:header,page',
 		iframe_cssFileName: ['suneditor', 'katex'],
 		copyFormatKeepOn: true,
@@ -679,6 +815,142 @@ window.editor_root = suneditor.create(
 		// autoLinkify: false,
 		// autoStyleify: [],
 		// componentAutoSelect: true,
+		strictMode: false,
+		value: `<div class="wrap_800 article_type_1"><br />
+			<div class="section section_01">
+				<div class="detail_cont_box">
+					<h3 class="first_h3">
+						<img class="emoji like_pin" alt="📍" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f4cd.svg" />
+						
+						"상큼한 레몬수로 건강하고 활기찬 일상 시작하기!"
+					</h3>
+					<div class="img_box">
+						<img src="https://i.imgur.com/hfHHulc.png" alt="레몬수" title="컵에 담긴 레몬수 사진" />
+						
+					</div>
+					<div class="text_box">
+						<span>
+							레몬수가 요즘 핫한 웰빙 트렌드로 자리 잡고 있습니다.
+							새콤달콤한 레몬으로 만든 시원한 음료 한 잔이 더위를 날려줄 뿐만 아니라, 건강까지 챙길 수 있다면?<br />
+							오늘은 레몬수의 놀라운 효능과 함께, 레몬을 다양하게 활용할 수 있는 레몬큐브 만드는 법을 소개합니다.<br />
+							또한, 모든 과정에서 최고의 성능을 자랑하는 테팔 블렌드포스 믹서기의 활용법까지! 건강과 맛을 모두 잡는 방법, 지금부터
+							만나보세요.
+						</span>
+					</div>
+				
+				</div>
+				<hr />
+				<div class="detail_cont_box">
+					<h3>이 아티클은 이런 분들에게 유용합니다!</h3>
+					<div class="text_box">
+						<span class="contain_img"><img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" /> 새로운 주방용품 구입을 고민하는 분들</span>
+						<span class="contain_img"><img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" /> 품질 좋은 주방용품을 오랫동안 사용하고 싶은 분들</span>
+						<span class="contain_img"><img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" /> 환경보호를 생각하며 지속 가능한 소비를 추구하는 분들</span>
+						
+					</div>
+				
+				</div>
+				<hr />
+				<div class="detail_cont_box">
+					<h3>레몬수를 왜 먹을까요? 효능에 대한 모든 것!</h3>
+					<div class="text_box">
+						<span>레몬수는 단순히 상큼한 맛을 즐기기 위한 음료가 아닙니다.</span>
+						<span>하루 한 잔의 레몬수는 피부부터 신장까지 관리할 수 있는 '마법의 음료'라 불리는 이유가 따로 있죠.</span>
+						<span>그 안에 숨겨진 놀라운 건강 효능을 살펴보겠습니다. 레몬수를 마시면 어떤 효과를 기대할 수 있을까요?</span>
+					</div>
+				
+				</div>
+			</div>
+			<div class="section section_02">
+				<div class="img_box">
+					<img src="https://i.imgur.com/Z4gQNYt.png" alt="레몬수" title="컵에 레몬수를 따르는 사진" />
+					
+				</div>
+				<div class="text_box">
+					<span class="mini_title">1. 비타민 C 폭탄! 피부와 면역력을 동시에</span>
+					<span>레몬수 한 잔에 담긴 비타민 C는 피로 해소는 물론, 피부를 더욱 맑고 투명하게 가꿔줍니다.</span>
+					<span>하루 한 잔의 레몬수가 우리 몸의 항산화 작용을 촉진하고, 스트레스와 노화를 예방해 줍니다.</span>
+					<span>일상의 활력을 채워주는 비타민 C 폭탄을 경험해 보세요.</span>
+				</div>
+				<div class="text_box">
+					<span class="mini_title">2. 다이어트의 비밀, 체중 감소와 소화 개선</span>
+					<span>다이어트를 하고 있다면 레몬수를 절대 놓치지 마세요!</span>
+					<span>레몬수는 소화를 돕고 장운동을 촉진해 복부 팽만감을 해소해 줍니다.</span>
+					<span>또한, 칼륨이 나트륨을 조절해 부기를 완화해 주므로, 규칙적인 섭취로 체중 감소의 효과까지 기대할 수 있습니다..</span>
+				</div>
+				<div class="text_box">
+					<span class="mini_title">3. 심혈관 건강을 지키는 든든한 수호자</span>
+					<span>레몬에는 혈관을 강화해 주는 펙틴과 몸속 노폐물을 제거하는 구연산이 풍부합니다.</span>
+					<span>이러한 성분들은 혈압을 낮추고 심혈관 질환을 예방하는 데 탁월한 효과가 있어,</span>
+					<span>레몬수를 매일 마시는 것만으로도 심장 건강을 챙길 수 있습니다.</span>
+				</div>
+				<div class="text_box">
+					<span class="mini_title">4. 신장 결석 예방, 상큼한 디톡스 효과</span>
+					<span>신장 결석을 예방하고 싶은 분들에게도 레몬수는 훌륭한 해결책입니다.</span>
+					<span>레몬에 함유된 구연산이 체액을 증가시켜 소변을 중화하고, 요로에 노폐물이 쌓이지 않도록 도와줍니다.</span>
+					<span>간단하게 레몬수로 디톡스 하세요!</span>
+				</div>
+			</div>
+			<div class="section section_03">
+				<div class="img_box">
+					<img src="https://i.imgur.com/GKQEJZP.png" alt="대용량 레몬즙, 레몬즙 스틱, 직접 레몬즙 착즙하기" />
+					
+				</div>
+				<hr />
+				<div class="text_box">
+					<h3>레몬수는 어떻게 음용할 수 있을까요? 간편하게 즐기는 레몬수 섭취 방법!</h3>
+					<div class="h3_des">
+						<span>레몬수는 상쾌한 맛과 함께 건강 효과를 제공하는 훌륭한 음료이지만, 매일 꾸준히 마시는 게 생각보다 어려울 수 있죠.</span>
+						<span>그렇다면 여러분의 라이프스타일에 맞는 섭취 방법을 찾아보세요!</span>
+						<span>오늘은 레몬수를 즐길 수 있는 세 가지 간편한 음용 방식을 소개해 드리겠습니다.</span>
+						<span>어떤 방법이 여러분에게 가장 잘 맞을까요?</span>
+					</div>
+				</div>
+				<div class="text_box">
+					<span class="mini_title">1. 레몬즙 스틱: 언제 어디서나 간편하게!</span>
+					<span>레몬즙 스틱은 바쁜 일상에서도 쉽게 레몬수를 섭취할 수 있는 최고의 방법입니다. 출근길이나 여행 중에도 물만 있으면 상쾌한 레몬수를 빠르게 만들 수 있어 휴대가 간편하고 위생적이죠. 언제 어디서나 빠르고 간편하게 레몬수를 즐길 수 있습니다.</span>
+				</div>
+				<div class="text_box">
+					<span class="mini_title">2. 대용량 레몬즙 통: 자유로운 양 조절과 경제성!</span>
+					<span>레몬수를 자주 마시거나 요리에도 활용하고 싶다면 대용량 레몬즙이 좋은 선택입니다. 자유롭게 양을 조절할 수 있어 다용도로 활용할 수 있으며, 경제적인 면에서도 유리합니다. 보관 시 신선도를 유지하기에 어려움이 있지만, 꾸준히 섭취하고자 하신다면 효율적인 선택입니다.</span>
+				</div>
+				<div class="text_box">
+					<span class="mini_title">3. 직접 레몬즙 착즙하기: 신선함은 그대로!</span>
+					<span>가장 신선하고 건강한 방법을 찾고 있다면, 직접 레몬을 착즙해 섭취하는 것이 답입니다. 방부제나 첨가물 없이 레몬 본연의 영양을 그대로 섭취할 수 있죠. 시간과 노력이 들어가지만, 최고의 신선함을 원한다면 직접 착즙이 가장 좋은 방법입니다.</span>
+				</div>
+			</div>
+			<div class="section section_04">
+				<div class="img_box">
+					<img src="https://i.imgur.com/IU0cWFV.png" alt="테팔 블렌드포스 믹서기" />
+					
+				</div>
+				<hr />
+				<div class="detail_cont_box">
+					<h3>테팔 블렌드포스 믹서기로 일상을 더 편리하게 만드는 이유!”</h3>
+					<div class="text_box">
+						<span class="mini_title contain_img"><img class="emoji_rhombus" alt="🔸" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f538.svg" /> 강력한 성능과 간편한 사용성</span>
+						<span>테팔 블렌드포스 믹서기는 강력한 22000RPM 모터와 파워엘릭스 기술로 단단한 재료도 손쉽게 분쇄합니다.
+							편리하게 분리할 수 있는 칼날 덕분에 세척이 간편하며, 1.75L 대용량 내열 유리 용기로 많은 양을 한 번에 블렌딩할 수 있어
+							요리에 더욱 유용합니다.
+						</span>
+					</div>
+					<div class="text_box">
+						<span class="mini_title contain_img"><img class="emoji_rhombus" alt="🔸" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f538.svg" /> 이중 잠금으로 안전하게</span>
+						<span>스마트 잠금 방식으로 안전하게 사용할 수 있어, 언제나 안심하고 요리할 수 있습니다. 안전을 고려한 설계로, 블렌딩이 더욱 즐거워집니다.</span>
+						
+					</div>
+				
+				</div>				
+				<hr />
+				<div class="text_box">
+					<h3>레몬수와 레몬큐브로 매일 상쾌하고 건강하게 살아가는 법!</h3>
+					<span>레몬수와 레몬큐브는 단순한 음료를 넘어, 상큼함과 건강을 동시에 잡을 수 있는 최고의 아이템입니다.</span>
+					<span>특히 테팔 블렌드포스 믹서기를 사용하면 간편하게 레몬큐브를 만들어 매일매일 신선한 맛과 영양을 즐길 수 있습니다.</span>
+					<span>이제부터는 매일 아침 상큼한 레몬수로 건강을 챙기고, 레몬큐브로 다양한 요리에 생기를 불어넣어 보세요.</span>
+					<span>이 작은 변화가 당신의 하루를 얼마나 상쾌하고 특별하게 만들지 기대해 보세요!</span>
+				</div>
+			</div>
+		</div>`,
 		link: {
 			uploadUrl: 'http://localhost:3000/editor/files/upload',
 			relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
@@ -691,9 +963,7 @@ window.editor_root = suneditor.create(
 		videoGallery: {
 			url: 'http://localhost:3000/editor/gallery/video'
 		},
-		embed: {
-
-		},
+		embed: {},
 		imageGallery: {
 			url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
 		},
@@ -707,6 +977,9 @@ window.editor_root = suneditor.create(
 		audio: {
 			uploadUrl: 'http://localhost:3000/editor/upload',
 			createFileInput: true
+		},
+		audioGallery: {
+			url: 'http://localhost:3000/editor/gallery/audio'
 		},
 		table: {
 			scrollType: 'x'

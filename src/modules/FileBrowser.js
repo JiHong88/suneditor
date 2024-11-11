@@ -319,7 +319,7 @@ function DrawItems(item) {
 	const props = `class="${thumbnail || 'se-browser-empty-image'}" src="${src}" alt="${item.alt || srcName}" data-command="${item.src}" data-value="${item.name || srcName}" data-thumbnail="${thumbnail}"`;
 	return /*html*/ `
 		<div class="se-file-item-img">
-			${this.thumbnail && !thumbnail ? `<div class="se-browser-empty-thumbnail" ${props}>${this.thumbnail}</div>` : `<img class="${thumbnail || 'se-browser-empty-image'}" ${props}>`}
+			${this.thumbnail && !thumbnail ? `<div class="se-browser-empty-thumbnail" ${props}>${this.thumbnail(item)}</div>` : `<img class="${thumbnail || 'se-browser-empty-image'}" ${props}>`}
 			<div class="se-file-name-image se-file-name-back"></div>
 			<div class="se-file-name-image">${item.name || srcName}</div>
 		</div>`;
