@@ -106,8 +106,8 @@ const Image_ = function (editor, pluginOptions) {
 	if (this.imgUrlFile) this.eventManager.addEvent(this.imgUrlFile, 'input', OnLinkPreview.bind(this));
 	if (this.imgInputFile && this.imgUrlFile) this.eventManager.addEvent(this.imgInputFile, 'change', OnfileInputChange.bind(this));
 
-	const imageGalleryButton = modalEl.querySelector('.__se__gallery');
-	if (imageGalleryButton) this.eventManager.addEvent(imageGalleryButton, 'click', OpenGallery.bind(this));
+	const galleryButton = modalEl.querySelector('.__se__gallery');
+	if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', OpenGallery.bind(this));
 
 	if (this._resizing) {
 		this.proportion = modalEl.querySelector('._se_check_proportion');

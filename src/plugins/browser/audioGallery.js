@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { FileBrowser } from '../../modules';
+import { Browser } from '../../modules';
 
 const AudioGallery = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -9,19 +9,19 @@ const AudioGallery = function (editor, pluginOptions) {
 
 	// modules
 	const thumbnail = pluginOptions.thumbnail || this.icons.audio_thumbnail;
-	this.fileBrowser = new FileBrowser(this, {
+	this.browser = new Browser(this, {
 		title: this.lang.audioGallery,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
 		selectorHandler: SetItem.bind(this),
 		columnSize: 4,
 		className: 'se-audio-gallery',
-		thumbnail: () => thumbnail
+		thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail
 	});
 };
 
 AudioGallery.key = 'audioGallery';
-AudioGallery.type = 'fileBrowser';
+AudioGallery.type = 'browser';
 AudioGallery.className = '';
 AudioGallery.prototype = {
 	/**
@@ -29,7 +29,7 @@ AudioGallery.prototype = {
 	 */
 	open(inputTarget) {
 		this.inputTarget = inputTarget;
-		this.fileBrowser.open();
+		this.browser.open();
 	},
 
 	/**
@@ -37,7 +37,7 @@ AudioGallery.prototype = {
 	 */
 	close() {
 		this.inputTarget = null;
-		this.fileBrowser.close();
+		this.browser.close();
 	},
 
 	constructor: AudioGallery

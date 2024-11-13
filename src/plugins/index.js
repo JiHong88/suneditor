@@ -33,9 +33,11 @@ import math from './modal/math';
 import drawing from './modal/drawing';
 
 // file browser
-import imageGallery from './fileBrowser/imageGallery';
-import videoGallery from './fileBrowser/videoGallery';
-import audioGallery from './fileBrowser/audioGallery';
+import imageGallery from './browser/imageGallery';
+import videoGallery from './browser/videoGallery';
+import audioGallery from './browser/audioGallery';
+import fileGallery from './browser/fileGallery';
+import fileBrowser from './browser/fileBrowser';
 
 // input
 import fontSize from './input/fontSize';
@@ -74,6 +76,8 @@ export {
 	imageGallery,
 	videoGallery,
 	audioGallery,
+	fileGallery,
+	fileBrowser,
 	fontSize,
 	pageNavigator,
 	anchor
@@ -108,6 +112,8 @@ export default {
 	imageGallery,
 	videoGallery,
 	audioGallery,
+	fileGallery,
+	fileBrowser,
 	fontSize,
 	pageNavigator,
 	anchor

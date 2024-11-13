@@ -286,20 +286,13 @@ FileUpload.prototype = {
 		this.component.select(target, FileUpload.key, false);
 	},
 
-	_register(response) {
-		response.result.forEach((file, i, a) => {
-			this._create(
-				file.url,
-				{
-					name: file.name,
-					size: file.size
-				},
-				i === a.length - 1
-			);
-		});
-	},
-
-	_create(url, file, isLast) {
+	/**
+	 * @description Create file element
+	 * @param {String} url File URL
+	 * @param {File} file File object
+	 * @param {Boolean} isLast Is last file
+	 */
+	create(url, file, isLast) {
 		const name = file.name || url;
 		const a = domUtils.createElement(
 			'A',
@@ -339,6 +332,19 @@ FileUpload.prototype = {
 		} else {
 			this.component.select(a, FileUpload.key, false);
 		}
+	},
+
+	_register(response) {
+		response.result.forEach((file, i, a) => {
+			this.create(
+				file.url,
+				{
+					name: file.name,
+					size: file.size
+				},
+				i === a.length - 1
+			);
+		});
 	},
 
 	async _error(response) {

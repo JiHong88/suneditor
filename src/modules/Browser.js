@@ -5,34 +5,34 @@ import ApiManager from './ApiManager';
 /**
  * @param {*} inst
  * @param {Object} params
- * @param {string} params.title - File browser window title. Required. Can be overridden in fileBrowser.
- * @param {string} params.url - File server url. Required. Can be overridden in fileBrowser.
- * @param {Object} params.headers - File server http header. Required. Can be overridden in fileBrowser.
- * @param {function} params.selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in fileBrowser.
+ * @param {string} params.title - File browser window title. Required. Can be overridden in browser.
+ * @param {string} params.url - File server url. Required. Can be overridden in browser.
+ * @param {Object} params.headers - File server http header. Required. Can be overridden in browser.
+ * @param {function} params.selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
  * @param {boolean?} params.useSearch - Whether to use the search function. Optional. Default: true.
- * @param {string?} params.searchUrl - File server search url. Optional. Can be overridden in fileBrowser.
- * @param {Object?} params.searchUrlHeader - File server search http header. Optional. Can be overridden in fileBrowser.
- * @param {string?} params.listClass - Class name of list div. Required. Can be overridden in fileBrowser.
- * @param {function?} params.drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in fileBrowser.
- * @param {number?} params.columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in fileBrowser. Default: 4.
+ * @param {string?} params.searchUrl - File server search url. Optional. Can be overridden in browser.
+ * @param {Object?} params.searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
+ * @param {string?} params.listClass - Class name of list div. Required. Can be overridden in browser.
+ * @param {function?} params.drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
+ * @param {number?} params.columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
  */
-const FileBrowser = function (inst, params) {
+const Browser = function (inst, params) {
 	CoreInjector.call(this, inst.editor);
 
 	// create HTML
 	this.useSearch = params.useSearch ?? true;
-	const browserFrame = domUtils.createElement('DIV', { class: 'se-file-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
-	const content = domUtils.createElement('DIV', { class: 'se-file-browser-inner' }, CreateHTML(inst.editor, this.useSearch));
+	const browserFrame = domUtils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
+	const content = domUtils.createElement('DIV', { class: 'se-browser-inner' }, CreateHTML(inst.editor, this.useSearch));
 
 	// members
 	this.kind = inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
 	this.area = browserFrame;
-	this.header = content.querySelector('.se-file-browser-header');
-	this.titleArea = content.querySelector('.se-file-browser-title');
-	this.tagArea = content.querySelector('.se-file-browser-tags');
-	this.body = content.querySelector('.se-file-browser-body');
-	this.list = content.querySelector('.se-file-browser-list');
+	this.header = content.querySelector('.se-browser-header');
+	this.titleArea = content.querySelector('.se-browser-title');
+	this.tagArea = content.querySelector('.se-browser-tags');
+	this.body = content.querySelector('.se-browser-body');
+	this.list = content.querySelector('.se-browser-list');
 	this._loading = content.querySelector('.se-loading-box');
 
 	this.title = params.title;
@@ -57,7 +57,7 @@ const FileBrowser = function (inst, params) {
 	this.apiManager = new ApiManager(this, { method: 'GET' });
 
 	// init
-	browserFrame.appendChild(domUtils.createElement('DIV', { class: 'se-file-browser-back' }));
+	browserFrame.appendChild(domUtils.createElement('DIV', { class: 'se-browser-back' }));
 	browserFrame.appendChild(content);
 	this.carrierWrapper.appendChild(browserFrame);
 
@@ -65,10 +65,10 @@ const FileBrowser = function (inst, params) {
 	this.eventManager.addEvent(this.list, 'click', OnClickFile.bind(this));
 	this.eventManager.addEvent(content, 'mousedown', OnMouseDown_browser.bind(this));
 	this.eventManager.addEvent(content, 'click', OnClick_browser.bind(this));
-	this.eventManager.addEvent(browserFrame.querySelector('form.se-file-browser-search-form'), 'submit', Search.bind(this));
+	this.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', Search.bind(this));
 };
 
-FileBrowser.prototype = {
+Browser.prototype = {
 	/**
 	 * @description Open a file browser plugin
 	 * @param {Object|null} params {
@@ -81,16 +81,18 @@ FileBrowser.prototype = {
 
 		const listClassName = params.listClass || this.listClass;
 		if (!domUtils.hasClass(this.list, listClassName)) {
-			this.list.className = 'se-file-browser-list ' + listClassName;
+			this.list.className = 'se-browser-list ' + listClassName;
 		}
+
 		this.titleArea.textContent = params.title || this.title;
 		this.area.style.display = 'block';
+		this.editor.opendBrowser = this;
 
 		this._drawFileList(params.url || this.url, params.urlHeader || this.urlHeader);
 	},
 
 	/**
-	 * @description Close a fileBrowser plugin
+	 * @description Close a browser plugin
 	 * The plugin's "init" method is called.
 	 */
 	close() {
@@ -101,6 +103,7 @@ FileBrowser.prototype = {
 		this.selectedTags = [];
 		this.items = [];
 		this.list.innerHTML = this.tagArea.innerHTML = this.titleArea.textContent = '';
+		this.editor.opendBrowser = null;
 
 		if (typeof this.inst.init === 'function') this.inst.init();
 	},
@@ -188,7 +191,7 @@ FileBrowser.prototype = {
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 	},
 
-	constructor: FileBrowser
+	constructor: Browser
 };
 
 function CallBackGet(xmlHttp) {
@@ -200,7 +203,7 @@ function CallBackGet(xmlHttp) {
 			this.list.innerHTML = res.nullMessage;
 		}
 	} catch (e) {
-		throw Error(`[SUNEDITOR.fileBrowser.drawList.fail] cause: "${e.message}"`);
+		throw Error(`[SUNEDITOR.browser.drawList.fail] cause: "${e.message}"`);
 	} finally {
 		this.closeBrowserLoading();
 		this.body.style.maxHeight = domUtils.getClientSize().h - this.header.offsetHeight - 50 + 'px';
@@ -209,7 +212,7 @@ function CallBackGet(xmlHttp) {
 
 function CallBackError(res, xmlHttp) {
 	this.closeBrowserLoading();
-	throw Error(`[SUNEDITOR.fileBrowser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`);
+	throw Error(`[SUNEDITOR.browser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`);
 }
 
 function OnClickTag(e) {
@@ -255,7 +258,7 @@ function OnClickFile(e) {
 }
 
 function OnMouseDown_browser(e) {
-	if (/se-file-browser-inner/.test(e.target.className)) {
+	if (/se-browser-inner/.test(e.target.className)) {
 		this._closeSignal = true;
 	} else {
 		this._closeSignal = false;
@@ -277,18 +280,18 @@ function Search(e) {
 
 function CreateHTML({ lang, icons }, useSearch) {
 	return /*html*/ `
-		<div class="se-file-browser-content">
-			<div class="se-file-browser-header">
-				<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" title="${lang.close}" aria-label="${lang.close}">
+		<div class="se-browser-content">
+			<div class="se-browser-header">
+				<button type="button" data-command="close" class="se-btn se-browser-close" class="close" title="${lang.close}" aria-label="${lang.close}">
 					${icons.cancel}
 				</button>
-				<span class="se-file-browser-title"></span>
-				<div class="se-file-browser-tags"></div>
+				<span class="se-browser-title"></span>
+				<div class="se-browser-tags"></div>
 				${
 					useSearch
 						? /*html*/ `
-						<div class="se-file-browser-search">
-							<form class="se-file-browser-search-form">
+						<div class="se-browser-search">
+							<form class="se-browser-search-form">
 								<input type="text" class="se-input-form" placeholder="${lang.search}" aria-label="${lang.search}">
 								<button type="submit" class="se-btn" title="${lang.search}" aria-label="${lang.search}">${icons.search}</button>
 							</form>
@@ -297,15 +300,15 @@ function CreateHTML({ lang, icons }, useSearch) {
 				}
 				
 			</div>
-			<div class="se-file-browser-body">
+			<div class="se-browser-body">
 				<div class="se-loading-box sun-editor-common"><div class="se-loading-effect"></div></div>
-				<div class="se-file-browser-list"></div>
+				<div class="se-browser-list"></div>
 			</div>
 		</div>`;
 }
 
 /**
- * @Required @override fileBrowser
+ * @Required @override browser
  * @description Define the HTML of the item to be put in "div.se-file-item-column".
  * Format: [
  *      { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" }
@@ -325,4 +328,4 @@ function DrawItems(item) {
 		</div>`;
 }
 
-export default FileBrowser;
+export default Browser;

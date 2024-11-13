@@ -1,6 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller, FileManager, Figure, _DragHandle } from '../../modules';
 import { domUtils, numbers, env } from '../../helper';
+import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 const Audio_ = function (editor, pluginOptions) {
@@ -47,6 +48,9 @@ const Audio_ = function (editor, pluginOptions) {
 	this.defaultHeight = this.pluginOptions.defaultHeight;
 	this.urlValue = '';
 	this._element = null;
+
+	const galleryButton = modalEl.querySelector('.__se__gallery');
+	if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', OpenGallery.bind(this));
 
 	// init
 	if (this.audioInputFile) {
@@ -403,6 +407,15 @@ function OnLinkPreview(e) {
 		: value;
 }
 
+function OpenGallery() {
+	this.plugins.audioGallery.open(_setUrlInput.bind(this));
+}
+
+function _setUrlInput(target) {
+	this.urlValue = this.preview.textContent = this.audioUrlFile.value = target.getAttribute('data-command') || target.src;
+	this.audioUrlFile.focus();
+}
+
 // Disable url input when uploading files
 function RemoveSelectedFiles(urlInput, preview) {
 	this.value = '';
@@ -429,7 +442,7 @@ function FileInputChange({ target }) {
 	Modal.OnChangeFile(this.fileModalWrapper, target.files);
 }
 
-function CreateHTML_modal({ lang, icons }, pluginOptions) {
+function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	let html = /*html*/ `
     <form method="post" enctype="multipart/form-data">
         <div class="se-modal-header">
@@ -450,7 +463,17 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		html += /*html*/ `
         <div class="se-modal-form">
             <label>${lang.audio_modal_url}</label>
-            <input class="se-input-form se-input-url" data-focus type="text" />
+			<div class="se-modal-form-files">
+				<input class="se-input-form se-input-url" data-focus type="text" />
+				${
+					plugins.audioGallery
+						? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button __se__gallery" aria-label="${lang.audioGallery}">
+							${icons.audio_gallery}
+							${CreateTooltipInner(lang.audioGallery)}
+							</button>`
+						: ''
+				}
+			</div>
             <pre class="se-link-preview"></pre>
         </div>`;
 	}

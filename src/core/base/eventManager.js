@@ -871,10 +871,9 @@ EventManager.prototype = {
 		const isToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar._inlineToolbarAttr.isShow);
 		if (toolbar.offsetWidth === 0 && !isToolbarHidden) return;
 
-		const fc = this.editor.frameContext;
-		const fileBrowser = fc.get('fileBrowser');
-		if (fileBrowser && fileBrowser.area.style.display === 'block') {
-			fileBrowser.body.style.maxHeight = domUtils.getClientSize().h - fileBrowser.header.offsetHeight - 50 + 'px';
+		const opendBrowser = this.editor.opendBrowser;
+		if (opendBrowser && opendBrowser.area.style.display === 'block') {
+			opendBrowser.body.style.maxHeight = domUtils.getClientSize().h - opendBrowser.header.offsetHeight - 50 + 'px';
 		}
 
 		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
@@ -883,6 +882,7 @@ EventManager.prototype = {
 
 		if (this.viewer._resetFullScreenHeight()) return;
 
+		const fc = this.editor.frameContext;
 		if (fc.get('isCodeView') && this.editor.isInline) {
 			this.toolbar._showInline();
 			return;

@@ -1,6 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager } from '../../modules';
 import { domUtils, numbers, env, converter } from '../../helper';
+import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 const Video = function (editor, pluginOptions) {
@@ -121,6 +122,9 @@ const Video = function (editor, pluginOptions) {
 			/loom\.com\/share\//
 		])
 		.concat(this.pluginOptions.urlPatterns || []);
+
+	const galleryButton = modalEl.querySelector('.__se__gallery');
+	if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', OpenGallery.bind(this));
 
 	// init
 	if (this.videoInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', RemoveSelectedFiles.bind(this));
@@ -792,6 +796,15 @@ function OnLinkPreview(e) {
 	}
 }
 
+function OpenGallery() {
+	this.plugins.videoGallery.open(_setUrlInput.bind(this));
+}
+
+function _setUrlInput(target) {
+	this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = target.getAttribute('data-command') || target.src;
+	this.videoUrlFile.focus();
+}
+
 function OnfileInputChange({ target }) {
 	if (!this.videoInputFile.value) {
 		this.videoUrlFile.removeAttribute('disabled');
@@ -847,7 +860,7 @@ function OnInputSize(xy, e) {
 	}
 }
 
-function CreateHTML_modal({ lang, icons }, pluginOptions) {
+function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	let html = /*html*/ `
 	<form method="post" enctype="multipart/form-data">
 		<div class="se-modal-header">
@@ -870,7 +883,17 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		html += /*html*/ `
 			<div class="se-modal-form">
 				<label>${lang.video_modal_url}</label>
-				<input class="se-input-form se-input-url" type="text" data-focus />
+				<div class="se-modal-form-files">
+					<input class="se-input-form se-input-url" type="text" data-focus />
+					${
+						plugins.videoGallery
+							? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button __se__gallery" aria-label="${lang.videoGallery}">
+								${icons.video_gallery}
+								${CreateTooltipInner(lang.videoGallery)}
+								</button>`
+							: ''
+					}
+				</div>
 				<pre class="se-link-preview"></pre>
 			</div>`;
 	}

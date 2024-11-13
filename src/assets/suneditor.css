@@ -2855,7 +2855,7 @@
 }
 
 /* --- browser ---------------------------------------------------------- */
-.sun-editor .se-file-browser {
+.sun-editor .se-browser {
 	position: fixed;
 	display: none;
 	top: 0;
@@ -2865,16 +2865,16 @@
 	z-index: 2147483647;
 }
 
-.sun-editor .se-file-browser label,
-.sun-editor .se-file-browser input,
-.sun-editor .se-file-browser button {
+.sun-editor .se-browser label,
+.sun-editor .se-browser input,
+.sun-editor .se-browser button {
 	font-size: var(--se-modal-input-font-size);
 	line-height: 1.5;
 	color: var(--se-main-color);
 	margin: 0;
 }
 
-.sun-editor .se-file-browser .se-file-browser-back {
+.sun-editor .se-browser .se-browser-back {
 	position: absolute;
 	display: block;
 	width: 100%;
@@ -2885,7 +2885,7 @@
 	opacity: 0.5;
 }
 
-.sun-editor .se-file-browser .se-file-browser-inner {
+.sun-editor .se-browser .se-browser-inner {
 	position: absolute;
 	display: block;
 	width: 100%;
@@ -2894,7 +2894,7 @@
 	left: 0;
 }
 
-.sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {
+.sun-editor .se-browser .se-browser-inner .se-browser-content {
 	position: relative;
 	width: 1024px;
 	max-width: 100%;
@@ -2910,14 +2910,14 @@
 }
 
 /* --- browser - header */
-.sun-editor .se-file-browser .se-file-browser-header {
+.sun-editor .se-browser .se-browser-header {
 	height: auto;
 	min-height: 50px;
 	padding: 6px 15px 6px 15px;
 	border-bottom: 1px solid var(--se-modal-border-color);
 }
 
-.sun-editor .se-file-browser .se-file-browser-header .se-file-browser-close {
+.sun-editor .se-browser .se-browser-header .se-browser-close {
 	float: right;
 	font-weight: bold;
 	text-shadow: 0 1px 0 var(--se-main-background-color);
@@ -2925,7 +2925,7 @@
 	opacity: 1;
 }
 
-.sun-editor .se-file-browser .se-file-browser-header .se-file-browser-title {
+.sun-editor .se-browser .se-browser-header .se-browser-title {
 	font-size: var(--se-browser-title-font-size);
 	font-weight: bold;
 	margin: 0;
@@ -2934,7 +2934,7 @@
 }
 
 /* --- browser - header - tags */
-.sun-editor .se-file-browser .se-file-browser-tags {
+.sun-editor .se-browser .se-browser-tags {
 	display: block;
 	font-size: var(--se-main-font-size);
 	width: 100%;
@@ -2943,7 +2943,7 @@
 	margin: 0 -15px;
 }
 
-.sun-editor .se-file-browser .se-file-browser-tags a {
+.sun-editor .se-browser .se-browser-tags a {
 	display: inline-block;
 	background-color: var(--se-main-background-color2);
 	padding: 6px 12px;
@@ -2960,7 +2960,7 @@
 }
 
 /* --- browser - header - search */
-.sun-editor .se-file-browser .se-file-browser-search {
+.sun-editor .se-browser .se-browser-search {
 	display: flex;
 	font-size: var(--se-main-font-size);
 	width: 100%;
@@ -2969,16 +2969,16 @@
 	margin: 0 -15px;
 }
 
-.sun-editor .se-file-browser .se-file-browser-search .se-file-browser-search-form {
+.sun-editor .se-browser .se-browser-search .se-browser-search-form {
 	width: 400px;
 	max-width: 100%;
 	display: flex;
 }
-.sun-editor .se-file-browser .se-file-browser-search .se-file-browser-search-form > * {
+.sun-editor .se-browser .se-browser-search .se-browser-search-form > * {
 	margin: 8px 0 8px 8px;
 }
 
-.sun-editor .se-file-browser .se-file-browser-search input {
+.sun-editor .se-browser .se-browser-search input {
 	flex: auto;
 	background-color: transparent;
 	padding: 3px 6px;
@@ -2992,33 +2992,33 @@
 	background-clip: padding-box;
 }
 
-.sun-editor .se-file-browser .se-file-browser-search button {
+.sun-editor .se-browser .se-browser-search button {
 	float: none;
 }
 
-.sun-editor .se-file-browser .se-file-browser-tags a:hover {
+.sun-editor .se-browser .se-browser-tags a:hover {
 	background-color: var(--se-main-divider-color);
 }
 
-.sun-editor .se-file-browser .se-file-browser-tags a:active {
+.sun-editor .se-browser .se-browser-tags a:active {
 	background-color: var(--se-main-border-color);
 }
 
-.sun-editor .se-file-browser .se-file-browser-tags a.on {
+.sun-editor .se-browser .se-browser-tags a.on {
 	background-color: var(--se-active-light3-color);
 	color: var(--se-active-dark3-color);
 }
 
-.sun-editor .se-file-browser .se-file-browser-tags a.on:hover {
+.sun-editor .se-browser .se-browser-tags a.on:hover {
 	background-color: var(--se-active-light5-color);
 }
 
-.sun-editor .se-file-browser .se-file-browser-tags a.on:active {
+.sun-editor .se-browser .se-browser-tags a.on:active {
 	background-color: var(--se-active-light5-color);
 }
 
 /* --- browser - body */
-.sun-editor .se-file-browser .se-file-browser-body {
+.sun-editor .se-browser .se-browser-body {
 	position: relative;
 	height: auto;
 	min-height: 350px;
@@ -3026,50 +3026,50 @@
 	overflow-y: auto;
 }
 
-.sun-editor .se-file-browser .se-file-browser-body .se-file-browser-list {
+.sun-editor .se-browser .se-browser-body .se-browser-list {
 	position: relative;
 	width: 100%;
 }
 
 @media screen and (max-width: 992px) {
-	.sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {
+	.sun-editor .se-browser .se-browser-inner .se-browser-content {
 		width: 748px;
 	}
 }
 
 @media screen and (max-width: 768px) {
-	.sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {
+	.sun-editor .se-browser .se-browser-inner .se-browser-content {
 		width: 600px;
 	}
 }
 
 /* --- browser - column */
-.sun-editor .se-file-browser .se-file-browser-list .se-file-item-column {
+.sun-editor .se-browser .se-browser-list .se-file-item-column {
 	position: relative;
 	display: block;
 	height: auto;
 	float: left;
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-column {
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-column {
 	width: calc(25% - 20px);
 	margin: 0 10px;
 }
 
 @media screen and (max-width: 992px) {
-	.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-column {
+	.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-column {
 		width: calc(33% - 20px);
 	}
 }
 
 @media screen and (max-width: 768px) {
-	.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-column {
+	.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-column {
 		width: calc(50% - 20px);
 	}
 }
 
 /* --- browser --- item */
-.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img {
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img {
 	position: relative;
 	display: block;
 	cursor: pointer;
@@ -3080,13 +3080,13 @@
 	margin: 10px 0;
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img:hover {
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img:hover {
 	opacity: 0.8;
 	-webkit-box-shadow: 0 0 0 0.2rem var(--se-active-color);
 	box-shadow: 0 0 0 0.2rem var(--se-active-color);
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > img {
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > img {
 	position: relative;
 	display: block;
 	width: 100%;
@@ -3095,7 +3095,7 @@
 	height: auto;
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > .se-file-name-image {
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > .se-file-name-image {
 	position: absolute;
 	z-index: 1;
 	font-size: var(--se-main-font-size);
@@ -3111,27 +3111,27 @@
 	pointer-events: none;
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > .se-file-name-image.se-file-name-back {
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > .se-file-name-image.se-file-name-back {
 	background-color: var(--se-main-font-color);
 	opacity: 0.6;
 	pointer-events: none;
 }
 
-.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > * {
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > * {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
 /* --- browser - empty-thumbnail */
-.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > .se-browser-empty-thumbnail {
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > .se-browser-empty-thumbnail {
 	width: 100%;
 	height: 170px;
 	max-height: 100%;
 	background-color: var(--se-active-light-color);
 	border-radius: var(--se-border-radius);
 }
-.sun-editor .se-file-browser .se-file-browser-list.se-preview-list .se-file-item-img > .se-browser-empty-thumbnail > svg {
+.sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > .se-browser-empty-thumbnail > svg {
 	width: 90px;
 	max-width: 100%;
 	height: auto;
@@ -3510,21 +3510,21 @@
 	float: right;
 }
 
-/* fileBrowser--- */
-.sun-editor.se-rtl .se-file-browser * {
+/* Browser--- */
+.sun-editor.se-rtl .se-browser * {
 	direction: rtl;
 }
 
-/* fileBrowser - header */
-.sun-editor.se-rtl .se-file-browser .se-file-browser-tags {
+/* Browser - header */
+.sun-editor.se-rtl .se-browser .se-browser-tags {
 	text-align: right;
 }
 
-.sun-editor.se-rtl .se-file-browser .se-file-browser-tags a {
+.sun-editor.se-rtl .se-browser .se-browser-tags a {
 	margin: 8px 8px 0 8px;
 }
 
-.sun-editor.se-rtl .se-file-browser .se-file-browser-header .se-file-browser-close {
+.sun-editor.se-rtl .se-browser .se-browser-header .se-browser-close {
 	float: left;
 }
 

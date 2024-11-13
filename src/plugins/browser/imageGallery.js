@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { FileBrowser } from '../../modules';
+import { Browser } from '../../modules';
 
 const ImageGallery = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -8,7 +8,7 @@ const ImageGallery = function (editor, pluginOptions) {
 	this.icon = 'image_gallery';
 
 	// modules
-	this.fileBrowser = new FileBrowser(this, {
+	this.browser = new Browser(this, {
 		title: this.lang.imageGallery,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
@@ -23,7 +23,7 @@ const ImageGallery = function (editor, pluginOptions) {
 };
 
 ImageGallery.key = 'imageGallery';
-ImageGallery.type = 'fileBrowser';
+ImageGallery.type = 'browser';
 ImageGallery.className = '';
 ImageGallery.prototype = {
 	/**
@@ -31,7 +31,7 @@ ImageGallery.prototype = {
 	 */
 	open(inputTarget) {
 		this.inputTarget = inputTarget;
-		this.fileBrowser.open();
+		this.browser.open();
 	},
 
 	/**
@@ -39,7 +39,7 @@ ImageGallery.prototype = {
 	 */
 	close() {
 		this.inputTarget = null;
-		this.fileBrowser.close();
+		this.browser.close();
 	},
 
 	constructor: ImageGallery

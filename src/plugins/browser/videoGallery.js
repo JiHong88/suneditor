@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { FileBrowser } from '../../modules';
+import { Browser } from '../../modules';
 
 const VideoGallery = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -9,14 +9,14 @@ const VideoGallery = function (editor, pluginOptions) {
 
 	// modules
 	const thumbnail = pluginOptions.thumbnail || this.icons.video_thumbnail;
-	this.fileBrowser = new FileBrowser(this, {
+	this.browser = new Browser(this, {
 		title: this.lang.videoGallery,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
 		selectorHandler: SetItem.bind(this),
 		columnSize: 4,
 		className: 'se-video-gallery',
-		thumbnail: () => thumbnail
+		thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail
 	});
 
 	// members
@@ -25,7 +25,7 @@ const VideoGallery = function (editor, pluginOptions) {
 };
 
 VideoGallery.key = 'videoGallery';
-VideoGallery.type = 'fileBrowser';
+VideoGallery.type = 'browser';
 VideoGallery.className = '';
 VideoGallery.prototype = {
 	/**
@@ -33,7 +33,7 @@ VideoGallery.prototype = {
 	 */
 	open(inputTarget) {
 		this.inputTarget = inputTarget;
-		this.fileBrowser.open();
+		this.browser.open();
 	},
 
 	/**
@@ -41,7 +41,7 @@ VideoGallery.prototype = {
 	 */
 	close() {
 		this.inputTarget = null;
-		this.fileBrowser.close();
+		this.browser.close();
 	},
 
 	constructor: VideoGallery

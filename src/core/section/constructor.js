@@ -1095,7 +1095,7 @@ function _createModuleGroup() {
  * @param {string} className className in button
  * @param {string} title Title in button
  * @param {string} dataCommand The data-command property of the button
- * @param {"command"|"dropdown"|"field"|"fileBrowser"|"input"|"modal"|"popup"} dataType The data-type property of the button
+ * @param {"command"|"dropdown"|"field"|"browser"|"input"|"modal"|"popup"} dataType The data-type property of the button
  * @param {string} innerHTML Html in button
  * @param {string} _disabled Button disabled
  * @param {Object} icons Icons

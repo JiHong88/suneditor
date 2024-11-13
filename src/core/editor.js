@@ -207,11 +207,12 @@ const Editor = function (multiTargets, options) {
 	this._onCopyFormatInitMethod = null;
 
 	/**
-	 * @description Controller, modal relative
+	 * @description Controller, modal, browser
 	 * @private
 	 */
 	this.opendModal = null;
 	this.opendControllers = [];
+	this.opendBrowser = null;
 	this.currentControllerName = '';
 	this._controllerTargetContext = null;
 	this.selectMenuOn = false;
@@ -366,7 +367,7 @@ Editor.prototype = {
 				return;
 			} else if (/command/.test(type)) {
 				this.plugins[command].action(button);
-			} else if (/fileBrowser/.test(type)) {
+			} else if (/browser/.test(type)) {
 				this.plugins[command].open(null);
 			} else if (/popup/.test(type)) {
 				this.plugins[command].show();
