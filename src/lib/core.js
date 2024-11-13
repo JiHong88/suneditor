@@ -6532,7 +6532,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
-        addGlobalEvent(type, listener, useCapture) {
+        addGlobalEvent: function (type, listener, useCapture) {
             if (options.iframe) {
                 core._ww.addEventListener(type, listener, useCapture);
             }
@@ -6544,7 +6544,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             };
         },
     
-        removeGlobalEvent(type, listener, useCapture) {
+        removeGlobalEvent: function (type, listener, useCapture) {
             if (!type) return;
     
             if (typeof type === 'object') {
@@ -7734,7 +7734,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             let selectionNode = core.getSelectionNode();
 
-            const selectNode = function (node, offset = 0) {
+            const selectNode = function (node, offset) {
+                if (!offset) offset = 0;
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -8353,7 +8354,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
-        _enterPrevent(e) {
+        _enterPrevent: function (e) {
             e.preventDefault();
             if (!util.isMobile) return;
 
