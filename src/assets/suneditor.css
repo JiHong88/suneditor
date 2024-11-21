@@ -2448,7 +2448,7 @@
 .sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected.se-drag-over,
 .sun-editor-editable[contenteditable='true'] .se-figure-selected.se-drag-over,
 .sun-editor-editable[contenteditable='true'] hr.se-component-selected.se-drag-over {
-	outline: 2px solid var(--se-drag-over-color);
+	outline: 3px solid var(--se-drag-over-color) !important;
 }
 .sun-editor-editable[contenteditable='true'] figure.se-drag-over > iframe {
 	pointer-events: none;
