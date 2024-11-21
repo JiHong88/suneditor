@@ -2998,6 +2998,7 @@
 
 .sun-editor .se-browser .se-browser-tags a:hover {
 	background-color: var(--se-main-divider-color);
+	transition: background-color 0.2s ease-in-out;
 }
 
 .sun-editor .se-browser .se-browser-tags a:active {
@@ -3011,6 +3012,7 @@
 
 .sun-editor .se-browser .se-browser-tags a.on:hover {
 	background-color: var(--se-active-light5-color);
+	transition: background-color 0.2s ease-in-out;
 }
 
 .sun-editor .se-browser .se-browser-tags a.on:active {
@@ -3084,6 +3086,7 @@
 	opacity: 0.8;
 	-webkit-box-shadow: 0 0 0 0.2rem var(--se-active-color);
 	box-shadow: 0 0 0 0.2rem var(--se-active-color);
+	transition: box-shadow 0.1s ease-in-out;
 }
 
 .sun-editor .se-browser .se-browser-list.se-preview-list .se-file-item-img > img {
@@ -3106,8 +3109,8 @@
 	background-color: transparent;
 	width: 100%;
 	height: 30px;
-	border-bottom-right-radius: 4px;
-	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: var(--se-border-radius);
+	border-bottom-left-radius: var(--se-border-radius);
 	pointer-events: none;
 }
 

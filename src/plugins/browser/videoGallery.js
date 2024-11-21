@@ -16,7 +16,8 @@ const VideoGallery = function (editor, pluginOptions) {
 		selectorHandler: SetItem.bind(this),
 		columnSize: 4,
 		className: 'se-video-gallery',
-		thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail
+		thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail,
+		props: ['frame']
 	});
 
 	// members
@@ -51,9 +52,23 @@ function SetItem(target) {
 	if (this.inputTarget) {
 		this.inputTarget(target);
 	} else {
-		const file = { name: target.getAttribute('data-value'), size: 0 };
+		let url = target.getAttribute('data-command');
+		const processUrl = this.plugins.video.findProcessUrl(url);
+		if (processUrl) {
+			url = processUrl.url;
+		}
+
+		const file = { name: target.getAttribute('data-name'), size: 0 };
 		this.plugins.video.init();
-		this.plugins.video.create(this.plugins.video.createVideoTag({ poster: target.getAttribute('data-thumbnail') }), target.getAttribute('data-command'), null, this.width, this.height, false, file);
+		this.plugins.video.create(
+			this.plugins.video[target.getAttribute('data-frame') === 'iframe' ? 'createIframeTag' : 'createVideoTag']({ poster: target.getAttribute('data-thumbnail') }),
+			url,
+			null,
+			this.width,
+			this.height,
+			false,
+			file
+		);
 	}
 }
 

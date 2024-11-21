@@ -41,7 +41,7 @@ const Browser = function (inst, params) {
 	this.urlHeader = params.headers;
 	this.searchUrl = params.searchUrl;
 	this.searchUrlHeader = params.searchUrlHeader;
-	this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({ thumbnail: params.thumbnail });
+	this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({ thumbnail: params.thumbnail, props: params.props || [] });
 	this.selectorHandler = params.selectorHandler;
 	this.columnSize = params.columnSize || 4;
 
@@ -319,7 +319,8 @@ function DrawItems(item) {
 	const srcName = item.src.split('/').pop();
 	const thumbnail = item.thumbnail || '';
 	const src = thumbnail || item.src;
-	const props = `class="${thumbnail || 'se-browser-empty-image'}" src="${src}" alt="${item.alt || srcName}" data-command="${item.src}" data-value="${item.name || srcName}" data-thumbnail="${thumbnail}"`;
+	const customProps = this.props?.map((v) => `data-${v}="${item[v]}"`).join(' ') || '';
+	const props = `class="${thumbnail || 'se-browser-empty-image'}" src="${src}" alt="${item.alt || srcName}" data-command="${item.src}" data-name="${item.name || srcName}" data-thumbnail="${thumbnail}" ${customProps}`;
 	return /*html*/ `
 		<div class="se-file-item-img">
 			${this.thumbnail && !thumbnail ? `<div class="se-browser-empty-thumbnail" ${props}>${this.thumbnail(item)}</div>` : `<img class="${thumbnail || 'se-browser-empty-image'}" ${props}>`}

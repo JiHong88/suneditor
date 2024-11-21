@@ -47,7 +47,7 @@ function SetItem(target) {
 	if (this.inputTarget) {
 		this.inputTarget(target);
 	} else {
-		const file = { name: target.getAttribute('data-value'), size: 0 };
+		const file = { name: target.getAttribute('data-name'), size: 0 };
 		this.plugins.fileUpload.create(target.getAttribute('data-command'), file, true);
 	}
 }
