@@ -320,7 +320,7 @@ function DrawItems(item) {
 	const thumbnail = item.thumbnail || '';
 	const src = thumbnail || item.src;
 	const customProps = this.props?.map((v) => `data-${v}="${item[v]}"`).join(' ') || '';
-	const attrs = `data-type="${item.type}" data-command="${item.src}" data-name="${item.name || srcName}" data-thumbnail="${thumbnail}" ${customProps}`;
+	const attrs = `data-type="${item.type}" data-command="${item.src}" data-name="${item.name || srcName}" data-thumbnail="${thumbnail}" data-extension="${item.src.split('.').pop()}" ${customProps}`;
 	const props = `class="${thumbnail || 'se-browser-empty-image'}" src="${src}" alt="${item.alt || srcName}" ${attrs}`;
 	return /*html*/ `
 		<div class="se-file-item-img">

@@ -981,14 +981,11 @@ window.editor_root = suneditor.create(
 		audioGallery: {
 			url: 'http://localhost:3000/editor/gallery/audio'
 		},
-		audioGallery: {
-			url: 'http://localhost:3000/editor/gallery/audio'
-		},
 		fileGallery: {
 			url: 'http://localhost:3000/editor/gallery/file'
 		},
 		fileBrowser: {
-			url: 'http://localhost:3000/editor/gallery/multimedia'
+			url: 'http://localhost:3000/editor/filebrowser'
 		},
 		table: {
 			scrollType: 'x'
