@@ -6718,10 +6718,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _toggleToolbarBalloon: function () {
-            core._editorRange();
-            const range = core.getRange();
-            if (core._bindControllersOff || (!core._isBalloonAlways && range.collapsed)) event._hideToolbar();
-            else event._showToolbarBalloon(range);
+            if (core) {
+                core._editorRange();
+                const range = core.getRange();
+                if (core._bindControllersOff || (!core._isBalloonAlways && range.collapsed)) event._hideToolbar();
+                else event._showToolbarBalloon(range);
+            }
         },
 
         _showToolbarBalloon: function (rangeObj) {
