@@ -46,6 +46,8 @@ const Browser = function (inst, params) {
 	this.columnSize = params.columnSize || 4;
 
 	this.items = [];
+	this.folders = {};
+	this.data = {};
 	this.selectedTags = [];
 	this._closeSignal = false;
 	this._bindClose = null;
@@ -102,6 +104,8 @@ Browser.prototype = {
 		this.area.style.display = 'none';
 		this.selectedTags = [];
 		this.items = [];
+		this.folders = {};
+		this.data = {};
 		this.list.innerHTML = this.tagArea.innerHTML = this.titleArea.textContent = '';
 		this.editor.opendBrowser = null;
 
@@ -191,15 +195,46 @@ Browser.prototype = {
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 	},
 
+	__parseFolderData(data, parentPath) {
+		// _data
+		if (data._data) {
+			const path = parentPath || 'root';
+			this.data[path] = data._data;
+		}
+
+		// create folders, file path
+		Object.entries(data).forEach(([key, value]) => {
+			if (key === '_data' || !value || typeof value !== 'object') return;
+
+			const currentPath = parentPath ? `${parentPath}/${key}` : key;
+
+			this.folders[currentPath] = {
+				name: value.name || key,
+				meta: value.meta || {}
+			};
+
+			this.__parseFolderData(value, currentPath);
+		});
+	},
+
 	constructor: Browser
 };
 
 function CallBackGet(xmlHttp) {
 	try {
 		const res = JSON.parse(xmlHttp.responseText);
-		if (res.result.length > 0) {
-			this._drawListItem(res.result, true);
-		} else if (res.nullMessage) {
+		const data = res.result;
+		if (Array.isArray(data)) {
+			if (data.length > 0) {
+				this._drawListItem(data, true);
+			}
+			return;
+		} else if (typeof data === 'object') {
+			this.__parseFolderData(data);
+			return;
+		}
+
+		if (res.nullMessage) {
 			this.list.innerHTML = res.nullMessage;
 		}
 	} catch (e) {
