@@ -6588,7 +6588,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             event.removeGlobalEvent(event.__selectionSyncEvent);
             event.__selectionSyncEvent = event.addGlobalEvent('mouseup', function() {
-                core._editorRange();
+                if (core) {
+                    core._editorRange();
+                }
                 event.removeGlobalEvent(event.__selectionSyncEvent);
             });
 
@@ -6670,7 +6672,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
 
             let selectionNodeDeepestFirstChild = selectionNode;
-            while (selectionNodeDeepestFirstChild.firstChild) selectionNodeDeepestFirstChild = selectionNodeDeepestFirstChild.firstChild;
+            while (selectionNodeDeepestFirstChild && selectionNodeDeepestFirstChild.firstChild) selectionNodeDeepestFirstChild = selectionNodeDeepestFirstChild.firstChild;
 
             const selectedComponentInfo = core.getFileComponent(selectionNodeDeepestFirstChild);
             if (selectedComponentInfo) {
@@ -6716,10 +6718,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _toggleToolbarBalloon: function () {
-            core._editorRange();
-            const range = core.getRange();
-            if (core._bindControllersOff || (!core._isBalloonAlways && range.collapsed)) event._hideToolbar();
-            else event._showToolbarBalloon(range);
+            if (core) {
+                core._editorRange();
+                const range = core.getRange();
+                if (core._bindControllersOff || (!core._isBalloonAlways && range.collapsed)) event._hideToolbar();
+                else event._showToolbarBalloon(range);
+            }
         },
 
         _showToolbarBalloon: function (rangeObj) {
@@ -7757,12 +7761,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 let currentCellFirstNode = currentCell;
                 let currentCellLastNode = currentCell;
                 if (currentCell) {
-                    while (currentCellFirstNode.firstChild) currentCellFirstNode = currentCellFirstNode.firstChild;
-                    while (currentCellLastNode.lastChild) currentCellLastNode = currentCellLastNode.lastChild;
+                    while (currentCellFirstNode && currentCellFirstNode.firstChild) currentCellFirstNode = currentCellFirstNode.firstChild;
+                    while (currentCellLastNode && currentCellLastNode.lastChild) currentCellLastNode = currentCellLastNode.lastChild;
                 }
 
                 let selectionNodeDeepestFirstChild = selectionNode;
-                while (selectionNodeDeepestFirstChild.firstChild) selectionNodeDeepestFirstChild = selectionNodeDeepestFirstChild.firstChild;
+                while (selectionNodeDeepestFirstChild && selectionNodeDeepestFirstChild.firstChild) selectionNodeDeepestFirstChild = selectionNodeDeepestFirstChild.firstChild;
                 const isCellFirstNode = (selectionNodeDeepestFirstChild === currentCellFirstNode);
                 const isCellLastNode = (selectionNodeDeepestFirstChild === currentCellLastNode);
 
@@ -7773,14 +7777,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (previousRow) siblingToSet = previousRow.children[currentCell.cellIndex];
                     else siblingToSet = util.getPreviousDeepestNode(table, core.context.element.wysiwyg);
 
-                    while (siblingToSet.lastChild) siblingToSet = siblingToSet.lastChild;
+                    while (siblingToSet && siblingToSet.lastChild) siblingToSet = siblingToSet.lastChild;
                     if (siblingToSet) offset = siblingToSet.textContent.length;
                 } else if (e.keyCode === 40 && isCellLastNode) {  // DOWN
                     const nextRow = currentRow && currentRow.nextElementSibling;
                     if (nextRow) siblingToSet = nextRow.children[currentCell.cellIndex];
                     else siblingToSet = util.getNextDeepestNode(table, core.context.element.wysiwyg);
 
-                    while (siblingToSet.firstChild) siblingToSet = siblingToSet.firstChild;
+                    while (siblingToSet && siblingToSet.firstChild) siblingToSet = siblingToSet.firstChild;
                 }
 
                 if (siblingToSet) {
@@ -7831,7 +7835,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             let selectionNodeDeepestFirstChild = selectionNode;
-            while (selectionNodeDeepestFirstChild.firstChild) selectionNodeDeepestFirstChild = selectionNodeDeepestFirstChild.firstChild;
+            while (selectionNodeDeepestFirstChild && selectionNodeDeepestFirstChild.firstChild) selectionNodeDeepestFirstChild = selectionNodeDeepestFirstChild.firstChild;
 
             const selectedComponentInfo = core.getFileComponent(selectionNodeDeepestFirstChild);
             if (!(e.keyCode === 16 || e.shiftKey) && selectedComponentInfo) core.selectComponent(selectedComponentInfo.target, selectedComponentInfo.pluginName);
