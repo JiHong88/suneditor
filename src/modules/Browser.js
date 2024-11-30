@@ -161,8 +161,8 @@ Browser.prototype = {
 	_drawFileList(url, urlHeader, pageLoading) {
 		this.apiManager.call({ method: 'GET', url, headers: urlHeader, callBack: CallBackGet.bind(this), errorCallBack: CallBackError.bind(this) });
 		if (!pageLoading) {
-			this.showBrowserLoading();
 			this.sideOpenBtn.style.display = 'none';
+			this.showBrowserLoading();
 		}
 	},
 
@@ -286,7 +286,12 @@ Browser.prototype = {
 				parentElement.appendChild(folderDiv);
 			} else {
 				const folderLabel = domUtils.createElement('div', { 'data-command': item.key, 'aria-label': item.name, class: 'se-menu-folder-item' }, `<span class="se-menu-icon">${this.icon_item}</span><span>${item.name}</span>`);
-				parentElement.appendChild(folderLabel);
+				if (parentElement === this.sideInner) {
+					const folderDiv = domUtils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
+					parentElement.appendChild(folderDiv);
+				} else {
+					parentElement.appendChild(folderLabel);
+				}
 			}
 		}
 	},
@@ -389,7 +394,7 @@ function OnClickSide(e) {
 	}
 
 	const cmdTarget = domUtils.getCommandTarget(target);
-	if (!cmdTarget) return;
+	if (!cmdTarget || domUtils.hasClass(cmdTarget, 'active')) return;
 
 	const data = this.data[cmdTarget.getAttribute('data-command')];
 

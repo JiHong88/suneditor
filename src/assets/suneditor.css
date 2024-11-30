@@ -2989,10 +2989,10 @@
 }
 .sun-editor .se-browser .se-menu-folder > div:not(.se-menu-child) {
 	display: flex;
-	padding: 8px 10px;
+	padding: 8px 10px 8px 20px;
 }
 .sun-editor .se-browser .se-menu-folder > div > button {
-	margin-left: -10px;
+	margin-left: -20px;
 }
 .sun-editor .se-browser .se-menu-folder .se-menu-folder-item {
 	padding: 8px 8px 8px 24px;
@@ -3647,9 +3647,12 @@
 	border-right: none;
 	border-left: 1px solid var(--se-modal-border-color);
 }
+.sun-editor.se-rtl .se-browser .se-menu-folder > div:not(.se-menu-child) {
+	padding: 8px 20px 8px 10px;
+}
 .sun-editor.se-rtl .se-browser .se-menu-folder > div > button {
 	margin-left: 0;
-	margin-right: -10px;
+	margin-right: -20px;
 }
 .sun-editor.se-rtl .se-browser .se-browser-search .se-browser-search-form {
 	margin: 2px 8px;
