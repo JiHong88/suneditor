@@ -33,6 +33,8 @@ const Browser = function (inst, params) {
 	this.tagArea = content.querySelector('.se-browser-tags');
 	this.body = content.querySelector('.se-browser-body');
 	this.list = content.querySelector('.se-browser-list');
+	this.side = content.querySelector('.se-browser-side');
+	this.wrapper = content.querySelector('.se-browser-wrapper');
 	this._loading = content.querySelector('.se-loading-box');
 
 	this.title = params.title;
@@ -44,11 +46,20 @@ const Browser = function (inst, params) {
 	this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({ thumbnail: params.thumbnail, props: params.props || [] });
 	this.selectorHandler = params.selectorHandler;
 	this.columnSize = params.columnSize || 4;
+	this.folderDefaultPath = '';
+	this.closeArrow = this.icons.menu_arrow_right;
+	this.openArrow = this.icons.menu_arrow_down;
+	this.icon_folder = this.icons.side_menu_folder_item;
+	this.icon_folder_item = this.icons.side_menu_folder;
+	this.icon_item = this.icons.side_menu_item;
 
 	this.items = [];
 	this.folders = {};
+	this.tree = {};
 	this.data = {};
 	this.selectedTags = [];
+	this.keyword = '';
+	this.sideInner = null;
 	this._closeSignal = false;
 	this._bindClose = null;
 	this.__globalEventHandler = (e) => {
@@ -65,9 +76,11 @@ const Browser = function (inst, params) {
 
 	this.eventManager.addEvent(this.tagArea, 'click', OnClickTag.bind(this));
 	this.eventManager.addEvent(this.list, 'click', OnClickFile.bind(this));
+	this.eventManager.addEvent(this.side, 'click', OnClickSide.bind(this));
 	this.eventManager.addEvent(content, 'mousedown', OnMouseDown_browser.bind(this));
 	this.eventManager.addEvent(content, 'click', OnClick_browser.bind(this));
 	this.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', Search.bind(this));
+	this.eventManager.addEvent((this.sideOpenBtn = browserFrame.querySelector('.se-side-open-btn')), 'click', SideOpen.bind(this));
 };
 
 Browser.prototype = {
@@ -89,8 +102,9 @@ Browser.prototype = {
 		this.titleArea.textContent = params.title || this.title;
 		this.area.style.display = 'block';
 		this.editor.opendBrowser = this;
+		this.closeArrow = this.options.get('_rtl') ? this.icons.menu_arrow_left : this.icons.menu_arrow_right;
 
-		this._drawFileList(params.url || this.url, params.urlHeader || this.urlHeader);
+		this._drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
 	},
 
 	/**
@@ -105,23 +119,29 @@ Browser.prototype = {
 		this.selectedTags = [];
 		this.items = [];
 		this.folders = {};
+		this.tree = {};
 		this.data = {};
+		this.keyword = '';
 		this.list.innerHTML = this.tagArea.innerHTML = this.titleArea.textContent = '';
 		this.editor.opendBrowser = null;
+		this.sideInner = null;
 
 		if (typeof this.inst.init === 'function') this.inst.init();
 	},
 
 	search(keyword) {
 		if (this.searchUrl) {
-			this._drawFileList(this.searchUrl + '?keyword=' + keyword, this.searchUrlHeader);
+			this.keyword = keyword;
+			this._drawFileList(this.searchUrl + '?keyword=' + keyword, this.searchUrlHeader, false);
 		} else {
-			keyword = keyword.toLowerCase();
-			this._drawListItem(
-				this.items.filter((item) => item.name.toLowerCase().indexOf(keyword) > -1),
-				false
-			);
+			this.keyword = keyword.toLowerCase();
+			this._drawListItem(this.items, false);
 		}
+	},
+
+	tagfilter(items) {
+		const selectedTags = this.selectedTags;
+		return selectedTags.length === 0 ? items : items.filter((item) => !item.tag.some || item.tag.some((tag) => selectedTags.includes(tag)));
 	},
 
 	/**
@@ -138,12 +158,18 @@ Browser.prototype = {
 		this._loading.style.display = 'none';
 	},
 
-	_drawFileList(url, urlHeader) {
+	_drawFileList(url, urlHeader, pageLoading) {
 		this.apiManager.call({ method: 'GET', url, headers: urlHeader, callBack: CallBackGet.bind(this), errorCallBack: CallBackError.bind(this) });
-		this.showBrowserLoading();
+		if (!pageLoading) {
+			this.showBrowserLoading();
+			this.sideOpenBtn.style.display = 'none';
+		}
 	},
 
 	_drawListItem(items, update) {
+		const keyword = this.keyword;
+		items = this.tagfilter(items).filter((item) => item.name.toLowerCase().indexOf(keyword) > -1);
+
 		const _tags = [];
 		const len = items.length;
 		const columnSize = this.columnSize;
@@ -195,18 +221,39 @@ Browser.prototype = {
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 	},
 
-	__parseFolderData(data, parentPath) {
+	__parseFolderData(data, path) {
+		let current = this.tree;
+
 		// _data
 		if (data._data) {
-			const path = parentPath || 'root';
 			this.data[path] = data._data;
+			if (!this.folderDefaultPath || data.default) {
+				this.folderDefaultPath = path;
+			}
+
+			const parts = path.split('/');
+			const len = parts.length - 1;
+			parts.forEach((part, index) => {
+				if (!current[part]) {
+					current[part] = { children: {} };
+				}
+
+				if (index === len) {
+					current[part].key = path;
+					current[part].name = this.folders[path].name;
+				} else {
+					current = current[part].children;
+				}
+			});
+		} else if (path) {
+			current[path] = { name: this.folders[path].name, children: {} };
 		}
 
 		// create folders, file path
 		Object.entries(data).forEach(([key, value]) => {
 			if (key === '_data' || !value || typeof value !== 'object') return;
 
-			const currentPath = parentPath ? `${parentPath}/${key}` : key;
+			const currentPath = path ? `${path}/${key}` : key;
 
 			this.folders[currentPath] = {
 				name: value.name || key,
@@ -215,6 +262,33 @@ Browser.prototype = {
 
 			this.__parseFolderData(value, currentPath);
 		});
+	},
+
+	__createFolderList(folderData, parentElement) {
+		for (const key in folderData) {
+			const item = folderData[key];
+			if (!item) continue;
+
+			if (Object.keys(item.children).length > 0) {
+				const folderLabel = domUtils.createElement(
+					'div',
+					item.key ? { 'data-command': item.key, 'aria-label': item.name } : null,
+					`<span class="se-menu-icon">${item.key ? this.icon_folder : this.icon_folder_item}</span><span>${item.name}</span>`
+				);
+				const folderDiv = domUtils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
+
+				folderLabel.insertBefore(domUtils.createElement('button', null, this.closeArrow), folderLabel.firstElementChild);
+				const childContainer = document.createElement('div');
+				domUtils.addClass(childContainer, 'se-menu-child|se-menu-hidden');
+				this.__createFolderList(item.children, childContainer);
+				folderDiv.appendChild(childContainer);
+
+				parentElement.appendChild(folderDiv);
+			} else {
+				const folderLabel = domUtils.createElement('div', { 'data-command': item.key, 'aria-label': item.name, class: 'se-menu-folder-item' }, `<span class="se-menu-icon">${this.icon_item}</span><span>${item.name}</span>`);
+				parentElement.appendChild(folderLabel);
+			}
+		}
 	},
 
 	constructor: Browser
@@ -230,7 +304,23 @@ function CallBackGet(xmlHttp) {
 			}
 			return;
 		} else if (typeof data === 'object') {
+			this.sideOpenBtn.style.display = '';
 			this.__parseFolderData(data);
+
+			this.side.innerHTML = '';
+			const sideInner = (this.sideInner = domUtils.createElement('div', null));
+			this.__createFolderList(this.tree, sideInner);
+			this.side.appendChild(sideInner);
+
+			if (this.folderDefaultPath) {
+				const openFolder = sideInner.querySelector(`[data-command="${this.folderDefaultPath}"]`);
+				openFolder.click();
+				if (this.folderDefaultPath.includes('/')) {
+					domUtils.removeClass(openFolder.parentElement, 'se-menu-hidden');
+					openFolder.parentElement.previousElementSibling.querySelector('button').innerHTML = this.openArrow;
+				}
+			}
+
 			return;
 		}
 
@@ -256,27 +346,17 @@ function OnClickTag(e) {
 
 	const tagName = target.textContent;
 	const selectTag = this.tagArea.querySelector('a[title="' + tagName + '"]');
-	const selectedTags = this.selectedTags;
-	const sTagIndex = selectedTags.indexOf(tagName);
+	const sTagIndex = this.selectedTags.indexOf(tagName);
 
 	if (sTagIndex > -1) {
-		selectedTags.splice(sTagIndex, 1);
+		this.selectedTags.splice(sTagIndex, 1);
 		domUtils.removeClass(selectTag, 'on');
 	} else {
-		selectedTags.push(tagName);
+		this.selectedTags.push(tagName);
 		domUtils.addClass(selectTag, 'on');
 	}
 
-	this._drawListItem(
-		selectedTags.length === 0
-			? this.items
-			: this.items.filter(function (item) {
-					return item.tag.some(function (tag) {
-						return selectedTags.includes(tag);
-					});
-			  }),
-		false
-	);
+	this._drawListItem(this.items, false);
 }
 
 function OnClickFile(e) {
@@ -290,6 +370,38 @@ function OnClickFile(e) {
 
 	this.close();
 	this.selectorHandler(target);
+}
+
+function OnClickSide(e) {
+	const { target } = e;
+	e.stopPropagation();
+
+	if (/^button$/i.test(target.nodeName)) {
+		const childContainer = target.parentElement.parentElement.querySelector('.se-menu-child');
+		if (domUtils.hasClass(childContainer, 'se-menu-hidden')) {
+			domUtils.removeClass(childContainer, 'se-menu-hidden');
+			target.innerHTML = this.openArrow;
+		} else {
+			domUtils.addClass(childContainer, 'se-menu-hidden');
+			target.innerHTML = this.closeArrow;
+		}
+		return;
+	}
+
+	const cmdTarget = domUtils.getCommandTarget(target);
+	if (!cmdTarget) return;
+
+	const data = this.data[cmdTarget.getAttribute('data-command')];
+
+	domUtils.removeClass(this.side.querySelector('.active'), 'active');
+	domUtils.addClass(cmdTarget, 'active');
+	this.tagArea.innerHTML = '';
+
+	if (typeof data === 'string') {
+		this._drawFileList(data, this.urlHeader, true);
+	} else {
+		this._drawListItem(data, false);
+	}
 }
 
 function OnMouseDown_browser(e) {
@@ -313,6 +425,16 @@ function Search(e) {
 	this.search(e.currentTarget.querySelector('input[type="text"]').value);
 }
 
+function SideOpen({ target }) {
+	if (domUtils.hasClass(target, 'active')) {
+		domUtils.removeClass(this.side, 'se-side-show');
+		domUtils.removeClass(target, 'active');
+	} else {
+		domUtils.addClass(this.side, 'se-side-show');
+		domUtils.addClass(target, 'active');
+	}
+}
+
 function CreateHTML({ lang, icons }, useSearch) {
 	return /*html*/ `
 		<div class="se-browser-content">
@@ -321,23 +443,31 @@ function CreateHTML({ lang, icons }, useSearch) {
 					${icons.cancel}
 				</button>
 				<span class="se-browser-title"></span>
-				<div class="se-browser-tags"></div>
-				${
-					useSearch
-						? /*html*/ `
-						<div class="se-browser-search">
-							<form class="se-browser-search-form">
-								<input type="text" class="se-input-form" placeholder="${lang.search}" aria-label="${lang.search}">
-								<button type="submit" class="se-btn" title="${lang.search}" aria-label="${lang.search}">${icons.search}</button>
-							</form>
-						</div>`
-						: ''
-				}
-				
 			</div>
-			<div class="se-browser-body">
-				<div class="se-loading-box sun-editor-common"><div class="se-loading-effect"></div></div>
-				<div class="se-browser-list"></div>
+			<div class="se-browser-wrapper">
+				<div class="se-browser-side"></div>
+				<div class="se-browser-main"> 
+					<div class="se-browser-bar">
+						<div class="se-browser-search">
+							<button class="se-btn se-side-open-btn">${icons.side_menu_hamburger}</button>
+							${
+								useSearch
+									? /*html*/ `
+										<form class="se-browser-search-form">
+											<input type="text" class="se-input-form" placeholder="${lang.search}" aria-label="${lang.search}">
+											<button type="submit" class="se-btn" title="${lang.search}" aria-label="${lang.search}">${icons.search}</button>
+										</form>`
+									: ''
+							}
+						</div>
+					</div>
+					<div class="se-browser-body">
+						<div class="se-browser-tags"></div>
+						<div class="se-loading-box sun-editor-common"><div class="se-loading-effect"></div></div>
+						<div class="se-browser-menus"></div>
+						<div class="se-browser-list"></div>
+					</div>
+				</div>
 			</div>
 		</div>`;
 }
@@ -359,7 +489,7 @@ function DrawItems(item) {
 	const props = `class="${thumbnail || 'se-browser-empty-image'}" src="${src}" alt="${item.alt || srcName}" ${attrs}`;
 	return /*html*/ `
 		<div class="se-file-item-img">
-			${this.thumbnail && !thumbnail ? `<div class="se-browser-empty-thumbnail" ${props}>${this.thumbnail(item)}</div>` : `<img class="${thumbnail || 'se-browser-empty-image'}" ${props}>`}
+			${this.thumbnail && !thumbnail && item.type !== 'image' ? `<div class="se-browser-empty-thumbnail" ${props}>${this.thumbnail(item)}</div>` : `<img class="${thumbnail || 'se-browser-empty-image'}" ${props}>`}
 			<div class="se-file-name-image se-file-name-back"></div>
 			<div class="se-file-name-image">${item.name || srcName}</div>
 		</div>`;
