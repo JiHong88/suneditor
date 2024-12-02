@@ -81,6 +81,7 @@ const Browser = function (inst, params) {
 	this.eventManager.addEvent(content, 'click', OnClick_browser.bind(this));
 	this.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', Search.bind(this));
 	this.eventManager.addEvent((this.sideOpenBtn = browserFrame.querySelector('.se-side-open-btn')), 'click', SideOpen.bind(this));
+	this.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', SideClose.bind(this));
 };
 
 Browser.prototype = {
@@ -398,8 +399,8 @@ function OnClickSide(e) {
 
 	const data = this.data[cmdTarget.getAttribute('data-command')];
 
-	domUtils.removeClass(this.side.querySelector('.active'), 'active');
-	domUtils.addClass(cmdTarget, 'active');
+	domUtils.removeClass(this.side.querySelectorAll('.active'), 'active');
+	domUtils.addClass([cmdTarget, domUtils.getParentElement(cmdTarget, '.se-menu-folder')], 'active');
 	this.tagArea.innerHTML = '';
 
 	if (typeof data === 'string') {
@@ -437,6 +438,14 @@ function SideOpen({ target }) {
 	} else {
 		domUtils.addClass(this.side, 'se-side-show');
 		domUtils.addClass(target, 'active');
+	}
+}
+
+function SideClose({ target }) {
+	if (target === this.sideOpenBtn) return;
+	if (domUtils.hasClass(this.sideOpenBtn, 'active')) {
+		domUtils.removeClass(this.side, 'se-side-show');
+		domUtils.removeClass(this.sideOpenBtn, 'active');
 	}
 }
 

@@ -3003,15 +3003,21 @@
 .sun-editor .se-browser .se-menu-folder .se-menu-folder-item > .se-menu-icon > * {
 	margin-top: -1px;
 }
-.sun-editor .se-browser .se-menu-folder div:not(.se-menu-child):hover {
+.sun-editor .se-browser .se-menu-folder div:not(.se-menu-child):not(.active):hover {
 	background-color: var(--se-main-divider-color);
 	border-color: var(--se-main-border-color);
 }
-.sun-editor .se-browser .se-menu-folder div.active,
 .sun-editor .se-browser .se-menu-folder div.active > button {
+	color: var(--se-active-dark5-color);
+}
+.sun-editor .se-browser .se-menu-folder div.active,
+.sun-editor .se-browser .se-browser-search .se-side-open-btn.active {
 	background-color: var(--se-active-light5-color);
 	color: var(--se-active-dark5-color);
-	border-color: var(--se-active-dark4-color);
+}
+.sun-editor .se-browser .se-menu-folder.active {
+	border-left: 2px solid var(--se-active-dark4-color);
+	margin-left: -2px;
 }
 
 /* --- browser - tags */
@@ -3653,6 +3659,12 @@
 .sun-editor.se-rtl .se-browser .se-menu-folder > div > button {
 	margin-left: 0;
 	margin-right: -20px;
+}
+.sun-editor.se-rtl .se-browser .se-menu-folder.active {
+	border-left: none;
+	margin-left: 0;
+	border-right: 2px solid var(--se-active-dark4-color);
+	margin-right: -2px;
 }
 .sun-editor.se-rtl .se-browser .se-browser-search .se-browser-search-form {
 	margin: 2px 8px;
