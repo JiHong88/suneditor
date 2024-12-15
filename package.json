@@ -5,6 +5,7 @@
 	"author": "Yi JiHong",
 	"license": "MIT",
 	"main": "src/suneditor.js",
+	"types": "types/index.d.ts",
 	"sideEffects": [
 		"./src/assets/css/*.css"
 	],
@@ -35,7 +36,6 @@
 		"**/.*",
 		"node_modules"
 	],
-	"types": "typings/index.d.ts",
 	"devDependencies": {
 		"@babel/core": "^7.22.1",
 		"@codemirror/lang-html": "^6.4.3",
@@ -71,6 +71,7 @@
 		"mini-css-extract-plugin": "^2.7.6",
 		"prettier": "^2.8.8",
 		"terser-webpack-plugin": "^5.3.10",
+		"typescript": "^5.7.2",
 		"url-loader": "^4.1.1",
 		"webpack": "^5.84.1",
 		"webpack-cli": "^5.1.1",

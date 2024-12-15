@@ -19,33 +19,23 @@ export default function () {
 
 		/**
 		 * @description Called just before the inline toolbar is positioned and displayed on the screen.
-		 * @param {Element} toolbar Toolbar Element
-		 * @param {Object} context The editor's context object (editor.getContext())
-		 * @param {Object} core Core object
 		 */
 		onShowToolbar: null,
 
 		/**
 		 * @description Called just after the controller is positioned and displayed on the screen.
 		 * controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
-		 * @param {String} name The name of the plugin that called the controller
-		 * @param {Array} controllers Array of Controller elements
-		 * @param {Object} core Core object
 		 */
 		onShowController: null,
 		onBeforeShowController: null,
 
 		/**
 		 * @description An event when toggling between code view and wysiwyg view.
-		 * @param {Boolean} isCodeView Whether the current code view mode
-		 * @param {Object} core Core object
 		 */
 		onToggleCodeView: null,
 
 		/**
 		 * @description An event when toggling full screen.
-		 * @param {Boolean} isFullScreen Whether the current full screen mode
-		 * @param {Object} core Core object
 		 */
 		onToggleFullScreen: null,
 
@@ -57,8 +47,6 @@ export default function () {
 		/**
 		 * @description Called after the "setToolbarButtons" invocation.
 		 * Can be used to tweak buttons properties (useful for custom buttons)
-		 * @param {Element} buttonTray Button tray element
-		 * @param {Object} core Core object
 		 */
 		onSetToolbarButtons: null,
 
@@ -68,8 +56,6 @@ export default function () {
 
 		/**
 		 * @description Event functions
-		 * @param {String} contents Current contents
-		 * @param {String|null} key Root key
 		 */
 		onSave: null,
 
@@ -77,10 +63,6 @@ export default function () {
 		 * @description Event functions (drop, paste)
 		 * When false is returned, the default behavior is stopped.
 		 * If the string is returned, the cleanData value is modified to the return value.
-		 * @param {Object} e Event object.
-		 * @param {String} cleanData HTML string modified for editor format.
-		 * @param {Boolean} maxChartCount option (true if max character is exceeded)
-		 * @param {Object} core Core object
 		 * @returns {Boolean|String}
 		 */
 		onDrop: null,
@@ -88,16 +70,6 @@ export default function () {
 
 		/**
 		 * @description It replaces the default callback function of the image upload
-		 * @param {Object} response Response object
-		 * @param {Object} info Input information
-		 * - linkValue: Link url value
-		 * - linkNewWindow: Open in new window Check Value
-		 * - inputWidth: Value of width input
-		 * - inputHeight: Value of height input
-		 * - align: Align Check Value
-		 * - isUpdate: Update image if true, create image if false
-		 * - element: If isUpdate is true, the currently selected image.
-		 * @param {Object} core Core object
 		 */
 		imageUploadHandler: null,
 
@@ -107,27 +79,6 @@ export default function () {
 		 * If false is returned, no image upload is performed.
 		 * If new fileList are returned,  replaced the previous fileList
 		 * If undefined is returned, it waits until "uploadHandler" is executed.
-		 * @param {Array} files Files array
-		 * @param {Object} info info: {
-		 * - linkValue: Link url value
-		 * - linkNewWindow: Open in new window Check Value
-		 * - inputWidth: Value of width input
-		 * - inputHeight: Value of height input
-		 * - align: Align Check Value
-		 * - isUpdate: Update image if true, create image if false
-		 * - element: If isUpdate is true, the currently selected image.
-		 * }
-		 * @param {Object} core Core object
-		 * @param {Function} uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
-		 *                "uploadHandler" is an upload function with "core" and "info" bound.
-		 *                [upload files] : uploadHandler(files or [new File(...),])
-		 *                [error]        : uploadHandler("Error message")
-		 *                [Just finish]  : uploadHandler()
-		 *                [directly register] : uploadHandler(response) // Same format as "imageUploadUrl" response
-		 *                                   ex) {
-		 *                                      // "errorMessage": "insert error message",
-		 *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-		 *                                   }
 		 * @returns {Boolean|Array|undefined}
 		 */
 		onImageUploadBefore: null,
@@ -139,47 +90,21 @@ export default function () {
 
 		/**
 		 * @description Called when the editor loaded, file Current editor value
-		 * -- arguments is same "Image info object" --
 		 */
 		onImageLoad: null,
 
 		/**
 		 * @description Called when the image is uploaded, updated, deleted
-		 * @param {Element} targetElement Target element
-		 * @param {Number} index Uploaded index
-		 * @param {String} state Upload status ('create', 'update', 'delete')
-		 * @param {Object} info Image info object
-		 * - index: data index
-		 * - name: file name
-		 * - size: file size
-		 * - select: select function
-		 * - delete: delete function
-		 * - element: target element
-		 * - src: src attribute of tag
-		 * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
-		 * @param {Object} core Core object
 		 */
 		onImageAction: null,
 
 		/**
 		 * @description Called when the image is upload failed
-		 * @param {String} errorMessage Error message
-		 * @param {Object} result Response Object
-		 * @param {Object} core Core object
-		 * @returns {Boolean}
 		 */
 		onImageUploadError: null,
 
 		/**
 		 * @description It replaces the default callback function of the video upload
-		 * @param xmlHttp xmlHttpRequest object
-		 * @param info Input information
-		 * - inputWidth: Value of width input
-		 * - inputHeight: Value of height input
-		 * - align: Align Check Value
-		 * - isUpdate: Update video if true, create video if false
-		 * - element: If isUpdate is true, the currently selected video.
-		 * @param core Core object
 		 */
 		videoUploadHandler: null,
 
@@ -189,26 +114,6 @@ export default function () {
 		 * If false is returned, no video(iframe, video) upload is performed.
 		 * If new fileList are returned,  replaced the previous fileList
 		 * If undefined is returned, it waits until "uploadHandler" is executed.
-		 * @param {Array} files Files array
-		 * @param {Object} info info: {
-		 * - inputWidth: Value of width input
-		 * - inputHeight: Value of height input
-		 * - align: Align Check Value
-		 * - isUpdate: Update video if true, create video if false
-		 * - element: If isUpdate is true, the currently selected video.
-		 * }
-		 * @param {Object} core Core object
-		 * @param {Function} uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
-		 *                "uploadHandler" is an upload function with "core" and "info" bound.
-		 *                [upload files] : uploadHandler(files or [new File(...),])
-		 *                [error]        : uploadHandler("Error message")
-		 *                [Just finish]  : uploadHandler()
-		 *                [directly register] : uploadHandler(response) // Same format as "videoUploadUrl" response
-		 *                                   ex) {
-		 *                                      // "errorMessage": "insert error message",
-		 *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-		 *                                   }
-		 * @returns {Boolean|Array|undefined}
 		 */
 		onVideoUploadBefore: null,
 
@@ -219,13 +124,11 @@ export default function () {
 
 		/**
 		 * @description Called when the editor loaded, file Current editor value
-		 * -- arguments is same "Image info object" --
 		 */
 		onVideoLoad: null,
 
 		/**
 		 * @description Called when the video(iframe, video) is is uploaded, updated, deleted
-		 * -- arguments is same "onImageUpload" --
 		 */
 		onVideoAction: null,
 
@@ -236,11 +139,6 @@ export default function () {
 
 		/**
 		 * @description It replaces the default callback function of the audio upload
-		 * @param xmlHttp xmlHttpRequest object
-		 * @param info Input information
-		 * - isUpdate: Update audio if true, create audio if false
-		 * - element: If isUpdate is true, the currently selected audio.
-		 * @param core Core object
 		 */
 		audioUploadHandler: null,
 
@@ -250,22 +148,6 @@ export default function () {
 		 * If false is returned, no audio upload is performed.
 		 * If new fileList are returned,  replaced the previous fileList
 		 * If undefined is returned, it waits until "uploadHandler" is executed.
-		 * @param {Array} files Files array
-		 * @param {Object} info info: {
-		 * - isUpdate: Update audio if true, create audio if false
-		 * - element: If isUpdate is true, the currently selected audio.
-		 * }
-		 * @param {Object} core Core object
-		 * @param {Function} uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
-		 *                "uploadHandler" is an upload function with "core" and "info" bound.
-		 *                [upload files] : uploadHandler(files or [new File(...),])
-		 *                [error]        : uploadHandler("Error message")
-		 *                [Just finish]  : uploadHandler()
-		 *                [directly register] : uploadHandler(response) // Same format as "audioUploadUrl" response
-		 *                                   ex) {
-		 *                                      // "errorMessage": "insert error message",
-		 *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-		 *                                   }
 		 * @returns {Boolean|Array|undefined}
 		 */
 		onAudioUploadBefore: null,
@@ -277,7 +159,6 @@ export default function () {
 
 		/**
 		 * @description Called when the audio is is uploaded, updated, deleted
-		 * -- arguments is same "onImageUpload" --
 		 */
 		onAudioAction: null,
 
@@ -288,13 +169,11 @@ export default function () {
 
 		/**
 		 * @description Called when the editor loaded, file Current editor value
-		 * -- arguments is same "Image info object" --
 		 */
 		onAudioLoad: null,
 
 		/**
 		 * @description Called when the file is is uploaded, updated, deleted
-		 * -- arguments is same "onImageUpload" --
 		 */
 		onFileAction: null,
 
@@ -305,16 +184,27 @@ export default function () {
 
 		/**
 		 * @description Called when the editor loaded, file Current editor value
-		 * -- arguments is same "Image info object" --
 		 */
 		onFileLoad: null,
 
+		/**
+		 * @description Called when the file is uploaded
+		 */
 		onFileUploadBefore: null,
 
+		/**
+		 * @description Called when the file is upload failed
+		 */
 		onFileUploadError: null,
 
+		/**
+		 * @description Called before the link is added
+		 */
 		onExportPDFBefore: null,
 
+		/**
+		 * @description Called before the link is added
+		 */
 		onFileManagerAction: null
 	};
 }
