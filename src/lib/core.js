@@ -6978,6 +6978,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             /** default key action */
+            if (keyCode === 13 && util.isFormatElement(core.getRange().startContainer)) {
+                core._resetRangeToTextNode();
+                selectionNode = core.getSelectionNode();
+            }
+            
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             const fileComponentName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
@@ -7596,7 +7601,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 const isMultiLine = util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null);
                                 const newFormat = formatEl.cloneNode(false);
                                 newFormat.innerHTML = '<br>';
-                                const r = core.removeNode();
+                                const commonCon = range.commonAncestorContainer;
+                                const r = commonCon === range.startContainer && commonCon === range.endContainer && util.onlyZeroWidthSpace(commonCon) ? range : core.removeNode();
                                 newEl = util.getFormatElement(r.container, null);
                                 if (!newEl) {
                                     if (util.isWysiwygDiv(r.container)) {
@@ -7724,7 +7730,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (event._directionKeyCode.test(keyCode)) {
-                core._editorRange();
+                _w.setTimeout(core._editorRange.bind(core), 0);
                 event._applyTagEffects();
             }
         },
