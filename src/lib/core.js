@@ -1485,7 +1485,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Check if the container and offset values are the edges of the format tag
          * @param {Node} container The node of the selection object. (range.startContainer..)
          * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
-         * @param {String} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
+         * @param {String} dir Select check point - "start": Front edge, "end": End edge, undefined: Both edge.
          * @returns {Array|null}
          * @private
          */
@@ -1493,7 +1493,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!this.isEdgePoint(node, offset, dir)) return false;
 
             const result = [];
-            dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
+            dir = dir === 'start' ? 'previousSibling' : 'nextSibling';
             while (node && !util.isFormatElement(node) && !util.isWysiwygDiv(node)) {
                 if (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir])) {
                     if (node.nodeType === 1) result.push(node.cloneNode(false));
