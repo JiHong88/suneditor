@@ -1474,11 +1474,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Determine if this offset is the edge offset of container
          * @param {Node} container The node of the selection object. (range.startContainer..)
          * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
-         * @param {String|undefined} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
+         * @param {String|undefined} dir Select check point - Both edge, Front edge or End edge. ("start": Front edge, "end": End edge, undefined: Both edge)
          * @returns {Boolean}
          */
         isEdgePoint: function (container, offset, dir) {
-            return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
+            if (container.nodeType === 1 && !container.textContent.length) return true;
+            return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'start') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
         },
 
         /**
@@ -6924,7 +6925,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false';
             } else {
                 siblingNode = event._isUneditableNode_getSibling(container, siblingKey, container);
-                return core.isEdgePoint(container, offset, isFront ? 'front' : 'end') && (siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false');
+                return core.isEdgePoint(container, offset, isFront ? 'start' : 'end') && (siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false');
             }
         },
 
@@ -7207,6 +7208,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         e.preventDefault();
                         e.stopPropagation();
                         break;
+                    }
+
+                    if (!selectRange && core._isEdgeFormat(range.endContainer, range.endOffset, 'end') && !formatEl.nextSibling) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return;
                     }
 
                     // tag[contenteditable="false"]
