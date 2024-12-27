@@ -7363,15 +7363,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (!shift) {
                             const tabText = util.createTextNode(new _w.Array(core._variable.tabSize + 1).join('\u00A0'));
                             if (lines.length === 1) {
-                                const textRange = core.insertNode(tabText, null, true);
-                                if (!textRange) return false;
+                                if (!core.insertNode(tabText, null, true)) return false;
                                 if (!fc) {
                                     r.sc = tabText;
-                                    r.so = textRange.endOffset;
+                                    r.so = tabText.length;
                                 }
                                 if (!lc) {
                                     r.ec = tabText;
-                                    r.eo = textRange.endOffset;
+                                    r.eo = tabText.length;
                                 }
                             } else {
                                 const len = lines.length - 1;
@@ -7717,8 +7716,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 e.preventDefault();
                 e.stopPropagation();
                 const nbsp = core.insertNode(util.createTextNode('\u00a0'));
-                if (nbsp && nbsp.container) {
-                    core.setRange(nbsp.container, nbsp.endOffset, nbsp.container, nbsp.endOffset);
+                if (nbsp) {
+                    core.setRange(nbsp, nbsp.length, nbsp, nbsp.length);
                     return;
                 }
             }
