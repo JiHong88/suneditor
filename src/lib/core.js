@@ -1270,6 +1270,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const range = this.getRange();
             if (this._selectionVoid(range)) return false;
 
+            const collapsed = range.collapsed;
             let startCon = range.startContainer;
             let startOff = range.startOffset;
             let endCon = range.endContainer;
@@ -1294,7 +1295,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 while (endCon && endCon.nodeType === 1 && endCon.lastChild) {
                     endCon = endCon.lastChild;
                 }
-                endOff = endCon.textContent.length;
+                endOff = collapsed ? 0 : endCon.textContent.length;
             }
 
             // startContainer
