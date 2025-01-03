@@ -4,6 +4,10 @@ import { Plugin } from './plugins/Plugin';
 export interface SunEditorOptions {
     plugins?: Plugin[] | Record<string, Plugin>;
     /**
+     * Option to disable clean mode, which checks the styles, classes, etc. of the editor content
+     */
+    strictMode?: boolean;
+    /**
      * Values
      * ======
      */
