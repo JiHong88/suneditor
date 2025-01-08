@@ -360,6 +360,10 @@ export interface SunEditorOptions {
      * =====
      */
     /**
+     * Direct JSON data without making server requests.
+     */
+    imageGalleryData?: Array;
+    /**
      * The url of the image gallery, if you use the image gallery
      */
     imageGalleryUrl?: string;

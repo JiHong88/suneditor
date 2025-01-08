@@ -692,6 +692,16 @@ imageMultipleFile: If true, multiple images can be selected.    default: false {
 imageAccept      : Define the "accept" attribute of the input.  default: "*" {String}
                    ex) "*" or ".jpg, .png .."
 // Image - image gallery
+imageGalleryJSONData    : Direct JSON data without making server requests.  default: null {Array}
+                          ex) [
+                                {
+                                    "src": "/download/editorImg/test_image.jpg", // @Require
+                                    "thumbnail": "/download/editorImg/test_thumbnail.jpg", // @Option - Thumbnail image to be displayed in the image gallery.
+                                    "name": "Test image", // @Option - default: src.split('/').pop()
+                                    "alt": "Alt text", // @Option - default: src.split('/').pop()
+                                    "tag": "Tag name" // @Option
+                                }
+                            ]
 imageGalleryUrl     : The url of the image gallery, if you use the image gallery.
                       When "imageUrlInput" is true, an image gallery button is created in the image modal.
                       You can also use it by adding "imageGallery" to the button list.   default: null {String}

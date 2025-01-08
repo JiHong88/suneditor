@@ -542,6 +542,7 @@ export default {
         options.imageMultipleFile = !!options.imageMultipleFile;
         options.imageAccept = (typeof options.imageAccept !== 'string' || options.imageAccept.trim() === "*") ? 'image/*' : options.imageAccept.trim() || 'image/*';
         /** Image - image gallery */
+        options.imageGalleryData = options.imageGalleryData || null;
         options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
         options.imageGalleryHeader = options.imageGalleryHeader || null;
         /** Video */

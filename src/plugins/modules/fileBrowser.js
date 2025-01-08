@@ -162,7 +162,11 @@
             fileBrowserContext.titleArea.textContent = pluginContext.title;
             fileBrowserContext.area.style.display = 'block';
 
-            this.plugins.fileBrowser._drawFileList.call(this, this.context[pluginName].url, this.context[pluginName].header);
+            if (this.context[pluginName].directData) {
+                this.plugins.fileBrowser._drawListItem.call(this, this.context[pluginName].directData, true);
+            } else {
+                this.plugins.fileBrowser._drawFileList.call(this, this.context[pluginName].url, this.context[pluginName].header);
+            }
         },
 
         _bindClose: null,

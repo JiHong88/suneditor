@@ -1031,6 +1031,26 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     videoFileInput: true,
     // font: ['\'Exo 2\'', 'Sans-serif', 'Exo 2'],
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
+    imageGalleryData: [
+        {
+          "src": "http://suneditor.com/docs/cat.jpg",
+          "name": "Tabby",
+          "alt": "Tabby",
+          "tag": "Cat"
+        },
+        {
+          "src": "http://suneditor.com/docs/cat1.jpg",
+          "name": "Cat paw",
+          "alt": "Cat paw",
+          "tag": "Cat"
+        },
+        {
+          "src": "http://suneditor.com/docs/cat2.jpg",
+          "name": "Cat",
+          "alt": "Cat",
+          "tag": "Cat"
+        }
+    ],
     videoTagAttrs: {
         autoplay: true,
         muted: true,
