@@ -8,6 +8,10 @@ export interface SunEditorOptions {
      */
     strictMode?: boolean;
     /**
+     * Enforces strict HTML validation based on the editor`s policy. Applies to methods like setContents to ensure content compliance when enabled.
+     */
+    strictHTMLValidation?: boolean;
+    /**
      * Values
      * ======
      */

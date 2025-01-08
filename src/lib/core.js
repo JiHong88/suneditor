@@ -5543,7 +5543,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const dom = _d.createRange().createContextualFragment(contents);
 
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
+                if (this.options.strictHTMLValidation) {
+                    util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
+                } else {
+                    util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, false);
+                }
             } catch (error) {
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }
