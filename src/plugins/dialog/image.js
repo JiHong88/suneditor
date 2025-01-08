@@ -684,7 +684,7 @@ export default {
         imagePlugin.setAlign.call(this, align, oImg, cover, container);
 
         oImg.onload = imagePlugin._image_create_onload.bind(this, oImg, contextImage.svgDefaultSize, container);
-        if (this.insertComponent(container, true, true, true)) this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
+        if (this.insertComponent(container, true, true, !this.options.mediaAutoSelect)) this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
         this.context.resizing._resize_plugin = '';
     },
 
@@ -697,6 +697,7 @@ export default {
             const line = this.appendFormatTag(container, null);
             if (line) this.setRange(line, 0, line, 0);
         }
+        this.history.push(false);
     },
 
     update_image: function (init, openController, notHistoryPush) {
