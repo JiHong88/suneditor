@@ -69,6 +69,7 @@
         <div style="background-color: #f3f3f3; padding: 4px 20px 20px 20px;">
             <h4 style="color: #b94a48;">--Value</h4>
             <label><input type="checkbox" id="strictMode" checked>&nbsp;&nbsp;strictMode&nbsp;&nbsp;&nbsp;</label><br><br>
+            <label><input type="checkbox" id="strictHTMLValidation">&nbsp;&nbsp;strictHTMLValidation&nbsp;&nbsp;&nbsp;</label><br><br>
             <label><input type="checkbox" id="defaultTag">&nbsp;&nbsp;defaultTag&nbsp;&nbsp;&nbsp;</label>
             <input type="text" id="defaultTag_value" placeholder="String ('p', 'div'..)"></input>
             <br><br>
@@ -342,6 +343,30 @@
             <input type="text" id="imageAccept_value" placeholder='String( * or .jpg, .png...)'>
             <br>
             <h4 style="color: #b94a48;">--image gallery</h4>
+            <label><input type="checkbox" id="imageGalleryData">&nbsp;&nbsp;imageGalleryData</label><br>
+            <textarea type="text" id="imageGalleryData_value" placeholder="Array" style="width: 300px; height: 120px;">
+[
+        {
+            "src": "http://suneditor.com/docs/cat.jpg",
+            "name": "Tabby",
+            "alt": "Tabby",
+            "tag": "Cat"
+        },
+        {
+            "src": "http://suneditor.com/docs/cat1.jpg",
+            "name": "Cat paw",
+            "alt": "Cat paw",
+            "tag": "Cat"
+        },
+        {
+            "src": "http://suneditor.com/docs/cat2.jpg",
+            "name": "Cat",
+            "alt": "Cat",
+            "tag": "Cat"
+        }
+]
+            </textarea>
+            <br><br>
             <label><input type="checkbox" id="imageGalleryUrl" checked>&nbsp;&nbsp;imageGalleryUrl</label>
             <input type="text" id="imageGalleryUrl_value" placeholder="String(URL address)" style="width: 200px" value="https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo">
             <label><input type="checkbox" id="imageGalleryHeader">&nbsp;&nbsp;imageGalleryHeader</label>
@@ -610,6 +635,7 @@ function sun_create () {
 
     var options = {
         strictMode: document.getElementById('strictMode').checked ? undefined : false,
+        strictHTMLValidation: document.getElementById('strictHTMLValidation').checked ? true : undefined,
         defaultTag: document.getElementById('defaultTag').checked ? document.getElementById('defaultTag_value').value : undefined,
         textTags: document.getElementById('textTags').checked ? {
             bold: 'b',
@@ -697,6 +723,7 @@ function sun_create () {
         imageMultipleFile: document.getElementById('imageMultipleFile').checked ? true : undefined,
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         imageAccept: document.getElementById('imageAccept').checked ? document.getElementById('imageAccept_value').value : undefined,
+        imageGalleryData: document.getElementById('imageGalleryData').checked ? JSON.parse(document.getElementById('imageGalleryData_value').value) : undefined,
         imageGalleryUrl: document.getElementById('imageGalleryUrl').checked ? document.getElementById('imageGalleryUrl_value').value : undefined,
         imageGalleryHeader: document.getElementById('imageGalleryHeader').checked ? JSON.parse(document.getElementById('imageGalleryHeader_value').value) : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,

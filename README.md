@@ -693,7 +693,7 @@ imageMultipleFile: If true, multiple images can be selected.    default: false {
 imageAccept      : Define the "accept" attribute of the input.  default: "*" {String}
                    ex) "*" or ".jpg, .png .."
 // Image - image gallery
-imageGalleryJSONData    : Direct JSON data without making server requests.  default: null {Array}
+imageGalleryData    : Direct JSON data without making server requests.  default: null {Array}
                           ex) [
                                 {
                                     "src": "/download/editorImg/test_image.jpg", // @Require
