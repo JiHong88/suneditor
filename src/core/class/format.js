@@ -844,7 +844,7 @@ Format.prototype = {
 		}
 
 		this.editor.effectNode = null;
-		return !isRemove || !isCollapsed ? originRange : afterRange;
+		return !isRemove || !isCollapsed ? originRange : afterRange || originRange;
 	},
 
 	/**

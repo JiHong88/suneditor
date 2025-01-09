@@ -221,7 +221,7 @@ HTML.prototype = {
 	 * Create RegExp object using helper.converter.createElementBlacklist method.
 	 * @returns {string} Cleaned and compressed HTML string
 	 */
-	clean(html, { forceFormat, whitelist, blacklist } = {}) {
+	clean(html, { forceFormat, whitelist, blacklist, _freeCodeViewMode } = {}) {
 		const { tagFilter, formatFilter, classFilter, styleNodeFilter, attrFilter, styleFilter } = this.options.get('strictMode');
 		let cleanData = '';
 
@@ -247,7 +247,7 @@ HTML.prototype = {
 
 		if (tagFilter) {
 			try {
-				this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter);
+				this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, tagFilter, _freeCodeViewMode ? false : formatFilter, _freeCodeViewMode ? false : classFilter);
 			} catch (error) {
 				console.warn('[SUNEDITOR.html.clean.fail]', error.message);
 			}

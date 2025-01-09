@@ -10,6 +10,7 @@ const ImageGallery = function (editor, pluginOptions) {
 	// modules
 	this.browser = new Browser(this, {
 		title: this.lang.imageGallery,
+		data: pluginOptions.data,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
 		selectorHandler: SetItem.bind(this),

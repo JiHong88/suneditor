@@ -64,6 +64,14 @@ export function OnInput_wysiwyg(frameContext, e) {
 		return false;
 	}
 
+	const range = this.selection.getRange();
+	const selectionNode = this.selection.getNode();
+	const formatEl = this.format.getLine(selectionNode, null);
+	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !domUtils.isList(selectionNode)) {
+		const rangeEl = this.format.getBlock(selectionNode, null);
+		this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine'));
+	}
+
 	this.selection._init();
 
 	const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
@@ -111,6 +119,11 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	if (this.triggerEvent('onKeyDown', { frameContext, event: e }) === false) return;
 
 	/** default key action */
+	if (keyCode === 13 && this.format.isLine(this.selection.getRange()?.startContainer)) {
+		this.selection._resetRangeToTextNode();
+		selectionNode = this.selection.getNode();
+	}
+
 	const range = this.selection.getRange();
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
@@ -264,7 +277,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			}
 
 			// format attributes
-			if (!selectRange && this.format.isEdgeLine(range.startContainer, range.startOffset, 'start')) {
+			if (!selectRange && this.format.isEdgeLine(range.startContainer, range.startOffset, 'front')) {
 				if (this.format.isLine(formatEl.previousElementSibling)) {
 					this._formatAttrsTemp = formatEl.previousElementSibling.attributes;
 				}
@@ -391,6 +404,12 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				e.preventDefault();
 				e.stopPropagation();
 				break;
+			}
+
+			if (!selectRange && this.format.isEdgeLine(range.endContainer, range.endOffset, 'end') && !formatEl.nextSibling) {
+				e.preventDefault();
+				e.stopPropagation();
+				return;
 			}
 
 			// line delete
@@ -593,15 +612,14 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						}
 
 						const tabText = domUtils.createTextNode(new Array(tabSize).join('\u00A0'));
-						const textRange = this.html.insertNode(tabText, { afterNode: null, skipCharCount: false });
-						if (!textRange) return false;
+						if (!this.html.insertNode(tabText, { afterNode: null, skipCharCount: false })) return false;
 						if (!fc) {
 							r.sc = tabText;
-							r.so = textRange.endOffset;
+							r.so = tabText.length;
 						}
 						if (!lc) {
 							r.ec = tabText;
-							r.eo = textRange.endOffset;
+							r.eo = tabText.length;
 						}
 					} else {
 						const tabText = domUtils.createTextNode(new Array(this.status.tabSize + 1).join('\u00A0'));
@@ -685,7 +703,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 			if (!shift) {
 				const formatEndEdge = !range.endContainer.nextSibling && this.format.isEdgeLine(range.endContainer, range.endOffset, 'end');
-				const formatStartEdge = !range.startContainer.previousSibling && this.format.isEdgeLine(range.startContainer, range.startOffset, 'start');
+				const formatStartEdge = !range.startContainer.previousSibling && this.format.isEdgeLine(range.startContainer, range.startOffset, 'front');
 
 				// add default format line
 				if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
@@ -882,7 +900,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						const isMultiLine = this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null);
 						const newFormat = formatEl.cloneNode(false);
 						newFormat.innerHTML = '<br>';
-						const rcon = this.html.remove();
+						const commonCon = range.commonAncestorContainer;
+						const rcon = commonCon === range.startContainer && commonCon === range.endContainer && domUtils.isZeroWith(commonCon) ? range : this.html.remove();
 						newEl = this.format.getLine(rcon.container, null);
 						if (!newEl) {
 							if (domUtils.isWysiwygFrame(rcon.container)) {
@@ -965,8 +984,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 		e.preventDefault();
 		e.stopPropagation();
 		const nbsp = this.html.insertNode(domUtils.createTextNode('\u00a0'), { afterNode: null, skipCharCount: true });
-		if (nbsp && nbsp.container) {
-			this.selection.setRange(nbsp.container, nbsp.endOffset, nbsp.container, nbsp.endOffset);
+		if (nbsp) {
+			this.selection.setRange(nbsp, nbsp.length, nbsp, nbsp.length);
 			return;
 		}
 	}

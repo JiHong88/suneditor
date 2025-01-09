@@ -445,6 +445,7 @@ Selection.prototype = {
 		}
 
 		const range = rangeObj;
+		const collapsed = range.collapsed;
 		let startCon = range.startContainer;
 		let startOff = range.startOffset;
 		let endCon = range.endContainer;
@@ -469,7 +470,8 @@ Selection.prototype = {
 			while (endCon?.nodeType === 1 && endCon.lastChild) {
 				endCon = endCon.lastChild;
 			}
-			if (endOff > 0) endOff = endCon.textContent.length;
+			if (collapsed) endOff = 0;
+			else if (endOff > 0) endOff = endCon.textContent.length;
 		}
 
 		// startContainer

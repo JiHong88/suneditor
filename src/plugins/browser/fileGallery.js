@@ -11,6 +11,7 @@ const FileGallery = function (editor, pluginOptions) {
 	const thumbnail = pluginOptions.thumbnail || this.icons.file_thumbnail;
 	this.browser = new Browser(this, {
 		title: this.lang.fileGallery,
+		data: pluginOptions.data,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
 		selectorHandler: SetItem.bind(this),

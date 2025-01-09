@@ -511,6 +511,8 @@ EventManager.prototype = {
 			this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
 			this.selection.removeRange();
 			this.selection._init();
+			this.editor.effectNode = null;
+			return;
 		}
 
 		if (format) {
@@ -524,7 +526,11 @@ EventManager.prototype = {
 		}
 
 		this.editor.effectNode = null;
-		this.editor._nativeFocus();
+		if (startCon) {
+			this.selection.setRange(startCon, 1, startCon, 1);
+		} else {
+			this.editor._nativeFocus();
+		}
 	},
 
 	_dataTransferAction(type, e, clipboardData, frameContext) {

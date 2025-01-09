@@ -11,6 +11,7 @@ const AudioGallery = function (editor, pluginOptions) {
 	const thumbnail = pluginOptions.thumbnail || this.icons.audio_thumbnail;
 	this.browser = new Browser(this, {
 		title: this.lang.audioGallery,
+		data: pluginOptions.data,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
 		selectorHandler: SetItem.bind(this),

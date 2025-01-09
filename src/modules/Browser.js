@@ -39,6 +39,7 @@ const Browser = function (inst, params) {
 
 	this.title = params.title;
 	this.listClass = params.listClass || 'se-preview-list';
+	this.directData = params.data;
 	this.url = params.url;
 	this.urlHeader = params.headers;
 	this.searchUrl = params.searchUrl;
@@ -105,7 +106,11 @@ Browser.prototype = {
 		this.editor.opendBrowser = this;
 		this.closeArrow = this.options.get('_rtl') ? this.icons.menu_arrow_left : this.icons.menu_arrow_right;
 
-		this._drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
+		if (this.directData) {
+			this.__drowItems(this.directData);
+		} else {
+			this._drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
+		}
 	},
 
 	/**
@@ -222,6 +227,35 @@ Browser.prototype = {
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 	},
 
+	__drowItems(data) {
+		if (Array.isArray(data)) {
+			if (data.length > 0) {
+				this._drawListItem(data, true);
+			}
+			return true;
+		} else if (typeof data === 'object') {
+			this.sideOpenBtn.style.display = '';
+			this.__parseFolderData(data);
+
+			this.side.innerHTML = '';
+			const sideInner = (this.sideInner = domUtils.createElement('div', null));
+			this.__createFolderList(this.tree, sideInner);
+			this.side.appendChild(sideInner);
+
+			if (this.folderDefaultPath) {
+				const openFolder = sideInner.querySelector(`[data-command="${this.folderDefaultPath}"]`);
+				openFolder.click();
+				if (this.folderDefaultPath.includes('/')) {
+					domUtils.removeClass(openFolder.parentElement, 'se-menu-hidden');
+					openFolder.parentElement.previousElementSibling.querySelector('button').innerHTML = this.openArrow;
+				}
+			}
+
+			return true;
+		}
+		return false;
+	},
+
 	__parseFolderData(data, path) {
 		let current = this.tree;
 
@@ -304,31 +338,7 @@ function CallBackGet(xmlHttp) {
 	try {
 		const res = JSON.parse(xmlHttp.responseText);
 		const data = res.result;
-		if (Array.isArray(data)) {
-			if (data.length > 0) {
-				this._drawListItem(data, true);
-			}
-			return;
-		} else if (typeof data === 'object') {
-			this.sideOpenBtn.style.display = '';
-			this.__parseFolderData(data);
-
-			this.side.innerHTML = '';
-			const sideInner = (this.sideInner = domUtils.createElement('div', null));
-			this.__createFolderList(this.tree, sideInner);
-			this.side.appendChild(sideInner);
-
-			if (this.folderDefaultPath) {
-				const openFolder = sideInner.querySelector(`[data-command="${this.folderDefaultPath}"]`);
-				openFolder.click();
-				if (this.folderDefaultPath.includes('/')) {
-					domUtils.removeClass(openFolder.parentElement, 'se-menu-hidden');
-					openFolder.parentElement.previousElementSibling.querySelector('button').innerHTML = this.openArrow;
-				}
-			}
-
-			return;
-		}
+		if (this.__drowItems(data)) return;
 
 		if (res.nullMessage) {
 			this.list.innerHTML = res.nullMessage;

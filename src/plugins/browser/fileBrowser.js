@@ -12,6 +12,7 @@ const FileBrowser = function (editor, pluginOptions) {
 	const defaultThumbnail = this.icons.file_thumbnail;
 	this.browser = new Browser(this, {
 		title: this.lang.fileBrowser,
+		data: pluginOptions.data,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
 		selectorHandler: SetItem.bind(this),

@@ -11,6 +11,7 @@ const VideoGallery = function (editor, pluginOptions) {
 	const thumbnail = pluginOptions.thumbnail || this.icons.video_thumbnail;
 	this.browser = new Browser(this, {
 		title: this.lang.videoGallery,
+		data: pluginOptions.data,
 		url: pluginOptions.url,
 		headers: pluginOptions.headers,
 		selectorHandler: SetItem.bind(this),

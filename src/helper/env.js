@@ -195,7 +195,7 @@ export const isSafari = (() => {
  * @type {boolean}
  */
 export const isMobile = (() => {
-	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) || 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) || ((navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0) && 'ontouchstart' in window);
 })();
 
 /**
