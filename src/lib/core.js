@@ -1270,6 +1270,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const range = this.getRange();
             if (this._selectionVoid(range)) return false;
 
+            const collapsed = range.collapsed;
             let startCon = range.startContainer;
             let startOff = range.startOffset;
             let endCon = range.endContainer;
@@ -1294,7 +1295,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 while (endCon && endCon.nodeType === 1 && endCon.lastChild) {
                     endCon = endCon.lastChild;
                 }
-                endOff = endCon.textContent.length;
+                endOff = collapsed ? 0 : endCon.textContent.length;
             }
 
             // startContainer
@@ -1474,18 +1475,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Determine if this offset is the edge offset of container
          * @param {Node} container The node of the selection object. (range.startContainer..)
          * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
-         * @param {String|undefined} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
+         * @param {String|undefined} dir Select check point - Both edge, Front edge or End edge. ("start": Front edge, "end": End edge, undefined: Both edge)
          * @returns {Boolean}
          */
         isEdgePoint: function (container, offset, dir) {
-            return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
+            if (container.nodeType === 1 && !container.textContent.length) return true;
+            return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'start') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
         },
 
         /**
          * @description Check if the container and offset values are the edges of the format tag
          * @param {Node} container The node of the selection object. (range.startContainer..)
          * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
-         * @param {String} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
+         * @param {String} dir Select check point - "start": Front edge, "end": End edge, undefined: Both edge.
          * @returns {Array|null}
          * @private
          */
@@ -1493,7 +1495,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!this.isEdgePoint(node, offset, dir)) return false;
 
             const result = [];
-            dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
+            dir = dir === 'start' ? 'previousSibling' : 'nextSibling';
             while (node && !util.isFormatElement(node) && !util.isWysiwygDiv(node)) {
                 if (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir])) {
                     if (node.nodeType === 1) result.push(node.cloneNode(false));
@@ -5541,7 +5543,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const dom = _d.createRange().createContextualFragment(contents);
 
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
+                if (this.options.strictHTMLValidation) {
+                    util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
+                } else {
+                    util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, false);
+                }
             } catch (error) {
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }
@@ -6235,6 +6241,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 this.execCommand('formatBlock', false, (formatName || options.defaultTag));
                 this.removeRange();
                 this._editorRange();
+                this.effectNode = null;
+                return;
             }
 
             if (format) {
@@ -6248,7 +6256,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this.effectNode = null;
-            this.nativeFocus();
+
+            if (startCon) {
+                this.setRange(startCon, 1, startCon, 1);
+            } else {
+                this.nativeFocus();
+            }
         },
 
         /**
@@ -6532,7 +6545,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
-        addGlobalEvent(type, listener, useCapture) {
+        addGlobalEvent: function (type, listener, useCapture) {
             if (options.iframe) {
                 core._ww.addEventListener(type, listener, useCapture);
             }
@@ -6544,7 +6557,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             };
         },
     
-        removeGlobalEvent(type, listener, useCapture) {
+        removeGlobalEvent: function (type, listener, useCapture) {
             if (!type) return;
     
             if (typeof type === 'object') {
@@ -6900,6 +6913,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return false;
             }
 
+            const range = core.getRange();
+            const selectionNode = core.getSelectionNode();
+            const formatEl = util.getFormatElement(selectionNode, null);
+            if (!formatEl && range.collapsed && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
+                const rangeEl = util.getRangeFormatElement(formatEl, null);
+                core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
+            }
+
             core._editorRange();
 
             const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
@@ -6928,7 +6949,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false';
             } else {
                 siblingNode = event._isUneditableNode_getSibling(container, siblingKey, container);
-                return core.isEdgePoint(container, offset, isFront ? 'front' : 'end') && (siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false');
+                return core.isEdgePoint(container, offset, isFront ? 'start' : 'end') && (siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false');
             }
         },
 
@@ -6982,6 +7003,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             /** default key action */
+            if (keyCode === 13 && util.isFormatElement(core.getRange().startContainer)) {
+                core._resetRangeToTextNode();
+                selectionNode = core.getSelectionNode();
+            }
+            
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             const fileComponentName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
@@ -7208,6 +7234,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         break;
                     }
 
+                    if (!selectRange && core._isEdgeFormat(range.endContainer, range.endOffset, 'end') && !formatEl.nextSibling) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return;
+                    }
+
                     // tag[contenteditable="false"]
                     if (event._isUneditableNode(range, false)) {
                         e.preventDefault();
@@ -7362,15 +7394,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (!shift) {
                             const tabText = util.createTextNode(new _w.Array(core._variable.tabSize + 1).join('\u00A0'));
                             if (lines.length === 1) {
-                                const textRange = core.insertNode(tabText, null, true);
-                                if (!textRange) return false;
+                                if (!core.insertNode(tabText, null, true)) return false;
                                 if (!fc) {
                                     r.sc = tabText;
-                                    r.so = textRange.endOffset;
+                                    r.so = tabText.length;
                                 }
                                 if (!lc) {
                                     r.ec = tabText;
-                                    r.eo = textRange.endOffset;
+                                    r.eo = tabText.length;
                                 }
                             } else {
                                 const len = lines.length - 1;
@@ -7600,7 +7631,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 const isMultiLine = util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null);
                                 const newFormat = formatEl.cloneNode(false);
                                 newFormat.innerHTML = '<br>';
-                                const r = core.removeNode();
+                                const commonCon = range.commonAncestorContainer;
+                                const r = commonCon === range.startContainer && commonCon === range.endContainer && util.onlyZeroWidthSpace(commonCon) ? range : core.removeNode();
                                 newEl = util.getFormatElement(r.container, null);
                                 if (!newEl) {
                                     if (util.isWysiwygDiv(r.container)) {
@@ -7715,8 +7747,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 e.preventDefault();
                 e.stopPropagation();
                 const nbsp = core.insertNode(util.createTextNode('\u00a0'));
-                if (nbsp && nbsp.container) {
-                    core.setRange(nbsp.container, nbsp.endOffset, nbsp.container, nbsp.endOffset);
+                if (nbsp) {
+                    core.setRange(nbsp, nbsp.length, nbsp, nbsp.length);
                     return;
                 }
             }
@@ -7728,7 +7760,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (event._directionKeyCode.test(keyCode)) {
-                core._editorRange();
+                _w.setTimeout(core._editorRange.bind(core), 0);
                 event._applyTagEffects();
             }
         },
@@ -7738,7 +7770,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             let selectionNode = core.getSelectionNode();
 
-            const selectNode = function (node, offset = 0) {
+            const selectNode = function (node, offset) {
+                if (!offset) offset = 0;
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -8357,7 +8390,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
-        _enterPrevent(e) {
+        _enterPrevent: function (e) {
             e.preventDefault();
             if (!util.isMobile) return;
 

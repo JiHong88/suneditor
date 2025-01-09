@@ -392,6 +392,7 @@ plugins: [
 
 // Values
 strictMode      : Option to disable clean mode, which checks the styles, classes, etc. of the editor content.   default : false {Boolean}
+strictHTMLValidation : Enforces strict HTML validation based on the editor`s policy. Applies to methods like setContents to ensure content compliance when enabled. default: false {Boolean}
 lang            : language object.   default : en {Object}
 defaultTag      : Specifies default tag name of the editor.     default: 'p' {String}
 textTags        : You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
@@ -692,6 +693,16 @@ imageMultipleFile: If true, multiple images can be selected.    default: false {
 imageAccept      : Define the "accept" attribute of the input.  default: "*" {String}
                    ex) "*" or ".jpg, .png .."
 // Image - image gallery
+imageGalleryJSONData    : Direct JSON data without making server requests.  default: null {Array}
+                          ex) [
+                                {
+                                    "src": "/download/editorImg/test_image.jpg", // @Require
+                                    "thumbnail": "/download/editorImg/test_thumbnail.jpg", // @Option - Thumbnail image to be displayed in the image gallery.
+                                    "name": "Test image", // @Option - default: src.split('/').pop()
+                                    "alt": "Alt text", // @Option - default: src.split('/').pop()
+                                    "tag": "Tag name" // @Option
+                                }
+                            ]
 imageGalleryUrl     : The url of the image gallery, if you use the image gallery.
                       When "imageUrlInput" is true, an image gallery button is created in the image modal.
                       You can also use it by adding "imageGallery" to the button list.   default: null {String}

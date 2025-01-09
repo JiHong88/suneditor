@@ -28,7 +28,7 @@ const util = {
         this.isOSX_IOS = /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
         this.isChromium = !!window.chrome;
         this.isResizeObserverSupported = (typeof ResizeObserver === 'function');
-        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ((navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0) && 'ontouchstart' in window);
     },
 
     _allowedEmptyNodeList: '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas',

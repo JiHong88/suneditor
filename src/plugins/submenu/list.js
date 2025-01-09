@@ -286,7 +286,7 @@ export default {
         }
         
         this.effectNode = null;
-        return !isCollapsed ? originRange : afterRange;
+        return !isCollapsed ? originRange : afterRange || originRange;
     },
 
     _detachNested: function (cells) {

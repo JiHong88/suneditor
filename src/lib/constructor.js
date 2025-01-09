@@ -416,6 +416,7 @@ export default {
         options.plugins = plugins;
         /** Values */
         options.strictMode = options.strictMode !== false;
+        options.strictHTMLValidation = options.strictHTMLValidation === true;
         options.lang = options.lang || _defaultLang;
         options.value = typeof options.value === 'string' ? options.value : null;
         options.allowedClassNames = new util._w.RegExp((options.allowedClassNames && typeof options.allowedClassNames === 'string' ? options.allowedClassNames + '|' : '') + '^__se__|se-|katex');
@@ -542,6 +543,7 @@ export default {
         options.imageMultipleFile = !!options.imageMultipleFile;
         options.imageAccept = (typeof options.imageAccept !== 'string' || options.imageAccept.trim() === "*") ? 'image/*' : options.imageAccept.trim() || 'image/*';
         /** Image - image gallery */
+        options.imageGalleryData = options.imageGalleryData || null;
         options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
         options.imageGalleryHeader = options.imageGalleryHeader || null;
         /** Video */
