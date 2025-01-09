@@ -6241,6 +6241,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 this.execCommand('formatBlock', false, (formatName || options.defaultTag));
                 this.removeRange();
                 this._editorRange();
+                this.effectNode = null;
+                return;
             }
 
             if (format) {
@@ -6254,7 +6256,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this.effectNode = null;
-            this.nativeFocus();
+
+            if (startCon) {
+                this.setRange(startCon, 1, startCon, 1);
+            } else {
+                this.nativeFocus();
+            }
         },
 
         /**
@@ -6900,6 +6907,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 e.stopPropagation();
                 core.history.go(core.history.getCurrentIndex());
                 return false;
+            }
+
+            const range = core.getRange();
+            const selectionNode = core.getSelectionNode();
+            const formatEl = util.getFormatElement(selectionNode, null);
+            if (!formatEl && range.collapsed && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
+                const rangeEl = util.getRangeFormatElement(formatEl, null);
+                core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
             }
 
             core._editorRange();
