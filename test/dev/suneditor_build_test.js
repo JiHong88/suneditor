@@ -988,8 +988,8 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
 
 //     `,
 // imageUploadUrl: 'http://localhost:3000/editor/upload',
-    // strictMode: false,
-    // strictHTMLValidation: true,
+    strictMode: false,
+    strictHTMLValidation: false,
     allowedClassNames: '.',
     width: '100%',
     // fontSizeUnit: 'em',
@@ -1059,9 +1059,10 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     // addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
     lineAttrReset: 'class',
     imageAccept: '*/*',
-    value: `<p>Ôtez la <span style="color: rgb(235, 141, 117)">complexité</span>,<br>
-M.Biz vous apporte des solutions utiles<br>
-</p>`,
+    value: `<div style="text-align: center">
+    <p>This text is centered.</p>
+    <p>This text is centered.</p>
+  </div>`,
     // attributesWhitelist: {
     //     all: 'style|class',
     // },

@@ -5480,12 +5480,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist, blacklist) {
-            if (!options.strictMode) return html;
+            if (!options.strictMode) return util.htmlCompress(html);
 
             html = this._deleteDisallowedTags(this._parser.parseFromString(util.htmlCompress(html), 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/<br\/?>$/i, '');
             const dom = _d.createRange().createContextualFragment(html);
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter, options.strictHTMLValidation);
             } catch (error) {
                 console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
             }
@@ -5538,16 +5538,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            if (!options.strictMode) return contents;
+            if (!options.strictMode) return util.htmlCompress(contents);
+
             contents = this._deleteDisallowedTags(this._parser.parseFromString(util.htmlCompress(contents), 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
             const dom = _d.createRange().createContextualFragment(contents);
 
             try {
-                if (this.options.strictHTMLValidation) {
-                    util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
-                } else {
-                    util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, false);
-                }
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter, options.strictHTMLValidation);
             } catch (error) {
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }

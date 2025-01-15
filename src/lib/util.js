@@ -1931,9 +1931,10 @@ const util = {
      * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
      * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist (core._htmlCheckBlacklistRegExp)
      * @param {Function} classNameFilter Class name filter function
+     * @param {Function} strictHTMLValidation Enforces strict HTML validation based on the editor`s policy
      * @private
      */
-    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, classNameFilter) {
+    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, classNameFilter, strictHTMLValidation) {
         /**
          * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
          * So check the node type and exclude the text no (current.nodeType !== 1)
@@ -1982,7 +1983,7 @@ const util = {
                 else current.removeAttribute('class');
             }
 
-            const result = current.parentNode !== documentFragment && nrtag &&
+            const result = strictHTMLValidation && current.parentNode !== documentFragment && nrtag &&
                 ((this.isListCell(current) && !this.isList(current.parentNode)) ||
                     ((this.isFormatElement(current) || this.isComponent(current)) && !this.isRangeFormatElement(current.parentNode) && !this.getParentElement(current, this.isComponent)));
 
