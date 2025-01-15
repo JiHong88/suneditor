@@ -988,7 +988,7 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
 
 //     `,
 // imageUploadUrl: 'http://localhost:3000/editor/upload',
-    // strictMode: false,
+    strictMode: false,
     strictHTMLValidation: false,
     allowedClassNames: '.',
     width: '100%',
