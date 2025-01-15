@@ -952,6 +952,10 @@ window.editor_root = suneditor.create(
 				</div>
 			</div>
 		</div>`,
+		value: `<div style="text-align: center">
+<p>This text is centered.</p>
+<p>This text is centered.</p>
+</div>`,
 		link: {
 			uploadUrl: 'http://localhost:3000/editor/files/upload',
 			relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],

@@ -247,7 +247,7 @@ HTML.prototype = {
 
 		if (tagFilter) {
 			try {
-				this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, tagFilter, _freeCodeViewMode ? false : formatFilter, _freeCodeViewMode ? false : classFilter);
+				this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter, _freeCodeViewMode);
 			} catch (error) {
 				console.warn('[SUNEDITOR.html.clean.fail]', error.message);
 			}
@@ -1012,7 +1012,7 @@ HTML.prototype = {
 				editableEls[j].removeAttribute('contenteditable');
 			}
 
-			const content = this.clean(renderHTML.innerHTML, { forceFormat: false, whitelist: null, blacklist: null });
+			const content = renderHTML.innerHTML;
 			if (this.editor.frameOptions.get('iframe_fullPage')) {
 				if (includeFullPage) {
 					const attrs = domUtils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
@@ -1286,7 +1286,7 @@ HTML.prototype = {
 	 * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist
 	 * @private
 	 */
-	_consistencyCheckOfHTML(documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter) {
+	_consistencyCheckOfHTML(documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter, _freeCodeViewMode) {
 		const removeTags = [],
 			emptyTags = [],
 			wrongList = [],
@@ -1356,6 +1356,7 @@ HTML.prototype = {
 			}
 
 			const result =
+				!_freeCodeViewMode &&
 				current.parentNode !== documentFragment &&
 				nrtag &&
 				((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) ||

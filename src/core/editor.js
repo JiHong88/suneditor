@@ -1192,7 +1192,8 @@ Editor.prototype = {
 			this.html.clean(typeof value === 'string' ? value : (/^TEXTAREA$/i.test(e.get('originElement').nodeName) ? e.get('originElement').value : e.get('originElement').innerHTML) || '', {
 				forceFormat: true,
 				whitelist: null,
-				blacklist: null
+				blacklist: null,
+				_freeCodeViewMode: this.options.get('freeCodeViewMode')
 			}) || '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 
 		// char counter

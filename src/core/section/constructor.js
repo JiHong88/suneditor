@@ -443,7 +443,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		styleFilter: modeValue,
 		...options.strictMode
 	});
-	o.set('freeCodeViewMode', options.freeCodeViewMode ?? true);
+	o.set('freeCodeViewMode', !!options.freeCodeViewMode);
 	o.set('__lineFormatFilter', options.__lineFormatFilter ?? true);
 	o.set('__pluginRetainFilter', options.__pluginRetainFilter ?? true);
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
