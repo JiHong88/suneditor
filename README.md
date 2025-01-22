@@ -392,7 +392,7 @@ plugins: [
 
 // Values
 strictMode      : Option to disable clean mode, which checks the styles, classes, etc. of the editor content.   default : false {Boolean}
-strictHTMLValidation : Enforces strict HTML validation based on the editor`s policy. Applies to methods like setContents to ensure content compliance when enabled. default: false {Boolean}
+strictHTMLValidation : Enforces strict HTML validation based on the editor`s policy. Applies to methods like setContents to ensure content compliance when enabled. default: true {Boolean}
 lang            : language object.   default : en {Object}
 defaultTag      : Specifies default tag name of the editor.     default: 'p' {String}
 textTags        : You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
