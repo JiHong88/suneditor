@@ -366,7 +366,7 @@ export interface SunEditorOptions {
     /**
      * Direct JSON data without making server requests.
      */
-    imageGalleryData?: Array;
+    imageGalleryData?: Array<any>;
     /**
      * The url of the image gallery, if you use the image gallery
      */
