@@ -18,8 +18,6 @@ import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js';
 import { EditorView, basicSetup, minimalSetup } from 'codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 
 // // codemirror5
 // import Codemirror5 from 'codemirror5';
@@ -1057,10 +1055,8 @@ window.editor_root = suneditor.create(
 				CHTML,
 				browserAdaptor,
 				RegisterHTMLHandler
-			},
+			}
 			// perfectFreehand: PerfectFreehand,
-			html2canvas: html2canvas,
-			jsPDF: jsPDF
 			// codemirror
 			// codeMirror: {
 			// 	EditorView: EditorView,
