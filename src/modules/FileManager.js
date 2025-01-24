@@ -29,8 +29,8 @@ FileManager.prototype = {
 	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
-	 * @param {Object|null} uploadHeader Request header
-	 * @param {Files|{FormData, size}} data FormData in body or Files array
+	 * @param {object|null} uploadHeader Request header
+	 * @param {Files|{formData: FormData, size: number}} data FormData in body or Files array
 	 * @param {Function|null} callBack Success call back function
 	 * @param {Function|null} errorCallBack Error call back function
 	 */
@@ -56,8 +56,8 @@ FileManager.prototype = {
 	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
-	 * @param {Object|null} uploadHeader Request header
-	 * @param {Files|{FormData, size}} data FormData in body or Files array
+	 * @param {object|null} uploadHeader Request header
+	 * @param {Files|{formData: FormData, size: number}} data FormData in body or Files array
 	 */
 	async asyncUpload(uploadUrl, uploadHeader, data) {
 		this.editor.showLoading();
@@ -88,7 +88,7 @@ FileManager.prototype = {
 	 * @description Create info object of file and add it to "infoList"
 	 * @private
 	 * @param {Element} element
-	 * @param {Object|null} file
+	 * @param {object|null} file
 	 */
 	_setInfo(element, file) {
 		let dataIndex = GetAttr(element, 'index');

@@ -191,7 +191,7 @@ Audio_.prototype = {
 		const container = figure.container || element;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 
-		const message = await this.triggerEvent('onAudioDeleteBefore', { target: element, container: figure, url: element.getAttribute('src') });
+		const message = await this.triggerEvent('onAudioDeleteBefore', { element: element, container: figure, url: element.getAttribute('src') });
 		if (message === false) return;
 
 		const emptyDiv = container.parentNode;
@@ -277,7 +277,7 @@ Audio_.prototype = {
 		}.bind(this, audioInfo);
 
 		const result = await this.triggerEvent('onAudioUploadBefore', {
-			...audioInfo,
+			info: audioInfo,
 			handler
 		});
 
@@ -307,7 +307,7 @@ Audio_.prototype = {
 		}.bind(this, audioInfo);
 
 		const result = await this.triggerEvent('onAudioUploadBefore', {
-			...audioInfo,
+			info: audioInfo,
 			handler
 		});
 

@@ -1,6 +1,6 @@
 /**
  * @description Add default properties to the editor core;
- * @param {any} editor Editor's core
+ * @param {object} editor Editor's core
  * @private
  */
 function CoreInjector(editor) {

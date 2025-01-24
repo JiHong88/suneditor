@@ -8,8 +8,8 @@ const userAgent = _w.navigator.userAgent.toLowerCase();
 
 /**
  * @description Object.values
- * @param {Object.<any>} obj Object parameter.
- * @returns {Array.<any>}
+ * @param {object.<*>} obj Object parameter.
+ * @returns {Array.<*>}
  */
 export function getValues(obj) {
 	return !obj
@@ -35,8 +35,8 @@ export function camelToKebabCase(param) {
 
 /**
  * @description Convert the KebabCase To the CamelCase.
- * @param {String|Array} param [KebabCase string]
- * @returns {String|Array}
+ * @param {string|Array.<string>} param [KebabCase string]
+ * @returns {string|Array.<string>}
  */
 export function kebabToCamelCase(param) {
 	if (typeof param === 'string') {

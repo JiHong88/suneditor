@@ -1,6 +1,6 @@
 /**
  * @description Add all inner classes to the editor;
- * @param {any} editor Editor object
+ * @param {object} editor Editor object
  * @private
  */
 function ClassInjector(editor) {

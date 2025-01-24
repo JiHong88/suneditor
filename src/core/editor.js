@@ -31,8 +31,8 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
 /**
  * @description SunEditor constructor function.
  * @param {Array.<Element>} multiTargets Target textarea
- * @param {Object} options options
- * @returns {Object}
+ * @param {object} options options
+ * @returns {object}
  */
 const Editor = function (multiTargets, options) {
 	const _d = multiTargets[0].target.ownerDocument || env._d;
@@ -67,19 +67,19 @@ const Editor = function (multiTargets, options) {
 
 	/**
 	 * @description Editor options
-	 * @type {Object.<string, any>}
+	 * @type {object.<string, *>}
 	 */
 	this.options = product.options;
 
 	/**
 	 * @description Plugins
-	 * @type {Object.<string, any>}
+	 * @type {object.<string, *>}
 	 */
 	this.plugins = product.plugins || {};
 
 	/**
 	 * @description Events object, call by triggerEvent function
-	 * @type {Object.<string, any>}
+	 * @type {object.<string, *>}
 	 */
 	this.events = null;
 
@@ -91,13 +91,13 @@ const Editor = function (multiTargets, options) {
 
 	/**
 	 * @description Default icons object
-	 * @type {Object.<string, string>}
+	 * @type {object.<string, string>}
 	 */
 	this.icons = product.icons;
 
 	/**
 	 * @description loaded language
-	 * @type {Object.<string, any>}
+	 * @type {object.<string, *>}
 	 */
 	this.lang = product.lang;
 
@@ -587,7 +587,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
-	 * @param {Object} newOptions Options
+	 * @param {object} newOptions Options
 	 */
 	resetOptions(newOptions) {
 		const _keys = Object.keys;
@@ -774,8 +774,8 @@ Editor.prototype = {
 	/**
 	 * @description javascript execCommand
 	 * @param {string} command javascript execCommand function property
-	 * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
-	 * @param {string|undefined} value javascript execCommand function property
+	 * @param {boolean=} showDefaultUI javascript execCommand function property
+	 * @param {string=} value javascript execCommand function property
 	 */
 	execCommand(command, showDefaultUI, value) {
 		this.frameContext.get('_wd').execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);

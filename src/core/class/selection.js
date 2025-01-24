@@ -17,7 +17,7 @@ const Selection = function (editor) {
 Selection.prototype = {
 	/**
 	 * @description Get window selection obejct
-	 * @returns {Object}
+	 * @returns {object}
 	 */
 	get() {
 		const selection = this._shadowRoot ? this._shadowRoot?.getComposedRanges() || this._shadowRoot?.getSelection() : this.editor.frameContext.get('_ww').getSelection();
@@ -32,7 +32,7 @@ Selection.prototype = {
 	/**
 	 * @description Check if the range object is valid
 	 * @param {Range|null|undefined} range Range object
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 */
 	isRange(range) {
 		return /Range/.test(Object.prototype.toString.call(range?.__proto__));
@@ -40,7 +40,7 @@ Selection.prototype = {
 
 	/**
 	 * @description Get current editor's range object
-	 * @returns {Object}
+	 * @returns {object}
 	 */
 	getRange() {
 		const range = this.status._range || this._createDefaultRange();
@@ -76,7 +76,7 @@ Selection.prototype = {
 	 * @param {number} startOff The startOffset property of the selection object.
 	 * @param {Node} endCon The endContainer property of the selection object.
 	 * @param {number} endOff The endOffset property of the selection object.
-	 * @returns {Object} Range object.
+	 * @returns {Range}
 	 */
 	setRange(startCon, startOff, endCon, endOff) {
 		if (this.isRange(startCon)) {
@@ -141,7 +141,7 @@ Selection.prototype = {
 	 * If the target node has a next sibling, it returns the next sibling with an offset of 0.
 	 * If there is no next sibling but a previous sibling exists, it returns the previous sibling with an offset of 1.
 	 * @param {Node} target Target node whose neighboring range is to be determined.
-	 * @returns {Object|null} An object containing the nearest container node and its offset.
+	 * @returns {object|null} An object containing the nearest container node and its offset.
 	 */
 	getNearRange(target) {
 		const next = target.nextSibling;
@@ -164,9 +164,9 @@ Selection.prototype = {
 	/**
 	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
 	 * Returns a new "range" or argument "range".
-	 * @param {Object} range core.getRange()
+	 * @param {object} range core.getRange()
 	 * @param {Element|null} container If there is "container" argument, it creates a line in front of the container.
-	 * @returns {Object} range
+	 * @returns {Range}
 	 */
 	getRangeAndAddLine(range, container) {
 		if (this._isNone(range)) {
@@ -268,7 +268,7 @@ Selection.prototype = {
 	/**
 	 * @description Get the custom range object of the event.
 	 * @returns {Event} e Event object
-	 * @returns {Object} {sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}
+	 * @returns {object} {sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}
 	 */
 	getEventLocationRange(e) {
 		let sc, so, ec, eo;
@@ -303,7 +303,7 @@ Selection.prototype = {
 	/**
 	 * @description Scroll to the corresponding selection or range position.
 	 * @param {Selection|Range|Node} ref selection or range object
-	 * @param {Object?} scrollOption option of scrollTo
+	 * @param {object?} scrollOption option of scrollTo
 	 */
 	scrollTo(ref, scrollOption) {
 		if (ref instanceof Selection) {
@@ -325,7 +325,7 @@ Selection.prototype = {
 
 	/**
 	 * @description Returns true if there is no valid selection.
-	 * @param {Object} range selection.getRange()
+	 * @param {Range} range selection.getRange()
 	 * @returns {boolean}
 	 */
 	_isNone(range) {
@@ -340,7 +340,7 @@ Selection.prototype = {
 
 	/**
 	 * @description Return the range object of editor's first child node
-	 * @returns {Object}
+	 * @returns {object}
 	 * @private
 	 */
 	_createDefaultRange() {
@@ -369,8 +369,8 @@ Selection.prototype = {
 
 	/**
 	 * @description Set "range" and "selection" info.
-	 * @param {Object} range range object.
-	 * @param {Object} selection selection object.
+	 * @param {Range} range range object.
+	 * @param {Selection} selection selection object.
 	 */
 	_rangeInfo(range, selection) {
 		let selectionNode = null;

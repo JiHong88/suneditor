@@ -20,8 +20,8 @@ export const onlyZeroWidthRegExp = new RegExp('^' + String.fromCharCode(zwsp) + 
 
 /**
  * @description Escape a string for safe use in regular expressions.
- * @param {String} string String to escape
- * @returns {String}
+ * @param {string} string String to escape
+ * @returns {string}
  */
 export function escapeStringRegexp(string) {
 	if (typeof string !== 'string') {

@@ -152,10 +152,10 @@ Controller.prototype = {
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
 	 * @param {Element} form Controller element
 	 * @param {Element|Range} target Controller target element
-	 * @param {Boolean} isRangeTarget If the target is a Range, set it to true.
+	 * @param {boolean} isRangeTarget If the target is a Range, set it to true.
 	 */
 	_controllerOn(form, target, isRangeTarget) {
-		const params = {
+		const info = {
 			position: this.position,
 			inst: this,
 			form,
@@ -164,7 +164,7 @@ Controller.prototype = {
 			notInCarrier: !this.carrierWrapper.contains(form)
 		};
 
-		if (this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.editor.frameContext, params }) === false) return;
+		if (this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.editor.frameContext, info }) === false) return;
 
 		form.style.display = 'block';
 		if (this._shadowRoot) {
@@ -176,13 +176,13 @@ Controller.prototype = {
 		this.editor._controllerTargetContext = this.editor.frameContext.get('topArea');
 
 		if (!this.isOpen) {
-			this.editor.opendControllers.push(params);
+			this.editor.opendControllers.push(info);
 		}
 
 		this.isOpen = true;
 		this.editor._antiBlur = true;
 		this.editor.status.onSelected = true;
-		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.editor.frameContext, params });
+		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.editor.frameContext, info });
 	},
 
 	/**

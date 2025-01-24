@@ -373,7 +373,7 @@ Table.prototype = {
 
 	/**
 	 * @override core
-	 * @param {any} event Event object
+	 * @param {Event} event Event object
 	 */
 	onMouseDown({ event }) {
 		this._ref = null;
@@ -461,8 +461,8 @@ Table.prototype = {
 
 	/**
 	 * @override core
-	 * @param {any} event Event object
-	 * @param {any} range range object
+	 * @param {Event} event Event object
+	 * @param {Range} range range object
 	 * @param {Element} line Current line element
 	 */
 	onKeyDown({ event, range, line }) {
@@ -538,8 +538,8 @@ Table.prototype = {
 
 	/**
 	 * @override core
-	 * @param {any} event Event object
-	 * @param {any} range range object
+	 * @param {Event} event Event object
+	 * @param {Range} range range object
 	 * @param {Element} line Current line element
 	 */
 	onKeyUp({ line }) {

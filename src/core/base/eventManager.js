@@ -582,7 +582,7 @@ EventManager.prototype = {
 		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText, false);
 		// user event - paste
 		if (type === 'paste') {
-			const value = await this.triggerEvent('onPaste', { frameContext, event: e, html: cleanData, maxCharCount, from });
+			const value = await this.triggerEvent('onPaste', { frameContext, event: e, data: cleanData, maxCharCount, from });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -592,7 +592,7 @@ EventManager.prototype = {
 		}
 		// user event - drop
 		if (type === 'drop') {
-			const value = await this.triggerEvent('onDrop', { frameContext, event: e, html: cleanData, maxCharCount, from });
+			const value = await this.triggerEvent('onDrop', { frameContext, event: e, data: cleanData, maxCharCount, from });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {

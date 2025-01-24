@@ -1,16 +1,16 @@
 import { env } from '../helper';
 
 /**
- *
- * @param {*} inst
- * @param {Object|null=} params
- * @param {string|null=} params.method - HTTP method (GET, POST, PUT, DELETE...)
- * @param {string|null=} params.url - API's URL
- * @param {Object|null=} params.headers - HTTP headers
- * @param {Object|null=} params.data - API data
- * @param {Function|null=} params.callBack - API success callback
- * @param {Function|null=} params.errorCallBack - API fail callback
- * @param {string|null=} params.responseType - XMLHttpRequest.responseType
+ * @description API Manager
+ * @param {object} inst
+ * @param {object=} params
+ * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
+ * @param {string=} params.url - API's URL
+ * @param {object=} params.headers - HTTP headers
+ * @param {object=} params.data - API data
+ * @param {Function=} params.callBack - API success callback
+ * @param {Function=} params.errorCallBack - API fail callback
+ * @param {string=} params.responseType - XMLHttpRequest.responseType
  */
 const ApiManager = function (inst, params) {
 	this.editor = inst.editor;
@@ -31,14 +31,14 @@ const ApiManager = function (inst, params) {
 ApiManager.prototype = {
 	/**
 	 * @description Call API
-	 * @param {Object|null=} params
-	 * @param {string|null=} params.method - HTTP method (GET, POST, PUT, DELETE...)
-	 * @param {string|null=} params.url - API's URL
-	 * @param {Object|null=} params.headers - HTTP headers
-	 * @param {Object|null=} params.data - API data
-	 * @param {Function|null=} params.callBack - API success callback
-	 * @param {Function|null=} params.errorCallBack - API fail callback
-	 * @param {string|null=} params.responseType - XMLHttpRequest.responseType
+	 * @param {object=} params
+	 * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
+	 * @param {string=} params.url - API's URL
+	 * @param {object=} params.headers - HTTP headers
+	 * @param {object=} params.data - API data
+	 * @param {Function=} params.callBack - API success callback
+	 * @param {Function=} params.errorCallBack - API fail callback
+	 * @param {string=} params.responseType - XMLHttpRequest.responseType
 	 */
 	call({ method, url, headers, data, callBack, errorCallBack, responseType }) {
 		this.cancel();
@@ -66,12 +66,12 @@ ApiManager.prototype = {
 
 	/**
 	 * @description Call Async API
-	 * @param {Object|null=} params
-	 * @param {string|null=} params.method - HTTP method (GET, POST, PUT, DELETE...)
-	 * @param {string|null=} params.url - API's URL
-	 * @param {Object|null=} params.headers - HTTP headers
-	 * @param {Object|null=} params.data - API data
-	 * @param {string|null=} params.responseType - XMLHttpRequest.responseType
+	 * @param {object=} params
+	 * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
+	 * @param {string=} params.url - API's URL
+	 * @param {object=} params.headers - HTTP headers
+	 * @param {object=} params.data - API data
+	 * @param {string=} params.responseType - XMLHttpRequest.responseType
 	 */
 	asyncCall({ method, url, headers, data, responseType }) {
 		this.cancel();

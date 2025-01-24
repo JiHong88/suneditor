@@ -4,17 +4,17 @@ import ApiManager from './ApiManager';
 
 /**
  * @param {*} inst
- * @param {Object} params
+ * @param {object} params
  * @param {string} params.title - File browser window title. Required. Can be overridden in browser.
  * @param {string} params.url - File server url. Required. Can be overridden in browser.
- * @param {Object} params.headers - File server http header. Required. Can be overridden in browser.
+ * @param {object} params.headers - File server http header. Required. Can be overridden in browser.
  * @param {function} params.selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
- * @param {boolean?} params.useSearch - Whether to use the search function. Optional. Default: true.
- * @param {string?} params.searchUrl - File server search url. Optional. Can be overridden in browser.
- * @param {Object?} params.searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
- * @param {string?} params.listClass - Class name of list div. Required. Can be overridden in browser.
- * @param {function?} params.drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
- * @param {number?} params.columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
+ * @param {boolean=} params.useSearch - Whether to use the search function. Optional. Default: true.
+ * @param {string=} params.searchUrl - File server search url. Optional. Can be overridden in browser.
+ * @param {object=} params.searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
+ * @param {string=} params.listClass - Class name of list div. Required. Can be overridden in browser.
+ * @param {function=} params.drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
+ * @param {number=} params.columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
  */
 const Browser = function (inst, params) {
 	CoreInjector.call(this, inst.editor);
@@ -88,9 +88,11 @@ const Browser = function (inst, params) {
 Browser.prototype = {
 	/**
 	 * @description Open a file browser plugin
-	 * @param {Object|null} params {
-	 * 	selectorHandler: When the function comes as an argument value, it substitutes "context.selectorHandler".
-	 * }
+	 * @param {object=} params
+	 * @param {string=} params.listClass - Class name of list div. If not, use "this.listClass".
+	 * @param {string=} params.title - File browser window title. If not, use "this.title".
+	 * @param {string=} params.url - File server url. If not, use "this.url".
+	 * @param {object} params.urlHeader - File server http header. If not, use "this.urlHeader".
 	 */
 	open(params) {
 		if (!params) params = {};
@@ -135,6 +137,10 @@ Browser.prototype = {
 		if (typeof this.inst.init === 'function') this.inst.init();
 	},
 
+	/**
+	 * @description Search files
+	 * @param {string} keyword - Search keyword
+	 */
 	search(keyword) {
 		if (this.searchUrl) {
 			this.keyword = keyword;
@@ -145,6 +151,11 @@ Browser.prototype = {
 		}
 	},
 
+	/**
+	 * @description Filter items by tag
+	 * @param {Array.<string>} items - Items to filter
+	 * @returns {Array.<string>}
+	 */
 	tagfilter(items) {
 		const selectedTags = this.selectedTags;
 		return selectedTags.length === 0 ? items : items.filter((item) => !item.tag.some || item.tag.some((tag) => selectedTags.includes(tag)));
@@ -502,7 +513,7 @@ function CreateHTML({ lang, icons }, useSearch) {
  * Format: [
  *      { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" }
  * ]
- * @param {Object} item Item of the response data's array
+ * @param {object} item Item of the response data's array
  */
 function DrawItems(item) {
 	const srcName = item.src.split('/').pop();

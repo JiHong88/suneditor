@@ -212,7 +212,7 @@ FileUpload.prototype = {
 		}.bind(this, fileInfo);
 
 		const result = await this.triggerEvent('onFileUploadBefore', {
-			...fileInfo,
+			info: fileInfo,
 			handler
 		});
 
@@ -233,7 +233,7 @@ FileUpload.prototype = {
 		const figure = Figure.GetContainer(target);
 		target = domUtils.getParentElement(target, '.se-component') || target;
 
-		const message = await this.triggerEvent('onFileDeleteBefore', { target: figure.target, container: figure, url: figure.target.getAttribute('href') });
+		const message = await this.triggerEvent('onFileDeleteBefore', { element: figure.target, container: figure, url: figure.target.getAttribute('href') });
 		if (message === false) return;
 
 		const isInlineComp = this.component.isInline(target);
@@ -288,9 +288,9 @@ FileUpload.prototype = {
 
 	/**
 	 * @description Create file element
-	 * @param {String} url File URL
+	 * @param {string} url File URL
 	 * @param {File} file File object
-	 * @param {Boolean} isLast Is last file
+	 * @param {boolean} isLast Is last file
 	 */
 	create(url, file, isLast) {
 		const name = file.name || url;

@@ -412,13 +412,13 @@ Format.prototype = {
 	 * @description The elements of the "selectedFormats" array are detached from the "blockElement" element. ("LI" tags are converted to "P" tags)
 	 * When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling, removeArray: [Array of removed elements]}.
 	 * @param {Element} blockElement Range format element (PRE, BLOCKQUOTE, OL, UL...)
-	 * @param {Object} [options] Options
+	 * @param {object} [options] Options
 	 * @param {Array} [options.selectedFormats=null] Array of format elements (P, DIV, LI...) to remove.
 	 * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
 	 * @param {Element} [options.newBlockElement=null] The node(blockElement) to replace the currently wrapped node.
 	 * @param {boolean} [options.shouldDelete=false] If true, deleted without detached.
 	 * @param {boolean} [options.skipHistory=false] When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
-	 * @returns {Object}
+	 * @returns {object}
 	 */
 	removeBlock(blockElement, { selectedFormats, newBlockElement, shouldDelete, skipHistory } = {}) {
 		const range = this.selection.getRange();
@@ -852,7 +852,7 @@ Format.prototype = {
 	 * The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
 	 * @param {Array} selectedCells Array of format elements (LI, P...) to remove.
 	 * @param {boolean} shouldDelete If true, It does not just remove the list, it deletes the content.
-	 * @returns {Object} {sc: <LI>, ec: <LI>}.
+	 * @returns {object} {sc: <LI>, ec: <LI>}.
 	 */
 	removeList(selectedCells, shouldDelete) {
 		let rangeArr = {};
@@ -965,7 +965,7 @@ Format.prototype = {
 	/**
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
 	 * @param {Element|null} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
-	 * @param {Object} [options] Options
+	 * @param {object} [options] Options
 	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
 	 *        (e.g., ['font-size'], ['.className'], ['font-family', 'color', '.className'])
 	 * @param {Array<string>} [options.nodesToRemove=null] Array of node names to remove.
@@ -1553,7 +1553,7 @@ Format.prototype = {
 
 	/**
 	 * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
-	 * @param {Node|String} element Element to check
+	 * @param {Node|string} element Element to check
 	 * @returns {boolean}
 	 * @private
 	 */
@@ -2294,7 +2294,7 @@ Format.prototype = {
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @returns {null|Node} If end container is renewed, returned renewed node
-	 * @returns {Object} { ancestor, container, offset, endContainer }
+	 * @returns {object} { ancestor, container, offset, endContainer }
 	 * @private
 	 */
 	_setNode_startLine(element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
@@ -2590,7 +2590,7 @@ Format.prototype = {
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @param {Node} _endContainer Offset node of last line already modified (end.container)
-	 * @returns {Object} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
+	 * @returns {object} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
 	 * @private
 	 */
 	_setNode_middleLine(element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
@@ -2729,7 +2729,7 @@ Format.prototype = {
 	 * @param {number} endOff The endOffset property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
-	 * @returns {Object} { ancestor, container, offset }
+	 * @returns {object} { ancestor, container, offset }
 	 * @private
 	 */
 	_setNode_endLine(element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {

@@ -14,7 +14,7 @@ NodeTransform.prototype = {
 	 * @description Split all tags based on "baseNode"
 	 * Returns the last element of the splited tag.
 	 * @param {Node} baseNode Element or text node on which to base
-	 * @param {Number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+	 * @param {number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
 	 * @param {number} depth The nesting depth of the element being split. (default: 0)
 	 * @returns {Element}
 	 */
@@ -268,7 +268,7 @@ NodeTransform.prototype = {
 	/**
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Element} element Element object
-	 * @param {Function|String|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
+	 * @param {Function|string|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
 	 */
 	mergeNestedTags(element, validation) {
 		if (typeof validation === 'string') {
@@ -302,7 +302,7 @@ NodeTransform.prototype = {
 	 * @param {Node} item Node to be remove
 	 * @param {Function|null} validation Validation function. default(Deleted if it only have breakLine and blanks)
 	 * @param {Element|null} stopParent Stop when the parent node reaches stopParent
-	 * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
+	 * @returns {object|null} {sc: previousSibling, ec: nextSibling}
 	 */
 	removeAllParents(item, validation, stopParent) {
 		if (!item) return null;

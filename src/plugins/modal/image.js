@@ -331,7 +331,7 @@ Image_.prototype = {
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.triggerEvent('onImageDeleteBefore', { target: targetEl, container, align: this._align, alt: this.altText.value, url: this._linkValue });
+		const message = await this.triggerEvent('onImageDeleteBefore', { element: targetEl, container, align: this._align, alt: this.altText.value, url: this._linkValue });
 		if (message === false) return;
 
 		domUtils.removeItem(container);
@@ -436,7 +436,7 @@ Image_.prototype = {
 		}.bind(this, imgInfo);
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
-			...imgInfo,
+			info: imgInfo,
 			handler
 		});
 
@@ -466,7 +466,7 @@ Image_.prototype = {
 		}.bind(this, imgInfo);
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
-			...imgInfo,
+			info: imgInfo,
 			handler
 		});
 

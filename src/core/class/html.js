@@ -213,7 +213,7 @@ HTML.prototype = {
 	/**
 	 * @description Cleans and compresses HTML code to suit the editor format.
 	 * @param {string} html HTML string to clean and compress
-	 * @param {Object} [options] Cleaning options
+	 * @param {object} [options] Cleaning options
 	 * @param {boolean} [options.forceFormat=false] If true, wraps text nodes without a format node in the format tag.
 	 * @param {string|RegExp|null} [options.whitelist=null] Regular expression of allowed tags.
 	 * Create RegExp object using helper.converter.createElementWhitelist method.
@@ -297,7 +297,7 @@ HTML.prototype = {
 	 * @description Inserts an (HTML element / HTML string / plain string) at the selection range.
 	 * If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
 	 * @param {Element|string} html HTML Element or HTML string or plain string
-	 * @param {Object} [options] Options
+	 * @param {object} [options] Options
 	 * @param {boolean} [options.selectInserted=false] If true, selects the range of the inserted node.
 	 * @param {boolean} [options.skipCharCount=false] If true, inserts even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipCleaning=false] If true, inserts the HTML string without refining it with html.clean.
@@ -374,7 +374,7 @@ HTML.prototype = {
 	 * If the "afterNode" exists, it is inserted after the "afterNode"
 	 * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
 	 * @param {Node} oNode Node to be inserted
-	 * @param {Object} [options] Options
+	 * @param {object} [options] Options
 	 * @param {Node} [options.afterNode=null] If the node exists, it is inserted after the node
 	 * @param {boolean} [options.skipCharCount=null] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @returns {Object|Node|null}
@@ -721,7 +721,7 @@ HTML.prototype = {
 	/**
 	 * @description Delete the selected range.
 	 * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
-	 * @returns {Object}
+	 * @returns {object}
 	 */
 	remove() {
 		this.selection._resetRangeToTextNode();
@@ -988,7 +988,7 @@ HTML.prototype = {
 
 	/**
 	 * @description Gets the current content
-	 * @param {Object} [options] Options
+	 * @param {object} [options] Options
 	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
 	 * Ignored for targetOptions.get('iframe_fullPage') is true.
 	 * @param {boolean} [options.includeFullPage=false] Return only the content of the body without headers when the "iframe_fullPage" option is true
@@ -1034,7 +1034,7 @@ HTML.prototype = {
 	/**
 	 * @description Sets the HTML string
 	 * @param {string} html HTML string
-	 * @param {Object} [options] Options
+	 * @param {object} [options] Options
 	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 */
 	set(html, { rootKey } = {}) {
@@ -1061,7 +1061,7 @@ HTML.prototype = {
 	/**
 	 * @description Add content to the end of content.
 	 * @param {string} html Content to Input
-	 * @param {Object} [options] Options
+	 * @param {object} [options] Options
 	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 */
 	add(html, { rootKey } = {}) {
@@ -1090,8 +1090,8 @@ HTML.prototype = {
 
 	/**
 	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
-	 * @param {Object} ctx { head: HTML string, body: HTML string}
-	 * @param {Object} [options] Options
+	 * @param {object} ctx { head: HTML string, body: HTML string}
+	 * @param {object} [options] Options
 	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 */
 	setFullPage(ctx, { rootKey } = {}) {
@@ -1122,8 +1122,8 @@ HTML.prototype = {
 
 	/**
 	 * @description construct wysiwyg area element to html string
-	 * @param {Element|String} html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
-	 * @param {Boolean} comp If true, does not line break and indentation of tags.
+	 * @param {Element|string} html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
+	 * @param {boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
 	 */
 	_convertToCode(html, comp) {
@@ -1284,6 +1284,10 @@ HTML.prototype = {
 	 * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
 	 * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist
 	 * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist
+	 * @param {boolean} tagFilter Tag filter option
+	 * @param {boolean} formatFilter Format filter option
+	 * @param {boolean} classFilter Class name filter option
+	 * @param {boolean} _freeCodeViewMode Enforces strict HTML validation based on the editor`s policy
 	 * @private
 	 */
 	_consistencyCheckOfHTML(documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter, _freeCodeViewMode) {

@@ -117,8 +117,8 @@ export function nodeListToArray(nodeList) {
 
 /**
  * @description Returns a new object with keys and values swapped.
- * @param {Object} obj object
- * @returns {Object}
+ * @param {object} obj object
+ * @returns {object}
  */
 export function swapKeyValue(obj) {
 	const swappedObj = {};
@@ -236,7 +236,7 @@ export function textToAnchor(node) {
 /**
  * Converts styles within a <span> tag to corresponding HTML tags (e.g., <strong>, <em>, <u>, <s>).
  * Maintains the original <span> tag and wraps its content with the new tags.
- * @param {Object} styleToTag An object mapping style properties to HTML tags. ex) {bold: { regex: /font-weight\s*:\s*bold/i, tag: 'strong' },}
+ * @param {object} styleToTag An object mapping style properties to HTML tags. ex) {bold: { regex: /font-weight\s*:\s*bold/i, tag: 'strong' },}
  * @param {Node} node Node
  */
 export function spanToStyleNode(styleToTag, node) {
@@ -298,7 +298,7 @@ export function addUrlQuery(url, query) {
 
 /**
  * @description Converts options-related styles and returns them for each frame.
- * @param {Object.<string, any>} fo frameOptions
+ * @param {object.<string, *>} fo frameOptions
  * @param {string} cssText Style string
  * @returns {{top: string, frame: string, editor: string}}
  * @private
@@ -343,7 +343,7 @@ export function _setDefaultOptionStyle(fo, cssText) {
 
 /**
  * @description Set default style tag of the iframe
- * @param {Object.<string, any>} options Options
+ * @param {object.<string, *>} options Options
  * @returns {string} "<link rel="stylesheet" href=".." />.."
  */
 export function _setIframeStyleLinks(linkNames) {

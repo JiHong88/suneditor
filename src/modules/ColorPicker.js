@@ -64,7 +64,7 @@ const DEFAULLT_COLOR_SPLITNUM = 9;
 /**
  * @description Create a color picker element and register for related events. (this.target)
  * When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
- * @param {Object} inst The "this" object of the calling function.
+ * @param {object} inst The "this" object of the calling function.
  * @param {string} styles style property ("color", "backgroundColor"..)
  * @param {Array.<string>} colorList color list
  * @param {string} _defaultColor default color
@@ -130,7 +130,7 @@ ColorPicker.prototype = {
 
 	/**
 	 * @description Displays or resets the currently selected color at color list.
-	 * @param {Node|String} nodeOrColor Current Selected node
+	 * @param {Node|string} nodeOrColor Current Selected node
 	 * @param {string|null} target target
 	 */
 	init(nodeOrColor, target) {

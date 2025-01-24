@@ -170,7 +170,7 @@ export default function (editor) {
 		 * If "delay" is true, it will be saved after (options.get('historyStackDelayTime') || 400) miliseconds
 		 * If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
 		 * You can specify the delay time by sending a number.
-		 * @param {Boolean|Number} delay If true, Add stack without delay time.
+		 * @param {boolean|number} delay If true, Add stack without delay time.
 		 */
 		push(delay, rootKey) {
 			if (waiting) return;

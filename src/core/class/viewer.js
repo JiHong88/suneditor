@@ -489,7 +489,7 @@ Viewer.prototype = {
 	/**
 	 * @description Run CodeMirror Editor
 	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
-	 * @param {any} value params
+	 * @param {*} value CodeMirror params
 	 * @param {string|undefined} rootKey Root key
 	 * @returns
 	 * @private

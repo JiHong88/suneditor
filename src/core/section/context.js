@@ -7,9 +7,9 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {Element} wwFrame Editor wysiwyg frame
  * @param {Element} codeWrapper Editor code view wrapper
  * @param {Element} codeFrame Editor code view frame
- * @param {Object} documentTypeInner Document type inner
+ * @param {object} documentTypeInner Document type inner
  * @param {Element|null} statusbar Editor statusbar
- * @param {any} key root key
+ * @param {*} key root key
  * @returns {Map}
  */
 export const CreateFrameContext = function (editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, documentTypeInner, key) {

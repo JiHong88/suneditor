@@ -50,7 +50,7 @@ Component.prototype = {
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)
 	 * If "element" is "HR", inserts and returns the new line.
 	 * @param {Element} element Element to be inserted
-	 * @param {Object} [options] Options
+	 * @param {object} [options] Options
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipSelection=false] If true, do not automatically select the inserted component.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
@@ -111,7 +111,7 @@ Component.prototype = {
 	 * @description Gets the file component and that plugin name
 	 * return: {target, component, pluginName} | null
 	 * @param {Element} element Target element (figure tag, component div, file tag)
-	 * @returns {Object|null}
+	 * @returns {object|null}
 	 */
 	get(element) {
 		if (!element) return null;

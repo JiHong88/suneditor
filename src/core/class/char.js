@@ -13,7 +13,7 @@ const Char = function (editor) {
 Char.prototype = {
 	/**
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "html" is added to the current editor.
-	 * @param {Node|String} html Element node or String.
+	 * @param {Node|string} html Element node or String.
 	 * @returns {boolean}
 	 */
 	check(html) {

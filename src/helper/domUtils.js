@@ -15,7 +15,7 @@ export function isZeroWith(text) {
 /**
  * @description Create Element node
  * @param {string} elementName Element name
- * @param {Object.<string, string>|null|undefined} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
+ * @param {object.<string, string>|null|undefined} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
  * @param {string|Node|null|undefined} inner A innerHTML string or inner node.
  * @returns {Element}
  */
@@ -911,8 +911,8 @@ export function isMedia(node) {
 
 /**
  * @description Check the node is a figure tag
- * @param {Node|String} node The element or element name to check
- * @returns {Boolean}
+ * @param {Node|string} node The element or element name to check
+ * @returns {boolean}
  */
 export function isFigure(node) {
 	return /^FIGURE$/i.test(typeof node === 'string' ? node : node?.nodeName);
@@ -921,7 +921,7 @@ export function isFigure(node) {
 /**
  * @description It is judged whether it is the input element (INPUT, TEXTAREA)
  * @param {Node} element The node to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isInputElement(element) {
 	return element?.nodeType === 1 && /^(INPUT|TEXTAREA|SELECT|OPTION)$/i.test(element.nodeName);
@@ -939,7 +939,7 @@ export function isEmptyLine(element) {
 /**
  * @description Check the span's attributes are empty.
  * @param {Element|null} element Element node
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isSpanWithoutAttr(element) {
 	return element?.nodeType === 1 && /^SPAN$/i.test(element.nodeName) && !element.className && !element.style.cssText;
@@ -1143,8 +1143,8 @@ export function findTabEndIndex(line, baseIndex, minTabSize) {
 /**
  * @description Copies the "wwTarget" element and returns it with inline all styles applied.
  * @param {Element} wwTarget Target element to copy(.sun-editor.sun-editor-editable)
- * @param {Boolean} includeWW Include the "wwTarget" element in the copy
- * @param {string[]} styles Style list - kamel case
+ * @param {boolean} includeWW Include the "wwTarget" element in the copy
+ * @param {Array.<string>} styles Style list - kamel case
  * @returns
  */
 export function applyInlineStylesAll(wwTarget, includeWW, styles) {

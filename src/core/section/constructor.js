@@ -108,9 +108,9 @@ export const RO_UNAVAILABD = [
 
 /**
  * @description document create
- * @param {Object} options Options
+ * @param {object} options Options
  * @param {Element|Array.<Element>} editorTargets Target textarea
- * @returns {Object}
+ * @returns {object}
  */
 const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
@@ -400,8 +400,8 @@ function _addTooltip(tooptipBtn, shift, shortcut) {
 
 /**
  * @description Returns a new object with merge "a" and "b"
- * @param {Object} obj object
- * @returns {Object}
+ * @param {object} obj object
+ * @returns {object}
  */
 function _mergeObject(a, b) {
 	return [a, b].reduce((_default, _new) => {
@@ -414,9 +414,9 @@ function _mergeObject(a, b) {
 
 /**
  * @description Initialize options
- * @param {Object} options Options object
+ * @param {object} options Options object
  * @param {Array.<Element>} editorTargets Target textarea
- * @param {Object} plugins Plugins object
+ * @param {object} plugins Plugins object
  * @returns {o:Map, p:Map} {{o: options map, p: plugins map}}
  */
 export function InitOptions(options, editorTargets, plugins) {
@@ -874,9 +874,9 @@ function InitFrameOptions(o, origin, fo) {
 /**
  * @description Initialize property of suneditor elements
  * @param {string} key Key
- * @param {Object} options Options
+ * @param {object} options Options
  * @param {Element} topDiv Suneditor top div
- * @returns {Object} Bottom bar elements (statusbar, navigation, charWrapper, charCounter)
+ * @returns {object} Bottom bar elements (statusbar, navigation, charWrapper, charCounter)
  */
 function _initTargetElements(key, options, topDiv, targetOptions) {
 	const editorStyles = targetOptions.get('_defaultStyles');
@@ -923,7 +923,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 
 /**
  * @description Check the CodeMirror option to apply the CodeMirror and return the CodeMirror element.
- * @param {Object} options options
+ * @param {object} options options
  * @param {Element} textarea textarea element
  */
 function _checkCodeMirror(options, targetOptions, textarea) {
@@ -1026,7 +1026,7 @@ function _createFormatInfo(value, defaultValue, blacklist) {
 
 /**
  * @description create whitelist or blacklist.
- * @param {Object} o options
+ * @param {object} o options
  * @returns {string} whitelist
  */
 function _createWhitelist(o) {
@@ -1041,7 +1041,7 @@ function _createWhitelist(o) {
 
 /**
  * @description Suneditor's Default button list
- * @param {Object} options options
+ * @param {object} options options
  */
 function _defaultButtons(options, icons, lang) {
 	const isRTL = options.get('_rtl');
@@ -1079,7 +1079,7 @@ function _defaultButtons(options, icons, lang) {
 
 /**
  * @description Create a group div containing each module
- * @returns {Object}
+ * @returns {object}
  */
 function _createModuleGroup() {
 	const oUl = domUtils.createElement('UL', { class: 'se-menu-list' });
@@ -1099,8 +1099,8 @@ function _createModuleGroup() {
  * @param {"command"|"dropdown"|"field"|"browser"|"input"|"modal"|"popup"} dataType The data-type property of the button
  * @param {string} innerHTML Html in button
  * @param {string} _disabled Button disabled
- * @param {Object} icons Icons
- * @returns {Object}
+ * @param {object} icons Icons
+ * @returns {object}
  */
 function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, icons) {
 	if (!innerHTML) innerHTML = '';
@@ -1212,12 +1212,12 @@ export function UpdateButton(element, plugin, icons, lang) {
 /**
  * @description Create editor HTML
  * @param {Array} buttonList option.buttonList
- * @param {Object|null} plugins Plugins
+ * @param {object|null} plugins Plugins
  * @param {Array} options options
- * @param {Object} icons icons
- * @param {Object} lang lang
+ * @param {object} icons icons
+ * @param {object} lang lang
  * @param {boolean} isUpdate Is update
- * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
+ * @returns {object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
  */
 export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdate) {
 	/** create button list */

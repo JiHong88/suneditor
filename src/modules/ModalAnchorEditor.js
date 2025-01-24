@@ -336,7 +336,7 @@ async function OnChangeFile(e) {
 	}.bind(this, fileInfo);
 
 	const result = await this.triggerEvent('onFileUploadBefore', {
-		...fileInfo,
+		info: fileInfo,
 		handler
 	});
 
