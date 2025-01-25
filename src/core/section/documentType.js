@@ -72,6 +72,9 @@ const DocumentType = function (editor, fc) {
 };
 
 DocumentType.prototype = {
+	/**
+	 * @description Refresh the document header area
+	 */
 	reHeader() {
 		if (!this.useHeader) return;
 
@@ -108,6 +111,10 @@ DocumentType.prototype = {
 		this.innerHeaders = inner.querySelectorAll('div');
 	},
 
+	/**
+	 * @description Refresh the document page
+	 * @param {boolean} force - Whether to force the page to be re-rendered
+	 */
 	async rePage(force) {
 		if (!this.page) return;
 		if (this._rePageTimeout) clearTimeout(this._rePageTimeout);

@@ -2,6 +2,24 @@
 // This is a collection of functions that can be used in the editor's event callback.
 // ---------
 
+// --- native events
+/**
+ * @typedef {object} BaseEvent
+ * @property {object} editor - editor core object
+ * @property {object} frameContext - frame context
+ * @property {Event} event - event object
+ */
+
+/**
+ * @typedef {object} ClipboardEvent
+ * @property {object} editor - editor core object
+ * @property {object} frameContext - frame context
+ * @property {Event} event - event object
+ * @property {string} data - drop data
+ * @property {boolean} maxCharCount - is max char count
+ * @property {string} from - "SE"|"MS"|"" - source
+ */
+
 // --- controller
 /**
  * @typedef {Object} ControllerInfo
@@ -99,23 +117,60 @@ export default function () {
 
 		/**
 		 * @description Event call back function
-		 * @param {object} params
-		 * @param {object} params.editor - editor core object
-		 * @param {object} params.frameContext - frame context
-		 * @param {Event} params.event - event object
+		 * @param {BaseEvent} params
 		 */
 		onScroll: null,
+
+		/**
+		 * @description Event call back function
+		 * @param {BaseEvent} params
+		 */
 		onMouseDown: null,
+
+		/**
+		 * @description Event call back function
+		 * @param {BaseEvent} params
+		 */
 		onClick: null,
+
+		/**
+		 * @description Event call back function
+		 * @param {BaseEvent} params
+		 */
 		onInput: null,
+
+		/**
+		 * @description Event call back function
+		 * @param {BaseEvent} params
+		 */
 		onMouseLeave: null,
+
+		/**
+		 * @description Event call back function
+		 * @param {BaseEvent} params
+		 */
 		onKeyDown: null,
+
+		/**
+		 * @description Event call back function
+		 * @param {BaseEvent} params
+		 */
 		onKeyUp: null,
+
+		/**
+		 * @description Event call back function
+		 * @param {BaseEvent} params
+		 */
 		onFocus: null,
+
+		/**
+		 * @description Event call back function
+		 * @param {BaseEvent} params
+		 */
 		onBlur: null,
 
 		/**
-		 * @description Event function on [copy, cut]
+		 * @description Event function on copy
 		 * @param {object} params
 		 * @param {object} params.editor - editor core object
 		 * @param {object} params.frameContext - frame context
@@ -123,6 +178,15 @@ export default function () {
 		 * @param {Event} params.clipboardData - clipboardData
 		 */
 		onCopy: null,
+
+		/**
+		 * @description Event function on cut
+		 * @param {object} params
+		 * @param {object} params.editor - editor core object
+		 * @param {object} params.frameContext - frame context
+		 * @param {Event} params.event - event object
+		 * @param {Event} params.clipboardData - clipboardData
+		 */
 		onCut: null,
 
 		/**
@@ -152,6 +216,16 @@ export default function () {
 		 * @param {ControllerInfo} params.info - info object
 		 */
 		onShowController: null,
+
+		/**
+		 * @description Called just after the controller is positioned and displayed on the screen.
+		 * controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
+		 * @param {object} params
+		 * @param {object} params.editor - editor core object
+		 * @param {object} params.frameContext - frame context
+		 * @param {string} params.caller - caller plugin name
+		 * @param {ControllerInfo} params.info - info object
+		 */
 		onBeforeShowController: null,
 
 		/**
@@ -210,16 +284,18 @@ export default function () {
 		 * @description Event function on [drop, paste] before
 		 * When false is returned, the default behavior is stopped.
 		 * If the string is returned, the cleanData value is modified to the return value.
-		 * @param {object} params
-		 * @param {object} params.editor - editor core object
-		 * @param {object} params.frameContext - frame context
-		 * @param {Event} params.event - event object
-		 * @param {string} params.data - drop data
-		 * @param {boolean} params.maxCharCount - is max char count
-		 * @param {string} params.from - "SE"|"MS"|"" - source
+		 * @param {ClipboardEvent} params
 		 * @returns {boolean|string}
 		 */
 		onDrop: null,
+
+		/**
+		 * @description Event function on [drop, paste] before
+		 * When false is returned, the default behavior is stopped.
+		 * If the string is returned, the cleanData value is modified to the return value.
+		 * @param {ClipboardEvent} params
+		 * @returns {boolean|string}
+		 */
 		onPaste: null,
 
 		/**
