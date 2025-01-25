@@ -72,6 +72,7 @@ export function OnDrop_wysiwyg(frameContext, dragCursor, e) {
 
 			// document type page
 			if (frameContext.has('documentType-use-page')) {
+				frameContext.get('documentTypePageMirror').innerHTML = frameContext.get('wysiwyg').innerHTML;
 				frameContext.get('documentType').rePage(true);
 			}
 
