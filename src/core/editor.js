@@ -29,6 +29,7 @@ const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-e
 const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
 
 /**
+ * @constructor
  * @description SunEditor constructor function.
  * @param {Array.<Element>} multiTargets Target textarea
  * @param {object} options options

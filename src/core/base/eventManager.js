@@ -15,6 +15,11 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHa
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
+/**
+ * @constructor
+ * @description Event manager, editor's all event management class
+ * @param {object} editor editor core object
+ */
 const EventManager = function (editor) {
 	CoreInjector.call(this, editor);
 	this._events = [];

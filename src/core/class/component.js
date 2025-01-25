@@ -10,6 +10,11 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DIR_UP_KEYCODE = /^3[7-8]$/;
 
+/**
+ * @constructor
+ * @description Class for managing components such as images and tables that are not in line format
+ * @param {Object} editor - editor core object
+ */
 const Component = function (editor) {
 	CoreInjector.call(this, editor);
 

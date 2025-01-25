@@ -6,6 +6,10 @@ import { _w } from '../../helper/env';
 import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 import { numbers } from '../../helper';
 
+/**
+ * @description History stack closure
+ * @param {Object} editor - editor core object
+ */
 export default function (editor) {
 	const frameRoots = editor.frameRoots;
 	let delayTime = editor.options.get('historyStackDelayTime');

@@ -5,6 +5,11 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter } from '../../helper';
 
+/**
+ * @constructor
+ * @description Dropdown and container menu management class
+ * @param {Object} editor - editor core object
+ */
 const Menu = function (editor) {
 	CoreInjector.call(this, editor);
 

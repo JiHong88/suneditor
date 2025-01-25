@@ -9,6 +9,11 @@ const NodeTransform = function (editor) {
 	CoreInjector.call(this, editor);
 };
 
+/**
+ * @constructor
+ * @description Node utility class. split, merge, etc.
+ * @param {Object} editor - editor core object
+ */
 NodeTransform.prototype = {
 	/**
 	 * @description Split all tags based on "baseNode"

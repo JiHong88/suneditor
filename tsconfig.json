@@ -1,26 +1,22 @@
 {
-  "compilerOptions": {
-    "module": "ES2020",
-    "target": "ES2020",
-    "sourceMap": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "preserve",
-    "noImplicitAny": false,
-  },
-  "exclude": [
-    "node_modules",
-    "test",
-    "dist",
-    "src",
-    "webpack"
-  ]
+	"compilerOptions": {
+		"module": "ES2020",
+		"target": "ES2020",
+		"sourceMap": true,
+		"allowJs": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"jsx": "preserve",
+		"noImplicitAny": false,
+		"declaration": true,
+		"declarationDir": "./types"
+	},
+	"exclude": ["node_modules", "src", "test", "dist", "webpack"]
 }

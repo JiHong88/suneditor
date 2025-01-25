@@ -8,6 +8,11 @@ import { domUtils, converter, numbers, unicode, env } from '../../helper';
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
 
+/**
+ * @constructor
+ * @description All HTML related classes involved in the editing area
+ * @param {Object} editor - editor core object
+ */
 const HTML = function (editor) {
 	CoreInjector.call(this, editor);
 

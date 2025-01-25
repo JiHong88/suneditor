@@ -2,6 +2,11 @@
  * @fileoverview Shortcuts class
  */
 
+/**
+ * @constructor
+ * @description Shortcuts class
+ * @param {Object} editor - editor core object
+ */
 const Shortcuts = function (editor) {
 	this.editor = editor;
 	this.isDisabled = false;
