@@ -950,10 +950,128 @@ window.editor_root = suneditor.create(
 				</div>
 			</div>
 		</div>`,
-		value: `<div style="text-align: center">
-<p>This text is centered.</p>
-<p>This text is centered.</p>
-</div>`,
+		value: `
+<p>dsa</p>
+
+<figure class="se-flex-component se-input-component se-scroll-figure-x">
+  <table class="se-table-layout-auto" style="">
+    <colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 17%;"><col style="width:33%"><col style="width: 10%;"><col style="width: 10%;"></colgroup>
+    <tbody>
+      <tr>
+        <td class="">
+          <div>312<br>
+          </div>
+        </td>
+        <td class="">
+          <div>312<br>
+          </div>
+        </td>
+        <td class="">
+          <div>fdsaf<br>
+          </div>
+        </td>
+        <td class="">
+          <div>dfsa<br>
+          </div>
+        </td>
+        <td class="">
+          <div>fdsa<br>
+          </div>
+        </td>
+        <td class="">
+          <div>31<br>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="">
+          <div>312<br>
+          </div>
+        </td>
+        <td class="" colspan="1" rowspan="2">
+          <div>312<br>
+          </div>
+        </td>
+        <td class="" colspan="2" rowspan="3">
+          <div>fddadsa</div>
+        </td>
+        <td class="" colspan="1" rowspan="2">
+          <div>fdsa<br>
+          </div>
+        </td>
+        <td class="">
+          <div>fdsa<br>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="">
+          <div>312<br>
+          </div>
+        </td>
+        <td class="">
+          <div>fdsa<br>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="">
+          <div>312<br>
+          </div>
+        </td>
+        <td class="">
+          <div>321<br>
+          </div>
+        </td>
+        <td class="">
+          <div>231<br>
+          </div>
+        </td>
+        <td class="">
+          <div>312<br>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="">
+          <div>312<br>
+          </div>
+        </td>
+        <td class="">
+          <div>312<br>
+          </div>
+        </td>
+        <td class="">
+          <div>321<br>
+          </div>
+        </td>
+        <td class="">
+          <div>321<br>
+          </div>
+        </td>
+        <td class="">
+          <div>312<br>
+          </div>
+        </td>
+        <td class="">
+          <div>321<br>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+
+<p><br>
+</p>
+
+<div class="se-component se-file-figure se-flex-component">
+  <figure class="">
+    <a href="http://localhost:3000/editor/files/download/public/files/d41d8cd98f00b204e9800998ecf8427e.html" title="xsOiDurC.html" download="xsOiDurC.html" data-se-file-download="" contenteditable="false" data-se-non-focus="true" data-se-non-link="true" data-se-file-name="xsOiDurC.html" data-se-file-size="0" name="xsOiDurC.html" data-se-index="0">xsOiDurC.html</a>
+  </figure>
+</div>
+
+`,
 		link: {
 			uploadUrl: 'http://localhost:3000/editor/files/upload',
 			relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],

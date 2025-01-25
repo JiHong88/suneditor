@@ -981,6 +981,8 @@ Table.prototype = {
 	},
 
 	editRow(option, positionResetElement) {
+		this._deleteStyleSelectedCells();
+
 		const remove = !option;
 		const up = option === 'up';
 		const originRowIndex = this._rowIndex;
