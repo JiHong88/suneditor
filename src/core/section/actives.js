@@ -30,13 +30,13 @@ export function SELECT_ALL(editor) {
 	const figcaption = domUtils.getParentElement(editor.selection.getNode(), 'FIGCAPTION');
 	const selectArea = figcaption || editor.frameContext.get('wysiwyg');
 
-	let first = domUtils.getEdgeChild(selectArea.firstChild, (current) => (!domUtils.isNonEditable(current) && (current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), false)) || selectArea.firstChild);
-	let last = domUtils.getEdgeChild(selectArea.lastChild, (current) => (!domUtils.isNonEditable(current) && (current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), true)) || selectArea.lastChild);
+	let first = domUtils.getEdgeChild(selectArea.firstChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), false) || selectArea.firstChild;
+	let last = domUtils.getEdgeChild(selectArea.lastChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), true) || selectArea.lastChild;
 
 	if (!first || !last) return;
 
 	if (domUtils.isMedia(first) || editor.component.is(first.parentElement) || domUtils.isTableElements(first)) {
-		const info = editor.component.get(first);
+		const info = editor.component.get(first) || editor.component.get(first.parentElement);
 		const br = domUtils.createElement('BR');
 		const format = domUtils.createElement(editor.options.get('defaultLine'), null, br);
 		first = info ? info.container || info.cover : first;
