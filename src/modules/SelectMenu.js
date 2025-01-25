@@ -5,7 +5,7 @@ const MENU_MIN_HEIGHT = 38;
 
 /**
  *
- * @param {*} inst
+ * @param {*} inst The instance object that called the constructor.
  * @param {object} params { checkList: boolean, position: "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]", dir?: "rtl" | "ltr" }
  */
 const SelectMenu = function (inst, params) {
@@ -102,6 +102,9 @@ SelectMenu.prototype = {
 		this.isOpen = true;
 	},
 
+	/**
+	 * @description Select menu close
+	 */
 	close() {
 		this.editor.selectMenuOn = false;
 		domUtils.removeClass(this._refer, 'on');
@@ -111,10 +114,19 @@ SelectMenu.prototype = {
 		if (typeof this.closeMethod === 'function') this.closeMethod();
 	},
 
+	/**
+	 * @description Get the index of the selected item
+	 * @param {number} index Item index
+	 * @returns
+	 */
 	getItem(index) {
 		return this.items[index];
 	},
 
+	/**
+	 * @description Set the index of the selected item
+	 * @param {number} index Item index
+	 */
 	setItem(index) {
 		this._selectItem(index);
 	},

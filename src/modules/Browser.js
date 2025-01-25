@@ -3,7 +3,8 @@ import { domUtils } from '../helper';
 import ApiManager from './ApiManager';
 
 /**
- * @param {*} inst
+ * @constructor
+ * @param {*} inst The instance object that called the constructor.
  * @param {object} params
  * @param {string} params.title - File browser window title. Required. Can be overridden in browser.
  * @param {string} params.url - File server url. Required. Can be overridden in browser.

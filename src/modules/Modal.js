@@ -5,6 +5,12 @@ import { domUtils, env } from '../helper';
 const { _w } = env;
 const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize', wRTL: 'ns-resize', hRTL: 'ew-resize', cRTL: 'nesw-resize' };
 
+/**
+ * @constructor
+ * @description Modal window module
+ * @param {*} inst The instance object that called the constructor.
+ * @param {Element} element Modal element
+ */
 const Modal = function (inst, element) {
 	CoreInjector.call(this, inst.editor);
 	this.offset = this.editor.offset;

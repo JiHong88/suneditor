@@ -1,8 +1,9 @@
 import { env } from '../helper';
 
 /**
+ * @constructor
  * @description API Manager
- * @param {object} inst
+ * @param {object} inst The instance object that called the constructor.
  * @param {object=} params
  * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
  * @param {string=} params.url - API's URL

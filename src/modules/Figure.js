@@ -11,6 +11,15 @@ let __resizing_p_ow = false;
 let __resizing_cw = 0;
 let __resizing_sw = 0;
 
+/**
+ * @constructor
+ * @description Controller module class
+ * @param {*} inst The instance object that called the constructor.
+ * @param {Array.<Function|string>} controls Controller button array
+ * @param {{position: "top" | "bottom" | "position", disabled?: boolean}} params params
+ * When using the "top" position, there should not be an arrow on the controller.
+ * When using the "bottom" position there should be an arrow on the controller.
+ */
 const Figure = function (inst, controls, params) {
 	EditorInjector.call(this, inst.editor);
 	this.kind = inst.constructor.key || inst.constructor.name;
@@ -120,12 +129,6 @@ Figure.CreateContainer = function (element, className) {
 	return Figure.GetContainer(element);
 };
 
-// @todo
-Figure.CreateInlineContainer = function (element, className) {
-	domUtils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
-	return Figure.GetContainer(element);
-};
-
 /**
  * @description Create a container for the inline resizing component and insert the element.
  * @param {Element} element Target element
@@ -231,7 +234,7 @@ Figure.__is = function (element) {
 
 Figure.prototype = {
 	/**
-	 * @override controller
+	 * @description Close the figure's controller
 	 */
 	close() {
 		this.editor._preventBlur = false;
@@ -242,6 +245,17 @@ Figure.prototype = {
 		this.component._removeDragEvent();
 	},
 
+	/**
+	 * @description Open the figure's controller
+	 * @param {Element} target Target element
+	 * @param {object} params params
+	 * @param {boolean} [params.nonResizing=false] Do not display the resizing button
+	 * @param {boolean} [params.nonSizeInfo=false] Do not display the size information
+	 * @param {boolean} [params.nonBorder=false] Do not display the selected style line
+	 * @param {boolean} [params.figureTarget=false] If true, the target is a figure element
+	 * @param {object} [params.__fileManagerInfo=false] If true, the file manager is called
+	 * @returns {?object} targetInfo
+	 */
 	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
 		if (!target) {
 			console.warn('[SUNEDITOR.modules.Figure.open] The target element is null.');
@@ -386,19 +400,39 @@ Figure.prototype = {
 		return targetInfo;
 	},
 
+	/**
+	 * @description Hide the controller
+	 */
 	controllerHide() {
 		this.controller.hide();
 	},
 
+	/**
+	 * @description Hide the controller
+	 */
 	controllerShow() {
 		this.controller.show();
 	},
 
-	controllerOpen(target, args) {
+	/**
+	 * @description Open the figure's controller
+	 * @param {Element} target Target element
+	 * @param {object} [params={}] params
+	 * @param {object=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
+	 * @param {function=} params.initMethod Method to be called when the controller is closed.
+	 * @param {boolean=} params.disabled If true, the controller is disabled.
+	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
+	 */
+	controllerOpen(target, params) {
 		this._element = target;
-		this.controller.open(target, null, args);
+		this.controller.open(target, null, params);
 	},
 
+	/**
+	 * @description Set the element's container size
+	 * @param {string|number} w Width size
+	 * @param {string|number} h Height size
+	 */
 	setSize(w, h) {
 		if (/%$/.test(w)) {
 			this._setPercentSize(w, h);
@@ -575,7 +609,6 @@ Figure.prototype = {
 	 * @returns
 	 */
 	controllerAction(target) {
-		// @todo
 		const command = target.getAttribute('data-command');
 		const value = target.getAttribute('data-value');
 		const type = target.getAttribute('data-type');
@@ -651,6 +684,12 @@ Figure.prototype = {
 		}
 	},
 
+	/**
+	 * @description Inspect the figure component format and change it to the correct format.
+	 * @param {*} container
+	 * @param {*} originEl
+	 * @param {*} anchorCover
+	 */
 	retainFigureFormat(container, originEl, anchorCover) {
 		const isInline = this.component.isInline(container);
 		let existElement = this.format.isBlock(originEl.parentNode) || domUtils.isWysiwygFrame(originEl.parentNode) ? originEl : domUtils.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;

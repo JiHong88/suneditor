@@ -56,7 +56,7 @@ BackgroundColor.prototype = {
 	 * @Override dropdown
 	 */
 	off() {
-		this.colorPicker.hueSliderClose();
+		this.colorPicker._hueSliderClose();
 	},
 
 	/**

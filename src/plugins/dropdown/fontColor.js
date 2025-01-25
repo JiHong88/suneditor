@@ -56,7 +56,7 @@ FontColor.prototype = {
 	 * @Override dropdown
 	 */
 	onDropdownClose() {
-		this.colorPicker.hueSliderClose();
+		this.colorPicker._hueSliderClose();
 	},
 
 	/**

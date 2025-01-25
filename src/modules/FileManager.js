@@ -2,8 +2,9 @@ import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';
 
 /**
- *
- * @param {*} inst
+ * @constructor
+ * @description This module manages the file information of the editor.
+ * @param {*} inst The instance object that called the constructor.
  * @param {{ query: string, loadHandler: Function, eventHandler: Function, figure: Figure instance | null }} params
  */
 const FileManager = function (inst, params) {
@@ -78,6 +79,14 @@ FileManager.prototype = {
 		return await this.apiManager.asyncCall({ method: 'POST', url: uploadUrl, headers: uploadHeader, data: formData });
 	},
 
+	/**
+	 * @description Set the file information to the element.
+	 * @param {Element} element File information element
+	 * @param {object} params
+	 * @param {string} params.name File name
+	 * @param {number} params.size File size
+	 * @returns
+	 */
 	setFileData(element, { name, size }) {
 		if (!element) return;
 		element.setAttribute('data-se-file-name', name);

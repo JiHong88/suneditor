@@ -9,9 +9,10 @@ const INDEX_1 = 2147483646;
 const INDEX_2 = 2147483645;
 
 /**
- *
- * @param {*} inst
- * @param {*} element
+ * @constructor
+ * @description Controller module class
+ * @param {*} inst The instance object that called the constructor.
+ * @param {Element} element Controller element
  * @param {{position: "top" | "bottom" | "position", disabled?: boolean}} params params
  * When using the "top" position, there should not be an arrow on the controller.
  * When using the "bottom" position there should be an arrow on the controller.
@@ -54,6 +55,13 @@ const Controller = function (inst, element, params, _name) {
 Controller.prototype = {
 	/**
 	 * @description Open a modal plugin
+	 * @param {Element} target Target element
+	 * @param {Element} positionTarget Position target element
+	 * @param {object} [params={}] params
+	 * @param {object=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
+	 * @param {function=} params.initMethod Method to be called when the controller is closed.
+	 * @param {boolean=} params.disabled If true, the controller is disabled.
+	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
 	 */
 	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset } = {}) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) {
@@ -102,6 +110,7 @@ Controller.prototype = {
 	/**
 	 * @description Close a modal plugin
 	 * The plugin's "init" method is called.
+	 * @param {boolean} force If true, parent controllers are forcibly closed.
 	 */
 	close(force) {
 		if (!this.isOpen) return;
@@ -142,7 +151,7 @@ Controller.prototype = {
 
 	/**
 	 * @description Reset controller position
-	 * @param {Element|undefined} target
+	 * @param {Element=} target
 	 */
 	resetPosition(target) {
 		this._setControllerPosition(this.form, target || this.currentPositionTarget);
@@ -278,12 +287,6 @@ Controller.prototype = {
 	},
 
 	constructor: Controller
-};
-
-// @todo
-Controller.CreateHTML = function () {
-	const html = '';
-	return domUtils.createElement('DIV', { class: '' }, html);
 };
 
 function Action(e) {

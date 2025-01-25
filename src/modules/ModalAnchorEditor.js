@@ -6,8 +6,10 @@ import { CreateTooltipInner } from '../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
- * @param {*} inst
- * @param {Element} modalForm
+ * @constructor
+ * @description Modal form Anchor tag editor
+ * @param {*} inst The instance object that called the constructor.
+ * @param {Element} modalForm The modal form element
  * @param {object} params
  * @param {boolean} params.textToDisplay - Create Text to display input.
  * @param {string} params.title - Modal title
@@ -113,10 +115,18 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 };
 
 ModalAnchorEditor.prototype = {
+	/**
+	 * @description Initialize
+	 * @param {Element} element Modal target element
+	 */
 	set(element) {
 		this.currentTarget = element;
 	},
 
+	/**
+	 * @description On anchor edit form
+	 * @param {boolean} isUpdate create or update
+	 */
 	on(isUpdate) {
 		if (!isUpdate) {
 			this.init();
@@ -136,6 +146,11 @@ ModalAnchorEditor.prototype = {
 		this._setLinkPreview(this.linkValue);
 	},
 
+	/**
+	 * @description Create anchor tag
+	 * @param {boolean} notText Empty text in the anchor tag
+	 * @returns {Element|null} A tag
+	 */
 	create(notText) {
 		if (this.linkValue.length === 0) return null;
 

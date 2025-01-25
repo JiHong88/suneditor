@@ -64,7 +64,9 @@ function CreateSliderCtx() {
  * @description Create a Hue slider. (only create one at a time)
  * When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
+ * @param {object} inst The instance object that called the constructor.
  * @param {{form: Element}} params {form: Element}
+ * @param {string} className The class name of the hue slider.
  */
 const HueSlider = function (inst, params, className) {
 	if (!params) params = {};
@@ -98,7 +100,7 @@ const HueSlider = function (inst, params, className) {
 
 		// buttons
 		this.eventManager.addEvent(hueController.querySelector('.se-btn-success'), 'click', () => {
-			inst.hueSliderAction(this.get());
+			inst._hueSliderAction(this.get());
 			this.close();
 		});
 		this.eventManager.addEvent(hueController.querySelector('.se-btn-danger'), 'click', () => {
@@ -108,15 +110,26 @@ const HueSlider = function (inst, params, className) {
 };
 
 HueSlider.prototype = {
+	/**
+	 * @description Get the current color information.
+	 * @returns {object} {hex: string, r: number, g: number, b: number, h: number, s: number, l: number}
+	 */
 	get() {
 		return finalColor;
 	},
 
+	/**
+	 * @description Open the hue slider.
+	 * @param {Element} target The element to attach the hue slider.
+	 */
 	open(target) {
 		this.attach();
 		this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
 	},
 
+	/**
+	 * @description Reset information and close the hue slider.
+	 */
 	off() {
 		this.ctx = {
 			gradientPointerX: gradientPointer.style.left,
@@ -132,11 +145,19 @@ HueSlider.prototype = {
 		this.init();
 	},
 
+	/**
+	 * @description Close the hue slider. (include off method)
+	 * Call the instance's _hueSliderCancelAction method.
+	 */
 	close() {
 		this.off();
-		this.inst.hueSliderCancelAction();
+		this.inst._hueSliderCancelAction();
 	},
 
+	/**
+	 * @description Attach the hue slider to the form element.
+	 * @param {Element} form The element to attach the hue slider.
+	 */
 	attach(form) {
 		// drow
 		this.init();
@@ -182,6 +203,9 @@ HueSlider.prototype = {
 		this.isOpen = true;
 	},
 
+	/**
+	 * @description Initialize the hue slider information.
+	 */
 	init() {
 		this.isOpen = false;
 		isWheelragging = false;

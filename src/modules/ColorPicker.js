@@ -62,9 +62,10 @@ const DEFAULT_COLOR_LIST = [
 const DEFAULLT_COLOR_SPLITNUM = 9;
 
 /**
+ * @constructor
  * @description Create a color picker element and register for related events. (this.target)
  * When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
- * @param {object} inst The "this" object of the calling function.
+ * @param {object} inst The instance object that called the constructor.
  * @param {string} styles style property ("color", "backgroundColor"..)
  * @param {Array.<string>} colorList color list
  * @param {string} _defaultColor default color
@@ -114,20 +115,6 @@ const ColorPicker = function (inst, styles, params) {
 };
 
 ColorPicker.prototype = {
-	hueSliderAction(color) {
-		this._setInputText(color.hex);
-	},
-
-	hueSliderCancelAction() {
-		if (this.parentForm?.length > 0) {
-			this.parentFormDisplay.forEach((e) => (e[0].style.display = e[1]));
-		}
-	},
-
-	hueSliderClose() {
-		this.hueSlider.off();
-	},
-
 	/**
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node
@@ -211,6 +198,20 @@ ColorPicker.prototype = {
 			});
 		domUtils.removeItem(temp);
 		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1) : false;
+	},
+
+	_hueSliderAction(color) {
+		this._setInputText(color.hex);
+	},
+
+	_hueSliderCancelAction() {
+		if (this.parentForm?.length > 0) {
+			this.parentFormDisplay.forEach((e) => (e[0].style.display = e[1]));
+		}
+	},
+
+	_hueSliderClose() {
+		this.hueSlider.off();
 	},
 
 	constructor: ColorPicker
