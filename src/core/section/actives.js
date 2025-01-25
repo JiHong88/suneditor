@@ -30,8 +30,8 @@ export function SELECT_ALL(editor) {
 	const figcaption = domUtils.getParentElement(editor.selection.getNode(), 'FIGCAPTION');
 	const selectArea = figcaption || editor.frameContext.get('wysiwyg');
 
-	let first = domUtils.getEdgeChild(selectArea.firstChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), false) || selectArea.firstChild;
-	let last = domUtils.getEdgeChild(selectArea.lastChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), true) || selectArea.lastChild;
+	let first = domUtils.getEdgeChild(selectArea.firstChild, (current) => (!domUtils.isNonEditable(current) && (current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), false)) || selectArea.firstChild);
+	let last = domUtils.getEdgeChild(selectArea.lastChild, (current) => (!domUtils.isNonEditable(current) && (current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), true)) || selectArea.lastChild);
 
 	if (!first || !last) return;
 
