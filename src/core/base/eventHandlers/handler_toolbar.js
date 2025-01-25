@@ -13,7 +13,7 @@ export function ButtonsHandler(e) {
 	if (this.menu._bindControllersOff) e.stopPropagation();
 
 	if (isInput) {
-		this.editor._antiBlur = false;
+		this.editor._preventBlur = false;
 	} else if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 		this.editor.focus();
 	}
@@ -33,7 +33,7 @@ export function ButtonsHandler(e) {
 
 		// toolbar input button
 		if (isInput && /^INPUT$/i.test(target?.getAttribute('data-type'))) {
-			this.editor._antiBlur = this._inputFocus = true;
+			this.editor._preventBlur = this._inputFocus = true;
 			if (!this.status.hasFocus) this.applyTagEffect();
 			/* event */
 			const eventTarget = e.target;
@@ -76,7 +76,7 @@ export function ButtonsHandler(e) {
 			return;
 		} else if (!this.editor.frameContext.get('isCodeView')) {
 			if (isMobile) {
-				this.editor._antiBlur = true;
+				this.editor._preventBlur = true;
 			} else {
 				e.preventDefault();
 				if (env.isGecko && command) {

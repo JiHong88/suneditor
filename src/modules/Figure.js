@@ -234,7 +234,7 @@ Figure.prototype = {
 	 * @override controller
 	 */
 	close() {
-		this.editor._antiBlur = false;
+		this.editor._preventBlur = false;
 		domUtils.removeClass(this._cover, 'se-figure-selected');
 		this.controller.close();
 

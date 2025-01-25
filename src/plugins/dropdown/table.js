@@ -2417,7 +2417,7 @@ function CreateCells(nodeName, cnt, returnElement) {
 }
 
 function OnCellMultiSelect(e) {
-	this.editor._antiBlur = true;
+	this.editor._preventBlur = true;
 	const target = domUtils.getParentElement(e.target, domUtils.isTableCell);
 
 	if (this._shift) {

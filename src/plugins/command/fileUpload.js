@@ -84,6 +84,7 @@ FileUpload.prototype = {
 	 * @param {Element} target Target command button
 	 */
 	action() {
+		this.editor._preventBlur = true;
 		this.input.click();
 	},
 

@@ -89,7 +89,7 @@ Menu.prototype = {
 
 		this.currentDropdownPlugin = this.plugins[dropdownName];
 		if (typeof this.currentDropdownPlugin?.on === 'function') this.currentDropdownPlugin.on(button);
-		this.editor._antiBlur = true;
+		this.editor._preventBlur = true;
 	},
 
 	/**
@@ -112,7 +112,7 @@ Menu.prototype = {
 			this.editor._notHideToolbar = false;
 		}
 
-		this.editor._antiBlur = false;
+		this.editor._preventBlur = false;
 
 		if (typeof this.currentDropdownPlugin?.off === 'function') this.currentDropdownPlugin.off();
 		this.currentDropdownPlugin = null;
@@ -132,7 +132,7 @@ Menu.prototype = {
 		this._bindClose_cons_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler.containerDown, false);
 
 		if (this.plugins[containerName].on) this.plugins[containerName].on(button);
-		this.editor._antiBlur = true;
+		this.editor._preventBlur = true;
 	},
 
 	/**
@@ -150,7 +150,7 @@ Menu.prototype = {
 			this.editor._notHideToolbar = false;
 		}
 
-		this.editor._antiBlur = false;
+		this.editor._preventBlur = false;
 	},
 
 	/**

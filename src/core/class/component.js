@@ -180,7 +180,7 @@ Component.prototype = {
 		if (!isInput && _DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
 			if (this.editor.status._onMousedown) return;
 
-			this.editor._antiBlur = true;
+			this.editor._preventBlur = true;
 			this.__selectionSelected = true;
 			if (this.isInline(info.container)) {
 				this.selection.setRange(info.container, 0, info.container, 0);
@@ -317,7 +317,7 @@ Component.prototype = {
 	},
 
 	__deselect() {
-		this.editor._antiBlur = false;
+		this.editor._preventBlur = false;
 		_DragHandle.set('__overInfo', null);
 		this._removeDragEvent(this);
 		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected|');
@@ -458,13 +458,13 @@ Component.prototype = {
 };
 
 function OnDragEnter() {
-	this.editor._antiBlur = true;
+	this.editor._preventBlur = true;
 	this.editor._visibleControllers(false, domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
 	domUtils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
 }
 
 function OnDragLeave() {
-	this.editor._antiBlur = false;
+	this.editor._preventBlur = false;
 	if (!domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.editor._visibleControllers(true, true);
 	domUtils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
 }
@@ -477,14 +477,14 @@ function OnDragStart(e) {
 		return;
 	}
 
-	this.editor._antiBlur = false;
+	this.editor._preventBlur = false;
 	domUtils.addClass(_DragHandle.get('__dragHandler'), 'se-dragging');
 	domUtils.addClass(_DragHandle.get('__dragContainer'), 'se-dragging');
 	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
 }
 
 function OnDragEnd() {
-	this.editor._antiBlur = false;
+	this.editor._preventBlur = false;
 	domUtils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
 	this._removeDragEvent();
 }
@@ -636,12 +636,12 @@ async function OnKeyDown_component(e) {
 			this.select(elComp.target, elComp.pluginName);
 		} else {
 			try {
-				this.editor._antiBlur = true;
+				this.editor._preventBlur = true;
 				e.stopPropagation();
 				e.preventDefault();
 				this.selection.setRange(el, offset, el, offset);
 			} finally {
-				this.editor._antiBlur = false;
+				this.editor._preventBlur = false;
 			}
 		}
 

@@ -180,7 +180,7 @@ Controller.prototype = {
 		}
 
 		this.isOpen = true;
-		this.editor._antiBlur = true;
+		this.editor._preventBlur = true;
 		this.editor.status.onSelected = true;
 		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.editor.frameContext, info });
 	},
@@ -199,7 +199,7 @@ Controller.prototype = {
 		this.editor.frameContext.get('lineBreaker_t').style.display = this.editor.frameContext.get('lineBreaker_b').style.display = 'none';
 		this.editor.effectNode = null;
 		this.editor.currentControllerName = '';
-		this.editor._antiBlur = false;
+		this.editor._preventBlur = false;
 		this.editor._controllerTargetContext = null;
 		_w.setTimeout(() => {
 			this.editor.status.onSelected = false;

@@ -961,7 +961,7 @@ EventManager.prototype = {
 	},
 
 	__removeInput() {
-		this._inputFocus = this.editor._antiBlur = false;
+		this._inputFocus = this.editor._preventBlur = false;
 		this.__inputBlurEvent = this.removeEvent(this.__inputBlurEvent);
 		this.__inputKeyEvent = this.removeEvent(this.__inputKeyEvent);
 		this.__inputPlugin = null;
@@ -1011,7 +1011,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 		return;
 	}
 
-	if (this.status.rootKey === rootKey && this.editor._antiBlur) return;
+	if (this.status.rootKey === rootKey && this.editor._preventBlur) return;
 
 	const onSelected = this.editor.status.onSelected || this.editor.opendModal;
 	this.editor._offCurrentController();
@@ -1039,7 +1039,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 }
 
 function OnBlur_wysiwyg(frameContext, e) {
-	if (this._inputFocus || this.editor._antiBlur || frameContext.get('isCodeView') || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return;
+	if (this._inputFocus || this.editor._preventBlur || frameContext.get('isCodeView') || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return;
 
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;
@@ -1103,12 +1103,12 @@ function DisplayLineBreak(dir, e) {
 	this.component.deselect();
 
 	try {
-		this.editor._antiBlur = true;
+		this.editor._preventBlur = true;
 		const focusEl = isList ? format : format.firstChild;
 		this.selection.setRange(focusEl, 1, focusEl, 1);
 		this.history.push(false);
 	} finally {
-		this.editor._antiBlur = false;
+		this.editor._preventBlur = false;
 	}
 }
 

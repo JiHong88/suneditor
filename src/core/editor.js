@@ -240,7 +240,7 @@ const Editor = function (multiTargets, options) {
 	 * @description Variables for controlling focus and blur events
 	 * @private
 	 */
-	this._antiBlur = false;
+	this._preventBlur = false;
 
 	/**
 	 * @description If true, (initialize, reset) all indexes of image, video information
@@ -789,7 +789,7 @@ Editor.prototype = {
 	focus(rootKey) {
 		if (rootKey) this.changeFrameContext(rootKey);
 		if (this.frameContext.get('wysiwygFrame').style.display === 'none') return;
-		this._antiBlur = false;
+		this._preventBlur = false;
 
 		if (this.frameOptions.get('iframe') || !this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 			this._nativeFocus();
@@ -822,7 +822,7 @@ Editor.prototype = {
 	 * @param {Element|null} focusEl Focus element
 	 */
 	focusEdge(focusEl) {
-		this._antiBlur = false;
+		this._preventBlur = false;
 		if (!focusEl) focusEl = this.frameContext.get('wysiwyg').lastElementChild;
 
 		const fileComponentInfo = this.component.get(focusEl);
@@ -1138,7 +1138,7 @@ Editor.prototype = {
 		}
 		this.opendControllers = fixedCont;
 		this.currentControllerName = '';
-		this._antiBlur = false;
+		this._preventBlur = false;
 	},
 
 	/**

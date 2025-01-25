@@ -431,7 +431,7 @@ function OnClickHeader(ww, e) {
 	e.preventDefault();
 
 	try {
-		this.editor._antiBlur = true;
+		this.editor._preventBlur = true;
 		const clickedHeader = e.target;
 		if (domUtils.hasClass(clickedHeader, 'se-doc-item')) {
 			const innerIndex = Array.prototype.indexOf.call(this.innerHeaders, clickedHeader);
@@ -443,7 +443,7 @@ function OnClickHeader(ww, e) {
 			}
 		}
 	} finally {
-		this.editor._antiBlur = false;
+		this.editor._preventBlur = false;
 	}
 }
 
