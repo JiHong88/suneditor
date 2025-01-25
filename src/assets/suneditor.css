@@ -2427,7 +2427,6 @@
 }
 
 .sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected,
-.sun-editor-editable[contenteditable='true'] .se-component-selected,
 .sun-editor-editable[contenteditable='true'] .se-component.se-component-selected > figure {
 	outline: 2px solid var(--se-active-dark-color);
 	transition: outline-color 0.2s ease-in-out, outline-width 0.2s ease-in-out;
