@@ -533,14 +533,17 @@ EventManager.prototype = {
 		}
 	},
 
-	_dataTransferAction(type, e, clipboardData, frameContext) {
+	async _dataTransferAction(type, e, clipboardData, frameContext) {
 		try {
-			this._setClipboardData(type, e, clipboardData, frameContext);
+			this.editor.showLoading();
+			await this._setClipboardData(type, e, clipboardData, frameContext);
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
 		} catch (err) {
 			console.warn('[SUNEDITOR.paste.error]', err);
+		} finally {
+			this.editor.hideLoading();
 		}
 	},
 
