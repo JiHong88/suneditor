@@ -16,7 +16,7 @@ Blockquote.type = 'command';
 Blockquote.className = '';
 Blockquote.prototype = {
 	/**
-	 * @override core
+	 * @description Override the function called when the carat moves
 	 */
 	active(element, target) {
 		if (/blockquote/i.test(element?.nodeName)) {
@@ -29,7 +29,7 @@ Blockquote.prototype = {
 	},
 
 	/**
-	 * @override core
+	 * @description Override the function that the plugin calls.
 	 */
 	action() {
 		const currentBlockquote = domUtils.getParentElement(this.selection.getNode(), 'blockquote');

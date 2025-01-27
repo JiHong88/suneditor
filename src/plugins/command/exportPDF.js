@@ -34,8 +34,7 @@ ExportPDF.type = 'command';
 ExportPDF.className = 'se-component-enabled';
 ExportPDF.prototype = {
 	/**
-	 * @override core
-	 * @param {Element} target Target command button
+	 * @description Override the function that the plugin calls.
 	 */
 	async action() {
 		if (!this.apiUrl) {

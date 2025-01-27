@@ -1,6 +1,16 @@
 import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
+/**
+ * @constructor
+ * @description Audio gallery plugin
+ * @param {Object} editor - editor core object
+ * @param {object} pluginOptions
+ * @param {object} pluginOptions.data - direct data without server calls
+ * @param {string} pluginOptions.url - server request url
+ * @param {object=} pluginOptions.headers - server request headers
+ * @param {string|Function} pluginOptions.thumbnail - default thumbnail
+ */
 const AudioGallery = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);

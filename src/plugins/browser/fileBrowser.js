@@ -1,6 +1,17 @@
 import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
+/**
+ * @constructor
+ * @description File browser plugin. Can contain any media type.
+ * @param {Object} editor - editor core object
+ * @param {object} pluginOptions
+ * @param {object} pluginOptions.data - direct data without server calls
+ * @param {string} pluginOptions.url - server request url
+ * @param {object=} pluginOptions.headers - server request headers
+ * @param {string|Function} pluginOptions.thumbnail - default thumbnail
+ * @param {Array.<string>} pluginOptions.props - additional tag names
+ */
 const FileBrowser = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);

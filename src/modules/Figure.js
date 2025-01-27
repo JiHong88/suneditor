@@ -604,7 +604,7 @@ Figure.prototype = {
 	},
 
 	/**
-	 * @override controller
+	 * @description Controller button action
 	 * @param {Element} target Target button element
 	 * @returns
 	 */
