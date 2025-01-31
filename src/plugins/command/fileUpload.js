@@ -5,6 +5,19 @@ import { FileManager, Figure, Controller } from '../../modules';
 
 const { NO_EVENT } = env;
 
+/**
+ * @constructor
+ * @description File upload plugin
+ * @param {object} editor - editor core object
+ * @param {object} pluginOptions - plugin options
+ * @param {string} pluginOptions.uploadUrl - server request url
+ * @param {Object=} pluginOptions.uploadHeaders - server request headers
+ * @param {string=} pluginOptions.uploadSizeLimit - upload size limit
+ * @param {string=} pluginOptions.uploadSingleSizeLimit - upload single size limit
+ * @param {boolean=} pluginOptions.allowMultiple - allow multiple files
+ * @param {string=} pluginOptions.acceptedFormats - accepted formats
+ * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
+ */
 const FileUpload = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
@@ -80,8 +93,9 @@ FileUpload.component = function (node) {
 };
 FileUpload.prototype = {
 	/**
-	 * @override core
-	 * @param {Element} target Target command button
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * It is executed by clicking a toolbar "command" button or calling an API.
 	 */
 	action() {
 		this.editor._preventBlur = true;
@@ -89,8 +103,9 @@ FileUpload.prototype = {
 	},
 
 	/**
-	 * @override component
-	 * @param {Element} target Target element
+	 * @editorMethod Editor.Component
+	 * @description Executes the method that is called when a component of a plugin is selected.
+	 * @param {Element} target Target component element
 	 */
 	select(target) {
 		this._element = target;
@@ -108,8 +123,13 @@ FileUpload.prototype = {
 	},
 
 	/**
-	 * @description On paste or drop
-	 * @param {*} params { frameContext, event, file }
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "paste" or "drop".
+	 * @param {object} params { frameContext, event, file }
+	 * @param {object} params.frameContext Frame context
+	 * @param {object} params.event Event object
+	 * @param {File} params.file File object
+	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
 	onPastAndDrop({ file }) {
 		const fileType = file.type;
@@ -129,7 +149,8 @@ FileUpload.prototype = {
 	},
 
 	/**
-	 * @override Figure
+	 * @editorMethod Modules.Controller
+	 * @description Executes the method that is called when a target component is edited.
 	 * @param {Element} target Target element
 	 */
 	edit(target) {
@@ -140,9 +161,9 @@ FileUpload.prototype = {
 	},
 
 	/**
-	 * @override controller
+	 * @editorMethod Modules.Controller
+	 * @description Executes the method that is called when a button is clicked in the "controller".
 	 * @param {Element} target Target button element
-	 * @returns
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -157,6 +178,33 @@ FileUpload.prototype = {
 		this.component.select(this._element, FileUpload.key, false);
 	},
 
+	/**
+	 * @editorMethod Editor.Component
+	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
+	 * @param {Element} target Target element
+	 */
+	async destroy(target) {
+		if (!target) return;
+
+		const figure = Figure.GetContainer(target);
+		target = domUtils.getParentElement(target, '.se-component') || target;
+
+		const message = await this.triggerEvent('onFileDeleteBefore', { element: figure.target, container: figure, url: figure.target.getAttribute('href') });
+		if (message === false) return;
+
+		const isInlineComp = this.component.isInline(target);
+		const focusEl = isInlineComp ? target.previousSibling || target.nextSibling : target.previousElementSibling || target.nextElementSibling;
+		domUtils.removeItem(target);
+		this.editor._offCurrentController();
+
+		this.editor.focusEdge(focusEl);
+		this.history.push(false);
+	},
+
+	/**
+	 * @description Submit file
+	 * @param {FileList} fileList File list
+	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return;
 
@@ -222,28 +270,6 @@ FileUpload.prototype = {
 		if (result !== null && typeof result === 'object') handler(result);
 
 		if (result === true || result === NO_EVENT) handler(null);
-	},
-
-	/**
-	 * @override fileManager, Figure
-	 * @param {Element} target Target element
-	 */
-	async destroy(target) {
-		if (!target) return;
-
-		const figure = Figure.GetContainer(target);
-		target = domUtils.getParentElement(target, '.se-component') || target;
-
-		const message = await this.triggerEvent('onFileDeleteBefore', { element: figure.target, container: figure, url: figure.target.getAttribute('href') });
-		if (message === false) return;
-
-		const isInlineComp = this.component.isInline(target);
-		const focusEl = isInlineComp ? target.previousSibling || target.nextSibling : target.previousElementSibling || target.nextElementSibling;
-		domUtils.removeItem(target);
-		this.editor._offCurrentController();
-
-		this.editor.focusEdge(focusEl);
-		this.history.push(false);
 	},
 
 	/**

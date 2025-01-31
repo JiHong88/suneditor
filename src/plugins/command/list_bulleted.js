@@ -3,6 +3,15 @@ import { domUtils } from '../../helper';
 
 const DEFAULT_TYPE = 'disc';
 
+/**
+ * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
+ */
+
+/**
+ * @constructor
+ * @description List bulleted plugin, Several types of lists are provided.
+ * @param {object} editor - editor core object
+ */
 const List_bulleted = function (editor) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -29,7 +38,11 @@ List_bulleted.type = 'command';
 List_bulleted.className = 'se-icon-flip-rtl';
 List_bulleted.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the method that is called whenever the cursor position changes.
+	 * @param {?Element} element - Node element where the cursor is currently located
+	 * @param {?Element} target - The plugin's toolbar button element
+	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
 		if (domUtils.isListCell(element) && /^UL$/i.test(element.parentElement.nodeName)) {
@@ -42,7 +55,8 @@ List_bulleted.prototype = {
 	},
 
 	/**
-	 * @override dropdown
+	 * @editorMethod Modules.Dropdown
+	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
 	 */
 	on() {
 		const list = this.listItems;
@@ -60,8 +74,10 @@ List_bulleted.prototype = {
 	},
 
 	/**
-	 * @override core
-	 * @param {Element|null} target Target command button
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
+	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const el = this.format.getBlock(this.selection.getNode());
@@ -76,13 +92,17 @@ List_bulleted.prototype = {
 		this.menu.dropdownOff();
 	},
 
-	submit(type) {
-		const range = this.format.applyList(`ul:${type || ''}`, null, false);
-		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
-		this.editor.focus();
-		this.history.push(false);
-	},
-
+	/**
+	 * @editorMethod Editor.core
+	 * @description Executes methods called by shortcut keys.
+	 * @param {object} params - Information of the "shortcut" plugin
+	 * @param {Range} params.range - Range object
+	 * @param {Element} params.line - The line element of the current range
+	 * @param {ShortcutInfo} params.info - Information of the shortcut
+	 * @param {Event} params.event - Key event object
+	 * @param {number} params.keyCode - Key code
+	 * @param {object} params.editor - editor core object
+	 */
 	shortcut({ range, info }) {
 		const { startContainer } = range;
 		if (startContainer.nodeType === 3) {
@@ -90,6 +110,17 @@ List_bulleted.prototype = {
 			startContainer.textContent = newText;
 		}
 		this.submit();
+	},
+
+	/**
+	 * @description Add a bulleted list
+	 * @param {string} type List type
+	 */
+	submit(type) {
+		const range = this.format.applyList(`ul:${type || ''}`, null, false);
+		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
+		this.editor.focus();
+		this.history.push(false);
 	},
 
 	constructor: List_bulleted

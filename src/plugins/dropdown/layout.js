@@ -1,6 +1,13 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
+/**
+ * @constructor
+ * @description Layout Plugin, Apply layout to the entire editor.
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {Array.<{name: string, html: string}>} pluginOptions.items - Layout list
+ */
 const Layout = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -23,8 +30,10 @@ Layout.type = 'dropdown';
 Layout.className = '';
 Layout.prototype = {
 	/**
-	 * @override core
-	 * @param {Element} target Target command button
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
+	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const index = target.getAttribute('data-value') * 1;

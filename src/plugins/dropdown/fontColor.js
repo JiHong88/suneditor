@@ -2,6 +2,15 @@ import EditorInjector from '../../editorInjector';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
+/**
+ * @constructor
+ * @description Font color plugin
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {Array.<string|{value: string, name: string}>} pluginOptions.items - Color list
+ * @param {number} pluginOptions.splitNum - Number of colors per line
+ * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+ */
 const FontColor = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
@@ -29,7 +38,11 @@ FontColor.type = 'dropdown-free';
 FontColor.className = '';
 FontColor.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the method that is called whenever the cursor position changes.
+	 * @param {?Element} element - Node element where the cursor is currently located
+	 * @param {?Element} target - The plugin's toolbar button element
+	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
 		const colorHelper = target.querySelector('.se-svg-color-helper');
@@ -46,32 +59,31 @@ FontColor.prototype = {
 	},
 
 	/**
-	 * @override dropdown
+	 * @editorMethod Modules.Dropdown
+	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
+	 * @param {Element} target Line element at the current cursor position
 	 */
 	on(target) {
 		this.colorPicker.init(this.selection.getNode(), target);
 	},
 
 	/**
-	 * @Override dropdown
+	 * @editorMethod Modules.Dropdown
+	 * @Override Executes the method that is called when a plugin's dropdown menu is closed.
 	 */
-	onDropdownClose() {
+	off() {
 		this.colorPicker._hueSliderClose();
 	},
 
 	/**
-	 *  @override ColorPicker
+	 * @editorMethod Modules.ColorPicker
+	 * @description Executes the method called when a button of "ColorPicker" module is clicked.
+	 * This plugin is by applying the "ColorPicker" module globally to the "dropdown" menu, the default "action" method is not called.
+	 * @param {string} color - Color code (hex)
 	 */
-	colorPickerAction(value) {
-		this.action(value);
-	},
-
-	/**
-	 * @override core
-	 */
-	action(value) {
-		if (value) {
-			const newNode = domUtils.createElement('SPAN', { style: 'color: ' + value + ';' });
+	colorPickerAction(color) {
+		if (color) {
+			const newNode = domUtils.createElement('SPAN', { style: 'color: ' + color + ';' });
 			this.format.applyInlineElement(newNode, { stylesToModify: ['color'], nodesToRemove: null, strictRemove: null });
 		} else {
 			this.format.applyInlineElement(null, { stylesToModify: ['color'], nodesToRemove: ['span'], strictRemove: true });

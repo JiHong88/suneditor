@@ -8,7 +8,7 @@ import { domUtils, env, converter, numbers } from '../../helper';
 /**
  * @constructor
  * @description Viewer(codeView, fullScreen, showBlocks) class
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  */
 const Viewer = function (editor) {
 	CoreInjector.call(this, editor);

@@ -62,13 +62,26 @@ const DEFAULT_COLOR_LIST = [
 const DEFAULLT_COLOR_SPLITNUM = 9;
 
 /**
+ * @typedef {import('./HueSlider').HueSliderParams} HueSliderParams
+ */
+
+/**
+ * @typedef {object} ColorPickerParams
+ * @property {Array.<string|{value: string, name: string}>=} [colorList=[]] color list
+ * @property {number=} [splitNum=0] Number of colors to be displayed in one line
+ * @property {string=} [defaultColor] Default color
+ * @property {boolean=} [disableHEXInput=false] Disable HEX input
+ * @property {boolean=} [disableRemove=false] Disable remove button
+ * @property {HueSliderParams=} [hueSliderParams] hue slider options
+ */
+
+/**
  * @constructor
  * @description Create a color picker element and register for related events. (this.target)
  * When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
  * @param {object} inst The instance object that called the constructor.
  * @param {string} styles style property ("color", "backgroundColor"..)
- * @param {Array.<string>} colorList color list
- * @param {string} _defaultColor default color
+ * @param {ColorPickerParams} params Color picker options
  */
 const ColorPicker = function (inst, styles, params) {
 	const editor = inst.editor;

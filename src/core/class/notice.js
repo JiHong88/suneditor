@@ -8,7 +8,7 @@ import { domUtils } from '../../helper';
 /**
  * @constructor
  * @description Notice class
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  */
 const Notice = function (editor) {
 	const modalEl = CreateHTML(editor);

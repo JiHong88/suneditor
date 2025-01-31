@@ -4,7 +4,7 @@ import { Browser } from '../../modules';
 /**
  * @constructor
  * @description Audio gallery plugin
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  * @param {object} pluginOptions
  * @param {object} pluginOptions.data - direct data without server calls
  * @param {string} pluginOptions.url - server request url
@@ -36,7 +36,9 @@ AudioGallery.type = 'browser';
 AudioGallery.className = '';
 AudioGallery.prototype = {
 	/**
-	 * @description Open audio gallery
+	 * @editorMethod Modules.Browser
+	 * @description Executes the method that is called when a "Browser" module's is opened.
+	 * @param {Element} inputTarget First focus element when the file "Browser" is opened
 	 */
 	open(inputTarget) {
 		this.inputTarget = inputTarget;
@@ -44,7 +46,8 @@ AudioGallery.prototype = {
 	},
 
 	/**
-	 * @description Close audio gallery
+	 * @editorMethod Modules.Browser
+	 * @description Executes the method that is called when a "Browser" module's is closed.
 	 */
 	close() {
 		this.inputTarget = null;

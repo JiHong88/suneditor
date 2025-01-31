@@ -1,6 +1,34 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
+/**
+ * @constructor
+ * @description A plugin to style lines using classes.
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {Array.<string|{name: string, class: string, _class: string}>} pluginOptions.items - Paragraph item list
+ * @example
+ * use default paragraph styles
+ * ['spaced', 'bordered', 'neon']
+ * custom paragraph styles
+ * [
+  		{
+			name: 'spaced',
+			class: '__se__p-spaced',
+			_class: ''
+		},
+		{
+			name: 'bordered',
+			class: '__se__p-bordered',
+			_class: ''
+		},
+		 {
+			name: 'neon',
+			class: '__se__p-neon',
+			_class: ''
+		}
+	]
+ */
 const ParagraphStyle = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -22,7 +50,8 @@ ParagraphStyle.type = 'dropdown';
 ParagraphStyle.className = '';
 ParagraphStyle.prototype = {
 	/**
-	 * @override dropdown
+	 * @editorMethod Modules.Dropdown
+	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
 	 */
 	on() {
 		const paragraphList = this.classList;
@@ -38,8 +67,10 @@ ParagraphStyle.prototype = {
 	},
 
 	/**
-	 * @override core
-	 * @param {Element} target Target command button
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
+	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const value = target.getAttribute('data-command');

@@ -4,6 +4,14 @@ import { ApiManager } from '../../modules';
 
 const { _d } = env;
 
+/**
+ * @constructor
+ * @description Export PDF plugin
+ * @param {object} editor - editor core object
+ * @param {object} pluginOptions - plugin options
+ * @param {string} pluginOptions.apiUrl - server request url
+ * @param {string} pluginOptions.fileName - file name
+ */
 const ExportPDF = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
@@ -34,7 +42,9 @@ ExportPDF.type = 'command';
 ExportPDF.className = 'se-component-enabled';
 ExportPDF.prototype = {
 	/**
-	 * @description Override the function that the plugin calls.
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * It is executed by clicking a toolbar "command" button or calling an API.
 	 */
 	async action() {
 		if (!this.apiUrl) {

@@ -4,9 +4,19 @@ import { domUtils, env } from '../helper';
 const MENU_MIN_HEIGHT = 38;
 
 /**
+ * @typedef {object} SelectMenuParams
+ * @property {string} position Position of the select menu, specified as "[left|right]-[middle|top|bottom]" or "[top|bottom]-[center|left|right]"
+ * @property {boolean=} checkList Flag to determine if the checklist is enabled (true or false)
+ * @property {"rtl" | "ltr"} [dir="ltr"] Optional text direction: "rtl" for right-to-left, "ltr" for left-to-right
+ * @property {number=} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
+ * @property {Function=} [openMethod] Optional method to call when the menu is opened
+ * @property {Function=} [closeMethod] Optional method to call when the menu is closed
+ */
+
+/**
  *
  * @param {*} inst The instance object that called the constructor.
- * @param {object} params { checkList: boolean, position: "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]", dir?: "rtl" | "ltr" }
+ * @param {SelectMenuParams} params Select menu options
  */
 const SelectMenu = function (inst, params) {
 	// plugin bisic properties

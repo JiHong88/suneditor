@@ -10,7 +10,7 @@ import { _w, _d } from '../../helper/env';
 /**
  * @constructor
  * @description Offset class, get the position of the element
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  */
 const Offset = function (editor) {
 	CoreInjector.call(this, editor);

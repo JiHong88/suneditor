@@ -62,6 +62,7 @@ const Modal = function (inst, element) {
 Modal.prototype = {
 	/**
 	 * @description Open a modal plugin
+	 * The plugin's "init" method is called.
 	 */
 	open() {
 		this.editor._offCurrentModal();
@@ -96,7 +97,7 @@ Modal.prototype = {
 
 	/**
 	 * @description Close a modal plugin
-	 * The plugin's "init" method is called.
+	 * The plugin's "init" and "off" method is called.
 	 */
 	close() {
 		this.__removeGlobalEvent();

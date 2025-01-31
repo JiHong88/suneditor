@@ -11,7 +11,7 @@ const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|da
 /**
  * @constructor
  * @description All HTML related classes involved in the editing area
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  */
 const HTML = function (editor) {
 	CoreInjector.call(this, editor);

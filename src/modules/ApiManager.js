@@ -1,17 +1,21 @@
 import { env } from '../helper';
 
 /**
+ * @typedef ApiManagerParams
+ * @property {string=} method - HTTP method (GET, POST, PUT, DELETE...)
+ * @property {string=} url - API's URL
+ * @property {object=} headers - HTTP headers
+ * @property {object=} data - API data
+ * @property {Function=} callBack - API success callback
+ * @property {Function=} errorCallBack - API fail callback
+ * @property {string=} responseType - XMLHttpRequest.responseType
+ */
+
+/**
  * @constructor
  * @description API Manager
  * @param {object} inst The instance object that called the constructor.
- * @param {object=} params
- * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
- * @param {string=} params.url - API's URL
- * @param {object=} params.headers - HTTP headers
- * @param {object=} params.data - API data
- * @param {Function=} params.callBack - API success callback
- * @param {Function=} params.errorCallBack - API fail callback
- * @param {string=} params.responseType - XMLHttpRequest.responseType
+ * @param {ApiManagerParams=} params API options
  */
 const ApiManager = function (inst, params) {
 	this.editor = inst.editor;
@@ -32,14 +36,7 @@ const ApiManager = function (inst, params) {
 ApiManager.prototype = {
 	/**
 	 * @description Call API
-	 * @param {object=} params
-	 * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
-	 * @param {string=} params.url - API's URL
-	 * @param {object=} params.headers - HTTP headers
-	 * @param {object=} params.data - API data
-	 * @param {Function=} params.callBack - API success callback
-	 * @param {Function=} params.errorCallBack - API fail callback
-	 * @param {string=} params.responseType - XMLHttpRequest.responseType
+	 * @param {ApiManagerParams=} params
 	 */
 	call({ method, url, headers, data, callBack, errorCallBack, responseType }) {
 		this.cancel();

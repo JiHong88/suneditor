@@ -8,7 +8,7 @@ import { domUtils, unicode, env } from '../../helper';
 /**
  * @constructor
  * @description Selection, Range related class
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  */
 const Selection = function (editor) {
 	CoreInjector.call(this, editor);

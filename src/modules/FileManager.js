@@ -2,10 +2,18 @@ import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';
 
 /**
+ * @typedef {object} FileManagerParams
+ * @property {string} query The query selector used to find file elements in the editor
+ * @property {Function=} loadHandler A function to handle the loaded file information
+ * @property {Function=} eventHandler A function to handle file-related events
+ * @property {?object=} figure An optional Figure instance related to the file
+ */
+
+/**
  * @constructor
  * @description This module manages the file information of the editor.
  * @param {*} inst The instance object that called the constructor.
- * @param {{ query: string, loadHandler: Function, eventHandler: Function, figure: Figure instance | null }} params
+ * @param {FileManagerParams} params FileManager options
  */
 const FileManager = function (inst, params) {
 	CoreInjector.call(this, inst.editor);

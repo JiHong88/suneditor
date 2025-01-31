@@ -551,6 +551,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	// text direction
 	o.set('textDirection', typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection);
 	o.set('_rtl', o.get('textDirection') === 'rtl');
+	// An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
 	o.set('reverseCommands', ['indent-outdent'].concat(options.reverseButtons || []));
 	o.set('_reverseCommandArray', ('-' + o.get('reverseCommands').join('-')).split('-'));
 	if (numbers.isEven(o.get('_reverseCommandArray').length)) {

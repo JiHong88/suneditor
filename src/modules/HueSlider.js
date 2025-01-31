@@ -61,11 +61,22 @@ function CreateSliderCtx() {
 }
 
 /**
+ * @typedef {import('../modules/Controller').ControllerParams} ControllerParams
+ */
+
+/**
+ * @typedef {object} HueSliderParams
+ * @property {Element} form The form element to attach the hue slider.
+ * @property {boolean} isNewForm Whether to create a new form element.
+ * @property {ControllerParams} controllerParams Controller options
+ */
+
+/**
  * @description Create a Hue slider. (only create one at a time)
  * When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
  * @param {object} inst The instance object that called the constructor.
- * @param {{form: Element}} params {form: Element}
+ * @param {HueSliderParams=} [params={}] Hue slider options
  * @param {string} className The class name of the hue slider.
  */
 const HueSlider = function (inst, params, className) {

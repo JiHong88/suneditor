@@ -61,6 +61,24 @@ const DEFAULT_COLOR_LIST = [
 	'#000000'
 ];
 
+/**
+ * @typedef {import('../../core/base/eventManager').PluginMouseEventInfo} PluginMouseEventInfo
+ */
+
+/**
+ * @typedef {import('../../core/base/eventManager').PluginKeyEventInfo} PluginKeyEventInfo
+ */
+
+/**
+ * @constructor
+ * @description Table Plugin
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {"x"|"y"|"xy"} [pluginOptions.scrollType='x'] - Scroll type ('x', 'y', 'xy')
+ * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')
+ * @param {"cell"|"table"} [pluginOptions.cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
+ * @param {Array} [pluginOptions.colorList] - Color list, used in cell color picker
+ */
 const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -165,6 +183,7 @@ const Table = function (editor, pluginOptions) {
 	this.propTargets = {
 		cell_alignment: controller_props.querySelector('.se-table-props-align .__se__a_h'),
 		cell_alignment_vertical: controller_props.querySelector('.se-table-props-align .__se__a_v'),
+		cell_alignment_table_text: controller_props.querySelector('.se-table-props-align .__se__a_table_t'),
 		border_format: borderFormatButton,
 		border_style: controller_props.querySelector('[data-command="props_onborder_style"] .se-txt'),
 		border_color: controller_props.querySelector('.__se_border_color'),
@@ -253,7 +272,9 @@ Table.component = function (node) {
 Table.options = { isInputComponent: true };
 Table.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
 	 */
 	action() {
 		const oTable = domUtils.createElement('TABLE');
@@ -281,7 +302,43 @@ Table.prototype = {
 	},
 
 	/**
-	 * @override core
+	 * @editorMethod Modules.Component
+	 * @description Executes the method that is called when a component of a plugin is selected.
+	 * @param {Element} target Target component element
+	 */
+	select(target) {
+		this._figureOpen(target);
+		if (!this._figure) this.setTableInfo(target);
+
+		const targetWidth = this._figure?.style.width || '100%';
+		this._maxWidth = targetWidth === '100%';
+		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
+		this._setTableStyle(this._maxWidth ? 'width|column' : 'width', true);
+
+		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
+
+		if (!this._tdElement) return;
+		this.setCellInfo(this._tdElement, true);
+
+		// controller open
+		const figureEl = domUtils.getParentElement(target, domUtils.isFigure);
+		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null });
+
+		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
+		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset });
+	},
+
+	/**
+	 * @editorMethod Editor.core
+	 * @description
+	 * This method is used to validate and preserve the format of the component within the editor.
+	 * It ensures that the structure and attributes of the element are maintained and secure.
+	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
+	 * If the element isn't properly contained, a new container is created to retain the format.
+	 * @returns {object} The format retention object containing the query and method to process the element.
+	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
+	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
+	 * The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
 		return {
@@ -320,7 +377,8 @@ Table.prototype = {
 	},
 
 	/**
-	 * @override core
+	 * @editorMethod Editor.core
+	 * @description Executes the method called when the rtl, ltr mode changes. ("editor.setDir")
 	 * @param {"rtl"|"ltr"} dir Direction
 	 */
 	setDir(dir) {
@@ -329,6 +387,11 @@ Table.prototype = {
 		this._resetPropsAlign(dir === 'rtl');
 	},
 
+	/**
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "mousemove".
+	 * @param {PluginMouseEventInfo} params
+	 */
 	onMouseMove({ event }) {
 		if (this._resizing) return;
 		const target = domUtils.getParentElement(event.target, IsResizeEls);
@@ -364,6 +427,11 @@ Table.prototype = {
 		this.__hideResizeLine();
 	},
 
+	/**
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "scroll".
+	 * @param {PluginMouseEventInfo} params
+	 */
 	onScroll() {
 		if (this._resizeLine?.style.display !== 'block') return;
 		// delete resize line position
@@ -372,8 +440,9 @@ Table.prototype = {
 	},
 
 	/**
-	 * @override core
-	 * @param {Event} event Event object
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "mousedown".
+	 * @param {PluginMouseEventInfo} params
 	 */
 	onMouseDown({ event }) {
 		this._ref = null;
@@ -446,24 +515,27 @@ Table.prototype = {
 	},
 
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "mouseup".
+	 * @param {PluginMouseEventInfo} params
 	 */
 	onMouseUp() {
 		this._shift = false;
 	},
 
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "mouseleave".
+	 * @param {PluginMouseEventInfo} params
 	 */
 	onMouseLeave() {
 		this.__hideResizeLine();
 	},
 
 	/**
-	 * @override core
-	 * @param {Event} event Event object
-	 * @param {Range} range range object
-	 * @param {Element} line Current line element
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "keydown".
+	 * @param {PluginKeyEventInfo} params
 	 */
 	onKeyDown({ event, range, line }) {
 		this._ref = null;
@@ -537,10 +609,9 @@ Table.prototype = {
 	},
 
 	/**
-	 * @override core
-	 * @param {Event} event Event object
-	 * @param {Range} range range object
-	 * @param {Element} line Current line element
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "keyup".
+	 * @param {PluginKeyEventInfo} params
 	 */
 	onKeyUp({ line }) {
 		this.__s = false;
@@ -553,7 +624,9 @@ Table.prototype = {
 	},
 
 	/**
-	 * @override ColorPicker
+	 * @editorMethod Modules.ColorPicker
+	 * @description Executes the method called when a button of "ColorPicker" module is clicked.
+	 * @param {string} color - Color code (hex)
 	 */
 	colorPickerAction(color) {
 		const target = this.propTargets[`${this.sliderType}_color`];
@@ -562,9 +635,9 @@ Table.prototype = {
 	},
 
 	/**
-	 * @override controller
+	 * @editorMethod Modules.Controller
+	 * @description Executes the method that is called when a button is clicked in the "controller".
 	 * @param {Element} target Target button element
-	 * @returns
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -656,13 +729,13 @@ Table.prototype = {
 				break;
 			case 'resize':
 				this._maxWidth = !this._maxWidth;
-				this.setTableStyle('width', false);
+				this._setTableStyle('width', false);
 				this._historyPush();
 				this.component.select(this._element, Table.key, true);
 				break;
 			case 'layout':
 				this._fixedColumn = !this._fixedColumn;
-				this.setTableStyle('column', false);
+				this._setTableStyle('column', false);
 				this._historyPush();
 				this.component.select(this._element, Table.key, true);
 				break;
@@ -690,12 +763,13 @@ Table.prototype = {
 		}
 
 		if (!/^(remove|props_|on|open|merge)/.test(command)) {
-			this.setCellControllerPosition(this._tdElement, this._shift);
+			this._setCellControllerPosition(this._tdElement, this._shift);
 		}
 	},
 
 	/**
-	 * @override controller
+	 * @editorMethod Modules.Controller
+	 * @description Executes the method called when the "controller" is closed.
 	 */
 	close() {
 		this.__removeGlobalEvents();
@@ -732,6 +806,12 @@ Table.prototype = {
 		domUtils.removeClass([border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike], 'on');
 	},
 
+	/**
+	 * @description Selects cells in a table, handling single and multi-cell selection, and managing shift key behavior for extended selection.
+	 * @param {Element} tdElement The target table cell (`<td>`) element that is being selected.
+	 * @param {boolean} shift A flag indicating whether the shift key is held down for multi-cell selection.
+	 * If `true`, the selection will extend to include adjacent cells, otherwise it selects only the provided cell.
+	 */
 	selectCells(tdElement, shift) {
 		this.__s = shift;
 		if (!this._shift && !this._ref) this.__removeGlobalEvents();
@@ -755,14 +835,24 @@ Table.prototype = {
 		this.__globalEvents.touchOff = this.eventManager.addGlobalEvent('touchmove', this._bindTouchOff, false);
 	},
 
-	seTableInfo(element) {
+	/**
+	 * @description Sets the table and figure elements based on the provided cell element, and stores references to them for later use.
+	 * @param {Element} element The target table cell (`<td>`) element from which the table info will be extracted.
+	 * @returns {Element} The `<table>` element that is the parent of the provided `element`.
+	 */
+	setTableInfo(element) {
 		const table = (this._element = this._selectedTable || domUtils.getParentElement(element, 'TABLE'));
 		this._figure = domUtils.getParentElement(table, domUtils.isFigure) || table;
 		return table;
 	},
 
+	/**
+	 * @description Sets various table-related information based on the provided table cell element (`<td>`). This includes updating cell, row, and table attributes, handling spanning cells, and adjusting the UI for elements like headers and captions.
+	 * @param {Element} tdElement The target table cell (`<td>`) element from which table information will be extracted.
+	 * @param {boolean} reset A flag indicating whether to reset the cell information. If `true`, the cell information will be reset and recalculated.
+	 */
 	setCellInfo(tdElement, reset) {
-		const table = this.seTableInfo(tdElement);
+		const table = this.setTableInfo(tdElement);
 		if (!table) return;
 		this._trElement = tdElement.parentNode;
 
@@ -868,13 +958,22 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @description Sets row-related information based on the provided table row element (`<tr>`). This includes updating the row count and the index of the selected row.
+	 * @param {Element} trElement The target table row (`<tr>`) element from which row information will be extracted.
+	 */
 	setRowInfo(trElement) {
-		const table = this.seTableInfo(trElement);
+		const table = this.setTableInfo(trElement);
 		const rows = (this._trElements = table.rows);
 		this._rowCnt = rows.length;
 		this._rowIndex = trElement.rowIndex;
 	},
 
+	/**
+	 * @description Edits the table by adding, removing, or modifying rows and cells, based on the provided options. Supports both single and multi-cell/row editing.
+	 * @param {"row"|"cell"} type The type of element to edit ('row' or 'cell').
+	 * @param {?"up"|"down"|"left"|"right"=} option The action to perform: 'up', 'down', 'left', 'right', or `null` for removing.
+	 */
 	editTable(type, option) {
 		const table = this._element;
 		const isRow = type === 'row';
@@ -980,6 +1079,11 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @description Edits a table row, either adding, removing, the row
+	 * @param {"up"|"down"|null} option The action to perform on the row: `null` to remove the row, 'up' to insert the row up, 'down' to insert the row down, or null to remove.
+	 * @param {Element?} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
+	 */
 	editRow(option, positionResetElement) {
 		this._deleteStyleSelectedCells();
 
@@ -1061,12 +1165,17 @@ Table.prototype = {
 		}
 
 		if (!remove) {
-			this.setCellControllerPosition(positionResetElement || this._tdElement, true);
+			this._setCellControllerPosition(positionResetElement || this._tdElement, true);
 		} else {
 			this._closeController();
 		}
 	},
 
+	/**
+	 * @description Edits a table cell(column), either adding, removing, or modifying the cell based on the provided option.
+	 * @param {"left"|"right"|null} option The action to perform on the cell: `null` to remove the cell, 'left' to insert a new cell to the left, 'right' to insert a new cell to the right, or `null` to remove the cell.
+	 * @param {Element?} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
+	 */
 	editCell(option, positionResetElement) {
 		const remove = !option;
 		const left = option === 'left';
@@ -1229,16 +1338,27 @@ Table.prototype = {
 
 			this._closeController();
 		} else {
-			this.setCellControllerPosition(positionResetElement || this._tdElement, true);
+			this._setCellControllerPosition(positionResetElement || this._tdElement, true);
 		}
 	},
 
+	/**
+	 * @description Inserts a new row into the table at the specified index to it.
+	 * @param {Element} table The table element to insert the row into.
+	 * @param {number} rowIndex The index at which to insert the new row.
+	 * @param {number} cellCnt The number of cells to create in the new row.
+	 * @returns {Element} The newly inserted row element.
+	 */
 	insertBodyRow(table, rowIndex, cellCnt) {
 		const newRow = table.insertRow(rowIndex);
 		newRow.innerHTML = CreateCells('td', cellCnt, false);
 		return newRow;
 	},
 
+	/**
+	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
+	 * This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
+	 */
 	mergeCells() {
 		const ref = this._ref;
 		const selectedCells = this._selectedCells;
@@ -1303,13 +1423,16 @@ Table.prototype = {
 		mergeCell.colSpan = cs;
 		mergeCell.rowSpan = rs;
 
-		this.setMergeSplitButton(true, false);
-		this.setController(mergeCell);
+		this._setMergeSplitButton(true, false);
+		this._setController(mergeCell);
 
 		this.editor.focusEdge(mergeCell);
 		this._historyPush();
 	},
 
+	/**
+	 * @description Toggles the visibility of the table header (`<thead>`). If the header is present, it is removed; if absent, it is added.
+	 */
 	toggleHeader() {
 		const btn = this.headerButton;
 		const active = domUtils.hasClass(btn, 'active');
@@ -1328,10 +1451,13 @@ Table.prototype = {
 		if (/TH/i.test(this._tdElement.nodeName)) {
 			this._closeController();
 		} else {
-			this.setCellControllerPosition(this._tdElement, false);
+			this._setCellControllerPosition(this._tdElement, false);
 		}
 	},
 
+	/**
+	 * @description Toggles the visibility of the table caption (`<caption>`). If the caption is present, it is removed; if absent, it is added.
+	 */
 	toggleCaption() {
 		const btn = this.captionButton;
 		const active = domUtils.hasClass(btn, 'active');
@@ -1346,10 +1472,10 @@ Table.prototype = {
 		}
 
 		domUtils.toggleClass(btn, 'active');
-		this.setCellControllerPosition(this._tdElement, false);
+		this._setCellControllerPosition(this._tdElement, false);
 	},
 
-	setTableStyle(styles, ondisplay) {
+	_setTableStyle(styles, ondisplay) {
 		if (styles.includes('width')) {
 			const targets = this._figure;
 			if (!targets) return;
@@ -1382,7 +1508,7 @@ Table.prototype = {
 		}
 	},
 
-	setMergeSplitButton(fixedCell, selectedCell) {
+	_setMergeSplitButton(fixedCell, selectedCell) {
 		if (!selectedCell || !selectedCell || fixedCell === selectedCell) {
 			this.splitButton.style.display = 'block';
 			this.mergeButton.style.display = 'none';
@@ -1392,33 +1518,7 @@ Table.prototype = {
 		}
 	},
 
-	/**
-	 * @override component
-	 * @param {Element} target Target element
-	 */
-	select(target) {
-		this._figureOpen(target);
-		if (!this._figure) this.seTableInfo(target);
-
-		const targetWidth = this._figure?.style.width || '100%';
-		this._maxWidth = targetWidth === '100%';
-		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
-		this.setTableStyle(this._maxWidth ? 'width|column' : 'width', true);
-
-		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
-
-		if (!this._tdElement) return;
-		this.setCellInfo(this._tdElement, true);
-
-		// controller open
-		const figureEl = domUtils.getParentElement(target, domUtils.isFigure);
-		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null });
-
-		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
-		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset });
-	},
-
-	setController(tdElement) {
+	_setController(tdElement) {
 		if (!this.selection.get().isCollapsed && !this._selectedCell) {
 			this._deleteStyleSelectedCells();
 			return;
@@ -1430,7 +1530,7 @@ Table.prototype = {
 		this.component.select(tableElement, Table.key, true);
 	},
 
-	setCellControllerPosition(tdElement, reset) {
+	_setCellControllerPosition(tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
 		this.controller_cell.resetPosition(this.cellControllerTop ? domUtils.getParentElement(tdElement, domUtils.isTable) : tdElement);
 	},
@@ -1610,11 +1710,12 @@ Table.prototype = {
 		const targets = isTable ? [this._element] : this._selectedCells;
 		if (!targets || targets.length === 0) return;
 
-		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
+		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, cell_alignment_table_text, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
 		const { border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = _w.getComputedStyle(targets[0]);
 		const cellBorder = this._getBorderStyle(border);
 
 		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
+		cell_alignment_table_text.style.display = isTable ? '' : 'none';
 		if (isTable) cell_alignment_vertical.style.display = 'none';
 		else cell_alignment_vertical.style.display = '';
 
@@ -2343,7 +2444,7 @@ function OnSplitCells(direction) {
 	this._deleteStyleSelectedCells();
 	this.history.push(false);
 
-	this.setController(currentCell);
+	this._setController(currentCell);
 	this._selectedCell = this._fixedCell = currentCell;
 }
 
@@ -2455,11 +2556,11 @@ function OffCellMultiSelect(e) {
 
 	if (!this._fixedCell || !this._selectedTable) return;
 
-	this.setMergeSplitButton(this._fixedCell, this._selectedCell);
+	this._setMergeSplitButton(this._fixedCell, this._selectedCell);
 	this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 
 	const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
-	this.setController(focusCell);
+	this._setController(focusCell);
 }
 
 function OffCellShift() {
@@ -2799,7 +2900,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 				</div>
 
 				<div class="se-table-props-align">
-					<label>${lang.align}</label>
+					<label>${lang.align} <span class="__se__a_table_t">( ${lang.table} )</span></label>
 					<div class="se-form-group se-form-w0 se-list-inner">
 						<div class="__se__a_h">
 							${alignHtml}

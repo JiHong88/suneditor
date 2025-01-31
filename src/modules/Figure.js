@@ -12,13 +12,17 @@ let __resizing_cw = 0;
 let __resizing_sw = 0;
 
 /**
+ * @typedef {object} FigureParams
+ * @property {string} [sizeUnit="px"] Size unit
+ * @property {boolean} [autoRatio=false] Auto ratio
+ */
+
+/**
  * @constructor
  * @description Controller module class
  * @param {*} inst The instance object that called the constructor.
  * @param {Array.<Function|string>} controls Controller button array
- * @param {{position: "top" | "bottom" | "position", disabled?: boolean}} params params
- * When using the "top" position, there should not be an arrow on the controller.
- * When using the "bottom" position there should be an arrow on the controller.
+ * @param {FigureParams} params Figure options
  */
 const Figure = function (inst, controls, params) {
 	EditorInjector.call(this, inst.editor);

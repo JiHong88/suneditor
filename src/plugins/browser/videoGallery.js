@@ -4,7 +4,7 @@ import { Browser } from '../../modules';
 /**
  * @constructor
  * @description Video gallery plugin
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  * @param {object} pluginOptions
  * @param {object} pluginOptions.data - direct data without server calls
  * @param {string} pluginOptions.url - server request url
@@ -41,7 +41,9 @@ VideoGallery.type = 'browser';
 VideoGallery.className = '';
 VideoGallery.prototype = {
 	/**
-	 * @description Open video gallery
+	 * @editorMethod Modules.Browser
+	 * @description Executes the method that is called when a "Browser" module's is opened.
+	 * @param {Element} inputTarget First focus element when the file "Browser" is opened
 	 */
 	open(inputTarget) {
 		this.inputTarget = inputTarget;
@@ -49,7 +51,8 @@ VideoGallery.prototype = {
 	},
 
 	/**
-	 * @description Close video gallery
+	 * @editorMethod Modules.Browser
+	 * @description Executes the method that is called when a "Browser" module's is closed.
 	 */
 	close() {
 		this.inputTarget = null;

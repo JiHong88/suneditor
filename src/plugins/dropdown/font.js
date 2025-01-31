@@ -1,6 +1,15 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
+/**
+ * @constructor
+ * @description Text font plugin
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {Array.<string>} pluginOptions.items - Font list
+ * @param {number} pluginOptions.splitNum - Number of colors per line
+ * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+ */
 const Font = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
@@ -25,7 +34,11 @@ Font.type = 'dropdown';
 Font.className = 'se-btn-select se-btn-tool-font';
 Font.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the method that is called whenever the cursor position changes.
+	 * @param {?Element} element - Node element where the cursor is currently located
+	 * @param {?Element} target - The plugin's toolbar button element
+	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
 		const targetText = target.querySelector('.se-txt');
@@ -46,7 +59,9 @@ Font.prototype = {
 	},
 
 	/**
-	 * @override dropdown
+	 * @editorMethod Modules.Dropdown
+	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
+	 * @param {Element} target Line element at the current cursor position
 	 */
 	on(target) {
 		const fontList = this.fontList;
@@ -66,8 +81,10 @@ Font.prototype = {
 	},
 
 	/**
-	 * @override core
-	 * @param {Element} target Target command button
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
+	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	async action(target) {
 		let value = target.getAttribute('data-command');

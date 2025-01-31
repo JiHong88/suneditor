@@ -45,8 +45,9 @@ Anchor.prototype = {
 	},
 
 	/**
-	 * @override component
-	 * @param {Element} target Target element
+	 * @editorMethod Modules.Component
+	 * @description Executes the method that is called when a component of a plugin is selected.
+	 * @param {Element} target Target component element
 	 */
 	select(target) {
 		this._element = target;
@@ -55,16 +56,18 @@ Anchor.prototype = {
 	},
 
 	/**
-	 * @override component
+	 * @editorMethod Editor.Component
+	 * @description Called when a container is deselected.
+	 * @param {Element} element Target element
 	 */
 	deselect() {
 		this.init();
 	},
 
 	/**
-	 * @override controller
+	 * @editorMethod Modules.Controller
+	 * @description Executes the method that is called when a button is clicked in the "controller".
 	 * @param {Element} target Target button element
-	 * @returns
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');

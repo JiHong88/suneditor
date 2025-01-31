@@ -40,7 +40,11 @@ Link.type = 'modal';
 Link.className = 'se-icon-flip-rtl';
 Link.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the method that is called whenever the cursor position changes.
+	 * @param {?Element} element - Node element where the cursor is currently located
+	 * @param {?Element} target - The plugin's toolbar button element
+	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element) {
 		if (domUtils.isAnchor(element) && !element.hasAttribute('data-se-non-link')) {
@@ -63,15 +67,17 @@ Link.prototype = {
 	},
 
 	/**
-	 * @override type = "modal"
+	 * @editorMethod Modules.Modal
+	 * @description Executes the method that is called when a "Modal" module's is opened.
 	 */
 	open() {
 		this.modal.open();
 	},
 
 	/**
-	 * @override modal
-	 * @param {boolean} isUpdate open state is update
+	 * @editorMethod Modules.Modal
+	 * @description Executes the method that is called when a plugin's modal is opened.
+	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
 	 */
 	on(isUpdate) {
 		this.isUpdateState = isUpdate;
@@ -113,9 +119,9 @@ Link.prototype = {
 	},
 
 	/**
-	 * @override controller
+	 * @editorMethod Modules.Controller
+	 * @description Executes the method that is called when a button is clicked in the "controller".
 	 * @param {Element} target Target button element
-	 * @returns
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');

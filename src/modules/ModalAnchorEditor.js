@@ -6,24 +6,29 @@ import { CreateTooltipInner } from '../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
- * @constructor
- * @description Modal form Anchor tag editor
- * @param {*} inst The instance object that called the constructor.
- * @param {Element} modalForm The modal form element
- * @param {object} params
- * @param {boolean} params.textToDisplay - Create Text to display input.
- * @param {string} params.title - Modal title
- * @param {boolean} params.openNewWindow - Default checked value of the "Open in new window" checkbox.
- * @param {boolean} params.relList - The "rel" attribute list of anchor tag.
- * @param {object} params.defaultRel - Default "rel" attributes of anchor tag.
- * @param {boolean} params.noAutoPrefix - If true, disables the automatic prefixing of the host URL to the value of the link.
-	Example:
+ * @typedef {object} ModalAnchorEditorParams
+ * @property {boolean} params.textToDisplay - Create Text to display input.
+ * @property {string} params.title - Modal title
+ * @property {boolean} params.openNewWindow - Default checked value of the "Open in new window" checkbox.
+ * @property {boolean} params.noAutoPrefix - If true, disables the automatic prefixing of the host URL to the value of the link.
+ * @property {boolean} params.relList - The "rel" attribute list of anchor tag.
+ * @property {object} params.defaultRel - Default "rel" attributes of anchor tag.
+ * @example "REL" structure
 	{
 		default: 'nofollow', // Default rel
 		check_new_window: 'noreferrer noopener', // When "open new window" is checked
 		check_bookmark: 'bookmark' // When "bookmark" is checked
 	}
- * @param {boolean} params.noAutoPrefix - If true, disables the automatic prefixing of the host URL to the value of the link.
+	If true, disables the automatic prefixing of the host URL to the value of the link.
+ */
+
+/**
+ * @constructor
+ * @description Modal form Anchor tag editor
+ * @param {*} inst The instance object that called the constructor.
+ * @param {Element} modalForm The modal form element
+ * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
+
  */
 const ModalAnchorEditor = function (inst, modalForm, params) {
 	// plugin bisic properties

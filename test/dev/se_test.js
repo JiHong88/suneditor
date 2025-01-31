@@ -1133,7 +1133,7 @@ window.editor_root = suneditor.create(
 			// cellControllerPosition: 'cell'
 		},
 		fontColor: {
-			disableHEXInput: true,
+			// disableHEXInput: true,
 			items: [{ name: 'red', value: '#ff0000' }, '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000']
 		},
 		fileUpload: {

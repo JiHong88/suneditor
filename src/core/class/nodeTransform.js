@@ -12,7 +12,7 @@ const NodeTransform = function (editor) {
 /**
  * @constructor
  * @description Node utility class. split, merge, etc.
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  */
 NodeTransform.prototype = {
 	/**

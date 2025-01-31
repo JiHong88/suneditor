@@ -493,7 +493,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Executes a function by traversing all root targets.
+	 * @description Execute a function by traversing all root targets.
 	 * @param {Function} f Function
 	 */
 	applyFrameRoots(f) {

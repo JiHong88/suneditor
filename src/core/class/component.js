@@ -13,7 +13,7 @@ const DIR_UP_KEYCODE = /^3[7-8]$/;
 /**
  * @constructor
  * @description Class for managing components such as images and tables that are not in line format
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  */
 const Component = function (editor) {
 	CoreInjector.call(this, editor);
@@ -171,9 +171,9 @@ Component.prototype = {
 	},
 
 	/**
-	 * @description The component(image, video) is selected and the resizing module is called.
-	 * @param {Element} element Element tag (img, iframe, video)
-	 * @param {string} pluginName Plugin name (image, video)
+	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.
+	 * @param {Element} target Target element
+	 * @param {string} pluginName The plugin name for the selected target.
 	 */
 	select(element, pluginName, isInput) {
 		const info = this.get(element);
@@ -262,6 +262,9 @@ Component.prototype = {
 		}
 	},
 
+	/**
+	 * @description Deselects the selected component.
+	 */
 	deselect() {
 		_w.setTimeout(() => {
 			this.editor.status.onSelected = false;

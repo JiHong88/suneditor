@@ -4,7 +4,7 @@ import { Browser } from '../../modules';
 /**
  * @constructor
  * @description File browser plugin. Can contain any media type.
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  * @param {object} pluginOptions
  * @param {object} pluginOptions.data - direct data without server calls
  * @param {string} pluginOptions.url - server request url
@@ -39,7 +39,9 @@ FileBrowser.type = 'browser';
 FileBrowser.className = '';
 FileBrowser.prototype = {
 	/**
-	 * @description Open gallery
+	 * @editorMethod Modules.Browser
+	 * @description Executes the method that is called when a "Browser" module's is opened.
+	 * @param {Element} inputTarget First focus element when the file "Browser" is opened
 	 */
 	open(inputTarget) {
 		this.inputTarget = inputTarget;
@@ -47,7 +49,8 @@ FileBrowser.prototype = {
 	},
 
 	/**
-	 * @description Close gallery
+	 * @editorMethod Modules.Browser
+	 * @description Executes the method that is called when a "Browser" module's is closed.
 	 */
 	close() {
 		this.inputTarget = null;

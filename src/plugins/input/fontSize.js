@@ -151,7 +151,11 @@ FontSize.type = 'input';
 FontSize.className = 'se-btn-select se-btn-input se-btn-tool-font-size';
 FontSize.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the method that is called whenever the cursor position changes.
+	 * @param {?Element} element - Node element where the cursor is currently located
+	 * @param {?Element} target - The plugin's toolbar button element
+	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
 		if (!domUtils.hasClass(target, '__se__font_size')) return false;
@@ -234,7 +238,9 @@ FontSize.prototype = {
 	},
 
 	/**
-	 * @override dropdown
+	 * @editorMethod Modules.Dropdown
+	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
+	 * @param {Element} target Line element at the current cursor position
 	 */
 	on(target) {
 		const { value, unit } = this._getSize(target);
@@ -255,8 +261,10 @@ FontSize.prototype = {
 	},
 
 	/**
-	 * @override
-	 * @param {Element} target Target command button
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
+	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const commandValue = target.getAttribute('data-command');

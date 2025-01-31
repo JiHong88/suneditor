@@ -9,7 +9,7 @@ import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 /**
  * @constructor
  * @description character count, character limit, etc. management class
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  */
 const Char = function (editor) {
 	CoreInjector.call(this, editor);

@@ -1,6 +1,13 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
+/**
+ * @constructor
+ * @description Align plugin
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {Array.<"right"|"center"|"left"|"justify">} pluginOptions.items - Align items
+ */
 const Align = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -30,10 +37,11 @@ Align.type = 'dropdown';
 Align.className = '';
 Align.prototype = {
 	/**
-	 * @override core
-	 * @param {Node} element Selection node.
-	 * @param {Element} target Target button.
-	 * @returns {boolean}
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the method that is called whenever the cursor position changes.
+	 * @param {?Element} element - Node element where the cursor is currently located
+	 * @param {?Element} target - The plugin's toolbar button element
+	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
 		const targetChild = target.firstElementChild;
@@ -54,7 +62,9 @@ Align.prototype = {
 	},
 
 	/**
-	 * @override dropdown
+	 * @editorMethod Modules.Dropdown
+	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
+	 * @param {Element} target Line element at the current cursor position
 	 */
 	on(target) {
 		const currentAlign = target.getAttribute('data-focus') || this.defaultDir;
@@ -71,7 +81,8 @@ Align.prototype = {
 	},
 
 	/**
-	 * @override core
+	 * @editorMethod Editor.core
+	 * @description Executes the method called when the rtl, ltr mode changes. ("editor.setDir")
 	 * @param {"rtl"|"ltr"} dir Direction
 	 */
 	setDir(dir) {
@@ -90,9 +101,10 @@ Align.prototype = {
 	},
 
 	/**
-	 * @override core
-	 * @param {Element} target Target command button
-	 * @returns
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
+	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const value = target.getAttribute('data-command');

@@ -93,14 +93,14 @@ Math_.component = function (node) {
 };
 Math_.prototype = {
 	/**
-	 * @override component, fileManager
-	 * @description Called when a container is selected.
-	 * @param {Element} element Target element
+	 * @editorMethod Modules.Component
+	 * @description Executes the method that is called when a component of a plugin is selected.
+	 * @param {Element} target Target component element
 	 */
-	select(element) {
-		if (domUtils.hasClass(element, 'se-math|katex') && getValue(element)) {
-			this._element = element;
-			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
+	select(target) {
+		if (domUtils.hasClass(target, 'se-math|katex') && getValue(target)) {
+			this._element = target;
+			this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
 			return;
 		}
 	},
@@ -113,7 +113,16 @@ Math_.prototype = {
 	},
 
 	/**
-	 * @override core
+	 * @editorMethod Editor.core
+	 * @description
+	 * This method is used to validate and preserve the format of the component within the editor.
+	 * It ensures that the structure and attributes of the element are maintained and secure.
+	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
+	 * If the element isn't properly contained, a new container is created to retain the format.
+	 * @returns {object} The format retention object containing the query and method to process the element.
+	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
+	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
+	 * The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
 		return {
@@ -144,15 +153,17 @@ Math_.prototype = {
 	},
 
 	/**
-	 * @override type = "modal"
+	 * @editorMethod Modules.Modal
+	 * @description Executes the method that is called when a "Modal" module's is opened.
 	 */
 	open() {
 		this.modal.open();
 	},
 
 	/**
-	 * @override modal
-	 * @param {boolean} isUpdate open state is update
+	 * @editorMethod Modules.Modal
+	 * @description Executes the method that is called when a plugin's modal is opened.
+	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
 	 */
 	on(isUpdate) {
 		this.isUpdateState = isUpdate;
@@ -238,9 +249,9 @@ Math_.prototype = {
 	},
 
 	/**
-	 * @override controller
+	 * @editorMethod Modules.Controller
+	 * @description Executes the method that is called when a button is clicked in the "controller".
 	 * @param {Element} target Target button element
-	 * @returns
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -256,6 +267,11 @@ Math_.prototype = {
 		}
 	},
 
+	/**
+	 * @editorMethod Editor.Component
+	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
+	 * @param {Element} target Target element
+	 */
 	destroy(element) {
 		domUtils.removeItem(element);
 		this.controller.close();

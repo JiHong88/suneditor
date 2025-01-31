@@ -1,6 +1,13 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
+/**
+ * @constructor
+ * @description Template Plugin, Apply a template to the selection.
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {Array.<{name: string, html: string}>} pluginOptions.items - Template list
+ */
 const Template = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -23,7 +30,10 @@ Template.type = 'dropdown';
 Template.className = '';
 Template.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
+	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const index = target.getAttribute('data-value') * 1;

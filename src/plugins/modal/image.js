@@ -142,22 +142,26 @@ Image_.component = function (node) {
 Image_.className = '';
 Image_.prototype = {
 	/**
-	 * @override type = "modal"
+	 * @editorMethod Modules.Modal
+	 * @description Executes the method that is called when a "Modal" module's is opened.
 	 */
 	open() {
 		this.modal.open();
 	},
 
 	/**
-	 * @override Figure
+	 * @editorMethod Modules.Controller(Figure)
+	 * @description Executes the method that is called when a target component is edited.
+	 * @param {Element} target Target element
 	 */
 	edit() {
 		this.modal.open();
 	},
 
 	/**
-	 * @override modal
-	 * @param {boolean} isUpdate open state is update
+	 * @editorMethod Modules.Modal
+	 * @description Executes the method that is called when a plugin's modal is opened.
+	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
 	 */
 	on(isUpdate) {
 		if (!isUpdate) {
@@ -172,8 +176,13 @@ Image_.prototype = {
 	},
 
 	/**
-	 * @description On paste or drop
-	 * @param {*} params { frameContext, event, file }
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "paste" or "drop".
+	 * @param {object} params { frameContext, event, file }
+	 * @param {object} params.frameContext Frame context
+	 * @param {object} params.event Event object
+	 * @param {File} params.file File object
+	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
 	onPastAndDrop({ file }) {
 		if (!/^image/.test(file.type)) return;
@@ -206,7 +215,16 @@ Image_.prototype = {
 	},
 
 	/**
-	 * @override core
+	 * @editorMethod Editor.core
+	 * @description
+	 * This method is used to validate and preserve the format of the component within the editor.
+	 * It ensures that the structure and attributes of the element are maintained and secure.
+	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
+	 * If the element isn't properly contained, a new container is created to retain the format.
+	 * @returns {object} The format retention object containing the query and method to process the element.
+	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
+	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
+	 * The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
 		return {
@@ -257,12 +275,12 @@ Image_.prototype = {
 	},
 
 	/**
-	 * @override component, fileManager
-	 * @description Called when a container is selected.
-	 * @param {Element} element Target element
+	 * @editorMethod Editor.Component
+	 * @description Executes the method that is called when a component of a plugin is selected.
+	 * @param {Element} target Target component element
 	 */
-	select(element) {
-		this.ready(element);
+	select(target) {
+		this.ready(target);
 	},
 
 	/**
@@ -323,7 +341,8 @@ Image_.prototype = {
 	},
 
 	/**
-	 * @override fileManager
+	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
+	 * @param {Element} target Target element
 	 */
 	async destroy(element) {
 		const targetEl = element || this._element;

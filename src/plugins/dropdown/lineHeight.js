@@ -1,6 +1,13 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
+/**
+ * @constructor
+ * @description Line height Plugin
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {Array.<{text: string, value: number}>} pluginOptions.items - Line height list
+ */
 const LineHeight = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -23,7 +30,11 @@ LineHeight.type = 'dropdown';
 LineHeight.className = '';
 LineHeight.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the method that is called whenever the cursor position changes.
+	 * @param {?Element} element - Node element where the cursor is currently located
+	 * @param {?Element} target - The plugin's toolbar button element
+	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
 		if (element?.style?.lineHeight.length > 0) {
@@ -36,7 +47,8 @@ LineHeight.prototype = {
 	},
 
 	/**
-	 * @override dropdown
+	 * @editorMethod Modules.Dropdown
+	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
 	 */
 	on() {
 		const format = this.format.getLine(this.selection.getNode());
@@ -57,8 +69,10 @@ LineHeight.prototype = {
 	},
 
 	/**
-	 * @override core
-	 * @param {Element} target Target command button
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
+	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const value = target.getAttribute('data-command') || '';

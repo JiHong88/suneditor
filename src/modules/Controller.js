@@ -9,13 +9,24 @@ const INDEX_1 = 2147483646;
 const INDEX_2 = 2147483645;
 
 /**
+ * @typedef {object} ControllerParams
+ * @property {"top"|"bottom"} position Controller position
+ * @property {boolean=} isWWTarget If the controller is in the WYSIWYG area, set it to true.
+ * @property {Function=} initMethod Method to be called when the controller is closed.
+ * @property {boolean=} disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
+ * @property {Array<Element>=} parents The parent "controller" array when "controller" is opened nested.
+ * @property {boolean=} parentsHide If true, the parent element is hidden when the controller is opened.
+ * @property {boolean=} isInsideForm If the controller is inside a form, set it to true.
+ * @property {boolean=} isOutsideForm If the controller is outside a form, set it to true.
+ */
+
+/**
  * @constructor
- * @description Controller module class
+ * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} element Controller element
- * @param {{position: "top" | "bottom" | "position", disabled?: boolean}} params params
- * When using the "top" position, there should not be an arrow on the controller.
- * When using the "bottom" position there should be an arrow on the controller.
+ * @param {ControllerParams} params Controller options
+ * @param {string?} _name An optional name for the controller key.
  */
 const Controller = function (inst, element, params, _name) {
 	EditorInjector.call(this, inst.editor);
@@ -60,7 +71,7 @@ Controller.prototype = {
 	 * @param {object} [params={}] params
 	 * @param {object=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
 	 * @param {function=} params.initMethod Method to be called when the controller is closed.
-	 * @param {boolean=} params.disabled If true, the controller is disabled.
+	 * @param {boolean=} params.disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled. (default: this.disabled)
 	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
 	 */
 	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset } = {}) {

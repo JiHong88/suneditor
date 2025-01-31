@@ -90,7 +90,8 @@ Drawing.type = 'modal';
 Drawing.className = '';
 Drawing.prototype = {
 	/**
-	 * @override type = "modal"
+	 * @editorMethod Modules.Modal
+	 * @description Executes the method that is called when a "Modal" module's is opened.
 	 */
 	open() {
 		if (this.pluginOptions.useFormatType) {
@@ -101,7 +102,8 @@ Drawing.prototype = {
 	},
 
 	/**
-	 * @override modal
+	 * @editorMethod Modules.Modal
+	 * @description Executes the method that is called when a plugin's "modal" is closed.
 	 */
 	off() {
 		this._destroyDrawing();

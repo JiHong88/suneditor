@@ -22,7 +22,7 @@
 
 // --- controller
 /**
- * @typedef {Object} ControllerInfo
+ * @typedef {object} ControllerInfo
  * @property {"top"|"bottom"|"position"} position - controller position
  * @property {object} inst - controller instance
  * @property {Element} form - controller element

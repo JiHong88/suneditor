@@ -201,6 +201,8 @@ const DEFAULT_CONTENT_STYLES =
 	spanStyles: '', // Span styles
 	lineStyles: '', // Line styles
 	textDirection: 'ltr', // Text direction
+	// Contains the names of the buttons that should be inverted. 
+	// For example, a button like indent-outdent means that in RTL mode, the **indent** and **outdent** actions should be reversed.
 	reverseButtons: ['indent-outdent'], // Reverse buttons
 	historyStackDelayTime: 400, // History stack delay time
 	lineAttrReset: ['id'], // Line attribute reset

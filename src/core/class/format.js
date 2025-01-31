@@ -8,7 +8,7 @@ import { domUtils, unicode, numbers, env } from '../../helper';
 /**
  * @constructor
  * @description Classes related to editor formats such as line creation, line retrieval from selected range, etc.
- * @param {Object} editor - editor core object
+ * @param {object} editor - editor core object
  */
 const Format = function (editor) {
 	CoreInjector.call(this, editor);

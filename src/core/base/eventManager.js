@@ -16,6 +16,20 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHa
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
 /**
+ * @typedef {object} PluginMouseEventInfo
+ * @property {object} frameContext Frame context
+ * @property {object} event Event object
+ */
+
+/**
+ * @typedef {object} PluginKeyEventInfo
+ * @property {object} frameContext Frame context
+ * @property {object} event Event object
+ * @property {Range} range range object
+ * @property {Element} line Current line element
+ */
+
+/**
  * @constructor
  * @description Event manager, editor's all event management class
  * @param {object} editor editor core object
@@ -1029,7 +1043,6 @@ function OnFocus_wysiwyg(frameContext, e) {
 	this.history.resetButtons(rootKey, null);
 
 	if (!onSelected) {
-		this.selection.removeRange();
 		this.applyTagEffect();
 	}
 

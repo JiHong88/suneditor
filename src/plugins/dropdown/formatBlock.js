@@ -10,6 +10,17 @@ const HEADER_KEYCODE = new Map([
 	[54, 'h6']
 ]);
 
+/**
+ * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
+ */
+
+/**
+ * @constructor
+ * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {Array.<string>} pluginOptions.items - Format list
+ */
 const FormatBlock = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
@@ -32,7 +43,11 @@ FormatBlock.type = 'dropdown';
 FormatBlock.className = 'se-btn-select se-btn-tool-format';
 FormatBlock.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the method that is called whenever the cursor position changes.
+	 * @param {?Element} element - Node element where the cursor is currently located
+	 * @param {?Element} target - The plugin's toolbar button element
+	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
 		let formatTitle = this.lang.formats;
@@ -64,7 +79,9 @@ FormatBlock.prototype = {
 	},
 
 	/**
-	 * @override dropdown
+	 * @editorMethod Modules.Dropdown
+	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
+	 * @param {Element} target Line element at the current cursor position
 	 */
 	on(target) {
 		const formatList = this.formatList;
@@ -86,8 +103,10 @@ FormatBlock.prototype = {
 	},
 
 	/**
-	 * @override core
-	 * @param {Element} target Target command button
+	 * @editorMethod Editor.core
+	 * @description Executes the main execution method of the plugin.
+	 * Called when an item in the "dropdown" menu is clicked.
+	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		// "line"|"br-line"|"block"
@@ -104,6 +123,11 @@ FormatBlock.prototype = {
 		this.menu.dropdownOff();
 	},
 
+	/**
+	 * @description Create a header tag, call by "shortcut" class
+	 * (e.g. shortcuts._h1: ['c+s+49+p~formatBlock.createHeader', ''])
+	 * @param {ShortcutInfo} params - Information of the shortcut
+	 */
 	createHeader({ keyCode }) {
 		const headerName = HEADER_KEYCODE.get(keyCode);
 		const tag = domUtils.createElement(headerName);

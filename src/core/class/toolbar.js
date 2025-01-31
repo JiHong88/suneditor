@@ -11,8 +11,8 @@ const { _w } = env;
 /**
  * @constructor
  * @description Toolbar class
- * @param {Object} editor - editor core object
- * @param {Object} options - toolbar options
+ * @param {object} editor - editor core object
+ * @param {object} options - toolbar options
  * @param {String} options.keyName - toolbar key name
  * @param {Boolean} options.balloon - balloon toolbar
  * @param {Boolean} options.inline - inline toolbar
