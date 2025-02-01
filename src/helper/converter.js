@@ -72,6 +72,24 @@ export function debounce(func, wait) {
 }
 
 /**
+ * @description Synchronizes two Map objects by updating the first Map with the values from the second,
+ *              and deleting any keys in the first Map that are not present in the second.
+ * @param {Map} targetMap The Map to update (target).
+ * @param {Map} referenceMap The Map providing the reference values (source).
+ */
+export function syncMaps(targetMap, referenceMap) {
+	referenceMap.forEach((value, key) => {
+		targetMap.set(key, value);
+	});
+
+	targetMap.forEach((_value, key) => {
+		if (!referenceMap.has(key)) {
+			targetMap.delete(key);
+		}
+	});
+}
+
+/**
  *
  * @param {"em"|"rem"|"%"|"pt"|"px"} to Size units to be converted
  * @param {string} size siSize to convert with units (ex: "15rem")
@@ -388,6 +406,7 @@ const converter = {
 	htmlToEntity,
 	entityToHTML,
 	debounce,
+	syncMaps,
 	fontSize,
 	nodeListToArray,
 	swapKeyValue,

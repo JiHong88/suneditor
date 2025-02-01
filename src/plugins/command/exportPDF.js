@@ -52,7 +52,7 @@ ExportPDF.prototype = {
 			return;
 		}
 
-		this.editor.showLoading();
+		this.ui.showLoading();
 		let ww = null;
 
 		try {
@@ -84,7 +84,7 @@ ExportPDF.prototype = {
 			console.error(`[SUNEDITOR.plugins.exportPDF.error] ${error.message}`);
 		} finally {
 			domUtils.removeItem(ww);
-			this.editor.hideLoading();
+			this.ui.hideLoading();
 		}
 	},
 

@@ -19,6 +19,7 @@ import { env } from '../helper';
  */
 const ApiManager = function (inst, params) {
 	this.editor = inst.editor;
+	this.ui = this.editor.ui;
 	this.kind = inst.constructor.key || inst.constructor.name;
 
 	// members
@@ -94,14 +95,14 @@ ApiManager.prototype = {
 					try {
 						resolve(xhr);
 					} finally {
-						this.editor.hideLoading();
+						this.ui.hideLoading();
 					}
 				} else {
 					try {
 						const res = !xhr.responseText ? xhr : JSON.parse(xhr.responseText);
 						reject(res, xhr);
 					} finally {
-						this.editor.hideLoading();
+						this.ui.hideLoading();
 					}
 				}
 			};
@@ -141,7 +142,7 @@ async function CallBackApi(xmlHttp, callBack, errorCallBack) {
 			} catch (error) {
 				throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.callBack.fail] ${error.message}`);
 			} finally {
-				this.editor.hideLoading();
+				this.ui.hideLoading();
 			}
 		} else {
 			// exception
@@ -153,11 +154,11 @@ async function CallBackApi(xmlHttp, callBack, errorCallBack) {
 					message = await errorCallBack(res, xmlHttp);
 				}
 				const err = `[SUNEDITOR.ApiManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${message || res.errorMessage || xmlHttp.responseText}`;
-				this.editor.notice.open(err);
+				this.ui.noticeOpen(err);
 			} catch (error) {
 				throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.errorCallBack.fail] ${error.message}`);
 			} finally {
-				this.editor.hideLoading();
+				this.ui.hideLoading();
 			}
 		}
 	}

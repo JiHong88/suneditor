@@ -25,7 +25,7 @@ export const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', '
 export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl']);
 
 export function SELECT_ALL(editor) {
-	editor._offCurrentController();
+	editor.ui._offCurrentController();
 	editor.menu.containerOff();
 	const figcaption = domUtils.getParentElement(editor.selection.getNode(), 'FIGCAPTION');
 	const selectArea = figcaption || editor.frameContext.get('wysiwyg');

@@ -267,7 +267,7 @@ Figure.prototype = {
 		}
 
 		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
-			this.editor._offCurrentController();
+			this.ui._offCurrentController();
 		} else {
 			nonBorder = true;
 		}
@@ -363,7 +363,7 @@ Figure.prototype = {
 			this._setAlignIcon();
 			// as button
 			this._setAsIcon();
-			this.editor._visibleControllers(true, true);
+			this.ui._visibleControllers(true, true);
 			// size
 			const size = this.getSize(target);
 			domUtils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.w + ', ' + size.h + ')');
@@ -1024,8 +1024,8 @@ Figure.prototype = {
 		this.eventManager.removeGlobalEvent(this.__onResizeESCEvent);
 
 		this._displayResizeHandles(true);
-		this.editor._offCurrentController();
-		this.editor.disableBackWrapper();
+		this.ui._offCurrentController();
+		this.ui.disableBackWrapper();
 	},
 
 	_setDragEvent(figureMain) {
@@ -1074,7 +1074,7 @@ function OnResizeContainer(e) {
 	inst._resizeClientX = e.clientX;
 	inst._resizeClientY = e.clientY;
 	inst.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
-	this.editor.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
+	this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
 
 	const { w, h } = this.getSize(inst._element);
 	__resizing_p_wh = __resizing_p_ow = false;

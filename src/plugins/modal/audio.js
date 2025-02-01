@@ -264,7 +264,7 @@ Audio_.prototype = {
 					file: f
 				});
 
-				this.notice.open(message === NO_EVENT ? err : message || err);
+				this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
 
 				return false;
 			}
@@ -278,7 +278,7 @@ Audio_.prototype = {
 			const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
 			const message = await this.triggerEvent('onAudioUploadError', { error: err, limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize });
 
-			this.notice.open(message === NO_EVENT ? err : message || err);
+			this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
 
 			return false;
 		}
@@ -396,7 +396,7 @@ Audio_.prototype = {
 	async _error(response) {
 		const message = await this.triggerEvent('onAudioUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.notice.open(err);
+		this.ui.noticeOpen(err);
 		console.error('[SUNEDITOR.plugin.audio.error]', err);
 	},
 

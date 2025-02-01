@@ -195,7 +195,7 @@ FileUpload.prototype = {
 		const isInlineComp = this.component.isInline(target);
 		const focusEl = isInlineComp ? target.previousSibling || target.nextSibling : target.previousElementSibling || target.nextElementSibling;
 		domUtils.removeItem(target);
-		this.editor._offCurrentController();
+		this.ui._offCurrentController();
 
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
@@ -223,7 +223,7 @@ FileUpload.prototype = {
 					file: f
 				});
 
-				this.notice.open(message === NO_EVENT ? err : message || err);
+				this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
 
 				return false;
 			}
@@ -243,7 +243,7 @@ FileUpload.prototype = {
 				uploadSize: fileSize
 			});
 
-			this.notice.open(message === NO_EVENT ? err : message || err);
+			this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
 
 			return false;
 		}
@@ -378,7 +378,7 @@ FileUpload.prototype = {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.notice.open(err);
+		this.ui.noticeOpen(err);
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	},
 

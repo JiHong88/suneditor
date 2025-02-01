@@ -36,6 +36,8 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
  */
 const EventManager = function (editor) {
 	CoreInjector.call(this, editor);
+
+	// members
 	this._events = [];
 	this._onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
 	this._onShortcutKey = false;
@@ -554,7 +556,7 @@ EventManager.prototype = {
 
 	async _dataTransferAction(type, e, clipboardData, frameContext) {
 		try {
-			this.editor.showLoading();
+			this.ui.showLoading();
 			await this._setClipboardData(type, e, clipboardData, frameContext);
 			e.preventDefault();
 			e.stopPropagation();
@@ -562,7 +564,7 @@ EventManager.prototype = {
 		} catch (err) {
 			console.warn('[SUNEDITOR.paste.error]', err);
 		} finally {
-			this.editor.hideLoading();
+			this.ui.hideLoading();
 		}
 	},
 
@@ -677,7 +679,7 @@ EventManager.prototype = {
 			this._wwFrameObserver = new ResizeObserver((entries) => {
 				_w.setTimeout(() => {
 					entries.forEach((e) => {
-						this.editor.__callResizeFunction(this.editor.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
+						this.editor.__callResizeFunction(this.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
 					});
 				}, 0);
 			});
@@ -690,7 +692,7 @@ EventManager.prototype = {
 				'click',
 				(e) => {
 					if (e.target === this.carrierWrapper.querySelector('.se-modal-inner')) {
-						this.editor._offCurrentModal();
+						this.ui._offCurrentModal();
 					}
 				},
 				false
@@ -843,7 +845,7 @@ EventManager.prototype = {
 		}
 
 		if (this.editor._controllerTargetContext !== this.editor.frameContext.get('topArea')) {
-			this.editor._offCurrentController();
+			this.ui._offCurrentController();
 		}
 
 		if (this.editor._lineBreaker_t) {
@@ -969,7 +971,7 @@ EventManager.prototype = {
 		if (info || figure) {
 			if (!info) info = this.component.get(figure);
 			if (info && !domUtils.hasClass(info.container, 'se-component-selected')) {
-				this.editor._offCurrentController();
+				this.ui._offCurrentController();
 				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
 				this.component.select(info.target, info.pluginName, false);
 			}
@@ -1033,7 +1035,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 	if (this.status.rootKey === rootKey && this.editor._preventBlur) return;
 
 	const onSelected = this.editor.status.onSelected || this.editor.opendModal;
-	this.editor._offCurrentController();
+	this.ui._offCurrentController();
 	this.status.hasFocus = true;
 
 	domUtils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
@@ -1084,7 +1086,7 @@ function OnBlur_wysiwyg(frameContext, e) {
 function OnMouseDown_statusbar(e) {
 	e.stopPropagation();
 	this._resizeClientY = e.clientY;
-	this.editor.enableBackWrapper('ns-resize');
+	this.ui.enableBackWrapper('ns-resize');
 	this.__resize_editor = this.addGlobalEvent('mousemove', __resizeEditor.bind(this));
 	this.__close_move = this.addGlobalEvent('mouseup', __closeMove.bind(this));
 }
@@ -1099,7 +1101,7 @@ function __resizeEditor(e) {
 }
 
 function __closeMove() {
-	this.editor.disableBackWrapper();
+	this.ui.disableBackWrapper();
 	if (this.__resize_editor) this.__resize_editor = this.removeGlobalEvent(this.__resize_editor);
 	if (this.__close_move) this.__close_move = this.removeGlobalEvent(this.__close_move);
 }
@@ -1134,7 +1136,7 @@ function OnResize_window() {
 	if (isMobile) {
 		this._scrollContainer();
 	} else {
-		this.editor._offCurrentController();
+		this.ui._offCurrentController();
 	}
 
 	if (this.editor.isBalloon) this.toolbar.hide();

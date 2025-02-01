@@ -239,7 +239,7 @@ Component.prototype = {
 		} else if (isBreakComponent || !domUtils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
 			domUtils.addClass(dragHandle, 'se-drag-handle-full');
-			this.editor._visibleControllers(false, false);
+			this.ui._visibleControllers(false, false);
 
 			const sizeTarget = info.caption ? info.target : info.cover || info.container || info.target;
 			const w = sizeTarget.offsetWidth;
@@ -342,7 +342,7 @@ Component.prototype = {
 		this.currentPluginName = '';
 		this.currentInfo = null;
 		this.__removeGlobalEvent();
-		this.editor.__offControllers();
+		this.ui.__offControllers();
 	},
 
 	/**
@@ -465,13 +465,13 @@ Component.prototype = {
 
 function OnDragEnter() {
 	this.editor._preventBlur = true;
-	this.editor._visibleControllers(false, domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
+	this.ui._visibleControllers(false, domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
 	domUtils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
 }
 
 function OnDragLeave() {
 	this.editor._preventBlur = false;
-	if (!domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.editor._visibleControllers(true, true);
+	if (!domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.ui._visibleControllers(true, true);
 	domUtils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
 }
 

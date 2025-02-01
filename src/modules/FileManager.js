@@ -17,6 +17,7 @@ import ApiManager from './ApiManager';
  */
 const FileManager = function (inst, params) {
 	CoreInjector.call(this, inst.editor);
+	this.ui = this.editor.ui;
 
 	// members
 	inst.__fileManagement = this;
@@ -44,7 +45,7 @@ FileManager.prototype = {
 	 * @param {Function|null} errorCallBack Error call back function
 	 */
 	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
-		this.editor.showLoading();
+		this.ui.showLoading();
 
 		let formData = null;
 		// create formData
@@ -69,7 +70,7 @@ FileManager.prototype = {
 	 * @param {Files|{formData: FormData, size: number}} data FormData in body or Files array
 	 */
 	async asyncUpload(uploadUrl, uploadHeader, data) {
-		this.editor.showLoading();
+		this.ui.showLoading();
 
 		let formData = null;
 		// create formData

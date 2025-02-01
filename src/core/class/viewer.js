@@ -40,8 +40,8 @@ Viewer.prototype = {
 		if (value === fc.get('isCodeView')) return;
 
 		fc.set('isCodeView', value);
-		this.editor._offCurrentController();
-		this.editor._offCurrentModal();
+		this.ui._offCurrentController();
+		this.ui._offCurrentModal();
 
 		const codeWrapper = fc.get('codeWrapper');
 		const codeFrame = fc.get('code');
@@ -149,7 +149,7 @@ Viewer.prototype = {
 		const isCodeView = this.editor.frameContext.get('isCodeView');
 		const arrow = this.context.get('toolbar._arrow');
 
-		this.editor._offCurrentController();
+		this.ui._offCurrentController();
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.editor.toolbar._inlineToolbarAttr.isShow);
 
 		if (value) {
@@ -397,7 +397,7 @@ Viewer.prototype = {
 				</html>`);
 		}
 
-		this.editor.showLoading();
+		this.ui.showLoading();
 		this._w.setTimeout(() => {
 			try {
 				iframe.focus();
@@ -416,7 +416,7 @@ Viewer.prototype = {
 			} catch (error) {
 				throw Error(`[SUNEDITOR.print.fail] error: ${error.message}`);
 			} finally {
-				this.editor.hideLoading();
+				this.ui.hideLoading();
 				domUtils.removeItem(iframe);
 			}
 		}, 1000);
@@ -428,8 +428,8 @@ Viewer.prototype = {
 	preview() {
 		this.menu.dropdownOff();
 		this.menu.containerOff();
-		this.editor._offCurrentController();
-		this.editor._offCurrentModal();
+		this.ui._offCurrentController();
+		this.ui._offCurrentModal();
 
 		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get({ withFrame: true })) : this.html.get({ withFrame: true });
 		const windowObject = this._w.open('', '_blank');

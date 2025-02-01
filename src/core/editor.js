@@ -17,11 +17,11 @@ import Format from './class/format';
 import HTML from './class/html';
 import Menu from './class/menu';
 import NodeTransform from './class/nodeTransform';
-import Notice from './class/notice';
 import Offset from './class/offset';
 import Selection from './class/selection';
 import Shortcuts from './class/shortcuts';
 import Toolbar from './class/toolbar';
+import UI from './class/ui';
 import Viewer from './class/viewer';
 
 const COMMAND_BUTTONS = '.se-menu-list .se-toolbar-btn[data-command]';
@@ -217,7 +217,6 @@ const Editor = function (multiTargets, options) {
 	this.currentControllerName = '';
 	this._controllerTargetContext = null;
 	this.selectMenuOn = false;
-	this._backWrapper = product.carrierWrapper.querySelector('.se-back-wrapper');
 
 	this._controllerOnDisabledButtons = [];
 	this._codeViewDisabledButtons = [];
@@ -522,7 +521,7 @@ Editor.prototype = {
 
 		try {
 			this.options.set('_rtl', rtl);
-			this._offCurrentController();
+			this.ui._offCurrentController();
 
 			const fc = this.frameContext;
 			const plugins = this.plugins;
@@ -677,7 +676,7 @@ Editor.prototype = {
 				fc.set('options', newRootOptions);
 
 				// frame styles
-				this.setEditorStyle(newRootOptions.get('_defaultStyles'), fc);
+				this.ui.setEditorStyle(newRootOptions.get('_defaultStyles'), fc);
 
 				// frame attributes
 				const frame = fc.get('wysiwyg');
@@ -725,39 +724,11 @@ Editor.prototype = {
 
 		// theme
 		if (this._originOptions.theme !== (newOptions.theme ?? this._originOptions.theme)) {
-			this.setTheme(newOptions.theme);
+			this.ui.setTheme(newOptions.theme);
 		}
 
 		this.effectNode = null;
 		this._setFrameInfo(this.frameRoots.get(this.status.rootKey));
-	},
-
-	/**
-	 * @description Set the theme to the editor
-	 * @param {string} theme Theme name
-	 */
-	setTheme(theme) {
-		if (typeof theme !== 'string') return;
-		const o = this.options;
-		const prevTheme = o.get('_themeClass').trim();
-		o.set('theme', theme || '');
-		o.set('_themeClass', theme ? ` se-theme-${theme}` : '');
-		theme = o.get('_themeClass').trim();
-
-		const applyTheme = (target) => {
-			if (!target) return;
-			if (prevTheme) domUtils.removeClass(target, prevTheme);
-			if (theme) domUtils.addClass(target, theme);
-		};
-
-		applyTheme(this.carrierWrapper);
-		this.applyFrameRoots((e) => {
-			applyTheme(e.get('topArea'));
-			applyTheme(e.get('wysiwyg'));
-		});
-
-		applyTheme(this.context.get('statusbar._wrapper'));
-		applyTheme(this.context.get('toolbar._wrapper'));
 	},
 
 	/**
@@ -858,163 +829,6 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Set "options.get('editorStyle')" style.
-	 * Define the style of the edit area
-	 * It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
-	 * @param {string} style Style string
-	 * @param {FrameContext|null} fc Frame context
-	 */
-	setEditorStyle(style, fc) {
-		fc = fc || this.frameContext;
-		const fo = fc.get('options');
-
-		const newStyles = converter._setDefaultOptionStyle(fo, style);
-		fo.set('_defaultStyles', newStyles);
-
-		// top area
-		fc.get('topArea').style.cssText = newStyles.top;
-
-		// code view
-		const code = fc.get('code');
-		code.style.cssText = fo.get('_defaultStyles').frame;
-		code.style.display = 'none';
-
-		// wysiwyg frame
-		if (!fo.get('iframe')) {
-			fc.get('wysiwygFrame').style.cssText = newStyles.frame + newStyles.editor;
-		} else {
-			fc.get('wysiwygFrame').style.cssText = newStyles.frame;
-			fc.get('wysiwyg').style.cssText = newStyles.editor;
-		}
-	},
-
-	/**
-	 * @description Switch to or off "ReadOnly" mode.
-	 * @param {boolean} value "readOnly" boolean value.
-	 * @param {string|undefined} rootKey Root key
-	 */
-	readOnly(value, rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
-
-		fc.set('isReadOnly', !!value);
-		domUtils.setDisabled(this._controllerOnDisabledButtons, !!value);
-
-		if (value) {
-			this._offCurrentController();
-			this._offCurrentModal();
-
-			if (this.toolbar?.currentMoreLayerActiveButton?.disabled) this.toolbar.moreLayerOff();
-			if (this.subToolbar?.currentMoreLayerActiveButton?.disabled) this.subToolbar.moreLayerOff();
-			if (this.menu?.currentDropdownActiveButton?.disabled) this.menu.dropdownOff();
-			if (this.menu?.currentContainerActiveButton?.disabled) this.menu.containerOff();
-			if (this.modalForm) this.plugins.modal.close.call(this);
-
-			fc.get('code').setAttribute('readOnly', 'true');
-			domUtils.addClass(fc.get('wysiwyg'), 'se-read-only');
-		} else {
-			fc.get('code').removeAttribute('readOnly');
-			domUtils.removeClass(fc.get('wysiwyg'), 'se-read-only');
-		}
-
-		if (this.options.get('hasCodeMirror')) {
-			this.viewer._codeMirrorEditor('readonly', !!value, rootKey);
-		}
-	},
-
-	/**
-	 * @description Disable the suneditor
-	 * @param {string|undefined} rootKey Root key
-	 */
-	disable(rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
-
-		this.toolbar.disable();
-		this._offCurrentController();
-		this._offCurrentModal();
-
-		if (this.modalForm) this.plugins.modal.close.call(this);
-
-		fc.get('wysiwyg').setAttribute('contenteditable', false);
-		fc.set('isDisabled', true);
-
-		if (this.options.get('hasCodeMirror')) {
-			this.viewer._codeMirrorEditor('readonly', true, rootKey);
-		} else {
-			fc.get('code').setAttribute('disabled', true);
-		}
-	},
-
-	/**
-	 * @description Enable the suneditor
-	 * @param {string|undefined} rootKey Root key
-	 */
-	enable(rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
-
-		this.toolbar.enable();
-		fc.get('wysiwyg').setAttribute('contenteditable', true);
-		fc.set('isDisabled', false);
-
-		if (this.options.get('hasCodeMirror')) {
-			this.viewer._codeMirrorEditor('readonly', false, rootKey);
-		} else {
-			fc.get('code').removeAttribute('disabled');
-		}
-	},
-
-	/**
-	 * @description Show the suneditor
-	 * @param {string|undefined} rootKey Root key
-	 */
-	show(rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
-		const topAreaStyle = fc.get('topArea').style;
-		if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
-	},
-
-	/**
-	 * @description Hide the suneditor
-	 * @param {string|undefined} rootKey Root key
-	 */
-	hide(rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
-		fc.get('topArea').style.display = 'none';
-	},
-
-	/**
-	 * @description Show loading box
-	 * @param {string|undefined} rootKey Root key
-	 */
-	showLoading(rootKey) {
-		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'block';
-	},
-
-	/**
-	 * @description Hide loading box
-	 * @param {string|undefined} rootKey Root key
-	 */
-	hideLoading(rootKey) {
-		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'none';
-	},
-
-	/**
-	 * @description Activate the transparent background "div" so that other elements are not affected during resizing.
-	 * @param {cursor} cursor cursor css property
-	 */
-	enableBackWrapper(cursor) {
-		this._backWrapper.style.cursor = cursor;
-		this._backWrapper.style.display = 'block';
-	},
-
-	/**
-	 * @description Disabled background "div"
-	 */
-	disableBackWrapper() {
-		this._backWrapper.style.display = 'none';
-		this._backWrapper.style.cursor = 'default';
-	},
-
-	/**
 	 * @description Destroy the suneditor
 	 */
 	destroy() {
@@ -1058,7 +872,7 @@ Editor.prototype = {
 			delete obj[k];
 		}
 
-		obj = ['eventManager', 'char', 'component', 'format', 'html', 'menu', 'nodeTransform', 'notice', 'offset', 'selection', 'shortcuts', 'toolbar', 'viewer'];
+		obj = ['eventManager', 'char', 'component', 'format', 'html', 'menu', 'nodeTransform', 'offset', 'selection', 'shortcuts', 'toolbar', 'ui', 'viewer'];
 		for (let i = 0, len = obj.length, c; i < len; i++) {
 			c = this[obj[i]];
 			for (const k in c) {
@@ -1091,65 +905,6 @@ Editor.prototype = {
 		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
 		this._lineBreaker_t = rt.get('lineBreaker_t');
 		this._lineBreaker_b = rt.get('lineBreaker_b');
-	},
-
-	/**
-	 * @description visible controllers
-	 * @param {boolean} value hidden/show
-	 * @param {boolean?} lineBreakShow Line break hidden/show (default: Follows the value "value".)
-	 * @private
-	 */
-	_visibleControllers(value, lineBreakShow) {
-		const visible = value ? '' : 'hidden';
-		const breakerVisible = lineBreakShow ?? visible ? '' : 'hidden';
-
-		const cont = this.opendControllers;
-		for (let i = 0, c; i < cont.length; i++) {
-			c = cont[i];
-			if (c.form) c.form.style.visibility = visible;
-		}
-
-		this._lineBreaker_t.style.visibility = breakerVisible;
-		this._lineBreaker_b.style.visibility = breakerVisible;
-	},
-
-	/**
-	 * @description Off current controllers
-	 * @private
-	 */
-	_offCurrentController() {
-		this.component.__deselect();
-	},
-
-	/**
-	 * @description Off controllers
-	 * @private
-	 */
-	__offControllers() {
-		const cont = this.opendControllers;
-		const fixedCont = [];
-		for (let i = 0, c; i < cont.length; i++) {
-			c = cont[i];
-			if (c.fixed) {
-				fixedCont.push(c);
-				continue;
-			}
-			if (typeof c.inst.close === 'function') c.inst.close();
-			if (c.form) c.form.style.display = 'none';
-		}
-		this.opendControllers = fixedCont;
-		this.currentControllerName = '';
-		this._preventBlur = false;
-	},
-
-	/**
-	 * @description Off current modal
-	 * @private
-	 */
-	_offCurrentModal() {
-		if (this.opendModal) {
-			this.opendModal.close();
-		}
 	},
 
 	/**
@@ -1591,7 +1346,6 @@ Editor.prototype = {
 		// util classes
 		this.offset = new Offset(this);
 		this.shortcuts = new Shortcuts(this);
-		this.notice = new Notice(this);
 		// main classes
 		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
 		if (this.options.has('_subMode')) {
@@ -1610,6 +1364,7 @@ Editor.prototype = {
 		this.format = new Format(this);
 		this.menu = new Menu(this);
 		this.char = new Char(this);
+		this.ui = new UI(this);
 		this.viewer = new Viewer(this);
 
 		// register classes to the eventManager
@@ -1624,6 +1379,7 @@ Editor.prototype = {
 		ClassInjector.call(this.offset, this);
 		ClassInjector.call(this.selection, this);
 		ClassInjector.call(this.toolbar, this);
+		ClassInjector.call(this.ui, this);
 		ClassInjector.call(this.viewer, this);
 		if (this.options.has('_subMode')) ClassInjector.call(this.subToolbar, this);
 

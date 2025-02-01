@@ -423,7 +423,7 @@ Image_.prototype = {
 					file: f
 				});
 
-				this.notice.open(message === NO_EVENT ? err : message || err);
+				this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
 
 				return false;
 			}
@@ -443,7 +443,7 @@ Image_.prototype = {
 				uploadSize: fileSize
 			});
 
-			this.notice.open(message === NO_EVENT ? err : message || err);
+			this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
 
 			return false;
 		}
@@ -843,7 +843,7 @@ Image_.prototype = {
 			const filesLen = this.modal.isUpdate ? 1 : files.length;
 
 			if (filesLen === 0) {
-				this.editor.hideLoading();
+				this.ui.hideLoading();
 				console.warn('[SUNEDITOR.image.base64.fail] cause : No applicable files');
 				return;
 			}
@@ -865,14 +865,14 @@ Image_.prototype = {
 
 					if (--this._base64RenderIndex === 0) {
 						this._onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt);
-						this.editor.hideLoading();
+						this.ui.hideLoading();
 					}
 				}.bind(this, reader, isUpdate, this._element, file, i);
 
 				reader.readAsDataURL(file);
 			}
 		} catch (error) {
-			this.editor.hideLoading();
+			this.ui.hideLoading();
 			throw Error(`[SUNEDITOR.plugins.image._setBase64.fail] ${error.message}`);
 		}
 	},
@@ -899,7 +899,7 @@ Image_.prototype = {
 	async _error(response) {
 		const message = await this.triggerEvent('onImageUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.notice.open(err);
+		this.ui.noticeOpen(err);
 		console.error('[SUNEDITOR.plugin.image.error]', err);
 	},
 

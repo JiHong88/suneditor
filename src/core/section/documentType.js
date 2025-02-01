@@ -21,6 +21,7 @@ const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS
 const DocumentType = function (editor, fc) {
 	// members
 	this.editor = editor;
+	this.context = editor.context;
 	this.selection = editor.selection;
 	this.offset = editor.offset;
 	this.fc = fc;
@@ -380,7 +381,7 @@ DocumentType.prototype = {
 				const scrollTop = i === 0 && !this.isAutoHeight ? 0 : c.offsetTop - this.page.offsetTop - c.offsetHeight + globalTop;
 				this._applyPageScroll(scrollTop, () => {
 					if (this.editor.toolbar._sticky) {
-						this.displayPage.scrollTo({ top: scrollTop - this.editor.context.get('toolbar.main').offsetHeight, behavior: 'smooth' });
+						this.displayPage.scrollTo({ top: scrollTop - this.context.get('toolbar.main').offsetHeight, behavior: 'smooth' });
 					}
 				});
 

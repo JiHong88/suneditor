@@ -14,6 +14,7 @@ const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize',
 const Modal = function (inst, element) {
 	CoreInjector.call(this, inst.editor);
 	this.offset = this.editor.offset;
+	this.ui = this.editor.ui;
 
 	// members
 	this.inst = inst;
@@ -65,7 +66,7 @@ Modal.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	open() {
-		this.editor._offCurrentModal();
+		this.ui._offCurrentModal();
 		this._fixCurrentController(true);
 
 		if (this._closeSignal) this._modalInner.addEventListener('click', this._closeListener[1]);
@@ -136,13 +137,13 @@ Modal.prototype = {
 
 	__addGlobalEvent(dir) {
 		this.__removeGlobalEvent();
-		this.editor.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
+		this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
 		this._bindClose_mousemove = this.eventManager.addGlobalEvent('mousemove', this.__globalEventHandlers.mousemove, true);
 		this._bindClose_mouseup = this.eventManager.addGlobalEvent('mouseup', this.__globalEventHandlers.mouseup, true);
 	},
 
 	__removeGlobalEvent() {
-		this.editor.disableBackWrapper();
+		this.ui.disableBackWrapper();
 		if (this._bindClose_mousemove) this._bindClose_mousemove = this.eventManager.removeGlobalEvent(this._bindClose_mousemove);
 		if (this._bindClose_mouseup) this._bindClose_mouseup = this.eventManager.removeGlobalEvent(this._bindClose_mouseup);
 	},
@@ -163,21 +164,21 @@ async function Action(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	this.editor.showLoading();
+	this.ui.showLoading();
 
 	try {
 		const result = await this.inst.modalAction();
 		if (result === false) {
-			this.editor.hideLoading();
+			this.ui.hideLoading();
 		} else if (result === undefined) {
 			this.close();
 		} else {
 			this.close();
-			this.editor.hideLoading();
+			this.ui.hideLoading();
 		}
 	} catch (error) {
 		this.close();
-		this.editor.hideLoading();
+		this.ui.hideLoading();
 		throw Error(`[SUNEDITOR.Modal[${this.kind}].warn] ${error.message}`);
 	}
 }

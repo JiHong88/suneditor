@@ -1315,7 +1315,7 @@ Format.prototype = {
 		}
 
 		// set range
-		this.editor._offCurrentController();
+		this.ui._offCurrentController();
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
 		this.history.push(false);
 

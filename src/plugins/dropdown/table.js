@@ -458,7 +458,7 @@ Table.prototype = {
 				const colIndex = this._logical_cellIndex - (cellEdge.isLeft ? 1 : 0);
 
 				// ready
-				this.editor.enableBackWrapper('ew-resize');
+				this.ui.enableBackWrapper('ew-resize');
 				if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
 				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_PREV_CLASS);
 
@@ -494,7 +494,7 @@ Table.prototype = {
 				this.setRowInfo(row);
 
 				// ready
-				this.editor.enableBackWrapper('ns-resize');
+				this.ui.enableBackWrapper('ns-resize');
 				if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
 				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
 
@@ -2223,7 +2223,7 @@ Table.prototype = {
 
 	__removeGlobalEvents() {
 		this._resizing = false;
-		this.editor.disableBackWrapper();
+		this.ui.disableBackWrapper();
 		this.__hideResizeLine();
 		if (this._resizeLinePrev) {
 			this._resizeLinePrev.style.display = 'none';

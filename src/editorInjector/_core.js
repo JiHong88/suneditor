@@ -1,6 +1,6 @@
 /**
  * @description Add default properties to the editor core;
- * @param {object} editor Editor's core
+ * @param {object} editor editor core object
  * @private
  */
 function CoreInjector(editor) {
@@ -19,6 +19,7 @@ function CoreInjector(editor) {
 	this.options = editor.options;
 	this.icons = editor.icons;
 	this.lang = editor.lang;
+	this.frameRoots = editor.frameRoots;
 	// window, document, shadowRoot
 	this._w = editor._w;
 	this._d = editor._d;
