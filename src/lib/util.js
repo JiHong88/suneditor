@@ -1610,6 +1610,7 @@ const util = {
                 child = children[i];
                 next = children[i + 1];
                 if (!child) break;
+                if (inst.isBreak(child) || inst.isMedia(child) || inst.isInputElement(child)) continue;
                 if((onlyText && inst._isIgnoreNodeChange(child)) || (!onlyText && (inst.isTable(child) || inst.isListCell(child) || (inst.isFormatElement(child) && !inst.isFreeFormatElement(child))))) {
                     if (inst.isTable(child) || inst.isListCell(child)) {
                         recursionFunc(child, depth + 1, i);
@@ -1646,6 +1647,7 @@ const util = {
                     current.parentNode.insertBefore(child, current);
                     inst.removeItem(current);
                 }
+
                 if (!next) {
                     if (child.nodeType === 1) recursionFunc(child, depth + 1, i);
                     break;
