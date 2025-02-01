@@ -46,6 +46,7 @@ const Controller = function (inst, element, params, _name) {
 	this.isInsideForm = !!params.isInsideForm;
 	this.isOutsideForm = !!params.isOutsideForm;
 	this._initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
+	this._btnDisabled = false;
 	this.__globalEventHandlers = { keydown: CloseListener_keydown.bind(this), mousedown: CloseListener_mousedown.bind(this) };
 	this._bindClose_key = null;
 	this._bindClose_mouse = null;
@@ -87,7 +88,13 @@ Controller.prototype = {
 		if (this.editor.isBalloon) this.toolbar.hide();
 		else if (this.editor.isSubBalloon) this.subToolbar.hide();
 
-		if (disabled ?? this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+		if (disabled ?? this.disabled) {
+			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+			this._btnDisabled = true;
+		} else {
+			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
+			this._btnDisabled = false;
+		}
 
 		this.currentTarget = target;
 		this.currentPositionTarget = positionTarget || target;
@@ -215,7 +222,10 @@ Controller.prototype = {
 		this.editor.opendControllers = this.editor.opendControllers.filter((v) => v.form !== this.form);
 		if (this.editor.currentControllerName !== this.kind && this.editor.opendControllers.length > 0) return;
 
-		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
+		if (this._btnDisabled) {
+			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
+			this._btnDisabled = false;
+		}
 		this.editor.frameContext.get('lineBreaker_t').style.display = this.editor.frameContext.get('lineBreaker_b').style.display = 'none';
 		this.editor.effectNode = null;
 		this.editor.currentControllerName = '';

@@ -321,11 +321,12 @@ Table.prototype = {
 		this.setCellInfo(this._tdElement, true);
 
 		// controller open
+		const btnDisabled = this._selectedCells.length > 1;
 		const figureEl = domUtils.getParentElement(target, domUtils.isFigure);
-		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null });
+		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
 
 		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
-		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset });
+		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset, disabled: btnDisabled });
 	},
 
 	/**

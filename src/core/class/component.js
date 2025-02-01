@@ -220,8 +220,6 @@ Component.prototype = {
 		domUtils.addClass(info.container, 'se-component-selected');
 
 		if (!isBreakComponent && __overInfo !== ON_OVER_COMPONENT) {
-			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
-
 			// set zero width space
 			if (!this.isInline(info.container)) return;
 

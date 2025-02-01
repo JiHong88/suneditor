@@ -13,8 +13,6 @@
 }
 
 .sun-editor-editable * {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	font-family: inherit;
 	font-size: inherit;
@@ -61,7 +59,17 @@
 	border: 3px solid #f3f3f3;
 	border-top: 3px solid #3498db;
 	border-radius: 50%;
+	-webkit-animation: spin 1s linear infinite;
 	animation: spin 1s linear infinite;
+}
+
+@-webkit-keyframes spin {
+	0% {
+		transform: translate(-50%, -50%) rotate(0deg);
+	}
+	100% {
+		transform: translate(-50%, -50%) rotate(360deg);
+	}
 }
 
 @keyframes spin {
@@ -160,10 +168,15 @@
 	list-style-position: outside;
 	display: block;
 	list-style-type: decimal;
+	-webkit-margin-before: 1em;
 	margin-block-start: 1em;
+	-webkit-margin-after: 1em;
 	margin-block-end: 1em;
+	-webkit-margin-start: 0px;
 	margin-inline-start: 0px;
+	-webkit-margin-end: 0px;
 	margin-inline-end: 0px;
+	-webkit-padding-start: 40px;
 	padding-inline-start: 40px;
 }
 
@@ -171,10 +184,15 @@
 	list-style-position: outside;
 	display: block;
 	list-style-type: disc;
+	-webkit-margin-before: 1em;
 	margin-block-start: 1em;
+	-webkit-margin-after: 1em;
 	margin-block-end: 1em;
+	-webkit-margin-start: 0px;
 	margin-inline-start: 0px;
+	-webkit-margin-end: 0px;
 	margin-inline-end: 0px;
+	-webkit-padding-start: 40px;
 	padding-inline-start: 40px;
 }
 
@@ -249,9 +267,13 @@
 	font-family: inherit;
 	font-size: inherit;
 	color: var(--se-edit-font-quote);
+	-webkit-margin-before: 1em;
 	margin-block-start: 1em;
+	-webkit-margin-after: 1em;
 	margin-block-end: 1em;
+	-webkit-margin-start: 0;
 	margin-inline-start: 0;
+	-webkit-margin-end: 0;
 	margin-inline-end: 0;
 	border-style: solid;
 	border-width: 0;
@@ -288,9 +310,13 @@
 .sun-editor-editable h1 {
 	display: block;
 	font-size: 2em;
+	-webkit-margin-before: 0.67em;
 	margin-block-start: 0.67em;
+	-webkit-margin-after: 0.67em;
 	margin-block-end: 0.67em;
+	-webkit-margin-start: 0px;
 	margin-inline-start: 0px;
+	-webkit-margin-end: 0px;
 	margin-inline-end: 0px;
 	font-weight: bold;
 }
@@ -299,9 +325,13 @@
 .sun-editor-editable h2 {
 	display: block;
 	font-size: 1.5em;
+	-webkit-margin-before: 0.83em;
 	margin-block-start: 0.83em;
+	-webkit-margin-after: 0.83em;
 	margin-block-end: 0.83em;
+	-webkit-margin-start: 0px;
 	margin-inline-start: 0px;
+	-webkit-margin-end: 0px;
 	margin-inline-end: 0px;
 	font-weight: bold;
 }
@@ -310,9 +340,13 @@
 .sun-editor-editable h3 {
 	display: block;
 	font-size: 1.17em;
+	-webkit-margin-before: 1em;
 	margin-block-start: 1em;
+	-webkit-margin-after: 1em;
 	margin-block-end: 1em;
+	-webkit-margin-start: 0px;
 	margin-inline-start: 0px;
+	-webkit-margin-end: 0px;
 	margin-inline-end: 0px;
 	font-weight: bold;
 }
@@ -321,9 +355,13 @@
 .sun-editor-editable h4 {
 	display: block;
 	font-size: 1em;
+	-webkit-margin-before: 1.33em;
 	margin-block-start: 1.33em;
+	-webkit-margin-after: 1.33em;
 	margin-block-end: 1.33em;
+	-webkit-margin-start: 0px;
 	margin-inline-start: 0px;
+	-webkit-margin-end: 0px;
 	margin-inline-end: 0px;
 	font-weight: bold;
 }
@@ -332,9 +370,13 @@
 .sun-editor-editable h5 {
 	display: block;
 	font-size: 0.83em;
+	-webkit-margin-before: 1.67em;
 	margin-block-start: 1.67em;
+	-webkit-margin-after: 1.67em;
 	margin-block-end: 1.67em;
+	-webkit-margin-start: 0px;
 	margin-inline-start: 0px;
+	-webkit-margin-end: 0px;
 	margin-inline-end: 0px;
 	font-weight: bold;
 }
@@ -343,9 +385,13 @@
 .sun-editor-editable h6 {
 	display: block;
 	font-size: 0.67em;
+	-webkit-margin-before: 2.33em;
 	margin-block-start: 2.33em;
+	-webkit-margin-after: 2.33em;
 	margin-block-end: 2.33em;
+	-webkit-margin-start: 0px;
 	margin-inline-start: 0px;
+	-webkit-margin-end: 0px;
 	margin-inline-end: 0px;
 	font-weight: bold;
 }
@@ -355,6 +401,7 @@
 	display: flex;
 	border-width: 1px 0 0;
 	border-color: var(--se-edit-hr-color);
+	-o-border-image: initial;
 	border-image: initial;
 	height: 20px;
 	margin-top: 20px;
@@ -375,7 +422,6 @@
 
 .sun-editor-editable hr.on {
 	border-color: var(--se-edit-active);
-	-webkit-box-shadow: 0 0 0 0.1rem var(--se-edit-hr-on-back);
 	box-shadow: 0 0 0 0.1rem var(--se-edit-hr-on-back);
 }
 
@@ -464,6 +510,7 @@
 	-moz-user-modify: read-only;
 	-webkit-user-select: all;
 	-moz-user-select: all;
+	-ms-user-select: all;
 	user-select: all;
 }
 .sun-editor-editable figure figcaption {
@@ -471,6 +518,7 @@
 	-moz-user-modify: read-write;
 	-webkit-user-select: text;
 	-moz-user-select: text;
+	-ms-user-select: text;
 	user-select: text;
 }
 
@@ -562,7 +610,11 @@
 .sun-editor-editable .se-inline-component {
 	display: inline-block;
 	width: auto;
+	min-width: -webkit-min-content;
+	min-width: -moz-min-content;
 	min-width: min-content;
+	max-width: -webkit-max-content;
+	max-width: -moz-max-content;
 	max-width: max-content;
 	margin: 0;
 	padding: 0;
@@ -665,7 +717,28 @@
 	border: 2px solid #fff;
 	border-radius: 6px;
 	text-transform: uppercase;
+	-webkit-animation: neonFlicker 1.5s infinite alternate;
 	animation: neonFlicker 1.5s infinite alternate;
+}
+
+@-webkit-keyframes neonFlicker {
+	0%,
+	19%,
+	21%,
+	23%,
+	25%,
+	54%,
+	56%,
+	100% {
+		text-shadow: -0.2rem -0.2rem 1rem #fff, 0.2rem 0.2rem 1rem #fff, 0 0 2px #f40, 0 0 4px #f40, 0 0 6px #f40, 0 0 8px #f40, 0 0 10px #f40;
+		box-shadow: 0 0 0.5px #fff, inset 0 0 0.5px #fff, 0 0 2px #08f, inset 0 0 2px #08f, 0 0 4px #08f, inset 0 0 4px #08f;
+	}
+	20%,
+	24%,
+	55% {
+		text-shadow: none;
+		box-shadow: none;
+	}
 }
 
 @keyframes neonFlicker {
