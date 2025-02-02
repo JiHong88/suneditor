@@ -5,6 +5,29 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 
 const { _w, isMobile } = env;
 
+/**
+ * @constructor
+ * @description Drawing modal plugin.
+ * @param {object} editor - The core editor object (e.g., handling selection, events, etc.)
+ * @param {object} pluginOptions
+ * @param {string=} [pluginOptions.outputFormat="dataurl"] - The output format of the drawing. Options: "dataurl", "svg".
+ * @param {boolean=} [pluginOptions.useFormatType=false] - Whether to enable format type selection (block vs inline).
+ * @param {string=} [pluginOptions.defaultFormatType="block"] - The default format type, either "block" or "inline".
+ * @param {boolean=} [pluginOptions.keepFormatType=false] - Whether to maintain the chosen format type after drawing.
+ * @param {number=} [pluginOptions.lineWidth=5] - The width of the drawing line.
+ * @param {boolean=} [pluginOptions.lineReconnect=false] - Whether to reconnect lines when drawing.
+ * @param {string=} [pluginOptions.lineCap="round"] - The style of the line cap ("butt", "round", or "square").
+ * @param {string=} [pluginOptions.lineColor=""] - The color of the drawing line.
+ * @param {object=} [pluginOptions.formSize] - The size configuration for the drawing modal form.
+ * @param {string=} [pluginOptions.formSize.width="750px"] - The width of the modal form.
+ * @param {string=} [pluginOptions.formSize.height="50vh"] - The height of the modal form.
+ * @param {string=} [pluginOptions.formSize.maxWidth=""] - The maximum width of the modal form.
+ * @param {string=} [pluginOptions.formSize.maxHeight=""] - The maximum height of the modal form.
+ * @param {string=} [pluginOptions.formSize.minWidth="150px"] - The minimum width of the modal form.
+ * @param {string=} [pluginOptions.formSize.minHeight="100px"] - The minimum height of the modal form.
+ * @param {boolean=} [pluginOptions.canResize=true] - Whether the modal form can be resized.
+ * @param {boolean=} [pluginOptions.maintainRatio=true] - Whether to maintain the aspect ratio when resizing.
+ */
 const Drawing = function (editor, pluginOptions) {
 	// plugin basic properties
 	EditorInjector.call(this, editor);
@@ -110,8 +133,9 @@ Drawing.prototype = {
 	},
 
 	/**
-	 * @override modal
-	 * @returns {string}
+	 * @editorMethod Modules.Modal
+	 * @description This function is called when a form within a modal window is "submit".
+	 * @returns {boolean} Success or failure
 	 */
 	modalAction() {
 		if (this.pluginOptions.outputFormat === 'svg') {

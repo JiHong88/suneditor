@@ -4,6 +4,37 @@ import { domUtils, numbers, env, converter } from '../../helper';
 import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
+/**
+ * @constructor
+ * @description Video plugin.
+ * This plugin provides video embedding functionality within the editor.
+ * It also supports embedding from popular video services
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {boolean=} [pluginOptions.canResize=true] - Whether the video element can be resized.
+ * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
+ * @param {string=} [pluginOptions.defaultWidth] - The default width of the video element. If a number is provided, "px" will be appended.
+ * @param {string=} [pluginOptions.defaultHeight] - The default height of the video element. If a number is provided, "px" will be appended.
+ * @param {boolean=} [pluginOptions.percentageOnlySize=false] - Whether to allow only percentage-based sizing.
+ * @param {boolean=} [pluginOptions.createFileInput=false] - Whether to create a file input element for video uploads.
+ * @param {boolean=} [pluginOptions.createUrlInput=true] - Whether to create a URL input element for video embedding.
+ * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for video file uploads.
+ * @param {object=} [pluginOptions.uploadHeaders] - Additional headers to include in the video upload request.
+ * @param {number=} [pluginOptions.uploadSizeLimit] - The total upload size limit for videos in bytes.
+ * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.
+ * @param {boolean=} [pluginOptions.allowMultiple=false] - Whether multiple video uploads are allowed.
+ * @param {string=} [pluginOptions.acceptedFormats="video/*"] - Accepted file formats for video uploads.
+ * @param {number=} [pluginOptions.defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
+ * @param {boolean=} [pluginOptions.showRatioOption=true] - Whether to display the ratio option in the modal.
+ * @param {Array=} [pluginOptions.ratioOptions] - Custom ratio options for video resizing.
+ * @param {object=} [pluginOptions.videoTagAttributes] - Additional attributes to set on the video tag.
+ * @param {object=} [pluginOptions.iframeTagAttributes] - Additional attributes to set on the iframe tag.
+ * @param {string=} [pluginOptions.query_youtube=""] - Additional query parameters for YouTube embedding.
+ * @param {string=} [pluginOptions.query_vimeo=""] - Additional query parameters for Vimeo embedding.
+ * @param {object=} [pluginOptions.embedQuery] - Custom query objects for additional embedding services.
+ * @param {Array.<RegExp|string>=} [pluginOptions.urlPatterns] - Additional URL patterns for video embedding.
+ * @param {Array.<string>=} [pluginOptions.extensions] - Additional file extensions to be recognized for video uploads.
+ */
 const Video = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -218,8 +249,9 @@ Video.prototype = {
 	},
 
 	/**
-	 * @override modal
-	 * @returns {boolean | undefined}
+	 * @editorMethod Modules.Modal
+	 * @description This function is called when a form within a modal window is "submit".
+	 * @returns {boolean} Success or failure
 	 */
 	async modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked').value;
@@ -259,7 +291,7 @@ Video.prototype = {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
-				this.ready(element);
+				this._ready(element);
 				const line = this.format.getLine(element);
 				if (line) this._align = line.style.textAlign || line.style.float;
 
@@ -269,7 +301,8 @@ Video.prototype = {
 	},
 
 	/**
-	 * @override modal
+	 * @editorMethod Modules.Modal
+	 * @description This function is called before the modal window is opened, but before it is closed.
 	 */
 	init() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
@@ -299,14 +332,10 @@ Video.prototype = {
 	 * @param {Element} target Target component element
 	 */
 	select(target) {
-		this.ready(target);
+		this._ready(target);
 	},
 
-	/**
-	 * @override fileManager, figure
-	 * @param {Element} target Target element
-	 */
-	ready(target) {
+	_ready(target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
 
@@ -381,6 +410,11 @@ Video.prototype = {
 		this.history.push(false);
 	},
 
+	/**
+	 * @description Checks if the given URL matches any of the defined URL patterns.
+	 * @param {string} url - The URL to check.
+	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
+	 */
 	checkContentType(url) {
 		url = url?.toLowerCase() || '';
 		if (this.extensions.some((ext) => url.endsWith(ext)) || this.urlPatterns.some((pattern) => pattern.test(url))) {
@@ -390,6 +424,12 @@ Video.prototype = {
 		return false;
 	},
 
+	/**
+	 * @description Finds and processes the URL for video by matching it against known service patterns.
+	 * @param {string} url - The original URL.
+	 * @returns {object|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
+	 * or null if no matching pattern is found.
+	 */
 	findProcessUrl(url) {
 		const query = this.query;
 		for (const key in query) {
@@ -406,6 +446,12 @@ Video.prototype = {
 		return null;
 	},
 
+	/**
+	 * @description Converts a YouTube URL into an embeddable URL.
+	 * If the URL does not start with "http", it prepends "https://". It also replaces "watch?v=" with the embed path.
+	 * @param {string} url - The original YouTube URL.
+	 * @returns {string} The converted YouTube embed URL.
+	 */
 	convertUrlYoutube(url) {
 		if (!/^http/.test(url)) url = 'https://' + url;
 		url = url.replace('watch?v=', '');
@@ -415,6 +461,12 @@ Video.prototype = {
 		return url;
 	},
 
+	/**
+	 * @description Converts a Vimeo URL into an embeddable URL.
+	 * Removes any trailing slash and extracts the video ID from the URL.
+	 * @param {string} url - The original Vimeo URL.
+	 * @returns {string} The converted Vimeo embed URL.
+	 */
 	convertUrlVimeo(url) {
 		if (url.endsWith('/')) {
 			url = url.slice(0, -1);
@@ -423,6 +475,13 @@ Video.prototype = {
 		return url;
 	},
 
+	/**
+	 * @description Adds query parameters to a URL.
+	 * If the URL already contains a query string, the provided query is appended with an "&".
+	 * @param {string} url - The original URL.
+	 * @param {string} query - The query string to append.
+	 * @returns {string} The URL with the appended query parameters.
+	 */
 	addQuery(url, query) {
 		if (query.length > 0) {
 			if (/\?/.test(url)) {
@@ -435,16 +494,18 @@ Video.prototype = {
 		return url;
 	},
 
-	applySize(w, h) {
-		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
-		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
-		if (this._onlyPercentage) {
-			if (!w) w = '100%';
-			else if (/%$/.test(w)) w += '%';
-		}
-		this.figure.setSize(w, h);
-	},
-
+	/**
+	 * @description Creates or updates a video embed component.
+	 * When updating, it replaces the existing element if necessary and applies the new source, size, and alignment.
+	 * When creating, it wraps the provided element in a figure container.
+	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The existing video element (for update) or a newly created one.
+	 * @param {string} src - The source URL for the video.
+	 * @param {string} width - The desired width for the video element.
+	 * @param {string} height - The desired height for the video element.
+	 * @param {string} align - The alignment to apply to the video element (e.g., 'left', 'center', 'right').
+	 * @param {boolean} isUpdate - Indicates whether this is an update to an existing component (true) or a new creation (false).
+	 * @param {object} file - File metadata associated with the video (e.g., name, size).
+	 */
 	create(oFrame, src, width, height, align, isUpdate, file) {
 		let cover = null;
 		let container = null;
@@ -493,7 +554,7 @@ Video.prototype = {
 
 		// set size
 		if (changeSize) {
-			this.applySize(width, height);
+			this._applySize(width, height);
 		}
 
 		// align
@@ -517,6 +578,12 @@ Video.prototype = {
 		this.history.push(false);
 	},
 
+	/**
+	 * @description Creates a new iframe element for video embedding.
+	 * Applies any additional properties provided and sets the necessary attributes for embedding.
+	 * @param {object} [props] - An optional object containing properties to assign to the iframe.
+	 * @returns {HTMLIFrameElement} The newly created iframe element.
+	 */
 	createIframeTag(props) {
 		const iframeTag = domUtils.createElement('IFRAME');
 		if (props) {
@@ -528,6 +595,12 @@ Video.prototype = {
 		return iframeTag;
 	},
 
+	/**
+	 * @description Creates a new video element for video embedding.
+	 * Applies any additional properties provided and sets the necessary attributes.
+	 * @param {object} [props] - An optional object containing properties to assign to the video element.
+	 * @returns {HTMLVideoElement} The newly created video element.
+	 */
 	createVideoTag(props) {
 		const videoTag = domUtils.createElement('VIDEO');
 		if (props) {
@@ -537,6 +610,16 @@ Video.prototype = {
 		}
 		this._setTagAttrs(videoTag);
 		return videoTag;
+	},
+
+	_applySize(w, h) {
+		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
+		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
+		if (this._onlyPercentage) {
+			if (!w) w = '100%';
+			else if (/%$/.test(w)) w += '%';
+		}
+		this.figure.setSize(w, h);
 	},
 
 	_getInfo() {
@@ -549,6 +632,11 @@ Video.prototype = {
 		};
 	},
 
+	/**
+	 * @description Create an "video" component using the provided files.
+	 * @param {Array.<File>} fileList File object list
+	 * @returns {boolean} If return false, the file upload will be canceled
+	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return;
 
@@ -612,6 +700,11 @@ Video.prototype = {
 		if (result === true || result === NO_EVENT) handler(null);
 	},
 
+	/**
+	 * @description Create an "video" component using the provided url.
+	 * @param {Array.<File>} fileList File object list
+	 * @returns {boolean} If return false, the file upload will be canceled
+	 */
 	async submitURL(url) {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
@@ -677,7 +770,7 @@ Video.prototype = {
 		// size
 		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
-		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
+		this._applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 
 		// align
 		const format = this.format.getLine(prevFrame);

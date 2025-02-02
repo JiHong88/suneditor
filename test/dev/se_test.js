@@ -52,7 +52,7 @@ import langs from '../../src/langs';
 import plugins, { audio, exportPDF } from '../../src/plugins';
 
 const bl = [
-	['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
+	['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'formatBlock'],
 	['paragraphStyle', 'blockquote'],
@@ -71,7 +71,7 @@ const bl = [
 	[
 		'%1565',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -89,7 +89,7 @@ const bl = [
 	[
 		'%1455',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -106,7 +106,7 @@ const bl = [
 	[
 		'%1326',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -122,7 +122,7 @@ const bl = [
 	[
 		'%1123',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
 			['fontColor', 'backgroundColor', 'textStyle'],
@@ -137,7 +137,7 @@ const bl = [
 	[
 		'%817',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike'],
 			[':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
@@ -152,7 +152,7 @@ const bl = [
 	[
 		'%673',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['copyFormat', 'removeFormat'],
@@ -166,7 +166,7 @@ const bl = [
 	[
 		'%525',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['copyFormat', 'removeFormat'],
@@ -180,7 +180,7 @@ const bl = [
 	[
 		'%420',
 		[
-			['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
+			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
@@ -191,7 +191,7 @@ const bl = [
 ];
 
 const bb = [
-	['newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
+	['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'formatBlock'],
 	['paragraphStyle', 'blockquote'],
@@ -1151,6 +1151,7 @@ window.editor_root = suneditor.create(
 			// showDefaultSizeLabel:true
 		},
 		mention: {
+			data: [{"key":"rwhilnj","name":"Riley White (Product Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/rwhilnj/info"},{"key":"mwil298","name":"Morgan Wilson (Project Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/mwil298/info"},{"key":"eand3d1","name":"Elliott Anderson (UX Designer)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/eand3d1/info"},{"key":"ztaya65","name":"Zane Taylor (Project Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/ztaya65/info"},{"key":"stho9wt","name":"Sawyer Thomas (Product Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/stho9wt/info"}],
 			apiUrl: 'https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/{ key }?limit={limitSize}',
 			useCachingFieldData: true
 		},

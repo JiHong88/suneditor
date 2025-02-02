@@ -257,7 +257,7 @@ Controller.prototype = {
 				return;
 			}
 		} else {
-			if (!this.offset.setAbsPosition(controller, refer, { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
+			if (refer && !this.offset.setAbsPosition(controller, refer, { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
 				this.hide();
 				return;
 			}

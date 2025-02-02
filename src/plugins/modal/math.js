@@ -4,6 +4,25 @@ import { domUtils, env, converter } from '../../helper';
 
 const { _w } = env;
 
+/**
+ * @constructor
+ * @description Math plugin.
+ * This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
+ * If external library is provided, a warning is issued.
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {object=} [pluginOptions.formSize] - An object specifying the dimensions for the math modal.
+ * @param {string=} [pluginOptions.formSize.width="460px"] - The default width of the math modal.
+ * @param {string=} [pluginOptions.formSize.height="14em"] - The default height of the math modal.
+ * @param {string=} [pluginOptions.formSize.maxWidth] - The maximum width of the math modal.
+ * @param {string=} [pluginOptions.formSize.maxHeight] - The maximum height of the math modal.
+ * @param {string=} [pluginOptions.formSize.minWidth="400px"] - The minimum width of the math modal.
+ * @param {string=} [pluginOptions.formSize.minHeight="40px"] - The minimum height of the math modal.
+ * @param {boolean=} [pluginOptions.canResize=true] - Whether the math modal can be resized.
+ * @param {boolean=} [pluginOptions.autoHeight=false] - Whether to automatically adjust the height of the modal.
+ * @param {Array.<object>=} [pluginOptions.fontSizeList] - A list of font size options for rendering math expressions.
+ * @param {function=} [pluginOptions.onPaste] - A callback function to handle paste events in the math input area.
+ */
 const Math_ = function (editor, pluginOptions) {
 	// external library
 	this.katex = null;
@@ -106,7 +125,8 @@ Math_.prototype = {
 	},
 
 	/**
-	 * @override controller
+	 * @editorMethod Modules.Controller
+	 * @description This function is called before the "controller" before it is closed.
 	 */
 	close() {
 		this._element = null;
@@ -181,8 +201,9 @@ Math_.prototype = {
 	},
 
 	/**
-	 * @override modal
-	 * @returns {boolean | undefined}
+	 * @editorMethod Modules.Modal
+	 * @description This function is called when a form within a modal window is "submit".
+	 * @returns {boolean} Success or failure
 	 */
 	modalAction() {
 		if (this.textArea.value.trim().length === 0 || domUtils.hasClass(this.textArea, 'se-error')) {
@@ -240,7 +261,8 @@ Math_.prototype = {
 	},
 
 	/**
-	 * @override modal
+	 * @editorMethod Modules.Modal
+	 * @description This function is called before the modal window is opened, but before it is closed.
 	 */
 	init() {
 		this.textArea.value = '';

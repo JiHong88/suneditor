@@ -169,6 +169,9 @@ ModalAnchorEditor.prototype = {
 		return oA;
 	},
 
+	/**
+	 * Resets the ModalAnchorEditor to its initial state.
+	 */
 	init() {
 		this.currentTarget = null;
 		this.linkValue = this.preview.textContent = this.urlInput.value = '';

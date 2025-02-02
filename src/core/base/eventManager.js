@@ -15,10 +15,18 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHa
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
+// wysiwyg event
 /**
  * @typedef {object} PluginMouseEventInfo
  * @property {object} frameContext Frame context
  * @property {object} event Event object
+ */
+
+/**
+ * @typedef {object} PluginInputEventInfo
+ * @property {object} frameContext Frame context
+ * @property {object} event Event object
+ * @property {string} data Input data
  */
 
 /**
@@ -27,6 +35,20 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
  * @property {object} event Event object
  * @property {Range} range range object
  * @property {Element} line Current line element
+ */
+
+// toolbar event
+/**
+ * @typedef {object} PluginToolbarInputKeyEventInfo
+ * @property {Element} target Input element
+ * @property {object} event Event object
+ */
+
+/**
+ * @typedef {object} PluginToolbarInputChangeEventInfo
+ * @property {Element} target Input element
+ * @property {object} event Event object
+ * @property {string} value Input value
  */
 
 /**

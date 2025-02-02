@@ -2,6 +2,21 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
+/**
+ * @constructor
+ * @description Link plugin.
+ * This plugin provides link insertion and editing functionality within the editor.
+ * It also supports file uploads if an upload URL is provided.
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {boolean=} [pluginOptions.textToDisplay=true] - Whether to display the link text.
+ * @param {boolean=} [pluginOptions.title=true] - Whether to display the link title.
+ * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for file uploads.
+ * @param {object=} [pluginOptions.uploadHeaders] - Additional headers for file upload requests.
+ * @param {number=} [pluginOptions.uploadSizeLimit] - The total file upload size limit in bytes.
+ * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit in bytes.
+ * @param {string=} [pluginOptions.acceptedFormats] - Accepted file formats for link uploads.
+ */
 const Link = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -85,8 +100,9 @@ Link.prototype = {
 	},
 
 	/**
-	 * @override modal
-	 * @returns {boolean | undefined}
+	 * @editorMethod Modules.Modal
+	 * @description This function is called when a form within a modal window is "submit".
+	 * @returns {boolean} Success or failure
 	 */
 	modalAction() {
 		const oA = this.anchor.create(false);
@@ -111,7 +127,8 @@ Link.prototype = {
 	},
 
 	/**
-	 * @override modal
+	 * @editorMethod Modules.Modal
+	 * @description This function is called before the modal window is opened, but before it is closed.
 	 */
 	init() {
 		this.controller.close();
@@ -155,7 +172,8 @@ Link.prototype = {
 	},
 
 	/**
-	 * @override controller
+	 * @editorMethod Modules.Controller
+	 * @description This function is called before the "controller" before it is closed.
 	 */
 	close() {
 		domUtils.removeClass(this.controller.currentTarget, 'on');

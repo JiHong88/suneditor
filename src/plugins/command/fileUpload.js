@@ -202,8 +202,9 @@ FileUpload.prototype = {
 	},
 
 	/**
-	 * @description Submit file
-	 * @param {FileList} fileList File list
+	 * @description Create an "file" component using the provided files.
+	 * @param {Array.<File>} fileList File object list
+	 * @returns {boolean} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return;

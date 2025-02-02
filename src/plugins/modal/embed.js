@@ -3,6 +3,45 @@ import { Modal, Figure } from '../../modules';
 import { domUtils, numbers, env } from '../../helper';
 const { NO_EVENT, _w } = env;
 
+/**
+ * @constructor
+ * @description Embed modal plugin.
+ * This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
+ * @param {object} editor - The core editor object (e.g., handling selection, events, etc.)
+ * @param {object} pluginOptions
+ * @param {boolean=} [pluginOptions.canResize=true] - Whether the embed element can be resized.
+ * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
+ * @param {string=} pluginOptions.defaultWidth - The default width of the embed element (numeric value or with unit).
+ * @param {string=} pluginOptions.defaultHeight - The default height of the embed element (numeric value or with unit).
+ * @param {boolean=} [pluginOptions.percentageOnlySize=false] - Whether to allow only percentage-based sizing.
+ * @param {string=} pluginOptions.uploadUrl - The URL for file uploads.
+ * @param {object=} pluginOptions.uploadHeaders - Headers to include in file upload requests.
+ * @param {number=} pluginOptions.uploadSizeLimit - The total file upload size limit in bytes.
+ * @param {number=} pluginOptions.uploadSingleSizeLimit - The single file upload size limit in bytes.
+ * @param {object=} pluginOptions.iframeTagAttributes - Additional attributes to set on the iframe tag.
+ * @param {string=} pluginOptions.query_youtube - YouTube query parameter (optional).
+ * @param {string=} pluginOptions.query_vimeo - Vimeo query parameter (optional).
+ * @param {object=} pluginOptions.embedQuery - Custom query objects for additional embedding services.
+ * Example :
+ * {
+ *   facebook: {
+ *     pattern: /(?:https?:\/\/)?(?:www\.)?(?:facebook\.com)\/(.+)/i,
+ *     action: (url) => {
+ *       return `https://www.facebook.com/plugins/post.php?href=${_w.encodeURIComponent(url)}&show_text=true&width=500`;
+ *     },
+ *     tag: 'iframe'
+ *   },
+ *   twitter: {
+ *     pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(status|embed)\/(.+)/i,
+ *     action: (url) => {
+ *       return `https://platform.twitter.com/embed/Tweet.html?url=${_w.encodeURIComponent(url)}`;
+ *     },
+ *     tag: 'iframe'
+ *   },
+ *   // Additional services...
+ * }
+ * @param {Array.<string>} pluginOptions.controls - Figure control configurations.
+ */
 const Embed = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -66,7 +105,7 @@ const Embed = function (editor, pluginOptions) {
 			tag: 'iframe'
 		},
 		twitter: {
-			pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(.+)\/status\/(.+)/i,
+			pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(status|embed)\/(.+)/i,
 			action: (url) => {
 				return `https://platform.twitter.com/embed/Tweet.html?url=${_w.encodeURIComponent(url)}`;
 			},
@@ -183,8 +222,9 @@ Embed.prototype = {
 	},
 
 	/**
-	 * @override modal
-	 * @returns {boolean | undefined}
+	 * @editorMethod Modules.Modal
+	 * @description This function is called when a form within a modal window is "submit".
+	 * @returns {boolean} Success or failure
 	 */
 	async modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked').value;
@@ -220,7 +260,7 @@ Embed.prototype = {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
-				this.ready(element);
+				this._ready(element);
 				const line = this.format.getLine(element);
 				if (line) this._align = line.style.textAlign || line.style.float;
 
@@ -230,7 +270,8 @@ Embed.prototype = {
 	},
 
 	/**
-	 * @override modal
+	 * @editorMethod Modules.Modal
+	 * @description This function is called before the modal window is opened, but before it is closed.
 	 */
 	init() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
@@ -254,14 +295,10 @@ Embed.prototype = {
 	 * @param {Element} target Target component element
 	 */
 	select(target) {
-		this.ready(target);
+		this._ready(target);
 	},
 
-	/**
-	 * @override fileManager, figure
-	 * @param {Element} target Target element
-	 */
-	ready(target) {
+	_ready(target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
 
@@ -337,6 +374,11 @@ Embed.prototype = {
 		this.history.push(false);
 	},
 
+	/**
+	 * @description Checks if the given URL matches any of the defined URL patterns.
+	 * @param {string} url - The URL to check.
+	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
+	 */
 	checkContentType(url) {
 		url = url?.toLowerCase() || '';
 		if (this.urlPatterns.some((pattern) => pattern.test(url))) {
@@ -346,6 +388,12 @@ Embed.prototype = {
 		return false;
 	},
 
+	/**
+	 * @description Finds and processes the URL for embedding by matching it against known service patterns.
+	 * @param {string} url - The original URL.
+	 * @returns {object|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
+	 * or null if no matching pattern is found.
+	 */
 	findProcessUrl(url) {
 		const query = this.query;
 		for (const key in query) {
@@ -362,17 +410,59 @@ Embed.prototype = {
 		return null;
 	},
 
-	applySize(w, h) {
-		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
-		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
-		if (this._onlyPercentage) {
-			if (!w) w = '100%';
-			else if (/%$/.test(w)) w += '%';
+	/**
+	 * @description Processes the provided source (URL or embed code) and submits it for embedding.
+	 * It parses the input, triggers any necessary events, and creates or updates the embed component.
+	 * @param {string} [src] - The embed source. If not provided, uses the internally stored link value.
+	 * @returns {Promise<boolean>} A promise that resolves to true on success or false on failure.
+	 */
+	async submitSRC(src) {
+		if (!src) src = this._linkValue;
+		if (!src) return false;
+
+		let embedInfo = null;
+		if (/^<iframe\s|^<blockquote\s/i.test(src)) {
+			const embedDOM = new DOMParser().parseFromString(src, 'text/html').body.children;
+			if (embedDOM.length === 0) return false;
+			embedInfo = { children: embedDOM, ...this._getInfo(), process: null };
+		} else {
+			const processUrl = this.findProcessUrl(src);
+			if (!processUrl) return false;
+			src = processUrl.url;
+			embedInfo = { url: src, ...this._getInfo(), process: processUrl };
 		}
-		this.figure.setSize(w, h);
+
+		const handler = function (infos, newInfos) {
+			infos = newInfos || infos;
+			this._create(infos.process, infos.process ? infos.url : infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
+		}.bind(this, embedInfo);
+
+		const result = await this.triggerEvent('onEmbedInputBefore', {
+			...embedInfo,
+			handler
+		});
+
+		if (result === undefined) return true;
+		if (result === false) return false;
+		if (result !== null && typeof result === 'object') handler(result);
+
+		if (result === true || result === NO_EVENT) handler(null);
+
+		return true;
 	},
 
-	create(process, src, width, height, align, isUpdate) {
+	_createIframeTag() {
+		const iframeTag = domUtils.createElement('IFRAME');
+		this._setIframeAttrs(iframeTag);
+		return iframeTag;
+	},
+
+	_createEmbedTag() {
+		const quoteTag = domUtils.createElement('BLOCKQUOTE');
+		return quoteTag;
+	},
+
+	_create(process, src, width, height, align, isUpdate) {
 		let oFrame = null;
 		let cover = null;
 		let container = null;
@@ -384,12 +474,12 @@ Embed.prototype = {
 			if (oFrame.src !== src) {
 				const processUrl = this.findProcessUrl(src);
 				if (/^iframe$/i.test(processUrl?.tag) && !/^iframe$/i.test(oFrame.nodeName)) {
-					const newTag = this.createIframeTag();
+					const newTag = this._createIframeTag();
 					newTag.src = src;
 					oFrame.parentNode.replaceChild(newTag, oFrame);
 					oFrame = newTag;
 				} else if (/^blockquote$/i.test(processUrl?.tag) && !/^blockquote$/i.test(oFrame.nodeName)) {
-					const newTag = this.createEmbedTag();
+					const newTag = this._createEmbedTag();
 					newTag.src = src;
 					oFrame.parentNode.replaceChild(newTag, oFrame);
 					oFrame = newTag;
@@ -402,7 +492,7 @@ Embed.prototype = {
 		} else {
 			/** create */
 			if (process) {
-				oFrame = this.createIframeTag();
+				oFrame = this._createIframeTag();
 				oFrame.src = src;
 				const figure = Figure.CreateContainer(oFrame, 'se-embed-container');
 				cover = figure.cover;
@@ -438,7 +528,7 @@ Embed.prototype = {
 
 		// set size
 		if (changeSize) {
-			this.applySize(width, height);
+			this._applySize(width, height);
 		}
 
 		// align
@@ -491,59 +581,6 @@ Embed.prototype = {
 		if (!scriptTag) this.history.push(false);
 	},
 
-	createIframeTag() {
-		const iframeTag = domUtils.createElement('IFRAME');
-		this._setIframeAttrs(iframeTag);
-		return iframeTag;
-	},
-
-	createEmbedTag() {},
-
-	_getInfo() {
-		return {
-			inputWidth: this.inputX.value,
-			inputHeight: this.inputY.value,
-			align: this._align,
-			isUpdate: this.modal.isUpdate,
-			element: this._element
-		};
-	},
-
-	async submitSRC(src) {
-		if (!src) src = this._linkValue;
-		if (!src) return false;
-
-		let embedInfo = null;
-		if (/^<iframe\s|^<blockquote\s/i.test(src)) {
-			const embedDOM = new DOMParser().parseFromString(src, 'text/html').body.children;
-			if (embedDOM.length === 0) return false;
-			embedInfo = { children: embedDOM, ...this._getInfo(), process: null };
-		} else {
-			const processUrl = this.findProcessUrl(src);
-			if (!processUrl) return false;
-			src = processUrl.url;
-			embedInfo = { url: src, ...this._getInfo(), process: processUrl };
-		}
-
-		const handler = function (infos, newInfos) {
-			infos = newInfos || infos;
-			this.create(infos.process, infos.process ? infos.url : infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
-		}.bind(this, embedInfo);
-
-		const result = await this.triggerEvent('onEmbedInputBefore', {
-			...embedInfo,
-			handler
-		});
-
-		if (result === undefined) return true;
-		if (result === false) return false;
-		if (result !== null && typeof result === 'object') handler(result);
-
-		if (result === true || result === NO_EVENT) handler(null);
-
-		return true;
-	},
-
 	_update(oFrame) {
 		if (!oFrame) return;
 
@@ -559,7 +596,7 @@ Embed.prototype = {
 		// size
 		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
-		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
+		this._applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 
 		// align
 		const format = this.format.getLine(prevFrame);
@@ -584,6 +621,26 @@ Embed.prototype = {
 		}
 
 		return oFrame;
+	},
+
+	_applySize(w, h) {
+		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
+		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
+		if (this._onlyPercentage) {
+			if (!w) w = '100%';
+			else if (/%$/.test(w)) w += '%';
+		}
+		this.figure.setSize(w, h);
+	},
+
+	_getInfo() {
+		return {
+			inputWidth: this.inputX.value,
+			inputHeight: this.inputY.value,
+			align: this._align,
+			isUpdate: this.modal.isUpdate,
+			element: this._element
+		};
 	},
 
 	_setIframeAttrs(element) {

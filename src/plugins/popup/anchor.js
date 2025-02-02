@@ -4,6 +4,12 @@ import { domUtils, env } from '../../helper';
 
 const { _w } = env;
 
+/**
+ * @constructor
+ * @description Anchor plugin
+ * Allows you to create, edit, and delete elements that act as anchors (bookmarks) within a document.
+ * @param {object} editor editor core object
+ */
 const Anchor = function (editor) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
@@ -35,7 +41,8 @@ Anchor.component = function (node) {
 Anchor.className = '';
 Anchor.prototype = {
 	/**
-	 * @override popup
+	 * @editorMethod Editor.Plugin<popup>
+	 * @description Displays a popup and gives focus to the input field.
 	 */
 	show() {
 		this.controller.open((this._range = this.selection.getRange()));
@@ -61,7 +68,7 @@ Anchor.prototype = {
 	 * @param {Element} element Target element
 	 */
 	deselect() {
-		this.init();
+		this._init();
 	},
 
 	/**
@@ -72,10 +79,11 @@ Anchor.prototype = {
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
 		if (!command) return;
+		const currentElement = this._element;
 
 		switch (command) {
 			case 'submit': {
-				if (!this._element) {
+				if (!currentElement) {
 					const id = this.inputEl.value.trim();
 					if (!id) {
 						this.inputEl.focus();
@@ -98,41 +106,53 @@ Anchor.prototype = {
 					} else {
 						this.component.select(a, Anchor.key, false);
 					}
-					this.init();
+					this._init();
 				} else {
-					this._element.id = this.inputEl.value;
-					this.select(this._element);
+					this.controller.close();
+					currentElement.id = this.inputEl.value;
+					this.select(currentElement);
 				}
+
 				break;
 			}
 			case 'cancel': {
-				this.controller.close(!this._element);
+				this.controller.close(!currentElement);
 				if (this._range) {
 					this.selection.setRange(this._range);
 				}
+
+				this._init();
+				if (currentElement) {
+					this.select(currentElement);
+				}
+
 				break;
 			}
 			case 'edit': {
 				this.inputEl.value = this.displayId.textContent;
-				this.controller.open(this._element);
+				this.controllerSelect.hide();
+				this.controller.open(currentElement);
+
 				break;
 			}
 			case 'delete': {
-				const r = this.selection.getNearRange(this._element);
+				const r = this.selection.getNearRange(currentElement);
 
-				domUtils.removeItem(this._element);
+				domUtils.removeItem(currentElement);
 				this.controllerSelect.close(true);
 
 				if (r) {
 					this.selection.setRange(r.container, r.offset, r.container, r.offset);
 				}
 
+				this._init();
+
 				break;
 			}
 		}
 	},
 
-	init() {
+	_init() {
 		this._element = null;
 		this._range = null;
 		this.inputEl.value = '';

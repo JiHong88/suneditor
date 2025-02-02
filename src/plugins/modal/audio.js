@@ -4,6 +4,23 @@ import { domUtils, numbers, env } from '../../helper';
 import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
+/**
+ * @constructor
+ * @description Audio modal plugin.
+ * @param {object} editor - The core editor object (e.g., handling selection, events, etc.)
+ * @param {object} pluginOptions
+ * @param {string=} pluginOptions.defaultWidth - The default width of the audio tag (e.g., "300px").
+ * @param {string=} pluginOptions.defaultHeight - The default height of the audio tag (e.g., "150px").
+ * @param {boolean=} pluginOptions.createFileInput - Whether to create a file input element.
+ * @param {boolean=} pluginOptions.createUrlInput - Whether to create a URL input element (default is true if file input is not created).
+ * @param {string=} pluginOptions.uploadUrl - The URL to which files will be uploaded.
+ * @param {object=} pluginOptions.uploadHeaders - Headers to include in the file upload request.
+ * @param {number=} pluginOptions.uploadSizeLimit - The total upload size limit in bytes.
+ * @param {number=} pluginOptions.uploadSingleSizeLimit - The single file size limit in bytes.
+ * @param {boolean=} pluginOptions.allowMultiple - Whether to allow multiple file uploads.
+ * @param {string=} [pluginOptions.acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
+ * @param {object=} pluginOptions.audioTagAttributes - Additional attributes to set on the audio tag.
+ */
 const Audio_ = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -114,8 +131,9 @@ Audio_.prototype = {
 	},
 
 	/**
-	 * @override modal
-	 * @returns {boolean | undefined}
+	 * @editorMethod Modules.Modal
+	 * @description This function is called when a form within a modal window is "submit".
+	 * @returns {boolean} Success or failure
 	 */
 	modalAction() {
 		if (this.audioInputFile && this.audioInputFile?.files.length > 0) {
@@ -127,7 +145,8 @@ Audio_.prototype = {
 	},
 
 	/**
-	 * @override modal
+	 * @editorMethod Modules.Modal
+	 * @description This function is called before the modal window is opened, but before it is closed.
 	 */
 	init() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
@@ -155,8 +174,7 @@ Audio_.prototype = {
 
 	/**
 	 * @editorMethod Editor.core
-	 * @description
-	 * This method is used to validate and preserve the format of the component within the editor.
+	 * @description This method is used to validate and preserve the format of the component within the editor.
 	 * It ensures that the structure and attributes of the element are maintained and secure.
 	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * If the element isn't properly contained, a new container is created to retain the format.
@@ -186,13 +204,10 @@ Audio_.prototype = {
 	 */
 	select(target) {
 		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
-		this.ready(target);
+		this._ready(target);
 	},
 
-	/**
-	 * @override fileManager
-	 */
-	ready(target) {
+	_ready(target) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
 		this._element = target;
 		this.controller.open(target, null, { isWWTarget: false, addOffset: null });
@@ -244,6 +259,11 @@ Audio_.prototype = {
 		}
 	},
 
+	/**
+	 * @description Create an "audio" component using the provided files.
+	 * @param {Array.<File>} fileList File object list
+	 * @returns {boolean} If return false, the file upload will be canceled
+	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return false;
 
@@ -308,6 +328,11 @@ Audio_.prototype = {
 		return true;
 	},
 
+	/**
+	 * @description Create an "audio" component using the provided url.
+	 * @param {Array.<File>} fileList File object list
+	 * @returns {boolean} If return false, the file upload will be canceled
+	 */
 	async submitURL(url) {
 		if (url.length === 0) return false;
 

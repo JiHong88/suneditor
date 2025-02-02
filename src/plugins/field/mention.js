@@ -4,6 +4,25 @@ import { domUtils, converter } from '../../helper';
 
 const { debounce } = converter;
 
+/**
+ * @typedef {import('../../core/base/eventManager').PluginInputEventInfo} PluginInputEventInfo
+ */
+
+/**
+ * @constructor
+ * @description Mention Plugin
+ * @param {object} editor edtor core object
+ * @param {object} pluginOptions
+ * @param {string=} [pluginOptions.triggerText="@"] The character that triggers the mention list. Default is '@'.
+ * @param {number=} [pluginOptions.limitSize=5] The number of items to display in the mention list. Default is 5.
+ * @param {number=} [pluginOptions.searchStartLength=0] The number of characters to start searching for the mention list. Default is 0.
+ * @param {number=} [pluginOptions.delayTime=200] The time to wait before displaying the mention list. Default is 200ms.
+ * @param {?Array.<{key: string, name: string, url: string}>=} pluginOptions.data Use data without using API.
+ * @param {?string=} pluginOptions.apiUrl The URL to call the mention list. Default is ''.
+ * @param {?object=} pluginOptions.apiHeaders The headers to send with the API call. Default is {}.
+ * @param {boolean=} [pluginOptions.useCachingData=true] Whether to cache the mention list data. Default is true.
+ * @param {boolean=} [pluginOptions.useCachingFieldData=true] Whether to cache the mention list data in the field. Default is true.
+ */
 const Mention = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
@@ -15,6 +34,7 @@ const Mention = function (editor, pluginOptions) {
 	this.limitSize = pluginOptions.limitSize || 5;
 	this.searchStartLength = pluginOptions.searchStartLength || 0;
 	this.delayTime = typeof pluginOptions.delayTime === 'number' ? pluginOptions.delayTime : 200;
+	this.directData = pluginOptions.data;
 	this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace(/\{limitSize\}/i, this.limitSize) || '';
 	this._delay = 0;
 	this._lastAtPos = 0;
@@ -51,10 +71,14 @@ Mention.type = 'field';
 Mention.className = '';
 Mention.prototype = {
 	/**
-	 * @override core
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "input".
+	 * @param {PluginInputEventInfo} params
 	 */
 	async onInput() {
-		this.apiManager.cancel();
+		if (!this.directData) {
+			this.apiManager.cancel();
+		}
 
 		const sel = this.selection.get();
 		if (!sel.rangeCount) {
@@ -101,8 +125,14 @@ Mention.prototype = {
 		}
 
 		if (!response) {
-			const xmlHttp = await this.apiManager.asyncCall({ method: 'GET', url: this._createUrl(value) });
-			response = JSON.parse(xmlHttp.responseText);
+			if (this.directData) {
+				const limit = this.limitSize;
+				this.directData.filter((item) => item.key.toLowerCase().startsWith(value.toLowerCase())).slice(0, limit);
+				response = this.directData;
+			} else {
+				const xmlHttp = await this.apiManager.asyncCall({ method: 'GET', url: this._createUrl(value) });
+				response = JSON.parse(xmlHttp.responseText);
+			}
 		}
 
 		if (this.cachingFieldData) {

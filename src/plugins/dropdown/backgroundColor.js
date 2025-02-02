@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 
 /**
  * @constructor
- * @description Background color plugin
+ * @description Text background color plugin
  * @param {object} editor editor core object
  * @param {object} pluginOptions
  * @param {Array.<string|{value: string, name: string}>} pluginOptions.items - Color list

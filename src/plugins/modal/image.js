@@ -4,6 +4,30 @@ import { domUtils, numbers, env } from '../../helper';
 import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
+/**
+ * @constructor
+ * @description Image plugin.
+ * This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
+ * @param {object} editor editor core object
+ * @param {object} pluginOptions
+ * @param {boolean=} [pluginOptions.canResize=true] - Whether the image element can be resized.
+ * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
+ * @param {string=} [pluginOptions.defaultWidth="auto"] - The default width of the image. If a number is provided, "px" will be appended.
+ * @param {string=} [pluginOptions.defaultHeight="auto"] - The default height of the image. If a number is provided, "px" will be appended.
+ * @param {boolean=} [pluginOptions.percentageOnlySize=false] - Whether to allow only percentage-based sizing.
+ * @param {boolean=} [pluginOptions.createFileInput=true] - Whether to create a file input element for image uploads.
+ * @param {boolean=} [pluginOptions.createUrlInput=true] - Whether to create a URL input element for image insertion.
+ * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for image file uploads.
+ * @param {object=} [pluginOptions.uploadHeaders] - Additional headers to include in the file upload request.
+ * @param {number=} [pluginOptions.uploadSizeLimit] - The total upload size limit in bytes.
+ * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit in bytes.
+ * @param {boolean=} [pluginOptions.allowMultiple=false] - Whether multiple image uploads are allowed.
+ * @param {string=} [pluginOptions.acceptedFormats="image/*"] - The accepted file formats for image uploads.
+ * @param {boolean=} [pluginOptions.useFormatType=true] - Whether to enable format type selection (block or inline).
+ * @param {string=} [pluginOptions.defaultFormatType="block"] - The default image format type ("block" or "inline").
+ * @param {boolean=} [pluginOptions.keepFormatType=false] - Whether to retain the chosen format type after image insertion.
+ * @param {boolean=} [pluginOptions.linkEnableFileUpload] - Whether to enable file uploads for linked images.
+ */
 const Image_ = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -194,8 +218,9 @@ Image_.prototype = {
 	},
 
 	/**
-	 * @override modal
-	 * @returns {boolean | undefined}
+	 * @editorMethod Modules.Modal
+	 * @description This function is called when a form within a modal window is "submit".
+	 * @returns {boolean} Success or failure
 	 */
 	async modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
@@ -233,14 +258,15 @@ Image_.prototype = {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
-				this.ready(element);
+				this._ready(element);
 				this._fileCheck(this._origin_w, this._origin_h);
 			}
 		};
 	},
 
 	/**
-	 * @override modal
+	 * @editorMethod Modules.Modal
+	 * @description This function is called before the modal window is opened, but before it is closed.
 	 */
 	init() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
@@ -280,13 +306,10 @@ Image_.prototype = {
 	 * @param {Element} target Target component element
 	 */
 	select(target) {
-		this.ready(target);
+		this._ready(target);
 	},
 
-	/**
-	 * @override fileManager, figure
-	 */
-	ready(target) {
+	_ready(target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
 		this.anchor.set(domUtils.isAnchor(target.parentNode) ? target.parentNode : null);
@@ -403,6 +426,11 @@ Image_.prototype = {
 		}
 	},
 
+	/**
+	 * @description Create an "image" component using the provided files.
+	 * @param {Array.<File>} fileList File object list
+	 * @returns {boolean} If return false, the file upload will be canceled
+	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return false;
 
@@ -466,6 +494,11 @@ Image_.prototype = {
 		if (result === true || result === NO_EVENT) handler(null);
 	},
 
+	/**
+	 * @description Create an "image" component using the provided url.
+	 * @param {Array.<File>} fileList File object list
+	 * @returns {boolean} If return false, the file upload will be canceled
+	 */
 	async submitURL(url) {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
@@ -554,7 +587,7 @@ Image_.prototype = {
 
 		// size
 		if (this._resizing && changeSize) {
-			this.applySize(width, height);
+			this._applySize(width, height);
 		}
 
 		if (isNewAnchor) {
@@ -662,7 +695,7 @@ Image_.prototype = {
 
 		// size
 		if (this._resizing && changeSize) {
-			this.applySize(width, height);
+			this._applySize(width, height);
 		}
 
 		if (isNewAnchor) {
@@ -739,7 +772,7 @@ Image_.prototype = {
 		}
 	},
 
-	applySize(w, h) {
+	_applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
 		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
@@ -749,6 +782,17 @@ Image_.prototype = {
 		this.figure.setSize(w, h, null);
 	},
 
+	/**
+	 * @description Creates a new image component, wraps it in a figure container with an optional anchor,
+	 * applies size and alignment settings, and inserts it into the editor.
+	 * @param {string} src - The URL of the image to be inserted.
+	 * @param {Element|null} anchor - An optional anchor element to wrap the image. If provided, a clone is used.
+	 * @param {string} width - The width value to be applied to the image.
+	 * @param {string} height - The height value to be applied to the image.
+	 * @param {string} align - The alignment setting for the image (e.g., 'left', 'center', 'right').
+	 * @param {object} file - File metadata associated with the image (e.g., name, size).
+	 * @param {string} alt - The alternative text for the image.
+	 */
 	create(src, anchor, width, height, align, file, alt) {
 		const oImg = domUtils.createElement('IMG');
 		oImg.src = src;
@@ -770,7 +814,7 @@ Image_.prototype = {
 		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 
 		// set size
-		this.applySize(width, height);
+		this._applySize(width, height);
 
 		// align
 		this.figure.setAlign(oImg, align);
@@ -781,6 +825,16 @@ Image_.prototype = {
 		this.component.insert(container, { skipCharCount: false, skipSelection: !this.options.get('componentAutoSelect'), skipHistory: false });
 	},
 
+	/**
+	 * @description Creates a new inline image component, wraps it in an inline figure container with an optional anchor,
+	 * applies size settings, and inserts it into the editor.
+	 * @param {string} src - The URL of the image to be inserted.
+	 * @param {Element|null} anchor - An optional anchor element to wrap the image. If provided, a clone is used.
+	 * @param {string} width - The width value to be applied to the image.
+	 * @param {string} height - The height value to be applied to the image.
+	 * @param {object} file - File metadata associated with the image (e.g., name, size).
+	 * @param {string} alt - The alternative text for the image.
+	 */
 	createInline(src, anchor, width, height, file, alt) {
 		const oImg = domUtils.createElement('IMG');
 		oImg.src = src;
@@ -795,7 +849,7 @@ Image_.prototype = {
 		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 
 		// set size
-		this.applySize(width, height);
+		this._applySize(width, height);
 
 		this.fileManager.setFileData(oImg, file);
 
@@ -1004,7 +1058,7 @@ function _setUrlInput(target) {
 
 function OnloadImg(oImg, _svgDefaultSize, container) {
 	// svg exception handling
-	if (oImg.offsetWidth === 0) this.applySize(_svgDefaultSize, '');
+	if (oImg.offsetWidth === 0) this._applySize(_svgDefaultSize, '');
 	if (this.options.get('componentAutoSelect')) {
 		this.component.select(oImg, Image_.key, false);
 	} else {
