@@ -151,6 +151,7 @@ NodeTransform.prototype = {
 				child = children[i];
 				next = children[i + 1];
 				if (!child) break;
+				if (domUtils.isBreak(child) || domUtils.isMedia(child) || domUtils.isInputElement(child)) continue;
 				if ((onlyText && inst.format._isIgnoreNodeChange(child)) || (!onlyText && (domUtils.isTableElements(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))) {
 					if (domUtils.isTableElements(child) || domUtils.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
@@ -190,6 +191,7 @@ NodeTransform.prototype = {
 					current.parentNode.insertBefore(child, current);
 					domUtils.removeItem(current);
 				}
+
 				if (!next) {
 					if (child.nodeType === 1) recursionFunc(child, depth + 1, i);
 					break;
