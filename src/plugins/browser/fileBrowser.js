@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
 /**
- * @constructor
+ * @class
  * @description File browser plugin. Can contain any media type.
  * @param {object} editor - editor core object
  * @param {object} pluginOptions

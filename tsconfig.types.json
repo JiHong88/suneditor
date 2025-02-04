@@ -4,19 +4,22 @@
 		"target": "ES2020",
 		"sourceMap": true,
 		"allowJs": true,
+		"checkJs": false,
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
-		"strict": true,
+		"strict": false,
 		"forceConsistentCasingInFileNames": true,
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-		"noEmit": true,
+		"noEmit": false,
 		"jsx": "preserve",
 		"noImplicitAny": false,
 		"declaration": true,
+		"emitDeclarationOnly": true,
 		"declarationDir": "./types"
 	},
-	"exclude": ["node_modules", "src", "test", "dist", "webpack"]
+	"include": ["src/**/*.js"],
+	"exclude": ["node_modules", "test", "dist", "webpack"]
 }

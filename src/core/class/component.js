@@ -11,7 +11,7 @@ const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DIR_UP_KEYCODE = /^3[7-8]$/;
 
 /**
- * @constructor
+ * @class
  * @description Class for managing components such as images and tables that are not in line format
  * @param {object} editor - editor core object
  */

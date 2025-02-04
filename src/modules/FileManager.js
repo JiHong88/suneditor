@@ -10,7 +10,7 @@ import ApiManager from './ApiManager';
  */
 
 /**
- * @constructor
+ * @class
  * @description This module manages the file information of the editor.
  * @param {*} inst The instance object that called the constructor.
  * @param {FileManagerParams} params FileManager options

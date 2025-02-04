@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description PageNavigator Plugin
  * This plugin provides functionality for navigating between pages within the editor's document.
  * It features an input field for entering the desired page number and a display element showing

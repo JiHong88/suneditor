@@ -13,7 +13,7 @@ const A4_HEIGHT_MM = 297;
 const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS);
 
 /**
- * @constructor
+ * @class
  * @description DocumentType, page, header management class
  * @param {object} editor - editor core object
  * @param {Map} fc - frame context object

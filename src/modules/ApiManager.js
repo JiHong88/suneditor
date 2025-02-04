@@ -12,7 +12,7 @@ import { env } from '../helper';
  */
 
 /**
- * @constructor
+ * @class
  * @description API Manager
  * @param {object} inst The instance object that called the constructor.
  * @param {ApiManagerParams=} params API options

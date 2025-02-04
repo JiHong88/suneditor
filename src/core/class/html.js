@@ -9,7 +9,7 @@ const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
 
 /**
- * @constructor
+ * @class
  * @description All HTML related classes involved in the editing area
  * @param {object} editor - editor core object
  */

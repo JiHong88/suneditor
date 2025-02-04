@@ -17,7 +17,7 @@ import ApiManager from './ApiManager';
  */
 
 /**
- * @constructor
+ * @class
  * @param {*} inst The instance object that called the constructor.
  * @param {BrowserParams} params Browser options
  */

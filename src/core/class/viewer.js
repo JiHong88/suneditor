@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env, converter, numbers } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description Viewer(codeView, fullScreen, showBlocks) class
  * @param {object} editor - editor core object
  */

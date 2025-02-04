@@ -19,7 +19,7 @@
  */
 
 /**
- * @constructor
+ * @class
  * @description Shortcuts class
  * @param {object} editor - editor core object
  */

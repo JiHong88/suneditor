@@ -18,7 +18,7 @@ let __resizing_sw = 0;
  */
 
 /**
- * @constructor
+ * @class
  * @description Controller module class
  * @param {*} inst The instance object that called the constructor.
  * @param {Array.<Function|string>} controls Controller button array

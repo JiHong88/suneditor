@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description A plugin to style lines using classes.
  * @param {object} editor editor core object
  * @param {object} pluginOptions

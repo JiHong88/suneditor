@@ -4,7 +4,7 @@ import { domUtils, numbers, env } from '../../helper';
 const { NO_EVENT, _w } = env;
 
 /**
- * @constructor
+ * @class
  * @description Embed modal plugin.
  * This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
  * @param {object} editor - The core editor object (e.g., handling selection, events, etc.)

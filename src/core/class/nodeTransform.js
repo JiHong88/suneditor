@@ -10,7 +10,7 @@ const NodeTransform = function (editor) {
 };
 
 /**
- * @constructor
+ * @class
  * @description Node utility class. split, merge, etc.
  * @param {object} editor - editor core object
  */

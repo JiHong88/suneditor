@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description Dropdown and container menu management class
  * @param {object} editor - editor core object
  */

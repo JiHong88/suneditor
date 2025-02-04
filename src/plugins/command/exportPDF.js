@@ -5,7 +5,7 @@ import { ApiManager } from '../../modules';
 const { _d } = env;
 
 /**
- * @constructor
+ * @class
  * @description Export PDF plugin
  * @param {object} editor - editor core object
  * @param {object} pluginOptions - plugin options

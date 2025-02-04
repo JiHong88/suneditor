@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description Template Plugin, Apply a template to the selection.
  * @param {object} editor editor core object
  * @param {object} pluginOptions

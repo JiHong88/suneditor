@@ -23,7 +23,7 @@ const { NO_EVENT } = env;
  */
 
 /**
- * @constructor
+ * @class
  * @description Modal form Anchor tag editor
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} modalForm The modal form element

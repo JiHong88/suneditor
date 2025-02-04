@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
 /**
- * @constructor
+ * @class
  * @description File gallery plugin
  * @param {object} editor - editor core object
  * @param {object} pluginOptions

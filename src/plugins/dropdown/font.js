@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description Text font plugin
  * @param {object} editor editor core object
  * @param {object} pluginOptions

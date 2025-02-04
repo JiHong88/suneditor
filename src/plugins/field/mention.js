@@ -9,7 +9,7 @@ const { debounce } = converter;
  */
 
 /**
- * @constructor
+ * @class
  * @description Mention Plugin
  * @param {object} editor edtor core object
  * @param {object} pluginOptions

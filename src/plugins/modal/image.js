@@ -5,7 +5,7 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
- * @constructor
+ * @class
  * @description Image plugin.
  * This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
  * @param {object} editor editor core object

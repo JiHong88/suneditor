@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description Layout Plugin, Apply layout to the entire editor.
  * @param {object} editor editor core object
  * @param {object} pluginOptions

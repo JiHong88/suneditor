@@ -7,7 +7,7 @@ import { _w, isEdge } from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 /**
- * @constructor
+ * @class
  * @description character count, character limit, etc. management class
  * @param {object} editor - editor core object
  */

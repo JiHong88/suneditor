@@ -3,7 +3,7 @@ import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description Link plugin.
  * This plugin provides link insertion and editing functionality within the editor.
  * It also supports file uploads if an upload URL is provided.

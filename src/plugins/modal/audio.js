@@ -5,7 +5,7 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 /**
- * @constructor
+ * @class
  * @description Audio modal plugin.
  * @param {object} editor - The core editor object (e.g., handling selection, events, etc.)
  * @param {object} pluginOptions

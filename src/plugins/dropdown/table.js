@@ -70,7 +70,7 @@ const DEFAULT_COLOR_LIST = [
  */
 
 /**
- * @constructor
+ * @class
  * @description Table Plugin
  * @param {object} editor editor core object
  * @param {object} pluginOptions

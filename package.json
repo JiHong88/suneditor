@@ -21,6 +21,7 @@
 		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
 		"lint:fix-ts": "npx eslint \"typings/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"typings/**/*.ts\" --fix",
+		"tsbuild": "npx tsc --project tsconfig.types.json",
 		"test": "karma start",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},

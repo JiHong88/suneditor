@@ -8,7 +8,7 @@ const DEFAULT_TYPE = 'disc';
  */
 
 /**
- * @constructor
+ * @class
  * @description List bulleted plugin, Several types of lists are provided.
  * @param {object} editor - editor core object
  */

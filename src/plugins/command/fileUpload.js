@@ -6,7 +6,7 @@ import { FileManager, Figure, Controller } from '../../modules';
 const { NO_EVENT } = env;
 
 /**
- * @constructor
+ * @class
  * @description File upload plugin
  * @param {object} editor - editor core object
  * @param {object} pluginOptions - plugin options

@@ -5,7 +5,7 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
- * @constructor
+ * @class
  * @description Video plugin.
  * This plugin provides video embedding functionality within the editor.
  * It also supports embedding from popular video services

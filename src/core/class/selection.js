@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, env } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description Selection, Range related class
  * @param {object} editor - editor core object
  */

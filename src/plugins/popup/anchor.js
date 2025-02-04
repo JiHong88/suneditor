@@ -5,7 +5,7 @@ import { domUtils, env } from '../../helper';
 const { _w } = env;
 
 /**
- * @constructor
+ * @class
  * @description Anchor plugin
  * Allows you to create, edit, and delete elements that act as anchors (bookmarks) within a document.
  * @param {object} editor editor core object

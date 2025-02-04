@@ -7,7 +7,7 @@ import Modal from '../../modules/Modal';
 import { domUtils, converter } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description The UI class is a class that handles operations related to the user interface of SunEditor.
  * This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
  * @param {object} editor - editor core object

@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description Classes related to editor formats such as line creation, line retrieval from selected range, etc.
  * @param {object} editor - editor core object
  */

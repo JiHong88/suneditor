@@ -52,7 +52,7 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
  */
 
 /**
- * @constructor
+ * @class
  * @description Event manager, editor's all event management class
  * @param {object} editor editor core object
  */

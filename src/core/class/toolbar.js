@@ -9,7 +9,7 @@ import { CreateToolBar, UpdateButton } from '../section/constructor';
 const { _w } = env;
 
 /**
- * @constructor
+ * @class
  * @description Toolbar class
  * @param {object} editor - editor core object
  * @param {object} options - toolbar options

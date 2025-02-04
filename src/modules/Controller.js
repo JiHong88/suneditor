@@ -21,7 +21,7 @@ const INDEX_2 = 2147483645;
  */
 
 /**
- * @constructor
+ * @class
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} element Controller element

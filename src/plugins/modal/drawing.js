@@ -6,7 +6,7 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { _w, isMobile } = env;
 
 /**
- * @constructor
+ * @class
  * @description Drawing modal plugin.
  * @param {object} editor - The core editor object (e.g., handling selection, events, etc.)
  * @param {object} pluginOptions

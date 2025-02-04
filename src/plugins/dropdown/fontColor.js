@@ -3,7 +3,7 @@ import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
 /**
- * @constructor
+ * @class
  * @description Font color plugin
  * @param {object} editor editor core object
  * @param {object} pluginOptions

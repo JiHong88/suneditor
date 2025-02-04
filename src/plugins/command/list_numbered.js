@@ -8,7 +8,7 @@ const DEFAULT_TYPE = 'decimal';
  */
 
 /**
- * @constructor
+ * @class
  * @description List numbered plugin, Several types of lists are provided.
  * @param {object} editor - editor core object
  */
