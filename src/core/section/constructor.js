@@ -139,8 +139,7 @@ export const RO_UNAVAILABD = [
  */
 
 /**
- * @typedef {object} EditorInitOptions
- * @extends EditorFrameOptions
+ * @typedef {object} EditorBasicOptions
  * @property {object|Array.<object>} [options.plugins] - Plugin configuration.
  * @property {Array.<string>} [options.excludedPlugins] - Plugin configuration.
  * @property {Array.<Array.<string>>} [options.buttonList] - List of toolbar buttons, grouped by sub-arrays.
@@ -238,6 +237,10 @@ export const RO_UNAVAILABD = [
  * - these styles will be applied to the `<li>` tag instead of wrapping the content inside additional tags.
  * @property {object.<string, *>} [options.externalLibs] - External libraries like CodeMirror or MathJax.
  * @property {object.<string, *>} [options.*] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
+ */
+
+/**
+ * @typedef {EditorBasicOptions & EditorFrameOptions} EditorInitOptions
  */
 
 /**

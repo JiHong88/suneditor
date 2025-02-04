@@ -29,10 +29,14 @@ const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-e
 const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
 
 /**
+ * @typedef {import('./section/constructor').EditorInitOptions} EditorInitOptions
+ */
+
+/**
  * @class
  * @description SunEditor constructor function.
- * @param {Array.<Element>} multiTargets Target textarea
- * @param {object} options options
+ * @param {Array.<Element>} multiTargets Target element
+ * @param {EditorInitOptions} options options
  * @returns {object}
  */
 const Editor = function (multiTargets, options) {
@@ -587,7 +591,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
-	 * @param {object} newOptions Options
+	 * @param {EditorInitOptions} newOptions Options
 	 */
 	resetOptions(newOptions) {
 		const _keys = Object.keys;
