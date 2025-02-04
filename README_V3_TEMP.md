@@ -186,7 +186,7 @@ const DEFAULT_CONTENT_STYLES =
 	allowedClassName: DEFAULT_CLASS_NAME, // Allowed class names
 	closeModalOutsideClick: false, // Close modal on outside click
 	copyFormatKeepOn: false, // Keep format on copy
-	syncTab: true, // Synchronize tab
+	syncTabIndent: true, // Synchronize tab
 	autoLinkify: false, // Auto convert URLs to links on paste
 	autoStyleify: ['bold', 'underline', 'italic', 'strike'], // Auto apply styles on paste
 	scrollToOptions: { behavior: 'auto', block: 'nearest' }, // Scroll to options

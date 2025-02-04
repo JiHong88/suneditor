@@ -106,12 +106,6 @@ export const RO_UNAVAILABD = [
 	'codeMirror'
 ];
 
-/**
- * @description document create
- * @param {object} options Options
- * @param {Element|Array.<Element>} editorTargets Target textarea
- * @returns {object}
- */
 const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
@@ -459,7 +453,7 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	// format
 	o.set('copyFormatKeepOn', !!options.copyFormatKeepOn);
-	o.set('syncTab', options.syncTab ?? true);
+	o.set('syncTabIndent', options.syncTabIndent ?? true);
 
 	// auto convert on paste
 	o.set('autoLinkify', options.autoLinkify ?? !!plugins.link);

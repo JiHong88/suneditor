@@ -584,7 +584,7 @@ window.editor_root = suneditor.create(
 		// `,
 		// <p>test abc  sss</p>
 		// 		`,
-		// syncTab: true,
+		// syncTabIndent: true,
 		// iframe: true,
 		// height: '600px',
 		// maxWidth: '1000px',

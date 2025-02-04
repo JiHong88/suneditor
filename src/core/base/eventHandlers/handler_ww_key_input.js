@@ -603,7 +603,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				if (!shift) {
 					if (lines.length === 1) {
 						let tabSize = this.status.tabSize + 1;
-						if (this.options.get('syncTab')) {
+						if (this.options.get('syncTabIndent')) {
 							const baseIndex = domUtils.findTextIndexOnLine(formatEl, range.startContainer, range.startOffset, this.component.is.bind(this.component));
 							const prevTabEndIndex = this.format.isLine(formatEl.previousElementSibling) ? domUtils.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2) : 0;
 							if (prevTabEndIndex > baseIndex) {
