@@ -12,12 +12,20 @@ export const modules = Modules;
 export const langs = Langs;
 export const helper = Helper;
 
+/**
+ * @typedef {import('./core/section/constructor').EditorFrameOptions} EditorFrameOptions
+ */
+
+/**
+ * @typedef {import('./core/section/constructor').EditorInitOptions} EditorInitOptions
+ */
+
 export default {
 	/**
 	 * @description Returns the create function with preset options.
 	 * If the options overlap, the options of the 'create' function take precedence.
-	 * @param {Json} options Initialization options
-	 * @returns {object}
+	 * @param {EditorInitOptions} options Initialization options
+	 * @returns {object} {create: function}
 	 */
 	init(init_options) {
 		return {
@@ -27,8 +35,8 @@ export default {
 
 	/**
 	 * @description Create the suneditor
-	 * @param {string|Element|Array.<string|Element>} target textarea Id or textarea element
-	 * @param {JSON|object} options user options
+	 * @param {Element|object<string, {target: Element, options: EditorFrameOptions}>} target Target element or multi-root object
+	 * @param {EditorInitOptions} options Initialization options
 	 * @returns {object}
 	 */
 	create(target, options, _init_options) {

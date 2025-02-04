@@ -929,7 +929,7 @@ export function isInputElement(element) {
 
 /**
  * @description Check the line element is empty.
- * @param {Element} element Format element node
+ * @param {Element} element "line" element node
  * @returns {boolean}
  */
 export function isEmptyLine(element) {

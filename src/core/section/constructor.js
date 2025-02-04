@@ -106,6 +106,146 @@ export const RO_UNAVAILABD = [
 	'codeMirror'
 ];
 
+/**
+ * @typedef {object} EditorFrameOptions
+ * @property {string} [options.value=""] - Initial value for the editor.
+ * @property {string} [options.placeholder=""] - Placeholder text.
+ * @property {object} [options.editableFrameAttributes={}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+ * @property {string} [options.width="100%"] - Width for the editor.
+ * @property {string} [options.minWidth=""] - Min width for the editor.
+ * @property {string} [options.maxWidth=""] - Max width for the editor.
+ * @property {string} [options.height="auto"] - Height for the editor.
+ * @property {string} [options.minHeight=""] - Min height for the editor.
+ * @property {string} [options.maxHeight=""] - Max height for the editor.
+ * @property {string} [options.editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
+ * @property {boolean} [options.iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
+ * @property {boolean} [options.iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the "iframe".
+ * @property {object} [options.iframe_attributes={}] - Attributes of the "iframe". (e.g. {'scrolling': 'no'})
+ * @property {string} [options.iframe_cssFileName="suneditor"] - Name or Array of the CSS file to apply inside the iframe.
+ * - You can also use regular expressions.
+ * - Applied by searching by filename in the link tag of document,
+ * - or put the URL value (".css" can be omitted).
+ * @property {boolean} [options.statusbar=true] - Enables the status bar.
+ * @property {boolean} [options.statusbar_showPathLabel=true] - Displays the current node structure to status bar.
+ * @property {boolean} [options.statusbar_resizeEnable=true] - Enables resize function of bottom status bar
+ * @property {boolean} [options.charCounter=false] - Shows the number of characters in the editor.
+ * - If the maxCharCount option has a value, it becomes true.
+ * @property {number} [options.charCounter_max] - The maximum number of characters allowed to be inserted into the editor.
+ * @property {string} [options.charCounter_label] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
+ * @property {"char"|"byte"|"byte-html"} [options.charCounter_type="char"] - Defines the calculation method of the "charCounter" option.
+ * - 'char': Characters length.
+ * - 'byte': Binary data size of characters.
+ * - 'byte-html': Binary data size of the full HTML string.
+ */
+
+/**
+ * @typedef {object} EditorInitOptions
+ * @extends EditorFrameOptions
+ * @property {object|Array.<object>} [options.plugins] - Plugin configuration.
+ * @property {Array.<string>} [options.excludedPlugins] - Plugin configuration.
+ * @property {Array.<Array.<string>>} [options.buttonList] - List of toolbar buttons, grouped by sub-arrays.
+ * @property {boolean} [options.v2Migration=false] - Enables migration mode for SunEditor v2.
+ * @property {boolean} [options.strictMode=true] - Enables strict filtering of tags, attributes, and styles.
+ * @property {"classic"|"inline"|"balloon"|"balloon-always"} [options.mode="classic"] - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
+ * @property {string} [options.type=""] - Editor type: "document:header,page".
+ * @property {string} [options.theme=""] - Editor theme.
+ * @property {boolean} [options.keepStyleOnDelete=false] - Keeps inline styles when deleting content.
+ * @property {Array.<string>} [options.fontSizeUnits=["px", "pt", "em", "rem"]] - Allowed font size units.
+ * @property {string} [options.allowedClassName] - Allowed class names.
+ * @property {boolean} [options.closeModalOutsideClick=false] - Closes modals when clicking outside.
+ * @property {boolean} [options.copyFormatKeepOn=false] - Keeps the format of the copied content.
+ * @property {boolean} [options.syncTabIndent=true] - Synchronizes tab indent with spaces.
+ * @property {boolean} [options.tabDisable=false] - Disables tab key input.
+ * @property {boolean} [options.autoLinkify] - Automatically converts URLs into hyperlinks. ("Link" plugin required)
+ * @property {Array.<string>} [options.autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
+ * @property {object} [options.scrollToOptions={behavior: "auto", block: "nearest"}] - Configuration for scroll behavior when navigating editor content.
+ * @property {object} [options.componentScrollToOptions={behavior: "smooth", block: "center"}] - Configuration for scroll behavior when navigating components.
+ * @property {string} [options.retainStyleMode="repeat"] - Retains styles on new lines: "repeat", "always", "none".
+ * @property {object} [options.allowedExtraTags={script: false, style: false, meta: false, link: false, "[a-z]+:[a-z]+": false}] - Specifies extra allowed or disallowed tags.
+ * @property {object} [options.events={}] - Custom event handlers.
+ * @property {object} [options.__textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - The basic tags that serves as the base for "textStyleTags"
+ * @property {object} [options.textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - Additional text style tags.
+ * @property {object} [options.convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
+ * @property {object} [options.tagStyles={'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style', 'ol|ul': 'list-style-type'}] - Specifies allowed styles for HTML tags.
+ * @property {string} [options.spanStyles="font-family|font-size|color|background-color"] - Specifies allowed styles for the "span" tag.
+ * @property {string} [options.lineStyles="text-align|margin-left|margin-right|line-height"] - Specifies allowed styles for the "line" element (p..).
+ * @property {string} [options.textDirection="ltr"] - Text direction: "ltr" or "rtl".
+ * @property {Array.<string>} [options.reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
+ * @property {number} [options.historyStackDelayTime=400] - Delay time for history stack updates (ms).
+ * @property {string} [options.lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
+ * @property {string} [options.printClass=""] - Class name for printing.
+ * @property {string} [options.defaultLine="p"] - Default line element when inserting new lines.
+ * @property {string} [options.__defaultElementWhitelist="br|div"] - Default allowed HTML elements. The default values are maintained.
+ * @property {string} [options.elementWhitelist=""] - Allowed HTML elements. Delimiter: "|" (e.g. "p|div", "*").
+ * @property {string} [options.elementBlacklist=""] - Disallowed HTML elements. Delimiter: "|" (e.g. "script|style").
+ * @property {string} [options.__defaultAttributeWhitelist] - Allowed attributes. Delimiter: "|" (e.g. "href|target").
+ * @property {object} [options.attributeWhitelist=""] - Allowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
+ * @property {object} [options.attributeBlacklist=""] - Disallowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
+ * @property {string} [options.__defaultFormatLine="P|H[1-6]|LI|TH|TD|DETAILS"] - Overrides the editor's default "line" element.
+ * @property {string} [options.formatLine="P|H[1-6]|LI|TH|TD|DETAILS"] - Specifies the editor's "line" elements.
+ * - (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
+ * - "line" element also contain "brLine" element
+ * @property {string} [options.__defaultFormatBrLine="PRE"] - Overrides the editor's default "brLine" element.
+ * @property {string} [options.formatBrLine="PRE"] - Specifies the editor's "brLine" elements. (e.g. "PRE").
+ * - (PRE | class="__se__format__br_line_xxx")
+ * - "brLine" elements is included in the "line" element.
+ * - "brLine" elements's line break is "BR" tag.
+ * ※ Entering the Enter key in the space on the last line ends "brLine" and appends "line".
+ * @property {string} [options.__defaultFormatClosureBrLine=""] - Overrides the editor's default "closureBrLine" element.
+ * @property {string} [options.formatClosureBrLine=""] - Specifies the editor's "closureBrLine" elements.
+ * - (class="__se__format__br_line__closure_xxx")
+ * - "closureBrLine" elements is included in the "brLine".
+ * - "closureBrLine" elements's line break is "BR" tag.
+ * - ※ You cannot exit this format with the Enter key or Backspace key.
+ * - ※ Use it only in special cases. ([ex] format of table cells)
+ * @property {string} [options.__defaultFormatBlock="BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS"] - Overrides the editor's default "block" element.
+ * @property {string} [options.formatBlock="BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS"] - Specifies the editor's "block" elements.
+ * - (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
+ * - "block" is wrap the "line" and "component"
+ * @property {string} [options.__defaultFormatClosureBlock="TH|TD"] - Overrides the editor's default "closureBlock" element.
+ * @property {string} [options.formatClosureBlock="TH|TD"] - Specifies the editor's "closureBlock" elements.
+ * - (TH, TD | class="__se__format__block_closure_xxx")
+ * - "closureBlock" elements is included in the "block".
+ * - "closureBlock" element is wrap the "line" and "component"
+ * - ※ You cannot exit this format with the Enter key or Backspace key.
+ * - ※ Use it only in special cases. ([ex] format of table cells)
+ * @property {string} [options.allowedEmptyTags=".se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details"] - Allowed empty tags.
+ * @property {number|string} [options.toolbar_width="auto"] - Toolbar width.
+ * @property {Element|string} [options.toolbar_container] - Container element for the toolbar.
+ * @property {number} [options.toolbar_sticky=0] - Enables sticky toolbar with optional offset.
+ * @property {boolean} [options.toolbar_hide=false] - Hides toolbar initially.
+ * @property {object} [options.subToolbar] - Sub-toolbar configuration.
+ * @property {Array.<Array.<string>>} [options.subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
+ * @property {"balloon"|"balloon-always"} [options.subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
+ * @property {number|string} [options.subToolbar.width="auto"] - Sub-toolbar width.
+ * @property {boolean} [options.statusbar_container] - Container element for the status bar.
+ * @property {boolean} [options.shortcutsHint=true] - Displays shortcut hints in tooltips.
+ * @property {boolean} [options.shortcutsDisable=false] - Disables keyboard shortcuts.
+ * @property {object.<string, Array.<string>>} [options.shortcuts] - Custom keyboard shortcuts.
+ * @property {number} [options.fullScreenOffset=0] - Offset applied when entering fullscreen mode.
+ * @property {string} [options.previewTemplate] - Custom template for preview mode.
+ * @property {string} [options.printTemplate] - Custom template for print mode.
+ * @property {boolean} [options.componentAutoSelect=false] - Enables automatic selection of inserted components.
+ * @property {string} [options.defaultUrlProtocol] - Default URL protocol for links.
+ * @property {boolean} [options.allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
+ * @property {object} [options.icons] - Overrides the default icons.
+ * @property {string} [options.freeCodeViewMode=false] - Enables free code view mode.
+ * @property {object} [options.__lineFormatFilter=true] - Line format filter configuration.
+ * @property {object} [options.__pluginRetainFilter=true] - Plugin retain filter configuration.
+ * @property {Array.<string>} [options.__listCommonStyle=["fontSize", "color", "fontFamily", "fontWeight", "fontStyle"]] - Defines the list of styles that are applied directly to the `<li>` element
+ * - when a text style is applied to the entire list item.
+ * - For example, when changing the font size or color of a list item (`<li>`),
+ * - these styles will be applied to the `<li>` tag instead of wrapping the content inside additional tags.
+ * @property {object.<string, *>} [options.externalLibs] - External libraries like CodeMirror or MathJax.
+ * @property {object.<string, *>} [options.*] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
+ */
+
+/**
+ * @description Creates a new SunEditor instance with specified options.
+ * @param {Element|object<string, {target: Element, options: EditorFrameOptions}>} editorTargets - Target element or multi-root object.
+ * @param {EditorInitOptions} options - Configuration options for the editor.
+ * @returns {object} - SunEditor instance with context, options, and DOM elements.
+ */
 const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
@@ -408,7 +548,7 @@ function _mergeObject(a, b) {
 
 /**
  * @description Initialize options
- * @param {object} options Options object
+ * @param {EditorInitOptions} options Configuration options for the editor.
  * @param {Array.<Element>} editorTargets Target textarea
  * @param {object} plugins Plugins object
  * @returns {o:Map, p:Map} {{o: options map, p: plugins map}}
@@ -766,6 +906,12 @@ export function InitOptions(options, editorTargets, plugins) {
 	};
 }
 
+/**
+ * @description Create a context object for the editor frame.
+ * @param {EditorFrameOptions} targetOptions - editor frame options
+ * @param {Element} statusbar - statusbar element
+ * @returns {object} {statusbar: Element, navigation: Element, charWrapper: Element, charCounter: Element}
+ */
 export function CreateStatusbar(targetOptions, statusbar) {
 	let navigation = null;
 	let charWrapper = null;

@@ -160,7 +160,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description If a parent node that contains an argument node finds a free format node (format.isBrLine), it returns that node.
+	 * @description If a parent node that contains an argument node finds a "brLine" (format.isBrLine), it returns that node.
 	 * @param {Node} element Reference node.
 	 * @param {Function|null} validation Additional validation function.
 	 * @returns {Element|null}
@@ -184,7 +184,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description Append format element to sibling node of argument element.
+	 * @description Append "line" element to sibling node of argument element.
 	 * If the "lineNode" argument value is present, the tag of that argument value is inserted,
 	 * If not, the currently selected format tag is inserted.
 	 * @param {Element} element Insert as siblings of that element
@@ -242,7 +242,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description Appended all selected format Element to the argument element and insert
+	 * @description Appended all selected "line" element to the argument element("block") and insert
 	 * @param {Element} block Element of wrap the arguments (BLOCKQUOTE...)
 	 */
 	applyBlock(block) {
@@ -416,9 +416,9 @@ Format.prototype = {
 	/**
 	 * @description The elements of the "selectedFormats" array are detached from the "blockElement" element. ("LI" tags are converted to "P" tags)
 	 * When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling, removeArray: [Array of removed elements]}.
-	 * @param {Element} blockElement Range format element (PRE, BLOCKQUOTE, OL, UL...)
+	 * @param {Element} blockElement "block" element (PRE, BLOCKQUOTE, OL, UL...)
 	 * @param {object} [options] Options
-	 * @param {Array} [options.selectedFormats=null] Array of format elements (P, DIV, LI...) to remove.
+	 * @param {Array} [options.selectedFormats=null] Array of "line" elements (P, DIV, LI...) to remove.
 	 * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
 	 * @param {Element} [options.newBlockElement=null] The node(blockElement) to replace the currently wrapped node.
 	 * @param {boolean} [options.shouldDelete=false] If true, deleted without detached.
@@ -657,9 +657,9 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description Append all selected format Element to the list and insert.
+	 * @description Append all selected "line" element to the list and insert.
 	 * @param {string} type List type. (ol | ul):[listStyleType]
-	 * @param {Element} selectedCells Format elements or list cells.
+	 * @param {Element} selectedCells "line" elements or list cells.
 	 * @param {boolean} nested If true, indenting existing list cells.
 	 */
 	applyList(type, selectedCells, nested) {
@@ -855,7 +855,7 @@ Format.prototype = {
 	/**
 	 * @description "selectedCells" array are detached from the list element.
 	 * The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
-	 * @param {Array} selectedCells Array of format elements (LI, P...) to remove.
+	 * @param {Array} selectedCells Array of ["line", li] elements(LI, P...) to remove.
 	 * @param {boolean} shouldDelete If true, It does not just remove the list, it deletes the content.
 	 * @returns {object} {sc: <LI>, ec: <LI>}.
 	 */
@@ -1363,8 +1363,9 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
-	 * Format element also contain "free format Element"
+	 * @description It is judged whether it is the "line" element.
+	 * - (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
+	 * - "line" element also contain "brLine" element
 	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
@@ -1375,8 +1376,9 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the only format element, not block (td, th, li)
-	 * Format element also contain "free format Element"
+	 * @description It is judged whether it is the only "line" element, not block.
+	 * - (td, th, li)
+	 * "line" element also contain "brLine" element"
 	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
@@ -1385,10 +1387,11 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the free format element. (PRE | class="__se__format__br_line_xxx")
-	 * Free format elements is included in the format element.
-	 * Free format elements's line break is "BR" tag.
-	 * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
+	 * @description It is judged whether it is the "brLine" element.
+	 * - (PRE | class="__se__format__br_line_xxx")
+	 * - "brLine" elements is included in the "line" element.
+	 * - "brLine" elements's line break is "BR" tag.
+	 * ※ Entering the Enter key in the space on the last line ends "brLine" and appends "line".
 	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
@@ -1399,8 +1402,9 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
-	 * Range format element is wrap the "format element" and "component"
+	 * @description It is judged whether it is the "block" element.
+	 * - (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
+	 * - "block" is wrap the "line" and "component"
 	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
@@ -1411,11 +1415,12 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__block_closure_xxx")
-	 * Closure range format elements is included in the range format element.
-	 *  - Closure range format element is wrap the "format element" and "component"
-	 * ※ You cannot exit this format with the Enter key or Backspace key.
-	 * ※ Use it only in special cases. ([ex] format of table cells)
+	 * @description It is judged whether it is the "closureBlock" element.
+	 * - (TH, TD | class="__se__format__block_closure_xxx")
+	 * - "closureBlock" elements is included in the "block".
+	 * - "closureBlock" element is wrap the "line" and "component"
+	 * - ※ You cannot exit this format with the Enter key or Backspace key.
+	 * - ※ Use it only in special cases. ([ex] format of table cells)
 	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
@@ -1426,11 +1431,12 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the closure free format element. (class="__se__format__br_line__closure_xxx")
-	 * Closure free format elements is included in the free format element.
-	 *  - Closure free format elements's line break is "BR" tag.
-	 * ※ You cannot exit this format with the Enter key or Backspace key.
-	 * ※ Use it only in special cases. ([ex] format of table cells)
+	 * @description It is judged whether it is the "closureBrLine" element.
+	 * - (class="__se__format__br_line__closure_xxx")
+	 * - "closureBrLine" elements is included in the "brLine".
+	 * - "closureBrLine" elements's line break is "BR" tag.
+	 * - ※ You cannot exit this format with the Enter key or Backspace key.
+	 * - ※ Use it only in special cases. ([ex] format of table cells)
 	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
