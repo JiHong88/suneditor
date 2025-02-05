@@ -759,7 +759,7 @@ window.editor_root = suneditor.create(
 		// iframe: true,
 		// defaultLine: 'p',
 		// __defaultFormatLine: 'H[1-6]|LI|TH|TD|DETAILS',
-		retainStyleMode: 'repeat', // repeat, always, none
+		retainStyleMode: 'none', // repeat, always, none
 		toolbar_sticky: 0,
 		lineAttrReset: 'id',
 		// height: '600px',
@@ -787,7 +787,6 @@ window.editor_root = suneditor.create(
 			width: 'auto',
 			mode: 'balloon' // balloon, balloon-always, balloon-block
 		},
-		keepStyleOnDelete: true,
 		shortcuts: {
 			// bold: ['s75', 'K'],
 			italic: [],

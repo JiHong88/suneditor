@@ -73,7 +73,6 @@ export const RO_UNAVAILABD = [
 	'mode',
 	'type',
 	'externalLibs',
-	'keepStyleOnDelete',
 	'iframe',
 	'convertTextTags',
 	'textStyleTags',
@@ -148,7 +147,6 @@ export const RO_UNAVAILABD = [
  * @property {"classic"|"inline"|"balloon"|"balloon-always"} [options.mode="classic"] - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
  * @property {string} [options.type=""] - Editor type: "document:header,page".
  * @property {string} [options.theme=""] - Editor theme.
- * @property {boolean} [options.keepStyleOnDelete=false] - Keeps inline styles when deleting content.
  * @property {Array.<string>} [options.fontSizeUnits=["px", "pt", "em", "rem"]] - Allowed font size units.
  * @property {string} [options.allowedClassName] - Allowed class names.
  * @property {boolean} [options.closeModalOutsideClick=false] - Closes modals when clicking outside.
@@ -159,7 +157,10 @@ export const RO_UNAVAILABD = [
  * @property {Array.<string>} [options.autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
  * @property {object} [options.scrollToOptions={behavior: "auto", block: "nearest"}] - Configuration for scroll behavior when navigating editor content.
  * @property {object} [options.componentScrollToOptions={behavior: "smooth", block: "center"}] - Configuration for scroll behavior when navigating components.
- * @property {string} [options.retainStyleMode="repeat"] - Retains styles on new lines: "repeat", "always", "none".
+ * @property {"repeat"|"always"|"none"} [options.retainStyleMode="repeat"] - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
+ * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
+ * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
+ * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
  * @property {object} [options.allowedExtraTags={script: false, style: false, meta: false, link: false, "[a-z]+:[a-z]+": false}] - Specifies extra allowed or disallowed tags.
  * @property {object} [options.events={}] - Custom event handlers.
  * @property {object} [options.__textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - The basic tags that serves as the base for "textStyleTags"
@@ -589,7 +590,6 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('_themeClass', options.theme ? ` se-theme-${options.theme}` : '');
 	o.set('type-options', options.type?.split(':')[1] || '');
 	o.set('externalLibs', options.externalLibs || {});
-	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
 	o.set('closeModalOutsideClick', !!options.closeModalOutsideClick);
