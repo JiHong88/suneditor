@@ -23,7 +23,7 @@ const { _w } = env;
  * @param {Array.<object>=} [pluginOptions.fontSizeList] - A list of font size options for rendering math expressions.
  * @param {function=} [pluginOptions.onPaste] - A callback function to handle paste events in the math input area.
  */
-const Math_ = function (editor, pluginOptions) {
+function Math_(editor, pluginOptions) {
 	// external library
 	this.katex = null;
 	this.mathjax = null;
@@ -102,7 +102,7 @@ const Math_ = function (editor, pluginOptions) {
 	if (this.pluginOptions.onPaste) {
 		this.eventManager.addEvent(this.textArea, 'paste', this.pluginOptions.onPaste.bind(this));
 	}
-};
+}
 
 Math_.key = 'math';
 Math_.type = 'modal';

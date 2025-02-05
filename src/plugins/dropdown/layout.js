@@ -8,7 +8,7 @@ import { domUtils } from '../../helper';
  * @param {object} pluginOptions
  * @param {Array.<{name: string, html: string}>} pluginOptions.items - Layout list
  */
-const Layout = function (editor, pluginOptions) {
+function Layout(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.layout;
@@ -23,7 +23,7 @@ const Layout = function (editor, pluginOptions) {
 
 	// init
 	this.menu.initDropdownTarget(Layout, menu);
-};
+}
 
 Layout.key = 'layout';
 Layout.type = 'dropdown';

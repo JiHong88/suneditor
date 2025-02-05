@@ -24,7 +24,7 @@ let __resizing_sw = 0;
  * @param {Array.<Function|string>} controls Controller button array
  * @param {FigureParams} params Figure options
  */
-const Figure = function (inst, controls, params) {
+function Figure(inst, controls, params) {
 	EditorInjector.call(this, inst.editor);
 	this.kind = inst.constructor.key || inst.constructor.name;
 	this._alignIcons = {
@@ -120,7 +120,7 @@ const Figure = function (inst, controls, params) {
 			this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
 		}
 	});
-};
+}
 
 /**
  * @description Create a container for the resizing component and insert the element.

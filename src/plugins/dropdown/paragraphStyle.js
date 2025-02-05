@@ -29,7 +29,7 @@ import { domUtils } from '../../helper';
 		}
 	]
  */
-const ParagraphStyle = function (editor, pluginOptions) {
+function ParagraphStyle(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.paragraphStyle;
@@ -43,7 +43,7 @@ const ParagraphStyle = function (editor, pluginOptions) {
 
 	// init
 	this.menu.initDropdownTarget(ParagraphStyle, menu);
-};
+}
 
 ParagraphStyle.key = 'paragraphStyle';
 ParagraphStyle.type = 'dropdown';

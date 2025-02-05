@@ -10,7 +10,7 @@ const { _w } = env;
  * Allows you to create, edit, and delete elements that act as anchors (bookmarks) within a document.
  * @param {object} editor editor core object
  */
-const Anchor = function (editor) {
+function Anchor(editor) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.anchor;
@@ -31,7 +31,7 @@ const Anchor = function (editor) {
 	const controllerEl = CreateHTML_controller(this);
 	this.inputEl = controllerEl.querySelector('input');
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true }, this.kind);
-};
+}
 
 Anchor.key = 'anchor';
 Anchor.type = 'popup';

@@ -35,7 +35,7 @@ const { NO_EVENT } = env;
  * @param {Array.<RegExp|string>=} [pluginOptions.urlPatterns] - Additional URL patterns for video embedding.
  * @param {Array.<string>=} [pluginOptions.extensions] - Additional file extensions to be recognized for video uploads.
  */
-const Video = function (editor, pluginOptions) {
+function Video(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.video;
@@ -179,7 +179,7 @@ const Video = function (editor, pluginOptions) {
 		this.eventManager.addEvent(this.frameRatioOption, 'change', SetRatio.bind(this));
 		this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
 	}
-};
+}
 
 Video.key = 'video';
 Video.type = 'modal';

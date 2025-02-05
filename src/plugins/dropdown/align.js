@@ -8,7 +8,7 @@ import { domUtils } from '../../helper';
  * @param {object} pluginOptions
  * @param {Array.<"right"|"center"|"left"|"justify">} pluginOptions.items - Align items
  */
-const Align = function (editor, pluginOptions) {
+function Align(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.align;
@@ -30,7 +30,7 @@ const Align = function (editor, pluginOptions) {
 
 	// init
 	this.menu.initDropdownTarget(Align, menu);
-};
+}
 
 Align.key = 'align';
 Align.type = 'dropdown';

@@ -11,7 +11,7 @@ const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize',
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} element Modal element
  */
-const Modal = function (inst, element) {
+function Modal(inst, element) {
 	CoreInjector.call(this, inst.editor);
 	this.offset = this.editor.offset;
 	this.ui = this.editor.ui;
@@ -58,7 +58,7 @@ const Modal = function (inst, element) {
 			this._bindClose_mouseup = null;
 		}
 	}
-};
+}
 
 Modal.prototype = {
 	/**

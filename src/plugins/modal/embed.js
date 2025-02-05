@@ -42,7 +42,7 @@ const { NO_EVENT, _w } = env;
  * }
  * @param {Array.<string>} pluginOptions.controls - Figure control configurations.
  */
-const Embed = function (editor, pluginOptions) {
+function Embed(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.embed;
@@ -175,7 +175,7 @@ const Embed = function (editor, pluginOptions) {
 		this.eventManager.addEvent(this.inputY, 'keyup', OnInputSize.bind(this, 'y'));
 		this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
 	}
-};
+}
 
 Embed.key = 'embed';
 Embed.type = 'modal';

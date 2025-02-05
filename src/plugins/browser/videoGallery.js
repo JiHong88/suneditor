@@ -11,7 +11,7 @@ import { Browser } from '../../modules';
  * @param {object=} pluginOptions.headers - server request headers
  * @param {string|Function} pluginOptions.thumbnail - default thumbnail
  */
-const VideoGallery = function (editor, pluginOptions) {
+function VideoGallery(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.videoGallery;
@@ -34,7 +34,7 @@ const VideoGallery = function (editor, pluginOptions) {
 	// members
 	this.width = this.plugins.video.pluginOptions.defaultWidth === 'auto' ? '' : this.plugins.video.pluginOptions.defaultWidth;
 	this.height = this.plugins.video.pluginOptions.defaultHeight === 'auto' ? '' : this.plugins.video.pluginOptions.defaultHeight;
-};
+}
 
 VideoGallery.key = 'videoGallery';
 VideoGallery.type = 'browser';

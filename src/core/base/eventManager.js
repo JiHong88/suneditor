@@ -56,7 +56,7 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
  * @description Event manager, editor's all event management class
  * @param {object} editor editor core object
  */
-const EventManager = function (editor) {
+function EventManager(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
@@ -87,7 +87,7 @@ const EventManager = function (editor) {
 	this.__retainTimer = null;
 	this.__eventDoc = null;
 	this.__secopy = null;
-};
+}
 
 EventManager.prototype = {
 	/**

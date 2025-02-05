@@ -79,7 +79,7 @@ const DEFAULT_COLOR_LIST = [
  * @param {"cell"|"table"} [pluginOptions.cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
  * @param {Array} [pluginOptions.colorList] - Color list, used in cell color picker
  */
-const Table = function (editor, pluginOptions) {
+function Table(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.table;
@@ -261,7 +261,7 @@ const Table = function (editor, pluginOptions) {
 	this.menu.initDropdownTarget(Table, menu);
 	this.eventManager.addEvent(commandArea, 'mousemove', OnMouseMoveTablePicker.bind(this));
 	this.eventManager.addEvent(commandArea, 'click', OnClickTablePicker.bind(this));
-};
+}
 
 Table.key = 'table';
 Table.type = 'dropdown-free';

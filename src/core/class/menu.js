@@ -10,7 +10,7 @@ import { domUtils, converter } from '../../helper';
  * @description Dropdown and container menu management class
  * @param {object} editor - editor core object
  */
-const Menu = function (editor) {
+function Menu(editor) {
 	CoreInjector.call(this, editor);
 
 	// members--
@@ -38,7 +38,7 @@ const Menu = function (editor) {
 	this._bindClose_dropdown_key = null;
 	this._bindClose_cons_mouse = null;
 	this.currentDropdownPlugin = null;
-};
+}
 
 Menu.prototype = {
 	/**

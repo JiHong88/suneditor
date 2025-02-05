@@ -28,7 +28,7 @@ const { _w, isMobile } = env;
  * @param {boolean=} [pluginOptions.canResize=true] - Whether the modal form can be resized.
  * @param {boolean=} [pluginOptions.maintainRatio=true] - Whether to maintain the aspect ratio when resizing.
  */
-const Drawing = function (editor, pluginOptions) {
+function Drawing(editor, pluginOptions) {
 	// plugin basic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.drawing;
@@ -106,7 +106,7 @@ const Drawing = function (editor, pluginOptions) {
 
 	// init
 	this.eventManager.addEvent(modalEl.querySelector('[data-command="remove"]'), 'click', OnRemove.bind(this));
-};
+}
 
 Drawing.key = 'drawing';
 Drawing.type = 'modal';

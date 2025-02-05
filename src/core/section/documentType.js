@@ -18,7 +18,7 @@ const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS
  * @param {object} editor - editor core object
  * @param {Map} fc - frame context object
  */
-const DocumentType = function (editor, fc) {
+function DocumentType(editor, fc) {
 	// members
 	this.editor = editor;
 	this.context = editor.context;
@@ -76,7 +76,7 @@ const DocumentType = function (editor, fc) {
 		this.page = fc.get('documentTypePage');
 		this.pageNavigator = editor.plugins.pageNavigator;
 	}
-};
+}
 
 DocumentType.prototype = {
 	/**

@@ -8,7 +8,7 @@ import { domUtils } from '../../helper';
  * @param {object} pluginOptions
  * @param {Array.<{name: string, html: string}>} pluginOptions.items - Template list
  */
-const TextStyle = function (editor, pluginOptions) {
+function TextStyle(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.textStyle;
@@ -22,7 +22,7 @@ const TextStyle = function (editor, pluginOptions) {
 
 	// init
 	this.menu.initDropdownTarget(TextStyle, menu);
-};
+}
 
 TextStyle.key = 'textStyle';
 TextStyle.type = 'dropdown';

@@ -29,6 +29,7 @@
 		"prefer-const": "error",
 		"no-var": "error",
 		"no-console": ["warn", { "allow": ["warn", "error"] }],
+		"@typescript-eslint/no-explicit-any": "off",
 		"prettier/prettier": [
 			"error",
 			{

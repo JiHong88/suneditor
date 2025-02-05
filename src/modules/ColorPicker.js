@@ -83,7 +83,7 @@ const DEFAULLT_COLOR_SPLITNUM = 9;
  * @param {string} styles style property ("color", "backgroundColor"..)
  * @param {ColorPickerParams} params Color picker options
  */
-const ColorPicker = function (inst, styles, params) {
+function ColorPicker(inst, styles, params) {
 	const editor = inst.editor;
 	CoreInjector.call(this, editor);
 
@@ -125,7 +125,7 @@ const ColorPicker = function (inst, styles, params) {
 	}
 
 	this.eventManager.addEvent(this.target, 'click', OnClickColor.bind(this));
-};
+}
 
 ColorPicker.prototype = {
 	/**

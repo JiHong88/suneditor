@@ -11,9 +11,9 @@ import { addClass, removeClass, hasClass } from '../../helper/domUtils';
  * @description character count, character limit, etc. management class
  * @param {object} editor - editor core object
  */
-const Char = function (editor) {
+function Char(editor) {
 	CoreInjector.call(this, editor);
-};
+}
 
 Char.prototype = {
 	/**

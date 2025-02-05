@@ -6,10 +6,38 @@ import Langs from './langs';
 import Modules from './modules';
 import Helper from './helper';
 
+/**
+ * @module SunEditorExports
+ */
+
+/**
+ * Editor Injector module
+ * @type {Function}
+ */
 export const editorInjector = EditorInjector;
+
+/**
+ * Available editor plugins
+ * @type {object}
+ */
 export const plugins = Plugins;
+
+/**
+ * Editor modules
+ * @type {object.<string, Function>}
+ */
 export const modules = Modules;
+
+/**
+ * Language packs for the editor
+ * @type {object}
+ */
 export const langs = Langs;
+
+/**
+ * Helper functions for the editor
+ * @type {object.<string, Function>}
+ */
 export const helper = Helper;
 
 /**
@@ -20,12 +48,16 @@ export const helper = Helper;
  * @typedef {import('./core/section/constructor').EditorInitOptions} EditorInitOptions
  */
 
+/**
+ * SunEditor Factory Object
+ * @namespace SunEditor
+ */
 export default {
 	/**
-	 * @description Returns the create function with preset options.
+	 * Returns the create function with preset options.
 	 * If the options overlap, the options of the 'create' function take precedence.
-	 * @param {EditorInitOptions} options Initialization options
-	 * @returns {object} {create: function}
+	 * @param {EditorInitOptions} init_options - Initialization options
+	 * @returns {{create: function(Element|object<string, {target: Element, options: EditorFrameOptions}>, EditorInitOptions): object}}
 	 */
 	init(init_options) {
 		return {
@@ -34,10 +66,12 @@ export default {
 	},
 
 	/**
-	 * @description Create the suneditor
-	 * @param {Element|object<string, {target: Element, options: EditorFrameOptions}>} target Target element or multi-root object
-	 * @param {EditorInitOptions} options Initialization options
-	 * @returns {object}
+	 * Creates a new instance of the SunEditor
+	 * @param {Element|object<string, {target: Element, options: EditorFrameOptions}>} target - Target element or multi-root object
+	 * @param {EditorInitOptions} options - Initialization options
+	 * @param {EditorInitOptions} [_init_options] - Optional preset initialization options
+	 * @returns {Editor} - Instance of the SunEditor
+	 * @throws {Error} If the target element is not provided or is invalid
 	 */
 	create(target, options, _init_options) {
 		if (typeof options !== 'object') options = {};

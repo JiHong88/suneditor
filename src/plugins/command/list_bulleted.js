@@ -12,7 +12,7 @@ const DEFAULT_TYPE = 'disc';
  * @description List bulleted plugin, Several types of lists are provided.
  * @param {object} editor - editor core object
  */
-const List_bulleted = function (editor) {
+function List_bulleted(editor) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.bulletedList;
@@ -31,7 +31,7 @@ const List_bulleted = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget({ key: List_bulleted.key, type: 'dropdown' }, menu);
-};
+}
 
 List_bulleted.key = 'list_bulleted';
 List_bulleted.type = 'command';

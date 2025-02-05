@@ -23,10 +23,10 @@
  * @description Shortcuts class
  * @param {object} editor - editor core object
  */
-const Shortcuts = function (editor) {
+function Shortcuts(editor) {
 	this.editor = editor;
 	this.isDisabled = false;
-};
+}
 
 Shortcuts.prototype = {
 	/**

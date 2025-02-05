@@ -21,7 +21,7 @@ import ApiManager from './ApiManager';
  * @param {*} inst The instance object that called the constructor.
  * @param {BrowserParams} params Browser options
  */
-const Browser = function (inst, params) {
+function Browser(inst, params) {
 	CoreInjector.call(this, inst.editor);
 
 	// create HTML
@@ -88,7 +88,7 @@ const Browser = function (inst, params) {
 	this.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', Search.bind(this));
 	this.eventManager.addEvent((this.sideOpenBtn = browserFrame.querySelector('.se-side-open-btn')), 'click', SideOpen.bind(this));
 	this.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', SideClose.bind(this));
-};
+}
 
 Browser.prototype = {
 	/**

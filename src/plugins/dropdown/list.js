@@ -6,7 +6,7 @@ import { domUtils } from '../../helper';
  * @description List Plugin (OL, UL)
  * @param {object} editor editor core object
  */
-const List = function (editor) {
+function List(editor) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.list;
@@ -24,7 +24,7 @@ const List = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(List, menu);
-};
+}
 
 List.key = 'list';
 List.type = 'dropdown';

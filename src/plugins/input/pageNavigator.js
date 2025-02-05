@@ -10,7 +10,7 @@ import { domUtils } from '../../helper';
  * a page navigation event through the editor's document context.
  * @param {object} editor editor core object
  */
-const PageNavigator = function (editor) {
+function PageNavigator(editor) {
 	EditorInjector.call(this, editor);
 
 	// create HTML
@@ -24,7 +24,7 @@ const PageNavigator = function (editor) {
 
 	// init
 	this.eventManager.addEvent(this.inner, 'change', OnChangeInner.bind(this));
-};
+}
 
 PageNavigator.key = 'pageNavigator';
 PageNavigator.type = 'input';

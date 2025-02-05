@@ -5,9 +5,9 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers } from '../../helper';
 
-const NodeTransform = function (editor) {
+function NodeTransform(editor) {
 	CoreInjector.call(this, editor);
-};
+}
 
 /**
  * @class

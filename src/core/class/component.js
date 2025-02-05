@@ -15,7 +15,7 @@ const DIR_UP_KEYCODE = /^3[7-8]$/;
  * @description Class for managing components such as images and tables that are not in line format
  * @param {object} editor - editor core object
  */
-const Component = function (editor) {
+function Component(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
@@ -48,7 +48,7 @@ const Component = function (editor) {
 		this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
 		this.eventManager.addEvent(dragHandle, 'click', OnDragClick.bind(this));
 	});
-};
+}
 
 Component.prototype = {
 	/**

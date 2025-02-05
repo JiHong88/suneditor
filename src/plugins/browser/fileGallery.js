@@ -11,7 +11,7 @@ import { Browser } from '../../modules';
  * @param {object=} pluginOptions.headers - server request headers
  * @param {string|Function} pluginOptions.thumbnail - default thumbnail
  */
-const FileGallery = function (editor, pluginOptions) {
+function FileGallery(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.fileGallery;
@@ -29,7 +29,7 @@ const FileGallery = function (editor, pluginOptions) {
 		className: 'se-file-gallery',
 		thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail
 	});
-};
+}
 
 FileGallery.key = 'fileGallery';
 FileGallery.type = 'browser';

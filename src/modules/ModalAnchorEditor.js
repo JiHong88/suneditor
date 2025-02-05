@@ -30,7 +30,7 @@ const { NO_EVENT } = env;
  * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
 
  */
-const ModalAnchorEditor = function (inst, modalForm, params) {
+function ModalAnchorEditor(inst, modalForm, params) {
 	// plugin bisic properties
 	EditorInjector.call(this, inst.editor);
 
@@ -117,7 +117,7 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 	this.eventManager.addEvent(this.urlInput, 'focus', OnFocus_urlInput.bind(this));
 	this.eventManager.addEvent(this.bookmarkButton, 'click', OnClick_bookmarkButton.bind(this));
 	this.eventManager.addEvent(forms.querySelector('._se_upload_button'), 'click', () => this.input.click());
-};
+}
 
 ModalAnchorEditor.prototype = {
 	/**

@@ -8,7 +8,7 @@ import { domUtils } from '../../helper';
  * @param {object} pluginOptions
  * @param {Array.<{name: string, class: string}>} pluginOptions.items - HR list
  */
-const HR = function (editor, pluginOptions) {
+function HR(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.horizontalLine;
@@ -22,7 +22,7 @@ const HR = function (editor, pluginOptions) {
 
 	// init
 	this.menu.initDropdownTarget(HR, HRMenus);
-};
+}
 
 HR.key = 'hr';
 HR.type = 'dropdown';

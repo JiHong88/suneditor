@@ -10,7 +10,7 @@ import { domUtils, unicode, numbers, env } from '../../helper';
  * @description Classes related to editor formats such as line creation, line retrieval from selected range, etc.
  * @param {object} editor - editor core object
  */
-const Format = function (editor) {
+function Format(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
@@ -22,7 +22,7 @@ const Format = function (editor) {
 	this._formatClosureBlockCheck = this.options.get('formatClosureBlock').reg;
 	this._formatClosureBrLineCheck = this.options.get('formatClosureBrLine').reg;
 	this._textStyleTagsCheck = new RegExp('^(' + this.options.get('textStyleTags') + ')$', 'i');
-};
+}
 
 Format.prototype = {
 	/**

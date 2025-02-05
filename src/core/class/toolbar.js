@@ -19,7 +19,7 @@ const { _w } = env;
  * @param {Boolean} options.balloonAlways - balloon toolbar always show
  * @param {Array} options.res - responsive toolbar button list
  */
-const Toolbar = function (editor, { keyName, balloon, inline, balloonAlways, res }) {
+function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 	CoreInjector.call(this, editor);
 
 	// members
@@ -46,7 +46,7 @@ const Toolbar = function (editor, { keyName, balloon, inline, balloonAlways, res
 	};
 
 	this._setResponsive();
-};
+}
 
 Toolbar.prototype = {
 	/**

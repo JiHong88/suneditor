@@ -18,7 +18,7 @@ const { NO_EVENT } = env;
  * @param {string=} pluginOptions.acceptedFormats - accepted formats
  * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
  */
-const FileUpload = function (editor, pluginOptions) {
+function FileUpload(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.fileUpload;
@@ -82,7 +82,7 @@ const FileUpload = function (editor, pluginOptions) {
 
 	// init
 	this.eventManager.addEvent(this.input, 'change', OnChangeFile.bind(this));
-};
+}
 
 FileUpload.key = 'fileUpload';
 FileUpload.type = 'command';

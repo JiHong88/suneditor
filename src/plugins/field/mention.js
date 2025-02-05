@@ -23,7 +23,7 @@ const { debounce } = converter;
  * @param {boolean=} [pluginOptions.useCachingData=true] Whether to cache the mention list data. Default is true.
  * @param {boolean=} [pluginOptions.useCachingFieldData=true] Whether to cache the mention list data in the field. Default is true.
  */
-const Mention = function (editor, pluginOptions) {
+function Mention(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.mention;
@@ -64,7 +64,7 @@ const Mention = function (editor, pluginOptions) {
 
 	// onInput debounce
 	this.onInput = debounce(this.onInput.bind(this), this.delayTime);
-};
+}
 
 Mention.key = 'mention';
 Mention.type = 'field';

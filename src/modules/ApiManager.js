@@ -17,7 +17,7 @@ import { env } from '../helper';
  * @param {object} inst The instance object that called the constructor.
  * @param {ApiManagerParams=} params API options
  */
-const ApiManager = function (inst, params) {
+function ApiManager(inst, params) {
 	this.editor = inst.editor;
 	this.ui = this.editor.ui;
 	this.kind = inst.constructor.key || inst.constructor.name;
@@ -32,7 +32,7 @@ const ApiManager = function (inst, params) {
 	this.callBack = params?.callBack;
 	this.errorCallBack = params?.errorCallBack;
 	this.responseType = params?.responseType;
-};
+}
 
 ApiManager.prototype = {
 	/**

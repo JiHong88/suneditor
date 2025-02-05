@@ -250,7 +250,7 @@ export const RO_UNAVAILABD = [
  * @param {EditorInitOptions} options - Configuration options for the editor.
  * @returns {object} - SunEditor instance with context, options, and DOM elements.
  */
-const Constructor = function (editorTargets, options) {
+function Constructor(editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
 	/** --- Plugins ------------------------------------------------------------------------------------------ */
@@ -457,7 +457,7 @@ const Constructor = function (editorTargets, options) {
 		pluginCallButtons_sub: sub_main ? sub_main.pluginCallButtons : [],
 		responsiveButtons_sub: sub_main ? sub_main.responsiveButtons : []
 	};
-};
+}
 
 /**
  * @description Create shortcuts desc span.

@@ -109,7 +109,7 @@ const DEFAULT_UNIT_MAP = {
  * @param {boolean=} [pluginOptions.disableInput=true] - When true, disables the direct font size input box.
  * @param {object=} [pluginOptions.unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
  */
-const FontSize = function (editor, pluginOptions) {
+function FontSize(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 
 	// create HTML
@@ -168,7 +168,7 @@ const FontSize = function (editor, pluginOptions) {
 
 	// init
 	this.menu.initDropdownTarget(FontSize, menu);
-};
+}
 
 FontSize.key = 'fontSize';
 FontSize.type = 'input';

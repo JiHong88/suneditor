@@ -28,7 +28,7 @@ const INDEX_2 = 2147483645;
  * @param {ControllerParams} params Controller options
  * @param {string?} _name An optional name for the controller key.
  */
-const Controller = function (inst, element, params, _name) {
+function Controller(inst, element, params, _name) {
 	EditorInjector.call(this, inst.editor);
 
 	// members
@@ -62,7 +62,7 @@ const Controller = function (inst, element, params, _name) {
 	this.eventManager.addEvent(element, 'click', Action.bind(this));
 	this.eventManager.addEvent(element, 'mouseenter', MouseEnter.bind(this));
 	this.eventManager.addEvent(element, 'mouseleave', MouseLeave.bind(this));
-};
+}
 
 Controller.prototype = {
 	/**

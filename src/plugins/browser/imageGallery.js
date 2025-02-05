@@ -10,7 +10,7 @@ import { Browser } from '../../modules';
  * @param {string} pluginOptions.url - server request url
  * @param {object=} pluginOptions.headers - server request headers
  */
-const ImageGallery = function (editor, pluginOptions) {
+function ImageGallery(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.imageGallery;
@@ -30,7 +30,7 @@ const ImageGallery = function (editor, pluginOptions) {
 	// members
 	this.width = this.plugins.image.pluginOptions.defaultWidth === 'auto' ? '' : this.plugins.image.pluginOptions.defaultWidth;
 	this.height = this.plugins.image.pluginOptions.defaultHeight === 'auto' ? '' : this.plugins.image.pluginOptions.defaultHeight;
-};
+}
 
 ImageGallery.key = 'imageGallery';
 ImageGallery.type = 'browser';

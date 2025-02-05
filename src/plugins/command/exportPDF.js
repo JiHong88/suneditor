@@ -12,7 +12,7 @@ const { _d } = env;
  * @param {string} pluginOptions.apiUrl - server request url
  * @param {string} pluginOptions.fileName - file name
  */
-const ExportPDF = function (editor, pluginOptions) {
+function ExportPDF(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.exportPDF;
@@ -35,7 +35,7 @@ const ExportPDF = function (editor, pluginOptions) {
 			responseType: 'blob'
 		});
 	}
-};
+}
 
 ExportPDF.key = 'exportPDF';
 ExportPDF.type = 'command';

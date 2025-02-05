@@ -8,7 +8,7 @@ import { domUtils } from '../../helper';
  * @param {object} pluginOptions
  * @param {Array.<{text: string, value: number}>} pluginOptions.items - Line height list
  */
-const LineHeight = function (editor, pluginOptions) {
+function LineHeight(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.lineHeight;
@@ -23,7 +23,7 @@ const LineHeight = function (editor, pluginOptions) {
 
 	// init
 	this.menu.initDropdownTarget(LineHeight, menu);
-};
+}
 
 LineHeight.key = 'lineHeight';
 LineHeight.type = 'dropdown';

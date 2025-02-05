@@ -21,7 +21,7 @@ const HEADER_KEYCODE = new Map([
  * @param {object} pluginOptions
  * @param {Array.<string>} pluginOptions.items - Format list
  */
-const FormatBlock = function (editor, pluginOptions) {
+function FormatBlock(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.formats;
@@ -36,7 +36,7 @@ const FormatBlock = function (editor, pluginOptions) {
 
 	// init
 	this.menu.initDropdownTarget(FormatBlock, menu);
-};
+}
 
 FormatBlock.key = 'formatBlock';
 FormatBlock.type = 'dropdown';

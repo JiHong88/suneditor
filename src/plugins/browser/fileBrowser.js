@@ -12,7 +12,7 @@ import { Browser } from '../../modules';
  * @param {string|Function} pluginOptions.thumbnail - default thumbnail
  * @param {Array.<string>} pluginOptions.props - additional tag names
  */
-const FileBrowser = function (editor, pluginOptions) {
+function FileBrowser(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.fileBrowser;
@@ -32,7 +32,7 @@ const FileBrowser = function (editor, pluginOptions) {
 		thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : (item) => thumbnail[item.type] || defaultThumbnail,
 		props: [...new Set((pluginOptions.props ?? []).concat(['frame']))]
 	});
-};
+}
 
 FileBrowser.key = 'fileBrowser';
 FileBrowser.type = 'browser';

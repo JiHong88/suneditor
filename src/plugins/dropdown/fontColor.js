@@ -11,7 +11,7 @@ import { domUtils } from '../../helper';
  * @param {number} pluginOptions.splitNum - Number of colors per line
  * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
  */
-const FontColor = function (editor, pluginOptions) {
+function FontColor(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.fontColor;
@@ -31,7 +31,7 @@ const FontColor = function (editor, pluginOptions) {
 	// itit
 	menu.appendChild(this.colorPicker.target);
 	this.menu.initDropdownTarget(FontColor, menu);
-};
+}
 
 FontColor.key = 'fontColor';
 FontColor.type = 'dropdown-free';

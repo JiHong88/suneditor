@@ -18,7 +18,7 @@ const MENU_MIN_HEIGHT = 38;
  * @param {*} inst The instance object that called the constructor.
  * @param {SelectMenuParams} params Select menu options
  */
-const SelectMenu = function (inst, params) {
+function SelectMenu(inst, params) {
 	// plugin bisic properties
 	CoreInjector.call(this, inst.editor);
 
@@ -58,7 +58,7 @@ const SelectMenu = function (inst, params) {
 		keydown: OnKeyDown_refer.bind(this)
 	};
 	this.__globalEventHandlers = { keydown: CloseListener_key.bind(this), mousedown: CloseListener_mousedown.bind(this), click: CloseListener_click.bind(this) };
-};
+}
 
 SelectMenu.prototype = {
 	create(items, menus) {

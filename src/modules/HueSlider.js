@@ -79,7 +79,7 @@ function CreateSliderCtx() {
  * @param {HueSliderParams=} [params={}] Hue slider options
  * @param {string} className The class name of the hue slider.
  */
-const HueSlider = function (inst, params, className) {
+function HueSlider(inst, params, className) {
 	if (!params) params = {};
 
 	this.editor = inst.editor;
@@ -118,7 +118,7 @@ const HueSlider = function (inst, params, className) {
 			this.close();
 		});
 	}
-};
+}
 
 HueSlider.prototype = {
 	/**

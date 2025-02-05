@@ -21,5 +21,5 @@
 		"declarationDir": "./types"
 	},
 	"include": ["src/**/*.js"],
-	"exclude": ["node_modules", "test", "dist", "webpack"]
+	"exclude": ["node_modules", "test", "dist", "webpack", "src/langs/*.js"]
 }

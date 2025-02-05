@@ -11,7 +11,7 @@ import { domUtils } from '../../helper';
  * @param {number} pluginOptions.splitNum - Number of colors per line
  * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
  */
-const BackgroundColor = function (editor, pluginOptions) {
+function BackgroundColor(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.backgroundColor;
@@ -31,7 +31,7 @@ const BackgroundColor = function (editor, pluginOptions) {
 	// itit
 	menu.appendChild(this.colorPicker.target);
 	this.menu.initDropdownTarget(BackgroundColor, menu);
-};
+}
 
 BackgroundColor.key = 'backgroundColor';
 BackgroundColor.type = 'dropdown-free';

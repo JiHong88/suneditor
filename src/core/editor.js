@@ -39,7 +39,7 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
  * @param {EditorInitOptions} options options
  * @returns {object}
  */
-const Editor = function (multiTargets, options) {
+function Editor(multiTargets, options) {
 	const _d = multiTargets[0].target.ownerDocument || env._d;
 	const _w = _d.defaultView || env._w;
 	const product = Constructor(multiTargets, options);
@@ -297,7 +297,7 @@ const Editor = function (multiTargets, options) {
 
 	/** ----- Create editor ------------------------------------------------------------ */
 	this.__Create(options);
-};
+}
 
 Editor.prototype = {
 	/**

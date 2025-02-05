@@ -10,7 +10,7 @@ import { domUtils, env, converter, numbers } from '../../helper';
  * @description Viewer(codeView, fullScreen, showBlocks) class
  * @param {object} editor - editor core object
  */
-const Viewer = function (editor) {
+function Viewer(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
@@ -27,7 +27,7 @@ const Viewer = function (editor) {
 	this.fullScreenBalloon = false;
 	this.fullScreenInline = false;
 	this.toolbarParent = null;
-};
+}
 
 Viewer.prototype = {
 	/**

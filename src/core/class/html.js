@@ -13,7 +13,7 @@ const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|da
  * @description All HTML related classes involved in the editing area
  * @param {object} editor - editor core object
  */
-const HTML = function (editor) {
+function HTML(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
@@ -156,7 +156,7 @@ const HTML = function (editor) {
 		});
 		this._autoStyleify = styleToTag;
 	}
-};
+}
 
 HTML.prototype = {
 	/**

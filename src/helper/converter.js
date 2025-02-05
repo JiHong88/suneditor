@@ -316,7 +316,7 @@ export function addUrlQuery(url, query) {
 
 /**
  * @description Converts options-related styles and returns them for each frame.
- * @param {object.<string, *>} fo frameOptions
+ * @param {Map} fo frameOptions
  * @param {string} cssText Style string
  * @returns {{top: string, frame: string, editor: string}}
  * @private
@@ -361,7 +361,7 @@ export function _setDefaultOptionStyle(fo, cssText) {
 
 /**
  * @description Set default style tag of the iframe
- * @param {object.<string, *>} options Options
+ * @param {Array.<string>} options link names array of CSS files
  * @returns {string} "<link rel="stylesheet" href=".." />.."
  */
 export function _setIframeStyleLinks(linkNames) {

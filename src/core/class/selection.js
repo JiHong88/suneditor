@@ -10,14 +10,14 @@ import { domUtils, unicode, env } from '../../helper';
  * @description Selection, Range related class
  * @param {object} editor - editor core object
  */
-const Selection = function (editor) {
+function Selection(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
 	this.range = null;
 	this.selectionNode = null;
 	this.__iframeFocus = false;
-};
+}
 
 Selection.prototype = {
 	/**

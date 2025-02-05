@@ -10,7 +10,7 @@ import { numbers } from '../../helper';
  * @description History stack closure
  * @param {object} editor - editor core object
  */
-export default function (editor) {
+export default function History(editor) {
 	const frameRoots = editor.frameRoots;
 	let delayTime = editor.options.get('historyStackDelayTime');
 	let pushDelay = null;
@@ -67,7 +67,7 @@ export default function (editor) {
 		if (stackIndex < 0) stackIndex = 0;
 		else if (stackIndex >= stack.length) stackIndex = stack.length - 1;
 
-		editor._offCurrentController();
+		editor.ui._offCurrentController();
 		editor._checkComponents();
 		editor.char.display();
 		editor._resourcesStateChange(fc);

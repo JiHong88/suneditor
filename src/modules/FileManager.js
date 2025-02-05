@@ -15,7 +15,7 @@ import ApiManager from './ApiManager';
  * @param {*} inst The instance object that called the constructor.
  * @param {FileManagerParams} params FileManager options
  */
-const FileManager = function (inst, params) {
+function FileManager(inst, params) {
 	CoreInjector.call(this, inst.editor);
 	this.ui = this.editor.ui;
 
@@ -33,7 +33,7 @@ const FileManager = function (inst, params) {
 	this.__updateTags = [];
 	// api manager
 	this.apiManager = new ApiManager(this, null);
-};
+}
 
 FileManager.prototype = {
 	/**

@@ -12,7 +12,7 @@ const DEFAULT_TYPE = 'decimal';
  * @description List numbered plugin, Several types of lists are provided.
  * @param {object} editor - editor core object
  */
-const List_numbered = function (editor) {
+function List_numbered(editor) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.numberedList;
@@ -31,7 +31,7 @@ const List_numbered = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget({ key: List_numbered.key, type: 'dropdown' }, menu);
-};
+}
 
 List_numbered.key = 'list_numbered';
 List_numbered.type = 'command';

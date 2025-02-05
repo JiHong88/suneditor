@@ -11,7 +11,7 @@ import { Browser } from '../../modules';
  * @param {object=} pluginOptions.headers - server request headers
  * @param {string|Function} pluginOptions.thumbnail - default thumbnail
  */
-const AudioGallery = function (editor, pluginOptions) {
+function AudioGallery(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.audioGallery;
@@ -29,7 +29,7 @@ const AudioGallery = function (editor, pluginOptions) {
 		className: 'se-audio-gallery',
 		thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail
 	});
-};
+}
 
 AudioGallery.key = 'audioGallery';
 AudioGallery.type = 'browser';

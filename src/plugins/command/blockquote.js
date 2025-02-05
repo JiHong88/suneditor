@@ -6,7 +6,7 @@ import { domUtils } from '../../helper';
  * @description Blockquote plugin
  * @param {object} editor - editor core object
  */
-const Blockquote = function (editor) {
+function Blockquote(editor) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.tag_blockquote;
@@ -14,7 +14,7 @@ const Blockquote = function (editor) {
 
 	// members
 	this.quoteTag = domUtils.createElement('BLOCKQUOTE');
-};
+}
 
 Blockquote.key = 'blockquote';
 Blockquote.type = 'command';

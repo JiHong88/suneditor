@@ -28,7 +28,7 @@ const { NO_EVENT } = env;
  * @param {boolean=} [pluginOptions.keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @param {boolean=} [pluginOptions.linkEnableFileUpload] - Whether to enable file uploads for linked images.
  */
-const Image_ = function (editor, pluginOptions) {
+function Image_(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.image;
@@ -155,7 +155,7 @@ const Image_ = function (editor, pluginOptions) {
 		this.asInline = modalEl.querySelector('[data-command="asInline"]');
 		this.eventManager.addEvent([this.asBlock, this.asInline], 'click', OnClickAsButton.bind(this));
 	}
-};
+}
 
 Image_.key = 'image';
 Image_.type = 'modal';

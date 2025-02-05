@@ -12,7 +12,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {*} key root key
  * @returns {Map}
  */
-export const CreateFrameContext = function (editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, documentTypeInner, key) {
+export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, documentTypeInner, key) {
 	const m = new Map([
 		['key', key],
 		['options', editorTarget.options],
@@ -48,14 +48,14 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeWrap
 	if (placeholder) m.set('placeholder', placeholder);
 
 	return m;
-};
+}
 
 /**
  * @description Update statusbar context
  * @param {Element} statusbar Statusbar element
  * @param {FrameContext} mapper FrameContext map
  */
-export const UpdateStatusbarContext = function (statusbar, mapper) {
+export function UpdateStatusbarContext(statusbar, mapper) {
 	statusbar ? mapper.set('statusbar', statusbar) : mapper.delete('statusbar');
 	const navigation = statusbar ? statusbar.querySelector('.se-navigation') : null;
 	const charWrapper = statusbar ? statusbar.querySelector('.se-char-counter-wrapper') : null;
@@ -63,7 +63,7 @@ export const UpdateStatusbarContext = function (statusbar, mapper) {
 	navigation ? mapper.set('navigation', navigation) : mapper.delete('navigation');
 	charWrapper ? mapper.set('charWrapper', charWrapper) : mapper.delete('charWrapper');
 	charCounter ? mapper.set('charCounter', charCounter) : mapper.delete('charCounter');
-};
+}
 
 /**
  * @description Common elements and variables you should have
@@ -73,7 +73,7 @@ export const UpdateStatusbarContext = function (statusbar, mapper) {
  * @param {Element|null} subbar sub toolbar
  * @returns {Map}
  */
-export const CreateContext = function (toolbar, toolbarContainer, menuTray, subbar, statusbarContainer) {
+export function CreateContext(toolbar, toolbarContainer, menuTray, subbar, statusbarContainer) {
 	const m = new Map([
 		['menuTray', menuTray],
 		['toolbar.main', toolbar],
@@ -98,4 +98,4 @@ export const CreateContext = function (toolbar, toolbarContainer, menuTray, subb
 	}
 
 	return m;
-};
+}

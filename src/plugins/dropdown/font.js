@@ -10,7 +10,7 @@ import { domUtils } from '../../helper';
  * @param {number} pluginOptions.splitNum - Number of colors per line
  * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
  */
-const Font = function (editor, pluginOptions) {
+function Font(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.font;
@@ -27,7 +27,7 @@ const Font = function (editor, pluginOptions) {
 
 	// init
 	this.menu.initDropdownTarget(Font, menu);
-};
+}
 
 Font.key = 'font';
 Font.type = 'dropdown';

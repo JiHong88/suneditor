@@ -21,7 +21,7 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
  * @param {string=} [pluginOptions.acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
  * @param {object=} pluginOptions.audioTagAttributes - Additional attributes to set on the audio tag.
  */
-const Audio_ = function (editor, pluginOptions) {
+function Audio_(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.audio;
@@ -79,7 +79,7 @@ const Audio_ = function (editor, pluginOptions) {
 	if (this.audioUrlFile) {
 		this.eventManager.addEvent(this.audioUrlFile, 'input', OnLinkPreview.bind(this));
 	}
-};
+}
 
 Audio_.key = 'audio';
 Audio_.type = 'modal';

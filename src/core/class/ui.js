@@ -12,7 +12,7 @@ import { domUtils, converter } from '../../helper';
  * This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
  * @param {object} editor - editor core object
  */
-const UI = function (editor) {
+function UI(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
@@ -21,7 +21,7 @@ const UI = function (editor) {
 	this.noticeMessage = noticeModal.querySelector('span');
 	this._backWrapper = this.carrierWrapper.querySelector('.se-back-wrapper');
 	this._controllerOnBtnDisabled = false;
-};
+}
 
 UI.prototype = {
 	/**

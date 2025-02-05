@@ -12,7 +12,7 @@ import { _w, _d } from '../../helper/env';
  * @description Offset class, get the position of the element
  * @param {object} editor - editor core object
  */
-const Offset = function (editor) {
+function Offset(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
@@ -20,7 +20,7 @@ const Offset = function (editor) {
 	this._elTop = 0;
 	this._scrollY = 0;
 	this._isFixed = false;
-};
+}
 
 Offset.prototype = {
 	/**

@@ -17,7 +17,7 @@ import { domUtils, numbers } from '../../helper';
  * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @param {string=} [pluginOptions.acceptedFormats] - Accepted file formats for link uploads.
  */
-const Link = function (editor, pluginOptions) {
+function Link(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.link;
@@ -48,7 +48,7 @@ const Link = function (editor, pluginOptions) {
 	this.anchor = new ModalAnchorEditor(this, modalEl, this.pluginOptions);
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: false });
-};
+}
 
 Link.key = 'link';
 Link.type = 'modal';
