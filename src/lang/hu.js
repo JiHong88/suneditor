@@ -53,7 +53,7 @@
             hr_dotted: 'Pontozott',
             hr_dashed: 'Szaggatott',
             table: 'Táblázat',
-            link: 'Link',
+            link: 'Hivatkozás',
             math: 'Matematika',
             image: 'Kép',
             video: 'Videó',
@@ -73,7 +73,7 @@
             template: 'Minta',
             lineHeight: 'Sormagasság',
             paragraphStyle: 'Bekezdésstílus',
-            textStyle: 'Betűstílus',
+            textStyle: 'Karakterstílus',
             imageGallery: 'Képgalléria',
             dir_ltr: 'Balról jobbra',
             dir_rtl: 'Jobbról balra',
@@ -157,8 +157,8 @@
             VerticalSplit: 'Szétválasztás függőlegesen'
         },
         menu: {
-            spaced: 'Széthúzott',
-            bordered: 'Körvonal',
+            spaced: 'Ritkított',
+            bordered: 'Keretezett',
             neon: 'Neon',
             translucent: 'Áttetsző',
             shadow: 'Árnyék',
