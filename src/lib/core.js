@@ -6355,6 +6355,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _responsiveCurrentSize: 'default',
         _responsiveButtonSize: null,
         _responsiveButtons: null,
+        _deleteKeyCode: new _w.RegExp('^(8|46)$'),
         _cursorMoveKeyCode: new _w.RegExp('^(8|3[2-9]|40|46)$'),
         _directionKeyCode: new _w.RegExp('^(8|13|3[2-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
@@ -7916,6 +7917,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 eo = range.endOffset - frontZeroWidthCnt;
                 selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, '');
                 core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
+            }
+
+            if (event._deleteKeyCode.test(keyCode) && formatEl && util.onlyZeroWidthSpace(formatEl.textContent) && !formatEl.previousElementSibling) {
+                formatEl.innerHTML = '<br>';
+                core.setRange(formatEl, 0, formatEl, 0);
             }
 
             core._charCount('');
