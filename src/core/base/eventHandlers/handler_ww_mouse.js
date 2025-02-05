@@ -120,7 +120,7 @@ export function OnClick_wysiwyg(frameContext, e) {
 				insertedNode.parentNode.insertBefore(parent, insertedNode);
 				inner.appendChild(insertedNode);
 
-				this.selection.setRange(insertedNode, domUtils.isZeroWith(insertedNode) ? 1 : 0, insertedNode, 1);
+				this.selection.setRange(insertedNode, domUtils.isZeroWidth(insertedNode) ? 1 : 0, insertedNode, 1);
 			}
 
 			if (this.options.get('copyFormatKeepOn')) return;

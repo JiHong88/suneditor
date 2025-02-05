@@ -94,7 +94,7 @@ Mention.prototype = {
 		if (lastAtPos > -1) {
 			const mentionQuery = textBeforeCursor.substring(lastAtPos + 1, anchorOffset);
 			const beforeText = textBeforeCursor[lastAtPos - 1]?.trim();
-			if (!/\s/.test(mentionQuery) && (!beforeText || domUtils.isZeroWith(beforeText))) {
+			if (!/\s/.test(mentionQuery) && (!beforeText || domUtils.isZeroWidth(beforeText))) {
 				if (mentionQuery.length < this.searchStartLength) return true;
 
 				const anchorParent = anchorNode.parentNode;

@@ -83,7 +83,7 @@ Component.prototype = {
 				if (oNode) formatEl = oNode.previousSibling;
 			}
 			this.html.insertNode(element, { afterNode: isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
-			if (!isInline && formatEl && domUtils.isZeroWith(formatEl)) domUtils.removeItem(formatEl);
+			if (!isInline && formatEl && domUtils.isZeroWidth(formatEl)) domUtils.removeItem(formatEl);
 		}
 
 		if (isInline) {

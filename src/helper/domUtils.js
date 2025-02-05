@@ -6,7 +6,7 @@ import { onlyZeroWidthRegExp, zeroWidthRegExp } from './unicode';
  * @param {string|Node} text String value or Node
  * @returns {boolean}
  */
-export function isZeroWith(text) {
+export function isZeroWidth(text) {
 	if (text === null || text === undefined) return false;
 	if (typeof text !== 'string') text = text.textContent;
 	return text === '' || onlyZeroWidthRegExp.test(text);
@@ -933,7 +933,7 @@ export function isInputElement(element) {
  * @returns {boolean}
  */
 export function isEmptyLine(element) {
-	return !element?.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && element.children.length === 0 && isZeroWith(element.textContent));
+	return !element?.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && element.children.length === 0 && isZeroWidth(element.textContent));
 }
 
 /**
@@ -1240,7 +1240,7 @@ function waitForMediaLoad(target, timeout = 5000) {
 }
 
 const domUtils = {
-	isZeroWith,
+	isZeroWidth,
 	createElement,
 	createTextNode,
 	getIframeDocument,

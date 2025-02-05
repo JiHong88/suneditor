@@ -298,7 +298,7 @@ FileUpload.prototype = {
 			const r = this.html.remove();
 			const s = this.nodeTransform.split(r.container, r.offset, 0);
 
-			if (s?.previousElementSibling && domUtils.isZeroWith(s.previousElementSibling)) {
+			if (s?.previousElementSibling && domUtils.isZeroWidth(s.previousElementSibling)) {
 				domUtils.removeItem(s.previousElementSibling);
 			}
 

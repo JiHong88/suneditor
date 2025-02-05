@@ -58,7 +58,7 @@ NodeTransform.prototype = {
 			if (offset >= 0 && baseNode.length !== offset) {
 				baseNode.splitText(offset);
 				const after = domUtils.getNodeFromPath([index + 1], bp);
-				if (domUtils.isZeroWith(after)) after.data = unicode.zeroWidthSpace;
+				if (domUtils.isZeroWidth(after)) after.data = unicode.zeroWidthSpace;
 			}
 		} else if (baseNode.nodeType === 1) {
 			if (offset === 0) {
@@ -356,7 +356,7 @@ NodeTransform.prototype = {
 
 		(function recursionFunc(current) {
 			if (inst.format._notTextNode(current) || current === notRemoveNode || domUtils.isNonEditable(current)) return 0;
-			if (current !== element && domUtils.isZeroWith(current.textContent) && (!current.firstChild || !domUtils.isBreak(current.firstChild)) && !current.querySelector(allowedEmptyTags)) {
+			if (current !== element && domUtils.isZeroWidth(current.textContent) && (!current.firstChild || !domUtils.isBreak(current.firstChild)) && !current.querySelector(allowedEmptyTags)) {
 				if (current.parentNode) {
 					current.parentNode.removeChild(current);
 					return -1;

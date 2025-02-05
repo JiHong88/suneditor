@@ -443,7 +443,7 @@ Format.prototype = {
 		let moveComplete = false;
 
 		const appendNode = (parentEl, insNode, sibling, originNode) => {
-			if (domUtils.isZeroWith(insNode)) {
+			if (domUtils.isZeroWidth(insNode)) {
 				insNode.innerHTML = unicode.zeroWidthSpace;
 				so = eo = 1;
 			}
@@ -687,7 +687,7 @@ Format.prototype = {
 		const isCollapsed = range.collapsed;
 		const originRange = {
 			sc: range.startContainer,
-			so: range.startContainer === range.endContainer && domUtils.isZeroWith(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
+			so: range.startContainer === range.endContainer && domUtils.isZeroWidth(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
 			ec: range.endContainer,
 			eo: range.endOffset
 		};
@@ -1264,7 +1264,7 @@ Format.prototype = {
 			end.container = newRange.endContainer;
 			end.offset = newRange.endOffset;
 
-			if (start.container === end.container && domUtils.isZeroWith(start.container)) {
+			if (start.container === end.container && domUtils.isZeroWidth(start.container)) {
 				start.offset = end.offset = 1;
 			}
 			this._sn_setCommonListStyle(newRange.ancestor, null);
@@ -1862,13 +1862,13 @@ Format.prototype = {
 		}
 
 		if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
-			if (domUtils.isZeroWith(startCon.textContent.slice(0, startOff)) && domUtils.isZeroWith(endCon.textContent.slice(endOff))) {
+			if (domUtils.isZeroWidth(startCon.textContent.slice(0, startOff)) && domUtils.isZeroWidth(endCon.textContent.slice(endOff))) {
 				const children = parentCon.childNodes;
 				let sameTag = false;
 
 				for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
 					c = children[i];
-					z = !domUtils.isZeroWith(c);
+					z = !domUtils.isZeroWidth(c);
 					if (c === startCon) {
 						s = true;
 						continue;
@@ -1963,7 +1963,7 @@ Format.prototype = {
 						anchorNode = anchorNode.cloneNode(false);
 					}
 
-					if (!domUtils.isZeroWith(prevNode)) {
+					if (!domUtils.isZeroWidth(prevNode)) {
 						ancestor.appendChild(prevNode);
 					}
 
@@ -2022,7 +2022,7 @@ Format.prototype = {
 						nNodeArray.push(newInnerNode);
 					}
 
-					if (!domUtils.isZeroWith(afterNode)) {
+					if (!domUtils.isZeroWidth(afterNode)) {
 						newNode = child;
 						cssText = '';
 						pCurrent = [];
@@ -2141,7 +2141,7 @@ Format.prototype = {
 						appendNode = newNode;
 					}
 
-					if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode) && !domUtils.isZeroWith(newInnerNode)) {
+					if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode) && !domUtils.isZeroWidth(newInnerNode)) {
 						newInnerNode = newInnerNode.cloneNode(false);
 						pNode.appendChild(newInnerNode);
 						nNodeArray.push(newInnerNode);
@@ -2316,11 +2316,11 @@ Format.prototype = {
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.nextSibling && domUtils.isZeroWith(startCon.textContent.slice(0, startOff))) {
+		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.nextSibling && domUtils.isZeroWidth(startCon.textContent.slice(0, startOff))) {
 			let sameTag = false;
 			let s = startCon.previousSibling;
 			while (s) {
-				if (!domUtils.isZeroWith(s)) {
+				if (!domUtils.isZeroWidth(s)) {
 					sameTag = false;
 					break;
 				}
@@ -2467,7 +2467,7 @@ Format.prototype = {
 						anchorNode = anchorNode.cloneNode(false);
 					}
 
-					if (!domUtils.isZeroWith(prevNode)) {
+					if (!domUtils.isZeroWidth(prevNode)) {
 						ancestor.appendChild(prevNode);
 					}
 
@@ -2563,7 +2563,7 @@ Format.prototype = {
 		} else {
 			this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
-			if (domUtils.isZeroWith(pNode.textContent)) {
+			if (domUtils.isZeroWidth(pNode.textContent)) {
 				container = pNode.firstChild;
 				offset = 0;
 			}
@@ -2751,11 +2751,11 @@ Format.prototype = {
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.previousSibling && domUtils.isZeroWith(endCon.textContent.slice(endOff))) {
+		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.previousSibling && domUtils.isZeroWidth(endCon.textContent.slice(endOff))) {
 			let sameTag = false;
 			let e = endCon.nextSibling;
 			while (e) {
-				if (!domUtils.isZeroWith(e)) {
+				if (!domUtils.isZeroWidth(e)) {
 					sameTag = false;
 					break;
 				}
@@ -2901,7 +2901,7 @@ Format.prototype = {
 						nNodeArray.push(newInnerNode);
 					}
 
-					if (!domUtils.isZeroWith(afterNode)) {
+					if (!domUtils.isZeroWidth(afterNode)) {
 						ancestor.insertBefore(afterNode, ancestor.firstChild);
 					}
 
@@ -3012,10 +3012,10 @@ Format.prototype = {
 
 			this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
-			if (domUtils.isZeroWith(pNode.textContent)) {
+			if (domUtils.isZeroWidth(pNode.textContent)) {
 				container = pNode.firstChild;
 				offset = container.textContent.length;
-			} else if (domUtils.isZeroWith(container)) {
+			} else if (domUtils.isZeroWidth(container)) {
 				container = newInnerNode;
 				offset = 1;
 			}

@@ -1378,7 +1378,7 @@ Table.prototype = {
 
 			ch = cell.children;
 			for (let c = 0, cLen = ch.length; c < cLen; c++) {
-				if (this.format.isLine(ch[c]) && domUtils.isZeroWith(ch[c].textContent)) {
+				if (this.format.isLine(ch[c]) && domUtils.isZeroWidth(ch[c].textContent)) {
 					domUtils.removeItem(ch[c]);
 				}
 			}

@@ -512,7 +512,7 @@ Editor.prototype = {
 	isEmpty(fc) {
 		fc = fc || this.frameContext;
 		const wysiwyg = fc.get('wysiwyg');
-		return domUtils.isZeroWith(wysiwyg.textContent) && !wysiwyg.querySelector(this.options.get('allowedEmptyTags')) && (wysiwyg.innerText.match(/\n/g) || '').length <= 1;
+		return domUtils.isZeroWidth(wysiwyg.textContent) && !wysiwyg.querySelector(this.options.get('allowedEmptyTags')) && (wysiwyg.innerText.match(/\n/g) || '').length <= 1;
 	},
 
 	/**

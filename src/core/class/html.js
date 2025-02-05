@@ -487,7 +487,7 @@ HTML.prototype = {
 					} else {
 						if (!domUtils.isBreak(parentNode)) {
 							const c = parentNode.childNodes[startOff];
-							const focusNode = c?.nodeType === 3 && domUtils.isZeroWith(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
+							const focusNode = c?.nodeType === 3 && domUtils.isZeroWidth(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
 							if (focusNode) {
 								if (!focusNode.nextSibling && domUtils.isBreak(focusNode)) {
 									parentNode.removeChild(focusNode);
@@ -637,7 +637,7 @@ HTML.prototype = {
 			parentNode.insertBefore(oNode, afterNode);
 
 			if (insertListCell) {
-				if (domUtils.isZeroWith(line.textContent.trim())) {
+				if (domUtils.isZeroWidth(line.textContent.trim())) {
 					domUtils.removeItem(line);
 					oNode = oNode.lastChild;
 				} else {
@@ -651,7 +651,7 @@ HTML.prototype = {
 							oNode = parentNode;
 						}
 
-						if (domUtils.isZeroWith(line.textContent.trim())) {
+						if (domUtils.isZeroWidth(line.textContent.trim())) {
 							domUtils.removeItem(line);
 						}
 					}
@@ -805,7 +805,7 @@ HTML.prototype = {
 						rOffset = rOffset === 0 ? 0 : 1;
 					}
 
-					if (domUtils.isZeroWith(line) && !line.contains(rEl)) {
+					if (domUtils.isZeroWidth(line) && !line.contains(rEl)) {
 						domUtils.removeItem(line);
 					}
 
@@ -830,7 +830,7 @@ HTML.prototype = {
 			};
 
 		if (startCon === endCon && range.collapsed) {
-			if (domUtils.isZeroWith(startCon.textContent?.substr(startOff))) {
+			if (domUtils.isZeroWidth(startCon.textContent?.substr(startOff))) {
 				return {
 					container: startCon,
 					offset: startOff,
@@ -881,7 +881,7 @@ HTML.prototype = {
 				startCon = endCon = commonCon;
 			} else {
 				startCon = endCon = childNodes[0];
-				if (domUtils.isBreak(startCon) || domUtils.isZeroWith(startCon)) {
+				if (domUtils.isBreak(startCon) || domUtils.isZeroWidth(startCon)) {
 					return {
 						container: domUtils.isMedia(commonCon) ? commonCon : startCon,
 						offset: 0,
@@ -1398,7 +1398,7 @@ HTML.prototype = {
 
 		for (let i = 0, len = checkTags.length, t; i < len; i++) {
 			t = checkTags[i];
-			if (domUtils.isZeroWith(t.textContent.trim())) {
+			if (domUtils.isZeroWidth(t.textContent.trim())) {
 				domUtils.removeItem(t);
 			}
 		}
