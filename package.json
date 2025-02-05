@@ -1,7 +1,7 @@
 {
   "name": "suneditor",
-  "version": "2.47.4",
-  "description": "Vanilla javascript based WYSIWYG web editor, with no dependencies",
+  "version": "2.47.5",
+  "description": "Vanilla JavaScript WYSIWYG web editor (2.x legacy version, actively maintained)",
   "author": "JiHong.Lee",
   "license": "MIT",
   "main": "src/suneditor.js",
