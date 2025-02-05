@@ -1,10 +1,13 @@
 # SunEditor
 Vanilla javscript based WYSIWYG web editor.
+
 SunEditor supports all modern browsers except IE without any dependencies and polyfills.
+
 
 #### 🌤 Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a> 🌤
 
 ⭐ If you would like to contribute, please refer to [guidelines](/CONTRIBUTING.md) and a list of [open tasks](https://github.com/jihong88/suneditor/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).⭐
+
 
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
@@ -26,16 +29,18 @@ SunEditor supports all modern browsers except IE without any dependencies and po
 ``` sh
 $ npm install suneditor --save
 ```
-#### CDN
+#### CDN - [jsdelivr/suneditor](https://www.jsdelivr.com/package/npm/suneditor)
 ``` html
-<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
-<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor.css" rel="stylesheet"> -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor-contents.css" rel="stylesheet"> -->
+<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <!-- languages (Basic Language: English/en) -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/langs/ko.js"></script>
 ```
-[jsdelivr/suneditor](https://www.jsdelivr.com/package/npm/suneditor)
+
+## Contributors ✨
+<a href="https://github.com/jihong88/suneditor/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jihong88/suneditor" alt="contributors"/>
+</a>
 
 
 ## License

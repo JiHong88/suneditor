@@ -20,6 +20,6 @@
 		"emitDeclarationOnly": true,
 		"declarationDir": "./types"
 	},
-	"include": ["src/**/*.js"],
-	"exclude": ["node_modules", "test", "dist", "webpack", "src/langs/*.js"]
+	"include": ["src/**/*.js", "!src/langs/*"],
+	"exclude": ["node_modules", "test", "dist", "webpack"]
 }

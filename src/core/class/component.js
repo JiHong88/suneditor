@@ -268,7 +268,7 @@ Component.prototype = {
 			this.editor.status.onSelected = false;
 		}, 0);
 		this.__deselect();
-		domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
+		this.ui.setControllerOnDisabledButtons(false);
 	},
 
 	/**

@@ -167,7 +167,7 @@ Toolbar.prototype = {
 		this.editor.effectNode = null;
 		this.viewer._setButtonsActive();
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
-		if (this.editor.frameContext.get('isReadOnly')) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+		if (this.editor.frameContext.get('isReadOnly')) this.ui.setControllerOnDisabledButtons(true);
 
 		this.triggerEvent('onSetToolbarButtons', { buttonTray: newToolbar.buttonTray, frameContext: this.editor.frameContext });
 	},

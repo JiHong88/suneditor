@@ -702,7 +702,7 @@ Video.prototype = {
 
 	/**
 	 * @description Create an "video" component using the provided url.
-	 * @param {Array.<File>} fileList File object list
+	 * @param {string} url File url
 	 * @returns {boolean} If return false, the file upload will be canceled
 	 */
 	async submitURL(url) {
