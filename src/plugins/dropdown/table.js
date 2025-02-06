@@ -72,7 +72,7 @@ const DEFAULT_COLOR_LIST = [
 /**
  * @class
  * @description Table Plugin
- * @param {object} editor editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {"x"|"y"|"xy"} [pluginOptions.scrollType='x'] - Scroll type ('x', 'y', 'xy')
  * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')
@@ -274,7 +274,7 @@ Table.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
-	 * Called when an item in the "dropdown" menu is clicked.
+	 * - Called when an item in the "dropdown" menu is clicked.
 	 */
 	action() {
 		const oTable = domUtils.createElement('TABLE');
@@ -331,15 +331,14 @@ Table.prototype = {
 
 	/**
 	 * @editorMethod Editor.core
-	 * @description
-	 * This method is used to validate and preserve the format of the component within the editor.
-	 * It ensures that the structure and attributes of the element are maintained and secure.
-	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * If the element isn't properly contained, a new container is created to retain the format.
+	 * @description This method is used to validate and preserve the format of the component within the editor.
+	 * - It ensures that the structure and attributes of the element are maintained and secure.
+	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
+	 * - If the element isn't properly contained, a new container is created to retain the format.
 	 * @returns {object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
-	 * The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
 		return {
@@ -1358,7 +1357,7 @@ Table.prototype = {
 
 	/**
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
-	 * This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
+	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
 	 */
 	mergeCells() {
 		const ref = this._ref;

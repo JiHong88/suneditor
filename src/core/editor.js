@@ -33,6 +33,10 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
  */
 
 /**
+ * @typedef {import('./section/context').FrameContext} FrameContext
+ */
+
+/**
  * @class
  * @description SunEditor constructor function.
  * @param {Array.<Element>} multiTargets Target element
@@ -175,13 +179,13 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
-	 * Each button is contained in an array.
+	 * - Each button is contained in an array.
 	 */
 	this.commandTargets = new Map();
 
 	/**
 	 * @description Plugins array with "active" method.
-	 * "activeCommands" runs the "add" method when creating the editor.
+	 * - "activeCommands" runs the "add" method when creating the editor.
 	 */
 	this.activeCommands = null;
 
@@ -302,7 +306,7 @@ function Editor(multiTargets, options) {
 Editor.prototype = {
 	/**
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
-	 * If the plugin is added call callBack function.
+	 * - If the plugin is added call callBack function.
 	 * @param {string} pluginName The name of the plugin to call
 	 * @param {Array.<Element>|null} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 * @param {object|null} pluginOptions Plugin's options
@@ -390,7 +394,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Execute default command of command button
-	 * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
+	 * - (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
 	 * @param {Element} button Command button
 	 */
@@ -485,13 +489,13 @@ Editor.prototype = {
 
 	/**
 	 * @description It is executed by inserting the button of commandTargets as the argument value of the "f" function.
-	 * "f" is called as long as the button array's length.
+	 * - "func" is called as long as the button array's length.
 	 * @param {string} cmd data-command
-	 * @param {Function} f Function.
+	 * @param {Function} func Function.
 	 */
-	applyCommandTargets(cmd, f) {
+	applyCommandTargets(cmd, func) {
 		if (this.commandTargets.has(cmd)) {
-			this.commandTargets.get(cmd).forEach(f);
+			this.commandTargets.get(cmd).forEach(func);
 		}
 	},
 
@@ -505,7 +509,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Checks if the content of the editor is empty.
-	 * Display criteria for "placeholder".
+	 * - Display criteria for "placeholder".
 	 * @param {frameContext|null} fc Frame context, if not present, currently selected frame context.
 	 * @returns {boolean}
 	 */
@@ -794,7 +798,7 @@ Editor.prototype = {
 
 	/**
 	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
-	 * If "focusEdge" is null, then selected last element
+	 * - If "focusEdge" is null, then selected last element
 	 * @param {Element|null} focusEl Focus element
 	 */
 	focusEdge(focusEl) {

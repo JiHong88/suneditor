@@ -10,7 +10,7 @@ import { _w, _d } from '../../helper/env';
 /**
  * @class
  * @description Offset class, get the position of the element
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 function Offset(editor) {
 	CoreInjector.call(this, editor);
@@ -277,6 +277,14 @@ Offset.prototype = {
 		};
 	},
 
+	/**
+	 * @description Sets the relative position of an element
+	 * @param {Element} element Element to position
+	 * @param {Element} e_container Element's root container
+	 * @param {Element} target Target element to position against
+	 * @param {Element} t_container Target's root container
+	 * @param {boolean} _reload Whether to reload position
+	 */
 	setRelPosition(element, e_container, target, t_container, _reload) {
 		this._scrollY = _w.scrollY;
 		let wy = 0;
@@ -349,6 +357,16 @@ Offset.prototype = {
 		}
 	},
 
+	/**
+	 * @description Sets the absolute position of an element
+	 * @param {Element} element Element to position
+	 * @param {Element} target Target element
+	 * @param {object} params Position parameters
+	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
+	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
+	 * @param {object} params.inst Instance object of caller
+	 * @returns {boolean} Success / Failure
+	 */
 	setAbsPosition(element, target, params) {
 		const addOffset = params.addOffset || {
 			left: 0,
@@ -487,6 +505,15 @@ Offset.prototype = {
 		return true;
 	},
 
+	/**
+	 * @description Sets the position of an element relative to a range
+	 * @param {Element} element Element to position
+	 * @param {Range} range Range to position against
+	 * @param {object} [options={}] Position options
+	 * @param {"bottom"|"top"} [options.position="bottom"] Position ('bottom'|'top')
+	 * @param {number} [options.addTop=0] Additional top offset
+	 * @returns {boolean} Success / Failure
+	 */
 	setRangePosition(element, range, { position, addTop } = {}) {
 		element.style.top = '-10000px';
 		element.style.visibility = 'hidden';
@@ -537,6 +564,25 @@ Offset.prototype = {
 		return true;
 	},
 
+	/**
+	 * @private
+	 * @description Sets the position of an element relative to the selection range in the editor.
+	 * - This method calculates the top and left offsets for the element, ensuring it
+	 * - does not overflow the editor boundaries and adjusts the arrow positioning accordingly.
+	 * @param {boolean} isDirTop - Determines whether the element should be positioned above (`true`) or below (`false`) the target.
+	 * @param {object} rects - Bounding rectangle information of the selection range.
+	 * @param {number} rects.left - The left position of the selection.
+	 * @param {number} rects.right - The right position of the selection.
+	 * @param {number} rects.top - The top position of the selection.
+	 * @param {number} rects.bottom - The bottom position of the selection.
+	 * @param {boolean} rects.noText - Whether the selection contains text.
+	 * @param {Element} element - The element to be positioned.
+	 * @param {number} editorLeft - The left position of the editor.
+	 * @param {number} editorWidth - The width of the editor.
+	 * @param {number} scrollLeft - The horizontal scroll offset.
+	 * @param {number} scrollTop - The vertical scroll offset.
+	 * @param {number} [addTop=0] - Additional top margin adjustment.
+	 */
 	_setOffsetOnRange(isDirTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop = 0) {
 		const padding = 1;
 		const arrow = element.querySelector('.se-arrow ');
@@ -577,11 +623,30 @@ Offset.prototype = {
 		arrow.style.left = (arrow_left + arrowMargin > element.offsetWidth ? element.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
 	},
 
+	/**
+	 * @private
+	 * @description Get available space from page bottom
+	 * @returns {number} Available space
+	 */
 	_getPageBottomSpace() {
 		const topArea = this.editor.frameContext.get('topArea');
 		return _d.documentElement.scrollHeight - (this.getGlobal(topArea).top + topArea.offsetHeight);
 	},
 
+	/**
+	 * @private
+	 * @description Calculates the vertical margin offsets for the target element relative to the editor frame.
+	 * - This method determines the top and bottom margins based on various conditions such as
+	 * - fullscreen mode, iframe usage, toolbar height, and scroll positions.
+	 * @param {number} tmtw Top margin to window
+	 * @param {number} tmbw Bottom margin to window
+	 * @param {number} toolbarH Toolbar height
+	 * @param {object} clientSize Client size object
+	 * @param {object} targetRect Target rect object
+	 * @param {boolean} isTargetAbs Is target absolute position
+	 * @param {object} wwScroll WYSIWYG scroll info
+	 * @returns {{rmt:number, rmb:number, rt:number}} Margin values (rmt: top margin, rmb: bottom margin, rt: Toolbar height offset adjustment)
+	 */
 	_getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll) {
 		let rmt = 0;
 		let rmb = 0;
@@ -636,6 +701,16 @@ Offset.prototype = {
 		};
 	},
 
+	/**
+	 * @private
+	 * @description Sets the visibility and direction of the arrow element.
+	 * - This method applies the appropriate class (`se-arrow-up` or `se-arrow-down`)
+	 * - based on the specified direction key and adjusts the visibility of the arrow.
+	 * @param {HTMLElement} arrow - The arrow element to be updated.
+	 * @param {"up"|"down"|""} key - The direction of the arrow.
+	 * - Accepts `'up'` for an upward arrow, `'down'` for a downward arrow,
+	 * - or any other value to hide the arrow.
+	 */
 	_setArrow(arrow, key) {
 		if (key === 'up') {
 			if (arrow) arrow.style.visibility = '';
@@ -650,6 +725,22 @@ Offset.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves the current window scroll position and viewport size.
+	 * - Returns an object containing the scroll offsets, viewport dimensions, and boundary rects.
+	 * @returns {object} An object with scroll and viewport information.
+	 * @returns {number} return.top - The vertical scroll position of the window.
+	 * @returns {number} return.left - The horizontal scroll position of the window.
+	 * @returns {number} return.width - The width of the viewport.
+	 * @returns {number} return.height - The height of the viewport.
+	 * @returns {object} return.rects - An object containing the boundary rects.
+	 * @returns {number} return.rects.left - The left boundary of the viewport.
+	 * @returns {number} return.rects.top - The top boundary of the viewport.
+	 * @returns {number} return.rects.right - The right boundary of the viewport.
+	 * @returns {number} return.rects.bottom - The bottom boundary of the viewport.
+	 * @returns {boolean} return.rects.noText - Indicates whether there is text in the viewport.
+	 */
 	_getWindowScroll() {
 		const viewPort = domUtils.getClientSize(_d);
 		return {
@@ -667,6 +758,11 @@ Offset.prototype = {
 		};
 	},
 
+	/**
+	 * @private
+	 * @description Removes the global scroll event listener from the editor.
+	 * - Resets related scroll tracking properties.
+	 */
 	__removeGlobalEvent() {
 		if (this._scrollEvent) {
 			this._scrollEvent = this.editor.eventManager.removeGlobalEvent(this._scrollEvent);

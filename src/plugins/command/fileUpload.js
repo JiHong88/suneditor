@@ -8,7 +8,7 @@ const { NO_EVENT } = env;
 /**
  * @class
  * @description File upload plugin
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions - plugin options
  * @param {string} pluginOptions.uploadUrl - server request url
  * @param {Object=} pluginOptions.uploadHeaders - server request headers
@@ -95,7 +95,7 @@ FileUpload.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
-	 * It is executed by clicking a toolbar "command" button or calling an API.
+	 * - It is executed by clicking a toolbar "command" button or calling an API.
 	 */
 	action() {
 		this.editor._preventBlur = true;

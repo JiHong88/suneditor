@@ -5,14 +5,14 @@
 // --- native events
 /**
  * @typedef {object} BaseEvent
- * @property {object} editor - editor core object
+ * @property {object} editor - The root editor instance
  * @property {object} frameContext - frame context
  * @property {Event} event - event object
  */
 
 /**
  * @typedef {object} ClipboardEvent
- * @property {object} editor - editor core object
+ * @property {object} editor - The root editor instance
  * @property {object} frameContext - frame context
  * @property {Event} event - event object
  * @property {string} data - drop data
@@ -111,7 +111,7 @@ export default function () {
 		/**
 		 * @description Event call back function
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 */
 		onload: null,
 
@@ -172,7 +172,7 @@ export default function () {
 		/**
 		 * @description Event function on copy
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {Event} params.event - event object
 		 * @param {Event} params.clipboardData - clipboardData
@@ -182,7 +182,7 @@ export default function () {
 		/**
 		 * @description Event function on cut
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {Event} params.event - event object
 		 * @param {Event} params.clipboardData - clipboardData
@@ -192,7 +192,7 @@ export default function () {
 		/**
 		 * @description Event call back function
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {Event} params.event - event object
 		 * @param {Event} params.data - editor data
@@ -208,9 +208,9 @@ export default function () {
 
 		/**
 		 * @description Called just after the controller is positioned and displayed on the screen.
-		 * controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
+		 * - controller : editing elements displayed on the screen [image resizing, table editor, link editor..]]
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {string} params.caller - caller plugin name
 		 * @param {ControllerInfo} params.info - info object
@@ -219,9 +219,9 @@ export default function () {
 
 		/**
 		 * @description Called just after the controller is positioned and displayed on the screen.
-		 * controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
+		 * - controller : editing elements displayed on the screen [image resizing, table editor, link editor..]]
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {string} params.caller - caller plugin name
 		 * @param {ControllerInfo} params.info - info object
@@ -231,7 +231,7 @@ export default function () {
 		/**
 		 * @description An event when toggling between code view and wysiwyg view.
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {boolean} params.is - code view status
 		 */
@@ -240,7 +240,7 @@ export default function () {
 		/**
 		 * @description An event when toggling full screen.
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {boolean} params.is - full screen status
 		 */
@@ -249,7 +249,7 @@ export default function () {
 		/**
 		 * @description Called when the editor is resized using the bottom bar
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {number} params.height - wysiwyg area frame height
 		 * @param {boolean} params.prevHeight - wysiwyg area previous height
@@ -259,9 +259,9 @@ export default function () {
 
 		/**
 		 * @description Called after the "setToolbarButtons" invocation.
-		 * Can be used to tweak buttons properties (useful for custom buttons)
+		 * - Can be used to tweak buttons properties (useful for custom buttons)
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {Element} params.buttonTray - button tray element
 		 */
@@ -274,7 +274,7 @@ export default function () {
 		/**
 		 * @description Event callback function on save
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {Event} params.data - editor data
 		 */
@@ -282,8 +282,8 @@ export default function () {
 
 		/**
 		 * @description Event function on [drop, paste] before
-		 * When false is returned, the default behavior is stopped.
-		 * If the string is returned, the cleanData value is modified to the return value.
+		 * - When false is returned, the default behavior is stopped.
+		 * - If the string is returned, the cleanData value is modified to the return value.
 		 * @param {ClipboardEvent} params
 		 * @returns {boolean|string}
 		 */
@@ -291,8 +291,8 @@ export default function () {
 
 		/**
 		 * @description Event function on [drop, paste] before
-		 * When false is returned, the default behavior is stopped.
-		 * If the string is returned, the cleanData value is modified to the return value.
+		 * - When false is returned, the default behavior is stopped.
+		 * - If the string is returned, the cleanData value is modified to the return value.
 		 * @param {ClipboardEvent} params
 		 * @returns {boolean|string}
 		 */
@@ -301,7 +301,7 @@ export default function () {
 		/**
 		 * @description It replaces the default callback function of the image upload
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
 		 * @param {ImageInfo} params.info - info object
 		 */
@@ -309,12 +309,12 @@ export default function () {
 
 		/**
 		 * @description Called before the image is uploaded
-		 * If true is returned, the internal upload process runs normally.
-		 * If false is returned, no image upload is performed.
-		 * If new fileList are returned,  replaced the previous fileList
-		 * If undefined is returned, it waits until "uploadHandler" is executed.
+		 * - If true is returned, the internal upload process runs normally.
+		 * - If false is returned, no image upload is performed.
+		 * - If new fileList are returned,  replaced the previous fileList
+		 * - If undefined is returned, it waits until "uploadHandler" is executed.
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {ImageInfo} params.info - info object
 		 * @param {Function} params.handler - handler function
 		 * @returns {boolean|Array|undefined}
@@ -324,7 +324,7 @@ export default function () {
 		/**
 		 * @description Called when the editor loaded, file Current editor value
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {Array.<FileManagementInfo>} infoList - info list
 		 */
 		onImageLoad: null,
@@ -332,7 +332,7 @@ export default function () {
 		/**
 		 * @description Called when the image is uploaded, updated, deleted* @param {object} params
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {FileManagementInfo} params.info - info object
 		 * @param {Element|null} params.element - target element
 		 * @param {"create"|"update"|"delete"} params.state - state
@@ -344,7 +344,7 @@ export default function () {
 		/**
 		 * @description Called when the image is upload failed
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.error - error object
 		 * @param {number=} params.limitSize - limit size
 		 * @param {number=} params.uploadSize - upload size
@@ -356,7 +356,7 @@ export default function () {
 		/**
 		 * @description Called before the image is deleted
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {Element} params.element - target element
 		 * @param {Element} params.container - target's container element (div)
 		 * @param {string} params.align - align value
@@ -368,7 +368,7 @@ export default function () {
 		/**
 		 * @description It replaces the default callback function of the video upload
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
 		 * @param {VideoInfo} params.info - info object
 		 */
@@ -376,12 +376,12 @@ export default function () {
 
 		/**
 		 * @description Called before the video is uploaded
-		 * If true is returned, the internal upload process runs normally.
-		 * If false is returned, no video(iframe, video) upload is performed.
-		 * If new fileList are returned,  replaced the previous fileList
-		 * If undefined is returned, it waits until "uploadHandler" is executed.
+		 * - If true is returned, the internal upload process runs normally.
+		 * - If false is returned, no video(iframe, video) upload is performed.
+		 * - If new fileList are returned,  replaced the previous fileList
+		 * - If undefined is returned, it waits until "uploadHandler" is executed.
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {VideoInfo} params.info - info object
 		 * @param {Function} params.handler - handler function
 		 */
@@ -390,7 +390,7 @@ export default function () {
 		/**
 		 * @description Called when the editor loaded, file Current editor value
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {Array.<FileManagementInfo>} infoList - info list
 		 */
 		onVideoLoad: null,
@@ -398,7 +398,7 @@ export default function () {
 		/**
 		 * @description Called when the video(iframe, video) is is uploaded, updated, deleted
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {FileManagementInfo} params.info - info object
 		 * @param {Element|null} params.element - target element
 		 * @param {"create"|"update"|"delete"} params.state - state
@@ -410,7 +410,7 @@ export default function () {
 		/**
 		 * @description Called when the video(iframe, video) upload failed
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.error - error object
 		 * @param {number=} params.limitSize - limit size
 		 * @param {number=} params.uploadSize - upload size
@@ -422,7 +422,7 @@ export default function () {
 		/**
 		 * @description Called before the video is deleted
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {Element} params.element - target element
 		 * @param {Element} params.container - target's container element (div)
 		 * @param {string} params.align - align value
@@ -433,7 +433,7 @@ export default function () {
 		/**
 		 * @description It replaces the default callback function of the audio upload
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
 		 * @param {AudioInfo} params.info - info object
 		 */
@@ -441,12 +441,12 @@ export default function () {
 
 		/**
 		 * @description Called before the audio is uploaded
-		 * If true is returned, the internal upload process runs normally.
-		 * If false is returned, no audio upload is performed.
-		 * If new fileList are returned,  replaced the previous fileList
-		 * If undefined is returned, it waits until "uploadHandler" is executed.
+		 * - If true is returned, the internal upload process runs normally.
+		 * - If false is returned, no audio upload is performed.
+		 * - If new fileList are returned,  replaced the previous fileList
+		 * - If undefined is returned, it waits until "uploadHandler" is executed.
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {AudioInfo} params.info - info object
 		 * @param {Function} params.handler - handler function
 		 * @returns {boolean|Array|undefined}
@@ -456,7 +456,7 @@ export default function () {
 		/**
 		 * @description Called when the audio upload failed
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.error - error object
 		 * @param {number=} params.limitSize - limit size
 		 * @param {number=} params.uploadSize - upload size
@@ -468,7 +468,7 @@ export default function () {
 		/**
 		 * @description Called when the audio is is uploaded, updated, deleted
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {FileManagementInfo} params.info - info object
 		 * @param {Element|null} params.element - target element
 		 * @param {"create"|"update"|"delete"} params.state - state
@@ -480,7 +480,7 @@ export default function () {
 		/**
 		 * @description Called before the audio is deleted
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {Element} params.element - target element
 		 * @param {Element} params.container - target's container element (div)
 		 * @param {string} params.url - audio url
@@ -490,7 +490,7 @@ export default function () {
 		/**
 		 * @description Called when the editor loaded, file Current editor value
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {Array.<FileManagementInfo>} infoList - info list
 		 */
 		onAudioLoad: null,
@@ -498,7 +498,7 @@ export default function () {
 		/**
 		 * @description Called when the file is is uploaded, updated, deleted
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {FileManagementInfo} params.info - info object
 		 * @param {Element|null} params.element - target element
 		 * @param {"create"|"update"|"delete"} params.state - state
@@ -510,7 +510,7 @@ export default function () {
 		/**
 		 * @description Called before the file is deleted
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {Element} params.element - target element
 		 * @param {Element} params.container - target's container element (div)
 		 * @param {string} params.url - file url
@@ -520,7 +520,7 @@ export default function () {
 		/**
 		 * @description Called when the editor loaded, file Current editor value
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {Array.<FileManagementInfo>} infoList - info list
 		 */
 		onFileLoad: null,
@@ -528,7 +528,7 @@ export default function () {
 		/**
 		 * @description Called when the file is uploaded
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {FileInfo} params.info - info object
 		 * @param {Function} params.handler - handler function
 		 */
@@ -537,7 +537,7 @@ export default function () {
 		/**
 		 * @description Called when the file is upload failed
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.error - error object
 		 * @param {number=} params.limitSize - limit size
 		 * @param {number=} params.uploadSize - upload size
@@ -549,7 +549,7 @@ export default function () {
 		/**
 		 * @description Called before the PDF export is started
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {Element} params.target - wysiwyg editable element
 		 */
 		onExportPDFBefore: null,
@@ -557,7 +557,7 @@ export default function () {
 		/**
 		 * @description Events that occur when actions such as uploading or deleting all files are performed in the file manager
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {FileManagementInfo} params.info - info object
 		 * @param {Element|null} params.element - target element
 		 * @param {"create"|"update"|"delete"} params.state - state
@@ -569,7 +569,7 @@ export default function () {
 		/**
 		 * @description Called before the embed is inserted
 		 * @param {object} params
-		 * @param {object} params.editor - editor core object
+		 * @param {object} params.editor - The root editor instance
 		 * @param {EmbedInfo} params.info - info object
 		 * @param {Function} params.handler - handler function
 		 */

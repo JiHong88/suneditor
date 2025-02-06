@@ -4,7 +4,7 @@ import { Browser } from '../../modules';
 /**
  * @class
  * @description Video gallery plugin
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {object} pluginOptions.data - direct data without server calls
  * @param {string} pluginOptions.url - server request url

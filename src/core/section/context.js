@@ -1,6 +1,51 @@
 import { get as getNumber } from '../../helper/numbers';
 
 /**
+ * @typedef {import('../section/constructor').EditorFrameOptions} EditorFrameOptions
+ */
+
+/**
+ * @typedef {Map<string, any>} FrameContext
+ * @property {string} key The root key identifier
+ * @property {EditorFrameOptions} options Editor frame options
+ * @property {Element} originElement The original target element
+ * @property {Element} topArea The top area of the editor
+ * @property {Element} container The editor container element
+ * @property {Element} wrapper The editor wrapper element
+ * @property {Element} wysiwygFrame The wysiwyg frame element
+ * @property {Element} wysiwyg The wysiwyg content area
+ * @property {Element} codeWrapper The code view wrapper
+ * @property {Element} code The code view frame
+ * @property {Element|null} codeNumbers The code line numbers container
+ * @property {Element} lineBreaker_t The top line breaker element
+ * @property {Element} lineBreaker_b The bottom line breaker element
+ * @property {Element|null} statusbar The status bar element
+ * @property {boolean} isCodeView Whether the editor is in code view mode
+ * @property {boolean} isFullScreen Whether the editor is in full-screen mode
+ * @property {boolean} isReadOnly Whether the editor is in read-only mode
+ * @property {boolean} isDisabled Whether the editor is disabled
+ * @property {number} isChanged Change tracking flag (-1 for initial state)
+ * @property {number} historyIndex The index of the current history state
+ * @property {number} savedIndex The index of the last saved history state
+ * @property {Element} eventWysiwyg Editable element for event delegation (isIframe ? fc.get('_ww') : fc.get('wysiwyg'))
+ */
+
+/**
+ * @typedef {Map<string, any>} Context
+ * @property {Element} menuTray The menu tray element
+ * @property {Element} toolbar.main The main toolbar frame
+ * @property {Element} toolbar.buttonTray The toolbar button tray
+ * @property {Element} toolbar._arrow The toolbar arrow
+ * @property {Element} [toolbar.sub.main] The sub-toolbar frame
+ * @property {Element} [toolbar.sub.buttonTray] The sub-toolbar button tray
+ * @property {Element} [toolbar.sub._arrow] The sub-toolbar arrow
+ * @property {Element} [toolbar.sub._wrapper] The sub-toolbar wrapper element
+ * @property {Element} [toolbar._wrapper] The main toolbar wrapper
+ * @property {Element} [_stickyDummy] The sticky toolbar placeholder
+ * @property {Element} [statusbar._wrapper] The status bar wrapper element
+ */
+
+/**
  * @description Elements and variables you should have
  * @param {Element} editorTargets Target textarea
  * @param {Element} top Editor top area
@@ -10,7 +55,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {object} documentTypeInner Document type inner
  * @param {Element|null} statusbar Editor statusbar
  * @param {*} key root key
- * @returns {Map}
+ * @returns {FrameContext}
  */
 export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, documentTypeInner, key) {
 	const m = new Map([
@@ -39,7 +84,8 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 		['isDisabled', false],
 		['isChanged', -1],
 		['historyIndex', -1],
-		['savedIndex', -1]
+		['savedIndex', -1],
+		['eventwysiwyg', null]
 	]);
 
 	if (statusbar) UpdateStatusbarContext(statusbar, m);
@@ -71,7 +117,7 @@ export function UpdateStatusbarContext(statusbar, mapper) {
  * @param {Element|null} toolbarContainer Toolbar container
  * @param {Element} menuTray menu tray
  * @param {Element|null} subbar sub toolbar
- * @returns {Map}
+ * @returns {Context}
  */
 export function CreateContext(toolbar, toolbarContainer, menuTray, subbar, statusbarContainer) {
 	const m = new Map([

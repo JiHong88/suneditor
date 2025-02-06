@@ -21,9 +21,24 @@ const __RemoveCopyformt = function (ww, button) {
 	return true;
 };
 
+/**
+ * List of commands that trigger active event handling in the editor.
+ * These commands typically apply inline formatting or structural changes.
+ * @constant {string[]}
+ */
 export const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'indent', 'outdent'];
+
+/**
+ * List of basic editor commands, including active event commands and additional actions
+ * such as undo, redo, saving, full-screen toggle, and text direction commands.
+ * @constant {string[]}
+ */
 export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl']);
 
+/**
+ * Selects all content in the editor.
+ * @param {object} editor - The root editor instance
+ */
 export function SELECT_ALL(editor) {
 	editor.ui._offCurrentController();
 	editor.menu.containerOff();
@@ -52,6 +67,11 @@ export function SELECT_ALL(editor) {
 	editor.toolbar._showBalloon(editor.selection.setRange(first, 0, last, last.textContent.length));
 }
 
+/**
+ * Toggles direction button active state.
+ * @param {Object} editor - The root editor instance
+ * @param {boolean} rtl - Whether the text direction is right-to-left.
+ */
 export function DIR_BTN_ACTIVE(editor, rtl) {
 	const icons = editor.icons;
 	const commandTargets = editor.commandTargets;
@@ -81,6 +101,10 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 	}
 }
 
+/**
+ * Saves the editor content.
+ * @param {Object} editor - The root editor instance
+ */
 export async function SAVE(editor) {
 	const fc = editor.frameContext;
 	if (!fc.get('isChanged')) return;
@@ -107,6 +131,11 @@ export async function SAVE(editor) {
 	});
 }
 
+/**
+ * Copies formatting from selected text.
+ * @param {Object} editor - The root editor instance
+ * @param {HTMLElement} button - The button triggering the copy format function.
+ */
 export function COPY_FORMAT(editor, button) {
 	if (typeof editor._onCopyFormatInitMethod === 'function') {
 		editor._onCopyFormatInitMethod();
@@ -129,6 +158,11 @@ export function COPY_FORMAT(editor, button) {
 	});
 }
 
+/**
+ * Applies font styling to selected text.
+ * @param {Object} editor - The root editor instance
+ * @param {string} command - The font style command (e.g., bold, italic, underline).
+ */
 export function FONT_STYLE(editor, command) {
 	command = editor.options.get('_defaultTagCommand')[command.toLowerCase()] || command;
 	let nodeName = editor.options.get('convertTextTags')[command] || command;
@@ -145,6 +179,10 @@ export function FONT_STYLE(editor, command) {
 	editor.focus();
 }
 
+/**
+ * Inserts a page break element into the editor.
+ * @param {Object} editor - The root editor instance
+ */
 export function PAGE_BREAK(editor) {
 	const pageBreak = domUtils.createElement('DIV', { class: 'se-component se-component-line-break se-page-break' });
 	editor.component.insert(pageBreak, { skipCharCount: true, skipSelection: true, skipHistory: false });

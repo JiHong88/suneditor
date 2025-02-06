@@ -78,7 +78,7 @@ const DEFAULLT_COLOR_SPLITNUM = 9;
 /**
  * @class
  * @description Create a color picker element and register for related events. (this.target)
- * When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
+ * - When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
  * @param {object} inst The instance object that called the constructor.
  * @param {string} styles style property ("color", "backgroundColor"..)
  * @param {ColorPickerParams} params Color picker options

@@ -5,9 +5,9 @@ import { domUtils, numbers } from '../../helper';
 /**
  * @class
  * @description Link plugin.
- * This plugin provides link insertion and editing functionality within the editor.
- * It also supports file uploads if an upload URL is provided.
- * @param {object} editor editor core object
+ * - This plugin provides link insertion and editing functionality within the editor.
+ * - It also supports file uploads if an upload URL is provided.
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {boolean=} [pluginOptions.textToDisplay=true] - Whether to display the link text.
  * @param {boolean=} [pluginOptions.title=true] - Whether to display the link title.

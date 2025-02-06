@@ -11,7 +11,7 @@ const { _w } = env;
 /**
  * @class
  * @description Toolbar class
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} options - toolbar options
  * @param {String} options.keyName - toolbar key name
  * @param {Boolean} options.balloon - balloon toolbar
@@ -136,7 +136,7 @@ Toolbar.prototype = {
 
 	/**
 	 * @description Reset the buttons on the toolbar. (Editor is not reloaded)
-	 * You cannot set a new plugin for the button.
+	 * - You cannot set a new plugin for the button.
 	 * @param {Array} buttonList Button list
 	 */
 	setButtons(buttonList) {
@@ -172,6 +172,9 @@ Toolbar.prototype = {
 		this.triggerEvent('onSetToolbarButtons', { buttonTray: newToolbar.buttonTray, frameContext: this.editor.frameContext });
 	},
 
+	/**
+	 * @description Reset the sticky toolbar position based on the editor state.
+	 */
 	_resetSticky() {
 		const wrapper = this.editor.frameContext.get('wrapper');
 		if (!wrapper) return;
@@ -201,6 +204,9 @@ Toolbar.prototype = {
 		}
 	},
 
+	/**
+	 * @description Enable sticky toolbar mode and adjust position.
+	 */
 	_onSticky(inlineOffset) {
 		const toolbar = this.context.get(this.keyName + '.main');
 
@@ -217,6 +223,10 @@ Toolbar.prototype = {
 		this._sticky = true;
 	},
 
+	/**
+	 * @description Get the viewport's top offset.
+	 * @returns {number}
+	 */
 	__getViewportTop() {
 		if (this._isViewPortSize) {
 			return _w.visualViewport.offsetTop;
@@ -224,6 +234,9 @@ Toolbar.prototype = {
 		return 0;
 	},
 
+	/**
+	 * @description Disable sticky toolbar mode.
+	 */
 	_offSticky() {
 		const stickyDummy = !this.options.get('toolbar_container') ? this.editor.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
 		stickyDummy.style.display = 'none';
@@ -237,6 +250,9 @@ Toolbar.prototype = {
 		this._sticky = false;
 	},
 
+	/**
+	 * @description Set up responsive behavior for the toolbar buttons.
+	 */
 	_setResponsive() {
 		if (this._rButtonArray?.length === 0) {
 			this._rButtonArray = null;
@@ -260,6 +276,9 @@ Toolbar.prototype = {
 		_rButtonsize.sort((a, b) => a - b).unshift('default');
 	},
 
+	/**
+	 * @description Show the balloon toolbar based on the current selection.
+	 */
 	_showBalloon(rangeObj) {
 		if (!this._isBalloon || this.editor.opendControllers.length > 0) {
 			return;
@@ -285,6 +304,9 @@ Toolbar.prototype = {
 		this.triggerEvent('onShowToolbar', { toolbar, mode: 'balloon', frameContext: this.editor.frameContext });
 	},
 
+	/**
+	 * @description Adjust the balloon toolbar's position.
+	 */
 	_setBalloonOffset(positionTop, range) {
 		const toolbar = this.context.get(this.keyName + '.main');
 		const topArea = this.editor.frameContext.get('topArea');
@@ -321,6 +343,9 @@ Toolbar.prototype = {
 		};
 	},
 
+	/**
+	 * @description Show the inline toolbar mode.
+	 */
 	_showInline() {
 		if (!this._isInline) return;
 
@@ -341,6 +366,9 @@ Toolbar.prototype = {
 		toolbar.style.visibility = '';
 	},
 
+	/**
+	 * @description Show a more options layer for toolbar buttons.
+	 */
 	_moreLayerOn(button, layer) {
 		this._moreLayerOff();
 		this.currentMoreLayerActiveButton = button;
@@ -348,7 +376,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @description Disable more layer
+	 * @description Hide the currently active more options layer.
 	 */
 	_moreLayerOff() {
 		if (this.currentMoreLayerActiveButton) {

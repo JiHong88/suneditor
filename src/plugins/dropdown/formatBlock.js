@@ -17,7 +17,7 @@ const HEADER_KEYCODE = new Map([
 /**
  * @class
  * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
- * @param {object} editor editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {Array.<string>} pluginOptions.items - Format list
  */
@@ -105,7 +105,7 @@ FormatBlock.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
-	 * Called when an item in the "dropdown" menu is clicked.
+	 * - Called when an item in the "dropdown" menu is clicked.
 	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
@@ -125,7 +125,7 @@ FormatBlock.prototype = {
 
 	/**
 	 * @description Create a header tag, call by "shortcut" class
-	 * (e.g. shortcuts._h1: ['c+s+49+p~formatBlock.createHeader', ''])
+	 * - (e.g. shortcuts._h1: ['c+s+49+p~formatBlock.createHeader', ''])
 	 * @param {ShortcutInfo} params - Information of the shortcut
 	 */
 	createHeader({ keyCode }) {

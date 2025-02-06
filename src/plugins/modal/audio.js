@@ -7,7 +7,7 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
 /**
  * @class
  * @description Audio modal plugin.
- * @param {object} editor - The core editor object (e.g., handling selection, events, etc.)
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {string=} pluginOptions.defaultWidth - The default width of the audio tag (e.g., "300px").
  * @param {string=} pluginOptions.defaultHeight - The default height of the audio tag (e.g., "150px").
@@ -175,13 +175,13 @@ Audio_.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * It ensures that the structure and attributes of the element are maintained and secure.
-	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * If the element isn't properly contained, a new container is created to retain the format.
+	 * - It ensures that the structure and attributes of the element are maintained and secure.
+	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
+	 * - If the element isn't properly contained, a new container is created to retain the format.
 	 * @returns {object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
-	 * The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
 		return {

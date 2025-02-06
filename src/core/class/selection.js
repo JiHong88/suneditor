@@ -8,7 +8,7 @@ import { domUtils, unicode, env } from '../../helper';
 /**
  * @class
  * @description Selection, Range related class
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 function Selection(editor) {
 	CoreInjector.call(this, editor);
@@ -22,7 +22,7 @@ function Selection(editor) {
 Selection.prototype = {
 	/**
 	 * @description Get window selection obejct
-	 * @returns {object}
+	 * @returns {Selection}
 	 */
 	get() {
 		const selection = this._shadowRoot ? this._shadowRoot?.getComposedRanges() || this._shadowRoot?.getSelection() : this.editor.frameContext.get('_ww').getSelection();
@@ -45,7 +45,7 @@ Selection.prototype = {
 
 	/**
 	 * @description Get current editor's range object
-	 * @returns {object}
+	 * @returns {Range}
 	 */
 	getRange() {
 		const range = this.status._range || this._createDefaultRange();
@@ -143,8 +143,8 @@ Selection.prototype = {
 
 	/**
 	 * @description Returns the range (container and offset) near the given target node.
-	 * If the target node has a next sibling, it returns the next sibling with an offset of 0.
-	 * If there is no next sibling but a previous sibling exists, it returns the previous sibling with an offset of 1.
+	 * - If the target node has a next sibling, it returns the next sibling with an offset of 0.
+	 * - If there is no next sibling but a previous sibling exists, it returns the previous sibling with an offset of 1.
 	 * @param {Node} target Target node whose neighboring range is to be determined.
 	 * @returns {object|null} An object containing the nearest container node and its offset.
 	 */
@@ -168,10 +168,9 @@ Selection.prototype = {
 
 	/**
 	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
-	 * Returns a new "range" or argument "range".
-	 * @param {object} range core.getRange()
+	 * @param {Range} range core.getRange()
 	 * @param {Element|null} container If there is "container" argument, it creates a line in front of the container.
-	 * @returns {Range}
+	 * @returns {Range} a new "range" or argument "range".
 	 */
 	getRangeAndAddLine(range, container) {
 		if (this._isNone(range)) {
@@ -212,7 +211,7 @@ Selection.prototype = {
 	 * @description  Get hte clientRects object.
 	 * @param {Range|Element|null} target Range object | Element | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
-	 * @returns
+	 * @returns {{rects: ClientRects, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 */
 	getRects(target, position) {
 		const targetAbs = target?.nodeType === 1 ? this._w.getComputedStyle(target).position === 'absolute' : false;
@@ -273,7 +272,7 @@ Selection.prototype = {
 	/**
 	 * @description Get the custom range object of the event.
 	 * @returns {Event} e Event object
-	 * @returns {object} {sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}
+	 * @returns {{sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}}
 	 */
 	getEventLocationRange(e) {
 		let sc, so, ec, eo;
@@ -329,6 +328,7 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Returns true if there is no valid selection.
 	 * @param {Range} range selection.getRange()
 	 * @returns {boolean}
@@ -344,9 +344,9 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Return the range object of editor's first child node
 	 * @returns {object}
-	 * @private
 	 */
 	_createDefaultRange() {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');
@@ -373,6 +373,7 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Set "range" and "selection" info.
 	 * @param {Range} range range object.
 	 * @param {Selection} selection selection object.
@@ -392,8 +393,8 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Saving the range object and the currently selected node of editor
 	 * @private
+	 * @description Saving the range object and the currently selected node of editor
 	 */
 	_init() {
 		const activeEl = this.editor.frameContext.get('_wd').activeElement;
@@ -417,8 +418,8 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Focus method
 	 * @private
+	 * @description Focus method
 	 */
 	__focus() {
 		try {
@@ -435,9 +436,9 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Reset range object to text node selected status.
 	 * @returns {boolean} Returns false if there is no valid selection.
-	 * @private
 	 */
 	_resetRangeToTextNode() {
 		let rangeObj = this.getRange();

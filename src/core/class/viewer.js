@@ -8,7 +8,7 @@ import { domUtils, env, converter, numbers } from '../../helper';
 /**
  * @class
  * @description Viewer(codeView, fullScreen, showBlocks) class
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 function Viewer(editor) {
 	CoreInjector.call(this, editor);
@@ -482,6 +482,11 @@ Viewer.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Resets the full-screen height of the editor.
+	 * - Updates the editor's height dynamically when in full-screen mode.
+	 */
 	_resetFullScreenHeight() {
 		if (this.editor.frameContext.get('isFullScreen')) {
 			this.fullScreenInnerHeight +=
@@ -492,12 +497,11 @@ Viewer.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Run CodeMirror Editor
 	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
 	 * @param {*} value CodeMirror params
 	 * @param {string|undefined} rootKey Root key
-	 * @returns
-	 * @private
 	 */
 	_codeMirrorEditor(key, value, rootKey) {
 		const fo = rootKey ? this.frameRoots.get(rootKey).get('options') : this.editor.frameOptions;
@@ -535,9 +539,9 @@ Viewer.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Set method in the code view area
 	 * @param {string} value HTML string
-	 * @private
 	 */
 	_setCodeView(value) {
 		if (this.options.get('hasCodeMirror')) {
@@ -548,8 +552,8 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @description Get method in the code view area
 	 * @private
+	 * @description Get method in the code view area
 	 */
 	_getCodeView() {
 		if (this.options.get('hasCodeMirror')) {
@@ -560,8 +564,8 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @description Convert the data of the code view and put it in the WYSIWYG area.
 	 * @private
+	 * @description Convert the data of the code view and put it in the WYSIWYG area.
 	 */
 	_setCodeDataToEditor() {
 		const code_html = this._getCodeView();
@@ -609,8 +613,8 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
 	 * @private
+	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
 	 */
 	_setEditorDataToCodeView() {
 		const codeContent = this.html._convertToCode(this.editor.frameContext.get('wysiwyg'), false);
@@ -626,11 +630,21 @@ Viewer.prototype = {
 		this._setCodeView(codeValue);
 	},
 
+	/**
+	 * @private
+	 * @description Adjusts the height of the code view area.
+	 * - Ensures the code block auto-resizes based on its content.
+	 */
 	_codeViewAutoHeight(code, codeNumbers, isAuto) {
 		if (isAuto) code.style.height = code.scrollHeight + 'px';
 		this._updateLineNumbers(codeNumbers, code);
 	},
 
+	/**
+	 * @private
+	 * @description Updates the line numbers for the code editor.
+	 * - Dynamically adjusts line numbers as content grows.
+	 */
 	_updateLineNumbers(lineNumbers, code) {
 		if (!lineNumbers) return;
 
@@ -647,6 +661,11 @@ Viewer.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Synchronizes scrolling of line numbers with the code editor.
+	 * - Keeps the line numbers aligned with the text.
+	 */
 	_scrollLineNumbers(codeNumbers) {
 		codeNumbers.scrollTop = this.scrollTop;
 		codeNumbers.scrollLeft = this.scrollLeft;

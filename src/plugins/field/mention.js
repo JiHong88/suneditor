@@ -11,7 +11,7 @@ const { debounce } = converter;
 /**
  * @class
  * @description Mention Plugin
- * @param {object} editor edtor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {string=} [pluginOptions.triggerText="@"] The character that triggers the mention list. Default is '@'.
  * @param {number=} [pluginOptions.limitSize=5] The number of items to display in the mention list. Default is 5.

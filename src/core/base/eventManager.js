@@ -15,6 +15,14 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHa
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
+/**
+ * @typedef {import('../section/constructor').EditorFrameOptions} EditorFrameOptions
+ */
+
+/**
+ * @typedef {import('../section/context').FrameContext} FrameContext
+ */
+
 // wysiwyg event
 /**
  * @typedef {object} PluginMouseEventInfo
@@ -54,7 +62,7 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
 /**
  * @class
  * @description Event manager, editor's all event management class
- * @param {object} editor editor core object
+ * @param {object} editor - The root editor instance
  */
 function EventManager(editor) {
 	CoreInjector.call(this, editor);
@@ -92,7 +100,7 @@ function EventManager(editor) {
 EventManager.prototype = {
 	/**
 	 * @description Register for an event.
-	 * Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
+	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
 	 * @param {Element|Array.<Element>} target Target element
 	 * @param {string} type Event type
 	 * @param {Function} listener Event handler
@@ -150,7 +158,7 @@ EventManager.prototype = {
 
 	/**
 	 * @description Add an event to document.
-	 * When created as an Iframe, the same event is added to the document in the Iframe.
+	 * - When created as an Iframe, the same event is added to the document in the Iframe.
 	 * @param {string} type Event type
 	 * @param {Function} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
@@ -170,7 +178,7 @@ EventManager.prototype = {
 
 	/**
 	 * @description Remove events from document.
-	 * When created as an Iframe, the event of the document inside the Iframe is also removed.
+	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
 	 * @param {string|object} type Event type
 	 * @param {Function} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
@@ -191,7 +199,7 @@ EventManager.prototype = {
 
 	/**
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
-	 * such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
+	 * - such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
 	 * @param {Node|null} selectionNode selectionNode
 	 * @returns {Node|undefined} selectionNode
 	 */
@@ -317,6 +325,7 @@ EventManager.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is true)
 	 * @param {Element} target Target element
 	 * @private
@@ -330,6 +339,7 @@ EventManager.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description remove class, display text.
 	 * @param {Array} ignoredList Igonred button list
 	 * @private
@@ -359,6 +369,10 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Show toolbar-balloon with delay.
+	 */
 	_showToolbarBalloonDelay() {
 		if (this._balloonDelay) {
 			_w.clearTimeout(this._balloonDelay);
@@ -372,6 +386,10 @@ EventManager.prototype = {
 		}, 250);
 	},
 
+	/**
+	 * @private
+	 * @description Show or hide the toolbar-balloon.
+	 */
 	_toggleToolbarBalloon() {
 		this.selection._init();
 		const range = this.selection.getRange();
@@ -386,22 +404,43 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Hide the toolbar.
+	 */
 	_hideToolbar() {
 		if (!this.editor._notHideToolbar && !this.editor.frameContext.get('isFullScreen')) {
 			this.toolbar.hide();
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Hide the Sub-Toolbar.
+	 */
 	_hideToolbar_sub() {
 		if (this.subToolbar && !this.editor._notHideToolbar) {
 			this.subToolbar.hide();
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Checks if a node is a non-focusable element(.data-se-non-focus). (e.g. fileUpload.component > span)
+	 * @param {Node} node Node to check
+	 * @returns {boolean} True if the node is non-focusable, otherwise false
+	 */
 	_isNonFocusNode(node) {
 		return node.nodeType === 1 && node.getAttribute('data-se-non-focus') === 'true';
 	},
 
+	/**
+	 * @private
+	 * @description Determines if the "range" is within an uneditable node.
+	 * @param {Range} range The range object
+	 * @param {boolean} isFront Whether to check the start or end of the range
+	 * @returns {Node|null} The uneditable node if found, otherwise null
+	 */
 	_isUneditableNode(range, isFront) {
 		const container = isFront ? range.startContainer : range.endContainer;
 		const offset = isFront ? range.startOffset : range.endOffset;
@@ -418,6 +457,15 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves the sibling node of a selected node if it is uneditable.
+	 * - Used only in `_isUneditableNode`.
+	 * @param {Node} selectNode The selected node
+	 * @param {string} siblingKey The key to access the sibling (`previousSibling` or `nextSibling`)
+	 * @param {Node} container The parent container node
+	 * @returns {Node|null} The sibling node if found, otherwise null
+	 */
 	_isUneditableNode_getSibling(selectNode, siblingKey, container) {
 		if (!selectNode) return null;
 		let siblingNode = selectNode[siblingKey];
@@ -432,7 +480,12 @@ EventManager.prototype = {
 		return siblingNode;
 	},
 
-	// FireFox - table delete, Chrome - image, video, audio
+	/**
+	 * @private
+	 * @description Deletes specific elements such as tables in "Firefox" and media elements (image, video, audio) in "Chrome".
+	 * - Handles deletion logic based on selection range and node types.
+	 * @returns {boolean} Returns `true` if an element was deleted and focus was adjusted, otherwise `false`.
+	 */
 	_hardDelete() {
 		const range = this.selection.getRange();
 		const sc = range.startContainer;
@@ -466,9 +519,9 @@ EventManager.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description If there is no default format, add a line and move 'selection'.
 	 * @param {string|null} formatName Format tag name (default: 'P')
-	 * @private
 	 */
 	_setDefaultLine(formatName) {
 		if (!this.options.get('__lineFormatFilter')) return null;
@@ -576,6 +629,16 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Handles data transfer actions for paste and drop events.
+	 * - It processes clipboard data, triggers relevant events, and inserts cleaned data into the editor.
+	 * @param {"paste"|"drop"} type The type of event
+	 * @param {Event} e The original event object
+	 * @param {DataTransfer} clipboardData The clipboard data object
+	 * @param {object} frameContext The frame context
+	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
+	 */
 	async _dataTransferAction(type, e, clipboardData, frameContext) {
 		try {
 			this.ui.showLoading();
@@ -590,6 +653,16 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Processes clipboard data for paste and drop events, handling text and HTML cleanup.
+	 * - Supports specific handling for content from Microsoft Office applications.
+	 * @param {"paste"|"drop"} type The type of event
+	 * @param {Event} e The original event object
+	 * @param {DataTransfer} clipboardData The clipboard data object
+	 * @param {object} frameContext The frame context
+	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
+	 */
 	async _setClipboardData(type, e, clipboardData, frameContext) {
 		let plainText = clipboardData.getData('text/plain');
 		let cleanData = clipboardData.getData('text/html');
@@ -671,6 +744,11 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Registers common UI events such as toolbar and menu interactions.
+	 * - Adds event listeners for various UI elements, sets up observers, and configures window events.
+	 */
 	_addCommonEvents() {
 		const buttonsHandler = ButtonsHandler.bind(this);
 		const toolbarHandler = OnClick_toolbar.bind(this);
@@ -729,6 +807,12 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Registers event listeners for the editor's frame, including text input, selection, and UI interactions.
+	 * - Handles events inside an iframe or within the standard wysiwyg editor.
+	 * @param {FrameContext} fc The frame context object
+	 */
 	_addFrameEvents(fc) {
 		const isIframe = fc.get('options').get('iframe');
 		const eventWysiwyg = isIframe ? fc.get('_ww') : fc.get('wysiwyg');
@@ -827,6 +911,13 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
+	 * - If resizing is not enabled, applies a non-resizable class.
+	 * @param {FrameContext} fc The frame context object
+	 * @param {EditorFrameOptions} fo The frame options object
+	 */
 	__addStatusbarEvent(fc, fo) {
 		if (/\d+/.test(fo.get('height')) && fo.get('statusbar_resizeEnable')) {
 			fo.set('__statusbarEvent', this.addEvent(fc.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false));
@@ -835,6 +926,11 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Removes all registered event listeners from the editor.
+	 * - Disconnects observers and clears stored event references.
+	 */
 	_removeAllEvents() {
 		for (let i = 0, len = this._events.length, e; i < len; i++) {
 			e = this._events[i];
@@ -854,6 +950,12 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Adjusts the position of the editor's toolbar, controllers, and other floating elements based on scroll position.
+	 * - Ensures UI elements maintain their intended relative positions when scrolling.
+	 * @param {Element} eventWysiwyg The wysiwyg event object containing scroll data
+	 */
 	_moveContainer(eventWysiwyg) {
 		const y = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
 		const x = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
@@ -898,6 +1000,11 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Handles the scrolling of the editor container.
+	 * - Repositions open controllers if necessary.
+	 */
 	_scrollContainer() {
 		const openCont = this.editor.opendControllers;
 		if (!openCont.length) return;
@@ -905,6 +1012,12 @@ EventManager.prototype = {
 		this.__rePositionController(openCont);
 	},
 
+	/**
+	 * @private
+	 * @description Repositions the currently open controllers within the editor.
+	 * - Ensures elements are displayed in their correct positions after scrolling.
+	 * @param {Array.<object>} cont List of controllers to reposition
+	 */
 	__rePositionController(cont) {
 		if (_DragHandle.get('__dragMove')) _DragHandle.get('__dragMove')();
 		for (let i = 0; i < cont.length; i++) {
@@ -913,6 +1026,11 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Resets the frame status, adjusting toolbar and UI elements based on the current state.
+	 * - Handles inline editor adjustments, fullscreen mode, and responsive toolbar updates.
+	 */
 	_resetFrameStatus() {
 		if (!env.isResizeObserverSupported) {
 			this.toolbar.resetResponsiveToolbar();
@@ -948,6 +1066,11 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Synchronizes the selection state by resetting it on mouseup.
+	 * - Ensures selection updates correctly across different interactions.
+	 */
 	_setSelectionSync() {
 		this.removeGlobalEvent(this.__selectionSyncEvent);
 		this.__selectionSyncEvent = this.addGlobalEvent('mouseup', () => {
@@ -956,6 +1079,13 @@ EventManager.prototype = {
 		});
 	},
 
+	/**
+	 * @private
+	 * @description Retains the style nodes for formatting consistency when applying styles.
+	 * - Preserves nested styling by cloning and restructuring the style nodes.
+	 * @param {Element} formatEl The format element where styles should be retained
+	 * @param {Array<Node>} _styleNodes The list of style nodes to retain
+	 */
 	_retainStyleNodes(formatEl, _styleNodes) {
 		const el = _styleNodes[0].cloneNode(false);
 		let n = el;
@@ -975,11 +1105,25 @@ EventManager.prototype = {
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	},
 
+	/**
+	 * @private
+	 * @description Clears retained style nodes by replacing content with a single line break.
+	 * - Resets the selection to the start of the cleared element.
+	 * @param {Element} formatEl The format element where styles should be cleared
+	 */
 	_clearRetainStyleNodes(formatEl) {
 		formatEl.innerHTML = '<br>';
 		this.selection.setRange(formatEl, 0, formatEl, 0);
 	},
 
+	/**
+	 * @private
+	 * @description Calls a registered plugin event and executes associated handlers.
+	 * - If any handler returns `false`, the event propagation stops.
+	 * @param {string} name The name of the plugin event
+	 * @param {Event} e The event object passed to the plugin event handler
+	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
+	 */
 	_callPluginEvent(name, e) {
 		const eventPlugins = this.editor._onPluginEvents.get(name);
 		for (let i = 0; i < eventPlugins.length; i++) {
@@ -987,6 +1131,12 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Handles the selection of a component when hovering over it.
+	 * - If the target is a component, it ensures that the component is selected properly.
+	 * @param {Element} target The element being hovered over
+	 */
 	_overComponentSelect(target) {
 		const figure = domUtils.getParentElement(target, domUtils.isFigure);
 		let info = this.component.get(target);
@@ -1003,6 +1153,10 @@ EventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Removes input event listeners and resets input-related properties.
+	 */
 	__removeInput() {
 		this._inputFocus = this.editor._preventBlur = false;
 		this.__inputBlurEvent = this.removeEvent(this.__inputBlurEvent);
@@ -1010,6 +1164,11 @@ EventManager.prototype = {
 		this.__inputPlugin = null;
 	},
 
+	/**
+	 * @private
+	 * @description Prevents the default behavior of the Enter key and refocuses the editor.
+	 * @param {Event} e The keyboard event
+	 */
 	__enterPrevent(e) {
 		e.preventDefault();
 		if (!isMobile) return;

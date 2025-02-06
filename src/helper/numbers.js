@@ -25,7 +25,7 @@ export function get(value, maxDec) {
 
 /**
  * @description It compares the start and end indexes of 'a' and 'b' and returns the number of overlapping indexes in the range.
- * ex) 1, 5, 4, 6 => '2' (4,5)
+ * - e.g.) 1, 5, 4, 6 => '2' (4,5)
  * @param {number} aStart Start index of 'a'
  * @param {number} aEnd End index of 'a'
  * @param {number} bStart Start index of 'b'

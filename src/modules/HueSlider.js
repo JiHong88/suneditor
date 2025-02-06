@@ -73,7 +73,7 @@ function CreateSliderCtx() {
 
 /**
  * @description Create a Hue slider. (only create one at a time)
- * When you call the .attach() method, the hue slider is appended to the form element.
+ * - When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
  * @param {object} inst The instance object that called the constructor.
  * @param {HueSliderParams=} [params={}] Hue slider options
@@ -158,7 +158,7 @@ HueSlider.prototype = {
 
 	/**
 	 * @description Close the hue slider. (include off method)
-	 * Call the instance's _hueSliderCancelAction method.
+	 * - Call the instance's _hueSliderCancelAction method.
 	 */
 	close() {
 		this.off();

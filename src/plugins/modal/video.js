@@ -7,9 +7,9 @@ const { NO_EVENT } = env;
 /**
  * @class
  * @description Video plugin.
- * This plugin provides video embedding functionality within the editor.
- * It also supports embedding from popular video services
- * @param {object} editor editor core object
+ * - This plugin provides video embedding functionality within the editor.
+ * - It also supports embedding from popular video services
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {boolean=} [pluginOptions.canResize=true] - Whether the video element can be resized.
  * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
@@ -270,15 +270,14 @@ Video.prototype = {
 
 	/**
 	 * @editorMethod Editor.core
-	 * @description
-	 * This method is used to validate and preserve the format of the component within the editor.
-	 * It ensures that the structure and attributes of the element are maintained and secure.
-	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * If the element isn't properly contained, a new container is created to retain the format.
+	 * @description This method is used to validate and preserve the format of the component within the editor.
+	 * - It ensures that the structure and attributes of the element are maintained and secure.
+	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
+	 * - If the element isn't properly contained, a new container is created to retain the format.
 	 * @returns {object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
-	 * The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
 		return {
@@ -448,7 +447,7 @@ Video.prototype = {
 
 	/**
 	 * @description Converts a YouTube URL into an embeddable URL.
-	 * If the URL does not start with "http", it prepends "https://". It also replaces "watch?v=" with the embed path.
+	 * - If the URL does not start with "http", it prepends "https://". It also replaces "watch?v=" with the embed path.
 	 * @param {string} url - The original YouTube URL.
 	 * @returns {string} The converted YouTube embed URL.
 	 */
@@ -463,7 +462,7 @@ Video.prototype = {
 
 	/**
 	 * @description Converts a Vimeo URL into an embeddable URL.
-	 * Removes any trailing slash and extracts the video ID from the URL.
+	 * - Removes any trailing slash and extracts the video ID from the URL.
 	 * @param {string} url - The original Vimeo URL.
 	 * @returns {string} The converted Vimeo embed URL.
 	 */
@@ -477,7 +476,7 @@ Video.prototype = {
 
 	/**
 	 * @description Adds query parameters to a URL.
-	 * If the URL already contains a query string, the provided query is appended with an "&".
+	 * - If the URL already contains a query string, the provided query is appended with an "&".
 	 * @param {string} url - The original URL.
 	 * @param {string} query - The query string to append.
 	 * @returns {string} The URL with the appended query parameters.
@@ -496,8 +495,8 @@ Video.prototype = {
 
 	/**
 	 * @description Creates or updates a video embed component.
-	 * When updating, it replaces the existing element if necessary and applies the new source, size, and alignment.
-	 * When creating, it wraps the provided element in a figure container.
+	 * - When updating, it replaces the existing element if necessary and applies the new source, size, and alignment.
+	 * - When creating, it wraps the provided element in a figure container.
 	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The existing video element (for update) or a newly created one.
 	 * @param {string} src - The source URL for the video.
 	 * @param {string} width - The desired width for the video element.
@@ -580,7 +579,7 @@ Video.prototype = {
 
 	/**
 	 * @description Creates a new iframe element for video embedding.
-	 * Applies any additional properties provided and sets the necessary attributes for embedding.
+	 * - Applies any additional properties provided and sets the necessary attributes for embedding.
 	 * @param {object} [props] - An optional object containing properties to assign to the iframe.
 	 * @returns {HTMLIFrameElement} The newly created iframe element.
 	 */
@@ -597,7 +596,7 @@ Video.prototype = {
 
 	/**
 	 * @description Creates a new video element for video embedding.
-	 * Applies any additional properties provided and sets the necessary attributes.
+	 * - Applies any additional properties provided and sets the necessary attributes.
 	 * @param {object} [props] - An optional object containing properties to assign to the video element.
 	 * @returns {HTMLVideoElement} The newly created video element.
 	 */

@@ -94,7 +94,7 @@ export function getPositionIndex(node) {
 
 /**
  * @description Returns the position of the "node" in the "parentNode" in a numerical array.
- * ex) <p><span>aa</span><span>bb</span></p> : getNodePath(node: "bb", parentNode: "<P>") -> [1, 0]
+ * - e.g.) <p><span>aa</span><span>bb</span></p> : getNodePath(node: "bb", parentNode: "<P>") -> [1, 0]
  * @param {Node} node The Node to find position path
  * @param {Node|null} parentNode Parent node. If null, wysiwyg div area
  * @param {{s: number, e: number}|null} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
@@ -230,8 +230,8 @@ export function getListChildNodes(element, validation) {
 
 /**
  * @description Returns the number of parents nodes.
- * "0" when the parent node is the WYSIWYG area.
- * '-1' when the element argument is the WYSIWYG area.
+ * - "0" when the parent node is the WYSIWYG area.
+ * - '-1' when the element argument is the WYSIWYG area.
  * @param {Node} node The element to check
  * @returns {number}
  */
@@ -302,14 +302,13 @@ export function compareElements(a, b) {
 
 /**
  * @description Get the parent element of the argument value.
- * A tag that satisfies the query condition is imported.
- * Returns null if not found.
+ * - A tag that satisfies the query condition is imported.
  * @param {Node} element Reference element
  * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @param {number?} depth Number of parent levels to depth.
- * @returns {Element|null}
+ * @returns {Element|null} Not found: null
  */
 export function getParentElement(element, query, depth) {
 	let check;
@@ -357,14 +356,13 @@ export function getParentElement(element, query, depth) {
 
 /**
  * @description Gets all ancestors of the argument value.
- * Get all tags that satisfy the query condition.
- * Returned in an array in order.
+ * - Get all tags that satisfy the query condition.
  * @param {Node} element Reference element
  * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @param {number?} depth Number of parent levels to depth.
- * @returns {Element|null}
+ * @returns {Element|null} Returned in an array in order.
  */
 export function getParentElements(element, query, depth) {
 	let check;
@@ -427,14 +425,13 @@ export function getCommandTarget(target) {
 
 /**
  * @description Get the child element of the argument value.
- * A tag that satisfies the query condition is imported.
- * Returns null if not found.
+ * - A tag that satisfies the query condition is imported.
  * @param {Node} node Reference element
  * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * @param {boolean} last If true returns the last node among the found child nodes. (default: first node)
  * Not use it like jquery.
  * Only one condition can be entered at a time.
- * @returns {Element|null}
+ * @returns {Element|null} Not found: null
  */
 export function getEdgeChild(node, query, last) {
 	let check;
@@ -473,13 +470,13 @@ export function getEdgeChild(node, query, last) {
 }
 
 /**
- * @description 1. The first node of all the child nodes of the "first" element is returned.
- * 2. The last node of all the child nodes of the "last" element is returned.
- * 3. When there is no "last" element, the first and last nodes of all the children of the "first" element are returned.
- * { sc: "first", ec: "last" }
+ * @description Get edge child nodes of the argument value.
+ * - 1. The first node of all the child nodes of the "first" element is returned.
+ * - 2. The last node of all the child nodes of the "last" element is returned.
+ * - 3. When there is no "last" element, the first and last nodes of all the children of the "first" element are returned.
  * @param {Node} first First element
  * @param {Node|null} last Last element
- * @returns {{sc: Node, ec: Node}}
+ * @returns {{sc: Node, ec: Node}} { sc: "first", ec: "last" }
  */
 export function getEdgeChildNodes(first, last) {
 	if (!first) return;
@@ -615,10 +612,9 @@ export function copyFormatAttributes(originEl, copyEl) {
 
 /**
  * @description Compares the style and class for equal values.
- * Returns true if both are text nodes.
  * @param {Node} a Node to compare
  * @param {Node} b Node to compare
- * @returns {boolean}
+ * @returns {boolean} Returns true if both are text nodes.
  */
 export function isSameAttributes(a, b) {
 	if (a.nodeType === 3 && b.nodeType === 3) return true;
@@ -947,7 +943,7 @@ export function isSpanWithoutAttr(element) {
 
 /**
  * @description Checks for "__se__uneditable" in the class list.
- * Components with class "__se__uneditable" cannot be modified.
+ * - Components with class "__se__uneditable" cannot be modified.
  * @param {Element} element The element to check
  * @returns {boolean}
  */
@@ -1023,10 +1019,9 @@ export function getViewportSize() {
 
 /**
  * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child
- * Returns null if not found.
  * @param {Node} node Reference element
  * @param {Node|null} ceiling Highest boundary allowed
- * @returns {Node|null}
+ * @returns {Node|null} Not found: null
  */
 export function getPreviousDeepestNode(node, ceiling) {
 	let previousNode = node.previousSibling;
@@ -1050,10 +1045,9 @@ export function getPreviousDeepestNode(node, ceiling) {
 
 /**
  * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child
- * Returns null if not found.
  * @param {Node} node Reference element
  * @param {Node|null} ceiling Highest boundary allowed
- * @returns {Node|null}
+ * @returns {Node|null} Not found: null
  */
 export function getNextDeepestNode(node, ceiling) {
 	let nextNode = node.nextSibling;
@@ -1114,7 +1108,7 @@ export function findTextIndexOnLine(line, offsetContainer, offset, validate) {
 
 /**
  * @description Find the end index of a sequence of at least minTabSize consecutive non-breaking spaces or spaces
- * which are interpreted as a tab key, occurring after a given base index in a text string.
+ * - which are interpreted as a tab key, occurring after a given base index in a text string.
  * @param {Element} line Line element (p, div, etc.)
  * @param {number} baseIndex Base index to start searching
  * @param {number} minTabSize Minimum number of consecutive spaces to consider as a tab

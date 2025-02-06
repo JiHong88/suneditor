@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Line height Plugin
- * @param {object} editor editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {Array.<{text: string, value: number}>} pluginOptions.items - Line height list
  */
@@ -71,7 +71,7 @@ LineHeight.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
-	 * Called when an item in the "dropdown" menu is clicked.
+	 * - Called when an item in the "dropdown" menu is clicked.
 	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {

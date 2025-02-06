@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Blockquote plugin
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 function Blockquote(editor) {
 	EditorInjector.call(this, editor);
@@ -40,7 +40,7 @@ Blockquote.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
-	 * It is executed by clicking a toolbar "command" button or calling an API.
+	 * - It is executed by clicking a toolbar "command" button or calling an API.
 	 */
 	action() {
 		const currentBlockquote = domUtils.getParentElement(this.selection.getNode(), 'blockquote');

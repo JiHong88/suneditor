@@ -9,7 +9,7 @@ import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 /**
  * @class
  * @description character count, character limit, etc. management class
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 function Char(editor) {
 	CoreInjector.call(this, editor);
@@ -35,7 +35,7 @@ Char.prototype = {
 
 	/**
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
-	 * If [content] is undefined, get the current editor's number of characters or binary data size.
+	 * - If [content] is undefined, get the current editor's number of characters or binary data size.
 	 * @param {string|undefined} content Content to count. (defalut: this.editor.frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
@@ -91,7 +91,7 @@ Char.prototype = {
 
 	/**
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "inputText" is added to the current editor.
-	 * If the current number of characters is greater than "charCounter_max", the excess characters are removed.
+	 * - If the current number of characters is greater than "charCounter_max", the excess characters are removed.
 	 * And call the char.display()
 	 * @param {string} inputText Text added.
 	 * @returns {boolean}
@@ -138,7 +138,6 @@ Char.prototype = {
 /**
  * @description The character counter blinks.
  * @param charWrapper {Element} this.editor.frameContext.get('charWrapper')
- * @private
  */
 function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, 'se-blink')) {

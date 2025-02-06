@@ -21,7 +21,7 @@
 /**
  * @class
  * @description Shortcuts class
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 function Shortcuts(editor) {
 	this.editor = editor;
@@ -61,10 +61,16 @@ Shortcuts.prototype = {
 		return true;
 	},
 
+	/**
+	 * @description Disable the shortcut activation.
+	 */
 	disable() {
 		this.isDisabled = true;
 	},
 
+	/**
+	 * @description Enable the shortcut activation.
+	 */
 	enable() {
 		this.isDisabled = false;
 	},

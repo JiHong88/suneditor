@@ -86,10 +86,9 @@ export function getPageStyle(doc) {
 /**
  * @deprecated
  * @description Get the the tag path of the arguments value
- * If not found, return the first found value
  * @param {Array.<string>} nameArray File name array
  * @param {string} extension js, css
- * @returns {string}
+ * @returns {string} If not found, return the first found value
  */
 export function getIncludePath(nameArray, extension) {
 	let path = '';
@@ -191,7 +190,7 @@ export const isSafari = (() => {
 
 /**
  * @description Check if User Agent is Mobile device.
- * when the device is touchable, it is judged as a mobile device.
+ * - when the device is touchable, it is judged as a mobile device.
  * @type {boolean}
  */
 export const isMobile = (() => {

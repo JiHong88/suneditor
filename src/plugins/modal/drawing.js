@@ -8,7 +8,7 @@ const { _w, isMobile } = env;
 /**
  * @class
  * @description Drawing modal plugin.
- * @param {object} editor - The core editor object (e.g., handling selection, events, etc.)
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {string=} [pluginOptions.outputFormat="dataurl"] - The output format of the drawing. Options: "dataurl", "svg".
  * @param {boolean=} [pluginOptions.useFormatType=false] - Whether to enable format type selection (block vs inline).

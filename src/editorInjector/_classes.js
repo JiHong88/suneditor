@@ -1,7 +1,7 @@
 /**
- * @description Add all inner classes to the editor;
- * @param {object} editor Editor object
  * @private
+ * @description Add all inner classes to the editor instance.
+ * @param {object} editor - The root editor instance
  */
 function ClassInjector(editor) {
 	this.char = editor.char;

@@ -8,7 +8,7 @@ import { domUtils, converter } from '../../helper';
 /**
  * @class
  * @description Dropdown and container menu management class
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 function Menu(editor) {
 	CoreInjector.call(this, editor);
@@ -43,7 +43,7 @@ function Menu(editor) {
 Menu.prototype = {
 	/**
 	 * @description Method for managing dropdown element.
-	 * You must add the "dropdown" element using the this method at custom plugin.
+	 * - You must add the "dropdown" element using the this method at custom plugin.
 	 * @param {{key: string, type: string}} classObj Class object
 	 * @param {Element} menu Dropdown element
 	 */
@@ -159,10 +159,10 @@ Menu.prototype = {
 	},
 
 	/**
-	 * @description Set the menu position. (dropdown, container)
-	 * @param {*} element Button element
-	 * @param {*} menu Menu element
 	 * @private
+	 * @description Set the menu position.
+	 * @param {Element} element Button element
+	 * @param {Element} menu Menu element
 	 */
 	_setMenuPosition(element, menu) {
 		menu.style.visibility = 'hidden';
@@ -175,6 +175,12 @@ Menu.prototype = {
 		menu.style.visibility = '';
 	},
 
+	/**
+	 * @private
+	 * @description Check if the element is part of a more layer
+	 * @param {Element} element The element to check
+	 * @returns {Element|null} The more layer element or null
+	 */
 	_checkMoreLayer(element) {
 		const more = domUtils.getParentElement(element, '.se-more-layer');
 		if (more && more.style.display !== 'block') {
@@ -184,6 +190,11 @@ Menu.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Move the selected item in the dropdown menu
+	 * @param {number} num Direction and amount to move (-1 for up, 1 for down)
+	 */
 	_moveItem(num) {
 		domUtils.removeClass(this.currentDropdown, 'se-select-menu-mouse-move');
 		domUtils.addClass(this.currentDropdown, 'se-select-menu-key-action');
@@ -200,6 +211,10 @@ Menu.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Remove global event listeners
+	 */
 	__removeGlobalEvent() {
 		if (this._bindClose_dropdown_mouse) this._bindClose_dropdown_mouse = this.eventManager.removeGlobalEvent(this._bindClose_dropdown_mouse);
 		if (this._bindClose_cons_mouse) this._bindClose_cons_mouse = this.eventManager.removeGlobalEvent(this._bindClose_cons_mouse);

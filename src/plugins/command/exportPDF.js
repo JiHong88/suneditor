@@ -7,7 +7,7 @@ const { _d } = env;
 /**
  * @class
  * @description Export PDF plugin
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions - plugin options
  * @param {string} pluginOptions.apiUrl - server request url
  * @param {string} pluginOptions.fileName - file name
@@ -44,7 +44,7 @@ ExportPDF.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
-	 * It is executed by clicking a toolbar "command" button or calling an API.
+	 * - It is executed by clicking a toolbar "command" button or calling an API.
 	 */
 	async action() {
 		if (!this.apiUrl) {

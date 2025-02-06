@@ -1,7 +1,7 @@
 /**
  * @module _DragHandle
  * @description A module that handles drag and drop events.
- * this module is initialize in the `classes/component.js`.
+ * - this module is initialize in the `classes/component.js`.
  */
 
 export const _DragHandle = new Map([

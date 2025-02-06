@@ -5,7 +5,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Font color plugin
- * @param {object} editor editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {Array.<string|{value: string, name: string}>} pluginOptions.items - Color list
  * @param {number} pluginOptions.splitNum - Number of colors per line
@@ -78,7 +78,7 @@ FontColor.prototype = {
 	/**
 	 * @editorMethod Modules.ColorPicker
 	 * @description Executes the method called when a button of "ColorPicker" module is clicked.
-	 * This plugin is by applying the "ColorPicker" module globally to the "dropdown" menu, the default "action" method is not called.
+	 * - This plugin is by applying the "ColorPicker" module globally to the "dropdown" menu, the default "action" method is not called.
 	 * @param {string} color - Color code (hex)
 	 */
 	colorPickerAction(color) {

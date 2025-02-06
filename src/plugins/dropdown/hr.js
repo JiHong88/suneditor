@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description HR Plugin
- * @param {object} editor editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {Array.<{name: string, class: string}>} pluginOptions.items - HR list
  */
@@ -68,7 +68,7 @@ HR.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
-	 * Called when an item in the "dropdown" menu is clicked.
+	 * - Called when an item in the "dropdown" menu is clicked.
 	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
@@ -87,7 +87,7 @@ HR.prototype = {
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
 	 * @param {Event} params.event - Key event object
 	 * @param {number} params.keyCode - Key code
-	 * @param {object} params.editor - editor core object
+	 * @param {object} params.editor - The root editor instance
 	 */
 	shortcut({ line, range }) {
 		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);

@@ -8,7 +8,7 @@ import { numbers } from '../../helper';
 
 /**
  * @description History stack closure
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 export default function History(editor) {
 	const frameRoots = editor.frameRoots;
@@ -171,10 +171,11 @@ export default function History(editor) {
 	return {
 		/**
 		 * @description Saving the current status to the history object stack
-		 * If "delay" is true, it will be saved after (options.get('historyStackDelayTime') || 400) miliseconds
-		 * If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
-		 * You can specify the delay time by sending a number.
-		 * @param {boolean|number} delay If true, Add stack without delay time.
+		 * - If "delay" is true, it will be saved after (options.get('historyStackDelayTime') || 400) milliseconds.
+		 * - If the function is called again with the "delay" argument true before it is saved, the delay time is renewed.
+		 * - You can specify the delay time by sending a number.
+		 * @param {boolean|number} delay If true, add stack without delay time.
+		 * @param {*} [rootKey] The key of the root frame to save history for.
 		 */
 		push(delay, rootKey) {
 			if (waiting) return;
@@ -200,6 +201,11 @@ export default function History(editor) {
 			}, time);
 		},
 
+		/**
+		 * @description Immediately saves the current state to the history stack if a delayed save is pending.
+		 * @param {*} rootKey The key of the root frame.
+		 * @param {Range} range The selection range object.
+		 */
 		check(rootKey, range) {
 			if (pushDelay) {
 				_w.clearTimeout(pushDelay);
@@ -209,7 +215,7 @@ export default function History(editor) {
 		},
 
 		/**
-		 * @description Undo function
+		 * @description Undo function that restores the previous state from the history stack.
 		 */
 		undo() {
 			if (stackIndex > 0) {
@@ -218,7 +224,7 @@ export default function History(editor) {
 		},
 
 		/**
-		 * @description Redo function
+		 * @description Redo function that re-applies a previously undone state from the history stack.
 		 */
 		redo() {
 			if (stack.length - 1 > stackIndex) {
@@ -226,14 +232,20 @@ export default function History(editor) {
 			}
 		},
 
+		/**
+		 * @description Overwrites the current state in the history stack with the latest content.
+		 * @param {string} [rootKey] The key of the root frame to overwrite.
+		 */
 		overwrite(rootKey) {
 			setStack(frameRoots.get(rootKey || editor.status.rootKey).get('wysiwyg').innerHTML, null, editor.status.rootKey, 0);
 		},
 
+		/**
+		 * @description Pauses the history stack, preventing new entries from being added for up to 5 seconds.
+		 */
 		pause() {
 			waiting = true;
 
-			// max 5 seconds
 			if (waitingTime) {
 				_w.clearTimeout(waitingTime);
 				waitingTime = null;
@@ -243,6 +255,9 @@ export default function History(editor) {
 			}, 5000);
 		},
 
+		/**
+		 * @description Resumes history tracking by allowing new entries to be added to the stack.
+		 */
 		resume() {
 			if (waitingTime) {
 				_w.clearTimeout(waitingTime);
@@ -252,19 +267,12 @@ export default function History(editor) {
 		},
 
 		/**
-		 * @description Reset the history object
+		 * @description Resets the history stack and disables related UI buttons.
 		 */
 		reset() {
-			editor.applyCommandTargets('undo', (e) => {
-				e.setAttribute('disabled', true);
-			});
-			editor.applyCommandTargets('redo', (e) => {
-				e.setAttribute('disabled', true);
-			});
-
-			editor.applyCommandTargets('save', (e) => {
-				e.setAttribute('disabled', true);
-			});
+			editor.applyCommandTargets('undo', (e) => e.setAttribute('disabled', true));
+			editor.applyCommandTargets('redo', (e) => e.setAttribute('disabled', true));
+			editor.applyCommandTargets('save', (e) => e.setAttribute('disabled', true));
 
 			editor.applyFrameRoots((e) => e.set('historyIndex', -1));
 			editor.applyFrameRoots((e) => e.set('isChanged', false));
@@ -282,7 +290,9 @@ export default function History(editor) {
 		},
 
 		/**
-		 * @description Reset the disabled state of the buttons to fit the current stack.
+		 * @description Updates the state of history-related buttons (undo, redo, save) based on the current history stack.
+		 * @param {*} rootKey The key of the root frame.
+		 * @param {number} [index] The index of the current history state.
 		 */
 		resetButtons(rootKey, index) {
 			const isReset = !numbers.is(index);
@@ -314,20 +324,24 @@ export default function History(editor) {
 			editor.triggerEvent('onResetButtons', { rootKey });
 		},
 
+		/**
+		 * @description Returns the root stack containing the history of each frame.
+		 * @returns {object} The root stack object.
+		 */
 		getRootStack() {
 			return rootStack;
 		},
 
 		/**
-		 * @description Reset the delay time.
-		 * @param {number} time millisecond
+		 * @description Resets the delay time for saving history.
+		 * @param {number} ms The new delay time in milliseconds.
 		 */
-		resetDelayTime(time) {
-			delayTime = time;
+		resetDelayTime(ms) {
+			delayTime = ms;
 		},
 
 		/**
-		 * @description Remove all stacks and remove the timeout function.
+		 * @description Clears the entire history stack and cancels any pending save operations.
 		 */
 		destroy() {
 			if (pushDelay) _w.clearTimeout(pushDelay);

@@ -7,9 +7,9 @@ const { _w } = env;
 /**
  * @class
  * @description Math plugin.
- * This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
- * If external library is provided, a warning is issued.
- * @param {object} editor editor core object
+ * - This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
+ * - If external library is provided, a warning is issued.
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {object=} [pluginOptions.formSize] - An object specifying the dimensions for the math modal.
  * @param {string=} [pluginOptions.formSize.width="460px"] - The default width of the math modal.
@@ -134,15 +134,14 @@ Math_.prototype = {
 
 	/**
 	 * @editorMethod Editor.core
-	 * @description
-	 * This method is used to validate and preserve the format of the component within the editor.
-	 * It ensures that the structure and attributes of the element are maintained and secure.
-	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * If the element isn't properly contained, a new container is created to retain the format.
+	 * @description This method is used to validate and preserve the format of the component within the editor.
+	 * - It ensures that the structure and attributes of the element are maintained and secure.
+	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
+	 * - If the element isn't properly contained, a new container is created to retain the format.
 	 * @returns {object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
-	 * The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
 		return {

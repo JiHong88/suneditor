@@ -96,14 +96,14 @@ const DEFAULT_UNIT_MAP = {
 /**
  * @class
  * @description FontSize Plugin
- * This plugin enables users to modify the font size of selected text within the editor.
- * It supports various measurement units (e.g., 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%') and
- * provides multiple interfaces: dropdown menus, direct input, and optional increment/decrement buttons.
- * @param {object} editor - The editor core object instance.
+ * - This plugin enables users to modify the font size of selected text within the editor.
+ * - It supports various measurement units (e.g., 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%') and
+ * - provides multiple interfaces: dropdown menus, direct input, and optional increment/decrement buttons.
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions - Configuration options for the FontSize plugin.
  * @param {string=} [pluginOptions.sizeUnit='px'] - The unit for the font size.
- * Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
- * If 'text' is used, a text-based font size list is applied.
+ * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
+ * - If 'text' is used, a text-based font size list is applied.
  * @param {boolean=} [pluginOptions.showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
  * @param {boolean=} [pluginOptions.showIncDecControls=false] - When true, displays increase and decrease buttons for font size adjustments.
  * @param {boolean=} [pluginOptions.disableInput=true] - When true, disables the direct font size input box.
@@ -291,7 +291,7 @@ FontSize.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
-	 * Called when an item in the "dropdown" menu is clicked.
+	 * - Called when an item in the "dropdown" menu is clicked.
 	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {

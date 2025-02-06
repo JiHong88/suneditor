@@ -12,16 +12,15 @@ function NodeTransform(editor) {
 /**
  * @class
  * @description Node utility class. split, merge, etc.
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 NodeTransform.prototype = {
 	/**
 	 * @description Split all tags based on "baseNode"
-	 * Returns the last element of the splited tag.
 	 * @param {Node} baseNode Element or text node on which to base
 	 * @param {number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
 	 * @param {number} depth The nesting depth of the element being split. (default: 0)
-	 * @returns {Element}
+	 * @returns {Element} The last element of the splited tag.
 	 */
 	split(baseNode, offset, depth) {
 		if (domUtils.isWysiwygFrame(baseNode) || this.component.is(baseNode) || !baseNode) return baseNode;
@@ -127,8 +126,8 @@ NodeTransform.prototype = {
 
 	/**
 	 * @description Use with "npdePath (domUtils.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
-	 * If "offset" has been changed, it will return as much "offset" as it has been modified.
-	 * An array containing change offsets is returned in the order of the "nodePathArray" array.
+	 * - If "offset" has been changed, it will return as much "offset" as it has been modified.
+	 * - An array containing change offsets is returned in the order of the "nodePathArray" array.
 	 * @param {Element} element Element
 	 * @param {Array|null} nodePathArray Array of NodePath object ([domUtils.getNodePath(), ..])
 	 * @param {boolean} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
@@ -305,11 +304,11 @@ NodeTransform.prototype = {
 
 	/**
 	 * @description Delete itself and all parent nodes that match the condition.
-	 * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
+	 * - Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
 	 * @param {Node} item Node to be remove
 	 * @param {Function|null} validation Validation function. default(Deleted if it only have breakLine and blanks)
 	 * @param {Element|null} stopParent Stop when the parent node reaches stopParent
-	 * @returns {object|null} {sc: previousSibling, ec: nextSibling}
+	 * @returns {{sc: Node|null, ec: Node|null}|null} {sc: previousSibling, ec: nextSibling} (the deleted node reference) or null.
 	 */
 	removeAllParents(item, validation, stopParent) {
 		if (!item) return null;

@@ -6,8 +6,8 @@ const { NO_EVENT, _w } = env;
 /**
  * @class
  * @description Embed modal plugin.
- * This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
- * @param {object} editor - The core editor object (e.g., handling selection, events, etc.)
+ * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {boolean=} [pluginOptions.canResize=true] - Whether the embed element can be resized.
  * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
@@ -241,15 +241,14 @@ Embed.prototype = {
 
 	/**
 	 * @editorMethod Editor.core
-	 * @description
-	 * This method is used to validate and preserve the format of the component within the editor.
-	 * It ensures that the structure and attributes of the element are maintained and secure.
-	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * If the element isn't properly contained, a new container is created to retain the format.
+	 * @description This method is used to validate and preserve the format of the component within the editor.
+	 * - It ensures that the structure and attributes of the element are maintained and secure.
+	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
+	 * - If the element isn't properly contained, a new container is created to retain the format.
 	 * @returns {object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
-	 * The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
 		return {
@@ -412,7 +411,7 @@ Embed.prototype = {
 
 	/**
 	 * @description Processes the provided source (URL or embed code) and submits it for embedding.
-	 * It parses the input, triggers any necessary events, and creates or updates the embed component.
+	 * - It parses the input, triggers any necessary events, and creates or updates the embed component.
 	 * @param {string} [src] - The embed source. If not provided, uses the internally stored link value.
 	 * @returns {Promise<boolean>} A promise that resolves to true on success or false on failure.
 	 */

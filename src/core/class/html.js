@@ -11,7 +11,7 @@ const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|da
 /**
  * @class
  * @description All HTML related classes involved in the editing area
- * @param {object} editor - editor core object
+ * @param {object} editor - The root editor instance
  */
 function HTML(editor) {
 	CoreInjector.call(this, editor);
@@ -300,7 +300,7 @@ HTML.prototype = {
 
 	/**
 	 * @description Inserts an (HTML element / HTML string / plain string) at the selection range.
-	 * If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
+	 * - If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
 	 * @param {Element|string} html HTML Element or HTML string or plain string
 	 * @param {object} [options] Options
 	 * @param {boolean} [options.selectInserted=false] If true, selects the range of the inserted node.
@@ -376,8 +376,8 @@ HTML.prototype = {
 
 	/**
 	 * @description Delete selected node and insert argument value node and return.
-	 * If the "afterNode" exists, it is inserted after the "afterNode"
-	 * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
+	 * - If the "afterNode" exists, it is inserted after the "afterNode"
+	 * - Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
 	 * @param {Node} oNode Node to be inserted
 	 * @param {object} [options] Options
 	 * @param {Node} [options.afterNode=null] If the node exists, it is inserted after the node
@@ -725,8 +725,7 @@ HTML.prototype = {
 
 	/**
 	 * @description Delete the selected range.
-	 * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
-	 * @returns {object}
+	 * @returns {{container:Node, offset:number, prevContainer:Node|null}} {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
 	 */
 	remove() {
 		this.selection._resetRangeToTextNode();
@@ -1126,6 +1125,7 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description construct wysiwyg area element to html string
 	 * @param {Element|string} html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
 	 * @param {boolean} comp If true, does not line break and indentation of tags.
@@ -1183,6 +1183,11 @@ HTML.prototype = {
 		return returnHTML.trim() + brChar;
 	},
 
+	/**
+	 * @private
+	 * @description Checks whether the given list item node should be removed and handles necessary clean-up.
+	 * @param {Node} item The list item node to be checked.
+	 */
 	_nodeRemoveListItem(item) {
 		const line = this.format.getLine(item, null);
 		domUtils.removeItem(item);
@@ -1197,10 +1202,10 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Recursive function  when used to place a node in "BrLine" in "html.insertNode"
 	 * @param {Node} oNode Node to be inserted
 	 * @returns {Node} "oNode"
-	 * @private
 	 */
 	_setIntoFreeFormat(oNode) {
 		const parentNode = oNode.parentNode;
@@ -1231,10 +1236,10 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Returns HTML string according to tag type and configurati isExcludeFormat.
 	 * @param {Node} node Node
 	 * @param {boolean} forceFormat If true, text nodes that do not have a format node is wrapped with the format tag.
-	 * @private
 	 */
 	_makeLine(node, forceFormat) {
 		const defaultLine = this.options.get('defaultLine');
@@ -1285,6 +1290,7 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Fix tags that do not fit the editor format.
 	 * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
 	 * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist
@@ -1293,7 +1299,6 @@ HTML.prototype = {
 	 * @param {boolean} formatFilter Format filter option
 	 * @param {boolean} classFilter Class name filter option
 	 * @param {boolean} _freeCodeViewMode Enforces strict HTML validation based on the editor`s policy
-	 * @private
 	 */
 	_consistencyCheckOfHTML(documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter, _freeCodeViewMode) {
 		const removeTags = [],
@@ -1437,10 +1442,10 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
 	 * @param {string} html HTML string
 	 * @returns {string} HTML string
-	 * @private
 	 */
 	_styleNodeConvertor(html) {
 		if (!this._disallowedStyleNodesRegExp) return html;
@@ -1452,10 +1457,10 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Determines if formatting is required and returns a domTree
 	 * @param {Element} dom documentFragment
 	 * @returns {Element}
-	 * @private
 	 */
 	_editFormat(dom) {
 		let value = '',
@@ -1490,6 +1495,14 @@ HTML.prototype = {
 		return this._d.createRange().createContextualFragment(value);
 	},
 
+	/**
+	 * @private
+	 * @description Converts a list of DOM nodes into an HTML list structure.
+	 * - If the node is already a list, its innerHTML is used. If it is a block element,
+	 * - the function is called recursively.
+	 * @param {NodeList} domTree List of DOM nodes to be converted.
+	 * @returns {string} The generated HTML list.
+	 */
 	_convertListCell(domTree) {
 		let html = '';
 
@@ -1515,6 +1528,12 @@ HTML.prototype = {
 		return html;
 	},
 
+	/**
+	 * @private
+	 * @description Checks whether the provided DOM nodes require formatting.
+	 * @param {NodeList} domTree List of DOM nodes to check.
+	 * @returns {boolean} True if formatting is required, otherwise false.
+	 */
 	_isFormatData(domTree) {
 		let requireFormat = false;
 
@@ -1529,6 +1548,15 @@ HTML.prototype = {
 		return requireFormat;
 	},
 
+	/**
+	 * @private
+	 * @description Cleans the inline style attributes of an HTML element.
+	 * - Extracts allowed styles and removes disallowed ones based on editor settings.
+	 * @param {string} m The full matched string from a regular expression.
+	 * @param {Array|null} v The list of allowed attributes.
+	 * @param {string} name The tag name of the element being cleaned.
+	 * @returns {Array} The updated list of allowed attributes including cleaned styles.
+	 */
 	_cleanStyle(m, v, name) {
 		let sv = (m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/) || [])[0];
 		if (this._textStyleTags.includes(name) && !sv && (m.match(/<[^\s]+\s(.+)/) || [])[1]) {
@@ -1592,10 +1620,10 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Delete disallowed tags
 	 * @param {string} html HTML string
 	 * @returns {string}
-	 * @private
 	 */
 	_deleteDisallowedTags(html, whitelistRegExp, blacklistRegExp) {
 		if (whitelistRegExp.test('<font>')) {
@@ -1605,6 +1633,12 @@ HTML.prototype = {
 		return html.replace(whitelistRegExp, '').replace(blacklistRegExp, '');
 	},
 
+	/**
+	 * @private
+	 * @description Recursively checks for duplicate text style nodes within a given parent node.
+	 * @param {Node} oNode The node to check for duplicate styles.
+	 * @param {Node} parentNode The parent node where the duplicate check occurs.
+	 */
 	_checkDuplicateNode(oNode, parentNode) {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
@@ -1617,6 +1651,14 @@ HTML.prototype = {
 		})(oNode);
 	},
 
+	/**
+	 * @private
+	 * @description Recursively checks for duplicate text style nodes within a given parent node.
+	 * - If duplicate styles are found, redundant attributes are removed.
+	 * @param {Node} oNode The node to check for duplicate styles.
+	 * @param {Node} parentNode The parent node where the duplicate check occurs.
+	 * @returns {Node} The cleaned node with redundant styles removed.
+	 */
 	_dupleCheck(oNode, parentNode) {
 		if (!this.format.isTextStyleNode(oNode)) return;
 
@@ -1667,7 +1709,6 @@ HTML.prototype = {
  * @param {string} m RegExp value
  * @param {string} t RegExp value
  * @returns {string}
- * @private
  */
 function CleanElements(attrFilter, styleFilter, m, t) {
 	if (/^<[a-z0-9]+:[a-z0-9]+/i.test(m)) return m;

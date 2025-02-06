@@ -7,10 +7,14 @@ import Modal from '../../modules/Modal';
 import { domUtils, converter } from '../../helper';
 
 /**
+ * @typedef {import('../section/context').FrameContext} FrameContext
+ */
+
+/**
  * @class
  * @description The UI class is a class that handles operations related to the user interface of SunEditor.
- * This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
- * @param {object} editor - editor core object
+ * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
+ * @param {object} editor - The root editor instance
  */
 function UI(editor) {
 	CoreInjector.call(this, editor);
@@ -26,8 +30,8 @@ function UI(editor) {
 UI.prototype = {
 	/**
 	 * @description Set "options.get('editorStyle')" style.
-	 * Define the style of the edit area
-	 * It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
+	 * - Define the style of the edit area
+	 * - It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param {string} style Style string
 	 * @param {FrameContext|null} fc Frame context
 	 */
@@ -191,7 +195,7 @@ UI.prototype = {
 
 	/**
 	 * @description This method disables or enables the toolbar buttons when the controller is activated or deactivated.
-	 *              When the controller is activated, the toolbar buttons are disabled; when the controller is deactivated, the buttons are enabled.
+	 * - When the controller is activated, the toolbar buttons are disabled; when the controller is deactivated, the buttons are enabled.
 	 * @param {boolean} active If `true`, the toolbar buttons will be disabled. If `false`, the toolbar buttons will be enabled.
 	 */
 	setControllerOnDisabledButtons(active) {
@@ -266,8 +270,8 @@ UI.prototype = {
 	},
 
 	/**
-	 * @description Off controllers
 	 * @private
+	 * @description Off controllers
 	 */
 	__offControllers() {
 		const cont = this.editor.opendControllers;
@@ -287,8 +291,8 @@ UI.prototype = {
 	},
 
 	/**
-	 * @description Off current modal
 	 * @private
+	 * @description Off current modal
 	 */
 	_offCurrentModal() {
 		if (this.opendModal) {

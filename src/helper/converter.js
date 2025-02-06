@@ -73,7 +73,7 @@ export function debounce(func, wait) {
 
 /**
  * @description Synchronizes two Map objects by updating the first Map with the values from the second,
- *              and deleting any keys in the first Map that are not present in the second.
+ * - and deleting any keys in the first Map that are not present in the second.
  * @param {Map} targetMap The Map to update (target).
  * @param {Map} referenceMap The Map providing the reference values (source).
  */
@@ -152,9 +152,8 @@ export function swapKeyValue(obj) {
 
 /**
  * @description Create whitelist RegExp object.
- * Return RegExp format: new RegExp("<\\/?\\b(?!" + list + ")\\b[^>^<]*+>", "gi")
  * @param {string} list Tags list ("br|p|div|pre...")
- * @returns {RegExp}
+ * @returns {RegExp} Return RegExp format: new RegExp("<\\/?\\b(?!" + list + ")\\b[^>^<]*+>", "gi")
  */
 export function createElementWhitelist(list) {
 	return new RegExp(`<\\/?\\b(?!\\b${(list || '').replace(/\|/g, '\\b|\\b')}\\b)[^>]*>`, 'gi');
@@ -162,9 +161,8 @@ export function createElementWhitelist(list) {
 
 /**
  * @description Create blacklist RegExp object.
- * Return RegExp format: new RegExp("<\\/?\\b(?:" + list + ")\\b[^>^<]*+>", "gi")
  * @param {string} list Tags list ("br|p|div|pre...")
- * @returns {RegExp}
+ * @returns {RegExp} Return RegExp format: new RegExp("<\\/?\\b(?:" + list + ")\\b[^>^<]*+>", "gi")
  */
 export function createElementBlacklist(list) {
 	return new RegExp(`<\\/?\\b(?:\\b${(list || '^').replace(/\|/g, '\\b|\\b')}\\b)[^>]*>`, 'gi');

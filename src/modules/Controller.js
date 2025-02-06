@@ -124,7 +124,7 @@ Controller.prototype = {
 
 	/**
 	 * @description Close a modal plugin
-	 * The plugin's "init" method is called.
+	 * - The plugin's "init" method is called.
 	 * @param {boolean} force If true, parent controllers are forcibly closed.
 	 */
 	close(force) {

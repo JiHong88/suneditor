@@ -122,7 +122,7 @@ Browser.prototype = {
 
 	/**
 	 * @description Close a browser plugin
-	 * The plugin's "init" method is called.
+	 * - The plugin's "init" method is called.
 	 */
 	close() {
 		this.__removeGlobalEvent();
@@ -514,9 +514,7 @@ function CreateHTML({ lang, icons }, useSearch) {
 
 /**
  * @description Define the HTML of the item to be put in "div.se-file-item-column".
- * Format: [
- *      { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" }
- * ]
+ * - Format: [ { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" } ]
  * @param {object} item Item of the response data's array
  */
 function DrawItems(item) {

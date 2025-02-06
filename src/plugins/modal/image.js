@@ -7,8 +7,8 @@ const { NO_EVENT } = env;
 /**
  * @class
  * @description Image plugin.
- * This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
- * @param {object} editor editor core object
+ * - This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {boolean=} [pluginOptions.canResize=true] - Whether the image element can be resized.
  * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
@@ -241,15 +241,14 @@ Image_.prototype = {
 
 	/**
 	 * @editorMethod Editor.core
-	 * @description
-	 * This method is used to validate and preserve the format of the component within the editor.
-	 * It ensures that the structure and attributes of the element are maintained and secure.
-	 * The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * If the element isn't properly contained, a new container is created to retain the format.
+	 * @description This method is used to validate and preserve the format of the component within the editor.
+	 * - It ensures that the structure and attributes of the element are maintained and secure.
+	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
+	 * - If the element isn't properly contained, a new container is created to retain the format.
 	 * @returns {object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
-	 * The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
 		return {
@@ -784,7 +783,7 @@ Image_.prototype = {
 
 	/**
 	 * @description Creates a new image component, wraps it in a figure container with an optional anchor,
-	 * applies size and alignment settings, and inserts it into the editor.
+	 * - applies size and alignment settings, and inserts it into the editor.
 	 * @param {string} src - The URL of the image to be inserted.
 	 * @param {Element|null} anchor - An optional anchor element to wrap the image. If provided, a clone is used.
 	 * @param {string} width - The width value to be applied to the image.
@@ -827,7 +826,7 @@ Image_.prototype = {
 
 	/**
 	 * @description Creates a new inline image component, wraps it in an inline figure container with an optional anchor,
-	 * applies size settings, and inserts it into the editor.
+	 * - applies size settings, and inserts it into the editor.
 	 * @param {string} src - The URL of the image to be inserted.
 	 * @param {Element|null} anchor - An optional anchor element to wrap the image. If provided, a clone is used.
 	 * @param {string} width - The width value to be applied to the image.

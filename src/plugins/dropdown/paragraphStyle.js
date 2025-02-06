@@ -4,30 +4,18 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description A plugin to style lines using classes.
- * @param {object} editor editor core object
+ * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {Array.<string|{name: string, class: string, _class: string}>} pluginOptions.items - Paragraph item list
  * @example
  * use default paragraph styles
  * ['spaced', 'bordered', 'neon']
  * custom paragraph styles
- * [
-  		{
-			name: 'spaced',
-			class: '__se__p-spaced',
-			_class: ''
-		},
-		{
-			name: 'bordered',
-			class: '__se__p-bordered',
-			_class: ''
-		},
-		 {
-			name: 'neon',
-			class: '__se__p-neon',
-			_class: ''
-		}
-	]
+[
+	{ name: 'spaced', class: '__se__p-spaced', _class: '' },
+	{ name: 'bordered', class: '__se__p-bordered', _class: '' },
+	{ name: 'neon', class: '__se__p-neon', _class: ''}
+]
  */
 function ParagraphStyle(editor, pluginOptions) {
 	// plugin bisic properties
@@ -69,7 +57,7 @@ ParagraphStyle.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
-	 * Called when an item in the "dropdown" menu is clicked.
+	 * - Called when an item in the "dropdown" menu is clicked.
 	 * @param {?Element} target - The plugin's toolbar button element
 	 */
 	action(target) {
