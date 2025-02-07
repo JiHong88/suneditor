@@ -422,11 +422,6 @@ SelectMenu.prototype = {
 	constructor: SelectMenu
 };
 
-/**
- * @private
- * @description Handles keyboard navigation in the select menu.
- * @param {KeyboardEvent} e - The keyboard event object.
- */
 function OnKeyDown_refer(e) {
 	let moveIndex;
 	switch (e.keyCode) {
@@ -475,11 +470,6 @@ function OnKeyDown_refer(e) {
 	if (moveIndex) this._moveItem(moveIndex);
 }
 
-/**
- * @private
- * @description Handles the `mousedown` event on the menu.
- * @param {MouseEvent} e - The mouse event object.
- */
 function OnMousedown_list(e) {
 	if (env.isGecko) {
 		const target = domUtils.getParentElement(e.target, '.se-select-item');
@@ -487,11 +477,6 @@ function OnMousedown_list(e) {
 	}
 }
 
-/**
- * @private
- * @description Highlights an item when the mouse moves over it.
- * @param {MouseEvent} e - The mouse event object.
- */
 function OnMouseMove_list(e) {
 	domUtils.addClass(this.form, 'se-select-menu-mouse-move');
 	const index = e.target.getAttribute('data-index');
@@ -499,11 +484,6 @@ function OnMouseMove_list(e) {
 	this.index = index * 1;
 }
 
-/**
- * @private
- * @description Selects an item when it is clicked.
- * @param {MouseEvent} e - The mouse event object.
- */
 function OnClick_list(e) {
 	let target = e.target;
 	let index = null;
@@ -517,21 +497,11 @@ function OnClick_list(e) {
 	this._select(index * 1);
 }
 
-/**
- * @private
- * @description Closes the menu when the `Escape` key is pressed.
- * @param {KeyboardEvent} e - The keyboard event object.
- */
 function CloseListener_key(e) {
 	if (!/27/.test(e.keyCode)) return;
 	this.close();
 }
 
-/**
- * @private
- * @description Closes the menu when a click occurs outside of it.
- * @param {MouseEvent} e - The mouse event object.
- */
 function CloseListener_mousedown(e) {
 	if (this.form.contains(e.target)) return;
 	if (e.target !== this._refer) {
@@ -541,11 +511,6 @@ function CloseListener_mousedown(e) {
 	}
 }
 
-/**
- * @private
- * @description Handles click events to properly close the menu.
- * @param {MouseEvent} e - The mouse event object.
- */
 function CloseListener_click(e) {
 	this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
 	if (e.target === this._refer) {

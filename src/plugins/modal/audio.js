@@ -5,6 +5,10 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 /**
+ * @typedef {import('../../core/base/events').AudioInfo} AudioInfo
+ */
+
+/**
  * @class
  * @description Audio modal plugin.
  * @param {object} editor - The root editor instance
@@ -207,6 +211,13 @@ Audio_.prototype = {
 		this._ready(target);
 	},
 
+	/**
+	 * @private
+	 * @description Prepares the component for selection.
+	 * - Ensures that the controller is properly positioned and initialized.
+	 * - Prevents duplicate event handling if the component is already selected.
+	 * @param {Element} target - The selected element.
+	 */
 	_ready(target) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
 		this._element = target;
@@ -247,6 +258,13 @@ Audio_.prototype = {
 		this.history.push(false);
 	},
 
+	/**
+	 * @private
+	 * @description Registers uploaded audio files and creates the corresponding audio elements.
+	 * - Iterates through the uploaded files and inserts them into the editor.
+	 * @param {object} info - Upload metadata, including `isUpdate` flag and `element`.
+	 * @param {object} response - Server response containing uploaded file details.
+	 */
 	_register(info, response) {
 		const fileList = response.result;
 
@@ -363,6 +381,16 @@ Audio_.prototype = {
 		return true;
 	},
 
+	/**
+	 * @private
+	 * @description Creates or updates an audio component within the editor.
+	 * - If `isUpdate` is `true`, updates the existing element's `src`.
+	 * - Otherwise, inserts a new audio component with the given file.
+	 * @param {Element} element - The target audio element.
+	 * @param {string} src - The source URL of the audio file.
+	 * @param {object} file - The file metadata (name, size).
+	 * @param {boolean} isUpdate - Whether to update an existing element.
+	 */
 	_createComp(element, src, file, isUpdate) {
 		// create new tag
 		if (!isUpdate) {
@@ -392,6 +420,12 @@ Audio_.prototype = {
 		if (isUpdate) this.history.push(false);
 	},
 
+	/**
+	 * @private
+	 * @description Creates a new `<audio>` element with default attributes.
+	 * - Applies width, height, and additional attributes from plugin options.
+	 * @returns {Element} - The newly created `<audio>` element.
+	 */
 	_createAudioTag() {
 		const w = this.defaultWidth;
 		const h = this.defaultHeight;
@@ -400,6 +434,12 @@ Audio_.prototype = {
 		return oAudio;
 	},
 
+	/**
+	 * @private
+	 * @description Sets attributes on an audio element based on plugin options.
+	 * - Adds the `controls` attribute and applies any custom attributes.
+	 * @param {Element} element - The `<audio>` element to modify.
+	 */
 	_setTagAttrs(element) {
 		element.setAttribute('controls', true);
 
@@ -411,6 +451,13 @@ Audio_.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Uploads audio files to the server.
+	 * - Sends a request to the configured upload URL and processes the response.
+	 * @param {AudioInfo} info - Upload metadata, including `files` and `isUpdate`.
+	 * @param {Array<File>} files - The files to be uploaded.
+	 */
 	_serverUpload(info, files) {
 		if (!files) return;
 
@@ -418,6 +465,15 @@ Audio_.prototype = {
 		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, UploadCallBack.bind(this, info), this._error.bind(this));
 	},
 
+	/**
+	 * @private
+	 * @async
+	 * @description Handles errors that occur during the audio upload process.
+	 * - Triggers the `onAudioUploadError` event to allow custom handling of errors.
+	 * - Displays an error message in the editor's UI.
+	 * - Logs the error to the console for debugging.
+	 * @param {object} response - The error response object from the server or upload process.
+	 */
 	async _error(response) {
 		const message = await this.triggerEvent('onAudioUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
@@ -428,6 +484,13 @@ Audio_.prototype = {
 	constructor: Audio_
 };
 
+/**
+ * @description Handles the server response after a file upload.
+ * - If the upload is successful, registers the uploaded audio.
+ * - If an error occurs, triggers an error event.
+ * @param {AudioInfo} info - Upload metadata.
+ * @param {XMLHttpRequest} xmlHttp - The completed XHR request.
+ */
 async function UploadCallBack(info, xmlHttp) {
 	if ((await this.triggerEvent('audioUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 		const response = JSON.parse(xmlHttp.responseText);
@@ -439,6 +502,12 @@ async function UploadCallBack(info, xmlHttp) {
 	}
 }
 
+/**
+ * @private
+ * @description Updates the preview text for the entered audio URL.
+ * - Formats the URL correctly based on the editor’s settings.
+ * @param {Event} e - The input event triggered when the user types a URL.
+ */
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();
 	this.urlValue = this.preview.textContent = !value
@@ -450,6 +519,11 @@ function OnLinkPreview(e) {
 		: value;
 }
 
+/**
+ * @private
+ * @description Opens the audio gallery plugin, if available.
+ * - Calls a function to populate the URL input with the selected audio file.
+ */
 function OpenGallery() {
 	this.plugins.audioGallery.open(_setUrlInput.bind(this));
 }
@@ -459,7 +533,13 @@ function _setUrlInput(target) {
 	this.audioUrlFile.focus();
 }
 
-// Disable url input when uploading files
+/**
+ * @private
+ * @description Clears the selected file input and re-enables the URL input.
+ * - Ensures that only one input method (file or URL) is used at a time.
+ * @param {Element} urlInput - The URL input field.
+ * @param {Element} preview - The preview text element.
+ */
 function RemoveSelectedFiles(urlInput, preview) {
 	this.value = '';
 	if (urlInput) {
@@ -471,7 +551,6 @@ function RemoveSelectedFiles(urlInput, preview) {
 	Modal.OnChangeFile(this.fileModalWrapper, []);
 }
 
-// Disable url input when uploading files
 function FileInputChange({ target }) {
 	if (!this.audioInputFile.value) {
 		this.audioUrlFile.removeAttribute('disabled');

@@ -401,6 +401,7 @@ ModalAnchorEditor.prototype = {
 };
 
 /**
+ * @private
  * @description Handles file input change events.
  * @param {Event} e - The change event object.
  */
@@ -433,6 +434,7 @@ async function OnChangeFile(e) {
 }
 
 /**
+ * @private
  * @description Opens the `rel` attribute selection menu.
  */
 function OnClick_relbutton() {
@@ -440,6 +442,7 @@ function OnClick_relbutton() {
 }
 
 /**
+ * @private
  * @description Sets the selected bookmark as the URL.
  * @param {Element} item - The selected bookmark element.
  */
@@ -454,6 +457,7 @@ function SetHeaderBookmark(item) {
 }
 
 /**
+ * @private
  * @description Updates the `rel` attribute selection based on user input.
  * @param {Element} item - The selected `rel` attribute element.
  */
@@ -469,18 +473,11 @@ function SetRelItem(item) {
 	this.relPreview.title = this.relPreview.textContent = current.join(', ');
 }
 
-/**
- * @description Tracks changes in the display text input field.
- * @param {Event} e - The input event object.
- */
+// Event handlers
 function OnChange_displayInput(e) {
 	this._change = !!e.target.value.trim();
 }
 
-/**
- * @description Updates the URL preview and bookmark suggestions.
- * @param {Event} e - The input event object.
- */
 function OnChange_urlInput(e) {
 	const value = e.target.value.trim();
 	this._setLinkPreview(value);
@@ -488,17 +485,11 @@ function OnChange_urlInput(e) {
 	else this.selectMenu_bookmark.close();
 }
 
-/**
- * @description Displays the bookmark selection menu when the URL input field gains focus.
- */
 function OnFocus_urlInput() {
 	const value = this.urlInput.value;
 	if (this._selfPathBookmark(value)) this._createBookmarkList(value);
 }
 
-/**
- * @description Toggles the bookmark state for the link.
- */
 function OnClick_bookmarkButton() {
 	let url = this.urlInput.value;
 	if (this._selfPathBookmark(url)) {
@@ -519,10 +510,6 @@ function OnClick_bookmarkButton() {
 	this.urlInput.focus();
 }
 
-/**
- * @description Updates the `rel` attribute when the "Open in new window" checkbox is toggled.
- * @param {Event} e - The change event object.
- */
 function OnChange_newWindowCheck(e) {
 	if (typeof this.defaultRel.check_new_window !== 'string') return;
 	if (e.target.checked) {
@@ -532,10 +519,6 @@ function OnChange_newWindowCheck(e) {
 	}
 }
 
-/**
- * @description Updates the `download` attribute and its visibility.
- * @param {Event} e - The change event object.
- */
 function OnChange_downloadCheck(e) {
 	if (e.target.checked) {
 		this.download.style.display = 'block';
@@ -553,13 +536,6 @@ function OnChange_downloadCheck(e) {
 	}
 }
 
-/**
- * @description Creates the modal form HTML structure.
- * @param {object} editor - The editor instance.
- * @param {ModalAnchorEditorParams} params - The modal parameters.
- * @param {string[]} relList - List of allowed `rel` attributes.
- * @returns {Element} - The created modal form element.
- */
 function CreatetModalForm(editor, params, relList) {
 	const lang = editor.lang;
 	const icons = editor.icons;

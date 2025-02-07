@@ -11,6 +11,10 @@ const { debounce } = converter;
 /**
  * @class
  * @description Mention Plugin
+ * - A plugin that provides a mention feature using `@` or a custom trigger character.
+ * - Displays a mention list when the trigger character is typed.
+ * - Supports fetching mention data from an API or a predefined data array.
+ * - Uses caching for optimized performance.
  * @param {object} editor - The root editor instance
  * @param {object} pluginOptions
  * @param {string=} [pluginOptions.triggerText="@"] The character that triggers the mention list. Default is '@'.
@@ -118,6 +122,16 @@ Mention.prototype = {
 		return true;
 	},
 
+	/**
+	 * @private
+	 * @description Generates the mention list based on user input.
+	 * - Fetches data from cache, direct data, or an API.
+	 * - Creates and opens the mention dropdown.
+	 * - Caches the fetched data for future use.
+	 * @param {string} value - The mention query text.
+	 * @param {Node} targetNode - The node where the mention is triggered.
+	 * @returns {Promise<boolean>} - Returns `true` if the mention list is displayed, `false` otherwise.
+	 */
 	async _createMentionList(value, targetNode) {
 		let response = null;
 		if (this.cachingData) {
@@ -167,6 +181,12 @@ Mention.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Constructs the API request URL with the mention query.
+	 * @param {string} key - The mention query text.
+	 * @returns {string} - The formatted API request URL.
+	 */
 	_createUrl(key) {
 		return this.apiUrl.replace(/\{key\}/i, key);
 	},
@@ -174,6 +194,11 @@ Mention.prototype = {
 	constructor: Mention
 };
 
+/**
+ * @description Inserts a mention link into the editor when a user selects a mention from the list.
+ * @param {{ key: string, name: string, url: string }} item - The selected mention item.
+ * @returns {boolean} - Returns `false` if insertion fails, otherwise completes execution.
+ */
 function SelectMention(item) {
 	if (!item) return false;
 

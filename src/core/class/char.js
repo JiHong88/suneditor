@@ -136,6 +136,7 @@ Char.prototype = {
 };
 
 /**
+ * @private
  * @description The character counter blinks.
  * @param charWrapper {Element} this.editor.frameContext.get('charWrapper')
  */

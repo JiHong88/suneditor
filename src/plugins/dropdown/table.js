@@ -1475,6 +1475,12 @@ Table.prototype = {
 		this._setCellControllerPosition(this._tdElement, false);
 	},
 
+	/**
+	 * @private
+	 * @description Updates table styles.
+	 * @param {string} styles - Styles to update.
+	 * @param {boolean} ondisplay - Whether to update display.
+	 */
 	_setTableStyle(styles, ondisplay) {
 		if (styles.includes('width')) {
 			const targets = this._figure;
@@ -1508,6 +1514,12 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Sets the merge/split button visibility.
+	 * @param {boolean} fixedCell - Whether a single cell is selected.
+	 * @param {boolean} selectedCell - Whether multiple cells are selected.
+	 */
 	_setMergeSplitButton(fixedCell, selectedCell) {
 		if (!selectedCell || !selectedCell || fixedCell === selectedCell) {
 			this.splitButton.style.display = 'block';
@@ -1518,6 +1530,11 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Sets the controller position for a cell.
+	 * @param {Element} tdElement - The target table cell.
+	 */
 	_setController(tdElement) {
 		if (!this.selection.get().isCollapsed && !this._selectedCell) {
 			this._deleteStyleSelectedCells();
@@ -1530,21 +1547,44 @@ Table.prototype = {
 		this.component.select(tableElement, Table.key, true);
 	},
 
+	/**
+	 * @private
+	 * @description Sets the position of the cell controller.
+	 * @param {Element} tdElement - The target table cell.
+	 * @param {boolean} reset - Whether to reset the controller position.
+	 */
 	_setCellControllerPosition(tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
 		this.controller_cell.resetPosition(this.cellControllerTop ? domUtils.getParentElement(tdElement, domUtils.isTable) : tdElement);
 	},
 
+	/**
+	 * @private
+	 * @description Adds a new entry to the history stack.
+	 */
 	_historyPush() {
 		this._deleteStyleSelectedCells();
 		this.history.push(false);
 		this._recallStyleSelectedCells();
 	},
 
+	/**
+	 * @private
+	 * @description Opens the figure.
+	 * @param {Element} target - The target figure element.
+	 */
 	_figureOpen(target) {
 		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
 	},
 
+	/**
+	 * @private
+	 * @description Starts resizing a table cell.
+	 * @param {Element} col The column element.
+	 * @param {number} startX The starting X position.
+	 * @param {number} startWidth The initial width of the column.
+	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
+	 */
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
 		this._setResizeLinePosition(this._figure, this._tdElement, this._resizeLinePrev, isLeftEdge);
 		this._resizeLinePrev.style.display = 'block';
@@ -1582,6 +1622,22 @@ Table.prototype = {
 		);
 	},
 
+	/**
+	 * @private
+	 * @description Resizes a table cell.
+	 * @param {Element} col The column element.
+	 * @param {Element} nextCol The next column element.
+	 * @param {Element} figure The table figure element.
+	 * @param {Element} tdEl The table cell element.
+	 * @param {Element} resizeLine The resize line element.
+	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
+	 * @param {number} startX The starting X position.
+	 * @param {number} startWidth The initial width of the column.
+	 * @param {number} prevWidthPercent The previous width percentage.
+	 * @param {number} nextColWidthPercent The next column's width percentage.
+	 * @param {number} tableWidth The total width of the table.
+	 * @param {MouseEvent} e The mouse event.
+	 */
 	_cellResize(col, nextCol, figure, tdEl, resizeLine, isLeftEdge, startX, startWidth, prevWidthPercent, nextColWidthPercent, tableWidth, e) {
 		const deltaX = e.clientX - startX;
 		const newWidthPx = startWidth + deltaX;
@@ -1595,6 +1651,13 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Starts resizing a table row.
+	 * @param {Element} row The table row element.
+	 * @param {number} startY The starting Y position.
+	 * @param {number} startHeight The initial height of the row.
+	 */
 	_startRowResizing(row, startY, startHeight) {
 		this._setResizeRowPosition(this._figure, row, this._resizeLinePrev);
 		this._resizeLinePrev.style.display = 'block';
@@ -1610,6 +1673,16 @@ Table.prototype = {
 		);
 	},
 
+	/**
+	 * @private
+	 * @description Resizes a table row.
+	 * @param {Element} row The table row element.
+	 * @param {Element} figure The table figure element.
+	 * @param {Element} resizeLine The resize line element.
+	 * @param {number} startY The starting Y position.
+	 * @param {number} startHeight The initial height of the row.
+	 * @param {MouseEvent} e The mouse event.
+	 */
 	_rowResize(row, figure, resizeLine, startY, startHeight, e) {
 		const deltaY = e.clientY - startY;
 		const newHeightPx = startHeight + deltaY;
@@ -1617,6 +1690,12 @@ Table.prototype = {
 		this._setResizeRowPosition(figure, row, resizeLine);
 	},
 
+	/**
+	 * @private
+	 * @description Starts resizing the table figure.
+	 * @param {number} startX The starting X position.
+	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
+	 */
 	_startFigureResizing(startX, isLeftEdge) {
 		const figure = this._figure;
 		this._setResizeLinePosition(figure, figure, this._resizeLinePrev, isLeftEdge);
@@ -1635,6 +1714,17 @@ Table.prototype = {
 		);
 	},
 
+	/**
+	 * @private
+	 * @description Resizes the table figure.
+	 * @param {Element} figure The table figure element.
+	 * @param {Element} resizeLine The resize line element.
+	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
+	 * @param {number} startX The starting X position.
+	 * @param {number} startWidth The initial width of the figure.
+	 * @param {number} constNum A constant number used for width calculation.
+	 * @param {MouseEvent} e The mouse event.
+	 */
 	_figureResize(figure, resizeLine, isLeftEdge, startX, startWidth, constNum, e) {
 		const deltaX = isLeftEdge ? startX - e.clientX : e.clientX - startX;
 		const newWidthPx = startWidth + deltaX;
@@ -1646,6 +1736,14 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Sets the resize line position.
+	 * @param {Element} figure The table figure element.
+	 * @param {Element} target The target element.
+	 * @param {Element} resizeLine The resize line element.
+	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
+	 */
 	_setResizeLinePosition(figure, target, resizeLine, isLeftEdge) {
 		const tdOffset = this.offset.getLocal(target);
 		const tableOffset = this.offset.getLocal(figure);
@@ -1654,6 +1752,13 @@ Table.prototype = {
 		resizeLine.style.height = `${figure.offsetHeight}px`;
 	},
 
+	/**
+	 * @private
+	 * @description Sets the resize row position.
+	 * @param {Element} figure The table figure element.
+	 * @param {Element} target The target row element.
+	 * @param {Element} resizeLine The resize line element.
+	 */
 	_setResizeRowPosition(figure, target, resizeLine) {
 		const rowOffset = this.offset.getLocal(target);
 		const tableOffset = this.offset.getLocal(figure);
@@ -1662,6 +1767,14 @@ Table.prototype = {
 		resizeLine.style.width = `${figure.offsetWidth}px`;
 	},
 
+	/**
+	 * @private
+	 * @description Stops resizing the table.
+	 * @param {Element} target The target element.
+	 * @param {string} prevValue The previous style value.
+	 * @param {string} styleProp The CSS property being changed.
+	 * @param {KeyboardEvent} e The keyboard event.
+	 */
 	_stopResize(target, prevValue, styleProp, e) {
 		if (e.keyCode !== 27) return;
 		this.__removeGlobalEvents();
@@ -1672,6 +1785,10 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Deletes styles from selected table cells.
+	 */
 	_deleteStyleSelectedCells() {
 		domUtils.removeClass([this._fixedCell, this._selectedCell], 'se-selected-cell-focus');
 		if (this._selectedTable) {
@@ -1682,6 +1799,10 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Restores styles for selected table cells.
+	 */
 	_recallStyleSelectedCells() {
 		if (this._selectedCells) {
 			const selectedCells = this._selectedCells;
@@ -1691,6 +1812,13 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Adds global event listeners for resizing.
+	 * @param {Function} resizeFn The function handling the resize event.
+	 * @param {Function} stopFn The function handling the stop event.
+	 * @param {Function} keyDownFn The function handling the keydown event.
+	 */
 	_addResizeGlobalEvents(resizeFn, stopFn, keyDownFn) {
 		this.__globalEvents.resize = this.eventManager.addGlobalEvent('mousemove', resizeFn, false);
 		this.__globalEvents.resizeStop = this.eventManager.addGlobalEvent('mouseup', stopFn, false);
@@ -1698,12 +1826,22 @@ Table.prototype = {
 		this._resizing = true;
 	},
 
+	/**
+	 * @private
+	 * @description Enables or disables editor mode.
+	 * @param {boolean} enabled Whether to enable or disable the editor.
+	 */
 	_toggleEditor(enabled) {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');
 		if (enabled) domUtils.removeClass(wysiwyg, 'se-disabled');
 		else domUtils.addClass(wysiwyg, 'se-disabled');
 	},
 
+	/**
+	 * @private
+	 * @description Updates control properties.
+	 * @param {string} type The type of control property.
+	 */
 	_setCtrlProps(type) {
 		this._typeCache = type;
 		const isTable = type === 'table';
@@ -1783,6 +1921,13 @@ Table.prototype = {
 		this._setAlignProps(cell_alignment_vertical, (this._propsVerticalAlignCache = align_v), true);
 	},
 
+	/**
+	 * @private
+	 * @description Sets text alignment properties.
+	 * @param {Element} el The element to apply alignment to.
+	 * @param {string} align The alignment value.
+	 * @param {boolean} reset Whether to reset the alignment.
+	 */
 	_setAlignProps(el, align, reset) {
 		domUtils.removeClass(el.querySelectorAll('button'), 'on');
 
@@ -1795,6 +1940,11 @@ Table.prototype = {
 		el.setAttribute('se-cell-align', align);
 	},
 
+	/**
+	 * @private
+	 * @description Disables or enables border properties.
+	 * @param {boolean} disabled Whether to disable or enable border properties.
+	 */
 	_disableBorderProps(disabled) {
 		const { border_color, border_width, palette_border_button } = this.propTargets;
 		if (disabled) {
@@ -1810,6 +1960,12 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Gets the border style.
+	 * @param {string} borderStyle The border style string.
+	 * @returns {object} The parsed border style object.
+	 */
 	_getBorderStyle(borderStyle) {
 		const parts = borderStyle.split(/\s(?![^()]*\))/);
 		let w = '',
@@ -1839,6 +1995,11 @@ Table.prototype = {
 		return { w, s, c: converter.rgb2hex(c) };
 	},
 
+	/**
+	 * @private
+	 * @description Applies properties to table cells.
+	 * @param {Element} target The target element.
+	 */
 	_submitProps(target) {
 		try {
 			target.setAttribute('disabled', true);
@@ -1998,6 +2159,11 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Sets font styles.
+	 * @param {CSSStyleDeclaration} styles The style object to modify.
+	 */
 	_setFontStyle(styles) {
 		const { font_bold, font_italic, font_strike, font_underline } = this.propTargets;
 		styles.fontWeight = domUtils.hasClass(font_bold, 'on') ? 'bold' : '';
@@ -2007,11 +2173,10 @@ Table.prototype = {
 
 	/**
 	 * @private
-	 * @description Set border format
-	 * @param {Element[]} cells Target elements
+	 * @description Sets border format and styles.
+	 * @param {{left: Element[], top: Element[], right: Element[], bottom: Element[], all: Element[]}} cells The table cells categorized by border positions.
 	 * @param {"all"|"inside"|"horizon"|"vertical"|"outside"|"left"|"top"|"right"|"bottom"} borderKey Border style
-	 * @param {number} s Border style
-	 * @param {boolean} isTable table selected
+	 * @param {string} s The border style value.
 	 */
 	_setBorderStyles(cells, borderKey, s) {
 		const { left, top, right, bottom, all } = cells;
@@ -2066,6 +2231,12 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Selects multiple table cells and applies selection styles.
+	 * @param {Element} startCell The first cell in the selection.
+	 * @param {Element} endCell The last cell in the selection.
+	 */
 	_setMultiCells(startCell, endCell) {
 		const rows = this._selectedTable.rows;
 		this._deleteStyleSelectedCells();
@@ -2171,6 +2342,10 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Resets the table picker display.
+	 */
 	_resetTablePicker() {
 		if (!this.tableHighlight) return;
 
@@ -2186,6 +2361,10 @@ Table.prototype = {
 		this.menu.dropdownOff();
 	},
 
+	/**
+	 * @private
+	 * @description Resets the alignment properties for table cells.
+	 */
 	_resetPropsAlign() {
 		const { cell_alignment } = this.propTargets;
 		const left = cell_alignment.querySelector('[data-value="left"]');
@@ -2196,6 +2375,13 @@ Table.prototype = {
 		r_parent.appendChild(left);
 	},
 
+	/**
+	 * @private
+	 * @description Handles color selection from the color palette.
+	 * @param {Element} button The button triggering the color palette.
+	 * @param {string} type The type of color selection.
+	 * @param {object} color The selected color object.
+	 */
 	_onColorPalette(button, type, color) {
 		if (this.controller_colorPicker.isOpen && type === this.sliderType) {
 			this.controller_colorPicker.close();
@@ -2207,12 +2393,20 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Closes table-related controllers.
+	 */
 	_closeController() {
 		this.component.deselect();
 		this.controller_table.close();
 		this.controller_cell.close();
 	},
 
+	/**
+	 * @private
+	 * @description Hides the resize line if it is visible.
+	 */
 	__hideResizeLine() {
 		if (this._resizeLine) {
 			this._resizeLine.style.display = 'none';
@@ -2220,6 +2414,10 @@ Table.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Removes global event listeners and resets resize-related properties.
+	 */
 	__removeGlobalEvents() {
 		this._resizing = false;
 		this.ui.disableBackWrapper();
@@ -2237,10 +2435,23 @@ Table.prototype = {
 	constructor: Table
 };
 
+/**
+ * @private
+ * @description Checks if the given node is a resizable table element.
+ * @param {Node} node The DOM node to check.
+ * @returns {boolean} True if the node is a table-related resizable element.
+ */
 function IsResizeEls(node) {
 	return /^(TD|TH|TR)$/i.test(node?.nodeName);
 }
 
+/**
+ * @private
+ * @description Checks if a table cell is at its edge based on the mouse event.
+ * @param {MouseEvent} event The mouse event.
+ * @param {HTMLElement} tableCell The table cell to check.
+ * @returns {Object} An object containing edge detection details.
+ */
 function CheckCellEdge(event, tableCell) {
 	const startX = event.clientX;
 	const startWidth = numbers.get(_w.getComputedStyle(tableCell).width, CELL_DECIMAL_END);
@@ -2256,6 +2467,13 @@ function CheckCellEdge(event, tableCell) {
 	};
 }
 
+/**
+ * @private
+ * @description Checks if a row is at its edge based on the mouse event.
+ * @param {MouseEvent} event The mouse event.
+ * @param {HTMLElement} tableCell The table row cell to check.
+ * @returns {Object} An object containing row edge detection details.
+ */
 function CheckRowEdge(event, tableCell) {
 	const startY = event.clientY;
 	const startHeight = numbers.get(_w.getComputedStyle(tableCell).height, CELL_DECIMAL_END);
@@ -2268,6 +2486,11 @@ function CheckRowEdge(event, tableCell) {
 	};
 }
 
+/**
+ * @private
+ * @description Splits a table cell either vertically or horizontally.
+ * @param {"vertical"|"horizontal"} direction The direction to split the cell.
+ */
 function OnSplitCells(direction) {
 	const vertical = direction === 'vertical';
 	const currentCell = this._tdElement;
@@ -2448,6 +2671,11 @@ function OnSplitCells(direction) {
 	this._selectedCell = this._fixedCell = currentCell;
 }
 
+/**
+ * @private
+ * @description Handles column operations such as insert and delete.
+ * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
+ */
 function OnColumnEdit(command) {
 	switch (command) {
 		case 'insert-left':
@@ -2463,6 +2691,11 @@ function OnColumnEdit(command) {
 	this._historyPush();
 }
 
+/**
+ * @private
+ * @description Handles row operations such as insert and delete.
+ * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
+ */
 function OnRowEdit(command) {
 	switch (command) {
 		case 'insert-above':
@@ -2478,6 +2711,11 @@ function OnRowEdit(command) {
 	this._historyPush();
 }
 
+/**
+ * @private
+ * @description Handles mouse movement within the table picker.
+ * @param {MouseEvent} e The mouse event.
+ */
 function OnMouseMoveTablePicker(e) {
 	e.stopPropagation();
 
@@ -2503,10 +2741,22 @@ function OnMouseMoveTablePicker(e) {
 	this._tableXY = [x, y];
 }
 
+/**
+ * @private
+ * @description Executes the selected action when the table picker is clicked.
+ */
 function OnClickTablePicker() {
 	this.action();
 }
 
+/**
+ * @private
+ * @description Creates table cells as elements or HTML strings.
+ * @param {string} nodeName The tag name of the cell (TD or TH).
+ * @param {number} cnt The number of cells to create.
+ * @param {boolean} returnElement Whether to return an HTML element or string.
+ * @returns {string|HTMLElement} The created cells.
+ */
 function CreateCells(nodeName, cnt, returnElement) {
 	nodeName = nodeName.toLowerCase();
 
@@ -2517,6 +2767,11 @@ function CreateCells(nodeName, cnt, returnElement) {
 	}
 }
 
+/**
+ * @private
+ * @description Handles multi-selection of table cells.
+ * @param {MouseEvent} e The mouse event.
+ */
 function OnCellMultiSelect(e) {
 	this.editor._preventBlur = true;
 	const target = domUtils.getParentElement(e.target, domUtils.isTableCell);
@@ -2544,6 +2799,11 @@ function OnCellMultiSelect(e) {
 	this._setMultiCells(this._fixedCell, target);
 }
 
+/**
+ * @private
+ * @description Stops multi-selection of table cells.
+ * @param {MouseEvent} e The mouse event.
+ */
 function OffCellMultiSelect(e) {
 	e.stopPropagation();
 
@@ -2563,14 +2823,28 @@ function OffCellMultiSelect(e) {
 	this._setController(focusCell);
 }
 
+/**
+ * @private
+ * @description Handles the removal of shift-based selection.
+ */
 function OffCellShift() {
 	if (!this._ref) this._closeController();
 }
 
+/**
+ * @private
+ * @description Handles the removal of touch-based selection.
+ */
 function OffCellTouch() {
 	this.close();
 }
 
+/**
+ * @private
+ * @description Gets the maximum number of columns in a table.
+ * @param {HTMLTableElement} table The table element.
+ * @returns {number} The maximum number of columns in the table.
+ */
 function GetMaxColumns(table) {
 	let maxColumns = 0;
 
@@ -2585,12 +2859,23 @@ function GetMaxColumns(table) {
 	return maxColumns;
 }
 
+/**
+ * @private
+ * @description Handles border style changes in table properties.
+ * @param {string} command The border style command.
+ */
 function OnPropsBorderEdit(command) {
 	this.propTargets.border_style.textContent = command;
 	this._disableBorderProps(command === BORDER_LIST[0]);
 	this.selectMenu_props_border.close();
 }
 
+/**
+ * @private
+ * @description Handles border format changes in table properties.
+ * @param {string} defaultCommand The default border format command.
+ * @param {string} command The new border format command.
+ */
 function OnPropsBorderFormatEdit(defaultCommand, command) {
 	const { border_format } = this.propTargets;
 

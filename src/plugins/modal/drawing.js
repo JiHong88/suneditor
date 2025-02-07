@@ -157,6 +157,10 @@ Drawing.prototype = {
 		return true;
 	},
 
+	/**
+	 * @private
+	 * @description Initializes the drawing canvas, sets up event listeners, and configures resize handling.
+	 */
 	_initDrawing() {
 		const canvas = (this.canvas = this.modal.form.querySelector('.se-drawing-canvas'));
 		this.ctx = canvas.getContext('2d');
@@ -195,6 +199,10 @@ Drawing.prototype = {
 		this.resizeObserver.observe(canvas);
 	},
 
+	/**
+	 * @private
+	 * @description Destroys the drawing canvas, removes event listeners, and clears stored drawing data.
+	 */
 	_destroyDrawing() {
 		if (this.resizeObserver) {
 			this.resizeObserver.disconnect();
@@ -216,12 +224,20 @@ Drawing.prototype = {
 		this.isDrawing = false;
 	},
 
+	/**
+	 * @private
+	 * @description Configures the drawing context (canvas settings like line width, color, etc.).
+	 */
 	_setCtx() {
 		this.ctx.lineWidth = this.pluginOptions.lineWidth;
 		this.ctx.lineCap = this.pluginOptions.lineCap;
 		this.ctx.lineColor = this.pluginOptions.lineColor || _w.getComputedStyle(this.carrierWrapper).color;
 	},
 
+	/**
+	 * @private
+	 * @description Draws the current stroke based on collected points.
+	 */
 	_draw() {
 		this._setCtx();
 		this.ctx.beginPath();
@@ -235,6 +251,10 @@ Drawing.prototype = {
 		this.ctx.stroke();
 	},
 
+	/**
+	 * @private
+	 * @description Redraws all stored paths onto the canvas.
+	 */
 	_drawAll() {
 		this._setCtx();
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -245,6 +265,14 @@ Drawing.prototype = {
 		this.points = [];
 	},
 
+	/**
+	 * @private
+	 * @description Adjusts all stored paths to fit new canvas dimensions after a resize event.
+	 * @param {number} prevWidth - The previous width of the canvas.
+	 * @param {number} prevHeight - The previous height of the canvas.
+	 * @param {number} newWidth - The new width of the canvas.
+	 * @param {number} newHeight - The new height of the canvas.
+	 */
 	_adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight) {
 		const xRatio = newWidth / prevWidth;
 		const yRatio = newHeight / prevHeight;
@@ -252,12 +280,21 @@ Drawing.prototype = {
 		this.paths = this.paths.map((path) => path.map(([x, y]) => [x * xRatio, y * yRatio]));
 	},
 
+	/**
+	 * @private
+	 * @description Clears the canvas and resets stored drawing paths.
+	 */
 	_clearCanvas() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.points = [];
 		this.paths = [];
 	},
 
+	/**
+	 * @private
+	 * @description Generates an SVG representation of the drawn content.
+	 * @returns {SVGElement} The generated SVG element.
+	 */
 	_getSVG() {
 		const svgNS = 'http://www.w3.org/2000/svg';
 		const svg = document.createElementNS(svgNS, 'svg');
@@ -281,6 +318,11 @@ Drawing.prototype = {
 		return svg;
 	},
 
+	/**
+	 * @private
+	 * @description Converts the SVG element into a downloadable file.
+	 * @returns {FileList} A FileList containing the generated SVG file.
+	 */
 	_getSVGFileList() {
 		const svgElement = this._getSVG();
 		const serializer = new XMLSerializer();
@@ -295,6 +337,12 @@ Drawing.prototype = {
 		return dataTransfer.files;
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves touch coordinates relative to the canvas.
+	 * @param {TouchEvent} e - The touch event.
+	 * @returns {object} An object containing the x and y coordinates.
+	 */
 	_getCanvasTouchPointer(e) {
 		const { touches } = e;
 		const rect = this.canvas.getBoundingClientRect();
@@ -303,6 +351,11 @@ Drawing.prototype = {
 		return { x, y };
 	},
 
+	/**
+	 * @private
+	 * @description Activates either block or inline format mode for inserted drawings.
+	 * @param {boolean} isInline - Whether the drawing should be inserted as an inline element.
+	 */
 	_activeAsInline(isInline) {
 		if (isInline) {
 			domUtils.addClass(this.asInline, 'on');

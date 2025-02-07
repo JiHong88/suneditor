@@ -1201,6 +1201,7 @@ function OnResizeContainer(e) {
 }
 
 /**
+ * @private
  * @description Handles the resizing of the figure container.
  * @param {MouseEvent} e Mouse event.
  */
@@ -1240,6 +1241,7 @@ function ContainerResizing(e) {
 }
 
 /**
+ * @private
  * @description Finalizes the resizing process of the figure container.
  */
 function ContainerResizingOff() {
@@ -1278,6 +1280,7 @@ function ContainerResizingOff() {
 }
 
 /**
+ * @private
  * @description Cancels the resizing process when the escape key is pressed.
  * @param {KeyboardEvent} e Keyboard event.
  */

@@ -315,7 +315,7 @@ Offset.prototype = {
 
 	/**
 	 * @description Get the scroll info of the WYSIWYG area.
-	 * @returns {{top: number, left: number, width: number, height: number, bottom: number, rects: DOMRect[]}} Scroll information within the editor.
+	 * @returns {OffsetWWScrollInfo} Scroll information within the editor.
 	 */
 	getWWScroll() {
 		const eventWysiwyg = this.editor.frameContext.get('wysiwyg');

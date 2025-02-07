@@ -537,6 +537,7 @@ function _addTooltip(tooptipBtn, shift, shortcut) {
 }
 
 /**
+ * @private
  * @description Returns a new object with merge "a" and "b"
  * @param {object} obj object
  * @returns {object}
@@ -1016,6 +1017,7 @@ function InitFrameOptions(o, origin, fo) {
 }
 
 /**
+ * @private
  * @description Initialize property of suneditor elements
  * @param {string} key Key
  * @param {object} options Options
@@ -1066,6 +1068,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 }
 
 /**
+ * @private
  * @description Check the CodeMirror option to apply the CodeMirror and return the CodeMirror element.
  * @param {object} options options
  * @param {Element} textarea textarea element
@@ -1128,6 +1131,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 }
 
 /**
+ * @private
  * @description create blacklist
  * @param {string} blacklist blacklist
  * @param {string} defaultLine options.get('defaultLine')
@@ -1149,6 +1153,7 @@ function _createBlacklist(blacklist, defaultLine) {
 }
 
 /**
+ * @private
  * @description create formats regexp object.
  * @param {string} value value
  * @param {string} defaultValue default value
@@ -1169,6 +1174,7 @@ function _createFormatInfo(value, defaultValue, blacklist) {
 }
 
 /**
+ * @private
  * @description create whitelist or blacklist.
  * @param {object} o options
  * @returns {string} whitelist
@@ -1184,6 +1190,7 @@ function _createWhitelist(o) {
 }
 
 /**
+ * @private
  * @description Suneditor's Default button list
  * @param {object} options options
  */
@@ -1222,6 +1229,7 @@ function _defaultButtons(options, icons, lang) {
 }
 
 /**
+ * @private
  * @description Create a group div containing each module
  * @returns {object}
  */
@@ -1236,6 +1244,7 @@ function _createModuleGroup() {
 }
 
 /**
+ * @private
  * @description Create a button element
  * @param {string} className className in button
  * @param {string} title Title in button
@@ -1290,10 +1299,22 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 	};
 }
 
+/**
+ * @description Create tooltip HTML
+ * @param {string} text Tooltip text
+ * @returns {string} Tooltip HTML
+ */
 export function CreateTooltipInner(text) {
 	return `<span class="se-tooltip-inner"><span class="se-tooltip-text">${text}</span></span>`;
 }
 
+/**
+ * @description Update a button state, attributes, and icons
+ * @param {Element} element Button element
+ * @param {object} plugin Plugin
+ * @param {object} icons Icons
+ * @param {object} lang lang
+ */
 export function UpdateButton(element, plugin, icons, lang) {
 	if (!element) return;
 

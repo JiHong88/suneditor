@@ -5,6 +5,10 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
+ * @typedef {import('../../core/base/events').ImageInfo} ImageInfo
+ */
+
+/**
  * @class
  * @description Image plugin.
  * - This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
@@ -308,6 +312,13 @@ Image_.prototype = {
 		this._ready(target);
 	},
 
+	/**
+	 * @private
+	 * @description Prepares the component for selection.
+	 * - Ensures that the controller is properly positioned and initialized.
+	 * - Prevents duplicate event handling if the component is already selected.
+	 * @param {Element} target - The selected element.
+	 */
 	_ready(target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
@@ -393,6 +404,11 @@ Image_.prototype = {
 		this.history.push(false);
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves the current image information.
+	 * @returns {object} - The image data.
+	 */
 	_getInfo() {
 		return {
 			element: this._element,
@@ -405,6 +421,11 @@ Image_.prototype = {
 		};
 	},
 
+	/**
+	 * @private
+	 * @description Toggles between block and inline image format.
+	 * @param {boolean} isInline - Whether the image should be inline.
+	 */
 	_activeAsInline(isInline) {
 		if (isInline) {
 			domUtils.addClass(this.asInline, 'on');
@@ -530,6 +551,12 @@ Image_.prototype = {
 		return true;
 	},
 
+	/**
+	 * @private
+	 * @description Updates the selected image size, alt text, and caption.
+	 * @param {string} width - New image width.
+	 * @param {string} height - New image height.
+	 */
 	_update(width, height) {
 		if (!width) width = this.inputX.value || 'auto';
 		if (!height) height = this.inputY.value || 'auto';
@@ -613,6 +640,12 @@ Image_.prototype = {
 		};
 	},
 
+	/**
+	 * @private
+	 * @description Validates the image size and applies necessary transformations.
+	 * @param {string} width - The width of the image.
+	 * @param {string} height - The height of the image.
+	 */
 	_fileCheck(width, height) {
 		if (!width) width = this.inputX.value || 'auto';
 		if (!height) height = this.inputY.value || 'auto';
@@ -723,6 +756,12 @@ Image_.prototype = {
 		this.figure.setAlign(imageEl, this._align);
 	},
 
+	/**
+	 * @private
+	 * @description Opens a specific tab inside the modal.
+	 * @param {Event|string} e - The event object or tab name.
+	 * @returns {boolean} - Whether the tab was successfully opened.
+	 */
 	_openTab(e) {
 		const modalForm = this.modal.form;
 		const targetElement = e === 'init' ? modalForm.querySelector('._se_tab_link') : e.target;
@@ -763,6 +802,17 @@ Image_.prototype = {
 		return false;
 	},
 
+	/**
+	 * @private
+	 * @description Creates a new image component based on provided parameters.
+	 * @param {string} src - The image source URL.
+	 * @param {Element|null} anchor - Optional anchor wrapping the image.
+	 * @param {string} width - Image width.
+	 * @param {string} height - Image height.
+	 * @param {string} align - Image alignment.
+	 * @param {object} file - File metadata.
+	 * @param {string} alt - Alternative text.
+	 */
 	_produce(src, anchor, width, height, align, file, alt) {
 		if (this.as !== 'inline') {
 			this.create(src, anchor, width, height, align, file, alt);
@@ -771,6 +821,12 @@ Image_.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Applies the specified width and height to the image.
+	 * @param {string} w - Image width.
+	 * @param {string} h - Image height.
+	 */
 	_applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
 		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
@@ -856,12 +912,25 @@ Image_.prototype = {
 		this.component.insert(container, { skipCharCount: false, skipSelection: true, skipHistory: false });
 	},
 
+	/**
+	 * @private
+	 * @description Updates the image source URL.
+	 * @param {string} src - The new image source.
+	 * @param {Element} element - The image element.
+	 * @param {{ name: string, size: number }} file - File metadata.
+	 */
 	_updateSrc(src, element, file) {
 		element.src = src;
 		this.fileManager.setFileData(element, file);
 		this.component.select(element, Image_.key, false);
 	},
 
+	/**
+	 * @private
+	 * @description Registers the uploaded image and inserts it into the editor.
+	 * @param {ImageInfo} info - Image info.
+	 * @param {object} response - Server response data.
+	 */
 	_register(info, response) {
 		const fileList = response.result;
 
@@ -879,6 +948,12 @@ Image_.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Uploads the image to the server.
+	 * @param {ImageInfo} info - Image upload info.
+	 * @param {Array.<File>} files - List of image files.
+	 */
 	_serverUpload(info, files) {
 		if (!files) return;
 
@@ -891,6 +966,17 @@ Image_.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Converts an image file to Base64 and inserts it into the editor.
+	 * @param {Array.<File>} files - List of image files.
+	 * @param {Element|null} anchor - Optional anchor wrapping the image.
+	 * @param {string} width - Image width.
+	 * @param {string} height - Image height.
+	 * @param {string} align - Image alignment.
+	 * @param {string} alt - Alternative text.
+	 * @param {boolean} isUpdate - Whether the image is being updated.
+	 */
 	_setBase64(files, anchor, width, height, align, alt, isUpdate) {
 		try {
 			const filesLen = this.modal.isUpdate ? 1 : files.length;
@@ -930,6 +1016,20 @@ Image_.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Inserts an image using a Base64-encoded string.
+	 * @param {boolean} update - Whether the image is being updated.
+	 * @param {Array.<{result: string, file: { name: string, size: number }}>} filesStack - Stack of Base64-encoded files.
+	 * - result: Image url or Base64-encoded string
+	 * - file: File metadata ({ name: string, size: number })
+	 * @param {Element} updateElement - The image element being updated.
+	 * @param {Element|null} anchor - Optional anchor wrapping the image.
+	 * @param {string} width - Image width.
+	 * @param {string} height - Image height.
+	 * @param {string} align - Image alignment.
+	 * @param {string} alt - Alternative text.
+	 */
 	_onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt) {
 		for (let i = 0, len = filesStack.length; i < len; i++) {
 			if (update) {
@@ -940,6 +1040,13 @@ Image_.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Wraps an image element with an anchor if provided.
+	 * @param {Element} imgTag - The image element to be wrapped.
+	 * @param {Element|null} anchor - The anchor element to wrap around the image. If null, returns the image itself.
+	 * @returns {Element} - The wrapped image inside the anchor or the original image element.
+	 */
 	_setAnchor(imgTag, anchor) {
 		if (anchor) {
 			anchor.appendChild(imgTag);
@@ -949,6 +1056,11 @@ Image_.prototype = {
 		return imgTag;
 	},
 
+	/**
+	 * @private
+	 * @description Handles errors during image upload and displays appropriate messages.
+	 * @param {object} response - The error response from the server.
+	 */
 	async _error(response) {
 		const message = await this.triggerEvent('onImageUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
@@ -959,6 +1071,12 @@ Image_.prototype = {
 	constructor: Image_
 };
 
+/**
+ * @private
+ * @description Handles the callback function for image upload completion.
+ * @param {ImageInfo} info - Image information.
+ * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
+ */
 async function UploadCallBack(info, xmlHttp) {
 	if ((await this.triggerEvent('imageUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 		const response = JSON.parse(xmlHttp.responseText);

@@ -22,21 +22,21 @@ const __RemoveCopyformt = function (ww, button) {
 };
 
 /**
- * List of commands that trigger active event handling in the editor.
- * These commands typically apply inline formatting or structural changes.
+ * @description List of commands that trigger active event handling in the editor.
+ * - These commands typically apply inline formatting or structural changes.
  * @constant {string[]}
  */
 export const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'indent', 'outdent'];
 
 /**
- * List of basic editor commands, including active event commands and additional actions
- * such as undo, redo, saving, full-screen toggle, and text direction commands.
+ * @description List of basic editor commands, including active event commands and additional actions
+ * - such as undo, redo, saving, full-screen toggle, and text direction commands.
  * @constant {string[]}
  */
 export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl']);
 
 /**
- * Selects all content in the editor.
+ * @description Selects all content in the editor.
  * @param {object} editor - The root editor instance
  */
 export function SELECT_ALL(editor) {
@@ -68,7 +68,7 @@ export function SELECT_ALL(editor) {
 }
 
 /**
- * Toggles direction button active state.
+ * @description Toggles direction button active state.
  * @param {Object} editor - The root editor instance
  * @param {boolean} rtl - Whether the text direction is right-to-left.
  */
@@ -102,7 +102,7 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 }
 
 /**
- * Saves the editor content.
+ * @description Saves the editor content.
  * @param {Object} editor - The root editor instance
  */
 export async function SAVE(editor) {
@@ -132,7 +132,7 @@ export async function SAVE(editor) {
 }
 
 /**
- * Copies formatting from selected text.
+ * @description Copies formatting from selected text.
  * @param {Object} editor - The root editor instance
  * @param {HTMLElement} button - The button triggering the copy format function.
  */
@@ -159,7 +159,7 @@ export function COPY_FORMAT(editor, button) {
 }
 
 /**
- * Applies font styling to selected text.
+ * @description Applies font styling to selected text.
  * @param {Object} editor - The root editor instance
  * @param {string} command - The font style command (e.g., bold, italic, underline).
  */
@@ -180,7 +180,7 @@ export function FONT_STYLE(editor, command) {
 }
 
 /**
- * Inserts a page break element into the editor.
+ * @description Inserts a page break element into the editor.
  * @param {Object} editor - The root editor instance
  */
 export function PAGE_BREAK(editor) {

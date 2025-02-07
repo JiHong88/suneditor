@@ -1705,6 +1705,7 @@ HTML.prototype = {
 };
 
 /**
+ * @private
  * @description Tag and tag attribute check RegExp function.
  * @param {string} m RegExp value
  * @param {string} t RegExp value

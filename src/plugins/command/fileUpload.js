@@ -362,6 +362,12 @@ FileUpload.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Processes the server response after file upload.
+	 * - Registers the uploaded files in the editor.
+	 * @param {object} response - The response object from the server.
+	 */
 	_register(response) {
 		response.result.forEach((file, i, a) => {
 			this.create(
@@ -375,6 +381,12 @@ FileUpload.prototype = {
 		});
 	},
 
+	/**
+	 * @private
+	 * @description Handles file upload errors.
+	 * - Displays an error message if the upload fails.
+	 * @param {object} response - The error response from the server.
+	 */
 	async _error(response) {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
@@ -383,6 +395,12 @@ FileUpload.prototype = {
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	},
 
+	/**
+	 * @private
+	 * @description Handles the file upload completion callback.
+	 * - Parses the response and registers the uploaded file.
+	 * @param {XMLHttpRequest} xmlHttp - The completed XHR request.
+	 */
 	_uploadCallBack(xmlHttp) {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
@@ -395,6 +413,12 @@ FileUpload.prototype = {
 	constructor: FileUpload
 };
 
+/**
+ * @private
+ * @description Handles the change event when a file is selected.
+ * - Triggers the file upload process.
+ * @param {Event} e - The change event object.
+ */
 async function OnChangeFile(e) {
 	await this.submitFile(e.target.files);
 }

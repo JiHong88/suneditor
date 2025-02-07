@@ -3278,6 +3278,7 @@ function SetLineMargin(lines, size, dir) {
 }
 
 /**
+ * @private
  * @description Strip remove node
  * @param {Node} removeNode The remove node
  * @private

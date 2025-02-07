@@ -4,6 +4,10 @@ import { domUtils, numbers, env } from '../../helper';
 const { NO_EVENT, _w } = env;
 
 /**
+ * @typedef {import('../../core/base/events').ProcessInfo} ProcessInfo
+ */
+
+/**
  * @class
  * @description Embed modal plugin.
  * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
@@ -297,6 +301,13 @@ Embed.prototype = {
 		this._ready(target);
 	},
 
+	/**
+	 * @private
+	 * @description Prepares the component for selection.
+	 * - Ensures that the controller is properly positioned and initialized.
+	 * - Prevents duplicate event handling if the component is already selected.
+	 * @param {Element} target - The selected element.
+	 */
 	_ready(target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
@@ -456,11 +467,26 @@ Embed.prototype = {
 		return iframeTag;
 	},
 
+	/**
+	 * @private
+	 * @description Creates an iframe element for embedding external content.
+	 * @returns {Element} The created iframe element.
+	 */
 	_createEmbedTag() {
 		const quoteTag = domUtils.createElement('BLOCKQUOTE');
 		return quoteTag;
 	},
 
+	/**
+	 * @private
+	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
+	 * @param {ProcessInfo|null} process - Processed embed information.
+	 * @param {string|Element[]} src - The source URL or embed elements.
+	 * @param {string} width - The width of the embed component.
+	 * @param {string} height - The height of the embed component.
+	 * @param {string} align - The alignment of the embed component.
+	 * @param {boolean} isUpdate - Whether this is an update to an existing embed component.
+	 */
 	_create(process, src, width, height, align, isUpdate) {
 		let oFrame = null;
 		let cover = null;
@@ -580,6 +606,11 @@ Embed.prototype = {
 		if (!scriptTag) this.history.push(false);
 	},
 
+	/**
+	 * @private
+	 * @description Updates an existing embed component within the editor.
+	 * @param {Element} oFrame - The existing embed element to be updated.
+	 */
 	_update(oFrame) {
 		if (!oFrame) return;
 
@@ -622,6 +653,12 @@ Embed.prototype = {
 		return oFrame;
 	},
 
+	/**
+	 * @private
+	 * @description Applies width and height to the embed component.
+	 * @param {string} w - The width to apply.
+	 * @param {string} h - The height to apply.
+	 */
 	_applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
 		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
@@ -632,6 +669,16 @@ Embed.prototype = {
 		this.figure.setSize(w, h);
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves embed component size and alignment information.
+	 * @returns {{inputWidth: string, inputHeight: string, align: string, isUpdate: boolean, element: Element}} An object containing
+	 * - inputWidth : The width of the embed component.
+	 * - inputHeight : The height of the embed component.
+	 * - align : The alignment of the embed component.
+	 * - isUpdate : Whether the component is being updated.
+	 * - element : The target element.
+	 */
 	_getInfo() {
 		return {
 			inputWidth: this.inputX.value,
@@ -642,6 +689,11 @@ Embed.prototype = {
 		};
 	},
 
+	/**
+	 * @private
+	 * @description Sets default attributes for an iframe element.
+	 * @param {Element} element - The iframe element to modify.
+	 */
 	_setIframeAttrs(element) {
 		element.frameBorder = '0';
 		element.allowFullscreen = true;

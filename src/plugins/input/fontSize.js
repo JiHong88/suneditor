@@ -315,10 +315,23 @@ FontSize.prototype = {
 		this.menu.dropdownOff();
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves the default font size of the editor.
+	 * @returns {string} - The computed font size from the editor.
+	 */
 	_getDefaultSize() {
 		return this.editor.frameContext.get('wwComputedStyle').fontSize;
 	},
 
+	/**
+	 * @private
+	 * @description Extracts the font size and unit from the given element or input value.
+	 * @param {string|Element} target - The target input or element.
+	 * @returns {{ unit: string, value: number|string }} - An object containing:
+	 * - `unit` (string): The detected font size unit.
+	 * - `value` (number|string): The numeric font size value or text-based size.
+	 */
 	_getSize(target) {
 		target = typeof target === 'string' ? target : target.parentElement.querySelector('.__se__font_size');
 		if (!target)
@@ -342,6 +355,13 @@ FontSize.prototype = {
 		};
 	},
 
+	/**
+	 * @private
+	 * @description Sets the font size in the toolbar input field or button label.
+	 * @param {Element} target - The target element in the toolbar.
+	 * @param {string|number} value - The font size value.
+	 * @returns {string|number} - The applied font size.
+	 */
 	_setSize(target, value) {
 		target = target.parentElement.querySelector('.__se__font_size');
 		if (!target) return 0;

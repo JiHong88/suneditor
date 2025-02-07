@@ -152,6 +152,11 @@ Anchor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Initializes state variables.
+	 * - called when the popup is closed
+	 */
 	_init() {
 		this._element = null;
 		this._range = null;

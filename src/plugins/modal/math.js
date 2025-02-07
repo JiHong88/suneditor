@@ -300,6 +300,12 @@ Math_.prototype = {
 		this.history.push(false);
 	},
 
+	/**
+	 * @private
+	 * @description Renders the given math expression using KaTeX or MathJax.
+	 * @param {string} exp - The math expression to render.
+	 * @returns {string} - The rendered math expression as HTML.
+	 */
 	_renderer(exp) {
 		let result = '';
 		try {
@@ -323,6 +329,13 @@ Math_.prototype = {
 		return result;
 	},
 
+	/**
+	 * @private
+	 * @description Escapes or unescapes backslashes in a given string.
+	 * @param {string} str - The input string.
+	 * @param {boolean} decode - If true, decodes escaped backslashes; otherwise, encodes them.
+	 * @returns {string} - The processed string.
+	 */
 	_escapeBackslashes(str, decode) {
 		return str.replace(/\\{2}/g, decode ? '\\' : '\\\\');
 	},
@@ -330,6 +343,10 @@ Math_.prototype = {
 	constructor: Math_
 };
 
+/**
+ * @description Copies the math expression text to clipboard.
+ * @param {Element} element - The math expression element.
+ */
 async function copyTextToClipboard(element) {
 	if (!navigator.clipboard || !element) return;
 
@@ -346,6 +363,10 @@ async function copyTextToClipboard(element) {
 	}
 }
 
+/**
+ * @description Handles rendering of math expressions in the preview.
+ * @param {Event} event - The input event.
+ */
 function RenderMathExp({ target }) {
 	if (this.pluginOptions.autoHeight) {
 		target.style.height = '5px';

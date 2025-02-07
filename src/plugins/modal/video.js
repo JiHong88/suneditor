@@ -5,6 +5,10 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
+ * @typedef {import('../../core/base/events').VideoInfo} VideoInfo
+ */
+
+/**
  * @class
  * @description Video plugin.
  * - This plugin provides video embedding functionality within the editor.
@@ -334,6 +338,13 @@ Video.prototype = {
 		this._ready(target);
 	},
 
+	/**
+	 * @private
+	 * @description Prepares the component for selection.
+	 * - Ensures that the controller is properly positioned and initialized.
+	 * - Prevents duplicate event handling if the component is already selected.
+	 * @param {Element} target - The selected element.
+	 */
 	_ready(target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
@@ -611,6 +622,12 @@ Video.prototype = {
 		return videoTag;
 	},
 
+	/**
+	 * @private
+	 * @description Sets the size of the video element.
+	 * @param {string} w - The width of the video.
+	 * @param {string} h - The height of the video.
+	 */
 	_applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
 		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
@@ -621,6 +638,11 @@ Video.prototype = {
 		this.figure.setSize(w, h);
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves video information including size and alignment.
+	 * @returns {VideoInfo} Video information object.
+	 */
 	_getInfo() {
 		return {
 			inputWidth: this.inputX.value,
@@ -742,6 +764,11 @@ Video.prototype = {
 		return true;
 	},
 
+	/**
+	 * @private
+	 * @description Updates the video component within the editor.
+	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The video element to update.
+	 */
 	_update(oFrame) {
 		if (!oFrame) return;
 
@@ -798,6 +825,12 @@ Video.prototype = {
 		return oFrame;
 	},
 
+	/**
+	 * @private
+	 * @description Registers the uploaded video in the editor.
+	 * @param {VideoInfo} info - Video information object.
+	 * @param {object} response - Server response containing video data.
+	 */
 	_register(info, response) {
 		const fileList = response.result;
 		const videoTag = this.createVideoTag();
@@ -810,6 +843,12 @@ Video.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Uploads a video to the server using an external upload handler.
+	 * @param {VideoInfo} info - Video information object.
+	 * @param {Array.<File>} files - The video files to upload.
+	 */
 	_serverUpload(info, files) {
 		if (!files) return;
 
@@ -819,6 +858,11 @@ Video.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Sets attributes for the video tag.
+	 * @param {Element} element - The video element.
+	 */
 	_setTagAttrs(element) {
 		element.setAttribute('controls', true);
 
@@ -830,6 +874,11 @@ Video.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Sets attributes for the iframe tag.
+	 * @param {Element} element - The iframe element.
+	 */
 	_setIframeAttrs(element) {
 		element.frameBorder = '0';
 		element.allowFullscreen = true;
@@ -842,6 +891,12 @@ Video.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Selects a ratio option in the ratio dropdown.
+	 * @param {string} value - The selected ratio value.
+	 * @returns {boolean} Returns true if a ratio was selected.
+	 */
 	_setRatioSelect(value) {
 		let ratioSelected = false;
 		const ratioOption = this.frameRatioOption.options;
@@ -860,6 +915,11 @@ Video.prototype = {
 		return ratioSelected;
 	},
 
+	/**
+	 * @private
+	 * @description Handles video upload errors.
+	 * @param {object} response - The error response object.
+	 */
 	async _error(response) {
 		const message = await this.triggerEvent('onVideoUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
@@ -870,6 +930,12 @@ Video.prototype = {
 	constructor: Video
 };
 
+/**
+ * @private
+ * @description Handles the callback function for video upload completion.
+ * @param {VideoInfo} info - Video information.
+ * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
+ */
 async function UploadCallBack(info, xmlHttp) {
 	if ((await this.triggerEvent('videoUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 		const response = JSON.parse(xmlHttp.responseText);
@@ -881,6 +947,10 @@ async function UploadCallBack(info, xmlHttp) {
 	}
 }
 
+/**
+ * @private
+ * @description Removes selected files from the file input.
+ */
 function RemoveSelectedFiles() {
 	this.videoInputFile.value = '';
 	if (this.videoUrlFile) {
@@ -892,6 +962,11 @@ function RemoveSelectedFiles() {
 	Modal.OnChangeFile(this.fileModalWrapper, []);
 }
 
+/**
+ * @private
+ * @description Handles link preview input changes.
+ * @param {Event} e - The input event.
+ */
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();
 	if (/^<iframe.*\/iframe>$/.test(value)) {
@@ -908,10 +983,19 @@ function OnLinkPreview(e) {
 	}
 }
 
+/**
+ * @private
+ * @description Opens the video gallery.
+ */
 function OpenGallery() {
 	this.plugins.videoGallery.open(_setUrlInput.bind(this));
 }
 
+/**
+ * @private
+ * @description Sets the URL input value when selecting from the gallery.
+ * @param {Element} target - The selected video element.
+ */
 function _setUrlInput(target) {
 	this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = target.getAttribute('data-command') || target.src;
 	this.videoUrlFile.focus();
