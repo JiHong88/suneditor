@@ -17,6 +17,28 @@ import ApiManager from './ApiManager';
  */
 
 /**
+ * @typedef {object} BrowserFile
+ * @property {string} src - Source url
+ * @property {string} name - Name
+ * @property {string=} thumbnail - Thumbnail url
+ * @property {string=} alt - Image alt
+ * @property {Array.<string>=} tag - Tag name list
+ * @property {string=} type - Type (image, video, audio, etc.)
+ * @property {string=} frame - Frame name (iframe, video, etc.)
+ */
+
+/**
+ * @typedef {Object} BrowserFolder
+ * @property {string} name - The name of the folder.
+ * @property {BrowserData | string} _data - The folder's contents or an API URL.
+ * @property {boolean} [default] - Whether this folder is the default selection.
+ */
+
+/**
+ * @typedef {Object<string, BrowserFolder | BrowserFile[]>} BrowserData
+ */
+
+/**
  * @class
  * @param {*} inst The instance object that called the constructor.
  * @param {BrowserParams} params Browser options
@@ -158,7 +180,7 @@ Browser.prototype = {
 
 	/**
 	 * @description Filter items by tag
-	 * @param {Array.<string>} items - Items to filter
+	 * @param {Array.<BrowserFile>} items - Items to filter
 	 * @returns {Array.<string>}
 	 */
 	tagfilter(items) {
@@ -180,6 +202,13 @@ Browser.prototype = {
 		this._loading.style.display = 'none';
 	},
 
+	/**
+	 * @private
+	 * @description Fetches the file list from the server.
+	 * @param {string} url - The file server URL.
+	 * @param {object} urlHeader - The HTTP headers for the request.
+	 * @param {boolean} pageLoading - Indicates if this is a paginated request.
+	 */
 	_drawFileList(url, urlHeader, pageLoading) {
 		this.apiManager.call({ method: 'GET', url, headers: urlHeader, callBack: CallBackGet.bind(this), errorCallBack: CallBackError.bind(this) });
 		if (!pageLoading) {
@@ -188,6 +217,12 @@ Browser.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Updates the displayed list of file items.
+	 * @param {Array.<BrowserItem>} items - The file items to display.
+	 * @param {boolean} update - Whether to update the tags.
+	 */
 	_drawListItem(items, update) {
 		const keyword = this.keyword;
 		items = this.tagfilter(items).filter((item) => item.name.toLowerCase().indexOf(keyword) > -1);
@@ -234,15 +269,29 @@ Browser.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Adds a global event listener for closing the browser.
+	 */
 	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler, true);
 	},
 
+	/**
+	 * @private
+	 * @description Removes the global event listener for closing the browser.
+	 */
 	__removeGlobalEvent() {
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 	},
 
+	/**
+	 * @private
+	 * @description Renders the file items or folder structure from data.
+	 * @param {BrowserData} data - The data representing the file structure.
+	 * @returns {boolean} True if rendering was successful, false otherwise.
+	 */
 	__drowItems(data) {
 		if (Array.isArray(data)) {
 			if (data.length > 0) {
@@ -272,6 +321,12 @@ Browser.prototype = {
 		return false;
 	},
 
+	/**
+	 * @private
+	 * @description Parses folder data into a structured format.
+	 * @param {BrowserData} data - The folder data.
+	 * @param {string} [path] - The current path in the folder hierarchy.
+	 */
 	__parseFolderData(data, path) {
 		let current = this.tree;
 
@@ -315,6 +370,12 @@ Browser.prototype = {
 		});
 	},
 
+	/**
+	 * @private
+	 * @description Creates a nested folder list from parsed data.
+	 * @param {BrowserData} folderData - The structured folder data.
+	 * @param {Element} parentElement - The parent element to append folder structure to.
+	 */
 	__createFolderList(folderData, parentElement) {
 		for (const key in folderData) {
 			const item = folderData[key];

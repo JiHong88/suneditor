@@ -123,6 +123,7 @@ ApiManager.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Remove unnecessary slashes in API URL.
 	 * @param {string} url url
 	 * @returns

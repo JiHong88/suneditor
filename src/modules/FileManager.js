@@ -198,8 +198,9 @@ FileManager.prototype = {
 	},
 
 	/**
-	 * @description Checke the file's information and modify the tag that does not fit the format.
 	 * @private
+	 * @description Checke the file's information and modify the tag that does not fit the format.
+	 * @param {boolean} loaded Whether the editor is loaded
 	 */
 	_checkInfo(loaded) {
 		const tags = [].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.query));
@@ -272,9 +273,9 @@ FileManager.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Reset info object and "infoList = []", "infoIndex = 0"
 	 * @param {string} this.kind Plugin name
-	 * @private
 	 */
 	_resetInfo() {
 		const eh = typeof this.eventHandler === 'function';
@@ -289,9 +290,9 @@ FileManager.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Delete info object at "infoList"
 	 * @param {number} index index of info object infoList[].index)
-	 * @private
 	 */
 	_deleteInfo(index) {
 		if (index >= 0) {

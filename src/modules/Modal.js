@@ -6,6 +6,10 @@ const { _w } = env;
 const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize', wRTL: 'ns-resize', hRTL: 'ew-resize', cRTL: 'nesw-resize' };
 
 /**
+ * @typedef {import('../core/class/offset').OffsetGlobalInfo} OffsetGlobalInfo
+ */
+
+/**
  * @class
  * @description Modal window module
  * @param {*} inst The instance object that called the constructor.
@@ -120,6 +124,11 @@ Modal.prototype = {
 		this.editor.focus();
 	},
 
+	/**
+	 * @private
+	 * @description Fixes the current controller's display state when the modal is opened or closed.
+	 * @param {boolean} fixed - Whether to fix or unfix the controller.
+	 */
 	_fixCurrentController(fixed) {
 		const cont = this.editor.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
@@ -128,6 +137,11 @@ Modal.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Saves the current offset position of the modal for resizing calculations.
+	 * @returns {OffsetGlobalInfo} Offset values including top and left positions. (offset.getGlobal)
+	 */
 	_saveOffset() {
 		const offset = this.offset.getGlobal(this._resizeBody);
 		this.__offetTop = offset.top;
@@ -135,6 +149,11 @@ Modal.prototype = {
 		return offset;
 	},
 
+	/**
+	 * @private
+	 * @description Adds global event listeners for resizing the modal.
+	 * @param {string} dir - The direction in which resizing is occurring.
+	 */
 	__addGlobalEvent(dir) {
 		this.__removeGlobalEvent();
 		this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
@@ -142,6 +161,10 @@ Modal.prototype = {
 		this._bindClose_mouseup = this.eventManager.addGlobalEvent('mouseup', this.__globalEventHandlers.mouseup, true);
 	},
 
+	/**
+	 * @private
+	 * @description Removes global event listeners related to modal resizing.
+	 */
 	__removeGlobalEvent() {
 		this.ui.disableBackWrapper();
 		if (this._bindClose_mousemove) this._bindClose_mousemove = this.eventManager.removeGlobalEvent(this._bindClose_mousemove);

@@ -25,10 +25,10 @@ const { NO_EVENT } = env;
 /**
  * @class
  * @description Modal form Anchor tag editor
+ * - Use it by inserting it into Modal in a plugin that uses Modal.
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} modalForm The modal form element
  * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
-
  */
 function ModalAnchorEditor(inst, modalForm, params) {
 	// plugin bisic properties
@@ -121,7 +121,8 @@ function ModalAnchorEditor(inst, modalForm, params) {
 
 ModalAnchorEditor.prototype = {
 	/**
-	 * @description Initialize
+	 * @description Initialize.
+	 * - Sets the current anchor element to be edited.
 	 * @param {Element} element Modal target element
 	 */
 	set(element) {
@@ -129,8 +130,8 @@ ModalAnchorEditor.prototype = {
 	},
 
 	/**
-	 * @description On anchor edit form
-	 * @param {boolean} isUpdate create or update
+	 * @description Opens the anchor editor modal and populates it with data.
+	 * @param {boolean} isUpdate - Indicates whether an existing anchor is being updated (`true`) or a new one is being created (`false`).
 	 */
 	on(isUpdate) {
 		if (!isUpdate) {
@@ -152,9 +153,9 @@ ModalAnchorEditor.prototype = {
 	},
 
 	/**
-	 * @description Create anchor tag
-	 * @param {boolean} notText Empty text in the anchor tag
-	 * @returns {Element|null} A tag
+	 * @description Creates an anchor (`<a>`) element with the specified attributes.
+	 * @param {boolean} notText - If `true`, the anchor will not contain text content.
+	 * @returns {Element|null} - The newly created anchor element, or `null` if the URL is empty.
 	 */
 	create(notText) {
 		if (this.linkValue.length === 0) return null;
@@ -182,6 +183,15 @@ ModalAnchorEditor.prototype = {
 		this._setRel(this.defaultRel.default || '');
 	},
 
+	/**
+	 * @private
+	 * @description Updates the anchor element with new attributes.
+	 * @param {Element} anchor - The anchor (`<a>`) element to update.
+	 * @param {string} url - The URL for the anchor's `href` attribute.
+	 * @param {string} displayText - The text to be displayed inside the anchor.
+	 * @param {string} title - The tooltip text (title attribute).
+	 * @param {boolean} notText - If `true`, the anchor will not contain text content.
+	 */
 	_updateAnchor(anchor, url, displayText, title, notText) {
 		// download
 		if (!this._selfPathBookmark(url) && this.downloadCheck.checked) {
@@ -211,11 +221,22 @@ ModalAnchorEditor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Checks if the given path is an internal bookmark.
+	 * @param {string} path - The URL or anchor link.
+	 * @returns {boolean} - `true` if the path is an internal bookmark, otherwise `false`.
+	 */
 	_selfPathBookmark(path) {
 		const href = this._w.location.href.replace(/\/$/, '');
 		return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (!href.includes('#') ? href.length : href.substr(0, href.indexOf('#')).length));
 	},
 
+	/**
+	 * @private
+	 * @description Updates the `rel` attribute list in the modal and preview.
+	 * @param {string} relAttr - The `rel` attribute string to set.
+	 */
 	_setRel(relAttr) {
 		if (!this._isRel) return;
 
@@ -238,6 +259,11 @@ ModalAnchorEditor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Generates a list of bookmark headers within the editor.
+	 * @param {string} urlValue - The current URL input value.
+	 */
 	_createBookmarkList(urlValue) {
 		const headers = domUtils.getListChildren(this.editor.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (domUtils.isAnchor(current) && current.id));
 		if (headers.length === 0) return;
@@ -260,6 +286,11 @@ ModalAnchorEditor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Updates the preview of the anchor link.
+	 * @param {string} value - The current URL value.
+	 */
 	_setLinkPreview(value) {
 		const preview = this.preview;
 		const protocol = this.options.get('defaultUrlProtocol');
@@ -287,6 +318,12 @@ ModalAnchorEditor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Merges the given `rel` attribute value with the current list.
+	 * @param {string} relAttr - The `rel` attribute to merge.
+	 * @returns {string} - The updated `rel` attribute string.
+	 */
 	_relMerge(relAttr) {
 		const current = this.currentRel;
 		if (!relAttr) return current.join(' ');
@@ -305,6 +342,12 @@ ModalAnchorEditor.prototype = {
 		return current.join(' ');
 	},
 
+	/**
+	 * @private
+	 * @description Removes the specified `rel` attribute from the current list.
+	 * @param {string} relAttr - The `rel` attribute to remove.
+	 * @returns {string} - The updated `rel` attribute string.
+	 */
 	_relDelete(relAttr) {
 		if (!relAttr) return this.currentRel.join(' ');
 		if (/^only:/.test(relAttr)) relAttr = relAttr.replace(/^only:/, '').trim();
@@ -314,6 +357,11 @@ ModalAnchorEditor.prototype = {
 		return rels;
 	},
 
+	/**
+	 * @private
+	 * @description Registers a newly uploaded file and sets its URL in the modal form.
+	 * @param {object} response - The response object from the file upload request.
+	 */
 	_register(response) {
 		const file = response.result[0];
 		this.linkValue = this.preview.textContent = this.urlInput.value = file.url;
@@ -322,6 +370,11 @@ ModalAnchorEditor.prototype = {
 		this.download.style.display = 'block';
 	},
 
+	/**
+	 * @private
+	 * @description Handles file upload errors.
+	 * @param {object} response - The error response object.
+	 */
 	async _error(response) {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
@@ -330,6 +383,11 @@ ModalAnchorEditor.prototype = {
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	},
 
+	/**
+	 * @private
+	 * @description Handles the callback after a file upload completes.
+	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object containing the response.
+	 */
 	_uploadCallBack(xmlHttp) {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
@@ -342,6 +400,10 @@ ModalAnchorEditor.prototype = {
 	constructor: ModalAnchorEditor
 };
 
+/**
+ * @description Handles file input change events.
+ * @param {Event} e - The change event object.
+ */
 async function OnChangeFile(e) {
 	const files = e.target.files;
 	if (!files[0]) return;
@@ -370,10 +432,17 @@ async function OnChangeFile(e) {
 	if (result === true || result === NO_EVENT) handler(null);
 }
 
+/**
+ * @description Opens the `rel` attribute selection menu.
+ */
 function OnClick_relbutton() {
 	this.selectMenu_rel.open(this.options.get('_rtl') ? 'left-middle' : '');
 }
 
+/**
+ * @description Sets the selected bookmark as the URL.
+ * @param {Element} item - The selected bookmark element.
+ */
 function SetHeaderBookmark(item) {
 	const id = item.id || 'h_' + Math.random().toString().replace(/.+\./, '');
 	item.id = id;
@@ -384,6 +453,10 @@ function SetHeaderBookmark(item) {
 	this.urlInput.focus();
 }
 
+/**
+ * @description Updates the `rel` attribute selection based on user input.
+ * @param {Element} item - The selected `rel` attribute element.
+ */
 function SetRelItem(item) {
 	const cmd = item.getAttribute('data-command');
 	if (!cmd) return;
@@ -396,10 +469,18 @@ function SetRelItem(item) {
 	this.relPreview.title = this.relPreview.textContent = current.join(', ');
 }
 
+/**
+ * @description Tracks changes in the display text input field.
+ * @param {Event} e - The input event object.
+ */
 function OnChange_displayInput(e) {
 	this._change = !!e.target.value.trim();
 }
 
+/**
+ * @description Updates the URL preview and bookmark suggestions.
+ * @param {Event} e - The input event object.
+ */
 function OnChange_urlInput(e) {
 	const value = e.target.value.trim();
 	this._setLinkPreview(value);
@@ -407,11 +488,17 @@ function OnChange_urlInput(e) {
 	else this.selectMenu_bookmark.close();
 }
 
+/**
+ * @description Displays the bookmark selection menu when the URL input field gains focus.
+ */
 function OnFocus_urlInput() {
 	const value = this.urlInput.value;
 	if (this._selfPathBookmark(value)) this._createBookmarkList(value);
 }
 
+/**
+ * @description Toggles the bookmark state for the link.
+ */
 function OnClick_bookmarkButton() {
 	let url = this.urlInput.value;
 	if (this._selfPathBookmark(url)) {
@@ -432,6 +519,10 @@ function OnClick_bookmarkButton() {
 	this.urlInput.focus();
 }
 
+/**
+ * @description Updates the `rel` attribute when the "Open in new window" checkbox is toggled.
+ * @param {Event} e - The change event object.
+ */
 function OnChange_newWindowCheck(e) {
 	if (typeof this.defaultRel.check_new_window !== 'string') return;
 	if (e.target.checked) {
@@ -441,6 +532,10 @@ function OnChange_newWindowCheck(e) {
 	}
 }
 
+/**
+ * @description Updates the `download` attribute and its visibility.
+ * @param {Event} e - The change event object.
+ */
 function OnChange_downloadCheck(e) {
 	if (e.target.checked) {
 		this.download.style.display = 'block';
@@ -458,6 +553,13 @@ function OnChange_downloadCheck(e) {
 	}
 }
 
+/**
+ * @description Creates the modal form HTML structure.
+ * @param {object} editor - The editor instance.
+ * @param {ModalAnchorEditorParams} params - The modal parameters.
+ * @param {string[]} relList - List of allowed `rel` attributes.
+ * @returns {Element} - The created modal form element.
+ */
 function CreatetModalForm(editor, params, relList) {
 	const lang = editor.lang;
 	const icons = editor.icons;

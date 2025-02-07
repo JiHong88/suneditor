@@ -66,6 +66,10 @@ const DEFAULLT_COLOR_SPLITNUM = 9;
  */
 
 /**
+ * @typedef {import('./HueSlider').HueSliderColor} HueSliderColor
+ */
+
+/**
  * @typedef {object} ColorPickerParams
  * @property {Array.<string|{value: string, name: string}>=} [colorList=[]] color list
  * @property {number=} [splitNum=0] Number of colors to be displayed in one line
@@ -167,6 +171,13 @@ ColorPicker.prototype = {
 	},
 
 	/**
+	 * @description Close hue slider
+	 */
+	hueSliderClose() {
+		this.hueSlider.off();
+	},
+
+	/**
 	 * @description Set color at input element
 	 * @param {string} hexColorStr Hax color value
 	 * @private
@@ -213,18 +224,23 @@ ColorPicker.prototype = {
 		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1) : false;
 	},
 
-	_hueSliderAction(color) {
+	/**
+	 * @editorMethod Modules.HueSlider
+	 * @description This method is called when the color is selected in the hue slider.
+	 * @param {HueSliderColor} color - Color object
+	 */
+	hueSliderAction(color) {
 		this._setInputText(color.hex);
 	},
 
-	_hueSliderCancelAction() {
+	/**
+	 * @editorMethod Modules.HueSlider
+	 * @description This method is called when the hue slider is closed.
+	 */
+	hueSliderCancelAction() {
 		if (this.parentForm?.length > 0) {
 			this.parentFormDisplay.forEach((e) => (e[0].style.display = e[1]));
 		}
-	},
-
-	_hueSliderClose() {
-		this.hueSlider.off();
 	},
 
 	constructor: ColorPicker

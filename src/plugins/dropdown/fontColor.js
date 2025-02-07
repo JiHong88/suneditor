@@ -72,7 +72,7 @@ FontColor.prototype = {
 	 * @Override Executes the method that is called when a plugin's dropdown menu is closed.
 	 */
 	off() {
-		this.colorPicker._hueSliderClose();
+		this.colorPicker.hueSliderClose();
 	},
 
 	/**

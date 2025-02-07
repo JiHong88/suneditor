@@ -61,6 +61,11 @@ function SelectMenu(inst, params) {
 }
 
 SelectMenu.prototype = {
+	/**
+	 * @description Creates the select menu items.
+	 * @param {Array.<string>} items - Command list of selectable items.
+	 * @param {Array.<Element>} [menus] - Optional list of menu display elements; defaults to `items`.
+	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';
 		menus = menus || items;
@@ -79,6 +84,12 @@ SelectMenu.prototype = {
 		this.menuLen = this.menus.length;
 	},
 
+	/**
+	 * @description Initializes the select menu and attaches it to a reference element.
+	 * @param {Element} referElement - The element that triggers the select menu.
+	 * @param {Function} selectMethod - The function to execute when an item is selected.
+	 * @param {object} [attr={}] - Additional attributes for the select menu container.
+	 */
 	on(referElement, selectMethod, attr) {
 		if (!attr) attr = {};
 		this._refer = referElement;
@@ -97,8 +108,8 @@ SelectMenu.prototype = {
 
 	/**
 	 * @description Select menu open
-	 * @param {string|null|undefined} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
-	 * @param {string|null|undefined} onItemQuerySelector The querySelector string of the menu to be activated
+	 * @param {?string=} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
+	 * @param {?string=} onItemQuerySelector The querySelector string of the menu to be activated
 	 */
 	open(position, onItemQuerySelector) {
 		this.editor.selectMenuOn = true;
@@ -141,10 +152,19 @@ SelectMenu.prototype = {
 		this._selectItem(index);
 	},
 
+	/**
+	 * @private
+	 * @description Appends a formatted list of items to the menu.
+	 * @param {string} html - The HTML string representing the menu items.
+	 */
 	_createFormat(html) {
 		this.form.firstElementChild.innerHTML += `<ul class="se-list-basic se-list-checked${this.horizontal ? ' se-list-horizontal' : ''}">${html}</ul>`;
 	},
 
+	/**
+	 * @private
+	 * @description Resets the menu state and removes event listeners.
+	 */
 	_init() {
 		this.__removeEvents();
 		this.__removeGlobalEvent();
@@ -156,6 +176,11 @@ SelectMenu.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Moves the selection up or down by a specified number of items.
+	 * @param {number} num - The number of items to move (negative for up, positive for down).
+	 */
 	_moveItem(num) {
 		num = this.index + num;
 		const len = this.menuLen;
@@ -164,6 +189,11 @@ SelectMenu.prototype = {
 		this._selectItem(selectIndex);
 	},
 
+	/**
+	 * @private
+	 * @description Highlights and selects an item by index.
+	 * @param {number} selectIndex - The index of the item to select.
+	 */
 	_selectItem(selectIndex) {
 		domUtils.removeClass(this.form, 'se-select-menu-mouse-move');
 
@@ -181,10 +211,12 @@ SelectMenu.prototype = {
 	},
 
 	/**
-	 * @description Menu open
+	 * @private
+	 * @description Sets the position of the select menu relative to the reference element.
 	 * @param {["left"|"right"] | ["top"|"bottom"]} position Menu position
 	 * @param {["middle"|"top"|"bottom"] | ["center"|"left"|"right"]} subPosition Sub position
-	 * @private
+	 * @param {string} [onItemQuerySelector] - A query selector string to highlight a specific item.
+	 * @param {boolean} [_re=false] - Whether this is a retry after adjusting the position.
 	 */
 	_setPosition(position, subPosition, onItemQuerySelector, _re) {
 		const originP = position;
@@ -331,11 +363,20 @@ SelectMenu.prototype = {
 		form.style.visibility = '';
 	},
 
+	/**
+	 * @private
+	 * @description Selects an item and triggers the callback function.
+	 * @param {number} index - The index of the item to select.
+	 */
 	_select(index) {
 		if (this.checkList) domUtils.toggleClass(this.menus[index], 'se-checked');
 		this._selectMethod(this.getItem(index));
 	},
 
+	/**
+	 * @private
+	 * @description Adds event listeners for menu interactions.
+	 */
 	__addEvents() {
 		this.__removeEvents();
 		this.__events = this.__eventHandlers;
@@ -345,6 +386,10 @@ SelectMenu.prototype = {
 		this._keydownTarget.addEventListener('keydown', this.__events.keydown);
 	},
 
+	/**
+	 * @private
+	 * @description Removes event listeners for menu interactions.
+	 */
 	__removeEvents() {
 		if (this.__events.length === 0) return;
 		this.form.removeEventListener('mousedown', this.__events.mousedown);
@@ -354,12 +399,20 @@ SelectMenu.prototype = {
 		this.__events = [];
 	},
 
+	/**
+	 * @private
+	 * @description Adds global event listeners for closing the menu.
+	 */
 	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers.keydown, true);
 		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers.mousedown, true);
 	},
 
+	/**
+	 * @private
+	 * @description Removes global event listeners for closing the menu.
+	 */
 	__removeGlobalEvent() {
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
 		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
@@ -369,6 +422,11 @@ SelectMenu.prototype = {
 	constructor: SelectMenu
 };
 
+/**
+ * @private
+ * @description Handles keyboard navigation in the select menu.
+ * @param {KeyboardEvent} e - The keyboard event object.
+ */
 function OnKeyDown_refer(e) {
 	let moveIndex;
 	switch (e.keyCode) {
@@ -417,6 +475,11 @@ function OnKeyDown_refer(e) {
 	if (moveIndex) this._moveItem(moveIndex);
 }
 
+/**
+ * @private
+ * @description Handles the `mousedown` event on the menu.
+ * @param {MouseEvent} e - The mouse event object.
+ */
 function OnMousedown_list(e) {
 	if (env.isGecko) {
 		const target = domUtils.getParentElement(e.target, '.se-select-item');
@@ -424,6 +487,11 @@ function OnMousedown_list(e) {
 	}
 }
 
+/**
+ * @private
+ * @description Highlights an item when the mouse moves over it.
+ * @param {MouseEvent} e - The mouse event object.
+ */
 function OnMouseMove_list(e) {
 	domUtils.addClass(this.form, 'se-select-menu-mouse-move');
 	const index = e.target.getAttribute('data-index');
@@ -431,6 +499,11 @@ function OnMouseMove_list(e) {
 	this.index = index * 1;
 }
 
+/**
+ * @private
+ * @description Selects an item when it is clicked.
+ * @param {MouseEvent} e - The mouse event object.
+ */
 function OnClick_list(e) {
 	let target = e.target;
 	let index = null;
@@ -444,11 +517,21 @@ function OnClick_list(e) {
 	this._select(index * 1);
 }
 
+/**
+ * @private
+ * @description Closes the menu when the `Escape` key is pressed.
+ * @param {KeyboardEvent} e - The keyboard event object.
+ */
 function CloseListener_key(e) {
 	if (!/27/.test(e.keyCode)) return;
 	this.close();
 }
 
+/**
+ * @private
+ * @description Closes the menu when a click occurs outside of it.
+ * @param {MouseEvent} e - The mouse event object.
+ */
 function CloseListener_mousedown(e) {
 	if (this.form.contains(e.target)) return;
 	if (e.target !== this._refer) {
@@ -458,6 +541,11 @@ function CloseListener_mousedown(e) {
 	}
 }
 
+/**
+ * @private
+ * @description Handles click events to properly close the menu.
+ * @param {MouseEvent} e - The mouse event object.
+ */
 function CloseListener_click(e) {
 	this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
 	if (e.target === this._refer) {

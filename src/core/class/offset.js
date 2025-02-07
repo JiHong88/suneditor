@@ -8,6 +8,62 @@ import { domUtils, numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
 /**
+ * @typedef {object} RectsInfo
+ * @property {object} rects - Bounding rectangle information of the selection range.
+ * @property {number} rects.left - The left position of the selection.
+ * @property {number} rects.right - The right position of the selection.
+ * @property {number} rects.top - The top position of the selection.
+ * @property {number} rects.bottom - The bottom position of the selection.
+ * @property {boolean} rects.noText - Whether the selection contains text.
+ */
+
+/**
+ * @typedef {object} OffsetInfo
+ * @property {number} top - The vertical position of the node relative to the entire document, including iframe offsets.
+ * @property {number} left - The horizontal position of the node relative to the entire document, including iframe offsets.
+ */
+
+/**
+ * @typedef {object} OffsetLocalInfo
+ * @property {number} top - The vertical position of the node relative to the WYSIWYG editor.
+ * @property {number} left - The horizontal position of the node relative to the WYSIWYG editor.
+ * @property {number} scrollX - The horizontal scroll offset inside the WYSIWYG editor.
+ * @property {number} scrollY - The vertical scroll offset inside the WYSIWYG editor.
+ */
+
+/**
+ * @typedef {object} OffsetGlobalInfo
+ * @property {number} top - The vertical position of the element relative to the entire document.
+ * @property {number} left - The horizontal position of the element relative to the entire document.
+ * @property {number} width - The total width of the element, including its content, padding, and border.
+ * @property {number} height - The total height of the element, including its content, padding, and border.
+ * @property {number} scrollTop - The amount of vertical scrolling applied to the element.
+ * @property {number} scrollLeft - The amount of horizontal scrolling applied to the element.
+ */
+
+/**
+ * @typedef {object} OffsetGlobalScrollInfo
+ * @property {number} top - The vertical scroll offset, representing the distance from the top of the document to the current scroll position (in pixels).
+ * @property {number} left - The horizontal scroll offset, representing the distance from the left side of the document to the current scroll position (in pixels).
+ * @property {number} width - The total scrollable width of the document, including content outside the viewport.
+ * @property {number} height - The total scrollable height of the document, including content outside the viewport.
+ * @property {number} x - The horizontal position of the scrollable area relative to the entire document.
+ * @property {number} y - The vertical position of the scrollable area relative to the entire document.
+ * @property {number} oh - The height of the visible viewport, representing the portion of the document currently displayed on the screen.
+ * @property {number} ow - The width of the visible viewport, representing the portion of the document currently displayed on the screen.
+ */
+
+/**
+ * @typedef {object} OffsetWWScrollInfo
+ * @property {number} top - The vertical scroll offset inside the WYSIWYG editor.
+ * @property {number} left - The horizontal scroll offset inside the WYSIWYG editor.
+ * @property {number} width - The total width of the WYSIWYG editor's scrollable area.
+ * @property {number} height - The total height of the WYSIWYG editor's scrollable area.
+ * @property {number} bottom - The sum of `top` and `height`, representing the bottom-most scrollable position.
+ * @property {RectsInfo} rects - The bounding rectangle of the editor's visible area.
+ */
+
+/**
  * @class
  * @description Offset class, get the position of the element
  * @param {object} editor - The root editor instance
@@ -24,9 +80,9 @@ function Offset(editor) {
 
 Offset.prototype = {
 	/**
-	 * @description Gets the position just outside the argument's internal editor(wysiwygFrame). [getLocal() + iframe offset]
-	 * @param {Node} node Target node
-	 * @returns {{top:boolean, left:boolean}}
+	 * @description Gets the position just outside the argument's internal editor (wysiwygFrame).
+	 * @param {Node} node Target node.
+	 * @returns {OffsetInfo} Position relative to the editor frame.
 	 */
 	get(node) {
 		const wFrame = this.editor.frameContext.get('wysiwygFrame');
@@ -40,9 +96,9 @@ Offset.prototype = {
 	},
 
 	/**
-	 * @description Gets the position in the internal editor of the argument.
-	 * @param {Node} node Target node
-	 * @returns {{top:boolean, left:boolean}}
+	 * @description Gets the position inside the internal editor of the argument.
+	 * @param {Node} node Target node.
+	 * @returns {OffsetLocalInfo} Position relative to the WYSIWYG editor.
 	 */
 	getLocal(node) {
 		let offsetLeft = 0;
@@ -75,9 +131,9 @@ Offset.prototype = {
 	},
 
 	/**
-	 * @description Returns the position of the argument, relative to global document. {left:0, top:0, scroll: 0}
-	 * @param {Element} element Target element
-	 * @returns {{top:boolean, left:boolean}}
+	 * @description Returns the position of the argument relative to the global document.
+	 * @param {Element} element Target element.
+	 * @returns {OffsetGlobalInfo} Global position and scroll values.
 	 */
 	getGlobal(element) {
 		const topArea = this.editor.frameContext.get('topArea');
@@ -127,8 +183,8 @@ Offset.prototype = {
 
 	/**
 	 * @description Gets the current editor-relative scroll offset.
-	 * @param {Element} element Target element
-	 * @returns {{top:boolean, left:boolean, width:boolean, height:boolean}}
+	 * @param {Element} element Target element.
+	 * @returns {OffsetGlobalScrollInfo} Global scroll information.
 	 */
 	getGlobalScroll(element) {
 		const topArea = this.editor.frameContext.get('topArea');
@@ -259,7 +315,7 @@ Offset.prototype = {
 
 	/**
 	 * @description Get the scroll info of the WYSIWYG area.
-	 * @returns {{top:boolean, left:boolean}}
+	 * @returns {{top: number, left: number, width: number, height: number, bottom: number, rects: DOMRect[]}} Scroll information within the editor.
 	 */
 	getWWScroll() {
 		const eventWysiwyg = this.editor.frameContext.get('wysiwyg');
@@ -570,12 +626,7 @@ Offset.prototype = {
 	 * - This method calculates the top and left offsets for the element, ensuring it
 	 * - does not overflow the editor boundaries and adjusts the arrow positioning accordingly.
 	 * @param {boolean} isDirTop - Determines whether the element should be positioned above (`true`) or below (`false`) the target.
-	 * @param {object} rects - Bounding rectangle information of the selection range.
-	 * @param {number} rects.left - The left position of the selection.
-	 * @param {number} rects.right - The right position of the selection.
-	 * @param {number} rects.top - The top position of the selection.
-	 * @param {number} rects.bottom - The bottom position of the selection.
-	 * @param {boolean} rects.noText - Whether the selection contains text.
+	 * @param {RectsInfo} rects - Bounding rectangle information of the selection range.
 	 * @param {Element} element - The element to be positioned.
 	 * @param {number} editorLeft - The left position of the editor.
 	 * @param {number} editorWidth - The width of the editor.

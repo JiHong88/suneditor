@@ -216,6 +216,11 @@ DocumentType.prototype = {
 		}, 400);
 	},
 
+	/**
+	 * @private
+	 * @description Initializes the cache for document elements.
+	 * @param {NodeList} mChr - List of mirrored elements.
+	 */
 	_initializeCache(mChr) {
 		this._positionCache.clear();
 		for (let i = 0, len = mChr.length; i < len; i++) {
@@ -232,6 +237,16 @@ DocumentType.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves the element at a given position.
+	 * @param {number} pageTop - The vertical position to check.
+	 * @param {NodeList} mChr - List of mirrored elements.
+	 * @returns {{ci: number, cm: number, ch: number}} The closest element and its related data.
+	 * - ci: The index of the closest element.
+	 * - cm: The distance between the top of the closest element and the given position.
+	 * - ch: The height of the closest element.
+	 */
 	_getElementAtPosition(pageTop, mChr) {
 		let start = this._mirrorCache;
 		let end = mChr.length - 1;
@@ -258,6 +273,9 @@ DocumentType.prototype = {
 		return { ci: closestIndex, cm: pageTop - iElement.bottom, ch: iElement.height };
 	},
 
+	/**
+	 * @description Resizes the document page dynamically.
+	 */
 	resizePage() {
 		const wwWidth = this.wwFrame.offsetWidth + 1;
 		const wwHeight = this.wwFrame.offsetHeight + 1;
@@ -281,6 +299,9 @@ DocumentType.prototype = {
 		this._displayCurrentPage();
 	},
 
+	/**
+	 * @description Scrolls the document page.
+	 */
 	scrollPage() {
 		const prevScrollTop = this.prevScrollTop;
 		const scrollTop = this._getWWScrollTop();
@@ -295,11 +316,18 @@ DocumentType.prototype = {
 		this._displayCurrentPage();
 	},
 
+	/**
+	 * @description Scrolls the window to a specific position.
+	 */
 	scrollWindow() {
 		if (!this.isAutoHeight) return;
 		this._displayCurrentPage();
 	},
 
+	/**
+	 * @description Retrieves the current page number.
+	 * @returns {number} The current page number.
+	 */
 	getCurrentPageNumber() {
 		if (this.totalPages <= 1) return 1;
 
@@ -322,16 +350,26 @@ DocumentType.prototype = {
 		return (this.pageNum = this.totalPages);
 	},
 
+	/**
+	 * @description Moves to the previous page.
+	 */
 	pageUp() {
 		const pageNum = this.pageNum - 1 <= 1 ? 1 : this.pageNum - 1;
 		this._movePage(pageNum, false);
 	},
 
+	/**
+	 * @description Moves to the next page.
+	 */
 	pageDown() {
 		const pageNum = this.pageNum + 1 > this.pages.length ? this.pages.length : this.pageNum + 1;
 		this._movePage(pageNum, false);
 	},
 
+	/**
+	 * @description Moves to a specific page.
+	 * @param {number} pageNumber - The target page number.
+	 */
 	pageGo(pageNum) {
 		if (pageNum < 1) pageNum = 1;
 		else if (pageNum > this.pages.length) pageNum = this.pages.length;
@@ -339,6 +377,10 @@ DocumentType.prototype = {
 		this._movePage(pageNum, true);
 	},
 
+	/**
+	 * @description Highlights the header of the current line.
+	 * @param {Element} line - The "line" element to be highlighted.
+	 */
 	on(line) {
 		if (!this.useHeader) return;
 
@@ -352,6 +394,9 @@ DocumentType.prototype = {
 		domUtils.addClass(item, 'active');
 	},
 
+	/**
+	 * @description Handles text changes in the document.
+	 */
 	onChangeText(header) {
 		if (!this.useHeader) return;
 
@@ -361,15 +406,29 @@ DocumentType.prototype = {
 		item.textContent = header.textContent;
 	},
 
+	/**
+	 * @private
+	 * @description Displays the current page number.
+	 */
 	_displayCurrentPage() {
 		const pageNum = this.getCurrentPageNumber();
 		this.pageNavigator?.display(pageNum, this.totalPages);
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves the scroll position in WYSIWYG mode.
+	 * @returns {number} The current scroll position.
+	 */
 	_getWWScrollTop() {
 		return this.displayPage.scrollTop || this.displayPage.scrollY || 0;
 	},
 
+	/**
+	 * @private
+	 * @description Moves to a specific page and updates the view.
+	 * @param {number} pageNumber - The target page number.
+	 */
 	_movePage(pageNum, force) {
 		const globalTop = this._getGlobalTop();
 		const children = converter.nodeListToArray(this.ww.children);
@@ -391,6 +450,10 @@ DocumentType.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Applies smooth scrolling for page navigation.
+	 */
 	_applyPageScroll(top, callback) {
 		this.displayPage.scrollTo({ top, behavior: 'smooth' });
 		const checkScrollEnd = () => {
@@ -404,10 +467,22 @@ DocumentType.prototype = {
 		_w.requestAnimationFrame(checkScrollEnd);
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves the global top offset of an element.
+	 * @param {Element} element - The element whose top offset is needed.
+	 * @returns {number} The top offset of the element.
+	 */
 	_getGlobalTop() {
 		return this.isAutoHeight ? this.offset.getGlobal(this.wwFrame).top : 0;
 	},
 
+	/**
+	 * @private
+	 * @description Finds an item within the document.
+	 * @param {string} query - The search query.
+	 * @returns {Element|null} The found element, or null if not found.
+	 */
 	_findItem(header) {
 		const headers = this._wwHeaders;
 		const index = Array.prototype.indexOf.call(headers, header);
@@ -419,6 +494,12 @@ DocumentType.prototype = {
 		return null;
 	},
 
+	/**
+	 * @private
+	 * @description Finds the closest header element from a given line.
+	 * @param {Element} line - The "line" to check.
+	 * @returns {Element|null} The closest header element, or null if not found.
+	 */
 	_findLinesHeader(line) {
 		while (line && line !== this.ww) {
 			if (this._is(line)) {
@@ -430,10 +511,21 @@ DocumentType.prototype = {
 		return null;
 	},
 
+	/**
+	 * @private
+	 * @description Checks if an element is a header.
+	 * @param {Element} element - The element to check.
+	 * @returns {boolean} True if the element is a header, otherwise false.
+	 */
 	_is(element) {
 		return /^h[1-6]$/i.test(element?.nodeName);
 	},
 
+	/**
+	 * @private
+	 * @description Retrieves all headers in the document.
+	 * @returns {Array<Element>} An array of header elements.
+	 */
 	_getHeaders() {
 		return (this._wwHeaders = this.ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));
 	},

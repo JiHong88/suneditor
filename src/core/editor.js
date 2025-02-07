@@ -196,28 +196,28 @@ function Editor(multiTargets, options) {
 
 	// ------------------------------------------------------- private properties -------------------------------------------------------
 	/**
+	 * @private
 	 * @description Closest ShadowRoot to editor if found
 	 * @type {ShadowRoot}
-	 * @private
 	 */
 	this._shadowRoot = null;
 
 	/**
-	 * @description Plugin call event map
 	 * @private
+	 * @description Plugin call event map
 	 */
 	this._onPluginEvents = null;
 
 	/**
-	 * @description Copy format info
 	 * @private
+	 * @description Copy format info
 	 */
 	this._onCopyFormatInfo = null;
 	this._onCopyFormatInitMethod = null;
 
 	/**
-	 * @description Controller, modal, browser
 	 * @private
+	 * @description Controller, modal, browser
 	 */
 	this.opendModal = null;
 	this.opendControllers = [];
@@ -230,8 +230,8 @@ function Editor(multiTargets, options) {
 	this._codeViewDisabledButtons = [];
 
 	/**
-	 * @description Button List in Responsive Toolbar.
 	 * @private
+	 * @description Button List in Responsive Toolbar.
 	 */
 	this._pluginCallButtons = product.pluginCallButtons;
 	this._pluginCallButtons_sub = product.pluginCallButtons_sub;
@@ -239,45 +239,45 @@ function Editor(multiTargets, options) {
 	this._responsiveButtons_sub = product.responsiveButtons_sub;
 
 	/**
-	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
 	 * @private
+	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
 	 */
 	this._notHideToolbar = false;
 
 	/**
-	 * @description Variables for controlling focus and blur events
 	 * @private
+	 * @description Variables for controlling focus and blur events
 	 */
 	this._preventBlur = false;
 
 	/**
-	 * @description If true, (initialize, reset) all indexes of image, video information
 	 * @private
+	 * @description If true, (initialize, reset) all indexes of image, video information
 	 */
 	this._componentsInfoInit = true;
 	this._componentsInfoReset = false;
 
 	/**
-	 * @description plugin retainFormat info Map()
 	 * @private
+	 * @description plugin retainFormat info Map()
 	 */
 	this._MELInfo = null;
 
 	/**
-	 * @description Properties for managing files in the "FileManager" module
 	 * @private
+	 * @description Properties for managing files in the "FileManager" module
 	 */
 	this._fileInfoPluginsCheck = null;
 
 	/**
-	 * @description Properties for managing files in the "FileManager" module
 	 * @private
+	 * @description Properties for managing files in the "FileManager" module
 	 */
 	this._fileInfoPluginsReset = null;
 
 	/**
-	 * @description Variables for file component management
 	 * @private
+	 * @description Variables for file component management
 	 */
 	this._fileManager = {
 		tags: null,
@@ -288,14 +288,14 @@ function Editor(multiTargets, options) {
 	this._componentManager = [];
 
 	/**
-	 * @description Current Figure container.
 	 * @private
+	 * @description Current Figure container.
 	 */
 	this._figureContainer = null;
 
 	/**
-	 * @description Origin options
 	 * @private
+	 * @description Origin options
 	 */
 	this._originOptions = options;
 
@@ -521,7 +521,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Set direction to "rtl" or "ltr".
-	 * @param {string} dir "rtl" or "ltr"
+	 * @param {"rtl"|"ltr"} dir "rtl" or "ltr"
 	 */
 	setDir(dir) {
 		const rtl = dir === 'rtl';
@@ -741,7 +741,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Change the current root index.
-	 * @param {number} rootKey
+	 * @param {*} rootKey
 	 */
 	changeFrameContext(rootKey) {
 		if (rootKey === this.status.rootKey) return;
@@ -764,7 +764,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Focus to wysiwyg area
-	 * @param {number|undefined} rootKey Root index
+	 * @param {*} rootKey Root index
 	 */
 	focus(rootKey) {
 		if (rootKey) this.changeFrameContext(rootKey);
@@ -904,6 +904,7 @@ Editor.prototype = {
 
 	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
 	/**
+	 * @private
 	 * @description Set frameContext, frameOptions
 	 * @param {rootTarget} rt Root target
 	 */
@@ -916,8 +917,8 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Focus to wysiwyg area using "native focus function"
 	 * @private
+	 * @description Focus to wysiwyg area using "native focus function"
 	 */
 	_nativeFocus() {
 		this.selection.__focus();
@@ -925,8 +926,9 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Check the components such as image and video and modify them according to the format.
 	 * @private
+	 * @description Check the components such as image and video and modify them according to the format.
+	 * @param {boolean} loaded If true, the component is loaded.
 	 */
 	_checkComponents(loaded) {
 		for (let i = 0, len = this._fileInfoPluginsCheck.length; i < len; i++) {
@@ -935,8 +937,8 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Initialize the information of the components.
 	 * @private
+	 * @description Initialize the information of the components.
 	 */
 	_resetComponents() {
 		for (let i = 0, len = this._fileInfoPluginsReset.length; i < len; i++) {
@@ -945,10 +947,10 @@ Editor.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Initializ wysiwyg area (Only called from core._init)
 	 * @param {Map} e frameContext
 	 * @param {string} value initial html string
-	 * @private
 	 */
 	_initWysiwygArea(e, value) {
 		// set content
@@ -977,8 +979,9 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Called when there are changes to tags in the wysiwyg region.
 	 * @private
+	 * @description Called when there are changes to tags in the wysiwyg region.
+	 * @param {FrameContext} fc - Frame context object
 	 */
 	_resourcesStateChange(fc) {
 		this._iframeAutoHeight(fc);
@@ -989,8 +992,9 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
 	 * @private
+	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
+	 * @param {FrameContext} fc - Frame context object
 	 */
 	_iframeAutoHeight(fc) {
 		const autoFrame = fc.get('_iframeAuto');
@@ -1006,6 +1010,13 @@ Editor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Call the "onResizeEditor" event
+	 * @param {FrameContext} fc - Frame context object
+	 * @param {number} h - Height value
+	 * @param {ResizeObserverEntry} resizeObserverEntry - ResizeObserverEntry object
+	 */
 	__callResizeFunction(fc, h, resizeObserverEntry) {
 		h =
 			h === -1
@@ -1025,8 +1036,9 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Set display property when there is placeholder.
 	 * @private
+	 * @description Set display property when there is placeholder.
+	 * @param {FrameContext} fc - Frame context object
 	 */
 	_checkPlaceholder(fc) {
 		fc = fc || this.frameContext;
@@ -1047,8 +1059,9 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Initializ editor
 	 * @private
+	 * @description Initializ editor
+	 * @param {EditorInitOptions} options Options
 	 */
 	__editorInit(options) {
 		this.applyFrameRoots((e) => {
@@ -1092,8 +1105,9 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Initializ core variable
 	 * @private
+	 * @description Initializ core variable
+	 * @param {EditorInitOptions} options Options
 	 */
 	__init(options) {
 		// file components
@@ -1212,8 +1226,8 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Caching basic buttons to use
 	 * @private
+	 * @description Caching basic buttons to use
 	 */
 	__cachingButtons() {
 		const ctx = this.context;
@@ -1224,6 +1238,11 @@ Editor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Set the disabled button list
+	 * - this._codeViewDisabledButtons, this._controllerOnDisabledButtons
+	 */
 	__setDisabledButtons() {
 		const ctx = this.context;
 
@@ -1237,8 +1256,10 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Save the current buttons
 	 * @private
+	 * @description Save the current buttons
+	 * @param {Map} cmdButtons Command button map
+	 * @param {Element} tray Button tray
 	 */
 	__saveCommandButtons(cmdButtons, tray) {
 		const currentButtons = tray.querySelectorAll(COMMAND_BUTTONS);
@@ -1258,6 +1279,10 @@ Editor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Caches shortcut keys for commands.
+	 */
 	__cachingShortcuts() {
 		const shortcuts = this.options.get('shortcuts');
 		const reverseCommandArray = this.options.get('_reverseCommandArray');
@@ -1269,6 +1294,12 @@ Editor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Sets command target elements.
+	 * @param {string} cmd - The command identifier.
+	 * @param {Element} target - The associated command button.
+	 */
 	__setCommandTargets(cmd, target) {
 		if (!cmd || !target) return;
 
@@ -1282,6 +1313,13 @@ Editor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Configures the document properties of an iframe editor.
+	 * @param {HTMLIFrameElement} frame - The editor iframe.
+	 * @param {object} originOptions - The original options.
+	 * @param {object} targetOptions - The new options.
+	 */
 	__setIframeDocument(frame, originOptions, targetOptions) {
 		frame.setAttribute('scrolling', 'auto');
 		frame.contentDocument.head.innerHTML =
@@ -1292,6 +1330,11 @@ Editor.prototype = {
 		frame.contentDocument.body.setAttribute('contenteditable', true);
 	},
 
+	/**
+	 * @private
+	 * @description Set the FrameContext parameters and options
+	 * @param {FrameContext} e - Frame context object
+	 */
 	__setEditorParams(e) {
 		const frameOptions = e.get('options');
 		const _w = this._w;
@@ -1332,6 +1375,10 @@ Editor.prototype = {
 		}
 	},
 
+	/**
+	 * @private
+	 * @description Registers and initializes editor classes.
+	 */
 	__registerClass() {
 		// use events
 		this.events = { ...Events(), ...this.options.get('events') };
@@ -1407,6 +1454,11 @@ Editor.prototype = {
 		this._responsiveButtons = this._responsiveButtons_res = null;
 	},
 
+	/**
+	 * @private
+	 * @description Creates the editor instance and initializes components.
+	 * @param {EditorInitOptions} originOptions - The initial editor options.
+	 */
 	async __Create(originOptions) {
 		// set modes
 		this.isInline = /inline/i.test(this.options.get('mode'));

@@ -65,6 +65,17 @@ function CreateSliderCtx() {
  */
 
 /**
+ * @typedef {object} HueSliderColor
+ * @property {string} hex - HEX color
+ * @property {number} r - Red color value
+ * @property {number} g - Green color value
+ * @property {number} b - Blue color value
+ * @property {number} h - Hue color value
+ * @property {number} s - Saturation color value
+ * @property {number} l - Lightness color value
+ */
+
+/**
  * @typedef {object} HueSliderParams
  * @property {Element} form The form element to attach the hue slider.
  * @property {boolean} isNewForm Whether to create a new form element.
@@ -111,7 +122,7 @@ function HueSlider(inst, params, className) {
 
 		// buttons
 		this.eventManager.addEvent(hueController.querySelector('.se-btn-success'), 'click', () => {
-			inst._hueSliderAction(this.get());
+			inst.hueSliderAction(this.get());
 			this.close();
 		});
 		this.eventManager.addEvent(hueController.querySelector('.se-btn-danger'), 'click', () => {
@@ -158,11 +169,11 @@ HueSlider.prototype = {
 
 	/**
 	 * @description Close the hue slider. (include off method)
-	 * - Call the instance's _hueSliderCancelAction method.
+	 * - Call the instance's hueSliderCancelAction method.
 	 */
 	close() {
 		this.off();
-		this.inst._hueSliderCancelAction();
+		this.inst.hueSliderCancelAction();
 	},
 
 	/**

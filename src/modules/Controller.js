@@ -173,6 +173,7 @@ Controller.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
 	 * @param {Element} form Controller element
 	 * @param {Element|Range} target Controller target element
@@ -210,9 +211,9 @@ Controller.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Hide controller at editor area (link button, image resize button..)
 	 * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "_controllerOn"
-	 * @private
 	 */
 	_controllerOff() {
 		this.form.style.display = 'none';
@@ -237,6 +238,7 @@ Controller.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Specify the position of the controller.
 	 * @param {Element} controller Controller element.
 	 * @param {Element|Range} refer Element or Range that is the basis of the controller's position.
@@ -261,18 +263,33 @@ Controller.prototype = {
 		controller.style.visibility = '';
 	},
 
+	/**
+	 * @private
+	 * @description Adds global event listeners.
+	 * - When the controller is opened
+	 */
 	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers.keydown, true);
 		this._bindClose_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers.mousedown, true);
 	},
 
+	/**
+	 * @private
+	 * @description Removes global event listeners.
+	 * - When the ESC key is pressed, the controller is closed.
+	 */
 	__removeGlobalEvent() {
 		this.component.__removeGlobalEvent();
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
 		if (this._bindClose_mouse) this._bindClose_mouse = this.eventManager.removeGlobalEvent(this._bindClose_mouse);
 	},
 
+	/**
+	 * @private
+	 * @description Checks if the controller is fixed and should not be closed.
+	 * @returns {boolean} True if the controller is fixed.
+	 */
 	_checkFixed() {
 		if (this.editor.selectMenuOn) return true;
 
@@ -285,6 +302,12 @@ Controller.prototype = {
 		return false;
 	},
 
+	/**
+	 * @private
+	 * @description Checks if the given target is within a form or controller.
+	 * @param {Element} target The target element.
+	 * @returns {boolean} True if the target is inside a form or controller.
+	 */
 	_checkForm(target) {
 		if (domUtils.isWysiwygFrame(target)) return false;
 		if (domUtils.hasClass(target, 'se-drag-handle')) return true;
