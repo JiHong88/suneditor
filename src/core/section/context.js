@@ -1,13 +1,34 @@
 import { get as getNumber } from '../../helper/numbers';
 
 /**
- * @typedef {import('../section/constructor').EditorFrameOptions} EditorFrameOptions
+ * @typedef {Map<string, *>} FrameOptions
+ * @property {string} value - Initial value for the editor.
+ * @property {string} placeholder - Placeholder text.
+ * @property {Object.<string, string|number>} editableFrameAttributes - Attributes for the editable frame.
+ * @property {string} width - Width for the editor (e.g., '100%', '600px').
+ * @property {string} minWidth - Minimum width for the editor.
+ * @property {string} maxWidth - Maximum width for the editor.
+ * @property {string} height - Height for the editor (e.g., 'auto', '400px').
+ * @property {string} minHeight - Minimum height for the editor.
+ * @property {string} maxHeight - Maximum height for the editor.
+ * @property {string} _defaultStyles - Computed default styles for the editor.
+ * @property {boolean} iframe - Whether to use an iframe for the editor.
+ * @property {boolean} iframe_fullPage - Whether to allow full-page HTML inside the iframe.
+ * @property {Object.<string, string|number>} iframe_attributes - Attributes applied to the iframe.
+ * @property {Array<string>|null} iframe_cssFileName - CSS files applied inside the iframe.
+ * @property {boolean} statusbar - Whether the status bar is enabled.
+ * @property {boolean} statusbar_showPathLabel - Whether to show the current node structure in the status bar.
+ * @property {boolean} statusbar_resizeEnable - Whether resizing via the status bar is enabled.
+ * @property {boolean} charCounter - Whether character count display is enabled.
+ * @property {number|null} charCounter_max - Maximum allowed characters in the editor.
+ * @property {string|null} charCounter_label - Label text for the character counter.
+ * @property {"char"|"byte"|"byte-html"} charCounter_type - Defines how the character counter is calculated.
  */
 
 /**
- * @typedef {Map<string, any>} FrameContext
+ * @typedef {Map<string, *>} FrameContext
  * @property {string} key The root key identifier
- * @property {EditorFrameOptions} options Editor frame options
+ * @property {FrameOptions} options Editor frame options map
  * @property {Element} originElement The original target element
  * @property {Element} topArea The top area of the editor
  * @property {Element} container The editor container element
@@ -31,7 +52,7 @@ import { get as getNumber } from '../../helper/numbers';
  */
 
 /**
- * @typedef {Map<string, any>} Context
+ * @typedef {Map<string, *>} Context
  * @property {Element} menuTray The menu tray element
  * @property {Element} toolbar.main The main toolbar frame
  * @property {Element} toolbar.buttonTray The toolbar button tray
@@ -52,7 +73,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {Element} wwFrame Editor wysiwyg frame
  * @param {Element} codeWrapper Editor code view wrapper
  * @param {Element} codeFrame Editor code view frame
- * @param {object} documentTypeInner Document type inner
+ * @param {{inner: Element, page: Element, pageMirror: Element}} documentTypeInner Document type elements
  * @param {Element|null} statusbar Editor statusbar
  * @param {*} key root key
  * @returns {FrameContext}

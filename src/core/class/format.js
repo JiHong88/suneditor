@@ -6,9 +6,14 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env } from '../../helper';
 
 /**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Classes related to editor formats such as line creation, line retrieval from selected range, etc.
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {Format}
  */
 function Format(editor) {
 	CoreInjector.call(this, editor);
@@ -417,13 +422,19 @@ Format.prototype = {
 	 * @description The elements of the "selectedFormats" array are detached from the "blockElement" element. ("LI" tags are converted to "P" tags)
 	 * - When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling, removeArray: [Array of removed elements]}.
 	 * @param {Element} blockElement "block" element (PRE, BLOCKQUOTE, OL, UL...)
-	 * @param {object} [options] Options
-	 * @param {Array} [options.selectedFormats=null] Array of "line" elements (P, DIV, LI...) to remove.
+	 * @param {Object.<string, Array.<Element>|Element|boolean>} [options] Options
+	 * @param {Array.<Element>} [options.selectedFormats=null] Array of "line" elements (P, DIV, LI...) to remove.
 	 * - If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
 	 * @param {Element} [options.newBlockElement=null] The node(blockElement) to replace the currently wrapped node.
 	 * @param {boolean} [options.shouldDelete=false] If true, deleted without detached.
 	 * @param {boolean} [options.skipHistory=false] When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
-	 * @returns {object}
+	 * @returns {{cc: Node, sc: Node, so: number, ec: Node, eo: number, removeArray: Array.<Node>|null}} Node information after deletion
+	 * - cc: Common parent container node
+	 * - sc: Start container node
+	 * - so: Start offset
+	 * - ec: End container node
+	 * - eo: End offset
+	 * - removeArray: Array of removed elements
 	 */
 	removeBlock(blockElement, { selectedFormats, newBlockElement, shouldDelete, skipHistory } = {}) {
 		const range = this.selection.getRange();
@@ -855,9 +866,11 @@ Format.prototype = {
 	/**
 	 * @description "selectedCells" array are detached from the list element.
 	 * - The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
-	 * @param {Array} selectedCells Array of ["line", li] elements(LI, P...) to remove.
+	 * @param {Array.<Element>} selectedCells Array of ["line", li] elements(LI, P...) to remove.
 	 * @param {boolean} shouldDelete If true, It does not just remove the list, it deletes the content.
-	 * @returns {object} {sc: <LI>, ec: <LI>}.
+	 * @returns {{sc: Node, ec: Node}} Node information after deletion
+	 * - sc: Start container node
+	 * - ec: End container node
 	 */
 	removeList(selectedCells, shouldDelete) {
 		let rangeArr = {};
@@ -921,7 +934,7 @@ Format.prototype = {
 
 	/**
 	 * @description Indent more the selected lines.
-	 * - margin size - 'status.indentSize'px
+	 * - margin size : 'status.indentSize'px
 	 */
 	indent() {
 		const range = this.selection.getRange();
@@ -970,7 +983,7 @@ Format.prototype = {
 	/**
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
 	 * @param {Element|null} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
-	 * @param {object} [options] Options
+	 * @param {Object.<string, Array<string>|boolean} [options] Options
 	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
 	 *        (e.g., ['font-size'], ['.className'], ['font-family', 'color', '.className'])
 	 * @param {Array<string>} [options.nodesToRemove=null] Array of node names to remove.
@@ -1642,7 +1655,11 @@ Format.prototype = {
 	 * @param {Element} innerList The nested list element.
 	 * @param {Element} prev The previous sibling element.
 	 * @param {Element} next The next sibling element.
-	 * @param {object} nodePath Object storing the start and end node paths.
+	 * @param {{s: Array<number> | null, e: Array<number> | null, sl: Element | null, el: Element | null}} nodePath Object storing the start and end node paths.
+	 * - s : Start node path.
+	 * - e : End node path.
+	 * - sl : Start node's parent element.
+	 * - el : End node's parent element.
 	 * @returns {Element} The attached inner list.
 	 */
 	_attachNested(originList, innerList, prev, next, nodePath) {
@@ -1699,7 +1716,10 @@ Format.prototype = {
 	 * @description Detaches a nested list structure by extracting list items from their parent list.
 	 * - Ensures proper restructuring of the list elements.
 	 * @param {Array<Element>} cells The list items to be detached.
-	 * @returns {object} An object containing reference nodes for repositioning.
+	 * @returns {{cc: Node, sc: Node, ec: Node}} An object containing reference nodes for repositioning.
+	 * - cc : The parent node of the first list item.
+	 * - sc : The first list item.
+	 * - ec : The last list item.
 	 */
 	_detachNested(cells) {
 		const first = cells[0];
@@ -2324,7 +2344,7 @@ Format.prototype = {
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @returns {null|Node} If end container is renewed, returned renewed node
-	 * @returns {object} { ancestor, container, offset, endContainer }
+	 * @returns {{ancestor: Node, container: Node, offset: number, endContainer: Node}} { ancestor, container, offset, endContainer }
 	 */
 	_setNode_startLine(element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
 		// not add tag
@@ -2620,7 +2640,7 @@ Format.prototype = {
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @param {Node} _endContainer Offset node of last line already modified (end.container)
-	 * @returns {object} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
+	 * @returns {{ancestor: Node, endContainer: Node}} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
 	 */
 	_setNode_middleLine(element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
 		// not add tag
@@ -2759,7 +2779,7 @@ Format.prototype = {
 	 * @param {number} endOff The endOffset property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
-	 * @returns {object} { ancestor, container, offset }
+	 * @returns {{ancestor: Node, container: Node, offset: number}} { ancestor, container, offset }
 	 */
 	_setNode_endLine(element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
 		// not add tag

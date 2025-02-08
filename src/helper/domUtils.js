@@ -15,8 +15,8 @@ export function isZeroWidth(text) {
 /**
  * @description Create Element node
  * @param {string} elementName Element name
- * @param {object.<string, string>|null|undefined} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
- * @param {string|Node|null|undefined} inner A innerHTML string or inner node.
+ * @param {?Object.<string, string|number>} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
+ * @param {?string|Node=} inner A innerHTML string or inner node.
  * @returns {Element}
  */
 export function createElement(elementName, attributes, inner) {
@@ -988,7 +988,7 @@ export function getScrollParent(element) {
 /**
  * @description Gets the size of the documentElement client size.
  * @param {Document} doc Document object
- * @returns {{w, h}}
+ * @returns {{w: number, h: number}} documentElement.clientWidth, documentElement.clientHeight
  */
 export function getClientSize(doc = _d) {
 	return {

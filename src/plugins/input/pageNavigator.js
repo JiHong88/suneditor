@@ -2,13 +2,18 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description PageNavigator Plugin
  * - This plugin provides functionality for navigating between pages within the editor's document.
  * - It features an input field for entering the desired page number and a display element showing
  * - the total number of pages. When the user changes the value in the input field, the plugin triggers
  * - a page navigation event through the editor's document context.
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {PageNavigator}
  */
 function PageNavigator(editor) {
 	EditorInjector.call(this, editor);

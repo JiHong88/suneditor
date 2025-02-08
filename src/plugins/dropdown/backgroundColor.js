@@ -3,13 +3,18 @@ import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Text background color plugin
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {Array.<string|{value: string, name: string}>} pluginOptions.items - Color list
  * @param {number} pluginOptions.splitNum - Number of colors per line
  * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+ * @returns {BackgroundColor}
  */
 function BackgroundColor(editor, pluginOptions) {
 	EditorInjector.call(this, editor);

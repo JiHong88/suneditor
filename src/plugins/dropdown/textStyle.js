@@ -2,11 +2,16 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Text style Plugin, Applies a tag that specifies text styles to a selection.
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {Array.<{name: string, html: string}>} pluginOptions.items - Template list
+ * @returns {TextStyle}
  */
 function TextStyle(editor, pluginOptions) {
 	// plugin bisic properties

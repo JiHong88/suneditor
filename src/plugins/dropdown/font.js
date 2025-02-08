@@ -2,13 +2,18 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Text font plugin
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {Array.<string>} pluginOptions.items - Font list
  * @param {number} pluginOptions.splitNum - Number of colors per line
  * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+ * @returns {Font}
  */
 function Font(editor, pluginOptions) {
 	EditorInjector.call(this, editor);

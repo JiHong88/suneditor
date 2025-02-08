@@ -6,9 +6,14 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, env } from '../../helper';
 
 /**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Selection, Range related class
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {Selection}
  */
 function Selection(editor) {
 	CoreInjector.call(this, editor);
@@ -146,7 +151,7 @@ Selection.prototype = {
 	 * - If the target node has a next sibling, it returns the next sibling with an offset of 0.
 	 * - If there is no next sibling but a previous sibling exists, it returns the previous sibling with an offset of 1.
 	 * @param {Node} target Target node whose neighboring range is to be determined.
-	 * @returns {object|null} An object containing the nearest container node and its offset.
+	 * @returns {{container: Node, offset: number}|null} An object containing the nearest container node and its offset.
 	 */
 	getNearRange(target) {
 		const next = target.nextSibling;
@@ -307,7 +312,7 @@ Selection.prototype = {
 	/**
 	 * @description Scroll to the corresponding selection or range position.
 	 * @param {Selection|Range|Node} ref selection or range object
-	 * @param {object?} scrollOption option of scrollTo
+	 * @param {Object.<string, *>?} scrollOption option of scrollTo
 	 */
 	scrollTo(ref, scrollOption) {
 		if (ref instanceof Selection) {
@@ -346,7 +351,7 @@ Selection.prototype = {
 	/**
 	 * @private
 	 * @description Return the range object of editor's first child node
-	 * @returns {object}
+	 * @returns {Range}
 	 */
 	_createDefaultRange() {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');

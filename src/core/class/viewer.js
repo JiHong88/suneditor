@@ -6,9 +6,14 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env, converter, numbers } from '../../helper';
 
 /**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Viewer(codeView, fullScreen, showBlocks) class
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {Viewer}
  */
 function Viewer(editor) {
 	CoreInjector.call(this, editor);

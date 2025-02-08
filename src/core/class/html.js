@@ -9,9 +9,14 @@ const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
 
 /**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description All HTML related classes involved in the editing area
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {HTML}
  */
 function HTML(editor) {
 	CoreInjector.call(this, editor);
@@ -160,14 +165,19 @@ function HTML(editor) {
 
 HTML.prototype = {
 	/**
-	 * @description Filter HTML by whitelist, blacklist, and validate.
-	 * @param {string} html HTML string to be filtered.
-	 * @param {object} params Filtering parameters.
-	 * @param {string} params.tagWhitelist Whitelist of allowed tags, specified as a string with tags separated by '|'. ex) "div|p|span".
-	 * @param {string} params.tagBlacklist Blacklist of disallowed tags, specified as a string with tags separated by '|'. ex) "script|iframe".
-	 * @param {function} params.validate Function to validate or replace individual elements based on custom conditions. Should return a new node for replacement, a string for outerHTML replacement, or null to remove the node.
-	 * @param {function} params.validateAll Function to validate or replace all elements based on custom conditions. Should return a new node for replacement, a string for outerHTML replacement, or null to remove the node.
-	 * @returns {string} Filtered HTML string.
+	 * @description Filters an HTML string based on allowed and disallowed tags, with optional custom validation.
+	 * - Removes blacklisted tags and keeps only whitelisted tags.
+	 * - Allows custom validation functions to replace, modify, or remove elements.
+	 * @param {string} html - The HTML string to be filtered.
+	 * @param {Object} params - Filtering parameters.
+	 * @param {string} [params.tagWhitelist] - Allowed tags, specified as a string with tags separated by '|'. (e.g. "div|p|span").
+	 * @param {string} [params.tagBlacklist] - Disallowed tags, specified as a string with tags separated by '|'. (e.g. "script|iframe").
+	 * @param {(node: Node) => Node | string | null} [params.validate] - Function to validate and modify individual nodes.
+	 *   - Return `null` to remove the node.
+	 *   - Return a `Node` to replace the current node.
+	 *   - Return a `string` to replace the node's outerHTML.
+	 * @param {boolean} [params.validateAll] - Whether to apply validation to all nodes.
+	 * @returns {string} - The filtered HTML string.
 	 */
 	filter(html, { tagWhitelist, tagBlacklist, validate, validateAll }) {
 		if (tagWhitelist) {
@@ -194,9 +204,7 @@ HTML.prototype = {
 		} else if (validateAll) {
 			const parseDocument = new DOMParser().parseFromString(html, 'text/html');
 			const compClass = ['.se-component', '.se-flex-component'];
-			const closestAny = function (element) {
-				return compClass.some((selector) => element.closest(selector));
-			};
+			const closestAny = (element) => compClass.some((selector) => element.closest(selector));
 			parseDocument.body.querySelectorAll('*').forEach((node) => {
 				if (!closestAny(node)) {
 					const result = validate(node);
@@ -218,7 +226,7 @@ HTML.prototype = {
 	/**
 	 * @description Cleans and compresses HTML code to suit the editor format.
 	 * @param {string} html HTML string to clean and compress
-	 * @param {object} [options] Cleaning options
+	 * @param {Object} [options] Cleaning options
 	 * @param {boolean} [options.forceFormat=false] If true, wraps text nodes without a format node in the format tag.
 	 * @param {string|RegExp|null} [options.whitelist=null] Regular expression of allowed tags.
 	 * Create RegExp object using helper.converter.createElementWhitelist method.
@@ -302,7 +310,7 @@ HTML.prototype = {
 	 * @description Inserts an (HTML element / HTML string / plain string) at the selection range.
 	 * - If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
 	 * @param {Element|string} html HTML Element or HTML string or plain string
-	 * @param {object} [options] Options
+	 * @param {Object} [options] Options
 	 * @param {boolean} [options.selectInserted=false] If true, selects the range of the inserted node.
 	 * @param {boolean} [options.skipCharCount=false] If true, inserts even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipCleaning=false] If true, inserts the HTML string without refining it with html.clean.
@@ -379,7 +387,7 @@ HTML.prototype = {
 	 * - If the "afterNode" exists, it is inserted after the "afterNode"
 	 * - Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
 	 * @param {Node} oNode Node to be inserted
-	 * @param {object} [options] Options
+	 * @param {Object} [options] Options
 	 * @param {Node} [options.afterNode=null] If the node exists, it is inserted after the node
 	 * @param {boolean} [options.skipCharCount=null] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @returns {Object|Node|null}
@@ -992,7 +1000,7 @@ HTML.prototype = {
 
 	/**
 	 * @description Gets the current content
-	 * @param {object} [options] Options
+	 * @param {Object} [options] Options
 	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
 	 * Ignored for targetOptions.get('iframe_fullPage') is true.
 	 * @param {boolean} [options.includeFullPage=false] Return only the content of the body without headers when the "iframe_fullPage" option is true
@@ -1038,7 +1046,7 @@ HTML.prototype = {
 	/**
 	 * @description Sets the HTML string
 	 * @param {string} html HTML string
-	 * @param {object} [options] Options
+	 * @param {Object} [options] Options
 	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 */
 	set(html, { rootKey } = {}) {
@@ -1065,7 +1073,7 @@ HTML.prototype = {
 	/**
 	 * @description Add content to the end of content.
 	 * @param {string} html Content to Input
-	 * @param {object} [options] Options
+	 * @param {Object} [options] Options
 	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 */
 	add(html, { rootKey } = {}) {
@@ -1094,8 +1102,8 @@ HTML.prototype = {
 
 	/**
 	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
-	 * @param {object} ctx { head: HTML string, body: HTML string}
-	 * @param {object} [options] Options
+	 * @param {{head: string, body: string}} ctx { head: HTML string, body: HTML string}
+	 * @param {Object} [options] Options
 	 * @param {number|Array.<number>} [options.rootKey=null] Root index
 	 */
 	setFullPage(ctx, { rootKey } = {}) {

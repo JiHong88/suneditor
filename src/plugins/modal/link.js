@@ -3,19 +3,24 @@ import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Link plugin.
  * - This plugin provides link insertion and editing functionality within the editor.
  * - It also supports file uploads if an upload URL is provided.
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {boolean=} [pluginOptions.textToDisplay=true] - Whether to display the link text.
  * @param {boolean=} [pluginOptions.title=true] - Whether to display the link title.
  * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for file uploads.
- * @param {object=} [pluginOptions.uploadHeaders] - Additional headers for file upload requests.
+ * @param {Object.<string, string|number>=} [pluginOptions.uploadHeaders] - Additional headers for file upload requests.
  * @param {number=} [pluginOptions.uploadSizeLimit] - The total file upload size limit in bytes.
  * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @param {string=} [pluginOptions.acceptedFormats] - Accepted file formats for link uploads.
+ * @returns {Link}
  */
 function Link(editor, pluginOptions) {
 	// plugin bisic properties

@@ -5,6 +5,10 @@ import { domUtils, converter } from '../../helper';
 const { debounce } = converter;
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @typedef {import('../../core/base/eventManager').PluginInputEventInfo} PluginInputEventInfo
  */
 
@@ -15,17 +19,18 @@ const { debounce } = converter;
  * - Displays a mention list when the trigger character is typed.
  * - Supports fetching mention data from an API or a predefined data array.
  * - Uses caching for optimized performance.
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {string=} [pluginOptions.triggerText="@"] The character that triggers the mention list. Default is '@'.
  * @param {number=} [pluginOptions.limitSize=5] The number of items to display in the mention list. Default is 5.
  * @param {number=} [pluginOptions.searchStartLength=0] The number of characters to start searching for the mention list. Default is 0.
  * @param {number=} [pluginOptions.delayTime=200] The time to wait before displaying the mention list. Default is 200ms.
- * @param {?Array.<{key: string, name: string, url: string}>=} pluginOptions.data Use data without using API.
- * @param {?string=} pluginOptions.apiUrl The URL to call the mention list. Default is ''.
- * @param {?object=} pluginOptions.apiHeaders The headers to send with the API call. Default is {}.
+ * @param {Array.<{key: string, name: string, url: string}>=} pluginOptions.data Use data without using API.
+ * @param {string=} pluginOptions.apiUrl The URL to call the mention list. Default is ''.
+ * @param {Object.<string, string|number>=} pluginOptions.apiHeaders The headers to send with the API call. Default is {}.
  * @param {boolean=} [pluginOptions.useCachingData=true] Whether to cache the mention list data. Default is true.
  * @param {boolean=} [pluginOptions.useCachingFieldData=true] Whether to cache the mention list data in the field. Default is true.
+ * @returns {Mention}
  */
 function Mention(editor, pluginOptions) {
 	EditorInjector.call(this, editor);

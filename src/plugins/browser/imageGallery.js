@@ -2,13 +2,18 @@ import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Image gallery plugin
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
- * @param {object} pluginOptions.data - direct data without server calls
- * @param {string} pluginOptions.url - server request url
- * @param {object=} pluginOptions.headers - server request headers
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
+ * @param {Array.<*>=} pluginOptions.data - direct data without server calls
+ * @param {string=} pluginOptions.url - server request url
+ * @param {Object.<string, string|number>=} pluginOptions.headers - server request headers
+ * @returns {ImageGallery}
  */
 function ImageGallery(editor, pluginOptions) {
 	// plugin bisic properties

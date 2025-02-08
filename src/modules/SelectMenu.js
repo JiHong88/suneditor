@@ -4,7 +4,7 @@ import { domUtils, env } from '../helper';
 const MENU_MIN_HEIGHT = 38;
 
 /**
- * @typedef {object} SelectMenuParams
+ * @typedef {Object} SelectMenuParams
  * @property {string} position Position of the select menu, specified as "[left|right]-[middle|top|bottom]" or "[top|bottom]-[center|left|right]"
  * @property {boolean=} checkList Flag to determine if the checklist is enabled (true or false)
  * @property {"rtl" | "ltr"} [dir="ltr"] Optional text direction: "rtl" for right-to-left, "ltr" for left-to-right
@@ -88,7 +88,7 @@ SelectMenu.prototype = {
 	 * @description Initializes the select menu and attaches it to a reference element.
 	 * @param {Element} referElement - The element that triggers the select menu.
 	 * @param {(command: string) => void} selectMethod - The function to execute when an item is selected.
-	 * @param {object} [attr={}] - Additional attributes for the select menu container.
+	 * @param {{class: string, style: string}} [attr={}] - Additional attributes for the select menu container.
 	 */
 	on(referElement, selectMethod, attr) {
 		if (!attr) attr = {};

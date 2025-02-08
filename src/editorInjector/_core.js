@@ -1,7 +1,11 @@
 /**
+ * @typedef {import('../core/editor').default} EditorInstance
+ */
+
+/**
  * @private
  * @description Add default properties to the editor core object.
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
  */
 function CoreInjector(editor) {
 	// editor root

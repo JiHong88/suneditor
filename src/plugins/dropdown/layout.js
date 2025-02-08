@@ -2,11 +2,16 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Layout Plugin, Apply layout to the entire editor.
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {Array.<{name: string, html: string}>} pluginOptions.items - Layout list
+ * @returns {Layout}
  */
 function Layout(editor, pluginOptions) {
 	// plugin bisic properties

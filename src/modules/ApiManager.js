@@ -4,8 +4,8 @@ import { env } from '../helper';
  * @typedef ApiManagerParams
  * @property {string=} method - HTTP method (GET, POST, PUT, DELETE...)
  * @property {string=} url - API's URL
- * @property {object=} headers - HTTP headers
- * @property {object=} data - API data
+ * @property {Object.<string, string|number>=} headers - HTTP headers
+ * @property {*=} data - API data
  * @property {(xmlHttp: XMLHttpRequest) => boolean=} callBack - API success callback
  * @property {(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack - API fail callback
  * @property {string=} responseType - XMLHttpRequest.responseType
@@ -14,8 +14,9 @@ import { env } from '../helper';
 /**
  * @class
  * @description API Manager
- * @param {object} inst The instance object that called the constructor.
+ * @param {*} inst The instance object that called the constructor.
  * @param {ApiManagerParams=} params API options
+ * @returns {ApiManager}
  */
 function ApiManager(inst, params) {
 	this.editor = inst.editor;
@@ -37,7 +38,7 @@ function ApiManager(inst, params) {
 ApiManager.prototype = {
 	/**
 	 * @description Call API
-	 * @param {ApiManagerParams=} params
+	 * @param {ApiManagerParams} params
 	 */
 	call({ method, url, headers, data, callBack, errorCallBack, responseType }) {
 		this.cancel();
@@ -65,13 +66,13 @@ ApiManager.prototype = {
 
 	/**
 	 * @description Call Async API
-	 * @param {object=} params
+	 * @param {Object} params
 	 * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
 	 * @param {string=} params.url - API's URL
-	 * @param {object=} params.headers - HTTP headers
-	 * @param {object=} params.data - API data
+	 * @param {Object.<string, string|number>=} params.headers - HTTP headers
+	 * @param {*=} params.data - API data
 	 * @param {string=} params.responseType - XMLHttpRequest.responseType
-	 * @returns {Promise<ApiResponse | XMLHttpRequest>}
+	 * @returns {Promise<XMLHttpRequest>}
 	 */
 	asyncCall({ method, url, headers, data, responseType }) {
 		this.cancel();

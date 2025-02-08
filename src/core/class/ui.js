@@ -7,6 +7,10 @@ import Modal from '../../modules/Modal';
 import { domUtils, converter } from '../../helper';
 
 /**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
  * @typedef {import('../section/context').FrameContext} FrameContext
  */
 
@@ -14,7 +18,8 @@ import { domUtils, converter } from '../../helper';
  * @class
  * @description The UI class is a class that handles operations related to the user interface of SunEditor.
  * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {UI}
  */
 function UI(editor) {
 	CoreInjector.call(this, editor);

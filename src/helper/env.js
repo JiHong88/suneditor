@@ -8,7 +8,7 @@ const userAgent = _w.navigator.userAgent.toLowerCase();
 
 /**
  * @description Object.values
- * @param {object.<*>} obj Object parameter.
+ * @param {Object.<*>} obj Object parameter.
  * @returns {Array.<*>}
  */
 export function getValues(obj) {

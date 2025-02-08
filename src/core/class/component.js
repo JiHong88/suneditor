@@ -11,9 +11,27 @@ const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DIR_UP_KEYCODE = /^3[7-8]$/;
 
 /**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
+ * @typedef {Object} ComponentInfo
+ * @property {Element} target - The target element associated with the component.
+ * @property {string} pluginName - The name of the plugin related to the component.
+ * @property {Object.<string,  *>} options - Options related to the component.
+ * @property {Element} container - The main container element for the component.
+ * @property {Element|null} cover - The cover element, if applicable.
+ * @property {Element|null} inlineCover - The inline cover element, if applicable.
+ * @property {Element|null} caption - The caption element, if applicable.
+ * @property {boolean} isFile - Whether the component is a file-related component.
+ * @property {Element|null} launcher - The element that triggered the component, if applicable.
+ */
+
+/**
  * @class
  * @description Class for managing components such as images and tables that are not in line format
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {Component}
  */
 function Component(editor) {
 	CoreInjector.call(this, editor);
@@ -55,7 +73,7 @@ Component.prototype = {
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)
 	 * - If "element" is "HR", inserts and returns the new line.
 	 * @param {Element} element Element to be inserted
-	 * @param {object} [options] Options
+	 * @param {Object} [options] Options
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipSelection=false] If true, do not automatically select the inserted component.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
@@ -116,7 +134,7 @@ Component.prototype = {
 	 * @description Gets the file component and that plugin name
 	 * - return: {target, component, pluginName} | null
 	 * @param {Element} element Target element (figure tag, component div, file tag)
-	 * @returns {object|null}
+	 * @returns {ComponentInfo|null}
 	 */
 	get(element) {
 		if (!element) return null;

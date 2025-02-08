@@ -5,15 +5,20 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers } from '../../helper';
 
-function NodeTransform(editor) {
-	CoreInjector.call(this, editor);
-}
+/**
+ * @typedef {import('../editor').default} EditorInstance
+ */
 
 /**
  * @class
  * @description Node utility class. split, merge, etc.
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {NodeTransform}
  */
+function NodeTransform(editor) {
+	CoreInjector.call(this, editor);
+}
+
 NodeTransform.prototype = {
 	/**
 	 * @description Split all tags based on "baseNode"

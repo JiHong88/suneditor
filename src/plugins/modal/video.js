@@ -5,7 +5,15 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @typedef {import('../../core/base/events').VideoInfo} VideoInfo
+ */
+
+/**
+ * @typedef {import('../../core/editor').FrameContext} FrameContext
  */
 
 /**
@@ -13,8 +21,8 @@ const { NO_EVENT } = env;
  * @description Video plugin.
  * - This plugin provides video embedding functionality within the editor.
  * - It also supports embedding from popular video services
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {boolean=} [pluginOptions.canResize=true] - Whether the video element can be resized.
  * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
  * @param {string=} [pluginOptions.defaultWidth] - The default width of the video element. If a number is provided, "px" will be appended.
@@ -23,7 +31,7 @@ const { NO_EVENT } = env;
  * @param {boolean=} [pluginOptions.createFileInput=false] - Whether to create a file input element for video uploads.
  * @param {boolean=} [pluginOptions.createUrlInput=true] - Whether to create a URL input element for video embedding.
  * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for video file uploads.
- * @param {object=} [pluginOptions.uploadHeaders] - Additional headers to include in the video upload request.
+ * @param {Object.<string, string|number>=} [pluginOptions.uploadHeaders] - Additional headers to include in the video upload request.
  * @param {number=} [pluginOptions.uploadSizeLimit] - The total upload size limit for videos in bytes.
  * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.
  * @param {boolean=} [pluginOptions.allowMultiple=false] - Whether multiple video uploads are allowed.
@@ -31,13 +39,14 @@ const { NO_EVENT } = env;
  * @param {number=} [pluginOptions.defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
  * @param {boolean=} [pluginOptions.showRatioOption=true] - Whether to display the ratio option in the modal.
  * @param {Array=} [pluginOptions.ratioOptions] - Custom ratio options for video resizing.
- * @param {object=} [pluginOptions.videoTagAttributes] - Additional attributes to set on the video tag.
- * @param {object=} [pluginOptions.iframeTagAttributes] - Additional attributes to set on the iframe tag.
+ * @param {Object.<string, string|number>=} [pluginOptions.videoTagAttributes] - Additional attributes to set on the video tag.
+ * @param {Object.<string, string|number>=} [pluginOptions.iframeTagAttributes] - Additional attributes to set on the iframe tag.
  * @param {string=} [pluginOptions.query_youtube=""] - Additional query parameters for YouTube embedding.
  * @param {string=} [pluginOptions.query_vimeo=""] - Additional query parameters for Vimeo embedding.
- * @param {object=} [pluginOptions.embedQuery] - Custom query objects for additional embedding services.
+ * @param {Object.<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} [pluginOptions.embedQuery] - Custom query objects for additional embedding services.
  * @param {Array.<RegExp|string>=} [pluginOptions.urlPatterns] - Additional URL patterns for video embedding.
  * @param {Array.<string>=} [pluginOptions.extensions] - Additional file extensions to be recognized for video uploads.
+ * @returns {Video}
  */
 function Video(editor, pluginOptions) {
 	// plugin bisic properties
@@ -237,9 +246,9 @@ Video.prototype = {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
-	 * @param {object} params { frameContext, event, file }
-	 * @param {object} params.frameContext Frame context
-	 * @param {object} params.event Event object
+	 * @param {Object} params { frameContext, event, file }
+	 * @param {FrameContext} params.frameContext Frame context
+	 * @param {Event} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
@@ -278,7 +287,7 @@ Video.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {object} The format retention object containing the query and method to process the element.
+	 * @returns {Object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -438,7 +447,7 @@ Video.prototype = {
 	/**
 	 * @description Finds and processes the URL for video by matching it against known service patterns.
 	 * @param {string} url - The original URL.
-	 * @returns {object|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
+	 * @returns {{origin: string, url: string, tag: string}|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
 	 * or null if no matching pattern is found.
 	 */
 	findProcessUrl(url) {
@@ -515,7 +524,7 @@ Video.prototype = {
 	 * @param {string} height - The desired height for the video element.
 	 * @param {string} align - The alignment to apply to the video element (e.g., 'left', 'center', 'right').
 	 * @param {boolean} isUpdate - Indicates whether this is an update to an existing component (true) or a new creation (false).
-	 * @param {object} file - File metadata associated with the video (e.g., name, size).
+	 * @param {{name: string, size: number}} file - File metadata associated with the video
 	 */
 	create(oFrame, src, width, height, align, isUpdate, file) {
 		let cover = null;
@@ -592,7 +601,7 @@ Video.prototype = {
 	/**
 	 * @description Creates a new iframe element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes for embedding.
-	 * @param {object} [props] - An optional object containing properties to assign to the iframe.
+	 * @param {Object.<string, string|number>} [props] - An optional object containing properties to assign to the iframe.
 	 * @returns {HTMLIFrameElement} The newly created iframe element.
 	 */
 	createIframeTag(props) {
@@ -609,7 +618,7 @@ Video.prototype = {
 	/**
 	 * @description Creates a new video element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes.
-	 * @param {object} [props] - An optional object containing properties to assign to the video element.
+	 * @param {Object.<string, string|number>} [props] - An optional object containing properties to assign to the video element.
 	 * @returns {HTMLVideoElement} The newly created video element.
 	 */
 	createVideoTag(props) {
@@ -830,7 +839,7 @@ Video.prototype = {
 	 * @private
 	 * @description Registers the uploaded video in the editor.
 	 * @param {VideoInfo} info - Video information object.
-	 * @param {object} response - Server response containing video data.
+	 * @param {Object.<string, *>} response - Server response containing video data.
 	 */
 	_register(info, response) {
 		const fileList = response.result;
@@ -919,7 +928,7 @@ Video.prototype = {
 	/**
 	 * @private
 	 * @description Handles video upload errors.
-	 * @param {object} response - The error response object.
+	 * @param {Object.<string, *>} response - The error response object.
 	 * @returns {Promise<void>}
 	 */
 	async _error(response) {

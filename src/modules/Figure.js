@@ -12,18 +12,35 @@ let __resizing_cw = 0;
 let __resizing_sw = 0;
 
 /**
- * @typedef {object} FigureParams
+ * @typedef {Object} FigureParams
  * @property {string} [sizeUnit="px"] Size unit
  * @property {boolean} [autoRatio=false] Auto ratio
  */
 
 /**
- * @typedef {object} FigureInfo
+ * @typedef {Object} FigureInfo
  * @property {Element} target Target element (img, iframe, video, audio, table, etc.)
- * @property {Element} container Container element (FIGURE)
- * @property {Element} cover Cover element (div.se-component)
- * @property {Element} inlineCover Inline cover element (span.se-inline-component)
- * @property {Element} caption Caption element (FIGCAPTION)
+ * @property {Element} container Container element (div.se-component|span.se-component.se-inline-component)
+ * @property {Element|null} cover Cover element (FIGURE|null)
+ * @property {Element|null} inlineCover Inline cover element (span.se-inline-component)
+ * @property {Element|null} caption Caption element (FIGCAPTION)
+ */
+
+/**
+ * @typedef {Object} FigureTargetInfo
+ * @property {Element} container Container element (div.se-component|span.se-component.se-inline-component)
+ * @property {Element|null} cover Cover element (FIGURE|null)
+ * @property {Element|null} caption Caption element (FIGCAPTION)
+ * @property {string} align - Alignment of the element.
+ * @property {number} ratio - The aspect ratio of the element.
+ * @property {number} w - Width of the element.
+ * @property {number} h - Height of the element.
+ * @property {number} t - Top position.
+ * @property {number} l - Left position.
+ * @property {string|number} width - Width, can be a number or 'auto'.
+ * @property {string|number} height - Height, can be a number or 'auto'.
+ * @property {number} originWidth - Original width from `naturalWidth` or `offsetWidth`.
+ * @property {number} originHeight - Original height from `naturalHeight` or `offsetHeight`.
  */
 
 /**
@@ -32,6 +49,7 @@ let __resizing_sw = 0;
  * @param {*} inst The instance object that called the constructor.
  * @param {Array.<string|{action: (element: Element, value: string, target: Element) => void, command: string, value: string, title: string, icon: string}>} controls Controller button array
  * @param {FigureParams} params Figure options
+ * @returns {Figure}
  */
 function Figure(inst, controls, params) {
 	EditorInjector.call(this, inst.editor);
@@ -261,13 +279,13 @@ Figure.prototype = {
 	/**
 	 * @description Open the figure's controller
 	 * @param {Element} target Target element
-	 * @param {object} params params
+	 * @param {Object} params params
 	 * @param {boolean} [params.nonResizing=false] Do not display the resizing button
 	 * @param {boolean} [params.nonSizeInfo=false] Do not display the size information
 	 * @param {boolean} [params.nonBorder=false] Do not display the selected style line
 	 * @param {boolean} [params.figureTarget=false] If true, the target is a figure element
-	 * @param {object} [params.__fileManagerInfo=false] If true, the file manager is called
-	 * @returns {?object} targetInfo
+	 * @param {boolean} [params.__fileManagerInfo=false] If true, the file manager is called
+	 * @returns {FigureTargetInfo|undefined} figure target info
 	 */
 	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
 		if (!target) {
@@ -430,9 +448,9 @@ Figure.prototype = {
 	/**
 	 * @description Open the figure's controller
 	 * @param {Element} target Target element
-	 * @param {object} [params={}] params
-	 * @param {object=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
-	 * @param {function=} params.initMethod Method to be called when the controller is closed.
+	 * @param {Object} [params={}] params
+	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
+	 * @param {() => void=} params.initMethod Method to be called when the controller is closed.
 	 * @param {boolean=} params.disabled If true, the controller is disabled.
 	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
 	 */

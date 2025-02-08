@@ -4,6 +4,10 @@ import { domUtils, numbers, env } from '../../helper';
 const { NO_EVENT, _w } = env;
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @typedef {import('../../core/base/events').ProcessInfo} ProcessInfo
  */
 
@@ -11,21 +15,21 @@ const { NO_EVENT, _w } = env;
  * @class
  * @description Embed modal plugin.
  * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {boolean=} [pluginOptions.canResize=true] - Whether the embed element can be resized.
  * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
  * @param {string=} pluginOptions.defaultWidth - The default width of the embed element (numeric value or with unit).
  * @param {string=} pluginOptions.defaultHeight - The default height of the embed element (numeric value or with unit).
  * @param {boolean=} [pluginOptions.percentageOnlySize=false] - Whether to allow only percentage-based sizing.
  * @param {string=} pluginOptions.uploadUrl - The URL for file uploads.
- * @param {object=} pluginOptions.uploadHeaders - Headers to include in file upload requests.
+ * @param {Object.<string, string|number>=} pluginOptions.uploadHeaders - Headers to include in file upload requests.
  * @param {number=} pluginOptions.uploadSizeLimit - The total file upload size limit in bytes.
  * @param {number=} pluginOptions.uploadSingleSizeLimit - The single file upload size limit in bytes.
- * @param {object=} pluginOptions.iframeTagAttributes - Additional attributes to set on the iframe tag.
+ * @param {Object.<string, string|number>=} pluginOptions.iframeTagAttributes - Additional attributes to set on the iframe tag.
  * @param {string=} pluginOptions.query_youtube - YouTube query parameter (optional).
  * @param {string=} pluginOptions.query_vimeo - Vimeo query parameter (optional).
- * @param {object=} pluginOptions.embedQuery - Custom query objects for additional embedding services.
+ * @param {Object.<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} pluginOptions.embedQuery - Custom query objects for additional embedding services.
  * Example :
  * {
  *   facebook: {
@@ -45,6 +49,7 @@ const { NO_EVENT, _w } = env;
  *   // Additional services...
  * }
  * @param {Array.<string>} pluginOptions.controls - Figure control configurations.
+ * @returns {Embed}
  */
 function Embed(editor, pluginOptions) {
 	// plugin bisic properties
@@ -249,7 +254,7 @@ Embed.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {object} The format retention object containing the query and method to process the element.
+	 * @returns {Object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -402,7 +407,7 @@ Embed.prototype = {
 	/**
 	 * @description Finds and processes the URL for embedding by matching it against known service patterns.
 	 * @param {string} url - The original URL.
-	 * @returns {object|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
+	 * @returns {{origin: string, url: string, tag: string}|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
 	 * or null if no matching pattern is found.
 	 */
 	findProcessUrl(url) {

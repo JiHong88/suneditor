@@ -7,9 +7,14 @@ import { _w, isEdge } from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 /**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description character count, character limit, etc. management class
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {Char}
  */
 function Char(editor) {
 	CoreInjector.call(this, editor);
@@ -36,7 +41,7 @@ Char.prototype = {
 	/**
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
 	 * - If [content] is undefined, get the current editor's number of characters or binary data size.
-	 * @param {string|undefined} content Content to count. (defalut: this.editor.frameContext.get('wysiwyg'))
+	 * @param {string=} content Content to count. (defalut: this.editor.frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
 	getLength(content) {

@@ -37,11 +37,15 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
  */
 
 /**
+ * @typedef {import('./section/context').FrameOptions} FrameOptions
+ */
+
+/**
  * @class
  * @description SunEditor constructor function.
  * @param {Array.<Element>} multiTargets Target element
  * @param {EditorInitOptions} options options
- * @returns {object} The root editor instance
+ * @returns {Editor}
  */
 function Editor(multiTargets, options) {
 	const _d = multiTargets[0].target.ownerDocument || env._d;
@@ -76,19 +80,19 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Editor options
-	 * @type {object.<string, *>}
+	 * @type {Object.<string, *>}
 	 */
 	this.options = product.options;
 
 	/**
 	 * @description Plugins
-	 * @type {object.<string, *>}
+	 * @type {Object.<string, *>}
 	 */
 	this.plugins = product.plugins || {};
 
 	/**
 	 * @description Events object, call by triggerEvent function
-	 * @type {object.<string, *>}
+	 * @type {Object.<string, *>}
 	 */
 	this.events = null;
 
@@ -100,13 +104,13 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Default icons object
-	 * @type {object.<string, string>}
+	 * @type {Object.<string, string>}
 	 */
 	this.icons = product.icons;
 
 	/**
 	 * @description loaded language
-	 * @type {object.<string, *>}
+	 * @type {Object.<string, *>}
 	 */
 	this.lang = product.lang;
 
@@ -308,9 +312,9 @@ Editor.prototype = {
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * - If the plugin is added call callBack function.
 	 * @param {string} pluginName The name of the plugin to call
-	 * @param {Array.<Element>|null} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
-	 * @param {object|null} pluginOptions Plugin's options
-	 * @param {object} shortcuts this.options.get('shortcuts')
+	 * @param {?Array.<Element>} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
+	 * @param {?Object.<string, *>} pluginOptions Plugin's options
+	 * @param {?Array.<string>} shortcuts this.options.get('shortcuts')[key]
 	 */
 	registerPlugin(pluginName, targets, pluginOptions, shortcuts) {
 		let plugin = this.plugins[pluginName];
@@ -336,7 +340,7 @@ Editor.prototype = {
 	 * @description Run plugin calls and basic commands.
 	 * @param {string} command Command string
 	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
-	 * @param {Element|null} button The element of command button
+	 * @param {?Element} button The element of command button
 	 */
 	run(command, type, button) {
 		if (type) {
@@ -492,7 +496,7 @@ Editor.prototype = {
 	 * @description It is executed by inserting the button of commandTargets as the argument value of the "f" function.
 	 * - "func" is called as long as the button array's length.
 	 * @param {string} cmd data-command
-	 * @param {function(...*): *} func Function.
+	 * @param {(...args: *) => *} func Function.
 	 */
 	applyCommandTargets(cmd, func) {
 		if (this.commandTargets.has(cmd)) {
@@ -502,7 +506,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Execute a function by traversing all root targets.
-	 * @param {function(...*): *} f Function
+	 * @param {(...args: *) => *} f Function
 	 */
 	applyFrameRoots(f) {
 		this.frameRoots.forEach(f);
@@ -511,7 +515,7 @@ Editor.prototype = {
 	/**
 	 * @description Checks if the content of the editor is empty.
 	 * - Display criteria for "placeholder".
-	 * @param {frameContext|null} fc Frame context, if not present, currently selected frame context.
+	 * @param {?frameContext=} fc Frame context, if not present, currently selected frame context.
 	 * @returns {boolean}
 	 */
 	isEmpty(fc) {
@@ -800,7 +804,7 @@ Editor.prototype = {
 	/**
 	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
 	 * - If "focusEdge" is null, then selected last element
-	 * @param {Element|null} focusEl Focus element
+	 * @param {?Element=} focusEl Focus element
 	 */
 	focusEdge(focusEl) {
 		this._preventBlur = false;
@@ -950,7 +954,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Initializ wysiwyg area (Only called from core._init)
-	 * @param {Map} e frameContext
+	 * @param {FrameContext} e frameContext
 	 * @param {string} value initial html string
 	 */
 	_initWysiwygArea(e, value) {
@@ -1259,7 +1263,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Save the current buttons
-	 * @param {Map} cmdButtons Command button map
+	 * @param {Map<string, Element>} cmdButtons Command button map
 	 * @param {Element} tray Button tray
 	 */
 	__saveCommandButtons(cmdButtons, tray) {
@@ -1318,8 +1322,8 @@ Editor.prototype = {
 	 * @private
 	 * @description Configures the document properties of an iframe editor.
 	 * @param {HTMLIFrameElement} frame - The editor iframe.
-	 * @param {object} originOptions - The original options.
-	 * @param {object} targetOptions - The new options.
+	 * @param {Map<string, *>} originOptions - The original options.
+	 * @param {FrameOptions} targetOptions - The new options.
 	 */
 	__setIframeDocument(frame, originOptions, targetOptions) {
 		frame.setAttribute('scrolling', 'auto');

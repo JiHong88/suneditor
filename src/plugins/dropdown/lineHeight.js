@@ -2,11 +2,16 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Line height Plugin
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {Array.<{text: string, value: number}>} pluginOptions.items - Line height list
+ * @returns {LineHeight}
  */
 function LineHeight(editor, pluginOptions) {
 	// plugin bisic properties

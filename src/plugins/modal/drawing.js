@@ -6,10 +6,14 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { _w, isMobile } = env;
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Drawing modal plugin.
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {string=} [pluginOptions.outputFormat="dataurl"] - The output format of the drawing. Options: "dataurl", "svg".
  * @param {boolean=} [pluginOptions.useFormatType=false] - Whether to enable format type selection (block vs inline).
  * @param {string=} [pluginOptions.defaultFormatType="block"] - The default format type, either "block" or "inline".
@@ -18,7 +22,7 @@ const { _w, isMobile } = env;
  * @param {boolean=} [pluginOptions.lineReconnect=false] - Whether to reconnect lines when drawing.
  * @param {string=} [pluginOptions.lineCap="round"] - The style of the line cap ("butt", "round", or "square").
  * @param {string=} [pluginOptions.lineColor=""] - The color of the drawing line.
- * @param {object=} [pluginOptions.formSize] - The size configuration for the drawing modal form.
+ * @param {Object=} [pluginOptions.formSize] - The size configuration for the drawing modal form.
  * @param {string=} [pluginOptions.formSize.width="750px"] - The width of the modal form.
  * @param {string=} [pluginOptions.formSize.height="50vh"] - The height of the modal form.
  * @param {string=} [pluginOptions.formSize.maxWidth=""] - The maximum width of the modal form.
@@ -27,6 +31,7 @@ const { _w, isMobile } = env;
  * @param {string=} [pluginOptions.formSize.minHeight="100px"] - The minimum height of the modal form.
  * @param {boolean=} [pluginOptions.canResize=true] - Whether the modal form can be resized.
  * @param {boolean=} [pluginOptions.maintainRatio=true] - Whether to maintain the aspect ratio when resizing.
+ * @returns {Drawing}
  */
 function Drawing(editor, pluginOptions) {
 	// plugin basic properties
@@ -341,7 +346,7 @@ Drawing.prototype = {
 	 * @private
 	 * @description Retrieves touch coordinates relative to the canvas.
 	 * @param {TouchEvent} e - The touch event.
-	 * @returns {object} An object containing the x and y coordinates.
+	 * @returns {{x: number, y: number}} An object containing the x and y coordinates.
 	 */
 	_getCanvasTouchPointer(e) {
 		const { touches } = e;

@@ -4,13 +4,18 @@ import { domUtils } from '../../helper';
 const DEFAULT_TYPE = 'decimal';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
  */
 
 /**
  * @class
  * @description List numbered plugin, Several types of lists are provided.
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {List_numbered}
  */
 function List_numbered(editor) {
 	// plugin bisic properties
@@ -95,13 +100,13 @@ List_numbered.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {object} params - Information of the "shortcut" plugin
+	 * @param {Object} params - Information of the "shortcut" plugin
 	 * @param {Range} params.range - Range object
 	 * @param {Element} params.line - The line element of the current range
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
 	 * @param {Event} params.event - Key event object
 	 * @param {number} params.keyCode - Key code
-	 * @param {object} params.editor - The root editor instance
+	 * @param {Object} params.editor - The root editor instance
 	 */
 	shortcut({ range, info }) {
 		const { startContainer } = range;

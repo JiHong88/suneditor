@@ -16,53 +16,58 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHa
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
 /**
- * @typedef {import('../section/constructor').EditorFrameOptions} EditorFrameOptions
+ * @typedef {import('../section/context').FrameOptions} FrameOptions
  */
 
 /**
  * @typedef {import('../section/context').FrameContext} FrameContext
  */
 
+/**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
 // wysiwyg event
 /**
- * @typedef {object} PluginMouseEventInfo
- * @property {object} frameContext Frame context
- * @property {object} event Event object
+ * @typedef {Object} PluginMouseEventInfo
+ * @property {FrameContext} frameContext Frame context
+ * @property {Event} event Event object
  */
 
 /**
- * @typedef {object} PluginInputEventInfo
- * @property {object} frameContext Frame context
- * @property {object} event Event object
+ * @typedef {Object} PluginInputEventInfo
+ * @property {FrameContext} frameContext Frame context
+ * @property {Event} event Event object
  * @property {string} data Input data
  */
 
 /**
- * @typedef {object} PluginKeyEventInfo
- * @property {object} frameContext Frame context
- * @property {object} event Event object
+ * @typedef {Object} PluginKeyEventInfo
+ * @property {FrameContext} frameContext Frame context
+ * @property {Event} event Event object
  * @property {Range} range range object
  * @property {Element} line Current line element
  */
 
 // toolbar event
 /**
- * @typedef {object} PluginToolbarInputKeyEventInfo
+ * @typedef {Object} PluginToolbarInputKeyEventInfo
  * @property {Element} target Input element
- * @property {object} event Event object
+ * @property {Event} event Event object
  */
 
 /**
- * @typedef {object} PluginToolbarInputChangeEventInfo
+ * @typedef {Object} PluginToolbarInputChangeEventInfo
  * @property {Element} target Input element
- * @property {object} event Event object
+ * @property {Event} event Event object
  * @property {string} value Input value
  */
 
 /**
  * @class
  * @description Event manager, editor's all event management class
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {EventManager}
  */
 function EventManager(editor) {
 	CoreInjector.call(this, editor);
@@ -103,9 +108,9 @@ EventManager.prototype = {
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
 	 * @param {Element|Array.<Element>} target Target element
 	 * @param {string} type Event type
-	 * @param {function(...*): *} listener Event handler
+	 * @param {(...args: *) => *} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
-	 * @return {boolean}
+	 * @return {{target: Element|Array.<Element>, type: string, listener: (...args: *) => *, handler: (...args: *) => *, useCapture: boolean}} Registered event information
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return false;
@@ -134,8 +139,8 @@ EventManager.prototype = {
 
 	/**
 	 * @description Remove event
-	 * @param {object} params { target, type, listener, useCapture } = this.addEvent()
-	 * @returns {null}
+	 * @param {{target: Element|Array.<Element>, type: string, listener: (...args: *) => *, useCapture: boolean}} params event info = this.addEvent()
+	 * @returns {undefined|false|null} Failed: false, Success: null, Not found: undefined
 	 */
 	removeEvent(params) {
 		if (!params) return;
@@ -160,9 +165,9 @@ EventManager.prototype = {
 	 * @description Add an event to document.
 	 * - When created as an Iframe, the same event is added to the document in the Iframe.
 	 * @param {string} type Event type
-	 * @param {function(...*): *} listener Event listener
+	 * @param {(...args: *) => *} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
-	 * @return {type, listener, useCapture}
+	 * @return {type: string, listener: (...args: *) => *, useCapture: boolean} Registered event information
 	 */
 	addGlobalEvent(type, listener, useCapture) {
 		if (this.editor.frameOptions.get('iframe')) {
@@ -179,8 +184,8 @@ EventManager.prototype = {
 	/**
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
-	 * @param {string|object} type Event type
-	 * @param {function(...*): *} listener Event listener
+	 * @param {string|{type: string, listener: (...args: *) => *, useCapture: boolean|undefined}} type Event type or (Event info = this.addGlobalEvent())
+	 * @param {(...args: *) => *} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
 	 */
 	removeGlobalEvent(type, listener, useCapture) {
@@ -636,7 +641,7 @@ EventManager.prototype = {
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
 	 * @param {DataTransfer} clipboardData The clipboard data object
-	 * @param {object} frameContext The frame context
+	 * @param {FrameContext} frameContext The frame context
 	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
 	 */
 	async _dataTransferAction(type, e, clipboardData, frameContext) {
@@ -660,7 +665,7 @@ EventManager.prototype = {
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
 	 * @param {DataTransfer} clipboardData The clipboard data object
-	 * @param {object} frameContext The frame context
+	 * @param {FrameContext} frameContext The frame context
 	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
 	 */
 	async _setClipboardData(type, e, clipboardData, frameContext) {
@@ -916,7 +921,7 @@ EventManager.prototype = {
 	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
 	 * - If resizing is not enabled, applies a non-resizable class.
 	 * @param {FrameContext} fc The frame context object
-	 * @param {EditorFrameOptions} fo The frame options object
+	 * @param {FrameOptions} fo The frame options object
 	 */
 	__addStatusbarEvent(fc, fo) {
 		if (/\d+/.test(fo.get('height')) && fo.get('statusbar_resizeEnable')) {

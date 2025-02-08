@@ -18,25 +18,25 @@ export const editorInjector = EditorInjector;
 
 /**
  * Available editor plugins
- * @type {object}
+ * @type {Object.<string, *>}
  */
 export const plugins = Plugins;
 
 /**
  * Editor modules
- * @type {{[key: string]: (element: Element) => object}}
+ * @type {{[key: string]: (element: Element) => *}}
  */
 export const modules = Modules;
 
 /**
  * Language packs for the editor
- * @type {object}
+ * @type {Object.<string, string>}
  */
 export const langs = Langs;
 
 /**
  * Helper functions for the editor
- * @type {object.<string, function(...*): *>}
+ * @type {Object.<string, (...args: *) => *>}
  */
 export const helper = Helper;
 
@@ -57,7 +57,7 @@ export default {
 	 * Returns the create function with preset options.
 	 * If the options overlap, the options of the 'create' function take precedence.
 	 * @param {EditorInitOptions} init_options - Initialization options
-	 * @returns {{create: function(Element|object<string, {target: Element, options: EditorFrameOptions}>, EditorInitOptions): object}}
+	 * @returns {{create: function(Element|Object.<string, {target: Element, options: EditorFrameOptions}>, EditorInitOptions): {create: (Element|Object.<string, {target: Element, options: EditorFrameOptions}>, EditorInitOptions) => Editor}}}
 	 */
 	init(init_options) {
 		return {
@@ -67,7 +67,7 @@ export default {
 
 	/**
 	 * Creates a new instance of the SunEditor
-	 * @param {Element|object<string, {target: Element, options: EditorFrameOptions}>} target - Target element or multi-root object
+	 * @param {Element|Object.<string, {target: Element, options: EditorFrameOptions}>} target - Target element or multi-root object
 	 * @param {EditorInitOptions} options - Initialization options
 	 * @param {EditorInitOptions} [_init_options] - Optional preset initialization options
 	 * @returns {Editor} - Instance of the SunEditor

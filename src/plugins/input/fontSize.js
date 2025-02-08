@@ -86,6 +86,10 @@ const DEFAULT_UNIT_MAP = {
 };
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @typedef {import('../../core/base/eventManager').PluginToolbarInputKeyEventInfo} PluginToolbarInputKeyEventInfo
  */
 
@@ -99,15 +103,16 @@ const DEFAULT_UNIT_MAP = {
  * - This plugin enables users to modify the font size of selected text within the editor.
  * - It supports various measurement units (e.g., 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%') and
  * - provides multiple interfaces: dropdown menus, direct input, and optional increment/decrement buttons.
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions - Configuration options for the FontSize plugin.
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions - Configuration options for the FontSize plugin.
  * @param {string=} [pluginOptions.sizeUnit='px'] - The unit for the font size.
  * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
  * - If 'text' is used, a text-based font size list is applied.
  * @param {boolean=} [pluginOptions.showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
  * @param {boolean=} [pluginOptions.showIncDecControls=false] - When true, displays increase and decrease buttons for font size adjustments.
  * @param {boolean=} [pluginOptions.disableInput=true] - When true, disables the direct font size input box.
- * @param {object=} [pluginOptions.unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
+ * @param {Object.<string, {default: number, inc: number, min: number, max: number, list: Array.<number>}} [pluginOptions.unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
+ * @returns {FontSize}
  */
 function FontSize(editor, pluginOptions) {
 	EditorInjector.call(this, editor);

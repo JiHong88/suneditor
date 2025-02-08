@@ -65,7 +65,7 @@ function CreateSliderCtx() {
  */
 
 /**
- * @typedef {object} HueSliderColor
+ * @typedef {Object} HueSliderColor
  * @property {string} hex - HEX color
  * @property {number} r - Red color value
  * @property {number} g - Green color value
@@ -76,7 +76,7 @@ function CreateSliderCtx() {
  */
 
 /**
- * @typedef {object} HueSliderParams
+ * @typedef {Object} HueSliderParams
  * @property {Element} form The form element to attach the hue slider.
  * @property {boolean} isNewForm Whether to create a new form element.
  * @property {ControllerParams} controllerParams Controller options
@@ -86,7 +86,7 @@ function CreateSliderCtx() {
  * @description Create a Hue slider. (only create one at a time)
  * - When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
- * @param {object} inst The instance object that called the constructor.
+ * @param {*} inst The instance object that called the constructor.
  * @param {HueSliderParams=} [params={}] Hue slider options
  * @param {string} className The class name of the hue slider.
  */
@@ -134,7 +134,7 @@ function HueSlider(inst, params, className) {
 HueSlider.prototype = {
 	/**
 	 * @description Get the current color information.
-	 * @returns {object} {hex: string, r: number, g: number, b: number, h: number, s: number, l: number}
+	 * @returns {HueSliderColor} color information
 	 */
 	get() {
 		return finalColor;

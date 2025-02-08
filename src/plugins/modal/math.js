@@ -5,13 +5,17 @@ import { domUtils, env, converter } from '../../helper';
 const { _w } = env;
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Math plugin.
  * - This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
  * - If external library is provided, a warning is issued.
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
- * @param {object=} [pluginOptions.formSize] - An object specifying the dimensions for the math modal.
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
+ * @param {Object=} [pluginOptions.formSize] - An object specifying the dimensions for the math modal.
  * @param {string=} [pluginOptions.formSize.width="460px"] - The default width of the math modal.
  * @param {string=} [pluginOptions.formSize.height="14em"] - The default height of the math modal.
  * @param {string=} [pluginOptions.formSize.maxWidth] - The maximum width of the math modal.
@@ -22,6 +26,7 @@ const { _w } = env;
  * @param {boolean=} [pluginOptions.autoHeight=false] - Whether to automatically adjust the height of the modal.
  * @param {Array.<object>=} [pluginOptions.fontSizeList] - A list of font size options for rendering math expressions.
  * @param {function=} [pluginOptions.onPaste] - A callback function to handle paste events in the math input area.
+ * @returns {Math_}
  */
 function Math_(editor, pluginOptions) {
 	// external library
@@ -138,7 +143,7 @@ Math_.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {object} The format retention object containing the query and method to process the element.
+	 * @returns {Object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.

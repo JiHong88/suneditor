@@ -8,8 +8,12 @@ import { domUtils, numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
 /**
- * @typedef {object} RectsInfo
- * @property {object} rects - Bounding rectangle information of the selection range.
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
+ * @typedef {Object} RectsInfo
+ * @property {Object} rects - Bounding rectangle information of the selection range.
  * @property {number} rects.left - The left position of the selection.
  * @property {number} rects.right - The right position of the selection.
  * @property {number} rects.top - The top position of the selection.
@@ -18,13 +22,13 @@ import { _w, _d } from '../../helper/env';
  */
 
 /**
- * @typedef {object} OffsetInfo
+ * @typedef {Object} OffsetInfo
  * @property {number} top - The vertical position of the node relative to the entire document, including iframe offsets.
  * @property {number} left - The horizontal position of the node relative to the entire document, including iframe offsets.
  */
 
 /**
- * @typedef {object} OffsetLocalInfo
+ * @typedef {Object} OffsetLocalInfo
  * @property {number} top - The vertical position of the node relative to the WYSIWYG editor.
  * @property {number} left - The horizontal position of the node relative to the WYSIWYG editor.
  * @property {number} scrollX - The horizontal scroll offset inside the WYSIWYG editor.
@@ -32,7 +36,7 @@ import { _w, _d } from '../../helper/env';
  */
 
 /**
- * @typedef {object} OffsetGlobalInfo
+ * @typedef {Object} OffsetGlobalInfo
  * @property {number} top - The vertical position of the element relative to the entire document.
  * @property {number} left - The horizontal position of the element relative to the entire document.
  * @property {number} width - The total width of the element, including its content, padding, and border.
@@ -42,7 +46,7 @@ import { _w, _d } from '../../helper/env';
  */
 
 /**
- * @typedef {object} OffsetGlobalScrollInfo
+ * @typedef {Object} OffsetGlobalScrollInfo
  * @property {number} top - The vertical scroll offset, representing the distance from the top of the document to the current scroll position (in pixels).
  * @property {number} left - The horizontal scroll offset, representing the distance from the left side of the document to the current scroll position (in pixels).
  * @property {number} width - The total scrollable width of the document, including content outside the viewport.
@@ -54,7 +58,7 @@ import { _w, _d } from '../../helper/env';
  */
 
 /**
- * @typedef {object} OffsetWWScrollInfo
+ * @typedef {Object} OffsetWWScrollInfo
  * @property {number} top - The vertical scroll offset inside the WYSIWYG editor.
  * @property {number} left - The horizontal scroll offset inside the WYSIWYG editor.
  * @property {number} width - The total width of the WYSIWYG editor's scrollable area.
@@ -66,7 +70,8 @@ import { _w, _d } from '../../helper/env';
 /**
  * @class
  * @description Offset class, get the position of the element
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {Offset}
  */
 function Offset(editor) {
 	CoreInjector.call(this, editor);
@@ -417,10 +422,10 @@ Offset.prototype = {
 	 * @description Sets the absolute position of an element
 	 * @param {Element} element Element to position
 	 * @param {Element} target Target element
-	 * @param {object} params Position parameters
+	 * @param {Object} params Position parameters
 	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
-	 * @param {object} params.inst Instance object of caller
+	 * @param {Object} params.inst Instance object of caller
 	 * @returns {boolean} Success / Failure
 	 */
 	setAbsPosition(element, target, params) {
@@ -565,7 +570,7 @@ Offset.prototype = {
 	 * @description Sets the position of an element relative to a range
 	 * @param {Element} element Element to position
 	 * @param {Range} range Range to position against
-	 * @param {object} [options={}] Position options
+	 * @param {Object} [options={}] Position options
 	 * @param {"bottom"|"top"} [options.position="bottom"] Position ('bottom'|'top')
 	 * @param {number} [options.addTop=0] Additional top offset
 	 * @returns {boolean} Success / Failure
@@ -692,10 +697,10 @@ Offset.prototype = {
 	 * @param {number} tmtw Top margin to window
 	 * @param {number} tmbw Bottom margin to window
 	 * @param {number} toolbarH Toolbar height
-	 * @param {object} clientSize Client size object
-	 * @param {object} targetRect Target rect object
+	 * @param {{w: number, h: number}} clientSize documentElement.clientWidth, documentElement.clientHeight
+	 * @param {RectsInfo} targetRect Target rect object
 	 * @param {boolean} isTargetAbs Is target absolute position
-	 * @param {object} wwScroll WYSIWYG scroll info
+	 * @param {OffsetWWScrollInfo} wwScroll WYSIWYG scroll info
 	 * @returns {{rmt:number, rmb:number, rt:number}} Margin values (rmt: top margin, rmb: bottom margin, rt: Toolbar height offset adjustment)
 	 */
 	_getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll) {
@@ -780,17 +785,12 @@ Offset.prototype = {
 	 * @private
 	 * @description Retrieves the current window scroll position and viewport size.
 	 * - Returns an object containing the scroll offsets, viewport dimensions, and boundary rects.
-	 * @returns {object} An object with scroll and viewport information.
+	 * @returns {Object} An object with scroll and viewport information.
 	 * @returns {number} return.top - The vertical scroll position of the window.
 	 * @returns {number} return.left - The horizontal scroll position of the window.
 	 * @returns {number} return.width - The width of the viewport.
 	 * @returns {number} return.height - The height of the viewport.
-	 * @returns {object} return.rects - An object containing the boundary rects.
-	 * @returns {number} return.rects.left - The left boundary of the viewport.
-	 * @returns {number} return.rects.top - The top boundary of the viewport.
-	 * @returns {number} return.rects.right - The right boundary of the viewport.
-	 * @returns {number} return.rects.bottom - The bottom boundary of the viewport.
-	 * @returns {boolean} return.rects.noText - Indicates whether there is text in the viewport.
+	 * @returns {RectsInfo} return.rects - An object containing the boundary rects.
 	 */
 	_getWindowScroll() {
 		const viewPort = domUtils.getClientSize(_d);

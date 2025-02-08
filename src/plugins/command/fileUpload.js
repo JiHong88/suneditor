@@ -6,17 +6,26 @@ import { FileManager, Figure, Controller } from '../../modules';
 const { NO_EVENT } = env;
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
+ * @typedef {import('../../core/editor').FrameContext} FrameContext
+ */
+
+/**
  * @class
  * @description File upload plugin
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions - plugin options
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions - plugin options
  * @param {string} pluginOptions.uploadUrl - server request url
- * @param {Object=} pluginOptions.uploadHeaders - server request headers
+ * @param {Object.<string, string|number>=} pluginOptions.uploadHeaders - server request headers
  * @param {string=} pluginOptions.uploadSizeLimit - upload size limit
  * @param {string=} pluginOptions.uploadSingleSizeLimit - upload single size limit
  * @param {boolean=} pluginOptions.allowMultiple - allow multiple files
  * @param {string=} pluginOptions.acceptedFormats - accepted formats
  * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
+ * @returns {FileUpload}
  */
 function FileUpload(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
@@ -125,9 +134,9 @@ FileUpload.prototype = {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
-	 * @param {object} params { frameContext, event, file }
-	 * @param {object} params.frameContext Frame context
-	 * @param {object} params.event Event object
+	 * @param {Object} params { frameContext, event, file }
+	 * @param {FrameContext} params.frameContext Frame context
+	 * @param {Event} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
@@ -367,7 +376,7 @@ FileUpload.prototype = {
 	 * @private
 	 * @description Processes the server response after file upload.
 	 * - Registers the uploaded files in the editor.
-	 * @param {object} response - The response object from the server.
+	 * @param {Object.<string, *>} response - The response object from the server.
 	 */
 	_register(response) {
 		response.result.forEach((file, i, a) => {
@@ -386,7 +395,7 @@ FileUpload.prototype = {
 	 * @private
 	 * @description Handles file upload errors.
 	 * - Displays an error message if the upload fails.
-	 * @param {object} response - The error response from the server.
+	 * @param {Object.<string, *>} response - The error response from the server.
 	 * @returns {Promise<void>}
 	 */
 	async _error(response) {

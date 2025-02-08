@@ -2,7 +2,11 @@ import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';
 
 /**
- * @typedef {object} FileStateInfo
+ * @typedef {import('../core/editor.js').default} EditorInstance
+ */
+
+/**
+ * @typedef {Object} FileStateInfo
  * @property {string} src File source
  * @property {number} index File index
  * @property {string} name File name
@@ -10,8 +14,8 @@ import ApiManager from './ApiManager';
  */
 
 /**
- * @typedef {object} FileStateParams
- * @property {object} editor - The root editor instance
+ * @typedef {Object} FileStateParams
+ * @property {EditorInstance} editor - The root editor instance
  * @property {Element} element File element
  * @property {number} index File index
  * @property {"create"|"update"|"delete"} state File state
@@ -20,11 +24,10 @@ import ApiManager from './ApiManager';
  */
 
 /**
- * @typedef {object} FileManagerParams
+ * @typedef {Object} FileManagerParams
  * @property {string} query The query selector used to find file elements in the editor
  * @property {(params: Array.<FileStateInfo>) => void=} loadHandler A function to handle the loaded file information
  * @property {(info: FileStateParams) => void=} eventHandler A function to handle file-related events
- * @property {?object=} figure An optional Figure instance related to the file
  */
 
 /**
@@ -32,6 +35,7 @@ import ApiManager from './ApiManager';
  * @description This module manages the file information of the editor.
  * @param {*} inst The instance object that called the constructor.
  * @param {FileManagerParams} params FileManager options
+ * @returns {FileManager}
  */
 function FileManager(inst, params) {
 	CoreInjector.call(this, inst.editor);
@@ -57,10 +61,10 @@ FileManager.prototype = {
 	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
-	 * @param {object|null} uploadHeader Request header
+	 * @param {?Object.<string, string|number>} uploadHeader Request header
 	 * @param {Files|{formData: FormData, size: number}} data FormData in body or Files array
-	 * @param {?(xmlHttp: XMLHttpRequest) => boolean} callBack Success call back function
-	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string} errorCallBack Error call back function
+	 * @param {?(xmlHttp: XMLHttpRequest) => boolean=} callBack Success call back function
+	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack Error call back function
 	 */
 	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
 		this.ui.showLoading();
@@ -84,7 +88,7 @@ FileManager.prototype = {
 	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
-	 * @param {object|null} uploadHeader Request header
+	 * @param {?Object.<string, string|number>} uploadHeader Request header
 	 * @param {Files|{formData: FormData, size: number}} data FormData in body or Files array
 	 * @returns {Promise<ApiResponse | XMLHttpRequest>}
 	 */
@@ -110,7 +114,7 @@ FileManager.prototype = {
 	/**
 	 * @description Set the file information to the element.
 	 * @param {Element} element File information element
-	 * @param {object} params
+	 * @param {Object} params
 	 * @param {string} params.name File name
 	 * @param {number} params.size File size
 	 * @returns
@@ -125,7 +129,7 @@ FileManager.prototype = {
 	 * @description Create info object of file and add it to "infoList"
 	 * @private
 	 * @param {Element} element
-	 * @param {object|null} file
+	 * @param {{name: string, size: number}|null} file File information
 	 */
 	_setInfo(element, file) {
 		let dataIndex = GetAttr(element, 'index');

@@ -3,7 +3,11 @@
  */
 
 /**
- * @typedef {object} ShortcutInfo
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
+ * @typedef {Object} ShortcutInfo
  * @property {boolean} c - Whether the [Ctrl, Command] key is pressed.
  * @property {boolean} s - Whether the [Shift] key is pressed.
  * @property {boolean} space - Whether the [Space] key is pressed.
@@ -21,7 +25,8 @@
 /**
  * @class
  * @description Shortcuts class
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {Shortcuts}
  */
 function Shortcuts(editor) {
 	this.editor = editor;

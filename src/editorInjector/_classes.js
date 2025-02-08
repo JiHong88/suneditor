@@ -1,7 +1,11 @@
 /**
+ * @typedef {import('../core/editor').default} EditorInstance
+ */
+
+/**
  * @private
  * @description Add all inner classes to the editor instance.
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
  */
 function ClassInjector(editor) {
 	this.char = editor.char;

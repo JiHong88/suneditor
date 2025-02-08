@@ -6,9 +6,14 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter } from '../../helper';
 
 /**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Dropdown and container menu management class
- * @param {object} editor - The root editor instance
+ * @param {EditorInstance} editor - The root editor instance
+ * @returns {Menu}
  */
 function Menu(editor) {
 	CoreInjector.call(this, editor);

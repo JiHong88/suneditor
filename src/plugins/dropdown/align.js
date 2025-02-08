@@ -2,11 +2,16 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @class
  * @description Align plugin
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {Array.<"right"|"center"|"left"|"justify">} pluginOptions.items - Align items
+ * @returns {Align}
  */
 function Align(editor, pluginOptions) {
 	// plugin bisic properties

@@ -6,13 +6,13 @@ import { CreateTooltipInner } from '../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {object} ModalAnchorEditorParams
+ * @typedef {Object} ModalAnchorEditorParams
  * @property {boolean} params.textToDisplay - Create Text to display input.
  * @property {string} params.title - Modal title
  * @property {boolean} params.openNewWindow - Default checked value of the "Open in new window" checkbox.
  * @property {boolean} params.noAutoPrefix - If true, disables the automatic prefixing of the host URL to the value of the link.
  * @property {boolean} params.relList - The "rel" attribute list of anchor tag.
- * @property {object} params.defaultRel - Default "rel" attributes of anchor tag.
+ * @property {{default: string, check_new_window: string, check_bookmark: string}} params.defaultRel - Default "rel" attributes of anchor tag.
  * @example "REL" structure
 	{
 		default: 'nofollow', // Default rel
@@ -29,6 +29,7 @@ const { NO_EVENT } = env;
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} modalForm The modal form element
  * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
+ * @returns {ModalAnchorEditor}
  */
 function ModalAnchorEditor(inst, modalForm, params) {
 	// plugin bisic properties
@@ -360,7 +361,7 @@ ModalAnchorEditor.prototype = {
 	/**
 	 * @private
 	 * @description Registers a newly uploaded file and sets its URL in the modal form.
-	 * @param {object} response - The response object from the file upload request.
+	 * @param {Object.<string, *>} response - The response object from the file upload request.
 	 */
 	_register(response) {
 		const file = response.result[0];
@@ -373,7 +374,7 @@ ModalAnchorEditor.prototype = {
 	/**
 	 * @private
 	 * @description Handles file upload errors.
-	 * @param {object} response - The error response object.
+	 * @param {Object.<string, *>} response - The error response object.
 	 * @returns {Promise<void>}
 	 */
 	async _error(response) {

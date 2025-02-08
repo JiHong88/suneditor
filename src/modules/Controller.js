@@ -9,7 +9,7 @@ const INDEX_1 = 2147483646;
 const INDEX_2 = 2147483645;
 
 /**
- * @typedef {object} ControllerParams
+ * @typedef {Object} ControllerParams
  * @property {"top"|"bottom"} position Controller position
  * @property {boolean=} isWWTarget If the controller is in the WYSIWYG area, set it to true.
  * @property {() => void=} initMethod Method to be called when the controller is closed.
@@ -26,7 +26,8 @@ const INDEX_2 = 2147483645;
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} element Controller element
  * @param {ControllerParams} params Controller options
- * @param {string?} _name An optional name for the controller key.
+ * @param {?string=} _name An optional name for the controller key.
+ * @returns {Controller}
  */
 function Controller(inst, element, params, _name) {
 	EditorInjector.call(this, inst.editor);
@@ -68,8 +69,8 @@ Controller.prototype = {
 	 * @description Open a modal plugin
 	 * @param {Element} target Target element
 	 * @param {Element} positionTarget Position target element
-	 * @param {object} [params={}] params
-	 * @param {object=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
+	 * @param {Object} [params={}] params
+	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
 	 * @param {function=} params.initMethod Method to be called when the controller is closed.
 	 * @param {boolean=} params.disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled. (default: this.disabled)
 	 * @param {{left: number, top: number}=} params.addOffset Additional offset values

@@ -53,7 +53,7 @@ export function entityToHTML(content) {
 
 /**
  * @description Debounce function
- * @param {function(...*): void} func function
+ * @param {(...args: *) => void} func function
  * @param {number} wait delay ms
  * @returns
  */
@@ -135,8 +135,8 @@ export function nodeListToArray(nodeList) {
 
 /**
  * @description Returns a new object with keys and values swapped.
- * @param {object} obj object
- * @returns {object}
+ * @param {Object.<string, string|number>} obj object
+ * @returns {Object.<string, string|number>}
  */
 export function swapKeyValue(obj) {
 	const swappedObj = {};
@@ -252,7 +252,7 @@ export function textToAnchor(node) {
 /**
  * Converts styles within a <span> tag to corresponding HTML tags (e.g., <strong>, <em>, <u>, <s>).
  * Maintains the original <span> tag and wraps its content with the new tags.
- * @param {object} styleToTag An object mapping style properties to HTML tags. ex) {bold: { regex: /font-weight\s*:\s*bold/i, tag: 'strong' },}
+ * @param {{ regex: RegExp, tag: string }} styleToTag An object mapping style properties to HTML tags. ex) {bold: { regex: /font-weight\s*:\s*bold/i, tag: 'strong' },}
  * @param {Node} node Node
  */
 export function spanToStyleNode(styleToTag, node) {
@@ -314,7 +314,7 @@ export function addUrlQuery(url, query) {
 
 /**
  * @description Converts options-related styles and returns them for each frame.
- * @param {Map} fo frameOptions
+ * @param {Map<string, *>} fo editor.frameOptions
  * @param {string} cssText Style string
  * @returns {{top: string, frame: string, editor: string}}
  * @private

@@ -62,6 +62,10 @@ const DEFAULT_COLOR_LIST = [
 ];
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @typedef {import('../../core/base/eventManager').PluginMouseEventInfo} PluginMouseEventInfo
  */
 
@@ -72,12 +76,13 @@ const DEFAULT_COLOR_LIST = [
 /**
  * @class
  * @description Table Plugin
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {"x"|"y"|"xy"} [pluginOptions.scrollType='x'] - Scroll type ('x', 'y', 'xy')
  * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')
  * @param {"cell"|"table"} [pluginOptions.cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
  * @param {Array} [pluginOptions.colorList] - Color list, used in cell color picker
+ * @returns {Table}
  */
 function Table(editor, pluginOptions) {
 	// plugin bisic properties
@@ -335,7 +340,7 @@ Table.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {object} The format retention object containing the query and method to process the element.
+	 * @returns {Object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -1964,7 +1969,10 @@ Table.prototype = {
 	 * @private
 	 * @description Gets the border style.
 	 * @param {string} borderStyle The border style string.
-	 * @returns {object} The parsed border style object.
+	 * @returns {{w: string, s: string, c: string}} The parsed border style object.
+	 * - w: The border width.
+	 * - s: The border style.
+	 * - c: The border color.
 	 */
 	_getBorderStyle(borderStyle) {
 		const parts = borderStyle.split(/\s(?![^()]*\))/);
@@ -2380,7 +2388,7 @@ Table.prototype = {
 	 * @description Handles color selection from the color palette.
 	 * @param {Element} button The button triggering the color palette.
 	 * @param {string} type The type of color selection.
-	 * @param {object} color The selected color object.
+	 * @param {Element} color Color text input element.
 	 */
 	_onColorPalette(button, type, color) {
 		if (this.controller_colorPicker.isOpen && type === this.sliderType) {

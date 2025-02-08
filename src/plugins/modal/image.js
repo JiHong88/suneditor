@@ -5,15 +5,23 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
+ * @typedef {import('../../core/editor').default} EditorInstance
+ */
+
+/**
  * @typedef {import('../../core/base/events').ImageInfo} ImageInfo
+ */
+
+/**
+ * @typedef {import('../../core/editor').FrameContext} FrameContext
  */
 
 /**
  * @class
  * @description Image plugin.
  * - This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
- * @param {object} editor - The root editor instance
- * @param {object} pluginOptions
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {Object} pluginOptions
  * @param {boolean=} [pluginOptions.canResize=true] - Whether the image element can be resized.
  * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
  * @param {string=} [pluginOptions.defaultWidth="auto"] - The default width of the image. If a number is provided, "px" will be appended.
@@ -22,7 +30,7 @@ const { NO_EVENT } = env;
  * @param {boolean=} [pluginOptions.createFileInput=true] - Whether to create a file input element for image uploads.
  * @param {boolean=} [pluginOptions.createUrlInput=true] - Whether to create a URL input element for image insertion.
  * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for image file uploads.
- * @param {object=} [pluginOptions.uploadHeaders] - Additional headers to include in the file upload request.
+ * @param {Object.<string, string|number>=} [pluginOptions.uploadHeaders] - Additional headers to include in the file upload request.
  * @param {number=} [pluginOptions.uploadSizeLimit] - The total upload size limit in bytes.
  * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @param {boolean=} [pluginOptions.allowMultiple=false] - Whether multiple image uploads are allowed.
@@ -31,6 +39,7 @@ const { NO_EVENT } = env;
  * @param {string=} [pluginOptions.defaultFormatType="block"] - The default image format type ("block" or "inline").
  * @param {boolean=} [pluginOptions.keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @param {boolean=} [pluginOptions.linkEnableFileUpload] - Whether to enable file uploads for linked images.
+ * @returns {Image_}
  */
 function Image_(editor, pluginOptions) {
 	// plugin bisic properties
@@ -206,9 +215,9 @@ Image_.prototype = {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
-	 * @param {object} params { frameContext, event, file }
-	 * @param {object} params.frameContext Frame context
-	 * @param {object} params.event Event object
+	 * @param {Object} params { frameContext, event, file }
+	 * @param {FrameContext} params.frameContext Frame context
+	 * @param {Event} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
@@ -249,7 +258,7 @@ Image_.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {object} The format retention object containing the query and method to process the element.
+	 * @returns {Object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
 	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -408,7 +417,7 @@ Image_.prototype = {
 	/**
 	 * @private
 	 * @description Retrieves the current image information.
-	 * @returns {object} - The image data.
+	 * @returns {ImageInfo} - The image data.
 	 */
 	_getInfo() {
 		return {
@@ -811,7 +820,7 @@ Image_.prototype = {
 	 * @param {string} width - Image width.
 	 * @param {string} height - Image height.
 	 * @param {string} align - Image alignment.
-	 * @param {object} file - File metadata.
+	 * @param {{name: string, size: number}} file - File metadata.
 	 * @param {string} alt - Alternative text.
 	 */
 	_produce(src, anchor, width, height, align, file, alt) {
@@ -846,7 +855,7 @@ Image_.prototype = {
 	 * @param {string} width - The width value to be applied to the image.
 	 * @param {string} height - The height value to be applied to the image.
 	 * @param {string} align - The alignment setting for the image (e.g., 'left', 'center', 'right').
-	 * @param {object} file - File metadata associated with the image (e.g., name, size).
+	 * @param {{name: string, size: number}} file - File metadata associated with the image
 	 * @param {string} alt - The alternative text for the image.
 	 */
 	create(src, anchor, width, height, align, file, alt) {
@@ -888,7 +897,7 @@ Image_.prototype = {
 	 * @param {Element|null} anchor - An optional anchor element to wrap the image. If provided, a clone is used.
 	 * @param {string} width - The width value to be applied to the image.
 	 * @param {string} height - The height value to be applied to the image.
-	 * @param {object} file - File metadata associated with the image (e.g., name, size).
+	 * @param {{name: string, size: number}} file - File metadata associated with the image
 	 * @param {string} alt - The alternative text for the image.
 	 */
 	createInline(src, anchor, width, height, file, alt) {
@@ -930,7 +939,7 @@ Image_.prototype = {
 	 * @private
 	 * @description Registers the uploaded image and inserts it into the editor.
 	 * @param {ImageInfo} info - Image info.
-	 * @param {object} response - Server response data.
+	 * @param {Object.<string, *>} response - Server response data.
 	 */
 	_register(info, response) {
 		const fileList = response.result;
@@ -1060,7 +1069,7 @@ Image_.prototype = {
 	/**
 	 * @private
 	 * @description Handles errors during image upload and displays appropriate messages.
-	 * @param {object} response - The error response from the server.
+	 * @param {Object.<string, *>} response - The error response from the server.
 	 * @returns {Promise<void>}
 	 */
 	async _error(response) {

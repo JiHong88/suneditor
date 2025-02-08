@@ -13,10 +13,19 @@ const A4_HEIGHT_MM = 297;
 const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS);
 
 /**
+ * @typedef {import('../editor').default} EditorInstance
+ */
+
+/**
+ * @typedef {import('./context').FrameContext} FrameContext
+ */
+
+/**
  * @class
  * @description DocumentType, page, header management class
- * @param {object} editor - The root editor instance
- * @param {Map} fc - frame context object
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {FrameContext} fc - frame context object
+ * @returns {DocumentType}
  */
 function DocumentType(editor, fc) {
 	// members
