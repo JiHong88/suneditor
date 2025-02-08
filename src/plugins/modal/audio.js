@@ -467,7 +467,7 @@ Audio_.prototype = {
 	 * @description Uploads audio files to the server.
 	 * - Sends a request to the configured upload URL and processes the response.
 	 * @param {AudioInfo} info - Upload metadata, including `files` and `isUpdate`.
-	 * @param {Array<File>} files - The files to be uploaded.
+	 * @param {Array.<File>} files - The files to be uploaded.
 	 */
 	_serverUpload(info, files) {
 		if (!files) return;

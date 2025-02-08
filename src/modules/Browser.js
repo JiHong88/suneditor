@@ -13,7 +13,7 @@ import ApiManager from './ApiManager';
  * @property {string=} searchUrl - File server search url. Optional. Can be overridden in browser.
  * @property {Object.<string, string|number>=} searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
  * @property {string=} listClass - Class name of list div. Required. Can be overridden in browser.
- * @property {(item: BrowserItem) => string=} drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
+ * @property {(item: BrowserFile) => string=} drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
  * @property {number=} columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
  */
 
@@ -222,7 +222,7 @@ Browser.prototype = {
 	/**
 	 * @private
 	 * @description Updates the displayed list of file items.
-	 * @param {Array.<BrowserItem>} items - The file items to display.
+	 * @param {Array.<BrowserFile>} items - The file items to display.
 	 * @param {boolean} update - Whether to update the tags.
 	 */
 	_drawListItem(items, update) {

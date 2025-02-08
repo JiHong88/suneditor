@@ -232,6 +232,7 @@ HTML.prototype = {
 	 * Create RegExp object using helper.converter.createElementWhitelist method.
 	 * @param {string|RegExp|null} [options.blacklist=null] Regular expression of disallowed tags.
 	 * Create RegExp object using helper.converter.createElementBlacklist method.
+	 * @param {boolean} [options._freeCodeViewMode=false] If true, the free code view mode is enabled.
 	 * @returns {string} Cleaned and compressed HTML string
 	 */
 	clean(html, { forceFormat, whitelist, blacklist, _freeCodeViewMode } = {}) {

@@ -15,7 +15,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @property {boolean} iframe - Whether to use an iframe for the editor.
  * @property {boolean} iframe_fullPage - Whether to allow full-page HTML inside the iframe.
  * @property {Object.<string, string|number>} iframe_attributes - Attributes applied to the iframe.
- * @property {Array<string>|null} iframe_cssFileName - CSS files applied inside the iframe.
+ * @property {Array.<string>|null} iframe_cssFileName - CSS files applied inside the iframe.
  * @property {boolean} statusbar - Whether the status bar is enabled.
  * @property {boolean} statusbar_showPathLabel - Whether to show the current node structure in the status bar.
  * @property {boolean} statusbar_resizeEnable - Whether resizing via the status bar is enabled.

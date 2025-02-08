@@ -167,7 +167,7 @@ EventManager.prototype = {
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
-	 * @return {type: string, listener: (...args: *) => *, useCapture: boolean} Registered event information
+	 * @return {{type: string, listener: (...args: *) => *, useCapture: boolean}} Registered event information
 	 */
 	addGlobalEvent(type, listener, useCapture) {
 		if (this.editor.frameOptions.get('iframe')) {
@@ -1089,7 +1089,7 @@ EventManager.prototype = {
 	 * @description Retains the style nodes for formatting consistency when applying styles.
 	 * - Preserves nested styling by cloning and restructuring the style nodes.
 	 * @param {Element} formatEl The format element where styles should be retained
-	 * @param {Array<Node>} _styleNodes The list of style nodes to retain
+	 * @param {Array.<Node>} _styleNodes The list of style nodes to retain
 	 */
 	_retainStyleNodes(formatEl, _styleNodes) {
 		const el = _styleNodes[0].cloneNode(false);

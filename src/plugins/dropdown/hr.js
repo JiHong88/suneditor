@@ -6,6 +6,10 @@ import { domUtils } from '../../helper';
  */
 
 /**
+ * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
+ */
+
+/**
  * @class
  * @description HR Plugin
  * @param {EditorInstance} editor - The root editor instance

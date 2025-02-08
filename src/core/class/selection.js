@@ -10,6 +10,10 @@ import { domUtils, unicode, env } from '../../helper';
  */
 
 /**
+ * @typedef {import('./offset').RectsInfo} RectsInfo
+ */
+
+/**
  * @class
  * @description Selection, Range related class
  * @param {EditorInstance} editor - The root editor instance
@@ -213,10 +217,10 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description  Get hte clientRects object.
+	 * @description Get the Rects object.
 	 * @param {Range|Element|null} target Range object | Element | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
-	 * @returns {{rects: ClientRects, position: "start"|"end", scrollLeft: number, scrollTop: number}}
+	 * @returns {{rects: RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 */
 	getRects(target, position) {
 		const targetAbs = target?.nodeType === 1 ? this._w.getComputedStyle(target).position === 'absolute' : false;

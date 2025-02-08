@@ -515,7 +515,7 @@ Editor.prototype = {
 	/**
 	 * @description Checks if the content of the editor is empty.
 	 * - Display criteria for "placeholder".
-	 * @param {?frameContext=} fc Frame context, if not present, currently selected frame context.
+	 * @param {?FrameContext=} fc Frame context, if not present, currently selected frame context.
 	 * @returns {boolean}
 	 */
 	isEmpty(fc) {
@@ -911,7 +911,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Set frameContext, frameOptions
-	 * @param {rootTarget} rt Root target
+	 * @param {FrameContext} rt Root target[key] FrameContext
 	 */
 	_setFrameInfo(rt) {
 		this.frameContext = rt;

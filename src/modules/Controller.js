@@ -14,7 +14,7 @@ const INDEX_2 = 2147483645;
  * @property {boolean=} isWWTarget If the controller is in the WYSIWYG area, set it to true.
  * @property {() => void=} initMethod Method to be called when the controller is closed.
  * @property {boolean=} disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
- * @property {Array<Element>=} parents The parent "controller" array when "controller" is opened nested.
+ * @property {Array.<Element>=} parents The parent "controller" array when "controller" is opened nested.
  * @property {boolean=} parentsHide If true, the parent element is hidden when the controller is opened.
  * @property {boolean=} isInsideForm If the controller is inside a form, set it to true.
  * @property {boolean=} isOutsideForm If the controller is outside a form, set it to true.
@@ -71,7 +71,7 @@ Controller.prototype = {
 	 * @param {Element} positionTarget Position target element
 	 * @param {Object} [params={}] params
 	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
-	 * @param {function=} params.initMethod Method to be called when the controller is closed.
+	 * @param {() => void=} params.initMethod Method to be called when the controller is closed.
 	 * @param {boolean=} params.disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled. (default: this.disabled)
 	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
 	 */

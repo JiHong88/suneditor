@@ -983,10 +983,10 @@ Format.prototype = {
 	/**
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
 	 * @param {Element|null} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
-	 * @param {Object.<string, Array<string>|boolean} [options] Options
-	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
+	 * @param {Object.<string, Array.<string>|boolean} [options] Options
+	 * @param {Array.<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
 	 *        (e.g., ['font-size'], ['.className'], ['font-family', 'color', '.className'])
-	 * @param {Array<string>} [options.nodesToRemove=null] Array of node names to remove.
+	 * @param {Array.<string>} [options.nodesToRemove=null] Array of node names to remove.
 	 *        If empty array or null when styleNode is null, all formats are removed.
 	 *        (e.g., ['span'], ['strong', 'em'])
 	 * @param {boolean} [options.strictRemove=false] If true, only removes nodes from nodesToRemove if all styles and classes are removed.
@@ -1608,7 +1608,7 @@ Format.prototype = {
 	/**
 	 * @private
 	 * @description Get current selected lines and selected node info.
-	 * @returns { lines: Array.<Element>, firstNode: Node,  lastNode: Node, firstPath: Array.<number>, lastPath: Array.<number>, startOffset: number, endOffset: number }
+	 * @returns {{lines: Array.<Element>, firstNode: Node,  lastNode: Node, firstPath: Array.<number>, lastPath: Array.<number>, startOffset: number, endOffset: number}}
 	 */
 	_lineWork() {
 		let range = this.selection.getRange();
@@ -1655,7 +1655,7 @@ Format.prototype = {
 	 * @param {Element} innerList The nested list element.
 	 * @param {Element} prev The previous sibling element.
 	 * @param {Element} next The next sibling element.
-	 * @param {{s: Array<number> | null, e: Array<number> | null, sl: Element | null, el: Element | null}} nodePath Object storing the start and end node paths.
+	 * @param {{s: Array.<number> | null, e: Array.<number> | null, sl: Element | null, el: Element | null}} nodePath Object storing the start and end node paths.
 	 * - s : Start node path.
 	 * - e : End node path.
 	 * - sl : Start node's parent element.
@@ -1715,7 +1715,7 @@ Format.prototype = {
 	 * @private
 	 * @description Detaches a nested list structure by extracting list items from their parent list.
 	 * - Ensures proper restructuring of the list elements.
-	 * @param {Array<Element>} cells The list items to be detached.
+	 * @param {Array.<Element>} cells The list items to be detached.
 	 * @returns {{cc: Node, sc: Node, ec: Node}} An object containing reference nodes for repositioning.
 	 * - cc : The parent node of the first list item.
 	 * - sc : The first list item.

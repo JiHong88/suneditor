@@ -18,7 +18,7 @@ const DIR_UP_KEYCODE = /^3[7-8]$/;
  * @typedef {Object} ComponentInfo
  * @property {Element} target - The target element associated with the component.
  * @property {string} pluginName - The name of the plugin related to the component.
- * @property {Object.<string,  *>} options - Options related to the component.
+ * @property {Object.<string, *>} options - Options related to the component.
  * @property {Element} container - The main container element for the component.
  * @property {Element|null} cover - The cover element, if applicable.
  * @property {Element|null} inlineCover - The inline cover element, if applicable.

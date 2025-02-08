@@ -215,7 +215,7 @@ UI.prototype = {
 
 	/**
 	 * @description Activate the transparent background "div" so that other elements are not affected during resizing.
-	 * @param {cursor} cursor cursor css property
+	 * @param {string} cursor cursor css property
 	 */
 	enableBackWrapper(cursor) {
 		this._backWrapper.style.cursor = cursor;

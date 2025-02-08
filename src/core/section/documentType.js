@@ -59,7 +59,7 @@ function DocumentType(editor, fc) {
 	this._mirror = fc.get('documentTypePageMirror');
 	this._mirrorCache = 0;
 	this._positionCache = new Map();
-	this._rePageTimeout = null;
+	this._rePageTimeout = 0;
 
 	const mirrorStyles = _w.getComputedStyle(this._mirror);
 	this._paddingTop = numbers.get(mirrorStyles.paddingTop);
@@ -534,7 +534,7 @@ DocumentType.prototype = {
 	/**
 	 * @private
 	 * @description Retrieves all headers in the document.
-	 * @returns {Array<Element>} An array of header elements.
+	 * @returns {Array.<Element>} An array of header elements.
 	 */
 	_getHeaders() {
 		return (this._wwHeaders = this.ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));

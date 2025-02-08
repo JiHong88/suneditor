@@ -1379,7 +1379,7 @@ export function UpdateButton(element, plugin, icons, lang) {
  * @param {Object.<string, string>} icons icons
  * @param {Object.<string, string>} lang lang
  * @param {boolean} isUpdate Is update
- * @returns {{element: Element, pluginCallButtons: Object.<string, Element>, responsiveButtons: Array.<Element>, buttonTray: Element, updateButtons: Array.<string, {button: Element, plugin: *, key: string>}}}
+ * @returns {{element: Element, pluginCallButtons: Object.<string, Element>, responsiveButtons: Array.<Element>, buttonTray: Element, updateButtons: Array.<{button: Element, plugin: *, key: string>}}}
  */
 export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdate) {
 	/** create button list */
