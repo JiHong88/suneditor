@@ -7,12 +7,12 @@ import ApiManager from './ApiManager';
  * @property {string} title - File browser window title. Required. Can be overridden in browser.
  * @property {string} url - File server url. Required. Can be overridden in browser.
  * @property {object} headers - File server http header. Required. Can be overridden in browser.
- * @property {function} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
+ * @property {(target: Element) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
  * @property {boolean=} useSearch - Whether to use the search function. Optional. Default: true.
  * @property {string=} searchUrl - File server search url. Optional. Can be overridden in browser.
  * @property {object=} searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
  * @property {string=} listClass - Class name of list div. Required. Can be overridden in browser.
- * @property {function=} drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
+ * @property {(item: BrowserItem) => string=} drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
  * @property {number=} columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
  */
 

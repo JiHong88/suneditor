@@ -103,7 +103,7 @@ EventManager.prototype = {
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
 	 * @param {Element|Array.<Element>} target Target element
 	 * @param {string} type Event type
-	 * @param {Function} listener Event handler
+	 * @param {function(...*): *} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
 	 * @return {boolean}
 	 */
@@ -160,7 +160,7 @@ EventManager.prototype = {
 	 * @description Add an event to document.
 	 * - When created as an Iframe, the same event is added to the document in the Iframe.
 	 * @param {string} type Event type
-	 * @param {Function} listener Event listener
+	 * @param {function(...*): *} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
 	 * @return {type, listener, useCapture}
 	 */
@@ -180,7 +180,7 @@ EventManager.prototype = {
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
 	 * @param {string|object} type Event type
-	 * @param {Function} listener Event listener
+	 * @param {function(...*): *} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
 	 */
 	removeGlobalEvent(type, listener, useCapture) {

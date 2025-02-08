@@ -171,7 +171,7 @@ export function getNodeFromPath(offsets, parentNode) {
 /**
  * @description Get all "children" of the argument value element (Without text nodes)
  * @param {Element} element element to get child node
- * @param {Function|null} validation Conditional function
+ * @param {?(current: Element) => boolean} validation Conditional function
  * @returns {Array.<Element>}
  */
 export function getListChildren(element, validation) {
@@ -202,7 +202,7 @@ export function getListChildren(element, validation) {
 /**
  * @description Get all "childNodes" of the argument value element (Include text nodes)
  * @param {Node} element element to get child node
- * @param {Function|null} validation Conditional function
+ * @param {?(current: Element) => boolean} validation Conditional function
  * @returns {Array.<Node>}
  */
 export function getListChildNodes(element, validation) {
@@ -304,7 +304,7 @@ export function compareElements(a, b) {
  * @description Get the parent element of the argument value.
  * - A tag that satisfies the query condition is imported.
  * @param {Node} element Reference element
- * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|(current: Element) => boolean|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @param {number?} depth Number of parent levels to depth.
@@ -358,7 +358,7 @@ export function getParentElement(element, query, depth) {
  * @description Gets all ancestors of the argument value.
  * - Get all tags that satisfy the query condition.
  * @param {Node} element Reference element
- * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|(current: Element) => boolean|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @param {number?} depth Number of parent levels to depth.
@@ -427,7 +427,7 @@ export function getCommandTarget(target) {
  * @description Get the child element of the argument value.
  * - A tag that satisfies the query condition is imported.
  * @param {Node} node Reference element
- * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|(current: Node) => boolean|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * @param {boolean} last If true returns the last node among the found child nodes. (default: first node)
  * Not use it like jquery.
  * Only one condition can be entered at a time.
@@ -494,7 +494,7 @@ export function getEdgeChildNodes(first, last) {
 /**
  * @description Get the item from the array that matches the condition.
  * @param {Array.<Node>|HTMLCollection|NodeList} array Array to get item
- * @param {Function|null} validation Conditional function
+ * @param {?(current: Node) => boolean} validation Conditional function
  * @param {boolean} multi If true, returns all items that meet the criteria otherwise, returns an empty array.
  * If false, returns only one item that meet the criteria otherwise return null.
  * @returns {Array.<Node>|null}
@@ -1074,7 +1074,7 @@ export function getNextDeepestNode(node, ceiling) {
  * @param {Element} line Line element (p, div, etc.)
  * @param {Node} offsetContainer Base node to start searching
  * @param {number} offset Base offset to start searching
- * @param {Function} validate Validation function
+ * @param {?(current: Node) => boolean=} validate Validation function
  * @returns {number}
  */
 export function findTextIndexOnLine(line, offsetContainer, offset, validate) {

@@ -12,7 +12,7 @@ const INDEX_2 = 2147483645;
  * @typedef {object} ControllerParams
  * @property {"top"|"bottom"} position Controller position
  * @property {boolean=} isWWTarget If the controller is in the WYSIWYG area, set it to true.
- * @property {Function=} initMethod Method to be called when the controller is closed.
+ * @property {() => void=} initMethod Method to be called when the controller is closed.
  * @property {boolean=} disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
  * @property {Array<Element>=} parents The parent "controller" array when "controller" is opened nested.
  * @property {boolean=} parentsHide If true, the parent element is hidden when the controller is opened.

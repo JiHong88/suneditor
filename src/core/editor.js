@@ -41,7 +41,7 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
  * @description SunEditor constructor function.
  * @param {Array.<Element>} multiTargets Target element
  * @param {EditorInitOptions} options options
- * @returns {object}
+ * @returns {object} The root editor instance
  */
 function Editor(multiTargets, options) {
 	const _d = multiTargets[0].target.ownerDocument || env._d;
@@ -94,7 +94,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Call the event function by injecting self: this.
-	 * @type {Function}
+	 * @type {(eventName: string, ...args: *) => void}
 	 */
 	this.triggerEvent = null;
 
@@ -491,7 +491,7 @@ Editor.prototype = {
 	 * @description It is executed by inserting the button of commandTargets as the argument value of the "f" function.
 	 * - "func" is called as long as the button array's length.
 	 * @param {string} cmd data-command
-	 * @param {Function} func Function.
+	 * @param {function(...*): *} func Function.
 	 */
 	applyCommandTargets(cmd, func) {
 		if (this.commandTargets.has(cmd)) {
@@ -501,7 +501,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Execute a function by traversing all root targets.
-	 * @param {Function} f Function
+	 * @param {function(...*): *} f Function
 	 */
 	applyFrameRoots(f) {
 		this.frameRoots.forEach(f);

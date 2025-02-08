@@ -251,7 +251,7 @@ Image_.prototype = {
 	 * - If the element isn't properly contained, a new container is created to retain the format.
 	 * @returns {object} The format retention object containing the query and method to process the element.
 	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
-	 * @returns {Function} method - The function to execute on the element to validate and preserve its format.
+	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {

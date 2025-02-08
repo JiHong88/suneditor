@@ -30,7 +30,7 @@ let __resizing_sw = 0;
  * @class
  * @description Controller module class
  * @param {*} inst The instance object that called the constructor.
- * @param {Array.<Function|string>} controls Controller button array
+ * @param {Array.<string|{action: (element: Element, value: string, target: Element) => void, command: string, value: string, title: string, icon: string}>} controls Controller button array
  * @param {FigureParams} params Figure options
  */
 function Figure(inst, controls, params) {

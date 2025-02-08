@@ -11,8 +11,8 @@ import Helper from './helper';
  */
 
 /**
- * Editor Injector module
- * @type {Function}
+ * Editor Injector module, Inject "editor" and basic frequently used objects by calling it with "call(this, editor)".
+ * @type {(editor: object) => void}
  */
 export const editorInjector = EditorInjector;
 
@@ -24,7 +24,7 @@ export const plugins = Plugins;
 
 /**
  * Editor modules
- * @type {object.<string, Function>}
+ * @type {object.<string, (element: Element) => void>}
  */
 export const modules = Modules;
 
@@ -36,7 +36,7 @@ export const langs = Langs;
 
 /**
  * Helper functions for the editor
- * @type {object.<string, Function>}
+ * @type {object.<string, function(...*): *>}
  */
 export const helper = Helper;
 

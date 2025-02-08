@@ -53,7 +53,7 @@ export function entityToHTML(content) {
 
 /**
  * @description Debounce function
- * @param {Function} func function
+ * @param {function(...*): void} func function
  * @param {number} wait delay ms
  * @returns
  */

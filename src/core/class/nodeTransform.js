@@ -274,7 +274,7 @@ NodeTransform.prototype = {
 	/**
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Element} element Element object
-	 * @param {Function|string|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
+	 * @param {(current: Node) => boolean|string|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
 	 */
 	mergeNestedTags(element, validation) {
 		if (typeof validation === 'string') {
@@ -306,7 +306,7 @@ NodeTransform.prototype = {
 	 * @description Delete itself and all parent nodes that match the condition.
 	 * - Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
 	 * @param {Node} item Node to be remove
-	 * @param {Function|null} validation Validation function. default(Deleted if it only have breakLine and blanks)
+	 * @param {?(current: Node) => boolean} validation Validation function. default(Deleted if it only have breakLine and blanks)
 	 * @param {Element|null} stopParent Stop when the parent node reaches stopParent
 	 * @returns {{sc: Node|null, ec: Node|null}|null} {sc: previousSibling, ec: nextSibling} (the deleted node reference) or null.
 	 */
@@ -383,7 +383,7 @@ NodeTransform.prototype = {
 	/**
 	 * @description Creates a nested node structure from the given array of nodes.
 	 * @param {Array} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
-	 * @param {Function|null|undefined} validate A validate function.
+	 * @param {?(current: Node) => boolean=} validate A validate function.
 	 * @returns {{ parent: Element, inner: Element }} An object containing the top-level parent node and the innermost child node.
 	 */
 	createNestedNode(nodeArray, validate) {

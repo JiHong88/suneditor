@@ -9,8 +9,8 @@ const MENU_MIN_HEIGHT = 38;
  * @property {boolean=} checkList Flag to determine if the checklist is enabled (true or false)
  * @property {"rtl" | "ltr"} [dir="ltr"] Optional text direction: "rtl" for right-to-left, "ltr" for left-to-right
  * @property {number=} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
- * @property {Function=} [openMethod] Optional method to call when the menu is opened
- * @property {Function=} [closeMethod] Optional method to call when the menu is closed
+ * @property {() => void=} [openMethod] Optional method to call when the menu is opened
+ * @property {() => void=} [closeMethod] Optional method to call when the menu is closed
  */
 
 /**
@@ -87,7 +87,7 @@ SelectMenu.prototype = {
 	/**
 	 * @description Initializes the select menu and attaches it to a reference element.
 	 * @param {Element} referElement - The element that triggers the select menu.
-	 * @param {Function} selectMethod - The function to execute when an item is selected.
+	 * @param {(command: string) => void} selectMethod - The function to execute when an item is selected.
 	 * @param {object} [attr={}] - Additional attributes for the select menu container.
 	 */
 	on(referElement, selectMethod, attr) {

@@ -2,10 +2,28 @@ import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';
 
 /**
+ * @typedef {object} FileStateInfo
+ * @property {string} src File source
+ * @property {number} index File index
+ * @property {string} name File name
+ * @property {number} size File size
+ */
+
+/**
+ * @typedef {object} FileStateParams
+ * @property {object} editor - The root editor instance
+ * @property {Element} element File element
+ * @property {number} index File index
+ * @property {"create"|"update"|"delete"} state File state
+ * @property {FileStateInfo} info File information
+ * @property {number} remainingFilesCount Remaining file count
+ */
+
+/**
  * @typedef {object} FileManagerParams
  * @property {string} query The query selector used to find file elements in the editor
- * @property {Function=} loadHandler A function to handle the loaded file information
- * @property {Function=} eventHandler A function to handle file-related events
+ * @property {(params: Array.<FileStateInfo>) => void=} loadHandler A function to handle the loaded file information
+ * @property {(info: FileStateParams) => void=} eventHandler A function to handle file-related events
  * @property {?object=} figure An optional Figure instance related to the file
  */
 
@@ -41,8 +59,8 @@ FileManager.prototype = {
 	 * @param {string} uploadUrl Upload server url
 	 * @param {object|null} uploadHeader Request header
 	 * @param {Files|{formData: FormData, size: number}} data FormData in body or Files array
-	 * @param {Function|null} callBack Success call back function
-	 * @param {Function|null} errorCallBack Error call back function
+	 * @param {?(xmlHttp: XMLHttpRequest) => boolean} callBack Success call back function
+	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string} errorCallBack Error call back function
 	 */
 	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
 		this.ui.showLoading();

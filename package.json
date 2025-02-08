@@ -19,8 +19,8 @@
 		"build:prod": "cross-env NODE_ENV=production webpack --config webpack/builder.js",
 		"lint": "eslint src",
 		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
-		"lint:fix-ts": "npx eslint \"typings/**/*.ts\" --fix",
-		"lint:fix-all": "npx eslint \"src/**/*.js\" \"typings/**/*.ts\" --fix",
+		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
+		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
 		"test": "karma start",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},

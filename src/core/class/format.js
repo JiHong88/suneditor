@@ -69,7 +69,7 @@ Format.prototype = {
 	/**
 	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
 	 * @param {Node} node Reference node.
-	 * @param {Function|null} validation Additional validation function.
+	 * @param {?(current: Node) => boolean=} validation Additional validation function.
 	 * @returns {Element|null}
 	 */
 	getLine(node, validation) {
@@ -162,7 +162,7 @@ Format.prototype = {
 	/**
 	 * @description If a parent node that contains an argument node finds a "brLine" (format.isBrLine), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {Function|null} validation Additional validation function.
+	 * @param {?(current: Node) => boolean=} validation Additional validation function.
 	 * @returns {Element|null}
 	 */
 	getBrLine(element, validation) {
@@ -221,7 +221,7 @@ Format.prototype = {
 	/**
 	 * @description If a parent node that contains an argument node finds a format node (format.isBlock), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {Function|null} validation Additional validation function.
+	 * @param {?(current: Node) => boolean=} validation Additional validation function.
 	 * @returns {Element|null}
 	 */
 	getBlock(element, validation) {
@@ -1448,7 +1448,7 @@ Format.prototype = {
 
 	/**
 	 * @description Returns a "line" array from selected range.
-	 * @param {Function|null} validation The validation function. (Replaces the default validation format.isLine(current))
+	 * @param {?(current: Node) => boolean=} validation The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array}
 	 */
 	getLines(validation) {
@@ -1861,7 +1861,7 @@ Format.prototype = {
 	 * @description wraps text nodes of line selected text.
 	 * @param {Element} element The node of the line that contains the selected text node.
 	 * @param {Element} newInnerNode The dom that will wrap the selected text area
-	 * @param {Function} validation Check if the node should be stripped.
+	 * @param {(current: Node) => boolean} validation Check if the node should be stripped.
 	 * @param {Node} startCon The startContainer property of the selection object.
 	 * @param {number} startOff The startOffset property of the selection object.
 	 * @param {Node} endCon The endContainer property of the selection object.
@@ -2318,7 +2318,7 @@ Format.prototype = {
 	 * @description wraps first line selected text.
 	 * @param {Element} element The node of the line that contains the selected text node.
 	 * @param {Element} newInnerNode The dom that will wrap the selected text area
-	 * @param {Function} validation Check if the node should be stripped.
+	 * @param {(current: Node) => boolean} validation Check if the node should be stripped.
 	 * @param {Node} startCon The startContainer property of the selection object.
 	 * @param {number} startOff The startOffset property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
@@ -2616,7 +2616,7 @@ Format.prototype = {
 	 * @description wraps mid lines selected text.
 	 * @param {Element} element The node of the line that contains the selected text node.
 	 * @param {Element} newInnerNode The dom that will wrap the selected text area
-	 * @param {Function} validation Check if the node should be stripped.
+	 * @param {(current: Node) => boolean} validation Check if the node should be stripped.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @param {Node} _endContainer Offset node of last line already modified (end.container)
@@ -2754,7 +2754,7 @@ Format.prototype = {
 	 * @description wraps last line selected text.
 	 * @param {Element} element The node of the line that contains the selected text node.
 	 * @param {Element} newInnerNode The dom that will wrap the selected text area
-	 * @param {Function} validation Check if the node should be stripped.
+	 * @param {(current: Node) => boolean} validation Check if the node should be stripped.
 	 * @param {Node} endCon The endContainer property of the selection object.
 	 * @param {number} endOff The endOffset property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?

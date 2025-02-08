@@ -39,8 +39,8 @@
  * @property {string} name - name of the file.
  * @property {number} size -  size of the file in bytes.
  * @property {Element} element -  target element.
- * @property {Function} delete -  delete function.
- * @property {Function} select -  select function.
+ * @property {() => void} delete -  delete function.
+ * @property {() => void} select -  select function.
  */
 
 /**
@@ -316,7 +316,7 @@ export default function () {
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {ImageInfo} params.info - info object
-		 * @param {Function} params.handler - handler function
+		 * @param {(newInfo?: ImageInfo|null) => void} params.handler - handler function
 		 * @returns {boolean|Array|undefined}
 		 */
 		onImageUploadBefore: null,
@@ -383,7 +383,7 @@ export default function () {
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {VideoInfo} params.info - info object
-		 * @param {Function} params.handler - handler function
+		 * @param {(newInfo?: VideoInfo|null) => void} params.handler - handler function
 		 */
 		onVideoUploadBefore: null,
 
@@ -448,7 +448,7 @@ export default function () {
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {AudioInfo} params.info - info object
-		 * @param {Function} params.handler - handler function
+		 * @param {(newInfo?: AudioInfo|null) => void} params.handler - handler function
 		 * @returns {boolean|Array|undefined}
 		 */
 		onAudioUploadBefore: null,
@@ -530,7 +530,7 @@ export default function () {
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {FileInfo} params.info - info object
-		 * @param {Function} params.handler - handler function
+		 * @param {(newInfo?: FileInfo|null) => void} params.handler - handler function
 		 */
 		onFileUploadBefore: null,
 
@@ -571,7 +571,7 @@ export default function () {
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {EmbedInfo} params.info - info object
-		 * @param {Function} params.handler - handler function
+		 * @param {(newInfo?: EmbedInfo|null) => void} params.handler - handler function
 		 */
 		onEmbedInputBefore: null
 	};

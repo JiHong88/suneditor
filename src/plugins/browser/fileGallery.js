@@ -9,7 +9,7 @@ import { Browser } from '../../modules';
  * @param {object} pluginOptions.data - direct data without server calls
  * @param {string} pluginOptions.url - server request url
  * @param {object=} pluginOptions.headers - server request headers
- * @param {string|Function} pluginOptions.thumbnail - default thumbnail
+ * @param {string|() => string} pluginOptions.thumbnail - default thumbnail
  */
 function FileGallery(editor, pluginOptions) {
 	// plugin bisic properties

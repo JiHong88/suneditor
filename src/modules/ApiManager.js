@@ -6,8 +6,8 @@ import { env } from '../helper';
  * @property {string=} url - API's URL
  * @property {object=} headers - HTTP headers
  * @property {object=} data - API data
- * @property {Function=} callBack - API success callback
- * @property {Function=} errorCallBack - API fail callback
+ * @property {(xmlHttp: XMLHttpRequest) => boolean=} callBack - API success callback
+ * @property {(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack - API fail callback
  * @property {string=} responseType - XMLHttpRequest.responseType
  */
 
