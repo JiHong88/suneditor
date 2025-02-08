@@ -228,6 +228,7 @@ Audio_.prototype = {
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
 	 * @param {Element} target Target element
+	 * @returns {Promise<void>}
 	 */
 	async destroy(element) {
 		element = element || this._element;
@@ -281,6 +282,7 @@ Audio_.prototype = {
 	 * @description Create an "audio" component using the provided files.
 	 * @param {Array.<File>} fileList File object list
 	 * @returns {boolean} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>}
 	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return false;
@@ -349,7 +351,7 @@ Audio_.prototype = {
 	/**
 	 * @description Create an "audio" component using the provided url.
 	 * @param {string} url File url
-	 * @returns {boolean} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>}
 	 */
 	async submitURL(url) {
 		if (url.length === 0) return false;
@@ -473,6 +475,7 @@ Audio_.prototype = {
 	 * - Displays an error message in the editor's UI.
 	 * - Logs the error to the console for debugging.
 	 * @param {object} response - The error response object from the server or upload process.
+	 * @returns {Promise<void>}
 	 */
 	async _error(response) {
 		const message = await this.triggerEvent('onAudioUploadError', { error: response });

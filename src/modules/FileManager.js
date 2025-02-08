@@ -86,6 +86,7 @@ FileManager.prototype = {
 	 * @param {string} uploadUrl Upload server url
 	 * @param {object|null} uploadHeader Request header
 	 * @param {Files|{formData: FormData, size: number}} data FormData in body or Files array
+	 * @returns {Promise<ApiResponse | XMLHttpRequest>}
 	 */
 	async asyncUpload(uploadUrl, uploadHeader, data) {
 		this.ui.showLoading();

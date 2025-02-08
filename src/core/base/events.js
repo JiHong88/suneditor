@@ -277,6 +277,7 @@ export default function () {
 		 * @param {object} params.editor - The root editor instance
 		 * @param {object} params.frameContext - frame context
 		 * @param {Event} params.data - editor data
+		 * @returns {Promise<boolean>}
 		 */
 		onSave: null,
 
@@ -285,7 +286,7 @@ export default function () {
 		 * - When false is returned, the default behavior is stopped.
 		 * - If the string is returned, the cleanData value is modified to the return value.
 		 * @param {ClipboardEvent} params
-		 * @returns {boolean|string}
+		 * @returns {Promise<boolean|string>}
 		 */
 		onDrop: null,
 
@@ -294,16 +295,18 @@ export default function () {
 		 * - When false is returned, the default behavior is stopped.
 		 * - If the string is returned, the cleanData value is modified to the return value.
 		 * @param {ClipboardEvent} params
-		 * @returns {boolean|string}
+		 * @returns {Promise<boolean|string>}
 		 */
 		onPaste: null,
 
+		// --- image
 		/**
 		 * @description It replaces the default callback function of the image upload
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
 		 * @param {ImageInfo} params.info - info object
+		 * @returns {Promise<boolean>}
 		 */
 		imageUploadHandler: null,
 
@@ -311,13 +314,13 @@ export default function () {
 		 * @description Called before the image is uploaded
 		 * - If true is returned, the internal upload process runs normally.
 		 * - If false is returned, no image upload is performed.
-		 * - If new fileList are returned,  replaced the previous fileList
+		 * - If new "info" are returned, replaced the previous "params.info"
 		 * - If undefined is returned, it waits until "uploadHandler" is executed.
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {ImageInfo} params.info - info object
 		 * @param {(newInfo?: ImageInfo|null) => void} params.handler - handler function
-		 * @returns {boolean|Array|undefined}
+		 * @returns {Promise<boolean|undefined|ImageInfo>}
 		 */
 		onImageUploadBefore: null,
 
@@ -350,6 +353,7 @@ export default function () {
 		 * @param {number=} params.uploadSize - upload size
 		 * @param {number=} params.currentSize - current size
 		 * @param {File=} params.file - File object
+		 * @returns {Promise<string|undefined>}
 		 */
 		onImageUploadError: null,
 
@@ -362,15 +366,18 @@ export default function () {
 		 * @param {string} params.align - align value
 		 * @param {string} params.alt - alt text value
 		 * @param {?string} params.url - Anchor url, if it exists
+		 * @returns {Promise<boolean>}
 		 */
 		onImageDeleteBefore: null,
 
+		// --- video
 		/**
 		 * @description It replaces the default callback function of the video upload
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
 		 * @param {VideoInfo} params.info - info object
+		 * @returns {Promise<boolean>}
 		 */
 		videoUploadHandler: null,
 
@@ -378,12 +385,13 @@ export default function () {
 		 * @description Called before the video is uploaded
 		 * - If true is returned, the internal upload process runs normally.
 		 * - If false is returned, no video(iframe, video) upload is performed.
-		 * - If new fileList are returned,  replaced the previous fileList
+		 * - If new "info" are returned, replaced the previous "params.info"
 		 * - If undefined is returned, it waits until "uploadHandler" is executed.
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {VideoInfo} params.info - info object
 		 * @param {(newInfo?: VideoInfo|null) => void} params.handler - handler function
+		 * @returns {Promise<boolean|undefined|VideoInfo>}
 		 */
 		onVideoUploadBefore: null,
 
@@ -416,6 +424,7 @@ export default function () {
 		 * @param {number=} params.uploadSize - upload size
 		 * @param {number=} params.currentSize - current size
 		 * @param {File=} params.file - File object
+		 * @returns {Promise<string|undefined>}
 		 */
 		onVideoUploadError: null,
 
@@ -427,6 +436,7 @@ export default function () {
 		 * @param {Element} params.container - target's container element (div)
 		 * @param {string} params.align - align value
 		 * @param {string} params.url - video url
+		 * @returns {Promise<boolean>}
 		 */
 		onVideoDeleteBefore: null,
 
@@ -436,20 +446,22 @@ export default function () {
 		 * @param {object} params.editor - The root editor instance
 		 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
 		 * @param {AudioInfo} params.info - info object
+		 * @returns {Promise<boolean>}
 		 */
 		audioUploadHandler: null,
 
+		// --- audio
 		/**
 		 * @description Called before the audio is uploaded
 		 * - If true is returned, the internal upload process runs normally.
 		 * - If false is returned, no audio upload is performed.
-		 * - If new fileList are returned,  replaced the previous fileList
+		 * - If new "info" are returned, replaced the previous "params.info"
 		 * - If undefined is returned, it waits until "uploadHandler" is executed.
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {AudioInfo} params.info - info object
 		 * @param {(newInfo?: AudioInfo|null) => void} params.handler - handler function
-		 * @returns {boolean|Array|undefined}
+		 * @returns {Promise<boolean|undefined|AudioInfo>}
 		 */
 		onAudioUploadBefore: null,
 
@@ -462,8 +474,17 @@ export default function () {
 		 * @param {number=} params.uploadSize - upload size
 		 * @param {number=} params.currentSize - current size
 		 * @param {File=} params.file - File object
+		 * @returns {Promise<string|undefined>}
 		 */
 		onAudioUploadError: null,
+
+		/**
+		 * @description Called when the editor loaded, file Current editor value
+		 * @param {object} params
+		 * @param {object} params.editor - The root editor instance
+		 * @param {Array.<FileManagementInfo>} infoList - info list
+		 */
+		onAudioLoad: null,
 
 		/**
 		 * @description Called when the audio is is uploaded, updated, deleted
@@ -484,8 +505,24 @@ export default function () {
 		 * @param {Element} params.element - target element
 		 * @param {Element} params.container - target's container element (div)
 		 * @param {string} params.url - audio url
+		 * @returns {Promise<boolean>}
 		 */
 		onAudioDeleteBefore: null,
+
+		// --- fileUpload
+		/**
+		 * @description Called when the file is uploaded
+		 * - If true is returned, the internal upload process runs normally.
+		 * - If false is returned, no image upload is performed.
+		 * - If new "info" are returned, replaced the previous "params.info"
+		 * - If undefined is returned, it waits until "uploadHandler" is executed.
+		 * @param {object} params
+		 * @param {object} params.editor - The root editor instance
+		 * @param {FileInfo} params.info - info object
+		 * @param {(newInfo?: FileInfo|null) => void} params.handler - handler function
+		 * @returns {Promise<boolean|undefined|AudioInfo>}
+		 */
+		onFileUploadBefore: null,
 
 		/**
 		 * @description Called when the editor loaded, file Current editor value
@@ -493,7 +530,7 @@ export default function () {
 		 * @param {object} params.editor - The root editor instance
 		 * @param {Array.<FileManagementInfo>} infoList - info list
 		 */
-		onAudioLoad: null,
+		onFileLoad: null,
 
 		/**
 		 * @description Called when the file is is uploaded, updated, deleted
@@ -508,33 +545,6 @@ export default function () {
 		onFileAction: null,
 
 		/**
-		 * @description Called before the file is deleted
-		 * @param {object} params
-		 * @param {object} params.editor - The root editor instance
-		 * @param {Element} params.element - target element
-		 * @param {Element} params.container - target's container element (div)
-		 * @param {string} params.url - file url
-		 */
-		onFileDeleteBefore: null,
-
-		/**
-		 * @description Called when the editor loaded, file Current editor value
-		 * @param {object} params
-		 * @param {object} params.editor - The root editor instance
-		 * @param {Array.<FileManagementInfo>} infoList - info list
-		 */
-		onFileLoad: null,
-
-		/**
-		 * @description Called when the file is uploaded
-		 * @param {object} params
-		 * @param {object} params.editor - The root editor instance
-		 * @param {FileInfo} params.info - info object
-		 * @param {(newInfo?: FileInfo|null) => void} params.handler - handler function
-		 */
-		onFileUploadBefore: null,
-
-		/**
 		 * @description Called when the file is upload failed
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
@@ -543,17 +553,32 @@ export default function () {
 		 * @param {number=} params.uploadSize - upload size
 		 * @param {number=} params.currentSize - current size
 		 * @param {File=} params.file - File object
+		 * @returns {Promise<string|undefined>}
 		 */
 		onFileUploadError: null,
 
+		/**
+		 * @description Called before the file is deleted
+		 * @param {object} params
+		 * @param {object} params.editor - The root editor instance
+		 * @param {Element} params.element - target element
+		 * @param {Element} params.container - target's container element (div)
+		 * @param {string} params.url - file url
+		 * @returns {Promise<boolean>}
+		 */
+		onFileDeleteBefore: null,
+
+		// --- exportPDF
 		/**
 		 * @description Called before the PDF export is started
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {Element} params.target - wysiwyg editable element
+		 * @returns {Promise<boolean>}
 		 */
 		onExportPDFBefore: null,
 
+		// --- fileManager
 		/**
 		 * @description Events that occur when actions such as uploading or deleting all files are performed in the file manager
 		 * @param {object} params
@@ -566,8 +591,13 @@ export default function () {
 		 */
 		onFileManagerAction: null,
 
+		// --- embed
 		/**
 		 * @description Called before the embed is inserted
+		 * - If true is returned, the internal upload process runs normally.
+		 * - If false is returned, no image upload is performed.
+		 * - If new fileList are returned,  replaced the previous fileList
+		 * - If undefined is returned, it waits until "uploadHandler" is executed.
 		 * @param {object} params
 		 * @param {object} params.editor - The root editor instance
 		 * @param {EmbedInfo} params.info - info object

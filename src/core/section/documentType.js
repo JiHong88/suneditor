@@ -121,6 +121,7 @@ DocumentType.prototype = {
 	/**
 	 * @description Refresh the document page
 	 * @param {boolean} force - Whether to force the page to be re-rendered
+	 * @returns {Promise<void>}
 	 */
 	async rePage(force) {
 		if (!this.page) return;

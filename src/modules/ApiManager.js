@@ -71,6 +71,7 @@ ApiManager.prototype = {
 	 * @param {object=} params.headers - HTTP headers
 	 * @param {object=} params.data - API data
 	 * @param {string=} params.responseType - XMLHttpRequest.responseType
+	 * @returns {Promise<ApiResponse | XMLHttpRequest>}
 	 */
 	asyncCall({ method, url, headers, data, responseType }) {
 		this.cancel();
@@ -83,6 +84,7 @@ ApiManager.prototype = {
 
 		const xhr = this._xhr;
 		if (responseType) xhr.responseType = responseType;
+
 		return new Promise((resolve, reject) => {
 			xhr.open(method, url, true);
 			if (headers !== null && typeof headers === 'object' && Object.keys(headers).length > 0) {

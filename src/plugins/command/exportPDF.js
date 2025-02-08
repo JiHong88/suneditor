@@ -45,6 +45,7 @@ ExportPDF.prototype = {
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - It is executed by clicking a toolbar "command" button or calling an API.
+	 * @returns {Promise<void>}
 	 */
 	async action() {
 		if (!this.apiUrl) {

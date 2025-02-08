@@ -346,6 +346,7 @@ Math_.prototype = {
 /**
  * @description Copies the math expression text to clipboard.
  * @param {Element} element - The math expression element.
+ * @returns {Promise<void>}
  */
 async function copyTextToClipboard(element) {
 	if (!navigator.clipboard || !element) return;

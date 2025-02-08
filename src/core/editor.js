@@ -397,6 +397,7 @@ Editor.prototype = {
 	 * - (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
 	 * @param {Element} button Command button
+	 * @returns {Promise<void>}
 	 */
 	async commandHandler(command, button) {
 		if (this.frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
@@ -1458,6 +1459,7 @@ Editor.prototype = {
 	 * @private
 	 * @description Creates the editor instance and initializes components.
 	 * @param {EditorInitOptions} originOptions - The initial editor options.
+	 * @returns {Promise<void>}
 	 */
 	async __Create(originOptions) {
 		// set modes

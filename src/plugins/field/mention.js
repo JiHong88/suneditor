@@ -78,6 +78,7 @@ Mention.prototype = {
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "input".
 	 * @param {PluginInputEventInfo} params
+	 * @returns {Promise<boolean>}
 	 */
 	async onInput() {
 		if (!this.directData) {
@@ -87,7 +88,7 @@ Mention.prototype = {
 		const sel = this.selection.get();
 		if (!sel.rangeCount) {
 			this.selectMenu.close();
-			return;
+			return true;
 		}
 
 		const anchorNode = sel.anchorNode;

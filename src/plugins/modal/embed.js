@@ -228,7 +228,7 @@ Embed.prototype = {
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {boolean} Success or failure
+	 * @returns {Promise<boolean>} Success / failure
 	 */
 	async modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked').value;
@@ -356,6 +356,7 @@ Embed.prototype = {
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
 	 * @param {Element} target Target element
+	 * @returns {Promise<void>}
 	 */
 	async destroy(element) {
 		const targetEl = element || this._element;

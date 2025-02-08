@@ -255,7 +255,7 @@ Video.prototype = {
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {boolean} Success or failure
+	 * @returns {Promise<boolean>} Success / failure
 	 */
 	async modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked').value;
@@ -392,6 +392,7 @@ Video.prototype = {
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
 	 * @param {Element} target Target element
+	 * @returns {Promise<void>}
 	 */
 	async destroy(element) {
 		const targetEl = element || this._element;
@@ -656,7 +657,7 @@ Video.prototype = {
 	/**
 	 * @description Create an "video" component using the provided files.
 	 * @param {Array.<File>} fileList File object list
-	 * @returns {boolean} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return;
@@ -724,7 +725,7 @@ Video.prototype = {
 	/**
 	 * @description Create an "video" component using the provided url.
 	 * @param {string} url File url
-	 * @returns {boolean} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitURL(url) {
 		if (!url) url = this._linkValue;
@@ -919,6 +920,7 @@ Video.prototype = {
 	 * @private
 	 * @description Handles video upload errors.
 	 * @param {object} response - The error response object.
+	 * @returns {Promise<void>}
 	 */
 	async _error(response) {
 		const message = await this.triggerEvent('onVideoUploadError', { error: response });

@@ -104,6 +104,7 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 /**
  * @description Saves the editor content.
  * @param {Object} editor - The root editor instance
+ * @returns {Promise<void>}
  */
 export async function SAVE(editor) {
 	const fc = editor.frameContext;

@@ -182,6 +182,7 @@ FileUpload.prototype = {
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
 	 * @param {Element} target Target element
+	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
 		if (!target) return;
@@ -204,7 +205,7 @@ FileUpload.prototype = {
 	/**
 	 * @description Create an "file" component using the provided files.
 	 * @param {Array.<File>} fileList File object list
-	 * @returns {boolean} If return false, the file upload will be canceled
+	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return;
@@ -386,6 +387,7 @@ FileUpload.prototype = {
 	 * @description Handles file upload errors.
 	 * - Displays an error message if the upload fails.
 	 * @param {object} response - The error response from the server.
+	 * @returns {Promise<void>}
 	 */
 	async _error(response) {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });

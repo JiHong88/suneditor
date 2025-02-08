@@ -374,6 +374,7 @@ ModalAnchorEditor.prototype = {
 	 * @private
 	 * @description Handles file upload errors.
 	 * @param {object} response - The error response object.
+	 * @returns {Promise<void>}
 	 */
 	async _error(response) {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });

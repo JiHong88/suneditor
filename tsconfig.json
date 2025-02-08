@@ -18,8 +18,9 @@
 		"noImplicitAny": false,
 		"declaration": true,
 		"emitDeclarationOnly": true,
-		"declarationDir": "./types"
+		"declarationDir": "./types",
+		"outDir": "./types"
 	},
-	"include": ["src/**/*.js", "!src/langs/*"],
-	"exclude": ["node_modules", "test", "dist", "webpack"]
+	"include": ["./src/**/*.js"],
+	"exclude": ["node_modules", "test", "dist", "webpack", "./src/langs", "./src/assets", "./types/**/*"]
 }

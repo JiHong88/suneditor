@@ -85,6 +85,7 @@ Font.prototype = {
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
 	 * @param {?Element} target - The plugin's toolbar button element
+	 * @returns {Promise<void>}
 	 */
 	async action(target) {
 		let value = target.getAttribute('data-command');

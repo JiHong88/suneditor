@@ -24,7 +24,7 @@ export const plugins = Plugins;
 
 /**
  * Editor modules
- * @type {object.<string, (element: Element) => void>}
+ * @type {{[key: string]: (element: Element) => object}}
  */
 export const modules = Modules;
 
