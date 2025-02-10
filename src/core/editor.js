@@ -295,23 +295,23 @@ function Editor(multiTargets, options) {
 	/** @description SubToolbar class instance @type {Toolbar|null} */
 	this.subToolbar = null;
 	/** @description Shortcuts class instance @type {Shortcuts} */
-	this.selection = new Selection(this);
+	this.selection = null;
 	/** @description HTML class instance @type {HTML} */
-	this.html = new HTML(this);
+	this.html = null;
 	/** @description Offset class instance @type {Offset} */
-	this.nodeTransform = new NodeTransform(this);
+	this.nodeTransform = null;
 	/** @description Component class instance @type {Component} */
-	this.component = new Component(this);
+	this.component = null;
 	/** @description Format class instance @type {Format} */
-	this.format = new Format(this);
+	this.format = null;
 	/** @description Menu class instance @type {Menu} */
-	this.menu = new Menu(this);
+	this.menu = null;
 	/** @description Char class instance @type {Char} */
-	this.char = new Char(this);
+	this.char = null;
 	/** @description UI class instance @type {UI} */
-	this.ui = new UI(this);
+	this.ui = null;
 	/** @description Viewer class instance @type {Viewer} */
-	this.viewer = new Viewer(this);
+	this.viewer = null;
 
 	// ------------------------------------------------------- private properties -------------------------------------------------------
 	/**
