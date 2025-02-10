@@ -17,7 +17,7 @@
  * @property {?string} key - The key pressed (e.g., "1.").
  * @property {?string} method - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
  * @property {?string} plugin - The plugin name.
- * @property {?string} r - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
+ * @property {?Array.<string>} r - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
  * @property {?string} textTrigger - Whether the event was triggered by a text input (e.g., mention like @ab).
  * @property {?string} type - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
  */

@@ -27,6 +27,21 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
  * @typedef {import('../editor').default} EditorInstance
  */
 
+/**
+ * @typedef {Object} EventInfo
+ * @property {Element|Array.<Element>} target Target element
+ * @property {string} type Event type
+ * @property {(...args: *) => *} listener Event handler
+ * @property {boolean|undefined} useCapture Event useCapture option
+ */
+
+/**
+ * @typedef {Object} GlobalEventInfo
+ * @property {string} type Event type
+ * @property {(...args: *) => *} listener Event listener
+ * @property {boolean|undefined} useCapture Use event capture
+ */
+
 // wysiwyg event
 /**
  * @typedef {Object} PluginMouseEventInfo
@@ -65,6 +80,7 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
 /**
  * @class
+ * @extends {CoreInjector}
  * @description Event manager, editor's all event management class
  * @param {EditorInstance} editor - The root editor instance
  * @returns {EventManager}
@@ -72,33 +88,61 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
 function EventManager(editor) {
 	CoreInjector.call(this, editor);
 
-	// members
+	/**
+	 * @description Old browsers: When there is no 'e.isComposing' in the keyup event
+	 * @type {boolean}
+	 */
+	this.isComposing = false;
+
+	/** @type {Array.<*>} @private */
 	this._events = [];
+	/** @type {RegExp} @private */
 	this._onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
+	/** @type {boolean} @private */
 	this._onShortcutKey = false;
-	this.isComposing = false; // Old browsers: When there is no 'e.isComposing' in the keyup event.
+	/** @type {number} @private */
 	this._balloonDelay = null;
+	/** @type {ResizeObserver} @private */
 	this._wwFrameObserver = null;
+	/** @type {ResizeObserver} @private */
 	this._toolbarObserver = null;
-	this._lineBreakDir = null;
+	/** @type {Element|null} @private */
 	this._lineBreakComp = null;
+	/** @type {Object.<string, string>|null} @private */
 	this._formatAttrsTemp = null;
+	/** @type {number} @private */
 	this._resizeClientY = 0;
+	/** @type {GlobalEventInfo|null} @private */
 	this.__resize_editor = null;
+	/** @type {GlobalEventInfo|null} @private */
 	this.__close_move = null;
+	/** @type {GlobalEventInfo|null} @private */
 	this.__geckoActiveEvent = null;
+	/** @type {Array.<Element>} @private */
 	this.__scrollparents = [];
+	/** @type {Array.<Element>} @private */
 	this.__cacheStyleNodes = [];
+	/** @type {GlobalEventInfo|null} @private */
 	this.__selectionSyncEvent = null;
+
 	// input plugins
+	/** @type {boolean} @private */
 	this._inputFocus = false;
+	/** @type {Object.<string, *>|null} @private */
 	this.__inputPlugin = null;
+	/** @type {EventInfo|null} @private */
 	this.__inputBlurEvent = null;
+	/** @type {EventInfo|null} @private */
 	this.__inputKeyEvent = null;
+
 	// viewport
+	/** @type {NodeList} @private */
 	this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
+	/** @type {number} @private */
 	this.__retainTimer = null;
+	/** @type {Element} @private */
 	this.__eventDoc = null;
+	/** @type {string} @private */
 	this.__secopy = null;
 }
 
@@ -110,7 +154,7 @@ EventManager.prototype = {
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
-	 * @return {{target: Element|Array.<Element>, type: string, listener: (...args: *) => *, handler: (...args: *) => *, useCapture: boolean}} Registered event information
+	 * @return {EventInfo} Registered event information
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return false;
@@ -139,7 +183,7 @@ EventManager.prototype = {
 
 	/**
 	 * @description Remove event
-	 * @param {{target: Element|Array.<Element>, type: string, listener: (...args: *) => *, useCapture: boolean}} params event info = this.addEvent()
+	 * @param {EventInfo} params event info = this.addEvent()
 	 * @returns {undefined|false|null} Failed: false, Success: null, Not found: undefined
 	 */
 	removeEvent(params) {
@@ -167,7 +211,7 @@ EventManager.prototype = {
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
-	 * @return {{type: string, listener: (...args: *) => *, useCapture: boolean}} Registered event information
+	 * @return {GlobalEventInfo} Registered event information
 	 */
 	addGlobalEvent(type, listener, useCapture) {
 		if (this.editor.frameOptions.get('iframe')) {
@@ -184,9 +228,9 @@ EventManager.prototype = {
 	/**
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
-	 * @param {string|{type: string, listener: (...args: *) => *, useCapture: boolean|undefined}} type Event type or (Event info = this.addGlobalEvent())
-	 * @param {(...args: *) => *} listener Event listener
-	 * @param {boolean|undefined} useCapture Use event capture
+	 * @param {string|GlobalEventInfo} type Event type or (Event info = this.addGlobalEvent())
+	 * @param {(...args: *) => *=} listener Event listener
+	 * @param {boolean|undefined=} useCapture Use event capture
 	 */
 	removeGlobalEvent(type, listener, useCapture) {
 		if (!type) return;
@@ -1298,7 +1342,6 @@ function DisplayLineBreak(dir, e) {
 	const component = this._lineBreakComp;
 	if (!component) return;
 
-	dir = !dir ? this._lineBreakDir : dir;
 	const isList = domUtils.isListCell(component.parentNode);
 	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.get('defaultLine'));
 	if (!isList) format.innerHTML = '<br>';

@@ -13,7 +13,28 @@ const { NO_EVENT } = env;
  */
 
 /**
- * @typedef {import('../../core/editor').FrameContext} FrameContext
+ * @typedef {import('../../core/section/context').FrameContext} FrameContext
+ */
+
+/**
+ * @typedef {Object} ImagePluginOptions
+ * @property {boolean=} [canResize=true] - Whether the image element can be resized.
+ * @property {boolean=} [showHeightInput=true] - Whether to display the height input field.
+ * @property {string=} [defaultWidth="auto"] - The default width of the image. If a number is provided, "px" will be appended.
+ * @property {string=} [defaultHeight="auto"] - The default height of the image. If a number is provided, "px" will be appended.
+ * @property {boolean=} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
+ * @property {boolean=} [createFileInput=true] - Whether to create a file input element for image uploads.
+ * @property {boolean=} [createUrlInput=true] - Whether to create a URL input element for image insertion.
+ * @property {string=} [uploadUrl] - The URL endpoint for image file uploads.
+ * @property {Object.<string, string|number>=} [uploadHeaders] - Additional headers to include in the file upload request.
+ * @property {number=} [uploadSizeLimit] - The total upload size limit in bytes.
+ * @property {number=} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
+ * @property {boolean=} [allowMultiple=false] - Whether multiple image uploads are allowed.
+ * @property {string=} [acceptedFormats="image/*"] - The accepted file formats for image uploads.
+ * @property {boolean=} [useFormatType=true] - Whether to enable format type selection (block or inline).
+ * @property {string=} [defaultFormatType="block"] - The default image format type ("block" or "inline").
+ * @property {boolean=} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
+ * @property {boolean=} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
  */
 
 /**
@@ -21,33 +42,17 @@ const { NO_EVENT } = env;
  * @description Image plugin.
  * - This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
  * @param {EditorInstance} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {boolean=} [pluginOptions.canResize=true] - Whether the image element can be resized.
- * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
- * @param {string=} [pluginOptions.defaultWidth="auto"] - The default width of the image. If a number is provided, "px" will be appended.
- * @param {string=} [pluginOptions.defaultHeight="auto"] - The default height of the image. If a number is provided, "px" will be appended.
- * @param {boolean=} [pluginOptions.percentageOnlySize=false] - Whether to allow only percentage-based sizing.
- * @param {boolean=} [pluginOptions.createFileInput=true] - Whether to create a file input element for image uploads.
- * @param {boolean=} [pluginOptions.createUrlInput=true] - Whether to create a URL input element for image insertion.
- * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for image file uploads.
- * @param {Object.<string, string|number>=} [pluginOptions.uploadHeaders] - Additional headers to include in the file upload request.
- * @param {number=} [pluginOptions.uploadSizeLimit] - The total upload size limit in bytes.
- * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit in bytes.
- * @param {boolean=} [pluginOptions.allowMultiple=false] - Whether multiple image uploads are allowed.
- * @param {string=} [pluginOptions.acceptedFormats="image/*"] - The accepted file formats for image uploads.
- * @param {boolean=} [pluginOptions.useFormatType=true] - Whether to enable format type selection (block or inline).
- * @param {string=} [pluginOptions.defaultFormatType="block"] - The default image format type ("block" or "inline").
- * @param {boolean=} [pluginOptions.keepFormatType=false] - Whether to retain the chosen format type after image insertion.
- * @param {boolean=} [pluginOptions.linkEnableFileUpload] - Whether to enable file uploads for linked images.
+ * @param {ImagePluginOptions} pluginOptions
  * @returns {Image_}
  */
 function Image_(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
+	/** @type {string} */
 	this.title = this.lang.image;
 	this.icon = 'image';
 
-	// define plugin options
+	/** @type {ImagePluginOptions} */
 	this.pluginOptions = {
 		canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
 		showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,

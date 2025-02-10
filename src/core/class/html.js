@@ -20,9 +20,11 @@ const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|da
  */
 function HTML(editor) {
 	CoreInjector.call(this, editor);
+	const options = this.options;
 
 	// members
-	const options = this.options;
+	this.fontSizeUnitRegExp = null;
+
 	this._isAllowedClassName = function (v) {
 		return this.test(v) ? v : '';
 	}.bind(this.options.get('allowedClassName'));
@@ -36,8 +38,13 @@ function HTML(editor) {
 	this._attributeWhitelistRegExp = null;
 	this._attributeBlacklist = null;
 	this._attributeBlacklistRegExp = null;
+	this._cleanStyleTagKeyRegExp = null;
+	this._cleanStyleRegExpMap = null;
 	this._textStyleTags = options.get('_textStyleTags');
 	this._autoStyleify = null;
+	this.__disallowedTagsRegExp = null;
+	this.__disallowedTagNameRegExp = null;
+	this.__allowedTagNameRegExp = null;
 
 	// clean styles
 	const tagStyles = options.get('tagStyles');

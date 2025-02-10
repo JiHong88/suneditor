@@ -9,6 +9,17 @@ const INDEX_1 = 2147483646;
 const INDEX_2 = 2147483645;
 
 /**
+ * @typedef {Object} ControllerInfo
+ * @property {string} name The controller name
+ * @property {string} position The controller position
+ * @property {*} inst The controller instance
+ * @property {Element} form The controller element
+ * @property {Element} target The controller target element
+ * @property {boolean} isRangeTarget If the target is a Range, set it to true.
+ * @property {boolean} notInCarrier If the controller is not in the "carrierWrapper", set it to true.
+ */
+
+/**
  * @typedef {Object} ControllerParams
  * @property {"top"|"bottom"} position Controller position
  * @property {boolean=} isWWTarget If the controller is in the WYSIWYG area, set it to true.
@@ -181,6 +192,7 @@ Controller.prototype = {
 	 * @param {boolean} isRangeTarget If the target is a Range, set it to true.
 	 */
 	_controllerOn(form, target, isRangeTarget) {
+		/** @type {ControllerInfo} */
 		const info = {
 			position: this.position,
 			inst: this,

@@ -13,7 +13,7 @@ const { NO_EVENT } = env;
  */
 
 /**
- * @typedef {import('../../core/editor').FrameContext} FrameContext
+ * @typedef {import('../../core/section/context').FrameContext} FrameContext
  */
 
 /**

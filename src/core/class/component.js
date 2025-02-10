@@ -36,24 +36,60 @@ const DIR_UP_KEYCODE = /^3[7-8]$/;
 function Component(editor) {
 	CoreInjector.call(this, editor);
 
-	// members
+	/**
+	 * @description The current component information, used copy, cut, and keydown events
+	 * @type {ComponentInfo}
+	 */
 	this.info = null;
+
+	/**
+	 * @description Component is selected
+	 * @type {boolean}
+	 */
 	this.isSelected = false;
+
+	/**
+	 * @description Currently selected component target
+	 * @type {Element|null}
+	 */
 	this.currentTarget = null;
+
+	/**
+	 * @description Currently selected component plugin instance
+	 * @type {*}
+	 */
 	this.currentPlugin = null;
+
+	/**
+	 * @description Currently selected component plugin name
+	 * @type {*}
+	 */
 	this.currentPluginName = '';
+
+	/**
+	 * @description Currently selected component information
+	 * @type {ComponentInfo|null}
+	 */
 	this.currentInfo = null;
+
+	/** @type {Object.<string, Function>} @private */
 	this.__globalEvents = {
 		copy: OnCopy_component.bind(this),
 		cut: OnCut_component.bind(this),
 		keydown: OnKeyDown_component.bind(this),
 		mousedown: CloseListener_mousedown.bind(this)
 	};
+	/** @type {Function|null} @private */
 	this._bindClose_copy = null;
+	/** @type {Function|null} @private */
 	this._bindClose_cut = null;
+	/** @type {Function|null} @private */
 	this._bindClose_keydown = null;
+	/** @type {Function|null} @private */
 	this._bindClose_mousedown = null;
+	/** @type {Function|null} @private */
 	this._bindClose_touchstart = null;
+	/** @type {boolean} @private */
 	this.__selectionSelected = false;
 
 	this.editor.applyFrameRoots((e) => {

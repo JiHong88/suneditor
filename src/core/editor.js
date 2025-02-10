@@ -33,11 +33,33 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
  */
 
 /**
+ * @typedef {import('./section/context').Context} Context
+ */
+
+/**
  * @typedef {import('./section/context').FrameContext} FrameContext
  */
 
 /**
  * @typedef {import('./section/context').FrameOptions} FrameOptions
+ */
+
+/**
+ * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo
+ */
+
+/**
+ * @typedef {Object} EditorStatus
+ * @property {boolean} hasFocus Boolean value of whether the editor has focus
+ * @property {number} tabSize Indent size of tab (4)
+ * @property {number} indentSize Indent size (25)px
+ * @property {number} codeIndentSize Indent size of Code view mode (2)
+ * @property {Array.<Node>} currentNodes  An element array of the current cursor's node structure
+ * @property {Array.<string>} currentNodesMap  An element name array of the current cursor's node structure
+ * @property {boolean} onSelected Boolean value of whether component is selected
+ * @property {number} rootKey Current root key
+ * @property {Range} _range Current range object
+ * @property {boolean} _onMousedown Mouse down event status
  */
 
 /**
@@ -52,14 +74,35 @@ function Editor(multiTargets, options) {
 	const _w = _d.defaultView || env._w;
 	const product = Constructor(multiTargets, options);
 
-	// properties
+	/**
+	 * @description Frame root key array
+	 * @type {Array.<*>}
+	 */
 	this.rootKeys = product.rootKeys;
+
+	/**
+	 * @description Frame root map
+	 * @type {Map.<*, FrameContext>}
+	 */
 	this.frameRoots = product.frameRoots;
+
+	/**
+	 * @description Editor context object
+	 * @type {Context}
+	 */
 	this.context = product.context;
+
+	/**
+	 * @description Current focusing frame context
+	 * @type {FrameContext}
+	 */
 	this.frameContext = new Map();
+
+	/**
+	 * @description Current focusing frame context options
+	 * @type {FrameOptions}
+	 */
 	this.frameOptions = new Map();
-	this._lineBreaker_t = null;
-	this._lineBreaker_b = null;
 
 	/**
 	 * @description Document object
@@ -75,6 +118,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Controllers carrier
+	 * @type {Element}
 	 */
 	this.carrierWrapper = product.carrierWrapper;
 
@@ -116,14 +160,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Variables used internally in editor operation
-	 * @property {boolean} hasFocus Boolean value of whether the editor has focus
-	 * @property {number} tabSize Indent size of tab (4)
-	 * @property {number} indentSize Indent size (25)px
-	 * @property {number} codeIndentSize Indent size of Code view mode (2)
-	 * @property {Array} currentNodes  An element array of the current cursor's node structure
-	 * @property {Array} currentNodesMap  An element name array of the current cursor's node structure
-	 * @property {boolean} onSelected Boolean value of whether component is selected
-	 * @property {number} rootKey Current root key
+	 * @type {EditorStatus}
 	 */
 	this.status = {
 		hasFocus: false,
@@ -140,65 +177,157 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Is classic mode?
+	 * @type {boolean}
 	 */
-	this.isClassic = null;
+	this.isClassic = false;
 
 	/**
 	 * @description Is inline mode?
+	 * @type {boolean}
 	 */
-	this.isInline = null;
+	this.isInline = false;
 
 	/**
 	 * @description Is balloon|balloon-always mode?
+	 * @type {boolean}
 	 */
-	this.isBalloon = null;
+	this.isBalloon = false;
 
 	/**
 	 * @description Is balloon-always mode?
+	 * @type {boolean}
 	 */
-	this.isBalloonAlways = null;
+	this.isBalloonAlways = false;
 
 	/**
 	 * @description Is subToolbar balloon|balloon-always mode?
+	 * @type {boolean}
 	 */
-	this.isSubBalloon = null;
+	this.isSubBalloon = false;
 
 	/**
 	 * @description Is subToolbar balloon-always mode?
+	 * @type {boolean}
 	 */
-	this.isSubBalloonAlways = null;
+	this.isSubBalloonAlways = false;
 
-	// ----- Properties not shared with _core -----
 	/**
 	 * @description All command buttons map
+	 * @type {Map.<string, Element>}
 	 */
 	this.allCommandButtons = new Map();
+
+	/**
+	 * @description All command buttons map
+	 * @type {Map.<string, Element>}
+	 */
 	this.subAllCommandButtons = new Map();
 
 	/**
 	 * @description Shoutcuts key map
+	 * @type {Map.<string, *>}
 	 */
 	this.shortcutsKeyMap = new Map();
+
+	/**
+	 * @description Shoutcuts reverse key array
+	 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
+	 * @type {Array.<string>}
+	 */
 	this.reverseKeys = [];
 
 	/**
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
 	 * - Each button is contained in an array.
+	 * @type {Map.<string, Array.<Element>>}
 	 */
 	this.commandTargets = new Map();
 
 	/**
 	 * @description Plugins array with "active" method.
 	 * - "activeCommands" runs the "add" method when creating the editor.
+	 * @type {Array.<string>}
 	 */
 	this.activeCommands = null;
 
 	/**
 	 * @description The selection node (selection.getNode()) to which the effect was last applied
+	 * @type {Node|null}
 	 */
 	this.effectNode = null;
 
+	/**
+	 * @description Currently open "Modal" instance
+	 * @type {*}
+	 */
+	this.opendModal = null;
+
+	/**
+	 * @description Currently open "Controller" info array
+	 * @type {Array.<ControllerInfo>}
+	 */
+	this.opendControllers = [];
+
+	/**
+	 * @description Currently open "Controller" caller plugin name
+	 */
+	this.currentControllerName = '';
+
+	/**
+	 * @description Currently open "Browser" instance
+	 * @type {*}
+	 */
+	this.opendBrowser = null;
+
+	/**
+	 * @description Whether "SelectMenu" is open
+	 * @type {boolean}
+	 */
+	this.selectMenuOn = false;
+
+	// ------ class ------
+	/** @description History class instance @type {History} */
+	this.history = null;
+	/** @description EventManager class instance @type {EventManager} */
+	this.eventManager = null;
+	/** @description Toolbar class instance @type {Toolbar} */
+	this.toolbar = null;
+	/** @description SubToolbar class instance @type {Toolbar|null} */
+	this.subToolbar = null;
+	/** @description Shortcuts class instance @type {Shortcuts} */
+	this.selection = new Selection(this);
+	/** @description HTML class instance @type {HTML} */
+	this.html = new HTML(this);
+	/** @description Offset class instance @type {Offset} */
+	this.nodeTransform = new NodeTransform(this);
+	/** @description Component class instance @type {Component} */
+	this.component = new Component(this);
+	/** @description Format class instance @type {Format} */
+	this.format = new Format(this);
+	/** @description Menu class instance @type {Menu} */
+	this.menu = new Menu(this);
+	/** @description Char class instance @type {Char} */
+	this.char = new Char(this);
+	/** @description UI class instance @type {UI} */
+	this.ui = new UI(this);
+	/** @description Viewer class instance @type {Viewer} */
+	this.viewer = new Viewer(this);
+
 	// ------------------------------------------------------- private properties -------------------------------------------------------
+	/**
+	 * @private
+	 * @description Line breaker (top)
+	 * @type {Element}
+	 */
+	this._lineBreaker_t = null;
+
+	/**
+	 * @private
+	 * @description Line breaker (bottom)
+	 * @type {Element}
+	 */
+	this._lineBreaker_b = null;
+
 	/**
 	 * @private
 	 * @description Closest ShadowRoot to editor if found
@@ -209,79 +338,127 @@ function Editor(multiTargets, options) {
 	/**
 	 * @private
 	 * @description Plugin call event map
+	 * @type {Map.<string, Array.<Function>>}
 	 */
 	this._onPluginEvents = null;
 
 	/**
 	 * @private
 	 * @description Copy format info
+	 * - eventManager.__cacheStyleNodes copied
+	 * @type {Array.<Element>|null}
 	 */
 	this._onCopyFormatInfo = null;
+
+	/**
+	 * @private
+	 * @description Copy format init method
+	 * @type {Function|null}
+	 */
 	this._onCopyFormatInitMethod = null;
 
 	/**
 	 * @private
-	 * @description Controller, modal, browser
+	 * @description Controller target's frame div (editor.frameContext.get('topArea'))
+	 * @type {Element|null}
 	 */
-	this.opendModal = null;
-	this.opendControllers = [];
-	this.opendBrowser = null;
-	this.currentControllerName = '';
 	this._controllerTargetContext = null;
-	this.selectMenuOn = false;
 
+	/**
+	 * @private
+	 * @description List of buttons that are disabled when "controller" is opened
+	 * @type {Array.<Element>}
+	 */
 	this._controllerOnDisabledButtons = [];
+
+	/**
+	 * @private
+	 * @description List of buttons that are disabled when "codeView" mode opened
+	 * @type {Array.<Element>}
+	 */
 	this._codeViewDisabledButtons = [];
 
 	/**
 	 * @private
-	 * @description Button List in Responsive Toolbar.
+	 * @description List of buttons to run plugins in the toolbar
+	 * @type {Array.<Element>}
 	 */
 	this._pluginCallButtons = product.pluginCallButtons;
+
+	/**
+	 * @private
+	 * @description List of buttons to run plugins in the Sub-Toolbar
+	 * @type {Array.<Element>}
+	 */
 	this._pluginCallButtons_sub = product.pluginCallButtons_sub;
+
+	/**
+	 * @private
+	 * @description Responsive Toolbar Button Structure array
+	 * @type {Array.<*>}
+	 */
 	this._responsiveButtons = product.responsiveButtons;
+
+	/**
+	 * @private
+	 * @description Responsive Sub-Toolbar Button Structure array
+	 * @type {Array.<*>}
+	 */
 	this._responsiveButtons_sub = product.responsiveButtons_sub;
 
 	/**
 	 * @private
 	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
+	 * @type {boolean}
 	 */
 	this._notHideToolbar = false;
 
 	/**
 	 * @private
 	 * @description Variables for controlling focus and blur events
+	 * @type {boolean}
 	 */
 	this._preventBlur = false;
 
 	/**
 	 * @private
-	 * @description If true, (initialize, reset) all indexes of image, video information
+	 * @description If true, initialize all indexes of image, video information
+	 * @type {boolean}
 	 */
 	this._componentsInfoInit = true;
+
+	/**
+	 * @private
+	 * @description If true, reset all indexes of image, video information
+	 * @type {boolean}
+	 */
 	this._componentsInfoReset = false;
 
 	/**
 	 * @private
 	 * @description plugin retainFormat info Map()
+	 * @type {Map.<string, Function>}
 	 */
 	this._MELInfo = null;
 
 	/**
 	 * @private
 	 * @description Properties for managing files in the "FileManager" module
+	 * @type {Array.<*>}
 	 */
 	this._fileInfoPluginsCheck = null;
 
 	/**
 	 * @private
 	 * @description Properties for managing files in the "FileManager" module
+	 * @type {Array.<*>}
 	 */
 	this._fileInfoPluginsReset = null;
 
 	/**
 	 * @private
 	 * @description Variables for file component management
+	 * @type {Object.<string, *>}
 	 */
 	this._fileManager = {
 		tags: null,
@@ -289,17 +466,25 @@ function Editor(multiTargets, options) {
 		pluginRegExp: null,
 		pluginMap: null
 	};
+
+	/**
+	 * @private
+	 * @description Variables for managing the components
+	 * @type {Array.<*>}
+	 */
 	this._componentManager = [];
 
 	/**
 	 * @private
 	 * @description Current Figure container.
+	 * @type {Element|null}
 	 */
 	this._figureContainer = null;
 
 	/**
 	 * @private
 	 * @description Origin options
+	 * @type {EditorInitOptions}
 	 */
 	this._originOptions = options;
 
@@ -1456,7 +1641,7 @@ Editor.prototype = {
 		delete this.viewer.viewer;
 		if (this.subToolbar) delete this.subToolbar.subToolbar;
 
-		this._responsiveButtons = this._responsiveButtons_res = null;
+		this._responsiveButtons = this._responsiveButtons_sub = null;
 	},
 
 	/**
