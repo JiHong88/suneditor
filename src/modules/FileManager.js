@@ -61,7 +61,7 @@ FileManager.prototype = {
 	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
-	 * @param {?Object.<string, string|number>} uploadHeader Request header
+	 * @param {?Object.<string, string>} uploadHeader Request header
 	 * @param {File|FileList|{formData: FormData, size: number}} data FormData in body or Files array
 	 * @param {?(xmlHttp: XMLHttpRequest) => boolean=} callBack Success call back function
 	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack Error call back function
@@ -88,7 +88,7 @@ FileManager.prototype = {
 	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
-	 * @param {?Object.<string, string|number>} uploadHeader Request header
+	 * @param {?Object.<string, string>} uploadHeader Request header
 	 * @param {File|FileList|{formData: FormData, size: number}} data FormData in body or Files array
 	 * @returns {Promise<XMLHttpRequest>}
 	 */

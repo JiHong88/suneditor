@@ -19,7 +19,7 @@ const { NO_EVENT } = env;
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions - plugin options
  * @param {string} pluginOptions.uploadUrl - server request url
- * @param {Object.<string, string|number>=} pluginOptions.uploadHeaders - server request headers
+ * @param {Object.<string, string>=} pluginOptions.uploadHeaders - server request headers
  * @param {string=} pluginOptions.uploadSizeLimit - upload size limit
  * @param {string=} pluginOptions.uploadSingleSizeLimit - upload single size limit
  * @param {boolean=} pluginOptions.allowMultiple - allow multiple files

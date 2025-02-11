@@ -12,7 +12,7 @@ import { Browser } from '../../modules';
  * @param {Object} pluginOptions
  * @param {Array.<*>=} pluginOptions.data - direct data without server calls
  * @param {string=} pluginOptions.url - server request url
- * @param {Object.<string, string|number>=} pluginOptions.headers - server request headers
+ * @param {Object.<string, string>=} pluginOptions.headers - server request headers
  * @param {string|() => string} pluginOptions.thumbnail - default thumbnail
  * @returns {VideoGallery}
  */

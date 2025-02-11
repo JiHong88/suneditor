@@ -26,12 +26,12 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
  * @param {boolean=} pluginOptions.createFileInput - Whether to create a file input element.
  * @param {boolean=} pluginOptions.createUrlInput - Whether to create a URL input element (default is true if file input is not created).
  * @param {string=} pluginOptions.uploadUrl - The URL to which files will be uploaded.
- * @param {Object.<string, string|number>=} pluginOptions.uploadHeaders - Headers to include in the file upload request.
+ * @param {Object.<string, string>=} pluginOptions.uploadHeaders - Headers to include in the file upload request.
  * @param {number=} pluginOptions.uploadSizeLimit - The total upload size limit in bytes.
  * @param {number=} pluginOptions.uploadSingleSizeLimit - The single file size limit in bytes.
  * @param {boolean=} pluginOptions.allowMultiple - Whether to allow multiple file uploads.
  * @param {string=} [pluginOptions.acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
- * @param {Object.<string, string|number>=} pluginOptions.audioTagAttributes - Additional attributes to set on the audio tag.
+ * @param {Object.<string, string>=} pluginOptions.audioTagAttributes - Additional attributes to set on the audio tag.
  * @returns {Audio_}
  */
 function Audio_(editor, pluginOptions) {

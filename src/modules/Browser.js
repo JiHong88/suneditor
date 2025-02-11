@@ -7,11 +7,11 @@ import ApiManager from './ApiManager';
  * @property {string} title - File browser window title. Required. Can be overridden in browser.
  * @property {Object.<string, *>|Array.<*>=} data - direct data without server calls
  * @property {string=} url - File server url. Required. Can be overridden in browser.
- * @property {Object.<string, string|number>=} headers - File server http header. Required. Can be overridden in browser.
+ * @property {Object.<string, string>=} headers - File server http header. Required. Can be overridden in browser.
  * @property {(target: Element) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
  * @property {boolean=} useSearch - Whether to use the search function. Optional. Default: true.
  * @property {string=} searchUrl - File server search url. Optional. Can be overridden in browser.
- * @property {Object.<string, string|number>=} searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
+ * @property {Object.<string, string>=} searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
  * @property {string=} listClass - Class name of list div. Required. Can be overridden in browser.
  * @property {(item: BrowserFile) => string=} drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
  * @property {number=} columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
@@ -121,7 +121,7 @@ Browser.prototype = {
 	 * @param {string=} params.listClass - Class name of list div. If not, use "this.listClass".
 	 * @param {string=} params.title - File browser window title. If not, use "this.title".
 	 * @param {string=} params.url - File server url. If not, use "this.url".
-	 * @param {Object.<string, string|number>} params.urlHeader - File server http header. If not, use "this.urlHeader".
+	 * @param {Object.<string, string>} params.urlHeader - File server http header. If not, use "this.urlHeader".
 	 */
 	open(params) {
 		if (!params) params = {};
@@ -208,7 +208,7 @@ Browser.prototype = {
 	 * @private
 	 * @description Fetches the file list from the server.
 	 * @param {string} url - The file server URL.
-	 * @param {Object.<string, string|number>} urlHeader - The HTTP headers for the request.
+	 * @param {Object.<string, string>} urlHeader - The HTTP headers for the request.
 	 * @param {boolean} pageLoading - Indicates if this is a paginated request.
 	 */
 	_drawFileList(url, urlHeader, pageLoading) {

@@ -249,7 +249,7 @@ UI.prototype = {
 	/**
 	 * @description visible controllers
 	 * @param {boolean} value hidden/show
-	 * @param {boolean?} lineBreakShow Line break hidden/show (default: Follows the value "value".)
+	 * @param {?boolean=} lineBreakShow Line break hidden/show (default: Follows the value "value".)
 	 * @private
 	 */
 	_visibleControllers(value, lineBreakShow) {

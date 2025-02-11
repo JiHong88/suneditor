@@ -4,7 +4,7 @@ import { env } from '../helper';
  * @typedef ApiManagerParams
  * @property {string=} method - HTTP method (GET, POST, PUT, DELETE...)
  * @property {string=} url - API's URL
- * @property {Object.<string, string|number>=} headers - HTTP headers
+ * @property {Object.<string, string>=} headers - HTTP headers
  * @property {*=} data - API data
  * @property {(xmlHttp: XMLHttpRequest) => boolean=} callBack - API success callback
  * @property {(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack - API fail callback
@@ -69,7 +69,7 @@ ApiManager.prototype = {
 	 * @param {Object} params
 	 * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
 	 * @param {string=} params.url - API's URL
-	 * @param {Object.<string, string|number>=} params.headers - HTTP headers
+	 * @param {Object.<string, string>=} params.headers - HTTP headers
 	 * @param {*=} params.data - API data
 	 * @param {string=} params.responseType - XMLHttpRequest.responseType
 	 * @returns {Promise<XMLHttpRequest>}

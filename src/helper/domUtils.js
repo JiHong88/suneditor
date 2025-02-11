@@ -15,7 +15,7 @@ export function isZeroWidth(text) {
 /**
  * @description Create Element node
  * @param {string} elementName Element name
- * @param {?Object.<string, string|number>} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
+ * @param {?Object.<string, string>} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
  * @param {?string|Node=} inner A innerHTML string or inner node.
  * @returns {Element}
  */
@@ -50,13 +50,11 @@ export function createTextNode(text) {
 
 /**
  * @description Get the argument iframe's document object if use the "iframe" or "fullPage" options
- * @param {Element} iframe Iframe element (this.editor.frameContext.get('wysiwygFrame'))
+ * @param {HTMLIFrameElement} iframe Iframe element (this.editor.frameContext.get('wysiwygFrame'))
  * @returns {Document}
  */
 export function getIframeDocument(iframe) {
-	let wDocument = iframe.contentWindow || iframe.contentDocument;
-	if (wDocument.document) wDocument = wDocument.document;
-	return wDocument;
+	return iframe.contentWindow?.document || iframe.contentDocument;
 }
 
 /**
@@ -97,7 +95,7 @@ export function getPositionIndex(node) {
  * - e.g.) <p><span>aa</span><span>bb</span></p> : getNodePath(node: "bb", parentNode: "<P>") -> [1, 0]
  * @param {Node} node The Node to find position path
  * @param {Node|null} parentNode Parent node. If null, wysiwyg div area
- * @param {{s: number, e: number}|null} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
+ * @param {?{s: number, e: number}=} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
  * "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".
  * Do not use unless absolutely necessary.
  * @returns {Array.<number>}
@@ -307,7 +305,7 @@ export function compareElements(a, b) {
  * @param {string|(current: Element) => boolean|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
- * @param {number?} depth Number of parent levels to depth.
+ * @param {?number=} depth Number of parent levels to depth.
  * @returns {Element|null} Not found: null
  */
 export function getParentElement(element, query, depth) {
@@ -361,7 +359,7 @@ export function getParentElement(element, query, depth) {
  * @param {string|(current: Element) => boolean|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
- * @param {number?} depth Number of parent levels to depth.
+ * @param {?number=} depth Number of parent levels to depth.
  * @returns {Element|null} Returned in an array in order.
  */
 export function getParentElements(element, query, depth) {
@@ -702,7 +700,7 @@ export function setStyle(elements, styleName, value) {
 
 /**
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
- * @param {Array.<Element>|HTMLCollection|NodeList} buttonList Button array
+ * @param {Array.<Element>|HTMLCollection} buttonList Button array
  * @param {boolean} disabled Disabled value
  * @param {boolean} important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
  */

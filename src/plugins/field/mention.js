@@ -27,7 +27,7 @@ const { debounce } = converter;
  * @param {number=} [pluginOptions.delayTime=200] The time to wait before displaying the mention list. Default is 200ms.
  * @param {Array.<{key: string, name: string, url: string}>=} pluginOptions.data Use data without using API.
  * @param {string=} pluginOptions.apiUrl The URL to call the mention list. Default is ''.
- * @param {Object.<string, string|number>=} pluginOptions.apiHeaders The headers to send with the API call. Default is {}.
+ * @param {Object.<string, string>=} pluginOptions.apiHeaders The headers to send with the API call. Default is {}.
  * @param {boolean=} [pluginOptions.useCachingData=true] Whether to cache the mention list data. Default is true.
  * @param {boolean=} [pluginOptions.useCachingFieldData=true] Whether to cache the mention list data in the field. Default is true.
  * @returns {Mention}

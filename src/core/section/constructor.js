@@ -109,7 +109,7 @@ export const RO_UNAVAILABD = [
  * @typedef {Object} EditorFrameOptions
  * @property {string} [options.value=""] - Initial value for the editor.
  * @property {string} [options.placeholder=""] - Placeholder text.
- * @property {Object.<string, string|number>} [options.editableFrameAttributes={}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+ * @property {Object.<string, string>} [options.editableFrameAttributes={}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
  * @property {string} [options.width="100%"] - Width for the editor.
  * @property {string} [options.minWidth=""] - Min width for the editor.
  * @property {string} [options.maxWidth=""] - Max width for the editor.
@@ -119,7 +119,7 @@ export const RO_UNAVAILABD = [
  * @property {string} [options.editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
  * @property {boolean} [options.iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
  * @property {boolean} [options.iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the "iframe".
- * @property {Object.<string, string|number>} [options.iframe_attributes={}] - Attributes of the "iframe". (e.g. {'scrolling': 'no'})
+ * @property {Object.<string, string>} [options.iframe_attributes={}] - Attributes of the "iframe". (e.g. {'scrolling': 'no'})
  * @property {string} [options.iframe_cssFileName="suneditor"] - Name or Array of the CSS file to apply inside the iframe.
  * - You can also use regular expressions.
  * - Applied by searching by filename in the link tag of document,

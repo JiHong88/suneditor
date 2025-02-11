@@ -16,7 +16,7 @@ import { domUtils, numbers } from '../../helper';
  * @param {boolean=} [pluginOptions.textToDisplay=true] - Whether to display the link text.
  * @param {boolean=} [pluginOptions.title=true] - Whether to display the link title.
  * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for file uploads.
- * @param {Object.<string, string|number>=} [pluginOptions.uploadHeaders] - Additional headers for file upload requests.
+ * @param {Object.<string, string>=} [pluginOptions.uploadHeaders] - Additional headers for file upload requests.
  * @param {number=} [pluginOptions.uploadSizeLimit] - The total file upload size limit in bytes.
  * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @param {string=} [pluginOptions.acceptedFormats] - Accepted file formats for link uploads.

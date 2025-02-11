@@ -23,10 +23,10 @@ const { NO_EVENT, _w } = env;
  * @param {string=} pluginOptions.defaultHeight - The default height of the embed element (numeric value or with unit).
  * @param {boolean=} [pluginOptions.percentageOnlySize=false] - Whether to allow only percentage-based sizing.
  * @param {string=} pluginOptions.uploadUrl - The URL for file uploads.
- * @param {Object.<string, string|number>=} pluginOptions.uploadHeaders - Headers to include in file upload requests.
+ * @param {Object.<string, string>=} pluginOptions.uploadHeaders - Headers to include in file upload requests.
  * @param {number=} pluginOptions.uploadSizeLimit - The total file upload size limit in bytes.
  * @param {number=} pluginOptions.uploadSingleSizeLimit - The single file upload size limit in bytes.
- * @param {Object.<string, string|number>=} pluginOptions.iframeTagAttributes - Additional attributes to set on the iframe tag.
+ * @param {Object.<string, string>=} pluginOptions.iframeTagAttributes - Additional attributes to set on the iframe tag.
  * @param {string=} pluginOptions.query_youtube - YouTube query parameter (optional).
  * @param {string=} pluginOptions.query_vimeo - Vimeo query parameter (optional).
  * @param {Object.<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} pluginOptions.embedQuery - Custom query objects for additional embedding services.

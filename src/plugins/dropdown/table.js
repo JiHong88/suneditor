@@ -1087,7 +1087,7 @@ Table.prototype = {
 	/**
 	 * @description Edits a table row, either adding, removing, the row
 	 * @param {"up"|"down"|null} option The action to perform on the row: `null` to remove the row, 'up' to insert the row up, 'down' to insert the row down, or null to remove.
-	 * @param {Element?} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
+	 * @param {?Element=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
 	 */
 	editRow(option, positionResetElement) {
 		this._deleteStyleSelectedCells();
@@ -1179,7 +1179,7 @@ Table.prototype = {
 	/**
 	 * @description Edits a table cell(column), either adding, removing, or modifying the cell based on the provided option.
 	 * @param {"left"|"right"|null} option The action to perform on the cell: `null` to remove the cell, 'left' to insert a new cell to the left, 'right' to insert a new cell to the right, or `null` to remove the cell.
-	 * @param {Element?} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
+	 * @param {?Element=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
 	 */
 	editCell(option, positionResetElement) {
 		const remove = !option;

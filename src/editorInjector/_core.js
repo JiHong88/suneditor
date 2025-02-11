@@ -15,7 +15,7 @@
  */
 
 /**
- * @class
+ * @constructor
  * @description Add default properties to the editor core object.
  * @param {EditorInstance} editor - The root editor instance
  */

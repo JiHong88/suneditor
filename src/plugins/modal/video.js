@@ -31,7 +31,7 @@ const { NO_EVENT } = env;
  * @param {boolean=} [pluginOptions.createFileInput=false] - Whether to create a file input element for video uploads.
  * @param {boolean=} [pluginOptions.createUrlInput=true] - Whether to create a URL input element for video embedding.
  * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for video file uploads.
- * @param {Object.<string, string|number>=} [pluginOptions.uploadHeaders] - Additional headers to include in the video upload request.
+ * @param {Object.<string, string>=} [pluginOptions.uploadHeaders] - Additional headers to include in the video upload request.
  * @param {number=} [pluginOptions.uploadSizeLimit] - The total upload size limit for videos in bytes.
  * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.
  * @param {boolean=} [pluginOptions.allowMultiple=false] - Whether multiple video uploads are allowed.
@@ -39,8 +39,8 @@ const { NO_EVENT } = env;
  * @param {number=} [pluginOptions.defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
  * @param {boolean=} [pluginOptions.showRatioOption=true] - Whether to display the ratio option in the modal.
  * @param {Array=} [pluginOptions.ratioOptions] - Custom ratio options for video resizing.
- * @param {Object.<string, string|number>=} [pluginOptions.videoTagAttributes] - Additional attributes to set on the video tag.
- * @param {Object.<string, string|number>=} [pluginOptions.iframeTagAttributes] - Additional attributes to set on the iframe tag.
+ * @param {Object.<string, string>=} [pluginOptions.videoTagAttributes] - Additional attributes to set on the video tag.
+ * @param {Object.<string, string>=} [pluginOptions.iframeTagAttributes] - Additional attributes to set on the iframe tag.
  * @param {string=} [pluginOptions.query_youtube=""] - Additional query parameters for YouTube embedding.
  * @param {string=} [pluginOptions.query_vimeo=""] - Additional query parameters for Vimeo embedding.
  * @param {Object.<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} [pluginOptions.embedQuery] - Custom query objects for additional embedding services.
@@ -601,7 +601,7 @@ Video.prototype = {
 	/**
 	 * @description Creates a new iframe element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes for embedding.
-	 * @param {Object.<string, string|number>} [props] - An optional object containing properties to assign to the iframe.
+	 * @param {Object.<string, string>} [props] - An optional object containing properties to assign to the iframe.
 	 * @returns {HTMLIFrameElement} The newly created iframe element.
 	 */
 	createIframeTag(props) {
@@ -618,7 +618,7 @@ Video.prototype = {
 	/**
 	 * @description Creates a new video element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes.
-	 * @param {Object.<string, string|number>} [props] - An optional object containing properties to assign to the video element.
+	 * @param {Object.<string, string>} [props] - An optional object containing properties to assign to the video element.
 	 * @returns {HTMLVideoElement} The newly created video element.
 	 */
 	createVideoTag(props) {

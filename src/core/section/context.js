@@ -4,7 +4,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @typedef {Map<string, *>} FrameOptions
  * @property {string} value - Initial value for the editor.
  * @property {string} placeholder - Placeholder text.
- * @property {Object.<string, string|number>} editableFrameAttributes - Attributes for the editable frame.
+ * @property {Object.<string, string>} editableFrameAttributes - Attributes for the editable frame.
  * @property {string} width - Width for the editor (e.g., '100%', '600px').
  * @property {string} minWidth - Minimum width for the editor.
  * @property {string} maxWidth - Maximum width for the editor.
@@ -14,7 +14,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @property {string} _defaultStyles - Computed default styles for the editor.
  * @property {boolean} iframe - Whether to use an iframe for the editor.
  * @property {boolean} iframe_fullPage - Whether to allow full-page HTML inside the iframe.
- * @property {Object.<string, string|number>} iframe_attributes - Attributes applied to the iframe.
+ * @property {Object.<string, string>} iframe_attributes - Attributes applied to the iframe.
  * @property {Array.<string>|null} iframe_cssFileName - CSS files applied inside the iframe.
  * @property {boolean} statusbar - Whether the status bar is enabled.
  * @property {boolean} statusbar_showPathLabel - Whether to show the current node structure in the status bar.

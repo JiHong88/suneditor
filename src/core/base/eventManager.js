@@ -31,7 +31,7 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
  * @typedef {Object} EventInfo
  * @property {Element|Array.<Element>} target Target element
  * @property {string} type Event type
- * @property {(...args: *) => *} listener Event handler
+ * @property {(...args: *) => *} listener Event listener
  * @property {boolean|undefined} useCapture Event useCapture option
  */
 
@@ -80,7 +80,6 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
 /**
  * @class
- * @extends {CoreInjector}
  * @description Event manager, editor's all event management class
  * @param {EditorInstance} editor - The root editor instance
  * @returns {EventManager}
@@ -154,7 +153,7 @@ EventManager.prototype = {
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
-	 * @return {EventInfo} Registered event information
+	 * @return {EventInfo|false} Registered event information
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return false;
@@ -166,9 +165,9 @@ EventManager.prototype = {
 			target[i].addEventListener(type, listener, useCapture);
 			this._events.push({
 				target: target[i],
-				type: type,
-				handler: listener,
-				useCapture: useCapture
+				type,
+				listener,
+				useCapture
 			});
 		}
 
@@ -176,7 +175,6 @@ EventManager.prototype = {
 			target: len > 1 ? target : target[0],
 			type: type,
 			listener,
-			handler: listener,
 			useCapture: useCapture
 		};
 	},
@@ -249,7 +247,7 @@ EventManager.prototype = {
 	/**
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * - such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
-	 * @param {Node|null} selectionNode selectionNode
+	 * @param {?Node=} selectionNode selectionNode
 	 * @returns {Node|undefined} selectionNode
 	 */
 	applyTagEffect(selectionNode) {
@@ -983,7 +981,7 @@ EventManager.prototype = {
 	_removeAllEvents() {
 		for (let i = 0, len = this._events.length, e; i < len; i++) {
 			e = this._events[i];
-			e.target.removeEventListener(e.type, e.handler, e.useCapture);
+			e.target.removeEventListener(e.type, e.listener, e.useCapture);
 		}
 
 		this._events = [];

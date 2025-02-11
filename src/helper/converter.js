@@ -135,8 +135,8 @@ export function nodeListToArray(nodeList) {
 
 /**
  * @description Returns a new object with keys and values swapped.
- * @param {Object.<string, string|number>} obj object
- * @returns {Object.<string, string|number>}
+ * @param {Object.<string, string>} obj object
+ * @returns {Object.<string, string>}
  */
 export function swapKeyValue(obj) {
 	const swappedObj = {};
