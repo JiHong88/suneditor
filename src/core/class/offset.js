@@ -8,10 +8,6 @@ import { domUtils, numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
 /**
- * @typedef {import('../editor').default} EditorInstance
- */
-
-/**
  * @typedef {Object} RectsInfo
  * @property {Object} rects - Bounding rectangle information of the selection range.
  * @property {number} rects.left - The left position of the selection.
@@ -68,10 +64,9 @@ import { _w, _d } from '../../helper/env';
  */
 
 /**
- * @class
+ * @constructor
  * @description Offset class, get the position of the element
  * @param {EditorInstance} editor - The root editor instance
- * @returns {Offset}
  */
 function Offset(editor) {
 	CoreInjector.call(this, editor);
@@ -762,7 +757,7 @@ Offset.prototype = {
 	 * @description Sets the visibility and direction of the arrow element.
 	 * - This method applies the appropriate class (`se-arrow-up` or `se-arrow-down`)
 	 * - based on the specified direction key and adjusts the visibility of the arrow.
-	 * @param {HTMLElement} arrow - The arrow element to be updated.
+	 * @param {Element} arrow - The arrow element to be updated.
 	 * @param {"up"|"down"|""} key - The direction of the arrow.
 	 * - Accepts `'up'` for an upward arrow, `'down'` for a downward arrow,
 	 * - or any other value to hide the arrow.

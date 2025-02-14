@@ -18,7 +18,7 @@ import HTML from './class/html';
 import Menu from './class/menu';
 import NodeTransform from './class/nodeTransform';
 import Offset from './class/offset';
-import Selection from './class/selection';
+import Selection_ from './class/selection';
 import Shortcuts from './class/shortcuts';
 import Toolbar from './class/toolbar';
 import UI from './class/ui';
@@ -33,15 +33,7 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
  */
 
 /**
- * @typedef {import('./section/context').Context} Context
- */
-
-/**
- * @typedef {import('./section/context').FrameContext} FrameContext
- */
-
-/**
- * @typedef {import('./section/context').FrameOptions} FrameOptions
+ * @typedef {import('./section/constructor').EditorFrameOptions} EditorFrameOptions
  */
 
 /**
@@ -49,25 +41,10 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
  */
 
 /**
- * @typedef {Object} EditorStatus
- * @property {boolean} hasFocus Boolean value of whether the editor has focus
- * @property {number} tabSize Indent size of tab (4)
- * @property {number} indentSize Indent size (25)px
- * @property {number} codeIndentSize Indent size of Code view mode (2)
- * @property {Array.<Node>} currentNodes  An element array of the current cursor's node structure
- * @property {Array.<string>} currentNodesMap  An element name array of the current cursor's node structure
- * @property {boolean} onSelected Boolean value of whether component is selected
- * @property {number} rootKey Current root key
- * @property {Range} _range Current range object
- * @property {boolean} _onMousedown Mouse down event status
- */
-
-/**
- * @class
+ * @constructor
  * @description SunEditor constructor function.
- * @param {Array.<Element>} multiTargets Target element
+ * @param {Array<{target: Element, key: *, options: EditorFrameOptions}>} multiTargets Target element
  * @param {EditorInitOptions} options options
- * @returns {Editor}
  */
 function Editor(multiTargets, options) {
 	const _d = multiTargets[0].target.ownerDocument || env._d;
@@ -76,13 +53,13 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Frame root key array
-	 * @type {Array.<*>}
+	 * @type {Array<*>}
 	 */
 	this.rootKeys = product.rootKeys;
 
 	/**
 	 * @description Frame root map
-	 * @type {Map.<*, FrameContext>}
+	 * @type {Map<*, FrameContext>}
 	 */
 	this.frameRoots = product.frameRoots;
 
@@ -118,43 +95,43 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Controllers carrier
-	 * @type {Element}
+	 * @type {HTMLElement}
 	 */
 	this.carrierWrapper = product.carrierWrapper;
 
 	/**
 	 * @description Editor options
-	 * @type {Object.<string, *>}
+	 * @type {Map<string, *>}
 	 */
 	this.options = product.options;
 
 	/**
 	 * @description Plugins
-	 * @type {Object.<string, *>}
+	 * @type {Object<string, *>}
 	 */
 	this.plugins = product.plugins || {};
 
 	/**
 	 * @description Events object, call by triggerEvent function
-	 * @type {Object.<string, *>}
+	 * @type {Object<string, *>}
 	 */
 	this.events = null;
 
 	/**
 	 * @description Call the event function by injecting self: this.
-	 * @type {(eventName: string, ...args: *) => void}
+	 * @type {(eventName: string, ...args: *) => Promise<boolean|symbol>}
 	 */
 	this.triggerEvent = null;
 
 	/**
 	 * @description Default icons object
-	 * @type {Object.<string, string>}
+	 * @type {Object<string, string>}
 	 */
 	this.icons = product.icons;
 
 	/**
 	 * @description loaded language
-	 * @type {Object.<string, *>}
+	 * @type {Object<string, *>}
 	 */
 	this.lang = product.lang;
 
@@ -213,40 +190,40 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description All command buttons map
-	 * @type {Map.<string, Element>}
+	 * @type {Map<string, Element>}
 	 */
 	this.allCommandButtons = new Map();
 
 	/**
 	 * @description All command buttons map
-	 * @type {Map.<string, Element>}
+	 * @type {Map<string, Element>}
 	 */
 	this.subAllCommandButtons = new Map();
 
 	/**
 	 * @description Shoutcuts key map
-	 * @type {Map.<string, *>}
+	 * @type {Map<string|number, *>}
 	 */
 	this.shortcutsKeyMap = new Map();
 
 	/**
 	 * @description Shoutcuts reverse key array
 	 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
-	 * @type {Array.<string>}
+	 * @type {Array<string>}
 	 */
 	this.reverseKeys = [];
 
 	/**
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
 	 * - Each button is contained in an array.
-	 * @type {Map.<string, Array.<Element>>}
+	 * @type {Map<string, Array<Element>>}
 	 */
 	this.commandTargets = new Map();
 
 	/**
 	 * @description Plugins array with "active" method.
 	 * - "activeCommands" runs the "add" method when creating the editor.
-	 * @type {Array.<string>}
+	 * @type {Array<string>}
 	 */
 	this.activeCommands = null;
 
@@ -264,7 +241,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Currently open "Controller" info array
-	 * @type {Array.<ControllerInfo>}
+	 * @type {Array<ControllerInfo>}
 	 */
 	this.opendControllers = [];
 
@@ -285,180 +262,165 @@ function Editor(multiTargets, options) {
 	 */
 	this.selectMenuOn = false;
 
-	// ------ class ------
-	/** @description History class instance @type {History} */
+	// ------ base ------
+	/** @description History class instance @type {ReturnType<typeof import('./base/history').default>} */
 	this.history = null;
-	/** @description EventManager class instance @type {EventManager} */
+	/** @description EventManager class instance @type {import('./base/eventManager').default} */
 	this.eventManager = null;
-	/** @description Toolbar class instance @type {Toolbar} */
+
+	// ------ class ------
+	/** @description Toolbar class instance @type {import('./class/toolbar').default} */
 	this.toolbar = null;
-	/** @description SubToolbar class instance @type {Toolbar|null} */
+	/** @description Sub-Toolbar class instance @type {import('./class/toolbar').default|null} */
 	this.subToolbar = null;
-	/** @description Shortcuts class instance @type {Shortcuts} */
-	this.selection = null;
-	/** @description HTML class instance @type {HTML} */
-	this.html = null;
-	/** @description Offset class instance @type {Offset} */
-	this.nodeTransform = null;
-	/** @description Component class instance @type {Component} */
-	this.component = null;
-	/** @description Format class instance @type {Format} */
-	this.format = null;
-	/** @description Menu class instance @type {Menu} */
-	this.menu = null;
-	/** @description Char class instance @type {Char} */
+	/** @description Char class instance @type {import('./class/char').default} */
 	this.char = null;
-	/** @description UI class instance @type {UI} */
+	/** @description Component class instance @type {import('./class/component').default} */
+	this.component = null;
+	/** @description Format class instance @type {import('./class/format').default} */
+	this.format = null;
+	/** @description HTML class instance @type {import('./class/html').default} */
+	this.html = null;
+	/** @description Menu class instance @type {import('./class/menu').default} */
+	this.menu = null;
+	/** @description NodeTransform class instance @type {import('./class/nodeTransform').default} */
+	this.nodeTransform = null;
+	/** @description Offset class instance @type {import('./class/offset').default} */
+	this.offset = null;
+	/** @description Selection class instance @type {import('./class/selection').default} */
+	this.selection = null;
+	/** @description Shortcuts class instance @type {import('./class/shortcuts').default} */
+	this.shortcuts = null;
+	/** @description UI class instance @type {import('./class/ui').default} */
 	this.ui = null;
-	/** @description Viewer class instance @type {Viewer} */
+	/** @description Viewer class instance @type {import('./class/viewer').default} */
 	this.viewer = null;
 
 	// ------------------------------------------------------- private properties -------------------------------------------------------
 	/**
-	 * @private
 	 * @description Line breaker (top)
 	 * @type {Element}
 	 */
 	this._lineBreaker_t = null;
 
 	/**
-	 * @private
 	 * @description Line breaker (bottom)
 	 * @type {Element}
 	 */
 	this._lineBreaker_b = null;
 
 	/**
-	 * @private
 	 * @description Closest ShadowRoot to editor if found
 	 * @type {ShadowRoot}
 	 */
 	this._shadowRoot = null;
 
 	/**
-	 * @private
 	 * @description Plugin call event map
-	 * @type {Map.<string, Array.<Function>>}
+	 * @type {Map<string, Array<Function & { index: number }>>}
 	 */
 	this._onPluginEvents = null;
 
 	/**
-	 * @private
 	 * @description Copy format info
 	 * - eventManager.__cacheStyleNodes copied
-	 * @type {Array.<Element>|null}
+	 * @type {Array<Node>|null}
 	 */
 	this._onCopyFormatInfo = null;
 
 	/**
-	 * @private
 	 * @description Copy format init method
 	 * @type {Function|null}
 	 */
 	this._onCopyFormatInitMethod = null;
 
 	/**
-	 * @private
 	 * @description Controller target's frame div (editor.frameContext.get('topArea'))
 	 * @type {Element|null}
 	 */
 	this._controllerTargetContext = null;
 
 	/**
-	 * @private
 	 * @description List of buttons that are disabled when "controller" is opened
-	 * @type {Array.<Element>}
+	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
 	 */
 	this._controllerOnDisabledButtons = [];
 
 	/**
-	 * @private
 	 * @description List of buttons that are disabled when "codeView" mode opened
-	 * @type {Array.<Element>}
+	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
 	 */
 	this._codeViewDisabledButtons = [];
 
 	/**
-	 * @private
 	 * @description List of buttons to run plugins in the toolbar
-	 * @type {Array.<Element>}
+	 * @type {Array<HTMLElement>}
 	 */
 	this._pluginCallButtons = product.pluginCallButtons;
 
 	/**
-	 * @private
 	 * @description List of buttons to run plugins in the Sub-Toolbar
-	 * @type {Array.<Element>}
+	 * @type {Array<HTMLElement>}
 	 */
 	this._pluginCallButtons_sub = product.pluginCallButtons_sub;
 
 	/**
-	 * @private
 	 * @description Responsive Toolbar Button Structure array
-	 * @type {Array.<*>}
+	 * @type {Array<*>}
 	 */
 	this._responsiveButtons = product.responsiveButtons;
 
 	/**
-	 * @private
 	 * @description Responsive Sub-Toolbar Button Structure array
-	 * @type {Array.<*>}
+	 * @type {Array<*>}
 	 */
 	this._responsiveButtons_sub = product.responsiveButtons_sub;
 
 	/**
-	 * @private
 	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
 	 * @type {boolean}
 	 */
 	this._notHideToolbar = false;
 
 	/**
-	 * @private
 	 * @description Variables for controlling focus and blur events
 	 * @type {boolean}
 	 */
 	this._preventBlur = false;
 
 	/**
-	 * @private
 	 * @description If true, initialize all indexes of image, video information
 	 * @type {boolean}
 	 */
 	this._componentsInfoInit = true;
 
 	/**
-	 * @private
 	 * @description If true, reset all indexes of image, video information
 	 * @type {boolean}
 	 */
 	this._componentsInfoReset = false;
 
 	/**
-	 * @private
 	 * @description plugin retainFormat info Map()
-	 * @type {Map.<string, Function>}
+	 * @type {Map<string, Function>}
 	 */
 	this._MELInfo = null;
 
 	/**
-	 * @private
 	 * @description Properties for managing files in the "FileManager" module
-	 * @type {Array.<*>}
+	 * @type {Array<*>}
 	 */
 	this._fileInfoPluginsCheck = null;
 
 	/**
-	 * @private
 	 * @description Properties for managing files in the "FileManager" module
-	 * @type {Array.<*>}
+	 * @type {Array<*>}
 	 */
 	this._fileInfoPluginsReset = null;
 
 	/**
-	 * @private
 	 * @description Variables for file component management
-	 * @type {Object.<string, *>}
+	 * @type {Object<string, *>}
 	 */
 	this._fileManager = {
 		tags: null,
@@ -468,21 +430,18 @@ function Editor(multiTargets, options) {
 	};
 
 	/**
-	 * @private
 	 * @description Variables for managing the components
-	 * @type {Array.<*>}
+	 * @type {Array<*>}
 	 */
 	this._componentManager = [];
 
 	/**
-	 * @private
 	 * @description Current Figure container.
 	 * @type {Element|null}
 	 */
 	this._figureContainer = null;
 
 	/**
-	 * @private
 	 * @description Origin options
 	 * @type {EditorInitOptions}
 	 */
@@ -497,11 +456,10 @@ Editor.prototype = {
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * - If the plugin is added call callBack function.
 	 * @param {string} pluginName The name of the plugin to call
-	 * @param {?Array.<Element>} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
-	 * @param {?Object.<string, *>} pluginOptions Plugin's options
-	 * @param {?Array.<string>} shortcuts this.options.get('shortcuts')[key]
+	 * @param {?Array<HTMLElement>} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
+	 * @param {?Object<string, *>} pluginOptions Plugin's options
 	 */
-	registerPlugin(pluginName, targets, pluginOptions, shortcuts) {
+	registerPlugin(pluginName, targets, pluginOptions) {
 		let plugin = this.plugins[pluginName];
 		if (!plugin) {
 			throw Error(`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`);
@@ -512,7 +470,7 @@ Editor.prototype = {
 
 		if (targets) {
 			for (let i = 0, len = targets.length; i < len; i++) {
-				UpdateButton(targets[i], plugin, this.icons, this.lang, shortcuts);
+				UpdateButton(targets[i], plugin, this.icons, this.lang);
 			}
 
 			if (!this.activeCommands.includes(pluginName) && typeof this.plugins[pluginName].active === 'function') {
@@ -530,7 +488,7 @@ Editor.prototype = {
 	run(command, type, button) {
 		if (type) {
 			if (/more/i.test(type)) {
-				const toolbar = domUtils.getParentElement(button, '.se-toolbar');
+				const toolbar = /** @type {Element} */ (domUtils.getParentElement(button, '.se-toolbar'));
 				const toolInst = domUtils.hasClass(toolbar, 'se-toolbar-sub') ? this.subToolbar : this.toolbar;
 				if (button !== toolInst.currentMoreLayerActiveButton) {
 					const layer = toolbar.querySelector('.' + command);
@@ -672,7 +630,7 @@ Editor.prototype = {
 		const type = target.getAttribute('data-type');
 
 		if (!command && !type) return;
-		if (target.disabled) return;
+		if ('disabled' in target && target.disabled) return;
 
 		this.run(command, type, target);
 	},
@@ -989,7 +947,7 @@ Editor.prototype = {
 	/**
 	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
 	 * - If "focusEdge" is null, then selected last element
-	 * @param {?Element=} focusEl Focus element
+	 * @param {?Node=} focusEl Focus element
 	 */
 	focusEdge(focusEl) {
 		this._preventBlur = false;
@@ -1329,12 +1287,11 @@ Editor.prototype = {
 
 		const plugins = this.plugins;
 		const isArray = Array.isArray;
-		const shortcuts = this.options.get('shortcuts');
 		const filePluginRegExp = [];
 		let plugin;
 		for (const key in plugins) {
-			this.registerPlugin(key, this._pluginCallButtons[key], options[key], shortcuts[key]);
-			this.registerPlugin(key, this._pluginCallButtons_sub[key], options[key], shortcuts[key]);
+			this.registerPlugin(key, this._pluginCallButtons[key], options[key]);
+			this.registerPlugin(key, this._pluginCallButtons_sub[key], options[key]);
 			plugin = this.plugins[key];
 
 			// Filemanager
@@ -1517,7 +1474,7 @@ Editor.prototype = {
 			converter._setIframeStyleLinks(targetOptions.get('iframe_cssFileName')) +
 			converter._setAutoHeightStyle(targetOptions.get('height'));
 		frame.contentDocument.body.className = originOptions.get('_editableClass');
-		frame.contentDocument.body.setAttribute('contenteditable', true);
+		frame.contentDocument.body.setAttribute('contenteditable', 'true');
 	},
 
 	/**
@@ -1571,7 +1528,7 @@ Editor.prototype = {
 	 */
 	__registerClass() {
 		// use events
-		this.events = { ...Events(), ...this.options.get('events') };
+		this.events = { ...Events, ...this.options.get('events') };
 		this.triggerEvent = async (eventName, eventData) => {
 			// [iframe] wysiwyg is disabled, the event is not called.
 			if (eventData?.frameContext?.get('wysiwyg').getAttribute('contenteditable') === 'false') return false;
@@ -1602,7 +1559,7 @@ Editor.prototype = {
 				res: this._responsiveButtons_sub
 			});
 		}
-		this.selection = new Selection(this);
+		this.selection = new Selection_(this);
 		this.html = new HTML(this);
 		this.nodeTransform = new NodeTransform(this);
 		this.component = new Component(this);
@@ -1623,6 +1580,7 @@ Editor.prototype = {
 		ClassInjector.call(this.nodeTransform, this);
 		ClassInjector.call(this.offset, this);
 		ClassInjector.call(this.selection, this);
+		ClassInjector.call(this.shortcuts, this);
 		ClassInjector.call(this.toolbar, this);
 		ClassInjector.call(this.ui, this);
 		ClassInjector.call(this.viewer, this);
@@ -1637,7 +1595,9 @@ Editor.prototype = {
 		delete this.nodeTransform.nodeTransform;
 		delete this.offset.offset;
 		delete this.selection.selection;
+		delete this.shortcuts.shortcuts;
 		delete this.toolbar.toolbar;
+		delete this.ui.ui;
 		delete this.viewer.viewer;
 		if (this.subToolbar) delete this.subToolbar.subToolbar;
 

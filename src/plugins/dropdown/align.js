@@ -2,45 +2,41 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @class
  * @description Align plugin
- * @param {EditorInstance} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array.<"right"|"center"|"left"|"justify">} pluginOptions.items - Align items
- * @returns {Align}
  */
-function Align(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.align;
-	this.icon = this.options.get('_rtl') ? 'align_right' : 'align_left';
+class Align extends EditorInjector {
+	static key = 'align';
+	static type = 'dropdown';
+	static className = '';
 
-	// create HTML
-	const menu = CreateHTML(editor, pluginOptions.items);
-	const commandArea = (this._itemMenu = menu.querySelector('ul'));
+	/**
+	 * @param {EditorInstance} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array.<"right"|"center"|"left"|"justify">} pluginOptions.items - Align items
+	 */
+	constructor(editor, pluginOptions) {
+		super(editor);
+		this.title = this.lang.align;
+		this.icon = this.options.get('_rtl') ? 'align_right' : 'align_left';
 
-	// members
-	this.defaultDir = editor.options.get('_rtl') ? 'right' : 'left';
-	this.alignIcons = {
-		justify: editor.icons.align_justify,
-		left: editor.icons.align_left,
-		right: editor.icons.align_right,
-		center: editor.icons.align_center
-	};
-	this.alignList = commandArea.querySelectorAll('li button');
+		// create HTML
+		const menu = CreateHTML(editor, pluginOptions.items);
+		const commandArea = (this._itemMenu = menu.querySelector('ul'));
 
-	// init
-	this.menu.initDropdownTarget(Align, menu);
-}
+		// members
+		this.defaultDir = editor.options.get('_rtl') ? 'right' : 'left';
+		this.alignIcons = {
+			justify: editor.icons.align_justify,
+			left: editor.icons.align_left,
+			right: editor.icons.align_right,
+			center: editor.icons.align_center
+		};
+		this.alignList = commandArea.querySelectorAll('li button');
 
-Align.key = 'align';
-Align.type = 'dropdown';
-Align.className = '';
-Align.prototype = {
+		// init
+		this.menu.initDropdownTarget(Align, menu);
+	}
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
@@ -64,7 +60,7 @@ Align.prototype = {
 		}
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Dropdown
@@ -83,7 +79,7 @@ Align.prototype = {
 				domUtils.removeClass(alignList[i], 'active');
 			}
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -103,7 +99,7 @@ Align.prototype = {
 			lp.appendChild(rightBtn);
 			rp.appendChild(leftBtn);
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -125,10 +121,8 @@ Align.prototype = {
 		this.menu.dropdownOff();
 		this.editor.focus();
 		this.history.push(false);
-	},
-
-	constructor: Align
-};
+	}
+}
 
 function CreateHTML({ lang, icons, options }, items) {
 	const alignItems = Array.isArray(items) ? items : options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];

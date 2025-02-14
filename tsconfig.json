@@ -1,10 +1,11 @@
 {
 	"compilerOptions": {
-		"module": "ES2020",
-		"target": "ES2020",
+		"module": "ES2022",
+		"target": "ES2022",
 		"sourceMap": true,
 		"allowJs": true,
-		"checkJs": false,
+		"checkJs": true,
+		"noUnusedLocals": false,
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
@@ -13,14 +14,17 @@
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-		"noEmit": false,
 		"jsx": "preserve",
 		"noImplicitAny": false,
 		"declaration": true,
+		"declarationMap": false,
 		"emitDeclarationOnly": true,
 		"declarationDir": "./types",
-		"outDir": "./types"
+		"outDir": "./types",
+		"typeRoots": ["./types", "./contracts"],
+		"types": [],
+		"noEmit": true
 	},
-	"include": ["./src/**/*.js"],
-	"exclude": ["node_modules", "test", "dist", "webpack", "./src/langs", "./src/assets", "./types/**/*"]
+	"include": ["./src/**/*.js", "./contracts"],
+	"exclude": ["node_modules", "test", "dist", "webpack", "./src/langs", "./src/assets", "./types/**/*.d.ts"]
 }

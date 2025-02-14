@@ -6,20 +6,15 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, env } from '../../helper';
 
 /**
- * @typedef {import('../editor').default} EditorInstance
- */
-
-/**
  * @typedef {import('./offset').RectsInfo} RectsInfo
  */
 
 /**
- * @class
+ * @constructor
  * @description Selection, Range related class
  * @param {EditorInstance} editor - The root editor instance
- * @returns {Selection}
  */
-function Selection(editor) {
+function Selection_(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
@@ -28,7 +23,7 @@ function Selection(editor) {
 	this.__iframeFocus = false;
 }
 
-Selection.prototype = {
+Selection_.prototype = {
 	/**
 	 * @description Get window selection obejct
 	 * @returns {Selection}
@@ -178,7 +173,7 @@ Selection.prototype = {
 	/**
 	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
 	 * @param {Range} range core.getRange()
-	 * @param {Element|null} container If there is "container" argument, it creates a line in front of the container.
+	 * @param {Node|null} container If there is "container" argument, it creates a line in front of the container.
 	 * @returns {Range} a new "range" or argument "range".
 	 */
 	getRangeAndAddLine(range, container) {
@@ -218,7 +213,7 @@ Selection.prototype = {
 
 	/**
 	 * @description Get the Rects object.
-	 * @param {Range|Element|null} target Range object | Element | null
+	 * @param {Range|Node|null} target Range object | Element | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
 	 * @returns {{rects: RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 */
@@ -280,8 +275,7 @@ Selection.prototype = {
 
 	/**
 	 * @description Get the custom range object of the event.
-	 * @returns {Event} e Event object
-	 * @returns {{sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}}
+	 * @returns {{sc: Node, so: number, ec: Node, eo: number}} {sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}
 	 */
 	getEventLocationRange(e) {
 		let sc, so, ec, eo;
@@ -316,7 +310,7 @@ Selection.prototype = {
 	/**
 	 * @description Scroll to the corresponding selection or range position.
 	 * @param {Selection|Range|Node} ref selection or range object
-	 * @param {?Object.<string, *>=} scrollOption option of scrollTo
+	 * @param {?Object<string, *>=} scrollOption option of scrollTo
 	 */
 	scrollTo(ref, scrollOption) {
 		if (ref instanceof Selection) {
@@ -572,7 +566,7 @@ Selection.prototype = {
 		return true;
 	},
 
-	constructor: Selection
+	constructor: Selection_
 };
 
-export default Selection;
+export default Selection_;

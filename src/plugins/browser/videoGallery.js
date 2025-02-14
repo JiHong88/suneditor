@@ -2,19 +2,14 @@ import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @class
  * @description Video gallery plugin
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions
- * @param {Array.<*>=} pluginOptions.data - direct data without server calls
+ * @param {Array<*>=} pluginOptions.data - direct data without server calls
  * @param {string=} pluginOptions.url - server request url
- * @param {Object.<string, string>=} pluginOptions.headers - server request headers
- * @param {string|() => string} pluginOptions.thumbnail - default thumbnail
- * @returns {VideoGallery}
+ * @param {Object<string, string>=} pluginOptions.headers - server request headers
+ * @param {string|(() => string)} pluginOptions.thumbnail - default thumbnail
  */
 function VideoGallery(editor, pluginOptions) {
 	// plugin bisic properties

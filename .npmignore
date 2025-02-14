@@ -26,3 +26,6 @@ webpack/
 karma.conf.js
 tsconfig.json
 package-lock.json
+
+#contracts - extend types
+contracts/

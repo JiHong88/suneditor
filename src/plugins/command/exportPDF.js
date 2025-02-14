@@ -5,17 +5,12 @@ import { ApiManager } from '../../modules';
 const { _d } = env;
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @class
  * @description Export PDF plugin
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions - plugin options
  * @param {string} pluginOptions.apiUrl - server request url
  * @param {string} pluginOptions.fileName - file name
- * @returns {ExportPDF}
  */
 function ExportPDF(editor, pluginOptions) {
 	EditorInjector.call(this, editor);

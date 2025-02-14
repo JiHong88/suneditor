@@ -9,11 +9,7 @@ import { CreateToolBar, UpdateButton } from '../section/constructor';
 const { _w } = env;
 
 /**
- * @typedef {import('../editor').default} EditorInstance
- */
-
-/**
- * @class
+ * @constructor
  * @description Toolbar class
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} options - toolbar options
@@ -22,7 +18,6 @@ const { _w } = env;
  * @param {Boolean} options.inline - inline toolbar
  * @param {Boolean} options.balloonAlways - balloon toolbar always show
  * @param {Array} options.res - responsive toolbar button list
- * @returns {Toolbar}
  */
 function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 	CoreInjector.call(this, editor);

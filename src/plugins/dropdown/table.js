@@ -62,18 +62,6 @@ const DEFAULT_COLOR_LIST = [
 ];
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
- * @typedef {import('../../core/base/eventManager').PluginMouseEventInfo} PluginMouseEventInfo
- */
-
-/**
- * @typedef {import('../../core/base/eventManager').PluginKeyEventInfo} PluginKeyEventInfo
- */
-
-/**
  * @class
  * @description Table Plugin
  * @param {EditorInstance} editor - The root editor instance
@@ -82,7 +70,6 @@ const DEFAULT_COLOR_LIST = [
  * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')
  * @param {"cell"|"table"} [pluginOptions.cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
  * @param {Array} [pluginOptions.colorList] - Color list, used in cell color picker
- * @returns {Table}
  */
 function Table(editor, pluginOptions) {
 	// plugin bisic properties
@@ -2457,7 +2444,7 @@ function IsResizeEls(node) {
  * @private
  * @description Checks if a table cell is at its edge based on the mouse event.
  * @param {MouseEvent} event The mouse event.
- * @param {HTMLElement} tableCell The table cell to check.
+ * @param {Element} tableCell The table cell to check.
  * @returns {Object} An object containing edge detection details.
  */
 function CheckCellEdge(event, tableCell) {
@@ -2479,7 +2466,7 @@ function CheckCellEdge(event, tableCell) {
  * @private
  * @description Checks if a row is at its edge based on the mouse event.
  * @param {MouseEvent} event The mouse event.
- * @param {HTMLElement} tableCell The table row cell to check.
+ * @param {Element} tableCell The table row cell to check.
  * @returns {Object} An object containing row edge detection details.
  */
 function CheckRowEdge(event, tableCell) {

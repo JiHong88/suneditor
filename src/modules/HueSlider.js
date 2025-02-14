@@ -42,7 +42,7 @@ function CreateSliderCtx() {
 	`;
 
 	const slider = domUtils.createElement('DIV', { class: 'se-hue-slider' }, html);
-	const wheelCanvas = slider.querySelector('.se-hue-wheel');
+	const wheelCanvas = /** @type {HTMLCanvasElement} */ (slider.querySelector('.se-hue-wheel'));
 	const gradientBarCanvas = slider.querySelector('.se-hue-gradient');
 	const currentColors = slider.querySelector('.se-hue-final-hex').children;
 
@@ -79,10 +79,11 @@ function CreateSliderCtx() {
  * @typedef {Object} HueSliderParams
  * @property {Element} form The form element to attach the hue slider.
  * @property {boolean} isNewForm Whether to create a new form element.
- * @property {ControllerParams} controllerParams Controller options
+ * @property {ControllerParams} controllerOptions Controller options
  */
 
 /**
+ * @constructor
  * @description Create a Hue slider. (only create one at a time)
  * - When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.

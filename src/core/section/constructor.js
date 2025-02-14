@@ -107,148 +107,150 @@ export const RO_UNAVAILABD = [
 
 /**
  * @typedef {Object} EditorFrameOptions
- * @property {string} [options.value=""] - Initial value for the editor.
- * @property {string} [options.placeholder=""] - Placeholder text.
- * @property {Object.<string, string>} [options.editableFrameAttributes={}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
- * @property {string} [options.width="100%"] - Width for the editor.
- * @property {string} [options.minWidth=""] - Min width for the editor.
- * @property {string} [options.maxWidth=""] - Max width for the editor.
- * @property {string} [options.height="auto"] - Height for the editor.
- * @property {string} [options.minHeight=""] - Min height for the editor.
- * @property {string} [options.maxHeight=""] - Max height for the editor.
- * @property {string} [options.editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
- * @property {boolean} [options.iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
- * @property {boolean} [options.iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the "iframe".
- * @property {Object.<string, string>} [options.iframe_attributes={}] - Attributes of the "iframe". (e.g. {'scrolling': 'no'})
- * @property {string} [options.iframe_cssFileName="suneditor"] - Name or Array of the CSS file to apply inside the iframe.
+ * @property {string} [value=""] - Initial value for the editor.
+ * @property {string} [placeholder=""] - Placeholder text.
+ * @property {Object<string, string>} [editableFrameAttributes={}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+ * @property {string} [width="100%"] - Width for the editor.
+ * @property {string} [minWidth=""] - Min width for the editor.
+ * @property {string} [maxWidth=""] - Max width for the editor.
+ * @property {string} [height="auto"] - Height for the editor.
+ * @property {string} [minHeight=""] - Min height for the editor.
+ * @property {string} [maxHeight=""] - Max height for the editor.
+ * @property {string} [editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
+ * @property {boolean} [iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
+ * @property {boolean} [iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the "iframe".
+ * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the "iframe". (e.g. {'scrolling': 'no'})
+ * @property {string} [iframe_cssFileName="suneditor"] - Name or Array of the CSS file to apply inside the iframe.
  * - You can also use regular expressions.
  * - Applied by searching by filename in the link tag of document,
  * - or put the URL value (".css" can be omitted).
- * @property {boolean} [options.statusbar=true] - Enables the status bar.
- * @property {boolean} [options.statusbar_showPathLabel=true] - Displays the current node structure to status bar.
- * @property {boolean} [options.statusbar_resizeEnable=true] - Enables resize function of bottom status bar
- * @property {boolean} [options.charCounter=false] - Shows the number of characters in the editor.
+ * @property {boolean} [statusbar=true] - Enables the status bar.
+ * @property {boolean} [statusbar_showPathLabel=true] - Displays the current node structure to status bar.
+ * @property {boolean} [statusbar_resizeEnable=true] - Enables resize function of bottom status bar
+ * @property {boolean} [charCounter=false] - Shows the number of characters in the editor.
  * - If the maxCharCount option has a value, it becomes true.
- * @property {number} [options.charCounter_max] - The maximum number of characters allowed to be inserted into the editor.
- * @property {string} [options.charCounter_label] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
- * @property {"char"|"byte"|"byte-html"} [options.charCounter_type="char"] - Defines the calculation method of the "charCounter" option.
+ * @property {number} [charCounter_max] - The maximum number of characters allowed to be inserted into the editor.
+ * @property {string} [charCounter_label] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
+ * @property {"char"|"byte"|"byte-html"} [charCounter_type="char"] - Defines the calculation method of the "charCounter" option.
  * - 'char': Characters length.
  * - 'byte': Binary data size of characters.
  * - 'byte-html': Binary data size of the full HTML string.
  */
 
 /**
- * @typedef {Object} EditorBasicOptions
- * @property {Object.<string, *>|Array.<Object.<string, *>>} [options.plugins] - Plugin configuration.
- * @property {Array.<string>} [options.excludedPlugins] - Plugin configuration.
- * @property {Array.<Array.<string>>} [options.buttonList] - List of toolbar buttons, grouped by sub-arrays.
- * @property {boolean} [options.v2Migration=false] - Enables migration mode for SunEditor v2.
- * @property {boolean} [options.strictMode=true] - Enables strict filtering of tags, attributes, and styles.
- * @property {"classic"|"inline"|"balloon"|"balloon-always"} [options.mode="classic"] - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
- * @property {string} [options.type=""] - Editor type: "document:header,page".
- * @property {string} [options.theme=""] - Editor theme.
- * @property {Array.<string>} [options.fontSizeUnits=["px", "pt", "em", "rem"]] - Allowed font size units.
- * @property {string} [options.allowedClassName] - Allowed class names.
- * @property {boolean} [options.closeModalOutsideClick=false] - Closes modals when clicking outside.
- * @property {boolean} [options.copyFormatKeepOn=false] - Keeps the format of the copied content.
- * @property {boolean} [options.syncTabIndent=true] - Synchronizes tab indent with spaces.
- * @property {boolean} [options.tabDisable=false] - Disables tab key input.
- * @property {boolean} [options.autoLinkify] - Automatically converts URLs into hyperlinks. ("Link" plugin required)
- * @property {Array.<string>} [options.autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
- * @property {Object.<string, string|number>} [options.scrollToOptions={behavior: "auto", block: "nearest"}] - Configuration for scroll behavior when navigating editor content.
- * @property {Object.<string, string|number>} [options.componentScrollToOptions={behavior: "smooth", block: "center"}] - Configuration for scroll behavior when navigating components.
- * @property {"repeat"|"always"|"none"} [options.retainStyleMode="repeat"] - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
+ * @typedef {Object} EditorBaseOptions
+ * @property {Object<string, *>|Array<Object<string, *>>} [plugins] - Plugin configuration.
+ * @property {Array<string>} [excludedPlugins] - Plugin configuration.
+ * @property {Array<string[]|string>} [buttonList] - List of toolbar buttons, grouped by sub-arrays.
+ * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
+ * @property {boolean|{tagFilter: boolean, formatFilter: boolean, classFilter: boolean, styleNodeFilter: boolean, attrFilter: boolean, styleFilter: boolean}} [strictMode=true] - Enables strict filtering of tags, attributes, and styles.
+ * @property {"classic"|"inline"|"balloon"|"balloon-always"} [mode="classic"] - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
+ * @property {string} [type=""] - Editor type: "document:header,page".
+ * @property {string} [theme=""] - Editor theme.
+ * @property {Object<string, string>} [lang] - Language configuration.
+ * @property {Array<string>} [fontSizeUnits=["px", "pt", "em", "rem"]] - Allowed font size units.
+ * @property {string} [allowedClassName] - Allowed class names.
+ * @property {boolean} [closeModalOutsideClick=false] - Closes modals when clicking outside.
+ * @property {boolean} [copyFormatKeepOn=false] - Keeps the format of the copied content.
+ * @property {boolean} [syncTabIndent=true] - Synchronizes tab indent with spaces.
+ * @property {boolean} [tabDisable=false] - Disables tab key input.
+ * @property {boolean} [autoLinkify] - Automatically converts URLs into hyperlinks. ("Link" plugin required)
+ * @property {Array<string>} [autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
+ * @property {Object<string, string|number>} [scrollToOptions={behavior: "auto", block: "nearest"}] - Configuration for scroll behavior when navigating editor content.
+ * @property {Object<string, string|number>} [componentScrollToOptions={behavior: "smooth", block: "center"}] - Configuration for scroll behavior when navigating components.
+ * @property {"repeat"|"always"|"none"} [retainStyleMode="repeat"] - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
  * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
  * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
  * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
- * @property {Object.<string, boolean>} [options.allowedExtraTags={script: false, style: false, meta: false, link: false, "[a-z]+:[a-z]+": false}] - Specifies extra allowed or disallowed tags.
- * @property {Object.<string, (...args: *) => *>} [options.events={}] - Custom event handlers.
- * @property {string} [options.__textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - The basic tags that serves as the base for "textStyleTags"
- * @property {string} [options.textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - Additional text style tags.
- * @property {Object.<string, string>} [options.convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
- * @property {Object.<string, string>} [options.tagStyles={'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style', 'ol|ul': 'list-style-type'}] - Specifies allowed styles for HTML tags.
- * @property {string} [options.spanStyles="font-family|font-size|color|background-color"] - Specifies allowed styles for the "span" tag.
- * @property {string} [options.lineStyles="text-align|margin-left|margin-right|line-height"] - Specifies allowed styles for the "line" element (p..).
- * @property {string} [options.textDirection="ltr"] - Text direction: "ltr" or "rtl".
- * @property {Array.<string>} [options.reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
- * @property {number} [options.historyStackDelayTime=400] - Delay time for history stack updates (ms).
- * @property {string} [options.lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
- * @property {string} [options.printClass=""] - Class name for printing.
- * @property {string} [options.defaultLine="p"] - Default line element when inserting new lines.
- * @property {string} [options.__defaultElementWhitelist="br|div"] - Default allowed HTML elements. The default values are maintained.
- * @property {string} [options.elementWhitelist=""] - Allowed HTML elements. Delimiter: "|" (e.g. "p|div", "*").
- * @property {string} [options.elementBlacklist=""] - Disallowed HTML elements. Delimiter: "|" (e.g. "script|style").
- * @property {string} [options.__defaultAttributeWhitelist] - Allowed attributes. Delimiter: "|" (e.g. "href|target").
- * @property {Object.<string, string>} [options.attributeWhitelist=""] - Allowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
- * @property {Object.<string, string>} [options.attributeBlacklist=""] - Disallowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
- * @property {string} [options.__defaultFormatLine="P|H[1-6]|LI|TH|TD|DETAILS"] - Overrides the editor's default "line" element.
- * @property {string} [options.formatLine="P|H[1-6]|LI|TH|TD|DETAILS"] - Specifies the editor's "line" elements.
+ * @property {Object<string, boolean>} [allowedExtraTags={script: false, style: false, meta: false, link: false, "[a-z]+:[a-z]+": false}] - Specifies extra allowed or disallowed tags.
+ * @property {Object<string, (...args: *) => *>} [events={}] - Custom event handlers.
+ * @property {string} [__textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - The basic tags that serves as the base for "textStyleTags"
+ * @property {string} [textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - Additional text style tags.
+ * @property {Object<string, string>} [convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
+ * @property {Object<string, string>} [__tagStyles={'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style', 'ol|ul': 'list-style-type'}] - The basic tags that serves as the base for "tagStyles"
+ * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags.
+ * @property {string} [spanStyles="font-family|font-size|color|background-color"] - Specifies allowed styles for the "span" tag.
+ * @property {string} [lineStyles="text-align|margin-left|margin-right|line-height"] - Specifies allowed styles for the "line" element (p..).
+ * @property {string} [textDirection="ltr"] - Text direction: "ltr" or "rtl".
+ * @property {Array<string>} [reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
+ * @property {number} [historyStackDelayTime=400] - Delay time for history stack updates (ms).
+ * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
+ * @property {string} [printClass=""] - Class name for printing.
+ * @property {string} [defaultLine="p"] - Default line element when inserting new lines.
+ * @property {string} [__defaultElementWhitelist="br|div"] - Default allowed HTML elements. The default values are maintained.
+ * @property {string} [elementWhitelist=""] - Allowed HTML elements. Delimiter: "|" (e.g. "p|div", "*").
+ * @property {string} [elementBlacklist=""] - Disallowed HTML elements. Delimiter: "|" (e.g. "script|style").
+ * @property {string} [__defaultAttributeWhitelist] - Allowed attributes. Delimiter: "|" (e.g. "href|target").
+ * @property {Object<string, string>} [attributeWhitelist=""] - Allowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
+ * @property {Object<string, string>} [attributeBlacklist=""] - Disallowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
+ * @property {string} [__defaultFormatLine="P|H[1-6]|LI|TH|TD|DETAILS"] - Overrides the editor's default "line" element.
+ * @property {string} [formatLine="P|H[1-6]|LI|TH|TD|DETAILS"] - Specifies the editor's "line" elements.
  * - (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
  * - "line" element also contain "brLine" element
- * @property {string} [options.__defaultFormatBrLine="PRE"] - Overrides the editor's default "brLine" element.
- * @property {string} [options.formatBrLine="PRE"] - Specifies the editor's "brLine" elements. (e.g. "PRE").
+ * @property {string} [__defaultFormatBrLine="PRE"] - Overrides the editor's default "brLine" element.
+ * @property {string} [formatBrLine="PRE"] - Specifies the editor's "brLine" elements. (e.g. "PRE").
  * - (PRE | class="__se__format__br_line_xxx")
  * - "brLine" elements is included in the "line" element.
  * - "brLine" elements's line break is "BR" tag.
  * ※ Entering the Enter key in the space on the last line ends "brLine" and appends "line".
- * @property {string} [options.__defaultFormatClosureBrLine=""] - Overrides the editor's default "closureBrLine" element.
- * @property {string} [options.formatClosureBrLine=""] - Specifies the editor's "closureBrLine" elements.
+ * @property {string} [__defaultFormatClosureBrLine=""] - Overrides the editor's default "closureBrLine" element.
+ * @property {string} [formatClosureBrLine=""] - Specifies the editor's "closureBrLine" elements.
  * - (class="__se__format__br_line__closure_xxx")
  * - "closureBrLine" elements is included in the "brLine".
  * - "closureBrLine" elements's line break is "BR" tag.
  * - ※ You cannot exit this format with the Enter key or Backspace key.
  * - ※ Use it only in special cases. ([ex] format of table cells)
- * @property {string} [options.__defaultFormatBlock="BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS"] - Overrides the editor's default "block" element.
- * @property {string} [options.formatBlock="BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS"] - Specifies the editor's "block" elements.
+ * @property {string} [__defaultFormatBlock="BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS"] - Overrides the editor's default "block" element.
+ * @property {string} [formatBlock="BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS"] - Specifies the editor's "block" elements.
  * - (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
  * - "block" is wrap the "line" and "component"
- * @property {string} [options.__defaultFormatClosureBlock="TH|TD"] - Overrides the editor's default "closureBlock" element.
- * @property {string} [options.formatClosureBlock="TH|TD"] - Specifies the editor's "closureBlock" elements.
+ * @property {string} [__defaultFormatClosureBlock="TH|TD"] - Overrides the editor's default "closureBlock" element.
+ * @property {string} [formatClosureBlock="TH|TD"] - Specifies the editor's "closureBlock" elements.
  * - (TH, TD | class="__se__format__block_closure_xxx")
  * - "closureBlock" elements is included in the "block".
  * - "closureBlock" element is wrap the "line" and "component"
  * - ※ You cannot exit this format with the Enter key or Backspace key.
  * - ※ Use it only in special cases. ([ex] format of table cells)
- * @property {string} [options.allowedEmptyTags=".se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details"] - Allowed empty tags.
- * @property {number|string} [options.toolbar_width="auto"] - Toolbar width.
- * @property {Element|string} [options.toolbar_container] - Container element for the toolbar.
- * @property {number} [options.toolbar_sticky=0] - Enables sticky toolbar with optional offset.
- * @property {boolean} [options.toolbar_hide=false] - Hides toolbar initially.
- * @property {Object} [options.subToolbar] - Sub-toolbar configuration.
- * @property {Array.<Array.<string>>} [options.subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
- * @property {"balloon"|"balloon-always"} [options.subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
- * @property {number|string} [options.subToolbar.width="auto"] - Sub-toolbar width.
- * @property {boolean} [options.statusbar_container] - Container element for the status bar.
- * @property {boolean} [options.shortcutsHint=true] - Displays shortcut hints in tooltips.
- * @property {boolean} [options.shortcutsDisable=false] - Disables keyboard shortcuts.
- * @property {Object.<string, Array.<string>>} [options.shortcuts] - Custom keyboard shortcuts.
- * @property {number} [options.fullScreenOffset=0] - Offset applied when entering fullscreen mode.
- * @property {string} [options.previewTemplate] - Custom template for preview mode.
- * @property {string} [options.printTemplate] - Custom template for print mode.
- * @property {boolean} [options.componentAutoSelect=false] - Enables automatic selection of inserted components.
- * @property {string} [options.defaultUrlProtocol] - Default URL protocol for links.
- * @property {boolean} [options.allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
- * @property {Object.<string, string>} [options.icons] - Overrides the default icons.
- * @property {string} [options.freeCodeViewMode=false] - Enables free code view mode.
- * @property {boolean} [options.__lineFormatFilter=true] - Line format filter configuration.
- * @property {boolean} [options.__pluginRetainFilter=true] - Plugin retain filter configuration.
- * @property {Array.<string>} [options.__listCommonStyle=["fontSize", "color", "fontFamily", "fontWeight", "fontStyle"]] - Defines the list of styles that are applied directly to the `<li>` element
+ * @property {string} [allowedEmptyTags=".se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details"] - Allowed empty tags.
+ * @property {number|string} [toolbar_width="auto"] - Toolbar width.
+ * @property {Element|string} [toolbar_container] - Container element for the toolbar.
+ * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
+ * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
+ * @property {Object} [subToolbar] - Sub-toolbar configuration.
+ * @property {Array<Array<string>>} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
+ * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
+ * @property {number|string} [subToolbar.width="auto"] - Sub-toolbar width.
+ * @property {Element|string} [statusbar_container] - Container element for the status bar.
+ * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
+ * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
+ * @property {Object<string, Array<string>>} [shortcuts] - Custom keyboard shortcuts.
+ * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
+ * @property {string} [previewTemplate] - Custom template for preview mode.
+ * @property {string} [printTemplate] - Custom template for print mode.
+ * @property {boolean} [componentAutoSelect=false] - Enables automatic selection of inserted components.
+ * @property {string} [defaultUrlProtocol] - Default URL protocol for links.
+ * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
+ * @property {Object<string, string>} [icons] - Overrides the default icons.
+ * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
+ * @property {boolean} [__lineFormatFilter=true] - Line format filter configuration.
+ * @property {boolean} [__pluginRetainFilter=true] - Plugin retain filter configuration.
+ * @property {Array<string>} [__listCommonStyle=["fontSize", "color", "fontFamily", "fontWeight", "fontStyle"]] - Defines the list of styles that are applied directly to the `<li>` element
  * - when a text style is applied to the entire list item.
  * - For example, when changing the font size or color of a list item (`<li>`),
  * - these styles will be applied to the `<li>` tag instead of wrapping the content inside additional tags.
- * @property {Object.<string, *>} [options.externalLibs] - External libraries like CodeMirror or MathJax.
- * @property {Object.<string, *>} [options.*] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
+ * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax.
+ * @property {Object<string, *>} [PluginOptions] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
  */
 
 /**
- * @typedef {EditorBasicOptions & EditorFrameOptions} EditorInitOptions
+ * @typedef {EditorBaseOptions & EditorFrameOptions} EditorInitOptions
  */
 
 /**
  * @description Creates a new SunEditor instance with specified options.
- * @param {Element|Object.<string, {target: Element, options: EditorFrameOptions}>} editorTargets - Target element or multi-root object.
+ * @param {Array<{target: Element, key: *, options: EditorFrameOptions}>} editorTargets - Target element or multi-root object.
  * @param {EditorInitOptions} options - Configuration options for the editor.
- * @returns {{Object.<string, *>}} - SunEditor instance with context, options, and DOM elements.
+ * @returns {Object<string, *>} - SunEditor instance with context, options, and DOM elements.
  */
 function Constructor(editorTargets, options) {
 	if (typeof options !== 'object') options = {};
@@ -279,10 +281,12 @@ function Constructor(editorTargets, options) {
 	const menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
 	editor_carrier_wrapper.appendChild(menuTray);
 	// focus temp element
-	const focusTemp = domUtils.createElement('INPUT', {
-		class: '__se__focus__temp__',
-		style: 'position: fixed !important; top: -10000px !important; left: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;'
-	});
+	const focusTemp = /** @type {HTMLInputElement} */ (
+		domUtils.createElement('INPUT', {
+			class: '__se__focus__temp__',
+			style: 'position: fixed !important; top: -10000px !important; left: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;'
+		})
+	);
 	focusTemp.tabIndex = 0;
 	editor_carrier_wrapper.appendChild(focusTemp);
 
@@ -340,7 +344,7 @@ function Constructor(editorTargets, options) {
 	let default_status_bar = null;
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
-		const to = editTarget.options;
+		const to = optionMap.frameMap.get(editTarget.key);
 		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (to.get('_rtl') ? ' se-rtl' : '') });
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') });
@@ -402,7 +406,7 @@ function Constructor(editorTargets, options) {
 		}
 
 		// document type
-		const documentTypeInner = {};
+		const documentTypeInner = { inner: null, page: null, pageMirror: null };
 		if (o.get('type-options').includes('header')) {
 			documentTypeInner.inner = domUtils.createElement('DIV', { class: 'se-document-lines', style: `height: ${to.get('height')};` }, '<div class="se-document-lines-inner"></div>');
 		}
@@ -421,7 +425,7 @@ function Constructor(editorTargets, options) {
 		// set container
 		top_div.appendChild(container);
 		rootKeys.push(key);
-		frameRoots.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, codeWrapper, textarea, default_status_bar || statusbar, documentTypeInner, key));
+		frameRoots.set(key, CreateFrameContext({ target: editTarget.target, key: editTarget.key, options: to }, top_div, wysiwyg_div, codeWrapper, textarea, default_status_bar || statusbar, documentTypeInner, key));
 	}
 	/** frame - root set - end -------------------------------------------------------------- */
 
@@ -462,9 +466,9 @@ function Constructor(editorTargets, options) {
 /**
  * @description Create shortcuts desc span.
  * @param {string} command Command string
- * @param {Array.<string>} values options.shortcuts[command]
+ * @param {Array<string>} values options.shortcuts[command]
  * @param {Element|null} button Command button element
- * @param {Map<string, *>} keyMap Map to store shortcut key info
+ * @param {Map<string|number, *>} keyMap Map to store shortcut key info
  * @param {Array} rc "_reverseCommandArray" option
  * @param {Array} reverseKeys Reverse key array
  */
@@ -539,9 +543,9 @@ function _addTooltip(tooptipBtn, shift, shortcut) {
 /**
  * @private
  * @description Returns a new object with merge "a" and "b"
- * @param {Object.<string|symbol, *>} a object
- * @param {Object.<string|symbol, *>} b object
- * @returns {Object.<string|symbol, *>} new object
+ * @param {Object<*, *>} a object
+ * @param {Object<*, *>} b object
+ * @returns {Object<*, *>} new object
  */
 function _mergeObject(a, b) {
 	return [a, b].reduce((_default, _new) => {
@@ -555,9 +559,17 @@ function _mergeObject(a, b) {
 /**
  * @description Initialize options
  * @param {EditorInitOptions} options Configuration options for the editor.
- * @param {Array.<Element>} editorTargets Target textarea
- * @param {Object.<string, *>} plugins Plugins object
- * @returns {o:Map, p:Map} {{o: options map, p: plugins map}}
+ * @param {Array<{target: Element, key: *, options: EditorFrameOptions}>} editorTargets Target textarea
+ * @param {Object<string, *>} plugins Plugins object
+ * @returns {{o: Map<string, *>, i: Object<string, string>, l: Object<string, string>, v: string, buttons: Array<string[]|string>, subButtons: Array<string[]|string>, statusbarContainer: Element|null, frameMap: Map<*, *>}}
+ * - o: options
+ * - i: icons
+ * - l: lang
+ * - v: value
+ * - buttons: Toolbar button list
+ * - subButtons: Sub-Toolbar button list
+ * - statusbarContainer: statusbar container
+ * - frameMap: converted options map
  */
 export function InitOptions(options, editorTargets, plugins) {
 	const buttonList = options.buttonList || DEFAULT_BUTTON_LIST;
@@ -581,7 +593,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		styleNodeFilter: modeValue,
 		attrFilter: modeValue,
 		styleFilter: modeValue,
-		...options.strictMode
+		...(typeof options.strictMode === 'boolean' ? {} : options.strictMode)
 	});
 	o.set('freeCodeViewMode', !!options.freeCodeViewMode);
 	o.set('__lineFormatFilter', options.__lineFormatFilter ?? true);
@@ -774,7 +786,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	/** Toolbar */
 	o.set('toolbar_width', options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto');
 	o.set('toolbar_container', options.toolbar_container && !/inline/i.test(o.get('mode')) ? (typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container) : null);
-	o.set('toolbar_sticky', /balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1);
+	o.set('toolbar_sticky', /balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : numbers.is(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1);
 	o.set('toolbar_hide', !!options.toolbar_hide);
 
 	/** subToolbar */
@@ -792,8 +804,9 @@ export function InitOptions(options, editorTargets, plugins) {
 	}
 
 	/** root options */
+	const frameMap = new Map();
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
-		InitFrameOptions(editorTargets[i].options || {}, options, (editorTargets[i].options = new Map()));
+		frameMap.set(editorTargets[i].key, InitFrameOptions(editorTargets[i].options || {}, options));
 	}
 
 	/** Key actions */
@@ -834,7 +847,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('shortcuts', shortcuts);
 
 	/** View */
-	o.set('fullScreenOffset', options.fullScreenOffset === undefined ? 0 : /^\d+/.test(options.fullScreenOffset) ? numbers.get(options.fullScreenOffset, 0) : 0);
+	o.set('fullScreenOffset', options.fullScreenOffset === undefined ? 0 : numbers.is(options.fullScreenOffset) ? numbers.get(options.fullScreenOffset, 0) : 0);
 	o.set('previewTemplate', typeof options.previewTemplate === 'string' ? options.previewTemplate : null);
 	o.set('printTemplate', typeof options.printTemplate === 'string' ? options.printTemplate : null);
 
@@ -903,19 +916,20 @@ export function InitOptions(options, editorTargets, plugins) {
 	return {
 		o: o,
 		i: icons,
-		l: options.lang || _defaultLang,
+		l: /** @type {Object<string, string>} */ (options.lang || _defaultLang),
 		v: (options.value = typeof options.value === 'string' ? options.value : null),
 		buttons: o.get('_rtl') ? buttonList.reverse() : buttonList,
 		subButtons: subButtons,
-		statusbarContainer: typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container
+		statusbarContainer: typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container,
+		frameMap: frameMap
 	};
 }
 
 /**
  * @description Create a context object for the editor frame.
  * @param {Map<string, *>} targetOptions - editor.frameOptions
- * @param {Element} statusbar - statusbar element
- * @returns {{statusbar: Element, navigation: Element, charWrapper: Element, charCounter: Element}}
+ * @param {HTMLElement} statusbar - statusbar element
+ * @returns {{statusbar: HTMLElement, navigation: HTMLElement, charWrapper: HTMLElement, charCounter: HTMLElement}}
  */
 export function CreateStatusbar(targetOptions, statusbar) {
 	let navigation = null;
@@ -955,13 +969,21 @@ export function CreateStatusbar(targetOptions, statusbar) {
 
 	return {
 		statusbar: statusbar,
-		navigation: navigation,
-		charWrapper: charWrapper,
-		charCounter: charCounter
+		navigation: /** @type {HTMLElement} */ (navigation),
+		charWrapper: /** @type {HTMLElement} */ (charWrapper),
+		charCounter: /** @type {HTMLElement} */ (charCounter)
 	};
 }
 
-function InitFrameOptions(o, origin, fo) {
+/**
+ * @description Initialize options.
+ * @param {EditorFrameOptions} o - Target options
+ * @param {EditorInitOptions} origin - Full options
+ * @returns {Map<string, *>}
+ */
+function InitFrameOptions(o, origin) {
+	const fo = new Map();
+
 	fo.set('_origin', o);
 	const barContainer = origin.statusbar_container;
 
@@ -1015,11 +1037,18 @@ function InitFrameOptions(o, origin, fo) {
 	fo.set('charCounter_max', numbers.is(charCounter_max) && charCounter_max > -1 ? charCounter_max * 1 : null);
 	fo.set('charCounter_label', typeof charCounter_label === 'string' ? charCounter_label.trim() : null);
 	fo.set('charCounter_type', typeof charCounter_type === 'string' ? charCounter_type : 'char');
+
+	return fo;
 }
 
 /**
  * @private
  * @description Initialize property of suneditor elements
+ * @param {string} key - The key of the editor frame
+ * @param {Map<string, *>} options - options
+ * @param {Element} topDiv - top div
+ * @param {Map<string, *>} targetOptions - editor.frameOptions
+ * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: Element, codeView: Element, placeholder: Element}}
  */
 function _initTargetElements(key, options, topDiv, targetOptions) {
 	const editorStyles = targetOptions.get('_defaultStyles');
@@ -1034,7 +1063,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 	});
 
 	if (!targetOptions.get('iframe')) {
-		wysiwygDiv.setAttribute('contenteditable', true);
+		wysiwygDiv.setAttribute('contenteditable', 'true');
 		wysiwygDiv.setAttribute('scrolling', 'auto');
 		wysiwygDiv.className += ' ' + options.get('_editableClass');
 		wysiwygDiv.style.cssText = editorStyles.frame + editorStyles.editor;
@@ -1043,9 +1072,10 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 		for (const frameKey in frameAttrs) {
 			wysiwygDiv.setAttribute(frameKey, frameAttrs[frameKey]);
 		}
-		wysiwygDiv.allowFullscreen = true;
-		wysiwygDiv.frameBorder = 0;
-		wysiwygDiv.style.cssText = editorStyles.frame;
+		const iframeWW = /** @type {HTMLIFrameElement} */ (wysiwygDiv);
+		iframeWW.allowFullscreen = true;
+		iframeWW.frameBorder = '0';
+		iframeWW.style.cssText = editorStyles.frame;
 	}
 
 	// textarea for code view
@@ -1053,7 +1083,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 	let placeholder = null;
 	if (targetOptions.get('placeholder')) {
 		placeholder = domUtils.createElement('SPAN', { class: 'se-placeholder' });
-		placeholder.innerText = targetOptions.get('placeholder');
+		placeholder.textContent = targetOptions.get('placeholder');
 	}
 
 	return {
@@ -1249,8 +1279,8 @@ function _createModuleGroup() {
  * @param {"command"|"dropdown"|"field"|"browser"|"input"|"modal"|"popup"} dataType The data-type property of the button
  * @param {string} innerHTML Html in button
  * @param {string} _disabled Button disabled
- * @param {Object.<string, string>} icons Icons
- * @returns {{li: Element, button: Element}}
+ * @param {Object<string, string>} icons Icons
+ * @returns {{li: HTMLElement, button: HTMLElement}}
  */
 function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, icons) {
 	if (!innerHTML) innerHTML = '';
@@ -1281,7 +1311,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 		oButton.className += ' se-btn-more-text';
 	}
 
-	if (_disabled) oButton.setAttribute('disabled', true);
+	if (_disabled) oButton.setAttribute('disabled', 'true');
 
 	if (/^FIELD$/i.test(dataType)) domUtils.addClass(oLi, 'se-toolbar-hidden-btn');
 
@@ -1307,10 +1337,10 @@ export function CreateTooltipInner(text) {
 
 /**
  * @description Update a button state, attributes, and icons
- * @param {Element} element Button element
- * @param {Object.<string, *>} plugin Plugin
- * @param {Object.<string, string>} icons Icons
- * @param {Object.<string, string>} lang lang
+ * @param {HTMLElement|null} element Button element
+ * @param {Object<string, *>} plugin Plugin
+ * @param {Object<string, string>} icons Icons
+ * @param {Object<string, string>} lang lang
  */
 export function UpdateButton(element, plugin, icons, lang) {
 	if (!element) return;
@@ -1366,7 +1396,7 @@ export function UpdateButton(element, plugin, icons, lang) {
 			domUtils.addClass(inputTarget, 'se-toolbar-btn');
 			inputTarget.setAttribute('data-command', element.getAttribute('data-command'));
 			inputTarget.setAttribute('data-type', element.getAttribute('data-type'));
-			if (element.hasAttribute('disabled')) inputTarget.setAttribute('disabled', true);
+			if (element.hasAttribute('disabled')) inputTarget.setAttribute('disabled', 'true');
 		}
 	}
 }
@@ -1374,17 +1404,18 @@ export function UpdateButton(element, plugin, icons, lang) {
 /**
  * @description Create editor HTML
  * @param {Array} buttonList option.buttonList
- * @param {?Object.<string, *>} plugins Plugins
+ * @param {?Object<string, *>} plugins Plugins
  * @param {Map<string, *>} options options
- * @param {Object.<string, string>} icons icons
- * @param {Object.<string, string>} lang lang
+ * @param {Object<string, string>} icons icons
+ * @param {Object<string, string>} lang lang
  * @param {boolean} isUpdate Is update
- * @returns {{element: Element, pluginCallButtons: Object.<string, Element>, responsiveButtons: Array.<Element>, buttonTray: Element, updateButtons: Array.<{button: Element, plugin: *, key: string>}}}
+ * @returns {{element: HTMLElement, pluginCallButtons: Object<string, Array<HTMLElement>>, responsiveButtons: Array<HTMLElement>, buttonTray: HTMLElement, updateButtons: Array<{button: HTMLElement, plugin: *, key: string}>}}}
  */
 export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdate) {
 	/** create button list */
 	buttonList = JSON.parse(JSON.stringify(buttonList));
 	const defaultButtonList = _defaultButtons(options, icons, lang);
+	/** @type {Object<string, Array<HTMLElement>>} */
 	const pluginCallButtons = {};
 	const responsiveButtons = [];
 	const updateButtons = [];

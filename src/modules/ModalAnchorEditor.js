@@ -23,13 +23,12 @@ const { NO_EVENT } = env;
  */
 
 /**
- * @class
+ * @constructor
  * @description Modal form Anchor tag editor
  * - Use it by inserting it into Modal in a plugin that uses Modal.
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} modalForm The modal form element
  * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
- * @returns {ModalAnchorEditor}
  */
 function ModalAnchorEditor(inst, modalForm, params) {
 	// plugin bisic properties
@@ -361,7 +360,7 @@ ModalAnchorEditor.prototype = {
 	/**
 	 * @private
 	 * @description Registers a newly uploaded file and sets its URL in the modal form.
-	 * @param {Object.<string, *>} response - The response object from the file upload request.
+	 * @param {Object<string, *>} response - The response object from the file upload request.
 	 */
 	_register(response) {
 		const file = response.result[0];
@@ -374,7 +373,7 @@ ModalAnchorEditor.prototype = {
 	/**
 	 * @private
 	 * @description Handles file upload errors.
-	 * @param {Object.<string, *>} response - The error response object.
+	 * @param {Object<string, *>} response - The error response object.
 	 * @returns {Promise<void>}
 	 */
 	async _error(response) {

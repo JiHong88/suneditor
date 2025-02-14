@@ -3,10 +3,6 @@
  */
 
 /**
- * @typedef {import('../editor').default} EditorInstance
- */
-
-/**
  * @typedef {Object} ShortcutInfo
  * @property {boolean} c - Whether the [Ctrl, Command] key is pressed.
  * @property {boolean} s - Whether the [Shift] key is pressed.
@@ -17,16 +13,15 @@
  * @property {?string} key - The key pressed (e.g., "1.").
  * @property {?string} method - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
  * @property {?string} plugin - The plugin name.
- * @property {?Array.<string>} r - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
+ * @property {?Array<string>} r - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
  * @property {?string} textTrigger - Whether the event was triggered by a text input (e.g., mention like @ab).
  * @property {?string} type - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
  */
 
 /**
- * @class
+ * @constructor
  * @description Shortcuts class
  * @param {EditorInstance} editor - The root editor instance
- * @returns {Shortcuts}
  */
 function Shortcuts(editor) {
 	this.editor = editor;

@@ -2,15 +2,24 @@ import { domUtils, env } from '../../../helper';
 
 const { isMobile } = env;
 
+/**
+ * @typedef {Omit<import('../eventManager').default & Partial<EditorInjector>, 'eventManager'>} EventManagerThis
+ */
+
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {MouseEvent} e - Event object
+ */
 export function ButtonsHandler(e) {
-	let target = e.target;
+	const eventTarget = /** @type {Element} */ (e.target);
+	let target = eventTarget;
 
 	if (this.editor.isSubBalloon && !this.context.get('toolbar.sub.main')?.contains(target)) {
 		this._hideToolbar_sub();
 	}
 
 	const isInput = domUtils.isInputElement(target);
-	if (this.menu._bindControllersOff) e.stopPropagation();
 
 	if (isInput) {
 		this.editor._preventBlur = false;
@@ -26,7 +35,7 @@ export function ButtonsHandler(e) {
 		let className = target.className;
 
 		while (target && !command && !/(se-menu-list|sun-editor-common|se-menu-tray)/.test(className)) {
-			target = target.parentNode;
+			target = target.parentElement;
 			command = target.getAttribute('data-command');
 			className = target.className;
 		}
@@ -36,7 +45,6 @@ export function ButtonsHandler(e) {
 			this.editor._preventBlur = this._inputFocus = true;
 			if (!this.status.hasFocus) this.applyTagEffect();
 			/* event */
-			const eventTarget = e.target;
 			if (!domUtils.isInputElement(eventTarget) || eventTarget.disabled) return;
 
 			const plugin = this.plugins[command];
@@ -85,14 +93,20 @@ export function ButtonsHandler(e) {
 			}
 		}
 
-		if (command === this.menu.currentDropdownName || command === this.editor._containerName) {
+		if (command === this.menu.currentDropdownName || command === this.menu.currentContainerName) {
 			e.stopPropagation();
 		}
 	}
 }
 
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {MouseEvent} e - Event object
+ */
 export function OnClick_menuTray(e) {
-	const target = domUtils.getCommandTarget(e.target);
+	const eventTarget = /** @type {Element} */ (e.target);
+	const target = domUtils.getCommandTarget(eventTarget);
 	if (!target) return;
 
 	let t = target;
@@ -110,6 +124,12 @@ export function OnClick_menuTray(e) {
 	plugin.action(target);
 }
 
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {MouseEvent} e - Event object
+ */
 export function OnClick_toolbar(e) {
-	this.editor.runFromTarget(e.target);
+	const eventTarget = /** @type {Element} */ (e.target);
+	this.editor.runFromTarget(eventTarget);
 }

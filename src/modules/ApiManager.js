@@ -4,19 +4,18 @@ import { env } from '../helper';
  * @typedef ApiManagerParams
  * @property {string=} method - HTTP method (GET, POST, PUT, DELETE...)
  * @property {string=} url - API's URL
- * @property {Object.<string, string>=} headers - HTTP headers
+ * @property {Object<string, string>=} headers - HTTP headers
  * @property {*=} data - API data
  * @property {(xmlHttp: XMLHttpRequest) => boolean=} callBack - API success callback
  * @property {(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack - API fail callback
- * @property {string=} responseType - XMLHttpRequest.responseType
+ * @property {XMLHttpRequestResponseType=} responseType - XMLHttpRequest.responseType
  */
 
 /**
- * @class
+ * @constructor
  * @description API Manager
  * @param {*} inst The instance object that called the constructor.
  * @param {ApiManagerParams=} params API options
- * @returns {ApiManager}
  */
 function ApiManager(inst, params) {
 	this.editor = inst.editor;
@@ -69,9 +68,9 @@ ApiManager.prototype = {
 	 * @param {Object} params
 	 * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
 	 * @param {string=} params.url - API's URL
-	 * @param {Object.<string, string>=} params.headers - HTTP headers
+	 * @param {Object<string, string>=} params.headers - HTTP headers
 	 * @param {*=} params.data - API data
-	 * @param {string=} params.responseType - XMLHttpRequest.responseType
+	 * @param {XMLHttpRequestResponseType=} params.responseType - XMLHttpRequest.responseType
 	 * @returns {Promise<XMLHttpRequest>}
 	 */
 	asyncCall({ method, url, headers, data, responseType }) {
@@ -103,7 +102,7 @@ ApiManager.prototype = {
 				} else {
 					try {
 						const res = !xhr.responseText ? xhr : JSON.parse(xhr.responseText);
-						reject(res, xhr);
+						reject(res);
 					} finally {
 						this.ui.hideLoading();
 					}

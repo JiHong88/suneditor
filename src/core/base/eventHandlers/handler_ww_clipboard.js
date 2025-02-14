@@ -1,14 +1,28 @@
+/**
+ * @typedef {Omit<import('../eventManager').default & Partial<EditorInjector>, 'eventManager'>} EventManagerThis
+ */
+
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {ClipboardEvent} e - Event object
+ */
 export function OnPaste_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 	if (!clipboardData) return true;
 	return this._dataTransferAction('paste', e, clipboardData, frameContext);
 }
 
-export function OnCopy_wysiwyg(frameContext, e) {
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {ClipboardEvent} e - Event object
+ */
+export async function OnCopy_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if (this.triggerEvent('onCopy', { frameContext, event: e, clipboardData }) === false) {
+	if ((await this.triggerEvent('onCopy', { frameContext, event: e, clipboardData })) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -18,11 +32,16 @@ export function OnCopy_wysiwyg(frameContext, e) {
 	this.__secopy = fcSelection.toString();
 }
 
-export function OnCut_wysiwyg(frameContext, e) {
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {ClipboardEvent} e - Event object
+ */
+export async function OnCut_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if (this.triggerEvent('onCut', { frameContext, event: e, clipboardData }) === false) {
+	if ((await this.triggerEvent('onCut', { frameContext, event: e, clipboardData })) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;

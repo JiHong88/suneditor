@@ -13,19 +13,10 @@ const A4_HEIGHT_MM = 297;
 const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS);
 
 /**
- * @typedef {import('../editor').default} EditorInstance
- */
-
-/**
- * @typedef {import('./context').FrameContext} FrameContext
- */
-
-/**
- * @class
+ * @constructor
  * @description DocumentType, page, header management class
  * @param {EditorInstance} editor - The root editor instance
  * @param {FrameContext} fc - frame context object
- * @returns {DocumentType}
  */
 function DocumentType(editor, fc) {
 	// members
@@ -215,7 +206,7 @@ DocumentType.prototype = {
 				if (!pages[i]) continue;
 				t = pages[i].top;
 				if (mirrorHeight < t) break;
-				const pageNumber = domUtils.createElement('DIV', { style: `top:${t - scrollTop}px`, innerHTML: i + 1 }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
+				const pageNumber = domUtils.createElement('DIV', { style: `top:${t - scrollTop}px`, innerHTML: String(i + 1) }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
 				this.page.appendChild(pageNumber);
 				this.pages.push(pageNumber);
 			}
@@ -229,7 +220,7 @@ DocumentType.prototype = {
 	/**
 	 * @private
 	 * @description Initializes the cache for document elements.
-	 * @param {NodeList} mChr - List of mirrored elements.
+	 * @param {Array<HTMLElement>} mChr - List of mirrored elements.
 	 */
 	_initializeCache(mChr) {
 		this._positionCache.clear();
@@ -378,7 +369,7 @@ DocumentType.prototype = {
 
 	/**
 	 * @description Moves to a specific page.
-	 * @param {number} pageNumber - The target page number.
+	 * @param {number} pageNum - The target page number.
 	 */
 	pageGo(pageNum) {
 		if (pageNum < 1) pageNum = 1;
@@ -437,7 +428,7 @@ DocumentType.prototype = {
 	/**
 	 * @private
 	 * @description Moves to a specific page and updates the view.
-	 * @param {number} pageNumber - The target page number.
+	 * @param {number} pageNum - The target page number.
 	 */
 	_movePage(pageNum, force) {
 		const globalTop = this._getGlobalTop();
@@ -480,7 +471,6 @@ DocumentType.prototype = {
 	/**
 	 * @private
 	 * @description Retrieves the global top offset of an element.
-	 * @param {Element} element - The element whose top offset is needed.
 	 * @returns {number} The top offset of the element.
 	 */
 	_getGlobalTop() {
@@ -489,9 +479,9 @@ DocumentType.prototype = {
 
 	/**
 	 * @private
-	 * @description Finds an item within the document.
-	 * @param {string} query - The search query.
-	 * @returns {Element|null} The found element, or null if not found.
+	 * @description Finds an header element of innerHeaders element.
+	 * @param {Element} header - H tag element to find.
+	 * @returns {HTMLElement|null} The found element, or null if not found.
 	 */
 	_findItem(header) {
 		const headers = this._wwHeaders;
@@ -534,7 +524,7 @@ DocumentType.prototype = {
 	/**
 	 * @private
 	 * @description Retrieves all headers in the document.
-	 * @returns {Array.<Element>} An array of header elements.
+	 * @returns {Array<Element>} An array of header elements.
 	 */
 	_getHeaders() {
 		return (this._wwHeaders = this.ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));
@@ -543,12 +533,17 @@ DocumentType.prototype = {
 	constructor: DocumentType
 };
 
+/**
+ * @private
+ * @param {Element} ww WYSIWYG element
+ * @param {Event} e Event object
+ */
 function OnClickHeader(ww, e) {
 	e.preventDefault();
 
 	try {
 		this.editor._preventBlur = true;
-		const clickedHeader = e.target;
+		const clickedHeader = /** @type {Element} */ (e.target);
 		if (domUtils.hasClass(clickedHeader, 'se-doc-item')) {
 			const innerIndex = Array.prototype.indexOf.call(this.innerHeaders, clickedHeader);
 			if (innerIndex === -1) return;

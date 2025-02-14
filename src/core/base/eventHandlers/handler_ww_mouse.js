@@ -9,13 +9,25 @@ function _offDownFn() {
 	_onDownEv = this.removeGlobalEvent(_onDownEv);
 }
 
-export function OnMouseDown_wysiwyg(frameContext, e) {
+/**
+ * @typedef {Omit<import('../eventManager').default & Partial<EditorInjector>, 'eventManager'>} EventManagerThis
+ */
+
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {MouseEvent} e - Event object
+ */
+export async function OnMouseDown_wysiwyg(fc, e) {
+	const eventTarget = /** @type {Element} */ (e.target);
+
 	this.editor.status._onMousedown = true;
 	if (_onDownEv) _offDownFn.call(this);
 	_onDownEv = this.addGlobalEvent('mouseup', _offDownFn.bind(this));
 
-	if (frameContext.get('isReadOnly') || domUtils.isNonEditable(frameContext.get('wysiwyg'))) return;
-	if (this.format._isExcludeSelectionElement(e.target)) {
+	if (fc.get('isReadOnly') || domUtils.isNonEditable(fc.get('wysiwyg'))) return;
+	if (this.format._isExcludeSelectionElement(eventTarget)) {
 		e.preventDefault();
 		return;
 	}
@@ -25,10 +37,10 @@ export function OnMouseDown_wysiwyg(frameContext, e) {
 	this._w.setTimeout(this.selection._init.bind(this.selection), 0);
 
 	// user event
-	if (this.triggerEvent('onMouseDown', { frameContext, event: e }) === false) return;
+	if ((await this.triggerEvent('onMouseDown', { frameContext: fc, event: e })) === false) return;
 
 	// plugin event
-	if (this._callPluginEvent('onMouseDown', { frameContext, event: e }) === false) return;
+	if (this._callPluginEvent('onMouseDown', { frameContext: fc, event: e }) === false) return;
 
 	if (this.editor.isBalloon) {
 		this._hideToolbar();
@@ -36,36 +48,48 @@ export function OnMouseDown_wysiwyg(frameContext, e) {
 		this._hideToolbar_sub();
 	}
 
-	if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
+	if (/FIGURE/i.test(eventTarget.nodeName)) e.preventDefault();
 }
 
-export function OnMouseUp_wysiwyg(frameContext, e) {
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {MouseEvent} e - Event object
+ */
+export async function OnMouseUp_wysiwyg(fc, e) {
 	// user event
-	if (this.triggerEvent('onMouseUp', { frameContext, event: e }) === false) return;
+	if ((await this.triggerEvent('onMouseUp', { frameContext: fc, event: e })) === false) return;
 
 	// plugin event
-	if (this._callPluginEvent('onMouseUp', { frameContext, event: e }) === false) return;
+	if (this._callPluginEvent('onMouseUp', { frameContext: fc, event: e }) === false) return;
 }
 
-export function OnClick_wysiwyg(frameContext, e) {
-	const targetElement = e.target;
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {MouseEvent} e - Event object
+ */
+export async function OnClick_wysiwyg(fc, e) {
+	const eventTarget = /** @type {Element} */ (e.target);
 
-	if (frameContext.get('isReadOnly')) {
+	if (fc.get('isReadOnly')) {
 		e.preventDefault();
-		if (domUtils.isAnchor(targetElement)) {
-			_w.open(targetElement.href, targetElement.target);
+		if (domUtils.isAnchor(eventTarget)) {
+			_w.open(eventTarget.getAttribute('href'), eventTarget.getAttribute('target'));
 		}
 		return false;
 	}
 
-	if (domUtils.isNonEditable(frameContext.get('wysiwyg'))) return;
+	if (domUtils.isNonEditable(fc.get('wysiwyg'))) return;
 
 	// user event
-	if (this.triggerEvent('onClick', { frameContext, event: e }) === false) return;
+	if ((await this.triggerEvent('onClick', { frameContext: fc, event: e })) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onClick', { frameContext, event: e }) === false) return;
+	if (this._callPluginEvent('onClick', { frameContext: fc, event: e }) === false) return;
 
-	const componentInfo = this.component.get(targetElement);
+	const componentInfo = this.component.get(eventTarget);
 	if (componentInfo) {
 		e.preventDefault();
 		this.component.select(componentInfo.target, componentInfo.pluginName, false);
@@ -85,7 +109,7 @@ export function OnClick_wysiwyg(frameContext, e) {
 	const selectionNode = this.selection.getNode();
 	const formatEl = this.format.getLine(selectionNode, null);
 	const rangeEl = this.format.getBlock(selectionNode, null);
-	if (!formatEl && !domUtils.isNonEditable(targetElement) && !domUtils.isList(rangeEl)) {
+	if (!formatEl && !domUtils.isNonEditable(eventTarget) && !domUtils.isList(rangeEl)) {
 		const range = this.selection.getRange();
 		if (this.format.getLine(range.startContainer) === this.format.getLine(range.endContainer)) {
 			if (domUtils.isList(rangeEl)) {
@@ -138,20 +162,33 @@ export function OnClick_wysiwyg(frameContext, e) {
 	if (this.editor.isBalloon || this.editor.isSubBalloon) this._w.setTimeout(this._toggleToolbarBalloon.bind(this), 0);
 }
 
-export function OnMouseMove_wysiwyg(frameContext, e) {
-	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return false;
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {MouseEvent} e - Event object
+ */
+export function OnMouseMove_wysiwyg(fc, e) {
+	if (fc.get('isReadOnly') || fc.get('isDisabled')) return false;
+	const eventTarget = /** @type {Element} */ (e.target);
 
 	// over component
 	if (_DragHandle.get('__overInfo') !== false) {
-		this._overComponentSelect(e.target);
+		this._overComponentSelect(eventTarget);
 	}
 
-	this._callPluginEvent('onMouseMove', { frameContext, event: e });
+	this._callPluginEvent('onMouseMove', { frameContext: fc, event: e });
 }
 
-export function OnMouseLeave_wysiwyg(frameContext, e) {
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {MouseEvent} e - Event object
+ */
+export async function OnMouseLeave_wysiwyg(fc, e) {
 	// user event
-	if (this.triggerEvent('onMouseLeave', { frameContext, event: e }) === false) return;
+	if ((await this.triggerEvent('onMouseLeave', { frameContext: fc, event: e })) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onMouseLeave', { frameContext, event: e }) === false) return;
+	if (this._callPluginEvent('onMouseLeave', { frameContext: fc, event: e }) === false) return;
 }

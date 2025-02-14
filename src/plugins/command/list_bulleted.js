@@ -4,10 +4,6 @@ import { domUtils } from '../../helper';
 const DEFAULT_TYPE = 'disc';
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
  */
 
@@ -15,7 +11,6 @@ const DEFAULT_TYPE = 'disc';
  * @class
  * @description List bulleted plugin, Several types of lists are provided.
  * @param {EditorInstance} editor - The root editor instance
- * @returns {List_bulleted}
  */
 function List_bulleted(editor) {
 	// plugin bisic properties

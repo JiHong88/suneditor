@@ -7,14 +7,14 @@ import { _w, isEdge } from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 /**
- * @typedef {import('../editor').default} EditorInstance
+ * @typedef {Omit<Char & Partial<EditorInjector>, 'char'>} CharThis
  */
 
 /**
- * @class
+ * @constructor
+ * @this {CharThis}
  * @description character count, character limit, etc. management class
  * @param {EditorInstance} editor - The root editor instance
- * @returns {Char}
  */
 function Char(editor) {
 	CoreInjector.call(this, editor);
@@ -22,6 +22,7 @@ function Char(editor) {
 
 Char.prototype = {
 	/**
+	 * @this {CharThis}
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "html" is added to the current editor.
 	 * @param {Node|string} html Element node or String.
 	 * @returns {boolean}
@@ -29,7 +30,7 @@ Char.prototype = {
 	check(html) {
 		const maxCharCount = this.editor.frameOptions.get('charCounter_max');
 		if (maxCharCount) {
-			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
+			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? /** @type {Element} */ (html).outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > maxCharCount) {
 				CounterBlink(this.editor.frameContext.get('charWrapper'));
 				return false;
@@ -39,6 +40,7 @@ Char.prototype = {
 	},
 
 	/**
+	 * @this {CharThis}
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
 	 * - If [content] is undefined, get the current editor's number of characters or binary data size.
 	 * @param {string=} content Content to count. (defalut: this.editor.frameContext.get('wysiwyg'))
@@ -52,6 +54,7 @@ Char.prototype = {
 	},
 
 	/**
+	 * @this {CharThis}
 	 * @descriptionGets Get the length in bytes of a string.
 	 * @param {string} text String text
 	 * @returns {number}
@@ -71,7 +74,7 @@ Char.prototype = {
 
 			return cl + cr;
 		} else {
-			cl = new TextEncoder('utf-8').encode(text).length;
+			cl = new TextEncoder().encode(text).length;
 			cr = 0;
 
 			if (encodeURIComponent(text).match(/(%0A|%0D)/gi) !== null) {
@@ -83,6 +86,7 @@ Char.prototype = {
 	},
 
 	/**
+	 * @this {CharThis}
 	 * @description Set the char count to charCounter element textContent.
 	 */
 	display() {
@@ -95,6 +99,7 @@ Char.prototype = {
 	},
 
 	/**
+	 * @this {CharThis}
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "inputText" is added to the current editor.
 	 * - If the current number of characters is greater than "charCounter_max", the excess characters are removed.
 	 * And call the char.display()

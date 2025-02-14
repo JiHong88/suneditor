@@ -12,31 +12,31 @@ import Helper from './helper';
 
 /**
  * Editor Injector module, Inject "editor" and basic frequently used objects by calling it with "call(this, editor)".
- * @type {(editor: object) => void}
+ * @type {Function}
  */
 export const editorInjector = EditorInjector;
 
 /**
  * Available editor plugins
- * @type {Object.<string, *>}
+ * @type {Object<string, *>}
  */
 export const plugins = Plugins;
 
 /**
  * Editor modules
- * @type {{[key: string]: (element: Element) => *}}
+ * @type {{[key: string]: Function|Map}}
  */
 export const modules = Modules;
 
 /**
  * Language packs for the editor
- * @type {Object.<string, string>}
+ * @type {Object<string, Object<string, string> | Function>}
  */
 export const langs = Langs;
 
 /**
  * Helper functions for the editor
- * @type {Object.<string, (...args: *) => *>}
+ * @type {Object<string|symbol, Object<string, Function>>}
  */
 export const helper = Helper;
 
@@ -57,7 +57,7 @@ export default {
 	 * Returns the create function with preset options.
 	 * If the options overlap, the options of the 'create' function take precedence.
 	 * @param {EditorInitOptions} init_options - Initialization options
-	 * @returns {{create: function(Element|Object.<string, {target: Element, options: EditorFrameOptions}>, EditorInitOptions): {create: (Element|Object.<string, {target: Element, options: EditorFrameOptions}>, EditorInitOptions) => Editor}}}
+	 * @returns {{create: (targets: Element|Object<string, {target: Element, options: EditorFrameOptions}>, options: EditorInitOptions) => Editor}}}
 	 */
 	init(init_options) {
 		return {
@@ -67,7 +67,7 @@ export default {
 
 	/**
 	 * Creates a new instance of the SunEditor
-	 * @param {Element|Object.<string, {target: Element, options: EditorFrameOptions}>} target - Target element or multi-root object
+	 * @param {Element|Object<string, {target: Element, options: EditorFrameOptions}>} target - Target element or multi-root object
 	 * @param {EditorInitOptions} options - Initialization options
 	 * @param {EditorInitOptions} [_init_options] - Optional preset initialization options
 	 * @returns {Editor} - Instance of the SunEditor

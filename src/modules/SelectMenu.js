@@ -14,7 +14,7 @@ const MENU_MIN_HEIGHT = 38;
  */
 
 /**
- *
+ * @constructor
  * @param {*} inst The instance object that called the constructor.
  * @param {SelectMenuParams} params Select menu options
  */
@@ -63,8 +63,8 @@ function SelectMenu(inst, params) {
 SelectMenu.prototype = {
 	/**
 	 * @description Creates the select menu items.
-	 * @param {Array.<string>} items - Command list of selectable items.
-	 * @param {Array.<Element>} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<string>} items - Command list of selectable items.
+	 * @param {Array<Element>} [menus] - Optional list of menu display elements; defaults to `items`.
 	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';

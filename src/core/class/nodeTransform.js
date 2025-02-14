@@ -6,14 +6,14 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers } from '../../helper';
 
 /**
- * @typedef {import('../editor').default} EditorInstance
+ * @typedef {Omit<NodeTransform & Partial<EditorInjector>, 'nodeTransform'>} NodeTransformThis
  */
 
 /**
- * @class
+ * @constructor
+ * @this {NodeTransformThis}
  * @description Node utility class. split, merge, etc.
  * @param {EditorInstance} editor - The root editor instance
- * @returns {NodeTransform}
  */
 function NodeTransform(editor) {
 	CoreInjector.call(this, editor);
@@ -21,18 +21,19 @@ function NodeTransform(editor) {
 
 NodeTransform.prototype = {
 	/**
+	 * @this {NodeTransformThis}
 	 * @description Split all tags based on "baseNode"
 	 * @param {Node} baseNode Element or text node on which to base
-	 * @param {number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+	 * @param {?number|Node} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
 	 * @param {number} depth The nesting depth of the element being split. (default: 0)
-	 * @returns {Element} The last element of the splited tag.
+	 * @returns {Node} The last element of the splited tag.
 	 */
 	split(baseNode, offset, depth) {
 		if (domUtils.isWysiwygFrame(baseNode) || this.component.is(baseNode) || !baseNode) return baseNode;
 
 		if (offset && !numbers.is(offset)) {
 			const children = baseNode.childNodes;
-			let index = domUtils.getPositionIndex(offset);
+			let index = domUtils.getPositionIndex(/** @type {Node} */ (offset));
 			const prev = baseNode.cloneNode(false);
 			const next = baseNode.cloneNode(false);
 			for (let i = 0, len = children.length; i < len; i++) {
@@ -59,6 +60,7 @@ NodeTransform.prototype = {
 
 		if (baseNode.nodeType === 3) {
 			index = domUtils.getPositionIndex(baseNode);
+			offset = Number(offset);
 			if (offset >= 0 && baseNode.length !== offset) {
 				baseNode.splitText(offset);
 				const after = domUtils.getNodeFromPath([index + 1], bp);
@@ -130,13 +132,14 @@ NodeTransform.prototype = {
 	},
 
 	/**
+	 * @this {NodeTransformThis}
 	 * @description Use with "npdePath (domUtils.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
 	 * - If "offset" has been changed, it will return as much "offset" as it has been modified.
 	 * - An array containing change offsets is returned in the order of the "nodePathArray" array.
-	 * @param {Element} element Element
-	 * @param {Array|null} nodePathArray Array of NodePath object ([domUtils.getNodePath(), ..])
+	 * @param {Node} element Element
+	 * @param {NodeCollection} nodePathArray Array of NodePath object ([domUtils.getNodePath(), ..])
 	 * @param {boolean} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
-	 * @returns {Array} [offset, ..]
+	 * @returns {ReturnNodeArray} [offset, ..]
 	 */
 	mergeSameTags(element, nodePathArray, onlyText) {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -201,7 +204,7 @@ NodeTransform.prototype = {
 					break;
 				}
 
-				if (child.nodeName === next.nodeName && domUtils.isSameAttributes(child, next) && child.href === next.href) {
+				if (child.nodeName === next.nodeName && domUtils.isSameAttributes(child, next) && child.getAttribute('href') === next.getAttribute('href')) {
 					const childs = child.childNodes;
 					let childLength = 0;
 					for (let n = 0, nLen = childs.length; n < nLen; n++) {
@@ -277,8 +280,9 @@ NodeTransform.prototype = {
 	},
 
 	/**
+	 * @this {NodeTransformThis}
 	 * @description Remove nested tags without other child nodes.
-	 * @param {Element} element Element object
+	 * @param {Node} element Element object
 	 * @param {(current: Node) => boolean|string|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
 	 */
 	mergeNestedTags(element, validation) {
@@ -308,11 +312,12 @@ NodeTransform.prototype = {
 	},
 
 	/**
+	 * @this {NodeTransformThis}
 	 * @description Delete itself and all parent nodes that match the condition.
 	 * - Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
 	 * @param {Node} item Node to be remove
-	 * @param {?(current: Node) => boolean} validation Validation function. default(Deleted if it only have breakLine and blanks)
-	 * @param {Element|null} stopParent Stop when the parent node reaches stopParent
+	 * @param {?(current: Node) => boolean=} validation Validation function. default(Deleted if it only have breakLine and blanks)
+	 * @param {?Node=} stopParent Stop when the parent node reaches stopParent
 	 * @returns {{sc: Node|null, ec: Node|null}|null} {sc: previousSibling, ec: nextSibling} (the deleted node reference) or null.
 	 */
 	removeAllParents(item, validation, stopParent) {
@@ -344,9 +349,10 @@ NodeTransform.prototype = {
 	},
 
 	/**
+	 * @this {NodeTransformThis}
 	 * @description Delete a empty child node of argument element
-	 * @param {Element} element Element node
-	 * @param {Node|null} notRemoveNode Do not remove node
+	 * @param {Node} element Element node
+	 * @param {?Node} notRemoveNode Do not remove node
 	 * @param {boolean} forceDelete When all child nodes are deleted, the parent node is also deleted.
 	 */
 	removeEmptyNode(element, notRemoveNode, forceDelete) {
@@ -386,10 +392,11 @@ NodeTransform.prototype = {
 	},
 
 	/**
+	 * @this {NodeTransformThis}
 	 * @description Creates a nested node structure from the given array of nodes.
-	 * @param {Array} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
+	 * @param {NodeCollection} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
 	 * @param {?(current: Node) => boolean=} validate A validate function.
-	 * @returns {{ parent: Element, inner: Element }} An object containing the top-level parent node and the innermost child node.
+	 * @returns {{ parent: Node, inner: Node }} An object containing the top-level parent node and the innermost child node.
 	 */
 	createNestedNode(nodeArray, validate) {
 		if (typeof validate !== 'function') validate = () => true;

@@ -4,32 +4,24 @@ import { domUtils, numbers, env } from '../../helper';
 const { NO_EVENT, _w } = env;
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @typedef {import('../../core/base/events').ProcessInfo} ProcessInfo
  */
 
 /**
- * @class
- * @description Embed modal plugin.
- * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
- * @param {EditorInstance} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {boolean=} [pluginOptions.canResize=true] - Whether the embed element can be resized.
- * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
- * @param {string=} pluginOptions.defaultWidth - The default width of the embed element (numeric value or with unit).
- * @param {string=} pluginOptions.defaultHeight - The default height of the embed element (numeric value or with unit).
- * @param {boolean=} [pluginOptions.percentageOnlySize=false] - Whether to allow only percentage-based sizing.
- * @param {string=} pluginOptions.uploadUrl - The URL for file uploads.
- * @param {Object.<string, string>=} pluginOptions.uploadHeaders - Headers to include in file upload requests.
- * @param {number=} pluginOptions.uploadSizeLimit - The total file upload size limit in bytes.
- * @param {number=} pluginOptions.uploadSingleSizeLimit - The single file upload size limit in bytes.
- * @param {Object.<string, string>=} pluginOptions.iframeTagAttributes - Additional attributes to set on the iframe tag.
- * @param {string=} pluginOptions.query_youtube - YouTube query parameter (optional).
- * @param {string=} pluginOptions.query_vimeo - Vimeo query parameter (optional).
- * @param {Object.<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} pluginOptions.embedQuery - Custom query objects for additional embedding services.
+ * @typedef {Object} EmbedPluginOptions
+ * @property {boolean=} [canResize=true] - Whether the embed element can be resized.
+ * @property {boolean=} [showHeightInput=true] - Whether to display the height input field.
+ * @property {string=} defaultWidth - The default width of the embed element (numeric value or with unit).
+ * @property {string=} defaultHeight - The default height of the embed element (numeric value or with unit).
+ * @property {boolean=} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
+ * @property {string=} uploadUrl - The URL for file uploads.
+ * @property {Object<string, string>=} uploadHeaders - Headers to include in file upload requests.
+ * @property {number=} uploadSizeLimit - The total file upload size limit in bytes.
+ * @property {number=} uploadSingleSizeLimit - The single file upload size limit in bytes.
+ * @property {Object<string, string>=} iframeTagAttributes - Additional attributes to set on the iframe tag.
+ * @property {string=} query_youtube - YouTube query parameter (optional).
+ * @property {string=} query_vimeo - Vimeo query parameter (optional).
+ * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} embedQuery - Custom query objects for additional embedding services.
  * Example :
  * {
  *   facebook: {
@@ -48,8 +40,15 @@ const { NO_EVENT, _w } = env;
  *   },
  *   // Additional services...
  * }
- * @param {Array.<string>} pluginOptions.controls - Figure control configurations.
- * @returns {Embed}
+ * @property {Array<string>} controls - Figure control configurations.
+ */
+
+/**
+ * @class
+ * @description Embed modal plugin.
+ * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
+ * @param {EditorInstance} editor - The root editor instance
+ * @param {EmbedPluginOptions} pluginOptions
  */
 function Embed(editor, pluginOptions) {
 	// plugin bisic properties

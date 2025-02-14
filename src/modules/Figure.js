@@ -44,12 +44,11 @@ let __resizing_sw = 0;
  */
 
 /**
- * @class
+ * @constructor
  * @description Controller module class
  * @param {*} inst The instance object that called the constructor.
- * @param {Array.<string|{action: (element: Element, value: string, target: Element) => void, command: string, value: string, title: string, icon: string}>} controls Controller button array
+ * @param {Array<string|{action: (element: Element, value: string, target: Element) => void, command: string, value: string, title: string, icon: string}>} controls Controller button array
  * @param {FigureParams} params Figure options
- * @returns {Figure}
  */
 function Figure(inst, controls, params) {
 	EditorInjector.call(this, inst.editor);

@@ -2,16 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @class
  * @description Template Plugin, Apply a template to the selection.
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions
- * @param {Array.<{name: string, html: string}>} pluginOptions.items - Template list
- * @returns {Template}
+ * @param {Array<{name: string, html: string}>} pluginOptions.items - Template list
  */
 function Template(editor, pluginOptions) {
 	// plugin bisic properties

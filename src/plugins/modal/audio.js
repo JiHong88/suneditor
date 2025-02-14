@@ -5,34 +5,29 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @typedef {import('../../core/base/events').AudioInfo} AudioInfo
  */
 
 /**
- * @typedef {import('../../core/section/context').FrameContext} FrameContext
+ * @typedef {Object} AudioPluginOptions
+ * @property {string=} [defaultWidth="300px"] - The default width of the audio tag (e.g., "300px").
+ * @property {string=} [defaultHeight="150px"] - The default height of the audio tag (e.g., "150px").
+ * @property {boolean=} createFileInput - Whether to create a file input element.
+ * @property {boolean=} createUrlInput - Whether to create a URL input element (default is true if file input is not created).
+ * @property {string=} uploadUrl - The URL to which files will be uploaded.
+ * @property {Object<string, string>=} uploadHeaders - Headers to include in the file upload request.
+ * @property {number=} uploadSizeLimit - The total upload size limit in bytes.
+ * @property {number=} uploadSingleSizeLimit - The single file size limit in bytes.
+ * @property {boolean=} allowMultiple - Whether to allow multiple file uploads.
+ * @property {string=} [acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
+ * @property {Object<string, string>=} audioTagAttributes - Additional attributes to set on the audio tag.
  */
 
 /**
  * @class
  * @description Audio modal plugin.
  * @param {EditorInstance} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {string=} pluginOptions.defaultWidth - The default width of the audio tag (e.g., "300px").
- * @param {string=} pluginOptions.defaultHeight - The default height of the audio tag (e.g., "150px").
- * @param {boolean=} pluginOptions.createFileInput - Whether to create a file input element.
- * @param {boolean=} pluginOptions.createUrlInput - Whether to create a URL input element (default is true if file input is not created).
- * @param {string=} pluginOptions.uploadUrl - The URL to which files will be uploaded.
- * @param {Object.<string, string>=} pluginOptions.uploadHeaders - Headers to include in the file upload request.
- * @param {number=} pluginOptions.uploadSizeLimit - The total upload size limit in bytes.
- * @param {number=} pluginOptions.uploadSingleSizeLimit - The single file size limit in bytes.
- * @param {boolean=} pluginOptions.allowMultiple - Whether to allow multiple file uploads.
- * @param {string=} [pluginOptions.acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
- * @param {Object.<string, string>=} pluginOptions.audioTagAttributes - Additional attributes to set on the audio tag.
- * @returns {Audio_}
+ * @param {AudioPluginOptions} pluginOptions
  */
 function Audio_(editor, pluginOptions) {
 	// plugin bisic properties
@@ -273,7 +268,7 @@ Audio_.prototype = {
 	 * @description Registers uploaded audio files and creates the corresponding audio elements.
 	 * - Iterates through the uploaded files and inserts them into the editor.
 	 * @param {AudioInfo} info - Upload metadata, including `isUpdate` flag and `element`.
-	 * @param {Object.<string, *>} response - Server response containing uploaded file details.
+	 * @param {Object<string, *>} response - Server response containing uploaded file details.
 	 */
 	_register(info, response) {
 		const fileList = response.result;
@@ -289,7 +284,7 @@ Audio_.prototype = {
 
 	/**
 	 * @description Create an "audio" component using the provided files.
-	 * @param {Array.<File>} fileList File object list
+	 * @param {Array<File>} fileList File object list
 	 * @returns {boolean} If return false, the file upload will be canceled
 	 * @returns {Promise<boolean>}
 	 */
@@ -467,7 +462,7 @@ Audio_.prototype = {
 	 * @description Uploads audio files to the server.
 	 * - Sends a request to the configured upload URL and processes the response.
 	 * @param {AudioInfo} info - Upload metadata, including `files` and `isUpdate`.
-	 * @param {Array.<File>} files - The files to be uploaded.
+	 * @param {Array<File>} files - The files to be uploaded.
 	 */
 	_serverUpload(info, files) {
 		if (!files) return;
@@ -483,7 +478,7 @@ Audio_.prototype = {
 	 * - Triggers the `onAudioUploadError` event to allow custom handling of errors.
 	 * - Displays an error message in the editor's UI.
 	 * - Logs the error to the console for debugging.
-	 * @param {Object.<string, *>} response - The error response object from the server or upload process.
+	 * @param {Object<string, *>} response - The error response object from the server or upload process.
 	 * @returns {Promise<void>}
 	 */
 	async _error(response) {

@@ -11,10 +11,6 @@ const HEADER_KEYCODE = new Map([
 ]);
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
  */
 
@@ -23,8 +19,7 @@ const HEADER_KEYCODE = new Map([
  * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions
- * @param {Array.<string>} pluginOptions.items - Format list
- * @returns {FormatBlock}
+ * @param {Array<string>} pluginOptions.items - Format list
  */
 function FormatBlock(editor, pluginOptions) {
 	EditorInjector.call(this, editor);

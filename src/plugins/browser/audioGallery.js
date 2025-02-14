@@ -2,25 +2,23 @@ import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @class
  * @description Audio gallery plugin
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions
- * @param {Array.<*>=} pluginOptions.data - direct data without server calls
+ * @param {Array<*>=} pluginOptions.data - direct data without server calls
  * @param {string} pluginOptions.url - server request url
- * @param {Object.<string, string>=} pluginOptions.headers - server request headers
- * @param {string|() => string} pluginOptions.thumbnail - default thumbnail
- * @returns {AudioGallery}
+ * @param {Object<string, string>=} pluginOptions.headers - server request headers
+ * @param {string|(() => string)} pluginOptions.thumbnail - default thumbnail
  */
 function AudioGallery(editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.audioGallery;
 	this.icon = 'audio_gallery';
+
+	// members
+	this.inputTarget = null;
 
 	// modules
 	const thumbnail = pluginOptions.thumbnail || this.icons.audio_thumbnail;

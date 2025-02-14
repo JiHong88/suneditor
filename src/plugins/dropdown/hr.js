@@ -2,10 +2,6 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
  */
 
@@ -14,8 +10,7 @@ import { domUtils } from '../../helper';
  * @description HR Plugin
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions
- * @param {Array.<{name: string, class: string}>} pluginOptions.items - HR list
- * @returns {HR}
+ * @param {Array<{name: string, class: string}>} pluginOptions.items - HR list
  */
 function HR(editor, pluginOptions) {
 	// plugin bisic properties

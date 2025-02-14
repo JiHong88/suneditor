@@ -6,14 +6,10 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter } from '../../helper';
 
 /**
- * @typedef {import('../editor').default} EditorInstance
- */
-
-/**
- * @class
+ * @constructor
+ * @this {EditorInjector & Menu}
  * @description Dropdown and container menu management class
  * @param {EditorInstance} editor - The root editor instance
- * @returns {Menu}
  */
 function Menu(editor) {
 	CoreInjector.call(this, editor);
@@ -30,6 +26,7 @@ function Menu(editor) {
 	// container
 	this.currentContainer = null;
 	this.currentContainerActiveButton = null;
+	this.currentContainerName = '';
 	// event
 	this._dropdownCommands = [];
 	this.__globalEventHandler = {
@@ -135,7 +132,7 @@ Menu.prototype = {
 	containerOn(button) {
 		this.__removeGlobalEvent();
 
-		const containerName = (this._containerName = button.getAttribute('data-command'));
+		const containerName = (this.currentContainerName = button.getAttribute('data-command'));
 		this.currentContainerActiveButton = button;
 		this._setMenuPosition(button, (this.currentContainer = this.targetMap[containerName]));
 
@@ -152,7 +149,7 @@ Menu.prototype = {
 		this.__removeGlobalEvent();
 
 		if (this.currentContainer) {
-			this._containerName = '';
+			this.currentContainerName = '';
 			this.currentContainer.style.display = 'none';
 			this.currentContainer = null;
 			domUtils.removeClass(this.currentContainerActiveButton, 'on');
@@ -235,15 +232,26 @@ Menu.prototype = {
 	constructor: Menu
 };
 
+/**
+ * @this {Menu}
+ * @param {Event} e - Event object
+ */
 function OnMouseDown_dropdown(e) {
 	if (domUtils.getParentElement(e.target, '.se-dropdown')) return;
 	this.dropdownOff();
 }
 
+/**
+ * @this {Menu}
+ */
 function OnMouseout_dropdown() {
 	this.index = -1;
 }
 
+/**
+ * @this {Menu}
+ * @param {Event} e - Event object
+ */
 function OnKeyDown_dropdown(e) {
 	const keyCode = e.keyCode;
 	switch (keyCode) {
@@ -273,6 +281,10 @@ function OnKeyDown_dropdown(e) {
 	}
 }
 
+/**
+ * @this {Menu}
+ * @param {Event} e - Event object
+ */
 function OnMousemove_dropdown(e) {
 	domUtils.addClass(this.currentDropdown, 'se-select-menu-mouse-move');
 	domUtils.removeClass(this.currentDropdown, 'se-select-menu-key-action');

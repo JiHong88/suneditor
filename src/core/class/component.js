@@ -11,14 +11,14 @@ const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DIR_UP_KEYCODE = /^3[7-8]$/;
 
 /**
- * @typedef {import('../editor').default} EditorInstance
+ * @typedef {Omit<Component & Partial<EditorInjector>, 'component'>} ComponentThis
  */
 
 /**
  * @typedef {Object} ComponentInfo
  * @property {Element} target - The target element associated with the component.
  * @property {string} pluginName - The name of the plugin related to the component.
- * @property {Object.<string, *>} options - Options related to the component.
+ * @property {Object<string, *>} options - Options related to the component.
  * @property {Element} container - The main container element for the component.
  * @property {Element|null} cover - The cover element, if applicable.
  * @property {Element|null} inlineCover - The inline cover element, if applicable.
@@ -28,10 +28,10 @@ const DIR_UP_KEYCODE = /^3[7-8]$/;
  */
 
 /**
- * @class
+ * @constructor
+ * @this {ComponentThis}
  * @description Class for managing components such as images and tables that are not in line format
  * @param {EditorInstance} editor - The root editor instance
- * @returns {Component}
  */
 function Component(editor) {
 	CoreInjector.call(this, editor);
@@ -72,24 +72,24 @@ function Component(editor) {
 	 */
 	this.currentInfo = null;
 
-	/** @type {Object.<string, Function>} @private */
+	/** @type {Object<string, (...args: *) => *>} */
 	this.__globalEvents = {
 		copy: OnCopy_component.bind(this),
 		cut: OnCut_component.bind(this),
 		keydown: OnKeyDown_component.bind(this),
 		mousedown: CloseListener_mousedown.bind(this)
 	};
-	/** @type {Function|null} @private */
+	/** @type {GlobalEventInfo|void} */
 	this._bindClose_copy = null;
-	/** @type {Function|null} @private */
+	/** @type {GlobalEventInfo|void} */
 	this._bindClose_cut = null;
-	/** @type {Function|null} @private */
+	/** @type {GlobalEventInfo|void} */
 	this._bindClose_keydown = null;
-	/** @type {Function|null} @private */
+	/** @type {GlobalEventInfo|void} */
 	this._bindClose_mousedown = null;
-	/** @type {Function|null} @private */
+	/** @type {GlobalEventInfo|void} */
 	this._bindClose_touchstart = null;
-	/** @type {boolean} @private */
+	/** @type {boolean} */
 	this.__selectionSelected = false;
 
 	this.editor.applyFrameRoots((e) => {
@@ -106,9 +106,10 @@ function Component(editor) {
 
 Component.prototype = {
 	/**
+	 * @this {ComponentThis}
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)
 	 * - If "element" is "HR", inserts and returns the new line.
-	 * @param {Element} element Element to be inserted
+	 * @param {Node} element Element to be inserted
 	 * @param {Object} [options] Options
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipSelection=false] If true, do not automatically select the inserted component.
@@ -163,13 +164,14 @@ Component.prototype = {
 			this.editor.frameContext.get('documentType').reHeader();
 		}
 
-		return oNode || element;
+		return /** @type {Element} */ (oNode || element);
 	},
 
 	/**
+	 * @this {ComponentThis}
 	 * @description Gets the file component and that plugin name
 	 * - return: {target, component, pluginName} | null
-	 * @param {Element} element Target element (figure tag, component div, file tag)
+	 * @param {Node} element Target element (figure tag, component div, file tag)
 	 * @returns {ComponentInfo|null}
 	 */
 	get(element) {
@@ -225,9 +227,11 @@ Component.prototype = {
 	},
 
 	/**
+	 * @this {ComponentThis}
 	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.
-	 * @param {Element} target Target element
+	 * @param {Element} element Target element
 	 * @param {string} pluginName The plugin name for the selected target.
+	 * @param {boolean=} isInput Whether the target is an input component.(table)
 	 */
 	select(element, pluginName, isInput) {
 		const info = this.get(element);
@@ -315,6 +319,7 @@ Component.prototype = {
 	},
 
 	/**
+	 * @this {ComponentThis}
 	 * @description Deselects the selected component.
 	 */
 	deselect() {
@@ -326,6 +331,7 @@ Component.prototype = {
 	},
 
 	/**
+	 * @this {ComponentThis}
 	 * @description Determines if the specified node is a block component (e.g., img, iframe, video, audio, table) with the class "se-component"
 	 * - or a direct FIGURE node. This function checks if the node itself is a component
 	 * - or if it belongs to any components identified by the component manager.
@@ -342,6 +348,7 @@ Component.prototype = {
 	},
 
 	/**
+	 * @this {ComponentThis}
 	 * @description Checks if the given node is an inline component (class "se-inline-component").
 	 * - If the node is a FIGURE, it checks the parent element instead.
 	 * - It also verifies whether the node is part of an inline component recognized by the component manager.
@@ -361,6 +368,7 @@ Component.prototype = {
 	},
 
 	/**
+	 * @this {ComponentThis}
 	 * @description Checks if the specified node qualifies as a basic component within the editor.
 	 * - This function verifies whether the node is recognized as a component by the `is` function, while also ensuring that it is not an inline component as determined by the `isInline` function.
 	 * - This is used to identify block-level elements or standalone components that are not part of the inline component classification.
@@ -373,9 +381,10 @@ Component.prototype = {
 
 	/**
 	 * @private
+	 * @this {ComponentThis}
 	 * @description Checks if the given element is a file component by matching its tag name against the file manager's regular expressions.
 	 * - It also verifies whether the element has the required attributes based on the tag type.
-	 * @param {Element} element The element to check.
+	 * @param {Node} element The element to check.
 	 * @returns {boolean} Returns true if the element is a file component, otherwise false.
 	 */
 	__isFiles(element) {
@@ -385,13 +394,14 @@ Component.prototype = {
 
 	/**
 	 * @private
+	 * @this {ComponentThis}
 	 * @description Deselects the currently selected component, removing any selection effects and associated event listeners.
 	 * - This method resets the selection state and hides UI elements related to the component selection.
 	 */
 	__deselect() {
 		this.editor._preventBlur = false;
 		_DragHandle.set('__overInfo', null);
-		this._removeDragEvent(this);
+		this._removeDragEvent();
 		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected|');
 		domUtils.removeClass(this.currentInfo?.cover, 'se-figure-over-selected');
 
@@ -413,6 +423,7 @@ Component.prototype = {
 
 	/**
 	 * @private
+	 * @this {ComponentThis}
 	 * @description Set line breaker of component
 	 * @param {Element} element Element tag
 	 */
@@ -487,6 +498,7 @@ Component.prototype = {
 
 	/**
 	 * @private
+	 * @this {ComponentThis}
 	 * @description Adds global event listeners for component interactions such as copy, cut, and keydown events.
 	 */
 	__addGlobalEvent() {
@@ -498,6 +510,7 @@ Component.prototype = {
 
 	/**
 	 * @private
+	 * @this {ComponentThis}
 	 * @description Removes global event listeners that were previously added for component interactions.
 	 */
 	__removeGlobalEvent() {
@@ -509,6 +522,7 @@ Component.prototype = {
 
 	/**
 	 * @private
+	 * @this {ComponentThis}
 	 * @description Adds global event listeners for non-file-related interactions such as mouse and touch events.
 	 */
 	__addNotFileGlobalEvent() {
@@ -519,6 +533,7 @@ Component.prototype = {
 
 	/**
 	 * @private
+	 * @this {ComponentThis}
 	 * @description Removes global event listeners related to non-file interactions.
 	 */
 	__removeNotFileGlobalEvent() {
@@ -528,6 +543,7 @@ Component.prototype = {
 
 	/**
 	 * @private
+	 * @this {ComponentThis}
 	 * @description Removes drag-related events and resets drag-related states.
 	 */
 	_removeDragEvent() {
@@ -549,18 +565,28 @@ Component.prototype = {
 	constructor: Component
 };
 
+/**
+ * @this {ComponentThis}
+ */
 function OnDragEnter() {
 	this.editor._preventBlur = true;
 	this.ui._visibleControllers(false, domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
 	domUtils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
 }
 
+/**
+ * @this {ComponentThis}
+ */
 function OnDragLeave() {
 	this.editor._preventBlur = false;
 	if (!domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.ui._visibleControllers(true, true);
 	domUtils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
 }
 
+/**
+ * @this {ComponentThis}
+ * @param {DragEvent} e - Drag event
+ */
 function OnDragStart(e) {
 	const cover = _DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer');
 
@@ -575,13 +601,21 @@ function OnDragStart(e) {
 	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
 }
 
+/**
+ * @this {ComponentThis}
+ */
 function OnDragEnd() {
 	this.editor._preventBlur = false;
 	domUtils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
 	this._removeDragEvent();
 }
 
-function OnDragClick({ target }) {
+/**
+ * @this {ComponentThis}
+ * @param {MouseEvent} e - Mouse event
+ */
+function OnDragClick(e) {
+	const target = /** @type {Element} */ (e.target);
 	if (!domUtils.hasClass(target, 'se-drag-handle-full')) return;
 
 	const dragInst = _DragHandle.get('__dragInst');
@@ -589,7 +623,12 @@ function OnDragClick({ target }) {
 	this.select(dragInst.currentTarget, dragInst.currentPluginName, false);
 }
 
-function CloseListener_mousedown({ target }) {
+/**
+ * @this {ComponentThis}
+ * @param {MouseEvent} e - Mouse event
+ */
+function CloseListener_mousedown(e) {
+	const target = /** @type {Element} */ (e.target);
 	if (
 		this.currentTarget?.contains(target) ||
 		domUtils.getParentElement(target, '.se-controller') ||
@@ -601,8 +640,13 @@ function CloseListener_mousedown({ target }) {
 	this.deselect();
 }
 
+/**
+ * @this {ComponentThis}
+ * @param {ClipboardEvent} e - Event object
+ */
 function OnCopy_component(e) {
-	if (domUtils.isInputElement(e.target) && domUtils.getParentElement(e.target, '.se-modal')) return;
+	const target = /** @type {Element} */ (e.target);
+	if (domUtils.isInputElement(target) && domUtils.getParentElement(target, '.se-modal')) return;
 
 	const info = this.info;
 	if (!info) return;
@@ -615,6 +659,10 @@ function OnCopy_component(e) {
 	}, 120);
 }
 
+/**
+ * @this {ComponentThis}
+ * @param {ClipboardEvent} e - Event object
+ */
 function OnCut_component(e) {
 	const info = this.info;
 	if (!info) return;
@@ -624,6 +672,10 @@ function OnCut_component(e) {
 	domUtils.removeItem(info.container);
 }
 
+/**
+ * @this {ComponentThis}
+ * @param {KeyboardEvent} e - Event object
+ */
 async function OnKeyDown_component(e) {
 	if (this.editor.selectMenuOn) return;
 

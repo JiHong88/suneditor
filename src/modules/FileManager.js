@@ -2,10 +2,6 @@ import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';
 
 /**
- * @typedef {import('../core/editor.js').default} EditorInstance
- */
-
-/**
  * @typedef {Object} FileStateInfo
  * @property {string} src File source
  * @property {number} index File index
@@ -26,16 +22,15 @@ import ApiManager from './ApiManager';
 /**
  * @typedef {Object} FileManagerParams
  * @property {string} query The query selector used to find file elements in the editor
- * @property {(params: Array.<FileStateInfo>) => void=} loadHandler A function to handle the loaded file information
+ * @property {(params: Array<FileStateInfo>) => void=} loadHandler A function to handle the loaded file information
  * @property {(info: FileStateParams) => void=} eventHandler A function to handle file-related events
  */
 
 /**
- * @class
+ * @constructor
  * @description This module manages the file information of the editor.
  * @param {*} inst The instance object that called the constructor.
  * @param {FileManagerParams} params FileManager options
- * @returns {FileManager}
  */
 function FileManager(inst, params) {
 	CoreInjector.call(this, inst.editor);
@@ -61,7 +56,7 @@ FileManager.prototype = {
 	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
-	 * @param {?Object.<string, string>} uploadHeader Request header
+	 * @param {?Object<string, string>} uploadHeader Request header
 	 * @param {File|FileList|{formData: FormData, size: number}} data FormData in body or Files array
 	 * @param {?(xmlHttp: XMLHttpRequest) => boolean=} callBack Success call back function
 	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack Error call back function
@@ -88,7 +83,7 @@ FileManager.prototype = {
 	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
-	 * @param {?Object.<string, string>} uploadHeader Request header
+	 * @param {?Object<string, string>} uploadHeader Request header
 	 * @param {File|FileList|{formData: FormData, size: number}} data FormData in body or Files array
 	 * @returns {Promise<XMLHttpRequest>}
 	 */

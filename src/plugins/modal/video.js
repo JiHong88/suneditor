@@ -5,15 +5,34 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @typedef {import('../../core/base/events').VideoInfo} VideoInfo
  */
 
 /**
- * @typedef {import('../../core/section/context').FrameContext} FrameContext
+ * @typedef {Object} VideoPluginOptions
+ * @property {boolean=} [canResize=true] - Whether the video element can be resized.
+ * @property {boolean=} [showHeightInput=true] - Whether to display the height input field.
+ * @property {string=} [defaultWidth] - The default width of the video element. If a number is provided, "px" will be appended.
+ * @property {string=} [defaultHeight] - The default height of the video element. If a number is provided, "px" will be appended.
+ * @property {boolean=} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
+ * @property {boolean=} [createFileInput=false] - Whether to create a file input element for video uploads.
+ * @property {boolean=} [createUrlInput=true] - Whether to create a URL input element for video embedding.
+ * @property {string=} [uploadUrl] - The URL endpoint for video file uploads.
+ * @property {Object<string, string>=} [uploadHeaders] - Additional headers to include in the video upload request.
+ * @property {number=} [uploadSizeLimit] - The total upload size limit for videos in bytes.
+ * @property {number=} [uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.
+ * @property {boolean=} [allowMultiple=false] - Whether multiple video uploads are allowed.
+ * @property {string=} [acceptedFormats="video/*"] - Accepted file formats for video uploads.
+ * @property {number=} [defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
+ * @property {boolean=} [showRatioOption=true] - Whether to display the ratio option in the modal.
+ * @property {Array=} [ratioOptions] - Custom ratio options for video resizing.
+ * @property {Object<string, string>=} [videoTagAttributes] - Additional attributes to set on the video tag.
+ * @property {Object<string, string>=} [iframeTagAttributes] - Additional attributes to set on the iframe tag.
+ * @property {string=} [query_youtube=""] - Additional query parameters for YouTube embedding.
+ * @property {string=} [query_vimeo=""] - Additional query parameters for Vimeo embedding.
+ * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} [embedQuery] - Custom query objects for additional embedding services.
+ * @property {Array<RegExp|string>=} [urlPatterns] - Additional URL patterns for video embedding.
+ * @property {Array<string>=} [extensions] - Additional file extensions to be recognized for video uploads.
  */
 
 /**
@@ -22,31 +41,7 @@ const { NO_EVENT } = env;
  * - This plugin provides video embedding functionality within the editor.
  * - It also supports embedding from popular video services
  * @param {EditorInstance} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {boolean=} [pluginOptions.canResize=true] - Whether the video element can be resized.
- * @param {boolean=} [pluginOptions.showHeightInput=true] - Whether to display the height input field.
- * @param {string=} [pluginOptions.defaultWidth] - The default width of the video element. If a number is provided, "px" will be appended.
- * @param {string=} [pluginOptions.defaultHeight] - The default height of the video element. If a number is provided, "px" will be appended.
- * @param {boolean=} [pluginOptions.percentageOnlySize=false] - Whether to allow only percentage-based sizing.
- * @param {boolean=} [pluginOptions.createFileInput=false] - Whether to create a file input element for video uploads.
- * @param {boolean=} [pluginOptions.createUrlInput=true] - Whether to create a URL input element for video embedding.
- * @param {string=} [pluginOptions.uploadUrl] - The URL endpoint for video file uploads.
- * @param {Object.<string, string>=} [pluginOptions.uploadHeaders] - Additional headers to include in the video upload request.
- * @param {number=} [pluginOptions.uploadSizeLimit] - The total upload size limit for videos in bytes.
- * @param {number=} [pluginOptions.uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.
- * @param {boolean=} [pluginOptions.allowMultiple=false] - Whether multiple video uploads are allowed.
- * @param {string=} [pluginOptions.acceptedFormats="video/*"] - Accepted file formats for video uploads.
- * @param {number=} [pluginOptions.defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
- * @param {boolean=} [pluginOptions.showRatioOption=true] - Whether to display the ratio option in the modal.
- * @param {Array=} [pluginOptions.ratioOptions] - Custom ratio options for video resizing.
- * @param {Object.<string, string>=} [pluginOptions.videoTagAttributes] - Additional attributes to set on the video tag.
- * @param {Object.<string, string>=} [pluginOptions.iframeTagAttributes] - Additional attributes to set on the iframe tag.
- * @param {string=} [pluginOptions.query_youtube=""] - Additional query parameters for YouTube embedding.
- * @param {string=} [pluginOptions.query_vimeo=""] - Additional query parameters for Vimeo embedding.
- * @param {Object.<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} [pluginOptions.embedQuery] - Custom query objects for additional embedding services.
- * @param {Array.<RegExp|string>=} [pluginOptions.urlPatterns] - Additional URL patterns for video embedding.
- * @param {Array.<string>=} [pluginOptions.extensions] - Additional file extensions to be recognized for video uploads.
- * @returns {Video}
+ * @param {VideoPluginOptions} pluginOptions
  */
 function Video(editor, pluginOptions) {
 	// plugin bisic properties
@@ -601,7 +596,7 @@ Video.prototype = {
 	/**
 	 * @description Creates a new iframe element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes for embedding.
-	 * @param {Object.<string, string>} [props] - An optional object containing properties to assign to the iframe.
+	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the iframe.
 	 * @returns {HTMLIFrameElement} The newly created iframe element.
 	 */
 	createIframeTag(props) {
@@ -618,7 +613,7 @@ Video.prototype = {
 	/**
 	 * @description Creates a new video element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes.
-	 * @param {Object.<string, string>} [props] - An optional object containing properties to assign to the video element.
+	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the video element.
 	 * @returns {HTMLVideoElement} The newly created video element.
 	 */
 	createVideoTag(props) {
@@ -665,7 +660,7 @@ Video.prototype = {
 
 	/**
 	 * @description Create an "video" component using the provided files.
-	 * @param {Array.<File>} fileList File object list
+	 * @param {Array<File>} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
@@ -839,7 +834,7 @@ Video.prototype = {
 	 * @private
 	 * @description Registers the uploaded video in the editor.
 	 * @param {VideoInfo} info - Video information object.
-	 * @param {Object.<string, *>} response - Server response containing video data.
+	 * @param {Object<string, *>} response - Server response containing video data.
 	 */
 	_register(info, response) {
 		const fileList = response.result;
@@ -857,7 +852,7 @@ Video.prototype = {
 	 * @private
 	 * @description Uploads a video to the server using an external upload handler.
 	 * @param {VideoInfo} info - Video information object.
-	 * @param {Array.<File>} files - The video files to upload.
+	 * @param {Array<File>} files - The video files to upload.
 	 */
 	_serverUpload(info, files) {
 		if (!files) return;
@@ -928,7 +923,7 @@ Video.prototype = {
 	/**
 	 * @private
 	 * @description Handles video upload errors.
-	 * @param {Object.<string, *>} response - The error response object.
+	 * @param {Object<string, *>} response - The error response object.
 	 * @returns {Promise<void>}
 	 */
 	async _error(response) {

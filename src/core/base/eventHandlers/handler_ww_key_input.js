@@ -9,6 +9,15 @@ const DOCUMENT_TYPE_OBSERVER_KEYCODE = /^(8|13|46)$/;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 let _styleNodes = null;
 
+/**
+ * @typedef {Omit<import('../eventManager').default & Partial<EditorInjector>, 'eventManager'>} EventManagerThis
+ */
+
+/**
+ * @private
+ * @param {Node} formatEl - Format element
+ * @returns {Node}
+ */
 function LineDelete_next(formatEl) {
 	const focusNode = formatEl.lastChild;
 	const next = formatEl.nextElementSibling;
@@ -30,17 +39,22 @@ function LineDelete_next(formatEl) {
 	return focusNode;
 }
 
+/**
+ * @private
+ * @param {Node} formatEl - Format element
+ * @returns {{focusNode: Node, focusOffset: number}}
+ */
 function LineDelete_prev(formatEl) {
 	const formatChild = formatEl.childNodes;
 	const prev = formatEl.previousElementSibling;
 	let focusNode = formatChild[0];
 	let focusOffset = 0;
 
-	if (!prev) return focusNode;
+	if (!prev) return { focusNode, focusOffset };
 
 	if (domUtils.isZeroWidth(prev)) {
 		domUtils.removeItem(prev);
-		return focusNode;
+		return { focusNode, focusOffset };
 	}
 
 	if (formatChild.length > 1 || formatChild[0]?.textContent.length > 0) {
@@ -57,8 +71,14 @@ function LineDelete_prev(formatEl) {
 	return { focusNode, focusOffset };
 }
 
-export function OnInput_wysiwyg(frameContext, e) {
-	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {InputEvent} e - Event object
+ */
+export async function OnInput_wysiwyg(fc, e) {
+	if (fc.get('isReadOnly') || fc.get('isDisabled')) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -82,14 +102,20 @@ export function OnInput_wysiwyg(frameContext, e) {
 	}
 
 	// user event
-	if (this.triggerEvent('onInput', { frameContext, event: e, data }) === false) return;
+	if ((await this.triggerEvent('onInput', { frameContext: fc, event: e, data })) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onInput', { frameContext, event: e, data }) === false) return;
+	if (this._callPluginEvent('onInput', { frameContext: fc, event: e, data }) === false) return;
 
 	this.history.push(true);
 }
 
-export function OnKeyDown_wysiwyg(frameContext, e) {
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {KeyboardEvent} e - Event object
+ */
+export async function OnKeyDown_wysiwyg(fc, e) {
 	if (this.editor.selectMenuOn || !e.isTrusted) return;
 
 	let selectionNode = this.selection.getNode();
@@ -102,7 +128,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	const alt = e.altKey;
 	this.isComposing = keyCode === 229;
 
-	if (!ctrl && frameContext.get('isReadOnly') && !DIR_KEYCODE.test(keyCode)) {
+	if (!ctrl && fc.get('isReadOnly') && !DIR_KEYCODE.test(keyCode)) {
 		e.preventDefault();
 		return false;
 	}
@@ -116,7 +142,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	}
 
 	// user event
-	if (this.triggerEvent('onKeyDown', { frameContext, event: e }) === false) return;
+	if ((await this.triggerEvent('onKeyDown', { frameContext: fc, event: e })) === false) return;
 
 	/** default key action */
 	if (keyCode === 13 && this.format.isLine(this.selection.getRange()?.startContainer)) {
@@ -148,7 +174,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	}
 
 	// plugin event
-	if (this._callPluginEvent('onKeyDown', { frameContext, event: e, range, line: formatEl }) === false) return;
+	if (this._callPluginEvent('onKeyDown', { frameContext: fc, event: e, range, line: formatEl }) === false) return;
 
 	switch (keyCode) {
 		case 8 /** backspace key */: {
@@ -160,7 +186,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				break;
 			}
 
-			if (!this.format.isLine(formatEl) && !frameContext.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.get('defaultLine')) !== null) {
+			if (!this.format.isLine(formatEl) && !fc.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.get('defaultLine')) !== null) {
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
@@ -532,9 +558,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			) {
 				if (range.startContainer !== range.endContainer) this.html.remove();
 
-				let next = domUtils.getArrayItem(formatEl.children, domUtils.isList, false);
-				next = next || formatEl.nextElementSibling || rangeEl.parentNode.nextElementSibling;
-				if (next && (domUtils.isList(next) || domUtils.getArrayItem(next.children, domUtils.isList, false))) {
+				const next = domUtils.arrayFind(formatEl.children, domUtils.isList) || formatEl.nextElementSibling || rangeEl.parentNode.nextElementSibling;
+				if (next && (domUtils.isList(next) || domUtils.arrayFind(next.children, domUtils.isList))) {
 					e.preventDefault();
 
 					let con, children;
@@ -572,8 +597,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 			selectionNode = this.selection.getNode();
 			const cells = [];
 			const lines = [];
-			const fc = domUtils.isListCell(selectedFormats[0]),
-				lc = domUtils.isListCell(selectedFormats[selectedFormats.length - 1]);
+			const firstCell = domUtils.isListCell(selectedFormats[0]),
+				lastCell = domUtils.isListCell(selectedFormats[selectedFormats.length - 1]);
 			let r = {
 				sc: range.startContainer,
 				so: range.startOffset,
@@ -613,11 +638,11 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 						const tabText = domUtils.createTextNode(new Array(tabSize).join('\u00A0'));
 						if (!this.html.insertNode(tabText, { afterNode: null, skipCharCount: false })) return false;
-						if (!fc) {
+						if (!firstCell) {
 							r.sc = tabText;
 							r.so = tabText.length;
 						}
-						if (!lc) {
+						if (!lastCell) {
 							r.ec = tabText;
 							r.eo = tabText.length;
 						}
@@ -637,11 +662,11 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 						const firstChild = domUtils.getEdgeChild(lines[0], 'text', false);
 						const endChild = domUtils.getEdgeChild(lines[len], 'text', true);
-						if (!fc && firstChild) {
+						if (!firstCell && firstChild) {
 							r.sc = firstChild;
 							r.so = 0;
 						}
-						if (!lc && endChild) {
+						if (!lastCell && endChild) {
 							r.ec = endChild;
 							r.eo = endChild.textContent.length;
 						}
@@ -667,11 +692,11 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 
 					const firstChild = domUtils.getEdgeChild(lines[0], 'text', false);
 					const endChild = domUtils.getEdgeChild(lines[len], 'text', true);
-					if (!fc && firstChild) {
+					if (!firstCell && firstChild) {
 						r.sc = firstChild;
 						r.so = 0;
 					}
-					if (!lc && endChild) {
+					if (!lastCell && endChild) {
 						r.ec = endChild;
 						r.eo = endChild.textContent.length;
 					}
@@ -708,19 +733,8 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 				// add default format line
 				if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
 					this.__enterPrevent(e);
-					let temp = null;
 					const newFormat = this.format.addLine(formatEl, this.options.get('defaultLine'));
-
-					if (formatEndEdge && formatEndEdge.length > 0) {
-						temp = formatEndEdge.pop();
-						const innerNode = temp;
-						while (formatEndEdge.length > 0) {
-							temp = temp.appendChild(formatEndEdge.pop());
-						}
-						newFormat.appendChild(innerNode);
-					}
-
-					temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
+					const temp = newFormat.firstChild;
 					if (domUtils.isBreak(temp)) {
 						const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
 						temp.parentNode.insertBefore(zeroWidth, temp);
@@ -870,7 +884,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 					let child = focusBR;
 					do {
 						if (!domUtils.isBreak(selectionNode) && selectionNode.nodeType === 1) {
-							const f = selectionNode.cloneNode(false);
+							const f = /** @type {HTMLElement} */ (selectionNode.cloneNode(false));
 							f.appendChild(child);
 							child = f;
 						}
@@ -901,12 +915,15 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						const newFormat = formatEl.cloneNode(false);
 						newFormat.innerHTML = '<br>';
 						const commonCon = range.commonAncestorContainer;
-						const rcon = commonCon === range.startContainer && commonCon === range.endContainer && domUtils.isZeroWidth(commonCon) ? range : this.html.remove();
+						const rcon =
+							commonCon === range.startContainer && commonCon === range.endContainer && domUtils.isZeroWidth(commonCon)
+								? { container: commonCon, offset: range.endOffset, prevContainer: commonCon.previousElementSibling, commonCon: commonCon }
+								: this.html.remove();
 						newEl = this.format.getLine(rcon.container, null);
 						if (!newEl) {
 							if (domUtils.isWysiwygFrame(rcon.container)) {
 								this.__enterPrevent(e);
-								frameContext.get('wysiwyg').appendChild(newFormat);
+								fc.get('wysiwyg').appendChild(newFormat);
 								newEl = newFormat;
 								domUtils.copyTagAttributes(newEl, formatEl, this.options.get('lineAttrReset'));
 								this.selection.setRange(newEl, offset, newEl, offset);
@@ -918,7 +935,7 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						}
 
 						const innerRange = this.format.getBlock(rcon.container);
-						newEl = newEl.contains(innerRange) ? domUtils.getEdgeChild(innerRange, this.format.getLine.bind(this.format)) : newEl;
+						newEl = newEl.contains(innerRange) ? domUtils.getEdgeChild(innerRange, this.format.getLine.bind(this.format), false) : newEl;
 						if (isMultiLine) {
 							if (formatEndEdge && !formatStartEdge) {
 								newEl.parentNode.insertBefore(newFormat, !rcon.prevContainer || rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl);
@@ -937,6 +954,10 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 						} else {
 							if (formatEndEdge && formatStartEdge) {
 								newEl.parentNode.insertBefore(newFormat, rcon.prevContainer && rcon.container === rcon.prevContainer ? newEl.nextElementSibling : newEl);
+								newEl = newFormat;
+								offset = 0;
+							} else if (formatEndEdge) {
+								newEl = newEl.parentNode.insertBefore(newFormat, newEl.nextElementSibling);
 								newEl = newFormat;
 								offset = 0;
 							} else {
@@ -997,9 +1018,9 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	}
 
 	// document type
-	if (frameContext.has('documentType-use-header') && !range.collapsed && !ctrl && !alt && !shift && !DIR_KEYCODE.test(keyCode)) {
+	if (fc.has('documentType-use-header') && !range.collapsed && !ctrl && !alt && !shift && !DIR_KEYCODE.test(keyCode)) {
 		_w.setTimeout(() => {
-			frameContext.get('documentType').reHeader();
+			fc.get('documentType').reHeader();
 		}, 0);
 		return;
 	}
@@ -1045,14 +1066,20 @@ export function OnKeyDown_wysiwyg(frameContext, e) {
 	}
 }
 
-export function OnKeyUp_wysiwyg(frameContext, e) {
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {KeyboardEvent} e - Event object
+ */
+export async function OnKeyUp_wysiwyg(fc, e) {
 	if (this._onShortcutKey || this.menu.currentDropdownName) return;
 
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	const alt = e.altKey;
 
-	if (frameContext.get('isReadOnly')) return;
+	if (fc.get('isReadOnly')) return;
 
 	const range = this.selection.getRange();
 	let selectionNode = this.selection.getNode();
@@ -1082,9 +1109,9 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 		this.history.push(false);
 
 		// document type
-		if (frameContext.has('documentType-use-header')) {
+		if (fc.has('documentType-use-header')) {
 			if (DOCUMENT_TYPE_OBSERVER_KEYCODE.test(keyCode)) {
-				frameContext.get('documentType').reHeader();
+				fc.get('documentType').reHeader();
 			}
 		}
 
@@ -1146,21 +1173,21 @@ export function OnKeyUp_wysiwyg(frameContext, e) {
 	this.char.test('', false);
 
 	// document type
-	if (frameContext.has('documentType-use-header')) {
+	if (fc.has('documentType-use-header')) {
 		if (DOCUMENT_TYPE_OBSERVER_KEYCODE.test(keyCode)) {
-			frameContext.get('documentType').reHeader();
+			fc.get('documentType').reHeader();
 			const el = domUtils.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
-			frameContext.get('documentType').on(el);
+			fc.get('documentType').on(el);
 		} else {
 			const el = domUtils.getParentElement(selectionNode, (current) => current.nodeType === 1);
-			frameContext.get('documentType').onChangeText(el);
+			fc.get('documentType').onChangeText(el);
 		}
 	}
 
 	// user event
-	if (this.triggerEvent('onKeyUp', { frameContext, event: e }) === false) return;
+	if ((await this.triggerEvent('onKeyUp', { frameContext: fc, event: e })) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onKeyUp', { frameContext, event: e, range, line: formatEl }) === false) return;
+	if (this._callPluginEvent('onKeyUp', { frameContext: fc, event: e, range, line: formatEl }) === false) return;
 
 	if (!ctrl && !alt && !HISTORY_IGNORE_KEYCODE.test(keyCode)) {
 		this.history.push(true);

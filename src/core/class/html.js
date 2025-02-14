@@ -9,14 +9,9 @@ const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
 
 /**
- * @typedef {import('../editor').default} EditorInstance
- */
-
-/**
- * @class
+ * @constructor
  * @description All HTML related classes involved in the editing area
  * @param {EditorInstance} editor - The root editor instance
- * @returns {HTML}
  */
 function HTML(editor) {
 	CoreInjector.call(this, editor);
@@ -27,7 +22,7 @@ function HTML(editor) {
 
 	this._isAllowedClassName = function (v) {
 		return this.test(v) ? v : '';
-	}.bind(this.options.get('allowedClassName'));
+	}.bind(options.get('allowedClassName'));
 	this._allowHTMLComment = null;
 	this._disallowedStyleNodesRegExp = null;
 	this._htmlCheckWhitelistRegExp = null;
@@ -78,7 +73,7 @@ function HTML(editor) {
 	this._cleanStyleRegExpMap = stylesMap;
 
 	// font size unit
-	this.fontSizeUnitRegExp = new RegExp('\\d+(' + this.options.get('fontSizeUnits').join('|') + ')$', 'i');
+	this.fontSizeUnitRegExp = new RegExp('\\d+(' + options.get('fontSizeUnits').join('|') + ')$', 'i');
 
 	// extra tags
 	const allowedExtraTags = options.get('_allowedExtraTag');
@@ -126,7 +121,7 @@ function HTML(editor) {
 		}
 	}
 
-	this._attributeWhitelistRegExp = new RegExp('\\s(?:' + (allAttr || defaultAttr) + '|' + REQUIRED_DATA_ATTRS + (this.options.get('v2Migration') ? V2_MIG_DATA_ATTRS : '') + ')' + regEndStr, 'ig');
+	this._attributeWhitelistRegExp = new RegExp('\\s(?:' + (allAttr || defaultAttr) + '|' + REQUIRED_DATA_ATTRS + (options.get('v2Migration') ? V2_MIG_DATA_ATTRS : '') + ')' + regEndStr, 'ig');
 	this._attributeWhitelist = tagsAttr;
 
 	// blacklist
@@ -147,10 +142,10 @@ function HTML(editor) {
 	this._attributeBlacklist = tagsAttr;
 
 	// autoStyleify
-	if (this.options.get('autoStyleify').length > 0) {
-		const convertTextTags = this.options.get('convertTextTags');
+	if (options.get('autoStyleify').length > 0) {
+		const convertTextTags = options.get('convertTextTags');
 		const styleToTag = {};
-		this.options.get('autoStyleify').forEach((style) => {
+		options.get('autoStyleify').forEach((style) => {
 			switch (style) {
 				case 'bold':
 					styleToTag.bold = { regex: /font-weight\s*:\s*bold/i, tag: convertTextTags.bold };
@@ -657,7 +652,7 @@ HTML.prototype = {
 					domUtils.removeItem(line);
 					oNode = oNode.lastChild;
 				} else {
-					const chList = domUtils.getArrayItem(line.children, domUtils.isList);
+					const chList = domUtils.arrayFind(line.children, domUtils.isList);
 					if (chList) {
 						if (oNode !== chList) {
 							oNode.appendChild(chList);
@@ -741,7 +736,11 @@ HTML.prototype = {
 
 	/**
 	 * @description Delete the selected range.
-	 * @returns {{container:Node, offset:number, prevContainer:Node|null}} {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
+	 * @returns {{container:Node, offset:number, prevContainer:Node|null, commonCon:Node|null}}
+	 * - container: "the last element after deletion"
+	 * - offset: "offset"
+	 * - prevContainer: "previousElementSibling Of the deleted area"
+	 * - commonCon: "commonAncestorContainer"
 	 */
 	remove() {
 		this.selection._resetRangeToTextNode();
@@ -1012,8 +1011,8 @@ HTML.prototype = {
 	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
 	 * Ignored for targetOptions.get('iframe_fullPage') is true.
 	 * @param {boolean} [options.includeFullPage=false] Return only the content of the body without headers when the "iframe_fullPage" option is true
-	 * @param {number|Array.<number>} [options.rootKey=null] Root index
-	 * @returns {string|Array.<string>}
+	 * @param {number|Array<number>} [options.rootKey=null] Root index
+	 * @returns {string|Array<string>}
 	 */
 	get({ withFrame, includeFullPage, rootKey } = {}) {
 		if (!rootKey) rootKey = [this.status.rootKey];
@@ -1055,7 +1054,7 @@ HTML.prototype = {
 	 * @description Sets the HTML string
 	 * @param {string} html HTML string
 	 * @param {Object} [options] Options
-	 * @param {number|Array.<number>} [options.rootKey=null] Root index
+	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	set(html, { rootKey } = {}) {
 		this.selection.removeRange();
@@ -1082,7 +1081,7 @@ HTML.prototype = {
 	 * @description Add content to the end of content.
 	 * @param {string} html Content to Input
 	 * @param {Object} [options] Options
-	 * @param {number|Array.<number>} [options.rootKey=null] Root index
+	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	add(html, { rootKey } = {}) {
 		if (!rootKey) rootKey = [this.status.rootKey];
@@ -1112,7 +1111,7 @@ HTML.prototype = {
 	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
 	 * @param {{head: string, body: string}} ctx { head: HTML string, body: HTML string}
 	 * @param {Object} [options] Options
-	 * @param {number|Array.<number>} [options.rootKey=null] Root index
+	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	setFullPage(ctx, { rootKey } = {}) {
 		if (!this.editor.frameOptions.get('iframe')) return false;
@@ -1475,7 +1474,7 @@ HTML.prototype = {
 	/**
 	 * @private
 	 * @description Determines if formatting is required and returns a domTree
-	 * @param {Element} dom documentFragment
+	 * @param {DocumentFragment} dom documentFragment
 	 * @returns {Element}
 	 */
 	_editFormat(dom) {
@@ -1484,7 +1483,7 @@ HTML.prototype = {
 		const tempTree = dom.childNodes;
 
 		for (let i = 0, len = tempTree.length, n; i < len; i++) {
-			n = tempTree[i];
+			n = /** @type {Element} */ (tempTree[i]);
 			if (this.__allowedTagNameRegExp.test(n.nodeName)) {
 				value += n.outerHTML;
 				continue;

@@ -1,6 +1,6 @@
 # Guidelines For Contributing
 
-Coded based on Nodejs@v20 and written in "prototype" syntax.
+Coded based on Nodejs@v20 and written.
 
 Nodejs version14 or higher is required to build or test this project.
 

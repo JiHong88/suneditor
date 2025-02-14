@@ -5,15 +5,10 @@ import { domUtils, env } from '../../helper';
 const { _w } = env;
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @class
  * @description Anchor plugin
  * - Allows you to create, edit, and delete elements that act as anchors (bookmarks) within a document.
  * @param {EditorInstance} editor - The root editor instance
- * @returns {Anchor}
  */
 function Anchor(editor) {
 	EditorInjector.call(this, editor);

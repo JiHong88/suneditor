@@ -15,9 +15,9 @@ export function isZeroWidth(text) {
 /**
  * @description Create Element node
  * @param {string} elementName Element name
- * @param {?Object.<string, string>} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
+ * @param {?Object<string, string>=} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
  * @param {?string|Node=} inner A innerHTML string or inner node.
- * @returns {Element}
+ * @returns {HTMLElement}
  */
 export function createElement(elementName, attributes, inner) {
 	const el = _d.createElement(elementName);
@@ -59,8 +59,8 @@ export function getIframeDocument(iframe) {
 
 /**
  * @description Get attributes of argument element to string ('class="---" name="---" ')
- * @param {Element} element Element object
- * @param {Array.<string>|null} exceptAttrs Array of attribute names to exclude from the result
+ * @param {Node} element Element object
+ * @param {Array<string>|null} exceptAttrs Array of attribute names to exclude from the result
  * @returns {string}
  */
 export function getAttributesToString(element, exceptAttrs) {
@@ -94,11 +94,11 @@ export function getPositionIndex(node) {
  * @description Returns the position of the "node" in the "parentNode" in a numerical array.
  * - e.g.) <p><span>aa</span><span>bb</span></p> : getNodePath(node: "bb", parentNode: "<P>") -> [1, 0]
  * @param {Node} node The Node to find position path
- * @param {Node|null} parentNode Parent node. If null, wysiwyg div area
+ * @param {?Node} parentNode Parent node. If null, wysiwyg div area
  * @param {?{s: number, e: number}=} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
  * "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".
  * Do not use unless absolutely necessary.
- * @returns {Array.<number>}
+ * @returns {Array<number>}
  */
 export function getNodePath(node, parentNode, _newOffsets) {
 	const path = [];
@@ -145,7 +145,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 
 /**
  * @description Returns the node in the location of the path array obtained from "helper.dom.getNodePath".
- * @param {Array.<number>} offsets Position array, array obtained from "helper.dom.getNodePath"
+ * @param {Array<number>} offsets Position array, array obtained from "helper.dom.getNodePath"
  * @param {Node} parentNode Base parent element
  * @returns {Node}
  */
@@ -168,9 +168,9 @@ export function getNodeFromPath(offsets, parentNode) {
 
 /**
  * @description Get all "children" of the argument value element (Without text nodes)
- * @param {Element} element element to get child node
- * @param {?(current: Element) => boolean} validation Conditional function
- * @returns {Array.<Element>}
+ * @param {Node} element element to get child node
+ * @param {?(current: *) => boolean} validation Conditional function
+ * @returns {Array<Element>}
  */
 export function getListChildren(element, validation) {
 	const children = [];
@@ -194,14 +194,14 @@ export function getListChildren(element, validation) {
 		}
 	})(element);
 
-	return children;
+	return /** @type {Array<Element>} */ (children);
 }
 
 /**
  * @description Get all "childNodes" of the argument value element (Include text nodes)
  * @param {Node} element element to get child node
- * @param {?(current: Element) => boolean} validation Conditional function
- * @returns {Array.<Node>}
+ * @param {?(current: *) => boolean} validation Conditional function
+ * @returns {Array<Node>}
  */
 export function getListChildNodes(element, validation) {
 	const children = [];
@@ -237,11 +237,11 @@ export function getNodeDepth(node) {
 	if (!node || isWysiwygFrame(node)) return -1;
 
 	let depth = 0;
-	node = node.parentNode;
+	node = node.parentElement;
 
 	while (node && !isWysiwygFrame(node)) {
 		depth += 1;
-		node = node.parentNode;
+		node = node.parentElement;
 	}
 
 	return depth;
@@ -249,7 +249,7 @@ export function getNodeDepth(node) {
 
 /**
  * @description Sort a node array by depth of element.
- * @param {Array.<Node>} array Node array
+ * @param {Array<Node>} array Node array
  * @param {boolean} des true: descending order / false: ascending order
  */
 export function sortNodeByDepth(array, des) {
@@ -258,9 +258,9 @@ export function sortNodeByDepth(array, des) {
 
 	array.sort(function (a, b) {
 		if (!isListCell(a) || !isListCell(b)) return 0;
-		a = getNodeDepth(a);
-		b = getNodeDepth(b);
-		return a > b ? t : a < b ? f : 0;
+		const a_i = getNodeDepth(a);
+		const b_i = getNodeDepth(b);
+		return a_i > b_i ? t : a_i < b_i ? f : 0;
 	});
 }
 
@@ -268,14 +268,14 @@ export function sortNodeByDepth(array, des) {
  * @description Compares two elements to find a common ancestor, and returns the order of the two elements.
  * @param {Node} a Node to compare.
  * @param {Node} b Node to compare.
- * @returns {{ancesstor: Node, a: Node, b: Node, ressult: number}} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
+ * @returns {{ancestor: Element|null, a: Node, b: Node, result: number}} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
  */
 export function compareElements(a, b) {
 	let aNode = a,
 		bNode = b;
-	while (aNode && bNode && aNode.parentNode !== bNode.parentNode) {
-		aNode = aNode.parentNode;
-		bNode = bNode.parentNode;
+	while (aNode && bNode && aNode.parentElement !== bNode.parentElement) {
+		aNode = aNode.parentElement;
+		bNode = bNode.parentElement;
 	}
 
 	if (!aNode || !bNode)
@@ -291,7 +291,7 @@ export function compareElements(a, b) {
 	const bIndex = getArrayIndex(children, bNode);
 
 	return {
-		ancestor: aNode.parentNode,
+		ancestor: aNode.parentElement,
 		a: aNode,
 		b: bNode,
 		result: aIndex > bIndex ? 1 : aIndex < bIndex ? -1 : 0
@@ -302,11 +302,11 @@ export function compareElements(a, b) {
  * @description Get the parent element of the argument value.
  * - A tag that satisfies the query condition is imported.
  * @param {Node} element Reference element
- * @param {string|(current: Element) => boolean|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
- * Not use it like jquery.
- * Only one condition can be entered at a time.
+ * @param {string|((current: *) => boolean)|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * - Not use it like jquery.
+ * - Only one condition can be entered at a time.
  * @param {?number=} depth Number of parent levels to depth.
- * @returns {Element|null} Not found: null
+ * @returns {Node|null} Not found: null
  */
 export function getParentElement(element, query, depth) {
 	let check;
@@ -314,9 +314,8 @@ export function getParentElement(element, query, depth) {
 	if (typeof query === 'function') {
 		check = query;
 	} else if (typeof query === 'object') {
-		check = function (current) {
-			return current === query;
-		};
+		/** @param {Node} current */
+		check = (current) => current === query;
 	} else {
 		let attr;
 		if (/^\./.test(query)) {
@@ -334,9 +333,8 @@ export function getParentElement(element, query, depth) {
 		}
 
 		const regExp = new RegExp(query, 'i');
-		check = function (el) {
-			return regExp.test(el[attr]);
-		};
+		/** @param {Node} el */
+		check = (el) => regExp.test(el[attr]);
 	}
 
 	if (!depth) depth = Infinity;
@@ -345,7 +343,7 @@ export function getParentElement(element, query, depth) {
 		if (index >= depth || isWysiwygFrame(element)) {
 			return null;
 		}
-		element = element.parentNode;
+		element = element.parentElement;
 		index++;
 	}
 
@@ -356,11 +354,11 @@ export function getParentElement(element, query, depth) {
  * @description Gets all ancestors of the argument value.
  * - Get all tags that satisfy the query condition.
  * @param {Node} element Reference element
- * @param {string|(current: Element) => boolean|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|((current: *) => boolean)|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @param {?number=} depth Number of parent levels to depth.
- * @returns {Element|null} Returned in an array in order.
+ * @returns {Array<Node>} Returned in an array in order.
  */
 export function getParentElements(element, query, depth) {
 	let check;
@@ -368,9 +366,8 @@ export function getParentElements(element, query, depth) {
 	if (typeof query === 'function') {
 		check = query;
 	} else if (typeof query === 'object') {
-		check = function (current) {
-			return current === query;
-		};
+		/** @param {Node} current */
+		check = (current) => current === query;
 	} else {
 		let attr;
 		if (/^\./.test(query)) {
@@ -388,9 +385,8 @@ export function getParentElements(element, query, depth) {
 		}
 
 		const regExp = new RegExp(query, 'i');
-		check = function (el) {
-			return regExp.test(el[attr]);
-		};
+		/** @param {Node} el */
+		check = (el) => regExp.test(el[attr]);
 	}
 
 	const elementList = [];
@@ -400,7 +396,7 @@ export function getParentElements(element, query, depth) {
 		if (check(element)) {
 			elementList.push(element);
 		}
-		element = element.parentNode;
+		element = element.parentElement;
 		index++;
 	}
 
@@ -410,12 +406,12 @@ export function getParentElements(element, query, depth) {
 /**
  * @description Gets the element with "data-command" attribute among the parent elements.
  * @param {Element} target Target element
- * @returns {Element|null}
+ * @returns {HTMLElement|null}
  */
 export function getCommandTarget(target) {
 	while (target && !/^(UL)$/i.test(target.tagName) && !hasClass(target, 'sun-editor')) {
-		if (target.hasAttribute('data-command')) return target;
-		target = target.parentNode;
+		if (target.hasAttribute('data-command')) return /** @type {HTMLElement} */ (target);
+		target = target.parentElement;
 	}
 
 	return null;
@@ -425,11 +421,11 @@ export function getCommandTarget(target) {
  * @description Get the child element of the argument value.
  * - A tag that satisfies the query condition is imported.
  * @param {Node} node Reference element
- * @param {string|(current: Node) => boolean|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|((current: *) => boolean)|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * @param {boolean} last If true returns the last node among the found child nodes. (default: first node)
  * Not use it like jquery.
  * Only one condition can be entered at a time.
- * @returns {Element|null} Not found: null
+ * @returns {Node|null} Not found: null
  */
 export function getEdgeChild(node, query, last) {
 	let check;
@@ -490,14 +486,12 @@ export function getEdgeChildNodes(first, last) {
 }
 
 /**
- * @description Get the item from the array that matches the condition.
- * @param {Array.<Node>|HTMLCollection|NodeList} array Array to get item
- * @param {?(current: Node) => boolean} validation Conditional function
- * @param {boolean} multi If true, returns all items that meet the criteria otherwise, returns an empty array.
- * If false, returns only one item that meet the criteria otherwise return null.
- * @returns {Array.<Node>|null}
+ * @description Get the items array from the array that matches the condition.
+ * @param {NodeCollection} array Array to get item
+ * @param {?(current: *) => boolean} validation Conditional function
+ * @returns {Array<Node>|null}
  */
-export function getArrayItem(array, validation, multi) {
+export function arrayFilter(array, validation) {
 	if (!array || array.length === 0) return null;
 
 	validation =
@@ -510,17 +504,41 @@ export function getArrayItem(array, validation, multi) {
 	for (let i = 0, len = array.length, a; i < len; i++) {
 		a = array[i];
 		if (validation(a)) {
-			if (!multi) return a;
-			else arr.push(a);
+			arr.push(a);
 		}
 	}
 
-	return !multi ? null : arr;
+	return arr;
+}
+
+/**
+ * @description Get the item from the array that matches the condition.
+ * @param {NodeCollection} array Array to get item
+ * @param {?(current: *) => boolean} validation Conditional function
+ * @returns {Node|null}
+ */
+export function arrayFind(array, validation) {
+	if (!array || array.length === 0) return null;
+
+	validation =
+		validation ||
+		function () {
+			return true;
+		};
+
+	for (let i = 0, len = array.length, a; i < len; i++) {
+		a = array[i];
+		if (validation(a)) {
+			return a;
+		}
+	}
+
+	return null;
 }
 
 /**
  * @description Check if an array contains an element
- * @param {Array.<Node>|HTMLCollection|NodeList} array element array
+ * @param {NodeCollection} array element array
  * @param {Node} node The node to check for
  * @returns {boolean}
  */
@@ -535,7 +553,7 @@ export function arrayIncludes(array, node) {
 
 /**
  * @description Get the index of the argument value in the element array
- * @param {Array|HTMLCollection|NodeList} array element array
+ * @param {NodeCollection} array element array
  * @param {Node} node The element to find index
  * @returns {number}
  */
@@ -553,7 +571,7 @@ export function getArrayIndex(array, node) {
 
 /**
  * @description Get the next index of the argument value in the element array
- * @param {Array.<Node>|HTMLCollection|NodeList} array element array
+ * @param {NodeCollection} array element array
  * @param {Node} item The element to find index
  * @returns {number}
  */
@@ -565,7 +583,7 @@ export function nextIndex(array, item) {
 
 /**
  * @description Get the previous index of the argument value in the element array
- * @param {Array.<Node>|HTMLCollection|NodeList} array Element array
+ * @param {NodeCollection} array Element array
  * @param {Node} item The element to find index
  * @returns {number}
  */
@@ -577,9 +595,9 @@ export function prevIndex(array, item) {
 
 /**
  * @description Add style and className of copyEl to originEl
- * @param {Element} originEl Origin element
- * @param {Element} copyEl Element to copy
- * @param {Array.<string>|null} blacklist Blacklist array(LowerCase)
+ * @param {Node} originEl Origin element
+ * @param {Node} copyEl Element to copy
+ * @param {?Array<string>=} blacklist Blacklist array(LowerCase)
  */
 export function copyTagAttributes(originEl, copyEl, blacklist) {
 	if (copyEl.style.cssText) {
@@ -599,11 +617,11 @@ export function copyTagAttributes(originEl, copyEl, blacklist) {
 
 /**
  * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
- * @param {Element} originEl Origin element
- * @param {Element} copyEl Element to copy
+ * @param {Node} originEl Origin element
+ * @param {Node} copyEl Element to copy
  */
 export function copyFormatAttributes(originEl, copyEl) {
-	copyEl = copyEl.cloneNode(false);
+	copyEl = /** @type {Element} */ (copyEl.cloneNode(false));
 	copyEl.className = copyEl.className.replace(/(\s|^)__se__format__[^\s]+/g, '');
 	copyTagAttributes(originEl, copyEl);
 }
@@ -644,7 +662,7 @@ export function isSameAttributes(a, b) {
  */
 export function removeItem(item) {
 	if (!item) return;
-	if (typeof item.remove === 'function') item.remove();
+	if ('remove' in item && typeof item.remove === 'function') item.remove();
 	else if (item.parentNode) item.parentNode.removeChild(item);
 }
 
@@ -662,8 +680,7 @@ export function changeElement(element, newElement) {
 		} else {
 			const doc = createElement('DIV');
 			doc.innerHTML = newElement;
-			newElement = doc.firstChild;
-			element.parentNode.replaceChild(newElement, element);
+			element.parentNode.replaceChild(doc.firstChild, element);
 		}
 	} else if (newElement?.nodeType === 1) {
 		element.parentNode.replaceChild(newElement, element);
@@ -682,7 +699,7 @@ export function changeTxt(node, txt) {
 
 /**
  * @description Set style, if all styles are deleted, the style properties are deleted.
- * @param {Element|Element[]} elements Element to set style
+ * @param {HTMLElement|HTMLElement[]} elements Element to set style
  * @param {string} styleName Style attribute name (marginLeft, textAlign...)
  * @param {string|number} value Style value
  */
@@ -700,9 +717,9 @@ export function setStyle(elements, styleName, value) {
 
 /**
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
- * @param {Array.<Element>|HTMLCollection} buttonList Button array
+ * @param {Array<HTMLButtonElement|HTMLInputElement>} buttonList (Button | Input) Element array
  * @param {boolean} disabled Disabled value
- * @param {boolean} important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
+ * @param {boolean} [important=false] If priveleged mode should be used (Necessary to switch importantDisabled buttons)
  */
 export function setDisabled(buttonList, disabled, important) {
 	for (let i = 0, len = buttonList.length; i < len; i++) {
@@ -720,7 +737,7 @@ export function setDisabled(buttonList, disabled, important) {
 
 /**
  * @description Determine whether any of the matched elements are assigned the given class
- * @param {Element} element Elements to search class name
+ * @param {?Node} element Elements to search class name
  * @param {string} className Class name to search for
  * @returns {boolean}
  */
@@ -732,7 +749,7 @@ export function hasClass(element, className) {
 
 /**
  * @description Append the className value of the argument value element
- * @param {Element|Array.<Element>|NodeList} element Elements to add class name
+ * @param {Node|NodeCollection} element Elements to add class name
  * @param {string} className Class name to be add
  */
 export function addClass(element, className) {
@@ -744,14 +761,14 @@ export function addClass(element, className) {
 	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;
 		for (const c of classNames) {
-			if (c) e.classList.add(c);
+			if (c) /** @type {HTMLElement} */ (e).classList.add(c);
 		}
 	}
 }
 
 /**
  * @description Delete the className value of the argument value element
- * @param {Element|Array.<Element>|NodeList} element Elements to remove class name
+ * @param {Node|NodeCollection} element Elements to remove class name
  * @param {string} className Class name to be remove
  */
 export function removeClass(element, className) {
@@ -763,14 +780,14 @@ export function removeClass(element, className) {
 	for (const e of elements) {
 		if (!e || e.nodeType !== 1) continue;
 		for (const c of classNames) {
-			if (c) e.classList.remove(c);
+			if (c) /** @type {HTMLElement} */ (e).classList.remove(c);
 		}
 	}
 }
 
 /**
  * @description Argument value If there is no class name, insert it and delete the class name if it exists
- * @param {Element} element Element to replace class name
+ * @param {Node} element Element to replace class name
  * @param {string} className Class name to be change
  * @returns {boolean|undefined}
  */
@@ -797,7 +814,7 @@ export function toggleClass(element, className) {
  * @description Determine if this offset is the edge offset of container
  * @param {Node} container The node of the selection object. (range.startContainer..)
  * @param {number} offset The offset of the selection object. (core.getRange().startOffset...)
- * @param {"front"|"end"|undefined} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
+ * @param {?"front"|"end"=} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
  * @returns {boolean}
  */
 export function isEdgePoint(container, offset, dir) {
@@ -806,7 +823,7 @@ export function isEdgePoint(container, offset, dir) {
 
 /**
  * @description It is judged whether it is the edit region top div element or iframe's body tag.
- * @param {Node} element The node to check
+ * @param {?Node=} element The node to check
  * @returns {boolean}
  */
 export function isWysiwygFrame(element) {
@@ -815,7 +832,7 @@ export function isWysiwygFrame(element) {
 
 /**
  * @description It is judged whether it is the contenteditable property is false.
- * @param {Node} element The node to check
+ * @param {?Node=} element The node to check
  * @returns {boolean}
  */
 export function isNonEditable(element) {
@@ -824,7 +841,7 @@ export function isNonEditable(element) {
 
 /**
  * @description Check the node is a list (ol, ul)
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isList(node) {
@@ -833,7 +850,7 @@ export function isList(node) {
 
 /**
  * @description Check the node is a list cell (li)
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isListCell(node) {
@@ -842,7 +859,7 @@ export function isListCell(node) {
 
 /**
  * @description Check the node is a table
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isTable(node) {
@@ -851,7 +868,7 @@ export function isTable(node) {
 
 /**
  * @description Check the node is a table elements. (table, thead, tbody, tr, th, td)
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isTableElements(node) {
@@ -860,7 +877,7 @@ export function isTableElements(node) {
 
 /**
  * @description Check the node is a table cell (td, th)
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isTableCell(node) {
@@ -869,7 +886,7 @@ export function isTableCell(node) {
 
 /**
  * @description Check the node is a table row (tr)
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isTableRow(node) {
@@ -878,7 +895,7 @@ export function isTableRow(node) {
 
 /**
  * @description Check the node is a break node (BR)
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isBreak(node) {
@@ -887,7 +904,7 @@ export function isBreak(node) {
 
 /**
  * @description Check the node is a anchor node (A)
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isAnchor(node) {
@@ -896,7 +913,7 @@ export function isAnchor(node) {
 
 /**
  * @description Check the node is a media node (img, iframe, audio, video, canvas)
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isMedia(node) {
@@ -905,7 +922,7 @@ export function isMedia(node) {
 
 /**
  * @description Check the node is a figure tag
- * @param {Node|string} node The element or element name to check
+ * @param {?Node|string=} node The element or element name to check
  * @returns {boolean}
  */
 export function isFigure(node) {
@@ -914,7 +931,7 @@ export function isFigure(node) {
 
 /**
  * @description It is judged whether it is the input element (INPUT, TEXTAREA)
- * @param {Node} element The node to check
+ * @param {?Node=} element The node to check
  * @returns {boolean}
  */
 export function isInputElement(element) {
@@ -932,17 +949,17 @@ export function isEmptyLine(element) {
 
 /**
  * @description Check the span's attributes are empty.
- * @param {Element|null} element Element node
+ * @param {?Node} element Element node
  * @returns {boolean}
  */
 export function isSpanWithoutAttr(element) {
-	return element?.nodeType === 1 && /^SPAN$/i.test(element.nodeName) && !element.className && !element.style.cssText;
+	return element?.nodeType === 1 && /^SPAN$/i.test(element.nodeName) && !element.className && !(/** @type {HTMLElement} */ (element).style.cssText);
 }
 
 /**
  * @description Checks for "__se__uneditable" in the class list.
  * - Components with class "__se__uneditable" cannot be modified.
- * @param {Element} element The element to check
+ * @param {Node} element The element to check
  * @returns {boolean}
  */
 export function isUneditable(element) {
@@ -952,6 +969,7 @@ export function isUneditable(element) {
 /**
  * @description Checks if element can't be easily enabled
  * @param {Element} element Element to check for
+ * @returns {boolean}
  */
 export function isImportantDisabled(element) {
 	return element.hasAttribute('data-important-disabled');
@@ -979,7 +997,7 @@ export function getScrollParent(element) {
 	if (element.scrollHeight > element.clientHeight) {
 		return element;
 	} else {
-		return getScrollParent(element.parentNode);
+		return getScrollParent(element.parentElement);
 	}
 }
 
@@ -1018,7 +1036,7 @@ export function getViewportSize() {
 /**
  * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child
  * @param {Node} node Reference element
- * @param {Node|null} ceiling Highest boundary allowed
+ * @param {?(Node & ParentNode)=} ceiling Highest boundary allowed
  * @returns {Node|null} Not found: null
  */
 export function getPreviousDeepestNode(node, ceiling) {
@@ -1044,7 +1062,7 @@ export function getPreviousDeepestNode(node, ceiling) {
 /**
  * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child
  * @param {Node} node Reference element
- * @param {Node|null} ceiling Highest boundary allowed
+ * @param {?(Node & ParentNode)=} ceiling Highest boundary allowed
  * @returns {Node|null} Not found: null
  */
 export function getNextDeepestNode(node, ceiling) {
@@ -1069,10 +1087,10 @@ export function getNextDeepestNode(node, ceiling) {
 
 /**
  * @description Find the index of the text node in the line element.
- * @param {Element} line Line element (p, div, etc.)
+ * @param {Node} line Line element (p, div, etc.)
  * @param {Node} offsetContainer Base node to start searching
  * @param {number} offset Base offset to start searching
- * @param {?(current: Node) => boolean=} validate Validation function
+ * @param {?(current: *) => boolean=} validate Validation function
  * @returns {number}
  */
 export function findTextIndexOnLine(line, offsetContainer, offset, validate) {
@@ -1107,7 +1125,7 @@ export function findTextIndexOnLine(line, offsetContainer, offset, validate) {
 /**
  * @description Find the end index of a sequence of at least minTabSize consecutive non-breaking spaces or spaces
  * - which are interpreted as a tab key, occurring after a given base index in a text string.
- * @param {Element} line Line element (p, div, etc.)
+ * @param {Node} line Line element (p, div, etc.)
  * @param {number} baseIndex Base index to start searching
  * @param {number} minTabSize Minimum number of consecutive spaces to consider as a tab
  * @returns {number} The adjusted index within the line element accounting for non-space characters
@@ -1136,7 +1154,7 @@ export function findTabEndIndex(line, baseIndex, minTabSize) {
  * @description Copies the "wwTarget" element and returns it with inline all styles applied.
  * @param {Element} wwTarget Target element to copy(.sun-editor.sun-editor-editable)
  * @param {boolean} includeWW Include the "wwTarget" element in the copy
- * @param {Array.<string>} styles Style list - kamel case
+ * @param {Array<string>} styles Style list - kamel case
  * @returns
  */
 export function applyInlineStylesAll(wwTarget, includeWW, styles) {
@@ -1157,14 +1175,16 @@ export function applyInlineStylesAll(wwTarget, includeWW, styles) {
 		wwDiv.innerHTML = wwTarget.innerHTML;
 		wwTarget = wwDiv;
 	} else {
-		wwTarget = wwTarget.cloneNode(true);
+		wwTarget = /** @type {Element} */ (wwTarget.cloneNode(true));
 	}
 
 	tempTarget.appendChild(wwTarget);
 	_d.body.appendChild(tempTarget);
 
-	const elements = includeWW ? [wwTarget].concat(Array.from(wwTarget.querySelectorAll('*'))) : wwTarget.querySelectorAll('*');
+	const allElements = Array.from(wwTarget.querySelectorAll('*'));
+	const elements = includeWW ? [wwTarget].concat(allElements) : allElements;
 	for (let i = 0, el; (el = elements[i]); i++) {
+		if (el.nodeType !== 1) continue;
 		const computedStyle = _w.getComputedStyle(el);
 		const els = el.style;
 		for (const props of styles) {
@@ -1250,7 +1270,8 @@ const domUtils = {
 	getCommandTarget,
 	getEdgeChild,
 	getEdgeChildNodes,
-	getArrayItem,
+	arrayFilter,
+	arrayFind,
 	arrayIncludes,
 	getArrayIndex,
 	nextIndex,

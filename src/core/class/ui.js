@@ -7,19 +7,10 @@ import Modal from '../../modules/Modal';
 import { domUtils, converter } from '../../helper';
 
 /**
- * @typedef {import('../editor').default} EditorInstance
- */
-
-/**
- * @typedef {import('../section/context').FrameContext} FrameContext
- */
-
-/**
- * @class
+ * @constructor
  * @description The UI class is a class that handles operations related to the user interface of SunEditor.
  * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
  * @param {EditorInstance} editor - The root editor instance
- * @returns {UI}
  */
 function UI(editor) {
 	CoreInjector.call(this, editor);
@@ -184,7 +175,7 @@ UI.prototype = {
 
 	/**
 	 * @description Show loading box
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string=} rootKey Root key
 	 */
 	showLoading(rootKey) {
 		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'block';
@@ -192,7 +183,7 @@ UI.prototype = {
 
 	/**
 	 * @description Hide loading box
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string=} rootKey Root key
 	 */
 	hideLoading(rootKey) {
 		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'none';

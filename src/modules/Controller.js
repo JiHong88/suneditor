@@ -25,20 +25,19 @@ const INDEX_2 = 2147483645;
  * @property {boolean=} isWWTarget If the controller is in the WYSIWYG area, set it to true.
  * @property {() => void=} initMethod Method to be called when the controller is closed.
  * @property {boolean=} disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
- * @property {Array.<Element>=} parents The parent "controller" array when "controller" is opened nested.
+ * @property {Array<Element>=} parents The parent "controller" array when "controller" is opened nested.
  * @property {boolean=} parentsHide If true, the parent element is hidden when the controller is opened.
  * @property {boolean=} isInsideForm If the controller is inside a form, set it to true.
  * @property {boolean=} isOutsideForm If the controller is outside a form, set it to true.
  */
 
 /**
- * @class
+ * @constructor
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} element Controller element
  * @param {ControllerParams} params Controller options
  * @param {?string=} _name An optional name for the controller key.
- * @returns {Controller}
  */
 function Controller(inst, element, params, _name) {
 	EditorInjector.call(this, inst.editor);

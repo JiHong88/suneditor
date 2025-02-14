@@ -5,15 +5,7 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @typedef {import('../../core/base/events').ImageInfo} ImageInfo
- */
-
-/**
- * @typedef {import('../../core/section/context').FrameContext} FrameContext
  */
 
 /**
@@ -26,7 +18,7 @@ const { NO_EVENT } = env;
  * @property {boolean=} [createFileInput=true] - Whether to create a file input element for image uploads.
  * @property {boolean=} [createUrlInput=true] - Whether to create a URL input element for image insertion.
  * @property {string=} [uploadUrl] - The URL endpoint for image file uploads.
- * @property {Object.<string, string>=} [uploadHeaders] - Additional headers to include in the file upload request.
+ * @property {Object<string, string>=} [uploadHeaders] - Additional headers to include in the file upload request.
  * @property {number=} [uploadSizeLimit] - The total upload size limit in bytes.
  * @property {number=} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @property {boolean=} [allowMultiple=false] - Whether multiple image uploads are allowed.
@@ -43,7 +35,6 @@ const { NO_EVENT } = env;
  * - This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
  * @param {EditorInstance} editor - The root editor instance
  * @param {ImagePluginOptions} pluginOptions
- * @returns {Image_}
  */
 function Image_(editor, pluginOptions) {
 	// plugin bisic properties
@@ -463,7 +454,7 @@ Image_.prototype = {
 
 	/**
 	 * @description Create an "image" component using the provided files.
-	 * @param {Array.<File>} fileList File object list
+	 * @param {Array<File>} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
@@ -944,7 +935,7 @@ Image_.prototype = {
 	 * @private
 	 * @description Registers the uploaded image and inserts it into the editor.
 	 * @param {ImageInfo} info - Image info.
-	 * @param {Object.<string, *>} response - Server response data.
+	 * @param {Object<string, *>} response - Server response data.
 	 */
 	_register(info, response) {
 		const fileList = response.result;
@@ -967,7 +958,7 @@ Image_.prototype = {
 	 * @private
 	 * @description Uploads the image to the server.
 	 * @param {ImageInfo} info - Image upload info.
-	 * @param {Array.<File>} files - List of image files.
+	 * @param {Array<File>} files - List of image files.
 	 */
 	_serverUpload(info, files) {
 		if (!files) return;
@@ -984,7 +975,7 @@ Image_.prototype = {
 	/**
 	 * @private
 	 * @description Converts an image file to Base64 and inserts it into the editor.
-	 * @param {Array.<File>} files - List of image files.
+	 * @param {Array<File>} files - List of image files.
 	 * @param {Element|null} anchor - Optional anchor wrapping the image.
 	 * @param {string} width - Image width.
 	 * @param {string} height - Image height.
@@ -1035,7 +1026,7 @@ Image_.prototype = {
 	 * @private
 	 * @description Inserts an image using a Base64-encoded string.
 	 * @param {boolean} update - Whether the image is being updated.
-	 * @param {Array.<{result: string, file: { name: string, size: number }}>} filesStack - Stack of Base64-encoded files.
+	 * @param {Array<{result: string, file: { name: string, size: number }}>} filesStack - Stack of Base64-encoded files.
 	 * - result: Image url or Base64-encoded string
 	 * - file: File metadata ({ name: string, size: number })
 	 * @param {Element} updateElement - The image element being updated.
@@ -1074,7 +1065,7 @@ Image_.prototype = {
 	/**
 	 * @private
 	 * @description Handles errors during image upload and displays appropriate messages.
-	 * @param {Object.<string, *>} response - The error response from the server.
+	 * @param {Object<string, *>} response - The error response from the server.
 	 * @returns {Promise<void>}
 	 */
 	async _error(response) {

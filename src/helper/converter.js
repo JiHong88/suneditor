@@ -55,7 +55,7 @@ export function entityToHTML(content) {
  * @description Debounce function
  * @param {(...args: *) => void} func function
  * @param {number} wait delay ms
- * @returns
+ * @returns {(...args: *) => void}
  */
 export function debounce(func, wait) {
 	let timeout;
@@ -74,8 +74,8 @@ export function debounce(func, wait) {
 /**
  * @description Synchronizes two Map objects by updating the first Map with the values from the second,
  * - and deleting any keys in the first Map that are not present in the second.
- * @param {Map} targetMap The Map to update (target).
- * @param {Map} referenceMap The Map providing the reference values (source).
+ * @param {Map<*, *>} targetMap The Map to update (target).
+ * @param {Map<*, *>} referenceMap The Map providing the reference values (source).
  */
 export function syncMaps(targetMap, referenceMap) {
 	referenceMap.forEach((value, key) => {
@@ -97,7 +97,7 @@ export function syncMaps(targetMap, referenceMap) {
  */
 export function fontSize(to, size) {
 	const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
-	const sizeNum = value ? value[1] * 1 : FONT_VALUES_MAP[size];
+	const sizeNum = value ? Number(value[1]) : FONT_VALUES_MAP[size];
 	const from = value ? value[2] : 'rem';
 	let pxSize = sizeNum;
 
@@ -114,7 +114,7 @@ export function fontSize(to, size) {
 		case 'rem':
 			return (pxSize * 0.0625).toFixed(2) + to;
 		case '%':
-			return (pxSize * 0.0625).toFixed(2) * 100 + to;
+			return Number((pxSize * 0.0625).toFixed(2)) * 100 + to;
 		case 'pt':
 			return Math.floor(pxSize / 1.333) + to;
 		default:
@@ -135,8 +135,8 @@ export function nodeListToArray(nodeList) {
 
 /**
  * @description Returns a new object with keys and values swapped.
- * @param {Object.<string, string>} obj object
- * @returns {Object.<string, string>}
+ * @param {Object<*, *>} obj object
+ * @returns {Object<*, *>}
  */
 export function swapKeyValue(obj) {
 	const swappedObj = {};
@@ -178,7 +178,7 @@ export function isHexColor(str) {
 
 /**
  * @description Function to convert hex format to a rgb color
- * @param {string} rgb RGB color format
+ * @param {string} rgba RGBA color format
  * @returns {string}
  */
 export function rgb2hex(rgba) {
@@ -214,8 +214,8 @@ export function rgb2hex(rgba) {
 export function getWidthInPercentage(target, parentTarget) {
 	const parent = parentTarget || target.parentElement;
 	const parentStyle = _w.getComputedStyle(parent);
-	const parentPaddingLeft = _w.parseFloat(parentStyle.paddingLeft);
-	const parentPaddingRight = _w.parseFloat(parentStyle.paddingRight);
+	const parentPaddingLeft = parseFloat(parentStyle.paddingLeft);
+	const parentPaddingRight = parseFloat(parentStyle.paddingRight);
 	const scrollbarWidth = parent.offsetWidth - parent.clientWidth;
 	const parentWidth = parent.offsetWidth - parentPaddingLeft - parentPaddingRight - scrollbarWidth;
 	const widthInPercentage = (target.offsetWidth / parentWidth) * 100;
@@ -225,11 +225,13 @@ export function getWidthInPercentage(target, parentTarget) {
 /**
  * @description Convert url pattern text node to anchor node
  * @param {Node} node Text node
+ * @returns {boolean} Return true if the text node is converted to an anchor node
  */
 export function textToAnchor(node) {
 	if (node.nodeType === 3 && URLPattern.test(node.textContent) && !/^A$/i.test(node.parentNode?.nodeName)) {
 		const textContent = node.textContent;
 		const fragment = _d.createDocumentFragment();
+
 		let lastIndex = 0;
 		textContent.replace(URLPattern, (match, offset) => {
 			if (offset > 0) {
@@ -244,9 +246,14 @@ export function textToAnchor(node) {
 			if (lastIndex < textContent.length) {
 				fragment.appendChild(_d.createTextNode(textContent.slice(lastIndex)));
 			}
+			return match;
 		});
+
 		node.parentNode.replaceChild(fragment, node);
+		return true;
 	}
+
+	return false;
 }
 
 /**
@@ -359,7 +366,7 @@ export function _setDefaultOptionStyle(fo, cssText) {
 
 /**
  * @description Set default style tag of the iframe
- * @param {Array.<string>} options link names array of CSS files
+ * @param {Array<string>} linkNames link names array of CSS files
  * @returns {string} "<link rel="stylesheet" href=".." />.."
  */
 export function _setIframeStyleLinks(linkNames) {

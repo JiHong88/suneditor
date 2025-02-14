@@ -1,6 +1,6 @@
 /**
  * @description Checks for numeric (with decimal point).
- * @param {string|number} text Text string or number
+ * @param {*} text Text string or number
  * @returns {boolean}
  */
 export function is(text) {
@@ -10,17 +10,17 @@ export function is(text) {
 /**
  * @description Get a number.
  * @param {string|number} value Text string or number
- * @param {number} maxDec Maximum number of decimal places (-1 : Infinity)
+ * @param {number} [maxDec=0] Maximum number of decimal places (-1 : Infinity)
  * @returns {number}
  */
-export function get(value, maxDec) {
+export function get(value, maxDec = 0) {
 	if (!value) return 0;
 
-	let number = (value + '').match(/-?\d+(\.\d+)?/);
-	if (!number || !number[0]) return 0;
+	const matched = (value + '').match(/-?\d+(\.\d+)?/);
+	if (!matched || !matched[0]) return 0;
 
-	number = number[0];
-	return maxDec < 0 ? number * 1 : maxDec === 0 ? Math.round(number * 1) : (number * 1).toFixed(maxDec) * 1;
+	const number = Number(matched[0]);
+	return maxDec < 0 ? number : maxDec === 0 ? Math.round(number) : Number(number.toFixed(maxDec));
 }
 
 /**

@@ -1,6 +1,19 @@
 import { domUtils } from '../../../helper';
 import { _DragHandle } from '../../../modules';
 
+/**
+ * @typedef {Omit<import('../eventManager').default & Partial<EditorInjector>, 'eventManager'>} EventManagerThis
+ */
+
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {Node} dragCursor - Drag cursor element
+ * @param {Element|null} _iframeTopArea - Iframe top area element
+ * @param {Element|null} _innerToolbar - Inner toolbar element
+ * @param {DragEvent} e - Event object
+ */
 export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar, e) {
 	e.preventDefault();
 
@@ -36,13 +49,25 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 	}
 }
 
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {Node} dragCursor - Drag cursor element
+ */
 export function OnDragEnd_wysiwyg(dragCursor) {
 	dragCursor.style.display = 'none';
 }
 
-export function OnDrop_wysiwyg(frameContext, dragCursor, e) {
+/**
+ * @private
+ * @this {EventManagerThis}
+ * @param {FrameContext} fc - Frame context object
+ * @param {Node} dragCursor - Drag cursor element
+ * @param {DragEvent} e - Event object
+ */
+export function OnDrop_wysiwyg(fc, dragCursor, e) {
 	try {
-		if (frameContext.get('isReadOnly')) {
+		if (fc.get('isReadOnly')) {
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
@@ -71,9 +96,9 @@ export function OnDrop_wysiwyg(frameContext, dragCursor, e) {
 			this.html.insertNode(dragContainer, { afterNode: null, skipCharCount: true });
 
 			// document type page
-			if (frameContext.has('documentType-use-page')) {
-				frameContext.get('documentTypePageMirror').innerHTML = frameContext.get('wysiwyg').innerHTML;
-				frameContext.get('documentType').rePage(true);
+			if (fc.has('documentType-use-page')) {
+				fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
+				fc.get('documentType').rePage(true);
 			}
 
 			return;
@@ -81,7 +106,7 @@ export function OnDrop_wysiwyg(frameContext, dragCursor, e) {
 
 		this.html.remove();
 		this.selection.setRange(sc, so, ec, eo);
-		return this._dataTransferAction('drop', e, dataTransfer, frameContext);
+		return this._dataTransferAction('drop', e, dataTransfer, fc);
 	} finally {
 		dragCursor.style.display = 'none';
 	}

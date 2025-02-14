@@ -6,26 +6,17 @@ import { FileManager, Figure, Controller } from '../../modules';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
- * @typedef {import('../../core/section/context').FrameContext} FrameContext
- */
-
-/**
  * @class
  * @description File upload plugin
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions - plugin options
  * @param {string} pluginOptions.uploadUrl - server request url
- * @param {Object.<string, string>=} pluginOptions.uploadHeaders - server request headers
+ * @param {Object<string, string>=} pluginOptions.uploadHeaders - server request headers
  * @param {string=} pluginOptions.uploadSizeLimit - upload size limit
  * @param {string=} pluginOptions.uploadSingleSizeLimit - upload single size limit
  * @param {boolean=} pluginOptions.allowMultiple - allow multiple files
  * @param {string=} pluginOptions.acceptedFormats - accepted formats
  * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
- * @returns {FileUpload}
  */
 function FileUpload(editor, pluginOptions) {
 	EditorInjector.call(this, editor);
@@ -213,7 +204,7 @@ FileUpload.prototype = {
 
 	/**
 	 * @description Create an "file" component using the provided files.
-	 * @param {Array.<File>} fileList File object list
+	 * @param {Array<File>} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
@@ -376,7 +367,7 @@ FileUpload.prototype = {
 	 * @private
 	 * @description Processes the server response after file upload.
 	 * - Registers the uploaded files in the editor.
-	 * @param {Object.<string, *>} response - The response object from the server.
+	 * @param {Object<string, *>} response - The response object from the server.
 	 */
 	_register(response) {
 		response.result.forEach((file, i, a) => {
@@ -395,7 +386,7 @@ FileUpload.prototype = {
 	 * @private
 	 * @description Handles file upload errors.
 	 * - Displays an error message if the upload fails.
-	 * @param {Object.<string, *>} response - The error response from the server.
+	 * @param {Object<string, *>} response - The error response from the server.
 	 * @returns {Promise<void>}
 	 */
 	async _error(response) {

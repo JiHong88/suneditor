@@ -6,32 +6,31 @@ import { CreateTooltipInner } from '../../core/section/constructor';
 const { _w, isMobile } = env;
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
+ * @typedef {Object} DrawingPluginOptions
+ * @property {string=} [outputFormat="dataurl"] - The output format of the drawing. Options: "dataurl", "svg".
+ * @property {boolean=} [useFormatType=false] - Whether to enable format type selection (block vs inline).
+ * @property {string=} [defaultFormatType="block"] - The default format type, either "block" or "inline".
+ * @property {boolean=} [keepFormatType=false] - Whether to maintain the chosen format type after drawing.
+ * @property {number=} [lineWidth=5] - The width of the drawing line.
+ * @property {boolean=} [lineReconnect=false] - Whether to reconnect lines when drawing.
+ * @property {string=} [lineCap="round"] - The style of the line cap ("butt", "round", or "square").
+ * @property {string=} [lineColor=""] - The color of the drawing line.
+ * @property {boolean=} [canResize=true] - Whether the modal form can be resized.
+ * @property {boolean=} [maintainRatio=true] - Whether to maintain the aspect ratio when resizing.
+ * @property {Object} [formSize={}] - The size configuration for the drawing modal form.
+ * @property {string=} [formSize.width="750px"] - The width of the modal form.
+ * @property {string=} [formSize.height="50vh"] - The height of the modal form.
+ * @property {string=} [formSize.maxWidth=""] - The maximum width of the modal form.
+ * @property {string=} [formSize.maxHeight=""] - The maximum height of the modal form.
+ * @property {string=} [formSize.minWidth="150px"] - The minimum width of the modal form.
+ * @property {string=} [formSize.minHeight="100px"] - The minimum height of the modal form.
  */
 
 /**
  * @class
  * @description Drawing modal plugin.
  * @param {EditorInstance} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {string=} [pluginOptions.outputFormat="dataurl"] - The output format of the drawing. Options: "dataurl", "svg".
- * @param {boolean=} [pluginOptions.useFormatType=false] - Whether to enable format type selection (block vs inline).
- * @param {string=} [pluginOptions.defaultFormatType="block"] - The default format type, either "block" or "inline".
- * @param {boolean=} [pluginOptions.keepFormatType=false] - Whether to maintain the chosen format type after drawing.
- * @param {number=} [pluginOptions.lineWidth=5] - The width of the drawing line.
- * @param {boolean=} [pluginOptions.lineReconnect=false] - Whether to reconnect lines when drawing.
- * @param {string=} [pluginOptions.lineCap="round"] - The style of the line cap ("butt", "round", or "square").
- * @param {string=} [pluginOptions.lineColor=""] - The color of the drawing line.
- * @param {Object=} [pluginOptions.formSize] - The size configuration for the drawing modal form.
- * @param {string=} [pluginOptions.formSize.width="750px"] - The width of the modal form.
- * @param {string=} [pluginOptions.formSize.height="50vh"] - The height of the modal form.
- * @param {string=} [pluginOptions.formSize.maxWidth=""] - The maximum width of the modal form.
- * @param {string=} [pluginOptions.formSize.maxHeight=""] - The maximum height of the modal form.
- * @param {string=} [pluginOptions.formSize.minWidth="150px"] - The minimum width of the modal form.
- * @param {string=} [pluginOptions.formSize.minHeight="100px"] - The minimum height of the modal form.
- * @param {boolean=} [pluginOptions.canResize=true] - Whether the modal form can be resized.
- * @param {boolean=} [pluginOptions.maintainRatio=true] - Whether to maintain the aspect ratio when resizing.
- * @returns {Drawing}
+ * @param {DrawingPluginOptions} pluginOptions
  */
 function Drawing(editor, pluginOptions) {
 	// plugin basic properties

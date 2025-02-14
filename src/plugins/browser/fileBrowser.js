@@ -2,20 +2,15 @@ import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @class
  * @description File browser plugin. Can contain any media type.
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions
- * @param {Object.<string, *>|Array.<*>=} pluginOptions.data - direct data without server calls
+ * @param {Object<string, *>|Array<*>=} pluginOptions.data - direct data without server calls
  * @param {string} pluginOptions.url - server request url
- * @param {Object.<string, string>=} pluginOptions.headers - server request headers
- * @param {string|() => string} pluginOptions.thumbnail - default thumbnail
- * @param {Array.<string>} pluginOptions.props - additional tag names
- * @returns {FileBrowser}
+ * @param {Object<string, string>=} pluginOptions.headers - server request headers
+ * @param {string|(() => string)} pluginOptions.thumbnail - default thumbnail
+ * @param {Array<string>} pluginOptions.props - additional tag names
  */
 function FileBrowser(editor, pluginOptions) {
 	// plugin bisic properties

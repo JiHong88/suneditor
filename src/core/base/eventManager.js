@@ -16,73 +16,15 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHa
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
 
 /**
- * @typedef {import('../section/context').FrameOptions} FrameOptions
+ * @typedef {Omit<EventManager & Partial<EditorInjector>, 'eventManager'>} EventManagerThis
  */
 
 /**
- * @typedef {import('../section/context').FrameContext} FrameContext
- */
-
-/**
- * @typedef {import('../editor').default} EditorInstance
- */
-
-/**
- * @typedef {Object} EventInfo
- * @property {Element|Array.<Element>} target Target element
- * @property {string} type Event type
- * @property {(...args: *) => *} listener Event listener
- * @property {boolean|undefined} useCapture Event useCapture option
- */
-
-/**
- * @typedef {Object} GlobalEventInfo
- * @property {string} type Event type
- * @property {(...args: *) => *} listener Event listener
- * @property {boolean|undefined} useCapture Use event capture
- */
-
-// wysiwyg event
-/**
- * @typedef {Object} PluginMouseEventInfo
- * @property {FrameContext} frameContext Frame context
- * @property {Event} event Event object
- */
-
-/**
- * @typedef {Object} PluginInputEventInfo
- * @property {FrameContext} frameContext Frame context
- * @property {Event} event Event object
- * @property {string} data Input data
- */
-
-/**
- * @typedef {Object} PluginKeyEventInfo
- * @property {FrameContext} frameContext Frame context
- * @property {Event} event Event object
- * @property {Range} range range object
- * @property {Element} line Current line element
- */
-
-// toolbar event
-/**
- * @typedef {Object} PluginToolbarInputKeyEventInfo
- * @property {Element} target Input element
- * @property {Event} event Event object
- */
-
-/**
- * @typedef {Object} PluginToolbarInputChangeEventInfo
- * @property {Element} target Input element
- * @property {Event} event Event object
- * @property {string} value Input value
- */
-
-/**
- * @class
+ * @constructor
+ * @this {EventManagerThis}
  * @description Event manager, editor's all event management class
  * @param {EditorInstance} editor - The root editor instance
- * @returns {EventManager}
+ * @property {EditorInstance} editor - The root editor instance
  */
 function EventManager(editor) {
 	CoreInjector.call(this, editor);
@@ -93,72 +35,73 @@ function EventManager(editor) {
 	 */
 	this.isComposing = false;
 
-	/** @type {Array.<*>} @private */
+	/** @type {Array<*>} */
 	this._events = [];
-	/** @type {RegExp} @private */
+	/** @type {RegExp} */
 	this._onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
-	/** @type {boolean} @private */
+	/** @type {boolean} */
 	this._onShortcutKey = false;
-	/** @type {number} @private */
+	/** @type {number} */
 	this._balloonDelay = null;
-	/** @type {ResizeObserver} @private */
+	/** @type {ResizeObserver} */
 	this._wwFrameObserver = null;
-	/** @type {ResizeObserver} @private */
+	/** @type {ResizeObserver} */
 	this._toolbarObserver = null;
-	/** @type {Element|null} @private */
+	/** @type {Element|null} */
 	this._lineBreakComp = null;
-	/** @type {Object.<string, string>|null} @private */
+	/** @type {Object<string, *>|null} */
 	this._formatAttrsTemp = null;
-	/** @type {number} @private */
+	/** @type {number} */
 	this._resizeClientY = 0;
-	/** @type {GlobalEventInfo|null} @private */
+	/** @type {GlobalEventInfo|null} */
 	this.__resize_editor = null;
-	/** @type {GlobalEventInfo|null} @private */
+	/** @type {GlobalEventInfo|null} */
 	this.__close_move = null;
-	/** @type {GlobalEventInfo|null} @private */
+	/** @type {GlobalEventInfo|null} */
 	this.__geckoActiveEvent = null;
-	/** @type {Array.<Element>} @private */
+	/** @type {Array<Element>} */
 	this.__scrollparents = [];
-	/** @type {Array.<Element>} @private */
+	/** @type {Array<Node>} */
 	this.__cacheStyleNodes = [];
-	/** @type {GlobalEventInfo|null} @private */
+	/** @type {GlobalEventInfo|null} */
 	this.__selectionSyncEvent = null;
 
 	// input plugins
-	/** @type {boolean} @private */
+	/** @type {boolean} */
 	this._inputFocus = false;
-	/** @type {Object.<string, *>|null} @private */
+	/** @type {Object<string, *>|null} */
 	this.__inputPlugin = null;
-	/** @type {EventInfo|null} @private */
+	/** @type {?EventInfo=} */
 	this.__inputBlurEvent = null;
-	/** @type {EventInfo|null} @private */
+	/** @type {?EventInfo=} */
 	this.__inputKeyEvent = null;
 
 	// viewport
-	/** @type {NodeList} @private */
+	/** @type {HTMLInputElement} */
 	this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
-	/** @type {number} @private */
+	/** @type {number|void} */
 	this.__retainTimer = null;
-	/** @type {Element} @private */
+	/** @type {Element} */
 	this.__eventDoc = null;
-	/** @type {string} @private */
+	/** @type {string} */
 	this.__secopy = null;
 }
 
 EventManager.prototype = {
 	/**
+	 * @this {EventManagerThis}
 	 * @description Register for an event.
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
-	 * @param {Element|Array.<Element>} target Target element
+	 * @param {*} target Target element
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event handler
-	 * @param {boolean|undefined} useCapture Event useCapture option
-	 * @return {EventInfo|false} Registered event information
+	 * @param {boolean|AddEventListenerOptions=} useCapture Event useCapture option
+	 * @return {EventInfo|null} Registered event information
 	 */
 	addEvent(target, type, listener, useCapture) {
-		if (!target) return false;
+		if (!target) return null;
 		if (!numbers.is(target.length) || target.nodeName || (!Array.isArray(target) && target.length < 1)) target = [target];
-		if (target.length === 0) return false;
+		if (target.length === 0) return null;
 
 		const len = target.length;
 		for (let i = 0; i < len; i++) {
@@ -173,16 +116,17 @@ EventManager.prototype = {
 
 		return {
 			target: len > 1 ? target : target[0],
-			type: type,
+			type,
 			listener,
-			useCapture: useCapture
+			useCapture
 		};
 	},
 
 	/**
+	 * @this {EventManagerThis}
 	 * @description Remove event
 	 * @param {EventInfo} params event info = this.addEvent()
-	 * @returns {undefined|false|null} Failed: false, Success: null, Not found: undefined
+	 * @returns {undefined|null} Success: null, Not found: undefined
 	 */
 	removeEvent(params) {
 		if (!params) return;
@@ -192,9 +136,9 @@ EventManager.prototype = {
 		const listener = params.listener;
 		const useCapture = params.useCapture;
 
-		if (!target) return false;
-		if (!numbers.is(target.length) || target.nodeName || (!Array.isArray(target) && target.length < 1)) target = [target];
-		if (target.length === 0) return false;
+		if (!target) return;
+		if (!numbers.is(target.length) || target.nodeName || (!Array.isArray(target) && target.length < 1)) target = /** @type {Array<Element>} */ ([target]);
+		if (target.length === 0) return;
 
 		for (let i = 0, len = target.length; i < len; i++) {
 			target[i].removeEventListener(type, listener, useCapture);
@@ -204,11 +148,12 @@ EventManager.prototype = {
 	},
 
 	/**
+	 * @this {EventManagerThis}
 	 * @description Add an event to document.
 	 * - When created as an Iframe, the same event is added to the document in the Iframe.
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event listener
-	 * @param {boolean|undefined} useCapture Use event capture
+	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
 	 * @return {GlobalEventInfo} Registered event information
 	 */
 	addGlobalEvent(type, listener, useCapture) {
@@ -217,18 +162,20 @@ EventManager.prototype = {
 		}
 		this._w.addEventListener(type, listener, useCapture);
 		return {
-			type: type,
-			listener: listener,
-			useCapture: useCapture
+			type,
+			listener,
+			useCapture
 		};
 	},
 
 	/**
+	 * @this {EventManagerThis}
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
 	 * @param {string|GlobalEventInfo} type Event type or (Event info = this.addGlobalEvent())
 	 * @param {(...args: *) => *=} listener Event listener
-	 * @param {boolean|undefined=} useCapture Use event capture
+	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
+	 * @returns {undefined|null} Success: null, Not found: undefined
 	 */
 	removeGlobalEvent(type, listener, useCapture) {
 		if (!type) return;
@@ -242,9 +189,12 @@ EventManager.prototype = {
 			this.editor.frameContext.get('_ww').removeEventListener(type, listener, useCapture);
 		}
 		this._w.removeEventListener(type, listener, useCapture);
+
+		return null;
 	},
 
 	/**
+	 * @this {EventManagerThis}
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * - such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
 	 * @param {?Node=} selectionNode selectionNode
@@ -283,7 +233,7 @@ EventManager.prototype = {
 
 		const fc = this.editor.frameContext;
 		const notReadonly = !fc.get('isReadOnly');
-		for (let element = selectionNode; !domUtils.isWysiwygFrame(element); element = element.parentNode) {
+		for (let element = /** @type {HTMLElement} */ (selectionNode); !domUtils.isWysiwygFrame(element); element = element.parentElement) {
 			if (!element) break;
 			if (element.nodeType !== 1 || domUtils.isBreak(element)) continue;
 			if (this._isNonFocusNode(element)) {
@@ -332,7 +282,7 @@ EventManager.prototype = {
 						commandTargets.get('indent').filter((e) => {
 							if (domUtils.isImportantDisabled(e)) return false;
 							if (indentDisable) {
-								e.setAttribute('disabled', true);
+								e.setAttribute('disabled', 'true');
 							} else {
 								e.removeAttribute('disabled');
 							}
@@ -373,6 +323,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is true)
 	 * @param {Element} target Target element
 	 * @private
@@ -387,8 +338,9 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description remove class, display text.
-	 * @param {Array} ignoredList Igonred button list
+	 * @param {Array<string>} ignoredList Igonred button list
 	 * @private
 	 */
 	_setKeyEffect(ignoredList) {
@@ -406,7 +358,7 @@ EventManager.prototype = {
 				if (p) {
 					p.active(null, e);
 				} else if (/^outdent$/i.test(k)) {
-					if (!domUtils.isImportantDisabled(e)) e.setAttribute('disabled', true);
+					if (!domUtils.isImportantDisabled(e)) e.setAttribute('disabled', 'true');
 				} else if (/^indent$/i.test(k)) {
 					if (!domUtils.isImportantDisabled(e)) e.removeAttribute('disabled');
 				} else {
@@ -418,6 +370,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Show toolbar-balloon with delay.
 	 */
 	_showToolbarBalloonDelay() {
@@ -435,6 +388,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Show or hide the toolbar-balloon.
 	 */
 	_toggleToolbarBalloon() {
@@ -442,7 +396,7 @@ EventManager.prototype = {
 		const range = this.selection.getRange();
 		const hasSubMode = this.options.has('_subMode');
 
-		if (this.menu._bindControllersOff || (!(hasSubMode ? this.editor.isSubBalloonAlways : this.editor.isBalloonAlways) && range.collapsed)) {
+		if (!(hasSubMode ? this.editor.isSubBalloonAlways : this.editor.isBalloonAlways) && range.collapsed) {
 			if (hasSubMode) this._hideToolbar_sub();
 			else this._hideToolbar();
 		} else {
@@ -453,6 +407,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Hide the toolbar.
 	 */
 	_hideToolbar() {
@@ -463,6 +418,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Hide the Sub-Toolbar.
 	 */
 	_hideToolbar_sub() {
@@ -473,16 +429,18 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Checks if a node is a non-focusable element(.data-se-non-focus). (e.g. fileUpload.component > span)
 	 * @param {Node} node Node to check
 	 * @returns {boolean} True if the node is non-focusable, otherwise false
 	 */
 	_isNonFocusNode(node) {
-		return node.nodeType === 1 && node.getAttribute('data-se-non-focus') === 'true';
+		return node.nodeType === 1 && /** @type {Element} */ (node).getAttribute('data-se-non-focus') === 'true';
 	},
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Determines if the "range" is within an uneditable node.
 	 * @param {Range} range The range object
 	 * @param {boolean} isFront Whether to check the start or end of the range
@@ -506,6 +464,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Retrieves the sibling node of a selected node if it is uneditable.
 	 * - Used only in `_isUneditableNode`.
 	 * @param {Node} selectNode The selected node
@@ -529,6 +488,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Deletes specific elements such as tables in "Firefox" and media elements (image, video, audio) in "Chrome".
 	 * - Handles deletion logic based on selection range and node types.
 	 * @returns {boolean} Returns `true` if an element was deleted and focus was adjusted, otherwise `false`.
@@ -567,6 +527,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description If there is no default format, add a line and move 'selection'.
 	 * @param {string|null} formatName Format tag name (default: 'P')
 	 */
@@ -578,7 +539,10 @@ EventManager.prototype = {
 		const commonCon = range.commonAncestorContainer;
 		const startCon = range.startContainer;
 		const rangeEl = this.format.getBlock(commonCon, null);
-		let focusNode, offset, format;
+
+		/** @type {Node} */
+		let focusNode;
+		let offset, format;
 
 		if (rangeEl) {
 			format = domUtils.createElement(formatName || this.options.get('defaultLine'));
@@ -678,6 +642,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Handles data transfer actions for paste and drop events.
 	 * - It processes clipboard data, triggers relevant events, and inserts cleaned data into the editor.
 	 * @param {"paste"|"drop"} type The type of event
@@ -702,6 +667,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Processes clipboard data for paste and drop events, handling text and HTML cleanup.
 	 * - Supports specific handling for content from Microsoft Office applications.
 	 * @param {"paste"|"drop"} type The type of event
@@ -793,6 +759,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Registers common UI events such as toolbar and menu interactions.
 	 * - Adds event listeners for various UI elements, sets up observers, and configures window events.
 	 */
@@ -856,6 +823,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Registers event listeners for the editor's frame, including text input, selection, and UI interactions.
 	 * - Handles events inside an iframe or within the standard wysiwyg editor.
 	 * @param {FrameContext} fc The frame context object
@@ -888,7 +856,7 @@ EventManager.prototype = {
 		);
 		this.addEvent(eventWysiwyg, 'dragend', OnDragEnd_wysiwyg.bind(this, dragCursor), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc, dragCursor), false);
-		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), { passive: true, useCapture: false });
+		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), { passive: true, capture: false });
 		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this, fc), false);
 		this.addEvent(codeArea, 'mousedown', OnFocus_code.bind(this, fc), false);
@@ -922,7 +890,7 @@ EventManager.prototype = {
 		if (isMobile) {
 			this.addEvent(eventWysiwyg, 'touchstart', wwMouseMove, {
 				passive: true,
-				useCapture: false
+				capture: false
 			});
 		}
 
@@ -960,6 +928,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
 	 * - If resizing is not enabled, applies a non-resizable class.
 	 * @param {FrameContext} fc The frame context object
@@ -975,6 +944,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Removes all registered event listeners from the editor.
 	 * - Disconnects observers and clears stored event references.
 	 */
@@ -999,13 +969,14 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Adjusts the position of the editor's toolbar, controllers, and other floating elements based on scroll position.
 	 * - Ensures UI elements maintain their intended relative positions when scrolling.
 	 * @param {Element} eventWysiwyg The wysiwyg event object containing scroll data
 	 */
 	_moveContainer(eventWysiwyg) {
-		const y = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
-		const x = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
+		const y = eventWysiwyg.scrollTop || 0;
+		const x = eventWysiwyg.scrollLeft || 0;
 
 		if (this.editor.isBalloon) {
 			this.context.get('toolbar.main').style.top = this.toolbar._balloonOffset.top - y + 'px';
@@ -1049,6 +1020,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Handles the scrolling of the editor container.
 	 * - Repositions open controllers if necessary.
 	 */
@@ -1061,9 +1033,10 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Repositions the currently open controllers within the editor.
 	 * - Ensures elements are displayed in their correct positions after scrolling.
-	 * @param {Array.<object>} cont List of controllers to reposition
+	 * @param {Array<object>} cont List of controllers to reposition
 	 */
 	__rePositionController(cont) {
 		if (_DragHandle.get('__dragMove')) _DragHandle.get('__dragMove')();
@@ -1075,6 +1048,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Resets the frame status, adjusting toolbar and UI elements based on the current state.
 	 * - Handles inline editor adjustments, fullscreen mode, and responsive toolbar updates.
 	 */
@@ -1115,6 +1089,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Synchronizes the selection state by resetting it on mouseup.
 	 * - Ensures selection updates correctly across different interactions.
 	 */
@@ -1128,10 +1103,11 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Retains the style nodes for formatting consistency when applying styles.
 	 * - Preserves nested styling by cloning and restructuring the style nodes.
-	 * @param {Element} formatEl The format element where styles should be retained
-	 * @param {Array.<Node>} _styleNodes The list of style nodes to retain
+	 * @param {Node} formatEl The format element where styles should be retained
+	 * @param {Array<Node>} _styleNodes The list of style nodes to retain
 	 */
 	_retainStyleNodes(formatEl, _styleNodes) {
 		const el = _styleNodes[0].cloneNode(false);
@@ -1154,9 +1130,10 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Clears retained style nodes by replacing content with a single line break.
 	 * - Resets the selection to the start of the cleared element.
-	 * @param {Element} formatEl The format element where styles should be cleared
+	 * @param {Node} formatEl The format element where styles should be cleared
 	 */
 	_clearRetainStyleNodes(formatEl) {
 		formatEl.innerHTML = '<br>';
@@ -1165,10 +1142,11 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Calls a registered plugin event and executes associated handlers.
 	 * - If any handler returns `false`, the event propagation stops.
 	 * @param {string} name The name of the plugin event
-	 * @param {Event} e The event object passed to the plugin event handler
+	 * @param {{ frameContext: FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File }} e The event object passed to the plugin event handler
 	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
 	 */
 	_callPluginEvent(name, e) {
@@ -1180,6 +1158,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Handles the selection of a component when hovering over it.
 	 * - If the target is a component, it ensures that the component is selected properly.
 	 * @param {Element} target The element being hovered over
@@ -1202,6 +1181,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Removes input event listeners and resets input-related properties.
 	 */
 	__removeInput() {
@@ -1213,6 +1193,7 @@ EventManager.prototype = {
 
 	/**
 	 * @private
+	 * @this {EventManagerThis}
 	 * @description Prevents the default behavior of the Enter key and refocuses the editor.
 	 * @param {Event} e The keyboard event
 	 */
@@ -1227,6 +1208,12 @@ EventManager.prototype = {
 	constructor: EventManager
 };
 
+/**
+ * @this {EventManagerThis}
+ * @param {FrameContext} frameContext - frame context object
+ * @param {Element} eventWysiwyg - wysiwyg event object
+ * @param {Event} e - Event object
+ */
 function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
 	this._scrollContainer();
@@ -1243,6 +1230,11 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 	this.triggerEvent('onScroll', { frameContext, event: e });
 }
 
+/**
+ * @this {EventManagerThis}
+ * @param {FrameContext} frameContext - frame context object
+ * @param {Event} e - Event object
+ */
 function OnFocus_wysiwyg(frameContext, e) {
 	if (this.selection.__iframeFocus || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
 		e.preventDefault();
@@ -1286,6 +1278,11 @@ function OnFocus_wysiwyg(frameContext, e) {
 	}, 0);
 }
 
+/**
+ * @this {EventManagerThis}
+ * @param {FrameContext} frameContext - frame context object
+ * @param {Event} e - Event object
+ */
 function OnBlur_wysiwyg(frameContext, e) {
 	if (this._inputFocus || this.editor._preventBlur || frameContext.get('isCodeView') || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return;
 
@@ -1311,6 +1308,10 @@ function OnBlur_wysiwyg(frameContext, e) {
 	this._callPluginEvent('onBlur', { frameContext, event: e });
 }
 
+/**
+ * @this {EventManagerThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnMouseDown_statusbar(e) {
 	e.stopPropagation();
 	this._resizeClientY = e.clientY;
@@ -1319,6 +1320,10 @@ function OnMouseDown_statusbar(e) {
 	this.__close_move = this.addGlobalEvent('mouseup', __closeMove.bind(this));
 }
 
+/**
+ * @this {EventManagerThis}
+ * @param {MouseEvent} e - Event object
+ */
 function __resizeEditor(e) {
 	const fc = this.editor.frameContext;
 	const resizeInterval = fc.get('wrapper').offsetHeight + (e.clientY - this._resizeClientY);
@@ -1328,12 +1333,20 @@ function __resizeEditor(e) {
 	if (!env.isResizeObserverSupported) this.editor.__callResizeFunction(fc, h, null);
 }
 
+/**
+ * @this {EventManagerThis}
+ */
 function __closeMove() {
 	this.ui.disableBackWrapper();
 	if (this.__resize_editor) this.__resize_editor = this.removeGlobalEvent(this.__resize_editor);
 	if (this.__close_move) this.__close_move = this.removeGlobalEvent(this.__close_move);
 }
 
+/**
+ * @this {EventManagerThis}
+ * @param {"t"|"b"} dir - Direction
+ * @param {Event} e - Event object
+ */
 function DisplayLineBreak(dir, e) {
 	e.preventDefault();
 
@@ -1359,6 +1372,9 @@ function DisplayLineBreak(dir, e) {
 	}
 }
 
+/**
+ * @this {EventManagerThis}
+ */
 function OnResize_window() {
 	if (isMobile) {
 		this._scrollContainer();
@@ -1372,6 +1388,9 @@ function OnResize_window() {
 	this._resetFrameStatus();
 }
 
+/**
+ * @this {EventManagerThis}
+ */
 function OnScroll_window() {
 	if (this.options.get('toolbar_sticky') > -1) {
 		this.toolbar._resetSticky();
@@ -1391,12 +1410,19 @@ function OnScroll_window() {
 	}
 }
 
+/**
+ * @this {EventManagerThis}
+ */
 function OnScroll_viewport() {
 	if (this.options.get('toolbar_sticky') > -1) {
 		this.toolbar._resetSticky();
 	}
 }
 
+/**
+ * @this {EventManagerThis}
+ * @param {Document} _wd - Wysiwyg document
+ */
 function OnSelectionchange_document(_wd) {
 	const selection = _wd.getSelection();
 	let anchorNode = selection.anchorNode;
@@ -1418,10 +1444,17 @@ function OnSelectionchange_document(_wd) {
 	});
 }
 
+/**
+ * @this {EventManagerThis}
+ */
 function OnScroll_Abs() {
 	this._scrollContainer();
 }
 
+/**
+ * @this {EventManagerThis}
+ * @param {FrameContext} frameContext - frame context object
+ */
 function OnFocus_code(frameContext) {
 	this.editor.changeFrameContext(frameContext.get('key'));
 	domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');

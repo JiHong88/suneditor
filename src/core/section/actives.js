@@ -1,6 +1,9 @@
 import { domUtils, env } from '../../helper';
 const { NO_EVENT } = env;
 
+/**
+ * @constant {Object.<string, string[]>} StyleMap - Map of font styles to CSS properties.
+ */
 const StyleMap = {
 	bold: ['font-weight'],
 	underline: ['text-decoration'],
@@ -10,6 +13,13 @@ const StyleMap = {
 
 let __globalEventKeydown = null;
 let __globalEventMousedown = null;
+
+/**
+ * @private
+ * @this {EditorInstance}
+ * @param {Element} ww Wywsiwyg element
+ * @param {Element} button Button element
+ */
 const __RemoveCopyformt = function (ww, button) {
 	__globalEventKeydown = this.eventManager.removeGlobalEvent('keydown', __globalEventKeydown);
 	__globalEventMousedown = this.eventManager.removeGlobalEvent('mousedown', __globalEventMousedown);
@@ -20,10 +30,6 @@ const __RemoveCopyformt = function (ww, button) {
 
 	return true;
 };
-
-/**
- * @typedef {import('../editor').default} EditorInstance
- */
 
 /**
  * @description List of commands that trigger active event handling in the editor.

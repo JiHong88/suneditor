@@ -6,14 +6,22 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env } from '../../helper';
 
 /**
- * @typedef {import('../editor').default} EditorInstance
+ * @typedef {Omit<Format & Partial<EditorInjector>, 'format'>} FormatThis
  */
 
 /**
- * @class
+ * @typedef {Object} NodeStyleContainerType
+ * @property {?Node=} ancestor
+ * @property {Node} container
+ * @property {number} offset
+ * @property {?Node=} endContainer
+ */
+
+/**
+ * @constructor
+ * @this {FormatThis}
  * @description Classes related to editor formats such as line creation, line retrieval from selected range, etc.
  * @param {EditorInstance} editor - The root editor instance
- * @returns {Format}
  */
 function Format(editor) {
 	CoreInjector.call(this, editor);
@@ -31,6 +39,7 @@ function Format(editor) {
 
 Format.prototype = {
 	/**
+	 * @this {FormatThis}
 	 * @description Replace the line tag of the current selection.
 	 * @param {Element} element Line element (P, DIV..)
 	 */
@@ -72,10 +81,11 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
 	 * @param {Node} node Reference node.
 	 * @param {?(current: Node) => boolean=} validation Additional validation function.
-	 * @returns {Element|null}
+	 * @returns {Node|null}
 	 */
 	getLine(node, validation) {
 		if (!node) return null;
@@ -97,6 +107,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Replace the br-line tag of the current selection.
 	 * @param {Element} element BR-Line element (PRE..)
 	 */
@@ -113,7 +124,7 @@ Format.prototype = {
 
 		for (let i = len, f, html, before, next, inner, isComp, first = true; i >= 0; i--) {
 			f = lines[i];
-			if (f === (!lines[i + 1] ? null : lines[i + 1].parentNode)) continue;
+			if (f === (!lines[i + 1] ? null : lines[i + 1].parentElement)) continue;
 
 			isComp = this.component.is(f);
 			html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
@@ -165,10 +176,11 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a "brLine" (format.isBrLine), it returns that node.
 	 * @param {Node} element Reference node.
 	 * @param {?(current: Node) => boolean=} validation Additional validation function.
-	 * @returns {Element|null}
+	 * @returns {Node|null}
 	 */
 	getBrLine(element, validation) {
 		if (!element) return null;
@@ -189,11 +201,12 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Append "line" element to sibling node of argument element.
 	 * - If the "lineNode" argument value is present, the tag of that argument value is inserted,
 	 * - If not, the currently selected format tag is inserted.
-	 * @param {Element} element Insert as siblings of that element
-	 * @param {string|Element|null} lineNode Node name or node obejct to be inserted
+	 * @param {Node} element Insert as siblings of that element
+	 * @param {?string|Node=} lineNode Node name or node obejct to be inserted
 	 * @returns {Element}
 	 */
 	addLine(element, lineNode) {
@@ -213,7 +226,7 @@ Format.prototype = {
 				: this.options.get('defaultLine');
 			oFormat = domUtils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
-				domUtils.copyTagAttributes(oFormat, lineNode || currentFormatEl, ['id']);
+				domUtils.copyTagAttributes(oFormat, /** @type {Node} */ (lineNode || currentFormatEl), ['id']);
 			}
 		}
 
@@ -224,10 +237,11 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isBlock), it returns that node.
 	 * @param {Node} element Reference node.
 	 * @param {?(current: Node) => boolean=} validation Additional validation function.
-	 * @returns {Element|null}
+	 * @returns {Node|null}
 	 */
 	getBlock(element, validation) {
 		if (!element) return null;
@@ -247,8 +261,9 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Appended all selected "line" element to the argument element("block") and insert
-	 * @param {Element} block Element of wrap the arguments (BLOCKQUOTE...)
+	 * @param {Node} block Element of wrap the arguments (BLOCKQUOTE...)
 	 */
 	applyBlock(block) {
 		this.selection.getRangeAndAddLine(this.selection.getRange(), null);
@@ -419,16 +434,17 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description The elements of the "selectedFormats" array are detached from the "blockElement" element. ("LI" tags are converted to "P" tags)
 	 * - When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling, removeArray: [Array of removed elements]}.
-	 * @param {Element} blockElement "block" element (PRE, BLOCKQUOTE, OL, UL...)
-	 * @param {Object.<string, Array.<Element>|Element|boolean>} [options] Options
-	 * @param {Array.<Element>} [options.selectedFormats=null] Array of "line" elements (P, DIV, LI...) to remove.
+	 * @param {Node} blockElement "block" element (PRE, BLOCKQUOTE, OL, UL...)
+	 * @param {Object} [options] Options
+	 * @param {Array<Node>} [options.selectedFormats=null] Array of "line" elements (P, DIV, LI...) to remove.
 	 * - If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
-	 * @param {Element} [options.newBlockElement=null] The node(blockElement) to replace the currently wrapped node.
+	 * @param {Node} [options.newBlockElement=null] The node(blockElement) to replace the currently wrapped node.
 	 * @param {boolean} [options.shouldDelete=false] If true, deleted without detached.
 	 * @param {boolean} [options.skipHistory=false] When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
-	 * @returns {{cc: Node, sc: Node, so: number, ec: Node, eo: number, removeArray: Array.<Node>|null}} Node information after deletion
+	 * @returns {{cc: Node, sc: Node, so: number, ec: Node, eo: number, removeArray: Array<Node>|null}} Node information after deletion
 	 * - cc: Common parent container node
 	 * - sc: Start container node
 	 * - so: Start offset
@@ -542,7 +558,7 @@ Format.prototype = {
 				}
 
 				if (!newList && domUtils.isListCell(insNode)) {
-					if (next && domUtils.getNodeDepth(insNode) !== domUtils.getNodeDepth(next) && (domUtils.isListCell(parent) || domUtils.getArrayItem(insNode.children, domUtils.isList, false))) {
+					if (next && domUtils.getNodeDepth(insNode) !== domUtils.getNodeDepth(next) && (domUtils.isListCell(parent) || domUtils.arrayFind(insNode.children, domUtils.isList))) {
 						const insNext = insNode.nextElementSibling;
 						const detachRange = this._removeNestedList(insNode, false);
 						if (blockElement !== detachRange || insNext !== insNode.nextElementSibling) {
@@ -668,9 +684,10 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Append all selected "line" element to the list and insert.
 	 * @param {string} type List type. (ol | ul):[listStyleType]
-	 * @param {Element} selectedCells "line" elements or list cells.
+	 * @param {Array<Node>} selectedCells "line" elements or list cells.
 	 * @param {boolean} nested If true, indenting existing list cells.
 	 */
 	applyList(type, selectedCells, nested) {
@@ -752,7 +769,7 @@ Format.prototype = {
 						if (nested && domUtils.isListCell(o.parentNode)) {
 							this._detachNested(rangeArr.f);
 						} else {
-							afterRange = this.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
+							afterRange = this.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
 						}
 
 						o = selectedFormats[i].parentNode;
@@ -774,7 +791,7 @@ Format.prototype = {
 					if (nested && domUtils.isListCell(o.parentNode)) {
 						this._detachNested(rangeArr.f);
 					} else {
-						afterRange = this.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
+						afterRange = this.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
 					}
 				}
 			}
@@ -864,9 +881,10 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description "selectedCells" array are detached from the list element.
 	 * - The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
-	 * @param {Array.<Element>} selectedCells Array of ["line", li] elements(LI, P...) to remove.
+	 * @param {Array<Element>} selectedCells Array of ["line", li] elements(LI, P...) to remove.
 	 * @param {boolean} shouldDelete If true, It does not just remove the list, it deletes the content.
 	 * @returns {{sc: Node, ec: Node}} Node information after deletion
 	 * - sc: Start container node
@@ -933,6 +951,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Indent more the selected lines.
 	 * - margin size : 'status.indentSize'px
 	 */
@@ -957,6 +976,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Indent less the selected lines.
 	 * - margin size - "status.indentSize"px
 	 */
@@ -981,16 +1001,17 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
-	 * @param {Element|null} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
-	 * @param {Object.<string, Array.<string>|boolean} [options] Options
-	 * @param {Array.<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
+	 * @param {?Node} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
+	 * @param {Object} [options] Options
+	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
 	 *        (e.g., ['font-size'], ['.className'], ['font-family', 'color', '.className'])
-	 * @param {Array.<string>} [options.nodesToRemove=null] Array of node names to remove.
+	 * @param {Array<string>} [options.nodesToRemove=null] Array of node names to remove.
 	 *        If empty array or null when styleNode is null, all formats are removed.
 	 *        (e.g., ['span'], ['strong', 'em'])
 	 * @param {boolean} [options.strictRemove=false] If true, only removes nodes from nodesToRemove if all styles and classes are removed.
-	 * @returns {Element} The element that was added to or modified in the selection.
+	 * @returns {Node} The element that was added to or modified in the selection.
 	 *
 	 * @details
 	 * 1. If styleNode is provided, a node with the same tags and attributes is added to the selected text.
@@ -1003,15 +1024,15 @@ Format.prototype = {
 	 * 8. Tags matching names in nodesToRemove are deleted regardless of their style and class.
 	 * 9. If strictRemove is true, nodes in nodesToRemove are only removed if all their styles and classes are removed.
 	 * 10. The function won't modify nodes if the parent has the same class and style values.
-	 *     However, if nodesToRemove has values, it will work and separate text nodes even if there's no node to replace.
+	 * - However, if nodesToRemove has values, it will work and separate text nodes even if there's no node to replace.
 	 */
 	applyInlineElement(styleNode, { stylesToModify, nodesToRemove, strictRemove } = {}) {
 		if (domUtils.getParentElement(this.selection.getNode(), domUtils.isNonEditable)) return;
 
 		this.selection._resetRangeToTextNode();
 		let range = this.selection.getRangeAndAddLine(this.selection.getRange(), null);
-		stylesToModify = stylesToModify?.length > 0 ? stylesToModify : false;
-		nodesToRemove = nodesToRemove?.length > 0 ? nodesToRemove : false;
+		stylesToModify = stylesToModify?.length > 0 ? stylesToModify : null;
+		nodesToRemove = nodesToRemove?.length > 0 ? nodesToRemove : null;
 
 		const isRemoveNode = !styleNode;
 		const isRemoveFormat = isRemoveNode && !nodesToRemove && !stylesToModify;
@@ -1110,12 +1131,18 @@ Format.prototype = {
 			}
 		}
 
-		let start = {},
-			end = {};
-		let newNode,
-			styleRegExp = '',
-			classRegExp = '',
-			removeNodeRegExp = null;
+		let newNode;
+		/** @type {NodeStyleContainerType} */
+		let start = {};
+		/** @type {NodeStyleContainerType} */
+		let end = {};
+
+		/** @type {string|RegExp} */
+		let styleRegExp;
+		/** @type {string|RegExp} */
+		let classRegExp;
+		/** @type {string|RegExp} */
+		let removeNodeRegExp;
 
 		if (stylesToModify) {
 			for (let i = 0, len = stylesToModify.length, s; i < len; i++) {
@@ -1148,7 +1175,6 @@ Format.prototype = {
 		}
 
 		/** validation check function*/
-		const wBoolean = Boolean;
 		const _removeCheck = {
 			v: false
 		};
@@ -1161,7 +1187,7 @@ Format.prototype = {
 			if (isRemoveFormat) return null;
 
 			// remove node check
-			const tagRemove = (!removeNodeRegExp && isRemoveNode) || removeNodeRegExp?.test(vNode.nodeName);
+			const tagRemove = (!removeNodeRegExp && isRemoveNode) || /** @type {RegExp} */ (removeNodeRegExp)?.test(vNode.nodeName);
 
 			// tag remove
 			if (tagRemove && !strictRemove) {
@@ -1194,7 +1220,7 @@ Format.prototype = {
 			}
 
 			// change
-			if (style || classes || vNode.nodeName !== newNodeName || wBoolean(styleRegExp) !== wBoolean(originStyle) || wBoolean(classRegExp) !== wBoolean(originClasses)) {
+			if (style || classes || vNode.nodeName !== newNodeName || Boolean(styleRegExp) !== Boolean(originStyle) || Boolean(classRegExp) !== Boolean(originClasses)) {
 				if (styleRegExp && originStyle.length > 0) vNode.style.cssText = style;
 				if (!vNode.style.cssText) {
 					vNode.removeAttribute('style');
@@ -1336,6 +1362,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Remove format of the currently selected text.
 	 */
 	removeInlineElement() {
@@ -1343,19 +1370,20 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Check if the container and offset values are the edges of the "line"
-	 * @param {Node} container The node of the selection object. (range.startContainer..)
+	 * @param {Node} node The node of the selection object. (range.startContainer..)
 	 * @param {number} offset The offset of the selection object. (selection.getRange().startOffset...)
-	 * @param {string} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
+	 * @param {"front"|"end"} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
 	 * @returns {boolean}
 	 */
 	isEdgeLine(node, offset, dir) {
 		if (!domUtils.isEdgePoint(node, offset, dir)) return false;
 
 		let result = false;
-		dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
+		const siblingType = dir === 'front' ? 'previousSibling' : 'nextSibling';
 		while (node && !this.isLine(node) && !domUtils.isWysiwygFrame(node)) {
-			if (!node[dir] || (domUtils.isBreak(node[dir]) && !node[dir][dir])) {
+			if (!node[siblingType] || (domUtils.isBreak(node[siblingType]) && !node[siblingType][siblingType])) {
 				result = true;
 				node = node.parentNode;
 			} else {
@@ -1367,6 +1395,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description It is judged whether it is a node related to the text style.
 	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
@@ -1376,6 +1405,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description It is judged whether it is the "line" element.
 	 * - (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
 	 * - "line" element also contain "brLine" element
@@ -1389,6 +1419,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description It is judged whether it is the only "line" element, not block.
 	 * - (td, th, li)
 	 * "line" element also contain "brLine" element"
@@ -1400,6 +1431,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description It is judged whether it is the "brLine" element.
 	 * - (PRE | class="__se__format__br_line_xxx")
 	 * - "brLine" elements is included in the "line" element.
@@ -1415,6 +1447,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description It is judged whether it is the "block" element.
 	 * - (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
 	 * - "block" is wrap the "line" and "component"
@@ -1428,6 +1461,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description It is judged whether it is the "closureBlock" element.
 	 * - (TH, TD | class="__se__format__block_closure_xxx")
 	 * - "closureBlock" elements is included in the "block".
@@ -1444,6 +1478,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description It is judged whether it is the "closureBrLine" element.
 	 * - (class="__se__format__br_line__closure_xxx")
 	 * - "closureBrLine" elements is included in the "brLine".
@@ -1460,6 +1495,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Returns a "line" array from selected range.
 	 * @param {?(current: Node) => boolean=} validation The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array}
@@ -1524,6 +1560,7 @@ Format.prototype = {
 	},
 
 	/**
+	 * @this {FormatThis}
 	 * @description Get lines and components from the selected range. (P, DIV, H[1-6], OL, UL, TABLE..)
 	 * - If some of the component are included in the selection, get the entire that component.
 	 * @param {boolean} removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
@@ -1557,6 +1594,7 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description A function that distinguishes areas where "selection" should not be placed
 	 * @param {Element} element Element
 	 * @returns {boolean}
@@ -1567,8 +1605,9 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description A function that distinguishes non-formatting HTML elements or tags from formatting ones.
-	 * @param {Element} element Element
+	 * @param {Node} element Element
 	 * @returns {boolean}
 	 */
 	_nonFormat(element) {
@@ -1577,6 +1616,7 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
 	 * @param {Node|string} element Element to check
 	 * @returns {boolean}
@@ -1587,8 +1627,9 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Nodes without text
-	 * @param {Node} element Element to check
+	 * @param {Node|string} element Element to check
 	 * @returns {boolean}
 	 */
 	_notTextNode(element) {
@@ -1597,8 +1638,9 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Nodes that need to be added without modification when changing text nodes
-	 * @param {Node} element Element to check
+	 * @param {Node|string} element Element to check
 	 * @returns {boolean}
 	 */
 	_isIgnoreNodeChange(element) {
@@ -1607,8 +1649,9 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Get current selected lines and selected node info.
-	 * @returns {{lines: Array.<Element>, firstNode: Node,  lastNode: Node, firstPath: Array.<number>, lastPath: Array.<number>, startOffset: number, endOffset: number}}
+	 * @returns {{lines: Array<Element>, firstNode: Node,  lastNode: Node, firstPath: Array<number>, lastPath: Array<number>, startOffset: number, endOffset: number}}
 	 */
 	_lineWork() {
 		let range = this.selection.getRange();
@@ -1649,13 +1692,14 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Attaches a nested list structure by merging adjacent lists if applicable.
 	 * - Ensures that the nested list is placed correctly in the document structure.
 	 * @param {Element} originList The original list element where the nested list is inserted.
 	 * @param {Element} innerList The nested list element.
 	 * @param {Element} prev The previous sibling element.
 	 * @param {Element} next The next sibling element.
-	 * @param {{s: Array.<number> | null, e: Array.<number> | null, sl: Element | null, el: Element | null}} nodePath Object storing the start and end node paths.
+	 * @param {{s: Array<number> | null, e: Array<number> | null, sl: Element | null, el: Element | null}} nodePath Object storing the start and end node paths.
 	 * - s : Start node path.
 	 * - e : End node path.
 	 * - sl : Start node's parent element.
@@ -1713,9 +1757,10 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Detaches a nested list structure by extracting list items from their parent list.
 	 * - Ensures proper restructuring of the list elements.
-	 * @param {Array.<Element>} cells The list items to be detached.
+	 * @param {Array<Node>} cells The list items to be detached.
 	 * @returns {{cc: Node, sc: Node, ec: Node}} An object containing reference nodes for repositioning.
 	 * - cc : The parent node of the first list item.
 	 * - sc : The first list item.
@@ -1757,6 +1802,7 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Nest list cells or cancel nested cells.
 	 * @param selectedCells List cells.
 	 * @param nested Nested or cancel nested.
@@ -1831,6 +1877,7 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Detach Nested all nested lists under the "baseNode".
 	 * - Returns a list with nested removed.
 	 * @param {Node} baseNode Element on which to base.
@@ -1878,10 +1925,11 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description wraps text nodes of line selected text.
-	 * @param {Element} element The node of the line that contains the selected text node.
-	 * @param {Element} newInnerNode The dom that will wrap the selected text area
-	 * @param {(current: Node) => boolean} validation Check if the node should be stripped.
+	 * @param {Node} element The node of the line that contains the selected text node.
+	 * @param {Node} newInnerNode The dom that will wrap the selected text area
+	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
 	 * @param {Node} startCon The startContainer property of the selection object.
 	 * @param {number} startOff The startOffset property of the selection object.
 	 * @param {Node} endCon The endContainer property of the selection object.
@@ -2335,16 +2383,16 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description wraps first line selected text.
-	 * @param {Element} element The node of the line that contains the selected text node.
-	 * @param {Element} newInnerNode The dom that will wrap the selected text area
-	 * @param {(current: Node) => boolean} validation Check if the node should be stripped.
+	 * @param {Node} element The node of the line that contains the selected text node.
+	 * @param {Node} newInnerNode The dom that will wrap the selected text area
+	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
 	 * @param {Node} startCon The startContainer property of the selection object.
 	 * @param {number} startOff The startOffset property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
-	 * @returns {null|Node} If end container is renewed, returned renewed node
-	 * @returns {{ancestor: Node, container: Node, offset: number, endContainer: Node}} { ancestor, container, offset, endContainer }
+	 * @returns {NodeStyleContainerType} { ancestor, container, offset, endContainer }
 	 */
 	_setNode_startLine(element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
 		// not add tag
@@ -2633,14 +2681,15 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description wraps mid lines selected text.
-	 * @param {Element} element The node of the line that contains the selected text node.
-	 * @param {Element} newInnerNode The dom that will wrap the selected text area
-	 * @param {(current: Node) => boolean} validation Check if the node should be stripped.
+	 * @param {Node} element The node of the line that contains the selected text node.
+	 * @param {Node} newInnerNode The dom that will wrap the selected text area
+	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @param {Node} _endContainer Offset node of last line already modified (end.container)
-	 * @returns {{ancestor: Node, endContainer: Node}} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
+	 * @returns {NodeStyleContainerType} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
 	 */
 	_setNode_middleLine(element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
 		// not add tag
@@ -2771,15 +2820,16 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description wraps last line selected text.
-	 * @param {Element} element The node of the line that contains the selected text node.
-	 * @param {Element} newInnerNode The dom that will wrap the selected text area
-	 * @param {(current: Node) => boolean} validation Check if the node should be stripped.
+	 * @param {Node} element The node of the line that contains the selected text node.
+	 * @param {Node} newInnerNode The dom that will wrap the selected text area
+	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
 	 * @param {Node} endCon The endContainer property of the selection object.
 	 * @param {number} endOff The endOffset property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
-	 * @returns {{ancestor: Node, container: Node, offset: number}} { ancestor, container, offset }
+	 * @returns {NodeStyleContainerType} { ancestor, container, offset }
 	 */
 	_setNode_endLine(element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
 		// not add tag
@@ -3084,19 +3134,21 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Node with font-size style
 	 * @param {Node} element Element to check
 	 * @returns {boolean}
 	 */
 	_sn_isSizeNode(element) {
-		return element && typeof element !== 'string' && element.nodeType !== 3 && this.isTextStyleNode(element) && element.style.fontSize;
+		return element && typeof element !== 'string' && element.nodeType !== 3 && this.isTextStyleNode(element) && !!element.style.fontSize;
 	},
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Return the parent maintained tag. (bind and use a util object)
-	 * @param {Element} element Element
-	 * @returns {Element}
+	 * @param {Node} element Element
+	 * @returns {Node|null}
 	 */
 	_sn_getMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove) return null;
@@ -3105,9 +3157,12 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Check if element is a tag that should be persisted. (bind and use a util object)
-	 * @param {Element} element Element
-	 * @returns {Element}
+	 * @param {boolean} _isRemove is remove anchor
+	 * @param {boolean} _isSizeNode is size span node
+	 * @param {Node} element Element
+	 * @returns {boolean}
 	 */
 	_sn_isMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
@@ -3117,20 +3172,15 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
-	 * @param {Element} el List cell element. <li>
-	 * @param {Element|null} child Variable for recursive call. ("null" on the first call)
+	 * @param {Node} el List cell element. <li>
+	 * @param {?Node} child Variable for recursive call. ("null" on the first call)
 	 */
 	_sn_setCommonListStyle(el, child) {
 		if (!domUtils.isListCell(el)) return;
 
-		const children = domUtils.getArrayItem(
-			(child || el).childNodes,
-			function (current) {
-				return !domUtils.isBreak(current);
-			},
-			true
-		);
+		const children = domUtils.arrayFilter((child || el).childNodes, (current) => !domUtils.isBreak(current));
 		child = children[0];
 
 		if (!child || children.length > 1 || child.nodeType !== 1) return;
@@ -3174,6 +3224,7 @@ Format.prototype = {
 
 	/**
 	 * @private
+	 * @this {FormatThis}
 	 * @description Watch the applied text nodes and adjust the common styles of the list.
 	 * @param {Element} el "LI" element
 	 * @param {Array|null} styleArray Refer style array
@@ -3182,7 +3233,7 @@ Format.prototype = {
 		if (!domUtils.isListCell(el)) return;
 		if (!styleArray) styleArray = this._listKebab;
 
-		const children = domUtils.getArrayItem(el.childNodes, (current) => !domUtils.isBreak(current), true);
+		const children = domUtils.arrayFilter(el.childNodes, (current) => !domUtils.isBreak(current));
 		const elStyles = el.style;
 
 		const ec = [],
@@ -3245,19 +3296,24 @@ Format.prototype = {
 	constructor: Format
 };
 
+/**
+ * @private
+ * @param {Node} baseNode Node
+ */
 function DeleteNestedList(baseNode) {
 	const baseParent = baseNode.parentNode;
-	let sibling = baseParent;
-	let parent = sibling.parentNode;
+	let parent = baseParent.parentNode;
 	let liSibling, liParent, child, index, c;
 
 	while (domUtils.isListCell(parent)) {
 		index = domUtils.getPositionIndex(baseNode);
 		liSibling = parent.nextElementSibling;
 		liParent = parent.parentNode;
-		child = sibling;
+		child = baseParent;
+
+		let siblingNode = null;
 		while (child) {
-			sibling = sibling.nextSibling;
+			siblingNode = baseParent.nextSibling;
 			if (domUtils.isList(child)) {
 				c = child.childNodes;
 				while (c[index]) {
@@ -3267,9 +3323,9 @@ function DeleteNestedList(baseNode) {
 			} else {
 				liParent.appendChild(child);
 			}
-			child = sibling;
+			child = siblingNode;
 		}
-		sibling = liParent;
+
 		parent = liParent.parentNode;
 	}
 
@@ -3278,6 +3334,13 @@ function DeleteNestedList(baseNode) {
 	return liParent;
 }
 
+/**
+ * @private
+ * @param {Element} lines - Line elements
+ * @param {number} size - Margin size
+ * @param {string} dir - Direction
+ * @returns
+ */
 function SetLineMargin(lines, size, dir) {
 	const cells = [];
 

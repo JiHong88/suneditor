@@ -2,15 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
- */
-
-/**
  * @class
  * @description A plugin to style lines using classes.
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} pluginOptions
- * @param {Array.<string|{name: string, class: string, _class: string}>} pluginOptions.items - Paragraph item list
+ * @param {Array<string|{name: string, class: string, _class: string}>} pluginOptions.items - Paragraph item list
  * @example
  * use default paragraph styles
  * ['spaced', 'bordered', 'neon']
@@ -20,7 +16,6 @@ import { domUtils } from '../../helper';
 		{ name: 'bordered', class: '__se__p-bordered', _class: '' },
 		{ name: 'neon', class: '__se__p-neon', _class: ''}
 	]
- * @returns {ParagraphStyle}
  */
 function ParagraphStyle(editor, pluginOptions) {
 	// plugin bisic properties

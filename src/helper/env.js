@@ -1,15 +1,26 @@
+/** @type {Window} */
 export const _w = window;
+/** @type {Document} */
 export const _d = document;
 
+/**
+ * @description No event symbol
+ * @type {Symbol}
+ */
 export const NO_EVENT = Symbol('noEventHandler');
+
+/**
+ * @description On over component symbol
+ * @type {Symbol}
+ */
 export const ON_OVER_COMPONENT = Symbol('onOverComponent');
 
 const userAgent = _w.navigator.userAgent.toLowerCase();
 
 /**
  * @description Object.values
- * @param {Object.<*>} obj Object parameter.
- * @returns {Array.<*>}
+ * @param {Object<*, *>} obj Object parameter.
+ * @returns {Array<*>}
  */
 export function getValues(obj) {
 	return !obj
@@ -21,7 +32,7 @@ export function getValues(obj) {
 
 /**
  * @description Convert the CamelCase To the KebabCase.
- * @param {string|Array.<string>} param [Camel string]
+ * @param {string|Array<string>} param [Camel string]
  */
 export function camelToKebabCase(param) {
 	if (typeof param === 'string') {
@@ -35,8 +46,8 @@ export function camelToKebabCase(param) {
 
 /**
  * @description Convert the KebabCase To the CamelCase.
- * @param {string|Array.<string>} param [KebabCase string]
- * @returns {string|Array.<string>}
+ * @param {string|Array<string>} param [KebabCase string]
+ * @returns {string|Array<string>}
  */
 export function kebabToCamelCase(param) {
 	if (typeof param === 'string') {
@@ -50,7 +61,7 @@ export function kebabToCamelCase(param) {
 
 /**
  * @description Gets XMLHttpRequest object
- * @returns {XMLHttpRequest|ActiveXObject}
+ * @returns {XMLHttpRequest}
  */
 export function getXMLHttpRequest() {
 	return new XMLHttpRequest();
@@ -86,7 +97,7 @@ export function getPageStyle(doc) {
 /**
  * @deprecated
  * @description Get the the tag path of the arguments value
- * @param {Array.<string>} nameArray File name array
+ * @param {Array<string>} nameArray File name array
  * @param {string} extension js, css
  * @returns {string} If not found, return the first found value
  */
@@ -121,7 +132,7 @@ export function getIncludePath(nameArray, extension) {
 	if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
 
 	if (!path.includes(':/') && '//' !== path.slice(0, 2)) {
-		path = 0 === path.includes('/') ? location.href.match(/^.*?:\/\/[^/]*/)[0] + path : location.href.match(/^[^?]*\/(?:)/)[0] + path;
+		path = false === path.includes('/') ? location.href.match(/^.*?:\/\/[^/]*/)[0] + path : location.href.match(/^[^?]*\/(?:)/)[0] + path;
 	}
 
 	if (!path) {
@@ -177,7 +188,7 @@ export const isGecko = (() => {
  * @type {boolean}
  */
 export const isChromium = (() => {
-	return !!window.chrome;
+	return !!(/** @type {Window & { chrome: any }} */ (_w).chrome);
 })();
 
 /**
@@ -194,7 +205,7 @@ export const isSafari = (() => {
  * @type {boolean}
  */
 export const isMobile = (() => {
-	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) || ((navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0) && 'ontouchstart' in window);
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) || (navigator.maxTouchPoints > 0 && 'ontouchstart' in _w);
 })();
 
 /**

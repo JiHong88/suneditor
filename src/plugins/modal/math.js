@@ -5,7 +5,18 @@ import { domUtils, env, converter } from '../../helper';
 const { _w } = env;
 
 /**
- * @typedef {import('../../core/editor').default} EditorInstance
+ * @typedef {Object} MathPluginOptions
+ * @property {boolean=} [canResize=true] - Whether the math modal can be resized.
+ * @property {boolean=} [autoHeight=false] - Whether to automatically adjust the height of the modal.
+ * @property {Array<object>=} [fontSizeList] - A list of font size options for rendering math expressions.
+ * @property {function=} [onPaste] - A callback function to handle paste events in the math input area.
+ * @property {Object} [formSize={}] - An object specifying the dimensions for the math modal.
+ * @property {string=} [formSize.width="460px"] - The default width of the math modal.
+ * @property {string=} [formSize.height="14em"] - The default height of the math modal.
+ * @property {string=} [formSize.maxWidth] - The maximum width of the math modal.
+ * @property {string=} [formSize.maxHeight] - The maximum height of the math modal.
+ * @property {string=} [formSize.minWidth="400px"] - The minimum width of the math modal.
+ * @property {string=} [formSize.minHeight="40px"] - The minimum height of the math modal.
  */
 
 /**
@@ -14,19 +25,7 @@ const { _w } = env;
  * - This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
  * - If external library is provided, a warning is issued.
  * @param {EditorInstance} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Object=} [pluginOptions.formSize] - An object specifying the dimensions for the math modal.
- * @param {string=} [pluginOptions.formSize.width="460px"] - The default width of the math modal.
- * @param {string=} [pluginOptions.formSize.height="14em"] - The default height of the math modal.
- * @param {string=} [pluginOptions.formSize.maxWidth] - The maximum width of the math modal.
- * @param {string=} [pluginOptions.formSize.maxHeight] - The maximum height of the math modal.
- * @param {string=} [pluginOptions.formSize.minWidth="400px"] - The minimum width of the math modal.
- * @param {string=} [pluginOptions.formSize.minHeight="40px"] - The minimum height of the math modal.
- * @param {boolean=} [pluginOptions.canResize=true] - Whether the math modal can be resized.
- * @param {boolean=} [pluginOptions.autoHeight=false] - Whether to automatically adjust the height of the modal.
- * @param {Array.<object>=} [pluginOptions.fontSizeList] - A list of font size options for rendering math expressions.
- * @param {function=} [pluginOptions.onPaste] - A callback function to handle paste events in the math input area.
- * @returns {Math_}
+ * @param {MathPluginOptions} pluginOptions
  */
 function Math_(editor, pluginOptions) {
 	// external library
