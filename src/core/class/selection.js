@@ -6,11 +6,16 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, env } from '../../helper';
 
 /**
+ * @typedef {Omit<Selection_ & Partial<EditorInjector>, 'selection'>} SelectionThis
+ */
+
+/**
  * @typedef {import('./offset').RectsInfo} RectsInfo
  */
 
 /**
  * @constructor
+ * @this {SelectionThis}
  * @description Selection, Range related class
  * @param {EditorInstance} editor - The root editor instance
  */
@@ -25,6 +30,7 @@ function Selection_(editor) {
 
 Selection_.prototype = {
 	/**
+	 * @this {SelectionThis}
 	 * @description Get window selection obejct
 	 * @returns {Selection}
 	 */
@@ -39,15 +45,18 @@ Selection_.prototype = {
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description Check if the range object is valid
-	 * @param {Range|null|undefined} range Range object
+	 * @param {*} range Range object
 	 * @returns {boolean}
 	 */
 	isRange(range) {
-		return /Range/.test(Object.prototype.toString.call(range?.__proto__));
+		// return /Range/.test(Object.prototype.toString.call(range?.__proto__));
+		return range instanceof Range;
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description Get current editor's range object
 	 * @returns {Range}
 	 */
@@ -80,39 +89,54 @@ Selection_.prototype = {
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description Set current editor's range object and return.
-	 * @param {Node|Range} startCon The startContainer property of the selection object.
-	 * @param {number} startOff The startOffset property of the selection object.
-	 * @param {Node} endCon The endContainer property of the selection object.
-	 * @param {number} endOff The endOffset property of the selection object.
+	 * @param {Node|Range} startCon Range object or The startContainer property of the selection object
+	 * @param {number} [startOff] The startOffset property of the selection object.
+	 * @param {Node} [endCon] The endContainer property of the selection object.
+	 * @param {number} [endOff] The endOffset property of the selection object.
 	 * @returns {Range}
 	 */
 	setRange(startCon, startOff, endCon, endOff) {
-		if (this.isRange(startCon)) {
-			const r = startCon;
-			startCon = r.startContainer;
-			startOff = r.startOffset;
-			endCon = r.endContainer;
-			endOff = r.endOffset;
+		/** @type {Node} */
+		let sc;
+		/** @type {number} */
+		let so;
+		/** @type {Node} */
+		let ec;
+		/** @type {number} */
+		let eo;
+
+		if (this.isRange(sc)) {
+			const r = /** @type {Range} */ (startCon);
+			sc = r.startContainer;
+			so = r.startOffset;
+			ec = r.endContainer;
+			eo = r.endOffset;
+		} else {
+			sc = /** @type {Node} */ (startCon);
+			so = startOff;
+			ec = endCon;
+			eo = endOff;
 		}
 
-		if (!startCon || !endCon) return;
-		if ((domUtils.isBreak(startCon) || startCon.nodeType === 3) && startOff > startCon.textContent.length) startOff = startCon.textContent.length;
-		if ((domUtils.isBreak(endCon) || endCon.nodeType === 3) && endOff > endCon.textContent.length) endOff = endCon.textContent.length;
-		if (this.format.isLine(startCon)) {
-			startCon = startCon.childNodes[startOff > 0 ? startCon.childNodes.length - 1 : 0] || startCon;
-			startOff = startOff > 0 ? (startCon.nodeType === 1 && !domUtils.isBreak(startCon) ? 1 : startCon.textContent ? startCon.textContent.length : 0) : 0;
+		if (!sc || !ec) return;
+		if ((domUtils.isBreak(sc) || sc.nodeType === 3) && so > sc.textContent.length) so = sc.textContent.length;
+		if ((domUtils.isBreak(ec) || ec.nodeType === 3) && eo > ec.textContent.length) eo = ec.textContent.length;
+		if (this.format.isLine(sc)) {
+			sc = sc.childNodes[so > 0 ? sc.childNodes.length - 1 : 0] || sc;
+			so = so > 0 ? (sc.nodeType === 1 && !domUtils.isBreak(sc) ? 1 : sc.textContent ? sc.textContent.length : 0) : 0;
 		}
-		if (this.format.isLine(endCon)) {
-			endCon = endCon.childNodes[endOff > 0 ? endCon.childNodes.length - 1 : 0] || endCon;
-			endOff = endOff > 0 ? (endCon.nodeType === 1 && !domUtils.isBreak(endCon) ? 1 : endCon.textContent ? endCon.textContent.length : 0) : 0;
+		if (this.format.isLine(ec)) {
+			ec = ec.childNodes[eo > 0 ? ec.childNodes.length - 1 : 0] || ec;
+			eo = eo > 0 ? (ec.nodeType === 1 && !domUtils.isBreak(ec) ? 1 : ec.textContent ? ec.textContent.length : 0) : 0;
 		}
 
 		const range = this.editor.frameContext.get('_wd').createRange();
 
 		try {
-			range.setStart(startCon, startOff);
-			range.setEnd(endCon, endOff);
+			range.setStart(sc, so);
+			range.setEnd(ec, eo);
 		} catch (error) {
 			console.warn('[SUNEDITOR.selection.focus.warn]', error.message);
 			this.editor._nativeFocus();
@@ -135,6 +159,7 @@ Selection_.prototype = {
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description Remove range object and button effect
 	 */
 	removeRange() {
@@ -146,6 +171,7 @@ Selection_.prototype = {
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description Returns the range (container and offset) near the given target node.
 	 * - If the target node has a next sibling, it returns the next sibling with an offset of 0.
 	 * - If there is no next sibling but a previous sibling exists, it returns the previous sibling with an offset of 1.
@@ -171,9 +197,10 @@ Selection_.prototype = {
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
 	 * @param {Range} range core.getRange()
-	 * @param {Node|null} container If there is "container" argument, it creates a line in front of the container.
+	 * @param {?Node=} container If there is "container" argument, it creates a line in front of the container.
 	 * @returns {Range} a new "range" or argument "range".
 	 */
 	getRangeAndAddLine(range, container) {
@@ -188,6 +215,7 @@ Selection_.prototype = {
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description Get current select node
 	 * @returns {Node}
 	 */
@@ -212,21 +240,21 @@ Selection_.prototype = {
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description Get the Rects object.
-	 * @param {Range|Node|null} target Range object | Element | null
+	 * @param {?Range|Node} ref Range | Node | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
 	 * @returns {{rects: RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 */
-	getRects(target, position) {
-		const targetAbs = target?.nodeType === 1 ? this._w.getComputedStyle(target).position === 'absolute' : false;
-		target = !target || target.nodeType === 3 ? this.getRange() : target;
+	getRects(ref, position) {
+		const range = /** @type {Range} */ (!ref || !this.isRange(ref) ? this.getRange() : ref);
 		const globalScroll = this.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
 		let scrollLeft = globalScroll.left;
 		let scrollTop = globalScroll.top;
 
-		let rects = target.getClientRects();
-		rects = rects[isStartPosition ? 0 : rects.length - 1];
+		const cr = range.getClientRects();
+		let rects = /** @type {RectsInfo} */ (cr[isStartPosition ? 0 : cr.length - 1]);
 
 		if (!rects) {
 			const node = this.getNode();
@@ -235,8 +263,8 @@ Selection_.prototype = {
 				this.html.insertNode(zeroWidth, { afterNode: null, skipCharCount: true });
 				this.setRange(zeroWidth, 1, zeroWidth, 1);
 				this._init();
-				rects = this.getRange().getClientRects();
-				rects = rects[isStartPosition ? 0 : rects.length - 1];
+				const lcr = this.getRange().getClientRects();
+				rects = lcr[isStartPosition ? 0 : lcr.length - 1];
 			}
 
 			if (!rects) {
@@ -244,7 +272,7 @@ Selection_.prototype = {
 				rects = {
 					left: nodeOffset.left,
 					top: nodeOffset.top,
-					right: nodeOffset.right,
+					right: nodeOffset.left + node.offsetWidth,
 					bottom: nodeOffset.top + node.offsetHeight,
 					noText: true
 				};
@@ -256,6 +284,7 @@ Selection_.prototype = {
 		}
 
 		const iframeRects = /^iframe$/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName) ? this.editor.frameContext.get('wysiwygFrame').getClientRects()[0] : null;
+		const targetAbs = ref instanceof Node && ref.nodeType === 1 && this._w.getComputedStyle(ref).position === 'absolute';
 		if (!targetAbs && iframeRects) {
 			rects = {
 				left: rects.left + iframeRects.left,
@@ -274,25 +303,31 @@ Selection_.prototype = {
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description Get the custom range object of the event.
+	 * @param {DragEvent} e Event object
 	 * @returns {{sc: Node, so: number, ec: Node, eo: number}} {sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}
 	 */
-	getEventLocationRange(e) {
-		let sc, so, ec, eo;
-		if (e.rangeParent) {
-			sc = e.rangeParent;
-			so = e.rangeOffset;
-			ec = e.rangeParent;
-			eo = e.rangeOffset;
-		} else if (this.editor.frameContext.get('_wd').caretRangeFromPoint) {
-			let r = this.editor.frameContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
-			if (!r) r = this.getRange();
+	getDragEventLocationRange(e) {
+		const wd = this.editor.frameContext.get('_wd');
+		let r, sc, so, ec, eo;
+
+		if (wd.caretPositionFromPoint) {
+			r = wd.caretPositionFromPoint(e.clientX, e.clientY);
+			sc = r.offsetNode;
+			so = r.offset;
+			ec = r.offsetNode;
+			eo = r.offset;
+		} else if (wd.caretRangeFromPoint) {
+			r = wd.caretRangeFromPoint(e.clientX, e.clientY);
 			sc = r.startContainer;
 			so = r.startOffset;
 			ec = r.endContainer;
 			eo = r.endOffset;
-		} else {
-			const r = this.getRange();
+		}
+
+		if (!r) {
+			r = this.getRange();
 			sc = r.startContainer;
 			so = r.startOffset;
 			ec = r.endContainer;
@@ -308,6 +343,7 @@ Selection_.prototype = {
 	},
 
 	/**
+	 * @this {SelectionThis}
 	 * @description Scroll to the corresponding selection or range position.
 	 * @param {Selection|Range|Node} ref selection or range object
 	 * @param {?Object<string, *>=} scrollOption option of scrollTo
@@ -315,7 +351,7 @@ Selection_.prototype = {
 	scrollTo(ref, scrollOption) {
 		if (ref instanceof Selection) {
 			ref = ref.getRangeAt(0);
-		} else if (ref instanceof Node || /^(1|3)$/.test(ref?.nodeType)) {
+		} else if (ref instanceof Node) {
 			ref = this.setRange(ref, 1, ref, 1);
 		} else if (typeof ref?.startContainer === 'undefined') {
 			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
@@ -332,6 +368,7 @@ Selection_.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectionThis}
 	 * @description Returns true if there is no valid selection.
 	 * @param {Range} range selection.getRange()
 	 * @returns {boolean}
@@ -348,6 +385,7 @@ Selection_.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectionThis}
 	 * @description Return the range object of editor's first child node
 	 * @returns {Range}
 	 */
@@ -377,6 +415,7 @@ Selection_.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectionThis}
 	 * @description Set "range" and "selection" info.
 	 * @param {Range} range range object.
 	 * @param {Selection} selection selection object.
@@ -389,7 +428,7 @@ Selection_.prototype = {
 			if (domUtils.isWysiwygFrame(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
 			else selectionNode = range.commonAncestorContainer;
 		} else {
-			selectionNode = selection.extentNode || selection.anchorNode;
+			selectionNode = selection.anchorNode;
 		}
 
 		this.selectionNode = selectionNode;
@@ -397,6 +436,7 @@ Selection_.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectionThis}
 	 * @description Saving the range object and the currently selected node of editor
 	 */
 	_init() {
@@ -422,6 +462,7 @@ Selection_.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectionThis}
 	 * @description Focus method
 	 */
 	__focus() {
@@ -440,6 +481,7 @@ Selection_.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectionThis}
 	 * @description Reset range object to text node selected status.
 	 * @returns {boolean} Returns false if there is no valid selection.
 	 */

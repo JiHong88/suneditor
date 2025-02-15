@@ -483,7 +483,7 @@ Editor.prototype = {
 	 * @description Run plugin calls and basic commands.
 	 * @param {string} command Command string
 	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
-	 * @param {?Element} button The element of command button
+	 * @param {?Node=} button The element of command button
 	 */
 	run(command, type, button) {
 		if (type) {
@@ -543,7 +543,7 @@ Editor.prototype = {
 	 * @description Execute default command of command button
 	 * - (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
-	 * @param {Element} button Command button
+	 * @param {Node} button Command button
 	 * @returns {Promise<void>}
 	 */
 	async commandHandler(command, button) {
@@ -620,7 +620,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Execute "editor.run" with command button.
-	 * @param {Element} target Command target
+	 * @param {Node} target Command target
 	 */
 	runFromTarget(target) {
 		const isInput = domUtils.isInputElement(target);
@@ -1587,19 +1587,20 @@ Editor.prototype = {
 		if (this.options.has('_subMode')) ClassInjector.call(this.subToolbar, this);
 
 		// delete self reference
-		delete this.char.char;
-		delete this.component.component;
-		delete this.format.format;
-		delete this.html.html;
-		delete this.menu.menu;
-		delete this.nodeTransform.nodeTransform;
-		delete this.offset.offset;
-		delete this.selection.selection;
-		delete this.shortcuts.shortcuts;
-		delete this.toolbar.toolbar;
-		delete this.ui.ui;
-		delete this.viewer.viewer;
-		if (this.subToolbar) delete this.subToolbar.subToolbar;
+		delete this.eventManager['eventManager'];
+		delete this.char['char'];
+		delete this.component['component'];
+		delete this.format['format'];
+		delete this.html['html'];
+		delete this.menu['menu'];
+		delete this.nodeTransform['nodeTransform'];
+		delete this.offset['offset'];
+		delete this.selection['selection'];
+		delete this.shortcuts['shortcuts'];
+		delete this.toolbar['toolbar'];
+		delete this.ui['ui'];
+		delete this.viewer['viewer'];
+		if (this.subToolbar) delete this.subToolbar['subToolbar'];
 
 		this._responsiveButtons = this._responsiveButtons_sub = null;
 	},

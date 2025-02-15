@@ -17,6 +17,7 @@ const INDEX_2 = 2147483645;
  * @property {Element} target The controller target element
  * @property {boolean} isRangeTarget If the target is a Range, set it to true.
  * @property {boolean} notInCarrier If the controller is not in the "carrierWrapper", set it to true.
+ * @property {boolean} [fixed] If the controller is fixed and should not be closed, set it to true.
  */
 
 /**

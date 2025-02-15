@@ -137,9 +137,9 @@ NodeTransform.prototype = {
 	 * - If "offset" has been changed, it will return as much "offset" as it has been modified.
 	 * - An array containing change offsets is returned in the order of the "nodePathArray" array.
 	 * @param {Node} element Element
-	 * @param {NodeCollection} nodePathArray Array of NodePath object ([domUtils.getNodePath(), ..])
-	 * @param {boolean} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
-	 * @returns {ReturnNodeArray} [offset, ..]
+	 * @param {?number[][]=} nodePathArray Array of NodePath object ([domUtils.getNodePath(), ..])
+	 * @param {?boolean=} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
+	 * @returns {Array<number>} [offset, ..]
 	 */
 	mergeSameTags(element, nodePathArray, onlyText) {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -283,13 +283,12 @@ NodeTransform.prototype = {
 	 * @this {NodeTransformThis}
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Node} element Element object
-	 * @param {(current: Node) => boolean|string|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
+	 * @param {?(current: Node) => boolean|string=} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
 	 */
 	mergeNestedTags(element, validation) {
 		if (typeof validation === 'string') {
-			validation = function (current) {
-				return this.test(current.tagName);
-			}.bind(new RegExp(`^(${validation ? validation : '.+'})$`, 'i'));
+			const tagRegExp = new RegExp(`^(${validation ? validation : '.+'})$`, 'i');
+			validation = (current) => tagRegExp.test(current.tagName);
 		} else if (typeof validation !== 'function') {
 			validation = () => true;
 		}

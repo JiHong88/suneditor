@@ -230,13 +230,13 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 				(!this.format.isBrLine(formatEl) || this.format.isClosureBrLine(formatEl))
 			) {
 				// closure range
-				if (this.format.isClosureBlock(formatEl.parentNode)) {
+				if (this.format.isClosureBlock(formatEl.parentElement)) {
 					e.preventDefault();
 					e.stopPropagation();
 					return false;
 				}
 				// maintain default format
-				if (domUtils.isWysiwygFrame(formatEl.parentNode) && formatEl.childNodes.length <= 1 && (!formatEl.firstChild || domUtils.isZeroWidth(formatEl.textContent))) {
+				if (domUtils.isWysiwygFrame(formatEl.parentElement) && formatEl.childNodes.length <= 1 && (!formatEl.firstChild || domUtils.isZeroWidth(formatEl.textContent))) {
 					e.preventDefault();
 					e.stopPropagation();
 
@@ -317,7 +317,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 				if (
 					domUtils.isListCell(formatEl) &&
 					domUtils.isList(rangeEl) &&
-					(domUtils.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) &&
+					(domUtils.isListCell(rangeEl.parentElement) || formatEl.previousElementSibling) &&
 					(selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.previousSibling || domUtils.isList(selectionNode.previousSibling)))) &&
 					(this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null) ? rangeEl.contains(range.startContainer) : range.startOffset === 0 && range.collapsed)
 				) {
@@ -331,7 +331,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 
 						this.history.push(true);
 					} else {
-						let prev = formatEl.previousElementSibling || rangeEl.parentNode;
+						let prev = formatEl.previousElementSibling || rangeEl.parentElement;
 						if (domUtils.isListCell(prev)) {
 							e.preventDefault();
 
@@ -771,9 +771,9 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 						this.__enterPrevent(e);
 						let newEl = null;
 
-						if (domUtils.isListCell(rangeEl.parentNode)) {
-							const parentLi = formatEl.parentNode.parentNode;
-							rangeEl = parentLi.parentNode;
+						if (domUtils.isListCell(rangeEl.parentElement)) {
+							const parentLi = formatEl.parentNode.parentElement;
+							rangeEl = parentLi.parentElement;
 							const newListCell = domUtils.createElement('LI');
 							newListCell.innerHTML = '<br>';
 							domUtils.copyTagAttributes(newListCell, formatEl, this.options.get('lineAttrReset'));
@@ -781,9 +781,9 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 							rangeEl.insertBefore(newEl, parentLi.nextElementSibling);
 						} else {
 							let newFormat;
-							if (domUtils.isTableCell(rangeEl.parentNode)) {
+							if (domUtils.isTableCell(rangeEl.parentElement)) {
 								newFormat = 'DIV';
-							} else if (domUtils.isList(rangeEl.parentNode)) {
+							} else if (domUtils.isList(rangeEl.parentElement)) {
 								newFormat = 'LI';
 							} else if (this.format.isLine(rangeEl.nextElementSibling) && !this.format.isBlock(rangeEl.nextElementSibling)) {
 								newFormat = rangeEl.nextElementSibling.nodeName;

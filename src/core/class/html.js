@@ -9,7 +9,12 @@ const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
 
 /**
+ * @typedef {Omit<HTML & Partial<EditorInjector>, 'html'>} HTMLThis
+ */
+
+/**
  * @constructor
+ * @this {HTMLThis}
  * @description All HTML related classes involved in the editing area
  * @param {EditorInstance} editor - The root editor instance
  */
@@ -167,6 +172,7 @@ function HTML(editor) {
 
 HTML.prototype = {
 	/**
+	 * @this {HTMLThis}
 	 * @description Filters an HTML string based on allowed and disallowed tags, with optional custom validation.
 	 * - Removes blacklisted tags and keeps only whitelisted tags.
 	 * - Allows custom validation functions to replace, modify, or remove elements.
@@ -226,6 +232,7 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @this {HTMLThis}
 	 * @description Cleans and compresses HTML code to suit the editor format.
 	 * @param {string} html HTML string to clean and compress
 	 * @param {Object} [options] Cleaning options
@@ -259,7 +266,7 @@ HTML.prototype = {
 		}
 
 		// get dom tree
-		const dom = this._d.createRange().createContextualFragment(html, true);
+		const dom = this._d.createRange().createContextualFragment(html);
 
 		if (tagFilter) {
 			try {
@@ -310,6 +317,7 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @this {HTMLThis}
 	 * @description Inserts an (HTML element / HTML string / plain string) at the selection range.
 	 * - If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
 	 * @param {Element|string} html HTML Element or HTML string or plain string
@@ -386,6 +394,7 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @this {HTMLThis}
 	 * @description Delete selected node and insert argument value node and return.
 	 * - If the "afterNode" exists, it is inserted after the "afterNode"
 	 * - Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
@@ -397,7 +406,7 @@ HTML.prototype = {
 	 */
 	insertNode(oNode, { afterNode, skipCharCount } = {}) {
 		let result = null;
-		if (this.editor.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(oNode, null))) {
+		if (this.editor.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(oNode))) {
 			return result;
 		}
 
@@ -735,12 +744,13 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @this {HTMLThis}
 	 * @description Delete the selected range.
-	 * @returns {{container:Node, offset:number, prevContainer:Node|null, commonCon:Node|null}}
+	 * @returns {{container: Node, offset: number, commonCon?: Node|null, prevContainer?: Node|null}}
 	 * - container: "the last element after deletion"
 	 * - offset: "offset"
-	 * - prevContainer: "previousElementSibling Of the deleted area"
 	 * - commonCon: "commonAncestorContainer"
+	 * - prevContainer: "previousElementSibling Of the deleted area"
 	 */
 	remove() {
 		this.selection._resetRangeToTextNode();
@@ -815,7 +825,7 @@ HTML.prototype = {
 
 					const npEl = this.format.getLine(rEl) || this.component.get(rEl);
 					if (line !== npEl) {
-						rEl = npEl;
+						rEl = /** @type {Node} */ (npEl);
 						rOffset = rOffset === 0 ? 0 : 1;
 					}
 
@@ -1006,13 +1016,14 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @this {HTMLThis}
 	 * @description Gets the current content
 	 * @param {Object} [options] Options
 	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
 	 * Ignored for targetOptions.get('iframe_fullPage') is true.
 	 * @param {boolean} [options.includeFullPage=false] Return only the content of the body without headers when the "iframe_fullPage" option is true
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
-	 * @returns {string|Array<string>}
+	 * @returns {string|Object<*, string>}
 	 */
 	get({ withFrame, includeFullPage, rootKey } = {}) {
 		if (!rootKey) rootKey = [this.status.rootKey];
@@ -1051,6 +1062,7 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @this {HTMLThis}
 	 * @description Sets the HTML string
 	 * @param {string} html HTML string
 	 * @param {Object} [options] Options
@@ -1078,6 +1090,7 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @this {HTMLThis}
 	 * @description Add content to the end of content.
 	 * @param {string} html Content to Input
 	 * @param {Object} [options] Options
@@ -1108,6 +1121,7 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @this {HTMLThis}
 	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
 	 * @param {{head: string, body: string}} ctx { head: HTML string, body: HTML string}
 	 * @param {Object} [options] Options
@@ -1128,6 +1142,7 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @this {HTMLThis}
 	 * @description HTML code compression
 	 * @param {string} html HTML string
 	 * @returns {string} HTML string
@@ -1141,6 +1156,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description construct wysiwyg area element to html string
 	 * @param {Element|string} html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
 	 * @param {boolean} comp If true, does not line break and indentation of tags.
@@ -1156,8 +1172,8 @@ HTML.prototype = {
 		};
 		const brChar = comp ? '' : '\n';
 
-		let indentSize = comp ? 0 : this.status.codeIndentSize * 1;
-		indentSize = indentSize > 0 ? new Array(indentSize + 1).join(' ') : '';
+		const codeSize = comp ? 0 : this.status.codeIndentSize * 1;
+		const indentSize = codeSize > 0 ? new Array(codeSize + 1).join(' ') : '';
 
 		(function recursionFunc(element, indent) {
 			const children = element.childNodes;
@@ -1189,8 +1205,8 @@ HTML.prototype = {
 					tag = node.nodeName.toLowerCase();
 					tagIndent = elementIndent || nodeRegTest ? indent : '';
 					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
-					recursionFunc(node, indent + indentSize, '');
-					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : '' || /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
+					recursionFunc(/** @type {Element} */ (node), indent + indentSize + '');
+					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
 				}
 			}
 		})(wDoc, '');
@@ -1200,6 +1216,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Checks whether the given list item node should be removed and handles necessary clean-up.
 	 * @param {Node} item The list item node to be checked.
 	 */
@@ -1218,6 +1235,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Recursive function  when used to place a node in "BrLine" in "html.insertNode"
 	 * @param {Node} oNode Node to be inserted
 	 * @returns {Node} "oNode"
@@ -1252,6 +1270,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Returns HTML string according to tag type and configurati isExcludeFormat.
 	 * @param {Node} node Node
 	 * @param {boolean} forceFormat If true, text nodes that do not have a format node is wrapped with the format tag.
@@ -1306,8 +1325,9 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Fix tags that do not fit the editor format.
-	 * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
+	 * @param {DocumentFragment} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
 	 * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist
 	 * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist
 	 * @param {boolean} tagFilter Tag filter option
@@ -1458,6 +1478,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
 	 * @param {string} html HTML string
 	 * @returns {string} HTML string
@@ -1473,9 +1494,10 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Determines if formatting is required and returns a domTree
 	 * @param {DocumentFragment} dom documentFragment
-	 * @returns {Element}
+	 * @returns {DocumentFragment}
 	 */
 	_editFormat(dom) {
 		let value = '',
@@ -1512,10 +1534,11 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Converts a list of DOM nodes into an HTML list structure.
 	 * - If the node is already a list, its innerHTML is used. If it is a block element,
 	 * - the function is called recursively.
-	 * @param {NodeList} domTree List of DOM nodes to be converted.
+	 * @param {NodeCollection} domTree List of DOM nodes to be converted.
 	 * @returns {string} The generated HTML list.
 	 */
 	_convertListCell(domTree) {
@@ -1531,7 +1554,7 @@ HTML.prototype = {
 				} else if (this.format.isLine(node)) {
 					html += '<li>' + (node.innerHTML.trim() || '<br>') + '</li>';
 				} else if (this.format.isBlock(node) && !domUtils.isTableElements(node)) {
-					html += this._convertListCell(node);
+					html += this._convertListCell(node.children);
 				} else {
 					html += '<li>' + node.outerHTML + '</li>';
 				}
@@ -1545,6 +1568,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Checks whether the provided DOM nodes require formatting.
 	 * @param {NodeList} domTree List of DOM nodes to check.
 	 * @returns {boolean} True if formatting is required, otherwise false.
@@ -1565,6 +1589,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Cleans the inline style attributes of an HTML element.
 	 * - Extracts allowed styles and removes disallowed ones based on editor settings.
 	 * @param {string} m The full matched string from a regular expression.
@@ -1579,7 +1604,7 @@ HTML.prototype = {
 			const face = (m.match(/\sface="([^"]+)"/i) || [])[1];
 			const color = (m.match(/\scolor="([^"]+)"/i) || [])[1];
 			if (size || face || color) {
-				sv = 'style="' + (size ? 'font-size:' + numbers.get(size / 3.333, 1) + 'rem;' : '') + (face ? 'font-family:' + face + ';' : '') + (color ? 'color:' + color + ';' : '') + '"';
+				sv = 'style="' + (size ? 'font-size:' + numbers.get(Number(size) / 3.333, 1) + 'rem;' : '') + (face ? 'font-family:' + face + ';' : '') + (color ? 'color:' + color + ';' : '') + '"';
 			}
 		}
 
@@ -1636,6 +1661,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Delete disallowed tags
 	 * @param {string} html HTML string
 	 * @returns {string}
@@ -1650,6 +1676,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Recursively checks for duplicate text style nodes within a given parent node.
 	 * @param {Node} oNode The node to check for duplicate styles.
 	 * @param {Node} parentNode The parent node where the duplicate check occurs.
@@ -1668,6 +1695,7 @@ HTML.prototype = {
 
 	/**
 	 * @private
+	 * @this {HTMLThis}
 	 * @description Recursively checks for duplicate text style nodes within a given parent node.
 	 * - If duplicate styles are found, redundant attributes are removed.
 	 * @param {Node} oNode The node to check for duplicate styles.
@@ -1721,6 +1749,7 @@ HTML.prototype = {
 
 /**
  * @private
+ * @this {HTMLThis}
  * @description Tag and tag attribute check RegExp function.
  * @param {string} m RegExp value
  * @param {string} t RegExp value
@@ -1781,6 +1810,12 @@ function CleanElements(attrFilter, styleFilter, m, t) {
 	return t;
 }
 
+/**
+ * @private
+ * @description Get related list
+ * @param {string} str Regular expression string
+ * @param {string} str2 Regular expression string
+ */
 function GetRegList(str, str2) {
 	return !str ? '^' : str === '*' ? '[a-z-]+' : !str2 ? str : str + '|' + str2;
 }

@@ -45,9 +45,14 @@ export function camelToKebabCase(param) {
 }
 
 /**
- * @description Convert the KebabCase To the CamelCase.
- * @param {string|Array<string>} param [KebabCase string]
- * @returns {string|Array<string>}
+ * @overload
+ * @param {string} param - Kebab-case string.
+ * @returns {string} CamelCase string.
+ */
+/**
+ * @overload
+ * @param {Array<string>} param - Array of Kebab-case strings.
+ * @returns {Array<string>} Array of CamelCase strings.
  */
 export function kebabToCamelCase(param) {
 	if (typeof param === 'string') {

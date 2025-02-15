@@ -6,7 +6,12 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env, converter, numbers } from '../../helper';
 
 /**
+ * @typedef {Omit<Viewer & Partial<EditorInjector>, 'viewer'>} ViewerThis
+ */
+
+/**
  * @constructor
+ * @this {ViewerThis}
  * @description Viewer(codeView, fullScreen, showBlocks) class
  * @param {EditorInstance} editor - The root editor instance
  */
@@ -31,8 +36,9 @@ function Viewer(editor) {
 
 Viewer.prototype = {
 	/**
+	 * @this {ViewerThis}
 	 * @description Changes to code view or wysiwyg view
-	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
+	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
 	 */
 	codeView(value) {
 		const fc = this.editor.frameContext;
@@ -112,7 +118,7 @@ Viewer.prototype = {
 			domUtils.removeClass(wrapper, 'se-code-view-status');
 		}
 
-		this.editor._checkPlaceholder();
+		this.editor._checkPlaceholder(fc);
 		domUtils.setDisabled(this.editor._codeViewDisabledButtons, value);
 
 		// document type
@@ -130,8 +136,9 @@ Viewer.prototype = {
 	},
 
 	/**
+	 * @this {ViewerThis}
 	 * @description Changes to full screen or default screen
-	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
+	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
 	 */
 	fullScreen(value) {
 		const fc = this.editor.frameContext;
@@ -283,8 +290,9 @@ Viewer.prototype = {
 	},
 
 	/**
+	 * @this {ViewerThis}
 	 * @description Add or remove the class name of "body" so that the code block is visible
-	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
+	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
 	 */
 	showBlocks(value) {
 		const fc = this.editor.frameContext;
@@ -302,6 +310,11 @@ Viewer.prototype = {
 		this.editor._resourcesStateChange(fc);
 	},
 
+	/**
+	 * @private
+	 * @this {ViewerThis}
+	 * @description Set the active class to the button of the toolbar
+	 */
 	_setButtonsActive() {
 		const fc = this.editor.frameContext;
 
@@ -336,10 +349,11 @@ Viewer.prototype = {
 	},
 
 	/**
+	 * @this {ViewerThis}
 	 * @description Prints the current content of the editor.
 	 */
 	print() {
-		const iframe = domUtils.createElement('IFRAME', { style: 'display: none;' });
+		const iframe = /** @type {HTMLIFrameElement} */ (domUtils.createElement('IFRAME', { style: 'display: none;' }));
 		this._d.body.appendChild(iframe);
 
 		const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;
@@ -402,7 +416,7 @@ Viewer.prototype = {
 			try {
 				iframe.focus();
 				// Edge, Chromium
-				if (env.isEdge || env.isChromium || this._d.documentMode || this._w.StyleMedia) {
+				if (env.isEdge || env.isChromium || this._w.StyleMedia) {
 					try {
 						iframe.contentWindow.document.execCommand('print', false, null);
 					} catch (e) {
@@ -423,6 +437,7 @@ Viewer.prototype = {
 	},
 
 	/**
+	 * @this {ViewerThis}
 	 * @description Open the preview window.
 	 */
 	preview() {
@@ -484,6 +499,7 @@ Viewer.prototype = {
 
 	/**
 	 * @private
+	 * @this {ViewerThis}
 	 * @description Resets the full-screen height of the editor.
 	 * - Updates the editor's height dynamically when in full-screen mode.
 	 */
@@ -498,6 +514,7 @@ Viewer.prototype = {
 
 	/**
 	 * @private
+	 * @this {ViewerThis}
 	 * @description Run CodeMirror Editor
 	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
 	 * @param {*} value CodeMirror params
@@ -540,6 +557,7 @@ Viewer.prototype = {
 
 	/**
 	 * @private
+	 * @this {ViewerThis}
 	 * @description Set method in the code view area
 	 * @param {string} value HTML string
 	 */
@@ -553,6 +571,7 @@ Viewer.prototype = {
 
 	/**
 	 * @private
+	 * @this {ViewerThis}
 	 * @description Get method in the code view area
 	 */
 	_getCodeView() {
@@ -565,6 +584,7 @@ Viewer.prototype = {
 
 	/**
 	 * @private
+	 * @this {ViewerThis}
 	 * @description Convert the data of the code view and put it in the WYSIWYG area.
 	 */
 	_setCodeDataToEditor() {
@@ -614,6 +634,7 @@ Viewer.prototype = {
 
 	/**
 	 * @private
+	 * @this {ViewerThis}
 	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
 	 */
 	_setEditorDataToCodeView() {
@@ -632,6 +653,7 @@ Viewer.prototype = {
 
 	/**
 	 * @private
+	 * @this {ViewerThis}
 	 * @description Adjusts the height of the code view area.
 	 * - Ensures the code block auto-resizes based on its content.
 	 */
@@ -642,8 +664,11 @@ Viewer.prototype = {
 
 	/**
 	 * @private
+	 * @this {ViewerThis}
 	 * @description Updates the line numbers for the code editor.
 	 * - Dynamically adjusts line numbers as content grows.
+	 * @param {Node} lineNumbers - Code numbers area
+	 * @param {Node} code - Code area
 	 */
 	_updateLineNumbers(lineNumbers, code) {
 		if (!lineNumbers) return;
@@ -663,8 +688,10 @@ Viewer.prototype = {
 
 	/**
 	 * @private
+	 * @this {Node} Code numbers area
 	 * @description Synchronizes scrolling of line numbers with the code editor.
 	 * - Keeps the line numbers aligned with the text.
+	 * @param {Node} codeNumbers - Code numbers textarea
 	 */
 	_scrollLineNumbers(codeNumbers) {
 		codeNumbers.scrollTop = this.scrollTop;
@@ -674,6 +701,11 @@ Viewer.prototype = {
 	constructor: Viewer
 };
 
+/**
+ * @private
+ * @description Create line numbers for the code view area
+ * @param {FrameContext} fc - Frame context
+ */
 function CreateLineNumbers(fc) {
 	const codeNumbers = fc.get('codeNumbers');
 	if (!codeNumbers) return;
@@ -692,17 +724,24 @@ function CreateLineNumbers(fc) {
 	codeNumbers.style.margin = margin || '';
 }
 
+/**
+ * @private
+ * @description Get the line height of the textarea
+ * @param {Node} textarea Textarea element
+ * @returns {number}
+ */
 function GetLineHeight(textarea) {
-	let lineHeight = env._w.getComputedStyle(textarea).lineHeight;
+	const lineHeight = env._w.getComputedStyle(textarea).lineHeight;
+	let lineHeightMatch;
 
 	if (!numbers.is(lineHeight)) {
 		const fontSize = env._w.getComputedStyle(textarea).fontSize;
-		lineHeight = numbers.get(fontSize) * 1.2;
+		lineHeightMatch = numbers.get(fontSize) * 1.2;
 	} else {
-		lineHeight = numbers.get(lineHeight);
+		lineHeightMatch = numbers.get(lineHeight);
 	}
 
-	return lineHeight;
+	return lineHeightMatch;
 }
 
 export default Viewer;

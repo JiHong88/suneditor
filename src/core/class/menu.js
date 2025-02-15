@@ -6,8 +6,12 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter } from '../../helper';
 
 /**
+ * @typedef {Omit<Menu & Partial<EditorInjector>, 'menu'>} MenuThis
+ */
+
+/**
  * @constructor
- * @this {EditorInjector & Menu}
+ * @this {MenuThis}
  * @description Dropdown and container menu management class
  * @param {EditorInstance} editor - The root editor instance
  */
@@ -44,10 +48,11 @@ function Menu(editor) {
 
 Menu.prototype = {
 	/**
+	 * @this {MenuThis}
 	 * @description Method for managing dropdown element.
 	 * - You must add the "dropdown" element using the this method at custom plugin.
 	 * @param {{key: string, type: string}} classObj Class object
-	 * @param {Element} menu Dropdown element
+	 * @param {Node} menu Dropdown element
 	 */
 	initDropdownTarget({ key, type }, menu) {
 		if (key) {
@@ -63,8 +68,9 @@ Menu.prototype = {
 	},
 
 	/**
+	 * @this {MenuThis}
 	 * @description On dropdown
-	 * @param {Element} button Dropdown's button element to call
+	 * @param {Node} button Dropdown's button element to call
 	 */
 	dropdownOn(button) {
 		this.__removeGlobalEvent();
@@ -100,6 +106,7 @@ Menu.prototype = {
 	},
 
 	/**
+	 * @this {MenuThis}
 	 * @description Off dropdown
 	 */
 	dropdownOff() {
@@ -126,8 +133,9 @@ Menu.prototype = {
 	},
 
 	/**
+	 * @this {MenuThis}
 	 * @description On menu container
-	 * @param {Element} button Container's button element to call
+	 * @param {Node} button Container's button element to call
 	 */
 	containerOn(button) {
 		this.__removeGlobalEvent();
@@ -143,6 +151,7 @@ Menu.prototype = {
 	},
 
 	/**
+	 * @this {MenuThis}
 	 * @description Off menu container
 	 */
 	containerOff() {
@@ -162,9 +171,10 @@ Menu.prototype = {
 
 	/**
 	 * @private
+	 * @this {MenuThis}
 	 * @description Set the menu position.
-	 * @param {Element} element Button element
-	 * @param {Element} menu Menu element
+	 * @param {Node} element Button element
+	 * @param {Node} menu Menu element
 	 */
 	_setMenuPosition(element, menu) {
 		menu.style.visibility = 'hidden';
@@ -179,9 +189,10 @@ Menu.prototype = {
 
 	/**
 	 * @private
+	 * @this {MenuThis}
 	 * @description Check if the element is part of a more layer
-	 * @param {Element} element The element to check
-	 * @returns {Element|null} The more layer element or null
+	 * @param {Node} element The element to check
+	 * @returns {Node|null} The more layer element or null
 	 */
 	_checkMoreLayer(element) {
 		const more = domUtils.getParentElement(element, '.se-more-layer');
@@ -194,6 +205,7 @@ Menu.prototype = {
 
 	/**
 	 * @private
+	 * @this {MenuThis}
 	 * @description Move the selected item in the dropdown menu
 	 * @param {number} num Direction and amount to move (-1 for up, 1 for down)
 	 */
@@ -215,6 +227,7 @@ Menu.prototype = {
 
 	/**
 	 * @private
+	 * @this {MenuThis}
 	 * @description Remove global event listeners
 	 */
 	__removeGlobalEvent() {
@@ -233,24 +246,28 @@ Menu.prototype = {
 };
 
 /**
- * @this {Menu}
- * @param {Event} e - Event object
+ * @private
+ * @this {MenuThis}
+ * @param {MouseEvent} e - Event object
  */
 function OnMouseDown_dropdown(e) {
-	if (domUtils.getParentElement(e.target, '.se-dropdown')) return;
+	const eventTarget = /** @type {Node} */ (e.target);
+	if (domUtils.getParentElement(eventTarget, '.se-dropdown')) return;
 	this.dropdownOff();
 }
 
 /**
- * @this {Menu}
+ * @private
+ * @this {MenuThis}
  */
 function OnMouseout_dropdown() {
 	this.index = -1;
 }
 
 /**
- * @this {Menu}
- * @param {Event} e - Event object
+ * @private
+ * @this {MenuThis}
+ * @param {KeyboardEvent} e - Event object
  */
 function OnKeyDown_dropdown(e) {
 	const keyCode = e.keyCode;
@@ -282,8 +299,9 @@ function OnKeyDown_dropdown(e) {
 }
 
 /**
- * @this {Menu}
- * @param {Event} e - Event object
+ * @private
+ * @this {MenuThis}
+ * @param {MouseEvent} e - Event object
  */
 function OnMousemove_dropdown(e) {
 	domUtils.addClass(this.currentDropdown, 'se-select-menu-mouse-move');

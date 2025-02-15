@@ -1353,8 +1353,8 @@ function DisplayLineBreak(dir, e) {
 	const component = this._lineBreakComp;
 	if (!component) return;
 
-	const isList = domUtils.isListCell(component.parentNode);
-	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.get('defaultLine'));
+	const isList = domUtils.isListCell(component.parentElement);
+	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentElement) ? 'DIV' : this.options.get('defaultLine'));
 	if (!isList) format.innerHTML = '<br>';
 
 	if (this.editor.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;

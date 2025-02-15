@@ -405,8 +405,8 @@ export function getParentElements(element, query, depth) {
 
 /**
  * @description Gets the element with "data-command" attribute among the parent elements.
- * @param {Element} target Target element
- * @returns {HTMLElement|null}
+ * @param {Node} target Target element
+ * @returns {Element|null}
  */
 export function getCommandTarget(target) {
 	while (target && !/^(UL)$/i.test(target.tagName) && !hasClass(target, 'sun-editor')) {
@@ -668,7 +668,7 @@ export function removeItem(item) {
 
 /**
  * @description Replace element
- * @param {Element} element Target element
+ * @param {Node} element Target element
  * @param {string|Element} newElement String or element of the new element to apply
  */
 export function changeElement(element, newElement) {
@@ -699,7 +699,7 @@ export function changeTxt(node, txt) {
 
 /**
  * @description Set style, if all styles are deleted, the style properties are deleted.
- * @param {HTMLElement|HTMLElement[]} elements Element to set style
+ * @param {Node|Node[]} elements Element to set style
  * @param {string} styleName Style attribute name (marginLeft, textAlign...)
  * @param {string|number} value Style value
  */
@@ -940,7 +940,7 @@ export function isInputElement(element) {
 
 /**
  * @description Check the line element is empty.
- * @param {Element} element "line" element node
+ * @param {Node} element "line" element node
  * @returns {boolean}
  */
 export function isEmptyLine(element) {
@@ -968,7 +968,7 @@ export function isUneditable(element) {
 
 /**
  * @description Checks if element can't be easily enabled
- * @param {Element} element Element to check for
+ * @param {Node} element Element to check for
  * @returns {boolean}
  */
 export function isImportantDisabled(element) {
@@ -986,7 +986,7 @@ export function isExcludeFormat(element) {
 
 /**
  * @description Get nearest scrollable parent
- * @param {Element} element Element
+ * @param {Node} element Element
  * @returns {Element|null}
  */
 export function getScrollParent(element) {
@@ -995,7 +995,7 @@ export function getScrollParent(element) {
 	}
 
 	if (element.scrollHeight > element.clientHeight) {
-		return element;
+		return /** @type {Element} */ (element);
 	} else {
 		return getScrollParent(element.parentElement);
 	}
@@ -1200,7 +1200,7 @@ export function applyInlineStylesAll(wwTarget, includeWW, styles) {
 /**
  * @description Wait for media elements to load
  * @param {number} timeout Timeout milliseconds
- * @param {Element} target Target element
+ * @param {Node} target Target element
  * @returns {Promise<void>}
  */
 function waitForMediaLoad(target, timeout = 5000) {

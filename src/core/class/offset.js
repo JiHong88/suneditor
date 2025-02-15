@@ -8,13 +8,18 @@ import { domUtils, numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
 /**
- * @typedef {Object} RectsInfo
- * @property {Object} rects - Bounding rectangle information of the selection range.
+ * @typedef {Omit<Offset & Partial<EditorInjector>, 'offset'>} OffsetThis
+ */
+
+/**
+ * @typedef {Object} RectsInfo Bounding rectangle information of the selection range.
  * @property {number} rects.left - The left position of the selection.
  * @property {number} rects.right - The right position of the selection.
  * @property {number} rects.top - The top position of the selection.
  * @property {number} rects.bottom - The bottom position of the selection.
- * @property {boolean} rects.noText - Whether the selection contains text.
+ * @property {boolean} [rects.noText] - Whether the selection contains text.
+ * @property {number} [rects.width] - The width of the selection.
+ * @property {number} [rects.height] - The height of the selection.
  */
 
 /**
@@ -43,14 +48,20 @@ import { _w, _d } from '../../helper/env';
 
 /**
  * @typedef {Object} OffsetGlobalScrollInfo
- * @property {number} top - The vertical scroll offset, representing the distance from the top of the document to the current scroll position (in pixels).
- * @property {number} left - The horizontal scroll offset, representing the distance from the left side of the document to the current scroll position (in pixels).
- * @property {number} width - The total scrollable width of the document, including content outside the viewport.
- * @property {number} height - The total scrollable height of the document, including content outside the viewport.
- * @property {number} x - The horizontal position of the scrollable area relative to the entire document.
- * @property {number} y - The vertical position of the scrollable area relative to the entire document.
- * @property {number} oh - The height of the visible viewport, representing the portion of the document currently displayed on the screen.
- * @property {number} ow - The width of the visible viewport, representing the portion of the document currently displayed on the screen.
+ * @property {number} top - Total vertical scroll distance
+ * @property {number} left - Total horizontal scroll distance
+ * @property {number} width - Total width including scrollable area
+ * @property {number} height - Total height including scrollable area
+ * @property {number} x - Horizontal offset from the top reference element
+ * @property {number} y - Vertical offset from the top reference element
+ * @property {Element|Window|null} ohOffsetEl - Element or window used as the vertical scroll reference
+ * @property {Element|Window|null} owOffsetEl - Element or window used as the horizontal scroll reference
+ * @property {number} oh - Height of the vertical scrollable area (clientHeight)
+ * @property {number} ow - Width of the horizontal scrollable area (clientWidth)
+ * @property {boolean} heightEditorRefer - Indicates if the vertical scroll reference is the editor area
+ * @property {boolean} widthEditorRefer - Indicates if the horizontal scroll reference is the editor area
+ * @property {number} ts - Top position of the height offset element relative to the viewport
+ * @property {number} ls - Left position of the width offset element relative to the viewport
  */
 
 /**
@@ -65,6 +76,7 @@ import { _w, _d } from '../../helper/env';
 
 /**
  * @constructor
+ * @this {OffsetThis}
  * @description Offset class, get the position of the element
  * @param {EditorInstance} editor - The root editor instance
  */
@@ -80,6 +92,7 @@ function Offset(editor) {
 
 Offset.prototype = {
 	/**
+	 * @this {OffsetThis}
 	 * @description Gets the position just outside the argument's internal editor (wysiwygFrame).
 	 * @param {Node} node Target node.
 	 * @returns {OffsetInfo} Position relative to the editor frame.
@@ -96,6 +109,7 @@ Offset.prototype = {
 	},
 
 	/**
+	 * @this {OffsetThis}
 	 * @description Gets the position inside the internal editor of the argument.
 	 * @param {Node} node Target node.
 	 * @returns {OffsetLocalInfo} Position relative to the WYSIWYG editor.
@@ -131,8 +145,9 @@ Offset.prototype = {
 	},
 
 	/**
+	 * @this {OffsetThis}
 	 * @description Returns the position of the argument relative to the global document.
-	 * @param {Element} element Target element.
+	 * @param {?Node=} element Target element.
 	 * @returns {OffsetGlobalInfo} Global position and scroll values.
 	 */
 	getGlobal(element) {
@@ -182,8 +197,9 @@ Offset.prototype = {
 	},
 
 	/**
+	 * @this {OffsetThis}
 	 * @description Gets the current editor-relative scroll offset.
-	 * @param {Element} element Target element.
+	 * @param {?Node=} element Target element.
 	 * @returns {OffsetGlobalScrollInfo} Global scroll information.
 	 */
 	getGlobalScroll(element) {
@@ -297,8 +313,8 @@ Offset.prototype = {
 		const clientSize = getClientSize(this.editor.frameContext.get('_wd'));
 		return {
 			top: t,
-			ts: ts,
 			left: l,
+			ts: ts,
 			ls: ls,
 			width: w,
 			height: h,
@@ -314,6 +330,7 @@ Offset.prototype = {
 	},
 
 	/**
+	 * @this {OffsetThis}
 	 * @description Get the scroll info of the WYSIWYG area.
 	 * @returns {OffsetWWScrollInfo} Scroll information within the editor.
 	 */
@@ -334,11 +351,12 @@ Offset.prototype = {
 	},
 
 	/**
+	 * @this {OffsetThis}
 	 * @description Sets the relative position of an element
-	 * @param {Element} element Element to position
-	 * @param {Element} e_container Element's root container
-	 * @param {Element} target Target element to position against
-	 * @param {Element} t_container Target's root container
+	 * @param {Node} element Element to position
+	 * @param {Node} e_container Element's root container
+	 * @param {Node} target Target element to position against
+	 * @param {Node} t_container Target's root container
 	 * @param {boolean} _reload Whether to reload position
 	 */
 	setRelPosition(element, e_container, target, t_container, _reload) {
@@ -414,13 +432,15 @@ Offset.prototype = {
 	},
 
 	/**
+	 * @this {OffsetThis}
 	 * @description Sets the absolute position of an element
-	 * @param {Element} element Element to position
-	 * @param {Element} target Target element
+	 * @param {Node} element Element to position
+	 * @param {Node} target Target element
 	 * @param {Object} params Position parameters
+	 * @param {boolean} [params.isWWTarget=false] Whether the target is within the editor's WYSIWYG area
 	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
-	 * @param {Object} params.inst Instance object of caller
+	 * @param {*} params.inst Instance object of caller
 	 * @returns {boolean} Success / Failure
 	 */
 	setAbsPosition(element, target, params) {
@@ -562,9 +582,11 @@ Offset.prototype = {
 	},
 
 	/**
+	 * @this {OffsetThis}
 	 * @description Sets the position of an element relative to a range
-	 * @param {Element} element Element to position
-	 * @param {Range} range Range to position against
+	 * @param {Node} element Element to position
+	 * @param {?Range} range Range to position against.
+	 * - if null, the current selection range is used
 	 * @param {Object} [options={}] Position options
 	 * @param {"bottom"|"top"} [options.position="bottom"] Position ('bottom'|'top')
 	 * @param {number} [options.addTop=0] Additional top offset
@@ -592,7 +614,7 @@ Offset.prototype = {
 		const toolbarHeight = element.offsetHeight;
 
 		this._setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
-		if (this.isSub && this.getGlobal(element).top - offsets.top < 0) {
+		if (this.getGlobal(element).top - offsets.top < 0) {
 			positionTop = !positionTop;
 			this._setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
 		}
@@ -622,12 +644,13 @@ Offset.prototype = {
 
 	/**
 	 * @private
+	 * @this {OffsetThis}
 	 * @description Sets the position of an element relative to the selection range in the editor.
 	 * - This method calculates the top and left offsets for the element, ensuring it
 	 * - does not overflow the editor boundaries and adjusts the arrow positioning accordingly.
 	 * @param {boolean} isDirTop - Determines whether the element should be positioned above (`true`) or below (`false`) the target.
 	 * @param {RectsInfo} rects - Bounding rectangle information of the selection range.
-	 * @param {Element} element - The element to be positioned.
+	 * @param {Node} element - The element to be positioned.
 	 * @param {number} editorLeft - The left position of the editor.
 	 * @param {number} editorWidth - The width of the editor.
 	 * @param {number} scrollLeft - The horizontal scroll offset.
@@ -676,6 +699,7 @@ Offset.prototype = {
 
 	/**
 	 * @private
+	 * @this {OffsetThis}
 	 * @description Get available space from page bottom
 	 * @returns {number} Available space
 	 */
@@ -686,6 +710,7 @@ Offset.prototype = {
 
 	/**
 	 * @private
+	 * @this {OffsetThis}
 	 * @description Calculates the vertical margin offsets for the target element relative to the editor frame.
 	 * - This method determines the top and bottom margins based on various conditions such as
 	 * - fullscreen mode, iframe usage, toolbar height, and scroll positions.
@@ -754,11 +779,12 @@ Offset.prototype = {
 
 	/**
 	 * @private
+	 * @this {OffsetThis}
 	 * @description Sets the visibility and direction of the arrow element.
 	 * - This method applies the appropriate class (`se-arrow-up` or `se-arrow-down`)
 	 * - based on the specified direction key and adjusts the visibility of the arrow.
-	 * @param {Element} arrow - The arrow element to be updated.
-	 * @param {"up"|"down"|""} key - The direction of the arrow.
+	 * @param {Node} arrow - The arrow element to be updated.
+	 * @param {string} key - The direction of the arrow. ("up"|"down"|"")
 	 * - Accepts `'up'` for an upward arrow, `'down'` for a downward arrow,
 	 * - or any other value to hide the arrow.
 	 */
@@ -778,15 +804,19 @@ Offset.prototype = {
 
 	/**
 	 * @private
+	 * @this {OffsetThis}
 	 * @description Retrieves the current window scroll position and viewport size.
 	 * - Returns an object containing the scroll offsets, viewport dimensions, and boundary rects.
-	 * @returns {Object} An object with scroll and viewport information.
-	 * @returns {number} return.top - The vertical scroll position of the window.
-	 * @returns {number} return.left - The horizontal scroll position of the window.
-	 * @returns {number} return.width - The width of the viewport.
-	 * @returns {number} return.height - The height of the viewport.
-	 * @returns {RectsInfo} return.rects - An object containing the boundary rects.
+	 * @returns {{
+	 *   top: number,
+	 *   left: number,
+	 *   width: number,
+	 *   height: number,
+	 *   bottom: number,
+	 *   rects: RectsInfo
+	 * }} An object with scroll and viewport information.
 	 */
+
 	_getWindowScroll() {
 		const viewPort = domUtils.getClientSize(_d);
 		return {
@@ -794,6 +824,7 @@ Offset.prototype = {
 			left: _w.scrollX,
 			width: viewPort.w,
 			height: viewPort.h,
+			bottom: _w.scrollY + viewPort.h,
 			rects: {
 				left: 0,
 				top: 0,
@@ -806,6 +837,7 @@ Offset.prototype = {
 
 	/**
 	 * @private
+	 * @this {OffsetThis}
 	 * @description Removes the global scroll event listener from the editor.
 	 * - Resets related scroll tracking properties.
 	 */
@@ -820,6 +852,14 @@ Offset.prototype = {
 	constructor: Offset
 };
 
+/**
+ * @private
+ * @this {OffsetThis}
+ * @param {Node} element - The element to check for a specific class name.
+ * @param {Node} e_container - The root container of the element.
+ * @param {Node} target - The target element to position against.
+ * @param {Node} t_container - The root container of the target element.
+ */
 function FixedScroll(element, e_container, target, t_container) {
 	const isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position);
 	if (!this._isFixed) {

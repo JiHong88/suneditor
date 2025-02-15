@@ -343,71 +343,71 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // });
 
 window.editor_root = suneditor.create(
-	// document.querySelector('#multi_editor_1'),
+	document.querySelector('#multi_editor_1'),
+	// {
+	// 	editor1: {
+	// 		target: document.querySelector('#multi_editor_1'),
+	// 		options: {
+	// 			value: `
+	// 			<p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+
+	// 			<p>ed1</p>
+
+	// 			<hr class="__se__solid">
+
+	// 			<p><br>
+	// 			</p>
+
+	// 			<p>ed2</p>
+
+	// 			<div class="se-component se-image-container __se__float-none">
+	// 			<figure>
+	// 				<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
+	// 			</figure>
+	// 			</div>
+
+	// 			<p>ed3</p>
+
+	// 			<p>ed4</p>
+
+	// 			<p>edend--</p>
+
+	// 			<div>					</div>
+
+	// 			`,
+	// 			placeholder: 'place1',
+	// 			height: '400px',
+	// 			width: '500px',
+	// 			iframe: true,
+	// 			// iframe_fullPage: true,
+	// 			statusbar: true,
+	// 			statusbar_resizeEnable: true
+	// 		}
+	// 	},
+	// 	editor2: {
+	// 		target: document.querySelector('#multi_editor_2'),
+	// 		options: {
+	// 			value: '<p>ed2</p>',
+	// 			placeholder: 'place21'
+	// 		}
+	// 	},
+	// 	editor3: {
+	// 		target: document.querySelector('#multi_editor_3'),
+	// 		options: {
+	// 			value: '<p>ed3</p>',
+	// 			placeholder: 'place3'
+	// 		}
+	// 	},
+	// 	editor4: {
+	// 		target: document.querySelector('#multi_editor_4'),
+	// 		options: {
+	// 			// value: '<p>ed4</p>',
+	// 			placeholder: 'place4'
+	// 		}
+	// 	}
+	// },
 	{
-		editor1: {
-			target: document.querySelector('#multi_editor_1'),
-			options: {
-				value: `
-				<p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
-
-				<p>ed1</p>
-
-				<hr class="__se__solid">
-
-				<p><br>
-				</p>
-
-				<p>ed2</p>
-
-				<div class="se-component se-image-container __se__float-none">
-				<figure>
-					<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
-				</figure>
-				</div>
-
-				<p>ed3</p>
-
-				<p>ed4</p>
-
-				<p>edend--</p>
-
-				<div>					</div>
-
-				`,
-				placeholder: 'place1',
-				height: '400px',
-				width: '500px',
-				iframe: true,
-				// iframe_fullPage: true,
-				statusbar: true,
-				statusbar_resizeEnable: true
-			}
-		},
-		editor2: {
-			target: document.querySelector('#multi_editor_2'),
-			options: {
-				value: '<p>ed2</p>',
-				placeholder: 'place21'
-			}
-		},
-		editor3: {
-			target: document.querySelector('#multi_editor_3'),
-			options: {
-				value: '<p>ed3</p>',
-				placeholder: 'place3'
-			}
-		},
-		editor4: {
-			target: document.querySelector('#multi_editor_4'),
-			options: {
-				// value: '<p>ed4</p>',
-				placeholder: 'place4'
-			}
-		}
-	},
-	{
-		mode: "inline",
+		// mode: "inline",
 		// toolbar_width: 300,
 		// textDirection: 'rtl',
 		// value: 'Common value',
@@ -790,8 +790,8 @@ window.editor_root = suneditor.create(
 		shortcuts: {
 			// bold: ['s75', 'K'],
 			italic: [],
-			image: ['73', 'I'],
-			list: ['76', 'L']
+			image: ['c+73', 'I'],
+			list: ['c+76', 'L']
 		},
 		// theme: 'dark',
 		math: {

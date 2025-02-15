@@ -135,7 +135,7 @@ Component.prototype = {
 			if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
 				const depthFormat = domUtils.getParentElement(r.container, this.format.isBlock.bind(this.format));
 				oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
-				if (oNode) formatEl = oNode.previousSibling;
+				if (oNode) formatEl = /** @type {Element} */ (oNode.previousSibling);
 			}
 			this.html.insertNode(element, { afterNode: isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
 			if (!isInline && formatEl && domUtils.isZeroWidth(formatEl)) domUtils.removeItem(formatEl);

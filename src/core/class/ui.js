@@ -7,7 +7,12 @@ import Modal from '../../modules/Modal';
 import { domUtils, converter } from '../../helper';
 
 /**
+ * @typedef {Omit<UI & Partial<EditorInjector>, 'ui'>} UIThis
+ */
+
+/**
  * @constructor
+ * @this {UIThis}
  * @description The UI class is a class that handles operations related to the user interface of SunEditor.
  * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
  * @param {EditorInstance} editor - The root editor instance
@@ -25,6 +30,7 @@ function UI(editor) {
 
 UI.prototype = {
 	/**
+	 * @this {UIThis}
 	 * @description Set "options.get('editorStyle')" style.
 	 * - Define the style of the edit area
 	 * - It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
@@ -56,6 +62,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Set the theme to the editor
 	 * @param {string} theme Theme name
 	 */
@@ -84,6 +91,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Switch to or off "ReadOnly" mode.
 	 * @param {boolean} value "readOnly" boolean value.
 	 * @param {string|undefined} rootKey Root key
@@ -98,8 +106,8 @@ UI.prototype = {
 			this._offCurrentController();
 			this._offCurrentModal();
 
-			if (this.toolbar?.currentMoreLayerActiveButton?.disabled) this.toolbar.moreLayerOff();
-			if (this.subToolbar?.currentMoreLayerActiveButton?.disabled) this.subToolbar.moreLayerOff();
+			if (this.toolbar?.currentMoreLayerActiveButton?.disabled) this.toolbar._moreLayerOff();
+			if (this.subToolbar?.currentMoreLayerActiveButton?.disabled) this.subToolbar._moreLayerOff();
 			if (this.menu?.currentDropdownActiveButton?.disabled) this.menu.dropdownOff();
 			if (this.menu?.currentContainerActiveButton?.disabled) this.menu.containerOff();
 
@@ -116,6 +124,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Disable the suneditor
 	 * @param {string|undefined} rootKey Root key
 	 */
@@ -137,6 +146,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Enable the suneditor
 	 * @param {string|undefined} rootKey Root key
 	 */
@@ -155,6 +165,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Show the suneditor
 	 * @param {string|undefined} rootKey Root key
 	 */
@@ -165,6 +176,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Hide the suneditor
 	 * @param {string|undefined} rootKey Root key
 	 */
@@ -174,6 +186,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Show loading box
 	 * @param {string=} rootKey Root key
 	 */
@@ -182,6 +195,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Hide loading box
 	 * @param {string=} rootKey Root key
 	 */
@@ -190,6 +204,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description This method disables or enables the toolbar buttons when the controller is activated or deactivated.
 	 * - When the controller is activated, the toolbar buttons are disabled; when the controller is deactivated, the buttons are enabled.
 	 * @param {boolean} active If `true`, the toolbar buttons will be disabled. If `false`, the toolbar buttons will be enabled.
@@ -205,6 +220,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Activate the transparent background "div" so that other elements are not affected during resizing.
 	 * @param {string} cursor cursor css property
 	 */
@@ -214,6 +230,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description Disabled background "div"
 	 */
 	disableBackWrapper() {
@@ -222,6 +239,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description  Open the notice panel
 	 * @param {string} text Notice message
 	 */
@@ -231,6 +249,7 @@ UI.prototype = {
 	},
 
 	/**
+	 * @this {UIThis}
 	 * @description  Close the notice panel
 	 */
 	noticeClose() {
@@ -238,10 +257,11 @@ UI.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {UIThis}
 	 * @description visible controllers
 	 * @param {boolean} value hidden/show
 	 * @param {?boolean=} lineBreakShow Line break hidden/show (default: Follows the value "value".)
-	 * @private
 	 */
 	_visibleControllers(value, lineBreakShow) {
 		const visible = value ? '' : 'hidden';
@@ -258,8 +278,9 @@ UI.prototype = {
 	},
 
 	/**
-	 * @description Off current controllers
 	 * @private
+	 * @this {UIThis}
+	 * @description Off current controllers
 	 */
 	_offCurrentController() {
 		this.component.__deselect();
@@ -267,6 +288,7 @@ UI.prototype = {
 
 	/**
 	 * @private
+	 * @this {UIThis}
 	 * @description Off controllers
 	 */
 	__offControllers() {
@@ -288,11 +310,12 @@ UI.prototype = {
 
 	/**
 	 * @private
+	 * @this {UIThis}
 	 * @description Off current modal
 	 */
 	_offCurrentModal() {
-		if (this.opendModal) {
-			this.opendModal.close();
+		if (this.editor.opendModal) {
+			this.editor.opendModal.close();
 		}
 	},
 

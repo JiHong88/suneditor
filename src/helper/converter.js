@@ -125,7 +125,7 @@ export function fontSize(to, size) {
 
 /**
  * @description Convert the node list to an array. If not, returns an empty array.
- * @param {NodeList|null} nodeList
+ * @param {NodeList|HTMLCollection|null} nodeList
  * @returns Array
  */
 export function nodeListToArray(nodeList) {
@@ -207,8 +207,8 @@ export function rgb2hex(rgba) {
 
 /**
  * @description Computes the width as a percentage of the parent's width, and returns this value rounded to two decimal places.
- * @param {Element} target
- * @param {Element|null} parentTarget
+ * @param {Node} target The target element for which to calculate the width percentage.
+ * @param {Node|null} parentTarget The parent element to use as the reference for the width calculation. If not provided, the target's parent element is used.
  * @returns {number}
  */
 export function getWidthInPercentage(target, parentTarget) {

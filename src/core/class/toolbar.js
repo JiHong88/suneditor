@@ -9,7 +9,12 @@ import { CreateToolBar, UpdateButton } from '../section/constructor';
 const { _w } = env;
 
 /**
+ * @typedef {Omit<Toolbar & Partial<EditorInjector>, 'toolbar' | 'subToolbar'>} ToolbarThis
+ */
+
+/**
  * @constructor
+ * @this {ToolbarThis}
  * @description Toolbar class
  * @param {EditorInstance} editor - The root editor instance
  * @param {Object} options - toolbar options
@@ -17,7 +22,7 @@ const { _w } = env;
  * @param {Boolean} options.balloon - balloon toolbar
  * @param {Boolean} options.inline - inline toolbar
  * @param {Boolean} options.balloonAlways - balloon toolbar always show
- * @param {Array} options.res - responsive toolbar button list
+ * @param {Array<Node>} options.res - responsive toolbar button list
  */
 function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 	CoreInjector.call(this, editor);
@@ -32,6 +37,7 @@ function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 	this._responsiveCurrentSize = 'default';
 	this._originRes = res;
 	this._rButtonArray = res;
+	this._rButtonsInfo = null;
 	this._rButtonsize = null;
 	this._sticky = false;
 	this._isViewPortSize = 'visualViewport' in _w;
@@ -50,6 +56,7 @@ function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 
 Toolbar.prototype = {
 	/**
+	 * @this {ToolbarThis}
 	 * @description Disable the toolbar
 	 */
 	disable() {
@@ -61,6 +68,7 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @this {ToolbarThis}
 	 * @description Enable the toolbar
 	 */
 	enable() {
@@ -68,6 +76,7 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @this {ToolbarThis}
 	 * @description Show the toolbar
 	 */
 	show() {
@@ -84,6 +93,7 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @this {ToolbarThis}
 	 * @description Hide the toolbar
 	 */
 	hide() {
@@ -94,7 +104,7 @@ Toolbar.prototype = {
 		} else {
 			this.context.get(this.keyName + '.main').style.display = 'none';
 			if (!this.isSub) this.editor.frameContext.get('_stickyDummy').style.display = 'none';
-			if (this.editorisBalloon) {
+			if (this._isBalloon) {
 				this._balloonOffset = {
 					top: 0,
 					left: 0
@@ -104,6 +114,7 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @this {ToolbarThis}
 	 * @description Reset buttons of the responsive toolbar.
 	 */
 	resetResponsiveToolbar() {
@@ -112,7 +123,7 @@ Toolbar.prototype = {
 		const responsiveSize = this._rButtonsize;
 		if (responsiveSize) {
 			let w = 0;
-			if (((this._isBalloon || this._isInline) && this.options.get('toolbar_width') === 'auto') || (this._isSubBalloon && this.options.get('toolbar.sub_width') === 'auto')) {
+			if (((this._isBalloon || this._isInline) && this.options.get('toolbar_width') === 'auto') || (this.editor.isSubBalloon && this.options.get('toolbar.sub_width') === 'auto')) {
 				w = this.editor.frameContext.get('topArea').offsetWidth;
 			} else {
 				w = this.context.get(this.keyName + '.main').offsetWidth;
@@ -128,13 +139,14 @@ Toolbar.prototype = {
 
 			if (this._responsiveCurrentSize !== responsiveWidth) {
 				this._responsiveCurrentSize = responsiveWidth;
-				this.setButtons(this._rButtonArray[responsiveWidth]);
+				this.setButtons(this._rButtonsInfo[responsiveWidth]);
 				// this.viewer._resetFullScreenHeight();
 			}
 		}
 	},
 
 	/**
+	 * @this {ToolbarThis}
 	 * @description Reset the buttons on the toolbar. (Editor is not reloaded)
 	 * - You cannot set a new plugin for the button.
 	 * @param {Array} buttonList Button list
@@ -147,8 +159,7 @@ Toolbar.prototype = {
 		const { options, icons, lang, isSub } = this;
 		const newToolbar = CreateToolBar(buttonList, this.plugins, options, icons, lang, true);
 
-		const shortcutss = options.get('shortcuts');
-		newToolbar.updateButtons.forEach((v) => UpdateButton(v.button, v.plugin, this.icons, this.lang, shortcutss[v.key]));
+		newToolbar.updateButtons.forEach((v) => UpdateButton(v.button, v.plugin, this.icons, this.lang));
 
 		let cmdButtons;
 		if (isSub) cmdButtons = this.editor.subAllCommandButtons = new Map();
@@ -173,6 +184,8 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Reset the sticky toolbar position based on the editor state.
 	 */
 	_resetSticky() {
@@ -205,6 +218,8 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Enable sticky toolbar mode and adjust position.
 	 */
 	_onSticky(inlineOffset) {
@@ -224,6 +239,8 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Get the viewport's top offset.
 	 * @returns {number}
 	 */
@@ -235,6 +252,8 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Disable sticky toolbar mode.
 	 */
 	_offSticky() {
@@ -251,6 +270,8 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Set up responsive behavior for the toolbar buttons.
 	 */
 	_setResponsive() {
@@ -262,7 +283,7 @@ Toolbar.prototype = {
 		this._responsiveCurrentSize = 'default';
 		const _rButtonsize = (this._rButtonsize = []);
 		const _responsiveButtons = this._originRes;
-		const buttonsObj = (this._rButtonArray = {
+		const buttonsObj = (this._rButtonsInfo = {
 			default: _responsiveButtons[0]
 		});
 
@@ -277,7 +298,10 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Show the balloon toolbar based on the current selection.
+	 * @param {?Range=} rangeObj - Selection range
 	 */
 	_showBalloon(rangeObj) {
 		if (!this._isBalloon || this.editor.opendControllers.length > 0) {
@@ -305,7 +329,11 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Adjust the balloon toolbar's position.
+	 * @param {boolean} positionTop - Whether the toolbar should be positioned above the selection
+	 * @param {Range} [range] - Selection range
 	 */
 	_setBalloonOffset(positionTop, range) {
 		const toolbar = this.context.get(this.keyName + '.main');
@@ -344,6 +372,8 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Show the inline toolbar mode.
 	 */
 	_showInline() {
@@ -367,7 +397,11 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Show a more options layer for toolbar buttons.
+	 * @param {Node} button - Button element
+	 * @param {Node} layer - More options layer element
 	 */
 	_moreLayerOn(button, layer) {
 		this._moreLayerOff();
@@ -376,6 +410,8 @@ Toolbar.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Hide the currently active more options layer.
 	 */
 	_moreLayerOff() {

@@ -145,7 +145,7 @@ export async function SAVE(editor) {
 /**
  * @description Copies formatting from selected text.
  * @param {EditorInstance} editor - The root editor instance
- * @param {Element} button - The button triggering the copy format function.
+ * @param {Node} button - The button triggering the copy format function.
  */
 export function COPY_FORMAT(editor, button) {
 	if (typeof editor._onCopyFormatInitMethod === 'function') {

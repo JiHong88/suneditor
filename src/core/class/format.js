@@ -12,8 +12,8 @@ import { domUtils, unicode, numbers, env } from '../../helper';
 /**
  * @typedef {Object} NodeStyleContainerType
  * @property {?Node=} ancestor
- * @property {Node} container
- * @property {number} offset
+ * @property {?number=} offset
+ * @property {?Node=} container
  * @property {?Node=} endContainer
  */
 
@@ -85,7 +85,7 @@ Format.prototype = {
 	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
 	 * @param {Node} node Reference node.
 	 * @param {?(current: Node) => boolean=} validation Additional validation function.
-	 * @returns {Node|null}
+	 * @returns {Element|null}
 	 */
 	getLine(node, validation) {
 		if (!node) return null;
@@ -98,7 +98,7 @@ Format.prototype = {
 		while (node) {
 			if (domUtils.isWysiwygFrame(node)) return null;
 			if (this.isBlock(node)) return node.firstElementChild;
-			if (this.isLine(node) && validation(node)) return node;
+			if (this.isLine(node) && validation(node)) return /** @type {Element} */ (node);
 
 			node = node.parentNode;
 		}
@@ -109,7 +109,7 @@ Format.prototype = {
 	/**
 	 * @this {FormatThis}
 	 * @description Replace the br-line tag of the current selection.
-	 * @param {Element} element BR-Line element (PRE..)
+	 * @param {Node} element BR-Line element (PRE..)
 	 */
 	setBrLine(element) {
 		if (!this.isBrLine(element)) {
@@ -1284,7 +1284,7 @@ Format.prototype = {
 			(isRemoveNode &&
 				(function (inst, arr) {
 					for (let n = 0, len = arr.length; n < len; n++) {
-						if (inst._isNonSplitNode(arr[n]) || inst._sn_isSizeNode(arr[n])) return true;
+						if (inst._isNonSplitNode(arr[n])) return true;
 					}
 					return false;
 				})(this, nodesToRemove));
@@ -1622,7 +1622,10 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	_isNonSplitNode(element) {
-		return element && element.nodeType !== 3 && /^(a|label|code|summary)$/i.test(typeof element === 'string' ? element : element.nodeName);
+		if (!element) return false;
+		const checkRegExp = /^(a|label|code|summary)$/i;
+		if (typeof element === 'string') return checkRegExp.test(element);
+		return element.nodeType === 1 && checkRegExp.test(element.nodeName);
 	},
 
 	/**
@@ -1633,18 +1636,21 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	_notTextNode(element) {
-		return element && element.nodeType !== 3 && (this.component.is(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(typeof element === 'string' ? element : element.nodeName));
+		if (!element) return false;
+		const checkRegExp = /^(br|input|select|canvas|img|iframe|audio|video)$/i;
+		if (typeof element === 'string') return checkRegExp.test(element);
+		return element.nodeType === 1 && (this.component.is(element) || checkRegExp.test(element.nodeName));
 	},
 
 	/**
 	 * @private
 	 * @this {FormatThis}
 	 * @description Nodes that need to be added without modification when changing text nodes
-	 * @param {Node|string} element Element to check
+	 * @param {Node} element Element to check
 	 * @returns {boolean}
 	 */
 	_isIgnoreNodeChange(element) {
-		return element && element.nodeType !== 3 && (domUtils.isNonEditable(element) || !this.isTextStyleNode(element) || this.component.is(element));
+		return element && element.nodeType === 1 && (domUtils.isNonEditable(element) || !this.isTextStyleNode(element) || this.component.is(element));
 	},
 
 	/**
@@ -1668,8 +1674,8 @@ Format.prototype = {
 
 		let first = selectedFormsts[0];
 		let last = selectedFormsts[selectedFormsts.length - 1];
-		const firstPath = domUtils.getNodePath(range.startContainer, first, null, null);
-		const lastPath = domUtils.getNodePath(range.endContainer, last, null, null);
+		const firstPath = domUtils.getNodePath(range.startContainer, first, null);
+		const lastPath = domUtils.getNodePath(range.endContainer, last, null);
 
 		// remove selected list
 		const rlist = this.removeList(selectedFormsts, false);
@@ -1695,16 +1701,16 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description Attaches a nested list structure by merging adjacent lists if applicable.
 	 * - Ensures that the nested list is placed correctly in the document structure.
-	 * @param {Element} originList The original list element where the nested list is inserted.
-	 * @param {Element} innerList The nested list element.
-	 * @param {Element} prev The previous sibling element.
-	 * @param {Element} next The next sibling element.
-	 * @param {{s: Array<number> | null, e: Array<number> | null, sl: Element | null, el: Element | null}} nodePath Object storing the start and end node paths.
+	 * @param {Node} originList The original list element where the nested list is inserted.
+	 * @param {Node} innerList The nested list element.
+	 * @param {Node} prev The previous sibling element.
+	 * @param {Node} next The next sibling element.
+	 * @param {{s: Array<number> | null, e: Array<number> | null, sl: Node | null, el: Node | null}} nodePath Object storing the start and end node paths.
 	 * - s : Start node path.
 	 * - e : End node path.
 	 * - sl : Start node's parent element.
 	 * - el : End node's parent element.
-	 * @returns {Element} The attached inner list.
+	 * @returns {Node} The attached inner list.
 	 */
 	_attachNested(originList, innerList, prev, next, nodePath) {
 		let insertPrev = false;
@@ -1882,7 +1888,7 @@ Format.prototype = {
 	 * - Returns a list with nested removed.
 	 * @param {Node} baseNode Element on which to base.
 	 * @param {boolean} all If true, it also detach all nested lists of a returned list.
-	 * @returns {Element} Result element
+	 * @returns {Node} Result element
 	 */
 	_removeNestedList(baseNode, all) {
 		const rNode = DeleteNestedList(baseNode);
@@ -2002,7 +2008,7 @@ Format.prototype = {
 		const wRegExp = RegExp;
 		function checkCss(vNode) {
 			const regExp = new wRegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
-			let style = '';
+			let style = false;
 
 			if (regExp && vNode.style.cssText.length > 0) {
 				style = regExp.test(vNode.style.cssText);
@@ -3147,6 +3153,8 @@ Format.prototype = {
 	 * @private
 	 * @this {FormatThis}
 	 * @description Return the parent maintained tag. (bind and use a util object)
+	 * @param {boolean} _isRemove is remove anchor
+	 * @param {boolean} _isSizeNode is size span node
 	 * @param {Node} element Element
 	 * @returns {Node|null}
 	 */
@@ -3336,7 +3344,7 @@ function DeleteNestedList(baseNode) {
 
 /**
  * @private
- * @param {Element} lines - Line elements
+ * @param {Array<Node>} lines - Line elements
  * @param {number} size - Margin size
  * @param {string} dir - Direction
  * @returns
