@@ -1,5 +1,5 @@
 /**
- * @fileoverview Menu class
+ * @fileoverview Toolbar Menu class
  */
 
 import CoreInjector from '../../editorInjector/_core';
@@ -92,7 +92,7 @@ Menu.prototype = {
 
 		this._bindClose_dropdown_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler.mousedown, false);
 		if (this._dropdownCommands.includes(dropdownName)) {
-			this.menus = converter.nodeListToArray(menu.querySelectorAll('.se-toolbar-btn[data-command]'));
+			this.menus = converter.nodeListToArray(menu.querySelectorAll('[data-command]'));
 			if (this.menus.length > 0) {
 				this._bindClose_dropdown_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler.keydown, false);
 				menu.addEventListener('mousemove', this.__globalEventHandler.mousemove, false);
@@ -278,6 +278,16 @@ function OnKeyDown_dropdown(e) {
 			this._moveItem(-1);
 			break;
 		case 40: // down
+			e.preventDefault();
+			e.stopPropagation();
+			this._moveItem(1);
+			break;
+		case 37: // left
+			e.preventDefault();
+			e.stopPropagation();
+			this._moveItem(-1);
+			break;
+		case 39: //right
 			e.preventDefault();
 			e.stopPropagation();
 			this._moveItem(1);
