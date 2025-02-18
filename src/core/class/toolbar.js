@@ -165,6 +165,7 @@ Toolbar.prototype = {
 		if (isSub) cmdButtons = this.editor.subAllCommandButtons = new Map();
 		else cmdButtons = this.editor.allCommandButtons = new Map();
 		this.editor.commandTargets = new Map();
+		this.editor.shortcutsKeyMap = new Map();
 		this.editor.__saveCommandButtons(cmdButtons, newToolbar.buttonTray);
 
 		this.context.get(this.keyName + '.main').replaceChild(newToolbar.buttonTray, this.context.get(this.keyName + '.buttonTray'));
