@@ -83,8 +83,8 @@ Controller.prototype = {
 	/**
 	 * @this {ControllerThis}
 	 * @description Open a modal plugin
-	 * @param {Element} target Target element
-	 * @param {Element} positionTarget Position target element
+	 * @param {Element|Range} target Target element
+	 * @param {Element} [positionTarget] Position target element
 	 * @param {Object} [params={}] params
 	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
 	 * @param {() => void=} params.initMethod Method to be called when the controller is closed.

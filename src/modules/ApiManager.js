@@ -23,11 +23,13 @@ function ApiManager(inst, params) {
 	 * @type {EditorCore}
 	 */
 	this.editor = inst.editor;
+
 	/**
 	 * @description UI class
 	 * @type {EditorCore["ui"]}
 	 */
 	this.ui = this.editor.ui;
+
 	/**
 	 * @description Caller instance key name
 	 * @type {string}

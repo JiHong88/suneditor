@@ -5,7 +5,7 @@
 		"sourceMap": true,
 		"allowJs": true,
 		"checkJs": true,
-		"noUnusedLocals": true,
+		"noUnusedLocals": false,
 		"skipLibCheck": true,
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,

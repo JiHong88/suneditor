@@ -35,7 +35,7 @@ import ApiManager from './ApiManager';
  * @property {(item: BrowserFile) => string=} drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
  * @property {Array<*>=} props - "props" argument to "drawItemHandler" function. Optional. Can be overridden in browser.
  * @property {number=} columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
- * @property {string|(() => string)=} thumbnail - Default thumbnail
+ * @property {((item: BrowserFile) => string)=} thumbnail - Default thumbnail
  */
 
 /**
