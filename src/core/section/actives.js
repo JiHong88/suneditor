@@ -16,7 +16,7 @@ let __globalEventMousedown = null;
 
 /**
  * @private
- * @this {EditorInstance}
+ * @this {EditorCore}
  * @param {Element} ww Wywsiwyg element
  * @param {Element} button Button element
  */
@@ -47,7 +47,7 @@ export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'sav
 
 /**
  * @description Selects all content in the editor.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 export function SELECT_ALL(editor) {
 	editor.ui._offCurrentController();
@@ -79,7 +79,7 @@ export function SELECT_ALL(editor) {
 
 /**
  * @description Toggles direction button active state.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {boolean} rtl - Whether the text direction is right-to-left.
  */
 export function DIR_BTN_ACTIVE(editor, rtl) {
@@ -113,7 +113,7 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 
 /**
  * @description Saves the editor content.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @returns {Promise<void>}
  */
 export async function SAVE(editor) {
@@ -144,7 +144,7 @@ export async function SAVE(editor) {
 
 /**
  * @description Copies formatting from selected text.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Node} button - The button triggering the copy format function.
  */
 export function COPY_FORMAT(editor, button) {
@@ -171,7 +171,7 @@ export function COPY_FORMAT(editor, button) {
 
 /**
  * @description Applies font styling to selected text.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {string} command - The font style command (e.g., bold, italic, underline).
  */
 export function FONT_STYLE(editor, command) {
@@ -192,7 +192,7 @@ export function FONT_STYLE(editor, command) {
 
 /**
  * @description Inserts a page break element into the editor.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 export function PAGE_BREAK(editor) {
 	const pageBreak = domUtils.createElement('DIV', { class: 'se-component se-component-line-break se-page-break' });

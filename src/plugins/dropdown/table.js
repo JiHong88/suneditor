@@ -64,7 +64,7 @@ const DEFAULT_COLOR_LIST = [
 /**
  * @class
  * @description Table Plugin
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {"x"|"y"|"xy"} [pluginOptions.scrollType='x'] - Scroll type ('x', 'y', 'xy')
  * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')

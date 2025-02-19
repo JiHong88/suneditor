@@ -27,7 +27,7 @@
  * @constructor
  * @this {ShortcutsThis}
  * @description Shortcuts class
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function Shortcuts(editor) {
 	this.editor = editor;

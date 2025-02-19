@@ -18,7 +18,7 @@ import { domUtils, numbers } from '../../helper';
  * @description Link plugin.
  * - This plugin provides link insertion and editing functionality within the editor.
  * - It also supports file uploads if an upload URL is provided.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {LinkPluginOptions} pluginOptions
  */
 function Link(editor, pluginOptions) {

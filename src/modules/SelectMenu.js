@@ -4,6 +4,10 @@ import { domUtils, env } from '../helper';
 const MENU_MIN_HEIGHT = 38;
 
 /**
+ * @typedef {SelectMenu & Partial<CoreInjector>} SelectMenuThis
+ */
+
+/**
  * @typedef {Object} SelectMenuParams
  * @property {string} position Position of the select menu, specified as "[left|right]-[middle|top|bottom]" or "[top|bottom]-[center|left|right]"
  * @property {boolean=} checkList Flag to determine if the checklist is enabled (true or false)
@@ -15,6 +19,7 @@ const MENU_MIN_HEIGHT = 38;
 
 /**
  * @constructor
+ * @this {SelectMenuThis}
  * @param {*} inst The instance object that called the constructor.
  * @param {SelectMenuParams} params Select menu options
  */
@@ -50,7 +55,7 @@ function SelectMenu(inst, params) {
 	this._bindClose_mousedown = null;
 	this._bindClose_click = null;
 	this._closeSignal = false;
-	this.__events = [];
+	this.__events = null;
 	this.__eventHandlers = {
 		mousedown: OnMousedown_list.bind(this.eventManager),
 		mousemove: OnMouseMove_list.bind(this),
@@ -62,9 +67,10 @@ function SelectMenu(inst, params) {
 
 SelectMenu.prototype = {
 	/**
+	 * @this {SelectMenuThis}
 	 * @description Creates the select menu items.
-	 * @param {Array<string>} items - Command list of selectable items.
-	 * @param {Array<Element>} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<string|Node>} items - Command list of selectable items.
+	 * @param {Array<string|Node>} [menus] - Optional list of menu display elements; defaults to `items`.
 	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';
@@ -75,7 +81,7 @@ SelectMenu.prototype = {
 				this._createFormat(html);
 				html = '';
 			}
-			html += `<li class="se-select-item" data-index="${i}">${typeof menus[i] === 'string' ? menus[i] : menus[i].outerHTML}</li>`;
+			html += `<li class="se-select-item" data-index="${i}">${typeof menus[i] === 'string' ? menus[i] : /** @type {HTMLElement} */ (menus[i]).outerHTML}</li>`;
 		}
 		this._createFormat(html);
 
@@ -85,13 +91,14 @@ SelectMenu.prototype = {
 	},
 
 	/**
+	 * @this {SelectMenuThis}
 	 * @description Initializes the select menu and attaches it to a reference element.
 	 * @param {Element} referElement - The element that triggers the select menu.
 	 * @param {(command: string) => void} selectMethod - The function to execute when an item is selected.
 	 * @param {{class: string, style: string}} [attr={}] - Additional attributes for the select menu container.
 	 */
 	on(referElement, selectMethod, attr) {
-		if (!attr) attr = {};
+		if (!attr) attr = { class: '', style: '' };
 		this._refer = referElement;
 		this._keydownTarget = domUtils.isInputElement(referElement) ? referElement : this._w;
 		this._selectMethod = selectMethod;
@@ -107,6 +114,7 @@ SelectMenu.prototype = {
 	},
 
 	/**
+	 * @this {SelectMenuThis}
 	 * @description Select menu open
 	 * @param {?string=} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
 	 * @param {?string=} onItemQuerySelector The querySelector string of the menu to be activated
@@ -124,6 +132,7 @@ SelectMenu.prototype = {
 	},
 
 	/**
+	 * @this {SelectMenuThis}
 	 * @description Select menu close
 	 */
 	close() {
@@ -136,6 +145,7 @@ SelectMenu.prototype = {
 	},
 
 	/**
+	 * @this {SelectMenuThis}
 	 * @description Get the index of the selected item
 	 * @param {number} index Item index
 	 * @returns
@@ -145,6 +155,7 @@ SelectMenu.prototype = {
 	},
 
 	/**
+	 * @this {SelectMenuThis}
 	 * @description Set the index of the selected item
 	 * @param {number} index Item index
 	 */
@@ -154,6 +165,7 @@ SelectMenu.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Appends a formatted list of items to the menu.
 	 * @param {string} html - The HTML string representing the menu items.
 	 */
@@ -163,6 +175,7 @@ SelectMenu.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Resets the menu state and removes event listeners.
 	 */
 	_init() {
@@ -178,6 +191,7 @@ SelectMenu.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Moves the selection up or down by a specified number of items.
 	 * @param {number} num - The number of items to move (negative for up, positive for down).
 	 */
@@ -191,6 +205,7 @@ SelectMenu.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Highlights and selects an item by index.
 	 * @param {number} selectIndex - The index of the item to select.
 	 */
@@ -212,9 +227,10 @@ SelectMenu.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Sets the position of the select menu relative to the reference element.
-	 * @param {["left"|"right"] | ["top"|"bottom"]} position Menu position
-	 * @param {["middle"|"top"|"bottom"] | ["center"|"left"|"right"]} subPosition Sub position
+	 * @param {string} position Menu position ("left"|"right") | ("top"|"bottom")
+	 * @param {string} subPosition Sub position ("middle"|"top"|"bottom") | ("center"|"left"|"right")
 	 * @param {string} [onItemQuerySelector] - A query selector string to highlight a specific item.
 	 * @param {boolean} [_re=false] - Whether this is a retry after adjusting the position.
 	 */
@@ -365,6 +381,7 @@ SelectMenu.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Selects an item and triggers the callback function.
 	 * @param {number} index - The index of the item to select.
 	 */
@@ -375,6 +392,7 @@ SelectMenu.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Adds event listeners for menu interactions.
 	 */
 	__addEvents() {
@@ -388,19 +406,21 @@ SelectMenu.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Removes event listeners for menu interactions.
 	 */
 	__removeEvents() {
-		if (this.__events.length === 0) return;
+		if (!this.__events) return;
 		this.form.removeEventListener('mousedown', this.__events.mousedown);
 		this.form.removeEventListener('mousemove', this.__events.mousemove);
 		this.form.removeEventListener('click', this.__events.click);
 		this._keydownTarget.removeEventListener('keydown', this.__events.keydown);
-		this.__events = [];
+		this.__events = null;
 	},
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Adds global event listeners for closing the menu.
 	 */
 	__addGlobalEvent() {
@@ -411,6 +431,7 @@ SelectMenu.prototype = {
 
 	/**
 	 * @private
+	 * @this {SelectMenuThis}
 	 * @description Removes global event listeners for closing the menu.
 	 */
 	__removeGlobalEvent() {
@@ -422,6 +443,11 @@ SelectMenu.prototype = {
 	constructor: SelectMenu
 };
 
+/**
+ * @private
+ * @this {SelectMenuThis}
+ * @param {KeyboardEvent} e - Event object
+ */
 function OnKeyDown_refer(e) {
 	let moveIndex;
 	switch (e.keyCode) {
@@ -470,47 +496,80 @@ function OnKeyDown_refer(e) {
 	if (moveIndex) this._moveItem(moveIndex);
 }
 
+/**
+ * @private
+ * @this {SelectMenuThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnMousedown_list(e) {
 	if (env.isGecko) {
-		const target = domUtils.getParentElement(e.target, '.se-select-item');
-		if (target) this._injectActiveEvent(target);
+		const eventTarget = /** @type {HTMLElement} */ (e.target);
+		const target = domUtils.getParentElement(eventTarget, '.se-select-item');
+		if (target) this.eventManager._injectActiveEvent(target);
 	}
 }
 
+/**
+ * @private
+ * @this {SelectMenuThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnMouseMove_list(e) {
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
 	domUtils.addClass(this.form, 'se-select-menu-mouse-move');
-	const index = e.target.getAttribute('data-index');
+	const index = eventTarget.getAttribute('data-index');
 	if (!index) return;
-	this.index = index * 1;
+	this.index = Number(index);
 }
 
+/**
+ * @private
+ * @this {SelectMenuThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnClick_list(e) {
-	let target = e.target;
+	let target = /** @type {HTMLElement} */ (e.target);
 	let index = null;
 
 	while (!index && !/UL/i.test(target.tagName) && !domUtils.hasClass(target, 'se-select-menu')) {
 		index = target.getAttribute('data-index');
-		target = target.parentNode;
+		target = target.parentElement;
 	}
 
 	if (!index) return;
-	this._select(index * 1);
+	this._select(Number(index));
 }
 
+/**
+ * @private
+ * @this {SelectMenuThis}
+ * @param {KeyboardEvent} e - Event object
+ */
 function CloseListener_key(e) {
 	if (!/27/.test(e.keyCode)) return;
 	this.close();
 }
 
+/**
+ * @private
+ * @this {SelectMenuThis}
+ * @param {MouseEvent} e - Event object
+ */
 function CloseListener_mousedown(e) {
-	if (this.form.contains(e.target)) return;
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	if (this.form.contains(eventTarget)) return;
 	if (e.target !== this._refer) {
 		this.close();
-	} else if (!domUtils.isInputElement(e.target)) {
+	} else if (!domUtils.isInputElement(eventTarget)) {
 		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers.click, true);
 	}
 }
 
+/**
+ * @private
+ * @this {SelectMenuThis}
+ * @param {MouseEvent} e - Event object
+ */
 function CloseListener_click(e) {
 	this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
 	if (e.target === this._refer) {

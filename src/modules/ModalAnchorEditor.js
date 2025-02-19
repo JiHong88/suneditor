@@ -6,13 +6,27 @@ import { CreateTooltipInner } from '../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
+ * @typedef {ModalAnchorEditor & Partial<EditorInjector>} ModalAnchorEditorThis
+ */
+
+/**
+ * @typedef {{default?: string, check_new_window?: string, check_bookmark?: string}} RELAttr
+ */
+
+/**
  * @typedef {Object} ModalAnchorEditorParams
  * @property {boolean} params.textToDisplay - Create Text to display input.
  * @property {string} params.title - Modal title
  * @property {boolean} params.openNewWindow - Default checked value of the "Open in new window" checkbox.
  * @property {boolean} params.noAutoPrefix - If true, disables the automatic prefixing of the host URL to the value of the link.
  * @property {boolean} params.relList - The "rel" attribute list of anchor tag.
- * @property {{default: string, check_new_window: string, check_bookmark: string}} params.defaultRel - Default "rel" attributes of anchor tag.
+ * @property {string} params.uploadUrl - File upload URL.
+ * @property {Object<string, string>} params.uploadHeaders - File upload headers.
+ * @property {number} params.uploadSizeLimit - File upload size limit.
+ * @property {number} params.uploadSingleSizeLimit - File upload single size limit.
+ * @property {string} params.acceptedFormats - File upload accepted formats.
+ * @property {boolean} params.enableFileUpload - If true, enables file upload.
+ * @property {RELAttr} params.defaultRel - Default "rel" attributes of anchor tag.
  * @example "REL" structure
 	{
 		default: 'nofollow', // Default rel
@@ -24,6 +38,7 @@ const { NO_EVENT } = env;
 
 /**
  * @constructor
+ * @this {ModalAnchorEditorThis}
  * @description Modal form Anchor tag editor
  * - Use it by inserting it into Modal in a plugin that uses Modal.
  * @param {*} inst The instance object that called the constructor.
@@ -37,6 +52,9 @@ function ModalAnchorEditor(inst, modalForm, params) {
 	// params
 	this.openNewWindow = !!params.openNewWindow;
 	this.relList = Array.isArray(params.relList) ? params.relList : [];
+	/**
+	 * @type {RELAttr}
+	 */
 	this.defaultRel = params.defaultRel || {};
 	this.noAutoPrefix = !!params.noAutoPrefix;
 	// file upload
@@ -121,6 +139,7 @@ function ModalAnchorEditor(inst, modalForm, params) {
 
 ModalAnchorEditor.prototype = {
 	/**
+	 * @this {ModalAnchorEditorThis}
 	 * @description Initialize.
 	 * - Sets the current anchor element to be edited.
 	 * @param {Element} element Modal target element
@@ -130,6 +149,7 @@ ModalAnchorEditor.prototype = {
 	},
 
 	/**
+	 * @this {ModalAnchorEditorThis}
 	 * @description Opens the anchor editor modal and populates it with data.
 	 * @param {boolean} isUpdate - Indicates whether an existing anchor is being updated (`true`) or a new one is being created (`false`).
 	 */
@@ -145,7 +165,7 @@ ModalAnchorEditor.prototype = {
 			this.displayInput.value = this.currentTarget.textContent;
 			this.titleInput.value = this.currentTarget.title;
 			this.newWindowCheck.checked = /_blank/i.test(this.currentTarget.target) ? true : false;
-			this.downloadCheck.checked = this.currentTarget.download;
+			this.downloadCheck.checked = !!this.currentTarget.download;
 		}
 
 		this._setRel(isUpdate && this.currentTarget ? this.currentTarget.rel : this.defaultRel.default || '');
@@ -153,6 +173,7 @@ ModalAnchorEditor.prototype = {
 	},
 
 	/**
+	 * @this {ModalAnchorEditorThis}
 	 * @description Creates an anchor (`<a>`) element with the specified attributes.
 	 * @param {boolean} notText - If `true`, the anchor will not contain text content.
 	 * @returns {Element|null} - The newly created anchor element, or `null` if the URL is empty.
@@ -171,7 +192,8 @@ ModalAnchorEditor.prototype = {
 	},
 
 	/**
-	 * Resets the ModalAnchorEditor to its initial state.
+	 * @this {ModalAnchorEditorThis}
+	 * @description Resets the ModalAnchorEditor to its initial state.
 	 */
 	init() {
 		this.currentTarget = null;
@@ -185,6 +207,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Updates the anchor element with new attributes.
 	 * @param {Element} anchor - The anchor (`<a>`) element to update.
 	 * @param {string} url - The URL for the anchor's `href` attribute.
@@ -223,6 +246,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Checks if the given path is an internal bookmark.
 	 * @param {string} path - The URL or anchor link.
 	 * @returns {boolean} - `true` if the path is an internal bookmark, otherwise `false`.
@@ -234,6 +258,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Updates the `rel` attribute list in the modal and preview.
 	 * @param {string} relAttr - The `rel` attribute string to set.
 	 */
@@ -261,6 +286,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Generates a list of bookmark headers within the editor.
 	 * @param {string} urlValue - The current URL input value.
 	 */
@@ -288,6 +314,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Updates the preview of the anchor link.
 	 * @param {string} value - The current URL value.
 	 */
@@ -320,6 +347,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Merges the given `rel` attribute value with the current list.
 	 * @param {string} relAttr - The `rel` attribute to merge.
 	 * @returns {string} - The updated `rel` attribute string.
@@ -344,6 +372,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Removes the specified `rel` attribute from the current list.
 	 * @param {string} relAttr - The `rel` attribute to remove.
 	 * @returns {string} - The updated `rel` attribute string.
@@ -359,6 +388,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Registers a newly uploaded file and sets its URL in the modal form.
 	 * @param {Object<string, *>} response - The response object from the file upload request.
 	 */
@@ -372,6 +402,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Handles file upload errors.
 	 * @param {Object<string, *>} response - The error response object.
 	 * @returns {Promise<void>}
@@ -386,6 +417,7 @@ ModalAnchorEditor.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalAnchorEditorThis}
 	 * @description Handles the callback after a file upload completes.
 	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object containing the response.
 	 */
@@ -404,10 +436,11 @@ ModalAnchorEditor.prototype = {
 /**
  * @private
  * @description Handles file input change events.
- * @param {Event} e - The change event object.
+ * @param {InputEvent} e - The change event object.
  */
 async function OnChangeFile(e) {
-	const files = e.target.files;
+	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	const files = eventTarget.files;
 	if (!files[0]) return;
 
 	const fileInfo = {
@@ -436,6 +469,7 @@ async function OnChangeFile(e) {
 
 /**
  * @private
+ * @this {ModalAnchorEditorThis}
  * @description Opens the `rel` attribute selection menu.
  */
 function OnClick_relbutton() {
@@ -444,6 +478,7 @@ function OnClick_relbutton() {
 
 /**
  * @private
+ * @this {ModalAnchorEditorThis}
  * @description Sets the selected bookmark as the URL.
  * @param {Element} item - The selected bookmark element.
  */
@@ -459,7 +494,7 @@ function SetHeaderBookmark(item) {
 
 /**
  * @private
- * @description Updates the `rel` attribute selection based on user input.
+ * @this {ModalAnchorEditorThis}
  * @param {Element} item - The selected `rel` attribute element.
  */
 function SetRelItem(item) {
@@ -474,23 +509,42 @@ function SetRelItem(item) {
 	this.relPreview.title = this.relPreview.textContent = current.join(', ');
 }
 
-// Event handlers
+/**
+ * @private
+ * @this {ModalAnchorEditorThis}
+ * @param {InputEvent} e - Event object
+ */
 function OnChange_displayInput(e) {
-	this._change = !!e.target.value.trim();
+	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	this._change = !!eventTarget.value.trim();
 }
 
+/**
+ * @private
+ * @this {ModalAnchorEditorThis}
+ * @param {InputEvent} e - Event object
+ */
 function OnChange_urlInput(e) {
-	const value = e.target.value.trim();
+	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	const value = eventTarget.value.trim();
 	this._setLinkPreview(value);
 	if (this._selfPathBookmark(value)) this._createBookmarkList(value);
 	else this.selectMenu_bookmark.close();
 }
 
+/**
+ * @private
+ * @this {ModalAnchorEditorThis}
+ */
 function OnFocus_urlInput() {
 	const value = this.urlInput.value;
 	if (this._selfPathBookmark(value)) this._createBookmarkList(value);
 }
 
+/**
+ * @private
+ * @this {ModalAnchorEditorThis}
+ */
 function OnClick_bookmarkButton() {
 	let url = this.urlInput.value;
 	if (this._selfPathBookmark(url)) {
@@ -511,17 +565,29 @@ function OnClick_bookmarkButton() {
 	this.urlInput.focus();
 }
 
+/**
+ * @private
+ * @this {ModalAnchorEditorThis}
+ * @param {InputEvent} e - Event object
+ */
 function OnChange_newWindowCheck(e) {
 	if (typeof this.defaultRel.check_new_window !== 'string') return;
-	if (e.target.checked) {
+	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	if (eventTarget.checked) {
 		this._setRel(this._relMerge(this.defaultRel.check_new_window));
 	} else {
 		this._setRel(this._relDelete(this.defaultRel.check_new_window));
 	}
 }
 
+/**
+ * @private
+ * @this {ModalAnchorEditorThis}
+ * @param {InputEvent} e - Event object
+ */
 function OnChange_downloadCheck(e) {
-	if (e.target.checked) {
+	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	if (eventTarget.checked) {
 		this.download.style.display = 'block';
 		this.bookmark.style.display = 'none';
 		domUtils.removeClass(this.bookmarkButton, 'active');
@@ -537,6 +603,13 @@ function OnChange_downloadCheck(e) {
 	}
 }
 
+/**
+ * @private
+ * @param {EditorCore} editor - Editor instance
+ * @param {ModalAnchorEditorParams} params - ModalAnchorEditor options
+ * @param {RELAttr[]} relList - REL attribute list
+ * @returns {HTMLElement} - Modal form element
+ */
 function CreatetModalForm(editor, params, relList) {
 	const lang = editor.lang;
 	const icons = editor.icons;

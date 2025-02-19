@@ -8,7 +8,7 @@ const { NO_EVENT } = env;
 /**
  * @class
  * @description File upload plugin
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions - plugin options
  * @param {string} pluginOptions.uploadUrl - server request url
  * @param {Object<string, string>=} pluginOptions.uploadHeaders - server request headers
@@ -204,7 +204,7 @@ FileUpload.prototype = {
 
 	/**
 	 * @description Create an "file" component using the provided files.
-	 * @param {Array<File>} fileList File object list
+	 * @param {FileList} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {

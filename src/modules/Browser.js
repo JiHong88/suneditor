@@ -3,6 +3,24 @@ import { domUtils } from '../helper';
 import ApiManager from './ApiManager';
 
 /**
+ * @typedef {Browser & Partial<CoreInjector>} BrowserThis
+ */
+
+/**
+ * @typedef {Object} BrowserFile
+ * @property {string} [src=""] - Source url
+ * @property {string} [name=""] - File name | Folder name
+ * @property {string=} thumbnail - Thumbnail url
+ * @property {string=} alt - Image alt
+ * @property {Array<string>|string=} tag - Tag name list
+ * @property {string=} type - Type (image, video, audio, etc.)
+ * @property {string=} frame - Frame name (iframe, video, etc.)
+ * @property {BrowserFile | string} [_data] - The folder's contents or an API URL.
+ * @property {boolean} [default] - Whether this folder is the default selection.
+ * @property {Object<string, *>} [meta] - Metadata
+ */
+
+/**
  * @typedef BrowserParams
  * @property {string} title - File browser window title. Required. Can be overridden in browser.
  * @property {string=} className - Class name of the file browser. Optional. Default: ''.
@@ -15,34 +33,14 @@ import ApiManager from './ApiManager';
  * @property {Object<string, string>=} searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
  * @property {string=} listClass - Class name of list div. Required. Can be overridden in browser.
  * @property {(item: BrowserFile) => string=} drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
+ * @property {Array<*>=} props - "props" argument to "drawItemHandler" function. Optional. Can be overridden in browser.
  * @property {number=} columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
  * @property {string|(() => string)=} thumbnail - Default thumbnail
  */
 
 /**
- * @typedef {Object} BrowserFile
- * @property {string} src - Source url
- * @property {string} name - Name
- * @property {string=} thumbnail - Thumbnail url
- * @property {string=} alt - Image alt
- * @property {Array<string>=} tag - Tag name list
- * @property {string=} type - Type (image, video, audio, etc.)
- * @property {string=} frame - Frame name (iframe, video, etc.)
- */
-
-/**
- * @typedef {Object} BrowserFolder
- * @property {string} name - The name of the folder.
- * @property {BrowserData | string} _data - The folder's contents or an API URL.
- * @property {boolean} [default] - Whether this folder is the default selection.
- */
-
-/**
- * @typedef {Object<string, BrowserFolder | BrowserFile[]>} BrowserData
- */
-
-/**
  * @constructor
+ * @this {BrowserThis}
  * @param {*} inst The instance object that called the constructor.
  * @param {BrowserParams} params Browser options
  */
@@ -117,6 +115,7 @@ function Browser(inst, params) {
 
 Browser.prototype = {
 	/**
+	 * @this {BrowserThis}
 	 * @description Open a file browser plugin
 	 * @param {Object} [params={}]
 	 * @param {string=} params.listClass - Class name of list div. If not, use "this.listClass".
@@ -146,6 +145,7 @@ Browser.prototype = {
 	},
 
 	/**
+	 * @this {BrowserThis}
 	 * @description Close a browser plugin
 	 * - The plugin's "init" method is called.
 	 */
@@ -157,6 +157,7 @@ Browser.prototype = {
 		this.selectedTags = [];
 		this.items = [];
 		this.folders = {};
+		/** @type {BrowserFile} */
 		this.tree = {};
 		this.data = {};
 		this.keyword = '';
@@ -168,6 +169,7 @@ Browser.prototype = {
 	},
 
 	/**
+	 * @this {BrowserThis}
 	 * @description Search files
 	 * @param {string} keyword - Search keyword
 	 */
@@ -182,16 +184,18 @@ Browser.prototype = {
 	},
 
 	/**
+	 * @this {BrowserThis}
 	 * @description Filter items by tag
 	 * @param {Array<BrowserFile>} items - Items to filter
-	 * @returns {Array<string>}
+	 * @returns {Array<BrowserFile>}
 	 */
 	tagfilter(items) {
 		const selectedTags = this.selectedTags;
-		return selectedTags.length === 0 ? items : items.filter((item) => !item.tag.some || item.tag.some((tag) => selectedTags.includes(tag)));
+		return selectedTags.length === 0 ? items : items.filter((item) => !Array.isArray(item.tag) || item.tag.some((tag) => selectedTags.includes(tag)));
 	},
 
 	/**
+	 * @this {BrowserThis}
 	 * @description Show file browser loading box
 	 */
 	showBrowserLoading() {
@@ -199,6 +203,7 @@ Browser.prototype = {
 	},
 
 	/**
+	 * @this {BrowserThis}
 	 * @description Close file browser loading box
 	 */
 	closeBrowserLoading() {
@@ -207,6 +212,7 @@ Browser.prototype = {
 
 	/**
 	 * @private
+	 * @this {BrowserThis}
 	 * @description Fetches the file list from the server.
 	 * @param {string} url - The file server URL.
 	 * @param {Object<string, string>} urlHeader - The HTTP headers for the request.
@@ -222,6 +228,7 @@ Browser.prototype = {
 
 	/**
 	 * @private
+	 * @this {BrowserThis}
 	 * @description Updates the displayed list of file items.
 	 * @param {Array<BrowserFile>} items - The file items to display.
 	 * @param {boolean} update - Whether to update the tags.
@@ -242,9 +249,7 @@ Browser.prototype = {
 		for (let i = 0, item, tags; i < len; i++) {
 			item = items[i];
 			tags = !item.tag ? [] : typeof item.tag === 'string' ? item.tag.split(',') : item.tag;
-			tags = item.tag = tags.map(function (v) {
-				return v.trim();
-			});
+			tags = item.tag = tags.map((v) => v.trim());
 			listHTML += drawItemHandler(item);
 
 			if ((i + 1) % splitSize === 0 && columns < columnSize && i + 1 < len) {
@@ -274,6 +279,7 @@ Browser.prototype = {
 
 	/**
 	 * @private
+	 * @this {BrowserThis}
 	 * @description Adds a global event listener for closing the browser.
 	 */
 	__addGlobalEvent() {
@@ -283,6 +289,7 @@ Browser.prototype = {
 
 	/**
 	 * @private
+	 * @this {BrowserThis}
 	 * @description Removes the global event listener for closing the browser.
 	 */
 	__removeGlobalEvent() {
@@ -291,8 +298,9 @@ Browser.prototype = {
 
 	/**
 	 * @private
+	 * @this {BrowserThis}
 	 * @description Renders the file items or folder structure from data.
-	 * @param {BrowserFile[]|BrowserData} data - The data representing the file structure.
+	 * @param {BrowserFile[]|BrowserFile} data - The data representing the file structure.
 	 * @returns {boolean} True if rendering was successful, false otherwise.
 	 */
 	__drowItems(data) {
@@ -326,8 +334,9 @@ Browser.prototype = {
 
 	/**
 	 * @private
+	 * @this {BrowserThis}
 	 * @description Parses folder data into a structured format.
-	 * @param {BrowserData} data - The folder data.
+	 * @param {BrowserFile} data - The folder data.
 	 * @param {string} [path] - The current path in the folder hierarchy.
 	 */
 	__parseFolderData(data, path) {
@@ -362,21 +371,23 @@ Browser.prototype = {
 		Object.entries(data).forEach(([key, value]) => {
 			if (key === '_data' || !value || typeof value !== 'object') return;
 
+			const v = /** @type {BrowserFile} */ (value);
 			const currentPath = path ? `${path}/${key}` : key;
 
 			this.folders[currentPath] = {
-				name: value.name || key,
-				meta: value.meta || {}
+				name: v.name || key,
+				meta: v.meta || {}
 			};
 
-			this.__parseFolderData(value, currentPath);
+			this.__parseFolderData(v, currentPath);
 		});
 	},
 
 	/**
 	 * @private
+	 * @this {BrowserThis}
 	 * @description Creates a nested folder list from parsed data.
-	 * @param {BrowserData} folderData - The structured folder data.
+	 * @param {BrowserFile[]|BrowserFile} folderData - The structured folder data.
 	 * @param {Element} parentElement - The parent element to append folder structure to.
 	 */
 	__createFolderList(folderData, parentElement) {
@@ -414,6 +425,11 @@ Browser.prototype = {
 	constructor: Browser
 };
 
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {XMLHttpRequest} xmlHttp - XMLHttpRequest object.
+ */
 function CallBackGet(xmlHttp) {
 	try {
 		const res = JSON.parse(xmlHttp.responseText);
@@ -431,16 +447,27 @@ function CallBackGet(xmlHttp) {
 	}
 }
 
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {*} res - response data.
+ * @param {XMLHttpRequest} xmlHttp - XMLHttpRequest object.
+ */
 function CallBackError(res, xmlHttp) {
 	this.closeBrowserLoading();
 	throw Error(`[SUNEDITOR.browser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`);
 }
 
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnClickTag(e) {
-	const target = e.target;
-	if (!domUtils.isAnchor(target)) return;
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	if (!domUtils.isAnchor(eventTarget)) return;
 
-	const tagName = target.textContent;
+	const tagName = eventTarget.textContent;
 	const selectTag = this.tagArea.querySelector('a[title="' + tagName + '"]');
 	const sTagIndex = this.selectedTags.indexOf(tagName);
 
@@ -455,36 +482,48 @@ function OnClickTag(e) {
 	this._drawListItem(this.items, false);
 }
 
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnClickFile(e) {
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+
 	e.preventDefault();
 	e.stopPropagation();
 
-	if (e.target === this.list) return;
+	if (eventTarget === this.list) return;
 
-	const target = domUtils.getCommandTarget(e.target);
+	const target = domUtils.getCommandTarget(eventTarget);
 	if (!target) return;
 
 	this.close();
 	this.selectorHandler(target);
 }
 
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnClickSide(e) {
-	const { target } = e;
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
 	e.stopPropagation();
 
-	if (/^button$/i.test(target.nodeName)) {
-		const childContainer = target.parentElement.parentElement.querySelector('.se-menu-child');
+	if (/^button$/i.test(eventTarget.nodeName)) {
+		const childContainer = eventTarget.parentElement.parentElement.querySelector('.se-menu-child');
 		if (domUtils.hasClass(childContainer, 'se-menu-hidden')) {
 			domUtils.removeClass(childContainer, 'se-menu-hidden');
-			target.innerHTML = this.openArrow;
+			eventTarget.innerHTML = this.openArrow;
 		} else {
 			domUtils.addClass(childContainer, 'se-menu-hidden');
-			target.innerHTML = this.closeArrow;
+			eventTarget.innerHTML = this.closeArrow;
 		}
 		return;
 	}
 
-	const cmdTarget = domUtils.getCommandTarget(target);
+	const cmdTarget = domUtils.getCommandTarget(eventTarget);
 	if (!cmdTarget || domUtils.hasClass(cmdTarget, 'active')) return;
 
 	const data = this.data[cmdTarget.getAttribute('data-command')];
@@ -500,37 +539,66 @@ function OnClickSide(e) {
 	}
 }
 
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnMouseDown_browser(e) {
-	if (/se-browser-inner/.test(e.target.className)) {
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	if (/se-browser-inner/.test(eventTarget.className)) {
 		this._closeSignal = true;
 	} else {
 		this._closeSignal = false;
 	}
 }
 
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnClick_browser(e) {
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
 	e.stopPropagation();
 
-	if (/close/.test(e.target.getAttribute('data-command')) || this._closeSignal) {
+	if (/close/.test(eventTarget.getAttribute('data-command')) || this._closeSignal) {
 		this.close();
 	}
 }
 
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {SubmitEvent} e - Event object
+ */
 function Search(e) {
+	const eventTarget = /** @type {HTMLElement} */ (e.currentTarget);
 	e.preventDefault();
-	this.search(e.currentTarget.querySelector('input[type="text"]').value);
+	this.search(eventTarget.querySelector('input[type="text"]').value);
 }
 
-function SideOpen({ target }) {
-	if (domUtils.hasClass(target, 'active')) {
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {MouseEvent} e - Event object
+ */
+function SideOpen(e) {
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	if (domUtils.hasClass(eventTarget, 'active')) {
 		domUtils.removeClass(this.side, 'se-side-show');
-		domUtils.removeClass(target, 'active');
+		domUtils.removeClass(eventTarget, 'active');
 	} else {
 		domUtils.addClass(this.side, 'se-side-show');
-		domUtils.addClass(target, 'active');
+		domUtils.addClass(eventTarget, 'active');
 	}
 }
 
+/**
+ * @private
+ * @this {BrowserThis}
+ * @param {MouseEvent} e - Event object
+ */
 function SideClose({ target }) {
 	if (target === this.sideOpenBtn) return;
 	if (domUtils.hasClass(this.sideOpenBtn, 'active')) {
@@ -539,6 +607,12 @@ function SideClose({ target }) {
 	}
 }
 
+/**
+ * @private
+ * @param {EditorCore} param0 - editor instance
+ * @param {boolean} useSearch - Whether to use the search function
+ * @returns {string} HTML
+ */
 function CreateHTML({ lang, icons }, useSearch) {
 	return /*html*/ `
 		<div class="se-browser-content">
@@ -580,7 +654,7 @@ function CreateHTML({ lang, icons }, useSearch) {
  * @private
  * @description Define the HTML of the item to be put in "div.se-file-item-column".
  * - Format: [ { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" } ]
- * @param {BrowserData} item Item of the response data's array
+ * @param {BrowserFile} item Item of the response data's array
  */
 function DrawItems(item) {
 	const srcName = item.src.split('/').pop();

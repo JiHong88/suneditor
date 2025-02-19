@@ -91,7 +91,7 @@ const DEFAULT_UNIT_MAP = {
  * - This plugin enables users to modify the font size of selected text within the editor.
  * - It supports various measurement units (e.g., 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%') and
  * - provides multiple interfaces: dropdown menus, direct input, and optional increment/decrement buttons.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions - Configuration options for the FontSize plugin.
  * @param {string=} [pluginOptions.sizeUnit='px'] - The unit for the font size.
  * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.

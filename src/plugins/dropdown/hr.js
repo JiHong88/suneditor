@@ -8,7 +8,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description HR Plugin
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {Array<{name: string, class: string}>} pluginOptions.items - HR list
  */
@@ -91,7 +91,7 @@ HR.prototype = {
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
 	 * @param {Event} params.event - Key event object
 	 * @param {number} params.keyCode - Key code
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 */
 	shortcut({ line, range }) {
 		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);

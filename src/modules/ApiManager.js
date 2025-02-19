@@ -18,8 +18,20 @@ import { env } from '../helper';
  * @param {ApiManagerParams=} params API options
  */
 function ApiManager(inst, params) {
+	/**
+	 * @description Editor instance
+	 * @type {EditorCore}
+	 */
 	this.editor = inst.editor;
+	/**
+	 * @description UI class
+	 * @type {EditorCore["ui"]}
+	 */
 	this.ui = this.editor.ui;
+	/**
+	 * @description Caller instance key name
+	 * @type {string}
+	 */
 	this.kind = inst.constructor.key || inst.constructor.name;
 
 	// members
@@ -137,6 +149,12 @@ ApiManager.prototype = {
 	constructor: ApiManager
 };
 
+/**
+ * @description API callback
+ * @param {XMLHttpRequest} xmlHttp - XMLHttpRequest
+ * @param {(xmlHttp: XMLHttpRequest) => Promise<void>} callBack - Callback function
+ * @param {(res: *, xmlHttp: XMLHttpRequest) => Promise<string>} errorCallBack - Error callback function
+ */
 async function CallBackApi(xmlHttp, callBack, errorCallBack) {
 	if (xmlHttp.readyState === 4) {
 		if (xmlHttp.status === 200) {

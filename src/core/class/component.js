@@ -31,7 +31,7 @@ const DIR_UP_KEYCODE = /^3[7-8]$/;
  * @constructor
  * @this {ComponentThis}
  * @description Class for managing components such as images and tables that are not in line format
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function Component(editor) {
 	CoreInjector.call(this, editor);

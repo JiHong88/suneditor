@@ -9,14 +9,14 @@
 // --- native events
 /**
  * @typedef {Object} BaseEvent
- * @property {EditorInstance} editor - The root editor instance
+ * @property {EditorCore} editor - The root editor instance
  * @property {FrameContext} frameContext - frame context
  * @property {Event} event - event object
  */
 
 /**
  * @typedef {Object} ClipboardEvent
- * @property {EditorInstance} editor - The root editor instance
+ * @property {EditorCore} editor - The root editor instance
  * @property {FrameContext} frameContext - frame context
  * @property {Event} event - event object
  * @property {string} data - drop data
@@ -114,7 +114,7 @@ export default {
 	/**
 	 * @description Event call back function
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 */
 	onload: null,
 
@@ -175,7 +175,7 @@ export default {
 	/**
 	 * @description Event function on copy
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {Event} params.event - event object
 	 * @param {Event} params.clipboardData - clipboardData
@@ -185,7 +185,7 @@ export default {
 	/**
 	 * @description Event function on cut
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {Event} params.event - event object
 	 * @param {Event} params.clipboardData - clipboardData
@@ -195,7 +195,7 @@ export default {
 	/**
 	 * @description Event call back function
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {Event} params.event - event object
 	 * @param {Event} params.data - editor data
@@ -213,7 +213,7 @@ export default {
 	 * @description Called just after the controller is positioned and displayed on the screen.
 	 * - controller : editing elements displayed on the screen [image resizing, table editor, link editor..]]
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {string} params.caller - caller plugin name
 	 * @param {ControllerInfo} params.info - info object
@@ -224,7 +224,7 @@ export default {
 	 * @description Called just after the controller is positioned and displayed on the screen.
 	 * - controller : editing elements displayed on the screen [image resizing, table editor, link editor..]]
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {string} params.caller - caller plugin name
 	 * @param {ControllerInfo} params.info - info object
@@ -234,7 +234,7 @@ export default {
 	/**
 	 * @description An event when toggling between code view and wysiwyg view.
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {boolean} params.is - code view status
 	 */
@@ -243,7 +243,7 @@ export default {
 	/**
 	 * @description An event when toggling full screen.
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {boolean} params.is - full screen status
 	 */
@@ -252,7 +252,7 @@ export default {
 	/**
 	 * @description Called when the editor is resized using the bottom bar
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {number} params.height - wysiwyg area frame height
 	 * @param {boolean} params.prevHeight - wysiwyg area previous height
@@ -264,7 +264,7 @@ export default {
 	 * @description Called after the "setToolbarButtons" invocation.
 	 * - Can be used to tweak buttons properties (useful for custom buttons)
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {Element} params.buttonTray - button tray element
 	 */
@@ -277,7 +277,7 @@ export default {
 	/**
 	 * @description Event callback function on save
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
 	 * @param {Event} params.data - editor data
 	 * @returns {Promise<boolean>}
@@ -306,7 +306,7 @@ export default {
 	/**
 	 * @description It replaces the default callback function of the image upload
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
 	 * @param {ImageInfo} params.info - info object
 	 * @returns {Promise<boolean>}
@@ -320,7 +320,7 @@ export default {
 	 * - If new "info" are returned, replaced the previous "params.info"
 	 * - If undefined is returned, it waits until "uploadHandler" is executed.
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {ImageInfo} params.info - info object
 	 * @param {(newInfo?: ImageInfo|null) => void} params.handler - handler function
 	 * @returns {Promise<boolean|undefined|ImageInfo>}
@@ -330,7 +330,7 @@ export default {
 	/**
 	 * @description Called when the editor loaded, file Current editor value
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {Array<FileManagementInfo>} infoList - info list
 	 */
 	onImageLoad: null,
@@ -338,19 +338,20 @@ export default {
 	/**
 	 * @description Called when the image is uploaded, updated, deleted
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
 	 * @param {Element|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count
+	 * @param {string} params.pluginName - plugin name
 	 */
 	onImageAction: null,
 
 	/**
 	 * @description Called when the image is upload failed
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {string} params.error - error message
 	 * @param {number=} params.limitSize - limit size
 	 * @param {number=} params.uploadSize - upload size
@@ -363,7 +364,7 @@ export default {
 	/**
 	 * @description Called before the image is deleted
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {Element} params.element - target element
 	 * @param {Element} params.container - target's container element (div)
 	 * @param {string} params.align - align value
@@ -377,7 +378,7 @@ export default {
 	/**
 	 * @description It replaces the default callback function of the video upload
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
 	 * @param {VideoInfo} params.info - info object
 	 * @returns {Promise<boolean>}
@@ -391,7 +392,7 @@ export default {
 	 * - If new "info" are returned, replaced the previous "params.info"
 	 * - If undefined is returned, it waits until "uploadHandler" is executed.
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {VideoInfo} params.info - info object
 	 * @param {(newInfo?: VideoInfo|null) => void} params.handler - handler function
 	 * @returns {Promise<boolean|undefined|VideoInfo>}
@@ -401,7 +402,7 @@ export default {
 	/**
 	 * @description Called when the editor loaded, file Current editor value
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {Array<FileManagementInfo>} infoList - info list
 	 */
 	onVideoLoad: null,
@@ -409,19 +410,20 @@ export default {
 	/**
 	 * @description Called when the video(iframe, video) is is uploaded, updated, deleted
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
 	 * @param {Element|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count
+	 * @param {string} params.pluginName - plugin name
 	 */
 	onVideoAction: null,
 
 	/**
 	 * @description Called when the video(iframe, video) upload failed
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {string} params.error - error message
 	 * @param {number=} params.limitSize - limit size
 	 * @param {number=} params.uploadSize - upload size
@@ -434,7 +436,7 @@ export default {
 	/**
 	 * @description Called before the video is deleted
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {Element} params.element - target element
 	 * @param {Element} params.container - target's container element (div)
 	 * @param {string} params.align - align value
@@ -446,7 +448,7 @@ export default {
 	/**
 	 * @description It replaces the default callback function of the audio upload
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
 	 * @param {AudioInfo} params.info - info object
 	 * @returns {Promise<boolean>}
@@ -461,7 +463,7 @@ export default {
 	 * - If new "info" are returned, replaced the previous "params.info"
 	 * - If undefined is returned, it waits until "uploadHandler" is executed.
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {AudioInfo} params.info - info object
 	 * @param {(newInfo?: AudioInfo|null) => void} params.handler - handler function
 	 * @returns {Promise<boolean|undefined|AudioInfo>}
@@ -471,7 +473,7 @@ export default {
 	/**
 	 * @description Called when the audio upload failed
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {string} params.error - error message
 	 * @param {number=} params.limitSize - limit size
 	 * @param {number=} params.uploadSize - upload size
@@ -484,7 +486,7 @@ export default {
 	/**
 	 * @description Called when the editor loaded, file Current editor value
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {Array<FileManagementInfo>} infoList - info list
 	 */
 	onAudioLoad: null,
@@ -492,19 +494,20 @@ export default {
 	/**
 	 * @description Called when the audio is is uploaded, updated, deleted
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
 	 * @param {Element|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count
+	 * @param {string} params.pluginName - plugin name
 	 */
 	onAudioAction: null,
 
 	/**
 	 * @description Called before the audio is deleted
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {Element} params.element - target element
 	 * @param {Element} params.container - target's container element (div)
 	 * @param {string} params.url - audio url
@@ -520,7 +523,7 @@ export default {
 	 * - If new "info" are returned, replaced the previous "params.info"
 	 * - If undefined is returned, it waits until "uploadHandler" is executed.
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileInfo} params.info - info object
 	 * @param {(newInfo?: FileInfo|null) => void} params.handler - handler function
 	 * @returns {Promise<boolean|undefined|AudioInfo>}
@@ -530,7 +533,7 @@ export default {
 	/**
 	 * @description Called when the editor loaded, file Current editor value
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {Array<FileManagementInfo>} infoList - info list
 	 */
 	onFileLoad: null,
@@ -538,19 +541,20 @@ export default {
 	/**
 	 * @description Called when the file is is uploaded, updated, deleted
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
 	 * @param {Element|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count
+	 * @param {string} params.pluginName - plugin name
 	 */
 	onFileAction: null,
 
 	/**
 	 * @description Called when the file is upload failed
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {string} params.error - error message
 	 * @param {number=} params.limitSize - limit size
 	 * @param {number=} params.uploadSize - upload size
@@ -563,7 +567,7 @@ export default {
 	/**
 	 * @description Called before the file is deleted
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {Element} params.element - target element
 	 * @param {Element} params.container - target's container element (div)
 	 * @param {string} params.url - file url
@@ -575,7 +579,7 @@ export default {
 	/**
 	 * @description Called before the PDF export is started
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {Element} params.target - wysiwyg editable element
 	 * @returns {Promise<boolean>}
 	 */
@@ -585,12 +589,13 @@ export default {
 	/**
 	 * @description Events that occur when actions such as uploading or deleting all files are performed in the file manager
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
 	 * @param {Element|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count
+	 * @param {string} params.pluginName - plugin name
 	 */
 	onFileManagerAction: null,
 
@@ -602,7 +607,7 @@ export default {
 	 * - If new fileList are returned,  replaced the previous fileList
 	 * - If undefined is returned, it waits until "uploadHandler" is executed.
 	 * @param {Object} params
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {EmbedInfo} params.info - info object
 	 * @param {(newInfo?: EmbedInfo|null) => void} params.handler - handler function
 	 */

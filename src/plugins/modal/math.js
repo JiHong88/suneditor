@@ -24,7 +24,7 @@ const { _w } = env;
  * @description Math plugin.
  * - This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
  * - If external library is provided, a warning is issued.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {MathPluginOptions} pluginOptions
  */
 function Math_(editor, pluginOptions) {

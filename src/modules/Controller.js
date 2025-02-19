@@ -4,17 +4,20 @@ import { _DragHandle } from '../modules';
 
 const { _w, ON_OVER_COMPONENT } = env;
 const NON_RESPONSE_KEYCODE = /^(1[7-9]|20|27|45|11[2-9]|12[0-3]|144|145)$/;
-const INDEX_0 = 2147483647;
-const INDEX_1 = 2147483646;
-const INDEX_2 = 2147483645;
+const INDEX_0 = '2147483647';
+const INDEX_1 = '2147483646';
+const INDEX_2 = '2147483645';
+
+/**
+ * @typedef {Controller & Partial<EditorInjector>} ControllerThis
+ */
 
 /**
  * @typedef {Object} ControllerInfo
- * @property {string} name The controller name
  * @property {string} position The controller position
  * @property {*} inst The controller instance
  * @property {Element} form The controller element
- * @property {Element} target The controller target element
+ * @property {Element|Range} target The controller target element
  * @property {boolean} isRangeTarget If the target is a Range, set it to true.
  * @property {boolean} notInCarrier If the controller is not in the "carrierWrapper", set it to true.
  * @property {boolean} [fixed] If the controller is fixed and should not be closed, set it to true.
@@ -34,6 +37,7 @@ const INDEX_2 = 2147483645;
 
 /**
  * @constructor
+ * @this {ControllerThis}
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  * @param {*} inst The instance object that called the constructor.
  * @param {Element} element Controller element
@@ -77,6 +81,7 @@ function Controller(inst, element, params, _name) {
 
 Controller.prototype = {
 	/**
+	 * @this {ControllerThis}
 	 * @description Open a modal plugin
 	 * @param {Element} target Target element
 	 * @param {Element} positionTarget Position target element
@@ -135,9 +140,10 @@ Controller.prototype = {
 	},
 
 	/**
+	 * @this {ControllerThis}
 	 * @description Close a modal plugin
 	 * - The plugin's "init" method is called.
-	 * @param {boolean} force If true, parent controllers are forcibly closed.
+	 * @param {boolean=} force If true, parent controllers are forcibly closed.
 	 */
 	close(force) {
 		if (!this.isOpen) return;
@@ -163,6 +169,7 @@ Controller.prototype = {
 	},
 
 	/**
+	 * @this {ControllerThis}
 	 * @description Hide controller
 	 */
 	hide() {
@@ -170,6 +177,7 @@ Controller.prototype = {
 	},
 
 	/**
+	 * @this {ControllerThis}
 	 * @description Show controller
 	 */
 	show() {
@@ -177,6 +185,7 @@ Controller.prototype = {
 	},
 
 	/**
+	 * @this {ControllerThis}
 	 * @description Reset controller position
 	 * @param {Element=} target
 	 */
@@ -186,12 +195,13 @@ Controller.prototype = {
 
 	/**
 	 * @private
+	 * @this {ControllerThis}
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
 	 * @param {Element} form Controller element
 	 * @param {Element|Range} target Controller target element
 	 * @param {boolean} isRangeTarget If the target is a Range, set it to true.
 	 */
-	_controllerOn(form, target, isRangeTarget) {
+	async _controllerOn(form, target, isRangeTarget) {
 		/** @type {ControllerInfo} */
 		const info = {
 			position: this.position,
@@ -202,7 +212,7 @@ Controller.prototype = {
 			notInCarrier: !this.carrierWrapper.contains(form)
 		};
 
-		if (this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.editor.frameContext, info }) === false) return;
+		if ((await this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.editor.frameContext, info })) === false) return;
 
 		form.style.display = 'block';
 		if (this._shadowRoot) {
@@ -225,8 +235,8 @@ Controller.prototype = {
 
 	/**
 	 * @private
+	 * @this {ControllerThis}
 	 * @description Hide controller at editor area (link button, image resize button..)
-	 * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "_controllerOn"
 	 */
 	_controllerOff() {
 		this.form.style.display = 'none';
@@ -252,6 +262,7 @@ Controller.prototype = {
 
 	/**
 	 * @private
+	 * @this {ControllerThis}
 	 * @description Specify the position of the controller.
 	 * @param {Element} controller Controller element.
 	 * @param {Element|Range} refer Element or Range that is the basis of the controller's position.
@@ -262,12 +273,12 @@ Controller.prototype = {
 		controller.style.display = 'block';
 
 		if (this.selection.isRange(refer)) {
-			if (!this.offset.setRangePosition(this.form, refer, { position: 'bottom' })) {
+			if (!this.offset.setRangePosition(this.form, /** @type {Range} */ (refer), { position: 'bottom' })) {
 				this.hide();
 				return;
 			}
 		} else {
-			if (refer && !this.offset.setAbsPosition(controller, refer, { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
+			if (refer && !this.offset.setAbsPosition(controller, /** @type {Element} */ (refer), { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
 				this.hide();
 				return;
 			}
@@ -278,6 +289,7 @@ Controller.prototype = {
 
 	/**
 	 * @private
+	 * @this {ControllerThis}
 	 * @description Adds global event listeners.
 	 * - When the controller is opened
 	 */
@@ -289,6 +301,7 @@ Controller.prototype = {
 
 	/**
 	 * @private
+	 * @this {ControllerThis}
 	 * @description Removes global event listeners.
 	 * - When the ESC key is pressed, the controller is closed.
 	 */
@@ -300,6 +313,7 @@ Controller.prototype = {
 
 	/**
 	 * @private
+	 * @this {ControllerThis}
 	 * @description Checks if the controller is fixed and should not be closed.
 	 * @returns {boolean} True if the controller is fixed.
 	 */
@@ -317,6 +331,7 @@ Controller.prototype = {
 
 	/**
 	 * @private
+	 * @this {ControllerThis}
 	 * @description Checks if the given target is within a form or controller.
 	 * @param {Element} target The target element.
 	 * @returns {boolean} True if the target is inside a form or controller.
@@ -335,14 +350,20 @@ Controller.prototype = {
 			});
 		}
 
-		return !isParentForm && (domUtils.getParentElement(target, '.se-controller') || target?.contains(this.inst._element));
+		return !isParentForm && (!!domUtils.getParentElement(target, '.se-controller') || target?.contains(this.inst._element));
 	},
 
 	constructor: Controller
 };
 
+/**
+ * @private
+ * @this {ControllerThis}
+ * @param {MouseEvent} e - Event object
+ */
 function Action(e) {
-	const target = domUtils.getCommandTarget(e.target);
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const target = domUtils.getCommandTarget(eventTarget);
 	if (!target) return;
 
 	e.stopPropagation();
@@ -351,37 +372,63 @@ function Action(e) {
 	this.inst.controllerAction(target);
 }
 
+/**
+ * @private
+ * @this {ControllerThis}
+ * @param {MouseEvent} e - Event object
+ */
 function MouseEnter(e) {
 	this.editor.currentControllerName = this.kind;
 	if (this.parents.length > 0 && this.isInsideForm) return;
-	e.target.style.zIndex = INDEX_0;
+
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	eventTarget.style.zIndex = INDEX_0;
 }
 
+/**
+ * @private
+ * @this {ControllerThis}
+ * @param {MouseEvent} e - Event object
+ */
 function MouseLeave(e) {
 	if (this.parents.length > 0 && this.isInsideForm) return;
-	e.target.style.zIndex = INDEX_2;
+
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	eventTarget.style.zIndex = INDEX_2;
 }
 
+/**
+ * @private
+ * @this {ControllerThis}
+ * @param {KeyboardEvent} e - Event object
+ */
 function CloseListener_keydown(e) {
 	if (this._checkFixed()) return;
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	if (ctrl || !NON_RESPONSE_KEYCODE.test(keyCode)) return;
 
-	if (this.form.contains(e.target) || this._checkForm(e.target)) return;
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	if (this.form.contains(eventTarget) || this._checkForm(eventTarget)) return;
 	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
 
 	this.close();
 }
 
-function CloseListener_mousedown({ target }) {
-	if (this.inst?._element?.contains(target)) {
+/**
+ * @private
+ * @this {ControllerThis}
+ * @param {KeyboardEvent} e - Event object
+ */
+function CloseListener_mousedown(e) {
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	if (this.inst?._element?.contains(eventTarget)) {
 		this.isOpen = false;
 		return;
 	}
 
 	this.isOpen = true;
-	if (target === this.inst._element || target === this.currentTarget || this._checkFixed() || this.form.contains(target) || this._checkForm(target)) {
+	if (eventTarget === this.inst._element || eventTarget === this.currentTarget || this._checkFixed() || this.form.contains(eventTarget) || this._checkForm(eventTarget)) {
 		return;
 	}
 

@@ -23,8 +23,8 @@ const { _w, ON_OVER_COMPONENT, isMobile } = env;
  * @constructor
  * @this {EventManagerThis}
  * @description Event manager, editor's all event management class
- * @param {EditorInstance} editor - The root editor instance
- * @property {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
+ * @property {EditorCore} editor - The root editor instance
  */
 function EventManager(editor) {
 	CoreInjector.call(this, editor);
@@ -325,7 +325,7 @@ EventManager.prototype = {
 	 * @private
 	 * @this {EventManagerThis}
 	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is true)
-	 * @param {Element} target Target element
+	 * @param {Node} target Target element
 	 * @private
 	 */
 	_injectActiveEvent(target) {

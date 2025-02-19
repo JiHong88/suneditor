@@ -14,7 +14,7 @@ import { addClass, removeClass, hasClass } from '../../helper/domUtils';
  * @constructor
  * @this {CharThis}
  * @description character count, character limit, etc. management class
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function Char(editor) {
 	CoreInjector.call(this, editor);

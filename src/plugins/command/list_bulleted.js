@@ -10,7 +10,7 @@ const DEFAULT_TYPE = 'disc';
 /**
  * @class
  * @description List bulleted plugin, Several types of lists are provided.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function List_bulleted(editor) {
 	// plugin bisic properties
@@ -101,7 +101,7 @@ List_bulleted.prototype = {
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
 	 * @param {Event} params.event - Key event object
 	 * @param {number} params.keyCode - Key code
-	 * @param {EditorInstance} params.editor - The root editor instance
+	 * @param {EditorCore} params.editor - The root editor instance
 	 */
 	shortcut({ range, info }) {
 		const { startContainer } = range;

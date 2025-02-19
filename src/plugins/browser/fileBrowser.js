@@ -4,7 +4,7 @@ import { Browser } from '../../modules';
 /**
  * @class
  * @description File browser plugin. Can contain any media type.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {Object<string, *>|Array<*>=} pluginOptions.data - direct data without server calls
  * @param {string} pluginOptions.url - server request url

@@ -17,7 +17,7 @@ const HEADER_KEYCODE = new Map([
 /**
  * @class
  * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {Array<string>} pluginOptions.items - Format list
  */

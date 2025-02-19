@@ -1,11 +1,11 @@
 /**
  * @description Add default properties to the editor core object.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 export default function CoreInjector(editor) {
 	/**
 	 * @description The root editor instance.
-	 * @type {EditorInstance}
+	 * @type {EditorCore}
 	 */
 	this.editor = editor;
 
@@ -17,29 +17,29 @@ export default function CoreInjector(editor) {
 	this.eventManager = editor.eventManager;
 	/**
 	 * @description The history manager instance.
-	 * @type {EditorInstance['history']}
+	 * @type {EditorCore['history']}
 	 */
 	this.history = editor.history;
 	/**
 	 * @description The events instance.
-	 * @type {EditorInstance['events']}
+	 * @type {EditorCore['events']}
 	 */
 	this.events = editor.events;
 	/**
 	 * @description The function to trigger an event.
-	 * @type {EditorInstance['triggerEvent']}
+	 * @type {EditorCore['triggerEvent']}
 	 */
 	this.triggerEvent = editor.triggerEvent;
 	/**
 	 * @description The wrapper element for carrying elements.
-	 * @type {EditorInstance['carrierWrapper']}
+	 * @type {EditorCore['carrierWrapper']}
 	 */
 	this.carrierWrapper = editor.carrierWrapper;
 
 	// environment variables
 	/**
 	 * @description The plugins used by the editor.
-	 * @type {EditorInstance['plugins']}
+	 * @type {EditorCore['plugins']}
 	 */
 	this.plugins = editor.plugins;
 	/**
@@ -49,27 +49,27 @@ export default function CoreInjector(editor) {
 	this.status = editor.status;
 	/**
 	 * @description The editor's context map.
-	 * @type {EditorInstance['context']}
+	 * @type {EditorCore['context']}
 	 */
 	this.context = editor.context;
 	/**
 	 * @description The editor's options map.
-	 * @type {EditorInstance['options']}
+	 * @type {EditorCore['options']}
 	 */
 	this.options = editor.options;
 	/**
 	 * @description The editor's icons.
-	 * @type {EditorInstance['icons']}
+	 * @type {EditorCore['icons']}
 	 */
 	this.icons = editor.icons;
 	/**
 	 * @description The language settings.
-	 * @type {EditorInstance['lang']}
+	 * @type {EditorCore['lang']}
 	 */
 	this.lang = editor.lang;
 	/**
 	 * @description editor.frameRoots map.
-	 * @type {EditorInstance['frameRoots']}
+	 * @type {EditorCore['frameRoots']}
 	 */
 	this.frameRoots = editor.frameRoots;
 
@@ -86,7 +86,7 @@ export default function CoreInjector(editor) {
 	this._d = editor._d;
 	/**
 	 * @description The shadow root object (if any).
-	 * @type {EditorInstance['_shadowRoot']}
+	 * @type {EditorCore['_shadowRoot']}
 	 */
 	this._shadowRoot = editor._shadowRoot;
 }

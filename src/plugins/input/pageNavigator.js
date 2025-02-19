@@ -8,7 +8,7 @@ import { domUtils } from '../../helper';
  * - It features an input field for entering the desired page number and a display element showing
  * - the total number of pages. When the user changes the value in the input field, the plugin triggers
  * - a page navigation event through the editor's document context.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function PageNavigator(editor) {
 	EditorInjector.call(this, editor);

@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Blockquote plugin
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function Blockquote(editor) {
 	EditorInjector.call(this, editor);

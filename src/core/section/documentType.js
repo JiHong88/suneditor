@@ -15,7 +15,7 @@ const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS
 /**
  * @constructor
  * @description DocumentType, page, header management class
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {FrameContext} fc - frame context object
  */
 function DocumentType(editor, fc) {

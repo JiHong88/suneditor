@@ -40,7 +40,7 @@ const { NO_EVENT } = env;
  * @description Video plugin.
  * - This plugin provides video embedding functionality within the editor.
  * - It also supports embedding from popular video services
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {VideoPluginOptions} pluginOptions
  */
 function Video(editor, pluginOptions) {
@@ -660,7 +660,7 @@ Video.prototype = {
 
 	/**
 	 * @description Create an "video" component using the provided files.
-	 * @param {Array<File>} fileList File object list
+	 * @param {FileList} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
@@ -852,7 +852,7 @@ Video.prototype = {
 	 * @private
 	 * @description Uploads a video to the server using an external upload handler.
 	 * @param {VideoInfo} info - Video information object.
-	 * @param {Array<File>} files - The video files to upload.
+	 * @param {FileList} files - The video files to upload.
 	 */
 	_serverUpload(info, files) {
 		if (!files) return;

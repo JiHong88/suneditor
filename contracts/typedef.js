@@ -10,11 +10,14 @@
 
 // --------------------------------------------------------- [Editor] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('../src/core/editor').default} EditorInstance
+ * @typedef {import('../src/core/editor').default} EditorCore
  */
 
 /**
- * @typedef {import('../src//editorInjector').default} EditorInjector
+ * @typedef {import('../src/editorInjector').default} EditorInjector
+ */
+/**
+ * @typedef {import('../src/editorInjector/_core').default} CoreInjector
  */
 
 /**

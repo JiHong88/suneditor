@@ -13,7 +13,7 @@ import { domUtils, converter } from '../../helper';
  * @constructor
  * @this {MenuThis}
  * @description Dropdown and container menu management class
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function Menu(editor) {
 	CoreInjector.call(this, editor);

@@ -62,6 +62,10 @@ const DEFAULT_COLOR_LIST = [
 const DEFAULLT_COLOR_SPLITNUM = 9;
 
 /**
+ * @typedef {ColorPicker & Partial<CoreInjector>} ColorPickerThis
+ */
+
+/**
  * @typedef {import('./HueSlider').HueSliderParams} HueSliderParams
  */
 
@@ -81,6 +85,7 @@ const DEFAULLT_COLOR_SPLITNUM = 9;
 
 /**
  * @constructor
+ * @this {ColorPickerThis}
  * @description Create a color picker element and register for related events. (this.target)
  * - When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
  * @param {*} inst The instance object that called the constructor.
@@ -133,6 +138,7 @@ function ColorPicker(inst, styles, params) {
 
 ColorPicker.prototype = {
 	/**
+	 * @this {ColorPickerThis}
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node
 	 * @param {string|null} target target
@@ -162,6 +168,7 @@ ColorPicker.prototype = {
 	},
 
 	/**
+	 * @this {ColorPickerThis}
 	 * @description Store color values
 	 * @param {string} hexColorStr Hax color value
 	 */
@@ -171,6 +178,7 @@ ColorPicker.prototype = {
 	},
 
 	/**
+	 * @this {ColorPickerThis}
 	 * @description Close hue slider
 	 */
 	hueSliderClose() {
@@ -178,9 +186,10 @@ ColorPicker.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ColorPickerThis}
 	 * @description Set color at input element
 	 * @param {string} hexColorStr Hax color value
-	 * @private
 	 */
 	_setInputText(hexColorStr) {
 		hexColorStr = /^#/.test(hexColorStr) ? hexColorStr : '#' + hexColorStr;
@@ -189,10 +198,11 @@ ColorPicker.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ColorPickerThis}
 	 * @description Gets color value at color property of node
 	 * @param {Node} node Selected node
 	 * @returns {string}
-	 * @private
 	 */
 	_getColorInNode(node) {
 		let findColor = '';
@@ -207,6 +217,8 @@ ColorPicker.prototype = {
 	},
 
 	/**
+	 * @private
+	 * @this {ColorPickerThis}
 	 * @description Converts color values of other formats to hex color values and returns.
 	 * @param {string} colorName Color value
 	 * @returns {string}
@@ -221,11 +233,12 @@ ColorPicker.prototype = {
 				return parseInt(a, 10);
 			});
 		domUtils.removeItem(temp);
-		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1) : false;
+		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1) : '';
 	},
 
 	/**
 	 * @editorMethod Modules.HueSlider
+	 * @this {ColorPickerThis}
 	 * @description This method is called when the color is selected in the hue slider.
 	 * @param {HueSliderColor} color - Color object
 	 */
@@ -235,6 +248,7 @@ ColorPicker.prototype = {
 
 	/**
 	 * @editorMethod Modules.HueSlider
+	 * @this {ColorPickerThis}
 	 * @description This method is called when the hue slider is closed.
 	 */
 	hueSliderCancelAction() {

@@ -7,7 +7,7 @@ const { _d } = env;
 /**
  * @class
  * @description Export PDF plugin
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions - plugin options
  * @param {string} pluginOptions.apiUrl - server request url
  * @param {string} pluginOptions.fileName - file name

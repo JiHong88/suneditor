@@ -16,7 +16,7 @@ const { _w } = env;
  * @constructor
  * @this {ToolbarThis}
  * @description Toolbar class
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} options - toolbar options
  * @param {String} options.keyName - toolbar key name
  * @param {Boolean} options.balloon - balloon toolbar

@@ -11,7 +11,7 @@ const { debounce } = converter;
  * - Displays a mention list when the trigger character is typed.
  * - Supports fetching mention data from an API or a predefined data array.
  * - Uses caching for optimized performance.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {string=} [pluginOptions.triggerText="@"] The character that triggers the mention list. Default is '@'.
  * @param {number=} [pluginOptions.limitSize=5] The number of items to display in the mention list. Default is 5.

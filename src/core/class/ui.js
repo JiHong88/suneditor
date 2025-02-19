@@ -15,7 +15,7 @@ import { domUtils, converter } from '../../helper';
  * @this {UIThis}
  * @description The UI class is a class that handles operations related to the user interface of SunEditor.
  * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function UI(editor) {
 	CoreInjector.call(this, editor);

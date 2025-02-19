@@ -16,7 +16,7 @@ const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|da
  * @constructor
  * @this {HTMLThis}
  * @description All HTML related classes involved in the editing area
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function HTML(editor) {
 	CoreInjector.call(this, editor);

@@ -29,7 +29,7 @@ const { _w, isMobile } = env;
 /**
  * @class
  * @description Drawing modal plugin.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {DrawingPluginOptions} pluginOptions
  */
 function Drawing(editor, pluginOptions) {

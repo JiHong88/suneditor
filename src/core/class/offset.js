@@ -78,7 +78,7 @@ import { _w, _d } from '../../helper/env';
  * @constructor
  * @this {OffsetThis}
  * @description Offset class, get the position of the element
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function Offset(editor) {
 	CoreInjector.call(this, editor);

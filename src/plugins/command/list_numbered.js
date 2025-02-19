@@ -10,7 +10,7 @@ const DEFAULT_TYPE = 'decimal';
 /**
  * @class
  * @description List numbered plugin, Several types of lists are provided.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function List_numbered(editor) {
 	// plugin bisic properties

@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Layout Plugin, Apply layout to the entire editor.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {Array<{name: string, html: string}>} pluginOptions.items - Layout list
  */

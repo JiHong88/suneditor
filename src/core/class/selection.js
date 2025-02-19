@@ -17,7 +17,7 @@ import { domUtils, unicode, env } from '../../helper';
  * @constructor
  * @this {SelectionThis}
  * @description Selection, Range related class
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function Selection_(editor) {
 	CoreInjector.call(this, editor);

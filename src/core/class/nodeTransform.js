@@ -13,7 +13,7 @@ import { domUtils, unicode, numbers } from '../../helper';
  * @constructor
  * @this {NodeTransformThis}
  * @description Node utility class. split, merge, etc.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function NodeTransform(editor) {
 	CoreInjector.call(this, editor);

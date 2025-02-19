@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Line height Plugin
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {Array<{text: string, value: number}>} pluginOptions.items - Line height list
  */

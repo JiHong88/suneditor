@@ -47,7 +47,7 @@ const { NO_EVENT, _w } = env;
  * @class
  * @description Embed modal plugin.
  * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {EmbedPluginOptions} pluginOptions
  */
 function Embed(editor, pluginOptions) {

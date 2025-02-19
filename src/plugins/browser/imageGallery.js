@@ -4,7 +4,7 @@ import { Browser } from '../../modules';
 /**
  * @class
  * @description Image gallery plugin
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {Array<*>=} pluginOptions.data - direct data without server calls
  * @param {string=} pluginOptions.url - server request url

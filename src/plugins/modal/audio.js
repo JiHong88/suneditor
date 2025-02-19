@@ -26,7 +26,7 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
 /**
  * @class
  * @description Audio modal plugin.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {AudioPluginOptions} pluginOptions
  */
 function Audio_(editor, pluginOptions) {
@@ -284,7 +284,7 @@ Audio_.prototype = {
 
 	/**
 	 * @description Create an "audio" component using the provided files.
-	 * @param {Array<File>} fileList File object list
+	 * @param {FileList} fileList File object list
 	 * @returns {boolean} If return false, the file upload will be canceled
 	 * @returns {Promise<boolean>}
 	 */
@@ -462,7 +462,7 @@ Audio_.prototype = {
 	 * @description Uploads audio files to the server.
 	 * - Sends a request to the configured upload URL and processes the response.
 	 * @param {AudioInfo} info - Upload metadata, including `files` and `isUpdate`.
-	 * @param {Array<File>} files - The files to be uploaded.
+	 * @param {FileList} files - The files to be uploaded.
 	 */
 	_serverUpload(info, files) {
 		if (!files) return;

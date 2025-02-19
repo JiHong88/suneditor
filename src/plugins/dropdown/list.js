@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description List Plugin (OL, UL)
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function List(editor) {
 	// plugin bisic properties

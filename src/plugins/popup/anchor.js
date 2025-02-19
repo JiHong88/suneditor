@@ -8,7 +8,7 @@ const { _w } = env;
  * @class
  * @description Anchor plugin
  * - Allows you to create, edit, and delete elements that act as anchors (bookmarks) within a document.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function Anchor(editor) {
 	EditorInjector.call(this, editor);

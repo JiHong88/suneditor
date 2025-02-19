@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description A plugin to style lines using classes.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {Array<string|{name: string, class: string, _class: string}>} pluginOptions.items - Paragraph item list
  * @example

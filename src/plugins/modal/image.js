@@ -33,7 +33,7 @@ const { NO_EVENT } = env;
  * @class
  * @description Image plugin.
  * - This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {ImagePluginOptions} pluginOptions
  */
 function Image_(editor, pluginOptions) {
@@ -454,7 +454,7 @@ Image_.prototype = {
 
 	/**
 	 * @description Create an "image" component using the provided files.
-	 * @param {Array<File>} fileList File object list
+	 * @param {FileList} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
@@ -958,7 +958,7 @@ Image_.prototype = {
 	 * @private
 	 * @description Uploads the image to the server.
 	 * @param {ImageInfo} info - Image upload info.
-	 * @param {Array<File>} files - List of image files.
+	 * @param {FileList} files - List of image files.
 	 */
 	_serverUpload(info, files) {
 		if (!files) return;
@@ -975,7 +975,7 @@ Image_.prototype = {
 	/**
 	 * @private
 	 * @description Converts an image file to Base64 and inserts it into the editor.
-	 * @param {Array<File>} files - List of image files.
+	 * @param {FileList} files - List of image files.
 	 * @param {Element|null} anchor - Optional anchor wrapping the image.
 	 * @param {string} width - Image width.
 	 * @param {string} height - Image height.

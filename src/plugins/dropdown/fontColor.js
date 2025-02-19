@@ -5,7 +5,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Font color plugin
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {Array<string|{value: string, name: string}>} pluginOptions.items - Color list
  * @param {number} pluginOptions.splitNum - Number of colors per line

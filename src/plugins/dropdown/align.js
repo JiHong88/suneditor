@@ -11,7 +11,7 @@ class Align extends EditorInjector {
 	static className = '';
 
 	/**
-	 * @param {EditorInstance} editor - The root editor instance
+	 * @param {EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {Array.<"right"|"center"|"left"|"justify">} pluginOptions.items - Align items
 	 */

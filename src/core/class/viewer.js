@@ -13,7 +13,7 @@ import { domUtils, env, converter, numbers } from '../../helper';
  * @constructor
  * @this {ViewerThis}
  * @description Viewer(codeView, fullScreen, showBlocks) class
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function Viewer(editor) {
 	CoreInjector.call(this, editor);

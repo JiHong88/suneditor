@@ -8,7 +8,7 @@ import { numbers } from '../../helper';
 
 /**
  * @description History stack closure
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 export default function History(editor) {
 	const frameRoots = editor.frameRoots;

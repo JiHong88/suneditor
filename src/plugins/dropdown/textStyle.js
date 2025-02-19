@@ -4,7 +4,7 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Text style Plugin, Applies a tag that specifies text styles to a selection.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  * @param {Object} pluginOptions
  * @param {Array<{name: string, html: string}>} pluginOptions.items - Template list
  */

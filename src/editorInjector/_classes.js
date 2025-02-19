@@ -1,35 +1,35 @@
 /**
  * @private
  * @description Add all inner classes to the editor instance.
- * @param {EditorInstance} editor - The root editor instance
+ * @param {EditorCore} editor - The root editor instance
  */
 function ClassInjector(editor) {
-	/** @description Toolbar class instance @type {EditorInstance['toolbar']} */
+	/** @description Toolbar class instance @type {EditorCore['toolbar']} */
 	this.toolbar = editor.toolbar;
-	/** @description Sub-Toolbar class instance @type {EditorInstance['subToolbar']|null} */
+	/** @description Sub-Toolbar class instance @type {EditorCore['subToolbar']|null} */
 	this.subToolbar = null;
 	if (editor.subToolbar) this.subToolbar = editor.subToolbar;
-	/** @description Char class instance @type {EditorInstance['char']} */
+	/** @description Char class instance @type {EditorCore['char']} */
 	this.char = editor.char;
-	/** @description Component class instance @type {EditorInstance['component']} */
+	/** @description Component class instance @type {EditorCore['component']} */
 	this.component = editor.component;
-	/** @description Format class instance @type {EditorInstance['format']} */
+	/** @description Format class instance @type {EditorCore['format']} */
 	this.format = editor.format;
-	/** @description HTML class instance @type {EditorInstance['html']} */
+	/** @description HTML class instance @type {EditorCore['html']} */
 	this.html = editor.html;
-	/** @description Menu class instance @type {EditorInstance['menu']} */
+	/** @description Menu class instance @type {EditorCore['menu']} */
 	this.menu = editor.menu;
-	/** @description NodeTransform class instance @type {EditorInstance['nodeTransform']} */
+	/** @description NodeTransform class instance @type {EditorCore['nodeTransform']} */
 	this.nodeTransform = editor.nodeTransform;
-	/** @description Offset class instance @type {EditorInstance['offset']} */
+	/** @description Offset class instance @type {EditorCore['offset']} */
 	this.offset = editor.offset;
-	/** @description Selection class instance @type {EditorInstance['selection']} */
+	/** @description Selection class instance @type {EditorCore['selection']} */
 	this.selection = editor.selection;
-	/** @description Shortcuts class instance @type {EditorInstance['shortcuts']} */
+	/** @description Shortcuts class instance @type {EditorCore['shortcuts']} */
 	this.shortcuts = editor.shortcuts;
-	/** @description UI class instance @type {EditorInstance['ui']} */
+	/** @description UI class instance @type {EditorCore['ui']} */
 	this.ui = editor.ui;
-	/** @description Viewer class instance @type {EditorInstance['viewer']} */
+	/** @description Viewer class instance @type {EditorCore['viewer']} */
 	this.viewer = editor.viewer;
 }
 

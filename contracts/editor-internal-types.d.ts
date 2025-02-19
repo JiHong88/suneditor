@@ -30,6 +30,13 @@ declare global {
 		value: string;
 		style: CSSStyleDeclaration;
 		children: HTMLCollection;
+		checked: boolean;
+		download: string;
+		href: string;
+		src: string;
+		target: string;
+		title: string;
+		rel: string;
 
 		// Navigation
 		nextElementSibling: Element | null;
@@ -40,13 +47,13 @@ declare global {
 		// Attribute management
 		attributes: NamedNodeMap;
 		getAttribute(name: string): string | null;
-		setAttribute(name: string, value: string): void;
+		setAttribute(name: string, value: string | number): void;
 		hasAttribute(name: string): boolean;
 		removeAttribute(name: string): void;
 
 		// Node manipulation methods
-		querySelector<T extends Node = Node>(selectors: string): T | null;
-		querySelectorAll<T extends Node = Node>(selectors: string): NodeListOf<T>;
+		querySelector<T extends Element = Element>(selectors: string): T | null;
+		querySelectorAll<T extends Element = Element>(selectors: string): NodeListOf<T>;
 
 		// Text node methods
 		substringData(offset: number, count: number): string;
@@ -81,18 +88,19 @@ declare global {
 		classList: DOMTokenList;
 		children: HTMLCollection;
 
-		// Navigation specific to Element (요소 간 네비게이션, 반환타입은 Element)
+		// Navigation specific to Element
 		nextElementSibling: Element | null;
 		previousElementSibling: Element | null;
 		firstElementChild: Element | null;
 		lastElementChild: Element | null;
 
-		// Attribute management (속성(attribute) 관리)
+		// Attribute management
 		attributes: NamedNodeMap;
 		getAttribute(name: string): string | null;
-		setAttribute(name: string, value: string): void;
+		setAttribute(name: string, value: string | number): void;
 		hasAttribute(name: string): boolean;
 		removeAttribute(name: string): void;
+		click(): void;
 	}
 
 	interface Text extends Node {

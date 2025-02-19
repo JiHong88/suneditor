@@ -6,13 +6,18 @@ const { _w } = env;
 const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize', wRTL: 'ns-resize', hRTL: 'ew-resize', cRTL: 'nesw-resize' };
 
 /**
+ * @typedef {Modal & Partial<EditorInjector>} ModalThis
+ */
+
+/**
  * @typedef {import('../core/class/offset').OffsetGlobalInfo} OffsetGlobalInfo
  */
 
 /**
  * @constructor
+ * @this {ModalThis}
  * @description Modal window module
- * @param {*} inst The instance object that called the constructor.
+ * @param {* & {editor: EditorCore}} inst The instance object that called the constructor.
  * @param {Element} element Modal element
  */
 function Modal(inst, element) {
@@ -66,6 +71,7 @@ function Modal(inst, element) {
 
 Modal.prototype = {
 	/**
+	 * @this {ModalThis}
 	 * @description Open a modal plugin
 	 * - The plugin's "init" method is called.
 	 */
@@ -101,6 +107,7 @@ Modal.prototype = {
 	},
 
 	/**
+	 * @this {ModalThis}
 	 * @description Close a modal plugin
 	 * - The plugin's "init" and "off" method is called.
 	 */
@@ -126,6 +133,7 @@ Modal.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalThis}
 	 * @description Fixes the current controller's display state when the modal is opened or closed.
 	 * @param {boolean} fixed - Whether to fix or unfix the controller.
 	 */
@@ -139,6 +147,7 @@ Modal.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalThis}
 	 * @description Saves the current offset position of the modal for resizing calculations.
 	 * @returns {OffsetGlobalInfo} Offset values including top and left positions. (offset.getGlobal)
 	 */
@@ -151,6 +160,7 @@ Modal.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalThis}
 	 * @description Adds global event listeners for resizing the modal.
 	 * @param {string} dir - The direction in which resizing is occurring.
 	 */
@@ -163,6 +173,7 @@ Modal.prototype = {
 
 	/**
 	 * @private
+	 * @this {ModalThis}
 	 * @description Removes global event listeners related to modal resizing.
 	 */
 	__removeGlobalEvent() {
@@ -175,6 +186,8 @@ Modal.prototype = {
 };
 
 /**
+ * @private
+ * @this {ModalThis}
  * The loading bar is executed before "modalAction" is executed.
  * return type -
  * true : the loading bar and modal window are closed.
@@ -182,6 +195,7 @@ Modal.prototype = {
  * undefined : only the modal window is closed.
  * -
  * exception occurs : the modal window and loading bar are closed.
+ * @param {SubmitEvent} e - Event object
  */
 async function Action(e) {
 	e.preventDefault();
@@ -206,23 +220,47 @@ async function Action(e) {
 	}
 }
 
+/**
+ * @private
+ * @this {ModalThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnClick_dialog(e) {
-	if (/close/.test(e.target.getAttribute('data-command')) || e.target === this._modalInner) {
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	if (/close/.test(eventTarget.getAttribute('data-command')) || e.target === this._modalInner) {
 		this.close();
 	}
 }
 
+/**
+ * @private
+ * @this {ModalThis}
+ * @param {KeyboardEvent} e - Event object
+ */
 function CloseListener(e) {
 	if (!/27/.test(e.keyCode)) return;
 	this.close();
 }
 
-/** Resize events */
+/** ---------- Resize events ---------- */
+
+/**
+ * @private
+ * @this {ModalThis}
+ * @param {string} dir - The direction in which the resize handle is located.
+ * @param {MouseEvent} e - Event object
+ */
 function OnResizeMouseDown(dir, e) {
-	domUtils.addClass((this._currentHandle = e.target), 'active');
+	this._currentHandle = /** @type {HTMLElement} */ (e.target);
+	domUtils.addClass(this._currentHandle, 'active');
 	this.__addGlobalEvent((this.__resizeDir = dir + (this.options.get('_rtl') ? 'RTL' : '')));
 }
 
+/**
+ * @private
+ * @this {ModalThis}
+ * @param {MouseEvent} e - Event object
+ */
 function OnResize(e) {
 	switch (this.__resizeDir) {
 		case 'w':
@@ -262,6 +300,10 @@ function OnResize(e) {
 	if (typeof this.inst.modalResize === 'function') this.inst.modalResize();
 }
 
+/**
+ * @private
+ * @this {ModalThis}
+ */
 function OnResizeMouseUp() {
 	domUtils.removeClass(this._currentHandle, 'active');
 	this._currentHandle = null;
@@ -270,7 +312,14 @@ function OnResizeMouseUp() {
 
 // HTML Creator ======================================================================================================
 
-// Create a file input tag
+/**
+ * @description Create a file input tag in the modal window.
+ * @param {{icons: EditorCore['icons'], lang: EditorCore['lang']}} param0 - icons and language object
+ * @param {{acceptedFormats: string, allowMultiple}} param1 - options
+ * - acceptedFormats: "image/*, video/*, audio/*", etc.
+ * - allowMultiple: true or false
+ * @returns {string} HTML string
+ */
 Modal.CreateFileInput = function ({ icons, lang }, { acceptedFormats, allowMultiple }) {
 	return /*html*/ `
 	<div class="se-modal-form-files">
@@ -292,6 +341,12 @@ Modal.CreateFileInput = function ({ icons, lang }, { acceptedFormats, allowMulti
 		</button>
 	</div>`;
 };
+
+/**
+ * @description A function called when the contents of "input" have changed and you want to adjust the style.
+ * @param {Node} wrapper - Modal file input wrapper(.se-flex-input-wrapper)
+ * @param {FileList} files - FileList object
+ */
 Modal.OnChangeFile = function (wrapper, files) {
 	if (!wrapper || !files) return;
 
