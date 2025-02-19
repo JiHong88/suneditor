@@ -42,7 +42,7 @@ const { NO_EVENT } = env;
  * @description Modal form Anchor tag editor
  * - Use it by inserting it into Modal in a plugin that uses Modal.
  * @param {*} inst The instance object that called the constructor.
- * @param {Element} modalForm The modal form element
+ * @param {Node} modalForm The modal form element
  * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
  */
 function ModalAnchorEditor(inst, modalForm, params) {
@@ -142,7 +142,7 @@ ModalAnchorEditor.prototype = {
 	 * @this {ModalAnchorEditorThis}
 	 * @description Initialize.
 	 * - Sets the current anchor element to be edited.
-	 * @param {Element} element Modal target element
+	 * @param {Node} element Modal target element
 	 */
 	set(element) {
 		this.currentTarget = element;
@@ -176,7 +176,7 @@ ModalAnchorEditor.prototype = {
 	 * @this {ModalAnchorEditorThis}
 	 * @description Creates an anchor (`<a>`) element with the specified attributes.
 	 * @param {boolean} notText - If `true`, the anchor will not contain text content.
-	 * @returns {Element|null} - The newly created anchor element, or `null` if the URL is empty.
+	 * @returns {HTMLElement|null} - The newly created anchor element, or `null` if the URL is empty.
 	 */
 	create(notText) {
 		if (this.linkValue.length === 0) return null;
@@ -184,7 +184,7 @@ ModalAnchorEditor.prototype = {
 		const url = this.linkValue;
 		const displayText = this.displayInput.value.length === 0 ? url : this.displayInput.value;
 
-		const oA = this.currentTarget || domUtils.createElement('A');
+		const oA = /** @type {HTMLElement} */ (this.currentTarget || domUtils.createElement('A'));
 		this._updateAnchor(oA, url, displayText, this.titleInput.value, notText);
 		this.linkValue = this.preview.textContent = this.urlInput.value = this.displayInput.value = '';
 
@@ -209,7 +209,7 @@ ModalAnchorEditor.prototype = {
 	 * @private
 	 * @this {ModalAnchorEditorThis}
 	 * @description Updates the anchor element with new attributes.
-	 * @param {Element} anchor - The anchor (`<a>`) element to update.
+	 * @param {Node} anchor - The anchor (`<a>`) element to update.
 	 * @param {string} url - The URL for the anchor's `href` attribute.
 	 * @param {string} displayText - The text to be displayed inside the anchor.
 	 * @param {string} title - The tooltip text (title attribute).
@@ -480,7 +480,7 @@ function OnClick_relbutton() {
  * @private
  * @this {ModalAnchorEditorThis}
  * @description Sets the selected bookmark as the URL.
- * @param {Element} item - The selected bookmark element.
+ * @param {Node} item - The selected bookmark element.
  */
 function SetHeaderBookmark(item) {
 	const id = item.id || 'h_' + Math.random().toString().replace(/.+\./, '');
@@ -495,7 +495,7 @@ function SetHeaderBookmark(item) {
 /**
  * @private
  * @this {ModalAnchorEditorThis}
- * @param {Element} item - The selected `rel` attribute element.
+ * @param {Node} item - The selected `rel` attribute element.
  */
 function SetRelItem(item) {
 	const cmd = item.getAttribute('data-command');

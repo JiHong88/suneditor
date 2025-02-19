@@ -25,7 +25,7 @@ NodeTransform.prototype = {
 	 * @description Split all tags based on "baseNode"
 	 * @param {Node} baseNode Element or text node on which to base
 	 * @param {?number|Node} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
-	 * @param {number} depth The nesting depth of the element being split. (default: 0)
+	 * @param {number} [depth=0] The nesting depth of the element being split. (default: 0)
 	 * @returns {Node} The last element of the splited tag.
 	 */
 	split(baseNode, offset, depth) {

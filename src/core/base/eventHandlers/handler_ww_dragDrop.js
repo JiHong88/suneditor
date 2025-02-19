@@ -10,8 +10,8 @@ import { _DragHandle } from '../../../modules';
  * @this {EventManagerThis}
  * @param {FrameContext} fc - Frame context object
  * @param {Node} dragCursor - Drag cursor element
- * @param {Element|null} _iframeTopArea - Iframe top area element
- * @param {Element|null} _innerToolbar - Inner toolbar element
+ * @param {?Element} _iframeTopArea - Iframe top area element
+ * @param {?Element} _innerToolbar - Inner toolbar element
  * @param {DragEvent} e - Event object
  */
 export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar, e) {

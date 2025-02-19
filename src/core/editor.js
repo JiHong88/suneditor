@@ -190,13 +190,13 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description All command buttons map
-	 * @type {Map<string, Element>}
+	 * @type {Map<string, HTMLElement>}
 	 */
 	this.allCommandButtons = new Map();
 
 	/**
 	 * @description All command buttons map
-	 * @type {Map<string, Element>}
+	 * @type {Map<string, HTMLElement>}
 	 */
 	this.subAllCommandButtons = new Map();
 
@@ -216,7 +216,7 @@ function Editor(multiTargets, options) {
 	/**
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
 	 * - Each button is contained in an array.
-	 * @type {Map<string, Array<Element>>}
+	 * @type {Map<string, Array<Node>>}
 	 */
 	this.commandTargets = new Map();
 
@@ -299,13 +299,13 @@ function Editor(multiTargets, options) {
 	// ------------------------------------------------------- private properties -------------------------------------------------------
 	/**
 	 * @description Line breaker (top)
-	 * @type {Element}
+	 * @type {HTMLElement}
 	 */
 	this._lineBreaker_t = null;
 
 	/**
 	 * @description Line breaker (bottom)
-	 * @type {Element}
+	 * @type {HTMLElement}
 	 */
 	this._lineBreaker_b = null;
 
@@ -336,7 +336,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Controller target's frame div (editor.frameContext.get('topArea'))
-	 * @type {Element|null}
+	 * @type {HTMLElement|null}
 	 */
 	this._controllerTargetContext = null;
 
@@ -437,7 +437,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Current Figure container.
-	 * @type {Element|null}
+	 * @type {HTMLElement|null}
 	 */
 	this._figureContainer = null;
 
@@ -1445,7 +1445,7 @@ Editor.prototype = {
 	 * @private
 	 * @description Sets command target elements.
 	 * @param {string} cmd - The command identifier.
-	 * @param {Element} target - The associated command button.
+	 * @param {Node} target - The associated command button.
 	 */
 	__setCommandTargets(cmd, target) {
 		if (!cmd || !target) return;

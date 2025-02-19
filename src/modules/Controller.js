@@ -16,10 +16,10 @@ const INDEX_2 = '2147483645';
  * @typedef {Object} ControllerInfo
  * @property {string} position The controller position
  * @property {*} inst The controller instance
- * @property {Element} form The controller element
- * @property {Element|Range} target The controller target element
- * @property {boolean} isRangeTarget If the target is a Range, set it to true.
+ * @property {HTMLElement} form The controller element
+ * @property {HTMLElement|Range} target The controller target element
  * @property {boolean} notInCarrier If the controller is not in the "carrierWrapper", set it to true.
+ * @property {boolean} [isRangeTarget] If the target is a Range, set it to true.
  * @property {boolean} [fixed] If the controller is fixed and should not be closed, set it to true.
  */
 
@@ -29,7 +29,7 @@ const INDEX_2 = '2147483645';
  * @property {boolean=} isWWTarget If the controller is in the WYSIWYG area, set it to true.
  * @property {() => void=} initMethod Method to be called when the controller is closed.
  * @property {boolean=} disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
- * @property {Array<Element>=} parents The parent "controller" array when "controller" is opened nested.
+ * @property {Array<Node>=} parents The parent "controller" array when "controller" is opened nested.
  * @property {boolean=} parentsHide If true, the parent element is hidden when the controller is opened.
  * @property {boolean=} isInsideForm If the controller is inside a form, set it to true.
  * @property {boolean=} isOutsideForm If the controller is outside a form, set it to true.
@@ -40,7 +40,7 @@ const INDEX_2 = '2147483645';
  * @this {ControllerThis}
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  * @param {*} inst The instance object that called the constructor.
- * @param {Element} element Controller element
+ * @param {Node} element Controller element
  * @param {ControllerParams} params Controller options
  * @param {?string=} _name An optional name for the controller key.
  */
@@ -83,8 +83,8 @@ Controller.prototype = {
 	/**
 	 * @this {ControllerThis}
 	 * @description Open a modal plugin
-	 * @param {Element|Range} target Target element
-	 * @param {Element} [positionTarget] Position target element
+	 * @param {Node|Range} target Target element
+	 * @param {Node} [positionTarget] Position target element
 	 * @param {Object} [params={}] params
 	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
 	 * @param {() => void=} params.initMethod Method to be called when the controller is closed.
@@ -187,7 +187,7 @@ Controller.prototype = {
 	/**
 	 * @this {ControllerThis}
 	 * @description Reset controller position
-	 * @param {Element=} target
+	 * @param {Node=} target
 	 */
 	resetPosition(target) {
 		this._setControllerPosition(this.form, target || this.currentPositionTarget);
@@ -197,8 +197,8 @@ Controller.prototype = {
 	 * @private
 	 * @this {ControllerThis}
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
-	 * @param {Element} form Controller element
-	 * @param {Element|Range} target Controller target element
+	 * @param {Node} form Controller element
+	 * @param {Node|Range} target Controller target element
 	 * @param {boolean} isRangeTarget If the target is a Range, set it to true.
 	 */
 	async _controllerOn(form, target, isRangeTarget) {
@@ -206,8 +206,8 @@ Controller.prototype = {
 		const info = {
 			position: this.position,
 			inst: this,
-			form,
-			target,
+			form: /** @type {HTMLElement} */ (form),
+			target: /** @type {HTMLElement} */ (target),
 			isRangeTarget,
 			notInCarrier: !this.carrierWrapper.contains(form)
 		};
@@ -264,8 +264,8 @@ Controller.prototype = {
 	 * @private
 	 * @this {ControllerThis}
 	 * @description Specify the position of the controller.
-	 * @param {Element} controller Controller element.
-	 * @param {Element|Range} refer Element or Range that is the basis of the controller's position.
+	 * @param {Node} controller Controller element.
+	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
 	 */
 	_setControllerPosition(controller, refer) {
 		controller.style.zIndex = INDEX_1;
@@ -278,7 +278,7 @@ Controller.prototype = {
 				return;
 			}
 		} else {
-			if (refer && !this.offset.setAbsPosition(controller, /** @type {Element} */ (refer), { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
+			if (refer && !this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
 				this.hide();
 				return;
 			}
@@ -333,7 +333,7 @@ Controller.prototype = {
 	 * @private
 	 * @this {ControllerThis}
 	 * @description Checks if the given target is within a form or controller.
-	 * @param {Element} target The target element.
+	 * @param {Node} target The target element.
 	 * @returns {boolean} True if the target is inside a form or controller.
 	 */
 	_checkForm(target) {

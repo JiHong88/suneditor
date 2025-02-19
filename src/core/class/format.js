@@ -41,7 +41,7 @@ Format.prototype = {
 	/**
 	 * @this {FormatThis}
 	 * @description Replace the line tag of the current selection.
-	 * @param {Element} element Line element (P, DIV..)
+	 * @param {Node} element Line element (P, DIV..)
 	 */
 	setLine(element) {
 		if (!this.isLine(element)) {
@@ -85,7 +85,7 @@ Format.prototype = {
 	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
 	 * @param {Node} node Reference node.
 	 * @param {?(current: Node) => boolean=} validation Additional validation function.
-	 * @returns {Element|null}
+	 * @returns {HTMLElement|null}
 	 */
 	getLine(node, validation) {
 		if (!node) return null;
@@ -97,8 +97,8 @@ Format.prototype = {
 
 		while (node) {
 			if (domUtils.isWysiwygFrame(node)) return null;
-			if (this.isBlock(node)) return node.firstElementChild;
-			if (this.isLine(node) && validation(node)) return /** @type {Element} */ (node);
+			if (this.isBlock(node)) return /** @type {HTMLElement} */ (node.firstElementChild);
+			if (this.isLine(node) && validation(node)) return /** @type {HTMLElement} */ (node);
 
 			node = node.parentNode;
 		}
@@ -207,7 +207,7 @@ Format.prototype = {
 	 * - If not, the currently selected format tag is inserted.
 	 * @param {Node} element Insert as siblings of that element
 	 * @param {?string|Node=} lineNode Node name or node obejct to be inserted
-	 * @returns {Element}
+	 * @returns {HTMLElement}
 	 */
 	addLine(element, lineNode) {
 		if (!element || !element.parentNode) return null;
@@ -884,7 +884,7 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description "selectedCells" array are detached from the list element.
 	 * - The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
-	 * @param {Array<Element>} selectedCells Array of ["line", li] elements(LI, P...) to remove.
+	 * @param {Array<Node>} selectedCells Array of ["line", li] elements(LI, P...) to remove.
 	 * @param {boolean} shouldDelete If true, It does not just remove the list, it deletes the content.
 	 * @returns {{sc: Node, ec: Node}} Node information after deletion
 	 * - sc: Start container node
@@ -1596,7 +1596,7 @@ Format.prototype = {
 	 * @private
 	 * @this {FormatThis}
 	 * @description A function that distinguishes areas where "selection" should not be placed
-	 * @param {Element} element Element
+	 * @param {Node} element Element
 	 * @returns {boolean}
 	 */
 	_isExcludeSelectionElement(element) {
@@ -3234,7 +3234,7 @@ Format.prototype = {
 	 * @private
 	 * @this {FormatThis}
 	 * @description Watch the applied text nodes and adjust the common styles of the list.
-	 * @param {Element} el "LI" element
+	 * @param {Node} el "LI" element
 	 * @param {Array|null} styleArray Refer style array
 	 */
 	_sn_resetCommonListCell(el, styleArray) {

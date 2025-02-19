@@ -12,7 +12,7 @@ const { isMobile } = env;
  * @param {MouseEvent} e - Event object
  */
 export function ButtonsHandler(e) {
-	const eventTarget = /** @type {Element} */ (e.target);
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
 	let target = eventTarget;
 
 	if (this.editor.isSubBalloon && !this.context.get('toolbar.sub.main')?.contains(target)) {
@@ -105,7 +105,7 @@ export function ButtonsHandler(e) {
  * @param {MouseEvent} e - Event object
  */
 export function OnClick_menuTray(e) {
-	const eventTarget = /** @type {Element} */ (e.target);
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
 	const target = domUtils.getCommandTarget(eventTarget);
 	if (!target) return;
 
@@ -130,6 +130,6 @@ export function OnClick_menuTray(e) {
  * @param {MouseEvent} e - Event object
  */
 export function OnClick_toolbar(e) {
-	const eventTarget = /** @type {Element} */ (e.target);
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
 	this.editor.runFromTarget(eventTarget);
 }

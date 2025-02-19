@@ -81,7 +81,7 @@ function CreateSliderCtx() {
 
 /**
  * @typedef {Object} HueSliderParams
- * @property {Element} [form] The form element to attach the hue slider.
+ * @property {Node} [form] The form element to attach the hue slider.
  * @property {boolean} [isNewForm] Whether to create a new form element.
  * @property {ControllerParams} [controllerOptions] Controller options
  */
@@ -147,7 +147,7 @@ HueSlider.prototype = {
 
 	/**
 	 * @description Open the hue slider.
-	 * @param {Element} target The element to attach the hue slider.
+	 * @param {Node} target The element to attach the hue slider.
 	 */
 	open(target) {
 		this.attach();
@@ -183,7 +183,7 @@ HueSlider.prototype = {
 
 	/**
 	 * @description Attach the hue slider to the form element.
-	 * @param {?Element=} form The element to attach the hue slider.
+	 * @param {?Node=} form The element to attach the hue slider.
 	 */
 	attach(form) {
 		// drow

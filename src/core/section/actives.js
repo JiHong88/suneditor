@@ -17,8 +17,8 @@ let __globalEventMousedown = null;
 /**
  * @private
  * @this {EditorCore}
- * @param {Element} ww Wywsiwyg element
- * @param {Element} button Button element
+ * @param {Node} ww Wywsiwyg element
+ * @param {Node} button Button element
  */
 const __RemoveCopyformt = function (ww, button) {
 	__globalEventKeydown = this.eventManager.removeGlobalEvent('keydown', __globalEventKeydown);

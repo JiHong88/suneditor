@@ -27,7 +27,7 @@ import ApiManager from './ApiManager';
  * @property {Object<string, *>|Array<*>=} data - direct data without server calls
  * @property {string=} url - File server url. Required. Can be overridden in browser.
  * @property {Object<string, string>=} headers - File server http header. Required. Can be overridden in browser.
- * @property {(target: Element) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
+ * @property {(target: Node) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
  * @property {boolean=} useSearch - Whether to use the search function. Optional. Default: true.
  * @property {string=} searchUrl - File server search url. Optional. Can be overridden in browser.
  * @property {Object<string, string>=} searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
@@ -388,7 +388,7 @@ Browser.prototype = {
 	 * @this {BrowserThis}
 	 * @description Creates a nested folder list from parsed data.
 	 * @param {BrowserFile[]|BrowserFile} folderData - The structured folder data.
-	 * @param {Element} parentElement - The parent element to append folder structure to.
+	 * @param {HTMLElement} parentElement - The parent element to append folder structure to.
 	 */
 	__createFolderList(folderData, parentElement) {
 		for (const key in folderData) {

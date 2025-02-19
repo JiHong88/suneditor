@@ -18,7 +18,7 @@ const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize',
  * @this {ModalThis}
  * @description Modal window module
  * @param {* & {editor: EditorCore}} inst The instance object that called the constructor.
- * @param {Element} element Modal element
+ * @param {Node} element Modal element
  */
 function Modal(inst, element) {
 	CoreInjector.call(this, inst.editor);

@@ -326,7 +326,7 @@ export default function History(editor) {
 
 		/**
 		 * @description Returns the root stack containing the history of each frame.
-		 * @returns {{content: string, s: {path: number|number[], offset: number|number[]}, e: {path: number|number[], offset: number|number[]}, frame: Element}} The root stack object.
+		 * @returns {{content: string, s: {path: number|number[], offset: number|number[]}, e: {path: number|number[], offset: number|number[]}, frame: HTMLElement}} The root stack object.
 		 * - content: content html string
 		 * - s: depth info of the "start" range
 		 * - e: depth info of the "end" range

@@ -148,7 +148,7 @@ Char.prototype = {
 /**
  * @private
  * @description The character counter blinks.
- * @param charWrapper {Element} this.editor.frameContext.get('charWrapper')
+ * @param {Element} charWrapper this.editor.frameContext.get('charWrapper')
  */
 function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, 'se-blink')) {

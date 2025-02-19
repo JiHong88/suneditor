@@ -170,7 +170,7 @@ export function getNodeFromPath(offsets, parentNode) {
  * @description Get all "children" of the argument value element (Without text nodes)
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
- * @returns {Array<Element>}
+ * @returns {Array<HTMLElement>}
  */
 export function getListChildren(element, validation) {
 	const children = [];
@@ -194,7 +194,7 @@ export function getListChildren(element, validation) {
 		}
 	})(element);
 
-	return /** @type {Array<Element>} */ (children);
+	return /** @type {Array<HTMLElement>} */ (children);
 }
 
 /**
@@ -268,7 +268,7 @@ export function sortNodeByDepth(array, des) {
  * @description Compares two elements to find a common ancestor, and returns the order of the two elements.
  * @param {Node} a Node to compare.
  * @param {Node} b Node to compare.
- * @returns {{ancestor: Element|null, a: Node, b: Node, result: number}} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
+ * @returns {{ancestor: HTMLElement|null, a: Node, b: Node, result: number}} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
  */
 export function compareElements(a, b) {
 	let aNode = a,
@@ -406,7 +406,7 @@ export function getParentElements(element, query, depth) {
 /**
  * @description Gets the element with "data-command" attribute among the parent elements.
  * @param {Node} target Target element
- * @returns {Element|null}
+ * @returns {HTMLElement|null}
  */
 export function getCommandTarget(target) {
 	while (target && !/^(UL)$/i.test(target.tagName) && !hasClass(target, 'sun-editor')) {
@@ -621,7 +621,7 @@ export function copyTagAttributes(originEl, copyEl, blacklist) {
  * @param {Node} copyEl Element to copy
  */
 export function copyFormatAttributes(originEl, copyEl) {
-	copyEl = /** @type {Element} */ (copyEl.cloneNode(false));
+	copyEl = /** @type {HTMLElement} */ (copyEl.cloneNode(false));
 	copyEl.className = copyEl.className.replace(/(\s|^)__se__format__[^\s]+/g, '');
 	copyTagAttributes(originEl, copyEl);
 }
@@ -669,7 +669,7 @@ export function removeItem(item) {
 /**
  * @description Replace element
  * @param {Node} element Target element
- * @param {string|Element} newElement String or element of the new element to apply
+ * @param {string|Node} newElement String or element of the new element to apply
  */
 export function changeElement(element, newElement) {
 	if (!element) return;
@@ -987,7 +987,7 @@ export function isExcludeFormat(element) {
 /**
  * @description Get nearest scrollable parent
  * @param {Node} element Element
- * @returns {Element|null}
+ * @returns {HTMLElement|null}
  */
 export function getScrollParent(element) {
 	if (!element || /^(body|html)$/i.test(element.nodeName)) {
@@ -995,7 +995,7 @@ export function getScrollParent(element) {
 	}
 
 	if (element.scrollHeight > element.clientHeight) {
-		return /** @type {Element} */ (element);
+		return /** @type {HTMLElement} */ (element);
 	} else {
 		return getScrollParent(element.parentElement);
 	}
@@ -1152,7 +1152,7 @@ export function findTabEndIndex(line, baseIndex, minTabSize) {
 
 /**
  * @description Copies the "wwTarget" element and returns it with inline all styles applied.
- * @param {Element} wwTarget Target element to copy(.sun-editor.sun-editor-editable)
+ * @param {Node} wwTarget Target element to copy(.sun-editor.sun-editor-editable)
  * @param {boolean} includeWW Include the "wwTarget" element in the copy
  * @param {Array<string>} styles Style list - kamel case
  * @returns
@@ -1175,7 +1175,7 @@ export function applyInlineStylesAll(wwTarget, includeWW, styles) {
 		wwDiv.innerHTML = wwTarget.innerHTML;
 		wwTarget = wwDiv;
 	} else {
-		wwTarget = /** @type {Element} */ (wwTarget.cloneNode(true));
+		wwTarget = /** @type {HTMLElement} */ (wwTarget.cloneNode(true));
 	}
 
 	tempTarget.appendChild(wwTarget);

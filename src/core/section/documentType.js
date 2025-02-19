@@ -380,7 +380,7 @@ DocumentType.prototype = {
 
 	/**
 	 * @description Highlights the header of the current line.
-	 * @param {Element} line - The "line" element to be highlighted.
+	 * @param {Node} line - The "line" element to be highlighted.
 	 */
 	on(line) {
 		if (!this.useHeader) return;
@@ -480,7 +480,7 @@ DocumentType.prototype = {
 	/**
 	 * @private
 	 * @description Finds an header element of innerHeaders element.
-	 * @param {Element} header - H tag element to find.
+	 * @param {Node} header - H tag element to find.
 	 * @returns {HTMLElement|null} The found element, or null if not found.
 	 */
 	_findItem(header) {
@@ -497,8 +497,8 @@ DocumentType.prototype = {
 	/**
 	 * @private
 	 * @description Finds the closest header element from a given line.
-	 * @param {Element} line - The "line" to check.
-	 * @returns {Element|null} The closest header element, or null if not found.
+	 * @param {Node} line - The "line" to check.
+	 * @returns {Node|null} The closest header element, or null if not found.
 	 */
 	_findLinesHeader(line) {
 		while (line && line !== this.ww) {
@@ -514,7 +514,7 @@ DocumentType.prototype = {
 	/**
 	 * @private
 	 * @description Checks if an element is a header.
-	 * @param {Element} element - The element to check.
+	 * @param {Node} element - The element to check.
 	 * @returns {boolean} True if the element is a header, otherwise false.
 	 */
 	_is(element) {
@@ -524,7 +524,7 @@ DocumentType.prototype = {
 	/**
 	 * @private
 	 * @description Retrieves all headers in the document.
-	 * @returns {Array<Element>} An array of header elements.
+	 * @returns {Array<HTMLElement>} An array of header elements.
 	 */
 	_getHeaders() {
 		return (this._wwHeaders = this.ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));
@@ -535,7 +535,7 @@ DocumentType.prototype = {
 
 /**
  * @private
- * @param {Element} ww WYSIWYG element
+ * @param {HTMLElement} ww WYSIWYG element
  * @param {Event} e Event object
  */
 function OnClickHeader(ww, e) {
@@ -543,7 +543,7 @@ function OnClickHeader(ww, e) {
 
 	try {
 		this.editor._preventBlur = true;
-		const clickedHeader = /** @type {Element} */ (e.target);
+		const clickedHeader = /** @type {HTMLElement} */ (e.target);
 		if (domUtils.hasClass(clickedHeader, 'se-doc-item')) {
 			const innerIndex = Array.prototype.indexOf.call(this.innerHeaders, clickedHeader);
 			if (innerIndex === -1) return;

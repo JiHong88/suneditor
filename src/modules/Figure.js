@@ -12,42 +12,47 @@ let __resizing_cw = 0;
 let __resizing_sw = 0;
 
 /**
+ * @typedef {Figure & Partial<EditorInjector>} FigureThis
+ */
+
+/**
  * @typedef {Object} FigureParams
  * @property {string} [sizeUnit="px"] Size unit
- * @property {boolean} [autoRatio=false] Auto ratio
+ * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio { current: '00%', default: '00%' }
  */
 
 /**
  * @typedef {Object} FigureInfo
- * @property {Element} target Target element (img, iframe, video, audio, table, etc.)
- * @property {Element} container Container element (div.se-component|span.se-component.se-inline-component)
- * @property {Element|null} cover Cover element (FIGURE|null)
- * @property {Element|null} inlineCover Inline cover element (span.se-inline-component)
- * @property {Element|null} caption Caption element (FIGCAPTION)
+ * @property {HTMLElement} target Target element (img, iframe, video, audio, table, etc.)
+ * @property {HTMLElement} container Container element (div.se-component|span.se-component.se-inline-component)
+ * @property {?HTMLElement} cover Cover element (FIGURE|null)
+ * @property {?HTMLElement} inlineCover Inline cover element (span.se-inline-component)
+ * @property {?HTMLElement} caption Caption element (FIGCAPTION)
  */
 
 /**
  * @typedef {Object} FigureTargetInfo
- * @property {Element} container Container element (div.se-component|span.se-component.se-inline-component)
- * @property {Element|null} cover Cover element (FIGURE|null)
- * @property {Element|null} caption Caption element (FIGCAPTION)
- * @property {string} align - Alignment of the element.
- * @property {number} ratio - The aspect ratio of the element.
- * @property {number} w - Width of the element.
- * @property {number} h - Height of the element.
- * @property {number} t - Top position.
- * @property {number} l - Left position.
+ * @property {HTMLElement} container Container element (div.se-component|span.se-component.se-inline-component)
+ * @property {?HTMLElement=} cover Cover element (FIGURE|null)
+ * @property {?HTMLElement=} caption Caption element (FIGCAPTION)
+ * @property {string} [align] - Alignment of the element.
+ * @property {{w:number, h:number}} [ratio] - The aspect ratio of the element.
+ * @property {string|number} [w] - Width of the element.
+ * @property {string|number} [h] - Height of the element.
+ * @property {number} [t] - Top position.
+ * @property {number} [l] - Left position.
  * @property {string|number} width - Width, can be a number or 'auto'.
  * @property {string|number} height - Height, can be a number or 'auto'.
- * @property {number} originWidth - Original width from `naturalWidth` or `offsetWidth`.
- * @property {number} originHeight - Original height from `naturalHeight` or `offsetHeight`.
+ * @property {number} [originWidth] - Original width from `naturalWidth` or `offsetWidth`.
+ * @property {number} [originHeight] - Original height from `naturalHeight` or `offsetHeight`.
  */
 
 /**
  * @constructor
+ * @this {FigureThis}
  * @description Controller module class
  * @param {*} inst The instance object that called the constructor.
- * @param {Array<string|{action: (element: Element, value: string, target: Element) => void, command: string, value: string, title: string, icon: string}>} controls Controller button array
+ * @param {Array<string|{action: (element: Node, value: string, target: Node) => void, command: string, value: string, title: string, icon: string}>} controls Controller button array
  * @param {FigureParams} params Figure options
  */
 function Figure(inst, controls, params) {
@@ -103,14 +108,14 @@ function Figure(inst, controls, params) {
 	this._inlineCover = null;
 	this._container = null;
 	this._caption = null;
-	this._width = 0;
-	this._height = 0;
+	this._width = '';
+	this._height = '';
+	this._resize_w = 0;
+	this._resize_h = 0;
 	this._element_w = 0;
 	this._element_h = 0;
 	this._element_l = 0;
 	this._element_t = 0;
-	this._resize_w = 0;
-	this._resize_h = 0;
 	this._resizeClientX = 0;
 	this._resizeClientY = 0;
 	this._resize_direction = '';
@@ -150,8 +155,8 @@ function Figure(inst, controls, params) {
 
 /**
  * @description Create a container for the resizing component and insert the element.
- * @param {Element} element Target element
- * @param {string} className Class name of container (fixed: se-component)
+ * @param {Node} element Target element
+ * @param {string=} className Class name of container (fixed: se-component)
  * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
  */
 Figure.CreateContainer = function (element, className) {
@@ -161,8 +166,8 @@ Figure.CreateContainer = function (element, className) {
 
 /**
  * @description Create a container for the inline resizing component and insert the element.
- * @param {Element} element Target element
- * @param {string} className Class name of container (fixed: se-component se-inline-component)
+ * @param {Node} element Target element
+ * @param {string} [className] Class name of container (fixed: se-component se-inline-component)
  * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
  */
 Figure.CreateInlineContainer = function (element, className) {
@@ -172,8 +177,8 @@ Figure.CreateInlineContainer = function (element, className) {
 
 /**
  * @description Return HTML string of caption(FIGCAPTION) element
- * @param {Element} cover Cover element(FIGURE). "CreateContainer().cover"
- * @returns {Element} caption element
+ * @param {Node} cover Cover element(FIGURE). "CreateContainer().cover"
+ * @returns {HTMLElement} caption element
  */
 Figure.CreateCaption = function (cover, text) {
 	const caption = domUtils.createElement('FIGCAPTION', null, '<div>' + text + '</div>');
@@ -183,18 +188,18 @@ Figure.CreateCaption = function (cover, text) {
 
 /**
  * @description Get the element's container(.se-component) info.
- * @param {Element} element Target element
+ * @param {Node} element Target element
  * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
  */
 Figure.GetContainer = function (element) {
 	const cover = domUtils.getParentElement(element, 'FIGURE', 2);
 	const inlineCover = domUtils.getParentElement(element, 'SPAN', 2);
 	return {
-		target: element,
-		container: domUtils.getParentElement(element, Figure.__is, 2) || cover,
-		cover: cover,
-		inlineCover: domUtils.hasClass(inlineCover, 'se-inline-component') ? inlineCover : null,
-		caption: domUtils.getEdgeChild(element.parentElement, 'FIGCAPTION')
+		target: /** @type {HTMLElement} */ (element),
+		container: /** @type {HTMLElement} */ (domUtils.getParentElement(element, Figure.is, 2) || cover),
+		cover: /** @type {HTMLElement} */ (cover),
+		inlineCover: domUtils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
+		caption: /** @type {HTMLElement} */ (domUtils.getEdgeChild(element.parentElement, 'FIGCAPTION', false))
 	};
 };
 
@@ -202,15 +207,15 @@ Figure.GetContainer = function (element) {
  * @description Ratio calculation
  * @param {string|number} w Width size
  * @param {string|number} h Height size
- * @param {defaultSizeUnit|undefined|null} defaultSizeUnit Default size unit (default: "px")
+ * @param {?string=} [defaultSizeUnit="px"] Default size unit (default: "px")
  * @return {{w: number, h: number}}
  */
 Figure.GetRatio = function (w, h, defaultSizeUnit) {
 	let rw = 1,
 		rh = 1;
 	if (/\d+/.test(w) && /\d+/.test(h)) {
-		const xUnit = (!numbers.is(w) && w.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
-		const yUnit = (!numbers.is(h) && h.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+		const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+		const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		if (xUnit === yUnit) {
 			const w_number = numbers.get(w, 4);
 			const h_number = numbers.get(h, 4);
@@ -229,14 +234,14 @@ Figure.GetRatio = function (w, h, defaultSizeUnit) {
  * @description Ratio calculation
  * @param {string|number} w Width size
  * @param {string|number} h Height size
- * @param {defaultSizeUnit|undefined|null} defaultSizeUnit Default size unit (default: "px")
+ * @param {string} defaultSizeUnit Default size unit (default: "px")
  * @param {{w: number, h: number}} ratio Ratio size (Figure.GetRatio)
  * @return {{w: string|number, h: string|number}}
  */
 Figure.CalcRatio = function (w, h, defaultSizeUnit, ratio) {
 	if (/\d+/.test(w) && /\d+/.test(h)) {
-		const xUnit = (!numbers.is(w) && w.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
-		const yUnit = (!numbers.is(h) && h.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+		const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+		const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		if (xUnit === yUnit) {
 			const dec = xUnit === '%' ? 2 : 0;
 			const ow = w;
@@ -253,31 +258,30 @@ Figure.CalcRatio = function (w, h, defaultSizeUnit, ratio) {
 };
 
 /**
- * @private
  * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
  * @param {Node} element Target element
  * @returns {boolean}
  */
-Figure.__is = function (element) {
+Figure.is = function (element) {
 	return domUtils.hasClass(element, 'se-component') || /^(HR)$/.test(element?.nodeName);
 };
 
 Figure.prototype = {
 	/**
+	 * @this {FigureThis}
 	 * @description Close the figure's controller
 	 */
 	close() {
 		this.editor._preventBlur = false;
 		domUtils.removeClass(this._cover, 'se-figure-selected');
 		this.controller.close();
-
-		if (domUtils.hasClass(this._w.event?.target, 'se-drag-handle|sun-editor-editable')) return;
 		this.component._removeDragEvent();
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Open the figure's controller
-	 * @param {Element} target Target element
+	 * @param {Node} target Target element
 	 * @param {Object} params params
 	 * @param {boolean} [params.nonResizing=false] Do not display the resizing button
 	 * @param {boolean} [params.nonSizeInfo=false] Do not display the size information
@@ -302,8 +306,8 @@ Figure.prototype = {
 		let exceptionFormat = false;
 		if (!figureInfo.container) {
 			if (!this.options.get('strictMode').formatFilter) {
-				figureInfo.container = target;
-				figureInfo.cover = target;
+				figureInfo.container = /** @type {HTMLElement} */ (target);
+				figureInfo.cover = /** @type {HTMLElement} */ (target);
 				exceptionFormat = true;
 			} else {
 				return { container: null, cover: null, width: target.style.width || (!numbers.is(target.width) ? target.width : '') || '', height: target.style.height || (!numbers.is(target.height) ? target.height : '') || '' };
@@ -314,9 +318,9 @@ Figure.prototype = {
 
 		this._setFigureInfo(figureInfo);
 
-		const sizeTarget = figureTarget ? this._cover || this._container || target : target;
-		const w = sizeTarget.offsetWidth || '';
-		const h = sizeTarget.offsetHeight || '';
+		const sizeTarget = /** @type {HTMLElement} */ (figureTarget ? this._cover || this._container || target : target);
+		const w = sizeTarget.offsetWidth || null;
+		const h = sizeTarget.offsetHeight || null;
 		const { top, left, scrollX, scrollY } = this.offset.getLocal(sizeTarget);
 
 		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
@@ -327,8 +331,8 @@ Figure.prototype = {
 			caption: figureInfo.caption,
 			align: this.align,
 			ratio: ratio,
-			w: w,
-			h: h,
+			w: w || '',
+			h: h || '',
 			t: top,
 			l: left,
 			width: dataSize[0] || 'auto',
@@ -431,6 +435,7 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Hide the controller
 	 */
 	controllerHide() {
@@ -438,6 +443,7 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Hide the controller
 	 */
 	controllerShow() {
@@ -445,8 +451,9 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Open the figure's controller
-	 * @param {Element} target Target element
+	 * @param {Node} target Target element
 	 * @param {Object} [params={}] params
 	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
 	 * @param {() => void=} params.initMethod Method to be called when the controller is closed.
@@ -459,6 +466,7 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Set the element's container size
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
@@ -475,8 +483,9 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Gets the Figure size
-	 * @param {Element|null} target
+	 * @param {?Node=} target Target element, default is the current element
 	 * @returns {{w: string, h: string}}
 	 */
 	getSize(target) {
@@ -513,9 +522,10 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Align the container.
-	 * @param {Element|null} target Target element
-	 * @param {"none"|"left"|"center"|"right"} align
+	 * @param {?Node} target Target element
+	 * @param {string} align "none"|"left"|"center"|"right"
 	 */
 	setAlign(target, align) {
 		if (!target) target = this._element;
@@ -531,7 +541,7 @@ Figure.prototype = {
 			cover.style.width = container.style.width;
 		} else {
 			container.style.minWidth = '';
-			cover.style.width = this.isVertical ? target.style.height || target.offsetHeight : !target.style.width || target.style.width === 'auto' ? '' : target.style.width || '100%';
+			cover.style.width = this.isVertical ? target.style.height || target.offsetHeight + 'px' : !target.style.width || target.style.width === 'auto' ? '' : target.style.width || '100%';
 		}
 
 		if (!domUtils.hasClass(container, '__se__float-' + align)) {
@@ -548,8 +558,9 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description As style[block, inline] the component
-	 * @param {Element|null} target Target element
+	 * @param {Node|null} target Target element
 	 * @param {"block"|"inline"} formatStyle Format style
 	 */
 	convertAsFormat(target, formatStyle) {
@@ -621,6 +632,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
 	 * @param {FigureInfo} figureinfo {target, container, cover, inlineCover, caption}
 	 * @param {string|number} w Width value.
@@ -641,8 +653,9 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Controller button action
-	 * @param {Element} target Target button element
+	 * @param {Node} target Target button element
 	 * @returns
 	 */
 	controllerAction(target) {
@@ -673,7 +686,7 @@ Figure.prototype = {
 			case 'caption':
 				if (!this._caption) {
 					const caption = Figure.CreateCaption(this._cover, this.lang.caption);
-					const captionText = domUtils.getEdgeChild(caption, (current) => current.nodeType === 3);
+					const captionText = domUtils.getEdgeChild(caption, (current) => current.nodeType === 3, false);
 
 					if (!captionText) {
 						caption.focus();
@@ -722,12 +735,14 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Inspect the figure component format and change it to the correct format.
-	 * @param {*} container
-	 * @param {*} originEl
-	 * @param {*} anchorCover
+	 * @param {Node} container - The container element of the figure component.
+	 * @param {Node} originEl - The original element of the figure component.
+	 * @param {Node} anchorCover - The anchor cover element of the figure component.
+	 * @param {import('./FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
 	 */
-	retainFigureFormat(container, originEl, anchorCover) {
+	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
 		const isInline = this.component.isInline(container);
 		let existElement = this.format.isBlock(originEl.parentNode) || domUtils.isWysiwygFrame(originEl.parentNode) ? originEl : domUtils.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
 
@@ -735,7 +750,7 @@ Figure.prototype = {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
 			existElement.parentNode.replaceChild(container, existElement);
 		} else if (isInline && this.format.isLine(existElement)) {
-			const refer = isInline && /^SPAN$/i.test(originEl.parentElement) ? originEl.parentElement : originEl;
+			const refer = isInline && /^SPAN$/i.test(originEl.parentElement.nodeName) ? originEl.parentElement : originEl;
 			refer.parentElement.replaceChild(container, refer);
 		} else if (domUtils.isListCell(existElement)) {
 			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
@@ -752,17 +767,19 @@ Figure.prototype = {
 			if (this.format.isLineOnly(existElement.parentNode)) {
 				const formats = existElement.parentNode;
 				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-				if (this.fileManager.__updateTags.map((current) => existElement.contains(current)).length === 0) domUtils.removeItem(existElement);
+				if (fileManagerInst?.__updateTags.map((current) => existElement.contains(current)).length === 0) domUtils.removeItem(existElement);
+				else if (domUtils.isZeroWidth(existElement)) domUtils.removeItem(existElement);
 			} else {
-				existElement = domUtils.isFigure(existElement.parentNode) ? domUtils.getParentElement(existElement.parentNode, Figure.__is) : existElement;
+				existElement = domUtils.isFigure(existElement.parentNode) ? domUtils.getParentElement(existElement.parentNode, Figure.is) : existElement;
 				existElement.parentNode.replaceChild(container, existElement);
 			}
 		}
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Initialize the transform style (rotation) of the element.
-	 * @param {Element|null} element Target element
+	 * @param {?Node=} element Target element, default is the current element
 	 */
 	deleteTransform(element) {
 		if (!element) element = this._element;
@@ -779,10 +796,11 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @this {FigureThis}
 	 * @description Set the transform style (rotation) of the element.
-	 * @param {Element} element Target element
-	 * @param {Number|null} width Element's width size
-	 * @param {Number|null} height Element's height size
+	 * @param {Node} element Target element
+	 * @param {?string|number} width Element's width size
+	 * @param {?string|number} height Element's height size
 	 */
 	setTransform(element, width, height, deg) {
 		try {
@@ -854,8 +872,9 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Applies rotation transformation to the target element.
-	 * @param {Element} element Target element.
+	 * @param {Node} element Target element.
 	 * @param {number} r Rotation degree.
 	 * @param {number} x X-axis rotation value.
 	 * @param {number} y Y-axis rotation value.
@@ -896,6 +915,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Applies size adjustments to the figure element.
 	 * @param {string|number} w Width value.
 	 * @param {string|number} h Height value.
@@ -904,8 +924,8 @@ Figure.prototype = {
 	_applySize(w, h, direction) {
 		const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(this._element.style.height);
 		const onlyH = /^(th|bh)$/.test(direction) && /\d+/.test(this._element.style.width);
-		h = h || (this.autoRatio ? this.autoRatio.current || this.autoRatio.default : h);
-		w = numbers.is(w) ? w + this.sizeUnit : w;
+		h = /** @type {string} */ (h || (this.autoRatio ? this.autoRatio.current || this.autoRatio.default : h));
+		w = /** @type {string} */ (numbers.is(w) ? w + this.sizeUnit : w);
 
 		if (!/%$/.test(w) && !/%$/.test(h) && !onlyW && !onlyH) this._deletePercentSize();
 
@@ -932,9 +952,10 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Sets padding-bottom for cover elements based on width and height.
-	 * @param {string|number} w Width value.
-	 * @param {string|number} h Height value.
+	 * @param {string} w Width value.
+	 * @param {string} h Height value.
 	 */
 	__setCoverPaddingBottom(w, h) {
 		if (this._inlineCover === this._cover) return;
@@ -949,6 +970,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Sets the figure element to its auto size.
 	 */
 	_setAutoSize() {
@@ -974,6 +996,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Sets the figure element's size in percentage.
 	 * @param {string|number} w Width percentage.
 	 * @param {string|number} h Height percentage.
@@ -983,7 +1006,7 @@ Figure.prototype = {
 		h = h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (this.autoRatio ? this.autoRatio.default : '');
 
 		const heightPercentage = /%$/.test(h);
-		this._container.style.width = numbers.is(w) ? w + '%' : w;
+		this._container.style.width = String(numbers.is(w) ? w + '%' : w);
 		this._container.style.height = '';
 
 		// exceptionFormat
@@ -994,15 +1017,15 @@ Figure.prototype = {
 
 		if (this._inlineCover !== this._cover) {
 			this._cover.style.width = '100%';
-			this._cover.style.height = h;
+			this._cover.style.height = String(h);
 		}
 		this._element.style.width = '100%';
 		this._element.style.maxWidth = '';
-		this._element.style.height = this.autoRatio ? '100%' : heightPercentage ? '' : h;
+		this._element.style.height = String(this.autoRatio ? '100%' : heightPercentage ? '' : h);
 
 		if (this.align === 'center') this.setAlign(this._element, this.align);
 		if (this.autoRatio) {
-			this.__setCoverPaddingBottom(w, h);
+			this.__setCoverPaddingBottom(String(w), String(h));
 		}
 
 		this._setCaptionPosition(this._element);
@@ -1013,6 +1036,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Deletes percentage-based sizing from the figure element.
 	 */
 	_deletePercentSize() {
@@ -1029,6 +1053,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Reverts the figure element to its previously saved size.
 	 */
 	_setRevert() {
@@ -1037,6 +1062,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Updates the figure's alignment icon.
 	 */
 	_setAlignIcon() {
@@ -1046,6 +1072,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Updates the figure's block/inline format icon.
 	 */
 	_setAsIcon() {
@@ -1055,6 +1082,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Saves the current size of the figure component.
 	 */
 	_saveCurrentSize() {
@@ -1076,11 +1104,12 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Adjusts the position of the caption within the figure.
-	 * @param {Element} element Target element.
+	 * @param {Node} element Target element.
 	 */
 	_setCaptionPosition(element) {
-		const figcaption = domUtils.getEdgeChild(domUtils.getParentElement(element, 'FIGURE'), 'FIGCAPTION');
+		const figcaption = domUtils.getEdgeChild(domUtils.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false);
 		if (figcaption) {
 			figcaption.style.marginTop = (this.isVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
 		}
@@ -1088,11 +1117,12 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Removes the margin top property from the figure caption.
-	 * @param {Element} element Target element.
+	 * @param {Node} element Target element.
 	 */
 	_deleteCaptionPosition(element) {
-		const figcaption = domUtils.getEdgeChild(domUtils.getParentElement(element, 'FIGURE'), 'FIGCAPTION');
+		const figcaption = domUtils.getEdgeChild(domUtils.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false);
 		if (figcaption) {
 			figcaption.style.marginTop = '';
 		}
@@ -1100,20 +1130,21 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Displays or hides the resize handles of the figure component.
 	 * @param {boolean} display Whether to display resize handles.
 	 */
 	_displayResizeHandles(display) {
-		display = !display ? 'none' : 'flex';
-		this.controller.form.style.display = display;
+		const type = !display ? 'none' : 'flex';
+		this.controller.form.style.display = type;
 
 		const _figure = this.editor.frameContext.get('_figure');
 		const resizeHandles = _figure.handles;
 		for (let i = 0, len = resizeHandles.length; i < len; i++) {
-			resizeHandles[i].style.display = display;
+			resizeHandles[i].style.display = type;
 		}
 
-		if (display === 'none') {
+		if (type === 'none') {
 			domUtils.addClass(_figure.main, 'se-resize-ing');
 			this.__onResizeESCEvent = this.eventManager.addGlobalEvent('keydown', this.__containerResizingESC);
 		} else {
@@ -1123,6 +1154,7 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Removes the resize event listeners.
 	 */
 	_offResizeEvent() {
@@ -1138,8 +1170,9 @@ Figure.prototype = {
 
 	/**
 	 * @private
+	 * @this {FigureThis}
 	 * @description Sets up drag event handling for the figure component.
-	 * @param {Element} figureMain The main figure container element.
+	 * @param {Node} figureMain The main figure container element.
 	 */
 	_setDragEvent(figureMain) {
 		const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
@@ -1219,6 +1252,7 @@ function OnResizeContainer(e) {
 
 /**
  * @private
+ * @this {FigureThis}
  * @description Handles the resizing of the figure container.
  * @param {MouseEvent} e Mouse event.
  */
@@ -1251,14 +1285,15 @@ function ContainerResizing(e) {
 		resultH = h;
 	}
 
-	this._resize_w = /h$/.test(direction) ? this._width : Math.round(resultW);
-	this._resize_h = /w$/.test(direction) ? this._height : Math.round(resultH);
+	this._resize_w = /** @type {number} */ (/h$/.test(direction) ? this._width : Math.round(resultW));
+	this._resize_h = /** @type {number} */ (/w$/.test(direction) ? this._height : Math.round(resultH));
 	const rw = __resizing_cw ? (this._resize_w / __resizing_sw) * __resizing_cw * 100 : this._resize_w;
 	domUtils.changeTxt(this.editor.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' x ' + this._resize_h);
 }
 
 /**
  * @private
+ * @this {FigureThis}
  * @description Finalizes the resizing process of the figure container.
  */
 function ContainerResizingOff() {
@@ -1285,8 +1320,8 @@ function ContainerResizingOff() {
 	if (__resizing_p_wh || __resizing_p_ow) {
 		const sizeTarget = this._cover || this._element;
 		w = (w / sizeTarget.offsetWidth) * __resizing_cw * 100;
-		w = numbers.get(w > 100 ? 100 : w, 2) + '%';
-		this._setPercentSize(w, __resizing_p_ow ? this.getSize(this._element).h : '');
+		const wp = numbers.get(w > 100 ? 100 : w, 2) + '%';
+		this._setPercentSize(wp, __resizing_p_ow ? this.getSize(this._element).h : '');
 	} else {
 		this._applySize(w, h, this._resize_direction);
 		if (this.isVertical) this.setTransform(this._element, w, h, 0);
@@ -1298,6 +1333,7 @@ function ContainerResizingOff() {
 
 /**
  * @private
+ * @this {FigureThis}
  * @description Cancels the resizing process when the escape key is pressed.
  * @param {KeyboardEvent} e Keyboard event.
  */
@@ -1549,8 +1585,8 @@ function CreateHTML_controller(inst, controls) {
 				}
 
 				html += /*html*/ `
-					<button type="button" data-command="${m.c}" data-value="${m.v}" class="${m.t ? 'se-btn-w-auto ' : ''}se-btn se-tooltip">
-						${icons[m.i] || m.t || m.i}
+					<button type="button" data-command="${m.c}" data-value="${m.v}" class="se-btn se-tooltip">
+						${icons[m.i] || m.i}
 						<span class="se-tooltip-inner"><span class="se-tooltip-text">${lang[m.l] || m.l}</span></span>
 					</button>`;
 			}

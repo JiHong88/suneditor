@@ -93,9 +93,9 @@ SelectMenu.prototype = {
 	/**
 	 * @this {SelectMenuThis}
 	 * @description Initializes the select menu and attaches it to a reference element.
-	 * @param {Element} referElement - The element that triggers the select menu.
+	 * @param {Node} referElement - The element that triggers the select menu.
 	 * @param {(command: string) => void} selectMethod - The function to execute when an item is selected.
-	 * @param {{class: string, style: string}} [attr={}] - Additional attributes for the select menu container.
+	 * @param {{class?: string, style?: string}} [attr={}] - Additional attributes for the select menu container.
 	 */
 	on(referElement, selectMethod, attr) {
 		if (!attr) attr = { class: '', style: '' };

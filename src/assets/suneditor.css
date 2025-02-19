@@ -241,10 +241,6 @@
 	color: var(--se-active-color);
 }
 
-.sun-editor .se-btn-w-auto {
-	width: auto !important;
-}
-
 .sun-editor .se-btn:not(.on):not(.active):enabled:hover,
 .sun-editor .se-btn:not(.on):not(.active):enabled:focus {
 	background-color: var(--se-main-divider-color);

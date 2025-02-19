@@ -16,15 +16,15 @@ const DIR_UP_KEYCODE = /^3[7-8]$/;
 
 /**
  * @typedef {Object} ComponentInfo
- * @property {Element} target - The target element associated with the component.
+ * @property {HTMLElement} target - The target element associated with the component.
  * @property {string} pluginName - The name of the plugin related to the component.
  * @property {Object<string, *>} options - Options related to the component.
- * @property {Element} container - The main container element for the component.
- * @property {Element|null} cover - The cover element, if applicable.
- * @property {Element|null} inlineCover - The inline cover element, if applicable.
- * @property {Element|null} caption - The caption element, if applicable.
+ * @property {HTMLElement} container - The main container element for the component.
+ * @property {?HTMLElement} cover - The cover element, if applicable.
+ * @property {?HTMLElement} inlineCover - The inline cover element, if applicable.
+ * @property {?HTMLElement} caption - The caption element, if applicable.
  * @property {boolean} isFile - Whether the component is a file-related component.
- * @property {Element|null} launcher - The element that triggered the component, if applicable.
+ * @property {?HTMLElement} launcher - The element that triggered the component, if applicable.
  */
 
 /**
@@ -50,7 +50,7 @@ function Component(editor) {
 
 	/**
 	 * @description Currently selected component target
-	 * @type {Element|null}
+	 * @type {Node|null}
 	 */
 	this.currentTarget = null;
 
@@ -114,7 +114,7 @@ Component.prototype = {
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipSelection=false] If true, do not automatically select the inserted component.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
-	 * @returns {Element} The inserted element or new line (for HR)
+	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
 	insert(element, { skipCharCount, skipSelection, skipHistory } = {}) {
 		if (this.editor.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(element))) {
@@ -135,7 +135,7 @@ Component.prototype = {
 			if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
 				const depthFormat = domUtils.getParentElement(r.container, this.format.isBlock.bind(this.format));
 				oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
-				if (oNode) formatEl = /** @type {Element} */ (oNode.previousSibling);
+				if (oNode) formatEl = /** @type {HTMLElement} */ (oNode.previousSibling);
 			}
 			this.html.insertNode(element, { afterNode: isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
 			if (!isInline && formatEl && domUtils.isZeroWidth(formatEl)) domUtils.removeItem(formatEl);
@@ -164,7 +164,7 @@ Component.prototype = {
 			this.editor.frameContext.get('documentType').reHeader();
 		}
 
-		return /** @type {Element} */ (oNode || element);
+		return /** @type {HTMLElement} */ (oNode || element);
 	},
 
 	/**
@@ -229,7 +229,7 @@ Component.prototype = {
 	/**
 	 * @this {ComponentThis}
 	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.
-	 * @param {Element} element Target element
+	 * @param {Node} element Target element
 	 * @param {string} pluginName The plugin name for the selected target.
 	 * @param {boolean=} isInput Whether the target is an input component.(table)
 	 */
@@ -425,7 +425,7 @@ Component.prototype = {
 	 * @private
 	 * @this {ComponentThis}
 	 * @description Set line breaker of component
-	 * @param {Element} element Element tag
+	 * @param {Node} element Element tag
 	 */
 	_setComponentLineBreaker(element) {
 		const _overInfo = _DragHandle.get('__overInfo') === ON_OVER_COMPONENT;
@@ -615,7 +615,7 @@ function OnDragEnd() {
  * @param {MouseEvent} e - Mouse event
  */
 function OnDragClick(e) {
-	const target = /** @type {Element} */ (e.target);
+	const target = /** @type {HTMLElement} */ (e.target);
 	if (!domUtils.hasClass(target, 'se-drag-handle-full')) return;
 
 	const dragInst = _DragHandle.get('__dragInst');
@@ -628,7 +628,7 @@ function OnDragClick(e) {
  * @param {MouseEvent} e - Mouse event
  */
 function CloseListener_mousedown(e) {
-	const target = /** @type {Element} */ (e.target);
+	const target = /** @type {HTMLElement} */ (e.target);
 	if (
 		this.currentTarget?.contains(target) ||
 		domUtils.getParentElement(target, '.se-controller') ||
@@ -645,7 +645,7 @@ function CloseListener_mousedown(e) {
  * @param {ClipboardEvent} e - Event object
  */
 function OnCopy_component(e) {
-	const target = /** @type {Element} */ (e.target);
+	const target = /** @type {HTMLElement} */ (e.target);
 	if (domUtils.isInputElement(target) && domUtils.getParentElement(target, '.se-modal')) return;
 
 	const info = this.info;

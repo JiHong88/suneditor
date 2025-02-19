@@ -20,6 +20,8 @@ declare global {
 		innerText: string;
 		data: string;
 		tagName: string;
+		id: string;
+		name: string;
 
 		// HTML-specific properties
 		innerHTML: string;
@@ -65,6 +67,8 @@ declare global {
 		offsetLeft: number;
 		offsetWidth: number;
 		offsetHeight: number;
+		naturalWidth: number;
+		naturalHeight: number;
 		scrollTop: number;
 		scrollLeft: number;
 		scrollWidth: number;
@@ -74,6 +78,8 @@ declare global {
 		clientHeight: number;
 		clientWidth: number;
 		offsetParent: Node | null;
+		width: number | string;
+		height: number | string;
 		getBoundingClientRect(): DOMRect;
 		scrollIntoView(arg?: boolean | ScrollIntoViewOptions): void;
 		focus(options?: FocusOptions, debug?: boolean): void;

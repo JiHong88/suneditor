@@ -20,7 +20,7 @@ function _offDownFn() {
  * @param {MouseEvent} e - Event object
  */
 export async function OnMouseDown_wysiwyg(fc, e) {
-	const eventTarget = /** @type {Element} */ (e.target);
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
 
 	this.editor.status._onMousedown = true;
 	if (_onDownEv) _offDownFn.call(this);
@@ -72,7 +72,7 @@ export async function OnMouseUp_wysiwyg(fc, e) {
  * @param {MouseEvent} e - Event object
  */
 export async function OnClick_wysiwyg(fc, e) {
-	const eventTarget = /** @type {Element} */ (e.target);
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
 
 	if (fc.get('isReadOnly')) {
 		e.preventDefault();
@@ -170,7 +170,7 @@ export async function OnClick_wysiwyg(fc, e) {
  */
 export function OnMouseMove_wysiwyg(fc, e) {
 	if (fc.get('isReadOnly') || fc.get('isDisabled')) return false;
-	const eventTarget = /** @type {Element} */ (e.target);
+	const eventTarget = /** @type {HTMLElement} */ (e.target);
 
 	// over component
 	if (_DragHandle.get('__overInfo') !== false) {

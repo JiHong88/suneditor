@@ -29,8 +29,8 @@
  * @typedef {Object} ControllerInfo
  * @property {"top"|"bottom"|"position"} position - controller position
  * @property {ControllerInstance} inst - controller instance
- * @property {Element} form - controller element
- * @property {Element} target - controller target element
+ * @property {HTMLElement} form - controller element
+ * @property {HTMLElement} target - controller target element
  * @property {boolean} isRangeTarget - If the target is a Range, set it to true.
  * @property {boolean} notInCarrier - "form"" is not included in the carrier.
  */
@@ -42,7 +42,7 @@
  * @property {number} index - index of the image.
  * @property {string} name - name of the file.
  * @property {number} size -  size of the file in bytes.
- * @property {Element} element -  target element.
+ * @property {HTMLElement} element -  target element.
  * @property {() => void} delete -  delete function.
  * @property {() => void} select -  select function.
  */
@@ -58,12 +58,12 @@
 /**
  * @typedef {Object} ImageInfo
  * @property {FileList} files - FileList object
- * @property {Element} element - target element
+ * @property {HTMLElement} element - target element
  * @property {string} inputWidth - width value
  * @property {string} inputHeight - height value
  * @property {string} align - align value
  * @property {boolean} isUpdate - new create or update
- * @property {?Element} anchor - Anchor element, if it exists
+ * @property {?HTMLElement} anchor - Anchor element, if it exists
  * @property {string} alt - alt text value
  */
 
@@ -71,7 +71,7 @@
 /**
  * @typedef {Object} VideoInfo
  * @property {FileList} files - FileList object
- * @property {Element} element - target element
+ * @property {HTMLElement} element - target element
  * @property {string} inputWidth - width value
  * @property {string} inputHeight - height value
  * @property {string} align - align value
@@ -83,7 +83,7 @@
 // --- audio
 /**
  * @typedef {Object} AudioInfo
- * @property {Element} element - target element
+ * @property {HTMLElement} element - target element
  * @property {FileList} files - FileList object
  * @property {boolean} isUpdate - new create or update
  */
@@ -99,13 +99,13 @@
 // --- embed
 /**
  * @typedef {Object} EmbedInfo
- * @property {Element} element - target element
+ * @property {HTMLElement} element - target element
  * @property {string} inputWidth - width value
  * @property {string} inputHeight - height value
  * @property {string} align - align value
  * @property {boolean} isUpdate - new create or update
  * @property {string} url - embed url
- * @property {?Element} children - When the input source is stacked in an iframe, etc., the actual embedded DOM
+ * @property {?HTMLElement} children - When the input source is stacked in an iframe, etc., the actual embedded DOM
  * @property {?ProcessInfo} process - embed process info
  */
 
@@ -204,7 +204,7 @@ export default {
 
 	/**
 	 * @description Called just before the inline toolbar is positioned and displayed on the screen.
-	 * @param {Element} toolbar - Toolbar element
+	 * @param {HTMLElement} toolbar - Toolbar element
 	 * @param {string} mode - Toolbar mode
 	 */
 	onShowToolbar: null,
@@ -266,7 +266,7 @@ export default {
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FrameContext} params.frameContext - frame context
-	 * @param {Element} params.buttonTray - button tray element
+	 * @param {HTMLElement} params.buttonTray - button tray element
 	 */
 	onSetToolbarButtons: null,
 
@@ -340,7 +340,7 @@ export default {
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
-	 * @param {Element|null} params.element - target element
+	 * @param {HTMLElement|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count
@@ -365,8 +365,8 @@ export default {
 	 * @description Called before the image is deleted
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
-	 * @param {Element} params.element - target element
-	 * @param {Element} params.container - target's container element (div)
+	 * @param {HTMLElement} params.element - target element
+	 * @param {HTMLElement} params.container - target's container element (div)
 	 * @param {string} params.align - align value
 	 * @param {string} params.alt - alt text value
 	 * @param {?string} params.url - Anchor url, if it exists
@@ -412,7 +412,7 @@ export default {
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
-	 * @param {Element|null} params.element - target element
+	 * @param {HTMLElement|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count
@@ -437,8 +437,8 @@ export default {
 	 * @description Called before the video is deleted
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
-	 * @param {Element} params.element - target element
-	 * @param {Element} params.container - target's container element (div)
+	 * @param {HTMLElement} params.element - target element
+	 * @param {HTMLElement} params.container - target's container element (div)
 	 * @param {string} params.align - align value
 	 * @param {string} params.url - video url
 	 * @returns {Promise<boolean>}
@@ -496,7 +496,7 @@ export default {
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
-	 * @param {Element|null} params.element - target element
+	 * @param {HTMLElement|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count
@@ -508,8 +508,8 @@ export default {
 	 * @description Called before the audio is deleted
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
-	 * @param {Element} params.element - target element
-	 * @param {Element} params.container - target's container element (div)
+	 * @param {HTMLElement} params.element - target element
+	 * @param {HTMLElement} params.container - target's container element (div)
 	 * @param {string} params.url - audio url
 	 * @returns {Promise<boolean>}
 	 */
@@ -543,7 +543,7 @@ export default {
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
-	 * @param {Element|null} params.element - target element
+	 * @param {HTMLElement|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count
@@ -568,8 +568,8 @@ export default {
 	 * @description Called before the file is deleted
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
-	 * @param {Element} params.element - target element
-	 * @param {Element} params.container - target's container element (div)
+	 * @param {HTMLElement} params.element - target element
+	 * @param {HTMLElement} params.container - target's container element (div)
 	 * @param {string} params.url - file url
 	 * @returns {Promise<boolean>}
 	 */
@@ -580,7 +580,7 @@ export default {
 	 * @description Called before the PDF export is started
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
-	 * @param {Element} params.target - wysiwyg editable element
+	 * @param {HTMLElement} params.target - wysiwyg editable element
 	 * @returns {Promise<boolean>}
 	 */
 	onExportPDFBefore: null,
@@ -591,7 +591,7 @@ export default {
 	 * @param {Object} params
 	 * @param {EditorCore} params.editor - The root editor instance
 	 * @param {FileManagementInfo} params.info - info object
-	 * @param {Element|null} params.element - target element
+	 * @param {HTMLElement|null} params.element - target element
 	 * @param {"create"|"update"|"delete"} params.state - state
 	 * @param {number} params.index - data index
 	 * @param {number} params.remainingFilesCount - remaining files count

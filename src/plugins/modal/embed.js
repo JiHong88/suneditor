@@ -364,7 +364,7 @@ Embed.prototype = {
 	 */
 	async destroy(element) {
 		const targetEl = element || this._element;
-		const container = domUtils.getParentElement(targetEl, Figure.__is) || targetEl;
+		const container = domUtils.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 

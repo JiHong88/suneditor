@@ -54,8 +54,8 @@ import { _w, _d } from '../../helper/env';
  * @property {number} height - Total height including scrollable area
  * @property {number} x - Horizontal offset from the top reference element
  * @property {number} y - Vertical offset from the top reference element
- * @property {Element|Window|null} ohOffsetEl - Element or window used as the vertical scroll reference
- * @property {Element|Window|null} owOffsetEl - Element or window used as the horizontal scroll reference
+ * @property {HTMLElement|Window|null} ohOffsetEl - Element or window used as the vertical scroll reference
+ * @property {HTMLElement|Window|null} owOffsetEl - Element or window used as the horizontal scroll reference
  * @property {number} oh - Height of the vertical scrollable area (clientHeight)
  * @property {number} ow - Width of the horizontal scrollable area (clientWidth)
  * @property {boolean} heightEditorRefer - Indicates if the vertical scroll reference is the editor area

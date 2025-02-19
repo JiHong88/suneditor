@@ -16,7 +16,7 @@ import ApiManager from './ApiManager';
 /**
  * @typedef {Object} FileStateParams
  * @property {EditorCore} editor - The root editor instance
- * @property {Element} element File element
+ * @property {Node} element File element
  * @property {number} index File index
  * @property {string} state File state ("create"|"update"|"delete")
  * @property {FileStateInfo} info File information
@@ -117,7 +117,7 @@ FileManager.prototype = {
 	/**
 	 * @this {FileManagerThis}
 	 * @description Set the file information to the element.
-	 * @param {Element} element File information element
+	 * @param {Node} element File information element
 	 * @param {Object} params
 	 * @param {string} params.name File name
 	 * @param {number} params.size File size
@@ -133,7 +133,7 @@ FileManager.prototype = {
 	 * @private
 	 * @this {FileManagerThis}
 	 * @description Create info object of file and add it to "infoList"
-	 * @param {Element} element
+	 * @param {Node} element
 	 * @param {{name: string, size: number}|null} file File information
 	 */
 	_setInfo(element, file) {
@@ -344,7 +344,7 @@ FileManager.prototype = {
 
 /**
  * @private
- * @param {Element} element - Element
+ * @param {Node} element - Element
  * @param {string} name - Attribute name
  * @returns {string|null}
  */

@@ -353,7 +353,7 @@ Viewer.prototype = {
 	 * @description Prints the current content of the editor.
 	 */
 	print() {
-		const iframe = /** @type {HTMLIFrameElement} */ (domUtils.createElement('IFRAME', { style: 'display: none;' }));
+		const iframe = /** @type {HTMLIFrameElement} */ (/** @type {unknown} */ (domUtils.createElement('IFRAME', { style: 'display: none;' })));
 		this._d.body.appendChild(iframe);
 
 		const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;

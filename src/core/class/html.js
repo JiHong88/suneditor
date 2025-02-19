@@ -320,12 +320,12 @@ HTML.prototype = {
 	 * @this {HTMLThis}
 	 * @description Inserts an (HTML element / HTML string / plain string) at the selection range.
 	 * - If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
-	 * @param {Element|string} html HTML Element or HTML string or plain string
+	 * @param {Node|string} html HTML Element or HTML string or plain string
 	 * @param {Object} [options] Options
 	 * @param {boolean} [options.selectInserted=false] If true, selects the range of the inserted node.
 	 * @param {boolean} [options.skipCharCount=false] If true, inserts even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipCleaning=false] If true, inserts the HTML string without refining it with html.clean.
-	 * @returns {Element|null} The inserted element or null if insertion failed
+	 * @returns {HTMLElement|null} The inserted element or null if insertion failed
 	 */
 	insert(html, { selectInserted, skipCharCount, skipCleaning } = {}) {
 		if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.get().focusNode)) this.editor.focus();
@@ -1158,7 +1158,7 @@ HTML.prototype = {
 	 * @private
 	 * @this {HTMLThis}
 	 * @description construct wysiwyg area element to html string
-	 * @param {Element|string} html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
+	 * @param {Node|string} html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
 	 * @param {boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
 	 */
@@ -1205,7 +1205,7 @@ HTML.prototype = {
 					tag = node.nodeName.toLowerCase();
 					tagIndent = elementIndent || nodeRegTest ? indent : '';
 					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
-					recursionFunc(/** @type {Element} */ (node), indent + indentSize + '');
+					recursionFunc(node, indent + indentSize + '');
 					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
 				}
 			}
@@ -1505,7 +1505,7 @@ HTML.prototype = {
 		const tempTree = dom.childNodes;
 
 		for (let i = 0, len = tempTree.length, n; i < len; i++) {
-			n = /** @type {Element} */ (tempTree[i]);
+			n = tempTree[i];
 			if (this.__allowedTagNameRegExp.test(n.nodeName)) {
 				value += n.outerHTML;
 				continue;
