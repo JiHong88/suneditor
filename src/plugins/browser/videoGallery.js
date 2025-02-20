@@ -2,53 +2,62 @@ import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
 /**
- * @class
- * @description Video gallery plugin
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<*>=} pluginOptions.data - direct data without server calls
- * @param {string=} pluginOptions.url - server request url
- * @param {Object<string, string>=} pluginOptions.headers - server request headers
- * @param {string|(() => string)} pluginOptions.thumbnail - default thumbnail
+ * @typedef {import('../../modules/Browser').BrowserFile} BrowserFile
  */
-function VideoGallery(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.videoGallery;
-	this.icon = 'video_gallery';
 
-	// modules
-	const thumbnail = pluginOptions.thumbnail || this.icons.video_thumbnail;
-	this.browser = new Browser(this, {
-		title: this.lang.videoGallery,
-		data: pluginOptions.data,
-		url: pluginOptions.url,
-		headers: pluginOptions.headers,
-		selectorHandler: SetItem.bind(this),
-		columnSize: 4,
-		className: 'se-video-gallery',
-		thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail,
-		props: ['frame']
-	});
+/**
+ * @class
+ * @extends EditorInjector
+ * @description Video gallery plugin
+ */
+class VideoGallery extends EditorInjector {
+	static key = 'videoGallery';
+	static type = 'browser';
+	static className = '';
 
-	// members
-	this.width = this.plugins.video.pluginOptions.defaultWidth === 'auto' ? '' : this.plugins.video.pluginOptions.defaultWidth;
-	this.height = this.plugins.video.pluginOptions.defaultHeight === 'auto' ? '' : this.plugins.video.pluginOptions.defaultHeight;
-}
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<*>=} pluginOptions.data - direct data without server calls
+	 * @param {string=} pluginOptions.url - server request url
+	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
+	 * @param {string|((item: BrowserFile) => string)} pluginOptions.thumbnail - default thumbnail
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.videoGallery;
+		this.icon = 'video_gallery';
 
-VideoGallery.key = 'videoGallery';
-VideoGallery.type = 'browser';
-VideoGallery.className = '';
-VideoGallery.prototype = {
+		// modules
+		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.icons.video_thumbnail;
+		this.browser = new Browser(this, {
+			title: this.lang.videoGallery,
+			data: pluginOptions.data,
+			url: pluginOptions.url,
+			headers: pluginOptions.headers,
+			selectorHandler: SetItem.bind(this),
+			columnSize: 4,
+			className: 'se-video-gallery',
+			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail,
+			props: ['frame']
+		});
+
+		// members
+		this.width = this.plugins.video.pluginOptions.defaultWidth === 'auto' ? '' : this.plugins.video.pluginOptions.defaultWidth;
+		this.height = this.plugins.video.pluginOptions.defaultHeight === 'auto' ? '' : this.plugins.video.pluginOptions.defaultHeight;
+	}
+
 	/**
 	 * @editorMethod Modules.Browser
 	 * @description Executes the method that is called when a "Browser" module's is opened.
-	 * @param {Element} inputTarget First focus element when the file "Browser" is opened
+	 * @param {HTMLElement} inputTarget First focus element when the file "Browser" is opened
 	 */
 	open(inputTarget) {
 		this.inputTarget = inputTarget;
 		this.browser.open();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Browser
@@ -57,10 +66,8 @@ VideoGallery.prototype = {
 	close() {
 		this.inputTarget = null;
 		this.browser.close();
-	},
-
-	constructor: VideoGallery
-};
+	}
+}
 
 function SetItem(target) {
 	if (this.inputTarget) {

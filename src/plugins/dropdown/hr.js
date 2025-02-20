@@ -8,66 +8,70 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description HR Plugin
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<{name: string, class: string}>} pluginOptions.items - HR list
  */
-function HR(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.horizontalLine;
-	this.icon = 'horizontal_line';
+class HR extends EditorInjector {
+	static key = 'hr';
+	static type = 'dropdown';
+	static className = '';
+	static component(node) {
+		return /^hr$/i.test(node?.nodeName) ? node : null;
+	}
 
-	// create HTML
-	const HRMenus = CreateHTML(editor, pluginOptions.items);
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<{name: string, class: string}>} pluginOptions.items - HR list
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.horizontalLine;
+		this.icon = 'horizontal_line';
 
-	// members
-	this.list = HRMenus.querySelectorAll('button');
+		// create HTML
+		const HRMenus = CreateHTML(editor, pluginOptions.items);
 
-	// init
-	this.menu.initDropdownTarget(HR, HRMenus);
-}
+		// members
+		this.list = HRMenus.querySelectorAll('button');
 
-HR.key = 'hr';
-HR.type = 'dropdown';
-HR.className = '';
-HR.component = function (node) {
-	return /^hr$/i.test(node?.nodeName) ? node : null;
-};
-HR.prototype = {
+		// init
+		this.menu.initDropdownTarget(HR, HRMenus);
+	}
+
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {Element} target Target component element
+	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
 		domUtils.addClass(target, 'on');
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Called when a container is deselected.
-	 * @param {Element} element Target element
+	 * @param {HTMLElement} element Target element
 	 */
 	deselect(element) {
 		domUtils.removeClass(element, 'on');
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Element} target Target element
+	 * @param {HTMLElement} target Target element
 	 */
-	destroy(element) {
-		if (!element) return;
+	destroy(target) {
+		if (!target) return;
 
-		const focusEl = element.previousElementSibling || element.nextElementSibling;
-		domUtils.removeItem(element);
+		const focusEl = target.previousElementSibling || target.nextElementSibling;
+		domUtils.removeItem(target);
 
 		// focus
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -80,7 +84,7 @@ HR.prototype = {
 		const line = this.format.addLine(hr);
 		this.selection.setRange(line, 1, line, 1);
 		this.menu.dropdownOff();
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -98,21 +102,19 @@ HR.prototype = {
 		this.submit('__se__solid');
 		domUtils.removeItem(line);
 		this.selection.setRange(newLine, 0, newLine, 0);
-	},
+	}
 
 	/**
 	 * @description Add a hr element
-	 * @param {string} type List type
+	 * @param {string} className HR class name
 	 */
 	submit(className) {
 		const hr = domUtils.createElement('hr', { class: className });
 		this.editor.focus();
 		this.component.insert(hr, { skipCharCount: false, skipSelection: true, skipHistory: false });
 		return hr;
-	},
-
-	constructor: HR
-};
+	}
+}
 
 function CreateHTML({ lang }, HRItems) {
 	const items = HRItems || [

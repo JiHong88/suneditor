@@ -15,9 +15,9 @@ import ApiManager from './ApiManager';
  * @property {Array<string>|string=} tag - Tag name list
  * @property {string=} type - Type (image, video, audio, etc.)
  * @property {string=} frame - Frame name (iframe, video, etc.)
- * @property {BrowserFile | string} [_data] - The folder's contents or an API URL.
- * @property {boolean} [default] - Whether this folder is the default selection.
- * @property {Object<string, *>} [meta] - Metadata
+ * @property {BrowserFile | string=} _data - The folder's contents or an API URL.
+ * @property {boolean=} default - Whether this folder is the default selection.
+ * @property {Object<string, *>=} meta - Metadata
  */
 
 /**
@@ -464,7 +464,7 @@ function CallBackError(res, xmlHttp) {
  * @param {MouseEvent} e - Event object
  */
 function OnClickTag(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	if (!domUtils.isAnchor(eventTarget)) return;
 
 	const tagName = eventTarget.textContent;
@@ -488,7 +488,7 @@ function OnClickTag(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClickFile(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 
 	e.preventDefault();
 	e.stopPropagation();
@@ -508,7 +508,7 @@ function OnClickFile(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClickSide(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	e.stopPropagation();
 
 	if (/^button$/i.test(eventTarget.nodeName)) {
@@ -545,7 +545,7 @@ function OnClickSide(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnMouseDown_browser(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	if (/se-browser-inner/.test(eventTarget.className)) {
 		this._closeSignal = true;
 	} else {
@@ -559,7 +559,7 @@ function OnMouseDown_browser(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClick_browser(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	e.stopPropagation();
 
 	if (/close/.test(eventTarget.getAttribute('data-command')) || this._closeSignal) {
@@ -584,7 +584,7 @@ function Search(e) {
  * @param {MouseEvent} e - Event object
  */
 function SideOpen(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	if (domUtils.hasClass(eventTarget, 'active')) {
 		domUtils.removeClass(this.side, 'se-side-show');
 		domUtils.removeClass(eventTarget, 'active');

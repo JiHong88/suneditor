@@ -503,7 +503,7 @@ function OnKeyDown_refer(e) {
  */
 function OnMousedown_list(e) {
 	if (env.isGecko) {
-		const eventTarget = /** @type {HTMLElement} */ (e.target);
+		const eventTarget = domUtils.getEventTarget(e);
 		const target = domUtils.getParentElement(eventTarget, '.se-select-item');
 		if (target) this.eventManager._injectActiveEvent(target);
 	}
@@ -515,7 +515,7 @@ function OnMousedown_list(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnMouseMove_list(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	domUtils.addClass(this.form, 'se-select-menu-mouse-move');
 	const index = eventTarget.getAttribute('data-index');
 	if (!index) return;
@@ -528,7 +528,7 @@ function OnMouseMove_list(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClick_list(e) {
-	let target = /** @type {HTMLElement} */ (e.target);
+	let target = domUtils.getEventTarget(e);
 	let index = null;
 
 	while (!index && !/UL/i.test(target.tagName) && !domUtils.hasClass(target, 'se-select-menu')) {
@@ -556,7 +556,7 @@ function CloseListener_key(e) {
  * @param {MouseEvent} e - Event object
  */
 function CloseListener_mousedown(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	if (this.form.contains(eventTarget)) return;
 	if (e.target !== this._refer) {
 		this.close();

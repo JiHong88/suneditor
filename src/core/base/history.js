@@ -138,7 +138,7 @@ export default function History(editor) {
 		stack = stack.slice(0, stackIndex + 1);
 		root.value.splice(stackIndex + 1);
 		editor.applyCommandTargets('redo', (e) => {
-			e.setAttribute('disabled', true);
+			e.disabled = true;
 		});
 
 		for (let i = 0, len = deleteRoot.length; i < len; i++) {
@@ -160,7 +160,7 @@ export default function History(editor) {
 
 		if (stackIndex === 1) {
 			editor.applyCommandTargets('undo', (e) => {
-				e.removeAttribute('disabled');
+				e.disabled = false;
 			});
 		}
 
@@ -270,9 +270,9 @@ export default function History(editor) {
 		 * @description Resets the history stack and disables related UI buttons.
 		 */
 		reset() {
-			editor.applyCommandTargets('undo', (e) => e.setAttribute('disabled', true));
-			editor.applyCommandTargets('redo', (e) => e.setAttribute('disabled', true));
-			editor.applyCommandTargets('save', (e) => e.setAttribute('disabled', true));
+			editor.applyCommandTargets('undo', (e) => (e.disabled = true));
+			editor.applyCommandTargets('redo', (e) => (e.disabled = true));
+			editor.applyCommandTargets('save', (e) => (e.disabled = true));
 
 			editor.applyFrameRoots((e) => e.set('historyIndex', -1));
 			editor.applyFrameRoots((e) => e.set('isChanged', false));
@@ -302,12 +302,12 @@ export default function History(editor) {
 			const rootLen = root.value.length - 1;
 
 			editor.applyCommandTargets('undo', (e) => {
-				if (index > 0 && index <= rootLen) e.removeAttribute('disabled');
-				else e.setAttribute('disabled', true);
+				if (index > 0 && index <= rootLen) e.disabled = false;
+				else e.disabled = true;
 			});
 			editor.applyCommandTargets('redo', (e) => {
-				if (index > -1 && index < rootLen) e.removeAttribute('disabled');
-				else e.setAttribute('disabled', true);
+				if (index > -1 && index < rootLen) e.disabled = false;
+				else e.disabled = true;
 			});
 
 			const savedIndex = target.get('savedIndex');
@@ -317,8 +317,8 @@ export default function History(editor) {
 			target.set('historyIndex', index);
 			target.set('isChanged', isChanged);
 			editor.applyCommandTargets('save', (e) => {
-				if (isChanged) e.removeAttribute('disabled');
-				else e.setAttribute('disabled', true);
+				if (isChanged) e.disabled = false;
+				else e.disabled = true;
 			});
 
 			editor.triggerEvent('onResetButtons', { rootKey });

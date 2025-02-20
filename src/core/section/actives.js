@@ -138,7 +138,7 @@ export async function SAVE(editor) {
 
 	// set save button disable
 	editor.applyCommandTargets('save', (e) => {
-		e.setAttribute('disabled', true);
+		e.disabled = true;
 	});
 }
 

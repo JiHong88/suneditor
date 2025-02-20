@@ -14,13 +14,14 @@
  * @property {boolean} enter - Whether the Enter key is pressed.
  * @property {string} command - The command key. (e.g. "bold")
  * @property {boolean} edge - Whether the cursor is at the end of the line.
- * @property {?string} key - The key pressed (e.g., "1.").
- * @property {?string|((...args: *) => *)} method - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
- * @property {?string} plugin - The plugin name.
- * @property {?string} type - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
- * @property {?Node} button - The plugin command button.
- * @property {?Array<string>} r - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
- * @property {?string} textTrigger - Whether the event was triggered by a text input (e.g., mention like @ab).
+ * @property {string=} key - The key pressed (e.g., "1.").
+ * @property {number=} keyCode - The keyCode.
+ * @property {string|((...args: *) => *)=} method - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
+ * @property {string} plugin - The plugin name.
+ * @property {string} type - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
+ * @property {Node} button - The plugin command button.
+ * @property {Array<string>} r - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
+ * @property {string} textTrigger - Whether the event was triggered by a text input (e.g., mention like @ab).
  */
 
 /**

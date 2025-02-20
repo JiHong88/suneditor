@@ -11,69 +11,72 @@ const { debounce } = converter;
  * - Displays a mention list when the trigger character is typed.
  * - Supports fetching mention data from an API or a predefined data array.
  * - Uses caching for optimized performance.
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {string=} [pluginOptions.triggerText="@"] The character that triggers the mention list. Default is '@'.
- * @param {number=} [pluginOptions.limitSize=5] The number of items to display in the mention list. Default is 5.
- * @param {number=} [pluginOptions.searchStartLength=0] The number of characters to start searching for the mention list. Default is 0.
- * @param {number=} [pluginOptions.delayTime=200] The time to wait before displaying the mention list. Default is 200ms.
- * @param {Array<{key: string, name: string, url: string}>=} pluginOptions.data Use data without using API.
- * @param {string=} pluginOptions.apiUrl The URL to call the mention list. Default is ''.
- * @param {Object<string, string>=} pluginOptions.apiHeaders The headers to send with the API call. Default is {}.
- * @param {boolean=} [pluginOptions.useCachingData=true] Whether to cache the mention list data. Default is true.
- * @param {boolean=} [pluginOptions.useCachingFieldData=true] Whether to cache the mention list data in the field. Default is true.
  */
-function Mention(editor, pluginOptions) {
-	EditorInjector.call(this, editor);
-	// plugin basic properties
-	this.title = this.lang.mention;
-	this.icon = 'mention';
+class Mention extends EditorInjector {
+	static key = 'mention';
+	static type = 'field';
+	static className = '';
 
-	// members
-	this.triggerText = pluginOptions.triggerText || '@';
-	this.limitSize = pluginOptions.limitSize || 5;
-	this.searchStartLength = pluginOptions.searchStartLength || 0;
-	this.delayTime = typeof pluginOptions.delayTime === 'number' ? pluginOptions.delayTime : 200;
-	this.directData = pluginOptions.data;
-	this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace(/\{limitSize\}/i, this.limitSize) || '';
-	this._delay = 0;
-	this._lastAtPos = 0;
-	this._anchorOffset = 0;
-	this._anchorNode = null;
-	// members - api, caching
-	this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
-	this.cachingData = pluginOptions.useCachingData ?? true ? new Map() : null;
-	this.cachingFieldData = pluginOptions.useCachingFieldData ?? true ? new Map([['', []]]) : null;
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {string=} [pluginOptions.triggerText="@"] The character that triggers the mention list. Default is '@'.
+	 * @param {number=} [pluginOptions.limitSize=5] The number of items to display in the mention list. Default is 5.
+	 * @param {number=} [pluginOptions.searchStartLength=0] The number of characters to start searching for the mention list. Default is 0.
+	 * @param {number=} [pluginOptions.delayTime=200] The time to wait before displaying the mention list. Default is 200ms.
+	 * @param {Array<{key: string, name: string, url: string}>=} pluginOptions.data Use data without using API.
+	 * @param {string=} pluginOptions.apiUrl The URL to call the mention list. Default is ''.
+	 * @param {Object<string, string>=} pluginOptions.apiHeaders The headers to send with the API call. Default is {}.
+	 * @param {boolean=} [pluginOptions.useCachingData=true] Whether to cache the mention list data. Default is true.
+	 * @param {boolean=} [pluginOptions.useCachingFieldData=true] Whether to cache the mention list data in the field. Default is true.
+	 */
+	constructor(editor, pluginOptions) {
+		super(editor);
+		// plugin basic properties
+		this.title = this.lang.mention;
+		this.icon = 'mention';
 
-	// controller
-	const controllerEl = CreateHTML_controller();
-	this.selectMenu = new SelectMenu(this, { position: 'right-bottom', dir: 'ltr', closeMethod: () => this.controller.close() });
-	this.controller = new Controller(
-		this,
-		controllerEl,
-		{
-			position: 'bottom',
-			initMethod: () => {
-				this.apiManager.cancel();
-				this.selectMenu.close();
-			}
-		},
-		null
-	);
-	this.selectMenu.on(controllerEl.firstElementChild, SelectMention.bind(this));
+		// members
+		this.triggerText = pluginOptions.triggerText || '@';
+		this.limitSize = pluginOptions.limitSize || 5;
+		this.searchStartLength = pluginOptions.searchStartLength || 0;
+		this.delayTime = typeof pluginOptions.delayTime === 'number' ? pluginOptions.delayTime : 200;
+		this.directData = pluginOptions.data;
+		this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace(/\{limitSize\}/i, String(this.limitSize)) || '';
+		this._delay = 0;
+		this._lastAtPos = 0;
+		this._anchorOffset = 0;
+		this._anchorNode = null;
+		// members - api, caching
+		this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
+		this.cachingData = pluginOptions.useCachingData ?? true ? new Map() : null;
+		this.cachingFieldData = pluginOptions.useCachingFieldData ?? true ? new Map([['', []]]) : null;
 
-	// onInput debounce
-	this.onInput = debounce(this.onInput.bind(this), this.delayTime);
-}
+		// controller
+		const controllerEl = CreateHTML_controller();
+		this.selectMenu = new SelectMenu(this, { position: 'right-bottom', dir: 'ltr', closeMethod: () => this.controller.close() });
+		this.controller = new Controller(
+			this,
+			controllerEl,
+			{
+				position: 'bottom',
+				initMethod: () => {
+					this.apiManager.cancel();
+					this.selectMenu.close();
+				}
+			},
+			null
+		);
+		this.selectMenu.on(controllerEl.firstElementChild, SelectMention.bind(this));
 
-Mention.key = 'mention';
-Mention.type = 'field';
-Mention.className = '';
-Mention.prototype = {
+		// onInput debounce
+		this.onInput = debounce(this.onInput.bind(this), this.delayTime);
+	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "input".
-	 * @param {PluginInputEventInfo} params
 	 * @returns {Promise<boolean>}
 	 */
 	async onInput() {
@@ -117,7 +120,7 @@ Mention.prototype = {
 
 		this.selectMenu.close();
 		return true;
-	},
+	}
 
 	/**
 	 * @private
@@ -176,7 +179,7 @@ Mention.prototype = {
 			if (this.cachingData) this.cachingData.set(value, list);
 			return true;
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -186,10 +189,8 @@ Mention.prototype = {
 	 */
 	_createUrl(key) {
 		return this.apiUrl.replace(/\{key\}/i, key);
-	},
-
-	constructor: Mention
-};
+	}
+}
 
 /**
  * @description Inserts a mention link into the editor when a user selects a mention from the list.

@@ -29,93 +29,97 @@ const { _w, isMobile } = env;
 /**
  * @class
  * @description Drawing modal plugin.
- * @param {EditorCore} editor - The root editor instance
- * @param {DrawingPluginOptions} pluginOptions
  */
-function Drawing(editor, pluginOptions) {
-	// plugin basic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.drawing;
-	this.icon = 'drawing';
-	this.pluginOptions = {
-		outputFormat: pluginOptions.outputFormat || 'dataurl', // dataurl, svg
-		useFormatType: pluginOptions.useFormatType ?? false,
-		defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
-		keepFormatType: pluginOptions.keepFormatType ?? false,
-		lineWidth: pluginOptions.lineWidth || 5,
-		lineReconnect: !!pluginOptions.lineReconnect,
-		lineCap: ['butt', 'round', 'square'].includes(pluginOptions.lineCap) ? pluginOptions.lineCap : 'round',
-		lineColor: pluginOptions.lineColor || '',
-		formSize: {
-			width: '750px',
-			height: '50vh',
-			maxWidth: '',
-			maxHeight: '',
-			minWidth: '150px',
-			minHeight: '100px',
-			...pluginOptions.formSize
-		},
-		canResize: pluginOptions.canResize ?? true,
-		maintainRatio: pluginOptions.maintainRatio ?? true
-	};
+class Drawing extends EditorInjector {
+	static key = 'drawing';
+	static type = 'modal';
+	static className = '';
 
-	// exception
-	if (!this.plugins.image) {
-		console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need either "image" plugin. Please add the "image" plugin.');
-	} else if (this.pluginOptions.outputFormat === 'svg' && !this.plugins.image.pluginOptions.uploadUrl) {
-		console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need the "image" plugin with the "uploadUrl" option. Please add the "image" plugin with the "uploadUrl" option.');
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {DrawingPluginOptions} pluginOptions
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin basic properties
+		super(editor);
+		this.title = this.lang.drawing;
+		this.icon = 'drawing';
+		this.pluginOptions = {
+			outputFormat: pluginOptions.outputFormat || 'dataurl', // dataurl, svg
+			useFormatType: pluginOptions.useFormatType ?? false,
+			defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
+			keepFormatType: pluginOptions.keepFormatType ?? false,
+			lineWidth: pluginOptions.lineWidth || 5,
+			lineReconnect: !!pluginOptions.lineReconnect,
+			lineCap: ['butt', 'round', 'square'].includes(pluginOptions.lineCap) ? pluginOptions.lineCap : 'round',
+			lineColor: pluginOptions.lineColor || '',
+			formSize: {
+				width: '750px',
+				height: '50vh',
+				maxWidth: '',
+				maxHeight: '',
+				minWidth: '150px',
+				minHeight: '100px',
+				...pluginOptions.formSize
+			},
+			canResize: pluginOptions.canResize ?? true,
+			maintainRatio: pluginOptions.maintainRatio ?? true
+		};
+
+		// exception
+		if (!this.plugins.image) {
+			console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need either "image" plugin. Please add the "image" plugin.');
+		} else if (this.pluginOptions.outputFormat === 'svg' && !this.plugins.image.pluginOptions.uploadUrl) {
+			console.warn('[SUNEDITOR.plugins.drawing.warn] The drawing plugin must need the "image" plugin with the "uploadUrl" option. Please add the "image" plugin with the "uploadUrl" option.');
+		}
+
+		// create HTML
+		const modalEl = CreateHTML_modal(this);
+
+		// modules
+		this.modal = new Modal(this, modalEl);
+
+		// members
+		this.as = this.pluginOptions.defaultFormatType;
+		if (this.pluginOptions.useFormatType) {
+			this.asBlock = modalEl.querySelector('[data-command="asBlock"]');
+			this.asInline = modalEl.querySelector('[data-command="asInline"]');
+			this.eventManager.addEvent([this.asBlock, this.asInline], 'click', OnClickAsButton.bind(this));
+		}
+
+		this.canvas = null;
+		this.ctx = null;
+		this.isDrawing = false;
+		this.points = [];
+		this.paths = [];
+		this.resizeObserver = null;
+		this.__events = {
+			mousedown: isMobile ? OnCanvasTouchStart.bind(this) : OnCanvasMouseDown.bind(this),
+			mousemove: isMobile ? OnCanvasTouchMove.bind(this) : OnCanvasMouseMove.bind(this),
+			mouseup: OnCanvasMouseUp.bind(this),
+			mouseleave: OnCanvasMouseLeave.bind(this),
+			mouseenter: OnCanvasMouseEnter.bind(this)
+		};
+		this.__eventsRegister = {
+			mousedown: null,
+			mousemove: null,
+			mouseup: null,
+			mouseleave: null,
+			mouseenter: null
+		};
+		this.__eventNameMap = {
+			mousedown: isMobile ? 'touchstart' : 'mousedown',
+			mousemove: isMobile ? 'touchmove' : 'mousemove',
+			mouseup: isMobile ? 'touchend' : 'mouseup',
+			mouseleave: 'mouseleave',
+			mouseenter: 'mouseenter'
+		};
+
+		// init
+		this.eventManager.addEvent(modalEl.querySelector('[data-command="remove"]'), 'click', OnRemove.bind(this));
 	}
 
-	// create HTML
-	const modalEl = CreateHTML_modal(this);
-
-	// modules
-	this.modal = new Modal(this, modalEl);
-
-	// members
-	this.as = this.pluginOptions.defaultFormatType;
-	if (this.pluginOptions.useFormatType) {
-		this.asBlock = modalEl.querySelector('[data-command="asBlock"]');
-		this.asInline = modalEl.querySelector('[data-command="asInline"]');
-		this.eventManager.addEvent([this.asBlock, this.asInline], 'click', OnClickAsButton.bind(this));
-	}
-
-	this.canvas = null;
-	this.ctx = null;
-	this.isDrawing = false;
-	this.points = [];
-	this.paths = [];
-	this.resizeObserver = null;
-	this.__events = {
-		mousedown: isMobile ? OnCanvasTouchStart.bind(this) : OnCanvasMouseDown.bind(this),
-		mousemove: isMobile ? OnCanvasTouchMove.bind(this) : OnCanvasMouseMove.bind(this),
-		mouseup: OnCanvasMouseUp.bind(this),
-		mouseleave: OnCanvasMouseLeave.bind(this),
-		mouseenter: OnCanvasMouseEnter.bind(this)
-	};
-	this.__eventsRegister = {
-		mousedown: null,
-		mousemove: null,
-		mouseup: null,
-		mouseleave: null,
-		mouseenter: null
-	};
-	this.__eventNameMap = {
-		mousedown: isMobile ? 'touchstart' : 'mousedown',
-		mousemove: isMobile ? 'touchmove' : 'mousemove',
-		mouseup: isMobile ? 'touchend' : 'mouseup',
-		mouseleave: 'mouseleave',
-		mouseenter: 'mouseenter'
-	};
-
-	// init
-	this.eventManager.addEvent(modalEl.querySelector('[data-command="remove"]'), 'click', OnRemove.bind(this));
-}
-
-Drawing.key = 'drawing';
-Drawing.type = 'modal';
-Drawing.className = '';
-Drawing.prototype = {
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description Executes the method that is called when a "Modal" module's is opened.
@@ -126,7 +130,7 @@ Drawing.prototype = {
 		}
 		this.modal.open();
 		this._initDrawing();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -134,7 +138,7 @@ Drawing.prototype = {
 	 */
 	off() {
 		this._destroyDrawing();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -159,7 +163,7 @@ Drawing.prototype = {
 		}
 
 		return true;
-	},
+	}
 
 	/**
 	 * @private
@@ -201,7 +205,7 @@ Drawing.prototype = {
 		});
 
 		this.resizeObserver.observe(canvas);
-	},
+	}
 
 	/**
 	 * @private
@@ -226,7 +230,7 @@ Drawing.prototype = {
 		this.points = [];
 		this.paths = [];
 		this.isDrawing = false;
-	},
+	}
 
 	/**
 	 * @private
@@ -236,7 +240,7 @@ Drawing.prototype = {
 		this.ctx.lineWidth = this.pluginOptions.lineWidth;
 		this.ctx.lineCap = this.pluginOptions.lineCap;
 		this.ctx.lineColor = this.pluginOptions.lineColor || _w.getComputedStyle(this.carrierWrapper).color;
-	},
+	}
 
 	/**
 	 * @private
@@ -253,7 +257,7 @@ Drawing.prototype = {
 			}
 		});
 		this.ctx.stroke();
-	},
+	}
 
 	/**
 	 * @private
@@ -267,7 +271,7 @@ Drawing.prototype = {
 			this._draw();
 		});
 		this.points = [];
-	},
+	}
 
 	/**
 	 * @private
@@ -282,7 +286,7 @@ Drawing.prototype = {
 		const yRatio = newHeight / prevHeight;
 
 		this.paths = this.paths.map((path) => path.map(([x, y]) => [x * xRatio, y * yRatio]));
-	},
+	}
 
 	/**
 	 * @private
@@ -292,7 +296,7 @@ Drawing.prototype = {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.points = [];
 		this.paths = [];
-	},
+	}
 
 	/**
 	 * @private
@@ -320,7 +324,7 @@ Drawing.prototype = {
 		});
 
 		return svg;
-	},
+	}
 
 	/**
 	 * @private
@@ -339,7 +343,7 @@ Drawing.prototype = {
 		dataTransfer.items.add(file);
 
 		return dataTransfer.files;
-	},
+	}
 
 	/**
 	 * @private
@@ -353,7 +357,7 @@ Drawing.prototype = {
 		const x = touches[0].clientX - rect.left;
 		const y = touches[0].clientY - rect.top;
 		return { x, y };
-	},
+	}
 
 	/**
 	 * @private
@@ -370,10 +374,8 @@ Drawing.prototype = {
 			domUtils.removeClass(this.asInline, 'on');
 			this.as = 'block';
 		}
-	},
-
-	constructor: Drawing
-};
+	}
+}
 
 function CreateHTML_modal({ lang, icons, pluginOptions }) {
 	const { width, height, maxWidth, maxHeight, minWidth, minHeight } = pluginOptions.formSize;

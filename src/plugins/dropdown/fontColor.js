@@ -5,43 +5,47 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Font color plugin
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<string|{value: string, name: string}>} pluginOptions.items - Color list
- * @param {number} pluginOptions.splitNum - Number of colors per line
- * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
  */
-function FontColor(editor, pluginOptions) {
-	EditorInjector.call(this, editor);
-	// plugin basic properties
-	this.title = this.lang.fontColor;
-	this.icon = 'font_color';
+class FontColor extends EditorInjector {
+	static key = 'fontColor';
+	static type = 'dropdown-free';
+	static className = '';
 
-	// create HTML
-	const menu = CreateHTML();
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<string|{value: string, name: string}>} pluginOptions.items - Color list
+	 * @param {number} pluginOptions.splitNum - Number of colors per line
+	 * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+	 */
+	constructor(editor, pluginOptions) {
+		super(editor);
+		// plugin basic properties
+		this.title = this.lang.fontColor;
+		this.icon = 'font_color';
 
-	// members
-	this.colorPicker = new ColorPicker(this, 'color', {
-		colorList: pluginOptions.items,
-		splitNum: pluginOptions.splitNum,
-		disableHEXInput: pluginOptions.disableHEXInput,
-		hueSliderOptions: { controllerOptions: { parents: [menu], isOutsideForm: true } }
-	});
+		// create HTML
+		const menu = CreateHTML();
 
-	// itit
-	menu.appendChild(this.colorPicker.target);
-	this.menu.initDropdownTarget(FontColor, menu);
-}
+		// members
+		this.colorPicker = new ColorPicker(this, 'color', {
+			colorList: pluginOptions.items,
+			splitNum: pluginOptions.splitNum,
+			disableHEXInput: pluginOptions.disableHEXInput,
+			hueSliderOptions: { controllerOptions: { parents: [menu], isOutsideForm: true } }
+		});
 
-FontColor.key = 'fontColor';
-FontColor.type = 'dropdown-free';
-FontColor.className = '';
-FontColor.prototype = {
+		// itit
+		menu.appendChild(this.colorPicker.target);
+		this.menu.initDropdownTarget(FontColor, menu);
+	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
@@ -56,7 +60,7 @@ FontColor.prototype = {
 		}
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Dropdown
@@ -65,7 +69,7 @@ FontColor.prototype = {
 	 */
 	on(target) {
 		this.colorPicker.init(this.selection.getNode(), target);
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Dropdown
@@ -73,7 +77,7 @@ FontColor.prototype = {
 	 */
 	off() {
 		this.colorPicker.hueSliderClose();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.ColorPicker
@@ -90,10 +94,8 @@ FontColor.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
-
-	constructor: FontColor
-};
+	}
+}
 
 function CreateHTML() {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, null);

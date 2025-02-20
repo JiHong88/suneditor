@@ -4,40 +4,44 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Text font plugin
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<string>} pluginOptions.items - Font list
- * @param {number} pluginOptions.splitNum - Number of colors per line
- * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
  */
-function Font(editor, pluginOptions) {
-	EditorInjector.call(this, editor);
-	// plugin basic properties
-	this.title = this.lang.font;
-	this.inner = '<span class="se-txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
+class Font extends EditorInjector {
+	static key = 'font';
+	static type = 'dropdown';
+	static className = 'se-btn-select se-btn-tool-font';
 
-	// create HTML
-	const fontList = pluginOptions.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];
-	const menu = CreateHTML(editor, fontList);
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<string>} pluginOptions.items - Font list
+	 * @param {number} pluginOptions.splitNum - Number of colors per line
+	 * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+	 */
+	constructor(editor, pluginOptions) {
+		super(editor);
+		// plugin basic properties
+		this.title = this.lang.font;
+		this.inner = '<span class="se-txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
 
-	// members
-	this.currentFont = '';
-	this.fontList = menu.querySelectorAll('ul li button');
-	this.fontArray = fontList;
+		// create HTML
+		const fontList = pluginOptions.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];
+		const menu = CreateHTML(editor, fontList);
 
-	// init
-	this.menu.initDropdownTarget(Font, menu);
-}
+		// members
+		this.currentFont = '';
+		this.fontList = menu.querySelectorAll('ul li button');
+		this.fontArray = fontList;
 
-Font.key = 'font';
-Font.type = 'dropdown';
-Font.className = 'se-btn-select se-btn-tool-font';
-Font.prototype = {
+		// init
+		this.menu.initDropdownTarget(Font, menu);
+	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
@@ -56,7 +60,7 @@ Font.prototype = {
 		}
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Dropdown
@@ -78,7 +82,7 @@ Font.prototype = {
 
 			this.currentFont = currentFont;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -104,10 +108,8 @@ Font.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
-
-	constructor: Font
-};
+	}
+}
 
 function CreateHTML({ lang }, fontList) {
 	let list = /*html*/ `

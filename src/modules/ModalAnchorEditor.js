@@ -439,7 +439,7 @@ ModalAnchorEditor.prototype = {
  * @param {InputEvent} e - The change event object.
  */
 async function OnChangeFile(e) {
-	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	const files = eventTarget.files;
 	if (!files[0]) return;
 
@@ -515,7 +515,7 @@ function SetRelItem(item) {
  * @param {InputEvent} e - Event object
  */
 function OnChange_displayInput(e) {
-	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	this._change = !!eventTarget.value.trim();
 }
 
@@ -525,7 +525,7 @@ function OnChange_displayInput(e) {
  * @param {InputEvent} e - Event object
  */
 function OnChange_urlInput(e) {
-	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	const value = eventTarget.value.trim();
 	this._setLinkPreview(value);
 	if (this._selfPathBookmark(value)) this._createBookmarkList(value);
@@ -572,7 +572,7 @@ function OnClick_bookmarkButton() {
  */
 function OnChange_newWindowCheck(e) {
 	if (typeof this.defaultRel.check_new_window !== 'string') return;
-	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	if (eventTarget.checked) {
 		this._setRel(this._relMerge(this.defaultRel.check_new_window));
 	} else {
@@ -586,7 +586,7 @@ function OnChange_newWindowCheck(e) {
  * @param {InputEvent} e - Event object
  */
 function OnChange_downloadCheck(e) {
-	const eventTarget = /** @type {HTMLInputElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	if (eventTarget.checked) {
 		this.download.style.display = 'block';
 		this.bookmark.style.display = 'none';

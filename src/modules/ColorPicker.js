@@ -141,7 +141,7 @@ ColorPicker.prototype = {
 	 * @this {ColorPickerThis}
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node
-	 * @param {string|null} target target
+	 * @param {Node} target target
 	 */
 	init(nodeOrColor, target) {
 		this.targetButton = target;

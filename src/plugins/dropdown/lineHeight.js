@@ -4,36 +4,40 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Line height Plugin
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<{text: string, value: number}>} pluginOptions.items - Line height list
  */
-function LineHeight(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.lineHeight;
-	this.icon = 'line_height';
+class LineHeight extends EditorInjector {
+	static key = 'lineHeight';
+	static type = 'dropdown';
+	static className = '';
 
-	// create HTML
-	const menu = CreateHTML(editor, pluginOptions.items);
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<{text: string, value: number}>} pluginOptions.items - Line height list
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.lineHeight;
+		this.icon = 'line_height';
 
-	// members
-	this.sizeList = menu.querySelectorAll('li button');
-	this.currentSize = -1;
+		// create HTML
+		const menu = CreateHTML(editor, pluginOptions.items);
 
-	// init
-	this.menu.initDropdownTarget(LineHeight, menu);
-}
+		// members
+		this.sizeList = menu.querySelectorAll('li button');
+		this.currentSize = null;
 
-LineHeight.key = 'lineHeight';
-LineHeight.type = 'dropdown';
-LineHeight.className = '';
-LineHeight.prototype = {
+		// init
+		this.menu.initDropdownTarget(LineHeight, menu);
+	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
@@ -44,7 +48,7 @@ LineHeight.prototype = {
 
 		domUtils.removeClass(target, 'active');
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Dropdown
@@ -66,7 +70,7 @@ LineHeight.prototype = {
 
 			this.currentSize = currentSize;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -86,10 +90,8 @@ LineHeight.prototype = {
 
 		this.editor.effectNode = null;
 		this.history.push(false);
-	},
-
-	constructor: LineHeight
-};
+	}
+}
 
 function CreateHTML({ lang }, items) {
 	const sizeList = items || [

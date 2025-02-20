@@ -543,7 +543,7 @@ function OnClickHeader(ww, e) {
 
 	try {
 		this.editor._preventBlur = true;
-		const clickedHeader = /** @type {HTMLElement} */ (e.target);
+		const clickedHeader = domUtils.getEventTarget(e);
 		if (domUtils.hasClass(clickedHeader, 'se-doc-item')) {
 			const innerIndex = Array.prototype.indexOf.call(this.innerHeaders, clickedHeader);
 			if (innerIndex === -1) return;

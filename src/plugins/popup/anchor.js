@@ -8,38 +8,42 @@ const { _w } = env;
  * @class
  * @description Anchor plugin
  * - Allows you to create, edit, and delete elements that act as anchors (bookmarks) within a document.
- * @param {EditorCore} editor - The root editor instance
  */
-function Anchor(editor) {
-	EditorInjector.call(this, editor);
-	// plugin basic properties
-	this.title = this.lang.anchor;
-	this.icon = 'bookmark_anchor';
+class Anchor extends EditorInjector {
+	static key = 'anchor';
+	static type = 'popup';
+	static className = '';
+	static component(node) {
+		return domUtils.isAnchor(node) && node.hasAttribute('id') && node.hasAttribute('data-se-anchor') ? node : null;
+	}
 
-	// members
-	const parser = new DOMParser();
-	const svgDoc = parser.parseFromString(this.icons.bookmark_anchor, 'image/svg+xml');
-	this.bookmarkIcon = svgDoc.documentElement;
-	this._element = null;
-	this._range = null;
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+		// plugin basic properties
+		this.title = this.lang.anchor;
+		this.icon = 'bookmark_anchor';
 
-	// controller
-	const controllerSelectEl = CreateHTML_controller_select(this);
-	this.displayId = controllerSelectEl.querySelector('.se-controller-display');
-	this.controllerSelect = new Controller(this, controllerSelectEl, { position: 'bottom', disabled: true }, this.kind);
+		// members
+		const parser = new DOMParser();
+		const svgDoc = parser.parseFromString(this.icons.bookmark_anchor, 'image/svg+xml');
+		this.bookmarkIcon = svgDoc.documentElement;
+		this._element = null;
+		this._range = null;
 
-	const controllerEl = CreateHTML_controller(this);
-	this.inputEl = controllerEl.querySelector('input');
-	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true }, this.kind);
-}
+		// controller
+		const controllerSelectEl = CreateHTML_controller_select(this);
+		this.displayId = controllerSelectEl.querySelector('.se-controller-display');
+		this.controllerSelect = new Controller(this, controllerSelectEl, { position: 'bottom', disabled: true }, Anchor.key);
 
-Anchor.key = 'anchor';
-Anchor.type = 'popup';
-Anchor.component = function (node) {
-	return domUtils.isAnchor(node) && node.hasAttribute('id') && node.hasAttribute('data-se-anchor') ? node : null;
-};
-Anchor.className = '';
-Anchor.prototype = {
+		const controllerEl = CreateHTML_controller(this);
+		this.inputEl = controllerEl.querySelector('input');
+		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true }, Anchor.key);
+	}
+
 	/**
 	 * @editorMethod Editor.Plugin<popup>
 	 * @description Displays a popup and gives focus to the input field.
@@ -49,32 +53,31 @@ Anchor.prototype = {
 		_w.setTimeout(() => {
 			this.inputEl.focus();
 		}, 0);
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {Element} target Target component element
+	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
 		this._element = target;
 		this.displayId.textContent = target.getAttribute('id');
 		this.controllerSelect.open(target);
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Called when a container is deselected.
-	 * @param {Element} element Target element
 	 */
 	deselect() {
 		this._init();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {Element} target Target button element
+	 * @param {HTMLElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -150,7 +153,7 @@ Anchor.prototype = {
 				break;
 			}
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -162,10 +165,8 @@ Anchor.prototype = {
 		this._range = null;
 		this.inputEl.value = '';
 		this.displayId.textContent = '';
-	},
-
-	constructor: Anchor
-};
+	}
+}
 
 function CreateHTML_controller({ lang, icons }) {
 	const html = /*html*/ `

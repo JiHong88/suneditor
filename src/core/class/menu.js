@@ -251,7 +251,7 @@ Menu.prototype = {
  * @param {MouseEvent} e - Event object
  */
 function OnMouseDown_dropdown(e) {
-	const eventTarget = /** @type {Node} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	if (domUtils.getParentElement(eventTarget, '.se-dropdown')) return;
 	this.dropdownOff();
 }

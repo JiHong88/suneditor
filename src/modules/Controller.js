@@ -14,25 +14,25 @@ const INDEX_2 = '2147483645';
 
 /**
  * @typedef {Object} ControllerInfo
- * @property {string} position The controller position
  * @property {*} inst The controller instance
- * @property {HTMLElement} form The controller element
- * @property {HTMLElement|Range} target The controller target element
- * @property {boolean} notInCarrier If the controller is not in the "carrierWrapper", set it to true.
- * @property {boolean} [isRangeTarget] If the target is a Range, set it to true.
- * @property {boolean} [fixed] If the controller is fixed and should not be closed, set it to true.
+ * @property {string} [position="bottom"] The controller position ("bottom"|"top")
+ * @property {HTMLElement} [form=null] The controller element
+ * @property {HTMLElement|Range} [target=null] The controller target element
+ * @property {boolean} [notInCarrier=false] If the controller is not in the "carrierWrapper", set it to true.
+ * @property {boolean} [isRangeTarget=false] If the target is a Range, set it to true.
+ * @property {boolean} [fixed=false] If the controller is fixed and should not be closed, set it to true.
  */
 
 /**
  * @typedef {Object} ControllerParams
- * @property {"top"|"bottom"} position Controller position
- * @property {boolean=} isWWTarget If the controller is in the WYSIWYG area, set it to true.
- * @property {() => void=} initMethod Method to be called when the controller is closed.
- * @property {boolean=} disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
- * @property {Array<Node>=} parents The parent "controller" array when "controller" is opened nested.
- * @property {boolean=} parentsHide If true, the parent element is hidden when the controller is opened.
- * @property {boolean=} isInsideForm If the controller is inside a form, set it to true.
- * @property {boolean=} isOutsideForm If the controller is outside a form, set it to true.
+ * @property {"top"|"bottom"} [position="bottom"] Controller position
+ * @property {boolean=} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to true.
+ * @property {() => void=} [initMethod=null] Method to be called when the controller is closed.
+ * @property {boolean=} [disabled=false] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
+ * @property {Array<Node>=} [parents=[]] The parent "controller" array when "controller" is opened nested.
+ * @property {boolean=} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
+ * @property {boolean=} [isInsideForm=false] If the controller is inside a form, set it to true.
+ * @property {boolean=} [isOutsideForm=false] If the controller is outside a form, set it to true.
  */
 
 /**
@@ -55,7 +55,7 @@ function Controller(inst, element, params, _name) {
 	this.currentTarget = null;
 	this.currentPositionTarget = null;
 	this.isWWTarget = params.isWWTarget ?? true;
-	this.position = params.position;
+	this.position = params.position || 'bottom';
 	this.disabled = !!params.disabled;
 	this.parents = params.parents || [];
 	this.parentsHide = !!params.parentsHide;
@@ -89,7 +89,7 @@ Controller.prototype = {
 	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
 	 * @param {() => void=} params.initMethod Method to be called when the controller is closed.
 	 * @param {boolean=} params.disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled. (default: this.disabled)
-	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
+	 * @param {{left?: number, top?: number}=} params.addOffset Additional offset values
 	 */
 	open(target, positionTarget, { isWWTarget, initMethod, disabled, addOffset } = {}) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) {
@@ -110,7 +110,6 @@ Controller.prototype = {
 			this.ui.setControllerOnDisabledButtons(false);
 		}
 
-		this.currentTarget = target;
 		this.currentPositionTarget = positionTarget || target;
 		this.isWWTarget = isWWTarget ?? this.isWWTarget;
 		if (typeof initMethod === 'function') this._initMethod = initMethod;
@@ -134,7 +133,8 @@ Controller.prototype = {
 		// display controller
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 
-		const isRangeTarget = this.selection.isRange(target);
+		const isRangeTarget = target instanceof Range;
+		this.currentTarget = isRangeTarget ? null : target;
 		this._controllerOn(this.form, target, isRangeTarget);
 		this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 	},
@@ -362,7 +362,7 @@ Controller.prototype = {
  * @param {MouseEvent} e - Event object
  */
 function Action(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	const target = domUtils.getCommandTarget(eventTarget);
 	if (!target) return;
 
@@ -381,7 +381,7 @@ function MouseEnter(e) {
 	this.editor.currentControllerName = this.kind;
 	if (this.parents.length > 0 && this.isInsideForm) return;
 
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	eventTarget.style.zIndex = INDEX_0;
 }
 
@@ -393,7 +393,7 @@ function MouseEnter(e) {
 function MouseLeave(e) {
 	if (this.parents.length > 0 && this.isInsideForm) return;
 
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	eventTarget.style.zIndex = INDEX_2;
 }
 
@@ -408,7 +408,7 @@ function CloseListener_keydown(e) {
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	if (ctrl || !NON_RESPONSE_KEYCODE.test(keyCode)) return;
 
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	if (this.form.contains(eventTarget) || this._checkForm(eventTarget)) return;
 	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
 
@@ -421,7 +421,7 @@ function CloseListener_keydown(e) {
  * @param {KeyboardEvent} e - Event object
  */
 function CloseListener_mousedown(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
+	const eventTarget = domUtils.getEventTarget(e);
 	if (this.inst?._element?.contains(eventTarget)) {
 		this.isOpen = false;
 		return;

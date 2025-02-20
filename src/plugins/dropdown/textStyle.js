@@ -4,30 +4,34 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Text style Plugin, Applies a tag that specifies text styles to a selection.
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<{name: string, html: string}>} pluginOptions.items - Template list
  */
-function TextStyle(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.textStyle;
-	this.icon = 'text_style';
+class TextStyle extends EditorInjector {
+	static key = 'textStyle';
+	static type = 'dropdown';
+	static className = '';
 
-	// create HTML
-	const menu = CreateHTML(editor, pluginOptions.items);
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<{name: string, html: string}>} pluginOptions.items - Template list
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.textStyle;
+		this.icon = 'text_style';
 
-	// members
-	this.styleList = menu.querySelectorAll('li button');
+		// create HTML
+		const menu = CreateHTML(editor, pluginOptions.items);
 
-	// init
-	this.menu.initDropdownTarget(TextStyle, menu);
-}
+		// members
+		this.styleList = menu.querySelectorAll('li button');
 
-TextStyle.key = 'textStyle';
-TextStyle.type = 'dropdown';
-TextStyle.className = '';
-TextStyle.prototype = {
+		// init
+		this.menu.initDropdownTarget(TextStyle, menu);
+	}
+
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
@@ -60,7 +64,7 @@ TextStyle.prototype = {
 
 			active ? domUtils.addClass(btn, 'active') : domUtils.removeClass(btn, 'active');
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -83,10 +87,8 @@ TextStyle.prototype = {
 		this.format.applyInlineElement(newNode, { stylesToModify: checkStyles, nodesToRemove: removeNodes, strictRemove: true });
 
 		this.menu.dropdownOff();
-	},
-
-	constructor: TextStyle
-};
+	}
+}
 
 function CreateHTML({ lang }, items) {
 	const defaultList = {

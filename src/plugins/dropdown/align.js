@@ -37,11 +37,12 @@ class Align extends EditorInjector {
 		// init
 		this.menu.initDropdownTarget(Align, menu);
 	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {

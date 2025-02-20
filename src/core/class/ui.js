@@ -141,7 +141,7 @@ UI.prototype = {
 		if (this.options.get('hasCodeMirror')) {
 			this.viewer._codeMirrorEditor('readonly', true, rootKey);
 		} else {
-			fc.get('code').setAttribute('disabled', true);
+			fc.get('code').disabled = true;
 		}
 	},
 
@@ -160,7 +160,7 @@ UI.prototype = {
 		if (this.options.get('hasCodeMirror')) {
 			this.viewer._codeMirrorEditor('readonly', false, rootKey);
 		} else {
-			fc.get('code').removeAttribute('disabled');
+			fc.get('code').disabled = false;
 		}
 	},
 

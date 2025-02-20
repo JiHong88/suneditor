@@ -8,90 +8,95 @@ const { NO_EVENT } = env;
 /**
  * @class
  * @description File upload plugin
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions - plugin options
- * @param {string} pluginOptions.uploadUrl - server request url
- * @param {Object<string, string>=} pluginOptions.uploadHeaders - server request headers
- * @param {string=} pluginOptions.uploadSizeLimit - upload size limit
- * @param {string=} pluginOptions.uploadSingleSizeLimit - upload single size limit
- * @param {boolean=} pluginOptions.allowMultiple - allow multiple files
- * @param {string=} pluginOptions.acceptedFormats - accepted formats
- * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
  */
-function FileUpload(editor, pluginOptions) {
-	EditorInjector.call(this, editor);
-	// plugin basic properties
-	this.title = this.lang.fileUpload;
-	this.icon = 'file_upload';
-
-	if (!pluginOptions.uploadUrl) console.warn('[SUNEDITOR.fileUpload.warn] "fileUpload" plugin must be have "uploadUrl" option.');
-
-	// members
-	this.uploadUrl = pluginOptions.uploadUrl;
-	this.uploadHeaders = pluginOptions.uploadHeaders;
-	this.uploadSizeLimit = /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null;
-	this.uploadSingleSizeLimit = /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null;
-	this.allowMultiple = !!pluginOptions.allowMultiple;
-	this.acceptedFormats = typeof pluginOptions.acceptedFormats !== 'string' ? '*' : pluginOptions.acceptedFormats.trim() || '*';
-	this._acceptedCheck = this.acceptedFormats.split(', ');
-	this.as = pluginOptions.as || 'box';
-	this.input = domUtils.createElement('input', { type: 'file', accept: this.acceptedFormats });
-	if (this.allowMultiple) {
-		this.input.setAttribute('multiple', 'multiple');
+class FileUpload extends EditorInjector {
+	static key = 'fileUpload';
+	static type = 'command';
+	static className = '';
+	static options = { eventIndex: 10000 };
+	static component(node) {
+		return domUtils.isAnchor(node) && node.hasAttribute('data-se-file-download') ? node : null;
 	}
-	this._element = null;
 
-	// figure
-	const customItems = {
-		'custom-download': {
-			command: 'download',
-			title: this.lang.download,
-			icon: 'download',
-			action: (target) => {
-				const url = target.getAttribute('href');
-				if (url) domUtils.createElement('A', { href: url }, null).click();
-			}
-		},
-		'custom-as': {
-			command: 'as',
-			value: 'link', // 'block' or 'link'
-			title: this.lang.asLink,
-			icon: 'reduction',
-			action: (target, value) => {
-				this.convertFormat(target, value);
-			}
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions - plugin options
+	 * @param {string} pluginOptions.uploadUrl - server request url
+	 * @param {Object<string, string>=} pluginOptions.uploadHeaders - server request headers
+	 * @param {string=} pluginOptions.uploadSizeLimit - upload size limit
+	 * @param {string=} pluginOptions.uploadSingleSizeLimit - upload single size limit
+	 * @param {boolean=} pluginOptions.allowMultiple - allow multiple files
+	 * @param {string=} pluginOptions.acceptedFormats - accepted formats
+	 * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
+	 * @param {Array<string>} pluginOptions.controls - Additional controls to be added to the figure
+	 */
+	constructor(editor, pluginOptions) {
+		super(editor);
+		// plugin basic properties
+		this.title = this.lang.fileUpload;
+		this.icon = 'file_upload';
+
+		if (!pluginOptions.uploadUrl) console.warn('[SUNEDITOR.fileUpload.warn] "fileUpload" plugin must be have "uploadUrl" option.');
+
+		// members
+		this.uploadUrl = pluginOptions.uploadUrl;
+		this.uploadHeaders = pluginOptions.uploadHeaders;
+		this.uploadSizeLimit = /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null;
+		this.uploadSingleSizeLimit = /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null;
+		this.allowMultiple = !!pluginOptions.allowMultiple;
+		this.acceptedFormats = typeof pluginOptions.acceptedFormats !== 'string' ? '*' : pluginOptions.acceptedFormats.trim() || '*';
+		this._acceptedCheck = this.acceptedFormats.split(', ');
+		this.as = pluginOptions.as || 'box';
+		this.input = domUtils.createElement('input', { type: 'file', accept: this.acceptedFormats });
+		if (this.allowMultiple) {
+			this.input.setAttribute('multiple', 'multiple');
 		}
-	};
-	let figureControls = pluginOptions.controls || [['custom-as', 'edit', 'align', 'remove', 'custom-download']];
-	figureControls = figureControls.map((subArray) => subArray.map((item) => (item.startsWith('custom-') ? customItems[item] : item)));
-	this.figure = new Figure(this, figureControls, {});
+		this._element = null;
 
-	// file manager
-	this.fileManager = new FileManager(this, {
-		query: 'a[download][data-se-file-download]',
-		loadHandler: this.events.onFileLoad,
-		eventHandler: this.events.onFileAction
-	});
+		// figure
+		const customItems = {
+			'custom-download': {
+				command: 'download',
+				title: this.lang.download,
+				icon: 'download',
+				action: (target) => {
+					const url = target.getAttribute('href');
+					if (url) domUtils.createElement('A', { href: url }, null).click();
+				}
+			},
+			'custom-as': {
+				command: 'as',
+				value: 'link', // 'block' or 'link'
+				title: this.lang.asLink,
+				icon: 'reduction',
+				action: (target, value) => {
+					this.convertFormat(target, value);
+				}
+			}
+		};
 
-	// controller
-	if (/\bedit\b/.test(JSON.stringify(figureControls))) {
-		const controllerEl = CreateHTML_controller(this);
-		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, FileUpload.key);
-		this.editInput = controllerEl.querySelector('input');
+		const figureControls = (pluginOptions.controls || [['custom-as', 'edit', 'align', 'remove', 'custom-download']]).map((subArray) => subArray.map((item) => (item.startsWith('custom-') ? customItems[item] : item)));
+		this.figure = new Figure(this, figureControls, {});
+
+		// file manager
+		this.fileManager = new FileManager(this, {
+			query: 'a[download][data-se-file-download]',
+			loadHandler: this.events.onFileLoad,
+			eventHandler: this.events.onFileAction
+		});
+
+		// controller
+		if (/\bedit\b/.test(JSON.stringify(figureControls))) {
+			const controllerEl = CreateHTML_controller(this);
+			this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, FileUpload.key);
+			this.editInput = controllerEl.querySelector('input');
+		}
+
+		// init
+		this.eventManager.addEvent(this.input, 'change', OnChangeFile.bind(this));
 	}
 
-	// init
-	this.eventManager.addEvent(this.input, 'change', OnChangeFile.bind(this));
-}
-
-FileUpload.key = 'fileUpload';
-FileUpload.type = 'command';
-FileUpload.className = '';
-FileUpload.options = { eventIndex: 10000 };
-FileUpload.component = function (node) {
-	return domUtils.isAnchor(node) && node.hasAttribute('data-se-file-download') ? node : null;
-};
-FileUpload.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
@@ -100,12 +105,12 @@ FileUpload.prototype = {
 	action() {
 		this.editor._preventBlur = true;
 		this.input.click();
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {Element} target Target component element
+	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
 		this._element = target;
@@ -120,7 +125,7 @@ FileUpload.prototype = {
 			this.figure.controllerOpen(target, { isWWTarget: true });
 			return true;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
@@ -146,24 +151,24 @@ FileUpload.prototype = {
 		this.editor.focus();
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a target component is edited.
-	 * @param {Element} target Target element
+	 * @param {HTMLElement|Text} target Target element
 	 */
 	edit(target) {
 		this.editInput.value = target.textContent;
 		this.figure.controllerHide();
 		this.controller.open(target, null, { isWWTarget: !domUtils.isFigure(target.parentElement), initMethod: null, addOffset: null });
 		this.editInput.focus();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {Element} target Target button element
+	 * @param {HTMLElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -176,35 +181,35 @@ FileUpload.prototype = {
 
 		this.controller.close();
 		this.component.select(this._element, FileUpload.key, false);
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Element} target Target element
+	 * @param {HTMLElement} target Target element
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
 		if (!target) return;
 
 		const figure = Figure.GetContainer(target);
-		target = domUtils.getParentElement(target, '.se-component') || target;
+		const containerTarget = domUtils.getParentElement(target, '.se-component') || target;
 
 		const message = await this.triggerEvent('onFileDeleteBefore', { element: figure.target, container: figure, url: figure.target.getAttribute('href') });
 		if (message === false) return;
 
-		const isInlineComp = this.component.isInline(target);
-		const focusEl = isInlineComp ? target.previousSibling || target.nextSibling : target.previousElementSibling || target.nextElementSibling;
-		domUtils.removeItem(target);
+		const isInlineComp = this.component.isInline(containerTarget);
+		const focusEl = isInlineComp ? containerTarget.previousSibling || containerTarget.nextSibling : containerTarget.previousElementSibling || containerTarget.nextElementSibling;
+		domUtils.removeItem(containerTarget);
 		this.ui._offCurrentController();
 
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
-	},
+	}
 
 	/**
 	 * @description Create an "file" component using the provided files.
-	 * @param {FileList} fileList File object list
+	 * @param {File[]|FileList} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
@@ -225,7 +230,7 @@ FileUpload.prototype = {
 					file: f
 				});
 
-				this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
+				this.ui.noticeOpen(message === NO_EVENT ? err : String(message) || err);
 
 				return false;
 			}
@@ -245,7 +250,7 @@ FileUpload.prototype = {
 				uploadSize: fileSize
 			});
 
-			this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
+			this.ui.noticeOpen(message === NO_EVENT ? err : String(message) || err);
 
 			return false;
 		}
@@ -261,6 +266,8 @@ FileUpload.prototype = {
 			const xmlHttp = await this.fileManager.asyncUpload(infos.url, infos.uploadHeaders, infos.files);
 			this._uploadCallBack(xmlHttp);
 		}.bind(this, fileInfo);
+		// @se-ts-ignore
+		void this._uploadCallBack;
 
 		const result = await this.triggerEvent('onFileUploadBefore', {
 			info: fileInfo,
@@ -272,11 +279,11 @@ FileUpload.prototype = {
 		if (result !== null && typeof result === 'object') handler(result);
 
 		if (result === true || result === NO_EVENT) handler(null);
-	},
+	}
 
 	/**
 	 * @description Convert format to link or block
-	 * @param {Element} target Target element
+	 * @param {HTMLElement} target Target element
 	 * @param {string} value 'link' or 'block'
 	 */
 	convertFormat(target, value) {
@@ -287,7 +294,7 @@ FileUpload.prototype = {
 			const parent = container.parentElement;
 
 			target.removeAttribute('data-se-non-focus');
-			target.setAttribute('contenteditable', false);
+			target.setAttribute('contenteditable', 'false');
 			domUtils.addClass(target, 'se-component|se-inline-component');
 
 			const line = domUtils.createElement(this.options.get('defaultLine'), null, target);
@@ -313,12 +320,12 @@ FileUpload.prototype = {
 
 		this.history.push(false);
 		this.component.select(target, FileUpload.key, false);
-	},
+	}
 
 	/**
 	 * @description Create file element
 	 * @param {string} url File URL
-	 * @param {File} file File object
+	 * @param {File|{name: string, size: number}} file File object
 	 * @param {boolean} isLast Is last file
 	 */
 	create(url, file, isLast) {
@@ -361,7 +368,7 @@ FileUpload.prototype = {
 		} else {
 			this.component.select(a, FileUpload.key, false);
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -380,7 +387,7 @@ FileUpload.prototype = {
 				i === a.length - 1
 			);
 		});
-	},
+	}
 
 	/**
 	 * @private
@@ -395,7 +402,7 @@ FileUpload.prototype = {
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.ui.noticeOpen(err);
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
-	},
+	}
 
 	/**
 	 * @private
@@ -410,19 +417,18 @@ FileUpload.prototype = {
 		} else {
 			this._register(response);
 		}
-	},
-
-	constructor: FileUpload
-};
+	}
+}
 
 /**
  * @private
  * @description Handles the change event when a file is selected.
  * - Triggers the file upload process.
- * @param {Event} e - The change event object.
+ * @param {InputEvent} e - The change event object.
  */
 async function OnChangeFile(e) {
-	await this.submitFile(e.target.files);
+	const eventTarget = domUtils.getEventTarget(e);
+	await this.submitFile(eventTarget.files);
 }
 
 function CreateHTML_controller({ lang, icons }) {

@@ -62,28 +62,15 @@
 /**
  * @typedef {Object} PluginMouseEventInfo
  * @property {FrameContext} frameContext Frame context
- * @property {Event} event Event object
- */
-
-/**
- * @typedef {Object} PluginInputEventInfo
- * @property {FrameContext} frameContext Frame context
- * @property {Event} event Event object
- * @property {string} data Input data
+ * @property {MouseEvent} event Event object
  */
 
 /**
  * @typedef {Object} PluginKeyEventInfo
  * @property {FrameContext} frameContext Frame context
- * @property {Event} event Event object
+ * @property {KeyboardEvent} event Event object
  * @property {Range} range range object
  * @property {Element} line Current line element
- */
-
-/**
- * @typedef {Object} PluginToolbarInputKeyEventInfo
- * @property {Element} target Input element
- * @property {Event} event Event object
  */
 
 /**

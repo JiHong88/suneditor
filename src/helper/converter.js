@@ -55,7 +55,7 @@ export function entityToHTML(content) {
  * @description Debounce function
  * @param {(...args: *) => void} func function
  * @param {number} wait delay ms
- * @returns {(...args: *) => void}
+ * @returns {*} executedFunction
  */
 export function debounce(func, wait) {
 	let timeout;
@@ -208,7 +208,7 @@ export function rgb2hex(rgba) {
 /**
  * @description Computes the width as a percentage of the parent's width, and returns this value rounded to two decimal places.
  * @param {Node} target The target element for which to calculate the width percentage.
- * @param {Node|null} parentTarget The parent element to use as the reference for the width calculation. If not provided, the target's parent element is used.
+ * @param {?Node=} parentTarget The parent element to use as the reference for the width calculation. If not provided, the target's parent element is used.
  * @returns {number}
  */
 export function getWidthInPercentage(target, parentTarget) {

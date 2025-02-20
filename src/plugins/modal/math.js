@@ -24,97 +24,101 @@ const { _w } = env;
  * @description Math plugin.
  * - This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
  * - If external library is provided, a warning is issued.
- * @param {EditorCore} editor - The root editor instance
- * @param {MathPluginOptions} pluginOptions
  */
-function Math_(editor, pluginOptions) {
-	// external library
-	this.katex = null;
-	this.mathjax = null;
-
-	// exception
-	if (!(this.katex = CheckKatex(editor.options.get('externalLibs').katex)) && !(this.mathjax = CheckMathJax(editor.options.get('externalLibs').mathjax, editor))) {
-		console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need either "KaTeX" or "MathJax" library. Please add the katex or mathjax option.');
+class Math_ extends EditorInjector {
+	static key = 'math';
+	static type = 'modal';
+	static className = '';
+	static component(node) {
+		return domUtils.hasClass(node, 'se-math|katex') && domUtils.hasClass(node, 'se-component') ? node : null;
 	}
 
-	// plugin basic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.math;
-	this.icon = 'math';
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {MathPluginOptions} pluginOptions
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin basic properties
+		super(editor);
+		this.title = this.lang.math;
+		this.icon = 'math';
 
-	this.pluginOptions = {
-		formSize: {
-			width: '460px',
-			height: '14em',
-			maxWidth: '',
-			maxHeight: '',
-			minWidth: '400px',
-			minHeight: '40px',
-			...pluginOptions.formSize
-		},
-		canResize: pluginOptions.canResize ?? true,
-		autoHeight: !!pluginOptions.autoHeight,
-		fontSizeList: pluginOptions.fontSizeList || [
-			{
-				text: '1',
-				value: '1em'
+		// external library
+		this.katex = null;
+		this.mathjax = null;
+
+		// exception
+		if (!(this.katex = CheckKatex(editor.options.get('externalLibs').katex)) && !(this.mathjax = CheckMathJax(editor.options.get('externalLibs').mathjax, editor))) {
+			console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need either "KaTeX" or "MathJax" library. Please add the katex or mathjax option.');
+		}
+
+		this.pluginOptions = {
+			formSize: {
+				width: '460px',
+				height: '14em',
+				maxWidth: '',
+				maxHeight: '',
+				minWidth: '400px',
+				minHeight: '40px',
+				...pluginOptions.formSize
 			},
-			{
-				text: '1.5',
-				value: '1.5em'
-			},
-			{
-				text: '2',
-				value: '2em'
-			},
-			{
-				text: '2.5',
-				value: '2.5em'
-			}
-		],
-		onPaste: typeof pluginOptions.onPaste === 'function' ? pluginOptions.onPaste : null
-	};
-	if (this.pluginOptions.autoHeight) {
-		this.pluginOptions.formSize.height = this.pluginOptions.formSize.minHeight;
+			canResize: pluginOptions.canResize ?? true,
+			autoHeight: !!pluginOptions.autoHeight,
+			fontSizeList: pluginOptions.fontSizeList || [
+				{
+					text: '1',
+					value: '1em'
+				},
+				{
+					text: '1.5',
+					value: '1.5em'
+				},
+				{
+					text: '2',
+					value: '2em'
+				},
+				{
+					text: '2.5',
+					value: '2.5em'
+				}
+			],
+			onPaste: typeof pluginOptions.onPaste === 'function' ? pluginOptions.onPaste : null
+		};
+		if (this.pluginOptions.autoHeight) {
+			this.pluginOptions.formSize.height = this.pluginOptions.formSize.minHeight;
+		}
+
+		// create HTML
+		const modalEl = CreateHTML_modal(this);
+		const controllerEl = CreateHTML_controller(editor);
+
+		// modules
+		this.modal = new Modal(this, modalEl);
+		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
+
+		// members
+		this.textArea = modalEl.querySelector('.se-math-exp');
+		this.previewElement = modalEl.querySelector('.se-math-preview');
+		this.fontSizeElement = modalEl.querySelector('.se-math-size');
+		this.isUpdateState = false;
+		this._element = null;
+
+		// init
+		this.previewElement.style.fontSize = this.defaultFontSize;
+		this.eventManager.addEvent(this.textArea, 'input', RenderMathExp.bind(this));
+		this.eventManager.addEvent(
+			this.fontSizeElement,
+			'change',
+			function (e) {
+				this.fontSize = e.target.value;
+			}.bind(this.previewElement.style)
+		);
+		if (this.pluginOptions.onPaste) {
+			this.eventManager.addEvent(this.textArea, 'paste', this.pluginOptions.onPaste.bind(this));
+		}
 	}
 
-	// create HTML
-	const modalEl = CreateHTML_modal(this);
-	const controllerEl = CreateHTML_controller(editor);
-
-	// modules
-	this.modal = new Modal(this, modalEl);
-	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
-
-	// members
-	this.textArea = modalEl.querySelector('.se-math-exp');
-	this.previewElement = modalEl.querySelector('.se-math-preview');
-	this.fontSizeElement = modalEl.querySelector('.se-math-size');
-	this.isUpdateState = false;
-	this._element = null;
-
-	// init
-	this.previewElement.style.fontSize = this.defaultFontSize;
-	this.eventManager.addEvent(this.textArea, 'input', RenderMathExp.bind(this));
-	this.eventManager.addEvent(
-		this.fontSizeElement,
-		'change',
-		function (e) {
-			this.fontSize = e.target.value;
-		}.bind(this.previewElement.style)
-	);
-	if (this.pluginOptions.onPaste) {
-		this.eventManager.addEvent(this.textArea, 'paste', this.pluginOptions.onPaste.bind(this));
-	}
-}
-
-Math_.key = 'math';
-Math_.type = 'modal';
-Math_.className = '';
-Math_.component = function (node) {
-	return domUtils.hasClass(node, 'se-math|katex') && domUtils.hasClass(node, 'se-component') ? node : null;
-};
-Math_.prototype = {
 	/**
 	 * @editorMethod Modules.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
@@ -126,7 +130,7 @@ Math_.prototype = {
 			this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
 			return;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
@@ -134,7 +138,7 @@ Math_.prototype = {
 	 */
 	close() {
 		this._element = null;
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -142,9 +146,9 @@ Math_.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {Object} The format retention object containing the query and method to process the element.
-	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
-	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
+	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
+	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
@@ -173,7 +177,7 @@ Math_.prototype = {
 				}
 			}
 		};
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -181,7 +185,7 @@ Math_.prototype = {
 	 */
 	open() {
 		this.modal.open();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -201,7 +205,7 @@ Math_.prototype = {
 			this.previewElement.innerHTML = this._renderer(exp);
 			this.previewElement.style.fontSize = fontSize;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -261,7 +265,7 @@ Math_.prototype = {
 		}
 
 		return true;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -271,7 +275,7 @@ Math_.prototype = {
 		this.textArea.value = '';
 		this.previewElement.innerHTML = '';
 		domUtils.removeClass(this.textArea, 'se-error');
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
@@ -290,7 +294,7 @@ Math_.prototype = {
 			case 'delete':
 				this.destroy(this.controller.currentTarget);
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
@@ -302,7 +306,7 @@ Math_.prototype = {
 		this.controller.close();
 		this.editor.focus();
 		this.history.push(false);
-	},
+	}
 
 	/**
 	 * @private
@@ -331,7 +335,7 @@ Math_.prototype = {
 			console.warn('[SUNEDITOR.math.error] ', error.message);
 		}
 		return result;
-	},
+	}
 
 	/**
 	 * @private
@@ -342,10 +346,8 @@ Math_.prototype = {
 	 */
 	_escapeBackslashes(str, decode) {
 		return str.replace(/\\{2}/g, decode ? '\\' : '\\\\');
-	},
-
-	constructor: Math_
-};
+	}
+}
 
 /**
  * @description Copies the math expression text to clipboard.

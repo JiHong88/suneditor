@@ -47,165 +47,169 @@ const { NO_EVENT, _w } = env;
  * @class
  * @description Embed modal plugin.
  * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
- * @param {EditorCore} editor - The root editor instance
- * @param {EmbedPluginOptions} pluginOptions
  */
-function Embed(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.embed;
-	this.icon = 'embed';
+class Embed extends EditorInjector {
+	static key = 'embed';
+	static type = 'modal';
+	static className = '';
+	static component(node) {
+		let src = '';
+		if (/^IFRAME$/i.test(node?.nodeName)) src = node.src;
+		if (/^DIV$/i.test(node?.nodeName) && /^IFRAME$/i.test(node.firstElementChild?.nodeName)) src = node.firstElementChild.src;
 
-	// define plugin options
-	this.pluginOptions = {
-		canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
-		showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
-		defaultWidth: !pluginOptions.defaultWidth || !numbers.get(pluginOptions.defaultWidth, 0) ? '' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
-		defaultHeight: !pluginOptions.defaultHeight || !numbers.get(pluginOptions.defaultHeight, 0) ? '' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
-		percentageOnlySize: !!pluginOptions.percentageOnlySize,
-		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
-		uploadHeaders: pluginOptions.uploadHeaders || null,
-		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
-		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
-		iframeTagAttributes: pluginOptions.iframeTagAttributes || null,
-		query_youtube: pluginOptions.query_youtube || '',
-		query_vimeo: pluginOptions.query_vimeo || ''
-	};
-
-	// create HTML
-	const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
-	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-	const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'revert', 'edit', 'remove']] : [['resize_auto,75,50', 'edit', 'align', 'revert', 'remove']];
-
-	// show align
-	if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.querySelector('.se-figure-align').style.display = 'none';
-
-	// modules
-	this.modal = new Modal(this, modalEl);
-	this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit });
-
-	// members
-	this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
-	this.embedInput = modalEl.querySelector('.se-input-url');
-	this.focusElement = this.embedInput;
-	this.previewSrc = modalEl.querySelector('.se-link-preview');
-	this._linkValue = '';
-	this._align = 'none';
-	this.sizeUnit = sizeUnit;
-	this.proportion = {};
-	this.inputX = {};
-	this.inputY = {};
-	this._element = null;
-	this._cover = null;
-	this._container = null;
-	this._ratio = { w: 1, h: 1 };
-	this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-	this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
-	this._resizing = this.pluginOptions.canResize;
-	this._onlyPercentage = this.pluginOptions.percentageOnlySize;
-	this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
-	this.query = {
-		facebook: {
-			pattern: /(?:https?:\/\/)?(?:www\.)?(?:facebook\.com)\/(.+)/i,
-			action: (url) => {
-				return `https://www.facebook.com/plugins/post.php?href=${_w.encodeURIComponent(url)}&show_text=true&width=500`;
-			},
-			tag: 'iframe'
-		},
-		twitter: {
-			pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(status|embed)\/(.+)/i,
-			action: (url) => {
-				return `https://platform.twitter.com/embed/Tweet.html?url=${_w.encodeURIComponent(url)}`;
-			},
-			tag: 'iframe'
-		},
-		instagram: {
-			pattern: /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com)\/p\/(.+)/i,
-			action: (url) => {
-				const postId = url.match(this.query.instagram.pattern)[1];
-				return `https://www.instagram.com/p/${postId}/embed`;
-			},
-			tag: 'iframe'
-		},
-		linkedin: {
-			pattern: /(?:https?:\/\/)?(?:www\.)?(?:linkedin\.com)\/(.+)\/(.+)/i,
-			action: (url) => {
-				return `https://www.linkedin.com/embed/feed/update/${_w.encodeURIComponent(url.split('/').pop())}`;
-			},
-			tag: 'iframe'
-		},
-		pinterest: {
-			pattern: /(?:https?:\/\/)?(?:www\.)?(?:pinterest\.com)\/pin\/(.+)/i,
-			action: (url) => {
-				const pinId = url.match(this.query.pinterest.pattern)[1];
-				return `https://assets.pinterest.com/ext/embed.html?id=${pinId}`;
-			},
-			tag: 'iframe'
-		},
-		spotify: {
-			pattern: /(?:https?:\/\/)?(?:open\.)?(?:spotify\.com)\/(track|album|playlist|show|episode)\/(.+)/i,
-			action: (url) => {
-				const match = url.match(this.query.spotify.pattern);
-				const type = match[1];
-				const id = match[2];
-				return `https://open.spotify.com/embed/${type}/${id}`;
-			},
-			tag: 'iframe'
-		},
-		codepen: {
-			pattern: /(?:https?:\/\/)?(?:www\.)?(?:codepen\.io)\/(.+)\/pen\/(.+)/i,
-			action: (url) => {
-				const [, user, penId] = url.match(this.query.codepen.pattern);
-				return `https://codepen.io/${user}/embed/${penId}`;
-			},
-			tag: 'iframe'
-		},
-		...pluginOptions.embedQuery
-	};
-
-	const urlPatterns = [];
-	for (const key in this.query) {
-		urlPatterns.push(this.query[key].pattern);
+		if (src) {
+			return this.checkContentType(src) ? node : null;
+		}
+		return null;
 	}
-	this.urlPatterns = urlPatterns.concat(pluginOptions.urlPatterns || []);
 
-	// init
-	this.eventManager.addEvent(this.embedInput, 'input', OnLinkPreview.bind(this));
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {EmbedPluginOptions} pluginOptions
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.embed;
+		this.icon = 'embed';
 
-	if (this._resizing) {
-		this.proportion = modalEl.querySelector('._se_check_proportion');
-		this.inputX = modalEl.querySelector('._se_size_x');
-		this.inputY = modalEl.querySelector('._se_size_y');
-		this.inputX.value = this.pluginOptions.defaultWidth;
-		this.inputY.value = this.pluginOptions.defaultHeight;
+		// define plugin options
+		this.pluginOptions = {
+			canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
+			showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
+			defaultWidth: !pluginOptions.defaultWidth || !numbers.get(pluginOptions.defaultWidth, 0) ? '' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
+			defaultHeight: !pluginOptions.defaultHeight || !numbers.get(pluginOptions.defaultHeight, 0) ? '' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
+			percentageOnlySize: !!pluginOptions.percentageOnlySize,
+			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
+			uploadHeaders: pluginOptions.uploadHeaders || null,
+			uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+			uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
+			iframeTagAttributes: pluginOptions.iframeTagAttributes || null,
+			query_youtube: pluginOptions.query_youtube || '',
+			query_vimeo: pluginOptions.query_vimeo || ''
+		};
 
-		this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
-		this.eventManager.addEvent(this.inputY, 'keyup', OnInputSize.bind(this, 'y'));
-		this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
+		// create HTML
+		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
+		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
+		const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'revert', 'edit', 'remove']] : [['resize_auto,75,50', 'edit', 'align', 'revert', 'remove']];
+
+		// show align
+		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.querySelector('.se-figure-align').style.display = 'none';
+
+		// modules
+		this.modal = new Modal(this, modalEl);
+		this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit });
+
+		// members
+		this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
+		this.embedInput = modalEl.querySelector('.se-input-url');
+		this.focusElement = this.embedInput;
+		this.previewSrc = modalEl.querySelector('.se-link-preview');
+		this._linkValue = '';
+		this._align = 'none';
+		this.sizeUnit = sizeUnit;
+		this.proportion = {};
+		this.inputX = {};
+		this.inputY = {};
+		this._element = null;
+		this._cover = null;
+		this._container = null;
+		this._ratio = { w: 1, h: 1 };
+		this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+		this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+		this._resizing = this.pluginOptions.canResize;
+		this._onlyPercentage = this.pluginOptions.percentageOnlySize;
+		this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
+		this.query = {
+			facebook: {
+				pattern: /(?:https?:\/\/)?(?:www\.)?(?:facebook\.com)\/(.+)/i,
+				action: (url) => {
+					return `https://www.facebook.com/plugins/post.php?href=${_w.encodeURIComponent(url)}&show_text=true&width=500`;
+				},
+				tag: 'iframe'
+			},
+			twitter: {
+				pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(status|embed)\/(.+)/i,
+				action: (url) => {
+					return `https://platform.twitter.com/embed/Tweet.html?url=${_w.encodeURIComponent(url)}`;
+				},
+				tag: 'iframe'
+			},
+			instagram: {
+				pattern: /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com)\/p\/(.+)/i,
+				action: (url) => {
+					const postId = url.match(this.query.instagram.pattern)[1];
+					return `https://www.instagram.com/p/${postId}/embed`;
+				},
+				tag: 'iframe'
+			},
+			linkedin: {
+				pattern: /(?:https?:\/\/)?(?:www\.)?(?:linkedin\.com)\/(.+)\/(.+)/i,
+				action: (url) => {
+					return `https://www.linkedin.com/embed/feed/update/${_w.encodeURIComponent(url.split('/').pop())}`;
+				},
+				tag: 'iframe'
+			},
+			pinterest: {
+				pattern: /(?:https?:\/\/)?(?:www\.)?(?:pinterest\.com)\/pin\/(.+)/i,
+				action: (url) => {
+					const pinId = url.match(this.query.pinterest.pattern)[1];
+					return `https://assets.pinterest.com/ext/embed.html?id=${pinId}`;
+				},
+				tag: 'iframe'
+			},
+			spotify: {
+				pattern: /(?:https?:\/\/)?(?:open\.)?(?:spotify\.com)\/(track|album|playlist|show|episode)\/(.+)/i,
+				action: (url) => {
+					const match = url.match(this.query.spotify.pattern);
+					const type = match[1];
+					const id = match[2];
+					return `https://open.spotify.com/embed/${type}/${id}`;
+				},
+				tag: 'iframe'
+			},
+			codepen: {
+				pattern: /(?:https?:\/\/)?(?:www\.)?(?:codepen\.io)\/(.+)\/pen\/(.+)/i,
+				action: (url) => {
+					const [, user, penId] = url.match(this.query.codepen.pattern);
+					return `https://codepen.io/${user}/embed/${penId}`;
+				},
+				tag: 'iframe'
+			},
+			...pluginOptions.embedQuery
+		};
+
+		const urlPatterns = [];
+		for (const key in this.query) {
+			urlPatterns.push(this.query[key].pattern);
+		}
+		this.urlPatterns = urlPatterns.concat(pluginOptions.urlPatterns || []);
+
+		// init
+		this.eventManager.addEvent(this.embedInput, 'input', OnLinkPreview.bind(this));
+
+		if (this._resizing) {
+			this.proportion = modalEl.querySelector('._se_check_proportion');
+			this.inputX = modalEl.querySelector('._se_size_x');
+			this.inputY = modalEl.querySelector('._se_size_y');
+			this.inputX.value = this.pluginOptions.defaultWidth;
+			this.inputY.value = this.pluginOptions.defaultHeight;
+
+			this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
+			this.eventManager.addEvent(this.inputY, 'keyup', OnInputSize.bind(this, 'y'));
+			this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
+		}
 	}
-}
 
-Embed.key = 'embed';
-Embed.type = 'modal';
-Embed.className = '';
-Embed.component = function (node) {
-	let src = '';
-	if (/^IFRAME$/i.test(node?.nodeName)) src = node.src;
-	if (/^DIV$/i.test(node?.nodeName) && /^IFRAME$/i.test(node.firstElementChild?.nodeName)) src = node.firstElementChild.src;
-
-	if (src) {
-		return this.checkContentType(src) ? node : null;
-	}
-	return null;
-};
-Embed.prototype = {
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description Executes the method that is called when a "Modal" module's is opened.
 	 */
 	open() {
 		this.modal.open();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller(Figure)
@@ -214,7 +218,7 @@ Embed.prototype = {
 	 */
 	edit() {
 		this.modal.open();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -227,7 +231,7 @@ Embed.prototype = {
 			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.disabled = true;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -245,7 +249,7 @@ Embed.prototype = {
 		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, 'video'), 0);
 
 		return result;
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -253,9 +257,9 @@ Embed.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {Object} The format retention object containing the query and method to process the element.
-	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
-	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
+	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
+	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
@@ -274,7 +278,7 @@ Embed.prototype = {
 				this._update(element);
 			}
 		};
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -294,7 +298,7 @@ Embed.prototype = {
 			this.proportion.checked = false;
 			this.proportion.disabled = true;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
@@ -303,7 +307,7 @@ Embed.prototype = {
 	 */
 	select(target) {
 		this._ready(target);
-	},
+	}
 
 	/**
 	 * @private
@@ -354,7 +358,7 @@ Embed.prototype = {
 					w: 1,
 					h: 1
 			  };
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
@@ -387,7 +391,7 @@ Embed.prototype = {
 		// focus
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
-	},
+	}
 
 	/**
 	 * @description Checks if the given URL matches any of the defined URL patterns.
@@ -401,7 +405,7 @@ Embed.prototype = {
 		}
 
 		return false;
-	},
+	}
 
 	/**
 	 * @description Finds and processes the URL for embedding by matching it against known service patterns.
@@ -423,7 +427,7 @@ Embed.prototype = {
 		}
 
 		return null;
-	},
+	}
 
 	/**
 	 * @description Processes the provided source (URL or embed code) and submits it for embedding.
@@ -464,13 +468,13 @@ Embed.prototype = {
 		if (result === true || result === NO_EVENT) handler(null);
 
 		return true;
-	},
+	}
 
 	_createIframeTag() {
 		const iframeTag = domUtils.createElement('IFRAME');
 		this._setIframeAttrs(iframeTag);
 		return iframeTag;
-	},
+	}
 
 	/**
 	 * @private
@@ -480,7 +484,7 @@ Embed.prototype = {
 	_createEmbedTag() {
 		const quoteTag = domUtils.createElement('BLOCKQUOTE');
 		return quoteTag;
-	},
+	}
 
 	/**
 	 * @private
@@ -609,7 +613,7 @@ Embed.prototype = {
 
 		if (this._resizing && changeSize && this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
 		if (!scriptTag) this.history.push(false);
-	},
+	}
 
 	/**
 	 * @private
@@ -656,7 +660,7 @@ Embed.prototype = {
 		}
 
 		return oFrame;
-	},
+	}
 
 	/**
 	 * @private
@@ -672,7 +676,7 @@ Embed.prototype = {
 			else if (/%$/.test(w)) w += '%';
 		}
 		this.figure.setSize(w, h);
-	},
+	}
 
 	/**
 	 * @private
@@ -692,7 +696,7 @@ Embed.prototype = {
 			isUpdate: this.modal.isUpdate,
 			element: this._element
 		};
-	},
+	}
 
 	/**
 	 * @private
@@ -709,10 +713,8 @@ Embed.prototype = {
 		for (const key in attrs) {
 			element.setAttribute(key, attrs[key]);
 		}
-	},
-
-	constructor: Embed
-};
+	}
+}
 
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();

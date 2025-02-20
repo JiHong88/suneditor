@@ -4,37 +4,41 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description List Plugin (OL, UL)
- * @param {EditorCore} editor - The root editor instance
  */
-function List(editor) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.list;
-	this.icon = 'list_numbered';
+class List extends EditorInjector {
+	static key = 'list';
+	static type = 'dropdown';
+	static className = 'se-icon-flip-rtl';
 
-	// create HTML
-	const menu = CreateHTML(editor);
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 */
+	constructor(editor) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.list;
+		this.icon = 'list_numbered';
 
-	// members
-	this.listItems = menu.querySelectorAll('li button');
-	this.icons = {
-		bulleted: editor.icons.list_bulleted,
-		numbered: editor.icons.list_numbered
-	};
+		// create HTML
+		const menu = CreateHTML(editor);
 
-	// init
-	this.menu.initDropdownTarget(List, menu);
-}
+		// members
+		this.listItems = menu.querySelectorAll('li button');
+		this.icons = {
+			bulleted: editor.icons.list_bulleted,
+			numbered: editor.icons.list_numbered
+		};
 
-List.key = 'list';
-List.type = 'dropdown';
-List.className = 'se-icon-flip-rtl';
-List.prototype = {
+		// init
+		this.menu.initDropdownTarget(List, menu);
+	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
@@ -59,12 +63,12 @@ List.prototype = {
 		domUtils.removeClass(target, 'active');
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {Element} target Line element at the current cursor position
+	 * @param {HTMLElement} target Line element at the current cursor position
 	 */
 	on(target) {
 		const currentList = target.getAttribute('data-focus') || '';
@@ -76,13 +80,13 @@ List.prototype = {
 				domUtils.removeClass(list[i], 'active');
 			}
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const command = target.getAttribute('data-command');
@@ -92,10 +96,8 @@ List.prototype = {
 
 		this.menu.dropdownOff();
 		this.history.push(false);
-	},
-
-	constructor: List
-};
+	}
+}
 
 function CreateHTML({ lang, icons }) {
 	const html = /*html*/ `

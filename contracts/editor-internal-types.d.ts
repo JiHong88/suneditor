@@ -29,10 +29,11 @@ declare global {
 		className: string;
 		classList: DOMTokenList;
 		disabled: boolean;
-		value: string;
 		style: CSSStyleDeclaration;
 		children: HTMLCollection;
 		checked: boolean;
+
+		// HTML-(A)-specific properties
 		download: string;
 		href: string;
 		src: string;
@@ -40,7 +41,25 @@ declare global {
 		title: string;
 		rel: string;
 
-		// Navigation
+		// HTML-(Input)-specific properties
+		value: string | null;
+		max: string;
+		min: string;
+		step: string;
+		placeholder: string;
+
+		// HTML-(Table)-specific properties
+		rowSpan: number;
+		colSpan: number;
+		alt: string;
+		cells: HTMLCollection;
+		cellIndex: number;
+		rows: HTMLCollection;
+		rowIndex: number;
+		deleteRow(index: number): void;
+		insertRow(index: number): HTMLTableRowElement;
+
+		// Element - Navigation
 		nextElementSibling: Element | null;
 		previousElementSibling: Element | null;
 		firstElementChild: Element | null;
@@ -84,21 +103,20 @@ declare global {
 		scrollIntoView(arg?: boolean | ScrollIntoViewOptions): void;
 		focus(options?: FocusOptions, debug?: boolean): void;
 	}
-	/**
-	 * Element interface extending Node.
-	 */
+
 	interface Element {
 		// HTML-specific properties (optional)
 		innerHTML: string;
 		className: string;
 		classList: DOMTokenList;
 		children: HTMLCollection;
+		files: FileList;
 
 		// Navigation specific to Element
-		nextElementSibling: Element | null;
-		previousElementSibling: Element | null;
-		firstElementChild: Element | null;
-		lastElementChild: Element | null;
+		nextElementSibling: HTMLElement | null;
+		previousElementSibling: HTMLElement | null;
+		firstElementChild: HTMLElement | null;
+		lastElementChild: HTMLElement | null;
 
 		// Attribute management
 		attributes: NamedNodeMap;

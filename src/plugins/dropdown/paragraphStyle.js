@@ -4,39 +4,43 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description A plugin to style lines using classes.
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<string|{name: string, class: string, _class: string}>} pluginOptions.items - Paragraph item list
- * @example
- * use default paragraph styles
- * ['spaced', 'bordered', 'neon']
- * custom paragraph styles
-	[
-		{ name: 'spaced', class: '__se__p-spaced', _class: '' },
-		{ name: 'bordered', class: '__se__p-bordered', _class: '' },
-		{ name: 'neon', class: '__se__p-neon', _class: ''}
-	]
  */
-function ParagraphStyle(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.paragraphStyle;
-	this.icon = 'paragraph_style';
+class ParagraphStyle extends EditorInjector {
+	static key = 'paragraphStyle';
+	static type = 'dropdown';
+	static className = '';
 
-	// create HTML
-	const menu = CreateHTML(editor, pluginOptions.items);
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<string|{name: string, class: string, _class: string}>} pluginOptions.items - Paragraph item list
+	 * @example
+	 * use default paragraph styles
+	 * ['spaced', 'bordered', 'neon']
+	 * custom paragraph styles
+		[
+			{ name: 'spaced', class: '__se__p-spaced', _class: '' },
+			{ name: 'bordered', class: '__se__p-bordered', _class: '' },
+			{ name: 'neon', class: '__se__p-neon', _class: ''}
+		]
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.paragraphStyle;
+		this.icon = 'paragraph_style';
 
-	// members
-	this.classList = menu.querySelectorAll('li button');
+		// create HTML
+		const menu = CreateHTML(editor, pluginOptions.items);
 
-	// init
-	this.menu.initDropdownTarget(ParagraphStyle, menu);
-}
+		// members
+		this.classList = menu.querySelectorAll('li button');
 
-ParagraphStyle.key = 'paragraphStyle';
-ParagraphStyle.type = 'dropdown';
-ParagraphStyle.className = '';
-ParagraphStyle.prototype = {
+		// init
+		this.menu.initDropdownTarget(ParagraphStyle, menu);
+	}
+
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
@@ -52,7 +56,7 @@ ParagraphStyle.prototype = {
 				domUtils.removeClass(paragraphList[i], 'active');
 			}
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -77,10 +81,8 @@ ParagraphStyle.prototype = {
 
 		this.menu.dropdownOff();
 		this.history.push(false);
-	},
-
-	constructor: ParagraphStyle
-};
+	}
+}
 
 function CreateHTML({ lang }, items) {
 	const defaultList = {

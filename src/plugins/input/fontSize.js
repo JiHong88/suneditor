@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { domUtils, numbers } from '../../helper';
 
 const DEFAULT_UNIT_MAP = {
 	text: {
@@ -91,86 +91,90 @@ const DEFAULT_UNIT_MAP = {
  * - This plugin enables users to modify the font size of selected text within the editor.
  * - It supports various measurement units (e.g., 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%') and
  * - provides multiple interfaces: dropdown menus, direct input, and optional increment/decrement buttons.
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions - Configuration options for the FontSize plugin.
- * @param {string=} [pluginOptions.sizeUnit='px'] - The unit for the font size.
- * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
- * - If 'text' is used, a text-based font size list is applied.
- * @param {boolean=} [pluginOptions.showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
- * @param {boolean=} [pluginOptions.showIncDecControls=false] - When true, displays increase and decrease buttons for font size adjustments.
- * @param {boolean=} [pluginOptions.disableInput=true] - When true, disables the direct font size input box.
- * @param {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}} [pluginOptions.unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
  */
-function FontSize(editor, pluginOptions) {
-	EditorInjector.call(this, editor);
+class FontSize extends EditorInjector {
+	static key = 'fontSize';
+	static type = 'input';
+	static className = 'se-btn-select se-btn-input se-btn-tool-font-size';
 
-	// create HTML
-	this.unitMap = { ...DEFAULT_UNIT_MAP, ...(pluginOptions.unitMap || {}) };
-	this.sizeUnit = /text/.test(pluginOptions.sizeUnit) ? '' : pluginOptions.sizeUnit || this.options.get('fontSizeUnits')[0];
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions - Configuration options for the FontSize plugin.
+	 * @param {string=} [pluginOptions.sizeUnit='px'] - The unit for the font size.
+	 * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
+	 * - If 'text' is used, a text-based font size list is applied.
+	 * @param {boolean=} [pluginOptions.showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
+	 * @param {boolean=} [pluginOptions.showIncDecControls=false] - When true, displays increase and decrease buttons for font size adjustments.
+	 * @param {boolean=} [pluginOptions.disableInput=true] - When true, disables the direct font size input box.
+	 * @param {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}} [pluginOptions.unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
+	 */
+	constructor(editor, pluginOptions) {
+		super(editor);
 
-	const unitMap = this.unitMap[this.sizeUnit || 'text'];
-	const menu = CreateHTML(editor, unitMap, this.sizeUnit, pluginOptions.showDefaultSizeLabel);
+		// create HTML
+		this.unitMap = { ...DEFAULT_UNIT_MAP, ...(pluginOptions.unitMap || {}) };
+		this.sizeUnit = /text/.test(pluginOptions.sizeUnit) ? '' : pluginOptions.sizeUnit || this.options.get('fontSizeUnits')[0];
 
-	// plugin basic properties
-	const showIncDec = this.sizeUnit ? pluginOptions.showIncDecControls ?? false : false;
-	const disableInput = this.sizeUnit ? pluginOptions.disableInput ?? false : true;
+		const unitMap = this.unitMap[this.sizeUnit || 'text'];
+		const menu = CreateHTML(editor, unitMap, this.sizeUnit, pluginOptions.showDefaultSizeLabel);
 
-	this.title = this.lang.fontSize;
-	this.inner =
-		disableInput && !showIncDec
-			? false
-			: disableInput
-			? `<span class="se-txt se-not-arrow-text __se__font_size">${this.lang.fontSize}</span>`
-			: `<input type="text" class="__se__font_size se-not-arrow-text" placeholder="${this.lang.fontSize}" />`;
+		// plugin basic properties
+		const showIncDec = this.sizeUnit ? pluginOptions.showIncDecControls ?? false : false;
+		const disableInput = this.sizeUnit ? pluginOptions.disableInput ?? false : true;
 
-	// increase, decrease buttons
-	if (showIncDec) {
-		this.beforeItem = domUtils.createElement(
-			'button',
-			{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'dec' },
-			`${this.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.decrease}</span></span>`
-		);
-		this.afterItem = domUtils.createElement(
-			'button',
-			{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'inc' },
-			`${this.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.increase}</span></span>`
-		);
-	} else if (!disableInput) {
-		this.afterItem = domUtils.createElement(
-			'button',
-			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': FontSize.key, 'data-type': 'dropdown' },
-			`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
-		);
-		this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
-	} else if (disableInput && !showIncDec) {
-		this.replaceButton = domUtils.createElement(
-			'button',
-			{ class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size', 'data-command': FontSize.key, 'data-type': 'dropdown' },
-			`<span class="se-txt __se__font_size">${this.lang.fontSize}</span>${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
-		);
-		this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
+		this.title = this.lang.fontSize;
+		this.inner =
+			disableInput && !showIncDec
+				? false
+				: disableInput
+				? `<span class="se-txt se-not-arrow-text __se__font_size">${this.lang.fontSize}</span>`
+				: `<input type="text" class="__se__font_size se-not-arrow-text" placeholder="${this.lang.fontSize}" />`;
+
+		// increase, decrease buttons
+		if (showIncDec) {
+			this.beforeItem = domUtils.createElement(
+				'button',
+				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'dec' },
+				`${this.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.decrease}</span></span>`
+			);
+			this.afterItem = domUtils.createElement(
+				'button',
+				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'inc' },
+				`${this.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.increase}</span></span>`
+			);
+		} else if (!disableInput) {
+			this.afterItem = domUtils.createElement(
+				'button',
+				{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': FontSize.key, 'data-type': 'dropdown' },
+				`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
+			);
+			this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
+		} else if (disableInput && !showIncDec) {
+			this.replaceButton = domUtils.createElement(
+				'button',
+				{ class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size', 'data-command': FontSize.key, 'data-type': 'dropdown' },
+				`<span class="se-txt __se__font_size">${this.lang.fontSize}</span>${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
+			);
+			this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
+		}
+
+		// members
+		this.currentSize = '';
+		this.sizeList = menu.querySelectorAll('li button');
+		this.hasInputFocus = false;
+		this.isInputActive = false; // input target event
+		this._disableInput = disableInput;
+
+		// init
+		this.menu.initDropdownTarget(FontSize, menu);
 	}
 
-	// members
-	this.currentSize = '';
-	this.sizeList = menu.querySelectorAll('li button');
-	this.hasInputFocus = false;
-	this.isInputActive = false; // input target event
-	this._disableInput = disableInput;
-
-	// init
-	this.menu.initDropdownTarget(FontSize, menu);
-}
-
-FontSize.key = 'fontSize';
-FontSize.type = 'input';
-FontSize.className = 'se-btn-select se-btn-input se-btn-tool-font-size';
-FontSize.prototype = {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
@@ -184,12 +188,14 @@ FontSize.prototype = {
 		}
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Toolbar
 	 * @description Executes the event function of toolbar's input tag - "keydown".
-	 * @param {PluginToolbarInputKeyEventInfo} params
+	 * @param {Object} params
+	 * @param {HTMLElement} params.target Input element
+	 * @param {KeyboardEvent} params.event Event object
 	 */
 	onInputKeyDown({ target, event }) {
 		const keyCode = event.keyCode;
@@ -204,16 +210,17 @@ FontSize.prototype = {
 		const { value, unit } = this._getSize(target);
 		if (!value) return;
 
+		const numValue = numbers.get(value);
 		const unitMap = this.unitMap[unit];
-		let changeValue = value;
+		let changeValue = numValue;
 		switch (keyCode) {
 			case 38: //up
 				changeValue += unitMap.inc;
-				if (changeValue > unitMap.max) changeValue = value;
+				if (changeValue > unitMap.max) changeValue = numValue;
 				break;
 			case 40: //down
 				changeValue -= unitMap.inc;
-				if (changeValue < unitMap.min) changeValue = value;
+				if (changeValue < unitMap.min) changeValue = numValue;
 		}
 
 		event.preventDefault();
@@ -230,7 +237,7 @@ FontSize.prototype = {
 		} finally {
 			this.isInputActive = false;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Toolbar
@@ -255,7 +262,7 @@ FontSize.prototype = {
 			event.preventDefault();
 			this.editor.focus();
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Dropdown
@@ -278,7 +285,7 @@ FontSize.prototype = {
 		}
 
 		this.currentSize = currentSize;
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -291,7 +298,7 @@ FontSize.prototype = {
 
 		if (commandValue === FontSize.key) {
 			const { value, unit } = this._getSize(target);
-			let newSize = value + (target.getAttribute('data-value') === 'inc' ? 1 : -1);
+			let newSize = numbers.get(value) + (target.getAttribute('data-value') === 'inc' ? 1 : -1);
 			const { min, max } = this.unitMap[unit];
 			newSize = newSize < min ? min : newSize > max ? max : newSize;
 
@@ -305,7 +312,7 @@ FontSize.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
+	}
 
 	/**
 	 * @private
@@ -314,7 +321,7 @@ FontSize.prototype = {
 	 */
 	_getDefaultSize() {
 		return this.editor.frameContext.get('wwComputedStyle').fontSize;
-	},
+	}
 
 	/**
 	 * @private
@@ -338,14 +345,14 @@ FontSize.prototype = {
 		let unit = (splitValue.pop() || '').trim().toLowerCase();
 		unit = this.options.get('fontSizeUnits').includes(unit) ? unit : this.sizeUnit;
 
-		let value = splitValue.pop();
-		value = unit ? value * 1 : value;
+		const tempValue = splitValue.pop();
+		const value = unit ? Number(tempValue) : tempValue;
 
 		return {
 			unit,
 			value
 		};
-	},
+	}
 
 	/**
 	 * @private
@@ -359,14 +366,12 @@ FontSize.prototype = {
 		if (!target) return 0;
 
 		if (/^INPUT$/i.test(target.nodeName)) {
-			return (target.value = value);
+			return (target.value = String(value));
 		} else {
-			return (target.textContent = this.sizeUnit ? value : this.unitMap.text.list.find((v) => v.size === value)?.title || value);
+			return (target.textContent = String(this.sizeUnit ? value : this.unitMap.text.list.find((v) => v.size === value)?.title || value));
 		}
-	},
-
-	constructor: FontSize
-};
+	}
+}
 
 function CreateHTML({ lang }, unitMap, sizeUnit, showDefaultSizeLabel) {
 	const sizeList = unitMap.list;

@@ -1312,7 +1312,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 		oButton.className += ' se-btn-more-text';
 	}
 
-	if (_disabled) oButton.setAttribute('disabled', 'true');
+	if (_disabled) oButton.disabled = true;
 
 	if (/^FIELD$/i.test(dataType)) domUtils.addClass(oLi, 'se-toolbar-hidden-btn');
 
@@ -1397,7 +1397,7 @@ export function UpdateButton(element, plugin, icons, lang) {
 			domUtils.addClass(inputTarget, 'se-toolbar-btn');
 			inputTarget.setAttribute('data-command', element.getAttribute('data-command'));
 			inputTarget.setAttribute('data-type', element.getAttribute('data-type'));
-			if (element.hasAttribute('disabled')) inputTarget.setAttribute('disabled', 'true');
+			if (element.hasAttribute('disabled')) inputTarget.disabled = true;
 		}
 	}
 }

@@ -64,205 +64,209 @@ const DEFAULT_COLOR_LIST = [
 /**
  * @class
  * @description Table Plugin
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {"x"|"y"|"xy"} [pluginOptions.scrollType='x'] - Scroll type ('x', 'y', 'xy')
- * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')
- * @param {"cell"|"table"} [pluginOptions.cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
- * @param {Array} [pluginOptions.colorList] - Color list, used in cell color picker
  */
-function Table(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.table;
-	this.icon = 'table';
+class Table extends EditorInjector {
+	static key = 'table';
+	static type = 'dropdown-free';
+	static className = '';
+	static options = { isInputComponent: true };
+	static component(node) {
+		return domUtils.isTable(node) ? node : null;
+	}
 
-	// pluginOptions options
-	this.figureScrollList = ['se-scroll-figure-xy', 'se-scroll-figure-x', 'se-scroll-figure-y'];
-	this.figureScroll = typeof pluginOptions.scrollType === 'string' ? pluginOptions.scrollType.toLowerCase() : 'x';
-	this.captionPosition = pluginOptions.captionPosition !== 'bottom' ? 'top' : 'bottom';
-	this.cellControllerTop = (pluginOptions.cellControllerPosition !== 'cell' ? 'table' : 'cell') === 'table';
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {"x"|"y"|"xy"} [pluginOptions.scrollType='x'] - Scroll type ('x', 'y', 'xy')
+	 * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')
+	 * @param {"cell"|"table"} [pluginOptions.cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
+	 * @param {Array} [pluginOptions.colorList] - Color list, used in cell color picker
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.table;
+		this.icon = 'table';
 
-	// create HTML
-	const menu = CreateHTML(editor);
-	const commandArea = menu.querySelector('.se-controller-table-picker');
-	const controller_table = CreateHTML_controller_table(editor);
-	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
-	const controller_props = CreateHTML_controller_properties(editor);
+		// pluginOptions options
+		this.figureScrollList = ['se-scroll-figure-xy', 'se-scroll-figure-x', 'se-scroll-figure-y'];
+		this.figureScroll = typeof pluginOptions.scrollType === 'string' ? pluginOptions.scrollType.toLowerCase() : 'x';
+		this.captionPosition = pluginOptions.captionPosition !== 'bottom' ? 'top' : 'bottom';
+		this.cellControllerTop = (pluginOptions.cellControllerPosition !== 'cell' ? 'table' : 'cell') === 'table';
 
-	editor.applyFrameRoots((e) => {
-		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_CELL_CLASS.replace(/^\./, '') }));
-		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }));
-		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_ROW_CLASS.replace(/^\./, '') }));
-		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }));
-	});
+		// create HTML
+		const menu = CreateHTML();
+		const commandArea = menu.querySelector('.se-controller-table-picker');
+		const controller_table = CreateHTML_controller_table(editor);
+		const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
+		const controller_props = CreateHTML_controller_properties(editor);
 
-	// members - Controller
-	this.controller_table = new Controller(this, controller_table, { position: 'top' });
-	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
-	// props
-	const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
-	this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
-	this.controller_props_title = controller_props.querySelector('.se-controller-title');
-	// color picker
-	const colorForm = domUtils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
-	this.colorPicker = new ColorPicker(this, '', {
-		colorList: pluginOptions.colorList || DEFAULT_COLOR_LIST,
-		splitNum: 5,
-		disableRemove: true,
-		hueSliderOptions: { controllerOptions: { parents: [colorForm], isOutsideForm: true } }
-	});
+		editor.applyFrameRoots((e) => {
+			e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_CELL_CLASS.replace(/^\./, '') }));
+			e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }));
+			e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_ROW_CLASS.replace(/^\./, '') }));
+			e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }));
+		});
 
-	colorForm.appendChild(this.colorPicker.target);
-	this.controller_colorPicker = new Controller(this, colorForm, {
-		position: 'bottom',
-		parents: [this.controller_props.form].concat(propsTargetForms),
-		isInsideForm: true,
-		isWWTarget: false,
-		initMethod: () => {
-			this.colorPicker.hueSlider.close();
-			domUtils.removeClass(this.controller_colorPicker.currentTarget, 'on');
-		}
-	});
+		// members - Controller
+		this.controller_table = new Controller(this, controller_table, { position: 'top' });
+		this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
+		// props
+		const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
+		this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
+		this.controller_props_title = controller_props.querySelector('.se-controller-title');
+		// color picker
+		const colorForm = domUtils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
+		this.colorPicker = new ColorPicker(this, '', {
+			colorList: pluginOptions.colorList || DEFAULT_COLOR_LIST,
+			splitNum: 5,
+			disableRemove: true,
+			hueSliderOptions: { controllerOptions: { parents: [colorForm], isOutsideForm: true } }
+		});
 
-	this.figure = new Figure(this, null, {});
+		colorForm.appendChild(this.colorPicker.target);
+		this.controller_colorPicker = new Controller(this, colorForm, {
+			position: 'bottom',
+			parents: [this.controller_props.form].concat(propsTargetForms),
+			isInsideForm: true,
+			isWWTarget: false,
+			initMethod: () => {
+				this.colorPicker.hueSlider.close();
+				domUtils.removeClass(this.controller_colorPicker.currentTarget, 'on');
+			}
+		});
 
-	this.sliderType = '';
+		this.figure = new Figure(this, null, {});
 
-	// members - SelectMenu - split
-	const splitMenu = CreateSplitMenu(this.lang);
-	this.splitButton = controller_cell.querySelector('[data-command="onsplit"]');
-	this.selectMenu_split = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-	this.selectMenu_split.on(this.splitButton, OnSplitCells.bind(this));
-	this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
+		this.sliderType = '';
 
-	// members - SelectMenu - column
-	const columnMenu = CreateColumnMenu(this.lang, this.icons);
-	const columnButton = controller_cell.querySelector('[data-command="oncolumn"]');
-	this.selectMenu_column = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-	this.selectMenu_column.on(columnButton, OnColumnEdit.bind(this));
-	this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
+		// members - SelectMenu - split
+		const splitMenu = CreateSplitMenu(this.lang);
+		this.splitButton = controller_cell.querySelector('[data-command="onsplit"]');
+		this.selectMenu_split = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_split.on(this.splitButton, OnSplitCells.bind(this));
+		this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 
-	// members - SelectMenu - row
-	const rownMenu = CreateRowMenu(this.lang, this.icons);
-	const rowButton = controller_cell.querySelector('[data-command="onrow"]');
-	this.selectMenu_row = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-	this.selectMenu_row.on(rowButton, OnRowEdit.bind(this));
-	this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
+		// members - SelectMenu - column
+		const columnMenu = CreateColumnMenu(this.lang, this.icons);
+		const columnButton = controller_cell.querySelector('[data-command="oncolumn"]');
+		this.selectMenu_column = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_column.on(columnButton, OnColumnEdit.bind(this));
+		this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
 
-	// members - SelectMenu - properties - border style
-	const borderMenu = CreateBorderMenu();
-	const borderButton = controller_props.querySelector('[data-command="props_onborder_style"]');
-	this.selectMenu_props_border = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-	this.selectMenu_props_border.on(borderButton, OnPropsBorderEdit.bind(this));
-	this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
+		// members - SelectMenu - row
+		const rownMenu = CreateRowMenu(this.lang, this.icons);
+		const rowButton = controller_cell.querySelector('[data-command="onrow"]');
+		this.selectMenu_row = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_row.on(rowButton, OnRowEdit.bind(this));
+		this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 
-	// members - SelectMenu - properties - border format
-	const borderFormatMenu = CreateBorderFormatMenu(this.lang, this.icons, []);
-	const borderFormatButton = controller_props.querySelector('[data-command="props_onborder_format"]');
-	this.selectMenu_props_border_format = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
-	this.selectMenu_props_border_format.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this, 'all'));
-	this.selectMenu_props_border_format.create(borderFormatMenu.items, borderFormatMenu.menus);
+		// members - SelectMenu - properties - border style
+		const borderMenu = CreateBorderMenu();
+		const borderButton = controller_props.querySelector('[data-command="props_onborder_style"]');
+		this.selectMenu_props_border = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_props_border.on(borderButton, OnPropsBorderEdit.bind(this));
+		this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
 
-	const borderFormatMenu_oneCell = CreateBorderFormatMenu(this.lang, this.icons, BORDER_FORMAT_INSIDE);
-	this.selectMenu_props_border_format_oneCell = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 6 });
-	this.selectMenu_props_border_format_oneCell.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this, 'outside'));
-	this.selectMenu_props_border_format_oneCell.create(borderFormatMenu_oneCell.items, borderFormatMenu_oneCell.menus);
+		// members - SelectMenu - properties - border format
+		const borderFormatMenu = CreateBorderFormatMenu(this.lang, this.icons, []);
+		const borderFormatButton = controller_props.querySelector('[data-command="props_onborder_format"]');
+		this.selectMenu_props_border_format = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
+		this.selectMenu_props_border_format.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this, 'all'));
+		this.selectMenu_props_border_format.create(borderFormatMenu.items, borderFormatMenu.menus);
 
-	// memberts - elements..
-	this.maxText = this.lang.maxSize;
-	this.minText = this.lang.minSize;
-	this.propTargets = {
-		cell_alignment: controller_props.querySelector('.se-table-props-align .__se__a_h'),
-		cell_alignment_vertical: controller_props.querySelector('.se-table-props-align .__se__a_v'),
-		cell_alignment_table_text: controller_props.querySelector('.se-table-props-align .__se__a_table_t'),
-		border_format: borderFormatButton,
-		border_style: controller_props.querySelector('[data-command="props_onborder_style"] .se-txt'),
-		border_color: controller_props.querySelector('.__se_border_color'),
-		border_width: controller_props.querySelector('.__se__border_size'),
-		back_color: controller_props.querySelector('.__se_back_color'),
-		font_color: controller_props.querySelector('.__se_font_color'),
-		palette_border_button: controller_props.querySelector('[data-command="props_onpalette"][data-value="border"]'),
-		font_bold: controller_props.querySelector('[data-command="props_font_style"][data-value="bold"]'),
-		font_underline: controller_props.querySelector('[data-command="props_font_style"][data-value="underline"]'),
-		font_italic: controller_props.querySelector('[data-command="props_font_style"][data-value="italic"]'),
-		font_strike: controller_props.querySelector('[data-command="props_font_style"][data-value="strike"]')
-	};
-	this._propsCache = [];
-	this._currentFontStyles = [];
-	this._propsAlignCache = '';
-	this._propsVerticalAlignCache = '';
-	this._typeCache = '';
-	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
-	this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
-	this.tableDisplay = menu.querySelector('.se-table-size-display');
-	this.resizeButton = controller_table.querySelector('._se_table_resize');
-	this.resizeText = controller_table.querySelector('._se_table_resize > span > span');
-	this.columnFixedButton = controller_table.querySelector('._se_table_fixed_column');
-	this.headerButton = controller_table.querySelector('._se_table_header');
-	this.captionButton = controller_table.querySelector('._se_table_caption');
-	this.mergeButton = controller_cell.querySelector('[data-command="merge"]');
+		const borderFormatMenu_oneCell = CreateBorderFormatMenu(this.lang, this.icons, BORDER_FORMAT_INSIDE);
+		this.selectMenu_props_border_format_oneCell = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 6 });
+		this.selectMenu_props_border_format_oneCell.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this, 'outside'));
+		this.selectMenu_props_border_format_oneCell.create(borderFormatMenu_oneCell.items, borderFormatMenu_oneCell.menus);
 
-	// members - private
-	this._resizing = false;
-	this._resizeLine = null;
-	this._resizeLinePrev = null;
-	this._figure = null;
-	this._element = null;
-	this._tdElement = null;
-	this._trElement = null;
-	this._trElements = null;
-	this._tableXY = [];
-	this._maxWidth = true;
-	this._fixedColumn = false;
-	this._physical_cellCnt = 0;
-	this._logical_cellCnt = 0;
-	this._rowCnt = 0;
-	this._rowIndex = 0;
-	this._physical_cellIndex = 0;
-	this._logical_cellIndex = 0;
-	this._current_colSpan = 0;
-	this._current_rowSpan = 0;
+		// memberts - elements..
+		this.maxText = this.lang.maxSize;
+		this.minText = this.lang.minSize;
+		this.propTargets = {
+			cell_alignment: controller_props.querySelector('.se-table-props-align .__se__a_h'),
+			cell_alignment_vertical: controller_props.querySelector('.se-table-props-align .__se__a_v'),
+			cell_alignment_table_text: controller_props.querySelector('.se-table-props-align .__se__a_table_t'),
+			border_format: borderFormatButton,
+			border_style: controller_props.querySelector('[data-command="props_onborder_style"] .se-txt'),
+			border_color: controller_props.querySelector('.__se_border_color'),
+			border_width: controller_props.querySelector('.__se__border_size'),
+			back_color: controller_props.querySelector('.__se_back_color'),
+			font_color: controller_props.querySelector('.__se_font_color'),
+			palette_border_button: controller_props.querySelector('[data-command="props_onpalette"][data-value="border"]'),
+			font_bold: controller_props.querySelector('[data-command="props_font_style"][data-value="bold"]'),
+			font_underline: controller_props.querySelector('[data-command="props_font_style"][data-value="underline"]'),
+			font_italic: controller_props.querySelector('[data-command="props_font_style"][data-value="italic"]'),
+			font_strike: controller_props.querySelector('[data-command="props_font_style"][data-value="strike"]')
+		};
+		this._propsCache = [];
+		this._currentFontStyles = [];
+		this._propsAlignCache = '';
+		this._propsVerticalAlignCache = '';
+		this._typeCache = '';
+		this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
+		this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
+		this.tableDisplay = menu.querySelector('.se-table-size-display');
+		this.resizeButton = controller_table.querySelector('._se_table_resize');
+		this.resizeText = controller_table.querySelector('._se_table_resize > span > span');
+		this.columnFixedButton = controller_table.querySelector('._se_table_fixed_column');
+		this.headerButton = controller_table.querySelector('._se_table_header');
+		this.captionButton = controller_table.querySelector('._se_table_caption');
+		this.mergeButton = controller_cell.querySelector('[data-command="merge"]');
 
-	// member - multi selecte
-	this._selectedCells = null;
-	this._shift = false;
-	this.__s = false;
-	this._fixedCell = null;
-	this._fixedCellName = null;
-	this._selectedCell = null;
-	this._selectedTable = null;
-	this._ref = null;
+		// members - private
+		this._resizing = false;
+		this._resizeLine = null;
+		this._resizeLinePrev = null;
+		this._figure = null;
+		this._element = null;
+		this._tdElement = null;
+		this._trElement = null;
+		this._trElements = null;
+		this._tableXY = [];
+		this._maxWidth = true;
+		this._fixedColumn = false;
+		this._physical_cellCnt = 0;
+		this._logical_cellCnt = 0;
+		this._rowCnt = 0;
+		this._rowIndex = 0;
+		this._physical_cellIndex = 0;
+		this._logical_cellIndex = 0;
+		this._current_colSpan = 0;
+		this._current_rowSpan = 0;
 
-	// member - global events
-	this._bindMultiOn = OnCellMultiSelect.bind(this);
-	this._bindMultiOff = OffCellMultiSelect.bind(this);
-	this._bindShiftOff = OffCellShift.bind(this);
-	this._bindTouchOff = OffCellTouch.bind(this);
-	this.__globalEvents = {
-		on: null,
-		off: null,
-		shiftOff: null,
-		touchOff: null,
-		resize: null,
-		resizeStop: null,
-		resizeKeyDown: null
-	};
+		// member - multi selecte
+		this._selectedCells = null;
+		this._shift = false;
+		this.__s = false;
+		this._fixedCell = null;
+		this._fixedCellName = null;
+		this._selectedCell = null;
+		this._selectedTable = null;
+		this._ref = null;
 
-	// init
-	this.menu.initDropdownTarget(Table, menu);
-	this.eventManager.addEvent(commandArea, 'mousemove', OnMouseMoveTablePicker.bind(this));
-	this.eventManager.addEvent(commandArea, 'click', OnClickTablePicker.bind(this));
-}
+		// member - global events
+		this._bindMultiOn = OnCellMultiSelect.bind(this);
+		this._bindMultiOff = OffCellMultiSelect.bind(this);
+		this._bindShiftOff = OffCellShift.bind(this);
+		this._bindTouchOff = OffCellTouch.bind(this);
+		this.__globalEvents = {
+			on: null,
+			off: null,
+			shiftOff: null,
+			touchOff: null,
+			resize: null,
+			resizeStop: null,
+			resizeKeyDown: null
+		};
 
-Table.key = 'table';
-Table.type = 'dropdown-free';
-Table.className = '';
-Table.component = function (node) {
-	return domUtils.isTable(node) ? node : null;
-};
-Table.options = { isInputComponent: true };
-Table.prototype = {
+		// init
+		this.menu.initDropdownTarget(Table, menu);
+		this.eventManager.addEvent(commandArea, 'mousemove', OnMouseMoveTablePicker.bind(this));
+		this.eventManager.addEvent(commandArea, 'click', OnClickTablePicker.bind(this));
+	}
+
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
@@ -273,7 +277,7 @@ Table.prototype = {
 		const x = this._tableXY[0];
 		const y = this._tableXY[1];
 
-		const body = `<tbody>${`<tr>${CreateCells('td', x, false)}</tr>`.repeat(y)}</tbody>`;
+		const body = `<tbody>${`<tr>${CreateCellsString('td', x)}</tr>`.repeat(y)}</tbody>`;
 		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
 		oTable.innerHTML = colGroup + body;
 
@@ -291,12 +295,12 @@ Table.prototype = {
 			const target = oTable.querySelector('td div');
 			this.selection.setRange(target, 0, target, 0);
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {Element} target Target component element
+	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
 		this._figureOpen(target);
@@ -319,7 +323,7 @@ Table.prototype = {
 
 		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
 		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset, disabled: btnDisabled });
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -327,9 +331,9 @@ Table.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {Object} The format retention object containing the query and method to process the element.
-	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
-	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
+	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
+	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
@@ -366,7 +370,7 @@ Table.prototype = {
 				}
 			}
 		};
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -376,8 +380,8 @@ Table.prototype = {
 	setDir(dir) {
 		this.tableHighlight.style.left = dir === 'rtl' ? 10 * 18 - 13 + 'px' : '';
 		this._resetTablePicker();
-		this._resetPropsAlign(dir === 'rtl');
-	},
+		this._resetPropsAlign();
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
@@ -386,7 +390,9 @@ Table.prototype = {
 	 */
 	onMouseMove({ event }) {
 		if (this._resizing) return;
-		const target = domUtils.getParentElement(event.target, IsResizeEls);
+
+		const eventTarget = /** @type {HTMLElement} */ (event.target);
+		const target = domUtils.getParentElement(eventTarget, IsResizeEls);
 		if (!target || this._fixedCell) {
 			this.__hideResizeLine();
 			return;
@@ -417,19 +423,18 @@ Table.prototype = {
 
 		if (this._element) this._element.style.cursor = '';
 		this.__hideResizeLine();
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "scroll".
-	 * @param {PluginMouseEventInfo} params
 	 */
 	onScroll() {
 		if (this._resizeLine?.style.display !== 'block') return;
 		// delete resize line position
 		if (this._element) this._element.style.cursor = '';
 		this._resizeLine.style.display = 'none';
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
@@ -438,7 +443,8 @@ Table.prototype = {
 	 */
 	onMouseDown({ event }) {
 		this._ref = null;
-		const target = domUtils.getParentElement(event.target, IsResizeEls);
+		const eventTarget = domUtils.getEventTarget(event);
+		const target = domUtils.getParentElement(eventTarget, IsResizeEls);
 		if (!target) return;
 
 		const cellEdge = CheckCellEdge(event, target);
@@ -504,25 +510,23 @@ Table.prototype = {
 		if (/^TR$/i.test(target.nodeName)) return;
 
 		this.selectCells(target, false);
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mouseup".
-	 * @param {PluginMouseEventInfo} params
 	 */
 	onMouseUp() {
 		this._shift = false;
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mouseleave".
-	 * @param {PluginMouseEventInfo} params
 	 */
 	onMouseLeave() {
 		this.__hideResizeLine();
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
@@ -598,7 +602,7 @@ Table.prototype = {
 			this.selectCells(cell, event.shiftKey);
 			return false;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
@@ -613,7 +617,7 @@ Table.prototype = {
 			this.__removeGlobalEvents();
 		}
 		this._shift = false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.ColorPicker
@@ -624,12 +628,12 @@ Table.prototype = {
 		const target = this.propTargets[`${this.sliderType}_color`];
 		target.style.borderColor = target.value = color;
 		this.controller_colorPicker.close();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {Element} target Target button element
+	 * @param {HTMLElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -757,7 +761,7 @@ Table.prototype = {
 		if (!/^(remove|props_|on|open|merge)/.test(command)) {
 			this._setCellControllerPosition(this._tdElement, this._shift);
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
@@ -796,11 +800,11 @@ Table.prototype = {
 
 		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
 		domUtils.removeClass([border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike], 'on');
-	},
+	}
 
 	/**
 	 * @description Selects cells in a table, handling single and multi-cell selection, and managing shift key behavior for extended selection.
-	 * @param {Element} tdElement The target table cell (`<td>`) element that is being selected.
+	 * @param {Node} tdElement The target table cell (`<td>`) element that is being selected.
 	 * @param {boolean} shift A flag indicating whether the shift key is held down for multi-cell selection.
 	 * If `true`, the selection will extend to include adjacent cells, otherwise it selects only the provided cell.
 	 */
@@ -825,22 +829,22 @@ Table.prototype = {
 
 		this.__globalEvents.off = this.eventManager.addGlobalEvent('mouseup', this._bindMultiOff, false);
 		this.__globalEvents.touchOff = this.eventManager.addGlobalEvent('touchmove', this._bindTouchOff, false);
-	},
+	}
 
 	/**
 	 * @description Sets the table and figure elements based on the provided cell element, and stores references to them for later use.
-	 * @param {Element} element The target table cell (`<td>`) element from which the table info will be extracted.
-	 * @returns {Element} The `<table>` element that is the parent of the provided `element`.
+	 * @param {Node} element The target table cell (`<td>`) element from which the table info will be extracted.
+	 * @returns {HTMLTableElement} The `<table>` element that is the parent of the provided `element`.
 	 */
 	setTableInfo(element) {
 		const table = (this._element = this._selectedTable || domUtils.getParentElement(element, 'TABLE'));
 		this._figure = domUtils.getParentElement(table, domUtils.isFigure) || table;
-		return table;
-	},
+		return /** @type {HTMLTableElement} */ (table);
+	}
 
 	/**
 	 * @description Sets various table-related information based on the provided table cell element (`<td>`). This includes updating cell, row, and table attributes, handling spanning cells, and adjusting the UI for elements like headers and captions.
-	 * @param {Element} tdElement The target table cell (`<td>`) element from which table information will be extracted.
+	 * @param {Node} tdElement The target table cell (`<td>`) element from which table information will be extracted.
 	 * @param {boolean} reset A flag indicating whether to reset the cell information. If `true`, the cell information will be reset and recalculated.
 	 */
 	setCellInfo(tdElement, reset) {
@@ -948,23 +952,23 @@ Table.prototype = {
 			rowSpanArr = null;
 			spanIndex = null;
 		}
-	},
+	}
 
 	/**
 	 * @description Sets row-related information based on the provided table row element (`<tr>`). This includes updating the row count and the index of the selected row.
-	 * @param {Element} trElement The target table row (`<tr>`) element from which row information will be extracted.
+	 * @param {Node} trElement The target table row (`<tr>`) element from which row information will be extracted.
 	 */
 	setRowInfo(trElement) {
 		const table = this.setTableInfo(trElement);
 		const rows = (this._trElements = table.rows);
 		this._rowCnt = rows.length;
 		this._rowIndex = trElement.rowIndex;
-	},
+	}
 
 	/**
 	 * @description Edits the table by adding, removing, or modifying rows and cells, based on the provided options. Supports both single and multi-cell/row editing.
 	 * @param {"row"|"cell"} type The type of element to edit ('row' or 'cell').
-	 * @param {?"up"|"down"|"left"|"right"=} option The action to perform: 'up', 'down', 'left', 'right', or `null` for removing.
+	 * @param {?"up"|"down"|"left"|"right"} option The action to perform: 'up', 'down', 'left', 'right', or `null` for removing.
 	 */
 	editTable(type, option) {
 		const table = this._element;
@@ -980,7 +984,7 @@ Table.prototype = {
 						domUtils.removeItem(this._figure);
 						this._closeController();
 					} else {
-						table.innerHTML += '<tbody><tr>' + CreateCells('td', this._logical_cellCnt, false) + '</tr></tbody>';
+						table.innerHTML += '<tbody><tr>' + CreateCellsString('td', this._logical_cellCnt) + '</tr></tbody>';
 					}
 					return;
 				}
@@ -1069,11 +1073,14 @@ Table.prototype = {
 
 			if (table.children.length === 0) domUtils.removeItem(table);
 		}
-	},
+	}
 
 	/**
 	 * @description Edits a table row, either adding, removing, the row
-	 * @param {"up"|"down"|null} option The action to perform on the row: `null` to remove the row, 'up' to insert the row up, 'down' to insert the row down, or null to remove.
+	 * @param {?string} option The action to perform on the row ("up"|"down"|null)
+	 * - null: to remove the row
+	 * - 'up': to insert the row up
+	 * - 'down': to insert the row down, or null to remove.
 	 * @param {?Element=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
 	 */
 	editRow(option, positionResetElement) {
@@ -1161,11 +1168,14 @@ Table.prototype = {
 		} else {
 			this._closeController();
 		}
-	},
+	}
 
 	/**
 	 * @description Edits a table cell(column), either adding, removing, or modifying the cell based on the provided option.
-	 * @param {"left"|"right"|null} option The action to perform on the cell: `null` to remove the cell, 'left' to insert a new cell to the left, 'right' to insert a new cell to the right, or `null` to remove the cell.
+	 * @param {?string} option The action to perform on the cell ("left"|"right"|null)
+	 * - null: to remove the cell
+	 * - left: to insert a new cell to the left
+	 * - right: to insert a new cell to the right
 	 * @param {?Element=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
 	 */
 	editCell(option, positionResetElement) {
@@ -1287,7 +1297,7 @@ Table.prototype = {
 				}
 
 				if (insertIndex !== null && cells.length > 0) {
-					newCell = CreateCells(cells[0].nodeName, 0, true);
+					newCell = CreateCellsHTML(cells[0].nodeName);
 					newCell = row.insertBefore(newCell, cells[insertIndex]);
 				}
 			}
@@ -1302,7 +1312,7 @@ Table.prototype = {
 				let totalW = 0;
 				for (let i = 0, len = cols.length, w; i < len; i++) {
 					w = numbers.get(cols[i].style.width);
-					w -= Math.round((w * len * 0.1) / 2, CELL_DECIMAL_END);
+					w -= Math.round((w * len * 0.1) / 2);
 					totalW += w;
 					cols[i].style.width = `${w}%`;
 				}
@@ -1332,20 +1342,20 @@ Table.prototype = {
 		} else {
 			this._setCellControllerPosition(positionResetElement || this._tdElement, true);
 		}
-	},
+	}
 
 	/**
 	 * @description Inserts a new row into the table at the specified index to it.
-	 * @param {Element} table The table element to insert the row into.
+	 * @param {Node} table The table element to insert the row into.
 	 * @param {number} rowIndex The index at which to insert the new row.
 	 * @param {number} cellCnt The number of cells to create in the new row.
-	 * @returns {Element} The newly inserted row element.
+	 * @returns {HTMLElement} The newly inserted row element.
 	 */
 	insertBodyRow(table, rowIndex, cellCnt) {
 		const newRow = table.insertRow(rowIndex);
-		newRow.innerHTML = CreateCells('td', cellCnt, false);
+		newRow.innerHTML = CreateCellsString('td', cellCnt);
 		return newRow;
-	},
+	}
 
 	/**
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
@@ -1420,7 +1430,7 @@ Table.prototype = {
 
 		this.editor.focusEdge(mergeCell);
 		this._historyPush();
-	},
+	}
 
 	/**
 	 * @description Toggles the visibility of the table header (`<thead>`). If the header is present, it is removed; if absent, it is added.
@@ -1432,7 +1442,7 @@ Table.prototype = {
 
 		if (!active) {
 			const header = domUtils.createElement('THEAD');
-			header.innerHTML = '<tr>' + CreateCells('th', this._logical_cellCnt, false) + '</tr>';
+			header.innerHTML = '<tr>' + CreateCellsString('th', this._logical_cellCnt) + '</tr>';
 			table.insertBefore(header, table.firstElementChild);
 		} else {
 			domUtils.removeItem(table.querySelector('thead'));
@@ -1445,7 +1455,7 @@ Table.prototype = {
 		} else {
 			this._setCellControllerPosition(this._tdElement, false);
 		}
-	},
+	}
 
 	/**
 	 * @description Toggles the visibility of the table caption (`<caption>`). If the caption is present, it is removed; if absent, it is added.
@@ -1465,7 +1475,7 @@ Table.prototype = {
 
 		domUtils.toggleClass(btn, 'active');
 		this._setCellControllerPosition(this._tdElement, false);
-	},
+	}
 
 	/**
 	 * @private
@@ -1504,10 +1514,10 @@ Table.prototype = {
 				domUtils.addClass(this.columnFixedButton, 'active');
 			}
 		}
-	},
+	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the merge/split button visibility.
 	 * @param {boolean} fixedCell - Whether a single cell is selected.
 	 * @param {boolean} selectedCell - Whether multiple cells are selected.
@@ -1520,12 +1530,12 @@ Table.prototype = {
 			this.splitButton.style.display = 'none';
 			this.mergeButton.style.display = 'block';
 		}
-	},
+	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the controller position for a cell.
-	 * @param {Element} tdElement - The target table cell.
+	 * @param {Node} tdElement - The target table cell.
 	 */
 	_setController(tdElement) {
 		if (!this.selection.get().isCollapsed && !this._selectedCell) {
@@ -1537,42 +1547,42 @@ Table.prototype = {
 		domUtils.addClass(tdElement, 'se-selected-cell-focus');
 		const tableElement = this._element || this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, true);
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Sets the position of the cell controller.
-	 * @param {Element} tdElement - The target table cell.
+	 * @param {Node} tdElement - The target table cell.
 	 * @param {boolean} reset - Whether to reset the controller position.
 	 */
 	_setCellControllerPosition(tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
 		this.controller_cell.resetPosition(this.cellControllerTop ? domUtils.getParentElement(tdElement, domUtils.isTable) : tdElement);
-	},
+	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Adds a new entry to the history stack.
 	 */
 	_historyPush() {
 		this._deleteStyleSelectedCells();
 		this.history.push(false);
 		this._recallStyleSelectedCells();
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Opens the figure.
-	 * @param {Element} target - The target figure element.
+	 * @param {Node} target - The target figure element.
 	 */
 	_figureOpen(target) {
 		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Starts resizing a table cell.
-	 * @param {Element} col The column element.
+	 * @param {Node} col The column element.
 	 * @param {number} startX The starting X position.
 	 * @param {number} startWidth The initial width of the column.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
@@ -1612,16 +1622,16 @@ Table.prototype = {
 				this._stopResize(nextCol, nextColPrevValue, 'width', e);
 			}
 		);
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Resizes a table cell.
-	 * @param {Element} col The column element.
-	 * @param {Element} nextCol The next column element.
-	 * @param {Element} figure The table figure element.
-	 * @param {Element} tdEl The table cell element.
-	 * @param {Element} resizeLine The resize line element.
+	 * @param {Node} col The column element.
+	 * @param {Node} nextCol The next column element.
+	 * @param {Node} figure The table figure element.
+	 * @param {Node} tdEl The table cell element.
+	 * @param {Node} resizeLine The resize line element.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 * @param {number} startX The starting X position.
 	 * @param {number} startWidth The initial width of the column.
@@ -1641,12 +1651,12 @@ Table.prototype = {
 			nextCol.style.width = `${nextColWidthPercent + delta}%`;
 			this._setResizeLinePosition(figure, tdEl, resizeLine, isLeftEdge);
 		}
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Starts resizing a table row.
-	 * @param {Element} row The table row element.
+	 * @param {Node} row The table row element.
 	 * @param {number} startY The starting Y position.
 	 * @param {number} startHeight The initial height of the row.
 	 */
@@ -1658,19 +1668,19 @@ Table.prototype = {
 		this._addResizeGlobalEvents(
 			this._rowResize.bind(this, row, this._figure, this._resizeLine, startY, startHeight),
 			() => {
-				this.__removeGlobalEvents(this);
+				this.__removeGlobalEvents();
 				this.history.push(true);
 			},
 			this._stopResize.bind(this, row, prevValue, 'height')
 		);
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Resizes a table row.
-	 * @param {Element} row The table row element.
-	 * @param {Element} figure The table figure element.
-	 * @param {Element} resizeLine The resize line element.
+	 * @param {Node} row The table row element.
+	 * @param {Node} figure The table figure element.
+	 * @param {Node} resizeLine The resize line element.
 	 * @param {number} startY The starting Y position.
 	 * @param {number} startHeight The initial height of the row.
 	 * @param {MouseEvent} e The mouse event.
@@ -1680,7 +1690,7 @@ Table.prototype = {
 		const newHeightPx = startHeight + deltaY;
 		row.style.height = `${newHeightPx}px`;
 		this._setResizeRowPosition(figure, row, resizeLine);
-	},
+	}
 
 	/**
 	 * @private
@@ -1704,13 +1714,13 @@ Table.prototype = {
 			},
 			this._stopResize.bind(this, figure, figure.style.width, 'width')
 		);
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Resizes the table figure.
-	 * @param {Element} figure The table figure element.
-	 * @param {Element} resizeLine The resize line element.
+	 * @param {Node} figure The table figure element.
+	 * @param {Node} resizeLine The resize line element.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 * @param {number} startX The starting X position.
 	 * @param {number} startWidth The initial width of the figure.
@@ -1726,14 +1736,14 @@ Table.prototype = {
 			figure.style.width = `${newWidthPercent}%`;
 			this._setResizeLinePosition(figure, figure, resizeLine, isLeftEdge);
 		}
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Sets the resize line position.
-	 * @param {Element} figure The table figure element.
-	 * @param {Element} target The target element.
-	 * @param {Element} resizeLine The resize line element.
+	 * @param {Node} figure The table figure element.
+	 * @param {Node} target The target element.
+	 * @param {Node} resizeLine The resize line element.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	_setResizeLinePosition(figure, target, resizeLine, isLeftEdge) {
@@ -1742,14 +1752,14 @@ Table.prototype = {
 		resizeLine.style.left = `${tdOffset.left + (isLeftEdge ? 0 : target.offsetWidth)}px`;
 		resizeLine.style.top = `${tableOffset.top}px`;
 		resizeLine.style.height = `${figure.offsetHeight}px`;
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Sets the resize row position.
-	 * @param {Element} figure The table figure element.
-	 * @param {Element} target The target row element.
-	 * @param {Element} resizeLine The resize line element.
+	 * @param {Node} figure The table figure element.
+	 * @param {Node} target The target row element.
+	 * @param {Node} resizeLine The resize line element.
 	 */
 	_setResizeRowPosition(figure, target, resizeLine) {
 		const rowOffset = this.offset.getLocal(target);
@@ -1757,12 +1767,12 @@ Table.prototype = {
 		resizeLine.style.top = `${rowOffset.top + target.offsetHeight}px`;
 		resizeLine.style.left = `${tableOffset.left}px`;
 		resizeLine.style.width = `${figure.offsetWidth}px`;
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Stops resizing the table.
-	 * @param {Element} target The target element.
+	 * @param {Node} target The target element.
 	 * @param {string} prevValue The previous style value.
 	 * @param {string} styleProp The CSS property being changed.
 	 * @param {KeyboardEvent} e The keyboard event.
@@ -1775,10 +1785,10 @@ Table.prototype = {
 		if (styleProp === 'width') {
 			this.component.select(this._element, Table.key, true);
 		}
-	},
+	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Deletes styles from selected table cells.
 	 */
 	_deleteStyleSelectedCells() {
@@ -1789,7 +1799,7 @@ Table.prototype = {
 				domUtils.removeClass(selectedCells[i], 'se-selected-table-cell');
 			}
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -1802,7 +1812,7 @@ Table.prototype = {
 				domUtils.addClass(selectedCells[i], 'se-selected-table-cell');
 			}
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -1816,10 +1826,10 @@ Table.prototype = {
 		this.__globalEvents.resizeStop = this.eventManager.addGlobalEvent('mouseup', stopFn, false);
 		this.__globalEvents.resizeKeyDown = this.eventManager.addGlobalEvent('keydown', keyDownFn, false);
 		this._resizing = true;
-	},
+	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Enables or disables editor mode.
 	 * @param {boolean} enabled Whether to enable or disable the editor.
 	 */
@@ -1827,7 +1837,7 @@ Table.prototype = {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');
 		if (enabled) domUtils.removeClass(wysiwyg, 'se-disabled');
 		else domUtils.addClass(wysiwyg, 'se-disabled');
-	},
+	}
 
 	/**
 	 * @private
@@ -1877,7 +1887,7 @@ Table.prototype = {
 			if (fontColor !== converter.rgb2hex(color)) fontColor = '';
 			if (align !== (isTable ? this._figure?.style.float : textAlign)) align = '';
 			if (align_v && align_v !== verticalAlign) align_v = '';
-			if (bold && bold !== /.+/.test(fontWeight)) bold = '';
+			if (bold && bold !== /.+/.test(fontWeight)) bold = false;
 			if (underline && underline !== /underline/i.test(textDecoration)) underline = false;
 			if (strike && strike !== /line-through/i.test(textDecoration)) strike = false;
 			if (italic && italic !== /italic/i.test(fontStyle)) italic = false;
@@ -1911,12 +1921,12 @@ Table.prototype = {
 		// align
 		this._setAlignProps(cell_alignment, (this._propsAlignCache = align), true);
 		this._setAlignProps(cell_alignment_vertical, (this._propsVerticalAlignCache = align_v), true);
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Sets text alignment properties.
-	 * @param {Element} el The element to apply alignment to.
+	 * @param {Node} el The element to apply alignment to.
 	 * @param {string} align The alignment value.
 	 * @param {boolean} reset Whether to reset the alignment.
 	 */
@@ -1930,7 +1940,7 @@ Table.prototype = {
 
 		domUtils.addClass(el.querySelector(`[data-value="${align}"]`), 'on');
 		el.setAttribute('se-cell-align', align);
-	},
+	}
 
 	/**
 	 * @private
@@ -1940,17 +1950,17 @@ Table.prototype = {
 	_disableBorderProps(disabled) {
 		const { border_color, border_width, palette_border_button } = this.propTargets;
 		if (disabled) {
-			border_color.setAttribute('disabled', true);
-			border_width.setAttribute('disabled', true);
-			palette_border_button.setAttribute('disabled', true);
-			border_width.setAttribute('disabled', true);
+			border_color.disabled = true;
+			border_width.disabled = true;
+			palette_border_button.disabled = true;
+			border_width.disabled = true;
 		} else {
-			border_color.removeAttribute('disabled');
-			border_width.removeAttribute('disabled');
-			palette_border_button.removeAttribute('disabled');
-			border_width.removeAttribute('disabled');
+			border_color.disabled = false;
+			border_width.disabled = false;
+			palette_border_button.disabled = false;
+			border_width.disabled = false;
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -1988,16 +1998,16 @@ Table.prototype = {
 		}
 
 		return { w, s, c: converter.rgb2hex(c) };
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Applies properties to table cells.
-	 * @param {Element} target The target element.
+	 * @param {Node} target The target element.
 	 */
 	_submitProps(target) {
 		try {
-			target.setAttribute('disabled', true);
+			target.disabled = true;
 
 			const isTable = this.controller_table.form.contains(this.controller_props.currentTarget);
 			const targets = isTable ? [this._element] : this._selectedCells;
@@ -2024,7 +2034,8 @@ Table.prototype = {
 				top: [],
 				right: [],
 				bottom: [],
-				middle: []
+				middle: [],
+				all: null
 			};
 
 			if (!isTable) {
@@ -2150,9 +2161,9 @@ Table.prototype = {
 		} catch (err) {
 			console.warn('[SUNEDITOR.plugins.table.setProps.error]', err);
 		} finally {
-			target.removeAttribute('disabled');
+			target.disabled = false;
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -2164,20 +2175,20 @@ Table.prototype = {
 		styles.fontWeight = domUtils.hasClass(font_bold, 'on') ? 'bold' : '';
 		styles.fontStyle = domUtils.hasClass(font_italic, 'on') ? 'italic' : '';
 		styles.textDecoration = ((domUtils.hasClass(font_strike, 'on') ? 'line-through ' : '') + (domUtils.hasClass(font_underline, 'on') ? 'underline' : '')).trim();
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Sets border format and styles.
-	 * @param {{left: Element[], top: Element[], right: Element[], bottom: Element[], all: Element[]}} cells The table cells categorized by border positions.
-	 * @param {"all"|"inside"|"horizon"|"vertical"|"outside"|"left"|"top"|"right"|"bottom"} borderKey Border style
+	 * @param {{left: HTMLTableCellElement[], top: HTMLTableCellElement[], right: HTMLTableCellElement[], bottom: HTMLTableCellElement[], all: HTMLTableCellElement[]}} cells The table cells categorized by border positions.
+	 * @param {string} borderKey Border style ("all"|"inside"|"horizon"|"vertical"|"outside"|"left"|"top"|"right"|"bottom")
 	 * @param {string} s The border style value.
 	 */
 	_setBorderStyles(cells, borderKey, s) {
 		const { left, top, right, bottom, all } = cells;
 		switch (borderKey) {
 			case 'inside':
-				if (cells.length === 1) return;
+				if (all.length === 1) return;
 				domUtils.setStyle(
 					all.filter((c) => !bottom.includes(c)),
 					BORDER_NS.b,
@@ -2190,7 +2201,7 @@ Table.prototype = {
 				);
 				break;
 			case 'horizon':
-				if (cells.length === 1) return;
+				if (all.length === 1) return;
 				domUtils.setStyle(
 					all.filter((c) => !bottom.includes(c)),
 					BORDER_NS.b,
@@ -2198,7 +2209,7 @@ Table.prototype = {
 				);
 				break;
 			case 'vertical':
-				if (cells.length === 1) return;
+				if (all.length === 1) return;
 				domUtils.setStyle(
 					all.filter((c) => !right.includes(c)),
 					BORDER_NS.r,
@@ -2224,13 +2235,13 @@ Table.prototype = {
 				domUtils.setStyle(bottom, BORDER_NS.b, s);
 				break;
 		}
-	},
+	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Selects multiple table cells and applies selection styles.
-	 * @param {Element} startCell The first cell in the selection.
-	 * @param {Element} endCell The last cell in the selection.
+	 * @param {Node} startCell The first cell in the selection.
+	 * @param {Node} endCell The last cell in the selection.
 	 */
 	_setMultiCells(startCell, endCell) {
 		const rows = this._selectedTable.rows;
@@ -2335,7 +2346,7 @@ Table.prototype = {
 			});
 			rowSpanArr = [];
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -2354,7 +2365,7 @@ Table.prototype = {
 
 		domUtils.changeTxt(this.tableDisplay, '1 x 1');
 		this.menu.dropdownOff();
-	},
+	}
 
 	/**
 	 * @private
@@ -2368,14 +2379,14 @@ Table.prototype = {
 		const r_parent = right.parentElement;
 		l_parent.appendChild(right);
 		r_parent.appendChild(left);
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Handles color selection from the color palette.
-	 * @param {Element} button The button triggering the color palette.
+	 * @param {Node} button The button triggering the color palette.
 	 * @param {string} type The type of color selection.
-	 * @param {Element} color Color text input element.
+	 * @param {Node} color Color text input element.
 	 */
 	_onColorPalette(button, type, color) {
 		if (this.controller_colorPicker.isOpen && type === this.sliderType) {
@@ -2386,17 +2397,17 @@ Table.prototype = {
 			this.colorPicker.init(color?.value || '', button);
 			this.controller_colorPicker.open(button, null, { isWWTarget: false, initMethod: null, addOffset: null });
 		}
-	},
+	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Closes table-related controllers.
 	 */
 	_closeController() {
 		this.component.deselect();
 		this.controller_table.close();
 		this.controller_cell.close();
-	},
+	}
 
 	/**
 	 * @private
@@ -2407,10 +2418,10 @@ Table.prototype = {
 			this._resizeLine.style.display = 'none';
 			this._resizeLine = null;
 		}
-	},
+	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Removes global event listeners and resets resize-related properties.
 	 */
 	__removeGlobalEvents() {
@@ -2425,10 +2436,8 @@ Table.prototype = {
 		for (const k in globalEvents) {
 			if (globalEvents[k]) globalEvents[k] = this.eventManager.removeGlobalEvent(globalEvents[k]);
 		}
-	},
-
-	constructor: Table
-};
+	}
+}
 
 /**
  * @private
@@ -2444,7 +2453,7 @@ function IsResizeEls(node) {
  * @private
  * @description Checks if a table cell is at its edge based on the mouse event.
  * @param {MouseEvent} event The mouse event.
- * @param {Element} tableCell The table cell to check.
+ * @param {Node} tableCell The table cell to check.
  * @returns {Object} An object containing edge detection details.
  */
 function CheckCellEdge(event, tableCell) {
@@ -2466,7 +2475,7 @@ function CheckCellEdge(event, tableCell) {
  * @private
  * @description Checks if a row is at its edge based on the mouse event.
  * @param {MouseEvent} event The mouse event.
- * @param {Element} tableCell The table row cell to check.
+ * @param {Node} tableCell The table row cell to check.
  * @returns {Object} An object containing row edge detection details.
  */
 function CheckRowEdge(event, tableCell) {
@@ -2483,6 +2492,31 @@ function CheckRowEdge(event, tableCell) {
 
 /**
  * @private
+ * @description Creates table cells as elements strings.
+ * @param {string} nodeName The tag name of the cell (TD or TH).
+ * @param {number} cnt The number of cells to create.
+ * @returns {string} The created cells.
+ */
+function CreateCellsString(nodeName, cnt) {
+	nodeName = nodeName.toLowerCase();
+	return `<${nodeName}><div><br></div></${nodeName}>`.repeat(cnt);
+}
+
+/**
+ * @private
+ * @description Creates table cells as element HTML.
+ * @param {string} nodeName The tag name of the cell (TD or TH).
+ * @returns {HTMLElement} The created cells.
+ */
+function CreateCellsHTML(nodeName) {
+	nodeName = nodeName.toLowerCase();
+	return domUtils.createElement(nodeName, null, '<div><br></div>');
+}
+
+// -------------------------------- event functions [START] ----------------------------------------------------------------
+/**
+ * @private
+ * @this {Table}
  * @description Splits a table cell either vertically or horizontally.
  * @param {"vertical"|"horizontal"} direction The direction to split the cell.
  */
@@ -2493,7 +2527,7 @@ function OnSplitCells(direction) {
 	const currentRow = this._trElement;
 	const index = this._logical_cellIndex;
 	const rowIndex = this._rowIndex;
-	const newCell = CreateCells(currentCell.nodeName, 0, true);
+	const newCell = CreateCellsHTML(currentCell.nodeName);
 
 	// vertical
 	if (vertical) {
@@ -2668,6 +2702,7 @@ function OnSplitCells(direction) {
 
 /**
  * @private
+ * @this {Table}
  * @description Handles column operations such as insert and delete.
  * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
  */
@@ -2688,6 +2723,7 @@ function OnColumnEdit(command) {
 
 /**
  * @private
+ * @this {Table}
  * @description Handles row operations such as insert and delete.
  * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
  */
@@ -2708,6 +2744,7 @@ function OnRowEdit(command) {
 
 /**
  * @private
+ * @this {Table}
  * @description Handles mouse movement within the table picker.
  * @param {MouseEvent} e The mouse event.
  */
@@ -2738,6 +2775,7 @@ function OnMouseMoveTablePicker(e) {
 
 /**
  * @private
+ * @this {Table}
  * @description Executes the selected action when the table picker is clicked.
  */
 function OnClickTablePicker() {
@@ -2746,30 +2784,13 @@ function OnClickTablePicker() {
 
 /**
  * @private
- * @description Creates table cells as elements or HTML strings.
- * @param {string} nodeName The tag name of the cell (TD or TH).
- * @param {number} cnt The number of cells to create.
- * @param {boolean} returnElement Whether to return an HTML element or string.
- * @returns {string|HTMLElement} The created cells.
- */
-function CreateCells(nodeName, cnt, returnElement) {
-	nodeName = nodeName.toLowerCase();
-
-	if (!returnElement) {
-		return `<${nodeName}><div><br></div></${nodeName}>`.repeat(cnt);
-	} else {
-		return domUtils.createElement(nodeName, null, '<div><br></div>');
-	}
-}
-
-/**
- * @private
+ * @this {Table}
  * @description Handles multi-selection of table cells.
  * @param {MouseEvent} e The mouse event.
  */
 function OnCellMultiSelect(e) {
 	this.editor._preventBlur = true;
-	const target = domUtils.getParentElement(e.target, domUtils.isTableCell);
+	const target = domUtils.getParentElement(domUtils.getEventTarget(e), domUtils.isTableCell);
 
 	if (this._shift) {
 		if (target === this._fixedCell) {
@@ -2796,6 +2817,7 @@ function OnCellMultiSelect(e) {
 
 /**
  * @private
+ * @this {Table}
  * @description Stops multi-selection of table cells.
  * @param {MouseEvent} e The mouse event.
  */
@@ -2811,7 +2833,7 @@ function OffCellMultiSelect(e) {
 
 	if (!this._fixedCell || !this._selectedTable) return;
 
-	this._setMergeSplitButton(this._fixedCell, this._selectedCell);
+	this._setMergeSplitButton(!!this._fixedCell, !!this._selectedCell);
 	this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 
 	const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
@@ -2820,6 +2842,7 @@ function OffCellMultiSelect(e) {
 
 /**
  * @private
+ * @this {Table}
  * @description Handles the removal of shift-based selection.
  */
 function OffCellShift() {
@@ -2828,16 +2851,18 @@ function OffCellShift() {
 
 /**
  * @private
+ * @this {Table}
  * @description Handles the removal of touch-based selection.
  */
 function OffCellTouch() {
 	this.close();
 }
+// -------------------------------- event functions [END] ----------------------------------------------------------------
 
 /**
  * @private
  * @description Gets the maximum number of columns in a table.
- * @param {HTMLTableElement} table The table element.
+ * @param {Node} table The table element.
  * @returns {number} The maximum number of columns in the table.
  */
 function GetMaxColumns(table) {

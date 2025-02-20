@@ -8,28 +8,31 @@ import { domUtils } from '../../helper';
  * - It features an input field for entering the desired page number and a display element showing
  * - the total number of pages. When the user changes the value in the input field, the plugin triggers
  * - a page navigation event through the editor's document context.
- * @param {EditorCore} editor - The root editor instance
  */
-function PageNavigator(editor) {
-	EditorInjector.call(this, editor);
+class PageNavigator extends EditorInjector {
+	static key = 'pageNavigator';
+	static type = 'input';
+	static className = 'se-btn-input se-btn-tool-pageNavigator';
 
-	// create HTML
-	this.title = this.lang.pageNumber;
-	this.inner = CreateInner();
-	this.afterItem = domUtils.createElement('span', { class: 'se-btn se-sub-btn' }, ``);
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
 
-	// members
-	this.pageNum = 1;
-	this.totalPages = 1;
+		// create HTML
+		this.title = this.lang.pageNumber;
+		this.inner = CreateInner();
+		this.afterItem = domUtils.createElement('span', { class: 'se-btn se-sub-btn' }, ``);
 
-	// init
-	this.eventManager.addEvent(this.inner, 'change', OnChangeInner.bind(this));
-}
+		// members
+		this.pageNum = 1;
+		this.totalPages = 1;
 
-PageNavigator.key = 'pageNavigator';
-PageNavigator.type = 'input';
-PageNavigator.className = 'se-btn-input se-btn-tool-pageNavigator';
-PageNavigator.prototype = {
+		// init
+		this.eventManager.addEvent(this.inner, 'change', OnChangeInner.bind(this));
+	}
 	/**
 	 * @editorMethod Editor.documentType
 	 * @description Updates the displayed page number and total pages in the navigator.
@@ -37,13 +40,14 @@ PageNavigator.prototype = {
 	 * @param {number} totalPages - The total number of pages in the document.
 	 */
 	display(pageNum, totalPages) {
-		this.inner.value = this.pageNum = pageNum;
-		this.afterItem.textContent = this.totalPages = totalPages;
-		this.inner.max = totalPages;
-	},
-
-	constructor: PageNavigator
-};
+		// data update
+		this.pageNum = pageNum;
+		this.totalPages = totalPages;
+		// display
+		this.inner.value = String(pageNum);
+		this.afterItem.textContent = this.inner.max = String(totalPages);
+	}
+}
 
 function OnChangeInner({ target }) {
 	if (!this.editor.frameContext.has('documentType-use-page')) return;
@@ -53,7 +57,7 @@ function OnChangeInner({ target }) {
 }
 
 function CreateInner() {
-	return domUtils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null);
+	return /** @type {HTMLInputElement} */ (domUtils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null));
 }
 
 export default PageNavigator;

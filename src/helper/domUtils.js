@@ -358,7 +358,7 @@ export function getParentElement(element, query, depth) {
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @param {?number=} depth Number of parent levels to depth.
- * @returns {Array<Node>} Returned in an array in order.
+ * @returns {Array<HTMLElement>} Returned in an array in order.
  */
 export function getParentElements(element, query, depth) {
 	let check;
@@ -400,7 +400,7 @@ export function getParentElements(element, query, depth) {
 		index++;
 	}
 
-	return elementList;
+	return /** @type {Array<HTMLElement>} */ (elementList);
 }
 
 /**
@@ -415,6 +415,15 @@ export function getCommandTarget(target) {
 	}
 
 	return null;
+}
+
+/**
+ * @description Get the event.target element.
+ * @param {Event} event Event object
+ * @returns {HTMLElement|null}
+ */
+export function getEventTarget(event) {
+	return /** @type {HTMLElement} */ (event.target);
 }
 
 /**
@@ -1268,6 +1277,7 @@ const domUtils = {
 	getParentElement,
 	getParentElements,
 	getCommandTarget,
+	getEventTarget,
 	getEdgeChild,
 	getEdgeChildNodes,
 	arrayFilter,

@@ -26,83 +26,87 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
 /**
  * @class
  * @description Audio modal plugin.
- * @param {EditorCore} editor - The root editor instance
- * @param {AudioPluginOptions} pluginOptions
  */
-function Audio_(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.audio;
-	this.icon = 'audio';
+class Audio_ extends EditorInjector {
+	static key = 'audio';
+	static type = 'modal';
+	static className = '';
+	static component(node) {
+		return /^AUDIO$/i.test(node?.nodeName) ? node : null;
+	}
 
-	// define plugin options
-	this.pluginOptions = {
-		defaultWidth: !pluginOptions.defaultWidth ? '' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
-		defaultHeight: !pluginOptions.defaultHeight ? '' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
-		createFileInput: !!pluginOptions.createFileInput,
-		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
-		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
-		uploadHeaders: pluginOptions.uploadHeaders || null,
-		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
-		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
-		allowMultiple: !!pluginOptions.allowMultiple,
-		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'audio/*' : pluginOptions.acceptedFormats.trim() || 'audio/*',
-		audioTagAttributes: pluginOptions.audioTagAttributes || null
-	};
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {AudioPluginOptions} pluginOptions
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.audio;
+		this.icon = 'audio';
 
-	// create HTML
-	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-	const controllerEl = CreateHTML_controller(editor);
+		// define plugin options
+		this.pluginOptions = {
+			defaultWidth: !pluginOptions.defaultWidth ? '' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
+			defaultHeight: !pluginOptions.defaultHeight ? '' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
+			createFileInput: !!pluginOptions.createFileInput,
+			createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
+			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
+			uploadHeaders: pluginOptions.uploadHeaders || null,
+			uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+			uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
+			allowMultiple: !!pluginOptions.allowMultiple,
+			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'audio/*' : pluginOptions.acceptedFormats.trim() || 'audio/*',
+			audioTagAttributes: pluginOptions.audioTagAttributes || null
+		};
 
-	// modules
-	this.modal = new Modal(this, modalEl);
-	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
-	this.fileManager = new FileManager(this, {
-		query: 'audio',
-		loadHandler: this.events.onAudioLoad,
-		eventHandler: this.events.onAudioAction
-	});
+		// create HTML
+		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
+		const controllerEl = CreateHTML_controller(editor);
 
-	// members
-	this.figure = new Figure(this, null, {});
-	this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
-	this.audioInputFile = modalEl.querySelector('.__se__file_input');
-	this.audioUrlFile = modalEl.querySelector('.se-input-url');
-	this.preview = modalEl.querySelector('.se-link-preview');
-	this.defaultWidth = this.pluginOptions.defaultWidth;
-	this.defaultHeight = this.pluginOptions.defaultHeight;
-	this.urlValue = '';
-	this._element = null;
+		// modules
+		this.modal = new Modal(this, modalEl);
+		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
+		this.fileManager = new FileManager(this, {
+			query: 'audio',
+			loadHandler: this.events.onAudioLoad,
+			eventHandler: this.events.onAudioAction
+		});
 
-	const galleryButton = modalEl.querySelector('.__se__gallery');
-	if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', OpenGallery.bind(this));
+		// members
+		this.figure = new Figure(this, null, {});
+		this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
+		this.audioInputFile = modalEl.querySelector('.__se__file_input');
+		this.audioUrlFile = modalEl.querySelector('.se-input-url');
+		this.preview = modalEl.querySelector('.se-link-preview');
+		this.defaultWidth = this.pluginOptions.defaultWidth;
+		this.defaultHeight = this.pluginOptions.defaultHeight;
+		this.urlValue = '';
+		this._element = null;
 
-	// init
-	if (this.audioInputFile) {
-		this.eventManager.addEvent(modalEl.querySelector('.se-modal-files-edge-button'), 'click', RemoveSelectedFiles.bind(this.audioInputFile, this.audioUrlFile, this.preview));
+		const galleryButton = modalEl.querySelector('.__se__gallery');
+		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', OpenGallery.bind(this));
+
+		// init
+		if (this.audioInputFile) {
+			this.eventManager.addEvent(modalEl.querySelector('.se-modal-files-edge-button'), 'click', RemoveSelectedFiles.bind(this.audioInputFile, this.audioUrlFile, this.preview));
+			if (this.audioUrlFile) {
+				this.eventManager.addEvent(this.audioInputFile, 'change', FileInputChange.bind(this));
+			}
+		}
 		if (this.audioUrlFile) {
-			this.eventManager.addEvent(this.audioInputFile, 'change', FileInputChange.bind(this));
+			this.eventManager.addEvent(this.audioUrlFile, 'input', OnLinkPreview.bind(this));
 		}
 	}
-	if (this.audioUrlFile) {
-		this.eventManager.addEvent(this.audioUrlFile, 'input', OnLinkPreview.bind(this));
-	}
-}
 
-Audio_.key = 'audio';
-Audio_.type = 'modal';
-Audio_.className = '';
-Audio_.component = function (node) {
-	return /^AUDIO$/i.test(node?.nodeName) ? node : null;
-};
-Audio_.prototype = {
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description Executes the method that is called when a "Modal" module's is opened.
 	 */
 	open() {
 		this.modal.open();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -118,7 +122,7 @@ Audio_.prototype = {
 		} else {
 			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
@@ -136,7 +140,7 @@ Audio_.prototype = {
 		this.editor.focus();
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -150,7 +154,7 @@ Audio_.prototype = {
 			return this.submitURL(this.urlValue);
 		}
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -161,10 +165,10 @@ Audio_.prototype = {
 		if (this.audioInputFile) this.audioInputFile.value = '';
 		if (this.audioUrlFile) this.urlValue = this.preview.textContent = this.audioUrlFile.value = '';
 		if (this.audioInputFile && this.audioUrlFile) {
-			this.audioUrlFile.removeAttribute('disabled');
+			this.audioUrlFile.disabled = false;
 			this.preview.style.textDecoration = '';
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
@@ -178,7 +182,7 @@ Audio_.prototype = {
 		} else {
 			this.destroy();
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -186,9 +190,9 @@ Audio_.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {Object} The format retention object containing the query and method to process the element.
-	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
-	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
+	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
+	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
@@ -200,20 +204,20 @@ Audio_.prototype = {
 
 				this._setTagAttrs(element);
 				const figure = Figure.CreateContainer(element.cloneNode(true), 'se-flex-component');
-				this.figure.retainFigureFormat(figure.container, element, null);
+				this.figure.retainFigureFormat(figure.container, element, null, this.fileManager);
 			}
 		};
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {Element} target Target component element
+	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
 		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
 		this._ready(target);
-	},
+	}
 
 	/**
 	 * @private
@@ -226,12 +230,12 @@ Audio_.prototype = {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
 		this._element = target;
 		this.controller.open(target, null, { isWWTarget: false, addOffset: null });
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Element} target Target element
+	 * @param {HTMLElement} target Target element
 	 * @returns {Promise<void>}
 	 */
 	async destroy(element) {
@@ -261,7 +265,7 @@ Audio_.prototype = {
 		// focus
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
-	},
+	}
 
 	/**
 	 * @private
@@ -280,7 +284,7 @@ Audio_.prototype = {
 			file = { name: fileList[i].name, size: fileList[i].size };
 			this._createComp(oAudio, fileList[i].url, file, info.isUpdate);
 		}
-	},
+	}
 
 	/**
 	 * @description Create an "audio" component using the provided files.
@@ -350,7 +354,7 @@ Audio_.prototype = {
 		if (result === true || result === NO_EVENT) handler(null);
 
 		return true;
-	},
+	}
 
 	/**
 	 * @description Create an "audio" component using the provided url.
@@ -385,7 +389,7 @@ Audio_.prototype = {
 		if (result === true || result === NO_EVENT) handler(null);
 
 		return true;
-	},
+	}
 
 	/**
 	 * @private
@@ -424,7 +428,7 @@ Audio_.prototype = {
 		}
 
 		if (isUpdate) this.history.push(false);
-	},
+	}
 
 	/**
 	 * @private
@@ -438,7 +442,7 @@ Audio_.prototype = {
 		const oAudio = domUtils.createElement('AUDIO', { style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
 		this._setTagAttrs(oAudio);
 		return oAudio;
-	},
+	}
 
 	/**
 	 * @private
@@ -447,7 +451,7 @@ Audio_.prototype = {
 	 * @param {Element} element - The `<audio>` element to modify.
 	 */
 	_setTagAttrs(element) {
-		element.setAttribute('controls', true);
+		element.setAttribute('controls', 'true');
 
 		const attrs = this.pluginOptions.audioTagAttributes;
 		if (!attrs) return;
@@ -455,7 +459,7 @@ Audio_.prototype = {
 		for (const key in attrs) {
 			element.setAttribute(key, attrs[key]);
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -469,7 +473,7 @@ Audio_.prototype = {
 
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
 		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, UploadCallBack.bind(this, info), this._error.bind(this));
-	},
+	}
 
 	/**
 	 * @private
@@ -486,10 +490,8 @@ Audio_.prototype = {
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.ui.noticeOpen(err);
 		console.error('[SUNEDITOR.plugin.audio.error]', err);
-	},
-
-	constructor: Audio_
-};
+	}
+}
 
 /**
  * @description Handles the server response after a file upload.
@@ -550,7 +552,7 @@ function _setUrlInput(target) {
 function RemoveSelectedFiles(urlInput, preview) {
 	this.value = '';
 	if (urlInput) {
-		urlInput.removeAttribute('disabled');
+		urlInput.disabled = false;
 		preview.style.textDecoration = '';
 	}
 
@@ -560,10 +562,10 @@ function RemoveSelectedFiles(urlInput, preview) {
 
 function FileInputChange({ target }) {
 	if (!this.audioInputFile.value) {
-		this.audioUrlFile.removeAttribute('disabled');
+		this.audioUrlFile.disabled = false;
 		this.preview.style.textDecoration = '';
 	} else {
-		this.audioUrlFile.setAttribute('disabled', true);
+		this.audioUrlFile.disabled = true;
 		this.preview.style.textDecoration = 'line-through';
 	}
 

@@ -33,154 +33,158 @@ const { NO_EVENT } = env;
  * @class
  * @description Image plugin.
  * - This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
- * @param {EditorCore} editor - The root editor instance
- * @param {ImagePluginOptions} pluginOptions
  */
-function Image_(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	/** @type {string} */
-	this.title = this.lang.image;
-	this.icon = 'image';
-
-	/** @type {ImagePluginOptions} */
-	this.pluginOptions = {
-		canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
-		showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
-		defaultWidth: !pluginOptions.defaultWidth ? 'auto' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
-		defaultHeight: !pluginOptions.defaultHeight ? 'auto' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
-		percentageOnlySize: !!pluginOptions.percentageOnlySize,
-		createFileInput: pluginOptions.createFileInput === undefined ? true : pluginOptions.createFileInput,
-		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
-		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
-		uploadHeaders: pluginOptions.uploadHeaders || null,
-		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
-		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
-		allowMultiple: !!pluginOptions.allowMultiple,
-		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
-		useFormatType: pluginOptions.useFormatType ?? true,
-		defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
-		keepFormatType: pluginOptions.keepFormatType ?? false
-	};
-
-	// create HTML
-	const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
-	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-	const ctrlAs = this.pluginOptions.useFormatType ? 'as' : '';
-	const figureControls =
-		pluginOptions.controls || !this.pluginOptions.canResize
-			? [[ctrlAs, 'mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
-			: [
-					[ctrlAs, 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-					['edit', 'align', 'caption', 'revert', 'remove']
-			  ];
-
-	// show align
-	this.alignForm = modalEl.querySelector('.se-figure-align');
-	if (!figureControls.some((subArray) => subArray.includes('align'))) this.alignForm.style.display = 'none';
-
-	// modules
-	const Link = this.plugins.link ? this.plugins.link.pluginOptions : {};
-	this.anchor = new ModalAnchorEditor(this, modalEl, {
-		textToDisplay: false,
-		title: true,
-		openNewWindow: Link.openNewWindow,
-		relList: Link.relList,
-		defaultRel: Link.defaultRel,
-		noAutoPrefix: Link.noAutoPrefix,
-		enableFileUpload: pluginOptions.linkEnableFileUpload
-	});
-	this.modal = new Modal(this, modalEl);
-	this.figure = new Figure(this, figureControls, {
-		sizeUnit: sizeUnit
-	});
-	this.fileManager = new FileManager(this, {
-		query: 'img',
-		loadHandler: this.events.onImageLoad,
-		eventHandler: this.events.onImageAction
-	});
-
-	// members
-	this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
-	this.imgInputFile = modalEl.querySelector('.__se__file_input');
-	this.imgUrlFile = modalEl.querySelector('.se-input-url');
-	this.focusElement = this.imgInputFile || this.imgUrlFile;
-	this.altText = modalEl.querySelector('._se_image_alt');
-	this.captionCheckEl = modalEl.querySelector('._se_image_check_caption');
-	this.captionEl = this.captionCheckEl?.parentElement;
-	this.previewSrc = modalEl.querySelector('._se_tab_content_image .se-link-preview');
-	this.sizeUnit = sizeUnit;
-	this.as = 'block';
-	this.proportion = {};
-	this.inputX = {};
-	this.inputY = {};
-	this._linkElement = null;
-	this._linkValue = '';
-	this._align = 'none';
-	this._svgDefaultSize = '30%';
-	this._base64RenderIndex = 0;
-	this._element = null;
-	this._cover = null;
-	this._container = null;
-	this._caption = null;
-	this._ratio = {
-		w: 1,
-		h: 1
-	};
-	this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-	this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
-	this._resizing = this.pluginOptions.canResize;
-	this._onlyPercentage = this.pluginOptions.percentageOnlySize;
-	this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
-
-	// init
-	this.eventManager.addEvent(modalEl.querySelector('.se-modal-tabs'), 'click', this._openTab.bind(this));
-	if (this.imgInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', RemoveSelectedFiles.bind(this));
-	if (this.imgUrlFile) this.eventManager.addEvent(this.imgUrlFile, 'input', OnLinkPreview.bind(this));
-	if (this.imgInputFile && this.imgUrlFile) this.eventManager.addEvent(this.imgInputFile, 'change', OnfileInputChange.bind(this));
-
-	const galleryButton = modalEl.querySelector('.__se__gallery');
-	if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', OpenGallery.bind(this));
-
-	if (this._resizing) {
-		this.proportion = modalEl.querySelector('._se_check_proportion');
-		this.inputX = modalEl.querySelector('._se_size_x');
-		this.inputY = modalEl.querySelector('._se_size_y');
-		this.inputX.value = this.pluginOptions.defaultWidth;
-		this.inputY.value = this.pluginOptions.defaultHeight;
-
-		const ratioChange = OnChangeRatio.bind(this);
-		this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
-		this.eventManager.addEvent(this.inputY, 'keyup', OnInputSize.bind(this, 'y'));
-		this.eventManager.addEvent(this.inputX, 'change', ratioChange);
-		this.eventManager.addEvent(this.inputY, 'change', ratioChange);
-		this.eventManager.addEvent(this.proportion, 'change', ratioChange);
-		this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
+class Image_ extends EditorInjector {
+	static key = 'image';
+	static type = 'modal';
+	static className = '';
+	static component(node) {
+		node = domUtils.isFigure(node) || (/^span$/i.test(node.nodeName) && domUtils.hasClass(node, 'se-component')) ? node.firstElementChild : node;
+		return /^IMG$/i.test(node?.nodeName) ? node : domUtils.isAnchor(node) && /^IMG$/i.test(node?.firstElementChild?.nodeName) ? node?.firstElementChild : null;
 	}
 
-	if (this.pluginOptions.useFormatType) {
-		this.as = this.pluginOptions.defaultFormatType;
-		this.asBlock = modalEl.querySelector('[data-command="asBlock"]');
-		this.asInline = modalEl.querySelector('[data-command="asInline"]');
-		this.eventManager.addEvent([this.asBlock, this.asInline], 'click', OnClickAsButton.bind(this));
-	}
-}
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {ImagePluginOptions} pluginOptions
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		/** @type {string} */
+		this.title = this.lang.image;
+		this.icon = 'image';
 
-Image_.key = 'image';
-Image_.type = 'modal';
-Image_.component = function (node) {
-	node = domUtils.isFigure(node) || (/^span$/i.test(node.nodeName) && domUtils.hasClass(node, 'se-component')) ? node.firstElementChild : node;
-	return /^IMG$/i.test(node?.nodeName) ? node : domUtils.isAnchor(node) && /^IMG$/i.test(node?.firstElementChild?.nodeName) ? node?.firstElementChild : null;
-};
-Image_.className = '';
-Image_.prototype = {
+		/** @type {ImagePluginOptions} */
+		this.pluginOptions = {
+			canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
+			showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
+			defaultWidth: !pluginOptions.defaultWidth ? 'auto' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
+			defaultHeight: !pluginOptions.defaultHeight ? 'auto' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
+			percentageOnlySize: !!pluginOptions.percentageOnlySize,
+			createFileInput: pluginOptions.createFileInput === undefined ? true : pluginOptions.createFileInput,
+			createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
+			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
+			uploadHeaders: pluginOptions.uploadHeaders || null,
+			uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+			uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
+			allowMultiple: !!pluginOptions.allowMultiple,
+			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
+			useFormatType: pluginOptions.useFormatType ?? true,
+			defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
+			keepFormatType: pluginOptions.keepFormatType ?? false
+		};
+
+		// create HTML
+		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
+		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
+		const ctrlAs = this.pluginOptions.useFormatType ? 'as' : '';
+		const figureControls =
+			pluginOptions.controls || !this.pluginOptions.canResize
+				? [[ctrlAs, 'mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
+				: [
+						[ctrlAs, 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
+						['edit', 'align', 'caption', 'revert', 'remove']
+				  ];
+
+		// show align
+		this.alignForm = modalEl.querySelector('.se-figure-align');
+		if (!figureControls.some((subArray) => subArray.includes('align'))) this.alignForm.style.display = 'none';
+
+		// modules
+		const Link = this.plugins.link ? this.plugins.link.pluginOptions : {};
+		this.anchor = new ModalAnchorEditor(this, modalEl, {
+			textToDisplay: false,
+			title: true,
+			openNewWindow: Link.openNewWindow,
+			relList: Link.relList,
+			defaultRel: Link.defaultRel,
+			noAutoPrefix: Link.noAutoPrefix,
+			enableFileUpload: pluginOptions.linkEnableFileUpload
+		});
+		this.modal = new Modal(this, modalEl);
+		this.figure = new Figure(this, figureControls, {
+			sizeUnit: sizeUnit
+		});
+		this.fileManager = new FileManager(this, {
+			query: 'img',
+			loadHandler: this.events.onImageLoad,
+			eventHandler: this.events.onImageAction
+		});
+
+		// members
+		this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
+		this.imgInputFile = modalEl.querySelector('.__se__file_input');
+		this.imgUrlFile = modalEl.querySelector('.se-input-url');
+		this.focusElement = this.imgInputFile || this.imgUrlFile;
+		this.altText = modalEl.querySelector('._se_image_alt');
+		this.captionCheckEl = modalEl.querySelector('._se_image_check_caption');
+		this.captionEl = this.captionCheckEl?.parentElement;
+		this.previewSrc = modalEl.querySelector('._se_tab_content_image .se-link-preview');
+		this.sizeUnit = sizeUnit;
+		this.as = 'block';
+		this.proportion = {};
+		this.inputX = {};
+		this.inputY = {};
+		this._linkElement = null;
+		this._linkValue = '';
+		this._align = 'none';
+		this._svgDefaultSize = '30%';
+		this._base64RenderIndex = 0;
+		this._element = null;
+		this._cover = null;
+		this._container = null;
+		this._caption = null;
+		this._ratio = {
+			w: 1,
+			h: 1
+		};
+		this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+		this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+		this._resizing = this.pluginOptions.canResize;
+		this._onlyPercentage = this.pluginOptions.percentageOnlySize;
+		this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
+
+		// init
+		this.eventManager.addEvent(modalEl.querySelector('.se-modal-tabs'), 'click', this._openTab.bind(this));
+		if (this.imgInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', RemoveSelectedFiles.bind(this));
+		if (this.imgUrlFile) this.eventManager.addEvent(this.imgUrlFile, 'input', OnLinkPreview.bind(this));
+		if (this.imgInputFile && this.imgUrlFile) this.eventManager.addEvent(this.imgInputFile, 'change', OnfileInputChange.bind(this));
+
+		const galleryButton = modalEl.querySelector('.__se__gallery');
+		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', OpenGallery.bind(this));
+
+		if (this._resizing) {
+			this.proportion = modalEl.querySelector('._se_check_proportion');
+			this.inputX = modalEl.querySelector('._se_size_x');
+			this.inputY = modalEl.querySelector('._se_size_y');
+			this.inputX.value = this.pluginOptions.defaultWidth;
+			this.inputY.value = this.pluginOptions.defaultHeight;
+
+			const ratioChange = OnChangeRatio.bind(this);
+			this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
+			this.eventManager.addEvent(this.inputY, 'keyup', OnInputSize.bind(this, 'y'));
+			this.eventManager.addEvent(this.inputX, 'change', ratioChange);
+			this.eventManager.addEvent(this.inputY, 'change', ratioChange);
+			this.eventManager.addEvent(this.proportion, 'change', ratioChange);
+			this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
+		}
+
+		if (this.pluginOptions.useFormatType) {
+			this.as = this.pluginOptions.defaultFormatType;
+			this.asBlock = modalEl.querySelector('[data-command="asBlock"]');
+			this.asInline = modalEl.querySelector('[data-command="asInline"]');
+			this.eventManager.addEvent([this.asBlock, this.asInline], 'click', OnClickAsButton.bind(this));
+		}
+	}
+
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description Executes the method that is called when a "Modal" module's is opened.
 	 */
 	open() {
 		this.modal.open();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller(Figure)
@@ -189,7 +193,7 @@ Image_.prototype = {
 	 */
 	edit() {
 		this.modal.open();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -206,7 +210,7 @@ Image_.prototype = {
 		}
 
 		this.anchor.on(isUpdate);
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.EventManager
@@ -224,7 +228,7 @@ Image_.prototype = {
 		this.editor.focus();
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -246,7 +250,7 @@ Image_.prototype = {
 		}
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -254,9 +258,9 @@ Image_.prototype = {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {Object} The format retention object containing the query and method to process the element.
-	 * @returns {string} query - The selector query to identify the relevant elements (in this case, 'audio').
-	 * @returns {(element: Element) => void} method - The function to execute on the element to validate and preserve its format.
+	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
+	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
 	 */
 	retainFormat() {
@@ -270,7 +274,7 @@ Image_.prototype = {
 				this._fileCheck(this._origin_w, this._origin_h);
 			}
 		};
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -281,7 +285,7 @@ Image_.prototype = {
 		if (this.imgInputFile) this.imgInputFile.value = '';
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = '';
 		if (this.imgInputFile && this.imgUrlFile) {
-			this.imgUrlFile.removeAttribute('disabled');
+			this.imgUrlFile.disabled = false;
 			this.previewSrc.style.textDecoration = '';
 		}
 
@@ -306,7 +310,7 @@ Image_.prototype = {
 		}
 
 		this.anchor.init();
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.Component
@@ -315,7 +319,7 @@ Image_.prototype = {
 	 */
 	select(target) {
 		this._ready(target);
-	},
+	}
 
 	/**
 	 * @private
@@ -376,7 +380,7 @@ Image_.prototype = {
 		if (this.pluginOptions.useFormatType) {
 			this._activeAsInline(this.component.isInline(figureInfo.container));
 		}
-	},
+	}
 
 	/**
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
@@ -408,7 +412,7 @@ Image_.prototype = {
 		// focus
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
-	},
+	}
 
 	/**
 	 * @private
@@ -425,7 +429,7 @@ Image_.prototype = {
 			isUpdate: this.modal.isUpdate,
 			alt: this.altText.value
 		};
-	},
+	}
 
 	/**
 	 * @private
@@ -450,7 +454,7 @@ Image_.prototype = {
 			// caption
 			if (this.captionEl) this.captionEl.style.display = '';
 		}
-	},
+	}
 
 	/**
 	 * @description Create an "image" component using the provided files.
@@ -518,7 +522,7 @@ Image_.prototype = {
 		if (result !== null && typeof result === 'object') handler(result);
 
 		if (result === true || result === NO_EVENT) handler(null);
-	},
+	}
 
 	/**
 	 * @description Create an "image" component using the provided url.
@@ -555,7 +559,7 @@ Image_.prototype = {
 		if (result === true || result === NO_EVENT) handler(null);
 
 		return true;
-	},
+	}
 
 	/**
 	 * @private
@@ -644,7 +648,7 @@ Image_.prototype = {
 		imageEl.onload = () => {
 			this.select(imageEl);
 		};
-	},
+	}
 
 	/**
 	 * @private
@@ -725,7 +729,7 @@ Image_.prototype = {
 
 		if (isNewContainer) {
 			imageEl = this._element;
-			this.figure.retainFigureFormat(container, this._element, isNewAnchor ? anchor : null);
+			this.figure.retainFigureFormat(container, this._element, isNewAnchor ? anchor : null, this.fileManager);
 			this._element = imageEl = container.querySelector('img');
 			this._cover = cover;
 			this._container = container;
@@ -760,7 +764,7 @@ Image_.prototype = {
 
 		// align
 		this.figure.setAlign(imageEl, this._align);
-	},
+	}
 
 	/**
 	 * @private
@@ -806,7 +810,7 @@ Image_.prototype = {
 		}
 
 		return false;
-	},
+	}
 
 	/**
 	 * @private
@@ -825,7 +829,7 @@ Image_.prototype = {
 		} else {
 			this.createInline(src, anchor, width, height, file, alt);
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -841,7 +845,7 @@ Image_.prototype = {
 			else if (/%$/.test(w)) w += '%';
 		}
 		this.figure.setSize(w, h, null);
-	},
+	}
 
 	/**
 	 * @description Creates a new image component, wraps it in a figure container with an optional anchor,
@@ -884,7 +888,7 @@ Image_.prototype = {
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
 		this.component.insert(container, { skipCharCount: false, skipSelection: !this.options.get('componentAutoSelect'), skipHistory: false });
-	},
+	}
 
 	/**
 	 * @description Creates a new inline image component, wraps it in an inline figure container with an optional anchor,
@@ -916,7 +920,7 @@ Image_.prototype = {
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
 		this.component.insert(container, { skipCharCount: false, skipSelection: true, skipHistory: false });
-	},
+	}
 
 	/**
 	 * @private
@@ -929,7 +933,7 @@ Image_.prototype = {
 		element.src = src;
 		this.fileManager.setFileData(element, file);
 		this.component.select(element, Image_.key, false);
-	},
+	}
 
 	/**
 	 * @private
@@ -952,7 +956,7 @@ Image_.prototype = {
 				this._produce(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
 			}
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -970,7 +974,7 @@ Image_.prototype = {
 		} else {
 			this._setBase64(files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, info.isUpdate);
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -1020,7 +1024,7 @@ Image_.prototype = {
 			this.ui.hideLoading();
 			throw Error(`[SUNEDITOR.plugins.image._setBase64.fail] ${error.message}`);
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -1044,7 +1048,7 @@ Image_.prototype = {
 				this._produce(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
 			}
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -1060,7 +1064,7 @@ Image_.prototype = {
 		}
 
 		return imgTag;
-	},
+	}
 
 	/**
 	 * @private
@@ -1073,10 +1077,8 @@ Image_.prototype = {
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.ui.noticeOpen(err);
 		console.error('[SUNEDITOR.plugin.image.error]', err);
-	},
-
-	constructor: Image_
-};
+	}
+}
 
 /**
  * @private
@@ -1098,7 +1100,7 @@ async function UploadCallBack(info, xmlHttp) {
 function RemoveSelectedFiles() {
 	this.imgInputFile.value = '';
 	if (this.imgUrlFile) {
-		this.imgUrlFile.removeAttribute('disabled');
+		this.imgUrlFile.disabled = false;
 		this.previewSrc.style.textDecoration = '';
 	}
 
@@ -1159,10 +1161,10 @@ function OnLinkPreview(e) {
 
 function OnfileInputChange({ target }) {
 	if (!this.imgInputFile.value) {
-		this.imgUrlFile.removeAttribute('disabled');
+		this.imgUrlFile.disabled = false;
 		this.previewSrc.style.textDecoration = '';
 	} else {
-		this.imgUrlFile.setAttribute('disabled', true);
+		this.imgUrlFile.disabled = true;
 		this.previewSrc.style.textDecoration = 'line-through';
 	}
 

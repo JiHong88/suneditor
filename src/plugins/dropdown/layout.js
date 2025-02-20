@@ -4,39 +4,43 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Layout Plugin, Apply layout to the entire editor.
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<{name: string, html: string}>} pluginOptions.items - Layout list
  */
-function Layout(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.layout;
-	this.icon = 'layout';
+class Layout extends EditorInjector {
+	static key = 'layout';
+	static type = 'dropdown';
+	static className = '';
 
-	// members
-	this.selectedIndex = -1;
-	this.items = pluginOptions.items;
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<{name: string, html: string}>} pluginOptions.items - Layout list
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.layout;
+		this.icon = 'layout';
 
-	// create HTML
-	const menu = CreateHTML(this.items);
+		// members
+		this.selectedIndex = -1;
+		this.items = pluginOptions.items;
 
-	// init
-	this.menu.initDropdownTarget(Layout, menu);
-}
+		// create HTML
+		const menu = CreateHTML(this.items);
 
-Layout.key = 'layout';
-Layout.type = 'dropdown';
-Layout.className = '';
-Layout.prototype = {
+		// init
+		this.menu.initDropdownTarget(Layout, menu);
+	}
+
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
-		const index = target.getAttribute('data-value') * 1;
+		const index = Number(target.getAttribute('data-value'));
 		const temp = this.items[(this.selectedIndex = index)];
 
 		if (temp.html) {
@@ -47,10 +51,8 @@ Layout.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
-
-	constructor: Layout
-};
+	}
+}
 
 function CreateHTML(layoutList) {
 	if (!layoutList || layoutList.length === 0) {

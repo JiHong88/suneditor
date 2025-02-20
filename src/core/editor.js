@@ -1286,7 +1286,6 @@ Editor.prototype = {
 		this._fileManager.tagAttrs = {};
 
 		const plugins = this.plugins;
-		const isArray = Array.isArray;
 		const filePluginRegExp = [];
 		let plugin;
 		for (const key in plugins) {
@@ -1299,7 +1298,7 @@ Editor.prototype = {
 				const fm = plugin.__fileManagement;
 				this._fileInfoPluginsCheck.push(fm._checkInfo.bind(fm));
 				this._fileInfoPluginsReset.push(fm._resetInfo.bind(fm));
-				if (isArray(fm.tagNames)) {
+				if (Array.isArray(fm.tagNames)) {
 					const tagNames = fm.tagNames;
 					this._fileManager.tags = this._fileManager.tags.concat(tagNames);
 					filePluginRegExp.push(key);

@@ -7,40 +7,44 @@ const { _d } = env;
 /**
  * @class
  * @description Export PDF plugin
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions - plugin options
- * @param {string} pluginOptions.apiUrl - server request url
- * @param {string} pluginOptions.fileName - file name
  */
-function ExportPDF(editor, pluginOptions) {
-	EditorInjector.call(this, editor);
-	// plugin basic properties
-	this.title = this.lang.exportPDF;
-	this.icon = 'PDF';
+class ExportPDF extends EditorInjector {
+	static key = 'exportPDF';
+	static type = 'command';
+	static className = 'se-component-enabled';
 
-	// plugin options
-	this.apiUrl = pluginOptions.apiUrl;
-	this.fileName = pluginOptions.fileName || 'suneditor-pdf';
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions - plugin options
+	 * @param {string} pluginOptions.apiUrl - server request url
+	 * @param {string} pluginOptions.fileName - file name
+	 */
+	constructor(editor, pluginOptions) {
+		super(editor);
+		// plugin basic properties
+		this.title = this.lang.exportPDF;
+		this.icon = 'PDF';
 
-	// option check
-	if (!this.apiUrl) {
-		console.warn('[SUNEDITOR.plugins.exportPDF.error] Requires exportPDF."apiUrl" options.');
-	} else {
-		this.apiManager = new ApiManager(this, {
-			method: 'POST',
-			url: this.apiUrl,
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			responseType: 'blob'
-		});
+		// plugin options
+		this.apiUrl = pluginOptions.apiUrl;
+		this.fileName = pluginOptions.fileName || 'suneditor-pdf';
+
+		// option check
+		if (!this.apiUrl) {
+			console.warn('[SUNEDITOR.plugins.exportPDF.error] Requires exportPDF."apiUrl" options.');
+		} else {
+			this.apiManager = new ApiManager(this, {
+				method: 'POST',
+				url: this.apiUrl,
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				responseType: 'blob'
+			});
+		}
 	}
-}
 
-ExportPDF.key = 'exportPDF';
-ExportPDF.type = 'command';
-ExportPDF.className = 'se-component-enabled';
-ExportPDF.prototype = {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
@@ -87,12 +91,12 @@ ExportPDF.prototype = {
 			domUtils.removeItem(ww);
 			this.ui.hideLoading();
 		}
-	},
+	}
 
 	/**
 	 * @private
 	 * @description Sends the editor content to the server for PDF generation.
-	 * @param {Element} ww - A temporary container holding the formatted editor content.
+	 * @param {HTMLElement} ww - A temporary container holding the formatted editor content.
 	 * @returns {Promise<void>} Resolves when the PDF file is successfully downloaded.
 	 * @throws {Error} Throws an error if the server response indicates a failure.
 	 */
@@ -124,9 +128,7 @@ ExportPDF.prototype = {
 				URL.revokeObjectURL(downloadUrl);
 			}, 100);
 		}
-	},
-
-	constructor: ExportPDF
-};
+	}
+}
 
 export default ExportPDF;

@@ -226,8 +226,8 @@ async function Action(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClick_dialog(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.target);
-	if (/close/.test(eventTarget.getAttribute('data-command')) || e.target === this._modalInner) {
+	const eventTarget = domUtils.getEventTarget(e);
+	if (/close/.test(eventTarget.getAttribute('data-command')) || eventTarget === this._modalInner) {
 		this.close();
 	}
 }
@@ -251,7 +251,7 @@ function CloseListener(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnResizeMouseDown(dir, e) {
-	this._currentHandle = /** @type {HTMLElement} */ (e.target);
+	this._currentHandle = domUtils.getEventTarget(e);
 	domUtils.addClass(this._currentHandle, 'active');
 	this.__addGlobalEvent((this.__resizeDir = dir + (this.options.get('_rtl') ? 'RTL' : '')));
 }
@@ -345,7 +345,7 @@ Modal.CreateFileInput = function ({ icons, lang }, { acceptedFormats, allowMulti
 /**
  * @description A function called when the contents of "input" have changed and you want to adjust the style.
  * @param {Node} wrapper - Modal file input wrapper(.se-flex-input-wrapper)
- * @param {FileList} files - FileList object
+ * @param {FileList|File[]} files - FileList object
  */
 Modal.OnChangeFile = function (wrapper, files) {
 	if (!wrapper || !files) return;

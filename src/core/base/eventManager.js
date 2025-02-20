@@ -268,7 +268,7 @@ EventManager.prototype = {
 					if (
 						commandTargets.get('outdent').filter((e) => {
 							if (domUtils.isImportantDisabled(e)) return false;
-							e.removeAttribute('disabled');
+							e.disabled = false;
 							return true;
 						}).length > 0
 					) {
@@ -282,9 +282,9 @@ EventManager.prototype = {
 						commandTargets.get('indent').filter((e) => {
 							if (domUtils.isImportantDisabled(e)) return false;
 							if (indentDisable) {
-								e.setAttribute('disabled', 'true');
+								e.disabled = true;
 							} else {
-								e.removeAttribute('disabled');
+								e.disabled = false;
 							}
 							return true;
 						}).length > 0
@@ -358,9 +358,9 @@ EventManager.prototype = {
 				if (p) {
 					p.active(null, e);
 				} else if (/^outdent$/i.test(k)) {
-					if (!domUtils.isImportantDisabled(e)) e.setAttribute('disabled', 'true');
+					if (!domUtils.isImportantDisabled(e)) e.disabled = true;
 				} else if (/^indent$/i.test(k)) {
-					if (!domUtils.isImportantDisabled(e)) e.removeAttribute('disabled');
+					if (!domUtils.isImportantDisabled(e)) e.disabled = false;
 				} else {
 					domUtils.removeClass(e, 'active');
 				}

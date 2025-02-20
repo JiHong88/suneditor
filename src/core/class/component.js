@@ -615,7 +615,7 @@ function OnDragEnd() {
  * @param {MouseEvent} e - Mouse event
  */
 function OnDragClick(e) {
-	const target = /** @type {HTMLElement} */ (e.target);
+	const target = domUtils.getEventTarget(e);
 	if (!domUtils.hasClass(target, 'se-drag-handle-full')) return;
 
 	const dragInst = _DragHandle.get('__dragInst');
@@ -628,7 +628,7 @@ function OnDragClick(e) {
  * @param {MouseEvent} e - Mouse event
  */
 function CloseListener_mousedown(e) {
-	const target = /** @type {HTMLElement} */ (e.target);
+	const target = domUtils.getEventTarget(e);
 	if (
 		this.currentTarget?.contains(target) ||
 		domUtils.getParentElement(target, '.se-controller') ||
@@ -645,7 +645,7 @@ function CloseListener_mousedown(e) {
  * @param {ClipboardEvent} e - Event object
  */
 function OnCopy_component(e) {
-	const target = /** @type {HTMLElement} */ (e.target);
+	const target = domUtils.getEventTarget(e);
 	if (domUtils.isInputElement(target) && domUtils.getParentElement(target, '.se-modal')) return;
 
 	const info = this.info;

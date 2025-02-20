@@ -17,36 +17,40 @@ const HEADER_KEYCODE = new Map([
 /**
  * @class
  * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<string>} pluginOptions.items - Format list
  */
-function FormatBlock(editor, pluginOptions) {
-	EditorInjector.call(this, editor);
-	// plugin basic properties
-	this.title = this.lang.formats;
-	this.inner = '<span class="se-txt">' + this.lang.formats + '</span>' + this.icons.arrow_down;
+class FormatBlock extends EditorInjector {
+	static key = 'formatBlock';
+	static type = 'dropdown';
+	static className = 'se-btn-select se-btn-tool-format';
 
-	// create HTML
-	const menu = CreateHTML(editor, pluginOptions.items);
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<string>} pluginOptions.items - Format list
+	 */
+	constructor(editor, pluginOptions) {
+		super(editor);
+		// plugin basic properties
+		this.title = this.lang.formats;
+		this.inner = '<span class="se-txt">' + this.lang.formats + '</span>' + this.icons.arrow_down;
 
-	// members
-	this.formatList = menu.querySelectorAll('li button');
-	this.currentFormat = '';
+		// create HTML
+		const menu = CreateHTML(editor, pluginOptions.items);
 
-	// init
-	this.menu.initDropdownTarget(FormatBlock, menu);
-}
+		// members
+		this.formatList = menu.querySelectorAll('li button');
+		this.currentFormat = '';
 
-FormatBlock.key = 'formatBlock';
-FormatBlock.type = 'dropdown';
-FormatBlock.className = 'se-btn-select se-btn-tool-format';
-FormatBlock.prototype = {
+		// init
+		this.menu.initDropdownTarget(FormatBlock, menu);
+	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
@@ -76,7 +80,7 @@ FormatBlock.prototype = {
 		}
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Dropdown
@@ -100,7 +104,7 @@ FormatBlock.prototype = {
 
 			this.currentFormat = currentFormat;
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -121,7 +125,7 @@ FormatBlock.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
+	}
 
 	/**
 	 * @description Create a header tag, call by "shortcut" class
@@ -132,10 +136,8 @@ FormatBlock.prototype = {
 		const headerName = HEADER_KEYCODE.get(keyCode);
 		const tag = domUtils.createElement(headerName);
 		this.format.setLine(tag);
-	},
-
-	constructor: FormatBlock
-};
+	}
+}
 
 function CreateHTML({ lang }, items) {
 	const defaultFormats = ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];

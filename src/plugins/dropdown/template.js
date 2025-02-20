@@ -4,39 +4,43 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Template Plugin, Apply a template to the selection.
- * @param {EditorCore} editor - The root editor instance
- * @param {Object} pluginOptions
- * @param {Array<{name: string, html: string}>} pluginOptions.items - Template list
  */
-function Template(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.template;
-	this.icon = 'template';
+class Template extends EditorInjector {
+	static key = 'template';
+	static type = 'dropdown';
+	static className = '';
 
-	// members
-	this.selectedIndex = -1;
-	this.items = pluginOptions.items;
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {Object} pluginOptions
+	 * @param {Array<{name: string, html: string}>} pluginOptions.items - Template list
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.template;
+		this.icon = 'template';
 
-	// create HTML
-	const menu = CreateHTML(this.items);
+		// members
+		this.selectedIndex = -1;
+		this.items = pluginOptions.items;
 
-	// init
-	this.menu.initDropdownTarget(Template, menu);
-}
+		// create HTML
+		const menu = CreateHTML(this.items);
 
-Template.key = 'template';
-Template.type = 'dropdown';
-Template.className = '';
-Template.prototype = {
+		// init
+		this.menu.initDropdownTarget(Template, menu);
+	}
+
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
-		const index = target.getAttribute('data-value') * 1;
+		const index = Number(target.getAttribute('data-value'));
 		const temp = this.items[(this.selectedIndex = index)];
 
 		if (temp.html) {
@@ -47,10 +51,8 @@ Template.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
-
-	constructor: Template
-};
+	}
+}
 
 function CreateHTML(templateList) {
 	if (!templateList || templateList.length === 0) {

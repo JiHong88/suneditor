@@ -18,51 +18,54 @@ import { domUtils, numbers } from '../../helper';
  * @description Link plugin.
  * - This plugin provides link insertion and editing functionality within the editor.
  * - It also supports file uploads if an upload URL is provided.
- * @param {EditorCore} editor - The root editor instance
- * @param {LinkPluginOptions} pluginOptions
  */
-function Link(editor, pluginOptions) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.link;
-	this.icon = 'link';
+class Link extends EditorInjector {
+	static key = 'link';
+	static type = 'modal';
+	static className = 'se-icon-flip-rtl';
 
-	// define plugin options
-	pluginOptions.textToDisplay = true;
-	pluginOptions.title = true;
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 * @param {LinkPluginOptions} pluginOptions
+	 */
+	constructor(editor, pluginOptions) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.link;
+		this.icon = 'link';
 
-	// create HTML
-	const modalEl = CreateHTML_modal(editor);
-	const controllerEl = CreateHTML_controller(editor);
+		// define plugin options
+		pluginOptions.textToDisplay = true;
+		pluginOptions.title = true;
 
-	// members
-	const uploadUrl = typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null;
-	this.isUpdateState = false;
-	this.pluginOptions = {
-		...pluginOptions,
-		uploadUrl,
-		uploadHeaders: pluginOptions.uploadHeaders || null,
-		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
-		uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
-		acceptedFormats: typeof pluginOptions.acceptedFormats === 'string' ? pluginOptions.acceptedFormats.trim() : null,
-		enableFileUpload: !!uploadUrl
-	};
+		// create HTML
+		const modalEl = CreateHTML_modal(editor);
+		const controllerEl = CreateHTML_controller(editor);
 
-	// modules
-	this.anchor = new ModalAnchorEditor(this, modalEl, this.pluginOptions);
-	this.modal = new Modal(this, modalEl);
-	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: false });
-}
+		// members
+		const uploadUrl = typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null;
+		this.isUpdateState = false;
+		this.pluginOptions = {
+			...pluginOptions,
+			uploadUrl,
+			uploadHeaders: pluginOptions.uploadHeaders || null,
+			uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+			uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
+			acceptedFormats: typeof pluginOptions.acceptedFormats === 'string' ? pluginOptions.acceptedFormats.trim() : null,
+			enableFileUpload: !!uploadUrl
+		};
 
-Link.key = 'link';
-Link.type = 'modal';
-Link.className = 'se-icon-flip-rtl';
-Link.prototype = {
+		// modules
+		this.anchor = new ModalAnchorEditor(this, modalEl, this.pluginOptions);
+		this.modal = new Modal(this, modalEl);
+		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: false });
+	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element) {
@@ -83,7 +86,7 @@ Link.prototype = {
 		this.controller.close();
 
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -91,7 +94,7 @@ Link.prototype = {
 	 */
 	open() {
 		this.modal.open();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -101,7 +104,7 @@ Link.prototype = {
 	on(isUpdate) {
 		this.isUpdateState = isUpdate;
 		this.anchor.on(isUpdate);
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -128,7 +131,7 @@ Link.prototype = {
 		}
 
 		return true;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Modal
@@ -137,7 +140,7 @@ Link.prototype = {
 	init() {
 		this.controller.close();
 		this.anchor.init();
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
@@ -173,7 +176,7 @@ Link.prototype = {
 			this.editor.focus();
 			this.history.push(false);
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Controller
@@ -181,10 +184,8 @@ Link.prototype = {
 	 */
 	close() {
 		domUtils.removeClass(this.controller.currentTarget, 'on');
-	},
-
-	constructor: Link
-};
+	}
+}
 
 function CreateHTML_modal({ lang, icons }) {
 	const html = /*html*/ `

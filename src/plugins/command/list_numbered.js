@@ -10,38 +10,42 @@ const DEFAULT_TYPE = 'decimal';
 /**
  * @class
  * @description List numbered plugin, Several types of lists are provided.
- * @param {EditorCore} editor - The root editor instance
  */
-function List_numbered(editor) {
-	// plugin bisic properties
-	EditorInjector.call(this, editor);
-	this.title = this.lang.numberedList;
-	this.icon = 'list_numbered';
-	this.afterItem = domUtils.createElement(
-		'button',
-		{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': List_numbered.key, 'data-type': 'dropdown' },
-		`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.numberedList}</span></span>`
-	);
+class List_numbered extends EditorInjector {
+	static key = 'list_numbered';
+	static type = 'command';
+	static className = 'se-icon-flip-rtl';
 
-	// create HTML
-	const menu = CreateHTML();
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 */
+	constructor(editor) {
+		// plugin bisic properties
+		super(editor);
+		this.title = this.lang.numberedList;
+		this.icon = 'list_numbered';
+		this.afterItem = domUtils.createElement(
+			'button',
+			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': List_numbered.key, 'data-type': 'dropdown' },
+			`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.numberedList}</span></span>`
+		);
 
-	// members
-	this.listItems = menu.querySelectorAll('li button ol');
+		// create HTML
+		const menu = CreateHTML();
 
-	// init
-	this.menu.initDropdownTarget({ key: List_numbered.key, type: 'dropdown' }, menu);
-}
+		// members
+		this.listItems = menu.querySelectorAll('li button ol');
 
-List_numbered.key = 'list_numbered';
-List_numbered.type = 'command';
-List_numbered.className = 'se-icon-flip-rtl';
-List_numbered.prototype = {
+		// init
+		this.menu.initDropdownTarget({ key: List_numbered.key, type: 'dropdown' }, menu);
+	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
@@ -52,7 +56,7 @@ List_numbered.prototype = {
 
 		domUtils.removeClass(target, 'active');
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.Dropdown
@@ -71,13 +75,13 @@ List_numbered.prototype = {
 				domUtils.removeClass(l.parentElement, 'active');
 			}
 		}
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const el = this.format.getBlock(this.selection.getNode());
@@ -90,14 +94,14 @@ List_numbered.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
 	 * @param {Object} params - Information of the "shortcut" plugin
 	 * @param {Range} params.range - Range object
-	 * @param {Element} params.line - The line element of the current range
+	 * @param {HTMLElement} params.line - The line element of the current range
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
 	 * @param {Event} params.event - Key event object
 	 * @param {number} params.keyCode - Key code
@@ -110,21 +114,19 @@ List_numbered.prototype = {
 			startContainer.textContent = newText;
 		}
 		this.submit();
-	},
+	}
 
 	/**
 	 * @description Add a numbered list
-	 * @param {string} type List type
+	 * @param {string} [type=""] List type
 	 */
 	submit(type) {
 		const range = this.format.applyList(`ol:${type || ''}`, null, false);
 		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
 		this.editor.focus();
 		this.history.push(false);
-	},
-
-	constructor: List_numbered
-};
+	}
+}
 
 function CreateHTML() {
 	const html = /*html*/ `

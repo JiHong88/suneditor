@@ -4,27 +4,31 @@ import { domUtils } from '../../helper';
 /**
  * @class
  * @description Blockquote plugin
- * @param {EditorCore} editor - The root editor instance
  */
-function Blockquote(editor) {
-	EditorInjector.call(this, editor);
-	// plugin basic properties
-	this.title = this.lang.tag_blockquote;
-	this.icon = 'blockquote';
+class Blockquote extends EditorInjector {
+	static key = 'blockquote';
+	static type = 'command';
+	static className = '';
 
-	// members
-	this.quoteTag = domUtils.createElement('BLOCKQUOTE');
-}
+	/**
+	 * @constructor
+	 * @param {EditorCore} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+		// plugin basic properties
+		this.title = this.lang.tag_blockquote;
+		this.icon = 'blockquote';
 
-Blockquote.key = 'blockquote';
-Blockquote.type = 'command';
-Blockquote.className = '';
-Blockquote.prototype = {
+		// members
+		this.quoteTag = domUtils.createElement('BLOCKQUOTE');
+	}
+
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?Element} element - Node element where the cursor is currently located
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
@@ -35,7 +39,7 @@ Blockquote.prototype = {
 
 		domUtils.removeClass(target, 'active');
 		return false;
-	},
+	}
 
 	/**
 	 * @editorMethod Editor.core
@@ -50,9 +54,7 @@ Blockquote.prototype = {
 		} else {
 			this.format.applyBlock(this.quoteTag.cloneNode(false));
 		}
-	},
-
-	constructor: Blockquote
-};
+	}
+}
 
 export default Blockquote;
