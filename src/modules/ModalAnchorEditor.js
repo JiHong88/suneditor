@@ -15,18 +15,18 @@ const { NO_EVENT } = env;
 
 /**
  * @typedef {Object} ModalAnchorEditorParams
- * @property {boolean} params.textToDisplay - Create Text to display input.
- * @property {string} params.title - Modal title
- * @property {boolean} params.openNewWindow - Default checked value of the "Open in new window" checkbox.
- * @property {boolean} params.noAutoPrefix - If true, disables the automatic prefixing of the host URL to the value of the link.
- * @property {boolean} params.relList - The "rel" attribute list of anchor tag.
- * @property {string} params.uploadUrl - File upload URL.
- * @property {Object<string, string>} params.uploadHeaders - File upload headers.
- * @property {number} params.uploadSizeLimit - File upload size limit.
- * @property {number} params.uploadSingleSizeLimit - File upload single size limit.
- * @property {string} params.acceptedFormats - File upload accepted formats.
- * @property {boolean} params.enableFileUpload - If true, enables file upload.
- * @property {RELAttr} params.defaultRel - Default "rel" attributes of anchor tag.
+ * @property {boolean} [title=false] - Modal title display.
+ * @property {boolean} [textToDisplay=''] - Create Text to display input.
+ * @property {boolean} [openNewWindow=false] - Default checked value of the "Open in new window" checkbox.
+ * @property {boolean} [noAutoPrefix=false] - If true, disables the automatic prefixing of the host URL to the value of the link.
+ * @property {Array<string>} [relList=[]] - The "rel" attribute list of anchor tag.
+ * @property {RELAttr} [defaultRel={}] - Default "rel" attributes of anchor tag.
+ * @property {string=} uploadUrl - File upload URL.
+ * @property {Object<string, string>=} uploadHeaders - File upload headers.
+ * @property {number=} uploadSizeLimit - File upload size limit.
+ * @property {number=} uploadSingleSizeLimit - File upload single size limit.
+ * @property {string=} acceptedFormats - File upload accepted formats.
+ * @property {boolean=} enableFileUpload - If true, enables file upload.
  * @example "REL" structure
 	{
 		default: 'nofollow', // Default rel
@@ -607,7 +607,7 @@ function OnChange_downloadCheck(e) {
  * @private
  * @param {EditorCore} editor - Editor instance
  * @param {ModalAnchorEditorParams} params - ModalAnchorEditor options
- * @param {RELAttr[]} relList - REL attribute list
+ * @param {Array<string>} relList - REL attribute list
  * @returns {HTMLElement} - Modal form element
  */
 function CreatetModalForm(editor, params, relList) {
