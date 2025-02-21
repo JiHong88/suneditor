@@ -599,7 +599,8 @@ export interface SunEditorOptions {
     /**
      * private options
      */
-    _printClass?: string;
+  _printClass?: string;
+  __allowedScriptTags?: boolean;
   }
   export type FormatTagName =
   'p'

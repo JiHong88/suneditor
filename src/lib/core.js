@@ -1214,6 +1214,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (util.isWysiwygDiv(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
                 else selectionNode = range.commonAncestorContainer;
             } else {
+                // extentNode - Firefox legacy
                 selectionNode = selection.extentNode || selection.anchorNode;
             }
 
