@@ -30,7 +30,7 @@ Char.prototype = {
 	check(html) {
 		const maxCharCount = this.editor.frameOptions.get('charCounter_max');
 		if (maxCharCount) {
-			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? /** @type {Element} */ (html).outerHTML : html.textContent);
+			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > maxCharCount) {
 				CounterBlink(this.editor.frameContext.get('charWrapper'));
 				return false;

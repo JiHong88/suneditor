@@ -204,7 +204,7 @@ NodeTransform.prototype = {
 					break;
 				}
 
-				if (child.nodeName === next.nodeName && domUtils.isSameAttributes(child, next) && child.getAttribute('href') === next.getAttribute('href')) {
+				if (child.nodeName === next.nodeName && domUtils.isSameAttributes(child, next) && child.href === next.href) {
 					const childs = child.childNodes;
 					let childLength = 0;
 					for (let n = 0, nLen = childs.length; n < nLen; n++) {

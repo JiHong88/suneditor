@@ -52,9 +52,6 @@ function ModalAnchorEditor(inst, modalForm, params) {
 	// params
 	this.openNewWindow = !!params.openNewWindow;
 	this.relList = Array.isArray(params.relList) ? params.relList : [];
-	/**
-	 * @type {RELAttr}
-	 */
 	this.defaultRel = params.defaultRel || {};
 	this.noAutoPrefix = !!params.noAutoPrefix;
 	// file upload

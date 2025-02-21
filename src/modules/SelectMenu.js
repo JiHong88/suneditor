@@ -98,7 +98,7 @@ SelectMenu.prototype = {
 	 * @param {{class?: string, style?: string}} [attr={}] - Additional attributes for the select menu container.
 	 */
 	on(referElement, selectMethod, attr) {
-		if (!attr) attr = { class: '', style: '' };
+		if (!attr) attr = {};
 		this._refer = referElement;
 		this._keydownTarget = domUtils.isInputElement(referElement) ? referElement : this._w;
 		this._selectMethod = selectMethod;

@@ -488,7 +488,7 @@ Editor.prototype = {
 	run(command, type, button) {
 		if (type) {
 			if (/more/i.test(type)) {
-				const toolbar = /** @type {Element} */ (domUtils.getParentElement(button, '.se-toolbar'));
+				const toolbar = domUtils.getParentElement(button, '.se-toolbar');
 				const toolInst = domUtils.hasClass(toolbar, 'se-toolbar-sub') ? this.subToolbar : this.toolbar;
 				if (button !== toolInst.currentMoreLayerActiveButton) {
 					const layer = toolbar.querySelector('.' + command);
@@ -630,7 +630,7 @@ Editor.prototype = {
 		const type = target.getAttribute('data-type');
 
 		if (!command && !type) return;
-		if ('disabled' in target && target.disabled) return;
+		if (target.disabled) return;
 
 		this.run(command, type, target);
 	},
@@ -669,7 +669,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Set direction to "rtl" or "ltr".
-	 * @param {"rtl"|"ltr"} dir "rtl" or "ltr"
+	 * @param {string} dir "rtl" or "ltr"
 	 */
 	setDir(dir) {
 		const rtl = dir === 'rtl';
@@ -1186,7 +1186,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Set display property when there is placeholder.
-	 * @param {FrameContext} fc - Frame context object
+	 * @param {?FrameContext=} fc - Frame context object, If null fc is this.frameContext
 	 */
 	_checkPlaceholder(fc) {
 		fc = fc || this.frameContext;

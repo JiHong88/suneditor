@@ -107,7 +107,7 @@ Selection_.prototype = {
 		/** @type {number} */
 		let eo;
 
-		if (this.isRange(sc)) {
+		if (this.isRange(startCon)) {
 			const r = /** @type {Range} */ (startCon);
 			sc = r.startContainer;
 			so = r.startOffset;
@@ -242,19 +242,20 @@ Selection_.prototype = {
 	/**
 	 * @this {SelectionThis}
 	 * @description Get the Rects object.
-	 * @param {?Range|Node} ref Range | Node | null
+	 * @param {?Range|Node} target Range | Node | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
 	 * @returns {{rects: RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 */
-	getRects(ref, position) {
-		const range = /** @type {Range} */ (!ref || !this.isRange(ref) ? this.getRange() : ref);
+	getRects(target, position) {
+		const targetAbs = /** @type {Node} */ (target)?.nodeType === 1 ? this._w.getComputedStyle(/** @type {Node} */ (target)).position === 'absolute' : false;
+		target = /** @type {Range} */ (!target || /** @type {Node} */ (target).nodeType === 3 ? this.getRange() : target);
 		const globalScroll = this.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
 		let scrollLeft = globalScroll.left;
 		let scrollTop = globalScroll.top;
 
-		const cr = range.getClientRects();
-		let rects = /** @type {RectsInfo} */ (cr[isStartPosition ? 0 : cr.length - 1]);
+		let rects = /** @type {*} */ (target).getClientRects();
+		rects = rects[isStartPosition ? 0 : rects.length - 1];
 
 		if (!rects) {
 			const node = this.getNode();
@@ -263,8 +264,8 @@ Selection_.prototype = {
 				this.html.insertNode(zeroWidth, { afterNode: null, skipCharCount: true });
 				this.setRange(zeroWidth, 1, zeroWidth, 1);
 				this._init();
-				const lcr = this.getRange().getClientRects();
-				rects = lcr[isStartPosition ? 0 : lcr.length - 1];
+				rects = this.getRange().getClientRects();
+				rects = rects[isStartPosition ? 0 : rects.length - 1];
 			}
 
 			if (!rects) {
@@ -284,7 +285,6 @@ Selection_.prototype = {
 		}
 
 		const iframeRects = /^iframe$/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName) ? this.editor.frameContext.get('wysiwygFrame').getClientRects()[0] : null;
-		const targetAbs = ref instanceof Node && ref.nodeType === 1 && this._w.getComputedStyle(ref).position === 'absolute';
 		if (!targetAbs && iframeRects) {
 			rects = {
 				left: rects.left + iframeRects.left,

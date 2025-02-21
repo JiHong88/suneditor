@@ -124,7 +124,7 @@ Format.prototype = {
 
 		for (let i = len, f, html, before, next, inner, isComp, first = true; i >= 0; i--) {
 			f = lines[i];
-			if (f === (!lines[i + 1] ? null : lines[i + 1].parentElement)) continue;
+			if (f === (!lines[i + 1] ? null : lines[i + 1].parentNode)) continue;
 
 			isComp = this.component.is(f);
 			html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
@@ -3311,17 +3311,17 @@ Format.prototype = {
 function DeleteNestedList(baseNode) {
 	const baseParent = baseNode.parentNode;
 	let parent = baseParent.parentNode;
+	let siblingNode = /** @type {*} */ (baseParent);
 	let liSibling, liParent, child, index, c;
 
 	while (domUtils.isListCell(parent)) {
 		index = domUtils.getPositionIndex(baseNode);
 		liSibling = parent.nextElementSibling;
 		liParent = parent.parentNode;
-		child = baseParent;
+		child = siblingNode;
 
-		let siblingNode = null;
 		while (child) {
-			siblingNode = baseParent.nextSibling;
+			siblingNode = siblingNode.nextSibling;
 			if (domUtils.isList(child)) {
 				c = child.childNodes;
 				while (c[index]) {

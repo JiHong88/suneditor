@@ -233,7 +233,7 @@ EventManager.prototype = {
 
 		const fc = this.editor.frameContext;
 		const notReadonly = !fc.get('isReadOnly');
-		for (let element = /** @type {HTMLElement} */ (selectionNode); !domUtils.isWysiwygFrame(element); element = element.parentElement) {
+		for (let element = selectionNode; !domUtils.isWysiwygFrame(element); element = element.parentElement) {
 			if (!element) break;
 			if (element.nodeType !== 1 || domUtils.isBreak(element)) continue;
 			if (this._isNonFocusNode(element)) {
@@ -435,7 +435,7 @@ EventManager.prototype = {
 	 * @returns {boolean} True if the node is non-focusable, otherwise false
 	 */
 	_isNonFocusNode(node) {
-		return node.nodeType === 1 && /** @type {Element} */ (node).getAttribute('data-se-non-focus') === 'true';
+		return node.nodeType === 1 && node.getAttribute('data-se-non-focus') === 'true';
 	},
 
 	/**

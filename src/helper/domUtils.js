@@ -237,11 +237,11 @@ export function getNodeDepth(node) {
 	if (!node || isWysiwygFrame(node)) return -1;
 
 	let depth = 0;
-	node = node.parentElement;
+	node = node.parentNode;
 
 	while (node && !isWysiwygFrame(node)) {
 		depth += 1;
-		node = node.parentElement;
+		node = node.parentNode;
 	}
 
 	return depth;
@@ -1006,7 +1006,7 @@ export function getScrollParent(element) {
 	if (element.scrollHeight > element.clientHeight) {
 		return /** @type {HTMLElement} */ (element);
 	} else {
-		return getScrollParent(element.parentElement);
+		return getScrollParent(element.parentNode);
 	}
 }
 
