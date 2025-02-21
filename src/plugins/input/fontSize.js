@@ -107,7 +107,7 @@ class FontSize extends EditorInjector {
 	 * @param {boolean=} [pluginOptions.showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
 	 * @param {boolean=} [pluginOptions.showIncDecControls=false] - When true, displays increase and decrease buttons for font size adjustments.
 	 * @param {boolean=} [pluginOptions.disableInput=true] - When true, disables the direct font size input box.
-	 * @param {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}} [pluginOptions.unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
+	 * @param {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}>} [pluginOptions.unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
@@ -267,7 +267,7 @@ class FontSize extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {Element} target Line element at the current cursor position
+	 * @param {HTMLElement} target Line element at the current cursor position
 	 */
 	on(target) {
 		const { value, unit } = this._getSize(target);
@@ -291,7 +291,7 @@ class FontSize extends EditorInjector {
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const commandValue = target.getAttribute('data-command');
@@ -326,7 +326,7 @@ class FontSize extends EditorInjector {
 	/**
 	 * @private
 	 * @description Extracts the font size and unit from the given element or input value.
-	 * @param {string|Element} target - The target input or element.
+	 * @param {string|Node} target - The target input or element.
 	 * @returns {{ unit: string, value: number|string }} - An object containing:
 	 * - `unit` (string): The detected font size unit.
 	 * - `value` (number|string): The numeric font size value or text-based size.
@@ -357,7 +357,7 @@ class FontSize extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the font size in the toolbar input field or button label.
-	 * @param {Element} target - The target element in the toolbar.
+	 * @param {Node} target - The target element in the toolbar.
 	 * @param {string|number} value - The font size value.
 	 * @returns {string|number} - The applied font size.
 	 */

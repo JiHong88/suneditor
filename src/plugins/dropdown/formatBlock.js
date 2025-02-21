@@ -85,7 +85,7 @@ class FormatBlock extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {Element} target Line element at the current cursor position
+	 * @param {HTMLElement} target Line element at the current cursor position
 	 */
 	on(target) {
 		const formatList = this.formatList;
@@ -110,7 +110,7 @@ class FormatBlock extends EditorInjector {
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		// "line"|"br-line"|"block"

@@ -65,7 +65,7 @@ class BackgroundColor extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's "dropdown" menu is opened.
-	 * @param {Element} target Line element at the current cursor position
+	 * @param {HTMLElement} target Line element at the current cursor position
 	 */
 	on(target) {
 		this.colorPicker.init(this.selection.getNode(), target);

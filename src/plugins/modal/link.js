@@ -4,13 +4,13 @@ import { domUtils, numbers } from '../../helper';
 
 /**
  * @typedef {Object} LinkPluginOptions
- * @property {boolean=} [textToDisplay=true] - Whether to display the link text.
- * @property {boolean=} [title=true] - Whether to display the link title.
- * @property {string=} [uploadUrl] - The URL endpoint for file uploads.
- * @property {Object<string, string>=} [uploadHeaders] - Additional headers for file upload requests.
- * @property {number=} [uploadSizeLimit] - The total file upload size limit in bytes.
- * @property {number=} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
- * @property {string=} [acceptedFormats] - Accepted file formats for link uploads.
+ * @property {boolean} [textToDisplay=true] - Whether to display the link text.
+ * @property {boolean} [title=true] - Whether to display the link title.
+ * @property {string} [uploadUrl] - The URL endpoint for file uploads.
+ * @property {Object<string, string>} [uploadHeaders] - Additional headers for file upload requests.
+ * @property {number} [uploadSizeLimit] - The total file upload size limit in bytes.
+ * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
+ * @property {string} [acceptedFormats] - Accepted file formats for link uploads.
  */
 
 /**
@@ -145,7 +145,7 @@ class Link extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {Element} target Target button element
+	 * @param {HTMLElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');

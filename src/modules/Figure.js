@@ -48,11 +48,15 @@ let __resizing_sw = 0;
  */
 
 /**
+ * @typedef {Array<Array<string|{action: (element: Node, value: string, target: Node) => void, command: string, value: string, title: string, icon: string}>>} FigureControls
+ */
+
+/**
  * @constructor
  * @this {FigureThis}
  * @description Controller module class
  * @param {*} inst The instance object that called the constructor.
- * @param {Array<string|{action: (element: Node, value: string, target: Node) => void, command: string, value: string, title: string, icon: string}>} controls Controller button array
+ * @param {FigureControls} controls Controller button array
  * @param {FigureParams} params Figure options
  */
 function Figure(inst, controls, params) {
@@ -313,8 +317,8 @@ Figure.prototype = {
 				return {
 					container: null,
 					cover: null,
-					width: target.style.width || (!numbers.is(target.getAttribute('width')) ? target.getAttribute('width') : '') || '',
-					height: target.style.height || (!numbers.is(target.getAttribute('height')) ? target.getAttribute('height') : '') || ''
+					width: target.style.width || (!numbers.is(target.width) ? target.width : '') || '',
+					height: target.style.height || (!numbers.is(target.height) ? target.height : '') || ''
 				};
 			}
 		}

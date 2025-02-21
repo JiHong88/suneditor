@@ -25,13 +25,16 @@ class ImageGallery extends EditorInjector {
 		this.title = this.lang.imageGallery;
 		this.icon = 'image_gallery';
 
+		// members
+		this.onSelectfunction = null;
+
 		// modules
 		this.browser = new Browser(this, {
 			title: this.lang.imageGallery,
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
-			selectorHandler: SetItem.bind(this),
+			selectorHandler: this.#SetItem.bind(this),
 			columnSize: 4,
 			className: 'se-image-gallery'
 		});
@@ -44,10 +47,10 @@ class ImageGallery extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Browser
 	 * @description Executes the method that is called when a "Browser" module's is opened.
-	 * @param {HTMLElement} inputTarget First focus element when the file "Browser" is opened
+	 * @param {?(targe: Node) => *=} onSelectfunction method to be executed after selecting an item in the gallery
 	 */
-	open(inputTarget) {
-		this.inputTarget = inputTarget;
+	open(onSelectfunction) {
+		this.onSelectfunction = onSelectfunction;
 		this.browser.open();
 	}
 
@@ -56,18 +59,22 @@ class ImageGallery extends EditorInjector {
 	 * @description Executes the method that is called when a "Browser" module's is closed.
 	 */
 	close() {
-		this.inputTarget = null;
+		this.onSelectfunction = null;
 		this.browser.close();
 	}
-}
 
-function SetItem(target) {
-	if (this.inputTarget) {
-		this.inputTarget(target);
-	} else {
-		const file = { name: target.getAttribute('data-name'), size: 0 };
-		this.plugins.image.init();
-		this.plugins.image.create(target.getAttribute('data-command'), null, this.width, this.height, 'none', file, target.alt);
+	/**
+	 * @description Set browser item
+	 * @param {Node} target - Target element
+	 */
+	#SetItem(target) {
+		if (this.onSelectfunction) {
+			this.onSelectfunction(target);
+		} else {
+			const file = { name: target.getAttribute('data-name'), size: 0 };
+			this.plugins.image.init();
+			this.plugins.image.create(target.getAttribute('data-command'), null, this.width, this.height, 'none', file, target.alt);
+		}
 	}
 }
 

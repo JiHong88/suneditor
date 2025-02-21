@@ -49,9 +49,10 @@
 
 /**
  * @typedef {Object} ProcessInfo
- * @property {string} origin - video origin url
- * @property {string} url - video url
- * @property {"video"|"iframe"} tag - video tag name
+ * @property {string} origin - origin url
+ * @property {string} url - url
+ * @property {"video"|"iframe"} tag - tag name
+ * @property {?HTMLCollection} children - embed children tags
  */
 
 // --- image

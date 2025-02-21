@@ -68,7 +68,7 @@ class Mention extends EditorInjector {
 			},
 			null
 		);
-		this.selectMenu.on(controllerEl.firstElementChild, SelectMention.bind(this));
+		this.selectMenu.on(controllerEl.firstElementChild, this.#SelectMention.bind(this));
 
 		// onInput debounce
 		this.onInput = debounce(this.onInput.bind(this), this.delayTime);
@@ -190,40 +190,40 @@ class Mention extends EditorInjector {
 	_createUrl(key) {
 		return this.apiUrl.replace(/\{key\}/i, key);
 	}
-}
 
-/**
- * @description Inserts a mention link into the editor when a user selects a mention from the list.
- * @param {{ key: string, name: string, url: string }} item - The selected mention item.
- * @returns {boolean} - Returns `false` if insertion fails, otherwise completes execution.
- */
-function SelectMention(item) {
-	if (!item) return false;
+	/**
+	 * @description Inserts a mention link into the editor when a user selects a mention from the list.
+	 * @param {{ key: string, name: string, url: string }} item - The selected mention item.
+	 * @returns {boolean} - Returns `false` if insertion fails, otherwise completes execution.
+	 */
+	#SelectMention(item) {
+		if (!item) return false;
 
-	let oA = null;
-	const { key, name, url } = item;
-	const anchorParent = this._anchorNode.parentNode;
+		let oA = null;
+		const { key, name, url } = item;
+		const anchorParent = this._anchorNode.parentNode;
 
-	if (domUtils.isAnchor(anchorParent)) {
-		oA = anchorParent;
-		oA.setAttribute('data-se-mention', key);
-		oA.setAttribute('href', url);
-		oA.setAttribute('title', name);
-		oA.textContent = this.triggerText + key;
-	} else {
-		this.selection.setRange(this._anchorNode, this._lastAtPos, this._anchorNode, this._anchorOffset);
-		oA = domUtils.createElement('A', { 'data-se-mention': key, href: url, title: name, target: '_blank' }, this.triggerText + key);
-		if (!this.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return false;
-	}
+		if (domUtils.isAnchor(anchorParent)) {
+			oA = anchorParent;
+			oA.setAttribute('data-se-mention', key);
+			oA.setAttribute('href', url);
+			oA.setAttribute('title', name);
+			oA.textContent = this.triggerText + key;
+		} else {
+			this.selection.setRange(this._anchorNode, this._lastAtPos, this._anchorNode, this._anchorOffset);
+			oA = domUtils.createElement('A', { 'data-se-mention': key, href: url, title: name, target: '_blank' }, this.triggerText + key);
+			if (!this.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return false;
+		}
 
-	this.selectMenu.close();
+		this.selectMenu.close();
 
-	const space = domUtils.createTextNode('\u00A0');
-	oA.parentNode.insertBefore(space, oA.nextSibling);
-	this.selection.setRange(space, 1, space, 1);
+		const space = domUtils.createTextNode('\u00A0');
+		oA.parentNode.insertBefore(space, oA.nextSibling);
+		this.selection.setRange(space, 1, space, 1);
 
-	if (this.cachingFieldData) {
-		this.cachingFieldData.get('').push(item);
+		if (this.cachingFieldData) {
+			this.cachingFieldData.get('').push(item);
+		}
 	}
 }
 

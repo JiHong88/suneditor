@@ -7,23 +7,23 @@ const { _w, isMobile } = env;
 
 /**
  * @typedef {Object} DrawingPluginOptions
- * @property {string=} [outputFormat="dataurl"] - The output format of the drawing. Options: "dataurl", "svg".
- * @property {boolean=} [useFormatType=false] - Whether to enable format type selection (block vs inline).
- * @property {string=} [defaultFormatType="block"] - The default format type, either "block" or "inline".
- * @property {boolean=} [keepFormatType=false] - Whether to maintain the chosen format type after drawing.
- * @property {number=} [lineWidth=5] - The width of the drawing line.
- * @property {boolean=} [lineReconnect=false] - Whether to reconnect lines when drawing.
- * @property {string=} [lineCap="round"] - The style of the line cap ("butt", "round", or "square").
- * @property {string=} [lineColor=""] - The color of the drawing line.
- * @property {boolean=} [canResize=true] - Whether the modal form can be resized.
- * @property {boolean=} [maintainRatio=true] - Whether to maintain the aspect ratio when resizing.
+ * @property {string} [outputFormat="dataurl"] - The output format of the drawing. Options: "dataurl", "svg".
+ * @property {boolean} [useFormatType=false] - Whether to enable format type selection (block vs inline).
+ * @property {string} [defaultFormatType="block"] - The default format type, either "block" or "inline".
+ * @property {boolean} [keepFormatType=false] - Whether to maintain the chosen format type after drawing.
+ * @property {number} [lineWidth=5] - The width of the drawing line.
+ * @property {boolean} [lineReconnect=false] - Whether to reconnect lines when drawing.
+ * @property {CanvasLineCap} [lineCap="round"] - The style of the line cap ("butt", "round", or "square").
+ * @property {string} [lineColor=""] - The color of the drawing line.
+ * @property {boolean} [canResize=true] - Whether the modal form can be resized.
+ * @property {boolean} [maintainRatio=true] - Whether to maintain the aspect ratio when resizing.
  * @property {Object} [formSize={}] - The size configuration for the drawing modal form.
- * @property {string=} [formSize.width="750px"] - The width of the modal form.
- * @property {string=} [formSize.height="50vh"] - The height of the modal form.
- * @property {string=} [formSize.maxWidth=""] - The maximum width of the modal form.
- * @property {string=} [formSize.maxHeight=""] - The maximum height of the modal form.
- * @property {string=} [formSize.minWidth="150px"] - The minimum width of the modal form.
- * @property {string=} [formSize.minHeight="100px"] - The minimum height of the modal form.
+ * @property {string} [formSize.width="750px"] - The width of the modal form.
+ * @property {string} [formSize.height="50vh"] - The height of the modal form.
+ * @property {string} [formSize.maxWidth=""] - The maximum width of the modal form.
+ * @property {string} [formSize.maxHeight=""] - The maximum height of the modal form.
+ * @property {string} [formSize.minWidth="150px"] - The minimum width of the modal form.
+ * @property {string} [formSize.minHeight="100px"] - The minimum height of the modal form.
  */
 
 /**
@@ -85,9 +85,12 @@ class Drawing extends EditorInjector {
 		if (this.pluginOptions.useFormatType) {
 			this.asBlock = modalEl.querySelector('[data-command="asBlock"]');
 			this.asInline = modalEl.querySelector('[data-command="asInline"]');
-			this.eventManager.addEvent([this.asBlock, this.asInline], 'click', OnClickAsButton.bind(this));
+			this.eventManager.addEvent([this.asBlock, this.asInline], 'click', this.#OnClickAsButton.bind(this));
 		}
 
+		/**
+		 * @type {HTMLCanvasElement}
+		 */
 		this.canvas = null;
 		this.ctx = null;
 		this.isDrawing = false;
@@ -95,11 +98,11 @@ class Drawing extends EditorInjector {
 		this.paths = [];
 		this.resizeObserver = null;
 		this.__events = {
-			mousedown: isMobile ? OnCanvasTouchStart.bind(this) : OnCanvasMouseDown.bind(this),
-			mousemove: isMobile ? OnCanvasTouchMove.bind(this) : OnCanvasMouseMove.bind(this),
-			mouseup: OnCanvasMouseUp.bind(this),
-			mouseleave: OnCanvasMouseLeave.bind(this),
-			mouseenter: OnCanvasMouseEnter.bind(this)
+			mousedown: isMobile ? this.#OnCanvasTouchStart.bind(this) : this.#OnCanvasMouseDown.bind(this),
+			mousemove: isMobile ? this.#OnCanvasTouchMove.bind(this) : this.#OnCanvasMouseMove.bind(this),
+			mouseup: this.#OnCanvasMouseUp.bind(this),
+			mouseleave: this.#OnCanvasMouseLeave.bind(this),
+			mouseenter: this.#OnCanvasMouseEnter.bind(this)
 		};
 		this.__eventsRegister = {
 			mousedown: null,
@@ -117,7 +120,7 @@ class Drawing extends EditorInjector {
 		};
 
 		// init
-		this.eventManager.addEvent(modalEl.querySelector('[data-command="remove"]'), 'click', OnRemove.bind(this));
+		this.eventManager.addEvent(modalEl.querySelector('[data-command="remove"]'), 'click', this.#OnRemove.bind(this));
 	}
 
 	/**
@@ -180,7 +183,7 @@ class Drawing extends EditorInjector {
 
 		this._setCtx();
 
-		this.__eventsRegister.mousedown = this.eventManager.addEvent(canvas, this.__eventNameMap.mousedown, this.__events.mousedown, { passive: false, useCapture: true });
+		this.__eventsRegister.mousedown = this.eventManager.addEvent(canvas, this.__eventNameMap.mousedown, this.__events.mousedown, { passive: false, capture: true });
 		this.__eventsRegister.mousemove = this.eventManager.addEvent(canvas, this.__eventNameMap.mousemove, this.__events.mousemove, true);
 		this.__eventsRegister.mouseup = this.eventManager.addEvent(canvas, this.__eventNameMap.mouseup, this.__events.mouseup, true);
 		this.__eventsRegister.mouseleave = this.eventManager.addEvent(canvas, this.__eventNameMap.mouseleave, this.__events.mouseleave);
@@ -239,7 +242,7 @@ class Drawing extends EditorInjector {
 	_setCtx() {
 		this.ctx.lineWidth = this.pluginOptions.lineWidth;
 		this.ctx.lineCap = this.pluginOptions.lineCap;
-		this.ctx.lineColor = this.pluginOptions.lineColor || _w.getComputedStyle(this.carrierWrapper).color;
+		this.ctx.strokeStyle = this.pluginOptions.lineColor || _w.getComputedStyle(this.carrierWrapper).color;
 	}
 
 	/**
@@ -301,7 +304,7 @@ class Drawing extends EditorInjector {
 	/**
 	 * @private
 	 * @description Generates an SVG representation of the drawn content.
-	 * @returns {SVGElement} The generated SVG element.
+	 * @returns {*} The generated SVG element.
 	 */
 	_getSVG() {
 		const svgNS = 'http://www.w3.org/2000/svg';
@@ -318,7 +321,7 @@ class Drawing extends EditorInjector {
 			const svgPath = document.createElementNS(svgNS, 'path');
 			svgPath.setAttribute('d', pathData);
 			svgPath.setAttribute('fill', 'none');
-			svgPath.setAttribute('stroke', this.ctx.strokeStyle);
+			svgPath.setAttribute('stroke', String(this.ctx.strokeStyle));
 			svgPath.setAttribute('stroke-width', this.ctx.lineWidth);
 			svg.appendChild(svgPath);
 		});
@@ -374,6 +377,95 @@ class Drawing extends EditorInjector {
 			domUtils.removeClass(this.asInline, 'on');
 			this.as = 'block';
 		}
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnCanvasMouseDown(e) {
+		e.preventDefault();
+		this.isDrawing = true;
+		this.points.push([e.offsetX, e.offsetY]);
+		this._draw();
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnCanvasMouseMove(e) {
+		e.preventDefault();
+		if (!this.isDrawing) return;
+		this.points.push([e.offsetX, e.offsetY]);
+		this._draw();
+	}
+
+	/**
+	 * @param {TouchEvent} e - Event object
+	 */
+	#OnCanvasTouchStart(e) {
+		e.preventDefault();
+		const { x, y } = this._getCanvasTouchPointer(e);
+		this.isDrawing = true;
+		this.points.push([x, y]);
+		this._draw();
+	}
+
+	/**
+	 * @param {TouchEvent} e - Event object
+	 */
+	#OnCanvasTouchMove(e) {
+		e.preventDefault();
+		const { x, y } = this._getCanvasTouchPointer(e);
+		if (!this.isDrawing) return;
+		this.points.push([x, y]);
+		this._draw();
+	}
+
+	#OnCanvasMouseUp() {
+		this.isDrawing = false;
+		if (this.points.length > 0) {
+			this.paths.push([...this.points]);
+			this.points = [];
+		}
+	}
+
+	#OnCanvasMouseLeave() {
+		if (this.isDrawing) {
+			this.paths.push([...this.points]);
+			if (!this.pluginOptions.lineReconnect) {
+				this.points = [];
+				this.isDrawing = false;
+			}
+		}
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnCanvasMouseEnter(e) {
+		if (e.buttons === 1) {
+			this.isDrawing = true;
+			if (!this.pluginOptions.lineReconnect) {
+				this.points.push([e.offsetX, e.offsetY]);
+			} else {
+				const lastPath = this.paths[this.paths.length - 1];
+				const lastPoint = lastPath[lastPath.length - 1];
+				this.points.push([lastPoint[0], lastPoint[1]]);
+				this.points.push([e.offsetX, e.offsetY]);
+			}
+			this._draw();
+		}
+	}
+
+	#OnRemove() {
+		this._clearCanvas();
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnClickAsButton(e) {
+		this._activeAsInline(domUtils.getEventTarget(e).getAttribute('data-command') === 'asInline');
 	}
 }
 
@@ -433,79 +525,6 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
 		},
 		html
 	);
-}
-
-// canvas events
-function OnCanvasMouseDown(e) {
-	e.preventDefault();
-	this.isDrawing = true;
-	this.points.push([e.offsetX, e.offsetY]);
-	this._draw();
-}
-
-function OnCanvasMouseMove(e) {
-	e.preventDefault();
-	if (!this.isDrawing) return;
-	this.points.push([e.offsetX, e.offsetY]);
-	this._draw();
-}
-
-function OnCanvasTouchStart(e) {
-	e.preventDefault();
-	const { x, y } = this._getCanvasTouchPointer(e);
-	this.isDrawing = true;
-	this.points.push([x, y]);
-	this._draw();
-}
-
-function OnCanvasTouchMove(e) {
-	e.preventDefault();
-	const { x, y } = this._getCanvasTouchPointer(e);
-	if (!this.isDrawing) return;
-	this.points.push([x, y]);
-	this._draw();
-}
-
-function OnCanvasMouseUp() {
-	this.isDrawing = false;
-	if (this.points.length > 0) {
-		this.paths.push([...this.points]);
-		this.points = [];
-	}
-}
-
-function OnCanvasMouseLeave() {
-	if (this.isDrawing) {
-		this.paths.push([...this.points]);
-		if (!this.pluginOptions.lineReconnect) {
-			this.points = [];
-			this.isDrawing = false;
-		}
-	}
-}
-
-function OnCanvasMouseEnter(e) {
-	if (e.buttons === 1) {
-		this.isDrawing = true;
-		if (!this.pluginOptions.lineReconnect) {
-			this.points.push([e.offsetX, e.offsetY]);
-		} else {
-			const lastPath = this.paths[this.paths.length - 1];
-			const lastPoint = lastPath[lastPath.length - 1];
-			this.points.push([lastPoint[0], lastPoint[1]]);
-			this.points.push([e.offsetX, e.offsetY]);
-		}
-		this._draw();
-	}
-}
-
-// button events
-function OnRemove() {
-	this._clearCanvas();
-}
-
-function OnClickAsButton({ target }) {
-	this._activeAsInline(target.getAttribute('data-command') === 'asInline');
 }
 
 export default Drawing;

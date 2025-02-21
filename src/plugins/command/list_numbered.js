@@ -103,7 +103,7 @@ class List_numbered extends EditorInjector {
 	 * @param {Range} params.range - Range object
 	 * @param {HTMLElement} params.line - The line element of the current range
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
-	 * @param {Event} params.event - Key event object
+	 * @param {KeyboardEvent} params.event - Key event object
 	 * @param {number} params.keyCode - Key code
 	 * @param {Object} params.editor - The root editor instance
 	 */

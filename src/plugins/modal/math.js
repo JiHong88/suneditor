@@ -6,17 +6,17 @@ const { _w } = env;
 
 /**
  * @typedef {Object} MathPluginOptions
- * @property {boolean=} [canResize=true] - Whether the math modal can be resized.
- * @property {boolean=} [autoHeight=false] - Whether to automatically adjust the height of the modal.
- * @property {Array<object>=} [fontSizeList] - A list of font size options for rendering math expressions.
- * @property {function=} [onPaste] - A callback function to handle paste events in the math input area.
+ * @property {boolean} [canResize=true] - Whether the math modal can be resized.
+ * @property {boolean} [autoHeight=false] - Whether to automatically adjust the height of the modal.
+ * @property {Array<object>} [fontSizeList] - A list of font size options for rendering math expressions.
+ * @property {function} [onPaste] - A callback function to handle paste events in the math input area.
  * @property {Object} [formSize={}] - An object specifying the dimensions for the math modal.
- * @property {string=} [formSize.width="460px"] - The default width of the math modal.
- * @property {string=} [formSize.height="14em"] - The default height of the math modal.
- * @property {string=} [formSize.maxWidth] - The maximum width of the math modal.
- * @property {string=} [formSize.maxHeight] - The maximum height of the math modal.
- * @property {string=} [formSize.minWidth="400px"] - The minimum width of the math modal.
- * @property {string=} [formSize.minHeight="40px"] - The minimum height of the math modal.
+ * @property {string} [formSize.width="460px"] - The default width of the math modal.
+ * @property {string} [formSize.height="14em"] - The default height of the math modal.
+ * @property {string} [formSize.maxWidth] - The maximum width of the math modal.
+ * @property {string} [formSize.maxHeight] - The maximum height of the math modal.
+ * @property {string} [formSize.minWidth="400px"] - The minimum width of the math modal.
+ * @property {string} [formSize.minHeight="40px"] - The minimum height of the math modal.
  */
 
 /**
@@ -29,6 +29,11 @@ class Math_ extends EditorInjector {
 	static key = 'math';
 	static type = 'modal';
 	static className = '';
+	/**
+	 * @this {Math_}
+	 * @param {Node} node - The node to check.
+	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 */
 	static component(node) {
 		return domUtils.hasClass(node, 'se-math|katex') && domUtils.hasClass(node, 'se-component') ? node : null;
 	}
@@ -49,7 +54,7 @@ class Math_ extends EditorInjector {
 		this.mathjax = null;
 
 		// exception
-		if (!(this.katex = CheckKatex(editor.options.get('externalLibs').katex)) && !(this.mathjax = CheckMathJax(editor.options.get('externalLibs').mathjax, editor))) {
+		if (!(this.katex = this.#CheckKatex(editor.options.get('externalLibs').katex)) && !(this.mathjax = this.#CheckMathJax(editor.options.get('externalLibs').mathjax, editor))) {
 			console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need either "KaTeX" or "MathJax" library. Please add the katex or mathjax option.');
 		}
 
@@ -90,6 +95,7 @@ class Math_ extends EditorInjector {
 		}
 
 		// create HTML
+		this.defaultFontSize = null;
 		const modalEl = CreateHTML_modal(this);
 		const controllerEl = CreateHTML_controller(editor);
 
@@ -106,7 +112,7 @@ class Math_ extends EditorInjector {
 
 		// init
 		this.previewElement.style.fontSize = this.defaultFontSize;
-		this.eventManager.addEvent(this.textArea, 'input', RenderMathExp.bind(this));
+		this.eventManager.addEvent(this.textArea, 'input', this.#RenderMathExp.bind(this));
 		this.eventManager.addEvent(
 			this.fontSizeElement,
 			'change',
@@ -122,7 +128,7 @@ class Math_ extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {Element} target Target component element
+	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
 		if (domUtils.hasClass(target, 'se-math|katex') && getValue(target)) {
@@ -162,7 +168,7 @@ class Math_ extends EditorInjector {
 
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
 				element.innerHTML = dom.querySelector('.se-math, .katex').innerHTML;
-				element.setAttribute('contenteditable', false);
+				element.setAttribute('contenteditable', 'false');
 				domUtils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
 
 				if (this.katex) {
@@ -172,8 +178,7 @@ class Math_ extends EditorInjector {
 				}
 
 				if (this.mathjax) {
-					renderMathJax(this.mathjax);
-					this._applyMathJaxStyleOnIframe();
+					this.#renderMathJax(this.mathjax);
 				}
 			}
 		};
@@ -223,7 +228,7 @@ class Math_ extends EditorInjector {
 
 		if (!mathEl) return false;
 		domUtils.addClass(mathEl, 'se-component|se-inline-component|se-disable-pointer|se-math');
-		mathEl.setAttribute('contenteditable', false);
+		mathEl.setAttribute('contenteditable', 'false');
 		mathEl.setAttribute('data-se-value', converter.htmlToEntity(this._escapeBackslashes(mathExp, false)));
 		mathEl.setAttribute('data-se-type', this.fontSizeElement.value);
 		mathEl.style.fontSize = this.fontSizeElement.value;
@@ -253,8 +258,7 @@ class Math_ extends EditorInjector {
 		}
 
 		if (this.mathjax) {
-			renderMathJax(this.mathjax);
-			this._applyMathJaxStyleOnIframe();
+			this.#renderMathJax(this.mathjax);
 		}
 
 		const r = this.selection.getNearRange(mathEl);
@@ -280,7 +284,7 @@ class Math_ extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {Element} target Target button element
+	 * @param {HTMLElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -289,7 +293,7 @@ class Math_ extends EditorInjector {
 				this.modal.open();
 				break;
 			case 'copy':
-				copyTextToClipboard(this._element);
+				this.#copyTextToClipboard(this._element);
 				break;
 			case 'delete':
 				this.destroy(this.controller.currentTarget);
@@ -299,10 +303,10 @@ class Math_ extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Element} target Target element
+	 * @param {Node} target Target element
 	 */
-	destroy(element) {
-		domUtils.removeItem(element);
+	destroy(target) {
+		domUtils.removeItem(target);
 		this.controller.close();
 		this.editor.focus();
 		this.history.push(false);
@@ -347,91 +351,104 @@ class Math_ extends EditorInjector {
 	_escapeBackslashes(str, decode) {
 		return str.replace(/\\{2}/g, decode ? '\\' : '\\\\');
 	}
-}
 
-/**
- * @description Copies the math expression text to clipboard.
- * @param {Element} element - The math expression element.
- * @returns {Promise<void>}
- */
-async function copyTextToClipboard(element) {
-	if (!navigator.clipboard || !element) return;
+	/**
+	 * @description Copies the math expression text to clipboard.
+	 * @param {Node} element - The math expression element.
+	 * @returns {Promise<void>}
+	 */
+	async #copyTextToClipboard(element) {
+		if (!navigator.clipboard || !element) return;
 
-	try {
-		const text = getValue(element);
-		await navigator.clipboard.writeText(text);
-		domUtils.addClass(element, 'se-copy');
-		// copy effect
-		_w.setTimeout(() => {
-			domUtils.removeClass(element, 'se-copy');
-		}, 120);
-	} catch (err) {
-		console.error('[SUNEDITOR.math.copy.fail]', err);
-	}
-}
-
-/**
- * @description Handles rendering of math expressions in the preview.
- * @param {Event} event - The input event.
- */
-function RenderMathExp({ target }) {
-	if (this.pluginOptions.autoHeight) {
-		target.style.height = '5px';
-		target.style.height = target.scrollHeight + 5 + 'px';
-	}
-
-	this.previewElement.innerHTML = this._renderer(target.value);
-	if (this.mathjax) renderMathJax(this.mathjax);
-}
-
-function renderMathJax(mathjax) {
-	mathjax.clear();
-	mathjax.updateDocument();
-}
-
-function CheckKatex(katex) {
-	if (!katex) return null;
-	if (!katex.src) {
-		console.warn('[SUNEDITOR.math.katex.fail] The katex option is set incorrectly.');
-		return null;
-	}
-
-	const katexOptions = [
-		{
-			throwOnError: false
-		},
-		katex.options || {}
-	].reduce((init, option) => {
-		for (const key in option) {
-			init[key] = option[key];
+		try {
+			const text = getValue(element);
+			await navigator.clipboard.writeText(text);
+			domUtils.addClass(element, 'se-copy');
+			// copy effect
+			_w.setTimeout(() => {
+				domUtils.removeClass(element, 'se-copy');
+			}, 120);
+		} catch (err) {
+			console.error('[SUNEDITOR.math.copy.fail]', err);
 		}
-		return init;
-	}, {});
-
-	katex.options = katexOptions;
-	return katex;
-}
-
-function CheckMathJax(mathjax, editor) {
-	if (!mathjax) return null;
-	if (editor.frameOptions.get('iframe')) {
-		console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is not supported in the iframe.');
 	}
 
-	try {
-		const adaptor = mathjax.browserAdaptor();
-		mathjax.RegisterHTMLHandler(adaptor);
+	/**
+	 * @description Handles rendering of math expressions in the preview.
+	 * @param {InputEvent} e - The input event.
+	 */
+	#RenderMathExp(e) {
+		const eventTarget = domUtils.getEventTarget(e);
+		if (this.pluginOptions.autoHeight) {
+			eventTarget.style.height = '5px';
+			eventTarget.style.height = eventTarget.scrollHeight + 5 + 'px';
+		}
 
-		const tex = new mathjax.TeX();
-		const chtml = new mathjax.CHTML();
+		this.previewElement.innerHTML = this._renderer(eventTarget.value);
+		if (this.mathjax) this.#renderMathJax(this.mathjax);
+	}
 
-		return mathjax.src.document(document, {
-			InputJax: tex,
-			OutputJax: chtml
-		});
-	} catch (error) {
-		console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is set incorrectly.');
-		return null;
+	/**
+	 * @param {*} mathjax - The MathJax instance.
+	 */
+	#renderMathJax(mathjax) {
+		mathjax.clear();
+		mathjax.updateDocument();
+	}
+
+	/**
+	 * @param {*} katex - The KaTeX instance.
+	 * @returns {*} - The KaTeX instance or null if the instance is invalid.
+	 */
+	#CheckKatex(katex) {
+		if (!katex) return null;
+		if (!katex.src) {
+			console.warn('[SUNEDITOR.math.katex.fail] The katex option is set incorrectly.');
+			return null;
+		}
+
+		const katexOptions = [
+			{
+				throwOnError: false
+			},
+			katex.options || {}
+		].reduce((init, option) => {
+			for (const key in option) {
+				init[key] = option[key];
+			}
+			return init;
+		}, {});
+
+		katex.options = katexOptions;
+		return katex;
+	}
+
+	/**
+	 * @param {*} mathjax - The MathJax instance.
+	 * @param {EditorCore} editor - The root editor instance.
+	 * @returns {*}
+	 */
+	#CheckMathJax(mathjax, editor) {
+		if (!mathjax) return null;
+		if (editor.frameOptions.get('iframe')) {
+			console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is not supported in the iframe.');
+		}
+
+		try {
+			const adaptor = mathjax.browserAdaptor();
+			mathjax.RegisterHTMLHandler(adaptor);
+
+			const tex = new mathjax.TeX();
+			const chtml = new mathjax.CHTML();
+
+			return mathjax.src.document(document, {
+				InputJax: tex,
+				OutputJax: chtml
+			});
+		} catch (error) {
+			console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is set incorrectly.');
+			return null;
+		}
 	}
 }
 

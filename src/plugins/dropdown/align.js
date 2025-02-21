@@ -66,7 +66,7 @@ class Align extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {Element} target Line element at the current cursor position
+	 * @param {HTMLElement} target Line element at the current cursor position
 	 */
 	on(target) {
 		const currentAlign = target.getAttribute('data-focus') || this.defaultDir;
@@ -85,7 +85,7 @@ class Align extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the method called when the rtl, ltr mode changes. ("editor.setDir")
-	 * @param {"rtl"|"ltr"} dir Direction
+	 * @param {string} dir Direction ("rtl" or "ltr")
 	 */
 	setDir(dir) {
 		const _dir = dir === 'rtl' ? 'right' : 'left';
@@ -106,7 +106,7 @@ class Align extends EditorInjector {
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const value = target.getAttribute('data-command');

@@ -31,7 +31,7 @@ class AudioGallery extends EditorInjector {
 		this.icon = 'audio_gallery';
 
 		// members
-		this.inputTarget = null;
+		this.onSelectfunction = null;
 
 		// modules
 		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.icons.audio_thumbnail;
@@ -40,7 +40,7 @@ class AudioGallery extends EditorInjector {
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
-			selectorHandler: SetItem.bind(this),
+			selectorHandler: this.#SetItem.bind(this),
 			columnSize: 4,
 			className: 'se-audio-gallery',
 			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail
@@ -50,10 +50,10 @@ class AudioGallery extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Browser
 	 * @description Executes the method that is called when a "Browser" module's is opened.
-	 * @param {HTMLElement} inputTarget First focus element when the file "Browser" is opened
+	 * @param {?(targe: Node) => *=} onSelectfunction method to be executed after selecting an item in the gallery
 	 */
-	open(inputTarget) {
-		this.inputTarget = inputTarget;
+	open(onSelectfunction) {
+		this.onSelectfunction = onSelectfunction;
 		this.browser.open();
 	}
 
@@ -62,17 +62,21 @@ class AudioGallery extends EditorInjector {
 	 * @description Executes the method that is called when a "Browser" module's is closed.
 	 */
 	close() {
-		this.inputTarget = null;
+		this.onSelectfunction = null;
 		this.browser.close();
 	}
-}
 
-function SetItem(target) {
-	if (this.inputTarget) {
-		this.inputTarget(target);
-	} else {
-		this.plugins.audio.init();
-		this.plugins.audio.submitURL(target.getAttribute('data-command'));
+	/**
+	 * @description Set browser item
+	 * @param {Node} target - Target element
+	 */
+	#SetItem(target) {
+		if (this.onSelectfunction) {
+			this.onSelectfunction(target);
+		} else {
+			this.plugins.audio.init();
+			this.plugins.audio.submitURL(target.getAttribute('data-command'));
+		}
 	}
 }
 

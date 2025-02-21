@@ -37,7 +37,7 @@ class Layout extends EditorInjector {
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {?HTMLElement} target - The plugin's toolbar button element
+	 * @param {HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const index = Number(target.getAttribute('data-value'));

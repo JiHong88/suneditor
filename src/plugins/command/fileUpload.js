@@ -14,6 +14,11 @@ class FileUpload extends EditorInjector {
 	static type = 'command';
 	static className = '';
 	static options = { eventIndex: 10000 };
+	/**
+	 * @this {FileUpload}
+	 * @param {Node} node - The node to check.
+	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 */
 	static component(node) {
 		return domUtils.isAnchor(node) && node.hasAttribute('data-se-file-download') ? node : null;
 	}
@@ -94,7 +99,7 @@ class FileUpload extends EditorInjector {
 		}
 
 		// init
-		this.eventManager.addEvent(this.input, 'change', OnChangeFile.bind(this));
+		this.eventManager.addEvent(this.input, 'change', this.#OnChangeFile.bind(this));
 	}
 
 	/**
@@ -132,7 +137,7 @@ class FileUpload extends EditorInjector {
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
 	 * @param {FrameContext} params.frameContext Frame context
-	 * @param {Event} params.event Event object
+	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
@@ -186,7 +191,7 @@ class FileUpload extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
+	 * @param {Node} target Target element
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
@@ -230,7 +235,7 @@ class FileUpload extends EditorInjector {
 					file: f
 				});
 
-				this.ui.noticeOpen(message === NO_EVENT ? err : String(message) || err);
+				this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
 
 				return false;
 			}
@@ -250,7 +255,7 @@ class FileUpload extends EditorInjector {
 				uploadSize: fileSize
 			});
 
-			this.ui.noticeOpen(message === NO_EVENT ? err : String(message) || err);
+			this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
 
 			return false;
 		}
@@ -261,13 +266,11 @@ class FileUpload extends EditorInjector {
 			files
 		};
 
-		const handler = async function (infos, newInfos) {
+		const handler = async function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
 			const xmlHttp = await this.fileManager.asyncUpload(infos.url, infos.uploadHeaders, infos.files);
-			this._uploadCallBack(xmlHttp);
-		}.bind(this, fileInfo);
-		// @se-ts-ignore
-		void this._uploadCallBack;
+			uploadCallback(xmlHttp);
+		}.bind(this, this.#_uploadCallBack.bind(this), fileInfo);
 
 		const result = await this.triggerEvent('onFileUploadBefore', {
 			info: fileInfo,
@@ -405,12 +408,11 @@ class FileUpload extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Handles the file upload completion callback.
 	 * - Parses the response and registers the uploaded file.
 	 * @param {XMLHttpRequest} xmlHttp - The completed XHR request.
 	 */
-	_uploadCallBack(xmlHttp) {
+	#_uploadCallBack(xmlHttp) {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
 			this._error(response);
@@ -418,17 +420,16 @@ class FileUpload extends EditorInjector {
 			this._register(response);
 		}
 	}
-}
 
-/**
- * @private
- * @description Handles the change event when a file is selected.
- * - Triggers the file upload process.
- * @param {InputEvent} e - The change event object.
- */
-async function OnChangeFile(e) {
-	const eventTarget = domUtils.getEventTarget(e);
-	await this.submitFile(eventTarget.files);
+	/**
+	 * @description Handles the change event when a file is selected.
+	 * - Triggers the file upload process.
+	 * @param {InputEvent} e - The change event object.
+	 */
+	async #OnChangeFile(e) {
+		const eventTarget = domUtils.getEventTarget(e);
+		await this.submitFile(eventTarget.files);
+	}
 }
 
 function CreateHTML_controller({ lang, icons }) {

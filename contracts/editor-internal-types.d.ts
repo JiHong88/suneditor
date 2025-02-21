@@ -1,5 +1,5 @@
 export {};
-import { NodeListOf, ChildNode, ScrollIntoViewOptions, FocusOptions } from 'dom';
+import { NodeListOf, HTMLCollectionOf, ChildNode, ScrollIntoViewOptions, FocusOptions } from 'dom';
 
 declare global {
 	interface Window {
@@ -32,6 +32,9 @@ declare global {
 		style: CSSStyleDeclaration;
 		children: HTMLCollection;
 		checked: boolean;
+		options: HTMLOptionsCollection;
+		selectedIndex: number;
+		selected: boolean;
 
 		// HTML-(A)-specific properties
 		download: string;
@@ -75,13 +78,14 @@ declare global {
 		// Node manipulation methods
 		querySelector<T extends Element = Element>(selectors: string): T | null;
 		querySelectorAll<T extends Element = Element>(selectors: string): NodeListOf<T>;
+		getElementsByClassName(classNames: string): HTMLCollectionOf<Element>;
 
 		// Text node methods
 		substringData(offset: number, count: number): string;
 		splitText(index: number): Node;
 		splice<T>(start: number, deleteCount: number, ...items: T[]): T[];
 
-		// Dimension properties (for HTMLElement)
+		// HTMLElement
 		offsetTop: number;
 		offsetLeft: number;
 		offsetWidth: number;
@@ -100,17 +104,25 @@ declare global {
 		getBoundingClientRect(): DOMRect;
 		scrollIntoView(arg?: boolean | ScrollIntoViewOptions): void;
 		focus(options?: FocusOptions, debug?: boolean): void;
+
+		// IFrame
+		frameBorder: string;
+		contentWindow: Window;
+		contentDocument: Document;
+		allowFullscreen: boolean;
+
+		// HTMLImageElement
+		width: number;
+		height: number;
 	}
 
 	interface Element {
-		// HTML-specific properties (optional)
+		// HTML-specific properties
 		innerHTML: string;
 		className: string;
 		classList: DOMTokenList;
 		children: HTMLCollection;
 		files: FileList;
-		width: number | string;
-		height: number | string;
 
 		// Navigation specific to Element
 		nextElementSibling: HTMLElement | null;

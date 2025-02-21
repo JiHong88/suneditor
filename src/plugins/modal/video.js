@@ -9,30 +9,35 @@ const { NO_EVENT } = env;
  */
 
 /**
+ * @typedef {import('../../modules/Figure').FigureControls} FigureControls
+ */
+
+/**
  * @typedef {Object} VideoPluginOptions
- * @property {boolean=} [canResize=true] - Whether the video element can be resized.
- * @property {boolean=} [showHeightInput=true] - Whether to display the height input field.
- * @property {string=} [defaultWidth] - The default width of the video element. If a number is provided, "px" will be appended.
- * @property {string=} [defaultHeight] - The default height of the video element. If a number is provided, "px" will be appended.
- * @property {boolean=} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
- * @property {boolean=} [createFileInput=false] - Whether to create a file input element for video uploads.
- * @property {boolean=} [createUrlInput=true] - Whether to create a URL input element for video embedding.
- * @property {string=} [uploadUrl] - The URL endpoint for video file uploads.
- * @property {Object<string, string>=} [uploadHeaders] - Additional headers to include in the video upload request.
- * @property {number=} [uploadSizeLimit] - The total upload size limit for videos in bytes.
- * @property {number=} [uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.
- * @property {boolean=} [allowMultiple=false] - Whether multiple video uploads are allowed.
- * @property {string=} [acceptedFormats="video/*"] - Accepted file formats for video uploads.
- * @property {number=} [defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
- * @property {boolean=} [showRatioOption=true] - Whether to display the ratio option in the modal.
- * @property {Array=} [ratioOptions] - Custom ratio options for video resizing.
- * @property {Object<string, string>=} [videoTagAttributes] - Additional attributes to set on the video tag.
- * @property {Object<string, string>=} [iframeTagAttributes] - Additional attributes to set on the iframe tag.
- * @property {string=} [query_youtube=""] - Additional query parameters for YouTube embedding.
- * @property {string=} [query_vimeo=""] - Additional query parameters for Vimeo embedding.
- * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} [embedQuery] - Custom query objects for additional embedding services.
- * @property {Array<RegExp|string>=} [urlPatterns] - Additional URL patterns for video embedding.
- * @property {Array<string>=} [extensions] - Additional file extensions to be recognized for video uploads.
+ * @property {boolean} [canResize=true] - Whether the video element can be resized.
+ * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
+ * @property {string} [defaultWidth] - The default width of the video element. If a number is provided, "px" will be appended.
+ * @property {string} [defaultHeight] - The default height of the video element. If a number is provided, "px" will be appended.
+ * @property {boolean} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
+ * @property {boolean} [createFileInput=false] - Whether to create a file input element for video uploads.
+ * @property {boolean} [createUrlInput=true] - Whether to create a URL input element for video embedding.
+ * @property {string} [uploadUrl] - The URL endpoint for video file uploads.
+ * @property {Object<string, string>} [uploadHeaders] - Additional headers to include in the video upload request.
+ * @property {number} [uploadSizeLimit] - The total upload size limit for videos in bytes.
+ * @property {number} [uploadSingleSizeLimit] - The single file upload size limit for videos in bytes.
+ * @property {boolean} [allowMultiple=false] - Whether multiple video uploads are allowed.
+ * @property {string} [acceptedFormats="video/*"] - Accepted file formats for video uploads.
+ * @property {number} [defaultRatio=0.5625] - The default aspect ratio for the video (e.g., 16:9 is 0.5625).
+ * @property {boolean} [showRatioOption=true] - Whether to display the ratio option in the modal.
+ * @property {Array} [ratioOptions] - Custom ratio options for video resizing.
+ * @property {Object<string, string>} [videoTagAttributes] - Additional attributes to set on the video tag.
+ * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the iframe tag.
+ * @property {string} [query_youtube=""] - Additional query parameters for YouTube embedding.
+ * @property {string} [query_vimeo=""] - Additional query parameters for Vimeo embedding.
+ * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
+ * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
+ * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
+ * @property {FigureControls} [controls] - Figure controls.
  */
 
 /**
@@ -45,6 +50,11 @@ class Video extends EditorInjector {
 	static key = 'video';
 	static type = 'modal';
 	static className = '';
+	/**
+	 * @this {Video}
+	 * @param {Node} node - The node to check.
+	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 */
 	static component(node) {
 		if (/^(VIDEO)$/i.test(node?.nodeName)) {
 			return node;
@@ -176,15 +186,15 @@ class Video extends EditorInjector {
 				/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
 				/loom\.com\/share\//
 			])
-			.concat(this.pluginOptions.urlPatterns || []);
+			.concat(pluginOptions.urlPatterns || []);
 
 		const galleryButton = modalEl.querySelector('.__se__gallery');
-		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', OpenGallery.bind(this));
+		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
 		// init
-		if (this.videoInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', RemoveSelectedFiles.bind(this));
-		if (this.videoUrlFile) this.eventManager.addEvent(this.videoUrlFile, 'input', OnLinkPreview.bind(this));
-		if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', OnfileInputChange.bind(this));
+		if (this.videoInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', this.#RemoveSelectedFiles.bind(this));
+		if (this.videoUrlFile) this.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
+		if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
 
 		if (this._resizing) {
 			this.proportion = modalEl.querySelector('._se_check_proportion');
@@ -194,14 +204,14 @@ class Video extends EditorInjector {
 			this.inputX.value = this.pluginOptions.defaultWidth;
 			this.inputY.value = this.pluginOptions.defaultHeight;
 
-			const ratioChange = OnChangeRatio.bind(this);
-			this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
-			this.eventManager.addEvent(this.inputY, 'keyup', OnInputSize.bind(this, 'y'));
+			const ratioChange = this.#OnChangeRatio.bind(this);
+			this.eventManager.addEvent(this.inputX, 'keyup', this.#OnInputSize.bind(this, 'x'));
+			this.eventManager.addEvent(this.inputY, 'keyup', this.#OnInputSize.bind(this, 'y'));
 			this.eventManager.addEvent(this.inputX, 'change', ratioChange);
 			this.eventManager.addEvent(this.inputY, 'change', ratioChange);
 			this.eventManager.addEvent(this.proportion, 'change', ratioChange);
-			this.eventManager.addEvent(this.frameRatioOption, 'change', SetRatio.bind(this));
-			this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
+			this.eventManager.addEvent(this.frameRatioOption, 'change', this.#SetRatio.bind(this));
+			this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', this.#OnClickRevert.bind(this));
 		}
 	}
 
@@ -216,7 +226,6 @@ class Video extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Controller(Figure)
 	 * @description Executes the method that is called when a target component is edited.
-	 * @param {Element} target Target element
 	 */
 	edit() {
 		this.modal.open();
@@ -247,7 +256,7 @@ class Video extends EditorInjector {
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
 	 * @param {FrameContext} params.frameContext Frame context
-	 * @param {Event} params.event Event object
+	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
@@ -340,7 +349,7 @@ class Video extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {Element} target Target component element
+	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
 		this._ready(target);
@@ -351,7 +360,7 @@ class Video extends EditorInjector {
 	 * @description Prepares the component for selection.
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {Element} target - The selected element.
+	 * @param {Node} target - The selected element.
 	 */
 	_ready(target) {
 		if (!target) return;
@@ -363,13 +372,13 @@ class Video extends EditorInjector {
 		this._align = figureInfo.align;
 		target.style.float = '';
 
-		this._origin_w = figureInfo.width || figureInfo.originWidth || figureInfo.w || '';
-		this._origin_h = figureInfo.height || figureInfo.originHeight || figureInfo.h || '';
+		this._origin_w = String(figureInfo.width || figureInfo.originWidth || figureInfo.w || '');
+		this._origin_h = String(figureInfo.height || figureInfo.originHeight || figureInfo.h || '');
 
 		let w = figureInfo.width || figureInfo.w || this._origin_w || '';
 		const h = figureInfo.height || figureInfo.h || this._origin_h || '';
 
-		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || (this._element.querySelector('source') || '').src || '';
+		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || this._element.querySelector('source')?.src || '';
 		(this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
 
 		if (!this._resizing) return;
@@ -399,11 +408,11 @@ class Video extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Element} target Target element
+	 * @param {Node} target Target element
 	 * @returns {Promise<void>}
 	 */
-	async destroy(element) {
-		const targetEl = element || this._element;
+	async destroy(target) {
+		const targetEl = target || this._element;
 		const container = domUtils.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
@@ -517,7 +526,7 @@ class Video extends EditorInjector {
 	 * @description Creates or updates a video embed component.
 	 * - When updating, it replaces the existing element if necessary and applies the new source, size, and alignment.
 	 * - When creating, it wraps the provided element in a figure container.
-	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The existing video element (for update) or a newly created one.
+	 * @param {Node} oFrame - The existing video element (for update) or a newly created one.
 	 * @param {string} src - The source URL for the video.
 	 * @param {string} width - The desired width for the video element.
 	 * @param {string} height - The desired height for the video element.
@@ -600,7 +609,7 @@ class Video extends EditorInjector {
 	 * @description Creates a new iframe element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes for embedding.
 	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the iframe.
-	 * @returns {HTMLIFrameElement} The newly created iframe element.
+	 * @returns {HTMLElement} The newly created iframe element.
 	 */
 	createIframeTag(props) {
 		const iframeTag = domUtils.createElement('IFRAME');
@@ -617,7 +626,7 @@ class Video extends EditorInjector {
 	 * @description Creates a new video element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes.
 	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the video element.
-	 * @returns {HTMLVideoElement} The newly created video element.
+	 * @returns {HTMLElement} The newly created video element.
 	 */
 	createVideoTag(props) {
 		const videoTag = domUtils.createElement('VIDEO');
@@ -633,8 +642,8 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the size of the video element.
-	 * @param {string} w - The width of the video.
-	 * @param {string} h - The height of the video.
+	 * @param {string|number} w - The width of the video.
+	 * @param {string|number} h - The height of the video.
 	 */
 	_applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
@@ -649,7 +658,7 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Retrieves video information including size and alignment.
-	 * @returns {VideoInfo} Video information object.
+	 * @returns {*} Video information object.
 	 */
 	_getInfo() {
 		return {
@@ -663,7 +672,7 @@ class Video extends EditorInjector {
 
 	/**
 	 * @description Create an "video" component using the provided files.
-	 * @param {FileList} fileList File object list
+	 * @param {FileList|File[]} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
@@ -671,7 +680,7 @@ class Video extends EditorInjector {
 
 		let fileSize = 0;
 		const files = [];
-		const slngleSizeLimit = this.uploadSingleSizeLimit;
+		const slngleSizeLimit = this.pluginOptions.uploadSingleSizeLimit;
 		for (let i = 0, len = fileList.length, f, s; i < len; i++) {
 			f = fileList[i];
 			if (!/video/i.test(f.type)) continue;
@@ -775,7 +784,7 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Updates the video component within the editor.
-	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The video element to update.
+	 * @param {Node} oFrame - The video element to update.
 	 */
 	_update(oFrame) {
 		if (!oFrame) return;
@@ -789,8 +798,8 @@ class Video extends EditorInjector {
 		let existElement = this.format.isBlock(oFrame.parentNode) || domUtils.isWysiwygFrame(oFrame.parentNode) ? oFrame : this.format.getLine(oFrame) || oFrame;
 
 		const prevFrame = oFrame;
-		oFrame = oFrame.cloneNode(true);
-		const figure = Figure.CreateContainer(oFrame, 'se-video-container');
+		const cloneFrame = oFrame.cloneNode(true);
+		const figure = Figure.CreateContainer(cloneFrame, 'se-video-container');
 		const container = figure.container;
 
 		const figcaption = existElement.querySelector('figcaption');
@@ -802,14 +811,14 @@ class Video extends EditorInjector {
 		}
 
 		// size
-		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
-		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
+		this.figure.open(cloneFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
+		const size = (cloneFrame.getAttribute('data-se-size') || ',').split(',');
 		this._applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 
 		// align
 		const format = this.format.getLine(prevFrame);
 		if (format) this._align = format.style.textAlign || format.style.float;
-		this.figure.setAlign(oFrame, this._align);
+		this.figure.setAlign(cloneFrame, this._align);
 
 		if (domUtils.getParentElement(prevFrame, domUtils.isExcludeFormat)) {
 			prevFrame.parentNode.replaceChild(container, prevFrame);
@@ -830,7 +839,7 @@ class Video extends EditorInjector {
 
 		if (caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
 
-		return oFrame;
+		return cloneFrame;
 	}
 
 	/**
@@ -862,17 +871,17 @@ class Video extends EditorInjector {
 
 		const videoUploadUrl = this.pluginOptions.uploadUrl;
 		if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
-			this.fileManager.upload(videoUploadUrl, this.pluginOptions.uploadHeaders, files, UploadCallBack.bind(this, info), this._error.bind(this));
+			this.fileManager.upload(videoUploadUrl, this.pluginOptions.uploadHeaders, files, this.#UploadCallBack.bind(this, info), this._error.bind(this));
 		}
 	}
 
 	/**
 	 * @private
 	 * @description Sets attributes for the video tag.
-	 * @param {Element} element - The video element.
+	 * @param {Node} element - The video element.
 	 */
 	_setTagAttrs(element) {
-		element.setAttribute('controls', true);
+		element.setAttribute('controls', 'true');
 
 		const attrs = this.pluginOptions.videoTagAttributes;
 		if (!attrs) return;
@@ -885,7 +894,7 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets attributes for the iframe tag.
-	 * @param {Element} element - The iframe element.
+	 * @param {Node} element - The iframe element.
 	 */
 	_setIframeAttrs(element) {
 		element.frameBorder = '0';
@@ -902,7 +911,7 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Selects a ratio option in the ratio dropdown.
-	 * @param {string} value - The selected ratio value.
+	 * @param {string|number} value - The selected ratio value.
 	 * @returns {boolean} Returns true if a ratio was selected.
 	 */
 	_setRatioSelect(value) {
@@ -910,13 +919,13 @@ class Video extends EditorInjector {
 		const ratioOption = this.frameRatioOption.options;
 
 		if (/%$/.test(value) || this._onlyPercentage) value = numbers.get(value, 2) / 100 + '';
-		else if (!numbers.is(value) || value * 1 >= 1) value = '';
+		else if (!numbers.is(value) || Number(value) >= 1) value = '';
 
 		this.inputY.placeholder = '';
 		for (let i = 0, len = ratioOption.length; i < len; i++) {
 			if (ratioOption[i].value === value) {
 				ratioSelected = ratioOption[i].selected = true;
-				this.inputY.placeholder = !value ? '' : value * 100 + '%';
+				this.inputY.placeholder = !value ? '' : Number(value) * 100 + '%';
 			} else ratioOption[i].selected = false;
 		}
 
@@ -935,131 +944,139 @@ class Video extends EditorInjector {
 		this.ui.noticeOpen(err);
 		console.error('[SUNEDITOR.plugin.video.error]', message);
 	}
-}
 
-/**
- * @private
- * @description Handles the callback function for video upload completion.
- * @param {VideoInfo} info - Video information.
- * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
- */
-async function UploadCallBack(info, xmlHttp) {
-	if ((await this.triggerEvent('videoUploadHandler', { xmlHttp, info })) === NO_EVENT) {
-		const response = JSON.parse(xmlHttp.responseText);
-		if (response.errorMessage) {
-			this._error(response);
-		} else {
-			this._register(info, response);
-		}
-	}
-}
-
-/**
- * @private
- * @description Removes selected files from the file input.
- */
-function RemoveSelectedFiles() {
-	this.videoInputFile.value = '';
-	if (this.videoUrlFile) {
-		this.videoUrlFile.disabled = false;
-		this.previewSrc.style.textDecoration = '';
-	}
-
-	// inputFile check
-	Modal.OnChangeFile(this.fileModalWrapper, []);
-}
-
-/**
- * @private
- * @description Handles link preview input changes.
- * @param {Event} e - The input event.
- */
-function OnLinkPreview(e) {
-	const value = e.target.value.trim();
-	if (/^<iframe.*\/iframe>$/.test(value)) {
-		this._linkValue = value;
-		this.previewSrc.textContent = '<IFrame :src=".."></IFrame>';
-	} else {
-		this._linkValue = this.previewSrc.textContent = !value
-			? ''
-			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-			? this.options.get('defaultUrlProtocol') + value
-			: !value.includes('://')
-			? '/' + value
-			: value;
-	}
-}
-
-/**
- * @private
- * @description Opens the video gallery.
- */
-function OpenGallery() {
-	this.plugins.videoGallery.open(_setUrlInput.bind(this));
-}
-
-/**
- * @private
- * @description Sets the URL input value when selecting from the gallery.
- * @param {Element} target - The selected video element.
- */
-function _setUrlInput(target) {
-	this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = target.getAttribute('data-command') || target.src;
-	this.videoUrlFile.focus();
-}
-
-function OnfileInputChange({ target }) {
-	if (!this.videoInputFile.value) {
-		this.videoUrlFile.disabled = false;
-		this.previewSrc.style.textDecoration = '';
-	} else {
-		this.videoUrlFile.disabled = true;
-		this.previewSrc.style.textDecoration = 'line-through';
-	}
-
-	// inputFile check
-	Modal.OnChangeFile(this.fileModalWrapper, target.files);
-}
-
-function OnClickRevert() {
-	if (this._onlyPercentage) {
-		this.inputX.value = this._origin_w > 100 ? 100 : this._origin_w;
-	} else {
-		this.inputX.value = this._origin_w;
-		this.inputY.value = this._origin_h;
-	}
-}
-
-function SetRatio(e) {
-	const value = e.target.options[e.target.selectedIndex].value;
-	this._defaultSizeY = this.figure.autoRatio.current = this._frameRatio = !value ? this._defaultSizeY : value * 100 + '%';
-	this.inputY.placeholder = !value ? '' : value * 100 + '%';
-	this.inputY.value = '';
-}
-
-function OnChangeRatio() {
-	this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 1, h: 1 };
-}
-
-function OnInputSize(xy, e) {
-	if (e.keyCode === 32) {
-		e.preventDefault();
-		return;
-	}
-
-	if (xy === 'x' && this._onlyPercentage && e.target.value > 100) {
-		e.target.value = 100;
-	} else if (this.proportion.checked) {
-		const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
-		if (xy === 'x') {
-			this.inputY.value = ratioSize.h;
-		} else {
-			this.inputX.value = ratioSize.w;
+	/**
+	 * @description Handles the callback function for video upload completion.
+	 * @param {VideoInfo} info - Video information.
+	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
+	 */
+	async #UploadCallBack(info, xmlHttp) {
+		if ((await this.triggerEvent('videoUploadHandler', { xmlHttp, info })) === NO_EVENT) {
+			const response = JSON.parse(xmlHttp.responseText);
+			if (response.errorMessage) {
+				this._error(response);
+			} else {
+				this._register(info, response);
+			}
 		}
 	}
 
-	if (xy === 'y') {
-		this._setRatioSelect(e.target.value || this._defaultRatio);
+	/**
+	 * @description Removes selected files from the file input.
+	 */
+	#RemoveSelectedFiles() {
+		this.videoInputFile.value = '';
+		if (this.videoUrlFile) {
+			this.videoUrlFile.disabled = false;
+			this.previewSrc.style.textDecoration = '';
+		}
+
+		// inputFile check
+		Modal.OnChangeFile(this.fileModalWrapper, []);
+	}
+
+	/**
+	 * @description Handles link preview input changes.
+	 * @param {InputEvent} e - Event object
+	 */
+	#OnLinkPreview(e) {
+		const eventTarget = domUtils.getEventTarget(e);
+		const value = eventTarget.value.trim();
+		if (/^<iframe.*\/iframe>$/.test(value)) {
+			this._linkValue = value;
+			this.previewSrc.textContent = '<IFrame :src=".."></IFrame>';
+		} else {
+			this._linkValue = this.previewSrc.textContent = !value
+				? ''
+				: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
+				? this.options.get('defaultUrlProtocol') + value
+				: !value.includes('://')
+				? '/' + value
+				: value;
+		}
+	}
+
+	/**
+	 * @description Opens the video gallery.
+	 */
+	#OpenGallery() {
+		this.plugins.videoGallery.open(this.#SetUrlInput.bind(this));
+	}
+
+	/**
+	 * @description Sets the URL input value when selecting from the gallery.
+	 * @param {Node} target - The selected video element.
+	 */
+	#SetUrlInput(target) {
+		this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = target.getAttribute('data-command') || target.src;
+		this.videoUrlFile.focus();
+	}
+
+	/**
+	 * @param {InputEvent} e - Event object
+	 */
+	#OnfileInputChange(e) {
+		if (!this.videoInputFile.value) {
+			this.videoUrlFile.disabled = false;
+			this.previewSrc.style.textDecoration = '';
+		} else {
+			this.videoUrlFile.disabled = true;
+			this.previewSrc.style.textDecoration = 'line-through';
+		}
+
+		// inputFile check
+		Modal.OnChangeFile(this.fileModalWrapper, domUtils.getEventTarget(e).files);
+	}
+
+	#OnClickRevert() {
+		if (this._onlyPercentage) {
+			this.inputX.value = Number(this._origin_w) > 100 ? 100 : this._origin_w;
+		} else {
+			this.inputX.value = this._origin_w;
+			this.inputY.value = this._origin_h;
+		}
+	}
+
+	/**
+	 * @param {InputEvent} e - Event object
+	 */
+	#SetRatio(e) {
+		const eventTarget = domUtils.getEventTarget(e);
+		const value = eventTarget.options[eventTarget.selectedIndex].value;
+		this._defaultSizeY = this.figure.autoRatio.current = this._frameRatio = !value ? this._defaultSizeY : Number(value) * 100 + '%';
+		this.inputY.placeholder = !value ? '' : Number(value) * 100 + '%';
+		this.inputY.value = '';
+	}
+
+	#OnChangeRatio() {
+		this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 1, h: 1 };
+	}
+
+	/**
+	 * @param {"x"|"y"} xy - x or y
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#OnInputSize(xy, e) {
+		if (e.keyCode === 32) {
+			e.preventDefault();
+			return;
+		}
+
+		const eventTarget = domUtils.getEventTarget(e);
+		if (xy === 'x' && this._onlyPercentage && Number(eventTarget.value) > 100) {
+			eventTarget.value = '100';
+		} else if (this.proportion.checked) {
+			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
+			if (xy === 'x') {
+				this.inputY.value = ratioSize.h;
+			} else {
+				this.inputX.value = ratioSize.w;
+			}
+		}
+
+		if (xy === 'y') {
+			this._setRatioSelect(eventTarget.value || this._defaultRatio);
+		}
 	}
 }
 

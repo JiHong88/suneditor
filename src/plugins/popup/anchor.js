@@ -13,6 +13,11 @@ class Anchor extends EditorInjector {
 	static key = 'anchor';
 	static type = 'popup';
 	static className = '';
+	/**
+	 * @this {Anchor}
+	 * @param {Node} node - The node to check.
+	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 */
 	static component(node) {
 		return domUtils.isAnchor(node) && node.hasAttribute('id') && node.hasAttribute('data-se-anchor') ? node : null;
 	}

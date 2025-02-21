@@ -70,6 +70,11 @@ class Table extends EditorInjector {
 	static type = 'dropdown-free';
 	static className = '';
 	static options = { isInputComponent: true };
+	/**
+	 * @this {Table}
+	 * @param {Node} node - The node to check.
+	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 */
 	static component(node) {
 		return domUtils.isTable(node) ? node : null;
 	}
@@ -145,21 +150,21 @@ class Table extends EditorInjector {
 		const splitMenu = CreateSplitMenu(this.lang);
 		this.splitButton = controller_cell.querySelector('[data-command="onsplit"]');
 		this.selectMenu_split = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-		this.selectMenu_split.on(this.splitButton, OnSplitCells.bind(this));
+		this.selectMenu_split.on(this.splitButton, this.#OnSplitCells.bind(this));
 		this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 
 		// members - SelectMenu - column
 		const columnMenu = CreateColumnMenu(this.lang, this.icons);
 		const columnButton = controller_cell.querySelector('[data-command="oncolumn"]');
 		this.selectMenu_column = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-		this.selectMenu_column.on(columnButton, OnColumnEdit.bind(this));
+		this.selectMenu_column.on(columnButton, this.#OnColumnEdit.bind(this));
 		this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
 
 		// members - SelectMenu - row
 		const rownMenu = CreateRowMenu(this.lang, this.icons);
 		const rowButton = controller_cell.querySelector('[data-command="onrow"]');
 		this.selectMenu_row = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-		this.selectMenu_row.on(rowButton, OnRowEdit.bind(this));
+		this.selectMenu_row.on(rowButton, this.#OnRowEdit.bind(this));
 		this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 
 		// members - SelectMenu - properties - border style
@@ -247,10 +252,10 @@ class Table extends EditorInjector {
 		this._ref = null;
 
 		// member - global events
-		this._bindMultiOn = OnCellMultiSelect.bind(this);
-		this._bindMultiOff = OffCellMultiSelect.bind(this);
-		this._bindShiftOff = OffCellShift.bind(this);
-		this._bindTouchOff = OffCellTouch.bind(this);
+		this._bindMultiOn = this.#OnCellMultiSelect.bind(this);
+		this._bindMultiOff = this.#OffCellMultiSelect.bind(this);
+		this._bindShiftOff = this.#OffCellShift.bind(this);
+		this._bindTouchOff = this.#OffCellTouch.bind(this);
 		this.__globalEvents = {
 			on: null,
 			off: null,
@@ -263,8 +268,8 @@ class Table extends EditorInjector {
 
 		// init
 		this.menu.initDropdownTarget(Table, menu);
-		this.eventManager.addEvent(commandArea, 'mousemove', OnMouseMoveTablePicker.bind(this));
-		this.eventManager.addEvent(commandArea, 'click', OnClickTablePicker.bind(this));
+		this.eventManager.addEvent(commandArea, 'mousemove', this.#OnMouseMoveTablePicker.bind(this));
+		this.eventManager.addEvent(commandArea, 'click', this.#OnClickTablePicker.bind(this));
 	}
 
 	/**
@@ -375,7 +380,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the method called when the rtl, ltr mode changes. ("editor.setDir")
-	 * @param {"rtl"|"ltr"} dir Direction
+	 * @param {string} dir Direction ("rtl" or "ltr")
 	 */
 	setDir(dir) {
 		this.tableHighlight.style.left = dir === 'rtl' ? 10 * 18 - 13 + 'px' : '';
@@ -391,7 +396,7 @@ class Table extends EditorInjector {
 	onMouseMove({ event }) {
 		if (this._resizing) return;
 
-		const eventTarget = /** @type {HTMLElement} */ (event.target);
+		const eventTarget = domUtils.getEventTarget(event);
 		const target = domUtils.getParentElement(eventTarget, IsResizeEls);
 		if (!target || this._fixedCell) {
 			this.__hideResizeLine();
@@ -834,12 +839,12 @@ class Table extends EditorInjector {
 	/**
 	 * @description Sets the table and figure elements based on the provided cell element, and stores references to them for later use.
 	 * @param {Node} element The target table cell (`<td>`) element from which the table info will be extracted.
-	 * @returns {HTMLTableElement} The `<table>` element that is the parent of the provided `element`.
+	 * @returns {Node} The `<table>` element that is the parent of the provided `element`.
 	 */
 	setTableInfo(element) {
 		const table = (this._element = this._selectedTable || domUtils.getParentElement(element, 'TABLE'));
 		this._figure = domUtils.getParentElement(table, domUtils.isFigure) || table;
-		return /** @type {HTMLTableElement} */ (table);
+		return table;
 	}
 
 	/**
@@ -1349,7 +1354,7 @@ class Table extends EditorInjector {
 	 * @param {Node} table The table element to insert the row into.
 	 * @param {number} rowIndex The index at which to insert the new row.
 	 * @param {number} cellCnt The number of cells to create in the new row.
-	 * @returns {HTMLElement} The newly inserted row element.
+	 * @returns {HTMLTableRowElement} The newly inserted row element.
 	 */
 	insertBodyRow(table, rowIndex, cellCnt) {
 		const newRow = table.insertRow(rowIndex);
@@ -1517,7 +1522,7 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @internal
+	 * @private
 	 * @description Sets the merge/split button visibility.
 	 * @param {boolean} fixedCell - Whether a single cell is selected.
 	 * @param {boolean} selectedCell - Whether multiple cells are selected.
@@ -1533,7 +1538,7 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @internal
+	 * @private
 	 * @description Sets the controller position for a cell.
 	 * @param {Node} tdElement - The target table cell.
 	 */
@@ -1561,7 +1566,7 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @internal
+	 * @private
 	 * @description Adds a new entry to the history stack.
 	 */
 	_historyPush() {
@@ -1788,7 +1793,7 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @internal
+	 * @private
 	 * @description Deletes styles from selected table cells.
 	 */
 	_deleteStyleSelectedCells() {
@@ -1829,7 +1834,7 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @internal
+	 * @private
 	 * @description Enables or disables editor mode.
 	 * @param {boolean} enabled Whether to enable or disable the editor.
 	 */
@@ -2180,7 +2185,7 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets border format and styles.
-	 * @param {{left: HTMLTableCellElement[], top: HTMLTableCellElement[], right: HTMLTableCellElement[], bottom: HTMLTableCellElement[], all: HTMLTableCellElement[]}} cells The table cells categorized by border positions.
+	 * @param {{left: Node[], top: Node[], right: Node[], bottom: Node[], all: Node[]}} cells The table cells categorized by border positions.
 	 * @param {string} borderKey Border style ("all"|"inside"|"horizon"|"vertical"|"outside"|"left"|"top"|"right"|"bottom")
 	 * @param {string} s The border style value.
 	 */
@@ -2238,7 +2243,7 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @internal
+	 * @private
 	 * @description Selects multiple table cells and applies selection styles.
 	 * @param {Node} startCell The first cell in the selection.
 	 * @param {Node} endCell The last cell in the selection.
@@ -2400,7 +2405,7 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @internal
+	 * @private
 	 * @description Closes table-related controllers.
 	 */
 	_closeController() {
@@ -2421,7 +2426,7 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @internal
+	 * @private
 	 * @description Removes global event listeners and resets resize-related properties.
 	 */
 	__removeGlobalEvents() {
@@ -2436,6 +2441,332 @@ class Table extends EditorInjector {
 		for (const k in globalEvents) {
 			if (globalEvents[k]) globalEvents[k] = this.eventManager.removeGlobalEvent(globalEvents[k]);
 		}
+	}
+
+	/**
+	 * @description Splits a table cell either vertically or horizontally.
+	 * @param {"vertical"|"horizontal"} direction The direction to split the cell.
+	 */
+	#OnSplitCells(direction) {
+		const vertical = direction === 'vertical';
+		const currentCell = this._tdElement;
+		const rows = this._trElements;
+		const currentRow = this._trElement;
+		const index = this._logical_cellIndex;
+		const rowIndex = this._rowIndex;
+		const newCell = CreateCellsHTML(currentCell.nodeName);
+
+		// vertical
+		if (vertical) {
+			const currentColSpan = currentCell.colSpan;
+			newCell.rowSpan = currentCell.rowSpan;
+
+			// colspan > 1
+			if (currentColSpan > 1) {
+				newCell.colSpan = Math.floor(currentColSpan / 2);
+				currentCell.colSpan = currentColSpan - newCell.colSpan;
+				currentRow.insertBefore(newCell, currentCell.nextElementSibling);
+			} else {
+				// colspan - 1
+				let rowSpanArr = [];
+				let spanIndex = [];
+
+				for (let i = 0, len = this._rowCnt, cells, colSpan; i < len; i++) {
+					cells = rows[i].cells;
+					colSpan = 0;
+					for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
+						cell = cells[c];
+						cs = cell.colSpan - 1;
+						rs = cell.rowSpan - 1;
+						logcalIndex = c + colSpan;
+
+						if (spanIndex.length > 0) {
+							for (let r = 0, arr; r < spanIndex.length; r++) {
+								arr = spanIndex[r];
+								if (arr.row > i) continue;
+								if (logcalIndex >= arr.index) {
+									colSpan += arr.cs;
+									logcalIndex += arr.cs;
+									arr.rs -= 1;
+									arr.row = i + 1;
+									if (arr.rs < 1) {
+										spanIndex.splice(r, 1);
+										r--;
+									}
+								} else if (c === cLen - 1) {
+									arr.rs -= 1;
+									arr.row = i + 1;
+									if (arr.rs < 1) {
+										spanIndex.splice(r, 1);
+										r--;
+									}
+								}
+							}
+						}
+
+						if (logcalIndex <= index && rs > 0) {
+							rowSpanArr.push({
+								index: logcalIndex,
+								cs: cs + 1,
+								rs: rs,
+								row: -1
+							});
+						}
+
+						if (cell !== currentCell && logcalIndex <= index && logcalIndex + cs >= index + currentColSpan - 1) {
+							cell.colSpan += 1;
+							break;
+						}
+
+						if (logcalIndex > index) break;
+
+						colSpan += cs;
+					}
+
+					spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {
+						return a.index - b.index;
+					});
+					rowSpanArr = [];
+				}
+
+				currentRow.insertBefore(newCell, currentCell.nextElementSibling);
+			}
+		} else {
+			// horizontal
+			const currentRowSpan = currentCell.rowSpan;
+			newCell.colSpan = currentCell.colSpan;
+
+			// rowspan > 1
+			if (currentRowSpan > 1) {
+				newCell.rowSpan = Math.floor(currentRowSpan / 2);
+				const newRowSpan = currentRowSpan - newCell.rowSpan;
+
+				const rowSpanArr = [];
+				const nextRowIndex = domUtils.getArrayIndex(rows, currentRow) + newRowSpan;
+
+				for (let i = 0, cells, colSpan; i < nextRowIndex; i++) {
+					cells = rows[i].cells;
+					colSpan = 0;
+					for (let c = 0, cLen = cells.length, cell, cs, logcalIndex; c < cLen; c++) {
+						logcalIndex = c + colSpan;
+						if (logcalIndex >= index) break;
+
+						cell = cells[c];
+						cs = cell.rowSpan - 1;
+						if (cs > 0 && cs + i >= nextRowIndex && logcalIndex < index) {
+							rowSpanArr.push({
+								index: logcalIndex,
+								cs: cell.colSpan
+							});
+						}
+						colSpan += cell.colSpan - 1;
+					}
+				}
+
+				const nextRow = rows[nextRowIndex];
+				const nextCells = nextRow.cells;
+				let rs = rowSpanArr.shift();
+
+				for (let c = 0, cLen = nextCells.length, colSpan = 0, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
+					logcalIndex = c + colSpan;
+					cell = nextCells[c];
+					cs = cell.colSpan - 1;
+					insertIndex = logcalIndex + cs + 1;
+
+					if (rs && insertIndex >= rs.index) {
+						colSpan += rs.cs;
+						insertIndex += rs.cs;
+						rs = rowSpanArr.shift();
+					}
+
+					if (insertIndex >= index || c === cLen - 1) {
+						nextRow.insertBefore(newCell, cell.nextElementSibling);
+						break;
+					}
+
+					colSpan += cs;
+				}
+
+				currentCell.rowSpan = newRowSpan;
+			} else {
+				// rowspan - 1
+				newCell.rowSpan = currentCell.rowSpan;
+				const newRow = domUtils.createElement('TR');
+				newRow.appendChild(newCell);
+
+				for (let i = 0, cells; i < rowIndex; i++) {
+					cells = rows[i].cells;
+					if (cells.length === 0) return;
+
+					for (let c = 0, cLen = cells.length; c < cLen; c++) {
+						if (i + cells[c].rowSpan - 1 >= rowIndex) {
+							cells[c].rowSpan += 1;
+						}
+					}
+				}
+
+				const physicalIndex = this._physical_cellIndex;
+				const cells = currentRow.cells;
+
+				for (let c = 0, cLen = cells.length; c < cLen; c++) {
+					if (c === physicalIndex) continue;
+					cells[c].rowSpan += 1;
+				}
+
+				currentRow.parentNode.insertBefore(newRow, currentRow.nextElementSibling);
+			}
+		}
+
+		this.selectMenu_split.close();
+		this.editor.focusEdge(currentCell);
+
+		this._deleteStyleSelectedCells();
+		this.history.push(false);
+
+		this._setController(currentCell);
+		this._selectedCell = this._fixedCell = currentCell;
+	}
+
+	/**
+	 * @description Handles column operations such as insert and delete.
+	 * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
+	 */
+	#OnColumnEdit(command) {
+		switch (command) {
+			case 'insert-left':
+				this.editTable('cell', 'left');
+				break;
+			case 'insert-right':
+				this.editTable('cell', 'right');
+				break;
+			case 'delete':
+				this.editTable('cell', null);
+		}
+
+		this._historyPush();
+	}
+
+	/**
+	 * @description Handles row operations such as insert and delete.
+	 * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
+	 */
+	#OnRowEdit(command) {
+		switch (command) {
+			case 'insert-above':
+				this.editTable('row', 'up');
+				break;
+			case 'insert-below':
+				this.editTable('row', 'down');
+				break;
+			case 'delete':
+				this.editTable('row', null);
+		}
+
+		this._historyPush();
+	}
+
+	/**
+	 * @description Handles mouse movement within the table picker.
+	 * @param {MouseEvent} e The mouse event.
+	 */
+	#OnMouseMoveTablePicker(e) {
+		e.stopPropagation();
+
+		let x = Math.ceil(e.offsetX / 18);
+		let y = Math.ceil(e.offsetY / 18);
+		x = x < 1 ? 1 : x;
+		y = y < 1 ? 1 : y;
+
+		if (this.options.get('_rtl')) {
+			this.tableHighlight.style.left = x * 18 - 13 + 'px';
+			x = 11 - x;
+		}
+
+		this.tableHighlight.style.width = x + 'em';
+		this.tableHighlight.style.height = y + 'em';
+
+		const x_u = x < 5 ? 5 : x > 8 ? 10 : x + 2;
+		const y_u = y < 5 ? 5 : y > 8 ? 10 : y + 2;
+		this.tableUnHighlight.style.width = x_u + 'em';
+		this.tableUnHighlight.style.height = y_u + 'em';
+
+		domUtils.changeTxt(this.tableDisplay, x + ' x ' + y);
+		this._tableXY = [x, y];
+	}
+
+	/**
+	 * @description Executes the selected action when the table picker is clicked.
+	 */
+	#OnClickTablePicker() {
+		this.action();
+	}
+
+	/**
+	 * @description Handles multi-selection of table cells.
+	 * @param {MouseEvent} e The mouse event.
+	 */
+	#OnCellMultiSelect(e) {
+		this.editor._preventBlur = true;
+		const target = domUtils.getParentElement(domUtils.getEventTarget(e), domUtils.isTableCell);
+
+		if (this._shift) {
+			if (target === this._fixedCell) {
+				this._shift = false;
+				this._deleteStyleSelectedCells();
+				this._toggleEditor(true);
+				this.__removeGlobalEvents();
+				return;
+			} else {
+				this._toggleEditor(false);
+			}
+		} else if (!this._ref) {
+			if (target === this._fixedCell) return;
+			else this._toggleEditor(false);
+		}
+
+		if (!target || target === this._selectedCell || this._fixedCellName !== target.nodeName || this._selectedTable !== domUtils.getParentElement(target, 'TABLE')) {
+			return;
+		}
+
+		this._selectedCell = target;
+		this._setMultiCells(this._fixedCell, target);
+	}
+
+	/**
+	 * @description Stops multi-selection of table cells.
+	 * @param {MouseEvent} e The mouse event.
+	 */
+	#OffCellMultiSelect(e) {
+		e.stopPropagation();
+
+		if (!this._shift) {
+			this.__removeGlobalEvents();
+			this._toggleEditor(true);
+		} else if (this.__globalEvents.touchOff) {
+			this.__globalEvents.touchOff = this.eventManager.removeGlobalEvent(this.__globalEvents.touchOff);
+		}
+
+		if (!this._fixedCell || !this._selectedTable) return;
+
+		this._setMergeSplitButton(!!this._fixedCell, !!this._selectedCell);
+		this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
+
+		const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
+		this._setController(focusCell);
+	}
+
+	/**
+	 * @description Handles the removal of shift-based selection.
+	 */
+	#OffCellShift() {
+		if (!this._ref) this._closeController();
+	}
+
+	/**
+	 * @description Handles the removal of touch-based selection.
+	 */
+	#OffCellTouch() {
+		this.close();
 	}
 }
 
@@ -2512,352 +2843,6 @@ function CreateCellsHTML(nodeName) {
 	nodeName = nodeName.toLowerCase();
 	return domUtils.createElement(nodeName, null, '<div><br></div>');
 }
-
-// -------------------------------- event functions [START] ----------------------------------------------------------------
-/**
- * @private
- * @this {Table}
- * @description Splits a table cell either vertically or horizontally.
- * @param {"vertical"|"horizontal"} direction The direction to split the cell.
- */
-function OnSplitCells(direction) {
-	const vertical = direction === 'vertical';
-	const currentCell = this._tdElement;
-	const rows = this._trElements;
-	const currentRow = this._trElement;
-	const index = this._logical_cellIndex;
-	const rowIndex = this._rowIndex;
-	const newCell = CreateCellsHTML(currentCell.nodeName);
-
-	// vertical
-	if (vertical) {
-		const currentColSpan = currentCell.colSpan;
-		newCell.rowSpan = currentCell.rowSpan;
-
-		// colspan > 1
-		if (currentColSpan > 1) {
-			newCell.colSpan = Math.floor(currentColSpan / 2);
-			currentCell.colSpan = currentColSpan - newCell.colSpan;
-			currentRow.insertBefore(newCell, currentCell.nextElementSibling);
-		} else {
-			// colspan - 1
-			let rowSpanArr = [];
-			let spanIndex = [];
-
-			for (let i = 0, len = this._rowCnt, cells, colSpan; i < len; i++) {
-				cells = rows[i].cells;
-				colSpan = 0;
-				for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
-					cell = cells[c];
-					cs = cell.colSpan - 1;
-					rs = cell.rowSpan - 1;
-					logcalIndex = c + colSpan;
-
-					if (spanIndex.length > 0) {
-						for (let r = 0, arr; r < spanIndex.length; r++) {
-							arr = spanIndex[r];
-							if (arr.row > i) continue;
-							if (logcalIndex >= arr.index) {
-								colSpan += arr.cs;
-								logcalIndex += arr.cs;
-								arr.rs -= 1;
-								arr.row = i + 1;
-								if (arr.rs < 1) {
-									spanIndex.splice(r, 1);
-									r--;
-								}
-							} else if (c === cLen - 1) {
-								arr.rs -= 1;
-								arr.row = i + 1;
-								if (arr.rs < 1) {
-									spanIndex.splice(r, 1);
-									r--;
-								}
-							}
-						}
-					}
-
-					if (logcalIndex <= index && rs > 0) {
-						rowSpanArr.push({
-							index: logcalIndex,
-							cs: cs + 1,
-							rs: rs,
-							row: -1
-						});
-					}
-
-					if (cell !== currentCell && logcalIndex <= index && logcalIndex + cs >= index + currentColSpan - 1) {
-						cell.colSpan += 1;
-						break;
-					}
-
-					if (logcalIndex > index) break;
-
-					colSpan += cs;
-				}
-
-				spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {
-					return a.index - b.index;
-				});
-				rowSpanArr = [];
-			}
-
-			currentRow.insertBefore(newCell, currentCell.nextElementSibling);
-		}
-	} else {
-		// horizontal
-		const currentRowSpan = currentCell.rowSpan;
-		newCell.colSpan = currentCell.colSpan;
-
-		// rowspan > 1
-		if (currentRowSpan > 1) {
-			newCell.rowSpan = Math.floor(currentRowSpan / 2);
-			const newRowSpan = currentRowSpan - newCell.rowSpan;
-
-			const rowSpanArr = [];
-			const nextRowIndex = domUtils.getArrayIndex(rows, currentRow) + newRowSpan;
-
-			for (let i = 0, cells, colSpan; i < nextRowIndex; i++) {
-				cells = rows[i].cells;
-				colSpan = 0;
-				for (let c = 0, cLen = cells.length, cell, cs, logcalIndex; c < cLen; c++) {
-					logcalIndex = c + colSpan;
-					if (logcalIndex >= index) break;
-
-					cell = cells[c];
-					cs = cell.rowSpan - 1;
-					if (cs > 0 && cs + i >= nextRowIndex && logcalIndex < index) {
-						rowSpanArr.push({
-							index: logcalIndex,
-							cs: cell.colSpan
-						});
-					}
-					colSpan += cell.colSpan - 1;
-				}
-			}
-
-			const nextRow = rows[nextRowIndex];
-			const nextCells = nextRow.cells;
-			let rs = rowSpanArr.shift();
-
-			for (let c = 0, cLen = nextCells.length, colSpan = 0, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
-				logcalIndex = c + colSpan;
-				cell = nextCells[c];
-				cs = cell.colSpan - 1;
-				insertIndex = logcalIndex + cs + 1;
-
-				if (rs && insertIndex >= rs.index) {
-					colSpan += rs.cs;
-					insertIndex += rs.cs;
-					rs = rowSpanArr.shift();
-				}
-
-				if (insertIndex >= index || c === cLen - 1) {
-					nextRow.insertBefore(newCell, cell.nextElementSibling);
-					break;
-				}
-
-				colSpan += cs;
-			}
-
-			currentCell.rowSpan = newRowSpan;
-		} else {
-			// rowspan - 1
-			newCell.rowSpan = currentCell.rowSpan;
-			const newRow = domUtils.createElement('TR');
-			newRow.appendChild(newCell);
-
-			for (let i = 0, cells; i < rowIndex; i++) {
-				cells = rows[i].cells;
-				if (cells.length === 0) return;
-
-				for (let c = 0, cLen = cells.length; c < cLen; c++) {
-					if (i + cells[c].rowSpan - 1 >= rowIndex) {
-						cells[c].rowSpan += 1;
-					}
-				}
-			}
-
-			const physicalIndex = this._physical_cellIndex;
-			const cells = currentRow.cells;
-
-			for (let c = 0, cLen = cells.length; c < cLen; c++) {
-				if (c === physicalIndex) continue;
-				cells[c].rowSpan += 1;
-			}
-
-			currentRow.parentNode.insertBefore(newRow, currentRow.nextElementSibling);
-		}
-	}
-
-	this.selectMenu_split.close();
-	this.editor.focusEdge(currentCell);
-
-	this._deleteStyleSelectedCells();
-	this.history.push(false);
-
-	this._setController(currentCell);
-	this._selectedCell = this._fixedCell = currentCell;
-}
-
-/**
- * @private
- * @this {Table}
- * @description Handles column operations such as insert and delete.
- * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
- */
-function OnColumnEdit(command) {
-	switch (command) {
-		case 'insert-left':
-			this.editTable('cell', 'left');
-			break;
-		case 'insert-right':
-			this.editTable('cell', 'right');
-			break;
-		case 'delete':
-			this.editTable('cell', null);
-	}
-
-	this._historyPush();
-}
-
-/**
- * @private
- * @this {Table}
- * @description Handles row operations such as insert and delete.
- * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
- */
-function OnRowEdit(command) {
-	switch (command) {
-		case 'insert-above':
-			this.editTable('row', 'up');
-			break;
-		case 'insert-below':
-			this.editTable('row', 'down');
-			break;
-		case 'delete':
-			this.editTable('row', null);
-	}
-
-	this._historyPush();
-}
-
-/**
- * @private
- * @this {Table}
- * @description Handles mouse movement within the table picker.
- * @param {MouseEvent} e The mouse event.
- */
-function OnMouseMoveTablePicker(e) {
-	e.stopPropagation();
-
-	let x = Math.ceil(e.offsetX / 18);
-	let y = Math.ceil(e.offsetY / 18);
-	x = x < 1 ? 1 : x;
-	y = y < 1 ? 1 : y;
-
-	if (this.options.get('_rtl')) {
-		this.tableHighlight.style.left = x * 18 - 13 + 'px';
-		x = 11 - x;
-	}
-
-	this.tableHighlight.style.width = x + 'em';
-	this.tableHighlight.style.height = y + 'em';
-
-	const x_u = x < 5 ? 5 : x > 8 ? 10 : x + 2;
-	const y_u = y < 5 ? 5 : y > 8 ? 10 : y + 2;
-	this.tableUnHighlight.style.width = x_u + 'em';
-	this.tableUnHighlight.style.height = y_u + 'em';
-
-	domUtils.changeTxt(this.tableDisplay, x + ' x ' + y);
-	this._tableXY = [x, y];
-}
-
-/**
- * @private
- * @this {Table}
- * @description Executes the selected action when the table picker is clicked.
- */
-function OnClickTablePicker() {
-	this.action();
-}
-
-/**
- * @private
- * @this {Table}
- * @description Handles multi-selection of table cells.
- * @param {MouseEvent} e The mouse event.
- */
-function OnCellMultiSelect(e) {
-	this.editor._preventBlur = true;
-	const target = domUtils.getParentElement(domUtils.getEventTarget(e), domUtils.isTableCell);
-
-	if (this._shift) {
-		if (target === this._fixedCell) {
-			this._shift = false;
-			this._deleteStyleSelectedCells();
-			this._toggleEditor(true);
-			this.__removeGlobalEvents();
-			return;
-		} else {
-			this._toggleEditor(false);
-		}
-	} else if (!this._ref) {
-		if (target === this._fixedCell) return;
-		else this._toggleEditor(false);
-	}
-
-	if (!target || target === this._selectedCell || this._fixedCellName !== target.nodeName || this._selectedTable !== domUtils.getParentElement(target, 'TABLE')) {
-		return;
-	}
-
-	this._selectedCell = target;
-	this._setMultiCells(this._fixedCell, target);
-}
-
-/**
- * @private
- * @this {Table}
- * @description Stops multi-selection of table cells.
- * @param {MouseEvent} e The mouse event.
- */
-function OffCellMultiSelect(e) {
-	e.stopPropagation();
-
-	if (!this._shift) {
-		this.__removeGlobalEvents();
-		this._toggleEditor(true);
-	} else if (this.__globalEvents.touchOff) {
-		this.__globalEvents.touchOff = this.eventManager.removeGlobalEvent(this.__globalEvents.touchOff);
-	}
-
-	if (!this._fixedCell || !this._selectedTable) return;
-
-	this._setMergeSplitButton(!!this._fixedCell, !!this._selectedCell);
-	this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
-
-	const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
-	this._setController(focusCell);
-}
-
-/**
- * @private
- * @this {Table}
- * @description Handles the removal of shift-based selection.
- */
-function OffCellShift() {
-	if (!this._ref) this._closeController();
-}
-
-/**
- * @private
- * @this {Table}
- * @description Handles the removal of touch-based selection.
- */
-function OffCellTouch() {
-	this.close();
-}
-// -------------------------------- event functions [END] ----------------------------------------------------------------
 
 /**
  * @private

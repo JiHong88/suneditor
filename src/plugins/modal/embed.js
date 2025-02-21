@@ -1,46 +1,51 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure } from '../../modules';
 import { domUtils, numbers, env } from '../../helper';
-const { NO_EVENT, _w } = env;
+const { NO_EVENT } = env;
 
 /**
  * @typedef {import('../../core/base/events').ProcessInfo} ProcessInfo
  */
 
 /**
+ * @typedef {import('../../modules/Figure').FigureControls} FigureControls
+ */
+
+/**
  * @typedef {Object} EmbedPluginOptions
- * @property {boolean=} [canResize=true] - Whether the embed element can be resized.
- * @property {boolean=} [showHeightInput=true] - Whether to display the height input field.
- * @property {string=} defaultWidth - The default width of the embed element (numeric value or with unit).
- * @property {string=} defaultHeight - The default height of the embed element (numeric value or with unit).
- * @property {boolean=} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
- * @property {string=} uploadUrl - The URL for file uploads.
- * @property {Object<string, string>=} uploadHeaders - Headers to include in file upload requests.
- * @property {number=} uploadSizeLimit - The total file upload size limit in bytes.
- * @property {number=} uploadSingleSizeLimit - The single file upload size limit in bytes.
- * @property {Object<string, string>=} iframeTagAttributes - Additional attributes to set on the iframe tag.
- * @property {string=} query_youtube - YouTube query parameter (optional).
- * @property {string=} query_vimeo - Vimeo query parameter (optional).
- * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>=} embedQuery - Custom query objects for additional embedding services.
+ * @property {boolean} [canResize=true] - Whether the embed element can be resized.
+ * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
+ * @property {string} [defaultWidth] - The default width of the embed element (numeric value or with unit).
+ * @property {string} [defaultHeight] - The default height of the embed element (numeric value or with unit).
+ * @property {boolean} [percentageOnlySize=false] - Whether to allow only percentage-based sizing.
+ * @property {string} [uploadUrl] - The URL for file uploads.
+ * @property {Object<string, string>} [uploadHeaders] - Headers to include in file upload requests.
+ * @property {number} [uploadSizeLimit] - The total file upload size limit in bytes.
+ * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
+ * @property {Object<string, string>} [iframeTagAttributes] - Additional attributes to set on the iframe tag.
+ * @property {string} [query_youtube] - YouTube query parameter.
+ * @property {string} [query_vimeo] - Vimeo query parameter.
+ * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for embed.
+ * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
  * Example :
  * {
  *   facebook: {
  *     pattern: /(?:https?:\/\/)?(?:www\.)?(?:facebook\.com)\/(.+)/i,
  *     action: (url) => {
- *       return `https://www.facebook.com/plugins/post.php?href=${_w.encodeURIComponent(url)}&show_text=true&width=500`;
+ *       return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=true&width=500`;
  *     },
  *     tag: 'iframe'
  *   },
  *   twitter: {
  *     pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(status|embed)\/(.+)/i,
  *     action: (url) => {
- *       return `https://platform.twitter.com/embed/Tweet.html?url=${_w.encodeURIComponent(url)}`;
+ *       return `https://platform.twitter.com/embed/Tweet.html?url=${encodeURIComponent(url)}`;
  *     },
  *     tag: 'iframe'
  *   },
  *   // Additional services...
  * }
- * @property {Array<string>} controls - Figure control configurations.
+ * @property {FigureControls} [controls] - Figure controls.
  */
 
 /**
@@ -52,6 +57,11 @@ class Embed extends EditorInjector {
 	static key = 'embed';
 	static type = 'modal';
 	static className = '';
+	/**
+	 * @this {Embed}
+	 * @param {Node} node - The node to check.
+	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 */
 	static component(node) {
 		let src = '';
 		if (/^IFRAME$/i.test(node?.nodeName)) src = node.src;
@@ -109,6 +119,8 @@ class Embed extends EditorInjector {
 		this.previewSrc = modalEl.querySelector('.se-link-preview');
 		this._linkValue = '';
 		this._align = 'none';
+		this._defaultSizeX = this.pluginOptions.defaultWidth;
+		this._defaultSizeY = this.pluginOptions.defaultHeight;
 		this.sizeUnit = sizeUnit;
 		this.proportion = {};
 		this.inputX = {};
@@ -126,14 +138,14 @@ class Embed extends EditorInjector {
 			facebook: {
 				pattern: /(?:https?:\/\/)?(?:www\.)?(?:facebook\.com)\/(.+)/i,
 				action: (url) => {
-					return `https://www.facebook.com/plugins/post.php?href=${_w.encodeURIComponent(url)}&show_text=true&width=500`;
+					return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=true&width=500`;
 				},
 				tag: 'iframe'
 			},
 			twitter: {
 				pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(status|embed)\/(.+)/i,
 				action: (url) => {
-					return `https://platform.twitter.com/embed/Tweet.html?url=${_w.encodeURIComponent(url)}`;
+					return `https://platform.twitter.com/embed/Tweet.html?url=${encodeURIComponent(url)}`;
 				},
 				tag: 'iframe'
 			},
@@ -148,7 +160,7 @@ class Embed extends EditorInjector {
 			linkedin: {
 				pattern: /(?:https?:\/\/)?(?:www\.)?(?:linkedin\.com)\/(.+)\/(.+)/i,
 				action: (url) => {
-					return `https://www.linkedin.com/embed/feed/update/${_w.encodeURIComponent(url.split('/').pop())}`;
+					return `https://www.linkedin.com/embed/feed/update/${encodeURIComponent(url.split('/').pop())}`;
 				},
 				tag: 'iframe'
 			},
@@ -188,7 +200,7 @@ class Embed extends EditorInjector {
 		this.urlPatterns = urlPatterns.concat(pluginOptions.urlPatterns || []);
 
 		// init
-		this.eventManager.addEvent(this.embedInput, 'input', OnLinkPreview.bind(this));
+		this.eventManager.addEvent(this.embedInput, 'input', this.#OnLinkPreview.bind(this));
 
 		if (this._resizing) {
 			this.proportion = modalEl.querySelector('._se_check_proportion');
@@ -197,9 +209,9 @@ class Embed extends EditorInjector {
 			this.inputX.value = this.pluginOptions.defaultWidth;
 			this.inputY.value = this.pluginOptions.defaultHeight;
 
-			this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
-			this.eventManager.addEvent(this.inputY, 'keyup', OnInputSize.bind(this, 'y'));
-			this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
+			this.eventManager.addEvent(this.inputX, 'keyup', this.#OnInputSize.bind(this, 'x'));
+			this.eventManager.addEvent(this.inputY, 'keyup', this.#OnInputSize.bind(this, 'y'));
+			this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', this.#OnClickRevert.bind(this));
 		}
 	}
 
@@ -214,7 +226,6 @@ class Embed extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Controller(Figure)
 	 * @description Executes the method that is called when a target component is edited.
-	 * @param {Element} target Target element
 	 */
 	edit() {
 		this.modal.open();
@@ -303,7 +314,7 @@ class Embed extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {Element} target Target component element
+	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
 		this._ready(target);
@@ -314,7 +325,7 @@ class Embed extends EditorInjector {
 	 * @description Prepares the component for selection.
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {Element} target - The selected element.
+	 * @param {Node} target - The selected element.
 	 */
 	_ready(target) {
 		if (!target) return;
@@ -327,8 +338,8 @@ class Embed extends EditorInjector {
 		this._align = figureInfo.align;
 		target.style.float = '';
 
-		this._origin_w = figureInfo.originWidth || figureInfo.w || '';
-		this._origin_h = figureInfo.originHeight || figureInfo.h || '';
+		this._origin_w = String(figureInfo.originWidth || figureInfo.w || '');
+		this._origin_h = String(figureInfo.originHeight || figureInfo.h || '');
 
 		(this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]')).checked = true;
 
@@ -363,11 +374,11 @@ class Embed extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Element} target Target element
+	 * @param {Node} target Target element
 	 * @returns {Promise<void>}
 	 */
-	async destroy(element) {
-		const targetEl = element || this._element;
+	async destroy(target) {
+		const targetEl = target || this._element;
 		const container = domUtils.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
@@ -453,7 +464,7 @@ class Embed extends EditorInjector {
 
 		const handler = function (infos, newInfos) {
 			infos = newInfos || infos;
-			this._create(infos.process, infos.process ? infos.url : infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
+			this._create(infos.process, infos.url, infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
 		}.bind(this, embedInfo);
 
 		const result = await this.triggerEvent('onEmbedInputBefore', {
@@ -470,6 +481,11 @@ class Embed extends EditorInjector {
 		return true;
 	}
 
+	/**
+	 * @private
+	 * @description Creates an iframe element for embedding external content.
+	 * @returns {Node} The created iframe element.
+	 */
 	_createIframeTag() {
 		const iframeTag = domUtils.createElement('IFRAME');
 		this._setIframeAttrs(iframeTag);
@@ -478,8 +494,8 @@ class Embed extends EditorInjector {
 
 	/**
 	 * @private
-	 * @description Creates an iframe element for embedding external content.
-	 * @returns {Element} The created iframe element.
+	 * @description Creates an blockquote element for embedding external content.
+	 * @returns {Node} The created iframe element.
 	 */
 	_createEmbedTag() {
 		const quoteTag = domUtils.createElement('BLOCKQUOTE');
@@ -489,14 +505,15 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
-	 * @param {ProcessInfo|null} process - Processed embed information.
-	 * @param {string|Element[]} src - The source URL or embed elements.
+	 * @param {?ProcessInfo} process - Processed embed information.
+	 * @param {?string} src - The source URL.
+	 * @param {?Node[]} children - The embed elements.
 	 * @param {string} width - The width of the embed component.
 	 * @param {string} height - The height of the embed component.
 	 * @param {string} align - The alignment of the embed component.
 	 * @param {boolean} isUpdate - Whether this is an update to an existing embed component.
 	 */
-	_create(process, src, width, height, align, isUpdate) {
+	_create(process, src, children, width, height, align, isUpdate) {
 		let oFrame = null;
 		let cover = null;
 		let container = null;
@@ -532,18 +549,18 @@ class Embed extends EditorInjector {
 				cover = figure.cover;
 				container = figure.container;
 			} else {
-				oFrame = src[0];
+				oFrame = children[0];
 				const figure = Figure.CreateContainer(oFrame, 'se-embed-container');
 				cover = figure.cover;
 				container = figure.container;
 				let index = 0;
-				while (src[index]) {
-					if (/^script$/i.test(src[index].nodeName)) {
-						scriptTag = domUtils.createElement('script', { src: src[index].src, async: true }, null);
+				while (children[index]) {
+					if (/^script$/i.test(children[index].nodeName)) {
+						scriptTag = domUtils.createElement('script', { src: children[index].src, async: 'true' }, null);
 						index++;
 						continue;
 					}
-					cover.appendChild(src[index]);
+					cover.appendChild(children[index]);
 				}
 			}
 		}
@@ -618,7 +635,7 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Updates an existing embed component within the editor.
-	 * @param {Element} oFrame - The existing embed element to be updated.
+	 * @param {Node} oFrame - The existing embed element to be updated.
 	 */
 	_update(oFrame) {
 		if (!oFrame) return;
@@ -665,8 +682,8 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Applies width and height to the embed component.
-	 * @param {string} w - The width to apply.
-	 * @param {string} h - The height to apply.
+	 * @param {string|number} w - The width to apply.
+	 * @param {string|number} h - The height to apply.
 	 */
 	_applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
@@ -701,7 +718,7 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets default attributes for an iframe element.
-	 * @param {Element} element - The iframe element to modify.
+	 * @param {Node} element - The iframe element to modify.
 	 */
 	_setIframeAttrs(element) {
 		element.frameBorder = '0';
@@ -714,52 +731,58 @@ class Embed extends EditorInjector {
 			element.setAttribute(key, attrs[key]);
 		}
 	}
-}
 
-function OnLinkPreview(e) {
-	const value = e.target.value.trim();
-	if (/^<iframe.*\/iframe>$/.test(value)) {
-		this._linkValue = value;
-		this.previewSrc.textContent = '<IFrame :src=".."></IFrame>';
-	} else {
-		this._linkValue = this.previewSrc.textContent = !value
-			? ''
-			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-			? this.options.get('defaultUrlProtocol') + value
-			: !value.includes('://')
-			? '/' + value
-			: value;
-	}
-}
-
-function OnClickRevert() {
-	if (this._onlyPercentage) {
-		this.inputX.value = this._origin_w > 100 ? 100 : this._origin_w;
-	} else {
-		this.inputX.value = this._origin_w;
-		this.inputY.value = this._origin_h;
-	}
-}
-
-function OnInputSize(xy, e) {
-	if (e.keyCode === 32) {
-		e.preventDefault();
-		return;
-	}
-
-	if (xy === 'x' && this._onlyPercentage && e.target.value > 100) {
-		e.target.value = 100;
-	} else if (this.proportion.checked) {
-		const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
-		if (xy === 'x') {
-			this.inputY.value = ratioSize.h;
+	/**
+	 * @description Handles link preview input changes.
+	 * @param {InputEvent} e - Event object
+	 */
+	#OnLinkPreview(e) {
+		const eventTarget = domUtils.getEventTarget(e);
+		const value = eventTarget.value.trim();
+		if (/^<iframe.*\/iframe>$/.test(value)) {
+			this._linkValue = value;
+			this.previewSrc.textContent = '<IFrame :src=".."></IFrame>';
 		} else {
-			this.inputX.value = ratioSize.w;
+			this._linkValue = this.previewSrc.textContent = !value
+				? ''
+				: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
+				? this.options.get('defaultUrlProtocol') + value
+				: !value.includes('://')
+				? '/' + value
+				: value;
 		}
 	}
 
-	if (xy === 'y') {
-		this._setRatioSelect(e.target.value || this._defaultRatio);
+	#OnClickRevert() {
+		if (this._onlyPercentage) {
+			this.inputX.value = Number(this._origin_w) > 100 ? 100 : this._origin_w;
+		} else {
+			this.inputX.value = this._origin_w;
+			this.inputY.value = this._origin_h;
+		}
+	}
+
+	/**
+	 * @param {"x"|"y"} xy - x or y
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#OnInputSize(xy, e) {
+		if (e.keyCode === 32) {
+			e.preventDefault();
+			return;
+		}
+
+		const eventTarget = domUtils.getEventTarget(e);
+		if (xy === 'x' && this._onlyPercentage && Number(eventTarget.value) > 100) {
+			eventTarget.value = '100';
+		} else if (this.proportion.checked) {
+			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
+			if (xy === 'x') {
+				this.inputY.value = ratioSize.h;
+			} else {
+				this.inputX.value = ratioSize.w;
+			}
+		}
 	}
 }
 

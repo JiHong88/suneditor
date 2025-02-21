@@ -13,6 +13,11 @@ class HR extends EditorInjector {
 	static key = 'hr';
 	static type = 'dropdown';
 	static className = '';
+	/**
+	 * @this {HR}
+	 * @param {Node} node - The node to check.
+	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 */
 	static component(node) {
 		return /^hr$/i.test(node?.nodeName) ? node : null;
 	}
@@ -60,7 +65,7 @@ class HR extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
+	 * @param {Node} target Target element
 	 */
 	destroy(target) {
 		if (!target) return;
@@ -77,7 +82,7 @@ class HR extends EditorInjector {
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {?Element} target - The plugin's toolbar button element
+	 * @param {HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
 		const hr = this.submit(target.firstElementChild.className);
@@ -91,9 +96,9 @@ class HR extends EditorInjector {
 	 * @description Executes methods called by shortcut keys.
 	 * @param {Object} params - Information of the "shortcut" plugin
 	 * @param {Range} params.range - Range object
-	 * @param {Element} params.line - The line element of the current range
+	 * @param {HTMLElement} params.line - The line element of the current range
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
-	 * @param {Event} params.event - Key event object
+	 * @param {KeyboardEvent} params.event - Key event object
 	 * @param {number} params.keyCode - Key code
 	 * @param {EditorCore} params.editor - The root editor instance
 	 */

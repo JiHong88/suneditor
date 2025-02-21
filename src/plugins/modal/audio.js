@@ -10,17 +10,17 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 /**
  * @typedef {Object} AudioPluginOptions
- * @property {string=} [defaultWidth="300px"] - The default width of the audio tag (e.g., "300px").
- * @property {string=} [defaultHeight="150px"] - The default height of the audio tag (e.g., "150px").
- * @property {boolean=} createFileInput - Whether to create a file input element.
- * @property {boolean=} createUrlInput - Whether to create a URL input element (default is true if file input is not created).
- * @property {string=} uploadUrl - The URL to which files will be uploaded.
- * @property {Object<string, string>=} uploadHeaders - Headers to include in the file upload request.
- * @property {number=} uploadSizeLimit - The total upload size limit in bytes.
- * @property {number=} uploadSingleSizeLimit - The single file size limit in bytes.
- * @property {boolean=} allowMultiple - Whether to allow multiple file uploads.
- * @property {string=} [acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
- * @property {Object<string, string>=} audioTagAttributes - Additional attributes to set on the audio tag.
+ * @property {string} [defaultWidth="300px"] - The default width of the audio tag (e.g., "300px").
+ * @property {string} [defaultHeight="150px"] - The default height of the audio tag (e.g., "150px").
+ * @property {boolean} [createFileInput] - Whether to create a file input element.
+ * @property {boolean} [createUrlInput] - Whether to create a URL input element (default is true if file input is not created).
+ * @property {string} [uploadUrl] - The URL to which files will be uploaded.
+ * @property {Object<string, string>} [uploadHeaders] - Headers to include in the file upload request.
+ * @property {number} [uploadSizeLimit] - The total upload size limit in bytes.
+ * @property {number} [uploadSingleSizeLimit] - The single file size limit in bytes.
+ * @property {boolean} [allowMultiple] - Whether to allow multiple file uploads.
+ * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
+ * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the audio tag.
  */
 
 /**
@@ -31,6 +31,11 @@ class Audio_ extends EditorInjector {
 	static key = 'audio';
 	static type = 'modal';
 	static className = '';
+	/**
+	 * @this {Audio_}
+	 * @param {Node} node - The node to check.
+	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 */
 	static component(node) {
 		return /^AUDIO$/i.test(node?.nodeName) ? node : null;
 	}
@@ -86,17 +91,17 @@ class Audio_ extends EditorInjector {
 		this._element = null;
 
 		const galleryButton = modalEl.querySelector('.__se__gallery');
-		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', OpenGallery.bind(this));
+		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
 		// init
 		if (this.audioInputFile) {
-			this.eventManager.addEvent(modalEl.querySelector('.se-modal-files-edge-button'), 'click', RemoveSelectedFiles.bind(this.audioInputFile, this.audioUrlFile, this.preview));
+			this.eventManager.addEvent(modalEl.querySelector('.se-modal-files-edge-button'), 'click', this.#RemoveSelectedFiles.bind(this, this.audioUrlFile, this.preview));
 			if (this.audioUrlFile) {
-				this.eventManager.addEvent(this.audioInputFile, 'change', FileInputChange.bind(this));
+				this.eventManager.addEvent(this.audioInputFile, 'change', this.#FileInputChange.bind(this));
 			}
 		}
 		if (this.audioUrlFile) {
-			this.eventManager.addEvent(this.audioUrlFile, 'input', OnLinkPreview.bind(this));
+			this.eventManager.addEvent(this.audioUrlFile, 'input', this.#OnLinkPreview.bind(this));
 		}
 	}
 
@@ -129,7 +134,7 @@ class Audio_ extends EditorInjector {
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
 	 * @param {FrameContext} params.frameContext Frame context
-	 * @param {Event} params.event Event object
+	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
@@ -145,13 +150,13 @@ class Audio_ extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {boolean} Success or failure
+	 * @returns {Promise<boolean>} Success or failure
 	 */
-	modalAction() {
+	async modalAction() {
 		if (this.audioInputFile && this.audioInputFile?.files.length > 0) {
-			return this.submitFile(this.audioInputFile.files);
+			return await this.submitFile(this.audioInputFile.files);
 		} else if (this.audioUrlFile && this.urlValue.length > 0) {
-			return this.submitURL(this.urlValue);
+			return await this.submitURL(this.urlValue);
 		}
 		return false;
 	}
@@ -173,7 +178,7 @@ class Audio_ extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {Element} target Target button element
+	 * @param {Node} target Target button element
 	 */
 	controllerAction(target) {
 		if (/update/.test(target.getAttribute('data-command'))) {
@@ -224,7 +229,7 @@ class Audio_ extends EditorInjector {
 	 * @description Prepares the component for selection.
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {Element} target - The selected element.
+	 * @param {Node} target - The selected element.
 	 */
 	_ready(target) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
@@ -235,11 +240,11 @@ class Audio_ extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
+	 * @param {Node=} target Target element, if null current selected element
 	 * @returns {Promise<void>}
 	 */
-	async destroy(element) {
-		element = element || this._element;
+	async destroy(target) {
+		const element = target || this._element;
 		const figure = Figure.GetContainer(element);
 		const container = figure.container || element;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
@@ -288,16 +293,15 @@ class Audio_ extends EditorInjector {
 
 	/**
 	 * @description Create an "audio" component using the provided files.
-	 * @param {FileList} fileList File object list
-	 * @returns {boolean} If return false, the file upload will be canceled
-	 * @returns {Promise<boolean>}
+	 * @param {FileList|File[]} fileList File object list
+	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitFile(fileList) {
 		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
 		const files = [];
-		const slngleSizeLimit = this.uploadSingleSizeLimit;
+		const slngleSizeLimit = this.pluginOptions.uploadSingleSizeLimit;
 		for (let i = 0, len = fileList.length, f, s; i < len; i++) {
 			f = fileList[i];
 			if (!/audio/i.test(f.type)) continue;
@@ -396,7 +400,7 @@ class Audio_ extends EditorInjector {
 	 * @description Creates or updates an audio component within the editor.
 	 * - If `isUpdate` is `true`, updates the existing element's `src`.
 	 * - Otherwise, inserts a new audio component with the given file.
-	 * @param {Element} element - The target audio element.
+	 * @param {Node} element - The target audio element.
 	 * @param {string} src - The source URL of the audio file.
 	 * @param {{name: string, size: number}} file - The file metadata (name, size).
 	 * @param {boolean} isUpdate - Whether to update an existing element.
@@ -434,7 +438,7 @@ class Audio_ extends EditorInjector {
 	 * @private
 	 * @description Creates a new `<audio>` element with default attributes.
 	 * - Applies width, height, and additional attributes from plugin options.
-	 * @returns {Element} - The newly created `<audio>` element.
+	 * @returns {HTMLElement} - The newly created `<audio>` element.
 	 */
 	_createAudioTag() {
 		const w = this.defaultWidth;
@@ -448,7 +452,7 @@ class Audio_ extends EditorInjector {
 	 * @private
 	 * @description Sets attributes on an audio element based on plugin options.
 	 * - Adds the `controls` attribute and applies any custom attributes.
-	 * @param {Element} element - The `<audio>` element to modify.
+	 * @param {Node} element - The `<audio>` element to modify.
 	 */
 	_setTagAttrs(element) {
 		element.setAttribute('controls', 'true');
@@ -466,18 +470,17 @@ class Audio_ extends EditorInjector {
 	 * @description Uploads audio files to the server.
 	 * - Sends a request to the configured upload URL and processes the response.
 	 * @param {AudioInfo} info - Upload metadata, including `files` and `isUpdate`.
-	 * @param {FileList} files - The files to be uploaded.
+	 * @param {FileList|File[]} files - The files to be uploaded.
 	 */
 	_serverUpload(info, files) {
 		if (!files) return;
 
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
-		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, UploadCallBack.bind(this, info), this._error.bind(this));
+		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, this.#UploadCallBack.bind(this, info), this._error.bind(this));
 	}
 
 	/**
 	 * @private
-	 * @async
 	 * @description Handles errors that occur during the audio upload process.
 	 * - Triggers the `onAudioUploadError` event to allow custom handling of errors.
 	 * - Displays an error message in the editor's UI.
@@ -491,86 +494,90 @@ class Audio_ extends EditorInjector {
 		this.ui.noticeOpen(err);
 		console.error('[SUNEDITOR.plugin.audio.error]', err);
 	}
-}
 
-/**
- * @description Handles the server response after a file upload.
- * - If the upload is successful, registers the uploaded audio.
- * - If an error occurs, triggers an error event.
- * @param {AudioInfo} info - Upload metadata.
- * @param {XMLHttpRequest} xmlHttp - The completed XHR request.
- */
-async function UploadCallBack(info, xmlHttp) {
-	if ((await this.triggerEvent('audioUploadHandler', { xmlHttp, info })) === NO_EVENT) {
-		const response = JSON.parse(xmlHttp.responseText);
-		if (response.errorMessage) {
-			this._error(response);
-		} else {
-			this._register(info, response);
+	/**
+	 * @description Handles the server response after a file upload.
+	 * - If the upload is successful, registers the uploaded audio.
+	 * - If an error occurs, triggers an error event.
+	 * @param {AudioInfo} info - Upload metadata.
+	 * @param {XMLHttpRequest} xmlHttp - The completed XHR request.
+	 */
+	async #UploadCallBack(info, xmlHttp) {
+		if ((await this.triggerEvent('audioUploadHandler', { xmlHttp, info })) === NO_EVENT) {
+			const response = JSON.parse(xmlHttp.responseText);
+			if (response.errorMessage) {
+				this._error(response);
+			} else {
+				this._register(info, response);
+			}
 		}
 	}
-}
 
-/**
- * @private
- * @description Updates the preview text for the entered audio URL.
- * - Formats the URL correctly based on the editor’s settings.
- * @param {Event} e - The input event triggered when the user types a URL.
- */
-function OnLinkPreview(e) {
-	const value = e.target.value.trim();
-	this.urlValue = this.preview.textContent = !value
-		? ''
-		: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-		? this.options.get('defaultUrlProtocol') + value
-		: !value.includes('://')
-		? '/' + value
-		: value;
-}
-
-/**
- * @private
- * @description Opens the audio gallery plugin, if available.
- * - Calls a function to populate the URL input with the selected audio file.
- */
-function OpenGallery() {
-	this.plugins.audioGallery.open(_setUrlInput.bind(this));
-}
-
-function _setUrlInput(target) {
-	this.urlValue = this.preview.textContent = this.audioUrlFile.value = target.getAttribute('data-command') || target.src;
-	this.audioUrlFile.focus();
-}
-
-/**
- * @private
- * @description Clears the selected file input and re-enables the URL input.
- * - Ensures that only one input method (file or URL) is used at a time.
- * @param {Element} urlInput - The URL input field.
- * @param {Element} preview - The preview text element.
- */
-function RemoveSelectedFiles(urlInput, preview) {
-	this.value = '';
-	if (urlInput) {
-		urlInput.disabled = false;
-		preview.style.textDecoration = '';
+	/**
+	 * @description Updates the preview text for the entered audio URL.
+	 * - Formats the URL correctly based on the editor’s settings.
+	 * @param {InputEvent} e - The input event triggered when the user types a URL.
+	 */
+	#OnLinkPreview(e) {
+		const value = domUtils.getEventTarget(e).value.trim();
+		this.urlValue = this.preview.textContent = !value
+			? ''
+			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
+			? this.options.get('defaultUrlProtocol') + value
+			: !value.includes('://')
+			? '/' + value
+			: value;
 	}
 
-	// inputFile check
-	Modal.OnChangeFile(this.fileModalWrapper, []);
-}
-
-function FileInputChange({ target }) {
-	if (!this.audioInputFile.value) {
-		this.audioUrlFile.disabled = false;
-		this.preview.style.textDecoration = '';
-	} else {
-		this.audioUrlFile.disabled = true;
-		this.preview.style.textDecoration = 'line-through';
+	/**
+	 * @description Opens the audio gallery plugin, if available.
+	 * - Calls a function to populate the URL input with the selected audio file.
+	 */
+	#OpenGallery() {
+		this.plugins.audioGallery.open(this.#SetUrlInput.bind(this));
 	}
 
-	// inputFile check
-	Modal.OnChangeFile(this.fileModalWrapper, target.files);
+	/**
+	 * @param {Node} target - The target element.
+	 */
+	#SetUrlInput(target) {
+		this.urlValue = this.preview.textContent = this.audioUrlFile.value = target.getAttribute('data-command') || target.src;
+		this.audioUrlFile.focus();
+	}
+
+	/**
+	 * @description Clears the selected file input and re-enables the URL input.
+	 * - Ensures that only one input method (file or URL) is used at a time.
+	 * @param {Node} urlInput - The URL input field.
+	 * @param {Node} preview - The preview text element.
+	 */
+	#RemoveSelectedFiles(urlInput, preview) {
+		this.audioInputFile.value = '';
+		if (urlInput) {
+			urlInput.disabled = false;
+			preview.style.textDecoration = '';
+		}
+
+		// inputFile check
+		Modal.OnChangeFile(this.fileModalWrapper, []);
+	}
+
+	/**
+	 * @param {InputEvent} e - Event object
+	 */
+	#FileInputChange(e) {
+		const target = domUtils.getEventTarget(e);
+		if (!this.audioInputFile.value) {
+			this.audioUrlFile.disabled = false;
+			this.preview.style.textDecoration = '';
+		} else {
+			this.audioUrlFile.disabled = true;
+			this.preview.style.textDecoration = 'line-through';
+		}
+
+		// inputFile check
+		Modal.OnChangeFile(this.fileModalWrapper, target.files);
+	}
 }
 
 function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {

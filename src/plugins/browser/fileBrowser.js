@@ -31,6 +31,9 @@ class FileBrowser extends EditorInjector {
 		this.title = this.lang.fileBrowser;
 		this.icon = 'file_browser';
 
+		// members
+		this.onSelectfunction = null;
+
 		// modules
 		const thumbnail = { video: this.icons.video_thumbnail, audio: this.icons.audio_thumbnail, file: this.icons.file_thumbnail };
 		const defaultThumbnail = this.icons.file_thumbnail;
@@ -39,7 +42,7 @@ class FileBrowser extends EditorInjector {
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
-			selectorHandler: SetItem.bind(this),
+			selectorHandler: this.#SetItem.bind(this),
 			columnSize: 4,
 			className: 'se-file-browser',
 			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : (item) => thumbnail[item.type] || defaultThumbnail,
@@ -50,10 +53,10 @@ class FileBrowser extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Browser
 	 * @description Executes the method that is called when a "Browser" module's is opened.
-	 * @param {HTMLElement} inputTarget First focus element when the file "Browser" is opened
+	 * @param {?(targe: Node) => *=} onSelectfunction method to be executed after selecting an item in the gallery
 	 */
-	open(inputTarget) {
-		this.inputTarget = inputTarget;
+	open(onSelectfunction) {
+		this.onSelectfunction = onSelectfunction;
 		this.browser.open();
 	}
 
@@ -62,32 +65,36 @@ class FileBrowser extends EditorInjector {
 	 * @description Executes the method that is called when a "Browser" module's is closed.
 	 */
 	close() {
-		this.inputTarget = null;
+		this.onSelectfunction = null;
 		this.browser.close();
 	}
-}
 
-function SetItem(target) {
-	if (this.inputTarget) {
-		this.inputTarget(target);
-	} else {
-		const type = target.getAttribute('data-type');
-		switch (type) {
-			case 'image': {
-				this.plugins.imageGallery.browser.selectorHandler(target);
-				break;
-			}
-			case 'video': {
-				this.plugins.videoGallery.browser.selectorHandler(target);
-				break;
-			}
-			case 'audio': {
-				this.plugins.audioGallery.browser.selectorHandler(target);
-				break;
-			}
-			case 'file': {
-				this.plugins.fileGallery.browser.selectorHandler(target);
-				break;
+	/**
+	 * @description Set browser item
+	 * @param {Node} target - Target element
+	 */
+	#SetItem(target) {
+		if (this.onSelectfunction) {
+			this.onSelectfunction(target);
+		} else {
+			const type = target.getAttribute('data-type');
+			switch (type) {
+				case 'image': {
+					this.plugins.imageGallery.browser.selectorHandler(target);
+					break;
+				}
+				case 'video': {
+					this.plugins.videoGallery.browser.selectorHandler(target);
+					break;
+				}
+				case 'audio': {
+					this.plugins.audioGallery.browser.selectorHandler(target);
+					break;
+				}
+				case 'file': {
+					this.plugins.fileGallery.browser.selectorHandler(target);
+					break;
+				}
 			}
 		}
 	}

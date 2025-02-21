@@ -31,7 +31,7 @@ class PageNavigator extends EditorInjector {
 		this.totalPages = 1;
 
 		// init
-		this.eventManager.addEvent(this.inner, 'change', OnChangeInner.bind(this));
+		this.eventManager.addEvent(this.inner, 'change', this.#OnChangeInner.bind(this));
 	}
 	/**
 	 * @editorMethod Editor.documentType
@@ -47,17 +47,21 @@ class PageNavigator extends EditorInjector {
 		this.inner.value = String(pageNum);
 		this.afterItem.textContent = this.inner.max = String(totalPages);
 	}
-}
 
-function OnChangeInner({ target }) {
-	if (!this.editor.frameContext.has('documentType-use-page')) return;
+	/**
+	 * @description Page number change event handler
+	 * @param {InputEvent} e - Event object
+	 */
+	#OnChangeInner(e) {
+		if (!this.editor.frameContext.has('documentType-use-page')) return;
 
-	const value = target.value || 1;
-	this.editor.frameContext.get('documentType').pageGo(value);
+		const value = Number(domUtils.getEventTarget(e).value) || 1;
+		this.editor.frameContext.get('documentType').pageGo(value);
+	}
 }
 
 function CreateInner() {
-	return /** @type {HTMLInputElement} */ (domUtils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null));
+	return domUtils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null);
 }
 
 export default PageNavigator;

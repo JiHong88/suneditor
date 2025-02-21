@@ -30,6 +30,9 @@ class FileGallery extends EditorInjector {
 		this.title = this.lang.fileGallery;
 		this.icon = 'file_gallery';
 
+		// members
+		this.onSelectfunction = null;
+
 		// modules
 		const thumbnail = typeof pluginOptions.thumbnail === 'string' ? pluginOptions.thumbnail : this.icons.file_thumbnail;
 		this.browser = new Browser(this, {
@@ -37,7 +40,7 @@ class FileGallery extends EditorInjector {
 			data: pluginOptions.data,
 			url: pluginOptions.url,
 			headers: pluginOptions.headers,
-			selectorHandler: SetItem.bind(this),
+			selectorHandler: this.#SetItem.bind(this),
 			columnSize: 4,
 			className: 'se-file-gallery',
 			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail
@@ -47,10 +50,10 @@ class FileGallery extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Browser
 	 * @description Executes the method that is called when a "Browser" module's is opened.
-	 * @param {HTMLElement} inputTarget First focus element when the file "Browser" is opened
+	 * @param {?(targe: Node) => *=} onSelectfunction method to be executed after selecting an item in the gallery
 	 */
-	open(inputTarget) {
-		this.inputTarget = inputTarget;
+	open(onSelectfunction) {
+		this.onSelectfunction = onSelectfunction;
 		this.browser.open();
 	}
 
@@ -59,17 +62,21 @@ class FileGallery extends EditorInjector {
 	 * @description Executes the method that is called when a "Browser" module's is closed.
 	 */
 	close() {
-		this.inputTarget = null;
+		this.onSelectfunction = null;
 		this.browser.close();
 	}
-}
 
-function SetItem(target) {
-	if (this.inputTarget) {
-		this.inputTarget(target);
-	} else {
-		const file = { name: target.getAttribute('data-name'), size: 0 };
-		this.plugins.fileUpload.create(target.getAttribute('data-command'), file, true);
+	/**
+	 * @description Set browser item
+	 * @param {Node} target - Target element
+	 */
+	#SetItem(target) {
+		if (this.onSelectfunction) {
+			this.onSelectfunction(target);
+		} else {
+			const file = { name: target.getAttribute('data-name'), size: 0 };
+			this.plugins.fileUpload.create(target.getAttribute('data-command'), file, true);
+		}
 	}
 }
 

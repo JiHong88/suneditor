@@ -119,7 +119,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Call the event function by injecting self: this.
-	 * @type {(eventName: string, ...args: *) => Promise<boolean|symbol>}
+	 * @type {(eventName: string, ...args: *) => Promise<*>}
 	 */
 	this.triggerEvent = null;
 
