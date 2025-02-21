@@ -224,7 +224,7 @@ HueSlider.prototype = {
 			moveEvent.func = OnTouchmove;
 		}
 
-		this.__globalMouseDown = this.eventManager.addGlobalEvent(downEvent.name, downEvent.func, { passive: false, useCapture: true });
+		this.__globalMouseDown = this.eventManager.addGlobalEvent(downEvent.name, downEvent.func, { passive: false, capture: true });
 		this.__globalMouseMove = this.eventManager.addGlobalEvent(moveEvent.name, moveEvent.func, true);
 		this.__globalMouseUp = this.eventManager.addGlobalEvent(upEvent.name, upEvent.func, true);
 		this.isOpen = true;

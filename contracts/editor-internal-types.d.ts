@@ -97,8 +97,6 @@ declare global {
 		clientHeight: number;
 		clientWidth: number;
 		offsetParent: Node | null;
-		width: number | string;
-		height: number | string;
 		getBoundingClientRect(): DOMRect;
 		scrollIntoView(arg?: boolean | ScrollIntoViewOptions): void;
 		focus(options?: FocusOptions, debug?: boolean): void;
@@ -111,6 +109,8 @@ declare global {
 		classList: DOMTokenList;
 		children: HTMLCollection;
 		files: FileList;
+		width: number | string;
+		height: number | string;
 
 		// Navigation specific to Element
 		nextElementSibling: HTMLElement | null;

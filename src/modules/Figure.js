@@ -310,7 +310,12 @@ Figure.prototype = {
 				figureInfo.cover = /** @type {HTMLElement} */ (target);
 				exceptionFormat = true;
 			} else {
-				return { container: null, cover: null, width: target.style.width || (!numbers.is(target.width) ? target.width : '') || '', height: target.style.height || (!numbers.is(target.height) ? target.height : '') || '' };
+				return {
+					container: null,
+					cover: null,
+					width: target.style.width || (!numbers.is(target.getAttribute('width')) ? target.getAttribute('width') : '') || '',
+					height: target.style.height || (!numbers.is(target.getAttribute('height')) ? target.getAttribute('height') : '') || ''
+				};
 			}
 		}
 
