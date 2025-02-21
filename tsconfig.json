@@ -23,7 +23,7 @@
 		"outDir": "./types",
 		"typeRoots": ["./types", "./contracts"],
 		"types": [],
-		"noEmit": true
+		"noEmit": false
 	},
 	"include": ["./src/**/*.js", "./contracts"],
 	"exclude": ["node_modules", "test", "dist", "webpack", "./src/langs", "./src/assets", "./types/**/*.d.ts"]

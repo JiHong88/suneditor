@@ -519,6 +519,8 @@ class Image_ extends EditorInjector {
 			infos = newInfos || infos;
 			this._serverUpload(infos, infos.files);
 		}.bind(this, imgInfo);
+		// se-ts-ignore
+		this._serverUpload;
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
 			info: imgInfo,
@@ -1024,6 +1026,8 @@ class Image_ extends EditorInjector {
 						this.ui.hideLoading();
 					}
 				}.bind(this, reader, isUpdate, this._element, file, i);
+				// se-ts-ignore
+				this._onRenderBase64;
 
 				reader.readAsDataURL(file);
 			}

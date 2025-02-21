@@ -1073,7 +1073,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 			wysiwygDiv.setAttribute(frameKey, frameAttrs[frameKey]);
 		}
 
-		const iframeWW = /** @type {HTMLIFrameElement} */ (/** @type {unknown} */ (wysiwygDiv));
+		const iframeWW = wysiwygDiv;
 		iframeWW.allowFullscreen = true;
 		iframeWW.frameBorder = '0';
 		iframeWW.style.cssText = editorStyles.frame;

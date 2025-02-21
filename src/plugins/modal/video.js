@@ -725,6 +725,8 @@ class Video extends EditorInjector {
 			infos = newInfos || infos;
 			this._serverUpload(infos, infos.files);
 		}.bind(this, videoInfo);
+		// se-ts-ignore
+		this._serverUpload;
 
 		const result = await this.triggerEvent('onVideoUploadBefore', {
 			info: videoInfo,

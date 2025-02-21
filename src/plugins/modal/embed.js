@@ -466,6 +466,8 @@ class Embed extends EditorInjector {
 			infos = newInfos || infos;
 			this._create(infos.process, infos.url, infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
 		}.bind(this, embedInfo);
+		// se-ts-ignore
+		void this._create;
 
 		const result = await this.triggerEvent('onEmbedInputBefore', {
 			...embedInfo,
