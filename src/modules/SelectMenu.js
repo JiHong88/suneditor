@@ -57,7 +57,7 @@ function SelectMenu(inst, params) {
 	this._closeSignal = false;
 	this.__events = null;
 	this.__eventHandlers = {
-		mousedown: OnMousedown_list.bind(this.eventManager),
+		mousedown: OnMousedown_list.bind(this),
 		mousemove: OnMouseMove_list.bind(this),
 		click: OnClick_list.bind(this),
 		keydown: OnKeyDown_refer.bind(this)

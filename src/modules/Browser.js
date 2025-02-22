@@ -652,6 +652,7 @@ function CreateHTML({ lang, icons }, useSearch) {
 
 /**
  * @private
+ * @this {{ thumbnail: ((...args: *) => *), props: Array<*> }}
  * @description Define the HTML of the item to be put in "div.se-file-item-column".
  * - Format: [ { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" } ]
  * @param {BrowserFile} item Item of the response data's array
