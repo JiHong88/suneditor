@@ -70,6 +70,7 @@ function Figure(inst, controls, params) {
 	};
 
 	// modules
+	/** @type {Object<string, *>} */
 	this._action = {};
 	const controllerEl = CreateHTML_controller(this, controls || []);
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, this.kind);
@@ -126,6 +127,7 @@ function Figure(inst, controls, params) {
 	this._floatClassStr = '__se__float-none|__se__float-left|__se__float-center|__se__float-right';
 	this.__preventSizechange = false;
 	this.__revertSize = { w: '', h: '' };
+	/** @type {{left?: number, top?: number}} */
 	this.__offset = {};
 	this.__offContainer = OffFigureContainer.bind(this);
 	this.__containerResizing = ContainerResizing.bind(this);

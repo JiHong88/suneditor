@@ -50,7 +50,7 @@ function DocumentType(editor, fc) {
 	this._mirror = fc.get('documentTypePageMirror');
 	this._mirrorCache = 0;
 	this._positionCache = new Map();
-	this._rePageTimeout = 0;
+	this._rePageTimeout = null;
 
 	const mirrorStyles = _w.getComputedStyle(this._mirror);
 	this._paddingTop = numbers.get(mirrorStyles.paddingTop);

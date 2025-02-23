@@ -122,9 +122,9 @@ class Embed extends EditorInjector {
 		this._defaultSizeX = this.pluginOptions.defaultWidth;
 		this._defaultSizeY = this.pluginOptions.defaultHeight;
 		this.sizeUnit = sizeUnit;
-		this.proportion = {};
-		this.inputX = {};
-		this.inputY = {};
+		this.proportion = null;
+		this.inputX = null;
+		this.inputY = null;
 		this._element = null;
 		this._cover = null;
 		this._container = null;
@@ -237,7 +237,7 @@ class Embed extends EditorInjector {
 	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
 	 */
 	on(isUpdate) {
-		if (!isUpdate) {
+		if (!isUpdate && this._resizing) {
 			this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
 			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.disabled = true;
@@ -351,11 +351,12 @@ class Embed extends EditorInjector {
 			w = numbers.get(w, 2);
 			if (w > 100) w = 100;
 		}
-		this.inputX.value = w === 'auto' ? '' : w;
+
+		this.inputX.value = String(w === 'auto' ? '' : w);
 
 		if (!this._onlyPercentage) {
 			const h = percentageRotation ? '' : figureInfo.height;
-			this.inputY.value = h === 'auto' ? '' : h;
+			this.inputY.value = String(h === 'auto' ? '' : h);
 		}
 
 		this.proportion.checked = true;
@@ -688,8 +689,8 @@ class Embed extends EditorInjector {
 	 * @param {string|number} h - The height to apply.
 	 */
 	_applySize(w, h) {
-		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
-		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
+		if (!w) w = this.inputX?.value || this.pluginOptions.defaultWidth;
+		if (!h) h = this.inputY?.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w)) w += '%';
@@ -709,8 +710,8 @@ class Embed extends EditorInjector {
 	 */
 	_getInfo() {
 		return {
-			inputWidth: this.inputX.value,
-			inputHeight: this.inputY.value,
+			inputWidth: this.inputX?.value || '',
+			inputHeight: this.inputY?.value || '',
 			align: this._align,
 			isUpdate: this.modal.isUpdate,
 			element: this._element
@@ -757,7 +758,7 @@ class Embed extends EditorInjector {
 
 	#OnClickRevert() {
 		if (this._onlyPercentage) {
-			this.inputX.value = Number(this._origin_w) > 100 ? 100 : this._origin_w;
+			this.inputX.value = Number(this._origin_w) > 100 ? '100' : this._origin_w;
 		} else {
 			this.inputX.value = this._origin_w;
 			this.inputY.value = this._origin_h;
@@ -780,9 +781,9 @@ class Embed extends EditorInjector {
 		} else if (this.proportion.checked) {
 			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
 			if (xy === 'x') {
-				this.inputY.value = ratioSize.h;
+				this.inputY.value = String(ratioSize.h);
 			} else {
-				this.inputX.value = ratioSize.w;
+				this.inputX.value = String(ratioSize.w);
 			}
 		}
 	}

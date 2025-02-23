@@ -131,9 +131,9 @@ class Image_ extends EditorInjector {
 		this.previewSrc = modalEl.querySelector('._se_tab_content_image .se-link-preview');
 		this.sizeUnit = sizeUnit;
 		this.as = 'block';
-		this.proportion = {};
-		this.inputX = {};
-		this.inputY = {};
+		this.proportion = null;
+		this.inputX = null;
+		this.inputY = null;
 		this._linkElement = null;
 		this._linkValue = '';
 		this._align = 'none';
@@ -209,8 +209,10 @@ class Image_ extends EditorInjector {
 	 */
 	on(isUpdate) {
 		if (!isUpdate) {
-			this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+			if (this._resizing) {
+				this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+				this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+			}
 			if (this.imgInputFile && this.pluginOptions.allowMultiple) this.imgInputFile.setAttribute('multiple', 'multiple');
 		} else {
 			if (this.imgInputFile && this.pluginOptions.allowMultiple) this.imgInputFile.removeAttribute('multiple');
@@ -246,7 +248,7 @@ class Image_ extends EditorInjector {
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
 
 		if (this.modal.isUpdate) {
-			this._update(this.inputX.value, this.inputY.value);
+			this._update(this.inputX?.value, this.inputY?.value);
 			this.history.push(false);
 		}
 
@@ -365,11 +367,11 @@ class Image_ extends EditorInjector {
 			w = numbers.get(w, 2);
 			if (w > 100) w = 100;
 		}
-		this.inputX.value = w === 'auto' ? '' : w;
+		this.inputX.value = String(w === 'auto' ? '' : w);
 
 		if (!this._onlyPercentage) {
 			const h = percentageRotation ? '' : figureInfo.height;
-			this.inputY.value = h === 'auto' ? '' : h;
+			this.inputY.value = String(h === 'auto' ? '' : h);
 		}
 
 		this.proportion.checked = true;
@@ -431,8 +433,8 @@ class Image_ extends EditorInjector {
 		return {
 			element: this._element,
 			anchor: this.anchor.create(true),
-			inputWidth: this.inputX.value,
-			inputHeight: this.inputY.value,
+			inputWidth: this.inputX?.value || '',
+			inputHeight: this.inputY?.value || '',
 			align: this._align,
 			isUpdate: this.modal.isUpdate,
 			alt: this.altText.value
@@ -578,8 +580,8 @@ class Image_ extends EditorInjector {
 	 * @param {string} height - New image height.
 	 */
 	_update(width, height) {
-		if (!width) width = this.inputX.value || 'auto';
-		if (!height) height = this.inputY.value || 'auto';
+		if (!width) width = this.inputX?.value || 'auto';
+		if (!height) height = this.inputY?.value || 'auto';
 
 		let imageEl = this._element;
 		const cover = this._cover;
@@ -667,8 +669,8 @@ class Image_ extends EditorInjector {
 	 * @param {string} height - The height of the image.
 	 */
 	_fileCheck(width, height) {
-		if (!width) width = this.inputX.value || 'auto';
-		if (!height) height = this.inputY.value || 'auto';
+		if (!width) width = this.inputX?.value || 'auto';
+		if (!height) height = this.inputY?.value || 'auto';
 
 		let imageEl = this._element;
 		let cover = this._cover;
@@ -847,8 +849,8 @@ class Image_ extends EditorInjector {
 	 * @param {string} h - Image height.
 	 */
 	_applySize(w, h) {
-		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
-		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
+		if (!w) w = this.inputX?.value || this.pluginOptions.defaultWidth;
+		if (!h) h = this.inputY?.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w)) w += '%';
@@ -1008,8 +1010,11 @@ class Image_ extends EditorInjector {
 
 			this._base64RenderIndex = filesLen;
 			const filesStack = new Array(filesLen);
-			this.inputX.value = width;
-			this.inputY.value = height;
+
+			if (this._resizing) {
+				this.inputX.value = width;
+				this.inputY.value = height;
+			}
 
 			for (let i = 0, reader, file; i < filesLen; i++) {
 				reader = new FileReader();
@@ -1128,9 +1133,9 @@ class Image_ extends EditorInjector {
 		} else if (this.proportion.checked) {
 			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
 			if (xy === 'x') {
-				this.inputY.value = ratioSize.h;
+				this.inputY.value = String(ratioSize.h);
 			} else {
-				this.inputX.value = ratioSize.w;
+				this.inputX.value = String(ratioSize.w);
 			}
 		}
 	}
@@ -1146,7 +1151,7 @@ class Image_ extends EditorInjector {
 
 	#OnClickRevert() {
 		if (this._onlyPercentage) {
-			this.inputX.value = Number(this._origin_w) > 100 ? 100 : this._origin_w;
+			this.inputX.value = Number(this._origin_w) > 100 ? '100' : this._origin_w;
 		} else {
 			this.inputX.value = this._origin_w;
 			this.inputY.value = this._origin_h;

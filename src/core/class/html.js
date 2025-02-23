@@ -34,9 +34,11 @@ function HTML(editor) {
 	this._htmlCheckBlacklistRegExp = null;
 	this._elementWhitelistRegExp = null;
 	this._elementBlacklistRegExp = null;
+	/** @type {Object<string, RegExp>} */
 	this._attributeWhitelist = null;
-	this._attributeWhitelistRegExp = null;
+	/** @type {Object<string, RegExp>} */
 	this._attributeBlacklist = null;
+	this._attributeWhitelistRegExp = null;
 	this._attributeBlacklistRegExp = null;
 	this._cleanStyleTagKeyRegExp = null;
 	this._cleanStyleRegExpMap = null;
@@ -113,6 +115,8 @@ function HTML(editor) {
 	// attributes
 	const regEndStr = '\\s*=\\s*(")[^"]*\\1';
 	const _wAttr = options.get('attributeWhitelist');
+
+	/** @type {Object<string, RegExp>} */
 	let tagsAttr = {};
 	let allAttr = '';
 	if (_wAttr) {

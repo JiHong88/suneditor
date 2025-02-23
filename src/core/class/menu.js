@@ -18,7 +18,10 @@ import { domUtils, converter } from '../../helper';
 function Menu(editor) {
 	CoreInjector.call(this, editor);
 
-	// members--
+	// members
+	/**
+	 * @type {Object.<string, Node>}
+	 */
 	this.targetMap = {};
 	this.index = -1;
 	this.menus = [];

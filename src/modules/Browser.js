@@ -82,9 +82,21 @@ function Browser(inst, params) {
 	this.icon_folder_item = this.icons.side_menu_folder;
 	this.icon_item = this.icons.side_menu_item;
 
+	/**
+	 * @type {Array<BrowserFile>}
+	 */
 	this.items = [];
+	/**
+	 * @type {Object<string, {name: string, meta: Object<string, *>}>}
+	 */
 	this.folders = {};
+	/**
+	 * @type {Object<string, {key?: string, name?: string, children?: *}>}
+	 */
 	this.tree = {};
+	/**
+	 * @type {BrowserFile}
+	 */
 	this.data = {};
 	this.selectedTags = [];
 	this.keyword = '';
@@ -157,7 +169,6 @@ Browser.prototype = {
 		this.selectedTags = [];
 		this.items = [];
 		this.folders = {};
-		/** @type {BrowserFile} */
 		this.tree = {};
 		this.data = {};
 		this.keyword = '';

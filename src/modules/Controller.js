@@ -65,6 +65,7 @@ function Controller(inst, element, params, _name) {
 	this.__globalEventHandlers = { keydown: CloseListener_keydown.bind(this), mousedown: CloseListener_mousedown.bind(this) };
 	this._bindClose_key = null;
 	this._bindClose_mouse = null;
+	/** @type {{left?: number, top?: number, addOfffset?: {left?: number, top?: number}}} */
 	this.__offset = {};
 	this.__addOffset = { left: 0, top: 0 };
 	this.__shadowRootEventForm = null;

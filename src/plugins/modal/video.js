@@ -130,10 +130,10 @@ class Video extends EditorInjector {
 		this._defaultSizeX = '100%';
 		this._defaultSizeY = this.pluginOptions.defaultRatio * 100 + '%';
 		this.sizeUnit = sizeUnit;
-		this.proportion = {};
-		this.frameRatioOption = {};
-		this.inputX = {};
-		this.inputY = {};
+		this.proportion = null;
+		this.frameRatioOption = null;
+		this.inputX = null;
+		this.inputY = null;
 		this._element = null;
 		this._cover = null;
 		this._container = null;
@@ -238,9 +238,11 @@ class Video extends EditorInjector {
 	 */
 	on(isUpdate) {
 		if (!isUpdate) {
-			this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === this._defaultSizeX ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === this._defaultSizeY ? '' : this.pluginOptions.defaultHeight;
-			this.proportion.disabled = true;
+			if (this._resizing) {
+				this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === this._defaultSizeX ? '' : this.pluginOptions.defaultWidth;
+				this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === this._defaultSizeY ? '' : this.pluginOptions.defaultHeight;
+				this.proportion.disabled = true;
+			}
 			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.setAttribute('multiple', 'multiple');
 		} else {
 			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.removeAttribute('multiple');
@@ -388,14 +390,14 @@ class Video extends EditorInjector {
 			w = numbers.get(w, 2);
 			if (w > 100) w = 100;
 		}
-		this.inputX.value = w === 'auto' ? '' : w;
+		this.inputX.value = String(w === 'auto' ? '' : w);
 
 		if (!this._onlyPercentage) {
 			const infoH = percentageRotation ? '' : figureInfo.height;
-			this.inputY.value = infoH === 'auto' ? '' : infoH;
+			this.inputY.value = String(infoH === 'auto' ? '' : infoH);
 		}
 
-		if (!this._setRatioSelect(h)) this.inputY.value = this._onlyPercentage ? numbers.get(h, 2) : h;
+		if (!this._setRatioSelect(h)) this.inputY.value = String(this._onlyPercentage ? numbers.get(h, 2) : h);
 
 		this.proportion.checked = true;
 		this.inputX.disabled = percentageRotation ? true : false;
@@ -646,8 +648,8 @@ class Video extends EditorInjector {
 	 * @param {string|number} h - The height of the video.
 	 */
 	_applySize(w, h) {
-		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
-		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
+		if (!w) w = this.inputX?.value || this.pluginOptions.defaultWidth;
+		if (!h) h = this.inputY?.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w)) w += '%';
@@ -662,8 +664,8 @@ class Video extends EditorInjector {
 	 */
 	_getInfo() {
 		return {
-			inputWidth: this.inputX.value,
-			inputHeight: this.inputY.value,
+			inputWidth: this.inputX?.value || '',
+			inputHeight: this.inputY?.value || '',
 			align: this._align,
 			isUpdate: this.modal.isUpdate,
 			element: this._element
@@ -1032,7 +1034,7 @@ class Video extends EditorInjector {
 
 	#OnClickRevert() {
 		if (this._onlyPercentage) {
-			this.inputX.value = Number(this._origin_w) > 100 ? 100 : this._origin_w;
+			this.inputX.value = Number(this._origin_w) > 100 ? '100' : this._origin_w;
 		} else {
 			this.inputX.value = this._origin_w;
 			this.inputY.value = this._origin_h;
@@ -1070,9 +1072,9 @@ class Video extends EditorInjector {
 		} else if (this.proportion.checked) {
 			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
 			if (xy === 'x') {
-				this.inputY.value = ratioSize.h;
+				this.inputY.value = String(ratioSize.h);
 			} else {
-				this.inputX.value = ratioSize.w;
+				this.inputX.value = String(ratioSize.w);
 			}
 		}
 
