@@ -1,8 +1,11 @@
 # Guidelines For Contributing
 
-Coded based on Nodejs@v20 and written.
+## Introduction
 
-Nodejs version14 or higher is required to build or test this project.
+The codebase is written in vanilla JavaScript, with JSDoc used for type definitions.  
+Node.js v14 or higher is required to build and test. 
+Although development and testing primarily take place in a Node.js 20 environment, any version 14 or later will suffice.
+
 
 ## Before submitting an issue
 
