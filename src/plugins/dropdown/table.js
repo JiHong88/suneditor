@@ -116,11 +116,11 @@ class Table extends EditorInjector {
 
 		// members - Controller
 		this.controller_table = new Controller(this, controller_table, { position: 'top' });
-		this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
+		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
 		// props
 		const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
-		this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
-		this.controller_props_title = controller_props.querySelector('.se-controller-title');
+		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
+		this.controller_props_title = controller_props.controller_props_title;
 		// color picker
 		const colorForm = dom.utils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
 		this.colorPicker = new ColorPicker(this, '', {
@@ -148,35 +148,35 @@ class Table extends EditorInjector {
 
 		// members - SelectMenu - split
 		const splitMenu = CreateSplitMenu(this.lang);
-		this.splitButton = controller_cell.querySelector('[data-command="onsplit"]');
+		this.splitButton = controller_cell.splitButton;
 		this.selectMenu_split = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 		this.selectMenu_split.on(this.splitButton, this.#OnSplitCells.bind(this));
 		this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 
 		// members - SelectMenu - column
 		const columnMenu = CreateColumnMenu(this.lang, this.icons);
-		const columnButton = controller_cell.querySelector('[data-command="oncolumn"]');
+		const columnButton = controller_cell.columnButton;
 		this.selectMenu_column = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 		this.selectMenu_column.on(columnButton, this.#OnColumnEdit.bind(this));
 		this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
 
 		// members - SelectMenu - row
 		const rownMenu = CreateRowMenu(this.lang, this.icons);
-		const rowButton = controller_cell.querySelector('[data-command="onrow"]');
+		const rowButton = controller_cell.rowButton;
 		this.selectMenu_row = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 		this.selectMenu_row.on(rowButton, this.#OnRowEdit.bind(this));
 		this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 
 		// members - SelectMenu - properties - border style
 		const borderMenu = CreateBorderMenu();
-		const borderButton = controller_props.querySelector('[data-command="props_onborder_style"]');
+		const borderButton = controller_props.borderButton;
 		this.selectMenu_props_border = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 		this.selectMenu_props_border.on(borderButton, OnPropsBorderEdit.bind(this));
 		this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
 
 		// members - SelectMenu - properties - border format
 		const borderFormatMenu = CreateBorderFormatMenu(this.lang, this.icons, []);
-		const borderFormatButton = controller_props.querySelector('[data-command="props_onborder_format"]');
+		const borderFormatButton = controller_props.borderFormatButton;
 		this.selectMenu_props_border_format = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
 		this.selectMenu_props_border_format.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this, 'all'));
 		this.selectMenu_props_border_format.create(borderFormatMenu.items, borderFormatMenu.menus);
@@ -190,45 +190,62 @@ class Table extends EditorInjector {
 		this.maxText = this.lang.maxSize;
 		this.minText = this.lang.minSize;
 		this.propTargets = {
-			cell_alignment: controller_props.querySelector('.se-table-props-align .__se__a_h'),
-			cell_alignment_vertical: controller_props.querySelector('.se-table-props-align .__se__a_v'),
-			cell_alignment_table_text: controller_props.querySelector('.se-table-props-align .__se__a_table_t'),
+			cell_alignment: controller_props.cell_alignment,
+			cell_alignment_vertical: controller_props.cell_alignment_vertical,
+			cell_alignment_table_text: controller_props.cell_alignment_table_text,
 			border_format: borderFormatButton,
-			border_style: controller_props.querySelector('[data-command="props_onborder_style"] .se-txt'),
-			border_color: controller_props.querySelector('.__se_border_color'),
-			border_width: controller_props.querySelector('.__se__border_size'),
-			back_color: controller_props.querySelector('.__se_back_color'),
-			font_color: controller_props.querySelector('.__se_font_color'),
-			palette_border_button: controller_props.querySelector('[data-command="props_onpalette"][data-value="border"]'),
-			font_bold: controller_props.querySelector('[data-command="props_font_style"][data-value="bold"]'),
-			font_underline: controller_props.querySelector('[data-command="props_font_style"][data-value="underline"]'),
-			font_italic: controller_props.querySelector('[data-command="props_font_style"][data-value="italic"]'),
-			font_strike: controller_props.querySelector('[data-command="props_font_style"][data-value="strike"]')
+			border_style: controller_props.border_style,
+			border_color: controller_props.border_color,
+			border_width: controller_props.border_width,
+			back_color: controller_props.back_color,
+			font_color: controller_props.font_color,
+			palette_border_button: controller_props.palette_border_button,
+			font_bold: controller_props.font_bold,
+			font_underline: controller_props.font_underline,
+			font_italic: controller_props.font_italic,
+			font_strike: controller_props.font_strike
 		};
 		this._propsCache = [];
 		this._currentFontStyles = [];
 		this._propsAlignCache = '';
 		this._propsVerticalAlignCache = '';
 		this._typeCache = '';
+
+		/** @type {HTMLElement} */
 		this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
+		/** @type {HTMLElement} */
 		this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
+		/** @type {HTMLElement} */
 		this.tableDisplay = menu.querySelector('.se-table-size-display');
+		/** @type {HTMLButtonElement} */
 		this.resizeButton = controller_table.querySelector('._se_table_resize');
+		/** @type {HTMLSpanElement} */
 		this.resizeText = controller_table.querySelector('._se_table_resize > span > span');
+		/** @type {HTMLButtonElement} */
 		this.columnFixedButton = controller_table.querySelector('._se_table_fixed_column');
+		/** @type {HTMLButtonElement} */
 		this.headerButton = controller_table.querySelector('._se_table_header');
+		/** @type {HTMLButtonElement} */
 		this.captionButton = controller_table.querySelector('._se_table_caption');
-		this.mergeButton = controller_cell.querySelector('[data-command="merge"]');
+		/** @type {HTMLButtonElement} */
+		this.mergeButton = controller_cell.mergeButton;
 
 		// members - private
 		this._resizing = false;
 		this._resizeLine = null;
 		this._resizeLinePrev = null;
+
+		/** @type {HTMLElement} */
 		this._figure = null;
+		/** @type {HTMLTableElement} */
 		this._element = null;
+		/** @type {HTMLTableCellElement} */
 		this._tdElement = null;
+		/** @type {HTMLTableRowElement} */
 		this._trElement = null;
+		/** @type {HTMLTableRowElement[]|HTMLCollectionOf<HTMLTableRowElement>} */
 		this._trElements = null;
+
 		this._tableXY = [];
 		this._maxWidth = true;
 		this._fixedColumn = false;
@@ -242,13 +259,18 @@ class Table extends EditorInjector {
 		this._current_rowSpan = 0;
 
 		// member - multi selecte
+		/** @type {HTMLTableElement} */
+		this._selectedTable = null;
+		/** @type {HTMLTableCellElement} */
+		this._fixedCell = null;
+		/** @type {HTMLTableCellElement} */
+		this._selectedCell = null;
+		/** @type {HTMLTableCellElement[]|} */
 		this._selectedCells = null;
+
 		this._shift = false;
 		this.__s = false;
-		this._fixedCell = null;
 		this._fixedCellName = null;
-		this._selectedCell = null;
-		this._selectedTable = null;
 		this._ref = null;
 
 		// member - global events
@@ -449,7 +471,7 @@ class Table extends EditorInjector {
 	onMouseDown({ event }) {
 		this._ref = null;
 		const eventTarget = dom.query.getEventTarget(event);
-		const target = dom.query.getParentElement(eventTarget, IsResizeEls);
+		const target = /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(eventTarget, IsResizeEls));
 		if (!target) return;
 
 		const cellEdge = CheckCellEdge(event, target);
@@ -483,11 +505,12 @@ class Table extends EditorInjector {
 		const rowEdge = CheckRowEdge(event, target);
 		if (rowEdge.is) {
 			try {
+				/** @type {HTMLTableRowElement} */
 				let row = dom.query.getParentElement(target, dom.check.isTableRow);
 				let rowSpan = target.rowSpan;
 				if (rowSpan > 1) {
 					while (dom.check.isTableRow(row) && rowSpan > 1) {
-						row = row.nextElementSibling;
+						row = /** @type {HTMLTableRowElement} */ (row.nextElementSibling);
 						--rowSpan;
 					}
 				}
@@ -551,7 +574,9 @@ class Table extends EditorInjector {
 				this._closeController();
 
 				const shift = event.shiftKey;
+				/** @type {HTMLTableElement} */
 				const table = dom.query.getParentElement(tableCell, 'table');
+				/** @type {HTMLTableCellElement[]} */
 				const cells = dom.query.getListChildren(table, dom.check.isTableCell);
 				const idx = shift ? dom.utils.prevIndex(cells, tableCell) : dom.utils.nextIndex(cells, tableCell);
 
@@ -571,11 +596,11 @@ class Table extends EditorInjector {
 
 				if (idx === -1 && shift) return;
 
-				let moveCell = cells[idx];
+				const moveCell = cells[idx];
 				if (!moveCell) return;
 
-				moveCell = moveCell.firstElementChild || moveCell;
-				this.selection.setRange(moveCell, 0, moveCell, 0);
+				const rangeCell = moveCell.firstElementChild || moveCell;
+				this.selection.setRange(rangeCell, 0, rangeCell, 0);
 
 				event.preventDefault();
 				event.stopPropagation();
@@ -599,7 +624,7 @@ class Table extends EditorInjector {
 
 		if (this._shift || this._ref) return;
 
-		cell = cell || dom.query.getParentElement(line, dom.check.isTableCell);
+		cell = /** @type {HTMLTableCellElement} */ (cell || dom.query.getParentElement(line, dom.check.isTableCell));
 		if (cell) {
 			this.__s = false;
 			this._fixedCell = cell;
@@ -809,7 +834,7 @@ class Table extends EditorInjector {
 
 	/**
 	 * @description Selects cells in a table, handling single and multi-cell selection, and managing shift key behavior for extended selection.
-	 * @param {Node} tdElement The target table cell (`<td>`) element that is being selected.
+	 * @param {HTMLTableCellElement} tdElement The target table cell (`<td>`) element that is being selected.
 	 * @param {boolean} shift A flag indicating whether the shift key is held down for multi-cell selection.
 	 * If `true`, the selection will extend to include adjacent cells, otherwise it selects only the provided cell.
 	 */
@@ -839,23 +864,23 @@ class Table extends EditorInjector {
 	/**
 	 * @description Sets the table and figure elements based on the provided cell element, and stores references to them for later use.
 	 * @param {Node} element The target table cell (`<td>`) element from which the table info will be extracted.
-	 * @returns {Node} The `<table>` element that is the parent of the provided `element`.
+	 * @returns {HTMLTableElement} The `<table>` element that is the parent of the provided `element`.
 	 */
 	setTableInfo(element) {
 		const table = (this._element = this._selectedTable || dom.query.getParentElement(element, 'TABLE'));
 		this._figure = dom.query.getParentElement(table, dom.check.isFigure) || table;
-		return table;
+		return /** @type {HTMLTableElement} */ (table);
 	}
 
 	/**
 	 * @description Sets various table-related information based on the provided table cell element (`<td>`). This includes updating cell, row, and table attributes, handling spanning cells, and adjusting the UI for elements like headers and captions.
-	 * @param {Node} tdElement The target table cell (`<td>`) element from which table information will be extracted.
+	 * @param {HTMLTableCellElement} tdElement The target table cell (`<td>`) element from which table information will be extracted.
 	 * @param {boolean} reset A flag indicating whether to reset the cell information. If `true`, the cell information will be reset and recalculated.
 	 */
 	setCellInfo(tdElement, reset) {
 		const table = this.setTableInfo(tdElement);
 		if (!table) return;
-		this._trElement = tdElement.parentNode;
+		this._trElement = /** @type {HTMLTableRowElement} */ (tdElement.parentNode);
 
 		// hedaer
 		if (table.querySelector('thead')) dom.utils.addClass(this.headerButton, 'active');
@@ -868,7 +893,7 @@ class Table extends EditorInjector {
 		if (reset || this._physical_cellCnt === 0) {
 			if (this._tdElement !== tdElement) {
 				this._tdElement = tdElement;
-				this._trElement = tdElement.parentNode;
+				this._trElement = /** @type {HTMLTableRowElement} */ (tdElement.parentNode);
 			}
 
 			if (!this._selectedCells || this._selectedCells.length === 0) this._selectedCells = [tdElement];
@@ -961,7 +986,7 @@ class Table extends EditorInjector {
 
 	/**
 	 * @description Sets row-related information based on the provided table row element (`<tr>`). This includes updating the row count and the index of the selected row.
-	 * @param {Node} trElement The target table row (`<tr>`) element from which row information will be extracted.
+	 * @param {HTMLTableRowElement} trElement The target table row (`<tr>`) element from which row information will be extracted.
 	 */
 	setRowInfo(trElement) {
 		const table = this.setTableInfo(trElement);
@@ -980,7 +1005,7 @@ class Table extends EditorInjector {
 		const isRow = type === 'row';
 
 		if (isRow) {
-			const tableAttr = this._trElement.parentNode;
+			const tableAttr = this._trElement.parentElement;
 			if (/^THEAD$/i.test(tableAttr.nodeName)) {
 				if (option === 'up') {
 					return;
@@ -1086,7 +1111,7 @@ class Table extends EditorInjector {
 	 * - null: to remove the row
 	 * - 'up': to insert the row up
 	 * - 'down': to insert the row down, or null to remove.
-	 * @param {?Element=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
+	 * @param {?HTMLTableCellElement=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
 	 */
 	editRow(option, positionResetElement) {
 		this._deleteStyleSelectedCells();
@@ -1130,7 +1155,7 @@ class Table extends EditorInjector {
 
 					if (cell.rowSpan > 1) {
 						cell.rowSpan -= 1;
-						spanCells.push({ cell: cell.cloneNode(false), index: logcalIndex });
+						spanCells.push({ cell: /** @type {HTMLTableCellElement} */ (cell.cloneNode(false)), index: logcalIndex });
 					}
 				}
 
@@ -1181,7 +1206,7 @@ class Table extends EditorInjector {
 	 * - null: to remove the cell
 	 * - left: to insert a new cell to the left
 	 * - right: to insert a new cell to the right
-	 * @param {?Element=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
+	 * @param {?HTMLTableCellElement=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
 	 */
 	editCell(option, positionResetElement) {
 		const remove = !option;
@@ -1329,7 +1354,7 @@ class Table extends EditorInjector {
 		if (remove) {
 			let removeFirst, removeEnd;
 			for (let r = 0, rLen = removeCell.length, row; r < rLen; r++) {
-				row = removeCell[r].parentNode;
+				row = /** @type {HTMLTableRowElement} */ (removeCell[r].parentNode);
 				dom.utils.removeItem(removeCell[r]);
 				if (row.cells.length === 0) {
 					if (!removeFirst) removeFirst = dom.utils.getArrayIndex(rows, row);
@@ -1351,7 +1376,7 @@ class Table extends EditorInjector {
 
 	/**
 	 * @description Inserts a new row into the table at the specified index to it.
-	 * @param {Node} table The table element to insert the row into.
+	 * @param {HTMLTableElement} table The table element to insert the row into.
 	 * @param {number} rowIndex The index at which to insert the new row.
 	 * @param {number} cellCnt The number of cells to create in the new row.
 	 * @returns {HTMLTableRowElement} The newly inserted row element.
@@ -1540,7 +1565,7 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the controller position for a cell.
-	 * @param {Node} tdElement - The target table cell.
+	 * @param {HTMLTableCellElement} tdElement - The target table cell.
 	 */
 	_setController(tdElement) {
 		if (!this.selection.get().isCollapsed && !this._selectedCell) {
@@ -1557,7 +1582,7 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the position of the cell controller.
-	 * @param {Node} tdElement - The target table cell.
+	 * @param {HTMLTableCellElement} tdElement - The target table cell.
 	 * @param {boolean} reset - Whether to reset the controller position.
 	 */
 	_setCellControllerPosition(tdElement, reset) {
@@ -1587,7 +1612,7 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Starts resizing a table cell.
-	 * @param {Node} col The column element.
+	 * @param {HTMLElement} col The column element.
 	 * @param {number} startX The starting X position.
 	 * @param {number} startWidth The initial width of the column.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
@@ -1596,7 +1621,7 @@ class Table extends EditorInjector {
 		this._setResizeLinePosition(this._figure, this._tdElement, this._resizeLinePrev, isLeftEdge);
 		this._resizeLinePrev.style.display = 'block';
 		const prevValue = col.style.width;
-		const nextCol = col.nextElementSibling;
+		const nextCol = /** @type {HTMLElement} */ (col.nextElementSibling);
 		const nextColPrevValue = nextCol.style.width;
 		const realWidth = dom.utils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(col);
 
@@ -1632,11 +1657,11 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Resizes a table cell.
-	 * @param {Node} col The column element.
-	 * @param {Node} nextCol The next column element.
-	 * @param {Node} figure The table figure element.
-	 * @param {Node} tdEl The table cell element.
-	 * @param {Node} resizeLine The resize line element.
+	 * @param {HTMLElement} col The column element.
+	 * @param {HTMLElement} nextCol The next column element.
+	 * @param {HTMLElement} figure The table figure element.
+	 * @param {HTMLElement} tdEl The table cell element.
+	 * @param {HTMLElement} resizeLine The resize line element.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 * @param {number} startX The starting X position.
 	 * @param {number} startWidth The initial width of the column.
@@ -1661,7 +1686,7 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Starts resizing a table row.
-	 * @param {Node} row The table row element.
+	 * @param {HTMLElement} row The table row element.
 	 * @param {number} startY The starting Y position.
 	 * @param {number} startHeight The initial height of the row.
 	 */
@@ -1683,9 +1708,9 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Resizes a table row.
-	 * @param {Node} row The table row element.
-	 * @param {Node} figure The table figure element.
-	 * @param {Node} resizeLine The resize line element.
+	 * @param {HTMLElement} row The table row element.
+	 * @param {HTMLElement} figure The table figure element.
+	 * @param {HTMLElement} resizeLine The resize line element.
 	 * @param {number} startY The starting Y position.
 	 * @param {number} startHeight The initial height of the row.
 	 * @param {MouseEvent} e The mouse event.
@@ -1724,8 +1749,8 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Resizes the table figure.
-	 * @param {Node} figure The table figure element.
-	 * @param {Node} resizeLine The resize line element.
+	 * @param {HTMLElement} figure The table figure element.
+	 * @param {HTMLElement} resizeLine The resize line element.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 * @param {number} startX The starting X position.
 	 * @param {number} startWidth The initial width of the figure.
@@ -1746,9 +1771,9 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the resize line position.
-	 * @param {Node} figure The table figure element.
-	 * @param {Node} target The target element.
-	 * @param {Node} resizeLine The resize line element.
+	 * @param {HTMLElement} figure The table figure element.
+	 * @param {HTMLElement} target The target element.
+	 * @param {HTMLElement} resizeLine The resize line element.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	_setResizeLinePosition(figure, target, resizeLine, isLeftEdge) {
@@ -1762,9 +1787,9 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the resize row position.
-	 * @param {Node} figure The table figure element.
-	 * @param {Node} target The target row element.
-	 * @param {Node} resizeLine The resize line element.
+	 * @param {HTMLElement} figure The table figure element.
+	 * @param {HTMLElement} target The target row element.
+	 * @param {HTMLElement} resizeLine The resize line element.
 	 */
 	_setResizeRowPosition(figure, target, resizeLine) {
 		const rowOffset = this.offset.getLocal(target);
@@ -1777,7 +1802,7 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Stops resizing the table.
-	 * @param {Node} target The target element.
+	 * @param {HTMLElement} target The target element.
 	 * @param {string} prevValue The previous style value.
 	 * @param {string} styleProp The CSS property being changed.
 	 * @param {KeyboardEvent} e The keyboard event.
@@ -1859,7 +1884,7 @@ class Table extends EditorInjector {
 		const { border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = _w.getComputedStyle(targets[0]);
 		const cellBorder = this._getBorderStyle(border);
 
-		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
+		/** @type {HTMLElement} */ (cell_alignment.querySelector('[data-value="justify"]')).style.display = isTable ? 'none' : '';
 		cell_alignment_table_text.style.display = isTable ? '' : 'none';
 		if (isTable) cell_alignment_vertical.style.display = 'none';
 		else cell_alignment_vertical.style.display = '';
@@ -1931,7 +1956,7 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets text alignment properties.
-	 * @param {Node} el The element to apply alignment to.
+	 * @param {Element} el The element to apply alignment to.
 	 * @param {string} align The alignment value.
 	 * @param {boolean} reset Whether to reset the alignment.
 	 */
@@ -2008,7 +2033,7 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Applies properties to table cells.
-	 * @param {Node} target The target element.
+	 * @param {HTMLButtonElement} target The target element.
 	 */
 	_submitProps(target) {
 		try {
@@ -2016,7 +2041,7 @@ class Table extends EditorInjector {
 
 			const isTable = this.controller_table.form.contains(this.controller_props.currentTarget);
 			const targets = isTable ? [this._element] : this._selectedCells;
-			const tr = targets[0];
+			const tr = /** @type {HTMLTableCellElement} */ (targets[0]);
 			const trStyles = _w.getComputedStyle(tr);
 			const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical } = this.propTargets;
 
@@ -2044,10 +2069,11 @@ class Table extends EditorInjector {
 			};
 
 			if (!isTable) {
+				const trRow = /** @type {HTMLTableRowElement} */ (tr.parentElement);
 				// --- target cells roof
 				let { rs, re, cs, ce } = this._ref || {
-					rs: tr.parentElement.rowIndex || 0,
-					re: tr.parentElement.rowIndex || 0,
+					rs: trRow.rowIndex || 0,
+					re: trRow.rowIndex || 0,
 					cs: tr.cellIndex || 0,
 					ce: tr.cellIndex || 0
 				};
@@ -2057,17 +2083,17 @@ class Table extends EditorInjector {
 				rs -= rs;
 				ce -= cs;
 				cs -= cs;
-				let prevRow = tr.parentNode;
+				let prevRow = /** @type {HTMLElement} */ (trRow);
 				for (let i = 0, cellCnt = 0, len = targets.length, e, es, rowIndex = 0, cellIndex, colspan, rowspan; i < len; i++, cellCnt++) {
-					e = targets[i];
+					e = /** @type {HTMLTableCellElement} */ (targets[i]);
 					colspan = e.colSpan;
 					rowspan = e.rowSpan;
 					cellIndex = e.cellIndex - cellStartIndex;
 
-					if (prevRow !== e.parentNode) {
+					if (prevRow !== e.parentElement) {
 						rowIndex++;
 						cellCnt = 0;
-						prevRow = e.parentNode;
+						prevRow = e.parentElement;
 					}
 
 					let c = 0;
@@ -2391,7 +2417,7 @@ class Table extends EditorInjector {
 	 * @description Handles color selection from the color palette.
 	 * @param {Node} button The button triggering the color palette.
 	 * @param {string} type The type of color selection.
-	 * @param {Node} color Color text input element.
+	 * @param {HTMLInputElement} color Color text input element.
 	 */
 	_onColorPalette(button, type, color) {
 		if (this.controller_colorPicker.isOpen && type === this.sliderType) {
@@ -2707,7 +2733,7 @@ class Table extends EditorInjector {
 	 */
 	#OnCellMultiSelect(e) {
 		this.editor._preventBlur = true;
-		const target = dom.query.getParentElement(dom.query.getEventTarget(e), dom.check.isTableCell);
+		const target = /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(dom.query.getEventTarget(e), dom.check.isTableCell));
 
 		if (this._shift) {
 			if (target === this._fixedCell) {
@@ -2784,7 +2810,7 @@ function IsResizeEls(node) {
  * @private
  * @description Checks if a table cell is at its edge based on the mouse event.
  * @param {MouseEvent} event The mouse event.
- * @param {Node} tableCell The table cell to check.
+ * @param {Element} tableCell The table cell to check.
  * @returns {Object} An object containing edge detection details.
  */
 function CheckCellEdge(event, tableCell) {
@@ -2806,7 +2832,7 @@ function CheckCellEdge(event, tableCell) {
  * @private
  * @description Checks if a row is at its edge based on the mouse event.
  * @param {MouseEvent} event The mouse event.
- * @param {Node} tableCell The table row cell to check.
+ * @param {Element} tableCell The table row cell to check.
  * @returns {Object} An object containing row edge detection details.
  */
 function CheckRowEdge(event, tableCell) {
@@ -2837,17 +2863,17 @@ function CreateCellsString(nodeName, cnt) {
  * @private
  * @description Creates table cells as element HTML.
  * @param {string} nodeName The tag name of the cell (TD or TH).
- * @returns {HTMLElement} The created cells.
+ * @returns {HTMLTableCellElement} The created cells.
  */
 function CreateCellsHTML(nodeName) {
 	nodeName = nodeName.toLowerCase();
-	return dom.utils.createElement(nodeName, null, '<div><br></div>');
+	return /** @type {HTMLTableCellElement} */ (dom.utils.createElement(nodeName, null, '<div><br></div>'));
 }
 
 /**
  * @private
  * @description Gets the maximum number of columns in a table.
- * @param {Node} table The table element.
+ * @param {HTMLTableElement} table The table element.
  * @returns {number} The maximum number of columns in the table.
  */
 function GetMaxColumns(table) {
@@ -3041,6 +3067,10 @@ function CreateHTML_controller_table({ lang, icons }) {
 	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-table' }, html);
 }
 
+/**
+ * @param {EditorCore} editor
+ * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement }}
+ */
 function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
 	const html = /*html*/ `
 	<div class="se-arrow se-arrow-${cellControllerTop ? 'down se-visible-hidden' : 'up'}"></div>
@@ -3077,9 +3107,44 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
         </button>
     </div>`;
 
-	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
+	const content = dom.utils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
+
+	return {
+		html: content,
+		splitButton: content.querySelector('[data-command="onsplit"]'),
+		columnButton: content.querySelector('[data-command="oncolumn"]'),
+		rowButton: content.querySelector('[data-command="onrow"]'),
+		mergeButton: content.querySelector('[data-command="merge"]')
+	};
 }
 
+/**
+ 
+ */
+
+/**
+ * @typedef {Object} TableCtrlProps
+ * @property {HTMLElement} html
+ * @property {HTMLElement} controller_props_title
+ * @property {HTMLButtonElement} borderButton
+ * @property {HTMLButtonElement} borderFormatButton
+ * @property {HTMLElement} cell_alignment
+ * @property {HTMLElement} cell_alignment_vertical
+ * @property {HTMLElement} cell_alignment_table_text
+ * @property {HTMLButtonElement} border_style
+ * @property {HTMLInputElement} border_color
+ * @property {HTMLInputElement} border_width
+ * @property {HTMLInputElement} back_color
+ * @property {HTMLInputElement} font_color
+ * @property {HTMLButtonElement} palette_border_button
+ * @property {HTMLButtonElement} font_bold
+ * @property {HTMLButtonElement} font_underline
+ * @property {HTMLButtonElement} font_italic
+ * @property {HTMLButtonElement} font_strike
+ *
+ * @param {EditorCore} editor - Editor instance
+ * @returns {TableCtrlProps}
+ */
 function CreateHTML_controller_properties({ lang, icons, options }) {
 	const alignItems = options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
 	let alignHtml = '';
@@ -3207,7 +3272,27 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 			</div>
 		</div>`;
 
-	return dom.utils.createElement('DIV', { class: 'se-controller se-table-props' }, html);
+	const content = dom.utils.createElement('DIV', { class: 'se-controller se-table-props' }, html);
+
+	return {
+		html: content,
+		controller_props_title: content.querySelector('.se-controller-title'),
+		borderButton: content.querySelector('[data-command="props_onborder_style"]'),
+		borderFormatButton: content.querySelector('[data-command="props_onborder_format"]'),
+		cell_alignment: content.querySelector('.se-table-props-align .__se__a_h'),
+		cell_alignment_vertical: content.querySelector('.se-table-props-align .__se__a_v'),
+		cell_alignment_table_text: content.querySelector('.se-table-props-align .__se__a_table_t'),
+		border_style: content.querySelector('[data-command="props_onborder_style"] .se-txt'),
+		border_color: content.querySelector('.__se_border_color'),
+		border_width: content.querySelector('.__se__border_size'),
+		back_color: content.querySelector('.__se_back_color'),
+		font_color: content.querySelector('.__se_font_color'),
+		palette_border_button: content.querySelector('[data-command="props_onpalette"][data-value="border"]'),
+		font_bold: content.querySelector('[data-command="props_font_style"][data-value="bold"]'),
+		font_underline: content.querySelector('[data-command="props_font_style"][data-value="underline"]'),
+		font_italic: content.querySelector('[data-command="props_font_style"][data-value="italic"]'),
+		font_strike: content.querySelector('[data-command="props_font_style"][data-value="strike"]')
+	};
 }
 
 export default Table;

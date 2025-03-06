@@ -51,7 +51,7 @@ class TextStyle extends EditorInjector {
 				while (node && !this.format.isLine(node) && !this.component.is(node)) {
 					if (node.nodeName.toLowerCase() === btn.getAttribute('data-command').toLowerCase()) {
 						value = data[v];
-						if (/^\./.test(value) ? dom.utils.hasClass(node, value.replace(/^\./, '')) : node.style[value]) {
+						if (/^\./.test(value) ? dom.utils.hasClass(node, value.replace(/^\./, '')) : /** @type {HTMLElement} */ (node).style[value]) {
 							active = true;
 							break;
 						}
@@ -73,7 +73,7 @@ class TextStyle extends EditorInjector {
 	 * @param {HTMLElement} target - The plugin's toolbar button element
 	 */
 	action(target) {
-		const tempElement = target.firstElementChild;
+		const tempElement = /** @type {HTMLElement} */ (target.firstElementChild);
 		const checkStyles = tempElement.style.cssText.replace(/:.+(;|$)/g, ',').split(',');
 		checkStyles.pop();
 

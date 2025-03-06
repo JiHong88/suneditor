@@ -49,6 +49,7 @@ class FontColor extends EditorInjector {
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
+		/** @type {HTMLElement} */
 		const colorHelper = target.querySelector('.se-svg-color-helper');
 		if (!colorHelper) return false;
 

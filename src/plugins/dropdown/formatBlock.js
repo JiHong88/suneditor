@@ -2,12 +2,12 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 const HEADER_KEYCODE = new Map([
-	[49, 'h1'],
-	[50, 'h2'],
-	[51, 'h3'],
-	[52, 'h4'],
-	[53, 'h5'],
-	[54, 'h6']
+	['Digit1', 'h1'],
+	['Digit2', 'h2'],
+	['Digit3', 'h3'],
+	['Digit4', 'h4'],
+	['Digit5', 'h5'],
+	['Digit6', 'h6']
 ]);
 
 /**
@@ -39,6 +39,7 @@ class FormatBlock extends EditorInjector {
 		const menu = CreateHTML(editor, pluginOptions.items);
 
 		// members
+		/** @type {NodeListOf<HTMLElement>} */
 		this.formatList = menu.querySelectorAll('li button');
 		this.currentFormat = '';
 

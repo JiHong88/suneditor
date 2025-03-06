@@ -427,6 +427,7 @@ class FileUpload extends EditorInjector {
 	 * @param {InputEvent} e - The change event object.
 	 */
 	async #OnChangeFile(e) {
+		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		await this.submitFile(eventTarget.files);
 	}

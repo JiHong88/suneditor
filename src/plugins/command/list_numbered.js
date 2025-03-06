@@ -35,6 +35,7 @@ class List_numbered extends EditorInjector {
 		const menu = CreateHTML();
 
 		// members
+		/** @type {NodeListOf<HTMLElement>} */
 		this.listItems = menu.querySelectorAll('li button ol');
 
 		// init
@@ -109,7 +110,7 @@ class List_numbered extends EditorInjector {
 	 */
 	shortcut({ range, info }) {
 		const { startContainer } = range;
-		if (startContainer.nodeType === 3) {
+		if (dom.check.isText(startContainer)) {
 			const newText = startContainer.substringData(info.key.length, startContainer.textContent.length - 1);
 			startContainer.textContent = newText;
 		}

@@ -59,7 +59,7 @@
 /**
  * @typedef {Object} ImageInfo
  * @property {FileList} files - FileList object
- * @property {HTMLElement} element - target element
+ * @property {HTMLImageElement} element - target element
  * @property {string} inputWidth - width value
  * @property {string} inputHeight - height value
  * @property {string} align - align value
@@ -72,7 +72,7 @@
 /**
  * @typedef {Object} VideoInfo
  * @property {FileList} files - FileList object
- * @property {HTMLElement} element - target element
+ * @property {HTMLVideoElement|HTMLIFrameElement} element - target element
  * @property {string} inputWidth - width value
  * @property {string} inputHeight - height value
  * @property {string} align - align value
@@ -84,7 +84,7 @@
 // --- audio
 /**
  * @typedef {Object} AudioInfo
- * @property {HTMLElement} element - target element
+ * @property {HTMLAudioElement} element - target element
  * @property {FileList} files - FileList object
  * @property {boolean} isUpdate - new create or update
  */

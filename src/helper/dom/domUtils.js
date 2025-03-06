@@ -13,11 +13,12 @@ function clone(node, deep = false) {
 }
 
 /**
+ * @template {HTMLElement} T
  * @description Create Element node
  * @param {string} elementName Element name
  * @param {?Object<string, string>=} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
  * @param {?string|Node=} inner A innerHTML string or inner node.
- * @returns {HTMLElement}
+ * @returns {T}
  */
 export function createElement(elementName, attributes, inner) {
 	const el = _d.createElement(elementName);
@@ -36,7 +37,7 @@ export function createElement(elementName, attributes, inner) {
 		}
 	}
 
-	return el;
+	return /** @type {T} */ (el);
 }
 
 /**

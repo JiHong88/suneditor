@@ -117,7 +117,7 @@ FileManager.prototype = {
 	/**
 	 * @this {FileManagerThis}
 	 * @description Set the file information to the element.
-	 * @param {Element} element File information element
+	 * @param {Node} element File information element
 	 * @param {Object} params
 	 * @param {string} params.name File name
 	 * @param {number} params.size File size
@@ -125,8 +125,8 @@ FileManager.prototype = {
 	 */
 	setFileData(element, { name, size }) {
 		if (!element) return;
-		element.setAttribute('data-se-file-name', name);
-		element.setAttribute('data-se-file-size', size + '');
+		/** @type {Element} */ (element).setAttribute('data-se-file-name', name);
+		/** @type {Element} */ (element).setAttribute('data-se-file-size', size + '');
 	},
 
 	/**

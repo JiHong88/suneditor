@@ -55,13 +55,16 @@ class PageNavigator extends EditorInjector {
 	#OnChangeInner(e) {
 		if (!this.editor.frameContext.has('documentType-use-page')) return;
 
-		const value = Number(dom.query.getEventTarget(e).value) || 1;
+		/** @type {HTMLInputElement} */
+		const eventTarget = dom.query.getEventTarget(e);
+
+		const value = Number(eventTarget.value) || 1;
 		this.editor.frameContext.get('documentType').pageGo(value);
 	}
 }
 
 function CreateInner() {
-	return dom.utils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null);
+	return /** @type {HTMLInputElement} */ (dom.utils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null));
 }
 
 export default PageNavigator;
