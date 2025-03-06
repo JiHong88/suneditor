@@ -2,7 +2,7 @@
  * @fileoverview DocumentType class
  */
 
-import { domUtils, numbers, converter, env } from '../../helper';
+import { dom, numbers, converter, env } from '../../helper';
 
 const { _w } = env;
 
@@ -128,7 +128,7 @@ DocumentType.prototype = {
 		if (this._rePageTimeout) clearTimeout(this._rePageTimeout);
 
 		this._rePageTimeout = setTimeout(async () => {
-			await domUtils.waitForMediaLoad(this._mirror, 1500);
+			await dom.utils.waitForMediaLoad(this._mirror, 1500);
 
 			const mirrorHeight = this._mirror.scrollHeight;
 			const pageBreaks = this._mirror.querySelectorAll('.se-page-break');
@@ -206,7 +206,7 @@ DocumentType.prototype = {
 				if (!pages[i]) continue;
 				t = pages[i].top;
 				if (mirrorHeight < t) break;
-				const pageNumber = domUtils.createElement('DIV', { style: `top:${t - scrollTop}px`, innerHTML: String(i + 1) }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
+				const pageNumber = dom.utils.createElement('DIV', { style: `top:${t - scrollTop}px`, innerHTML: String(i + 1) }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
 				this.page.appendChild(pageNumber);
 				this.pages.push(pageNumber);
 			}
@@ -284,9 +284,9 @@ DocumentType.prototype = {
 		if (wwWidth === this.wwWidth && (rh = wwHeight === this.wwHeight)) return;
 
 		if (wwWidth > 800) {
-			domUtils.removeClass(this.documentTypeInner, 'se-document-responsible');
+			dom.utils.removeClass(this.documentTypeInner, 'se-document-responsible');
 		} else {
-			domUtils.addClass(this.documentTypeInner, 'se-document-responsible');
+			dom.utils.addClass(this.documentTypeInner, 'se-document-responsible');
 		}
 
 		this.wwWidth = wwWidth;
@@ -391,8 +391,8 @@ DocumentType.prototype = {
 		const item = this._findItem(line);
 		if (!item) return;
 
-		domUtils.removeClass(this.innerHeaders, 'active');
-		domUtils.addClass(item, 'active');
+		dom.utils.removeClass(this.innerHeaders, 'active');
+		dom.utils.addClass(item, 'active');
 	},
 
 	/**
@@ -505,7 +505,7 @@ DocumentType.prototype = {
 			if (this._is(line)) {
 				return line;
 			}
-			line = line.previousElementSibling || line.parentElement;
+			line = /** @type {HTMLElement} */ (line).previousElementSibling || line.parentElement;
 		}
 
 		return null;
@@ -543,8 +543,8 @@ function OnClickHeader(ww, e) {
 
 	try {
 		this.editor._preventBlur = true;
-		const clickedHeader = domUtils.getEventTarget(e);
-		if (domUtils.hasClass(clickedHeader, 'se-doc-item')) {
+		const clickedHeader = dom.query.getEventTarget(e);
+		if (dom.utils.hasClass(clickedHeader, 'se-doc-item')) {
 			const innerIndex = Array.prototype.indexOf.call(this.innerHeaders, clickedHeader);
 			if (innerIndex === -1) return;
 

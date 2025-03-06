@@ -3,8 +3,10 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getClientSize } from '../../helper/domUtils';
-import { domUtils, numbers } from '../../helper';
+import { getParentElement } from '../../helper/dom/domQuery';
+import { isWysiwygFrame, isElement } from '../../helper/dom/domCheck';
+import { hasClass, addClass, removeClass, getClientSize } from '../../helper/dom/domUtils';
+import { numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
 /**
@@ -119,14 +121,14 @@ Offset.prototype = {
 		let offsetTop = 0;
 		let l = 0;
 		let t = 0;
-		let offsetElement = node.nodeType === 3 ? node.parentElement : node;
+		let offsetElement = /** @type {HTMLElement} */ (node.nodeType === 3 ? node.parentElement : node);
 		const wysiwyg = getParentElement(node, isWysiwygFrame.bind(this));
 		const self = offsetElement;
 
 		while (offsetElement && !hasClass(offsetElement, 'se-wrapper') && offsetElement !== wysiwyg) {
 			offsetLeft += offsetElement.offsetLeft - (self !== offsetElement ? offsetElement.scrollLeft : 0);
 			offsetTop += offsetElement.offsetTop + (self !== offsetElement ? offsetElement.scrollTop : 0);
-			offsetElement = offsetElement.offsetParent;
+			offsetElement = /** @type {HTMLElement} */ (offsetElement.offsetParent);
 		}
 
 		const wwFrame = this.editor.frameContext.get('wysiwygFrame');
@@ -147,21 +149,22 @@ Offset.prototype = {
 	/**
 	 * @this {OffsetThis}
 	 * @description Returns the position of the argument relative to the global document.
-	 * @param {?Node=} element Target element.
+	 * @param {?Node=} node Target element.
 	 * @returns {OffsetGlobalInfo} Global position and scroll values.
 	 */
-	getGlobal(element) {
+	getGlobal(node) {
 		const topArea = this.editor.frameContext.get('topArea');
 		const wFrame = this.editor.frameContext.get('wysiwygFrame');
 
 		let isTop = false;
 		let targetAbs = false;
-		if (!element) element = topArea;
-		if (element === topArea) isTop = true;
-		if (!isTop && element.nodeType === 1) {
-			targetAbs = _w.getComputedStyle(element).position === 'absolute';
+		if (!node) node = topArea;
+		if (node === topArea) isTop = true;
+		if (!isTop && isElement(node)) {
+			targetAbs = _w.getComputedStyle(node).position === 'absolute';
 		}
 
+		let element = /** @type {HTMLElement} */ (node);
 		const w = element.offsetWidth;
 		const h = element.offsetHeight;
 		let t = 0,
@@ -174,7 +177,7 @@ Offset.prototype = {
 			l += element.offsetLeft;
 			st += element.scrollTop;
 			sl += element.scrollLeft;
-			element = element.offsetParent;
+			element = /** @type {HTMLElement} */ (element.offsetParent);
 		}
 
 		if (!targetAbs && !isTop && /^iframe$/i.test(wFrame.nodeName) && this.editor.frameContext.get('wysiwyg').contains(element)) {
@@ -182,7 +185,7 @@ Offset.prototype = {
 			while (element) {
 				t += element.offsetTop;
 				l += element.offsetLeft;
-				element = element.offsetParent;
+				element = /** @type {HTMLElement} */ (element.offsetParent);
 			}
 		}
 
@@ -199,19 +202,20 @@ Offset.prototype = {
 	/**
 	 * @this {OffsetThis}
 	 * @description Gets the current editor-relative scroll offset.
-	 * @param {?Node=} element Target element.
+	 * @param {?Node=} node Target element.
 	 * @returns {OffsetGlobalScrollInfo} Global scroll information.
 	 */
-	getGlobalScroll(element) {
+	getGlobalScroll(node) {
 		const topArea = this.editor.frameContext.get('topArea');
 		let isTop = false;
 		let targetAbs = false;
-		if (!element) element = topArea;
-		if (element === topArea) isTop = true;
-		if (!isTop && element.nodeType === 1) {
-			targetAbs = _w.getComputedStyle(element).position === 'absolute';
+		if (!node) node = topArea;
+		if (node === topArea) isTop = true;
+		if (!isTop && isElement(node)) {
+			targetAbs = _w.getComputedStyle(node).position === 'absolute';
 		}
 
+		const element = /** @type {HTMLElement} */ (node);
 		let t = 0,
 			l = 0,
 			h = 0,
@@ -276,7 +280,7 @@ Offset.prototype = {
 			}
 		}
 
-		el = this._shadowRoot?.host;
+		el = /** @type {HTMLElement} */ (this._shadowRoot?.host);
 		if (el) ohOffsetEl = owOffsetEl = topArea;
 		while (el) {
 			t += el.scrollTop;
@@ -353,10 +357,10 @@ Offset.prototype = {
 	/**
 	 * @this {OffsetThis}
 	 * @description Sets the relative position of an element
-	 * @param {Node} element Element to position
-	 * @param {Node} e_container Element's root container
-	 * @param {Node} target Target element to position against
-	 * @param {Node} t_container Target's root container
+	 * @param {HTMLElement} element Element to position
+	 * @param {HTMLElement} e_container Element's root container
+	 * @param {HTMLElement} target Target element to position against
+	 * @param {HTMLElement} t_container Target's root container
 	 * @param {boolean} _reload Whether to reload position
 	 */
 	setRelPosition(element, e_container, target, t_container, _reload) {
@@ -368,7 +372,7 @@ Offset.prototype = {
 				wy += this._scrollY;
 				break;
 			}
-		} while (!domUtils.hasClass(tCon, 'sun-editor') && (tCon = tCon.parentElement));
+		} while (!hasClass(tCon, 'sun-editor') && (tCon = tCon.parentElement));
 
 		if (!_reload) {
 			this.__removeGlobalEvent();
@@ -404,7 +408,7 @@ Offset.prototype = {
 		let offsetEl = target;
 		while (offsetEl && offsetEl !== e_container) {
 			bt += offsetEl.offsetTop;
-			offsetEl = offsetEl.offsetParent;
+			offsetEl = /** @type {HTMLElement} */ (offsetEl.offsetParent);
 		}
 
 		const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
@@ -434,8 +438,8 @@ Offset.prototype = {
 	/**
 	 * @this {OffsetThis}
 	 * @description Sets the absolute position of an element
-	 * @param {Node} element Element to position
-	 * @param {Node} target Target element
+	 * @param {HTMLElement} element Element to position
+	 * @param {HTMLElement} target Target element
 	 * @param {Object} params Position parameters
 	 * @param {boolean} [params.isWWTarget=false] Whether the target is within the editor's WYSIWYG area
 	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
@@ -457,13 +461,13 @@ Offset.prototype = {
 		}
 
 		const isWWTarget = this.editor.frameContext.get('wrapper').contains(target) || params.isWWTarget;
-		const isCtrlTarget = domUtils.getParentElement(target, '.se-controller');
+		const isCtrlTarget = getParentElement(target, '.se-controller');
 		const isTargetAbs = isWWTarget && !isCtrlTarget;
 		const clientSize = getClientSize(_d);
 		const wwScroll = isTargetAbs ? this.getWWScroll() : this._getWindowScroll();
 		const targetRect = isCtrlTarget ? target.getBoundingClientRect() : this.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
-		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
+		const arrow = /** @type {HTMLElement} */ (hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null);
 
 		// top ----------------------------------------------------------------------------------------------------
 		const ah = arrow ? arrow.offsetHeight : 0;
@@ -584,7 +588,7 @@ Offset.prototype = {
 	/**
 	 * @this {OffsetThis}
 	 * @description Sets the position of an element relative to a range
-	 * @param {Node} element Element to position
+	 * @param {HTMLElement} element Element to position
 	 * @param {?Range} range Range to position against.
 	 * - if null, the current selection range is used
 	 * @param {Object} [options={}] Position options
@@ -650,7 +654,7 @@ Offset.prototype = {
 	 * - does not overflow the editor boundaries and adjusts the arrow positioning accordingly.
 	 * @param {boolean} isDirTop - Determines whether the element should be positioned above (`true`) or below (`false`) the target.
 	 * @param {RectsInfo} rects - Bounding rectangle information of the selection range.
-	 * @param {Node} element - The element to be positioned.
+	 * @param {HTMLElement} element - The element to be positioned.
 	 * @param {number} editorLeft - The left position of the editor.
 	 * @param {number} editorWidth - The width of the editor.
 	 * @param {number} scrollLeft - The horizontal scroll offset.
@@ -659,7 +663,7 @@ Offset.prototype = {
 	 */
 	_setOffsetOnRange(isDirTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop = 0) {
 		const padding = 1;
-		const arrow = element.querySelector('.se-arrow ');
+		const arrow = /** @type  {HTMLElement} */ (element.querySelector('.se-arrow '));
 		const arrowMargin = Math.round(arrow.offsetWidth / 2);
 		const elW = element.offsetWidth;
 		const elH = rects.noText && !isDirTop ? 0 : element.offsetHeight;
@@ -686,11 +690,11 @@ Offset.prototype = {
 		element.style.top = Math.floor(t) + 'px';
 
 		if (isDirTop) {
-			domUtils.removeClass(arrow, 'se-arrow-up');
-			domUtils.addClass(arrow, 'se-arrow-down');
+			removeClass(arrow, 'se-arrow-up');
+			addClass(arrow, 'se-arrow-down');
 		} else {
-			domUtils.removeClass(arrow, 'se-arrow-down');
-			domUtils.addClass(arrow, 'se-arrow-up');
+			removeClass(arrow, 'se-arrow-down');
+			addClass(arrow, 'se-arrow-up');
 		}
 
 		const arrow_left = Math.floor(elW / 2 + (absoluteLeft - l));
@@ -783,7 +787,7 @@ Offset.prototype = {
 	 * @description Sets the visibility and direction of the arrow element.
 	 * - This method applies the appropriate class (`se-arrow-up` or `se-arrow-down`)
 	 * - based on the specified direction key and adjusts the visibility of the arrow.
-	 * @param {Node} arrow - The arrow element to be updated.
+	 * @param {HTMLElement} arrow - The arrow element to be updated.
 	 * @param {string} key - The direction of the arrow. ("up"|"down"|"")
 	 * - Accepts `'up'` for an upward arrow, `'down'` for a downward arrow,
 	 * - or any other value to hide the arrow.
@@ -818,7 +822,7 @@ Offset.prototype = {
 	 */
 
 	_getWindowScroll() {
-		const viewPort = domUtils.getClientSize(_d);
+		const viewPort = getClientSize(_d);
 		return {
 			top: _w.scrollY,
 			left: _w.scrollX,
@@ -855,10 +859,10 @@ Offset.prototype = {
 /**
  * @private
  * @this {OffsetThis}
- * @param {Node} element - The element to check for a specific class name.
- * @param {Node} e_container - The root container of the element.
- * @param {Node} target - The target element to position against.
- * @param {Node} t_container - The root container of the target element.
+ * @param {HTMLElement} element - The element to check for a specific class name.
+ * @param {HTMLElement} e_container - The root container of the element.
+ * @param {HTMLElement} target - The target element to position against.
+ * @param {HTMLElement} t_container - The root container of the target element.
  */
 function FixedScroll(element, e_container, target, t_container) {
 	const isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position);

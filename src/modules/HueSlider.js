@@ -2,7 +2,7 @@
  * @fileoverview Implements HueSlider.
  */
 
-import { domUtils, env } from '../helper';
+import { dom, env } from '../helper';
 import Controller from './Controller';
 
 const { isMobile } = env;
@@ -45,7 +45,7 @@ function CreateSliderCtx() {
 	</div>
 	`;
 
-	const slider = domUtils.createElement('DIV', { class: 'se-hue-slider' }, html);
+	const slider = dom.utils.createElement('DIV', { class: 'se-hue-slider' }, html);
 	const wheelCanvas = /** @type {HTMLCanvasElement} */ (slider.querySelector('.se-hue-wheel'));
 	const gradientBarCanvas = /** @type {HTMLCanvasElement} */ (slider.querySelector('.se-hue-gradient'));
 	const currentColors = slider.querySelector('.se-hue-final-hex').children;
@@ -546,7 +546,7 @@ drawColorWheelToContext(offscreenCtx);
 drawColorWheel();
 
 function CreateHTML_basicControllerForm({ lang, icons }, className) {
-	const hueController = domUtils.createElement(
+	const hueController = dom.utils.createElement(
 		'DIV',
 		{ class: `se-controller ${className}` },
 		/*html*/ `

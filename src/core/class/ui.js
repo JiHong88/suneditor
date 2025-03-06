@@ -4,7 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import Modal from '../../modules/Modal';
-import { domUtils, converter } from '../../helper';
+import { dom, converter } from '../../helper';
 
 /**
  * @typedef {Omit<UI & Partial<EditorInjector>, 'ui'>} UIThis
@@ -24,7 +24,7 @@ function UI(editor) {
 	const noticeModal = CreateNoticeHTML(editor);
 	this.noticeModal = new Modal(this, noticeModal);
 	this.noticeMessage = noticeModal.querySelector('span');
-	this._backWrapper = this.carrierWrapper.querySelector('.se-back-wrapper');
+	this._backWrapper = /** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-back-wrapper'));
 	this._controllerOnBtnDisabled = false;
 }
 
@@ -76,8 +76,8 @@ UI.prototype = {
 
 		const applyTheme = (target) => {
 			if (!target) return;
-			if (prevTheme) domUtils.removeClass(target, prevTheme);
-			if (theme) domUtils.addClass(target, theme);
+			if (prevTheme) dom.utils.removeClass(target, prevTheme);
+			if (theme) dom.utils.addClass(target, theme);
 		};
 
 		applyTheme(this.carrierWrapper);
@@ -100,7 +100,7 @@ UI.prototype = {
 		const fc = rootKey ? this.frameRoots.get(rootKey) : this.editor.frameContext;
 
 		fc.set('isReadOnly', !!value);
-		domUtils.setDisabled(this.editor._controllerOnDisabledButtons, !!value);
+		dom.utils.setDisabled(this.editor._controllerOnDisabledButtons, !!value);
 
 		if (value) {
 			this._offCurrentController();
@@ -112,10 +112,10 @@ UI.prototype = {
 			if (this.menu?.currentContainerActiveButton?.disabled) this.menu.containerOff();
 
 			fc.get('code').setAttribute('readOnly', 'true');
-			domUtils.addClass(fc.get('wysiwyg'), 'se-read-only');
+			dom.utils.addClass(fc.get('wysiwyg'), 'se-read-only');
 		} else {
 			fc.get('code').removeAttribute('readOnly');
-			domUtils.removeClass(fc.get('wysiwyg'), 'se-read-only');
+			dom.utils.removeClass(fc.get('wysiwyg'), 'se-read-only');
 		}
 
 		if (this.options.get('hasCodeMirror')) {
@@ -211,10 +211,10 @@ UI.prototype = {
 	 */
 	setControllerOnDisabledButtons(active) {
 		if (active && !this._controllerOnBtnDisabled) {
-			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+			dom.utils.setDisabled(this.editor._controllerOnDisabledButtons, true);
 			this._controllerOnBtnDisabled = true;
 		} else if (!active && this._controllerOnBtnDisabled) {
-			domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
+			dom.utils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 			this._controllerOnBtnDisabled = false;
 		}
 	},
@@ -324,7 +324,7 @@ UI.prototype = {
 
 function CreateNoticeHTML({ lang, icons }) {
 	const html = '<div><button class="close" data-command="close" title="' + lang.close + '">' + icons.cancel + '</button></div><div><span></span></div>';
-	return domUtils.createElement('DIV', { class: 'se-notice' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-notice' }, html);
 }
 
 export default UI;

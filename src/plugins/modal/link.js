@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller, ModalAnchorEditor } from '../../modules';
-import { domUtils, numbers } from '../../helper';
+import { dom, numbers } from '../../helper';
 
 /**
  * @typedef {Object} LinkPluginOptions
@@ -50,8 +50,8 @@ class Link extends EditorInjector {
 			...pluginOptions,
 			uploadUrl,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
-			uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
-			uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
+			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
+			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			acceptedFormats: typeof pluginOptions.acceptedFormats === 'string' ? pluginOptions.acceptedFormats.trim() : null,
 			enableFileUpload: !!uploadUrl
 		};
@@ -65,17 +65,17 @@ class Link extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element) {
-		if (domUtils.isAnchor(element) && !element.hasAttribute('data-se-non-link')) {
+		if (dom.check.isAnchor(element) && !element.hasAttribute('data-se-non-link')) {
 			const tempLink = this.controller.form.querySelector('a');
 			tempLink.href = element.href;
 			tempLink.title = element.textContent;
 			tempLink.textContent = element.textContent;
 
-			domUtils.addClass(element, 'on');
+			dom.utils.addClass(element, 'on');
 
 			this.anchor.set(element);
 			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
@@ -118,7 +118,7 @@ class Link extends EditorInjector {
 		if (!this.isUpdateState) {
 			const selectedFormats = this.format.getLines();
 			if (selectedFormats.length > 1) {
-				if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), { afterNode: null, skipCharCount: false })) return true;
+				if (!this.html.insertNode(dom.utils.createElement(selectedFormats[0].nodeName, null, oA), { afterNode: null, skipCharCount: false })) return true;
 			} else {
 				if (!this.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return true;
 			}
@@ -145,7 +145,7 @@ class Link extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLElement} target Target button element
+	 * @param {HTMLButtonElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -153,14 +153,14 @@ class Link extends EditorInjector {
 		if (/update/.test(command)) {
 			this.modal.open();
 		} else if (/unlink/.test(command)) {
-			const sc = domUtils.getEdgeChild(
+			const sc = dom.query.getEdgeChild(
 				this.controller.currentTarget,
 				function (current) {
 					return current.childNodes.length === 0 || current.nodeType === 3;
 				},
 				false
 			);
-			const ec = domUtils.getEdgeChild(
+			const ec = dom.query.getEdgeChild(
 				this.controller.currentTarget,
 				function (current) {
 					return current.childNodes.length === 0 || current.nodeType === 3;
@@ -171,7 +171,7 @@ class Link extends EditorInjector {
 			this.format.applyInlineElement(null, { stylesToModify: null, nodesToRemove: ['A'], strictRemove: false });
 		} else {
 			/** delete */
-			domUtils.removeItem(this.controller.currentTarget);
+			dom.utils.removeItem(this.controller.currentTarget);
 			this.controller.currentTarget = null;
 			this.editor.focus();
 			this.history.push(false);
@@ -183,7 +183,7 @@ class Link extends EditorInjector {
 	 * @description This function is called before the "controller" before it is closed.
 	 */
 	close() {
-		domUtils.removeClass(this.controller.currentTarget, 'on');
+		dom.utils.removeClass(this.controller.currentTarget, 'on');
 	}
 }
 
@@ -204,7 +204,7 @@ function CreateHTML_modal({ lang, icons }) {
 		</div>
 	</form>`;
 
-	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
 function CreateHTML_controller({ lang, icons }) {
@@ -234,7 +234,7 @@ function CreateHTML_controller({ lang, icons }) {
 		</div>
 	</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
 }
 
 export default Link;

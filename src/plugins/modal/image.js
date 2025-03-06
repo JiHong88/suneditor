@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
-import { domUtils, numbers, env } from '../../helper';
+import { dom, numbers, env, keyCodeMap } from '../../helper';
 import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
@@ -45,12 +45,12 @@ class Image_ extends EditorInjector {
 	static className = '';
 	/**
 	 * @this {Image_}
-	 * @param {Node} node - The node to check.
-	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
-		node = domUtils.isFigure(node) || (/^span$/i.test(node.nodeName) && domUtils.hasClass(node, 'se-component')) ? node.firstElementChild : node;
-		return /^IMG$/i.test(node?.nodeName) ? node : domUtils.isAnchor(node) && /^IMG$/i.test(node?.firstElementChild?.nodeName) ? node?.firstElementChild : null;
+		node = dom.check.isFigure(node) || (/^span$/i.test(node.nodeName) && dom.utils.hasClass(node, 'se-component')) ? node.firstElementChild : node;
+		return /^IMG$/i.test(node?.nodeName) ? node : dom.check.isAnchor(node) && /^IMG$/i.test(node?.firstElementChild?.nodeName) ? node?.firstElementChild : null;
 	}
 
 	/**
@@ -74,8 +74,8 @@ class Image_ extends EditorInjector {
 			createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
 			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
-			uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
-			uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
+			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
+			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			allowMultiple: !!pluginOptions.allowMultiple,
 			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
 			useFormatType: pluginOptions.useFormatType ?? true,
@@ -267,7 +267,7 @@ class Image_ extends EditorInjector {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * @returns {{query: string, method: (element: HTMLImageElement) => void}} The format retention object containing the query and method to process the element.
 	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
 	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -340,7 +340,7 @@ class Image_ extends EditorInjector {
 	_ready(target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
-		this.anchor.set(domUtils.isAnchor(target.parentNode) ? target.parentNode : null);
+		this.anchor.set(dom.check.isAnchor(target.parentNode) ? target.parentNode : null);
 
 		this._linkElement = this.anchor.currentTarget;
 		this._element = target;
@@ -394,19 +394,19 @@ class Image_ extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Node} target Target element
+	 * @param {HTMLElement} target Target element
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
 		const targetEl = target || this._element;
-		const container = domUtils.getParentElement(targetEl, Figure.is) || targetEl;
+		const container = dom.query.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
 		const message = await this.triggerEvent('onImageDeleteBefore', { element: targetEl, container, align: this._align, alt: this.altText.value, url: this._linkValue });
 		if (message === false) return;
 
-		domUtils.removeItem(container);
+		dom.utils.removeItem(container);
 		this.init();
 
 		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
@@ -448,16 +448,16 @@ class Image_ extends EditorInjector {
 	 */
 	_activeAsInline(isInline) {
 		if (isInline) {
-			domUtils.addClass(this.asInline, 'on');
-			domUtils.removeClass(this.asBlock, 'on');
+			dom.utils.addClass(this.asInline, 'on');
+			dom.utils.removeClass(this.asBlock, 'on');
 			this.as = 'inline';
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = 'none';
 			// caption
 			if (this.captionEl) this.captionEl.style.display = 'none';
 		} else {
-			domUtils.addClass(this.asBlock, 'on');
-			domUtils.removeClass(this.asInline, 'on');
+			dom.utils.addClass(this.asBlock, 'on');
+			dom.utils.removeClass(this.asInline, 'on');
 			this.as = 'block';
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = '';
@@ -609,7 +609,7 @@ class Image_ extends EditorInjector {
 			}
 		} else {
 			if (this._caption) {
-				domUtils.removeItem(this._caption);
+				dom.utils.removeItem(this._caption);
 				this._caption = null;
 				modifiedCaption = true;
 			}
@@ -639,7 +639,7 @@ class Image_ extends EditorInjector {
 		}
 
 		if (isNewAnchor) {
-			domUtils.removeItem(anchor);
+			dom.utils.removeItem(anchor);
 		}
 
 		// transform
@@ -714,7 +714,7 @@ class Image_ extends EditorInjector {
 				}
 			} else {
 				if (this._caption) {
-					domUtils.removeItem(this._caption);
+					dom.utils.removeItem(this._caption);
 					this._caption = null;
 					modifiedCaption = true;
 				}
@@ -754,11 +754,11 @@ class Image_ extends EditorInjector {
 
 		if (isNewAnchor) {
 			if (!isNewContainer) {
-				domUtils.removeItem(anchor);
+				dom.utils.removeItem(anchor);
 			} else {
-				domUtils.removeItem(isNewAnchor);
-				if (domUtils.getListChildren(anchor, (current) => /IMG/i.test(current.tagName)).length === 0) {
-					domUtils.removeItem(anchor);
+				dom.utils.removeItem(isNewAnchor);
+				if (dom.query.getListChildren(anchor, (current) => /IMG/i.test(current.tagName)).length === 0) {
+					dom.utils.removeItem(anchor);
 				}
 			}
 		}
@@ -785,7 +785,7 @@ class Image_ extends EditorInjector {
 	 */
 	#OpenTab(e) {
 		const modalForm = this.modal.form;
-		const targetElement = typeof e === 'string' ? modalForm.querySelector('._se_tab_link') : domUtils.getEventTarget(e);
+		const targetElement = typeof e === 'string' ? modalForm.querySelector('._se_tab_link') : dom.query.getEventTarget(e);
 
 		if (!/^BUTTON$/i.test(targetElement.tagName)) {
 			return false;
@@ -804,12 +804,12 @@ class Image_ extends EditorInjector {
 		// Get all elements with class="tablinks" and remove the class "active"
 		const tabLinks = modalForm.getElementsByClassName('_se_tab_link');
 		for (i = 0; i < tabLinks.length; i++) {
-			domUtils.removeClass(tabLinks[i], 'active');
+			dom.utils.removeClass(tabLinks[i], 'active');
 		}
 
 		// Show the current tab, and add an "active" class to the button that opened the tab
 		modalForm.querySelector('._se_tab_content_' + tabName).style.display = 'block';
-		domUtils.addClass(targetElement, 'active');
+		dom.utils.addClass(targetElement, 'active');
 
 		// focus
 		if (e !== 'init') {
@@ -870,7 +870,7 @@ class Image_ extends EditorInjector {
 	 * @param {string} alt - The alternative text for the image.
 	 */
 	create(src, anchor, width, height, align, file, alt) {
-		const oImg = domUtils.createElement('IMG');
+		const oImg = dom.utils.createElement('IMG');
 		oImg.src = src;
 		oImg.alt = alt;
 		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
@@ -912,7 +912,7 @@ class Image_ extends EditorInjector {
 	 * @param {string} alt - The alternative text for the image.
 	 */
 	createInline(src, anchor, width, height, file, alt) {
-		const oImg = domUtils.createElement('IMG');
+		const oImg = dom.utils.createElement('IMG');
 		oImg.src = src;
 		oImg.alt = alt;
 		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
@@ -1123,7 +1123,7 @@ class Image_ extends EditorInjector {
 	}
 
 	#OnInputSize(xy, e) {
-		if (e.keyCode === 32) {
+		if (keyCodeMap.isSpace(e.code)) {
 			e.preventDefault();
 			return;
 		}
@@ -1323,7 +1323,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			</div>
 		</form>`;
 
-	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
 export default Image_;

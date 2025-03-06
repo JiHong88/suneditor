@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @class
@@ -24,7 +24,7 @@ class PageNavigator extends EditorInjector {
 		// create HTML
 		this.title = this.lang.pageNumber;
 		this.inner = CreateInner();
-		this.afterItem = domUtils.createElement('span', { class: 'se-btn se-sub-btn' }, ``);
+		this.afterItem = dom.utils.createElement('span', { class: 'se-btn se-sub-btn' }, ``);
 
 		// members
 		this.pageNum = 1;
@@ -55,13 +55,13 @@ class PageNavigator extends EditorInjector {
 	#OnChangeInner(e) {
 		if (!this.editor.frameContext.has('documentType-use-page')) return;
 
-		const value = Number(domUtils.getEventTarget(e).value) || 1;
+		const value = Number(dom.query.getEventTarget(e).value) || 1;
 		this.editor.frameContext.get('documentType').pageGo(value);
 	}
 }
 
 function CreateInner() {
-	return domUtils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null);
+	return dom.utils.createElement('input', { type: 'number', class: 'se-not-arrow-text', placeholder: '1', value: '1', min: '1' }, null);
 }
 
 export default PageNavigator;

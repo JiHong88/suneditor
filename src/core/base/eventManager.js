@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, unicode, numbers, env, converter } from '../../helper';
+import { dom, unicode, numbers, env, converter } from '../../helper';
 import { _DragHandle } from '../../modules';
 
 // event handlers
@@ -233,9 +233,9 @@ EventManager.prototype = {
 
 		const fc = this.editor.frameContext;
 		const notReadonly = !fc.get('isReadOnly');
-		for (let element = selectionNode; !domUtils.isWysiwygFrame(element); element = element.parentElement) {
+		for (let element = selectionNode; !dom.check.isWysiwygFrame(element); element = element.parentElement) {
 			if (!element) break;
-			if (element.nodeType !== 1 || domUtils.isBreak(element)) continue;
+			if (element.nodeType !== 1 || dom.check.isBreak(element)) continue;
 			if (this._isNonFocusNode(element)) {
 				this.editor.blur();
 				return;
@@ -264,10 +264,10 @@ EventManager.prototype = {
 			/** indent, outdent */
 			if (this.format.isLine(element)) {
 				/* Outdent */
-				if (!commandMapNodes.includes('outdent') && commandTargets.has('outdent') && (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
+				if (!commandMapNodes.includes('outdent') && commandTargets.has('outdent') && (dom.check.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
 					if (
 						commandTargets.get('outdent').filter((e) => {
-							if (domUtils.isImportantDisabled(e)) return false;
+							if (dom.check.isImportantDisabled(e)) return false;
 							e.disabled = false;
 							return true;
 						}).length > 0
@@ -277,15 +277,11 @@ EventManager.prototype = {
 				}
 				/* Indent */
 				if (!commandMapNodes.includes('indent') && commandTargets.has('indent')) {
-					const indentDisable = domUtils.isListCell(element) && !element.previousElementSibling;
+					const indentDisable = dom.check.isListCell(element) && !element.previousElementSibling;
 					if (
 						commandTargets.get('indent').filter((e) => {
-							if (domUtils.isImportantDisabled(e)) return false;
-							if (indentDisable) {
-								e.disabled = true;
-							} else {
-								e.disabled = false;
-							}
+							if (dom.check.isImportantDisabled(e)) return false;
+							e.disabled = indentDisable;
 							return true;
 						}).length > 0
 					) {
@@ -300,7 +296,7 @@ EventManager.prototype = {
 			if (classOnCheck.test(nodeName)) {
 				nodeName = styleCommand[nodeName] || nodeName;
 				commandMapNodes.push(nodeName);
-				domUtils.addClass(commandTargets.get(nodeName), 'active');
+				dom.utils.addClass(commandTargets.get(nodeName), 'active');
 			}
 		}
 
@@ -329,9 +325,9 @@ EventManager.prototype = {
 	 * @private
 	 */
 	_injectActiveEvent(target) {
-		domUtils.addClass(target, '__se__active');
+		dom.utils.addClass(target, '__se__active');
 		this.__geckoActiveEvent = this.addGlobalEvent('mouseup', () => {
-			domUtils.removeClass(target, '__se__active');
+			dom.utils.removeClass(target, '__se__active');
 			this.__geckoActiveEvent = this.removeGlobalEvent(this.__geckoActiveEvent);
 		});
 	},
@@ -354,15 +350,15 @@ EventManager.prototype = {
 			p = plugins[k];
 			for (let j = 0, jLen = c.length, e; j < jLen; j++) {
 				e = c[j];
-				if (!e || e.length === 0) continue;
+				if (!e) continue;
 				if (p) {
 					p.active(null, e);
 				} else if (/^outdent$/i.test(k)) {
-					if (!domUtils.isImportantDisabled(e)) e.disabled = true;
+					if (!dom.check.isImportantDisabled(e)) e.disabled = true;
 				} else if (/^indent$/i.test(k)) {
-					if (!domUtils.isImportantDisabled(e)) e.disabled = false;
+					if (!dom.check.isImportantDisabled(e)) e.disabled = false;
 				} else {
-					domUtils.removeClass(e, 'active');
+					dom.utils.removeClass(e, 'active');
 				}
 			}
 		}
@@ -435,7 +431,7 @@ EventManager.prototype = {
 	 * @returns {boolean} True if the node is non-focusable, otherwise false
 	 */
 	_isNonFocusNode(node) {
-		return node.nodeType === 1 && node.getAttribute('data-se-non-focus') === 'true';
+		return dom.check.isElement(node) && node.getAttribute('data-se-non-focus') === 'true';
 	},
 
 	/**
@@ -451,14 +447,14 @@ EventManager.prototype = {
 		const offset = isFront ? range.startOffset : range.endOffset;
 		const siblingKey = isFront ? 'previousSibling' : 'nextSibling';
 		const isElement = container.nodeType === 1;
-		let siblingNode;
 
+		let siblingNode;
 		if (isElement) {
-			siblingNode = this._isUneditableNode_getSibling(container.childNodes[offset], siblingKey, container);
+			siblingNode = /** @type {HTMLElement} */ (this._isUneditableNode_getSibling(container.childNodes[offset], siblingKey, container));
 			return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false' ? siblingNode : null;
 		} else {
-			siblingNode = this._isUneditableNode_getSibling(container, siblingKey, container);
-			return domUtils.isEdgePoint(container, offset, isFront ? 'front' : 'end') && siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false' ? siblingNode : null;
+			siblingNode = /** @type {HTMLElement} */ (this._isUneditableNode_getSibling(container, siblingKey, container));
+			return dom.check.isEdgePoint(container, offset, isFront ? 'front' : 'end') && siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false' ? siblingNode : null;
 		}
 	},
 
@@ -501,26 +497,26 @@ EventManager.prototype = {
 		// table
 		const sCell = this.format.getBlock(sc);
 		const eCell = this.format.getBlock(ec);
-		const sIsCell = domUtils.isTableCell(sCell);
-		const eIsCell = domUtils.isTableCell(eCell);
+		const sIsCell = dom.check.isTableCell(sCell);
+		const eIsCell = dom.check.isTableCell(eCell);
 		const ancestor = range.commonAncestorContainer;
 		if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
 			if (!sIsCell) {
-				domUtils.removeItem(domUtils.getParentElement(eCell, (current) => ancestor === current.parentNode));
+				dom.utils.removeItem(dom.query.getParentElement(eCell, (current) => ancestor === current.parentNode));
 			} else if (!eIsCell) {
-				domUtils.removeItem(domUtils.getParentElement(sCell, (current) => ancestor === current.parentNode));
+				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current.parentNode));
 			} else {
-				domUtils.removeItem(domUtils.getParentElement(sCell, (current) => ancestor === current.parentNode));
+				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current.parentNode));
 				this.editor._nativeFocus();
 				return true;
 			}
 		}
 
 		// component
-		const sComp = sc.nodeType === 1 ? domUtils.getParentElement(sc, '.se-component') : null;
-		const eComp = ec.nodeType === 1 ? domUtils.getParentElement(ec, '.se-component') : null;
-		if (sComp) domUtils.removeItem(sComp);
-		if (eComp) domUtils.removeItem(eComp);
+		const sComp = sc.nodeType === 1 ? dom.query.getParentElement(sc, '.se-component') : null;
+		const eComp = ec.nodeType === 1 ? dom.query.getParentElement(ec, '.se-component') : null;
+		if (sComp) dom.utils.removeItem(sComp);
+		if (eComp) dom.utils.removeItem(eComp);
 
 		return false;
 	},
@@ -536,7 +532,7 @@ EventManager.prototype = {
 		if (this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName)) return;
 
 		const range = this.selection.getRange();
-		const commonCon = range.commonAncestorContainer;
+		const commonCon = /** @type {HTMLElement} */ (range.commonAncestorContainer);
 		const startCon = range.startContainer;
 		const rangeEl = this.format.getBlock(commonCon, null);
 
@@ -545,16 +541,16 @@ EventManager.prototype = {
 		let offset, format;
 
 		if (rangeEl) {
-			format = domUtils.createElement(formatName || this.options.get('defaultLine'));
+			format = dom.utils.createElement(formatName || this.options.get('defaultLine'));
 			format.innerHTML = rangeEl.innerHTML;
 			if (format.childNodes.length === 0) format.innerHTML = unicode.zeroWidthSpace;
 
 			rangeEl.innerHTML = format.outerHTML;
 			format = rangeEl.firstChild;
-			focusNode = domUtils.getEdgeChildNodes(format, null).sc;
+			focusNode = dom.query.getEdgeChildNodes(format, null).sc;
 
 			if (!focusNode) {
-				focusNode = domUtils.createTextNode(unicode.zeroWidthSpace);
+				focusNode = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				format.insertBefore(focusNode, format.firstChild);
 			}
 
@@ -569,7 +565,7 @@ EventManager.prototype = {
 
 			if (commonCon.parentElement === container) {
 				const siblingEl = commonCon.nextElementSibling ? container : container.nextElementSibling;
-				const el = domUtils.createElement(this.options.get('defaultLine'), null, commonCon);
+				const el = dom.utils.createElement(this.options.get('defaultLine'), null, commonCon);
 				container.parentElement.insertBefore(el, siblingEl);
 				this.editor.focusEdge(el);
 				return;
@@ -584,15 +580,15 @@ EventManager.prototype = {
 			return;
 		}
 
-		if ((this.format.isBlock(startCon) || domUtils.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
-		if (domUtils.getParentElement(commonCon, domUtils.isExcludeFormat)) return null;
+		if ((this.format.isBlock(startCon) || dom.check.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
+		if (dom.query.getParentElement(commonCon, dom.check.isExcludeFormat)) return null;
 
 		if (this.format.isBlock(commonCon) && commonCon.childNodes.length <= 1) {
 			let br = null;
-			if (commonCon.childNodes.length === 1 && domUtils.isBreak(commonCon.firstChild)) {
+			if (commonCon.childNodes.length === 1 && dom.check.isBreak(commonCon.firstChild)) {
 				br = commonCon.firstChild;
 			} else {
-				br = domUtils.createTextNode(unicode.zeroWidthSpace);
+				br = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				commonCon.appendChild(br);
 			}
 
@@ -602,15 +598,15 @@ EventManager.prototype = {
 
 		try {
 			if (commonCon.nodeType === 3) {
-				format = domUtils.createElement(formatName || this.options.get('defaultLine'));
+				format = dom.utils.createElement(formatName || this.options.get('defaultLine'));
 				commonCon.parentNode.insertBefore(format, commonCon);
 				format.appendChild(commonCon);
 			}
 
-			if (domUtils.isBreak(format.nextSibling)) domUtils.removeItem(format.nextSibling);
-			if (domUtils.isBreak(format.previousSibling)) domUtils.removeItem(format.previousSibling);
-			if (domUtils.isBreak(focusNode)) {
-				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+			if (dom.check.isBreak(format.nextSibling)) dom.utils.removeItem(format.nextSibling);
+			if (dom.check.isBreak(format.previousSibling)) dom.utils.removeItem(format.previousSibling);
+			if (dom.check.isBreak(focusNode)) {
+				const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				focusNode.parentNode.insertBefore(zeroWidth, focusNode);
 				focusNode = zeroWidth;
 			}
@@ -623,10 +619,10 @@ EventManager.prototype = {
 		}
 
 		if (format) {
-			if (domUtils.isBreak(format.nextSibling)) domUtils.removeItem(format.nextSibling);
-			if (domUtils.isBreak(format.previousSibling)) domUtils.removeItem(format.previousSibling);
-			if (domUtils.isBreak(focusNode)) {
-				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+			if (dom.check.isBreak(format.nextSibling)) dom.utils.removeItem(format.nextSibling);
+			if (dom.check.isBreak(format.previousSibling)) dom.utils.removeItem(format.previousSibling);
+			if (dom.check.isBreak(focusNode)) {
+				const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				focusNode.parentNode.insertBefore(zeroWidth, focusNode);
 				focusNode = zeroWidth;
 			}
@@ -701,9 +697,9 @@ EventManager.prototype = {
 		if (!SEData) {
 			const autoLinkify = this.options.get('autoLinkify');
 			if (autoLinkify) {
-				const dom = new DOMParser().parseFromString(cleanData, 'text/html');
-				domUtils.getListChildNodes(dom.body, converter.textToAnchor);
-				cleanData = dom.body.innerHTML;
+				const domParser = new DOMParser().parseFromString(cleanData, 'text/html');
+				dom.query.getListChildNodes(domParser.body, converter.textToAnchor);
+				cleanData = domParser.body.innerHTML;
 			}
 		}
 
@@ -911,7 +907,7 @@ EventManager.prototype = {
 
 		const OnScrollAbs = OnScroll_Abs.bind(this);
 		let scrollParent = fc.get('originElement');
-		while ((scrollParent = domUtils.getScrollParent(scrollParent.parentElement))) {
+		while ((scrollParent = dom.query.getScrollParent(scrollParent.parentElement))) {
 			this.__scrollparents.push(scrollParent);
 			this.addEvent(scrollParent, 'scroll', OnScrollAbs, false);
 		}
@@ -938,7 +934,7 @@ EventManager.prototype = {
 		if (/\d+/.test(fo.get('height')) && fo.get('statusbar_resizeEnable')) {
 			fo.set('__statusbarEvent', this.addEvent(fc.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false));
 		} else {
-			domUtils.addClass(fc.get('statusbar'), 'se-resizing-none');
+			dom.utils.addClass(fc.get('statusbar'), 'se-resizing-none');
 		}
 	},
 
@@ -1064,7 +1060,7 @@ EventManager.prototype = {
 
 		const opendBrowser = this.editor.opendBrowser;
 		if (opendBrowser && opendBrowser.area.style.display === 'block') {
-			opendBrowser.body.style.maxHeight = domUtils.getClientSize().h - opendBrowser.header.offsetHeight - 50 + 'px';
+			opendBrowser.body.style.maxHeight = dom.utils.getClientSize().h - opendBrowser.header.offsetHeight - 50 + 'px';
 		}
 
 		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
@@ -1106,7 +1102,7 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 * @description Retains the style nodes for formatting consistency when applying styles.
 	 * - Preserves nested styling by cloning and restructuring the style nodes.
-	 * @param {Node} formatEl The format element where styles should be retained
+	 * @param {HTMLElement} formatEl The format element where styles should be retained
 	 * @param {Array<Node>} _styleNodes The list of style nodes to retain
 	 */
 	_retainStyleNodes(formatEl, _styleNodes) {
@@ -1119,7 +1115,7 @@ EventManager.prototype = {
 		}
 
 		const { parent, inner } = this.nodeTransform.createNestedNode(_styleNodes, null);
-		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+		const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 		inner.appendChild(zeroWidth);
 
 		formatEl.innerHTML = '';
@@ -1133,7 +1129,7 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 * @description Clears retained style nodes by replacing content with a single line break.
 	 * - Resets the selection to the start of the cleared element.
-	 * @param {Node} formatEl The format element where styles should be cleared
+	 * @param {HTMLElement} formatEl The format element where styles should be cleared
 	 */
 	_clearRetainStyleNodes(formatEl) {
 		formatEl.innerHTML = '<br>';
@@ -1164,16 +1160,16 @@ EventManager.prototype = {
 	 * @param {Element} target The element being hovered over
 	 */
 	_overComponentSelect(target) {
-		const figure = domUtils.getParentElement(target, domUtils.isFigure);
+		const figure = dom.query.getParentElement(target, dom.check.isFigure);
 		let info = this.component.get(target);
 		if (info || figure) {
 			if (!info) info = this.component.get(figure);
-			if (info && !domUtils.hasClass(info.container, 'se-component-selected')) {
+			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
 				this.ui._offCurrentController();
 				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
 				this.component.select(info.target, info.pluginName, false);
 			}
-		} else if (_DragHandle.get('__overInfo') !== null && !domUtils.hasClass(target, 'se-drag-handle')) {
+		} else if (_DragHandle.get('__overInfo') !== null && !dom.utils.hasClass(target, 'se-drag-handle')) {
 			this.component.__deselect();
 			_DragHandle.set('__overInfo', null);
 		}
@@ -1258,8 +1254,8 @@ function OnFocus_wysiwyg(frameContext, e) {
 	this.ui._offCurrentController();
 	this.status.hasFocus = true;
 
-	domUtils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
-	domUtils.setDisabled(this.editor._codeViewDisabledButtons, false);
+	dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
+	dom.utils.setDisabled(this.editor._codeViewDisabledButtons, false);
 
 	this.editor.changeFrameContext(rootKey);
 	this.history.resetButtons(rootKey, null);
@@ -1353,8 +1349,8 @@ function DisplayLineBreak(dir, e) {
 	const component = this._lineBreakComp;
 	if (!component) return;
 
-	const isList = domUtils.isListCell(component.parentElement);
-	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentElement) ? 'DIV' : this.options.get('defaultLine'));
+	const isList = dom.check.isListCell(component.parentElement);
+	const format = dom.utils.createElement(isList ? 'BR' : dom.check.isTableCell(component.parentElement) ? 'DIV' : this.options.get('defaultLine'));
 	if (!isList) format.innerHTML = '<br>';
 
 	if (this.editor.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
@@ -1437,7 +1433,7 @@ function OnSelectionchange_document(_wd) {
 
 			// document type
 			if (root.has('documentType-use-header')) {
-				const el = domUtils.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
+				const el = dom.query.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
 				root.get('documentType').on(el);
 			}
 		}
@@ -1457,8 +1453,8 @@ function OnScroll_Abs() {
  */
 function OnFocus_code(frameContext) {
 	this.editor.changeFrameContext(frameContext.get('key'));
-	domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');
-	domUtils.setDisabled(this.editor._codeViewDisabledButtons, true);
+	dom.utils.addClass(this.editor.commandTargets.get('codeView'), 'active');
+	dom.utils.setDisabled(this.editor._codeViewDisabledButtons, true);
 }
 
 export default EventManager;

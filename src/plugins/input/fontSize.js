@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils, numbers } from '../../helper';
+import { dom, numbers, keyCodeMap } from '../../helper';
 
 const DEFAULT_UNIT_MAP = {
 	text: {
@@ -133,25 +133,25 @@ class FontSize extends EditorInjector {
 
 		// increase, decrease buttons
 		if (showIncDec) {
-			this.beforeItem = domUtils.createElement(
+			this.beforeItem = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'dec' },
 				`${this.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.decrease}</span></span>`
 			);
-			this.afterItem = domUtils.createElement(
+			this.afterItem = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'inc' },
 				`${this.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.increase}</span></span>`
 			);
 		} else if (!disableInput) {
-			this.afterItem = domUtils.createElement(
+			this.afterItem = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': FontSize.key, 'data-type': 'dropdown' },
 				`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
 			);
 			this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
 		} else if (disableInput && !showIncDec) {
-			this.replaceButton = domUtils.createElement(
+			this.replaceButton = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size', 'data-command': FontSize.key, 'data-type': 'dropdown' },
 				`<span class="se-txt __se__font_size">${this.lang.fontSize}</span>${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
@@ -173,12 +173,12 @@ class FontSize extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
-		if (!domUtils.hasClass(target, '__se__font_size')) return false;
+		if (!dom.utils.hasClass(target, '__se__font_size')) return false;
 
 		if (!element) {
 			this._setSize(target, this._getDefaultSize());
@@ -198,9 +198,9 @@ class FontSize extends EditorInjector {
 	 * @param {KeyboardEvent} params.event Event object
 	 */
 	onInputKeyDown({ target, event }) {
-		const keyCode = event.keyCode;
+		const keyCode = event.code;
 
-		if (this._disableInput || keyCode === 32) {
+		if (this._disableInput || keyCodeMap.isSpace(keyCode)) {
 			event.preventDefault();
 			return;
 		}
@@ -214,11 +214,11 @@ class FontSize extends EditorInjector {
 		const unitMap = this.unitMap[unit];
 		let changeValue = numValue;
 		switch (keyCode) {
-			case 38: //up
+			case 'ArrowUp': //up
 				changeValue += unitMap.inc;
 				if (changeValue > unitMap.max) changeValue = numValue;
 				break;
-			case 40: //down
+			case 'ArrowDown': //down
 				changeValue -= unitMap.inc;
 				if (changeValue < unitMap.min) changeValue = numValue;
 		}
@@ -230,10 +230,10 @@ class FontSize extends EditorInjector {
 			const size = this._setSize(target, changeValue + unit);
 			if (this._disableInput) return;
 
-			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + size + ';' });
+			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + size + ';' });
 			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 
-			if (keyCode !== 13) target.focus();
+			if (!keyCodeMap.isEnter(keyCode)) target.focus();
 		} finally {
 			this.isInputActive = false;
 		}
@@ -255,7 +255,7 @@ class FontSize extends EditorInjector {
 			const { max, min } = this.unitMap[unit];
 			value = value > max ? max : value < min ? min : value;
 
-			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + this._setSize(target, value + unit) + ';' });
+			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + this._setSize(target, value + unit) + ';' });
 			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} finally {
 			this.isInputActive = false;
@@ -278,9 +278,9 @@ class FontSize extends EditorInjector {
 		const sizeList = this.sizeList;
 		for (let i = 0, len = sizeList.length; i < len; i++) {
 			if (currentSize === sizeList[i].getAttribute('data-value')) {
-				domUtils.addClass(sizeList[i], 'active');
+				dom.utils.addClass(sizeList[i], 'active');
 			} else {
-				domUtils.removeClass(sizeList[i], 'active');
+				dom.utils.removeClass(sizeList[i], 'active');
 			}
 		}
 
@@ -302,10 +302,10 @@ class FontSize extends EditorInjector {
 			const { min, max } = this.unitMap[unit];
 			newSize = newSize < min ? min : newSize > max ? max : newSize;
 
-			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + newSize + unit + ';' });
+			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + newSize + unit + ';' });
 			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} else if (commandValue) {
-			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + commandValue + ';' });
+			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + commandValue + ';' });
 			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} else {
 			this.format.applyInlineElement(null, { stylesToModify: ['font-size'], nodesToRemove: ['span'], strictRemove: true });
@@ -326,7 +326,7 @@ class FontSize extends EditorInjector {
 	/**
 	 * @private
 	 * @description Extracts the font size and unit from the given element or input value.
-	 * @param {string|Node} target - The target input or element.
+	 * @param {string|Element} target - The target input or element.
 	 * @returns {{ unit: string, value: number|string }} - An object containing:
 	 * - `unit` (string): The detected font size unit.
 	 * - `value` (number|string): The numeric font size value or text-based size.
@@ -339,7 +339,7 @@ class FontSize extends EditorInjector {
 				value: this.sizeUnit ? 0 : ''
 			};
 
-		const size = typeof target === 'string' ? target : /^INPUT$/i.test(target.nodeName) ? target.value : target.textContent;
+		const size = typeof target === 'string' ? target : dom.check.isInputElement(target) ? target.value : target.textContent;
 		const splitValue = this.sizeUnit ? size.split(/(\d+)/) : [size, ''];
 
 		let unit = (splitValue.pop() || '').trim().toLowerCase();
@@ -357,7 +357,7 @@ class FontSize extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the font size in the toolbar input field or button label.
-	 * @param {Node} target - The target element in the toolbar.
+	 * @param {HTMLElement} target - The target element in the toolbar.
 	 * @param {string|number} value - The font size value.
 	 * @returns {string|number} - The applied font size.
 	 */
@@ -365,7 +365,7 @@ class FontSize extends EditorInjector {
 		target = target.parentElement.querySelector('.__se__font_size');
 		if (!target) return 0;
 
-		if (/^INPUT$/i.test(target.nodeName)) {
+		if (dom.check.isInputElement(target)) {
 			return (target.value = String(value));
 		} else {
 			return (target.textContent = String(this.sizeUnit ? value : this.unitMap.text.list.find((v) => v.size === value)?.title || value));
@@ -404,7 +404,7 @@ function CreateHTML({ lang }, unitMap, sizeUnit, showDefaultSizeLabel) {
 		</ul>
 	</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-size' }, list);
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-size' }, list);
 }
 
 export default FontSize;

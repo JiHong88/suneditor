@@ -4,7 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { _w, isEdge } from '../../helper/env';
-import { addClass, removeClass, hasClass } from '../../helper/domUtils';
+import { addClass, removeClass, hasClass } from '../../helper/dom/domUtils';
 
 /**
  * @typedef {Omit<Char & Partial<EditorInjector>, 'char'>} CharThis
@@ -30,7 +30,7 @@ Char.prototype = {
 	check(html) {
 		const maxCharCount = this.editor.frameOptions.get('charCounter_max');
 		if (maxCharCount) {
-			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
+			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? /** @type {HTMLElement} */ (html).outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > maxCharCount) {
 				CounterBlink(this.editor.frameContext.get('charWrapper'));
 				return false;

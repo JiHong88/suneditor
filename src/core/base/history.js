@@ -3,7 +3,7 @@
  */
 
 import { _w } from '../../helper/env';
-import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
+import { getNodeFromPath, getNodePath } from '../../helper/dom/domQuery';
 import { numbers } from '../../helper';
 
 /**

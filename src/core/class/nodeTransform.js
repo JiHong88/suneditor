@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, unicode, numbers } from '../../helper';
+import { dom, unicode, numbers } from '../../helper';
 
 /**
  * @typedef {Omit<NodeTransform & Partial<EditorInjector>, 'nodeTransform'>} NodeTransformThis
@@ -22,18 +22,19 @@ function NodeTransform(editor) {
 NodeTransform.prototype = {
 	/**
 	 * @this {NodeTransformThis}
+	 * @template {Node} T
 	 * @description Split all tags based on "baseNode"
 	 * @param {Node} baseNode Element or text node on which to base
 	 * @param {?number|Node} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
 	 * @param {number} [depth=0] The nesting depth of the element being split. (default: 0)
-	 * @returns {Node} The last element of the splited tag.
+	 * @returns {T} The last element of the splited tag.
 	 */
 	split(baseNode, offset, depth) {
-		if (domUtils.isWysiwygFrame(baseNode) || this.component.is(baseNode) || !baseNode) return baseNode;
+		if (dom.check.isWysiwygFrame(baseNode) || this.component.is(baseNode) || !baseNode) return /** @type {T} */ (baseNode);
 
 		if (offset && !numbers.is(offset)) {
 			const children = baseNode.childNodes;
-			let index = domUtils.getPositionIndex(/** @type {Node} */ (offset));
+			let index = dom.query.getPositionIndex(/** @type {Node} */ (offset));
 			const prev = baseNode.cloneNode(false);
 			const next = baseNode.cloneNode(false);
 			for (let i = 0, len = children.length; i < len; i++) {
@@ -46,9 +47,9 @@ NodeTransform.prototype = {
 			}
 
 			if (prev.childNodes.length > 0) baseNode.parentNode.insertBefore(prev, baseNode);
-			if (next.childNodes.length > 0) baseNode.parentNode.insertBefore(next, baseNode.nextElementSibling);
+			if (next.childNodes.length > 0) baseNode.parentNode.insertBefore(next, /** @type {HTMLElement|Text} */ (baseNode).nextElementSibling);
 
-			return baseNode;
+			return /** @type {T} */ (baseNode);
 		}
 
 		const bp = baseNode.parentNode;
@@ -58,13 +59,13 @@ NodeTransform.prototype = {
 		let newEl, children, temp;
 		if (!depth || depth < 0) depth = 0;
 
-		if (baseNode.nodeType === 3) {
-			index = domUtils.getPositionIndex(baseNode);
+		if (dom.check.isText(baseNode)) {
+			index = dom.query.getPositionIndex(baseNode);
 			offset = Number(offset);
 			if (offset >= 0 && baseNode.length !== offset) {
 				baseNode.splitText(offset);
-				const after = domUtils.getNodeFromPath([index + 1], bp);
-				if (domUtils.isZeroWidth(after)) after.data = unicode.zeroWidthSpace;
+				const after = /** @type {Text} */ (dom.query.getNodeFromPath([index + 1], bp));
+				if (dom.check.isZeroWidth(after)) after.data = unicode.zeroWidthSpace;
 			}
 		} else if (baseNode.nodeType === 1) {
 			if (offset === 0) {
@@ -72,14 +73,14 @@ NodeTransform.prototype = {
 					baseNode = baseNode.firstChild;
 				}
 				if (baseNode.nodeType === 3) {
-					const after = domUtils.createTextNode(unicode.zeroWidthSpace);
+					const after = dom.utils.createTextNode(unicode.zeroWidthSpace);
 					baseNode.parentNode.insertBefore(after, baseNode);
 					baseNode = after;
 				}
 			}
 
 			if (!baseNode.previousSibling) {
-				if (domUtils.getNodeDepth(baseNode) === depth) next = false;
+				if (dom.query.getNodeDepth(baseNode) === depth) next = false;
 			} else {
 				baseNode = baseNode.previousSibling;
 			}
@@ -87,8 +88,8 @@ NodeTransform.prototype = {
 
 		if (baseNode.nodeType === 1) suffixIndex = 0;
 		let depthEl = baseNode;
-		while (domUtils.getNodeDepth(depthEl) > depth) {
-			index = domUtils.getPositionIndex(depthEl) + suffixIndex;
+		while (dom.query.getNodeDepth(depthEl) > depth) {
+			index = dom.query.getPositionIndex(depthEl) + suffixIndex;
 			depthEl = depthEl.parentNode;
 
 			temp = newEl;
@@ -96,9 +97,9 @@ NodeTransform.prototype = {
 			children = depthEl.childNodes;
 
 			if (temp) {
-				if (domUtils.isListCell(newEl) && domUtils.isList(temp) && temp.firstElementChild) {
+				if (dom.check.isListCell(newEl) && dom.check.isList(temp) && temp.firstElementChild) {
 					newEl.innerHTML = temp.firstElementChild.innerHTML;
-					domUtils.removeItem(temp.firstElementChild);
+					dom.utils.removeItem(temp.firstElementChild);
 					if (temp.children.length > 0) newEl.appendChild(temp);
 				} else {
 					newEl.appendChild(temp);
@@ -110,34 +111,34 @@ NodeTransform.prototype = {
 			}
 		}
 
-		if (depthEl.childNodes.length <= 1 && (!depthEl.firstChild || depthEl.firstChild.textContent.length === 0)) depthEl.innerHTML = '<br>';
+		if (depthEl.childNodes.length <= 1 && (!depthEl.firstChild || depthEl.firstChild.textContent.length === 0)) /** @type {HTMLElement} */ (depthEl).innerHTML = '<br>';
 
 		const pElement = depthEl.parentNode;
 		if (next) depthEl = depthEl.nextSibling;
-		if (!newEl) return depthEl;
+		if (!newEl) return /** @type {T} */ (depthEl);
 
 		this.mergeSameTags(newEl, null, false);
-		this.mergeNestedTags(newEl, domUtils.isList);
+		this.mergeNestedTags(newEl, dom.check.isList);
 
 		if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
 		else newEl = depthEl;
 
-		if (domUtils.isListCell(newEl) && newEl.children && domUtils.isList(newEl.children[0])) {
-			newEl.insertBefore(domUtils.createElement('BR'), newEl.children[0]);
+		if (dom.check.isListCell(newEl) && newEl.children && dom.check.isList(newEl.children[0])) {
+			newEl.insertBefore(dom.utils.createElement('BR'), newEl.children[0]);
 		}
 
-		if (bp.childNodes.length === 0) domUtils.removeItem(bp);
+		if (bp.childNodes.length === 0) dom.utils.removeItem(bp);
 
-		return newEl;
+		return /** @type {T} */ (newEl);
 	},
 
 	/**
 	 * @this {NodeTransformThis}
-	 * @description Use with "npdePath (domUtils.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
+	 * @description Use with "npdePath (dom-query-GetNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
 	 * - If "offset" has been changed, it will return as much "offset" as it has been modified.
 	 * - An array containing change offsets is returned in the order of the "nodePathArray" array.
 	 * @param {Node} element Element
-	 * @param {?number[][]=} nodePathArray Array of NodePath object ([domUtils.getNodePath(), ..])
+	 * @param {?number[][]=} nodePathArray Array of NodePath object ([dom-query-GetNodePath(), ..])
 	 * @param {?boolean=} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
 	 * @returns {Array<number>} [offset, ..]
 	 */
@@ -155,12 +156,12 @@ NodeTransform.prototype = {
 			const children = current.childNodes;
 
 			for (let i = 0, len = children.length, child, next; i < len; i++) {
-				child = children[i];
-				next = children[i + 1];
+				child = /** @type {HTMLElement} */ (children[i]);
+				next = /** @type {HTMLElement} */ (children[i + 1]);
 				if (!child) break;
-				if (domUtils.isBreak(child) || domUtils.isMedia(child) || domUtils.isInputElement(child)) continue;
-				if ((onlyText && inst.format._isIgnoreNodeChange(child)) || (!onlyText && (domUtils.isTableElements(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))) {
-					if (domUtils.isTableElements(child) || domUtils.isListCell(child)) {
+				if (dom.check.isBreak(child) || dom.check.isMedia(child) || dom.check.isInputElement(child)) continue;
+				if ((onlyText && inst.format._isIgnoreNodeChange(child)) || (!onlyText && (dom.check.isTableElements(child) || dom.check.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))) {
+					if (dom.check.isTableElements(child) || dom.check.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}
 					continue;
@@ -177,7 +178,7 @@ NodeTransform.prototype = {
 								cDepth = depth;
 								spliceDepth = true;
 								while (cDepth >= 0) {
-									if (domUtils.getArrayIndex(p.childNodes, c) !== path[cDepth]) {
+									if (dom.utils.getArrayIndex(p.childNodes, c) !== path[cDepth]) {
 										spliceDepth = false;
 										break;
 									}
@@ -194,9 +195,9 @@ NodeTransform.prototype = {
 					}
 
 					// merge tag
-					domUtils.copyTagAttributes(child, current);
+					dom.utils.copyTagAttributes(child, current);
 					current.parentNode.insertBefore(child, current);
-					domUtils.removeItem(current);
+					dom.utils.removeItem(current);
 				}
 
 				if (!next) {
@@ -204,7 +205,7 @@ NodeTransform.prototype = {
 					break;
 				}
 
-				if (child.nodeName === next.nodeName && domUtils.isSameAttributes(child, next) && child.href === next.href) {
+				if (child.nodeName === next.nodeName && dom.check.isSameAttributes(child, next) && child.getAttribute?.('href') === next.getAttribute?.('href')) {
 					const childs = child.childNodes;
 					let childLength = 0;
 					for (let n = 0, nLen = childs.length; n < nLen; n++) {
@@ -268,7 +269,7 @@ NodeTransform.prototype = {
 						child.innerHTML += next.innerHTML;
 					}
 
-					domUtils.removeItem(next);
+					dom.utils.removeItem(next);
 					i--;
 				} else if (child.nodeType === 1) {
 					recursionFunc(child, depth + 1, i);
@@ -288,7 +289,7 @@ NodeTransform.prototype = {
 	mergeNestedTags(element, validation) {
 		if (typeof validation === 'string') {
 			const tagRegExp = new RegExp(`^(${validation ? validation : '.+'})$`, 'i');
-			validation = (current) => tagRegExp.test(current.tagName);
+			validation = (current) => tagRegExp.test(current.nodeName);
 		} else if (typeof validation !== 'function') {
 			validation = () => true;
 		}
@@ -307,7 +308,7 @@ NodeTransform.prototype = {
 			for (let i = 0, len = current.children.length; i < len; i++) {
 				recursionFunc(current.children[i]);
 			}
-		})(element);
+		})(/** @type {Element} */ (element));
 	},
 
 	/**
@@ -331,18 +332,18 @@ NodeTransform.prototype = {
 		}
 
 		(function recursionFunc(element) {
-			if (!domUtils.isWysiwygFrame(element)) {
+			if (!dom.check.isWysiwygFrame(element)) {
 				const parent = element.parentNode;
 				if (parent && validation(element)) {
 					cc = {
 						sc: element.previousElementSibling,
 						ec: element.nextElementSibling
 					};
-					domUtils.removeItem(element);
-					recursionFunc(parent);
+					dom.utils.removeItem(element);
+					recursionFunc(/** @type {Element} */ (parent));
 				}
 			}
-		})(item);
+		})(/** @type {Element} */ (item));
 
 		return cc;
 	},
@@ -360,12 +361,12 @@ NodeTransform.prototype = {
 		const allowedEmptyTags = this.options.get('allowedEmptyTags');
 
 		if (notRemoveNode) {
-			notRemoveNode = domUtils.getParentElement(notRemoveNode, (current) => element === current.parentElement);
+			notRemoveNode = dom.query.getParentElement(notRemoveNode, (current) => element === current.parentElement);
 		}
 
 		(function recursionFunc(current) {
-			if (inst.format._notTextNode(current) || current === notRemoveNode || domUtils.isNonEditable(current)) return 0;
-			if (current !== element && domUtils.isZeroWidth(current.textContent) && (!current.firstChild || !domUtils.isBreak(current.firstChild)) && !current.querySelector(allowedEmptyTags)) {
+			if (inst.format._notTextNode(current) || current === notRemoveNode || dom.check.isNonEditable(current)) return 0;
+			if (current !== element && dom.check.isZeroWidth(current.textContent) && (!current.firstChild || !dom.check.isBreak(current.firstChild)) && !current.querySelector(allowedEmptyTags)) {
 				if (current.parentNode) {
 					current.parentNode.removeChild(current);
 					return -1;
@@ -379,13 +380,13 @@ NodeTransform.prototype = {
 			}
 
 			return 0;
-		})(element);
+		})(/** @type {Element} */ (element));
 
 		if (element.childNodes.length === 0) {
 			if (forceDelete) {
-				domUtils.removeItem(element);
+				dom.utils.removeItem(element);
 			} else {
-				element.innerHTML = '<br>';
+				/** @type {HTMLElement} */ (element).innerHTML = '<br>';
 			}
 		}
 	},
@@ -400,11 +401,11 @@ NodeTransform.prototype = {
 	createNestedNode(nodeArray, validate) {
 		if (typeof validate !== 'function') validate = () => true;
 
-		const el = nodeArray[0].cloneNode(false);
+		const el = /** @type {HTMLElement} */ (nodeArray[0].cloneNode(false));
 		let n = el;
 		for (let i = 1, len = nodeArray.length, t; i < len; i++) {
 			if (!validate(nodeArray[i])) continue;
-			t = nodeArray[i].cloneNode(false);
+			t = /** @type {HTMLElement} */ (nodeArray[i].cloneNode(false));
 			n.appendChild(t);
 			n = t;
 		}

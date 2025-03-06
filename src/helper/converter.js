@@ -207,12 +207,12 @@ export function rgb2hex(rgba) {
 
 /**
  * @description Computes the width as a percentage of the parent's width, and returns this value rounded to two decimal places.
- * @param {Node} target The target element for which to calculate the width percentage.
- * @param {?Node=} parentTarget The parent element to use as the reference for the width calculation. If not provided, the target's parent element is used.
+ * @param {HTMLElement} target The target element for which to calculate the width percentage.
+ * @param {?HTMLElement=} parentTarget The parent element to use as the reference for the width calculation. If not provided, the target's parent element is used.
  * @returns {number}
  */
 export function getWidthInPercentage(target, parentTarget) {
-	const parent = parentTarget || target.parentElement;
+	const parent = /** @type {HTMLElement} */ (parentTarget || target.parentElement);
 	const parentStyle = _w.getComputedStyle(parent);
 	const parentPaddingLeft = parseFloat(parentStyle.paddingLeft);
 	const parentPaddingRight = parseFloat(parentStyle.paddingRight);
@@ -263,8 +263,8 @@ export function textToAnchor(node) {
  * @param {Node} node Node
  */
 export function spanToStyleNode(styleToTag, node) {
-	if (node.nodeType === 1 && /^SPAN$/i.test(node.nodeName) && node.hasAttribute('style')) {
-		const style = node.getAttribute('style');
+	if (node.nodeType === 1 && /^SPAN$/i.test(node.nodeName) && /** @type {HTMLElement} */ (node).hasAttribute('style')) {
+		const style = /** @type {HTMLElement} */ (node).getAttribute('style');
 		const tags = [];
 		Object.keys(styleToTag).forEach((key) => {
 			if (styleToTag[key].regex.test(style)) {

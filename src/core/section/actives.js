@@ -1,4 +1,4 @@
-import { domUtils, env } from '../../helper';
+import { dom, env, keyCodeMap } from '../../helper';
 const { NO_EVENT } = env;
 
 /**
@@ -25,8 +25,8 @@ const __RemoveCopyformt = function (ww, button) {
 	__globalEventMousedown = this.eventManager.removeGlobalEvent('mousedown', __globalEventMousedown);
 	this._onCopyFormatInfo = null;
 	this._onCopyFormatInitMethod = null;
-	domUtils.removeClass(ww, 'se-copy-format-cursor');
-	domUtils.removeClass(button, 'on');
+	dom.utils.removeClass(ww, 'se-copy-format-cursor');
+	dom.utils.removeClass(button, 'on');
 
 	return true;
 };
@@ -52,26 +52,26 @@ export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'sav
 export function SELECT_ALL(editor) {
 	editor.ui._offCurrentController();
 	editor.menu.containerOff();
-	const figcaption = domUtils.getParentElement(editor.selection.getNode(), 'FIGCAPTION');
+	const figcaption = dom.query.getParentElement(editor.selection.getNode(), 'FIGCAPTION');
 	const selectArea = figcaption || editor.frameContext.get('wysiwyg');
 
-	let first = domUtils.getEdgeChild(selectArea.firstChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), false) || selectArea.firstChild;
-	let last = domUtils.getEdgeChild(selectArea.lastChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), true) || selectArea.lastChild;
+	let first = dom.query.getEdgeChild(selectArea.firstChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current), false) || selectArea.firstChild;
+	let last = dom.query.getEdgeChild(selectArea.lastChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current), true) || selectArea.lastChild;
 
 	if (!first || !last) return;
 
-	if (domUtils.isMedia(first) || editor.component.is(first.parentElement) || domUtils.isTableElements(first)) {
+	if (dom.check.isMedia(first) || editor.component.is(first.parentElement) || dom.check.isTableElements(first)) {
 		const info = editor.component.get(first) || editor.component.get(first.parentElement);
-		const br = domUtils.createElement('BR');
-		const format = domUtils.createElement(editor.options.get('defaultLine'), null, br);
+		const br = dom.utils.createElement('BR');
+		const format = dom.utils.createElement(editor.options.get('defaultLine'), null, br);
 		first = info ? info.container || info.cover : first;
 		first.parentNode.insertBefore(format, first);
 		first = br;
 	}
 
-	if (domUtils.isMedia(last) || editor.component.is(last.parentElement) || domUtils.isTableElements(last)) {
-		last = domUtils.createElement('BR');
-		selectArea.appendChild(domUtils.createElement(editor.options.get('defaultLine'), null, last));
+	if (dom.check.isMedia(last) || editor.component.is(last.parentElement) || dom.check.isTableElements(last)) {
+		last = dom.utils.createElement('BR');
+		selectArea.appendChild(dom.utils.createElement(editor.options.get('defaultLine'), null, last));
 	}
 
 	editor.toolbar._showBalloon(editor.selection.setRange(first, 0, last, last.textContent.length));
@@ -98,16 +98,16 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 
 	// change dir buttons
 	editor.applyCommandTargets('dir', (e) => {
-		domUtils.changeTxt(e.querySelector('.se-tooltip-text'), editor.lang[rtl ? 'dir_ltr' : 'dir_rtl']);
-		domUtils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
+		dom.utils.changeTxt(e.querySelector('.se-tooltip-text'), editor.lang[rtl ? 'dir_ltr' : 'dir_rtl']);
+		dom.utils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
 	});
 
 	if (rtl) {
-		domUtils.addClass(commandTargets.get('dir_rtl'), 'active');
-		domUtils.removeClass(commandTargets.get('dir_ltr'), 'active');
+		dom.utils.addClass(commandTargets.get('dir_rtl'), 'active');
+		dom.utils.removeClass(commandTargets.get('dir_ltr'), 'active');
 	} else {
-		domUtils.addClass(commandTargets.get('dir_ltr'), 'active');
-		domUtils.removeClass(commandTargets.get('dir_rtl'), 'active');
+		dom.utils.addClass(commandTargets.get('dir_ltr'), 'active');
+		dom.utils.removeClass(commandTargets.get('dir_rtl'), 'active');
 	}
 }
 
@@ -156,11 +156,11 @@ export function COPY_FORMAT(editor, button) {
 	const ww = editor.frameContext.get('wysiwyg');
 	editor._onCopyFormatInfo = [...editor.eventManager.__cacheStyleNodes];
 	editor._onCopyFormatInitMethod = __RemoveCopyformt.bind(editor, ww, button);
-	domUtils.addClass(ww, 'se-copy-format-cursor');
-	domUtils.addClass(button, 'on');
+	dom.utils.addClass(ww, 'se-copy-format-cursor');
+	dom.utils.addClass(button, 'on');
 
 	__globalEventKeydown = editor.eventManager.addGlobalEvent('keydown', (e) => {
-		if (e.keyCode !== 27) return;
+		if (!keyCodeMap.isEsc(e.code)) return;
 		editor._onCopyFormatInitMethod?.();
 	});
 	__globalEventMousedown = editor.eventManager.addGlobalEvent('mousedown', (e) => {
@@ -178,7 +178,7 @@ export function FONT_STYLE(editor, command) {
 	command = editor.options.get('_defaultTagCommand')[command.toLowerCase()] || command;
 	let nodeName = editor.options.get('convertTextTags')[command] || command;
 	const nodesMap = editor.status.currentNodesMap;
-	const el = nodesMap.includes(editor.options.get('_styleCommandMap')[nodeName]) ? null : domUtils.createElement(nodeName);
+	const el = nodesMap.includes(editor.options.get('_styleCommandMap')[nodeName]) ? null : dom.utils.createElement(nodeName);
 
 	if (/^sub$/i.test(nodeName) && nodesMap.includes('superscript')) {
 		nodeName = 'sup';
@@ -195,7 +195,7 @@ export function FONT_STYLE(editor, command) {
  * @param {EditorCore} editor - The root editor instance
  */
 export function PAGE_BREAK(editor) {
-	const pageBreak = domUtils.createElement('DIV', { class: 'se-component se-component-line-break se-page-break' });
+	const pageBreak = dom.utils.createElement('DIV', { class: 'se-component se-component-line-break se-page-break' });
 	editor.component.insert(pageBreak, { skipCharCount: true, skipSelection: true, skipHistory: false });
 	const line = pageBreak.nextElementSibling || editor.format.addLine(pageBreak);
 	editor.selection.setRange(line, 1, line, 1);

@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller, FileManager, Figure, _DragHandle } from '../../modules';
-import { domUtils, numbers, env } from '../../helper';
+import { dom, numbers, env } from '../../helper';
 import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
@@ -33,8 +33,8 @@ class Audio_ extends EditorInjector {
 	static className = '';
 	/**
 	 * @this {Audio_}
-	 * @param {Node} node - The node to check.
-	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
 		return /^AUDIO$/i.test(node?.nodeName) ? node : null;
@@ -59,8 +59,8 @@ class Audio_ extends EditorInjector {
 			createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
 			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
-			uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
-			uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
+			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
+			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			allowMultiple: !!pluginOptions.allowMultiple,
 			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'audio/*' : pluginOptions.acceptedFormats.trim() || 'audio/*',
 			audioTagAttributes: pluginOptions.audioTagAttributes || null
@@ -178,7 +178,7 @@ class Audio_ extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {Node} target Target button element
+	 * @param {HTMLButtonElement} target Target button element
 	 */
 	controllerAction(target) {
 		if (/update/.test(target.getAttribute('data-command'))) {
@@ -195,7 +195,7 @@ class Audio_ extends EditorInjector {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * @returns {{query: string, method: (element: HTMLAudioElement) => void}} The format retention object containing the query and method to process the element.
 	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
 	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -240,7 +240,7 @@ class Audio_ extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Node=} target Target element, if null current selected element
+	 * @param {HTMLElement=} target Target element, if null current selected element
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
@@ -253,7 +253,7 @@ class Audio_ extends EditorInjector {
 		if (message === false) return;
 
 		const emptyDiv = container.parentNode;
-		domUtils.removeItem(container);
+		dom.utils.removeItem(container);
 		this.init();
 		this.controller.close();
 
@@ -443,7 +443,7 @@ class Audio_ extends EditorInjector {
 	_createAudioTag() {
 		const w = this.defaultWidth;
 		const h = this.defaultHeight;
-		const oAudio = domUtils.createElement('AUDIO', { style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
+		const oAudio = dom.utils.createElement('AUDIO', { style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
 		this._setTagAttrs(oAudio);
 		return oAudio;
 	}
@@ -519,7 +519,7 @@ class Audio_ extends EditorInjector {
 	 * @param {InputEvent} e - The input event triggered when the user types a URL.
 	 */
 	#OnLinkPreview(e) {
-		const value = domUtils.getEventTarget(e).value.trim();
+		const value = dom.query.getEventTarget(e).value.trim();
 		this.urlValue = this.preview.textContent = !value
 			? ''
 			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
@@ -566,7 +566,7 @@ class Audio_ extends EditorInjector {
 	 * @param {InputEvent} e - Event object
 	 */
 	#FileInputChange(e) {
-		const target = domUtils.getEventTarget(e);
+		const target = dom.query.getEventTarget(e);
 		if (!this.audioInputFile.value) {
 			this.audioUrlFile.disabled = false;
 			this.preview.style.textDecoration = '';
@@ -624,7 +624,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
         </div>
     </form>`;
 
-	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
 function CreateHTML_controller({ lang, icons }) {
@@ -647,7 +647,7 @@ function CreateHTML_controller({ lang, icons }) {
         </div>
     </div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller' }, html);
 }
 
 export default Audio_;

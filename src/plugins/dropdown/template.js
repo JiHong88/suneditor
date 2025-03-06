@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @class
@@ -77,7 +77,7 @@ function CreateHTML(templateList) {
 	}
 	list += '</ul></div>';
 
-	return domUtils.createElement('DIV', { class: 'se-list-layer' }, list);
+	return dom.utils.createElement('DIV', { class: 'se-list-layer' }, list);
 }
 
 export default Template;

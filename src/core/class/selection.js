@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, unicode, env } from '../../helper';
+import { dom, unicode, env } from '../../helper';
 
 /**
  * @typedef {Omit<Selection_ & Partial<EditorInjector>, 'selection'>} SelectionThis
@@ -23,7 +23,9 @@ function Selection_(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
+	/** @type {Range} */
 	this.range = null;
+	/** @type {HTMLElement|Text} */
 	this.selectionNode = null;
 	this.__iframeFocus = false;
 }
@@ -35,7 +37,17 @@ Selection_.prototype = {
 	 * @returns {Selection}
 	 */
 	get() {
-		const selection = this._shadowRoot ? this._shadowRoot?.getComposedRanges() || this._shadowRoot?.getSelection() : this.editor.frameContext.get('_ww').getSelection();
+		const wSelection = this.editor.frameContext.get('_ww').getSelection();
+		let selection = null;
+
+		if (this._shadowRoot) {
+			selection = wSelection.getComposedRanges?.();
+		}
+
+		if (!selection) {
+			selection = wSelection;
+		}
+
 		if (!selection) return null;
 		if (!this.status._range && !this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) {
 			selection.removeAllRanges();
@@ -82,7 +94,7 @@ Selection_.prototype = {
 				ec = selection.focusNode,
 				so = selection.anchorOffset,
 				eo = selection.focusOffset;
-			const compareValue = domUtils.compareElements(sc, ec);
+			const compareValue = dom.query.compareElements(sc, ec);
 			const rightDir = compareValue.ancestor && (compareValue.result === 0 ? so <= eo : compareValue.result > 1 ? true : false);
 			return this.setRange(rightDir ? sc : ec, rightDir ? so : eo, rightDir ? ec : sc, rightDir ? eo : so);
 		}
@@ -121,15 +133,15 @@ Selection_.prototype = {
 		}
 
 		if (!sc || !ec) return;
-		if ((domUtils.isBreak(sc) || sc.nodeType === 3) && so > sc.textContent.length) so = sc.textContent.length;
-		if ((domUtils.isBreak(ec) || ec.nodeType === 3) && eo > ec.textContent.length) eo = ec.textContent.length;
+		if ((dom.check.isBreak(sc) || sc.nodeType === 3) && so > sc.textContent.length) so = sc.textContent.length;
+		if ((dom.check.isBreak(ec) || ec.nodeType === 3) && eo > ec.textContent.length) eo = ec.textContent.length;
 		if (this.format.isLine(sc)) {
 			sc = sc.childNodes[so > 0 ? sc.childNodes.length - 1 : 0] || sc;
-			so = so > 0 ? (sc.nodeType === 1 && !domUtils.isBreak(sc) ? 1 : sc.textContent ? sc.textContent.length : 0) : 0;
+			so = so > 0 ? (sc.nodeType === 1 && !dom.check.isBreak(sc) ? 1 : sc.textContent ? sc.textContent.length : 0) : 0;
 		}
 		if (this.format.isLine(ec)) {
 			ec = ec.childNodes[eo > 0 ? ec.childNodes.length - 1 : 0] || ec;
-			eo = eo > 0 ? (ec.nodeType === 1 && !domUtils.isBreak(ec) ? 1 : ec.textContent ? ec.textContent.length : 0) : 0;
+			eo = eo > 0 ? (ec.nodeType === 1 && !dom.check.isBreak(ec) ? 1 : ec.textContent ? ec.textContent.length : 0) : 0;
 		}
 
 		const range = this.editor.frameContext.get('_wd').createRange();
@@ -206,8 +218,8 @@ Selection_.prototype = {
 	getRangeAndAddLine(range, container) {
 		if (this._isNone(range)) {
 			const parent = container?.parentElement || this.editor.frameContext.get('wysiwyg');
-			const op = domUtils.createElement(this.options.get('defaultLine'), null, '<br>');
-			parent.insertBefore(op, container && container !== parent ? (!container.previousElementSibling ? container : container.nextElementSibling) : parent.firstElementChild);
+			const op = dom.utils.createElement(this.options.get('defaultLine'), null, '<br>');
+			parent.insertBefore(op, container && container !== parent ? (!(/** @type {HTMLElement} */ (container).previousElementSibling) ? container : /** @type {HTMLElement} */ (container).nextElementSibling) : parent.firstElementChild);
 			this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
 			range = this.status._range;
 		}
@@ -217,18 +229,12 @@ Selection_.prototype = {
 	/**
 	 * @this {SelectionThis}
 	 * @description Get current select node
-	 * @returns {Node}
+	 * @returns {HTMLElement|Text}
 	 */
 	getNode() {
 		if (!this.editor.frameContext.get('wysiwyg').contains(this.selectionNode)) this._init();
 		if (!this.selectionNode) {
-			const selectionNode = domUtils.getEdgeChild(
-				this.editor.frameContext.get('wysiwyg').firstChild,
-				function (current) {
-					return current.childNodes.length === 0 || current.nodeType === 3;
-				},
-				false
-			);
+			const selectionNode = /** @type {HTMLElement|Text} */ (dom.query.getEdgeChild(this.editor.frameContext.get('wysiwyg').firstChild, (current) => current.childNodes.length === 0 || current.nodeType === 3, false));
 			if (!selectionNode) {
 				this._init();
 			} else {
@@ -247,8 +253,8 @@ Selection_.prototype = {
 	 * @returns {{rects: RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 */
 	getRects(target, position) {
-		const targetAbs = /** @type {Node} */ (target)?.nodeType === 1 ? this._w.getComputedStyle(/** @type {Node} */ (target)).position === 'absolute' : false;
-		target = /** @type {Range} */ (!target || /** @type {Node} */ (target).nodeType === 3 ? this.getRange() : target);
+		const targetAbs = dom.check.isElement(/** @type {Node} */ (target)) ? this._w.getComputedStyle(target).position === 'absolute' : false;
+		target = /** @type {Range} */ (!target || dom.check.isText(/** @type {Node} */ (target)) ? this.getRange() : target);
 		const globalScroll = this.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
 		let scrollLeft = globalScroll.left;
@@ -260,7 +266,7 @@ Selection_.prototype = {
 		if (!rects) {
 			const node = this.getNode();
 			if (this.format.isLine(node)) {
-				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+				const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				this.html.insertNode(zeroWidth, { afterNode: null, skipCharCount: true });
 				this.setRange(zeroWidth, 1, zeroWidth, 1);
 				this._init();
@@ -273,8 +279,8 @@ Selection_.prototype = {
 				rects = {
 					left: nodeOffset.left,
 					top: nodeOffset.top,
-					right: nodeOffset.left + node.offsetWidth,
-					bottom: nodeOffset.top + node.offsetHeight,
+					right: nodeOffset.left + /** @type {HTMLElement} */ (node).offsetWidth,
+					bottom: nodeOffset.top + /** @type {HTMLElement} */ (node).offsetHeight,
 					noText: true
 				};
 				scrollLeft = 0;
@@ -362,7 +368,7 @@ Selection_.prototype = {
 
 		if (isVisible) return;
 
-		const el = domUtils.getParentElement(ref.startContainer, (current) => current.nodeType === 1);
+		const el = dom.query.getParentElement(ref.startContainer, (current) => current.nodeType === 1);
 		el?.scrollIntoView?.(scrollOption || this.options.get('scrollToOptions'));
 	},
 
@@ -374,9 +380,9 @@ Selection_.prototype = {
 	 * @returns {boolean}
 	 */
 	_isNone(range) {
-		const comm = range.commonAncestorContainer;
+		const comm = /** @type {HTMLElement} */ (range.commonAncestorContainer);
 		return (
-			(domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) ||
+			(dom.check.isWysiwygFrame(range.startContainer) && dom.check.isWysiwygFrame(range.endContainer)) ||
 			/FIGURE/i.test(comm.nodeName) ||
 			(this.editor._fileManager.regExp.test(comm.nodeName) && (!this.editor._fileManager.tagAttrs[comm.nodeName] || this.editor._fileManager.tagAttrs[comm.nodeName]?.every((v) => comm.hasAttribute(v)))) ||
 			this.component.is(comm)
@@ -396,13 +402,13 @@ Selection_.prototype = {
 		let firstFormat = wysiwyg.firstElementChild;
 		let focusEl = null;
 		if (!firstFormat) {
-			focusEl = domUtils.createElement('BR');
-			firstFormat = domUtils.createElement(this.options.get('defaultLine'), null, focusEl);
+			focusEl = dom.utils.createElement('BR');
+			firstFormat = dom.utils.createElement(this.options.get('defaultLine'), null, focusEl);
 			wysiwyg.appendChild(firstFormat);
 		} else {
 			focusEl = firstFormat.firstChild;
 			if (!focusEl) {
-				focusEl = domUtils.createElement('BR');
+				focusEl = dom.utils.createElement('BR');
 				firstFormat.appendChild(focusEl);
 			}
 		}
@@ -425,13 +431,13 @@ Selection_.prototype = {
 		this.status._range = range;
 
 		if (range.collapsed) {
-			if (domUtils.isWysiwygFrame(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
+			if (dom.check.isWysiwygFrame(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
 			else selectionNode = range.commonAncestorContainer;
 		} else {
 			selectionNode = selection.anchorNode;
 		}
 
-		this.selectionNode = selectionNode;
+		this.selectionNode = /** @type {HTMLElement|Text| */ (selectionNode);
 	},
 
 	/**
@@ -441,7 +447,7 @@ Selection_.prototype = {
 	 */
 	_init() {
 		const activeEl = this.editor.frameContext.get('_wd').activeElement;
-		if (domUtils.isInputElement(activeEl)) {
+		if (dom.check.isInputElement(activeEl)) {
 			this.selectionNode = activeEl;
 			return activeEl;
 		}
@@ -468,7 +474,7 @@ Selection_.prototype = {
 	__focus() {
 		try {
 			this.__iframeFocus = true;
-			const caption = domUtils.getParentElement(this.getNode(), 'figcaption');
+			const caption = dom.query.getParentElement(this.getNode(), 'figcaption');
 			if (caption) {
 				caption.focus();
 			} else {
@@ -488,8 +494,8 @@ Selection_.prototype = {
 	_resetRangeToTextNode() {
 		let rangeObj = this.getRange();
 		if (this._isNone(rangeObj)) {
-			if (!domUtils.isWysiwygFrame(rangeObj.startContainer) || !domUtils.isWysiwygFrame(rangeObj.endContainer)) return false;
-			const ww = rangeObj.commonAncestorContainer;
+			if (!dom.check.isWysiwygFrame(rangeObj.startContainer) || !dom.check.isWysiwygFrame(rangeObj.endContainer)) return false;
+			const ww = /** @type {HTMLElement} */ (rangeObj.commonAncestorContainer);
 			const first = ww.children[rangeObj.startOffset];
 			const end = ww.children[rangeObj.endOffset];
 			if (!(rangeObj = this.setRange(first, 0, end, first === end ? 0 : 1))) return false;
@@ -526,14 +532,14 @@ Selection_.prototype = {
 		}
 
 		// startContainer
-		tempCon = domUtils.isWysiwygFrame(startCon) ? this.editor.frameContext.get('wysiwyg').firstChild : startCon;
+		tempCon = dom.check.isWysiwygFrame(startCon) ? this.editor.frameContext.get('wysiwyg').firstChild : startCon;
 		tempOffset = startOff;
 
-		if (domUtils.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
-			const onlyBreak = domUtils.isBreak(tempCon);
+		if (dom.check.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
+			const onlyBreak = dom.check.isBreak(tempCon);
 			if (!onlyBreak) {
 				const tempConCache = tempCon;
-				while (tempCon && !domUtils.isBreak(tempCon) && tempCon.nodeType === 1) {
+				while (tempCon && !dom.check.isBreak(tempCon) && tempCon.nodeType === 1) {
 					tempChild = tempCon.childNodes;
 					if (tempChild.length === 0) break;
 					tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : tempCon.previousElementSibling || tempCon.previousSibling || startCon;
@@ -543,14 +549,14 @@ Selection_.prototype = {
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
 					tempCon = tempCon || tempConCache;
-					format = domUtils.createElement(domUtils.getParentElement(tempCon, domUtils.isTableCell) ? 'DIV' : this.options.get('defaultLine'));
+					format = dom.utils.createElement(dom.query.getParentElement(tempCon, dom.check.isTableCell) ? 'DIV' : this.options.get('defaultLine'));
 					tempCon.parentNode.insertBefore(format, tempCon);
 					if (tempCon !== tempConCache) format.appendChild(tempCon);
 				}
 			}
 
-			if (domUtils.isBreak(tempCon) || this.component.is(tempCon)) {
-				const emptyText = domUtils.createTextNode(unicode.zeroWidthSpace);
+			if (dom.check.isBreak(tempCon) || this.component.is(tempCon)) {
+				const emptyText = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				tempCon.parentNode.insertBefore(emptyText, tempCon);
 				tempCon = emptyText;
 				if (onlyBreak) {
@@ -567,13 +573,13 @@ Selection_.prototype = {
 		startOff = tempOffset;
 
 		// endContainer
-		tempCon = domUtils.isWysiwygFrame(endCon) ? this.editor.frameContext.get('wysiwyg').lastChild : endCon;
+		tempCon = dom.check.isWysiwygFrame(endCon) ? this.editor.frameContext.get('wysiwyg').lastChild : endCon;
 		tempOffset = endOff;
 
-		if (domUtils.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
-			const onlyBreak = domUtils.isBreak(tempCon);
+		if (dom.check.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
+			const onlyBreak = dom.check.isBreak(tempCon);
 			if (!onlyBreak) {
-				while (tempCon && !domUtils.isBreak(tempCon) && tempCon.nodeType === 1) {
+				while (tempCon && !dom.check.isBreak(tempCon) && tempCon.nodeType === 1) {
 					tempChild = tempCon.childNodes;
 					if (tempChild.length === 0) break;
 					tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : tempCon.previousElementSibling || tempCon.previousSibling || startCon;
@@ -582,19 +588,19 @@ Selection_.prototype = {
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
-					format = domUtils.createElement(domUtils.isTableCell(format) ? 'DIV' : this.options.get('defaultLine'));
+					format = dom.utils.createElement(dom.check.isTableCell(format) ? 'DIV' : this.options.get('defaultLine'));
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}
 			}
 
-			if (domUtils.isBreak(tempCon)) {
-				const emptyText = domUtils.createTextNode(unicode.zeroWidthSpace);
+			if (dom.check.isBreak(tempCon)) {
+				const emptyText = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				tempCon.parentNode.insertBefore(emptyText, tempCon);
 				tempCon = emptyText;
 				tempOffset = 1;
 				if (onlyBreak && !tempCon.previousSibling) {
-					domUtils.removeItem(endCon);
+					dom.utils.removeItem(endCon);
 				}
 			}
 		}

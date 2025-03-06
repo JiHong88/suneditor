@@ -1,4 +1,4 @@
-import { domUtils } from '../../../helper';
+import { dom } from '../../../helper';
 import { _DragHandle } from '../../../modules';
 
 /**
@@ -9,9 +9,9 @@ import { _DragHandle } from '../../../modules';
  * @private
  * @this {EventManagerThis}
  * @param {FrameContext} fc - Frame context object
- * @param {Node} dragCursor - Drag cursor element
- * @param {?Element} _iframeTopArea - Iframe top area element
- * @param {?Element} _innerToolbar - Inner toolbar element
+ * @param {HTMLElement} dragCursor - Drag cursor element
+ * @param {?HTMLElement} _iframeTopArea - Iframe top area element
+ * @param {?HTMLElement} _innerToolbar - Inner toolbar element
  * @param {DragEvent} e - Event object
  */
 export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar, e) {
@@ -52,7 +52,7 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 /**
  * @private
  * @this {EventManagerThis}
- * @param {Node} dragCursor - Drag cursor element
+ * @param {HTMLElement} dragCursor - Drag cursor element
  */
 export function OnDragEnd_wysiwyg(dragCursor) {
 	dragCursor.style.display = 'none';
@@ -62,7 +62,7 @@ export function OnDragEnd_wysiwyg(dragCursor) {
  * @private
  * @this {EventManagerThis}
  * @param {FrameContext} fc - Frame context object
- * @param {Node} dragCursor - Drag cursor element
+ * @param {HTMLElement} dragCursor - Drag cursor element
  * @param {DragEvent} e - Event object
  */
 export function OnDrop_wysiwyg(fc, dragCursor, e) {
@@ -78,7 +78,7 @@ export function OnDrop_wysiwyg(fc, dragCursor, e) {
 
 		const { sc, so, ec, eo } = this.selection.getDragEventLocationRange(e);
 
-		if (domUtils.getParentElement(sc, '.se-disable-pointer')) {
+		if (dom.query.getParentElement(sc, '.se-disable-pointer')) {
 			e.preventDefault();
 			return;
 		}

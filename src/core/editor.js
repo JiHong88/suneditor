@@ -1,4 +1,4 @@
-import { env, converter, domUtils, numbers } from '../helper';
+import { env, converter, dom, numbers } from '../helper';
 import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, RO_UNAVAILABD } from './section/constructor';
 import { UpdateStatusbarContext } from './section/context';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
@@ -202,7 +202,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Shoutcuts key map
-	 * @type {Map<string|number, *>}
+	 * @type {Map<string, *>}
 	 */
 	this.shortcutsKeyMap = new Map();
 
@@ -216,7 +216,7 @@ function Editor(multiTargets, options) {
 	/**
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
 	 * - Each button is contained in an array.
-	 * @type {Map<string, Array<Node>>}
+	 * @type {Map<string, Array<HTMLButtonElement>>}
 	 */
 	this.commandTargets = new Map();
 
@@ -488,8 +488,8 @@ Editor.prototype = {
 	run(command, type, button) {
 		if (type) {
 			if (/more/i.test(type)) {
-				const toolbar = domUtils.getParentElement(button, '.se-toolbar');
-				const toolInst = domUtils.hasClass(toolbar, 'se-toolbar-sub') ? this.subToolbar : this.toolbar;
+				const toolbar = dom.query.getParentElement(button, '.se-toolbar');
+				const toolInst = dom.utils.hasClass(toolbar, 'se-toolbar-sub') ? this.subToolbar : this.toolbar;
 				if (button !== toolInst.currentMoreLayerActiveButton) {
 					const layer = toolbar.querySelector('.' + command);
 					if (layer) {
@@ -497,7 +497,7 @@ Editor.prototype = {
 						toolInst._showBalloon();
 						toolInst._showInline();
 					}
-					domUtils.addClass(button, 'on');
+					dom.utils.addClass(button, 'on');
 				} else if (toolInst.currentMoreLayerActiveButton) {
 					toolInst._moreLayerOff();
 					toolInst._showBalloon();
@@ -513,7 +513,7 @@ Editor.prototype = {
 				return;
 			}
 
-			if (this.frameContext.get('isReadOnly') && domUtils.arrayIncludes(this._controllerOnDisabledButtons, button)) return;
+			if (this.frameContext.get('isReadOnly') && dom.utils.arrayIncludes(this._controllerOnDisabledButtons, button)) return;
 			if (/dropdown/.test(type) && (this.menu.targetMap[command] === null || button !== this.menu.currentDropdownActiveButton)) {
 				this.menu.dropdownOn(button);
 				return;
@@ -623,14 +623,16 @@ Editor.prototype = {
 	 * @param {Node} target Command target
 	 */
 	runFromTarget(target) {
-		const isInput = domUtils.isInputElement(target);
-		if (isInput || !(target = domUtils.getCommandTarget(target))) return;
+		if (dom.check.isInputElement(target)) return;
 
-		const command = target.getAttribute('data-command');
-		const type = target.getAttribute('data-type');
+		const targetBtn = /** @type {HTMLButtonElement} */ (dom.query.getCommandTarget(target));
+		if (!targetBtn) return;
+
+		const command = targetBtn.getAttribute('data-command');
+		const type = targetBtn.getAttribute('data-type');
 
 		if (!command && !type) return;
-		if (target.disabled) return;
+		if (targetBtn.disabled) return;
 
 		this.run(command, type, target);
 	},
@@ -664,7 +666,7 @@ Editor.prototype = {
 	isEmpty(fc) {
 		fc = fc || this.frameContext;
 		const wysiwyg = fc.get('wysiwyg');
-		return domUtils.isZeroWidth(wysiwyg.textContent) && !wysiwyg.querySelector(this.options.get('allowedEmptyTags')) && (wysiwyg.innerText.match(/\n/g) || '').length <= 1;
+		return dom.check.isZeroWidth(wysiwyg.textContent) && !wysiwyg.querySelector(this.options.get('allowedEmptyTags')) && (wysiwyg.innerText.match(/\n/g) || '').length <= 1;
 	},
 
 	/**
@@ -689,18 +691,18 @@ Editor.prototype = {
 			const statusbarWrapper = this.context.get('statusbar._wrapper');
 			if (rtl) {
 				this.applyFrameRoots((e) => {
-					domUtils.addClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
+					dom.utils.addClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
 				});
-				domUtils.addClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
+				dom.utils.addClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			} else {
 				this.applyFrameRoots((e) => {
-					domUtils.removeClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
+					dom.utils.removeClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
 				});
-				domUtils.removeClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
+				dom.utils.removeClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			}
 
-			const lineNodes = domUtils.getListChildren(fc.get('wysiwyg'), (current) => {
-				return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
+			const lineNodes = dom.query.getListChildren(fc.get('wysiwyg'), (current) => {
+				return this.format.isLine(current) && !!(current.style.marginRight || current.style.marginLeft || current.style.textAlign);
 			});
 
 			for (let i = 0, n, l, r; (n = lineNodes[i]); i++) {
@@ -797,7 +799,7 @@ Editor.prototype = {
 
 				// statusbar
 				if (diff.has('statusbar')) {
-					domUtils.removeItem(fc.get('statusbar'));
+					dom.utils.removeItem(fc.get('statusbar'));
 					if (newRootOptions.get('statusbar')) {
 						const statusbar = CreateStatusbar(newRootOptions, null).statusbar;
 						fc.get('container').appendChild(statusbar);
@@ -873,9 +875,9 @@ Editor.prototype = {
 		}
 		// shortcuts hint
 		if (options.get('shortcutsHint')) {
-			domUtils.removeClass(toolbar, 'se-shortcut-hide');
+			dom.utils.removeClass(toolbar, 'se-shortcut-hide');
 		} else {
-			domUtils.addClass(toolbar, 'se-shortcut-hide');
+			dom.utils.addClass(toolbar, 'se-shortcut-hide');
 		}
 
 		// theme
@@ -924,11 +926,11 @@ Editor.prototype = {
 		} else {
 			try {
 				const range = this.selection.getRange();
-				if (range.startContainer === range.endContainer && domUtils.isWysiwygFrame(range.startContainer)) {
-					const currentNode = range.commonAncestorContainer.children[range.startOffset];
+				if (range.startContainer === range.endContainer && dom.check.isWysiwygFrame(range.startContainer)) {
+					const currentNode = /** @type {HTMLElement} */ (range.commonAncestorContainer).children[range.startOffset];
 					if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
-						const br = domUtils.createElement('BR');
-						const format = domUtils.createElement(this.options.get('defaultLine'), null, br);
+						const br = dom.utils.createElement('BR');
+						const format = dom.utils.createElement(this.options.get('defaultLine'), null, br);
 						this.frameContext.get('wysiwyg').insertBefore(format, currentNode);
 						this.selection.setRange(br, 0, br, 0);
 						return;
@@ -958,7 +960,7 @@ Editor.prototype = {
 			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false);
 		} else if (focusEl) {
 			if (focusEl.nodeType !== 3) {
-				focusEl = domUtils.getEdgeChild(
+				focusEl = dom.query.getEdgeChild(
 					focusEl,
 					function (current) {
 						return current.childNodes.length === 0 || current.nodeType === 3;
@@ -1000,12 +1002,12 @@ Editor.prototype = {
 		}
 
 		/** remove element */
-		domUtils.removeItem(this.carrierWrapper);
-		domUtils.removeItem(this.context.get('toolbar._wrapper'));
-		domUtils.removeItem(this.context.get('toolbar.sub._wrapper'));
-		domUtils.removeItem(this.context.get('statusbar._wrapper'));
+		dom.utils.removeItem(this.carrierWrapper);
+		dom.utils.removeItem(this.context.get('toolbar._wrapper'));
+		dom.utils.removeItem(this.context.get('toolbar.sub._wrapper'));
+		dom.utils.removeItem(this.context.get('statusbar._wrapper'));
 		this.applyFrameRoots((e) => {
-			domUtils.removeItem(e.get('topArea'));
+			dom.utils.removeItem(e.get('topArea'));
 			e.get('options').clear();
 			e.clear();
 		});
@@ -1345,13 +1347,13 @@ Editor.prototype = {
 
 		if (this.options.get('buttons').has('pageBreak') || this.options.get('buttons_sub')?.has('pageBreak')) {
 			this._componentManager.push((element) => {
-				if (!element || !domUtils.hasClass(element, 'se-page-break')) return null;
+				if (!element || !dom.utils.hasClass(element, 'se-page-break')) return null;
 				return {
 					target: element,
 					launcher: {
 						destroy: (target) => {
 							const focusEl = target.previousElementSibling || target.nextElementSibling;
-							domUtils.removeItem(target);
+							dom.utils.removeItem(target);
 							// focus
 							this.focusEdge(focusEl);
 							this.history.push(false);
@@ -1415,7 +1417,7 @@ Editor.prototype = {
 		const reverseKeys = this.reverseKeys;
 
 		for (let i = 0, len = currentButtons.length, e, c; i < len; i++) {
-			e = currentButtons[i];
+			e = /** @type {HTMLButtonElement} */ (currentButtons[i]);
 			c = e.getAttribute('data-command');
 			// command set
 			cmdButtons.set(c, e);
@@ -1444,7 +1446,7 @@ Editor.prototype = {
 	 * @private
 	 * @description Sets command target elements.
 	 * @param {string} cmd - The command identifier.
-	 * @param {Node} target - The associated command button.
+	 * @param {HTMLButtonElement} target - The associated command button.
 	 */
 	__setCommandTargets(cmd, target) {
 		if (!cmd || !target) return;

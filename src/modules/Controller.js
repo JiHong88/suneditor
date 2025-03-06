@@ -1,9 +1,8 @@
 import EditorInjector from '../editorInjector';
-import { domUtils, env } from '../helper';
+import { dom, env, keyCodeMap } from '../helper';
 import { _DragHandle } from '../modules';
 
 const { _w, ON_OVER_COMPONENT } = env;
-const NON_RESPONSE_KEYCODE = /^(1[7-9]|20|27|45|11[2-9]|12[0-3]|144|145)$/;
 const INDEX_0 = '2147483647';
 const INDEX_1 = '2147483646';
 const INDEX_2 = '2147483645';
@@ -50,7 +49,7 @@ function Controller(inst, element, params, _name) {
 	// members
 	this.kind = _name || inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
-	this.form = element;
+	this.form = /** @type {HTMLElement} */ (element);
 	this.isOpen = false;
 	this.currentTarget = null;
 	this.currentPositionTarget = null;
@@ -265,7 +264,7 @@ Controller.prototype = {
 	 * @private
 	 * @this {ControllerThis}
 	 * @description Specify the position of the controller.
-	 * @param {Node} controller Controller element.
+	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
 	 */
 	_setControllerPosition(controller, refer) {
@@ -338,8 +337,8 @@ Controller.prototype = {
 	 * @returns {boolean} True if the target is inside a form or controller.
 	 */
 	_checkForm(target) {
-		if (domUtils.isWysiwygFrame(target)) return false;
-		if (domUtils.hasClass(target, 'se-drag-handle')) return true;
+		if (dom.check.isWysiwygFrame(target)) return false;
+		if (dom.utils.hasClass(target, 'se-drag-handle')) return true;
 
 		let isParentForm = false;
 		if (this.isInsideForm && this.parents?.length > 0) {
@@ -351,7 +350,7 @@ Controller.prototype = {
 			});
 		}
 
-		return !isParentForm && (!!domUtils.getParentElement(target, '.se-controller') || target?.contains(this.inst._element));
+		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || target?.contains(this.inst._element));
 	},
 
 	constructor: Controller
@@ -363,8 +362,8 @@ Controller.prototype = {
  * @param {MouseEvent} e - Event object
  */
 function Action(e) {
-	const eventTarget = domUtils.getEventTarget(e);
-	const target = domUtils.getCommandTarget(eventTarget);
+	const eventTarget = dom.query.getEventTarget(e);
+	const target = dom.query.getCommandTarget(eventTarget);
 	if (!target) return;
 
 	e.stopPropagation();
@@ -382,7 +381,7 @@ function MouseEnter(e) {
 	this.editor.currentControllerName = this.kind;
 	if (this.parents.length > 0 && this.isInsideForm) return;
 
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	eventTarget.style.zIndex = INDEX_0;
 }
 
@@ -394,7 +393,7 @@ function MouseEnter(e) {
 function MouseLeave(e) {
 	if (this.parents.length > 0 && this.isInsideForm) return;
 
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	eventTarget.style.zIndex = INDEX_2;
 }
 
@@ -405,13 +404,13 @@ function MouseLeave(e) {
  */
 function CloseListener_keydown(e) {
 	if (this._checkFixed()) return;
-	const keyCode = e.keyCode;
-	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
-	if (ctrl || !NON_RESPONSE_KEYCODE.test(keyCode)) return;
+	const keyCode = e.code;
+	const ctrl = keyCodeMap.isCtrl(e);
+	if (ctrl || !keyCodeMap.isNonResponseKey(keyCode)) return;
 
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	if (this.form.contains(eventTarget) || this._checkForm(eventTarget)) return;
-	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
+	if (this.editor._fileManager.pluginRegExp.test(this.kind) && !keyCodeMap.isEsc(keyCode)) return;
 
 	this.close();
 }
@@ -422,7 +421,7 @@ function CloseListener_keydown(e) {
  * @param {KeyboardEvent} e - Event object
  */
 function CloseListener_mousedown(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	if (this.inst?._element?.contains(eventTarget)) {
 		this.isOpen = false;
 		return;

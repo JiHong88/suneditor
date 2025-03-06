@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 const DEFAULT_TYPE = 'decimal';
 
@@ -25,7 +25,7 @@ class List_numbered extends EditorInjector {
 		super(editor);
 		this.title = this.lang.numberedList;
 		this.icon = 'list_numbered';
-		this.afterItem = domUtils.createElement(
+		this.afterItem = dom.utils.createElement(
 			'button',
 			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': List_numbered.key, 'data-type': 'dropdown' },
 			`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.numberedList}</span></span>`
@@ -44,17 +44,17 @@ class List_numbered extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
-		if (domUtils.isListCell(element) && /^OL$/i.test(element.parentElement.nodeName)) {
-			domUtils.addClass(target, 'active');
+		if (dom.check.isListCell(element) && /^OL$/i.test(element.parentElement.nodeName)) {
+			dom.utils.addClass(target, 'active');
 			return true;
 		}
 
-		domUtils.removeClass(target, 'active');
+		dom.utils.removeClass(target, 'active');
 		return false;
 	}
 
@@ -70,9 +70,9 @@ class List_numbered extends EditorInjector {
 		for (let i = 0, len = list.length, l; i < len; i++) {
 			l = list[i];
 			if (type === l.style.listStyleType) {
-				domUtils.addClass(l.parentElement, 'active');
+				dom.utils.addClass(l.parentElement, 'active');
 			} else {
-				domUtils.removeClass(l.parentElement, 'active');
+				dom.utils.removeClass(l.parentElement, 'active');
 			}
 		}
 	}
@@ -87,7 +87,7 @@ class List_numbered extends EditorInjector {
 		const el = this.format.getBlock(this.selection.getNode());
 		const type = target?.querySelector('ol')?.style.listStyleType;
 
-		if (domUtils.isList(el) && type) {
+		if (dom.check.isList(el) && type) {
 			el.style.listStyleType = type;
 		} else {
 			this.submit(type);
@@ -104,7 +104,7 @@ class List_numbered extends EditorInjector {
 	 * @param {HTMLElement} params.line - The line element of the current range
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
 	 * @param {KeyboardEvent} params.event - Key event object
-	 * @param {number} params.keyCode - Key code
+	 * @param {string} params.keyCode - KeyBoardEvent.code
 	 * @param {Object} params.editor - The root editor instance
 	 */
 	shortcut({ range, info }) {
@@ -139,7 +139,7 @@ function CreateHTML() {
 		</ul>
 	</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, html);
 }
 
 function _CreateLI(types) {

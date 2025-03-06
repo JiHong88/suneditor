@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Controller } from '../../modules';
-import { domUtils, env } from '../../helper';
+import { dom, env } from '../../helper';
 
 const { _w } = env;
 
@@ -15,11 +15,11 @@ class Anchor extends EditorInjector {
 	static className = '';
 	/**
 	 * @this {Anchor}
-	 * @param {Node} node - The node to check.
-	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
-		return domUtils.isAnchor(node) && node.hasAttribute('id') && node.hasAttribute('data-se-anchor') ? node : null;
+		return dom.check.isAnchor(node) && node.hasAttribute('id') && node.hasAttribute('data-se-anchor') ? node : null;
 	}
 
 	/**
@@ -82,7 +82,7 @@ class Anchor extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLElement} target Target button element
+	 * @param {HTMLButtonElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -98,7 +98,7 @@ class Anchor extends EditorInjector {
 						return;
 					}
 
-					const a = domUtils.createElement('A', {
+					const a = dom.utils.createElement('A', {
 						id,
 						'data-se-anchor': this.inputEl.value,
 						'data-se-non-link': 'true',
@@ -146,7 +146,7 @@ class Anchor extends EditorInjector {
 			case 'delete': {
 				const r = this.selection.getNearRange(currentElement);
 
-				domUtils.removeItem(currentElement);
+				dom.utils.removeItem(currentElement);
 				this.controllerSelect.close(true);
 
 				if (r) {
@@ -192,7 +192,7 @@ function CreateHTML_controller({ lang, icons }) {
 		</form>
 		`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-simple-input' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-simple-input' }, html);
 }
 
 function CreateHTML_controller_select({ lang, icons }) {
@@ -216,7 +216,7 @@ function CreateHTML_controller_select({ lang, icons }) {
 		</div>
 	</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
 }
 
 export default Anchor;

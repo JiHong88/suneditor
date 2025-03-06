@@ -65,7 +65,7 @@ class ImageGallery extends EditorInjector {
 
 	/**
 	 * @description Set browser item
-	 * @param {Node} target - Target element
+	 * @param {HTMLImageElement} target - Target element
 	 */
 	#SetItem(target) {
 		if (this.onSelectfunction) {

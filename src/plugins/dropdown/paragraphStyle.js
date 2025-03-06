@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @class
@@ -50,10 +50,10 @@ class ParagraphStyle extends EditorInjector {
 		const currentFormat = this.format.getLine(this.selection.getNode());
 
 		for (let i = 0, len = paragraphList.length; i < len; i++) {
-			if (domUtils.hasClass(currentFormat, paragraphList[i].getAttribute('data-command'))) {
-				domUtils.addClass(paragraphList[i], 'active');
+			if (dom.utils.hasClass(currentFormat, paragraphList[i].getAttribute('data-command'))) {
+				dom.utils.addClass(paragraphList[i], 'active');
 			} else {
-				domUtils.removeClass(paragraphList[i], 'active');
+				dom.utils.removeClass(paragraphList[i], 'active');
 			}
 		}
 	}
@@ -74,7 +74,7 @@ class ParagraphStyle extends EditorInjector {
 		}
 
 		// change format class
-		const toggleClass = domUtils.hasClass(target, 'active') ? domUtils.removeClass : domUtils.addClass;
+		const toggleClass = dom.utils.hasClass(target, 'active') ? dom.utils.removeClass : dom.utils.addClass;
 		for (let i = 0, len = selectedFormsts.length; i < len; i++) {
 			toggleClass(selectedFormsts[i], value);
 		}
@@ -132,7 +132,7 @@ function CreateHTML({ lang }, items) {
 		</ul>
 	</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
 }
 
 export default ParagraphStyle;

@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, env, numbers, unicode } from '../../helper';
+import { dom, env, numbers, unicode, keyCodeMap } from '../../helper';
 import { Figure, _DragHandle } from '../../modules';
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
@@ -94,7 +94,7 @@ function Component(editor) {
 
 	this.editor.applyFrameRoots((e) => {
 		// drag
-		const dragHandle = domUtils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true' }, this.icons.selection);
+		const dragHandle = dom.utils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true' }, this.icons.selection);
 		e.get('wrapper').appendChild(dragHandle);
 		this.eventManager.addEvent(dragHandle, 'mouseenter', OnDragEnter.bind(this));
 		this.eventManager.addEvent(dragHandle, 'mouseleave', OnDragLeave.bind(this));
@@ -128,21 +128,21 @@ Component.prototype = {
 		let oNode = null;
 		let formatEl = this.format.getLine(selectionNode, null);
 
-		if (domUtils.isListCell(formatEl)) {
+		if (dom.check.isListCell(formatEl)) {
 			this.html.insertNode(element, { afterNode: isInline ? null : selectionNode === formatEl ? null : r.container.nextSibling, skipCharCount: true });
-			if (!isInline && !element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
+			if (!isInline && !element.nextSibling) element.parentNode.appendChild(dom.utils.createElement('BR'));
 		} else {
-			if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
-				const depthFormat = domUtils.getParentElement(r.container, this.format.isBlock.bind(this.format));
-				oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
+			if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || dom.check.isBreak(r.container))) {
+				const depthFormat = dom.query.getParentElement(r.container, this.format.isBlock.bind(this.format));
+				oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
 				if (oNode) formatEl = /** @type {HTMLElement} */ (oNode.previousSibling);
 			}
 			this.html.insertNode(element, { afterNode: isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
-			if (!isInline && formatEl && domUtils.isZeroWidth(formatEl)) domUtils.removeItem(formatEl);
+			if (!isInline && formatEl && dom.check.isZeroWidth(formatEl)) dom.utils.removeItem(formatEl);
 		}
 
 		if (isInline) {
-			const empty = domUtils.createTextNode(unicode.zeroWidthSpace);
+			const empty = dom.utils.createTextNode(unicode.zeroWidthSpace);
 			element.parentNode.insertBefore(empty, element.nextSibling);
 		}
 
@@ -154,7 +154,7 @@ Component.prototype = {
 			if (fileComponentInfo) {
 				this.select(fileComponentInfo.target, fileComponentInfo.pluginName);
 			} else if (oNode) {
-				oNode = domUtils.getEdgeChildNodes(oNode, null).sc || oNode;
+				oNode = dom.query.getEdgeChildNodes(oNode, null).sc || oNode;
 				this.selection.setRange(oNode, 0, oNode, 0);
 			}
 		}
@@ -184,8 +184,8 @@ Component.prototype = {
 		let launcher = null;
 
 		if (this.is(element)) {
-			if (domUtils.hasClass(element, 'se-component') && !domUtils.hasClass(element, 'se-inline-component')) element = element.firstElementChild || element;
-			if (/^FIGURE$/i.test(element.nodeName)) element = element.firstElementChild;
+			if (dom.utils.hasClass(element, 'se-component') && !dom.utils.hasClass(element, 'se-inline-component')) element = /** @type {HTMLElement} */ (element).firstElementChild || element;
+			if (/^FIGURE$/i.test(element.nodeName)) element = /** @type {HTMLElement} */ (element).firstElementChild;
 			if (!element) return null;
 
 			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
@@ -235,7 +235,7 @@ Component.prototype = {
 	 */
 	select(element, pluginName, isInput) {
 		const info = this.get(element);
-		if (!info || domUtils.isUneditable(domUtils.getParentElement(element, this.is.bind(this))) || domUtils.isUneditable(element)) return false;
+		if (!info || dom.check.isUneditable(dom.query.getParentElement(element, this.is.bind(this))) || dom.check.isUneditable(element)) return false;
 
 		const plugin = info.launcher || this.plugins[pluginName];
 		if (!plugin) return;
@@ -259,8 +259,8 @@ Component.prototype = {
 		let isNonFigureComponent;
 		if (typeof plugin.select === 'function') isNonFigureComponent = plugin.select(element);
 
-		const isBreakComponent = domUtils.hasClass(info.target, 'se-component-line-break');
-		if (isBreakComponent || (!isNonFigureComponent && !domUtils.hasClass(info.container, 'se-inline-component'))) this._setComponentLineBreaker(info.container || info.cover || element);
+		const isBreakComponent = dom.utils.hasClass(info.target, 'se-component-line-break');
+		if (isBreakComponent || (!isNonFigureComponent && !dom.utils.hasClass(info.container, 'se-inline-component'))) this._setComponentLineBreaker(/** @type {HTMLElement} */ (info.container || info.cover || element));
 
 		this.currentTarget = element;
 		this.currentPlugin = plugin;
@@ -275,7 +275,7 @@ Component.prototype = {
 			if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
 			if (!info.isFile) this.__addNotFileGlobalEvent();
 		}, 0);
-		domUtils.addClass(info.container, 'se-component-selected');
+		dom.utils.addClass(info.container, 'se-component-selected');
 
 		if (!isBreakComponent && __overInfo !== ON_OVER_COMPONENT) {
 			// set zero width space
@@ -283,20 +283,20 @@ Component.prototype = {
 
 			const oNode = info.container;
 			let zeroWidth = null;
-			if (!oNode.previousSibling || domUtils.isBreak(oNode.previousSibling)) {
-				zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+			if (!oNode.previousSibling || dom.check.isBreak(oNode.previousSibling)) {
+				zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				oNode.parentNode.insertBefore(zeroWidth, oNode);
 			}
 
-			if (!oNode.nextSibling || domUtils.isBreak(oNode.nextSibling)) {
-				zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+			if (!oNode.nextSibling || dom.check.isBreak(oNode.nextSibling)) {
+				zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
 			}
 
 			this.editor.status.onSelected = true;
-		} else if (isBreakComponent || !domUtils.hasClass(info.container, 'se-input-component')) {
+		} else if (isBreakComponent || !dom.utils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
-			domUtils.addClass(dragHandle, 'se-drag-handle-full');
+			dom.utils.addClass(dragHandle, 'se-drag-handle-full');
 			this.ui._visibleControllers(false, false);
 
 			const sizeTarget = info.caption ? info.target : info.cover || info.container || info.target;
@@ -341,7 +341,7 @@ Component.prototype = {
 	is(element) {
 		if (!element) return false;
 
-		if (/^FIGURE$/i.test(element.nodeName) || domUtils.hasClass(element, 'se-component')) return true;
+		if (/^FIGURE$/i.test(element.nodeName) || dom.utils.hasClass(element, 'se-component')) return true;
 		if (this.editor._componentManager.find((f) => f(element))) return true;
 
 		return false;
@@ -359,10 +359,10 @@ Component.prototype = {
 		if (!element) return false;
 
 		if (/^FIGURE$/i.test(element.nodeName)) element = element.parentElement;
-		if (domUtils.hasClass(element, 'se-inline-component')) return true;
+		if (dom.utils.hasClass(element, 'se-inline-component')) return true;
 
 		const container = this.editor._componentManager.find((f) => f(element));
-		if (container && domUtils.hasClass(element, 'se-inline-component')) return true;
+		if (container && dom.utils.hasClass(element, 'se-inline-component')) return true;
 
 		return false;
 	},
@@ -389,7 +389,7 @@ Component.prototype = {
 	 */
 	__isFiles(element) {
 		const nodeName = element.nodeName.toLowerCase();
-		return this.editor._fileManager.regExp.test(nodeName) && (!this.editor._fileManager.tagAttrs[nodeName] || this.editor._fileManager.tagAttrs[nodeName]?.every((v) => element.hasAttribute(v)));
+		return this.editor._fileManager.regExp.test(nodeName) && (!this.editor._fileManager.tagAttrs[nodeName] || this.editor._fileManager.tagAttrs[nodeName]?.every((v) => /** @type {HTMLElement} */ (element).hasAttribute(v)));
 	},
 
 	/**
@@ -402,8 +402,8 @@ Component.prototype = {
 		this.editor._preventBlur = false;
 		_DragHandle.set('__overInfo', null);
 		this._removeDragEvent();
-		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected|');
-		domUtils.removeClass(this.currentInfo?.cover, 'se-figure-over-selected');
+		dom.utils.removeClass(this.currentInfo?.container, 'se-component-selected|');
+		dom.utils.removeClass(this.currentInfo?.cover, 'se-figure-over-selected');
 
 		const { frameContext } = this.editor;
 		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = 'none';
@@ -425,7 +425,7 @@ Component.prototype = {
 	 * @private
 	 * @this {ComponentThis}
 	 * @description Set line breaker of component
-	 * @param {Node} element Element tag
+	 * @param {HTMLElement} element Element tag
 	 */
 	_setComponentLineBreaker(element) {
 		const _overInfo = _DragHandle.get('__overInfo') === ON_OVER_COMPONENT;
@@ -435,14 +435,14 @@ Component.prototype = {
 
 		const fc = this.editor.frameContext;
 		const container = info.container;
-		const isNonSelected = domUtils.hasClass(container, 'se-flex-component');
+		const isNonSelected = dom.utils.hasClass(container, 'se-flex-component');
 		const lb_t = fc.get('lineBreaker_t');
 		const lb_b = fc.get('lineBreaker_b');
 		const t_style = lb_t.style;
 		const b_style = lb_b.style;
 		const offsetTarget = container.offsetWidth < element.offsetWidth ? container : element;
 		const target = this.editor._figureContainer?.style.display === 'block' ? this.editor._figureContainer : offsetTarget;
-		const isList = domUtils.isListCell(container.parentNode);
+		const isList = dom.check.isListCell(container.parentNode);
 
 		// top
 		let componentTop, w;
@@ -461,8 +461,8 @@ Component.prototype = {
 			t_style[dir[1]] = '';
 
 			lb_t.setAttribute('data-offset', scrollY + ',' + scrollX);
-			if (_overInfo) domUtils.removeClass(lb_t, 'se-on-selected');
-			else domUtils.addClass(lb_t, 'se-on-selected');
+			if (_overInfo) dom.utils.removeClass(lb_t, 'se-on-selected');
+			else dom.utils.addClass(lb_t, 'se-on-selected');
 
 			t_style.display = 'block';
 		} else {
@@ -487,8 +487,8 @@ Component.prototype = {
 
 			const bDir = 'left';
 			lb_b.setAttribute('data-offset', scrollY + ',' + bDir + ',' + scrollX);
-			if (_overInfo) domUtils.removeClass(lb_b, 'se-on-selected');
-			else domUtils.addClass(lb_b, 'se-on-selected');
+			if (_overInfo) dom.utils.removeClass(lb_b, 'se-on-selected');
+			else dom.utils.addClass(lb_b, 'se-on-selected');
 
 			b_style.display = 'block';
 		} else {
@@ -547,11 +547,11 @@ Component.prototype = {
 	 * @description Removes drag-related events and resets drag-related states.
 	 */
 	_removeDragEvent() {
-		this.carrierWrapper.querySelector('.se-drag-cursor').style.left = '-10000px';
+		/** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-drag-cursor')).style.left = '-10000px';
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 
-		domUtils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
-		domUtils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
+		dom.utils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
+		dom.utils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
 
 		_DragHandle.set('__figureInst', null);
 		_DragHandle.set('__dragInst', null);
@@ -570,8 +570,8 @@ Component.prototype = {
  */
 function OnDragEnter() {
 	this.editor._preventBlur = true;
-	this.ui._visibleControllers(false, domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
-	domUtils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
+	this.ui._visibleControllers(false, dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
+	dom.utils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
 }
 
 /**
@@ -579,8 +579,8 @@ function OnDragEnter() {
  */
 function OnDragLeave() {
 	this.editor._preventBlur = false;
-	if (!domUtils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.ui._visibleControllers(true, true);
-	domUtils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
+	if (!dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.ui._visibleControllers(true, true);
+	dom.utils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
 }
 
 /**
@@ -596,8 +596,8 @@ function OnDragStart(e) {
 	}
 
 	this.editor._preventBlur = false;
-	domUtils.addClass(_DragHandle.get('__dragHandler'), 'se-dragging');
-	domUtils.addClass(_DragHandle.get('__dragContainer'), 'se-dragging');
+	dom.utils.addClass(_DragHandle.get('__dragHandler'), 'se-dragging');
+	dom.utils.addClass(_DragHandle.get('__dragContainer'), 'se-dragging');
 	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
 }
 
@@ -606,7 +606,7 @@ function OnDragStart(e) {
  */
 function OnDragEnd() {
 	this.editor._preventBlur = false;
-	domUtils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
+	dom.utils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
 	this._removeDragEvent();
 }
 
@@ -615,8 +615,8 @@ function OnDragEnd() {
  * @param {MouseEvent} e - Mouse event
  */
 function OnDragClick(e) {
-	const target = domUtils.getEventTarget(e);
-	if (!domUtils.hasClass(target, 'se-drag-handle-full')) return;
+	const target = dom.query.getEventTarget(e);
+	if (!dom.utils.hasClass(target, 'se-drag-handle-full')) return;
 
 	const dragInst = _DragHandle.get('__dragInst');
 	this._removeDragEvent();
@@ -628,11 +628,11 @@ function OnDragClick(e) {
  * @param {MouseEvent} e - Mouse event
  */
 function CloseListener_mousedown(e) {
-	const target = domUtils.getEventTarget(e);
+	const target = dom.query.getEventTarget(e);
 	if (
 		this.currentTarget?.contains(target) ||
-		domUtils.getParentElement(target, '.se-controller') ||
-		domUtils.hasClass(target, 'se-drag-handle') ||
+		dom.query.getParentElement(target, '.se-controller') ||
+		dom.utils.hasClass(target, 'se-drag-handle') ||
 		(this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target)))
 	) {
 		return;
@@ -645,17 +645,17 @@ function CloseListener_mousedown(e) {
  * @param {ClipboardEvent} e - Event object
  */
 function OnCopy_component(e) {
-	const target = domUtils.getEventTarget(e);
-	if (domUtils.isInputElement(target) && domUtils.getParentElement(target, '.se-modal')) return;
+	const target = dom.query.getEventTarget(e);
+	if (dom.check.isInputElement(target) && dom.query.getParentElement(target, '.se-modal')) return;
 
 	const info = this.info;
 	if (!info) return;
 
 	SetClipboardComponent(e, info.container, e.clipboardData);
-	domUtils.addClass(info.container, 'se-copy');
+	dom.utils.addClass(info.container, 'se-copy');
 	// copy effect
 	_w.setTimeout(() => {
-		domUtils.removeClass(info.container, 'se-copy');
+		dom.utils.removeClass(info.container, 'se-copy');
 	}, 120);
 }
 
@@ -669,7 +669,7 @@ function OnCut_component(e) {
 
 	SetClipboardComponent(e, info.container, e.clipboardData);
 	this.deselect();
-	domUtils.removeItem(info.container);
+	dom.utils.removeItem(info.container);
 }
 
 /**
@@ -679,13 +679,13 @@ function OnCut_component(e) {
 async function OnKeyDown_component(e) {
 	if (this.editor.selectMenuOn) return;
 
-	const keyCode = e.keyCode;
-	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
+	const keyCode = e.code;
+	const ctrl = keyCodeMap.isCtrl(e);
 
 	// redo, undo
 	if (ctrl) {
-		if (keyCode !== 17) {
-			const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? 1000 : 0));
+		if (keyCode !== 'ControlRight' && keyCode !== 'ControlLeft') {
+			const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? '1000' : ''));
 			if (/^(redo|undo)$/.test(info?.c)) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -696,7 +696,7 @@ async function OnKeyDown_component(e) {
 	}
 
 	// backspace key, delete key
-	if (keyCode === 8 || keyCode === 46) {
+	if (keyCodeMap.isRemoveKey(keyCode)) {
 		e.preventDefault();
 		e.stopPropagation();
 		if (typeof this.currentPlugin?.destroy === 'function') {
@@ -708,16 +708,16 @@ async function OnKeyDown_component(e) {
 	}
 
 	// enter key
-	if (keyCode === 13) {
+	if (keyCodeMap.isEnter(keyCode)) {
 		e.preventDefault();
 		const compContext = this.currentInfo || this.get(this.currentTarget);
 		const container = compContext.container || compContext.target;
 		const sibling = container.previousElementSibling || container.nextElementSibling;
 		let newEl = null;
-		if (domUtils.isListCell(container.parentNode)) {
-			newEl = domUtils.createElement('BR');
+		if (dom.check.isListCell(container.parentNode)) {
+			newEl = dom.utils.createElement('BR');
 		} else {
-			newEl = domUtils.createElement(this.format.isLine(sibling) && !this.format.isBlock(sibling) ? sibling.nodeName : this.options.get('defaultLine'), null, '<br>');
+			newEl = dom.utils.createElement(this.format.isLine(sibling) ? sibling.nodeName : this.options.get('defaultLine'), null, '<br>');
 		}
 
 		const pluginName = this.currentPluginName;
@@ -738,22 +738,22 @@ async function OnKeyDown_component(e) {
 		let offset = 1;
 		if (isInline) {
 			switch (keyCode) {
-				case 37: // left
+				case 'ArrowLeft': // left
 					el = container.previousSibling;
 					offset = el?.nodeType === 3 ? el.textContent.length : 1;
 					break;
-				case 39: // right
+				case 'ArrowRight': // right
 					el = container.nextSibling;
 					offset = 0;
 					break;
-				case 38: {
+				case 'ArrowUp': {
 					// up
 					const line = this.format.getLine(container, null);
 					el = line?.previousElementSibling;
 					offset = 0;
 					break;
 				}
-				case 40: {
+				case 'ArrowDown': {
 					// down
 					const line = this.format.getLine(container, null);
 					el = line?.nextElementSibling;
@@ -793,7 +793,7 @@ async function OnKeyDown_component(e) {
 	}
 
 	// ESC
-	if (keyCode === 27) {
+	if (keyCodeMap.isEsc(keyCode)) {
 		this.deselect();
 		return;
 	}
@@ -803,8 +803,8 @@ function SetClipboardComponent(e, container, clipboardData) {
 	e.preventDefault();
 	e.stopPropagation();
 	const pasteContainer = container.cloneNode(true);
-	domUtils.removeClass(pasteContainer, 'se-component-selected');
-	pasteContainer.querySelectorAll('.se-figure-selected').forEach((el) => domUtils.removeClass(el, 'se-figure-selected'));
+	dom.utils.removeClass(pasteContainer, 'se-component-selected');
+	pasteContainer.querySelectorAll('.se-figure-selected').forEach((el) => dom.utils.removeClass(el, 'se-figure-selected'));
 	clipboardData.setData('text/html', pasteContainer.outerHTML);
 }
 

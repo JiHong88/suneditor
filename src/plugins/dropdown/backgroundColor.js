@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import ColorPicker from '../../modules/ColorPicker';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @class
@@ -44,17 +44,17 @@ class BackgroundColor extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
-		const colorHelper = target.querySelector('.se-svg-color-helper');
+		const colorHelper = /** @type {SVGPathElement} */ (target.querySelector('path.se-svg-color-helper'));
 		if (!colorHelper) return false;
 
 		if (!element) {
 			colorHelper.style.color = '';
-		} else if (element?.style.backgroundColor.length > 0) {
+		} else if (element.style.backgroundColor.length > 0) {
 			colorHelper.style.color = element.style.backgroundColor;
 			return true;
 		}
@@ -87,7 +87,7 @@ class BackgroundColor extends EditorInjector {
 	 */
 	colorPickerAction(color) {
 		if (color) {
-			const newNode = domUtils.createElement('SPAN', { style: 'background-color: ' + color + ';' });
+			const newNode = dom.utils.createElement('SPAN', { style: 'background-color: ' + color + ';' });
 			this.format.applyInlineElement(newNode, { stylesToModify: ['background-color'], nodesToRemove: null, strictRemove: null });
 		} else {
 			this.format.applyInlineElement(null, { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true });
@@ -98,7 +98,7 @@ class BackgroundColor extends EditorInjector {
 }
 
 function CreateHTML() {
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, null);
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, null);
 }
 
 export default BackgroundColor;

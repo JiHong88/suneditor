@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, env, converter, numbers } from '../../helper';
+import { dom, env, converter, numbers } from '../../helper';
 
 /**
  * @typedef {Omit<Viewer & Partial<EditorInjector>, 'viewer'>} ViewerThis
@@ -88,10 +88,10 @@ Viewer.prototype = {
 
 			this.status._range = null;
 			codeFrame.focus();
-			domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');
-			domUtils.addClass(wrapper, 'se-code-view-status');
+			dom.utils.addClass(this.editor.commandTargets.get('codeView'), 'active');
+			dom.utils.addClass(wrapper, 'se-code-view-status');
 		} else {
-			if (!domUtils.isNonEditable(wysiwygFrame)) this._setCodeDataToEditor();
+			if (!dom.check.isNonEditable(wysiwygFrame)) this._setCodeDataToEditor();
 			wysiwygFrame.scrollTop = 0;
 			codeWrapper.style.setProperty('display', 'none', 'important');
 			wysiwygFrame.style.display = 'block';
@@ -109,17 +109,17 @@ Viewer.prototype = {
 			}
 
 			this.editor._nativeFocus();
-			domUtils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
+			dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
 
-			if (!domUtils.isNonEditable(wysiwygFrame)) {
+			if (!dom.check.isNonEditable(wysiwygFrame)) {
 				this.history.push(false);
 				this.history.resetButtons(fc.get('key'), null);
 			}
-			domUtils.removeClass(wrapper, 'se-code-view-status');
+			dom.utils.removeClass(wrapper, 'se-code-view-status');
 		}
 
 		this.editor._checkPlaceholder(fc);
-		domUtils.setDisabled(this.editor._codeViewDisabledButtons, value);
+		dom.utils.setDisabled(this.editor._codeViewDisabledButtons, value);
 
 		// document type
 		if (fc.has('documentType-use-header')) {
@@ -193,7 +193,7 @@ Viewer.prototype = {
 			if (fc.get('_stickyDummy').style.display !== 'none' && fc.get('_stickyDummy').style.display !== '') {
 				this.fullScreenSticky = true;
 				fc.get('_stickyDummy').style.display = 'none';
-				domUtils.removeClass(toolbar, 'se-toolbar-sticky');
+				dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 
 			this.bodyOverflow = this._d.body.style.overflow;
@@ -228,8 +228,8 @@ Viewer.prototype = {
 
 			const reductionIcon = this.icons.reduction;
 			this.editor.applyCommandTargets('fullScreen', (e) => {
-				domUtils.changeElement(e.firstElementChild, reductionIcon);
-				domUtils.addClass(e, 'active');
+				dom.utils.changeElement(e.firstElementChild, reductionIcon);
+				dom.utils.addClass(e, 'active');
 			});
 		} else {
 			// frame
@@ -249,7 +249,7 @@ Viewer.prototype = {
 			if (arrow) arrow.style.cssText = this.arrowOriginCssText;
 			this._d.body.style.overflow = this.bodyOverflow;
 
-			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight(fc);
+			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight(fc.get('code'), fc.get('codeNumbers'), true);
 
 			if (this.toolbarParent) {
 				this.toolbarParent.appendChild(toolbar);
@@ -257,13 +257,13 @@ Viewer.prototype = {
 			}
 
 			if (this.options.get('toolbar_sticky') > -1) {
-				domUtils.removeClass(toolbar, 'se-toolbar-sticky');
+				dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 
 			if (this.fullScreenSticky && !this.options.get('toolbar_container')) {
 				this.fullScreenSticky = false;
 				fc.get('_stickyDummy').style.display = 'block';
-				domUtils.addClass(toolbar, 'se-toolbar-sticky');
+				dom.utils.addClass(toolbar, 'se-toolbar-sticky');
 			}
 
 			this.editor.isInline = this.toolbar._isInline = this.fullScreenInline;
@@ -278,8 +278,8 @@ Viewer.prototype = {
 
 			const expansionIcon = this.icons.expansion;
 			this.editor.applyCommandTargets('fullScreen', (e) => {
-				domUtils.changeElement(e.firstElementChild, expansionIcon);
-				domUtils.removeClass(e, 'active');
+				dom.utils.changeElement(e.firstElementChild, expansionIcon);
+				dom.utils.removeClass(e, 'active');
 			});
 		}
 
@@ -300,11 +300,11 @@ Viewer.prototype = {
 		fc.set('isShowBlocks', !!value);
 
 		if (value) {
-			domUtils.addClass(fc.get('wysiwyg'), 'se-show-block');
-			domUtils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
+			dom.utils.addClass(fc.get('wysiwyg'), 'se-show-block');
+			dom.utils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		} else {
-			domUtils.removeClass(fc.get('wysiwyg'), 'se-show-block');
-			domUtils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
+			dom.utils.removeClass(fc.get('wysiwyg'), 'se-show-block');
+			dom.utils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		}
 
 		this.editor._resourcesStateChange(fc);
@@ -320,31 +320,31 @@ Viewer.prototype = {
 
 		// codeView
 		if (fc.get('isCodeView')) {
-			domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');
+			dom.utils.addClass(this.editor.commandTargets.get('codeView'), 'active');
 		} else {
-			domUtils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
+			dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
 		}
 
 		// fullScreen
 		if (fc.get('isFullScreen')) {
 			const reductionIcon = this.icons.reduction;
 			this.editor.applyCommandTargets('fullScreen', (e) => {
-				domUtils.changeElement(e.firstElementChild, reductionIcon);
-				domUtils.addClass(e, 'active');
+				dom.utils.changeElement(e.firstElementChild, reductionIcon);
+				dom.utils.addClass(e, 'active');
 			});
 		} else {
 			const expansionIcon = this.icons.expansion;
 			this.editor.applyCommandTargets('fullScreen', (e) => {
-				domUtils.changeElement(e.firstElementChild, expansionIcon);
-				domUtils.removeClass(e, 'active');
+				dom.utils.changeElement(e.firstElementChild, expansionIcon);
+				dom.utils.removeClass(e, 'active');
 			});
 		}
 
 		// showBlocks
 		if (fc.get('isShowBlocks')) {
-			domUtils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
+			dom.utils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		} else {
-			domUtils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
+			dom.utils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		}
 	},
 
@@ -353,12 +353,12 @@ Viewer.prototype = {
 	 * @description Prints the current content of the editor.
 	 */
 	print() {
-		const iframe = domUtils.createElement('IFRAME', { style: 'display: none;' });
+		const iframe = /** @type {HTMLIFrameElement} */ (dom.utils.createElement('IFRAME', { style: 'display: none;' }));
 		this._d.body.appendChild(iframe);
 
 		const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;
 		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get()) : this.html.get();
-		const printDocument = domUtils.getIframeDocument(iframe);
+		const printDocument = dom.query.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
 		const rtlClass = this.options.get('_rtl') ? ' se-rtl' : '';
 		const pageCSS = /*html*/ `
@@ -373,7 +373,7 @@ Viewer.prototype = {
 			const arrts = this.options.get('printClass')
 				? 'class="' + this.options.get('printClass') + rtlClass + '"'
 				: this.editor.frameOptions.get('iframe_fullPage')
-				? domUtils.getAttributesToString(wDoc.body, ['contenteditable'])
+				? dom.utils.getAttributesToString(wDoc.body, ['contenteditable'])
 				: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
 
 			printDocument.write(/*html*/ `
@@ -416,7 +416,7 @@ Viewer.prototype = {
 			try {
 				iframe.focus();
 				// Edge, Chromium
-				if (env.isEdge || env.isChromium || this._w.StyleMedia) {
+				if (env.isEdge || env.isChromium || 'StyleMedia' in env._w) {
 					try {
 						iframe.contentWindow.document.execCommand('print', false, null);
 					} catch (e) {
@@ -431,7 +431,7 @@ Viewer.prototype = {
 				throw Error(`[SUNEDITOR.print.fail] error: ${error.message}`);
 			} finally {
 				this.ui.hideLoading();
-				domUtils.removeItem(iframe);
+				dom.utils.removeItem(iframe);
 			}
 		}, 1000);
 	},
@@ -448,7 +448,6 @@ Viewer.prototype = {
 
 		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get({ withFrame: true })) : this.html.get({ withFrame: true });
 		const windowObject = this._w.open('', '_blank');
-		windowObject.mimeType = 'text/html';
 		const wDoc = this.editor.frameContext.get('_wd');
 		const rtlClass = this.options.get('_rtl') ? ' se-rtl' : '';
 
@@ -456,7 +455,7 @@ Viewer.prototype = {
 			const arrts = this.options.get('printClass')
 				? 'class="' + this.options.get('printClass') + rtlClass + '"'
 				: this.editor.frameOptions.get('iframe_fullPage')
-				? domUtils.getAttributesToString(wDoc.body, ['contenteditable'])
+				? dom.utils.getAttributesToString(wDoc.body, ['contenteditable'])
 				: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
 
 			windowObject.document.write(/*html*/ `<!DOCTYPE html>
@@ -618,10 +617,10 @@ Viewer.prototype = {
 				if (attrs[i].name === 'contenteditable') continue;
 				wDoc.body.setAttribute(attrs[i].name, attrs[i].value);
 			}
-			if (!domUtils.hasClass(wDoc.body, 'sun-editor-editable')) {
+			if (!dom.utils.hasClass(wDoc.body, 'sun-editor-editable')) {
 				const editableClasses = this.options.get('_editableClass').split(' ');
 				for (let i = 0; i < editableClasses.length; i++) {
-					domUtils.addClass(wDoc.body, this.options.get('_editableClass')[i]);
+					dom.utils.addClass(wDoc.body, this.options.get('_editableClass')[i]);
 				}
 			}
 		} else {
@@ -642,7 +641,7 @@ Viewer.prototype = {
 		let codeValue = '';
 
 		if (this.editor.frameOptions.get('iframe_fullPage')) {
-			const attrs = domUtils.getAttributesToString(this.editor.frameContext.get('_wd').body, null);
+			const attrs = dom.utils.getAttributesToString(this.editor.frameContext.get('_wd').body, null);
 			codeValue = '<!DOCTYPE html>\n<html>\n' + this.editor.frameContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
 		} else {
 			codeValue = codeContent;
@@ -656,6 +655,9 @@ Viewer.prototype = {
 	 * @this {ViewerThis}
 	 * @description Adjusts the height of the code view area.
 	 * - Ensures the code block auto-resizes based on its content.
+	 * @param {HTMLElement} code - Code area
+	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers area
+	 * @param {boolean} isAuto - Auto height option
 	 */
 	_codeViewAutoHeight(code, codeNumbers, isAuto) {
 		if (isAuto) code.style.height = code.scrollHeight + 'px';
@@ -667,8 +669,8 @@ Viewer.prototype = {
 	 * @this {ViewerThis}
 	 * @description Updates the line numbers for the code editor.
 	 * - Dynamically adjusts line numbers as content grows.
-	 * @param {Node} lineNumbers - Code numbers area
-	 * @param {Node} code - Code area
+	 * @param {HTMLTextAreaElement} lineNumbers - Code numbers area
+	 * @param {HTMLElement} code - Code area
 	 */
 	_updateLineNumbers(lineNumbers, code) {
 		if (!lineNumbers) return;
@@ -688,10 +690,10 @@ Viewer.prototype = {
 
 	/**
 	 * @private
-	 * @this {Node} Code numbers area
+	 * @this {HTMLElement} Code numbers area
 	 * @description Synchronizes scrolling of line numbers with the code editor.
 	 * - Keeps the line numbers aligned with the text.
-	 * @param {Node} codeNumbers - Code numbers textarea
+	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers textarea
 	 */
 	_scrollLineNumbers(codeNumbers) {
 		codeNumbers.scrollTop = this.scrollTop;
@@ -727,7 +729,7 @@ function CreateLineNumbers(fc) {
 /**
  * @private
  * @description Get the line height of the textarea
- * @param {Node} textarea Textarea element
+ * @param {HTMLTextAreaElement} textarea Textarea element
  * @returns {number}
  */
 function GetLineHeight(textarea) {

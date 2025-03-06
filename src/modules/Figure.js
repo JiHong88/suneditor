@@ -1,6 +1,6 @@
 import EditorInjector from '../editorInjector';
 import { Controller, SelectMenu, _DragHandle } from '../modules';
-import { domUtils, numbers, env, converter } from '../helper';
+import { dom, numbers, env, converter, keyCodeMap } from '../helper';
 
 const { ON_OVER_COMPONENT } = env;
 const DIRECTION_CURSOR_MAP = { tl: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize', br: 'nwse-resize', lw: 'ew-resize', th: 'ns-resize', rw: 'ew-resize', bh: 'ns-resize' };
@@ -166,7 +166,7 @@ function Figure(inst, controls, params) {
  * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
  */
 Figure.CreateContainer = function (element, className) {
-	domUtils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : '') }, domUtils.createElement('FIGURE', null, element));
+	dom.utils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : '') }, dom.utils.createElement('FIGURE', null, element));
 	return Figure.GetContainer(element);
 };
 
@@ -177,7 +177,7 @@ Figure.CreateContainer = function (element, className) {
  * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
  */
 Figure.CreateInlineContainer = function (element, className) {
-	domUtils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
+	dom.utils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
 	return Figure.GetContainer(element);
 };
 
@@ -187,7 +187,7 @@ Figure.CreateInlineContainer = function (element, className) {
  * @returns {HTMLElement} caption element
  */
 Figure.CreateCaption = function (cover, text) {
-	const caption = domUtils.createElement('FIGCAPTION', null, '<div>' + text + '</div>');
+	const caption = dom.utils.createElement('FIGCAPTION', null, '<div>' + text + '</div>');
 	cover.appendChild(caption);
 	return caption;
 };
@@ -198,14 +198,14 @@ Figure.CreateCaption = function (cover, text) {
  * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
  */
 Figure.GetContainer = function (element) {
-	const cover = domUtils.getParentElement(element, 'FIGURE', 2);
-	const inlineCover = domUtils.getParentElement(element, 'SPAN', 2);
+	const cover = dom.query.getParentElement(element, 'FIGURE', 2);
+	const inlineCover = dom.query.getParentElement(element, 'SPAN', 2);
 	return {
 		target: /** @type {HTMLElement} */ (element),
-		container: /** @type {HTMLElement} */ (domUtils.getParentElement(element, Figure.is, 2) || cover),
+		container: /** @type {HTMLElement} */ (dom.query.getParentElement(element, Figure.is, 2) || cover),
 		cover: /** @type {HTMLElement} */ (cover),
-		inlineCover: domUtils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
-		caption: /** @type {HTMLElement} */ (domUtils.getEdgeChild(element.parentElement, 'FIGCAPTION', false))
+		inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
+		caption: /** @type {HTMLElement} */ (dom.query.getEdgeChild(element.parentElement, 'FIGCAPTION', false))
 	};
 };
 
@@ -269,7 +269,7 @@ Figure.CalcRatio = function (w, h, defaultSizeUnit, ratio) {
  * @returns {boolean}
  */
 Figure.is = function (element) {
-	return domUtils.hasClass(element, 'se-component') || /^(HR)$/.test(element?.nodeName);
+	return dom.utils.hasClass(element, 'se-component') || /^(HR)$/.test(element?.nodeName);
 };
 
 Figure.prototype = {
@@ -279,7 +279,7 @@ Figure.prototype = {
 	 */
 	close() {
 		this.editor._preventBlur = false;
-		domUtils.removeClass(this._cover, 'se-figure-selected');
+		dom.utils.removeClass(this._cover, 'se-figure-selected');
 		this.controller.close();
 		this.component._removeDragEvent();
 	},
@@ -380,18 +380,18 @@ Figure.prototype = {
 		const value = /%$/.test(target.style.width) && /%$/.test(figureInfo.container.style.width) ? numbers.get(figureInfo.container.style.width, 0) / 100 + '' : '';
 		for (let i = 0, len = this.percentageButtons.length; i < len; i++) {
 			if (this.percentageButtons[i].getAttribute('data-value') === value) {
-				domUtils.addClass(this.percentageButtons[i], 'active');
+				dom.utils.addClass(this.percentageButtons[i], 'active');
 			} else {
-				domUtils.removeClass(this.percentageButtons[i], 'active');
+				dom.utils.removeClass(this.percentageButtons[i], 'active');
 			}
 		}
 
 		// caption active
 		if (this.captionButton) {
 			if (figureInfo.caption) {
-				domUtils.addClass(this.captionButton, 'active');
+				dom.utils.addClass(this.captionButton, 'active');
 			} else {
-				domUtils.removeClass(this.captionButton, 'active');
+				dom.utils.removeClass(this.captionButton, 'active');
 			}
 		}
 
@@ -407,7 +407,7 @@ Figure.prototype = {
 			this.ui._visibleControllers(true, true);
 			// size
 			const size = this.getSize(target);
-			domUtils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.w + ', ' + size.h + ')');
+			dom.utils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.w + ', ' + size.h + ')');
 			this._displayResizeHandles(!nonResizing);
 			// rotate, aption, align, onresize - display;
 			const transformButtons = this.controller.form.querySelectorAll(
@@ -423,22 +423,22 @@ Figure.prototype = {
 				onas.style.display = exceptionFormat ? 'none' : '';
 			}
 			// selecte
-			domUtils.removeClass(this._cover, 'se-figure-over-selected');
+			dom.utils.removeClass(this._cover, 'se-figure-over-selected');
 			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
 			this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 		} else {
-			domUtils.addClass(this._cover, 'se-figure-over-selected');
+			dom.utils.addClass(this._cover, 'se-figure-over-selected');
 		}
 
 		// set members
-		domUtils.addClass(this._cover, 'se-figure-selected');
+		dom.utils.addClass(this._cover, 'se-figure-selected');
 		this._element_w = this._resize_w = w;
 		this._element_h = this._resize_h = h;
 		this._element_l = left;
 		this._element_t = top;
 
 		// drag
-		if (!this._inlineCover && (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || domUtils.hasClass(figureInfo.container, 'se-input-component'))) {
+		if (!this._inlineCover && (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || dom.utils.hasClass(figureInfo.container, 'se-input-component'))) {
 			this._setDragEvent(_figure.main);
 		}
 
@@ -472,7 +472,7 @@ Figure.prototype = {
 	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
 	 */
 	controllerOpen(target, params) {
-		this._element = target;
+		this._element = /** @type {HTMLElement}  */ (target);
 		this.controller.open(target, null, params);
 	},
 
@@ -555,9 +555,9 @@ Figure.prototype = {
 			cover.style.width = this.isVertical ? target.style.height || target.offsetHeight + 'px' : !target.style.width || target.style.width === 'auto' ? '' : target.style.width || '100%';
 		}
 
-		if (!domUtils.hasClass(container, '__se__float-' + align)) {
-			domUtils.removeClass(container, this._floatClassStr);
-			domUtils.addClass(container, '__se__float-' + align);
+		if (!dom.utils.hasClass(container, '__se__float-' + align)) {
+			dom.utils.removeClass(container, this._floatClassStr);
+			dom.utils.addClass(container, '__se__float-' + align);
 		}
 
 		if (this.autoRatio) {
@@ -593,7 +593,7 @@ Figure.prototype = {
 				newTarget.style.width = '';
 				newTarget.style.height = '';
 				const figure = Figure.CreateInlineContainer(newTarget);
-				domUtils.addClass(
+				dom.utils.addClass(
 					figure.container,
 					container.className
 						.split(' ')
@@ -603,9 +603,9 @@ Figure.prototype = {
 
 				this._asFormatChange(figure, w, h);
 
-				const line = domUtils.createElement(this.options.get('defaultLine'), null, figure.container);
+				const line = dom.utils.createElement(this.options.get('defaultLine'), null, figure.container);
 				parent.insertBefore(line, next);
-				domUtils.removeItem(container);
+				dom.utils.removeItem(container);
 
 				break;
 			}
@@ -617,14 +617,14 @@ Figure.prototype = {
 				const r = this.html.remove();
 				const s = this.nodeTransform.split(r.container, r.offset, 0);
 
-				if (s?.previousElementSibling && domUtils.isZeroWidth(s.previousElementSibling)) {
-					domUtils.removeItem(s.previousElementSibling);
+				if (s?.previousElementSibling && dom.check.isZeroWidth(s.previousElementSibling)) {
+					dom.utils.removeItem(s.previousElementSibling);
 				}
 
 				newTarget.style.width = '';
 				newTarget.style.height = '';
 				const figure = Figure.CreateContainer(newTarget);
-				domUtils.addClass(
+				dom.utils.addClass(
 					figure.container,
 					container.className
 						.split(' ')
@@ -666,7 +666,7 @@ Figure.prototype = {
 	/**
 	 * @this {FigureThis}
 	 * @description Controller button action
-	 * @param {Node} target Target button element
+	 * @param {HTMLButtonElement} target Target button element
 	 * @returns
 	 */
 	controllerAction(target) {
@@ -697,7 +697,7 @@ Figure.prototype = {
 			case 'caption':
 				if (!this._caption) {
 					const caption = Figure.CreateCaption(this._cover, this.lang.caption);
-					const captionText = domUtils.getEdgeChild(caption, (current) => current.nodeType === 3, false);
+					const captionText = dom.query.getEdgeChild(caption, (current) => current.nodeType === 3, false);
 
 					if (!captionText) {
 						caption.focus();
@@ -707,7 +707,7 @@ Figure.prototype = {
 
 					this.controller.close();
 				} else {
-					domUtils.removeItem(this._caption);
+					dom.utils.removeItem(this._caption);
 					this._w.setTimeout(this.component.select.bind(this.component, element, this.kind), 0);
 				}
 
@@ -755,33 +755,33 @@ Figure.prototype = {
 	 */
 	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
 		const isInline = this.component.isInline(container);
-		let existElement = this.format.isBlock(originEl.parentNode) || domUtils.isWysiwygFrame(originEl.parentNode) ? originEl : domUtils.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
+		let existElement = this.format.isBlock(originEl.parentNode) || dom.check.isWysiwygFrame(originEl.parentNode) ? originEl : dom.check.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
 
-		if (domUtils.getParentElement(originEl, domUtils.isExcludeFormat)) {
+		if (dom.query.getParentElement(originEl, dom.check.isExcludeFormat)) {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
 			existElement.parentNode.replaceChild(container, existElement);
 		} else if (isInline && this.format.isLine(existElement)) {
 			const refer = isInline && /^SPAN$/i.test(originEl.parentElement.nodeName) ? originEl.parentElement : originEl;
 			refer.parentElement.replaceChild(container, refer);
-		} else if (domUtils.isListCell(existElement)) {
-			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
+		} else if (dom.check.isListCell(existElement)) {
+			const refer = dom.query.getParentElement(originEl, (current) => current.parentNode === existElement);
 			existElement.insertBefore(container, refer);
-			domUtils.removeItem(originEl);
+			dom.utils.removeItem(originEl);
 			this.nodeTransform.removeEmptyNode(refer, null, true);
 		} else if (this.format.isLine(existElement)) {
-			const refer = domUtils.getParentElement(originEl, (current) => current.parentNode === existElement);
+			const refer = dom.query.getParentElement(originEl, (current) => current.parentNode === existElement);
 			existElement = this.nodeTransform.split(existElement, refer);
 			existElement.parentNode.insertBefore(container, existElement);
-			domUtils.removeItem(originEl);
+			dom.utils.removeItem(originEl);
 			this.nodeTransform.removeEmptyNode(existElement, null, true);
 		} else {
-			if (this.format.isLineOnly(existElement.parentNode)) {
+			if (this.format.isLine(existElement.parentNode)) {
 				const formats = existElement.parentNode;
 				formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-				if (fileManagerInst?.__updateTags.map((current) => existElement.contains(current)).length === 0) domUtils.removeItem(existElement);
-				else if (domUtils.isZeroWidth(existElement)) domUtils.removeItem(existElement);
+				if (fileManagerInst?.__updateTags.map((current) => existElement.contains(current)).length === 0) dom.utils.removeItem(existElement);
+				else if (dom.check.isZeroWidth(existElement)) dom.utils.removeItem(existElement);
 			} else {
-				existElement = domUtils.isFigure(existElement.parentNode) ? domUtils.getParentElement(existElement.parentNode, Figure.is) : existElement;
+				existElement = dom.check.isFigure(existElement.parentNode) ? dom.query.getParentElement(existElement.parentNode, Figure.is) : existElement;
 				existElement.parentNode.replaceChild(container, existElement);
 			}
 		}
@@ -1056,8 +1056,8 @@ Figure.prototype = {
 		this._container.style.width = '';
 		this._container.style.height = '';
 
-		domUtils.removeClass(this._container, this._floatClassStr);
-		domUtils.addClass(this._container, '__se__float-' + this.align);
+		dom.utils.removeClass(this._container, this._floatClassStr);
+		dom.utils.addClass(this._container, '__se__float-' + this.align);
 
 		if (this.align === 'center') this.setAlign(this._element, this.align);
 	},
@@ -1078,7 +1078,7 @@ Figure.prototype = {
 	 */
 	_setAlignIcon() {
 		if (!this.alignButton) return;
-		domUtils.changeElement(this.alignButton.firstElementChild, this._alignIcons[this.align]);
+		dom.utils.changeElement(this.alignButton.firstElementChild, this._alignIcons[this.align]);
 	},
 
 	/**
@@ -1088,7 +1088,7 @@ Figure.prototype = {
 	 */
 	_setAsIcon() {
 		if (!this.asButton) return;
-		domUtils.changeElement(this.asButton.firstElementChild, this.icons[`as_${this.as}`]);
+		dom.utils.changeElement(this.asButton.firstElementChild, this.icons[`as_${this.as}`]);
 	},
 
 	/**
@@ -1120,7 +1120,7 @@ Figure.prototype = {
 	 * @param {Node} element Target element.
 	 */
 	_setCaptionPosition(element) {
-		const figcaption = domUtils.getEdgeChild(domUtils.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false);
+		const figcaption = dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false);
 		if (figcaption) {
 			figcaption.style.marginTop = (this.isVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
 		}
@@ -1133,7 +1133,7 @@ Figure.prototype = {
 	 * @param {Node} element Target element.
 	 */
 	_deleteCaptionPosition(element) {
-		const figcaption = domUtils.getEdgeChild(domUtils.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false);
+		const figcaption = dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false);
 		if (figcaption) {
 			figcaption.style.marginTop = '';
 		}
@@ -1156,10 +1156,10 @@ Figure.prototype = {
 		}
 
 		if (type === 'none') {
-			domUtils.addClass(_figure.main, 'se-resize-ing');
+			dom.utils.addClass(_figure.main, 'se-resize-ing');
 			this.__onResizeESCEvent = this.eventManager.addGlobalEvent('keydown', this.__containerResizingESC);
 		} else {
-			domUtils.removeClass(_figure.main, 'se-resize-ing');
+			dom.utils.removeClass(_figure.main, 'se-resize-ing');
 		}
 	},
 
@@ -1187,7 +1187,7 @@ Figure.prototype = {
 	 */
 	_setDragEvent(figureMain) {
 		const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
-		domUtils.removeClass(dragHandle, 'se-drag-handle-full');
+		dom.utils.removeClass(dragHandle, 'se-drag-handle-full');
 
 		dragHandle.style.opacity = '';
 		dragHandle.style.width = '';
@@ -1258,7 +1258,7 @@ function OnResizeContainer(e) {
 
 	const _display = this.editor.frameContext.get('_figure').display;
 	_display.style.display = 'block';
-	domUtils.changeTxt(_display, w + ' x ' + h);
+	dom.utils.changeTxt(_display, w + ' x ' + h);
 }
 
 /**
@@ -1299,7 +1299,7 @@ function ContainerResizing(e) {
 	this._resize_w = /** @type {number} */ (/h$/.test(direction) ? this._width : Math.round(resultW));
 	this._resize_h = /** @type {number} */ (/w$/.test(direction) ? this._height : Math.round(resultH));
 	const rw = __resizing_cw ? (this._resize_w / __resizing_sw) * __resizing_cw * 100 : this._resize_w;
-	domUtils.changeTxt(this.editor.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' x ' + this._resize_h);
+	dom.utils.changeTxt(this.editor.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' x ' + this._resize_h);
 }
 
 /**
@@ -1349,7 +1349,7 @@ function ContainerResizingOff() {
  * @param {KeyboardEvent} e Keyboard event.
  */
 function ContainerResizingESC(e) {
-	if (!/^27$/.test(e.keyCode)) return;
+	if (!keyCodeMap.isEsc(e.code)) return;
 	this._offResizeEvent();
 	this.component.select(this._element, this.kind, false);
 }
@@ -1493,7 +1493,7 @@ function CreateHTML_resizeDot() {
 			<div class="se-resize-display"></div>
 		</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-resizing-container', style: 'display: none;' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-resizing-container', style: 'display: none;' }, html);
 }
 
 function GET_CONTROLLER_BUTTONS(group) {
@@ -1605,7 +1605,7 @@ function CreateHTML_controller(inst, controls) {
 		}
 	}
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-resizing' + (!html ? ' se-empty-controller' : '') }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-resizing' + (!html ? ' se-empty-controller' : '') }, html);
 }
 
 export default Figure;

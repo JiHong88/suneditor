@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
@@ -15,8 +15,8 @@ class HR extends EditorInjector {
 	static className = '';
 	/**
 	 * @this {HR}
-	 * @param {Node} node - The node to check.
-	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
 		return /^hr$/i.test(node?.nodeName) ? node : null;
@@ -50,7 +50,7 @@ class HR extends EditorInjector {
 	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
-		domUtils.addClass(target, 'on');
+		dom.utils.addClass(target, 'on');
 	}
 
 	/**
@@ -59,19 +59,19 @@ class HR extends EditorInjector {
 	 * @param {HTMLElement} element Target element
 	 */
 	deselect(element) {
-		domUtils.removeClass(element, 'on');
+		dom.utils.removeClass(element, 'on');
 	}
 
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Node} target Target element
+	 * @param {HTMLElement} target Target element
 	 */
 	destroy(target) {
 		if (!target) return;
 
 		const focusEl = target.previousElementSibling || target.nextElementSibling;
-		domUtils.removeItem(target);
+		dom.utils.removeItem(target);
 
 		// focus
 		this.editor.focusEdge(focusEl);
@@ -99,13 +99,13 @@ class HR extends EditorInjector {
 	 * @param {HTMLElement} params.line - The line element of the current range
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
 	 * @param {KeyboardEvent} params.event - Key event object
-	 * @param {number} params.keyCode - Key code
+	 * @param {string} params.keyCode - KeyBoardEvent.code
 	 * @param {EditorCore} params.editor - The root editor instance
 	 */
 	shortcut({ line, range }) {
 		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);
 		this.submit('__se__solid');
-		domUtils.removeItem(line);
+		dom.utils.removeItem(line);
 		this.selection.setRange(newLine, 0, newLine, 0);
 	}
 
@@ -114,7 +114,7 @@ class HR extends EditorInjector {
 	 * @param {string} className HR class name
 	 */
 	submit(className) {
-		const hr = domUtils.createElement('hr', { class: className });
+		const hr = dom.utils.createElement('hr', { class: className });
 		this.editor.focus();
 		this.component.insert(hr, { skipCharCount: false, skipSelection: true, skipHistory: false });
 		return hr;
@@ -147,7 +147,7 @@ function CreateHTML({ lang }, HRItems) {
 		</li>`;
 	}
 
-	return domUtils.createElement(
+	return dom.utils.createElement(
 		'DIV',
 		{
 			class: 'se-dropdown se-list-layer se-list-line'

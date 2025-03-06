@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils, env } from '../../helper';
+import { dom, env } from '../../helper';
 import { ApiManager } from '../../modules';
 
 const { _d } = env;
@@ -62,11 +62,11 @@ class ExportPDF extends EditorInjector {
 
 		try {
 			const standardWW = this.editor.frameContext.get('documentTypePageMirror') || this.editor.frameContext.get('wysiwygFrame');
-			const editableDiv = domUtils.createElement('div', { class: standardWW.className }, standardWW.innerHTML);
-			ww = domUtils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
+			const editableDiv = dom.utils.createElement('div', { class: standardWW.className }, standardWW.innerHTML);
+			ww = dom.utils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
 
 			const innerPadding = this._w.getComputedStyle(standardWW).padding;
-			const inlineWW = domUtils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
+			const inlineWW = dom.utils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
 			inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '0';
 			ww.innerHTML = `
 				<style>
@@ -88,7 +88,7 @@ class ExportPDF extends EditorInjector {
 		} catch (error) {
 			console.error(`[SUNEDITOR.plugins.exportPDF.error] ${error.message}`);
 		} finally {
-			domUtils.removeItem(ww);
+			dom.utils.removeItem(ww);
 			this.ui.hideLoading();
 		}
 	}
@@ -117,14 +117,14 @@ class ExportPDF extends EditorInjector {
 		const contentDisposition = xhr.getResponseHeader('Content-Disposition');
 		const downloadUrl = URL.createObjectURL(blob);
 		const filename = (contentDisposition.match(/filename="([^"]+)/) || [])[1] || this.fileName + '.pdf';
-		const a = domUtils.createElement('A', { href: downloadUrl, download: filename, style: 'display: none;' }, null);
+		const a = dom.utils.createElement('A', { href: downloadUrl, download: filename, style: 'display: none;' }, null);
 
 		try {
 			_d.body.appendChild(a);
 			a.click();
 		} finally {
 			setTimeout(() => {
-				domUtils.removeItem(a);
+				dom.utils.removeItem(a);
 				URL.revokeObjectURL(downloadUrl);
 			}, 100);
 		}

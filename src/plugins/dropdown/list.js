@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @class
@@ -37,30 +37,30 @@ class List extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
 		const icon = target.firstElementChild;
 
-		if (domUtils.isList(element)) {
+		if (dom.check.isList(element)) {
 			const nodeName = element.nodeName.toLowerCase();
 			target.setAttribute('data-focus', nodeName);
-			domUtils.addClass(target, 'active');
+			dom.utils.addClass(target, 'active');
 
 			if (/^ul$/.test(nodeName)) {
-				domUtils.changeElement(icon, this.icons.bulleted);
+				dom.utils.changeElement(icon, this.icons.bulleted);
 			} else {
-				domUtils.changeElement(icon, this.icons.numbered);
+				dom.utils.changeElement(icon, this.icons.numbered);
 			}
 
 			return true;
 		}
 
 		target.removeAttribute('data-focus');
-		domUtils.changeElement(icon, this.icons.number);
-		domUtils.removeClass(target, 'active');
+		dom.utils.changeElement(icon, this.icons.number);
+		dom.utils.removeClass(target, 'active');
 
 		return false;
 	}
@@ -75,9 +75,9 @@ class List extends EditorInjector {
 		const list = this.listItems;
 		for (let i = 0, len = list.length; i < len; i++) {
 			if (currentList === list[i].getAttribute('data-command')) {
-				domUtils.addClass(list[i], 'active');
+				dom.utils.addClass(list[i], 'active');
 			} else {
-				domUtils.removeClass(list[i], 'active');
+				dom.utils.removeClass(list[i], 'active');
 			}
 		}
 	}
@@ -116,7 +116,7 @@ function CreateHTML({ lang, icons }) {
 		</ul>
 	</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, html);
 }
 
 export default List;

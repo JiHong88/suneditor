@@ -3,12 +3,12 @@ import { get as getNumber } from '../../helper/numbers';
 /**
  * @description Elements and variables you should have
  * @param {{target: Element, key: *, options: FrameOptions}} editorTarget Target textarea
- * @param {Element} top Editor top area
- * @param {Element} wwFrame Editor wysiwyg frame
- * @param {Element} codeWrapper Editor code view wrapper
- * @param {Element} codeFrame Editor code view frame
- * @param {{inner: Element, page: Element, pageMirror: Element}} documentTypeInner Document type elements
- * @param {?Element} statusbar Editor statusbar
+ * @param {HTMLElement} top Editor top area
+ * @param {HTMLElement} wwFrame Editor wysiwyg frame
+ * @param {HTMLElement} codeWrapper Editor code view wrapper
+ * @param {HTMLElement} codeFrame Editor code view frame
+ * @param {{inner: HTMLElement, page: HTMLElement, pageMirror: HTMLElement}} documentTypeInner Document type elements
+ * @param {?HTMLElement} statusbar Editor statusbar
  * @param {*} key root key
  * @returns {FrameContext}
  */
@@ -27,7 +27,7 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 		['wysiwyg', wwFrame], // options.iframe ? wwFrame.contentDocument.body : wwFrame
 		['codeWrapper', codeWrapper],
 		['code', codeFrame],
-		['codeNumbers', codeWrapper?.querySelector('.se-code-view-line')],
+		['codeNumbers', /** @type {HTMLTextAreaElement} */ (codeWrapper?.querySelector('.se-code-view-line'))],
 		['lineBreaker_t', top.querySelector('.se-line-breaker-component-t')],
 		['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],
 		['_stickyDummy', top.querySelector('.se-toolbar-sticky-dummy')],
@@ -53,7 +53,7 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 
 /**
  * @description Update statusbar context
- * @param {Element} statusbar Statusbar element
+ * @param {HTMLElement} statusbar Statusbar element
  * @param {FrameContext} mapper FrameContext map
  */
 export function UpdateStatusbarContext(statusbar, mapper) {

@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure } from '../../modules';
-import { domUtils, numbers, env } from '../../helper';
+import { dom, numbers, env, keyCodeMap } from '../../helper';
 const { NO_EVENT } = env;
 
 /**
@@ -59,8 +59,8 @@ class Embed extends EditorInjector {
 	static className = '';
 	/**
 	 * @this {Embed}
-	 * @param {Node} node - The node to check.
-	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
 		let src = '';
@@ -93,8 +93,8 @@ class Embed extends EditorInjector {
 			percentageOnlySize: !!pluginOptions.percentageOnlySize,
 			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
-			uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
-			uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
+			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
+			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			iframeTagAttributes: pluginOptions.iframeTagAttributes || null,
 			query_youtube: pluginOptions.query_youtube || '',
 			query_vimeo: pluginOptions.query_vimeo || ''
@@ -268,7 +268,7 @@ class Embed extends EditorInjector {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * @returns {{query: string, method: (element: HTMLIFrameElement) => void}} The format retention object containing the query and method to process the element.
 	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
 	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -375,19 +375,19 @@ class Embed extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Node} target Target element
+	 * @param {HTMLElement} target Target element
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
 		const targetEl = target || this._element;
-		const container = domUtils.getParentElement(targetEl, Figure.is) || targetEl;
+		const container = dom.query.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
 		const message = await this.triggerEvent('onVideoDeleteBefore', { element: targetEl, container, align: this._align, url: this._linkValue });
 		if (message === false) return;
 
-		domUtils.removeItem(container);
+		dom.utils.removeItem(container);
 		this.init();
 
 		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
@@ -490,7 +490,7 @@ class Embed extends EditorInjector {
 	 * @returns {Node} The created iframe element.
 	 */
 	_createIframeTag() {
-		const iframeTag = domUtils.createElement('IFRAME');
+		const iframeTag = dom.utils.createElement('IFRAME');
 		this._setIframeAttrs(iframeTag);
 		return iframeTag;
 	}
@@ -501,7 +501,7 @@ class Embed extends EditorInjector {
 	 * @returns {Node} The created iframe element.
 	 */
 	_createEmbedTag() {
-		const quoteTag = domUtils.createElement('BLOCKQUOTE');
+		const quoteTag = dom.utils.createElement('BLOCKQUOTE');
 		return quoteTag;
 	}
 
@@ -542,7 +542,7 @@ class Embed extends EditorInjector {
 				}
 			}
 			container = this._container;
-			cover = domUtils.getParentElement(oFrame, 'FIGURE');
+			cover = dom.query.getParentElement(oFrame, 'FIGURE');
 		} else {
 			/** create */
 			if (process) {
@@ -559,7 +559,7 @@ class Embed extends EditorInjector {
 				let index = 0;
 				while (children[index]) {
 					if (/^script$/i.test(children[index].nodeName)) {
-						scriptTag = domUtils.createElement('script', { src: children[index].src, async: 'true' }, null);
+						scriptTag = dom.utils.createElement('script', { src: children[index].src, async: 'true' }, null);
 						index++;
 						continue;
 					}
@@ -596,7 +596,7 @@ class Embed extends EditorInjector {
 					this.history.pause();
 
 					scriptTag.onload = () => {
-						domUtils.removeItem(scriptTag);
+						dom.utils.removeItem(scriptTag);
 						scriptTag = null;
 					};
 					cover.appendChild(scriptTag);
@@ -645,7 +645,7 @@ class Embed extends EditorInjector {
 
 		this._setIframeAttrs(oFrame);
 
-		let existElement = this.format.isBlock(oFrame.parentNode) || domUtils.isWysiwygFrame(oFrame.parentNode) ? oFrame : this.format.getLine(oFrame) || oFrame;
+		let existElement = this.format.isBlock(oFrame.parentNode) || dom.check.isWysiwygFrame(oFrame.parentNode) ? oFrame : this.format.getLine(oFrame) || oFrame;
 
 		const prevFrame = oFrame;
 		oFrame = oFrame.cloneNode(true);
@@ -662,18 +662,18 @@ class Embed extends EditorInjector {
 		if (format) this._align = format.style.textAlign || format.style.float;
 		this.figure.setAlign(oFrame, this._align);
 
-		if (domUtils.getParentElement(prevFrame, domUtils.isExcludeFormat)) {
+		if (dom.query.getParentElement(prevFrame, dom.check.isExcludeFormat)) {
 			prevFrame.parentNode.replaceChild(container, prevFrame);
-		} else if (domUtils.isListCell(existElement)) {
-			const refer = domUtils.getParentElement(prevFrame, (current) => current.parentNode === existElement);
+		} else if (dom.check.isListCell(existElement)) {
+			const refer = dom.query.getParentElement(prevFrame, (current) => current.parentNode === existElement);
 			existElement.insertBefore(container, refer);
-			domUtils.removeItem(prevFrame);
+			dom.utils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(refer, null, true);
-		} else if (this.format.isLineOnly(existElement)) {
-			const refer = domUtils.getParentElement(prevFrame, (current) => current.parentNode === existElement);
+		} else if (this.format.isLine(existElement)) {
+			const refer = dom.query.getParentElement(prevFrame, (current) => current.parentNode === existElement);
 			existElement = this.nodeTransform.split(existElement, refer);
 			existElement.parentNode.insertBefore(container, existElement);
-			domUtils.removeItem(prevFrame);
+			dom.utils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(existElement, null, true);
 		} else {
 			existElement.parentNode.replaceChild(container, existElement);
@@ -740,7 +740,7 @@ class Embed extends EditorInjector {
 	 * @param {InputEvent} e - Event object
 	 */
 	#OnLinkPreview(e) {
-		const eventTarget = domUtils.getEventTarget(e);
+		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.value.trim();
 		if (/^<iframe.*\/iframe>$/.test(value)) {
 			this._linkValue = value;
@@ -770,12 +770,12 @@ class Embed extends EditorInjector {
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	#OnInputSize(xy, e) {
-		if (e.keyCode === 32) {
+		if (keyCodeMap.isSpace(e.code)) {
 			e.preventDefault();
 			return;
 		}
 
-		const eventTarget = domUtils.getEventTarget(e);
+		const eventTarget = dom.query.getEventTarget(e);
 		if (xy === 'x' && this._onlyPercentage && Number(eventTarget.value) > 100) {
 			eventTarget.value = '100';
 		} else if (this.proportion.checked) {
@@ -845,7 +845,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		</div>
 	</form>`;
 
-	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
 export default Embed;

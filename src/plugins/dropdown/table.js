@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils, numbers, converter, env } from '../../helper';
+import { dom, numbers, converter, env, keyCodeMap } from '../../helper';
 import { Controller, SelectMenu, ColorPicker, Figure, _DragHandle } from '../../modules';
 
 const { _w, ON_OVER_COMPONENT } = env;
@@ -72,11 +72,11 @@ class Table extends EditorInjector {
 	static options = { isInputComponent: true };
 	/**
 	 * @this {Table}
-	 * @param {Node} node - The node to check.
-	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
-		return domUtils.isTable(node) ? node : null;
+		return dom.check.isTable(node) ? node : null;
 	}
 
 	/**
@@ -108,10 +108,10 @@ class Table extends EditorInjector {
 		const controller_props = CreateHTML_controller_properties(editor);
 
 		editor.applyFrameRoots((e) => {
-			e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_CELL_CLASS.replace(/^\./, '') }));
-			e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }));
-			e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_ROW_CLASS.replace(/^\./, '') }));
-			e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }));
+			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: RESIZE_CELL_CLASS.replace(/^\./, '') }));
+			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }));
+			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: RESIZE_ROW_CLASS.replace(/^\./, '') }));
+			e.get('wrapper').appendChild(dom.utils.createElement('DIV', { class: RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }));
 		});
 
 		// members - Controller
@@ -122,7 +122,7 @@ class Table extends EditorInjector {
 		this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
 		this.controller_props_title = controller_props.querySelector('.se-controller-title');
 		// color picker
-		const colorForm = domUtils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
+		const colorForm = dom.utils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
 		this.colorPicker = new ColorPicker(this, '', {
 			colorList: pluginOptions.colorList || DEFAULT_COLOR_LIST,
 			splitNum: 5,
@@ -138,7 +138,7 @@ class Table extends EditorInjector {
 			isWWTarget: false,
 			initMethod: () => {
 				this.colorPicker.hueSlider.close();
-				domUtils.removeClass(this.controller_colorPicker.currentTarget, 'on');
+				dom.utils.removeClass(this.controller_colorPicker.currentTarget, 'on');
 			}
 		});
 
@@ -278,7 +278,7 @@ class Table extends EditorInjector {
 	 * - Called when an item in the "dropdown" menu is clicked.
 	 */
 	action() {
-		const oTable = domUtils.createElement('TABLE');
+		const oTable = dom.utils.createElement('TABLE');
 		const x = this._tableXY[0];
 		const y = this._tableXY[1];
 
@@ -292,7 +292,7 @@ class Table extends EditorInjector {
 			scrollTypeClass = ` se-scroll-figure-${this.figureScroll}`;
 		}
 
-		const figure = domUtils.createElement('FIGURE', { class: 'se-flex-component se-input-component' + scrollTypeClass });
+		const figure = dom.utils.createElement('FIGURE', { class: 'se-flex-component se-input-component' + scrollTypeClass });
 		figure.appendChild(oTable);
 
 		if (this.component.insert(figure, { skipCharCount: false, skipSelection: false, skipHistory: false })) {
@@ -313,7 +313,7 @@ class Table extends EditorInjector {
 
 		const targetWidth = this._figure?.style.width || '100%';
 		this._maxWidth = targetWidth === '100%';
-		this._fixedColumn = domUtils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
+		this._fixedColumn = dom.utils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
 		this._setTableStyle(this._maxWidth ? 'width|column' : 'width', true);
 
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
@@ -323,7 +323,7 @@ class Table extends EditorInjector {
 
 		// controller open
 		const btnDisabled = this._selectedCells.length > 1;
-		const figureEl = domUtils.getParentElement(target, domUtils.isFigure);
+		const figureEl = dom.query.getParentElement(target, dom.check.isFigure);
 		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
 
 		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
@@ -336,7 +336,7 @@ class Table extends EditorInjector {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * @returns {{query: string, method: (element: HTMLTableElement) => void}} The format retention object containing the query and method to process the element.
 	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
 	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -346,32 +346,32 @@ class Table extends EditorInjector {
 			query: 'table',
 			method: (element) => {
 				const ColgroupEl = element.querySelector('colgroup');
-				let FigureEl = domUtils.isFigure(element.parentNode) ? element.parentNode : null;
+				let FigureEl = dom.check.isFigure(element.parentNode) ? element.parentNode : null;
 				if (ColgroupEl && FigureEl) return;
 
 				// create colgroup
 				if (!ColgroupEl) {
 					const maxCount = GetMaxColumns(element);
-					const colGroup = domUtils.createElement('colgroup', null, `<col style="width: ${numbers.get(100 / maxCount, CELL_DECIMAL_END)}%;">`.repeat(maxCount));
+					const colGroup = dom.utils.createElement('colgroup', null, `<col style="width: ${numbers.get(100 / maxCount, CELL_DECIMAL_END)}%;">`.repeat(maxCount));
 					element.insertBefore(colGroup, element.firstElementChild);
 				}
 
 				// figure
 				if (!FigureEl) {
-					FigureEl = domUtils.createElement('FIGURE', { class: 'se-flex-component se-input-component' });
+					FigureEl = dom.utils.createElement('FIGURE', { class: 'se-flex-component se-input-component' });
 					element.parentNode.insertBefore(FigureEl, element);
 					FigureEl.appendChild(element);
 				} else {
-					domUtils.addClass(FigureEl, 'se-flex-component|se-input-component');
+					dom.utils.addClass(FigureEl, 'se-flex-component|se-input-component');
 				}
 
 				// scroll
 				if (!this.figureScroll) {
-					domUtils.removeClass(FigureEl, this.figureScrollList.join('|'));
+					dom.utils.removeClass(FigureEl, this.figureScrollList.join('|'));
 				} else {
 					const scrollTypeClass = `se-scroll-figure-${this.figureScroll}`;
-					domUtils.addClass(FigureEl, scrollTypeClass);
-					domUtils.removeClass(FigureEl, this.figureScrollList.filter((v) => v !== scrollTypeClass).join('|'));
+					dom.utils.addClass(FigureEl, scrollTypeClass);
+					dom.utils.removeClass(FigureEl, this.figureScrollList.filter((v) => v !== scrollTypeClass).join('|'));
 				}
 			}
 		};
@@ -396,8 +396,8 @@ class Table extends EditorInjector {
 	onMouseMove({ event }) {
 		if (this._resizing) return;
 
-		const eventTarget = domUtils.getEventTarget(event);
-		const target = domUtils.getParentElement(eventTarget, IsResizeEls);
+		const eventTarget = dom.query.getEventTarget(event);
+		const target = dom.query.getParentElement(eventTarget, IsResizeEls);
 		if (!target || this._fixedCell) {
 			this.__hideResizeLine();
 			return;
@@ -409,7 +409,7 @@ class Table extends EditorInjector {
 			this.__removeGlobalEvents();
 			if (this._resizeLine?.style.display === 'block') this._resizeLine.style.display = 'none';
 			this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
-			this._setResizeLinePosition(domUtils.getParentElement(target, domUtils.isTable), target, this._resizeLine, cellEdge.isLeft);
+			this._setResizeLinePosition(dom.query.getParentElement(target, dom.check.isTable), target, this._resizeLine, cellEdge.isLeft);
 			this._resizeLine.style.display = 'block';
 			return;
 		}
@@ -417,11 +417,11 @@ class Table extends EditorInjector {
 		const rowEdge = CheckRowEdge(event, target);
 		if (rowEdge.is) {
 			this.__removeGlobalEvents();
-			this._element = domUtils.getParentElement(target, domUtils.isTable);
+			this._element = dom.query.getParentElement(target, dom.check.isTable);
 			this._element.style.cursor = 'ns-resize';
 			if (this._resizeLine?.style.display === 'block') this._resizeLine.style.display = 'none';
 			this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
-			this._setResizeRowPosition(domUtils.getParentElement(target, domUtils.isTable), target, this._resizeLine);
+			this._setResizeRowPosition(dom.query.getParentElement(target, dom.check.isTable), target, this._resizeLine);
 			this._resizeLine.style.display = 'block';
 			return;
 		}
@@ -448,8 +448,8 @@ class Table extends EditorInjector {
 	 */
 	onMouseDown({ event }) {
 		this._ref = null;
-		const eventTarget = domUtils.getEventTarget(event);
-		const target = domUtils.getParentElement(eventTarget, IsResizeEls);
+		const eventTarget = dom.query.getEventTarget(event);
+		const target = dom.query.getParentElement(eventTarget, IsResizeEls);
 		if (!target) return;
 
 		const cellEdge = CheckCellEdge(event, target);
@@ -483,10 +483,10 @@ class Table extends EditorInjector {
 		const rowEdge = CheckRowEdge(event, target);
 		if (rowEdge.is) {
 			try {
-				let row = domUtils.getParentElement(target, domUtils.isTableRow);
+				let row = dom.query.getParentElement(target, dom.check.isTableRow);
 				let rowSpan = target.rowSpan;
 				if (rowSpan > 1) {
-					while (domUtils.isTableRow(row) && rowSpan > 1) {
+					while (dom.check.isTableRow(row) && rowSpan > 1) {
 						row = row.nextElementSibling;
 						--rowSpan;
 					}
@@ -542,21 +542,21 @@ class Table extends EditorInjector {
 		this._ref = null;
 		if (this.editor.selectMenuOn || this._resizing || this.__s) return;
 
-		const keyCode = event.keyCode;
+		const keyCode = event.code;
 		this.__s = event.shiftKey;
 		// table tabkey
-		if (keyCode === 9) {
-			const tableCell = domUtils.getParentElement(line, domUtils.isTableCell);
-			if (tableCell && range.collapsed && domUtils.isEdgePoint(range.startContainer, range.startOffset)) {
+		if (keyCodeMap.isTab(keyCode)) {
+			const tableCell = dom.query.getParentElement(line, dom.check.isTableCell);
+			if (tableCell && range.collapsed && dom.check.isEdgePoint(range.startContainer, range.startOffset)) {
 				this._closeController();
 
 				const shift = event.shiftKey;
-				const table = domUtils.getParentElement(tableCell, 'table');
-				const cells = domUtils.getListChildren(table, domUtils.isTableCell);
-				const idx = shift ? domUtils.prevIndex(cells, tableCell) : domUtils.nextIndex(cells, tableCell);
+				const table = dom.query.getParentElement(tableCell, 'table');
+				const cells = dom.query.getListChildren(table, dom.check.isTableCell);
+				const idx = shift ? dom.utils.prevIndex(cells, tableCell) : dom.utils.nextIndex(cells, tableCell);
 
 				if (idx === cells.length && !shift) {
-					if (!domUtils.getParentElement(tableCell, 'thead')) {
+					if (!dom.query.getParentElement(tableCell, 'thead')) {
 						const rows = table.rows;
 						const newRow = this.insertBodyRow(table, rows.length, rows[rows.length - 1].cells.length);
 						const firstTd = newRow.querySelector('td div');
@@ -585,9 +585,9 @@ class Table extends EditorInjector {
 		}
 
 		let cell = null;
-		if (!event.shiftKey || keyCode !== 16) {
-			cell = domUtils.getParentElement(line, domUtils.isTableCell);
-			if (!domUtils.hasClass(cell, 'se-selected-cell-focus')) return;
+		if (!keyCodeMap.isShift(event)) {
+			cell = dom.query.getParentElement(line, dom.check.isTableCell);
+			if (!dom.utils.hasClass(cell, 'se-selected-cell-focus')) return;
 
 			this._deleteStyleSelectedCells();
 			this._toggleEditor(true);
@@ -599,7 +599,7 @@ class Table extends EditorInjector {
 
 		if (this._shift || this._ref) return;
 
-		cell = cell || domUtils.getParentElement(line, domUtils.isTableCell);
+		cell = cell || dom.query.getParentElement(line, dom.check.isTableCell);
 		if (cell) {
 			this.__s = false;
 			this._fixedCell = cell;
@@ -616,7 +616,7 @@ class Table extends EditorInjector {
 	 */
 	onKeyUp({ line }) {
 		this.__s = false;
-		if (this._shift && domUtils.getParentElement(line, domUtils.isTableCell) === this._fixedCell) {
+		if (this._shift && dom.query.getParentElement(line, dom.check.isTableCell) === this._fixedCell) {
 			this._deleteStyleSelectedCells();
 			this._toggleEditor(true);
 			this.__removeGlobalEvents();
@@ -638,7 +638,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLElement} target Target button element
+	 * @param {HTMLButtonElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -698,7 +698,7 @@ class Table extends EditorInjector {
 				this._onColorPalette(target, value, value === 'border' ? border_color : value === 'back' ? back_color : font_color);
 				break;
 			case 'props_font_style':
-				domUtils.toggleClass(this.propTargets[`font_${value}`], 'on');
+				dom.utils.toggleClass(this.propTargets[`font_${value}`], 'on');
 				break;
 			case 'props_submit':
 				this._submitProps(target);
@@ -711,7 +711,7 @@ class Table extends EditorInjector {
 				// alignment
 				this._setAlignProps(this.propTargets.cell_alignment, this._propsAlignCache, true);
 				this._setAlignProps(this.propTargets.cell_alignment_vertical, this._propsVerticalAlignCache, true);
-				if (domUtils.isTable(propsCache[0][0]) && this._figure) {
+				if (dom.check.isTable(propsCache[0][0]) && this._figure) {
 					this._figure.style.float = this._propsAlignCache;
 				}
 				break;
@@ -742,7 +742,7 @@ class Table extends EditorInjector {
 				break;
 			case 'remove': {
 				const emptyDiv = this._figure?.parentNode;
-				domUtils.removeItem(this._figure);
+				dom.utils.removeItem(this._figure);
 				this._closeController();
 
 				if (emptyDiv !== this.editor.frameContext.get('wysiwyg'))
@@ -804,7 +804,7 @@ class Table extends EditorInjector {
 		this._fixedCellName = null;
 
 		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
-		domUtils.removeClass([border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike], 'on');
+		dom.utils.removeClass([border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike], 'on');
 	}
 
 	/**
@@ -820,10 +820,10 @@ class Table extends EditorInjector {
 		this._shift = shift;
 		this._fixedCell = tdElement;
 		this._fixedCellName = tdElement.nodeName;
-		this._selectedTable = domUtils.getParentElement(tdElement, 'TABLE');
+		this._selectedTable = dom.query.getParentElement(tdElement, 'TABLE');
 
 		this._deleteStyleSelectedCells();
-		domUtils.addClass(tdElement, 'se-selected-cell-focus');
+		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
 
 		if (!shift) {
 			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousemove', this._bindMultiOn, false);
@@ -842,8 +842,8 @@ class Table extends EditorInjector {
 	 * @returns {Node} The `<table>` element that is the parent of the provided `element`.
 	 */
 	setTableInfo(element) {
-		const table = (this._element = this._selectedTable || domUtils.getParentElement(element, 'TABLE'));
-		this._figure = domUtils.getParentElement(table, domUtils.isFigure) || table;
+		const table = (this._element = this._selectedTable || dom.query.getParentElement(element, 'TABLE'));
+		this._figure = dom.query.getParentElement(table, dom.check.isFigure) || table;
 		return table;
 	}
 
@@ -858,12 +858,12 @@ class Table extends EditorInjector {
 		this._trElement = tdElement.parentNode;
 
 		// hedaer
-		if (table.querySelector('thead')) domUtils.addClass(this.headerButton, 'active');
-		else domUtils.removeClass(this.headerButton, 'active');
+		if (table.querySelector('thead')) dom.utils.addClass(this.headerButton, 'active');
+		else dom.utils.removeClass(this.headerButton, 'active');
 
 		// caption
-		if (table.querySelector('caption')) domUtils.addClass(this.captionButton, 'active');
-		else domUtils.removeClass(this.captionButton, 'active');
+		if (table.querySelector('caption')) dom.utils.addClass(this.captionButton, 'active');
+		else dom.utils.removeClass(this.captionButton, 'active');
 
 		if (reset || this._physical_cellCnt === 0) {
 			if (this._tdElement !== tdElement) {
@@ -986,7 +986,7 @@ class Table extends EditorInjector {
 					return;
 				} else if (!tableAttr.nextElementSibling || !/^TBODY$/i.test(tableAttr.nextElementSibling.nodeName)) {
 					if (!option) {
-						domUtils.removeItem(this._figure);
+						dom.utils.removeItem(this._figure);
 						this._closeController();
 					} else {
 						table.innerHTML += '<tbody><tr>' + CreateCellsString('td', this._logical_cellCnt) + '</tr></tbody>';
@@ -1071,12 +1071,12 @@ class Table extends EditorInjector {
 			const children = table.children;
 			for (let i = 0; i < children.length; i++) {
 				if (children[i].children.length === 0) {
-					domUtils.removeItem(children[i]);
+					dom.utils.removeItem(children[i]);
 					i--;
 				}
 			}
 
-			if (table.children.length === 0) domUtils.removeItem(table);
+			if (table.children.length === 0) dom.utils.removeItem(table);
 		}
 	}
 
@@ -1312,7 +1312,7 @@ class Table extends EditorInjector {
 		if (colgroup) {
 			const cols = colgroup.querySelectorAll('col');
 			if (remove) {
-				domUtils.removeItem(cols[insertIndex]);
+				dom.utils.removeItem(cols[insertIndex]);
 			} else {
 				let totalW = 0;
 				for (let i = 0, len = cols.length, w; i < len; i++) {
@@ -1321,7 +1321,7 @@ class Table extends EditorInjector {
 					totalW += w;
 					cols[i].style.width = `${w}%`;
 				}
-				const newCol = domUtils.createElement('col', { style: `width:${100 - totalW}%` });
+				const newCol = dom.utils.createElement('col', { style: `width:${100 - totalW}%` });
 				colgroup.insertBefore(newCol, cols[insertIndex]);
 			}
 		}
@@ -1330,11 +1330,11 @@ class Table extends EditorInjector {
 			let removeFirst, removeEnd;
 			for (let r = 0, rLen = removeCell.length, row; r < rLen; r++) {
 				row = removeCell[r].parentNode;
-				domUtils.removeItem(removeCell[r]);
+				dom.utils.removeItem(removeCell[r]);
 				if (row.cells.length === 0) {
-					if (!removeFirst) removeFirst = domUtils.getArrayIndex(rows, row);
-					removeEnd = domUtils.getArrayIndex(rows, row);
-					domUtils.removeItem(row);
+					if (!removeFirst) removeFirst = dom.utils.getArrayIndex(rows, row);
+					removeEnd = dom.utils.getArrayIndex(rows, row);
+					dom.utils.removeItem(row);
 				}
 			}
 
@@ -1384,13 +1384,13 @@ class Table extends EditorInjector {
 
 			ch = cell.children;
 			for (let c = 0, cLen = ch.length; c < cLen; c++) {
-				if (this.format.isLine(ch[c]) && domUtils.isZeroWidth(ch[c].textContent)) {
-					domUtils.removeItem(ch[c]);
+				if (this.format.isLine(ch[c]) && dom.check.isZeroWidth(ch[c].textContent)) {
+					dom.utils.removeItem(ch[c]);
 				}
 			}
 
 			mergeHTML += cell.innerHTML;
-			domUtils.removeItem(cell);
+			dom.utils.removeItem(cell);
 
 			if (row.cells.length === 0) {
 				if (!emptyRowFirst) emptyRowFirst = row;
@@ -1401,8 +1401,8 @@ class Table extends EditorInjector {
 
 		if (emptyRowFirst) {
 			const rows = this._trElements;
-			const rowIndexFirst = domUtils.getArrayIndex(rows, emptyRowFirst);
-			const rowIndexLast = domUtils.getArrayIndex(rows, emptyRowLast || emptyRowFirst);
+			const rowIndexFirst = dom.utils.getArrayIndex(rows, emptyRowFirst);
+			const rowIndexLast = dom.utils.getArrayIndex(rows, emptyRowLast || emptyRowFirst);
 			const removeRows = [];
 
 			for (let i = 0, cells; i <= rowIndexLast; i++) {
@@ -1422,7 +1422,7 @@ class Table extends EditorInjector {
 			}
 
 			for (let i = 0, len = removeRows.length; i < len; i++) {
-				domUtils.removeItem(removeRows[i]);
+				dom.utils.removeItem(removeRows[i]);
 			}
 		}
 
@@ -1442,18 +1442,18 @@ class Table extends EditorInjector {
 	 */
 	toggleHeader() {
 		const btn = this.headerButton;
-		const active = domUtils.hasClass(btn, 'active');
+		const active = dom.utils.hasClass(btn, 'active');
 		const table = this._element;
 
 		if (!active) {
-			const header = domUtils.createElement('THEAD');
+			const header = dom.utils.createElement('THEAD');
 			header.innerHTML = '<tr>' + CreateCellsString('th', this._logical_cellCnt) + '</tr>';
 			table.insertBefore(header, table.firstElementChild);
 		} else {
-			domUtils.removeItem(table.querySelector('thead'));
+			dom.utils.removeItem(table.querySelector('thead'));
 		}
 
-		domUtils.toggleClass(btn, 'active');
+		dom.utils.toggleClass(btn, 'active');
 
 		if (/TH/i.test(this._tdElement.nodeName)) {
 			this._closeController();
@@ -1467,18 +1467,18 @@ class Table extends EditorInjector {
 	 */
 	toggleCaption() {
 		const btn = this.captionButton;
-		const active = domUtils.hasClass(btn, 'active');
+		const active = dom.utils.hasClass(btn, 'active');
 		const table = this._element;
 
 		if (!active) {
-			const caption = domUtils.createElement('CAPTION', { class: `se-table-caption-${this.captionPosition}` });
+			const caption = dom.utils.createElement('CAPTION', { class: `se-table-caption-${this.captionPosition}` });
 			caption.innerHTML = '<div><br></div>';
 			table.insertBefore(caption, table.firstElementChild);
 		} else {
-			domUtils.removeItem(table.querySelector('caption'));
+			dom.utils.removeItem(table.querySelector('caption'));
 		}
 
-		domUtils.toggleClass(btn, 'active');
+		dom.utils.toggleClass(btn, 'active');
 		this._setCellControllerPosition(this._tdElement, false);
 	}
 
@@ -1504,19 +1504,19 @@ class Table extends EditorInjector {
 				if (!ondisplay) targets.style.width = '100%';
 			}
 
-			domUtils.changeElement(this.resizeButton.firstElementChild, sizeIcon);
-			domUtils.changeTxt(this.resizeText, text);
+			dom.utils.changeElement(this.resizeButton.firstElementChild, sizeIcon);
+			dom.utils.changeTxt(this.resizeText, text);
 		}
 
 		if (styles.includes('column')) {
 			if (!this._fixedColumn) {
-				domUtils.removeClass(this._element, 'se-table-layout-fixed');
-				domUtils.addClass(this._element, 'se-table-layout-auto');
-				domUtils.removeClass(this.columnFixedButton, 'active');
+				dom.utils.removeClass(this._element, 'se-table-layout-fixed');
+				dom.utils.addClass(this._element, 'se-table-layout-auto');
+				dom.utils.removeClass(this.columnFixedButton, 'active');
 			} else {
-				domUtils.removeClass(this._element, 'se-table-layout-auto');
-				domUtils.addClass(this._element, 'se-table-layout-fixed');
-				domUtils.addClass(this.columnFixedButton, 'active');
+				dom.utils.removeClass(this._element, 'se-table-layout-auto');
+				dom.utils.addClass(this._element, 'se-table-layout-fixed');
+				dom.utils.addClass(this.columnFixedButton, 'active');
 			}
 		}
 	}
@@ -1549,8 +1549,8 @@ class Table extends EditorInjector {
 		}
 
 		this._tdElement = tdElement;
-		domUtils.addClass(tdElement, 'se-selected-cell-focus');
-		const tableElement = this._element || this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE');
+		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
+		const tableElement = this._element || this._selectedTable || dom.query.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, true);
 	}
 
@@ -1562,7 +1562,7 @@ class Table extends EditorInjector {
 	 */
 	_setCellControllerPosition(tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
-		this.controller_cell.resetPosition(this.cellControllerTop ? domUtils.getParentElement(tdElement, domUtils.isTable) : tdElement);
+		this.controller_cell.resetPosition(this.cellControllerTop ? dom.query.getParentElement(tdElement, dom.check.isTable) : tdElement);
 	}
 
 	/**
@@ -1598,7 +1598,7 @@ class Table extends EditorInjector {
 		const prevValue = col.style.width;
 		const nextCol = col.nextElementSibling;
 		const nextColPrevValue = nextCol.style.width;
-		const realWidth = domUtils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(col);
+		const realWidth = dom.utils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(col);
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 		this._addResizeGlobalEvents(
@@ -1783,7 +1783,7 @@ class Table extends EditorInjector {
 	 * @param {KeyboardEvent} e The keyboard event.
 	 */
 	_stopResize(target, prevValue, styleProp, e) {
-		if (e.keyCode !== 27) return;
+		if (!keyCodeMap.isEsc(e.code)) return;
 		this.__removeGlobalEvents();
 		target.style[styleProp] = prevValue;
 		// figure reopen
@@ -1797,11 +1797,11 @@ class Table extends EditorInjector {
 	 * @description Deletes styles from selected table cells.
 	 */
 	_deleteStyleSelectedCells() {
-		domUtils.removeClass([this._fixedCell, this._selectedCell], 'se-selected-cell-focus');
+		dom.utils.removeClass([this._fixedCell, this._selectedCell], 'se-selected-cell-focus');
 		if (this._selectedTable) {
 			const selectedCells = this._selectedTable.querySelectorAll('.se-selected-table-cell');
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
-				domUtils.removeClass(selectedCells[i], 'se-selected-table-cell');
+				dom.utils.removeClass(selectedCells[i], 'se-selected-table-cell');
 			}
 		}
 	}
@@ -1814,7 +1814,7 @@ class Table extends EditorInjector {
 		if (this._selectedCells) {
 			const selectedCells = this._selectedCells;
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
-				domUtils.addClass(selectedCells[i], 'se-selected-table-cell');
+				dom.utils.addClass(selectedCells[i], 'se-selected-table-cell');
 			}
 		}
 	}
@@ -1840,8 +1840,8 @@ class Table extends EditorInjector {
 	 */
 	_toggleEditor(enabled) {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');
-		if (enabled) domUtils.removeClass(wysiwyg, 'se-disabled');
-		else domUtils.addClass(wysiwyg, 'se-disabled');
+		if (enabled) dom.utils.removeClass(wysiwyg, 'se-disabled');
+		else dom.utils.addClass(wysiwyg, 'se-disabled');
 	}
 
 	/**
@@ -1904,7 +1904,7 @@ class Table extends EditorInjector {
 		// border - format
 		border_format.firstElementChild.innerHTML = this.icons[BORDER_FORMATS[targets.length === 1 ? 'outside' : 'all']];
 		border_format.setAttribute('se-border-format', 'all');
-		domUtils.removeClass(border_format, 'active');
+		dom.utils.removeClass(border_format, 'active');
 
 		// border - styles
 		b_style = b_style || BORDER_LIST[0];
@@ -1918,10 +1918,10 @@ class Table extends EditorInjector {
 		font_color.value = font_color.style.borderColor = fontColor;
 
 		// font style
-		if (bold) domUtils.addClass(font_bold, 'on');
-		if (underline) domUtils.addClass(font_underline, 'on');
-		if (strike) domUtils.addClass(font_strike, 'on');
-		if (italic) domUtils.addClass(font_italic, 'on');
+		if (bold) dom.utils.addClass(font_bold, 'on');
+		if (underline) dom.utils.addClass(font_underline, 'on');
+		if (strike) dom.utils.addClass(font_strike, 'on');
+		if (italic) dom.utils.addClass(font_italic, 'on');
 
 		// align
 		this._setAlignProps(cell_alignment, (this._propsAlignCache = align), true);
@@ -1936,14 +1936,14 @@ class Table extends EditorInjector {
 	 * @param {boolean} reset Whether to reset the alignment.
 	 */
 	_setAlignProps(el, align, reset) {
-		domUtils.removeClass(el.querySelectorAll('button'), 'on');
+		dom.utils.removeClass(el.querySelectorAll('button'), 'on');
 
 		if (!reset && el.getAttribute('se-cell-align') === align) {
 			el.setAttribute('se-cell-align', '');
 			return;
 		}
 
-		domUtils.addClass(el.querySelector(`[data-value="${align}"]`), 'on');
+		dom.utils.addClass(el.querySelector(`[data-value="${align}"]`), 'on');
 		el.setAttribute('se-cell-align', align);
 	}
 
@@ -2161,7 +2161,7 @@ class Table extends EditorInjector {
 			if (this._tdElement) {
 				this._recallStyleSelectedCells();
 				this.setCellInfo(this._tdElement, true);
-				domUtils.addClass(this._tdElement, 'se-selected-cell-focus');
+				dom.utils.addClass(this._tdElement, 'se-selected-cell-focus');
 			}
 		} catch (err) {
 			console.warn('[SUNEDITOR.plugins.table.setProps.error]', err);
@@ -2177,9 +2177,9 @@ class Table extends EditorInjector {
 	 */
 	_setFontStyle(styles) {
 		const { font_bold, font_italic, font_strike, font_underline } = this.propTargets;
-		styles.fontWeight = domUtils.hasClass(font_bold, 'on') ? 'bold' : '';
-		styles.fontStyle = domUtils.hasClass(font_italic, 'on') ? 'italic' : '';
-		styles.textDecoration = ((domUtils.hasClass(font_strike, 'on') ? 'line-through ' : '') + (domUtils.hasClass(font_underline, 'on') ? 'underline' : '')).trim();
+		styles.fontWeight = dom.utils.hasClass(font_bold, 'on') ? 'bold' : '';
+		styles.fontStyle = dom.utils.hasClass(font_italic, 'on') ? 'italic' : '';
+		styles.textDecoration = ((dom.utils.hasClass(font_strike, 'on') ? 'line-through ' : '') + (dom.utils.hasClass(font_underline, 'on') ? 'underline' : '')).trim();
 	}
 
 	/**
@@ -2194,12 +2194,12 @@ class Table extends EditorInjector {
 		switch (borderKey) {
 			case 'inside':
 				if (all.length === 1) return;
-				domUtils.setStyle(
+				dom.utils.setStyle(
 					all.filter((c) => !bottom.includes(c)),
 					BORDER_NS.b,
 					s
 				);
-				domUtils.setStyle(
+				dom.utils.setStyle(
 					all.filter((c) => !right.includes(c)),
 					BORDER_NS.r,
 					s
@@ -2207,7 +2207,7 @@ class Table extends EditorInjector {
 				break;
 			case 'horizon':
 				if (all.length === 1) return;
-				domUtils.setStyle(
+				dom.utils.setStyle(
 					all.filter((c) => !bottom.includes(c)),
 					BORDER_NS.b,
 					s
@@ -2215,29 +2215,29 @@ class Table extends EditorInjector {
 				break;
 			case 'vertical':
 				if (all.length === 1) return;
-				domUtils.setStyle(
+				dom.utils.setStyle(
 					all.filter((c) => !right.includes(c)),
 					BORDER_NS.r,
 					s
 				);
 				break;
 			case 'outside':
-				domUtils.setStyle(left, BORDER_NS.l, s);
-				domUtils.setStyle(top, BORDER_NS.t, s);
-				domUtils.setStyle(right, BORDER_NS.r, s);
-				domUtils.setStyle(bottom, BORDER_NS.b, s);
+				dom.utils.setStyle(left, BORDER_NS.l, s);
+				dom.utils.setStyle(top, BORDER_NS.t, s);
+				dom.utils.setStyle(right, BORDER_NS.r, s);
+				dom.utils.setStyle(bottom, BORDER_NS.b, s);
 				break;
 			case 'left':
-				domUtils.setStyle(left, BORDER_NS.l, s);
+				dom.utils.setStyle(left, BORDER_NS.l, s);
 				break;
 			case 'top':
-				domUtils.setStyle(top, BORDER_NS.t, s);
+				dom.utils.setStyle(top, BORDER_NS.t, s);
 				break;
 			case 'right':
-				domUtils.setStyle(right, BORDER_NS.r, s);
+				dom.utils.setStyle(right, BORDER_NS.r, s);
 				break;
 			case 'bottom':
-				domUtils.setStyle(bottom, BORDER_NS.b, s);
+				dom.utils.setStyle(bottom, BORDER_NS.b, s);
 				break;
 		}
 	}
@@ -2255,7 +2255,7 @@ class Table extends EditorInjector {
 		if (startCell === endCell) {
 			if (!this._shift) return;
 		} else {
-			domUtils.addClass(startCell, 'se-selected-table-cell');
+			dom.utils.addClass(startCell, 'se-selected-table-cell');
 		}
 
 		let findSelectedCell = true;
@@ -2331,7 +2331,7 @@ class Table extends EditorInjector {
 						break;
 					}
 
-					domUtils.addClass(cell, 'se-selected-table-cell');
+					dom.utils.addClass(cell, 'se-selected-table-cell');
 				}
 
 				if (rs > 0) {
@@ -2368,7 +2368,7 @@ class Table extends EditorInjector {
 		unHighlight.width = '10em';
 		unHighlight.height = '10em';
 
-		domUtils.changeTxt(this.tableDisplay, '1 x 1');
+		dom.utils.changeTxt(this.tableDisplay, '1 x 1');
 		this.menu.dropdownOff();
 	}
 
@@ -2398,7 +2398,7 @@ class Table extends EditorInjector {
 			this.controller_colorPicker.close();
 		} else {
 			this.sliderType = type;
-			domUtils.addClass(button, 'on');
+			dom.utils.addClass(button, 'on');
 			this.colorPicker.init(color?.value || '', button);
 			this.controller_colorPicker.open(button, null, { isWWTarget: false, initMethod: null, addOffset: null });
 		}
@@ -2542,7 +2542,7 @@ class Table extends EditorInjector {
 				const newRowSpan = currentRowSpan - newCell.rowSpan;
 
 				const rowSpanArr = [];
-				const nextRowIndex = domUtils.getArrayIndex(rows, currentRow) + newRowSpan;
+				const nextRowIndex = dom.utils.getArrayIndex(rows, currentRow) + newRowSpan;
 
 				for (let i = 0, cells, colSpan; i < nextRowIndex; i++) {
 					cells = rows[i].cells;
@@ -2591,7 +2591,7 @@ class Table extends EditorInjector {
 			} else {
 				// rowspan - 1
 				newCell.rowSpan = currentCell.rowSpan;
-				const newRow = domUtils.createElement('TR');
+				const newRow = dom.utils.createElement('TR');
 				newRow.appendChild(newCell);
 
 				for (let i = 0, cells; i < rowIndex; i++) {
@@ -2690,7 +2690,7 @@ class Table extends EditorInjector {
 		this.tableUnHighlight.style.width = x_u + 'em';
 		this.tableUnHighlight.style.height = y_u + 'em';
 
-		domUtils.changeTxt(this.tableDisplay, x + ' x ' + y);
+		dom.utils.changeTxt(this.tableDisplay, x + ' x ' + y);
 		this._tableXY = [x, y];
 	}
 
@@ -2707,7 +2707,7 @@ class Table extends EditorInjector {
 	 */
 	#OnCellMultiSelect(e) {
 		this.editor._preventBlur = true;
-		const target = domUtils.getParentElement(domUtils.getEventTarget(e), domUtils.isTableCell);
+		const target = dom.query.getParentElement(dom.query.getEventTarget(e), dom.check.isTableCell);
 
 		if (this._shift) {
 			if (target === this._fixedCell) {
@@ -2724,7 +2724,7 @@ class Table extends EditorInjector {
 			else this._toggleEditor(false);
 		}
 
-		if (!target || target === this._selectedCell || this._fixedCellName !== target.nodeName || this._selectedTable !== domUtils.getParentElement(target, 'TABLE')) {
+		if (!target || target === this._selectedCell || this._fixedCellName !== target.nodeName || this._selectedTable !== dom.query.getParentElement(target, 'TABLE')) {
 			return;
 		}
 
@@ -2841,7 +2841,7 @@ function CreateCellsString(nodeName, cnt) {
  */
 function CreateCellsHTML(nodeName) {
 	nodeName = nodeName.toLowerCase();
-	return domUtils.createElement(nodeName, null, '<div><br></div>');
+	return dom.utils.createElement(nodeName, null, '<div><br></div>');
 }
 
 /**
@@ -2886,8 +2886,8 @@ function OnPropsBorderFormatEdit(defaultCommand, command) {
 
 	border_format.setAttribute('se-border-format', command);
 	border_format.firstElementChild.innerHTML = this.icons[BORDER_FORMATS[command]];
-	if (command !== defaultCommand) domUtils.addClass(border_format, 'active');
-	else domUtils.removeClass(border_format, 'active');
+	if (command !== defaultCommand) dom.utils.addClass(border_format, 'active');
+	else dom.utils.removeClass(border_format, 'active');
 
 	this.selectMenu_props_border_format.close();
 	this.selectMenu_props_border_format_oneCell.close();
@@ -2895,7 +2895,7 @@ function OnPropsBorderFormatEdit(defaultCommand, command) {
 
 // init element
 function CreateSplitMenu(lang) {
-	const menus = domUtils.createElement(
+	const menus = dom.utils.createElement(
 		'DIV',
 		null,
 		/*html*/ `
@@ -2911,7 +2911,7 @@ function CreateSplitMenu(lang) {
 }
 
 function CreateColumnMenu(lang, icons) {
-	const menus = domUtils.createElement(
+	const menus = dom.utils.createElement(
 		'DIV',
 		null,
 		/*html*/ `
@@ -2930,7 +2930,7 @@ function CreateColumnMenu(lang, icons) {
 }
 
 function CreateRowMenu(lang, icons) {
-	const menus = domUtils.createElement(
+	const menus = dom.utils.createElement(
 		'DIV',
 		null,
 		/*html*/ `
@@ -2959,7 +2959,7 @@ function CreateBorderMenu() {
 		</div>`;
 	}
 
-	const menus = domUtils.createElement('DIV', null, html);
+	const menus = dom.utils.createElement('DIV', null, html);
 	return { items: BORDER_LIST, menus: menus.querySelectorAll('div') };
 }
 
@@ -2980,7 +2980,7 @@ function CreateBorderFormatMenu(langs, icons, indideFormats) {
 			</button>`;
 	}
 
-	const menus = domUtils.createElement('DIV', null, html);
+	const menus = dom.utils.createElement('DIV', null, html);
 	return { items, menus: menus.querySelectorAll('button') };
 }
 
@@ -2993,7 +2993,7 @@ function CreateHTML() {
 	</div>
 	<div class="se-table-size-display">1 x 1</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-selector-table' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-selector-table' }, html);
 }
 
 function CreateHTML_controller_table({ lang, icons }) {
@@ -3038,7 +3038,7 @@ function CreateHTML_controller_table({ lang, icons }) {
 		</button>
 	</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-table' }, html);
 }
 
 function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
@@ -3077,7 +3077,7 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
         </button>
     </div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
 }
 
 function CreateHTML_controller_properties({ lang, icons, options }) {
@@ -3207,7 +3207,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 			</div>
 		</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-table-props' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-table-props' }, html);
 }
 
 export default Table;

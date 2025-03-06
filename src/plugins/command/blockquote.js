@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @class
@@ -21,23 +21,23 @@ class Blockquote extends EditorInjector {
 		this.icon = 'blockquote';
 
 		// members
-		this.quoteTag = domUtils.createElement('BLOCKQUOTE');
+		this.quoteTag = dom.utils.createElement('BLOCKQUOTE');
 	}
 
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
 	active(element, target) {
 		if (/blockquote/i.test(element?.nodeName)) {
-			domUtils.addClass(target, 'active');
+			dom.utils.addClass(target, 'active');
 			return true;
 		}
 
-		domUtils.removeClass(target, 'active');
+		dom.utils.removeClass(target, 'active');
 		return false;
 	}
 
@@ -47,7 +47,7 @@ class Blockquote extends EditorInjector {
 	 * - It is executed by clicking a toolbar "command" button or calling an API.
 	 */
 	action() {
-		const currentBlockquote = domUtils.getParentElement(this.selection.getNode(), 'blockquote');
+		const currentBlockquote = dom.query.getParentElement(this.selection.getNode(), 'blockquote');
 
 		if (currentBlockquote) {
 			this.format.removeBlock(currentBlockquote, { selectedFormats: null, newBlockElement: null, shouldDelete: false, skipHistory: false });

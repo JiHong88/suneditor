@@ -1,5 +1,5 @@
 import CoreInjector from '../editorInjector/_core';
-import { domUtils } from '../helper';
+import { dom, keyCodeMap } from '../helper';
 import ApiManager from './ApiManager';
 
 /**
@@ -49,8 +49,8 @@ function Browser(inst, params) {
 
 	// create HTML
 	this.useSearch = params.useSearch ?? true;
-	const browserFrame = domUtils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
-	const content = domUtils.createElement('DIV', { class: 'se-browser-inner' }, CreateHTML(inst.editor, this.useSearch));
+	const browserFrame = dom.utils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
+	const content = dom.utils.createElement('DIV', { class: 'se-browser-inner' }, CreateHTML(inst.editor, this.useSearch));
 
 	// members
 	this.kind = inst.constructor.key || inst.constructor.name;
@@ -104,14 +104,14 @@ function Browser(inst, params) {
 	this._closeSignal = false;
 	this._bindClose = null;
 	this.__globalEventHandler = (e) => {
-		if (!/27/.test(e.keyCode)) return;
+		if (!keyCodeMap.isEsc(e.code)) return;
 		this.close();
 	};
 	// api manager
 	this.apiManager = new ApiManager(this, { method: 'GET' });
 
 	// init
-	browserFrame.appendChild(domUtils.createElement('DIV', { class: 'se-browser-back' }));
+	browserFrame.appendChild(dom.utils.createElement('DIV', { class: 'se-browser-back' }));
 	browserFrame.appendChild(content);
 	this.carrierWrapper.appendChild(browserFrame);
 
@@ -140,7 +140,7 @@ Browser.prototype = {
 		this.__addGlobalEvent();
 
 		const listClassName = params.listClass || this.listClass;
-		if (!domUtils.hasClass(this.list, listClassName)) {
+		if (!dom.utils.hasClass(this.list, listClassName)) {
 			this.list.className = 'se-browser-list ' + listClassName;
 		}
 
@@ -325,7 +325,7 @@ Browser.prototype = {
 			this.__parseFolderData(data);
 
 			this.side.innerHTML = '';
-			const sideInner = (this.sideInner = domUtils.createElement('div', null));
+			const sideInner = (this.sideInner = dom.utils.createElement('div', null));
 			this.__createFolderList(this.tree, sideInner);
 			this.side.appendChild(sideInner);
 
@@ -333,7 +333,7 @@ Browser.prototype = {
 				const openFolder = sideInner.querySelector(`[data-command="${this.folderDefaultPath}"]`);
 				openFolder.click();
 				if (this.folderDefaultPath.includes('/')) {
-					domUtils.removeClass(openFolder.parentElement, 'se-menu-hidden');
+					dom.utils.removeClass(openFolder.parentElement, 'se-menu-hidden');
 					openFolder.parentElement.previousElementSibling.querySelector('button').innerHTML = this.openArrow;
 				}
 			}
@@ -407,24 +407,24 @@ Browser.prototype = {
 			if (!item) continue;
 
 			if (Object.keys(item.children).length > 0) {
-				const folderLabel = domUtils.createElement(
+				const folderLabel = dom.utils.createElement(
 					'div',
 					item.key ? { 'data-command': item.key, 'aria-label': item.name } : null,
 					`<span class="se-menu-icon">${item.key ? this.icon_folder : this.icon_folder_item}</span><span>${item.name}</span>`
 				);
-				const folderDiv = domUtils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
+				const folderDiv = dom.utils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
 
-				folderLabel.insertBefore(domUtils.createElement('button', null, this.closeArrow), folderLabel.firstElementChild);
+				folderLabel.insertBefore(dom.utils.createElement('button', null, this.closeArrow), folderLabel.firstElementChild);
 				const childContainer = document.createElement('div');
-				domUtils.addClass(childContainer, 'se-menu-child|se-menu-hidden');
+				dom.utils.addClass(childContainer, 'se-menu-child|se-menu-hidden');
 				this.__createFolderList(item.children, childContainer);
 				folderDiv.appendChild(childContainer);
 
 				parentElement.appendChild(folderDiv);
 			} else {
-				const folderLabel = domUtils.createElement('div', { 'data-command': item.key, 'aria-label': item.name, class: 'se-menu-folder-item' }, `<span class="se-menu-icon">${this.icon_item}</span><span>${item.name}</span>`);
+				const folderLabel = dom.utils.createElement('div', { 'data-command': item.key, 'aria-label': item.name, class: 'se-menu-folder-item' }, `<span class="se-menu-icon">${this.icon_item}</span><span>${item.name}</span>`);
 				if (parentElement === this.sideInner) {
-					const folderDiv = domUtils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
+					const folderDiv = dom.utils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
 					parentElement.appendChild(folderDiv);
 				} else {
 					parentElement.appendChild(folderLabel);
@@ -454,7 +454,7 @@ function CallBackGet(xmlHttp) {
 		throw Error(`[SUNEDITOR.browser.drawList.fail] cause: "${e.message}"`);
 	} finally {
 		this.closeBrowserLoading();
-		this.body.style.maxHeight = domUtils.getClientSize().h - this.header.offsetHeight - 50 + 'px';
+		this.body.style.maxHeight = dom.utils.getClientSize().h - this.header.offsetHeight - 50 + 'px';
 	}
 }
 
@@ -475,8 +475,8 @@ function CallBackError(res, xmlHttp) {
  * @param {MouseEvent} e - Event object
  */
 function OnClickTag(e) {
-	const eventTarget = domUtils.getEventTarget(e);
-	if (!domUtils.isAnchor(eventTarget)) return;
+	const eventTarget = dom.query.getEventTarget(e);
+	if (!dom.check.isAnchor(eventTarget)) return;
 
 	const tagName = eventTarget.textContent;
 	const selectTag = this.tagArea.querySelector('a[title="' + tagName + '"]');
@@ -484,10 +484,10 @@ function OnClickTag(e) {
 
 	if (sTagIndex > -1) {
 		this.selectedTags.splice(sTagIndex, 1);
-		domUtils.removeClass(selectTag, 'on');
+		dom.utils.removeClass(selectTag, 'on');
 	} else {
 		this.selectedTags.push(tagName);
-		domUtils.addClass(selectTag, 'on');
+		dom.utils.addClass(selectTag, 'on');
 	}
 
 	this._drawListItem(this.items, false);
@@ -499,14 +499,14 @@ function OnClickTag(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClickFile(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 
 	e.preventDefault();
 	e.stopPropagation();
 
 	if (eventTarget === this.list) return;
 
-	const target = domUtils.getCommandTarget(eventTarget);
+	const target = dom.query.getCommandTarget(eventTarget);
 	if (!target) return;
 
 	this.close();
@@ -519,28 +519,28 @@ function OnClickFile(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClickSide(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	e.stopPropagation();
 
 	if (/^button$/i.test(eventTarget.nodeName)) {
 		const childContainer = eventTarget.parentElement.parentElement.querySelector('.se-menu-child');
-		if (domUtils.hasClass(childContainer, 'se-menu-hidden')) {
-			domUtils.removeClass(childContainer, 'se-menu-hidden');
+		if (dom.utils.hasClass(childContainer, 'se-menu-hidden')) {
+			dom.utils.removeClass(childContainer, 'se-menu-hidden');
 			eventTarget.innerHTML = this.openArrow;
 		} else {
-			domUtils.addClass(childContainer, 'se-menu-hidden');
+			dom.utils.addClass(childContainer, 'se-menu-hidden');
 			eventTarget.innerHTML = this.closeArrow;
 		}
 		return;
 	}
 
-	const cmdTarget = domUtils.getCommandTarget(eventTarget);
-	if (!cmdTarget || domUtils.hasClass(cmdTarget, 'active')) return;
+	const cmdTarget = dom.query.getCommandTarget(eventTarget);
+	if (!cmdTarget || dom.utils.hasClass(cmdTarget, 'active')) return;
 
 	const data = this.data[cmdTarget.getAttribute('data-command')];
 
-	domUtils.removeClass(this.side.querySelectorAll('.active'), 'active');
-	domUtils.addClass([cmdTarget, domUtils.getParentElement(cmdTarget, '.se-menu-folder')], 'active');
+	dom.utils.removeClass(this.side.querySelectorAll('.active'), 'active');
+	dom.utils.addClass([cmdTarget, dom.query.getParentElement(cmdTarget, '.se-menu-folder')], 'active');
 	this.tagArea.innerHTML = '';
 
 	if (typeof data === 'string') {
@@ -556,7 +556,7 @@ function OnClickSide(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnMouseDown_browser(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	if (/se-browser-inner/.test(eventTarget.className)) {
 		this._closeSignal = true;
 	} else {
@@ -570,7 +570,7 @@ function OnMouseDown_browser(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClick_browser(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	e.stopPropagation();
 
 	if (/close/.test(eventTarget.getAttribute('data-command')) || this._closeSignal) {
@@ -595,13 +595,13 @@ function Search(e) {
  * @param {MouseEvent} e - Event object
  */
 function SideOpen(e) {
-	const eventTarget = domUtils.getEventTarget(e);
-	if (domUtils.hasClass(eventTarget, 'active')) {
-		domUtils.removeClass(this.side, 'se-side-show');
-		domUtils.removeClass(eventTarget, 'active');
+	const eventTarget = dom.query.getEventTarget(e);
+	if (dom.utils.hasClass(eventTarget, 'active')) {
+		dom.utils.removeClass(this.side, 'se-side-show');
+		dom.utils.removeClass(eventTarget, 'active');
 	} else {
-		domUtils.addClass(this.side, 'se-side-show');
-		domUtils.addClass(eventTarget, 'active');
+		dom.utils.addClass(this.side, 'se-side-show');
+		dom.utils.addClass(eventTarget, 'active');
 	}
 }
 
@@ -612,9 +612,9 @@ function SideOpen(e) {
  */
 function SideClose({ target }) {
 	if (target === this.sideOpenBtn) return;
-	if (domUtils.hasClass(this.sideOpenBtn, 'active')) {
-		domUtils.removeClass(this.side, 'se-side-show');
-		domUtils.removeClass(this.sideOpenBtn, 'active');
+	if (dom.utils.hasClass(this.sideOpenBtn, 'active')) {
+		dom.utils.removeClass(this.side, 'se-side-show');
+		dom.utils.removeClass(this.sideOpenBtn, 'active');
 	}
 }
 

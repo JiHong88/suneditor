@@ -2,6 +2,8 @@
  * @fileoverview Shortcuts class
  */
 
+import { keyCodeMap } from '../../helper';
+
 /**
  * @typedef {Omit<Shortcuts & Partial<EditorInjector>, 'shortcuts'>} ShortcutsThis
  */
@@ -15,7 +17,7 @@
  * @property {string} command - The command key. (e.g. "bold")
  * @property {boolean} edge - Whether the cursor is at the end of the line.
  * @property {string=} key - The key pressed (e.g., "1.").
- * @property {number=} keyCode - The keyCode.
+ * @property {string=} keyCode - The keyEvent.code.
  * @property {string|((...args: *) => *)=} method - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
  * @property {string} plugin - The plugin name.
  * @property {string} type - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
@@ -39,6 +41,14 @@ Shortcuts.prototype = {
 	/**
 	 * @this {ShortcutsThis}
 	 * @description If there is a shortcut function, run it.
+	 * @param {KeyboardEvent} event Keyboard event object
+	 * @param {boolean} ctrl Whether the Ctrl key is pressed
+	 * @param {boolean} shift Whether the Shift key is pressed
+	 * @param {string} keyCode The keyEvent.code.
+	 * @param {string} text The text content of the key
+	 * @param {boolean} edge Whether the cursor is at the end of the line
+	 * @param {HTMLElement} line The current line node
+	 * @param {Range} range The current range object
 	 * @returns {boolean} Whether to execute shortcuts
 	 */
 	command(event, ctrl, shift, keyCode, text, edge, line, range) {
@@ -48,12 +58,12 @@ Shortcuts.prototype = {
 		let info = null;
 
 		if (ctrl) {
-			info = this.editor.shortcutsKeyMap.get(keyCode + (shift ? 1000 : 0));
+			info = this.editor.shortcutsKeyMap.get(keyCode + (shift ? '1000' : ''));
 		} else {
 			info = this.editor.shortcutsKeyMap.get(text) || this.editor.shortcutsKeyMap.get(text + event.key);
 		}
 
-		if (!info || (!shift && info.s) || (info.space && keyCode !== 32) || (info.enter && keyCode !== 13) || (info.textTrigger && !event.key.trim()) || (info.edge && !edge)) return false;
+		if (!info || (!shift && info.s) || (info.space && !keyCodeMap.isSpace(keyCode)) || (info.enter && !keyCodeMap.isEnter(keyCode)) || (info.textTrigger && !event.key.trim()) || (info.edge && !edge)) return false;
 
 		if (info.plugin && typeof info.method === 'string') {
 			this.editor.plugins[info.plugin][info.method]?.({ range, line, info, event, keyCode });

@@ -1,7 +1,7 @@
 import EditorInjector from '../editorInjector';
 import SelectMenu from './SelectMenu';
 import FileManager from './FileManager';
-import { domUtils, numbers, env, unicode } from '../helper';
+import { dom, numbers, env, unicode } from '../helper';
 import { CreateTooltipInner } from '../core/section/constructor';
 const { NO_EVENT } = env;
 
@@ -58,9 +58,9 @@ function ModalAnchorEditor(inst, modalForm, params) {
 	if (params.enableFileUpload) {
 		this.uploadUrl = typeof params.uploadUrl === 'string' ? params.uploadUrl : null;
 		this.uploadHeaders = params.uploadHeaders || null;
-		this.uploadSizeLimit = /\d+/.test(params.uploadSizeLimit) ? numbers.get(params.uploadSizeLimit, 0) : null;
-		this.uploadSingleSizeLimit = /\d+/.test(params.uploadSingleSizeLimit) ? numbers.get(params.uploadSingleSizeLimit, 0) : null;
-		this.input = domUtils.createElement('input', { type: 'file', accept: params.acceptedFormats || '*' });
+		this.uploadSizeLimit = numbers.get(params.uploadSizeLimit, 0) || null;
+		this.uploadSingleSizeLimit = numbers.get(params.uploadSingleSizeLimit, 0) || null;
+		this.input = dom.utils.createElement('input', { type: 'file', accept: params.acceptedFormats || '*' });
 		this.eventManager.addEvent(this.input, 'change', OnChangeFile.bind(this));
 		// file manager
 		this.fileManager = new FileManager(this, {
@@ -102,7 +102,7 @@ function ModalAnchorEditor(inst, modalForm, params) {
 		for (let i = 0, len = relList.length, rel; i < len; i++) {
 			rel = relList[i];
 			list.push(
-				domUtils.createElement(
+				dom.utils.createElement(
 					'BUTTON',
 					{
 						type: 'button',
@@ -157,8 +157,8 @@ ModalAnchorEditor.prototype = {
 			this.newWindowCheck.checked = this.openNewWindow;
 			this.titleInput.value = '';
 		} else if (this.currentTarget) {
-			const href = this.currentTarget.getAttribute('href');
-			this.linkValue = this.preview.textContent = this.urlInput.value = this._selfPathBookmark(href) ? href.substr(href.lastIndexOf('#')) : href;
+			const href = this.currentTarget.href;
+			this.linkValue = this.preview.textContent = this.urlInput.value = this._selfPathBookmark(href) ? href.substring(href.lastIndexOf('#')) : href;
 			this.displayInput.value = this.currentTarget.textContent;
 			this.titleInput.value = this.currentTarget.title;
 			this.newWindowCheck.checked = /_blank/i.test(this.currentTarget.target) ? true : false;
@@ -181,7 +181,7 @@ ModalAnchorEditor.prototype = {
 		const url = this.linkValue;
 		const displayText = this.displayInput.value.length === 0 ? url : this.displayInput.value;
 
-		const oA = /** @type {HTMLElement} */ (this.currentTarget || domUtils.createElement('A'));
+		const oA = /** @type {HTMLElement} */ (this.currentTarget || dom.utils.createElement('A'));
 		this._updateAnchor(oA, url, displayText, this.titleInput.value, notText);
 		this.linkValue = this.preview.textContent = this.urlInput.value = this.displayInput.value = '';
 
@@ -250,7 +250,7 @@ ModalAnchorEditor.prototype = {
 	 */
 	_selfPathBookmark(path) {
 		const href = this._w.location.href.replace(/\/$/, '');
-		return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (!href.includes('#') ? href.length : href.substr(0, href.indexOf('#')).length));
+		return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (!href.includes('#') ? href.length : href.substring(0, href.indexOf('#')).length));
 	},
 
 	/**
@@ -267,17 +267,17 @@ ModalAnchorEditor.prototype = {
 		for (let i = 0, len = checkedRel.length, cmd; i < len; i++) {
 			cmd = checkedRel[i].getAttribute('data-command');
 			if (rels.includes(cmd)) {
-				domUtils.addClass(checkedRel[i], 'se-checked');
+				dom.utils.addClass(checkedRel[i], 'se-checked');
 			} else {
-				domUtils.removeClass(checkedRel[i], 'se-checked');
+				dom.utils.removeClass(checkedRel[i], 'se-checked');
 			}
 		}
 
 		this.relPreview.title = this.relPreview.textContent = rels.join(' ');
 		if (rels.length > 0) {
-			domUtils.addClass(this.relButton, 'on');
+			dom.utils.addClass(this.relButton, 'on');
 		} else {
-			domUtils.removeClass(this.relButton, 'on');
+			dom.utils.removeClass(this.relButton, 'on');
 		}
 	},
 
@@ -288,7 +288,7 @@ ModalAnchorEditor.prototype = {
 	 * @param {string} urlValue - The current URL input value.
 	 */
 	_createBookmarkList(urlValue) {
-		const headers = domUtils.getListChildren(this.editor.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (domUtils.isAnchor(current) && current.id));
+		const headers = dom.query.getListChildren(this.editor.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && current.id));
 		if (headers.length === 0) return;
 
 		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');
@@ -298,7 +298,7 @@ ModalAnchorEditor.prototype = {
 			v = headers[i];
 			if (!valueRegExp.test(v.textContent)) continue;
 			list.push(v);
-			menus.push(domUtils.isAnchor(v) ? `<div><span class="se-text-prefix-icon">${this.icons.bookmark_anchor}</span>${v.id}</div>` : `<div style="${v.style.cssText}">${v.textContent}</div>`);
+			menus.push(dom.check.isAnchor(v) ? `<div><span class="se-text-prefix-icon">${this.icons.bookmark_anchor}</span>${v.id}</div>` : `<div style="${v.style.cssText}">${v.textContent}</div>`);
 		}
 
 		if (list.length === 0) {
@@ -320,7 +320,7 @@ ModalAnchorEditor.prototype = {
 		const protocol = this.options.get('defaultUrlProtocol');
 		const noPrefix = this.noAutoPrefix;
 		const reservedProtocol = /^(mailto:|tel:|sms:|https*:\/\/|#)/.test(value) || value.indexOf(protocol) === 0;
-		const sameProtocol = !protocol ? false : RegExp('^' + unicode.escapeStringRegexp(value.substr(0, protocol.length))).test(protocol);
+		const sameProtocol = !protocol ? false : RegExp('^' + unicode.escapeStringRegexp(value.substring(0, protocol.length))).test(protocol);
 
 		value =
 			this.linkValue =
@@ -329,10 +329,10 @@ ModalAnchorEditor.prototype = {
 
 		if (this._selfPathBookmark(value)) {
 			this.bookmark.style.display = 'block';
-			domUtils.addClass(this.bookmarkButton, 'active');
+			dom.utils.addClass(this.bookmarkButton, 'active');
 		} else {
 			this.bookmark.style.display = 'none';
-			domUtils.removeClass(this.bookmarkButton, 'active');
+			dom.utils.removeClass(this.bookmarkButton, 'active');
 		}
 
 		if (!this._selfPathBookmark(value) && this.downloadCheck.checked) {
@@ -436,7 +436,7 @@ ModalAnchorEditor.prototype = {
  * @param {InputEvent} e - The change event object.
  */
 async function OnChangeFile(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	const files = eventTarget.files;
 	if (!files[0]) return;
 
@@ -512,7 +512,7 @@ function SetRelItem(item) {
  * @param {InputEvent} e - Event object
  */
 function OnChange_displayInput(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	this._change = !!eventTarget.value.trim();
 }
 
@@ -522,7 +522,7 @@ function OnChange_displayInput(e) {
  * @param {InputEvent} e - Event object
  */
 function OnChange_urlInput(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	const value = eventTarget.value.trim();
 	this._setLinkPreview(value);
 	if (this._selfPathBookmark(value)) this._createBookmarkList(value);
@@ -545,13 +545,13 @@ function OnFocus_urlInput() {
 function OnClick_bookmarkButton() {
 	let url = this.urlInput.value;
 	if (this._selfPathBookmark(url)) {
-		url = url.substr(1);
+		url = url.substring(1);
 		this.bookmark.style.display = 'none';
-		domUtils.removeClass(this.bookmarkButton, 'active');
+		dom.utils.removeClass(this.bookmarkButton, 'active');
 	} else {
 		url = '#' + url;
 		this.bookmark.style.display = 'block';
-		domUtils.addClass(this.bookmarkButton, 'active');
+		dom.utils.addClass(this.bookmarkButton, 'active');
 		this.downloadCheck.checked = false;
 		this.download.style.display = 'none';
 		this._createBookmarkList(url);
@@ -569,7 +569,7 @@ function OnClick_bookmarkButton() {
  */
 function OnChange_newWindowCheck(e) {
 	if (typeof this.defaultRel.check_new_window !== 'string') return;
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	if (eventTarget.checked) {
 		this._setRel(this._relMerge(this.defaultRel.check_new_window));
 	} else {
@@ -583,11 +583,11 @@ function OnChange_newWindowCheck(e) {
  * @param {InputEvent} e - Event object
  */
 function OnChange_downloadCheck(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	if (eventTarget.checked) {
 		this.download.style.display = 'block';
 		this.bookmark.style.display = 'none';
-		domUtils.removeClass(this.bookmarkButton, 'active');
+		dom.utils.removeClass(this.bookmarkButton, 'active');
 		this.linkValue = this.preview.textContent = this.urlInput.value = this.urlInput.value.replace(/^#+/, '');
 		if (typeof this.defaultRel.check_bookmark === 'string') {
 			this._setRel(this._relMerge(this.defaultRel.check_bookmark));
@@ -660,7 +660,7 @@ function CreatetModalForm(editor, params, relList) {
 
 	html += '</div></div>';
 
-	return domUtils.createElement('DIV', null, html);
+	return dom.utils.createElement('DIV', null, html);
 }
 
 export default ModalAnchorEditor;

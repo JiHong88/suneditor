@@ -1,5 +1,5 @@
 import CoreInjector from '../editorInjector/_core';
-import { domUtils, env } from '../helper';
+import { dom, env, keyCodeMap } from '../helper';
 
 const MENU_MIN_HEIGHT = 38;
 
@@ -69,8 +69,8 @@ SelectMenu.prototype = {
 	/**
 	 * @this {SelectMenuThis}
 	 * @description Creates the select menu items.
-	 * @param {Array<string|Node>} items - Command list of selectable items.
-	 * @param {Array<string|Node>} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<string|Node>|NodeCollection} items - Command list of selectable items.
+	 * @param {Array<string|Node>|NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
 	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';
@@ -100,9 +100,9 @@ SelectMenu.prototype = {
 	on(referElement, selectMethod, attr) {
 		if (!attr) attr = {};
 		this._refer = referElement;
-		this._keydownTarget = domUtils.isInputElement(referElement) ? referElement : this._w;
+		this._keydownTarget = dom.check.isInputElement(referElement) ? referElement : this._w;
 		this._selectMethod = selectMethod;
-		this.form = domUtils.createElement(
+		this.form = dom.utils.createElement(
 			'DIV',
 			{
 				class: 'se-select-menu' + (attr.class ? ' ' + attr.class : ''),
@@ -137,7 +137,7 @@ SelectMenu.prototype = {
 	 */
 	close() {
 		this.editor.selectMenuOn = false;
-		domUtils.removeClass(this._refer, 'on');
+		dom.utils.removeClass(this._refer, 'on');
 		this._init();
 		if (this.form) this.form.style.cssText = '';
 		this.isOpen = false;
@@ -184,7 +184,7 @@ SelectMenu.prototype = {
 		this.index = -1;
 		this.item = null;
 		if (this._onItem) {
-			domUtils.removeClass(this._onItem, 'se-select-on');
+			dom.utils.removeClass(this._onItem, 'se-select-on');
 			this._onItem = null;
 		}
 	},
@@ -210,14 +210,14 @@ SelectMenu.prototype = {
 	 * @param {number} selectIndex - The index of the item to select.
 	 */
 	_selectItem(selectIndex) {
-		domUtils.removeClass(this.form, 'se-select-menu-mouse-move');
+		dom.utils.removeClass(this.form, 'se-select-menu-mouse-move');
 
 		const len = this.menuLen;
 		for (let i = 0; i < len; i++) {
 			if (i === selectIndex) {
-				domUtils.addClass(this.menus[i], 'active');
+				dom.utils.addClass(this.menus[i], 'active');
 			} else {
-				domUtils.removeClass(this.menus[i], 'active');
+				dom.utils.removeClass(this.menus[i], 'active');
 			}
 		}
 
@@ -240,8 +240,8 @@ SelectMenu.prototype = {
 		const target = this._refer;
 		form.style.visibility = 'hidden';
 		form.style.display = 'block';
-		domUtils.removeClass(form, 'se-select-menu-scroll');
-		domUtils.addClass(target, 'on');
+		dom.utils.removeClass(form, 'se-select-menu-scroll');
+		dom.utils.addClass(target, 'on');
 
 		const formW = form.offsetWidth;
 		const targetW = target.offsetWidth;
@@ -265,7 +265,7 @@ SelectMenu.prototype = {
 		const targetOffsetTop = target.offsetTop;
 		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;
-		const wbottom = domUtils.getClientSize().h - (targetGlobalTop - this._w.scrollY + targetHeight);
+		const wbottom = dom.utils.getClientSize().h - (targetGlobalTop - this._w.scrollY + targetHeight);
 		const sideAddH = side ? targetHeight : 0;
 		let overH = 10000;
 		switch (position) {
@@ -370,7 +370,7 @@ SelectMenu.prototype = {
 			const item = form.firstElementChild.querySelector(onItemQuerySelector);
 			if (item) {
 				this._onItem = item;
-				domUtils.addClass(item, 'se-select-on');
+				dom.utils.addClass(item, 'se-select-on');
 			}
 		}
 
@@ -386,7 +386,7 @@ SelectMenu.prototype = {
 	 * @param {number} index - The index of the item to select.
 	 */
 	_select(index) {
-		if (this.checkList) domUtils.toggleClass(this.menus[index], 'se-checked');
+		if (this.checkList) dom.utils.toggleClass(this.menus[index], 'se-checked');
 		this._selectMethod(this.getItem(index));
 	},
 
@@ -450,8 +450,8 @@ SelectMenu.prototype = {
  */
 function OnKeyDown_refer(e) {
 	let moveIndex;
-	switch (e.keyCode) {
-		case 38: // up
+	switch (e.code) {
+		case 'ArrowUp': // up
 			e.preventDefault();
 			e.stopPropagation();
 			if (this.horizontal && this.index > -1) {
@@ -461,7 +461,7 @@ function OnKeyDown_refer(e) {
 				moveIndex = -1;
 			}
 			break;
-		case 40: // down
+		case 'ArrowDown': // down
 			e.preventDefault();
 			e.stopPropagation();
 			if (this.horizontal && this.index > -1) {
@@ -471,18 +471,18 @@ function OnKeyDown_refer(e) {
 				moveIndex = 1;
 			}
 			break;
-		case 37: // left
+		case 'ArrowLeft': // left
 			e.preventDefault();
 			e.stopPropagation();
 			moveIndex = -1;
 			break;
-		case 39: //right
+		case 'ArrowRight': //right
 			e.preventDefault();
 			e.stopPropagation();
 			moveIndex = 1;
 			break;
-		case 13:
-		case 32: // enter, space
+		case 'Enter':
+		case 'Space': // enter, space
 			if (this.index > -1) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -503,8 +503,8 @@ function OnKeyDown_refer(e) {
  */
 function OnMousedown_list(e) {
 	if (env.isGecko) {
-		const eventTarget = domUtils.getEventTarget(e);
-		const target = domUtils.getParentElement(eventTarget, '.se-select-item');
+		const eventTarget = dom.query.getEventTarget(e);
+		const target = dom.query.getParentElement(eventTarget, '.se-select-item');
 		if (target) this.eventManager._injectActiveEvent(target);
 	}
 }
@@ -515,8 +515,8 @@ function OnMousedown_list(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnMouseMove_list(e) {
-	const eventTarget = domUtils.getEventTarget(e);
-	domUtils.addClass(this.form, 'se-select-menu-mouse-move');
+	const eventTarget = dom.query.getEventTarget(e);
+	dom.utils.addClass(this.form, 'se-select-menu-mouse-move');
 	const index = eventTarget.getAttribute('data-index');
 	if (!index) return;
 	this.index = Number(index);
@@ -528,10 +528,10 @@ function OnMouseMove_list(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClick_list(e) {
-	let target = domUtils.getEventTarget(e);
+	let target = dom.query.getEventTarget(e);
 	let index = null;
 
-	while (!index && !/UL/i.test(target.tagName) && !domUtils.hasClass(target, 'se-select-menu')) {
+	while (!index && !/UL/i.test(target.tagName) && !dom.utils.hasClass(target, 'se-select-menu')) {
 		index = target.getAttribute('data-index');
 		target = target.parentElement;
 	}
@@ -546,7 +546,7 @@ function OnClick_list(e) {
  * @param {KeyboardEvent} e - Event object
  */
 function CloseListener_key(e) {
-	if (!/27/.test(e.keyCode)) return;
+	if (!keyCodeMap.isEsc(e.code)) return;
 	this.close();
 }
 
@@ -556,11 +556,11 @@ function CloseListener_key(e) {
  * @param {MouseEvent} e - Event object
  */
 function CloseListener_mousedown(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	if (this.form.contains(eventTarget)) return;
 	if (e.target !== this._refer) {
 		this.close();
-	} else if (!domUtils.isInputElement(eventTarget)) {
+	} else if (!dom.check.isInputElement(eventTarget)) {
 		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers.click, true);
 	}
 }

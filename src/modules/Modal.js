@@ -1,6 +1,6 @@
 import CoreInjector from '../editorInjector/_core';
 import { CreateTooltipInner } from '../core/section/constructor';
-import { domUtils, env } from '../helper';
+import { dom, env, keyCodeMap } from '../helper';
 
 const { _w } = env;
 const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize', wRTL: 'ns-resize', hRTL: 'ew-resize', cRTL: 'nesw-resize' };
@@ -99,8 +99,8 @@ Modal.prototype = {
 			const mw = `${this.form.offsetWidth - offset.width}px`;
 			const mh = `${this.form.offsetTop + (this.form.offsetHeight - this._resizeBody.offsetHeight)}px`;
 			// set max
-			if (maxWidth && typeof this.__resizeDir === 'string') domUtils.setStyle(this._resizeBody, 'max-width', `calc(${maxWidth} - ${mw})`);
-			if (maxHeight) domUtils.setStyle(this._resizeBody, 'max-height', `calc(${maxHeight} - ${mh})`);
+			if (maxWidth && typeof this.__resizeDir === 'string') dom.utils.setStyle(this._resizeBody, 'max-width', `calc(${maxWidth} - ${mw})`);
+			if (maxHeight) dom.utils.setStyle(this._resizeBody, 'max-height', `calc(${maxHeight} - ${mh})`);
 		}
 
 		if (this.focusElement) this.focusElement.focus();
@@ -226,7 +226,7 @@ async function Action(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnClick_dialog(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	if (/close/.test(eventTarget.getAttribute('data-command')) || eventTarget === this._modalInner) {
 		this.close();
 	}
@@ -238,7 +238,7 @@ function OnClick_dialog(e) {
  * @param {KeyboardEvent} e - Event object
  */
 function CloseListener(e) {
-	if (!/27/.test(e.keyCode)) return;
+	if (!keyCodeMap.isEsc(e.code)) return;
 	this.close();
 }
 
@@ -251,8 +251,8 @@ function CloseListener(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnResizeMouseDown(dir, e) {
-	this._currentHandle = domUtils.getEventTarget(e);
-	domUtils.addClass(this._currentHandle, 'active');
+	this._currentHandle = dom.query.getEventTarget(e);
+	dom.utils.addClass(this._currentHandle, 'active');
 	this.__addGlobalEvent((this.__resizeDir = dir + (this.options.get('_rtl') ? 'RTL' : '')));
 }
 
@@ -305,7 +305,7 @@ function OnResize(e) {
  * @this {ModalThis}
  */
 function OnResizeMouseUp() {
-	domUtils.removeClass(this._currentHandle, 'active');
+	dom.utils.removeClass(this._currentHandle, 'active');
 	this._currentHandle = null;
 	this.__removeGlobalEvent();
 }

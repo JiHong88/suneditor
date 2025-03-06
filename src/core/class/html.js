@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, converter, numbers, unicode, env } from '../../helper';
+import { dom, converter, numbers, unicode, env } from '../../helper';
 
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
@@ -260,9 +260,9 @@ HTML.prototype = {
 		}
 
 		if (this._autoStyleify) {
-			const dom = new DOMParser().parseFromString(html, 'text/html');
-			domUtils.getListChildNodes(dom.body, converter.spanToStyleNode.bind(null, this._autoStyleify));
-			html = dom.body.innerHTML;
+			const domParser = new DOMParser().parseFromString(html, 'text/html');
+			dom.query.getListChildNodes(domParser.body, converter.spanToStyleNode.bind(null, this._autoStyleify));
+			html = domParser.body.innerHTML;
 		}
 
 		if (attrFilter || styleFilter) {
@@ -270,11 +270,11 @@ HTML.prototype = {
 		}
 
 		// get dom tree
-		const dom = this._d.createRange().createContextualFragment(html);
+		const domParser = this._d.createRange().createContextualFragment(html);
 
 		if (tagFilter) {
 			try {
-				this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter, _freeCodeViewMode);
+				this._consistencyCheckOfHTML(domParser, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, tagFilter, formatFilter, classFilter, _freeCodeViewMode);
 			} catch (error) {
 				console.warn('[SUNEDITOR.html.clean.fail]', error.message);
 			}
@@ -282,7 +282,7 @@ HTML.prototype = {
 
 		if (this.options.get('__pluginRetainFilter')) {
 			this.editor._MELInfo.forEach((method, query) => {
-				const infoLst = dom.querySelectorAll(query);
+				const infoLst = domParser.querySelectorAll(query);
 				for (let i = 0, len = infoLst.length; i < len; i++) {
 					method(infoLst[i]);
 				}
@@ -290,14 +290,14 @@ HTML.prototype = {
 		}
 
 		if (formatFilter) {
-			let domTree = dom.childNodes;
+			let domTree = domParser.childNodes;
 			if (!forceFormat) forceFormat = this._isFormatData(domTree);
-			if (forceFormat) domTree = this._editFormat(dom).childNodes;
+			if (forceFormat) domTree = this._editFormat(domParser).childNodes;
 
 			for (let i = 0, len = domTree.length, t; i < len; i++) {
 				t = domTree[i];
 				if (this.__allowedTagNameRegExp.test(t.nodeName)) {
-					cleanData += t.outerHTML;
+					cleanData += /** @type {HTMLElement} */ (t).outerHTML;
 					continue;
 				}
 				cleanData += this._makeLine(t, forceFormat);
@@ -337,14 +337,14 @@ HTML.prototype = {
 		if (typeof html === 'string') {
 			if (!skipCleaning) html = this.clean(html, { forceFormat: false, whitelist: null, blacklist: null });
 			try {
-				if (domUtils.isListCell(this.format.getLine(this.selection.getNode(), null))) {
-					const dom = this._d.createRange().createContextualFragment(html);
-					const domTree = dom.childNodes;
+				if (dom.check.isListCell(this.format.getLine(this.selection.getNode(), null))) {
+					const domParser = this._d.createRange().createContextualFragment(html);
+					const domTree = domParser.childNodes;
 					if (this._isFormatData(domTree)) html = this._convertListCell(domTree);
 				}
 
-				const dom = this._d.createRange().createContextualFragment(html);
-				const domTree = dom.childNodes;
+				const domParser = this._d.createRange().createContextualFragment(html);
+				const domTree = domParser.childNodes;
 
 				if (!skipCharCount) {
 					const type = this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
@@ -357,9 +357,9 @@ HTML.prototype = {
 
 				let c, a, t, prev, firstCon;
 				while ((c = domTree[0])) {
-					if (prev?.nodeType === 3 && a?.nodeType === 1 && domUtils.isBreak(c)) {
+					if (prev?.nodeType === 3 && a?.nodeType === 1 && dom.check.isBreak(c)) {
 						prev = c;
-						domUtils.removeItem(c);
+						dom.utils.removeItem(c);
 						continue;
 					}
 					t = this.insertNode(c, { afterNode: a, skipCharCount: true });
@@ -385,7 +385,7 @@ HTML.prototype = {
 				this.component.insert(html, { skipCharCount, skipSelection: false, skipHistory: false });
 			} else {
 				let afterNode = null;
-				if (this.format.isLine(html) || domUtils.isMedia(html)) {
+				if (this.format.isLine(html) || dom.check.isMedia(html)) {
 					afterNode = this.format.getLine(this.selection.getNode(), null);
 				}
 				this.insertNode(html, { afterNode, skipCharCount });
@@ -416,8 +416,8 @@ HTML.prototype = {
 
 		let fNode = null;
 		let range = this.selection.getRange();
-		let line = domUtils.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : this.format.getLine(this.selection.getNode(), null);
-		let insertListCell = domUtils.isListCell(line) && (domUtils.isListCell(oNode) || domUtils.isList(oNode));
+		let line = dom.check.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : this.format.getLine(this.selection.getNode(), null);
+		let insertListCell = dom.check.isListCell(line) && (dom.check.isListCell(oNode) || dom.check.isList(oNode));
 
 		let parentNode,
 			originAfter,
@@ -427,12 +427,12 @@ HTML.prototype = {
 		const isFormats = (!freeFormat && (this.format.isLine(oNode) || this.format.isBlock(oNode))) || this.component.isBasic(oNode);
 
 		if (insertListCell) {
-			tempAfterNode = afterNode || domUtils.isList(oNode) ? line.lastChild : line.nextElementSibling;
-			tempParentNode = domUtils.isList(oNode) ? line : (tempAfterNode || line).parentNode;
+			tempAfterNode = afterNode || dom.check.isList(oNode) ? line.lastChild : line.nextElementSibling;
+			tempParentNode = dom.check.isList(oNode) ? line : (tempAfterNode || line).parentNode;
 		}
 
-		if (!afterNode && (isFormats || this.component.isBasic(oNode) || domUtils.isMedia(oNode))) {
-			const isEdge = domUtils.isEdgePoint(range.endContainer, range.endOffset, 'end');
+		if (!afterNode && (isFormats || this.component.isBasic(oNode) || dom.check.isMedia(oNode))) {
+			const isEdge = dom.check.isEdgePoint(range.endContainer, range.endOffset, 'end');
 			const r = this.remove();
 			const container = r.container;
 			const prevContainer = container === r.prevContainer && range.collapsed ? null : r.prevContainer;
@@ -450,30 +450,30 @@ HTML.prototype = {
 				} else {
 					tempAfterNode = null;
 				}
-			} else if (insertListCell && domUtils.isListCell(container) && !line.parentElement) {
-				line = domUtils.createElement('LI');
+			} else if (insertListCell && dom.check.isListCell(container) && !line.parentElement) {
+				line = dom.utils.createElement('LI');
 				tempParentNode.appendChild(line);
 				container.appendChild(tempParentNode);
 				tempAfterNode = null;
-			} else if (container.nodeType === 3 || domUtils.isBreak(container) || insertListCell) {
-				const depthFormat = domUtils.getParentElement(container, (current) => {
-					return this.format.isBlock(current) || domUtils.isListCell(current);
+			} else if (container.nodeType === 3 || dom.check.isBreak(container) || insertListCell) {
+				const depthFormat = dom.query.getParentElement(container, (current) => {
+					return this.format.isBlock(current) || dom.check.isListCell(current);
 				});
-				afterNode = this.nodeTransform.split(container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
+				afterNode = this.nodeTransform.split(container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
 				if (!afterNode) {
 					tempAfterNode = afterNode = line;
 				} else if (insertListCell) {
 					if (line.contains(container)) {
-						const subList = domUtils.isList(line.lastElementChild);
+						const subList = dom.check.isList(line.lastElementChild);
 						let newCell = null;
 						if (!isEdge) {
 							newCell = line.cloneNode(false);
-							newCell.appendChild(afterNode.textContent.trim() ? afterNode : domUtils.createTextNode(unicode.zeroWidthSpace));
+							newCell.appendChild(afterNode.textContent.trim() ? afterNode : dom.utils.createTextNode(unicode.zeroWidthSpace));
 						}
 						if (subList) {
 							if (!newCell) {
 								newCell = line.cloneNode(false);
-								newCell.appendChild(domUtils.createTextNode(unicode.zeroWidthSpace));
+								newCell.appendChild(dom.utils.createTextNode(unicode.zeroWidthSpace));
 							}
 							newCell.appendChild(line.lastElementChild);
 						}
@@ -506,18 +506,18 @@ HTML.prototype = {
 				/** No Select range node */
 				if (range.collapsed) {
 					if (commonCon.nodeType === 3) {
-						if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
+						if (commonCon.textContent.length > endOff) afterNode = /** @type {Text} */ (commonCon).splitText(endOff);
 						else afterNode = commonCon.nextSibling;
 					} else {
-						if (!domUtils.isBreak(parentNode)) {
+						if (!dom.check.isBreak(parentNode)) {
 							const c = parentNode.childNodes[startOff];
-							const focusNode = c?.nodeType === 3 && domUtils.isZeroWidth(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
+							const focusNode = c?.nodeType === 3 && dom.check.isZeroWidth(c) && dom.check.isBreak(c.nextSibling) ? c.nextSibling : c;
 							if (focusNode) {
-								if (!focusNode.nextSibling && domUtils.isBreak(focusNode)) {
+								if (!focusNode.nextSibling && dom.check.isBreak(focusNode)) {
 									parentNode.removeChild(focusNode);
 									afterNode = null;
 								} else {
-									afterNode = domUtils.isBreak(focusNode) && !domUtils.isBreak(oNode) ? focusNode : focusNode.nextSibling;
+									afterNode = dom.check.isBreak(focusNode) && !dom.check.isBreak(oNode) ? focusNode : focusNode.nextSibling;
 								}
 							} else {
 								afterNode = null;
@@ -532,15 +532,15 @@ HTML.prototype = {
 					const isSameContainer = startCon === endCon;
 
 					if (isSameContainer) {
-						if (domUtils.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
-						else afterNode = endCon.splitText(endOff);
+						if (dom.check.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
+						else afterNode = /** @type {Text} */ (endCon).splitText(endOff);
 
 						let removeNode = startCon;
-						if (!domUtils.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
+						if (!dom.check.isEdgePoint(startCon, startOff)) removeNode = /** @type {Text} */ (startCon).splitText(startOff);
 
 						parentNode.removeChild(removeNode);
 						if (parentNode.childNodes.length === 0 && isFormats) {
-							parentNode.innerHTML = '<br>';
+							/** @type {HTMLElement} */ (parentNode).innerHTML = '<br>';
 						}
 					} else {
 						const removedTag = this.remove();
@@ -555,7 +555,7 @@ HTML.prototype = {
 							}
 						}
 
-						if (domUtils.isListCell(container) && oNode.nodeType === 3) {
+						if (dom.check.isListCell(container) && oNode.nodeType === 3) {
 							parentNode = container;
 							afterNode = null;
 						} else if (!isFormats && prevContainer) {
@@ -571,8 +571,8 @@ HTML.prototype = {
 							} else {
 								afterNode = null;
 							}
-						} else if (domUtils.isWysiwygFrame(container) && !this.format.isLine(oNode)) {
-							parentNode = container.appendChild(domUtils.createElement(this.options.get('defaultLine')));
+						} else if (dom.check.isWysiwygFrame(container) && !this.format.isLine(oNode)) {
+							parentNode = container.appendChild(dom.utils.createElement(this.options.get('defaultLine')));
 							afterNode = null;
 						} else {
 							afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
@@ -596,36 +596,36 @@ HTML.prototype = {
 			// set node
 			const wysiwyg = this.editor.frameContext.get('wysiwyg');
 			if (!insertListCell) {
-				if (domUtils.isWysiwygFrame(afterNode) || parentNode === wysiwyg.parentNode) {
+				if (dom.check.isWysiwygFrame(afterNode) || parentNode === wysiwyg.parentNode) {
 					parentNode = wysiwyg;
 					afterNode = null;
 				}
 
-				if (this.format.isLine(oNode) || this.format.isBlock(oNode) || (!domUtils.isListCell(parentNode) && this.component.isBasic(oNode))) {
+				if (this.format.isLine(oNode) || this.format.isBlock(oNode) || (!dom.check.isListCell(parentNode) && this.component.isBasic(oNode))) {
 					const oldParent = parentNode;
-					if (domUtils.isList(afterNode)) {
+					if (dom.check.isList(afterNode)) {
 						parentNode = afterNode;
 						afterNode = null;
-					} else if (domUtils.isListCell(afterNode)) {
+					} else if (dom.check.isListCell(afterNode)) {
 						parentNode = afterNode.previousElementSibling || afterNode;
 					} else if (!originAfter && !afterNode) {
 						const r = this.remove();
-						const container = r.container.nodeType === 3 ? (domUtils.isListCell(this.format.getLine(r.container, null)) ? r.container : this.format.getLine(r.container, null) || r.container.parentNode) : r.container;
-						const rangeCon = domUtils.isWysiwygFrame(container) || this.format.isBlock(container);
+						const container = r.container.nodeType === 3 ? (dom.check.isListCell(this.format.getLine(r.container, null)) ? r.container : this.format.getLine(r.container, null) || r.container.parentNode) : r.container;
+						const rangeCon = dom.check.isWysiwygFrame(container) || this.format.isBlock(container);
 						parentNode = rangeCon ? container : container.parentNode;
 						afterNode = rangeCon ? null : container.nextSibling;
 					}
 
-					if (oldParent.childNodes.length === 0 && parentNode !== oldParent) domUtils.removeItem(oldParent);
+					if (oldParent.childNodes.length === 0 && parentNode !== oldParent) dom.utils.removeItem(oldParent);
 				}
 
-				if (isFormats && !freeFormat && !this.format.isBlock(parentNode) && !domUtils.isListCell(parentNode) && !domUtils.isWysiwygFrame(parentNode)) {
+				if (isFormats && !freeFormat && !this.format.isBlock(parentNode) && !dom.check.isListCell(parentNode) && !dom.check.isWysiwygFrame(parentNode)) {
 					afterNode = parentNode.nextElementSibling;
 					parentNode = parentNode.parentNode;
 				}
 
-				if (domUtils.isWysiwygFrame(parentNode) && (oNode.nodeType === 3 || domUtils.isBreak(oNode))) {
-					const formatNode = domUtils.createElement(this.options.get('defaultLine'), null, oNode);
+				if (dom.check.isWysiwygFrame(parentNode) && (oNode.nodeType === 3 || dom.check.isBreak(oNode))) {
+					const formatNode = dom.utils.createElement(this.options.get('defaultLine'), null, oNode);
 					fNode = oNode;
 					oNode = formatNode;
 				}
@@ -644,12 +644,12 @@ HTML.prototype = {
 				afterNode = parentNode === afterNode ? parentNode.lastChild : afterNode;
 			}
 
-			if (domUtils.isListCell(oNode) && !domUtils.isList(parentNode)) {
-				if (domUtils.isListCell(parentNode)) {
+			if (dom.check.isListCell(oNode) && !dom.check.isList(parentNode)) {
+				if (dom.check.isListCell(parentNode)) {
 					afterNode = parentNode.nextElementSibling;
 					parentNode = parentNode.parentNode;
 				} else {
-					const ul = domUtils.createElement('ol');
+					const ul = dom.utils.createElement('ol');
 					parentNode.insertBefore(ul, afterNode);
 					parentNode = ul;
 					afterNode = null;
@@ -661,11 +661,11 @@ HTML.prototype = {
 			parentNode.insertBefore(oNode, afterNode);
 
 			if (insertListCell) {
-				if (domUtils.isZeroWidth(line.textContent.trim())) {
-					domUtils.removeItem(line);
+				if (dom.check.isZeroWidth(line.textContent.trim())) {
+					dom.utils.removeItem(line);
 					oNode = oNode.lastChild;
 				} else {
-					const chList = domUtils.arrayFind(line.children, domUtils.isList);
+					const chList = dom.utils.arrayFind(line.children, dom.check.isList);
 					if (chList) {
 						if (oNode !== chList) {
 							oNode.appendChild(chList);
@@ -675,8 +675,8 @@ HTML.prototype = {
 							oNode = parentNode;
 						}
 
-						if (domUtils.isZeroWidth(line.textContent.trim())) {
-							domUtils.removeItem(line);
+						if (dom.check.isZeroWidth(line.textContent.trim())) {
+							dom.utils.removeItem(line);
 						}
 					}
 				}
@@ -700,14 +700,14 @@ HTML.prototype = {
 					}
 
 					if (d === oNode) oNode = c;
-					domUtils.removeItem(d);
+					dom.utils.removeItem(d);
 				}
 			}
 
 			if ((this.format.isLine(oNode) || this.component.isBasic(oNode)) && startCon === endCon) {
 				const cItem = this.format.getLine(commonCon, null);
-				if (cItem?.nodeType === 1 && domUtils.isEmptyLine(cItem)) {
-					domUtils.removeItem(cItem);
+				if (cItem?.nodeType === 1 && dom.check.isEmptyLine(cItem)) {
+					dom.utils.removeItem(cItem);
 				}
 			}
 
@@ -720,15 +720,15 @@ HTML.prototype = {
 				if (oNode.nodeType === 3) {
 					offset = oNode.textContent.length;
 					this.selection.setRange(oNode, offset, oNode, offset);
-				} else if (!domUtils.isBreak(oNode) && !domUtils.isListCell(oNode) && this.format.isLine(parentNode)) {
+				} else if (!dom.check.isBreak(oNode) && !dom.check.isListCell(oNode) && this.format.isLine(parentNode)) {
 					let zeroWidth = null;
-					if (!oNode.previousSibling || domUtils.isBreak(oNode.previousSibling)) {
-						zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+					if (!oNode.previousSibling || dom.check.isBreak(oNode.previousSibling)) {
+						zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 						oNode.parentNode.insertBefore(zeroWidth, oNode);
 					}
 
-					if (!oNode.nextSibling || domUtils.isBreak(oNode.nextSibling)) {
-						zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+					if (!oNode.nextSibling || dom.check.isBreak(oNode.nextSibling)) {
+						zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 						oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
 					}
 
@@ -761,7 +761,7 @@ HTML.prototype = {
 
 		const range = this.selection.getRange();
 		const isStartEdge = range.startOffset === 0;
-		const isEndEdge = domUtils.isEdgePoint(range.endContainer, range.endOffset, 'end');
+		const isEndEdge = dom.check.isEdgePoint(range.endContainer, range.endOffset, 'end');
 		let prevContainer = null;
 		let startPrevEl = null;
 		let endNextEl = null;
@@ -781,23 +781,23 @@ HTML.prototype = {
 		let endCon = range.endContainer;
 		let startOff = range.startOffset;
 		let endOff = range.endOffset;
-		const commonCon = range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode ? startCon.parentNode : range.commonAncestorContainer;
+		const commonCon = /** @type {HTMLElement} */ (range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode ? startCon.parentNode : range.commonAncestorContainer);
 		if (commonCon === startCon && commonCon === endCon) {
 			if (this.component.isBasic(commonCon)) {
 				const compInfo = this.component.get(commonCon);
 				const compContainer = compInfo.container;
-				const parent = compContainer.parentNode;
+				const parent = compContainer.parentElement;
 
 				const next = compContainer.nextSibling || compContainer.previousSibling;
 				const nextOffset = next === compContainer.previousSibling ? next?.textContent?.length || 1 : 0;
 				const parentNext = parent.nextElementSibling || parent.previousElementSibling;
 				const parentNextOffset = parentNext === parent.previousElementSibling ? parentNext?.textContent?.length || 1 : 0;
 
-				domUtils.removeItem(compContainer);
+				dom.utils.removeItem(compContainer);
 
 				if (this.format.isLine(parent)) {
 					if (parent.childNodes.length === 0) {
-						domUtils.removeItem(parent);
+						dom.utils.removeItem(parent);
 						return {
 							container: parentNext,
 							offset: parentNextOffset,
@@ -819,10 +819,10 @@ HTML.prototype = {
 				}
 			} else {
 				if ((commonCon.nodeType === 1 && startOff === 0 && endOff === 1) || (commonCon.nodeType === 3 && startOff === 0 && endOff === commonCon.textContent.length)) {
-					const nextEl = domUtils.getNextDeepestNode(commonCon, this.editor.frameContext.get('wysiwyg'));
-					const prevEl = domUtils.getPreviousDeepestNode(commonCon, this.editor.frameContext.get('wysiwyg'));
+					const nextEl = dom.query.getNextDeepestNode(commonCon, this.editor.frameContext.get('wysiwyg'));
+					const prevEl = dom.query.getPreviousDeepestNode(commonCon, this.editor.frameContext.get('wysiwyg'));
 					const line = this.format.getLine(commonCon);
-					domUtils.removeItem(commonCon);
+					dom.utils.removeItem(commonCon);
 
 					let rEl = nextEl || prevEl;
 					let rOffset = nextEl ? 0 : rEl?.nodeType === 3 ? rEl.textContent.length : 1;
@@ -833,8 +833,8 @@ HTML.prototype = {
 						rOffset = rOffset === 0 ? 0 : 1;
 					}
 
-					if (domUtils.isZeroWidth(line) && !line.contains(rEl)) {
-						domUtils.removeItem(line);
+					if (dom.check.isZeroWidth(line) && !line.contains(rEl)) {
+						dom.utils.removeItem(line);
 					}
 
 					return {
@@ -858,7 +858,7 @@ HTML.prototype = {
 			};
 
 		if (startCon === endCon && range.collapsed) {
-			if (domUtils.isZeroWidth(startCon.textContent?.substr(startOff))) {
+			if (dom.check.isZeroWidth(startCon.textContent?.substring(startOff))) {
 				return {
 					container: startCon,
 					offset: startOff,
@@ -871,9 +871,9 @@ HTML.prototype = {
 		let beforeNode = null;
 		let afterNode = null;
 
-		const childNodes = domUtils.getListChildNodes(commonCon, null);
-		let startIndex = domUtils.getArrayIndex(childNodes, startCon);
-		let endIndex = domUtils.getArrayIndex(childNodes, endCon);
+		const childNodes = dom.query.getListChildNodes(commonCon, null);
+		let startIndex = dom.utils.getArrayIndex(childNodes, startCon);
+		let endIndex = dom.utils.getArrayIndex(childNodes, endCon);
 
 		if (childNodes.length > 0 && startIndex > -1 && endIndex > -1) {
 			for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
@@ -892,13 +892,13 @@ HTML.prototype = {
 			}
 		} else {
 			if (childNodes.length === 0) {
-				if (this.format.isLine(commonCon) || this.format.isBlock(commonCon) || domUtils.isWysiwygFrame(commonCon) || domUtils.isBreak(commonCon) || domUtils.isMedia(commonCon)) {
+				if (this.format.isLine(commonCon) || this.format.isBlock(commonCon) || dom.check.isWysiwygFrame(commonCon) || dom.check.isBreak(commonCon) || dom.check.isMedia(commonCon)) {
 					return {
 						container: commonCon,
 						offset: 0,
 						commonCon
 					};
-				} else if (commonCon.nodeType === 3) {
+				} else if (dom.check.isText(commonCon)) {
 					return {
 						container: commonCon,
 						offset: endOff,
@@ -909,9 +909,9 @@ HTML.prototype = {
 				startCon = endCon = commonCon;
 			} else {
 				startCon = endCon = childNodes[0];
-				if (domUtils.isBreak(startCon) || domUtils.isZeroWidth(startCon)) {
+				if (dom.check.isBreak(startCon) || dom.check.isZeroWidth(startCon)) {
 					return {
-						container: domUtils.isMedia(commonCon) ? commonCon : startCon,
+						container: dom.check.isMedia(commonCon) ? commonCon : startCon,
 						offset: 0,
 						commonCon
 					};
@@ -921,29 +921,33 @@ HTML.prototype = {
 			startIndex = endIndex = 0;
 		}
 
+		const _isText = dom.check.isText;
+		const _isElement = dom.check.isElement;
 		for (let i = startIndex; i <= endIndex; i++) {
-			const item = childNodes[i];
+			const item = /** @type {Text} */ (childNodes[i]);
 
-			if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
+			if (_isText(item) && (item.data === undefined || item.length === 0)) {
 				this._nodeRemoveListItem(item);
 				continue;
 			}
 
 			if (item === startCon) {
-				if (startCon.nodeType === 1) {
+				if (_isElement(startCon)) {
 					if (this.component.is(startCon)) continue;
-					else beforeNode = domUtils.createTextNode(startCon.textContent);
+					else beforeNode = dom.utils.createTextNode(startCon.textContent);
 				} else {
+					const sc = /** @type {Text} */ (startCon);
+					const ec = /** @type {Text} */ (endCon);
 					if (item === endCon) {
-						beforeNode = domUtils.createTextNode(startCon.substringData(0, startOff) + endCon.substringData(endOff, endCon.length - endOff));
+						beforeNode = dom.utils.createTextNode(sc.substringData(0, startOff) + ec.substringData(endOff, ec.length - endOff));
 						offset = startOff;
 					} else {
-						beforeNode = domUtils.createTextNode(startCon.substringData(0, startOff));
+						beforeNode = dom.utils.createTextNode(sc.substringData(0, startOff));
 					}
 				}
 
 				if (beforeNode.length > 0) {
-					startCon.data = beforeNode.data;
+					/** @type {Text} */ (startCon).data = beforeNode.data;
 				} else {
 					this._nodeRemoveListItem(startCon);
 				}
@@ -953,15 +957,15 @@ HTML.prototype = {
 			}
 
 			if (item === endCon) {
-				if (endCon.nodeType === 1) {
-					if (this.component.is(endCon)) continue;
-					else afterNode = domUtils.createTextNode(endCon.textContent);
+				if (_isText(endCon)) {
+					afterNode = dom.utils.createTextNode(endCon.substringData(endOff, endCon.length - endOff));
 				} else {
-					afterNode = domUtils.createTextNode(endCon.substringData(endOff, endCon.length - endOff));
+					if (this.component.is(endCon)) continue;
+					else afterNode = dom.utils.createTextNode(endCon.textContent);
 				}
 
 				if (afterNode.length > 0) {
-					endCon.data = afterNode.data;
+					/** @type {Text} */ (endCon).data = afterNode.data;
 				} else {
 					this._nodeRemoveListItem(endCon);
 				}
@@ -972,8 +976,8 @@ HTML.prototype = {
 			this._nodeRemoveListItem(item);
 		}
 
-		const endUl = domUtils.getParentElement(endCon, 'ul');
-		const startLi = domUtils.getParentElement(startCon, 'li');
+		const endUl = dom.query.getParentElement(endCon, 'ul');
+		const startLi = dom.query.getParentElement(startCon, 'li');
 		if (endUl && startLi && startLi.contains(endUl)) {
 			container = endUl.previousSibling;
 			offset = container.textContent.length;
@@ -982,7 +986,7 @@ HTML.prototype = {
 			if (isStartEdge || isEndEdge) {
 				if (isEndEdge) {
 					if (container.nodeType === 1 && container.childNodes.length === 0) {
-						container.appendChild(domUtils.createElement('BR'));
+						container.appendChild(dom.utils.createElement('BR'));
 						offset = 1;
 					} else {
 						offset = container.textContent.length;
@@ -1003,7 +1007,7 @@ HTML.prototype = {
 			}
 		}
 
-		if (!domUtils.isWysiwygFrame(container) && container.childNodes.length === 0) {
+		if (!dom.check.isWysiwygFrame(container) && container.childNodes.length === 0) {
 			const rc = this.nodeTransform.removeAllParents(container, null, null);
 			if (rc) container = rc.sc || rc.ec || this.editor.frameContext.get('wysiwyg');
 		}
@@ -1039,8 +1043,8 @@ HTML.prototype = {
 			this.editor.changeFrameContext(rootKey[i]);
 
 			const fc = this.editor.frameContext;
-			const renderHTML = domUtils.createElement('DIV', null, this._convertToCode(fc.get('wysiwyg'), true));
-			const editableEls = domUtils.getListChildren(renderHTML, (current) => current.hasAttribute('contenteditable'));
+			const renderHTML = dom.utils.createElement('DIV', null, this._convertToCode(fc.get('wysiwyg'), true));
+			const editableEls = dom.query.getListChildren(renderHTML, (current) => current.hasAttribute('contenteditable'));
 
 			for (let j = 0, jlen = editableEls.length; j < jlen; j++) {
 				editableEls[j].removeAttribute('contenteditable');
@@ -1049,7 +1053,7 @@ HTML.prototype = {
 			const content = renderHTML.innerHTML;
 			if (this.editor.frameOptions.get('iframe_fullPage')) {
 				if (includeFullPage) {
-					const attrs = domUtils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
+					const attrs = dom.utils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
 					r = `<!DOCTYPE html><html>${fc.get('_wd').head.outerHTML}<body ${attrs}>${content}</body></html>`;
 				} else {
 					r = content;
@@ -1109,7 +1113,7 @@ HTML.prototype = {
 			const convertValue = this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
 
 			if (!this.editor.frameContext.get('isCodeView')) {
-				const temp = domUtils.createElement('DIV', null, convertValue);
+				const temp = dom.utils.createElement('DIV', null, convertValue);
 				const children = temp.children;
 				const len = children.length;
 				for (let j = 0; j < len; j++) {
@@ -1195,20 +1199,20 @@ HTML.prototype = {
 					continue;
 				}
 				if (node.nodeType === 3) {
-					if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? '' : node.data);
+					if (!dom.check.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(/** @type {Text} */ (node).data) ? '' : /** @type {Text} */ (node).data);
 					continue;
 				}
 				if (node.childNodes.length === 0) {
-					returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
+					returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + /** @type {HTMLElement} */ (node).outerHTML + br;
 					continue;
 				}
 
-				if (!node.outerHTML) {
+				if (!(/** @type {HTMLElement} */ (node).outerHTML)) {
 					returnHTML += new XMLSerializer().serializeToString(node);
 				} else {
 					tag = node.nodeName.toLowerCase();
 					tagIndent = elementIndent || nodeRegTest ? indent : '';
-					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
+					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + /** @type {HTMLElement} */ (node).outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
 					recursionFunc(node, indent + indentSize + '');
 					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
 				}
@@ -1226,14 +1230,14 @@ HTML.prototype = {
 	 */
 	_nodeRemoveListItem(item) {
 		const line = this.format.getLine(item, null);
-		domUtils.removeItem(item);
+		dom.utils.removeItem(item);
 
-		if (!domUtils.isListCell(line)) return;
+		if (!dom.check.isListCell(line)) return;
 
 		this.nodeTransform.removeAllParents(line, null, null);
 
-		if (domUtils.isList(line?.firstChild)) {
-			line.insertBefore(domUtils.createTextNode(unicode.zeroWidthSpace), line.firstChild);
+		if (dom.check.isList(line?.firstChild)) {
+			line.insertBefore(dom.utils.createTextNode(unicode.zeroWidthSpace), line.firstChild);
 		}
 	},
 
@@ -1264,8 +1268,8 @@ HTML.prototype = {
 				parentNode.insertBefore(lastONode, oNode);
 			}
 
-			if (oNode.childNodes.length === 0) domUtils.removeItem(oNode);
-			oNode = domUtils.createElement('BR');
+			if (oNode.childNodes.length === 0) dom.utils.removeItem(oNode);
+			oNode = dom.utils.createElement('BR');
 			parentNode.insertBefore(oNode, lastONode.nextSibling);
 		}
 
@@ -1284,14 +1288,15 @@ HTML.prototype = {
 		// element
 		if (node.nodeType === 1) {
 			if (this.__disallowedTagNameRegExp.test(node.nodeName)) return '';
-			if (domUtils.isExcludeFormat(node)) return node.outerHTML;
+			if (dom.check.isExcludeFormat(node)) return node.outerHTML;
 
 			const ch =
-				domUtils.getListChildNodes(node, (current) => {
-					return domUtils.isSpanWithoutAttr(current) && !domUtils.getParentElement(current, domUtils.isExcludeFormat);
+				dom.query.getListChildNodes(node, (current) => {
+					return dom.check.isSpanWithoutAttr(current) && !dom.query.getParentElement(current, dom.check.isExcludeFormat);
 				}) || [];
-			for (let i = ch.length - 1; i >= 0; i--) {
-				ch[i].outerHTML = ch[i].innerHTML;
+			for (let i = ch.length - 1, c; i >= 0; i--) {
+				c = /** @type {HTMLElement} */ (ch[i]);
+				c.outerHTML = c.innerHTML;
 			}
 
 			if (
@@ -1299,13 +1304,15 @@ HTML.prototype = {
 				this.format.isLine(node) ||
 				this.format.isBlock(node) ||
 				this.component.is(node) ||
-				domUtils.isMedia(node) ||
-				domUtils.isFigure(node) ||
-				(domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))
+				dom.check.isMedia(node) ||
+				dom.check.isFigure(node) ||
+				(dom.check.isAnchor(node) && dom.check.isMedia(node.firstElementChild))
 			) {
-				return domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML;
+				const n = /** @type {HTMLElement} */ (node);
+				return dom.check.isSpanWithoutAttr(node) ? n.innerHTML : n.outerHTML;
 			} else {
-				return '<' + defaultLine + '>' + (domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultLine + '>';
+				const n = /** @type {HTMLElement} */ (node);
+				return '<' + defaultLine + '>' + (dom.check.isSpanWithoutAttr(node) ? n.innerHTML : n.outerHTML) + '</' + defaultLine + '>';
 			}
 		}
 		// text
@@ -1346,30 +1353,30 @@ HTML.prototype = {
 			withoutFormatCells = [];
 
 		// wrong position
-		const wrongTags = domUtils.getListChildNodes(documentFragment, (current) => {
+		const wrongTags = dom.query.getListChildNodes(documentFragment, (current) => {
 			if (formatFilter && current.nodeType !== 1) {
-				if (domUtils.isList(current.parentElement)) removeTags.push(current);
+				if (dom.check.isList(current.parentElement)) removeTags.push(current);
 				return false;
 			}
 
 			// tag filter
 			if (tagFilter) {
 				// white list
-				if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && domUtils.isExcludeFormat(current))) {
+				if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && dom.check.isExcludeFormat(current))) {
 					removeTags.push(current);
 					return false;
 				}
 			}
 
-			const nrtag = !domUtils.getParentElement(current, domUtils.isExcludeFormat);
+			const nrtag = !dom.query.getParentElement(current, dom.check.isExcludeFormat);
 
 			// formatFilter
 			if (formatFilter) {
 				// empty tags
 				if (
-					!domUtils.isTableElements(current) &&
-					!domUtils.isListCell(current) &&
-					!domUtils.isAnchor(current) &&
+					!dom.check.isTableElements(current) &&
+					!dom.check.isListCell(current) &&
+					!dom.check.isAnchor(current) &&
 					(this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) &&
 					current.childNodes.length === 0 &&
 					nrtag
@@ -1379,13 +1386,13 @@ HTML.prototype = {
 				}
 
 				// wrong list
-				if (domUtils.isList(current.parentNode) && !domUtils.isList(current) && !domUtils.isListCell(current)) {
+				if (dom.check.isList(current.parentNode) && !dom.check.isList(current) && !dom.check.isListCell(current)) {
 					wrongList.push(current);
 					return false;
 				}
 
 				// table cells
-				if (domUtils.isTableCell(current)) {
+				if (dom.check.isTableCell(current)) {
 					const fel = current.firstElementChild;
 					if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
 						withoutFormatCells.push(current);
@@ -1412,14 +1419,14 @@ HTML.prototype = {
 				!_freeCodeViewMode &&
 				current.parentNode !== documentFragment &&
 				nrtag &&
-				((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) ||
-					((this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is.bind(this.component))));
+				((dom.check.isListCell(current) && !dom.check.isList(current.parentNode)) ||
+					((this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !dom.query.getParentElement(current, this.component.is.bind(this.component))));
 
 			return result;
 		});
 
 		for (let i = 0, len = removeTags.length; i < len; i++) {
-			domUtils.removeItem(removeTags[i]);
+			dom.utils.removeItem(removeTags[i]);
 		}
 
 		const checkTags = [];
@@ -1428,7 +1435,7 @@ HTML.prototype = {
 			p = t.parentNode;
 			if (!p || !p.parentNode) continue;
 
-			if (domUtils.getParentElement(t, domUtils.isListCell)) {
+			if (dom.query.getParentElement(t, dom.check.isListCell)) {
 				const cellChildren = t.childNodes;
 				for (let j = cellChildren.length - 1; len >= 0; j--) {
 					p.insertBefore(t, cellChildren[j]);
@@ -1442,13 +1449,13 @@ HTML.prototype = {
 
 		for (let i = 0, len = checkTags.length, t; i < len; i++) {
 			t = checkTags[i];
-			if (domUtils.isZeroWidth(t.textContent.trim())) {
-				domUtils.removeItem(t);
+			if (dom.check.isZeroWidth(t.textContent.trim())) {
+				dom.utils.removeItem(t);
 			}
 		}
 
 		for (let i = 0, len = emptyTags.length; i < len; i++) {
-			domUtils.removeItem(emptyTags[i]);
+			dom.utils.removeItem(emptyTags[i]);
 		}
 
 		for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
@@ -1456,7 +1463,7 @@ HTML.prototype = {
 			p = t.parentNode;
 			if (!p) continue;
 
-			tp = domUtils.createElement('LI');
+			tp = dom.utils.createElement('LI');
 
 			if (this.format.isLine(t)) {
 				children = t.childNodes;
@@ -1464,7 +1471,7 @@ HTML.prototype = {
 					tp.appendChild(children[0]);
 				}
 				p.insertBefore(tp, t);
-				domUtils.removeItem(t);
+				dom.utils.removeItem(t);
 			} else {
 				t = t.nextSibling;
 				tp.appendChild(wrongList[i]);
@@ -1474,7 +1481,7 @@ HTML.prototype = {
 
 		for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
 			t = withoutFormatCells[i];
-			f = domUtils.createElement('DIV');
+			f = dom.utils.createElement('DIV');
 			f.innerHTML = t.textContent.trim().length === 0 && t.children.length === 0 ? '<br>' : t.innerHTML;
 			t.innerHTML = f.outerHTML;
 		}
@@ -1500,16 +1507,16 @@ HTML.prototype = {
 	 * @private
 	 * @this {HTMLThis}
 	 * @description Determines if formatting is required and returns a domTree
-	 * @param {DocumentFragment} dom documentFragment
+	 * @param {DocumentFragment} domFrag documentFragment
 	 * @returns {DocumentFragment}
 	 */
-	_editFormat(dom) {
+	_editFormat(domFrag) {
 		let value = '',
 			f;
-		const tempTree = dom.childNodes;
+		const tempTree = domFrag.childNodes;
 
 		for (let i = 0, len = tempTree.length, n; i < len; i++) {
-			n = tempTree[i];
+			n = /** @type {HTMLElement} */ (tempTree[i]);
 			if (this.__allowedTagNameRegExp.test(n.nodeName)) {
 				value += n.outerHTML;
 				continue;
@@ -1517,8 +1524,8 @@ HTML.prototype = {
 
 			if (n.nodeType === 8) {
 				value += '<!-- ' + n.textContent + ' -->';
-			} else if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName) && !domUtils.isExcludeFormat(n)) {
-				if (!f) f = domUtils.createElement(this.options.get('defaultLine'));
+			} else if (!/meta/i.test(n.nodeName) && !this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !dom.check.isExcludeFormat(n)) {
+				if (!f) f = dom.utils.createElement(this.options.get('defaultLine'));
 				f.appendChild(n);
 				i--;
 				len--;
@@ -1551,16 +1558,16 @@ HTML.prototype = {
 		for (let i = 0, len = domTree.length, node; i < len; i++) {
 			node = domTree[i];
 			if (node.nodeType === 1) {
-				if (domUtils.isList(node)) {
+				if (dom.check.isList(node)) {
 					html += node.innerHTML;
-				} else if (domUtils.isListCell(node)) {
+				} else if (dom.check.isListCell(node)) {
 					html += node.outerHTML;
 				} else if (this.format.isLine(node)) {
 					html += '<li>' + (node.innerHTML.trim() || '<br>') + '</li>';
-				} else if (this.format.isBlock(node) && !domUtils.isTableElements(node)) {
+				} else if (this.format.isBlock(node) && !dom.check.isTableElements(node)) {
 					html += this._convertListCell(node.children);
 				} else {
-					html += '<li>' + node.outerHTML + '</li>';
+					html += '<li>' + /** @type {HTMLElement} */ (node).outerHTML + '</li>';
 				}
 			} else {
 				html += '<li>' + (node.textContent || '<br>') + '</li>';
@@ -1582,7 +1589,7 @@ HTML.prototype = {
 
 		for (let i = 0, len = domTree.length, t; i < len; i++) {
 			t = domTree[i];
-			if (t.nodeType === 1 && !this.format.isTextStyleNode(t) && !domUtils.isBreak(t) && !this.__disallowedTagNameRegExp.test(t.nodeName)) {
+			if (t.nodeType === 1 && !this.format.isTextStyleNode(t) && !dom.check.isBreak(t) && !this.__disallowedTagNameRegExp.test(t.nodeName)) {
 				requireFormat = true;
 				break;
 			}
@@ -1718,7 +1725,7 @@ HTML.prototype = {
 		const inst = this.format;
 		let duple = false;
 		(function recursionFunc(ancestor) {
-			if (domUtils.isWysiwygFrame(ancestor) || !inst.isTextStyleNode(ancestor)) return;
+			if (dom.check.isWysiwygFrame(ancestor) || !inst.isTextStyleNode(ancestor)) return;
 			if (ancestor.nodeName === nodeName) {
 				duple = true;
 				const styles = ancestor.style.cssText.match(/[^;]+;/g) || [];
@@ -1798,7 +1805,7 @@ function CleanElements(attrFilter, styleFilter, m, t) {
 	}
 
 	// figure
-	if (domUtils.isMedia(tagName) || domUtils.isFigure(tagName)) {
+	if (dom.check.isMedia(tagName) || dom.check.isFigure(tagName)) {
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
 		if (!v) v = [];
 		if (sv) v.push(sv[0]);

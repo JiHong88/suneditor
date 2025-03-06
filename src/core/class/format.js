@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, unicode, numbers, env } from '../../helper';
+import { dom, unicode, numbers, env } from '../../helper';
 
 /**
  * @typedef {Omit<Format & Partial<EditorInjector>, 'format'>} FormatThis
@@ -59,8 +59,8 @@ Format.prototype = {
 			node = lines[i];
 
 			if ((node.nodeName !== value || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.component.is(node)) {
-				newFormat = element.cloneNode(false);
-				domUtils.copyFormatAttributes(newFormat, node);
+				newFormat = /** @type {HTMLElement} */ (element.cloneNode(false));
+				dom.utils.copyFormatAttributes(newFormat, node);
 				newFormat.innerHTML = node.innerHTML;
 
 				node.parentNode.replaceChild(newFormat, node);
@@ -71,7 +71,7 @@ Format.prototype = {
 			newFormat = null;
 		}
 
-		this.selection.setRange(domUtils.getNodeFromPath(info.firstPath, first), info.startOffset, domUtils.getNodeFromPath(info.lastPath, last), info.endOffset);
+		this.selection.setRange(dom.query.getNodeFromPath(info.firstPath, first), info.startOffset, dom.query.getNodeFromPath(info.lastPath, last), info.endOffset);
 		this.history.push(false);
 
 		// document type
@@ -96,7 +96,7 @@ Format.prototype = {
 		}
 
 		while (node) {
-			if (domUtils.isWysiwygFrame(node)) return null;
+			if (dom.check.isWysiwygFrame(node)) return null;
 			if (this.isBlock(node)) return /** @type {HTMLElement} */ (node.firstElementChild);
 			if (this.isLine(node) && validation(node)) return /** @type {HTMLElement} */ (node);
 
@@ -119,7 +119,7 @@ Format.prototype = {
 		const lines = this._lineWork().lines;
 		const len = lines.length - 1;
 		let parentNode = lines[len].parentNode;
-		let freeElement = element.cloneNode(false);
+		let freeElement = /** @type {HTMLElement} */ (element.cloneNode(false));
 		const focusElement = freeElement;
 
 		for (let i = len, f, html, before, next, inner, isComp, first = true; i >= 0; i--) {
@@ -128,7 +128,7 @@ Format.prototype = {
 
 			isComp = this.component.is(f);
 			html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
-			before = domUtils.getParentElement(f, (current) => current.parentNode === parentNode);
+			before = dom.query.getParentElement(f, (current) => current.parentNode === parentNode);
 
 			if (parentNode !== f.parentNode || isComp) {
 				if (this.isLine(parentNode)) {
@@ -139,13 +139,13 @@ Format.prototype = {
 					parentNode = f.parentNode;
 				}
 
-				next = freeElement.nextSibling;
-				if (next && freeElement.nodeName === next.nodeName && domUtils.isSameAttributes(freeElement, next)) {
+				next = /** @type {HTMLElement} */ (freeElement.nextSibling);
+				if (next && freeElement.nodeName === next.nodeName && dom.check.isSameAttributes(freeElement, next)) {
 					freeElement.innerHTML += '<BR>' + next.innerHTML;
-					domUtils.removeItem(next);
+					dom.utils.removeItem(next);
 				}
 
-				freeElement = element.cloneNode(false);
+				freeElement = /** @type {HTMLElement} */ (element.cloneNode(false));
 				first = true;
 			}
 
@@ -154,20 +154,20 @@ Format.prototype = {
 
 			if (i === 0) {
 				parentNode.insertBefore(freeElement, f);
-				next = f.nextSibling;
-				if (next && freeElement.nodeName === next.nodeName && domUtils.isSameAttributes(freeElement, next)) {
+				next = /** @type {HTMLElement} */ (f.nextSibling);
+				if (next && freeElement.nodeName === next.nodeName && dom.check.isSameAttributes(freeElement, next)) {
 					freeElement.innerHTML += '<BR>' + next.innerHTML;
-					domUtils.removeItem(next);
+					dom.utils.removeItem(next);
 				}
 
-				const prev = freeElement.previousSibling;
-				if (prev && freeElement.nodeName === prev.nodeName && domUtils.isSameAttributes(freeElement, prev)) {
+				const prev = /** @type {HTMLElement} */ (freeElement.previousSibling);
+				if (prev && freeElement.nodeName === prev.nodeName && dom.check.isSameAttributes(freeElement, prev)) {
 					prev.innerHTML += '<BR>' + freeElement.innerHTML;
-					domUtils.removeItem(freeElement);
+					dom.utils.removeItem(freeElement);
 				}
 			}
 
-			if (!isComp) domUtils.removeItem(f);
+			if (!isComp) dom.utils.removeItem(f);
 			if (html) first = false;
 		}
 
@@ -180,7 +180,7 @@ Format.prototype = {
 	 * @description If a parent node that contains an argument node finds a "brLine" (format.isBrLine), it returns that node.
 	 * @param {Node} element Reference node.
 	 * @param {?(current: Node) => boolean=} validation Additional validation function.
-	 * @returns {Node|null}
+	 * @returns {HTMLBRElement|null}
 	 */
 	getBrLine(element, validation) {
 		if (!element) return null;
@@ -191,8 +191,8 @@ Format.prototype = {
 		}
 
 		while (element) {
-			if (domUtils.isWysiwygFrame(element)) return null;
-			if (this.isBrLine(element) && validation(element)) return element;
+			if (dom.check.isWysiwygFrame(element)) return null;
+			if (this.isBrLine(element) && validation(element)) return /** @type {HTMLBRElement} */ (element);
 
 			element = element.parentNode;
 		}
@@ -215,23 +215,17 @@ Format.prototype = {
 		const currentFormatEl = this.getLine(this.selection.getNode(), null);
 		let oFormat = null;
 		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode)) {
-			oFormat = domUtils.createElement('BR');
+			oFormat = dom.utils.createElement('BR');
 		} else {
-			const oFormatName = lineNode
-				? typeof lineNode === 'string'
-					? lineNode
-					: lineNode.nodeName
-				: this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl)
-				? currentFormatEl.nodeName
-				: this.options.get('defaultLine');
-			oFormat = domUtils.createElement(oFormatName, null, '<br>');
+			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLineOnly(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLine');
+			oFormat = dom.utils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
-				domUtils.copyTagAttributes(oFormat, /** @type {Node} */ (lineNode || currentFormatEl), ['id']);
+				dom.utils.copyTagAttributes(oFormat, /** @type {Node} */ (lineNode || currentFormatEl), ['id']);
 			}
 		}
 
-		if (domUtils.isTableCell(element)) element.insertBefore(oFormat, element.nextElementSibling);
-		else element.parentNode.insertBefore(oFormat, element.nextElementSibling);
+		if (dom.check.isTableCell(element)) element.insertBefore(oFormat, element.nextElementSibling);
+		else element.parentNode.insertBefore(oFormat, /** @type {HTMLElement} */ (element).nextElementSibling);
 
 		return oFormat;
 	},
@@ -241,7 +235,7 @@ Format.prototype = {
 	 * @description If a parent node that contains an argument node finds a format node (format.isBlock), it returns that node.
 	 * @param {Node} element Reference node.
 	 * @param {?(current: Node) => boolean=} validation Additional validation function.
-	 * @returns {Node|null}
+	 * @returns {HTMLElement|null}
 	 */
 	getBlock(element, validation) {
 		if (!element) return null;
@@ -252,7 +246,7 @@ Format.prototype = {
 		}
 
 		while (element) {
-			if (domUtils.isWysiwygFrame(element)) return null;
+			if (dom.check.isWysiwygFrame(element)) return null;
 			if (this.isBlock(element) && !/^(THEAD|TBODY|TR)$/i.test(element.nodeName) && validation(element)) return element;
 			element = element.parentNode;
 		}
@@ -263,24 +257,24 @@ Format.prototype = {
 	/**
 	 * @this {FormatThis}
 	 * @description Appended all selected "line" element to the argument element("block") and insert
-	 * @param {Node} block Element of wrap the arguments (BLOCKQUOTE...)
+	 * @param {Node} blockElement Element of wrap the arguments (BLOCKQUOTE...)
 	 */
-	applyBlock(block) {
+	applyBlock(blockElement) {
 		this.selection.getRangeAndAddLine(this.selection.getRange(), null);
-		const rangeLines = this.getLinesAndComponents(false);
+		const rangeLines = /** @type {Element[]} */ (this.getLinesAndComponents(false));
 		if (!rangeLines || rangeLines.length === 0) return;
 
 		linesLoop: for (let i = 0, len = rangeLines.length, line, nested, fEl, lEl, f, l; i < len; i++) {
 			line = rangeLines[i];
-			if (!domUtils.isListCell(line)) continue;
+			if (!dom.check.isListCell(line)) continue;
 
 			nested = line.lastElementChild;
-			if (nested && domUtils.isListCell(line.nextElementSibling) && rangeLines.includes(line.nextElementSibling)) {
+			if (nested && dom.check.isListCell(line.nextElementSibling) && rangeLines.includes(line.nextElementSibling)) {
 				lEl = nested.lastElementChild;
 				if (rangeLines.includes(lEl)) {
 					let list = null;
 					while ((list = lEl.lastElementChild)) {
-						if (domUtils.isList(list)) {
+						if (dom.check.isList(list)) {
 							if (rangeLines.includes(list.lastElementChild)) {
 								lEl = list.lastElementChild;
 							} else {
@@ -308,7 +302,7 @@ Format.prototype = {
 			standTag = this.getBlock(last, null) || this.getLine(last, null);
 		}
 
-		if (domUtils.isTableCell(standTag)) {
+		if (dom.check.isTableCell(standTag)) {
 			beforeTag = null;
 			pElement = standTag;
 		} else {
@@ -316,14 +310,14 @@ Format.prototype = {
 			pElement = standTag.parentNode;
 		}
 
-		block = block.cloneNode(false);
-		let parentDepth = domUtils.getNodeDepth(standTag);
+		const block = /** @type {HTMLElement} */ (blockElement.cloneNode(false));
+		let parentDepth = dom.query.getNodeDepth(standTag);
 		let listParent = null;
 		const lineArr = [];
 		const removeItems = (parent, origin, before) => {
 			let cc = null;
-			if (parent !== origin && !domUtils.isTableElements(origin)) {
-				if (origin && domUtils.getNodeDepth(parent) === domUtils.getNodeDepth(origin)) return before;
+			if (parent !== origin && !dom.check.isTableElements(origin)) {
+				if (origin && dom.query.getNodeDepth(parent) === dom.query.getNodeDepth(origin)) return before;
 				cc = this.nodeTransform.removeAllParents(origin, null, parent);
 			}
 
@@ -335,9 +329,9 @@ Format.prototype = {
 			originParent = line.parentNode;
 			if (!originParent || block.contains(originParent)) continue;
 
-			depth = domUtils.getNodeDepth(line);
+			depth = dom.query.getNodeDepth(line);
 
-			if (domUtils.isList(originParent)) {
+			if (dom.check.isList(originParent)) {
 				if (listParent === null) {
 					if (nextList) {
 						listParent = nextList;
@@ -359,8 +353,8 @@ Format.prototype = {
 
 					let list = originParent.parentNode,
 						p;
-					while (domUtils.isList(list)) {
-						p = domUtils.createElement(list.nodeName);
+					while (dom.check.isList(list)) {
+						p = dom.utils.createElement(list.nodeName);
 						p.appendChild(listParent);
 						listParent = p;
 						list = list.parentNode;
@@ -410,12 +404,12 @@ Format.prototype = {
 
 		this.editor.effectNode = null;
 		this.nodeTransform.mergeSameTags(block, null, false);
-		this.nodeTransform.mergeNestedTags(block, (current) => domUtils.isList(current));
+		this.nodeTransform.mergeNestedTags(block, (current) => dom.check.isList(current));
 
 		// Nested list
-		if (beforeTag && domUtils.getNodeDepth(beforeTag) > 0 && (domUtils.isList(beforeTag.parentNode) || domUtils.isList(beforeTag.parentNode.parentNode))) {
-			const depthFormat = domUtils.getParentElement(beforeTag, (current) => this.isBlock(current) && !domUtils.isList(current));
-			const splitRange = this.nodeTransform.split(beforeTag, null, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
+		if (beforeTag && dom.query.getNodeDepth(beforeTag) > 0 && (dom.check.isList(beforeTag.parentNode) || dom.check.isList(beforeTag.parentNode.parentNode))) {
+			const depthFormat = dom.query.getParentElement(beforeTag, (current) => this.isBlock(current) && !dom.check.isList(current));
+			const splitRange = this.nodeTransform.split(beforeTag, null, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
 			splitRange.parentNode.insertBefore(block, splitRange);
 		} else {
 			// basic
@@ -423,7 +417,7 @@ Format.prototype = {
 			removeItems(block, beforeTag);
 		}
 
-		const edge = domUtils.getEdgeChildNodes(block.firstElementChild, block.lastElementChild);
+		const edge = dom.query.getEdgeChildNodes(block.firstElementChild, block.lastElementChild);
 		if (rangeLines.length > 1) {
 			this.selection.setRange(edge.sc, 0, edge.ec, edge.ec.textContent.length);
 		} else {
@@ -443,7 +437,7 @@ Format.prototype = {
 	 * - If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
 	 * @param {Node} [options.newBlockElement=null] The node(blockElement) to replace the currently wrapped node.
 	 * @param {boolean} [options.shouldDelete=false] If true, deleted without detached.
-	 * @param {boolean} [options.skipHistory=false] When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
+	 * @param {boolean} [options.skipHistory=false] When true, it does not update the history stack and the selection object and return EdgeNodes (dom-query-GetEdgeChildNodes)
 	 * @returns {{cc: Node, sc: Node, so: number, ec: Node, eo: number, removeArray: Array<Node>|null}} Node information after deletion
 	 * - cc: Common parent container node
 	 * - sc: Start container node
@@ -457,20 +451,20 @@ Format.prototype = {
 		let so = range.startOffset;
 		let eo = range.endOffset;
 
-		let children = domUtils.getListChildNodes(blockElement, (current) => current.parentNode === blockElement);
+		let children = dom.query.getListChildNodes(blockElement, (current) => current.parentNode === blockElement);
 		let parent = blockElement.parentNode;
 		let firstNode = null;
 		let lastNode = null;
-		let rangeEl = blockElement.cloneNode(false);
+		let rangeEl = /** @type {HTMLElement} */ (blockElement.cloneNode(false));
 
 		const removeArray = [];
-		const newList = domUtils.isList(newBlockElement);
+		const newList = dom.check.isList(newBlockElement);
 		let insertedNew = false;
 		let reset = false;
 		let moveComplete = false;
 
 		const appendNode = (parentEl, insNode, sibling, originNode) => {
-			if (domUtils.isZeroWidth(insNode)) {
+			if (dom.check.isZeroWidth(insNode)) {
 				insNode.innerHTML = unicode.zeroWidthSpace;
 				so = eo = 1;
 			}
@@ -487,7 +481,7 @@ Format.prototype = {
 
 			while (insChildren[0]) {
 				c = insChildren[0];
-				if (this._notTextNode(c) && !domUtils.isBreak(c) && !domUtils.isListCell(format)) {
+				if (this._notTextNode(c) && !dom.check.isBreak(c) && !dom.check.isListCell(format)) {
 					if (format.childNodes.length > 0) {
 						if (!first) first = format;
 						parentEl.insertBefore(format, sibling);
@@ -501,7 +495,7 @@ Format.prototype = {
 			}
 
 			if (format.childNodes.length > 0) {
-				if (domUtils.isListCell(parentEl) && domUtils.isListCell(format) && domUtils.isList(sibling)) {
+				if (dom.check.isListCell(parentEl) && dom.check.isListCell(format) && dom.check.isList(sibling)) {
 					if (newList) {
 						first = sibling;
 						while (sibling) {
@@ -535,7 +529,7 @@ Format.prototype = {
 		// detach loop
 		for (let i = 0, len = children.length, insNode, lineIndex, next; i < len; i++) {
 			insNode = children[i];
-			if (insNode.nodeType === 3 && domUtils.isList(rangeEl)) continue;
+			if (insNode.nodeType === 3 && dom.check.isList(rangeEl)) continue;
 
 			moveComplete = false;
 			if (shouldDelete && i === 0) {
@@ -548,7 +542,7 @@ Format.prototype = {
 
 			if (selectedFormats) lineIndex = selectedFormats.indexOf(insNode);
 			if (selectedFormats && lineIndex === -1) {
-				if (!rangeEl) rangeEl = blockElement.cloneNode(false);
+				if (!rangeEl) rangeEl = /** @type {HTMLElement} */ (blockElement.cloneNode(false));
 				rangeEl.appendChild(insNode);
 			} else {
 				if (selectedFormats) next = selectedFormats[lineIndex + 1];
@@ -557,8 +551,8 @@ Format.prototype = {
 					rangeEl = null;
 				}
 
-				if (!newList && domUtils.isListCell(insNode)) {
-					if (next && domUtils.getNodeDepth(insNode) !== domUtils.getNodeDepth(next) && (domUtils.isListCell(parent) || domUtils.arrayFind(insNode.children, domUtils.isList))) {
+				if (!newList && dom.check.isListCell(insNode)) {
+					if (next && dom.query.getNodeDepth(insNode) !== dom.query.getNodeDepth(next) && (dom.check.isListCell(parent) || dom.utils.arrayFind(insNode.children, dom.check.isList))) {
 						const insNext = insNode.nextElementSibling;
 						const detachRange = this._removeNestedList(insNode, false);
 						if (blockElement !== detachRange || insNext !== insNode.nextElementSibling) {
@@ -567,22 +561,22 @@ Format.prototype = {
 						}
 					} else {
 						const inner = insNode;
-						insNode = domUtils.createElement(
+						insNode = dom.utils.createElement(
 							shouldDelete
 								? inner.nodeName
-								: domUtils.isList(blockElement.parentNode) || domUtils.isListCell(blockElement.parentNode)
+								: dom.check.isList(blockElement.parentNode) || dom.check.isListCell(blockElement.parentNode)
 								? 'LI'
-								: domUtils.isTableCell(blockElement.parentNode)
+								: dom.check.isTableCell(blockElement.parentNode)
 								? 'DIV'
 								: this.options.get('defaultLine')
 						);
-						const isCell = domUtils.isListCell(insNode);
+						const isCell = dom.check.isListCell(insNode);
 						const innerChildren = inner.childNodes;
 						while (innerChildren[0]) {
-							if (domUtils.isList(innerChildren[0]) && !isCell) break;
+							if (dom.check.isList(innerChildren[0]) && !isCell) break;
 							insNode.appendChild(innerChildren[0]);
 						}
-						domUtils.copyFormatAttributes(insNode, inner);
+						dom.utils.copyFormatAttributes(insNode, inner);
 						moveComplete = true;
 					}
 				} else {
@@ -613,13 +607,13 @@ Format.prototype = {
 						}
 					} else {
 						removeArray.push(insNode);
-						domUtils.removeItem(children[i]);
+						dom.utils.removeItem(children[i]);
 					}
 
 					if (reset) {
 						reset = moveComplete = false;
-						children = domUtils.getListChildNodes(blockElement, (current) => current.parentNode === blockElement);
-						rangeEl = blockElement.cloneNode(false);
+						children = dom.query.getListChildNodes(blockElement, (current) => current.parentNode === blockElement);
+						rangeEl = /** @type {HTMLElement} */ (blockElement.cloneNode(false));
 						parent = blockElement.parentNode;
 						i = -1;
 						len = children.length;
@@ -639,8 +633,8 @@ Format.prototype = {
 		else if (!firstNode) firstNode = blockElement.previousSibling;
 		rangeRight = blockElement.nextSibling !== rangeEl ? blockElement.nextSibling : rangeEl ? rangeEl.nextSibling : null;
 
-		if (blockElement.children.length === 0 || blockElement.textContent.length === 0) {
-			domUtils.removeItem(blockElement);
+		if (/** @type {HTMLElement} */ (blockElement).children.length === 0 || blockElement.textContent.length === 0) {
+			dom.utils.removeItem(blockElement);
 		} else {
 			this.nodeTransform.removeEmptyNode(blockElement, null, false);
 		}
@@ -658,7 +652,7 @@ Format.prototype = {
 		} else {
 			if (!firstNode) firstNode = lastNode;
 			if (!lastNode) lastNode = firstNode;
-			const childEdge = domUtils.getEdgeChildNodes(firstNode, lastNode.parentNode ? firstNode : lastNode);
+			const childEdge = dom.query.getEdgeChildNodes(firstNode, lastNode.parentNode ? firstNode : lastNode);
 			edge = {
 				cc: (childEdge.sc || childEdge.ec).parentNode,
 				sc: childEdge.sc,
@@ -695,7 +689,7 @@ Format.prototype = {
 		const listStyle = type.split(':')[1] || '';
 
 		let range = this.selection.getRange();
-		let selectedFormats = !selectedCells ? this.getLinesAndComponents(false) : selectedCells;
+		let selectedFormats = /** @type {Array<HTMLElement>} */ (!selectedCells ? this.getLinesAndComponents(false) : selectedCells);
 
 		if (selectedFormats.length === 0) {
 			if (selectedCells) return;
@@ -704,18 +698,18 @@ Format.prototype = {
 			if (selectedFormats.length === 0) return;
 		}
 
-		domUtils.sortNodeByDepth(selectedFormats, true);
+		dom.query.sortNodeByDepth(selectedFormats, true);
 
 		// merge
 		const firstSel = selectedFormats[0];
 		const lastSel = selectedFormats[selectedFormats.length - 1];
-		let topEl = (domUtils.isListCell(firstSel) || this.component.is(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
-		let bottomEl = (domUtils.isListCell(lastSel) || this.component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
+		let topEl = (dom.check.isListCell(firstSel) || this.component.is(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentElement.previousElementSibling : firstSel.previousElementSibling;
+		let bottomEl = (dom.check.isListCell(lastSel) || this.component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentElement.nextElementSibling : lastSel.nextElementSibling;
 
 		const isCollapsed = range.collapsed;
 		const originRange = {
 			sc: range.startContainer,
-			so: range.startContainer === range.endContainer && domUtils.isZeroWidth(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
+			so: range.startContainer === range.endContainer && dom.check.isZeroWidth(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
 			ec: range.endContainer,
 			eo: range.endOffset
 		};
@@ -723,7 +717,7 @@ Format.prototype = {
 		let isRemove = true;
 
 		for (let i = 0, len = selectedFormats.length; i < len; i++) {
-			if (!domUtils.isList(this.getBlock(selectedFormats[i], (current) => this.getBlock(current) && current !== selectedFormats[i]))) {
+			if (!dom.check.isList(this.getBlock(selectedFormats[i], (current) => this.getBlock(current) && current !== selectedFormats[i]))) {
 				isRemove = false;
 				break;
 			}
@@ -751,22 +745,22 @@ Format.prototype = {
 			};
 
 			if (!cancel) {
-				tempList = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
+				tempList = dom.utils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 			}
 
 			for (let i = 0, len = selectedFormats.length, r, o; i < len; i++) {
 				o = this.getBlock(selectedFormats[i], passComponent);
-				if (!o || !domUtils.isList(o)) continue;
+				if (!o || !dom.check.isList(o)) continue;
 
 				if (!r) {
 					r = o;
 					rangeArr = {
 						r: r,
-						f: [domUtils.getParentElement(selectedFormats[i], 'LI')]
+						f: [dom.query.getParentElement(selectedFormats[i], 'LI')]
 					};
 				} else {
 					if (r !== o) {
-						if (nested && domUtils.isListCell(o.parentNode)) {
+						if (nested && dom.check.isListCell(o.parentNode)) {
 							this._detachNested(rangeArr.f);
 						} else {
 							afterRange = this.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
@@ -774,21 +768,21 @@ Format.prototype = {
 
 						o = selectedFormats[i].parentNode;
 						if (!cancel) {
-							tempList = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
+							tempList = dom.utils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 						}
 
 						r = o;
 						rangeArr = {
 							r: r,
-							f: [domUtils.getParentElement(selectedFormats[i], 'LI')]
+							f: [dom.query.getParentElement(selectedFormats[i], 'LI')]
 						};
 					} else {
-						rangeArr.f.push(domUtils.getParentElement(selectedFormats[i], 'LI'));
+						rangeArr.f.push(dom.query.getParentElement(selectedFormats[i], 'LI'));
 					}
 				}
 
 				if (i === len - 1) {
-					if (nested && domUtils.isListCell(o.parentNode)) {
+					if (nested && dom.check.isListCell(o.parentNode)) {
 						this._detachNested(rangeArr.f);
 					} else {
 						afterRange = this.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
@@ -798,38 +792,38 @@ Format.prototype = {
 		} else {
 			const topElParent = topEl ? topEl.parentNode : topEl;
 			const bottomElParent = bottomEl ? bottomEl.parentNode : bottomEl;
-			topEl = topElParent && !domUtils.isWysiwygFrame(topElParent) && topElParent.nodeName === listTag ? topElParent : topEl;
-			bottomEl = bottomElParent && !domUtils.isWysiwygFrame(bottomElParent) && bottomElParent.nodeName === listTag ? bottomElParent : bottomEl;
+			topEl = /** @type {HTMLElement} */ (topElParent && !dom.check.isWysiwygFrame(topElParent) && topElParent.nodeName === listTag ? topElParent : topEl);
+			bottomEl = /** @type {HTMLElement} */ (bottomElParent && !dom.check.isWysiwygFrame(bottomElParent) && bottomElParent.nodeName === listTag ? bottomElParent : bottomEl);
 
 			const mergeTop = topEl?.tagName === listTag;
 			const mergeBottom = bottomEl?.tagName === listTag;
 
-			let list = mergeTop ? topEl : domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
+			let list = mergeTop ? topEl : dom.utils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 			let firstList = null;
 			let topNumber = null;
 			// let lastList = null;
 			// let bottomNumber = null;
 
 			const passComponent = (current) => {
-				return !this.component.is(current) && !domUtils.isList(current);
+				return !this.component.is(current) && !dom.check.isList(current);
 			};
 
 			for (let i = 0, len = selectedFormats.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
 				fTag = selectedFormats[i];
 				if (fTag.childNodes.length === 0 && !this._isIgnoreNodeChange(fTag)) {
-					domUtils.removeItem(fTag);
+					dom.utils.removeItem(fTag);
 					continue;
 				}
 				next = selectedFormats[i + 1];
 				originParent = fTag.parentNode;
 				nextParent = next ? next.parentNode : null;
-				isCell = domUtils.isListCell(fTag);
+				isCell = dom.check.isListCell(fTag);
 				rangeTag = this.isBlock(originParent) ? originParent : null;
-				parentTag = isCell && !domUtils.isWysiwygFrame(originParent) ? originParent.parentNode : originParent;
-				siblingTag = isCell && !domUtils.isWysiwygFrame(originParent) ? (!next || domUtils.isListCell(parentTag) ? originParent : originParent.nextSibling) : fTag.nextSibling;
+				parentTag = isCell && !dom.check.isWysiwygFrame(originParent) ? originParent.parentNode : originParent;
+				siblingTag = isCell && !dom.check.isWysiwygFrame(originParent) ? (!next || dom.check.isListCell(parentTag) ? originParent : originParent.nextSibling) : fTag.nextSibling;
 
-				newCell = domUtils.createElement('LI');
-				domUtils.copyFormatAttributes(newCell, fTag);
+				newCell = dom.utils.createElement('LI');
+				dom.utils.copyFormatAttributes(newCell, fTag);
 				if (this.component.is(fTag)) {
 					const isHR = /^HR$/i.test(fTag.nodeName);
 					if (!isHR) newCell.innerHTML = '<br>';
@@ -846,22 +840,22 @@ Format.prototype = {
 				// if (!next) lastList = list;
 				if (!next || parentTag !== nextParent || this.isBlock(siblingTag)) {
 					if (!firstList) firstList = list;
-					if ((!mergeTop || !next || parentTag !== nextParent) && !(next && domUtils.isList(nextParent) && nextParent === originParent)) {
+					if ((!mergeTop || !next || parentTag !== nextParent) && !(next && dom.check.isList(nextParent) && nextParent === originParent)) {
 						if (list.parentNode !== parentTag) parentTag.insertBefore(list, siblingTag);
 					}
 				}
 
-				domUtils.removeItem(fTag);
+				dom.utils.removeItem(fTag);
 				if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
 				if (
 					next &&
 					(this.getBlock(nextParent, passComponent) !== this.getBlock(originParent, passComponent) ||
-						(domUtils.isList(nextParent) && domUtils.isList(originParent) && domUtils.getNodeDepth(nextParent) !== domUtils.getNodeDepth(originParent)))
+						(dom.check.isList(nextParent) && dom.check.isList(originParent) && dom.query.getNodeDepth(nextParent) !== dom.query.getNodeDepth(originParent)))
 				) {
-					list = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
+					list = dom.utils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 				}
 
-				if (rangeTag?.children.length === 0) domUtils.removeItem(rangeTag);
+				if (rangeTag?.children.length === 0) dom.utils.removeItem(rangeTag);
 			}
 
 			if (topNumber) {
@@ -872,7 +866,7 @@ Format.prototype = {
 				// bottomNumber = list.children.length - 1;
 				list.innerHTML += bottomEl.innerHTML;
 				// lastList = list.children[bottomNumber] || lastList;
-				domUtils.removeItem(bottomEl);
+				dom.utils.removeItem(bottomEl);
 			}
 		}
 
@@ -903,12 +897,12 @@ Format.prototype = {
 		for (let i = 0, len = selectedCells.length, r, o, lastIndex, isList; i < len; i++) {
 			lastIndex = i === len - 1;
 			o = this.getBlock(selectedCells[i], passComponent);
-			isList = domUtils.isList(o);
+			isList = dom.check.isList(o);
 			if (!r && isList) {
 				r = o;
 				rangeArr = {
 					r: r,
-					f: [domUtils.getParentElement(selectedCells[i], 'LI')]
+					f: [dom.query.getParentElement(selectedCells[i], 'LI')]
 				};
 				if (i === 0) listFirst = true;
 			} else if (r && isList) {
@@ -925,19 +919,19 @@ Format.prototype = {
 						r = o;
 						rangeArr = {
 							r: r,
-							f: [domUtils.getParentElement(selectedCells[i], 'LI')]
+							f: [dom.query.getParentElement(selectedCells[i], 'LI')]
 						};
 						if (lastIndex) listLast = true;
 					} else {
 						r = null;
 					}
 				} else {
-					rangeArr.f.push(domUtils.getParentElement(selectedCells[i], 'LI'));
+					rangeArr.f.push(dom.query.getParentElement(selectedCells[i], 'LI'));
 					if (lastIndex) listLast = true;
 				}
 			}
 
-			if (lastIndex && domUtils.isList(r)) {
+			if (lastIndex && dom.check.isList(r)) {
 				const edge = this.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: null, shouldDelete, skipHistory: true });
 				if (listLast || len === 1) last = edge.ec;
 				if (listFirst) first = edge.sc || last;
@@ -1011,7 +1005,7 @@ Format.prototype = {
 	 *        If empty array or null when styleNode is null, all formats are removed.
 	 *        (e.g., ['span'], ['strong', 'em'])
 	 * @param {boolean} [options.strictRemove=false] If true, only removes nodes from nodesToRemove if all styles and classes are removed.
-	 * @returns {Node} The element that was added to or modified in the selection.
+	 * @returns {HTMLElement} The element that was added to or modified in the selection.
 	 *
 	 * @details
 	 * 1. If styleNode is provided, a node with the same tags and attributes is added to the selected text.
@@ -1027,7 +1021,7 @@ Format.prototype = {
 	 * - However, if nodesToRemove has values, it will work and separate text nodes even if there's no node to replace.
 	 */
 	applyInlineElement(styleNode, { stylesToModify, nodesToRemove, strictRemove } = {}) {
-		if (domUtils.getParentElement(this.selection.getNode(), domUtils.isNonEditable)) return;
+		if (dom.query.getParentElement(this.selection.getNode(), dom.check.isNonEditable)) return;
 
 		this.selection._resetRangeToTextNode();
 		let range = this.selection.getRangeAndAddLine(this.selection.getRange(), null);
@@ -1041,10 +1035,10 @@ Format.prototype = {
 		let endCon = range.endContainer;
 		let endOff = range.endOffset;
 
-		if ((isRemoveFormat && range.collapsed && this.isLine(startCon.parentNode) && this.isLine(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && domUtils.isNonEditable(startCon))) {
+		if ((isRemoveFormat && range.collapsed && this.isLine(startCon.parentNode) && this.isLine(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && dom.check.isNonEditable(startCon))) {
 			const format = startCon.parentNode;
 			if (
-				!domUtils.isListCell(format) ||
+				!dom.check.isListCell(format) ||
 				!env.getValues(format.style).some((k) => {
 					return this._listKebab.includes(k);
 				})
@@ -1054,7 +1048,7 @@ Format.prototype = {
 		}
 
 		if (range.collapsed && !isRemoveFormat) {
-			if (startCon.nodeType === 1 && !domUtils.isBreak(startCon) && !this.component.is(startCon)) {
+			if (startCon.nodeType === 1 && !dom.check.isBreak(startCon) && !this.component.is(startCon)) {
 				let afterNode = null;
 				const focusNode = startCon.childNodes[startOff];
 
@@ -1062,11 +1056,11 @@ Format.prototype = {
 					if (!focusNode.nextSibling) {
 						afterNode = null;
 					} else {
-						afterNode = domUtils.isBreak(focusNode) ? focusNode : focusNode.nextSibling;
+						afterNode = dom.check.isBreak(focusNode) ? focusNode : focusNode.nextSibling;
 					}
 				}
 
-				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+				const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				startCon.insertBefore(zeroWidth, afterNode);
 				this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 
@@ -1088,7 +1082,7 @@ Format.prototype = {
 		}
 
 		if (isRemoveNode) {
-			styleNode = domUtils.createElement('DIV');
+			styleNode = dom.utils.createElement('DIV');
 		}
 
 		const wRegExp = RegExp;
@@ -1100,25 +1094,28 @@ Format.prototype = {
 			let checkCnt = 0;
 			const checkAttrs = [];
 
-			const checkStyles = styleNode.style;
+			const checkStyles = /** @type {HTMLElement} */ (styleNode).style;
 			for (let i = 0, len = checkStyles.length; i < len; i++) {
 				checkAttrs.push(checkStyles[i]);
 			}
 
-			const ckeckClasses = styleNode.classList;
+			const checkClassName = /** @type {HTMLElement} */ (styleNode).className;
+			const ckeckClasses = /** @type {HTMLElement} */ (styleNode).classList;
 			for (let i = 0, len = ckeckClasses.length; i < len; i++) {
 				checkAttrs.push('.' + ckeckClasses[i]);
 			}
 
 			if (checkAttrs.length > 0) {
-				while (!this.isLine(sNode) && !domUtils.isWysiwygFrame(sNode)) {
+				while (!this.isLine(sNode) && !dom.check.isWysiwygFrame(sNode)) {
 					for (let i = 0; i < checkAttrs.length; i++) {
 						if (sNode.nodeType === 1) {
 							const s = checkAttrs[i];
 							const classReg = /^\./.test(s) ? new wRegExp('\\s*' + s.replace(/^\./, '') + '(\\s+|$)', 'ig') : false;
+							const sNodeStyle = /** @type {HTMLElement} */ (sNode).style;
+							const sNodeClassName = /** @type {HTMLElement} */ (sNode).className;
 
-							const styleCheck = isRemoveNode ? !!sNode.style[s] : !!sNode.style[s] && !!styleNode.style[s] && sNode.style[s] === styleNode.style[s];
-							const classCheck = classReg === false ? false : isRemoveNode ? !!sNode.className.match(classReg) : !!sNode.className.match(classReg) && !!styleNode.className.match(classReg);
+							const styleCheck = isRemoveNode ? !!sNodeStyle[s] : !!sNodeStyle[s] && !!checkStyles[s] && sNodeStyle[s] === checkStyles[s];
+							const classCheck = classReg === false ? false : isRemoveNode ? !!sNodeClassName.match(classReg) : !!sNodeClassName.match(classReg) && !!checkClassName.match(classReg);
 							if (styleCheck || classCheck) {
 								checkCnt++;
 							}
@@ -1182,7 +1179,7 @@ Format.prototype = {
 			const vNode = checkNode.cloneNode(false);
 
 			// all path
-			if (vNode.nodeType === 3 || domUtils.isBreak(vNode)) return vNode;
+			if (vNode.nodeType === 3 || dom.check.isBreak(vNode)) return vNode;
 			// all remove
 			if (isRemoveFormat) return null;
 
@@ -1252,7 +1249,7 @@ Format.prototype = {
 		endOff = range.endOffset;
 
 		if (!this.getLine(startCon, null)) {
-			startCon = domUtils.getEdgeChild(
+			startCon = dom.query.getEdgeChild(
 				lineNodes[0],
 				function (current) {
 					return current.nodeType === 3;
@@ -1263,7 +1260,7 @@ Format.prototype = {
 		}
 
 		if (!this.getLine(endCon, null)) {
-			endCon = domUtils.getEdgeChild(
+			endCon = dom.query.getEdgeChild(
 				lineNodes[lineNodes.length - 1],
 				function (current) {
 					return current.nodeType === 3;
@@ -1303,7 +1300,7 @@ Format.prototype = {
 			end.container = newRange.endContainer;
 			end.offset = newRange.endOffset;
 
-			if (start.container === end.container && domUtils.isZeroWidth(start.container)) {
+			if (start.container === end.container && dom.check.isZeroWidth(start.container)) {
 				start.offset = end.offset = 1;
 			}
 			this._sn_setCommonListStyle(newRange.ancestor, null);
@@ -1358,7 +1355,7 @@ Format.prototype = {
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
 		this.history.push(false);
 
-		return newNode;
+		return /** @type {HTMLElement} */ (newNode);
 	},
 
 	/**
@@ -1375,15 +1372,15 @@ Format.prototype = {
 	 * @param {Node} node The node of the selection object. (range.startContainer..)
 	 * @param {number} offset The offset of the selection object. (selection.getRange().startOffset...)
 	 * @param {"front"|"end"} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
-	 * @returns {boolean}
+	 * @returns {node is HTMLElement}
 	 */
 	isEdgeLine(node, offset, dir) {
-		if (!domUtils.isEdgePoint(node, offset, dir)) return false;
+		if (!dom.check.isEdgePoint(node, offset, dir)) return false;
 
 		let result = false;
 		const siblingType = dir === 'front' ? 'previousSibling' : 'nextSibling';
-		while (node && !this.isLine(node) && !domUtils.isWysiwygFrame(node)) {
-			if (!node[siblingType] || (domUtils.isBreak(node[siblingType]) && !node[siblingType][siblingType])) {
+		while (node && !this.isLine(node) && !dom.check.isWysiwygFrame(node)) {
+			if (!node[siblingType] || (dom.check.isBreak(node[siblingType]) && !node[siblingType][siblingType])) {
 				result = true;
 				node = node.parentNode;
 			} else {
@@ -1398,7 +1395,7 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description It is judged whether it is a node related to the text style.
 	 * @param {Node|string} element The node to check
-	 * @returns {boolean}
+	 * @returns {element is HTMLElement}
 	 */
 	isTextStyleNode(element) {
 		return typeof element === 'string' ? this._textStyleTagsCheck.test(element) : element && element.nodeType === 1 && this._textStyleTagsCheck.test(element.nodeName);
@@ -1410,24 +1407,23 @@ Format.prototype = {
 	 * - (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
 	 * - "line" element also contain "brLine" element
 	 * @param {Node|string} element The node to check
-	 * @returns {boolean}
+	 * @returns {element is HTMLElement}
 	 */
 	isLine(element) {
+		if (this.isBlock(element)) return false;
 		return typeof element === 'string'
 			? this._formatLineCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this._nonFormat(element);
+			: element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this._nonFormat(element);
 	},
 
 	/**
 	 * @this {FormatThis}
-	 * @description It is judged whether it is the only "line" element, not block.
-	 * - (td, th, li)
-	 * "line" element also contain "brLine" element"
+	 * @description It is judged whether it is the only "line" element, not "brLine".
 	 * @param {Node|string} element The node to check
-	 * @returns {boolean}
+	 * @returns {element is HTMLElement}
 	 */
 	isLineOnly(element) {
-		return this._formatLineCheck.test(element) && !this._formatBlockCheck.test(element);
+		return this.isLine(element) && !this.isBrLine(element);
 	},
 
 	/**
@@ -1438,12 +1434,12 @@ Format.prototype = {
 	 * - "brLine" elements's line break is "BR" tag.
 	 * ※ Entering the Enter key in the space on the last line ends "brLine" and appends "line".
 	 * @param {Node|string} element The node to check
-	 * @returns {boolean}
+	 * @returns {element is HTMLElement}
 	 */
 	isBrLine(element) {
 		return typeof element === 'string'
 			? this._formatBrLineCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element);
+			: element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1452,12 +1448,12 @@ Format.prototype = {
 	 * - (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
 	 * - "block" is wrap the "line" and "component"
 	 * @param {Node|string} element The node to check
-	 * @returns {boolean}
+	 * @returns {element is HTMLElement}
 	 */
 	isBlock(element) {
 		return typeof element === 'string'
 			? this._formatBlockCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__block_.+')) && !this._nonFormat(element);
+			: element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1469,12 +1465,12 @@ Format.prototype = {
 	 * - ※ You cannot exit this format with the Enter key or Backspace key.
 	 * - ※ Use it only in special cases. ([ex] format of table cells)
 	 * @param {Node|string} element The node to check
-	 * @returns {boolean}
+	 * @returns {element is HTMLElement}
 	 */
 	isClosureBlock(element) {
 		return typeof element === 'string'
 			? this._formatClosureBlockCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__block_closure_.+')) && !this._nonFormat(element);
+			: element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_closure_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1486,25 +1482,25 @@ Format.prototype = {
 	 * - ※ You cannot exit this format with the Enter key or Backspace key.
 	 * - ※ Use it only in special cases. ([ex] format of table cells)
 	 * @param {Node|string} element The node to check
-	 * @returns {boolean}
+	 * @returns {element is HTMLElement}
 	 */
 	isClosureBrLine(element) {
 		return typeof element === 'string'
 			? this._formatClosureBrLineCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '__se__format__br_line__closure_.+')) && !this._nonFormat(element);
+			: element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line__closure_.+')) && !this._nonFormat(element);
 	},
 
 	/**
 	 * @this {FormatThis}
 	 * @description Returns a "line" array from selected range.
 	 * @param {?(current: Node) => boolean=} validation The validation function. (Replaces the default validation format.isLine(current))
-	 * @returns {Array}
+	 * @returns {Array<HTMLElement>}
 	 */
 	getLines(validation) {
 		if (!this.selection._resetRangeToTextNode()) return [];
 		let range = this.selection.getRange();
 
-		if (domUtils.isWysiwygFrame(range.startContainer)) {
+		if (dom.check.isWysiwygFrame(range.startContainer)) {
 			const children = this.editor.frameContext.get('wysiwyg').children;
 			if (children.length === 0) return [];
 
@@ -1517,11 +1513,11 @@ Format.prototype = {
 		const commonCon = range.commonAncestorContainer;
 
 		// get line nodes
-		const lineNodes = domUtils.getListChildren(commonCon, (current) => {
+		const lineNodes = dom.query.getListChildren(commonCon, (current) => {
 			return validation ? validation(current) : this.isLine(current);
 		});
 
-		if (!domUtils.isWysiwygFrame(commonCon) && !this.isBlock(commonCon)) lineNodes.unshift(this.getLine(commonCon, null));
+		if (!dom.check.isWysiwygFrame(commonCon) && !this.isBlock(commonCon)) lineNodes.unshift(this.getLine(commonCon, null));
 		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
 
 		const startLine = this.getLine(startCon, null);
@@ -1530,13 +1526,13 @@ Format.prototype = {
 		let endIdx = null;
 
 		const onlyTable = function (current) {
-			return domUtils.isTableElements(current) ? /^TABLE$/i.test(current.nodeName) : true;
+			return dom.check.isTableElements(current) ? /^TABLE$/i.test(current.nodeName) : true;
 		};
 
 		let startRangeEl = this.getBlock(startLine, onlyTable);
 		let endRangeEl = this.getBlock(endLine, onlyTable);
-		if (domUtils.isTableElements(startRangeEl) && domUtils.isListCell(startRangeEl.parentNode)) startRangeEl = startRangeEl.parentNode;
-		if (domUtils.isTableElements(endRangeEl) && domUtils.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
+		if (dom.check.isTableElements(startRangeEl) && dom.check.isListCell(startRangeEl.parentNode)) startRangeEl = startRangeEl.parentNode;
+		if (dom.check.isTableElements(endRangeEl) && dom.check.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
 
 		const sameRange = startRangeEl === endRangeEl;
 		for (let i = 0, len = lineNodes.length, line; i < len; i++) {
@@ -1564,15 +1560,15 @@ Format.prototype = {
 	 * @description Get lines and components from the selected range. (P, DIV, H[1-6], OL, UL, TABLE..)
 	 * - If some of the component are included in the selection, get the entire that component.
 	 * @param {boolean} removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
-	 * @returns {Array}
+	 * @returns {Array<HTMLElement>}
 	 */
 	getLinesAndComponents(removeDuplicate) {
 		const commonCon = this.selection.getRange().commonAncestorContainer;
-		const myComponent = domUtils.getParentElement(commonCon, this.component.is.bind(this.component));
-		const selectedLines = domUtils.isTableElements(commonCon)
+		const myComponent = dom.query.getParentElement(commonCon, this.component.is.bind(this.component));
+		const selectedLines = dom.check.isTableElements(commonCon)
 			? this.getLines(null)
 			: this.getLines((current) => {
-					const component = domUtils.getParentElement(current, this.component.is.bind(this.component));
+					const component = dom.query.getParentElement(current, this.component.is.bind(this.component));
 					return (this.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.getLine(current));
 			  });
 
@@ -1611,7 +1607,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	_nonFormat(element) {
-		return domUtils.isExcludeFormat(element) || this.component.is(element) || domUtils.isWysiwygFrame(element);
+		return dom.check.isExcludeFormat(element) || this.component.is(element) || dom.check.isWysiwygFrame(element);
 	},
 
 	/**
@@ -1650,14 +1646,14 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	_isIgnoreNodeChange(element) {
-		return element && element.nodeType === 1 && (domUtils.isNonEditable(element) || !this.isTextStyleNode(element) || this.component.is(element));
+		return element && element.nodeType === 1 && (dom.check.isNonEditable(element) || !this.isTextStyleNode(element) || this.component.is(element));
 	},
 
 	/**
 	 * @private
 	 * @this {FormatThis}
 	 * @description Get current selected lines and selected node info.
-	 * @returns {{lines: Array<Element>, firstNode: Node,  lastNode: Node, firstPath: Array<number>, lastPath: Array<number>, startOffset: number, endOffset: number}}
+	 * @returns {{lines: Array<HTMLElement>, firstNode: Node,  lastNode: Node, firstPath: Array<number>, lastPath: Array<number>, startOffset: number, endOffset: number}}
 	 */
 	_lineWork() {
 		let range = this.selection.getRange();
@@ -1672,10 +1668,10 @@ Format.prototype = {
 		const startOffset = range.startOffset;
 		const endOffset = range.endOffset;
 
-		let first = selectedFormsts[0];
-		let last = selectedFormsts[selectedFormsts.length - 1];
-		const firstPath = domUtils.getNodePath(range.startContainer, first, null);
-		const lastPath = domUtils.getNodePath(range.endContainer, last, null);
+		let first = /** @type {Node} */ (selectedFormsts[0]);
+		let last = /** @type {Node} */ (selectedFormsts[selectedFormsts.length - 1]);
+		const firstPath = dom.query.getNodePath(range.startContainer, first, null);
+		const lastPath = dom.query.getNodePath(range.endContainer, last, null);
 
 		// remove selected list
 		const rlist = this.removeList(selectedFormsts, false);
@@ -1683,7 +1679,7 @@ Format.prototype = {
 		if (rlist.ec) last = rlist.ec;
 
 		// change format tag
-		this.selection.setRange(domUtils.getNodeFromPath(firstPath, first), startOffset, domUtils.getNodeFromPath(lastPath, last), endOffset);
+		this.selection.setRange(dom.query.getNodeFromPath(firstPath, first), startOffset, dom.query.getNodeFromPath(lastPath, last), endOffset);
 
 		return {
 			lines: this.getLinesAndComponents(false),
@@ -1701,10 +1697,10 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description Attaches a nested list structure by merging adjacent lists if applicable.
 	 * - Ensures that the nested list is placed correctly in the document structure.
-	 * @param {Node} originList The original list element where the nested list is inserted.
-	 * @param {Node} innerList The nested list element.
-	 * @param {Node} prev The previous sibling element.
-	 * @param {Node} next The next sibling element.
+	 * @param {Element} originList The original list element where the nested list is inserted.
+	 * @param {Element} innerList The nested list element.
+	 * @param {Element} prev The previous sibling element.
+	 * @param {Element} next The next sibling element.
 	 * @param {{s: Array<number> | null, e: Array<number> | null, sl: Node | null, el: Node | null}} nodePath Object storing the start and end node paths.
 	 * - s : Start node path.
 	 * - e : End node path.
@@ -1737,7 +1733,7 @@ Format.prototype = {
 		}
 
 		if (!insertPrev) {
-			if (domUtils.isListCell(prev)) {
+			if (dom.check.isListCell(prev)) {
 				originList = prev;
 				next = null;
 			}
@@ -1745,17 +1741,17 @@ Format.prototype = {
 			originList.insertBefore(innerList, next);
 
 			if (!nodePath.s) {
-				nodePath.s = domUtils.getNodePath(innerList.firstElementChild.firstChild, originList, null);
+				nodePath.s = dom.query.getNodePath(innerList.firstElementChild.firstChild, originList, null);
 				nodePath.sl = originList;
 			}
 
-			const slPath = originList.contains(nodePath.sl) ? domUtils.getNodePath(nodePath.sl, originList) : null;
-			nodePath.e = domUtils.getNodePath(innerList.lastElementChild.firstChild, originList, null);
+			const slPath = originList.contains(nodePath.sl) ? dom.query.getNodePath(nodePath.sl, originList) : null;
+			nodePath.e = dom.query.getNodePath(innerList.lastElementChild.firstChild, originList, null);
 			nodePath.el = originList;
 
 			this.nodeTransform.mergeSameTags(originList, [nodePath.s, nodePath.e, slPath], false);
 			this.nodeTransform.mergeNestedTags(originList);
-			if (slPath) nodePath.sl = domUtils.getNodeFromPath(slPath, originList);
+			if (slPath) nodePath.sl = dom.query.getNodeFromPath(slPath, originList);
 		}
 
 		return innerList;
@@ -1766,7 +1762,7 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description Detaches a nested list structure by extracting list items from their parent list.
 	 * - Ensures proper restructuring of the list elements.
-	 * @param {Array<Node>} cells The list items to be detached.
+	 * @param {Array<HTMLElement>} cells The list items to be detached.
 	 * @returns {{cc: Node, sc: Node, ec: Node}} An object containing reference nodes for repositioning.
 	 * - cc : The parent node of the first list item.
 	 * - sc : The first list item.
@@ -1776,9 +1772,9 @@ Format.prototype = {
 		const first = cells[0];
 		const last = cells[cells.length - 1];
 		const next = last.nextElementSibling;
-		const originList = first.parentNode;
-		const sibling = originList.parentNode.nextElementSibling;
-		const parentNode = originList.parentNode.parentNode;
+		const originList = first.parentElement;
+		const sibling = originList.parentElement.nextElementSibling;
+		const parentNode = originList.parentElement.parentElement;
 
 		for (let c = 0, cLen = cells.length; c < cLen; c++) {
 			parentNode.insertBefore(cells[c], sibling);
@@ -1787,17 +1783,17 @@ Format.prototype = {
 		if (next && originList.children.length > 0) {
 			const newList = originList.cloneNode(false);
 			const children = originList.childNodes;
-			const index = domUtils.getPositionIndex(next);
+			const index = dom.query.getPositionIndex(next);
 			while (children[index]) {
 				newList.appendChild(children[index]);
 			}
 			last.appendChild(newList);
 		}
 
-		if (originList.children.length === 0) domUtils.removeItem(originList);
+		if (originList.children.length === 0) dom.utils.removeItem(originList);
 		this.nodeTransform.mergeSameTags(parentNode);
 
-		const edge = domUtils.getEdgeChildNodes(first, last);
+		const edge = dom.query.getEdgeChildNodes(first, last);
 
 		return {
 			cc: first.parentNode,
@@ -1816,11 +1812,11 @@ Format.prototype = {
 	_applyNestedList(selectedCells, nested) {
 		selectedCells = !selectedCells
 			? this.getLines().filter(function (el) {
-					return domUtils.isListCell(el);
+					return dom.check.isListCell(el);
 			  })
 			: selectedCells;
 		const cellsLen = selectedCells.length;
-		if (cellsLen === 0 || (!nested && !domUtils.isListCell(selectedCells[0].previousElementSibling) && !domUtils.isListCell(selectedCells[cellsLen - 1].nextElementSibling))) {
+		if (cellsLen === 0 || (!nested && !dom.check.isListCell(selectedCells[0].previousElementSibling) && !dom.check.isListCell(selectedCells[cellsLen - 1].nextElementSibling))) {
 			return {
 				sc: selectedCells[0],
 				so: 0,
@@ -1834,7 +1830,7 @@ Format.prototype = {
 		let range = null;
 
 		if (nested) {
-			if (originList !== lastCell.parentNode && domUtils.isList(lastCell.parentNode.parentNode) && lastCell.nextElementSibling) {
+			if (originList !== lastCell.parentNode && dom.check.isList(lastCell.parentNode.parentNode) && lastCell.nextElementSibling) {
 				lastCell = lastCell.nextElementSibling;
 				while (lastCell) {
 					selectedCells.push(lastCell);
@@ -1843,7 +1839,7 @@ Format.prototype = {
 			}
 			range = this.applyList(originList.nodeName + ':' + originList.style.listStyleType, selectedCells, true);
 		} else {
-			let innerList = domUtils.createElement(originList.nodeName);
+			let innerList = dom.utils.createElement(originList.nodeName);
 			let prev = selectedCells[0].previousElementSibling;
 			let next = lastCell.nextElementSibling;
 			const nodePath = {
@@ -1858,7 +1854,7 @@ Format.prototype = {
 				if (c.parentNode !== originList) {
 					this._attachNested(originList, innerList, prev, next, nodePath);
 					originList = c.parentNode;
-					innerList = domUtils.createElement(originList.nodeName);
+					innerList = dom.utils.createElement(originList.nodeName);
 				}
 
 				prev = c.previousElementSibling;
@@ -1868,8 +1864,8 @@ Format.prototype = {
 
 			this._attachNested(originList, innerList, prev, next, nodePath);
 
-			const sc = domUtils.getNodeFromPath(nodePath.s, nodePath.sl);
-			const ec = domUtils.getNodeFromPath(nodePath.e, nodePath.el);
+			const sc = dom.query.getNodeFromPath(nodePath.s, nodePath.sl);
+			const ec = dom.query.getNodeFromPath(nodePath.e, nodePath.el);
 			range = {
 				sc: sc,
 				so: 0,
@@ -1886,7 +1882,7 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description Detach Nested all nested lists under the "baseNode".
 	 * - Returns a list with nested removed.
-	 * @param {Node} baseNode Element on which to base.
+	 * @param {HTMLElement} baseNode Element on which to base.
 	 * @param {boolean} all If true, it also detach all nested lists of a returned list.
 	 * @returns {Node} Result element
 	 */
@@ -1897,7 +1893,7 @@ Format.prototype = {
 		if (rNode) {
 			rangeElement = rNode.cloneNode(false);
 			cNodes = rNode.childNodes;
-			const index = domUtils.getPositionIndex(baseNode);
+			const index = dom.query.getPositionIndex(baseNode);
 			while (cNodes[index]) {
 				rangeElement.appendChild(cNodes[index]);
 			}
@@ -1907,13 +1903,13 @@ Format.prototype = {
 
 		let rChildren;
 		if (!all) {
-			const depth = domUtils.getNodeDepth(baseNode) + 2;
-			rChildren = domUtils.getListChildren(baseNode, (current) => {
-				return domUtils.isListCell(current) && !current.previousElementSibling && domUtils.getNodeDepth(current) === depth;
+			const depth = dom.query.getNodeDepth(baseNode) + 2;
+			rChildren = dom.query.getListChildren(baseNode, (current) => {
+				return dom.check.isListCell(current) && !current.previousElementSibling && dom.query.getNodeDepth(current) === depth;
 			});
 		} else {
-			rChildren = domUtils.getListChildren(rangeElement, (current) => {
-				return domUtils.isListCell(current) && !current.previousElementSibling;
+			rChildren = dom.query.getListChildren(rangeElement, (current) => {
+				return dom.check.isListCell(current) && !current.previousElementSibling;
 			});
 		}
 
@@ -1923,7 +1919,7 @@ Format.prototype = {
 
 		if (rNode) {
 			rNode.parentNode.insertBefore(rangeElement, rNode.nextSibling);
-			if (cNodes?.length === 0) domUtils.removeItem(rNode);
+			if (cNodes?.length === 0) dom.utils.removeItem(rNode);
 		}
 
 		return rangeElement === baseNode ? rangeElement.parentNode : rangeElement;
@@ -1948,19 +1944,19 @@ Format.prototype = {
 	_setNode_oneLine(element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
 		// not add tag
 		let parentCon = startCon.parentNode;
-		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !domUtils.isWysiwygFrame(parentCon.parentNode)) {
+		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
 			parentCon = parentCon.parentNode;
 		}
 
 		if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
-			if (domUtils.isZeroWidth(startCon.textContent.slice(0, startOff)) && domUtils.isZeroWidth(endCon.textContent.slice(endOff))) {
+			if (dom.check.isZeroWidth(startCon.textContent.slice(0, startOff)) && dom.check.isZeroWidth(endCon.textContent.slice(endOff))) {
 				const children = parentCon.childNodes;
 				let sameTag = false;
 
 				for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
 					c = children[i];
-					z = !domUtils.isZeroWidth(c);
+					z = !dom.check.isZeroWidth(c);
 					if (c === startCon) {
 						s = true;
 						continue;
@@ -1976,7 +1972,7 @@ Format.prototype = {
 				}
 
 				if (sameTag) {
-					domUtils.copyTagAttributes(parentCon, newInnerNode);
+					dom.utils.copyTagAttributes(parentCon, newInnerNode);
 
 					return {
 						ancestor: element,
@@ -2030,12 +2026,17 @@ Format.prototype = {
 				if (!startPass && child === startContainer) {
 					let line = pNode;
 					anchorNode = _getMaintainedNode(child);
-					const prevNode = domUtils.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
-					const textNode = domUtils.createTextNode(
-						startContainer.nodeType === 1
-							? ''
-							: startContainer.substringData(startOffset, isSameNode ? (endOffset >= startOffset ? endOffset - startOffset : startContainer.data.length - startOffset) : startContainer.data.length - startOffset)
-					);
+
+					let _prevText = '';
+					let _nextText = '';
+					if (startContainer.nodeType === 3) {
+						const sText = /** @type {Text} */ (startContainer);
+						_prevText = sText.substringData(0, startOffset);
+						_nextText = sText.substringData(startOffset, isSameNode ? (endOffset >= startOffset ? endOffset - startOffset : sText.data.length - startOffset) : sText.data.length - startOffset);
+					}
+
+					const prevNode = dom.utils.createTextNode(_prevText);
+					const textNode = dom.utils.createTextNode(_nextText);
 
 					if (anchorNode) {
 						const a = _getMaintainedNode(ancestor);
@@ -2055,7 +2056,7 @@ Format.prototype = {
 						anchorNode = anchorNode.cloneNode(false);
 					}
 
-					if (!domUtils.isZeroWidth(prevNode)) {
+					if (!dom.check.isZeroWidth(prevNode)) {
 						ancestor.appendChild(prevNode);
 					}
 
@@ -2063,16 +2064,16 @@ Format.prototype = {
 					if (prevAnchorNode) anchorNode = prevAnchorNode;
 					if (anchorNode) line = anchorNode;
 
-					newNode = child;
+					newNode = /** @type {HTMLElement} */ (child);
 					pCurrent = [];
 					cssText = '';
 					while (newNode !== line && newNode !== el && newNode !== null) {
 						vNode = _isMaintainedNode(newNode) ? null : validation(newNode);
 						if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
 							pCurrent.push(vNode);
-							cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
+							cssText += newNode.style.cssText.substring(0, newNode.style.cssText.indexOf(':')) + '|';
 						}
-						newNode = newNode.parentNode;
+						newNode = newNode.parentElement;
 					}
 
 					const childNode = pCurrent.pop() || textNode;
@@ -2103,8 +2104,17 @@ Format.prototype = {
 				// endContainer
 				if (!endPass && child === endContainer) {
 					anchorNode = _getMaintainedNode(child);
-					const afterNode = domUtils.createTextNode(endContainer.nodeType === 1 ? '' : endContainer.substringData(endOffset, endContainer.length - endOffset));
-					const textNode = domUtils.createTextNode(isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset));
+
+					let _prevText = '';
+					let _nextText = '';
+					if (endContainer.nodeType === 3) {
+						const eText = /** @type {Text} */ (endContainer);
+						_prevText = eText.substringData(endOffset, eText.length - endOffset);
+						_nextText = isSameNode ? '' : eText.substringData(0, endOffset);
+					}
+
+					const afterNode = dom.utils.createTextNode(_prevText);
+					const textNode = dom.utils.createTextNode(_nextText);
 
 					if (anchorNode) {
 						anchorNode = anchorNode.cloneNode(false);
@@ -2114,8 +2124,8 @@ Format.prototype = {
 						nNodeArray.push(newInnerNode);
 					}
 
-					if (!domUtils.isZeroWidth(afterNode)) {
-						newNode = child;
+					if (!dom.check.isZeroWidth(afterNode)) {
+						newNode = /** @type {HTMLElement} */ (child);
 						cssText = '';
 						pCurrent = [];
 						const anchors = [];
@@ -2123,9 +2133,9 @@ Format.prototype = {
 							if (newNode.nodeType === 1 && checkCss(newNode)) {
 								if (_isMaintainedNode(newNode)) anchors.push(newNode.cloneNode(false));
 								else pCurrent.push(newNode.cloneNode(false));
-								cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
+								cssText += newNode.style.cssText.substring(0, newNode.style.cssText.indexOf(':')) + '|';
 							}
-							newNode = newNode.parentNode;
+							newNode = newNode.parentElement;
 						}
 						pCurrent = pCurrent.concat(anchors);
 
@@ -2147,16 +2157,16 @@ Format.prototype = {
 						}
 					}
 
-					newNode = child;
+					newNode = /** @type {HTMLElement} */ (child);
 					pCurrent = [];
 					cssText = '';
 					while (newNode !== pNode && newNode !== el && newNode !== null) {
 						vNode = _isMaintainedNode(newNode) ? null : validation(newNode);
 						if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
 							pCurrent.push(vNode);
-							cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
+							cssText += newNode.style.cssText.substring(0, newNode.style.cssText.indexOf(':')) + '|';
 						}
-						newNode = newNode.parentNode;
+						newNode = newNode.parentElement;
 					}
 
 					const childNode = pCurrent.pop() || textNode;
@@ -2193,7 +2203,7 @@ Format.prototype = {
 
 				// other
 				if (startPass) {
-					if (child.nodeType === 1 && !domUtils.isBreak(child)) {
+					if (child.nodeType === 1 && !dom.check.isBreak(child)) {
 						if (inst._isIgnoreNodeChange(child)) {
 							pNode.appendChild(child.cloneNode(true));
 							if (!collapsed) {
@@ -2207,21 +2217,21 @@ Format.prototype = {
 						continue;
 					}
 
-					newNode = child;
+					newNode = /** @type {HTMLElement} */ (child);
 					pCurrent = [];
 					cssText = '';
 					const anchors = [];
 					while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
 						vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
-						if (newNode.nodeType === 1 && !domUtils.isBreak(child) && vNode && checkCss(newNode)) {
+						if (newNode.nodeType === 1 && !dom.check.isBreak(child) && vNode && checkCss(newNode)) {
 							if (_isMaintainedNode(newNode)) {
 								if (!anchorNode) anchors.push(vNode);
 							} else {
 								pCurrent.push(vNode);
 							}
-							cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
+							cssText += newNode.style.cssText.substring(0, newNode.style.cssText.indexOf(':')) + '|';
 						}
-						newNode = newNode.parentNode;
+						newNode = newNode.parentElement;
 					}
 					pCurrent = pCurrent.concat(anchors);
 
@@ -2233,7 +2243,7 @@ Format.prototype = {
 						appendNode = newNode;
 					}
 
-					if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode) && !domUtils.isZeroWidth(newInnerNode)) {
+					if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode) && !dom.check.isZeroWidth(newInnerNode)) {
 						newInnerNode = newInnerNode.cloneNode(false);
 						pNode.appendChild(newInnerNode);
 						nNodeArray.push(newInnerNode);
@@ -2248,7 +2258,7 @@ Format.prototype = {
 						childNode.appendChild(newInnerNode);
 						pNode.appendChild(childNode);
 						nNodeArray.push(newInnerNode);
-						if (newInnerNode.children.length > 0) ancestor = newNode;
+						if (/** @type {HTMLElement} */ (newInnerNode).children.length > 0) ancestor = newNode;
 						else ancestor = newInnerNode;
 					} else if (childNode === child) {
 						if (!endPass) ancestor = newInnerNode;
@@ -2263,7 +2273,7 @@ Format.prototype = {
 
 					if (anchorNode && child.nodeType === 3) {
 						if (_getMaintainedNode(child)) {
-							const ancestorAnchorNode = domUtils.getParentElement(ancestor, (c) => {
+							const ancestorAnchorNode = dom.query.getParentElement(ancestor, (c) => {
 								return inst._isNonSplitNode(c.parentNode) || c.parentNode === pNode;
 							});
 							anchorNode.appendChild(ancestorAnchorNode);
@@ -2278,7 +2288,7 @@ Format.prototype = {
 
 				cloneNode = child.cloneNode(false);
 				ancestor.appendChild(cloneNode);
-				if (child.nodeType === 1 && !domUtils.isBreak(child)) coverNode = cloneNode;
+				if (child.nodeType === 1 && !dom.check.isBreak(child)) coverNode = cloneNode;
 
 				recursionFunc(child, coverNode);
 			}
@@ -2303,7 +2313,7 @@ Format.prototype = {
 				let textNode, textNode_s, textNode_e;
 
 				if (collapsed) {
-					textNode = domUtils.createTextNode(unicode.zeroWidthSpace);
+					textNode = dom.utils.createTextNode(unicode.zeroWidthSpace);
 					pNode.replaceChild(textNode, removeNode);
 				} else {
 					const rChildren = removeNode.childNodes;
@@ -2312,7 +2322,7 @@ Format.prototype = {
 						textNode_e = rChildren[0];
 						pNode.insertBefore(textNode_e, removeNode);
 					}
-					domUtils.removeItem(removeNode);
+					dom.utils.removeItem(removeNode);
 				}
 
 				if (i === 0) {
@@ -2346,8 +2356,8 @@ Format.prototype = {
 		// endContainer reset
 		const endConReset = isRemoveFormat || endContainer.textContent.length === 0;
 
-		if (!domUtils.isBreak(endContainer) && endContainer.textContent.length === 0) {
-			domUtils.removeItem(endContainer);
+		if (!dom.check.isBreak(endContainer) && endContainer.textContent.length === 0) {
+			dom.utils.removeItem(endContainer);
 			endContainer = startContainer;
 		}
 		endOffset = endConReset ? endContainer.textContent.length : endOffset;
@@ -2357,7 +2367,7 @@ Format.prototype = {
 			s: 0,
 			e: 0
 		};
-		const startPath = domUtils.getNodePath(startContainer, pNode, newStartOffset);
+		const startPath = dom.query.getNodePath(startContainer, pNode, newStartOffset);
 
 		const mergeEndCon = !endContainer.parentNode;
 		if (mergeEndCon) endContainer = startContainer;
@@ -2365,7 +2375,7 @@ Format.prototype = {
 			s: 0,
 			e: 0
 		};
-		const endPath = domUtils.getNodePath(endContainer, pNode, !mergeEndCon && !endConReset ? newEndOffset : null);
+		const endPath = dom.query.getNodePath(endContainer, pNode, !mergeEndCon && !endConReset ? newEndOffset : null);
 
 		startOffset += newStartOffset.s;
 		endOffset = collapsed ? startOffset : mergeEndCon ? startContainer.textContent.length : endConReset ? endOffset + newStartOffset.s : endOffset + newEndOffset.s;
@@ -2375,8 +2385,8 @@ Format.prototype = {
 
 		element.parentNode.replaceChild(pNode, element);
 
-		startContainer = domUtils.getNodeFromPath(startPath, pNode);
-		endContainer = domUtils.getNodeFromPath(endPath, pNode);
+		startContainer = dom.query.getNodeFromPath(startPath, pNode);
+		endContainer = dom.query.getNodeFromPath(endPath, pNode);
 
 		return {
 			ancestor: pNode,
@@ -2403,16 +2413,16 @@ Format.prototype = {
 	_setNode_startLine(element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
 		// not add tag
 		let parentCon = startCon.parentNode;
-		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !domUtils.isWysiwygFrame(parentCon.parentNode)) {
+		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.nextSibling && domUtils.isZeroWidth(startCon.textContent.slice(0, startOff))) {
+		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.nextSibling && dom.check.isZeroWidth(startCon.textContent.slice(0, startOff))) {
 			let sameTag = false;
 			let s = startCon.previousSibling;
 			while (s) {
-				if (!domUtils.isZeroWidth(s)) {
+				if (!dom.check.isZeroWidth(s)) {
 					sameTag = false;
 					break;
 				}
@@ -2420,7 +2430,7 @@ Format.prototype = {
 			}
 
 			if (sameTag) {
-				domUtils.copyTagAttributes(parentCon, newInnerNode);
+				dom.utils.copyTagAttributes(parentCon, newInnerNode);
 
 				return {
 					ancestor: element,
@@ -2447,11 +2457,11 @@ Format.prototype = {
 			const childNodes = current.childNodes;
 
 			for (let i = 0, len = childNodes.length, vNode, cloneChild; i < len; i++) {
-				const child = childNodes[i];
+				const child = /** @type {HTMLElement} */ (childNodes[i]);
 				if (!child) continue;
 				let coverNode = ancestor;
 
-				if (passNode && !domUtils.isBreak(child)) {
+				if (passNode && !dom.check.isBreak(child)) {
 					if (child.nodeType === 1) {
 						if (inst._isIgnoreNodeChange(child)) {
 							newInnerNode = newInnerNode.cloneNode(false);
@@ -2462,8 +2472,8 @@ Format.prototype = {
 
 							// end container
 							if (_endContainer && child.contains(_endContainer)) {
-								const endPath = domUtils.getNodePath(_endContainer, child);
-								_endContainer = domUtils.getNodeFromPath(endPath, cloneChild);
+								const endPath = dom.query.getNodePath(_endContainer, child);
+								_endContainer = dom.query.getNodeFromPath(endPath, cloneChild);
 							}
 						} else {
 							recursionFunc(child, child);
@@ -2521,7 +2531,7 @@ Format.prototype = {
 
 					if (anchorNode && child.nodeType === 3) {
 						if (_getMaintainedNode(child)) {
-							const ancestorAnchorNode = domUtils.getParentElement(ancestor, (c) => {
+							const ancestorAnchorNode = dom.query.getParentElement(ancestor, (c) => {
 								return inst._isNonSplitNode(c.parentNode) || c.parentNode === pNode;
 							});
 							anchorNode.appendChild(ancestorAnchorNode);
@@ -2538,8 +2548,17 @@ Format.prototype = {
 				if (!passNode && child === container) {
 					let line = pNode;
 					anchorNode = _getMaintainedNode(child);
-					const prevNode = domUtils.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
-					const textNode = domUtils.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, container.length - offset));
+
+					let _prevText = '';
+					let _nextText = '';
+					if (container.nodeType === 3) {
+						const cText = /** @type {Text} */ (container);
+						_prevText = cText.substringData(0, offset);
+						_nextText = cText.substringData(offset, cText.length - offset);
+					}
+
+					const prevNode = dom.utils.createTextNode(_prevText);
+					const textNode = dom.utils.createTextNode(_nextText);
 
 					if (anchorNode) {
 						const a = _getMaintainedNode(ancestor);
@@ -2559,7 +2578,7 @@ Format.prototype = {
 						anchorNode = anchorNode.cloneNode(false);
 					}
 
-					if (!domUtils.isZeroWidth(prevNode)) {
+					if (!dom.check.isZeroWidth(prevNode)) {
 						ancestor.appendChild(prevNode);
 					}
 
@@ -2592,7 +2611,7 @@ Format.prototype = {
 						ancestor = newInnerNode;
 					}
 
-					if (domUtils.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
+					if (dom.check.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
 					line.appendChild(newInnerNode);
 
 					container = textNode;
@@ -2606,7 +2625,7 @@ Format.prototype = {
 				vNode = !passNode ? child.cloneNode(false) : validation(child);
 				if (vNode) {
 					ancestor.appendChild(vNode);
-					if (child.nodeType === 1 && !domUtils.isBreak(child)) coverNode = vNode;
+					if (child.nodeType === 1 && !dom.check.isBreak(child)) coverNode = vNode;
 				}
 
 				recursionFunc(child, coverNode);
@@ -2634,7 +2653,7 @@ Format.prototype = {
 				while (rChildren[0]) {
 					pNode.insertBefore(rChildren[0], removeNode);
 				}
-				domUtils.removeItem(removeNode);
+				dom.utils.removeItem(removeNode);
 
 				if (i === 0) container = textNode;
 			}
@@ -2649,13 +2668,13 @@ Format.prototype = {
 			if (element.childNodes) {
 				container = element.childNodes[0];
 			} else {
-				container = domUtils.createTextNode(unicode.zeroWidthSpace);
+				container = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				element.appendChild(container);
 			}
 		} else {
 			this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
-			if (domUtils.isZeroWidth(pNode.textContent)) {
+			if (dom.check.isZeroWidth(pNode.textContent)) {
 				container = pNode.firstChild;
 				offset = 0;
 			}
@@ -2665,7 +2684,7 @@ Format.prototype = {
 				s: 0,
 				e: 0
 			};
-			const path = domUtils.getNodePath(container, pNode, offsets);
+			const path = dom.query.getNodePath(container, pNode, offsets);
 			offset += offsets.s;
 
 			// tag merge
@@ -2673,7 +2692,7 @@ Format.prototype = {
 
 			element.parentNode.replaceChild(pNode, element);
 
-			container = domUtils.getNodeFromPath(path, pNode);
+			container = dom.query.getNodeFromPath(path, pNode);
 			offset += newOffsets[0];
 		}
 
@@ -2689,7 +2708,7 @@ Format.prototype = {
 	 * @private
 	 * @this {FormatThis}
 	 * @description wraps mid lines selected text.
-	 * @param {Node} element The node of the line that contains the selected text node.
+	 * @param {HTMLElement} element The node of the line that contains the selected text node.
 	 * @param {Node} newInnerNode The dom that will wrap the selected text area
 	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
@@ -2702,23 +2721,23 @@ Format.prototype = {
 		if (!isRemoveNode) {
 			// end container path
 			let endPath = null;
-			if (_endContainer && element.contains(_endContainer)) endPath = domUtils.getNodePath(_endContainer, element);
+			if (_endContainer && element.contains(_endContainer)) endPath = dom.query.getNodePath(_endContainer, element);
 
 			const tempNode = element.cloneNode(true);
-			const newNodeName = newInnerNode.nodeName;
-			const newCssText = newInnerNode.style.cssText;
-			const newClass = newInnerNode.className;
+			const newNodeName = /** @type {HTMLElement} */ (newInnerNode).nodeName;
+			const newCssText = /** @type {HTMLElement} */ (newInnerNode).style.cssText;
+			const newClass = /** @type {HTMLElement} */ (newInnerNode).className;
 
 			let children = tempNode.childNodes;
 			let i = 0,
 				len = children.length;
 			for (let child; i < len; i++) {
-				child = children[i];
+				child = /** @type {HTMLElement} */ (children[i]);
 				if (child.nodeType === 3) break;
 				if (child.nodeName === newNodeName) {
 					child.style.cssText += newCssText;
-					domUtils.addClass(child, newClass);
-				} else if (!domUtils.isBreak(child) && this._isIgnoreNodeChange(child)) {
+					dom.utils.addClass(child, newClass);
+				} else if (!dom.check.isBreak(child) && this._isIgnoreNodeChange(child)) {
 					continue;
 				} else if (len === 1) {
 					children = child.childNodes;
@@ -2731,10 +2750,10 @@ Format.prototype = {
 			}
 
 			if (len > 0 && i === len) {
-				element.innerHTML = tempNode.innerHTML;
+				element.innerHTML = /** @type {HTMLElement} */ (tempNode).innerHTML;
 				return {
 					ancestor: element,
-					endContainer: endPath ? domUtils.getNodeFromPath(endPath, element) : null
+					endContainer: endPath ? dom.query.getNodeFromPath(endPath, element) : null
 				};
 			}
 		}
@@ -2751,11 +2770,11 @@ Format.prototype = {
 			const childNodes = current.childNodes;
 
 			for (let i = 0, len = childNodes.length, vNode, cloneChild; i < len; i++) {
-				const child = childNodes[i];
+				const child = /** @type {HTMLElement} */ (childNodes[i]);
 				if (!child) continue;
 				let coverNode = ancestor;
 
-				if (!domUtils.isBreak(child) && inst._isIgnoreNodeChange(child)) {
+				if (!dom.check.isBreak(child) && inst._isIgnoreNodeChange(child)) {
 					if (newInnerNode.childNodes.length > 0) {
 						pNode.appendChild(newInnerNode);
 						newInnerNode = newInnerNode.cloneNode(false);
@@ -2769,8 +2788,8 @@ Format.prototype = {
 
 					// end container
 					if (_endContainer && child.contains(_endContainer)) {
-						const endPath = domUtils.getNodePath(_endContainer, child);
-						_endContainer = domUtils.getNodeFromPath(endPath, cloneChild);
+						const endPath = dom.query.getNodePath(_endContainer, child);
+						_endContainer = dom.query.getNodeFromPath(endPath, cloneChild);
 					}
 
 					continue;
@@ -2783,7 +2802,7 @@ Format.prototype = {
 					}
 				}
 
-				if (!domUtils.isBreak(child)) recursionFunc(child, coverNode);
+				if (!dom.check.isBreak(child)) recursionFunc(child, coverNode);
 			}
 		})(element, newInnerNode);
 
@@ -2804,7 +2823,7 @@ Format.prototype = {
 				while (rChildren[0]) {
 					pNode.insertBefore(rChildren[0], removeNode);
 				}
-				domUtils.removeItem(removeNode);
+				dom.utils.removeItem(removeNode);
 			}
 		} else if (isRemoveNode) {
 			newInnerNode = newInnerNode.firstChild;
@@ -2840,16 +2859,16 @@ Format.prototype = {
 	_setNode_endLine(element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
 		// not add tag
 		let parentCon = endCon.parentNode;
-		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !domUtils.isWysiwygFrame(parentCon.parentNode)) {
+		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.previousSibling && domUtils.isZeroWidth(endCon.textContent.slice(endOff))) {
+		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.previousSibling && dom.check.isZeroWidth(endCon.textContent.slice(endOff))) {
 			let sameTag = false;
 			let e = endCon.nextSibling;
 			while (e) {
-				if (!domUtils.isZeroWidth(e)) {
+				if (!dom.check.isZeroWidth(e)) {
 					sameTag = false;
 					break;
 				}
@@ -2857,7 +2876,7 @@ Format.prototype = {
 			}
 
 			if (sameTag) {
-				domUtils.copyTagAttributes(parentCon, newInnerNode);
+				dom.utils.copyTagAttributes(parentCon, newInnerNode);
 
 				return {
 					ancestor: element,
@@ -2888,7 +2907,7 @@ Format.prototype = {
 				if (!child) continue;
 				let coverNode = ancestor;
 
-				if (passNode && !domUtils.isBreak(child)) {
+				if (passNode && !dom.check.isBreak(child)) {
 					if (child.nodeType === 1) {
 						if (inst._isIgnoreNodeChange(child)) {
 							newInnerNode = newInnerNode.cloneNode(false);
@@ -2942,7 +2961,7 @@ Format.prototype = {
 						childNode.appendChild(newInnerNode);
 						pNode.insertBefore(childNode, pNode.firstChild);
 						nNodeArray.push(newInnerNode);
-						if (newInnerNode.children.length > 0) ancestor = newNode;
+						if (/** @type {HTMLElement} */ (newInnerNode).children.length > 0) ancestor = newNode;
 						else ancestor = newInnerNode;
 					} else if (isTopNode) {
 						newInnerNode.insertBefore(childNode, newInnerNode.firstChild);
@@ -2953,7 +2972,7 @@ Format.prototype = {
 
 					if (anchorNode && child.nodeType === 3) {
 						if (_getMaintainedNode(child)) {
-							const ancestorAnchorNode = domUtils.getParentElement(ancestor, (c) => {
+							const ancestorAnchorNode = dom.query.getParentElement(ancestor, (c) => {
 								return inst._isNonSplitNode(c.parentNode) || c.parentNode === pNode;
 							});
 							anchorNode.appendChild(ancestorAnchorNode);
@@ -2969,8 +2988,17 @@ Format.prototype = {
 				// endContainer
 				if (!passNode && child === container) {
 					anchorNode = _getMaintainedNode(child);
-					const afterNode = domUtils.createTextNode(container.nodeType === 1 ? '' : container.substringData(offset, container.length - offset));
-					const textNode = domUtils.createTextNode(container.nodeType === 1 ? '' : container.substringData(0, offset));
+
+					let _prevText = '';
+					let _nextText = '';
+					if (container.nodeType === 3) {
+						const cText = /** @type {Text} */ (container);
+						_prevText = cText.substringData(offset, cText.length - offset);
+						_nextText = cText.substringData(0, offset);
+					}
+
+					const afterNode = dom.utils.createTextNode(_prevText);
+					const textNode = dom.utils.createTextNode(_nextText);
 
 					if (anchorNode) {
 						anchorNode = anchorNode.cloneNode(false);
@@ -2995,7 +3023,7 @@ Format.prototype = {
 						nNodeArray.push(newInnerNode);
 					}
 
-					if (!domUtils.isZeroWidth(afterNode)) {
+					if (!dom.check.isZeroWidth(afterNode)) {
 						ancestor.insertBefore(afterNode, ancestor.firstChild);
 					}
 
@@ -3024,7 +3052,7 @@ Format.prototype = {
 						ancestor = newInnerNode;
 					}
 
-					if (domUtils.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
+					if (dom.check.isBreak(child)) newInnerNode.appendChild(child.cloneNode(false));
 
 					if (anchorNode) {
 						anchorNode.insertBefore(newInnerNode, anchorNode.firstChild);
@@ -3045,7 +3073,7 @@ Format.prototype = {
 				vNode = !passNode ? child.cloneNode(false) : validation(child);
 				if (vNode) {
 					ancestor.insertBefore(vNode, ancestor.firstChild);
-					if (child.nodeType === 1 && !domUtils.isBreak(child)) coverNode = vNode;
+					if (child.nodeType === 1 && !dom.check.isBreak(child)) coverNode = vNode;
 				}
 
 				recursionFunc(child, coverNode);
@@ -3073,7 +3101,7 @@ Format.prototype = {
 					textNode = rChildren[0];
 					pNode.insertBefore(textNode, removeNode);
 				}
-				domUtils.removeItem(removeNode);
+				dom.utils.removeItem(removeNode);
 
 				if (i === nNodeArray.length - 1) {
 					container = textNode;
@@ -3091,7 +3119,7 @@ Format.prototype = {
 			if (element.childNodes) {
 				container = element.childNodes[0];
 			} else {
-				container = domUtils.createTextNode(unicode.zeroWidthSpace);
+				container = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				element.appendChild(container);
 			}
 		} else {
@@ -3106,10 +3134,10 @@ Format.prototype = {
 
 			this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
-			if (domUtils.isZeroWidth(pNode.textContent)) {
+			if (dom.check.isZeroWidth(pNode.textContent)) {
 				container = pNode.firstChild;
 				offset = container.textContent.length;
-			} else if (domUtils.isZeroWidth(container)) {
+			} else if (dom.check.isZeroWidth(container)) {
 				container = newInnerNode;
 				offset = 1;
 			}
@@ -3119,7 +3147,7 @@ Format.prototype = {
 				s: 0,
 				e: 0
 			};
-			const path = domUtils.getNodePath(container, pNode, offsets);
+			const path = dom.query.getNodePath(container, pNode, offsets);
 			offset += offsets.s;
 
 			// tag merge
@@ -3127,7 +3155,7 @@ Format.prototype = {
 
 			element.parentNode.replaceChild(pNode, element);
 
-			container = domUtils.getNodeFromPath(path, pNode);
+			container = dom.query.getNodeFromPath(path, pNode);
 			offset += newOffsets[0];
 		}
 
@@ -3160,7 +3188,7 @@ Format.prototype = {
 	 */
 	_sn_getMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove) return null;
-		return domUtils.getParentElement(element, this._isNonSplitNode.bind(this)) || (!_isSizeNode ? domUtils.getParentElement(element, this._sn_isSizeNode.bind(this)) : null);
+		return dom.query.getParentElement(element, this._isNonSplitNode.bind(this)) || (!_isSizeNode ? dom.query.getParentElement(element, this._sn_isSizeNode.bind(this)) : null);
 	},
 
 	/**
@@ -3175,7 +3203,7 @@ Format.prototype = {
 	_sn_isMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
 		const anchor = this._isNonSplitNode(element);
-		return domUtils.getParentElement(element, this._isNonSplitNode.bind(this)) ? anchor : anchor || (!_isSizeNode ? this._sn_isSizeNode(element) : false);
+		return dom.query.getParentElement(element, this._isNonSplitNode.bind(this)) ? anchor : anchor || (!_isSizeNode ? this._sn_isSizeNode(element) : false);
 	},
 
 	/**
@@ -3186,12 +3214,12 @@ Format.prototype = {
 	 * @param {?Node} child Variable for recursive call. ("null" on the first call)
 	 */
 	_sn_setCommonListStyle(el, child) {
-		if (!domUtils.isListCell(el)) return;
+		if (!dom.check.isListCell(el)) return;
 
-		const children = domUtils.arrayFilter((child || el).childNodes, (current) => !domUtils.isBreak(current));
+		const children = dom.utils.arrayFilter((child || el).childNodes, (current) => !dom.check.isBreak(current));
 		child = children[0];
 
-		if (!child || children.length > 1 || child.nodeType !== 1) return;
+		if (!dom.check.isElement(child) || children.length > 1) return;
 
 		// set cell style---
 		const childStyle = child.style;
@@ -3226,7 +3254,7 @@ Format.prototype = {
 			while (ch.length > 0) {
 				p.insertBefore(ch[0], n);
 			}
-			domUtils.removeItem(child);
+			dom.utils.removeItem(child);
 		}
 	},
 
@@ -3238,10 +3266,10 @@ Format.prototype = {
 	 * @param {Array|null} styleArray Refer style array
 	 */
 	_sn_resetCommonListCell(el, styleArray) {
-		if (!domUtils.isListCell(el)) return;
+		if (!dom.check.isListCell(el)) return;
 		if (!styleArray) styleArray = this._listKebab;
 
-		const children = domUtils.arrayFilter(el.childNodes, (current) => !domUtils.isBreak(current));
+		const children = dom.utils.arrayFilter(el.childNodes, (current) => !dom.check.isBreak(current));
 		const elStyles = el.style;
 
 		const ec = [],
@@ -3257,7 +3285,7 @@ Format.prototype = {
 		if (!ec.length) return;
 
 		// reset cell style---
-		const refer = domUtils.createElement('SPAN');
+		const refer = dom.utils.createElement('SPAN');
 		for (let i = 0, len = ec.length; i < len; i++) {
 			refer.style[ec[i]] = elStyles[ek[i]];
 			elStyles.removeProperty(ek[i]);
@@ -3267,7 +3295,7 @@ Format.prototype = {
 		let r = null,
 			appliedEl = false;
 		for (let i = 0, len = children.length, c, s; i < len; i++) {
-			c = children[i];
+			c = /** @type {HTMLElement} */ (children[i]);
 			if (this.options.get('_defaultStyleTagMap')[c.nodeName.toLowerCase()]) continue;
 
 			s = env.getValues(c.style);
@@ -3314,20 +3342,20 @@ function DeleteNestedList(baseNode) {
 	let siblingNode = /** @type {*} */ (baseParent);
 	let liSibling, liParent, child, index, c;
 
-	while (domUtils.isListCell(parent)) {
-		index = domUtils.getPositionIndex(baseNode);
+	while (dom.check.isListCell(parent)) {
+		index = dom.query.getPositionIndex(baseNode);
 		liSibling = parent.nextElementSibling;
 		liParent = parent.parentNode;
 		child = siblingNode;
 
 		while (child) {
 			siblingNode = siblingNode.nextSibling;
-			if (domUtils.isList(child)) {
+			if (dom.check.isList(child)) {
 				c = child.childNodes;
 				while (c[index]) {
 					liParent.insertBefore(c[index], liSibling);
 				}
-				if (c.length === 0) domUtils.removeItem(child);
+				if (c.length === 0) dom.utils.removeItem(child);
 			} else {
 				liParent.appendChild(child);
 			}
@@ -3337,14 +3365,14 @@ function DeleteNestedList(baseNode) {
 		parent = liParent.parentNode;
 	}
 
-	if (baseParent.children.length === 0) domUtils.removeItem(baseParent);
+	if (baseParent.children.length === 0) dom.utils.removeItem(baseParent);
 
 	return liParent;
 }
 
 /**
  * @private
- * @param {Array<Node>} lines - Line elements
+ * @param {Array<HTMLElement>} lines - Line elements
  * @param {number} size - Margin size
  * @param {string} dir - Direction
  * @returns
@@ -3354,10 +3382,10 @@ function SetLineMargin(lines, size, dir) {
 
 	for (let i = 0, len = lines.length, f, margin; i < len; i++) {
 		f = lines[i];
-		if (!domUtils.isListCell(f)) {
+		if (!dom.check.isListCell(f)) {
 			margin = /\d+/.test(f.style[dir]) ? numbers.get(f.style[dir], 0) : 0;
 			margin += size;
-			domUtils.setStyle(f, dir, margin <= 0 ? '' : margin + 'px');
+			dom.utils.setStyle(f, dir, margin <= 0 ? '' : margin + 'px');
 		} else {
 			if (size < 0 || f.previousElementSibling) {
 				cells.push(f);

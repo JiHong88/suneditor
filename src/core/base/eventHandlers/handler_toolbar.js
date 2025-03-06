@@ -1,4 +1,4 @@
-import { domUtils, env } from '../../../helper';
+import { dom, env } from '../../../helper';
 
 const { isMobile } = env;
 
@@ -12,14 +12,14 @@ const { isMobile } = env;
  * @param {MouseEvent} e - Event object
  */
 export function ButtonsHandler(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	let target = eventTarget;
 
 	if (this.editor.isSubBalloon && !this.context.get('toolbar.sub.main')?.contains(target)) {
 		this._hideToolbar_sub();
 	}
 
-	const isInput = domUtils.isInputElement(target);
+	const isInput = dom.check.isInputElement(target);
 
 	if (isInput) {
 		this.editor._preventBlur = false;
@@ -27,7 +27,7 @@ export function ButtonsHandler(e) {
 		this.editor.focus();
 	}
 
-	if (domUtils.getParentElement(target, '.se-dropdown')) {
+	if (dom.query.getParentElement(target, '.se-dropdown')) {
 		e.stopPropagation();
 		this.editor._notHideToolbar = true;
 	} else {
@@ -45,7 +45,7 @@ export function ButtonsHandler(e) {
 			this.editor._preventBlur = this._inputFocus = true;
 			if (!this.status.hasFocus) this.applyTagEffect();
 			/* event */
-			if (!domUtils.isInputElement(eventTarget) || eventTarget.disabled) return;
+			if (!dom.check.isInputElement(eventTarget) || eventTarget.disabled) return;
 
 			const plugin = this.plugins[command];
 			if (!plugin) return;
@@ -105,8 +105,8 @@ export function ButtonsHandler(e) {
  * @param {MouseEvent} e - Event object
  */
 export function OnClick_menuTray(e) {
-	const eventTarget = domUtils.getEventTarget(e);
-	const target = domUtils.getCommandTarget(eventTarget);
+	const eventTarget = dom.query.getEventTarget(e);
+	const target = dom.query.getCommandTarget(eventTarget);
 	if (!target) return;
 
 	let t = target;
@@ -130,6 +130,6 @@ export function OnClick_menuTray(e) {
  * @param {MouseEvent} e - Event object
  */
 export function OnClick_toolbar(e) {
-	const eventTarget = domUtils.getEventTarget(e);
+	const eventTarget = dom.query.getEventTarget(e);
 	this.editor.runFromTarget(eventTarget);
 }

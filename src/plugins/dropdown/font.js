@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @class
@@ -40,7 +40,7 @@ class Font extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
@@ -50,12 +50,12 @@ class Font extends EditorInjector {
 
 		if (!element) {
 			const font = this.status.hasFocus ? this.editor.frameContext.get('wwComputedStyle').fontFamily : this.lang.font;
-			domUtils.changeTxt(targetText, font);
-			domUtils.changeTxt(tooltip, this.status.hasFocus ? this.lang.font + (font ? ' (' + font + ')' : '') : font);
+			dom.utils.changeTxt(targetText, font);
+			dom.utils.changeTxt(tooltip, this.status.hasFocus ? this.lang.font + (font ? ' (' + font + ')' : '') : font);
 		} else if (element?.style.fontFamily.length > 0) {
 			const selectFont = element.style.fontFamily.replace(/["']/g, '');
-			domUtils.changeTxt(targetText, selectFont);
-			domUtils.changeTxt(tooltip, this.lang.font + ' (' + selectFont + ')');
+			dom.utils.changeTxt(targetText, selectFont);
+			dom.utils.changeTxt(tooltip, this.lang.font + ' (' + selectFont + ')');
 			return true;
 		}
 
@@ -74,9 +74,9 @@ class Font extends EditorInjector {
 		if (currentFont !== this.currentFont) {
 			for (let i = 0, len = fontList.length; i < len; i++) {
 				if (currentFont === (fontList[i].getAttribute('data-command') || '').replace(/'|"/g, '')) {
-					domUtils.addClass(fontList[i], 'active');
+					dom.utils.addClass(fontList[i], 'active');
 				} else {
-					domUtils.removeClass(fontList[i], 'active');
+					dom.utils.removeClass(fontList[i], 'active');
 				}
 			}
 
@@ -101,7 +101,7 @@ class Font extends EditorInjector {
 			// before event
 			if ((await this.triggerEvent('onFontActionBefore', { value })) === false) return;
 
-			const newNode = domUtils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
+			const newNode = dom.utils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
 			this.format.applyInlineElement(newNode, { stylesToModify: ['font-family'], nodesToRemove: null, strictRemove: null });
 		} else {
 			this.format.applyInlineElement(null, { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true });
@@ -131,7 +131,7 @@ function CreateHTML({ lang }, fontList) {
 		</ul>
 	</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-family' }, list);
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-family' }, list);
 }
 
 export default Font;

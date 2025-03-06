@@ -1,4 +1,4 @@
-import { domUtils, converter } from '../helper';
+import { dom, converter } from '../helper';
 import CoreInjector from '../editorInjector/_core';
 import { HueSlider } from '../modules';
 
@@ -157,10 +157,10 @@ ColorPicker.prototype = {
 			c = colorList[i];
 			if (fillColor.toLowerCase() === c.getAttribute('data-value').toLowerCase()) {
 				c.appendChild(this.checkedIcon);
-				domUtils.addClass(c, 'active');
+				dom.utils.addClass(c, 'active');
 			} else {
-				domUtils.removeClass(c, 'active');
-				if (c.contains(this.checkedIcon)) domUtils.removeItem(this.checkedIcon);
+				dom.utils.removeClass(c, 'active');
+				if (c.contains(this.checkedIcon)) dom.utils.removeItem(this.checkedIcon);
 			}
 		}
 
@@ -208,7 +208,7 @@ ColorPicker.prototype = {
 		let findColor = '';
 		const sp = this.styleProperties;
 
-		while (node && !domUtils.isWysiwygFrame(node) && findColor.length === 0) {
+		while (node && !dom.check.isWysiwygFrame(node) && findColor.length === 0) {
 			if (node.nodeType === 1 && node.style[sp]) findColor = node.style[sp];
 			node = node.parentNode;
 		}
@@ -225,15 +225,15 @@ ColorPicker.prototype = {
 	 */
 	_colorName2hex(colorName) {
 		if (/^#/.test(colorName)) return colorName;
-		const temp = domUtils.createElement('div', { style: 'display: none; color: ' + colorName });
+		const temp = dom.utils.createElement('div', { style: 'display: none; color: ' + colorName });
 		const colors = this._w
 			.getComputedStyle(this._d.body.appendChild(temp))
 			.color.match(/\d+/g)
 			.map(function (a) {
 				return parseInt(a, 10);
 			});
-		domUtils.removeItem(temp);
-		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1) : '';
+		dom.utils.removeItem(temp);
+		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substring(1) : '';
 	},
 
 	/**
@@ -330,7 +330,7 @@ function CreateHTML({ lang, icons }, { colorList, disableHEXInput, disableRemove
 			${disableRemove ? '' : `<button type="button" class="se-btn __se_remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.remove_color}</button>`}
 		</form>`;
 
-	return domUtils.createElement('DIV', { class: 'se-list-inner' }, list);
+	return dom.utils.createElement('DIV', { class: 'se-list-inner' }, list);
 }
 
 function _makeColor(colorList, splitNum) {

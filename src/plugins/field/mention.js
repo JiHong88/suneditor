@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { ApiManager, SelectMenu, Controller } from '../../modules';
-import { domUtils, converter } from '../../helper';
+import { dom, converter } from '../../helper';
 
 const { debounce } = converter;
 
@@ -98,11 +98,11 @@ class Mention extends EditorInjector {
 		if (lastAtPos > -1) {
 			const mentionQuery = textBeforeCursor.substring(lastAtPos + 1, anchorOffset);
 			const beforeText = textBeforeCursor[lastAtPos - 1]?.trim();
-			if (!/\s/.test(mentionQuery) && (!beforeText || domUtils.isZeroWidth(beforeText))) {
+			if (!/\s/.test(mentionQuery) && (!beforeText || dom.check.isZeroWidth(beforeText))) {
 				if (mentionQuery.length < this.searchStartLength) return true;
 
 				const anchorParent = anchorNode.parentNode;
-				if (domUtils.isAnchor(anchorParent) && !anchorParent.getAttribute('data-se-mention')) {
+				if (dom.check.isAnchor(anchorParent) && !anchorParent.getAttribute('data-se-mention')) {
 					return true;
 				}
 
@@ -203,7 +203,7 @@ class Mention extends EditorInjector {
 		const { key, name, url } = item;
 		const anchorParent = this._anchorNode.parentNode;
 
-		if (domUtils.isAnchor(anchorParent)) {
+		if (dom.check.isAnchor(anchorParent)) {
 			oA = anchorParent;
 			oA.setAttribute('data-se-mention', key);
 			oA.setAttribute('href', url);
@@ -211,13 +211,13 @@ class Mention extends EditorInjector {
 			oA.textContent = this.triggerText + key;
 		} else {
 			this.selection.setRange(this._anchorNode, this._lastAtPos, this._anchorNode, this._anchorOffset);
-			oA = domUtils.createElement('A', { 'data-se-mention': key, href: url, title: name, target: '_blank' }, this.triggerText + key);
+			oA = dom.utils.createElement('A', { 'data-se-mention': key, href: url, title: name, target: '_blank' }, this.triggerText + key);
 			if (!this.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return false;
 		}
 
 		this.selectMenu.close();
 
-		const space = domUtils.createTextNode('\u00A0');
+		const space = dom.utils.createTextNode('\u00A0');
 		oA.parentNode.insertBefore(space, oA.nextSibling);
 		this.selection.setRange(space, 1, space, 1);
 
@@ -228,7 +228,7 @@ class Mention extends EditorInjector {
 }
 
 function CreateHTML_controller() {
-	return domUtils.createElement('DIV', { class: 'se-controller se-empty-controller' }, '<div></div>');
+	return dom.utils.createElement('DIV', { class: 'se-controller se-empty-controller' }, '<div></div>');
 }
 
 export default Mention;

@@ -2,7 +2,7 @@
  * @fileoverview Toolbar class
  */
 
-import { domUtils, env } from '../../helper';
+import { dom, env } from '../../helper';
 import CoreInjector from '../../editorInjector/_core';
 import { CreateToolBar, UpdateButton } from '../section/constructor';
 
@@ -64,7 +64,7 @@ Toolbar.prototype = {
 		this._moreLayerOff();
 		this.menu.dropdownOff();
 		this.menu.containerOff();
-		domUtils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), true);
+		dom.utils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), true);
 	},
 
 	/**
@@ -72,7 +72,7 @@ Toolbar.prototype = {
 	 * @description Enable the toolbar
 	 */
 	enable() {
-		domUtils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), false);
+		dom.utils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), false);
 	},
 
 	/**
@@ -235,7 +235,7 @@ Toolbar.prototype = {
 		const toolbarTopPosition = this.options.get('toolbar_sticky') + inlineOffset + this.__getViewportTop();
 		toolbar.style.top = `${toolbarTopPosition}px`;
 		toolbar.style.width = this._isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
-		domUtils.addClass(toolbar, 'se-toolbar-sticky');
+		dom.utils.addClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = true;
 	},
 
@@ -266,7 +266,7 @@ Toolbar.prototype = {
 		toolbar.style.width = this._isInline ? this._inlineToolbarAttr.width : '';
 		this.editor.frameContext.get('wrapper').style.marginTop = '';
 
-		domUtils.removeClass(toolbar, 'se-toolbar-sticky');
+		dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = false;
 	},
 
@@ -320,8 +320,8 @@ Toolbar.prototype = {
 		} else if (selection.focusNode === selection.anchorNode) {
 			isDirTop = selection.focusOffset < selection.anchorOffset;
 		} else {
-			const childNodes = domUtils.getListChildNodes(range.commonAncestorContainer, null);
-			isDirTop = domUtils.getArrayIndex(childNodes, selection.focusNode) < domUtils.getArrayIndex(childNodes, selection.anchorNode);
+			const childNodes = dom.query.getListChildNodes(range.commonAncestorContainer, null);
+			isDirTop = dom.utils.getArrayIndex(childNodes, selection.focusNode) < dom.utils.getArrayIndex(childNodes, selection.anchorNode);
 		}
 
 		this._setBalloonOffset(isDirTop, range);
@@ -406,8 +406,8 @@ Toolbar.prototype = {
 	 */
 	_moreLayerOn(button, layer) {
 		this._moreLayerOff();
-		this.currentMoreLayerActiveButton = button;
-		layer.style.display = 'block';
+		this.currentMoreLayerActiveButton = /** @type {HTMLButtonElement} */ (button);
+		/** @type {HTMLElement} */ (layer).style.display = 'block';
 	},
 
 	/**
@@ -419,7 +419,7 @@ Toolbar.prototype = {
 		if (this.currentMoreLayerActiveButton) {
 			const layer = this.context.get(this.keyName + '.main').querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
 			layer.style.display = 'none';
-			domUtils.removeClass(this.currentMoreLayerActiveButton, 'on');
+			dom.utils.removeClass(this.currentMoreLayerActiveButton, 'on');
 			this.currentMoreLayerActiveButton = null;
 		}
 	},

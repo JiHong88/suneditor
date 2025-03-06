@@ -70,12 +70,12 @@
  * @property {FrameContext} frameContext Frame context
  * @property {KeyboardEvent} event Event object
  * @property {Range} range range object
- * @property {Element} line Current line element
+ * @property {HTMLElement} line Current line element
  */
 
 /**
  * @typedef {Object} PluginToolbarInputChangeEventInfo
- * @property {Element} target Input element
+ * @property {HTMLElement} target Input element
  * @property {Event} event Event object
  * @property {string} value Input value
  */

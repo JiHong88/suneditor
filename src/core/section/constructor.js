@@ -1,7 +1,7 @@
 import _icons from '../../assets/icons/_default';
 import _defaultLang from '../../langs/en';
 import { CreateContext, CreateFrameContext } from './context';
-import { domUtils, numbers, converter, env } from '../../helper';
+import { dom, numbers, converter, env } from '../../helper';
 
 const _d = env._d;
 const DEFAULT_BUTTON_LIST = [
@@ -183,8 +183,8 @@ export const RO_UNAVAILABD = [
  * @property {string} [__defaultAttributeWhitelist] - Allowed attributes. Delimiter: "|" (e.g. "href|target").
  * @property {Object<string, string>} [attributeWhitelist=""] - Allowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
  * @property {Object<string, string>} [attributeBlacklist=""] - Disallowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
- * @property {string} [__defaultFormatLine="P|H[1-6]|LI|TH|TD|DETAILS"] - Overrides the editor's default "line" element.
- * @property {string} [formatLine="P|H[1-6]|LI|TH|TD|DETAILS"] - Specifies the editor's "line" elements.
+ * @property {string} [__defaultFormatLine="P|DIV|H[1-6]|LI|TH|TD|DETAILS"] - Overrides the editor's default "line" element.
+ * @property {string} [formatLine="P|DIV|H[1-6]|LI|TH|TD|DETAILS"] - Specifies the editor's "line" elements.
  * - (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
  * - "line" element also contain "brLine" element
  * @property {string} [__defaultFormatBrLine="PRE"] - Overrides the editor's default "brLine" element.
@@ -273,16 +273,16 @@ function Constructor(editorTargets, options) {
 	const o = optionMap.o;
 	const icons = optionMap.i;
 	const lang = optionMap.l;
-	const loadingBox = domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
+	const loadingBox = dom.utils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
-	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper sun-editor-common' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
+	const editor_carrier_wrapper = dom.utils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper sun-editor-common' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
 	// menuTray
-	const menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
+	const menuTray = dom.utils.createElement('DIV', { class: 'se-menu-tray' });
 	editor_carrier_wrapper.appendChild(menuTray);
 	// focus temp element
 	const focusTemp = /** @type {HTMLInputElement} */ (
-		domUtils.createElement('INPUT', {
+		dom.utils.createElement('INPUT', {
 			class: '__se__focus__temp__',
 			style: 'position: fixed !important; top: -10000px !important; left: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;'
 		})
@@ -291,19 +291,19 @@ function Constructor(editorTargets, options) {
 	editor_carrier_wrapper.appendChild(focusTemp);
 
 	// modal
-	const modal = domUtils.createElement('DIV', { class: 'se-modal sun-editor-common' });
-	const modal_back = domUtils.createElement('DIV', { class: 'se-modal-back', style: 'display: none;' });
-	const modal_inner = domUtils.createElement('DIV', { class: 'se-modal-inner', style: 'display: none;' });
+	const modal = dom.utils.createElement('DIV', { class: 'se-modal sun-editor-common' });
+	const modal_back = dom.utils.createElement('DIV', { class: 'se-modal-back', style: 'display: none;' });
+	const modal_inner = dom.utils.createElement('DIV', { class: 'se-modal-inner', style: 'display: none;' });
 	modal.appendChild(modal_back);
 	modal.appendChild(modal_inner);
 	editor_carrier_wrapper.appendChild(modal);
 
 	// loding box, resizing back
-	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-back-wrapper' }));
+	editor_carrier_wrapper.appendChild(dom.utils.createElement('DIV', { class: 'se-back-wrapper' }));
 	editor_carrier_wrapper.appendChild(loadingBox.cloneNode(true));
 
 	// drag cursor
-	const dragCursor = domUtils.createElement('DIV', { class: 'se-drag-cursor' });
+	const dragCursor = dom.utils.createElement('DIV', { class: 'se-drag-cursor' });
 	editor_carrier_wrapper.appendChild(dragCursor);
 
 	// set carrier wrapper
@@ -322,7 +322,7 @@ function Constructor(editorTargets, options) {
 	} else if (/balloon/i.test(o.get('mode'))) {
 		toolbar.className += ' se-toolbar-balloon';
 		toolbar.style.width = o.get('toolbar_width');
-		toolbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
+		toolbar.appendChild(dom.utils.createElement('DIV', { class: 'se-arrow' }));
 	}
 
 	/** --- subToolbar --------------------------------------------------------------- */
@@ -333,7 +333,7 @@ function Constructor(editorTargets, options) {
 		// subbar mode must be balloon-*
 		subbar.className += ' se-toolbar-balloon se-toolbar-sub';
 		subbar.style.width = o.get('toolbar.sub_width');
-		subbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
+		subbar.appendChild(dom.utils.createElement('DIV', { class: 'se-arrow' }));
 	}
 
 	/** frame - root set - start -------------------------------------------------------------- */
@@ -345,11 +345,11 @@ function Constructor(editorTargets, options) {
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
 		const to = optionMap.frameMap.get(editTarget.key);
-		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (to.get('_rtl') ? ' se-rtl' : '') });
-		const container = domUtils.createElement('DIV', { class: 'se-container' });
-		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') });
+		const top_div = dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (to.get('_rtl') ? ' se-rtl' : '') });
+		const container = dom.utils.createElement('DIV', { class: 'se-container' });
+		const editor_div = dom.utils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') });
 
-		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-shadow' }));
+		container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
 		// init element
 		const initElements = _initTargetElements(editTarget.key, o, top_div, to);
@@ -360,22 +360,22 @@ function Constructor(editorTargets, options) {
 		let textarea = initElements.codeView;
 
 		// line breaker
-		const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t', title: lang.insertLine }, icons.line_break);
-		const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b', title: lang.insertLine }, icons.line_break);
+		const line_breaker_t = dom.utils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t', title: lang.insertLine }, icons.line_break);
+		const line_breaker_b = dom.utils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b', title: lang.insertLine }, icons.line_break);
 
 		editor_div.appendChild(line_breaker_t);
 		editor_div.appendChild(line_breaker_b);
 
 		// append container
 		if (placeholder_span) editor_div.appendChild(placeholder_span);
-		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
+		container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 		container.appendChild(editor_div);
 
 		// statusbar
 		if (statusbar) {
 			if (statusbarContainer) {
 				if (!default_status_bar) {
-					statusbarContainer.appendChild(domUtils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') }, statusbar));
+					statusbarContainer.appendChild(dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') }, statusbar));
 					default_status_bar = statusbar;
 				}
 			} else {
@@ -390,7 +390,7 @@ function Constructor(editorTargets, options) {
 		const key = editTarget.key || null;
 
 		// code view - wrapper
-		const codeWrapper = domUtils.createElement('DIV', { class: 'se-code-wrapper' }, textarea);
+		const codeWrapper = dom.utils.createElement('DIV', { class: 'se-code-wrapper' }, textarea);
 		codeWrapper.style.setProperty('display', 'none', 'important');
 		editor_div.appendChild(codeWrapper);
 
@@ -399,7 +399,7 @@ function Constructor(editorTargets, options) {
 		// not used code mirror
 		if (textarea === codeMirrorEl) {
 			// add line nubers
-			const codeNumbers = domUtils.createElement('TEXTAREA', { class: 'se-code-view-line', readonly: 'true' }, null);
+			const codeNumbers = dom.utils.createElement('TEXTAREA', { class: 'se-code-view-line', readonly: 'true' }, null);
 			codeWrapper.insertBefore(codeNumbers, textarea);
 		} else {
 			textarea = codeMirrorEl;
@@ -408,11 +408,11 @@ function Constructor(editorTargets, options) {
 		// document type
 		const documentTypeInner = { inner: null, page: null, pageMirror: null };
 		if (o.get('type-options').includes('header')) {
-			documentTypeInner.inner = domUtils.createElement('DIV', { class: 'se-document-lines', style: `height: ${to.get('height')};` }, '<div class="se-document-lines-inner"></div>');
+			documentTypeInner.inner = dom.utils.createElement('DIV', { class: 'se-document-lines', style: `height: ${to.get('height')};` }, '<div class="se-document-lines-inner"></div>');
 		}
 		if (o.get('type-options').includes('page')) {
-			documentTypeInner.page = domUtils.createElement('DIV', { class: 'se-document-page' }, null);
-			documentTypeInner.pageMirror = domUtils.createElement(
+			documentTypeInner.page = dom.utils.createElement('DIV', { class: 'se-document-page' }, null);
+			documentTypeInner.pageMirror = dom.utils.createElement(
 				'DIV',
 				{
 					class: 'sun-editor-editable se-document-page-mirror-a4',
@@ -432,13 +432,13 @@ function Constructor(editorTargets, options) {
 	// toolbar container
 	const toolbar_container = o.get('toolbar_container');
 	if (toolbar_container) {
-		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
-		const container = domUtils.createElement('DIV', { class: 'se-container' });
+		const top_div = dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
+		const container = dom.utils.createElement('DIV', { class: 'se-container' });
 		container.appendChild(toolbar);
 		if (subbar) container.appendChild(subbar);
 		top_div.appendChild(container);
 		toolbar_container.appendChild(top_div);
-		toolbar_container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
+		toolbar_container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 	} else {
 		const rootContainer = frameRoots.get(rootId).get('container');
 		rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
@@ -468,7 +468,7 @@ function Constructor(editorTargets, options) {
  * @param {string} command Command string
  * @param {Array<string>} values options.shortcuts[command]
  * @param {Element|null} button Command button element
- * @param {Map<string|number, *>} keyMap Map to store shortcut key info
+ * @param {Map<string, *>} keyMap Map to store shortcut key info
  * @param {Array} rc "_reverseCommandArray" option
  * @param {Array} reverseKeys Reverse key array
  */
@@ -522,7 +522,7 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 			}
 		}
 
-		k = c ? numbers.get(v) + (s ? 1000 : 0) : v;
+		k = c ? v + (s ? '1000' : '') : v;
 		if (!keyMap.has(k)) {
 			r = rc.indexOf(command);
 			r = r === -1 ? '' : numbers.isOdd(r) ? rc[r + 1] : rc[r - 1];
@@ -537,7 +537,7 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 }
 
 function _addTooltip(tooptipBtn, shift, shortcut) {
-	tooptipBtn.appendChild(domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (shift ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + shortcut + '</span>'));
+	tooptipBtn.appendChild(dom.utils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (shift ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + shortcut + '</span>'));
 }
 
 /**
@@ -817,25 +817,25 @@ export function InitOptions(options, editorTargets, plugins) {
 		: [
 				{
 					// default command
-					selectAll: ['c+65', 'A'],
-					bold: ['c+66', 'B'],
-					strike: ['c+s+83', 'S'],
-					underline: ['c+85', 'U'],
-					italic: ['c+73', 'I'],
-					redo: ['c+89', 'Y', 'c+s+90', 'Z'],
-					undo: ['c+90', 'Z'],
-					indent: ['c+221', ']'],
-					outdent: ['c+219', '['],
-					save: ['c+83', 'S'],
+					selectAll: ['c+KeyA', 'A'],
+					bold: ['c+KeyB', 'B'],
+					strike: ['c+s+KeyS', 'S'],
+					underline: ['c+KeyU', 'U'],
+					italic: ['c+KeyI', 'I'],
+					redo: ['c+KeyY', 'Y', 'c+s+KeyZ', 'Z'],
+					undo: ['c+KeyZ', 'Z'],
+					indent: ['c+BracketRight', ']'],
+					outdent: ['c+BracketLeft', '['],
+					save: ['c+KeyS', 'S'],
 					// plugins
-					link: ['c+75', 'K'],
+					link: ['c+KeyK', 'K'],
 					hr: ['!+---+=+~shortcut', ''],
 					list_numbered: ['!+1.+_+~shortcut', ''],
 					list_bulleted: ['!+*.+_+~shortcut', ''],
 					// custom
-					_h1: ['c+s+49+p~formatBlock.createHeader', ''],
-					_h2: ['c+s+50+p~formatBlock.createHeader', ''],
-					_h3: ['c+s+51+p~formatBlock.createHeader', '']
+					_h1: ['c+s+Digit1+p~formatBlock.createHeader', ''],
+					_h2: ['c+s+Digit2+p~formatBlock.createHeader', ''],
+					_h3: ['c+s+Digit3+p~formatBlock.createHeader', '']
 				},
 				options.shortcuts || {}
 		  ].reduce((_default, _new) => {
@@ -937,28 +937,28 @@ export function CreateStatusbar(targetOptions, statusbar) {
 	let charCounter = null;
 
 	if (targetOptions.get('statusbar')) {
-		statusbar = statusbar || domUtils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
+		statusbar = statusbar || dom.utils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
 
 		/** navigation */
-		navigation = statusbar.querySelector('.se-navigation') || domUtils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
+		navigation = statusbar.querySelector('.se-navigation') || dom.utils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
 		statusbar.appendChild(navigation);
 
 		/** char counter */
 		if (targetOptions.get('charCounter')) {
-			charWrapper = statusbar.querySelector('.se-char-counter-wrapper') || domUtils.createElement('DIV', { class: 'se-char-counter-wrapper' });
+			charWrapper = statusbar.querySelector('.se-char-counter-wrapper') || dom.utils.createElement('DIV', { class: 'se-char-counter-wrapper' });
 
 			if (targetOptions.get('charCounter_label')) {
-				const charLabel = charWrapper.querySelector('.se-char-label') || domUtils.createElement('SPAN', { class: 'se-char-label' });
+				const charLabel = charWrapper.querySelector('.se-char-label') || dom.utils.createElement('SPAN', { class: 'se-char-label' });
 				charLabel.textContent = targetOptions.get('charCounter_label');
 				charWrapper.appendChild(charLabel);
 			}
 
-			charCounter = charWrapper.querySelector('.se-char-counter') || domUtils.createElement('SPAN', { class: 'se-char-counter' });
+			charCounter = charWrapper.querySelector('.se-char-counter') || dom.utils.createElement('SPAN', { class: 'se-char-counter' });
 			charCounter.textContent = '0';
 			charWrapper.appendChild(charCounter);
 
 			if (targetOptions.get('charCounter_max') > 0) {
-				const char_max = charWrapper.querySelector('.se-char-max') || domUtils.createElement('SPAN', { class: 'se-char-max' });
+				const char_max = charWrapper.querySelector('.se-char-max') || dom.utils.createElement('SPAN', { class: 'se-char-max' });
 				char_max.textContent = ' / ' + targetOptions.get('charCounter_max');
 				charWrapper.appendChild(char_max);
 			}
@@ -1046,9 +1046,9 @@ function InitFrameOptions(o, origin) {
  * @description Initialize property of suneditor elements
  * @param {string} key - The key of the editor frame
  * @param {Map<string, *>} options - options
- * @param {Element} topDiv - top div
+ * @param {HTMLElement} topDiv - top div
  * @param {Map<string, *>} targetOptions - editor.frameOptions
- * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: Element, codeView: Element, placeholder: Element}}
+ * @returns {{bottomBar: ReturnType<CreateStatusbar>, wysiwygFrame: HTMLElement, codeView: HTMLElement, placeholder: HTMLElement}}
  */
 function _initTargetElements(key, options, topDiv, targetOptions) {
 	const editorStyles = targetOptions.get('_defaultStyles');
@@ -1057,7 +1057,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 
 	/** editor */
 	// wysiwyg div or iframe
-	const wysiwygDiv = domUtils.createElement(!targetOptions.get('iframe') ? 'DIV' : 'IFRAME', {
+	const wysiwygDiv = dom.utils.createElement(!targetOptions.get('iframe') ? 'DIV' : 'IFRAME', {
 		class: 'se-wrapper-inner se-wrapper-wysiwyg',
 		'data-root-key': key
 	});
@@ -1073,17 +1073,17 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 			wysiwygDiv.setAttribute(frameKey, frameAttrs[frameKey]);
 		}
 
-		const iframeWW = wysiwygDiv;
+		const iframeWW = /** @type {HTMLIFrameElement} */ (wysiwygDiv);
 		iframeWW.allowFullscreen = true;
 		iframeWW.frameBorder = '0';
 		iframeWW.style.cssText = editorStyles.frame;
 	}
 
 	// textarea for code view
-	const textarea = domUtils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-code-viewer', style: editorStyles.frame });
+	const textarea = dom.utils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-code-viewer', style: editorStyles.frame });
 	let placeholder = null;
 	if (targetOptions.get('placeholder')) {
-		placeholder = domUtils.createElement('SPAN', { class: 'se-placeholder' });
+		placeholder = dom.utils.createElement('SPAN', { class: 'se-placeholder' });
 		placeholder.textContent = targetOptions.get('placeholder');
 	}
 
@@ -1099,7 +1099,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
  * @private
  * @description Check the CodeMirror option to apply the CodeMirror and return the CodeMirror element.
  * @param {Map<string, *>} options options
- * @param {Element} textarea textarea element
+ * @param {HTMLElement} textarea textarea element
  */
 function _checkCodeMirror(options, targetOptions, textarea) {
 	let cmeditor = null;
@@ -1150,7 +1150,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 
 	options.set('hasCodeMirror', hasCodeMirror);
 	if (cmeditor) {
-		domUtils.removeItem(textarea);
+		dom.utils.removeItem(textarea);
 		cmeditor.className += ' se-code-viewer-mirror';
 		return cmeditor;
 	}
@@ -1262,8 +1262,8 @@ function _defaultButtons(options, icons, lang) {
  * @returns {{div: Element, ul: Element}}
  */
 function _createModuleGroup() {
-	const oUl = domUtils.createElement('UL', { class: 'se-menu-list' });
-	const oDiv = domUtils.createElement('DIV', { class: 'se-btn-module se-btn-module-border' }, oUl);
+	const oUl = dom.utils.createElement('UL', { class: 'se-menu-list' });
+	const oDiv = dom.utils.createElement('DIV', { class: 'se-btn-module se-btn-module-border' }, oUl);
 
 	return {
 		div: oDiv,
@@ -1286,19 +1286,20 @@ function _createModuleGroup() {
 function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, icons) {
 	if (!innerHTML) innerHTML = '';
 
-	const oLi = domUtils.createElement('LI');
+	const oLi = dom.utils.createElement('LI');
 	const label = title || '';
 	const isDiv = /^INPUT|FIELD$/i.test(dataType);
-	const oButton =
+	const oButton = /** @type {HTMLButtonElement} */ (
 		'se-toolbar-separator-vertical' === className
-			? domUtils.createElement('DIV', { class: className, tabindex: '-1' }, null)
-			: domUtils.createElement(isDiv ? 'DIV' : 'BUTTON', {
+			? dom.utils.createElement('DIV', { class: className, tabindex: '-1' }, null)
+			: dom.utils.createElement(isDiv ? 'DIV' : 'BUTTON', {
 					class: 'se-toolbar-btn se-btn se-tooltip' + (className ? ' ' + className : ''),
 					'data-command': dataCommand,
 					'data-type': dataType,
 					'aria-label': label.replace(/<span .+<\/span>/, ''),
 					tabindex: '-1'
-			  });
+			  })
+	);
 
 	if (!isDiv) {
 		oButton.setAttribute('type', 'button');
@@ -1314,7 +1315,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 
 	if (_disabled) oButton.disabled = true;
 
-	if (/^FIELD$/i.test(dataType)) domUtils.addClass(oLi, 'se-toolbar-hidden-btn');
+	if (/^FIELD$/i.test(dataType)) dom.utils.addClass(oLi, 'se-toolbar-hidden-btn');
 
 	if (label) innerHTML += CreateTooltipInner(label);
 	if (innerHTML) oButton.innerHTML = innerHTML;
@@ -1368,23 +1369,23 @@ export function UpdateButton(element, plugin, icons, lang) {
 
 	// side, replace button
 	if (plugin.afterItem) {
-		domUtils.addClass(plugin.afterItem, 'se-toolbar-btn');
+		dom.utils.addClass(plugin.afterItem, 'se-toolbar-btn');
 		element.parentElement.appendChild(plugin.afterItem);
 
-		domUtils.addClass(element, 'se-side-btn-a');
-		domUtils.addClass(plugin.afterItem, 'se-side-btn-after');
+		dom.utils.addClass(element, 'se-side-btn-a');
+		dom.utils.addClass(plugin.afterItem, 'se-side-btn-after');
 	}
 	if (plugin.beforeItem) {
-		domUtils.addClass(plugin.beforeItem, 'se-toolbar-btn');
+		dom.utils.addClass(plugin.beforeItem, 'se-toolbar-btn');
 		element.parentElement.insertBefore(plugin.beforeItem, element);
 
 		if (plugin.afterItem) {
-			domUtils.addClass(element, 'se-side-btn');
-			domUtils.removeClass(element, 'se-side-btn-a');
+			dom.utils.addClass(element, 'se-side-btn');
+			dom.utils.removeClass(element, 'se-side-btn-a');
 		} else {
-			domUtils.addClass(element, 'se-side-btn-b');
+			dom.utils.addClass(element, 'se-side-btn-b');
 		}
-		domUtils.addClass(plugin.beforeItem, 'se-side-btn-before');
+		dom.utils.addClass(plugin.beforeItem, 'se-side-btn-before');
 	}
 	if (plugin.replaceButton) {
 		element.parentElement.appendChild(plugin.replaceButton);
@@ -1394,7 +1395,7 @@ export function UpdateButton(element, plugin, icons, lang) {
 	if (!plugin.replaceButton && /^INPUT$/i.test(element.getAttribute('data-type'))) {
 		const inputTarget = element.querySelector('input');
 		if (inputTarget) {
-			domUtils.addClass(inputTarget, 'se-toolbar-btn');
+			dom.utils.addClass(inputTarget, 'se-toolbar-btn');
 			inputTarget.setAttribute('data-command', element.getAttribute('data-command'));
 			inputTarget.setAttribute('data-type', element.getAttribute('data-type'));
 			if (element.hasAttribute('disabled')) inputTarget.disabled = true;
@@ -1427,9 +1428,9 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 	let moduleElement = null;
 	let buttonElement = null;
 	// let vertical = false;
-	const moreLayer = domUtils.createElement('DIV', { class: 'se-toolbar-more-layer' });
-	const buttonTray = domUtils.createElement('DIV', { class: 'se-btn-tray' });
-	const separator_vertical = domUtils.createElement('DIV', { class: 'se-toolbar-separator-vertical' });
+	const moreLayer = dom.utils.createElement('DIV', { class: 'se-toolbar-more-layer' });
+	const buttonTray = dom.utils.createElement('DIV', { class: 'se-btn-tray' });
+	const separator_vertical = dom.utils.createElement('DIV', { class: 'se-toolbar-separator-vertical' });
 
 	buttonGroupLoop: for (let i = 0, more, moreContainer, moreCommand, buttonGroup, align; i < buttonList.length; i++) {
 		more = false;
@@ -1459,14 +1460,14 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 				} else {
 					// align
 					if (/^-/.test(button)) {
-						align = button.substr(1);
+						align = button.substring(1);
 						moduleElement.div.className += ' module-float-' + align;
 						continue;
 					}
 
 					// rtl fix
 					if (/^#/.test(button)) {
-						const option = button.substr(1);
+						const option = button.substring(1);
 						if (option === 'fix') moduleElement.ul.className += ' se-menu-dir-fix';
 						continue;
 					}
@@ -1512,7 +1513,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 				// more button
 				if (moreButton) {
 					more = true;
-					moreContainer = domUtils.createElement('DIV');
+					moreContainer = dom.utils.createElement('DIV');
 					moreContainer.className = 'se-more-layer ' + moreCommand;
 					moreContainer.setAttribute('data-ref', moreCommand);
 					moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"' + (align ? ' style="float: ' + align + ';"' : '') + '></ul></div>';
@@ -1535,7 +1536,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 			continue;
 		} else if (/^\/$/.test(buttonGroup)) {
 			/** line break  */
-			const enterDiv = domUtils.createElement('DIV', { class: 'se-btn-module-enter' });
+			const enterDiv = dom.utils.createElement('DIV', { class: 'se-btn-module-enter' });
 			buttonTray.appendChild(enterDiv);
 			// vertical = false;
 		}
@@ -1546,7 +1547,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 			buttonTray.style.display = 'none';
 			break;
 		case 1:
-			domUtils.removeClass(buttonTray.firstElementChild, 'se-btn-module-border');
+			dom.utils.removeClass(buttonTray.firstElementChild, 'se-btn-module-border');
 			break;
 	}
 
@@ -1554,7 +1555,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 	if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
 
 	// rendering toolbar
-	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' + (!options.get('shortcutsHint') ? ' se-shortcut-hide' : '') }, buttonTray);
+	const tool_bar = dom.utils.createElement('DIV', { class: 'se-toolbar sun-editor-common' + (!options.get('shortcutsHint') ? ' se-shortcut-hide' : '') }, buttonTray);
 
 	if (options.get('toolbar_hide')) tool_bar.style.display = 'none';
 

@@ -1,4 +1,4 @@
-import { env, converter, domUtils, numbers } from '../../src/helper';
+import { env, converter, dom, numbers } from '../../src/helper';
 
 describe('env', () => {
 	it('_global', () => {

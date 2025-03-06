@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller } from '../../modules';
-import { domUtils, env, converter } from '../../helper';
+import { dom, env, converter } from '../../helper';
 
 const { _w } = env;
 
@@ -31,11 +31,11 @@ class Math_ extends EditorInjector {
 	static className = '';
 	/**
 	 * @this {Math_}
-	 * @param {Node} node - The node to check.
-	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
-		return domUtils.hasClass(node, 'se-math|katex') && domUtils.hasClass(node, 'se-component') ? node : null;
+		return dom.utils.hasClass(node, 'se-math|katex') && dom.utils.hasClass(node, 'se-component') ? node : null;
 	}
 
 	/**
@@ -131,7 +131,7 @@ class Math_ extends EditorInjector {
 	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
-		if (domUtils.hasClass(target, 'se-math|katex') && getValue(target)) {
+		if (dom.utils.hasClass(target, 'se-math|katex') && getValue(target)) {
 			this._element = target;
 			this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
 			return;
@@ -152,7 +152,7 @@ class Math_ extends EditorInjector {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * @returns {{query: string, method: (element: HTMLElement) => void}} The format retention object containing the query and method to process the element.
 	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
 	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -166,15 +166,15 @@ class Math_ extends EditorInjector {
 				const value = getValue(element);
 				if (!value) return;
 
-				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
-				element.innerHTML = dom.querySelector('.se-math, .katex').innerHTML;
+				const domParser = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
+				element.innerHTML = domParser.querySelector('.se-math, .katex').innerHTML;
 				element.setAttribute('contenteditable', 'false');
-				domUtils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
+				dom.utils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
 
 				if (this.katex) {
-					domUtils.addClass(element, 'katex');
+					dom.utils.addClass(element, 'katex');
 				} else {
-					domUtils.removeClass(element, 'katex');
+					dom.utils.removeClass(element, 'katex');
 				}
 
 				if (this.mathjax) {
@@ -218,7 +218,7 @@ class Math_ extends EditorInjector {
 	 * @returns {boolean} Success or failure
 	 */
 	modalAction() {
-		if (this.textArea.value.trim().length === 0 || domUtils.hasClass(this.textArea, 'se-error')) {
+		if (this.textArea.value.trim().length === 0 || dom.utils.hasClass(this.textArea, 'se-error')) {
 			this.textArea.focus();
 			return false;
 		}
@@ -227,30 +227,30 @@ class Math_ extends EditorInjector {
 		const mathEl = this.previewElement.querySelector('.se-math, .katex');
 
 		if (!mathEl) return false;
-		domUtils.addClass(mathEl, 'se-component|se-inline-component|se-disable-pointer|se-math');
+		dom.utils.addClass(mathEl, 'se-component|se-inline-component|se-disable-pointer|se-math');
 		mathEl.setAttribute('contenteditable', 'false');
 		mathEl.setAttribute('data-se-value', converter.htmlToEntity(this._escapeBackslashes(mathExp, false)));
 		mathEl.setAttribute('data-se-type', this.fontSizeElement.value);
 		mathEl.style.fontSize = this.fontSizeElement.value;
 
 		if (this.katex) {
-			domUtils.addClass(mathEl, 'katex');
-			domUtils.removeClass(mathEl, 'MathJax');
+			dom.utils.addClass(mathEl, 'katex');
+			dom.utils.removeClass(mathEl, 'MathJax');
 		} else {
-			domUtils.removeClass(mathEl, 'katex');
+			dom.utils.removeClass(mathEl, 'katex');
 		}
 
 		if (!this.isUpdateState) {
 			const selectedFormats = this.format.getLines();
 
 			if (selectedFormats.length > 1) {
-				const oFormat = domUtils.createElement(selectedFormats[0].nodeName, null, mathEl);
+				const oFormat = dom.utils.createElement(selectedFormats[0].nodeName, null, mathEl);
 				this.component.insert(oFormat, { skipCharCount: false, skipSelection: true, skipHistory: false });
 			} else {
 				this.component.insert(mathEl, { skipCharCount: false, skipSelection: true, skipHistory: false });
 			}
 		} else {
-			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.se-component');
+			const containerEl = dom.query.getParentElement(this.controller.currentTarget, '.se-component');
 			containerEl.parentNode.replaceChild(mathEl, containerEl);
 			const compInfo = this.component.get(mathEl);
 			this.component.select(compInfo.target, compInfo.pluginName, false);
@@ -278,13 +278,13 @@ class Math_ extends EditorInjector {
 	init() {
 		this.textArea.value = '';
 		this.previewElement.innerHTML = '';
-		domUtils.removeClass(this.textArea, 'se-error');
+		dom.utils.removeClass(this.textArea, 'se-error');
 	}
 
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLElement} target Target button element
+	 * @param {HTMLButtonElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -303,10 +303,10 @@ class Math_ extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Node} target Target element
+	 * @param {HTMLElement} target Target element
 	 */
 	destroy(target) {
-		domUtils.removeItem(target);
+		dom.utils.removeItem(target);
 		this.controller.close();
 		this.editor.focus();
 		this.history.push(false);
@@ -321,20 +321,20 @@ class Math_ extends EditorInjector {
 	_renderer(exp) {
 		let result = '';
 		try {
-			domUtils.removeClass(this.textArea, 'se-error');
+			dom.utils.removeClass(this.textArea, 'se-error');
 			if (this.katex) {
 				result = this.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
 			} else if (this.mathjax) {
 				result = this.mathjax.convert(exp).outerHTML;
 				if (/<mjx-merror/.test(result)) {
-					domUtils.addClass(this.textArea, 'se-error');
+					dom.utils.addClass(this.textArea, 'se-error');
 					result = `<span class="se-math-error">${result}</span>`;
 				} else {
 					result = `<span class="se-math">${result}</span>`;
 				}
 			}
 		} catch (error) {
-			domUtils.addClass(this.textArea, 'se-error');
+			dom.utils.addClass(this.textArea, 'se-error');
 			result = `<span class="se-math-error">Math syntax error. (Refer ${this.katex ? `<a href="${env.KATEX_WEBSITE}" target="_blank">KaTeX</a>` : `<a href="${env.MATHJAX_WEBSITE}" target="_blank">MathJax</a>`})</span>`;
 			console.warn('[SUNEDITOR.math.error] ', error.message);
 		}
@@ -363,10 +363,10 @@ class Math_ extends EditorInjector {
 		try {
 			const text = getValue(element);
 			await navigator.clipboard.writeText(text);
-			domUtils.addClass(element, 'se-copy');
+			dom.utils.addClass(element, 'se-copy');
 			// copy effect
 			_w.setTimeout(() => {
-				domUtils.removeClass(element, 'se-copy');
+				dom.utils.removeClass(element, 'se-copy');
 			}, 120);
 		} catch (err) {
 			console.error('[SUNEDITOR.math.copy.fail]', err);
@@ -378,7 +378,7 @@ class Math_ extends EditorInjector {
 	 * @param {InputEvent} e - The input event.
 	 */
 	#RenderMathExp(e) {
-		const eventTarget = domUtils.getEventTarget(e);
+		const eventTarget = dom.query.getEventTarget(e);
 		if (this.pluginOptions.autoHeight) {
 			eventTarget.style.height = '5px';
 			eventTarget.style.height = eventTarget.scrollHeight + 5 + 'px';
@@ -497,7 +497,7 @@ function CreateHTML_modal(inst) {
     </form>`;
 
 	inst.defaultFontSize = defaultFontSize;
-	return domUtils.createElement('DIV', { class: 'se-modal-content se-modal-responsive', style: `max-width: ${maxWidth}; max-height: ${maxHeight};` }, html);
+	return dom.utils.createElement('DIV', { class: 'se-modal-content se-modal-responsive', style: `max-width: ${maxWidth}; max-height: ${maxHeight};` }, html);
 }
 
 function CreateHTML_controller({ lang, icons }) {
@@ -526,7 +526,7 @@ function CreateHTML_controller({ lang, icons }) {
         </div>
     </div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
 }
 
 function getValue(element) {

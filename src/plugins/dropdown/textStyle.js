@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @class
@@ -51,7 +51,7 @@ class TextStyle extends EditorInjector {
 				while (node && !this.format.isLine(node) && !this.component.is(node)) {
 					if (node.nodeName.toLowerCase() === btn.getAttribute('data-command').toLowerCase()) {
 						value = data[v];
-						if (/^\./.test(value) ? domUtils.hasClass(node, value.replace(/^\./, '')) : node.style[value]) {
+						if (/^\./.test(value) ? dom.utils.hasClass(node, value.replace(/^\./, '')) : node.style[value]) {
 							active = true;
 							break;
 						}
@@ -62,7 +62,7 @@ class TextStyle extends EditorInjector {
 				if (!active) break;
 			}
 
-			active ? domUtils.addClass(btn, 'active') : domUtils.removeClass(btn, 'active');
+			active ? dom.utils.addClass(btn, 'active') : dom.utils.removeClass(btn, 'active');
 		}
 	}
 
@@ -82,7 +82,7 @@ class TextStyle extends EditorInjector {
 			checkStyles.push('.' + classes[i]);
 		}
 
-		const newNode = domUtils.hasClass(target, 'active') ? null : tempElement.cloneNode(false);
+		const newNode = dom.utils.hasClass(target, 'active') ? null : tempElement.cloneNode(false);
 		const removeNodes = newNode ? null : [tempElement.nodeName];
 		this.format.applyInlineElement(newNode, { stylesToModify: checkStyles, nodesToRemove: removeNodes, strictRemove: true });
 
@@ -143,7 +143,7 @@ function CreateHTML({ lang }, items) {
 	}
 	list += '</ul></div>';
 
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
 }
 
 export default TextStyle;

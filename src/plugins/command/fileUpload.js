@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { CreateTooltipInner } from '../../core/section/constructor';
-import { domUtils, env, numbers } from '../../helper';
+import { dom, env, numbers } from '../../helper';
 import { FileManager, Figure, Controller } from '../../modules';
 
 const { NO_EVENT } = env;
@@ -16,11 +16,11 @@ class FileUpload extends EditorInjector {
 	static options = { eventIndex: 10000 };
 	/**
 	 * @this {FileUpload}
-	 * @param {Node} node - The node to check.
-	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
-		return domUtils.isAnchor(node) && node.hasAttribute('data-se-file-download') ? node : null;
+		return dom.check.isAnchor(node) && node.hasAttribute('data-se-file-download') ? node : null;
 	}
 
 	/**
@@ -47,13 +47,13 @@ class FileUpload extends EditorInjector {
 		// members
 		this.uploadUrl = pluginOptions.uploadUrl;
 		this.uploadHeaders = pluginOptions.uploadHeaders;
-		this.uploadSizeLimit = /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null;
-		this.uploadSingleSizeLimit = /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null;
+		this.uploadSizeLimit = numbers.get(pluginOptions.uploadSizeLimit, 0);
+		this.uploadSingleSizeLimit = numbers.get(pluginOptions.uploadSingleSizeLimit, 0);
 		this.allowMultiple = !!pluginOptions.allowMultiple;
 		this.acceptedFormats = typeof pluginOptions.acceptedFormats !== 'string' ? '*' : pluginOptions.acceptedFormats.trim() || '*';
 		this._acceptedCheck = this.acceptedFormats.split(', ');
 		this.as = pluginOptions.as || 'box';
-		this.input = domUtils.createElement('input', { type: 'file', accept: this.acceptedFormats });
+		this.input = dom.utils.createElement('input', { type: 'file', accept: this.acceptedFormats });
 		if (this.allowMultiple) {
 			this.input.setAttribute('multiple', 'multiple');
 		}
@@ -67,7 +67,7 @@ class FileUpload extends EditorInjector {
 				icon: 'download',
 				action: (target) => {
 					const url = target.getAttribute('href');
-					if (url) domUtils.createElement('A', { href: url }, null).click();
+					if (url) dom.utils.createElement('A', { href: url }, null).click();
 				}
 			},
 			'custom-as': {
@@ -120,7 +120,7 @@ class FileUpload extends EditorInjector {
 	select(target) {
 		this._element = target;
 		const asBtn = this.figure.controller.form.querySelector('[data-command="__c__as"]');
-		if (domUtils.isFigure(target.parentElement)) {
+		if (dom.check.isFigure(target.parentElement)) {
 			asBtn.innerHTML = this.icons.reduction + CreateTooltipInner(this.lang.asLink);
 			asBtn.setAttribute('data-value', 'link');
 			this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
@@ -166,14 +166,14 @@ class FileUpload extends EditorInjector {
 	edit(target) {
 		this.editInput.value = target.textContent;
 		this.figure.controllerHide();
-		this.controller.open(target, null, { isWWTarget: !domUtils.isFigure(target.parentElement), initMethod: null, addOffset: null });
+		this.controller.open(target, null, { isWWTarget: !dom.check.isFigure(target.parentElement), initMethod: null, addOffset: null });
 		this.editInput.focus();
 	}
 
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLElement} target Target button element
+	 * @param {HTMLButtonElement} target Target button element
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -191,21 +191,21 @@ class FileUpload extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Node} target Target element
+	 * @param {HTMLElement} target Target element
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
 		if (!target) return;
 
 		const figure = Figure.GetContainer(target);
-		const containerTarget = domUtils.getParentElement(target, '.se-component') || target;
+		const containerTarget = dom.query.getParentElement(target, '.se-component') || target;
 
 		const message = await this.triggerEvent('onFileDeleteBefore', { element: figure.target, container: figure, url: figure.target.getAttribute('href') });
 		if (message === false) return;
 
 		const isInlineComp = this.component.isInline(containerTarget);
 		const focusEl = isInlineComp ? containerTarget.previousSibling || containerTarget.nextSibling : containerTarget.previousElementSibling || containerTarget.nextElementSibling;
-		domUtils.removeItem(containerTarget);
+		dom.utils.removeItem(containerTarget);
 		this.ui._offCurrentController();
 
 		this.editor.focusEdge(focusEl);
@@ -298,24 +298,24 @@ class FileUpload extends EditorInjector {
 
 			target.removeAttribute('data-se-non-focus');
 			target.setAttribute('contenteditable', 'false');
-			domUtils.addClass(target, 'se-component|se-inline-component');
+			dom.utils.addClass(target, 'se-component|se-inline-component');
 
-			const line = domUtils.createElement(this.options.get('defaultLine'), null, target);
+			const line = dom.utils.createElement(this.options.get('defaultLine'), null, target);
 			parent.insertBefore(line, next);
-			domUtils.removeItem(container);
+			dom.utils.removeItem(container);
 		} else {
 			// block
 			this.selection.setRange(target, 0, target, 1);
 			const r = this.html.remove();
 			const s = this.nodeTransform.split(r.container, r.offset, 0);
 
-			if (s?.previousElementSibling && domUtils.isZeroWidth(s.previousElementSibling)) {
-				domUtils.removeItem(s.previousElementSibling);
+			if (s?.previousElementSibling && dom.check.isZeroWidth(s.previousElementSibling)) {
+				dom.utils.removeItem(s.previousElementSibling);
 			}
 
 			target.setAttribute('data-se-non-focus', 'true');
 			target.removeAttribute('contenteditable');
-			domUtils.removeClass(target, 'se-component|se-component-selected|se-inline-component');
+			dom.utils.removeClass(target, 'se-component|se-component-selected|se-inline-component');
 
 			const figure = Figure.CreateContainer(target, 'se-file-figure se-flex-component');
 			(s || r.container).parentElement.insertBefore(figure.container, s);
@@ -333,7 +333,7 @@ class FileUpload extends EditorInjector {
 	 */
 	create(url, file, isLast) {
 		const name = file.name || url;
-		const a = domUtils.createElement(
+		const a = dom.utils.createElement(
 			'A',
 			{
 				href: url,
@@ -356,7 +356,7 @@ class FileUpload extends EditorInjector {
 		}
 
 		const figure = Figure.CreateContainer(a);
-		domUtils.addClass(figure.container, 'se-file-figure|se-flex-component');
+		dom.utils.addClass(figure.container, 'se-file-figure|se-flex-component');
 
 		if (!this.component.insert(figure.container, { skipCharCount: false, skipSelection: isLast ? !this.options.get('componentAutoSelect') : true, skipHistory: false })) {
 			this.editor.focus();
@@ -427,7 +427,7 @@ class FileUpload extends EditorInjector {
 	 * @param {InputEvent} e - The change event object.
 	 */
 	async #OnChangeFile(e) {
-		const eventTarget = domUtils.getEventTarget(e);
+		const eventTarget = dom.query.getEventTarget(e);
 		await this.submitFile(eventTarget.files);
 	}
 }
@@ -450,7 +450,7 @@ function CreateHTML_controller({ lang, icons }) {
 		</form>
 		`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-simple-input' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-simple-input' }, html);
 }
 
 export default FileUpload;

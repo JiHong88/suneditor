@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, converter } from '../../helper';
+import { dom, converter } from '../../helper';
 
 /**
  * @typedef {Omit<Menu & Partial<EditorInjector>, 'menu'>} MenuThis
@@ -19,9 +19,6 @@ function Menu(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
-	/**
-	 * @type {Object.<string, Node>}
-	 */
 	this.targetMap = {};
 	this.index = -1;
 	this.menus = [];
@@ -60,11 +57,11 @@ Menu.prototype = {
 	initDropdownTarget({ key, type }, menu) {
 		if (key) {
 			if (!/free$/.test(type)) {
-				menu.setAttribute('data-key', key);
+				/** @type {HTMLElement} */ (menu).setAttribute('data-key', key);
 				this._dropdownCommands.push(key);
 			}
 			this.context.get('menuTray').appendChild(menu);
-			this.targetMap[key] = menu;
+			this.targetMap[key] = /** @type {HTMLElement} */ (menu);
 		} else {
 			throw Error("[SUNEDITOR.init.fail] The plugin's key is not added.");
 		}
@@ -79,7 +76,7 @@ Menu.prototype = {
 		this.__removeGlobalEvent();
 		const moreBtn = this._checkMoreLayer(button);
 		if (moreBtn) {
-			const target = domUtils.getParentElement(moreBtn, '.se-btn-tray').querySelector('[data-command="' + moreBtn.getAttribute('data-ref') + '"]');
+			const target = dom.query.getParentElement(moreBtn, '.se-btn-tray').querySelector('[data-command="' + moreBtn.getAttribute('data-ref') + '"]');
 			if (target) {
 				this.editor.runFromTarget(target);
 				this.dropdownOn(button);
@@ -87,11 +84,12 @@ Menu.prototype = {
 			}
 		}
 
-		const dropdownName = (this.currentDropdownName = button.getAttribute('data-command'));
-		this.currentDropdownType = button.getAttribute('data-type');
+		const btnEl = /** @type {HTMLButtonElement} */ (button);
+		const dropdownName = (this.currentDropdownName = btnEl.getAttribute('data-command'));
+		this.currentDropdownType = btnEl.getAttribute('data-type');
 		const menu = (this.currentDropdown = this.targetMap[dropdownName]);
-		this.currentDropdownActiveButton = button;
-		this._setMenuPosition(button, menu);
+		this.currentDropdownActiveButton = btnEl;
+		this._setMenuPosition(btnEl, menu);
 
 		this._bindClose_dropdown_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler.mousedown, false);
 		if (this._dropdownCommands.includes(dropdownName)) {
@@ -104,7 +102,7 @@ Menu.prototype = {
 		}
 
 		this.currentDropdownPlugin = this.plugins[dropdownName];
-		if (typeof this.currentDropdownPlugin?.on === 'function') this.currentDropdownPlugin.on(button);
+		if (typeof this.currentDropdownPlugin?.on === 'function') this.currentDropdownPlugin.on(btnEl);
 		this.editor._preventBlur = true;
 	},
 
@@ -123,7 +121,7 @@ Menu.prototype = {
 			this.currentDropdown.style.display = 'none';
 			this.currentDropdown = null;
 			if (this.currentDropdownActiveButton) {
-				domUtils.removeClass(this.currentDropdownActiveButton.parentElement.children, 'on');
+				dom.utils.removeClass(this.currentDropdownActiveButton.parentElement.children, 'on');
 			}
 			this.currentDropdownActiveButton = null;
 			this.editor._notHideToolbar = false;
@@ -143,8 +141,8 @@ Menu.prototype = {
 	containerOn(button) {
 		this.__removeGlobalEvent();
 
-		const containerName = (this.currentContainerName = button.getAttribute('data-command'));
-		this.currentContainerActiveButton = button;
+		this.currentContainerActiveButton = /** @type {HTMLButtonElement} */ (button);
+		const containerName = (this.currentContainerName = this.currentContainerActiveButton.getAttribute('data-command'));
 		this._setMenuPosition(button, (this.currentContainer = this.targetMap[containerName]));
 
 		this._bindClose_cons_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler.containerDown, false);
@@ -164,7 +162,7 @@ Menu.prototype = {
 			this.currentContainerName = '';
 			this.currentContainer.style.display = 'none';
 			this.currentContainer = null;
-			domUtils.removeClass(this.currentContainerActiveButton, 'on');
+			dom.utils.removeClass(this.currentContainerActiveButton, 'on');
 			this.currentContainerActiveButton = null;
 			this.editor._notHideToolbar = false;
 		}
@@ -177,15 +175,15 @@ Menu.prototype = {
 	 * @this {MenuThis}
 	 * @description Set the menu position.
 	 * @param {Node} element Button element
-	 * @param {Node} menu Menu element
+	 * @param {HTMLElement} menu Menu element
 	 */
 	_setMenuPosition(element, menu) {
 		menu.style.visibility = 'hidden';
 		menu.style.display = 'block';
 		menu.style.height = '';
-		domUtils.addClass(element.parentElement.children, 'on');
+		dom.utils.addClass(element.parentElement.children, 'on');
 
-		this.offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, domUtils.getParentElement(element, '.se-toolbar'), false);
+		this.offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'), false);
 
 		menu.style.visibility = '';
 	},
@@ -195,10 +193,10 @@ Menu.prototype = {
 	 * @this {MenuThis}
 	 * @description Check if the element is part of a more layer
 	 * @param {Node} element The element to check
-	 * @returns {Node|null} The more layer element or null
+	 * @returns {HTMLElement|null} The more layer element or null
 	 */
 	_checkMoreLayer(element) {
-		const more = domUtils.getParentElement(element, '.se-more-layer');
+		const more = dom.query.getParentElement(element, '.se-more-layer');
 		if (more && more.style.display !== 'block') {
 			return more.getAttribute('data-ref') ? more : null;
 		} else {
@@ -213,17 +211,17 @@ Menu.prototype = {
 	 * @param {number} num Direction and amount to move (-1 for up, 1 for down)
 	 */
 	_moveItem(num) {
-		domUtils.removeClass(this.currentDropdown, 'se-select-menu-mouse-move');
-		domUtils.addClass(this.currentDropdown, 'se-select-menu-key-action');
+		dom.utils.removeClass(this.currentDropdown, 'se-select-menu-mouse-move');
+		dom.utils.addClass(this.currentDropdown, 'se-select-menu-key-action');
 		num = this.index + num;
 		const len = this.menus.length;
 		const selectIndex = (this.index = num >= len ? 0 : num < 0 ? len - 1 : num);
 
 		for (let i = 0; i < len; i++) {
 			if (i === selectIndex) {
-				domUtils.addClass(this.menus[i], 'on');
+				dom.utils.addClass(this.menus[i], 'on');
 			} else {
-				domUtils.removeClass(this.menus[i], 'on');
+				dom.utils.removeClass(this.menus[i], 'on');
 			}
 		}
 	},
@@ -238,8 +236,8 @@ Menu.prototype = {
 		if (this._bindClose_cons_mouse) this._bindClose_cons_mouse = this.eventManager.removeGlobalEvent(this._bindClose_cons_mouse);
 		if (this._bindClose_dropdown_key) {
 			this._bindClose_dropdown_key = this.eventManager.removeGlobalEvent(this._bindClose_dropdown_key);
-			domUtils.removeClass(this.menus, 'on');
-			domUtils.removeClass(this.currentDropdown, 'se-select-menu-key-action|se-select-menu-mouse-move');
+			dom.utils.removeClass(this.menus, 'on');
+			dom.utils.removeClass(this.currentDropdown, 'se-select-menu-key-action|se-select-menu-mouse-move');
 			this.currentDropdown.removeEventListener('mousemove', this.__globalEventHandler.mousemove, false);
 			this.currentDropdown.removeEventListener('mouseout', this.__globalEventHandler.mouseout, false);
 		}
@@ -254,8 +252,8 @@ Menu.prototype = {
  * @param {MouseEvent} e - Event object
  */
 function OnMouseDown_dropdown(e) {
-	const eventTarget = domUtils.getEventTarget(e);
-	if (domUtils.getParentElement(eventTarget, '.se-dropdown')) return;
+	const eventTarget = dom.query.getEventTarget(e);
+	if (dom.query.getParentElement(eventTarget, '.se-dropdown')) return;
 	this.dropdownOff();
 }
 
@@ -273,30 +271,30 @@ function OnMouseout_dropdown() {
  * @param {KeyboardEvent} e - Event object
  */
 function OnKeyDown_dropdown(e) {
-	const keyCode = e.keyCode;
+	const keyCode = e.code;
 	switch (keyCode) {
-		case 38: // up
+		case 'ArrowUp': // up
 			e.preventDefault();
 			e.stopPropagation();
 			this._moveItem(-1);
 			break;
-		case 40: // down
+		case 'ArrowDown': // down
 			e.preventDefault();
 			e.stopPropagation();
 			this._moveItem(1);
 			break;
-		case 37: // left
+		case 'ArrowLeft': // left
 			e.preventDefault();
 			e.stopPropagation();
 			this._moveItem(-1);
 			break;
-		case 39: //right
+		case 'ArrowRight': //right
 			e.preventDefault();
 			e.stopPropagation();
 			this._moveItem(1);
 			break;
-		case 13:
-		case /* enter, space */ 32: {
+		case 'Enter':
+		case 'Space': /* enter, space */ {
 			if (this.index < 0) break;
 
 			const target = this.menus[this.index];
@@ -317,8 +315,8 @@ function OnKeyDown_dropdown(e) {
  * @param {MouseEvent} e - Event object
  */
 function OnMousemove_dropdown(e) {
-	domUtils.addClass(this.currentDropdown, 'se-select-menu-mouse-move');
-	domUtils.removeClass(this.currentDropdown, 'se-select-menu-key-action');
+	dom.utils.addClass(this.currentDropdown, 'se-select-menu-mouse-move');
+	dom.utils.removeClass(this.currentDropdown, 'se-select-menu-key-action');
 
 	const index = this.menus.indexOf(e.target);
 	if (index === -1) return;

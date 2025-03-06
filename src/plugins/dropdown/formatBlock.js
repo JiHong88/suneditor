@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 const HEADER_KEYCODE = new Map([
 	[49, 'h1'],
@@ -49,7 +49,7 @@ class FormatBlock extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
@@ -58,7 +58,7 @@ class FormatBlock extends EditorInjector {
 		const targetText = target.querySelector('.se-txt');
 
 		if (!element) {
-			domUtils.changeTxt(targetText, formatTitle);
+			dom.utils.changeTxt(targetText, formatTitle);
 		} else if (this.format.isLine(element)) {
 			const formatList = this.formatList;
 			const nodeName = element.nodeName.toLowerCase();
@@ -72,7 +72,7 @@ class FormatBlock extends EditorInjector {
 				}
 			}
 
-			domUtils.changeTxt(targetText, formatTitle);
+			dom.utils.changeTxt(targetText, formatTitle);
 			targetText.setAttribute('data-value', nodeName);
 			targetText.setAttribute('data-class', className);
 
@@ -96,9 +96,9 @@ class FormatBlock extends EditorInjector {
 			for (let i = 0, len = formatList.length, f; i < len; i++) {
 				f = formatList[i];
 				if (currentFormat === f.getAttribute('data-value') + f.getAttribute('data-class')) {
-					domUtils.addClass(f, 'active');
+					dom.utils.addClass(f, 'active');
 				} else {
-					domUtils.removeClass(f, 'active');
+					dom.utils.removeClass(f, 'active');
 				}
 			}
 
@@ -134,7 +134,7 @@ class FormatBlock extends EditorInjector {
 	 */
 	createHeader({ keyCode }) {
 		const headerName = HEADER_KEYCODE.get(keyCode);
-		const tag = domUtils.createElement(headerName);
+		const tag = dom.utils.createElement(headerName);
 		this.format.setLine(tag);
 	}
 }
@@ -176,7 +176,7 @@ function CreateHTML({ lang }, items) {
 		</ul>
 	</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
+	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
 }
 
 export default FormatBlock;

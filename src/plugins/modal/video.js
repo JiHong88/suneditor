@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager } from '../../modules';
-import { domUtils, numbers, env, converter } from '../../helper';
+import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
 import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
@@ -52,14 +52,14 @@ class Video extends EditorInjector {
 	static className = '';
 	/**
 	 * @this {Video}
-	 * @param {Node} node - The node to check.
-	 * @returns {Node|null} Returns a node if the node is a valid component.
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
 		if (/^(VIDEO)$/i.test(node?.nodeName)) {
 			return node;
 		} else if (/^(IFRAME)$/i.test(node?.nodeName)) {
-			return this.checkContentType(node.src) ? node : null;
+			return this.checkContentType(/** @type {HTMLIFrameElement} */ (node).src) ? node : null;
 		}
 		return null;
 	}
@@ -86,8 +86,8 @@ class Video extends EditorInjector {
 			createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
 			uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 			uploadHeaders: pluginOptions.uploadHeaders || null,
-			uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
-			uploadSingleSizeLimit: /\d+/.test(pluginOptions.uploadSingleSizeLimit) ? numbers.get(pluginOptions.uploadSingleSizeLimit, 0) : null,
+			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
+			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			allowMultiple: !!pluginOptions.allowMultiple,
 			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'video/*' : pluginOptions.acceptedFormats.trim() || 'video/*',
 			defaultRatio: numbers.get(pluginOptions.defaultRatio, 4) || 0.5625,
@@ -297,7 +297,7 @@ class Video extends EditorInjector {
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
 	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
 	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: Node) => void}} The format retention object containing the query and method to process the element.
+	 * @returns {{query: string, method: (element: HTMLIFrameElement|HTMLVideoElement) => void}} The format retention object containing the query and method to process the element.
 	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
 	 * - method:The function to execute on the element to validate and preserve its format.
 	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
@@ -410,19 +410,19 @@ class Video extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Node} target Target element
+	 * @param {HTMLElement} target Target element
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
 		const targetEl = target || this._element;
-		const container = domUtils.getParentElement(targetEl, Figure.is) || targetEl;
+		const container = dom.query.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
 		const message = await this.triggerEvent('onVideoDeleteBefore', { element: targetEl, container, align: this._align, url: this._linkValue });
 		if (message === false) return;
 
-		domUtils.removeItem(container);
+		dom.utils.removeItem(container);
 		this.init();
 
 		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
@@ -560,7 +560,7 @@ class Video extends EditorInjector {
 				}
 			}
 			container = this._container;
-			cover = domUtils.getParentElement(oFrame, 'FIGURE');
+			cover = dom.query.getParentElement(oFrame, 'FIGURE');
 		} else {
 			/** create */
 			oFrame.src = src;
@@ -614,7 +614,7 @@ class Video extends EditorInjector {
 	 * @returns {HTMLElement} The newly created iframe element.
 	 */
 	createIframeTag(props) {
-		const iframeTag = domUtils.createElement('IFRAME');
+		const iframeTag = dom.utils.createElement('IFRAME');
 		if (props) {
 			for (const key in props) {
 				iframeTag[key] = props[key];
@@ -631,7 +631,7 @@ class Video extends EditorInjector {
 	 * @returns {HTMLElement} The newly created video element.
 	 */
 	createVideoTag(props) {
-		const videoTag = domUtils.createElement('VIDEO');
+		const videoTag = dom.utils.createElement('VIDEO');
 		if (props) {
 			for (const key in props) {
 				videoTag[key] = props[key];
@@ -799,7 +799,7 @@ class Video extends EditorInjector {
 			this._setIframeAttrs(oFrame);
 		}
 
-		let existElement = this.format.isBlock(oFrame.parentNode) || domUtils.isWysiwygFrame(oFrame.parentNode) ? oFrame : this.format.getLine(oFrame) || oFrame;
+		let existElement = this.format.isBlock(oFrame.parentNode) || dom.check.isWysiwygFrame(oFrame.parentNode) ? oFrame : this.format.getLine(oFrame) || oFrame;
 
 		const prevFrame = oFrame;
 		const cloneFrame = oFrame.cloneNode(true);
@@ -809,9 +809,9 @@ class Video extends EditorInjector {
 		const figcaption = existElement.querySelector('figcaption');
 		let caption = null;
 		if (figcaption) {
-			caption = domUtils.createElement('DIV');
+			caption = dom.utils.createElement('DIV');
 			caption.innerHTML = figcaption.innerHTML;
-			domUtils.removeItem(figcaption);
+			dom.utils.removeItem(figcaption);
 		}
 
 		// size
@@ -824,18 +824,18 @@ class Video extends EditorInjector {
 		if (format) this._align = format.style.textAlign || format.style.float;
 		this.figure.setAlign(cloneFrame, this._align);
 
-		if (domUtils.getParentElement(prevFrame, domUtils.isExcludeFormat)) {
+		if (dom.query.getParentElement(prevFrame, dom.check.isExcludeFormat)) {
 			prevFrame.parentNode.replaceChild(container, prevFrame);
-		} else if (domUtils.isListCell(existElement)) {
-			const refer = domUtils.getParentElement(prevFrame, (current) => current.parentNode === existElement);
+		} else if (dom.check.isListCell(existElement)) {
+			const refer = dom.query.getParentElement(prevFrame, (current) => current.parentNode === existElement);
 			existElement.insertBefore(container, refer);
-			domUtils.removeItem(prevFrame);
+			dom.utils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(refer, null, true);
-		} else if (this.format.isLineOnly(existElement)) {
-			const refer = domUtils.getParentElement(prevFrame, (current) => current.parentNode === existElement);
+		} else if (this.format.isLine(existElement)) {
+			const refer = dom.query.getParentElement(prevFrame, (current) => current.parentNode === existElement);
 			existElement = this.nodeTransform.split(existElement, refer);
 			existElement.parentNode.insertBefore(container, existElement);
-			domUtils.removeItem(prevFrame);
+			dom.utils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(existElement, null, true);
 		} else {
 			existElement.parentNode.replaceChild(container, existElement);
@@ -984,7 +984,7 @@ class Video extends EditorInjector {
 	 * @param {InputEvent} e - Event object
 	 */
 	#OnLinkPreview(e) {
-		const eventTarget = domUtils.getEventTarget(e);
+		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.value.trim();
 		if (/^<iframe.*\/iframe>$/.test(value)) {
 			this._linkValue = value;
@@ -1029,7 +1029,7 @@ class Video extends EditorInjector {
 		}
 
 		// inputFile check
-		Modal.OnChangeFile(this.fileModalWrapper, domUtils.getEventTarget(e).files);
+		Modal.OnChangeFile(this.fileModalWrapper, dom.query.getEventTarget(e).files);
 	}
 
 	#OnClickRevert() {
@@ -1045,7 +1045,7 @@ class Video extends EditorInjector {
 	 * @param {InputEvent} e - Event object
 	 */
 	#SetRatio(e) {
-		const eventTarget = domUtils.getEventTarget(e);
+		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.options[eventTarget.selectedIndex].value;
 		this._defaultSizeY = this.figure.autoRatio.current = this._frameRatio = !value ? this._defaultSizeY : Number(value) * 100 + '%';
 		this.inputY.placeholder = !value ? '' : Number(value) * 100 + '%';
@@ -1061,12 +1061,12 @@ class Video extends EditorInjector {
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	#OnInputSize(xy, e) {
-		if (e.keyCode === 32) {
+		if (keyCodeMap.isSpace(e.code)) {
 			e.preventDefault();
 			return;
 		}
 
-		const eventTarget = domUtils.getEventTarget(e);
+		const eventTarget = dom.query.getEventTarget(e);
 		if (xy === 'x' && this._onlyPercentage && Number(eventTarget.value) > 100) {
 			eventTarget.value = '100';
 		} else if (this.proportion.checked) {
@@ -1174,7 +1174,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 		</div>
 	</form>`;
 
-	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
 export default Video;

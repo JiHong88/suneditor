@@ -68,7 +68,7 @@ class AudioGallery extends EditorInjector {
 
 	/**
 	 * @description Set browser item
-	 * @param {Node} target - Target element
+	 * @param {HTMLElement} target - Target element
 	 */
 	#SetItem(target) {
 		if (this.onSelectfunction) {

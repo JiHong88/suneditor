@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { dom } from '../../helper';
 
 /**
  * @class
@@ -41,7 +41,7 @@ class Align extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement|Text=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 */
@@ -49,12 +49,12 @@ class Align extends EditorInjector {
 		const targetChild = target.firstElementChild;
 
 		if (!element) {
-			domUtils.changeElement(targetChild, this.alignIcons[this.defaultDir]);
+			dom.utils.changeElement(targetChild, this.alignIcons[this.defaultDir]);
 			target.removeAttribute('data-focus');
 		} else if (this.format.isLine(element)) {
-			const textAlign = element.style.textAlign;
+			const textAlign = /** @type {HTMLElement} */ (element).style.textAlign;
 			if (textAlign) {
-				domUtils.changeElement(targetChild, this.alignIcons[textAlign] || this.alignIcons[this.defaultDir]);
+				dom.utils.changeElement(targetChild, this.alignIcons[textAlign] || this.alignIcons[this.defaultDir]);
 				target.setAttribute('data-focus', textAlign);
 				return true;
 			}
@@ -75,9 +75,9 @@ class Align extends EditorInjector {
 		const alignList = this.alignList;
 		for (let i = 0, len = alignList.length; i < len; i++) {
 			if (currentAlign === alignList[i].getAttribute('data-command')) {
-				domUtils.addClass(alignList[i], 'active');
+				dom.utils.addClass(alignList[i], 'active');
 			} else {
-				domUtils.removeClass(alignList[i], 'active');
+				dom.utils.removeClass(alignList[i], 'active');
 			}
 		}
 	}
@@ -115,7 +115,7 @@ class Align extends EditorInjector {
 		const defaultDir = this.defaultDir;
 		const selectedFormsts = this.format.getLines();
 		for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-			domUtils.setStyle(selectedFormsts[i], 'textAlign', value === defaultDir ? '' : value);
+			dom.utils.setStyle(selectedFormsts[i], 'textAlign', value === defaultDir ? '' : value);
 		}
 
 		this.editor.effectNode = null;
@@ -140,7 +140,7 @@ function CreateHTML({ lang, icons, options }, items) {
 		</li>`;
 	}
 
-	return domUtils.createElement(
+	return dom.utils.createElement(
 		'div',
 		{
 			class: 'se-dropdown se-list-layer se-list-align'

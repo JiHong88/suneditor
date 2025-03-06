@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal } from '../../modules';
-import { domUtils, env } from '../../helper';
+import { dom, env } from '../../helper';
 import { CreateTooltipInner } from '../../core/section/constructor';
 
 const { _w, isMobile } = env;
@@ -369,12 +369,12 @@ class Drawing extends EditorInjector {
 	 */
 	_activeAsInline(isInline) {
 		if (isInline) {
-			domUtils.addClass(this.asInline, 'on');
-			domUtils.removeClass(this.asBlock, 'on');
+			dom.utils.addClass(this.asInline, 'on');
+			dom.utils.removeClass(this.asBlock, 'on');
 			this.as = 'inline';
 		} else {
-			domUtils.addClass(this.asBlock, 'on');
-			domUtils.removeClass(this.asInline, 'on');
+			dom.utils.addClass(this.asBlock, 'on');
+			dom.utils.removeClass(this.asInline, 'on');
 			this.as = 'block';
 		}
 	}
@@ -465,7 +465,7 @@ class Drawing extends EditorInjector {
 	 * @param {MouseEvent} e - Event object
 	 */
 	#OnClickAsButton(e) {
-		this._activeAsInline(domUtils.getEventTarget(e).getAttribute('data-command') === 'asInline');
+		this._activeAsInline(dom.query.getEventTarget(e).getAttribute('data-command') === 'asInline');
 	}
 }
 
@@ -517,7 +517,7 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
         </div>
     </form>`;
 
-	return domUtils.createElement(
+	return dom.utils.createElement(
 		'DIV',
 		{
 			class: 'se-modal-content se-modal-responsive',
