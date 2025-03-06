@@ -76,17 +76,28 @@ function ModalAnchorEditor(inst, modalForm, params) {
 	// members
 	this.kink = inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
-	this.modalForm = modalForm;
+	this.modalForm = /** @type {HTMLElement} */ (modalForm);
 	this.host = (this._w.location.origin + this._w.location.pathname).replace(/\/$/, '');
+
+	/** @type {HTMLInputElement} */
 	this.urlInput = forms.querySelector('.se-input-url');
+	/** @type {HTMLInputElement} */
 	this.displayInput = forms.querySelector('._se_display_text');
+	/** @type {HTMLInputElement} */
 	this.titleInput = forms.querySelector('._se_title');
+	/** @type {HTMLInputElement} */
 	this.newWindowCheck = forms.querySelector('._se_anchor_check');
+	/** @type {HTMLInputElement} */
 	this.downloadCheck = forms.querySelector('._se_anchor_download');
+	/** @type {HTMLElement} */
 	this.download = forms.querySelector('._se_anchor_download_icon');
+	/** @type {HTMLElement} */
 	this.preview = forms.querySelector('.se-link-preview');
+	/** @type {HTMLElement} */
 	this.bookmark = forms.querySelector('._se_anchor_bookmark_icon');
+	/** @type {HTMLButtonElement} */
 	this.bookmarkButton = forms.querySelector('._se_bookmark_button');
+
 	this.currentRel = [];
 	this.currentTarget = null;
 	this.linkValue = '';
@@ -94,8 +105,11 @@ function ModalAnchorEditor(inst, modalForm, params) {
 	this._isRel = this.relList.length > 0;
 	// members - rel
 	if (this._isRel) {
+		/** @type {HTMLButtonElement} */
 		this.relButton = forms.querySelector('.se-anchor-rel-btn');
+		/** @type {HTMLElement} */
 		this.relPreview = forms.querySelector('.se-anchor-rel-preview');
+
 		const relList = this.relList;
 		const defaultRel = (this.defaultRel.default || '').split(' ');
 		const list = [];
@@ -122,7 +136,7 @@ function ModalAnchorEditor(inst, modalForm, params) {
 	}
 
 	// init
-	modalForm.querySelector('.se-anchor-editor').appendChild(forms);
+	this.modalForm.querySelector('.se-anchor-editor').appendChild(forms);
 	this.selectMenu_bookmark = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
 	this.selectMenu_bookmark.on(this.urlInput, SetHeaderBookmark.bind(this));
 	this.eventManager.addEvent(this.newWindowCheck, 'change', OnChange_newWindowCheck.bind(this));
@@ -142,7 +156,7 @@ ModalAnchorEditor.prototype = {
 	 * @param {Node} element Modal target element
 	 */
 	set(element) {
-		this.currentTarget = element;
+		this.currentTarget = /** @type {HTMLAnchorElement} */ (element);
 	},
 
 	/**
@@ -181,7 +195,7 @@ ModalAnchorEditor.prototype = {
 		const url = this.linkValue;
 		const displayText = this.displayInput.value.length === 0 ? url : this.displayInput.value;
 
-		const oA = /** @type {HTMLElement} */ (this.currentTarget || dom.utils.createElement('A'));
+		const oA = /** @type {HTMLAnchorElement} */ (this.currentTarget || dom.utils.createElement('A'));
 		this._updateAnchor(oA, url, displayText, this.titleInput.value, notText);
 		this.linkValue = this.preview.textContent = this.urlInput.value = this.displayInput.value = '';
 
@@ -206,7 +220,7 @@ ModalAnchorEditor.prototype = {
 	 * @private
 	 * @this {ModalAnchorEditorThis}
 	 * @description Updates the anchor element with new attributes.
-	 * @param {Node} anchor - The anchor (`<a>`) element to update.
+	 * @param {HTMLAnchorElement} anchor - The anchor (`<a>`) element to update.
 	 * @param {string} url - The URL for the anchor's `href` attribute.
 	 * @param {string} displayText - The text to be displayed inside the anchor.
 	 * @param {string} title - The tooltip text (title attribute).
@@ -288,7 +302,7 @@ ModalAnchorEditor.prototype = {
 	 * @param {string} urlValue - The current URL input value.
 	 */
 	_createBookmarkList(urlValue) {
-		const headers = dom.query.getListChildren(this.editor.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && current.id));
+		const headers = dom.query.getListChildren(this.editor.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id));
 		if (headers.length === 0) return;
 
 		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');
@@ -436,7 +450,7 @@ ModalAnchorEditor.prototype = {
  * @param {InputEvent} e - The change event object.
  */
 async function OnChangeFile(e) {
-	const eventTarget = dom.query.getEventTarget(e);
+	const eventTarget = /** @type {HTMLInputElement} */ (dom.query.getEventTarget(e));
 	const files = eventTarget.files;
 	if (!files[0]) return;
 
@@ -477,7 +491,7 @@ function OnClick_relbutton() {
  * @private
  * @this {ModalAnchorEditorThis}
  * @description Sets the selected bookmark as the URL.
- * @param {Node} item - The selected bookmark element.
+ * @param {HTMLElement} item - The selected bookmark element.
  */
 function SetHeaderBookmark(item) {
 	const id = item.id || 'h_' + Math.random().toString().replace(/.+\./, '');
@@ -492,7 +506,7 @@ function SetHeaderBookmark(item) {
 /**
  * @private
  * @this {ModalAnchorEditorThis}
- * @param {Node} item - The selected `rel` attribute element.
+ * @param {HTMLElement} item - The selected `rel` attribute element.
  */
 function SetRelItem(item) {
 	const cmd = item.getAttribute('data-command');
@@ -512,7 +526,7 @@ function SetRelItem(item) {
  * @param {InputEvent} e - Event object
  */
 function OnChange_displayInput(e) {
-	const eventTarget = dom.query.getEventTarget(e);
+	const eventTarget = /** @type {HTMLInputElement} */ (dom.query.getEventTarget(e));
 	this._change = !!eventTarget.value.trim();
 }
 
@@ -522,7 +536,7 @@ function OnChange_displayInput(e) {
  * @param {InputEvent} e - Event object
  */
 function OnChange_urlInput(e) {
-	const eventTarget = dom.query.getEventTarget(e);
+	const eventTarget = /** @type {HTMLInputElement} */ (dom.query.getEventTarget(e));
 	const value = eventTarget.value.trim();
 	this._setLinkPreview(value);
 	if (this._selfPathBookmark(value)) this._createBookmarkList(value);
@@ -569,7 +583,7 @@ function OnClick_bookmarkButton() {
  */
 function OnChange_newWindowCheck(e) {
 	if (typeof this.defaultRel.check_new_window !== 'string') return;
-	const eventTarget = dom.query.getEventTarget(e);
+	const eventTarget = /** @type {HTMLInputElement} */ (dom.query.getEventTarget(e));
 	if (eventTarget.checked) {
 		this._setRel(this._relMerge(this.defaultRel.check_new_window));
 	} else {
@@ -583,7 +597,7 @@ function OnChange_newWindowCheck(e) {
  * @param {InputEvent} e - Event object
  */
 function OnChange_downloadCheck(e) {
-	const eventTarget = dom.query.getEventTarget(e);
+	const eventTarget = /** @type {HTMLInputElement} */ (dom.query.getEventTarget(e));
 	if (eventTarget.checked) {
 		this.download.style.display = 'block';
 		this.bookmark.style.display = 'none';

@@ -117,7 +117,7 @@ FileManager.prototype = {
 	/**
 	 * @this {FileManagerThis}
 	 * @description Set the file information to the element.
-	 * @param {Node} element File information element
+	 * @param {Element} element File information element
 	 * @param {Object} params
 	 * @param {string} params.name File name
 	 * @param {number} params.size File size
@@ -126,14 +126,14 @@ FileManager.prototype = {
 	setFileData(element, { name, size }) {
 		if (!element) return;
 		element.setAttribute('data-se-file-name', name);
-		element.setAttribute('data-se-file-size', size);
+		element.setAttribute('data-se-file-size', size + '');
 	},
 
 	/**
 	 * @private
 	 * @this {FileManagerThis}
 	 * @description Create info object of file and add it to "infoList"
-	 * @param {Node} element
+	 * @param {HTMLMediaElement} element
 	 * @param {{name: string, size: number}|null} file File information
 	 */
 	_setInfo(element, file) {
@@ -153,9 +153,9 @@ FileManager.prototype = {
 			state = 'create';
 			dataIndex = this.infoIndex++;
 
-			element.setAttribute('data-se-index', dataIndex);
+			element.setAttribute('data-se-index', dataIndex + '');
 			element.setAttribute('data-se-file-name', file.name);
-			element.setAttribute('data-se-file-size', file.size);
+			element.setAttribute('data-se-file-size', file.size + '');
 
 			info = {
 				src: element.src,
@@ -344,7 +344,7 @@ FileManager.prototype = {
 
 /**
  * @private
- * @param {Node} element - Element
+ * @param {Element} element - Element
  * @param {string} name - Attribute name
  * @returns {string|null}
  */

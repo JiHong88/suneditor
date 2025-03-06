@@ -56,11 +56,11 @@ function CreateSliderCtx() {
 		offscreenCtx: offscreenCanvas.getContext('2d'),
 		wheel: wheelCanvas,
 		wheelCtx: wheelCanvas.getContext('2d'),
-		wheelPointer: slider.querySelector('.se-hue-wheel-pointer'),
+		wheelPointer: /** @type {HTMLElement} */ (slider.querySelector('.se-hue-wheel-pointer')),
 		gradientBar: gradientBarCanvas,
-		gradientPointer: slider.querySelector('.se-hue-gradient-pointer'),
-		fanalColorHex: currentColors[0],
-		fanalColorBackground: currentColors[1]
+		gradientPointer: /** @type {HTMLElement} */ (slider.querySelector('.se-hue-gradient-pointer')),
+		fanalColorHex: /** @type {HTMLElement} */ (currentColors[0]),
+		fanalColorBackground: /** @type {HTMLElement} */ (currentColors[1])
 	};
 }
 

@@ -49,14 +49,14 @@ function Controller(inst, element, params, _name) {
 	// members
 	this.kind = _name || inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
-	this.form = /** @type {HTMLElement} */ (element);
+	this.form = /** @type {HTMLFormElement} */ (element);
 	this.isOpen = false;
 	this.currentTarget = null;
 	this.currentPositionTarget = null;
 	this.isWWTarget = params.isWWTarget ?? true;
 	this.position = params.position || 'bottom';
 	this.disabled = !!params.disabled;
-	this.parents = params.parents || [];
+	this.parents = /** @type {Array<HTMLElement>} */ (params.parents || []);
 	this.parentsHide = !!params.parentsHide;
 	this.isInsideForm = !!params.isInsideForm;
 	this.isOutsideForm = !!params.isOutsideForm;
@@ -197,7 +197,7 @@ Controller.prototype = {
 	 * @private
 	 * @this {ControllerThis}
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
-	 * @param {Node} form Controller element
+	 * @param {HTMLFormElement} form Controller element
 	 * @param {Node|Range} target Controller target element
 	 * @param {boolean} isRangeTarget If the target is a Range, set it to true.
 	 */

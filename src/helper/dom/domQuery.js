@@ -583,7 +583,6 @@ export function getIframeDocument(iframe) {
 }
 
 const query = {
-	selectMap,
 	getPositionIndex,
 	getNodePath,
 	getNodeFromPath,

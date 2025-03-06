@@ -1,4 +1,5 @@
 import { dom, converter } from '../helper';
+import { isElement } from '../helper/dom/domCheck';
 import CoreInjector from '../editorInjector/_core';
 import { HueSlider } from '../modules';
 
@@ -101,7 +102,7 @@ function ColorPicker(inst, styles, params) {
 	this.inst = inst;
 	this.target = CreateHTML(editor, params);
 	this.targetButton = null;
-	this.inputElement = this.target.querySelector('.se-color-input');
+	this.inputElement = /** @type {HTMLInputElement} */ (this.target.querySelector('.se-color-input'));
 	this.styleProperties = styles;
 	this.splitNum = params.splitNum || 0;
 	this.defaultColor = params.defaultColor;
@@ -209,7 +210,7 @@ ColorPicker.prototype = {
 		const sp = this.styleProperties;
 
 		while (node && !dom.check.isWysiwygFrame(node) && findColor.length === 0) {
-			if (node.nodeType === 1 && node.style[sp]) findColor = node.style[sp];
+			if (isElement(node) && node.style[sp]) findColor = node.style[sp];
 			node = node.parentNode;
 		}
 

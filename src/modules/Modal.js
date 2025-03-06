@@ -18,7 +18,7 @@ const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize',
  * @this {ModalThis}
  * @description Modal window module
  * @param {* & {editor: EditorCore}} inst The instance object that called the constructor.
- * @param {Node} element Modal element
+ * @param {Element} element Modal element
  */
 function Modal(inst, element) {
 	CoreInjector.call(this, inst.editor);
@@ -28,17 +28,25 @@ function Modal(inst, element) {
 	// members
 	this.inst = inst;
 	this.kind = inst.constructor.key || inst.constructor.name;
-	this.form = element;
-	this.focusElement = element.querySelector('[data-focus]');
+	this.form = /** @type {HTMLElement} */ (element);
 	this.isUpdate = false;
+
+	/** @type {HTMLInputElement} */
+	this.focusElement = element.querySelector('[data-focus]');
+	/** @type {HTMLElement} */
 	this._modalArea = this.carrierWrapper.querySelector('.se-modal');
+	/** @type {HTMLElement} */
 	this._modalBack = this.carrierWrapper.querySelector('.se-modal-back');
+	/** @type {HTMLElement} */
 	this._modalInner = this.carrierWrapper.querySelector('.se-modal-inner');
+
 	this._closeListener = [CloseListener.bind(this), OnClick_dialog.bind(this)];
 	this._bindClose = null;
 	this._onClickEvent = null;
 	this._closeSignal = false;
+
 	// resie
+	/** @type {HTMLElement} */
 	this._resizeBody = null;
 
 	// add element
@@ -344,15 +352,15 @@ Modal.CreateFileInput = function ({ icons, lang }, { acceptedFormats, allowMulti
 
 /**
  * @description A function called when the contents of "input" have changed and you want to adjust the style.
- * @param {Node} wrapper - Modal file input wrapper(.se-flex-input-wrapper)
+ * @param {Element} wrapper - Modal file input wrapper(.se-flex-input-wrapper)
  * @param {FileList|File[]} files - FileList object
  */
 Modal.OnChangeFile = function (wrapper, files) {
 	if (!wrapper || !files) return;
 
-	const fileCnt = wrapper.querySelector('.se-input-file-cnt');
-	const fileUp = wrapper.querySelector('.se-input-file-icon-up');
-	const fileSelected = wrapper.querySelector('.se-input-file-icon-files');
+	const fileCnt = /** @type {HTMLElement} */ (wrapper.querySelector('.se-input-file-cnt'));
+	const fileUp = /** @type {HTMLElement} */ (wrapper.querySelector('.se-input-file-icon-up'));
+	const fileSelected = /** @type {HTMLElement} */ (wrapper.querySelector('.se-input-file-icon-files'));
 
 	if (files.length > 1) {
 		fileUp.style.display = 'none';

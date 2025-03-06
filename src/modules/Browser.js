@@ -50,20 +50,21 @@ function Browser(inst, params) {
 	// create HTML
 	this.useSearch = params.useSearch ?? true;
 	const browserFrame = dom.utils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
-	const content = dom.utils.createElement('DIV', { class: 'se-browser-inner' }, CreateHTML(inst.editor, this.useSearch));
+	const contentHTML = CreateHTMLInfos(inst.editor, this.useSearch);
+	const content = contentHTML.html;
 
 	// members
 	this.kind = inst.constructor.key || inst.constructor.name;
 	this.inst = inst;
 	this.area = browserFrame;
-	this.header = content.querySelector('.se-browser-header');
-	this.titleArea = content.querySelector('.se-browser-title');
-	this.tagArea = content.querySelector('.se-browser-tags');
-	this.body = content.querySelector('.se-browser-body');
-	this.list = content.querySelector('.se-browser-list');
-	this.side = content.querySelector('.se-browser-side');
-	this.wrapper = content.querySelector('.se-browser-wrapper');
-	this._loading = content.querySelector('.se-loading-box');
+	this.header = contentHTML.header;
+	this.titleArea = contentHTML.titleArea;
+	this.tagArea = contentHTML.tagArea;
+	this.body = contentHTML.body;
+	this.list = contentHTML.list;
+	this.side = contentHTML.side;
+	this.wrapper = contentHTML.wrapper;
+	this._loading = contentHTML._loading;
 
 	this.title = params.title;
 	this.listClass = params.listClass || 'se-preview-list';
@@ -121,7 +122,7 @@ function Browser(inst, params) {
 	this.eventManager.addEvent(content, 'mousedown', OnMouseDown_browser.bind(this));
 	this.eventManager.addEvent(content, 'click', OnClick_browser.bind(this));
 	this.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', Search.bind(this));
-	this.eventManager.addEvent((this.sideOpenBtn = browserFrame.querySelector('.se-side-open-btn')), 'click', SideOpen.bind(this));
+	this.eventManager.addEvent((this.sideOpenBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-side-open-btn'))), 'click', SideOpen.bind(this));
 	this.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', SideClose.bind(this));
 }
 
@@ -330,7 +331,7 @@ Browser.prototype = {
 			this.side.appendChild(sideInner);
 
 			if (this.folderDefaultPath) {
-				const openFolder = sideInner.querySelector(`[data-command="${this.folderDefaultPath}"]`);
+				const openFolder = /** @type {HTMLButtonElement} */ (sideInner.querySelector(`[data-command="${this.folderDefaultPath}"]`));
 				openFolder.click();
 				if (this.folderDefaultPath.includes('/')) {
 					dom.utils.removeClass(openFolder.parentElement, 'se-menu-hidden');
@@ -586,7 +587,7 @@ function OnClick_browser(e) {
 function Search(e) {
 	const eventTarget = /** @type {HTMLElement} */ (e.currentTarget);
 	e.preventDefault();
-	this.search(eventTarget.querySelector('input[type="text"]').value);
+	this.search(/** @type {HTMLInputElement} */ (eventTarget.querySelector('input[type="text"]')).value);
 }
 
 /**
@@ -620,12 +621,14 @@ function SideClose({ target }) {
 
 /**
  * @private
- * @param {EditorCore} param0 - editor instance
+ * @param {EditorCore} editor - editor instance
  * @param {boolean} useSearch - Whether to use the search function
- * @returns {string} HTML
+ * @returns {{ html: HTMLElement, header: HTMLElement, titleArea: HTMLElement, tagArea: HTMLElement, body: HTMLElement, list: HTMLElement, side: HTMLElement, wrapper: HTMLElement, _loading: HTMLElement }} HTML
  */
-function CreateHTML({ lang, icons }, useSearch) {
-	return /*html*/ `
+function CreateHTMLInfos(editor, useSearch) {
+	const lang = editor.lang;
+	const icons = editor.icons;
+	const htmlString = /*html*/ `
 		<div class="se-browser-content">
 			<div class="se-browser-header">
 				<button type="button" data-command="close" class="se-btn se-browser-close" class="close" title="${lang.close}" aria-label="${lang.close}">
@@ -659,6 +662,20 @@ function CreateHTML({ lang, icons }, useSearch) {
 				</div>
 			</div>
 		</div>`;
+
+	const content = dom.utils.createElement('DIV', { class: 'se-browser-inner' }, htmlString);
+
+	return {
+		html: content,
+		header: content.querySelector('.se-browser-header'),
+		titleArea: content.querySelector('.se-browser-title'),
+		tagArea: content.querySelector('.se-browser-tags'),
+		body: content.querySelector('.se-browser-body'),
+		list: content.querySelector('.se-browser-list'),
+		side: content.querySelector('.se-browser-side'),
+		wrapper: content.querySelector('.se-browser-wrapper'),
+		_loading: content.querySelector('.se-loading-box')
+	};
 }
 
 /**

@@ -33,7 +33,8 @@ function SelectMenu(inst, params) {
 	const positionItems = params.position.split('-');
 	this.form = null;
 	this.items = [];
-	this.menus = [];
+	/** @type {NodeListOf<HTMLLIElement>} */
+	this.menus = null;
 	this.menuLen = 0;
 	this.index = -1;
 	this.item = null;
@@ -69,8 +70,8 @@ SelectMenu.prototype = {
 	/**
 	 * @this {SelectMenuThis}
 	 * @description Creates the select menu items.
-	 * @param {Array<string|Node>|NodeCollection} items - Command list of selectable items.
-	 * @param {Array<string|Node>|NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<string|Node>} items - Command list of selectable items.
+	 * @param {Array<string|Node>} [menus] - Optional list of menu display elements; defaults to `items`.
 	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';
@@ -99,7 +100,7 @@ SelectMenu.prototype = {
 	 */
 	on(referElement, selectMethod, attr) {
 		if (!attr) attr = {};
-		this._refer = referElement;
+		this._refer = /** @type {HTMLElement} */ (referElement);
 		this._keydownTarget = dom.check.isInputElement(referElement) ? referElement : this._w;
 		this._selectMethod = selectMethod;
 		this.form = dom.utils.createElement(

@@ -22,7 +22,7 @@ function NodeTransform(editor) {
 NodeTransform.prototype = {
 	/**
 	 * @this {NodeTransformThis}
-	 * @template {Node} T
+	 * @template {HTMLElement} T
 	 * @description Split all tags based on "baseNode"
 	 * @param {Node} baseNode Element or text node on which to base
 	 * @param {?number|Node} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)

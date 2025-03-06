@@ -219,7 +219,7 @@ Figure.GetContainer = function (element) {
 Figure.GetRatio = function (w, h, defaultSizeUnit) {
 	let rw = 1,
 		rh = 1;
-	if (/\d+/.test(w) && /\d+/.test(h)) {
+	if (/\d+/.test(w + '') && /\d+/.test(h + '')) {
 		const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		if (xUnit === yUnit) {
@@ -245,7 +245,7 @@ Figure.GetRatio = function (w, h, defaultSizeUnit) {
  * @return {{w: string|number, h: string|number}}
  */
 Figure.CalcRatio = function (w, h, defaultSizeUnit, ratio) {
-	if (/\d+/.test(w) && /\d+/.test(h)) {
+	if (/\d+/.test(w + '') && /\d+/.test(h + '')) {
 		const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		if (xUnit === yUnit) {
@@ -287,7 +287,7 @@ Figure.prototype = {
 	/**
 	 * @this {FigureThis}
 	 * @description Open the figure's controller
-	 * @param {Node} target Target element
+	 * @param {Node} targetNode Target element
 	 * @param {Object} params params
 	 * @param {boolean} [params.nonResizing=false] Do not display the resizing button
 	 * @param {boolean} [params.nonSizeInfo=false] Do not display the size information
@@ -296,9 +296,9 @@ Figure.prototype = {
 	 * @param {boolean} [params.__fileManagerInfo=false] If true, the file manager is called
 	 * @returns {FigureTargetInfo|undefined} figure target info
 	 */
-	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
-		if (!target) {
-			console.warn('[SUNEDITOR.modules.Figure.open] The target element is null.');
+	open(targetNode, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
+		if (!targetNode) {
+			console.warn('[SUNEDITOR.modules.Figure.open] The "targetNode" is null.');
 			return;
 		}
 
@@ -308,19 +308,20 @@ Figure.prototype = {
 			nonBorder = true;
 		}
 
-		const figureInfo = Figure.GetContainer(target);
+		const figureInfo = Figure.GetContainer(targetNode);
+		const target = figureInfo.target;
 		let exceptionFormat = false;
 		if (!figureInfo.container) {
 			if (!this.options.get('strictMode').formatFilter) {
-				figureInfo.container = /** @type {HTMLElement} */ (target);
-				figureInfo.cover = /** @type {HTMLElement} */ (target);
+				figureInfo.container = target;
+				figureInfo.cover = target;
 				exceptionFormat = true;
 			} else {
 				return {
 					container: null,
 					cover: null,
-					width: target.style.width || (!numbers.is(target.width) ? target.width : '') || '',
-					height: target.style.height || (!numbers.is(target.height) ? target.height : '') || ''
+					width: target.style.width || (!numbers.is(/** @type {HTMLImageElement} */ (target).width) ? /** @type {HTMLImageElement} */ (target).width : '') || '',
+					height: target.style.height || (!numbers.is(/** @type {HTMLImageElement} */ (target).height) ? /** @type {HTMLImageElement} */ (target).height : '') || ''
 				};
 			}
 		}
@@ -348,8 +349,8 @@ Figure.prototype = {
 			l: left,
 			width: dataSize[0] || 'auto',
 			height: dataSize[1] || 'auto',
-			originWidth: target.naturalWidth || target.offsetWidth,
-			originHeight: target.naturalHeight || target.offsetHeight
+			originWidth: /** @type {HTMLImageElement} */ (target).naturalWidth || target.offsetWidth,
+			originHeight: /** @type {HTMLImageElement} */ (target).naturalHeight || target.offsetHeight
 		};
 
 		this._width = targetInfo.width;
@@ -415,12 +416,12 @@ Figure.prototype = {
 			);
 			const display = this._inlineCover || exceptionFormat ? 'none' : '';
 			transformButtons.forEach((button) => {
-				button.style.display = display;
+				/** @type {HTMLButtonElement} */ (button).style.display = display;
 			});
 			// onas
 			const onas = this.controller.form.querySelector('[data-command="onas"]');
 			if (onas) {
-				onas.style.display = exceptionFormat ? 'none' : '';
+				/** @type {HTMLButtonElement} */ (onas).style.display = exceptionFormat ? 'none' : '';
 			}
 			// selecte
 			dom.utils.removeClass(this._cover, 'se-figure-over-selected');
@@ -483,7 +484,7 @@ Figure.prototype = {
 	 * @param {string|number} h Height size
 	 */
 	setSize(w, h) {
-		if (/%$/.test(w)) {
+		if (/%$/.test(w + '')) {
 			this._setPercentSize(w, h);
 		} else if ((!w || w === 'auto') && (!h || h === 'auto')) {
 			if (this.autoRatio) this._setPercentSize(100, this.autoRatio.default || this.autoRatio.current);
@@ -496,14 +497,15 @@ Figure.prototype = {
 	/**
 	 * @this {FigureThis}
 	 * @description Gets the Figure size
-	 * @param {?Node=} target Target element, default is the current element
+	 * @param {?Node=} targetNode Target element, default is the current element
 	 * @returns {{w: string, h: string}}
 	 */
-	getSize(target) {
-		if (!target) target = this._element;
-		if (!target) return { w: '', h: '' };
+	getSize(targetNode) {
+		if (!targetNode) targetNode = this._element;
+		if (!targetNode) return { w: '', h: '' };
 
-		const figure = Figure.GetContainer(target);
+		const figure = Figure.GetContainer(targetNode);
+		const target = figure.target;
 		if (!figure.container) {
 			// exceptionFormat
 			if (!this.options.get('strictMode').formatFilter) {
@@ -535,16 +537,17 @@ Figure.prototype = {
 	/**
 	 * @this {FigureThis}
 	 * @description Align the container.
-	 * @param {?Node} target Target element
+	 * @param {?Node} targetNode Target element
 	 * @param {string} align "none"|"left"|"center"|"right"
 	 */
-	setAlign(target, align) {
-		if (!target) target = this._element;
+	setAlign(targetNode, align) {
+		if (!targetNode) targetNode = this._element;
 		this.align = align = align || 'none';
 
-		const figure = Figure.GetContainer(target);
+		const figure = Figure.GetContainer(targetNode);
 		if (!figure.cover) return;
 
+		const target = figure.target;
 		const container = figure.container;
 		const cover = figure.cover;
 		if (/%$/.test(target.style.width) && align === 'center' && !this.component.isInline(container)) {
@@ -571,16 +574,16 @@ Figure.prototype = {
 	/**
 	 * @this {FigureThis}
 	 * @description As style[block, inline] the component
-	 * @param {Node|null} target Target element
+	 * @param {?Node} targetNode Target element
 	 * @param {"block"|"inline"} formatStyle Format style
 	 */
-	convertAsFormat(target, formatStyle) {
-		if (!target) target = this._element;
+	convertAsFormat(targetNode, formatStyle) {
+		if (!targetNode) targetNode = this._element;
 		this.as = formatStyle || 'block';
-		const { container, inlineCover } = Figure.GetContainer(target);
+		const { container, inlineCover, target } = Figure.GetContainer(targetNode);
 		const { w, h } = this.getSize(target);
 
-		const newTarget = target.cloneNode(false);
+		const newTarget = /** @type {HTMLElement} */ (target.cloneNode(false));
 
 		switch (formatStyle) {
 			case 'inline': {
@@ -790,11 +793,12 @@ Figure.prototype = {
 	/**
 	 * @this {FigureThis}
 	 * @description Initialize the transform style (rotation) of the element.
-	 * @param {?Node=} element Target element, default is the current element
+	 * @param {?Node=} node Target element, default is the current element
 	 */
-	deleteTransform(element) {
-		if (!element) element = this._element;
+	deleteTransform(node) {
+		if (!node) node = this._element;
 
+		const element = /** @type {HTMLElement} */ (node);
 		const size = (element.getAttribute('data-se-size') || '').split(',');
 		this.isVertical = false;
 
@@ -809,14 +813,14 @@ Figure.prototype = {
 	/**
 	 * @this {FigureThis}
 	 * @description Set the transform style (rotation) of the element.
-	 * @param {Node} element Target element
+	 * @param {Node} node Target element
 	 * @param {?string|number} width Element's width size
 	 * @param {?string|number} height Element's height size
 	 */
-	setTransform(element, width, height, deg) {
+	setTransform(node, width, height, deg) {
 		try {
 			this.__preventSizechange = true;
-			const info = GetRotateValue(element);
+			const info = GetRotateValue(node);
 			const slope = info.r + (deg || 0) * 1;
 			deg = Math.abs(slope) >= 360 ? 0 : slope;
 			const isVertical = (this.isVertical = /^(90|270)$/.test(Math.abs(deg).toString()));
@@ -824,6 +828,7 @@ Figure.prototype = {
 			width = numbers.get(width, 0);
 			height = numbers.get(height, 0);
 
+			const element = /** @type {HTMLElement} */ (node);
 			const dataSize = (element.getAttribute('data-se-size') || 'auto,auto').split(',');
 			let transOrigin = '';
 			if (/auto|%$/.test(dataSize[0]) && !isVertical) {
@@ -885,16 +890,16 @@ Figure.prototype = {
 	 * @private
 	 * @this {FigureThis}
 	 * @description Applies rotation transformation to the target element.
-	 * @param {Node} element Target element.
+	 * @param {HTMLElement} element Target element.
 	 * @param {number} r Rotation degree.
 	 * @param {number} x X-axis rotation value.
 	 * @param {number} y Y-axis rotation value.
 	 */
 	_setRotate(element, r, x, y) {
-		let width = (element.offsetWidth - element.offsetHeight) * (/^-/.test(r) ? 1 : -1);
+		let width = (element.offsetWidth - element.offsetHeight) * (/^-/.test(r + '') ? 1 : -1);
 		let translate = '';
 
-		if (/[1-9]/.test(r) && (x || y)) {
+		if (/[1-9]/.test(r + '') && (x || y)) {
 			translate = x ? 'Y' : 'X';
 
 			switch (r + '') {
@@ -1014,9 +1019,9 @@ Figure.prototype = {
 	 */
 	_setPercentSize(w, h) {
 		if (!h) h = this.autoRatio ? (/%$/.test(this.autoRatio.current) ? this.autoRatio.current : this.autoRatio.default) : h;
-		h = h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (this.autoRatio ? this.autoRatio.default : '');
+		h = h && !/%$/.test(h + '') && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (this.autoRatio ? this.autoRatio.default : '');
 
-		const heightPercentage = /%$/.test(h);
+		const heightPercentage = /%$/.test(h + '');
 		this._container.style.width = String(numbers.is(w) ? w + '%' : w);
 		this._container.style.height = '';
 
@@ -1117,10 +1122,10 @@ Figure.prototype = {
 	 * @private
 	 * @this {FigureThis}
 	 * @description Adjusts the position of the caption within the figure.
-	 * @param {Node} element Target element.
+	 * @param {HTMLElement} element Target element.
 	 */
 	_setCaptionPosition(element) {
-		const figcaption = dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false);
+		const figcaption = /** @type {HTMLElement} */ (dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false));
 		if (figcaption) {
 			figcaption.style.marginTop = (this.isVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
 		}
@@ -1130,10 +1135,10 @@ Figure.prototype = {
 	 * @private
 	 * @this {FigureThis}
 	 * @description Removes the margin top property from the figure caption.
-	 * @param {Node} element Target element.
+	 * @param {HTMLElement} element Target element.
 	 */
 	_deleteCaptionPosition(element) {
-		const figcaption = dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false);
+		const figcaption = /** @type {HTMLElement} */ (dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false));
 		if (figcaption) {
 			figcaption.style.marginTop = '';
 		}
@@ -1316,7 +1321,7 @@ function ContainerResizingOff() {
 	w = Math.round(w) || w;
 	h = Math.round(h) || h;
 
-	if (!this.isVertical && !/%$/.test(w)) {
+	if (!this.isVertical && !/%$/.test(w + '')) {
 		const limit =
 			this.editor.frameContext.get('wysiwygFrame').clientWidth -
 			numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) +
