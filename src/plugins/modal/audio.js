@@ -81,14 +81,21 @@ class Audio_ extends EditorInjector {
 
 		// members
 		this.figure = new Figure(this, null, {});
+
+		/** @type {HTMLElement} */
 		this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
+		/** @type {HTMLInputElement} */
 		this.audioInputFile = modalEl.querySelector('.__se__file_input');
+		/** @type {HTMLInputElement} */
 		this.audioUrlFile = modalEl.querySelector('.se-input-url');
+		/** @type {HTMLElement} */
 		this.preview = modalEl.querySelector('.se-link-preview');
+		/** @type {HTMLAudioElement} */
+		this._element = null;
+
 		this.defaultWidth = this.pluginOptions.defaultWidth;
 		this.defaultHeight = this.pluginOptions.defaultHeight;
 		this.urlValue = '';
-		this._element = null;
 
 		const galleryButton = modalEl.querySelector('.__se__gallery');
 		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
@@ -229,11 +236,11 @@ class Audio_ extends EditorInjector {
 	 * @description Prepares the component for selection.
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {Node} target - The selected element.
+	 * @param {HTMLElement} target - The selected element.
 	 */
 	_ready(target) {
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
-		this._element = target;
+		this._element = /** @type {HTMLAudioElement} */ (target);
 		this.controller.open(target, null, { isWWTarget: false, addOffset: null });
 	}
 
@@ -400,7 +407,7 @@ class Audio_ extends EditorInjector {
 	 * @description Creates or updates an audio component within the editor.
 	 * - If `isUpdate` is `true`, updates the existing element's `src`.
 	 * - Otherwise, inserts a new audio component with the given file.
-	 * @param {Node} element - The target audio element.
+	 * @param {HTMLAudioElement} element - The target audio element.
 	 * @param {string} src - The source URL of the audio file.
 	 * @param {{name: string, size: number}} file - The file metadata (name, size).
 	 * @param {boolean} isUpdate - Whether to update an existing element.
@@ -438,11 +445,12 @@ class Audio_ extends EditorInjector {
 	 * @private
 	 * @description Creates a new `<audio>` element with default attributes.
 	 * - Applies width, height, and additional attributes from plugin options.
-	 * @returns {HTMLElement} - The newly created `<audio>` element.
+	 * @returns {HTMLAudioElement} - The newly created `<audio>` element.
 	 */
 	_createAudioTag() {
 		const w = this.defaultWidth;
 		const h = this.defaultHeight;
+		/** @type {HTMLAudioElement} */
 		const oAudio = dom.utils.createElement('AUDIO', { style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
 		this._setTagAttrs(oAudio);
 		return oAudio;
@@ -452,7 +460,7 @@ class Audio_ extends EditorInjector {
 	 * @private
 	 * @description Sets attributes on an audio element based on plugin options.
 	 * - Adds the `controls` attribute and applies any custom attributes.
-	 * @param {Node} element - The `<audio>` element to modify.
+	 * @param {HTMLElement} element - The `<audio>` element to modify.
 	 */
 	_setTagAttrs(element) {
 		element.setAttribute('controls', 'true');
@@ -519,7 +527,9 @@ class Audio_ extends EditorInjector {
 	 * @param {InputEvent} e - The input event triggered when the user types a URL.
 	 */
 	#OnLinkPreview(e) {
-		const value = dom.query.getEventTarget(e).value.trim();
+		/** @type {HTMLInputElement} */
+		const target = dom.query.getEventTarget(e);
+		const value = target.value.trim();
 		this.urlValue = this.preview.textContent = !value
 			? ''
 			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
@@ -538,7 +548,7 @@ class Audio_ extends EditorInjector {
 	}
 
 	/**
-	 * @param {Node} target - The target element.
+	 * @param {HTMLInputElement} target - The target element.
 	 */
 	#SetUrlInput(target) {
 		this.urlValue = this.preview.textContent = this.audioUrlFile.value = target.getAttribute('data-command') || target.src;
@@ -548,8 +558,8 @@ class Audio_ extends EditorInjector {
 	/**
 	 * @description Clears the selected file input and re-enables the URL input.
 	 * - Ensures that only one input method (file or URL) is used at a time.
-	 * @param {Node} urlInput - The URL input field.
-	 * @param {Node} preview - The preview text element.
+	 * @param {HTMLInputElement} urlInput - The URL input field.
+	 * @param {HTMLElement} preview - The preview text element.
 	 */
 	#RemoveSelectedFiles(urlInput, preview) {
 		this.audioInputFile.value = '';
@@ -566,6 +576,7 @@ class Audio_ extends EditorInjector {
 	 * @param {InputEvent} e - Event object
 	 */
 	#FileInputChange(e) {
+		/** @type {HTMLInputElement} */
 		const target = dom.query.getEventTarget(e);
 		if (!this.audioInputFile.value) {
 			this.audioUrlFile.disabled = false;

@@ -104,9 +104,13 @@ class Math_ extends EditorInjector {
 		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
 
 		// members
+		/** @type {HTMLTextAreaElement} */
 		this.textArea = modalEl.querySelector('.se-math-exp');
+		/** @type {HTMLPreElement} */
 		this.previewElement = modalEl.querySelector('.se-math-preview');
+		/** @type {HTMLSelectElement} */
 		this.fontSizeElement = modalEl.querySelector('.se-math-size');
+
 		this.isUpdateState = false;
 		this._element = null;
 
@@ -224,6 +228,8 @@ class Math_ extends EditorInjector {
 		}
 
 		const mathExp = this.textArea.value;
+
+		/** @type {HTMLSpanElement} */
 		const mathEl = this.previewElement.querySelector('.se-math, .katex');
 
 		if (!mathEl) return false;
@@ -303,7 +309,7 @@ class Math_ extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
+	 * @param {Node} target Target element
 	 */
 	destroy(target) {
 		dom.utils.removeItem(target);
@@ -378,6 +384,7 @@ class Math_ extends EditorInjector {
 	 * @param {InputEvent} e - The input event.
 	 */
 	#RenderMathExp(e) {
+		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		if (this.pluginOptions.autoHeight) {
 			eventTarget.style.height = '5px';

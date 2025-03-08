@@ -105,11 +105,11 @@ class Video extends EditorInjector {
 		const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'revert', 'edit', 'remove']] : [['resize_auto,75,50', 'edit', 'align', 'revert', 'remove']];
 
 		// show align
-		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.querySelector('.se-figure-align').style.display = 'none';
+		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.alignForm.style.display = 'none';
 
 		// modules
 		const defaultRatio = this.pluginOptions.defaultRatio * 100 + '%';
-		this.modal = new Modal(this, modalEl);
+		this.modal = new Modal(this, modalEl.html);
 		this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
 		this.fileManager = new FileManager(this, {
 			query: 'iframe, video',
@@ -118,11 +118,11 @@ class Video extends EditorInjector {
 		});
 
 		// members
-		this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
-		this.videoInputFile = modalEl.querySelector('.__se__file_input');
-		this.videoUrlFile = modalEl.querySelector('.se-input-url');
+		this.fileModalWrapper = modalEl.fileModalWrapper;
+		this.videoInputFile = modalEl.videoInputFile;
+		this.videoUrlFile = modalEl.videoUrlFile;
 		this.focusElement = this.videoUrlFile || this.videoInputFile;
-		this.previewSrc = modalEl.querySelector('.se-link-preview');
+		this.previewSrc = modalEl.previewSrc;
 		this._linkValue = '';
 		this._align = 'none';
 		this._frameRatio = defaultRatio;
@@ -188,19 +188,19 @@ class Video extends EditorInjector {
 			])
 			.concat(pluginOptions.urlPatterns || []);
 
-		const galleryButton = modalEl.querySelector('.__se__gallery');
+		const galleryButton = modalEl.galleryButton;
 		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
 		// init
-		if (this.videoInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', this.#RemoveSelectedFiles.bind(this));
+		if (this.videoInputFile) this.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
 		if (this.videoUrlFile) this.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
 		if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
 
 		if (this._resizing) {
-			this.proportion = modalEl.querySelector('._se_check_proportion');
-			this.frameRatioOption = modalEl.querySelector('.se-modal-ratio');
-			this.inputX = modalEl.querySelector('._se_size_x');
-			this.inputY = modalEl.querySelector('._se_size_y');
+			this.proportion = modalEl.proportion;
+			this.frameRatioOption = modalEl.frameRatioOption;
+			this.inputX = modalEl.inputX;
+			this.inputY = modalEl.inputY;
 			this.inputX.value = this.pluginOptions.defaultWidth;
 			this.inputY.value = this.pluginOptions.defaultHeight;
 
@@ -211,7 +211,7 @@ class Video extends EditorInjector {
 			this.eventManager.addEvent(this.inputY, 'change', ratioChange);
 			this.eventManager.addEvent(this.proportion, 'change', ratioChange);
 			this.eventManager.addEvent(this.frameRatioOption, 'change', this.#SetRatio.bind(this));
-			this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', this.#OnClickRevert.bind(this));
+			this.eventManager.addEvent(modalEl.revertBtn, 'click', this.#OnClickRevert.bind(this));
 		}
 	}
 
@@ -277,7 +277,7 @@ class Video extends EditorInjector {
 	 * @returns {Promise<boolean>} Success / failure
 	 */
 	async modalAction() {
-		this._align = this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked').value;
+		this._align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked')).value;
 
 		let result = false;
 		if (this.videoInputFile && this.videoInputFile.files.length > 0) {
@@ -335,7 +335,7 @@ class Video extends EditorInjector {
 			this.previewSrc.style.textDecoration = '';
 		}
 
-		this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]').checked = true;
+		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
 		this._ratio = { w: 1, h: 1 };
 		this._nonResizing = false;
 
@@ -351,7 +351,7 @@ class Video extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Component
 	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
+	 * @param {HTMLIFrameElement|HTMLVideoElement} target Target component element
 	 */
 	select(target) {
 		this._ready(target);
@@ -362,7 +362,7 @@ class Video extends EditorInjector {
 	 * @description Prepares the component for selection.
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {Node} target - The selected element.
+	 * @param {HTMLIFrameElement|HTMLVideoElement} target - The selected element.
 	 */
 	_ready(target) {
 		if (!target) return;
@@ -381,7 +381,10 @@ class Video extends EditorInjector {
 		const h = figureInfo.height || figureInfo.h || this._origin_h || '';
 
 		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || this._element.querySelector('source')?.src || '';
-		(this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
+
+		/** @type {HTMLInputElement} */
+		const activeAlgin = this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]');
+		activeAlgin.checked = true;
 
 		if (!this._resizing) return;
 
@@ -528,7 +531,7 @@ class Video extends EditorInjector {
 	 * @description Creates or updates a video embed component.
 	 * - When updating, it replaces the existing element if necessary and applies the new source, size, and alignment.
 	 * - When creating, it wraps the provided element in a figure container.
-	 * @param {Node} oFrame - The existing video element (for update) or a newly created one.
+	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The existing video element (for update) or a newly created one.
 	 * @param {string} src - The source URL for the video.
 	 * @param {string} width - The desired width for the video element.
 	 * @param {string} height - The desired height for the video element.
@@ -611,9 +614,10 @@ class Video extends EditorInjector {
 	 * @description Creates a new iframe element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes for embedding.
 	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the iframe.
-	 * @returns {HTMLElement} The newly created iframe element.
+	 * @returns {HTMLIFrameElement} The newly created iframe element.
 	 */
 	createIframeTag(props) {
+		/** @type {HTMLIFrameElement} */
 		const iframeTag = dom.utils.createElement('IFRAME');
 		if (props) {
 			for (const key in props) {
@@ -628,9 +632,10 @@ class Video extends EditorInjector {
 	 * @description Creates a new video element for video embedding.
 	 * - Applies any additional properties provided and sets the necessary attributes.
 	 * @param {Object<string, string>} [props] - An optional object containing properties to assign to the video element.
-	 * @returns {HTMLElement} The newly created video element.
+	 * @returns {HTMLVideoElement} The newly created video element.
 	 */
 	createVideoTag(props) {
+		/** @type {HTMLVideoElement} */
 		const videoTag = dom.utils.createElement('VIDEO');
 		if (props) {
 			for (const key in props) {
@@ -652,7 +657,7 @@ class Video extends EditorInjector {
 		if (!h) h = this.inputY?.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
-			else if (/%$/.test(w)) w += '%';
+			else if (/%$/.test(w + '')) w += '%';
 		}
 		this.figure.setSize(w, h);
 	}
@@ -788,21 +793,21 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Updates the video component within the editor.
-	 * @param {Node} oFrame - The video element to update.
+	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The video element to update.
 	 */
 	_update(oFrame) {
 		if (!oFrame) return;
 
 		if (/^video$/i.test(oFrame.nodeName)) {
-			this._setTagAttrs(oFrame);
+			this._setTagAttrs(/** @type {HTMLVideoElement} */ (oFrame));
 		} else if (/^iframe$/i.test(oFrame.nodeName)) {
-			this._setIframeAttrs(oFrame);
+			this._setIframeAttrs(/** @type {HTMLIFrameElement} */ (oFrame));
 		}
 
 		let existElement = this.format.isBlock(oFrame.parentNode) || dom.check.isWysiwygFrame(oFrame.parentNode) ? oFrame : this.format.getLine(oFrame) || oFrame;
 
 		const prevFrame = oFrame;
-		const cloneFrame = oFrame.cloneNode(true);
+		const cloneFrame = /** @type {HTMLIFrameElement|HTMLVideoElement} */ (oFrame.cloneNode(true));
 		const figure = Figure.CreateContainer(cloneFrame, 'se-video-container');
 		const container = figure.container;
 
@@ -838,7 +843,7 @@ class Video extends EditorInjector {
 			dom.utils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(existElement, null, true);
 		} else {
-			existElement.parentNode.replaceChild(container, existElement);
+			/** @type {Element} */ (existElement).parentNode.replaceChild(container, existElement);
 		}
 
 		if (caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
@@ -857,7 +862,8 @@ class Video extends EditorInjector {
 		const videoTag = this.createVideoTag();
 
 		for (let i = 0, len = fileList.length; i < len; i++) {
-			this.create(info.isUpdate ? info.element : videoTag.cloneNode(false), fileList[i].url, info.inputWidth, info.inputHeight, info.align, info.isUpdate, {
+			const ctag = info.isUpdate ? info.element : /** @type {HTMLIFrameElement|HTMLVideoElement} */ (videoTag.cloneNode(false));
+			this.create(ctag, fileList[i].url, info.inputWidth, info.inputHeight, info.align, info.isUpdate, {
 				name: fileList[i].name,
 				size: fileList[i].size
 			});
@@ -882,7 +888,7 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets attributes for the video tag.
-	 * @param {Node} element - The video element.
+	 * @param {HTMLVideoElement} element - The video element.
 	 */
 	_setTagAttrs(element) {
 		element.setAttribute('controls', 'true');
@@ -898,7 +904,7 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets attributes for the iframe tag.
-	 * @param {Node} element - The iframe element.
+	 * @param {HTMLIFrameElement} element - The iframe element.
 	 */
 	_setIframeAttrs(element) {
 		element.frameBorder = '0';
@@ -922,7 +928,7 @@ class Video extends EditorInjector {
 		let ratioSelected = false;
 		const ratioOption = this.frameRatioOption.options;
 
-		if (/%$/.test(value) || this._onlyPercentage) value = numbers.get(value, 2) / 100 + '';
+		if (/%$/.test(value + '') || this._onlyPercentage) value = numbers.get(value, 2) / 100 + '';
 		else if (!numbers.is(value) || Number(value) >= 1) value = '';
 
 		this.inputY.placeholder = '';
@@ -984,6 +990,7 @@ class Video extends EditorInjector {
 	 * @param {InputEvent} e - Event object
 	 */
 	#OnLinkPreview(e) {
+		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.value.trim();
 		if (/^<iframe.*\/iframe>$/.test(value)) {
@@ -1009,7 +1016,7 @@ class Video extends EditorInjector {
 
 	/**
 	 * @description Sets the URL input value when selecting from the gallery.
-	 * @param {Node} target - The selected video element.
+	 * @param {HTMLInputElement} target - The selected video element.
 	 */
 	#SetUrlInput(target) {
 		this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = target.getAttribute('data-command') || target.src;
@@ -1029,7 +1036,9 @@ class Video extends EditorInjector {
 		}
 
 		// inputFile check
-		Modal.OnChangeFile(this.fileModalWrapper, dom.query.getEventTarget(e).files);
+		/** @type {HTMLInputElement} */
+		const eventTarget = dom.query.getEventTarget(e);
+		Modal.OnChangeFile(this.fileModalWrapper, eventTarget.files);
 	}
 
 	#OnClickRevert() {
@@ -1045,6 +1054,7 @@ class Video extends EditorInjector {
 	 * @param {InputEvent} e - Event object
 	 */
 	#SetRatio(e) {
+		/** @type {HTMLSelectElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.options[eventTarget.selectedIndex].value;
 		this._defaultSizeY = this.figure.autoRatio.current = this._frameRatio = !value ? this._defaultSizeY : Number(value) * 100 + '%';
@@ -1066,6 +1076,7 @@ class Video extends EditorInjector {
 			return;
 		}
 
+		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		if (xy === 'x' && this._onlyPercentage && Number(eventTarget.value) > 100) {
 			eventTarget.value = '100';
@@ -1084,6 +1095,26 @@ class Video extends EditorInjector {
 	}
 }
 
+/**
+ * @typedef {object} ModalReturns
+ * @property {HTMLElement} html
+ * @property {HTMLElement} alignForm
+ * @property {HTMLElement} fileModalWrapper
+ * @property {HTMLInputElement} videoInputFile
+ * @property {HTMLInputElement} videoUrlFile
+ * @property {HTMLElement} previewSrc
+ * @property {HTMLButtonElement} galleryButton
+ * @property {HTMLInputElement} proportion
+ * @property {HTMLSelectElement} frameRatioOption
+ * @property {HTMLInputElement} inputX
+ * @property {HTMLInputElement} inputY
+ * @property {HTMLButtonElement} revertBtn
+ * @property {HTMLButtonElement} fileRemoveBtn
+ *
+ * @param {EditorCore} editor
+ * @param {*} pluginOptions
+ * @returns {ModalReturns}
+ */
 function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	let html = /*html*/ `
 	<form method="post" enctype="multipart/form-data">
@@ -1174,7 +1205,23 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 		</div>
 	</form>`;
 
-	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
+	const content = dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
+
+	return {
+		html: content,
+		alignForm: content.querySelector('.se-figure-align'),
+		fileModalWrapper: content.querySelector('.se-flex-input-wrapper'),
+		videoInputFile: content.querySelector('.__se__file_input'),
+		videoUrlFile: content.querySelector('.se-input-url'),
+		previewSrc: content.querySelector('.se-link-preview'),
+		galleryButton: content.querySelector('.__se__gallery'),
+		proportion: content.querySelector('._se_check_proportion'),
+		frameRatioOption: content.querySelector('.se-modal-ratio'),
+		inputX: content.querySelector('._se_size_x'),
+		inputY: content.querySelector('._se_size_y'),
+		revertBtn: content.querySelector('.se-modal-btn-revert'),
+		fileRemoveBtn: content.querySelector('.se-file-remove')
+	};
 }
 
 export default Video;

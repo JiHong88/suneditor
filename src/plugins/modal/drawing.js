@@ -309,8 +309,8 @@ class Drawing extends EditorInjector {
 	_getSVG() {
 		const svgNS = 'http://www.w3.org/2000/svg';
 		const svg = document.createElementNS(svgNS, 'svg');
-		svg.setAttribute('width', this.canvas.width);
-		svg.setAttribute('height', this.canvas.height);
+		svg.setAttribute('width', this.canvas.width + '');
+		svg.setAttribute('height', this.canvas.height + '');
 		svg.setAttribute('viewBox', `0 0 ${this.canvas.width} ${this.canvas.height}`);
 		svg.setAttribute('xmlns', svgNS);
 
@@ -322,7 +322,7 @@ class Drawing extends EditorInjector {
 			svgPath.setAttribute('d', pathData);
 			svgPath.setAttribute('fill', 'none');
 			svgPath.setAttribute('stroke', String(this.ctx.strokeStyle));
-			svgPath.setAttribute('stroke-width', this.ctx.lineWidth);
+			svgPath.setAttribute('stroke-width', this.ctx.lineWidth + '');
 			svg.appendChild(svgPath);
 		});
 

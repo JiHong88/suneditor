@@ -145,9 +145,18 @@ export function isMedia(node) {
 }
 
 /**
+ * @description Check the node is a iframe tag
+ * @param {?Node|string} node The element or element name to check
+ * @returns {node is HTMLIFrameElement}
+ */
+export function isIFrame(node) {
+	return /^IFRAME$/i.test(typeof node === 'string' ? node : node?.nodeName);
+}
+
+/**
  * @description Check the node is a figure tag
  * @param {?Node|string} node The element or element name to check
- * @returns {node is HTMLElement}
+ * @returns {boolean}
  */
 export function isFigure(node) {
 	return /^FIGURE$/i.test(typeof node === 'string' ? node : node?.nodeName);
@@ -270,6 +279,7 @@ const check = {
 	isBreak,
 	isAnchor,
 	isMedia,
+	isIFrame,
 	isFigure,
 	isEmptyLine,
 	isWysiwygFrame,

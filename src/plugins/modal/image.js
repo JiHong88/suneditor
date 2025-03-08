@@ -45,12 +45,12 @@ class Image_ extends EditorInjector {
 	static className = '';
 	/**
 	 * @this {Image_}
-	 * @param {HTMLElement} node - The node to check.
-	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
+	 * @param {Element} node - The node to check.
+	 * @returns {Element|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
-		node = dom.check.isFigure(node) || (/^span$/i.test(node.nodeName) && dom.utils.hasClass(node, 'se-component')) ? node.firstElementChild : node;
-		return /^IMG$/i.test(node?.nodeName) ? node : dom.check.isAnchor(node) && /^IMG$/i.test(node?.firstElementChild?.nodeName) ? node?.firstElementChild : null;
+		const compNode = dom.check.isFigure(node) || (/^span$/i.test(node.nodeName) && dom.utils.hasClass(node, 'se-component')) ? node.firstElementChild : node;
+		return /^IMG$/i.test(compNode?.nodeName) ? compNode : dom.check.isAnchor(compNode) && /^IMG$/i.test(compNode?.firstElementChild?.nodeName) ? compNode?.firstElementChild : null;
 	}
 
 	/**
@@ -96,12 +96,12 @@ class Image_ extends EditorInjector {
 				  ];
 
 		// show align
-		this.alignForm = modalEl.querySelector('.se-figure-align');
+		this.alignForm = modalEl.alignForm;
 		if (!figureControls.some((subArray) => subArray.includes('align'))) this.alignForm.style.display = 'none';
 
 		// modules
 		const Link = this.plugins.link ? this.plugins.link.pluginOptions : {};
-		this.anchor = new ModalAnchorEditor(this, modalEl, {
+		this.anchor = new ModalAnchorEditor(this, modalEl.html, {
 			textToDisplay: false,
 			title: true,
 			openNewWindow: Link.openNewWindow,
@@ -110,7 +110,7 @@ class Image_ extends EditorInjector {
 			noAutoPrefix: Link.noAutoPrefix,
 			enableFileUpload: pluginOptions.linkEnableFileUpload
 		});
-		this.modal = new Modal(this, modalEl);
+		this.modal = new Modal(this, modalEl.html);
 		this.figure = new Figure(this, figureControls, {
 			sizeUnit: sizeUnit
 		});
@@ -121,14 +121,14 @@ class Image_ extends EditorInjector {
 		});
 
 		// members
-		this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
-		this.imgInputFile = modalEl.querySelector('.__se__file_input');
-		this.imgUrlFile = modalEl.querySelector('.se-input-url');
+		this.fileModalWrapper = modalEl.fileModalWrapper;
+		this.imgInputFile = modalEl.imgInputFile;
+		this.imgUrlFile = modalEl.imgUrlFile;
 		this.focusElement = this.imgInputFile || this.imgUrlFile;
-		this.altText = modalEl.querySelector('._se_image_alt');
-		this.captionCheckEl = modalEl.querySelector('._se_image_check_caption');
+		this.altText = modalEl.altText;
+		this.captionCheckEl = modalEl.captionCheckEl;
 		this.captionEl = this.captionCheckEl?.parentElement;
-		this.previewSrc = modalEl.querySelector('._se_tab_content_image .se-link-preview');
+		this.previewSrc = modalEl.previewSrc;
 		this.sizeUnit = sizeUnit;
 		this.as = 'block';
 		this.proportion = null;
@@ -154,18 +154,18 @@ class Image_ extends EditorInjector {
 		this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
 
 		// init
-		this.eventManager.addEvent(modalEl.querySelector('.se-modal-tabs'), 'click', this.#OpenTab.bind(this));
-		if (this.imgInputFile) this.eventManager.addEvent(modalEl.querySelector('.se-file-remove'), 'click', this.#RemoveSelectedFiles.bind(this));
+		this.eventManager.addEvent(modalEl.tabs, 'click', this.#OpenTab.bind(this));
+		if (this.imgInputFile) this.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
 		if (this.imgUrlFile) this.eventManager.addEvent(this.imgUrlFile, 'input', this.#OnLinkPreview.bind(this));
 		if (this.imgInputFile && this.imgUrlFile) this.eventManager.addEvent(this.imgInputFile, 'change', this.#OnfileInputChange.bind(this));
 
-		const galleryButton = modalEl.querySelector('.__se__gallery');
+		const galleryButton = modalEl.galleryButton;
 		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
 		if (this._resizing) {
-			this.proportion = modalEl.querySelector('._se_check_proportion');
-			this.inputX = modalEl.querySelector('._se_size_x');
-			this.inputY = modalEl.querySelector('._se_size_y');
+			this.proportion = modalEl.proportion;
+			this.inputX = modalEl.inputX;
+			this.inputY = modalEl.inputY;
 			this.inputX.value = this.pluginOptions.defaultWidth;
 			this.inputY.value = this.pluginOptions.defaultHeight;
 
@@ -175,13 +175,13 @@ class Image_ extends EditorInjector {
 			this.eventManager.addEvent(this.inputX, 'change', ratioChange);
 			this.eventManager.addEvent(this.inputY, 'change', ratioChange);
 			this.eventManager.addEvent(this.proportion, 'change', ratioChange);
-			this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', this.#OnClickRevert.bind(this));
+			this.eventManager.addEvent(modalEl.revertBtn, 'click', this.#OnClickRevert.bind(this));
 		}
 
 		if (this.pluginOptions.useFormatType) {
 			this.as = this.pluginOptions.defaultFormatType;
-			this.asBlock = modalEl.querySelector('[data-command="asBlock"]');
-			this.asInline = modalEl.querySelector('[data-command="asInline"]');
+			this.asBlock = modalEl.asBlock;
+			this.asInline = modalEl.asInline;
 			this.eventManager.addEvent([this.asBlock, this.asInline], 'click', this.#OnClickAsButton.bind(this));
 		}
 	}
@@ -245,7 +245,7 @@ class Image_ extends EditorInjector {
 	 * @returns {Promise<boolean>} Success or failure
 	 */
 	async modalAction() {
-		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
+		this._align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked')).value;
 
 		if (this.modal.isUpdate) {
 			this._update(this.inputX?.value, this.inputY?.value);
@@ -299,7 +299,7 @@ class Image_ extends EditorInjector {
 		}
 
 		this.altText.value = '';
-		this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]').checked = true;
+		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
 		this.captionCheckEl.checked = false;
 		this._element = null;
 		this._ratio = {
@@ -335,7 +335,7 @@ class Image_ extends EditorInjector {
 	 * @description Prepares the component for selection.
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {Node} target - The selected element.
+	 * @param {HTMLElement} target - The selected element.
 	 */
 	_ready(target) {
 		if (!target) return;
@@ -356,7 +356,9 @@ class Image_ extends EditorInjector {
 
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this._element.src;
 
-		(this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
+		/** @type {HTMLInputElement} */
+		const activeAlign = this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]');
+		activeAlign.checked = true;
 		this.captionCheckEl.checked = !!this._caption;
 
 		if (!this._resizing) return;
@@ -796,7 +798,7 @@ class Image_ extends EditorInjector {
 		let i;
 
 		// Get all elements with class="tabcontent" and hide them
-		const tabContent = modalForm.getElementsByClassName('_se_tab_content');
+		const tabContent = /** @type {HTMLCollectionOf<HTMLElement>}*/ (modalForm.getElementsByClassName('_se_tab_content'));
 		for (i = 0; i < tabContent.length; i++) {
 			tabContent[i].style.display = 'none';
 		}
@@ -808,7 +810,7 @@ class Image_ extends EditorInjector {
 		}
 
 		// Show the current tab, and add an "active" class to the button that opened the tab
-		modalForm.querySelector('._se_tab_content_' + tabName).style.display = 'block';
+		/** @type {HTMLElement}*/ (modalForm.querySelector('._se_tab_content_' + tabName)).style.display = 'block';
 		dom.utils.addClass(targetElement, 'active');
 
 		// focus
@@ -870,6 +872,7 @@ class Image_ extends EditorInjector {
 	 * @param {string} alt - The alternative text for the image.
 	 */
 	create(src, anchor, width, height, align, file, alt) {
+		/** @type {HTMLImageElement} */
 		const oImg = dom.utils.createElement('IMG');
 		oImg.src = src;
 		oImg.alt = alt;
@@ -912,6 +915,7 @@ class Image_ extends EditorInjector {
 	 * @param {string} alt - The alternative text for the image.
 	 */
 	createInline(src, anchor, width, height, file, alt) {
+		/** @type {HTMLImageElement} */
 		const oImg = dom.utils.createElement('IMG');
 		oImg.src = src;
 		oImg.alt = alt;
@@ -937,7 +941,7 @@ class Image_ extends EditorInjector {
 	 * @private
 	 * @description Updates the image source URL.
 	 * @param {string} src - The new image source.
-	 * @param {Node} element - The image element.
+	 * @param {HTMLImageElement} element - The image element.
 	 * @param {{ name: string, size: number }} file - File metadata.
 	 */
 	_updateSrc(src, element, file) {
@@ -1049,8 +1053,8 @@ class Image_ extends EditorInjector {
 	 * @param {Array<{result: string, file: { name: string, size: number }}>} filesStack - Stack of Base64-encoded files.
 	 * - result: Image url or Base64-encoded string
 	 * - file: File metadata ({ name: string, size: number })
-	 * @param {Node} updateElement - The image element being updated.
-	 * @param {?Node} anchor - Optional anchor wrapping the image.
+	 * @param {HTMLImageElement} updateElement - The image element being updated.
+	 * @param {?HTMLAnchorElement} anchor - Optional anchor wrapping the image.
 	 * @param {string} width - Image width.
 	 * @param {string} height - Image height.
 	 * @param {string} align - Image alignment.
@@ -1222,6 +1226,30 @@ class Image_ extends EditorInjector {
 	}
 }
 
+/**
+ * @typedef {Object} ModalReturns
+ * @property {HTMLElement} html
+ * @property {HTMLElement} alignForm
+ * @property {HTMLElement} fileModalWrapper
+ * @property {HTMLInputElement} imgInputFile
+ * @property {HTMLInputElement} imgUrlFile
+ * @property {HTMLInputElement} altText
+ * @property {HTMLInputElement} captionCheckEl
+ * @property {HTMLElement} previewSrc
+ * @property {HTMLElement} tabs
+ * @property {HTMLButtonElement} galleryButton
+ * @property {HTMLInputElement} proportion
+ * @property {HTMLInputElement} inputX
+ * @property {HTMLInputElement} inputY
+ * @property {HTMLButtonElement} revertBtn
+ * @property {HTMLButtonElement} asBlock
+ * @property {HTMLButtonElement} asInline
+ * @property {HTMLButtonElement} fileRemoveBtn
+ *
+ * @param {EditorCore} editor
+ * @param {*} pluginOptions
+ * @returns {ModalReturns}
+ */
 function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	const createFileInputHtml = !pluginOptions.createFileInput
 		? ''
@@ -1323,7 +1351,27 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			</div>
 		</form>`;
 
-	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
+	const content = dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
+
+	return {
+		html: content,
+		alignForm: content.querySelector('.se-figure-align'),
+		fileModalWrapper: content.querySelector('.se-flex-input-wrapper'),
+		imgInputFile: content.querySelector('.__se__file_input'),
+		imgUrlFile: content.querySelector('.se-input-url'),
+		altText: content.querySelector('._se_image_alt'),
+		captionCheckEl: content.querySelector('._se_image_check_caption'),
+		previewSrc: content.querySelector('._se_tab_content_image .se-link-preview'),
+		tabs: content.querySelector('.se-modal-tabs'),
+		galleryButton: content.querySelector('.__se__gallery'),
+		proportion: content.querySelector('._se_check_proportion'),
+		inputX: content.querySelector('._se_size_x'),
+		inputY: content.querySelector('._se_size_y'),
+		revertBtn: content.querySelector('.se-modal-btn-revert'),
+		asBlock: content.querySelector('[data-command="asBlock"]'),
+		asInline: content.querySelector('[data-command="asInline"]'),
+		fileRemoveBtn: content.querySelector('.se-file-remove')
+	};
 }
 
 export default Image_;

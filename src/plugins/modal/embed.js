@@ -64,8 +64,8 @@ class Embed extends EditorInjector {
 	 */
 	static component(node) {
 		let src = '';
-		if (/^IFRAME$/i.test(node?.nodeName)) src = node.src;
-		if (/^DIV$/i.test(node?.nodeName) && /^IFRAME$/i.test(node.firstElementChild?.nodeName)) src = node.firstElementChild.src;
+		if (dom.check.isIFrame(node)) src = node.src;
+		if (/^DIV$/i.test(node?.nodeName) && dom.check.isIFrame(node.firstElementChild)) src = node.firstElementChild.src;
 
 		if (src) {
 			return this.checkContentType(src) ? node : null;
@@ -106,17 +106,17 @@ class Embed extends EditorInjector {
 		const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'revert', 'edit', 'remove']] : [['resize_auto,75,50', 'edit', 'align', 'revert', 'remove']];
 
 		// show align
-		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.querySelector('.se-figure-align').style.display = 'none';
+		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.figureAlignBtn.style.display = 'none';
 
 		// modules
-		this.modal = new Modal(this, modalEl);
+		this.modal = new Modal(this, modalEl.html);
 		this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit });
 
 		// members
-		this.fileModalWrapper = modalEl.querySelector('.se-flex-input-wrapper');
-		this.embedInput = modalEl.querySelector('.se-input-url');
+		this.fileModalWrapper = modalEl.fileModalWrapper;
+		this.embedInput = modalEl.embedInput;
 		this.focusElement = this.embedInput;
-		this.previewSrc = modalEl.querySelector('.se-link-preview');
+		this.previewSrc = modalEl.previewSrc;
 		this._linkValue = '';
 		this._align = 'none';
 		this._defaultSizeX = this.pluginOptions.defaultWidth;
@@ -203,15 +203,15 @@ class Embed extends EditorInjector {
 		this.eventManager.addEvent(this.embedInput, 'input', this.#OnLinkPreview.bind(this));
 
 		if (this._resizing) {
-			this.proportion = modalEl.querySelector('._se_check_proportion');
-			this.inputX = modalEl.querySelector('._se_size_x');
-			this.inputY = modalEl.querySelector('._se_size_y');
+			this.proportion = modalEl.proportion;
+			this.inputX = modalEl.inputX;
+			this.inputY = modalEl.inputY;
 			this.inputX.value = this.pluginOptions.defaultWidth;
 			this.inputY.value = this.pluginOptions.defaultHeight;
 
 			this.eventManager.addEvent(this.inputX, 'keyup', this.#OnInputSize.bind(this, 'x'));
 			this.eventManager.addEvent(this.inputY, 'keyup', this.#OnInputSize.bind(this, 'y'));
-			this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', this.#OnClickRevert.bind(this));
+			this.eventManager.addEvent(modalEl.revertBtn, 'click', this.#OnClickRevert.bind(this));
 		}
 	}
 
@@ -250,7 +250,7 @@ class Embed extends EditorInjector {
 	 * @returns {Promise<boolean>} Success / failure
 	 */
 	async modalAction() {
-		this._align = this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked').value;
+		this._align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked')).value;
 
 		let result = false;
 		if (this._linkValue.length > 0) {
@@ -299,7 +299,7 @@ class Embed extends EditorInjector {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
 		this._linkValue = this.previewSrc.textContent = this.embedInput.value = '';
 
-		this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]').checked = true;
+		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]')).checked = true;
 		this._ratio = { w: 1, h: 1 };
 		this._nonResizing = false;
 
@@ -325,7 +325,7 @@ class Embed extends EditorInjector {
 	 * @description Prepares the component for selection.
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {Node} target - The selected element.
+	 * @param {HTMLElement} target - The selected element.
 	 */
 	_ready(target) {
 		if (!target) return;
@@ -341,7 +341,9 @@ class Embed extends EditorInjector {
 		this._origin_w = String(figureInfo.originWidth || figureInfo.w || '');
 		this._origin_h = String(figureInfo.originHeight || figureInfo.h || '');
 
-		(this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]')).checked = true;
+		/** @type {HTMLInputElement} */
+		const activeAlign = this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]');
+		activeAlign.checked = true;
 
 		if (!this._resizing) return;
 
@@ -487,9 +489,10 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Creates an iframe element for embedding external content.
-	 * @returns {Node} The created iframe element.
+	 * @returns {HTMLIFrameElement} The created iframe element.
 	 */
 	_createIframeTag() {
+		/** @type {HTMLIFrameElement} */
 		const iframeTag = dom.utils.createElement('IFRAME');
 		this._setIframeAttrs(iframeTag);
 		return iframeTag;
@@ -498,7 +501,7 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Creates an blockquote element for embedding external content.
-	 * @returns {Node} The created iframe element.
+	 * @returns {HTMLElement} The created iframe element.
 	 */
 	_createEmbedTag() {
 		const quoteTag = dom.utils.createElement('BLOCKQUOTE');
@@ -534,7 +537,7 @@ class Embed extends EditorInjector {
 					oFrame = newTag;
 				} else if (/^blockquote$/i.test(processUrl?.tag) && !/^blockquote$/i.test(oFrame.nodeName)) {
 					const newTag = this._createEmbedTag();
-					newTag.src = src;
+					newTag.setAttribute('src', src);
 					oFrame.parentNode.replaceChild(newTag, oFrame);
 					oFrame = newTag;
 				} else {
@@ -556,14 +559,16 @@ class Embed extends EditorInjector {
 				const figure = Figure.CreateContainer(oFrame, 'se-embed-container');
 				cover = figure.cover;
 				container = figure.container;
+
+				let chd = null;
 				let index = 0;
-				while (children[index]) {
-					if (/^script$/i.test(children[index].nodeName)) {
-						scriptTag = dom.utils.createElement('script', { src: children[index].src, async: 'true' }, null);
+				while ((chd = /** @type {Element} */ (children[index]))) {
+					if (/^script$/i.test(chd.nodeName)) {
+						scriptTag = dom.utils.createElement('script', { src: chd.getAttribute('src'), async: 'true' }, null);
 						index++;
 						continue;
 					}
-					cover.appendChild(children[index]);
+					cover.appendChild(chd);
 				}
 			}
 		}
@@ -638,7 +643,7 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Updates an existing embed component within the editor.
-	 * @param {Node} oFrame - The existing embed element to be updated.
+	 * @param {HTMLIFrameElement} oFrame - The existing embed element to be updated.
 	 */
 	_update(oFrame) {
 		if (!oFrame) return;
@@ -648,7 +653,7 @@ class Embed extends EditorInjector {
 		let existElement = this.format.isBlock(oFrame.parentNode) || dom.check.isWysiwygFrame(oFrame.parentNode) ? oFrame : this.format.getLine(oFrame) || oFrame;
 
 		const prevFrame = oFrame;
-		oFrame = oFrame.cloneNode(true);
+		oFrame = /** @type {HTMLIFrameElement} */ (oFrame.cloneNode(true));
 		const figure = Figure.CreateContainer(oFrame, 'se-embed-container');
 		const container = figure.container;
 
@@ -676,7 +681,7 @@ class Embed extends EditorInjector {
 			dom.utils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(existElement, null, true);
 		} else {
-			existElement.parentNode.replaceChild(container, existElement);
+			/** @type {Element} */ (existElement).parentNode.replaceChild(container, existElement);
 		}
 
 		return oFrame;
@@ -693,7 +698,7 @@ class Embed extends EditorInjector {
 		if (!h) h = this.inputY?.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
-			else if (/%$/.test(w)) w += '%';
+			else if (/%$/.test(w + '')) w += '%';
 		}
 		this.figure.setSize(w, h);
 	}
@@ -721,7 +726,7 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets default attributes for an iframe element.
-	 * @param {Node} element - The iframe element to modify.
+	 * @param {HTMLIFrameElement} element - The iframe element to modify.
 	 */
 	_setIframeAttrs(element) {
 		element.frameBorder = '0';
@@ -740,6 +745,7 @@ class Embed extends EditorInjector {
 	 * @param {InputEvent} e - Event object
 	 */
 	#OnLinkPreview(e) {
+		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.value.trim();
 		if (/^<iframe.*\/iframe>$/.test(value)) {
@@ -775,7 +781,9 @@ class Embed extends EditorInjector {
 			return;
 		}
 
+		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
+
 		if (xy === 'x' && this._onlyPercentage && Number(eventTarget.value) > 100) {
 			eventTarget.value = '100';
 		} else if (this.proportion.checked) {
@@ -789,6 +797,21 @@ class Embed extends EditorInjector {
 	}
 }
 
+/**
+ * @param {EditorCore} editor Editor instance
+ * @param {*} pluginOptions
+ * @returns {{
+ * html: HTMLElement,
+ * figureAlignBtn: HTMLButtonElement,
+ * fileModalWrapper: HTMLElement,
+ * embedInput: HTMLInputElement,
+ * previewSrc: HTMLElement,
+ * proportion: HTMLInputElement,
+ * inputX: HTMLInputElement,
+ * inputY: HTMLInputElement,
+ * revertBtn: HTMLButtonElement
+ * }}
+ */
 function CreateHTML_modal({ lang, icons }, pluginOptions) {
 	let html = /*html*/ `
 	<form method="post" enctype="multipart/form-data">
@@ -845,7 +868,19 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		</div>
 	</form>`;
 
-	return dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
+	const content = dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
+
+	return {
+		html: content,
+		figureAlignBtn: content.querySelector('.se-figure-align'),
+		fileModalWrapper: content.querySelector('.se-flex-input-wrapper'),
+		embedInput: content.querySelector('.se-input-url'),
+		previewSrc: content.querySelector('.se-link-preview'),
+		proportion: content.querySelector('._se_check_proportion'),
+		inputX: content.querySelector('._se_size_x'),
+		inputY: content.querySelector('._se_size_y'),
+		revertBtn: content.querySelector('.se-modal-btn-revert')
+	};
 }
 
 export default Embed;

@@ -72,7 +72,7 @@
 /**
  * @typedef {Object} VideoInfo
  * @property {FileList} files - FileList object
- * @property {HTMLVideoElement|HTMLIFrameElement} element - target element
+ * @property {HTMLIFrameElement|HTMLVideoElement} element - target element
  * @property {string} inputWidth - width value
  * @property {string} inputHeight - height value
  * @property {string} align - align value
