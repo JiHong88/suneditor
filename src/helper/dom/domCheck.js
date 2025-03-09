@@ -93,7 +93,7 @@ export function isTable(node) {
 /**
  * @description Check the node is a table elements. (table, thead, tbody, tr, th, td)
  * @param {?Node|string} node The element or element name to check
- * @returns {node is HTMLTableElement|HTMLTableSectionElement|HTMLTableRowElement|HTMLTableCellElement|HTMLTableColElement|HTMLTableHeaderCellElement}
+ * @returns {node is HTMLTableElement|HTMLTableSectionElement|HTMLTableRowElement|HTMLTableCellElement|HTMLTableColElement|HTMLTableColElement}
  */
 export function isTableElements(node) {
 	return /^(TABLE|THEAD|TBODY|TR|TH|TD|COL)$/i.test(typeof node === 'string' ? node : node?.nodeName);
@@ -102,7 +102,7 @@ export function isTableElements(node) {
 /**
  * @description Check the node is a table cell (td, th)
  * @param {?Node|string} node The element or element name to check
- * @returns {node is HTMLTableCellElement|HTMLTableHeaderCellElement}
+ * @returns {node is HTMLTableCellElement|HTMLTableColElement}
  */
 export function isTableCell(node) {
 	return /^(TD|TH)$/i.test(typeof node === 'string' ? node : node?.nodeName);

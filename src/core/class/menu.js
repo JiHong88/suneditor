@@ -19,6 +19,7 @@ function Menu(editor) {
 	CoreInjector.call(this, editor);
 
 	// members
+	/** @type {Object<string, HTMLElement>} */
 	this.targetMap = {};
 	this.index = -1;
 	this.menus = [];

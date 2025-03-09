@@ -440,7 +440,7 @@ export function getEdgeChildNodes(first, last) {
  * @template {Node} T
  * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child
  * @param {Node} node Reference element
- * @param {?(Node & ParentNode)=} ceiling Highest boundary allowed
+ * @param {?Node=} ceiling Highest boundary allowed
  * @returns {T|null} Not found: null
  */
 export function getPreviousDeepestNode(node, ceiling) {
@@ -467,7 +467,7 @@ export function getPreviousDeepestNode(node, ceiling) {
  * @template {Node} T
  * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child
  * @param {Node} node Reference element
- * @param {?(Node & ParentNode)=} ceiling Highest boundary allowed
+ * @param {?Node=} ceiling Highest boundary allowed
  * @returns {T|null} Not found: null
  */
 export function getNextDeepestNode(node, ceiling) {
@@ -517,8 +517,9 @@ export function findTextIndexOnLine(line, offsetContainer, offset, validate) {
 			}
 			index += node.textContent.length;
 		} else if (node.nodeType === 1) {
-			for (const child of node.childNodes) {
-				recursionFunc(child);
+			const childNodes = node.childNodes;
+			for (let i = 0, len = childNodes.length; i < len; i++) {
+				recursionFunc(childNodes[i]);
 				if (found) return;
 			}
 		}

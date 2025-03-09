@@ -12,7 +12,7 @@ import Helper from './helper';
 
 /**
  * Editor Injector module, Inject "editor" and basic frequently used objects by calling it with "call(this, editor)".
- * @type {Function}
+ * @type {(...args: *) => *}
  */
 export const editorInjector = EditorInjector;
 
@@ -24,19 +24,19 @@ export const plugins = Plugins;
 
 /**
  * Editor modules
- * @type {{[key: string]: Function|Map}}
+ * @type {{[key: string]: ((...args: *) => *)|Map}}
  */
 export const modules = Modules;
 
 /**
  * Language packs for the editor
- * @type {Object<string, Object<string, string> | Function>}
+ * @type {Object<string, Object<string, string> | ((...args: *) => *)>}
  */
 export const langs = Langs;
 
 /**
  * Helper functions for the editor
- * @type {Object<string|symbol, Object<string, Function>>}
+ * @type {Object<string|symbol, Object<string, ((...args: *) => *)>>}
  */
 export const helper = Helper;
 

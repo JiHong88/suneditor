@@ -313,7 +313,8 @@ export function addClass(element, className) {
 	const elements = element instanceof HTMLCollection || element instanceof NodeList || element instanceof Array ? element : [element];
 	const classNames = className.split('|');
 
-	for (const e of elements) {
+	for (let i = 0, len = elements.length; i < len; i++) {
+		const e = elements[i];
 		if (!e || e.nodeType !== 1) continue;
 		for (const c of classNames) {
 			if (c) /** @type {HTMLElement} */ (e).classList.add(c);
@@ -332,7 +333,8 @@ export function removeClass(element, className) {
 	const elements = element instanceof HTMLCollection || element instanceof NodeList || element instanceof Array ? element : [element];
 	const classNames = className.split('|');
 
-	for (const e of elements) {
+	for (let i = 0, len = elements.length; i < len; i++) {
+		const e = elements[i];
 		if (!e || e.nodeType !== 1) continue;
 		for (const c of classNames) {
 			if (c) /** @type {HTMLElement} */ (e).classList.remove(c);

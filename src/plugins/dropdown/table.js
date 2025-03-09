@@ -265,7 +265,7 @@ class Table extends EditorInjector {
 		this._fixedCell = null;
 		/** @type {HTMLTableCellElement} */
 		this._selectedCell = null;
-		/** @type {HTMLTableCellElement[]|} */
+		/** @type {HTMLTableCellElement[]} */
 		this._selectedCells = null;
 
 		this._shift = false;
@@ -1405,7 +1405,7 @@ class Table extends EditorInjector {
 
 		for (let i = 1, len = selectedCells.length, cell, ch; i < len; i++) {
 			cell = selectedCells[i];
-			if (row !== cell.parentNode) row = cell.parentNode;
+			if (row !== cell.parentNode) row = /** @type {HTMLTableRowElement} */ (cell.parentNode);
 
 			ch = cell.children;
 			for (let c = 0, cLen = ch.length; c < cLen; c++) {
@@ -2877,13 +2877,17 @@ function CreateCellsHTML(nodeName) {
  * @returns {number} The maximum number of columns in the table.
  */
 function GetMaxColumns(table) {
+	const rows = table.rows;
 	let maxColumns = 0;
 
-	for (const row of table.rows) {
+	for (let i = 0, len = rows.length; i < len; i++) {
+		const cells = rows[i].cells;
 		let columnCount = 0;
-		for (const cell of row.cells) {
-			columnCount += cell.colSpan;
+
+		for (let j = 0, jLen = cells.length; j < jLen; j++) {
+			columnCount += cells[j].colSpan;
 		}
+
 		maxColumns = Math.max(maxColumns, columnCount);
 	}
 

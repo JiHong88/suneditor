@@ -317,7 +317,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Plugin call event map
-	 * @type {Map<string, Array<Function & { index: number }>>}
+	 * @type {Map<string, Array<((...args: *) => *) & { index: number }>>}
 	 */
 	this._onPluginEvents = null;
 
@@ -330,7 +330,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Copy format init method
-	 * @type {Function|null}
+	 * @type {(...args: *) => *|null}
 	 */
 	this._onCopyFormatInitMethod = null;
 
@@ -402,7 +402,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description plugin retainFormat info Map()
-	 * @type {Map<string, Function>}
+	 * @type {Map<string, ((...args: *) => *)>}
 	 */
 	this._MELInfo = null;
 

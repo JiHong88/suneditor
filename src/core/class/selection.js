@@ -437,7 +437,7 @@ Selection_.prototype = {
 			selectionNode = selection.anchorNode;
 		}
 
-		this.selectionNode = /** @type {HTMLElement|Text| */ (selectionNode);
+		this.selectionNode = /** @type {HTMLElement|Text} */ (selectionNode);
 	},
 
 	/**

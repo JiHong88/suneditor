@@ -9,7 +9,7 @@ const { _w } = env;
  * @property {boolean} [canResize=true] - Whether the math modal can be resized.
  * @property {boolean} [autoHeight=false] - Whether to automatically adjust the height of the modal.
  * @property {Array<object>} [fontSizeList] - A list of font size options for rendering math expressions.
- * @property {function} [onPaste] - A callback function to handle paste events in the math input area.
+ * @property {(...args: *) => *} [onPaste] - A callback function to handle paste events in the math input area.
  * @property {Object} [formSize={}] - An object specifying the dimensions for the math modal.
  * @property {string} [formSize.width="460px"] - The default width of the math modal.
  * @property {string} [formSize.height="14em"] - The default height of the math modal.

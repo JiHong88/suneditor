@@ -43,6 +43,7 @@ function HTML(editor) {
 	this._cleanStyleTagKeyRegExp = null;
 	this._cleanStyleRegExpMap = null;
 	this._textStyleTags = options.get('_textStyleTags');
+	/** @type {Object<string, *>} */
 	this._autoStyleify = null;
 	this.__disallowedTagsRegExp = null;
 	this.__disallowedTagNameRegExp = null;
