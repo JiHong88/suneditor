@@ -1,4 +1,5 @@
 /**
+ * @version 1.0.0
  * @namespace SuneditorTypes
  */
 
@@ -12,17 +13,17 @@
 // --------------------------------------------------------- [Editor] ---------------------------------------------------------------------------------------------------
 /**
  * @memberof SuneditorTypes
- * @typedef {import('../src/core/editor').default} EditorCore
+ * @typedef {import('./core/editor').default} EditorCore
  */
 
 /**
  * @memberof SuneditorTypes
- * @typedef {import('../src/editorInjector').default} EditorInjector
+ * @typedef {import('./editorInjector').default} EditorInjector
  */
 
 /**
  * @memberof SuneditorTypes
- * @typedef {import('../src/editorInjector/_core').default} CoreInjector
+ * @typedef {import('./editorInjector/_core').default} CoreInjector
  */
 
 /**

@@ -20,7 +20,7 @@
 	"rules": {
 		"eqeqeq": "error",
 		"strict": ["error", "safe"],
-		"no-undef": "error",
+		"no-undef": "off",
 		"no-unused-vars": "warn",
 		"no-loop-func": "off",
 		"no-shadow": "error",

@@ -20,9 +20,10 @@
 		"declaration": true,
 		"declarationMap": false,
 		"emitDeclarationOnly": true,
+		"rootDir": "./src",
 		"declarationDir": "./types",
 		"outDir": "./types",
 		"noEmit": false
 	},
-	"include": ["./src/**/*.js", "./contracts", "./types"]
+	"include": ["./src/**/*.js", "./types"]
 }
