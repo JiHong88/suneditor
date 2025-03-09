@@ -33,7 +33,7 @@ function SelectMenu(inst, params) {
 	const positionItems = params.position.split('-');
 	this.form = null;
 	this.items = [];
-	/** @type {NodeListOf<HTMLLIElement>} */
+	/** @type {HTMLLIElement[]} */
 	this.menus = null;
 	this.menuLen = 0;
 	this.index = -1;
@@ -70,8 +70,8 @@ SelectMenu.prototype = {
 	/**
 	 * @this {SelectMenuThis}
 	 * @description Creates the select menu items.
-	 * @param {Array<string|Node>|NodeListOf} items - Command list of selectable items.
-	 * @param {Array<string|Node>|NodeListOf} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<string>|NodeCollection} items - Command list of selectable items.
+	 * @param {Array<string>|NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
 	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';
@@ -87,7 +87,7 @@ SelectMenu.prototype = {
 		this._createFormat(html);
 
 		this.items = /** @type {Array<string|Node>} */ (items);
-		this.menus = this.form.querySelectorAll('li');
+		this.menus = Array.from(this.form.querySelectorAll('li'));
 		this.menuLen = this.menus.length;
 	},
 

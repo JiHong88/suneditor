@@ -39,7 +39,6 @@ class FormatBlock extends EditorInjector {
 		const menu = CreateHTML(editor, pluginOptions.items);
 
 		// members
-		/** @type {NodeListOf<HTMLElement>} */
 		this.formatList = menu.querySelectorAll('li button');
 		this.currentFormat = '';
 
@@ -66,7 +65,7 @@ class FormatBlock extends EditorInjector {
 			const className = (element.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim();
 
 			for (let i = 0, len = formatList.length, f; i < len; i++) {
-				f = formatList[i];
+				f = /** @type {HTMLButtonElement} */ (formatList[i]);
 				if (nodeName === f.getAttribute('data-value') && className === f.getAttribute('data-class')) {
 					formatTitle = f.title;
 					break;

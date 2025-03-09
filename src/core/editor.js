@@ -33,10 +33,6 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
  */
 
 /**
- * @typedef {import('./section/constructor').EditorFrameOptions} EditorFrameOptions
- */
-
-/**
  * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo
  */
 

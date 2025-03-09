@@ -41,10 +41,6 @@ export const langs = Langs;
 export const helper = Helper;
 
 /**
- * @typedef {import('./core/section/constructor').EditorFrameOptions} EditorFrameOptions
- */
-
-/**
  * @typedef {import('./core/section/constructor').EditorInitOptions} EditorInitOptions
  */
 

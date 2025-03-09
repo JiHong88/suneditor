@@ -35,7 +35,6 @@ class List_bulleted extends EditorInjector {
 		const menu = CreateHTML();
 
 		// members
-		/** @type {NodeListOf<HTMLElement>} */
 		this.listItems = menu.querySelectorAll('li button ul');
 
 		// init
@@ -69,7 +68,7 @@ class List_bulleted extends EditorInjector {
 		const type = el?.style ? el.style.listStyleType || DEFAULT_TYPE : '';
 
 		for (let i = 0, len = list.length, l; i < len; i++) {
-			l = list[i];
+			l = /** @type {HTMLElement} */ (list[i]);
 			if (type === l.style.listStyleType) {
 				dom.utils.addClass(l.parentElement, 'active');
 			} else {
