@@ -25,5 +25,6 @@
 		"outDir": "./types",
 		"noEmit": false
 	},
-	"include": ["./src/**/*.js", "./types"]
+	"include": ["./src/**/*.js"],
+	"exclude": ["./types/**/*.d.ts"]
 }
