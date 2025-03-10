@@ -40,7 +40,7 @@ class Math_ extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {MathPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
@@ -432,7 +432,7 @@ class Math_ extends EditorInjector {
 
 	/**
 	 * @param {*} mathjax - The MathJax instance.
-	 * @param {EditorCore} editor - The root editor instance.
+	 * @param {__se__EditorCore} editor - The root editor instance.
 	 * @returns {*}
 	 */
 	#CheckMathJax(mathjax, editor) {

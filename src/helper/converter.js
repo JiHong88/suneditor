@@ -125,7 +125,7 @@ export function fontSize(to, size) {
 
 /**
  * @description Convert the node list to an array. If not, returns an empty array.
- * @param {?NodeCollection} nodeList
+ * @param {?__se__NodeCollection} nodeList
  * @returns Array
  */
 export function nodeListToArray(nodeList) {

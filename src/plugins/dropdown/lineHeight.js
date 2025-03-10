@@ -12,7 +12,7 @@ class LineHeight extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {Array<{text: string, value: number}>} pluginOptions.items - Line height list
 	 */

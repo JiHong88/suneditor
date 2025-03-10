@@ -66,7 +66,7 @@ class Video extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {VideoPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
@@ -257,7 +257,7 @@ class Video extends EditorInjector {
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
-	 * @param {FrameContext} params.frameContext Frame context
+	 * @param {__se__FrameContext} params.frameContext Frame context
 	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
@@ -1111,7 +1111,7 @@ class Video extends EditorInjector {
  * @property {HTMLButtonElement} revertBtn
  * @property {HTMLButtonElement} fileRemoveBtn
  *
- * @param {EditorCore} editor
+ * @param {__se__EditorCore} editor
  * @param {*} pluginOptions
  * @returns {ModalReturns}
  */

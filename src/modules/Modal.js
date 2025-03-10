@@ -6,7 +6,7 @@ const { _w } = env;
 const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize', wRTL: 'ns-resize', hRTL: 'ew-resize', cRTL: 'nesw-resize' };
 
 /**
- * @typedef {Modal & Partial<EditorInjector>} ModalThis
+ * @typedef {Modal & Partial<__se__EditorInjector>} ModalThis
  */
 
 /**
@@ -17,7 +17,7 @@ const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize',
  * @constructor
  * @this {ModalThis}
  * @description Modal window module
- * @param {* & {editor: EditorCore}} inst The instance object that called the constructor.
+ * @param {* & {editor: __se__EditorCore}} inst The instance object that called the constructor.
  * @param {Element} element Modal element
  */
 function Modal(inst, element) {
@@ -322,7 +322,7 @@ function OnResizeMouseUp() {
 
 /**
  * @description Create a file input tag in the modal window.
- * @param {{icons: EditorCore['icons'], lang: EditorCore['lang']}} param0 - icons and language object
+ * @param {{icons: __se__EditorCore['icons'], lang: __se__EditorCore['lang']}} param0 - icons and language object
  * @param {{acceptedFormats: string, allowMultiple}} param1 - options
  * - acceptedFormats: "image/*, video/*, audio/*", etc.
  * - allowMultiple: true or false

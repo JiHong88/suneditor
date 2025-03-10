@@ -12,7 +12,7 @@ class List extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 */
 	constructor(editor) {
 		// plugin bisic properties

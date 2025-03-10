@@ -13,7 +13,7 @@ class ImageGallery extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {Array<*>=} pluginOptions.data - direct data without server calls
 	 * @param {string=} pluginOptions.url - server request url

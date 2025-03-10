@@ -26,7 +26,7 @@ class Link extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {LinkPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {

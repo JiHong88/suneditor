@@ -70,7 +70,7 @@ export function getAttributesToString(element, exceptAttrs) {
 
 /**
  * @description Get the items array from the array that matches the condition.
- * @param {NodeCollection} array Array to get item
+ * @param {__se__NodeCollection} array Array to get item
  * @param {?(current: *) => boolean} validation Conditional function
  * @returns {Array<Node>|null}
  */
@@ -96,7 +96,7 @@ export function arrayFilter(array, validation) {
 
 /**
  * @description Get the item from the array that matches the condition.
- * @param {NodeCollection} array Array to get item
+ * @param {__se__NodeCollection} array Array to get item
  * @param {?(current: *) => boolean} validation Conditional function
  * @returns {Node|null}
  */
@@ -121,7 +121,7 @@ export function arrayFind(array, validation) {
 
 /**
  * @description Check if an array contains an element
- * @param {NodeCollection} array element array
+ * @param {__se__NodeCollection} array element array
  * @param {Node} node The node to check for
  * @returns {boolean}
  */
@@ -136,7 +136,7 @@ export function arrayIncludes(array, node) {
 
 /**
  * @description Get the index of the argument value in the element array
- * @param {NodeCollection} array element array
+ * @param {__se__NodeCollection} array element array
  * @param {Node} node The element to find index
  * @returns {number}
  */
@@ -154,7 +154,7 @@ export function getArrayIndex(array, node) {
 
 /**
  * @description Get the next index of the argument value in the element array
- * @param {NodeCollection} array element array
+ * @param {__se__NodeCollection} array element array
  * @param {Node} item The element to find index
  * @returns {number}
  */
@@ -166,7 +166,7 @@ export function nextIndex(array, item) {
 
 /**
  * @description Get the previous index of the argument value in the element array
- * @param {NodeCollection} array Element array
+ * @param {__se__NodeCollection} array Element array
  * @param {Node} item The element to find index
  * @returns {number}
  */
@@ -304,7 +304,7 @@ export function hasClass(element, className) {
 
 /**
  * @description Append the className value of the argument value element
- * @param {Node|NodeCollection} element Elements to add class name
+ * @param {Node|__se__NodeCollection} element Elements to add class name
  * @param {string} className Class name to be add
  */
 export function addClass(element, className) {
@@ -324,7 +324,7 @@ export function addClass(element, className) {
 
 /**
  * @description Delete the className value of the argument value element
- * @param {Node|NodeCollection} element Elements to remove class name
+ * @param {Node|__se__NodeCollection} element Elements to remove class name
  * @param {string} className Class name to be remove
  */
 export function removeClass(element, className) {

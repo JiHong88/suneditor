@@ -12,7 +12,7 @@ class ParagraphStyle extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {Array<string|{name: string, class: string, _class: string}>} pluginOptions.items - Paragraph item list
 	 * @example

@@ -37,7 +37,7 @@ class Drawing extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {DrawingPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {

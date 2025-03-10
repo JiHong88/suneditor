@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, numbers, env } from '../../helper';
 
 /**
- * @typedef {Omit<Format & Partial<EditorInjector>, 'format'>} FormatThis
+ * @typedef {Omit<Format & Partial<__se__EditorInjector>, 'format'>} FormatThis
  */
 
 /**
@@ -21,7 +21,7 @@ import { dom, unicode, numbers, env } from '../../helper';
  * @constructor
  * @this {FormatThis}
  * @description Classes related to editor formats such as line creation, line retrieval from selected range, etc.
- * @param {EditorCore} editor - The root editor instance
+ * @param {__se__EditorCore} editor - The root editor instance
  */
 function Format(editor) {
 	CoreInjector.call(this, editor);

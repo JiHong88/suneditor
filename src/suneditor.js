@@ -11,6 +11,10 @@ import Helper from './helper';
  */
 
 /**
+ * @typedef {import('./core/section/constructor').EditorFrameOptions} EditorFrameOptions
+ */
+
+/**
  * Editor Injector module, Inject "editor" and basic frequently used objects by calling it with "call(this, editor)".
  * @type {(...args: *) => *}
  */

@@ -11,7 +11,7 @@ const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DIR_UP_KEYCODE = /^3[7-8]$/;
 
 /**
- * @typedef {Omit<Component & Partial<EditorInjector>, 'component'>} ComponentThis
+ * @typedef {Omit<Component & Partial<__se__EditorInjector>, 'component'>} ComponentThis
  */
 
 /**
@@ -31,7 +31,7 @@ const DIR_UP_KEYCODE = /^3[7-8]$/;
  * @constructor
  * @this {ComponentThis}
  * @description Class for managing components such as images and tables that are not in line format
- * @param {EditorCore} editor - The root editor instance
+ * @param {__se__EditorCore} editor - The root editor instance
  */
 function Component(editor) {
 	CoreInjector.call(this, editor);
@@ -79,15 +79,15 @@ function Component(editor) {
 		keydown: OnKeyDown_component.bind(this),
 		mousedown: CloseListener_mousedown.bind(this)
 	};
-	/** @type {GlobalEventInfo|void} */
+	/** @type {__se__GlobalEventInfo|void} */
 	this._bindClose_copy = null;
-	/** @type {GlobalEventInfo|void} */
+	/** @type {__se__GlobalEventInfo|void} */
 	this._bindClose_cut = null;
-	/** @type {GlobalEventInfo|void} */
+	/** @type {__se__GlobalEventInfo|void} */
 	this._bindClose_keydown = null;
-	/** @type {GlobalEventInfo|void} */
+	/** @type {__se__GlobalEventInfo|void} */
 	this._bindClose_mousedown = null;
-	/** @type {GlobalEventInfo|void} */
+	/** @type {__se__GlobalEventInfo|void} */
 	this._bindClose_touchstart = null;
 	/** @type {boolean} */
 	this.__selectionSelected = false;

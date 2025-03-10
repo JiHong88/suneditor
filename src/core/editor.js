@@ -33,6 +33,10 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
  */
 
 /**
+ * @typedef {import('./section/constructor').EditorFrameOptions} EditorFrameOptions
+ */
+
+/**
  * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo
  */
 
@@ -55,25 +59,25 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Frame root map
-	 * @type {Map<*, FrameContext>}
+	 * @type {Map<*, __se__FrameContext>}
 	 */
 	this.frameRoots = product.frameRoots;
 
 	/**
 	 * @description Editor context object
-	 * @type {Context}
+	 * @type {__se__Context}
 	 */
 	this.context = product.context;
 
 	/**
 	 * @description Current focusing frame context
-	 * @type {FrameContext}
+	 * @type {__se__FrameContext}
 	 */
 	this.frameContext = new Map();
 
 	/**
 	 * @description Current focusing frame context options
-	 * @type {FrameOptions}
+	 * @type {__se__FrameOptions}
 	 */
 	this.frameOptions = new Map();
 
@@ -133,7 +137,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Variables used internally in editor operation
-	 * @type {EditorStatus}
+	 * @type {__se__EditorStatus}
 	 */
 	this.status = {
 		hasFocus: false,
@@ -656,7 +660,7 @@ Editor.prototype = {
 	/**
 	 * @description Checks if the content of the editor is empty.
 	 * - Display criteria for "placeholder".
-	 * @param {?FrameContext=} fc Frame context, if not present, currently selected frame context.
+	 * @param {?__se__FrameContext=} fc Frame context, if not present, currently selected frame context.
 	 * @returns {boolean}
 	 */
 	isEmpty(fc) {
@@ -1052,7 +1056,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Set frameContext, frameOptions
-	 * @param {FrameContext} rt Root target[key] FrameContext
+	 * @param {__se__FrameContext} rt Root target[key] FrameContext
 	 */
 	_setFrameInfo(rt) {
 		this.frameContext = rt;
@@ -1095,7 +1099,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Initializ wysiwyg area (Only called from core._init)
-	 * @param {FrameContext} e frameContext
+	 * @param {__se__FrameContext} e frameContext
 	 * @param {string} value initial html string
 	 */
 	_initWysiwygArea(e, value) {
@@ -1127,7 +1131,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Called when there are changes to tags in the wysiwyg region.
-	 * @param {FrameContext} fc - Frame context object
+	 * @param {__se__FrameContext} fc - Frame context object
 	 */
 	_resourcesStateChange(fc) {
 		this._iframeAutoHeight(fc);
@@ -1140,7 +1144,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
-	 * @param {FrameContext} fc - Frame context object
+	 * @param {__se__FrameContext} fc - Frame context object
 	 */
 	_iframeAutoHeight(fc) {
 		const autoFrame = fc.get('_iframeAuto');
@@ -1159,7 +1163,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Call the "onResizeEditor" event
-	 * @param {FrameContext} fc - Frame context object
+	 * @param {__se__FrameContext} fc - Frame context object
 	 * @param {number} h - Height value
 	 * @param {ResizeObserverEntry} resizeObserverEntry - ResizeObserverEntry object
 	 */
@@ -1184,7 +1188,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Set display property when there is placeholder.
-	 * @param {?FrameContext=} fc - Frame context object, If null fc is this.frameContext
+	 * @param {?__se__FrameContext=} fc - Frame context object, If null fc is this.frameContext
 	 */
 	_checkPlaceholder(fc) {
 		fc = fc || this.frameContext;
@@ -1462,7 +1466,7 @@ Editor.prototype = {
 	 * @description Configures the document properties of an iframe editor.
 	 * @param {HTMLIFrameElement} frame - The editor iframe.
 	 * @param {Map<string, *>} originOptions - The original options.
-	 * @param {FrameOptions} targetOptions - The new options.
+	 * @param {__se__FrameOptions} targetOptions - The new options.
 	 */
 	__setIframeDocument(frame, originOptions, targetOptions) {
 		frame.setAttribute('scrolling', 'auto');
@@ -1477,7 +1481,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Set the FrameContext parameters and options
-	 * @param {FrameContext} e - Frame context object
+	 * @param {__se__FrameContext} e - Frame context object
 	 */
 	__setEditorParams(e) {
 		const frameOptions = e.get('options');

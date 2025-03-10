@@ -5,7 +5,7 @@
 import { keyCodeMap } from '../../helper';
 
 /**
- * @typedef {Omit<Shortcuts & Partial<EditorInjector>, 'shortcuts'>} ShortcutsThis
+ * @typedef {Omit<Shortcuts & Partial<__se__EditorInjector>, 'shortcuts'>} ShortcutsThis
  */
 
 /**
@@ -30,7 +30,7 @@ import { keyCodeMap } from '../../helper';
  * @constructor
  * @this {ShortcutsThis}
  * @description Shortcuts class
- * @param {EditorCore} editor - The root editor instance
+ * @param {__se__EditorCore} editor - The root editor instance
  */
 function Shortcuts(editor) {
 	this.editor = editor;

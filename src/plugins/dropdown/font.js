@@ -12,7 +12,7 @@ class Font extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {Array<string>} pluginOptions.items - Font list
 	 * @param {number} pluginOptions.splitNum - Number of colors per line

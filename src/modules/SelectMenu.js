@@ -70,8 +70,8 @@ SelectMenu.prototype = {
 	/**
 	 * @this {SelectMenuThis}
 	 * @description Creates the select menu items.
-	 * @param {Array<string>|NodeCollection} items - Command list of selectable items.
-	 * @param {Array<string>|NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<string>|__se__NodeCollection} items - Command list of selectable items.
+	 * @param {Array<string>|__se__NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
 	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';

@@ -81,7 +81,7 @@ class Table extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {"x"|"y"|"xy"} [pluginOptions.scrollType='x'] - Scroll type ('x', 'y', 'xy')
 	 * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')
@@ -413,7 +413,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousemove".
-	 * @param {PluginMouseEventInfo} params
+	 * @param {__se__PluginMouseEventInfo} params
 	 */
 	onMouseMove({ event }) {
 		if (this._resizing) return;
@@ -466,7 +466,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousedown".
-	 * @param {PluginMouseEventInfo} params
+	 * @param {__se__PluginMouseEventInfo} params
 	 */
 	onMouseDown({ event }) {
 		this._ref = null;
@@ -559,7 +559,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keydown".
-	 * @param {PluginKeyEventInfo} params
+	 * @param {__se__PluginKeyEventInfo} params
 	 */
 	onKeyDown({ event, range, line }) {
 		this._ref = null;
@@ -637,7 +637,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keyup".
-	 * @param {PluginKeyEventInfo} params
+	 * @param {__se__PluginKeyEventInfo} params
 	 */
 	onKeyUp({ line }) {
 		this.__s = false;
@@ -3072,7 +3072,7 @@ function CreateHTML_controller_table({ lang, icons }) {
 }
 
 /**
- * @param {EditorCore} editor
+ * @param {__se__EditorCore} editor
  * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement }}
  */
 function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
@@ -3146,7 +3146,7 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
  * @property {HTMLButtonElement} font_italic
  * @property {HTMLButtonElement} font_strike
  *
- * @param {EditorCore} editor - Editor instance
+ * @param {__se__EditorCore} editor - Editor instance
  * @returns {TableCtrlProps}
  */
 function CreateHTML_controller_properties({ lang, icons, options }) {

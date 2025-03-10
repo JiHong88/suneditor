@@ -5,7 +5,7 @@ const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 let _styleNodes = null;
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<EditorInjector>, 'eventManager'>} EventManagerThis
+ * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
  */
 
 /**
@@ -69,7 +69,7 @@ function LineDelete_prev(formatEl) {
 /**
  * @private
  * @this {EventManagerThis}
- * @param {FrameContext} fc - Frame context object
+ * @param {__se__FrameContext} fc - Frame context object
  * @param {InputEvent} e - Event object
  */
 export async function OnInput_wysiwyg(fc, e) {
@@ -107,7 +107,7 @@ export async function OnInput_wysiwyg(fc, e) {
 /**
  * @private
  * @this {EventManagerThis}
- * @param {FrameContext} fc - Frame context object
+ * @param {__se__FrameContext} fc - Frame context object
  * @param {KeyboardEvent} e - Event object
  */
 export async function OnKeyDown_wysiwyg(fc, e) {
@@ -1066,7 +1066,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 /**
  * @private
  * @this {EventManagerThis}
- * @param {FrameContext} fc - Frame context object
+ * @param {__se__FrameContext} fc - Frame context object
  * @param {KeyboardEvent} e - Event object
  */
 export async function OnKeyUp_wysiwyg(fc, e) {

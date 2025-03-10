@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, env } from '../../helper';
 
 /**
- * @typedef {Omit<Selection_ & Partial<EditorInjector>, 'selection'>} SelectionThis
+ * @typedef {Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>} SelectionThis
  */
 
 /**
@@ -17,7 +17,7 @@ import { dom, unicode, env } from '../../helper';
  * @constructor
  * @this {SelectionThis}
  * @description Selection, Range related class
- * @param {EditorCore} editor - The root editor instance
+ * @param {__se__EditorCore} editor - The root editor instance
  */
 function Selection_(editor) {
 	CoreInjector.call(this, editor);

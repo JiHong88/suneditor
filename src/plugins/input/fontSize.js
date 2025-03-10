@@ -99,7 +99,7 @@ class FontSize extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions - Configuration options for the FontSize plugin.
 	 * @param {string=} [pluginOptions.sizeUnit='px'] - The unit for the font size.
 	 * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
@@ -242,7 +242,7 @@ class FontSize extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Toolbar
 	 * @description Executes the event function of toolbar's input tag - "change".
-	 * @param {PluginToolbarInputChangeEventInfo} params
+	 * @param {__se__PluginToolbarInputChangeEventInfo} params
 	 */
 	onInputChange({ target, value: changeValue, event }) {
 		if (this._disableInput) return;

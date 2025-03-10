@@ -621,7 +621,7 @@ function OnChange_downloadCheck(e) {
 
 /**
  * @private
- * @param {EditorCore} editor - Editor instance
+ * @param {__se__EditorCore} editor - Editor instance
  * @param {ModalAnchorEditorParams} params - ModalAnchorEditor options
  * @param {Array<string>} relList - REL attribute list
  * @returns {HTMLElement} - Modal form element

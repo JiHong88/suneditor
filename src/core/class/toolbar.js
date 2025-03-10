@@ -9,14 +9,14 @@ import { CreateToolBar, UpdateButton } from '../section/constructor';
 const { _w } = env;
 
 /**
- * @typedef {Omit<Toolbar & Partial<EditorInjector>, 'toolbar' | 'subToolbar'>} ToolbarThis
+ * @typedef {Omit<Toolbar & Partial<__se__EditorInjector>, 'toolbar' | 'subToolbar'>} ToolbarThis
  */
 
 /**
  * @constructor
  * @this {ToolbarThis}
  * @description Toolbar class
- * @param {EditorCore} editor - The root editor instance
+ * @param {__se__EditorCore} editor - The root editor instance
  * @param {Object} options - toolbar options
  * @param {String} options.keyName - toolbar key name
  * @param {Boolean} options.balloon - balloon toolbar

@@ -19,7 +19,7 @@ class Mention extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {string=} [pluginOptions.triggerText="@"] The character that triggers the mention list. Default is '@'.
 	 * @param {number=} [pluginOptions.limitSize=5] The number of items to display in the mention list. Default is 5.

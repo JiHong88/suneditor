@@ -15,7 +15,7 @@ class ExportPDF extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions - plugin options
 	 * @param {string} pluginOptions.apiUrl - server request url
 	 * @param {string} pluginOptions.fileName - file name

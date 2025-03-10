@@ -2,7 +2,7 @@ import { get as getNumber } from '../../helper/numbers';
 
 /**
  * @description Elements and variables you should have
- * @param {{target: Element, key: *, options: FrameOptions}} editorTarget Target textarea
+ * @param {{target: Element, key: *, options: __se__FrameOptions}} editorTarget Target textarea
  * @param {HTMLElement} top Editor top area
  * @param {HTMLElement} wwFrame Editor wysiwyg frame
  * @param {HTMLElement} codeWrapper Editor code view wrapper
@@ -10,7 +10,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {{inner: HTMLElement, page: HTMLElement, pageMirror: HTMLElement}} documentTypeInner Document type elements
  * @param {?HTMLElement} statusbar Editor statusbar
  * @param {*} key root key
- * @returns {FrameContext}
+ * @returns {__se__FrameContext}
  */
 export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, documentTypeInner, key) {
 	const m = new Map([
@@ -54,7 +54,7 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 /**
  * @description Update statusbar context
  * @param {HTMLElement} statusbar Statusbar element
- * @param {FrameContext} mapper FrameContext map
+ * @param {__se__FrameContext} mapper FrameContext map
  */
 export function UpdateStatusbarContext(statusbar, mapper) {
 	statusbar ? mapper.set('statusbar', statusbar) : mapper.delete('statusbar');
@@ -72,7 +72,7 @@ export function UpdateStatusbarContext(statusbar, mapper) {
  * @param {HTMLElement|null} toolbarContainer Toolbar container
  * @param {HTMLElement} menuTray menu tray
  * @param {HTMLElement|null} subbar sub toolbar
- * @returns {Context}
+ * @returns {__se__Context}
  */
 export function CreateContext(toolbar, toolbarContainer, menuTray, subbar, statusbarContainer) {
 	const m = new Map([

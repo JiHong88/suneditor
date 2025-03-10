@@ -15,7 +15,7 @@ import ApiManager from './ApiManager';
 
 /**
  * @typedef {Object} FileStateParams
- * @property {EditorCore} editor - The root editor instance
+ * @property {__se__EditorCore} editor - The root editor instance
  * @property {Node} element File element
  * @property {number} index File index
  * @property {string} state File state ("create"|"update"|"delete")

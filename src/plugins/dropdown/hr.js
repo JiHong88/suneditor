@@ -24,7 +24,7 @@ class HR extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {Array<{name: string, class: string}>} pluginOptions.items - HR list
 	 */
@@ -100,7 +100,7 @@ class HR extends EditorInjector {
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
 	 * @param {KeyboardEvent} params.event - Key event object
 	 * @param {string} params.keyCode - KeyBoardEvent.code
-	 * @param {EditorCore} params.editor - The root editor instance
+	 * @param {__se__EditorCore} params.editor - The root editor instance
 	 */
 	shortcut({ line, range }) {
 		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);

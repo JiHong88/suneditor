@@ -25,7 +25,7 @@ class FormatBlock extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {Array<string>} pluginOptions.items - Format list
 	 */

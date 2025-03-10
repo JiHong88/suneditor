@@ -12,7 +12,7 @@ class Layout extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} pluginOptions
 	 * @param {Array<{name: string, html: string}>} pluginOptions.items - Layout list
 	 */

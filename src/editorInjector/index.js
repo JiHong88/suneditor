@@ -3,11 +3,11 @@ import ClassInjector from './_classes';
 
 /**
  * @description Initializes and adds inner classes and default properties of the editor.
- * @param {EditorCore} editor - The root editor instance
+ * @param {__se__EditorCore} editor - The root editor instance
  */
 function EditorInjector(editor) {
 	// CoreInjector props
-	/** @type {EditorCore} */
+	/** @type {__se__EditorCore} */
 	this.editor;
 	/** @type {import('./_core').default['eventManager']} */
 	this.eventManager;

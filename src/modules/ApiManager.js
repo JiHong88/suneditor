@@ -20,13 +20,13 @@ import { env } from '../helper';
 function ApiManager(inst, params) {
 	/**
 	 * @description Editor instance
-	 * @type {EditorCore}
+	 * @type {__se__EditorCore}
 	 */
 	this.editor = inst.editor;
 
 	/**
 	 * @description UI class
-	 * @type {EditorCore["ui"]}
+	 * @type {__se__EditorCore["ui"]}
 	 */
 	this.ui = this.editor.ui;
 

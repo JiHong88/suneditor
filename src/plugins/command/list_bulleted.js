@@ -18,7 +18,7 @@ class List_bulleted extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 */
 	constructor(editor) {
 		// plugin bisic properties
@@ -105,7 +105,7 @@ class List_bulleted extends EditorInjector {
 	 * @param {ShortcutInfo} params.info - Information of the shortcut
 	 * @param {KeyboardEvent} params.event - Key event object
 	 * @param {string} params.keyCode - KeyBoardEvent.code
-	 * @param {EditorCore} params.editor - The root editor instance
+	 * @param {__se__EditorCore} params.editor - The root editor instance
 	 */
 	shortcut({ range, info }) {
 		const { startContainer } = range;

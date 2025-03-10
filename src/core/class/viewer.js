@@ -6,14 +6,14 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, env, converter, numbers } from '../../helper';
 
 /**
- * @typedef {Omit<Viewer & Partial<EditorInjector>, 'viewer'>} ViewerThis
+ * @typedef {Omit<Viewer & Partial<__se__EditorInjector>, 'viewer'>} ViewerThis
  */
 
 /**
  * @constructor
  * @this {ViewerThis}
  * @description Viewer(codeView, fullScreen, showBlocks) class
- * @param {EditorCore} editor - The root editor instance
+ * @param {__se__EditorCore} editor - The root editor instance
  */
 function Viewer(editor) {
 	CoreInjector.call(this, editor);
@@ -707,7 +707,7 @@ Viewer.prototype = {
 /**
  * @private
  * @description Create line numbers for the code view area
- * @param {FrameContext} fc - Frame context
+ * @param {__se__FrameContext} fc - Frame context
  */
 function CreateLineNumbers(fc) {
 	const codeNumbers = fc.get('codeNumbers');

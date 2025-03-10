@@ -7,14 +7,14 @@ import { _w, isEdge } from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/dom/domUtils';
 
 /**
- * @typedef {Omit<Char & Partial<EditorInjector>, 'char'>} CharThis
+ * @typedef {Omit<Char & Partial<__se__EditorInjector>, 'char'>} CharThis
  */
 
 /**
  * @constructor
  * @this {CharThis}
  * @description character count, character limit, etc. management class
- * @param {EditorCore} editor - The root editor instance
+ * @param {__se__EditorCore} editor - The root editor instance
  */
 function Char(editor) {
 	CoreInjector.call(this, editor);

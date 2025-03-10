@@ -75,7 +75,7 @@ class Embed extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {EditorCore} editor - The root editor instance
+	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {EmbedPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
@@ -798,7 +798,7 @@ class Embed extends EditorInjector {
 }
 
 /**
- * @param {EditorCore} editor Editor instance
+ * @param {__se__EditorCore} editor Editor instance
  * @param {*} pluginOptions
  * @returns {{
  * html: HTMLElement,
