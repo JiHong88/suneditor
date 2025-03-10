@@ -45,7 +45,7 @@ jobs:
 
             # 5) 빌드
             - name: Build
-              run: npm run build
+              run: npm run build:prod
 
             # 6) npm publish
             - name: Deploy
@@ -53,7 +53,7 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # NPM 토큰
 
-            # 7) 스크립트 실행 (마일스톤 관리 등 필요 작업)
+            # 7) 스크립트 실행
             - name: Execute script for milestone
               run: node .github/scripts/manage-deploy.js ${{ steps.check-version.outputs.package_version }}
               env:
