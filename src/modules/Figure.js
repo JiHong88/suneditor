@@ -168,6 +168,7 @@ class Figure extends EditorInjector {
 		dom.utils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : '') }, dom.utils.createElement('FIGURE', null, element));
 		return Figure.GetContainer(element);
 	}
+
 	/**
 	 * @description Create a container for the inline resizing component and insert the element.
 	 * @param {Node} element Target element
@@ -178,6 +179,7 @@ class Figure extends EditorInjector {
 		dom.utils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
 		return Figure.GetContainer(element);
 	}
+
 	/**
 	 * @description Return HTML string of caption(FIGCAPTION) element
 	 * @param {Node} cover Cover element(FIGURE). "CreateContainer().cover"
@@ -188,6 +190,7 @@ class Figure extends EditorInjector {
 		cover.appendChild(caption);
 		return caption;
 	}
+
 	/**
 	 * @description Get the element's container(.se-component) info.
 	 * @param {Node} element Target element
@@ -204,6 +207,7 @@ class Figure extends EditorInjector {
 			caption: /** @type {HTMLElement} */ (dom.query.getEdgeChild(element.parentElement, 'FIGCAPTION', false))
 		};
 	}
+
 	/**
 	 * @description Ratio calculation
 	 * @param {string|number} w Width size
@@ -230,6 +234,7 @@ class Figure extends EditorInjector {
 			h: numbers.get(rh, 4)
 		};
 	}
+
 	/**
 	 * @description Ratio calculation
 	 * @param {string|number} w Width size
@@ -256,6 +261,7 @@ class Figure extends EditorInjector {
 			h: h
 		};
 	}
+
 	/**
 	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
 	 * @param {Node} element Target element
@@ -264,6 +270,7 @@ class Figure extends EditorInjector {
 	static is(element) {
 		return dom.utils.hasClass(element, 'se-component') || /^(HR)$/.test(element?.nodeName);
 	}
+
 	/**
 	 * @description Close the figure's controller
 	 */
