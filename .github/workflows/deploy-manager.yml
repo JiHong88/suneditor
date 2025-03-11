@@ -3,7 +3,7 @@ name: Deploy Management Action
 on:
     push:
         branches:
-            - release-test
+            - release
 
 jobs:
     deploy:
@@ -49,7 +49,7 @@ jobs:
 
             # 6) npm publish
             - name: Deploy
-              run: npm publish --tag alpha
+              run: npm publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # NPM 토큰
 
