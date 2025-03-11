@@ -41,6 +41,7 @@
 		"@babel/core": "^7.22.1",
 		"@codemirror/lang-html": "^6.4.3",
 		"@codemirror/lang-javascript": "^6.1.8",
+		"@octokit/rest": "^21.1.1",
 		"@typescript-eslint/eslint-plugin": "^7.18.0",
 		"@typescript-eslint/parser": "^7.18.0",
 		"@webpack-cli/serve": "^2.0.4",
