@@ -64,40 +64,14 @@ export type HueSliderParams = {
  * @property {ControllerParams} [controllerOptions] Controller options
  */
 /**
- * @constructor
+ * @class
  * @description Create a Hue slider. (only create one at a time)
  * - When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
- * @param {*} inst The instance object that called the constructor.
- * @param {HueSliderParams} [params={}] Hue slider options
- * @param {string} [className=""] The class name of the hue slider.
  */
-declare function HueSlider(inst: any, params?: HueSliderParams, className?: string): void;
 declare class HueSlider {
 	/**
-	 * @typedef {import('../modules/Controller').ControllerParams} ControllerParams
-	 */
-	/**
-	 * @typedef {Object} HueSliderColor
-	 * @property {string} hex - HEX color
-	 * @property {number} r - Red color value
-	 * @property {number} g - Green color value
-	 * @property {number} b - Blue color value
-	 * @property {number} h - Hue color value
-	 * @property {number} s - Saturation color value
-	 * @property {number} l - Lightness color value
-	 */
-	/**
-	 * @typedef {Object} HueSliderParams
-	 * @property {Node} [form] The form element to attach the hue slider.
-	 * @property {boolean} [isNewForm] Whether to create a new form element.
-	 * @property {ControllerParams} [controllerOptions] Controller options
-	 */
-	/**
 	 * @constructor
-	 * @description Create a Hue slider. (only create one at a time)
-	 * - When you call the .attach() method, the hue slider is appended to the form element.
-	 * It must be called every time it is used.
 	 * @param {*} inst The instance object that called the constructor.
 	 * @param {HueSliderParams} [params={}] Hue slider options
 	 * @param {string} [className=""] The class name of the hue slider.

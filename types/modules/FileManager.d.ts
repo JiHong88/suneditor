@@ -1,5 +1,4 @@
 export default FileManager;
-export type FileManagerThis = FileManager & Partial<CoreInjector>;
 export type FileStateInfo = {
 	/**
 	 * File source
@@ -63,9 +62,6 @@ export type FileManagerParams = {
 	eventHandler?: ((info: FileStateParams) => void) | undefined;
 };
 /**
- * @typedef {FileManager & Partial<CoreInjector>} FileManagerThis
- */
-/**
  * @typedef {Object} FileStateInfo
  * @property {string} src File source
  * @property {number} index File index
@@ -89,44 +85,12 @@ export type FileManagerParams = {
  * @property {(info: FileStateParams) => void=} eventHandler A function to handle file-related events
  */
 /**
- * @constructor
- * @this {FileManagerThis}
+ * @class
  * @description This module manages the file information of the editor.
- * @param {*} inst The instance object that called the constructor.
- * @param {FileManagerParams} params FileManager options
  */
-declare function FileManager(this: FileManagerThis, inst: any, params: FileManagerParams): void;
-declare class FileManager {
-	/**
-	 * @typedef {FileManager & Partial<CoreInjector>} FileManagerThis
-	 */
-	/**
-	 * @typedef {Object} FileStateInfo
-	 * @property {string} src File source
-	 * @property {number} index File index
-	 * @property {string} name File name
-	 * @property {number} size File size
-	 */
-	/**
-	 * @typedef {Object} FileStateParams
-	 * @property {__se__EditorCore} editor - The root editor instance
-	 * @property {Node} element File element
-	 * @property {number} index File index
-	 * @property {string} state File state ("create"|"update"|"delete")
-	 * @property {FileStateInfo} info File information
-	 * @property {number} remainingFilesCount Remaining file count
-	 * @property {string} pluginName Plugin name
-	 */
-	/**
-	 * @typedef {Object} FileManagerParams
-	 * @property {string} query The query selector used to find file elements in the editor
-	 * @property {(params: Array<FileStateInfo>) => void=} loadHandler A function to handle the loaded file information
-	 * @property {(info: FileStateParams) => void=} eventHandler A function to handle file-related events
-	 */
+declare class FileManager extends CoreInjector {
 	/**
 	 * @constructor
-	 * @this {FileManagerThis}
-	 * @description This module manages the file information of the editor.
 	 * @param {*} inst The instance object that called the constructor.
 	 * @param {FileManagerParams} params FileManager options
 	 */
@@ -144,7 +108,6 @@ declare class FileManager {
 	__updateTags: any[];
 	apiManager: ApiManager;
 	/**
-	 * @this {FileManagerThis}
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
 	 * @param {?Object<string, string>} uploadHeader Request header
@@ -153,7 +116,6 @@ declare class FileManager {
 	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack Error call back function
 	 */
 	upload(
-		this: FileManagerThis,
 		uploadUrl: string,
 		uploadHeader: {
 			[x: string]: string;
@@ -169,7 +131,6 @@ declare class FileManager {
 		errorCallBack?: (((res: any, xmlHttp: XMLHttpRequest) => string) | null) | undefined
 	): void;
 	/**
-	 * @this {FileManagerThis}
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
 	 * @param {?Object<string, string>} uploadHeader Request header
@@ -177,7 +138,6 @@ declare class FileManager {
 	 * @returns {Promise<XMLHttpRequest>}
 	 */
 	asyncUpload(
-		this: FileManagerThis,
 		uploadUrl: string,
 		uploadHeader: {
 			[x: string]: string;
@@ -191,7 +151,6 @@ declare class FileManager {
 			  }
 	): Promise<XMLHttpRequest>;
 	/**
-	 * @this {FileManagerThis}
 	 * @description Set the file information to the element.
 	 * @param {Node} element File information element
 	 * @param {Object} params
@@ -200,7 +159,6 @@ declare class FileManager {
 	 * @returns
 	 */
 	setFileData(
-		this: FileManagerThis,
 		element: Node,
 		{
 			name,
@@ -212,45 +170,33 @@ declare class FileManager {
 	): void;
 	/**
 	 * @private
-	 * @this {FileManagerThis}
 	 * @description Create info object of file and add it to "infoList"
 	 * @param {HTMLMediaElement} element
 	 * @param {{name: string, size: number}|null} file File information
 	 */
-	_setInfo(
-		this: FileManagerThis,
-		element: HTMLMediaElement,
-		file: {
-			name: string;
-			size: number;
-		} | null
-	): void;
+	private _setInfo;
 	/**
-	 * @this {FileManagerThis}
 	 * @description Gets the sum of the sizes of the currently saved files.
 	 * @returns {number} Size
 	 */
-	getSize(this: FileManagerThis): number;
+	getSize(): number;
 	/**
 	 * @private
-	 * @this {FileManagerThis}
 	 * @description Checke the file's information and modify the tag that does not fit the format.
 	 * @param {boolean} loaded Whether the editor is loaded
 	 */
-	_checkInfo(this: FileManagerThis, loaded: boolean): void;
+	private _checkInfo;
 	/**
 	 * @private
-	 * @this {FileManagerThis}
 	 * @description Reset info object and "infoList = []", "infoIndex = 0"
 	 */
-	_resetInfo(this: FileManagerThis): void;
+	private _resetInfo;
 	/**
 	 * @private
-	 * @this {FileManagerThis}
 	 * @description Delete info object at "infoList"
 	 * @param {number} index index of info object infoList[].index)
 	 */
-	_deleteInfo(this: FileManagerThis, index: number): void;
+	private _deleteInfo;
 }
 import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';

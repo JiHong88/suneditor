@@ -1,36 +1,44 @@
 export default Modal;
-export type ModalThis = Modal & Partial<__se__EditorInjector>;
 export type OffsetGlobalInfo = import('../core/class/offset').OffsetGlobalInfo;
-/**
- * @typedef {Modal & Partial<__se__EditorInjector>} ModalThis
- */
 /**
  * @typedef {import('../core/class/offset').OffsetGlobalInfo} OffsetGlobalInfo
  */
 /**
- * @constructor
- * @this {ModalThis}
+ * @class
  * @description Modal window module
- * @param {* & {editor: __se__EditorCore}} inst The instance object that called the constructor.
- * @param {Element} element Modal element
  */
-declare function Modal(
-	this: ModalThis,
-	inst: any & {
-		editor: __se__EditorCore;
-	},
-	element: Element
-): void;
-declare class Modal {
+declare class Modal extends CoreInjector {
 	/**
-	 * @typedef {Modal & Partial<__se__EditorInjector>} ModalThis
+	 * @description Create a file input tag in the modal window.
+	 * @param {{icons: __se__EditorCore['icons'], lang: __se__EditorCore['lang']}} param0 - icons and language object
+	 * @param {{acceptedFormats: string, allowMultiple}} param1 - options
+	 * - acceptedFormats: "image/*, video/*, audio/*", etc.
+	 * - allowMultiple: true or false
+	 * @returns {string} HTML string
 	 */
+	static CreateFileInput(
+		{
+			icons,
+			lang
+		}: {
+			icons: __se__EditorCore['icons'];
+			lang: __se__EditorCore['lang'];
+		},
+		{
+			acceptedFormats,
+			allowMultiple
+		}: {
+			acceptedFormats: string;
+			allowMultiple: any;
+		}
+	): string;
 	/**
-	 * @typedef {import('../core/class/offset').OffsetGlobalInfo} OffsetGlobalInfo
+	 * @description A function called when the contents of "input" have changed and you want to adjust the style.
+	 * @param {Element} wrapper - Modal file input wrapper(.se-flex-input-wrapper)
+	 * @param {FileList|File[]} files - FileList object
 	 */
+	static OnChangeFile(wrapper: Element, files: FileList | File[]): void;
 	/**
-	 * @constructor
-	 * @this {ModalThis}
 	 * @description Modal window module
 	 * @param {* & {editor: __se__EditorCore}} inst The instance object that called the constructor.
 	 * @param {Element} element Modal element
@@ -41,8 +49,8 @@ declare class Modal {
 		},
 		element: Element
 	);
-	offset: any;
-	ui: any;
+	offset: import('../core/class/offset').default;
+	ui: import('../core/class/ui').default;
 	inst: any;
 	kind: any;
 	form: HTMLElement;
@@ -61,7 +69,7 @@ declare class Modal {
 	_closeSignal: boolean;
 	/** @type {HTMLElement} */
 	_resizeBody: HTMLElement;
-	_currentHandle: any;
+	_currentHandle: HTMLElement;
 	__resizeDir: string;
 	__offetTop: number;
 	__offetLeft: number;
@@ -72,75 +80,38 @@ declare class Modal {
 	_bindClose_mousemove: any;
 	_bindClose_mouseup: any;
 	/**
-	 * @this {ModalThis}
 	 * @description Open a modal plugin
 	 * - The plugin's "init" method is called.
 	 */
-	open(this: ModalThis): void;
+	open(): void;
 	/**
-	 * @this {ModalThis}
 	 * @description Close a modal plugin
 	 * - The plugin's "init" and "off" method is called.
 	 */
-	close(this: ModalThis): void;
+	close(): void;
 	/**
 	 * @private
-	 * @this {ModalThis}
 	 * @description Fixes the current controller's display state when the modal is opened or closed.
 	 * @param {boolean} fixed - Whether to fix or unfix the controller.
 	 */
-	_fixCurrentController(this: ModalThis, fixed: boolean): void;
+	private _fixCurrentController;
 	/**
 	 * @private
-	 * @this {ModalThis}
 	 * @description Saves the current offset position of the modal for resizing calculations.
 	 * @returns {OffsetGlobalInfo} Offset values including top and left positions. (offset.getGlobal)
 	 */
-	_saveOffset(this: ModalThis): OffsetGlobalInfo;
+	private _saveOffset;
 	/**
 	 * @private
-	 * @this {ModalThis}
 	 * @description Adds global event listeners for resizing the modal.
 	 * @param {string} dir - The direction in which resizing is occurring.
 	 */
-	__addGlobalEvent(this: ModalThis, dir: string): void;
+	private __addGlobalEvent;
 	/**
 	 * @private
-	 * @this {ModalThis}
 	 * @description Removes global event listeners related to modal resizing.
 	 */
-	__removeGlobalEvent(this: ModalThis): void;
+	private __removeGlobalEvent;
+	#private;
 }
-declare namespace Modal {
-	export { CreateFileInput, OnChangeFile };
-}
-/**
- * @description Create a file input tag in the modal window.
- * @param {{icons: __se__EditorCore['icons'], lang: __se__EditorCore['lang']}} param0 - icons and language object
- * @param {{acceptedFormats: string, allowMultiple}} param1 - options
- * - acceptedFormats: "image/*, video/*, audio/*", etc.
- * - allowMultiple: true or false
- * @returns {string} HTML string
- */
-declare function CreateFileInput(
-	{
-		icons,
-		lang
-	}: {
-		icons: __se__EditorCore['icons'];
-		lang: __se__EditorCore['lang'];
-	},
-	{
-		acceptedFormats,
-		allowMultiple
-	}: {
-		acceptedFormats: string;
-		allowMultiple: any;
-	}
-): string;
-/**
- * @description A function called when the contents of "input" have changed and you want to adjust the style.
- * @param {Element} wrapper - Modal file input wrapper(.se-flex-input-wrapper)
- * @param {FileList|File[]} files - FileList object
- */
-declare function OnChangeFile(wrapper: Element, files: FileList | File[]): void;
+import CoreInjector from '../editorInjector/_core';

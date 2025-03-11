@@ -44,26 +44,12 @@ export type ApiManagerParams = {
  * @property {XMLHttpRequestResponseType=} responseType - XMLHttpRequest.responseType
  */
 /**
- * @constructor
+ * @class
  * @description API Manager
- * @param {*} inst The instance object that called the constructor.
- * @param {ApiManagerParams=} params API options
  */
-declare function ApiManager(inst: any, params?: ApiManagerParams | undefined): void;
 declare class ApiManager {
 	/**
-	 * @typedef ApiManagerParams
-	 * @property {string=} method - HTTP method (GET, POST, PUT, DELETE...)
-	 * @property {string=} url - API's URL
-	 * @property {Object<string, string>=} headers - HTTP headers
-	 * @property {*=} data - API data
-	 * @property {(xmlHttp: XMLHttpRequest) => boolean=} callBack - API success callback
-	 * @property {(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack - API fail callback
-	 * @property {XMLHttpRequestResponseType=} responseType - XMLHttpRequest.responseType
-	 */
-	/**
 	 * @constructor
-	 * @description API Manager
 	 * @param {*} inst The instance object that called the constructor.
 	 * @param {ApiManagerParams=} params API options
 	 */
@@ -135,5 +121,5 @@ declare class ApiManager {
 	 * @param {string} url url
 	 * @returns
 	 */
-	_normalizeUrl(url: string): string;
+	private _normalizeUrl;
 }

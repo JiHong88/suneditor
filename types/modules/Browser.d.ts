@@ -1,5 +1,4 @@
 export default Browser;
-export type BrowserThis = Browser & Partial<CoreInjector>;
 export type BrowserFile = {
 	/**
 	 * - Source url
@@ -120,9 +119,6 @@ export type BrowserParams = {
 	thumbnail?: ((item: BrowserFile) => string) | undefined;
 };
 /**
- * @typedef {Browser & Partial<CoreInjector>} BrowserThis
- */
-/**
  * @typedef {Object} BrowserFile
  * @property {string} [src=""] - Source url
  * @property {string} [name=""] - File name | Folder name
@@ -153,49 +149,12 @@ export type BrowserParams = {
  * @property {((item: BrowserFile) => string)=} thumbnail - Default thumbnail
  */
 /**
- * @constructor
- * @this {BrowserThis}
- * @param {*} inst The instance object that called the constructor.
- * @param {BrowserParams} params Browser options
+ * @class
+ * @description File browser plugin
  */
-declare function Browser(this: BrowserThis, inst: any, params: BrowserParams): void;
-declare class Browser {
-	/**
-	 * @typedef {Browser & Partial<CoreInjector>} BrowserThis
-	 */
-	/**
-	 * @typedef {Object} BrowserFile
-	 * @property {string} [src=""] - Source url
-	 * @property {string} [name=""] - File name | Folder name
-	 * @property {string=} thumbnail - Thumbnail url
-	 * @property {string=} alt - Image alt
-	 * @property {Array<string>|string=} tag - Tag name list
-	 * @property {string=} type - Type (image, video, audio, etc.)
-	 * @property {string=} frame - Frame name (iframe, video, etc.)
-	 * @property {BrowserFile | string=} _data - The folder's contents or an API URL.
-	 * @property {boolean=} default - Whether this folder is the default selection.
-	 * @property {Object<string, *>=} meta - Metadata
-	 */
-	/**
-	 * @typedef BrowserParams
-	 * @property {string} title - File browser window title. Required. Can be overridden in browser.
-	 * @property {string=} className - Class name of the file browser. Optional. Default: ''.
-	 * @property {Object<string, *>|Array<*>=} data - direct data without server calls
-	 * @property {string=} url - File server url. Required. Can be overridden in browser.
-	 * @property {Object<string, string>=} headers - File server http header. Required. Can be overridden in browser.
-	 * @property {(target: Node) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
-	 * @property {boolean=} useSearch - Whether to use the search function. Optional. Default: true.
-	 * @property {string=} searchUrl - File server search url. Optional. Can be overridden in browser.
-	 * @property {Object<string, string>=} searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
-	 * @property {string=} listClass - Class name of list div. Required. Can be overridden in browser.
-	 * @property {(item: BrowserFile) => string=} drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
-	 * @property {Array<*>=} props - "props" argument to "drawItemHandler" function. Optional. Can be overridden in browser.
-	 * @property {number=} columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
-	 * @property {((item: BrowserFile) => string)=} thumbnail - Default thumbnail
-	 */
+declare class Browser extends CoreInjector {
 	/**
 	 * @constructor
-	 * @this {BrowserThis}
 	 * @param {*} inst The instance object that called the constructor.
 	 * @param {BrowserParams} params Browser options
 	 */
@@ -267,14 +226,13 @@ declare class Browser {
 	data: BrowserFile;
 	selectedTags: any[];
 	keyword: string;
-	sideInner: any;
+	sideInner: HTMLElement;
 	_closeSignal: boolean;
 	_bindClose: any;
 	__globalEventHandler: (e: any) => void;
 	apiManager: ApiManager;
 	sideOpenBtn: HTMLButtonElement;
 	/**
-	 * @this {BrowserThis}
 	 * @description Open a file browser plugin
 	 * @param {Object} [params={}]
 	 * @param {string=} params.listClass - Class name of list div. If not, use "this.listClass".
@@ -282,108 +240,87 @@ declare class Browser {
 	 * @param {string=} params.url - File server url. If not, use "this.url".
 	 * @param {Object<string, string>=} params.urlHeader - File server http header. If not, use "this.urlHeader".
 	 */
-	open(
-		this: BrowserThis,
-		params?: {
-			listClass?: string | undefined;
-			title?: string | undefined;
-			url?: string | undefined;
-			urlHeader?:
-				| {
-						[x: string]: string;
-				  }
-				| undefined;
-		}
-	): void;
+	open(params?: {
+		listClass?: string | undefined;
+		title?: string | undefined;
+		url?: string | undefined;
+		urlHeader?:
+			| {
+					[x: string]: string;
+			  }
+			| undefined;
+	}): void;
 	/**
-	 * @this {BrowserThis}
 	 * @description Close a browser plugin
 	 * - The plugin's "init" method is called.
 	 */
-	close(this: BrowserThis): void;
+	close(): void;
 	/**
-	 * @this {BrowserThis}
 	 * @description Search files
 	 * @param {string} keyword - Search keyword
 	 */
-	search(this: BrowserThis, keyword: string): void;
+	search(keyword: string): void;
 	/**
-	 * @this {BrowserThis}
 	 * @description Filter items by tag
 	 * @param {Array<BrowserFile>} items - Items to filter
 	 * @returns {Array<BrowserFile>}
 	 */
-	tagfilter(this: BrowserThis, items: Array<BrowserFile>): Array<BrowserFile>;
+	tagfilter(items: Array<BrowserFile>): Array<BrowserFile>;
 	/**
-	 * @this {BrowserThis}
 	 * @description Show file browser loading box
 	 */
-	showBrowserLoading(this: BrowserThis): void;
+	showBrowserLoading(): void;
 	/**
-	 * @this {BrowserThis}
 	 * @description Close file browser loading box
 	 */
-	closeBrowserLoading(this: BrowserThis): void;
+	closeBrowserLoading(): void;
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Fetches the file list from the server.
 	 * @param {string} url - The file server URL.
 	 * @param {Object<string, string>} urlHeader - The HTTP headers for the request.
 	 * @param {boolean} pageLoading - Indicates if this is a paginated request.
 	 */
-	_drawFileList(
-		this: BrowserThis,
-		url: string,
-		urlHeader: {
-			[x: string]: string;
-		},
-		pageLoading: boolean
-	): void;
+	private _drawFileList;
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Updates the displayed list of file items.
 	 * @param {Array<BrowserFile>} items - The file items to display.
 	 * @param {boolean} update - Whether to update the tags.
 	 */
-	_drawListItem(this: BrowserThis, items: Array<BrowserFile>, update: boolean): void;
+	private _drawListItem;
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Adds a global event listener for closing the browser.
 	 */
-	__addGlobalEvent(this: BrowserThis): void;
+	private __addGlobalEvent;
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Removes the global event listener for closing the browser.
 	 */
-	__removeGlobalEvent(this: BrowserThis): void;
+	private __removeGlobalEvent;
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Renders the file items or folder structure from data.
 	 * @param {BrowserFile[]|BrowserFile} data - The data representing the file structure.
 	 * @returns {boolean} True if rendering was successful, false otherwise.
 	 */
-	__drowItems(this: BrowserThis, data: BrowserFile[] | BrowserFile): boolean;
+	private __drowItems;
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Parses folder data into a structured format.
 	 * @param {BrowserFile} data - The folder data.
 	 * @param {string} [path] - The current path in the folder hierarchy.
 	 */
-	__parseFolderData(this: BrowserThis, data: BrowserFile, path?: string): void;
+	private __parseFolderData;
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Creates a nested folder list from parsed data.
 	 * @param {BrowserFile[]|BrowserFile} folderData - The structured folder data.
 	 * @param {HTMLElement} parentElement - The parent element to append folder structure to.
 	 */
-	__createFolderList(this: BrowserThis, folderData: BrowserFile[] | BrowserFile, parentElement: HTMLElement): void;
+	private __createFolderList;
+	#private;
 }
 import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';

@@ -1,5 +1,4 @@
 export default Figure;
-export type FigureThis = Figure & Partial<EditorInjector>;
 export type FigureParams = {
 	/**
 	 * Size unit
@@ -105,9 +104,6 @@ export type FigureControls = Array<
 	>
 >;
 /**
- * @typedef {Figure & Partial<EditorInjector>} FigureThis
- */
-/**
  * @typedef {Object} FigureParams
  * @property {string} [sizeUnit="px"] Size unit
  * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio { current: '00%', default: '00%' }
@@ -140,54 +136,79 @@ export type FigureControls = Array<
  * @typedef {Array<Array<string|{action: (element: Node, value: string, target: Node) => void, command: string, value: string, title: string, icon: string}>>} FigureControls
  */
 /**
- * @constructor
- * @this {FigureThis}
+ * @class
  * @description Controller module class
- * @param {*} inst The instance object that called the constructor.
- * @param {FigureControls} controls Controller button array
- * @param {FigureParams} params Figure options
  */
-declare function Figure(this: FigureThis, inst: any, controls: FigureControls, params: FigureParams): void;
-declare class Figure {
+declare class Figure extends EditorInjector {
 	/**
-	 * @typedef {Figure & Partial<EditorInjector>} FigureThis
+	 * @description Create a container for the resizing component and insert the element.
+	 * @param {Node} element Target element
+	 * @param {string=} className Class name of container (fixed: se-component)
+	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
 	 */
+	static CreateContainer(element: Node, className?: string | undefined): FigureInfo;
 	/**
-	 * @typedef {Object} FigureParams
-	 * @property {string} [sizeUnit="px"] Size unit
-	 * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio { current: '00%', default: '00%' }
+	 * @description Create a container for the inline resizing component and insert the element.
+	 * @param {Node} element Target element
+	 * @param {string} [className] Class name of container (fixed: se-component se-inline-component)
+	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
 	 */
+	static CreateInlineContainer(element: Node, className?: string): FigureInfo;
 	/**
-	 * @typedef {Object} FigureInfo
-	 * @property {HTMLElement} target Target element (img, iframe, video, audio, table, etc.)
-	 * @property {HTMLElement} container Container element (div.se-component|span.se-component.se-inline-component)
-	 * @property {?HTMLElement} cover Cover element (FIGURE|null)
-	 * @property {?HTMLElement} inlineCover Inline cover element (span.se-inline-component)
-	 * @property {?HTMLElement} caption Caption element (FIGCAPTION)
+	 * @description Return HTML string of caption(FIGCAPTION) element
+	 * @param {Node} cover Cover element(FIGURE). "CreateContainer().cover"
+	 * @returns {HTMLElement} caption element
 	 */
+	static CreateCaption(cover: Node, text: any): HTMLElement;
 	/**
-	 * @typedef {Object} FigureTargetInfo
-	 * @property {HTMLElement} container Container element (div.se-component|span.se-component.se-inline-component)
-	 * @property {?HTMLElement=} cover Cover element (FIGURE|null)
-	 * @property {?HTMLElement=} caption Caption element (FIGCAPTION)
-	 * @property {string} [align] - Alignment of the element.
-	 * @property {{w:number, h:number}} [ratio] - The aspect ratio of the element.
-	 * @property {string|number} [w] - Width of the element.
-	 * @property {string|number} [h] - Height of the element.
-	 * @property {number} [t] - Top position.
-	 * @property {number} [l] - Left position.
-	 * @property {string|number} width - Width, can be a number or 'auto'.
-	 * @property {string|number} height - Height, can be a number or 'auto'.
-	 * @property {number} [originWidth] - Original width from `naturalWidth` or `offsetWidth`.
-	 * @property {number} [originHeight] - Original height from `naturalHeight` or `offsetHeight`.
+	 * @description Get the element's container(.se-component) info.
+	 * @param {Node} element Target element
+	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
 	 */
+	static GetContainer(element: Node): FigureInfo;
 	/**
-	 * @typedef {Array<Array<string|{action: (element: Node, value: string, target: Node) => void, command: string, value: string, title: string, icon: string}>>} FigureControls
+	 * @description Ratio calculation
+	 * @param {string|number} w Width size
+	 * @param {string|number} h Height size
+	 * @param {?string=} [defaultSizeUnit="px"] Default size unit (default: "px")
+	 * @return {{w: number, h: number}}
 	 */
+	static GetRatio(
+		w: string | number,
+		h: string | number,
+		defaultSizeUnit?: (string | null) | undefined
+	): {
+		w: number;
+		h: number;
+	};
+	/**
+	 * @description Ratio calculation
+	 * @param {string|number} w Width size
+	 * @param {string|number} h Height size
+	 * @param {string} defaultSizeUnit Default size unit (default: "px")
+	 * @param {{w: number, h: number}} ratio Ratio size (Figure.GetRatio)
+	 * @return {{w: string|number, h: string|number}}
+	 */
+	static CalcRatio(
+		w: string | number,
+		h: string | number,
+		defaultSizeUnit: string,
+		ratio: {
+			w: number;
+			h: number;
+		}
+	): {
+		w: string | number;
+		h: string | number;
+	};
+	/**
+	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
+	 * @param {Node} element Target element
+	 * @returns {boolean}
+	 */
+	static is(element: Node): boolean;
 	/**
 	 * @constructor
-	 * @this {FigureThis}
-	 * @description Controller module class
 	 * @param {*} inst The instance object that called the constructor.
 	 * @param {FigureControls} controls Controller button array
 	 * @param {FigureParams} params Figure options
@@ -258,12 +279,10 @@ declare class Figure {
 	__onResizeESCEvent: __se__GlobalEventInfo;
 	__fileManagerInfo: boolean;
 	/**
-	 * @this {FigureThis}
 	 * @description Close the figure's controller
 	 */
-	close(this: FigureThis): void;
+	close(): void;
 	/**
-	 * @this {FigureThis}
 	 * @description Open the figure's controller
 	 * @param {Node} targetNode Target element
 	 * @param {Object} params params
@@ -275,7 +294,6 @@ declare class Figure {
 	 * @returns {FigureTargetInfo|undefined} figure target info
 	 */
 	open(
-		this: FigureThis,
 		targetNode: Node,
 		{
 			nonResizing,
@@ -292,17 +310,14 @@ declare class Figure {
 		}
 	): FigureTargetInfo | undefined;
 	/**
-	 * @this {FigureThis}
 	 * @description Hide the controller
 	 */
-	controllerHide(this: FigureThis): void;
+	controllerHide(): void;
 	/**
-	 * @this {FigureThis}
 	 * @description Hide the controller
 	 */
-	controllerShow(this: FigureThis): void;
+	controllerShow(): void;
 	/**
-	 * @this {FigureThis}
 	 * @description Open the figure's controller
 	 * @param {Node} target Target element
 	 * @param {Object} [params={}] params
@@ -312,7 +327,6 @@ declare class Figure {
 	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
 	 */
 	controllerOpen(
-		this: FigureThis,
 		target: Node,
 		params?: {
 			isWWTarget?: boolean | undefined;
@@ -327,260 +341,164 @@ declare class Figure {
 		}
 	): void;
 	/**
-	 * @this {FigureThis}
 	 * @description Set the element's container size
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
 	 */
-	setSize(this: FigureThis, w: string | number, h: string | number): void;
+	setSize(w: string | number, h: string | number): void;
 	/**
-	 * @this {FigureThis}
 	 * @description Gets the Figure size
 	 * @param {?Node=} targetNode Target element, default is the current element
 	 * @returns {{w: string, h: string}}
 	 */
-	getSize(
-		this: FigureThis,
-		targetNode?: (Node | null) | undefined
-	): {
+	getSize(targetNode?: (Node | null) | undefined): {
 		w: string;
 		h: string;
 	};
 	/**
-	 * @this {FigureThis}
 	 * @description Align the container.
 	 * @param {?Node} targetNode Target element
 	 * @param {string} align "none"|"left"|"center"|"right"
 	 */
-	setAlign(this: FigureThis, targetNode: Node | null, align: string): void;
+	setAlign(targetNode: Node | null, align: string): void;
 	/**
-	 * @this {FigureThis}
 	 * @description As style[block, inline] the component
 	 * @param {?Node} targetNode Target element
 	 * @param {"block"|"inline"} formatStyle Format style
 	 */
-	convertAsFormat(this: FigureThis, targetNode: Node | null, formatStyle: 'block' | 'inline'): void;
+	convertAsFormat(targetNode: Node | null, formatStyle: 'block' | 'inline'): void;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
 	 * @param {FigureInfo} figureinfo {target, container, cover, inlineCover, caption}
 	 * @param {string|number} w Width value.
 	 * @param {string|number} h Height value.
 	 */
-	_asFormatChange(this: FigureThis, figureinfo: FigureInfo, w: string | number, h: string | number): void;
+	private _asFormatChange;
 	/**
-	 * @this {FigureThis}
 	 * @description Controller button action
 	 * @param {HTMLButtonElement} target Target button element
 	 * @returns
 	 */
-	controllerAction(this: FigureThis, target: HTMLButtonElement): void;
+	controllerAction(target: HTMLButtonElement): void;
 	/**
-	 * @this {FigureThis}
 	 * @description Inspect the figure component format and change it to the correct format.
 	 * @param {Node} container - The container element of the figure component.
 	 * @param {Node} originEl - The original element of the figure component.
 	 * @param {Node} anchorCover - The anchor cover element of the figure component.
 	 * @param {import('./FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
 	 */
-	retainFigureFormat(this: FigureThis, container: Node, originEl: Node, anchorCover: Node, fileManagerInst?: import('./FileManager').default): void;
+	retainFigureFormat(container: Node, originEl: Node, anchorCover: Node, fileManagerInst?: import('./FileManager').default): void;
 	/**
-	 * @this {FigureThis}
 	 * @description Initialize the transform style (rotation) of the element.
 	 * @param {?Node=} node Target element, default is the current element
 	 */
-	deleteTransform(this: FigureThis, node?: (Node | null) | undefined): void;
+	deleteTransform(node?: (Node | null) | undefined): void;
 	/**
-	 * @this {FigureThis}
 	 * @description Set the transform style (rotation) of the element.
 	 * @param {Node} node Target element
 	 * @param {?string|number} width Element's width size
 	 * @param {?string|number} height Element's height size
 	 */
-	setTransform(this: FigureThis, node: Node, width: (string | number) | null, height: (string | number) | null, deg: any): void;
+	setTransform(node: Node, width: (string | number) | null, height: (string | number) | null, deg: any): void;
 	/**
 	 * @private
 	 * @description Sets figure component properties such as cover, container, caption, and alignment.
 	 * @param {FigureInfo} figureInfo - {target, container, cover, inlineCover, caption}
 	 */
-	_setFigureInfo(figureInfo: FigureInfo): void;
+	private _setFigureInfo;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Applies rotation transformation to the target element.
 	 * @param {HTMLElement} element Target element.
 	 * @param {number} r Rotation degree.
 	 * @param {number} x X-axis rotation value.
 	 * @param {number} y Y-axis rotation value.
 	 */
-	_setRotate(this: FigureThis, element: HTMLElement, r: number, x: number, y: number): void;
+	private _setRotate;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Applies size adjustments to the figure element.
 	 * @param {string|number} w Width value.
 	 * @param {string|number} h Height value.
 	 * @param {string} direction Resize direction.
 	 */
-	_applySize(this: FigureThis, w: string | number, h: string | number, direction: string): void;
+	private _applySize;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Sets padding-bottom for cover elements based on width and height.
 	 * @param {string} w Width value.
 	 * @param {string} h Height value.
 	 */
-	__setCoverPaddingBottom(this: FigureThis, w: string, h: string): void;
+	private __setCoverPaddingBottom;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Sets the figure element to its auto size.
 	 */
-	_setAutoSize(this: FigureThis): void;
+	private _setAutoSize;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Sets the figure element's size in percentage.
 	 * @param {string|number} w Width percentage.
 	 * @param {string|number} h Height percentage.
 	 */
-	_setPercentSize(this: FigureThis, w: string | number, h: string | number): void;
+	private _setPercentSize;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Deletes percentage-based sizing from the figure element.
 	 */
-	_deletePercentSize(this: FigureThis): void;
+	private _deletePercentSize;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Reverts the figure element to its previously saved size.
 	 */
-	_setRevert(this: FigureThis): void;
+	private _setRevert;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Updates the figure's alignment icon.
 	 */
-	_setAlignIcon(this: FigureThis): void;
+	private _setAlignIcon;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Updates the figure's block/inline format icon.
 	 */
-	_setAsIcon(this: FigureThis): void;
+	private _setAsIcon;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Saves the current size of the figure component.
 	 */
-	_saveCurrentSize(this: FigureThis): void;
+	private _saveCurrentSize;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Adjusts the position of the caption within the figure.
 	 * @param {HTMLElement} element Target element.
 	 */
-	_setCaptionPosition(this: FigureThis, element: HTMLElement): void;
+	private _setCaptionPosition;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Removes the margin top property from the figure caption.
 	 * @param {HTMLElement} element Target element.
 	 */
-	_deleteCaptionPosition(this: FigureThis, element: HTMLElement): void;
+	private _deleteCaptionPosition;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Displays or hides the resize handles of the figure component.
 	 * @param {boolean} display Whether to display resize handles.
 	 */
-	_displayResizeHandles(this: FigureThis, display: boolean): void;
+	private _displayResizeHandles;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Removes the resize event listeners.
 	 */
-	_offResizeEvent(this: FigureThis): void;
+	private _offResizeEvent;
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Sets up drag event handling for the figure component.
 	 * @param {Node} figureMain The main figure container element.
 	 */
-	_setDragEvent(this: FigureThis, figureMain: Node): void;
-}
-declare namespace Figure {
-	export { CreateContainer, CreateInlineContainer, CreateCaption, GetContainer, GetRatio, CalcRatio, is };
+	private _setDragEvent;
+	#private;
 }
 import EditorInjector from '../editorInjector';
 import { Controller } from '../modules';
 import { SelectMenu } from '../modules';
-/**
- * @description Create a container for the resizing component and insert the element.
- * @param {Node} element Target element
- * @param {string=} className Class name of container (fixed: se-component)
- * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
- */
-declare function CreateContainer(element: Node, className?: string | undefined): FigureInfo;
-/**
- * @description Create a container for the inline resizing component and insert the element.
- * @param {Node} element Target element
- * @param {string} [className] Class name of container (fixed: se-component se-inline-component)
- * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
- */
-declare function CreateInlineContainer(element: Node, className?: string): FigureInfo;
-/**
- * @description Return HTML string of caption(FIGCAPTION) element
- * @param {Node} cover Cover element(FIGURE). "CreateContainer().cover"
- * @returns {HTMLElement} caption element
- */
-declare function CreateCaption(cover: Node, text: any): HTMLElement;
-/**
- * @description Get the element's container(.se-component) info.
- * @param {Node} element Target element
- * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
- */
-declare function GetContainer(element: Node): FigureInfo;
-/**
- * @description Ratio calculation
- * @param {string|number} w Width size
- * @param {string|number} h Height size
- * @param {?string=} [defaultSizeUnit="px"] Default size unit (default: "px")
- * @return {{w: number, h: number}}
- */
-declare function GetRatio(
-	w: string | number,
-	h: string | number,
-	defaultSizeUnit?: (string | null) | undefined
-): {
-	w: number;
-	h: number;
-};
-/**
- * @description Ratio calculation
- * @param {string|number} w Width size
- * @param {string|number} h Height size
- * @param {string} defaultSizeUnit Default size unit (default: "px")
- * @param {{w: number, h: number}} ratio Ratio size (Figure.GetRatio)
- * @return {{w: string|number, h: string|number}}
- */
-declare function CalcRatio(
-	w: string | number,
-	h: string | number,
-	defaultSizeUnit: string,
-	ratio: {
-		w: number;
-		h: number;
-	}
-): {
-	w: string | number;
-	h: string | number;
-};
-/**
- * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
- * @param {Node} element Target element
- * @returns {boolean}
- */
-declare function is(element: Node): boolean;

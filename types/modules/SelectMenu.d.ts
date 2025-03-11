@@ -1,5 +1,4 @@
 export default SelectMenu;
-export type SelectMenuThis = SelectMenu & Partial<CoreInjector>;
 export type SelectMenuParams = {
 	/**
 	 * Position of the select menu, specified as "[left|right]-[middle|top|bottom]" or "[top|bottom]-[center|left|right]"
@@ -27,9 +26,6 @@ export type SelectMenuParams = {
 	closeMethod?: (() => void) | undefined;
 };
 /**
- * @typedef {SelectMenu & Partial<CoreInjector>} SelectMenuThis
- */
-/**
  * @typedef {Object} SelectMenuParams
  * @property {string} position Position of the select menu, specified as "[left|right]-[middle|top|bottom]" or "[top|bottom]-[center|left|right]"
  * @property {boolean} [checkList=false] Flag to determine if the checklist is enabled (true or false)
@@ -39,35 +35,19 @@ export type SelectMenuParams = {
  * @property {() => void=} closeMethod Optional method to call when the menu is closed
  */
 /**
- * @constructor
- * @this {SelectMenuThis}
- * @param {*} inst The instance object that called the constructor.
- * @param {SelectMenuParams} params Select menu options
+ * @class
+ * @description Creates a select menu
  */
-declare function SelectMenu(this: SelectMenuThis, inst: any, params: SelectMenuParams): void;
-declare class SelectMenu {
-	/**
-	 * @typedef {SelectMenu & Partial<CoreInjector>} SelectMenuThis
-	 */
-	/**
-	 * @typedef {Object} SelectMenuParams
-	 * @property {string} position Position of the select menu, specified as "[left|right]-[middle|top|bottom]" or "[top|bottom]-[center|left|right]"
-	 * @property {boolean} [checkList=false] Flag to determine if the checklist is enabled (true or false)
-	 * @property {"rtl" | "ltr"} [dir="ltr"] Optional text direction: "rtl" for right-to-left, "ltr" for left-to-right
-	 * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
-	 * @property {() => void=} openMethod Optional method to call when the menu is opened
-	 * @property {() => void=} closeMethod Optional method to call when the menu is closed
-	 */
+declare class SelectMenu extends CoreInjector {
 	/**
 	 * @constructor
-	 * @this {SelectMenuThis}
 	 * @param {*} inst The instance object that called the constructor.
 	 * @param {SelectMenuParams} params Select menu options
 	 */
 	constructor(inst: any, params: SelectMenuParams);
 	kink: any;
 	inst: any;
-	form: any;
+	form: HTMLElement;
 	items: any[];
 	/** @type {HTMLLIElement[]} */
 	menus: HTMLLIElement[];
@@ -110,21 +90,18 @@ declare class SelectMenu {
 		click: any;
 	};
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Creates the select menu items.
 	 * @param {Array<string>|__se__NodeCollection} items - Command list of selectable items.
 	 * @param {Array<string>|__se__NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
 	 */
-	create(this: SelectMenuThis, items: Array<string> | __se__NodeCollection, menus?: Array<string> | __se__NodeCollection): void;
+	create(items: Array<string> | __se__NodeCollection, menus?: Array<string> | __se__NodeCollection): void;
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Initializes the select menu and attaches it to a reference element.
 	 * @param {Node} referElement - The element that triggers the select menu.
 	 * @param {(command: string) => void} selectMethod - The function to execute when an item is selected.
 	 * @param {{class?: string, style?: string}} [attr={}] - Additional attributes for the select menu container.
 	 */
 	on(
-		this: SelectMenuThis,
 		referElement: Node,
 		selectMethod: (command: string) => void,
 		attr?: {
@@ -133,98 +110,85 @@ declare class SelectMenu {
 		}
 	): void;
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Select menu open
 	 * @param {?string=} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
 	 * @param {?string=} onItemQuerySelector The querySelector string of the menu to be activated
 	 */
-	open(this: SelectMenuThis, position?: (string | null) | undefined, onItemQuerySelector?: (string | null) | undefined): void;
+	open(position?: (string | null) | undefined, onItemQuerySelector?: (string | null) | undefined): void;
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Select menu close
 	 */
-	close(this: SelectMenuThis): void;
+	close(): void;
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Get the index of the selected item
 	 * @param {number} index Item index
 	 * @returns
 	 */
-	getItem(this: SelectMenuThis, index: number): any;
+	getItem(index: number): any;
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Set the index of the selected item
 	 * @param {number} index Item index
 	 */
-	setItem(this: SelectMenuThis, index: number): void;
+	setItem(index: number): void;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Appends a formatted list of items to the menu.
 	 * @param {string} html - The HTML string representing the menu items.
 	 */
-	_createFormat(this: SelectMenuThis, html: string): void;
+	private _createFormat;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Resets the menu state and removes event listeners.
 	 */
-	_init(this: SelectMenuThis): void;
+	private _init;
 	_onItem: Element;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Moves the selection up or down by a specified number of items.
 	 * @param {number} num - The number of items to move (negative for up, positive for down).
 	 */
-	_moveItem(this: SelectMenuThis, num: number): void;
+	private _moveItem;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Highlights and selects an item by index.
 	 * @param {number} selectIndex - The index of the item to select.
 	 */
-	_selectItem(this: SelectMenuThis, selectIndex: number): void;
+	private _selectItem;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Sets the position of the select menu relative to the reference element.
 	 * @param {string} position Menu position ("left"|"right") | ("top"|"bottom")
 	 * @param {string} subPosition Sub position ("middle"|"top"|"bottom") | ("center"|"left"|"right")
 	 * @param {string} [onItemQuerySelector] - A query selector string to highlight a specific item.
 	 * @param {boolean} [_re=false] - Whether this is a retry after adjusting the position.
 	 */
-	_setPosition(this: SelectMenuThis, position: string, subPosition: string, onItemQuerySelector?: string, _re?: boolean): void;
+	private _setPosition;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Selects an item and triggers the callback function.
 	 * @param {number} index - The index of the item to select.
 	 */
-	_select(this: SelectMenuThis, index: number): void;
+	private _select;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Adds event listeners for menu interactions.
 	 */
-	__addEvents(this: SelectMenuThis): void;
+	private __addEvents;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Removes event listeners for menu interactions.
 	 */
-	__removeEvents(this: SelectMenuThis): void;
+	private __removeEvents;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Adds global event listeners for closing the menu.
 	 */
-	__addGlobalEvent(this: SelectMenuThis): void;
+	private __addGlobalEvent;
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Removes global event listeners for closing the menu.
 	 */
-	__removeGlobalEvent(this: SelectMenuThis): void;
+	private __removeGlobalEvent;
+	#private;
 }
 import CoreInjector from '../editorInjector/_core';

@@ -1,44 +1,3 @@
-/**
- * @module SunEditorExports
- */
-/**
- * @typedef {import('./core/section/constructor').EditorFrameOptions} EditorFrameOptions
- */
-/**
- * Editor Injector module, Inject "editor" and basic frequently used objects by calling it with "call(this, editor)".
- * @type {(...args: *) => *}
- */
-export const editorInjector: (...args: any) => any;
-/**
- * Available editor plugins
- * @type {Object<string, *>}
- */
-export const plugins: {
-	[x: string]: any;
-};
-/**
- * Editor modules
- * @type {{[key: string]: ((...args: *) => *)|Map}}
- */
-export const modules: {
-	[key: string]: ((...args: any) => any) | Map<any, any>;
-};
-/**
- * Language packs for the editor
- * @type {Object<string, Object<string, string> | ((...args: *) => *)>}
- */
-export const langs: {
-	[x: string]:
-		| {
-				[x: string]: string;
-		  }
-		| ((...args: any) => any);
-};
-/**
- * Helper functions for the editor
- * @type {Object<string|symbol, Object<string, ((...args: *) => *)>>}
- */
-export const helper: any;
 declare namespace _default {
 	/**
 	 * Returns the create function with preset options.
@@ -83,4 +42,10 @@ declare namespace _default {
 export default _default;
 export type EditorFrameOptions = import('./core/section/constructor').EditorFrameOptions;
 export type EditorInitOptions = import('./core/section/constructor').EditorInitOptions;
+import EditorInjector from './editorInjector';
+import Plugins from './plugins';
+import Modules from './modules';
+import Langs from './langs';
+import Helper from './helper';
 import Editor from './core/editor';
+export { EditorInjector, Plugins, Modules, Langs, Helper };
