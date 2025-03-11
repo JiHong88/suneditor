@@ -2,10 +2,6 @@ import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';
 
 /**
- * @typedef {FileManager & Partial<CoreInjector>} FileManagerThis
- */
-
-/**
  * @typedef {Object} FileStateInfo
  * @property {string} src File source
  * @property {number} index File index
@@ -32,35 +28,40 @@ import ApiManager from './ApiManager';
  */
 
 /**
- * @constructor
- * @this {FileManagerThis}
+ * @class
  * @description This module manages the file information of the editor.
- * @param {*} inst The instance object that called the constructor.
- * @param {FileManagerParams} params FileManager options
  */
-function FileManager(inst, params) {
-	CoreInjector.call(this, inst.editor);
-	this.ui = this.editor.ui;
-
-	// members
-	inst.__fileManagement = this;
-	this.kind = inst.constructor.key || inst.constructor.name;
-	this.inst = inst;
-	this.component = inst.editor.component;
-	this.query = params.query;
-	this.loadHandler = params.loadHandler;
-	this.eventHandler = params.eventHandler;
-	this.infoList = [];
-	this.infoIndex = 0;
-	this.uploadFileLength = 0;
-	this.__updateTags = [];
-	// api manager
-	this.apiManager = new ApiManager(this, null);
-}
-
-FileManager.prototype = {
+class FileManager extends CoreInjector {
 	/**
-	 * @this {FileManagerThis}
+	 * @constructor
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {FileManagerParams} params FileManager options
+	 */
+	constructor(inst, params) {
+		super(inst.editor);
+		this.ui = this.editor.ui;
+
+		// members
+		inst.__fileManagement = this;
+		this.kind = inst.constructor.key || inst.constructor.name;
+		this.inst = inst;
+		this.component = inst.editor.component;
+		this.query = params.query;
+		this.loadHandler = params.loadHandler;
+		this.eventHandler = params.eventHandler;
+		this.infoList = [];
+		this.infoIndex = 0;
+		this.uploadFileLength = 0;
+		this.__updateTags = [];
+		// api manager
+		this.apiManager = new ApiManager(this, null);
+
+		// se-ts-ignore - call by editor
+		void this._resetInfo;
+		void this._checkInfo;
+	}
+
+	/**
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
 	 * @param {?Object<string, string>} uploadHeader Request header
@@ -85,10 +86,9 @@ FileManager.prototype = {
 		}
 
 		this.apiManager.call({ method: 'POST', url: uploadUrl, headers: uploadHeader, data: formData, callBack, errorCallBack });
-	},
+	}
 
 	/**
-	 * @this {FileManagerThis}
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
 	 * @param {?Object<string, string>} uploadHeader Request header
@@ -112,10 +112,9 @@ FileManager.prototype = {
 		}
 
 		return await this.apiManager.asyncCall({ method: 'POST', url: uploadUrl, headers: uploadHeader, data: formData });
-	},
+	}
 
 	/**
-	 * @this {FileManagerThis}
 	 * @description Set the file information to the element.
 	 * @param {Node} element File information element
 	 * @param {Object} params
@@ -127,11 +126,10 @@ FileManager.prototype = {
 		if (!element) return;
 		/** @type {Element} */ (element).setAttribute('data-se-file-name', name);
 		/** @type {Element} */ (element).setAttribute('data-se-file-size', size + '');
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FileManagerThis}
 	 * @description Create info object of file and add it to "infoList"
 	 * @param {HTMLMediaElement} element
 	 * @param {{name: string, size: number}|null} file File information
@@ -192,10 +190,14 @@ FileManager.prototype = {
 
 		// method bind
 		info.element = element;
+
 		info.delete = function (el) {
 			if (typeof this.inst.destroy === 'function') this.inst.destroy.call(this.inst, el);
 			this._deleteInfo(Number(GetAttr(el, 'index')));
 		}.bind(this, element);
+		// se-ts-ignore
+		void this._deleteInfo;
+
 		info.select = function (el) {
 			el.scrollIntoView(this.options.get('componentScrollToOptions'));
 			const comp = this.component.get(el);
@@ -211,10 +213,9 @@ FileManager.prototype = {
 			this.eventHandler(params);
 		}
 		this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
-	},
+	}
 
 	/**
-	 * @this {FileManagerThis}
 	 * @description Gets the sum of the sizes of the currently saved files.
 	 * @returns {number} Size
 	 */
@@ -224,11 +225,10 @@ FileManager.prototype = {
 			size += this.infoList[i].size * 1;
 		}
 		return size;
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FileManagerThis}
 	 * @description Checke the file's information and modify the tag that does not fit the format.
 	 * @param {boolean} loaded Whether the editor is loaded
 	 */
@@ -300,11 +300,10 @@ FileManager.prototype = {
 
 			i--;
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FileManagerThis}
 	 * @description Reset info object and "infoList = []", "infoIndex = 0"
 	 */
 	_resetInfo() {
@@ -317,11 +316,10 @@ FileManager.prototype = {
 
 		this.infoList = [];
 		this.infoIndex = 0;
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FileManagerThis}
 	 * @description Delete info object at "infoList"
 	 * @param {number} index index of info object infoList[].index)
 	 */
@@ -337,10 +335,8 @@ FileManager.prototype = {
 				}
 			}
 		}
-	},
-
-	constructor: FileManager
-};
+	}
+}
 
 /**
  * @private

@@ -63,10 +63,6 @@ const DEFAULT_COLOR_LIST = [
 const DEFAULLT_COLOR_SPLITNUM = 9;
 
 /**
- * @typedef {ColorPicker & Partial<CoreInjector>} ColorPickerThis
- */
-
-/**
  * @typedef {import('./HueSlider').HueSliderParams} HueSliderParams
  */
 
@@ -85,61 +81,62 @@ const DEFAULLT_COLOR_SPLITNUM = 9;
  */
 
 /**
- * @constructor
- * @this {ColorPickerThis}
+ * @class
  * @description Create a color picker element and register for related events. (this.target)
  * - When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
- * @param {*} inst The instance object that called the constructor.
- * @param {string} styles style property ("color", "backgroundColor"..)
- * @param {ColorPickerParams} params Color picker options
  */
-function ColorPicker(inst, styles, params) {
-	const editor = inst.editor;
-	CoreInjector.call(this, editor);
-
-	// members
-	this.kind = inst.constructor.key || inst.constructor.name;
-	this.inst = inst;
-	this.target = CreateHTML(editor, params);
-	this.targetButton = null;
-	this.inputElement = /** @type {HTMLInputElement} */ (this.target.querySelector('.se-color-input'));
-	this.styleProperties = styles;
-	this.splitNum = params.splitNum || 0;
-	this.defaultColor = params.defaultColor;
-	this.hueSliderOptions = params.hueSliderOptions;
-	this.parentDisplay = '';
-	this.currentColor = '';
-	this.parentForm = null;
-	this.colorList = this.target.querySelectorAll('li button') || [];
-	this.hueSlider = null;
-
-	// check icon
-	const parser = new DOMParser();
-	const svgDoc = parser.parseFromString(this.icons.color_checked, 'image/svg+xml');
-	this.checkedIcon = svgDoc.documentElement;
-
-	// modules - hex, hue slider
-	if (!params.disableHEXInput) {
-		this.hueSlider = new HueSlider(this, params.hueSliderOptions, 'se-dropdown');
-		this.parentFormDisplay = [];
-		this.parentForm = params.hueSliderOptions?.controllerOptions?.parents?.length > 0 && !params.hueSliderOptions?.controllerOptions?.isInsideForm ? params.hueSliderOptions.controllerOptions.parents : null;
-		// hue open
-		this.eventManager.addEvent(this.target.querySelector('.se-btn-info'), 'click', OnColorPalette.bind(this));
-		this.eventManager.addEvent(this.inputElement, 'input', OnChangeInput.bind(this));
-		this.eventManager.addEvent(this.target.querySelector('form'), 'submit', Submit.bind(this));
-	}
-
-	// remove style
-	if (!params.disableRemove) {
-		this.eventManager.addEvent(this.target.querySelector('.__se_remove'), 'click', Remove.bind(this));
-	}
-
-	this.eventManager.addEvent(this.target, 'click', OnClickColor.bind(this));
-}
-
-ColorPicker.prototype = {
+class ColorPicker extends CoreInjector {
 	/**
-	 * @this {ColorPickerThis}
+	 * @constructor
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {string} styles style property ("color", "backgroundColor"..)
+	 * @param {ColorPickerParams} params Color picker options
+	 */
+	constructor(inst, styles, params) {
+		const editor = inst.editor;
+		super(editor);
+
+		// members
+		this.kind = inst.constructor.key || inst.constructor.name;
+		this.inst = inst;
+		this.target = CreateHTML(editor, params);
+		this.targetButton = null;
+		this.inputElement = /** @type {HTMLInputElement} */ (this.target.querySelector('.se-color-input'));
+		this.styleProperties = styles;
+		this.splitNum = params.splitNum || 0;
+		this.defaultColor = params.defaultColor;
+		this.hueSliderOptions = params.hueSliderOptions;
+		this.parentDisplay = '';
+		this.currentColor = '';
+		this.parentForm = null;
+		this.colorList = this.target.querySelectorAll('li button') || [];
+		this.hueSlider = null;
+
+		// check icon
+		const parser = new DOMParser();
+		const svgDoc = parser.parseFromString(this.icons.color_checked, 'image/svg+xml');
+		this.checkedIcon = svgDoc.documentElement;
+
+		// modules - hex, hue slider
+		if (!params.disableHEXInput) {
+			this.hueSlider = new HueSlider(this, params.hueSliderOptions, 'se-dropdown');
+			this.parentFormDisplay = [];
+			this.parentForm = params.hueSliderOptions?.controllerOptions?.parents?.length > 0 && !params.hueSliderOptions?.controllerOptions?.isInsideForm ? params.hueSliderOptions.controllerOptions.parents : null;
+			// hue open
+			this.eventManager.addEvent(this.target.querySelector('.se-btn-info'), 'click', this.#OnColorPalette.bind(this));
+			this.eventManager.addEvent(this.inputElement, 'input', this.#OnChangeInput.bind(this));
+			this.eventManager.addEvent(this.target.querySelector('form'), 'submit', this.#Submit.bind(this));
+		}
+
+		// remove style
+		if (!params.disableRemove) {
+			this.eventManager.addEvent(this.target.querySelector('.__se_remove'), 'click', this.#Remove.bind(this));
+		}
+
+		this.eventManager.addEvent(this.target, 'click', this.#OnClickColor.bind(this));
+	}
+
+	/**
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node
 	 * @param {Node} target target
@@ -166,29 +163,26 @@ ColorPicker.prototype = {
 		}
 
 		this._setInputText(this._colorName2hex(fillColor));
-	},
+	}
 
 	/**
-	 * @this {ColorPickerThis}
 	 * @description Store color values
 	 * @param {string} hexColorStr Hax color value
 	 */
 	setHexColor(hexColorStr) {
 		this.currentColor = hexColorStr;
 		this.inputElement.style.borderColor = hexColorStr;
-	},
+	}
 
 	/**
-	 * @this {ColorPickerThis}
 	 * @description Close hue slider
 	 */
 	hueSliderClose() {
 		this.hueSlider.off();
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ColorPickerThis}
 	 * @description Set color at input element
 	 * @param {string} hexColorStr Hax color value
 	 */
@@ -196,11 +190,10 @@ ColorPicker.prototype = {
 		hexColorStr = /^#/.test(hexColorStr) ? hexColorStr : '#' + hexColorStr;
 		this.inputElement.value = hexColorStr;
 		this.setHexColor.call(this, hexColorStr);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ColorPickerThis}
 	 * @description Gets color value at color property of node
 	 * @param {Node} node Selected node
 	 * @returns {string}
@@ -215,11 +208,10 @@ ColorPicker.prototype = {
 		}
 
 		return findColor;
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ColorPickerThis}
 	 * @description Converts color values of other formats to hex color values and returns.
 	 * @param {string} colorName Color value
 	 * @returns {string}
@@ -235,64 +227,72 @@ ColorPicker.prototype = {
 			});
 		dom.utils.removeItem(temp);
 		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substring(1) : '';
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.HueSlider
-	 * @this {ColorPickerThis}
 	 * @description This method is called when the color is selected in the hue slider.
 	 * @param {HueSliderColor} color - Color object
 	 */
 	hueSliderAction(color) {
 		this._setInputText(color.hex);
-	},
+	}
 
 	/**
 	 * @editorMethod Modules.HueSlider
-	 * @this {ColorPickerThis}
 	 * @description This method is called when the hue slider is closed.
 	 */
 	hueSliderCancelAction() {
 		if (this.parentForm?.length > 0) {
 			this.parentFormDisplay.forEach((e) => (e[0].style.display = e[1]));
 		}
-	},
-
-	constructor: ColorPicker
-};
-
-function OnColorPalette() {
-	if (this.parentForm?.length > 0) {
-		this.parentForm.forEach((e) => {
-			this.parentFormDisplay.push([e, e.style.display]);
-			e.style.display = 'none';
-		});
 	}
-	this.hueSlider.open(this.targetButton);
-}
 
-function Submit(e) {
-	e.preventDefault();
+	#OnColorPalette() {
+		if (this.parentForm?.length > 0) {
+			this.parentForm.forEach((e) => {
+				this.parentFormDisplay.push([e, e.style.display]);
+				e.style.display = 'none';
+			});
+		}
+		this.hueSlider.open(this.targetButton);
+	}
 
-	if (typeof this.inst.colorPickerAction !== 'function') return;
-	this.inst.colorPickerAction(this.currentColor);
-}
+	/**
+	 * @param {SubmitEvent} e Event object
+	 */
+	#Submit(e) {
+		e.preventDefault();
 
-function OnClickColor(e) {
-	const color = e.target.getAttribute('data-value');
-	if (!color) return;
+		if (typeof this.inst.colorPickerAction !== 'function') return;
+		this.inst.colorPickerAction(this.currentColor);
+	}
 
-	if (typeof this.inst.colorPickerAction !== 'function') return;
-	this.inst.colorPickerAction(color);
-}
+	/**
+	 * @param {MouseEvent} e Event object
+	 */
+	#OnClickColor(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		const color = eventTarget.getAttribute('data-value');
+		if (!color) return;
 
-function Remove() {
-	if (typeof this.inst.colorPickerAction !== 'function') return;
-	this.inst.colorPickerAction(null);
-}
+		if (typeof this.inst.colorPickerAction !== 'function') return;
+		this.inst.colorPickerAction(color);
+	}
 
-function OnChangeInput(e) {
-	this.setHexColor(e.target.value);
+	#Remove() {
+		if (typeof this.inst.colorPickerAction !== 'function') return;
+		this.inst.colorPickerAction(null);
+	}
+
+	/**
+	 * @param {InputEvent} e Event object
+	 */
+	#OnChangeInput(e) {
+		/** @type {HTMLInputElement} */
+		const eventTarget = dom.query.getEventTarget(e);
+		this.setHexColor(eventTarget.value);
+	}
 }
 
 /**

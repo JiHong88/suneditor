@@ -1,7 +1,7 @@
 require('../src/assets/suneditor.css');
 require('../src/assets/suneditor-contents.css');
 
-import suneditor, { editorInjector, plugins, modules, helper } from '../src/suneditor';
+import suneditor, { EditorInjector, Plugins, Modules, Helper } from '../src/suneditor';
 
 Object.defineProperty(window, 'SUNEDITOR', {
 	enumerable: true,
@@ -9,9 +9,9 @@ Object.defineProperty(window, 'SUNEDITOR', {
 	configurable: false,
 	value: {
 		...suneditor,
-		editorInjector,
-		plugins,
-		modules,
-		helper
+		EditorInjector,
+		Plugins,
+		Modules,
+		Helper
 	}
 });

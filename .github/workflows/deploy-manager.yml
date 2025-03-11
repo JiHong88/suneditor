@@ -35,7 +35,7 @@ jobs:
                     exit 1
                   else
                     echo "Package version has been updated to $PACKAGE_VERSION."
-                    # GitHub Actions 최신 문법: $GITHUB_OUTPUT 파일에 기록
+                    # GitHub Actions : $GITHUB_OUTPUT 파일에 기록
                     echo "package_version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
                   fi
 

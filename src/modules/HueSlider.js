@@ -87,63 +87,66 @@ function CreateSliderCtx() {
  */
 
 /**
- * @constructor
+ * @class
  * @description Create a Hue slider. (only create one at a time)
  * - When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
- * @param {*} inst The instance object that called the constructor.
- * @param {HueSliderParams} [params={}] Hue slider options
- * @param {string} [className=""] The class name of the hue slider.
  */
-function HueSlider(inst, params, className) {
-	if (!params) params = {};
+class HueSlider {
+	/**
+	 * @constructor
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {HueSliderParams} [params={}] Hue slider options
+	 * @param {string} [className=""] The class name of the hue slider.
+	 */
+	constructor(inst, params, className) {
+		if (!params) params = {};
 
-	this.editor = inst.editor;
-	this.eventManager = inst.eventManager;
-	this.inst = inst;
+		this.editor = inst.editor;
+		this.eventManager = inst.eventManager;
+		this.inst = inst;
 
-	// members
-	this.form = params.form;
-	this.ctx = {
-		wheelX: wheelX,
-		wheelY: wheelY,
-		lightness: LIGHTNESS,
-		wheelPointerX: '50%',
-		wheelPointerY: '50%',
-		gradientPointerX: 'calc(100% - 14px)',
-		color: DEFAULT_COLOR_VALUE
-	};
-	this.isOpen = false;
-	this.controlle = null;
-	this.__globalMouseDown = null;
-	this.__globalMouseMove = null;
-	this.__globalMouseUp = null;
+		// members
+		this.form = params.form;
+		this.ctx = {
+			wheelX: wheelX,
+			wheelY: wheelY,
+			lightness: LIGHTNESS,
+			wheelPointerX: '50%',
+			wheelPointerY: '50%',
+			gradientPointerX: 'calc(100% - 14px)',
+			color: DEFAULT_COLOR_VALUE
+		};
+		this.isOpen = false;
+		this.controlle = null;
+		this.__globalMouseDown = null;
+		this.__globalMouseMove = null;
+		this.__globalMouseUp = null;
 
-	// init default controller
-	if (!params.isNewForm) {
-		const hueController = CreateHTML_basicControllerForm(inst.editor, className);
-		this.form = hueController.querySelector('.se-hue');
-		this.controller = new Controller(this, hueController, { position: 'top', isWWTarget: false, ...params.controllerOptions });
+		// init default controller
+		if (!params.isNewForm) {
+			const hueController = CreateHTML_basicControllerForm(inst.editor, className);
+			this.form = hueController.querySelector('.se-hue');
+			this.controller = new Controller(this, hueController, { position: 'top', isWWTarget: false, ...params.controllerOptions });
 
-		// buttons
-		this.eventManager.addEvent(hueController.querySelector('.se-btn-success'), 'click', () => {
-			inst.hueSliderAction(this.get());
-			this.close();
-		});
-		this.eventManager.addEvent(hueController.querySelector('.se-btn-danger'), 'click', () => {
-			this.close();
-		});
+			// buttons
+			this.eventManager.addEvent(hueController.querySelector('.se-btn-success'), 'click', () => {
+				inst.hueSliderAction(this.get());
+				this.close();
+			});
+			this.eventManager.addEvent(hueController.querySelector('.se-btn-danger'), 'click', () => {
+				this.close();
+			});
+		}
 	}
-}
 
-HueSlider.prototype = {
 	/**
 	 * @description Get the current color information.
 	 * @returns {HueSliderColor} color information
 	 */
 	get() {
 		return finalColor;
-	},
+	}
 
 	/**
 	 * @description Open the hue slider.
@@ -152,7 +155,7 @@ HueSlider.prototype = {
 	open(target) {
 		this.attach();
 		this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
-	},
+	}
 
 	/**
 	 * @description Reset information and close the hue slider.
@@ -170,7 +173,7 @@ HueSlider.prototype = {
 
 		this.controller.close();
 		this.init();
-	},
+	}
 
 	/**
 	 * @description Close the hue slider. (include off method)
@@ -179,7 +182,7 @@ HueSlider.prototype = {
 	close() {
 		this.off();
 		this.inst.hueSliderCancelAction();
-	},
+	}
 
 	/**
 	 * @description Attach the hue slider to the form element.
@@ -228,7 +231,7 @@ HueSlider.prototype = {
 		this.__globalMouseMove = this.eventManager.addGlobalEvent(moveEvent.name, moveEvent.func, true);
 		this.__globalMouseUp = this.eventManager.addGlobalEvent(upEvent.name, upEvent.func, true);
 		this.isOpen = true;
-	},
+	}
 
 	/**
 	 * @description Initialize the hue slider information.
@@ -240,10 +243,8 @@ HueSlider.prototype = {
 		if (this.__globalMouseDown) this.__globalMouseDown = this.eventManager.removeGlobalEvent(this.__globalMouseDown);
 		if (this.__globalMouseMove) this.__globalMouseMove = this.eventManager.removeGlobalEvent(this.__globalMouseMove);
 		if (this.__globalMouseUp) this.__globalMouseUp = this.eventManager.removeGlobalEvent(this.__globalMouseUp);
-	},
-
-	constructor: HueSlider
-};
+	}
+}
 
 // init
 const { slider, offscreenCanvas, offscreenCtx, wheel, wheelCtx, wheelPointer, gradientBar, gradientPointer, fanalColorHex, fanalColorBackground } = CreateSliderCtx();

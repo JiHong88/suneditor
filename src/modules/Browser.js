@@ -3,10 +3,6 @@ import { dom, keyCodeMap } from '../helper';
 import ApiManager from './ApiManager';
 
 /**
- * @typedef {Browser & Partial<CoreInjector>} BrowserThis
- */
-
-/**
  * @typedef {Object} BrowserFile
  * @property {string} [src=""] - Source url
  * @property {string} [name=""] - File name | Folder name
@@ -39,96 +35,98 @@ import ApiManager from './ApiManager';
  */
 
 /**
- * @constructor
- * @this {BrowserThis}
- * @param {*} inst The instance object that called the constructor.
- * @param {BrowserParams} params Browser options
+ * @class
+ * @description File browser plugin
  */
-function Browser(inst, params) {
-	CoreInjector.call(this, inst.editor);
-
-	// create HTML
-	this.useSearch = params.useSearch ?? true;
-	const browserFrame = dom.utils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
-	const contentHTML = CreateHTMLInfos(inst.editor, this.useSearch);
-	const content = contentHTML.html;
-
-	// members
-	this.kind = inst.constructor.key || inst.constructor.name;
-	this.inst = inst;
-	this.area = browserFrame;
-	this.header = contentHTML.header;
-	this.titleArea = contentHTML.titleArea;
-	this.tagArea = contentHTML.tagArea;
-	this.body = contentHTML.body;
-	this.list = contentHTML.list;
-	this.side = contentHTML.side;
-	this.wrapper = contentHTML.wrapper;
-	this._loading = contentHTML._loading;
-
-	this.title = params.title;
-	this.listClass = params.listClass || 'se-preview-list';
-	this.directData = params.data;
-	this.url = params.url;
-	this.urlHeader = params.headers;
-	this.searchUrl = params.searchUrl;
-	this.searchUrlHeader = params.searchUrlHeader;
-	this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({ thumbnail: params.thumbnail, props: params.props || [] });
-	this.selectorHandler = params.selectorHandler;
-	this.columnSize = params.columnSize || 4;
-	this.folderDefaultPath = '';
-	this.closeArrow = this.icons.menu_arrow_right;
-	this.openArrow = this.icons.menu_arrow_down;
-	this.icon_folder = this.icons.side_menu_folder_item;
-	this.icon_folder_item = this.icons.side_menu_folder;
-	this.icon_item = this.icons.side_menu_item;
-
+class Browser extends CoreInjector {
 	/**
-	 * @type {Array<BrowserFile>}
+	 * @constructor
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {BrowserParams} params Browser options
 	 */
-	this.items = [];
-	/**
-	 * @type {Object<string, {name: string, meta: Object<string, *>}>}
-	 */
-	this.folders = {};
-	/**
-	 * @type {Object<string, {key?: string, name?: string, children?: *}>}
-	 */
-	this.tree = {};
-	/**
-	 * @type {BrowserFile}
-	 */
-	this.data = {};
-	this.selectedTags = [];
-	this.keyword = '';
-	this.sideInner = null;
-	this._closeSignal = false;
-	this._bindClose = null;
-	this.__globalEventHandler = (e) => {
-		if (!keyCodeMap.isEsc(e.code)) return;
-		this.close();
-	};
-	// api manager
-	this.apiManager = new ApiManager(this, { method: 'GET' });
+	constructor(inst, params) {
+		super(inst.editor);
 
-	// init
-	browserFrame.appendChild(dom.utils.createElement('DIV', { class: 'se-browser-back' }));
-	browserFrame.appendChild(content);
-	this.carrierWrapper.appendChild(browserFrame);
+		// create HTML
+		this.useSearch = params.useSearch ?? true;
+		const browserFrame = dom.utils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
+		const contentHTML = CreateHTMLInfos(inst.editor, this.useSearch);
+		const content = contentHTML.html;
 
-	this.eventManager.addEvent(this.tagArea, 'click', OnClickTag.bind(this));
-	this.eventManager.addEvent(this.list, 'click', OnClickFile.bind(this));
-	this.eventManager.addEvent(this.side, 'click', OnClickSide.bind(this));
-	this.eventManager.addEvent(content, 'mousedown', OnMouseDown_browser.bind(this));
-	this.eventManager.addEvent(content, 'click', OnClick_browser.bind(this));
-	this.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', Search.bind(this));
-	this.eventManager.addEvent((this.sideOpenBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-side-open-btn'))), 'click', SideOpen.bind(this));
-	this.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', SideClose.bind(this));
-}
+		// members
+		this.kind = inst.constructor.key || inst.constructor.name;
+		this.inst = inst;
+		this.area = browserFrame;
+		this.header = contentHTML.header;
+		this.titleArea = contentHTML.titleArea;
+		this.tagArea = contentHTML.tagArea;
+		this.body = contentHTML.body;
+		this.list = contentHTML.list;
+		this.side = contentHTML.side;
+		this.wrapper = contentHTML.wrapper;
+		this._loading = contentHTML._loading;
 
-Browser.prototype = {
+		this.title = params.title;
+		this.listClass = params.listClass || 'se-preview-list';
+		this.directData = params.data;
+		this.url = params.url;
+		this.urlHeader = params.headers;
+		this.searchUrl = params.searchUrl;
+		this.searchUrlHeader = params.searchUrlHeader;
+		this.drawItemHandler = (params.drawItemHandler || DrawItems).bind({ thumbnail: params.thumbnail, props: params.props || [] });
+		this.selectorHandler = params.selectorHandler;
+		this.columnSize = params.columnSize || 4;
+		this.folderDefaultPath = '';
+		this.closeArrow = this.icons.menu_arrow_right;
+		this.openArrow = this.icons.menu_arrow_down;
+		this.icon_folder = this.icons.side_menu_folder_item;
+		this.icon_folder_item = this.icons.side_menu_folder;
+		this.icon_item = this.icons.side_menu_item;
+
+		/**
+		 * @type {Array<BrowserFile>}
+		 */
+		this.items = [];
+		/**
+		 * @type {Object<string, {name: string, meta: Object<string, *>}>}
+		 */
+		this.folders = {};
+		/**
+		 * @type {Object<string, {key?: string, name?: string, children?: *}>}
+		 */
+		this.tree = {};
+		/**
+		 * @type {BrowserFile}
+		 */
+		this.data = {};
+		this.selectedTags = [];
+		this.keyword = '';
+		this.sideInner = null;
+		this._closeSignal = false;
+		this._bindClose = null;
+		this.__globalEventHandler = (e) => {
+			if (!keyCodeMap.isEsc(e.code)) return;
+			this.close();
+		};
+		// api manager
+		this.apiManager = new ApiManager(this, { method: 'GET' });
+
+		// init
+		browserFrame.appendChild(dom.utils.createElement('DIV', { class: 'se-browser-back' }));
+		browserFrame.appendChild(content);
+		this.carrierWrapper.appendChild(browserFrame);
+
+		this.eventManager.addEvent(this.tagArea, 'click', this.#OnClickTag.bind(this));
+		this.eventManager.addEvent(this.list, 'click', this.#OnClickFile.bind(this));
+		this.eventManager.addEvent(this.side, 'click', this.#OnClickSide.bind(this));
+		this.eventManager.addEvent(content, 'mousedown', this.#OnMouseDown_browser.bind(this));
+		this.eventManager.addEvent(content, 'click', this.#OnClick_browser.bind(this));
+		this.eventManager.addEvent(browserFrame.querySelector('form.se-browser-search-form'), 'submit', this.#Search.bind(this));
+		this.eventManager.addEvent((this.sideOpenBtn = /** @type {HTMLButtonElement} */ (browserFrame.querySelector('.se-side-open-btn'))), 'click', this.#SideOpen.bind(this));
+		this.eventManager.addEvent([this.header, browserFrame.querySelector('.se-browser-main')], 'mousedown', this.#SideClose.bind(this));
+	}
+
 	/**
-	 * @this {BrowserThis}
 	 * @description Open a file browser plugin
 	 * @param {Object} [params={}]
 	 * @param {string=} params.listClass - Class name of list div. If not, use "this.listClass".
@@ -155,10 +153,9 @@ Browser.prototype = {
 		} else {
 			this._drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
 		}
-	},
+	}
 
 	/**
-	 * @this {BrowserThis}
 	 * @description Close a browser plugin
 	 * - The plugin's "init" method is called.
 	 */
@@ -178,10 +175,9 @@ Browser.prototype = {
 		this.sideInner = null;
 
 		if (typeof this.inst.init === 'function') this.inst.init();
-	},
+	}
 
 	/**
-	 * @this {BrowserThis}
 	 * @description Search files
 	 * @param {string} keyword - Search keyword
 	 */
@@ -193,10 +189,9 @@ Browser.prototype = {
 			this.keyword = keyword.toLowerCase();
 			this._drawListItem(this.items, false);
 		}
-	},
+	}
 
 	/**
-	 * @this {BrowserThis}
 	 * @description Filter items by tag
 	 * @param {Array<BrowserFile>} items - Items to filter
 	 * @returns {Array<BrowserFile>}
@@ -204,43 +199,39 @@ Browser.prototype = {
 	tagfilter(items) {
 		const selectedTags = this.selectedTags;
 		return selectedTags.length === 0 ? items : items.filter((item) => !Array.isArray(item.tag) || item.tag.some((tag) => selectedTags.includes(tag)));
-	},
+	}
 
 	/**
-	 * @this {BrowserThis}
 	 * @description Show file browser loading box
 	 */
 	showBrowserLoading() {
 		this._loading.style.display = 'block';
-	},
+	}
 
 	/**
-	 * @this {BrowserThis}
 	 * @description Close file browser loading box
 	 */
 	closeBrowserLoading() {
 		this._loading.style.display = 'none';
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Fetches the file list from the server.
 	 * @param {string} url - The file server URL.
 	 * @param {Object<string, string>} urlHeader - The HTTP headers for the request.
 	 * @param {boolean} pageLoading - Indicates if this is a paginated request.
 	 */
 	_drawFileList(url, urlHeader, pageLoading) {
-		this.apiManager.call({ method: 'GET', url, headers: urlHeader, callBack: CallBackGet.bind(this), errorCallBack: CallBackError.bind(this) });
+		this.apiManager.call({ method: 'GET', url, headers: urlHeader, callBack: this.#CallBackGet.bind(this), errorCallBack: this.#CallBackError.bind(this) });
 		if (!pageLoading) {
 			this.sideOpenBtn.style.display = 'none';
 			this.showBrowserLoading();
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Updates the displayed list of file items.
 	 * @param {Array<BrowserFile>} items - The file items to display.
 	 * @param {boolean} update - Whether to update the tags.
@@ -287,30 +278,27 @@ Browser.prototype = {
 			this.items = items;
 			this.tagArea.innerHTML = tagsHTML;
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Adds a global event listener for closing the browser.
 	 */
 	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler, true);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Removes the global event listener for closing the browser.
 	 */
 	__removeGlobalEvent() {
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Renders the file items or folder structure from data.
 	 * @param {BrowserFile[]|BrowserFile} data - The data representing the file structure.
 	 * @returns {boolean} True if rendering was successful, false otherwise.
@@ -342,11 +330,10 @@ Browser.prototype = {
 			return true;
 		}
 		return false;
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Parses folder data into a structured format.
 	 * @param {BrowserFile} data - The folder data.
 	 * @param {string} [path] - The current path in the folder hierarchy.
@@ -393,11 +380,10 @@ Browser.prototype = {
 
 			this.__parseFolderData(v, currentPath);
 		});
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {BrowserThis}
 	 * @description Creates a nested folder list from parsed data.
 	 * @param {BrowserFile[]|BrowserFile} folderData - The structured folder data.
 	 * @param {HTMLElement} parentElement - The parent element to append folder structure to.
@@ -432,190 +418,168 @@ Browser.prototype = {
 				}
 			}
 		}
-	},
+	}
 
-	constructor: Browser
-};
+	/**
+	 * @param {XMLHttpRequest} xmlHttp - XMLHttpRequest object.
+	 */
+	#CallBackGet(xmlHttp) {
+		try {
+			const res = JSON.parse(xmlHttp.responseText);
+			const data = res.result;
+			if (this.__drowItems(data)) return;
 
-/**
- * @private
- * @this {BrowserThis}
- * @param {XMLHttpRequest} xmlHttp - XMLHttpRequest object.
- */
-function CallBackGet(xmlHttp) {
-	try {
-		const res = JSON.parse(xmlHttp.responseText);
-		const data = res.result;
-		if (this.__drowItems(data)) return;
-
-		if (res.nullMessage) {
-			this.list.innerHTML = res.nullMessage;
+			if (res.nullMessage) {
+				this.list.innerHTML = res.nullMessage;
+			}
+		} catch (e) {
+			throw Error(`[SUNEDITOR.browser.drawList.fail] cause: "${e.message}"`);
+		} finally {
+			this.closeBrowserLoading();
+			this.body.style.maxHeight = dom.utils.getClientSize().h - this.header.offsetHeight - 50 + 'px';
 		}
-	} catch (e) {
-		throw Error(`[SUNEDITOR.browser.drawList.fail] cause: "${e.message}"`);
-	} finally {
+	}
+
+	/**
+	 * @param {*} res - response data.
+	 * @param {XMLHttpRequest} xmlHttp - XMLHttpRequest object.
+	 */
+	#CallBackError(res, xmlHttp) {
 		this.closeBrowserLoading();
-		this.body.style.maxHeight = dom.utils.getClientSize().h - this.header.offsetHeight - 50 + 'px';
-	}
-}
-
-/**
- * @private
- * @this {BrowserThis}
- * @param {*} res - response data.
- * @param {XMLHttpRequest} xmlHttp - XMLHttpRequest object.
- */
-function CallBackError(res, xmlHttp) {
-	this.closeBrowserLoading();
-	throw Error(`[SUNEDITOR.browser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`);
-}
-
-/**
- * @private
- * @this {BrowserThis}
- * @param {MouseEvent} e - Event object
- */
-function OnClickTag(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	if (!dom.check.isAnchor(eventTarget)) return;
-
-	const tagName = eventTarget.textContent;
-	const selectTag = this.tagArea.querySelector('a[title="' + tagName + '"]');
-	const sTagIndex = this.selectedTags.indexOf(tagName);
-
-	if (sTagIndex > -1) {
-		this.selectedTags.splice(sTagIndex, 1);
-		dom.utils.removeClass(selectTag, 'on');
-	} else {
-		this.selectedTags.push(tagName);
-		dom.utils.addClass(selectTag, 'on');
+		throw Error(`[SUNEDITOR.browser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`);
 	}
 
-	this._drawListItem(this.items, false);
-}
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnClickTag(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		if (!dom.check.isAnchor(eventTarget)) return;
 
-/**
- * @private
- * @this {BrowserThis}
- * @param {MouseEvent} e - Event object
- */
-function OnClickFile(e) {
-	const eventTarget = dom.query.getEventTarget(e);
+		const tagName = eventTarget.textContent;
+		const selectTag = this.tagArea.querySelector('a[title="' + tagName + '"]');
+		const sTagIndex = this.selectedTags.indexOf(tagName);
 
-	e.preventDefault();
-	e.stopPropagation();
-
-	if (eventTarget === this.list) return;
-
-	const target = dom.query.getCommandTarget(eventTarget);
-	if (!target) return;
-
-	this.close();
-	this.selectorHandler(target);
-}
-
-/**
- * @private
- * @this {BrowserThis}
- * @param {MouseEvent} e - Event object
- */
-function OnClickSide(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	e.stopPropagation();
-
-	if (/^button$/i.test(eventTarget.nodeName)) {
-		const childContainer = eventTarget.parentElement.parentElement.querySelector('.se-menu-child');
-		if (dom.utils.hasClass(childContainer, 'se-menu-hidden')) {
-			dom.utils.removeClass(childContainer, 'se-menu-hidden');
-			eventTarget.innerHTML = this.openArrow;
+		if (sTagIndex > -1) {
+			this.selectedTags.splice(sTagIndex, 1);
+			dom.utils.removeClass(selectTag, 'on');
 		} else {
-			dom.utils.addClass(childContainer, 'se-menu-hidden');
-			eventTarget.innerHTML = this.closeArrow;
+			this.selectedTags.push(tagName);
+			dom.utils.addClass(selectTag, 'on');
 		}
-		return;
+
+		this._drawListItem(this.items, false);
 	}
 
-	const cmdTarget = dom.query.getCommandTarget(eventTarget);
-	if (!cmdTarget || dom.utils.hasClass(cmdTarget, 'active')) return;
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnClickFile(e) {
+		const eventTarget = dom.query.getEventTarget(e);
 
-	const data = this.data[cmdTarget.getAttribute('data-command')];
+		e.preventDefault();
+		e.stopPropagation();
 
-	dom.utils.removeClass(this.side.querySelectorAll('.active'), 'active');
-	dom.utils.addClass([cmdTarget, dom.query.getParentElement(cmdTarget, '.se-menu-folder')], 'active');
-	this.tagArea.innerHTML = '';
+		if (eventTarget === this.list) return;
 
-	if (typeof data === 'string') {
-		this._drawFileList(data, this.urlHeader, true);
-	} else {
-		this._drawListItem(data, false);
-	}
-}
+		const target = dom.query.getCommandTarget(eventTarget);
+		if (!target) return;
 
-/**
- * @private
- * @this {BrowserThis}
- * @param {MouseEvent} e - Event object
- */
-function OnMouseDown_browser(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	if (/se-browser-inner/.test(eventTarget.className)) {
-		this._closeSignal = true;
-	} else {
-		this._closeSignal = false;
-	}
-}
-
-/**
- * @private
- * @this {BrowserThis}
- * @param {MouseEvent} e - Event object
- */
-function OnClick_browser(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	e.stopPropagation();
-
-	if (/close/.test(eventTarget.getAttribute('data-command')) || this._closeSignal) {
 		this.close();
+		this.selectorHandler(target);
 	}
-}
 
-/**
- * @private
- * @this {BrowserThis}
- * @param {SubmitEvent} e - Event object
- */
-function Search(e) {
-	const eventTarget = /** @type {HTMLElement} */ (e.currentTarget);
-	e.preventDefault();
-	this.search(/** @type {HTMLInputElement} */ (eventTarget.querySelector('input[type="text"]')).value);
-}
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnClickSide(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		e.stopPropagation();
 
-/**
- * @private
- * @this {BrowserThis}
- * @param {MouseEvent} e - Event object
- */
-function SideOpen(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	if (dom.utils.hasClass(eventTarget, 'active')) {
-		dom.utils.removeClass(this.side, 'se-side-show');
-		dom.utils.removeClass(eventTarget, 'active');
-	} else {
-		dom.utils.addClass(this.side, 'se-side-show');
-		dom.utils.addClass(eventTarget, 'active');
+		if (/^button$/i.test(eventTarget.nodeName)) {
+			const childContainer = eventTarget.parentElement.parentElement.querySelector('.se-menu-child');
+			if (dom.utils.hasClass(childContainer, 'se-menu-hidden')) {
+				dom.utils.removeClass(childContainer, 'se-menu-hidden');
+				eventTarget.innerHTML = this.openArrow;
+			} else {
+				dom.utils.addClass(childContainer, 'se-menu-hidden');
+				eventTarget.innerHTML = this.closeArrow;
+			}
+			return;
+		}
+
+		const cmdTarget = dom.query.getCommandTarget(eventTarget);
+		if (!cmdTarget || dom.utils.hasClass(cmdTarget, 'active')) return;
+
+		const data = this.data[cmdTarget.getAttribute('data-command')];
+
+		dom.utils.removeClass(this.side.querySelectorAll('.active'), 'active');
+		dom.utils.addClass([cmdTarget, dom.query.getParentElement(cmdTarget, '.se-menu-folder')], 'active');
+		this.tagArea.innerHTML = '';
+
+		if (typeof data === 'string') {
+			this._drawFileList(data, this.urlHeader, true);
+		} else {
+			this._drawListItem(data, false);
+		}
 	}
-}
 
-/**
- * @private
- * @this {BrowserThis}
- * @param {MouseEvent} e - Event object
- */
-function SideClose({ target }) {
-	if (target === this.sideOpenBtn) return;
-	if (dom.utils.hasClass(this.sideOpenBtn, 'active')) {
-		dom.utils.removeClass(this.side, 'se-side-show');
-		dom.utils.removeClass(this.sideOpenBtn, 'active');
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnMouseDown_browser(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		if (/se-browser-inner/.test(eventTarget.className)) {
+			this._closeSignal = true;
+		} else {
+			this._closeSignal = false;
+		}
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnClick_browser(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		e.stopPropagation();
+
+		if (/close/.test(eventTarget.getAttribute('data-command')) || this._closeSignal) {
+			this.close();
+		}
+	}
+
+	/**
+	 * @param {SubmitEvent} e - Event object
+	 */
+	#Search(e) {
+		const eventTarget = /** @type {HTMLElement} */ (e.currentTarget);
+		e.preventDefault();
+		this.search(/** @type {HTMLInputElement} */ (eventTarget.querySelector('input[type="text"]')).value);
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#SideOpen(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		if (dom.utils.hasClass(eventTarget, 'active')) {
+			dom.utils.removeClass(this.side, 'se-side-show');
+			dom.utils.removeClass(eventTarget, 'active');
+		} else {
+			dom.utils.addClass(this.side, 'se-side-show');
+			dom.utils.addClass(eventTarget, 'active');
+		}
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#SideClose({ target }) {
+		if (target === this.sideOpenBtn) return;
+		if (dom.utils.hasClass(this.sideOpenBtn, 'active')) {
+			dom.utils.removeClass(this.side, 'se-side-show');
+			dom.utils.removeClass(this.sideOpenBtn, 'active');
+		}
 	}
 }
 

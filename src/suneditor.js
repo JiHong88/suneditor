@@ -18,31 +18,31 @@ import Helper from './helper';
  * Editor Injector module, Inject "editor" and basic frequently used objects by calling it with "call(this, editor)".
  * @type {(...args: *) => *}
  */
-export const editorInjector = EditorInjector;
+export { EditorInjector };
 
 /**
  * Available editor plugins
  * @type {Object<string, *>}
  */
-export const plugins = Plugins;
+export { Plugins };
 
 /**
  * Editor modules
  * @type {{[key: string]: ((...args: *) => *)|Map}}
  */
-export const modules = Modules;
+export { Modules };
 
 /**
  * Language packs for the editor
  * @type {Object<string, Object<string, string> | ((...args: *) => *)>}
  */
-export const langs = Langs;
+export { Langs };
 
 /**
  * Helper functions for the editor
  * @type {Object<string|symbol, Object<string, ((...args: *) => *)>>}
  */
-export const helper = Helper;
+export { Helper };
 
 /**
  * @typedef {import('./core/section/constructor').EditorInitOptions} EditorInitOptions

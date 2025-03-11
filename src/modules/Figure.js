@@ -12,10 +12,6 @@ let __resizing_cw = 0;
 let __resizing_sw = 0;
 
 /**
- * @typedef {Figure & Partial<EditorInjector>} FigureThis
- */
-
-/**
  * @typedef {Object} FigureParams
  * @property {string} [sizeUnit="px"] Size unit
  * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio { current: '00%', default: '00%' }
@@ -52,229 +48,223 @@ let __resizing_sw = 0;
  */
 
 /**
- * @constructor
- * @this {FigureThis}
+ * @class
  * @description Controller module class
- * @param {*} inst The instance object that called the constructor.
- * @param {FigureControls} controls Controller button array
- * @param {FigureParams} params Figure options
  */
-function Figure(inst, controls, params) {
-	EditorInjector.call(this, inst.editor);
-	this.kind = inst.constructor.key || inst.constructor.name;
-	this._alignIcons = {
-		none: this.icons.format_float_none,
-		left: this.icons.format_float_left,
-		right: this.icons.format_float_right,
-		center: this.icons.format_float_center
-	};
-
-	// modules
-	/** @type {Object<string, *>} */
-	this._action = {};
-	const controllerEl = CreateHTML_controller(this, controls || []);
-	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, this.kind);
-	// align selectmenu
-	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
-	const alignMenus = CreateAlign(this, this.alignButton);
-	if (alignMenus) {
-		this.selectMenu_align = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-		this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-figure-select-list' });
-		this.selectMenu_align.create(alignMenus.items, alignMenus.html);
-	}
-	// as [block, inline] selectmenu
-	this.asButton = controllerEl.querySelector('[data-command="onas"]');
-	const asMenus = CreateAs(this, this.asButton);
-	if (asMenus) {
-		this.selectMenu_as = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-		this.selectMenu_as.on(this.asButton, SetMenuAs.bind(this), { class: 'se-figure-select-list' });
-		this.selectMenu_as.create(asMenus.items, asMenus.html);
-	}
-	// resize selectmenu
-	this.resizeButton = controllerEl.querySelector('[data-command="onresize"]');
-	const resizeMenus = CreateResize(this, this.resizeButton);
-	if (resizeMenus) {
-		this.selectMenu_resize = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
-		this.selectMenu_resize.on(this.resizeButton, SetResize.bind(this));
-		this.selectMenu_resize.create(resizeMenus.items, resizeMenus.html);
-	}
-
-	// members
-	this.inst = inst;
-	this.sizeUnit = params.sizeUnit || 'px';
-	this.autoRatio = params.autoRatio;
-	this.isVertical = false;
-	this.percentageButtons = controllerEl.querySelectorAll('[data-command="resize_percent"]');
-	this.captionButton = controllerEl.querySelector('[data-command="caption"]');
-	this.align = 'none';
-	this.as = 'block';
-	this._element = null;
-	this._cover = null;
-	this._inlineCover = null;
-	this._container = null;
-	this._caption = null;
-	this._width = '';
-	this._height = '';
-	this._resize_w = 0;
-	this._resize_h = 0;
-	this._element_w = 0;
-	this._element_h = 0;
-	this._element_l = 0;
-	this._element_t = 0;
-	this._resizeClientX = 0;
-	this._resizeClientY = 0;
-	this._resize_direction = '';
-	this._floatClassStr = '__se__float-none|__se__float-left|__se__float-center|__se__float-right';
-	this.__preventSizechange = false;
-	this.__revertSize = { w: '', h: '' };
-	/** @type {{left?: number, top?: number}} */
-	this.__offset = {};
-	this.__offContainer = OffFigureContainer.bind(this);
-	this.__containerResizing = ContainerResizing.bind(this);
-	this.__containerResizingOff = ContainerResizingOff.bind(this);
-	this.__containerResizingESC = ContainerResizingESC.bind(this);
-	this.__onContainerEvent = null;
-	this.__offContainerEvent = null;
-	this.__onResizeESCEvent = null;
-	this.__fileManagerInfo = false;
-
-	// init
-	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
-	this.eventManager.addEvent(this.asButton, 'click', OnClick_asButton.bind(this));
-	this.eventManager.addEvent(this.resizeButton, 'click', OnClick_resizeButton.bind(this));
-	this.editor.applyFrameRoots((e) => {
-		if (!e.get('wrapper').querySelector('.se-controller.se-resizing-container')) {
-			// resizing
-			const main = CreateHTML_resizeDot();
-			const handles = main.querySelectorAll('.se-resize-dot > span');
-			e.set('_figure', {
-				main: main,
-				border: main.querySelector('.se-resize-dot'),
-				display: main.querySelector('.se-resize-display'),
-				handles: handles
-			});
-			e.get('wrapper').appendChild(main);
-			this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
-		}
-	});
-}
-
-/**
- * @description Create a container for the resizing component and insert the element.
- * @param {Node} element Target element
- * @param {string=} className Class name of container (fixed: se-component)
- * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
- */
-Figure.CreateContainer = function (element, className) {
-	dom.utils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : '') }, dom.utils.createElement('FIGURE', null, element));
-	return Figure.GetContainer(element);
-};
-
-/**
- * @description Create a container for the inline resizing component and insert the element.
- * @param {Node} element Target element
- * @param {string} [className] Class name of container (fixed: se-component se-inline-component)
- * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
- */
-Figure.CreateInlineContainer = function (element, className) {
-	dom.utils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
-	return Figure.GetContainer(element);
-};
-
-/**
- * @description Return HTML string of caption(FIGCAPTION) element
- * @param {Node} cover Cover element(FIGURE). "CreateContainer().cover"
- * @returns {HTMLElement} caption element
- */
-Figure.CreateCaption = function (cover, text) {
-	const caption = dom.utils.createElement('FIGCAPTION', null, '<div>' + text + '</div>');
-	cover.appendChild(caption);
-	return caption;
-};
-
-/**
- * @description Get the element's container(.se-component) info.
- * @param {Node} element Target element
- * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
- */
-Figure.GetContainer = function (element) {
-	const cover = dom.query.getParentElement(element, 'FIGURE', 2);
-	const inlineCover = dom.query.getParentElement(element, 'SPAN', 2);
-	return {
-		target: /** @type {HTMLElement} */ (element),
-		container: /** @type {HTMLElement} */ (dom.query.getParentElement(element, Figure.is, 2) || cover),
-		cover: /** @type {HTMLElement} */ (cover),
-		inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
-		caption: /** @type {HTMLElement} */ (dom.query.getEdgeChild(element.parentElement, 'FIGCAPTION', false))
-	};
-};
-
-/**
- * @description Ratio calculation
- * @param {string|number} w Width size
- * @param {string|number} h Height size
- * @param {?string=} [defaultSizeUnit="px"] Default size unit (default: "px")
- * @return {{w: number, h: number}}
- */
-Figure.GetRatio = function (w, h, defaultSizeUnit) {
-	let rw = 1,
-		rh = 1;
-	if (/\d+/.test(w + '') && /\d+/.test(h + '')) {
-		const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
-		const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
-		if (xUnit === yUnit) {
-			const w_number = numbers.get(w, 4);
-			const h_number = numbers.get(h, 4);
-			rw = w_number / h_number;
-			rh = h_number / w_number;
-		}
-	}
-
-	return {
-		w: numbers.get(rw, 4),
-		h: numbers.get(rh, 4)
-	};
-};
-
-/**
- * @description Ratio calculation
- * @param {string|number} w Width size
- * @param {string|number} h Height size
- * @param {string} defaultSizeUnit Default size unit (default: "px")
- * @param {{w: number, h: number}} ratio Ratio size (Figure.GetRatio)
- * @return {{w: string|number, h: string|number}}
- */
-Figure.CalcRatio = function (w, h, defaultSizeUnit, ratio) {
-	if (/\d+/.test(w + '') && /\d+/.test(h + '')) {
-		const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
-		const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
-		if (xUnit === yUnit) {
-			const dec = xUnit === '%' ? 2 : 0;
-			const ow = w;
-			const oh = h;
-			h = numbers.get(ratio.h * numbers.get(ow, dec), dec) + yUnit;
-			w = numbers.get(ratio.w * numbers.get(oh, dec), dec) + xUnit;
-		}
-	}
-
-	return {
-		w: w,
-		h: h
-	};
-};
-
-/**
- * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
- * @param {Node} element Target element
- * @returns {boolean}
- */
-Figure.is = function (element) {
-	return dom.utils.hasClass(element, 'se-component') || /^(HR)$/.test(element?.nodeName);
-};
-
-Figure.prototype = {
+class Figure extends EditorInjector {
 	/**
-	 * @this {FigureThis}
+	 * @constructor
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {FigureControls} controls Controller button array
+	 * @param {FigureParams} params Figure options
+	 */
+	constructor(inst, controls, params) {
+		super(inst.editor);
+		this.kind = inst.constructor.key || inst.constructor.name;
+		this._alignIcons = {
+			none: this.icons.format_float_none,
+			left: this.icons.format_float_left,
+			right: this.icons.format_float_right,
+			center: this.icons.format_float_center
+		};
+
+		// modules
+		/** @type {Object<string, *>} */
+		this._action = {};
+		const controllerEl = CreateHTML_controller(this, controls || []);
+		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, this.kind);
+		// align selectmenu
+		this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
+		const alignMenus = CreateAlign(this, this.alignButton);
+		if (alignMenus) {
+			this.selectMenu_align = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+			this.selectMenu_align.on(this.alignButton, this.#SetMenuAlign.bind(this), { class: 'se-figure-select-list' });
+			this.selectMenu_align.create(alignMenus.items, alignMenus.html);
+		}
+		// as [block, inline] selectmenu
+		this.asButton = controllerEl.querySelector('[data-command="onas"]');
+		const asMenus = CreateAs(this, this.asButton);
+		if (asMenus) {
+			this.selectMenu_as = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+			this.selectMenu_as.on(this.asButton, this.#SetMenuAs.bind(this), { class: 'se-figure-select-list' });
+			this.selectMenu_as.create(asMenus.items, asMenus.html);
+		}
+		// resize selectmenu
+		this.resizeButton = controllerEl.querySelector('[data-command="onresize"]');
+		const resizeMenus = CreateResize(this, this.resizeButton);
+		if (resizeMenus) {
+			this.selectMenu_resize = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
+			this.selectMenu_resize.on(this.resizeButton, this.#SetResize.bind(this));
+			this.selectMenu_resize.create(resizeMenus.items, resizeMenus.html);
+		}
+
+		// members
+		this.inst = inst;
+		this.sizeUnit = params.sizeUnit || 'px';
+		this.autoRatio = params.autoRatio;
+		this.isVertical = false;
+		this.percentageButtons = controllerEl.querySelectorAll('[data-command="resize_percent"]');
+		this.captionButton = controllerEl.querySelector('[data-command="caption"]');
+		this.align = 'none';
+		this.as = 'block';
+		this._element = null;
+		this._cover = null;
+		this._inlineCover = null;
+		this._container = null;
+		this._caption = null;
+		this._width = '';
+		this._height = '';
+		this._resize_w = 0;
+		this._resize_h = 0;
+		this._element_w = 0;
+		this._element_h = 0;
+		this._element_l = 0;
+		this._element_t = 0;
+		this._resizeClientX = 0;
+		this._resizeClientY = 0;
+		this._resize_direction = '';
+		this._floatClassStr = '__se__float-none|__se__float-left|__se__float-center|__se__float-right';
+		this.__preventSizechange = false;
+		this.__revertSize = { w: '', h: '' };
+		/** @type {{left?: number, top?: number}} */
+		this.__offset = {};
+		this.__offContainer = this.#OffFigureContainer.bind(this);
+		this.__containerResizing = this.#ContainerResizing.bind(this);
+		this.__containerResizingOff = this.#ContainerResizingOff.bind(this);
+		this.__containerResizingESC = this.#ContainerResizingESC.bind(this);
+		this.__onContainerEvent = null;
+		this.__offContainerEvent = null;
+		this.__onResizeESCEvent = null;
+		this.__fileManagerInfo = false;
+
+		// init
+		this.eventManager.addEvent(this.alignButton, 'click', this.#OnClick_alignButton.bind(this));
+		this.eventManager.addEvent(this.asButton, 'click', this.#OnClick_asButton.bind(this));
+		this.eventManager.addEvent(this.resizeButton, 'click', this.#OnClick_resizeButton.bind(this));
+		this.editor.applyFrameRoots((e) => {
+			if (!e.get('wrapper').querySelector('.se-controller.se-resizing-container')) {
+				// resizing
+				const main = CreateHTML_resizeDot();
+				const handles = main.querySelectorAll('.se-resize-dot > span');
+				e.set('_figure', {
+					main: main,
+					border: main.querySelector('.se-resize-dot'),
+					display: main.querySelector('.se-resize-display'),
+					handles: handles
+				});
+				e.get('wrapper').appendChild(main);
+				this.eventManager.addEvent(handles, 'mousedown', this.#OnResizeContainer.bind(this));
+			}
+		});
+	}
+
+	/**
+	 * @description Create a container for the resizing component and insert the element.
+	 * @param {Node} element Target element
+	 * @param {string=} className Class name of container (fixed: se-component)
+	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
+	 */
+	static CreateContainer(element, className) {
+		dom.utils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : '') }, dom.utils.createElement('FIGURE', null, element));
+		return Figure.GetContainer(element);
+	}
+	/**
+	 * @description Create a container for the inline resizing component and insert the element.
+	 * @param {Node} element Target element
+	 * @param {string} [className] Class name of container (fixed: se-component se-inline-component)
+	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
+	 */
+	static CreateInlineContainer(element, className) {
+		dom.utils.createElement('SPAN', { class: 'se-component se-inline-component' + (className ? ' ' + className : '') }, element);
+		return Figure.GetContainer(element);
+	}
+	/**
+	 * @description Return HTML string of caption(FIGCAPTION) element
+	 * @param {Node} cover Cover element(FIGURE). "CreateContainer().cover"
+	 * @returns {HTMLElement} caption element
+	 */
+	static CreateCaption(cover, text) {
+		const caption = dom.utils.createElement('FIGCAPTION', null, '<div>' + text + '</div>');
+		cover.appendChild(caption);
+		return caption;
+	}
+	/**
+	 * @description Get the element's container(.se-component) info.
+	 * @param {Node} element Target element
+	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
+	 */
+	static GetContainer(element) {
+		const cover = dom.query.getParentElement(element, 'FIGURE', 2);
+		const inlineCover = dom.query.getParentElement(element, 'SPAN', 2);
+		return {
+			target: /** @type {HTMLElement} */ (element),
+			container: /** @type {HTMLElement} */ (dom.query.getParentElement(element, Figure.is, 2) || cover),
+			cover: /** @type {HTMLElement} */ (cover),
+			inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
+			caption: /** @type {HTMLElement} */ (dom.query.getEdgeChild(element.parentElement, 'FIGCAPTION', false))
+		};
+	}
+	/**
+	 * @description Ratio calculation
+	 * @param {string|number} w Width size
+	 * @param {string|number} h Height size
+	 * @param {?string=} [defaultSizeUnit="px"] Default size unit (default: "px")
+	 * @return {{w: number, h: number}}
+	 */
+	static GetRatio(w, h, defaultSizeUnit) {
+		let rw = 1,
+			rh = 1;
+		if (/\d+/.test(w + '') && /\d+/.test(h + '')) {
+			const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+			const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+			if (xUnit === yUnit) {
+				const w_number = numbers.get(w, 4);
+				const h_number = numbers.get(h, 4);
+				rw = w_number / h_number;
+				rh = h_number / w_number;
+			}
+		}
+
+		return {
+			w: numbers.get(rw, 4),
+			h: numbers.get(rh, 4)
+		};
+	}
+	/**
+	 * @description Ratio calculation
+	 * @param {string|number} w Width size
+	 * @param {string|number} h Height size
+	 * @param {string} defaultSizeUnit Default size unit (default: "px")
+	 * @param {{w: number, h: number}} ratio Ratio size (Figure.GetRatio)
+	 * @return {{w: string|number, h: string|number}}
+	 */
+	static CalcRatio(w, h, defaultSizeUnit, ratio) {
+		if (/\d+/.test(w + '') && /\d+/.test(h + '')) {
+			const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+			const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+			if (xUnit === yUnit) {
+				const dec = xUnit === '%' ? 2 : 0;
+				const ow = w;
+				const oh = h;
+				h = numbers.get(ratio.h * numbers.get(ow, dec), dec) + yUnit;
+				w = numbers.get(ratio.w * numbers.get(oh, dec), dec) + xUnit;
+			}
+		}
+
+		return {
+			w: w,
+			h: h
+		};
+	}
+	/**
+	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
+	 * @param {Node} element Target element
+	 * @returns {boolean}
+	 */
+	static is(element) {
+		return dom.utils.hasClass(element, 'se-component') || /^(HR)$/.test(element?.nodeName);
+	}
+	/**
 	 * @description Close the figure's controller
 	 */
 	close() {
@@ -282,10 +272,9 @@ Figure.prototype = {
 		dom.utils.removeClass(this._cover, 'se-figure-selected');
 		this.controller.close();
 		this.component._removeDragEvent();
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Open the figure's controller
 	 * @param {Node} targetNode Target element
 	 * @param {Object} params params
@@ -444,26 +433,23 @@ Figure.prototype = {
 		}
 
 		return targetInfo;
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Hide the controller
 	 */
 	controllerHide() {
 		this.controller.hide();
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Hide the controller
 	 */
 	controllerShow() {
 		this.controller.show();
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Open the figure's controller
 	 * @param {Node} target Target element
 	 * @param {Object} [params={}] params
@@ -475,10 +461,9 @@ Figure.prototype = {
 	controllerOpen(target, params) {
 		this._element = /** @type {HTMLElement}  */ (target);
 		this.controller.open(target, null, params);
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Set the element's container size
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
@@ -492,10 +477,9 @@ Figure.prototype = {
 		} else {
 			this._applySize(w, h, '');
 		}
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Gets the Figure size
 	 * @param {?Node=} targetNode Target element, default is the current element
 	 * @returns {{w: string, h: string}}
@@ -532,10 +516,9 @@ Figure.prototype = {
 			w: w || 'auto',
 			h: h || 'auto'
 		};
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Align the container.
 	 * @param {?Node} targetNode Target element
 	 * @param {string} align "none"|"left"|"center"|"right"
@@ -569,10 +552,9 @@ Figure.prototype = {
 		}
 
 		this._setAlignIcon();
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description As style[block, inline] the component
 	 * @param {?Node} targetNode Target element
 	 * @param {"block"|"inline"} formatStyle Format style
@@ -642,11 +624,10 @@ Figure.prototype = {
 				break;
 			}
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
 	 * @param {FigureInfo} figureinfo {target, container, cover, inlineCover, caption}
 	 * @param {string|number} w Width value.
@@ -664,10 +645,9 @@ Figure.prototype = {
 		}
 
 		this.setSize(w, h);
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Controller button action
 	 * @param {HTMLButtonElement} target Target button element
 	 * @returns
@@ -681,7 +661,7 @@ Figure.prototype = {
 
 		switch (command) {
 			case 'mirror': {
-				const info = GetRotateValue(element);
+				const info = this.#GetRotateValue(element);
 				let x = info.x;
 				let y = info.y;
 
@@ -746,10 +726,9 @@ Figure.prototype = {
 		if (!/^remove|caption$/.test(command)) {
 			this.component.select(element, this.kind, false);
 		}
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Inspect the figure component format and change it to the correct format.
 	 * @param {Node} container - The container element of the figure component.
 	 * @param {Node} originEl - The original element of the figure component.
@@ -788,10 +767,9 @@ Figure.prototype = {
 				existElement.parentNode.replaceChild(container, existElement);
 			}
 		}
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Initialize the transform style (rotation) of the element.
 	 * @param {?Node=} node Target element, default is the current element
 	 */
@@ -808,10 +786,9 @@ Figure.prototype = {
 
 		this._deleteCaptionPosition(element);
 		this._applySize(size[0] || 'auto', size[1] || '', '');
-	},
+	}
 
 	/**
-	 * @this {FigureThis}
 	 * @description Set the transform style (rotation) of the element.
 	 * @param {Node} node Target element
 	 * @param {?string|number} width Element's width size
@@ -820,7 +797,7 @@ Figure.prototype = {
 	setTransform(node, width, height, deg) {
 		try {
 			this.__preventSizechange = true;
-			const info = GetRotateValue(node);
+			const info = this.#GetRotateValue(node);
 			const slope = info.r + (deg || 0) * 1;
 			deg = Math.abs(slope) >= 360 ? 0 : slope;
 			const isVertical = (this.isVertical = /^(90|270)$/.test(Math.abs(deg).toString()));
@@ -868,7 +845,7 @@ Figure.prototype = {
 		} finally {
 			this.__preventSizechange = false;
 		}
-	},
+	}
 
 	/**
 	 * @private
@@ -883,12 +860,11 @@ Figure.prototype = {
 		this._element = figureInfo.target;
 		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || figureInfo.target.style.float || 'none';
 		this.as = this._inlineCover ? 'inline' : 'block';
-		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(figureInfo.target).r).toString());
-	},
+		this.isVertical = /^(90|270)$/.test(Math.abs(this.#GetRotateValue(figureInfo.target).r).toString());
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Applies rotation transformation to the target element.
 	 * @param {HTMLElement} element Target element.
 	 * @param {number} r Rotation degree.
@@ -927,11 +903,10 @@ Figure.prototype = {
 		}
 
 		element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Applies size adjustments to the figure element.
 	 * @param {string|number} w Width value.
 	 * @param {string|number} h Height value.
@@ -964,11 +939,10 @@ Figure.prototype = {
 
 		// save current size
 		this._saveCurrentSize();
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Sets padding-bottom for cover elements based on width and height.
 	 * @param {string} w Width value.
 	 * @param {string} h Height value.
@@ -982,11 +956,10 @@ Figure.prototype = {
 		} else {
 			this._cover.style.paddingBottom = h;
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Sets the figure element to its auto size.
 	 */
 	_setAutoSize() {
@@ -1008,11 +981,10 @@ Figure.prototype = {
 
 		// save current size
 		this._saveCurrentSize();
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Sets the figure element's size in percentage.
 	 * @param {string|number} w Width percentage.
 	 * @param {string|number} h Height percentage.
@@ -1048,11 +1020,10 @@ Figure.prototype = {
 
 		// save current size
 		this._saveCurrentSize();
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Deletes percentage-based sizing from the figure element.
 	 */
 	_deletePercentSize() {
@@ -1065,40 +1036,36 @@ Figure.prototype = {
 		dom.utils.addClass(this._container, '__se__float-' + this.align);
 
 		if (this.align === 'center') this.setAlign(this._element, this.align);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Reverts the figure element to its previously saved size.
 	 */
 	_setRevert() {
 		this.setSize(this.__revertSize.w, this.__revertSize.h);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Updates the figure's alignment icon.
 	 */
 	_setAlignIcon() {
 		if (!this.alignButton) return;
 		dom.utils.changeElement(this.alignButton.firstElementChild, this._alignIcons[this.align]);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Updates the figure's block/inline format icon.
 	 */
 	_setAsIcon() {
 		if (!this.asButton) return;
 		dom.utils.changeElement(this.asButton.firstElementChild, this.icons[`as_${this.as}`]);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Saves the current size of the figure component.
 	 */
 	_saveCurrentSize() {
@@ -1116,11 +1083,10 @@ Figure.prototype = {
 		if (this.autoRatio) {
 			this.autoRatio.current = /%$/.test(size.h) ? size.h : '';
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Adjusts the position of the caption within the figure.
 	 * @param {HTMLElement} element Target element.
 	 */
@@ -1129,11 +1095,10 @@ Figure.prototype = {
 		if (figcaption) {
 			figcaption.style.marginTop = (this.isVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Removes the margin top property from the figure caption.
 	 * @param {HTMLElement} element Target element.
 	 */
@@ -1142,11 +1107,10 @@ Figure.prototype = {
 		if (figcaption) {
 			figcaption.style.marginTop = '';
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Displays or hides the resize handles of the figure component.
 	 * @param {boolean} display Whether to display resize handles.
 	 */
@@ -1166,11 +1130,10 @@ Figure.prototype = {
 		} else {
 			dom.utils.removeClass(_figure.main, 'se-resize-ing');
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Removes the resize event listeners.
 	 */
 	_offResizeEvent() {
@@ -1182,11 +1145,10 @@ Figure.prototype = {
 		this._displayResizeHandles(true);
 		this.ui._offCurrentController();
 		this.ui.disableBackWrapper();
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {FigureThis}
 	 * @description Sets up drag event handling for the figure component.
 	 * @param {Node} figureMain The main figure container element.
 	 */
@@ -1201,192 +1163,240 @@ Figure.prototype = {
 		_DragHandle.set('__dragHandler', dragHandle);
 		_DragHandle.set('__dragContainer', this._container);
 		_DragHandle.set('__dragCover', this._cover);
-		_DragHandle.set('__dragMove', OnScrollDragHandler.bind(this, dragHandle, figureMain));
+		_DragHandle.set('__dragMove', this.#OnScrollDragHandler.bind(this, dragHandle, figureMain));
 
 		_DragHandle.get('__dragMove')();
 
 		dragHandle.style.display = 'block';
-	},
+	}
 
-	constructor: Figure
-};
+	/**
+	 * @param {HTMLElement} dragHandle Drag handle element
+	 * @param {HTMLElement} figureMain Figure container element
+	 */
+	#OnScrollDragHandler(dragHandle, figureMain) {
+		dragHandle.style.display = 'block';
+		dragHandle.style.left = figureMain.offsetLeft + (this.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
+		dragHandle.style.top = figureMain.offsetTop - dragHandle.offsetHeight + 'px';
+	}
 
-function OnScrollDragHandler(dragHandle, figureMain) {
-	dragHandle.style.display = 'block';
-	dragHandle.style.left = figureMain.offsetLeft + (this.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
-	dragHandle.style.top = figureMain.offsetTop - dragHandle.offsetHeight + 'px';
-}
+	/**
+	 * @param {MouseEvent} e Event object
+	 */
+	#OnResizeContainer(e) {
+		e.stopPropagation();
+		e.preventDefault();
 
-function GetRotateValue(element) {
-	const transform = element.style.transform;
-	if (!transform) return { r: 0, x: '', y: '' };
-	return {
-		r: ((transform.match(/rotate\(([-0-9]+)deg\)/) || [])[1] || 0) * 1,
-		x: (transform.match(/rotateX\(([-0-9]+)deg\)/) || [])[1] || '',
-		y: (transform.match(/rotateY\(([-0-9]+)deg\)/) || [])[1] || ''
-	};
-}
+		const eventTarget = dom.query.getEventTarget(e);
+		const inst = _DragHandle.get('__figureInst');
+		const direction = (inst._resize_direction = eventTarget.classList[0]);
+		inst._resizeClientX = e.clientX;
+		inst._resizeClientY = e.clientY;
+		inst.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
+		this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
 
-function OnResizeContainer(e) {
-	e.stopPropagation();
-	e.preventDefault();
+		const { w, h } = this.getSize(inst._element);
+		__resizing_p_wh = __resizing_p_ow = false;
+		__resizing_cw = __resizing_sw = 0;
+		if (!this.isVertical) {
+			const pw = !w || /auto|%$/.test(w);
+			const ph = !h || /auto|%$/.test(h);
+			if (DIR_DIAGONAL.includes(direction) && pw && ph) {
+				__resizing_p_wh = true;
+			} else if (DIR_W.includes(direction) && pw) {
+				__resizing_p_ow = true;
+			}
 
-	const inst = _DragHandle.get('__figureInst');
-	const direction = (inst._resize_direction = e.target.classList[0]);
-	inst._resizeClientX = e.clientX;
-	inst._resizeClientY = e.clientY;
-	inst.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
-	this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
+			if (__resizing_p_wh || __resizing_p_ow) {
+				const sizeTarget = inst._cover || inst._element;
+				__resizing_sw = sizeTarget.offsetWidth;
+				__resizing_cw = converter.getWidthInPercentage(sizeTarget, this.editor.frameContext.get('wysiwygFrame')) / 100;
+			}
+		}
 
-	const { w, h } = this.getSize(inst._element);
-	__resizing_p_wh = __resizing_p_ow = false;
-	__resizing_cw = __resizing_sw = 0;
-	if (!this.isVertical) {
-		const pw = !w || /auto|%$/.test(w);
-		const ph = !h || /auto|%$/.test(h);
-		if (DIR_DIAGONAL.includes(direction) && pw && ph) {
-			__resizing_p_wh = true;
-		} else if (DIR_W.includes(direction) && pw) {
-			__resizing_p_ow = true;
+		inst.__onContainerEvent = inst.eventManager.addGlobalEvent('mousemove', inst.__containerResizing);
+		inst.__offContainerEvent = inst.eventManager.addGlobalEvent('mouseup', inst.__containerResizingOff);
+		inst._displayResizeHandles(false);
+
+		const _display = this.editor.frameContext.get('_figure').display;
+		_display.style.display = 'block';
+		dom.utils.changeTxt(_display, w + ' x ' + h);
+	}
+
+	/**
+	 * @description Handles the resizing of the figure container.
+	 * @param {MouseEvent} e Mouse event.
+	 */
+	#ContainerResizing(e) {
+		const direction = this._resize_direction;
+		const clientX = e.clientX;
+		const clientY = e.clientY;
+
+		let resultW = this._element_w;
+		let resultH = this._element_h;
+
+		const w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
+		const h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
+		const wh = (resultH / resultW) * w;
+		const resizeBorder = this.editor.frameContext.get('_figure').border;
+
+		if (/t/.test(direction)) resizeBorder.style.top = resultH - (/h/.test(direction) ? h : wh) + 'px';
+		if (/l/.test(direction)) resizeBorder.style.left = resultW - w + 'px';
+
+		if (/r|l/.test(direction)) {
+			resizeBorder.style.width = w + 'px';
+			resultW = w;
+		}
+
+		if (/^(t|b)[^h]$/.test(direction)) {
+			resizeBorder.style.height = wh + 'px';
+			resultH = wh;
+		} else if (/^(t|b)h$/.test(direction)) {
+			resizeBorder.style.height = h + 'px';
+			resultH = h;
+		}
+
+		this._resize_w = /** @type {number} */ (/h$/.test(direction) ? this._width : Math.round(resultW));
+		this._resize_h = /** @type {number} */ (/w$/.test(direction) ? this._height : Math.round(resultH));
+		const rw = __resizing_cw ? (this._resize_w / __resizing_sw) * __resizing_cw * 100 : this._resize_w;
+		dom.utils.changeTxt(this.editor.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' x ' + this._resize_h);
+	}
+
+	/**
+	 * @description Finalizes the resizing process of the figure container.
+	 */
+	#ContainerResizingOff() {
+		this._offResizeEvent();
+
+		// set size
+		let w = this.isVertical ? this._resize_h : this._resize_w;
+		let h = this.isVertical ? this._resize_w : this._resize_h;
+		w = Math.round(w) || w;
+		h = Math.round(h) || h;
+
+		if (!this.isVertical && !/%$/.test(w + '')) {
+			const limit =
+				this.editor.frameContext.get('wysiwygFrame').clientWidth -
+				numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) +
+				numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) -
+				2;
+			if (numbers.get(w, 0) > limit) {
+				h = Math.round((h / w) * limit);
+				w = limit;
+			}
 		}
 
 		if (__resizing_p_wh || __resizing_p_ow) {
-			const sizeTarget = inst._cover || inst._element;
-			__resizing_sw = sizeTarget.offsetWidth;
-			__resizing_cw = converter.getWidthInPercentage(sizeTarget, this.editor.frameContext.get('wysiwygFrame')) / 100;
-		}
-	}
-
-	inst.__onContainerEvent = inst.eventManager.addGlobalEvent('mousemove', inst.__containerResizing);
-	inst.__offContainerEvent = inst.eventManager.addGlobalEvent('mouseup', inst.__containerResizingOff);
-	inst._displayResizeHandles(false);
-
-	const _display = this.editor.frameContext.get('_figure').display;
-	_display.style.display = 'block';
-	dom.utils.changeTxt(_display, w + ' x ' + h);
-}
-
-/**
- * @private
- * @this {FigureThis}
- * @description Handles the resizing of the figure container.
- * @param {MouseEvent} e Mouse event.
- */
-function ContainerResizing(e) {
-	const direction = this._resize_direction;
-	const clientX = e.clientX;
-	const clientY = e.clientY;
-
-	let resultW = this._element_w;
-	let resultH = this._element_h;
-
-	const w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
-	const h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
-	const wh = (resultH / resultW) * w;
-	const resizeBorder = this.editor.frameContext.get('_figure').border;
-
-	if (/t/.test(direction)) resizeBorder.style.top = resultH - (/h/.test(direction) ? h : wh) + 'px';
-	if (/l/.test(direction)) resizeBorder.style.left = resultW - w + 'px';
-
-	if (/r|l/.test(direction)) {
-		resizeBorder.style.width = w + 'px';
-		resultW = w;
-	}
-
-	if (/^(t|b)[^h]$/.test(direction)) {
-		resizeBorder.style.height = wh + 'px';
-		resultH = wh;
-	} else if (/^(t|b)h$/.test(direction)) {
-		resizeBorder.style.height = h + 'px';
-		resultH = h;
-	}
-
-	this._resize_w = /** @type {number} */ (/h$/.test(direction) ? this._width : Math.round(resultW));
-	this._resize_h = /** @type {number} */ (/w$/.test(direction) ? this._height : Math.round(resultH));
-	const rw = __resizing_cw ? (this._resize_w / __resizing_sw) * __resizing_cw * 100 : this._resize_w;
-	dom.utils.changeTxt(this.editor.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' x ' + this._resize_h);
-}
-
-/**
- * @private
- * @this {FigureThis}
- * @description Finalizes the resizing process of the figure container.
- */
-function ContainerResizingOff() {
-	this._offResizeEvent();
-
-	// set size
-	let w = this.isVertical ? this._resize_h : this._resize_w;
-	let h = this.isVertical ? this._resize_w : this._resize_h;
-	w = Math.round(w) || w;
-	h = Math.round(h) || h;
-
-	if (!this.isVertical && !/%$/.test(w + '')) {
-		const limit =
-			this.editor.frameContext.get('wysiwygFrame').clientWidth -
-			numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) +
-			numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) -
-			2;
-		if (numbers.get(w, 0) > limit) {
-			h = Math.round((h / w) * limit);
-			w = limit;
-		}
-	}
-
-	if (__resizing_p_wh || __resizing_p_ow) {
-		const sizeTarget = this._cover || this._element;
-		w = (w / sizeTarget.offsetWidth) * __resizing_cw * 100;
-		const wp = numbers.get(w > 100 ? 100 : w, 2) + '%';
-		this._setPercentSize(wp, __resizing_p_ow ? this.getSize(this._element).h : '');
-	} else {
-		this._applySize(w, h, this._resize_direction);
-		if (this.isVertical) this.setTransform(this._element, w, h, 0);
-	}
-
-	this.history.push(false);
-	this.component.select(this._element, this.kind, false);
-}
-
-/**
- * @private
- * @this {FigureThis}
- * @description Cancels the resizing process when the escape key is pressed.
- * @param {KeyboardEvent} e Keyboard event.
- */
-function ContainerResizingESC(e) {
-	if (!keyCodeMap.isEsc(e.code)) return;
-	this._offResizeEvent();
-	this.component.select(this._element, this.kind, false);
-}
-
-function SetMenuAlign(value) {
-	this.setAlign(this._element, value);
-	this.selectMenu_align.close();
-	this.component.select(this._element, this.kind, false);
-}
-
-function SetMenuAs(value) {
-	this.convertAsFormat(this._element, value);
-	this.selectMenu_as.close();
-}
-
-function SetResize(value) {
-	if (value === 'auto') {
-		this.deleteTransform();
-		this._setAutoSize();
-	} else {
-		let dataY = this.getSize(this._element).h;
-		if (this.isVertical) {
-			const dataSize = (this._element.getAttribute('data-se-size') || ',').split(',');
-			if (dataSize[1]) dataY = dataSize[1];
+			const sizeTarget = this._cover || this._element;
+			w = (w / sizeTarget.offsetWidth) * __resizing_cw * 100;
+			const wp = numbers.get(w > 100 ? 100 : w, 2) + '%';
+			this._setPercentSize(wp, __resizing_p_ow ? this.getSize(this._element).h : '');
+		} else {
+			this._applySize(w, h, this._resize_direction);
+			if (this.isVertical) this.setTransform(this._element, w, h, 0);
 		}
 
-		this.deleteTransform();
-		this._setPercentSize(value * 1, numbers.get(dataY, 0) === null || !/%$/.test(dataY) ? '' : dataY);
+		this.history.push(false);
+		this.component.select(this._element, this.kind, false);
 	}
 
-	this.selectMenu_resize.close();
-	this.component.select(this._element, this.kind, false);
+	/**
+	 * @description Cancels the resizing process when the escape key is pressed.
+	 * @param {KeyboardEvent} e Keyboard event.
+	 */
+	#ContainerResizingESC(e) {
+		if (!keyCodeMap.isEsc(e.code)) return;
+		this._offResizeEvent();
+		this.component.select(this._element, this.kind, false);
+	}
+
+	/**
+	 * @param { "none"|"left"|"center"|"right"} value align value
+	 */
+	#SetMenuAlign(value) {
+		this.setAlign(this._element, value);
+		this.selectMenu_align.close();
+		this.component.select(this._element, this.kind, false);
+	}
+
+	/**
+	 * @param {"block"|"inline"} value Format style
+	 */
+	#SetMenuAs(value) {
+		this.convertAsFormat(this._element, value);
+		this.selectMenu_as.close();
+	}
+
+	/**
+	 * @param {"auto"|number} value Resize value
+	 */
+	#SetResize(value) {
+		if (value === 'auto') {
+			this.deleteTransform();
+			this._setAutoSize();
+		} else {
+			let dataY = this.getSize(this._element).h;
+			if (this.isVertical) {
+				const dataSize = (this._element.getAttribute('data-se-size') || ',').split(',');
+				if (dataSize[1]) dataY = dataSize[1];
+			}
+
+			this.deleteTransform();
+			this._setPercentSize(value * 1, numbers.get(dataY, 0) === null || !/%$/.test(dataY) ? '' : dataY);
+		}
+
+		this.selectMenu_resize.close();
+		this.component.select(this._element, this.kind, false);
+	}
+
+	#OffFigureContainer() {
+		this.editor.frameContext.get('_figure').main.style.display = 'none';
+		this.editor._figureContainer = null;
+	}
+
+	#OnClick_alignButton() {
+		this.selectMenu_align.open('', '[data-command="' + this.align + '"]');
+	}
+
+	#OnClick_asButton() {
+		this.selectMenu_as.open('', '[data-command="' + this.as + '"]');
+	}
+
+	#OnClick_resizeButton() {
+		const size = this.getSize(this._element);
+		const w = size.w;
+		const h = size.h;
+		let command = '';
+		if (this.autoRatio) {
+			if (h === this.autoRatio.default && /%$/.test(w)) {
+				const nw = numbers.get(w);
+				if (nw === 100) command = 'auto';
+				else command = 'resize_percent' + nw;
+			}
+		} else if (h === 'auto') {
+			if (w === 'auto') {
+				command = 'auto';
+			} else if (/%$/.test(w)) {
+				command = 'resize_percent' + numbers.get(w);
+			}
+		}
+
+		this.selectMenu_resize.open('', '[data-command="' + command + '"]');
+	}
+
+	/**
+	 * @param {Node} element Target element
+	 * @returns {{ r: *, x: *, y: * }} Rotation value
+	 */
+	#GetRotateValue(element) {
+		const transform = /** @type {HTMLElement} */ (element).style.transform;
+		if (!transform) return { r: 0, x: '', y: '' };
+		return {
+			r: Number((transform.match(/rotate\(([-0-9]+)deg\)/) || [])[1] || 0),
+			x: (transform.match(/rotateX\(([-0-9]+)deg\)/) || [])[1] || '',
+			y: (transform.match(/rotateY\(([-0-9]+)deg\)/) || [])[1] || ''
+		};
+	}
 }
 
 function CreateAlign(inst, button) {
@@ -1447,41 +1457,6 @@ function CreateResize(editor, button) {
 	}
 
 	return { html: html, items: items };
-}
-
-function OffFigureContainer() {
-	this.editor.frameContext.get('_figure').main.style.display = 'none';
-	this.editor._figureContainer = null;
-}
-
-function OnClick_alignButton() {
-	this.selectMenu_align.open('', '[data-command="' + this.align + '"]');
-}
-
-function OnClick_asButton() {
-	this.selectMenu_as.open('', '[data-command="' + this.as + '"]');
-}
-
-function OnClick_resizeButton() {
-	const size = this.getSize(this._element);
-	const w = size.w;
-	const h = size.h;
-	let command = '';
-	if (this.autoRatio) {
-		if (h === this.autoRatio.default && /%$/.test(w)) {
-			const nw = numbers.get(w);
-			if (nw === 100) command = 'auto';
-			else command = 'resize_percent' + nw;
-		}
-	} else if (h === 'auto') {
-		if (w === 'auto') {
-			command = 'auto';
-		} else if (/%$/.test(w)) {
-			command = 'resize_percent' + numbers.get(w);
-		}
-	}
-
-	this.selectMenu_resize.open('', '[data-command="' + command + '"]');
 }
 
 function CreateHTML_resizeDot() {

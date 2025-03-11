@@ -8,10 +8,6 @@ const INDEX_1 = '2147483646';
 const INDEX_2 = '2147483645';
 
 /**
- * @typedef {Controller & Partial<EditorInjector>} ControllerThis
- */
-
-/**
  * @typedef {Object} ControllerInfo
  * @property {*} inst The controller instance
  * @property {string} [position="bottom"] The controller position ("bottom"|"top")
@@ -28,60 +24,61 @@ const INDEX_2 = '2147483645';
  * @property {boolean=} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to true.
  * @property {() => void=} [initMethod=null] Method to be called when the controller is closed.
  * @property {boolean=} [disabled=false] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
- * @property {Array<Node>=} [parents=[]] The parent "controller" array when "controller" is opened nested.
+ * @property {Array<HTMLElement>=} [parents=[]] The parent "controller" array when "controller" is opened nested.
  * @property {boolean=} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
  * @property {boolean=} [isInsideForm=false] If the controller is inside a form, set it to true.
  * @property {boolean=} [isOutsideForm=false] If the controller is outside a form, set it to true.
  */
 
 /**
- * @constructor
- * @this {ControllerThis}
+ * @class
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
- * @param {*} inst The instance object that called the constructor.
- * @param {Node} element Controller element
- * @param {ControllerParams} params Controller options
- * @param {?string=} _name An optional name for the controller key.
  */
-function Controller(inst, element, params, _name) {
-	EditorInjector.call(this, inst.editor);
-
-	// members
-	this.kind = _name || inst.constructor.key || inst.constructor.name;
-	this.inst = inst;
-	this.form = /** @type {HTMLFormElement} */ (element);
-	this.isOpen = false;
-	this.currentTarget = null;
-	this.currentPositionTarget = null;
-	this.isWWTarget = params.isWWTarget ?? true;
-	this.position = params.position || 'bottom';
-	this.disabled = !!params.disabled;
-	this.parents = /** @type {Array<HTMLElement>} */ (params.parents || []);
-	this.parentsHide = !!params.parentsHide;
-	this.isInsideForm = !!params.isInsideForm;
-	this.isOutsideForm = !!params.isOutsideForm;
-	this._initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
-	this.__globalEventHandlers = { keydown: CloseListener_keydown.bind(this), mousedown: CloseListener_mousedown.bind(this) };
-	this._bindClose_key = null;
-	this._bindClose_mouse = null;
-	/** @type {{left?: number, top?: number, addOfffset?: {left?: number, top?: number}}} */
-	this.__offset = {};
-	this.__addOffset = { left: 0, top: 0 };
-	this.__shadowRootEventForm = null;
-	this.__shadowRootEventListener = null;
-
-	// add element
-	this.carrierWrapper.appendChild(element);
-
-	// init
-	this.eventManager.addEvent(element, 'click', Action.bind(this));
-	this.eventManager.addEvent(element, 'mouseenter', MouseEnter.bind(this));
-	this.eventManager.addEvent(element, 'mouseleave', MouseLeave.bind(this));
-}
-
-Controller.prototype = {
+class Controller extends EditorInjector {
 	/**
-	 * @this {ControllerThis}
+	 * @constructor
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {Node} element Controller element
+	 * @param {ControllerParams} params Controller options
+	 * @param {?string=} _name An optional name for the controller key.
+	 */
+	constructor(inst, element, params, _name) {
+		super(inst.editor);
+
+		// members
+		this.kind = _name || inst.constructor.key || inst.constructor.name;
+		this.inst = inst;
+		this.form = /** @type {HTMLFormElement} */ (element);
+		this.isOpen = false;
+		this.currentTarget = null;
+		this.currentPositionTarget = null;
+		this.isWWTarget = params.isWWTarget ?? true;
+		this.position = params.position || 'bottom';
+		this.disabled = !!params.disabled;
+		this.parents = /** @type {Array<HTMLElement>} */ (params.parents || []);
+		this.parentsHide = !!params.parentsHide;
+		this.isInsideForm = !!params.isInsideForm;
+		this.isOutsideForm = !!params.isOutsideForm;
+		this._initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
+		this.__globalEventHandlers = { keydown: this.#CloseListener_keydown.bind(this), mousedown: this.#CloseListener_mousedown.bind(this) };
+		this._bindClose_key = null;
+		this._bindClose_mouse = null;
+		/** @type {{left?: number, top?: number, addOfffset?: {left?: number, top?: number}}} */
+		this.__offset = {};
+		this.__addOffset = { left: 0, top: 0 };
+		this.__shadowRootEventForm = null;
+		this.__shadowRootEventListener = null;
+
+		// add element
+		this.carrierWrapper.appendChild(element);
+
+		// init
+		this.eventManager.addEvent(element, 'click', this.#Action.bind(this));
+		this.eventManager.addEvent(element, 'mouseenter', this.#MouseEnter.bind(this));
+		this.eventManager.addEvent(element, 'mouseleave', this.#MouseLeave.bind(this));
+	}
+
+	/**
 	 * @description Open a modal plugin
 	 * @param {Node|Range} target Target element
 	 * @param {Node} [positionTarget] Position target element
@@ -137,10 +134,9 @@ Controller.prototype = {
 		this.currentTarget = isRangeTarget ? null : target;
 		this._controllerOn(this.form, target, isRangeTarget);
 		this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
-	},
+	}
 
 	/**
-	 * @this {ControllerThis}
 	 * @description Close a modal plugin
 	 * - The plugin's "init" method is called.
 	 * @param {boolean=} force If true, parent controllers are forcibly closed.
@@ -166,36 +162,32 @@ Controller.prototype = {
 		if (this.parents.length > 0) return;
 		if (typeof this.inst.close === 'function') this.inst.close();
 		this.component.deselect();
-	},
+	}
 
 	/**
-	 * @this {ControllerThis}
 	 * @description Hide controller
 	 */
 	hide() {
 		this.form.style.display = 'none';
-	},
+	}
 
 	/**
-	 * @this {ControllerThis}
 	 * @description Show controller
 	 */
 	show() {
 		this._setControllerPosition(this.form, this.currentPositionTarget);
-	},
+	}
 
 	/**
-	 * @this {ControllerThis}
 	 * @description Reset controller position
 	 * @param {Node=} target
 	 */
 	resetPosition(target) {
 		this._setControllerPosition(this.form, target || this.currentPositionTarget);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ControllerThis}
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
 	 * @param {HTMLFormElement} form Controller element
 	 * @param {Node|Range} target Controller target element
@@ -231,11 +223,10 @@ Controller.prototype = {
 		this.editor._preventBlur = true;
 		this.editor.status.onSelected = true;
 		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.editor.frameContext, info });
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ControllerThis}
 	 * @description Hide controller at editor area (link button, image resize button..)
 	 */
 	_controllerOff() {
@@ -258,11 +249,10 @@ Controller.prototype = {
 			this.__shadowRootEventForm = this.__shadowRootEventListener = null;
 		}
 		if (typeof this.inst.reset === 'function') this.inst.reset();
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ControllerThis}
 	 * @description Specify the position of the controller.
 	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
@@ -285,11 +275,10 @@ Controller.prototype = {
 		}
 
 		controller.style.visibility = '';
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ControllerThis}
 	 * @description Adds global event listeners.
 	 * - When the controller is opened
 	 */
@@ -297,11 +286,10 @@ Controller.prototype = {
 		this.__removeGlobalEvent();
 		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers.keydown, true);
 		this._bindClose_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers.mousedown, true);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ControllerThis}
 	 * @description Removes global event listeners.
 	 * - When the ESC key is pressed, the controller is closed.
 	 */
@@ -309,11 +297,10 @@ Controller.prototype = {
 		this.component.__removeGlobalEvent();
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
 		if (this._bindClose_mouse) this._bindClose_mouse = this.eventManager.removeGlobalEvent(this._bindClose_mouse);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ControllerThis}
 	 * @description Checks if the controller is fixed and should not be closed.
 	 * @returns {boolean} True if the controller is fixed.
 	 */
@@ -327,11 +314,10 @@ Controller.prototype = {
 			}
 		}
 		return false;
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {ControllerThis}
 	 * @description Checks if the given target is within a form or controller.
 	 * @param {Node} target The target element.
 	 * @returns {boolean} True if the target is inside a form or controller.
@@ -351,88 +337,76 @@ Controller.prototype = {
 		}
 
 		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || target?.contains(this.inst._element));
-	},
-
-	constructor: Controller
-};
-
-/**
- * @private
- * @this {ControllerThis}
- * @param {MouseEvent} e - Event object
- */
-function Action(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	const target = dom.query.getCommandTarget(eventTarget);
-	if (!target) return;
-
-	e.stopPropagation();
-	e.preventDefault();
-
-	this.inst.controllerAction(target);
-}
-
-/**
- * @private
- * @this {ControllerThis}
- * @param {MouseEvent} e - Event object
- */
-function MouseEnter(e) {
-	this.editor.currentControllerName = this.kind;
-	if (this.parents.length > 0 && this.isInsideForm) return;
-
-	const eventTarget = dom.query.getEventTarget(e);
-	eventTarget.style.zIndex = INDEX_0;
-}
-
-/**
- * @private
- * @this {ControllerThis}
- * @param {MouseEvent} e - Event object
- */
-function MouseLeave(e) {
-	if (this.parents.length > 0 && this.isInsideForm) return;
-
-	const eventTarget = dom.query.getEventTarget(e);
-	eventTarget.style.zIndex = INDEX_2;
-}
-
-/**
- * @private
- * @this {ControllerThis}
- * @param {KeyboardEvent} e - Event object
- */
-function CloseListener_keydown(e) {
-	if (this._checkFixed()) return;
-	const keyCode = e.code;
-	const ctrl = keyCodeMap.isCtrl(e);
-	if (ctrl || !keyCodeMap.isNonResponseKey(keyCode)) return;
-
-	const eventTarget = dom.query.getEventTarget(e);
-	if (this.form.contains(eventTarget) || this._checkForm(eventTarget)) return;
-	if (this.editor._fileManager.pluginRegExp.test(this.kind) && !keyCodeMap.isEsc(keyCode)) return;
-
-	this.close();
-}
-
-/**
- * @private
- * @this {ControllerThis}
- * @param {KeyboardEvent} e - Event object
- */
-function CloseListener_mousedown(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	if (this.inst?._element?.contains(eventTarget)) {
-		this.isOpen = false;
-		return;
 	}
 
-	this.isOpen = true;
-	if (eventTarget === this.inst._element || eventTarget === this.currentTarget || this._checkFixed() || this.form.contains(eventTarget) || this._checkForm(eventTarget)) {
-		return;
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#Action(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		const target = dom.query.getCommandTarget(eventTarget);
+		if (!target) return;
+
+		e.stopPropagation();
+		e.preventDefault();
+
+		this.inst.controllerAction(target);
 	}
 
-	this.close(true);
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#MouseEnter(e) {
+		this.editor.currentControllerName = this.kind;
+		if (this.parents.length > 0 && this.isInsideForm) return;
+
+		const eventTarget = dom.query.getEventTarget(e);
+		eventTarget.style.zIndex = INDEX_0;
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#MouseLeave(e) {
+		if (this.parents.length > 0 && this.isInsideForm) return;
+
+		const eventTarget = dom.query.getEventTarget(e);
+		eventTarget.style.zIndex = INDEX_2;
+	}
+
+	/**
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#CloseListener_keydown(e) {
+		if (this._checkFixed()) return;
+		const keyCode = e.code;
+		const ctrl = keyCodeMap.isCtrl(e);
+		if (ctrl || !keyCodeMap.isNonResponseKey(keyCode)) return;
+
+		const eventTarget = dom.query.getEventTarget(e);
+		if (this.form.contains(eventTarget) || this._checkForm(eventTarget)) return;
+		if (this.editor._fileManager.pluginRegExp.test(this.kind) && !keyCodeMap.isEsc(keyCode)) return;
+
+		this.close();
+	}
+
+	/**
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#CloseListener_mousedown(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		if (this.inst?._element?.contains(eventTarget)) {
+			this.isOpen = false;
+			return;
+		}
+
+		this.isOpen = true;
+		if (eventTarget === this.inst._element || eventTarget === this.currentTarget || this._checkFixed() || this.form.contains(eventTarget) || this._checkForm(eventTarget)) {
+			return;
+		}
+
+		this.close(true);
+	}
 }
 
 export default Controller;

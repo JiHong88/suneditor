@@ -4,10 +4,6 @@ import { dom, env, keyCodeMap } from '../helper';
 const MENU_MIN_HEIGHT = 38;
 
 /**
- * @typedef {SelectMenu & Partial<CoreInjector>} SelectMenuThis
- */
-
-/**
  * @typedef {Object} SelectMenuParams
  * @property {string} position Position of the select menu, specified as "[left|right]-[middle|top|bottom]" or "[top|bottom]-[center|left|right]"
  * @property {boolean} [checkList=false] Flag to determine if the checklist is enabled (true or false)
@@ -18,57 +14,59 @@ const MENU_MIN_HEIGHT = 38;
  */
 
 /**
- * @constructor
- * @this {SelectMenuThis}
- * @param {*} inst The instance object that called the constructor.
- * @param {SelectMenuParams} params Select menu options
+ * @class
+ * @description Creates a select menu
  */
-function SelectMenu(inst, params) {
-	// plugin bisic properties
-	CoreInjector.call(this, inst.editor);
-
-	// members
-	this.kink = inst.constructor.key || inst.constructor.name;
-	this.inst = inst;
-	const positionItems = params.position.split('-');
-	this.form = null;
-	this.items = [];
-	/** @type {HTMLLIElement[]} */
-	this.menus = null;
-	this.menuLen = 0;
-	this.index = -1;
-	this.item = null;
-	this.isOpen = false;
-	this.checkList = !!params.checkList;
-	this.position = positionItems[0];
-	this.subPosition = positionItems[1];
-	this._dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
-	this._dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
-	this._textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
-	this.splitNum = params.splitNum || 0;
-	this.horizontal = !!this.splitNum;
-	this.openMethod = params.openMethod;
-	this.closeMethod = params.closeMethod;
-	this._refer = null;
-	this._keydownTarget = null;
-	this._selectMethod = null;
-	this._bindClose_key = null;
-	this._bindClose_mousedown = null;
-	this._bindClose_click = null;
-	this._closeSignal = false;
-	this.__events = null;
-	this.__eventHandlers = {
-		mousedown: OnMousedown_list.bind(this),
-		mousemove: OnMouseMove_list.bind(this),
-		click: OnClick_list.bind(this),
-		keydown: OnKeyDown_refer.bind(this)
-	};
-	this.__globalEventHandlers = { keydown: CloseListener_key.bind(this), mousedown: CloseListener_mousedown.bind(this), click: CloseListener_click.bind(this) };
-}
-
-SelectMenu.prototype = {
+class SelectMenu extends CoreInjector {
 	/**
-	 * @this {SelectMenuThis}
+	 * @constructor
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {SelectMenuParams} params Select menu options
+	 */
+	constructor(inst, params) {
+		// plugin bisic properties
+		super(inst.editor);
+
+		// members
+		this.kink = inst.constructor.key || inst.constructor.name;
+		this.inst = inst;
+		const positionItems = params.position.split('-');
+		this.form = null;
+		this.items = [];
+		/** @type {HTMLLIElement[]} */
+		this.menus = null;
+		this.menuLen = 0;
+		this.index = -1;
+		this.item = null;
+		this.isOpen = false;
+		this.checkList = !!params.checkList;
+		this.position = positionItems[0];
+		this.subPosition = positionItems[1];
+		this._dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
+		this._dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
+		this._textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
+		this.splitNum = params.splitNum || 0;
+		this.horizontal = !!this.splitNum;
+		this.openMethod = params.openMethod;
+		this.closeMethod = params.closeMethod;
+		this._refer = null;
+		this._keydownTarget = null;
+		this._selectMethod = null;
+		this._bindClose_key = null;
+		this._bindClose_mousedown = null;
+		this._bindClose_click = null;
+		this._closeSignal = false;
+		this.__events = null;
+		this.__eventHandlers = {
+			mousedown: this.#OnMousedown_list.bind(this),
+			mousemove: this.#OnMouseMove_list.bind(this),
+			click: this.#OnClick_list.bind(this),
+			keydown: this.#OnKeyDown_refer.bind(this)
+		};
+		this.__globalEventHandlers = { keydown: this.#CloseListener_key.bind(this), mousedown: this.#CloseListener_mousedown.bind(this), click: this.#CloseListener_click.bind(this) };
+	}
+
+	/**
 	 * @description Creates the select menu items.
 	 * @param {Array<string>|__se__NodeCollection} items - Command list of selectable items.
 	 * @param {Array<string>|__se__NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
@@ -89,10 +87,9 @@ SelectMenu.prototype = {
 		this.items = /** @type {Array<string|Node>} */ (items);
 		this.menus = Array.from(this.form.querySelectorAll('li'));
 		this.menuLen = this.menus.length;
-	},
+	}
 
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Initializes the select menu and attaches it to a reference element.
 	 * @param {Node} referElement - The element that triggers the select menu.
 	 * @param {(command: string) => void} selectMethod - The function to execute when an item is selected.
@@ -112,10 +109,9 @@ SelectMenu.prototype = {
 			'<div class="se-list-inner"></div>'
 		);
 		referElement.parentNode.insertBefore(this.form, referElement);
-	},
+	}
 
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Select menu open
 	 * @param {?string=} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
 	 * @param {?string=} onItemQuerySelector The querySelector string of the menu to be activated
@@ -130,10 +126,9 @@ SelectMenu.prototype = {
 		const subPosition = positionItems[1] || (this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl') ? this._dirSubPosition : this.subPosition);
 		this._setPosition(mainPosition, subPosition, onItemQuerySelector);
 		this.isOpen = true;
-	},
+	}
 
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Select menu close
 	 */
 	close() {
@@ -143,40 +138,36 @@ SelectMenu.prototype = {
 		if (this.form) this.form.style.cssText = '';
 		this.isOpen = false;
 		if (typeof this.closeMethod === 'function') this.closeMethod();
-	},
+	}
 
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Get the index of the selected item
 	 * @param {number} index Item index
 	 * @returns
 	 */
 	getItem(index) {
 		return this.items[index];
-	},
+	}
 
 	/**
-	 * @this {SelectMenuThis}
 	 * @description Set the index of the selected item
 	 * @param {number} index Item index
 	 */
 	setItem(index) {
 		this._selectItem(index);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Appends a formatted list of items to the menu.
 	 * @param {string} html - The HTML string representing the menu items.
 	 */
 	_createFormat(html) {
 		this.form.firstElementChild.innerHTML += `<ul class="se-list-basic se-list-checked${this.horizontal ? ' se-list-horizontal' : ''}">${html}</ul>`;
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Resets the menu state and removes event listeners.
 	 */
 	_init() {
@@ -188,11 +179,10 @@ SelectMenu.prototype = {
 			dom.utils.removeClass(this._onItem, 'se-select-on');
 			this._onItem = null;
 		}
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Moves the selection up or down by a specified number of items.
 	 * @param {number} num - The number of items to move (negative for up, positive for down).
 	 */
@@ -202,11 +192,10 @@ SelectMenu.prototype = {
 		const selectIndex = (this.index = num >= len ? 0 : num < 0 ? len - 1 : num);
 
 		this._selectItem(selectIndex);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Highlights and selects an item by index.
 	 * @param {number} selectIndex - The index of the item to select.
 	 */
@@ -224,11 +213,10 @@ SelectMenu.prototype = {
 
 		this.index = selectIndex;
 		this.item = this.items[selectIndex];
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Sets the position of the select menu relative to the reference element.
 	 * @param {string} position Menu position ("left"|"right") | ("top"|"bottom")
 	 * @param {string} subPosition Sub position ("middle"|"top"|"bottom") | ("center"|"left"|"right")
@@ -378,22 +366,20 @@ SelectMenu.prototype = {
 		form.style.left = l + 'px';
 		form.style.top = t + 'px';
 		form.style.visibility = '';
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Selects an item and triggers the callback function.
 	 * @param {number} index - The index of the item to select.
 	 */
 	_select(index) {
 		if (this.checkList) dom.utils.toggleClass(this.menus[index], 'se-checked');
 		this._selectMethod(this.getItem(index));
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Adds event listeners for menu interactions.
 	 */
 	__addEvents() {
@@ -403,11 +389,10 @@ SelectMenu.prototype = {
 		this.form.addEventListener('mousemove', this.__events.mousemove);
 		this.form.addEventListener('click', this.__events.click);
 		this._keydownTarget.addEventListener('keydown', this.__events.keydown);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Removes event listeners for menu interactions.
 	 */
 	__removeEvents() {
@@ -417,165 +402,147 @@ SelectMenu.prototype = {
 		this.form.removeEventListener('click', this.__events.click);
 		this._keydownTarget.removeEventListener('keydown', this.__events.keydown);
 		this.__events = null;
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Adds global event listeners for closing the menu.
 	 */
 	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers.keydown, true);
 		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers.mousedown, true);
-	},
+	}
 
 	/**
 	 * @private
-	 * @this {SelectMenuThis}
 	 * @description Removes global event listeners for closing the menu.
 	 */
 	__removeGlobalEvent() {
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
 		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
 		if (this._bindClose_click) this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
-	},
+	}
 
-	constructor: SelectMenu
-};
-
-/**
- * @private
- * @this {SelectMenuThis}
- * @param {KeyboardEvent} e - Event object
- */
-function OnKeyDown_refer(e) {
-	let moveIndex;
-	switch (e.code) {
-		case 'ArrowUp': // up
-			e.preventDefault();
-			e.stopPropagation();
-			if (this.horizontal && this.index > -1) {
-				const num = this.splitNum;
-				moveIndex = this.index - num < 0 ? num : -num;
-			} else {
-				moveIndex = -1;
-			}
-			break;
-		case 'ArrowDown': // down
-			e.preventDefault();
-			e.stopPropagation();
-			if (this.horizontal && this.index > -1) {
-				const num = this.splitNum;
-				moveIndex = this.index + num > this.menuLen ? -num : num;
-			} else {
-				moveIndex = 1;
-			}
-			break;
-		case 'ArrowLeft': // left
-			e.preventDefault();
-			e.stopPropagation();
-			moveIndex = -1;
-			break;
-		case 'ArrowRight': //right
-			e.preventDefault();
-			e.stopPropagation();
-			moveIndex = 1;
-			break;
-		case 'Enter':
-		case 'Space': // enter, space
-			if (this.index > -1) {
+	/**
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#OnKeyDown_refer(e) {
+		let moveIndex;
+		switch (e.code) {
+			case 'ArrowUp': // up
 				e.preventDefault();
 				e.stopPropagation();
-				this._select(this.index);
-			} else {
-				this.close();
-			}
-			break;
+				if (this.horizontal && this.index > -1) {
+					const num = this.splitNum;
+					moveIndex = this.index - num < 0 ? num : -num;
+				} else {
+					moveIndex = -1;
+				}
+				break;
+			case 'ArrowDown': // down
+				e.preventDefault();
+				e.stopPropagation();
+				if (this.horizontal && this.index > -1) {
+					const num = this.splitNum;
+					moveIndex = this.index + num > this.menuLen ? -num : num;
+				} else {
+					moveIndex = 1;
+				}
+				break;
+			case 'ArrowLeft': // left
+				e.preventDefault();
+				e.stopPropagation();
+				moveIndex = -1;
+				break;
+			case 'ArrowRight': //right
+				e.preventDefault();
+				e.stopPropagation();
+				moveIndex = 1;
+				break;
+			case 'Enter':
+			case 'Space': // enter, space
+				if (this.index > -1) {
+					e.preventDefault();
+					e.stopPropagation();
+					this._select(this.index);
+				} else {
+					this.close();
+				}
+				break;
+		}
+
+		if (moveIndex) this._moveItem(moveIndex);
 	}
 
-	if (moveIndex) this._moveItem(moveIndex);
-}
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnMousedown_list(e) {
+		if (env.isGecko) {
+			const eventTarget = dom.query.getEventTarget(e);
+			const target = dom.query.getParentElement(eventTarget, '.se-select-item');
+			if (target) this.eventManager._injectActiveEvent(target);
+		}
+	}
 
-/**
- * @private
- * @this {SelectMenuThis}
- * @param {MouseEvent} e - Event object
- */
-function OnMousedown_list(e) {
-	if (env.isGecko) {
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnMouseMove_list(e) {
 		const eventTarget = dom.query.getEventTarget(e);
-		const target = dom.query.getParentElement(eventTarget, '.se-select-item');
-		if (target) this.eventManager._injectActiveEvent(target);
-	}
-}
-
-/**
- * @private
- * @this {SelectMenuThis}
- * @param {MouseEvent} e - Event object
- */
-function OnMouseMove_list(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	dom.utils.addClass(this.form, 'se-select-menu-mouse-move');
-	const index = eventTarget.getAttribute('data-index');
-	if (!index) return;
-	this.index = Number(index);
-}
-
-/**
- * @private
- * @this {SelectMenuThis}
- * @param {MouseEvent} e - Event object
- */
-function OnClick_list(e) {
-	let target = dom.query.getEventTarget(e);
-	let index = null;
-
-	while (!index && !/UL/i.test(target.tagName) && !dom.utils.hasClass(target, 'se-select-menu')) {
-		index = target.getAttribute('data-index');
-		target = target.parentElement;
+		dom.utils.addClass(this.form, 'se-select-menu-mouse-move');
+		const index = eventTarget.getAttribute('data-index');
+		if (!index) return;
+		this.index = Number(index);
 	}
 
-	if (!index) return;
-	this._select(Number(index));
-}
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnClick_list(e) {
+		let target = dom.query.getEventTarget(e);
+		let index = null;
 
-/**
- * @private
- * @this {SelectMenuThis}
- * @param {KeyboardEvent} e - Event object
- */
-function CloseListener_key(e) {
-	if (!keyCodeMap.isEsc(e.code)) return;
-	this.close();
-}
+		while (!index && !/UL/i.test(target.tagName) && !dom.utils.hasClass(target, 'se-select-menu')) {
+			index = target.getAttribute('data-index');
+			target = target.parentElement;
+		}
 
-/**
- * @private
- * @this {SelectMenuThis}
- * @param {MouseEvent} e - Event object
- */
-function CloseListener_mousedown(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	if (this.form.contains(eventTarget)) return;
-	if (e.target !== this._refer) {
+		if (!index) return;
+		this._select(Number(index));
+	}
+
+	/**
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#CloseListener_key(e) {
+		if (!keyCodeMap.isEsc(e.code)) return;
 		this.close();
-	} else if (!dom.check.isInputElement(eventTarget)) {
-		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers.click, true);
 	}
-}
 
-/**
- * @private
- * @this {SelectMenuThis}
- * @param {MouseEvent} e - Event object
- */
-function CloseListener_click(e) {
-	this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
-	if (e.target === this._refer) {
-		e.stopPropagation();
-		this.close();
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#CloseListener_mousedown(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		if (this.form.contains(eventTarget)) return;
+		if (e.target !== this._refer) {
+			this.close();
+		} else if (!dom.check.isInputElement(eventTarget)) {
+			this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers.click, true);
+		}
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#CloseListener_click(e) {
+		this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
+		if (e.target === this._refer) {
+			e.stopPropagation();
+			this.close();
+		}
 	}
 }
 

@@ -12,43 +12,46 @@ import { env } from '../helper';
  */
 
 /**
- * @constructor
+ * @class
  * @description API Manager
- * @param {*} inst The instance object that called the constructor.
- * @param {ApiManagerParams=} params API options
  */
-function ApiManager(inst, params) {
+class ApiManager {
 	/**
-	 * @description Editor instance
-	 * @type {__se__EditorCore}
+	 * @constructor
+	 * @param {*} inst The instance object that called the constructor.
+	 * @param {ApiManagerParams=} params API options
 	 */
-	this.editor = inst.editor;
+	constructor(inst, params) {
+		/**
+		 * @description Editor instance
+		 * @type {__se__EditorCore}
+		 */
+		this.editor = inst.editor;
 
-	/**
-	 * @description UI class
-	 * @type {__se__EditorCore["ui"]}
-	 */
-	this.ui = this.editor.ui;
+		/**
+		 * @description UI class
+		 * @type {__se__EditorCore["ui"]}
+		 */
+		this.ui = this.editor.ui;
 
-	/**
-	 * @description Caller instance key name
-	 * @type {string}
-	 */
-	this.kind = inst.constructor.key || inst.constructor.name;
+		/**
+		 * @description Caller instance key name
+		 * @type {string}
+		 */
+		this.kind = inst.constructor.key || inst.constructor.name;
 
-	// members
-	this._xhr = env.getXMLHttpRequest();
-	// members - option
-	this.method = params?.method;
-	this.url = params?.url;
-	this.headers = params?.headers;
-	this.data = params?.data;
-	this.callBack = params?.callBack;
-	this.errorCallBack = params?.errorCallBack;
-	this.responseType = params?.responseType;
-}
+		// members
+		this._xhr = env.getXMLHttpRequest();
+		// members - option
+		this.method = params?.method;
+		this.url = params?.url;
+		this.headers = params?.headers;
+		this.data = params?.data;
+		this.callBack = params?.callBack;
+		this.errorCallBack = params?.errorCallBack;
+		this.responseType = params?.responseType;
+	}
 
-ApiManager.prototype = {
 	/**
 	 * @description Call API
 	 * @param {ApiManagerParams} params
@@ -75,7 +78,7 @@ ApiManager.prototype = {
 		}
 
 		xhr.send(data);
-	},
+	}
 
 	/**
 	 * @description Call Async API
@@ -129,14 +132,14 @@ ApiManager.prototype = {
 
 			xhr.send(data);
 		});
-	},
+	}
 
 	/**
 	 * @description Cancel API (xhr.abort())
 	 */
 	cancel() {
 		if (this._xhr) this._xhr.abort();
-	},
+	}
 
 	/**
 	 * @private
@@ -146,10 +149,8 @@ ApiManager.prototype = {
 	 */
 	_normalizeUrl(url) {
 		return url.replace(/([^:])\/+/g, '$1/').replace(/\/(\?|#|$)/, '$1');
-	},
-
-	constructor: ApiManager
-};
+	}
+}
 
 /**
  * @description API callback
