@@ -55,6 +55,7 @@ jobs:
 
             # 7) 스크립트 실행
             - name: Execute script for milestone
-              run: node .github/scripts/manage-deploy.js ${{ steps.check-version.outputs.package_version }}
+              run: node .github/scripts/manage-deploy.js
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  VERSION_NAME: ${{ steps.check-version.outputs.package_version }}
