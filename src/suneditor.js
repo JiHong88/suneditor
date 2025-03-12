@@ -16,31 +16,26 @@ import Helper from './helper';
 
 /**
  * Editor Injector module, Inject "editor" and basic frequently used objects by calling it with "call(this, editor)".
- * @type {(...args: *) => *}
  */
 export { EditorInjector };
 
 /**
  * Available editor plugins
- * @type {Object<string, *>}
  */
 export { Plugins };
 
 /**
  * Editor modules
- * @type {{[key: string]: ((...args: *) => *)|Map}}
  */
 export { Modules };
 
 /**
  * Language packs for the editor
- * @type {Object<string, Object<string, string> | ((...args: *) => *)>}
  */
 export { Langs };
 
 /**
  * Helper functions for the editor
- * @type {Object<string|symbol, Object<string, ((...args: *) => *)>>}
  */
 export { Helper };
 
