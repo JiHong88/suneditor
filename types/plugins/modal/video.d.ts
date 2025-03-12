@@ -14,7 +14,7 @@ export type ModalReturns = {
 	revertBtn: HTMLButtonElement;
 	fileRemoveBtn: HTMLButtonElement;
 };
-export type VideoInfo = import('../../core/base/events').VideoInfo;
+export type VideoInfo = import('../../events').VideoInfo;
 export type FigureControls = import('../../modules/Figure').FigureControls;
 export type VideoPluginOptions = {
 	/**
@@ -127,7 +127,7 @@ export type VideoPluginOptions = {
 	controls?: FigureControls;
 };
 /**
- * @typedef {import('../../core/base/events').VideoInfo} VideoInfo
+ * @typedef {import('../../events').VideoInfo} VideoInfo
  */
 /**
  * @typedef {import('../../modules/Figure').FigureControls} FigureControls

@@ -18,7 +18,7 @@ export type ModalReturns = {
 	asInline: HTMLButtonElement;
 	fileRemoveBtn: HTMLButtonElement;
 };
-export type ImageInfo = import('../../core/base/events').ImageInfo;
+export type ImageInfo = import('../../events').ImageInfo;
 export type FigureControls = import('../../modules/Figure').FigureControls;
 export type ImagePluginOptions = {
 	/**
@@ -97,7 +97,7 @@ export type ImagePluginOptions = {
 	controls?: FigureControls;
 };
 /**
- * @typedef {import('../../core/base/events').ImageInfo} ImageInfo
+ * @typedef {import('../../events').ImageInfo} ImageInfo
  */
 /**
  * @typedef {import('../../modules/Figure').FigureControls} FigureControls

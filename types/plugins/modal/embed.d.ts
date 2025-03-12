@@ -1,5 +1,5 @@
 export default Embed;
-export type ProcessInfo = import('../../core/base/events').ProcessInfo;
+export type ProcessInfo = import('../../events').ProcessInfo;
 export type FigureControls = import('../../modules/Figure').FigureControls;
 export type EmbedPluginOptions = {
 	/**
@@ -92,7 +92,7 @@ export type EmbedPluginOptions = {
 	controls?: FigureControls;
 };
 /**
- * @typedef {import('../../core/base/events').ProcessInfo} ProcessInfo
+ * @typedef {import('../../events').ProcessInfo} ProcessInfo
  */
 /**
  * @typedef {import('../../modules/Figure').FigureControls} FigureControls

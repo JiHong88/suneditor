@@ -1,4 +1,12 @@
 /**
+ * @template {Node} T
+ * @description Clones a node while preserving its type.
+ * @param {T} node - The node to clone.
+ * @param {boolean} [deep=false] - Whether to perform a deep clone.
+ * @returns {T} - The cloned node.
+ */
+export function clone<T extends Node>(node: T, deep?: boolean): T;
+/**
  * @template {HTMLElement} T
  * @description Create Element node
  * @param {string} elementName Element name
@@ -166,6 +174,19 @@ export function getViewportSize(): {
  * @returns
  */
 export function applyInlineStylesAll(wwTarget: Node, includeWW: boolean, styles: Array<string>): HTMLElement;
+/**
+ * @description Wait for media elements to load
+ * @param {Node} target Target element
+ * @param {number} timeout Timeout milliseconds
+ * @returns {Promise<void>}
+ */
+export function waitForMediaLoad(target: Node, timeout?: number): Promise<void>;
+/**
+ * @description Create tooltip HTML
+ * @param {string} text Tooltip text
+ * @returns {string} Tooltip HTML
+ */
+export function createTooltipInner(text: string): string;
 export default utils;
 declare namespace utils {
 	export { clone };
@@ -193,19 +214,5 @@ declare namespace utils {
 	export { getViewportSize };
 	export { applyInlineStylesAll };
 	export { waitForMediaLoad };
+	export { createTooltipInner };
 }
-/**
- * @template {Node} T
- * @description Clones a node while preserving its type.
- * @param {T} node - The node to clone.
- * @param {boolean} [deep=false] - Whether to perform a deep clone.
- * @returns {T} - The cloned node.
- */
-declare function clone<T extends Node>(node: T, deep?: boolean): T;
-/**
- * @description Wait for media elements to load
- * @param {Node} target Target element
- * @param {number} timeout Timeout milliseconds
- * @returns {Promise<void>}
- */
-declare function waitForMediaLoad(target: Node, timeout?: number): Promise<void>;

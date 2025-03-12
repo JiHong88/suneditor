@@ -16,9 +16,9 @@ export default class CoreInjector {
 	editor: __se__EditorCore;
 	/**
 	 * @description The event manager instance.
-	 * @type {import('../core/base/eventManager').default}
+	 * @type {__se__EditorCore['eventManager']}
 	 */
-	eventManager: import('../core/base/eventManager').default;
+	eventManager: __se__EditorCore['eventManager'];
 	/**
 	 * @description The history manager instance.
 	 * @type {__se__EditorCore['history']}

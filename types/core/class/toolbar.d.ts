@@ -16,7 +16,7 @@ export type ToolbarThis = Omit<Toolbar & Partial<__se__EditorInjector>, 'toolbar
  * @param {Array<Node>} options.res - responsive toolbar button list
  */
 declare function Toolbar(
-	this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>,
+	this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>,
 	editor: __se__EditorCore,
 	{
 		keyName,
@@ -92,72 +92,72 @@ declare class Toolbar {
 	 * @this {ToolbarThis}
 	 * @description Disable the toolbar
 	 */
-	disable(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	disable(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
 	 * @this {ToolbarThis}
 	 * @description Enable the toolbar
 	 */
-	enable(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	enable(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
 	 * @this {ToolbarThis}
 	 * @description Show the toolbar
 	 */
-	show(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	show(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
 	 * @this {ToolbarThis}
 	 * @description Hide the toolbar
 	 */
-	hide(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	hide(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
 	 * @this {ToolbarThis}
 	 * @description Reset buttons of the responsive toolbar.
 	 */
-	resetResponsiveToolbar(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	resetResponsiveToolbar(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
 	 * @this {ToolbarThis}
 	 * @description Reset the buttons on the toolbar. (Editor is not reloaded)
 	 * - You cannot set a new plugin for the button.
 	 * @param {Array} buttonList Button list
 	 */
-	setButtons(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>, buttonList: any[]): void;
+	setButtons(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, buttonList: any[]): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Reset the sticky toolbar position based on the editor state.
 	 */
-	_resetSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	_resetSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Enable sticky toolbar mode and adjust position.
 	 */
-	_onSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>, inlineOffset: any): void;
+	_onSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, inlineOffset: any): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Get the viewport's top offset.
 	 * @returns {number}
 	 */
-	__getViewportTop(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): number;
+	__getViewportTop(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): number;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Disable sticky toolbar mode.
 	 */
-	_offSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	_offSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Set up responsive behavior for the toolbar buttons.
 	 */
-	_setResponsive(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	_setResponsive(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Show the balloon toolbar based on the current selection.
 	 * @param {?Range=} rangeObj - Selection range
 	 */
-	_showBalloon(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>, rangeObj?: (Range | null) | undefined): void;
+	_showBalloon(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, rangeObj?: (Range | null) | undefined): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
@@ -165,13 +165,13 @@ declare class Toolbar {
 	 * @param {boolean} positionTop - Whether the toolbar should be positioned above the selection
 	 * @param {Range} [range] - Selection range
 	 */
-	_setBalloonOffset(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>, positionTop: boolean, range?: Range): void;
+	_setBalloonOffset(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, positionTop: boolean, range?: Range): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Show the inline toolbar mode.
 	 */
-	_showInline(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	_showInline(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
@@ -179,11 +179,11 @@ declare class Toolbar {
 	 * @param {Node} button - Button element
 	 * @param {Node} layer - More options layer element
 	 */
-	_moreLayerOn(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>, button: Node, layer: Node): void;
+	_moreLayerOn(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, button: Node, layer: Node): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Hide the currently active more options layer.
 	 */
-	_moreLayerOff(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
+	_moreLayerOff(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 }

@@ -101,7 +101,7 @@ export const dom: {
 		isImportantDisabled: typeof import('./dom/domCheck').isImportantDisabled;
 	};
 	utils: {
-		clone: <T extends Node>(node: T, deep?: boolean) => T;
+		clone: typeof import('./dom/domUtils').clone;
 		createElement: typeof import('./dom/domUtils').createElement;
 		createTextNode: typeof import('./dom/domUtils').createTextNode;
 		getAttributesToString: typeof import('./dom/domUtils').getAttributesToString;
@@ -125,7 +125,8 @@ export const dom: {
 		getClientSize: typeof import('./dom/domUtils').getClientSize;
 		getViewportSize: typeof import('./dom/domUtils').getViewportSize;
 		applyInlineStylesAll: typeof import('./dom/domUtils').applyInlineStylesAll;
-		waitForMediaLoad: (target: Node, timeout?: number) => Promise<void>;
+		waitForMediaLoad: typeof import('./dom/domUtils').waitForMediaLoad;
+		createTooltipInner: typeof import('./dom/domUtils').createTooltipInner;
 	};
 };
 export const numbers: {

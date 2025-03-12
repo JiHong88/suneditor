@@ -1,5 +1,5 @@
 export default Audio_;
-export type AudioInfo = import('../../core/base/events').AudioInfo;
+export type AudioInfo = import('../../events').AudioInfo;
 export type AudioPluginOptions = {
 	/**
 	 * - The default width of the audio tag (e.g., "300px").
@@ -51,7 +51,7 @@ export type AudioPluginOptions = {
 	};
 };
 /**
- * @typedef {import('../../core/base/events').AudioInfo} AudioInfo
+ * @typedef {import('../../events').AudioInfo} AudioInfo
  */
 /**
  * @typedef {Object} AudioPluginOptions

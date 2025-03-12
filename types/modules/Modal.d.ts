@@ -1,8 +1,4 @@
 export default Modal;
-export type OffsetGlobalInfo = import('../core/class/offset').OffsetGlobalInfo;
-/**
- * @typedef {import('../core/class/offset').OffsetGlobalInfo} OffsetGlobalInfo
- */
 /**
  * @class
  * @description Modal window module
@@ -98,7 +94,7 @@ declare class Modal extends CoreInjector {
 	/**
 	 * @private
 	 * @description Saves the current offset position of the modal for resizing calculations.
-	 * @returns {OffsetGlobalInfo} Offset values including top and left positions. (offset.getGlobal)
+	 * @returns {__se__Class_OffsetGlobalInfo} The offset position of the modal.
 	 */
 	private _saveOffset;
 	/**

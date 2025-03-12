@@ -63,12 +63,6 @@ export function CreateStatusbar(
 	charCounter: HTMLElement;
 };
 /**
- * @description Create tooltip HTML
- * @param {string} text Tooltip text
- * @returns {string} Tooltip HTML
- */
-export function CreateTooltipInner(text: string): string;
-/**
  * @description Update a button state, attributes, and icons
  * @param {HTMLElement|null} element Button element
  * @param {Object<string, *>} plugin Plugin

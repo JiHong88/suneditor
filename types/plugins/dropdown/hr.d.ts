@@ -1,8 +1,4 @@
 export default HR;
-export type ShortcutInfo = import('../../core/class/shortcuts').ShortcutInfo;
-/**
- * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
- */
 /**
  * @class
  * @description HR Plugin
@@ -63,15 +59,9 @@ declare class HR extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {Object} params - Information of the "shortcut" plugin
-	 * @param {Range} params.range - Range object
-	 * @param {HTMLElement} params.line - The line element of the current range
-	 * @param {ShortcutInfo} params.info - Information of the shortcut
-	 * @param {KeyboardEvent} params.event - Key event object
-	 * @param {string} params.keyCode - KeyBoardEvent.code
-	 * @param {__se__EditorCore} params.editor - The root editor instance
+	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	shortcut({ line, range }: { range: Range; line: HTMLElement; info: ShortcutInfo; event: KeyboardEvent; keyCode: string; editor: __se__EditorCore }): void;
+	shortcut({ line, range }: __se__PluginShortcutInfo): void;
 	/**
 	 * @description Add a hr element
 	 * @param {string} className HR class name

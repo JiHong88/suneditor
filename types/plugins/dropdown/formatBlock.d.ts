@@ -1,8 +1,4 @@
 export default FormatBlock;
-export type ShortcutInfo = import('../../core/class/shortcuts').ShortcutInfo;
-/**
- * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
- */
 /**
  * @class
  * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
@@ -51,8 +47,8 @@ declare class FormatBlock extends EditorInjector {
 	/**
 	 * @description Create a header tag, call by "shortcut" class
 	 * - (e.g. shortcuts._h1: ['c+s+49+p~formatBlock.createHeader', ''])
-	 * @param {ShortcutInfo} params - Information of the shortcut
+	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	createHeader({ keyCode }: ShortcutInfo): void;
+	createHeader({ keyCode }: __se__PluginShortcutInfo): void;
 }
 import EditorInjector from '../../editorInjector';
