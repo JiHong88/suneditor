@@ -2,10 +2,6 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 /**
- * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
- */
-
-/**
  * @class
  * @description HR Plugin
  */
@@ -94,13 +90,7 @@ class HR extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {Object} params - Information of the "shortcut" plugin
-	 * @param {Range} params.range - Range object
-	 * @param {HTMLElement} params.line - The line element of the current range
-	 * @param {ShortcutInfo} params.info - Information of the shortcut
-	 * @param {KeyboardEvent} params.event - Key event object
-	 * @param {string} params.keyCode - KeyBoardEvent.code
-	 * @param {__se__EditorCore} params.editor - The root editor instance
+	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
 	shortcut({ line, range }) {
 		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);

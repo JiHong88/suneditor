@@ -1317,7 +1317,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 
 	if (/^FIELD$/i.test(dataType)) dom.utils.addClass(oLi, 'se-toolbar-hidden-btn');
 
-	if (label) innerHTML += CreateTooltipInner(label);
+	if (label) innerHTML += dom.utils.createTooltipInner(label);
 	if (innerHTML) oButton.innerHTML = innerHTML;
 
 	oLi.appendChild(oButton);
@@ -1326,15 +1326,6 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 		li: oLi,
 		button: oButton
 	};
-}
-
-/**
- * @description Create tooltip HTML
- * @param {string} text Tooltip text
- * @returns {string} Tooltip HTML
- */
-export function CreateTooltipInner(text) {
-	return `<span class="se-tooltip-inner"><span class="se-tooltip-text">${text}</span></span>`;
 }
 
 /**

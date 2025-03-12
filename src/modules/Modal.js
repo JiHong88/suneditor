@@ -1,13 +1,8 @@
 import CoreInjector from '../editorInjector/_core';
-import { CreateTooltipInner } from '../core/section/constructor';
 import { dom, env, keyCodeMap } from '../helper';
 
 const { _w } = env;
 const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize', wRTL: 'ns-resize', hRTL: 'ew-resize', cRTL: 'nesw-resize' };
-
-/**
- * @typedef {import('../core/class/offset').OffsetGlobalInfo} OffsetGlobalInfo
- */
 
 /**
  * @class
@@ -101,7 +96,7 @@ class Modal extends CoreInjector {
 			</div>
 			<button type="button" class="se-btn se-modal-files-edge-button se-file-remove se-tooltip" aria-label="${lang.remove}">
 				${icons.selection_remove}
-				${CreateTooltipInner(lang.remove)}
+				${dom.utils.createTooltipInner(lang.remove)}
 			</button>
 		</div>`;
 	}
@@ -211,7 +206,7 @@ class Modal extends CoreInjector {
 	/**
 	 * @private
 	 * @description Saves the current offset position of the modal for resizing calculations.
-	 * @returns {OffsetGlobalInfo} Offset values including top and left positions. (offset.getGlobal)
+	 * @returns {__se__Class_OffsetGlobalInfo} The offset position of the modal.
 	 */
 	_saveOffset() {
 		const offset = this.offset.getGlobal(this._resizeBody);

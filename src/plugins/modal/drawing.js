@@ -1,7 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal } from '../../modules';
 import { dom, env } from '../../helper';
-import { CreateTooltipInner } from '../../core/section/constructor';
 
 const { _w, isMobile } = env;
 
@@ -492,11 +491,11 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
 							<div class="se-modal-flex-group">
 								<button type="button" class="se-btn se-tooltip" data-command="asBlock" aria-label="${lang.blockStyle}">
 									${icons.as_block}
-									${CreateTooltipInner(lang.blockStyle)}
+									${dom.utils.createTooltipInner(lang.blockStyle)}
 								</button>
 								<button type="button" class="se-btn se-tooltip" data-command="asInline" aria-label="${lang.inlineStyle}">
 									${icons.as_inline}
-									${CreateTooltipInner(lang.inlineStyle)}
+									${dom.utils.createTooltipInner(lang.inlineStyle)}
 								</button>
 							</div>`
 							: ''
@@ -504,7 +503,7 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
 					<div class="se-modal-flex-group">
 						<button type="button" class="se-btn se-tooltip" data-command="remove" aria-label="${lang.remove}">
 							${icons.eraser}
-							${CreateTooltipInner(lang.remove)}
+							${dom.utils.createTooltipInner(lang.remove)}
 						</button>
 					</div>
 				</div>

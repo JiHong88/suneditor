@@ -4,7 +4,7 @@ import { dom, numbers, env, keyCodeMap } from '../../helper';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../core/base/events').ProcessInfo} ProcessInfo
+ * @typedef {import('../../events').ProcessInfo} ProcessInfo
  */
 
 /**

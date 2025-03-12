@@ -2,7 +2,6 @@ import EditorInjector from '../editorInjector';
 import SelectMenu from './SelectMenu';
 import FileManager from './FileManager';
 import { dom, numbers, env, unicode } from '../helper';
-import { CreateTooltipInner } from '../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
@@ -601,13 +600,13 @@ function CreatetModalForm(editor, params, relList) {
 						params.enableFileUpload
 							? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button _se_upload_button" aria-label="${lang.fileUpload}">
 									${icons.file_upload}
-									${CreateTooltipInner(lang.fileUpload)}
+									${dom.utils.createTooltipInner(lang.fileUpload)}
 								</button>`
 							: ''
 					}
 					<button type="button" class="se-btn se-tooltip se-modal-files-edge-button _se_bookmark_button" aria-label="${lang.link_modal_bookmark}">
 						${icons.bookmark}
-						${CreateTooltipInner(lang.link_modal_bookmark)}
+						${dom.utils.createTooltipInner(lang.link_modal_bookmark)}
 					</button>
 				</div>
 				<div class="se-anchor-preview-form">
@@ -629,7 +628,7 @@ function CreatetModalForm(editor, params, relList) {
 			<div class="se-anchor-rel">
 				<button type="button" class="se-btn se-tooltip se-anchor-rel-btn" title="${lang.link_modal_relAttribute}" aria-label="${lang.link_modal_relAttribute}">
 					${icons.link_rel}
-					${CreateTooltipInner(lang.link_modal_relAttribute)}
+					${dom.utils.createTooltipInner(lang.link_modal_relAttribute)}
 				</button>
 				<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>
 			</div>

@@ -1,11 +1,10 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
 import { dom, numbers, env, keyCodeMap } from '../../helper';
-import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../core/base/events').ImageInfo} ImageInfo
+ * @typedef {import('../../events').ImageInfo} ImageInfo
  */
 
 /**
@@ -1270,7 +1269,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 					plugins.imageGallery
 						? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button __se__gallery" aria-label="${lang.imageGallery}">
 							${icons.image_gallery}
-							${CreateTooltipInner(lang.imageGallery)}
+							${dom.utils.createTooltipInner(lang.imageGallery)}
 							</button>`
 						: ''
 				}
@@ -1293,7 +1292,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<label><input type="checkbox" class="se-modal-btn-check _se_check_proportion" checked/>&nbsp;${lang.proportion}</label>
 			<button type="button" aria-label="${lang.revert}" class="se-btn se-tooltip se-modal-btn-revert">
 				${icons.revert}
-				${CreateTooltipInner(lang.revert)}
+				${dom.utils.createTooltipInner(lang.revert)}
 			</button>
 		</div>`;
 
@@ -1304,11 +1303,11 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<div class="se-modal-flex-form">
 				<button type="button" data-command="asBlock" class="se-btn se-tooltip" aria-label="${lang.inlineStyle}">
 					${icons.as_block}
-					${CreateTooltipInner(lang.blockStyle)}
+					${dom.utils.createTooltipInner(lang.blockStyle)}
 				</button>
 				<button type="button" data-command="asInline" class="se-btn se-tooltip" aria-label="${lang.inlineStyle}">
 					${icons.as_inline}
-					${CreateTooltipInner(lang.inlineStyle)}
+					${dom.utils.createTooltipInner(lang.inlineStyle)}
 				</button>
 			</div>
 		</div>`;

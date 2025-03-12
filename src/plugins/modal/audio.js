@@ -1,11 +1,10 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller, FileManager, Figure, _DragHandle } from '../../modules';
 import { dom, numbers, env } from '../../helper';
-import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 /**
- * @typedef {import('../../core/base/events').AudioInfo} AudioInfo
+ * @typedef {import('../../events').AudioInfo} AudioInfo
  */
 
 /**
@@ -618,7 +617,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 					plugins.audioGallery
 						? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button __se__gallery" aria-label="${lang.audioGallery}">
 							${icons.audio_gallery}
-							${CreateTooltipInner(lang.audioGallery)}
+							${dom.utils.createTooltipInner(lang.audioGallery)}
 							</button>`
 						: ''
 				}

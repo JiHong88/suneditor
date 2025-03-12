@@ -12,7 +12,7 @@ export default function CoreInjector(editor) {
 	// base
 	/**
 	 * @description The event manager instance.
-	 * @type {import('../core/base/eventManager').default}
+	 * @type {__se__EditorCore['eventManager']}
 	 */
 	this.eventManager = editor.eventManager;
 	/**

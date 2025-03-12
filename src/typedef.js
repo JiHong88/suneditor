@@ -72,6 +72,16 @@
  * @property {string} value Input value
  */
 
+/**
+ * @typedef {Object} __se__PluginShortcutInfo Information of the "shortcut" plugin
+ * @property {Range} params.range - Range object
+ * @property {HTMLElement} params.line - The line element of the current range
+ * @property {import('./core/class/shortcuts').ShortcutInfo} params.info - Information of the shortcut
+ * @property {KeyboardEvent} params.event - Key event object
+ * @property {string} params.keyCode - KeyBoardEvent.code
+ * @property {__se__EditorCore} params.editor - The root editor instance
+ */
+
 // --------------------------------------------------------- [Context] ---------------------------------------------------------------------------------------------------
 /**
  * @typedef {Map<string, *>} __se__FrameOptions
@@ -83,4 +93,9 @@
 
 /**
  * @typedef {Map<string, *>} __se__Context
+ */
+
+// --------------------------------------------------------- [core.class] ---------------------------------------------------------------------------------------------------
+/**
+ * @typedef {import('./core/class/offset').OffsetGlobalInfo} __se__Class_OffsetGlobalInfo
  */

@@ -11,10 +11,6 @@ const HEADER_KEYCODE = new Map([
 ]);
 
 /**
- * @typedef {import('../../core/class/shortcuts').ShortcutInfo} ShortcutInfo
- */
-
-/**
  * @class
  * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
  */
@@ -130,7 +126,7 @@ class FormatBlock extends EditorInjector {
 	/**
 	 * @description Create a header tag, call by "shortcut" class
 	 * - (e.g. shortcuts._h1: ['c+s+49+p~formatBlock.createHeader', ''])
-	 * @param {ShortcutInfo} params - Information of the shortcut
+	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
 	createHeader({ keyCode }) {
 		const headerName = HEADER_KEYCODE.get(keyCode);

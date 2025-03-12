@@ -1,11 +1,10 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager } from '../../modules';
 import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
-import { CreateTooltipInner } from '../../core/section/constructor';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../core/base/events').VideoInfo} VideoInfo
+ * @typedef {import('../../events').VideoInfo} VideoInfo
  */
 
 /**
@@ -1144,7 +1143,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 						plugins.videoGallery
 							? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button __se__gallery" aria-label="${lang.videoGallery}">
 								${icons.video_gallery}
-								${CreateTooltipInner(lang.videoGallery)}
+								${dom.utils.createTooltipInner(lang.videoGallery)}
 								</button>`
 							: ''
 					}

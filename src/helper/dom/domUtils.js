@@ -8,7 +8,7 @@ import check from './domCheck';
  * @param {boolean} [deep=false] - Whether to perform a deep clone.
  * @returns {T} - The cloned node.
  */
-function clone(node, deep = false) {
+export function clone(node, deep = false) {
 	return /** @type {T} */ (node.cloneNode(deep));
 }
 
@@ -454,7 +454,7 @@ export function applyInlineStylesAll(wwTarget, includeWW, styles) {
  * @param {number} timeout Timeout milliseconds
  * @returns {Promise<void>}
  */
-function waitForMediaLoad(target, timeout = 5000) {
+export function waitForMediaLoad(target, timeout = 5000) {
 	const doc = /** @type {HTMLElement|Document} */ (target || _d);
 	return new Promise((resolveAll) => {
 		const selectors = ['img', 'video', 'audio', 'iframe'];
@@ -502,6 +502,15 @@ function waitForMediaLoad(target, timeout = 5000) {
 	});
 }
 
+/**
+ * @description Create tooltip HTML
+ * @param {string} text Tooltip text
+ * @returns {string} Tooltip HTML
+ */
+export function createTooltipInner(text) {
+	return `<span class="se-tooltip-inner"><span class="se-tooltip-text">${text}</span></span>`;
+}
+
 const utils = {
 	clone,
 	createElement,
@@ -527,7 +536,8 @@ const utils = {
 	getClientSize,
 	getViewportSize,
 	applyInlineStylesAll,
-	waitForMediaLoad
+	waitForMediaLoad,
+	createTooltipInner
 };
 
 export default utils;

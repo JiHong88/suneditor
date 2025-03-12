@@ -1,5 +1,4 @@
 import EditorInjector from '../../editorInjector';
-import { CreateTooltipInner } from '../../core/section/constructor';
 import { dom, env, numbers } from '../../helper';
 import { FileManager, Figure, Controller } from '../../modules';
 
@@ -121,11 +120,11 @@ class FileUpload extends EditorInjector {
 		this._element = target;
 		const asBtn = this.figure.controller.form.querySelector('[data-command="__c__as"]');
 		if (dom.check.isFigure(target.parentElement)) {
-			asBtn.innerHTML = this.icons.reduction + CreateTooltipInner(this.lang.asLink);
+			asBtn.innerHTML = this.icons.reduction + dom.utils.createTooltipInner(this.lang.asLink);
 			asBtn.setAttribute('data-value', 'link');
 			this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
 		} else {
-			asBtn.innerHTML = this.icons.expansion + CreateTooltipInner(this.lang.asBlock);
+			asBtn.innerHTML = this.icons.expansion + dom.utils.createTooltipInner(this.lang.asBlock);
 			asBtn.setAttribute('data-value', 'box');
 			this.figure.controllerOpen(target, { isWWTarget: true });
 			return true;

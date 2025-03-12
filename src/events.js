@@ -3,7 +3,7 @@
 // ---------
 
 /**
- * @typedef {import('../../modules/Controller').default} ControllerInstance
+ * @typedef {import('./modules/Controller').default} ControllerInstance
  */
 
 // --- native events

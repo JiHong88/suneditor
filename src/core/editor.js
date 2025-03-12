@@ -4,7 +4,7 @@ import { UpdateStatusbarContext } from './section/context';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
-import Events from './base/events';
+import Events from '../events';
 import DocumentType from './section/documentType';
 
 // class injector
