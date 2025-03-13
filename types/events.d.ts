@@ -91,32 +91,7 @@ export type ClipboardEvent = {
 	 */
 	from: string;
 };
-export type ControllerInfo = {
-	/**
-	 * - controller position
-	 */
-	position: 'top' | 'bottom' | 'position';
-	/**
-	 * - controller instance
-	 */
-	inst: ControllerInstance;
-	/**
-	 * - controller element
-	 */
-	form: HTMLElement;
-	/**
-	 * - controller target element
-	 */
-	target: HTMLElement;
-	/**
-	 * - If the target is a Range, set it to true.
-	 */
-	isRangeTarget: boolean;
-	/**
-	 * - "form"" is not included in the carrier.
-	 */
-	notInCarrier: boolean;
-};
+export type ControllerInfo_events = import('./modules/Controller').ControllerInfo;
 export type FileManagementInfo = {
 	/**
 	 * - source URL of the image.

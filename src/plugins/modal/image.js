@@ -4,11 +4,11 @@ import { dom, numbers, env, keyCodeMap } from '../../helper';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../events').ImageInfo} ImageInfo
+ * @typedef {import('../../events').ImageInfo} ImageInfo_image
  */
 
 /**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls
+ * @typedef {import('../../modules/Figure').FigureControls} FigureControls_image
  */
 
 /**
@@ -30,7 +30,7 @@ const { NO_EVENT } = env;
  * @property {string} [defaultFormatType="block"] - The default image format type ("block" or "inline").
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
- * @property {FigureControls} [controls] - Figure controls.
+ * @property {FigureControls_image} [controls] - Figure controls.
  */
 
 /**
@@ -952,7 +952,7 @@ class Image_ extends EditorInjector {
 	/**
 	 * @private
 	 * @description Registers the uploaded image and inserts it into the editor.
-	 * @param {ImageInfo} info - Image info.
+	 * @param {ImageInfo_image} info - Image info.
 	 * @param {Object<string, *>} response - Server response data.
 	 */
 	_register(info, response) {
@@ -975,7 +975,7 @@ class Image_ extends EditorInjector {
 	/**
 	 * @private
 	 * @description Uploads the image to the server.
-	 * @param {ImageInfo} info - Image upload info.
+	 * @param {ImageInfo_image} info - Image upload info.
 	 * @param {FileList} files - List of image files.
 	 */
 	_serverUpload(info, files) {
@@ -1100,7 +1100,7 @@ class Image_ extends EditorInjector {
 
 	/**
 	 * @description Handles the callback function for image upload completion.
-	 * @param {ImageInfo} info - Image information.
+	 * @param {ImageInfo_image} info - Image information.
 	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
 	 */
 	async #UploadCallBack(info, xmlHttp) {
@@ -1226,7 +1226,7 @@ class Image_ extends EditorInjector {
 }
 
 /**
- * @typedef {Object} ModalReturns
+ * @typedef {Object} ModalReturns_image
  * @property {HTMLElement} html
  * @property {HTMLElement} alignForm
  * @property {HTMLElement} fileModalWrapper
@@ -1247,7 +1247,7 @@ class Image_ extends EditorInjector {
  *
  * @param {__se__EditorCore} editor
  * @param {*} pluginOptions
- * @returns {ModalReturns}
+ * @returns {ModalReturns_image}
  */
 function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	const createFileInputHtml = !pluginOptions.createFileInput

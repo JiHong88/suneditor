@@ -4,7 +4,7 @@ import { dom, numbers, env } from '../../helper';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 /**
- * @typedef {import('../../events').AudioInfo} AudioInfo
+ * @typedef {import('../../events').AudioInfo} AudioInfo_audio
  */
 
 /**
@@ -282,7 +282,7 @@ class Audio_ extends EditorInjector {
 	 * @private
 	 * @description Registers uploaded audio files and creates the corresponding audio elements.
 	 * - Iterates through the uploaded files and inserts them into the editor.
-	 * @param {AudioInfo} info - Upload metadata, including `isUpdate` flag and `element`.
+	 * @param {AudioInfo_audio} info - Upload metadata, including `isUpdate` flag and `element`.
 	 * @param {Object<string, *>} response - Server response containing uploaded file details.
 	 */
 	_register(info, response) {
@@ -476,7 +476,7 @@ class Audio_ extends EditorInjector {
 	 * @private
 	 * @description Uploads audio files to the server.
 	 * - Sends a request to the configured upload URL and processes the response.
-	 * @param {AudioInfo} info - Upload metadata, including `files` and `isUpdate`.
+	 * @param {AudioInfo_audio} info - Upload metadata, including `files` and `isUpdate`.
 	 * @param {FileList|File[]} files - The files to be uploaded.
 	 */
 	_serverUpload(info, files) {
@@ -506,7 +506,7 @@ class Audio_ extends EditorInjector {
 	 * @description Handles the server response after a file upload.
 	 * - If the upload is successful, registers the uploaded audio.
 	 * - If an error occurs, triggers an error event.
-	 * @param {AudioInfo} info - Upload metadata.
+	 * @param {AudioInfo_audio} info - Upload metadata.
 	 * @param {XMLHttpRequest} xmlHttp - The completed XHR request.
 	 */
 	async #UploadCallBack(info, xmlHttp) {

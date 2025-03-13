@@ -63,11 +63,11 @@ const DEFAULT_COLOR_LIST = [
 const DEFAULLT_COLOR_SPLITNUM = 9;
 
 /**
- * @typedef {import('./HueSlider').HueSliderParams} HueSliderParams
+ * @typedef {import('./HueSlider').HueSliderParams} HueSliderParams_colorPicker
  */
 
 /**
- * @typedef {import('./HueSlider').HueSliderColor} HueSliderColor
+ * @typedef {import('./HueSlider').HueSliderColor} HueSliderColor_colorPicker
  */
 
 /**
@@ -77,7 +77,7 @@ const DEFAULLT_COLOR_SPLITNUM = 9;
  * @property {string=} [defaultColor] Default color
  * @property {boolean=} [disableHEXInput=false] Disable HEX input
  * @property {boolean=} [disableRemove=false] Disable remove button
- * @property {HueSliderParams=} [hueSliderOptions] hue slider options
+ * @property {HueSliderParams_colorPicker=} [hueSliderOptions] hue slider options
  */
 
 /**
@@ -232,7 +232,7 @@ class ColorPicker extends CoreInjector {
 	/**
 	 * @editorMethod Modules.HueSlider
 	 * @description This method is called when the color is selected in the hue slider.
-	 * @param {HueSliderColor} color - Color object
+	 * @param {HueSliderColor_colorPicker} color - Color object
 	 */
 	hueSliderAction(color) {
 		this._setInputText(color.hex);

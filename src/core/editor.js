@@ -29,22 +29,22 @@ const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-e
 const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
 
 /**
- * @typedef {import('./section/constructor').EditorInitOptions} EditorInitOptions
+ * @typedef {import('./section/constructor').EditorInitOptions} EditorInitOptions_editor
  */
 
 /**
- * @typedef {import('./section/constructor').EditorFrameOptions} EditorFrameOptions
+ * @typedef {import('./section/constructor').EditorFrameOptions} EditorFrameOptions_editor
  */
 
 /**
- * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo
+ * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
  */
 
 /**
  * @constructor
  * @description SunEditor constructor function.
- * @param {Array<{target: Element, key: *, options: EditorFrameOptions}>} multiTargets Target element
- * @param {EditorInitOptions} options options
+ * @param {Array<{target: Element, key: *, options: EditorFrameOptions_editor}>} multiTargets Target element
+ * @param {EditorInitOptions_editor} options options
  */
 function Editor(multiTargets, options) {
 	const _d = multiTargets[0].target.ownerDocument || env._d;
@@ -241,7 +241,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Currently open "Controller" info array
-	 * @type {Array<ControllerInfo>}
+	 * @type {Array<ControllerInfo_editor>}
 	 */
 	this.opendControllers = [];
 
@@ -443,7 +443,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Origin options
-	 * @type {EditorInitOptions}
+	 * @type {EditorInitOptions_editor}
 	 */
 	this._originOptions = options;
 
@@ -745,7 +745,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
-	 * @param {EditorInitOptions} newOptions Options
+	 * @param {EditorInitOptions_editor} newOptions Options
 	 */
 	resetOptions(newOptions) {
 		const _keys = Object.keys;
@@ -1211,7 +1211,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Initializ editor
-	 * @param {EditorInitOptions} options Options
+	 * @param {EditorInitOptions_editor} options Options
 	 */
 	__editorInit(options) {
 		this.applyFrameRoots((e) => {
@@ -1257,7 +1257,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Initializ core variable
-	 * @param {EditorInitOptions} options Options
+	 * @param {EditorInitOptions_editor} options Options
 	 */
 	__init(options) {
 		// file components
@@ -1609,7 +1609,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Creates the editor instance and initializes components.
-	 * @param {EditorInitOptions} originOptions - The initial editor options.
+	 * @param {EditorInitOptions_editor} originOptions - The initial editor options.
 	 * @returns {Promise<void>}
 	 */
 	async __Create(originOptions) {

@@ -1649,7 +1649,7 @@ HTML.prototype = {
 						case 'fontSize':
 							if (!this.plugins.fontSize) continue;
 							if (!this.fontSizeUnitRegExp.test(r[0])) {
-								r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], converter.fontSize.bind(null, this.options.get('fontSizeUnits')[0]));
+								r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], converter.toFontUnit.bind(null, this.options.get('fontSizeUnits')[0]));
 							}
 							break;
 						case 'color':

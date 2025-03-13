@@ -10,7 +10,7 @@ import { dom, unicode, env } from '../../helper';
  */
 
 /**
- * @typedef {import('./offset').RectsInfo} RectsInfo
+ * @typedef {import('./offset').RectsInfo} RectsInfo_selection
  */
 
 /**
@@ -250,7 +250,7 @@ Selection_.prototype = {
 	 * @description Get the Rects object.
 	 * @param {?Range|Node} target Range | Node | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
-	 * @returns {{rects: RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
+	 * @returns {{rects: RectsInfo_selection, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 */
 	getRects(target, position) {
 		const targetAbs = dom.check.isElement(/** @type {Node} */ (target)) ? this._w.getComputedStyle(target).position === 'absolute' : false;

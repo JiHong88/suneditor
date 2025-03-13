@@ -21,8 +21,8 @@
 		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
-		"ts-build": "npx tsc -p tsconfig.extend.json && npm run lint:fix-ts",
-		"ts-build:all": "npx tsc && npm run lint:fix-ts",
+		"ts-build": "npx tsc -p tsconfig.extend.json && barrelsby --delete --directory types && npm run lint:fix-ts",
+		"ts-build:all": "npx tsc && barrelsby --delete --directory types && npm run lint:fix-ts",
 		"test": "karma start",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},
@@ -47,6 +47,7 @@
 		"@typescript-eslint/parser": "^7.18.0",
 		"@webpack-cli/serve": "^2.0.4",
 		"babel-loader": "^9.1.2",
+		"barrelsby": "^2.8.1",
 		"clean-webpack-plugin": "^4.0.0",
 		"codemirror": "^6.0.1",
 		"codemirror5": "npm:codemirror@^5.65.9",

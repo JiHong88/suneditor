@@ -1,10 +1,10 @@
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
+ * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_ww_clipboard
  */
 
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_ww_clipboard}
  * @param {ClipboardEvent} e - Event object
  */
 export function OnPaste_wysiwyg(frameContext, e) {
@@ -15,7 +15,7 @@ export function OnPaste_wysiwyg(frameContext, e) {
 
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_ww_clipboard}
  * @param {ClipboardEvent} e - Event object
  */
 export async function OnCopy_wysiwyg(frameContext, e) {
@@ -34,7 +34,7 @@ export async function OnCopy_wysiwyg(frameContext, e) {
 
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_ww_clipboard}
  * @param {ClipboardEvent} e - Event object
  */
 export async function OnCut_wysiwyg(frameContext, e) {

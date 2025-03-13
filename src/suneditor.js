@@ -11,7 +11,11 @@ import Helper from './helper';
  */
 
 /**
- * @typedef {import('./core/section/constructor').EditorFrameOptions} EditorFrameOptions
+ * @typedef {import('./core/section/constructor').EditorFrameOptions} EditorFrameOptions_suneditor
+ */
+
+/**
+ * @typedef {import('./core/section/constructor').EditorInitOptions} EditorInitOptions_suneditor
  */
 
 /**
@@ -40,10 +44,6 @@ export { Langs };
 export { Helper };
 
 /**
- * @typedef {import('./core/section/constructor').EditorInitOptions} EditorInitOptions
- */
-
-/**
  * SunEditor Factory Object
  * @namespace SunEditor
  */
@@ -51,8 +51,8 @@ export default {
 	/**
 	 * Returns the create function with preset options.
 	 * If the options overlap, the options of the 'create' function take precedence.
-	 * @param {EditorInitOptions} init_options - Initialization options
-	 * @returns {{create: (targets: Element|Object<string, {target: Element, options: EditorFrameOptions}>, options: EditorInitOptions) => Editor}}}
+	 * @param {EditorInitOptions_suneditor} init_options - Initialization options
+	 * @returns {{create: (targets: Element|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>, options: EditorInitOptions_suneditor) => Editor}}}
 	 */
 	init(init_options) {
 		return {
@@ -62,9 +62,9 @@ export default {
 
 	/**
 	 * Creates a new instance of the SunEditor
-	 * @param {Element|Object<string, {target: Element, options: EditorFrameOptions}>} target - Target element or multi-root object
-	 * @param {EditorInitOptions} options - Initialization options
-	 * @param {EditorInitOptions} [_init_options] - Optional preset initialization options
+	 * @param {Element|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>} target - Target element or multi-root object
+	 * @param {EditorInitOptions_suneditor} options - Initialization options
+	 * @param {EditorInitOptions_suneditor} [_init_options] - Optional preset initialization options
 	 * @returns {Editor} - Instance of the SunEditor
 	 * @throws {Error} If the target element is not provided or is invalid
 	 */

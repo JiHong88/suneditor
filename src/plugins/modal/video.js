@@ -4,11 +4,11 @@ import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../events').VideoInfo} VideoInfo
+ * @typedef {import('../../events').VideoInfo} VideoInfo_video
  */
 
 /**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls
+ * @typedef {import('../../modules/Figure').FigureControls} FigureControls_video
  */
 
 /**
@@ -36,7 +36,7 @@ const { NO_EVENT } = env;
  * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
- * @property {FigureControls} [controls] - Figure controls.
+ * @property {FigureControls_video} [controls] - Figure controls.
  */
 
 /**
@@ -853,7 +853,7 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Registers the uploaded video in the editor.
-	 * @param {VideoInfo} info - Video information object.
+	 * @param {VideoInfo_video} info - Video information object.
 	 * @param {Object<string, *>} response - Server response containing video data.
 	 */
 	_register(info, response) {
@@ -872,7 +872,7 @@ class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Uploads a video to the server using an external upload handler.
-	 * @param {VideoInfo} info - Video information object.
+	 * @param {VideoInfo_video} info - Video information object.
 	 * @param {FileList} files - The video files to upload.
 	 */
 	_serverUpload(info, files) {
@@ -956,7 +956,7 @@ class Video extends EditorInjector {
 
 	/**
 	 * @description Handles the callback function for video upload completion.
-	 * @param {VideoInfo} info - Video information.
+	 * @param {VideoInfo_video} info - Video information.
 	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
 	 */
 	async #UploadCallBack(info, xmlHttp) {
@@ -1095,7 +1095,7 @@ class Video extends EditorInjector {
 }
 
 /**
- * @typedef {object} ModalReturns
+ * @typedef {object} ModalReturns_video
  * @property {HTMLElement} html
  * @property {HTMLElement} alignForm
  * @property {HTMLElement} fileModalWrapper
@@ -1112,7 +1112,7 @@ class Video extends EditorInjector {
  *
  * @param {__se__EditorCore} editor
  * @param {*} pluginOptions
- * @returns {ModalReturns}
+ * @returns {ModalReturns_video}
  */
 function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	let html = /*html*/ `

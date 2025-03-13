@@ -95,7 +95,7 @@ export function syncMaps(targetMap, referenceMap) {
  * @param {string} size siSize to convert with units (ex: "15rem")
  * @returns {string}
  */
-export function fontSize(to, size) {
+export function toFontUnit(to, size) {
 	const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
 	const sizeNum = value ? Number(value[1]) : FONT_VALUES_MAP[size];
 	const from = value ? value[2] : 'rem';
@@ -412,7 +412,7 @@ const converter = {
 	entityToHTML,
 	debounce,
 	syncMaps,
-	fontSize,
+	toFontUnit,
 	nodeListToArray,
 	swapKeyValue,
 	createElementWhitelist,

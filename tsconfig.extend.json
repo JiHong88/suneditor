@@ -1,5 +1,5 @@
 {
 	"extends": "./tsconfig.json",
-	"include": ["./types/typedef.d.ts"],
+	"include": ["./types/**/*.d.ts"],
 	"exclude": ["./src/core/**/*.js", "./src/suneditor.js", "./src/typedef.js"]
 }

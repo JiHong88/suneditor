@@ -65,7 +65,7 @@ function CreateSliderCtx() {
 }
 
 /**
- * @typedef {import('../modules/Controller').ControllerParams} ControllerParams
+ * @typedef {import('../modules/Controller').ControllerParams} ControllerParams_hueSlider
  */
 
 /**
@@ -83,7 +83,7 @@ function CreateSliderCtx() {
  * @typedef {Object} HueSliderParams
  * @property {Node} [form] The form element to attach the hue slider.
  * @property {boolean} [isNewForm] Whether to create a new form element.
- * @property {ControllerParams} [controllerOptions] Controller options
+ * @property {ControllerParams_hueSlider} [controllerOptions] Controller options
  */
 
 /**

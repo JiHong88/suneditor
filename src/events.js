@@ -26,13 +26,7 @@
 
 // --- controller
 /**
- * @typedef {Object} ControllerInfo
- * @property {"top"|"bottom"|"position"} position - controller position
- * @property {ControllerInstance} inst - controller instance
- * @property {HTMLElement} form - controller element
- * @property {HTMLElement} target - controller target element
- * @property {boolean} isRangeTarget - If the target is a Range, set it to true.
- * @property {boolean} notInCarrier - "form"" is not included in the carrier.
+ * @typedef {import('./modules/Controller').ControllerInfo} ControllerInfo_events
  */
 
 // --- media
@@ -217,7 +211,7 @@ export default {
 	 * @param {__se__EditorCore} params.editor - The root editor instance
 	 * @param {__se__FrameContext} params.frameContext - frame context
 	 * @param {string} params.caller - caller plugin name
-	 * @param {ControllerInfo} params.info - info object
+	 * @param {ControllerInfo_events} params.info - info object
 	 */
 	onShowController: null,
 
@@ -228,7 +222,7 @@ export default {
 	 * @param {__se__EditorCore} params.editor - The root editor instance
 	 * @param {__se__FrameContext} params.frameContext - frame context
 	 * @param {string} params.caller - caller plugin name
-	 * @param {ControllerInfo} params.info - info object
+	 * @param {ControllerInfo_events} params.info - info object
 	 */
 	onBeforeShowController: null,
 

@@ -3,12 +3,12 @@ import { dom, env } from '../../../helper';
 const { isMobile } = env;
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
+ * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_toolbar
  */
 
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
 export function ButtonsHandler(e) {
@@ -101,7 +101,7 @@ export function ButtonsHandler(e) {
 
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
 export function OnClick_menuTray(e) {
@@ -126,7 +126,7 @@ export function OnClick_menuTray(e) {
 
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
 export function OnClick_toolbar(e) {

@@ -25,24 +25,24 @@ describe('unicode', () => {
 			)
 		).toBe('&lt;div class="se-test" data-test="test"&gt;&lt;span style="color: #fdfdfd; background-color: #ccc;"&gt;123&lt;/span&gt;abc&lt;/div&gt;');
 	});
-	it('fontSize', () => {
+	it('toFontUnit', () => {
 		// px
-		expect(converter.fontSize('em', '14px')).toBe('0.88em');
-		expect(converter.fontSize('%', '14px')).toBe('88%');
-		expect(converter.fontSize('pt', '14px')).toBe('10pt');
+		expect(converter.toFontUnit('em', '14px')).toBe('0.88em');
+		expect(converter.toFontUnit('%', '14px')).toBe('88%');
+		expect(converter.toFontUnit('pt', '14px')).toBe('10pt');
 		// em
-		expect(converter.fontSize('px', '1em')).toBe('16px');
-		expect(converter.fontSize('rem', '1em')).toBe('1.00rem');
-		expect(converter.fontSize('%', '1em')).toBe('100%');
-		expect(converter.fontSize('pt', '1em')).toBe('12pt');
+		expect(converter.toFontUnit('px', '1em')).toBe('16px');
+		expect(converter.toFontUnit('rem', '1em')).toBe('1.00rem');
+		expect(converter.toFontUnit('%', '1em')).toBe('100%');
+		expect(converter.toFontUnit('pt', '1em')).toBe('12pt');
 		// pt
-		expect(converter.fontSize('px', '8pt')).toBe('11px');
-		expect(converter.fontSize('em', '8pt')).toBe('0.69em');
-		expect(converter.fontSize('%', '8pt')).toBe('69%');
+		expect(converter.toFontUnit('px', '8pt')).toBe('11px');
+		expect(converter.toFontUnit('em', '8pt')).toBe('0.69em');
+		expect(converter.toFontUnit('%', '8pt')).toBe('69%');
 		// %
-		expect(converter.fontSize('px', '150%')).toBe('1.5px');
-		expect(converter.fontSize('em', '150%')).toBe('0.09em');
-		expect(converter.fontSize('pt', '150%')).toBe('1pt');
+		expect(converter.toFontUnit('px', '150%')).toBe('1.5px');
+		expect(converter.toFontUnit('em', '150%')).toBe('0.09em');
+		expect(converter.toFontUnit('pt', '150%')).toBe('1pt');
 	});
 	it('nodeListToArray', () => {
 		const temp = document.createElement('div');

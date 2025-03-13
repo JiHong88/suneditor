@@ -2,12 +2,12 @@ import { dom } from '../../../helper';
 import { _DragHandle } from '../../../modules';
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
+ * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_ww_dragDrop
  */
 
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {__se__FrameContext} fc - Frame context object
  * @param {HTMLElement} dragCursor - Drag cursor element
  * @param {?HTMLElement} _iframeTopArea - Iframe top area element
@@ -51,7 +51,7 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {HTMLElement} dragCursor - Drag cursor element
  */
 export function OnDragEnd_wysiwyg(dragCursor) {
@@ -60,7 +60,7 @@ export function OnDragEnd_wysiwyg(dragCursor) {
 
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {__se__FrameContext} fc - Frame context object
  * @param {HTMLElement} dragCursor - Drag cursor element
  * @param {DragEvent} e - Event object

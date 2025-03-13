@@ -4,11 +4,11 @@ import { dom, numbers, env, keyCodeMap } from '../../helper';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../events').ProcessInfo} ProcessInfo
+ * @typedef {import('../../events').ProcessInfo} ProcessInfo_embed
  */
 
 /**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls
+ * @typedef {import('../../modules/Figure').FigureControls} FigureControls_embed
  */
 
 /**
@@ -45,7 +45,7 @@ const { NO_EVENT } = env;
  *   },
  *   // Additional services...
  * }
- * @property {FigureControls} [controls] - Figure controls.
+ * @property {FigureControls_embed} [controls] - Figure controls.
  */
 
 /**
@@ -511,7 +511,7 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
-	 * @param {?ProcessInfo} process - Processed embed information.
+	 * @param {?ProcessInfo_embed} process - Processed embed information.
 	 * @param {?string} src - The source URL.
 	 * @param {?Node[]} children - The embed elements.
 	 * @param {string} width - The width of the embed component.
