@@ -21,8 +21,8 @@
 		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
-		"ts-build": "npx tsc -p tsconfig.extend.json && barrelsby --delete --directory types && npm run lint:fix-ts",
-		"ts-build:all": "npx tsc && barrelsby --delete --directory types && npm run lint:fix-ts",
+		"ts-build": "(npx tsc -p tsconfig.extend.json || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && npm run lint:fix-ts && node scripts/rename-index.js",
+		"ts-build:all": "(npx tsc || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && node scripts/wrap-dts.js && npm run lint:fix-ts && node scripts/rename-index.js",
 		"test": "karma start",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},

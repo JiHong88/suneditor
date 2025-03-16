@@ -1,5 +1,5 @@
 export default Audio_;
-export type AudioInfo = import('../../events').AudioInfo;
+export type AudioInfo_audio = import('../../events').AudioInfo;
 export type AudioPluginOptions = {
 	/**
 	 * - The default width of the audio tag (e.g., "300px").
@@ -51,7 +51,7 @@ export type AudioPluginOptions = {
 	};
 };
 /**
- * @typedef {import('../../events').AudioInfo} AudioInfo
+ * @typedef {import('../../events').AudioInfo} AudioInfo_audio
  */
 /**
  * @typedef {Object} AudioPluginOptions
@@ -201,7 +201,7 @@ declare class Audio_ extends EditorInjector {
 	 * @private
 	 * @description Registers uploaded audio files and creates the corresponding audio elements.
 	 * - Iterates through the uploaded files and inserts them into the editor.
-	 * @param {AudioInfo} info - Upload metadata, including `isUpdate` flag and `element`.
+	 * @param {AudioInfo_audio} info - Upload metadata, including `isUpdate` flag and `element`.
 	 * @param {Object<string, *>} response - Server response containing uploaded file details.
 	 */
 	private _register;
@@ -246,7 +246,7 @@ declare class Audio_ extends EditorInjector {
 	 * @private
 	 * @description Uploads audio files to the server.
 	 * - Sends a request to the configured upload URL and processes the response.
-	 * @param {AudioInfo} info - Upload metadata, including `files` and `isUpdate`.
+	 * @param {AudioInfo_audio} info - Upload metadata, including `files` and `isUpdate`.
 	 * @param {FileList|File[]} files - The files to be uploaded.
 	 */
 	private _serverUpload;

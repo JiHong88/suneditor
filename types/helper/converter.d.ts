@@ -31,7 +31,7 @@ export function syncMaps(targetMap: Map<any, any>, referenceMap: Map<any, any>):
  * @param {string} size siSize to convert with units (ex: "15rem")
  * @returns {string}
  */
-export function fontSize(to: 'em' | 'rem' | '%' | 'pt' | 'px', size: string): string;
+export function toFontUnit(to: 'em' | 'rem' | '%' | 'pt' | 'px', size: string): string;
 /**
  * @description Convert the node list to an array. If not, returns an empty array.
  * @param {?__se__NodeCollection} nodeList
@@ -133,7 +133,7 @@ declare namespace converter {
 	export { entityToHTML };
 	export { debounce };
 	export { syncMaps };
-	export { fontSize };
+	export { toFontUnit };
 	export { nodeListToArray };
 	export { swapKeyValue };
 	export { createElementWhitelist };

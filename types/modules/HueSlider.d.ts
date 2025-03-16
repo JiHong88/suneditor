@@ -1,5 +1,5 @@
 export default HueSlider;
-export type ControllerParams = import('../modules/Controller').ControllerParams;
+export type ControllerParams_hueSlider = import('../modules/Controller').ControllerParams;
 export type HueSliderColor = {
 	/**
 	 * - HEX color
@@ -42,10 +42,10 @@ export type HueSliderParams = {
 	/**
 	 * Controller options
 	 */
-	controllerOptions?: ControllerParams;
+	controllerOptions?: ControllerParams_hueSlider;
 };
 /**
- * @typedef {import('../modules/Controller').ControllerParams} ControllerParams
+ * @typedef {import('../modules/Controller').ControllerParams} ControllerParams_hueSlider
  */
 /**
  * @typedef {Object} HueSliderColor
@@ -61,7 +61,7 @@ export type HueSliderParams = {
  * @typedef {Object} HueSliderParams
  * @property {Node} [form] The form element to attach the hue slider.
  * @property {boolean} [isNewForm] Whether to create a new form element.
- * @property {ControllerParams} [controllerOptions] Controller options
+ * @property {ControllerParams_hueSlider} [controllerOptions] Controller options
  */
 /**
  * @class

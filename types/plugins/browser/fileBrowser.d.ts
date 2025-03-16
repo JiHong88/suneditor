@@ -1,7 +1,7 @@
 export default FileBrowser;
-export type BrowserFile = import('../../modules/Browser').BrowserFile;
+export type BrowserFile_fileBrowser = import('../../modules/Browser').BrowserFile;
 /**
- * @typedef {import('../../modules/Browser').BrowserFile} BrowserFile
+ * @typedef {import('../../modules/Browser').BrowserFile} BrowserFile_fileBrowser
  */
 /**
  * @class
@@ -19,7 +19,7 @@ declare class FileBrowser extends EditorInjector {
 	 * @param {Object<string, *>|Array<*>=} pluginOptions.data - direct data without server calls
 	 * @param {string} pluginOptions.url - server request url
 	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
-	 * @param {string|((item: BrowserFile) => string)} pluginOptions.thumbnail - default thumbnail
+	 * @param {string|((item: BrowserFile_fileBrowser) => string)} pluginOptions.thumbnail - default thumbnail
 	 * @param {Array<string>} pluginOptions.props - additional tag names
 	 */
 	constructor(
@@ -39,7 +39,7 @@ declare class FileBrowser extends EditorInjector {
 						[x: string]: string;
 				  }
 				| undefined;
-			thumbnail: string | ((item: BrowserFile) => string);
+			thumbnail: string | ((item: BrowserFile_fileBrowser) => string);
 			props: Array<string>;
 		}
 	);

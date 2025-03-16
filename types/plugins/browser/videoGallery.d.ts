@@ -1,7 +1,7 @@
 export default VideoGallery;
-export type BrowserFile = import('../../modules/Browser').BrowserFile;
+export type BrowserFile_videoGallery = import('../../modules/Browser').BrowserFile;
 /**
- * @typedef {import('../../modules/Browser').BrowserFile} BrowserFile
+ * @typedef {import('../../modules/Browser').BrowserFile} BrowserFile_videoGallery
  */
 /**
  * @class
@@ -19,7 +19,7 @@ declare class VideoGallery extends EditorInjector {
 	 * @param {Array<*>=} pluginOptions.data - direct data without server calls
 	 * @param {string=} pluginOptions.url - server request url
 	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
-	 * @param {string|((item: BrowserFile) => string)} pluginOptions.thumbnail - default thumbnail
+	 * @param {string|((item: BrowserFile_videoGallery) => string)} pluginOptions.thumbnail - default thumbnail
 	 */
 	constructor(
 		editor: __se__EditorCore,
@@ -31,7 +31,7 @@ declare class VideoGallery extends EditorInjector {
 						[x: string]: string;
 				  }
 				| undefined;
-			thumbnail: string | ((item: BrowserFile) => string);
+			thumbnail: string | ((item: BrowserFile_videoGallery) => string);
 		}
 	);
 	title: any;

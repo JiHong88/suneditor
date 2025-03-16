@@ -1,5 +1,5 @@
 export default Video;
-export type ModalReturns = {
+export type ModalReturns_video = {
 	html: HTMLElement;
 	alignForm: HTMLElement;
 	fileModalWrapper: HTMLElement;
@@ -14,8 +14,8 @@ export type ModalReturns = {
 	revertBtn: HTMLButtonElement;
 	fileRemoveBtn: HTMLButtonElement;
 };
-export type VideoInfo = import('../../events').VideoInfo;
-export type FigureControls = import('../../modules/Figure').FigureControls;
+export type VideoInfo_video = import('../../events').VideoInfo;
+export type FigureControls_video = import('../../modules/Figure').FigureControls;
 export type VideoPluginOptions = {
 	/**
 	 * - Whether the video element can be resized.
@@ -124,13 +124,13 @@ export type VideoPluginOptions = {
 	/**
 	 * - Figure controls.
 	 */
-	controls?: FigureControls;
+	controls?: FigureControls_video;
 };
 /**
- * @typedef {import('../../events').VideoInfo} VideoInfo
+ * @typedef {import('../../events').VideoInfo} VideoInfo_video
  */
 /**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls
+ * @typedef {import('../../modules/Figure').FigureControls} FigureControls_video
  */
 /**
  * @typedef {Object} VideoPluginOptions
@@ -157,7 +157,7 @@ export type VideoPluginOptions = {
  * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
- * @property {FigureControls} [controls] - Figure controls.
+ * @property {FigureControls_video} [controls] - Figure controls.
  */
 /**
  * @class
@@ -440,14 +440,14 @@ declare class Video extends EditorInjector {
 	/**
 	 * @private
 	 * @description Registers the uploaded video in the editor.
-	 * @param {VideoInfo} info - Video information object.
+	 * @param {VideoInfo_video} info - Video information object.
 	 * @param {Object<string, *>} response - Server response containing video data.
 	 */
 	private _register;
 	/**
 	 * @private
 	 * @description Uploads a video to the server using an external upload handler.
-	 * @param {VideoInfo} info - Video information object.
+	 * @param {VideoInfo_video} info - Video information object.
 	 * @param {FileList} files - The video files to upload.
 	 */
 	private _serverUpload;

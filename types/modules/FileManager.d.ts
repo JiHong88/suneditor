@@ -95,7 +95,7 @@ declare class FileManager extends CoreInjector {
 	 * @param {FileManagerParams} params FileManager options
 	 */
 	constructor(inst: any, params: FileManagerParams);
-	ui: import('../core/class/ui').default;
+	ui: import('../../types/core/class/ui').default;
 	kind: any;
 	inst: any;
 	component: any;

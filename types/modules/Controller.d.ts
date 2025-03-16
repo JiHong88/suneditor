@@ -102,7 +102,7 @@ declare class Controller extends EditorInjector {
 	form: HTMLFormElement;
 	isOpen: boolean;
 	currentTarget: Node;
-	currentPositionTarget: Range | Node;
+	currentPositionTarget: Node | Range;
 	isWWTarget: boolean;
 	position: 'top' | 'bottom';
 	disabled: boolean;

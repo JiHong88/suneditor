@@ -1,19 +1,19 @@
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
+ * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_toolbar
  */
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
 export function ButtonsHandler(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, e: MouseEvent): void;
 export class ButtonsHandler {
 	/**
-	 * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
+	 * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_toolbar
 	 */
 	/**
 	 * @private
-	 * @this {EventManagerThis}
+	 * @this {EventManagerThis_handler_toolbar}
 	 * @param {MouseEvent} e - Event object
 	 */
 	private constructor();
@@ -28,14 +28,14 @@ export class ButtonsHandler {
 }
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
 export function OnClick_menuTray(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, e: MouseEvent): void;
 /**
  * @private
- * @this {EventManagerThis}
+ * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
 export function OnClick_toolbar(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, e: MouseEvent): void;
-export type EventManagerThis = Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>;
+export type EventManagerThis_handler_toolbar = Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>;

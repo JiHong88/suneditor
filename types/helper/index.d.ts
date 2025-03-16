@@ -35,7 +35,7 @@ export const converter: {
 	entityToHTML: typeof import('./converter').entityToHTML;
 	debounce: typeof import('./converter').debounce;
 	syncMaps: typeof import('./converter').syncMaps;
-	fontSize: typeof import('./converter').fontSize;
+	toFontUnit: typeof import('./converter').toFontUnit;
 	nodeListToArray: typeof import('./converter').nodeListToArray;
 	swapKeyValue: typeof import('./converter').swapKeyValue;
 	createElementWhitelist: typeof import('./converter').createElementWhitelist;

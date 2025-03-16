@@ -1,6 +1,6 @@
 export default Embed;
-export type ProcessInfo = import('../../events').ProcessInfo;
-export type FigureControls = import('../../modules/Figure').FigureControls;
+export type ProcessInfo_embed = import('../../events').ProcessInfo;
+export type FigureControls_embed = import('../../modules/Figure').FigureControls;
 export type EmbedPluginOptions = {
 	/**
 	 * - Whether the embed element can be resized.
@@ -89,13 +89,13 @@ export type EmbedPluginOptions = {
 	/**
 	 * - Figure controls.
 	 */
-	controls?: FigureControls;
+	controls?: FigureControls_embed;
 };
 /**
- * @typedef {import('../../events').ProcessInfo} ProcessInfo
+ * @typedef {import('../../events').ProcessInfo} ProcessInfo_embed
  */
 /**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls
+ * @typedef {import('../../modules/Figure').FigureControls} FigureControls_embed
  */
 /**
  * @typedef {Object} EmbedPluginOptions
@@ -131,7 +131,7 @@ export type EmbedPluginOptions = {
  *   },
  *   // Additional services...
  * }
- * @property {FigureControls} [controls] - Figure controls.
+ * @property {FigureControls_embed} [controls] - Figure controls.
  */
 /**
  * @class
@@ -341,7 +341,7 @@ declare class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
-	 * @param {?ProcessInfo} process - Processed embed information.
+	 * @param {?ProcessInfo_embed} process - Processed embed information.
 	 * @param {?string} src - The source URL.
 	 * @param {?Node[]} children - The embed elements.
 	 * @param {string} width - The width of the embed component.

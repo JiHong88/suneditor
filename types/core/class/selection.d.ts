@@ -1,11 +1,11 @@
 export default Selection_;
 export type SelectionThis = Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>;
-export type RectsInfo = import('./offset').RectsInfo;
+export type RectsInfo_selection = import('./offset').RectsInfo;
 /**
  * @typedef {Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>} SelectionThis
  */
 /**
- * @typedef {import('./offset').RectsInfo} RectsInfo
+ * @typedef {import('./offset').RectsInfo} RectsInfo_selection
  */
 /**
  * @constructor
@@ -19,7 +19,7 @@ declare class Selection_ {
 	 * @typedef {Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>} SelectionThis
 	 */
 	/**
-	 * @typedef {import('./offset').RectsInfo} RectsInfo
+	 * @typedef {import('./offset').RectsInfo} RectsInfo_selection
 	 */
 	/**
 	 * @constructor
@@ -101,14 +101,14 @@ declare class Selection_ {
 	 * @description Get the Rects object.
 	 * @param {?Range|Node} target Range | Node | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
-	 * @returns {{rects: RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
+	 * @returns {{rects: RectsInfo_selection, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 */
 	getRects(
 		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
 		target: (Range | Node) | null,
 		position: 'start' | 'end'
 	): {
-		rects: RectsInfo;
+		rects: RectsInfo_selection;
 		position: 'start' | 'end';
 		scrollLeft: number;
 		scrollTop: number;

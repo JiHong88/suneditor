@@ -2,27 +2,27 @@ declare namespace _default {
 	/**
 	 * Returns the create function with preset options.
 	 * If the options overlap, the options of the 'create' function take precedence.
-	 * @param {EditorInitOptions} init_options - Initialization options
-	 * @returns {{create: (targets: Element|Object<string, {target: Element, options: EditorFrameOptions}>, options: EditorInitOptions) => Editor}}}
+	 * @param {EditorInitOptions_suneditor} init_options - Initialization options
+	 * @returns {{create: (targets: Element|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>, options: EditorInitOptions_suneditor) => Editor}}}
 	 */
-	function init(init_options: EditorInitOptions): {
+	function init(init_options: EditorInitOptions_suneditor): {
 		create: (
 			targets:
 				| Element
 				| {
 						[x: string]: {
 							target: Element;
-							options: EditorFrameOptions;
+							options: EditorFrameOptions_suneditor;
 						};
 				  },
-			options: EditorInitOptions
+			options: EditorInitOptions_suneditor
 		) => Editor;
 	};
 	/**
 	 * Creates a new instance of the SunEditor
-	 * @param {Element|Object<string, {target: Element, options: EditorFrameOptions}>} target - Target element or multi-root object
-	 * @param {EditorInitOptions} options - Initialization options
-	 * @param {EditorInitOptions} [_init_options] - Optional preset initialization options
+	 * @param {Element|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>} target - Target element or multi-root object
+	 * @param {EditorInitOptions_suneditor} options - Initialization options
+	 * @param {EditorInitOptions_suneditor} [_init_options] - Optional preset initialization options
 	 * @returns {Editor} - Instance of the SunEditor
 	 * @throws {Error} If the target element is not provided or is invalid
 	 */
@@ -32,16 +32,16 @@ declare namespace _default {
 			| {
 					[x: string]: {
 						target: Element;
-						options: EditorFrameOptions;
+						options: EditorFrameOptions_suneditor;
 					};
 			  },
-		options: EditorInitOptions,
-		_init_options?: EditorInitOptions
+		options: EditorInitOptions_suneditor,
+		_init_options?: EditorInitOptions_suneditor
 	): Editor;
 }
 export default _default;
-export type EditorFrameOptions = import('./core/section/constructor').EditorFrameOptions;
-export type EditorInitOptions = import('./core/section/constructor').EditorInitOptions;
+export type EditorFrameOptions_suneditor = import('./core/section/constructor').EditorFrameOptions;
+export type EditorInitOptions_suneditor = import('./core/section/constructor').EditorInitOptions;
 import EditorInjector from './editorInjector';
 import Plugins from './plugins';
 import Modules from './modules';

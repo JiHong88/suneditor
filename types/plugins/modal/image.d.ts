@@ -1,5 +1,5 @@
 export default Image_;
-export type ModalReturns = {
+export type ModalReturns_image = {
 	html: HTMLElement;
 	alignForm: HTMLElement;
 	fileModalWrapper: HTMLElement;
@@ -18,8 +18,8 @@ export type ModalReturns = {
 	asInline: HTMLButtonElement;
 	fileRemoveBtn: HTMLButtonElement;
 };
-export type ImageInfo = import('../../events').ImageInfo;
-export type FigureControls = import('../../modules/Figure').FigureControls;
+export type ImageInfo_image = import('../../events').ImageInfo;
+export type FigureControls_image = import('../../modules/Figure').FigureControls;
 export type ImagePluginOptions = {
 	/**
 	 * - Whether the image element can be resized.
@@ -94,13 +94,13 @@ export type ImagePluginOptions = {
 	/**
 	 * - Figure controls.
 	 */
-	controls?: FigureControls;
+	controls?: FigureControls_image;
 };
 /**
- * @typedef {import('../../events').ImageInfo} ImageInfo
+ * @typedef {import('../../events').ImageInfo} ImageInfo_image
  */
 /**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls
+ * @typedef {import('../../modules/Figure').FigureControls} FigureControls_image
  */
 /**
  * @typedef {Object} ImagePluginOptions
@@ -121,7 +121,7 @@ export type ImagePluginOptions = {
  * @property {string} [defaultFormatType="block"] - The default image format type ("block" or "inline").
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
- * @property {FigureControls} [controls] - Figure controls.
+ * @property {FigureControls_image} [controls] - Figure controls.
  */
 /**
  * @class
@@ -389,14 +389,14 @@ declare class Image_ extends EditorInjector {
 	/**
 	 * @private
 	 * @description Registers the uploaded image and inserts it into the editor.
-	 * @param {ImageInfo} info - Image info.
+	 * @param {ImageInfo_image} info - Image info.
 	 * @param {Object<string, *>} response - Server response data.
 	 */
 	private _register;
 	/**
 	 * @private
 	 * @description Uploads the image to the server.
-	 * @param {ImageInfo} info - Image upload info.
+	 * @param {ImageInfo_image} info - Image upload info.
 	 * @param {FileList} files - List of image files.
 	 */
 	private _serverUpload;

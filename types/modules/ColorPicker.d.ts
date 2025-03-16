@@ -1,6 +1,6 @@
 export default ColorPicker;
-export type HueSliderParams = import('./HueSlider').HueSliderParams;
-export type HueSliderColor = import('./HueSlider').HueSliderColor;
+export type HueSliderParams_colorPicker = import('./HueSlider').HueSliderParams;
+export type HueSliderColor_colorPicker = import('./HueSlider').HueSliderColor;
 export type ColorPickerParams = {
 	/**
 	 * color list
@@ -33,13 +33,13 @@ export type ColorPickerParams = {
 	/**
 	 * hue slider options
 	 */
-	hueSliderOptions?: HueSliderParams | undefined;
+	hueSliderOptions?: HueSliderParams_colorPicker | undefined;
 };
 /**
- * @typedef {import('./HueSlider').HueSliderParams} HueSliderParams
+ * @typedef {import('./HueSlider').HueSliderParams} HueSliderParams_colorPicker
  */
 /**
- * @typedef {import('./HueSlider').HueSliderColor} HueSliderColor
+ * @typedef {import('./HueSlider').HueSliderColor} HueSliderColor_colorPicker
  */
 /**
  * @typedef {Object} ColorPickerParams
@@ -48,7 +48,7 @@ export type ColorPickerParams = {
  * @property {string=} [defaultColor] Default color
  * @property {boolean=} [disableHEXInput=false] Disable HEX input
  * @property {boolean=} [disableRemove=false] Disable remove button
- * @property {HueSliderParams=} [hueSliderOptions] hue slider options
+ * @property {HueSliderParams_colorPicker=} [hueSliderOptions] hue slider options
  */
 /**
  * @class
@@ -117,9 +117,9 @@ declare class ColorPicker extends CoreInjector {
 	/**
 	 * @editorMethod Modules.HueSlider
 	 * @description This method is called when the color is selected in the hue slider.
-	 * @param {HueSliderColor} color - Color object
+	 * @param {HueSliderColor_colorPicker} color - Color object
 	 */
-	hueSliderAction(color: HueSliderColor): void;
+	hueSliderAction(color: HueSliderColor_colorPicker): void;
 	/**
 	 * @editorMethod Modules.HueSlider
 	 * @description This method is called when the hue slider is closed.
