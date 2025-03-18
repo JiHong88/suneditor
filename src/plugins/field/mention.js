@@ -133,6 +133,7 @@ class Mention extends EditorInjector {
 	 * @returns {Promise<boolean>} - Returns `true` if the mention list is displayed, `false` otherwise.
 	 */
 	async _createMentionList(value, targetNode) {
+		const limit = this.limitSize;
 		let response = null;
 		if (this.cachingData) {
 			response = this.cachingData.get(value);
@@ -140,7 +141,6 @@ class Mention extends EditorInjector {
 
 		if (!response) {
 			if (this.directData) {
-				const limit = this.limitSize;
 				this.directData.filter((item) => item.key.toLowerCase().startsWith(value.toLowerCase())).slice(0, limit);
 				response = this.directData;
 			} else {
@@ -150,7 +150,12 @@ class Mention extends EditorInjector {
 		}
 
 		if (this.cachingFieldData) {
-			response = this.cachingFieldData.get('').concat(response).splice(0, this.limitSize);
+			response = this.cachingFieldData
+				.get('')
+				.filter((item) => item.key.toLowerCase().startsWith(value.toLowerCase()))
+				.slice(0, limit)
+				.concat(response)
+				.splice(0, this.limitSize);
 		}
 
 		if (!response?.length) {

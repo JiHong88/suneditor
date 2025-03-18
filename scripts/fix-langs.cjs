@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { glob } from 'glob';
+const fs = require('fs');
+const path = require('path');
+const { glob } = require('glob');
 
 const filesPath = 'types/langs/*.d.ts';
 const ignorePath = ['types/langs/_Lang.d.ts', 'types/langs/index.d.ts'];

@@ -1865,6 +1865,7 @@ class Table extends EditorInjector {
 	 */
 	_toggleEditor(enabled) {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');
+		wysiwyg.setAttribute('contenteditable', enabled.toString());
 		if (enabled) dom.utils.removeClass(wysiwyg, 'se-disabled');
 		else dom.utils.addClass(wysiwyg, 'se-disabled');
 	}

@@ -1,5 +1,5 @@
-import fs from 'fs';
-import { glob } from 'glob';
+const fs = require('fs');
+const { glob } = require('glob');
 
 const filePath = ['types/core/class/*.d.ts', 'types/core/base/eventManager.d.ts'];
 

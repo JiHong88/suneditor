@@ -6,7 +6,6 @@
 	"license": "MIT",
 	"main": "src/suneditor.js",
 	"types": "types/index.d.ts",
-	"type": "module",
 	"sideEffects": [
 		"./src/assets/css/*.css"
 	],
@@ -22,7 +21,7 @@
 		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
-		"ts-build": "(npx tsc || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && node scripts/fix-langs.js && node scripts/wrap-dts.js && node scripts/rename-index.js && node scripts/remove-this-params.js && npm run lint:fix-ts",
+		"ts-build": "(npx tsc || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && npm run lint:fix-ts",
 		"test": "karma start",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},
