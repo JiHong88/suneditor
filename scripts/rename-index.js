@@ -23,3 +23,5 @@ fs.copyFile(sourcePath, targetPath, (copyErr) => {
 		}
 	});
 });
+// eslint-disable-next-line no-console
+console.log('[rename-index]');

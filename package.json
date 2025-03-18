@@ -6,6 +6,7 @@
 	"license": "MIT",
 	"main": "src/suneditor.js",
 	"types": "types/index.d.ts",
+	"type": "module",
 	"sideEffects": [
 		"./src/assets/css/*.css"
 	],
@@ -21,8 +22,7 @@
 		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
-		"ts-build": "(npx tsc -p tsconfig.extend.json || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && npm run lint:fix-ts && node scripts/rename-index.js",
-		"ts-build:all": "(npx tsc || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && node scripts/wrap-dts.js && npm run lint:fix-ts && node scripts/rename-index.js",
+		"ts-build": "(npx tsc || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && node scripts/fix-langs.js && node scripts/wrap-dts.js && node scripts/rename-index.js && node scripts/remove-this-params.js && npm run lint:fix-ts",
 		"test": "karma start",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},
@@ -59,6 +59,7 @@
 		"eslint-plugin-compat": "^4.2.0",
 		"eslint-plugin-prettier": "^4.2.1",
 		"file-loader": "^6.2.0",
+		"glob": "^11.0.1",
 		"html-webpack-plugin": "^5.5.1",
 		"jasmine": "^5.0.0",
 		"jsdoc": "^4.0.4",

@@ -15,3 +15,5 @@ const wrappedContent = `export {};\n\ndeclare global {\n${content}\n}\n`;
 
 // file write
 fs.writeFileSync(dtsFilePath, wrappedContent, 'utf8');
+// eslint-disable-next-line no-console
+console.log('[wrap-dts]');
