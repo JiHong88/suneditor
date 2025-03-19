@@ -51,7 +51,7 @@ class Mention extends EditorInjector {
 		// members - api, caching
 		this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
 		this.cachingData = pluginOptions.useCachingData ?? true ? new Map() : null;
-		this.cachingFieldData = pluginOptions.useCachingFieldData ?? true ? new Map([['', []]]) : null;
+		this.cachingFieldData = pluginOptions.useCachingFieldData ?? true ? [] : null;
 
 		// controller
 		const controllerEl = CreateHTML_controller();
@@ -134,6 +134,7 @@ class Mention extends EditorInjector {
 	 */
 	async _createMentionList(value, targetNode) {
 		const limit = this.limitSize;
+		const lowerValue = value.toLowerCase();
 		let response = null;
 		if (this.cachingData) {
 			response = this.cachingData.get(value);
@@ -141,8 +142,7 @@ class Mention extends EditorInjector {
 
 		if (!response) {
 			if (this.directData) {
-				this.directData.filter((item) => item.key.toLowerCase().startsWith(value.toLowerCase())).slice(0, limit);
-				response = this.directData;
+				response = this.directData.filter((item) => item.key.toLowerCase().startsWith(lowerValue)).slice(0, limit);
 			} else {
 				const xmlHttp = await this.apiManager.asyncCall({ method: 'GET', url: this._createUrl(value) });
 				response = JSON.parse(xmlHttp.responseText);
@@ -150,12 +150,15 @@ class Mention extends EditorInjector {
 		}
 
 		if (this.cachingFieldData) {
+			const uniqueKeys = new Set();
 			response = this.cachingFieldData
-				.get('')
-				.filter((item) => item.key.toLowerCase().startsWith(value.toLowerCase()))
-				.slice(0, limit)
 				.concat(response)
-				.splice(0, this.limitSize);
+				.filter(({ key }) => {
+					if (uniqueKeys.has(key)) return false;
+					uniqueKeys.add(key);
+					return key.toLowerCase().startsWith(lowerValue);
+				})
+				.slice(0, limit);
 		}
 
 		if (!response?.length) {
@@ -226,8 +229,8 @@ class Mention extends EditorInjector {
 		oA.parentNode.insertBefore(space, oA.nextSibling);
 		this.selection.setRange(space, 1, space, 1);
 
-		if (this.cachingFieldData) {
-			this.cachingFieldData.get('').push(item);
+		if (this.cachingFieldData && !this.cachingFieldData.some((data) => data.key === item.key)) {
+			this.cachingFieldData.push(item);
 		}
 	}
 }
