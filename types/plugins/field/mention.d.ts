@@ -67,7 +67,7 @@ declare class Mention extends EditorInjector {
 	_anchorNode: Node;
 	apiManager: ApiManager;
 	cachingData: Map<any, any>;
-	cachingFieldData: Map<string, any[]>;
+	cachingFieldData: any[];
 	selectMenu: SelectMenu;
 	controller: Controller;
 	/**
