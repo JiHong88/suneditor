@@ -73,6 +73,20 @@ export function getXMLHttpRequest() {
 }
 
 /**
+ * @description Set the content to the clipboard
+ * @param {string} content Content to be copied to the clipboard
+ * @param {string} type MIME type (text/html, text/plain)
+ * @returns {Promise<void>}
+ */
+export async function setClipboard(content, type) {
+	await navigator.clipboard.write([
+		new ClipboardItem({
+			[type]: new Blob([content], { type })
+		})
+	]);
+}
+
+/**
  * @deprecated
  * @description Returns the CSS text that has been applied to the current page.
  * @param {Document|null} doc To get the CSS text of an document. If null get the current document.
@@ -252,6 +266,7 @@ const env = {
 	camelToKebabCase,
 	kebabToCamelCase,
 	getXMLHttpRequest,
+	setClipboard,
 	getPageStyle,
 	getIncludePath,
 	isResizeObserverSupported,
