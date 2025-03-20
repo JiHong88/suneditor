@@ -25,5 +25,5 @@
 		"outDir": "./types",
 		"noEmit": false
 	},
-	"include": ["./src/**/*.js", "./types/typedef.d.ts"]
+	"include": ["./src/**/*.js"]
 }

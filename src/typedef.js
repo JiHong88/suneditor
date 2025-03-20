@@ -21,6 +21,20 @@
  */
 
 /**
+ * @typedef {Object} __se__ComponentInfo
+ * @property {HTMLElement} target - The target element associated with the component.
+ * @property {string} pluginName - The name of the plugin related to the component.
+ * @property {Object<string, *>} options - Options related to the component.
+ * @property {HTMLElement} container - The main container element for the component.
+ * @property {?HTMLElement} cover - The cover element, if applicable.
+ * @property {?HTMLElement} inlineCover - The inline cover element, if applicable.
+ * @property {?HTMLElement} caption - The caption element, if applicable.
+ * @property {boolean} isFile - Whether the component is a file-related component.
+ * @property {?HTMLElement} launcher - The element that triggered the component, if applicable.
+ * @property {boolean} isInputType - Whether the component is an input component (e.g., table).
+ */
+
+/**
  * @typedef {Object} __se__EditorStatus
  * @property {boolean} hasFocus Boolean value of whether the editor has focus
  * @property {number} tabSize Indent size of tab (4)

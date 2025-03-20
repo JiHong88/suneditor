@@ -325,7 +325,7 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Component
+	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component of a plugin is selected.
 	 * @param {HTMLElement} target Target component element
 	 */
@@ -348,8 +348,24 @@ class Table extends EditorInjector {
 		const figureEl = dom.query.getParentElement(target, dom.check.isFigure);
 		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
 
+		if (!this._fixedCell) return;
+
 		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
 		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset, disabled: btnDisabled });
+	}
+
+	/**
+	 * @editorMethod Editor.component
+	 * @description Executes the method that is called when a component copy is requested.
+	 * @param {ClipboardEvent} event Clipboard event object
+	 * @param {__se__ComponentInfo} info Component information
+	 */
+	onCopyComponent(event, info) {
+		/** @type {NodeListOf<HTMLTableCellElement>} */
+		const selectedCells = info.container.querySelectorAll('.se-selected-table-cell');
+		if (selectedCells.length > 0) {
+			SetClipboardSelectedTableCells(event, info.container, selectedCells);
+		}
 	}
 
 	/**
@@ -494,9 +510,12 @@ class Table extends EditorInjector {
 
 				const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
 				this._startCellResizing(col, cellEdge.startX, numbers.get(_w.getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
+				this._toggleEditor(false);
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
 				this.__removeGlobalEvents();
+			} finally {
+				this._fixedCell = this._selectedCell = null;
 			}
 
 			return;
@@ -524,9 +543,12 @@ class Table extends EditorInjector {
 				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
 
 				this._startRowResizing(row, rowEdge.startY, numbers.get(_w.getComputedStyle(row).height, CELL_DECIMAL_END));
+				this._toggleEditor(false);
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
 				this.__removeGlobalEvents();
+			} finally {
+				this._fixedCell = this._selectedCell = null;
 			}
 
 			return;
@@ -2457,6 +2479,7 @@ class Table extends EditorInjector {
 	 * @description Removes global event listeners and resets resize-related properties.
 	 */
 	__removeGlobalEvents() {
+		this._toggleEditor(true);
 		this._resizing = false;
 		this.ui.disableBackWrapper();
 		this.__hideResizeLine();
@@ -3124,8 +3147,85 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
 }
 
 /**
- 
+ * @description Creates the table properties controller.
+ * @param {ClipboardEvent} e - Event object
+ * @param {HTMLElement} container - The container element
+ * @param {NodeListOf<HTMLTableCellElement>} selectedCells - The selected table cells
  */
+function SetClipboardSelectedTableCells(e, container, selectedCells) {
+	e.preventDefault();
+	e.stopPropagation();
+
+	const originalTable = selectedCells[0].closest('table');
+	const tempTable = originalTable.cloneNode(false);
+	const tbody = dom.utils.createElement('tbody');
+	tempTable.appendChild(tbody);
+
+	const cellPositions = new Map();
+	selectedCells.forEach((cell) => {
+		cellPositions.set(cell, true);
+	});
+
+	const rows = originalTable.rows;
+	const rowCount = rows.length;
+	const colCount = Array.from(rows[0].cells).reduce((sum, cell) => sum + (cell.colSpan || 1), 0);
+	const matrix = Array.from({ length: rowCount }, () => Array(colCount).fill(null));
+
+	// build matrix
+	for (let r = 0, realRow = 0; r < rowCount; r++, realRow++) {
+		const cells = rows[r].cells;
+		for (let c = 0, realCol = 0, cLen = cells.length; c < cLen; c++) {
+			while (matrix[realRow][realCol]) realCol++;
+			const cell = cells[c];
+			const rowspan = cell.rowSpan || 1;
+			const colspan = cell.colSpan || 1;
+			for (let i = 0; i < rowspan; i++) {
+				for (let j = 0; j < colspan; j++) {
+					matrix[realRow + i][realCol + j] = cell;
+				}
+			}
+			realCol += colspan;
+		}
+	}
+
+	// construct new table
+	for (let r = 0; r < rowCount; r++) {
+		let newRow;
+		for (let c = 0; c < colCount; c++) {
+			const cell = matrix[r][c];
+			if (!cell || !cellPositions.has(cell)) continue;
+
+			if (!newRow) {
+				newRow = dom.utils.createElement('tr');
+				tbody.appendChild(newRow);
+			}
+
+			if (newRow.lastChild && matrix[r][c - 1] === cell) continue;
+			if (r > 0 && matrix[r - 1][c] === cell) continue;
+
+			const clonedCell = cell.cloneNode(true);
+			dom.utils.removeClass(clonedCell, 'se-selected-table-cell');
+
+			// recalculate rowspan and colspan
+			let rowspan = 1;
+			let colspan = 1;
+			while (r + rowspan < rowCount && matrix[r + rowspan][c] === cell) rowspan++;
+			while (c + colspan < colCount && matrix[r][c + colspan] === cell) colspan++;
+
+			if (rowspan > 1) clonedCell.rowSpan = rowspan;
+			if (colspan > 1) clonedCell.colSpan = colspan;
+
+			newRow.appendChild(clonedCell);
+		}
+	}
+
+	const figure = dom.utils.createElement('figure');
+	figure.className = container.className;
+	figure.appendChild(tempTable);
+
+	const htmlContent = `<html><body><!--StartFragment-->${figure.outerHTML}<!--EndFragment--></body></html>`;
+	e.clipboardData.setData('text/html', htmlContent);
+}
 
 /**
  * @typedef {Object} TableCtrlProps

@@ -15,19 +15,6 @@ const DIR_UP_KEYCODE = /^3[7-8]$/;
  */
 
 /**
- * @typedef {Object} ComponentInfo
- * @property {HTMLElement} target - The target element associated with the component.
- * @property {string} pluginName - The name of the plugin related to the component.
- * @property {Object<string, *>} options - Options related to the component.
- * @property {HTMLElement} container - The main container element for the component.
- * @property {?HTMLElement} cover - The cover element, if applicable.
- * @property {?HTMLElement} inlineCover - The inline cover element, if applicable.
- * @property {?HTMLElement} caption - The caption element, if applicable.
- * @property {boolean} isFile - Whether the component is a file-related component.
- * @property {?HTMLElement} launcher - The element that triggered the component, if applicable.
- */
-
-/**
  * @constructor
  * @this {ComponentThis}
  * @description Class for managing components such as images and tables that are not in line format
@@ -38,7 +25,7 @@ function Component(editor) {
 
 	/**
 	 * @description The current component information, used copy, cut, and keydown events
-	 * @type {ComponentInfo}
+	 * @type {__se__ComponentInfo}
 	 */
 	this.info = null;
 
@@ -68,7 +55,7 @@ function Component(editor) {
 
 	/**
 	 * @description Currently selected component information
-	 * @type {ComponentInfo|null}
+	 * @type {__se__ComponentInfo|null}
 	 */
 	this.currentInfo = null;
 
@@ -172,7 +159,7 @@ Component.prototype = {
 	 * @description Gets the file component and that plugin name
 	 * - return: {target, component, pluginName} | null
 	 * @param {Node} element Target element (figure tag, component div, file tag)
-	 * @returns {ComponentInfo|null}
+	 * @returns {__se__ComponentInfo|null}
 	 */
 	get(element) {
 		if (!element) return null;
@@ -213,16 +200,18 @@ Component.prototype = {
 		}
 
 		const figureInfo = Figure.GetContainer(target);
+		const container = figureInfo.container || figureInfo.cover || target;
 		return (this.info = {
 			target,
 			pluginName,
 			options,
-			container: figureInfo.container || figureInfo.cover || target,
+			container: container,
 			cover: figureInfo.cover,
 			inlineCover: figureInfo.inlineCover,
 			caption: figureInfo.caption,
 			isFile,
-			launcher
+			launcher,
+			isInputType: dom.utils.hasClass(container, 'se-input-component')
 		});
 	},
 
@@ -651,7 +640,12 @@ function OnCopy_component(e) {
 	const info = this.info;
 	if (!info) return;
 
-	SetClipboardComponent(e, info.container, e.clipboardData);
+	if (typeof this.plugins[info.pluginName]?.onCopyComponent === 'function') {
+		this.plugins[info.pluginName].onCopyComponent(e, info);
+	} else {
+		SetClipboardComponent(e, info.container, e.clipboardData);
+	}
+
 	dom.utils.addClass(info.container, 'se-copy');
 	// copy effect
 	_w.setTimeout(() => {

@@ -673,6 +673,9 @@ EventManager.prototype = {
 	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
 	 */
 	async _setClipboardData(type, e, clipboardData, frameContext) {
+		e.preventDefault();
+		e.stopPropagation();
+
 		let plainText = clipboardData.getData('text/plain');
 		let cleanData = clipboardData.getData('text/html');
 		const onlyText = !cleanData;

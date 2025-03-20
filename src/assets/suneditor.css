@@ -2433,7 +2433,7 @@
 .sun-editor-editable[contenteditable='true'] .se-copy {
 	background-color: var(--se-main-border-color);
 	opacity: 0.3;
-	box-shadow: 0 0 0 0.5rem var(--se-active-dark5-color);
+	box-shadow: 0 0 0 0.25rem var(--se-active-dark5-color);
 	transition: box-shadow 0.15s ease-in-out;
 }
 
@@ -3407,7 +3407,7 @@
 .sun-editor-editable table th.se-selected-table-cell::after {
 	position: absolute;
 	content: '';
-	background-color: var(--se-active-dark3-color);
+	background-color: var(--se-active-light3-color);
 	opacity: 0.3;
 	width: 100%;
 	height: 100%;
