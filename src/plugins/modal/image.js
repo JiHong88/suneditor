@@ -88,10 +88,10 @@ class Image_ extends EditorInjector {
 		const ctrlAs = this.pluginOptions.useFormatType ? 'as' : '';
 		const figureControls =
 			pluginOptions.controls || !this.pluginOptions.canResize
-				? [[ctrlAs, 'mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
+				? [[ctrlAs, 'mirror_h', 'mirror_v', 'align', 'caption', 'edit', 'revert', 'copy', 'remove']]
 				: [
 						[ctrlAs, 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-						['edit', 'align', 'caption', 'revert', 'remove']
+						['align', 'caption', 'edit', 'revert', 'copy', 'remove']
 				  ];
 
 		// show align

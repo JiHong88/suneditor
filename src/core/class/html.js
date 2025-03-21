@@ -281,6 +281,20 @@ HTML.prototype = {
 			}
 		}
 
+		// iframe placeholder parsing
+		const iframePlaceholders = domParser.querySelectorAll('[data-se-iframe-holder]');
+		for (let i = 0, len = iframePlaceholders.length; i < len; i++) {
+			/** @type {HTMLIFrameElement} */
+			const iframe = dom.utils.createElement('iframe');
+
+			const attrs = JSON.parse(iframePlaceholders[i].getAttribute('data-se-iframe-holder-attrs'));
+			for (const [key, value] of Object.entries(attrs)) {
+				iframe.setAttribute(key, value);
+			}
+
+			iframePlaceholders[i].replaceWith(iframe);
+		}
+
 		if (this.options.get('__pluginRetainFilter')) {
 			this.editor._MELInfo.forEach((method, query) => {
 				const infoLst = domParser.querySelectorAll(query);

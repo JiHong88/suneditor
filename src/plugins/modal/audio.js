@@ -187,11 +187,19 @@ class Audio_ extends EditorInjector {
 	 * @param {HTMLButtonElement} target Target button element
 	 */
 	controllerAction(target) {
-		if (/update/.test(target.getAttribute('data-command'))) {
-			if (this.audioUrlFile) this.urlValue = this.preview.textContent = this.audioUrlFile.value = this._element.src;
-			this.open();
-		} else {
-			this.destroy();
+		switch (target.getAttribute('data-command')) {
+			case 'update':
+				if (this.audioUrlFile) this.urlValue = this.preview.textContent = this.audioUrlFile.value = this._element.src;
+				this.open();
+				break;
+			case 'copy': {
+				const figure = Figure.GetContainer(this._element);
+				this.component.copy(figure.container);
+				break;
+			}
+			case 'delete':
+				this.destroy();
+				break;
 		}
 	}
 
@@ -646,6 +654,12 @@ function CreateHTML_controller({ lang, icons }) {
                 ${icons.edit}
                 <span class="se-tooltip-inner">
                     <span class="se-tooltip-text">${lang.edit}</span>
+                </span>
+            </button>
+            <button type="button" data-command="copy" tabindex="-1" class="se-btn se-tooltip">
+                ${icons.copy}
+                <span class="se-tooltip-inner">
+                    <span class="se-tooltip-text">${lang.copy}</span>
                 </span>
             </button>
             <button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">

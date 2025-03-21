@@ -80,7 +80,7 @@ class FileUpload extends EditorInjector {
 			}
 		};
 
-		const figureControls = (pluginOptions.controls || [['custom-as', 'edit', 'align', 'remove', 'custom-download']]).map((subArray) => subArray.map((item) => (item.startsWith('custom-') ? customItems[item] : item)));
+		const figureControls = (pluginOptions.controls || [['custom-as', 'align', 'edit', 'custom-download', 'copy', 'remove']]).map((subArray) => subArray.map((item) => (item.startsWith('custom-') ? customItems[item] : item)));
 		this.figure = new Figure(this, figureControls, {});
 
 		// file manager

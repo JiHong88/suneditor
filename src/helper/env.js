@@ -1,3 +1,5 @@
+import { isElement } from './dom/domCheck';
+
 /** @type {Window} */
 export const _w = window;
 /** @type {Document} */
@@ -74,14 +76,39 @@ export function getXMLHttpRequest() {
 
 /**
  * @description Set the content to the clipboard
- * @param {string} content Content to be copied to the clipboard
- * @param {string} type MIME type (text/html, text/plain)
+ * - Iframe is replaced with a placeholder : <div data-se-iframe-holder-src="iframe.src">[iframe: iframe.src]</div>
+ * - "iframe placeholder" is re-rendered in html.clean when pasted into the editor.
+ * @param {Element|Text|string} content Content to be copied to the clipboard
+ * @param {"text/html"|"text/plain"} type MIME type (text/html, text/plain)
  * @returns {Promise<void>}
  */
 export async function setClipboard(content, type) {
+	let htmlString = '';
+
+	if (typeof content === 'string') {
+		htmlString = content;
+	} else if (isElement(content)) {
+		content.querySelectorAll('iframe').forEach((iframe) => {
+			const placeholder = document.createElement('div');
+			const iframeAttrs = {};
+			for (const attr of Array.from(iframe.attributes)) {
+				iframeAttrs[attr.name] = attr.value;
+			}
+
+			placeholder.setAttribute('data-se-iframe-holder', '1');
+			placeholder.setAttribute('data-se-iframe-holder-attrs', JSON.stringify(iframeAttrs));
+			placeholder.innerText = `[iframe: ${iframe.src}]`;
+
+			iframe.replaceWith(placeholder);
+		});
+		htmlString = content.outerHTML;
+	} else {
+		htmlString = content.textContent;
+	}
+
 	await navigator.clipboard.write([
 		new ClipboardItem({
-			[type]: new Blob([content], { type })
+			[type]: new Blob([htmlString], { type })
 		})
 	]);
 }

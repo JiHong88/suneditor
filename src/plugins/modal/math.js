@@ -257,7 +257,7 @@ class Math_ extends EditorInjector {
 			}
 		} else {
 			const containerEl = dom.query.getParentElement(this.controller.currentTarget, '.se-component');
-			containerEl.parentNode.replaceChild(mathEl, containerEl);
+			containerEl.replaceWith(mathEl);
 			const compInfo = this.component.get(mathEl);
 			this.component.select(compInfo.target, compInfo.pluginName, false);
 			return true;
@@ -368,7 +368,7 @@ class Math_ extends EditorInjector {
 
 		try {
 			const text = getValue(element);
-			await navigator.clipboard.writeText(text);
+			await env.setClipboard(text, 'text/plain');
 			dom.utils.addClass(element, 'se-copy');
 			// copy effect
 			_w.setTimeout(() => {

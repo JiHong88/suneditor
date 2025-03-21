@@ -101,7 +101,7 @@ class Video extends EditorInjector {
 		// create HTML
 		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-		const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'revert', 'edit', 'remove']] : [['resize_auto,75,50', 'edit', 'align', 'revert', 'remove']];
+		const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']];
 
 		// show align
 		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.alignForm.style.display = 'none';
@@ -550,12 +550,12 @@ class Video extends EditorInjector {
 				if (/^iframe$/i.test(processUrl?.tag) && !/^iframe$/i.test(oFrame.nodeName)) {
 					const newTag = this.createIframeTag();
 					newTag.src = src;
-					oFrame.parentNode.replaceChild(newTag, oFrame);
+					oFrame.replaceWith(newTag);
 					this._element = oFrame = newTag;
 				} else if (/^video$/i.test(processUrl?.tag) && !/^video$/i.test(oFrame.nodeName)) {
 					const newTag = this.createVideoTag();
 					newTag.src = src;
-					oFrame.parentNode.replaceChild(newTag, oFrame);
+					oFrame.replaceWith(newTag);
 					this._element = oFrame = newTag;
 				} else {
 					oFrame.src = src;
@@ -829,7 +829,7 @@ class Video extends EditorInjector {
 		this.figure.setAlign(cloneFrame, this._align);
 
 		if (dom.query.getParentElement(prevFrame, dom.check.isExcludeFormat)) {
-			prevFrame.parentNode.replaceChild(container, prevFrame);
+			prevFrame.replaceWith(container);
 		} else if (dom.check.isListCell(existElement)) {
 			const refer = dom.query.getParentElement(prevFrame, (current) => current.parentNode === existElement);
 			existElement.insertBefore(container, refer);
@@ -842,7 +842,7 @@ class Video extends EditorInjector {
 			dom.utils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(existElement, null, true);
 		} else {
-			/** @type {Element} */ (existElement).parentNode.replaceChild(container, existElement);
+			/** @type {Element} */ (existElement).replaceWith(container);
 		}
 
 		if (caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);

@@ -88,12 +88,19 @@
 
 /**
  * @typedef {Object} __se__PluginShortcutInfo Information of the "shortcut" plugin
- * @property {Range} params.range - Range object
- * @property {HTMLElement} params.line - The line element of the current range
- * @property {import('./core/class/shortcuts').ShortcutInfo} params.info - Information of the shortcut
- * @property {KeyboardEvent} params.event - Key event object
- * @property {string} params.keyCode - KeyBoardEvent.code
- * @property {__se__EditorCore} params.editor - The root editor instance
+ * @property {Range} range - Range object
+ * @property {HTMLElement} line - The line element of the current range
+ * @property {import('./core/class/shortcuts').ShortcutInfo} info - Information of the shortcut
+ * @property {KeyboardEvent} event - Key event object
+ * @property {string} keyCode - KeyBoardEvent.code
+ * @property {__se__EditorCore} editor - The root editor instance
+ */
+
+/**
+ * @typedef {Object} __se__PluginCopyComponentParams
+ * @param {ClipboardEvent} event Clipboard event object
+ * @param {HTMLElement} cloneContainer Cloned component container
+ * @param {__se__ComponentInfo} info Component information
  */
 
 // --------------------------------------------------------- [Context] ---------------------------------------------------------------------------------------------------

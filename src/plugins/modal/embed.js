@@ -103,7 +103,7 @@ class Embed extends EditorInjector {
 		// create HTML
 		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-		const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'revert', 'edit', 'remove']] : [['resize_auto,75,50', 'edit', 'align', 'revert', 'remove']];
+		const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']];
 
 		// show align
 		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.figureAlignBtn.style.display = 'none';
@@ -533,12 +533,12 @@ class Embed extends EditorInjector {
 				if (/^iframe$/i.test(processUrl?.tag) && !/^iframe$/i.test(oFrame.nodeName)) {
 					const newTag = this._createIframeTag();
 					newTag.src = src;
-					oFrame.parentNode.replaceChild(newTag, oFrame);
+					oFrame.replaceWith(newTag);
 					oFrame = newTag;
 				} else if (/^blockquote$/i.test(processUrl?.tag) && !/^blockquote$/i.test(oFrame.nodeName)) {
 					const newTag = this._createEmbedTag();
 					newTag.setAttribute('src', src);
-					oFrame.parentNode.replaceChild(newTag, oFrame);
+					oFrame.replaceWith(newTag);
 					oFrame = newTag;
 				} else {
 					oFrame.src = src;
@@ -668,7 +668,7 @@ class Embed extends EditorInjector {
 		this.figure.setAlign(oFrame, this._align);
 
 		if (dom.query.getParentElement(prevFrame, dom.check.isExcludeFormat)) {
-			prevFrame.parentNode.replaceChild(container, prevFrame);
+			prevFrame.replaceWith(container);
 		} else if (dom.check.isListCell(existElement)) {
 			const refer = dom.query.getParentElement(prevFrame, (current) => current.parentNode === existElement);
 			existElement.insertBefore(container, refer);
@@ -681,7 +681,7 @@ class Embed extends EditorInjector {
 			dom.utils.removeItem(prevFrame);
 			this.nodeTransform.removeEmptyNode(existElement, null, true);
 		} else {
-			/** @type {Element} */ (existElement).parentNode.replaceChild(container, existElement);
+			/** @type {Element} */ (existElement).replaceWith(container);
 		}
 
 		return oFrame;

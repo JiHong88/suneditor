@@ -369,6 +369,27 @@ Component.prototype = {
 	},
 
 	/**
+	 * @this {ComponentThis}
+	 * @description Copies the specified component node to the clipboard.
+	 * - This function is different from the one called when the user presses the "Ctrl + C" key combination.
+	 * @param {Node} container The DOM node to check.
+	 */
+	copy(container) {
+		const cloneContainer = /** @type {HTMLElement} */ (dom.utils.clone(container, true));
+
+		// remove selected class
+		dom.utils.removeClass(cloneContainer, 'se-component-selected');
+		dom.utils.removeClass(cloneContainer.querySelectorAll('.se-figure-selected'), 'se-figure-selected');
+		dom.utils.removeClass(cloneContainer.querySelectorAll('.se-selected-table-cell, se-selected-cell-focus'), 'se-selected-table-cell|se-selected-cell-focus');
+
+		// copy to clipboard
+		env.setClipboard(cloneContainer, 'text/html');
+
+		// copy effect
+		dom.utils.flashClass(container, 'se-copy');
+	},
+
+	/**
 	 * @private
 	 * @this {ComponentThis}
 	 * @description Checks if the given element is a file component by matching its tag name against the file manager's regular expressions.
@@ -640,17 +661,15 @@ function OnCopy_component(e) {
 	const info = this.info;
 	if (!info) return;
 
-	if (typeof this.plugins[info.pluginName]?.onCopyComponent === 'function') {
-		this.plugins[info.pluginName].onCopyComponent(e, info);
-	} else {
-		SetClipboardComponent(e, info.container, e.clipboardData);
+	const cloneContainer = info.container.cloneNode(true);
+	dom.utils.removeClass(cloneContainer, 'se-component-selected');
+
+	if (typeof this.plugins[info.pluginName]?.onCopyComponent !== 'function' || this.plugins[info.pluginName].onCopyComponent({ event: e, cloneContainer, info }) === false) {
+		SetClipboardComponent(e, cloneContainer, e.clipboardData);
 	}
 
-	dom.utils.addClass(info.container, 'se-copy');
 	// copy effect
-	_w.setTimeout(() => {
-		dom.utils.removeClass(info.container, 'se-copy');
-	}, 120);
+	dom.utils.flashClass(info.container, 'se-copy');
 }
 
 /**
@@ -661,7 +680,10 @@ function OnCut_component(e) {
 	const info = this.info;
 	if (!info) return;
 
-	SetClipboardComponent(e, info.container, e.clipboardData);
+	const cloneContainer = info.container.cloneNode(true);
+	dom.utils.removeClass(cloneContainer, 'se-component-selected');
+
+	SetClipboardComponent(e, cloneContainer, e.clipboardData);
 	this.deselect();
 	dom.utils.removeItem(info.container);
 }
@@ -796,10 +818,8 @@ async function OnKeyDown_component(e) {
 function SetClipboardComponent(e, container, clipboardData) {
 	e.preventDefault();
 	e.stopPropagation();
-	const pasteContainer = container.cloneNode(true);
-	dom.utils.removeClass(pasteContainer, 'se-component-selected');
-	pasteContainer.querySelectorAll('.se-figure-selected').forEach((el) => dom.utils.removeClass(el, 'se-figure-selected'));
-	clipboardData.setData('text/html', pasteContainer.outerHTML);
+	container.querySelectorAll('.se-figure-selected').forEach((el) => dom.utils.removeClass(el, 'se-figure-selected'));
+	clipboardData.setData('text/html', container.outerHTML);
 }
 
 export default Component;

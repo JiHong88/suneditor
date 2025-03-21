@@ -357,14 +357,16 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component copy is requested.
-	 * @param {ClipboardEvent} event Clipboard event object
-	 * @param {__se__ComponentInfo} info Component information
+	 * @param {__se__PluginCopyComponentParams} params
+	 * @returns {boolean|void}
 	 */
-	onCopyComponent(event, info) {
+	onCopyComponent({ event, cloneContainer }) {
 		/** @type {NodeListOf<HTMLTableCellElement>} */
-		const selectedCells = info.container.querySelectorAll('.se-selected-table-cell');
+		const selectedCells = cloneContainer.querySelectorAll('.se-selected-table-cell');
+		dom.utils.removeClass(selectedCells, 'se-selected-table-cell|se-selected-cell-focus');
+
 		if (selectedCells.length > 0) {
-			SetClipboardSelectedTableCells(event, info.container, selectedCells);
+			SetClipboardSelectedTableCells(event, cloneContainer, selectedCells);
 		}
 	}
 
@@ -786,6 +788,9 @@ class Table extends EditorInjector {
 				this._setTableStyle('column', false);
 				this._historyPush();
 				this.component.select(this._element, Table.key, true);
+				break;
+			case 'copy':
+				this.component.copy(this._figure);
 				break;
 			case 'remove': {
 				const emptyDiv = this._figure?.parentNode;
@@ -3084,6 +3089,12 @@ function CreateHTML_controller_table({ lang, icons }) {
 				<span class="se-tooltip-text">${lang.minSize}</span>
 			</span>
 		</button>
+		<button type="button" data-command="copy" class="se-btn se-tooltip">
+			${icons.copy}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${lang.copy}</span>
+			</span>
+		</button>
 		<button type="button" data-command="remove" class="se-btn se-tooltip">
 			${icons.delete}
 			<span class="se-tooltip-inner">
@@ -3204,7 +3215,6 @@ function SetClipboardSelectedTableCells(e, container, selectedCells) {
 			if (r > 0 && matrix[r - 1][c] === cell) continue;
 
 			const clonedCell = cell.cloneNode(true);
-			dom.utils.removeClass(clonedCell, 'se-selected-table-cell');
 
 			// recalculate rowspan and colspan
 			let rowspan = 1;

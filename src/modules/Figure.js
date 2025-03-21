@@ -44,7 +44,17 @@ let __resizing_sw = 0;
  */
 
 /**
- * @typedef {Array<Array<string|{action: (element: Node, value: string, target: Node) => void, command: string, value: string, title: string, icon: string}>>} FigureControls
+ * @typedef {Array<Array<
+ *   string |
+ *   {
+ *     action: (element: Node, value: string, target: Node) => void,
+ *     command: string,
+ *     value: string,
+ *     title: string,
+ *     icon: string
+ *   }
+ * >>} FigureControls
+ * "mirror". "rotate", "caption", "revert", "edit", "copy", "remove", "as", "resize_auto,[number]"
  */
 
 /**
@@ -716,6 +726,10 @@ class Figure extends EditorInjector {
 			case 'edit':
 				this.inst.edit(element);
 				break;
+			case 'copy': {
+				this.component.copy(this._container);
+				break;
+			}
 			case 'remove':
 				this.inst.destroy(element);
 				this.controller.close();
@@ -1537,6 +1551,11 @@ function GET_CONTROLLER_BUTTONS(group) {
 			c = 'onas';
 			l = 'blockStyle';
 			i = 'as_block';
+			break;
+		case 'copy':
+			c = 'copy';
+			l = 'copy';
+			i = 'copy';
 			break;
 		case 'remove':
 			c = 'remove';
