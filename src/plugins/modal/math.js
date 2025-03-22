@@ -368,7 +368,7 @@ class Math_ extends EditorInjector {
 
 		try {
 			const text = getValue(element);
-			await env.setClipboard(text, 'text/plain');
+			await env.setClipboard(text);
 			dom.utils.addClass(element, 'se-copy');
 			// copy effect
 			_w.setTimeout(() => {

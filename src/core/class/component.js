@@ -383,7 +383,7 @@ Component.prototype = {
 		dom.utils.removeClass(cloneContainer.querySelectorAll('.se-selected-table-cell, se-selected-cell-focus'), 'se-selected-table-cell|se-selected-cell-focus');
 
 		// copy to clipboard
-		env.setClipboard(cloneContainer, 'text/html');
+		env.setClipboard(cloneContainer);
 
 		// copy effect
 		dom.utils.flashClass(container, 'se-copy');
