@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { dom, converter, numbers, unicode, env } from '../../helper';
+import { dom, converter, numbers, unicode } from '../../helper';
 
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
@@ -393,7 +393,7 @@ HTML.prototype = {
 				}
 			} catch (error) {
 				if (this.editor.frameContext.get('isReadOnly') || this.editor.frameContext.get('isDisabled')) return;
-				throw Error('[SUNEDITOR.html.insert.error]', error.message);
+				throw Error(`[SUNEDITOR.html.insert.error] ${error.message}`);
 			}
 		} else {
 			if (this.component.is(html)) {
@@ -1653,7 +1653,7 @@ HTML.prototype = {
 			for (let i = 0, len = style.length, r; i < len; i++) {
 				r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"']+)/);
 				if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
-					const k = env.kebabToCamelCase(r[1].trim());
+					const k = converter.kebabToCamelCase(r[1].trim());
 					const cs = this.editor.frameContext.get('wwComputedStyle')[k]?.replace(/"/g, '');
 					const c = r[3].trim();
 					switch (k) {

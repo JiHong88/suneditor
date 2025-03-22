@@ -90,6 +90,53 @@ export function syncMaps(targetMap, referenceMap) {
 }
 
 /**
+ * @description Object.values
+ * @param {Object<*, *>} obj Object parameter.
+ * @returns {Array<*>}
+ */
+export function getValues(obj) {
+	return !obj
+		? []
+		: Object.keys(obj).map(function (i) {
+				return obj[i];
+		  });
+}
+
+/**
+ * @description Convert the CamelCase To the KebabCase.
+ * @param {string|Array<string>} param [Camel string]
+ */
+export function camelToKebabCase(param) {
+	if (typeof param === 'string') {
+		return param.replace(/[A-Z]/g, (letter) => '-' + letter.toLowerCase());
+	} else {
+		return param.map(function (str) {
+			return camelToKebabCase(str);
+		});
+	}
+}
+
+/**
+ * @overload
+ * @param {string} param - Kebab-case string.
+ * @returns {string} CamelCase string.
+ */
+/**
+ * @overload
+ * @param {Array<string>} param - Array of Kebab-case strings.
+ * @returns {Array<string>} Array of CamelCase strings.
+ */
+export function kebabToCamelCase(param) {
+	if (typeof param === 'string') {
+		return param.replace(/-[a-zA-Z]/g, (letter) => letter.replace('-', '').toUpperCase());
+	} else {
+		return param.map(function (str) {
+			return camelToKebabCase(str);
+		});
+	}
+}
+
+/**
  *
  * @param {"em"|"rem"|"%"|"pt"|"px"} to Size units to be converted
  * @param {string} size siSize to convert with units (ex: "15rem")
@@ -412,6 +459,9 @@ const converter = {
 	entityToHTML,
 	debounce,
 	syncMaps,
+	getValues,
+	camelToKebabCase,
+	kebabToCamelCase,
 	toFontUnit,
 	nodeListToArray,
 	swapKeyValue,

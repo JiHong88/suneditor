@@ -291,12 +291,20 @@ function Constructor(editorTargets, options) {
 	editor_carrier_wrapper.appendChild(focusTemp);
 
 	// modal
-	const modal = dom.utils.createElement('DIV', { class: 'se-modal sun-editor-common' });
-	const modal_back = dom.utils.createElement('DIV', { class: 'se-modal-back', style: 'display: none;' });
-	const modal_inner = dom.utils.createElement('DIV', { class: 'se-modal-inner', style: 'display: none;' });
+	const modal = dom.utils.createElement('DIV', { class: 'se-modal se-modal-area sun-editor-common' });
+	const modal_back = dom.utils.createElement('DIV', { class: 'se-modal-back' });
+	const modal_inner = dom.utils.createElement('DIV', { class: 'se-modal-inner' });
 	modal.appendChild(modal_back);
 	modal.appendChild(modal_inner);
 	editor_carrier_wrapper.appendChild(modal);
+
+	// alert
+	const alert = dom.utils.createElement('DIV', { class: 'se-alert se-modal-area sun-editor-common', style: 'display: none;' });
+	const alert_back = dom.utils.createElement('DIV', { class: 'se-modal-back' });
+	const alert_inner = dom.utils.createElement('DIV', { class: 'se-modal-inner' });
+	alert.appendChild(alert_back);
+	alert.appendChild(alert_inner);
+	editor_carrier_wrapper.appendChild(alert);
 
 	// loding box, resizing back
 	editor_carrier_wrapper.appendChild(dom.utils.createElement('DIV', { class: 'se-back-wrapper' }));
@@ -481,7 +489,7 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 		a = values[i].split('+');
 
 		plugin = null;
-		method = a.at(-1).trim?.();
+		method = a[a.length - 1].trim?.();
 		if (method.startsWith('~')) {
 			plugin = command;
 			method = a.pop().trim().substring(1);
@@ -1242,6 +1250,7 @@ function _defaultButtons(options, icons, lang) {
 		redo: ['se-component-enabled', lang.redo, 'redo', '', icons.redo],
 		preview: ['se-component-enabled', lang.preview, 'preview', '', icons.preview],
 		print: ['se-component-enabled', lang.print, 'print', '', icons.print],
+		copy: ['', lang.copy, 'copy', '', icons.copy],
 		dir: ['', lang[isRTL ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[isRTL ? 'dir_ltr' : 'dir_rtl']],
 		dir_ltr: ['', lang.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
@@ -1476,6 +1485,10 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 						modules = ['se-toolbar-separator-vertical', '', '', 'separator', ''];
 					} else {
 						// default command
+						if (button === 'copy' && !env.isClipboardSupported) {
+							console.warn('[SUNEDITOR.constructor.warn] Clipboard is not supported in this browser. : [copy] button is not rendered.');
+							continue;
+						}
 						modules = defaultButtonList[button];
 					}
 

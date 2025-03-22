@@ -1,4 +1,4 @@
-import { env, converter, dom, numbers } from '../helper';
+import { env, converter, dom, numbers, clipboard } from '../helper';
 import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, RO_UNAVAILABD } from './section/constructor';
 import { UpdateStatusbarContext } from './section/context';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
@@ -543,7 +543,7 @@ Editor.prototype = {
 	 * @description Execute default command of command button
 	 * - (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
-	 * @param {Node} button Command button
+	 * @param {?Node=} button Command button
 	 * @returns {Promise<void>}
 	 */
 	async commandHandler(command, button) {
@@ -553,6 +553,15 @@ Editor.prototype = {
 			case 'selectAll':
 				SELECT_ALL(this);
 				break;
+			case 'copy': {
+				const range = this.selection.getRange();
+				if (range.collapsed) break;
+
+				const container = dom.utils.createElement('div', null, range.cloneContents());
+				await clipboard.write(container.innerHTML);
+
+				break;
+			}
 			case 'newDocument':
 				this.html.set(`<${this.options.get('defaultLine')}><br></${this.options.get('defaultLine')}>`);
 				this.focus();

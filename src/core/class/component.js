@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { dom, env, numbers, unicode, keyCodeMap } from '../../helper';
+import { dom, env, numbers, unicode, keyCodeMap, clipboard } from '../../helper';
 import { Figure, _DragHandle } from '../../modules';
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
@@ -383,7 +383,7 @@ Component.prototype = {
 		dom.utils.removeClass(cloneContainer.querySelectorAll('.se-selected-table-cell, se-selected-cell-focus'), 'se-selected-table-cell|se-selected-cell-focus');
 
 		// copy to clipboard
-		env.setClipboard(cloneContainer);
+		clipboard.write(cloneContainer);
 
 		// copy effect
 		dom.utils.flashClass(container, 'se-copy');

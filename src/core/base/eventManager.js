@@ -801,10 +801,10 @@ EventManager.prototype = {
 		/** modal outside click */
 		if (this.options.get('closeModalOutsideClick')) {
 			this.addEvent(
-				this.carrierWrapper.querySelector('.se-modal-inner'),
+				this.carrierWrapper.querySelector('.se-modal .se-modal-inner'),
 				'click',
 				(e) => {
-					if (e.target === this.carrierWrapper.querySelector('.se-modal-inner')) {
+					if (e.target === this.carrierWrapper.querySelector('.se-modal .se-modal-inner')) {
 						this.ui._offCurrentModal();
 					}
 				},

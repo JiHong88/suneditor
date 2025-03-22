@@ -193,20 +193,22 @@ class Drawing extends EditorInjector {
 			this.resizeObserver = null;
 		}
 
-		this.resizeObserver = new ResizeObserver(() => {
-			const prevWidth = canvas.width;
-			const prevHeight = canvas.height;
-			const newWidth = canvas.offsetWidth;
-			const newHeight = canvas.offsetHeight;
-			canvas.width = newWidth;
-			canvas.height = newHeight;
-			if (prevWidth !== canvas.width || prevHeight !== canvas.height) {
-				if (this.pluginOptions.maintainRatio) this._adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight);
-				this._drawAll();
-			}
-		});
+		if (env.isResizeObserverSupported) {
+			this.resizeObserver = new ResizeObserver(() => {
+				const prevWidth = canvas.width;
+				const prevHeight = canvas.height;
+				const newWidth = canvas.offsetWidth;
+				const newHeight = canvas.offsetHeight;
+				canvas.width = newWidth;
+				canvas.height = newHeight;
+				if (prevWidth !== canvas.width || prevHeight !== canvas.height) {
+					if (this.pluginOptions.maintainRatio) this._adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight);
+					this._drawAll();
+				}
+			});
 
-		this.resizeObserver.observe(canvas);
+			this.resizeObserver.observe(canvas);
+		}
 	}
 
 	/**

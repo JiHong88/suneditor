@@ -234,7 +234,7 @@ class FileUpload extends EditorInjector {
 					file: f
 				});
 
-				this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
+				this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 				return false;
 			}
@@ -254,7 +254,7 @@ class FileUpload extends EditorInjector {
 				uploadSize: fileSize
 			});
 
-			this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
+			this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 			return false;
 		}
@@ -402,7 +402,7 @@ class FileUpload extends EditorInjector {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.ui.noticeOpen(err);
+		this.ui.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	}
 

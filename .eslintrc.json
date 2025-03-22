@@ -1,9 +1,9 @@
 {
-	"plugins": ["prettier", "@typescript-eslint"],
+	"plugins": ["prettier", "@typescript-eslint", "compat"],
 	"extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
-		"ecmaVersion": 2022,
+		"ecmaVersion": 2020,
 		"sourceType": "module"
 	},
 	"env": {
@@ -18,6 +18,7 @@
 		"Range": "writable"
 	},
 	"rules": {
+		"compat/compat": "error",
 		"eqeqeq": "error",
 		"strict": ["error", "safe"],
 		"no-undef": "off",

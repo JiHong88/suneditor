@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { dom, unicode, numbers, env } from '../../helper';
+import { dom, unicode, numbers, converter } from '../../helper';
 
 /**
  * @typedef {Omit<Format & Partial<__se__EditorInjector>, 'format'>} FormatThis
@@ -28,7 +28,7 @@ function Format(editor) {
 
 	// members
 	this._listCamel = this.options.get('__listCommonStyle');
-	this._listKebab = env.camelToKebabCase(this.options.get('__listCommonStyle'));
+	this._listKebab = converter.camelToKebabCase(this.options.get('__listCommonStyle'));
 	this._formatLineCheck = this.options.get('formatLine').reg;
 	this._formatBrLineCheck = this.options.get('formatBrLine').reg;
 	this._formatBlockCheck = this.options.get('formatBlock').reg;
@@ -1039,7 +1039,7 @@ Format.prototype = {
 			const format = startCon.parentNode;
 			if (
 				!dom.check.isListCell(format) ||
-				!env.getValues(format.style).some((k) => {
+				!converter.getValues(format.style).some((k) => {
 					return this._listKebab.includes(k);
 				})
 			)
@@ -3232,7 +3232,7 @@ Format.prototype = {
 		if (this.options.get('_defaultStyleTagMap')[nodeName] === this.options.get('_defaultTagCommand').italic.toLowerCase()) elStyle.fontStyle = 'italic';
 
 		// styles
-		const cKeys = env.getValues(childStyle);
+		const cKeys = converter.getValues(childStyle);
 		if (cKeys.length > 0) {
 			for (let i = 0, len = this._listCamel.length; i < len; i++) {
 				if (cKeys.includes(this._listKebab[i])) {
@@ -3274,7 +3274,7 @@ Format.prototype = {
 
 		const ec = [],
 			ek = [],
-			elKeys = env.getValues(elStyles);
+			elKeys = converter.getValues(elStyles);
 		for (let i = 0, len = this._listKebab.length; i < len; i++) {
 			if (elKeys.includes(this._listKebab[i]) && styleArray.includes(this._listKebab[i])) {
 				ec.push(this._listCamel[i]);
@@ -3298,7 +3298,7 @@ Format.prototype = {
 			c = /** @type {HTMLElement} */ (children[i]);
 			if (this.options.get('_defaultStyleTagMap')[c.nodeName.toLowerCase()]) continue;
 
-			s = env.getValues(c.style);
+			s = converter.getValues(c.style);
 			if (
 				s.length === 0 ||
 				(ec.some(function (k) {

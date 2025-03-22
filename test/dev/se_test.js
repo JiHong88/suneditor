@@ -64,7 +64,7 @@ const bl = [
 	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 	['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-	['fullScreen', 'showBlocks', 'codeView'],
+	['fullScreen', 'showBlocks', 'codeView', 'copy'],
 	['preview', 'print'],
 	['save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
 	// (min-width: 1565)
@@ -81,7 +81,7 @@ const bl = [
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 			['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['fullScreen', 'showBlocks', 'codeView'],
+			['fullScreen', 'showBlocks', 'codeView', 'copy'],
 			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
@@ -99,7 +99,7 @@ const bl = [
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 			['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
 	// (min-width: 1326)
@@ -114,7 +114,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser']
 		]
 	],
@@ -129,7 +129,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser']
 		]
 	],
@@ -144,7 +144,7 @@ const bl = [
 			['copyFormat', 'removeFormat'],
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser']
 		]
 	],
@@ -159,7 +159,7 @@ const bl = [
 			['outdent', 'indent'],
 			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
 	// (min-width: 525)
@@ -173,7 +173,7 @@ const bl = [
 			['outdent', 'indent'],
 			[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	],
 	// (min-width: 420)
@@ -185,7 +185,7 @@ const bl = [
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
+			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 		]
 	]
 ];
@@ -203,7 +203,7 @@ const bb = [
 	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
 	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 	['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-	['fullScreen', 'showBlocks', 'codeView'],
+	['fullScreen', 'showBlocks', 'codeView', 'copy'],
 	['preview', 'print'],
 	['save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
 ];
@@ -466,6 +466,7 @@ window.editor_root = suneditor.create(
 		// 		value: `
 		// 		<p>dsa<strong>d&nbsp;&nbsp;&nbsp;&nbsp;sa</strong><u><strong>dsadsadsa</strong></u><span style="color: #ff0000"><u><strong>dsadasdsa</strong></u></span><br>
 		// </p>
+		// closeModalOutsideClick: true,
 		value: `<p>test abc  <span>
 		<img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="width:40px;" data-se-index="0">
 		</span>

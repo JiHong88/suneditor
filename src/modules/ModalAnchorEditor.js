@@ -405,7 +405,7 @@ class ModalAnchorEditor extends EditorInjector {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.ui.noticeOpen(err);
+		this.ui.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	}
 

@@ -178,7 +178,7 @@ async function CallBackApi(xmlHttp, callBack, errorCallBack) {
 					message = await errorCallBack(res, xmlHttp);
 				}
 				const err = `[SUNEDITOR.ApiManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${message || res.errorMessage || xmlHttp.responseText}`;
-				this.ui.noticeOpen(err);
+				this.ui.alertOpen(err, 'error');
 			} catch (error) {
 				throw Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.errorCallBack.fail] ${error.message}`);
 			} finally {

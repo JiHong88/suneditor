@@ -3,8 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import Modal from '../../modules/Modal';
-import { dom, converter } from '../../helper';
+import { dom, converter, keyCodeMap } from '../../helper';
 
 /**
  * @typedef {Omit<UI & Partial<__se__EditorInjector>, 'ui'>} UIThis
@@ -20,11 +19,20 @@ import { dom, converter } from '../../helper';
 function UI(editor) {
 	CoreInjector.call(this, editor);
 
-	// members
-	const noticeModal = CreateNoticeHTML(editor);
-	this.noticeModal = new Modal(this, noticeModal);
-	this.noticeMessage = noticeModal.querySelector('span');
+	// members - modal
+	const alertModal = CreateAlertHTML(editor);
+	this.alertModal = alertModal;
+	this.alertMessage = alertModal.querySelector('span');
+	this._alertArea = /** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-alert'));
+	this._alertInner = /** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-alert .se-modal-inner'));
+	this._alertInner.appendChild(alertModal);
+
+	this._closeListener = [CloseListener.bind(this), OnClick_alert.bind(this)];
+	this._closeSignal = !this.eventManager.addEvent(alertModal.querySelector('[data-command="close"]'), 'click', this.alertClose.bind(this));
+	this._bindClose = null;
 	this._backWrapper = /** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-back-wrapper'));
+
+	// members
 	this._controllerOnBtnDisabled = false;
 }
 
@@ -240,20 +248,32 @@ UI.prototype = {
 
 	/**
 	 * @this {UIThis}
-	 * @description  Open the notice panel
-	 * @param {string} text Notice message
+	 * @description  Open the alert panel
+	 * @param {string} text alert message
+	 * @param {""|"error"|"success"} type alert type
 	 */
-	noticeOpen(text) {
-		this.noticeMessage.textContent = text;
-		this.noticeModal.open();
+	alertOpen(text, type) {
+		this.alertMessage.textContent = text;
+
+		if (type) dom.utils.addClass(this.alertModal, `se-alert-${type || ''}`);
+		if (this._closeSignal) this._alertInner.addEventListener('click', this._closeListener[1]);
+		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
+		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
+
+		this._alertArea.style.display = 'block';
+		dom.utils.addClass(this.alertModal, 'se-modal-show');
 	},
 
 	/**
 	 * @this {UIThis}
-	 * @description  Close the notice panel
+	 * @description  Close the alert panel
 	 */
-	noticeClose() {
-		this.noticeModal.close();
+	alertClose() {
+		dom.utils.removeClass(this.alertModal, 'se-modal-show');
+		dom.utils.removeClass(this.alertModal, 'se-alert-*');
+		this._alertArea.style.display = 'none';
+		if (this._closeSignal) this._alertInner.removeEventListener('click', this._closeListener[1]);
+		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 	},
 
 	/**
@@ -322,9 +342,31 @@ UI.prototype = {
 	constructor: UI
 };
 
-function CreateNoticeHTML({ lang, icons }) {
+/**
+ * @private
+ * @this {UIThis}
+ * @param {MouseEvent} e - Event object
+ */
+function OnClick_alert(e) {
+	const eventTarget = dom.query.getEventTarget(e);
+	if (/close/.test(eventTarget.getAttribute('data-command')) || eventTarget === this._alertInner) {
+		this.alertClose();
+	}
+}
+
+/**
+ *  @private
+ * @this {UIThis}
+ * @param {KeyboardEvent} e - Event object
+ */
+function CloseListener(e) {
+	if (!keyCodeMap.isEsc(e.code)) return;
+	this.alertClose();
+}
+
+function CreateAlertHTML({ lang, icons }) {
 	const html = '<div><button class="close" data-command="close" title="' + lang.close + '">' + icons.cancel + '</button></div><div><span></span></div>';
-	return dom.utils.createElement('DIV', { class: 'se-notice' }, html);
+	return dom.utils.createElement('DIV', { class: 'se-alert-content' }, html);
 }
 
 export default UI;

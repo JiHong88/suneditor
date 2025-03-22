@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Unicode helper functions
+ */
+
 const zwsp = 8203;
 
 /**

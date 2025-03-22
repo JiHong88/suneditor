@@ -30,9 +30,7 @@ class Modal extends CoreInjector {
 		/** @type {HTMLElement} */
 		this._modalArea = this.carrierWrapper.querySelector('.se-modal');
 		/** @type {HTMLElement} */
-		this._modalBack = this.carrierWrapper.querySelector('.se-modal-back');
-		/** @type {HTMLElement} */
-		this._modalInner = this.carrierWrapper.querySelector('.se-modal-inner');
+		this._modalInner = this.carrierWrapper.querySelector('.se-modal .se-modal-inner');
 
 		this._closeListener = [this.#CloseListener.bind(this), this.#OnClick_dialog.bind(this)];
 		this._bindClose = null;
@@ -148,10 +146,8 @@ class Modal extends CoreInjector {
 		if (!this.isUpdate && typeof this.inst.init === 'function') this.inst.init();
 		if (typeof this.inst.on === 'function') this.inst.on(this.isUpdate);
 
-		this._modalArea.style.display = 'block';
-		this._modalBack.style.display = 'block';
-		this._modalInner.style.display = 'block';
-		this.form.style.display = 'block';
+		dom.utils.addClass(this._modalArea, 'se-backdrop-show');
+		dom.utils.addClass(this.form, 'se-modal-show');
 
 		if (this._resizeBody) {
 			const offset = this._saveOffset();
@@ -181,9 +177,8 @@ class Modal extends CoreInjector {
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 
 		// close
-		this.form.style.display = 'none';
-		this._modalBack.style.display = 'none';
-		this._modalArea.style.display = 'none';
+		dom.utils.removeClass(this._modalArea, 'se-backdrop-show');
+		dom.utils.removeClass(this.form, 'se-modal-show');
 
 		if (typeof this.inst.init === 'function') this.inst.init();
 		if (typeof this.inst.off === 'function') this.inst.off(this.isUpdate);

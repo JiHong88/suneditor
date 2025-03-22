@@ -1,4 +1,6 @@
-import { isElement } from './dom/domCheck';
+/**
+ * @fileoverview Environment  helper functions
+ */
 
 /** @type {Window} */
 export const _w = window;
@@ -17,54 +19,7 @@ export const NO_EVENT = Symbol('noEventHandler');
  */
 export const ON_OVER_COMPONENT = Symbol('onOverComponent');
 
-const userAgent = _w.navigator.userAgent.toLowerCase();
-
-/**
- * @description Object.values
- * @param {Object<*, *>} obj Object parameter.
- * @returns {Array<*>}
- */
-export function getValues(obj) {
-	return !obj
-		? []
-		: Object.keys(obj).map(function (i) {
-				return obj[i];
-		  });
-}
-
-/**
- * @description Convert the CamelCase To the KebabCase.
- * @param {string|Array<string>} param [Camel string]
- */
-export function camelToKebabCase(param) {
-	if (typeof param === 'string') {
-		return param.replace(/[A-Z]/g, (letter) => '-' + letter.toLowerCase());
-	} else {
-		return param.map(function (str) {
-			return camelToKebabCase(str);
-		});
-	}
-}
-
-/**
- * @overload
- * @param {string} param - Kebab-case string.
- * @returns {string} CamelCase string.
- */
-/**
- * @overload
- * @param {Array<string>} param - Array of Kebab-case strings.
- * @returns {Array<string>} Array of CamelCase strings.
- */
-export function kebabToCamelCase(param) {
-	if (typeof param === 'string') {
-		return param.replace(/-[a-zA-Z]/g, (letter) => letter.replace('-', '').toUpperCase());
-	} else {
-		return param.map(function (str) {
-			return camelToKebabCase(str);
-		});
-	}
-}
+const userAgent = navigator.userAgent.toLowerCase();
 
 /**
  * @description Gets XMLHttpRequest object
@@ -72,49 +27,6 @@ export function kebabToCamelCase(param) {
  */
 export function getXMLHttpRequest() {
 	return new XMLHttpRequest();
-}
-
-/**
- * @description Set the content to the clipboard
- * - Iframe is replaced with a placeholder : <div data-se-iframe-holder-src="iframe.src">[iframe: iframe.src]</div>
- * - "iframe placeholder" is re-rendered in html.clean when pasted into the editor.
- * @param {Element|Text|string} content Content to be copied to the clipboard
- * @returns {Promise<void>}
- */
-export async function setClipboard(content) {
-	let htmlString = '';
-	let plainText = '';
-
-	if (typeof content === 'string') {
-		htmlString = content;
-		plainText = content;
-	} else if (isElement(content)) {
-		content.querySelectorAll('iframe').forEach((iframe) => {
-			const placeholder = document.createElement('div');
-			const iframeAttrs = {};
-			for (const attr of Array.from(iframe.attributes)) {
-				iframeAttrs[attr.name] = attr.value;
-			}
-
-			placeholder.setAttribute('data-se-iframe-holder', '1');
-			placeholder.setAttribute('data-se-iframe-holder-attrs', JSON.stringify(iframeAttrs));
-			placeholder.innerText = `[iframe: ${iframe.src}]`;
-
-			iframe.replaceWith(placeholder);
-		});
-		htmlString = content.outerHTML;
-		plainText = content.textContent;
-	} else {
-		htmlString = content.textContent;
-		plainText = content.textContent;
-	}
-
-	await navigator.clipboard.write([
-		new ClipboardItem({
-			'text/html': new Blob([htmlString], { type: 'text/html' }),
-			'text/plain': new Blob([plainText], { type: 'text/plain' })
-		})
-	]);
 }
 
 /**
@@ -202,6 +114,15 @@ export const isResizeObserverSupported = (() => {
 })();
 
 /**
+ * @description Check if support navigator.clipboard
+ * @returns {boolean} Whether support navigator.clipboard or not.
+ */
+export const isClipboardSupported = (() => {
+	/* eslint-disable-next-line compat/compat */
+	return typeof navigator.clipboard?.write === 'function';
+})();
+
+/**
  * @description Check if User Agent is Edge
  * @returns {boolean} Whether User Agent is Edge or not.
  */
@@ -255,6 +176,7 @@ export const isSafari = (() => {
  * @type {boolean}
  */
 export const isMobile = (() => {
+	/* eslint-disable-next-line compat/compat */
 	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) || (navigator.maxTouchPoints > 0 && 'ontouchstart' in _w);
 })();
 
@@ -293,14 +215,11 @@ const env = {
 	_d,
 	NO_EVENT,
 	ON_OVER_COMPONENT,
-	getValues,
-	camelToKebabCase,
-	kebabToCamelCase,
 	getXMLHttpRequest,
-	setClipboard,
 	getPageStyle,
 	getIncludePath,
 	isResizeObserverSupported,
+	isClipboardSupported,
 	isEdge,
 	isBlink,
 	isGecko,

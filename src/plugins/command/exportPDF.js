@@ -86,7 +86,7 @@ class ExportPDF extends EditorInjector {
 			await this._createByServer(ww);
 			return;
 		} catch (error) {
-			console.error(`[SUNEDITOR.plugins.exportPDF.error] ${error.message}`);
+			console.error('[SUNEDITOR.plugins.exportPDF.error]', error.message);
 		} finally {
 			dom.utils.removeItem(ww);
 			this.ui.hideLoading();

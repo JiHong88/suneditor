@@ -701,7 +701,7 @@ class Video extends EditorInjector {
 					file: f
 				});
 
-				this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
+				this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 				return false;
 			}
@@ -716,7 +716,7 @@ class Video extends EditorInjector {
 			const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
 			const message = await this.triggerEvent('onVideoUploadError', { error: err, limitSize, currentSize, uploadSize: fileSize });
 
-			this.ui.noticeOpen(message === NO_EVENT ? err : message || err);
+			this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
 
 			return false;
 		}
@@ -950,7 +950,7 @@ class Video extends EditorInjector {
 	async _error(response) {
 		const message = await this.triggerEvent('onVideoUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.ui.noticeOpen(err);
+		this.ui.alertOpen(err, 'error');
 		console.error('[SUNEDITOR.plugin.video.error]', message);
 	}
 
