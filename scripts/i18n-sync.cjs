@@ -19,7 +19,11 @@ const langMap = {
 	zh_cn: 'zh-CN',
 	zh_tw: 'zh-TW',
 	se: 'sv',
-	ua: 'uk'
+	ua: 'uk',
+	fr_ca: 'fr-CA',
+	ms_arab: 'ms-Arab',
+	mni_mtei: 'mni-Mtei',
+	pa_arab: 'pa-Arab'
 };
 
 const getLangObject = (fileContent) => {
@@ -118,12 +122,16 @@ const injectKeys = async (filePath, langCode, baseLangObj) => {
 
 const updateTypeDef = (baseLangObj) => {
 	let typeFile = fs.readFileSync(TYPE_FILE, 'utf8');
-	const missingKeys = Object.keys(baseLangObj).filter((k) => !typeFile.includes(`${k}:`));
-	if (missingKeys.length === 0) return;
+	const existingKeys = new Set((typeFile.match(/\b(\w+): string;/g) || []).map((k) => k.split(':')[0]));
+	const keyOrder = Object.keys(baseLangObj);
+	const toInsert = keyOrder.filter((k) => !existingKeys.has(k)).map((k) => `\t${k}: string;`);
+	if (toInsert.length === 0) return;
 
-	typeFile = typeFile.replace(/(interface Lang \{)([\s\S]*?)(\n\})/, (match, p1, body, p3) => {
-		const newLines = missingKeys.map((k) => `\t${k}: string;`).join('\n');
-		return `${p1}${body}\n${newLines}${p3}`;
+	typeFile = typeFile.replace(/(interface _Lang\s*{)([\s\S]*?)(\n?})/, (match, p1, body, p3) => {
+		const existingLines = body.trimEnd().split('\n').filter(Boolean);
+		const existingLineMap = new Map(existingLines.map((line) => [line.trim().split(':')[0], line]));
+		const sorted = keyOrder.map((k) => existingLineMap.get(k) || `\t${k}: string;`);
+		return `${p1}\n${sorted.join('\n')}\n${p3}`;
 	});
 
 	fs.writeFileSync(TYPE_FILE, typeFile, 'utf8');
