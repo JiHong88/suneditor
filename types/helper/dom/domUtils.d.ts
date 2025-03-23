@@ -149,6 +149,13 @@ export function removeClass(element: Node | __se__NodeCollection, className: str
  */
 export function toggleClass(element: Node, className: string): boolean | undefined;
 /**
+ * @description Flash the class name of the argument value element for a certain time
+ * @param {Node} element Element to flash class name
+ * @param {string} className class name
+ * @param {number} [duration=120] duration milliseconds
+ */
+export function flashClass(element: Node, className: string, duration?: number): void;
+/**
  * @description Gets the size of the documentElement client size.
  * @param {Document} doc Document object
  * @returns {{w: number, h: number}} documentElement.clientWidth, documentElement.clientHeight
@@ -210,6 +217,7 @@ declare namespace utils {
 	export { addClass };
 	export { removeClass };
 	export { toggleClass };
+	export { flashClass };
 	export { getClientSize };
 	export { getViewportSize };
 	export { applyInlineStylesAll };

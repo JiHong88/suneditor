@@ -3,13 +3,11 @@ export const env: {
 	_d: Document;
 	NO_EVENT: symbol;
 	ON_OVER_COMPONENT: symbol;
-	getValues: typeof import('./env').getValues;
-	camelToKebabCase: typeof import('./env').camelToKebabCase;
-	kebabToCamelCase: typeof import('./env').kebabToCamelCase;
 	getXMLHttpRequest: typeof import('./env').getXMLHttpRequest;
 	getPageStyle: typeof import('./env').getPageStyle;
 	getIncludePath: typeof import('./env').getIncludePath;
 	isResizeObserverSupported: boolean;
+	isClipboardSupported: boolean;
 	isEdge: boolean;
 	isBlink: boolean;
 	isGecko: boolean;
@@ -35,6 +33,9 @@ export const converter: {
 	entityToHTML: typeof import('./converter').entityToHTML;
 	debounce: typeof import('./converter').debounce;
 	syncMaps: typeof import('./converter').syncMaps;
+	getValues: typeof import('./converter').getValues;
+	camelToKebabCase: typeof import('./converter').camelToKebabCase;
+	kebabToCamelCase: typeof import('./converter').kebabToCamelCase;
 	toFontUnit: typeof import('./converter').toFontUnit;
 	nodeListToArray: typeof import('./converter').nodeListToArray;
 	swapKeyValue: typeof import('./converter').swapKeyValue;
@@ -122,6 +123,7 @@ export const dom: {
 		addClass: typeof import('./dom/domUtils').addClass;
 		removeClass: typeof import('./dom/domUtils').removeClass;
 		toggleClass: typeof import('./dom/domUtils').toggleClass;
+		flashClass: typeof import('./dom/domUtils').flashClass;
 		getClientSize: typeof import('./dom/domUtils').getClientSize;
 		getViewportSize: typeof import('./dom/domUtils').getViewportSize;
 		applyInlineStylesAll: typeof import('./dom/domUtils').applyInlineStylesAll;
@@ -153,6 +155,9 @@ export const keyCodeMap: {
 	isDocumentTypeObserverKey: typeof import('./keyCodeMap').isDocumentTypeObserverKey;
 	isNonResponseKey: typeof import('./keyCodeMap').isNonResponseKey;
 };
+export const clipboard: {
+	write: typeof import('./clipboard').write;
+};
 declare namespace _default {
 	export { env };
 	export { unicode };
@@ -160,5 +165,6 @@ declare namespace _default {
 	export { dom };
 	export { numbers };
 	export { keyCodeMap };
+	export { clipboard };
 }
 export default _default;

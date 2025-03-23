@@ -409,10 +409,10 @@ declare class Editor {
 	 * @description Execute default command of command button
 	 * - (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
-	 * @param {Node} button Command button
+	 * @param {?Node=} button Command button
 	 * @returns {Promise<void>}
 	 */
-	commandHandler(command: string, button: Node): Promise<void>;
+	commandHandler(command: string, button?: (Node | null) | undefined): Promise<void>;
 	/**
 	 * @description Execute "editor.run" with command button.
 	 * @param {Node} target Command target

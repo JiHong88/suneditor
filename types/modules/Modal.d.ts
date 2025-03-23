@@ -56,8 +56,6 @@ declare class Modal extends CoreInjector {
 	/** @type {HTMLElement} */
 	_modalArea: HTMLElement;
 	/** @type {HTMLElement} */
-	_modalBack: HTMLElement;
-	/** @type {HTMLElement} */
 	_modalInner: HTMLElement;
 	_closeListener: any[];
 	_bindClose: any;

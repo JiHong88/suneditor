@@ -1,27 +1,4 @@
 /**
- * @description Object.values
- * @param {Object<*, *>} obj Object parameter.
- * @returns {Array<*>}
- */
-export function getValues(obj: any): Array<any>;
-/**
- * @description Convert the CamelCase To the KebabCase.
- * @param {string|Array<string>} param [Camel string]
- */
-export function camelToKebabCase(param: string | Array<string>): any;
-/**
- * @overload
- * @param {string} param - Kebab-case string.
- * @returns {string} CamelCase string.
- */
-export function kebabToCamelCase(param: string): string;
-/**
- * @overload
- * @param {Array<string>} param - Array of Kebab-case strings.
- * @returns {Array<string>} Array of CamelCase strings.
- */
-export function kebabToCamelCase(param: Array<string>): Array<string>;
-/**
  * @description Gets XMLHttpRequest object
  * @returns {XMLHttpRequest}
  */
@@ -41,6 +18,9 @@ export function getPageStyle(doc: Document | null): string;
  * @returns {string} If not found, return the first found value
  */
 export function getIncludePath(nameArray: Array<string>, extension: string): string;
+/**
+ * @fileoverview Environment  helper functions
+ */
 /** @type {Window} */
 export const _w: Window;
 /** @type {Document} */
@@ -61,6 +41,11 @@ export const ON_OVER_COMPONENT: symbol;
  * @returns {boolean} Whether support ResizeObserver function or not.
  */
 export const isResizeObserverSupported: boolean;
+/**
+ * @description Check if support navigator.clipboard
+ * @returns {boolean} Whether support navigator.clipboard or not.
+ */
+export const isClipboardSupported: boolean;
 /**
  * @description Check if User Agent is Edge
  * @returns {boolean} Whether User Agent is Edge or not.
@@ -126,13 +111,11 @@ declare namespace env {
 	export { _d };
 	export { NO_EVENT };
 	export { ON_OVER_COMPONENT };
-	export { getValues };
-	export { camelToKebabCase };
-	export { kebabToCamelCase };
 	export { getXMLHttpRequest };
 	export { getPageStyle };
 	export { getIncludePath };
 	export { isResizeObserverSupported };
+	export { isClipboardSupported };
 	export { isEdge };
 	export { isBlink };
 	export { isGecko };

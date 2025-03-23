@@ -1,59 +1,7 @@
 export default Component;
 export type ComponentThis = Omit<Component & Partial<__se__EditorInjector>, 'component'>;
-export type ComponentInfo = {
-	/**
-	 * - The target element associated with the component.
-	 */
-	target: HTMLElement;
-	/**
-	 * - The name of the plugin related to the component.
-	 */
-	pluginName: string;
-	/**
-	 * - Options related to the component.
-	 */
-	options: {
-		[x: string]: any;
-	};
-	/**
-	 * - The main container element for the component.
-	 */
-	container: HTMLElement;
-	/**
-	 * - The cover element, if applicable.
-	 */
-	cover: HTMLElement | null;
-	/**
-	 * - The inline cover element, if applicable.
-	 */
-	inlineCover: HTMLElement | null;
-	/**
-	 * - The caption element, if applicable.
-	 */
-	caption: HTMLElement | null;
-	/**
-	 * - Whether the component is a file-related component.
-	 */
-	isFile: boolean;
-	/**
-	 * - The element that triggered the component, if applicable.
-	 */
-	launcher: HTMLElement | null;
-};
 /**
  * @typedef {Omit<Component & Partial<__se__EditorInjector>, 'component'>} ComponentThis
- */
-/**
- * @typedef {Object} ComponentInfo
- * @property {HTMLElement} target - The target element associated with the component.
- * @property {string} pluginName - The name of the plugin related to the component.
- * @property {Object<string, *>} options - Options related to the component.
- * @property {HTMLElement} container - The main container element for the component.
- * @property {?HTMLElement} cover - The cover element, if applicable.
- * @property {?HTMLElement} inlineCover - The inline cover element, if applicable.
- * @property {?HTMLElement} caption - The caption element, if applicable.
- * @property {boolean} isFile - Whether the component is a file-related component.
- * @property {?HTMLElement} launcher - The element that triggered the component, if applicable.
  */
 /**
  * @constructor
@@ -67,18 +15,6 @@ declare class Component {
 	 * @typedef {Omit<Component & Partial<__se__EditorInjector>, 'component'>} ComponentThis
 	 */
 	/**
-	 * @typedef {Object} ComponentInfo
-	 * @property {HTMLElement} target - The target element associated with the component.
-	 * @property {string} pluginName - The name of the plugin related to the component.
-	 * @property {Object<string, *>} options - Options related to the component.
-	 * @property {HTMLElement} container - The main container element for the component.
-	 * @property {?HTMLElement} cover - The cover element, if applicable.
-	 * @property {?HTMLElement} inlineCover - The inline cover element, if applicable.
-	 * @property {?HTMLElement} caption - The caption element, if applicable.
-	 * @property {boolean} isFile - Whether the component is a file-related component.
-	 * @property {?HTMLElement} launcher - The element that triggered the component, if applicable.
-	 */
-	/**
 	 * @constructor
 	 * @this {ComponentThis}
 	 * @description Class for managing components such as images and tables that are not in line format
@@ -87,9 +23,9 @@ declare class Component {
 	constructor(editor: __se__EditorCore);
 	/**
 	 * @description The current component information, used copy, cut, and keydown events
-	 * @type {ComponentInfo}
+	 * @type {__se__ComponentInfo}
 	 */
-	info: ComponentInfo;
+	info: __se__ComponentInfo;
 	/**
 	 * @description Component is selected
 	 * @type {boolean}
@@ -112,9 +48,9 @@ declare class Component {
 	currentPluginName: any;
 	/**
 	 * @description Currently selected component information
-	 * @type {ComponentInfo|null}
+	 * @type {__se__ComponentInfo|null}
 	 */
-	currentInfo: ComponentInfo | null;
+	currentInfo: __se__ComponentInfo | null;
 	/** @type {Object<string, (...args: *) => *>} */
 	__globalEvents: {
 		[x: string]: (...args: any) => any;
@@ -160,9 +96,9 @@ declare class Component {
 	 * @description Gets the file component and that plugin name
 	 * - return: {target, component, pluginName} | null
 	 * @param {Node} element Target element (figure tag, component div, file tag)
-	 * @returns {ComponentInfo|null}
+	 * @returns {__se__ComponentInfo|null}
 	 */
-	get(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): ComponentInfo | null;
+	get(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): __se__ComponentInfo | null;
 	/**
 	 * @this {ComponentThis}
 	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.
@@ -203,6 +139,13 @@ declare class Component {
 	 * @returns {boolean} True if the node is a basic (non-inline) component, otherwise false.
 	 */
 	isBasic(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): boolean;
+	/**
+	 * @this {ComponentThis}
+	 * @description Copies the specified component node to the clipboard.
+	 * - This function is different from the one called when the user presses the "Ctrl + C" key combination.
+	 * @param {Node} container The DOM node to check.
+	 */
+	copy(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node): void;
 	/**
 	 * @private
 	 * @this {ComponentThis}

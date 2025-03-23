@@ -177,11 +177,18 @@ declare class Table extends EditorInjector {
 	 */
 	action(): void;
 	/**
-	 * @editorMethod Modules.Component
+	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component of a plugin is selected.
 	 * @param {HTMLElement} target Target component element
 	 */
 	select(target: HTMLElement): void;
+	/**
+	 * @editorMethod Editor.component
+	 * @description Executes the method that is called when a component copy is requested.
+	 * @param {__se__PluginCopyComponentParams} params
+	 * @returns {boolean|void}
+	 */
+	onCopyComponent({ event, cloneContainer }: __se__PluginCopyComponentParams): boolean | void;
 	/**
 	 * @editorMethod Editor.core
 	 * @description This method is used to validate and preserve the format of the component within the editor.

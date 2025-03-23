@@ -309,7 +309,7 @@ declare class Video extends EditorInjector {
 	 */
 	init(): void;
 	/**
-	 * @editorMethod Modules.Component
+	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component of a plugin is selected.
 	 * @param {HTMLIFrameElement|HTMLVideoElement} target Target component element
 	 */

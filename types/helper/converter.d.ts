@@ -26,6 +26,29 @@ export function debounce(func: (...args: any) => void, wait: number): any;
  */
 export function syncMaps(targetMap: Map<any, any>, referenceMap: Map<any, any>): void;
 /**
+ * @description Object.values
+ * @param {Object<*, *>} obj Object parameter.
+ * @returns {Array<*>}
+ */
+export function getValues(obj: any): Array<any>;
+/**
+ * @description Convert the CamelCase To the KebabCase.
+ * @param {string|Array<string>} param [Camel string]
+ */
+export function camelToKebabCase(param: string | Array<string>): any;
+/**
+ * @overload
+ * @param {string} param - Kebab-case string.
+ * @returns {string} CamelCase string.
+ */
+export function kebabToCamelCase(param: string): string;
+/**
+ * @overload
+ * @param {Array<string>} param - Array of Kebab-case strings.
+ * @returns {Array<string>} Array of CamelCase strings.
+ */
+export function kebabToCamelCase(param: Array<string>): Array<string>;
+/**
  *
  * @param {"em"|"rem"|"%"|"pt"|"px"} to Size units to be converted
  * @param {string} size siSize to convert with units (ex: "15rem")
@@ -133,6 +156,9 @@ declare namespace converter {
 	export { entityToHTML };
 	export { debounce };
 	export { syncMaps };
+	export { getValues };
+	export { camelToKebabCase };
+	export { kebabToCamelCase };
 	export { toFontUnit };
 	export { nodeListToArray };
 	export { swapKeyValue };

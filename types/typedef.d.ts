@@ -5,6 +5,50 @@ declare global {
 	type __se__EditorCore = import('./core/editor').default;
 	type __se__EditorInjector = import('./editorInjector').default;
 	type __se__CoreInjector = import('./editorInjector/_core').default;
+	type __se__ComponentInfo = {
+		/**
+		 * - The target element associated with the component.
+		 */
+		target: HTMLElement;
+		/**
+		 * - The name of the plugin related to the component.
+		 */
+		pluginName: string;
+		/**
+		 * - Options related to the component.
+		 */
+		options: {
+			[x: string]: any;
+		};
+		/**
+		 * - The main container element for the component.
+		 */
+		container: HTMLElement;
+		/**
+		 * - The cover element, if applicable.
+		 */
+		cover: HTMLElement | null;
+		/**
+		 * - The inline cover element, if applicable.
+		 */
+		inlineCover: HTMLElement | null;
+		/**
+		 * - The caption element, if applicable.
+		 */
+		caption: HTMLElement | null;
+		/**
+		 * - Whether the component is a file-related component.
+		 */
+		isFile: boolean;
+		/**
+		 * - The element that triggered the component, if applicable.
+		 */
+		launcher: HTMLElement | null;
+		/**
+		 * - Whether the component is an input component (e.g., table).
+		 */
+		isInputType: boolean;
+	};
 	type __se__EditorStatus = {
 		/**
 		 * Boolean value of whether the editor has focus
@@ -150,6 +194,7 @@ declare global {
 		 */
 		editor: __se__EditorCore;
 	};
+	type __se__PluginCopyComponentParams = any;
 	type __se__FrameOptions = Map<string, any>;
 	type __se__FrameContext = Map<string, any>;
 	type __se__Context = Map<string, any>;

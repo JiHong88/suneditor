@@ -112,7 +112,7 @@ declare class Math_ extends EditorInjector {
 	isUpdateState: boolean;
 	_element: HTMLElement;
 	/**
-	 * @editorMethod Modules.Component
+	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component of a plugin is selected.
 	 * @param {HTMLElement} target Target component element
 	 */

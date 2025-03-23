@@ -91,6 +91,9 @@ export type FigureTargetInfo = {
 	 */
 	originHeight?: number;
 };
+/**
+ * "mirror". "rotate", "caption", "revert", "edit", "copy", "remove", "as", "resize_auto,[number]"
+ */
 export type FigureControls = Array<
 	Array<
 		| string
@@ -133,7 +136,17 @@ export type FigureControls = Array<
  * @property {number} [originHeight] - Original height from `naturalHeight` or `offsetHeight`.
  */
 /**
- * @typedef {Array<Array<string|{action: (element: Node, value: string, target: Node) => void, command: string, value: string, title: string, icon: string}>>} FigureControls
+ * @typedef {Array<Array<
+ *   string |
+ *   {
+ *     action: (element: Node, value: string, target: Node) => void,
+ *     command: string,
+ *     value: string,
+ *     title: string,
+ *     icon: string
+ *   }
+ * >>} FigureControls
+ * "mirror". "rotate", "caption", "revert", "edit", "copy", "remove", "as", "resize_auto,[number]"
  */
 /**
  * @class

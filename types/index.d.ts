@@ -33,6 +33,7 @@ export * from './core/section/documentType';
 export * from './editorInjector/_classes';
 export * from './editorInjector/_core';
 export * from './editorInjector/index';
+export * from './helper/clipboard';
 export * from './helper/converter';
 export * from './helper/env';
 export * from './helper/index';

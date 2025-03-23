@@ -225,6 +225,13 @@ declare class HTML {
 	): void;
 	/**
 	 * @this {HTMLThis}
+	 * @description Call "clipboard.write" to copy the contents and display a success/failure toast message.
+	 * @param {Element|Text|string} content Content to be copied to the clipboard
+	 * @returns {Promise<boolean>} Success or failure
+	 */
+	copy(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, content: Element | Text | string): Promise<boolean>;
+	/**
+	 * @this {HTMLThis}
 	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
 	 * @param {{head: string, body: string}} ctx { head: HTML string, body: HTML string}
 	 * @param {Object} [options] Options

@@ -44,7 +44,7 @@ declare class DocumentType {
 	_mirror: any;
 	_mirrorCache: number;
 	_positionCache: Map<any, any>;
-	_rePageTimeout: NodeJS.Timeout;
+	_rePageTimeout: number;
 	_paddingTop: number;
 	_paddingBottom: number;
 	/**

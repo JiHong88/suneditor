@@ -23,10 +23,19 @@ declare class UI {
 	 * @param {__se__EditorCore} editor - The root editor instance
 	 */
 	constructor(editor: __se__EditorCore);
-	noticeModal: Modal;
-	noticeMessage: HTMLSpanElement;
-	_backWrapper: HTMLElement;
 	_controllerOnBtnDisabled: boolean;
+	alertModal: HTMLElement;
+	alertMessage: HTMLSpanElement;
+	_alertArea: HTMLElement;
+	_alertInner: HTMLElement;
+	_closeListener: any[];
+	_closeSignal: boolean;
+	_bindClose: any;
+	_backWrapper: HTMLElement;
+	toastPopup: HTMLElement;
+	toastContainer: Element;
+	toastMessage: HTMLSpanElement;
+	_toastToggle: number;
 	/**
 	 * @this {UIThis}
 	 * @description Set "options.get('editorStyle')" style.
@@ -105,15 +114,27 @@ declare class UI {
 	disableBackWrapper(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
 	/**
 	 * @this {UIThis}
-	 * @description  Open the notice panel
-	 * @param {string} text Notice message
+	 * @description  Open the alert panel
+	 * @param {string} text alert message
+	 * @param {""|"error"|"success"} type alert type
 	 */
-	noticeOpen(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, text: string): void;
+	alertOpen(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, text: string, type: '' | 'error' | 'success'): void;
 	/**
 	 * @this {UIThis}
-	 * @description  Close the notice panel
+	 * @description  Close the alert panel
 	 */
-	noticeClose(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
+	alertClose(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
+	/**
+	 * @description Show toast
+	 * @param {string} message toast message
+	 * @param {number} [duration=1000] duration time(ms)
+	 * @param {""|"error"|"success"} [type=""] duration time(ms)
+	 */
+	showToast(message: string, duration?: number, type?: '' | 'error' | 'success'): void;
+	/**
+	 * @description Close toast
+	 */
+	closeToast(): void;
 	/**
 	 * @private
 	 * @this {UIThis}
@@ -141,4 +162,3 @@ declare class UI {
 	 */
 	_offCurrentModal(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
 }
-import Modal from '../../modules/Modal';

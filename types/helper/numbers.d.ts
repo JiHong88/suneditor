@@ -1,4 +1,7 @@
 /**
+ * @fileoverview Number-related helper functions
+ */
+/**
  * @description Checks for numeric (with decimal point).
  * @param {*} text Text string or number
  * @returns {boolean}
