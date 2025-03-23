@@ -5,7 +5,6 @@ import { _DragHandle } from '../modules';
 const { _w, ON_OVER_COMPONENT } = env;
 const INDEX_0 = '2147483645';
 const INDEX_1 = '2147483644';
-const INDEX_2 = '2147483643';
 
 /**
  * @typedef {Object} ControllerInfo
@@ -116,7 +115,7 @@ class Controller extends EditorInjector {
 
 		const parents = this.isOutsideForm ? this.parents : [];
 		this.editor.opendControllers?.forEach((e) => {
-			if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_2;
+			if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_1;
 		});
 
 		if (this.parentsHide) {
@@ -371,7 +370,7 @@ class Controller extends EditorInjector {
 		if (this.parents.length > 0 && this.isInsideForm) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
-		eventTarget.style.zIndex = INDEX_2;
+		eventTarget.style.zIndex = INDEX_1;
 	}
 
 	/**

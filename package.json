@@ -3,7 +3,7 @@
 	"version": "3.0.0-alpha.20",
 	"description": "Vanilla javascript based WYSIWYG web editor",
 	"author": "Yi JiHong",
-	"license": "MIT",
+	"license": "AGPL-3.0-only",
 	"main": "src/suneditor.js",
 	"types": "types/index.d.ts",
 	"sideEffects": [
@@ -22,6 +22,7 @@
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
 		"ts-build": "(npx tsc || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && npm run lint:fix-ts",
+		"i18n-build": "node scripts/i18n-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix",
 		"test": "karma start",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},
@@ -44,6 +45,7 @@
 		"@octokit/rest": "^21.1.1",
 		"@typescript-eslint/eslint-plugin": "^7.18.0",
 		"@typescript-eslint/parser": "^7.18.0",
+		"@vitalets/google-translate-api": "^9.2.1",
 		"@webpack-cli/serve": "^2.0.4",
 		"babel-loader": "^9.1.2",
 		"barrelsby": "^2.8.1",
@@ -82,10 +84,16 @@
 		"webpack-merge": "^5.9.0"
 	},
 	"browserslist": [
-		"last 2 versions",
-		"not dead",
-		"not < 1%",
-		"not ie <= 11"
+		"chrome >= 80",
+		"edge >= 80",
+		"firefox >= 74",
+		"safari >= 13.1",
+		"ios >= 13.4",
+		"opera >= 67",
+		"android >= 80",
+		"samsung >= 13",
+		"not IE <= 11",
+		"not dead"
 	],
 	"keywords": [
 		"wysiwyg",

@@ -115,8 +115,8 @@ class Table extends EditorInjector {
 		});
 
 		// members - Controller
-		this.controller_table = new Controller(this, controller_table, { position: 'top' });
 		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
+		this.controller_table = new Controller(this, controller_table, { position: 'top' });
 		// props
 		const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
 		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
@@ -350,7 +350,7 @@ class Table extends EditorInjector {
 
 		if (!this._fixedCell) return;
 
-		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
+		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { top: -this.controller_table.form.offsetHeight + 1 } : null;
 		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset, disabled: btnDisabled });
 	}
 

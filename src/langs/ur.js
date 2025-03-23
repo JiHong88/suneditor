@@ -196,7 +196,7 @@
 		underline: 'انڈر لائن',
 		undo: 'واپس کریں',
 		unlink: 'لنک ختم کریں',
-		VerticalSplit: 'عمودی تقسیم',
+		verticalSplit: 'عمودی تقسیم',
 		video: 'ویڈیو',
 		videoGallery: 'ویڈیو گیلری',
 		video_modal_file: 'فائلوں سے منتخب کریں',

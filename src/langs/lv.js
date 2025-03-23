@@ -85,7 +85,7 @@
 		fileBrowser: 'Failu pārlūks',
 		fileGallery: 'Failu galerija',
 		fileUpload: 'Failu augšupielāde',
-		fixColumnWidth: 'Fiksēts kolonnas platums',
+		fixedColumnWidth: 'Fiksēts kolonnas platums',
 		font: 'Fonts',
 		fontColor: 'Fonta krāsa',
 		fontSize: 'Fonta lielums',
