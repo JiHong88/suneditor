@@ -1,6 +1,6 @@
-# SunEditor
+# ![SunEditor](https://se3-docs-repo.s3.ap-northeast-2.amazonaws.com/logo/se3_logo_title.svg)
 
-Vanilla javscript based WYSIWYG web editor.
+Vanilla Javscript(ES2020) based WYSIWYG web editor.
 
 SunEditor supports all modern browsers except IE without any dependencies and polyfills.
 
@@ -12,16 +12,25 @@ SunEditor supports all modern browsers except IE without any dependencies and po
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
 [![npm version](https://img.shields.io/npm/v/suneditor.svg?style=flat-square)](https://www.npmjs.com/package/suneditor)
 [![](https://data.jsdelivr.com/v1/package/npm/suneditor/badge)](https://www.jsdelivr.com/package/npm/suneditor)
-[![npm](https://img.shields.io/npm/dt/suneditor.svg?style=flat-square)](https://www.npmjs.com/package/suneditor)
-![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/suneditor.svg?style=flat-square)
 
 ![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2700)
 
-#### Browser Support
+### Language
 
-| <img src="http://suneditor.com/docs/chrome-64.png" alt="Chrome" width="16px" height="16px" /> Chrome | <img src="http://suneditor.com/docs/mozilla-64.png" alt="Firefox" width="16px" height="16px" /> Firefox | <img src="http://suneditor.com/docs/opera-64.png" alt="Opera" width="16px" height="16px" /> Opera | <img src="http://suneditor.com/docs/safari-64.png" alt="Safari" width="16px" height="16px" /> Safari | <img src="http://suneditor.com/docs/edge-64.png" alt="Edge" width="16px" height="16px" /> Edge |
-| :--------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: |
-|                                                 Yes                                                  |                                                   Yes                                                   |                                                Yes                                                |                                                 Yes                                                  |                                              Yes                                               |
+-   JavaScript (ES2020)
+-   TypeScript: typings (`.d.ts`) provided via JSDoc
+-   No transpilation required (no Babel)
+-   Compatible with modern browsers only (see below)
+
+### Browser Support
+
+-   Chrome ≥ 80
+-   Firefox ≥ 74
+-   Safari ≥ 13.1
+-   iOS Safari ≥ 13.4
+-   Edge ≥ 80 (Chromium)
+-   Android WebView ≥ 80
+-   Not supported: Internet Explorer (IE), Legacy Edge
 
 ## Install
 
@@ -31,15 +40,18 @@ SunEditor supports all modern browsers except IE without any dependencies and po
 $ npm install suneditor --save
 ```
 
-#### CDN - [jsdelivr/suneditor](https://www.jsdelivr.com/package/npm/suneditor)
+#### CDN ([jsdelivr/suneditor](https://www.jsdelivr.com/package/npm/suneditor))
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
+
+<!-- CSS -->
+<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.css" rel="stylesheet" />
 <!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/variables.css" rel="stylesheet"> -->
 <!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor.css" rel="stylesheet"> -->
 <!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor-contents.css" rel="stylesheet"> -->
-<!-- languages (Basic Language: English/en) -->
+
+<!-- Languages (Basic Language: English/en) -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/langs/ko.js"></script>
 ```
 
@@ -48,3 +60,21 @@ $ npm install suneditor --save
 <a href="https://github.com/jihong88/suneditor/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=jihong88/suneditor" alt="contributors"/>
 </a>
+
+## 📄 License
+
+SunEditor is an open-source project available under the following licenses:
+
+-   **Version 2 (legacy):** MIT License → [See v2-legacy branch](https://github.com/JiHong88/suneditor/tree/v2-legacy)
+-   **Version 3 and later:** GNU AGPL v3 (Affero General Public License)
+
+### 🔐 Commercial Use
+
+If you want to use a **modified version** of SunEditor in a **commercial product**, SDK, or closed-source SaaS:
+
+-   📢 You must either **open source your modifications** under the AGPL v3, **or**
+-   💼 Purchase a **commercial license**
+
+See [LICENSE-COMMERCIAL.md](./LICENSE-COMMERCIAL.md) for full terms.
+
+For commercial licensing inquiries: **0125ses@hanmail.net**

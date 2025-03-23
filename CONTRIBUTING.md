@@ -2,8 +2,17 @@
 
 ## Introduction
 
-The codebase is written in vanilla JavaScript, with JSDoc used for type definitions.  
+The codebase is written in JavaScript(ES2020), with JSDoc used for type definitions.  
 Node.js v14 or higher is required to build and test.
+
+### Notes
+
+- Uses modern syntax including:
+  - Optional chaining (`?.`)
+  - Nullish coalescing (`??`)
+  - Private class fields (`#myField`)
+- Polyfills are **not included** – make sure your target environment supports these features.
+
 
 ## Before submitting an issue
 
