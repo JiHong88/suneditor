@@ -202,7 +202,9 @@
 		video_modal_file: 'ファイルの選択',
 		video_modal_title: '動画を挿入',
 		video_modal_url: 'メディア埋め込みアドレス, YouTube/Vimeo',
-		width: '横'
+		width: '横',
+		message_copy_success: 'クリップボードにコピーしました',
+		message_copy_fail: 'コピーに失敗しました。手動でコピーしてください。'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

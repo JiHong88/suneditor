@@ -202,7 +202,9 @@
 		video_modal_file: '上传图片',
 		video_modal_title: '插入视频',
 		video_modal_url: '嵌入网址, Youtube,Vimeo',
-		width: '宽度'
+		width: '宽度',
+		message_copy_success: '已复制到剪贴板',
+		message_copy_fail: '复制失败，请手动复制。'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

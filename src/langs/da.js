@@ -202,7 +202,9 @@
 		video_modal_file: 'Indsæt fra fil',
 		video_modal_title: 'Indsæt Video',
 		video_modal_url: 'Indlejr video / YouTube,Vimeo',
-		width: 'Bredde'
+		width: 'Bredde',
+		message_copy_success: 'Kopieret til udklipsholderen',
+		message_copy_fail: 'Kopiering mislykkedes. Kopiér venligst manuelt.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

@@ -202,7 +202,9 @@
 		video_modal_file: 'Seleziona da file',
 		video_modal_title: 'Inserisci video',
 		video_modal_url: 'Indirizzo video di embed, YouTube/Vimeo',
-		width: 'Larghezza'
+		width: 'Larghezza',
+		message_copy_success: 'Copiato negli appunti',
+		message_copy_fail: 'Copia non riuscita. Copia manuale richiesta.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

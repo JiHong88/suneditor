@@ -202,7 +202,9 @@
 		video_modal_file: 'Vybrat ze souborů',
 		video_modal_title: 'Vložit video',
 		video_modal_url: 'URL pro vložení médií, YouTube/Vimeo',
-		width: 'Šířka'
+		width: 'Šířka',
+		message_copy_success: 'Zkopírováno do schránky',
+		message_copy_fail: 'Kopírování selhalo. Zkopírujte prosím ručně.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

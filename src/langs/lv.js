@@ -202,7 +202,9 @@
 		video_modal_file: 'Izvēlieties no failiem',
 		video_modal_title: 'Ievietot video',
 		video_modal_url: 'Multivides iegulšanas URL, YouTube/Vimeo',
-		width: 'Platums'
+		width: 'Platums',
+		message_copy_success: 'Kopēts starpliktuvē',
+		message_copy_fail: 'Kopēšana neizdevās. Lūdzu, kopējiet manuāli.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

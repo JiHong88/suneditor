@@ -202,7 +202,9 @@
 		video_modal_file: 'انتخاب فایل',
 		video_modal_title: 'درج ویدئو',
 		video_modal_url: 'آدرس Url ویدئو, YouTube/Vimeo',
-		width: 'پهنا'
+		width: 'پهنا',
+		message_copy_success: 'در کلیپ‌بورد کپی شد',
+		message_copy_fail: 'کپی انجام نشد. لطفاً به صورت دستی کپی کنید.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

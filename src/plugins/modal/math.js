@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller } from '../../modules';
-import { dom, env, converter, clipboard } from '../../helper';
+import { dom, env, converter } from '../../helper';
 
 const { _w } = env;
 
@@ -368,7 +368,7 @@ class Math_ extends EditorInjector {
 
 		try {
 			const text = getValue(element);
-			await clipboard.write(text);
+			await this.html.copy(text);
 			dom.utils.addClass(element, 'se-copy');
 			// copy effect
 			_w.setTimeout(() => {

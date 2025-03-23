@@ -3,7 +3,8 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { dom, converter, keyCodeMap } from '../../helper';
+import { dom, converter, keyCodeMap, env } from '../../helper';
+const { _w } = env;
 
 /**
  * @typedef {Omit<UI & Partial<__se__EditorInjector>, 'ui'>} UIThis
@@ -19,6 +20,9 @@ import { dom, converter, keyCodeMap } from '../../helper';
 function UI(editor) {
 	CoreInjector.call(this, editor);
 
+	// members
+	this._controllerOnBtnDisabled = false;
+
 	// members - modal
 	const alertModal = CreateAlertHTML(editor);
 	this.alertModal = alertModal;
@@ -32,8 +36,13 @@ function UI(editor) {
 	this._bindClose = null;
 	this._backWrapper = /** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-back-wrapper'));
 
-	// members
-	this._controllerOnBtnDisabled = false;
+	// members - toast
+	const toastPopup = CreateToastHTML();
+	this.toastPopup = toastPopup;
+	this.toastContainer = toastPopup.querySelector('.se-toast-container');
+	this.toastMessage = toastPopup.querySelector('span');
+	this.carrierWrapper.appendChild(toastPopup);
+	this._toastToggle = null;
 }
 
 UI.prototype = {
@@ -255,7 +264,9 @@ UI.prototype = {
 	alertOpen(text, type) {
 		this.alertMessage.textContent = text;
 
-		if (type) dom.utils.addClass(this.alertModal, `se-alert-${type || ''}`);
+		dom.utils.removeClass(this.alertModal, 'se-alert-error|se-alert-success');
+		if (type) dom.utils.addClass(this.alertModal, `se-alert-${type}`);
+
 		if (this._closeSignal) this._alertInner.addEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
@@ -274,6 +285,40 @@ UI.prototype = {
 		this._alertArea.style.display = 'none';
 		if (this._closeSignal) this._alertInner.removeEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
+	},
+
+	/**
+	 * @description Show toast
+	 * @param {string} message toast message
+	 * @param {number} [duration=1000] duration time(ms)
+	 * @param {""|"error"|"success"} [type=""] duration time(ms)
+	 */
+	showToast(message, duration = 1000, type) {
+		if (dom.utils.hasClass(this.toastContainer, 'se-toast-show')) {
+			this.closeToast();
+		}
+
+		dom.utils.removeClass(this.toastPopup, 'se-toast-error|se-toast-success');
+		if (type) dom.utils.addClass(this.toastPopup, `se-toast-${type}`);
+
+		this.toastPopup.style.display = 'block';
+		this.toastMessage.textContent = message;
+		dom.utils.addClass(this.toastContainer, 'se-toast-show');
+
+		// remove after animation
+		this._toastToggle = _w.setTimeout(() => {
+			this.closeToast();
+		}, duration);
+	},
+
+	/**
+	 * @description Close toast
+	 */
+	closeToast() {
+		if (this._toastToggle) _w.clearTimeout(this._toastToggle);
+		this._toastToggle = null;
+		dom.utils.removeClass(this.toastContainer, 'se-toast-show');
+		this.toastPopup.style.display = 'none';
 	},
 
 	/**
@@ -367,6 +412,11 @@ function CloseListener(e) {
 function CreateAlertHTML({ lang, icons }) {
 	const html = '<div><button class="close" data-command="close" title="' + lang.close + '">' + icons.cancel + '</button></div><div><span></span></div>';
 	return dom.utils.createElement('DIV', { class: 'se-alert-content' }, html);
+}
+
+function CreateToastHTML() {
+	const html = '<div class="se-toast-container"><span></span></div>';
+	return dom.utils.createElement('DIV', { class: 'se-toast' }, html);
 }
 
 export default UI;

@@ -125,9 +125,9 @@ DocumentType.prototype = {
 	 */
 	async rePage(force) {
 		if (!this.page) return;
-		if (this._rePageTimeout) clearTimeout(this._rePageTimeout);
+		if (this._rePageTimeout) _w.clearTimeout(this._rePageTimeout);
 
-		this._rePageTimeout = setTimeout(async () => {
+		this._rePageTimeout = _w.setTimeout(async () => {
 			await dom.utils.waitForMediaLoad(this._mirror, 1500);
 
 			const mirrorHeight = this._mirror.scrollHeight;

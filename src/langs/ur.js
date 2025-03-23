@@ -202,7 +202,9 @@
 		video_modal_file: 'فائلوں سے منتخب کریں',
 		video_modal_title: 'ویڈیو داخل کریں',
 		video_modal_url: 'ذرائع ابلاغ کا یو آر ایل، یوٹیوب/ویمیو',
-		width: 'چوڑائی'
+		width: 'چوڑائی',
+		message_copy_success: 'کلپ بورڈ میں کاپی ہو گیا',
+		message_copy_fail: 'کاپی ناکام۔ براہ کرم دستی طور پر کاپی کریں۔'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

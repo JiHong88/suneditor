@@ -202,7 +202,9 @@
 		video_modal_file: 'Lägg till från fil',
 		video_modal_title: 'Lägg till video',
 		video_modal_url: 'Bädda in video / YouTube,Vimeo',
-		width: 'Bredd'
+		width: 'Bredd',
+		message_copy_success: 'Kopierat till urklipp',
+		message_copy_fail: 'Kopieringen misslyckades. Kopiera manuellt.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

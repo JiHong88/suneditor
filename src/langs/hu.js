@@ -116,7 +116,7 @@
 		layout: 'Elrendezés',
 		left: 'Balra',
 		lineHeight: 'Sormagasság',
-		link: 'Link',
+		link: 'Hivatkozás',
 		link_modal_bookmark: 'Könyvjelző',
 		link_modal_downloadLinkCheck: 'Letöltési link',
 		link_modal_newWindowCheck: 'Új ablakban nyitás',
@@ -133,11 +133,11 @@
 		maxSize: 'Maximális méret',
 		mediaGallery: 'Média galéria',
 		mention: 'Említés',
-		menu_bordered: 'Körvonalas',
+		menu_bordered: 'Keretezett',
 		menu_code: 'Kód',
 		menu_neon: 'Neon',
 		menu_shadow: 'Árnyék',
-		menu_spaced: 'Szellősebb',
+		menu_spaced: 'Ritkított',
 		menu_translucent: 'Áttetsző',
 		mergeCells: 'Cellák egyesítése',
 		minSize: 'Minimális méret',
@@ -191,7 +191,7 @@
 		tag_p: 'Bekezdés',
 		tag_pre: 'Kód',
 		template: 'Minta',
-		textStyle: 'Szövegstílus',
+		textStyle: 'Karakterstílus',
 		title: 'Cím',
 		underline: 'Aláhúzott',
 		undo: 'Visszavonás',
@@ -202,7 +202,9 @@
 		video_modal_file: 'Fájl feltöltés',
 		video_modal_title: 'Videó beszúrása',
 		video_modal_url: 'Beágyazható URL, YouTube/Vimeo',
-		width: 'Szélesség'
+		width: 'Szélesség',
+		message_copy_success: 'Vágólapra másolva',
+		message_copy_fail: 'A másolás sikertelen. Kérjük, másolja kézzel.'
 	};
 
 	if (typeof noGlobal === 'undefined') {

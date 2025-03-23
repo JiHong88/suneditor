@@ -202,7 +202,9 @@
 		video_modal_file: 'Wybierz plik',
 		video_modal_title: 'Wstaw wideo',
 		video_modal_url: 'Adres URL video, np. YouTube/Vimeo',
-		width: 'Szerokość'
+		width: 'Szerokość',
+		message_copy_success: 'Skopiowano do schowka',
+		message_copy_fail: 'Nie udało się skopiować. Skopiuj ręcznie.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

@@ -202,7 +202,9 @@
 		video_modal_file: 'فایلێك هه‌ڵبژێره‌',
 		video_modal_title: 'ڤیدیۆیه‌ك دابنێ',
 		video_modal_url: 'YouTube/Vimeo به‌سته‌ری له‌ناودانان وه‌ك ',
-		width: 'پانی'
+		width: 'پانی',
+		message_copy_success: 'لە پەڕگەی لەبەرگرتووەدا هاوپەڕ کرا',
+		message_copy_fail: 'هاوپەڕکردن سەرکەوتوو نەبوو. تکایە بەدەست هاوپەڕ بکە.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

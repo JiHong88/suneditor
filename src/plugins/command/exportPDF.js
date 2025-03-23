@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { dom, env } from '../../helper';
 import { ApiManager } from '../../modules';
 
-const { _d } = env;
+const { _w, _d } = env;
 
 /**
  * @class
@@ -123,7 +123,7 @@ class ExportPDF extends EditorInjector {
 			_d.body.appendChild(a);
 			a.click();
 		} finally {
-			setTimeout(() => {
+			_w.setTimeout(() => {
 				dom.utils.removeItem(a);
 				URL.revokeObjectURL(downloadUrl);
 			}, 100);

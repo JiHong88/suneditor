@@ -202,7 +202,9 @@
 		video_modal_file: 'Dosya Seç',
 		video_modal_title: 'Video Ekle',
 		video_modal_url: "Medya Ekleme URL'si (YouTube/Vimeo)",
-		width: 'Genişlik'
+		width: 'Genişlik',
+		message_copy_success: 'Panoya kopyalandı',
+		message_copy_fail: 'Kopyalama başarısız oldu. Lütfen manuel olarak kopyalayın.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

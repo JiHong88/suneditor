@@ -509,7 +509,7 @@ export function waitForMediaLoad(target, timeout = 5000) {
 			});
 		});
 
-		Promise.race([Promise.all(mediaPromises), new Promise((resolve) => setTimeout(resolve, timeout))]).then(() => {
+		Promise.race([Promise.all(mediaPromises), new Promise((resolve) => _w.setTimeout(resolve, timeout))]).then(() => {
 			resolveAll();
 		});
 	});

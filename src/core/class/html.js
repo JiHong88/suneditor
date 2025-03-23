@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { dom, converter, numbers, unicode } from '../../helper';
+import { dom, converter, numbers, unicode, clipboard } from '../../helper';
 
 const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
@@ -1140,6 +1140,24 @@ HTML.prototype = {
 			} else {
 				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertToCode(convertValue, false));
 			}
+		}
+	},
+
+	/**
+	 * @this {HTMLThis}
+	 * @description Call "clipboard.write" to copy the contents and display a success/failure toast message.
+	 * @param {Element|Text|string} content Content to be copied to the clipboard
+	 * @returns {Promise<boolean>} Success or failure
+	 */
+	async copy(content) {
+		try {
+			await clipboard.write(content);
+			this.editor.ui.showToast(this.lang.message_copy_success, 550);
+			return true;
+		} catch (err) {
+			console.error('[SUNEDITOR.html.copy.fail] :', err);
+			this.editor.ui.showToast(this.lang.message_copy_fail, 1500, 'error');
+			return false;
 		}
 	},
 

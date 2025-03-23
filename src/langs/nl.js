@@ -202,7 +202,9 @@
 		video_modal_file: 'Selecteer een bestand van uw apparaat',
 		video_modal_title: 'Video invoegen',
 		video_modal_url: 'Embedded URL (YouTube/Vimeo)',
-		width: 'Breedte'
+		width: 'Breedte',
+		message_copy_success: 'Gekopieerd naar klembord',
+		message_copy_fail: 'Kopiëren mislukt. Kopieer handmatig.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

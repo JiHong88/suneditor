@@ -202,7 +202,9 @@
 		video_modal_file: 'בחר מקובץ',
 		video_modal_title: 'הכנס סרטון',
 		video_modal_url: 'כתובת הטמעה YouTube/Vimeo',
-		width: 'רוחב'
+		width: 'רוחב',
+		message_copy_success: 'הועתק ללוח',
+		message_copy_fail: 'ההעתקה נכשלה. נא להעתיק ידנית.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

@@ -67,7 +67,7 @@ export function debounce(func, wait) {
 		};
 
 		_w.clearTimeout(timeout);
-		timeout = setTimeout(later, wait);
+		timeout = _w.setTimeout(later, wait);
 	};
 }
 

@@ -3,9 +3,9 @@ import { dom, env, keyCodeMap } from '../helper';
 import { _DragHandle } from '../modules';
 
 const { _w, ON_OVER_COMPONENT } = env;
-const INDEX_0 = '2147483647';
-const INDEX_1 = '2147483646';
-const INDEX_2 = '2147483645';
+const INDEX_0 = '2147483645';
+const INDEX_1 = '2147483644';
+const INDEX_2 = '2147483643';
 
 /**
  * @typedef {Object} ControllerInfo

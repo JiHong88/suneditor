@@ -202,7 +202,9 @@
 		video_modal_file: 'Выберите файл',
 		video_modal_title: 'Вставить видео',
 		video_modal_url: 'Ссылка на видео, Youtube,Vimeo',
-		width: 'Ширина'
+		width: 'Ширина',
+		message_copy_success: 'Скопировано в буфер обмена',
+		message_copy_fail: 'Не удалось скопировать. Пожалуйста, скопируйте вручную.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

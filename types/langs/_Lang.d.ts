@@ -188,4 +188,6 @@ export interface _Lang {
 	video_modal_title: string;
 	video_modal_url: string;
 	width: string;
+	message_copy_success: string;
+	message_copy_fail: string;
 }

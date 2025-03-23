@@ -1,4 +1,4 @@
-import { env, converter, dom, numbers, clipboard } from '../helper';
+import { env, converter, dom, numbers } from '../helper';
 import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, RO_UNAVAILABD } from './section/constructor';
 import { UpdateStatusbarContext } from './section/context';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
@@ -558,7 +558,7 @@ Editor.prototype = {
 				if (range.collapsed) break;
 
 				const container = dom.utils.createElement('div', null, range.cloneContents());
-				await clipboard.write(container.innerHTML);
+				await this.html.copy(container.innerHTML);
 
 				break;
 			}

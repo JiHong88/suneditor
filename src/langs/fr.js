@@ -202,7 +202,9 @@
 		video_modal_file: 'Sélectionner le fichier',
 		video_modal_title: 'Insérer une vidéo',
 		video_modal_url: 'URL d’intégration du média, YouTube/Vimeo',
-		width: 'Largeur'
+		width: 'Largeur',
+		message_copy_success: 'Copié dans le presse-papiers',
+		message_copy_fail: 'Échec de la copie. Veuillez copier manuellement.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

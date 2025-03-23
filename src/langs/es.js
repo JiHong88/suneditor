@@ -202,7 +202,9 @@
 		video_modal_file: 'Seleccionar desde los archivos',
 		video_modal_title: 'Insertar Video',
 		video_modal_url: 'URL del vídeo',
-		width: 'Ancho'
+		width: 'Ancho',
+		message_copy_success: 'Copiado al portapapeles',
+		message_copy_fail: 'Error al copiar. Por favor, copie manualmente.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {

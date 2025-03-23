@@ -202,7 +202,9 @@
 		video_modal_file: 'Datei auswählen',
 		video_modal_title: 'Video einfügen',
 		video_modal_url: 'Video-URL, YouTube/Vimeo',
-		width: 'Breite'
+		width: 'Breite',
+		message_copy_success: 'In die Zwischenablage kopiert',
+		message_copy_fail: 'Kopieren fehlgeschlagen. Bitte manuell kopieren.'
 	};
 
 	if (typeof noGlobal === typeof undefined) {
