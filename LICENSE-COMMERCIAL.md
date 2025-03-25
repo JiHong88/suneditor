@@ -1,18 +1,20 @@
 # Commercial License for SunEditor v3
 
-SunEditor v3 is licensed under the GNU AGPL v3.  
-If you use or modify SunEditor in a way that requires code disclosure under the AGPL (e.g., in a commercial platform, product, or modified deployment), you must:
+SunEditor v3 is licensed under the GNU Affero General Public License (AGPL v3).  
+To use SunEditor v3 without complying with the obligations of the AGPL (such as open-sourcing your modifications), you must purchase a separate commercial license.
 
-- Open source your modified version under the AGPL, **or**
-- Purchase a commercial license
+## When do I need a Commercial License?
 
-## When is a Commercial License Required?
+A commercial license is required if you:
 
-- Using SunEditor or a modified version in a commercial editor, SDK, or platform
-- Bundling the editor into a product or service for external customers
-- Integrating it into a closed-source, paid SaaS product where modifications are made
+- Integrate SunEditor into a proprietary (closed-source) product or service.
+- Modify SunEditor without publicly releasing the modified source code under AGPL v3.
+- Use SunEditor in commercial editors, SDKs, SaaS products, or platforms that do not comply with AGPL requirements.
 
-## Contact
+If you choose not to purchase a commercial license, you must fully comply with the terms of AGPL v3, including releasing the full source code of any modified or derivative versions.
 
-For commercial licensing inquiries, please contact:  
-0125ses@hanmail.net
+## How to Purchase a Commercial License?
+
+For pricing, inquiries, or purchasing a commercial license, please contact:
+
+**Email:** 0125ses@hanmail.net
