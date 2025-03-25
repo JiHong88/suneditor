@@ -3,7 +3,7 @@
 	"version": "3.0.0-alpha.20",
 	"description": "Vanilla javascript based WYSIWYG web editor",
 	"author": "Yi JiHong",
-	"license": "AGPL-3.0-only",
+	"license": "MIT",
 	"main": "src/suneditor.js",
 	"types": "types/index.d.ts",
 	"sideEffects": [
