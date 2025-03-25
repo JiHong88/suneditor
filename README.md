@@ -29,33 +29,17 @@ SunEditor supports all modern browsers (excluding IE) without dependencies or po
 
 ---
 
-## 📦 Installation
+## ⚡ Install & Quick Start
 
-### NPM
+You can use SunEditor via **npm** or **CDN**.
 
-```sh
+Please refer to the 🌤 **[Live Demo](https://suneditor.com)** 🌤 for detailed documentation and examples.
+
+### 🧩 NPM
+
+```bash
 npm install suneditor --save
 ```
-
-### CDN ([jsDelivr](https://www.jsdelivr.com/package/npm/suneditor))
-
-```html
-<!-- SunEditor JS -->
-<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
-
-<!-- SunEditor CSS -->
-<link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.css" rel="stylesheet" />
-<!-- Optional CSS (assets/*.css): variables, suneditor, suneditor-contents -->
-
-<!-- Optional language (default is English): e.g., Korean (ko) -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/langs/ko.js"></script> -->
-```
-
----
-
-## ⚡ Quick Start
-
-#### npm
 
 ```js
 import 'suneditor/dist/suneditor.min.css';
@@ -67,11 +51,13 @@ suneditor.create(document.querySelector('#editor'), {
 });
 ```
 
-#### CDN
+### 🌐 CDN ([jsDelivr](https://www.jsdelivr.com/package/npm/suneditor))
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.css" rel="stylesheet" />
+<!-- Optional language (default is English): e.g., Korean (ko) -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/langs/ko.js"></script> -->
 
 <div id="editor"></div>
 <!-- or <textarea id="editor"></textarea> -->
@@ -82,8 +68,6 @@ suneditor.create(document.querySelector('#editor'), {
 	});
 </script>
 ```
-
-Please refer to the 🌤 **[Live Demo](https://suneditor.com)** 🌤 for detailed documentation and examples.
 
 ---
 
