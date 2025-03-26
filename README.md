@@ -1,10 +1,18 @@
-# ![SunEditor](https://se3-docs-repo.s3.ap-northeast-2.amazonaws.com/logo/se3_logo_title.svg)
+# ![SunEditor](https://s3.ap-northeast-2.amazonaws.com/suneditor.com/docs/se3_logo_title.svg)
 
 **A vanilla JavaScript (ES2020) WYSIWYG web editor**
 
 SunEditor supports all modern browsers (excluding IE) without dependencies or polyfills.
 
-🌤 **[✨ Live Demo – Try SunEditor Now! ✨](http://suneditor.com)** 🌤
+## 🌟 Why SunEditor?
+
+-   ⚡ Lightweight and fast
+-   ✨ Pure vanilla JavaScript (no dependencies)
+-   🧩 Plugin-based architecture
+-   📱 Responsive and touch-friendly
+-   🌐 Easy integration with frameworks (React, Vue, etc.)
+
+🌤 **[ Live Demo – Try SunEditor Now! ](http://suneditor.com)** 🌤
 
 ⭐ **Contributions welcome!** Please refer to [Contribution Guidelines](/CONTRIBUTING.md) and check out our [open tasks](https://github.com/jihong88/suneditor/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22). ⭐
 
@@ -29,13 +37,12 @@ SunEditor supports all modern browsers (excluding IE) without dependencies or po
 
 ---
 
-## ⚡ Install & Quick Start
+## 🚀 Install & Quick Start
 
-You can use SunEditor via **npm** or **CDN**.
+> 💡 **Want to see it in action?**  
+> Check out the 🌤 [**Live Demo**](https://suneditor.com) 🌤 with full options and examples.
 
-Please refer to the 🌤 **[Live Demo](https://suneditor.com)** 🌤 for detailed documentation and examples.
-
-### 🧩 NPM
+### NPM
 
 ```bash
 npm install suneditor --save
@@ -47,11 +54,24 @@ import suneditor from 'suneditor';
 
 // HTML: <div id="editor"></div> or <textarea id="editor"></textarea>
 suneditor.create(document.querySelector('#editor'), {
-	/** options */
+	buttonList: [
+		['undo', 'redo'],
+		'|',
+		['bold', 'underline', 'italic', 'strike', '|', 'subscript', 'superscript'],
+		'|',
+		['removeFormat'],
+		'|',
+		['outdent', 'indent'],
+		'|',
+		['fullScreen', 'showBlocks', 'codeView'],
+		'|',
+		['preview', 'print', 'copy']
+	],
+	height: 'auto'
 });
 ```
 
-### 🌐 CDN ([jsDelivr](https://www.jsdelivr.com/package/npm/suneditor))
+### CDN ([jsDelivr](https://www.jsdelivr.com/package/npm/suneditor))
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
@@ -64,10 +84,41 @@ suneditor.create(document.querySelector('#editor'), {
 
 <script>
 	SUNEDITOR.create(document.querySelector('#editor'), {
-		/** options */
+		buttonList: [
+			['undo', 'redo'],
+			'|',
+			['bold', 'underline', 'italic', 'strike', '|', 'subscript', 'superscript'],
+			'|',
+			['removeFormat'],
+			'|',
+			['outdent', 'indent'],
+			'|',
+			['fullScreen', 'showBlocks', 'codeView'],
+			'|',
+			['preview', 'print', 'copy']
+		],
+		height: 'auto'
 	});
 </script>
 ```
+
+---
+
+## 📦 Plugins
+
+SunEditor supports a plugin-based architecture.
+You can enable only the plugins you need or even create your own custom ones.
+
+```js
+suneditor.create('#editor', {
+	plugins: ['font', 'image', 'video'],
+	image: {
+		uploadUrl: 'https://upload.image'
+	}
+});
+```
+
+📘 [Learn how to build your own plugin →](https://suneditor.com/plugins)
 
 ---
 
