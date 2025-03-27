@@ -736,7 +736,7 @@ EventManager.prototype = {
 		const files = clipboardData.files;
 		if (files.length > 0 && !MSData) {
 			for (let i = 0, len = files.length; i < len; i++) {
-				this._callPluginEvent('onPastAndDrop', { frameContext, event: e, file: files[i] });
+				this._callPluginEvent('onFilePasteAndDrop', { frameContext, event: e, file: files[i] });
 			}
 
 			return false;
@@ -747,7 +747,11 @@ EventManager.prototype = {
 		}
 
 		if (cleanData) {
-			this.html.insert(cleanData, { selectInserted: false, skipCharCount: true, skipCleaning: true });
+			const domParser = new DOMParser().parseFromString(cleanData, 'text/html');
+			if (this._callPluginEvent('onPaste', { frameContext, event: e, data: cleanData, doc: domParser }) !== true) {
+				this.html.insert(cleanData, { selectInserted: false, skipCharCount: true, skipCleaning: true });
+			}
+
 			// document type
 			if (frameContext.has('documentType-use-header')) {
 				frameContext.get('documentType').reHeader();
@@ -1145,7 +1149,7 @@ EventManager.prototype = {
 	 * @description Calls a registered plugin event and executes associated handlers.
 	 * - If any handler returns `false`, the event propagation stops.
 	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: __se__FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File }} e The event object passed to the plugin event handler
+	 * @param {{ frameContext: __se__FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
 	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
 	 */
 	_callPluginEvent(name, e) {

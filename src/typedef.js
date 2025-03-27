@@ -97,10 +97,18 @@
  */
 
 /**
+ * @typedef {Object} __se__PluginPasteParams
+ * @property {__se__FrameContext} frameContext Frame context
+ * @property {ClipboardEvent} event Clipboard event object
+ * @property {string} data Format cleaned paste data (HTML string)
+ * @property {Document} doc DomParser data (new DOMParser().parseFromString(data, 'text/html');)
+ */
+
+/**
  * @typedef {Object} __se__PluginCopyComponentParams
- * @param {ClipboardEvent} event Clipboard event object
- * @param {HTMLElement} cloneContainer Cloned component container
- * @param {__se__ComponentInfo} info Component information
+ * @property {ClipboardEvent} event Clipboard event object
+ * @property {HTMLElement} cloneContainer Cloned component container
+ * @property {__se__ComponentInfo} info Component information
  */
 
 // --------------------------------------------------------- [Context] ---------------------------------------------------------------------------------------------------

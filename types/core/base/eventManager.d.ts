@@ -338,7 +338,7 @@ declare class EventManager {
 	 * @description Calls a registered plugin event and executes associated handlers.
 	 * - If any handler returns `false`, the event propagation stops.
 	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: __se__FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File }} e The event object passed to the plugin event handler
+	 * @param {{ frameContext: __se__FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
 	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
 	 */
 	_callPluginEvent(
@@ -351,6 +351,7 @@ declare class EventManager {
 			line?: Node;
 			range?: Range;
 			file?: File;
+			doc?: Document;
 		}
 	): boolean | undefined;
 	/**

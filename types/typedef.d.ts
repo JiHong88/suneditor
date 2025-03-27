@@ -194,7 +194,38 @@ declare global {
 		 */
 		editor: __se__EditorCore;
 	};
-	type __se__PluginCopyComponentParams = any;
+	type __se__PluginPasteParams = {
+		/**
+		 * Frame context
+		 */
+		frameContext: __se__FrameContext;
+		/**
+		 * Clipboard event object
+		 */
+		event: ClipboardEvent;
+		/**
+		 * Format cleaned paste data (HTML string)
+		 */
+		data: string;
+		/**
+		 * DomParser data (new DOMParser().parseFromString(data, 'text/html');)
+		 */
+		doc: Document;
+	};
+	type __se__PluginCopyComponentParams = {
+		/**
+		 * Clipboard event object
+		 */
+		event: ClipboardEvent;
+		/**
+		 * Cloned component container
+		 */
+		cloneContainer: HTMLElement;
+		/**
+		 * Component information
+		 */
+		info: __se__ComponentInfo;
+	};
 	type __se__FrameOptions = Map<string, any>;
 	type __se__FrameContext = Map<string, any>;
 	type __se__Context = Map<string, any>;

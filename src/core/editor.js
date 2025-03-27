@@ -1290,7 +1290,8 @@ Editor.prototype = {
 			['onKeyUp', []],
 			['onFocus', []],
 			['onBlur', []],
-			['onPastAndDrop', []]
+			['onPaste', []],
+			['onFilePasteAndDrop', []]
 		]);
 		this._fileManager.tags = [];
 		this._fileManager.pluginMap = {};

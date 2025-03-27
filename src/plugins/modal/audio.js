@@ -144,7 +144,7 @@ class Audio_ extends EditorInjector {
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
-	onPastAndDrop({ file }) {
+	onFilePasteAndDrop({ file }) {
 		if (!/^audio/.test(file.type)) return;
 
 		this.submitFile([file]);

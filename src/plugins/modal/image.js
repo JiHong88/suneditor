@@ -229,7 +229,7 @@ class Image_ extends EditorInjector {
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
-	onPastAndDrop({ file }) {
+	onFilePasteAndDrop({ file }) {
 		if (!/^image/.test(file.type)) return;
 
 		this.submitFile([file]);

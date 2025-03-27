@@ -85,7 +85,7 @@ declare class FileUpload extends EditorInjector {
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
-	onPastAndDrop({ file }: { frameContext: __se__FrameContext; event: ClipboardEvent; file: File }): boolean;
+	onFilePasteAndDrop({ file }: { frameContext: __se__FrameContext; event: ClipboardEvent; file: File }): boolean;
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a target component is edited.
