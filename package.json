@@ -100,13 +100,17 @@
 		"wysiwyg editor",
 		"wysiwyg html editor",
 		"rich text",
-		"rich editor",
 		"rich text editor",
-		"html",
-		"text",
+		"rich editor",
+		"html editor",
+		"text editor",
 		"editor",
+		"javascript editor",
+		"vanilla javascript",
 		"contenteditable",
-		"javascript",
-		"vanillajs"
+		"lightweight editor",
+		"text formatting",
+		"web editor",
+		"browser editor"
 	]
 }
