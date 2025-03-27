@@ -371,6 +371,30 @@ class Table extends EditorInjector {
 	}
 
 	/**
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "copy".
+	 * @param {__se__PluginPasteParams} params
+	 * @returns {boolean|void}
+	 */
+	onPaste({ event, doc }) {
+		/** @type {HTMLTableCellElement} */
+		const targetCell = dom.query.getParentElement(dom.query.getEventTarget(event), dom.check.isTableCell);
+		if (!targetCell) return;
+
+		const domParserBody = doc.body;
+		if (domParserBody.childElementCount !== 1) return;
+
+		const componentInfo = this.component.get(domParserBody.firstElementChild);
+		if (componentInfo.pluginName !== Table.key) return;
+
+		this.setCellInfo(targetCell, true);
+		const copyTable = componentInfo.target;
+		console.log(copyTable);
+
+		return true;
+	}
+
+	/**
 	 * @editorMethod Editor.core
 	 * @description This method is used to validate and preserve the format of the component within the editor.
 	 * - It ensures that the structure and attributes of the element are maintained and secure.
@@ -587,7 +611,7 @@ class Table extends EditorInjector {
 	 */
 	onKeyDown({ event, range, line }) {
 		this._ref = null;
-		if (this.editor.selectMenuOn || this._resizing || this.__s) return;
+		if (this.editor.selectMenuOn || this._resizing || this.__s || keyCodeMap.isCtrl(event)) return;
 
 		const keyCode = event.code;
 		this.__s = event.shiftKey;

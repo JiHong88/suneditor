@@ -1154,8 +1154,9 @@ EventManager.prototype = {
 	 */
 	_callPluginEvent(name, e) {
 		const eventPlugins = this.editor._onPluginEvents.get(name);
-		for (let i = 0; i < eventPlugins.length; i++) {
-			if (eventPlugins[i](e) === false) return false;
+		for (let i = 0, r; i < eventPlugins.length; i++) {
+			r = eventPlugins[i](e);
+			if (typeof r === 'boolean') return r;
 		}
 	},
 
