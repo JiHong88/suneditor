@@ -195,6 +195,7 @@
 		title: 'タイトル',
 		underline: '下線',
 		undo: '元に戻す',
+		unmergeCells: 'セルのマージ解除',
 		unlink: 'リンク解除',
 		verticalSplit: '垂直分割',
 		video: '動画',

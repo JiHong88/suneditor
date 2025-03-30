@@ -1,4 +1,5 @@
 // Portuguese (Brazil)
+// 브라질 포르투갈어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Título',
 		underline: 'Sublinhado',
 		undo: 'Voltar',
+		unmergeCells: 'Desfazer mesclagem de células',
 		unlink: 'Remover link',
 		verticalSplit: 'Divisão vertical',
 		video: 'Vídeo',

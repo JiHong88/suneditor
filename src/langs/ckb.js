@@ -1,4 +1,5 @@
 // Central Kurdish (Sorani) (کوردیی ناوەندی)
+// 쿠르드어 (소라니)
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'ناونیشان',
 		underline: 'هێڵ به‌ژێردا بێنه‌',
 		undo: 'وەک خۆی لێ بکەوە',
+		unmergeCells: 'خانەکان یەکبخەنەوە',
 		unlink: 'سڕینەوەی بەستەر',
 		verticalSplit: 'جیاكردنه‌وه‌ی ستونی',
 		video: 'ڤیدیۆ',

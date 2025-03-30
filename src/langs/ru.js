@@ -1,4 +1,5 @@
 // Russia
+// 러시아어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Заголовок',
 		underline: 'Подчёркнутый',
 		undo: 'Отменить',
+		unmergeCells: 'Отменить объединение ячеек',
 		unlink: 'Убрать ссылку',
 		verticalSplit: 'Разделить вертикально',
 		video: 'Видео',

@@ -1,4 +1,5 @@
 // Latvia
+// 라트리아어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Nosaukums',
 		underline: 'Pasvītrot',
 		undo: 'Atsaukt',
+		unmergeCells: 'Atvienot šūnu sapludināšanu',
 		unlink: 'Atsaistīt',
 		verticalSplit: 'Vertikāls sadalījums',
 		video: 'Video',

@@ -1,4 +1,5 @@
 // Poland
+// 폴란드어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Tytuł',
 		underline: 'Podkreślenie',
 		undo: 'Cofnij',
+		unmergeCells: 'Cofnij scalanie komórek',
 		unlink: 'Usuń odnośnik',
 		verticalSplit: 'Podział pionowy',
 		video: 'Wideo',

@@ -115,8 +115,8 @@ class Table extends EditorInjector {
 		});
 
 		// members - Controller
-		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
 		this.controller_table = new Controller(this, controller_table, { position: 'top' });
+		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
 		// props
 		const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
 		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
@@ -229,6 +229,8 @@ class Table extends EditorInjector {
 		this.captionButton = controller_table.querySelector('._se_table_caption');
 		/** @type {HTMLButtonElement} */
 		this.mergeButton = controller_cell.mergeButton;
+		/** @type {HTMLButtonElement} */
+		this.unmergeButton = controller_cell.unmergeButton;
 
 		// members - private
 		this._resizing = false;
@@ -350,6 +352,7 @@ class Table extends EditorInjector {
 
 		if (!this._fixedCell) return;
 
+		this._setUnMergeButton();
 		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { top: -this.controller_table.form.offsetHeight + 1 } : null;
 		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset, disabled: btnDisabled });
 	}
@@ -367,6 +370,7 @@ class Table extends EditorInjector {
 
 		if (selectedCells.length > 0) {
 			SetClipboardSelectedTableCells(event, cloneContainer, selectedCells);
+			this.editor.ui.showToast(this.lang.message_copy_success, 550);
 		}
 	}
 
@@ -798,7 +802,10 @@ class Table extends EditorInjector {
 				this._setAlignProps(this.propTargets.cell_alignment_vertical, target.getAttribute('data-value'), false);
 				break;
 			case 'merge':
-				this.mergeCells();
+				this.mergeCells(this._selectedCells);
+				break;
+			case 'unmerge':
+				this.unmergeCells(this._selectedCells);
 				break;
 			case 'resize':
 				this._maxWidth = !this._maxWidth;
@@ -1437,31 +1444,41 @@ class Table extends EditorInjector {
 		if (!copyTable || !targetTD) return;
 
 		this.setCellInfo(copyTable.querySelector('TD'), true);
-		const copyRows = copyTable.rows;
-		const copyInfo = {
-			physicalCellCnt: this._physical_cellCnt,
-			logicalCellCnt: this._logical_cellCnt,
-			rowCnt: this._rowCnt,
-			rowInex: this._rowIndex,
-			physicalCellIndex: this._physical_cellIndex,
-			logicalCellIndex: this._logical_cellIndex,
-			currentColSpan: this._current_colSpan,
-			currentRowSpan: this._current_rowSpan
-		};
+		// const copyRows = copyTable.rows;
+		// const copyInfo = {
+		// 	physicalCellCnt: this._physical_cellCnt,
+		// 	logicalCellCnt: this._logical_cellCnt,
+		// 	rowCnt: this._rowCnt,
+		// 	rowInex: this._rowIndex,
+		// 	physicalCellIndex: this._physical_cellIndex,
+		// 	logicalCellIndex: this._logical_cellIndex,
+		// 	currentColSpan: this._current_colSpan,
+		// 	currentRowSpan: this._current_rowSpan
+		// };
 
-		this.setCellInfo(targetTD, true);
-		const targetTable = targetTD.closest('table');
-		const targetRows = targetTable.rows;
-		const targetInfo = {
-			physicalCellCnt: this._physical_cellCnt,
-			logicalCellCnt: this._logical_cellCnt,
-			rowCnt: this._rowCnt,
-			rowInex: this._rowIndex,
-			physicalCellIndex: this._physical_cellIndex,
-			logicalCellIndex: this._logical_cellIndex,
-			currentColSpan: this._current_colSpan,
-			currentRowSpan: this._current_rowSpan
-		};
+		// this.setCellInfo(targetTD, true);
+		// const targetTable = targetTD.closest('table');
+		// const targetRows = targetTable.rows;
+		// const targetInfo = {
+		// 	physicalCellCnt: this._physical_cellCnt,
+		// 	logicalCellCnt: this._logical_cellCnt,
+		// 	rowCnt: this._rowCnt,
+		// 	rowInex: this._rowIndex,
+		// 	physicalCellIndex: this._physical_cellIndex,
+		// 	logicalCellIndex: this._logical_cellIndex,
+		// 	currentColSpan: this._current_colSpan,
+		// 	currentRowSpan: this._current_rowSpan
+		// };
+
+		// // target table cells info
+		// for (let r = 0, rLen = targetRows.length; r < rLen; r++) {
+		// 	const row = targetRows[r];
+		// 	const cells = row.cells;
+		// 	for (let c = 0, cLen = cells.length; c < cLen; c++) {
+		// 		const cell = cells[c];
+		// 		this.unmergeCells(cell);
+		// 	}
+		// }
 
 		this._historyPush();
 	}
@@ -1482,10 +1499,14 @@ class Table extends EditorInjector {
 	/**
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
 	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
+	 * @param {HTMLTableCellElement[]} selectedCells Cells array
 	 */
-	mergeCells() {
+	mergeCells(selectedCells) {
+		if (!this._ref) {
+			this._setMultiCells(selectedCells[0], selectedCells[selectedCells.length - 1]);
+		}
+
 		const ref = this._ref;
-		const selectedCells = this._selectedCells;
 		const mergeCell = selectedCells[0];
 
 		let emptyRowFirst = null;
@@ -1547,11 +1568,81 @@ class Table extends EditorInjector {
 		mergeCell.colSpan = cs;
 		mergeCell.rowSpan = rs;
 
-		this._setMergeSplitButton(true, false);
+		this._setMergeSplitButton(null, undefined);
 		this._setController(mergeCell);
 
 		this.editor.focusEdge(mergeCell);
 		this._historyPush();
+	}
+
+	/**
+	 * @description Unmerges a table cell that has been merged using rowspan and/or colspan.
+	 * @param {HTMLTableCellElement[]} selectedCells - Cells array
+	 */
+	unmergeCells(selectedCells) {
+		let firstCell = selectedCells[0];
+		let lastCell = selectedCells[selectedCells.length - 1];
+		let newLastCell = null;
+
+		const table = firstCell.closest('table');
+		const rows = table.rows;
+
+		for (const cell of selectedCells) {
+			const tr = /** @type {HTMLTableRowElement} */ (cell.parentElement);
+			const rowIndex = tr.rowIndex;
+			const colIndex = cell.cellIndex;
+			const rowspan = cell.rowSpan;
+			const colspan = cell.colSpan;
+
+			if (rowspan === 1 && colspan === 1) continue;
+
+			this.setCellInfo(cell, true);
+
+			const originalHTML = cell.innerHTML;
+			cell.remove();
+
+			for (let r = 0; r < rowspan; r++) {
+				const targetRow = rows[rowIndex + r];
+
+				for (let c = 0; c < colspan; c++) {
+					const newCell = CreateCellsHTML('td');
+
+					if (r === 0 && c === 0) {
+						if (firstCell === cell) firstCell = newCell;
+						if (lastCell === cell) lastCell = newCell;
+						newCell.innerHTML = originalHTML;
+						targetRow.insertBefore(newCell, targetRow.cells[colIndex]);
+					} else {
+						targetRow.insertBefore(newCell, targetRow.cells[colIndex + c]);
+						newLastCell = newCell;
+					}
+				}
+			}
+		}
+
+		this._historyPush();
+
+		if (firstCell !== lastCell) {
+			lastCell = lastCell.closest('tr').rowIndex > newLastCell.closest('tr').rowIndex || lastCell.cellIndex > newLastCell.cellIndex ? lastCell : newLastCell;
+			this._setMultiCells(firstCell, lastCell);
+			this._selectedCells = Array.from(table.querySelectorAll('.se-selected-table-cell'));
+		}
+
+		this.controller_cell.resetPosition(lastCell);
+	}
+
+	/**
+	 * @description Find merged cells
+	 * @param {HTMLTableCellElement[]} cells - Cells array
+	 */
+	findMergedCells(cells) {
+		const mergedCells = [];
+		cells?.forEach((cell) => {
+			if (cell.rowSpan > 1 || cell.colSpan > 1) {
+				mergedCells.push(cell);
+			}
+		});
+		return mergedCells;
 	}
 
 	/**
@@ -1641,8 +1732,8 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the merge/split button visibility.
-	 * @param {boolean} fixedCell - Whether a single cell is selected.
-	 * @param {boolean} selectedCell - Whether multiple cells are selected.
+	 * @param {?HTMLTableCellElement=} fixedCell - Whether a single cell is selected.
+	 * @param {?HTMLTableCellElement=} selectedCell - Whether multiple cells are selected.
 	 */
 	_setMergeSplitButton(fixedCell, selectedCell) {
 		if (!selectedCell || !selectedCell || fixedCell === selectedCell) {
@@ -1656,6 +1747,18 @@ class Table extends EditorInjector {
 
 	/**
 	 * @private
+	 * @description Sets the unmerge button visibility.
+	 */
+	_setUnMergeButton() {
+		if (this.findMergedCells(this._selectedCells).length > 0) {
+			this.unmergeButton.style.display = 'block';
+		} else {
+			this.unmergeButton.style.display = 'none';
+		}
+	}
+
+	/**
+	 * @private
 	 * @description Sets the controller position for a cell.
 	 * @param {HTMLTableCellElement} tdElement - The target table cell.
 	 */
@@ -1664,6 +1767,8 @@ class Table extends EditorInjector {
 			this._deleteStyleSelectedCells();
 			return;
 		}
+
+		this._setUnMergeButton();
 
 		this._tdElement = tdElement;
 		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
@@ -2868,7 +2973,7 @@ class Table extends EditorInjector {
 
 		if (!this._fixedCell || !this._selectedTable) return;
 
-		this._setMergeSplitButton(!!this._fixedCell, !!this._selectedCell);
+		this._setMergeSplitButton(this._fixedCell, this._selectedCell);
 		this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 
 		const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
@@ -3017,6 +3122,87 @@ function OnPropsBorderFormatEdit(defaultCommand, command) {
 	this.selectMenu_props_border_format_oneCell.close();
 }
 
+/**
+ * @description Creates the table properties controller.
+ * @param {ClipboardEvent} e - Event object
+ * @param {HTMLElement} container - The container element
+ * @param {NodeListOf<HTMLTableCellElement>} selectedCells - The selected table cells
+ */
+function SetClipboardSelectedTableCells(e, container, selectedCells) {
+	e.preventDefault();
+	e.stopPropagation();
+
+	const originalTable = selectedCells[0].closest('table');
+	const tempTable = originalTable.cloneNode(false);
+	const tbody = dom.utils.createElement('tbody');
+	tempTable.appendChild(tbody);
+
+	const cellPositions = new Map();
+	selectedCells.forEach((cell) => {
+		cellPositions.set(cell, true);
+	});
+
+	const rows = originalTable.rows;
+	const rowCount = rows.length;
+	const colCount = Array.from(rows[0].cells).reduce((sum, cell) => sum + (cell.colSpan || 1), 0);
+	const matrix = Array.from({ length: rowCount }, () => Array(colCount).fill(null));
+
+	// build matrix
+	for (let r = 0, realRow = 0; r < rowCount; r++, realRow++) {
+		const cells = rows[r].cells;
+		for (let c = 0, realCol = 0, cLen = cells.length; c < cLen; c++) {
+			while (matrix[realRow][realCol]) realCol++;
+			const cell = cells[c];
+			const rowspan = cell.rowSpan || 1;
+			const colspan = cell.colSpan || 1;
+			for (let i = 0; i < rowspan; i++) {
+				for (let j = 0; j < colspan; j++) {
+					matrix[realRow + i][realCol + j] = cell;
+				}
+			}
+			realCol += colspan;
+		}
+	}
+
+	// construct new table
+	for (let r = 0; r < rowCount; r++) {
+		let newRow;
+		for (let c = 0; c < colCount; c++) {
+			const cell = matrix[r][c];
+			if (!cell || !cellPositions.has(cell)) continue;
+
+			if (!newRow) {
+				newRow = dom.utils.createElement('tr');
+				tbody.appendChild(newRow);
+			}
+
+			if (newRow.lastChild && matrix[r][c - 1] === cell) continue;
+			if (r > 0 && matrix[r - 1][c] === cell) continue;
+
+			const clonedCell = cell.cloneNode(true);
+
+			// recalculate rowspan and colspan
+			let rowspan = 1;
+			let colspan = 1;
+			while (r + rowspan < rowCount && matrix[r + rowspan][c] === cell) rowspan++;
+			while (c + colspan < colCount && matrix[r][c + colspan] === cell) colspan++;
+
+			if (rowspan > 1) clonedCell.rowSpan = rowspan;
+			if (colspan > 1) clonedCell.colSpan = colspan;
+
+			newRow.appendChild(clonedCell);
+		}
+	}
+
+	const figure = dom.utils.createElement('figure');
+	figure.className = container.className;
+	figure.appendChild(tempTable);
+
+	const htmlContent = `<html><body><!--StartFragment-->${figure.outerHTML}<!--EndFragment--></body></html>`;
+	e.clipboardData.setData('text/html', htmlContent);
+}
+
+/** --------------------- HTML Create --------------------- */
 // init element
 function CreateSplitMenu(lang) {
 	const menus = dom.utils.createElement(
@@ -3173,7 +3359,7 @@ function CreateHTML_controller_table({ lang, icons }) {
 
 /**
  * @param {__se__EditorCore} editor
- * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement }}
+ * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement, unmergeButton: HTMLButtonElement }}
  */
 function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
 	const html = /*html*/ `
@@ -3209,6 +3395,12 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
                 <span class="se-tooltip-text">${lang.splitCells}</span>
             </span>
         </button>
+		<button type="button" data-command="unmerge" class="se-btn se-tooltip">
+            ${icons.unmerge_cell}
+            <span class="se-tooltip-inner">
+                <span class="se-tooltip-text">${lang.unmergeCells}</span>
+            </span>
+        </button>
     </div>`;
 
 	const content = dom.utils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
@@ -3218,88 +3410,9 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
 		splitButton: content.querySelector('[data-command="onsplit"]'),
 		columnButton: content.querySelector('[data-command="oncolumn"]'),
 		rowButton: content.querySelector('[data-command="onrow"]'),
-		mergeButton: content.querySelector('[data-command="merge"]')
+		mergeButton: content.querySelector('[data-command="merge"]'),
+		unmergeButton: content.querySelector('[data-command="unmerge"]')
 	};
-}
-
-/**
- * @description Creates the table properties controller.
- * @param {ClipboardEvent} e - Event object
- * @param {HTMLElement} container - The container element
- * @param {NodeListOf<HTMLTableCellElement>} selectedCells - The selected table cells
- */
-function SetClipboardSelectedTableCells(e, container, selectedCells) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	const originalTable = selectedCells[0].closest('table');
-	const tempTable = originalTable.cloneNode(false);
-	const tbody = dom.utils.createElement('tbody');
-	tempTable.appendChild(tbody);
-
-	const cellPositions = new Map();
-	selectedCells.forEach((cell) => {
-		cellPositions.set(cell, true);
-	});
-
-	const rows = originalTable.rows;
-	const rowCount = rows.length;
-	const colCount = Array.from(rows[0].cells).reduce((sum, cell) => sum + (cell.colSpan || 1), 0);
-	const matrix = Array.from({ length: rowCount }, () => Array(colCount).fill(null));
-
-	// build matrix
-	for (let r = 0, realRow = 0; r < rowCount; r++, realRow++) {
-		const cells = rows[r].cells;
-		for (let c = 0, realCol = 0, cLen = cells.length; c < cLen; c++) {
-			while (matrix[realRow][realCol]) realCol++;
-			const cell = cells[c];
-			const rowspan = cell.rowSpan || 1;
-			const colspan = cell.colSpan || 1;
-			for (let i = 0; i < rowspan; i++) {
-				for (let j = 0; j < colspan; j++) {
-					matrix[realRow + i][realCol + j] = cell;
-				}
-			}
-			realCol += colspan;
-		}
-	}
-
-	// construct new table
-	for (let r = 0; r < rowCount; r++) {
-		let newRow;
-		for (let c = 0; c < colCount; c++) {
-			const cell = matrix[r][c];
-			if (!cell || !cellPositions.has(cell)) continue;
-
-			if (!newRow) {
-				newRow = dom.utils.createElement('tr');
-				tbody.appendChild(newRow);
-			}
-
-			if (newRow.lastChild && matrix[r][c - 1] === cell) continue;
-			if (r > 0 && matrix[r - 1][c] === cell) continue;
-
-			const clonedCell = cell.cloneNode(true);
-
-			// recalculate rowspan and colspan
-			let rowspan = 1;
-			let colspan = 1;
-			while (r + rowspan < rowCount && matrix[r + rowspan][c] === cell) rowspan++;
-			while (c + colspan < colCount && matrix[r][c + colspan] === cell) colspan++;
-
-			if (rowspan > 1) clonedCell.rowSpan = rowspan;
-			if (colspan > 1) clonedCell.colSpan = colspan;
-
-			newRow.appendChild(clonedCell);
-		}
-	}
-
-	const figure = dom.utils.createElement('figure');
-	figure.className = container.className;
-	figure.appendChild(tempTable);
-
-	const htmlContent = `<html><body><!--StartFragment-->${figure.outerHTML}<!--EndFragment--></body></html>`;
-	e.clipboardData.setData('text/html', htmlContent);
 }
 
 /**

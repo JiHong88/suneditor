@@ -1,4 +1,5 @@
 // Czechoslovakia
+// 체코어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Titul',
 		underline: 'Podtržení',
 		undo: 'Zpět',
+		unmergeCells: 'Zrušit sloučení buněk',
 		unlink: 'Odpojit',
 		verticalSplit: 'Svislé rozdělení',
 		video: 'Video',

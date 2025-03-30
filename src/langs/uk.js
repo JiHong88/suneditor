@@ -1,4 +1,5 @@
 // Ukraine
+// 우크라이나어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -14,7 +15,7 @@
 	}
 })(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
 	const lang = {
-		code: 'ua',
+		code: 'uk',
 		align: 'Вирівнювання',
 		alignBottom: 'Вирівняти низ',
 		alignCenter: 'По центру',
@@ -195,6 +196,7 @@
 		title: 'Назва',
 		underline: 'Підкреслений',
 		undo: 'Скасувати',
+		unmergeCells: 'Скасувати об’єднання комірок',
 		unlink: 'Прибрати посилання',
 		verticalSplit: 'Розділити вертикально',
 		video: 'Відео',
@@ -217,7 +219,7 @@
 			});
 		}
 
-		Object.defineProperty(window.SUNEDITOR_LANG, 'ua', {
+		Object.defineProperty(window.SUNEDITOR_LANG, 'uk', {
 			enumerable: true,
 			writable: true,
 			configurable: true,

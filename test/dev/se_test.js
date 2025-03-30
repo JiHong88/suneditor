@@ -955,107 +955,85 @@ window.editor_root = suneditor.create(
 
 <figure class="se-flex-component se-input-component se-scroll-figure-x">
   <table class="se-table-layout-auto" style="">
-    <colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 17%;"><col style="width:33%"><col style="width: 10%;"><col style="width: 10%;"></colgroup>
+    <colgroup><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"></colgroup>
     <tbody>
       <tr>
         <td class="">
-          <div>312<br>
-          </div>
+          <div>1</div>
         </td>
         <td class="">
-          <div>312<br>
-          </div>
+          <div>2</div>
         </td>
         <td class="">
-          <div>fdsaf<br>
-          </div>
+          <div>3</div>
         </td>
         <td class="">
-          <div>dfsa<br>
-          </div>
+          <div>4</div>
         </td>
         <td class="">
-          <div>fdsa<br>
-          </div>
+          <div>5</div>
         </td>
         <td class="">
-          <div>31<br>
-          </div>
+          <div>6</div>
         </td>
       </tr>
       <tr>
         <td class="">
-          <div>312<br>
-          </div>
+          <div>7</div>
         </td>
         <td class="" colspan="1" rowspan="2">
-          <div>312<br>
-          </div>
+          <div>8</div>
         </td>
         <td class="" colspan="2" rowspan="3">
-          <div>fddadsa</div>
+          <div>9</div>
         </td>
         <td class="" colspan="1" rowspan="2">
-          <div>fdsa<br>
-          </div>
+          <div>10</div>
         </td>
         <td class="">
-          <div>fdsa<br>
-          </div>
+          <div>11</div>
         </td>
       </tr>
       <tr>
         <td class="">
-          <div>312<br>
-          </div>
+          <div>12</div>
         </td>
         <td class="">
-          <div>fdsa<br>
-          </div>
+          <div>13</div>
         </td>
       </tr>
       <tr>
         <td class="">
-          <div>312<br>
-          </div>
+          <div>14</div>
         </td>
         <td class="">
-          <div>321<br>
-          </div>
+          <div>15</div>
         </td>
         <td class="">
-          <div>231<br>
-          </div>
+          <div>16</div>
         </td>
         <td class="">
-          <div>312<br>
-          </div>
+          <div>17</div>
         </td>
       </tr>
       <tr>
         <td class="">
-          <div>312<br>
-          </div>
+          <div>18</div>
         </td>
         <td class="">
-          <div>312<br>
-          </div>
+          <div>19</div>
         </td>
         <td class="">
-          <div>321<br>
-          </div>
+          <div>20</div>
         </td>
         <td class="">
-          <div>321<br>
-          </div>
+          <div>21</div>
         </td>
         <td class="">
-          <div>312<br>
-          </div>
+          <div>22</div>
         </td>
         <td class="">
-          <div>321<br>
-          </div>
+          <div>23</div>
         </td>
       </tr>
     </tbody>

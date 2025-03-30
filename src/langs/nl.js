@@ -1,4 +1,5 @@
 // Netherlands
+// 네덜란드어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Titel',
 		underline: 'Onderstrepen',
 		undo: 'Ongedaan maken',
+		unmergeCells: 'Samenvoegen van cellen ongedaan maken',
 		unlink: 'Ontkoppelen',
 		verticalSplit: 'Verticaal splitsen',
 		video: 'Video',

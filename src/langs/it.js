@@ -1,4 +1,5 @@
 // Italy
+// 이탈리아어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Titolo',
 		underline: 'Sottolineato',
 		undo: 'Annulla',
+		unmergeCells: 'Annulla unione celle',
 		unlink: 'Elimina link',
 		verticalSplit: 'Separa verticalmente',
 		video: 'Video',

@@ -1,4 +1,5 @@
 // France
+// 프랑스어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Titre',
 		underline: 'Souligné',
 		undo: 'Annuler',
+		unmergeCells: 'Annuler la fusion des cellules',
 		unlink: 'Supprimer un lien',
 		verticalSplit: 'Scission verticale',
 		video: 'Video',

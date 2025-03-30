@@ -1,4 +1,5 @@
 // Spainish
+// 스페인어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Título',
 		underline: 'Subrayado',
 		undo: 'Deshacer última acción',
+		unmergeCells: 'Separar celdas combinadas',
 		unlink: 'Desvincular',
 		verticalSplit: 'División vertical',
 		video: 'Video',

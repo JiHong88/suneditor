@@ -1,4 +1,5 @@
 // Romania
+// 루마니아어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Titlu',
 		underline: 'Subliniat',
 		undo: 'Anulează',
+		unmergeCells: 'Anulează unirea celulelor',
 		unlink: 'Scoate link',
 		verticalSplit: 'Despicare verticală',
 		video: 'Video',

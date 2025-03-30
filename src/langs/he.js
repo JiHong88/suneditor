@@ -1,4 +1,5 @@
 // Hebrew
+// 히브리어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'כּוֹתֶרֶת',
 		underline: 'קו תחתון',
 		undo: 'בטל',
+		unmergeCells: 'בטל מיזוג תאים',
 		unlink: 'הסר קישורים',
 		verticalSplit: 'פצל לרוחב',
 		video: 'חוזי',

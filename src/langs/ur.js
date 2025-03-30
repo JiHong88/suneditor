@@ -1,4 +1,5 @@
 // Urdu
+// 우르두어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'عنوان',
 		underline: 'انڈر لائن',
 		undo: 'واپس کریں',
+		unmergeCells: 'سیلز کا انضمام ختم کریں',
 		unlink: 'لنک ختم کریں',
 		verticalSplit: 'عمودی تقسیم',
 		video: 'ویڈیو',

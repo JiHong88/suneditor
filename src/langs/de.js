@@ -1,4 +1,5 @@
 // Germany
+// 독일어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Titel',
 		underline: 'Unterstrichen',
 		undo: 'Rückgängig',
+		unmergeCells: 'Zellen zusammenführung aufheben',
 		unlink: 'Link entfernen',
 		verticalSplit: 'Vertikal teilen',
 		video: 'Video',

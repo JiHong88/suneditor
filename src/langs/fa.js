@@ -1,4 +1,5 @@
 // Farsi (Persian)
+// 페르시아어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'عنوان',
 		underline: 'زیرخطدار کردن',
 		undo: 'برگرداندن تغییر',
+		unmergeCells: 'جدا کردن سلول‌های ادغام‌شده',
 		unlink: 'حذف لینک',
 		verticalSplit: 'تقسیم در جهت عمودی',
 		video: 'درج ویدئو',

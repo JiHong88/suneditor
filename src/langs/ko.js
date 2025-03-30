@@ -195,6 +195,7 @@
 		title: '제목',
 		underline: '밑줄',
 		undo: '실행 취소',
+		unmergeCells: '셀 병합 해제',
 		unlink: '링크 해제',
 		verticalSplit: '세로 분할',
 		video: '동영상',

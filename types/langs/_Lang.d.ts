@@ -180,6 +180,7 @@ export interface _Lang {
 	title: string;
 	underline: string;
 	undo: string;
+	unmergeCells: string;
 	unlink: string;
 	verticalSplit: string;
 	video: string;

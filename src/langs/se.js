@@ -1,4 +1,5 @@
 // Sweden
+// 스웨덴
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Titel',
 		underline: 'Understruket',
 		undo: 'Ångra',
+		unmergeCells: 'koppla bort celler',
 		unlink: 'Ta bort länk',
 		verticalSplit: 'Separera vertikalt',
 		video: 'Video',

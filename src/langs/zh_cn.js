@@ -1,4 +1,5 @@
 // Simplified Chinese, Mainland China
+// 중국어 (간체)
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: '标题',
 		underline: '下划线',
 		undo: '撤消',
+		unmergeCells: '取消合并单元格',
 		unlink: '去除链接',
 		verticalSplit: '垂直分割',
 		video: '视频',

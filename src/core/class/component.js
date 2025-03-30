@@ -380,7 +380,8 @@ Component.prototype = {
 		// remove selected class
 		dom.utils.removeClass(cloneContainer, 'se-component-selected');
 		dom.utils.removeClass(cloneContainer.querySelectorAll('.se-figure-selected'), 'se-figure-selected');
-		dom.utils.removeClass(cloneContainer.querySelectorAll('.se-selected-table-cell, se-selected-cell-focus'), 'se-selected-table-cell|se-selected-cell-focus');
+		dom.utils.removeClass(cloneContainer.querySelectorAll('.se-selected-table-cell'), 'se-selected-table-cell');
+		dom.utils.removeClass(cloneContainer.querySelector('.se-selected-cell-focus'), 'se-selected-cell-focus');
 
 		// copy to clipboard
 		this.html.copy(cloneContainer);

@@ -1,4 +1,5 @@
 // Hungarian
+// 헝가리어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Cím',
 		underline: 'Aláhúzott',
 		undo: 'Visszavonás',
+		unmergeCells: 'Cellák egyesítésének visszavonása',
 		unlink: 'Link eltávolítása',
 		verticalSplit: 'Függőleges elválasztás',
 		video: 'Videó',

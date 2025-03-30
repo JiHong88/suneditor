@@ -1,4 +1,5 @@
 // Danish
+// 덴마크어
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Titel',
 		underline: 'Understreget',
 		undo: 'Undo',
+		unmergeCells: 'Ophæv cellefletning',
 		unlink: 'Fjern link',
 		verticalSplit: 'Opdel vertikalt',
 		video: 'Video',

@@ -1,4 +1,5 @@
 // Turkey
+// 튀르키예
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = global.document
@@ -195,6 +196,7 @@
 		title: 'Başlık',
 		underline: 'Alt Çizili',
 		undo: 'Geri Al',
+		unmergeCells: 'Hücre birleştirmeyi kaldır',
 		unlink: 'Bağlantıyı Kaldır',
 		verticalSplit: 'Dikey Ayırma',
 		video: 'Video',
