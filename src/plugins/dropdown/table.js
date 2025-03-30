@@ -387,9 +387,8 @@ class Table extends EditorInjector {
 		const componentInfo = this.component.get(domParserBody.firstElementChild);
 		if (componentInfo.pluginName !== Table.key) return;
 
-		this.setCellInfo(targetCell, true);
-		const copyTable = componentInfo.target;
-		console.log(copyTable);
+		const copyTable = /** @type {HTMLTableElement} */ (componentInfo.target);
+		this.pasteTableCellMatrix(copyTable, targetCell);
 
 		return true;
 	}
@@ -931,6 +930,7 @@ class Table extends EditorInjector {
 	setCellInfo(tdElement, reset) {
 		const table = this.setTableInfo(tdElement);
 		if (!table) return;
+		this._fixedCell = tdElement;
 		this._trElement = /** @type {HTMLTableRowElement} */ (tdElement.parentNode);
 
 		// hedaer
@@ -1258,6 +1258,7 @@ class Table extends EditorInjector {
 	 * - left: to insert a new cell to the left
 	 * - right: to insert a new cell to the right
 	 * @param {?HTMLTableCellElement=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
+	 * @returns {HTMLTableCellElement} Target table cell
 	 */
 	editCell(option, positionResetElement) {
 		const remove = !option;
@@ -1423,6 +1424,46 @@ class Table extends EditorInjector {
 		} else {
 			this._setCellControllerPosition(positionResetElement || this._tdElement, true);
 		}
+
+		return positionResetElement || this._tdElement;
+	}
+
+	/**
+	 * @description Updates the target table's cells with the data from the copied table.
+	 * @param {HTMLTableElement} copyTable The table containing the copied data.
+	 * @param {HTMLTableCellElement} targetTD The starting cell in the target table where data will be pasted.
+	 */
+	pasteTableCellMatrix(copyTable, targetTD) {
+		if (!copyTable || !targetTD) return;
+
+		this.setCellInfo(copyTable.querySelector('TD'), true);
+		const copyRows = copyTable.rows;
+		const copyInfo = {
+			physicalCellCnt: this._physical_cellCnt,
+			logicalCellCnt: this._logical_cellCnt,
+			rowCnt: this._rowCnt,
+			rowInex: this._rowIndex,
+			physicalCellIndex: this._physical_cellIndex,
+			logicalCellIndex: this._logical_cellIndex,
+			currentColSpan: this._current_colSpan,
+			currentRowSpan: this._current_rowSpan
+		};
+
+		this.setCellInfo(targetTD, true);
+		const targetTable = targetTD.closest('table');
+		const targetRows = targetTable.rows;
+		const targetInfo = {
+			physicalCellCnt: this._physical_cellCnt,
+			logicalCellCnt: this._logical_cellCnt,
+			rowCnt: this._rowCnt,
+			rowInex: this._rowIndex,
+			physicalCellIndex: this._physical_cellIndex,
+			logicalCellIndex: this._logical_cellIndex,
+			currentColSpan: this._current_colSpan,
+			currentRowSpan: this._current_rowSpan
+		};
+
+		this._historyPush();
 	}
 
 	/**

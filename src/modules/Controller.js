@@ -127,7 +127,7 @@ class Controller extends EditorInjector {
 		this.__addGlobalEvent();
 
 		// display controller
-		this._setControllerPosition(this.form, this.currentPositionTarget);
+		this._setControllerPosition(this.form, this.currentPositionTarget, false);
 
 		const isRangeTarget = target instanceof Range;
 		this.currentTarget = isRangeTarget ? null : target;
@@ -174,7 +174,7 @@ class Controller extends EditorInjector {
 	 * @description Show controller
 	 */
 	show() {
-		this._setControllerPosition(this.form, this.currentPositionTarget);
+		this._setControllerPosition(this.form, this.currentPositionTarget, false);
 	}
 
 	/**
@@ -182,7 +182,7 @@ class Controller extends EditorInjector {
 	 * @param {Node=} target
 	 */
 	resetPosition(target) {
-		this._setControllerPosition(this.form, target || this.currentPositionTarget);
+		this._setControllerPosition(this.form, target || this.currentPositionTarget, true);
 	}
 
 	/**
@@ -255,9 +255,10 @@ class Controller extends EditorInjector {
 	 * @description Specify the position of the controller.
 	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
+	 * @param {?boolean=} reload Maintain z-index when repositioning
 	 */
-	_setControllerPosition(controller, refer) {
-		controller.style.zIndex = INDEX_1;
+	_setControllerPosition(controller, refer, reload) {
+		if (!reload) controller.style.zIndex = INDEX_1;
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
