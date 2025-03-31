@@ -146,24 +146,27 @@ class Table extends EditorInjector {
 
 		this.sliderType = '';
 
+		// members - SelectMenu [cells]
+		const openCellMenuFunc = _CellFormZIndex.bind(this, true);
+		const closeCellMenuFunc = _CellFormZIndex.bind(this, false);
 		// members - SelectMenu - split
 		const splitMenu = CreateSplitMenu(this.lang);
 		this.splitButton = controller_cell.splitButton;
-		this.selectMenu_split = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_split = new SelectMenu(this, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
 		this.selectMenu_split.on(this.splitButton, this.#OnSplitCells.bind(this));
 		this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 
 		// members - SelectMenu - column
 		const columnMenu = CreateColumnMenu(this.lang, this.icons);
 		const columnButton = controller_cell.columnButton;
-		this.selectMenu_column = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_column = new SelectMenu(this, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
 		this.selectMenu_column.on(columnButton, this.#OnColumnEdit.bind(this));
 		this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
 
 		// members - SelectMenu - row
 		const rownMenu = CreateRowMenu(this.lang, this.icons);
 		const rowButton = controller_cell.rowButton;
-		this.selectMenu_row = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_row = new SelectMenu(this, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
 		this.selectMenu_row.on(rowButton, this.#OnRowEdit.bind(this));
 		this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 
@@ -1442,6 +1445,47 @@ class Table extends EditorInjector {
 	 */
 	pasteTableCellMatrix(copyTable, targetTD) {
 		if (!copyTable || !targetTD) return;
+
+		// copy info
+		const copyRows = copyTable.rows;
+		let logicalColCount = 0;
+		for (let i = 0, cells = copyRows[0].cells, len = cells.length; i < len; i++) {
+			const cell = cells[i];
+			logicalColCount += cell.colSpan || 1;
+		}
+		const copyInfo = {
+			rowCnt: copyRows.length,
+			logicalCellCnt: logicalColCount
+		};
+
+		// target info
+		this.setCellInfo(targetTD, true);
+		this._deleteStyleSelectedCells();
+		const targetTable = targetTD.closest('table');
+		const targetInfo = {
+			physicalCellCnt: this._physical_cellCnt,
+			logicalCellCnt: this._logical_cellCnt,
+			rowCnt: this._rowCnt,
+			rowInex: this._rowIndex,
+			physicalCellIndex: this._physical_cellIndex,
+			logicalCellIndex: this._logical_cellIndex,
+			currentColSpan: this._current_colSpan,
+			currentRowSpan: this._current_rowSpan
+		};
+
+		// target table expand
+		const addRowCnt = copyInfo.rowCnt - (targetInfo.rowCnt - (targetInfo.rowInex + 1)) - 1;
+		const addColCnt = copyInfo.logicalCellCnt - (targetInfo.logicalCellCnt - (targetInfo.logicalCellIndex + 1)) - 1;
+		if (addRowCnt > 0 || addColCnt > 0) {
+			const lastRow = targetTable.rows[targetInfo.rowCnt - 1];
+			const lastCell = lastRow.cells[lastRow.cells.length - 1];
+			for (let i = 0; i < addRowCnt; i++) {
+				this.editCell('right', lastCell);
+			}
+			for (let i = 0; i < addColCnt; i++) {
+				this.editRow('down', lastCell);
+			}
+		}
 
 		this._historyPush();
 	}
@@ -3178,6 +3222,10 @@ function SetClipboardSelectedTableCells(e, container, selectedCells) {
 
 	const htmlContent = `<html><body><!--StartFragment-->${figure.outerHTML}<!--EndFragment--></body></html>`;
 	e.clipboardData.setData('text/html', htmlContent);
+}
+
+function _CellFormZIndex(value) {
+	this.controller_cell.bringToTop(value);
 }
 
 /** --------------------- HTML Create --------------------- */

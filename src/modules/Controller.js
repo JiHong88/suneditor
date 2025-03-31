@@ -3,6 +3,7 @@ import { dom, env, keyCodeMap } from '../helper';
 import { _DragHandle } from '../modules';
 
 const { _w, ON_OVER_COMPONENT } = env;
+const INDEX_00 = '2147483646';
 const INDEX_0 = '2147483645';
 const INDEX_1 = '2147483644';
 
@@ -58,6 +59,7 @@ class Controller extends EditorInjector {
 		this.parentsHide = !!params.parentsHide;
 		this.isInsideForm = !!params.isInsideForm;
 		this.isOutsideForm = !!params.isOutsideForm;
+		this.toTop = false;
 		this._initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
 		this.__globalEventHandlers = { keydown: this.#CloseListener_keydown.bind(this), mousedown: this.#CloseListener_mousedown.bind(this) };
 		this._bindClose_key = null;
@@ -127,7 +129,7 @@ class Controller extends EditorInjector {
 		this.__addGlobalEvent();
 
 		// display controller
-		this._setControllerPosition(this.form, this.currentPositionTarget, false);
+		this._setControllerPosition(this.form, this.currentPositionTarget);
 
 		const isRangeTarget = target instanceof Range;
 		this.currentTarget = isRangeTarget ? null : target;
@@ -143,6 +145,7 @@ class Controller extends EditorInjector {
 	close(force) {
 		if (!this.isOpen) return;
 
+		this.toTop = false;
 		this.isOpen = false;
 		this.__offset = {};
 		this.__addOffset = { left: 0, top: 0 };
@@ -174,7 +177,16 @@ class Controller extends EditorInjector {
 	 * @description Show controller
 	 */
 	show() {
-		this._setControllerPosition(this.form, this.currentPositionTarget, false);
+		this._setControllerPosition(this.form, this.currentPositionTarget);
+	}
+
+	/**
+	 * @description Sets whether the element (form) should be brought to the top based on z-index.
+	 * @param {boolean} value - true: '2147483646', false: '2147483645'.
+	 */
+	bringToTop(value) {
+		this.toTop = value;
+		this.form.style.zIndex = value ? INDEX_00 : INDEX_0;
 	}
 
 	/**
@@ -182,7 +194,7 @@ class Controller extends EditorInjector {
 	 * @param {Node=} target
 	 */
 	resetPosition(target) {
-		this._setControllerPosition(this.form, target || this.currentPositionTarget, true);
+		this._setControllerPosition(this.form, target || this.currentPositionTarget);
 	}
 
 	/**
@@ -255,10 +267,9 @@ class Controller extends EditorInjector {
 	 * @description Specify the position of the controller.
 	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
-	 * @param {?boolean=} reload Maintain z-index when repositioning
 	 */
-	_setControllerPosition(controller, refer, reload) {
-		if (!reload) controller.style.zIndex = INDEX_1;
+	_setControllerPosition(controller, refer) {
+		controller.style.zIndex = this.toTop ? INDEX_0 : INDEX_1;
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
@@ -361,7 +372,7 @@ class Controller extends EditorInjector {
 		if (this.parents.length > 0 && this.isInsideForm) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
-		eventTarget.style.zIndex = INDEX_0;
+		eventTarget.style.zIndex = this.toTop ? INDEX_00 : INDEX_0;
 	}
 
 	/**
@@ -371,7 +382,7 @@ class Controller extends EditorInjector {
 		if (this.parents.length > 0 && this.isInsideForm) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
-		eventTarget.style.zIndex = INDEX_1;
+		eventTarget.style.zIndex = this.toTop ? INDEX_0 : INDEX_1;
 	}
 
 	/**
