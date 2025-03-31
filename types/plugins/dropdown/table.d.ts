@@ -115,6 +115,8 @@ declare class Table extends EditorInjector {
 	captionButton: HTMLButtonElement;
 	/** @type {HTMLButtonElement} */
 	mergeButton: HTMLButtonElement;
+	/** @type {HTMLButtonElement} */
+	unmergeButton: HTMLButtonElement;
 	_resizing: boolean;
 	_resizeLine: any;
 	_resizeLinePrev: any;
@@ -189,6 +191,13 @@ declare class Table extends EditorInjector {
 	 * @returns {boolean|void}
 	 */
 	onCopyComponent({ event, cloneContainer }: __se__PluginCopyComponentParams): boolean | void;
+	/**
+	 * @editorMethod Editor.EventManager
+	 * @description Executes the event function of "copy".
+	 * @param {__se__PluginPasteParams} params
+	 * @returns {boolean|void}
+	 */
+	onPaste({ event, doc }: __se__PluginPasteParams): boolean | void;
 	/**
 	 * @editorMethod Editor.core
 	 * @description This method is used to validate and preserve the format of the component within the editor.
@@ -312,8 +321,15 @@ declare class Table extends EditorInjector {
 	 * - left: to insert a new cell to the left
 	 * - right: to insert a new cell to the right
 	 * @param {?HTMLTableCellElement=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
+	 * @returns {HTMLTableCellElement} Target table cell
 	 */
-	editCell(option: string | null, positionResetElement?: (HTMLTableCellElement | null) | undefined): void;
+	editCell(option: string | null, positionResetElement?: (HTMLTableCellElement | null) | undefined): HTMLTableCellElement;
+	/**
+	 * @description Updates the target table's cells with the data from the copied table.
+	 * @param {HTMLTableElement} copyTable The table containing the copied data.
+	 * @param {HTMLTableCellElement} targetTD The starting cell in the target table where data will be pasted.
+	 */
+	pasteTableCellMatrix(copyTable: HTMLTableElement, targetTD: HTMLTableCellElement): void;
 	/**
 	 * @description Inserts a new row into the table at the specified index to it.
 	 * @param {HTMLTableElement} table The table element to insert the row into.
@@ -325,8 +341,19 @@ declare class Table extends EditorInjector {
 	/**
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
 	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
+	 * @param {HTMLTableCellElement[]} selectedCells Cells array
 	 */
-	mergeCells(): void;
+	mergeCells(selectedCells: HTMLTableCellElement[]): void;
+	/**
+	 * @description Unmerges a table cell that has been merged using rowspan and/or colspan.
+	 * @param {HTMLTableCellElement[]} selectedCells - Cells array
+	 */
+	unmergeCells(selectedCells: HTMLTableCellElement[]): void;
+	/**
+	 * @description Find merged cells
+	 * @param {HTMLTableCellElement[]} cells - Cells array
+	 */
+	findMergedCells(cells: HTMLTableCellElement[]): any[];
 	/**
 	 * @description Toggles the visibility of the table header (`<thead>`). If the header is present, it is removed; if absent, it is added.
 	 */
@@ -345,10 +372,13 @@ declare class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the merge/split button visibility.
-	 * @param {boolean} fixedCell - Whether a single cell is selected.
-	 * @param {boolean} selectedCell - Whether multiple cells are selected.
 	 */
 	private _setMergeSplitButton;
+	/**
+	 * @private
+	 * @description Sets the unmerge button visibility.
+	 */
+	private _setUnMergeButton;
 	/**
 	 * @private
 	 * @description Sets the controller position for a cell.

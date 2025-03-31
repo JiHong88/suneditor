@@ -199,6 +199,7 @@ declare class Controller extends EditorInjector {
 	 * @description Specify the position of the controller.
 	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
+	 * @param {?boolean=} reload Maintain z-index when repositioning
 	 */
 	private _setControllerPosition;
 	/**

@@ -73,6 +73,7 @@ declare namespace _default {
 	export let unlink: string;
 	export let merge_cell: string;
 	export let split_cell: string;
+	export let unmerge_cell: string;
 	export let caption: string;
 	export let edit: string;
 	let _delete: string;
