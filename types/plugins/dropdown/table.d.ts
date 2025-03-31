@@ -342,13 +342,15 @@ declare class Table extends EditorInjector {
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
 	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
 	 * @param {HTMLTableCellElement[]} selectedCells Cells array
+	 * @param {?boolean=} [notSelected=false] - Whether to not select the merged cell
 	 */
-	mergeCells(selectedCells: HTMLTableCellElement[]): void;
+	mergeCells(selectedCells: HTMLTableCellElement[], notSelected?: (boolean | null) | undefined): void;
 	/**
 	 * @description Unmerges a table cell that has been merged using rowspan and/or colspan.
 	 * @param {HTMLTableCellElement[]} selectedCells - Cells array
+	 * @param {?boolean=} [notSelected=false] - Whether to not select the unmerged cells
 	 */
-	unmergeCells(selectedCells: HTMLTableCellElement[]): void;
+	unmergeCells(selectedCells: HTMLTableCellElement[], notSelected?: (boolean | null) | undefined): void;
 	/**
 	 * @description Find merged cells
 	 * @param {HTMLTableCellElement[]} cells - Cells array

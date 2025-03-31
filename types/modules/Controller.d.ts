@@ -110,6 +110,7 @@ declare class Controller extends EditorInjector {
 	parentsHide: boolean;
 	isInsideForm: boolean;
 	isOutsideForm: boolean;
+	toTop: boolean;
 	_initMethod: () => void;
 	__globalEventHandlers: {
 		keydown: any;
@@ -177,6 +178,11 @@ declare class Controller extends EditorInjector {
 	 */
 	show(): void;
 	/**
+	 * @description Sets whether the element (form) should be brought to the top based on z-index.
+	 * @param {boolean} value - true: '2147483646', false: '2147483645'.
+	 */
+	bringToTop(value: boolean): void;
+	/**
 	 * @description Reset controller position
 	 * @param {Node=} target
 	 */
@@ -199,7 +205,6 @@ declare class Controller extends EditorInjector {
 	 * @description Specify the position of the controller.
 	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
-	 * @param {?boolean=} reload Maintain z-index when repositioning
 	 */
 	private _setControllerPosition;
 	/**

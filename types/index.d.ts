@@ -66,7 +66,6 @@ export * from './langs/ro';
 export * from './langs/ru';
 export * from './langs/se';
 export * from './langs/tr';
-export * from './langs/ua';
 export * from './langs/uk';
 export * from './langs/ur';
 export * from './langs/zh_cn';

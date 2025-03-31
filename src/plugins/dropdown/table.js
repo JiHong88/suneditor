@@ -1453,6 +1453,7 @@ class Table extends EditorInjector {
 			const cell = cells[i];
 			logicalColCount += cell.colSpan || 1;
 		}
+
 		const copyInfo = {
 			rowCnt: copyRows.length,
 			logicalCellCnt: logicalColCount
@@ -1461,7 +1462,9 @@ class Table extends EditorInjector {
 		// target info
 		this.setCellInfo(targetTD, true);
 		this._deleteStyleSelectedCells();
+
 		const targetTable = targetTD.closest('table');
+		const targetRows = targetTable.rows;
 		const targetInfo = {
 			physicalCellCnt: this._physical_cellCnt,
 			logicalCellCnt: this._logical_cellCnt,
@@ -1476,8 +1479,12 @@ class Table extends EditorInjector {
 		// target table expand
 		const addRowCnt = copyInfo.rowCnt - (targetInfo.rowCnt - (targetInfo.rowInex + 1)) - 1;
 		const addColCnt = copyInfo.logicalCellCnt - (targetInfo.logicalCellCnt - (targetInfo.logicalCellIndex + 1)) - 1;
+		targetInfo.rowCnt += addRowCnt;
+		targetInfo.logicalCellCnt += addColCnt;
+		targetInfo.physicalCellCnt += addColCnt;
+
 		if (addRowCnt > 0 || addColCnt > 0) {
-			const lastRow = targetTable.rows[targetInfo.rowCnt - 1];
+			const lastRow = targetRows[targetInfo.rowCnt - 1];
 			const lastCell = lastRow.cells[lastRow.cells.length - 1];
 			for (let i = 0; i < addRowCnt; i++) {
 				this.editCell('right', lastCell);
@@ -1487,6 +1494,27 @@ class Table extends EditorInjector {
 			}
 		}
 
+		// unmerge cells
+		const unmergeCells = [];
+		const ci = targetInfo.logicalCellIndex;
+		for (let r = targetInfo.rowInex; r < copyInfo.rowCnt; r++) {
+			const row = targetRows[r];
+			const cells = row.cells;
+			for (let c = 0, cLen = cells.length, cs = 0, index; c < cLen; c++) {
+				const cell = cells[c];
+				cs = cell.colSpan || 1;
+				index = c + cs - 1;
+				if (cs > 1 && index >= ci) {
+					unmergeCells.push(cell);
+				}
+			}
+		}
+
+		this.unmergeCells(unmergeCells, true);
+
+		// paste cell data
+
+		// history push
 		this._historyPush();
 	}
 
