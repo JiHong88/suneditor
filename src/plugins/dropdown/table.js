@@ -115,8 +115,8 @@ class Table extends EditorInjector {
 		});
 
 		// members - Controller
-		this.controller_table = new Controller(this, controller_table, { position: 'top' });
 		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
+		this.controller_table = new Controller(this, controller_table, { position: 'top' });
 		// props
 		const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
 		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
@@ -1568,7 +1568,7 @@ class Table extends EditorInjector {
 		mergeCell.colSpan = cs;
 		mergeCell.rowSpan = rs;
 
-		this._setMergeSplitButton(null, undefined);
+		this._setMergeSplitButton();
 		this._setController(mergeCell);
 
 		this.editor.focusEdge(mergeCell);
@@ -1620,14 +1620,22 @@ class Table extends EditorInjector {
 			}
 		}
 
+		this._selectedCells = null;
 		this._historyPush();
 
 		if (firstCell !== lastCell) {
 			lastCell = lastCell.closest('tr').rowIndex > newLastCell.closest('tr').rowIndex || lastCell.cellIndex > newLastCell.cellIndex ? lastCell : newLastCell;
 			this._setMultiCells(firstCell, lastCell);
 			this._selectedCells = Array.from(table.querySelectorAll('.se-selected-table-cell'));
+		} else {
+			this.setCellInfo(lastCell, true);
 		}
 
+		this._fixedCell = firstCell;
+		this._selectedCell = lastCell;
+		dom.utils.addClass(lastCell, 'se-selected-cell-focus');
+
+		this._setUnMergeButton();
 		this.controller_cell.resetPosition(lastCell);
 	}
 
@@ -1732,11 +1740,9 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets the merge/split button visibility.
-	 * @param {?HTMLTableCellElement=} fixedCell - Whether a single cell is selected.
-	 * @param {?HTMLTableCellElement=} selectedCell - Whether multiple cells are selected.
 	 */
-	_setMergeSplitButton(fixedCell, selectedCell) {
-		if (!selectedCell || !selectedCell || fixedCell === selectedCell) {
+	_setMergeSplitButton() {
+		if (!this._ref) {
 			this.splitButton.style.display = 'block';
 			this.mergeButton.style.display = 'none';
 		} else {
@@ -2973,7 +2979,7 @@ class Table extends EditorInjector {
 
 		if (!this._fixedCell || !this._selectedTable) return;
 
-		this._setMergeSplitButton(this._fixedCell, this._selectedCell);
+		this._setMergeSplitButton();
 		this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 
 		const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
