@@ -1443,43 +1443,6 @@ class Table extends EditorInjector {
 	pasteTableCellMatrix(copyTable, targetTD) {
 		if (!copyTable || !targetTD) return;
 
-		this.setCellInfo(copyTable.querySelector('TD'), true);
-		// const copyRows = copyTable.rows;
-		// const copyInfo = {
-		// 	physicalCellCnt: this._physical_cellCnt,
-		// 	logicalCellCnt: this._logical_cellCnt,
-		// 	rowCnt: this._rowCnt,
-		// 	rowInex: this._rowIndex,
-		// 	physicalCellIndex: this._physical_cellIndex,
-		// 	logicalCellIndex: this._logical_cellIndex,
-		// 	currentColSpan: this._current_colSpan,
-		// 	currentRowSpan: this._current_rowSpan
-		// };
-
-		// this.setCellInfo(targetTD, true);
-		// const targetTable = targetTD.closest('table');
-		// const targetRows = targetTable.rows;
-		// const targetInfo = {
-		// 	physicalCellCnt: this._physical_cellCnt,
-		// 	logicalCellCnt: this._logical_cellCnt,
-		// 	rowCnt: this._rowCnt,
-		// 	rowInex: this._rowIndex,
-		// 	physicalCellIndex: this._physical_cellIndex,
-		// 	logicalCellIndex: this._logical_cellIndex,
-		// 	currentColSpan: this._current_colSpan,
-		// 	currentRowSpan: this._current_rowSpan
-		// };
-
-		// // target table cells info
-		// for (let r = 0, rLen = targetRows.length; r < rLen; r++) {
-		// 	const row = targetRows[r];
-		// 	const cells = row.cells;
-		// 	for (let c = 0, cLen = cells.length; c < cLen; c++) {
-		// 		const cell = cells[c];
-		// 		this.unmergeCells(cell);
-		// 	}
-		// }
-
 		this._historyPush();
 	}
 
@@ -1500,8 +1463,9 @@ class Table extends EditorInjector {
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
 	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
 	 * @param {HTMLTableCellElement[]} selectedCells Cells array
+	 * @param {?boolean=} [notSelected=false] - Whether to not select the merged cell
 	 */
-	mergeCells(selectedCells) {
+	mergeCells(selectedCells, notSelected = false) {
 		if (!this._ref) {
 			this._setMultiCells(selectedCells[0], selectedCells[selectedCells.length - 1]);
 		}
@@ -1568,6 +1532,8 @@ class Table extends EditorInjector {
 		mergeCell.colSpan = cs;
 		mergeCell.rowSpan = rs;
 
+		if (notSelected) return;
+
 		this._setMergeSplitButton();
 		this._setController(mergeCell);
 
@@ -1578,8 +1544,11 @@ class Table extends EditorInjector {
 	/**
 	 * @description Unmerges a table cell that has been merged using rowspan and/or colspan.
 	 * @param {HTMLTableCellElement[]} selectedCells - Cells array
+	 * @param {?boolean=} [notSelected=false] - Whether to not select the unmerged cells
 	 */
-	unmergeCells(selectedCells) {
+	unmergeCells(selectedCells, notSelected = false) {
+		if (!selectedCells?.length) return;
+
 		let firstCell = selectedCells[0];
 		let lastCell = selectedCells[selectedCells.length - 1];
 		let newLastCell = null;
@@ -1621,10 +1590,13 @@ class Table extends EditorInjector {
 		}
 
 		this._selectedCells = null;
+
+		if (notSelected) return;
+
 		this._historyPush();
 
 		if (firstCell !== lastCell) {
-			lastCell = lastCell.closest('tr').rowIndex > newLastCell.closest('tr').rowIndex || lastCell.cellIndex > newLastCell.cellIndex ? lastCell : newLastCell;
+			lastCell = !newLastCell || lastCell.closest('tr').rowIndex > newLastCell.closest('tr').rowIndex || lastCell.cellIndex > newLastCell.cellIndex ? lastCell : newLastCell;
 			this._setMultiCells(firstCell, lastCell);
 			this._selectedCells = Array.from(table.querySelectorAll('.se-selected-table-cell'));
 		} else {

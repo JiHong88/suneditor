@@ -951,6 +951,8 @@ window.editor_root = suneditor.create(
 			</div>
 		</div>`,
 		value: `
+
+		<table style="cursor: ns-resize;"><colgroup><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"></colgroup><tbody><tr><td><div>1<br></div></td><td><div>2<br></div></td><td><div>3<br></div></td><td><div>4<br></div></td><td><div>5<br></div></td><td><div>6<br></div></td></tr><tr><td><div>7<br></div></td><td><div>8<br></div></td><td><div>9<br></div></td><td><div>10<br></div></td><td><div>11<br></div></td><td><div>12<br></div></td></tr><tr><td><div>13<br></div></td><td><div>14<br></div></td><td><div>15<br></div></td><td><div>16<br></div></td><td><div>17<br></div></td><td><div>18<br></div></td></tr><tr><td><div>19<br></div></td><td><div>20<br></div></td><td><div>21<br></div></td><td><div>22<br></div></td><td><div>23<br></div></td><td><div>24<br></div></td></tr><tr><td><div>25<br></div></td><td><div>26<br></div></td><td><div>27<br></div></td><td><div>28<br></div></td><td><div>29<br></div></td><td><div>30<br></div></td></tr><tr><td><div>31<br></div></td><td><div>32<br></div></td><td><div>33<br></div></td><td><div>34<br></div></td><td><div>35<br></div></td><td><div>36<br></div></td></tr></tbody></table>
 <p>dsa</p>
 
 <figure class="se-flex-component se-input-component se-scroll-figure-x">
