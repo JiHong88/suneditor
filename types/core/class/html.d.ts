@@ -193,7 +193,7 @@ declare class HTML {
 	): string | any;
 	/**
 	 * @this {HTMLThis}
-	 * @description Sets the HTML string
+	 * @description Sets the HTML string to the editor content
 	 * @param {string} html HTML string
 	 * @param {Object} [options] Options
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
@@ -217,6 +217,44 @@ declare class HTML {
 	add(
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
 		html: string,
+		{
+			rootKey
+		}?: {
+			rootKey?: number | Array<number>;
+		}
+	): void;
+	/**
+	 * @this {HTMLThis}
+	 * @description Gets the current content to JSON data
+	 * @param {Object} [options] Options
+	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
+	 * @param {number|Array<number>} [options.rootKey=null] Root index
+	 * @returns {Object<string, *>} JSON data
+	 */
+	getJson(
+		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		{
+			withFrame,
+			rootKey
+		}?: {
+			withFrame?: boolean;
+			rootKey?: number | Array<number>;
+		}
+	): {
+		[x: string]: any;
+	};
+	/**
+	 * @this {HTMLThis}
+	 * @description Sets the JSON data to the editor content
+	 * @param {Object<string, *>} jsdonData HTML string
+	 * @param {Object} [options] Options
+	 * @param {number|Array<number>} [options.rootKey=null] Root index
+	 */
+	setJson(
+		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		jsdonData: {
+			[x: string]: any;
+		},
 		{
 			rootKey
 		}?: {

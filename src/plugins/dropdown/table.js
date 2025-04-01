@@ -591,7 +591,7 @@ class Table extends EditorInjector {
 		this._deleteStyleSelectedCells();
 		if (/^TR$/i.test(target.nodeName)) return;
 
-		this.selectCells(target, false);
+		this.#StyleSelectCells(target, false);
 	}
 
 	/**
@@ -683,7 +683,7 @@ class Table extends EditorInjector {
 			this.__s = false;
 			this._fixedCell = cell;
 			this._closeController();
-			this.selectCells(cell, event.shiftKey);
+			this.#StyleSelectCells(cell, event.shiftKey);
 			return false;
 		}
 	}
@@ -893,32 +893,20 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @description Selects cells in a table, handling single and multi-cell selection, and managing shift key behavior for extended selection.
-	 * @param {HTMLTableCellElement} tdElement The target table cell (`<td>`) element that is being selected.
-	 * @param {boolean} shift A flag indicating whether the shift key is held down for multi-cell selection.
-	 * If `true`, the selection will extend to include adjacent cells, otherwise it selects only the provided cell.
+	 * @description Selects a group of table cells and sets internal state related to multi-cell selection.
+	 * @param {HTMLTableCellElement[]} cells - An array of table cell elements to be selected.
 	 */
-	selectCells(tdElement, shift) {
-		this.__s = shift;
-		if (!this._shift && !this._ref) this.__removeGlobalEvents();
+	selectCells(cells) {
+		const firstCell = cells[0];
+		const lastCell = dom.query.findTableLastCell(cells);
 
-		this._shift = shift;
-		this._fixedCell = tdElement;
-		this._fixedCellName = tdElement.nodeName;
-		this._selectedTable = dom.query.getParentElement(tdElement, 'TABLE');
+		this._selectedCells = cells;
+		this._fixedCell = firstCell;
+		this._selectedCell = lastCell;
+		this._fixedCellName = firstCell.nodeName;
+		this._selectedTable = dom.query.getParentElement(firstCell, 'TABLE');
 
-		this._deleteStyleSelectedCells();
-		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
-
-		if (!shift) {
-			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousemove', this._bindMultiOn, false);
-		} else {
-			this.__globalEvents.shiftOff = this.eventManager.addGlobalEvent('keyup', this._bindShiftOff, false);
-			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousedown', this._bindMultiOn, false);
-		}
-
-		this.__globalEvents.off = this.eventManager.addGlobalEvent('mouseup', this._bindMultiOff, false);
-		this.__globalEvents.touchOff = this.eventManager.addGlobalEvent('touchmove', this._bindTouchOff, false);
+		this._setMultiCells(firstCell, lastCell);
 	}
 
 	/**
@@ -1108,7 +1096,7 @@ class Table extends EditorInjector {
 				} else {
 					// edit row
 					this.setCellInfo(option === 'up' ? selectedCells[0] : selectedCells[selectedCells.length - 1], true);
-					this.editRow(option, positionCell);
+					this.editRow(option, null, positionCell);
 				}
 			} else {
 				// multi - cell
@@ -1142,7 +1130,7 @@ class Table extends EditorInjector {
 					}
 
 					this.setCellInfo(option === 'left' ? selectedCells[0] : rightCell || selectedCells[0], true);
-					this.editCell(option, positionCell);
+					this.editCell(option, null, positionCell);
 				}
 			}
 
@@ -1172,10 +1160,12 @@ class Table extends EditorInjector {
 	 * - null: to remove the row
 	 * - 'up': to insert the row up
 	 * - 'down': to insert the row down, or null to remove.
+	 * @param {?HTMLTableCellElement=} targetCell Target cell, (default: current selected cell)
 	 * @param {?HTMLTableCellElement=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
 	 */
-	editRow(option, positionResetElement) {
+	editRow(option, targetCell, positionResetElement) {
 		this._deleteStyleSelectedCells();
+		if (targetCell) this.setCellInfo(targetCell, true);
 
 		const remove = !option;
 		const up = option === 'up';
@@ -1267,10 +1257,13 @@ class Table extends EditorInjector {
 	 * - null: to remove the cell
 	 * - left: to insert a new cell to the left
 	 * - right: to insert a new cell to the right
-	 * @param {?HTMLTableCellElement=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
+	 * @param {?HTMLTableCellElement=} targetCell Target cell, (default: current selected cell)
+	 * @param {?HTMLTableCellElement=} positionResetElement The element to reset the position of (optional). This can be the cell that triggered the column edit.
 	 * @returns {HTMLTableCellElement} Target table cell
 	 */
-	editCell(option, positionResetElement) {
+	editCell(option, targetCell, positionResetElement) {
+		if (targetCell) this.setCellInfo(targetCell, true);
+
 		const remove = !option;
 		const left = option === 'left';
 		const colSpan = this._current_colSpan;
@@ -1453,7 +1446,6 @@ class Table extends EditorInjector {
 			const cell = cells[i];
 			logicalColCount += cell.colSpan || 1;
 		}
-
 		const copyInfo = {
 			rowCnt: copyRows.length,
 			logicalCellCnt: logicalColCount
@@ -1462,9 +1454,8 @@ class Table extends EditorInjector {
 		// target info
 		this.setCellInfo(targetTD, true);
 		this._deleteStyleSelectedCells();
-
 		const targetTable = targetTD.closest('table');
-		const targetRows = targetTable.rows;
+		let targetRows = targetTable.rows;
 		const targetInfo = {
 			physicalCellCnt: this._physical_cellCnt,
 			logicalCellCnt: this._logical_cellCnt,
@@ -1484,27 +1475,30 @@ class Table extends EditorInjector {
 		targetInfo.physicalCellCnt += addColCnt;
 
 		if (addRowCnt > 0 || addColCnt > 0) {
-			const lastRow = targetRows[targetInfo.rowCnt - 1];
+			const lastRow = targetRows[targetRows.length - 1];
 			const lastCell = lastRow.cells[lastRow.cells.length - 1];
 			for (let i = 0; i < addRowCnt; i++) {
-				this.editCell('right', lastCell);
+				this.editRow('down', lastCell);
 			}
 			for (let i = 0; i < addColCnt; i++) {
-				this.editRow('down', lastCell);
+				this.editCell('right', lastCell);
 			}
 		}
 
 		// unmerge cells
+		const cellIndex = targetInfo.logicalCellIndex;
+		const cellEndIndex = cellIndex + copyInfo.logicalCellCnt;
 		const unmergeCells = [];
-		const ci = targetInfo.logicalCellIndex;
-		for (let r = targetInfo.rowInex; r < copyInfo.rowCnt; r++) {
-			const row = targetRows[r];
-			const cells = row.cells;
-			for (let c = 0, cLen = cells.length, cs = 0, index; c < cLen; c++) {
+		for (let r = targetInfo.rowInex, len = r + copyInfo.rowCnt; r < len; r++) {
+			const cells = targetRows[r].cells;
+			for (let c = 0, cLen = cells.length, cs, rs, index; c < cLen; c++) {
 				const cell = cells[c];
 				cs = cell.colSpan || 1;
+				rs = cell.rowSpan || 1;
 				index = c + cs - 1;
-				if (cs > 1 && index >= ci) {
+				if (index < cellIndex) continue;
+				if (index >= cellEndIndex) break;
+				if (cs > 1 || rs > 1) {
 					unmergeCells.push(cell);
 				}
 			}
@@ -1512,7 +1506,69 @@ class Table extends EditorInjector {
 
 		this.unmergeCells(unmergeCells, true);
 
+		// merge cell
+		const mergeGroups = [];
+		for (let r = 0, len = copyInfo.rowCnt; r < len; r++) {
+			const cells = copyRows[r].cells;
+			for (let c = 0, cLen = cells.length, cs, rs, copyIndex = 0; c < cLen; c++, copyIndex++) {
+				const cell = cells[c];
+				cs = cell.colSpan || 1;
+				rs = cell.rowSpan || 1;
+				copyIndex += cs - 1;
+				if (cs <= 1 && rs <= 1) continue;
+
+				// merge target cells
+				const cEnd = copyIndex + targetInfo.logicalCellIndex;
+				const cStart = cEnd - cs;
+				const mergeCells = [];
+				for (let targetR = targetInfo.rowInex + 1, tRowCnt = targetR + rs; targetR < tRowCnt; targetR++) {
+					const targetRow = targetRows[targetR];
+					const targetCells = targetRow.cells;
+					for (let targetC = 0, tLen = targetCells.length, tIndex; targetC < tLen; targetC++) {
+						const tCell = targetCells[targetC];
+						tIndex = targetC + (tCell.colSpan || 1) - 1;
+						if (tIndex <= cStart) continue;
+						if (tIndex > cEnd) break;
+						mergeCells.push(tCell);
+					}
+				}
+				if (mergeCells.length > 0) mergeGroups.push(mergeCells);
+			}
+		}
+
+		if (mergeGroups.length > 0) {
+			for (const mc of mergeGroups) {
+				this._ref = null;
+				this._trElements = targetTable.rows;
+				this.mergeCells(mc, true);
+			}
+			targetRows = this._trElements = targetTable.rows;
+		}
+
 		// paste cell data
+		const selectedCells = [];
+		for (let r = targetInfo.rowInex, copyR = 0; r < targetInfo.rowCnt; r++, copyR++) {
+			const tr = targetRows[r];
+			if (!tr) break;
+			const cells = tr.cells;
+			for (let c = 0, cLen = cells.length, copyIndex = 0, copyC = 0; c < cLen; c++) {
+				const cell = cells[c];
+				copyIndex += cell.colSpan || 1;
+				if (copyIndex > cellIndex) {
+					const copyCell = copyRows[copyR].cells[copyC];
+					if (!copyCell) break;
+					cell.innerHTML = copyCell.innerHTML;
+					selectedCells.push(cell);
+					copyC++;
+				}
+				if (copyIndex >= cellEndIndex) break;
+			}
+		}
+
+		// select cell
+		this.selectCells(selectedCells);
+		this._setMergeSplitButton();
+		this._setUnMergeButton();
 
 		// history push
 		this._historyPush();
@@ -1609,7 +1665,7 @@ class Table extends EditorInjector {
 		this._setMergeSplitButton();
 		this._setController(mergeCell);
 
-		this.editor.focusEdge(mergeCell);
+		this.#focusEdge(mergeCell);
 		this._historyPush();
 	}
 
@@ -1821,7 +1877,7 @@ class Table extends EditorInjector {
 		this._setUnMergeButton();
 
 		this._tdElement = tdElement;
-		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
+		if (this._fixedCell === tdElement) dom.utils.addClass(tdElement, 'se-selected-cell-focus');
 		const tableElement = this._element || this._selectedTable || dom.query.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, true);
 	}
@@ -2719,6 +2775,35 @@ class Table extends EditorInjector {
 	}
 
 	/**
+	 * @description Selects cells in a table, handling single and multi-cell selection, and managing shift key behavior for extended selection.
+	 * @param {HTMLTableCellElement} tdElement The target table cell (`<td>`) element that is being selected.
+	 * @param {boolean} shift A flag indicating whether the shift key is held down for multi-cell selection.
+	 * If `true`, the selection will extend to include adjacent cells, otherwise it selects only the provided cell.
+	 */
+	#StyleSelectCells(tdElement, shift) {
+		this.__s = shift;
+		if (!this._shift && !this._ref) this.__removeGlobalEvents();
+
+		this._shift = shift;
+		this._fixedCell = tdElement;
+		this._fixedCellName = tdElement.nodeName;
+		this._selectedTable = dom.query.getParentElement(tdElement, 'TABLE');
+
+		this._deleteStyleSelectedCells();
+		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
+
+		if (!shift) {
+			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousemove', this._bindMultiOn, false);
+		} else {
+			this.__globalEvents.shiftOff = this.eventManager.addGlobalEvent('keyup', this._bindShiftOff, false);
+			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousedown', this._bindMultiOn, false);
+		}
+
+		this.__globalEvents.off = this.eventManager.addGlobalEvent('mouseup', this._bindMultiOff, false);
+		this.__globalEvents.touchOff = this.eventManager.addGlobalEvent('touchmove', this._bindTouchOff, false);
+	}
+
+	/**
 	 * @description Splits a table cell either vertically or horizontally.
 	 * @param {"vertical"|"horizontal"} direction The direction to split the cell.
 	 */
@@ -2893,7 +2978,7 @@ class Table extends EditorInjector {
 		}
 
 		this.selectMenu_split.close();
-		this.editor.focusEdge(currentCell);
+		this.#focusEdge(currentCell);
 
 		this._deleteStyleSelectedCells();
 		this.history.push(false);
@@ -3003,8 +3088,7 @@ class Table extends EditorInjector {
 			return;
 		}
 
-		this._selectedCell = target;
-		this._setMultiCells(this._fixedCell, target);
+		this._setMultiCells(this._fixedCell, (this._selectedCell = target));
 	}
 
 	/**
@@ -3015,26 +3099,40 @@ class Table extends EditorInjector {
 		e.stopPropagation();
 
 		if (!this._shift) {
-			this.__removeGlobalEvents();
 			this._toggleEditor(true);
+			this.__removeGlobalEvents();
 		} else if (this.__globalEvents.touchOff) {
 			this.__globalEvents.touchOff = this.eventManager.removeGlobalEvent(this.__globalEvents.touchOff);
 		}
 
-		if (!this._fixedCell || !this._selectedTable) return;
+		if (!this._selectedCell || !this._selectedTable) return;
 
 		this._setMergeSplitButton();
 		this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 
-		const focusCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
-		this._setController(focusCell);
+		if (this._shift) return;
+
+		this.#focusEdge(this._fixedCell);
+
+		const displayCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
+		this._setController(displayCell);
 	}
 
 	/**
 	 * @description Handles the removal of shift-based selection.
 	 */
 	#OffCellShift() {
-		if (!this._ref) this._closeController();
+		if (!this._ref) {
+			this._closeController();
+		} else {
+			this.__removeGlobalEvents();
+			this._toggleEditor(true);
+
+			this.#focusEdge(this._fixedCell);
+
+			const displayCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
+			this._setController(displayCell);
+		}
 	}
 
 	/**
@@ -3042,6 +3140,14 @@ class Table extends EditorInjector {
 	 */
 	#OffCellTouch() {
 		this.close();
+	}
+
+	/**
+	 * @description Focus cell
+	 * @param {HTMLElement} cell Target node
+	 */
+	#focusEdge(cell) {
+		if (!env.isMobile) this.editor.focusEdge(cell);
 	}
 }
 

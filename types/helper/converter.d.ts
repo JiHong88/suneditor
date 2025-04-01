@@ -1,4 +1,23 @@
 /**
+ * @description Parses an HTML string into a DOM tree, then recursively traverses the nodes to convert them into a structured JSON representation.
+ * -Each element includes its tag name, attributes, and children.
+ * -Text nodes are represented as { type: 'text', content: '...' }.
+ * @param {string} content HTML string
+ * @returns {Object<string, *>} JSON data
+ */
+export function htmlToJson(content: string): {
+	[x: string]: any;
+};
+/**
+ * @description Takes a JSON structure representing HTML elements and recursively serializes it into a valid HTML string.
+ * -It rebuilds each tag with attributes and inner content.
+ * Text content and attributes are safely escaped to prevent parsing issues or XSS.
+ * Useful for restoring dynamic HTML from a data format.
+ * @param {Object<string, *>} jsonData
+ * @returns {string} HTML string
+ */
+export function jsonToHtml(jsonData: { [x: string]: any }): string;
+/**
  * @description Convert HTML string to HTML Entity
  * @param {string} content
  * @returns {string} Content string
@@ -152,6 +171,8 @@ export function _setIframeStyleLinks(linkNames: Array<string>): string;
 export function _setAutoHeightStyle(frameHeight: string): string;
 export default converter;
 declare namespace converter {
+	export { htmlToJson };
+	export { jsonToHtml };
 	export { htmlToEntity };
 	export { entityToHTML };
 	export { debounce };

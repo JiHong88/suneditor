@@ -178,6 +178,18 @@ export function findTextIndexOnLine(line: Node, offsetContainer: Node, offset: n
  */
 export function findTabEndIndex(line: Node, baseIndex: number, minTabSize: number): number;
 /**
+ * @description Finds the table cell that appears at the bottom-right position
+ * - on the display, considering vertical merges (`rowSpan`).
+ *
+ * - Among all cells provided, it calculates the ending row index for each cell by using: `rowEnd = rowIndex + rowSpan - 1`.
+ * - Then it returns the cell with the largest rowEnd. If multiple cells share the same
+ * - rowEnd, the one with the larger `cellIndex` (more to the right) is returned.
+ *
+ * @param {HTMLTableCellElement[]} cells - A list of table cell elements to search through.
+ * @returns {HTMLTableCellElement|null} The cell located at the bottom-right position, or null if input is invalid or empty.
+ */
+export function findTableLastCell(cells: HTMLTableCellElement[]): HTMLTableCellElement | null;
+/**
  * @description Get nearest scrollable parent
  * @param {Node} element Element
  * @returns {HTMLElement|null}
@@ -209,6 +221,7 @@ declare namespace query {
 	export { getNextDeepestNode };
 	export { findTextIndexOnLine };
 	export { findTabEndIndex };
+	export { findTableLastCell };
 	export { getScrollParent };
 	export { getIframeDocument };
 }

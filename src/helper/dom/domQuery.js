@@ -557,6 +557,39 @@ export function findTabEndIndex(line, baseIndex, minTabSize) {
 }
 
 /**
+ * @description Finds the table cell that appears at the bottom-right position
+ * - on the display, considering vertical merges (`rowSpan`).
+ *
+ * - Among all cells provided, it calculates the ending row index for each cell by using: `rowEnd = rowIndex + rowSpan - 1`.
+ * - Then it returns the cell with the largest rowEnd. If multiple cells share the same
+ * - rowEnd, the one with the larger `cellIndex` (more to the right) is returned.
+ *
+ * @param {HTMLTableCellElement[]} cells - A list of table cell elements to search through.
+ * @returns {HTMLTableCellElement|null} The cell located at the bottom-right position, or null if input is invalid or empty.
+ */
+export function findTableLastCell(cells) {
+	if (!cells || cells.length === 0) return null;
+
+	let target = null;
+	let maxRowEnd = -1;
+	let maxColIndex = -1;
+
+	for (const cell of cells) {
+		const rowStart = /** @type {HTMLTableRowElement} */ (cell.parentElement).rowIndex;
+		const rowEnd = rowStart + (cell.rowSpan || 1) - 1;
+		const colIndex = cell.cellIndex;
+
+		if (rowEnd > maxRowEnd || (rowEnd === maxRowEnd && colIndex > maxColIndex)) {
+			target = cell;
+			maxRowEnd = rowEnd;
+			maxColIndex = colIndex;
+		}
+	}
+
+	return target;
+}
+
+/**
  * @description Get nearest scrollable parent
  * @param {Node} element Element
  * @returns {HTMLElement|null}
@@ -602,6 +635,7 @@ const query = {
 	getNextDeepestNode,
 	findTextIndexOnLine,
 	findTabEndIndex,
+	findTableLastCell,
 	getScrollParent,
 	getIframeDocument
 };

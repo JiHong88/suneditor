@@ -29,6 +29,8 @@ export const unicode: {
 	escapeStringRegexp: typeof import('./unicode').escapeStringRegexp;
 };
 export const converter: {
+	htmlToJson: typeof import('./converter').htmlToJson;
+	jsonToHtml: typeof import('./converter').jsonToHtml;
 	htmlToEntity: typeof import('./converter').htmlToEntity;
 	entityToHTML: typeof import('./converter').entityToHTML;
 	debounce: typeof import('./converter').debounce;
@@ -71,6 +73,7 @@ export const dom: {
 		getNextDeepestNode: typeof import('./dom/domQuery').getNextDeepestNode;
 		findTextIndexOnLine: typeof import('./dom/domQuery').findTextIndexOnLine;
 		findTabEndIndex: typeof import('./dom/domQuery').findTabEndIndex;
+		findTableLastCell: typeof import('./dom/domQuery').findTableLastCell;
 		getScrollParent: typeof import('./dom/domQuery').getScrollParent;
 		getIframeDocument: typeof import('./dom/domQuery').getIframeDocument;
 	};

@@ -12,6 +12,87 @@ const FONT_VALUES_MAP = {
 	'xxx-large': 8
 };
 
+function NodeToJson(node) {
+	// text
+	if (node.nodeType === 3) {
+		const text = node.nodeValue.trim();
+		if (text) return { type: 'text', content: text };
+		return null;
+	}
+
+	// element
+	if (node.nodeType === 1) {
+		const jsonNode = {
+			type: 'element',
+			tag: node.tagName.toLowerCase(),
+			attributes: {},
+			children: []
+		};
+
+		// get attribute
+		for (const attr of node.attributes) {
+			jsonNode.attributes[attr.name] = attr.value;
+		}
+
+		// children
+		for (const child of node.childNodes) {
+			const childJson = NodeToJson(child);
+			if (childJson) jsonNode.children.push(childJson);
+		}
+
+		return jsonNode;
+	}
+
+	return null;
+}
+
+/**
+ * @description Parses an HTML string into a DOM tree, then recursively traverses the nodes to convert them into a structured JSON representation.
+ * -Each element includes its tag name, attributes, and children.
+ * -Text nodes are represented as { type: 'text', content: '...' }.
+ * @param {string} content HTML string
+ * @returns {Object<string, *>} JSON data
+ */
+export function htmlToJson(content) {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(content, 'text/html');
+	return NodeToJson(doc.body);
+}
+
+/**
+ * @description Takes a JSON structure representing HTML elements and recursively serializes it into a valid HTML string.
+ * -It rebuilds each tag with attributes and inner content.
+ * Text content and attributes are safely escaped to prevent parsing issues or XSS.
+ * Useful for restoring dynamic HTML from a data format.
+ * @param {Object<string, *>} jsonData
+ * @returns {string} HTML string
+ */
+export function jsonToHtml(jsonData) {
+	if (!jsonData) return '';
+
+	if (jsonData.type === 'text') {
+		return htmlToEntity(jsonData.content || '');
+	}
+
+	if (jsonData.type === 'element') {
+		const { tag, attributes = {}, children = [] } = jsonData;
+
+		// 속성 문자열 구성
+		const attrString = Object.entries(attributes)
+			.map(([key, value]) => `${key}="${htmlToEntity(value)}"`)
+			.join(' ');
+
+		const openTag = attrString ? `<${tag} ${attrString}>` : `<${tag}>`;
+		const closeTag = `</${tag}>`;
+
+		const childrenHtml = children.map(jsonToHtml).join('');
+
+		return `${openTag}${childrenHtml}${closeTag}`;
+	}
+
+	return '';
+}
+
 /**
  * @description Convert HTML string to HTML Entity
  * @param {string} content
@@ -455,6 +536,8 @@ export function _setAutoHeightStyle(frameHeight) {
 }
 
 const converter = {
+	htmlToJson,
+	jsonToHtml,
 	htmlToEntity,
 	entityToHTML,
 	debounce,

@@ -1086,7 +1086,7 @@ HTML.prototype = {
 
 	/**
 	 * @this {HTMLThis}
-	 * @description Sets the HTML string
+	 * @description Sets the HTML string to the editor content
 	 * @param {string} html HTML string
 	 * @param {Object} [options] Options
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
@@ -1141,6 +1141,29 @@ HTML.prototype = {
 				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertToCode(convertValue, false));
 			}
 		}
+	},
+
+	/**
+	 * @this {HTMLThis}
+	 * @description Gets the current content to JSON data
+	 * @param {Object} [options] Options
+	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
+	 * @param {number|Array<number>} [options.rootKey=null] Root index
+	 * @returns {Object<string, *>} JSON data
+	 */
+	getJson({ withFrame, rootKey } = {}) {
+		return converter.htmlToJson(this.get({ withFrame, rootKey }));
+	},
+
+	/**
+	 * @this {HTMLThis}
+	 * @description Sets the JSON data to the editor content
+	 * @param {Object<string, *>} jsdonData HTML string
+	 * @param {Object} [options] Options
+	 * @param {number|Array<number>} [options.rootKey=null] Root index
+	 */
+	setJson(jsdonData, { rootKey } = {}) {
+		this.set(converter.jsonToHtml(jsdonData), { rootKey });
 	},
 
 	/**
