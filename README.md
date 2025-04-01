@@ -48,6 +48,18 @@ SunEditor supports all modern browsers without dependencies or polyfills.
 
 ---
 
+## 📦 Legacy Version (v2-legacy)
+
+> **SunEditor v3 is the latest version.**  
+> This section refers to the **previous stable version, SunEditor v2**.
+
+The `v2-legacy` branch is no longer actively maintained,  
+but still available for compatibility with older projects.
+
+👉 [`v2-legacy` branch](https://github.com/JiHong88/SunEditor/tree/v2-legacy)
+
+---
+
 ## 🚀 Install & Quick Start
 
 > 💡 **Want to see it in action?**  
