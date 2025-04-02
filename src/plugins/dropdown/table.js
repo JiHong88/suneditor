@@ -1491,19 +1491,21 @@ class Table extends EditorInjector {
 			targetRows = this._trElements = targetTable.rows;
 		}
 
-		// unmerge cells
+		// [Un]merge cells
 		const cellIndex = targetInfo.logicalCellIndex;
 		const cellEndIndex = cellIndex + copyInfo.logicalCellCnt;
 		const unmergeCells = [];
 		for (let r = targetInfo.rowInex, len = r + copyInfo.rowCnt; r < len; r++) {
 			const cells = targetRows[r].cells;
-			for (let c = 0, cLen = cells.length, cs, rs, index; c < cLen; c++) {
+			for (let c = 0, cLen = cells.length, cs, rs, index = 0, endIndex = 0; c < cLen; c++) {
 				const cell = cells[c];
+				const prevCell = cell[c - 1];
 				cs = cell.colSpan || 1;
 				rs = cell.rowSpan || 1;
-				index = c + cs - 1;
-				if (index < cellIndex) continue;
-				if (index >= cellEndIndex) break;
+				index += c + (prevCell?.rowSpan || 1) - 1;
+				endIndex = index + cs - 1;
+				if (endIndex < cellIndex) continue;
+				if (index > cellEndIndex) break;
 				if (cs > 1 || rs > 1) {
 					unmergeCells.push(cell);
 				}
@@ -1527,16 +1529,18 @@ class Table extends EditorInjector {
 				if (cs <= 1 && rs <= 1) continue;
 
 				// merge target cells
-				const cEnd = copyIndex + targetInfo.logicalCellIndex;
-				const cStart = cEnd - cs;
+				const cStart = copyIndex + targetInfo.logicalCellIndex;
+				const cEnd = cStart + cs - 1;
 				const mergeCells = [];
-				for (let targetR = targetInfo.rowInex, tRowCnt = targetR + rs; targetR < tRowCnt; targetR++) {
+				for (let targetR = targetInfo.rowInex + r, tRowCnt = targetR + rs; targetR < tRowCnt; targetR++) {
 					const targetRow = targetRows[targetR];
 					const targetCells = targetRow.cells;
-					for (let targetC = 0, tLen = targetCells.length, tIndex; targetC < tLen; targetC++) {
+					for (let targetC = 0, tLen = targetCells.length, tIndex, tcs, tcsSum = 0; targetC < tLen; targetC++) {
 						const tCell = targetCells[targetC];
-						tIndex = targetC + (tCell.colSpan || 1) - 1;
-						if (tIndex <= cStart) continue;
+						tcs = (tCell.colSpan || 1) - 1;
+						tIndex = targetC + tcs + tcsSum;
+						tcsSum += tcs;
+						if (tIndex < cStart) continue;
 						if (tIndex > cEnd) break;
 						mergeCells.push(tCell);
 					}
@@ -1603,11 +1607,11 @@ class Table extends EditorInjector {
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
 	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
 	 * @param {HTMLTableCellElement[]} selectedCells Cells array
-	 * @param {?boolean=} [notRender=false] - Whether to not rendering the merged cell
+	 * @param {boolean} [skipPostProcess=false] - If true, skips table cloning, cell re-selection, history stack push, and rendering.
 	 */
-	mergeCells(selectedCells, notRender = false) {
+	mergeCells(selectedCells, skipPostProcess = false) {
 		const originTable = selectedCells[0].closest('table');
-		const { cloneTable, clonedSelectedCells } = notRender ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this.#cloneTable(originTable, selectedCells);
+		const { cloneTable, clonedSelectedCells } = skipPostProcess ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this.#cloneTable(originTable, selectedCells);
 
 		this.setTableInfo(cloneTable);
 		selectedCells = clonedSelectedCells;
@@ -1676,28 +1680,30 @@ class Table extends EditorInjector {
 		mergeCell.colSpan = cs;
 		mergeCell.rowSpan = rs;
 
-		if (notRender) return;
+		if (skipPostProcess) return;
 
-		// rendering
+		// replace table
 		originTable.replaceWith(cloneTable);
 
 		this._setMergeSplitButton();
 		this._setController(mergeCell);
 
 		this.#focusEdge(mergeCell);
+
+		// history push
 		this._historyPush();
 	}
 
 	/**
 	 * @description Unmerges a table cell that has been merged using rowspan and/or colspan.
 	 * @param {HTMLTableCellElement[]} selectedCells - Cells array
-	 * @param {?boolean=} [notRender=false] - Whether to not rendering the unmerged cells
+	 * @param {boolean} [skipPostProcess=false] - If true, skips table cloning, cell re-selection, history stack push, and rendering.
 	 */
-	unmergeCells(selectedCells, notRender = false) {
+	unmergeCells(selectedCells, skipPostProcess = false) {
 		if (!selectedCells?.length) return;
 
 		const originTable = selectedCells[0].closest('table');
-		const { cloneTable, clonedSelectedCells } = notRender ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this.#cloneTable(originTable, selectedCells);
+		const { cloneTable, clonedSelectedCells } = skipPostProcess ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this.#cloneTable(originTable, selectedCells);
 
 		this._ref = null;
 		this.setTableInfo(cloneTable);
@@ -1745,9 +1751,9 @@ class Table extends EditorInjector {
 
 		this._selectedCells = [];
 
-		if (notRender) return;
+		if (skipPostProcess) return;
 
-		// rendering
+		// replace table
 		originTable.replaceWith(cloneTable);
 
 		// set info

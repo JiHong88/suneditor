@@ -389,6 +389,11 @@ function Editor(multiTargets, options) {
 	this._preventBlur = false;
 
 	/**
+	 * @description Variables for controlling selection change events
+	 */
+	this._preventSelection = false;
+
+	/**
 	 * @description If true, initialize all indexes of image, video information
 	 * @type {boolean}
 	 */

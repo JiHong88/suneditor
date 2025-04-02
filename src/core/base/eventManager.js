@@ -1428,6 +1428,8 @@ function OnScroll_viewport() {
  * @param {Document} _wd - Wysiwyg document
  */
 function OnSelectionchange_document(_wd) {
+	if (this.editor._preventSelection) return;
+
 	const selection = _wd.getSelection();
 	let anchorNode = selection.anchorNode;
 
