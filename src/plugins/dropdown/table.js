@@ -864,7 +864,6 @@ class Table extends EditorInjector {
 
 		this._figure = null;
 		this._element = null;
-		// this._tdElement = null;
 		this._trElement = null;
 		this._trElements = null;
 		this._tableXY = [];
@@ -915,7 +914,7 @@ class Table extends EditorInjector {
 	 * @returns {HTMLTableElement} The `<table>` element that is the parent of the provided `element`.
 	 */
 	setTableInfo(element) {
-		const table = (this._element = this._selectedTable || dom.query.getParentElement(element, 'TABLE'));
+		const table = (this._element = this._selectedTable = dom.query.getParentElement(element, 'TABLE'));
 		this._figure = dom.query.getParentElement(table, dom.check.isFigure) || table;
 		return /** @type {HTMLTableElement} */ (table);
 	}
@@ -1452,10 +1451,16 @@ class Table extends EditorInjector {
 		};
 
 		// target info
-		this.setCellInfo(targetTD, true);
 		this._deleteStyleSelectedCells();
-		const targetTable = targetTD.closest('table');
+		const originTable = targetTD.closest('table');
+		const { cloneTable, clonedSelectedCells } = this.#cloneTable(originTable, [targetTD]);
+
+		const targetTable = cloneTable;
+		targetTD = clonedSelectedCells[0];
 		let targetRows = targetTable.rows;
+		this.setTableInfo(targetTable);
+		this.setCellInfo(targetTD, true);
+
 		const targetInfo = {
 			physicalCellCnt: this._physical_cellCnt,
 			logicalCellCnt: this._logical_cellCnt,
@@ -1483,6 +1488,7 @@ class Table extends EditorInjector {
 			for (let i = 0; i < addColCnt; i++) {
 				this.editCell('right', lastCell);
 			}
+			targetRows = this._trElements = targetTable.rows;
 		}
 
 		// unmerge cells
@@ -1504,7 +1510,10 @@ class Table extends EditorInjector {
 			}
 		}
 
-		this.unmergeCells(unmergeCells, true);
+		if (unmergeCells.length > 0) {
+			this.unmergeCells(unmergeCells, true);
+			targetRows = this._trElements = targetTable.rows;
+		}
 
 		// merge cell
 		const mergeGroups = [];
@@ -1521,7 +1530,7 @@ class Table extends EditorInjector {
 				const cEnd = copyIndex + targetInfo.logicalCellIndex;
 				const cStart = cEnd - cs;
 				const mergeCells = [];
-				for (let targetR = targetInfo.rowInex + 1, tRowCnt = targetR + rs; targetR < tRowCnt; targetR++) {
+				for (let targetR = targetInfo.rowInex, tRowCnt = targetR + rs; targetR < tRowCnt; targetR++) {
 					const targetRow = targetRows[targetR];
 					const targetCells = targetRow.cells;
 					for (let targetC = 0, tLen = targetCells.length, tIndex; targetC < tLen; targetC++) {
@@ -1565,6 +1574,9 @@ class Table extends EditorInjector {
 			}
 		}
 
+		// replace table
+		originTable.replaceWith(targetTable);
+
 		// select cell
 		this.selectCells(selectedCells);
 		this._setMergeSplitButton();
@@ -1591,12 +1603,16 @@ class Table extends EditorInjector {
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
 	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
 	 * @param {HTMLTableCellElement[]} selectedCells Cells array
-	 * @param {?boolean=} [notSelected=false] - Whether to not select the merged cell
+	 * @param {?boolean=} [notRender=false] - Whether to not rendering the merged cell
 	 */
-	mergeCells(selectedCells, notSelected = false) {
-		if (!this._ref) {
-			this._setMultiCells(selectedCells[0], selectedCells[selectedCells.length - 1]);
-		}
+	mergeCells(selectedCells, notRender = false) {
+		const originTable = selectedCells[0].closest('table');
+		const { cloneTable, clonedSelectedCells } = notRender ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this.#cloneTable(originTable, selectedCells);
+
+		this.setTableInfo(cloneTable);
+		selectedCells = clonedSelectedCells;
+		this._ref = null;
+		this._setMultiCells(selectedCells[0], dom.query.findTableLastCell(selectedCells));
 
 		const ref = this._ref;
 		const mergeCell = selectedCells[0];
@@ -1660,7 +1676,10 @@ class Table extends EditorInjector {
 		mergeCell.colSpan = cs;
 		mergeCell.rowSpan = rs;
 
-		if (notSelected) return;
+		if (notRender) return;
+
+		// rendering
+		originTable.replaceWith(cloneTable);
 
 		this._setMergeSplitButton();
 		this._setController(mergeCell);
@@ -1672,13 +1691,20 @@ class Table extends EditorInjector {
 	/**
 	 * @description Unmerges a table cell that has been merged using rowspan and/or colspan.
 	 * @param {HTMLTableCellElement[]} selectedCells - Cells array
-	 * @param {?boolean=} [notSelected=false] - Whether to not select the unmerged cells
+	 * @param {?boolean=} [notRender=false] - Whether to not rendering the unmerged cells
 	 */
-	unmergeCells(selectedCells, notSelected = false) {
+	unmergeCells(selectedCells, notRender = false) {
 		if (!selectedCells?.length) return;
 
+		const originTable = selectedCells[0].closest('table');
+		const { cloneTable, clonedSelectedCells } = notRender ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this.#cloneTable(originTable, selectedCells);
+
+		this._ref = null;
+		this.setTableInfo(cloneTable);
+		selectedCells = clonedSelectedCells;
+
 		let firstCell = selectedCells[0];
-		let lastCell = selectedCells[selectedCells.length - 1];
+		let lastCell = dom.query.findTableLastCell(selectedCells);
 		let newLastCell = null;
 
 		const table = firstCell.closest('table');
@@ -1717,12 +1743,14 @@ class Table extends EditorInjector {
 			}
 		}
 
-		this._selectedCells = null;
+		this._selectedCells = [];
 
-		if (notSelected) return;
+		if (notRender) return;
 
-		this._historyPush();
+		// rendering
+		originTable.replaceWith(cloneTable);
 
+		// set info
 		if (firstCell !== lastCell) {
 			lastCell = !newLastCell || lastCell.closest('tr').rowIndex > newLastCell.closest('tr').rowIndex || lastCell.cellIndex > newLastCell.cellIndex ? lastCell : newLastCell;
 			this._setMultiCells(firstCell, lastCell);
@@ -1737,6 +1765,9 @@ class Table extends EditorInjector {
 
 		this._setUnMergeButton();
 		this.controller_cell.resetPosition(lastCell);
+
+		// history push
+		this._historyPush();
 	}
 
 	/**
@@ -2772,6 +2803,34 @@ class Table extends EditorInjector {
 		for (const k in globalEvents) {
 			if (globalEvents[k]) globalEvents[k] = this.eventManager.removeGlobalEvent(globalEvents[k]);
 		}
+	}
+
+	/**
+	 * @description Clone a table element and map selected cells to the cloned table
+	 * @param {HTMLTableElement} table <table> element
+	 * @param {HTMLTableCellElement[]} selectedCells Selected cells array
+	 * @returns {{ cloneTable: HTMLTableElement, clonedSelectedCells: HTMLTableCellElement[] }}
+	 */
+	#cloneTable(table, selectedCells) {
+		/** @type {HTMLTableElement} */
+		const cloneTable = dom.utils.clone(table, true);
+
+		const originalCells = Array.from(table.querySelectorAll('td, th'));
+		const clonedCells = Array.from(cloneTable.querySelectorAll('td, th'));
+
+		const clonedSelectedCells = /** @type {HTMLTableCellElement[]} */ (
+			selectedCells
+				.map((cell) => {
+					const index = originalCells.indexOf(cell);
+					return index > -1 ? clonedCells[index] : null;
+				})
+				.filter((cell) => cell !== null)
+		);
+
+		return {
+			cloneTable,
+			clonedSelectedCells
+		};
 	}
 
 	/**
