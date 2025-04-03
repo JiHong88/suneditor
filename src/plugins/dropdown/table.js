@@ -349,7 +349,7 @@ class Table extends EditorInjector {
 		this.setCellInfo(this._tdElement, true);
 
 		// controller open
-		const btnDisabled = this._selectedCells.length > 1;
+		const btnDisabled = this._selectedCells?.length > 1;
 		const figureEl = dom.query.getParentElement(target, dom.check.isFigure);
 		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
 
@@ -517,7 +517,7 @@ class Table extends EditorInjector {
 	 * @param {__se__PluginMouseEventInfo} params
 	 */
 	onMouseDown({ event }) {
-		this._ref = null;
+		this._ref = this._selectedCell = null;
 		const eventTarget = dom.query.getEventTarget(event);
 		const target = /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(eventTarget, IsResizeEls));
 		if (!target) return;
@@ -944,7 +944,7 @@ class Table extends EditorInjector {
 				this._trElement = /** @type {HTMLTableRowElement} */ (tdElement.parentNode);
 			}
 
-			if (!this._selectedCells || this._selectedCells.length === 0) this._selectedCells = [tdElement];
+			if (!this._selectedCells?.length) this._selectedCells = [tdElement];
 
 			const rows = (this._trElements = table.rows);
 			const cellIndex = tdElement.cellIndex;
@@ -1749,7 +1749,7 @@ class Table extends EditorInjector {
 			}
 		}
 
-		this._selectedCells = [];
+		this._selectedCells = null;
 
 		if (skipPostProcess) return;
 
@@ -2619,10 +2619,10 @@ class Table extends EditorInjector {
 		const rows = this._selectedTable.rows;
 		this._deleteStyleSelectedCells();
 
+		dom.utils.addClass(startCell, 'se-selected-table-cell');
+
 		if (startCell === endCell) {
 			if (!this._shift) return;
-		} else {
-			dom.utils.addClass(startCell, 'se-selected-table-cell');
 		}
 
 		let findSelectedCell = true;
@@ -3170,14 +3170,19 @@ class Table extends EditorInjector {
 			this.__globalEvents.touchOff = this.eventManager.removeGlobalEvent(this.__globalEvents.touchOff);
 		}
 
-		if (!this._selectedCell || !this._selectedTable) return;
+		if (!this._fixedCell || !this._selectedTable) return;
 
 		this._setMergeSplitButton();
 		this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 
 		if (this._shift) return;
 
-		this.#focusEdge(this._fixedCell);
+		if (this._fixedCell && this._selectedCell) {
+			this.#focusEdge(this._fixedCell);
+			if (this._fixedCell === this._selectedCell) {
+				dom.utils.removeClass(this._fixedCell, 'se-selected-table-cell');
+			}
+		}
 
 		const displayCell = this._selectedCells?.length > 0 ? this._selectedCell : this._fixedCell;
 		this._setController(displayCell);

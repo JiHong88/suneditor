@@ -18,8 +18,8 @@ export default function History(editor) {
 	let waiting = false;
 	let waitingTime = null;
 
-	function change(fc, index) {
-		if (editor.status.hasFocus) editor.eventManager.applyTagEffect();
+	function change(fc, index, isSetFocus) {
+		if (isSetFocus && editor.status.hasFocus) editor.eventManager.applyTagEffect();
 		editor.history.resetButtons(fc.get('key'), index);
 
 		// user event
@@ -78,7 +78,7 @@ export default function History(editor) {
 		}
 
 		// onChange
-		change(fc, root.index);
+		change(fc, root.index, true);
 	}
 
 	function setStack(content, range, rootKey, increase) {
@@ -165,7 +165,7 @@ export default function History(editor) {
 		}
 
 		editor.char.display();
-		change(fc, root.index);
+		change(fc, root.index, false);
 	}
 
 	return {

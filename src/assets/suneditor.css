@@ -2422,7 +2422,6 @@
 .sun-editor-editable[contenteditable='true'] figure,
 .sun-editor-editable[contenteditable='true'] hr {
 	outline: 2px solid transparent;
-	transition: outline-color 0.2s ease-in-out, outline-width 0.2s ease-in-out;
 }
 
 .sun-editor-editable[contenteditable='true'] .se-component:not(:has(figure)).se-component-selected,
