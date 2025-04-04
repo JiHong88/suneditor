@@ -557,32 +557,58 @@ export function findTabEndIndex(line, baseIndex, minTabSize) {
 }
 
 /**
- * @description Finds the table cell that appears at the bottom-right position
- * - on the display, considering vertical merges (`rowSpan`).
+ * @description Finds the table cell that appears visually at the bottom-right position,
+ * considering both rowSpan and colSpan, even if smaller cells are placed after large merged cells.
  *
- * - Among all cells provided, it calculates the ending row index for each cell by using: `rowEnd = rowIndex + rowSpan - 1`.
- * - Then it returns the cell with the largest rowEnd. If multiple cells share the same
- * - rowEnd, the one with the larger `cellIndex` (more to the right) is returned.
- *
- * @param {HTMLTableCellElement[]} cells - A list of table cell elements to search through.
- * @returns {HTMLTableCellElement|null} The cell located at the bottom-right position, or null if input is invalid or empty.
+ * @param {HTMLTableCellElement[]} cells
+ * @returns {HTMLTableCellElement|null}
  */
-export function findTableLastCell(cells) {
+export function findVisualLastCell(cells) {
 	if (!cells || cells.length === 0) return null;
+
+	/**
+	 * @description visibility col index
+	 * @type {Object<number, boolean[]>}
+	 */
+	const occupied = {};
 
 	let target = null;
 	let maxRowEnd = -1;
-	let maxColIndex = -1;
+	let maxColEnd = -1;
 
 	for (const cell of cells) {
-		const rowStart = /** @type {HTMLTableRowElement} */ (cell.parentElement).rowIndex;
-		const rowEnd = rowStart + (cell.rowSpan || 1) - 1;
-		const colIndex = cell.cellIndex;
+		const row = /** @type {HTMLTableRowElement} */ (cell.parentElement);
+		const rowIndex = row.rowIndex;
+		const rowSpan = cell.rowSpan || 1;
+		const colSpan = cell.colSpan || 1;
 
-		if (rowEnd > maxRowEnd || (rowEnd === maxRowEnd && colIndex > maxColIndex)) {
+		// 현재 행에서 visual column index 찾기
+		if (!occupied[rowIndex]) occupied[rowIndex] = [];
+
+		let colIndex = 0;
+		const rowOcc = occupied[rowIndex];
+		while (rowOcc[colIndex]) colIndex++;
+
+		for (let i = 0; i < colSpan; i++) {
+			rowOcc[colIndex + i] = true;
+		}
+
+		for (let r = 1; r < rowSpan; r++) {
+			const nextRow = rowIndex + r;
+			if (!occupied[nextRow]) occupied[nextRow] = [];
+			for (let i = 0; i < colSpan; i++) {
+				occupied[nextRow][colIndex + i] = true;
+			}
+		}
+
+		const visualRowEnd = rowIndex + rowSpan - 1;
+		const visualColEnd = colIndex + colSpan - 1;
+
+		// right-bottom
+		if (visualRowEnd > maxRowEnd || (visualRowEnd === maxRowEnd && visualColEnd > maxColEnd)) {
+			maxRowEnd = visualRowEnd;
+			maxColEnd = visualColEnd;
 			target = cell;
-			maxRowEnd = rowEnd;
-			maxColIndex = colIndex;
 		}
 	}
 
@@ -635,7 +661,7 @@ const query = {
 	getNextDeepestNode,
 	findTextIndexOnLine,
 	findTabEndIndex,
-	findTableLastCell,
+	findVisualLastCell,
 	getScrollParent,
 	getIframeDocument
 };

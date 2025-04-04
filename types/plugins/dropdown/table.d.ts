@@ -122,7 +122,10 @@ declare class Table extends EditorInjector {
 	_resizeLinePrev: any;
 	/** @type {HTMLElement} */
 	_figure: HTMLElement;
-	/** @type {HTMLTableElement} */
+	/**
+	 * @description Same value a "this._selectedTable", but it maintain prev table element
+	 * @type {HTMLTableElement}
+	 */
 	_element: HTMLTableElement;
 	/** @type {HTMLTableCellElement} */
 	_tdElement: HTMLTableCellElement;
@@ -342,15 +345,15 @@ declare class Table extends EditorInjector {
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
 	 * - This method removes the selected cells, consolidates their contents, and applies the appropriate row and column spans to the merged cell.
 	 * @param {HTMLTableCellElement[]} selectedCells Cells array
-	 * @param {?boolean=} [notSelected=false] - Whether to not select the merged cell
+	 * @param {boolean} [skipPostProcess=false] - If true, skips table cloning, cell re-selection, history stack push, and rendering.
 	 */
-	mergeCells(selectedCells: HTMLTableCellElement[], notSelected?: (boolean | null) | undefined): void;
+	mergeCells(selectedCells: HTMLTableCellElement[], skipPostProcess?: boolean): void;
 	/**
 	 * @description Unmerges a table cell that has been merged using rowspan and/or colspan.
 	 * @param {HTMLTableCellElement[]} selectedCells - Cells array
-	 * @param {?boolean=} [notSelected=false] - Whether to not select the unmerged cells
+	 * @param {boolean} [skipPostProcess=false] - If true, skips table cloning, cell re-selection, history stack push, and rendering.
 	 */
-	unmergeCells(selectedCells: HTMLTableCellElement[], notSelected?: (boolean | null) | undefined): void;
+	unmergeCells(selectedCells: HTMLTableCellElement[], skipPostProcess?: boolean): void;
 	/**
 	 * @description Find merged cells
 	 * @param {HTMLTableCellElement[]} cells - Cells array
@@ -599,6 +602,11 @@ declare class Table extends EditorInjector {
 	 * @description Closes table-related controllers.
 	 */
 	private _closeController;
+	/**
+	 * @private
+	 * @description Closes table-related controllers and table figure
+	 */
+	private _closeTableSelectInfo;
 	/**
 	 * @private
 	 * @description Hides the resize line if it is visible.

@@ -242,7 +242,10 @@ class Table extends EditorInjector {
 
 		/** @type {HTMLElement} */
 		this._figure = null;
-		/** @type {HTMLTableElement} */
+		/**
+		 * @description Same value a "this._selectedTable", but it maintain prev table element
+		 * @type {HTMLTableElement}
+		 */
 		this._element = null;
 		/** @type {HTMLTableCellElement} */
 		this._tdElement = null;
@@ -828,7 +831,8 @@ class Table extends EditorInjector {
 			case 'remove': {
 				const emptyDiv = this._figure?.parentNode;
 				dom.utils.removeItem(this._figure);
-				this._closeController();
+
+				this._closeTableSelectInfo();
 
 				if (emptyDiv !== this.editor.frameContext.get('wysiwyg'))
 					this.nodeTransform.removeAllParents(
@@ -897,7 +901,7 @@ class Table extends EditorInjector {
 	 */
 	selectCells(cells) {
 		const firstCell = cells[0];
-		const lastCell = dom.query.findTableLastCell(cells);
+		const lastCell = dom.query.findVisualLastCell(cells);
 
 		this._selectedCells = cells;
 		this._fixedCell = firstCell;
@@ -1060,7 +1064,7 @@ class Table extends EditorInjector {
 				} else if (!tableAttr.nextElementSibling || !/^TBODY$/i.test(tableAttr.nextElementSibling.nodeName)) {
 					if (!option) {
 						dom.utils.removeItem(this._figure);
-						this._closeController();
+						this._closeTableSelectInfo();
 					} else {
 						table.innerHTML += '<tbody><tr>' + CreateCellsString('td', this._logical_cellCnt) + '</tr></tbody>';
 					}
@@ -1612,6 +1616,8 @@ class Table extends EditorInjector {
 
 		// replace table
 		originTable.replaceWith(targetTable);
+		this._closeTableSelectInfo();
+		this.setTableInfo(originTable);
 
 		// select cell
 		this.selectCells(selectedCells);
@@ -1648,7 +1654,7 @@ class Table extends EditorInjector {
 		this.setTableInfo(cloneTable);
 		selectedCells = clonedSelectedCells;
 		this._ref = null;
-		this._setMultiCells(selectedCells[0], dom.query.findTableLastCell(selectedCells));
+		this._setMultiCells(selectedCells[0], dom.query.findVisualLastCell(selectedCells));
 
 		const ref = this._ref;
 		const mergeCell = selectedCells[0];
@@ -1716,6 +1722,7 @@ class Table extends EditorInjector {
 
 		// replace table
 		originTable.replaceWith(cloneTable);
+		this._closeTableSelectInfo();
 
 		this._setMergeSplitButton();
 		this._setController(mergeCell);
@@ -1742,7 +1749,7 @@ class Table extends EditorInjector {
 		selectedCells = clonedSelectedCells;
 
 		let firstCell = selectedCells[0];
-		let lastCell = dom.query.findTableLastCell(selectedCells);
+		let lastCell = dom.query.findVisualLastCell(selectedCells);
 		let newLastCell = null;
 
 		const table = firstCell.closest('table');
@@ -1787,6 +1794,8 @@ class Table extends EditorInjector {
 
 		// replace table
 		originTable.replaceWith(cloneTable);
+		this._closeTableSelectInfo();
+		this.setTableInfo(originTable);
 
 		// set info
 		if (firstCell !== lastCell) {
@@ -1925,7 +1934,7 @@ class Table extends EditorInjector {
 	 * @description Sets the unmerge button visibility.
 	 */
 	_setUnMergeButton() {
-		if (this.findMergedCells(this._selectedCells).length > 0) {
+		if (this.findMergedCells(!this._selectedCells?.length ? [this._fixedCell] : this._selectedCells).length > 0) {
 			this.unmergeButton.style.display = 'block';
 		} else {
 			this.unmergeButton.style.display = 'none';
@@ -1947,7 +1956,7 @@ class Table extends EditorInjector {
 
 		this._tdElement = tdElement;
 		if (this._fixedCell === tdElement) dom.utils.addClass(tdElement, 'se-selected-cell-focus');
-		const tableElement = this._element || this._selectedTable || dom.query.getParentElement(tdElement, 'TABLE');
+		const tableElement = this._selectedTable || this._element || dom.query.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, true);
 	}
 
@@ -2808,9 +2817,17 @@ class Table extends EditorInjector {
 	 * @description Closes table-related controllers.
 	 */
 	_closeController() {
-		this.component.deselect();
 		this.controller_table.close();
 		this.controller_cell.close();
+	}
+
+	/**
+	 * @private
+	 * @description Closes table-related controllers and table figure
+	 */
+	_closeTableSelectInfo() {
+		this.component.deselect();
+		this._closeController();
 	}
 
 	/**

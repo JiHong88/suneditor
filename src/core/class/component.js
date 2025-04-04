@@ -220,9 +220,12 @@ Component.prototype = {
 	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.
 	 * @param {Node} element Target element
 	 * @param {string} pluginName The plugin name for the selected target.
-	 * @param {boolean=} isInput Whether the target is an input component.(table)
+	 * @param {boolean} [isInput=false] Whether the target is an input component.(table)
+	 * @param {boolean} [force=false] Forces the component selection action again even if it is already selected.
 	 */
-	select(element, pluginName, isInput) {
+	select(element, pluginName, isInput, force) {
+		if (!force && element === this.currentTarget && this.editor.currentControllerName === this.currentPluginName) return;
+
 		const info = this.get(element);
 		if (!info || dom.check.isUneditable(dom.query.getParentElement(element, this.is.bind(this))) || dom.check.isUneditable(element)) return false;
 

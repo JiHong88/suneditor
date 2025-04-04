@@ -73,7 +73,7 @@ export const dom: {
 		getNextDeepestNode: typeof import('./dom/domQuery').getNextDeepestNode;
 		findTextIndexOnLine: typeof import('./dom/domQuery').findTextIndexOnLine;
 		findTabEndIndex: typeof import('./dom/domQuery').findTabEndIndex;
-		findTableLastCell: typeof import('./dom/domQuery').findTableLastCell;
+		findVisualLastCell: typeof import('./dom/domQuery').findVisualLastCell;
 		getScrollParent: typeof import('./dom/domQuery').getScrollParent;
 		getIframeDocument: typeof import('./dom/domQuery').getIframeDocument;
 	};

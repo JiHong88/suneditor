@@ -338,6 +338,10 @@ declare class Editor {
 	 */
 	_preventBlur: boolean;
 	/**
+	 * @description Variables for controlling selection change events
+	 */
+	_preventSelection: boolean;
+	/**
 	 * @description If true, initialize all indexes of image, video information
 	 * @type {boolean}
 	 */
