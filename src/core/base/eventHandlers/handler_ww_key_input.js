@@ -2,6 +2,11 @@ import { dom, env, unicode, keyCodeMap } from '../../../helper';
 
 const { _w, isOSX_IOS } = env;
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
+
+const keyState = {
+	ctrl: false,
+	alt: false
+};
 let _styleNodes = null;
 
 /**
@@ -119,8 +124,8 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 
 	const keyCode = e.code;
 	const shift = keyCodeMap.isShift(e);
-	const ctrl = keyCodeMap.isCtrl(e);
-	const alt = keyCodeMap.isAlt(e);
+	const ctrl = (keyState.ctrl = keyCodeMap.isCtrl(e));
+	const alt = (keyState.alt = keyCodeMap.isAlt(e));
 	this.isComposing = keyCodeMap.isComposing(e);
 
 	if (!ctrl && fc.get('isReadOnly') && !keyCodeMap.isDirectionKey(keyCode)) {
@@ -1076,6 +1081,9 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	const ctrl = keyCodeMap.isCtrl(e);
 	const alt = keyCodeMap.isAlt(e);
 
+	if (ctrl) keyState.ctrl = false;
+	if (alt) keyState.alt = false;
+
 	if (fc.get('isReadOnly')) return;
 
 	const range = this.selection.getRange();
@@ -1134,7 +1142,7 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 		selectionNode = this.selection.getNode();
 	}
 
-	const textKey = !ctrl && !alt && !keyCodeMap.isNonTextKey(keyCode);
+	const textKey = !keyState.ctrl && !keyState.alt && !keyCodeMap.isNonTextKey(keyCode);
 	if (textKey && selectionNode.nodeType === 3 && unicode.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : this.isComposing)) {
 		let so = range.startOffset,
 			eo = range.endOffset;
@@ -1186,7 +1194,7 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	// plugin event
 	if (this._callPluginEvent('onKeyUp', { frameContext: fc, event: e, range, line: formatEl }) === false) return;
 
-	if (!ctrl && !alt && !keyCodeMap.isHistoryIgnoreKey(keyCode)) {
+	if (!keyState.ctrl && !keyState.alt && !keyCodeMap.isHistoryIgnoreKey(keyCode)) {
 		this.history.push(true);
 	}
 }
