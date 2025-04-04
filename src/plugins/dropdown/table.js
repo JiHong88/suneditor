@@ -1519,33 +1519,65 @@ class Table extends EditorInjector {
 
 		// merge cell
 		const mergeGroups = [];
+		const rowSpanMap = [];
 		for (let r = 0, len = copyInfo.rowCnt; r < len; r++) {
 			const cells = copyRows[r].cells;
-			for (let c = 0, cLen = cells.length, cs, rs, copyIndex = 0; c < cLen; c++, copyIndex++) {
-				const cell = cells[c];
-				cs = cell.colSpan || 1;
-				rs = cell.rowSpan || 1;
-				copyIndex += cs - 1;
-				if (cs <= 1 && rs <= 1) continue;
+			let copyIndex = 0;
 
-				// merge target cells
+			for (let c = 0; c < cells.length; c++) {
+				const cell = cells[c];
+				const cs = cell.colSpan || 1;
+				const rs = cell.rowSpan || 1;
+
+				while (rowSpanMap[r]?.[copyIndex]) {
+					copyIndex++;
+				}
+
+				// rowSpan map
+				for (let rsOffset = 1; rsOffset < rs; rsOffset++) {
+					const rowIndex = r + rsOffset;
+					if (!rowSpanMap[rowIndex]) rowSpanMap[rowIndex] = [];
+					for (let csOffset = 0; csOffset < cs; csOffset++) {
+						rowSpanMap[rowIndex][copyIndex + csOffset] = true;
+					}
+				}
+
+				if (cs <= 1 && rs <= 1) {
+					copyIndex += cs;
+					continue;
+				}
+
 				const cStart = copyIndex + targetInfo.logicalCellIndex;
 				const cEnd = cStart + cs - 1;
 				const mergeCells = [];
-				for (let targetR = targetInfo.rowInex + r, tRowCnt = targetR + rs; targetR < tRowCnt; targetR++) {
+				for (let targetR = targetInfo.rowInex + r, tRowCnt = targetR + rs, rowOffset = 0; targetR < tRowCnt; targetR++, rowOffset++) {
 					const targetRow = targetRows[targetR];
 					const targetCells = targetRow.cells;
-					for (let targetC = 0, tLen = targetCells.length, tIndex, tcs, tcsSum = 0; targetC < tLen; targetC++) {
-						const tCell = targetCells[targetC];
-						tcs = (tCell.colSpan || 1) - 1;
-						tIndex = targetC + tcs + tcsSum;
-						tcsSum += tcs;
-						if (tIndex < cStart) continue;
-						if (tIndex > cEnd) break;
-						mergeCells.push(tCell);
+
+					// get logical cell index
+					let targetIndex = 0;
+					let logicalIndex = 0;
+
+					while (logicalIndex <= cEnd && targetIndex < targetCells.length) {
+						const tCell = targetCells[targetIndex];
+						const tcs = tCell.colSpan || 1;
+						const logicalStart = logicalIndex;
+						const logicalEnd = logicalIndex + tcs - 1;
+
+						if (logicalEnd >= cStart && logicalStart <= cEnd) {
+							mergeCells.push(tCell);
+						}
+
+						logicalIndex += tcs;
+						targetIndex++;
 					}
 				}
-				if (mergeCells.length > 0) mergeGroups.push(mergeCells);
+
+				if (mergeCells.length > 0) {
+					mergeGroups.push(mergeCells);
+				}
+
+				copyIndex += cs;
 			}
 		}
 
