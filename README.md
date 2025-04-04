@@ -9,8 +9,8 @@
 <p align="center">
 	<a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE" title="MIT License"><img src="https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square" alt="GitHub License"></a>
 	<a href="https://www.npmjs.com/package/suneditor" title="npm release"><img src="https://img.shields.io/npm/v/suneditor.svg?style=flat-square" alt="npm"></a>
-	<a href="https://www.npmjs.com/package/suneditor" title="npm download"><img src="https://img.shields.io/npm/dt/suneditor.svg?style=flat-square" alt="npm download"></a>
-	<a href="https://www.jsdelivr.com/package/npm/suneditor" title="jsDelivr CDN"><img src="https://img.shields.io/jsdelivr/npm/hm/suneditor?label=CDN&style=flat-square" alt="jsDelivr CDN" /></a>
+	<a href="https://www.npmjs.com/package/suneditor" title="npm month downloads"><img src="https://img.shields.io/npm/dm/suneditor.svg?logo=npm&style=flat-square" alt="npm weekly downloads"></a>
+	<a href="https://www.jsdelivr.com/package/npm/suneditor" title="jsDelivr CDN month downloads"><img src="https://img.shields.io/jsdelivr/npm/hm/suneditor?label=CDN&style=flat-square" alt="jsDelivr CDN" /></a>
 </p>
 
 #
@@ -19,13 +19,23 @@ SunEditor supports all modern browsers without dependencies or polyfills.
 
 ## 🌟 Why SunEditor?
 
--   ⚡ Lightweight and fast
--   ✨ Pure vanilla JavaScript (no dependencies)
--   🧩 Plugin-based architecture
--   📱 Responsive and touch-friendly
--   🌐 Easy integration with frameworks (React, Vue, etc.)
+SunEditor is a lightweight, fast, and extensible WYSIWYG editor written in pure JavaScript.  
+It's easy to integrate, highly customizable, and built for modern web applications.
 
-🌤 **[ Live Demo – Try SunEditor Now! ](https://suneditor.com)** 🌤
+### Key Features
+
+-   ⚡ **No dependencies** — Optimized for speed and simplicity
+-   🧩 **Modular architecture** — Enable only the plugins you need
+-   📱 **Responsive UI** — Works smoothly on all modern devices
+-   🔌 **Framework-friendly** — Easy to use with React, Vue, Svelte, etc.
+-   💼 **Feature-rich plugin ecosystem**, including:
+    -   🏷 @Mentions with autocomplete
+    -   🎨 Advanced table editing & custom layouts
+    -   🧮 Math (LaTeX), drawing, and code block support
+    -   📂 Built-in media galleries (image, video, audio, file)
+    -   📄 PDF export, templates, and embedded content (audio/video/iframe)
+
+🌤 **[Explore all plugins](https://suneditor.com/plugins)**
 
 ⭐ **Contributions welcome!** Please refer to [Contribution Guidelines](/CONTRIBUTING.md) and check out our [open tasks](https://github.com/jihong88/suneditor/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22). ⭐
 
