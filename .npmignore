@@ -3,8 +3,10 @@
 
 # project files
 .vscode/
+scripts/
 .idea/
 .github/
+.env/
 out
 gen
 
@@ -17,7 +19,6 @@ node_modules/
 
 #dev
 .git/
-sample/
 test/
 webpack/
 .jshintrc
@@ -25,7 +26,3 @@ webpack/
 .prettierrc
 karma.conf.js
 tsconfig.json
-package-lock.json
-
-#contracts - extend types
-contracts/

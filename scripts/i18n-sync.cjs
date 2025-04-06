@@ -2,7 +2,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const { translate } = require('@vitalets/google-translate-api');
 const args = require('minimist')(process.argv.slice(2));
 
 const LANG_DIR = path.join(__dirname, '../src/langs');
@@ -12,6 +11,23 @@ const BASE_LANG = args.base || 'en';
 const targets = args.target ? args.target.split(',') : null;
 const autoTranslate = args['auto-translate'] || false;
 const fillEmpty = args['fill-empty'] || false;
+
+const { TranslationServiceClient } = require('@google-cloud/translate').v3;
+const translationClient = new TranslationServiceClient();
+
+const googleTranslate = async (text, from, to) => {
+	const projectId = await translationClient.getProjectId();
+	const request = {
+		parent: `projects/${projectId}/locations/global`,
+		contents: [text],
+		mimeType: 'text/plain',
+		sourceLanguageCode: from,
+		targetLanguageCode: to
+	};
+
+	const [response] = await translationClient.translateText(request);
+	return response.translations[0]?.translatedText || text;
+};
 
 // https://cloud.google.com/translate/docs/languages?hl=ko
 const langMap = {
@@ -53,12 +69,7 @@ const injectKeys = async (filePath, langCode, baseLangObj) => {
 				try {
 					// eslint-disable-next-line no-console
 					console.log(`[↻] Translating (${BASE_LANG} → ${googleLangCode}) ${key}: ${baseValue}`);
-					const result = await translate(baseValue, {
-						from: BASE_LANG,
-						to: googleLangCode
-					});
-
-					value = result.text || baseValue;
+					value = await googleTranslate(baseValue, BASE_LANG, googleLangCode);
 					// eslint-disable-next-line no-console
 					console.log(`[✓] Translated (${langCode}:${key}) → ${value}`);
 				} catch (e) {

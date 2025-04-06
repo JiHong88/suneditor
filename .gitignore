@@ -6,6 +6,7 @@
 .idea/**
 .out/**
 .gen/**
+.env/**
 
 # modules
 node_modules/**
