@@ -1,0 +1,222 @@
+import EditorInjector from '../../editorInjector';
+import { Controller } from '../../modules';
+import { dom, env } from '../../helper';
+
+const { _w } = env;
+
+/**
+ * @class
+ * @description Anchor plugin
+ * - Allows you to create, edit, and delete elements that act as anchors (bookmarks) within a document.
+ */
+class Anchor extends EditorInjector {
+	static key = 'anchor';
+	static type = 'popup';
+	static className = '';
+	/**
+	 * @this {Anchor}
+	 * @param {HTMLElement} node - The node to check.
+	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
+	 */
+	static component(node) {
+		return dom.check.isAnchor(node) && node.hasAttribute('id') && node.hasAttribute('data-se-anchor') ? node : null;
+	}
+
+	/**
+	 * @constructor
+	 * @param {__se__EditorCore} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+		// plugin basic properties
+		this.title = this.lang.anchor;
+		this.icon = 'bookmark_anchor';
+
+		// members
+		const parser = new DOMParser();
+		const svgDoc = parser.parseFromString(this.icons.bookmark_anchor, 'image/svg+xml');
+		this.bookmarkIcon = svgDoc.documentElement;
+		this._element = null;
+		this._range = null;
+
+		// controller
+		const controllerSelectEl = CreateHTML_controller_select(this);
+		this.displayId = controllerSelectEl.querySelector('.se-controller-display');
+		this.controllerSelect = new Controller(this, controllerSelectEl, { position: 'bottom', disabled: true }, Anchor.key);
+
+		const controllerEl = CreateHTML_controller(this);
+		this.inputEl = controllerEl.querySelector('input');
+		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true }, Anchor.key);
+	}
+
+	/**
+	 * @editorMethod Editor.Plugin<popup>
+	 * @description Displays a popup and gives focus to the input field.
+	 */
+	show() {
+		this.controller.open((this._range = this.selection.getRange()));
+		_w.setTimeout(() => {
+			this.inputEl.focus();
+		}, 0);
+	}
+
+	/**
+	 * @editorMethod Editor.component
+	 * @description Executes the method that is called when a component of a plugin is selected.
+	 * @param {HTMLElement} target Target component element
+	 */
+	select(target) {
+		this._element = target;
+		this.displayId.textContent = target.getAttribute('id');
+		this.controllerSelect.open(target);
+	}
+
+	/**
+	 * @editorMethod Editor.Component
+	 * @description Called when a container is deselected.
+	 */
+	deselect() {
+		this._init();
+	}
+
+	/**
+	 * @editorMethod Modules.Controller
+	 * @description Executes the method that is called when a button is clicked in the "controller".
+	 * @param {HTMLButtonElement} target Target button element
+	 */
+	controllerAction(target) {
+		const command = target.getAttribute('data-command');
+		if (!command) return;
+		const currentElement = this._element;
+
+		switch (command) {
+			case 'submit': {
+				if (!currentElement) {
+					const id = this.inputEl.value.trim();
+					if (!id) {
+						this.inputEl.focus();
+						return;
+					}
+
+					const a = dom.utils.createElement('A', {
+						id,
+						'data-se-anchor': this.inputEl.value,
+						'data-se-non-link': 'true',
+						contenteditable: 'false',
+						class: 'se-component se-inline-component'
+					});
+
+					this.component.insert(a, { skipCharCount: false, skipSelection: true, skipHistory: false });
+
+					const r = this.selection.getNearRange(a);
+					if (r) {
+						this.selection.setRange(r.container, r.offset, r.container, r.offset);
+					} else {
+						this.component.select(a, Anchor.key, false);
+					}
+					this._init();
+				} else {
+					this.controller.close();
+					currentElement.id = this.inputEl.value;
+					this.select(currentElement);
+				}
+
+				break;
+			}
+			case 'cancel': {
+				this.controller.close(!currentElement);
+				if (this._range) {
+					this.selection.setRange(this._range);
+				}
+
+				this._init();
+				if (currentElement) {
+					this.select(currentElement);
+				}
+
+				break;
+			}
+			case 'edit': {
+				this.inputEl.value = this.displayId.textContent;
+				this.controllerSelect.hide();
+				this.controller.open(currentElement);
+
+				break;
+			}
+			case 'delete': {
+				const r = this.selection.getNearRange(currentElement);
+
+				dom.utils.removeItem(currentElement);
+				this.controllerSelect.close(true);
+
+				if (r) {
+					this.selection.setRange(r.container, r.offset, r.container, r.offset);
+				}
+
+				this._init();
+
+				break;
+			}
+		}
+	}
+
+	/**
+	 * @private
+	 * @description Initializes state variables.
+	 * - called when the popup is closed
+	 */
+	_init() {
+		this._element = null;
+		this._range = null;
+		this.inputEl.value = '';
+		this.displayId.textContent = '';
+	}
+}
+
+function CreateHTML_controller({ lang, icons }) {
+	const html = /*html*/ `
+		<div class="se-arrow se-arrow-up"></div>
+		<form>
+			<div class="se-controller-display">${lang.id}</div>
+			<div class="se-btn-group se-form-group">
+				<input type="text" required />
+				<button type="submit" data-command="submit" class="se-btn se-tooltip se-btn-success">
+					${icons.checked}
+					<span class="se-tooltip-inner"><span class="se-tooltip-text">${lang.save}</span></span>
+				</button>
+				<button type="button" data-command="cancel" class="se-btn se-tooltip se-btn-danger">
+					${icons.cancel}
+					<span class="se-tooltip-inner"><span class="se-tooltip-text">${lang.cancel}</span></span>
+				</button>
+			</div>
+		</form>
+		`;
+
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-simple-input' }, html);
+}
+
+function CreateHTML_controller_select({ lang, icons }) {
+	const html = /*html*/ `
+	<div class="se-arrow se-arrow-up"></div>
+	<div class="link-content">
+		<div class="se-controller-display"></div>
+		<div class="se-btn-group">
+			<button type="button" data-command="edit" tabindex="-1" class="se-btn se-tooltip">
+				${icons.edit}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${lang.edit}</span>
+				</span>
+			</button>
+			<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">
+				${icons.delete}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${lang.remove}</span>
+				</span>
+			</button>
+		</div>
+	</div>`;
+
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
+}
+
+export default Anchor;

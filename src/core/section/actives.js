@@ -1,0 +1,203 @@
+import { dom, env, keyCodeMap } from '../../helper';
+const { NO_EVENT } = env;
+
+/**
+ * @constant {Object.<string, string[]>} StyleMap - Map of font styles to CSS properties.
+ */
+const StyleMap = {
+	bold: ['font-weight'],
+	underline: ['text-decoration'],
+	italic: ['font-style'],
+	strike: ['text-decoration']
+};
+
+let __globalEventKeydown = null;
+let __globalEventMousedown = null;
+
+/**
+ * @private
+ * @this {__se__EditorCore}
+ * @param {Node} ww Wywsiwyg element
+ * @param {Node} button Button element
+ */
+const __RemoveCopyformt = function (ww, button) {
+	__globalEventKeydown = this.eventManager.removeGlobalEvent('keydown', __globalEventKeydown);
+	__globalEventMousedown = this.eventManager.removeGlobalEvent('mousedown', __globalEventMousedown);
+	this._onCopyFormatInfo = null;
+	this._onCopyFormatInitMethod = null;
+	dom.utils.removeClass(ww, 'se-copy-format-cursor');
+	dom.utils.removeClass(button, 'on');
+
+	return true;
+};
+
+/**
+ * @description List of commands that trigger active event handling in the editor.
+ * - These commands typically apply inline formatting or structural changes.
+ * @constant {string[]}
+ */
+export const ACTIVE_EVENT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'indent', 'outdent'];
+
+/**
+ * @description List of basic editor commands, including active event commands and additional actions
+ * - such as undo, redo, saving, full-screen toggle, and text direction commands.
+ * @constant {string[]}
+ */
+export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'save', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl']);
+
+/**
+ * @description Selects all content in the editor.
+ * @param {__se__EditorCore} editor - The root editor instance
+ */
+export function SELECT_ALL(editor) {
+	editor.ui._offCurrentController();
+	editor.menu.containerOff();
+	const figcaption = dom.query.getParentElement(editor.selection.getNode(), 'FIGCAPTION');
+	const selectArea = figcaption || editor.frameContext.get('wysiwyg');
+
+	let first = dom.query.getEdgeChild(selectArea.firstChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current), false) || selectArea.firstChild;
+	let last = dom.query.getEdgeChild(selectArea.lastChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current), true) || selectArea.lastChild;
+
+	if (!first || !last) return;
+
+	if (dom.check.isMedia(first) || editor.component.is(first.parentElement) || dom.check.isTableElements(first)) {
+		const info = editor.component.get(first) || editor.component.get(first.parentElement);
+		const br = dom.utils.createElement('BR');
+		const format = dom.utils.createElement(editor.options.get('defaultLine'), null, br);
+		first = info ? info.container || info.cover : first;
+		first.parentNode.insertBefore(format, first);
+		first = br;
+	}
+
+	if (dom.check.isMedia(last) || editor.component.is(last.parentElement) || dom.check.isTableElements(last)) {
+		last = dom.utils.createElement('BR');
+		selectArea.appendChild(dom.utils.createElement(editor.options.get('defaultLine'), null, last));
+	}
+
+	editor.toolbar._showBalloon(editor.selection.setRange(first, 0, last, last.textContent.length));
+}
+
+/**
+ * @description Toggles direction button active state.
+ * @param {__se__EditorCore} editor - The root editor instance
+ * @param {boolean} rtl - Whether the text direction is right-to-left.
+ */
+export function DIR_BTN_ACTIVE(editor, rtl) {
+	const icons = editor.icons;
+	const commandTargets = editor.commandTargets;
+	const shortcutsKeyMap = editor.shortcutsKeyMap;
+
+	// change reverse shortcuts key
+	editor.reverseKeys.forEach((e) => {
+		const info = shortcutsKeyMap.get(e);
+		if (!info) return;
+		const temp = info.c;
+		info.c = info.r;
+		info.r = temp;
+	});
+
+	// change dir buttons
+	editor.applyCommandTargets('dir', (e) => {
+		dom.utils.changeTxt(e.querySelector('.se-tooltip-text'), editor.lang[rtl ? 'dir_ltr' : 'dir_rtl']);
+		dom.utils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
+	});
+
+	if (rtl) {
+		dom.utils.addClass(commandTargets.get('dir_rtl'), 'active');
+		dom.utils.removeClass(commandTargets.get('dir_ltr'), 'active');
+	} else {
+		dom.utils.addClass(commandTargets.get('dir_ltr'), 'active');
+		dom.utils.removeClass(commandTargets.get('dir_rtl'), 'active');
+	}
+}
+
+/**
+ * @description Saves the editor content.
+ * @param {__se__EditorCore} editor - The root editor instance
+ * @returns {Promise<void>}
+ */
+export async function SAVE(editor) {
+	const fc = editor.frameContext;
+	if (!fc.get('isChanged')) return;
+
+	const data = editor.html.get();
+	const saved = await editor.triggerEvent('onSave', { frameContext: fc, data });
+	if (saved === NO_EVENT) {
+		const origin = fc.get('originElement');
+		if (/^TEXTAREA$/i.test(origin.nodeName)) {
+			origin.value = data;
+		} else {
+			origin.innerHTML = data;
+		}
+	} else if (saved === false) {
+		return;
+	}
+
+	fc.set('isChanged', false);
+	fc.set('savedIndex', editor.history.getRootStack()[editor.status.rootKey].index);
+
+	// set save button disable
+	editor.applyCommandTargets('save', (e) => {
+		e.disabled = true;
+	});
+}
+
+/**
+ * @description Copies formatting from selected text.
+ * @param {__se__EditorCore} editor - The root editor instance
+ * @param {Node} button - The button triggering the copy format function.
+ */
+export function COPY_FORMAT(editor, button) {
+	if (typeof editor._onCopyFormatInitMethod === 'function') {
+		editor._onCopyFormatInitMethod();
+		return;
+	}
+
+	const ww = editor.frameContext.get('wysiwyg');
+	editor._onCopyFormatInfo = [...editor.eventManager.__cacheStyleNodes];
+	editor._onCopyFormatInitMethod = __RemoveCopyformt.bind(editor, ww, button);
+	dom.utils.addClass(ww, 'se-copy-format-cursor');
+	dom.utils.addClass(button, 'on');
+
+	__globalEventKeydown = editor.eventManager.addGlobalEvent('keydown', (e) => {
+		if (!keyCodeMap.isEsc(e.code)) return;
+		editor._onCopyFormatInitMethod?.();
+	});
+	__globalEventMousedown = editor.eventManager.addGlobalEvent('mousedown', (e) => {
+		if (ww.contains(e.target) || e.target === button) return;
+		editor._onCopyFormatInitMethod?.();
+	});
+}
+
+/**
+ * @description Applies font styling to selected text.
+ * @param {__se__EditorCore} editor - The root editor instance
+ * @param {string} command - The font style command (e.g., bold, italic, underline).
+ */
+export function FONT_STYLE(editor, command) {
+	command = editor.options.get('_defaultTagCommand')[command.toLowerCase()] || command;
+	let nodeName = editor.options.get('convertTextTags')[command] || command;
+	const nodesMap = editor.status.currentNodesMap;
+	const el = nodesMap.includes(editor.options.get('_styleCommandMap')[nodeName]) ? null : dom.utils.createElement(nodeName);
+
+	if (/^sub$/i.test(nodeName) && nodesMap.includes('superscript')) {
+		nodeName = 'sup';
+	} else if (/^sup$/i.test(nodeName) && nodesMap.includes('subscript')) {
+		nodeName = 'sub';
+	}
+
+	editor.format.applyInlineElement(el, { stylesToModify: StyleMap[command] || null, nodesToRemove: [nodeName], strictRemove: false });
+	editor.focus();
+}
+
+/**
+ * @description Inserts a page break element into the editor.
+ * @param {__se__EditorCore} editor - The root editor instance
+ */
+export function PAGE_BREAK(editor) {
+	const pageBreak = dom.utils.createElement('DIV', { class: 'se-component se-component-line-break se-page-break' });
+	editor.component.insert(pageBreak, { skipCharCount: true, skipSelection: true, skipHistory: false });
+	const line = pageBreak.nextElementSibling || editor.format.addLine(pageBreak);
+	editor.selection.setRange(line, 1, line, 1);
+	editor.history.push(false);
+}

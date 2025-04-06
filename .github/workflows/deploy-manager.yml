@@ -1,52 +1,61 @@
 name: Deploy Management Action
 
 on:
-  push:
-    branches:
-      - release
+    push:
+        branches:
+            - release
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            # 1) 소스 체크아웃
+            - uses: actions/checkout@v3
 
-      - name: Checkout
-        uses: actions/checkout@v2
+            # 2) Node.js 세팅
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '22'
+                  registry-url: 'https://registry.npmjs.org/'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "12"
-          registry-url: "https://registry.npmjs.org/"
+            # 3) package.json 버전이 기존 태그와 다른지 확인
+            - name: Check if version has been updated
+              id: check-version
+              run: |
+                  PACKAGE_VERSION=$(node -p "require('./package.json').version")
+                  # 혹시 태그가 하나도 없을 경우 에러가 발생할 수 있으므로 || echo "v0.0.0" 추가
+                  LAST_GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
 
-      - name: Check if version has been updated
-        id: check-version
-        run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          LAST_GIT_TAG=$(git describe --tags --abbrev=0)
-          if [ "v$PACKAGE_VERSION" == "$LAST_GIT_TAG" ]; then
-            echo "Package version ($PACKAGE_VERSION) has not been updated since the last tag ($LAST_GIT_TAG)."
-            exit 1
-          else
-            echo "Package version has been updated to $PACKAGE_VERSION."
-            echo "::set-output name=package_version::$PACKAGE_VERSION"
-          fi  
+                  echo "현재 package.json 버전: v$PACKAGE_VERSION"
+                  echo "가장 최근 태그: $LAST_GIT_TAG"
 
-      - name: Install dependencies
-        run: npm ci
+                  if [ "v$PACKAGE_VERSION" = "$LAST_GIT_TAG" ]; then
+                    echo "Package version ($PACKAGE_VERSION) has not been updated since the last tag ($LAST_GIT_TAG)."
+                    exit 1
+                  else
+                    echo "Package version has been updated to $PACKAGE_VERSION."
+                    # GitHub Actions : $GITHUB_OUTPUT 파일에 기록
+                    echo "package_version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+                  fi
 
-      - name: Build
-        run: npm run build
+            # 4) 패키지 설치
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Deploy
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            # 5) 빌드
+            - name: Build
+              run: npm run build:prod
 
-      - name: Execute script for milestone
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_NAME: ${{ steps.check-version.outputs.package_version }}
-        run: node .github/scripts/manage-deploy.js $VERSION_NAME
-  
+            # 6) npm publish
+            - name: Deploy
+              run: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # NPM 토큰
+
+            # 7) 스크립트 실행
+            - name: Execute script for milestone
+              run: node .github/scripts/manage-deploy.js
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  VERSION_NAME: ${{ steps.check-version.outputs.package_version }}

@@ -1,0 +1,67 @@
+{
+	"plugins": ["prettier", "@typescript-eslint", "compat"],
+	"extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaVersion": 2020,
+		"sourceType": "module"
+	},
+	"env": {
+		"browser": true,
+		"node": true,
+		"es2022": true
+	},
+	"globals": {
+		"ActiveXObject": "writable",
+		"Selection": "writable",
+		"Node": "writable",
+		"Range": "writable"
+	},
+	"rules": {
+		"compat/compat": "error",
+		"eqeqeq": "error",
+		"strict": ["error", "safe"],
+		"no-undef": "off",
+		"no-unused-vars": "warn",
+		"no-loop-func": "off",
+		"no-shadow": "error",
+		"no-unused-expressions": "off",
+		"curly": "off",
+		"prefer-const": "error",
+		"no-var": "error",
+		"no-console": ["warn", { "allow": ["warn", "error"] }],
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-var-requires": "off",
+		"prettier/prettier": [
+			"error",
+			{
+				"arrowParens": "always",
+				"bracketSpacing": true,
+				"endOfLine": "auto",
+				"htmlWhitespaceSensitivity": "css",
+				"insertPragma": false,
+				"jsxBracketSameLine": false,
+				"jsxSingleQuote": true,
+				"printWidth": 240,
+				"proseWrap": "preserve",
+				"quoteProps": "as-needed",
+				"requirePragma": false,
+				"semi": true,
+				"singleQuote": true,
+				"tabWidth": 4,
+				"trailingComma": "none",
+				"useTabs": true,
+				"vueIndentScriptAndStyle": false
+			}
+		]
+	},
+	"overrides": [
+		{
+			"files": ["*.d.ts"],
+			"rules": {
+				"no-unused-vars": "off",
+				"@typescript-eslint/no-unused-vars": "off"
+			}
+		}
+	]
+}
