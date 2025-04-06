@@ -10,6 +10,7 @@ import hu from './hu';
 import it from './it';
 import ja from './ja';
 import ko from './ko';
+import km from './km';
 import lv from './lv';
 import nl from './nl';
 import pl from './pl';
@@ -21,4 +22,4 @@ import ua from './ua';
 import ur from './ur';
 import zh_cn from './zh_cn';
 
-export { ckb, cs, da, de, en, es, fr, he, hu, it, ja, ko, lv, nl, pl, pt_br, ro, ru, se, ua, ur, zh_cn };
+export { ckb, cs, da, de, en, es, fr, he, hu, it, ja, ko, km, lv, nl, pl, pt_br, ro, ru, se, ua, ur, zh_cn };
