@@ -1500,19 +1500,28 @@ class Table extends EditorInjector {
 		const cellEndIndex = cellIndex + copyInfo.logicalCellCnt;
 		const unmergeCells = [];
 		for (let r = targetInfo.rowInex, len = r + copyInfo.rowCnt; r < len; r++) {
-			const cells = targetRows[r].cells;
-			for (let c = 0, cLen = cells.length, cs, rs, index = 0, endIndex = 0; c < cLen; c++) {
+			const cells = targetRows[r]?.cells;
+			if (!cells) continue;
+			let logicalIndex = 0;
+
+			for (let c = 0; c < cells.length; c++) {
 				const cell = cells[c];
-				const prevCell = cell[c - 1];
-				cs = cell.colSpan || 1;
-				rs = cell.rowSpan || 1;
-				index += c + (prevCell?.rowSpan || 1) - 1;
-				endIndex = index + cs - 1;
-				if (endIndex < cellIndex) continue;
-				if (index > cellEndIndex) break;
+				const cs = cell.colSpan || 1;
+				const rs = cell.rowSpan || 1;
+				const logicalStart = logicalIndex;
+				const logicalEnd = logicalIndex + cs - 1;
+
+				if (logicalEnd < cellIndex) {
+					logicalIndex += cs;
+					continue;
+				}
+				if (logicalStart > cellEndIndex) {
+					break;
+				}
 				if (cs > 1 || rs > 1) {
 					unmergeCells.push(cell);
 				}
+				logicalIndex += cs;
 			}
 		}
 
@@ -1617,7 +1626,7 @@ class Table extends EditorInjector {
 		// replace table
 		originTable.replaceWith(targetTable);
 		this._closeTableSelectInfo();
-		this.setTableInfo(originTable);
+		this.setTableInfo(targetTable);
 
 		// select cell
 		this.selectCells(selectedCells);
@@ -1795,7 +1804,7 @@ class Table extends EditorInjector {
 		// replace table
 		originTable.replaceWith(cloneTable);
 		this._closeTableSelectInfo();
-		this.setTableInfo(originTable);
+		this.setTableInfo(cloneTable);
 
 		// set info
 		if (firstCell !== lastCell) {
@@ -2204,8 +2213,9 @@ class Table extends EditorInjector {
 	 */
 	_deleteStyleSelectedCells() {
 		dom.utils.removeClass([this._fixedCell, this._selectedCell], 'se-selected-cell-focus');
-		if (this._selectedTable) {
-			const selectedCells = this._selectedTable.querySelectorAll('.se-selected-table-cell');
+		const table = this._fixedCell?.closest('table');
+		if (table) {
+			const selectedCells = table.querySelectorAll('.se-selected-table-cell');
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
 				dom.utils.removeClass(selectedCells[i], 'se-selected-table-cell');
 			}
