@@ -1442,19 +1442,24 @@ class Table extends EditorInjector {
 	pasteTableCellMatrix(copyTable, targetTD) {
 		if (!copyTable || !targetTD) return;
 
-		// copy info
+		// --- copy info ---
 		const copyRows = copyTable.rows;
+		let rowCnt = 0;
+		for (let i = 0, len = copyRows.length; i < len; i++) {
+			const cell = copyRows[i].cells[0];
+			rowCnt += cell.rowSpan || 1;
+		}
 		let logicalColCount = 0;
 		for (let i = 0, cells = copyRows[0].cells, len = cells.length; i < len; i++) {
 			const cell = cells[i];
 			logicalColCount += cell.colSpan || 1;
 		}
 		const copyInfo = {
-			rowCnt: copyRows.length,
+			rowCnt: rowCnt,
 			logicalCellCnt: logicalColCount
 		};
 
-		// target info
+		// --- target info ---
 		this._deleteStyleSelectedCells();
 		const originTable = targetTD.closest('table');
 		const { cloneTable, clonedSelectedCells } = this.#cloneTable(originTable, [targetTD]);
@@ -1476,7 +1481,7 @@ class Table extends EditorInjector {
 			currentRowSpan: this._current_rowSpan
 		};
 
-		// target table expand
+		// --- [expand] target table ---
 		const addRowCnt = copyInfo.rowCnt - (targetInfo.rowCnt - (targetInfo.rowInex + 1)) - 1;
 		const addColCnt = copyInfo.logicalCellCnt - (targetInfo.logicalCellCnt - (targetInfo.logicalCellIndex + 1)) - 1;
 		targetInfo.rowCnt += addRowCnt;
@@ -1495,32 +1500,48 @@ class Table extends EditorInjector {
 			targetRows = this._trElements = targetTable.rows;
 		}
 
-		// [Un]merge cells
+		// --- [Un_merge] cells ---
 		const cellIndex = targetInfo.logicalCellIndex;
-		const cellEndIndex = cellIndex + copyInfo.logicalCellCnt;
+		const cellEndIndex = cellIndex + copyInfo.logicalCellCnt - 1;
 		const unmergeCells = [];
+		const un_mergeRowSpanMap = [];
 		for (let r = targetInfo.rowInex, len = r + copyInfo.rowCnt; r < len; r++) {
 			const cells = targetRows[r]?.cells;
 			if (!cells) continue;
+
 			let logicalIndex = 0;
+			let cellIndexInRow = 0;
 
 			for (let c = 0; c < cells.length; c++) {
-				const cell = cells[c];
+				while (un_mergeRowSpanMap[r]?.[logicalIndex]) {
+					logicalIndex++;
+				}
+
+				const cell = cells[cellIndexInRow++];
+				if (!cell) break;
+
 				const cs = cell.colSpan || 1;
 				const rs = cell.rowSpan || 1;
 				const logicalStart = logicalIndex;
 				const logicalEnd = logicalIndex + cs - 1;
 
-				if (logicalEnd < cellIndex) {
-					logicalIndex += cs;
-					continue;
+				// rowSpan map
+				if (rs > 1 || cs > 1) {
+					for (let rsOffset = 1; rsOffset < rs; rsOffset++) {
+						const rowIndex = r + rsOffset;
+						if (!un_mergeRowSpanMap[rowIndex]) un_mergeRowSpanMap[rowIndex] = [];
+						for (let csOffset = 0; csOffset < cs; csOffset++) {
+							un_mergeRowSpanMap[rowIndex][logicalIndex + csOffset] = true;
+						}
+					}
 				}
-				if (logicalStart > cellEndIndex) {
-					break;
+
+				if ((logicalStart >= cellIndex && logicalStart <= cellEndIndex) || (logicalEnd >= cellIndex && logicalEnd <= cellEndIndex) || (logicalStart <= cellIndex && logicalEnd >= cellEndIndex)) {
+					if (cs > 1 || rs > 1) {
+						unmergeCells.push(cell);
+					}
 				}
-				if (cs > 1 || rs > 1) {
-					unmergeCells.push(cell);
-				}
+
 				logicalIndex += cs;
 			}
 		}
@@ -1530,9 +1551,10 @@ class Table extends EditorInjector {
 			targetRows = this._trElements = targetTable.rows;
 		}
 
-		// merge cell
+		// --- [merge] cells ---
 		const mergeGroups = [];
-		const rowSpanMap = [];
+		const copyCowSpanMap = [];
+		const targetRowSpanMap = [];
 		for (let r = 0, len = copyInfo.rowCnt; r < len; r++) {
 			const cells = copyRows[r].cells;
 			let copyIndex = 0;
@@ -1542,16 +1564,15 @@ class Table extends EditorInjector {
 				const cs = cell.colSpan || 1;
 				const rs = cell.rowSpan || 1;
 
-				while (rowSpanMap[r]?.[copyIndex]) {
+				while (copyCowSpanMap[r]?.[copyIndex]) {
 					copyIndex++;
 				}
 
-				// rowSpan map
 				for (let rsOffset = 1; rsOffset < rs; rsOffset++) {
 					const rowIndex = r + rsOffset;
-					if (!rowSpanMap[rowIndex]) rowSpanMap[rowIndex] = [];
+					if (!copyCowSpanMap[rowIndex]) copyCowSpanMap[rowIndex] = [];
 					for (let csOffset = 0; csOffset < cs; csOffset++) {
-						rowSpanMap[rowIndex][copyIndex + csOffset] = true;
+						copyCowSpanMap[rowIndex][copyIndex + csOffset] = true;
 					}
 				}
 
@@ -1563,26 +1584,41 @@ class Table extends EditorInjector {
 				const cStart = copyIndex + targetInfo.logicalCellIndex;
 				const cEnd = cStart + cs - 1;
 				const mergeCells = [];
+
 				for (let targetR = targetInfo.rowInex + r, tRowCnt = targetR + rs, rowOffset = 0; targetR < tRowCnt; targetR++, rowOffset++) {
 					const targetRow = targetRows[targetR];
 					const targetCells = targetRow.cells;
 
-					// get logical cell index
-					let targetIndex = 0;
 					let logicalIndex = 0;
+					let targetIndex = 0;
 
-					while (logicalIndex <= cEnd && targetIndex < targetCells.length) {
-						const tCell = targetCells[targetIndex];
+					while (targetIndex < targetCells.length && logicalIndex <= cEnd) {
+						while (targetRowSpanMap[targetR]?.[logicalIndex]) {
+							logicalIndex++;
+						}
+
+						const tCell = targetCells[targetIndex++];
 						const tcs = tCell.colSpan || 1;
+						const trs = tCell.rowSpan || 1;
 						const logicalStart = logicalIndex;
 						const logicalEnd = logicalIndex + tcs - 1;
+
+						// rowSpan map
+						if (trs > 1) {
+							for (let rsOffset = 1; rsOffset < trs; rsOffset++) {
+								const rIndex = targetR + rsOffset;
+								if (!targetRowSpanMap[rIndex]) targetRowSpanMap[rIndex] = [];
+								for (let i = 0; i < tcs; i++) {
+									targetRowSpanMap[rIndex][logicalIndex + i] = true;
+								}
+							}
+						}
 
 						if (logicalEnd >= cStart && logicalStart <= cEnd) {
 							mergeCells.push(tCell);
 						}
 
 						logicalIndex += tcs;
-						targetIndex++;
 					}
 				}
 
@@ -1603,23 +1639,51 @@ class Table extends EditorInjector {
 			targetRows = this._trElements = targetTable.rows;
 		}
 
-		// paste cell data
+		// --- [result] paste cell data ---
 		const selectedCells = [];
-		for (let r = targetInfo.rowInex, copyR = 0; r < targetInfo.rowCnt; r++, copyR++) {
-			const tr = targetRows[r];
-			if (!tr) break;
-			const cells = tr.cells;
-			for (let c = 0, cLen = cells.length, copyIndex = 0, copyC = 0; c < cLen; c++) {
-				const cell = cells[c];
-				copyIndex += cell.colSpan || 1;
-				if (copyIndex > cellIndex) {
-					const copyCell = copyRows[copyR].cells[copyC];
-					if (!copyCell) break;
-					cell.innerHTML = copyCell.innerHTML;
-					selectedCells.push(cell);
-					copyC++;
+		const rowSpanMap = [];
+		for (let r = 0; r < copyInfo.rowCnt; r++) {
+			const tr = targetRows[targetInfo.rowInex + r];
+			const cr = copyRows[r];
+			if (!tr || !cr) break;
+
+			const tCells = tr.cells;
+			const cCells = cr.cells;
+
+			let tLogicalIndex = 0;
+			let tIndex = 0;
+			let cIndex = 0;
+
+			while (tIndex < tCells.length && cIndex < cCells.length && tLogicalIndex <= cellEndIndex) {
+				while (rowSpanMap[r]?.[tLogicalIndex]) {
+					tLogicalIndex++;
 				}
-				if (copyIndex >= cellEndIndex) break;
+
+				const tCell = tCells[tIndex++];
+				const cCell = cCells[cIndex];
+				if (!tCell || !cCell) break;
+
+				const tcs = tCell.colSpan || 1;
+				const trs = tCell.rowSpan || 1;
+
+				// rowSpan map
+				if (trs > 1) {
+					for (let rs = 1; rs < trs; rs++) {
+						const rr = r + rs;
+						if (!rowSpanMap[rr]) rowSpanMap[rr] = [];
+						for (let cs = 0; cs < tcs; cs++) {
+							rowSpanMap[rr][tLogicalIndex + cs] = true;
+						}
+					}
+				}
+
+				if (tLogicalIndex >= cellIndex && tLogicalIndex + tcs - 1 <= cellEndIndex) {
+					tCell.innerHTML = cCell.innerHTML;
+					selectedCells.push(tCell);
+					cIndex++;
+				}
+
+				tLogicalIndex += tcs;
 			}
 		}
 
