@@ -626,6 +626,7 @@ class Table extends EditorInjector {
 		this.__s = event.shiftKey;
 		// table tabkey
 		if (keyCodeMap.isTab(keyCode)) {
+			this._deleteStyleSelectedCells();
 			const tableCell = dom.query.getParentElement(line, dom.check.isTableCell);
 			if (tableCell && range.collapsed && dom.check.isEdgePoint(range.startContainer, range.startOffset)) {
 				this._closeController();

@@ -58,6 +58,11 @@
 	--se-active-light4-color: #dbeaff;
 	--se-active-light5-color: #c4ddff;
 	--se-active-light6-color: #b7ccf2;
+	/* shadow */
+	/* shadow - [toolbar, menu, modal] layer */
+	--se-shadow-layer-color: rgba(0, 0, 0, 0.5);
+	/* shadow - controller */
+	--se-shadow-controller-color: rgba(0, 0, 0, 0.2);
 	/* drag */
 	--se-drag-over-color: #f0c20a;
 	/* modal, browser, dropdown */

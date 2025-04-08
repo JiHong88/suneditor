@@ -74,12 +74,15 @@
 	--se-error-light3-color: #ff3333;
 	--se-error-light4-color: #ff0000;
 	--se-error-light5-color: #cc0000;
-	--se-doc-background: #2a2a2a;
+	--se-doc-background: #a5a6a7d1;
 	--se-doc-info-font-color: #ccc;
-	--se-doc-info-page-background-color: #444;
+	--se-doc-info-page-font-color: #2a2a2a;
+	--se-doc-info-page-background-color: #cfcfcf;
 	--se-doc-info-active-color: #77aaff;
 	--se-loading-color: #77aaff;
 	--se-show-blocks-color: #5599ff;
 	--se-show-blocks-li-color: #d539ff;
 	--se-show-blocks-pre-color: #27c022;
+	--se-shadow-layer-color: rgba(255, 255, 255, 0.5);
+	--se-shadow-controller-color: rgba(255, 255, 255, 0.2);
 }
