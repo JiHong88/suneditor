@@ -1697,6 +1697,7 @@ class Table extends EditorInjector {
 		this.selectCells(selectedCells);
 		this._setMergeSplitButton();
 		this._setUnMergeButton();
+		this.#focusEdge(selectedCells[0]);
 
 		// history push
 		this._historyPush();
@@ -1898,7 +1899,7 @@ class Table extends EditorInjector {
 	findMergedCells(cells) {
 		const mergedCells = [];
 		cells?.forEach((cell) => {
-			if (cell.rowSpan > 1 || cell.colSpan > 1) {
+			if (cell && (cell.rowSpan > 1 || cell.colSpan > 1)) {
 				mergedCells.push(cell);
 			}
 		});
@@ -2030,6 +2031,7 @@ class Table extends EditorInjector {
 
 		this._tdElement = tdElement;
 		if (this._fixedCell === tdElement) dom.utils.addClass(tdElement, 'se-selected-cell-focus');
+		if (!this._selectedCells?.length) this._selectedCells = [tdElement];
 		const tableElement = this._selectedTable || this._element || dom.query.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, true);
 	}
@@ -2975,6 +2977,7 @@ class Table extends EditorInjector {
 
 		this._shift = shift;
 		this._fixedCell = tdElement;
+		if (!this._selectedCells?.length) this._selectedCells = [tdElement];
 		this._fixedCellName = tdElement.nodeName;
 		this._selectedTable = dom.query.getParentElement(tdElement, 'TABLE');
 
@@ -3174,6 +3177,7 @@ class Table extends EditorInjector {
 
 		this._setController(currentCell);
 		this._selectedCell = this._fixedCell = currentCell;
+		if (!this._selectedCells?.length) this._selectedCells = [currentCell];
 	}
 
 	/**
