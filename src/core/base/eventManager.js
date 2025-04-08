@@ -611,6 +611,7 @@ EventManager.prototype = {
 				focusNode = zeroWidth;
 			}
 		} catch (e) {
+			console.warn('[SUNEDITOR.setDefaultLine.exception]', e);
 			this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
 			this.selection.removeRange();
 			this.selection._init();

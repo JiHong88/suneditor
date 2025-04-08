@@ -548,6 +548,10 @@ export type EditorBaseOptions = {
 	 */
 	allUsedStyles?: string;
 	/**
+	 * - {"copy": 1500} - Duration for displaying toast messages.
+	 */
+	toastMessageTime?: any;
+	/**
 	 * - Overrides the default icons.
 	 */
 	icons?: {
@@ -710,6 +714,7 @@ export type EditorInitOptions = EditorBaseOptions & EditorFrameOptions;
  * @property {boolean} [componentAutoSelect=false] - Enables automatic selection of inserted components.
  * @property {string} [defaultUrlProtocol] - Default URL protocol for links.
  * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
+ * @property {Object<"copy", number>} [toastMessageTime] - {"copy": 1500} - Duration for displaying toast messages.
  * @property {Object<string, string>} [icons] - Overrides the default icons.
  * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
  * @property {boolean} [__lineFormatFilter=true] - Line format filter configuration.

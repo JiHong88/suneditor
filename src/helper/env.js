@@ -40,11 +40,13 @@ export function getPageStyle(doc) {
 	const sheets = (doc || _d).styleSheets;
 
 	for (let i = 0, len = sheets.length, rules; i < len; i++) {
+		/* eslint-disable @typescript-eslint/no-unused-vars */
 		try {
 			rules = sheets[i].cssRules;
 		} catch (e) {
 			continue;
 		}
+		/* eslint-disable @typescript-eslint/no-unused-vars */
 
 		if (rules) {
 			for (let c = 0, cLen = rules.length; c < cLen; c++) {

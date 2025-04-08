@@ -364,7 +364,7 @@ declare class Offset {
 	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
 	 * @param {*} params.inst Instance object of caller
-	 * @returns {boolean} Success / Failure
+	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 */
 	setAbsPosition(
 		this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>,
@@ -379,7 +379,11 @@ declare class Offset {
 			position?: 'bottom' | 'top';
 			inst: any;
 		}
-	): boolean;
+	):
+		| {
+				position: 'top' | 'bottom';
+		  }
+		| undefined;
 	/**
 	 * @this {OffsetThis}
 	 * @description Sets the position of an element relative to a range

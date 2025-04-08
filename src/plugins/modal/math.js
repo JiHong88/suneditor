@@ -453,7 +453,7 @@ class Math_ extends EditorInjector {
 				OutputJax: chtml
 			});
 		} catch (error) {
-			console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is set incorrectly.');
+			console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is set incorrectly.', error);
 			return null;
 		}
 	}
