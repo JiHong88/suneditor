@@ -363,7 +363,7 @@ class Table extends EditorInjector {
 		if (!this._fixedCell) return;
 
 		this._setUnMergeButton();
-		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, disabled: btnDisabled });
+		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
 	}
 
 	/**
@@ -528,6 +528,10 @@ class Table extends EditorInjector {
 		const target = /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(eventTarget, IsResizeEls));
 		if (!target) return;
 
+		if (!this.cellControllerTop) {
+			this.controller_cell.hide();
+		}
+
 		const cellEdge = CheckCellEdge(event, target);
 		if (cellEdge.is) {
 			try {
@@ -606,6 +610,9 @@ class Table extends EditorInjector {
 	 */
 	onMouseUp() {
 		this._shift = false;
+		if (!this.cellControllerTop) {
+			this.controller_cell.resetPosition(this._fixedCell);
+		}
 	}
 
 	/**
@@ -624,6 +631,10 @@ class Table extends EditorInjector {
 	onKeyDown({ event, range, line }) {
 		this._ref = null;
 		if (this.editor.selectMenuOn || this._resizing || this.__s || keyCodeMap.isCtrl(event)) return;
+
+		if (!this.cellControllerTop) {
+			this.controller_cell.hide();
+		}
 
 		const keyCode = event.code;
 		this.__s = event.shiftKey;

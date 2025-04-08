@@ -461,18 +461,19 @@ Component.prototype = {
 		// top
 		let componentTop, w;
 		const isRtl = this.options.get('_rtl');
-		const dir = isRtl ? ['right', 'left'] : ['left', 'right'];
 		const { top, left, scrollX, scrollY } = this.offset.getLocal(offsetTarget);
 
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
-			const tlComputedStyle = _w.getComputedStyle(lb_t);
-			const tH = numbers.get(tlComputedStyle.height, 1);
+			const cStyle = _w.getComputedStyle(lb_t);
+			const cH = numbers.get(cStyle.height, 1);
+			const cW = numbers.get(cStyle.width, 1);
+
 			this.eventManager._lineBreakComp = container;
 			componentTop = top;
 			w = target.offsetWidth / 2 / 2;
-			t_style.top = componentTop - scrollY - tH / 2 + 'px';
-			t_style[dir[0]] = (isNonSelected ? left - numbers.get(tlComputedStyle.height, 0) / 2 : left + w) + 'px';
-			t_style[dir[1]] = '';
+			t_style.top = componentTop - scrollY - cH / 2 + 'px';
+			t_style.left = (isRtl ? left + target.offsetWidth - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) : isNonSelected ? left - numbers.get(cStyle.height, 0) / 2 : left + w) + 'px';
+			t_style.right = '';
 
 			lb_t.setAttribute('data-offset', scrollY + ',' + scrollX);
 			if (_overInfo) dom.utils.removeClass(lb_t, 'se-on-selected');
@@ -486,8 +487,8 @@ Component.prototype = {
 		// bottom
 		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
 			const cStyle = _w.getComputedStyle(lb_b);
-			const bH = numbers.get(cStyle.height, 1);
-			const bW = numbers.get(cStyle.width, 1);
+			const cH = numbers.get(cStyle.height, 1);
+			const cW = numbers.get(cStyle.width, 1);
 
 			if (!componentTop) {
 				this.eventManager._lineBreakComp = container;
@@ -495,9 +496,9 @@ Component.prototype = {
 				w = target.offsetWidth / 2 / 2;
 			}
 
-			b_style.top = componentTop + target.offsetHeight - scrollY - bH / 2 + 'px';
+			b_style.top = componentTop + target.offsetHeight - scrollY - cH / 2 + 'px';
 			b_style.right = '';
-			b_style.left = left + (isRtl ? 0 : target.offsetWidth) - (isNonSelected ? 0 : w) - (isNonSelected ? bW / 2 : bW) + 'px';
+			b_style.left = left + (isRtl ? 0 : target.offsetWidth) - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) + 'px';
 
 			const bDir = 'left';
 			lb_b.setAttribute('data-offset', scrollY + ',' + bDir + ',' + scrollX);

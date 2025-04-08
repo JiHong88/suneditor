@@ -5,7 +5,8 @@ import { _DragHandle } from '../modules';
 const { _w, ON_OVER_COMPONENT } = env;
 const INDEX_00 = '2147483646';
 const INDEX_0 = '2147483645';
-const INDEX_1 = '2147483644';
+const INDEX_S_1 = '2147483641';
+const INDEX_1 = '2147483640';
 
 /**
  * @typedef {Object} ControllerInfo
@@ -64,6 +65,7 @@ class Controller extends EditorInjector {
 		this.isInsideForm = !!params.isInsideForm;
 		this.isOutsideForm = !!params.isOutsideForm;
 		this.toTop = false;
+		this._reserveIndex = false;
 		this._initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
 		this.__globalEventHandlers = { keydown: this.#CloseListener_keydown.bind(this), mousedown: this.#CloseListener_mousedown.bind(this) };
 		this._bindClose_key = null;
@@ -136,9 +138,9 @@ class Controller extends EditorInjector {
 		// add sibling offset
 		if (this.sibling) {
 			if (this.siblingPosition === 'top') {
-				this.__addOffset.top += -this.sibling.offsetHeight;
+				this.__addOffset.top += -this.sibling.offsetHeight + 1;
 			} else {
-				this.__addOffset.left += this.sibling.offsetWidth + (this.options.get('_rtl') ? this.form.offsetWidth : 0);
+				this.__addOffset.left += this.form.offsetWidth + this.sibling.offsetWidth - 1;
 			}
 		}
 		// display controller
@@ -283,7 +285,6 @@ class Controller extends EditorInjector {
 	 * @param {boolean} [skipAutoReposition=false] If true, skips scroll/resize-based automatic positioning logic.
 	 */
 	_setControllerPosition(controller, refer, skipAutoReposition) {
-		controller.style.zIndex = this.toTop ? INDEX_0 : INDEX_1;
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
@@ -303,14 +304,18 @@ class Controller extends EditorInjector {
 				if (!skipAutoReposition && this.sibling && this.siblingPosition === 'top' && positionResult.position !== this.position) {
 					const resetPosition = controller.offsetTop - this.__addOffset.top;
 					if (positionResult.position === 'bottom') {
-						controller.style.top = resetPosition + this.sibling.offsetHeight + 'px';
+						this._reserveIndex = true;
+						controller.style.top = resetPosition + this.sibling.offsetHeight - 2 + 'px';
 					} else {
-						controller.style.top = resetPosition - this.sibling.offsetHeight + 'px';
+						controller.style.top = resetPosition - this.sibling.offsetHeight + 2 + 'px';
 					}
+				} else {
+					this._reserveIndex = false;
 				}
 			}
 		}
 
+		controller.style.zIndex = this.toTop ? INDEX_0 : this._reserveIndex ? INDEX_S_1 : INDEX_1;
 		controller.style.visibility = '';
 	}
 
@@ -408,7 +413,7 @@ class Controller extends EditorInjector {
 		if (this.parents.length > 0 && this.isInsideForm) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
-		eventTarget.style.zIndex = this.toTop ? INDEX_0 : INDEX_1;
+		eventTarget.style.zIndex = this.toTop ? INDEX_0 : this._reserveIndex ? INDEX_S_1 : INDEX_1;
 	}
 
 	/**

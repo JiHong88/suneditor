@@ -1175,11 +1175,11 @@ HTML.prototype = {
 	async copy(content) {
 		try {
 			await clipboard.write(content);
-			this.editor.ui.showToast(this.lang.message_copy_success, 550);
+			this.editor.ui.showToast(this.lang.message_copy_success, this.options.get('toastMessageTime').copy);
 			return true;
 		} catch (err) {
 			console.error('[SUNEDITOR.html.copy.fail] :', err);
-			this.editor.ui.showToast(this.lang.message_copy_fail, 1500, 'error');
+			this.editor.ui.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
 			return false;
 		}
 	},

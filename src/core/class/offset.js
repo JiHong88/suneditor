@@ -448,9 +448,10 @@ Offset.prototype = {
 	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 */
 	setAbsPosition(element, target, params) {
-		const addOffset = params.addOffset || {
+		const addOffset = {
 			left: 0,
-			top: 0
+			top: 0,
+			...params.addOffset
 		};
 		const position = params.position || 'bottom';
 		const inst = params.inst;
