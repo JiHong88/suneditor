@@ -1501,11 +1501,13 @@ class Table extends EditorInjector {
 		}
 
 		// --- [Un_merge] cells ---
+		const startRowIndex = targetInfo.rowInex;
 		const cellIndex = targetInfo.logicalCellIndex;
 		const cellEndIndex = cellIndex + copyInfo.logicalCellCnt - 1;
 		const unmergeCells = [];
 		const un_mergeRowSpanMap = [];
-		for (let r = targetInfo.rowInex, len = r + copyInfo.rowCnt; r < len; r++) {
+
+		for (let r = 0, len = startRowIndex + copyInfo.rowCnt; r < len; r++) {
 			const cells = targetRows[r]?.cells;
 			if (!cells) continue;
 
@@ -1536,10 +1538,9 @@ class Table extends EditorInjector {
 					}
 				}
 
-				if ((logicalStart >= cellIndex && logicalStart <= cellEndIndex) || (logicalEnd >= cellIndex && logicalEnd <= cellEndIndex) || (logicalStart <= cellIndex && logicalEnd >= cellEndIndex)) {
-					if (cs > 1 || rs > 1) {
-						unmergeCells.push(cell);
-					}
+				const isOverlap = logicalStart <= cellEndIndex && logicalEnd >= cellIndex;
+				if (isOverlap && (cs > 1 || rs > 1)) {
+					unmergeCells.push(cell);
 				}
 
 				logicalIndex += cs;
