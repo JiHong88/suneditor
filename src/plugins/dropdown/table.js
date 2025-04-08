@@ -117,6 +117,10 @@ class Table extends EditorInjector {
 		// members - Controller
 		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
 		this.controller_table = new Controller(this, controller_table, { position: 'top' });
+		if (this.cellControllerTop) {
+			this.controller_cell.sibling = this.controller_table.form;
+			this.controller_cell.siblingPosition = 'top';
+		}
 		// props
 		const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
 		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
@@ -359,8 +363,7 @@ class Table extends EditorInjector {
 		if (!this._fixedCell) return;
 
 		this._setUnMergeButton();
-		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { top: -this.controller_table.form.offsetHeight + 1 } : null;
-		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset, disabled: btnDisabled });
+		this.controller_cell.open(this._tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, disabled: btnDisabled });
 	}
 
 	/**
@@ -2011,9 +2014,9 @@ class Table extends EditorInjector {
 	 */
 	_setUnMergeButton() {
 		if (this.findMergedCells(!this._selectedCells?.length ? [this._fixedCell] : this._selectedCells).length > 0) {
-			this.unmergeButton.style.display = 'block';
+			this.unmergeButton.disabled = false;
 		} else {
-			this.unmergeButton.style.display = 'none';
+			this.unmergeButton.disabled = true;
 		}
 	}
 

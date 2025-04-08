@@ -445,7 +445,7 @@ Offset.prototype = {
 	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
 	 * @param {*} params.inst Instance object of caller
-	 * @returns {boolean} Success / Failure
+	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 */
 	setAbsPosition(element, target, params) {
 		const addOffset = params.addOffset || {
@@ -582,7 +582,7 @@ Offset.prototype = {
 			addOffset: addOffset
 		};
 
-		return true;
+		return { position: arrowDir === 'up' ? 'bottom' : 'top' };
 	},
 
 	/**

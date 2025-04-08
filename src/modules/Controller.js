@@ -26,6 +26,8 @@ const INDEX_1 = '2147483644';
  * @property {boolean=} [disabled=false] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
  * @property {Array<HTMLElement>=} [parents=[]] The parent "controller" array when "controller" is opened nested.
  * @property {boolean=} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
+ * @property {HTMLElement=} [sibling=null] The related sibling controller element that this controller is positioned relative to.
+ * @property {"top"|"side"} [siblingPosition="top"] The relative position of this controller to the sibling element (e.g., display above or beside the sibling).
  * @property {boolean=} [isInsideForm=false] If the controller is inside a form, set it to true.
  * @property {boolean=} [isOutsideForm=false] If the controller is outside a form, set it to true.
  */
@@ -57,6 +59,8 @@ class Controller extends EditorInjector {
 		this.disabled = !!params.disabled;
 		this.parents = /** @type {Array<HTMLElement>} */ (params.parents || []);
 		this.parentsHide = !!params.parentsHide;
+		this.sibling = /** @type {HTMLElement} */ (params.sibling || null);
+		this.siblingPosition = ['top', 'side'].includes(params.siblingPosition) ? params.siblingPosition : 'top';
 		this.isInsideForm = !!params.isInsideForm;
 		this.isOutsideForm = !!params.isOutsideForm;
 		this.toTop = false;
@@ -113,6 +117,7 @@ class Controller extends EditorInjector {
 		if (typeof initMethod === 'function') this._initMethod = initMethod;
 		this.editor.currentControllerName = this.kind;
 
+		this.__addOffset = { left: 0, top: 0 };
 		if (addOffset) this.__addOffset = { ...this.__addOffset, ...addOffset };
 
 		const parents = this.isOutsideForm ? this.parents : [];
@@ -128,8 +133,16 @@ class Controller extends EditorInjector {
 
 		this.__addGlobalEvent();
 
+		// add sibling offset
+		if (this.sibling) {
+			if (this.siblingPosition === 'top') {
+				this.__addOffset.top += -this.sibling.offsetHeight;
+			} else {
+				this.__addOffset.left += this.sibling.offsetWidth + (this.options.get('_rtl') ? this.form.offsetWidth : 0);
+			}
+		}
 		// display controller
-		this._setControllerPosition(this.form, this.currentPositionTarget);
+		this._setControllerPosition(this.form, this.currentPositionTarget, false);
 
 		const isRangeTarget = target instanceof Range;
 		this.currentTarget = isRangeTarget ? null : target;
@@ -177,7 +190,7 @@ class Controller extends EditorInjector {
 	 * @description Show controller
 	 */
 	show() {
-		this._setControllerPosition(this.form, this.currentPositionTarget);
+		this._setControllerPosition(this.form, this.currentPositionTarget, false);
 	}
 
 	/**
@@ -194,7 +207,7 @@ class Controller extends EditorInjector {
 	 * @param {Node=} target
 	 */
 	resetPosition(target) {
-		this._setControllerPosition(this.form, target || this.currentPositionTarget);
+		this._setControllerPosition(this.form, target || this.currentPositionTarget, true);
 	}
 
 	/**
@@ -267,8 +280,9 @@ class Controller extends EditorInjector {
 	 * @description Specify the position of the controller.
 	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
+	 * @param {boolean} [skipAutoReposition=false] If true, skips scroll/resize-based automatic positioning logic.
 	 */
-	_setControllerPosition(controller, refer) {
+	_setControllerPosition(controller, refer, skipAutoReposition) {
 		controller.style.zIndex = this.toTop ? INDEX_0 : INDEX_1;
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
@@ -279,9 +293,21 @@ class Controller extends EditorInjector {
 				return;
 			}
 		} else {
-			if (refer && !this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
-				this.hide();
-				return;
+			if (refer) {
+				const positionResult = this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this });
+				if (!positionResult) {
+					this.hide();
+					return;
+				}
+
+				if (!skipAutoReposition && this.sibling && this.siblingPosition === 'top' && positionResult.position !== this.position) {
+					const resetPosition = controller.offsetTop - this.__addOffset.top;
+					if (positionResult.position === 'bottom') {
+						controller.style.top = resetPosition + this.sibling.offsetHeight + 'px';
+					} else {
+						controller.style.top = resetPosition - this.sibling.offsetHeight + 'px';
+					}
+				}
 			}
 		}
 
