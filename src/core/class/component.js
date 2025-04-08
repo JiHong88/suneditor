@@ -472,7 +472,7 @@ Component.prototype = {
 			componentTop = top;
 			w = target.offsetWidth / 2 / 2;
 			t_style.top = componentTop - scrollY - cH / 2 + 'px';
-			t_style.left = (isRtl ? left + target.offsetWidth - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) : isNonSelected ? left - numbers.get(cStyle.height, 0) / 2 : left + w) + 'px';
+			t_style.left = left + (isRtl ? target.offsetWidth : 0) - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) + 'px';
 			t_style.right = '';
 
 			lb_t.setAttribute('data-offset', scrollY + ',' + scrollX);
