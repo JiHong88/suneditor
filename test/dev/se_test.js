@@ -1184,17 +1184,11 @@ window.editor_root = suneditor.create(
     </tbody>
   </table>
 </figure>
-
-<p><br>
-</p>
-
 <div class="se-component se-file-figure se-flex-component">
   <figure class="">
     <a href="http://localhost:3000/editor/files/download/public/files/d41d8cd98f00b204e9800998ecf8427e.html" title="xsOiDurC.html" download="xsOiDurC.html" data-se-file-download="" contenteditable="false" data-se-non-focus="true" data-se-non-link="true" data-se-file-name="xsOiDurC.html" data-se-file-size="0" name="xsOiDurC.html" data-se-index="0">xsOiDurC.html</a>
   </figure>
-</div>
-
-`,
+</div>`,
 		link: {
 			uploadUrl: 'http://localhost:3000/editor/files/upload',
 			relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],

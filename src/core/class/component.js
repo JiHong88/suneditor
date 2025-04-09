@@ -461,7 +461,9 @@ Component.prototype = {
 		// top
 		let componentTop, w;
 		const isRtl = this.options.get('_rtl');
-		const { top, left, scrollX, scrollY } = this.offset.getLocal(offsetTarget);
+		const dir = isRtl ? ['right', 'left'] : ['left', 'right'];
+		const { top, left, right, scrollX, scrollY } = this.offset.getLocal(offsetTarget);
+		const sideOffset = isRtl ? right : left;
 
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
 			const cStyle = _w.getComputedStyle(lb_t);
@@ -471,9 +473,10 @@ Component.prototype = {
 			this.eventManager._lineBreakComp = container;
 			componentTop = top;
 			w = target.offsetWidth / 2 / 2;
+
 			t_style.top = componentTop - scrollY - cH / 2 + 'px';
-			t_style.left = left + (isRtl ? target.offsetWidth : 0) - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) + 'px';
-			t_style.right = '';
+			t_style[dir[0]] = (isNonSelected ? sideOffset - cW / 2 : sideOffset + w) + 'px';
+			t_style[dir[1]] = '';
 
 			lb_t.setAttribute('data-offset', scrollY + ',' + scrollX);
 			if (_overInfo) dom.utils.removeClass(lb_t, 'se-on-selected');
@@ -497,11 +500,10 @@ Component.prototype = {
 			}
 
 			b_style.top = componentTop + target.offsetHeight - scrollY - cH / 2 + 'px';
-			b_style.right = '';
-			b_style.left = left + (isRtl ? 0 : target.offsetWidth) - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) + 'px';
+			b_style[dir[0]] = sideOffset + target.offsetWidth - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) + 'px';
+			b_style[dir[1]] = '';
 
-			const bDir = 'left';
-			lb_b.setAttribute('data-offset', scrollY + ',' + bDir + ',' + scrollX);
+			lb_b.setAttribute('data-offset', scrollY + ',' + dir[0] + ',' + scrollX);
 			if (_overInfo) dom.utils.removeClass(lb_b, 'se-on-selected');
 			else dom.utils.addClass(lb_b, 'se-on-selected');
 

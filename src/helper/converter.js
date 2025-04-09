@@ -244,7 +244,7 @@ export function toFontUnit(to, size) {
 		case '%':
 			return Number((pxSize * 0.0625).toFixed(2)) * 100 + to;
 		case 'pt':
-			return Math.floor(pxSize / 1.333) + to;
+			return Math.round(pxSize / 1.333) + to;
 		default:
 			// px
 			return pxSize + to;

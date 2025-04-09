@@ -118,13 +118,15 @@ Offset.prototype = {
 	 * @returns {OffsetLocalInfo} Position relative to the WYSIWYG editor.
 	 */
 	getLocal(node) {
+		const target = /** @type {HTMLElement} */ (node);
 		let offsetLeft = 0;
 		let offsetTop = 0;
 		let l = 0;
 		let t = 0;
 		let r = 0;
-		let offsetElement = /** @type {HTMLElement} */ (node.nodeType === 3 ? node.parentElement : node);
-		const wysiwyg = getParentElement(node, isWysiwygFrame.bind(this));
+		let offsetElement = target.nodeType === 3 ? target.parentElement : target;
+		const targetWidth = target.offsetWidth;
+		const wysiwyg = getParentElement(target, isWysiwygFrame.bind(this));
 		const self = offsetElement;
 
 		while (offsetElement && !hasClass(offsetElement, 'se-wrapper') && offsetElement !== wysiwyg) {
@@ -134,10 +136,10 @@ Offset.prototype = {
 		}
 
 		const wwFrame = this.editor.frameContext.get('wysiwygFrame');
-		if (this.editor.frameContext.get('wysiwyg').contains(node)) {
+		if (this.editor.frameContext.get('wysiwyg').contains(target)) {
 			l = wwFrame.offsetLeft;
 			t = wwFrame.offsetTop;
-			r = wwFrame.parentElement.offsetWidth - (l + wwFrame.offsetWidth);
+			r = wwFrame.parentElement.offsetWidth - (wwFrame.offsetLeft + wwFrame.offsetWidth);
 		}
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
@@ -146,7 +148,7 @@ Offset.prototype = {
 		return {
 			left: offsetLeft,
 			top: offsetTop,
-			right: offsetElement.offsetWidth - (offsetLeft + /** @type {HTMLElement} */ (node).offsetWidth) + r,
+			right: offsetElement.offsetWidth - (offsetLeft - l + targetWidth) + r,
 			scrollX: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
 			scrollY: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0
 		};

@@ -35,23 +35,27 @@ export type RectsInfo = {
 };
 export type OffsetInfo = {
 	/**
-	 * - The vertical position of the node relative to the entire document, including iframe offsets.
+	 * - The top position of the node relative to the entire document, including iframe offsets.
 	 */
 	top: number;
 	/**
-	 * - The horizontal position of the node relative to the entire document, including iframe offsets.
+	 * - The left position of the node relative to the entire document, including iframe offsets.
 	 */
 	left: number;
 };
 export type OffsetLocalInfo = {
 	/**
-	 * - The vertical position of the node relative to the WYSIWYG editor.
+	 * - The top position of the node relative to the WYSIWYG editor.
 	 */
 	top: number;
 	/**
-	 * - The horizontal position of the node relative to the WYSIWYG editor.
+	 * - The left position of the node relative to the WYSIWYG editor.
 	 */
 	left: number;
+	/**
+	 * - The right position of the node relative to the WYSIWYG editor.
+	 */
+	right: number;
 	/**
 	 * - The horizontal scroll offset inside the WYSIWYG editor.
 	 */
@@ -63,11 +67,11 @@ export type OffsetLocalInfo = {
 };
 export type OffsetGlobalInfo = {
 	/**
-	 * - The vertical position of the element relative to the entire document.
+	 * - The top position of the element relative to the entire document.
 	 */
 	top: number;
 	/**
-	 * - The horizontal position of the element relative to the entire document.
+	 * - The left position of the element relative to the entire document.
 	 */
 	left: number;
 	/**
@@ -89,11 +93,11 @@ export type OffsetGlobalInfo = {
 };
 export type OffsetGlobalScrollInfo = {
 	/**
-	 * - Total vertical scroll distance
+	 * - Total top scroll distance
 	 */
 	top: number;
 	/**
-	 * - Total horizontal scroll distance
+	 * - Total left scroll distance
 	 */
 	left: number;
 	/**
@@ -147,11 +151,11 @@ export type OffsetGlobalScrollInfo = {
 };
 export type OffsetWWScrollInfo = {
 	/**
-	 * - The vertical scroll offset inside the WYSIWYG editor.
+	 * - The top scroll offset inside the WYSIWYG editor.
 	 */
 	top: number;
 	/**
-	 * - The horizontal scroll offset inside the WYSIWYG editor.
+	 * - The left scroll offset inside the WYSIWYG editor.
 	 */
 	left: number;
 	/**
@@ -186,20 +190,21 @@ export type OffsetWWScrollInfo = {
  */
 /**
  * @typedef {Object} OffsetInfo
- * @property {number} top - The vertical position of the node relative to the entire document, including iframe offsets.
- * @property {number} left - The horizontal position of the node relative to the entire document, including iframe offsets.
+ * @property {number} top - The top position of the node relative to the entire document, including iframe offsets.
+ * @property {number} left - The left position of the node relative to the entire document, including iframe offsets.
  */
 /**
  * @typedef {Object} OffsetLocalInfo
- * @property {number} top - The vertical position of the node relative to the WYSIWYG editor.
- * @property {number} left - The horizontal position of the node relative to the WYSIWYG editor.
+ * @property {number} top - The top position of the node relative to the WYSIWYG editor.
+ * @property {number} left - The left position of the node relative to the WYSIWYG editor.
+ * @property {number} right - The right position of the node relative to the WYSIWYG editor.
  * @property {number} scrollX - The horizontal scroll offset inside the WYSIWYG editor.
  * @property {number} scrollY - The vertical scroll offset inside the WYSIWYG editor.
  */
 /**
  * @typedef {Object} OffsetGlobalInfo
- * @property {number} top - The vertical position of the element relative to the entire document.
- * @property {number} left - The horizontal position of the element relative to the entire document.
+ * @property {number} top - The top position of the element relative to the entire document.
+ * @property {number} left - The left position of the element relative to the entire document.
  * @property {number} width - The total width of the element, including its content, padding, and border.
  * @property {number} height - The total height of the element, including its content, padding, and border.
  * @property {number} scrollTop - The amount of vertical scrolling applied to the element.
@@ -207,8 +212,8 @@ export type OffsetWWScrollInfo = {
  */
 /**
  * @typedef {Object} OffsetGlobalScrollInfo
- * @property {number} top - Total vertical scroll distance
- * @property {number} left - Total horizontal scroll distance
+ * @property {number} top - Total top scroll distance
+ * @property {number} left - Total left scroll distance
  * @property {number} width - Total width including scrollable area
  * @property {number} height - Total height including scrollable area
  * @property {number} x - Horizontal offset from the top reference element
@@ -224,8 +229,8 @@ export type OffsetWWScrollInfo = {
  */
 /**
  * @typedef {Object} OffsetWWScrollInfo
- * @property {number} top - The vertical scroll offset inside the WYSIWYG editor.
- * @property {number} left - The horizontal scroll offset inside the WYSIWYG editor.
+ * @property {number} top - The top scroll offset inside the WYSIWYG editor.
+ * @property {number} left - The left scroll offset inside the WYSIWYG editor.
  * @property {number} width - The total width of the WYSIWYG editor's scrollable area.
  * @property {number} height - The total height of the WYSIWYG editor's scrollable area.
  * @property {number} bottom - The sum of `top` and `height`, representing the bottom-most scrollable position.
@@ -254,20 +259,21 @@ declare class Offset {
 	 */
 	/**
 	 * @typedef {Object} OffsetInfo
-	 * @property {number} top - The vertical position of the node relative to the entire document, including iframe offsets.
-	 * @property {number} left - The horizontal position of the node relative to the entire document, including iframe offsets.
+	 * @property {number} top - The top position of the node relative to the entire document, including iframe offsets.
+	 * @property {number} left - The left position of the node relative to the entire document, including iframe offsets.
 	 */
 	/**
 	 * @typedef {Object} OffsetLocalInfo
-	 * @property {number} top - The vertical position of the node relative to the WYSIWYG editor.
-	 * @property {number} left - The horizontal position of the node relative to the WYSIWYG editor.
+	 * @property {number} top - The top position of the node relative to the WYSIWYG editor.
+	 * @property {number} left - The left position of the node relative to the WYSIWYG editor.
+	 * @property {number} right - The right position of the node relative to the WYSIWYG editor.
 	 * @property {number} scrollX - The horizontal scroll offset inside the WYSIWYG editor.
 	 * @property {number} scrollY - The vertical scroll offset inside the WYSIWYG editor.
 	 */
 	/**
 	 * @typedef {Object} OffsetGlobalInfo
-	 * @property {number} top - The vertical position of the element relative to the entire document.
-	 * @property {number} left - The horizontal position of the element relative to the entire document.
+	 * @property {number} top - The top position of the element relative to the entire document.
+	 * @property {number} left - The left position of the element relative to the entire document.
 	 * @property {number} width - The total width of the element, including its content, padding, and border.
 	 * @property {number} height - The total height of the element, including its content, padding, and border.
 	 * @property {number} scrollTop - The amount of vertical scrolling applied to the element.
@@ -275,8 +281,8 @@ declare class Offset {
 	 */
 	/**
 	 * @typedef {Object} OffsetGlobalScrollInfo
-	 * @property {number} top - Total vertical scroll distance
-	 * @property {number} left - Total horizontal scroll distance
+	 * @property {number} top - Total top scroll distance
+	 * @property {number} left - Total left scroll distance
 	 * @property {number} width - Total width including scrollable area
 	 * @property {number} height - Total height including scrollable area
 	 * @property {number} x - Horizontal offset from the top reference element
@@ -292,8 +298,8 @@ declare class Offset {
 	 */
 	/**
 	 * @typedef {Object} OffsetWWScrollInfo
-	 * @property {number} top - The vertical scroll offset inside the WYSIWYG editor.
-	 * @property {number} left - The horizontal scroll offset inside the WYSIWYG editor.
+	 * @property {number} top - The top scroll offset inside the WYSIWYG editor.
+	 * @property {number} left - The left scroll offset inside the WYSIWYG editor.
 	 * @property {number} width - The total width of the WYSIWYG editor's scrollable area.
 	 * @property {number} height - The total height of the WYSIWYG editor's scrollable area.
 	 * @property {number} bottom - The sum of `top` and `height`, representing the bottom-most scrollable position.
