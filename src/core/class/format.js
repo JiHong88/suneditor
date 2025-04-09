@@ -35,6 +35,8 @@ function Format(editor) {
 	this._formatClosureBlockCheck = this.options.get('formatClosureBlock').reg;
 	this._formatClosureBrLineCheck = this.options.get('formatClosureBrLine').reg;
 	this._textStyleTagsCheck = new RegExp('^(' + this.options.get('textStyleTags') + ')$', 'i');
+	// members - _defaultBrLineBreak
+	this._brLineBreak = this.options.get('_defaultBrLineBreak');
 }
 
 Format.prototype = {
@@ -214,7 +216,7 @@ Format.prototype = {
 
 		const currentFormatEl = this.getLine(this.selection.getNode(), null);
 		let oFormat = null;
-		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode)) {
+		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode) && !this.component.is(element)) {
 			oFormat = dom.utils.createElement('BR');
 		} else {
 			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLineOnly(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLine');
@@ -1423,7 +1425,7 @@ Format.prototype = {
 	 * @returns {element is HTMLElement}
 	 */
 	isLineOnly(element) {
-		return this.isLine(element) && !this.isBrLine(element);
+		return this.isLine(element) && (this._brLineBreak || !this.isBrLine(element));
 	},
 
 	/**
@@ -1437,9 +1439,12 @@ Format.prototype = {
 	 * @returns {element is HTMLElement}
 	 */
 	isBrLine(element) {
-		return typeof element === 'string'
-			? this._formatBrLineCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element);
+		return (
+			(this._brLineBreak && this.isLine(element)) ||
+			(typeof element === 'string'
+				? this._formatBrLineCheck.test(element)
+				: element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element))
+		);
 	},
 
 	/**

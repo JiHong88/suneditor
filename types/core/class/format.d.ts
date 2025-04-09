@@ -49,6 +49,7 @@ declare class Format {
 	_formatClosureBlockCheck: any;
 	_formatClosureBrLineCheck: any;
 	_textStyleTagsCheck: RegExp;
+	_brLineBreak: any;
 	/**
 	 * @this {FormatThis}
 	 * @description Replace the line tag of the current selection.

@@ -392,6 +392,17 @@ export type EditorBaseOptions = {
 	 */
 	defaultLine?: string;
 	/**
+	 * - Specifies the default line break format.
+	 * - [Recommended] "line" :  is a line break that is divided into general tags.
+	 * - [Not recommended] "br" : Line breaks are treated as <br> on the same line. (like shift+enter)
+	 * - Line breaks are handled as <br> within "line".
+	 * - You can create a new "line" by entering a line break twice in a row.
+	 * - Formats that include "line", such as "Quote", still operate on a "line" basis.
+	 * - ● suneditor processes work in "line" units.
+	 * - ● When set to "br", performance may decrease when editing a lot of data.
+	 */
+	defaultLineBreakFormat?: 'line' | 'br';
+	/**
 	 * - Default allowed HTML elements. The default values are maintained.
 	 */
 	__defaultElementWhitelist?: string;
@@ -661,6 +672,14 @@ export type EditorInitOptions = EditorBaseOptions & EditorFrameOptions;
  * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
  * @property {string} [printClass=""] - Class name for printing.
  * @property {string} [defaultLine="p"] - Default line element when inserting new lines.
+ * @property {"line"|"br"} [defaultLineBreakFormat="line"] - Specifies the default line break format.
+ * - [Recommended] "line" :  is a line break that is divided into general tags.
+ * - [Not recommended] "br" : Line breaks are treated as <br> on the same line. (like shift+enter)
+ * - Line breaks are handled as <br> within "line".
+ * - You can create a new "line" by entering a line break twice in a row.
+ * - Formats that include "line", such as "Quote", still operate on a "line" basis.
+ * - ● suneditor processes work in "line" units.
+ * - ● When set to "br", performance may decrease when editing a lot of data.
  * @property {string} [__defaultElementWhitelist="br|div"] - Default allowed HTML elements. The default values are maintained.
  * @property {string} [elementWhitelist=""] - Allowed HTML elements. Delimiter: "|" (e.g. "p|div", "*").
  * @property {string} [elementBlacklist=""] - Disallowed HTML elements. Delimiter: "|" (e.g. "script|style").
