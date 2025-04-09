@@ -354,7 +354,7 @@ function Constructor(editorTargets, options) {
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
 		const to = optionMap.frameMap.get(editTarget.key);
-		const top_div = dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (to.get('_rtl') ? ' se-rtl' : '') });
+		const top_div = dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
 		const container = dom.utils.createElement('DIV', { class: 'se-container' });
 		const editor_div = dom.utils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') });
 

@@ -1572,9 +1572,10 @@ class Table extends EditorInjector {
 		const copyCowSpanMap = [];
 		const targetRowSpanMap = [];
 		for (let r = 0, len = copyInfo.rowCnt; r < len; r++) {
-			const cells = copyRows[r].cells;
-			let copyIndex = 0;
+			const cells = copyRows[r]?.cells;
+			if (!cells) break;
 
+			let copyIndex = 0;
 			for (let c = 0; c < cells.length; c++) {
 				const cell = cells[c];
 				const cs = cell.colSpan || 1;

@@ -118,7 +118,8 @@
 	--se-doc-info-page-width: 16px;
 	--se-doc-info-page-font-color: #f5f5f5;
 	--se-doc-info-page-background-color: #b1b1b1;
-	/* document type - active */
+	/* document type - font, active */
+	--se-doc-info-font-color: #333;
 	--se-doc-info-active-color: #4a32ff;
 	/* document type indent - padding */
 	--se-doc-info-inner-line-indent-h1: 0em;

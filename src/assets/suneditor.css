@@ -128,9 +128,11 @@
 }
 
 .sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner {
-	padding: var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding) 0;
+	padding: var(--se-doc-info-inner-padding);
+	padding-right: var(--se-doc-info-inner-line-padding);
 }
 .sun-editor .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-item {
+	color: var(--se-doc-info-font-color);
 	width: 100%;
 	padding: var(--se-doc-info-inner-line-padding);
 	white-space: nowrap;
@@ -3804,7 +3806,8 @@
 
 /** se-type-document - header  */
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner {
-	padding: var(--se-doc-info-inner-padding) 0 var(--se-doc-info-inner-padding) var(--se-doc-info-inner-padding);
+	padding-left: var(--se-doc-info-inner-line-padding);
+	padding-right: var(--se-doc-info-inner-padding);
 	direction: rtl;
 }
 .sun-editor.se-rtl .se-wrapper.se-type-document .se-document-lines .se-document-lines-inner > div.se-doc-h1 {
