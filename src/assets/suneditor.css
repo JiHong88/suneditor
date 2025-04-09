@@ -3953,11 +3953,16 @@
 	border: 1px dashed var(--se-show-blocks-pre-color) !important;
 }
 
+.sun-editor-editable.se-show-block div.se-component {
+	border: 1px dashed var(--se-show-blocks-component-color) !important;
+	padding: 1px !important;
+}
+
 .sun-editor-editable.se-show-block p {
 	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPAQMAAAAF7dc0AAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAaSURBVAjXY/j/gwGCPvxg+F4BQiAGDP1HQQByxxw0gqOzIwAAAABJRU5ErkJggg==') no-repeat;
 }
 
-.sun-editor-editable.se-show-block div {
+.sun-editor-editable.se-show-block div:not(.se-component) {
 	background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPAQMAAAAxlBYoAAAABlBMVEWAgID////n1o2sAAAAAnRSTlP/AOW3MEoAAAAmSURBVAjXY/j//wcDDH+8XsHwDYi/hwNx1A8w/nYLKH4XoQYJAwCXnSgcl2MOPgAAAABJRU5ErkJggg==') no-repeat;
 }
 
