@@ -148,7 +148,7 @@ Offset.prototype = {
 		return {
 			left: offsetLeft,
 			top: offsetTop,
-			right: offsetElement.offsetWidth - (offsetLeft - l + targetWidth) + r,
+			right: offsetElement?.offsetWidth ? offsetElement.offsetWidth - (offsetLeft - l + targetWidth) + r : 0,
 			scrollX: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
 			scrollY: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0
 		};
