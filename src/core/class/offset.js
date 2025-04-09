@@ -26,22 +26,23 @@ import { _w, _d } from '../../helper/env';
 
 /**
  * @typedef {Object} OffsetInfo
- * @property {number} top - The vertical position of the node relative to the entire document, including iframe offsets.
- * @property {number} left - The horizontal position of the node relative to the entire document, including iframe offsets.
+ * @property {number} top - The top position of the node relative to the entire document, including iframe offsets.
+ * @property {number} left - The left position of the node relative to the entire document, including iframe offsets.
  */
 
 /**
  * @typedef {Object} OffsetLocalInfo
- * @property {number} top - The vertical position of the node relative to the WYSIWYG editor.
- * @property {number} left - The horizontal position of the node relative to the WYSIWYG editor.
+ * @property {number} top - The top position of the node relative to the WYSIWYG editor.
+ * @property {number} left - The left position of the node relative to the WYSIWYG editor.
+ * @property {number} right - The right position of the node relative to the WYSIWYG editor.
  * @property {number} scrollX - The horizontal scroll offset inside the WYSIWYG editor.
  * @property {number} scrollY - The vertical scroll offset inside the WYSIWYG editor.
  */
 
 /**
  * @typedef {Object} OffsetGlobalInfo
- * @property {number} top - The vertical position of the element relative to the entire document.
- * @property {number} left - The horizontal position of the element relative to the entire document.
+ * @property {number} top - The top position of the element relative to the entire document.
+ * @property {number} left - The left position of the element relative to the entire document.
  * @property {number} width - The total width of the element, including its content, padding, and border.
  * @property {number} height - The total height of the element, including its content, padding, and border.
  * @property {number} scrollTop - The amount of vertical scrolling applied to the element.
@@ -50,8 +51,8 @@ import { _w, _d } from '../../helper/env';
 
 /**
  * @typedef {Object} OffsetGlobalScrollInfo
- * @property {number} top - Total vertical scroll distance
- * @property {number} left - Total horizontal scroll distance
+ * @property {number} top - Total top scroll distance
+ * @property {number} left - Total left scroll distance
  * @property {number} width - Total width including scrollable area
  * @property {number} height - Total height including scrollable area
  * @property {number} x - Horizontal offset from the top reference element
@@ -68,8 +69,8 @@ import { _w, _d } from '../../helper/env';
 
 /**
  * @typedef {Object} OffsetWWScrollInfo
- * @property {number} top - The vertical scroll offset inside the WYSIWYG editor.
- * @property {number} left - The horizontal scroll offset inside the WYSIWYG editor.
+ * @property {number} top - The top scroll offset inside the WYSIWYG editor.
+ * @property {number} left - The left scroll offset inside the WYSIWYG editor.
  * @property {number} width - The total width of the WYSIWYG editor's scrollable area.
  * @property {number} height - The total height of the WYSIWYG editor's scrollable area.
  * @property {number} bottom - The sum of `top` and `height`, representing the bottom-most scrollable position.
@@ -121,6 +122,7 @@ Offset.prototype = {
 		let offsetTop = 0;
 		let l = 0;
 		let t = 0;
+		let r = 0;
 		let offsetElement = /** @type {HTMLElement} */ (node.nodeType === 3 ? node.parentElement : node);
 		const wysiwyg = getParentElement(node, isWysiwygFrame.bind(this));
 		const self = offsetElement;
@@ -135,12 +137,16 @@ Offset.prototype = {
 		if (this.editor.frameContext.get('wysiwyg').contains(node)) {
 			l = wwFrame.offsetLeft;
 			t = wwFrame.offsetTop;
+			r = wwFrame.parentElement.offsetWidth - (l + wwFrame.offsetWidth);
 		}
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
+		offsetLeft += l;
+		offsetTop += t - (wysiwyg ? wysiwyg.scrollTop : 0);
 		return {
-			left: offsetLeft + l,
-			top: offsetTop + t - (wysiwyg ? wysiwyg.scrollTop : 0),
+			left: offsetLeft,
+			top: offsetTop,
+			right: offsetElement.offsetWidth - (offsetLeft + /** @type {HTMLElement} */ (node).offsetWidth) + r,
 			scrollX: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
 			scrollY: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0
 		};

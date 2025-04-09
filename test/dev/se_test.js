@@ -952,6 +952,7 @@ window.editor_root = suneditor.create(
 			</div>
 		</div>`,
 		value: `
+		<div class="se-component se-image-container __se__float-none"><figure style="" class=""><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" data-se-index="0"></figure></div>
 <figure class="se-flex-component se-input-component se-scroll-figure-x">
   <table class="se-table-layout-auto" style="">
     <colgroup><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"></colgroup>
