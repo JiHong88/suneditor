@@ -154,7 +154,7 @@ export const keyCodeMap: {
 	isDirectionKey: typeof import('./keyCodeMap').isDirectionKey;
 	isRemoveKey: typeof import('./keyCodeMap').isRemoveKey;
 	isNonTextKey: typeof import('./keyCodeMap').isNonTextKey;
-	isHistoryIgnoreKey: typeof import('./keyCodeMap').isHistoryIgnoreKey;
+	isHistoryRelevantKey: typeof import('./keyCodeMap').isHistoryRelevantKey;
 	isDocumentTypeObserverKey: typeof import('./keyCodeMap').isDocumentTypeObserverKey;
 	isNonResponseKey: typeof import('./keyCodeMap').isNonResponseKey;
 };

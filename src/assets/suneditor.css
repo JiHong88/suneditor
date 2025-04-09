@@ -3006,7 +3006,7 @@
 }
 .sun-editor .se-browser .se-menu-folder div.active,
 .sun-editor .se-browser .se-browser-search .se-side-open-btn.active {
-	background-color: var(--se-active-light5-color);
+	background-color: var(--se-active-light2-color);
 	color: var(--se-active-dark5-color);
 }
 .sun-editor .se-browser .se-menu-folder.active {
@@ -3752,7 +3752,7 @@
 	flex-direction: row-reverse;
 }
 .sun-editor.se-rtl .se-browser .se-browser-side .se-menu-icon {
-	margin: -1px 0 0 10px;
+	margin: 0 0 0 10px;
 }
 .sun-editor.se-rtl .se-browser .se-browser-search .se-side-open-btn {
 	margin: 8px 8px 0 0;

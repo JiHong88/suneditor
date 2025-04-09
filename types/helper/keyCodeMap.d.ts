@@ -73,11 +73,11 @@ export function isRemoveKey(code: string): boolean;
  */
 export function isNonTextKey(code: string): boolean;
 /**
- * @description History ignore key check
- * @param {string} code Event.code
+ * @description Check if the given key is relevant for history push
+ * @param {string} code - Event.code
  * @returns {boolean}
  */
-export function isHistoryIgnoreKey(code: string): boolean;
+export function isHistoryRelevantKey(code: string): boolean;
 /**
  * @description Document type observer key check
  * @param {string} code Event.code
@@ -104,7 +104,7 @@ declare namespace keyCodeMap {
 	export { isDirectionKey };
 	export { isRemoveKey };
 	export { isNonTextKey };
-	export { isHistoryIgnoreKey };
+	export { isHistoryRelevantKey };
 	export { isDocumentTypeObserverKey };
 	export { isNonResponseKey };
 }

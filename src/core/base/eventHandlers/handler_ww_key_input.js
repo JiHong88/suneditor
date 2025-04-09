@@ -1194,7 +1194,7 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	// plugin event
 	if (this._callPluginEvent('onKeyUp', { frameContext: fc, event: e, range, line: formatEl }) === false) return;
 
-	if (!keyState.ctrl && !keyState.alt && !keyCodeMap.isHistoryIgnoreKey(keyCode)) {
+	if (keyCodeMap.isHistoryRelevantKey(keyCode)) {
 		this.history.push(true);
 	}
 }
