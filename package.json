@@ -38,6 +38,13 @@
 		"**/.*",
 		"node_modules"
 	],
+	"files": [
+		"src",
+		"types",
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
 	"devDependencies": {
 		"@babel/core": "^7.22.1",
 		"@codemirror/lang-html": "^6.4.3",

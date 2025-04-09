@@ -15,3 +15,6 @@ node_modules/**
 #dev
 .git/**
 /.vs
+
+#only release branch, npm
+dist/**
