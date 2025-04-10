@@ -46,6 +46,7 @@ Coded based on ES5 in supported by IE11.
 - [Custom plugins](#custom-plugins)
 - [Document](#document)
 - [Other libraries using SunEditor](#other-libraries-using-sunEditor)
+    - [plugin: suneditor-emojis](#lib-suneditor-emojis)
     - [suneditor-react](#lib-suneditor-react)
     - [angular-suneditor](#lib-angular-suneditor)
     - [Using SunEditor with Livewire & Alpine.JS](#lib-livewire-alpine)
@@ -1603,6 +1604,8 @@ editor.showController = function (name, controllers, core) {
 [Document](http://suneditor.com/sample/html/document.html)
 
 ## Other libraries using SunEditor
+<a id="lib-suneditor-emojis"></a>[suneditor-emojis](https://github.com/davidkonrad/suneditor-emojis) ([@davidkonrad](https://suneditor-emojis.github.io/)) - Emojis plugin for SunEditor.
+
 <a id="lib-suneditor-react"></a>[suneditor-react](https://github.com/mkhstar/suneditor-react) ([@mkhstar](https://github.com/mkhstar)) - Pure React Component for SunEditor.
 
 <a id="lib-angular-suneditor"></a>[angular-suneditor](https://github.com/BauViso/angular-suneditor) ([@BauViso](https://github.com/BauViso)) - Angular module for the SunEditor WYSIWYG Editor.
@@ -1612,6 +1615,11 @@ editor.showController = function (name, controllers, core) {
 <a id="lib-pluxml"></a>[Plugin for Pluxml](https://forum.pluxml.org/discussion/comment/59339) ([@sudwebdesign](https://github.com/sudwebdesign)) - Plugin for Pluxml.
 
 <a id="lib-aem-suneditor"></a>[AEM-SunEditor](https://blogs.perficientdigital.com/2019/08/13/suneditor-an-alternative-to-the-aem-rte) ([@ahmed-musallam](https://github.com/ahmed-musallam/AEM-SunEditor)) - Enables using SunEditor in AEM dialogs as an RTE replacement.
+
+## ✨ Contributors
+<a href="https://github.com/jihong88/suneditor/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jihong88/suneditor" alt="contributors"/>
+</a>
     
 ## License
 Suneditor may be freely distributed under the MIT license.
