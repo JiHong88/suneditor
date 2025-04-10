@@ -1460,15 +1460,43 @@ class Table extends EditorInjector {
 		// --- copy info ---
 		const copyRows = copyTable.rows;
 		let rowCnt = 0;
-		for (let i = 0, len = copyRows.length; i < len; i++) {
-			const cell = copyRows[i].cells[0];
-			rowCnt += cell.rowSpan || 1;
+		const colIndexMap = [];
+		for (let row = 0; row < copyRows.length; row++) {
+			const cells = copyRows[row].cells;
+			let logicalCol = 0;
+
+			for (let i = 0; i < cells.length; i++) {
+				const cell = cells[i];
+
+				while (colIndexMap[row]?.[logicalCol]) {
+					logicalCol++;
+				}
+
+				const rowspan = cell.rowSpan || 1;
+				const colspan = cell.colSpan || 1;
+
+				if (logicalCol === 0) {
+					rowCnt += rowspan;
+				}
+
+				// rowspan map
+				for (let r = 0; r < rowspan; r++) {
+					for (let c = 0; c < colspan; c++) {
+						if (!colIndexMap[row + r]) colIndexMap[row + r] = [];
+						colIndexMap[row + r][logicalCol + c] = true;
+					}
+				}
+
+				logicalCol += colspan;
+			}
 		}
+
 		let logicalColCount = 0;
 		for (let i = 0, cells = copyRows[0].cells, len = cells.length; i < len; i++) {
 			const cell = cells[i];
 			logicalColCount += cell.colSpan || 1;
 		}
+
 		const copyInfo = {
 			rowCnt: rowCnt,
 			logicalCellCnt: logicalColCount

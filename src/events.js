@@ -606,5 +606,17 @@ export default {
 	 * @param {EmbedInfo} params.info - info object
 	 * @param {(newInfo?: EmbedInfo|null) => void} params.handler - handler function
 	 */
-	onEmbedInputBefore: null
+	onEmbedInputBefore: null,
+
+	/**
+	 * @description Called before the embed is deleted
+	 * @param {Object} params
+	 * @param {__se__EditorCore} params.editor - The root editor instance
+	 * @param {HTMLElement} params.element - target element
+	 * @param {HTMLElement} params.container - target's container element (div)
+	 * @param {string} params.align - align value
+	 * @param {string} params.url - embed url
+	 * @returns {Promise<boolean>}
+	 */
+	onEmbedDeleteBefore: null
 };

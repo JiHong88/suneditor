@@ -257,7 +257,7 @@ class Embed extends EditorInjector {
 			result = await this.submitSRC(this._linkValue);
 		}
 
-		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, 'video'), 0);
+		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, Embed.key), 0);
 
 		return result;
 	}
@@ -386,7 +386,7 @@ class Embed extends EditorInjector {
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.triggerEvent('onVideoDeleteBefore', { element: targetEl, container, align: this._align, url: this._linkValue });
+		const message = await this.triggerEvent('onEmbedDeleteBefore', { element: targetEl, container, align: this._align, url: this._linkValue });
 		if (message === false) return;
 
 		dom.utils.removeItem(container);

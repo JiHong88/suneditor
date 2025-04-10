@@ -1227,7 +1227,7 @@ window.editor_root = suneditor.create(
 			url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
 		},
 		image: {
-			canResize: false,
+			// canResize: false,
 			uploadUrl: 'http://localhost:3000/editor/upload',
 			linkEnableFileUpload: true,
 			allowMultiple: true,
