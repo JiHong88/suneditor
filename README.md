@@ -137,9 +137,18 @@ suneditor.create(document.querySelector('#editor'), {
 
 ---
 
+## 🔧 Framework Integration
+
+You can use the official wrappers for easier integration:
+
+React – [suneditor-react](https://github.com/JiHong88/suneditor-react)\
+Vue – [suneditor-vue](https://github.com/JiHong88/suneditor-vue)
+
+---
+
 ## 📦 Plugins
 
-SunEditor supports a plugin-based architecture.
+SunEditor supports a plugin-based architecture.\
 You can enable only the plugins you need or even create your own custom ones.
 
 ```js
@@ -152,6 +161,9 @@ suneditor.create('#editor', {
 ```
 
 📘 [Learn how to build your own plugin →](https://suneditor.com/plugins)
+
+🤖 Want to build plugins? Get real-time help from [SunEditor Devs AI](https://chatgpt.com/g/g-JViNPCrkD-suneditor-devs).\
+See [Contribution Guide](./CONTRIBUTING.md#ai-plugin-helper) for tips and examples.
 
 ---
 

@@ -34,17 +34,6 @@
 		"type": "git",
 		"url": "https://github.com/JiHong88/SunEditor.git"
 	},
-	"ignore": [
-		"**/.*",
-		"node_modules"
-	],
-	"files": [
-		"src",
-		"types",
-		"dist",
-		"README.md",
-		"LICENSE"
-	],
 	"devDependencies": {
 		"@babel/core": "^7.22.1",
 		"@codemirror/lang-html": "^6.4.3",
@@ -101,6 +90,18 @@
 		"samsung >= 13",
 		"not IE <= 11",
 		"not dead"
+	],
+	"ignore": [
+		"**/.*",
+		"node_modules"
+	],
+	"files": [
+		"src",
+		"types",
+		"dist",
+		"README.md",
+		"CONTRIBUTING.md",
+		"LICENSE"
 	],
 	"keywords": [
 		"wysiwyg",
