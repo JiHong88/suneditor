@@ -5276,7 +5276,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 case '%':
                     return (pxSize * 0.0625).toFixed(2) + to;
                 case 'pt':
-                    return math.floor(pxSize / 1.333) + to;
+                    return math.round(pxSize / 1.333) + to;
                 default: // px
                     return pxSize + to;
             }
