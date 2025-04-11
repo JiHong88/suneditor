@@ -483,6 +483,7 @@ Component.prototype = {
 			else dom.utils.addClass(lb_t, 'se-on-selected');
 
 			t_style.display = 'block';
+			t_style.visibility = '';
 		} else {
 			t_style.display = 'none';
 		}
@@ -508,6 +509,7 @@ Component.prototype = {
 			else dom.utils.addClass(lb_b, 'se-on-selected');
 
 			b_style.display = 'block';
+			b_style.visibility = '';
 		} else {
 			b_style.display = 'none';
 		}

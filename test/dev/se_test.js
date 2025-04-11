@@ -796,7 +796,7 @@ window.editor_root = suneditor.create(
 			image: ['c+73', 'I'],
 			list: ['c+76', 'L']
 		},
-		theme: 'dark',
+		// theme: 'dark',
 		math: {
 			// katex: {
 			// 	src: Katex

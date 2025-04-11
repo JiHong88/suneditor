@@ -827,7 +827,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 							(!selectionFormat &&
 								dom.check.isZeroWidth(selectionNode.textContent) &&
 								dom.check.isBreak(prev) &&
-								(dom.check.isBreak(prev.previousSibling) || !dom.check.isZeroWidth(prev.previousSibling.textContent)) &&
+								(dom.check.isBreak(prev.previousSibling) || !dom.check.isZeroWidth(prev.previousSibling?.textContent)) &&
 								(!next || (!dom.check.isBreak(next) && dom.check.isZeroWidth(next.textContent)))))
 					) {
 						if (selectionFormat) dom.utils.removeItem(children[offset - 1]);

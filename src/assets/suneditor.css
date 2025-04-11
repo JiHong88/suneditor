@@ -1,4 +1,4 @@
-@import url('variables.css');
+@import url('design/index.css');
 
 /** --- suneditor main */
 .sun-editor {
@@ -1818,7 +1818,8 @@
 	width: auto;
 	max-width: 500px;
 	margin: 1.75rem auto;
-	background-color: var(--se-main-background-color);
+	background-color: var(--se-modal-background-color);
+	color: var(--se-modal-color);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	border: 1px solid rgba(0, 0, 0, 0.2);
@@ -2374,7 +2375,8 @@
 	word-spacing: normal;
 	word-wrap: normal;
 	white-space: normal;
-	background-color: var(--se-main-background-color);
+	background-color: var(--se-controller-background-color);
+	color: var(--se-controller-color);
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	line-break: auto;

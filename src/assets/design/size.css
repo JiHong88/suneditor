@@ -1,0 +1,51 @@
+.sun-editor,
+.sun-editor-editable {
+	/** --------------------------- content - [size] ----------- */
+	--se-edit-font-size: 13px;
+	--se-edit-inner-padding: 1.5em 1.5em;
+	--se-edit-inner-padding-doc-type: 2.5rem 2.5rem;
+	--se-edit-line-height: 1.5em;
+
+	/** --------------------------- layout - [size] ----------- */
+	/** main, common */
+	--se-min-height: 65px;
+	--se-main-font-family: Helvetica Neue;
+	--se-main-font-size: 13px;
+	--se-border-radius: 2px;
+	--se-btn-font-size: 12px;
+	--se-statusbar-font-size: 10px;
+
+	/* browser */
+	--se-browser-title-font-size: 16px;
+
+	/* controller */
+	--se-controller-font-size: 14px;
+
+	/* input:btn */
+	--se-input-btn-size: 32px;
+
+	/* document type */
+	--se-doc-min-padding: 1rem;
+	--se-doc-max-padding: 1.5rem;
+	--se-doc-padding-factor: 0.5;
+	--se-doc-info-font-size: 14px;
+	--se-doc-info-width: 18%;
+	--se-doc-info-min-width: 16ch;
+	--se-doc-info-inner-padding: 2ch;
+	--se-doc-info-inner-line-padding: 0.5ch;
+	--se-doc-info-page-width: 16px;
+	/* document type indent - padding */
+	--se-doc-info-inner-line-indent-h1: 0em;
+	--se-doc-info-inner-line-indent-h2: 0.4em;
+	--se-doc-info-inner-line-indent-h3: 0.8em;
+	--se-doc-info-inner-line-indent-h4: 1.2em;
+	--se-doc-info-inner-line-indent-h5: 1.6em;
+	--se-doc-info-inner-line-indent-h6: 2em;
+	/* document type indent - weight */
+	--se-doc-info-inner-line-weight-h1: 700;
+	--se-doc-info-inner-line-weight-h2: 500;
+	--se-doc-info-inner-line-weight-h3: 400;
+	--se-doc-info-inner-line-weight-h4: 300;
+	--se-doc-info-inner-line-weight-h5: 300;
+	--se-doc-info-inner-line-weight-h6: 300;
+}
