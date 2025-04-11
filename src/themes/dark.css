@@ -1,6 +1,7 @@
 .sun-editor.se-theme-dark,
 .sun-editor-editable.se-theme-dark {
-	/** --------- editable - styles --------- */
+	/** --------------------------- content - [colors] ----------- */
+	--se-caret-color: #ccc;
 	--se-edit-font-color: #ccc;
 	--se-edit-font-pre: #aaa;
 	--se-edit-font-quote: #888;
@@ -19,73 +20,102 @@
 	--se-edit-hover: #5599ff;
 	--se-edit-outline: #444;
 
-	/** --------- editor - styles --------- */
+	/** --------------------------- layout - [colors] ----------- */
+	/** main, common */
+	--se-main-font-family: Helvetica Neue;
 	--se-main-out-color: #444;
 	--se-main-color: #ccc;
 	--se-main-color-lighter: #aaa;
 	--se-main-background-color: #0f1828;
-	--se-main-background-color2: #030712;
-	--se-main-background-color3: #333;
+	--se-code-view-color: #030712;
 	--se-main-font-color: #ccc;
-	--se-main-font-color2: #ddd;
+	--se-code-view-background-color: #ddd;
 	--se-main-divider-color: #555;
 	--se-main-border-color: #666;
 	--se-main-outline-color: #444;
 	--se-main-shadow-color: #222;
 	--se-statusbar-font-color: #aaa;
 	--se-overlay-background-color: #111;
-	--se-active-color: #5cd2e6; 
+
+	/* hover, active */
+	--se-active-color: #5cd2e6;
 	--se-active-dark-color: #3bb9cd;
-	--se-active-dark2-color: #2a9fb1; 
-	--se-active-dark3-color: #5cd2e6; 
+	--se-active-dark2-color: #2a9fb1;
+	--se-active-dark3-color: #5cd2e6;
 	--se-active-dark4-color: #3bb9cd;
-	--se-active-dark5-color: #197d91; 
-	--se-active-light-color: #17303a; 
+	--se-active-dark5-color: #197d91;
+	--se-active-light-color: #17303a;
 	--se-active-light2-color: #1e3f4d;
 	--se-active-light3-color: #255e6f;
 	--se-active-light4-color: #2c7d91;
 	--se-active-light5-color: #33aacc;
 	--se-active-light6-color: #3bd1f2;
+
+	/* [toolbar, menu, modal] layer - shadow */
+	--se-shadow-layer-color: rgba(0, 64, 128, 0.25);
+
+	/* drag */
 	--se-drag-over-color: #ffcc00;
+
+	/* modal, browser, dropdown */
+	--se-modal-background-color: #1c202a;
+	--se-modal-color: #ececec;
 	--se-modal-border-color: #555;
 	--se-modal-anchor-color: #77aaff;
 	--se-modal-preview-color: #aaa;
+	--se-modal-file-input-background-color: #232837;
 	--se-modal-input-disabled-color: #666;
 	--se-modal-input-disabled-background-color: #333;
+
+	/* dropdown, selectMenu */
 	--se-dropdown-font-color: #ccc;
+
+	/* controller */
 	--se-controller-border-color: #555;
+	--se-controller-background-color: #091025;
+	--se-controller-color: #ececec;
+	--se-shadow-controller-color: rgba(80, 200, 255, 0.2);
+
+	/* button : input-side */
 	--se-input-btn-border-color: #444;
 	--se-input-btn-disabled-color: #666;
-	--se-success-color: #33cc33;
-	--se-success-dark-color: #2a7a2a;
-	--se-success-dark2-color: #207a20;
-	--se-success-dark3-color: #1a661a;
-	--se-success-light-color: #00ff00;
-	--se-success-light2-color: #00cc00;
-	--se-success-light3-color: #009900;
-	--se-success-light4-color: #006600;
-	--se-success-light5-color: #003300;
-	--se-error-color: #ff6666;
-	--se-error-dark-color: #b24a48;
-	--se-error-dark2-color: #993333;
-	--se-error-dark3-color: #662222;
-	--se-error-light-color: #ff9999;
-	--se-error-light2-color: #ffcccc;
-	--se-error-light3-color: #ff3333;
-	--se-error-light4-color: #ff0000;
-	--se-error-light5-color: #cc0000;
+
+	/* success */
+	--se-success-color: #2cb67d;
+	--se-success-dark-color: #1f8f65;
+	--se-success-dark2-color: #186f4f;
+	--se-success-dark3-color: #125f44;
+	--se-success-light-color: #3dd9a5;
+	--se-success-light2-color: #57e2b7;
+	--se-success-light3-color: #8cf0ce;
+	--se-success-light4-color: #c1fae4;
+	--se-success-light5-color: #e9fef5;
+
+	/* error */
+	--se-error-color: #ef4444;
+	--se-error-dark-color: #991b1b;
+	--se-error-dark2-color: #7f1d1d;
+	--se-error-dark3-color: #651616;
+	--se-error-light-color: #f87171;
+	--se-error-light2-color: #fca5a5;
+	--se-error-light3-color: #fecaca;
+	--se-error-light4-color: #fee2e2;
+	--se-error-light5-color: #fef2f2;
+
+	/* document type */
 	--se-doc-background: #344153;
 	--se-doc-info-page-font-color: #0f1828;
 	--se-doc-info-page-background-color: #cfcfcf;
+	/* document type - font, active */
 	--se-doc-info-font-color: #cfcfcf;
 	--se-doc-info-active-color: #5599ff;
+
+	/* loading */
 	--se-loading-color: #77aaff;
-	--se-controller-background-color: #091025;
-	--se-controller-color: #ececec;
+
+	/* show blocks */
 	--se-show-blocks-color: #5599ff;
 	--se-show-blocks-li-color: #d539ff;
 	--se-show-blocks-pre-color: #27c022;
-	--se-shadow-layer-color: rgba(0, 64, 128, 0.5);
-	--se-shadow-controller-color: rgba(80, 200, 255, 0.2);
 	--se-show-blocks-component-color: #f4b124;
 }

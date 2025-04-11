@@ -257,7 +257,7 @@ class Embed extends EditorInjector {
 			result = await this.submitSRC(this._linkValue);
 		}
 
-		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, Embed.key), 0);
+		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, Embed.key, { force: true }), 0);
 
 		return result;
 	}

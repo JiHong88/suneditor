@@ -971,7 +971,7 @@ Editor.prototype = {
 
 		const fileComponentInfo = this.component.get(focusEl);
 		if (fileComponentInfo) {
-			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false);
+			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
 		} else if (focusEl) {
 			if (focusEl.nodeType !== 3) {
 				focusEl = dom.query.getEdgeChild(

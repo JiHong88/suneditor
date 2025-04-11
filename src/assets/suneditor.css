@@ -1,4 +1,4 @@
-@import url('design/index.css');
+@import url('design/_index.css');
 
 /** --- suneditor main */
 .sun-editor {
@@ -1642,8 +1642,8 @@
 	width: 100%;
 }
 .sun-editor .se-wrapper .se-code-wrapper .se-code-view-line {
-	background-color: var(--se-main-background-color2);
-	color: var(--se-main-font-color2);
+	background-color: var(--se-code-view-color);
+	color: var(--se-code-view-background-color);
 	text-align: right;
 	width: 50px;
 	font-size: var(--se-main-font-size);
@@ -1652,8 +1652,8 @@
 }
 
 .sun-editor .se-wrapper .se-code-viewer {
-	background-color: var(--se-main-font-color2);
-	color: var(--se-main-background-color2);
+	background-color: var(--se-code-view-background-color);
+	color: var(--se-code-view-color);
 	font-size: var(--se-main-font-size);
 	word-break: break-all;
 	padding: 4px;
@@ -1664,6 +1664,7 @@
 .sun-editor .se-wrapper .se-wrapper-wysiwyg {
 	display: block;
 	position: relative;
+	caret-color: var(--se-caret-color);
 }
 
 .sun-editor-editable[contenteditable='true'] .se-disable-pointer *,
@@ -2151,7 +2152,7 @@
 	height: 100%;
 	padding: 0;
 	margin: 0;
-	background-color: var(--se-main-background-color3);
+	background-color: var(--se-modal-file-input-background-color);
 	border: 2px dashed var(--se-input-btn-border-color);
 	pointer-events: none;
 }
@@ -3030,7 +3031,7 @@
 
 .sun-editor .se-browser .se-browser-tags a {
 	display: inline-block;
-	background-color: var(--se-main-background-color2);
+	background-color: var(--se-code-view-color);
 	padding: 6px 12px;
 	margin: 8px 0 8px 8px;
 	color: var(--se-main-font-color);

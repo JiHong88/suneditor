@@ -832,13 +832,13 @@ class Table extends EditorInjector {
 				this._maxWidth = !this._maxWidth;
 				this._setTableStyle('width', false);
 				this._historyPush();
-				this.component.select(this._element, Table.key, true);
+				this.component.select(this._element, Table.key, { isInput: true });
 				break;
 			case 'layout':
 				this._fixedColumn = !this._fixedColumn;
 				this._setTableStyle('column', false);
 				this._historyPush();
-				this.component.select(this._element, Table.key, true);
+				this.component.select(this._element, Table.key, { isInput: true });
 				break;
 			case 'copy':
 				this.component.copy(this._figure);
@@ -2077,7 +2077,7 @@ class Table extends EditorInjector {
 		if (this._fixedCell === tdElement) dom.utils.addClass(tdElement, 'se-selected-cell-focus');
 		if (!this._selectedCells?.length) this._selectedCells = [tdElement];
 		const tableElement = this._selectedTable || this._element || dom.query.getParentElement(tdElement, 'TABLE');
-		this.component.select(tableElement, Table.key, true);
+		this.component.select(tableElement, Table.key, { isInput: true });
 	}
 
 	/**
@@ -2146,7 +2146,7 @@ class Table extends EditorInjector {
 				this.__removeGlobalEvents();
 				this.history.push(true);
 				// figure reopen
-				this.component.select(this._element, Table.key, true);
+				this.component.select(this._element, Table.key, { isInput: true });
 			},
 			(e) => {
 				this._stopResize(col, prevValue, 'width', e);
@@ -2241,7 +2241,7 @@ class Table extends EditorInjector {
 			() => {
 				this.__removeGlobalEvents();
 				// figure reopen
-				this.component.select(this._element, Table.key, true);
+				this.component.select(this._element, Table.key, { isInput: true, force: true });
 			},
 			this._stopResize.bind(this, figure, figure.style.width, 'width')
 		);
@@ -2314,7 +2314,7 @@ class Table extends EditorInjector {
 		target.style[styleProp] = prevValue;
 		// figure reopen
 		if (styleProp === 'width') {
-			this.component.select(this._element, Table.key, true);
+			this.component.select(this._element, Table.key, { isInput: true, force: true });
 		}
 	}
 

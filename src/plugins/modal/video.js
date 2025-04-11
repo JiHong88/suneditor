@@ -285,7 +285,7 @@ class Video extends EditorInjector {
 			result = await this.submitURL(this._linkValue);
 		}
 
-		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, Video.key), 0);
+		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, Video.key, { force: true }), 0);
 
 		return result;
 	}

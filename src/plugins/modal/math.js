@@ -259,7 +259,7 @@ class Math_ extends EditorInjector {
 			const containerEl = dom.query.getParentElement(this.controller.currentTarget, '.se-component');
 			containerEl.replaceWith(mathEl);
 			const compInfo = this.component.get(mathEl);
-			this.component.select(compInfo.target, compInfo.pluginName, false);
+			this.component.select(compInfo.target, compInfo.pluginName, { force: true });
 			return true;
 		}
 
@@ -271,7 +271,7 @@ class Math_ extends EditorInjector {
 		if (r) {
 			this.selection.setRange(r.container, r.offset, r.container, r.offset);
 		} else {
-			this.component.select(mathEl, Math_.key, false);
+			this.component.select(mathEl, Math_.key, { force: true });
 		}
 
 		return true;

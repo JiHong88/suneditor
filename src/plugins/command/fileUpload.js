@@ -184,7 +184,7 @@ class FileUpload extends EditorInjector {
 		}
 
 		this.controller.close();
-		this.component.select(this._element, FileUpload.key, false);
+		this.component.select(this._element, FileUpload.key, { force: true });
 	}
 
 	/**
@@ -321,7 +321,7 @@ class FileUpload extends EditorInjector {
 		}
 
 		this.history.push(false);
-		this.component.select(target, FileUpload.key, false);
+		this.component.select(target, FileUpload.key, { force: true });
 	}
 
 	/**
@@ -368,7 +368,7 @@ class FileUpload extends EditorInjector {
 			const line = this.format.addLine(figure.container, null);
 			if (line) this.selection.setRange(line, 0, line, 0);
 		} else {
-			this.component.select(a, FileUpload.key, false);
+			this.component.select(a, FileUpload.key);
 		}
 	}
 

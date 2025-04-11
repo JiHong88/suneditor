@@ -220,10 +220,11 @@ Component.prototype = {
 	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.
 	 * @param {Node} element Target element
 	 * @param {string} pluginName The plugin name for the selected target.
-	 * @param {boolean} [isInput=false] Whether the target is an input component.(table)
-	 * @param {boolean} [force=false] Forces the component selection action again even if it is already selected.
+	 * @param {Object} [options] Options
+	 * @param {boolean} [options.isInput=false] Whether the target is an input component.(table)
+	 * @param {boolean} [options.force=false] Forces the component to be selected again, even if it is already selected.
 	 */
-	select(element, pluginName, isInput, force) {
+	select(element, pluginName, { isInput = false, force = false } = {}) {
 		if (!force && element === this.currentTarget && this.editor.currentControllerName === this.currentPluginName) return;
 
 		const info = this.get(element);
@@ -639,7 +640,7 @@ function OnDragClick(e) {
 
 	const dragInst = _DragHandle.get('__dragInst');
 	this._removeDragEvent();
-	this.select(dragInst.currentTarget, dragInst.currentPluginName, false);
+	this.select(dragInst.currentTarget, dragInst.currentPluginName, { force: true });
 }
 
 /**
@@ -748,7 +749,7 @@ async function OnKeyDown_component(e) {
 		const pluginName = this.currentPluginName;
 		this.deselect();
 		container.parentNode.insertBefore(newEl, container);
-		if (this.select(compContext.target, pluginName) === false) this.editor.blur();
+		if (this.select(compContext.target, pluginName, { force: true }) === false) this.editor.blur();
 		this.history.push(false);
 
 		return;
@@ -802,7 +803,7 @@ async function OnKeyDown_component(e) {
 		if (elComp?.container) {
 			e.stopPropagation();
 			e.preventDefault();
-			this.select(elComp.target, elComp.pluginName);
+			this.select(elComp.target, elComp.pluginName, { force: true });
 		} else {
 			try {
 				this.editor._preventBlur = true;

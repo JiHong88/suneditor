@@ -223,7 +223,7 @@ EventManager.prototype = {
 		if (this.component.is(selectionNode) && !this.component.__selectionSelected) {
 			const component = this.component.get(selectionNode);
 			if (!component) return;
-			this.component.select(component.target, component.pluginName, false);
+			this.component.select(component.target, component.pluginName);
 			return;
 		}
 
@@ -571,7 +571,7 @@ EventManager.prototype = {
 				return;
 			}
 
-			this.component.select(compInfo.target, compInfo.pluginName, false);
+			this.component.select(compInfo.target, compInfo.pluginName);
 			return null;
 		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
 			let el = commonCon.nextElementSibling;
@@ -1177,7 +1177,7 @@ EventManager.prototype = {
 			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
 				this.ui._offCurrentController();
 				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
-				this.component.select(info.target, info.pluginName, false);
+				this.component.select(info.target, info.pluginName);
 			}
 		} else if (_DragHandle.get('__overInfo') !== null && !dom.utils.hasClass(target, 'se-drag-handle')) {
 			this.component.__deselect();

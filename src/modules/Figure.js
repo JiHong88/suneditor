@@ -652,7 +652,7 @@ class Figure extends EditorInjector {
 	 */
 	_asFormatChange(figureinfo, w, h) {
 		const kind = this.kind;
-		figureinfo.target.onload = () => this.component.select(figureinfo.target, kind, false);
+		figureinfo.target.onload = () => this.component.select(figureinfo.target, kind, { force: true });
 
 		this._setFigureInfo(figureinfo);
 
@@ -708,7 +708,7 @@ class Figure extends EditorInjector {
 					this.controller.close();
 				} else {
 					dom.utils.removeItem(this._caption);
-					this._w.setTimeout(this.component.select.bind(this.component, element, this.kind), 0);
+					this._w.setTimeout(this.component.select.bind(this.component, element, this.kind, { force: true }), 0);
 				}
 
 				this._caption = !this._caption;
@@ -745,7 +745,7 @@ class Figure extends EditorInjector {
 
 		this.history.push(false);
 		if (!/^remove|caption$/.test(command)) {
-			this.component.select(element, this.kind, false);
+			this.component.select(element, this.kind, { force: true });
 		}
 	}
 
@@ -1318,7 +1318,7 @@ class Figure extends EditorInjector {
 		}
 
 		this.history.push(false);
-		this.component.select(this._element, this.kind, false);
+		this.component.select(this._element, this.kind, { force: true });
 	}
 
 	/**
@@ -1328,7 +1328,7 @@ class Figure extends EditorInjector {
 	#ContainerResizingESC(e) {
 		if (!keyCodeMap.isEsc(e.code)) return;
 		this._offResizeEvent();
-		this.component.select(this._element, this.kind, false);
+		this.component.select(this._element, this.kind, { force: true });
 	}
 
 	/**
@@ -1337,7 +1337,7 @@ class Figure extends EditorInjector {
 	#SetMenuAlign(value) {
 		this.setAlign(this._element, value);
 		this.selectMenu_align.close();
-		this.component.select(this._element, this.kind, false);
+		this.component.select(this._element, this.kind, { force: true });
 	}
 
 	/**
@@ -1367,7 +1367,7 @@ class Figure extends EditorInjector {
 		}
 
 		this.selectMenu_resize.close();
-		this.component.select(this._element, this.kind, false);
+		this.component.select(this._element, this.kind, { force: true });
 	}
 
 	#OffFigureContainer() {

@@ -92,7 +92,7 @@ export async function OnClick_wysiwyg(fc, e) {
 	const componentInfo = this.component.get(eventTarget);
 	if (componentInfo) {
 		e.preventDefault();
-		this.component.select(componentInfo.target, componentInfo.pluginName, false);
+		this.component.select(componentInfo.target, componentInfo.pluginName);
 		return;
 	}
 
