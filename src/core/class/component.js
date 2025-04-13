@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { dom, env, numbers, unicode, keyCodeMap } from '../../helper';
+import { dom, env, numbers, unicode, keyCodeMap, converter } from '../../helper';
 import { Figure, _DragHandle } from '../../modules';
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
@@ -222,11 +222,8 @@ Component.prototype = {
 	 * @param {string} pluginName The plugin name for the selected target.
 	 * @param {Object} [options] Options
 	 * @param {boolean} [options.isInput=false] Whether the target is an input component.(table)
-	 * @param {boolean} [options.force=false] Forces the component to be selected again, even if it is already selected.
 	 */
-	select(element, pluginName, { isInput = false, force = false } = {}) {
-		if (!force && element === this.currentTarget && this.editor.currentControllerName === this.currentPluginName) return;
-
+	select(element, pluginName, { isInput = false } = {}) {
 		const info = this.get(element);
 		if (!info || dom.check.isUneditable(dom.query.getParentElement(element, this.is.bind(this))) || dom.check.isUneditable(element)) return false;
 
@@ -268,7 +265,10 @@ Component.prototype = {
 			if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
 			if (!info.isFile) this.__addNotFileGlobalEvent();
 		}, 0);
-		dom.utils.addClass(info.container, 'se-component-selected');
+
+		converter.debounce(() => {
+			dom.utils.addClass(info.container, 'se-component-selected');
+		}, 0)();
 
 		if (!isBreakComponent && __overInfo !== ON_OVER_COMPONENT) {
 			// set zero width space
@@ -417,8 +417,15 @@ Component.prototype = {
 		this.editor._preventBlur = false;
 		_DragHandle.set('__overInfo', null);
 		this._removeDragEvent();
-		dom.utils.removeClass(this.currentInfo?.container, 'se-component-selected|');
-		dom.utils.removeClass(this.currentInfo?.cover, 'se-figure-over-selected');
+
+		if (this.currentInfo) {
+			const infoContainer = this.currentInfo.container;
+			const infoCover = this.currentInfo.cover;
+			converter.debounce(() => {
+				dom.utils.removeClass(infoContainer, 'se-component-selected');
+				dom.utils.removeClass(infoCover, 'se-figure-over-selected');
+			}, 0)();
+		}
 
 		const { frameContext } = this.editor;
 		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = 'none';
@@ -640,7 +647,7 @@ function OnDragClick(e) {
 
 	const dragInst = _DragHandle.get('__dragInst');
 	this._removeDragEvent();
-	this.select(dragInst.currentTarget, dragInst.currentPluginName, { force: true });
+	this.select(dragInst.currentTarget, dragInst.currentPluginName);
 }
 
 /**
@@ -749,7 +756,7 @@ async function OnKeyDown_component(e) {
 		const pluginName = this.currentPluginName;
 		this.deselect();
 		container.parentNode.insertBefore(newEl, container);
-		if (this.select(compContext.target, pluginName, { force: true }) === false) this.editor.blur();
+		if (this.select(compContext.target, pluginName) === false) this.editor.blur();
 		this.history.push(false);
 
 		return;
@@ -803,7 +810,7 @@ async function OnKeyDown_component(e) {
 		if (elComp?.container) {
 			e.stopPropagation();
 			e.preventDefault();
-			this.select(elComp.target, elComp.pluginName, { force: true });
+			this.select(elComp.target, elComp.pluginName);
 		} else {
 			try {
 				this.editor._preventBlur = true;

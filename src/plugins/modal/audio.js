@@ -438,9 +438,9 @@ class Audio_ extends EditorInjector {
 			this.fileManager.setFileData(element, file);
 			if (element && element.src !== src) {
 				element.src = src;
-				this.component.select(element, Audio_.key, { force: true });
+				this.component.select(element, Audio_.key);
 			} else {
-				this.component.select(element, Audio_.key, { force: true });
+				this.component.select(element, Audio_.key);
 				return;
 			}
 		}

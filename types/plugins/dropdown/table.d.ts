@@ -138,6 +138,7 @@ declare class Table extends EditorInjector {
 	_fixedColumn: boolean;
 	_physical_cellCnt: number;
 	_logical_cellCnt: number;
+	_cellCnt: number;
 	_rowCnt: number;
 	_rowIndex: number;
 	_physical_cellIndex: number;

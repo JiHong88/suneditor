@@ -263,6 +263,7 @@ class Table extends EditorInjector {
 		this._fixedColumn = false;
 		this._physical_cellCnt = 0;
 		this._logical_cellCnt = 0;
+		this._cellCnt = 0;
 		this._rowCnt = 0;
 		this._rowIndex = 0;
 		this._physical_cellIndex = 0;
@@ -637,7 +638,7 @@ class Table extends EditorInjector {
 		}
 
 		const keyCode = event.code;
-		this.__s = event.shiftKey;
+		this.__s = keyCodeMap.isShift(event);
 		// table tabkey
 		if (keyCodeMap.isTab(keyCode)) {
 			this._deleteStyleSelectedCells();
@@ -645,7 +646,7 @@ class Table extends EditorInjector {
 			if (tableCell && range.collapsed && dom.check.isEdgePoint(range.startContainer, range.startOffset)) {
 				this._closeController();
 
-				const shift = event.shiftKey;
+				const shift = this.__s;
 				/** @type {HTMLTableElement} */
 				const table = dom.query.getParentElement(tableCell, 'table');
 				/** @type {HTMLTableCellElement[]} */
@@ -655,7 +656,7 @@ class Table extends EditorInjector {
 				if (idx === cells.length && !shift) {
 					if (!dom.query.getParentElement(tableCell, 'thead')) {
 						const rows = table.rows;
-						const newRow = this.insertBodyRow(table, rows.length, rows[rows.length - 1].cells.length);
+						const newRow = this.insertBodyRow(table, rows.length, this._cellCnt);
 						const firstTd = newRow.querySelector('td div');
 						this.selection.setRange(firstTd, 0, firstTd, 0);
 					}
@@ -666,7 +667,7 @@ class Table extends EditorInjector {
 					return false;
 				}
 
-				if (idx === -1 && shift) return;
+				if (idx === -1 && shift) return false;
 
 				const moveCell = cells[idx];
 				if (!moveCell) return;
@@ -979,7 +980,7 @@ class Table extends EditorInjector {
 
 			// cell cnt, physical cell index
 			this._physical_cellCnt = this._trElement.cells.length;
-			this._logical_cellCnt = cellCnt;
+			this._logical_cellCnt = this._cellCnt = cellCnt;
 			this._physical_cellIndex = cellIndex;
 
 			// span
@@ -2145,7 +2146,6 @@ class Table extends EditorInjector {
 			() => {
 				this.__removeGlobalEvents();
 				this.history.push(true);
-				// figure reopen
 				this.component.select(this._element, Table.key, { isInput: true });
 			},
 			(e) => {
@@ -2241,7 +2241,7 @@ class Table extends EditorInjector {
 			() => {
 				this.__removeGlobalEvents();
 				// figure reopen
-				this.component.select(this._element, Table.key, { isInput: true, force: true });
+				this.component.select(this._element, Table.key, { isInput: true });
 			},
 			this._stopResize.bind(this, figure, figure.style.width, 'width')
 		);
@@ -2314,7 +2314,7 @@ class Table extends EditorInjector {
 		target.style[styleProp] = prevValue;
 		// figure reopen
 		if (styleProp === 'width') {
-			this.component.select(this._element, Table.key, { isInput: true, force: true });
+			this.component.select(this._element, Table.key, { isInput: true });
 		}
 	}
 

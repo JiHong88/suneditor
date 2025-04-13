@@ -184,7 +184,7 @@ class FileUpload extends EditorInjector {
 		}
 
 		this.controller.close();
-		this.component.select(this._element, FileUpload.key, { force: true });
+		this.component.select(this._element, FileUpload.key);
 	}
 
 	/**
@@ -321,7 +321,7 @@ class FileUpload extends EditorInjector {
 		}
 
 		this.history.push(false);
-		this.component.select(target, FileUpload.key, { force: true });
+		this.component.select(target, FileUpload.key);
 	}
 
 	/**

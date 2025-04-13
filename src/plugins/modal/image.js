@@ -946,7 +946,7 @@ class Image_ extends EditorInjector {
 	_updateSrc(src, element, file) {
 		element.src = src;
 		this.fileManager.setFileData(element, file);
-		this.component.select(element, Image_.key, { force: true });
+		this.component.select(element, Image_.key);
 	}
 
 	/**
@@ -1203,7 +1203,7 @@ class Image_ extends EditorInjector {
 		// svg exception handling
 		if (oImg.offsetWidth === 0) this._applySize(_svgDefaultSize, '');
 		if (this.options.get('componentAutoSelect')) {
-			this.component.select(oImg, Image_.key, { force: true });
+			this.component.select(oImg, Image_.key);
 		} else {
 			if (!this.component.isInline(container)) {
 				const line = this.format.addLine(container, null);
@@ -1213,7 +1213,7 @@ class Image_ extends EditorInjector {
 				if (r) {
 					this.selection.setRange(r.container, r.offset, r.container, r.offset);
 				} else {
-					this.component.select(oImg, Image_.key, { force: true });
+					this.component.select(oImg, Image_.key);
 				}
 			}
 		}

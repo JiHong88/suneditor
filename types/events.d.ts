@@ -48,6 +48,7 @@ declare namespace _default {
 	let onExportPDFBefore: any;
 	let onFileManagerAction: any;
 	let onEmbedInputBefore: any;
+	let onEmbedDeleteBefore: any;
 }
 export default _default;
 export type ControllerInstance = import('./modules/Controller').default;

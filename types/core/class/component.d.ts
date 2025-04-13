@@ -104,10 +104,19 @@ declare class Component {
 	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.
 	 * @param {Node} element Target element
 	 * @param {string} pluginName The plugin name for the selected target.
-	 * @param {boolean} [isInput=false] Whether the target is an input component.(table)
-	 * @param {boolean} [force=false] Forces the component selection action again even if it is already selected.
+	 * @param {Object} [options] Options
+	 * @param {boolean} [options.isInput=false] Whether the target is an input component.(table)
 	 */
-	select(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node, pluginName: string, isInput?: boolean, force?: boolean): boolean;
+	select(
+		this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>,
+		element: Node,
+		pluginName: string,
+		{
+			isInput
+		}?: {
+			isInput?: boolean;
+		}
+	): boolean;
 	/**
 	 * @this {ComponentThis}
 	 * @description Deselects the selected component.

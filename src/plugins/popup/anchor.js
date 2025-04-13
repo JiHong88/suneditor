@@ -112,7 +112,7 @@ class Anchor extends EditorInjector {
 					if (r) {
 						this.selection.setRange(r.container, r.offset, r.container, r.offset);
 					} else {
-						this.component.select(a, Anchor.key, { force: true });
+						this.component.select(a, Anchor.key);
 					}
 					this._init();
 				} else {

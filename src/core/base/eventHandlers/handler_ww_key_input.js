@@ -289,7 +289,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					if (fileComponentInfo) {
 						e.preventDefault();
 						e.stopPropagation();
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, { force: true }) === false) this.editor.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
 						break;
 					}
 				}
@@ -404,7 +404,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 						e.preventDefault();
 						e.stopPropagation();
 						if (formatEl.textContent.length === 0) dom.utils.removeItem(formatEl);
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, { force: true }) === false) this.editor.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
 					} else if (this.component.is(prev)) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -474,7 +474,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 						e.preventDefault();
 						e.stopPropagation();
 						if (dom.check.isZeroWidth(formatEl.textContent)) dom.utils.removeItem(formatEl);
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, { force: true }) === false) this.editor.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
 						break;
 					}
 				}
@@ -512,7 +512,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					const fileComponentInfo = this.component.get(nextEl);
 					if (fileComponentInfo) {
 						e.stopPropagation();
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, { force: true }) === false) this.editor.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
 					} else if (this.component.is(nextEl)) {
 						e.stopPropagation();
 						dom.utils.removeItem(nextEl);
