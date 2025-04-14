@@ -499,14 +499,14 @@ EventManager.prototype = {
 		const eCell = this.format.getBlock(ec);
 		const sIsCell = dom.check.isTableCell(sCell);
 		const eIsCell = dom.check.isTableCell(eCell);
-		const ancestor = range.commonAncestorContainer;
 		if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
+			const ancestor = dom.query.getParentElement(range.commonAncestorContainer, dom.check.isFigure) || range.commonAncestorContainer;
 			if (!sIsCell) {
-				dom.utils.removeItem(dom.query.getParentElement(eCell, (current) => ancestor === current.parentNode));
+				dom.utils.removeItem(dom.query.getParentElement(eCell, (current) => ancestor === current));
 			} else if (!eIsCell) {
-				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current.parentNode));
+				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current));
 			} else {
-				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current.parentNode));
+				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current));
 				this.editor._nativeFocus();
 				return true;
 			}

@@ -163,6 +163,15 @@ export function isFigure(node) {
 }
 
 /**
+ * @description Checks whether the given node is a content-less (void) HTML tag
+ * @param {?Node|string} node The element or element name to check
+ * @returns {boolean}
+ */
+export function isContentLess(node) {
+	return /^(BR|COLGROUP|COL|THEAD|TBODY|TFOOT|TR|AREA|BASE|EMBED|HR|IMG|INPUT|KEYGEN|LINK|META|PARAM|SOURCE|TRACK|WBR)$/i.test(typeof node === 'string' ? node : node?.nodeName);
+}
+
+/**
  * @description Check the line element is empty.
  * @param {Node} node "line" element node
  * @returns {boolean}
@@ -281,6 +290,7 @@ const check = {
 	isMedia,
 	isIFrame,
 	isFigure,
+	isContentLess,
 	isEmptyLine,
 	isWysiwygFrame,
 	isNonEditable,

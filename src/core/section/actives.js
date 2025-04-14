@@ -52,11 +52,49 @@ export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'sav
 export function SELECT_ALL(editor) {
 	editor.ui._offCurrentController();
 	editor.menu.containerOff();
-	const figcaption = dom.query.getParentElement(editor.selection.getNode(), 'FIGCAPTION');
-	const selectArea = figcaption || editor.frameContext.get('wysiwyg');
 
-	let first = dom.query.getEdgeChild(selectArea.firstChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current), false) || selectArea.firstChild;
-	let last = dom.query.getEdgeChild(selectArea.lastChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current), true) || selectArea.lastChild;
+	// check all tags
+	const ww = editor.frameContext.get('wysiwyg');
+	let prevScopeTag = null;
+	let prevScopeTagName = '';
+	const scopeSelectionTags = editor.options.get('scopeSelectionTags');
+	const range = editor.selection.getRange();
+	if (!range.collapsed) {
+		let commonNode = range.commonAncestorContainer;
+		let commonNodeName = commonNode.nodeName?.toLowerCase();
+
+		while (commonNode && ((!commonNode.nextSibling && !commonNode.previousSibling && !scopeSelectionTags.includes(commonNodeName)) || dom.check.isContentLess(commonNodeName)) && commonNode !== ww) {
+			commonNode = commonNode.parentElement;
+			commonNodeName = commonNode.nodeName?.toLowerCase();
+		}
+
+		if (scopeSelectionTags.includes(commonNodeName)) {
+			prevScopeTag = commonNode;
+			prevScopeTagName = commonNodeName;
+		}
+	}
+
+	// select all
+	const scopeTagList = scopeSelectionTags.filter((tagName) => tagName !== prevScopeTagName);
+	const scopeBaseTag = dom.query.getParentElement(prevScopeTag || editor.selection.getNode(), (current) => scopeTagList.includes(current.nodeName?.toLowerCase()));
+	const selectArea = scopeBaseTag || ww;
+
+	let first =
+		dom.query.getEdgeChild(
+			dom.query.getEdgeChild(selectArea, (current) => !dom.check.isContentLess(current), false),
+			(current) => {
+				return current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current);
+			},
+			false
+		) || selectArea.firstChild;
+	let last =
+		dom.query.getEdgeChild(
+			selectArea.lastChild,
+			(current) => {
+				return current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current);
+			},
+			true
+		) || selectArea.lastChild;
 
 	if (!first || !last) return;
 
