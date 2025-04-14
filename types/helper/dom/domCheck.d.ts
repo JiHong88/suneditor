@@ -103,6 +103,12 @@ export function isIFrame(node: (Node | string) | null): node is HTMLIFrameElemen
  */
 export function isFigure(node: (Node | string) | null): boolean;
 /**
+ * @description Checks whether the given node is a content-less (void) HTML tag
+ * @param {?Node|string} node The element or element name to check
+ * @returns {boolean}
+ */
+export function isContentLess(node: (Node | string) | null): boolean;
+/**
  * @description Check the line element is empty.
  * @param {Node} node "line" element node
  * @returns {boolean}
@@ -171,6 +177,7 @@ declare namespace check {
 	export { isMedia };
 	export { isIFrame };
 	export { isFigure };
+	export { isContentLess };
 	export { isEmptyLine };
 	export { isWysiwygFrame };
 	export { isNonEditable };

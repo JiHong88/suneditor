@@ -822,7 +822,8 @@ EventManager.prototype = {
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
 		if (env.isMobile) {
-			this.addEvent(_w.visualViewport, 'scroll', OnScroll_viewport.bind(this), false);
+			this.addEvent(_w.visualViewport, 'resize', OnChange_viewport.bind(this), false);
+			this.addEvent(_w.visualViewport, 'scroll', OnChange_viewport.bind(this), false);
 		}
 	},
 
@@ -1211,6 +1212,16 @@ EventManager.prototype = {
 		this.editor.frameContext.get('wysiwyg').focus();
 	},
 
+	/**
+	 * @private
+	 * @description Scrolls the editor view to the caret position after pressing Enter. (Ignored on mobile devices)
+	 * @this {EventManagerThis}
+	 * @param {*} range Range object
+	 */
+	__enterScrollTo(range) {
+		if (!env.isMobile) this.editor.selection.scrollTo(range);
+	},
+
 	constructor: EventManager
 };
 
@@ -1419,9 +1430,10 @@ function OnScroll_window() {
 /**
  * @this {EventManagerThis}
  */
-function OnScroll_viewport() {
+function OnChange_viewport() {
 	if (this.options.get('toolbar_sticky') > -1) {
 		this.toolbar._resetSticky();
+		this.editor.menu._restoreMenuPosition();
 	}
 }
 

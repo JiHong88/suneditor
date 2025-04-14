@@ -45,6 +45,10 @@ function Menu(editor) {
 	this._bindClose_dropdown_key = null;
 	this._bindClose_cons_mouse = null;
 	this.currentDropdownPlugin = null;
+
+	// eventManager member (viewport)
+	this.__menuBtn = null;
+	this.__menuContainer = null;
 }
 
 Menu.prototype = {
@@ -115,6 +119,8 @@ Menu.prototype = {
 		this.__removeGlobalEvent();
 		this.index = -1;
 		this.menus = [];
+		this.__menuBtn = null;
+		this.__menuContainer = null;
 
 		if (this.currentDropdown) {
 			this.currentDropdownName = '';
@@ -187,6 +193,19 @@ Menu.prototype = {
 		this.offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'), false);
 
 		menu.style.visibility = '';
+
+		this.__menuBtn = element;
+		this.__menuContainer = menu;
+	},
+
+	/**
+	 * @private
+	 * @this {MenuThis}
+	 * @description Restore the last menu position using previously stored button and menu elements.
+	 */
+	_restoreMenuPosition() {
+		if (!this.__menuBtn || !this.__menuContainer) return;
+		this._setMenuPosition(this.__menuBtn, this.__menuContainer);
 	},
 
 	/**

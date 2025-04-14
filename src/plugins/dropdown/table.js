@@ -631,22 +631,27 @@ class Table extends EditorInjector {
 	 */
 	onKeyDown({ event, range, line }) {
 		this._ref = null;
-		if (this.editor.selectMenuOn || this._resizing || this.__s || keyCodeMap.isCtrl(event)) return;
+
+		const keyCode = event.code;
+		const isTab = keyCodeMap.isTab(keyCode);
+		if (this.editor.selectMenuOn || this._resizing || (!isTab && this.__s) || keyCodeMap.isCtrl(event)) return;
 
 		if (!this.cellControllerTop) {
 			this.controller_cell.hide();
 		}
 
-		const keyCode = event.code;
 		this.__s = keyCodeMap.isShift(event);
+
 		// table tabkey
-		if (keyCodeMap.isTab(keyCode)) {
+		if (isTab) {
 			this._deleteStyleSelectedCells();
 			const tableCell = dom.query.getParentElement(line, dom.check.isTableCell);
 			if (tableCell && range.collapsed && dom.check.isEdgePoint(range.startContainer, range.startOffset)) {
 				this._closeController();
 
 				const shift = this.__s;
+				this._shift = this.__s = false;
+
 				/** @type {HTMLTableElement} */
 				const table = dom.query.getParentElement(tableCell, 'table');
 				/** @type {HTMLTableCellElement[]} */

@@ -403,6 +403,10 @@ export type EditorBaseOptions = {
 	 */
 	defaultLineBreakFormat?: 'line' | 'br';
 	/**
+	 * - Tags treated as whole units when selecting all content.
+	 */
+	scopeSelectionTags?: Array<string>;
+	/**
 	 * - Default allowed HTML elements. The default values are maintained.
 	 */
 	__defaultElementWhitelist?: string;
@@ -680,6 +684,7 @@ export type EditorInitOptions = EditorBaseOptions & EditorFrameOptions;
  * - Formats that include "line", such as "Quote", still operate on a "line" basis.
  * - ● suneditor processes work in "line" units.
  * - ● When set to "br", performance may decrease when editing a lot of data.
+ * @property {Array<string>} [scopeSelectionTags=["td", "table", "pre", "figcaption"]] - Tags treated as whole units when selecting all content.
  * @property {string} [__defaultElementWhitelist="br|div"] - Default allowed HTML elements. The default values are maintained.
  * @property {string} [elementWhitelist=""] - Allowed HTML elements. Delimiter: "|" (e.g. "p|div", "*").
  * @property {string} [elementBlacklist=""] - Disallowed HTML elements. Delimiter: "|" (e.g. "script|style").

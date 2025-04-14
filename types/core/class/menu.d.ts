@@ -46,6 +46,8 @@ declare class Menu {
 	_bindClose_dropdown_key: any;
 	_bindClose_cons_mouse: any;
 	currentDropdownPlugin: any;
+	__menuBtn: Node;
+	__menuContainer: HTMLElement;
 	/**
 	 * @this {MenuThis}
 	 * @description Method for managing dropdown element.
@@ -94,6 +96,12 @@ declare class Menu {
 	 * @param {HTMLElement} menu Menu element
 	 */
 	_setMenuPosition(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, element: Node, menu: HTMLElement): void;
+	/**
+	 * @private
+	 * @this {MenuThis}
+	 * @description Restore the last menu position using previously stored button and menu elements.
+	 */
+	_restoreMenuPosition(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
 	/**
 	 * @private
 	 * @this {MenuThis}

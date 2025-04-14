@@ -2582,8 +2582,8 @@
 	display: none;
 	pointer-events: auto;
 	cursor: move;
-	width: 18px;
-	height: 18px;
+	width: 20px;
+	height: 20px;
 	background-color: var(--se-active-dark-color);
 	border: 0;
 	padding: 1px;

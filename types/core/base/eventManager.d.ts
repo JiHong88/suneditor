@@ -375,4 +375,11 @@ declare class EventManager {
 	 * @param {Event} e The keyboard event
 	 */
 	__enterPrevent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, e: Event): void;
+	/**
+	 * @private
+	 * @description Scrolls the editor view to the caret position after pressing Enter. (Ignored on mobile devices)
+	 * @this {EventManagerThis}
+	 * @param {*} range Range object
+	 */
+	__enterScrollTo(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, range: any): void;
 }

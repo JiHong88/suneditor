@@ -744,7 +744,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					}
 
 					// enter scroll
-					this.selection.scrollTo(range);
+					this.__enterScrollTo(range);
 					break;
 				} else if (rangeEl && formatEl && !dom.check.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
 					const rangeEnt = this.selection.getRange();
@@ -759,7 +759,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 						this.selection.setRange(br, 1, br, 1);
 
 						// enter scroll
-						this.selection.scrollTo(range);
+						this.__enterScrollTo(range);
 						break;
 					}
 
@@ -838,7 +838,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 						this.selection.setRange(newEl, 1, newEl, 1);
 
 						// enter scroll
-						this.selection.scrollTo(range);
+						this.__enterScrollTo(range);
 						break;
 					}
 
@@ -870,7 +870,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					this._onShortcutKey = true;
 
 					// enter scroll
-					this.selection.scrollTo(range);
+					this.__enterScrollTo(range);
 					break;
 				}
 
@@ -902,7 +902,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					}
 
 					// enter scroll
-					this.selection.scrollTo(range);
+					this.__enterScrollTo(range);
 					break;
 				}
 
@@ -932,7 +932,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 							}
 
 							// enter scroll
-							this.selection.scrollTo(range);
+							this.__enterScrollTo(range);
 							break;
 						}
 
@@ -979,14 +979,14 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					this.selection.setRange(newEl, offset, newEl, offset);
 
 					// enter scroll
-					this.selection.scrollTo(range);
+					this.__enterScrollTo(range);
 					break;
 				}
 			}
 
 			if (selectRange) {
 				// enter scroll
-				this.selection.scrollTo(range);
+				this.__enterScrollTo(range);
 				break;
 			}
 
@@ -996,7 +996,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 				this.selection.setRange(formatEl, 0, formatEl, 0);
 
 				// enter scroll
-				this.selection.scrollTo(range);
+				this.__enterScrollTo(range);
 			}
 
 			break;

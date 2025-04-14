@@ -95,6 +95,7 @@ export const dom: {
 		isMedia: typeof import('./dom/domCheck').isMedia;
 		isIFrame: typeof import('./dom/domCheck').isIFrame;
 		isFigure: typeof import('./dom/domCheck').isFigure;
+		isContentLess: typeof import('./dom/domCheck').isContentLess;
 		isEmptyLine: typeof import('./dom/domCheck').isEmptyLine;
 		isWysiwygFrame: typeof import('./dom/domCheck').isWysiwygFrame;
 		isNonEditable: typeof import('./dom/domCheck').isNonEditable;
