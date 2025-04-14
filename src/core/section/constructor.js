@@ -24,7 +24,8 @@ const DEFAULT_ELEMENT_WHITELIST =
 	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_TEXT_STYLE_TAGS = 'strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary';
 
-const DEFAULT_SCOPE_SELECTION_TAGS = 'td|table|pre|figcaption|li|ol|ul';
+/* scopeSelectionTags */
+const DEFAULT_SCOPE_SELECTION_TAGS = 'td|table|li|ol|ul|pre|figcaption|blockquote|dl|dt|dd';
 
 const _video_audio_attr = '|controls|autoplay|loop|muted|poster|preload|playsinline|volume|crossorigin|disableRemotePlayback|controlsList';
 const _iframe_attr = '|allowfullscreen|sandbox|loading|allow|referrerpolicy|frameborder|scrolling';
@@ -187,7 +188,7 @@ export const RO_UNAVAILABD = [
  * - Formats that include "line", such as "Quote", still operate on a "line" basis.
  * - ● suneditor processes work in "line" units.
  * - ● When set to "br", performance may decrease when editing a lot of data.
- * @property {Array<string>} [scopeSelectionTags=["td", "table", "pre", "figcaption"]] - Tags treated as whole units when selecting all content.
+ * @property {Array<string>} [scopeSelectionTags=["td", "table", "li", "ol", "ul", "pre", "figcaption", "blockquote", "dl", "dt", "dd"]] - Tags treated as whole units when selecting all content.
  * @property {string} [__defaultElementWhitelist="br|div"] - Default allowed HTML elements. The default values are maintained.
  * @property {string} [elementWhitelist=""] - Allowed HTML elements. Delimiter: "|" (e.g. "p|div", "*").
  * @property {string} [elementBlacklist=""] - Disallowed HTML elements. Delimiter: "|" (e.g. "script|style").
