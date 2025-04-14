@@ -1,4 +1,4 @@
-import _icons from '../../assets/icons/_default';
+import _icons from '../../assets/icons/defaultIcons';
 import _defaultLang from '../../langs/en';
 import { CreateContext, CreateFrameContext } from './context';
 import { dom, numbers, converter, env } from '../../helper';

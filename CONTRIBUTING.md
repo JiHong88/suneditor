@@ -125,7 +125,7 @@ A quick overview of the `src/` directory:
 ### `/assets/` – 🎨 Styles & Icons
 
 -   CSS for editor layout and themes
--   SVG icon sets (`icons/_default.js`)
+-   SVG icon sets (`icons/defaultIcons.js`)
 
 ### `/themes/` – 🧪 Theme Stylesheets
 
