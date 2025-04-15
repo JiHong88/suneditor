@@ -2,6 +2,7 @@
 .sun-editor-editable.se-theme-dark {
 	/** --------------------------- content - [colors] ----------- */
 	--se-caret-color: #ccc;
+	--se-placeholder-color: #64718c;
 	--se-edit-font-color: #ccc;
 	--se-edit-font-pre: #aaa;
 	--se-edit-font-quote: #888;

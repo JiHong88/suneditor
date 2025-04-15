@@ -467,6 +467,7 @@ window.editor_root = suneditor.create(
 		// 		<p>dsa<strong>d&nbsp;&nbsp;&nbsp;&nbsp;sa</strong><u><strong>dsadsadsa</strong></u><span style="color: #ff0000"><u><strong>dsadasdsa</strong></u></span><br>
 		// </p>
 		// closeModalOutsideClick: true,
+		placeholder: 'placeholder text',
 		value: `<p>test abc  <span>
 		<img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="width:40px;" data-se-index="0">
 		</span>

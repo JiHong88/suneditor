@@ -197,6 +197,14 @@
 	top: 0px;
 	right: 100%;
 }
+
+/* se-type-document - placeholder position set */
+.sun-editor .se-wrapper.se-type-document .se-placeholder {
+	top: clamp(var(--se-doc-min-padding));
+	left: var(--se-doc-info-width);
+	right: var(--se-doc-info-width);
+	padding: var(--se-edit-inner-padding-doc-type);
+}
 /** --- se-type-document end ---------------------------------------------------------- */
 
 .sun-editor .se-wrapper .se-code-viewer-mirror,
@@ -1687,12 +1695,8 @@
 	left: 0;
 	right: 0;
 	overflow: hidden;
-	margin-top: 0px;
-	padding-top: 16px;
-	padding-left: 16px;
-	margin-left: 0px;
-	padding-right: 16px;
-	margin-right: 0px;
+	padding: var(--se-edit-inner-padding);
+	margin: 0;
 	pointer-events: none;
 	backface-visibility: hidden;
 	-webkit-backface-visibility: hidden;
