@@ -43,8 +43,8 @@ function DocumentType(editor, fc) {
 	this.pages = [];
 	this.pages_line = [];
 	this.prevScrollTop = 0;
-	this.useHeader = editor.options.get('type-options').includes('header');
-	this.usePage = editor.options.get('type-options').includes('page');
+	this.useHeader = editor.options.get('_type_options').includes('header');
+	this.usePage = editor.options.get('_type_options').includes('page');
 	this.navigatorButtons = [];
 	this.pageNavigator = null;
 	this._mirror = fc.get('documentTypePageMirror');

@@ -72,42 +72,6 @@ const DEFAULT_CONTENT_STYLES =
 
 const RETAIN_STYLE_MODE = ['repeat', 'always', 'none'];
 
-export const RO_UNAVAILABD = [
-	'mode',
-	'type',
-	'externalLibs',
-	'iframe',
-	'convertTextTags',
-	'textStyleTags',
-	'fontSizeUnits',
-	'spanStyles',
-	'lineStyles',
-	'tagStyles',
-	'reverseCommands',
-	'shortcutsDisable',
-	'shortcuts',
-	'buttonList',
-	'subToolbar',
-	'toolbar_container',
-	'statusbar_container',
-	'elementWhitelist',
-	'elementBlacklist',
-	'attributeWhitelist',
-	'attributeBlacklist',
-	'defaultLine',
-	'formatClosureBrLine',
-	'formatBrLine',
-	'formatLine',
-	'formatClosureBlock',
-	'formatBlock',
-	'__defaultElementWhitelist',
-	'__defaultAttributeWhitelist',
-	'__listCommonStyle',
-	'icons',
-	'lang',
-	'codeMirror'
-];
-
 /**
  * @typedef {Object} EditorFrameOptions
  * @property {string} [value=""] - Initial value for the editor.
@@ -252,12 +216,118 @@ export const RO_UNAVAILABD = [
  * - For example, when changing the font size or color of a list item (`<li>`),
  * - these styles will be applied to the `<li>` tag instead of wrapping the content inside additional tags.
  * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax.
- * @property {Object<string, *>} [PluginOptions] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
+ *
+ * @property {Object<string, *>} [Dynamic_pluginOptions] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
  */
 
 /**
  * @typedef {EditorBaseOptions & EditorFrameOptions} EditorInitOptions
  */
+
+/**
+ * @description For all EditorInitOptions keys, only boolean | null values are allowed.
+ * - 'fixed' → Immutable / null → Resettable.
+ * @type {Partial<Record<keyof EditorInitOptions, "fixed" | null>>}
+ */
+export const OPTION_FIXED_FLAG = {
+	value: 'fixed',
+	placeholder: null,
+	editableFrameAttributes: null,
+	width: null,
+	minWidth: null,
+	maxWidth: null,
+	height: null,
+	minHeight: null,
+	maxHeight: null,
+	editorStyle: null,
+	iframe: 'fixed',
+	iframe_fullPage: null,
+	iframe_attributes: null,
+	iframe_cssFileName: null,
+	statusbar: null,
+	statusbar_showPathLabel: null,
+	statusbar_resizeEnable: null,
+	charCounter: null,
+	charCounter_max: null,
+	charCounter_label: null,
+	charCounter_type: null,
+	plugins: null,
+	excludedPlugins: null,
+	buttonList: 'fixed',
+	v2Migration: null,
+	strictMode: null,
+	mode: 'fixed',
+	type: 'fixed',
+	theme: null,
+	lang: 'fixed',
+	fontSizeUnits: 'fixed',
+	allowedClassName: null,
+	closeModalOutsideClick: null,
+	copyFormatKeepOn: null,
+	syncTabIndent: null,
+	tabDisable: null,
+	autoLinkify: null,
+	autoStyleify: null,
+	scrollToOptions: null,
+	componentScrollToOptions: null,
+	retainStyleMode: null,
+	allowedExtraTags: null,
+	events: null,
+	__textStyleTags: 'fixed',
+	textStyleTags: 'fixed',
+	convertTextTags: 'fixed',
+	__tagStyles: null,
+	tagStyles: 'fixed',
+	spanStyles: 'fixed',
+	lineStyles: 'fixed',
+	textDirection: null,
+	reverseButtons: null,
+	historyStackDelayTime: null,
+	lineAttrReset: null,
+	printClass: null,
+	defaultLine: 'fixed',
+	defaultLineBreakFormat: null,
+	scopeSelectionTags: null,
+	__defaultElementWhitelist: 'fixed',
+	elementWhitelist: 'fixed',
+	elementBlacklist: 'fixed',
+	__defaultAttributeWhitelist: 'fixed',
+	attributeWhitelist: 'fixed',
+	attributeBlacklist: 'fixed',
+	__defaultFormatLine: null,
+	formatLine: 'fixed',
+	__defaultFormatBrLine: null,
+	formatBrLine: 'fixed',
+	__defaultFormatClosureBrLine: 'fixed',
+	formatClosureBrLine: 'fixed',
+	__defaultFormatBlock: null,
+	formatBlock: 'fixed',
+	__defaultFormatClosureBlock: null,
+	formatClosureBlock: 'fixed',
+	allowedEmptyTags: null,
+	toolbar_width: null,
+	toolbar_container: 'fixed',
+	toolbar_sticky: null,
+	toolbar_hide: null,
+	subToolbar: 'fixed',
+	statusbar_container: 'fixed',
+	shortcutsHint: null,
+	shortcutsDisable: 'fixed',
+	shortcuts: 'fixed',
+	fullScreenOffset: null,
+	previewTemplate: null,
+	printTemplate: null,
+	componentAutoSelect: null,
+	defaultUrlProtocol: null,
+	allUsedStyles: null,
+	toastMessageTime: null,
+	icons: 'fixed',
+	freeCodeViewMode: null,
+	__lineFormatFilter: null,
+	__pluginRetainFilter: null,
+	__listCommonStyle: 'fixed',
+	externalLibs: 'fixed'
+};
 
 /**
  * @description Creates a new SunEditor instance with specified options.
@@ -428,10 +498,10 @@ function Constructor(editorTargets, options) {
 
 		// document type
 		const documentTypeInner = { inner: null, page: null, pageMirror: null };
-		if (o.get('type-options').includes('header')) {
+		if (o.get('_type_options').includes('header')) {
 			documentTypeInner.inner = dom.utils.createElement('DIV', { class: 'se-document-lines', style: `height: ${to.get('height')};` }, '<div class="se-document-lines-inner"></div>');
 		}
-		if (o.get('type-options').includes('page')) {
+		if (o.get('_type_options').includes('page')) {
 			documentTypeInner.page = dom.utils.createElement('DIV', { class: 'se-document-page' }, null);
 			documentTypeInner.pageMirror = dom.utils.createElement(
 				'DIV',
@@ -623,7 +693,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('type', options.type?.split(':')[0] || ''); // document:header,page
 	o.set('theme', options.theme || '');
 	o.set('_themeClass', options.theme ? ` se-theme-${options.theme}` : '');
-	o.set('type-options', options.type?.split(':')[1] || '');
+	o.set('_type_options', options.type?.split(':')[1] || '');
 	o.set('externalLibs', options.externalLibs || {});
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));

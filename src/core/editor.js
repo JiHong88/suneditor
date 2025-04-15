@@ -1,5 +1,5 @@
 import { env, converter, dom, numbers } from '../helper';
-import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, RO_UNAVAILABD } from './section/constructor';
+import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, OPTION_FIXED_FLAG } from './section/constructor';
 import { UpdateStatusbarContext } from './section/context';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
 import History from './base/history';
@@ -1697,7 +1697,7 @@ function GetResetDiffKey(key) {
 function CheckResetKeys(keys, plugins, root) {
 	for (let i = 0, len = keys.length, k; i < len; i++) {
 		k = keys[i];
-		if (RO_UNAVAILABD.includes(k) || (plugins && plugins[k])) {
+		if (OPTION_FIXED_FLAG[k] === 'fixed' || (plugins && plugins[k])) {
 			console.warn(`[SUNEDITOR.warn.resetOptions] "[${root + k}]" options not available in resetOptions have no effect.`);
 			keys.splice(i--, 1);
 			len--;
