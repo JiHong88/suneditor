@@ -91,7 +91,7 @@ export default {
 
 		const multiTargets = [];
 		if (target.nodeType === 1) {
-			multiTargets.push({ target: target });
+			multiTargets.push({ key: null, target: target });
 		} else {
 			let props;
 			for (const key in target) {

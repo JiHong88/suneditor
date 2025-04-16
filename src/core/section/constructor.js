@@ -227,11 +227,11 @@ const RETAIN_STYLE_MODE = ['repeat', 'always', 'none'];
 /**
  * @description For all EditorInitOptions keys, only boolean | null values are allowed.
  * - 'fixed' → Immutable / null → Resettable.
- * @type {Partial<Record<keyof EditorInitOptions, "fixed" | null>>}
+ * @type {Partial<Record<keyof EditorInitOptions, "fixed" | true>>}
  */
 export const OPTION_FIXED_FLAG = {
 	value: 'fixed',
-	placeholder: null,
+	placeholder: 'fixed',
 	editableFrameAttributes: null,
 	width: null,
 	minWidth: null,

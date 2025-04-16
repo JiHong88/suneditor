@@ -407,7 +407,7 @@ window.editor_root = suneditor.create(
 	// 	}
 	// },
 	{
-		// mode: "inline",
+		mode: "inline",
 		// toolbar_width: 300,
 		// textDirection: 'rtl',
 		// value: 'Common value',
