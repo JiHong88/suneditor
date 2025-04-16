@@ -201,9 +201,13 @@
 /* se-type-document - placeholder position set */
 .sun-editor .se-wrapper.se-type-document .se-placeholder {
 	top: clamp(var(--se-doc-min-padding));
+	left: clamp(var(--se-doc-min-padding));
+	right: clamp(var(--se-doc-min-padding));
+	padding: var(--se-edit-inner-padding-doc-type);
+}
+.sun-editor .se-wrapper.se-type-document.se-type-document-header .se-placeholder {
 	left: var(--se-doc-info-width);
 	right: var(--se-doc-info-width);
-	padding: var(--se-edit-inner-padding-doc-type);
 }
 /** --- se-type-document end ---------------------------------------------------------- */
 

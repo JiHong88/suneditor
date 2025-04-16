@@ -438,7 +438,7 @@ function Constructor(editorTargets, options) {
 		const to = optionMap.frameMap.get(editTarget.key);
 		const top_div = dom.utils.createElement('DIV', { class: 'sun-editor' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') });
 		const container = dom.utils.createElement('DIV', { class: 'se-container' });
-		const editor_div = dom.utils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') });
+		const editor_div = dom.utils.createElement('DIV', { class: 'se-wrapper' + (o.get('type') === 'document' ? ' se-type-document' : '') + (o.get('_type_options').includes('header') ? ' se-type-document-header' : '') });
 
 		container.appendChild(dom.utils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
