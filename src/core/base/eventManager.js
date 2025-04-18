@@ -881,14 +881,14 @@ EventManager.prototype = {
 
 		/** line breaker */
 		const lineBreakEventName = isMobile ? 'touchstart' : 'mousedown';
-		this.addEvent(
-			[fc.get('lineBreaker_t'), fc.get('lineBreaker_b')],
-			lineBreakEventName,
-			(e) => {
-				e.preventDefault();
-			},
-			false
-		);
+		// this.addEvent(
+		// 	[fc.get('lineBreaker_t'), fc.get('lineBreaker_b')],
+		// 	lineBreakEventName,
+		// 	(e) => {
+		// 		e.preventDefault();
+		// 	},
+		// 	false
+		// );
 		this.addEvent(fc.get('lineBreaker_t'), lineBreakEventName, DisplayLineBreak.bind(this, 't'), false);
 		this.addEvent(fc.get('lineBreaker_b'), lineBreakEventName, DisplayLineBreak.bind(this, 'b'), false);
 
@@ -1230,6 +1230,9 @@ EventManager.prototype = {
 	 * @param {Event} event - Event object
 	 */
 	__postFocusEvent(frameContext, event) {
+		if (this.editor.isInline || this.editor.isBalloonAlways) this.toolbar.show();
+		if (this.editor.isSubBalloonAlways) this.subToolbar.show();
+
 		// user event
 		this.triggerEvent('onFocus', { frameContext, event });
 		// plugin event
@@ -1244,6 +1247,9 @@ EventManager.prototype = {
 	 * @param {Event} event - Event object
 	 */
 	__postBlurEvent(frameContext, event) {
+		if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
+		if (this.editor.isSubBalloon) this._hideToolbar_sub();
+
 		// user event
 		this.triggerEvent('onBlur', { frameContext, event });
 		// plugin event
@@ -1318,8 +1324,6 @@ function OnFocus_wysiwyg(frameContext, e) {
 	}
 
 	this._w.setTimeout(() => {
-		if (this.editor.isInline || this.editor.isBalloonAlways) this.toolbar.show();
-		if (this.editor.isSubBalloonAlways) this.subToolbar.show();
 		this.__postFocusEvent(frameContext, e);
 	}, 0);
 }
@@ -1338,9 +1342,6 @@ function OnBlur_wysiwyg(frameContext, e) {
 
 	if (this._inputFocus || this.editor._preventBlur) return;
 	this.editor._preventFocus = false;
-
-	if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
-	if (this.editor.isSubBalloon) this._hideToolbar_sub();
 
 	this._setKeyEffect([]);
 
@@ -1411,12 +1412,11 @@ function DisplayLineBreak(dir, e) {
 	this.component.deselect();
 
 	try {
-		this.editor._preventBlur = true;
 		const focusEl = isList ? format : format.firstChild;
 		this.selection.setRange(focusEl, 1, focusEl, 1);
 		this.history.push(false);
-	} finally {
-		this.editor._preventBlur = false;
+	} catch (err) {
+		console.warn('[SUNEDITOR.lineBreaker.error]', err);
 	}
 }
 

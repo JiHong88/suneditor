@@ -188,7 +188,7 @@ export function isEmptyLine(node) {
  * @returns {node is HTMLElement}
  */
 export function isWysiwygFrame(node) {
-	return node?.nodeType === 1 && (domUtils.hasClass(node, 'se-wrapper-wysiwyg|sun-editor-carrier-wrapper') || /^BODY$/i.test(node.nodeName));
+	return node?.nodeType === 1 && (domUtils.hasClass(node, 'se-wrapper-wysiwyg|sun-editor-carrier-wrapper|se-wrapper') || /^BODY$/i.test(node.nodeName));
 }
 
 /**

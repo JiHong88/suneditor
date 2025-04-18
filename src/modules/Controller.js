@@ -444,7 +444,14 @@ class Controller extends EditorInjector {
 		}
 
 		this.isOpen = true;
-		if (eventTarget === this.inst._element || eventTarget === this.currentTarget || this._checkFixed() || this.form.contains(eventTarget) || this._checkForm(eventTarget)) {
+		if (
+			eventTarget === this.inst._element ||
+			eventTarget === this.currentTarget ||
+			this._checkFixed() ||
+			this.form.contains(eventTarget) ||
+			this._checkForm(eventTarget) ||
+			dom.query.getParentElement(eventTarget, '.se-line-breaker-component')
+		) {
 			return;
 		}
 
