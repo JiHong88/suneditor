@@ -165,7 +165,19 @@ export default {
 	 * @description Event call back function
 	 * @param {BaseEvent} params
 	 */
+	onNativeFocus: null,
+
+	/**
+	 * @description Event call back function
+	 * @param {BaseEvent} params
+	 */
 	onBlur: null,
+
+	/**
+	 * @description Event call back function
+	 * @param {BaseEvent} params
+	 */
+	onNativeBlur: null,
 
 	/**
 	 * @description Event function on copy

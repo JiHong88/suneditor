@@ -79,6 +79,8 @@ function Component(editor) {
 	/** @type {boolean} */
 	this.__selectionSelected = false;
 
+	this.__prevent = false;
+
 	this.editor.applyFrameRoots((e) => {
 		// drag
 		const dragHandle = dom.utils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true' }, this.icons.selection);
@@ -230,7 +232,8 @@ Component.prototype = {
 		const plugin = info.launcher || this.plugins[pluginName];
 		if (!plugin) return;
 
-		if (!isInput && _DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
+		const notOver = _DragHandle.get('__overInfo') !== ON_OVER_COMPONENT;
+		if (!isInput && notOver) {
 			if (this.editor.status._onMousedown) return;
 
 			this.editor._preventBlur = true;
@@ -245,6 +248,7 @@ Component.prototype = {
 		}
 
 		this.isSelected = true;
+		this.__prevent = true;
 
 		let isNonFigureComponent;
 		if (typeof plugin.select === 'function') isNonFigureComponent = plugin.select(element);
@@ -269,6 +273,11 @@ Component.prototype = {
 		converter.debounce(() => {
 			dom.utils.addClass(info.container, 'se-component-selected');
 		}, 0)();
+
+		if (notOver && !this.status.hasFocus && !this.editor._preventFocus) {
+			this.eventManager.__postFocusEvent(this.editor.frameContext, null);
+			this.editor._preventFocus = true;
+		}
 
 		if (!isBreakComponent && __overInfo !== ON_OVER_COMPONENT) {
 			// set zero width space
@@ -321,6 +330,11 @@ Component.prototype = {
 		}, 0);
 		this.__deselect();
 		this.ui.setControllerOnDisabledButtons(false);
+
+		if (this.editor._preventFocus && !this.status.hasFocus && !this.__prevent) {
+			this.eventManager.__postBlurEvent(this.editor.frameContext, null);
+			this.editor._preventFocus = false;
+		}
 	},
 
 	/**

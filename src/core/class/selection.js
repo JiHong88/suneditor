@@ -149,6 +149,7 @@ Selection_.prototype = {
 		try {
 			range.setStart(sc, so);
 			range.setEnd(ec, eo);
+			this.status.hasFocus = true;
 		} catch (error) {
 			console.warn('[SUNEDITOR.selection.focus.warn]', error.message);
 			this.editor._nativeFocus();

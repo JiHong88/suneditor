@@ -1222,6 +1222,34 @@ EventManager.prototype = {
 		if (!env.isMobile) this.editor.selection.scrollTo(range);
 	},
 
+	/**
+	 * @private
+	 * @description Focus Event Postprocessing
+	 * @this {EventManagerThis}
+	 * @param {__se__FrameContext} frameContext - frame context object
+	 * @param {Event} event - Event object
+	 */
+	__postFocusEvent(frameContext, event) {
+		// user event
+		this.triggerEvent('onFocus', { frameContext, event });
+		// plugin event
+		this._callPluginEvent('onFocus', { frameContext, event });
+	},
+
+	/**
+	 * @private
+	 * @description Blur Event Postprocessing
+	 * @this {EventManagerThis}
+	 * @param {__se__FrameContext} frameContext - frame context object
+	 * @param {Event} event - Event object
+	 */
+	__postBlurEvent(frameContext, event) {
+		// user event
+		this.triggerEvent('onBlur', { frameContext, event });
+		// plugin event
+		this._callPluginEvent('onBlur', { frameContext, event });
+	},
+
 	constructor: EventManager
 };
 
@@ -1258,6 +1286,10 @@ function OnFocus_wysiwyg(frameContext, e) {
 		return false;
 	}
 
+	this.status.hasFocus = true;
+	this.component.__prevent = false;
+	this.triggerEvent('onNativeFocus', { frameContext, event: e });
+
 	const rootKey = frameContext.get('key');
 
 	if (this._inputFocus) {
@@ -1269,11 +1301,11 @@ function OnFocus_wysiwyg(frameContext, e) {
 		return;
 	}
 
-	if (this.status.rootKey === rootKey && this.editor._preventBlur) return;
+	if ((this.status.rootKey === rootKey && this.editor._preventBlur) || this.editor._preventFocus) return;
+	this.editor._preventFocus = true;
 
 	const onSelected = this.editor.status.onSelected || this.editor.opendModal;
 	this.ui._offCurrentController();
-	this.status.hasFocus = true;
 
 	dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
 	dom.utils.setDisabled(this.editor._codeViewDisabledButtons, false);
@@ -1286,12 +1318,9 @@ function OnFocus_wysiwyg(frameContext, e) {
 	}
 
 	this._w.setTimeout(() => {
-		if (this.editor.isInline) this.toolbar._showInline();
-
-		// user event
-		this.triggerEvent('onFocus', { frameContext, event: e });
-		// plugin event
-		this._callPluginEvent('onFocus', { frameContext, event: e });
+		if (this.editor.isInline || this.editor.isBalloonAlways) this.toolbar.show();
+		if (this.editor.isSubBalloonAlways) this.subToolbar.show();
+		this.__postFocusEvent(frameContext, e);
 	}, 0);
 }
 
@@ -1301,10 +1330,15 @@ function OnFocus_wysiwyg(frameContext, e) {
  * @param {Event} e - Event object
  */
 function OnBlur_wysiwyg(frameContext, e) {
-	if (this._inputFocus || this.editor._preventBlur || frameContext.get('isCodeView') || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return;
+	if (frameContext.get('isCodeView') || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return;
 
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;
+	this.triggerEvent('onNativeBlur', { frameContext, event: e });
+
+	if (this._inputFocus || this.editor._preventBlur) return;
+	this.editor._preventFocus = false;
+
 	if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
 	if (this.editor.isSubBalloon) this._hideToolbar_sub();
 
@@ -1319,10 +1353,7 @@ function OnBlur_wysiwyg(frameContext, e) {
 
 	this.history.check(frameContext.get('key'), this.status._range);
 
-	// user event
-	this.triggerEvent('onBlur', { frameContext, event: e });
-	// plugin event
-	this._callPluginEvent('onBlur', { frameContext, event: e });
+	this.__postBlurEvent(frameContext, e);
 }
 
 /**

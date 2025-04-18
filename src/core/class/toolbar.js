@@ -305,7 +305,7 @@ Toolbar.prototype = {
 	 * @param {?Range=} rangeObj - Selection range
 	 */
 	_showBalloon(rangeObj) {
-		if (!this._isBalloon || this.editor.opendControllers.length > 0) {
+		if (!this._isBalloon) {
 			return;
 		}
 		if (this.isSub) this.resetResponsiveToolbar();

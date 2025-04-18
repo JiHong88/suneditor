@@ -429,6 +429,7 @@ class Controller extends EditorInjector {
 		if (this.form.contains(eventTarget) || this._checkForm(eventTarget)) return;
 		if (this.editor._fileManager.pluginRegExp.test(this.kind) && !keyCodeMap.isEsc(keyCode)) return;
 
+		this.#PostCloseEvent(eventTarget);
 		this.close();
 	}
 
@@ -447,7 +448,17 @@ class Controller extends EditorInjector {
 			return;
 		}
 
+		this.#PostCloseEvent(eventTarget);
 		this.close(true);
+	}
+
+	/**
+	 * @param {HTMLElement} eventTarget - The target element that triggered the event.
+	 */
+	#PostCloseEvent(eventTarget) {
+		if (!this.editor.frameContext.get('wysiwyg').contains(eventTarget)) {
+			this.component.__prevent = false;
+		}
 	}
 }
 

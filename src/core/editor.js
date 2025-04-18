@@ -383,10 +383,16 @@ function Editor(multiTargets, options) {
 	this._notHideToolbar = false;
 
 	/**
-	 * @description Variables for controlling focus and blur events
+	 * @description Variables for controlling blur events
 	 * @type {boolean}
 	 */
 	this._preventBlur = false;
+
+	/**
+	 * @description Variables for controlling focus events
+	 * @type {boolean}
+	 */
+	this._preventFocus = false;
 
 	/**
 	 * @description Variables for controlling selection change events

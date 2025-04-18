@@ -407,7 +407,7 @@ window.editor_root = suneditor.create(
 	// 	}
 	// },
 	{
-		mode: "inline",
+		mode: 'inline',
 		// toolbar_width: 300,
 		// textDirection: 'rtl',
 		// value: 'Common value',
@@ -1321,8 +1321,14 @@ window.editor_root = suneditor.create(
 			onBlur() {
 				console.log('blur');
 			},
+			onNativeBlur() {
+				console.log('blurNative');
+			},
 			onFocus() {
 				console.log('focus');
+			},
+			onNativeFocus() {
+				console.log('focusNative');
 			},
 			onExportPDFBefore(params) {
 				console.log('pdfbefore', params);
