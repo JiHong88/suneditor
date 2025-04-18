@@ -108,10 +108,12 @@ class Controller extends EditorInjector {
 		if (this.editor.isBalloon) this.toolbar.hide();
 		else if (this.editor.isSubBalloon) this.subToolbar.hide();
 
-		if (disabled ?? this.disabled) {
-			this.ui.setControllerOnDisabledButtons(true);
-		} else {
-			this.ui.setControllerOnDisabledButtons(false);
+		if (!this.status.hasFocus) {
+			if (disabled ?? this.disabled) {
+				this.ui.setControllerOnDisabledButtons(true);
+			} else {
+				this.ui.setControllerOnDisabledButtons(false);
+			}
 		}
 
 		this.currentPositionTarget = positionTarget || target;

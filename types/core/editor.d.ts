@@ -333,10 +333,15 @@ declare class Editor {
 	 */
 	_notHideToolbar: boolean;
 	/**
-	 * @description Variables for controlling focus and blur events
+	 * @description Variables for controlling blur events
 	 * @type {boolean}
 	 */
 	_preventBlur: boolean;
+	/**
+	 * @description Variables for controlling focus events
+	 * @type {boolean}
+	 */
+	_preventFocus: boolean;
 	/**
 	 * @description Variables for controlling selection change events
 	 */

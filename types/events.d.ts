@@ -8,7 +8,9 @@ declare namespace _default {
 	let onKeyDown: any;
 	let onKeyUp: any;
 	let onFocus: any;
+	let onNativeFocus: any;
 	let onBlur: any;
+	let onNativeBlur: any;
 	let onCopy: any;
 	let onCut: any;
 	let onChange: any;

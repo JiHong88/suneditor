@@ -67,6 +67,7 @@ declare class Component {
 	_bindClose_touchstart: __se__GlobalEventInfo | void;
 	/** @type {boolean} */
 	__selectionSelected: boolean;
+	__prevent: boolean;
 	/**
 	 * @this {ComponentThis}
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)

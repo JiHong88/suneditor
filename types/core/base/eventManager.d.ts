@@ -382,4 +382,20 @@ declare class EventManager {
 	 * @param {*} range Range object
 	 */
 	__enterScrollTo(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, range: any): void;
+	/**
+	 * @private
+	 * @description Focus Event Postprocessing
+	 * @this {EventManagerThis}
+	 * @param {__se__FrameContext} frameContext - frame context object
+	 * @param {Event} event - Event object
+	 */
+	__postFocusEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: __se__FrameContext, event: Event): void;
+	/**
+	 * @private
+	 * @description Blur Event Postprocessing
+	 * @this {EventManagerThis}
+	 * @param {__se__FrameContext} frameContext - frame context object
+	 * @param {Event} event - Event object
+	 */
+	__postBlurEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: __se__FrameContext, event: Event): void;
 }
