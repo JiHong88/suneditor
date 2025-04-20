@@ -15,9 +15,10 @@ import { _DragHandle } from '../../../modules';
  * @param {DragEvent} e - Event object
  */
 export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar, e) {
-	e.preventDefault();
-
 	const { sc, so, ec, eo } = this.selection.getDragEventLocationRange(e);
+	if (!sc) return;
+
+	e.preventDefault();
 
 	const cursorRange = fc.get('_wd').createRange();
 	cursorRange.setStart(sc, so);
@@ -77,6 +78,7 @@ export function OnDrop_wysiwyg(fc, dragCursor, e) {
 		if (!dataTransfer) return true;
 
 		const { sc, so, ec, eo } = this.selection.getDragEventLocationRange(e);
+		if (!sc) return;
 
 		if (dom.query.getParentElement(sc, '.se-disable-pointer')) {
 			e.preventDefault();

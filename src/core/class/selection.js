@@ -333,14 +333,6 @@ Selection_.prototype = {
 			eo = r.endOffset;
 		}
 
-		if (!r) {
-			r = this.getRange();
-			sc = r.startContainer;
-			so = r.startOffset;
-			ec = r.endContainer;
-			eo = r.endOffset;
-		}
-
 		return {
 			sc,
 			so,
