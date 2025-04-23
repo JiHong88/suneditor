@@ -179,7 +179,7 @@ export function isContentLess(node) {
 export function isEmptyLine(node) {
 	if (!node?.parentNode) return true;
 	const el = /** @type {HTMLElement} */ (node);
-	return !el.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && el.children.length === 0 && check.isZeroWidth(el.textContent);
+	return !el.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && (el.children.length <= 1 || isBreak(el.firstElementChild)) && isZeroWidth(el.textContent);
 }
 
 /**

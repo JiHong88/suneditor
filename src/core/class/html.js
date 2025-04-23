@@ -1059,10 +1059,28 @@ HTML.prototype = {
 
 			const fc = this.editor.frameContext;
 			const renderHTML = dom.utils.createElement('DIV', null, this._convertToCode(fc.get('wysiwyg'), true));
-			const editableEls = dom.query.getListChildren(renderHTML, (current) => current.hasAttribute('contenteditable'));
+
+			const isTableCell = dom.check.isTableCell;
+			const isEmptyLine = dom.check.isEmptyLine;
+			const editableEls = [];
+			const emptyCells = [];
+			dom.query.getListChildren(renderHTML, (current) => {
+				if (current.hasAttribute('contenteditable')) {
+					editableEls.push(current);
+				}
+
+				const parent = current.parentElement;
+				if (isTableCell(parent) && parent.children.length <= 1 && isEmptyLine(current)) {
+					emptyCells.push(parent);
+				}
+				return false;
+			});
 
 			for (let j = 0, jlen = editableEls.length; j < jlen; j++) {
 				editableEls[j].removeAttribute('contenteditable');
+			}
+			for (let j = 0, jlen = emptyCells.length; j < jlen; j++) {
+				emptyCells[j].innerHTML = '<br>';
 			}
 
 			const content = renderHTML.innerHTML;
