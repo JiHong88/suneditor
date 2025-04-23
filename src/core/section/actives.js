@@ -32,6 +32,35 @@ const __RemoveCopyformt = function (ww, button) {
 };
 
 /**
+ * @private
+ * @description Finds the first and last child elements in a selection area.
+ * @param {Element} selectArea Selection area element
+ * @returns {{ first: Node, last: Node}} Object containing the first and last child elements
+ */
+const __findFirstAndLast = function (selectArea) {
+	const isContentLess = dom.check.isContentLess;
+	const isTable = dom.check.isTable;
+	const first =
+		dom.query.getEdgeChild(
+			dom.query.getEdgeChild(selectArea, (current) => !isContentLess(current), false),
+			(current) => {
+				return current.childNodes.length === 0 || current.nodeType === 3 || isTable(current);
+			},
+			false
+		) || selectArea.firstChild;
+	const last =
+		dom.query.getEdgeChild(
+			selectArea.lastChild,
+			(current) => {
+				return current.childNodes.length === 0 || current.nodeType === 3 || isTable(current);
+			},
+			true
+		) || selectArea.lastChild;
+
+	return { first, last };
+};
+
+/**
  * @description List of commands that trigger active event handling in the editor.
  * - These commands typically apply inline formatting or structural changes.
  * @constant {string[]}
@@ -77,39 +106,35 @@ export function SELECT_ALL(editor) {
 	// select all
 	const scopeTagList = scopeSelectionTags.filter((tagName) => tagName !== prevScopeTagName);
 	const scopeBaseTag = dom.query.getParentElement(prevScopeTag || editor.selection.getNode(), (current) => scopeTagList.includes(current.nodeName?.toLowerCase()));
-	const selectArea = scopeBaseTag || ww;
 
-	let first =
-		dom.query.getEdgeChild(
-			dom.query.getEdgeChild(selectArea, (current) => !dom.check.isContentLess(current), false),
-			(current) => {
-				return current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current);
-			},
-			false
-		) || selectArea.firstChild;
-	let last =
-		dom.query.getEdgeChild(
-			selectArea.lastChild,
-			(current) => {
-				return current.childNodes.length === 0 || current.nodeType === 3 || dom.check.isTable(current);
-			},
-			true
-		) || selectArea.lastChild;
+	let selectArea = scopeBaseTag || ww;
+	let { first, last } = __findFirstAndLast(selectArea);
 
 	if (!first || !last) return;
 
-	if (dom.check.isMedia(first) || editor.component.is(first.parentElement) || dom.check.isTableElements(first)) {
-		const info = editor.component.get(first) || editor.component.get(first.parentElement);
+	const isZeroWidth = dom.check.isZeroWidth;
+	while (isZeroWidth(first) && isZeroWidth(last) && selectArea !== ww) {
+		selectArea = selectArea.parentElement;
+		({ first, last } = __findFirstAndLast(dom.query.getParentElement(selectArea, (current) => scopeTagList.includes(current.nodeName?.toLowerCase())) || ww));
+	}
+
+	if (!first || !last) return;
+
+	let info = null;
+	if (dom.check.isMedia(first) || (info = editor.component.get(first.parentElement)) || dom.check.isTableElements(first)) {
 		const br = dom.utils.createElement('BR');
 		const format = dom.utils.createElement(editor.options.get('defaultLine'), null, br);
 		first = info ? info.container || info.cover : first;
-		first.parentNode.insertBefore(format, first);
+		first.parentElement.insertBefore(format, first);
 		first = br;
 	}
 
-	if (dom.check.isMedia(last) || editor.component.is(last.parentElement) || dom.check.isTableElements(last)) {
-		last = dom.utils.createElement('BR');
-		selectArea.appendChild(dom.utils.createElement(editor.options.get('defaultLine'), null, last));
+	if (dom.check.isMedia(last) || (info = editor.component.get(last.parentElement)) || dom.check.isTableElements(last)) {
+		const br = dom.utils.createElement('BR');
+		const format = dom.utils.createElement(editor.options.get('defaultLine'), null, br);
+		last = info ? info.container || info.cover : last;
+		last.parentElement.appendChild(format);
+		last = br;
 	}
 
 	editor.toolbar._showBalloon(editor.selection.setRange(first, 0, last, last.textContent.length));
