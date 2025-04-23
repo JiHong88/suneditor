@@ -500,13 +500,13 @@ EventManager.prototype = {
 		const sIsCell = dom.check.isTableCell(sCell);
 		const eIsCell = dom.check.isTableCell(eCell);
 		if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
-			const ancestor = dom.query.getParentElement(range.commonAncestorContainer, dom.check.isFigure) || range.commonAncestorContainer;
+			const ancestor = dom.query.getParentElement(range.commonAncestorContainer, dom.check.isFigure)?.parentElement || range.commonAncestorContainer;
 			if (!sIsCell) {
-				dom.utils.removeItem(dom.query.getParentElement(eCell, (current) => ancestor === current));
+				dom.utils.removeItem(dom.query.getParentElement(eCell, (current) => ancestor === current.parentNode));
 			} else if (!eIsCell) {
-				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current));
+				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current.parentNode));
 			} else {
-				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current));
+				dom.utils.removeItem(dom.query.getParentElement(sCell, (current) => ancestor === current.parentNode));
 				this.editor._nativeFocus();
 				return true;
 			}
