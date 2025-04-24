@@ -37,8 +37,18 @@
 	--se-statusbar-font-color: #666;
 	--se-overlay-background-color: #222;
 
-	/* hover, active */
+	/* hover */
+	--se-hover-color: #000;
+	--se-hover-dark-color: #cccccc;
+	--se-hover-dark2-color: #bfbfbf;
+	--se-hover-dark3-color: #b0b0b0;
+	--se-hover-light-color: #e1e1e1;
+	--se-hover-light2-color: #e6e6e6;
+	--se-hover-light3-color: #d9d9d9;
+
+	/* active */
 	--se-active-color: #5cd2e6;
+	--se-active-hover-color: #2964b7;
 	--se-active-dark-color: #80bdff;
 	--se-active-dark2-color: #407dd1;
 	--se-active-dark3-color: #4592ff;

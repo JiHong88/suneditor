@@ -407,7 +407,7 @@ window.editor_root = suneditor.create(
 	// 	}
 	// },
 	{
-		mode: 'inline',
+		// mode: 'inline',
 		// toolbar_width: 300,
 		// textDirection: 'rtl',
 		// value: 'Common value',
@@ -797,7 +797,7 @@ window.editor_root = suneditor.create(
 			image: ['c+73', 'I'],
 			list: ['c+76', 'L']
 		},
-		theme: 'dark',
+		// theme: 'dark',
 		math: {
 			// katex: {
 			// 	src: Katex

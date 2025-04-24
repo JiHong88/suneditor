@@ -257,16 +257,17 @@
 
 .sun-editor .se-btn:not(.on):not(.active):enabled:hover,
 .sun-editor .se-btn:not(.on):not(.active):enabled:focus {
-	background-color: var(--se-main-divider-color);
-	border-color: var(--se-main-border-color);
+	color: var(--se-hover-color);
+	background-color: var(--se-hover-light-color);
+	border-color: var(--se-hover-dark-color);
 }
 
 .sun-editor .se-btn:not(.on):not(.active):enabled:active,
 .sun-editor .se-btn:not(.on):not(.active):enabled.__se__active {
-	background-color: var(--se-main-shadow-color);
-	border-color: var(--se-main-shadow-color) !important;
-	outline: 1px solid var(--se-main-outline-color) !important;
-	box-shadow: 0 0 0 0.3rem var(--se-main-shadow-color);
+	background-color: var(--se-hover-light2-color);
+	border-color: var(--se-hover-dark2-color) !important;
+	outline: 1px solid var(--se-hover-dark3-color) !important;
+	box-shadow: 0 0 0 0.3rem var(--se-hover-light2-color);
 	transition: box-shadow 0.1s ease-in-out;
 }
 
@@ -278,7 +279,7 @@
 .sun-editor .se-menu-list li:hover .se-btn-input input:enabled {
 	border-width: 1px;
 	border-style: solid;
-	border-color: var(--se-main-divider-color);
+	border-color: var(--se-hover-light3-color);
 }
 
 /* after, before button - on, active */
@@ -328,7 +329,7 @@
 .sun-editor .se-btn:enabled.on:hover,
 .sun-editor .se-btn:enabled.on:focus {
 	background-color: var(--se-active-light3-color);
-	color: var(--se-active-dark2-color);
+	color: var(--se-active-hover-color);
 	border-color: var(--se-active-light5-color);
 }
 
@@ -353,14 +354,14 @@
 .sun-editor .se-btn:enabled.active:hover,
 .sun-editor .se-btn:enabled.active:focus {
 	background-color: var(--se-active-light5-color);
-	color: var(--se-active-dark5-color);
+	color: var(--se-active-hover-color);
 	border-color: var(--se-active-dark4-color);
 }
 
 .sun-editor .se-btn:enabled.active:active,
 .sun-editor .se-btn:enabled.active.__se__active {
 	background-color: var(--se-active-light5-color);
-	color: var(--se-active-dark5-color);
+	color: var(--se-active-hover-color);
 	border-color: var(--se-active-dark5-color) !important;
 	outline: 1px solid var(--se-active-dark5-color) !important;
 	box-shadow: 0 0 0 0.3rem var(--se-active-light5-color);
@@ -2849,7 +2850,7 @@
 	background-color: var(--se-active-light4-color);
 	border-color: var(--se-active-light4-color) !important;
 	outline: 1px solid var(--se-active-color) !important;
-	box-shadow: inset 2px 2px 5px var(--se-active-light6-color), inset -2px -2px 5px var(--se-active-light-color);
+	box-shadow: none;
 	transition: background-color 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
 }
 
