@@ -7312,7 +7312,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (range.startContainer !== range.endContainer) core.removeNode();
 
                         let next = util.getArrayItem(formatEl.children, util.isList, false);
-                        next = next || formatEl.nextElementSibling || rangeEl.parentNode.nextElementSibling;
+                        next = next || formatEl.nextElementSibling || (rangeEl.parentNode ? rangeEl.parentNode.nextElementSibling : null);
                         if (next && (util.isList(next) || util.getArrayItem(next.children, util.isList, false))) {
                             e.preventDefault();
 
