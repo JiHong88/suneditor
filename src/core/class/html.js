@@ -1600,6 +1600,10 @@ HTML.prototype = {
 				value += '<!-- ' + n.textContent + ' -->';
 			} else if (!/meta/i.test(n.nodeName) && !this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !dom.check.isExcludeFormat(n)) {
 				if (!f) f = dom.utils.createElement(this.options.get('defaultLine'));
+				if (this.format.isTextStyleNode(n)) {
+					/** @type {HTMLElement} */
+					(n).removeAttribute('style');
+				}
 				f.appendChild(n);
 				i--;
 				len--;
