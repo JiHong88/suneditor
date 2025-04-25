@@ -5416,6 +5416,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     value += '<!-- ' + n.textContent + ' -->';
                 } else if (!util.isFormatElement(n) && !util.isRangeFormatElement(n) && !util.isComponent(n) && !/meta/i.test(n.nodeName)) {
                     if (!f) f = util.createElement(options.defaultTag);
+                    if (util.isTextStyleElement(n)) {
+                        (n).removeAttribute('style');
+                    }
                     f.appendChild(n);
                     i--; len--;
                 } else {
