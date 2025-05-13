@@ -1,5 +1,5 @@
 import { env, converter, dom, numbers } from '../helper';
-import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, OPTION_FIXED_FLAG } from './section/constructor';
+import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG } from './section/constructor';
 import { UpdateStatusbarContext } from './section/context';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
 import History from './base/history';
@@ -777,20 +777,27 @@ Editor.prototype = {
 		if (newOptionKeys.length === 0) return;
 
 		// option merge
+		const frameKeys = Object.keys(OPTION_FRAME_FIXED_FLAG);
 		const rootDiff = {};
 		const rootKeys = this.rootKeys;
 		const frameRoots = this.frameRoots;
+		const isSingleRoot = rootKeys.length === 1;
+		const singleOption = {};
+
 		const newRoots = [];
-		const newRootKeys = {};
+		const newRootKeys = new Map();
 		this._originOptions = [newOptions, this._originOptions].reduce(function (init, option) {
 			for (const key in option) {
-				if (rootKeys.includes(key) && option[key]) {
+				if (isSingleRoot && frameKeys.includes(key)) {
+					singleOption[key] = option[key];
+				} else if (rootKeys.includes(key) && option[key]) {
 					const nro = option[key];
 					const newKeys = _keys(nro);
 					CheckResetKeys(newKeys, null, key + '.');
 					if (newKeys.length === 0) continue;
 
 					rootDiff[key] = new Map();
+					/** @type {Array.<*>} */
 					const o = frameRoots.get(key).get('options').get('_origin');
 					for (const rk in nro) {
 						const roV = nro[rk];
@@ -798,7 +805,8 @@ Editor.prototype = {
 						rootDiff[key].set(GetResetDiffKey(rk), true);
 						o[rk] = roV;
 					}
-					newRoots.push((newRootKeys[key] = { options: o }));
+					newRootKeys.set(key, { options: o });
+					newRoots.push({ key: newRootKeys.get(key) });
 				} else {
 					init[key] = option[key];
 				}
@@ -806,16 +814,22 @@ Editor.prototype = {
 			return init;
 		}, {});
 
+		if (newRoots.length === 0) {
+			newRoots.push({ target: null, key: null, options: singleOption });
+			newRootKeys.set(null, { options: singleOption });
+		}
+
 		// init options
 		const options = this.options;
-		const newMap = InitOptions(this._originOptions, newRoots, this.plugins).o;
+		const newO = InitOptions(this._originOptions, newRoots, this.plugins);
+		const newOptionMap = newO.o;
 		/** --------- root start --------- */
 		for (let i = 0, k; (k = newOptionKeys[i]); i++) {
-			if (newRootKeys[k]) {
+			if (newRootKeys.get(k)) {
 				const diff = rootDiff[k];
 				const fc = frameRoots.get(k);
 				const originOptions = fc.get('options');
-				const newRootOptions = newRootKeys[k].options;
+				const newRootOptions = newRootKeys.get(k).options;
 
 				// statusbar
 				if (diff.has('statusbar')) {
@@ -867,7 +881,7 @@ Editor.prototype = {
 			}
 			/** --------- root end --------- */
 
-			options.set(k, newMap.get(k));
+			options.set(k, newOptionMap.get(k));
 
 			/** apply option */
 			// history delay time
@@ -1450,7 +1464,7 @@ Editor.prototype = {
 
 	/**
 	 * @private
-	 * @description Caches shortcut keys for commands.
+	 * @description Caches custom(starts with "_") shortcut keys for commands.
 	 */
 	__cachingShortcuts() {
 		const shortcuts = this.options.get('shortcuts');
@@ -1703,7 +1717,7 @@ function GetResetDiffKey(key) {
 function CheckResetKeys(keys, plugins, root) {
 	for (let i = 0, len = keys.length, k; i < len; i++) {
 		k = keys[i];
-		if (OPTION_FIXED_FLAG[k] === 'fixed' || (plugins && plugins[k])) {
+		if (OPTION_FIXED_FLAG[k] === 'fixed' || OPTION_FRAME_FIXED_FLAG[k] === 'fixed' || (plugins && plugins[k])) {
 			console.warn(`[SUNEDITOR.warn.resetOptions] "[${root + k}]" options not available in resetOptions have no effect.`);
 			keys.splice(i--, 1);
 			len--;
