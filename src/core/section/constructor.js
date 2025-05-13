@@ -224,15 +224,16 @@ const RETAIN_STYLE_MODE = ['repeat', 'always', 'none'];
  * @typedef {EditorBaseOptions & EditorFrameOptions} EditorInitOptions
  */
 
+/** ------------- [OPTIONS FRAG] ------------- */
 /**
  * @description For all EditorInitOptions keys, only boolean | null values are allowed.
  * - 'fixed' → Immutable / null → Resettable.
  * @type {Partial<Record<keyof EditorInitOptions, "fixed" | true>>}
  */
-export const OPTION_FIXED_FLAG = {
+export const OPTION_FRAME_FIXED_FLAG = {
 	value: 'fixed',
 	placeholder: 'fixed',
-	editableFrameAttributes: null,
+	editableFrameAttributes: true,
 	width: null,
 	minWidth: null,
 	maxWidth: null,
@@ -250,7 +251,14 @@ export const OPTION_FIXED_FLAG = {
 	charCounter: null,
 	charCounter_max: null,
 	charCounter_label: null,
-	charCounter_type: null,
+	charCounter_type: null
+};
+/**
+ * @description For all EditorInitOptions keys, only boolean | null values are allowed.
+ * - 'fixed' → Immutable / null → Resettable.
+ * @type {Partial<Record<keyof EditorInitOptions, "fixed" | true>>}
+ */
+export const OPTION_FIXED_FLAG = {
 	plugins: null,
 	excludedPlugins: null,
 	buttonList: 'fixed',
@@ -574,13 +582,16 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 		plugin = null;
 		method = a[a.length - 1].trim?.();
 		if (method.startsWith('~')) {
+			// plugin key, method
 			plugin = command;
 			method = a.pop().trim().substring(1);
-		} else if (method.startsWith('p~')) {
+		} else if (method.startsWith('$~')) {
+			// custom key, plugin method
 			const a_ = a.pop().trim().substring(2).split('.');
 			plugin = a_[0];
 			method = a_[1];
 		} else if (method.startsWith('$')) {
+			// directly method
 			_i = 1;
 			method = values[i + 2];
 		} else {
@@ -613,13 +624,16 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 			}
 		}
 
-		k = c ? v + (s ? '1000' : '') : v;
-		if (!keyMap.has(k)) {
-			r = rc.indexOf(command);
-			r = r === -1 ? '' : numbers.isOdd(r) ? rc[r + 1] : rc[r - 1];
-			if (r) reverseKeys.push(k);
+		v = v.split('|');
+		for (let j = 0, len = v.length; j < len; j++) {
+			k = c ? v[j] + (s ? '1000' : '') : v[j];
+			if (!keyMap.has(k)) {
+				r = rc.indexOf(command);
+				r = r === -1 ? '' : numbers.isOdd(r) ? rc[r + 1] : rc[r - 1];
+				if (r) reverseKeys.push(k);
 
-			keyMap.set(k, { c, s, edge, space, enter, textTrigger, plugin, command, method, r, type: button?.getAttribute('data-type'), button, key: k });
+				keyMap.set(k, { c, s, edge, space, enter, textTrigger, plugin, command, method, r, type: button?.getAttribute('data-type'), button, key: k });
+			}
 		}
 
 		if (!(t = values[i + 1])) continue;
@@ -926,9 +940,9 @@ export function InitOptions(options, editorTargets, plugins) {
 					list_numbered: ['!+1.+_+~shortcut', ''],
 					list_bulleted: ['!+*.+_+~shortcut', ''],
 					// custom
-					_h1: ['c+s+Digit1+p~formatBlock.createHeader', ''],
-					_h2: ['c+s+Digit2+p~formatBlock.createHeader', ''],
-					_h3: ['c+s+Digit3+p~formatBlock.createHeader', '']
+					_h1: ['c+s+Digit1|Numpad1+$~formatBlock.applyHeaderByShortcut', ''],
+					_h2: ['c+s+Digit2|Numpad2+$~formatBlock.applyHeaderByShortcut', ''],
+					_h3: ['c+s+Digit3|Numpad3+$~formatBlock.applyHeaderByShortcut', '']
 				},
 				options.shortcuts || {}
 		  ].reduce((_default, _new) => {

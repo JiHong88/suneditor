@@ -1,15 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
-const HEADER_KEYCODE = new Map([
-	['Digit1', 'h1'],
-	['Digit2', 'h2'],
-	['Digit3', 'h3'],
-	['Digit4', 'h4'],
-	['Digit5', 'h5'],
-	['Digit6', 'h6']
-]);
-
 /**
  * @class
  * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
@@ -125,12 +116,12 @@ class FormatBlock extends EditorInjector {
 
 	/**
 	 * @description Create a header tag, call by "shortcut" class
-	 * - (e.g. shortcuts._h1: ['c+s+49+p~formatBlock.createHeader', ''])
+	 * - (e.g. shortcuts._h1: ['c+s+49+$~formatBlock.applyHeaderByShortcut', ''])
 	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	createHeader({ keyCode }) {
-		const headerName = HEADER_KEYCODE.get(keyCode);
-		const tag = dom.utils.createElement(headerName);
+	applyHeaderByShortcut({ keyCode }) {
+		const headerNum = keyCode.match(/\d+$/)?.[0];
+		const tag = dom.utils.createElement(`H${headerNum}`);
 		this.format.setLine(tag);
 	}
 }

@@ -167,6 +167,7 @@ Toolbar.prototype = {
 		this.editor.commandTargets = new Map();
 		this.editor.shortcutsKeyMap = new Map();
 		this.editor.__saveCommandButtons(cmdButtons, newToolbar.buttonTray);
+		this.editor.__cachingShortcuts();
 
 		this.context.get(this.keyName + '.main').replaceChild(newToolbar.buttonTray, this.context.get(this.keyName + '.buttonTray'));
 		this.context.set(this.keyName + '.buttonTray', newToolbar.buttonTray);

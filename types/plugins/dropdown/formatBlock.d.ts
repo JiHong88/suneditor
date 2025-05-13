@@ -46,9 +46,9 @@ declare class FormatBlock extends EditorInjector {
 	action(target: HTMLElement): void;
 	/**
 	 * @description Create a header tag, call by "shortcut" class
-	 * - (e.g. shortcuts._h1: ['c+s+49+p~formatBlock.createHeader', ''])
+	 * - (e.g. shortcuts._h1: ['c+s+49+$~formatBlock.applyHeaderByShortcut', ''])
 	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	createHeader({ keyCode }: __se__PluginShortcutInfo): void;
+	applyHeaderByShortcut({ keyCode }: __se__PluginShortcutInfo): void;
 }
 import EditorInjector from '../../editorInjector';
