@@ -768,11 +768,10 @@ Editor.prototype = {
 	 * @param {EditorInitOptions_editor} newOptions Options
 	 */
 	resetOptions(newOptions) {
-		const _keys = Object.keys;
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
 
-		const newOptionKeys = _keys(newOptions);
+		const newOptionKeys = Object.keys(newOptions);
 		CheckResetKeys(newOptionKeys, this.plugins, '');
 		if (newOptionKeys.length === 0) return;
 
@@ -781,43 +780,23 @@ Editor.prototype = {
 		const rootDiff = {};
 		const rootKeys = this.rootKeys;
 		const frameRoots = this.frameRoots;
-		const isSingleRoot = rootKeys.length === 1;
-		const singleOption = {};
 
 		const newRoots = [];
 		const newRootKeys = new Map();
+		let isSingleRoot = rootKeys.length === 1;
 		this._originOptions = [newOptions, this._originOptions].reduce(function (init, option) {
 			for (const key in option) {
 				if (isSingleRoot && frameKeys.includes(key)) {
-					singleOption[key] = option[key];
+					RestoreFrameOptions(null, { null: option }, frameRoots, rootDiff, newRootKeys, newRoots);
+					isSingleRoot = false;
 				} else if (rootKeys.includes(key) && option[key]) {
-					const nro = option[key];
-					const newKeys = _keys(nro);
-					CheckResetKeys(newKeys, null, key + '.');
-					if (newKeys.length === 0) continue;
-
-					rootDiff[key] = new Map();
-					/** @type {Array.<*>} */
-					const o = frameRoots.get(key).get('options').get('_origin');
-					for (const rk in nro) {
-						const roV = nro[rk];
-						if (!newKeys.includes(rk) || o[rk] === roV) continue;
-						rootDiff[key].set(GetResetDiffKey(rk), true);
-						o[rk] = roV;
-					}
-					newRootKeys.set(key, { options: o });
-					newRoots.push({ key: newRootKeys.get(key) });
+					RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots);
 				} else {
 					init[key] = option[key];
 				}
 			}
 			return init;
 		}, {});
-
-		if (newRoots.length === 0) {
-			newRoots.push({ target: null, key: null, options: singleOption });
-			newRootKeys.set(null, { options: singleOption });
-		}
 
 		// init options
 		const options = this.options;
@@ -1708,6 +1687,25 @@ Editor.prototype = {
 
 	Constructor: Editor
 };
+
+function RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots) {
+	const nro = option[key];
+	const newKeys = Object.keys(nro);
+	CheckResetKeys(newKeys, null, key + '.');
+	if (newKeys.length === 0) return false;
+
+	rootDiff[key] = new Map();
+	/** @type {Array.<*>} */
+	const o = frameRoots.get(key).get('options').get('_origin');
+	for (const rk in nro) {
+		const roV = nro[rk];
+		if (!newKeys.includes(rk) || o[rk] === roV) return false;
+		rootDiff[key].set(GetResetDiffKey(rk), true);
+		o[rk] = roV;
+	}
+	newRootKeys.set(key, { options: o });
+	newRoots.push({ key: newRootKeys.get(key) });
+}
 
 function GetResetDiffKey(key) {
 	if (/^statusbar/i.test(key)) return 'statusbar';
