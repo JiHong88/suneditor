@@ -7,8 +7,8 @@ import { dom, env, numbers, unicode, keyCodeMap, converter } from '../../helper'
 import { Figure, _DragHandle } from '../../modules';
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
-const DIR_KEYCODE = /^(3[7-9]|40)$/;
-const DIR_UP_KEYCODE = /^3[7-8]$/;
+const DIR_KEYCODE = /^Arrow(Left|Up|Right|Down)$/;
+const DIR_UP_KEYCODE = /^Arrow(Left|Up)$/;
 
 /**
  * @typedef {Omit<Component & Partial<__se__EditorInjector>, 'component'>} ComponentThis
