@@ -266,7 +266,7 @@ export const OPTION_FIXED_FLAG = {
 	strictMode: null,
 	mode: 'fixed',
 	type: 'fixed',
-	theme: null,
+	theme: true,
 	lang: 'fixed',
 	fontSizeUnits: 'fixed',
 	allowedClassName: null,
@@ -1129,6 +1129,7 @@ function InitFrameOptions(o, origin) {
 	fo.set('height', height ? (numbers.is(height) ? height + 'px' : height) : 'auto');
 	fo.set('minHeight', (numbers.is(minHeight) ? minHeight + 'px' : minHeight) || '');
 	fo.set('maxHeight', (numbers.is(maxHeight) ? maxHeight + 'px' : maxHeight) || '');
+	fo.set('editorStyle', editorStyle);
 	fo.set('_defaultStyles', converter._setDefaultOptionStyle(fo, typeof editorStyle === 'string' ? editorStyle : ''));
 	// iframe
 	fo.set('iframe', !!(iframe_fullPage || iframe));

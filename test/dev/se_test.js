@@ -343,71 +343,72 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // });
 
 window.editor_root = suneditor.create(
-	document.querySelector('#multi_editor_1'),
-	// {
-	// 	editor1: {
-	// 		target: document.querySelector('#multi_editor_1'),
-	// 		options: {
-	// 			value: `
-	// 			<p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
-
-	// 			<p>ed1</p>
-
-	// 			<hr class="__se__solid">
-
-	// 			<p><br>
-	// 			</p>
-
-	// 			<p>ed2</p>
-
-	// 			<div class="se-component se-image-container __se__float-none">
-	// 			<figure>
-	// 				<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
-	// 			</figure>
-	// 			</div>
-
-	// 			<p>ed3</p>
-
-	// 			<p>ed4</p>
-
-	// 			<p>edend--</p>
-
-	// 			<div>					</div>
-
-	// 			`,
-	// 			placeholder: 'place1',
-	// 			height: '400px',
-	// 			width: '500px',
-	// 			iframe: true,
-	// 			// iframe_fullPage: true,
-	// 			statusbar: true,
-	// 			statusbar_resizeEnable: true
-	// 		}
-	// 	},
-	// 	editor2: {
-	// 		target: document.querySelector('#multi_editor_2'),
-	// 		options: {
-	// 			value: '<p>ed2</p>',
-	// 			placeholder: 'place21'
-	// 		}
-	// 	},
-	// 	editor3: {
-	// 		target: document.querySelector('#multi_editor_3'),
-	// 		options: {
-	// 			value: '<p>ed3</p>',
-	// 			placeholder: 'place3'
-	// 		}
-	// 	},
-	// 	editor4: {
-	// 		target: document.querySelector('#multi_editor_4'),
-	// 		options: {
-	// 			// value: '<p>ed4</p>',
-	// 			placeholder: 'place4'
-	// 		}
-	// 	}
-	// },
+	// document.querySelector('#multi_editor_1'),
 	{
-		// mode: 'inline',
+		editor1: {
+			target: document.querySelector('#multi_editor_1'),
+			options: {
+				// value: `
+				// <p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+
+				// <p>ed1</p>
+
+				// <hr class="__se__solid">
+
+				// <p><br>
+				// </p>
+
+				// <p>ed2</p>
+
+				// <div class="se-component se-image-container __se__float-none">
+				// <figure>
+				// 	<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
+				// </figure>
+				// </div>
+
+				// <p>ed3</p>
+
+				// <p>ed4</p>
+
+				// <p>edend--</p>
+
+				// <div>					</div>
+
+				// `,
+				placeholder: 'place1',
+				height: '400px',
+				width: '500px',
+				iframe: true,
+				// iframe_fullPage: true,
+				statusbar: true,
+				statusbar_resizeEnable: true
+			}
+		},
+		editor2: {
+			target: document.querySelector('#multi_editor_2'),
+			options: {
+				value: '<p>ed2</p>',
+				placeholder: 'place21'
+			}
+		},
+		editor3: {
+			target: document.querySelector('#multi_editor_3'),
+			options: {
+				value: '<p>ed3</p>',
+				placeholder: 'place3'
+			}
+		},
+		editor4: {
+			target: document.querySelector('#multi_editor_4'),
+			options: {
+				// value: '<p>ed4</p>',
+				placeholder: 'place4'
+			}
+		}
+	},
+	{
+		mode: 'inline',
+		// editorStyle: 'height:100px',
 		// toolbar_width: 300,
 		// textDirection: 'rtl',
 		// value: 'Common value',
@@ -1192,6 +1193,7 @@ window.editor_root = suneditor.create(
     <a href="http://localhost:3000/editor/files/download/public/files/d41d8cd98f00b204e9800998ecf8427e.html" title="xsOiDurC.html" download="xsOiDurC.html" data-se-file-download="" contenteditable="false" data-se-non-focus="true" data-se-non-link="true" data-se-file-name="xsOiDurC.html" data-se-file-size="0" name="xsOiDurC.html" data-se-index="0">xsOiDurC.html</a>
   </figure>
 </div>`,
+		value: '',
 		link: {
 			uploadUrl: 'http://localhost:3000/editor/files/upload',
 			relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],

@@ -269,8 +269,9 @@ export function nodeListToArray(nodeList) {
 export function swapKeyValue(obj) {
 	const swappedObj = {};
 
+	const hasOwn = Object.prototype.hasOwnProperty;
 	for (const key in obj) {
-		if (Object.prototype.hasOwnProperty.call(obj, key)) {
+		if (hasOwn.call(obj, key)) {
 			swappedObj[obj[key]] = key;
 		}
 	}

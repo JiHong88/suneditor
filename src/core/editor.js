@@ -775,21 +775,28 @@ Editor.prototype = {
 		CheckResetKeys(newOptionKeys, this.plugins, '');
 		if (newOptionKeys.length === 0) return;
 
-		// option merge
-		const frameKeys = Object.keys(OPTION_FRAME_FIXED_FLAG);
-		const rootDiff = {};
-		const rootKeys = this.rootKeys;
+		const rootDiff = new Map();
 		const frameRoots = this.frameRoots;
-
 		const newRoots = [];
 		const newRootKeys = new Map();
-		let isSingleRoot = rootKeys.length === 1;
-		this._originOptions = [newOptions, this._originOptions].reduce(function (init, option) {
+
+		// single root
+		if (frameRoots.size === 1) {
+			newOptionKeys.unshift(null);
+
+			const nullRoot = {};
+			for (const k in newOptions) {
+				if (OPTION_FRAME_FIXED_FLAG[k] === undefined) continue;
+				nullRoot[k] = newOptions[k];
+				delete newOptions[k];
+			}
+			newOptions[''] = nullRoot;
+		}
+
+		// option merge
+		const _originOptions = [this._originOptions, newOptions].reduce((init, option) => {
 			for (const key in option) {
-				if (isSingleRoot && frameKeys.includes(key)) {
-					RestoreFrameOptions(null, { null: option }, frameRoots, rootDiff, newRootKeys, newRoots);
-					isSingleRoot = false;
-				} else if (rootKeys.includes(key) && option[key]) {
+				if (frameRoots.has(key || null)) {
 					RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots);
 				} else {
 					init[key] = option[key];
@@ -800,15 +807,21 @@ Editor.prototype = {
 
 		// init options
 		const options = this.options;
-		const newO = InitOptions(this._originOptions, newRoots, this.plugins);
+		const newO = InitOptions(_originOptions, newRoots, this.plugins);
 		const newOptionMap = newO.o;
-		/** --------- root start --------- */
-		for (let i = 0, k; (k = newOptionKeys[i]); i++) {
-			if (newRootKeys.get(k)) {
-				const diff = rootDiff[k];
+		const newFrameMap = newO.frameMap;
+		/** --------- [root start] --------- */
+		for (let i = 0, len = newOptionKeys.length, k; i < len; i++) {
+			k = newOptionKeys[i] || null;
+
+			if (newRootKeys.has(k)) {
+				const diff = rootDiff.get(k);
 				const fc = frameRoots.get(k);
 				const originOptions = fc.get('options');
-				const newRootOptions = newRootKeys.get(k).options;
+				const newRootOptions = newFrameMap.get(k);
+
+				// --- set options : fc ---
+				fc.set('options', newRootOptions);
 
 				// statusbar
 				if (diff.has('statusbar')) {
@@ -833,6 +846,7 @@ Editor.prototype = {
 					for (const origin_k in originAttr) frame.removeAttribute(origin_k, originAttr[origin_k]);
 					for (const new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
 				}
+
 				if (diff.has('iframe_cssFileName')) {
 					const docHead = fc.get('_wd').head;
 					const links = docHead.getElementsByTagName('link');
@@ -843,11 +857,8 @@ Editor.prototype = {
 					while (newLinks[0]) docHead.insertBefore(newLinks[0], sTag);
 				}
 
-				// --- options set ---
-				fc.set('options', newRootOptions);
-
 				// frame styles
-				this.ui.setEditorStyle(newRootOptions.get('_defaultStyles'), fc);
+				this.ui.setEditorStyle(newRootOptions.get('editorStyle'), fc);
 
 				// frame attributes
 				const frame = fc.get('wysiwyg');
@@ -858,8 +869,9 @@ Editor.prototype = {
 
 				continue;
 			}
-			/** --------- root end --------- */
+			/** --------- [root end] --------- */
 
+			//  --- set options ---
 			options.set(k, newOptionMap.get(k));
 
 			/** apply option */
@@ -873,9 +885,17 @@ Editor.prototype = {
 				this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
 				continue;
 			}
+			// theme
+			if (k === 'theme') {
+				this.ui.setTheme(options.get('theme'));
+				continue;
+			}
 		}
 
 		/** apply options */
+		// _origin
+		this._originOptions = _originOptions;
+
 		// toolbar
 		const toolbar = this.context.get('toolbar.main');
 		// width
@@ -1694,17 +1714,23 @@ function RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, new
 	CheckResetKeys(newKeys, null, key + '.');
 	if (newKeys.length === 0) return false;
 
-	rootDiff[key] = new Map();
-	/** @type {Array.<*>} */
-	const o = frameRoots.get(key).get('options').get('_origin');
+	const rootKey = key || null;
+	rootDiff.set(rootKey, new Map());
+
+	const o = frameRoots.get(rootKey).get('options').get('_origin');
+	const no = {};
+	const hasOwn = Object.prototype.hasOwnProperty;
 	for (const rk in nro) {
+		if (!hasOwn.call(OPTION_FRAME_FIXED_FLAG, rk)) continue;
 		const roV = nro[rk];
 		if (!newKeys.includes(rk) || o[rk] === roV) return false;
-		rootDiff[key].set(GetResetDiffKey(rk), true);
-		o[rk] = roV;
+		rootDiff.get(rootKey).set(GetResetDiffKey(rk), true);
+		no[rk] = roV;
 	}
-	newRootKeys.set(key, { options: o });
-	newRoots.push({ key: newRootKeys.get(key) });
+
+	const newO = { ...o, ...no };
+	newRootKeys.set(rootKey, new Map(Object.entries(newO)));
+	newRoots.push({ key: rootKey, options: newO });
 }
 
 function GetResetDiffKey(key) {
@@ -1716,7 +1742,7 @@ function CheckResetKeys(keys, plugins, root) {
 	for (let i = 0, len = keys.length, k; i < len; i++) {
 		k = keys[i];
 		if (OPTION_FIXED_FLAG[k] === 'fixed' || OPTION_FRAME_FIXED_FLAG[k] === 'fixed' || (plugins && plugins[k])) {
-			console.warn(`[SUNEDITOR.warn.resetOptions] "[${root + k}]" options not available in resetOptions have no effect.`);
+			console.warn(`[SUNEDITOR.warn.resetOptions] The "[${root + k}]" option cannot be changed after the editor is created.`);
 			keys.splice(i--, 1);
 			len--;
 		}

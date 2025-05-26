@@ -38,7 +38,7 @@ declare class UI {
 	_toastToggle: number;
 	/**
 	 * @this {UIThis}
-	 * @description Set "options.get('editorStyle')" style.
+	 * @description set editor frame styles.
 	 * - Define the style of the edit area
 	 * - It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param {string} style Style string
