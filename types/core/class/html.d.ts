@@ -419,4 +419,12 @@ declare class HTML {
 	 * @returns {Node} The cleaned node with redundant styles removed.
 	 */
 	_dupleCheck(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, oNode: Node, parentNode: Node): Node;
+	/**
+	 * @private
+	 * @this {HTMLThis}
+	 * @description Reset autoStyleify options.
+	 * @param {Array.<string>} autoStyleify Styles applied automatically on text input.
+	 * - ex ["bold", "underline", "italic", "strike"]
+	 */
+	__resetAutoStyleify(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, autoStyleify: Array<string>): void;
 }

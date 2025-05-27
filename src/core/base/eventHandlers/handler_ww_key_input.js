@@ -632,7 +632,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 							const baseIndex = dom.query.findTextIndexOnLine(formatEl, range.startContainer, range.startOffset, this.component.is.bind(this.component));
 							const prevTabEndIndex = this.format.isLine(formatEl.previousElementSibling) ? dom.query.findTabEndIndex(formatEl.previousElementSibling, baseIndex, 2) : 0;
 							if (prevTabEndIndex > baseIndex) {
-								tabSize = prevTabEndIndex - baseIndex + 1;
+								tabSize = prevTabEndIndex - baseIndex;
 							}
 						}
 

@@ -152,27 +152,7 @@ function HTML(editor) {
 	this._attributeBlacklist = tagsAttr;
 
 	// autoStyleify
-	if (options.get('autoStyleify').length > 0) {
-		const convertTextTags = options.get('convertTextTags');
-		const styleToTag = {};
-		options.get('autoStyleify').forEach((style) => {
-			switch (style) {
-				case 'bold':
-					styleToTag.bold = { regex: /font-weight\s*:\s*bold/i, tag: convertTextTags.bold };
-					break;
-				case 'italic':
-					styleToTag.italic = { regex: /font-style\s*:\s*italic/i, tag: convertTextTags.italic };
-					break;
-				case 'underline':
-					styleToTag.underline = { regex: /text-decoration\s*:\s*underline/i, tag: convertTextTags.underline };
-					break;
-				case 'strike':
-					styleToTag.strike = { regex: /text-decoration\s*:\s*line-through/i, tag: convertTextTags.strike };
-					break;
-			}
-		});
-		this._autoStyleify = styleToTag;
-	}
+	this.__resetAutoStyleify(options.get('autoStyleify'));
 }
 
 HTML.prototype = {
@@ -1828,6 +1808,39 @@ HTML.prototype = {
 		}
 
 		return oNode;
+	},
+
+	/**
+	 * @private
+	 * @this {HTMLThis}
+	 * @description Reset autoStyleify options.
+	 * @param {Array.<string>} autoStyleify Styles applied automatically on text input.
+	 * - ex ["bold", "underline", "italic", "strike"]
+	 */
+	__resetAutoStyleify(autoStyleify) {
+		if (autoStyleify.length > 0) {
+			const convertTextTags = this.options.get('convertTextTags');
+			const styleToTag = {};
+			autoStyleify.forEach((style) => {
+				switch (style) {
+					case 'bold':
+						styleToTag.bold = { regex: /font-weight\s*:\s*bold/i, tag: convertTextTags.bold };
+						break;
+					case 'italic':
+						styleToTag.italic = { regex: /font-style\s*:\s*italic/i, tag: convertTextTags.italic };
+						break;
+					case 'underline':
+						styleToTag.underline = { regex: /text-decoration\s*:\s*underline/i, tag: convertTextTags.underline };
+						break;
+					case 'strike':
+						styleToTag.strike = { regex: /text-decoration\s*:\s*line-through/i, tag: convertTextTags.strike };
+						break;
+				}
+			});
+			this._autoStyleify = styleToTag;
+		} else {
+			this._autoStyleify = null;
+		}
 	},
 
 	constructor: HTML

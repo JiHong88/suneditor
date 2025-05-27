@@ -886,21 +886,24 @@ Editor.prototype = {
 			//  --- set options ---
 			options.set(k, newOptionMap.get(k));
 
-			/** apply option */
-			// history delay time
-			if (k === 'historyStackDelayTime') {
-				this.history.resetDelayTime(options.get('historyStackDelayTime'));
-				continue;
-			}
-			// set dir
-			if (k === 'textDirection') {
-				this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
-				continue;
-			}
-			// theme
-			if (k === 'theme') {
-				this.ui.setTheme(options.get('theme'));
-				continue;
+			/** Options that require a function call */
+			switch (k) {
+				case 'historyStackDelayTime': {
+					this.history.resetDelayTime(options.get('historyStackDelayTime'));
+					break;
+				}
+				case 'textDirection': {
+					this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
+					break;
+				}
+				case 'theme': {
+					this.ui.setTheme(options.get('theme'));
+					break;
+				}
+				case 'autoStyleify': {
+					this.html.__resetAutoStyleify(options.get('autoStyleify'));
+					break;
+				}
 			}
 		}
 
