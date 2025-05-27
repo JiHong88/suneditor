@@ -49,7 +49,7 @@ declare class Format {
 	_formatClosureBlockCheck: any;
 	_formatClosureBrLineCheck: any;
 	_textStyleTagsCheck: RegExp;
-	_brLineBreak: any;
+	_brLineBreak: boolean;
 	/**
 	 * @this {FormatThis}
 	 * @description Replace the line tag of the current selection.
@@ -613,4 +613,11 @@ declare class Format {
 	 * @param {Array|null} styleArray Refer style array
 	 */
 	_sn_resetCommonListCell(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, el: Node, styleArray: any[] | null): boolean;
+	/**
+	 * @private
+	 * @this {FormatThis}
+	 * @description Reset the line break format.
+	 * @param {"line"|"br"} breakFormat options.get('defaultLineBreakFormat')
+	 */
+	__resetBrLineBreak(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, breakFormat: 'line' | 'br'): void;
 }

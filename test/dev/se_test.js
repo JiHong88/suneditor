@@ -1313,6 +1313,7 @@ window.editor_root = suneditor.create(
 			// 	minimalSetup: minimalSetup
 			// },
 		},
+		// defaultLineBreakFormat: 'br',
 		events: {
 			// onFileAction: (data) => {
 			// 	// console.log('fileaa', data);

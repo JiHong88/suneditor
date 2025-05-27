@@ -888,21 +888,31 @@ Editor.prototype = {
 
 			/** Options that require a function call */
 			switch (k) {
-				case 'historyStackDelayTime': {
-					this.history.resetDelayTime(options.get('historyStackDelayTime'));
+				case 'theme': {
+					this.ui.setTheme(options.get('theme'));
+					break;
+				}
+				case 'events': {
+					const events = options.get('events');
+					for (const name in events) {
+						this.events[name] = events[name];
+					}
+					break;
+				}
+				case 'autoStyleify': {
+					this.html.__resetAutoStyleify(options.get('autoStyleify'));
 					break;
 				}
 				case 'textDirection': {
 					this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
 					break;
 				}
-				case 'theme': {
-					this.ui.setTheme(options.get('theme'));
+				case 'historyStackDelayTime': {
+					this.history.resetDelayTime(options.get('historyStackDelayTime'));
 					break;
 				}
-				case 'autoStyleify': {
-					this.html.__resetAutoStyleify(options.get('autoStyleify'));
-					break;
+				case 'defaultLineBreakFormat': {
+					this.format.__resetBrLineBreak(options.get('defaultLineBreakFormat'));
 				}
 			}
 		}
@@ -911,7 +921,7 @@ Editor.prototype = {
 		// _origin
 		this._originOptions = _originOptions;
 
-		// toolbar
+		// --- [toolbar] ---
 		const toolbar = this.context.get('toolbar.main');
 		// width
 		if (/inline|balloon/i.test(options.get('mode')) && newOptionKeys.includes('toolbar_width')) {
@@ -920,17 +930,14 @@ Editor.prototype = {
 		// hide
 		if (options.get('toolbar_hide')) {
 			toolbar.style.display = 'none';
+		} else {
+			toolbar.style.display = '';
 		}
 		// shortcuts hint
 		if (options.get('shortcutsHint')) {
 			dom.utils.removeClass(toolbar, 'se-shortcut-hide');
 		} else {
 			dom.utils.addClass(toolbar, 'se-shortcut-hide');
-		}
-
-		// theme
-		if (this._originOptions.theme !== (newOptions.theme ?? this._originOptions.theme)) {
-			this.ui.setTheme(newOptions.theme);
 		}
 
 		this.effectNode = null;

@@ -35,8 +35,9 @@ function Format(editor) {
 	this._formatClosureBlockCheck = this.options.get('formatClosureBlock').reg;
 	this._formatClosureBrLineCheck = this.options.get('formatClosureBrLine').reg;
 	this._textStyleTagsCheck = new RegExp('^(' + this.options.get('textStyleTags') + ')$', 'i');
-	// members - _defaultBrLineBreak
-	this._brLineBreak = this.options.get('_defaultBrLineBreak');
+
+	this._brLineBreak = null;
+	this.__resetBrLineBreak(this.options.get('defaultLineBreakFormat'));
 }
 
 Format.prototype = {
@@ -3332,6 +3333,16 @@ Format.prototype = {
 		}
 
 		return appliedEl;
+	},
+
+	/**
+	 * @private
+	 * @this {FormatThis}
+	 * @description Reset the line break format.
+	 * @param {"line"|"br"} breakFormat options.get('defaultLineBreakFormat')
+	 */
+	__resetBrLineBreak(breakFormat) {
+		this._brLineBreak = breakFormat === 'br';
 	},
 
 	constructor: Format
