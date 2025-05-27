@@ -5,7 +5,7 @@
 자동 번역 스크립트. 언어 파일을 기준으로 누락된 키를 Google Cloud Translation API를 통해 자동 번역합니다.
 
 -   실행: `npm run i18n-build`
--   [🔗 API 설정 가이드](../scripts/docs/i18n-build--translate-setup)
+-   [🔗 API 설정 가이드](../scripts/docs/i18n-build--translate-setup.md)
 
 ---
 
