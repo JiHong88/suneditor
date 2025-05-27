@@ -575,7 +575,7 @@ declare class Editor {
 	__saveCommandButtons(cmdButtons: Map<string, Element>, tray: Element): void;
 	/**
 	 * @private
-	 * @description Caches shortcut keys for commands.
+	 * @description Caches custom(starts with "_") shortcut keys for commands.
 	 */
 	__cachingShortcuts(): void;
 	/**

@@ -46,8 +46,9 @@ declare class Char {
 	/**
 	 * @this {CharThis}
 	 * @description Set the char count to charCounter element textContent.
+	 * @param {?__se__FrameContext=} fc Frame context
 	 */
-	display(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>): void;
+	display(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, fc?: (__se__FrameContext | null) | undefined): void;
 	/**
 	 * @this {CharThis}
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "inputText" is added to the current editor.

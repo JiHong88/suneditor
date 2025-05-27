@@ -88,9 +88,10 @@ Char.prototype = {
 	/**
 	 * @this {CharThis}
 	 * @description Set the char count to charCounter element textContent.
+	 * @param {?__se__FrameContext=} fc Frame context
 	 */
-	display() {
-		const charCounter = this.editor.frameContext.get('charCounter');
+	display(fc) {
+		const charCounter = (fc || this.editor.frameContext).get('charCounter');
 		if (charCounter) {
 			_w.setTimeout(() => {
 				charCounter.textContent = this.getLength();

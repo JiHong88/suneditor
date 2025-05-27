@@ -45,6 +45,14 @@ export function debounce(func: (...args: any) => void, wait: number): any;
  */
 export function syncMaps(targetMap: Map<any, any>, referenceMap: Map<any, any>): void;
 /**
+ * @description Merges multiple Map objects into a new Map using spread syntax.
+ * - Entries from later maps in the arguments list will overwrite entries from earlier maps if keys conflict.
+ * - The original maps are not modified.
+ * @param {...Map<*, *>} mapsToMerge - An arbitrary number of Map objects to merge.
+ * @returns {Map<*, *>} A new Map containing all entries from the input maps.
+ */
+export function mergeMaps(...mapsToMerge: Map<any, any>[]): Map<any, any>;
+/**
  * @description Object.values
  * @param {Object<*, *>} obj Object parameter.
  * @returns {Array<*>}
@@ -177,6 +185,7 @@ declare namespace converter {
 	export { entityToHTML };
 	export { debounce };
 	export { syncMaps };
+	export { mergeMaps };
 	export { getValues };
 	export { camelToKebabCase };
 	export { kebabToCamelCase };

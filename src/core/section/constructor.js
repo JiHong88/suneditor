@@ -232,26 +232,26 @@ const RETAIN_STYLE_MODE = ['repeat', 'always', 'none'];
  */
 export const OPTION_FRAME_FIXED_FLAG = {
 	value: 'fixed',
-	placeholder: 'fixed',
+	placeholder: true,
 	editableFrameAttributes: true,
-	width: null,
-	minWidth: null,
-	maxWidth: null,
-	height: null,
-	minHeight: null,
-	maxHeight: null,
-	editorStyle: null,
+	width: true,
+	minWidth: true,
+	maxWidth: true,
+	height: true,
+	minHeight: true,
+	maxHeight: true,
+	editorStyle: true,
 	iframe: 'fixed',
-	iframe_fullPage: null,
-	iframe_attributes: null,
-	iframe_cssFileName: null,
-	statusbar: null,
-	statusbar_showPathLabel: null,
-	statusbar_resizeEnable: null,
-	charCounter: null,
-	charCounter_max: null,
-	charCounter_label: null,
-	charCounter_type: null
+	iframe_fullPage: 'fixed',
+	iframe_attributes: true,
+	iframe_cssFileName: true,
+	statusbar: true,
+	statusbar_showPathLabel: true,
+	statusbar_resizeEnable: 'fixed',
+	charCounter: true,
+	charCounter_max: true,
+	charCounter_label: true,
+	charCounter_type: true
 };
 /**
  * @description For all EditorInitOptions keys, only boolean | null values are allowed.
@@ -1190,9 +1190,8 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 
 	// textarea for code view
 	const textarea = dom.utils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-code-viewer', style: editorStyles.frame });
-	let placeholder = null;
+	const placeholder = dom.utils.createElement('SPAN', { class: 'se-placeholder' });
 	if (targetOptions.get('placeholder')) {
-		placeholder = dom.utils.createElement('SPAN', { class: 'se-placeholder' });
 		placeholder.textContent = targetOptions.get('placeholder');
 	}
 

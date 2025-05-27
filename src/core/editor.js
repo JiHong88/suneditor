@@ -771,26 +771,29 @@ Editor.prototype = {
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
 
-		const newOptionKeys = Object.keys(newOptions);
-		CheckResetKeys(newOptionKeys, this.plugins, '');
-		if (newOptionKeys.length === 0) return;
-
 		const rootDiff = new Map();
 		const frameRoots = this.frameRoots;
 		const newRoots = [];
 		const newRootKeys = new Map();
 
-		// single root
+		// frame roots
+		const nRoot = {};
+		for (const k in newOptions) {
+			if (OPTION_FRAME_FIXED_FLAG[k] === undefined) continue;
+			nRoot[k] = newOptions[k];
+			delete newOptions[k];
+		}
+		for (const rootKey of frameRoots.keys()) {
+			newOptions[rootKey || ''] = { ...nRoot, ...newOptions[rootKey || ''] };
+		}
+
+		// check reoption validation
+		const newOptionKeys = Object.keys(newOptions);
+		CheckResetKeys(newOptionKeys, this.plugins, '');
+		if (newOptionKeys.length === 0) return;
+
 		if (frameRoots.size === 1) {
 			newOptionKeys.unshift(null);
-
-			const nullRoot = {};
-			for (const k in newOptions) {
-				if (OPTION_FRAME_FIXED_FLAG[k] === undefined) continue;
-				nullRoot[k] = newOptions[k];
-				delete newOptions[k];
-			}
-			newOptions[''] = nullRoot;
 		}
 
 		// option merge
@@ -823,8 +826,9 @@ Editor.prototype = {
 				// --- set options : fc ---
 				fc.set('options', newRootOptions);
 
-				// statusbar
-				if (diff.has('statusbar')) {
+				// statusbar-changed
+				if (diff.has('statusbar-changed')) {
+					// statusbar
 					dom.utils.removeItem(fc.get('statusbar'));
 					if (newRootOptions.get('statusbar')) {
 						const statusbar = CreateStatusbar(newRootOptions, null).statusbar;
@@ -835,6 +839,10 @@ Editor.prototype = {
 						this.eventManager.removeEvent(originOptions.get('__statusbarEvent'));
 						newRootOptions.set('__statusbarEvent', null);
 						UpdateStatusbarContext(null, fc);
+					}
+					// charCounter
+					if (fc.get('statusbar')) {
+						this.char.display(fc);
 					}
 				}
 
@@ -855,6 +863,10 @@ Editor.prototype = {
 					const newLinks = parseDocument.head.children;
 					const sTag = docHead.querySelector('style');
 					while (newLinks[0]) docHead.insertBefore(newLinks[0], sTag);
+				}
+
+				if (diff.has('placeholder')) {
+					fc.get('placeholder').textContent = newRootOptions.get('placeholder');
 				}
 
 				// frame styles
@@ -1723,7 +1735,7 @@ function RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, new
 	for (const rk in nro) {
 		if (!hasOwn.call(OPTION_FRAME_FIXED_FLAG, rk)) continue;
 		const roV = nro[rk];
-		if (!newKeys.includes(rk) || o[rk] === roV) return false;
+		if (!newKeys.includes(rk) || o[rk] === roV) continue;
 		rootDiff.get(rootKey).set(GetResetDiffKey(rk), true);
 		no[rk] = roV;
 	}
@@ -1734,7 +1746,7 @@ function RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, new
 }
 
 function GetResetDiffKey(key) {
-	if (/^statusbar/i.test(key)) return 'statusbar';
+	if (/^statusbar|^charCounter/.test(key)) return 'statusbar-changed';
 	return key;
 }
 

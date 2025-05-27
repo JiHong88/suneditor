@@ -35,6 +35,7 @@ export const converter: {
 	entityToHTML: typeof import('./converter').entityToHTML;
 	debounce: typeof import('./converter').debounce;
 	syncMaps: typeof import('./converter').syncMaps;
+	mergeMaps: typeof import('./converter').mergeMaps;
 	getValues: typeof import('./converter').getValues;
 	camelToKebabCase: typeof import('./converter').camelToKebabCase;
 	kebabToCamelCase: typeof import('./converter').kebabToCamelCase;

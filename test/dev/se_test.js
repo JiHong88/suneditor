@@ -343,69 +343,69 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // });
 
 window.editor_root = suneditor.create(
-	// document.querySelector('#multi_editor_1'),
-	{
-		editor1: {
-			target: document.querySelector('#multi_editor_1'),
-			options: {
-				// value: `
-				// <p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+	document.querySelector('#multi_editor_1'),
+	// {
+	// 	editor1: {
+	// 		target: document.querySelector('#multi_editor_1'),
+	// 		options: {
+	// 			// value: `
+	// 			// <p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
 
-				// <p>ed1</p>
+	// 			// <p>ed1</p>
 
-				// <hr class="__se__solid">
+	// 			// <hr class="__se__solid">
 
-				// <p><br>
-				// </p>
+	// 			// <p><br>
+	// 			// </p>
 
-				// <p>ed2</p>
+	// 			// <p>ed2</p>
 
-				// <div class="se-component se-image-container __se__float-none">
-				// <figure>
-				// 	<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
-				// </figure>
-				// </div>
+	// 			// <div class="se-component se-image-container __se__float-none">
+	// 			// <figure>
+	// 			// 	<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
+	// 			// </figure>
+	// 			// </div>
 
-				// <p>ed3</p>
+	// 			// <p>ed3</p>
 
-				// <p>ed4</p>
+	// 			// <p>ed4</p>
 
-				// <p>edend--</p>
+	// 			// <p>edend--</p>
 
-				// <div>					</div>
+	// 			// <div>					</div>
 
-				// `,
-				placeholder: 'place1',
-				height: '400px',
-				width: '500px',
-				iframe: true,
-				// iframe_fullPage: true,
-				statusbar: true,
-				statusbar_resizeEnable: true
-			}
-		},
-		editor2: {
-			target: document.querySelector('#multi_editor_2'),
-			options: {
-				value: '<p>ed2</p>',
-				placeholder: 'place21'
-			}
-		},
-		editor3: {
-			target: document.querySelector('#multi_editor_3'),
-			options: {
-				value: '<p>ed3</p>',
-				placeholder: 'place3'
-			}
-		},
-		editor4: {
-			target: document.querySelector('#multi_editor_4'),
-			options: {
-				// value: '<p>ed4</p>',
-				placeholder: 'place4'
-			}
-		}
-	},
+	// 			// `,
+	// 			placeholder: 'place1',
+	// 			height: '400px',
+	// 			width: '500px',
+	// 			iframe: true,
+	// 			// iframe_fullPage: true,
+	// 			statusbar: true,
+	// 			statusbar_resizeEnable: true
+	// 		}
+	// 	},
+	// 	editor2: {
+	// 		target: document.querySelector('#multi_editor_2'),
+	// 		options: {
+	// 			value: '<p>ed2</p>',
+	// 			// placeholder: 'place21'
+	// 		}
+	// 	},
+	// 	editor3: {
+	// 		target: document.querySelector('#multi_editor_3'),
+	// 		options: {
+	// 			value: '<p>ed3</p>',
+	// 			placeholder: 'place3'
+	// 		}
+	// 	},
+	// 	editor4: {
+	// 		target: document.querySelector('#multi_editor_4'),
+	// 		options: {
+	// 			// value: '<p>ed4</p>',
+	// 			placeholder: 'place4'
+	// 		}
+	// 	}
+	// },
 	{
 		mode: 'inline',
 		// editorStyle: 'height:100px',
@@ -468,7 +468,7 @@ window.editor_root = suneditor.create(
 		// 		<p>dsa<strong>d&nbsp;&nbsp;&nbsp;&nbsp;sa</strong><u><strong>dsadsadsa</strong></u><span style="color: #ff0000"><u><strong>dsadasdsa</strong></u></span><br>
 		// </p>
 		// closeModalOutsideClick: true,
-		placeholder: 'placeholder text',
+		// placeholder: 'placeholder text',
 		value: `<p>test abc  <span>
 		<img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="width:40px;" data-se-index="0">
 		</span>

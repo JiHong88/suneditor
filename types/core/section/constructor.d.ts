@@ -266,6 +266,13 @@ export function CreateToolBar(
 /**
  * @typedef {EditorBaseOptions & EditorFrameOptions} EditorInitOptions
  */
+/** ------------- [OPTIONS FRAG] ------------- */
+/**
+ * @description For all EditorInitOptions keys, only boolean | null values are allowed.
+ * - 'fixed' → Immutable / null → Resettable.
+ * @type {Partial<Record<keyof EditorInitOptions, "fixed" | true>>}
+ */
+export const OPTION_FRAME_FIXED_FLAG: Partial<Record<keyof EditorInitOptions, 'fixed' | true>>;
 /**
  * @description For all EditorInitOptions keys, only boolean | null values are allowed.
  * - 'fixed' → Immutable / null → Resettable.
