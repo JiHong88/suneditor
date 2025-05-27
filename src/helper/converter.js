@@ -171,6 +171,26 @@ export function syncMaps(targetMap, referenceMap) {
 }
 
 /**
+ * @description Merges multiple Map objects into a new Map using spread syntax.
+ * - Entries from later maps in the arguments list will overwrite entries from earlier maps if keys conflict.
+ * - The original maps are not modified.
+ * @param {...Map<*, *>} mapsToMerge - An arbitrary number of Map objects to merge.
+ * @returns {Map<*, *>} A new Map containing all entries from the input maps.
+ */
+export function mergeMaps(...mapsToMerge) {
+	const validMaps = mapsToMerge.filter((m) => {
+		if (!(m instanceof Map)) {
+			return false;
+		}
+		return true;
+	});
+
+	const allEntries = validMaps.flatMap((map) => [...map]);
+
+	return new Map(allEntries);
+}
+
+/**
  * @description Object.values
  * @param {Object<*, *>} obj Object parameter.
  * @returns {Array<*>}
@@ -543,6 +563,7 @@ const converter = {
 	entityToHTML,
 	debounce,
 	syncMaps,
+	mergeMaps,
 	getValues,
 	camelToKebabCase,
 	kebabToCamelCase,

@@ -56,7 +56,9 @@ UI.prototype = {
 	 */
 	setEditorStyle(style, fc) {
 		fc = fc || this.editor.frameContext;
+
 		const fo = fc.get('options');
+		fo.set('editorStyle', style);
 
 		const newStyles = converter._setDefaultOptionStyle(fo, style);
 		fo.set('_defaultStyles', newStyles);
