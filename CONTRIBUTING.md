@@ -27,6 +27,8 @@ Node.js **v14 or higher** is required to build and test.
 
 ## ✅ Before Submitting a PR
 
+> [commit-guide](./guide/commit-types.md)
+
 -   Check that no one is working on the same thing in [open issues](https://github.com/jihong88/suneditor/issues).
 -   For new features or major changes, please open an issue first to gather feedback.
 -   Use a **feature branch** (not `master`) for your pull request.
@@ -139,6 +141,8 @@ A quick overview of the `src/` directory:
 
 ## 🚀 Useful Commands
 
+> [scripts-guide](./guide/scripts-guide.md)
+
 ```bash
 # Start local dev server
 npm run dev
@@ -171,8 +175,6 @@ npm run i18n-build
 # test
 npm run test
 ```
-
-> [scripts/README](https://github.com/JiHong88/suneditor/blob/develop/scripts/README.md)
 
 ---
 
