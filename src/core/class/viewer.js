@@ -188,7 +188,7 @@ Viewer.prototype = {
 			topArea.style.width = '100%';
 			topArea.style.maxWidth = '100%';
 			topArea.style.height = '100%';
-			topArea.style.zIndex = '2147483646';
+			topArea.style.zIndex = '2147483640';
 
 			if (fc.get('_stickyDummy').style.display !== 'none' && fc.get('_stickyDummy').style.display !== '') {
 				this.fullScreenSticky = true;
