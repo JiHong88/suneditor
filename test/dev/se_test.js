@@ -344,7 +344,7 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // });
 
 // shadowroot test
-const shadow = document.querySelector('#app').attachShadow({ mode: 'open' });
+const shadow = document.querySelector('#app').attachShadow({ mode: 'open', delegatesFocus: true });
 const appEl = document.createElement('textarea');
 const appStyle = document.createElement('style');
 appStyle.textContent = getPageStyle(document);
@@ -353,7 +353,7 @@ shadow.appendChild(appStyle);
 shadow.appendChild(appEl);
 
 const options1 = {
-	mode: 'inline',
+	// mode: 'inline',
 	// editorStyle: 'height:100px',
 	// toolbar_width: 300,
 	// textDirection: 'rtl',
@@ -415,113 +415,6 @@ const options1 = {
 	// </p>
 	// closeModalOutsideClick: true,
 	// placeholder: 'placeholder text',
-	value: `<p>test abc  <span>
-		<img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="width:40px;" data-se-index="0">
-		</span>
-		sss</p>
-		<p>test abc  <span>
-		<img src="http://suneditor.com/docs/welsh Corgi.jpg">
-		</span>
-		sss</p>`,
-	value: `
-		<h1>Header~1</h1>
-		<p>test fdste text</p>
-		<div class="se-component se-image-container __se__float-none se-component-selected"><figure style="" class="se-figure-over-selected se-figure-selected"><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" style="" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Welsh Corgi" data-se-file-size="0" data-se-index="0"></figure></div>
-		<h2>header 22222</h2>
-		<p>2222222</p>
-		<p>2222222aa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<h3>header33333</h3>
-		<p>33333</p>
-		<p>aafffff</p>
-		<h4>hdaedde444</h4>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<h5>header55555</h5>
-		<p>ndfjsjio;dfsaji;fads</p>
-		<p>dfs78oyfeaw</p>
-		<h6>header66666</h6>
-		<p>asfhjfds</p>
-		<p>fdsaa99999</p>
-		<h1>Header~1</h1>
-		<p>test fdste text</p>
-		<h2>header 22222</h2>
-		<p>2222222</p>
-		<p>2222222aa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<h3>header33333</h3>
-		<p>33333</p>
-		<p>aafffff</p>
-		<h4>hdaedde444</h4>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<h5>header55555</h5>
-		<p>ndfjsjio;dfsaji;fads</p>
-		<p>dfs78oyfeaw</p>
-		<h6>header66666</h6>
-		<p>asfhjfds</p>
-		<p>fdsaa99999</p>
-		<h1>Header~1</h1>
-		<p>test fdste text</p>
-		<h2>header 22222</h2>
-		<p>2222222</p>
-		<p>2222222aa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<h3>header33333</h3>
-		<p>33333</p>
-		<p>aafffff</p>
-		<h4>hdaedde444</h4>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<h5>header55555</h5>
-		<p>ndfjsjio;dfsaji;fads</p>
-		<p>dfs78oyfeaw</p>
-		<h6>header66666</h6>
-		<p>asfhjfds</p>
-		<p>fdsaa99999</p>
-		<h1>Header~1</h1>
-		<p>test fdste text</p>
-		<h2>header 22222</h2>
-		<p>2222222</p>
-		<p>2222222aa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<p>2222222sadsa</p>
-		<h3>header33333</h3>
-		<p>33333</p>
-		<p>aafffff</p>
-		<h4>hdaedde444</h4>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<p>4894984o8p</p>
-		<h5>header55555</h5>
-		<p>ndfjsjio;dfsaji;fads</p>
-		<p>dfs78oyfeaw</p>
-		<h6>header66666</h6>
-		<p>asfhjfds</p>
-		<p>fdsaa99999</p>
-		`,
 	// textDirection: 'rtl',
 	// defaultLineBreakFormat: 'br',
 	value: `<h1>Header~1</h1><p>test fdste text</p><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-size="auto,auto" data-se-file-name="Welsh Corgi" data-se-file-size="0" style="" data-se-index="0"></figure></div><h2>header 22222</h2><p>2222222</p><p>2222222aa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><h3>header33333</h3><p>33333</p><p>aafffff</p><h4>hdaedde444</h4><figure class="se-flex-component se-input-component se-scroll-figure-x" style="width: 100%;"><table class="se-table-layout-auto" style=""><colgroup><col style="width: 13%;"><col style="width: 13%;"><col style="width: 13%;"><col style="width: 13%;"><col style="width: 13%;"><col style="width: 13%;"><col style="width: 13%;"><col style="width: 13%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><p>4894984o8p</p><p>4894984o8p</p><p>4894984o8p</p><p>4894984o8p</p><h5>header55555</h5><p>ndfjsjio;dfsaji;fads</p><p>dfs78oyfeaw</p><h6>header66666</h6><p>asfhjfds</p><p>fdsaa99999</p><h1>Header~1</h1><p>test fdste text</p><h2>header 22222</h2><p>2222222</p><p>2222222aa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><h3>header33333</h3><p>33333</p><p>aafffff</p><h4>hdaedde444</h4><p>4894984o8p</p><p>4894984o8p</p><p>4894984o8p</p><p>4894984o8p</p><h5>header55555</h5><p>ndfjsjio;dfsaji;fads</p><p>dfs78oyfeaw</p><h6>header66666</h6><p>asfhjfds</p><p>fdsaa99999</p><h1>Header~1</h1><p>test fdste text</p><h2>header 22222</h2><p>2222222</p><p>2222222aa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><h3>header33333</h3><p>33333</p><p>aafffff</p><h4>hdaedde444</h4><p>4894984o8p</p><p>4894984o8p</p><p>4894984o8p</p><p>4894984o8p</p><h5>header55555</h5><p>ndfjsjio;dfsaji;fads</p><p>dfs78oyfeaw</p><h6>header66666</h6><p>asfhjfds</p><p>fdsaa99999</p><h1>Header~1</h1><p>test fdste text</p><h2>header 22222</h2><p>2222222</p><p>2222222aa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><p>2222222sadsa</p><h3>header33333</h3><p>33333</p><p>aafffff</p><h4>hdaedde444</h4><p>4894984o8p</p><p>4894984o8p</p><p>4894984o8p</p><p>4894984o8p</p><h5>header55555</h5><p>ndfjsjio;dfsaji;fads</p><p>dfs78oyfeaw</p><h6>header66666</h6><p>asfhjfds</p><p>fdsaa99999</p>`,

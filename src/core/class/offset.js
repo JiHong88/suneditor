@@ -288,7 +288,7 @@ Offset.prototype = {
 			}
 		}
 
-		el = /** @type {HTMLElement} */ (this._shadowRoot?.host);
+		el = /** @type {HTMLElement} */ (this.editor._shadowRoot?.host);
 		if (el) ohOffsetEl = owOffsetEl = topArea;
 		while (el) {
 			t += el.scrollTop;

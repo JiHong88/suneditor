@@ -37,15 +37,12 @@ Selection_.prototype = {
 	 * @returns {Selection}
 	 */
 	get() {
-		const wSelection = this.editor.frameContext.get('_ww').getSelection();
 		let selection = null;
 
-		if (this._shadowRoot) {
-			selection = wSelection.getComposedRanges?.();
-		}
-
-		if (!selection) {
-			selection = wSelection;
+		if (typeof this.editor._shadowRoot?.getSelection === 'function') {
+			selection = this.editor._shadowRoot.getSelection();
+		} else {
+			selection = this.editor.frameContext.get('_ww').getSelection();
 		}
 
 		if (!selection) return null;

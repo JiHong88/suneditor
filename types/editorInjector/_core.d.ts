@@ -84,9 +84,4 @@ export default class CoreInjector {
 	 * @type {Document}
 	 */
 	_d: Document;
-	/**
-	 * @description The shadow root object (if any).
-	 * @type {__se__EditorCore['_shadowRoot']}
-	 */
-	_shadowRoot: __se__EditorCore['_shadowRoot'];
 }

@@ -84,9 +84,4 @@ export default function CoreInjector(editor) {
 	 * @type {Document}
 	 */
 	this._d = editor._d;
-	/**
-	 * @description The shadow root object (if any).
-	 * @type {__se__EditorCore['_shadowRoot']}
-	 */
-	this._shadowRoot = editor._shadowRoot;
 }

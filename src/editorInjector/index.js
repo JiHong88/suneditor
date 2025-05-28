@@ -37,8 +37,6 @@ function EditorInjector(editor) {
 	this._w;
 	/** @type {import('./_core').default['_d']} */
 	this._d;
-	/** @type {import('./_core').default['_shadowRoot']} */
-	this._shadowRoot;
 
 	// ClassInjector props
 	/** @type {import('./_classes').default['toolbar']} */

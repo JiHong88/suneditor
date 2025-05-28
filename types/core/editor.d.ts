@@ -266,9 +266,11 @@ declare class Editor {
 	_lineBreaker_b: HTMLElement;
 	/**
 	 * @description Closest ShadowRoot to editor if found
-	 * @type {ShadowRoot}
+	 * @type {ShadowRoot & { getSelection?: () => Selection }} - Chromium-based browsers (Chrome, Edge, etc.) has a getSelection method on the ShadowRoot
 	 */
-	_shadowRoot: ShadowRoot;
+	_shadowRoot: ShadowRoot & {
+		getSelection?: () => Selection;
+	};
 	/**
 	 * @description Plugin call event map
 	 * @type {Map<string, Array<((...args: *) => *) & { index: number }>>}

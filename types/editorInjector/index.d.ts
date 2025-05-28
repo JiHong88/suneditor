@@ -40,8 +40,6 @@ declare class EditorInjector {
 	_w: import('./_core').default['_w'];
 	/** @type {import('./_core').default['_d']} */
 	_d: import('./_core').default['_d'];
-	/** @type {import('./_core').default['_shadowRoot']} */
-	_shadowRoot: import('./_core').default['_shadowRoot'];
 	/** @type {import('./_classes').default['toolbar']} */
 	toolbar: import('./_classes').default['toolbar'];
 	/** @type {import('./_classes').default['subToolbar']} */

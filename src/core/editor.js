@@ -311,7 +311,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Closest ShadowRoot to editor if found
-	 * @type {ShadowRoot}
+	 * @type {ShadowRoot & { getSelection?: () => Selection }} - Chromium-based browsers (Chrome, Edge, etc.) has a getSelection method on the ShadowRoot
 	 */
 	this._shadowRoot = null;
 
