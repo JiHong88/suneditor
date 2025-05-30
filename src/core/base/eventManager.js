@@ -1208,8 +1208,8 @@ EventManager.prototype = {
 		e.preventDefault();
 		if (!isMobile) return;
 
-		this.__focusTemp.focus();
-		this.editor.frameContext.get('wysiwyg').focus();
+		this.__focusTemp.focus({ preventScroll: true });
+		this.editor.frameContext.get('wysiwyg').focus({ preventScroll: true });
 	},
 
 	/**
