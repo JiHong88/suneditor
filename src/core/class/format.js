@@ -964,7 +964,7 @@ Format.prototype = {
 
 		// list cells
 		if (cells.length > 0) {
-			this._applyNestedList(cells, true);
+			this._applyNestedList(cells, false);
 		}
 
 		this.editor.effectNode = null;
@@ -989,7 +989,7 @@ Format.prototype = {
 
 		// list cells
 		if (cells.length > 0) {
-			this._applyNestedList(cells, false);
+			this._applyNestedList(cells, true);
 		}
 
 		this.editor.effectNode = null;

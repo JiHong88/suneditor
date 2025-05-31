@@ -475,7 +475,7 @@ class Table extends EditorInjector {
 
 		const eventTarget = dom.query.getEventTarget(event);
 		const target = dom.query.getParentElement(eventTarget, IsResizeEls);
-		if (!target || this._fixedCell) {
+		if (!target) {
 			this.__hideResizeLine();
 			return;
 		}

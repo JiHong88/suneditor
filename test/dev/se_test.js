@@ -1213,9 +1213,9 @@ const options1 = {
 	}
 };
 
-// suneditor.create(document.querySelector('#multi_editor_1'), options1);
+window.editor_root = suneditor.create(document.querySelector('#multi_editor_1'), options1);
 
-window.editor_root = suneditor.create(
+suneditor.create(
 	appEl,
 	// document.querySelector('#multi_editor_1'),
 	// {
