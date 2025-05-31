@@ -1736,7 +1736,7 @@
 	-khtml-user-select: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
-	z-index: 2147483646;
+	z-index: 2147483647;
 	background-color: transparent;
 }
 
