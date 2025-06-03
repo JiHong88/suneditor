@@ -1138,9 +1138,9 @@ Format.prototype = {
 		let end = {};
 
 		/** @type {string|RegExp} */
-		let styleRegExp;
+		let styleRegExp = '';
 		/** @type {string|RegExp} */
-		let classRegExp;
+		let classRegExp = '';
 		/** @type {string|RegExp} */
 		let removeNodeRegExp;
 
