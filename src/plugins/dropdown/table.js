@@ -2433,7 +2433,7 @@ class Table extends EditorInjector {
 
 		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
 			// eslint-disable-next-line no-shadow
-			const { cssText, border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = t.style;
+			const { cssText, border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = _w.getComputedStyle(t);
 			this._propsCache.push([t, cssText]);
 			if (isBreak) continue;
 
