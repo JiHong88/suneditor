@@ -2,14 +2,14 @@ import { _d, _w } from './env';
 
 const URLPattern = /https?:\/\/[^\s]+/g;
 const FONT_VALUES_MAP = {
-	'xx-small': 1,
-	'x-small': 2,
-	small: 3,
-	medium: 4,
-	large: 5,
-	'x-large': 6,
-	'xx-large': 7,
-	'xxx-large': 8
+	'xx-small': 0.5625,
+	'x-small': 0.625,
+	small: 0.8333,
+	medium: 1,
+	large: 1.125,
+	'x-large': 1.5,
+	'xx-large': 2,
+	'xxx-large': 2.5
 };
 
 function NodeToJson(node) {

@@ -264,7 +264,7 @@ export function setStyle(elements, styleName, value) {
 	for (let i = 0, len = elements.length, e; i < len; i++) {
 		e = /** @type {HTMLElement} */ (elements[i]);
 		e.style[styleName] = value;
-		if (!value && !e.style.cssText) {
+		if (!e.style.cssText) {
 			e.removeAttribute('style');
 		}
 	}

@@ -423,13 +423,28 @@ class Table extends EditorInjector {
 			query: 'table',
 			method: (element) => {
 				const ColgroupEl = element.querySelector('colgroup');
-				let FigureEl = dom.check.isFigure(element.parentNode) ? element.parentNode : null;
-				if (ColgroupEl && FigureEl) return;
+				let FigureEl = /** @type {HTMLElement} */ (dom.check.isFigure(element.parentNode) ? element.parentNode : null);
 
 				// create colgroup
 				if (!ColgroupEl) {
+					const rows = element.rows;
+					const firstRow = rows[0];
 					const maxCount = GetMaxColumns(element);
-					const colGroup = dom.utils.createElement('colgroup', null, `<col style="width: ${numbers.get(100 / maxCount, CELL_DECIMAL_END)}%;">`.repeat(maxCount));
+					const colHTML = [];
+
+					for (let i = 0; i < maxCount; i++) {
+						let colStyle = '';
+						if (firstRow && firstRow.cells[i]) {
+							const styleWidth = firstRow.cells[i].style.width;
+							if (styleWidth) {
+								colStyle = ` style="width: ${styleWidth};"`;
+								dom.utils.setStyle(firstRow.cells[i], 'width', '');
+							}
+						}
+						colHTML.push(`<col${colStyle}>`);
+					}
+
+					const colGroup = dom.utils.createElement('colgroup', null, colHTML.join(''));
 					element.insertBefore(colGroup, element.firstElementChild);
 				}
 
@@ -440,6 +455,12 @@ class Table extends EditorInjector {
 					FigureEl.appendChild(element);
 				} else {
 					dom.utils.addClass(FigureEl, 'se-flex-component|se-input-component');
+				}
+
+				// table width
+				if (element.style.width) {
+					FigureEl.style.width = element.style.width;
+					dom.utils.setStyle(element, 'width', '');
 				}
 
 				// scroll

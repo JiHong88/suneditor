@@ -21,7 +21,7 @@ const DEFAULT_BUTTON_LIST = [
 const REQUIRED_FORMAT_LINE = 'div';
 const REQUIRED_ELEMENT_WHITELIST = 'br|div';
 const DEFAULT_ELEMENT_WHITELIST =
-	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
+	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|colgroup|col|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_TEXT_STYLE_TAGS = 'strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary';
 
 /* scopeSelectionTags */
@@ -46,7 +46,10 @@ const DEFAULT_CLASS_MJX = 'mjx-container|mjx-math|mjx-mrow|mjx-mi|mjx-mo|mjx-mn|
 const DEFAULT_EXTRA_TAG_MAP = { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false };
 
 const DEFAULT_TAG_STYLES = {
-	'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style',
+	'table|th|td|tr': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align|text-align',
+	'table|td': 'width',
+	tr: 'height',
+	col: 'width',
 	'ol|ul': 'list-style-type'
 };
 const DEFAULT_TEXT_STYLES = 'font-family|font-size|color|background-color';
