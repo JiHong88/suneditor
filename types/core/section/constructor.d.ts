@@ -178,7 +178,14 @@ export function CreateToolBar(
  * @property {string} [__textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - The basic tags that serves as the base for "textStyleTags"
  * @property {string} [textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - Additional text style tags.
  * @property {Object<string, string>} [convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
- * @property {Object<string, string>} [__tagStyles={'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style', 'ol|ul': 'list-style-type'}] - The basic tags that serves as the base for "tagStyles"
+ * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
+ * @property {Object<string, string>} [__tagStyles={
+    'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align|text-align',
+    'table|td': 'width',
+    tr: 'height',
+    col: 'width',
+    'ol|ul': 'list-style-type'
+    }] - The basic tags that serves as the base for "tagStyles"
  * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags.
  * @property {string} [spanStyles="font-family|font-size|color|background-color"] - Specifies allowed styles for the "span" tag.
  * @property {string} [lineStyles="text-align|margin-left|margin-right|line-height"] - Specifies allowed styles for the "line" element (p..).
@@ -249,7 +256,6 @@ export function CreateToolBar(
  * @property {string} [printTemplate] - Custom template for print mode.
  * @property {boolean} [componentAutoSelect=false] - Enables automatic selection of inserted components.
  * @property {string} [defaultUrlProtocol] - Default URL protocol for links.
- * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
  * @property {Object<"copy", number>} [toastMessageTime] - {"copy": 1500} - Duration for displaying toast messages.
  * @property {Object<string, string>} [icons] - Overrides the default icons.
  * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
@@ -509,6 +515,10 @@ export type EditorBaseOptions = {
 		[x: string]: string;
 	};
 	/**
+	 * - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
+	 */
+	allUsedStyles?: string;
+	/**
 	 * - The basic tags that serves as the base for "tagStyles"
 	 */
 	__tagStyles?: {
@@ -719,10 +729,6 @@ export type EditorBaseOptions = {
 	 * - Default URL protocol for links.
 	 */
 	defaultUrlProtocol?: string;
-	/**
-	 * - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
-	 */
-	allUsedStyles?: string;
 	/**
 	 * - {"copy": 1500} - Duration for displaying toast messages.
 	 */

@@ -22,11 +22,11 @@ Many options use predefined constants for their default values. Here are their d
 
 -   **`DEFAULT_SCOPE_SELECTION_TAGS`**: `'td|table|li|ol|ul|pre|figcaption|blockquote|dl|dt|dd'`
 
--   **`_video_audio_attr`**: `'|controls|autoplay|loop|muted|poster|preload|playsinline|volume|crossorigin|disableRemotePlayback|controlsList'` (Used within `DEFAULT_ATTRIBUTE_WHITELIST`)
+-   **`_media_attr`**: `'|width|height|controls|autoplay|loop|muted|poster|preload|playsinline|volume|crossorigin|disableRemotePlayback|controlsList'` (Used within `DEFAULT_ATTRIBUTE_WHITELIST`)
 
 -   **`_iframe_attr`**: `'|allowfullscreen|sandbox|loading|allow|referrerpolicy|frameborder|scrolling'` (Used within `DEFAULT_ATTRIBUTE_WHITELIST`)
 
--   **`DEFAULT_ATTRIBUTE_WHITELIST`**: `'contenteditable|target|href|title|download|rel|src|alt|class|type|colspan|rowspan' + _video_audio_attr + _iframe_attr`
+-   **`DEFAULT_ATTRIBUTE_WHITELIST`**: `'contenteditable|target|href|title|download|rel|src|alt|class|type|colspan|rowspan' + _media_attr + _iframe_attr`
 
 -   **`DEFAULT_FORMAT_LINE`**: `'P|H[1-6]|LI|TH|TD|DETAILS'`
 
@@ -412,6 +412,13 @@ These options control the core functionality, plugins, toolbar, styling, and con
 -   **Default**: `{bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}`
 -   **Mutability**: Fixed
 
+### `allUsedStyles`
+
+-   **Description**: Specifies additional styles to the list of allowed styles. Delimiter: `|`.
+-   **Type**: `string`
+-   **Default**: `undefined`
+-   **Mutability**: Fixed
+
 ### `__tagStyles`
 
 -   **Description**: The basic tags that serves as the base for "tagStyles". (Internal use primarily)
@@ -717,13 +724,6 @@ These options control the core functionality, plugins, toolbar, styling, and con
 -   **Type**: `string`
 -   **Default**: `undefined`
 -   **Mutability**: Resettable
-
-### `allUsedStyles`
-
--   **Description**: Specifies additional styles to the list of allowed styles. Delimiter: `|`.
--   **Type**: `string`
--   **Default**: `undefined`
--   **Mutability**: Fixed
 
 ### `toastMessageTime`
 

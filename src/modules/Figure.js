@@ -326,8 +326,8 @@ class Figure extends EditorInjector {
 				return {
 					container: null,
 					cover: null,
-					width: target.style.width || (!numbers.is(/** @type {HTMLImageElement} */ (target).width) ? /** @type {HTMLImageElement} */ (target).width : '') || '',
-					height: target.style.height || (!numbers.is(/** @type {HTMLImageElement} */ (target).height) ? /** @type {HTMLImageElement} */ (target).height : '') || ''
+					width: target.style.width || /** @type {HTMLImageElement} */ (target).width || '',
+					height: target.style.height || /** @type {HTMLImageElement} */ (target).height || ''
 				};
 			}
 		}
