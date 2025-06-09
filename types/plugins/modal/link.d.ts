@@ -86,6 +86,7 @@ declare class Link extends EditorInjector {
 	 * @description Executes the method that is called whenever the cursor position changes.
 	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @returns {boolean} - Whether the plugin is active
+	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
 	active(element?: (HTMLElement | null) | undefined): boolean;
 	/**

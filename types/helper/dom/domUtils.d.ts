@@ -116,6 +116,13 @@ export function changeTxt(node: Node, txt: string): void;
  */
 export function setStyle(elements: Node | Node[], styleName: string, value: string | number): void;
 /**
+ * @description Gets the style value of the element. If the elements is an array, the style of the first element is returned.
+ * @param {Node} element Element to get style from.
+ * @param {string} styleName Style attribute name (e.g., 'marginLeft', 'textAlign').
+ * @returns {string | undefined} The value of the style attribute, or undefined if the element does not exist.
+ */
+export function getStyle(element: Node, styleName: string): string | undefined;
+/**
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
  * @param {Array<HTMLButtonElement|HTMLInputElement>} buttonList (Button | Input) Element array
  * @param {boolean} disabled Disabled value
@@ -212,6 +219,7 @@ declare namespace utils {
 	export { changeElement };
 	export { changeTxt };
 	export { setStyle };
+	export { getStyle };
 	export { setDisabled };
 	export { hasClass };
 	export { addClass };

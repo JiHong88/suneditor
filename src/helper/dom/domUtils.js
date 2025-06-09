@@ -271,6 +271,20 @@ export function setStyle(elements, styleName, value) {
 }
 
 /**
+ * @description Gets the style value of the element. If the elements is an array, the style of the first element is returned.
+ * @param {Node} element Element to get style from.
+ * @param {string} styleName Style attribute name (e.g., 'marginLeft', 'textAlign').
+ * @returns {string | undefined} The value of the style attribute, or undefined if the element does not exist.
+ */
+export function getStyle(element, styleName) {
+	if (element?.nodeType !== 1) {
+		return undefined;
+	}
+
+	return /** @type {HTMLElement} */ (element).style[styleName];
+}
+
+/**
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
  * @param {Array<HTMLButtonElement|HTMLInputElement>} buttonList (Button | Input) Element array
  * @param {boolean} disabled Disabled value
@@ -541,6 +555,7 @@ const utils = {
 	changeElement,
 	changeTxt,
 	setStyle,
+	getStyle,
 	setDisabled,
 	hasClass,
 	addClass,

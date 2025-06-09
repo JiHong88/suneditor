@@ -43,17 +43,21 @@ class Font extends EditorInjector {
 	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
+	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
 	active(element, target) {
 		const targetText = target.querySelector('.se-txt');
 		const tooltip = target.parentNode.querySelector('.se-tooltip-text');
 
+		let fontFamily = '';
 		if (!element) {
 			const font = this.status.hasFocus ? this.editor.frameContext.get('wwComputedStyle').fontFamily : this.lang.font;
 			dom.utils.changeTxt(targetText, font);
 			dom.utils.changeTxt(tooltip, this.status.hasFocus ? this.lang.font + (font ? ' (' + font + ')' : '') : font);
-		} else if (element?.style.fontFamily.length > 0) {
-			const selectFont = element.style.fontFamily.replace(/["']/g, '');
+		} else if (this.format.isLine(element)) {
+			return undefined;
+		} else if ((fontFamily = dom.utils.getStyle(element, 'fontFamily'))) {
+			const selectFont = fontFamily.replace(/["']/g, '');
 			dom.utils.changeTxt(targetText, selectFont);
 			dom.utils.changeTxt(tooltip, this.lang.font + ' (' + selectFont + ')');
 			return true;

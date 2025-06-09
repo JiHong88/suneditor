@@ -83,8 +83,11 @@ declare class ColorPicker extends CoreInjector {
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node
 	 * @param {Node} target target
+	 * @param {?((current: Node) => boolean)=} stopCondition - A function used to stop traversing parent nodes while finding the color.
+	 * - When this function returns true, the traversal ends at that node.
+	 * - e.g., `(node) => this.format.isLine(node)` stops at line-level elements like <p>, <div>.
 	 */
-	init(nodeOrColor: Node | string, target: Node): void;
+	init(nodeOrColor: Node | string, target: Node, stopCondition?: (((current: Node) => boolean) | null) | undefined): void;
 	/**
 	 * @description Store color values
 	 * @param {string} hexColorStr Hax color value
@@ -104,6 +107,7 @@ declare class ColorPicker extends CoreInjector {
 	 * @private
 	 * @description Gets color value at color property of node
 	 * @param {Node} node Selected node
+	 * @param {(current: Node) => boolean} stopCondition - A function used to stop traversing parent nodes while finding the color.
 	 * @returns {string}
 	 */
 	private _getColorInNode;

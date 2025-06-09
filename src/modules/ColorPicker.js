@@ -104,7 +104,7 @@ class ColorPicker extends CoreInjector {
 		this.inputElement = /** @type {HTMLInputElement} */ (this.target.querySelector('.se-color-input'));
 		this.styleProperties = styles;
 		this.splitNum = params.splitNum || 0;
-		this.defaultColor = params.defaultColor;
+		this.defaultColor = params.defaultColor || '';
 		this.hueSliderOptions = params.hueSliderOptions;
 		this.parentDisplay = '';
 		this.currentColor = '';
@@ -140,14 +140,15 @@ class ColorPicker extends CoreInjector {
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node
 	 * @param {Node} target target
+	 * @param {?((current: Node) => boolean)=} stopCondition - A function used to stop traversing parent nodes while finding the color.
+	 * - When this function returns true, the traversal ends at that node.
+	 * - e.g., `(node) => this.format.isLine(node)` stops at line-level elements like <p>, <div>.
 	 */
-	init(nodeOrColor, target) {
+	init(nodeOrColor, target, stopCondition) {
 		this.targetButton = target;
+		if (typeof stopCondition !== 'function') stopCondition = () => false;
 
-		const computedColor = this.editor.frameContext.get('wwComputedStyle')[this.styleProperties];
-		const defaultColor = this.defaultColor || converter.isHexColor(computedColor) ? computedColor : converter.rgb2hex(computedColor);
-
-		let fillColor = (typeof nodeOrColor === 'string' ? nodeOrColor : this._getColorInNode(nodeOrColor)) || defaultColor;
+		let fillColor = (typeof nodeOrColor === 'string' ? nodeOrColor : this._getColorInNode(nodeOrColor, stopCondition)) || this.defaultColor;
 		fillColor = converter.isHexColor(fillColor) ? fillColor : converter.rgb2hex(fillColor) || fillColor || '';
 
 		const colorList = this.colorList;
@@ -187,7 +188,7 @@ class ColorPicker extends CoreInjector {
 	 * @param {string} hexColorStr Hax color value
 	 */
 	_setInputText(hexColorStr) {
-		hexColorStr = /^#/.test(hexColorStr) ? hexColorStr : '#' + hexColorStr;
+		hexColorStr = !hexColorStr || /^#/.test(hexColorStr) ? hexColorStr : '#' + hexColorStr;
 		this.inputElement.value = hexColorStr;
 		this.setHexColor.call(this, hexColorStr);
 	}
@@ -196,13 +197,14 @@ class ColorPicker extends CoreInjector {
 	 * @private
 	 * @description Gets color value at color property of node
 	 * @param {Node} node Selected node
+	 * @param {(current: Node) => boolean} stopCondition - A function used to stop traversing parent nodes while finding the color.
 	 * @returns {string}
 	 */
-	_getColorInNode(node) {
+	_getColorInNode(node, stopCondition) {
 		let findColor = '';
 		const sp = this.styleProperties;
 
-		while (node && !dom.check.isWysiwygFrame(node) && findColor.length === 0) {
+		while (node && !stopCondition(node) && !dom.check.isWysiwygFrame(node) && findColor.length === 0) {
 			if (isElement(node) && node.style[sp]) findColor = node.style[sp];
 			node = node.parentNode;
 		}
@@ -217,7 +219,7 @@ class ColorPicker extends CoreInjector {
 	 * @returns {string}
 	 */
 	_colorName2hex(colorName) {
-		if (/^#/.test(colorName)) return colorName;
+		if (!colorName || /^#/.test(colorName)) return colorName;
 		const temp = dom.utils.createElement('div', { style: 'display: none; color: ' + colorName });
 		const colors = this._w
 			.getComputedStyle(this._d.body.appendChild(temp))

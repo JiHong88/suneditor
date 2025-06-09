@@ -2431,19 +2431,32 @@ class Table extends EditorInjector {
 			align_v = verticalAlign;
 		this._propsCache = [];
 
+		const tempColorStyles = _w.getComputedStyle(this.eventManager.__focusTemp);
 		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
 			// eslint-disable-next-line no-shadow
-			const { cssText, border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = _w.getComputedStyle(t);
+			const { cssText, border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = t.style;
 			this._propsCache.push([t, cssText]);
 			if (isBreak) continue;
 
 			const { c, s, w } = this._getBorderStyle(border);
 
+			// colors
+			let hexBackColor = backgroundColor;
+			let hexColor = color;
+			if (hexBackColor) {
+				this.eventManager.__focusTemp.style.backgroundColor = hexBackColor;
+				hexBackColor = tempColorStyles.backgroundColor;
+			}
+			if (hexColor) {
+				this.eventManager.__focusTemp.style.color = hexColor;
+				hexColor = tempColorStyles.color;
+			}
+
 			if (b_color && cellBorder.c !== c) b_color = '';
 			if (b_style && cellBorder.s !== s) b_style = '';
 			if (b_width && cellBorder.w !== w) b_width = '';
-			if (backColor !== converter.rgb2hex(backgroundColor)) backColor = '';
-			if (fontColor !== converter.rgb2hex(color)) fontColor = '';
+			if (backColor !== converter.rgb2hex(hexBackColor)) backColor = '';
+			if (fontColor !== converter.rgb2hex(hexColor)) fontColor = '';
 			if (align !== (isTable ? this._figure?.style.float : textAlign)) align = '';
 			if (align_v && align_v !== verticalAlign) align_v = '';
 			if (bold && bold !== /.+/.test(fontWeight)) bold = false;

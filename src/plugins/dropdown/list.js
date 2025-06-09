@@ -40,6 +40,7 @@ class List extends EditorInjector {
 	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
+	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
 	active(element, target) {
 		const icon = target.firstElementChild;

@@ -176,14 +176,18 @@ class FontSize extends EditorInjector {
 	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
+	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
 	active(element, target) {
 		if (!dom.utils.hasClass(target, '__se__font_size')) return false;
 
+		let fontSize = '';
 		if (!element) {
 			this._setSize(target, this._getDefaultSize());
-		} else if (element?.style.fontSize.length > 0) {
-			this._setSize(target, element.style.fontSize);
+		} else if (this.format.isLine(element)) {
+			return undefined;
+		} else if ((fontSize = dom.utils.getStyle(element, 'fontSize'))) {
+			this._setSize(target, fontSize);
 			return true;
 		}
 

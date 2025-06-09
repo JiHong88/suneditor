@@ -47,15 +47,19 @@ class BackgroundColor extends EditorInjector {
 	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
 	 * @param {?HTMLElement=} target - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
+	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
 	active(element, target) {
 		const colorHelper = /** @type {SVGPathElement} */ (target.querySelector('path.se-svg-color-helper'));
-		if (!colorHelper) return false;
+		if (!colorHelper) return undefined;
 
+		let color = '';
 		if (!element) {
-			colorHelper.style.color = '';
-		} else if (element.style.backgroundColor.length > 0) {
-			colorHelper.style.color = element.style.backgroundColor;
+			colorHelper.style.color = color;
+		} else if (this.format.isLine(element)) {
+			return undefined;
+		} else if ((color = dom.utils.getStyle(element, 'backgroundColor'))) {
+			colorHelper.style.color = color;
 			return true;
 		}
 
@@ -68,7 +72,7 @@ class BackgroundColor extends EditorInjector {
 	 * @param {HTMLElement} target Line element at the current cursor position
 	 */
 	on(target) {
-		this.colorPicker.init(this.selection.getNode(), target);
+		this.colorPicker.init(this.selection.getNode(), target, (current) => this.format.isLine(current));
 	}
 
 	/**

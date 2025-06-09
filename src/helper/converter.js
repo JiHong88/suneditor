@@ -350,7 +350,7 @@ export function rgb2hex(rgba) {
 
 		return `#${r}${g}${b}${a}`;
 	} else {
-		return '';
+		return rgba;
 	}
 }
 

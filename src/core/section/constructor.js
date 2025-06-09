@@ -46,7 +46,7 @@ const DEFAULT_CLASS_MJX = 'mjx-container|mjx-math|mjx-mrow|mjx-mi|mjx-mo|mjx-mn|
 const DEFAULT_EXTRA_TAG_MAP = { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false };
 
 const DEFAULT_TAG_STYLES = {
-	'table|th|td|tr': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align|text-align',
+	'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align|text-align',
 	'table|td': 'width',
 	tr: 'height',
 	col: 'width',

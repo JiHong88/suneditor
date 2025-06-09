@@ -123,6 +123,7 @@ export const dom: {
 		changeElement: typeof import('./dom/domUtils').changeElement;
 		changeTxt: typeof import('./dom/domUtils').changeTxt;
 		setStyle: typeof import('./dom/domUtils').setStyle;
+		getStyle: typeof import('./dom/domUtils').getStyle;
 		setDisabled: typeof import('./dom/domUtils').setDisabled;
 		hasClass: typeof import('./dom/domUtils').hasClass;
 		addClass: typeof import('./dom/domUtils').addClass;

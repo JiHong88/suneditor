@@ -216,6 +216,7 @@ EventManager.prototype = {
 		const styleTags = this.options.get('_textStyleTags');
 		const styleNodes = [];
 
+		const ignoreCommands = [];
 		const activeCommands = this.editor.activeCommands;
 		const cLen = activeCommands.length;
 		let nodeName = '';
@@ -251,9 +252,14 @@ EventManager.prototype = {
 					name = activeCommands[c];
 					if (
 						!commandMapNodes.includes(name) &&
+						!ignoreCommands.includes(name) &&
 						commandTargets.get(name) &&
 						commandTargets.get(name).filter((e) => {
-							return plugins[name]?.active(element, e);
+							const r = plugins[name]?.active(element, e);
+							if (r === undefined) {
+								ignoreCommands.push(name);
+							}
+							return r;
 						}).length > 0
 					) {
 						commandMapNodes.push(name);
@@ -561,6 +567,8 @@ EventManager.prototype = {
 
 		if (commonCon.nodeType === 3 && this.component.is(commonCon.parentElement)) {
 			const compInfo = this.component.get(commonCon.parentElement);
+			if (!compInfo) return;
+
 			const container = compInfo.container;
 
 			if (commonCon.parentElement === container) {

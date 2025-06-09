@@ -52,7 +52,7 @@ Many options use predefined constants for their default values. Here are their d
 
     ```javascript
     {
-        'table|th|td|tr': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align|text-align',
+        'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align|text-align',
         'table|td': 'width',
         tr: 'height',
         col: 'width',
