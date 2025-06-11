@@ -496,7 +496,7 @@ class Table extends EditorInjector {
 
 		const eventTarget = dom.query.getEventTarget(event);
 		const target = dom.query.getParentElement(eventTarget, IsResizeEls);
-		if (!target) {
+		if (!target || event.buttons === 1) {
 			this.__hideResizeLine();
 			return;
 		}
@@ -559,7 +559,7 @@ class Table extends EditorInjector {
 			try {
 				this._deleteStyleSelectedCells();
 				this.setCellInfo(target, true);
-				const colIndex = this._logical_cellIndex - (cellEdge.isLeft ? 1 : 0);
+				const colIndex = this._logical_cellIndex + this._current_colSpan - (cellEdge.isLeft ? 1 : 0);
 
 				// ready
 				this.ui.enableBackWrapper('ew-resize');
@@ -2151,7 +2151,7 @@ class Table extends EditorInjector {
 		const prevValue = col.style.width;
 		const nextCol = /** @type {HTMLElement} */ (col.nextElementSibling);
 		const nextColPrevValue = nextCol.style.width;
-		const realWidth = dom.utils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(col);
+		const realWidth = dom.utils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(nextCol || col);
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 		this._addResizeGlobalEvents(
