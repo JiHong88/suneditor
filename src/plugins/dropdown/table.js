@@ -458,8 +458,9 @@ class Table extends EditorInjector {
 				}
 
 				// table width
-				if (element.style.width) {
-					FigureEl.style.width = element.style.width;
+				const tableWidth = element.style.width;
+				if (tableWidth) {
+					FigureEl.style.width = tableWidth === 'auto' ? 'min-content' : tableWidth;
 					dom.utils.setStyle(element, 'width', '');
 				}
 
