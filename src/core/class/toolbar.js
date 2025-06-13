@@ -156,23 +156,32 @@ Toolbar.prototype = {
 		this.menu.dropdownOff();
 		this.menu.containerOff();
 
-		const { options, icons, lang, isSub } = this;
+		const { options, icons, lang } = this;
 		const newToolbar = CreateToolBar(buttonList, this.plugins, options, icons, lang, true);
 
 		newToolbar.updateButtons.forEach((v) => UpdateButton(v.button, v.plugin, this.icons, this.lang));
 
-		let cmdButtons;
-		if (isSub) cmdButtons = this.editor.subAllCommandButtons = new Map();
-		else cmdButtons = this.editor.allCommandButtons = new Map();
-		this.editor.commandTargets = new Map();
-		this.editor.shortcutsKeyMap = new Map();
-		this.editor.__saveCommandButtons(cmdButtons, newToolbar.buttonTray);
-		this.editor.__cachingShortcuts();
-
 		this.context.get(this.keyName + '.main').replaceChild(newToolbar.buttonTray, this.context.get(this.keyName + '.buttonTray'));
 		this.context.set(this.keyName + '.buttonTray', newToolbar.buttonTray);
 
-		this.editor.__setDisabledButtons();
+		this._resetButtonInfo();
+
+		this.triggerEvent('onSetToolbarButtons', { buttonTray: newToolbar.buttonTray, frameContext: this.editor.frameContext });
+	},
+
+	/**
+	 * @private
+	 * @this {ToolbarThis}
+	 * @description Reset the common buttons info.
+	 */
+	_resetButtonInfo() {
+		this.editor.allCommandButtons = new Map();
+		this.editor.subAllCommandButtons = new Map();
+		this.editor.commandTargets = new Map();
+		this.editor.shortcutsKeyMap = new Map();
+
+		this.editor.__cachingButtons();
+		this.editor.__cachingShortcuts();
 
 		this.history.resetButtons(this.editor.frameContext.get('key'), null);
 		this._resetSticky();
@@ -181,8 +190,6 @@ Toolbar.prototype = {
 		this.viewer._setButtonsActive();
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		if (this.editor.frameContext.get('isReadOnly')) this.ui.setControllerOnDisabledButtons(true);
-
-		this.triggerEvent('onSetToolbarButtons', { buttonTray: newToolbar.buttonTray, frameContext: this.editor.frameContext });
 	},
 
 	/**

@@ -123,6 +123,12 @@ declare class Toolbar {
 	/**
 	 * @private
 	 * @this {ToolbarThis}
+	 * @description Reset the common buttons info.
+	 */
+	_resetButtonInfo(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
+	/**
+	 * @private
+	 * @this {ToolbarThis}
 	 * @description Reset the sticky toolbar position based on the editor state.
 	 */
 	_resetSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
