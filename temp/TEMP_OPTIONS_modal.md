@@ -493,7 +493,8 @@ suneditor.create('editor', {
 	link: {
 		uploadUrl: '/api/link/upload',
 		defaultRel: 'nofollow noreferrer',
-		acceptedFormats: 'application/pdf, .zip'
+		acceptedFormats: 'application/pdf, .zip',
+		openNewWindow: true
 	}
 });
 ```
@@ -550,26 +551,26 @@ These options control the behavior and attributes of the created link (`<a>` tag
 -   **Default:** `false`
 -   **Description:** If `true`, a checkbox to open the link in a new window (`target='_blank'`) is added and checked by default.
 
-#### `relList`
-
--   **Type:** `Array<Object>`
--   **Required:** `false`
--   **Default:** `undefined`
--   **Description:** A list of `rel` attribute options to display as checkboxes. Example: `[{name: 'nofollow', value: 'nofollow', checked: true}]`.
-
-#### `defaultRel`
-
--   **Type:** `string`
--   **Required:** `false`
--   **Default:** `undefined`
--   **Description:** The default `rel` attribute value to apply to new links (e.g., `'nofollow noreferrer'`).
-
 #### `noAutoPrefix`
 
 -   **Type:** `boolean`
 -   **Required:** `false`
 -   **Default:** `false`
 -   **Description:** If `true`, does not automatically add 'http://' to URLs that lack a protocol.
+
+#### `relList`
+
+-   **Type:** `Array<Object>`
+-   **Required:** `false`
+-   **Default:** `[]`
+-   **Description:** A list of `rel` attribute options to display as checkboxes. Example: `[{name: 'nofollow', value: 'nofollow', checked: true}]`.
+
+#### `defaultRel`
+
+-   **Type:** `Object | string`
+-   **Required:** `false`
+-   **Default:** `{}`
+-   **Description:** The default `rel` attribute values to apply to new links. It can be a simple string (e.g., `'nofollow'`) or an object for more complex scenarios, like: `{ default: 'nofollow', check_new_window: 'noreferrer noopener' }`.
 
 ---
 

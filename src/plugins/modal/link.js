@@ -3,14 +3,20 @@ import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { dom, numbers } from '../../helper';
 
 /**
- * @typedef {Object} LinkPluginOptions
- * @property {boolean} [textToDisplay=true] - Whether to display the link text.
- * @property {boolean} [title=true] - Whether to display the link title.
+ * @typedef {import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams} ModalAnchorEditorParams
+ */
+
+/**
+ * @typedef {Object} LinkOptions
  * @property {string} [uploadUrl] - The URL endpoint for file uploads.
  * @property {Object<string, string>} [uploadHeaders] - Additional headers for file upload requests.
  * @property {number} [uploadSizeLimit] - The total file upload size limit in bytes.
  * @property {number} [uploadSingleSizeLimit] - The single file upload size limit in bytes.
  * @property {string} [acceptedFormats] - Accepted file formats for link uploads.
+ */
+
+/**
+ * @typedef {Omit<LinkOptions & ModalAnchorEditorParams, ''>} LinkPluginOptions
  */
 
 /**
