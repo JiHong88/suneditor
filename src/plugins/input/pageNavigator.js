@@ -33,6 +33,7 @@ class PageNavigator extends EditorInjector {
 		// init
 		this.eventManager.addEvent(this.inner, 'change', this.#OnChangeInner.bind(this));
 	}
+
 	/**
 	 * @editorMethod Editor.documentType
 	 * @description Updates the displayed page number and total pages in the navigator.
