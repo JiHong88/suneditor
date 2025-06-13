@@ -486,6 +486,7 @@
 	background-clip: padding-box;
 	background-color: inherit;
 	vertical-align: middle;
+	min-width: 2em;
 }
 
 /** table style class */
@@ -604,6 +605,10 @@
 	min-width: auto;
 	max-width: 100%;
 	margin: 0 0 10px;
+}
+
+.sun-editor-editable figure.se-flex-component {
+	width: max-content;
 }
 
 .sun-editor-editable .se-inline-component {

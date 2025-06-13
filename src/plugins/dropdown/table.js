@@ -327,8 +327,9 @@ class Table extends EditorInjector {
 			scrollTypeClass = ` se-scroll-figure-${this.figureScroll}`;
 		}
 
-		const figure = dom.utils.createElement('FIGURE', { class: 'se-flex-component se-input-component' + scrollTypeClass });
+		const figure = dom.utils.createElement('FIGURE', { class: 'se-flex-component se-input-component' + scrollTypeClass, style: 'width: 100%;' });
 		figure.appendChild(oTable);
+		this._maxWidth = true;
 
 		if (this.component.insert(figure, { skipCharCount: false, skipSelection: false, skipHistory: false })) {
 			this._resetTablePicker();
@@ -346,8 +347,7 @@ class Table extends EditorInjector {
 		this._figureOpen(target);
 		if (!this._figure) this.setTableInfo(target);
 
-		const targetWidth = this._figure?.style.width || '100%';
-		this._maxWidth = targetWidth === '100%';
+		this._maxWidth = this._figure?.style.width === '100%';
 		this._fixedColumn = dom.utils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
 		this._setTableStyle(this._maxWidth ? 'width|column' : 'width', true);
 
@@ -460,7 +460,7 @@ class Table extends EditorInjector {
 				// table width
 				const tableWidth = element.style.width;
 				if (tableWidth) {
-					FigureEl.style.width = tableWidth === 'auto' ? 'min-content' : tableWidth;
+					FigureEl.style.width = tableWidth === 'auto' ? 'max-content' : tableWidth;
 					dom.utils.setStyle(element, 'width', '');
 				}
 
@@ -2038,7 +2038,7 @@ class Table extends EditorInjector {
 			if (!this._maxWidth) {
 				sizeIcon = this.icons.expansion;
 				text = this.maxText;
-				if (!ondisplay) targets.style.width = 'min-content';
+				if (!ondisplay) targets.style.width = 'max-content';
 			} else {
 				sizeIcon = this.icons.reduction;
 				text = this.minText;
