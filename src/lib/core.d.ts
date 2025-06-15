@@ -19,7 +19,7 @@ type fileInfo =  {
 };
 type seledtedFileInfo = {target: Element; component: Element; pluginName: string;};
 type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript' | 'copy' | 'cut' | 'paste';
-​​
+
 interface Core {
     /**
      * @description Util object
@@ -172,7 +172,7 @@ interface Core {
     activePlugins: Plugin[];
 
     /**
-     * @description Plugins array with "checkFiletInfo" and "resetFileInfo" methods.
+     * @description Plugins array with "checkFileInfo" and "resetFileInfo" methods.
      * "fileInfoPlugins" runs the "add" method when creating the editor.
      * "checkFileInfo" method is always call just before the "change" event.
      */
@@ -267,7 +267,7 @@ interface Core {
      * @param position Type of position ("top" | "bottom")
      * When using the "top" position, there should not be an arrow on the controller.
      * When using the "bottom" position there should be an arrow on the controller.
-     * @param addOffset These are the left and top values that need to be added specially. 
+     * @param addOffset These are the left and top values that need to be added specially.
      * This argument is required. - {left: 0, top: 0}
      * Please enter the value based on ltr mode.
      * Calculated automatically in rtl mode.
@@ -399,7 +399,7 @@ interface Core {
      * @returns
      */
     insertComponent(element: Element, notHistoryPush?: boolean, checkCharCount?: boolean, notSelect?:boolean): Element;
-    
+
     /**
      * @description Gets the file component and that plugin name
      * return: {target, component, pluginName} | null
@@ -424,7 +424,7 @@ interface Core {
      * @returns
      */
     insertNode(oNode: Node, afterNode?: Node, checkCharCount?: boolean): { startOffset: Node, endOffset: number } | Node | null;
-    
+
     /**
      * @description Delete the currently selected nodes and reset selection range
      * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
@@ -583,15 +583,15 @@ interface Core {
     /**
      * @description Converts contents into a format that can be placed in an editor
      * @param contents contents
-     * @returns 
+     * @returns
      */
     convertContentsForEditor(contents: string): string;
-    
+
     /**
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
      * @param html WYSIWYG element (context.element.wysiwyg) or HTML string.
      * @param comp If true, does not line break and indentation of tags.
-     * @returns 
+     * @returns
      */
     convertHTMLForCodeView(html: Element | string, comp?: boolean): string;
 
@@ -614,7 +614,7 @@ interface Core {
 
     /**
      * @description When "element" is added, if it is greater than "options.maxCharCount", false is returned.
-     * @param element Element node or String.
+     * @param element Element node or string.
      * @param charCounterType charCounterType. If it is null, the options.charCounterType
      */
     checkCharCount(element: Node | string, charCounterType?: string): boolean;
@@ -668,6 +668,24 @@ type imageInputInformation = { linkValue: string, linkNewWindow: Window, inputWi
 type videoInputInformation = { inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, element: any };
 type audioInputInformation = { isUpdate: boolean, element: any };
 
+type MediaUploadState = 'create' | 'update' | 'delete';
+type MediaUploadHandlerParam = {
+  result: {
+    /** @property {string} url - The url of uploaded file, */
+    url: string,
+    /** @property {string} name - The name of the uploaded file, */
+    name: string,
+    /** @property {string} size(optional) - The size of the uploaded file, */
+    size?: string
+  }[]
+}
+type MediaUploadHandlerFunc = (param: File[] | string | MediaUploadHandlerParam | undefined) => void
+type MediaUploadHandlerErrorResult = {
+  'limitSize': number,
+  'uploadSize': number
+  'currentSize': number,
+}
+
 export default class SunEditor {
     constructor(context: Context,
         pluginCallButtons: Record<string, Element>,
@@ -678,7 +696,7 @@ export default class SunEditor {
 
     core: Core;
     util: Util;
-    
+
     onload: (core: Core, reload: boolean) => void;
     onScroll: EventFn;
     onFocus: EventFn;
@@ -717,7 +735,7 @@ export default class SunEditor {
      * @param controllers Array of Controller elements
      * @param core Core object
      */
-    showController: (name: String, controllers: Controllers, core: Core) => void;
+    showController: (name: string, controllers: Controllers, core: Core) => void;
 
     /**
      * @description It replaces the default callback function of the image upload
@@ -792,7 +810,7 @@ export default class SunEditor {
      *                                   }
      * @returns
      */
-    onImageUploadBefore: (files: any[], info: imageInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
+    onImageUploadBefore: (files: File[], info: imageInputInformation, core: Core, uploadHandler: MediaUploadHandlerFunc) => boolean | any[] | undefined;
 
     /**
      * @description Called before the video is uploaded
@@ -815,7 +833,7 @@ export default class SunEditor {
      *                                   }
      * @returns
      */
-    onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
+    onVideoUploadBefore: (files: File[], info: videoInputInformation, core: Core, uploadHandler: MediaUploadHandlerFunc) => boolean | any[] | undefined;
 
     /**
      * @description Called before the audio is uploaded
@@ -838,7 +856,7 @@ export default class SunEditor {
      *                                   }
      * @returns
      */
-    onAudioUploadBefore: (files: any[], info: audioInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
+    onAudioUploadBefore: (files: File[], info: audioInputInformation, core: Core, uploadHandler: MediaUploadHandlerFunc) => boolean | any[] | undefined;
 
     /**
      * @description Called when the image is uploaded, updated, deleted
@@ -856,7 +874,7 @@ export default class SunEditor {
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onImageUpload: (targetElement: HTMLImageElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number, core: Core) => void;
+    onImageUpload: (targetElement: HTMLImageElement, index: number, state: MediaUploadState, info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the video(iframe, video) is uploaded, updated, deleted
@@ -874,7 +892,7 @@ export default class SunEditor {
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number, core: Core) => void;
+    onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: MediaUploadState, info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the audio is uploaded, updated, deleted
@@ -892,16 +910,19 @@ export default class SunEditor {
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number, core: Core) => void;
+    onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: MediaUploadState, info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the image is upload failed
      * @param errorMessage Error message
      * @param result Response Object
+     * - limitSize: limit size in bytes
+     * - uploadSize: uploaded size in bytes
+     * - currentSize: current file size in bytes
      * @param core Core object
      * @returns
      */
-    onImageUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+    onImageUploadError: (errorMessage: string, result: MediaUploadHandlerErrorResult, core: Core) => boolean;
 
     /**
      * @description Called when the video(iframe, video) upload failed
@@ -910,7 +931,7 @@ export default class SunEditor {
      * @param core Core object
      * @returns
      */
-    onVideoUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+    onVideoUploadError: (errorMessage: string, result: MediaUploadHandlerErrorResult, core: Core) => boolean;
 
     /**
      * @description Called when the audio upload failed
@@ -919,7 +940,7 @@ export default class SunEditor {
      * @param core Core object
      * @returns
      */
-    onAudioUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+    onAudioUploadError: (errorMessage: string, result: MediaUploadHandlerErrorResult, core: Core) => boolean;
 
     /**
      * @description Called when the audio image delete before.
@@ -967,7 +988,7 @@ export default class SunEditor {
     /**
      * @description Called after the "setToolbarButtons" invocation.
      * Can be used to tweak buttons properties (useful for custom buttons)
-     * @param buttonList Button list 
+     * @param buttonList Button list
      * @param core Core object
      */
     onSetToolbarButtons: (buttonList: any[], core: Core) => void;
@@ -975,7 +996,7 @@ export default class SunEditor {
     /**
      * @description Reset the buttons on the toolbar. (Editor is not reloaded)
      * You cannot set a new plugin for the button.
-     * @param buttonList Button list 
+     * @param buttonList Button list
      */
     setToolbarButtons(buttonList: any[]): void;
 
