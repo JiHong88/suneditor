@@ -679,7 +679,14 @@ type MediaUploadHandlerParam = {
     size?: string
   }[]
 }
-type MediaUploadHandlerFunc = (param: MediaUploadHandlerParam | File[] | string | undefined) => void
+/**
+ * Function that takes a parameter of *any one* of the below
+ * - Result: An object of type MediaUploadHandlerParam: {result: {url, name, size}[]}
+ * - File[]: Array of files, handled by suneditor(refer to docs for imageUploadUrl option)
+ * - string: In case of errors
+ * - no param: Just finish, nothing to do
+ */
+type MediaUploadHandlerFunc = (param?: MediaUploadHandlerParam | File[] | string) => void
 type MediaUploadHandlerErrorResult = {
   'limitSize': number,
   'uploadSize': number
