@@ -669,17 +669,17 @@ type videoInputInformation = { inputWidth: number, inputHeight: number, align: s
 type audioInputInformation = { isUpdate: boolean, element: any };
 
 type MediaUploadState = 'create' | 'update' | 'delete';
+/**
+ * @description Result parameter for uploadHandler when file is uploaded with custom function
+ */
 type MediaUploadHandlerParam = {
   result: {
-    /** @property {string} url - The url of uploaded file, */
     url: string,
-    /** @property {string} name - The name of the uploaded file, */
     name: string,
-    /** @property {string} size(optional) - The size of the uploaded file, */
     size?: string
   }[]
 }
-type MediaUploadHandlerFunc = (param: File[] | string | MediaUploadHandlerParam | undefined) => void
+type MediaUploadHandlerFunc = (param: MediaUploadHandlerParam | File[] | string | undefined) => void
 type MediaUploadHandlerErrorResult = {
   'limitSize': number,
   'uploadSize': number
