@@ -230,7 +230,7 @@ HTML.prototype = {
 	 * @returns {string} Cleaned and compressed HTML string
 	 */
 	clean(html, { forceFormat, whitelist, blacklist, _freeCodeViewMode } = {}) {
-		const { tagFilter, formatFilter, classFilter, styleNodeFilter, attrFilter, styleFilter } = this.options.get('strictMode');
+		const { tagFilter, formatFilter, classFilter, textStyleTagFilter, attrFilter, styleFilter } = this.options.get('strictMode');
 		let cleanData = '';
 
 		html = this.compress(html);
@@ -308,7 +308,7 @@ HTML.prototype = {
 			if (blacklist) cleanData = cleanData.replace(typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist, '');
 		}
 
-		if (styleNodeFilter) {
+		if (textStyleTagFilter) {
 			cleanData = this._styleNodeConvertor(cleanData);
 		}
 

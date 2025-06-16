@@ -154,7 +154,7 @@ export function CreateToolBar(
  * @property {Array<string>} [excludedPlugins] - Plugin configuration.
  * @property {Array<string[]|string>} [buttonList] - List of toolbar buttons, grouped by sub-arrays.
  * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
- * @property {boolean|{tagFilter: boolean, formatFilter: boolean, classFilter: boolean, styleNodeFilter: boolean, attrFilter: boolean, styleFilter: boolean}} [strictMode=true] - Enables strict filtering of tags, attributes, and styles.
+ * @property {boolean|{tagFilter: boolean, formatFilter: boolean, classFilter: boolean, textStyleTagFilter: boolean, attrFilter: boolean, styleFilter: boolean}} [strictMode=true] - Enables strict filtering of tags, attributes, and styles.
  * @property {"classic"|"inline"|"balloon"|"balloon-always"} [mode="classic"] - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
  * @property {string} [type=""] - Editor type: "document:header,page".
  * @property {string} [theme=""] - Editor theme.
@@ -415,7 +415,7 @@ export type EditorBaseOptions = {
 				tagFilter: boolean;
 				formatFilter: boolean;
 				classFilter: boolean;
-				styleNodeFilter: boolean;
+				textStyleTagFilter: boolean;
 				attrFilter: boolean;
 				styleFilter: boolean;
 		  };

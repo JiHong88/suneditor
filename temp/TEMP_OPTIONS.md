@@ -265,7 +265,7 @@ These options control the core functionality, plugins, toolbar, styling, and con
 ### `strictMode`
 
 -   **Description**: Enables strict filtering of tags, attributes, and styles. Can be a boolean or an object to configure specific filters.
--   **Type**: `boolean|{tagFilter: boolean, formatFilter: boolean, classFilter: boolean, styleNodeFilter: boolean, attrFilter: boolean, styleFilter: boolean}`
+-   **Type**: `boolean|{tagFilter: boolean, formatFilter: boolean, classFilter: boolean, textStyleTagFilter: boolean, attrFilter: boolean, styleFilter: boolean}`
 -   **Default**: `true`
 -   **Mutability**: Fixed
 
