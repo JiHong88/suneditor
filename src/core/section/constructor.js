@@ -167,8 +167,8 @@ const RETAIN_STYLE_MODE = ['repeat', 'always', 'none'];
  * @property {string} [elementWhitelist=""] - Allowed HTML elements. Delimiter: "|" (e.g. "p|div", "*").
  * @property {string} [elementBlacklist=""] - Disallowed HTML elements. Delimiter: "|" (e.g. "script|style").
  * @property {string} [__defaultAttributeWhitelist] - Allowed attributes. Delimiter: "|" (e.g. "href|target").
- * @property {Object<string, string>} [attributeWhitelist=""] - Allowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
- * @property {Object<string, string>} [attributeBlacklist=""] - Disallowed attributes. (e.g. {a: "href|target", img: "src|alt"}).
+ * @property {Object<string, string>} [attributeWhitelist=""] - Allowed attributes. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
+ * @property {Object<string, string>} [attributeBlacklist=""] - Disallowed attributes. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
  * @property {string} [__defaultFormatLine="P|DIV|H[1-6]|LI|TH|TD|DETAILS"] - Overrides the editor's default "line" element.
  * @property {string} [formatLine="P|DIV|H[1-6]|LI|TH|TD|DETAILS"] - Specifies the editor's "line" elements.
  * - (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")

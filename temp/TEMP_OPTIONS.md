@@ -535,14 +535,14 @@ These options control the core functionality, plugins, toolbar, styling, and con
 
 ### `attributeWhitelist`
 
--   **Description**: Allowed attributes. (e.g. `{a: "href|target", img: "src|alt"}`).
+-   **Description**: Allowed attributes. (e.g. `{a: "href|target", img: "src|alt", "*": "id"}`).
 -   **Type**: `Object<string, string>`
 -   **Default**: `""` (Effectively means `DEFAULT_ATTRIBUTE_WHITELIST` is used unless overridden)
 -   **Mutability**: Fixed
 
 ### `attributeBlacklist`
 
--   **Description**: Disallowed attributes. (e.g. `{a: "href|target", img: "src|alt"}`).
+-   **Description**: Disallowed attributes. (e.g. `{a: "href|target", img: "src|alt", "*": "name"}`).
 -   **Type**: `Object<string, string>`
 -   **Default**: `""`
 -   **Mutability**: Fixed
