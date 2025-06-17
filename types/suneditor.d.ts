@@ -40,8 +40,8 @@ declare namespace _default {
 	): Editor;
 }
 export default _default;
-export type EditorFrameOptions_suneditor = import('./core/section/constructor').EditorFrameOptions;
-export type EditorInitOptions_suneditor = import('./core/section/constructor').EditorInitOptions;
+export type EditorFrameOptions_suneditor = import('./core/section/options').EditorFrameOptions;
+export type EditorInitOptions_suneditor = import('./core/section/options').EditorInitOptions;
 import EditorInjector from './editorInjector';
 import Plugins from './plugins';
 import Modules from './modules';

@@ -411,6 +411,11 @@ declare class Table extends EditorInjector {
 	private _figureOpen;
 	/**
 	 * @private
+	 * @description Converts the width of <col> elements to percentages.
+	 */
+	private _resizePercentCol;
+	/**
+	 * @private
 	 * @description Starts resizing a table cell.
 	 * @param {HTMLElement} col The column element.
 	 * @param {number} startX The starting X position.

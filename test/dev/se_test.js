@@ -606,6 +606,7 @@ const options1 = {
 	retainStyleMode: 'none', // repeat, always, none
 	toolbar_sticky: 0,
 	lineAttrReset: 'id',
+	// __pluginRetainFilter: { table: false },
 	// height: '600px',
 	// charCounter_max: 1400,
 	buttonList: bl,
@@ -1032,7 +1033,85 @@ const options1 = {
     <a href="http://localhost:3000/editor/files/download/public/files/d41d8cd98f00b204e9800998ecf8427e.html" title="xsOiDurC.html" download="xsOiDurC.html" data-se-file-download="" contenteditable="false" data-se-non-focus="true" data-se-non-link="true" data-se-file-name="xsOiDurC.html" data-se-file-size="0" name="xsOiDurC.html" data-se-index="0">xsOiDurC.html</a>
   </figure>
 </div>`,
-	value: '',
+	value: `<div style="text-align: center;"><strong style="color: rgb(56, 61, 65); font-family: 돋움; font-size: 12px;"><span style="font-size: 20px;">(재)국가마우스표현형분석사업단 채용공고</span></strong></div>
+<br />
+(재)국가마우스표현형분석사업단은 인체 유전자 기능을 생체 수준에서 규명하기 위하여 특정 유전자를 변형 또는 제거한 유전자변형마우스(GEM, Genetically Engineered Mouse)의 생물학적 특성을 분석하는 마우스 표현형분석기술과 국내 마우스 자원의 효율적인 활용과 마우스 정보를 국내 연구자에게 제공하는 것을 목표로 하고 있습니다. 2013년 11월 미래창조과학부(현 과학기술정보통신부) 바이오&middot;의료기술개발사업의 일환으로 시작하여 10년간의 연구 사업을 추진 중에 있습니다. 비만-염증과 관련 연구를 진행 중에 있습니다. 관련 연구를 같이할 분을 모시고자 합니다.<br />
+&nbsp;<br />
+특이사항 : 우리 연구실에서는 모델 마우스 유래 갈색 및 백색 지방 세포주를 기반으로 하는 대사 조절 연구 시스템을 구축해서 연구를 해오고 있습니다. 국내 최대 규모의 비만, 대사 질환 마우스 제작과 표현형 분석 시스템을 구축 운영해 오고 있습니다.<br />
+&nbsp;<br />
+운동 효과가 비만-염증에 미치는 영향을 유전자변형마우스와 무균동물 (Germ Free) 기반으로 연구를 진행 중에 있습니다. 우리 연구실은 유전자변형마우스와 세포주의 대사표현형 분석 (temperature-controlled metabolic chamber, body composition, seahorse XF analyzer 등)을 갖추고 있습니다. 비만모델동물 지방세포의 single cell 기반 생물정보 분석도 수행 중에 있습니다.&nbsp;<br />
+<br />
+&nbsp;
+<div style="font-size: 12px; font-family: 돋움; color: rgb(56, 61, 65); text-align: center;">2020년 6월 16일<br />
+<br />
+&nbsp;<br />
+국가마우스표현형분석사업단장 성제경</div>
+<img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0">
+
+<div style="font-size: 12px; font-family: 돋움; color: rgb(56, 61, 65);"><span style="font-family: gulim;"><span style="font-family: 돋움; line-height: 15px;">1. 모집분야 및 업무</span></span>&nbsp;
+
+<table border="1">
+	<tbody>
+		<tr>
+			<td style="height:43px;">채용분야</td>
+			<td style="width:263px;height:43px;">담당업무</td>
+			<td style="width:195px;height:43px;">자격요건</td>
+			<td style="width:48px;height:43px;">인원</td>
+			<td style="height:43px;">급여조건</td>
+		</tr>
+		<tr>
+			<td rowspan="2" style="width:70px;height:281px;">박사급<br />
+			연구원</td>
+			<td style="width:263px;height:147px;">마우스모델 마이크로바이옴 분석 및 국제 공동연구 (마우스모델 활용 마이크로바이옴 연구, Germ Free 마우스 기반 대사질환 연구)<br />
+			&nbsp;<br />
+			* 본 사업단은 Germ Free 마우스 연구시설(사육, 실험, 대사 측정 등)을 보유하고 있음</td>
+			<td style="width:195px;height:147px;">생명과학분야 석/박사학위 소지자<br />
+			미생물학 관련전공 (우대)</td>
+			<td style="width:48px;height:147px;">0명</td>
+			<td style="width:70px;height:147px;">면접 후 경력에 따라 결정</td>
+		</tr>
+		<tr>
+			<td style="width:263px;height:134px;">면역기반 대사질환 연구 (대사이상-염증 In vivo/in vitro system 기반 post-transcriptional modification 기전 연구)</td>
+			<td style="width:195px;height:134px;">생명과학분야 박사학위 소지자<br />
+			면역학 분야 박사학위 소지자(우대)<br />
+			FACS 유경험자(우대)<br />
+			동물실험 유경험자(우대)</td>
+			<td style="width:48px;height:134px;">0명</td>
+			<td style="width:70px;height:134px;">면접 후 경력에 따라 결정</td>
+		</tr>
+		<tr>
+			<td rowspan="2" style="width:70px;height:255px;">석/박사급연구원</td>
+			<td style="width:263px;height:138px;">FACS 운영 및 서비스 제공 (ARIA II 급)</td>
+			<td style="width:195px;height:138px;">생명과학분야 석/박사학위 소지자<br />
+			FACS 운영 및 사용 경력(우대)<br />
+			면역기반 연구 유경험자(우대)</td>
+			<td style="width:48px;height:138px;">0명</td>
+			<td style="width:70px;height:138px;">면접 후 경력에 따라 결정</td>
+		</tr>
+		<tr>
+			<td style="width:263px;height:117px;">분자생물학적 분석 (비만 마우스에서 지방 및 염증 세포 post-transcriptional modification 연구, Invitro 지방세포주를 이용한 비만-염증 연구)</td>
+			<td style="width:195px;height:117px;">생명과학분야 석/박사학위 소지자<br />
+			세포배양, 유전자발현(RNA, protein) 유경험자 (우대)</td>
+			<td style="width:48px;height:117px;">0명</td>
+			<td style="width:70px;height:117px;">면접 후 경력에 따라 결정</td>
+		</tr>
+	</tbody>
+</table>
+<br />
+<br />
+2<span style="color: rgb(51, 51, 51); font-size: 13px;">. 신청 및 접수방법</span></div>
+
+<div>
+<p class="0" style="font-family: 굴림; color: rgb(68, 68, 68); padding: 0px; margin: 3pt 0px 0px; line-height: 18px;">○ 신청방법 : &lsquo;이력서 및 자기소개서 (자유양식)&rsquo;를 작성하여 전자파일로 제출<br />
+○ 접수기한 : 2020. 7. 10(금).&nbsp;오후 6시까지 (※ 마감일 마감시간 내 도착분에 한함.)<br />
+○ 면접일정 : 합격자에 한하여 개별통보<br />
+○ 접수처/문의처 : 서울대학교 생명공학연구동 81동 520호, 국가마우스표현형분석사업단<br />
+(Tel. 02-885-8388, E-mail :&nbsp;mouseclinic.snu.ac.kr)<br />
+<br style="color: rgb(56, 61, 65); font-family: 돋움; line-height: 15px;" />
+<br style="color: rgb(56, 61, 65); font-family: 돋움; line-height: 15px;" />
+<span style="color: rgb(56, 61, 65); font-family: gulim;"><span style="font-family: 돋움; line-height: 15px;">※ 자세한 내용은 첨부파일을 참고하시기 바랍니다</span></span></p>
+</div>
+`,
 	link: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
 		relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],

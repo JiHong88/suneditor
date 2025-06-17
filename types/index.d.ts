@@ -30,6 +30,7 @@ export * from './core/section/actives';
 export * from './core/section/constructor';
 export * from './core/section/context';
 export * from './core/section/documentType';
+export * from './core/section/options';
 export * from './editorInjector/_classes';
 export * from './editorInjector/_core';
 export * from './editorInjector/index';

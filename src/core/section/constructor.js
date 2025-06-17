@@ -2,235 +2,16 @@ import _icons from '../../assets/icons/defaultIcons';
 import _defaultLang from '../../langs/en';
 import { CreateContext, CreateFrameContext } from './context';
 import { dom, numbers, converter, env } from '../../helper';
+import { DEFAULTS } from './options';
 
 const _d = env._d;
-const DEFAULT_BUTTON_LIST = [
-	['undo', 'redo'],
-	'|',
-	['bold', 'underline', 'italic', 'strike', '|', 'subscript', 'superscript'],
-	'|',
-	['removeFormat'],
-	'|',
-	['outdent', 'indent'],
-	'|',
-	['fullScreen', 'showBlocks', 'codeView'],
-	'|',
-	['preview', 'print']
-];
-
-const REQUIRED_FORMAT_LINE = 'div';
-const REQUIRED_ELEMENT_WHITELIST = 'br|div';
-const DEFAULT_ELEMENT_WHITELIST =
-	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|colgroup|col|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
-const DEFAULT_TEXT_STYLE_TAGS = 'strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary';
-
-/* scopeSelectionTags */
-const DEFAULT_SCOPE_SELECTION_TAGS = 'td|table|li|ol|ul|pre|figcaption|blockquote|dl|dt|dd';
-
-const _media_attr = '|width|height|controls|autoplay|loop|muted|poster|preload|playsinline|volume|crossorigin|disableRemotePlayback|controlsList';
-const _iframe_attr = '|allowfullscreen|sandbox|loading|allow|referrerpolicy|frameborder|scrolling';
-const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|title|download|rel|src|alt|class|type|colspan|rowspan' + _media_attr + _iframe_attr;
-
-const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';
-const DEFAULT_FORMAT_BR_LINE = 'PRE';
-const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
-const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS';
-const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
-
-const DEFAULT_ALLOWED_EMPTY_NODE_LIST = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';
-
-const DEFAULT_SIZE_UNITS = ['px', 'pt', 'em', 'rem'];
-
-const DEFAULT_CLASS_NAME = '^__se__|^se-|^katex|^MathJax';
-const DEFAULT_CLASS_MJX = 'mjx-container|mjx-math|mjx-mrow|mjx-mi|mjx-mo|mjx-mn|mjx-msup|mjx-mfrac|mjx-munderover';
-const DEFAULT_EXTRA_TAG_MAP = { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false };
-
-const DEFAULT_CONTENT_STYLES =
-	'background|background-clip|background-color|' +
-	'border|border-bottom|border-collapse|border-color|border-image|border-left-width|border-radius|border-right-width|border-spacing|border-style|border-top|border-width|' +
-	'box-shadow|box-sizing|' +
-	'caption-side|color|content|' +
-	'direction|display|' +
-	'float|font|font-family|font-size|font-style|font-weight|' +
-	'height|' +
-	'left|letter-spacing|line-height|list-style-position|list-style-type|' +
-	'margin|margin-block-end|margin-block-start|margin-bottom|margin-inline-end|margin-inline-start|margin-left|margin-right|margin-top|max-width|min-width|' +
-	'outline|overflow|' +
-	'position|padding|padding-bottom|padding-inline-start|padding-left|padding-right|padding-top|' +
-	'page-break-before|page-break-after|page-break-inside|' +
-	'rotate|rotateX|rotateY|' +
-	'table-layout|text-align|text-decoration|text-shadow|text-transform|top|' +
-	'text-indent|text-rendering|' +
-	'vertical-align|visibility|' +
-	'white-space|width|word-break|word-wrap';
-const DEFAULT_TAG_STYLES = {
-	'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align|text-align',
-	'table|td': 'width',
-	tr: 'height',
-	col: 'width',
-	'ol|ul': 'list-style-type'
-};
-const DEFAULT_TEXT_STYLES = 'font-family|font-size|color|background-color';
-const DEFAULT_LINE_STYLES = 'text-align|margin-left|margin-right|line-height';
-
-const RETAIN_STYLE_MODE = ['repeat', 'always', 'none'];
 
 /**
- * @typedef {Object} EditorFrameOptions
- * @property {string} [value=""] - Initial value for the editor.
- * @property {string} [placeholder=""] - Placeholder text.
- * @property {Object<string, string>} [editableFrameAttributes={}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
- * @property {string} [width="100%"] - Width for the editor.
- * @property {string} [minWidth=""] - Min width for the editor.
- * @property {string} [maxWidth=""] - Max width for the editor.
- * @property {string} [height="auto"] - Height for the editor.
- * @property {string} [minHeight=""] - Min height for the editor.
- * @property {string} [maxHeight=""] - Max height for the editor.
- * @property {string} [editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
- * @property {boolean} [iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
- * @property {boolean} [iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the "iframe".
- * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the "iframe". (e.g. {'scrolling': 'no'})
- * @property {string} [iframe_cssFileName="suneditor"] - Name or Array of the CSS file to apply inside the iframe.
- * - You can also use regular expressions.
- * - Applied by searching by filename in the link tag of document,
- * - or put the URL value (".css" can be omitted).
- * @property {boolean} [statusbar=true] - Enables the status bar.
- * @property {boolean} [statusbar_showPathLabel=true] - Displays the current node structure to status bar.
- * @property {boolean} [statusbar_resizeEnable=true] - Enables resize function of bottom status bar
- * @property {boolean} [charCounter=false] - Shows the number of characters in the editor.
- * - If the maxCharCount option has a value, it becomes true.
- * @property {number} [charCounter_max] - The maximum number of characters allowed to be inserted into the editor.
- * @property {string} [charCounter_label] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
- * @property {"char"|"byte"|"byte-html"} [charCounter_type="char"] - Defines the calculation method of the "charCounter" option.
- * - 'char': Characters length.
- * - 'byte': Binary data size of characters.
- * - 'byte-html': Binary data size of the full HTML string.
+ * @typedef {import('./options').EditorFrameOptions} EditorFrameOptions
  */
 
 /**
- * @typedef {Object} EditorBaseOptions
- * @property {Object<string, *>|Array<Object<string, *>>} [plugins] - Plugin configuration.
- * @property {Array<string>} [excludedPlugins] - Plugin configuration.
- * @property {Array<string[]|string>} [buttonList] - List of toolbar buttons, grouped by sub-arrays.
- * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
- * @property {boolean|{tagFilter: boolean, formatFilter: boolean, classFilter: boolean, textStyleTagFilter: boolean, attrFilter: boolean, styleFilter: boolean}} [strictMode=true] - Enables strict filtering of tags, attributes, and styles.
- * @property {"classic"|"inline"|"balloon"|"balloon-always"} [mode="classic"] - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
- * @property {string} [type=""] - Editor type: "document:header,page".
- * @property {string} [theme=""] - Editor theme.
- * @property {Object<string, string>} [lang] - Language configuration.
- * @property {Array<string>} [fontSizeUnits=["px", "pt", "em", "rem"]] - Allowed font size units.
- * @property {string} [allowedClassName] - Allowed class names.
- * @property {boolean} [closeModalOutsideClick=false] - Closes modals when clicking outside.
- * @property {boolean} [copyFormatKeepOn=false] - Keeps the format of the copied content.
- * @property {boolean} [syncTabIndent=true] - Synchronizes tab indent with spaces.
- * @property {boolean} [tabDisable=false] - Disables tab key input.
- * @property {boolean} [autoLinkify] - Automatically converts URLs into hyperlinks. ("Link" plugin required)
- * @property {Array<string>} [autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
- * @property {Object<string, string|number>} [scrollToOptions={behavior: "auto", block: "nearest"}] - Configuration for scroll behavior when navigating editor content.
- * @property {Object<string, string|number>} [componentScrollToOptions={behavior: "smooth", block: "center"}] - Configuration for scroll behavior when navigating components.
- * @property {"repeat"|"always"|"none"} [retainStyleMode="repeat"] - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
- * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
- * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
- * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
- * @property {Object<string, boolean>} [allowedExtraTags={script: false, style: false, meta: false, link: false, "[a-z]+:[a-z]+": false}] - Specifies extra allowed or disallowed tags.
- * @property {Object<string, (...args: *) => *>} [events={}] - Custom event handlers.
- * @property {string} [__textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - The basic tags that serves as the base for "textStyleTags"
- * @property {string} [textStyleTags="strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary"] - Additional text style tags.
- * @property {Object<string, string>} [convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
- * @property {string} [allUsedStyles] - Specifies additional styles to the list of allowed styles. Delimiter: "|" (e.g. "color|background-color").
- * @property {Object<string, string>} [__tagStyles={
- 	'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align|text-align',
-	'table|td': 'width',
-	tr: 'height',
-	col: 'width',
-	'ol|ul': 'list-style-type'
-	}] - The basic tags that serves as the base for "tagStyles"
- * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags.
- * @property {string} [spanStyles="font-family|font-size|color|background-color"] - Specifies allowed styles for the "span" tag.
- * @property {string} [lineStyles="text-align|margin-left|margin-right|line-height"] - Specifies allowed styles for the "line" element (p..).
- * @property {string} [textDirection="ltr"] - Text direction: "ltr" or "rtl".
- * @property {Array<string>} [reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
- * @property {number} [historyStackDelayTime=400] - Delay time for history stack updates (ms).
- * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
- * @property {string} [printClass=""] - Class name for printing.
- * @property {string} [defaultLine="p"] - Default line element when inserting new lines.
- * @property {"line"|"br"} [defaultLineBreakFormat="line"] - Specifies the default line break format.
- * - [Recommended] "line" :  is a line break that is divided into general tags.
- * - [Not recommended] "br" : Line breaks are treated as <br> on the same line. (like shift+enter)
- * - Line breaks are handled as <br> within "line".
- * - You can create a new "line" by entering a line break twice in a row.
- * - Formats that include "line", such as "Quote", still operate on a "line" basis.
- * - ● suneditor processes work in "line" units.
- * - ● When set to "br", performance may decrease when editing a lot of data.
- * @property {Array<string>} [scopeSelectionTags=["td", "table", "li", "ol", "ul", "pre", "figcaption", "blockquote", "dl", "dt", "dd"]] - Tags treated as whole units when selecting all content.
- * @property {string} [__defaultElementWhitelist="br|div"] - Default allowed HTML elements. The default values are maintained.
- * @property {string} [elementWhitelist=""] - Allowed HTML elements. Delimiter: "|" (e.g. "p|div", "*").
- * @property {string} [elementBlacklist=""] - Disallowed HTML elements. Delimiter: "|" (e.g. "script|style").
- * @property {string} [__defaultAttributeWhitelist] - Allowed attributes. Delimiter: "|" (e.g. "href|target").
- * @property {Object<string, string>} [attributeWhitelist=""] - Allowed attributes. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
- * @property {Object<string, string>} [attributeBlacklist=""] - Disallowed attributes. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
- * @property {string} [__defaultFormatLine="P|DIV|H[1-6]|LI|TH|TD|DETAILS"] - Overrides the editor's default "line" element.
- * @property {string} [formatLine="P|DIV|H[1-6]|LI|TH|TD|DETAILS"] - Specifies the editor's "line" elements.
- * - (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
- * - "line" element also contain "brLine" element
- * @property {string} [__defaultFormatBrLine="PRE"] - Overrides the editor's default "brLine" element.
- * @property {string} [formatBrLine="PRE"] - Specifies the editor's "brLine" elements. (e.g. "PRE").
- * - (PRE | class="__se__format__br_line_xxx")
- * - "brLine" elements is included in the "line" element.
- * - "brLine" elements's line break is "BR" tag.
- * ※ Entering the Enter key in the space on the last line ends "brLine" and appends "line".
- * @property {string} [__defaultFormatClosureBrLine=""] - Overrides the editor's default "closureBrLine" element.
- * @property {string} [formatClosureBrLine=""] - Specifies the editor's "closureBrLine" elements.
- * - (class="__se__format__br_line__closure_xxx")
- * - "closureBrLine" elements is included in the "brLine".
- * - "closureBrLine" elements's line break is "BR" tag.
- * - ※ You cannot exit this format with the Enter key or Backspace key.
- * - ※ Use it only in special cases. ([ex] format of table cells)
- * @property {string} [__defaultFormatBlock="BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS"] - Overrides the editor's default "block" element.
- * @property {string} [formatBlock="BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS"] - Specifies the editor's "block" elements.
- * - (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
- * - "block" is wrap the "line" and "component"
- * @property {string} [__defaultFormatClosureBlock="TH|TD"] - Overrides the editor's default "closureBlock" element.
- * @property {string} [formatClosureBlock="TH|TD"] - Specifies the editor's "closureBlock" elements.
- * - (TH, TD | class="__se__format__block_closure_xxx")
- * - "closureBlock" elements is included in the "block".
- * - "closureBlock" element is wrap the "line" and "component"
- * - ※ You cannot exit this format with the Enter key or Backspace key.
- * - ※ Use it only in special cases. ([ex] format of table cells)
- * @property {string} [allowedEmptyTags=".se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details"] - Allowed empty tags.
- * @property {number|string} [toolbar_width="auto"] - Toolbar width.
- * @property {Element|string} [toolbar_container] - Container element for the toolbar.
- * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
- * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
- * @property {Object} [subToolbar] - Sub-toolbar configuration.
- * @property {Array<Array<string>>} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
- * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
- * @property {number|string} [subToolbar.width="auto"] - Sub-toolbar width.
- * @property {Element|string} [statusbar_container] - Container element for the status bar.
- * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
- * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
- * @property {Object<string, Array<string>>} [shortcuts] - Custom keyboard shortcuts.
- * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
- * @property {string} [previewTemplate] - Custom template for preview mode.
- * @property {string} [printTemplate] - Custom template for print mode.
- * @property {boolean} [componentAutoSelect=false] - Enables automatic selection of inserted components.
- * @property {string} [defaultUrlProtocol] - Default URL protocol for links.
- * @property {Object<"copy", number>} [toastMessageTime] - {"copy": 1500} - Duration for displaying toast messages.
- * @property {Object<string, string>} [icons] - Overrides the default icons.
- * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
- * @property {boolean} [__lineFormatFilter=true] - Line format filter configuration.
- * @property {boolean} [__pluginRetainFilter=true] - Plugin retain filter configuration.
- * @property {Array<string>} [__listCommonStyle=["fontSize", "color", "fontFamily", "fontWeight", "fontStyle"]] - Defines the list of styles that are applied directly to the `<li>` element
- * - when a text style is applied to the entire list item.
- * - For example, when changing the font size or color of a list item (`<li>`),
- * - these styles will be applied to the `<li>` tag instead of wrapping the content inside additional tags.
- * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax.
- *
- * @property {Object<string, *>} [Dynamic_pluginOptions] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
- */
-
-/**
- * @typedef {EditorBaseOptions & EditorFrameOptions} EditorInitOptions
+ * @typedef {import('./options').EditorInitOptions} EditorInitOptions
  */
 
 /** ------------- [OPTIONS FRAG] ------------- */
@@ -686,7 +467,7 @@ function _mergeObject(a, b) {
  * - frameMap: converted options map
  */
 export function InitOptions(options, editorTargets, plugins) {
-	const buttonList = options.buttonList || DEFAULT_BUTTON_LIST;
+	const buttonList = options.buttonList || DEFAULTS.BUTTON_LIST;
 	const o = new Map();
 
 	/** Multi root */
@@ -718,8 +499,8 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('_themeClass', options.theme ? ` se-theme-${options.theme}` : '');
 	o.set('_type_options', options.type?.split(':')[1] || '');
 	o.set('externalLibs', options.externalLibs || {});
-	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
-	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
+	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULTS.SIZE_UNITS);
+	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULTS.CLASS_NAME}`));
 	o.set('closeModalOutsideClick', !!options.closeModalOutsideClick);
 
 	// format
@@ -735,13 +516,13 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('componentScrollToOptions', { behavior: 'smooth', block: 'center', ...options.componentScrollToOptions });
 
 	let retainStyleMode = options.retainStyleMode;
-	if (typeof retainStyleMode === 'string' && !RETAIN_STYLE_MODE.includes(retainStyleMode)) {
-		console.error(`Invalid retainStyleMode: ${retainStyleMode}. Valid options are ${RETAIN_STYLE_MODE.join(', ')}. Using default 'once'.`);
+	if (typeof retainStyleMode === 'string' && !DEFAULTS.RETAIN_STYLE_MODE.includes(retainStyleMode)) {
+		console.error(`Invalid retainStyleMode: ${retainStyleMode}. Valid options are ${DEFAULTS.RETAIN_STYLE_MODE.join(', ')}. Using default 'once'.`);
 		retainStyleMode = 'repeat';
 	}
 	o.set('retainStyleMode', retainStyleMode);
 
-	const allowedExtraTags = { ...DEFAULT_EXTRA_TAG_MAP, ...options.allowedExtraTags, '-': true };
+	const allowedExtraTags = { ...DEFAULTS.EXTRA_TAG_MAP, ...options.allowedExtraTags, '-': true };
 	const extraKeys = Object.keys(allowedExtraTags);
 	const allowedKeys = extraKeys.filter((k) => allowedExtraTags[k]).join('|');
 	const disallowedKeys = extraKeys.filter((k) => !allowedExtraTags[k]).join('|');
@@ -751,7 +532,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('events', options.events || {});
 
 	// text style tags
-	o.set('textStyleTags', (typeof options.__textStyleTags === 'string' ? options.__textStyleTags : DEFAULT_TEXT_STYLE_TAGS) + (options.textStyleTags ? '|' + options.textStyleTags : ''));
+	o.set('textStyleTags', (typeof options.__textStyleTags === 'string' ? options.__textStyleTags : DEFAULTS.TEXT_STYLE_TAGS) + (options.textStyleTags ? '|' + options.textStyleTags : ''));
 	const textTags = _mergeObject(
 		{
 			bold: 'strong',
@@ -767,15 +548,15 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('_textStyleTags', Object.values(textTags).concat(['span', 'li']));
 	o.set(
 		'tagStyles',
-		[{ ...DEFAULT_TAG_STYLES, ...(options.__tagStyles || {}) }, options.tagStyles || {}].reduce((_default, _new) => {
+		[{ ...DEFAULTS.TAG_STYLES, ...(options.__tagStyles || {}) }, options.tagStyles || {}].reduce((_default, _new) => {
 			for (const key in _new) {
 				_default[key] = _new[key];
 			}
 			return _default;
 		}, {})
 	);
-	o.set('_textStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULT_TEXT_STYLES}${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
-	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULT_LINE_STYLES}${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
+	o.set('_textStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULTS.TEXT_STYLES}${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
+	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULTS.LINE_STYLES}${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
 		b: textTags.bold,
@@ -833,10 +614,10 @@ export function InitOptions(options, editorTargets, plugins) {
 	// default line
 	o.set('defaultLine', typeof options.defaultLine === 'string' && options.defaultLine.length > 0 ? options.defaultLine : 'p');
 	o.set('defaultLineBreakFormat', options.defaultLineBreakFormat || 'line');
-	o.set('scopeSelectionTags', options.scopeSelectionTags || DEFAULT_SCOPE_SELECTION_TAGS.split('|'));
+	o.set('scopeSelectionTags', options.scopeSelectionTags || DEFAULTS.SCOPE_SELECTION_TAGS);
 	// element
 	const elw = (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase();
-	const mjxEls = o.get('externalLibs').mathjax ? DEFAULT_CLASS_MJX + '|' : '';
+	const mjxEls = o.get('externalLibs').mathjax ? DEFAULTS.CLASS_MJX + '|' : '';
 	o.set('elementWhitelist', elw + (elw ? '|' : '') + mjxEls + o.get('_allowedExtraTag'));
 	const elb = _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLine'));
 	o.set('elementBlacklist', elb + (elb ? '|' : '') + o.get('_disallowedExtraTag'));
@@ -848,7 +629,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		'formatClosureBrLine',
 		_createFormatInfo(
 			options.formatClosureBrLine,
-			(options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(),
+			(options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULTS.FORMAT_CLOSURE_BR_LINE).toLowerCase(),
 			o.get('elementBlacklist')
 		)
 	);
@@ -856,15 +637,15 @@ export function InitOptions(options, editorTargets, plugins) {
 		'formatBrLine',
 		_createFormatInfo(
 			(options.formatBrLine || '') + '|' + o.get('formatClosureBrLine').str,
-			(options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULT_FORMAT_BR_LINE).toLowerCase(),
+			(options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULTS.FORMAT_BR_LINE).toLowerCase(),
 			o.get('elementBlacklist')
 		)
 	);
 	o.set(
 		'formatLine',
 		_createFormatInfo(
-			REQUIRED_FORMAT_LINE + '|' + (options.formatLine || '') + '|' + o.get('formatBrLine').str,
-			(options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULT_FORMAT_LINE).toLowerCase(),
+			DEFAULTS.REQUIRED_FORMAT_LINE + '|' + (options.formatLine || '') + '|' + o.get('formatBrLine').str,
+			(options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULTS.FORMAT_LINE).toLowerCase(),
 			o.get('elementBlacklist')
 		)
 	);
@@ -878,7 +659,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		'formatClosureBlock',
 		_createFormatInfo(
 			options.formatClosureBlock,
-			(options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(),
+			(options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULTS.FORMAT_CLOSURE_BLOCK).toLowerCase(),
 			o.get('elementBlacklist')
 		)
 	);
@@ -886,16 +667,16 @@ export function InitOptions(options, editorTargets, plugins) {
 		'formatBlock',
 		_createFormatInfo(
 			(options.formatBlock || '') + '|' + o.get('formatClosureBlock').str,
-			(options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(),
+			(options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULTS.FORMAT_BLOCK).toLowerCase(),
 			o.get('elementBlacklist')
 		)
 	);
 
-	o.set('allowedEmptyTags', DEFAULT_ALLOWED_EMPTY_NODE_LIST + (options.allowedEmptyTags ? ', ' + options.allowedEmptyTags : ''));
+	o.set('allowedEmptyTags', DEFAULTS.ALLOWED_EMPTY_NODE_LIST + (options.allowedEmptyTags ? ', ' + options.allowedEmptyTags : ''));
 
 	/** __defaults */
-	o.set('__defaultElementWhitelist', REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase());
-	o.set('__defaultAttributeWhitelist', (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase());
+	o.set('__defaultElementWhitelist', DEFAULTS.REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULTS.ELEMENT_WHITELIST).toLowerCase());
+	o.set('__defaultAttributeWhitelist', (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULTS.ATTRIBUTE_WHITELIST).toLowerCase());
 	// --- create element whitelist (__defaultElementWhiteList + elementWhitelist + format[line, BrLine, Block, Closureblock, ClosureBrLine] - elementBlacklist)
 	o.set('_editorElementWhitelist', o.get('elementWhitelist') === '*' ? '*' : _createWhitelist(o));
 
@@ -1004,10 +785,10 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('icons', icons);
 
 	/** Create all used styles  */
-	const allUsedStyles = new Set(DEFAULT_CONTENT_STYLES.split('|'));
+	const allUsedStyles = new Set(DEFAULTS.CONTENT_STYLES.split('|'));
 	const _ss = options.spanStyles?.split('|') || [];
 	const _ls = o.get('__listCommonStyle');
-	const _dts = DEFAULT_TEXT_STYLES.split('|');
+	const _dts = DEFAULTS.TEXT_STYLES.split('|');
 	for (let i = 0, len = _dts.length; i < len; i++) {
 		allUsedStyles.add(_dts[i]);
 	}

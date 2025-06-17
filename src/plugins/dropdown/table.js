@@ -2140,6 +2140,25 @@ class Table extends EditorInjector {
 
 	/**
 	 * @private
+	 * @description Converts the width of <col> elements to percentages.
+	 */
+	_resizePercentCol() {
+		const cols = this._element.querySelector('colgroup').querySelectorAll('col');
+		const tableTotalWidth = this._element.offsetWidth;
+
+		cols.forEach((col) => {
+			const colWidthString = _w.getComputedStyle(col).getPropertyValue('width');
+
+			if (!colWidthString.endsWith('%')) {
+				const pixelWidth = numbers.get(colWidthString, 1);
+				const percentage = (pixelWidth / tableTotalWidth) * 100;
+				col.style.width = percentage + '%';
+			}
+		});
+	}
+
+	/**
+	 * @private
 	 * @description Starts resizing a table cell.
 	 * @param {HTMLElement} col The column element.
 	 * @param {number} startX The starting X position.
@@ -2147,6 +2166,7 @@ class Table extends EditorInjector {
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
+		this._resizePercentCol();
 		this._setResizeLinePosition(this._figure, this._tdElement, this._resizeLinePrev, isLeftEdge);
 		this._resizeLinePrev.style.display = 'block';
 		const prevValue = col.style.width;
@@ -2172,6 +2192,7 @@ class Table extends EditorInjector {
 			),
 			() => {
 				this.__removeGlobalEvents();
+				this._resizePercentCol();
 				this.history.push(true);
 				this.component.select(this._element, Table.key, { isInput: true });
 			},
@@ -2267,6 +2288,7 @@ class Table extends EditorInjector {
 			this._figureResize.bind(this, figure, this._resizeLine, isLeftEdge, startX, figure.offsetWidth, numbers.get(realWidth, CELL_DECIMAL_END)),
 			() => {
 				this.__removeGlobalEvents();
+				if (numbers.get(figure.style.width, 0) > 100) figure.style.width = '100%';
 				// figure reopen
 				this.component.select(this._element, Table.key, { isInput: true });
 			},

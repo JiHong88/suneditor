@@ -1,12 +1,12 @@
 export default Editor;
-export type EditorInitOptions_editor = import('./section/constructor').EditorInitOptions;
-export type EditorFrameOptions_editor = import('./section/constructor').EditorFrameOptions;
+export type EditorInitOptions_editor = import('./section/options').EditorInitOptions;
+export type EditorFrameOptions_editor = import('./section/options').EditorFrameOptions;
 export type ControllerInfo_editor = import('../modules/Controller').ControllerInfo;
 /**
- * @typedef {import('./section/constructor').EditorInitOptions} EditorInitOptions_editor
+ * @typedef {import('./section/options').EditorInitOptions} EditorInitOptions_editor
  */
 /**
- * @typedef {import('./section/constructor').EditorFrameOptions} EditorFrameOptions_editor
+ * @typedef {import('./section/options').EditorFrameOptions} EditorFrameOptions_editor
  */
 /**
  * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
@@ -27,10 +27,10 @@ declare function Editor(
 ): void;
 declare class Editor {
 	/**
-	 * @typedef {import('./section/constructor').EditorInitOptions} EditorInitOptions_editor
+	 * @typedef {import('./section/options').EditorInitOptions} EditorInitOptions_editor
 	 */
 	/**
-	 * @typedef {import('./section/constructor').EditorFrameOptions} EditorFrameOptions_editor
+	 * @typedef {import('./section/options').EditorFrameOptions} EditorFrameOptions_editor
 	 */
 	/**
 	 * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
@@ -360,9 +360,15 @@ declare class Editor {
 	_componentsInfoReset: boolean;
 	/**
 	 * @description plugin retainFormat info Map()
-	 * @type {Map<string, ((...args: *) => *)>}
+	 * @type {Map<string, { key: string, method: (...args: *) => * }>}
 	 */
-	_MELInfo: Map<string, (...args: any) => any>;
+	_MELInfo: Map<
+		string,
+		{
+			key: string;
+			method: (...args: any) => any;
+		}
+	>;
 	/**
 	 * @description Properties for managing files in the "FileManager" module
 	 * @type {Array<*>}

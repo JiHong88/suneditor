@@ -11,11 +11,11 @@ import Helper from './helper';
  */
 
 /**
- * @typedef {import('./core/section/constructor').EditorFrameOptions} EditorFrameOptions_suneditor
+ * @typedef {import('./core/section/options').EditorFrameOptions} EditorFrameOptions_suneditor
  */
 
 /**
- * @typedef {import('./core/section/constructor').EditorInitOptions} EditorInitOptions_suneditor
+ * @typedef {import('./core/section/options').EditorInitOptions} EditorInitOptions_suneditor
  */
 
 /**

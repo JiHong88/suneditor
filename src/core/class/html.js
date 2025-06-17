@@ -275,11 +275,12 @@ HTML.prototype = {
 			iframePlaceholders[i].replaceWith(iframe);
 		}
 
-		if (this.options.get('__pluginRetainFilter')) {
-			this.editor._MELInfo.forEach((method, query) => {
+		let retainFilter;
+		if ((retainFilter = this.options.get('__pluginRetainFilter'))) {
+			this.editor._MELInfo.forEach((plugin, query) => {
 				const infoLst = domParser.querySelectorAll(query);
 				for (let i = 0, len = infoLst.length; i < len; i++) {
-					method(infoLst[i]);
+					if (retainFilter === true || retainFilter[plugin.key] !== false) plugin.method(infoLst[i]);
 				}
 			});
 		}

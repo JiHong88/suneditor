@@ -29,11 +29,11 @@ const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-e
 const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
 
 /**
- * @typedef {import('./section/constructor').EditorInitOptions} EditorInitOptions_editor
+ * @typedef {import('./section/options').EditorInitOptions} EditorInitOptions_editor
  */
 
 /**
- * @typedef {import('./section/constructor').EditorFrameOptions} EditorFrameOptions_editor
+ * @typedef {import('./section/options').EditorFrameOptions} EditorFrameOptions_editor
  */
 
 /**
@@ -413,7 +413,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description plugin retainFormat info Map()
-	 * @type {Map<string, ((...args: *) => *)>}
+	 * @type {Map<string, { key: string, method: (...args: *) => * }>}
 	 */
 	this._MELInfo = null;
 
@@ -1397,7 +1397,7 @@ Editor.prototype = {
 			// plugin maintain
 			if (plugin.retainFormat) {
 				const info = plugin.retainFormat();
-				this._MELInfo.set(info.query, info.method);
+				this._MELInfo.set(info.query, { key: plugin.constructor.key, method: info.method });
 			}
 		}
 

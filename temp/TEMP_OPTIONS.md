@@ -245,7 +245,7 @@ These options control the core functionality, plugins, toolbar, styling, and con
 
 -   **Description**: Plugin configuration. List of plugin names to exclude.
 -   **Type**: `Array<string>`
--   **Default**: `undefined` (empty array likely)
+-   **Default**: `[]`
 -   **Mutability**: Fixed
 
 ### `buttonList`
@@ -294,7 +294,7 @@ These options control the core functionality, plugins, toolbar, styling, and con
 
 -   **Description**: Language configuration.
 -   **Type**: `Object<string, string>`
--   **Default**: `undefined` (Likely uses a default English pack internally if not specified)
+-   **Default**: `en`
 -   **Mutability**: Fixed
 
 ### `fontSizeUnits`
@@ -343,7 +343,7 @@ These options control the core functionality, plugins, toolbar, styling, and con
 
 -   **Description**: Automatically converts URLs into hyperlinks. ("Link" plugin required)
 -   **Type**: `boolean`
--   **Default**: `undefined` (likely false, depends on Link plugin)
+-   **Default**: `Boolean(plugins.link)`
 -   **Mutability**: Resettable
 
 ### `autoStyleify`
