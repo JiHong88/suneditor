@@ -117,28 +117,15 @@ export function CreateToolBar(
 		key: string;
 	}>;
 };
+export default Constructor;
+export type EditorFrameOptions = import('./options').EditorFrameOptions;
+export type EditorInitOptions = import('./options').EditorInitOptions;
 /**
  * @typedef {import('./options').EditorFrameOptions} EditorFrameOptions
  */
 /**
  * @typedef {import('./options').EditorInitOptions} EditorInitOptions
  */
-/** ------------- [OPTIONS FRAG] ------------- */
-/**
- * @description For all EditorInitOptions keys, only boolean | null values are allowed.
- * - 'fixed' → Immutable / null → Resettable.
- * @type {Partial<Record<keyof EditorInitOptions, "fixed" | true>>}
- */
-export const OPTION_FRAME_FIXED_FLAG: Partial<Record<keyof EditorInitOptions, 'fixed' | true>>;
-/**
- * @description For all EditorInitOptions keys, only boolean | null values are allowed.
- * - 'fixed' → Immutable / null → Resettable.
- * @type {Partial<Record<keyof EditorInitOptions, "fixed" | true>>}
- */
-export const OPTION_FIXED_FLAG: Partial<Record<keyof EditorInitOptions, 'fixed' | true>>;
-export default Constructor;
-export type EditorFrameOptions = import('./options').EditorFrameOptions;
-export type EditorInitOptions = import('./options').EditorInitOptions;
 /**
  * @description Creates a new SunEditor instance with specified options.
  * @param {Array<{target: Element, key: *, options: EditorFrameOptions}>} editorTargets - Target element or multi-root object.

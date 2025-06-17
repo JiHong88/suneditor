@@ -1,5 +1,6 @@
 import { env, converter, dom, numbers } from '../helper';
-import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG } from './section/constructor';
+import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar } from './section/constructor';
+import { OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG } from './section/options';
 import { UpdateStatusbarContext } from './section/context';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
 import History from './base/history';
