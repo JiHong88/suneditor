@@ -17,7 +17,7 @@ npm run ts-build
 ```
 
 ```json
-"ts-build": "(npx tsc || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && npm run lint:fix-ts"
+"ts-build": "(npx tsc || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && node scripts/gen-options-dts.cjs && npm run lint:fix-ts"
 ```
 
 ---
@@ -55,7 +55,12 @@ npm run ts-build
     - **`core/`** 디렉터리는 `prototype` 기반 구조이므로 `constructor`에 `this: any` 파라미터가 잘못 생성됨
     - 이를 찾아 제거해주는 후처리 스크립트
 
-7. **`lint:fix-ts`**
+7. **`gen-options-dts.cjs`**
+
+    - `core/section/options.js > DEFAULTS` 객체의 실제 값들을 기반으로 `options.d.ts` 내 `export namespace DEFAULTS` 타입 정의를 덮어씀
+    - 문자열, 배열, 객체 등의 값을 정확히 리터럴 타입으로 유지하여 자동으로 타입 갱신
+
+8. **`lint:fix-ts`**
     - 최종 `.d.ts` 파일에 대해 ESLint를 적용하여 포맷팅 및 스타일 정리 수행
 
 ---
@@ -85,6 +90,7 @@ types/
 | `wrap-dts.cjs`           | `typedef.d.ts`에 `global {}` 래핑 추가                           |
 | `rename-index.cjs`       | `index.ts` → `index.d.ts` 이름 변경                              |
 | `remove-this-params.cjs` | `prototype` 기반 constructor의 잘못된 `this` 파라미터 제거       |
+| `gen-options-dts.cjs`    | `DEFAULTS` 객체 기반으로 `options.d.ts` 타입 정의 자동 갱신      |
 
 ---
 
