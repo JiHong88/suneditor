@@ -20,7 +20,10 @@ declare namespace _default {
 	};
 	/**
 	 * Creates a new instance of the SunEditor
-	 * @param {Element|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>} target - Target element or multi-root object
+	 * @param {Element|string|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>} target
+	 * - Element: The direct DOM element to initialize the editor on.
+	 * - string: A CSS selector string. The corresponding element is selected using `document.querySelector`.
+	 * - Object: For multi-root setup. Each key maps to a config with `{target, options}`.
 	 * @param {EditorInitOptions_suneditor} options - Initialization options
 	 * @param {EditorInitOptions_suneditor} [_init_options] - Optional preset initialization options
 	 * @returns {Editor} - Instance of the SunEditor
@@ -29,6 +32,7 @@ declare namespace _default {
 	function create(
 		target:
 			| Element
+			| string
 			| {
 					[x: string]: {
 						target: Element;

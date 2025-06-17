@@ -62,7 +62,10 @@ export default {
 
 	/**
 	 * Creates a new instance of the SunEditor
-	 * @param {Element|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>} target - Target element or multi-root object
+	 * @param {Element|string|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>} target
+	 * - Element: The direct DOM element to initialize the editor on.
+	 * - string: A CSS selector string. The corresponding element is selected using `document.querySelector`.
+	 * - Object: For multi-root setup. Each key maps to a config with `{target, options}`.
 	 * @param {EditorInitOptions_suneditor} options - Initialization options
 	 * @param {EditorInitOptions_suneditor} [_init_options] - Optional preset initialization options
 	 * @returns {Editor} - Instance of the SunEditor
@@ -90,7 +93,11 @@ export default {
 		if (!target) throw Error("[SUNEDITOR.create.fail] suneditor requires textarea's element");
 
 		const multiTargets = [];
-		if (target.nodeType === 1) {
+		if (typeof target === 'string') {
+			const t = document.querySelector(target);
+			if (!t) throw Error(`[SUNEDITOR.create.fail]-[document.querySelector(${target})] Cannot find target element. Make sure "${target}" is a valid selector and exists in the document.`);
+			multiTargets.push({ key: null, target: t });
+		} else if (target.nodeType === 1) {
 			multiTargets.push({ key: null, target: target });
 		} else {
 			let props;
