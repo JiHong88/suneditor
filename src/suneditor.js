@@ -1,10 +1,10 @@
 import Editor from './core/editor';
 
-import EditorInjector from './editorInjector';
-import Plugins from './plugins';
-import Langs from './langs';
-import Modules from './modules';
-import Helper from './helper';
+import editorInjector from './editorInjector';
+import plugins from './plugins';
+import langs from './langs';
+import modules from './modules';
+import helper from './helper';
 
 /**
  * @module SunEditorExports
@@ -21,27 +21,27 @@ import Helper from './helper';
 /**
  * Editor Injector module, Inject "editor" and basic frequently used objects by calling it with "call(this, editor)".
  */
-export { EditorInjector };
+export { editorInjector };
 
 /**
  * Available editor plugins
  */
-export { Plugins };
+export { plugins };
 
 /**
  * Editor modules
  */
-export { Modules };
+export { modules };
 
 /**
  * Language packs for the editor
  */
-export { Langs };
+export { langs };
 
 /**
  * Helper functions for the editor
  */
-export { Helper };
+export { helper };
 
 /**
  * SunEditor Factory Object

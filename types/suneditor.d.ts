@@ -46,10 +46,10 @@ declare namespace _default {
 export default _default;
 export type EditorFrameOptions_suneditor = import('./core/section/options').EditorFrameOptions;
 export type EditorInitOptions_suneditor = import('./core/section/options').EditorInitOptions;
-import EditorInjector from './editorInjector';
-import Plugins from './plugins';
-import Modules from './modules';
-import Langs from './langs';
-import Helper from './helper';
+import editorInjector from './editorInjector';
+import plugins from './plugins';
+import modules from './modules';
+import langs from './langs';
+import helper from './helper';
 import Editor from './core/editor';
-export { EditorInjector, Plugins, Modules, Langs, Helper };
+export { editorInjector, plugins, modules, langs, helper };
