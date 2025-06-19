@@ -21,9 +21,9 @@ import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
 
 // // codemirror5
-// import Codemirror5 from 'codemirror5';
-// require('codemirror5/lib/codemirror.css');
-// require('codemirror5/mode/htmlmixed/htmlmixed');
+import Codemirror5 from 'codemirror5';
+require('codemirror5/lib/codemirror.css');
+require('codemirror5/mode/htmlmixed/htmlmixed');
 
 // perfect-freehand
 // import PerfectFreehand from 'perfect-freehand';
@@ -1215,21 +1215,22 @@ const options1 = {
 			CHTML,
 			browserAdaptor,
 			RegisterHTMLHandler
-		}
+		},
 		// perfectFreehand: PerfectFreehand,
 		// codemirror
-		// codeMirror: {
-		// 	EditorView: EditorView,
-		// 	extensions: [
-		// 		basicSetup,
-		// 		html({
-		// 			matchClosingTags: true,
-		// 			autoCloseTags: true
-		// 		}),
-		// 		javascript()
-		// 	],
-		// 	minimalSetup: minimalSetup
-		// },
+		codeMirror: {
+			EditorView: EditorView,
+			extensions: [
+				basicSetup,
+				html({
+					matchClosingTags: true,
+					autoCloseTags: true
+				}),
+				javascript()
+			],
+			minimalSetup: minimalSetup
+			// src: Codemirror5
+		}
 	},
 	// defaultLineBreakFormat: 'br',
 	events: {
