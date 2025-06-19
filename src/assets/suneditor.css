@@ -366,6 +366,7 @@
 	outline: 1px solid var(--se-active-dark5-color) !important;
 	box-shadow: 0 0 0 0.3rem var(--se-active-light5-color);
 	transition: box-shadow 0.1s ease-in-out;
+	z-index: 1;
 }
 
 /** --- primary button */
