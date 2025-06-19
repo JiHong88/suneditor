@@ -46,13 +46,13 @@ It's easy to integrate, highly customizable, and built for modern web applicatio
 | Browser                                                                                                                             | Since    | Version ≥ |
 | ----------------------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
 | ![Chrome](https://img.shields.io/badge/-Chrome-4285F4?logo=GoogleChrome&logoColor=white&style=flat-square)                          | Feb 2020 | 80        |
-| ![Firefox](https://img.shields.io/badge/-Firefox-FF7139?logo=FirefoxBrowser&logoColor=white&style=flat-square)                      | Mar 2020 | 74        |
-| ![Safari](https://img.shields.io/badge/-Safari-0D96F6?logo=Safari&logoColor=white&style=flat-square)                                | Mar 2020 | 13.1      |
+| ![Firefox](https://img.shields.io/badge/-Firefox-FF7139?logo=FirefoxBrowser&logoColor=white&style=flat-square)                      | Jul 2021 | 90        |
+| ![Safari](https://img.shields.io/badge/-Safari-0D96F6?logo=Safari&logoColor=white&style=flat-square)                                | Apr 2021 | 14.1      |
 | ![Edge](https://img.shields.io/badge/-Edge-0078D7?logo=MicrosoftEdge&logoColor=white&style=flat-square)                             | Jan 2020 | 80        |
 | ![Opera](https://img.shields.io/badge/-Opera-FF1B2D?logo=Opera&logoColor=white&style=flat-square)                                   | Feb 2020 | 67        |
-| ![iOS Safari](https://img.shields.io/badge/-iOS%20Safari-000000?logo=apple&logoColor=white&style=flat-square)                       | Mar 2020 | 13.4      |
+| ![iOS Safari](https://img.shields.io/badge/-iOS%20Safari-000000?logo=apple&logoColor=white&style=flat-square)                       | Apr 2021 | 14.5      |
 | ![Android WebView](https://img.shields.io/badge/-Android%20WebView-3DDC84?logo=android&logoColor=white&style=flat-square)           | Feb 2020 | 80        |
-| ![Samsung Internet](https://img.shields.io/badge/-Samsung%20Internet-1428A0?logo=samsunginternet&logoColor=white&style=flat-square) | Apr 2020 | 11.1      |
+| ![Samsung Internet](https://img.shields.io/badge/-Samsung%20Internet-1428A0?logo=samsunginternet&logoColor=white&style=flat-square) | Apr 2020 | 13.0      |
 
 ❌ Not Supported : IE, Legacy Edge
 
