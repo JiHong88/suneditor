@@ -59,6 +59,16 @@ declare class DocumentType {
 	rePage(force: boolean): Promise<void>;
 	/**
 	 * @private
+	 * @description Calculates and compensates for the vertical gap between the rendered content (current page)
+	 * - and the mirrored preview page due to differences in width and layout.
+	 * @param {number} t - The initial top position value to be adjusted.
+	 * @param {HTMLElement[]} chr - The elements array in the current (main) page.
+	 * @param {HTMLElement[]} mChr - The elements array in the mirrored page.
+	 * @returns {number|null} - The adjusted top value.
+	 */
+	_calcPageBreakTop(t: number, chr: HTMLElement[], mChr: HTMLElement[]): number | null;
+	/**
+	 * @private
 	 * @description Initializes the cache for document elements.
 	 * @param {Array<HTMLElement>} mChr - List of mirrored elements.
 	 */
@@ -67,7 +77,7 @@ declare class DocumentType {
 	 * @private
 	 * @description Retrieves the element at a given position.
 	 * @param {number} pageTop - The vertical position to check.
-	 * @param {NodeList} mChr - List of mirrored elements.
+	 * @param {HTMLElement[]} mChr - List of mirrored elements.
 	 * @returns {{ci: number, cm: number, ch: number}} The closest element and its related data.
 	 * - ci: The index of the closest element.
 	 * - cm: The distance between the top of the closest element and the given position.
@@ -75,7 +85,7 @@ declare class DocumentType {
 	 */
 	_getElementAtPosition(
 		pageTop: number,
-		mChr: NodeList
+		mChr: HTMLElement[]
 	): {
 		ci: number;
 		cm: number;

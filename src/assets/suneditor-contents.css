@@ -20,9 +20,7 @@
 	line-height: var(--se-edit-line-height);
 }
 
-.sun-editor-editable.se-type-document-editable {
-	padding: var(--se-edit-inner-padding-doc-type);
-}
+.sun-editor .se-wrapper .se-wrapper-inner.sun-editor-editable.se-type-document-editable,
 .sun-editor-editable.se-document-page-mirror-a4 {
 	width: 21cm;
 	padding: var(--se-edit-inner-padding-doc-type);

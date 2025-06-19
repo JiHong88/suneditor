@@ -130,9 +130,11 @@ DocumentType.prototype = {
 		this._rePageTimeout = _w.setTimeout(async () => {
 			await dom.utils.waitForMediaLoad(this._mirror, 1500);
 
-			const mirrorHeight = this._mirror.scrollHeight;
+			const heightGap = this.ww.scrollHeight > this._mirror.scrollHeight ? this.ww.scrollHeight - this._mirror.scrollHeight : 0;
+			const mirrorHeight = this._mirror.scrollHeight + heightGap;
 			const pageBreaks = this._mirror.querySelectorAll('.se-page-break');
 			if (!force && this.pageHeight === mirrorHeight && this.pageBreaksCnt === pageBreaks.length) return;
+
 			this.pageHeight = mirrorHeight;
 			this.pageBreaksCnt = pageBreaks.length;
 
@@ -145,18 +147,12 @@ DocumentType.prototype = {
 				for (let i = 0; i < pageBreaks.length; i++) {
 					const breakPosition = pageBreaks[i].offsetTop;
 					const sectionHeight = breakPosition - lastBreakPosition;
-
-					if (sectionHeight % A4_PAGE_HEIGHT !== 0) {
-						additionalPages++;
-					}
-
+					if (sectionHeight % A4_PAGE_HEIGHT !== 0) additionalPages++;
 					lastBreakPosition = breakPosition;
 				}
 
 				const lastSectionHeight = mirrorHeight - lastBreakPosition;
-				if (lastSectionHeight > 0 && lastSectionHeight % A4_PAGE_HEIGHT !== 0) {
-					additionalPages++;
-				}
+				if (lastSectionHeight > 0 && lastSectionHeight % A4_PAGE_HEIGHT !== 0) additionalPages++;
 			}
 
 			const scrollTop = this.isAutoHeight ? 0 : this._getWWScrollTop();
@@ -168,25 +164,18 @@ DocumentType.prototype = {
 				pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight - scrollTop });
 			}
 
-			// A4 position
 			this._mirrorCache = 0;
 			const chr = this.ww.children;
 			const mChr = this._mirror.children;
 			this._initializeCache(mChr);
+
 			pages.push({ number: 0, top: 0 });
+
 			for (let i = 1, t = 0; i < totalPages; i++) {
 				t += A4_PAGE_HEIGHT + (i === 1 ? this._paddingTop + this._paddingBottom : this._paddingTop);
-				if (!pages.some((p) => Math.abs(p.top - t) < 1)) {
-					const { ci, cm, ch } = this._getElementAtPosition(t, mChr);
-					const el = chr[ci];
-					if (!el) break;
-
-					if (chr[this._mirrorCache]) {
-						t += numbers.get(_w.getComputedStyle(chr[this._mirrorCache]).marginBottom);
-					}
-
-					const elBottom = el.offsetTop + el.offsetHeight;
-					const top = elBottom + cm + (el.offsetHeight - ch);
+				if (!pages.some((p) => Math.abs(p.top - t) < 3)) {
+					const top = this._calcPageBreakTop(t, chr, mChr);
+					if (top === null) break;
 					pages.push({ number: i, top });
 				}
 			}
@@ -202,11 +191,21 @@ DocumentType.prototype = {
 			pages.sort((a, b) => a.top - b.top);
 			this.page.innerHTML = '';
 			this.pages = [];
+
 			for (let i = 0, t; i < totalPages; i++) {
 				if (!pages[i]) continue;
 				t = pages[i].top;
 				if (mirrorHeight < t) break;
-				const pageNumber = dom.utils.createElement('DIV', { style: `top:${t - scrollTop}px`, innerHTML: String(i + 1) }, `<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`);
+
+				const pageNumber = dom.utils.createElement(
+					'DIV',
+					{
+						style: `top:${t - scrollTop}px`,
+						innerHTML: String(i + 1)
+					},
+					`<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`
+				);
+
 				this.page.appendChild(pageNumber);
 				this.pages.push(pageNumber);
 			}
@@ -215,6 +214,28 @@ DocumentType.prototype = {
 			this.totalPages = this.pages.length;
 			this._displayCurrentPage();
 		}, 400);
+	},
+
+	/**
+	 * @private
+	 * @description Calculates and compensates for the vertical gap between the rendered content (current page)
+	 * - and the mirrored preview page due to differences in width and layout.
+	 * @param {number} t - The initial top position value to be adjusted.
+	 * @param {HTMLElement[]} chr - The elements array in the current (main) page.
+	 * @param {HTMLElement[]} mChr - The elements array in the mirrored page.
+	 * @returns {number|null} - The adjusted top value.
+	 */
+	_calcPageBreakTop(t, chr, mChr) {
+		const { ci } = this._getElementAtPosition(t, mChr);
+		const mel = mChr[ci];
+		const el = chr[ci];
+		if (!mel || !el) return null;
+
+		const offsetDiff = el.offsetTop - mel.offsetTop;
+		const heightDiff = el.offsetHeight - mel.offsetHeight;
+
+		const top = t + offsetDiff + heightDiff / 2;
+		return Math.round(top);
 	},
 
 	/**
@@ -242,7 +263,7 @@ DocumentType.prototype = {
 	 * @private
 	 * @description Retrieves the element at a given position.
 	 * @param {number} pageTop - The vertical position to check.
-	 * @param {NodeList} mChr - List of mirrored elements.
+	 * @param {HTMLElement[]} mChr - List of mirrored elements.
 	 * @returns {{ci: number, cm: number, ch: number}} The closest element and its related data.
 	 * - ci: The index of the closest element.
 	 * - cm: The distance between the top of the closest element and the given position.
