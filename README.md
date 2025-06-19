@@ -56,6 +56,9 @@ It's easy to integrate, highly customizable, and built for modern web applicatio
 
 ❌ Not Supported : IE, Legacy Edge
 
+> SunEditor is designed for modern browsers released since 2020.\
+> This includes support for ES2020+ features like optional chaining (?.), nullish coalescing (??), and private class fields (#field).
+
 ---
 
 ## 📦 Legacy Version (v2-legacy)
@@ -87,20 +90,7 @@ import suneditor from 'suneditor';
 
 // HTML: <div id="editor"></div> or <textarea id="editor"></textarea>
 suneditor.create(document.querySelector('#editor'), {
-	buttonList: [
-		['undo', 'redo'],
-		'|',
-		['bold', 'underline', 'italic', 'strike', '|', 'subscript', 'superscript'],
-		'|',
-		['removeFormat'],
-		'|',
-		['outdent', 'indent'],
-		'|',
-		['fullScreen', 'showBlocks', 'codeView'],
-		'|',
-		['preview', 'print', 'copy']
-	],
-	height: 'auto'
+	// options
 });
 ```
 
@@ -117,20 +107,7 @@ suneditor.create(document.querySelector('#editor'), {
 
 <script>
 	SUNEDITOR.create(document.querySelector('#editor'), {
-		buttonList: [
-			['undo', 'redo'],
-			'|',
-			['bold', 'underline', 'italic', 'strike', '|', 'subscript', 'superscript'],
-			'|',
-			['removeFormat'],
-			'|',
-			['outdent', 'indent'],
-			'|',
-			['fullScreen', 'showBlocks', 'codeView'],
-			'|',
-			['preview', 'print', 'copy']
-		],
-		height: 'auto'
+		// options
 	});
 </script>
 ```
