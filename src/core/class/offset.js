@@ -764,7 +764,6 @@ Offset.prototype = {
 				if (toolbarH > wst) {
 					if (this.editor.toolbar._sticky) {
 						st = toolbarH;
-						toolbarH = 0;
 					} else {
 						st = wst + toolbarH;
 					}
@@ -774,13 +773,13 @@ Offset.prototype = {
 					st = wst + (this.editor.toolbar._sticky ? toolbarH : 0);
 				}
 
-				rmt = targetRect.top - st;
+				rmt = targetRect.top - wwScroll.rects.top - st;
 				rmb = wwScroll.rects.bottom - targetRect.bottom - wsb - statusBarH;
 			}
 
 			// display margin
 			rmt = (rmt > 0 ? tMargin : rmt) - toolbarH;
-			rmb = rmb > 0 ? bMargin : rmb;
+			rmb = (rmb > 0 ? bMargin : rmb) + statusBarH;
 		}
 
 		return {
