@@ -496,7 +496,7 @@ Component.prototype = {
 			componentTop = top;
 			w = target.offsetWidth / 2 / 2;
 
-			t_style.top = componentTop - scrollY - cH / 2 + 'px';
+			t_style.top = componentTop - cH / 2 + 'px';
 			t_style[dir[0]] = (isNonSelected ? sideOffset - cW / 2 : sideOffset + w) + 'px';
 			t_style[dir[1]] = '';
 
@@ -522,7 +522,7 @@ Component.prototype = {
 				w = target.offsetWidth / 2 / 2;
 			}
 
-			b_style.top = componentTop + target.offsetHeight - scrollY - cH / 2 + 'px';
+			b_style.top = componentTop + target.offsetHeight - cH / 2 + 'px';
 			b_style[dir[0]] = sideOffset + target.offsetWidth - (isNonSelected ? 0 : w) - (isNonSelected ? cW / 2 : cW) + 'px';
 			b_style[dir[1]] = '';
 
