@@ -91,7 +91,7 @@ class Image_ extends EditorInjector {
 				? [[ctrlAs, 'mirror_h', 'mirror_v', 'align', 'caption', 'edit', 'revert', 'copy', 'remove']]
 				: [
 						[ctrlAs, 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-						['align', 'caption', 'edit', 'revert', 'copy', 'remove']
+						['edit', 'align', 'caption', 'revert', 'copy', 'remove']
 				  ];
 
 		// show align
@@ -276,7 +276,7 @@ class Image_ extends EditorInjector {
 			query: 'img',
 			method: (element) => {
 				const figureInfo = Figure.GetContainer(element);
-				if (figureInfo && figureInfo.container && figureInfo.cover) return;
+				if (figureInfo && figureInfo.container && (figureInfo.cover || figureInfo.inlineCover)) return;
 
 				this._ready(element);
 				this._fileCheck(this._origin_w, this._origin_h);
@@ -585,6 +585,13 @@ class Image_ extends EditorInjector {
 		if (!height) height = this.inputY?.value || 'auto';
 
 		let imageEl = this._element;
+
+		// as (block | inline)
+		if ((this.as === 'block' && !this._cover) || (this.as === 'inline' && this._cover)) {
+			imageEl = this.figure.convertAsFormat(imageEl, this.as);
+		}
+
+		// --- update image ---
 		const cover = this._cover;
 		const container = this._container === this._cover ? null : this._container;
 
@@ -661,6 +668,8 @@ class Image_ extends EditorInjector {
 		imageEl.onload = () => {
 			this.select(imageEl);
 		};
+
+		this._ready(imageEl);
 	}
 
 	/**
@@ -690,16 +699,6 @@ class Image_ extends EditorInjector {
 			container = figureInfo.container;
 			inlineCover = figureInfo.inlineCover;
 			this.figure.open(imageEl, { nonResizing: true, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
-		}
-
-		// check size
-		let changeSize;
-		const x = numbers.is(width) ? width + this.sizeUnit : width;
-		const y = numbers.is(height) ? height + this.sizeUnit : height;
-		if (/%$/.test(imageEl.style.width)) {
-			changeSize = x !== container.style.width || y !== container.style.height;
-		} else {
-			changeSize = x !== imageEl.style.width || y !== imageEl.style.height;
 		}
 
 		// alt
@@ -749,9 +748,11 @@ class Image_ extends EditorInjector {
 		}
 
 		// size
-		if (this._resizing && changeSize) {
-			this._applySize(width, height);
-		}
+		imageEl.style.width = '';
+		imageEl.style.height = '';
+		imageEl.removeAttribute('width');
+		imageEl.removeAttribute('height');
+		this._applySize(width, height);
 
 		if (isNewAnchor) {
 			if (!isNewContainer) {
@@ -765,7 +766,7 @@ class Image_ extends EditorInjector {
 		}
 
 		// transform
-		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
+		if (modifiedCaption || !this._onlyPercentage) {
 			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
 				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
 					this.figure.deleteTransform(imageEl);

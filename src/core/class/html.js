@@ -1091,6 +1091,7 @@ HTML.prototype = {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	set(html, { rootKey } = {}) {
+		this.ui._offCurrentController();
 		this.selection.removeRange();
 		const convertValue = html === null || html === undefined ? '' : this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
 
@@ -1119,6 +1120,8 @@ HTML.prototype = {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	add(html, { rootKey } = {}) {
+		this.ui._offCurrentController();
+
 		if (!rootKey) rootKey = [this.status.rootKey];
 		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
 

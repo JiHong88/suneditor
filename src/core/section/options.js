@@ -66,7 +66,7 @@ export const DEFAULTS = {
 		col: 'width',
 		'ol|ul': 'list-style-type'
 	},
-	TEXT_STYLES: 'font-family|font-size|color|background-color',
+	SPAN_STYLES: 'font-family|font-size|color|background-color|width|height',
 	LINE_STYLES: 'text-align|margin-left|margin-right|line-height',
 
 	RETAIN_STYLE_MODE: ['repeat', 'always', 'none']
@@ -145,8 +145,8 @@ export const DEFAULTS = {
  * @property {Object<string, string>} [__tagStyles=CONSTANTS.TAG_STYLES] - The basic tags that serves as the base for "tagStyles"
  * - The default follows {@link DEFAULTS.TAG_STYLES}
  * @property {Object<string, string>} [tagStyles={}] - Specifies allowed styles for HTML tags.
- * @property {string} [spanStyles=CONSTANTS.TEXT_STYLES] - Specifies allowed styles for the "span" tag.
- * - The default follows {@link DEFAULTS.TEXT_STYLES}
+ * @property {string} [spanStyles=CONSTANTS.SPAN_STYLES] - Specifies allowed styles for the "span" tag.
+ * - The default follows {@link DEFAULTS.SPAN_STYLES}
  * @property {string} [lineStyles=CONSTANTS.LINE_STYLES] - Specifies allowed styles for the "line" element (p..).
  * - The default follows {@link DEFAULTS.LINE_STYLES}
  * @property {string} [textDirection="ltr"] - Text direction: "ltr" or "rtl".

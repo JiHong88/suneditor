@@ -523,7 +523,7 @@ class Figure extends EditorInjector {
 
 		const w = !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%';
 		const h = figure.inlineCover
-			? figure.inlineCover.style.height
+			? figure.inlineCover.style.height || /** @type {HTMLElement} */ (targetNode).style.height || String(/** @type {HTMLImageElement} */ (targetNode).height || '')
 			: numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !this.isVertical
 			? figure.cover.style.height
 			: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
@@ -575,6 +575,7 @@ class Figure extends EditorInjector {
 	 * @description As style[block, inline] the component
 	 * @param {?Node} targetNode Target element
 	 * @param {"block"|"inline"} formatStyle Format style
+	 * @returns {HTMLElement} New target element after conversion
 	 */
 	convertAsFormat(targetNode, formatStyle) {
 		if (!targetNode) targetNode = this._element;
@@ -583,6 +584,10 @@ class Figure extends EditorInjector {
 		const { w, h } = this.getSize(target);
 
 		const newTarget = /** @type {HTMLElement} */ (target.cloneNode(false));
+		newTarget.style.width = '';
+		newTarget.style.height = '';
+		newTarget.removeAttribute('width');
+		newTarget.removeAttribute('height');
 
 		switch (formatStyle) {
 			case 'inline': {
@@ -592,8 +597,6 @@ class Figure extends EditorInjector {
 				const next = container.nextElementSibling;
 				const parent = container.parentElement;
 
-				newTarget.style.width = '';
-				newTarget.style.height = '';
 				const figure = Figure.CreateInlineContainer(newTarget);
 				dom.utils.addClass(
 					figure.container,
@@ -623,8 +626,6 @@ class Figure extends EditorInjector {
 					dom.utils.removeItem(s.previousElementSibling);
 				}
 
-				newTarget.style.width = '';
-				newTarget.style.height = '';
 				const figure = Figure.CreateContainer(newTarget);
 				dom.utils.addClass(
 					figure.container,
@@ -641,6 +642,8 @@ class Figure extends EditorInjector {
 				break;
 			}
 		}
+
+		return newTarget;
 	}
 
 	/**

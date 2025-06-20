@@ -4,8 +4,8 @@ import { Controller, SelectMenu, ColorPicker, Figure, _DragHandle } from '../../
 
 const { _w, ON_OVER_COMPONENT } = env;
 
-const ROW_SELECT_MARGIN = 5;
-const CELL_SELECT_MARGIN = 2;
+const ROW_SELECT_MARGIN = 6;
+const CELL_SELECT_MARGIN = 6;
 const CELL_DECIMAL_END = 0;
 
 const RESIZE_CELL_CLASS = '.se-table-resize-line';
@@ -428,24 +428,69 @@ class Table extends EditorInjector {
 				// create colgroup
 				if (!ColgroupEl) {
 					const rows = element.rows;
-					const firstRow = rows[0];
-					const maxCount = GetMaxColumns(element);
-					const colHTML = [];
+					const maxColumnCount = GetMaxColumns(element);
+					const colWidths = new Array(maxColumnCount).fill(null);
 
-					for (let i = 0; i < maxCount; i++) {
-						let colStyle = '';
-						if (firstRow && firstRow.cells[i]) {
-							const styleWidth = firstRow.cells[i].style.width;
-							if (styleWidth) {
-								colStyle = ` style="width: ${styleWidth};"`;
-								dom.utils.setStyle(firstRow.cells[i], 'width', '');
+					for (let r = 0, rLen = rows.length, cellsCount; r < rLen; r++) {
+						const cellsInRow = rows[r].cells;
+						cellsCount = cellsInRow.length;
+						let currentLogicalCol = 0;
+						const rowColOccupancy = new Array(maxColumnCount).fill(false);
+
+						for (let c = 0; c < cellsCount; c++) {
+							const cell = cellsInRow[c];
+							const cellWidth = cell.style.width;
+							const colSpan = cell.colSpan || 1;
+
+							while (currentLogicalCol < maxColumnCount && rowColOccupancy[currentLogicalCol]) {
+								currentLogicalCol++;
 							}
+
+							if (currentLogicalCol >= maxColumnCount) break;
+							if (cellWidth && !colWidths[currentLogicalCol]) colWidths[currentLogicalCol] = cellWidth;
+
+							for (let i = 0; i < colSpan; i++) {
+								if (currentLogicalCol + i >= maxColumnCount || !cellWidth) continue;
+
+								rowColOccupancy[currentLogicalCol + i] = true;
+								const currentPxWidth = parseFloat(cellWidth);
+
+								for (let j = 0; j < colSpan; j++) {
+									const targetColIndex = currentLogicalCol + j;
+									if (targetColIndex >= maxColumnCount) continue;
+
+									const existingWidth = colWidths[targetColIndex];
+									if (existingWidth === null) {
+										colWidths[targetColIndex] = `width: ${cellWidth};`;
+									} else {
+										const existingPxWidth = parseFloat(existingWidth.replace('width: ', '').replace(';', ''));
+										if (colSpan === 1 && currentPxWidth !== existingPxWidth) {
+											colWidths[targetColIndex] = `width: ${cellWidth};`;
+										}
+									}
+								}
+							}
+							currentLogicalCol += colSpan;
 						}
+
+						if (cellsCount === maxColumnCount) break;
+					}
+
+					const colHTML = [];
+					for (let i = 0; i < maxColumnCount; i++) {
+						const colStyle = colWidths[i] ? ` style="${colWidths[i]}"` : '';
 						colHTML.push(`<col${colStyle}>`);
 					}
 
 					const colGroup = dom.utils.createElement('colgroup', null, colHTML.join(''));
 					element.insertBefore(colGroup, element.firstElementChild);
+
+					for (let r = 0; r < rows.length; r++) {
+						const cellsInRow = rows[r].cells;
+						for (let c = 0; c < cellsInRow.length; c++) {
+							dom.utils.setStyle(cellsInRow[c], 'width', '');
+						}
+					}
 				}
 
 				// figure
@@ -2141,16 +2186,17 @@ class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Converts the width of <col> elements to percentages.
+	 * @param {HTMLTableElement} target - The target table element.
 	 */
-	_resizePercentCol() {
-		const cols = this._element.querySelector('colgroup').querySelectorAll('col');
-		const tableTotalWidth = this._element.offsetWidth;
+	_resizePercentCol(target) {
+		const cols = target.querySelector('colgroup').querySelectorAll('col');
+		const tableTotalWidth = target.offsetWidth;
 
 		cols.forEach((col) => {
-			const colWidthString = _w.getComputedStyle(col).getPropertyValue('width');
+			const colWidthString = col.style.width;
 
 			if (!colWidthString.endsWith('%')) {
-				const pixelWidth = numbers.get(colWidthString, 1);
+				const pixelWidth = col.offsetWidth || numbers.get(colWidthString, CELL_DECIMAL_END);
 				const percentage = (pixelWidth / tableTotalWidth) * 100;
 				col.style.width = percentage + '%';
 			}
@@ -2166,7 +2212,7 @@ class Table extends EditorInjector {
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
-		this._resizePercentCol();
+		this._resizePercentCol(this._element);
 		this._setResizeLinePosition(this._figure, this._tdElement, this._resizeLinePrev, isLeftEdge);
 		this._resizeLinePrev.style.display = 'block';
 		const prevValue = col.style.width;
@@ -2192,7 +2238,7 @@ class Table extends EditorInjector {
 			),
 			() => {
 				this.__removeGlobalEvents();
-				this._resizePercentCol();
+				this._resizePercentCol(this._element);
 				this.history.push(true);
 				this.component.select(this._element, Table.key, { isInput: true });
 			},

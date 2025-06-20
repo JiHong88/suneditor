@@ -60,7 +60,7 @@ Many options use predefined constants for their default values. Here are their d
     }
     ```
 
--   **`DEFAULT_TEXT_STYLES`**: `'font-family|font-size|color|background-color'`
+-   **`DEFAULT_SPAN_STYLES`**: `'font-family|font-size|color|background-color'`
 
 -   **`DEFAULT_LINE_STYLES`**: `'text-align|margin-left|margin-right|line-height'`
 
@@ -437,7 +437,7 @@ These options control the core functionality, plugins, toolbar, styling, and con
 
 -   **Description**: Specifies allowed styles for the "span" tag.
 -   **Type**: `string`
--   **Default**: `DEFAULT_TEXT_STYLES` (see [Default Value Constants](#default-value-constants))
+-   **Default**: `DEFAULT_SPAN_STYLES` (see [Default Value Constants](#default-value-constants))
 -   **Mutability**: Fixed
 
 ### `lineStyles`

@@ -412,6 +412,7 @@ declare class Table extends EditorInjector {
 	/**
 	 * @private
 	 * @description Converts the width of <col> elements to percentages.
+	 * @param {HTMLTableElement} target - The target table element.
 	 */
 	private _resizePercentCol;
 	/**

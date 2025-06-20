@@ -378,8 +378,9 @@ declare class Figure extends EditorInjector {
 	 * @description As style[block, inline] the component
 	 * @param {?Node} targetNode Target element
 	 * @param {"block"|"inline"} formatStyle Format style
+	 * @returns {HTMLElement} New target element after conversion
 	 */
-	convertAsFormat(targetNode: Node | null, formatStyle: 'block' | 'inline'): void;
+	convertAsFormat(targetNode: Node | null, formatStyle: 'block' | 'inline'): HTMLElement;
 	/**
 	 * @private
 	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
