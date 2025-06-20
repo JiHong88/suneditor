@@ -98,10 +98,6 @@ suneditor.create('editor', {
 
 ---
 
-Of course. Here is the documentation for the `fileGallery` plugin options in both English and Korean.
-
----
-
 ### File Gallery Plugin Options (`fileGallery`)
 
 This plugin provides a gallery UI for users to browse and insert generic files.
@@ -146,10 +142,6 @@ suneditor.create('editor', {
     -   **As a `string`**: The provided URL will be used as the thumbnail for all file items in the gallery.
     -   **As a `function`**: Receives each file item (`item`) as an argument and should return a thumbnail URL dynamically. This allows you to set different thumbnails for different files.
     -   If this option is not set, all items will use the editor's default file icon.
-
----
-
-Of course. Here is the documentation for the `imageGallery` plugin options in both English and Korean.
 
 ---
 
@@ -198,10 +190,6 @@ suneditor.create('editor', {
 -   **Description**: This is the default initial height when creating an image.
 -   **Type**: `string`
 -   **Default**: `auto`
-
----
-
-Of course. Here is the documentation for the `videoGallery` plugin options in both English and Korean.
 
 ---
 
