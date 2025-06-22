@@ -308,9 +308,7 @@ class Figure extends EditorInjector {
 			return;
 		}
 
-		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
-			this.ui._offCurrentController();
-		} else {
+		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) {
 			nonBorder = true;
 		}
 

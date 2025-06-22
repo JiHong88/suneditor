@@ -307,7 +307,7 @@ class Controller extends EditorInjector {
 					const resetPosition = controller.offsetTop - this.__addOffset.top;
 					if (positionResult.position === 'bottom') {
 						this._reserveIndex = true;
-						controller.style.top = resetPosition + this.sibling.offsetHeight - 2 + 'px';
+						controller.style.top = resetPosition + this.sibling.offsetHeight - 1 + 'px';
 					} else {
 						controller.style.top = resetPosition - this.sibling.offsetHeight + 2 + 'px';
 					}

@@ -362,7 +362,7 @@ Toolbar.prototype = {
 			let left = container.offsetLeft;
 			let top = container.offsetTop;
 
-			while (!container.parentElement.contains(editorParent) || !/^(BODY|HTML)$/i.test(container.parentElement.nodeName)) {
+			while (!container.parentElement.contains(editorParent) && !/^(BODY|HTML)$/i.test(container.parentElement.nodeName)) {
 				container = container.offsetParent;
 				left += container.offsetLeft;
 				top += container.offsetTop;

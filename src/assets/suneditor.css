@@ -761,7 +761,7 @@
 	top: -12px;
 	content: ' ';
 	border-bottom-width: 0;
-	border-top-color: var(--se-main-background-color);
+	border-top-color: var(--se-controller-background-color);
 }
 
 /** --- container */

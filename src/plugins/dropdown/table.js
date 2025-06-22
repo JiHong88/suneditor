@@ -115,8 +115,8 @@ class Table extends EditorInjector {
 		});
 
 		// members - Controller
-		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
 		this.controller_table = new Controller(this, controller_table, { position: 'top' });
+		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
 		if (this.cellControllerTop) {
 			this.controller_cell.sibling = this.controller_table.form;
 			this.controller_cell.siblingPosition = 'top';

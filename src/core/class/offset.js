@@ -494,6 +494,7 @@ Offset.prototype = {
 		let t = addOffset.top;
 		let y = 0;
 		let arrowDir = '';
+		// bottom position
 		if (position === 'bottom') {
 			arrowDir = 'up';
 			t += targetRect.bottom + ah + _w.scrollY;
@@ -505,9 +506,12 @@ Offset.prototype = {
 				if (y < 0) {
 					arrowDir = '';
 					t -= y;
+					t += toolbarH + 2;
 				}
 			}
-		} else {
+		}
+		// top position
+		else {
 			arrowDir = 'down';
 			t += targetRect.top - elH - ah + _w.scrollY;
 			y = rmt - (elH + ah);
@@ -517,7 +521,7 @@ Offset.prototype = {
 				y = rmb - (elH + ah);
 				if (y < 0) {
 					arrowDir = '';
-					t += y;
+					t += y - 20;
 				}
 			}
 		}
@@ -767,19 +771,19 @@ Offset.prototype = {
 					} else {
 						st = wst + toolbarH;
 					}
-				} else if (this.options.get('toolbar_container')) {
+				} else if (this.options.get('toolbar_container') && !this.editor.toolbar._sticky) {
 					toolbarH = 0;
 				} else {
-					st = wst + (this.editor.toolbar._sticky ? toolbarH : 0);
+					st = wst + toolbarH;
 				}
 
-				rmt = targetRect.top - wwScroll.rects.top - st;
-				rmb = wwScroll.rects.bottom - targetRect.bottom - wsb - statusBarH;
+				rmt = targetRect.top - wwScroll.rects.top - st + toolbarH;
+				rmb = wwScroll.rects.bottom - targetRect.bottom - wsb;
 			}
 
 			// display margin
-			rmt = (rmt > 0 ? tMargin : rmt) - toolbarH;
-			rmb = (rmb > 0 ? bMargin : rmb) + statusBarH;
+			rmt = rmt > 0 ? tMargin - toolbarH : rmt - toolbarH;
+			rmb = rmb > 0 ? bMargin : rmb;
 		}
 
 		return {
