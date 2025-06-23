@@ -115,13 +115,17 @@ class Table extends EditorInjector {
 		});
 
 		// members - Controller
-		this.controller_table = new Controller(this, controller_table, { position: 'top' });
-		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
 		if (this.cellControllerTop) {
+			this.controller_cell = new Controller(this, controller_cell.html, { position: 'top' });
+			this.controller_table = new Controller(this, controller_table, { position: 'top' });
 			this.controller_cell.sibling = this.controller_table.form;
 			this.controller_table.sibling = this.controller_cell.form;
 			this.controller_table.siblingMain = true;
+		} else {
+			this.controller_table = new Controller(this, controller_table, { position: 'top' });
+			this.controller_cell = new Controller(this, controller_cell.html, { position: 'bottom' });
 		}
+
 		// props
 		const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
 		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
@@ -906,13 +910,17 @@ class Table extends EditorInjector {
 				this._maxWidth = !this._maxWidth;
 				this._setTableStyle('width', false);
 				this._historyPush();
-				this.component.select(this._element, Table.key, { isInput: true });
+				_w.setTimeout(() => {
+					this.component.select(this._element, Table.key, { isInput: true });
+				}, 0);
 				break;
 			case 'layout':
 				this._fixedColumn = !this._fixedColumn;
 				this._setTableStyle('column', false);
 				this._historyPush();
-				this.component.select(this._element, Table.key, { isInput: true });
+				_w.setTimeout(() => {
+					this.component.select(this._element, Table.key, { isInput: true });
+				}, 0);
 				break;
 			case 'copy':
 				this.component.copy(this._figure);

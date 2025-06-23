@@ -59,8 +59,8 @@ declare class Table extends EditorInjector {
 	figureScroll: string;
 	captionPosition: string;
 	cellControllerTop: boolean;
-	controller_table: Controller;
 	controller_cell: Controller;
+	controller_table: Controller;
 	controller_props: Controller;
 	controller_props_title: HTMLElement;
 	colorPicker: ColorPicker;
