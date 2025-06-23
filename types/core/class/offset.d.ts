@@ -370,6 +370,7 @@ declare class Offset {
 	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
 	 * @param {*} params.inst Instance object of caller
+	 * @param {HTMLElement} [params.sibling] The sibling controller element
 	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 */
 	setAbsPosition(
@@ -384,6 +385,7 @@ declare class Offset {
 			};
 			position?: 'bottom' | 'top';
 			inst: any;
+			sibling?: HTMLElement;
 		}
 	):
 		| {
@@ -459,7 +461,12 @@ declare class Offset {
 	 * @param {RectsInfo} targetRect Target rect object
 	 * @param {boolean} isTargetAbs Is target absolute position
 	 * @param {OffsetWWScrollInfo} wwScroll WYSIWYG scroll info
-	 * @returns {{rmt:number, rmb:number, rt:number}} Margin values (rmt: top margin, rmb: bottom margin, rt: Toolbar height offset adjustment)
+	 * @returns {{rmt:number, rmb:number, rt:number, tMargin:number, bMargin:number}} Margin values
+	 * - rmt: top margin to frame
+	 * - rmb: bottom margin to frame
+	 * - rt: Toolbar height offset adjustment
+	 * - tMargin: top margin
+	 * - bMargin: bottom margin
 	 */
 	_getVMargin(
 		this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>,
@@ -477,6 +484,8 @@ declare class Offset {
 		rmt: number;
 		rmb: number;
 		rt: number;
+		tMargin: number;
+		bMargin: number;
 	};
 	/**
 	 * @private

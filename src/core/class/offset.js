@@ -453,6 +453,7 @@ Offset.prototype = {
 	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
 	 * @param {*} params.inst Instance object of caller
+	 * @param {HTMLElement} [params.sibling] The sibling controller element
 	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 */
 	setAbsPosition(element, target, params) {
@@ -479,49 +480,63 @@ Offset.prototype = {
 		const arrow = /** @type {HTMLElement} */ (hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null);
 
 		// top ----------------------------------------------------------------------------------------------------
+		const siblingH = params.sibling?.offsetHeight || 0;
 		const ah = arrow ? arrow.offsetHeight : 0;
 		const elH = element.offsetHeight;
 		const targetH = target.offsetHeight;
 		// margin
 		const tmtw = targetRect.top;
 		const tmbw = clientSize.h - targetRect.bottom;
-		const toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar.main').offsetHeight;
+		const globalTop = this.getGlobal(this.editor.frameContext.get('topArea')).top;
+		const wScrollY = _w.scrollY;
+		const th = this.context.get('toolbar.main').offsetHeight;
+		const containerToolbar = this.options.get('toolbar_container');
+		const headLess = this.editor.isBalloon || this.editor.isInline || containerToolbar;
+		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.editor.toolbar._sticky && headLess) ? 0 : th;
 
 		// check margin
-		const { rmt, rmb, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll);
-		if (isWWTarget && (rmb + targetH <= 0 || rmt + rt + targetH <= 0)) return;
+		const { rmt, rmb, bMargin, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll);
+		if (isWWTarget && ((rmb > 0 ? bMargin : rmb) + targetH <= 0 || rmt + rt + targetH <= 0)) return;
 
+		const isSticky = this.editor.toolbar._sticky && this.context.get('toolbar.main').style.display !== 'none' && (!headLess || this.editor.frameContext.get('topArea').getBoundingClientRect().top <= th);
 		let t = addOffset.top;
 		let y = 0;
 		let arrowDir = '';
-		// bottom position
+
+		// [bottom] position
 		if (position === 'bottom') {
+			const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
+			let trmt = rmt - (isSticky && globalTop - wScrollY <= toolbarH ? toolbarH : 0);
+			if (isSticky && trmt + toolbarH < 0) trmt += toolbarH;
 			arrowDir = 'up';
-			t += targetRect.bottom + ah + _w.scrollY;
-			y = rmb - (elH + ah);
-			if (y < 0) {
+			t += targetRect.bottom + ah + wScrollY;
+			y = rmb - (elH + ah) - statusBarH;
+			// change to <top> position
+			if (y - siblingH < 0) {
 				arrowDir = 'down';
 				t -= targetH + elH + ah * 2;
-				y = toolbarH + rmt - (elH + ah);
-				if (y < 0) {
+				y = trmt - (elH + ah);
+				// sticky the <top> position
+				if (y - siblingH < 0) {
 					arrowDir = '';
-					t -= y;
-					t += toolbarH + 2;
+					t -= y - siblingH - Math.max(1, y + elH + ah) + (!isSticky && trmt < 0 ? toolbarH : 0) - (isSticky ? this.context.get('toolbar.main').offsetTop : 0);
 				}
 			}
 		}
-		// top position
+		// <top> position
 		else {
 			arrowDir = 'down';
-			t += targetRect.top - elH - ah + _w.scrollY;
-			y = rmt - (elH + ah);
-			if (y < 0) {
+			t += targetRect.top - elH - ah + wScrollY;
+			y = (isSticky ? targetRect.top - toolbarH : rmt) - elH - ah;
+			// change to [bottom] position
+			if (y - siblingH < 0) {
 				arrowDir = 'up';
 				t += targetH + elH + ah * 2;
-				y = rmb - (elH + ah);
-				if (y < 0) {
+				y = (rmb > 0 ? bMargin : rmb) - (elH + ah);
+				// sticky the [bottom] position
+				if (y - siblingH < 0) {
 					arrowDir = '';
-					t += y - 20;
+					t += y - 2;
 				}
 			}
 		}
@@ -738,19 +753,26 @@ Offset.prototype = {
 	 * @param {RectsInfo} targetRect Target rect object
 	 * @param {boolean} isTargetAbs Is target absolute position
 	 * @param {OffsetWWScrollInfo} wwScroll WYSIWYG scroll info
-	 * @returns {{rmt:number, rmb:number, rt:number}} Margin values (rmt: top margin, rmb: bottom margin, rt: Toolbar height offset adjustment)
+	 * @returns {{rmt:number, rmb:number, rt:number, tMargin:number, bMargin:number}} Margin values
+	 * - rmt: top margin to frame
+	 * - rmb: bottom margin to frame
+	 * - rt: Toolbar height offset adjustment
+	 * - tMargin: top margin
+	 * - bMargin: bottom margin
 	 */
 	_getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll) {
 		let rmt = 0;
 		let rmb = 0;
 		let rt = 0;
+		let tMargin = 0;
+		let bMargin = 0;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rmt = tmtw - toolbarH;
 			rmb = tmbw;
 		} else {
 			const isIframe = isTargetAbs && this.editor.frameOptions.get('iframe');
-			const tMargin = targetRect.top;
-			const bMargin = clientSize.h - targetRect.bottom;
+			tMargin = targetRect.top;
+			bMargin = clientSize.h - targetRect.bottom;
 			const editorOffset = this.getGlobal();
 			const editorScroll = this.getGlobalScroll();
 			const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
@@ -782,14 +804,15 @@ Offset.prototype = {
 			}
 
 			// display margin
-			rmt = rmt > 0 ? tMargin - toolbarH : rmt - toolbarH;
-			rmb = rmb > 0 ? bMargin : rmb;
+			rmt = rmt > 0 ? rmt : rmt - toolbarH;
 		}
 
 		return {
 			rmt,
 			rmb,
-			rt
+			rt,
+			tMargin,
+			bMargin
 		};
 	},
 

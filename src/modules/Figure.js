@@ -1209,8 +1209,10 @@ class Figure extends EditorInjector {
 		e.stopPropagation();
 		e.preventDefault();
 
-		const eventTarget = dom.query.getEventTarget(e);
 		const inst = _DragHandle.get('__figureInst');
+		if (!inst) return;
+
+		const eventTarget = dom.query.getEventTarget(e);
 		const direction = (inst._resize_direction = eventTarget.classList[0]);
 		inst._resizeClientX = e.clientX;
 		inst._resizeClientY = e.clientY;

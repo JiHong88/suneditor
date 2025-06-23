@@ -119,7 +119,8 @@ class Table extends EditorInjector {
 		this.controller_cell = new Controller(this, controller_cell.html, { position: this.cellControllerTop ? 'top' : 'bottom' });
 		if (this.cellControllerTop) {
 			this.controller_cell.sibling = this.controller_table.form;
-			this.controller_cell.siblingPosition = 'top';
+			this.controller_table.sibling = this.controller_cell.form;
+			this.controller_table.siblingMain = true;
 		}
 		// props
 		const propsTargetForms = [this.controller_table.form, this.controller_cell.form];

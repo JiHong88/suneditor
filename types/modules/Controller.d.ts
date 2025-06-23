@@ -56,12 +56,14 @@ export type ControllerParams = {
 	parentsHide?: boolean | undefined;
 	/**
 	 * The related sibling controller element that this controller is positioned relative to.
+	 * - e.g.) table plugin :: 118
 	 */
 	sibling?: HTMLElement | undefined;
 	/**
-	 * The relative position of this controller to the sibling element (e.g., display above or beside the sibling).
+	 * If true, This sibling controller is the main controller.
+	 * - You must specify this option, if use "sibling"
 	 */
-	siblingPosition?: 'top' | 'side';
+	siblingMain?: boolean | undefined;
 	/**
 	 * If the controller is inside a form, set it to true.
 	 */
@@ -90,7 +92,9 @@ export type ControllerParams = {
  * @property {Array<HTMLElement>=} [parents=[]] The parent "controller" array when "controller" is opened nested.
  * @property {boolean=} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
  * @property {HTMLElement=} [sibling=null] The related sibling controller element that this controller is positioned relative to.
- * @property {"top"|"side"} [siblingPosition="top"] The relative position of this controller to the sibling element (e.g., display above or beside the sibling).
+ * - e.g.) table plugin :: 118
+ * @property {boolean=} [siblingMain=false] If true, This sibling controller is the main controller.
+ * - You must specify this option, if use "sibling"
  * @property {boolean=} [isInsideForm=false] If the controller is inside a form, set it to true.
  * @property {boolean=} [isOutsideForm=false] If the controller is outside a form, set it to true.
  */
@@ -119,7 +123,7 @@ declare class Controller extends EditorInjector {
 	parents: HTMLElement[];
 	parentsHide: boolean;
 	sibling: HTMLElement;
-	siblingPosition: 'top' | 'side';
+	siblingMain: boolean;
 	isInsideForm: boolean;
 	isOutsideForm: boolean;
 	toTop: boolean;

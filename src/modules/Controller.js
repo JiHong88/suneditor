@@ -28,7 +28,9 @@ const INDEX_1 = '2147483640';
  * @property {Array<HTMLElement>=} [parents=[]] The parent "controller" array when "controller" is opened nested.
  * @property {boolean=} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
  * @property {HTMLElement=} [sibling=null] The related sibling controller element that this controller is positioned relative to.
- * @property {"top"|"side"} [siblingPosition="top"] The relative position of this controller to the sibling element (e.g., display above or beside the sibling).
+ * - e.g.) table plugin :: 118
+ * @property {boolean=} [siblingMain=false] If true, This sibling controller is the main controller.
+ * - You must specify this option, if use "sibling"
  * @property {boolean=} [isInsideForm=false] If the controller is inside a form, set it to true.
  * @property {boolean=} [isOutsideForm=false] If the controller is outside a form, set it to true.
  */
@@ -61,7 +63,7 @@ class Controller extends EditorInjector {
 		this.parents = /** @type {Array<HTMLElement>} */ (params.parents || []);
 		this.parentsHide = !!params.parentsHide;
 		this.sibling = /** @type {HTMLElement} */ (params.sibling || null);
-		this.siblingPosition = ['top', 'side'].includes(params.siblingPosition) ? params.siblingPosition : 'top';
+		this.siblingMain = !!params.siblingMain;
 		this.isInsideForm = !!params.isInsideForm;
 		this.isOutsideForm = !!params.isOutsideForm;
 		this.toTop = false;
@@ -137,14 +139,6 @@ class Controller extends EditorInjector {
 
 		this.__addGlobalEvent();
 
-		// add sibling offset
-		if (this.sibling) {
-			if (this.siblingPosition === 'top') {
-				this.__addOffset.top += -this.sibling.offsetHeight + 1;
-			} else {
-				this.__addOffset.left += this.form.offsetWidth + this.sibling.offsetWidth - 1;
-			}
-		}
 		// display controller
 		this._setControllerPosition(this.form, this.currentPositionTarget, false);
 
@@ -290,6 +284,11 @@ class Controller extends EditorInjector {
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
+		if (this.sibling && this.sibling.style.display !== 'block') {
+			this.sibling.style.visibility = 'hidden';
+			this.sibling.style.display = 'block';
+		}
+
 		if (this.selection.isRange(refer)) {
 			if (!this.offset.setRangePosition(this.form, /** @type {Range} */ (refer), { position: 'bottom' })) {
 				this.hide();
@@ -297,13 +296,13 @@ class Controller extends EditorInjector {
 			}
 		} else {
 			if (refer) {
-				const positionResult = this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this });
+				const positionResult = this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this, sibling: this.sibling });
 				if (!positionResult) {
 					this.hide();
 					return;
 				}
 
-				if (!skipAutoReposition && this.sibling && this.siblingPosition === 'top' && positionResult.position !== this.position) {
+				if (!skipAutoReposition && this.sibling && !this.siblingMain) {
 					const resetPosition = controller.offsetTop - this.__addOffset.top;
 					if (positionResult.position === 'bottom') {
 						this._reserveIndex = true;
