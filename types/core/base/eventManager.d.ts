@@ -283,9 +283,9 @@ declare class EventManager {
 	 * @this {EventManagerThis}
 	 * @description Adjusts the position of the editor's toolbar, controllers, and other floating elements based on scroll position.
 	 * - Ensures UI elements maintain their intended relative positions when scrolling.
-	 * @param {Element} eventWysiwyg The wysiwyg event object containing scroll data
+	 * @param {*} eventWysiwyg The wysiwyg event object containing scroll data (Window or element)
 	 */
-	_moveContainer(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, eventWysiwyg: Element): void;
+	_moveContainer(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, eventWysiwyg: any): void;
 	/**
 	 * @private
 	 * @this {EventManagerThis}

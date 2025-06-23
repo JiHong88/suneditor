@@ -149,8 +149,8 @@ Offset.prototype = {
 			left: offsetLeft,
 			top: offsetTop,
 			right: offsetElement?.offsetWidth ? offsetElement.offsetWidth - (offsetLeft - l + targetWidth) + r : 0,
-			scrollX: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
-			scrollY: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0
+			scrollX: eventWysiwyg.scrollLeft || eventWysiwyg.scrollX || 0,
+			scrollY: eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0
 		};
 	},
 
@@ -349,13 +349,13 @@ Offset.prototype = {
 	getWWScroll() {
 		const eventWysiwyg = this.editor.frameContext.get('wysiwyg');
 		const rects = this.selection.getRects(eventWysiwyg, 'start').rects;
-		const top = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
-		const height = eventWysiwyg.scrollHeight || 0;
+		const top = eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0;
+		const height = eventWysiwyg.scrollHeight || eventWysiwyg.document?.documentElement.scrollHeight || 0;
 
 		return {
 			top,
-			left: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
-			width: eventWysiwyg.scrollWidth || 0,
+			left: eventWysiwyg.scrollLeft || eventWysiwyg.scrollX || 0,
+			width: eventWysiwyg.scrollWidth || eventWysiwyg.document?.documentElement.scrollWidth || 0,
 			height,
 			bottom: top + height,
 			rects
@@ -470,12 +470,15 @@ Offset.prototype = {
 			addOffset.left *= -1;
 		}
 
-		const isWWTarget = this.editor.frameContext.get('wrapper').contains(target) || params.isWWTarget;
-		const isCtrlTarget = getParentElement(target, '.se-controller');
+		const isIframe = this.editor.frameOptions.get('iframe');
+		const isWWTarget = this.editor.frameContext.get('wrapper').contains(target) || params.isWWTarget || (isIframe ? this.editor.frameContext.get('wysiwyg').contains(target) : false);
+
+		const isCtrlTarget = target.nodeType === 1;
 		const isTargetAbs = isWWTarget && !isCtrlTarget;
+		const isInlineTarget = isCtrlTarget && /inline/.test(_w.getComputedStyle(target).display);
 		const clientSize = getClientSize(_d);
 		const wwScroll = isTargetAbs ? this.getWWScroll() : this._getWindowScroll();
-		const targetRect = isCtrlTarget ? target.getBoundingClientRect() : this.selection.getRects(target, 'start').rects;
+		const targetRect = !isIframe && isCtrlTarget ? target.getBoundingClientRect() : this.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
 		const arrow = /** @type {HTMLElement} */ (hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null);
 
@@ -496,16 +499,16 @@ Offset.prototype = {
 
 		// check margin
 		const { rmt, rmb, bMargin, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll);
-		if (isWWTarget && ((rmb > 0 ? bMargin : rmb) + targetH <= 0 || rmt + rt + targetH <= 0)) return;
+		if (isWWTarget && ((rmb > 0 ? bMargin : rmb) + targetH <= 0 || rmt + rt + targetH - (this.editor.toolbar._sticky && isInlineTarget ? toolbarH : 0) <= 0)) return;
 
 		const isSticky = this.editor.toolbar._sticky && this.context.get('toolbar.main').style.display !== 'none' && (!headLess || this.editor.frameContext.get('topArea').getBoundingClientRect().top <= th);
+		const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
 		let t = addOffset.top;
 		let y = 0;
 		let arrowDir = '';
 
 		// [bottom] position
 		if (position === 'bottom') {
-			const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
 			let trmt = rmt - (isSticky && globalTop - wScrollY <= toolbarH ? toolbarH : 0);
 			if (isSticky && trmt + toolbarH < 0) trmt += toolbarH;
 			arrowDir = 'up';
@@ -532,7 +535,7 @@ Offset.prototype = {
 			if (y - siblingH < 0) {
 				arrowDir = 'up';
 				t += targetH + elH + ah * 2;
-				y = (rmb > 0 ? bMargin : rmb) - (elH + ah);
+				y = (rmb > 0 ? bMargin : rmb) - (elH + ah) - statusBarH;
 				// sticky the [bottom] position
 				if (y - siblingH < 0) {
 					arrowDir = '';
@@ -766,18 +769,19 @@ Offset.prototype = {
 		let rt = 0;
 		let tMargin = 0;
 		let bMargin = 0;
+
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rmt = tmtw - toolbarH;
 			rmb = tmbw;
 		} else {
-			const isIframe = isTargetAbs && this.editor.frameOptions.get('iframe');
+			const isIframeAbs = isTargetAbs && this.editor.frameOptions.get('iframe');
 			tMargin = targetRect.top;
 			bMargin = clientSize.h - targetRect.bottom;
 			const editorOffset = this.getGlobal();
 			const editorScroll = this.getGlobalScroll();
 			const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
 
-			if (isIframe) {
+			if (isIframeAbs) {
 				const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
 				const editorH = this.editor.frameContext.get('topArea').offsetHeight;
 				rmt = targetRect.top - emt;
@@ -801,10 +805,9 @@ Offset.prototype = {
 
 				rmt = targetRect.top - wwScroll.rects.top - st + toolbarH;
 				rmb = wwScroll.rects.bottom - targetRect.bottom - wsb;
+				// display margin
+				rmt = rmt > 0 ? rmt : rmt - toolbarH;
 			}
-
-			// display margin
-			rmt = rmt > 0 ? rmt : rmt - toolbarH;
 		}
 
 		return {

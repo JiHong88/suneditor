@@ -986,11 +986,11 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 * @description Adjusts the position of the editor's toolbar, controllers, and other floating elements based on scroll position.
 	 * - Ensures UI elements maintain their intended relative positions when scrolling.
-	 * @param {Element} eventWysiwyg The wysiwyg event object containing scroll data
+	 * @param {*} eventWysiwyg The wysiwyg event object containing scroll data (Window or element)
 	 */
 	_moveContainer(eventWysiwyg) {
-		const y = eventWysiwyg.scrollTop || 0;
-		const x = eventWysiwyg.scrollLeft || 0;
+		const y = eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0;
+		const x = eventWysiwyg.scrollLeft || eventWysiwyg.scrollX || 0;
 
 		if (this.editor.isBalloon) {
 			this.context.get('toolbar.main').style.top = this.toolbar._balloonOffset.top - y + 'px';
@@ -1270,7 +1270,7 @@ EventManager.prototype = {
 /**
  * @this {EventManagerThis}
  * @param {__se__FrameContext} frameContext - frame context object
- * @param {Element} eventWysiwyg - wysiwyg event object
+ * @param {Element|Window} eventWysiwyg - wysiwyg event object
  * @param {Event} e - Event object
  */
 function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
