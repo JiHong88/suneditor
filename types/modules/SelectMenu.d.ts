@@ -66,7 +66,7 @@ declare class SelectMenu extends CoreInjector {
 	openMethod: () => void;
 	closeMethod: () => void;
 	_refer: HTMLElement;
-	_keydownTarget: Window | HTMLInputElement;
+	_keydownTarget: any;
 	_selectMethod: (command: string) => void;
 	_bindClose_key: any;
 	_bindClose_mousedown: any;
