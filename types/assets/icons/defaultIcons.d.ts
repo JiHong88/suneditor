@@ -134,6 +134,8 @@ declare namespace _default {
 	export let side_menu_item: string;
 	export let side_menu_folder_plus: string;
 	export let alert_outline: string;
+	export let more_media: string;
+	export let more_view: string;
 	export let more_text: string;
 	export let more_paragraph: string;
 	export let more_plus: string;
