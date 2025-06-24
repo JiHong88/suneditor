@@ -1,6 +1,6 @@
 {
 	"name": "suneditor",
-	"version": "3.0.0-beta.14",
+	"version": "3.0.0-beta.15",
 	"description": "Vanilla javascript based WYSIWYG web editor",
 	"author": "Yi JiHong",
 	"license": "MIT",
@@ -81,11 +81,11 @@
 	},
 	"browserslist": [
 		"chrome >= 80",
+		"firefox >= 90",
+		"safari >= 14.1",
 		"edge >= 80",
-		"firefox >= 74",
-		"safari >= 13.1",
-		"ios >= 13.4",
 		"opera >= 67",
+		"ios >= 14.5",
 		"android >= 80",
 		"samsung >= 13",
 		"not IE <= 11",
