@@ -279,7 +279,7 @@
 .sun-editor .se-menu-list li:hover .se-btn-input input:enabled {
 	border-width: 1px;
 	border-style: solid;
-	border-color: var(--se-hover-light3-color);
+	border-color: var(--se-hover-dark-color);
 }
 
 /* after, before button - on, active */
@@ -289,7 +289,7 @@
 .sun-editor .se-menu-list li .se-side-btn-before.active:enabled,
 .sun-editor .se-menu-list li .se-btn-input.on input:enabled,
 .sun-editor .se-menu-list li .se-btn-input.active input:enabled {
-	border-color: var(--se-active-dark-color);
+	border-color: var(--se-active-dark3-color);
 }
 
 /* after, before button : hover - on, active - border */
