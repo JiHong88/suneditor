@@ -615,9 +615,7 @@
 	min-width: -webkit-min-content;
 	min-width: -moz-min-content;
 	min-width: min-content;
-	max-width: -webkit-max-content;
-	max-width: -moz-max-content;
-	max-width: max-content;
+	max-width: 100%;
 	margin: 0;
 	padding: 0;
 }
