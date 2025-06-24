@@ -308,6 +308,7 @@ class Controller extends EditorInjector {
 						this._reserveIndex = true;
 						controller.style.top = resetPosition + this.sibling.offsetHeight - 1 + 'px';
 					} else {
+						this._reserveIndex = false;
 						controller.style.top = resetPosition - this.sibling.offsetHeight + 2 + 'px';
 					}
 				} else {
