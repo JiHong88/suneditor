@@ -41,6 +41,7 @@ declare namespace _default {
 	export let background_color: string;
 	export let list_bulleted: string;
 	export let list_numbered: string;
+	export let list_checked: string;
 	export let table: string;
 	export let table_header: string;
 	export let table_properties: string;
@@ -135,7 +136,12 @@ declare namespace _default {
 	export let side_menu_folder_plus: string;
 	export let alert_outline: string;
 	export let more_media: string;
+	export let more_gallery: string;
+	export let more_folder: string;
+	export let more_list: string;
+	export let more_file: string;
 	export let more_view: string;
+	export let more_page: string;
 	export let more_text: string;
 	export let more_paragraph: string;
 	export let more_plus: string;

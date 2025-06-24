@@ -52,141 +52,122 @@ import langs from '../../src/langs';
 // import imageGallery from '../../src/plugins/browser/imageGallery';
 import plugins, { audio, exportPDF } from '../../src/plugins';
 
+// , 'dir_ltr', 'dir_rtl', 'list'
 const bl = [
-	['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
-	['dir_ltr', 'dir_rtl'],
-	['font', 'fontSize', 'formatBlock'],
-	['paragraphStyle', 'blockquote'],
+	// full size
+	['undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
+	'|',
+	['blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle', 'textStyle'],
+	'|',
 	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-	['fontColor', 'backgroundColor', 'textStyle'],
-	['copyFormat', 'removeFormat'],
+	['fontColor', 'backgroundColor'],
+	'|',
+	['removeFormat', 'copyFormat'],
+	'|',
+	['align', 'lineHeight', 'list_numbered', 'list_bulleted'],
 	'/',
-	['outdent', 'indent'],
-	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
+	['indent', 'outdent', 'hr'],
+	'|',
+	['link', 'anchor'],
+	'|',
+	['table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+	'|',
 	['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-	['fullScreen', 'showBlocks', 'codeView', 'copy'],
-	['preview', 'print'],
-	['save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-	// (min-width: 1565)
+	'|',
+	['fileUpload', 'template', 'layout'],
+	'|',
+	['fullScreen', 'showBlocks', 'codeView'],
+	'|',
+	['pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
+	'|',
+	['copy'],
+	// (min-width: 1200)
 	[
-		'%1565',
+		'%1200',
 		[
-			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
-			['font', 'fontSize', 'formatBlock'],
-			['paragraphStyle', 'blockquote'],
+			['undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
+			'|',
+			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
+			'|',
+			['textStyle'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-			['fontColor', 'backgroundColor', 'textStyle'],
-			['copyFormat', 'removeFormat'],
-			['outdent', 'indent'],
-			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-			['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['fullScreen', 'showBlocks', 'codeView', 'copy'],
-			['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
+			['fontColor', 'backgroundColor'],
+			'|',
+			['removeFormat', 'copyFormat'],
+			'/',
+			['indent', 'outdent'],
+			'|',
+			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
+			[':Media-default.more_media', 'table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
+			'|',
+			['link', 'anchor'],
+			'|',
+			['fileUpload', 'template', 'layout'],
+			'|',
+			['fullScreen', 'showBlocks', 'codeView'],
+			'|',
+			['pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
+			'|',
+			['copy']
 		]
 	],
-	// (min-width: 1455)
+	// (min-width: 992)
 	[
-		'%1455',
+		'%992',
 		[
-			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
-			['font', 'fontSize', 'formatBlock'],
-			['paragraphStyle', 'blockquote'],
-			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-			['fontColor', 'backgroundColor', 'textStyle'],
-			['copyFormat', 'removeFormat'],
-			['outdent', 'indent'],
-			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
-			['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
+			['undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
+			'|',
+			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
+			'|',
+			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
+			['indent', 'outdent'],
+			'|',
+			['link', 'anchor'],
+			'|',
+			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
+			[':Media-default.more_media', 'table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
+			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
+			['-right', ':View-default.more_view', 'preview', 'print', 'fullScreen', 'fullScreen', 'showBlocks', 'codeView']
 		]
 	],
-	// (min-width: 1326)
+	// (min-width: 768)
 	[
-		'%1326',
+		'%768',
 		[
-			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
-			['font', 'fontSize', 'formatBlock'],
-			['paragraphStyle', 'blockquote'],
-			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-			['fontColor', 'backgroundColor', 'textStyle'],
-			['copyFormat', 'removeFormat'],
-			['outdent', 'indent'],
-			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser']
-		]
-	],
-	// (min-width: 1123)
-	[
-		'%1123',
-		[
-			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
-			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-			['fontColor', 'backgroundColor', 'textStyle'],
-			['copyFormat', 'removeFormat'],
-			['outdent', 'indent'],
-			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser']
-		]
-	],
-	// (min-width: 817)
-	[
-		'%817',
-		[
-			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
-			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-			['bold', 'underline', 'italic', 'strike'],
-			[':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
-			['copyFormat', 'removeFormat'],
-			['outdent', 'indent'],
-			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention'],
-			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser']
-		]
-	],
-	// (min-width: 673)
-	[
-		'%673',
-		[
-			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
-			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
-			['copyFormat', 'removeFormat'],
-			['outdent', 'indent'],
-			['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
+			['undo', 'redo'],
+			'|',
+			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll'],
+			['save'],
+			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
+			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
+			['indent', 'outdent'],
+			[':Insert-default.more_plus', 'link', 'anchor'],
+			'|',
+			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
+			[':Media-default.more_media', 'table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
+			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
+			'|',
+			['-right', ':Pages-default.more_page', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
+			['-right', ':View-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView']
 		]
 	],
 	// (min-width: 525)
 	[
-		'%525',
+		'%576',
 		[
-			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
-			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
-			['copyFormat', 'removeFormat'],
-			['outdent', 'indent'],
-			[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
-		]
-	],
-	// (min-width: 420)
-	[
-		'%420',
-		[
-			['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
-			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
-			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
-			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'embed', 'audio', 'math', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
-			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'copy', 'preview', 'print', 'save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
+			['undo', 'redo'],
+			'|',
+			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll', 'save'],
+			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
+			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
+			[':Insert-default.more_plus', 'indent', 'outdent', 'link', 'anchor'],
+			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
+			[':Media-default.more_media', 'table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+			[':Galleries & File-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser', '|', 'fileUpload', 'template', 'layout'],
+			[':View & Pages-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView', '|', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown']
 		]
 	]
 ];
@@ -205,8 +186,8 @@ const bb = [
 	['table', 'link', 'image', 'video', 'embed', 'audio', 'math'],
 	['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 	['fullScreen', 'showBlocks', 'codeView', 'copy'],
-	['preview', 'print'],
-	['save', 'template', 'layout', 'fileUpload', 'exportPDF', 'mention']
+	['preview', 'print', 'exportPDF'],
+	['save', 'template', 'layout', 'fileUpload', 'mention']
 ];
 
 const begContent = `
@@ -609,7 +590,9 @@ const options1 = {
 	// __pluginRetainFilter: { table: false },
 	// height: '600px',
 	// charCounter_max: 1400,
+	// buttonList: [['bold', 'newDocument', 'selectAll', 'undo', 'redo']],
 	buttonList: bl,
+	tableCellControllerPosition: 'cell',
 	// buttonList: [
 	// 	['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 	// 	'|',
@@ -638,7 +621,7 @@ const options1 = {
 		image: ['c+73', 'I'],
 		list: ['c+76', 'L']
 	},
-	theme: 'dark',
+	// theme: 'dark',
 	math: {
 		// katex: {
 		// 	src: Katex
@@ -794,324 +777,9 @@ const options1 = {
 				</div>
 			</div>
 		</div>`,
-	value: `
-		<figure class="se-flex-component se-input-component se-scroll-figure-x"><table class="se-table-layout-auto" style=""><colgroup><col style="width: 14%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 14%;"><col style="width: 14%;"></colgroup><tbody><tr><td></td><td></td><td></td><td></td><td></td><td> </td><td>a</td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td><td><br></td></tr></tbody></table></figure>
-		<div class="se-component se-image-container __se__float-none"><figure style="" class=""><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" data-se-index="0"></figure></div>
-<figure class="se-flex-component se-input-component se-scroll-figure-x">
-  <table class="se-table-layout-auto" style="">
-    <colgroup><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"></colgroup>
-    <tbody>
-      <tr>
-        <td>
-          <div>1<br>
-          </div>
-        </td>
-        <td>
-          <div>2<br>
-          </div>
-        </td>
-        <td>
-          <div>3<br>
-          </div>
-        </td>
-        <td>
-          <div>4<br>
-          </div>
-        </td>
-        <td>
-          <div>5<br>
-          </div>
-        </td>
-        <td>
-          <div>6<br>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <div>7<br>
-          </div>
-        </td>
-        <td>
-          <div>8<br>
-          </div>
-        </td>
-        <td>
-          <div>9<br>
-          </div>
-        </td>
-        <td>
-          <div>10<br>
-          </div>
-        </td>
-        <td>
-          <div>11<br>
-          </div>
-        </td>
-        <td>
-          <div>12<br>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td class="" colspan="2" rowspan="1">
-          <div>13<br>
-          </div>
-          <div>14<br>
-          </div>
-        </td>
-        <td class="" colspan="3" rowspan="2">
-          <div>15<br>
-          </div>
-          <div>16<br>
-          </div>
-          <div>17<br>
-          </div>
-          <div>21<br>
-          </div>
-          <div>22<br>
-          </div>
-          <div>23<br>
-          </div>
-        </td>
-        <td class="">
-          <div>18<br>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <div>19<br>
-          </div>
-        </td>
-        <td>
-          <div>20<br>
-          </div>
-        </td>
-        <td class="">
-          <div>24<br>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <div>25<br>
-          </div>
-        </td>
-        <td>
-          <div>26<br>
-          </div>
-        </td>
-        <td>
-          <div>27<br>
-          </div>
-        </td>
-        <td>
-          <div>28<br>
-          </div>
-        </td>
-        <td>
-          <div>29<br>
-          </div>
-        </td>
-        <td>
-          <div>30<br>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <div>31<br>
-          </div>
-        </td>
-        <td>
-          <div>32<br>
-          </div>
-        </td>
-        <td class="" colspan="2" rowspan="1">
-          <div>33<br>
-          </div>
-          <div>34<br>
-          </div>
-        </td>
-        <td>
-          <div>35<br>
-          </div>
-        </td>
-        <td>
-          <div>36<br>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</figure>
-<figure class="se-flex-component se-input-component se-scroll-figure-x">
-  <table class="se-table-layout-auto">
-    <colgroup><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"><col style="width: 17%;"></colgroup>
-    <tbody>
-      <tr>
-        <td class="">
-          <div>1</div>
-        </td>
-        <td class="" colspan="1" rowspan="4">
-          <div>2</div>
-          <div>8</div>
-          <div>15</div>
-        </td>
-        <td class="">
-          <div>3</div>
-        </td>
-        <td class="">
-          <div>4</div>
-        </td>
-        <td class="">
-          <div>5</div>
-        </td>
-        <td class="">
-          <div>6</div>
-        </td>
-      </tr>
-      <tr>
-        <td class="">
-          <div>7</div>
-        </td>
-        <td class="" colspan="2" rowspan="3">
-          <div>9</div>
-        </td>
-        <td class="" colspan="1" rowspan="2">
-          <div>10</div>
-        </td>
-        <td class="">
-          <div>11</div>
-        </td>
-      </tr>
-      <tr>
-        <td class="">
-          <div>12</div>
-        </td>
-        <td class="">
-          <div>13</div>
-        </td>
-      </tr>
-      <tr>
-        <td class="">
-          <div>14</div>
-        </td>
-        <td class="">
-          <div>16</div>
-        </td>
-        <td class="">
-          <div>17</div>
-        </td>
-      </tr>
-      <tr>
-        <td class="">
-          <div>18</div>
-        </td>
-        <td class="">
-          <div>19</div>
-        </td>
-        <td class="">
-          <div>20</div>
-        </td>
-        <td class="">
-          <div>21</div>
-        </td>
-        <td class="">
-          <div>22</div>
-        </td>
-        <td class="">
-          <div>23</div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</figure>
-<div class="se-component se-file-figure se-flex-component">
-  <figure class="">
-    <a href="http://localhost:3000/editor/files/download/public/files/d41d8cd98f00b204e9800998ecf8427e.html" title="xsOiDurC.html" download="xsOiDurC.html" data-se-file-download="" contenteditable="false" data-se-non-focus="true" data-se-non-link="true" data-se-file-name="xsOiDurC.html" data-se-file-size="0" name="xsOiDurC.html" data-se-index="0">xsOiDurC.html</a>
-  </figure>
-</div>`,
-	value: `<div style="text-align: center;"><strong style="color: rgb(56, 61, 65); font-family: 돋움; font-size: 12px;"><span style="font-size: 20px;">(재)국가마우스표현형분석사업단 채용공고</span></strong></div>
-<br />
-(재)국가마우스표현형분석사업단은 인체 유전자 기능을 생체 수준에서 규명하기 위하여 특정 유전자를 변형 또는 제거한 유전자변형마우스(GEM, Genetically Engineered Mouse)의 생물학적 특성을 분석하는 마우스 표현형분석기술과 국내 마우스 자원의 효율적인 활용과 마우스 정보를 국내 연구자에게 제공하는 것을 목표로 하고 있습니다. 2013년 11월 미래창조과학부(현 과학기술정보통신부) 바이오&middot;의료기술개발사업의 일환으로 시작하여 10년간의 연구 사업을 추진 중에 있습니다. 비만-염증과 관련 연구를 진행 중에 있습니다. 관련 연구를 같이할 분을 모시고자 합니다.<br />
-&nbsp;<br />
-특이사항 : 우리 연구실에서는 모델 마우스 유래 갈색 및 백색 지방 세포주를 기반으로 하는 대사 조절 연구 시스템을 구축해서 연구를 해오고 있습니다. 국내 최대 규모의 비만, 대사 질환 마우스 제작과 표현형 분석 시스템을 구축 운영해 오고 있습니다.<br />
-&nbsp;<br />
-운동 효과가 비만-염증에 미치는 영향을 유전자변형마우스와 무균동물 (Germ Free) 기반으로 연구를 진행 중에 있습니다. 우리 연구실은 유전자변형마우스와 세포주의 대사표현형 분석 (temperature-controlled metabolic chamber, body composition, seahorse XF analyzer 등)을 갖추고 있습니다. 비만모델동물 지방세포의 single cell 기반 생물정보 분석도 수행 중에 있습니다.&nbsp;<br />
-<br />
-&nbsp;
-<div style="font-size: 12px; font-family: 돋움; color: rgb(56, 61, 65); text-align: center;">2020년 6월 16일<br />
-<br />
-&nbsp;<br />
-국가마우스표현형분석사업단장 성제경</div>
-<img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="auto,auto" style="" data-se-index="0">
-
-<div style="font-size: 12px; font-family: 돋움; color: rgb(56, 61, 65);"><span style="font-family: gulim;"><span style="font-family: 돋움; line-height: 15px;">1. 모집분야 및 업무</span></span>&nbsp;
-
-<table border="1">
-	<tbody>
-		<tr>
-			<td style="height:43px;">채용분야</td>
-			<td style="width:263px;height:43px;">담당업무</td>
-			<td style="width:195px;height:43px;">자격요건</td>
-			<td style="width:48px;height:43px;">인원</td>
-			<td style="height:43px;">급여조건</td>
-		</tr>
-		<tr>
-			<td rowspan="2" style="width:70px;height:281px;">박사급<br />
-			연구원</td>
-			<td style="width:263px;height:147px;">마우스모델 마이크로바이옴 분석 및 국제 공동연구 (마우스모델 활용 마이크로바이옴 연구, Germ Free 마우스 기반 대사질환 연구)<br />
-			&nbsp;<br />
-			* 본 사업단은 Germ Free 마우스 연구시설(사육, 실험, 대사 측정 등)을 보유하고 있음</td>
-			<td style="width:195px;height:147px;">생명과학분야 석/박사학위 소지자<br />
-			미생물학 관련전공 (우대)</td>
-			<td style="width:48px;height:147px;">0명</td>
-			<td style="width:70px;height:147px;">면접 후 경력에 따라 결정</td>
-		</tr>
-		<tr>
-			<td style="width:263px;height:134px;">면역기반 대사질환 연구 (대사이상-염증 In vivo/in vitro system 기반 post-transcriptional modification 기전 연구)</td>
-			<td style="width:195px;height:134px;">생명과학분야 박사학위 소지자<br />
-			면역학 분야 박사학위 소지자(우대)<br />
-			FACS 유경험자(우대)<br />
-			동물실험 유경험자(우대)</td>
-			<td style="width:48px;height:134px;">0명</td>
-			<td style="width:70px;height:134px;">면접 후 경력에 따라 결정</td>
-		</tr>
-		<tr>
-			<td rowspan="2" style="width:70px;height:255px;">석/박사급연구원</td>
-			<td style="width:263px;height:138px;">FACS 운영 및 서비스 제공 (ARIA II 급)</td>
-			<td style="width:195px;height:138px;">생명과학분야 석/박사학위 소지자<br />
-			FACS 운영 및 사용 경력(우대)<br />
-			면역기반 연구 유경험자(우대)</td>
-			<td style="width:48px;height:138px;">0명</td>
-			<td style="width:70px;height:138px;">면접 후 경력에 따라 결정</td>
-		</tr>
-		<tr>
-			<td style="width:263px;height:117px;">분자생물학적 분석 (비만 마우스에서 지방 및 염증 세포 post-transcriptional modification 연구, Invitro 지방세포주를 이용한 비만-염증 연구)</td>
-			<td style="width:195px;height:117px;">생명과학분야 석/박사학위 소지자<br />
-			세포배양, 유전자발현(RNA, protein) 유경험자 (우대)</td>
-			<td style="width:48px;height:117px;">0명</td>
-			<td style="width:70px;height:117px;">면접 후 경력에 따라 결정</td>
-		</tr>
-	</tbody>
-</table>
-<br />
-<br />
-2<span style="color: rgb(51, 51, 51); font-size: 13px;">. 신청 및 접수방법</span></div>
-
-<div>
-<p class="0" style="font-family: 굴림; color: rgb(68, 68, 68); padding: 0px; margin: 3pt 0px 0px; line-height: 18px;">○ 신청방법 : &lsquo;이력서 및 자기소개서 (자유양식)&rsquo;를 작성하여 전자파일로 제출<br />
-○ 접수기한 : 2020. 7. 10(금).&nbsp;오후 6시까지 (※ 마감일 마감시간 내 도착분에 한함.)<br />
-○ 면접일정 : 합격자에 한하여 개별통보<br />
-○ 접수처/문의처 : 서울대학교 생명공학연구동 81동 520호, 국가마우스표현형분석사업단<br />
-(Tel. 02-885-8388, E-mail :&nbsp;mouseclinic.snu.ac.kr)<br />
-<br style="color: rgb(56, 61, 65); font-family: 돋움; line-height: 15px;" />
-<br style="color: rgb(56, 61, 65); font-family: 돋움; line-height: 15px;" />
-<span style="color: rgb(56, 61, 65); font-family: gulim;"><span style="font-family: 돋움; line-height: 15px;">※ 자세한 내용은 첨부파일을 참고하시기 바랍니다</span></span></p>
-</div>
-`,
+	// toolbar_container: document.getElementById('ttt'),
+	// iframe: true,
+	height: 500,
 	link: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
 		relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
@@ -1295,73 +963,73 @@ const options1 = {
 
 window.editor_root = suneditor.create('#multi_editor_1', options1);
 
-suneditor.create(
-	appEl,
-	// document.querySelector('#multi_editor_1'),
-	// {
-	// 	editor1: {
-	// 		target: document.querySelector('#multi_editor_1'),
-	// 		options: {
-	// 			// value: `
-	// 			// <p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+// suneditor.create(
+// 	appEl,
+// 	// document.querySelector('#multi_editor_1'),
+// 	// {
+// 	// 	editor1: {
+// 	// 		target: document.querySelector('#multi_editor_1'),
+// 	// 		options: {
+// 	// 			// value: `
+// 	// 			// <p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
 
-	// 			// <p>ed1</p>
+// 	// 			// <p>ed1</p>
 
-	// 			// <hr class="__se__solid">
+// 	// 			// <hr class="__se__solid">
 
-	// 			// <p><br>
-	// 			// </p>
+// 	// 			// <p><br>
+// 	// 			// </p>
 
-	// 			// <p>ed2</p>
+// 	// 			// <p>ed2</p>
 
-	// 			// <div class="se-component se-image-container __se__float-none">
-	// 			// <figure>
-	// 			// 	<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
-	// 			// </figure>
-	// 			// </div>
+// 	// 			// <div class="se-component se-image-container __se__float-none">
+// 	// 			// <figure>
+// 	// 			// 	<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
+// 	// 			// </figure>
+// 	// 			// </div>
 
-	// 			// <p>ed3</p>
+// 	// 			// <p>ed3</p>
 
-	// 			// <p>ed4</p>
+// 	// 			// <p>ed4</p>
 
-	// 			// <p>edend--</p>
+// 	// 			// <p>edend--</p>
 
-	// 			// <div>					</div>
+// 	// 			// <div>					</div>
 
-	// 			// `,
-	// 			placeholder: 'place1',
-	// 			height: '400px',
-	// 			width: '500px',
-	// 			iframe: true,
-	// 			// iframe_fullPage: true,
-	// 			statusbar: true,
-	// 			statusbar_resizeEnable: true
-	// 		}
-	// 	},
-	// 	editor2: {
-	// 		target: document.querySelector('#multi_editor_2'),
-	// 		options: {
-	// 			value: '<p>ed2</p>',
-	// 			// placeholder: 'place21'
-	// 		}
-	// 	},
-	// 	editor3: {
-	// 		target: document.querySelector('#multi_editor_3'),
-	// 		options: {
-	// 			value: '<p>ed3</p>',
-	// 			placeholder: 'place3'
-	// 		}
-	// 	},
-	// 	editor4: {
-	// 		target: document.querySelector('#multi_editor_4'),
-	// 		options: {
-	// 			// value: '<p>ed4</p>',
-	// 			placeholder: 'place4'
-	// 		}
-	// 	}
-	// },
-	options1
-);
+// 	// 			// `,
+// 	// 			placeholder: 'place1',
+// 	// 			height: '400px',
+// 	// 			width: '500px',
+// 	// 			iframe: true,
+// 	// 			// iframe_fullPage: true,
+// 	// 			statusbar: true,
+// 	// 			statusbar_resizeEnable: true
+// 	// 		}
+// 	// 	},
+// 	// 	editor2: {
+// 	// 		target: document.querySelector('#multi_editor_2'),
+// 	// 		options: {
+// 	// 			value: '<p>ed2</p>',
+// 	// 			// placeholder: 'place21'
+// 	// 		}
+// 	// 	},
+// 	// 	editor3: {
+// 	// 		target: document.querySelector('#multi_editor_3'),
+// 	// 		options: {
+// 	// 			value: '<p>ed3</p>',
+// 	// 			placeholder: 'place3'
+// 	// 		}
+// 	// 	},
+// 	// 	editor4: {
+// 	// 		target: document.querySelector('#multi_editor_4'),
+// 	// 		options: {
+// 	// 			// value: '<p>ed4</p>',
+// 	// 			placeholder: 'place4'
+// 	// 		}
+// 	// 	}
+// 	// },
+// 	options1
+// );
 
 window.countEventListeners = function () {
 	const elements = document.querySelectorAll('*');
