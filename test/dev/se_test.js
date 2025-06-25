@@ -778,8 +778,9 @@ const options1 = {
 			</div>
 		</div>`,
 	// toolbar_container: document.getElementById('ttt'),
-	// iframe: true,
-	height: 500,
+	iframe: true,
+	theme: 'dark',
+	// height: 500,
 	link: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
 		relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],

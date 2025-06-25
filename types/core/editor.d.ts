@@ -228,6 +228,8 @@ declare class Editor {
 	history: ReturnType<typeof import('./base/history').default>;
 	/** @description EventManager class instance @type {import('./base/eventManager').default} */
 	eventManager: import('./base/eventManager').default;
+	/** @description iframe-safe instanceof check utility class @type {import('./util/instanceCheck').default} */
+	instanceCheck: import('./util/instanceCheck').default;
 	/** @description Toolbar class instance @type {import('./class/toolbar').default} */
 	toolbar: import('./class/toolbar').default;
 	/** @description Sub-Toolbar class instance @type {import('./class/toolbar').default|null} */

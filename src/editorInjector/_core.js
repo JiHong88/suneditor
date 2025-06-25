@@ -16,6 +16,11 @@ export default function CoreInjector(editor) {
 	 */
 	this.eventManager = editor.eventManager;
 	/**
+	 * @description The util/instanceCheck instance.
+	 * @type {__se__EditorCore['instanceCheck']}
+	 */
+	this.instanceCheck = editor.instanceCheck;
+	/**
 	 * @description The history manager instance.
 	 * @type {__se__EditorCore['history']}
 	 */

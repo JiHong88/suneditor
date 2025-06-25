@@ -11,6 +11,8 @@ function EditorInjector(editor) {
 	this.editor;
 	/** @type {import('./_core').default['eventManager']} */
 	this.eventManager;
+	/** @type {import('./_core').default['instanceCheck']} */
+	this.instanceCheck;
 	/** @type {import('./_core').default['history']} */
 	this.history;
 	/** @type {import('./_core').default['events']} */

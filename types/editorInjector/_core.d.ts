@@ -20,6 +20,11 @@ export default class CoreInjector {
 	 */
 	eventManager: __se__EditorCore['eventManager'];
 	/**
+	 * @description The util/instanceCheck instance.
+	 * @type {__se__EditorCore['instanceCheck']}
+	 */
+	instanceCheck: __se__EditorCore['instanceCheck'];
+	/**
 	 * @description The history manager instance.
 	 * @type {__se__EditorCore['history']}
 	 */

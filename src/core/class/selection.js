@@ -61,7 +61,7 @@ Selection_.prototype = {
 	 */
 	isRange(range) {
 		// return /Range/.test(Object.prototype.toString.call(range?.__proto__));
-		return range instanceof Range;
+		return this.instanceCheck.isRange(range);
 	},
 
 	/**
@@ -345,17 +345,26 @@ Selection_.prototype = {
 	 * @param {?Object<string, *>=} scrollOption option of scrollTo
 	 */
 	scrollTo(ref, scrollOption) {
-		if (ref instanceof Selection) {
+		if (this.instanceCheck.isSelection(ref)) {
 			ref = ref.getRangeAt(0);
-		} else if (ref instanceof Node) {
+		} else if (this.instanceCheck.isNode(ref)) {
 			ref = this.setRange(ref, 1, ref, 1);
 		} else if (typeof ref?.startContainer === 'undefined') {
 			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
 		}
 
 		const rect = ref.getBoundingClientRect();
-		const isVisible = rect.top >= 0 && rect.bottom <= this.editor.frameContext.get('wysiwygFrame').innerHeight;
+		const wwFrame = this.editor.frameContext.get('wysiwygFrame');
+		let top = rect.top;
+		let bottom = rect.bottom;
 
+		if (this.editor.frameOptions.get('iframe')) {
+			const iframeRect = wwFrame.getBoundingClientRect();
+			top -= iframeRect.top;
+			bottom -= iframeRect.top;
+		}
+
+		const isVisible = top >= 0 && bottom <= wwFrame.innerHeight;
 		if (isVisible) return;
 
 		const el = dom.query.getParentElement(ref.startContainer, (current) => current.nodeType === 1);

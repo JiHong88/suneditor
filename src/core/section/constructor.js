@@ -399,7 +399,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('autoStyleify', Array.isArray(options.autoStyleify) ? options.autoStyleify : ['bold', 'underline', 'italic', 'strike']);
 
 	// scroll options
-	o.set('scrollToOptions', { behavior: 'auto', block: 'nearest', ...options.scrollToOptions });
+	o.set('scrollToOptions', { behavior: 'smooth', block: 'nearest', ...options.scrollToOptions });
 	o.set('componentScrollToOptions', { behavior: 'smooth', block: 'center', ...options.componentScrollToOptions });
 
 	let retainStyleMode = options.retainStyleMode;
@@ -493,7 +493,7 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
-	o.set('_editableClass', 'sun-editor-editable' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') + (o.get('type') === 'document' ? ' se-type-document-editable' : ''));
+	o.set('_editableClass', 'sun-editor-editable' + o.get('_themeClass') + (o.get('_rtl') ? ' se-rtl' : '') + (o.get('type') === 'document' ? ' se-type-document-editable-a4' : ''));
 	o.set('lineAttrReset', ['id'].concat(options.lineAttrReset && typeof options.lineAttrReset === 'string' ? options.lineAttrReset.toLowerCase().split('|') : []));
 	o.set('printClass', typeof options.printClass === 'string' ? options.printClass + ' ' + o.get('_editableClass') : null);
 
@@ -844,7 +844,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 	/** editor */
 	// wysiwyg div or iframe
 	const wysiwygDiv = dom.utils.createElement(!targetOptions.get('iframe') ? 'DIV' : 'IFRAME', {
-		class: 'se-wrapper-inner se-wrapper-wysiwyg',
+		class: 'se-wrapper-inner se-wrapper-wysiwyg' + (options.get('type') === 'document' ? ' se-type-document-iframe-a4' : ''),
 		'data-root-key': key
 	});
 

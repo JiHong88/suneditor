@@ -1,6 +1,52 @@
 import { _d, _w } from '../env';
 import check from './domCheck';
 
+// ----- iframe-safe type check [START] -----
+/**
+ * @private
+ * @description iframe-safe : Node type [HTMLCollection, NodeList, Array] check.
+ * @param {*} element
+ * @returns {element is HTMLCollection|NodeList|Array}
+ */
+function IsElementArray(element) {
+	const type = Object.prototype.toString.call(element);
+	return type === '[object HTMLCollection]' || type === '[object NodeList]' || type === '[object Array]';
+}
+
+/**
+ * @private
+ * @description iframe-safe: check if element is an HTMLImageElement
+ * @param {*} element
+ * @returns {element is HTMLImageElement}
+ */
+function IsHTMLImageElement(element) {
+	const type = Object.prototype.toString.call(element);
+	return type === '[object HTMLImageElement]';
+}
+
+/**
+ * @private
+ * @description iframe-safe: check if element is an HTMLMediaElement (video or audio)
+ * @param {*} element
+ * @returns {element is HTMLMediaElement}
+ */
+function IsHTMLMediaElement(element) {
+	const type = Object.prototype.toString.call(element);
+	return type === '[object HTMLVideoElement]' || type === '[object HTMLAudioElement]';
+}
+
+/**
+ * @private
+ * @description iframe-safe: check if element is an HTMLIFrameElement
+ * @param {*} element
+ * @returns {element is HTMLIFrameElement}
+ */
+function IsHTMLIFrameElement(element) {
+	const type = Object.prototype.toString.call(element);
+	return type === '[object HTMLIFrameElement]';
+}
+// ----- iframe-safe type check [END] -----
+
 /**
  * @template {Node} T
  * @description Clones a node while preserving its type.
@@ -324,7 +370,7 @@ export function hasClass(element, className) {
 export function addClass(element, className) {
 	if (!element) return;
 
-	const elements = element instanceof HTMLCollection || element instanceof NodeList || element instanceof Array ? element : [element];
+	const elements = IsElementArray(element) ? element : [element];
 	const classNames = className.split('|');
 
 	for (let i = 0, len = elements.length; i < len; i++) {
@@ -344,7 +390,7 @@ export function addClass(element, className) {
 export function removeClass(element, className) {
 	if (!element) return;
 
-	const elements = element instanceof HTMLCollection || element instanceof NodeList || element instanceof Array ? element : [element];
+	const elements = IsElementArray(element) ? element : [element];
 	const classNames = className.split('|');
 
 	for (let i = 0, len = elements.length; i < len; i++) {
@@ -494,19 +540,19 @@ export function waitForMediaLoad(target, timeout = 5000) {
 
 		const mediaPromises = mediaElements.map((element) => {
 			// image
-			if (element instanceof HTMLImageElement) {
+			if (IsHTMLImageElement(element)) {
 				if (element.complete) {
 					return Promise.resolve();
 				}
 			}
 			// video, audio
-			else if (element instanceof HTMLMediaElement) {
+			else if (IsHTMLMediaElement(element)) {
 				if (element.readyState >= 2) {
 					return Promise.resolve();
 				}
 			}
 			// iframe
-			else if (element instanceof HTMLIFrameElement) {
+			else if (IsHTMLIFrameElement(element)) {
 				try {
 					if (element.contentDocument?.readyState === 'complete') {
 						return Promise.resolve();

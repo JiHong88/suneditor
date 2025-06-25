@@ -186,7 +186,7 @@ HTML.prototype = {
 					const result = validate(node);
 					if (result === null) {
 						node.remove();
-					} else if (result instanceof Node) {
+					} else if (this.instanceCheck.isNode(result)) {
 						node.replaceWith(result);
 					} else if (typeof result === 'string') {
 						node.outerHTML = result;
@@ -203,7 +203,7 @@ HTML.prototype = {
 					const result = validate(node);
 					if (result === null) {
 						node.remove();
-					} else if (result instanceof Node) {
+					} else if (this.instanceCheck.isNode(result)) {
 						node.replaceWith(result);
 					} else if (typeof result === 'string') {
 						node.outerHTML = result;

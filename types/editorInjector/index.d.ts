@@ -14,6 +14,8 @@ declare class EditorInjector {
 	editor: __se__EditorCore;
 	/** @type {import('./_core').default['eventManager']} */
 	eventManager: import('./_core').default['eventManager'];
+	/** @type {import('./_core').default['instanceCheck']} */
+	instanceCheck: import('./_core').default['instanceCheck'];
 	/** @type {import('./_core').default['history']} */
 	history: import('./_core').default['history'];
 	/** @type {import('./_core').default['events']} */

@@ -8,6 +8,9 @@ import EventManager from './base/eventManager';
 import Events from '../events';
 import DocumentType from './section/documentType';
 
+// util
+import InstanceCheck from './util/instanceCheck';
+
 // class injector
 import ClassInjector from '../editorInjector/_classes';
 
@@ -268,6 +271,10 @@ function Editor(multiTargets, options) {
 	this.history = null;
 	/** @description EventManager class instance @type {import('./base/eventManager').default} */
 	this.eventManager = null;
+
+	//  ----- util -----
+	/** @description iframe-safe instanceof check utility class @type {import('./util/instanceCheck').default} */
+	this.instanceCheck = null;
 
 	// ------ class ------
 	/** @description Toolbar class instance @type {import('./class/toolbar').default} */
@@ -1086,7 +1093,7 @@ Editor.prototype = {
 			delete obj[k];
 		}
 
-		obj = ['eventManager', 'char', 'component', 'format', 'html', 'menu', 'nodeTransform', 'offset', 'selection', 'shortcuts', 'toolbar', 'ui', 'viewer'];
+		obj = ['eventManager', 'instanceCheck', 'char', 'component', 'format', 'html', 'menu', 'nodeTransform', 'offset', 'selection', 'shortcuts', 'toolbar', 'ui', 'viewer'];
 		for (let i = 0, len = obj.length, c; i < len; i++) {
 			c = this[obj[i]];
 			for (const k in c) {
@@ -1192,8 +1199,10 @@ Editor.prototype = {
 	_resourcesStateChange(fc) {
 		this._iframeAutoHeight(fc);
 		this._checkPlaceholder(fc);
-		if (this.options.get('type') === 'document' && fc.get('documentType').usePage) {
+		// document type page
+		if (fc.has('documentType-use-page') && fc.get('options').get('height') !== 'auto') {
 			fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
+			fc.get('documentType').rePage(true);
 		}
 	},
 
@@ -1284,6 +1293,9 @@ Editor.prototype = {
 		this.applyFrameRoots((e) => {
 			this.eventManager._addFrameEvents(e);
 			this._initWysiwygArea(e, e.get('options').get('value'));
+			if (e.get('options').get('iframe') && e.get('options').get('height') === 'auto') {
+				this.__callResizeFunction(e, e.get('wysiwygFrame').offsetHeight, null);
+			}
 		});
 
 		this.eventManager.__eventDoc = null;
@@ -1603,10 +1615,12 @@ Editor.prototype = {
 		// eventManager
 		this.eventManager = new EventManager(this);
 
-		// util classes
+		// util
+		this.instanceCheck = new InstanceCheck(this);
+
+		// main classes
 		this.offset = new Offset(this);
 		this.shortcuts = new Shortcuts(this);
-		// main classes
 		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
 		if (this.options.has('_subMode')) {
 			this.subToolbar = new Toolbar(this, {
