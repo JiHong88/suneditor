@@ -64,13 +64,15 @@ const bl = [
 	'|',
 	['removeFormat', 'copyFormat'],
 	'|',
-	['align', 'lineHeight', 'list_numbered', 'list_bulleted'],
+	['align', 'lineHeight'],
 	'/',
-	['indent', 'outdent', 'hr'],
+	['list_numbered', 'list_bulleted'],
 	'|',
-	['link', 'anchor'],
+	['outdent', 'indent', 'hr'],
 	'|',
-	['table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+	['table', 'link', 'anchor'],
+	'|',
+	['image', 'drawing', 'video', 'audio', 'math', 'embed'],
 	'|',
 	['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 	'|',
@@ -95,13 +97,13 @@ const bl = [
 			'|',
 			['removeFormat', 'copyFormat'],
 			'/',
-			['indent', 'outdent'],
+			['outdent', 'indent'],
 			'|',
 			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
-			[':Media-default.more_media', 'table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
 			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 			'|',
-			['link', 'anchor'],
+			['table', 'link', 'anchor'],
 			'|',
 			['fileUpload', 'template', 'layout'],
 			'|',
@@ -121,12 +123,12 @@ const bl = [
 			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
 			'|',
 			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
-			['indent', 'outdent'],
+			['outdent', 'indent'],
 			'|',
-			['link', 'anchor'],
+			['table', 'link', 'anchor'],
 			'|',
 			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
-			[':Media-default.more_media', 'table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
 			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
 			['-right', ':View-default.more_view', 'preview', 'print', 'fullScreen', 'fullScreen', 'showBlocks', 'codeView']
@@ -142,11 +144,11 @@ const bl = [
 			['save'],
 			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
 			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
-			['indent', 'outdent'],
-			[':Insert-default.more_plus', 'link', 'anchor'],
+			['outdent', 'indent'],
+			[':Insert-default.more_plus', 'table', 'link', 'anchor'],
 			'|',
 			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
-			[':Media-default.more_media', 'table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
 			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
 			'|',
@@ -161,11 +163,11 @@ const bl = [
 			['undo', 'redo'],
 			'|',
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll', 'save'],
-			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
+			[':Paragraph-default.more_paragraph', 'outdent', 'indent', '|', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
 			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
-			[':Insert-default.more_plus', 'indent', 'outdent', 'link', 'anchor'],
+			[':Insert-default.more_plus', 'table', 'link', 'anchor'],
 			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
-			[':Media-default.more_media', 'table', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
+			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
 			[':Galleries & File-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser', '|', 'fileUpload', 'template', 'layout'],
 			[':View & Pages-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView', '|', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown']
 		]
@@ -777,10 +779,11 @@ const options1 = {
 				</div>
 			</div>
 		</div>`,
+	// theme: 'dark',
 	// toolbar_container: document.getElementById('ttt'),
-	iframe: true,
-	theme: 'dark',
-	// height: 500,
+	// iframe: true,
+	height: 500,
+
 	link: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
 		relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
@@ -964,73 +967,73 @@ const options1 = {
 
 window.editor_root = suneditor.create('#multi_editor_1', options1);
 
-// suneditor.create(
-// 	appEl,
-// 	// document.querySelector('#multi_editor_1'),
-// 	// {
-// 	// 	editor1: {
-// 	// 		target: document.querySelector('#multi_editor_1'),
-// 	// 		options: {
-// 	// 			// value: `
-// 	// 			// <p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+suneditor.create(
+	appEl,
+	// document.querySelector('#multi_editor_1'),
+	// {
+	// 	editor1: {
+	// 		target: document.querySelector('#multi_editor_1'),
+	// 		options: {
+	// 			// value: `
+	// 			// <p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
 
-// 	// 			// <p>ed1</p>
+	// 			// <p>ed1</p>
 
-// 	// 			// <hr class="__se__solid">
+	// 			// <hr class="__se__solid">
 
-// 	// 			// <p><br>
-// 	// 			// </p>
+	// 			// <p><br>
+	// 			// </p>
 
-// 	// 			// <p>ed2</p>
+	// 			// <p>ed2</p>
 
-// 	// 			// <div class="se-component se-image-container __se__float-none">
-// 	// 			// <figure>
-// 	// 			// 	<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
-// 	// 			// </figure>
-// 	// 			// </div>
+	// 			// <div class="se-component se-image-container __se__float-none">
+	// 			// <figure>
+	// 			// 	<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
+	// 			// </figure>
+	// 			// </div>
 
-// 	// 			// <p>ed3</p>
+	// 			// <p>ed3</p>
 
-// 	// 			// <p>ed4</p>
+	// 			// <p>ed4</p>
 
-// 	// 			// <p>edend--</p>
+	// 			// <p>edend--</p>
 
-// 	// 			// <div>					</div>
+	// 			// <div>					</div>
 
-// 	// 			// `,
-// 	// 			placeholder: 'place1',
-// 	// 			height: '400px',
-// 	// 			width: '500px',
-// 	// 			iframe: true,
-// 	// 			// iframe_fullPage: true,
-// 	// 			statusbar: true,
-// 	// 			statusbar_resizeEnable: true
-// 	// 		}
-// 	// 	},
-// 	// 	editor2: {
-// 	// 		target: document.querySelector('#multi_editor_2'),
-// 	// 		options: {
-// 	// 			value: '<p>ed2</p>',
-// 	// 			// placeholder: 'place21'
-// 	// 		}
-// 	// 	},
-// 	// 	editor3: {
-// 	// 		target: document.querySelector('#multi_editor_3'),
-// 	// 		options: {
-// 	// 			value: '<p>ed3</p>',
-// 	// 			placeholder: 'place3'
-// 	// 		}
-// 	// 	},
-// 	// 	editor4: {
-// 	// 		target: document.querySelector('#multi_editor_4'),
-// 	// 		options: {
-// 	// 			// value: '<p>ed4</p>',
-// 	// 			placeholder: 'place4'
-// 	// 		}
-// 	// 	}
-// 	// },
-// 	options1
-// );
+	// 			// `,
+	// 			placeholder: 'place1',
+	// 			height: '400px',
+	// 			width: '500px',
+	// 			iframe: true,
+	// 			// iframe_fullPage: true,
+	// 			statusbar: true,
+	// 			statusbar_resizeEnable: true
+	// 		}
+	// 	},
+	// 	editor2: {
+	// 		target: document.querySelector('#multi_editor_2'),
+	// 		options: {
+	// 			value: '<p>ed2</p>',
+	// 			// placeholder: 'place21'
+	// 		}
+	// 	},
+	// 	editor3: {
+	// 		target: document.querySelector('#multi_editor_3'),
+	// 		options: {
+	// 			value: '<p>ed3</p>',
+	// 			placeholder: 'place3'
+	// 		}
+	// 	},
+	// 	editor4: {
+	// 		target: document.querySelector('#multi_editor_4'),
+	// 		options: {
+	// 			// value: '<p>ed4</p>',
+	// 			placeholder: 'place4'
+	// 		}
+	// 	}
+	// },
+	options1
+);
 
 window.countEventListeners = function () {
 	const elements = document.querySelectorAll('*');

@@ -1227,6 +1227,7 @@ EventManager.prototype = {
 	 * @param {*} range Range object
 	 */
 	__enterScrollTo(range) {
+		this.editor._iframeAutoHeight(this.editor.frameContext);
 		if (!env.isMobile) this.editor.selection.scrollTo(range);
 	},
 

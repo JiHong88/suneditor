@@ -1409,8 +1409,9 @@ HTML.prototype = {
 
 		// wrong position
 		const wrongTags = dom.query.getListChildNodes(documentFragment, (current) => {
-			if (formatFilter && current.nodeType !== 1) {
-				if (dom.check.isList(current.parentElement)) removeTags.push(current);
+			if (current.nodeType !== 1) {
+				if (formatFilter && dom.check.isList(current.parentElement)) removeTags.push(current);
+				if (current.nodeType === 3 && !current.textContent.trim()) removeTags.push(current);
 				return false;
 			}
 

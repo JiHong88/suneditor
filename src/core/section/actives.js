@@ -122,6 +122,7 @@ export function SELECT_ALL(editor) {
 
 	let info = null;
 	if (dom.check.isMedia(first) || (info = editor.component.get(first.parentElement)) || dom.check.isTableElements(first)) {
+		if (!info) info = editor.component.get(first);
 		const br = dom.utils.createElement('BR');
 		const format = dom.utils.createElement(editor.options.get('defaultLine'), null, br);
 		first = info ? info.container || info.cover : first;
@@ -130,6 +131,7 @@ export function SELECT_ALL(editor) {
 	}
 
 	if (dom.check.isMedia(last) || (info = editor.component.get(last.parentElement)) || dom.check.isTableElements(last)) {
+		if (!info) info = editor.component.get(first);
 		const br = dom.utils.createElement('BR');
 		const format = dom.utils.createElement(editor.options.get('defaultLine'), null, br);
 		last = info ? info.container || info.cover : last;

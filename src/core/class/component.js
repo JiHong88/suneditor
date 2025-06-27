@@ -442,7 +442,9 @@ Component.prototype = {
 		}
 
 		const { frameContext } = this.editor;
-		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = 'none';
+		if (frameContext.get('lineBreaker_t')) {
+			frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = 'none';
+		}
 
 		if (this.currentPlugin && typeof this.currentPlugin.deselect === 'function') {
 			this.currentPlugin.deselect(this.currentTarget);
