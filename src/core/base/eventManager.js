@@ -35,6 +35,12 @@ function EventManager(editor) {
 	 */
 	this.isComposing = false;
 
+	/**
+	 * @description An array of parent containers that can be scrolled (in descending order)
+	 * @type {Array<Element>}
+	 */
+	this.scrollparents = [];
+
 	/** @type {Array<*>} */
 	this._events = [];
 	/** @type {RegExp} */
@@ -59,8 +65,6 @@ function EventManager(editor) {
 	this.__close_move = null;
 	/** @type {__se__GlobalEventInfo|null} */
 	this.__geckoActiveEvent = null;
-	/** @type {Array<Element>} */
-	this.__scrollparents = [];
 	/** @type {Array<Node>} */
 	this.__cacheStyleNodes = [];
 	/** @type {__se__GlobalEventInfo|null} */
@@ -924,10 +928,10 @@ EventManager.prototype = {
 		if (fc.has('statusbar')) this.__addStatusbarEvent(fc, fc.get('options'));
 
 		const OnScrollAbs = OnScroll_Abs.bind(this);
-		let scrollParent = fc.get('originElement');
-		while ((scrollParent = dom.query.getScrollParent(scrollParent.parentElement))) {
-			this.__scrollparents.push(scrollParent);
-			this.addEvent(scrollParent, 'scroll', OnScrollAbs, false);
+		const scrollParents = dom.query.getScrollParents(fc.get('originElement'));
+		for (const parent of scrollParents) {
+			this.scrollparents.push(parent);
+			this.addEvent(parent, 'scroll', OnScrollAbs, false);
 		}
 
 		/** focus temp (mobile) */
@@ -1508,6 +1512,7 @@ function OnSelectionchange_document(_wd) {
  * @this {EventManagerThis}
  */
 function OnScroll_Abs() {
+	this.menu.dropdownOff();
 	this._scrollContainer();
 }
 

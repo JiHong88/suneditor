@@ -399,8 +399,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('autoStyleify', Array.isArray(options.autoStyleify) ? options.autoStyleify : ['bold', 'underline', 'italic', 'strike']);
 
 	// scroll options
-	o.set('scrollToOptions', { behavior: 'smooth', block: 'nearest', ...options.scrollToOptions });
-	o.set('componentScrollToOptions', { behavior: 'smooth', block: 'center', ...options.componentScrollToOptions });
+	o.set('scrollToOptions', { behavior: 'smooth', block: 'nearest', inline: 'nearest', ...options.scrollToOptions });
 
 	let retainStyleMode = options.retainStyleMode;
 	if (typeof retainStyleMode === 'string' && !DEFAULTS.RETAIN_STYLE_MODE.includes(retainStyleMode)) {

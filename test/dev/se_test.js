@@ -68,9 +68,9 @@ const bl = [
 	'/',
 	['list_numbered', 'list_bulleted'],
 	'|',
-	['outdent', 'indent', 'hr'],
+	['outdent', 'indent'],
 	'|',
-	['table', 'link', 'anchor'],
+	['table', 'hr', 'link', 'anchor'],
 	'|',
 	['image', 'drawing', 'video', 'audio', 'math', 'embed'],
 	'|',
@@ -99,11 +99,11 @@ const bl = [
 			'/',
 			['outdent', 'indent'],
 			'|',
-			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
+			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted'],
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
 			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 			'|',
-			['table', 'link', 'anchor'],
+			['table', 'hr', 'link', 'anchor'],
 			'|',
 			['fileUpload', 'template', 'layout'],
 			'|',
@@ -125,9 +125,9 @@ const bl = [
 			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
 			['outdent', 'indent'],
 			'|',
-			['table', 'link', 'anchor'],
+			['table', 'hr', 'link', 'anchor'],
 			'|',
-			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
+			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted'],
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
 			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
@@ -145,9 +145,9 @@ const bl = [
 			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
 			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
 			['outdent', 'indent'],
-			[':Insert-default.more_plus', 'table', 'link', 'anchor'],
+			[':Insert-default.more_plus', 'table', 'hr', 'link', 'anchor'],
 			'|',
-			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
+			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted'],
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
 			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
@@ -165,8 +165,8 @@ const bl = [
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll', 'save'],
 			[':Paragraph-default.more_paragraph', 'outdent', 'indent', '|', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
 			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
-			[':Insert-default.more_plus', 'table', 'link', 'anchor'],
-			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted', 'hr'],
+			[':Insert-default.more_plus', 'table', 'hr', 'link', 'anchor'],
+			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted'],
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
 			[':Galleries & File-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser', '|', 'fileUpload', 'template', 'layout'],
 			[':View & Pages-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView', '|', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown']
@@ -781,7 +781,7 @@ const options1 = {
 		</div>`,
 	// theme: 'dark',
 	// toolbar_container: document.getElementById('ttt'),
-	// iframe: true,
+	iframe: true,
 	height: 500,
 
 	link: {
@@ -966,6 +966,7 @@ const options1 = {
 };
 
 window.editor_root = suneditor.create('#multi_editor_1', options1);
+window.editor_root = suneditor.create('#scrolleditor', options1);
 
 suneditor.create(
 	appEl,

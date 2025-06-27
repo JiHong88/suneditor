@@ -75,7 +75,7 @@ export const dom: {
 		findTextIndexOnLine: typeof import('./dom/domQuery').findTextIndexOnLine;
 		findTabEndIndex: typeof import('./dom/domQuery').findTabEndIndex;
 		findVisualLastCell: typeof import('./dom/domQuery').findVisualLastCell;
-		getScrollParent: typeof import('./dom/domQuery').getScrollParent;
+		getScrollParents: typeof import('./dom/domQuery').getScrollParents;
 		getIframeDocument: typeof import('./dom/domQuery').getIframeDocument;
 	};
 	check: {

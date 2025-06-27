@@ -891,9 +891,6 @@ class Table extends EditorInjector {
 				}
 				break;
 			}
-			case 'close_props':
-				this.controller_props.close();
-				break;
 			case 'props_align':
 				this._setAlignProps(this.propTargets.cell_alignment, target.getAttribute('data-value'), false);
 				break;
@@ -944,6 +941,7 @@ class Table extends EditorInjector {
 			}
 		}
 
+		// [close_props]
 		if (!/(^props_|^revert|Properties$)/.test(command)) {
 			this.controller_props.close();
 			this.controller_colorPicker.close();
@@ -2170,7 +2168,7 @@ class Table extends EditorInjector {
 	 */
 	_setCellControllerPosition(tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
-		this.controller_cell.resetPosition(this.cellControllerTop ? dom.query.getParentElement(tdElement, dom.check.isTable) : tdElement);
+		if (!this.cellControllerTop) this.controller_cell.resetPosition(tdElement);
 	}
 
 	/**

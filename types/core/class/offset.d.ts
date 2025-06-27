@@ -82,14 +82,6 @@ export type OffsetGlobalInfo = {
 	 * - The total height of the element, including its content, padding, and border.
 	 */
 	height: number;
-	/**
-	 * - The amount of vertical scrolling applied to the element.
-	 */
-	scrollTop: number;
-	/**
-	 * - The amount of horizontal scrolling applied to the element.
-	 */
-	scrollLeft: number;
 };
 export type OffsetGlobalScrollInfo = {
 	/**
@@ -207,8 +199,6 @@ export type OffsetWWScrollInfo = {
  * @property {number} left - The left position of the element relative to the entire document.
  * @property {number} width - The total width of the element, including its content, padding, and border.
  * @property {number} height - The total height of the element, including its content, padding, and border.
- * @property {number} scrollTop - The amount of vertical scrolling applied to the element.
- * @property {number} scrollLeft - The amount of horizontal scrolling applied to the element.
  */
 /**
  * @typedef {Object} OffsetGlobalScrollInfo
@@ -276,8 +266,6 @@ declare class Offset {
 	 * @property {number} left - The left position of the element relative to the entire document.
 	 * @property {number} width - The total width of the element, including its content, padding, and border.
 	 * @property {number} height - The total height of the element, including its content, padding, and border.
-	 * @property {number} scrollTop - The amount of vertical scrolling applied to the element.
-	 * @property {number} scrollLeft - The amount of horizontal scrolling applied to the element.
 	 */
 	/**
 	 * @typedef {Object} OffsetGlobalScrollInfo
@@ -333,6 +321,7 @@ declare class Offset {
 	/**
 	 * @this {OffsetThis}
 	 * @description Returns the position of the argument relative to the global document.
+	 * This is a refactored version using getBoundingClientRect for better performance and accuracy.
 	 * @param {?Node=} node Target element.
 	 * @returns {OffsetGlobalInfo} Global position and scroll values.
 	 */

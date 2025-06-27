@@ -186,11 +186,11 @@ export function findTabEndIndex(line: Node, baseIndex: number, minTabSize: numbe
  */
 export function findVisualLastCell(cells: HTMLTableCellElement[]): HTMLTableCellElement | null;
 /**
- * @description Get nearest scrollable parent
- * @param {Node} element Element
- * @returns {HTMLElement|null}
+ * @description Finds and returns parent containers that are scrollable.
+ * @param {HTMLElement} element - Element to start with
+ * @returns {HTMLElement[]} - Array (in descending order)
  */
-export function getScrollParent(element: Node): HTMLElement | null;
+export function getScrollParents(element: HTMLElement): HTMLElement[];
 /**
  * @description Get the argument iframe's document object if use the "iframe" or "fullPage" options
  * @param {HTMLIFrameElement} iframe Iframe element (this.editor.frameContext.get('wysiwygFrame'))
@@ -218,6 +218,6 @@ declare namespace query {
 	export { findTextIndexOnLine };
 	export { findTabEndIndex };
 	export { findVisualLastCell };
-	export { getScrollParent };
+	export { getScrollParents };
 	export { getIframeDocument };
 }

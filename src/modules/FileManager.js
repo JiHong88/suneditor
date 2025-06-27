@@ -199,7 +199,7 @@ class FileManager extends CoreInjector {
 		void this._deleteInfo;
 
 		info.select = function (el) {
-			el.scrollIntoView(this.options.get('componentScrollToOptions'));
+			el.scrollIntoView({ ...this.options.get('scrollToOptions'), block: 'center' });
 			const comp = this.component.get(el);
 			if (comp) {
 				this.component.select(comp.target, comp.pluginName);

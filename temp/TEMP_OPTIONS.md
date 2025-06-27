@@ -357,14 +357,7 @@ These options control the core functionality, plugins, toolbar, styling, and con
 
 -   **Description**: Configuration for scroll behavior when navigating editor content.
 -   **Type**: `Object<string, string|number>`
--   **Default**: `{behavior: "auto", block: "nearest"}`
--   **Mutability**: Resettable
-
-### `componentScrollToOptions`
-
--   **Description**: Configuration for scroll behavior when navigating components.
--   **Type**: `Object<string, string|number>`
--   **Default**: `{behavior: "smooth", block: "center"}`
+-   **Default**: `{behavior: "auto", block: "nearest", inline: "nearest"}`
 -   **Mutability**: Resettable
 
 ### `retainStyleMode`

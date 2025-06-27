@@ -9,6 +9,7 @@
 	/** main, common */
 	--se-border-radius: 2px;
 	--se-min-height: 65px;
+	--se-scroll-padding: 2em;
 
 	/* modal */
 	--se-modal-input-width: 70px;

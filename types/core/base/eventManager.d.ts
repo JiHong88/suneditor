@@ -28,6 +28,11 @@ declare class EventManager {
 	 * @type {boolean}
 	 */
 	isComposing: boolean;
+	/**
+	 * @description An array of parent containers that can be scrolled (in descending order)
+	 * @type {Array<Element>}
+	 */
+	scrollparents: Array<Element>;
 	/** @type {Array<*>} */
 	_events: Array<any>;
 	/** @type {RegExp} */
@@ -54,8 +59,6 @@ declare class EventManager {
 	__close_move: __se__GlobalEventInfo | null;
 	/** @type {__se__GlobalEventInfo|null} */
 	__geckoActiveEvent: __se__GlobalEventInfo | null;
-	/** @type {Array<Element>} */
-	__scrollparents: Array<Element>;
 	/** @type {Array<Node>} */
 	__cacheStyleNodes: Array<Node>;
 	/** @type {__se__GlobalEventInfo|null} */

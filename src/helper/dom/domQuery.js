@@ -2,6 +2,7 @@
  * @fileoverview Implements Helper for querying the DOM.
  */
 
+import { _w } from '../env';
 import { zeroWidthRegExp } from '../unicode';
 import domUtils from './domUtils';
 import domCheck from './domCheck';
@@ -616,21 +617,28 @@ export function findVisualLastCell(cells) {
 }
 
 /**
- * @description Get nearest scrollable parent
- * @param {Node} element Element
- * @returns {HTMLElement|null}
+ * @description Finds and returns parent containers that are scrollable.
+ * @param {HTMLElement} element - Element to start with
+ * @returns {HTMLElement[]} - Array (in descending order)
  */
-export function getScrollParent(element) {
-	if (!element || /^(body|html)$/i.test(element.nodeName)) {
-		return null;
+export function getScrollParents(element) {
+	const scrollable = [];
+	let parent = element?.parentElement;
+
+	while (parent && !/^(body|html)$/i.test(parent.nodeName)) {
+		const style = _w.getComputedStyle(parent);
+		const { overflow, overflowX, overflowY } = style;
+
+		const canScroll = [overflow, overflowX, overflowY].some((prop) => ['auto', 'scroll', 'overlay'].includes(prop));
+
+		if (canScroll) {
+			scrollable.push(parent);
+		}
+
+		parent = parent.parentElement;
 	}
 
-	const el = /** @type {HTMLElement} */ (element);
-	if (el.scrollHeight > el.clientHeight) {
-		return el;
-	} else {
-		return getScrollParent(el.parentNode);
-	}
+	return scrollable;
 }
 
 /**
@@ -662,7 +670,7 @@ const query = {
 	findTextIndexOnLine,
 	findTabEndIndex,
 	findVisualLastCell,
-	getScrollParent,
+	getScrollParents,
 	getIframeDocument
 };
 

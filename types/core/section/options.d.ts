@@ -88,8 +88,7 @@ export namespace DEFAULTS {
  * @property {boolean} [autoLinkify] - Automatically converts URLs into hyperlinks. ("Link" plugin required)
  * - Default value is determined dynamically based on whether the 'link' plugin is enabled. (default : Boolean(plugins.link))
  * @property {Array<string>} [autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
- * @property {Object<string, string|number>} [scrollToOptions={behavior: "smooth", block: "nearest"}] - Configuration for scroll behavior when navigating editor content.
- * @property {Object<string, string|number>} [componentScrollToOptions={behavior: "smooth", block: "center"}] - Configuration for scroll behavior when navigating components.
+ * @property {Object<string, string|number>} [scrollToOptions={behavior: "smooth", block: "nearest", inline: "nearest"}] - Configuration for scroll behavior when navigating editor content.
  * @property {"repeat"|"always"|"none"} [retainStyleMode="repeat"] - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
  * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
  * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
@@ -420,12 +419,6 @@ export type EditorBaseOptions = {
 	 * - Configuration for scroll behavior when navigating editor content.
 	 */
 	scrollToOptions?: {
-		[x: string]: string | number;
-	};
-	/**
-	 * - Configuration for scroll behavior when navigating components.
-	 */
-	componentScrollToOptions?: {
 		[x: string]: string | number;
 	};
 	/**

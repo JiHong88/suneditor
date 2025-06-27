@@ -4,6 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, env } from '../../helper';
+const { _w } = env;
 
 /**
  * @typedef {Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>} SelectionThis
@@ -251,7 +252,7 @@ Selection_.prototype = {
 	 * @returns {{rects: RectsInfo_selection, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 */
 	getRects(target, position) {
-		const targetAbs = dom.check.isElement(/** @type {Node} */ (target)) ? this._w.getComputedStyle(target).position === 'absolute' : false;
+		const targetAbs = dom.check.isElement(/** @type {Node} */ (target)) ? _w.getComputedStyle(target).position === 'absolute' : false;
 		target = /** @type {Range} */ (!target || dom.check.isText(/** @type {Node} */ (target)) ? this.getRange() : target);
 		const globalScroll = this.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
@@ -353,22 +354,93 @@ Selection_.prototype = {
 			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
 		}
 
-		const rect = ref.getBoundingClientRect();
-		const wwFrame = this.editor.frameContext.get('wysiwygFrame');
-		let top = rect.top;
-		let bottom = rect.bottom;
+		scrollOption = scrollOption || this.options.get('scrollToOptions');
+		const el = dom.query.getParentElement(ref.startContainer, (current) => current.nodeType === 1);
 
-		if (this.editor.frameOptions.get('iframe')) {
-			const iframeRect = wwFrame.getBoundingClientRect();
-			top -= iframeRect.top;
-			bottom -= iframeRect.top;
+		if (this.eventManager.scrollparents?.length > 0) {
+			el?.scrollIntoView(scrollOption);
+			return;
 		}
 
-		const isVisible = top >= 0 && bottom <= wwFrame.innerHeight;
-		if (isVisible) return;
+		const PADDING = 40;
+		const { frameContext, frameOptions } = this.editor;
+		const ww = frameContext.get('_ww');
+		const wwFrame = frameContext.get('wysiwygFrame');
+		const isIframe = frameOptions.get('iframe');
+		const isAutoHeight = frameOptions.get('height') === 'auto';
 
-		const el = dom.query.getParentElement(ref.startContainer, (current) => current.nodeType === 1);
-		el?.scrollIntoView?.(scrollOption || this.options.get('scrollToOptions'));
+		const viewHeight = isAutoHeight ? _w.innerHeight : wwFrame.offsetHeight;
+		const scrollY = isAutoHeight ? _w.scrollY : isIframe ? ww.scrollY : wwFrame.scrollTop;
+		const toolbarHeight = this.toolbar._sticky ? this.context.get('toolbar.main').offsetHeight : 0;
+		const elH = el.offsetHeight || 0;
+
+		const behavior = scrollOption?.behavior;
+
+		if (isAutoHeight) {
+			if (isIframe) {
+				const rect = this.getRects(ref, 'end').rects;
+				const topMargin = rect.top + elH - toolbarHeight;
+				const bottomMargin = viewHeight - PADDING - (rect.top + elH);
+				if (topMargin >= 0 && bottomMargin >= 0) return;
+
+				const newScrollTop = scrollY - (topMargin < 0 ? -(topMargin - PADDING) : bottomMargin);
+				_w.scrollTo({
+					top: newScrollTop,
+					behavior
+				});
+			} else {
+				const rect = this.offset.getGlobal(el);
+				const scrollMargin = viewHeight + scrollY - rect.top + toolbarHeight - elH;
+
+				if (scrollMargin - PADDING > 0 && viewHeight > scrollMargin + PADDING) return;
+
+				const newScrollTop = scrollMargin - PADDING <= 0 ? scrollY - scrollMargin - PADDING : scrollY - scrollMargin + (viewHeight - toolbarHeight - elH);
+				_w.scrollTo({
+					top: newScrollTop + PADDING,
+					behavior
+				});
+			}
+		} else {
+			// local scroll
+			const { top } = this.offset.getLocal(el);
+			let rectScroll = 0;
+			let newScrollTop = 0;
+
+			if (top - PADDING <= 0 || top + PADDING > viewHeight) {
+				rectScroll = top - PADDING > 0 ? top + PADDING - viewHeight : top - (toolbarHeight + elH);
+				newScrollTop = scrollY + rectScroll;
+			}
+
+			// frame scroll
+			const globalRect = this.offset.getGlobal();
+			const topMargin = _w.scrollY - globalRect.top;
+			const bottomMargin = globalRect.top + globalRect.height - (_w.scrollY + _w.innerHeight);
+
+			// set frame scroll
+			if (topMargin > 0) {
+				if (top - rectScroll < topMargin) {
+					_w.scrollTo({
+						top: _w.scrollY - (topMargin - (top - rectScroll)),
+						behavior: 'smooth'
+					});
+				}
+			} else if (bottomMargin > 0) {
+				if (top - rectScroll < bottomMargin) {
+					_w.scrollTo({
+						top: _w.scrollY + (bottomMargin - newScrollTop) + rectScroll,
+						behavior: 'smooth'
+					});
+				}
+			}
+
+			// set local scroll
+			if (rectScroll !== 0) {
+				(isIframe ? ww : wwFrame).scrollTo({
+					top: newScrollTop,
+					behavior
+				});
+			}
+		}
 	},
 
 	/**
@@ -480,7 +552,7 @@ Selection_.prototype = {
 				this.editor.frameContext.get('wysiwyg').focus();
 			}
 		} finally {
-			env._w.setTimeout(() => (this.__iframeFocus = false), 0);
+			_w.setTimeout(() => (this.__iframeFocus = false), 0);
 		}
 	},
 

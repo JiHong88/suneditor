@@ -45,8 +45,6 @@ import { _w, _d } from '../../helper/env';
  * @property {number} left - The left position of the element relative to the entire document.
  * @property {number} width - The total width of the element, including its content, padding, and border.
  * @property {number} height - The total height of the element, including its content, padding, and border.
- * @property {number} scrollTop - The amount of vertical scrolling applied to the element.
- * @property {number} scrollLeft - The amount of horizontal scrolling applied to the element.
  */
 
 /**
@@ -157,6 +155,7 @@ Offset.prototype = {
 	/**
 	 * @this {OffsetThis}
 	 * @description Returns the position of the argument relative to the global document.
+	 * This is a refactored version using getBoundingClientRect for better performance and accuracy.
 	 * @param {?Node=} node Target element.
 	 * @returns {OffsetGlobalInfo} Global position and scroll values.
 	 */
@@ -164,46 +163,36 @@ Offset.prototype = {
 		const topArea = this.editor.frameContext.get('topArea');
 		const wFrame = this.editor.frameContext.get('wysiwygFrame');
 
-		let isTop = false;
-		let targetAbs = false;
-		if (!node) node = topArea;
-		if (node === topArea) isTop = true;
-		if (!isTop && isElement(node)) {
-			targetAbs = _w.getComputedStyle(node).position === 'absolute';
+		node = node || topArea;
+
+		if (!isElement(node)) {
+			return { top: 0, left: 0, width: 0, height: 0 };
 		}
 
-		let element = /** @type {HTMLElement} */ (node);
-		const w = element.offsetWidth;
-		const h = element.offsetHeight;
-		let t = 0,
-			l = 0,
-			st = 0,
-			sl = 0;
+		const element = /** @type {HTMLElement} */ (node);
 
-		while (element) {
-			t += element.offsetTop;
-			l += element.offsetLeft;
-			st += element.scrollTop;
-			sl += element.scrollLeft;
-			element = /** @type {HTMLElement} */ (element.offsetParent);
+		const rect = element.getBoundingClientRect();
+
+		let top = rect.top;
+		let left = rect.left;
+
+		const isIframe = /^iframe$/i.test(wFrame.nodeName);
+		if (isIframe && wFrame.contentDocument.contains(element)) {
+			const iframeRect = wFrame.getBoundingClientRect();
+			top += iframeRect.top;
+			left += iframeRect.left;
 		}
 
-		if (!targetAbs && !isTop && /^iframe$/i.test(wFrame.nodeName) && this.editor.frameContext.get('wysiwyg').contains(element)) {
-			element = this.editor.frameContext.get('wrapper');
-			while (element) {
-				t += element.offsetTop;
-				l += element.offsetLeft;
-				element = /** @type {HTMLElement} */ (element.offsetParent);
-			}
+		if (!this.editor.frameContext.get('isFullScreen')) {
+			top += _w.scrollY;
+			left += _w.scrollX;
 		}
 
 		return {
-			top: t + st,
-			left: l + sl,
-			width: w,
-			height: h,
-			scrollTop: st,
-			scrollLeft: sl
+			top: top,
+			left: left,
+			width: element.offsetWidth,
+			height: element.offsetHeight
 		};
 	},
 
@@ -389,7 +378,8 @@ Offset.prototype = {
 
 		const ew = element.offsetWidth;
 		const tw = target.offsetWidth;
-		const tl = this.getGlobal(target).left;
+		const tGlobal = this.getGlobal(target);
+		const tl = tGlobal.left;
 		const tcleft = this.getGlobal(t_container).left;
 
 		// left
@@ -412,12 +402,7 @@ Offset.prototype = {
 		const containerTop = isSameContainer ? this.getGlobal(e_container).top : 0;
 		const elHeight = element.offsetHeight;
 		const scrollTop = this.getGlobalScroll().top;
-		let bt = wy;
-		let offsetEl = target;
-		while (offsetEl && offsetEl !== e_container) {
-			bt += offsetEl.offsetTop;
-			offsetEl = /** @type {HTMLElement} */ (offsetEl.offsetParent);
-		}
+		const bt = wy + tGlobal.top;
 
 		const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
 		if (menuHeight_bottom < elHeight) {
