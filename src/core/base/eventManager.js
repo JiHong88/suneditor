@@ -1232,7 +1232,7 @@ EventManager.prototype = {
 	 */
 	__enterScrollTo(range) {
 		this.editor._iframeAutoHeight(this.editor.frameContext);
-		if (!env.isMobile) this.editor.selection.scrollTo(range);
+		if (!env.isMobile) this.editor.selection.scrollTo(range, { behavior: 'auto', block: 'nearest', inline: 'nearest' });
 	},
 
 	/**
