@@ -781,8 +781,8 @@ const options1 = {
 		</div>`,
 	// theme: 'dark',
 	// toolbar_container: document.getElementById('ttt'),
-	iframe: true,
-	height: 500,
+	// iframe: true,
+	// height: 500,
 
 	link: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',

@@ -33,6 +33,8 @@ declare class Selection_ {
 	/** @type {HTMLElement|Text} */
 	selectionNode: HTMLElement | Text;
 	__iframeFocus: boolean;
+	__hasScrollParents: boolean;
+	_scrollMargin: number;
 	/**
 	 * @this {SelectionThis}
 	 * @description Get window selection obejct

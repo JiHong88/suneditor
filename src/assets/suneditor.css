@@ -1275,8 +1275,9 @@
 	border-radius: var(--se-border-radius);
 }
 
+.sun-editor-editable[contenteditable='true'],
 .sun-editor-editable[contenteditable='true'] * {
-	scroll-margin: var(--se-scroll-padding);
+	scroll-margin: var(--se-edit-scroll-margin);
 }
 
 .sun-editor-editable[contenteditable='true'].se-copy-format-cursor {

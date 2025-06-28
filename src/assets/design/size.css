@@ -4,6 +4,7 @@
 	/* main */
 	--se-edit-inner-padding: 1.5em 1.5em;
 	--se-edit-inner-padding-doc-type: 2.5rem 2.5rem;
+	--se-edit-scroll-margin: 3em;
 
 	/** --------------------------- layout - [size] ----------- */
 	/** main, common */
