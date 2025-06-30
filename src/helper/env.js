@@ -174,12 +174,20 @@ export const isSafari = (() => {
 
 /**
  * @description Check if User Agent is Mobile device.
- * - when the device is touchable, it is judged as a mobile device.
  * @type {boolean}
  */
 export const isMobile = (() => {
 	/* eslint-disable-next-line compat/compat */
-	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) || (navigator.maxTouchPoints > 0 && 'ontouchstart' in _w);
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+})();
+
+/**
+ * @description Check if the device is touchable.
+ * @type {boolean}
+ */
+export const isTouchDevice = (() => {
+	/* eslint-disable-next-line compat/compat */
+	return navigator.maxTouchPoints > 0 && 'ontouchstart' in _w;
 })();
 
 /**
@@ -230,6 +238,7 @@ const env = {
 	isOSX_IOS,
 	isAndroid,
 	isMobile,
+	isTouchDevice,
 	cmdIcon,
 	shiftIcon,
 	DPI,

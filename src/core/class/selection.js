@@ -4,7 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, env, numbers } from '../../helper';
-const { _w, isMobile } = env;
+const { _w, isTouchDevice } = env;
 
 /**
  * @typedef {Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>} SelectionThis
@@ -366,7 +366,7 @@ Selection_.prototype = {
 		const isIframe = frameOptions.get('iframe');
 		const viewportHeight = this.status.currentViewportHeight;
 
-		if (this.__hasScrollParents || (!isIframe && (!isMobile || _w.innerHeight - viewportHeight < 150))) {
+		if (this.__hasScrollParents || (!isIframe && (!isTouchDevice || _w.innerHeight - viewportHeight < 150))) {
 			el?.scrollIntoView(scrollOption);
 			return;
 		}
