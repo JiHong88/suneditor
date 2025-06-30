@@ -74,8 +74,6 @@ function Component(editor) {
 	this._bindClose_keydown = null;
 	/** @type {__se__GlobalEventInfo|void} */
 	this._bindClose_mousedown = null;
-	/** @type {__se__GlobalEventInfo|void} */
-	this._bindClose_touchstart = null;
 	/** @type {boolean} */
 	this.__selectionSelected = false;
 
@@ -570,8 +568,7 @@ Component.prototype = {
 	 */
 	__addNotFileGlobalEvent() {
 		this.__removeNotFileGlobalEvent();
-		if (!isMobile) this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents.mousedown, true);
-		else this._bindClose_touchstart = this.eventManager.addGlobalEvent('touchstart', this.__globalEvents.mousedown, true);
+		this._bindClose_mousedown = this.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.__globalEvents.mousedown, true);
 	},
 
 	/**
@@ -581,7 +578,6 @@ Component.prototype = {
 	 */
 	__removeNotFileGlobalEvent() {
 		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
-		if (this._bindClose_touchstart) this._bindClose_touchstart = this.eventManager.removeGlobalEvent(this._bindClose_touchstart);
 	},
 
 	/**
@@ -662,6 +658,8 @@ function OnDragClick(e) {
 	if (!dom.utils.hasClass(target, 'se-drag-handle-full')) return;
 
 	const dragInst = _DragHandle.get('__dragInst');
+	if (!dragInst) return;
+
 	this._removeDragEvent();
 	this.select(dragInst.currentTarget, dragInst.currentPluginName);
 }

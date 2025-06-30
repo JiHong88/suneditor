@@ -43,6 +43,8 @@ import { _w, _d } from '../../helper/env';
  * @typedef {Object} OffsetGlobalInfo
  * @property {number} top - The top position of the element relative to the entire document.
  * @property {number} left - The left position of the element relative to the entire document.
+ * @property {number} fixedTop - The top position within the current viewport, without taking scrolling into account.
+ * @property {number} fixedLeft - The left position within the current viewport, without taking scrolling into account.
  * @property {number} width - The total width of the element, including its content, padding, and border.
  * @property {number} height - The total height of the element, including its content, padding, and border.
  */
@@ -83,12 +85,6 @@ import { _w, _d } from '../../helper/env';
  */
 function Offset(editor) {
 	CoreInjector.call(this, editor);
-
-	// members
-	this._scrollEvent = null;
-	this._elTop = 0;
-	this._scrollY = 0;
-	this._isFixed = false;
 }
 
 Offset.prototype = {
@@ -166,7 +162,7 @@ Offset.prototype = {
 		node = node || topArea;
 
 		if (!isElement(node)) {
-			return { top: 0, left: 0, width: 0, height: 0 };
+			return { top: 0, left: 0, fixedTop: 0, fixedLeft: 0, width: 0, height: 0 };
 		}
 
 		const element = /** @type {HTMLElement} */ (node);
@@ -183,14 +179,18 @@ Offset.prototype = {
 			left += iframeRect.left;
 		}
 
+		let wy = 0;
+		let wx = 0;
 		if (!this.editor.frameContext.get('isFullScreen')) {
-			top += _w.scrollY;
-			left += _w.scrollX;
+			wy += _w.scrollY;
+			wx += _w.scrollX;
 		}
 
 		return {
-			top: top,
-			left: left,
+			top: top + wy,
+			left: left + wx,
+			fixedTop: top,
+			fixedLeft: left,
 			width: element.offsetWidth,
 			height: element.offsetHeight
 		};
@@ -358,27 +358,46 @@ Offset.prototype = {
 	 * @param {HTMLElement} e_container Element's root container
 	 * @param {HTMLElement} target Target element to position against
 	 * @param {HTMLElement} t_container Target's root container
-	 * @param {boolean} _reload Whether to reload position
 	 */
-	setRelPosition(element, e_container, target, t_container, _reload) {
-		this._scrollY = _w.scrollY;
-		let wy = 0;
-		let tCon = t_container;
-		do {
-			if ((this._isFixed = /^fixed$/i.test(_w.getComputedStyle(tCon).position))) {
-				wy += this._scrollY;
-				break;
-			}
-		} while (!hasClass(tCon, 'sun-editor') && (tCon = tCon.parentElement));
+	setRelPosition(element, e_container, target, t_container) {
+		const isFixedContainer = /^fixed$/i.test(_w.getComputedStyle(t_container).position);
+		const tGlobal = this.getGlobal(target);
 
-		if (!_reload) {
-			this.__removeGlobalEvent();
-			this._scrollEvent = this.editor.eventManager.addGlobalEvent('scroll', FixedScroll.bind(this, element, e_container, target, t_container), false);
+		// top
+		if (isFixedContainer) {
+			element.style.position = 'fixed';
+			element.style.top = `${tGlobal.fixedTop + tGlobal.height}px`;
+		} else {
+			element.style.position = '';
+
+			const isSameContainer = t_container.contains(element);
+			const containerTop = isSameContainer ? this.getGlobal(e_container).top : 0;
+			const elHeight = element.offsetHeight;
+			const scrollTop = this.getGlobalScroll().top;
+			const bt = tGlobal.top;
+
+			const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
+			if (menuHeight_bottom < elHeight) {
+				let menuTop = -1 * (elHeight - bt + 3);
+				const insTop = containerTop - scrollTop + menuTop;
+				const menuHeight_top = elHeight + (insTop < 0 ? insTop : 0);
+
+				if (menuHeight_top > menuHeight_bottom) {
+					element.style.height = `${menuHeight_top}px`;
+					menuTop = -1 * (menuHeight_top - bt + 3);
+				} else {
+					element.style.height = `${menuHeight_bottom}px`;
+					menuTop = bt + target.offsetHeight;
+				}
+
+				element.style.top = `${menuTop}px`;
+			} else {
+				element.style.top = `${bt + target.offsetHeight}px`;
+			}
 		}
 
 		const ew = element.offsetWidth;
 		const tw = target.offsetWidth;
-		const tGlobal = this.getGlobal(target);
 		const tl = tGlobal.left;
 		const tcleft = this.getGlobal(t_container).left;
 
@@ -395,36 +414,6 @@ Offset.prototype = {
 			const overLeft = cw <= ew ? 0 : cw - (tl + ew);
 			if (overLeft < 0) element.style.left = `${tl + overLeft + tcleft}px`;
 			else element.style.left = `${tl}px`;
-		}
-
-		// top
-		const isSameContainer = t_container.contains(element);
-		const containerTop = isSameContainer ? this.getGlobal(e_container).top : 0;
-		const elHeight = element.offsetHeight;
-		const scrollTop = this.getGlobalScroll().top;
-		const bt = wy + tGlobal.top;
-
-		const menuHeight_bottom = getClientSize(_d).h - (containerTop - scrollTop + bt + target.offsetHeight);
-		if (menuHeight_bottom < elHeight) {
-			let menuTop = -1 * (elHeight - bt + 3);
-			const insTop = containerTop - scrollTop + menuTop;
-			const menuHeight_top = elHeight + (insTop < 0 ? insTop : 0);
-
-			if (menuHeight_top > menuHeight_bottom) {
-				element.style.height = `${menuHeight_top}px`;
-				menuTop = -1 * (menuHeight_top - bt + 3);
-			} else {
-				element.style.height = `${menuHeight_bottom}px`;
-				menuTop = bt + target.offsetHeight;
-			}
-
-			element.style.top = `${menuTop}px`;
-		} else {
-			element.style.top = `${bt + target.offsetHeight}px`;
-		}
-
-		if (this._isFixed) {
-			this._elTop = element.offsetTop;
 		}
 	},
 
@@ -774,7 +763,7 @@ Offset.prototype = {
 			} else {
 				rt = !this.editor.toolbar._sticky && !this.options.get('toolbar_container') ? toolbarH : 0;
 				const wst = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? editorOffset.top - _w.scrollY + rt : 0;
-				const wsb = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? _w.innerHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
+				const wsb = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? this.status.currentViewportHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
 				let st = wst;
 				if (toolbarH > wst) {
 					if (this.editor.toolbar._sticky) {
@@ -862,44 +851,7 @@ Offset.prototype = {
 		};
 	},
 
-	/**
-	 * @private
-	 * @this {OffsetThis}
-	 * @description Removes the global scroll event listener from the editor.
-	 * - Resets related scroll tracking properties.
-	 */
-	__removeGlobalEvent() {
-		if (this._scrollEvent) {
-			this._scrollEvent = this.editor.eventManager.removeGlobalEvent(this._scrollEvent);
-			this._scrollY = 0;
-			this._elTop = null;
-		}
-	},
-
 	constructor: Offset
 };
-
-/**
- * @private
- * @this {OffsetThis}
- * @param {HTMLElement} element - The element to check for a specific class name.
- * @param {HTMLElement} e_container - The root container of the element.
- * @param {HTMLElement} target - The target element to position against.
- * @param {HTMLElement} t_container - The root container of the target element.
- */
-function FixedScroll(element, e_container, target, t_container) {
-	const isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position);
-	if (!this._isFixed) {
-		if (isFixed) {
-			this.setRelPosition(element, e_container, target, t_container, true);
-		}
-		return;
-	} else if (!isFixed) {
-		this.setRelPosition(element, e_container, target, t_container, true);
-		return;
-	}
-
-	element.style.top = `${this._elTop - (this._scrollY - _w.scrollY - t_container.offsetTop)}px`;
-}
 
 export default Offset;

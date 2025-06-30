@@ -13,7 +13,7 @@ import { OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './eventHand
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './eventHandlers/handler_ww_clipboard';
 import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHandlers/handler_ww_dragDrop';
 
-const { _w, ON_OVER_COMPONENT, isMobile } = env;
+const { _w, _d, ON_OVER_COMPONENT, isMobile } = env;
 
 /**
  * @typedef {Omit<EventManager & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
@@ -830,12 +830,12 @@ EventManager.prototype = {
 			);
 		}
 
-		/** window event */
+		/** global event */
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
+		this.addEvent(_w.visualViewport, 'resize', OnResize_viewport.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
 		if (env.isMobile) {
-			this.addEvent(_w.visualViewport, 'resize', OnChange_viewport.bind(this), false);
-			this.addEvent(_w.visualViewport, 'scroll', OnChange_viewport.bind(this), false);
+			this.addEvent(_w.visualViewport, 'scroll', OnMobileScroll_viewport.bind(this), false);
 		}
 	},
 
@@ -1043,6 +1043,10 @@ EventManager.prototype = {
 	 * - Repositions open controllers if necessary.
 	 */
 	_scrollContainer() {
+		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
+			this.menu._resetMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
+		}
+
 		const openCont = this.editor.opendControllers;
 		if (!openCont.length) return;
 
@@ -1086,7 +1090,7 @@ EventManager.prototype = {
 		}
 
 		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
-			this.menu._setMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
+			this.menu._resetMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
 		}
 
 		if (this.viewer._resetFullScreenHeight()) return;
@@ -1232,7 +1236,10 @@ EventManager.prototype = {
 	 */
 	__enterScrollTo(range) {
 		this.editor._iframeAutoHeight(this.editor.frameContext);
-		if (!env.isMobile) this.editor.selection.scrollTo(range, { behavior: 'auto', block: 'nearest', inline: 'nearest' });
+
+		// scroll to
+		if (env.isMobile && this.scrollparents.length > 0) return;
+		this.editor.selection.scrollTo(range, { behavior: 'auto', block: 'nearest', inline: 'nearest' });
 	},
 
 	/**
@@ -1267,6 +1274,22 @@ EventManager.prototype = {
 		this.triggerEvent('onBlur', { frameContext, event });
 		// plugin event
 		this._callPluginEvent('onBlur', { frameContext, event });
+	},
+
+	/**
+	 * @private
+	 * @description Records the current viewport size.
+	 * @this {EventManagerThis}
+	 */
+	__setViewportSize() {
+		const currentVisibleHeight = (this.status.currentViewportHeight = numbers.get(_w.visualViewport.height, 0));
+		if (this.editor.frameOptions.get('iframe')) {
+			this.editor.applyFrameRoots((root) => {
+				root.get('_wd').documentElement.style.setProperty('--se-var-viewport-height', `${currentVisibleHeight}px`);
+			});
+		} else {
+			this._d.documentElement.style.setProperty('--se-var-viewport-height', `${currentVisibleHeight}px`);
+		}
 	},
 
 	constructor: EventManager
@@ -1452,6 +1475,17 @@ function OnResize_window() {
 /**
  * @this {EventManagerThis}
  */
+function OnResize_viewport() {
+	if (env.isMobile && this.options.get('toolbar_sticky') > -1) {
+		this.toolbar._resetSticky();
+		this.editor.menu._restoreMenuPosition();
+	}
+	this.__setViewportSize();
+}
+
+/**
+ * @this {EventManagerThis}
+ */
 function OnScroll_window() {
 	if (this.options.get('toolbar_sticky') > -1) {
 		this.toolbar._resetSticky();
@@ -1474,7 +1508,7 @@ function OnScroll_window() {
 /**
  * @this {EventManagerThis}
  */
-function OnChange_viewport() {
+function OnMobileScroll_viewport() {
 	if (this.options.get('toolbar_sticky') > -1) {
 		this.toolbar._resetSticky();
 		this.editor.menu._restoreMenuPosition();

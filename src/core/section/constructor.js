@@ -398,9 +398,6 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('autoLinkify', options.autoLinkify ?? !!plugins.link);
 	o.set('autoStyleify', Array.isArray(options.autoStyleify) ? options.autoStyleify : ['bold', 'underline', 'italic', 'strike']);
 
-	// scroll options
-	o.set('scrollToOptions', { behavior: 'smooth', block: 'nearest', inline: 'nearest', ...options.scrollToOptions });
-
 	let retainStyleMode = options.retainStyleMode;
 	if (typeof retainStyleMode === 'string' && !DEFAULTS.RETAIN_STYLE_MODE.includes(retainStyleMode)) {
 		console.error(`Invalid retainStyleMode: ${retainStyleMode}. Valid options are ${DEFAULTS.RETAIN_STYLE_MODE.join(', ')}. Using default 'once'.`);

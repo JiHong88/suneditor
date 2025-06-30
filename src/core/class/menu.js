@@ -190,12 +190,23 @@ Menu.prototype = {
 		menu.style.height = '';
 		dom.utils.addClass(element.parentElement.children, 'on');
 
-		this.offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'), false);
+		this.offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'));
 
 		menu.style.visibility = '';
 
 		this.__menuBtn = element;
 		this.__menuContainer = menu;
+	},
+
+	/**
+	 * @private
+	 * @this {MenuThis}
+	 * @description Reset the menu position.
+	 * @param {Node} element Button element
+	 * @param {HTMLElement} menu Menu element
+	 */
+	_resetMenuPosition(element, menu) {
+		this.offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'));
 	},
 
 	/**

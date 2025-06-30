@@ -75,6 +75,10 @@ declare global {
 		 */
 		currentNodesMap: Array<string>;
 		/**
+		 * Current visual viewport height size
+		 */
+		currentViewportHeight: number;
+		/**
 		 * Boolean value of whether component is selected
 		 */
 		onSelected: boolean;

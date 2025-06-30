@@ -401,4 +401,10 @@ declare class EventManager {
 	 * @param {Event} event - Event object
 	 */
 	__postBlurEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: __se__FrameContext, event: Event): void;
+	/**
+	 * @private
+	 * @description Records the current viewport size.
+	 * @this {EventManagerThis}
+	 */
+	__setViewportSize(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 }

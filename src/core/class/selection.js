@@ -31,7 +31,7 @@ function Selection_(editor) {
 	this.__iframeFocus = false;
 
 	_w.setTimeout(() => {
-		this.__hasScrollParents = this.eventManager.scrollparents?.length > 0;
+		this.__hasScrollParents = this.eventManager.scrollparents.length > 0;
 		this._scrollMargin = numbers.get(_w.getComputedStyle(editor.frameContext.get('wysiwyg')).scrollMargin, 0) || 40;
 	}, 1000);
 }
@@ -359,40 +359,54 @@ Selection_.prototype = {
 			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
 		}
 
-		scrollOption = scrollOption || this.options.get('scrollToOptions');
+		scrollOption = { behavior: 'smooth', block: 'nearest', inline: 'nearest', ...scrollOption };
 		const el = dom.query.getParentElement(ref.startContainer, (current) => current.nodeType === 1);
 
-		const { frameContext, frameOptions } = this.editor;
-		const isIframe = frameOptions.get('iframe');
-		if (!isIframe || this.__hasScrollParents) {
+		if (this.__hasScrollParents) {
 			el?.scrollIntoView(scrollOption);
 			return;
 		}
 
 		// --- When there is no upper scroll and it is an iframe ---
-		const PADDING = this._scrollMargin;
+		const PADDING = 40;
+		const { frameContext, frameOptions } = this.editor;
 		const ww = frameContext.get('_ww');
 		const wwFrame = frameContext.get('wysiwygFrame');
+		const isIframe = frameOptions.get('iframe');
 		const isAutoHeight = frameOptions.get('height') === 'auto';
+		const viewportHeight = this.status.currentViewportHeight;
 
-		const viewHeight = isAutoHeight ? _w.innerHeight : wwFrame.offsetHeight;
-		const scrollY = isAutoHeight ? _w.scrollY : ww.scrollY;
+		const viewHeight = isAutoHeight ? viewportHeight : wwFrame.offsetHeight;
+		const scrollY = isAutoHeight ? _w.scrollY : isIframe ? ww.scrollY : wwFrame.scrollTop;
 		const toolbarHeight = this.toolbar._sticky ? this.context.get('toolbar.main').offsetHeight : 0;
 		const elH = el.offsetHeight || 0;
 
 		const behavior = scrollOption?.behavior;
 
 		if (isAutoHeight) {
-			const rect = this.getRects(ref, 'end').rects;
-			const topMargin = rect.top + elH - toolbarHeight;
-			const bottomMargin = viewHeight - PADDING - (rect.top + elH);
-			if (topMargin >= 0 && bottomMargin >= 0) return;
+			if (isIframe) {
+				const rect = this.getRects(ref, 'end').rects;
+				const topMargin = rect.top + elH - toolbarHeight;
+				const bottomMargin = viewHeight - PADDING - (rect.top + elH);
+				if (topMargin >= 0 && bottomMargin >= 0) return;
 
-			const newScrollTop = scrollY - (topMargin < 0 ? -(topMargin - PADDING) : bottomMargin);
-			_w.scrollTo({
-				top: newScrollTop,
-				behavior
-			});
+				const newScrollTop = scrollY - (topMargin < 0 ? -(topMargin - PADDING) : bottomMargin);
+				_w.scrollTo({
+					top: newScrollTop,
+					behavior
+				});
+			} else {
+				const rect = this.offset.getGlobal(el);
+				const scrollMargin = viewHeight + scrollY - rect.top + toolbarHeight - elH;
+
+				if (scrollMargin - PADDING > 0 && viewHeight > scrollMargin + PADDING) return;
+
+				const newScrollTop = scrollMargin <= PADDING ? scrollY - scrollMargin : scrollY - scrollMargin + (viewHeight - toolbarHeight - elH);
+				_w.scrollTo({
+					top: newScrollTop + PADDING * (scrollMargin <= PADDING ? 1 : -1),
+					behavior
+				});
+			}
 		} else {
 			// local scroll
 			const { top } = this.offset.getLocal(el);
@@ -407,7 +421,7 @@ Selection_.prototype = {
 			// frame scroll
 			const globalRect = this.offset.getGlobal();
 			const topMargin = _w.scrollY - globalRect.top;
-			const bottomMargin = globalRect.top + globalRect.height - (_w.scrollY + _w.innerHeight);
+			const bottomMargin = globalRect.top + globalRect.height - (_w.scrollY + viewportHeight);
 
 			// set frame scroll
 			if (topMargin > 0) {
@@ -428,7 +442,7 @@ Selection_.prototype = {
 
 			// set local scroll
 			if (rectScroll !== 0) {
-				ww.scrollTo({
+				(isIframe ? ww : wwFrame).scrollTo({
 					top: newScrollTop,
 					behavior
 				});

@@ -131,7 +131,7 @@ const bl = [
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
 			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
-			['-right', ':View-default.more_view', 'preview', 'print', 'fullScreen', 'fullScreen', 'showBlocks', 'codeView']
+			['-right', ':View-default.more_view', 'preview', 'print', 'fullScreen', 'showBlocks', 'codeView']
 		]
 	],
 	// (min-width: 768)

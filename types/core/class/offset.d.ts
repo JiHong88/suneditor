@@ -75,6 +75,14 @@ export type OffsetGlobalInfo = {
 	 */
 	left: number;
 	/**
+	 * - The top position within the current viewport, without taking scrolling into account.
+	 */
+	fixedTop: number;
+	/**
+	 * - The left position within the current viewport, without taking scrolling into account.
+	 */
+	fixedLeft: number;
+	/**
 	 * - The total width of the element, including its content, padding, and border.
 	 */
 	width: number;
@@ -197,6 +205,8 @@ export type OffsetWWScrollInfo = {
  * @typedef {Object} OffsetGlobalInfo
  * @property {number} top - The top position of the element relative to the entire document.
  * @property {number} left - The left position of the element relative to the entire document.
+ * @property {number} fixedTop - The top position within the current viewport, without taking scrolling into account.
+ * @property {number} fixedLeft - The left position within the current viewport, without taking scrolling into account.
  * @property {number} width - The total width of the element, including its content, padding, and border.
  * @property {number} height - The total height of the element, including its content, padding, and border.
  */
@@ -264,6 +274,8 @@ declare class Offset {
 	 * @typedef {Object} OffsetGlobalInfo
 	 * @property {number} top - The top position of the element relative to the entire document.
 	 * @property {number} left - The left position of the element relative to the entire document.
+	 * @property {number} fixedTop - The top position within the current viewport, without taking scrolling into account.
+	 * @property {number} fixedLeft - The left position within the current viewport, without taking scrolling into account.
 	 * @property {number} width - The total width of the element, including its content, padding, and border.
 	 * @property {number} height - The total height of the element, including its content, padding, and border.
 	 */
@@ -300,10 +312,6 @@ declare class Offset {
 	 * @param {__se__EditorCore} editor - The root editor instance
 	 */
 	constructor(editor: __se__EditorCore);
-	_scrollEvent: any;
-	_elTop: number;
-	_scrollY: number;
-	_isFixed: boolean;
 	/**
 	 * @this {OffsetThis}
 	 * @description Gets the position just outside the argument's internal editor (wysiwygFrame).
@@ -346,9 +354,8 @@ declare class Offset {
 	 * @param {HTMLElement} e_container Element's root container
 	 * @param {HTMLElement} target Target element to position against
 	 * @param {HTMLElement} t_container Target's root container
-	 * @param {boolean} _reload Whether to reload position
 	 */
-	setRelPosition(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, element: HTMLElement, e_container: HTMLElement, target: HTMLElement, t_container: HTMLElement, _reload: boolean): void;
+	setRelPosition(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, element: HTMLElement, e_container: HTMLElement, target: HTMLElement, t_container: HTMLElement): void;
 	/**
 	 * @this {OffsetThis}
 	 * @description Sets the absolute position of an element
@@ -510,11 +517,4 @@ declare class Offset {
 		bottom: number;
 		rects: RectsInfo;
 	};
-	/**
-	 * @private
-	 * @this {OffsetThis}
-	 * @description Removes the global scroll event listener from the editor.
-	 * - Resets related scroll tracking properties.
-	 */
-	__removeGlobalEvent(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>): void;
 }

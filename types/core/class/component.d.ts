@@ -63,8 +63,6 @@ declare class Component {
 	_bindClose_keydown: __se__GlobalEventInfo | void;
 	/** @type {__se__GlobalEventInfo|void} */
 	_bindClose_mousedown: __se__GlobalEventInfo | void;
-	/** @type {__se__GlobalEventInfo|void} */
-	_bindClose_touchstart: __se__GlobalEventInfo | void;
 	/** @type {boolean} */
 	__selectionSelected: boolean;
 	__prevent: boolean;

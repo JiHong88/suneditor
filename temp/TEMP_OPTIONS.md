@@ -353,13 +353,6 @@ These options control the core functionality, plugins, toolbar, styling, and con
 -   **Default**: `["bold", "underline", "italic", "strike"]`
 -   **Mutability**: Resettable
 
-### `scrollToOptions`
-
--   **Description**: Configuration for scroll behavior when navigating editor content.
--   **Type**: `Object<string, string|number>`
--   **Default**: `{behavior: "auto", block: "nearest", inline: "nearest"}`
--   **Mutability**: Resettable
-
 ### `retainStyleMode`
 
 -   **Description**: Determines how inline elements are handled when deleting text.

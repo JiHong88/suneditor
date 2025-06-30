@@ -2,7 +2,7 @@ import EditorInjector from '../editorInjector';
 import { dom, env, keyCodeMap } from '../helper';
 import { _DragHandle } from '../modules';
 
-const { _w, ON_OVER_COMPONENT } = env;
+const { _w, isMobile, ON_OVER_COMPONENT } = env;
 const INDEX_00 = '2147483646';
 const INDEX_0 = '2147483645';
 const INDEX_S_1 = '2147483641';
@@ -329,7 +329,7 @@ class Controller extends EditorInjector {
 	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers.keydown, true);
-		this._bindClose_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers.mousedown, true);
+		this._bindClose_mouse = this.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.__globalEventHandlers.mousedown, true);
 	}
 
 	/**
