@@ -472,6 +472,13 @@ declare class Editor {
 	 */
 	changeFrameContext(rootKey: any): void;
 	/**
+	 * @description Sets a CSS variable on the root element of the editor.
+	 * If the editor is using an iframe or multi root applies it to all iframe roots instead.
+	 * @param {string} name - The CSS variable name (e.g. `--se-color-primary`)
+	 * @param {string} value - The CSS variable value
+	 */
+	setRootCssVar(name: string, value: string): void;
+	/**
 	 * @description javascript execCommand
 	 * @param {string} command javascript execCommand function property
 	 * @param {boolean=} showDefaultUI javascript execCommand function property

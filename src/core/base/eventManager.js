@@ -1274,13 +1274,7 @@ EventManager.prototype = {
 	 */
 	__setViewportSize() {
 		const currentVisibleHeight = (this.status.currentViewportHeight = numbers.get(_w.visualViewport.height, 0));
-		if (this.editor.frameOptions.get('iframe')) {
-			this.editor.applyFrameRoots((root) => {
-				root.get('_wd').documentElement.style.setProperty('--se-var-viewport-height', `${currentVisibleHeight}px`);
-			});
-		} else {
-			this._d.documentElement.style.setProperty('--se-var-viewport-height', `${currentVisibleHeight}px`);
-		}
+		this.editor.setRootCssVar('--se-var-viewport-height', `${currentVisibleHeight}px`);
 	},
 
 	constructor: EventManager

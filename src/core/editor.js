@@ -966,6 +966,22 @@ Editor.prototype = {
 	},
 
 	/**
+	 * @description Sets a CSS variable on the root element of the editor.
+	 * If the editor is using an iframe or multi root applies it to all iframe roots instead.
+	 * @param {string} name - The CSS variable name (e.g. `--se-color-primary`)
+	 * @param {string} value - The CSS variable value
+	 */
+	setRootCssVar(name, value) {
+		if (this.frameOptions.get('iframe')) {
+			this.applyFrameRoots((root) => {
+				root.get('_wd').documentElement.style.setProperty(name, value);
+			});
+		} else {
+			this._d.documentElement.style.setProperty(name, value);
+		}
+	},
+
+	/**
 	 * @description javascript execCommand
 	 * @param {string} command javascript execCommand function property
 	 * @param {boolean=} showDefaultUI javascript execCommand function property
