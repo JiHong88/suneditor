@@ -5,7 +5,7 @@
 import { dom, env } from '../helper';
 import Controller from './Controller';
 
-const { isMobile } = env;
+const { isTouchDevice } = env;
 
 const SIZE = 240;
 const BAR_H = 28;
@@ -120,8 +120,11 @@ class HueSlider {
 		this.isOpen = false;
 		this.controlle = null;
 		this.__globalMouseDown = null;
-		this.__globalMouseMove = null;
+		this.__globalTouchMove = null;
 		this.__globalMouseUp = null;
+		this.__globalMouseMove = null;
+		this.__globalTouchStart = null;
+		this.__globalTouchEnd = null;
 
 		// init default controller
 		if (!params.isNewForm) {
@@ -206,30 +209,34 @@ class HueSlider {
 			createGradientBar(getDefaultColor());
 		}
 
-		// event
-		const downEvent = { name: 'mousedown', func: OnMousedown };
-		const moveEvent = { name: 'mousemove', func: OnMousemove, option: true };
-		const upEvent = {
-			name: 'mouseup',
-			func: () => {
-				isWheelragging = false;
-				isBarDragging = false;
-			}
-		};
-
-		if (isMobile) {
+		// touch event
+		if (isTouchDevice) {
 			// mobile name
-			downEvent.name = 'touchstart';
-			moveEvent.name = 'touchmove';
-			upEvent.name = 'touchend';
-			// mobile func
-			downEvent.func = OnTouchstart;
-			moveEvent.func = OnTouchmove;
+			this.__globalTouchStart = this.eventManager.addGlobalEvent('touchstart', OnTouchstart, { passive: false, capture: true });
+			this.__globalTouchMove = this.eventManager.addGlobalEvent('touchmove', OnTouchmove, true);
+			this.__globalTouchEnd = this.eventManager.addGlobalEvent(
+				'touchend',
+				() => {
+					isWheelragging = false;
+					isBarDragging = false;
+				},
+				true
+			);
 		}
 
-		this.__globalMouseDown = this.eventManager.addGlobalEvent(downEvent.name, downEvent.func, { passive: false, capture: true });
-		this.__globalMouseMove = this.eventManager.addGlobalEvent(moveEvent.name, moveEvent.func, true);
-		this.__globalMouseUp = this.eventManager.addGlobalEvent(upEvent.name, upEvent.func, true);
+		// mouse event
+		this.__globalMouseDown = this.eventManager.addGlobalEvent('mousedown', OnMousedown, { passive: false, capture: true });
+		this.__globalMouseMove = this.eventManager.addGlobalEvent('mousemove', OnMousemove, true);
+		this.__globalMouseUp = this.eventManager.addGlobalEvent(
+			'mouseup',
+			() => {
+				isWheelragging = false;
+				isBarDragging = false;
+			},
+			true
+		);
+
+		// open
 		this.isOpen = true;
 	}
 
@@ -240,9 +247,14 @@ class HueSlider {
 		this.isOpen = false;
 		isWheelragging = false;
 		isBarDragging = false;
+
 		if (this.__globalMouseDown) this.__globalMouseDown = this.eventManager.removeGlobalEvent(this.__globalMouseDown);
 		if (this.__globalMouseMove) this.__globalMouseMove = this.eventManager.removeGlobalEvent(this.__globalMouseMove);
 		if (this.__globalMouseUp) this.__globalMouseUp = this.eventManager.removeGlobalEvent(this.__globalMouseUp);
+
+		if (this.__globalTouchStart) this.__globalTouchStart = this.eventManager.removeGlobalEvent(this.__globalTouchStart);
+		if (this.__globalTouchMove) this.__globalTouchMove = this.eventManager.removeGlobalEvent(this.__globalTouchMove);
+		if (this.__globalTouchEnd) this.__globalTouchEnd = this.eventManager.removeGlobalEvent(this.__globalTouchEnd);
 	}
 }
 

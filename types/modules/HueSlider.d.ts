@@ -101,8 +101,11 @@ declare class HueSlider {
 	isOpen: boolean;
 	controlle: any;
 	__globalMouseDown: any;
-	__globalMouseMove: any;
+	__globalTouchMove: any;
 	__globalMouseUp: any;
+	__globalMouseMove: any;
+	__globalTouchStart: any;
+	__globalTouchEnd: any;
 	controller: Controller;
 	/**
 	 * @description Get the current color information.

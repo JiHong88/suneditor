@@ -16,6 +16,7 @@ export const env: {
 	isOSX_IOS: boolean;
 	isAndroid: boolean;
 	isMobile: boolean;
+	isTouchDevice: boolean;
 	cmdIcon: string;
 	shiftIcon: string;
 	DPI: number;

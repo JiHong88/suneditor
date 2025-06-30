@@ -13,7 +13,7 @@ import { OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './eventHand
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './eventHandlers/handler_ww_clipboard';
 import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHandlers/handler_ww_dragDrop';
 
-const { _w, _d, ON_OVER_COMPONENT, isMobile } = env;
+const { _w, _d, ON_OVER_COMPONENT, isMobile, isTouchDevice } = env;
 
 /**
  * @typedef {Omit<EventManager & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
@@ -834,7 +834,7 @@ EventManager.prototype = {
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		this.addEvent(_w.visualViewport, 'resize', OnResize_viewport.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
-		if (env.isMobile) {
+		if (isTouchDevice) {
 			this.addEvent(_w.visualViewport, 'scroll', OnMobileScroll_viewport.bind(this), false);
 		}
 	},
@@ -892,20 +892,11 @@ EventManager.prototype = {
 		);
 
 		/** line breaker */
-		const lineBreakEventName = isMobile ? 'touchstart' : 'mousedown';
-		// this.addEvent(
-		// 	[fc.get('lineBreaker_t'), fc.get('lineBreaker_b')],
-		// 	lineBreakEventName,
-		// 	(e) => {
-		// 		e.preventDefault();
-		// 	},
-		// 	false
-		// );
-		this.addEvent(fc.get('lineBreaker_t'), lineBreakEventName, DisplayLineBreak.bind(this, 't'), false);
-		this.addEvent(fc.get('lineBreaker_b'), lineBreakEventName, DisplayLineBreak.bind(this, 'b'), false);
+		this.addEvent(fc.get('lineBreaker_t'), 'pointerdown', DisplayLineBreak.bind(this, 't'), false);
+		this.addEvent(fc.get('lineBreaker_b'), 'pointerdown', DisplayLineBreak.bind(this, 'b'), false);
 
 		/** Events are registered mobile. */
-		if (isMobile) {
+		if (isTouchDevice) {
 			this.addEvent(eventWysiwyg, 'touchstart', wwMouseMove, {
 				passive: true,
 				capture: false
@@ -1460,9 +1451,7 @@ function DisplayLineBreak(dir, e) {
  * @this {EventManagerThis}
  */
 function OnResize_window() {
-	if (isMobile) {
-		this._scrollContainer();
-	} else {
+	if (!isMobile) {
 		this.ui._offCurrentController();
 	}
 
@@ -1476,10 +1465,12 @@ function OnResize_window() {
  * @this {EventManagerThis}
  */
 function OnResize_viewport() {
-	if (env.isMobile && this.options.get('toolbar_sticky') > -1) {
+	if (isMobile && this.options.get('toolbar_sticky') > -1) {
 		this.toolbar._resetSticky();
 		this.editor.menu._restoreMenuPosition();
 	}
+
+	this._scrollContainer();
 	this.__setViewportSize();
 }
 

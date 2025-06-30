@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { Modal } from '../../modules';
 import { dom, env } from '../../helper';
 
-const { _w, isMobile } = env;
+const { _w, isTouchDevice } = env;
 
 /**
  * @typedef {Object} DrawingPluginOptions
@@ -97,13 +97,17 @@ class Drawing extends EditorInjector {
 		this.paths = [];
 		this.resizeObserver = null;
 		this.__events = {
-			mousedown: isMobile ? this.#OnCanvasTouchStart.bind(this) : this.#OnCanvasMouseDown.bind(this),
-			mousemove: isMobile ? this.#OnCanvasTouchMove.bind(this) : this.#OnCanvasMouseMove.bind(this),
+			touchstart: this.#OnCanvasTouchStart.bind(this),
+			touchmove: this.#OnCanvasTouchMove.bind(this),
+			mousedown: this.#OnCanvasMouseDown.bind(this),
+			mousemove: this.#OnCanvasMouseMove.bind(this),
 			mouseup: this.#OnCanvasMouseUp.bind(this),
 			mouseleave: this.#OnCanvasMouseLeave.bind(this),
 			mouseenter: this.#OnCanvasMouseEnter.bind(this)
 		};
 		this.__eventsRegister = {
+			touchstart: null,
+			touchmove: null,
 			mousedown: null,
 			mousemove: null,
 			mouseup: null,
@@ -111,9 +115,9 @@ class Drawing extends EditorInjector {
 			mouseenter: null
 		};
 		this.__eventNameMap = {
-			mousedown: isMobile ? 'touchstart' : 'mousedown',
-			mousemove: isMobile ? 'touchmove' : 'mousemove',
-			mouseup: isMobile ? 'touchend' : 'mouseup',
+			mousedown: isTouchDevice ? 'touchstart' : 'mousedown',
+			mousemove: isTouchDevice ? 'touchmove' : 'mousemove',
+			mouseup: isTouchDevice ? 'touchend' : 'mouseup',
 			mouseleave: 'mouseleave',
 			mouseenter: 'mouseenter'
 		};
@@ -182,11 +186,13 @@ class Drawing extends EditorInjector {
 
 		this._setCtx();
 
-		this.__eventsRegister.mousedown = this.eventManager.addEvent(canvas, this.__eventNameMap.mousedown, this.__events.mousedown, { passive: false, capture: true });
-		this.__eventsRegister.mousemove = this.eventManager.addEvent(canvas, this.__eventNameMap.mousemove, this.__events.mousemove, true);
-		this.__eventsRegister.mouseup = this.eventManager.addEvent(canvas, this.__eventNameMap.mouseup, this.__events.mouseup, true);
-		this.__eventsRegister.mouseleave = this.eventManager.addEvent(canvas, this.__eventNameMap.mouseleave, this.__events.mouseleave);
-		this.__eventsRegister.mouseenter = this.eventManager.addEvent(canvas, this.__eventNameMap.mouseenter, this.__events.mouseenter);
+		this.__eventsRegister.touchstart = this.eventManager.addEvent(canvas, 'touchstart', this.__events.touchstart, { passive: false, capture: true });
+		this.__eventsRegister.touchmove = this.eventManager.addEvent(canvas, 'touchmove', this.__events.touchmove, true);
+		this.__eventsRegister.mousedown = this.eventManager.addEvent(canvas, 'mousedown', this.__events.mousedown, { passive: false, capture: true });
+		this.__eventsRegister.mousemove = this.eventManager.addEvent(canvas, 'mousemove', this.__events.mousemove, true);
+		this.__eventsRegister.mouseup = this.eventManager.addEvent(canvas, 'mouseup', this.__events.mouseup, true);
+		this.__eventsRegister.mouseleave = this.eventManager.addEvent(canvas, 'mouseleave', this.__events.mouseleave);
+		this.__eventsRegister.mouseenter = this.eventManager.addEvent(canvas, 'mouseenter', this.__events.mouseenter);
 
 		if (this.resizeObserver) {
 			this.resizeObserver.disconnect();

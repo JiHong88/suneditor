@@ -123,7 +123,7 @@ class ColorPicker extends CoreInjector {
 			this.parentFormDisplay = [];
 			this.parentForm = params.hueSliderOptions?.controllerOptions?.parents?.length > 0 && !params.hueSliderOptions?.controllerOptions?.isInsideForm ? params.hueSliderOptions.controllerOptions.parents : null;
 			// hue open
-			this.eventManager.addEvent(this.target.querySelector('.se-btn-info'), 'click', this.#OnColorPalette.bind(this));
+			this.eventManager.addEvent(this.target.querySelector('.__se_hue'), 'click', this.#OnColorPalette.bind(this));
 			this.eventManager.addEvent(this.inputElement, 'input', this.#OnChangeInput.bind(this));
 			this.eventManager.addEvent(this.target.querySelector('form'), 'submit', this.#Submit.bind(this));
 		}
@@ -327,7 +327,7 @@ function CreateHTML({ lang, icons }, { colorList, disableHEXInput, disableRemove
 	}
 	list += /*html*/ `
 		<form class="se-form-group se-form-w0">
-			${disableHEXInput ? '' : `<button type="button" class="se-btn se-btn-info" title="${lang.colorPicker}" aria-label="${lang.colorPicker}">${icons.color_palette}</button>`}
+			${disableHEXInput ? '' : `<button type="button" class="se-btn __se_hue" title="${lang.colorPicker}" aria-label="${lang.colorPicker}">${icons.color_palette}</button>`}
 			<input type="text" class="se-color-input" ${disableHEXInput ? 'readonly' : ''} placeholder="${lang.color}" />
 			${disableHEXInput ? '' : `<button type="submit" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>`}
 			${disableRemove ? '' : `<button type="button" class="se-btn __se_remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.remove_color}</button>`}

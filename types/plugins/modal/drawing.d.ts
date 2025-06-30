@@ -140,6 +140,8 @@ declare class Drawing extends EditorInjector {
 	paths: any[];
 	resizeObserver: ResizeObserver;
 	__events: {
+		touchstart: any;
+		touchmove: any;
 		mousedown: any;
 		mousemove: any;
 		mouseup: any;
@@ -147,6 +149,8 @@ declare class Drawing extends EditorInjector {
 		mouseenter: any;
 	};
 	__eventsRegister: {
+		touchstart: any;
+		touchmove: any;
 		mousedown: any;
 		mousemove: any;
 		mouseup: any;

@@ -78,10 +78,14 @@ export const isChromium: boolean;
 export const isSafari: boolean;
 /**
  * @description Check if User Agent is Mobile device.
- * - when the device is touchable, it is judged as a mobile device.
  * @type {boolean}
  */
 export const isMobile: boolean;
+/**
+ * @description Check if the device is touchable.
+ * @type {boolean}
+ */
+export const isTouchDevice: boolean;
 /**
  * @description Check if User Agent is Android mobile device.
  * @type {boolean}
@@ -124,6 +128,7 @@ declare namespace env {
 	export { isOSX_IOS };
 	export { isAndroid };
 	export { isMobile };
+	export { isTouchDevice };
 	export { cmdIcon };
 	export { shiftIcon };
 	export { DPI };
