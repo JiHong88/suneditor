@@ -363,22 +363,25 @@ Selection_.prototype = {
 		const el = dom.query.getParentElement(ref.startContainer, (current) => current.nodeType === 1);
 
 		const { frameContext, frameOptions } = this.editor;
+		const ww = frameContext.get('_ww');
+		const wwFrame = frameContext.get('wysiwygFrame');
 		const isIframe = frameOptions.get('iframe');
+		const isAutoHeight = frameOptions.get('height') === 'auto';
 		const viewportHeight = this.status.currentViewportHeight;
+		const scrollY = isAutoHeight ? _w.scrollY : isIframe ? ww.scrollY : wwFrame.scrollTop;
+		const toolbarHeight = this.toolbar._sticky ? this.context.get('toolbar.main').offsetHeight : 0;
 
 		if (this.__hasScrollParents || (!isIframe && (!isTouchDevice || _w.innerHeight - viewportHeight < 150))) {
 			el?.scrollIntoView(scrollOption);
+			if (isAutoHeight && toolbarHeight > 0 && scrollY > _w.scrollY) {
+				window.scrollBy(0, -toolbarHeight);
+			}
 			return;
 		}
 
 		// --- When there is no upper scroll and it is an iframe ---
 		const PADDING = this._scrollMargin;
-		const ww = frameContext.get('_ww');
-		const wwFrame = frameContext.get('wysiwygFrame');
-		const isAutoHeight = frameOptions.get('height') === 'auto';
 		const viewHeight = isAutoHeight ? viewportHeight : wwFrame.offsetHeight;
-		const scrollY = isAutoHeight ? _w.scrollY : isIframe ? ww.scrollY : wwFrame.scrollTop;
-		const toolbarHeight = this.toolbar._sticky ? this.context.get('toolbar.main').offsetHeight : 0;
 		const elH = el.offsetHeight || 0;
 
 		const behavior = scrollOption?.behavior;
