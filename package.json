@@ -104,6 +104,7 @@
 		"LICENSE"
 	],
 	"keywords": [
+		"suneditor",
 		"wysiwyg",
 		"wysiwyg editor",
 		"wysiwyg html editor",
@@ -111,12 +112,14 @@
 		"rich text editor",
 		"rich editor",
 		"html editor",
-		"text editor",
-		"editor",
+		"html5 editor",
 		"javascript editor",
+		"javascript rich text editor",
 		"vanilla javascript",
 		"contenteditable",
 		"lightweight editor",
+		"lightweight rich text editor",
+		"open source editor",
 		"text formatting",
 		"web editor",
 		"browser editor"
