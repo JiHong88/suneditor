@@ -126,7 +126,7 @@ function HTML(editor) {
 			if (k === '*') {
 				allAttr = GetRegList(_wAttr[k], defaultAttr);
 			} else {
-				tagsAttr[k] = new RegExp('\\s(?:' + GetRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
+				tagsAttr[k] = new RegExp('\\s(?:' + GetRegList(_wAttr[k], defaultAttr) + ')' + regEndStr, 'ig');
 			}
 		}
 	}
