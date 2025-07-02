@@ -370,17 +370,16 @@ Selection_.prototype = {
 		const initViewportHeight = this.status.initViewportHeight;
 		const viewportHeight = this.status.currentViewportHeight;
 		const scrollY = isAutoHeight ? _w.scrollY : isIframe ? ww.scrollY : wwFrame.scrollTop;
-		const toolbarHeight = this.toolbar._sticky ? this.context.get('toolbar.main').offsetHeight : 0;
+		const realToolbarHeight = this.context.get('toolbar.main').offsetHeight;
+		const toolbarHeight = this.toolbar._sticky ? realToolbarHeight : 0;
 		const statusbarHeight = frameContext.get('statusbar')?.offsetHeight || 0;
 
 		if (this.__hasScrollParents || (!isIframe && (!isTouchDevice || initViewportHeight - viewportHeight < 150))) {
 			el?.scrollIntoView(scrollOption);
 
-			if (!isAutoHeight) return;
-
-			if (scrollY > _w.scrollY) {
+			if (toolbarHeight && scrollY > _w.scrollY) {
 				_w.scrollBy(0, -toolbarHeight);
-			} else {
+			} else if (isAutoHeight) {
 				_w.scrollBy(0, statusbarHeight);
 			}
 
@@ -420,38 +419,41 @@ Selection_.prototype = {
 		} else {
 			// local scroll
 			const { top } = this.offset.getLocal(el);
-			let rectScroll = 0;
-			let newScrollTop = 0;
 
-			if (top - PADDING <= 0 || top + PADDING > viewHeight) {
-				rectScroll = top - PADDING > 0 ? top + PADDING - viewHeight : top - (toolbarHeight + elH);
-				newScrollTop = scrollY + rectScroll;
-			}
+			const keepLocalScroll = top - PADDING > 0 && top + PADDING <= viewHeight;
+			const rectScroll = top - PADDING > 0 ? top + PADDING - viewHeight : top - (toolbarHeight + elH);
+			let newScrollTop = scrollY + rectScroll;
 
 			// frame scroll
+			const gy = _w.scrollY;
 			const globalRect = this.offset.getGlobal();
-			const topMargin = _w.scrollY - globalRect.top;
-			const bottomMargin = globalRect.top + globalRect.height - (_w.scrollY + viewportHeight);
+			const topMargin = gy - globalRect.top + realToolbarHeight;
+			const bottomMargin = globalRect.top + globalRect.height - (gy + viewportHeight) + realToolbarHeight;
 
 			// set frame scroll
 			if (topMargin > 0) {
-				if (top - rectScroll < topMargin) {
+				const newFrameY = (keepLocalScroll ? top : top + scrollY - newScrollTop) - elH - PADDING - topMargin;
+				if (newFrameY < 0) {
+					newScrollTop += realToolbarHeight;
 					_w.scrollTo({
-						top: _w.scrollY - (topMargin - (top - rectScroll)),
+						top: gy + newFrameY,
 						behavior: 'smooth'
 					});
 				}
-			} else if (bottomMargin > 0) {
-				if (top - rectScroll < bottomMargin) {
+			}
+			if (bottomMargin > 0) {
+				const newFrameY = (keepLocalScroll ? top : top + scrollY - newScrollTop) + elH + PADDING - (globalRect.height - bottomMargin);
+				if (newFrameY > 0) {
+					newScrollTop += statusbarHeight;
 					_w.scrollTo({
-						top: _w.scrollY + (bottomMargin - newScrollTop) + rectScroll,
+						top: gy + newFrameY,
 						behavior: 'smooth'
 					});
 				}
 			}
 
 			// set local scroll
-			if (rectScroll !== 0) {
+			if (!keepLocalScroll) {
 				(isIframe ? ww : wwFrame).scrollTo({
 					top: newScrollTop,
 					behavior

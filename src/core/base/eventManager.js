@@ -1445,6 +1445,8 @@ function DisplayLineBreak(dir, e) {
  * @this {EventManagerThis}
  */
 function OnResize_window() {
+	this.status.initViewportHeight = _w.visualViewport.height;
+
 	if (!isMobile) {
 		this.ui._offCurrentController();
 	}

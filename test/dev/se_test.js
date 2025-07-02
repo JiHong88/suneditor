@@ -164,7 +164,7 @@ const bl = [
 			'|',
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll', 'save'],
 			[':Paragraph-default.more_paragraph', 'outdent', 'indent', '|', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
-			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
+			[':Text-default.more_text', 'bold', 'bold', 'bold', 'bold', 'bold', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
 			[':Insert-default.more_plus', 'table', 'hr', 'link', 'anchor'],
 			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted'],
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'math', 'embed'],
@@ -327,13 +327,13 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // });
 
 // shadowroot test
-const shadow = document.querySelector('#app').attachShadow({ mode: 'open', delegatesFocus: true });
-const appEl = document.createElement('textarea');
-const appStyle = document.createElement('style');
-appStyle.textContent = getPageStyle(document);
+// const shadow = document.querySelector('#app').attachShadow({ mode: 'open', delegatesFocus: true });
+// const appEl = document.createElement('textarea');
+// const appStyle = document.createElement('style');
+// appStyle.textContent = getPageStyle(document);
 
-shadow.appendChild(appStyle);
-shadow.appendChild(appEl);
+// shadow.appendChild(appStyle);
+// shadow.appendChild(appEl);
 
 const options1 = {
 	// mode: 'inline',
@@ -550,7 +550,7 @@ const options1 = {
 	// 		</div>
 	// 	</div>
 	// </div>`,
-	type: 'document:header,page',
+	// type: 'document:header,page',
 	iframe_cssFileName: ['suneditor', 'katex'],
 	copyFormatKeepOn: true,
 	// 		value: `<figure>
@@ -782,7 +782,229 @@ const options1 = {
 	// theme: 'dark',
 	// toolbar_container: document.getElementById('ttt'),
 	// iframe: true,
-	// height: 500,
+	height: 1500,
+	value: `<p>1</p>
+
+<p>2</p>
+
+<p>3</p>
+
+<p>4</p>
+
+<p>5</p>
+
+<p>​1</p>
+
+<p>​w</p>
+
+<p>efew</p>
+
+<p>​fe</p>
+
+<p>w23</p>
+
+<p>r</p>
+
+<p>g13</p>
+
+<p>g34</p>
+
+<p>g43</p>
+
+<p>g3</p>
+
+<p>2h5</p>
+
+<p>4h</p>
+
+<p>54h</p>
+
+<p>he</p>
+
+<p>qy45</p>
+
+<p>y4</p>
+
+<p>u56w</p>
+
+<p>​g</p>
+
+<p>34yt</p>
+
+<p>3y</p>
+
+<p>45</p>
+
+<p>y5</p>
+
+<p>gq</p>
+
+<p>5y</p>
+
+<p>345u</p>
+
+<p>y4</p>
+
+<p>​g</p>
+
+<p>agf</p>
+
+<p>4y452y</p>
+
+<p>2t43tfvc</p>
+
+<p>gew</p>
+
+<p>ewh4n4w</p>
+
+<p>a​&nbsp;</p>
+
+<p>w4 5</p>
+
+<p>4h 5</p>
+
+<p>4y&nbsp;</p>
+
+<p>54w</p>
+
+<p>y55554</p>
+
+<p>wyw</p>
+
+<p>45by</p>
+
+<p>4yb</p>
+
+<p>5y</p>
+
+<p>b5w4</p>
+
+<p>yb4w</p>
+
+<p>ybw4by4w</p>
+
+<p>byw</p>
+
+<p>54yb</p>
+
+<p>4by</p>
+
+<p>w4</p>
+
+<p>by</p>
+
+<p>45by</p>
+
+<p>45wby</p>
+
+<p>w45</p>
+
+<p>by4w5</p>
+
+<p>by</p>
+
+<p>54wby</p>
+
+<p>45wby</p>
+
+<p>w4yb</p>
+
+<p>54</p>
+
+<p>byw45</p>
+
+<p>by</p>
+
+<p>w4by</p>
+
+<p>54wb</p>
+
+<p>y54w</p>
+
+<p>byw4</p>
+
+<p>byw</p>
+
+<p>4by</p>
+
+<p>54wby</p>
+
+<p>w4b</p>
+
+<p>yw4</p>
+
+<p>by45w</p>
+
+<p>byw4</p>
+
+<p>by</p>
+
+<p>4w5b</p>
+
+<p>yw4</p>
+
+<p>bw4</p>
+
+<p>​b</p>
+
+<p>y</p>
+
+<p>4wby</p>
+
+<p>4w</p>
+
+<p>by4w5</p>
+
+<p>byw4</p>
+
+<p>by</p>
+
+<p>4b</p>
+
+<p>5w4b</p>
+
+<p>y4w</p>
+
+<p>by</p>
+
+<p>w4yb</p>
+
+<p>w4</p>
+
+<p>by4w</p>
+
+<p>by4w</p>
+
+<p>yb</p>
+
+<p>w4b</p>
+
+<p>yw4yb</p>
+
+<p>wb</p>
+
+<p>yw4</p>
+
+<p>by4</p>
+
+<p>b</p>
+
+<p>45wby</p>
+
+<p>w4by</p>
+
+<p>4b</p>
+
+<p>yw4</p>
+
+<p>bbw</p>
+
+<p>4by</p>
+
+<p>4w</p>
+
+<p>​wh</p>
+`,
 
 	link: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
@@ -965,177 +1187,177 @@ const options1 = {
 	}
 };
 
-window.editor_root = suneditor.create('#multi_editor_1', options1);
-window.editor_root = suneditor.create('#scrolleditor', options1);
+window.editor_root = suneditor.create('#editor_classic', options1);
+// window.editor_root = suneditor.create('#scrolleditor', options1);
 
-suneditor.create(
-	appEl,
-	// document.querySelector('#multi_editor_1'),
-	// {
-	// 	editor1: {
-	// 		target: document.querySelector('#multi_editor_1'),
-	// 		options: {
-	// 			// value: `
-	// 			// <p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+// suneditor.create(
+// 	appEl,
+// 	// document.querySelector('#multi_editor_1'),
+// 	// {
+// 	// 	editor1: {
+// 	// 		target: document.querySelector('#multi_editor_1'),
+// 	// 		options: {
+// 	// 			// value: `
+// 	// 			// <p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
 
-	// 			// <p>ed1</p>
+// 	// 			// <p>ed1</p>
 
-	// 			// <hr class="__se__solid">
+// 	// 			// <hr class="__se__solid">
 
-	// 			// <p><br>
-	// 			// </p>
+// 	// 			// <p><br>
+// 	// 			// </p>
 
-	// 			// <p>ed2</p>
+// 	// 			// <p>ed2</p>
 
-	// 			// <div class="se-component se-image-container __se__float-none">
-	// 			// <figure>
-	// 			// 	<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
-	// 			// </figure>
-	// 			// </div>
+// 	// 			// <div class="se-component se-image-container __se__float-none">
+// 	// 			// <figure>
+// 	// 			// 	<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
+// 	// 			// </figure>
+// 	// 			// </div>
 
-	// 			// <p>ed3</p>
+// 	// 			// <p>ed3</p>
 
-	// 			// <p>ed4</p>
+// 	// 			// <p>ed4</p>
 
-	// 			// <p>edend--</p>
+// 	// 			// <p>edend--</p>
 
-	// 			// <div>					</div>
+// 	// 			// <div>					</div>
 
-	// 			// `,
-	// 			placeholder: 'place1',
-	// 			height: '400px',
-	// 			width: '500px',
-	// 			iframe: true,
-	// 			// iframe_fullPage: true,
-	// 			statusbar: true,
-	// 			statusbar_resizeEnable: true
-	// 		}
-	// 	},
-	// 	editor2: {
-	// 		target: document.querySelector('#multi_editor_2'),
-	// 		options: {
-	// 			value: '<p>ed2</p>',
-	// 			// placeholder: 'place21'
-	// 		}
-	// 	},
-	// 	editor3: {
-	// 		target: document.querySelector('#multi_editor_3'),
-	// 		options: {
-	// 			value: '<p>ed3</p>',
-	// 			placeholder: 'place3'
-	// 		}
-	// 	},
-	// 	editor4: {
-	// 		target: document.querySelector('#multi_editor_4'),
-	// 		options: {
-	// 			// value: '<p>ed4</p>',
-	// 			placeholder: 'place4'
-	// 		}
-	// 	}
-	// },
-	options1
-);
+// 	// 			// `,
+// 	// 			placeholder: 'place1',
+// 	// 			height: '400px',
+// 	// 			width: '500px',
+// 	// 			iframe: true,
+// 	// 			// iframe_fullPage: true,
+// 	// 			statusbar: true,
+// 	// 			statusbar_resizeEnable: true
+// 	// 		}
+// 	// 	},
+// 	// 	editor2: {
+// 	// 		target: document.querySelector('#multi_editor_2'),
+// 	// 		options: {
+// 	// 			value: '<p>ed2</p>',
+// 	// 			// placeholder: 'place21'
+// 	// 		}
+// 	// 	},
+// 	// 	editor3: {
+// 	// 		target: document.querySelector('#multi_editor_3'),
+// 	// 		options: {
+// 	// 			value: '<p>ed3</p>',
+// 	// 			placeholder: 'place3'
+// 	// 		}
+// 	// 	},
+// 	// 	editor4: {
+// 	// 		target: document.querySelector('#multi_editor_4'),
+// 	// 		options: {
+// 	// 			// value: '<p>ed4</p>',
+// 	// 			placeholder: 'place4'
+// 	// 		}
+// 	// 	}
+// 	// },
+// 	options1
+// );
 
-window.countEventListeners = function () {
-	const elements = document.querySelectorAll('*');
-	let totalListeners = 0;
+// window.countEventListeners = function () {
+// 	const elements = document.querySelectorAll('*');
+// 	let totalListeners = 0;
 
-	elements.forEach((element) => {
-		const listeners = getEventListeners(element);
-		for (let type in listeners) {
-			totalListeners += listeners[type].length;
-		}
-	});
+// 	elements.forEach((element) => {
+// 		const listeners = getEventListeners(element);
+// 		for (let type in listeners) {
+// 			totalListeners += listeners[type].length;
+// 		}
+// 	});
 
-	return totalListeners;
-};
-
-editor_root.onload = () => {
-	// editor_root.events.onFileAction = () => {
-	// 	console.log('arguems', arguments);
-	// };
-};
-
-window.aaa = function () {
-	editor_root.html.insert('<p>aaaaaaaaa</p>');
-};
-window.create = function () {
-	window.editor_root = suneditor.create(document.querySelector('#multi_editor_1'));
-};
-window.destroy = function () {
-	editor_root.destroy();
-};
-
-window.r = () => {
-	window.editor_root.resetOptions({
-		editor1: {
-			statusbar_resizeEnable: false
-		}
-	});
-};
-
-window.d = () => {
-	// window.editor_root = window.editor_root.destroy()
-};
-
-function delay(ms) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function delayedFunction() {
-	console.log('Starting---');
-	await delay(2000);
-	console.log('Finished...');
-}
-
-function loadEvent() {
-	// editor_root.events.onClick = async (rootKey) => {
-	// 	await delayedFunction();
-	// 	console.log('rootkeuy', rootKey);
-	// };
-	editor_root.events.onSave = async ({ frameContext, data }) => {
-		await delayedFunction();
-		console.log('rootkeuy', data);
-	};
-
-	window.editor_root.events.imageUploadHandler = async ({ xmlHttp, info }) => {
-		await delayedFunction();
-		console.log(xmlHttp);
-		console.log(info);
-		// editor_root.plugins.image._register(info, JSON.parse(xmlHttp.response));
-	};
-	window.editor_root.events.onImageUploadBefore = async (info) => {
-		await delayedFunction();
-		console.log('info', info);
-		info.handler();
-	};
-	window.editor_root.events.onImageUpload = async ({ handler, info, files, file, url }) => {
-		await delayedFunction();
-		handler('http://suneditor.com/docs/cat.jpg');
-	};
-	window.editor_root.events.onImageUploadError = async (params) => {
-		await delayedFunction();
-		return 'aaa';
-	};
-	// window.editor_root.events.onBlur = async (e) => {
-	// 	console.log('blurrrr', e.event);
-	// };
-	// window.editor_root.events.onFocus = async () => {
-	// 	console.log('onFocusonFocusonFocus');
-	// };
-}
-
-editor_root.events.onload = () => {
-	// loadEvent();
-};
-
-// editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
-// 	console.log('blur', editor_root.frameContext);
+// 	return totalListeners;
 // };
 
-// editor_root.events.onload = function () {
-// 	editor_root.html.set('fdjksl;afjds ...fdjksafl;d');
+// editor_root.onload = () => {
+// 	// editor_root.events.onFileAction = () => {
+// 	// 	console.log('arguems', arguments);
+// 	// };
 // };
-// editor_root.events.onChange = function (c) {
-// 	console.log(c);
+
+// window.aaa = function () {
+// 	editor_root.html.insert('<p>aaaaaaaaa</p>');
 // };
+// window.create = function () {
+// 	window.editor_root = suneditor.create(document.querySelector('#multi_editor_1'));
+// };
+// window.destroy = function () {
+// 	editor_root.destroy();
+// };
+
+// window.r = () => {
+// 	window.editor_root.resetOptions({
+// 		editor1: {
+// 			statusbar_resizeEnable: false
+// 		}
+// 	});
+// };
+
+// window.d = () => {
+// 	// window.editor_root = window.editor_root.destroy()
+// };
+
+// function delay(ms) {
+// 	return new Promise((resolve) => setTimeout(resolve, ms));
+// }
+
+// async function delayedFunction() {
+// 	console.log('Starting---');
+// 	await delay(2000);
+// 	console.log('Finished...');
+// }
+
+// function loadEvent() {
+// 	// editor_root.events.onClick = async (rootKey) => {
+// 	// 	await delayedFunction();
+// 	// 	console.log('rootkeuy', rootKey);
+// 	// };
+// 	editor_root.events.onSave = async ({ frameContext, data }) => {
+// 		await delayedFunction();
+// 		console.log('rootkeuy', data);
+// 	};
+
+// 	window.editor_root.events.imageUploadHandler = async ({ xmlHttp, info }) => {
+// 		await delayedFunction();
+// 		console.log(xmlHttp);
+// 		console.log(info);
+// 		// editor_root.plugins.image._register(info, JSON.parse(xmlHttp.response));
+// 	};
+// 	window.editor_root.events.onImageUploadBefore = async (info) => {
+// 		await delayedFunction();
+// 		console.log('info', info);
+// 		info.handler();
+// 	};
+// 	window.editor_root.events.onImageUpload = async ({ handler, info, files, file, url }) => {
+// 		await delayedFunction();
+// 		handler('http://suneditor.com/docs/cat.jpg');
+// 	};
+// 	window.editor_root.events.onImageUploadError = async (params) => {
+// 		await delayedFunction();
+// 		return 'aaa';
+// 	};
+// 	// window.editor_root.events.onBlur = async (e) => {
+// 	// 	console.log('blurrrr', e.event);
+// 	// };
+// 	// window.editor_root.events.onFocus = async () => {
+// 	// 	console.log('onFocusonFocusonFocus');
+// 	// };
+// }
+
+// editor_root.events.onload = () => {
+// 	// loadEvent();
+// };
+
+// // editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
+// // 	console.log('blur', editor_root.frameContext);
+// // };
+
+// // editor_root.events.onload = function () {
+// // 	editor_root.html.set('fdjksl;afjds ...fdjksafl;d');
+// // };
+// // editor_root.events.onChange = function (c) {
+// // 	console.log(c);
+// // };

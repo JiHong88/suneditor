@@ -79,6 +79,10 @@ declare global {
 		 */
 		currentViewportHeight: number;
 		/**
+		 * Height of the initial visual viewport height size
+		 */
+		initViewportHeight: number;
+		/**
 		 * Boolean value of whether component is selected
 		 */
 		onSelected: boolean;
