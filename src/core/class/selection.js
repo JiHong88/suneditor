@@ -367,15 +367,23 @@ Selection_.prototype = {
 		const wwFrame = frameContext.get('wysiwygFrame');
 		const isIframe = frameOptions.get('iframe');
 		const isAutoHeight = frameOptions.get('height') === 'auto';
+		const initViewportHeight = this.status.initViewportHeight;
 		const viewportHeight = this.status.currentViewportHeight;
 		const scrollY = isAutoHeight ? _w.scrollY : isIframe ? ww.scrollY : wwFrame.scrollTop;
 		const toolbarHeight = this.toolbar._sticky ? this.context.get('toolbar.main').offsetHeight : 0;
+		const statusbarHeight = frameContext.get('statusbar')?.offsetHeight || 0;
 
-		if (this.__hasScrollParents || (!isIframe && (!isTouchDevice || _w.innerHeight - viewportHeight < 150))) {
+		if (this.__hasScrollParents || (!isIframe && (!isTouchDevice || initViewportHeight - viewportHeight < 150))) {
 			el?.scrollIntoView(scrollOption);
-			if (isAutoHeight && toolbarHeight > 0 && scrollY > _w.scrollY) {
-				window.scrollBy(0, -toolbarHeight);
+
+			if (!isAutoHeight) return;
+
+			if (scrollY > _w.scrollY) {
+				_w.scrollBy(0, -toolbarHeight);
+			} else {
+				_w.scrollBy(0, statusbarHeight);
 			}
+
 			return;
 		}
 
@@ -399,11 +407,11 @@ Selection_.prototype = {
 				});
 			} else {
 				const rect = this.offset.getGlobal(el);
-				const scrollMargin = viewHeight + scrollY - rect.top + toolbarHeight - elH;
+				const scrollMargin = viewHeight + scrollY - rect.top - elH;
 
-				if (scrollMargin - PADDING > 0 && viewHeight > scrollMargin + PADDING) return;
+				if (scrollMargin - PADDING > 0 && viewHeight > scrollMargin + PADDING + toolbarHeight) return;
 
-				const newScrollTop = scrollMargin <= PADDING ? scrollY - scrollMargin + PADDING : scrollY - scrollMargin + (viewHeight - toolbarHeight - elH - PADDING);
+				const newScrollTop = scrollMargin <= PADDING ? scrollY - scrollMargin + PADDING + statusbarHeight : scrollY - scrollMargin + (viewHeight - elH - PADDING);
 				_w.scrollTo({
 					top: newScrollTop,
 					behavior

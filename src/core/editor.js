@@ -150,6 +150,7 @@ function Editor(multiTargets, options) {
 		codeIndentSize: 2,
 		currentNodes: [],
 		currentNodesMap: [],
+		initViewportHeight: 0,
 		currentViewportHeight: 0,
 		onSelected: false,
 		rootKey: product.rootId,
@@ -1296,6 +1297,7 @@ Editor.prototype = {
 	 * @param {EditorInitOptions_editor} options Options
 	 */
 	__editorInit(options) {
+		this.status.initViewportHeight = this._w.visualViewport.height;
 		this.eventManager.__setViewportSize();
 
 		this.applyFrameRoots((e) => {

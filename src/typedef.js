@@ -43,6 +43,7 @@
  * @property {Array<string>} currentNodes  An element array of the current cursor's node structure
  * @property {Array<string>} currentNodesMap  An element name array of the current cursor's node structure
  * @property {number} currentViewportHeight Current visual viewport height size
+ * @property {number} initViewportHeight Height of the initial visual viewport height size
  * @property {boolean} onSelected Boolean value of whether component is selected
  * @property {number} rootKey Current root key
  * @property {Range} _range Current range object
