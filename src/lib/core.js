@@ -5954,7 +5954,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (k === 'all') {
                         allAttr = getRegList(_wAttr[k], defaultAttr);
                     } else {
-                        tagsAttr[k] = new wRegExp('\\s(?:' + getRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
+                        tagsAttr[k] = new wRegExp('\\s(?:' + getRegList(_wAttr[k], defaultAttr) + ')' + regEndStr, 'ig');
                     }
                 }
             }
