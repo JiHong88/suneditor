@@ -178,9 +178,9 @@ export const DEFAULTS = {
  * - Tags specified here will eventually be removed, even if they are included in other whitelists.
  * @property {string} [__defaultAttributeWhitelist=CONSTANTS.ATTRIBUTE_WHITELIST] - A complete list of attributes that are allowed by default on all tags. Delimiter: "|" (e.g. "href|target").
  * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}
- * @property {Object<string, string>} [attributeWhitelist=""] - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
+ * @property {Object<string, string>} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
  * - Rules for objects specified here will be merged into the {@link EditorBaseOptions.__defaultAttributeWhitelist}.
- * @property {Object<string, string>} [attributeBlacklist=""] - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
+ * @property {Object<string, string>} [attributeBlacklist=null] - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
  * - Attributes specified here will eventually be removed even if they are allowed by other settings.
  * @property {string} [__defaultFormatLine=CONSTANTS.FORMAT_LINE] - Specifies the tag to be used as the editor's default "line" element.
  * - The default follows {@link DEFAULTS.FORMAT_LINE}
@@ -232,10 +232,10 @@ export const DEFAULTS = {
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
  * @property {Object<string, Array<string>>} [shortcuts] - Custom keyboard shortcuts.
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
- * @property {string} [previewTemplate] - Custom template for preview mode.
- * @property {string} [printTemplate] - Custom template for print mode.
+ * @property {string} [previewTemplate=null] - Custom template for preview mode.
+ * @property {string} [printTemplate=null] - Custom template for print mode.
  * @property {boolean} [componentAutoSelect=false] - Enables automatic selection of inserted components.
- * @property {string} [defaultUrlProtocol] - Default URL protocol for links.
+ * @property {string} [defaultUrlProtocol=null] - Default URL protocol for links.
  * @property {Object<"copy", number>} [toastMessageTime] - {"copy": 1500} - Duration for displaying toast messages.
  * @property {Object<string, string>} [icons] - Overrides the default icons.
  * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
