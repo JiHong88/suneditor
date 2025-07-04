@@ -76,7 +76,7 @@ export const DEFAULTS = {
  * @typedef {Object} EditorFrameOptions
  * @property {string} [value=""] - Initial value for the editor.
  * @property {string} [placeholder=""] - Placeholder text.
- * @property {Object<string, string>} [editableFrameAttributes={}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+ * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
  * @property {string} [width="100%"] - Width for the editor.
  * @property {string} [minWidth=""] - Min width for the editor.
  * @property {string} [maxWidth=""] - Max width for the editor.

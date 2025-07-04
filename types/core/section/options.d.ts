@@ -38,7 +38,7 @@ export namespace DEFAULTS {
  * @typedef {Object} EditorFrameOptions
  * @property {string} [value=""] - Initial value for the editor.
  * @property {string} [placeholder=""] - Placeholder text.
- * @property {Object<string, string>} [editableFrameAttributes={}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+ * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
  * @property {string} [width="100%"] - Width for the editor.
  * @property {string} [minWidth=""] - Min width for the editor.
  * @property {string} [maxWidth=""] - Max width for the editor.
@@ -58,8 +58,8 @@ export namespace DEFAULTS {
  * @property {boolean} [statusbar_resizeEnable=true] - Enables resize function of bottom status bar
  * @property {boolean} [charCounter=false] - Shows the number of characters in the editor.
  * - If the maxCharCount option has a value, it becomes true.
- * @property {number} [charCounter_max] - The maximum number of characters allowed to be inserted into the editor.
- * @property {string} [charCounter_label] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
+ * @property {number} [charCounter_max=null] - The maximum number of characters allowed to be inserted into the editor.
+ * @property {string} [charCounter_label=null] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
  * @property {"char"|"byte"|"byte-html"} [charCounter_type="char"] - Defines the calculation method of the "charCounter" option.
  * - 'char': Characters length.
  * - 'byte': Binary data size of characters.
@@ -139,9 +139,9 @@ export namespace DEFAULTS {
  * - Tags specified here will eventually be removed, even if they are included in other whitelists.
  * @property {string} [__defaultAttributeWhitelist=CONSTANTS.ATTRIBUTE_WHITELIST] - A complete list of attributes that are allowed by default on all tags. Delimiter: "|" (e.g. "href|target").
  * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}
- * @property {Object<string, string>} [attributeWhitelist=""] - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
+ * @property {Object<string, string>} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
  * - Rules for objects specified here will be merged into the {@link EditorBaseOptions.__defaultAttributeWhitelist}.
- * @property {Object<string, string>} [attributeBlacklist=""] - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
+ * @property {Object<string, string>} [attributeBlacklist=null] - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
  * - Attributes specified here will eventually be removed even if they are allowed by other settings.
  * @property {string} [__defaultFormatLine=CONSTANTS.FORMAT_LINE] - Specifies the tag to be used as the editor's default "line" element.
  * - The default follows {@link DEFAULTS.FORMAT_LINE}
@@ -184,20 +184,20 @@ export namespace DEFAULTS {
  * @property {Element|string} [toolbar_container] - Container element for the toolbar.
  * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
- * @property {Object} [subToolbar] - Sub-toolbar configuration.
+ * @property {Object} [subToolbar={}] - Sub-toolbar configuration.
  * @property {Array<Array<string>>} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
  * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
  * @property {number|string} [subToolbar.width="auto"] - Sub-toolbar width.
  * @property {Element|string} [statusbar_container] - Container element for the status bar.
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
- * @property {Object<string, Array<string>>} [shortcuts] - Custom keyboard shortcuts.
+ * @property {Object<string, Array<string>>} [shortcuts={}] - Custom keyboard shortcuts.
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
- * @property {string} [previewTemplate] - Custom template for preview mode.
- * @property {string} [printTemplate] - Custom template for print mode.
+ * @property {string} [previewTemplate=null] - Custom template for preview mode.
+ * @property {string} [printTemplate=null] - Custom template for print mode.
  * @property {boolean} [componentAutoSelect=false] - Enables automatic selection of inserted components.
- * @property {string} [defaultUrlProtocol] - Default URL protocol for links.
- * @property {Object<"copy", number>} [toastMessageTime] - {"copy": 1500} - Duration for displaying toast messages.
+ * @property {string} [defaultUrlProtocol=null] - Default URL protocol for links.
+ * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - {"copy": 1500} - Duration for displaying toast messages.
  * @property {Object<string, string>} [icons] - Overrides the default icons.
  * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
  * @property {boolean} [__lineFormatFilter=true] - Line format filter configuration.

@@ -794,7 +794,7 @@ function InitFrameOptions(o, origin) {
 	// value
 	fo.set('value', value);
 	fo.set('placeholder', placeholder);
-	fo.set('editableFrameAttributes', editableFrameAttributes || {});
+	fo.set('editableFrameAttributes', { spellcheck: 'false', ...editableFrameAttributes });
 	// styles
 	fo.set('width', width ? (numbers.is(width) ? width + 'px' : width) : '100%');
 	fo.set('minWidth', (numbers.is(minWidth) ? minWidth + 'px' : minWidth) || '');

@@ -1593,12 +1593,6 @@ Editor.prototype = {
 			}
 		}
 
-		// wisywig attributes
-		const attr = frameOptions.get('editableFrameAttributes');
-		for (const k in attr) {
-			e.get('wysiwyg').setAttribute(k, attr[k]);
-		}
-
 		// init, validate
 		if (frameOptions.get('iframe')) {
 			e.set('_ww', e.get('wysiwygFrame').contentWindow);
@@ -1610,6 +1604,12 @@ Editor.prototype = {
 		} else {
 			e.set('_ww', _w);
 			e.set('_wd', this._d);
+		}
+
+		// wisywig attributes
+		const attr = frameOptions.get('editableFrameAttributes');
+		for (const k in attr) {
+			e.get('wysiwyg').setAttribute(k, attr[k]);
 		}
 	},
 
