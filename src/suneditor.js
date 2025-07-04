@@ -90,7 +90,7 @@ export default {
 			})();
 		}
 
-		if (!target) throw Error("[SUNEDITOR.create.fail] suneditor requires textarea's element");
+		if (!target) throw Error('[SUNEDITOR.create.fail] suneditor requires target element');
 
 		const multiTargets = [];
 		if (typeof target === 'string') {
