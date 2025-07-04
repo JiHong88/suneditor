@@ -121,6 +121,8 @@ class Anchor extends EditorInjector {
 					this.select(currentElement);
 				}
 
+				this.controller.close();
+
 				break;
 			}
 			case 'cancel': {

@@ -180,7 +180,7 @@ export default function History(editor) {
 		push(delay, rootKey) {
 			if (waiting) return;
 
-			rootKey = rootKey || editor.status.rootKey;
+			rootKey = rootKey || rootKey === null ? rootKey : editor.status.rootKey;
 			const range = editor.status._range;
 
 			_w.setTimeout(editor._resourcesStateChange.bind(editor, frameRoots.get(rootKey)), 0);

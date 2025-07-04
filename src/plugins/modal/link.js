@@ -137,6 +137,7 @@ class Link extends EditorInjector {
 			this.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 		}
 
+		this.history.push(false);
 		return true;
 	}
 
