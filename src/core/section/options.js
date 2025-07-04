@@ -96,8 +96,8 @@ export const DEFAULTS = {
  * @property {boolean} [statusbar_resizeEnable=true] - Enables resize function of bottom status bar
  * @property {boolean} [charCounter=false] - Shows the number of characters in the editor.
  * - If the maxCharCount option has a value, it becomes true.
- * @property {number} [charCounter_max] - The maximum number of characters allowed to be inserted into the editor.
- * @property {string} [charCounter_label] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
+ * @property {number} [charCounter_max=null] - The maximum number of characters allowed to be inserted into the editor.
+ * @property {string} [charCounter_label=null] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
  * @property {"char"|"byte"|"byte-html"} [charCounter_type="char"] - Defines the calculation method of the "charCounter" option.
  * - 'char': Characters length.
  * - 'byte': Binary data size of characters.
@@ -223,20 +223,20 @@ export const DEFAULTS = {
  * @property {Element|string} [toolbar_container] - Container element for the toolbar.
  * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
- * @property {Object} [subToolbar] - Sub-toolbar configuration.
+ * @property {Object} [subToolbar={}] - Sub-toolbar configuration.
  * @property {Array<Array<string>>} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
  * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
  * @property {number|string} [subToolbar.width="auto"] - Sub-toolbar width.
  * @property {Element|string} [statusbar_container] - Container element for the status bar.
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
- * @property {Object<string, Array<string>>} [shortcuts] - Custom keyboard shortcuts.
+ * @property {Object<string, Array<string>>} [shortcuts={}] - Custom keyboard shortcuts.
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
  * @property {string} [previewTemplate=null] - Custom template for preview mode.
  * @property {string} [printTemplate=null] - Custom template for print mode.
  * @property {boolean} [componentAutoSelect=false] - Enables automatic selection of inserted components.
  * @property {string} [defaultUrlProtocol=null] - Default URL protocol for links.
- * @property {Object<"copy", number>} [toastMessageTime] - {"copy": 1500} - Duration for displaying toast messages.
+ * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - {"copy": 1500} - Duration for displaying toast messages.
  * @property {Object<string, string>} [icons] - Overrides the default icons.
  * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
  * @property {boolean} [__lineFormatFilter=true] - Line format filter configuration.
