@@ -90,7 +90,7 @@ export default {
 			})();
 		}
 
-		if (!target) throw Error('[SUNEDITOR.create.fail] suneditor requires target element');
+		if (!target) throw Error('[SUNEDITOR.create.fail] The first parameter "target" is missing.');
 
 		const multiTargets = [];
 		if (typeof target === 'string') {
