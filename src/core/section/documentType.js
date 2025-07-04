@@ -132,7 +132,7 @@ DocumentType.prototype = {
 
 			const heightGap = this.ww.scrollHeight > this._mirror.scrollHeight ? this.ww.scrollHeight - this._mirror.scrollHeight : 0;
 			const mirrorHeight = this._mirror.scrollHeight + heightGap;
-			const pageBreaks = this._mirror.querySelectorAll('.se-page-break');
+			const pageBreaks = this.ww.querySelectorAll('.se-page-break');
 			if (!force && this.pageHeight === mirrorHeight && this.pageBreaksCnt === pageBreaks.length) return;
 
 			this.pageHeight = mirrorHeight;
@@ -161,7 +161,7 @@ DocumentType.prototype = {
 			const pages = [];
 
 			for (let i = 0; i < pageBreaks.length; i++) {
-				pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight - scrollTop });
+				pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight / 2 - scrollTop });
 			}
 
 			this._mirrorCache = 0;
