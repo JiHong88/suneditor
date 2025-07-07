@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://suneditor.com" target="_blank">
-    <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/docs/se3_logo_title_flat.svg" alt="SunEditor" width="280" />
+    <img src="https://suneditor-files.s3.ap-northeast-2.amazonaws.com/docs/se3_logo_title_flat.svg?v=1" alt="SunEditor" width="280" />
   </a>
 </p>
 
