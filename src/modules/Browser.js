@@ -1,5 +1,6 @@
 import CoreInjector from '../editorInjector/_core';
 import { dom, keyCodeMap } from '../helper';
+import { _w } from '../helper/env';
 import ApiManager from './ApiManager';
 
 /**
@@ -153,6 +154,8 @@ class Browser extends CoreInjector {
 		} else {
 			this._drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
 		}
+
+		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.editor.offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
 	}
 
 	/**
@@ -436,7 +439,6 @@ class Browser extends CoreInjector {
 			throw Error(`[SUNEDITOR.browser.drawList.fail] cause: "${e.message}"`);
 		} finally {
 			this.closeBrowserLoading();
-			this.body.style.maxHeight = dom.utils.getClientSize().h - this.header.offsetHeight - 50 + 'px';
 		}
 	}
 

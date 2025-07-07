@@ -801,26 +801,26 @@ const options1 = {
 	},
 	embed: {},
 	imageGallery: {
-		data: [
-			{
-				src: 'http://suneditor.com/docs/cat.jpg',
-				name: 'Tabby',
-				alt: 'Tabby',
-				tag: 'Cat'
-			},
-			{
-				src: 'http://suneditor.com/docs/cat1.jpg',
-				name: 'Cat paw',
-				alt: 'Cat paw',
-				tag: 'Cat'
-			},
-			{
-				src: 'http://suneditor.com/docs/cat2.jpg',
-				name: 'Cat',
-				alt: 'Cat',
-				tag: 'Cat'
-			}
-		],
+		// data: [
+		// 	{
+		// 		src: 'http://suneditor.com/docs/cat.jpg',
+		// 		name: 'Tabby',
+		// 		alt: 'Tabby',
+		// 		tag: 'Cat'
+		// 	},
+		// 	{
+		// 		src: 'http://suneditor.com/docs/cat1.jpg',
+		// 		name: 'Cat paw',
+		// 		alt: 'Cat paw',
+		// 		tag: 'Cat'
+		// 	},
+		// 	{
+		// 		src: 'http://suneditor.com/docs/cat2.jpg',
+		// 		name: 'Cat',
+		// 		alt: 'Cat',
+		// 		tag: 'Cat'
+		// 	}
+		// ],
 		url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
 	},
 	image: {
