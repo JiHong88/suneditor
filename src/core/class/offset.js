@@ -363,14 +363,13 @@ Offset.prototype = {
 		const isFixedContainer = /^fixed$/i.test(_w.getComputedStyle(t_container).position);
 		const tGlobal = this.getGlobal(target);
 
+		// top
 		if (isFixedContainer) {
 			element.style.position = 'fixed';
 			element.style.top = `${tGlobal.fixedTop + tGlobal.height}px`;
-			element.style.left = `${tGlobal.fixedLeft}px`;
 		} else {
 			element.style.position = '';
 
-			// top
 			const isSameContainer = t_container.contains(element);
 			const containerTop = isSameContainer ? this.getGlobal(e_container).top : 0;
 			const elHeight = element.offsetHeight;
@@ -395,26 +394,26 @@ Offset.prototype = {
 			} else {
 				element.style.top = `${bt + target.offsetHeight}px`;
 			}
+		}
 
-			// left
-			const ew = element.offsetWidth;
-			const tw = target.offsetWidth;
-			const tl = tGlobal.left;
-			const tcleft = this.getGlobal(t_container).left;
+		// left
+		const ew = element.offsetWidth;
+		const tw = target.offsetWidth;
+		const tl = tGlobal.left;
+		const tcleft = this.getGlobal(t_container).left;
 
-			if (this.options.get('_rtl')) {
-				const rtlW = ew > tw ? ew - tw : 0;
-				const rtlL = rtlW > 0 ? 0 : tw - ew;
-				element.style.left = `${tl - rtlW + rtlL + tcleft}px`;
-				if (tcleft > this.getGlobal(element).left) {
-					element.style.left = tcleft + 'px';
-				}
-			} else {
-				const cw = t_container.offsetWidth + tcleft;
-				const overLeft = cw <= ew ? 0 : cw - (tl + ew);
-				if (overLeft < 0) element.style.left = `${tl + overLeft + tcleft}px`;
-				else element.style.left = `${tl}px`;
+		if (this.options.get('_rtl')) {
+			const rtlW = ew > tw ? ew - tw : 0;
+			const rtlL = rtlW > 0 ? 0 : tw - ew;
+			element.style.left = `${tl - rtlW + rtlL + tcleft}px`;
+			if (tcleft > this.getGlobal(element).left) {
+				element.style.left = tcleft + 'px';
 			}
+		} else {
+			const cw = t_container.offsetWidth + tcleft;
+			const overLeft = cw <= ew ? 0 : cw - (tl + ew);
+			if (overLeft < 0) element.style.left = `${tl + overLeft + tcleft}px`;
+			else element.style.left = `${tl}px`;
 		}
 	},
 
