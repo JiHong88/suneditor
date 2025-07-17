@@ -256,6 +256,7 @@ declare class Video extends EditorInjector {
 	};
 	extensions: string[];
 	urlPatterns: RegExp[];
+	_initRatioValue: string;
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description Executes the method that is called when a "Modal" module's is opened.

@@ -5,9 +5,9 @@
  * @param {Element|null} button Command button element
  * @param {Map<string, *>} keyMap Map to store shortcut key info
  * @param {Array} rc "_reverseCommandArray" option
- * @param {Array} reverseKeys Reverse key array
+ * @param {Set} reverseKeys Reverse key array
  */
-export function CreateShortcuts(command: string, button: Element | null, values: Array<string>, keyMap: Map<string, any>, rc: any[], reverseKeys: any[]): void;
+export function CreateShortcuts(command: string, button: Element | null, values: Array<string>, keyMap: Map<string, any>, rc: any[], reverseKeys: Set<any>): void;
 /**
  * @description Initialize options
  * @param {EditorInitOptions} options Configuration options for the editor.

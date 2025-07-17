@@ -101,7 +101,7 @@ class Video extends EditorInjector {
 		// create HTML
 		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-		const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']];
+		const figureControls = pluginOptions.controls || (!this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']]);
 
 		// show align
 		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.alignForm.style.display = 'none';
@@ -136,7 +136,7 @@ class Video extends EditorInjector {
 		this._element = null;
 		this._cover = null;
 		this._container = null;
-		this._ratio = { w: 1, h: 1 };
+		this._ratio = { w: 0, h: 0 };
 		this._origin_w = this.pluginOptions.defaultWidth === '100%' ? '' : this.pluginOptions.defaultWidth;
 		this._origin_h = this.pluginOptions.defaultHeight === defaultRatio ? '' : this.pluginOptions.defaultHeight;
 		this._resizing = this.pluginOptions.canResize;
@@ -196,6 +196,7 @@ class Video extends EditorInjector {
 		if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
 
 		if (this._resizing) {
+			this._initRatioValue = null;
 			this.proportion = modalEl.proportion;
 			this.frameRatioOption = modalEl.frameRatioOption;
 			this.inputX = modalEl.inputX;
@@ -248,7 +249,8 @@ class Video extends EditorInjector {
 		}
 
 		if (this._resizing) {
-			this._setRatioSelect(this._origin_h || this._defaultRatio);
+			this._setRatioSelect(this.figure.isVertical ? '' : this._origin_h || this._defaultRatio);
+			this._initRatioValue = this.frameRatioOption?.value;
 		}
 	}
 
@@ -335,7 +337,7 @@ class Video extends EditorInjector {
 		}
 
 		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
-		this._ratio = { w: 1, h: 1 };
+		this._ratio = { w: 0, h: 0 };
 		this._nonResizing = false;
 
 		if (this._resizing) {
@@ -376,7 +378,6 @@ class Video extends EditorInjector {
 		this._origin_w = String(figureInfo.width || figureInfo.originWidth || figureInfo.w || '');
 		this._origin_h = String(figureInfo.height || figureInfo.originHeight || figureInfo.h || '');
 
-		let w = figureInfo.width || figureInfo.w || this._origin_w || '';
 		const h = figureInfo.height || figureInfo.h || this._origin_h || '';
 
 		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || this._element.querySelector('source')?.src || '';
@@ -388,16 +389,9 @@ class Video extends EditorInjector {
 		if (!this._resizing) return;
 
 		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
-		if (this._onlyPercentage) {
-			w = numbers.get(w, 2);
-			if (w > 100) w = 100;
-		}
-		this.inputX.value = String(w === 'auto' ? '' : w);
-
-		if (!this._onlyPercentage) {
-			const infoH = percentageRotation ? '' : figureInfo.height;
-			this.inputY.value = String(infoH === 'auto' ? '' : infoH);
-		}
+		const { dw, dh } = this.figure.getSize(target);
+		this.inputX.value = dw === 'auto' ? '' : dw;
+		this.inputY.value = dh === 'auto' ? '' : dh;
 
 		if (!this._setRatioSelect(h)) this.inputY.value = String(this._onlyPercentage ? numbers.get(h, 2) : h);
 
@@ -406,7 +400,11 @@ class Video extends EditorInjector {
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
 
-		this._ratio = this.proportion.checked ? figureInfo.ratio : { w: 1, h: 1 };
+		if (figureInfo.isVertical) {
+			this.proportion.checked = false;
+		}
+
+		this._ratio = this.proportion.checked ? figureInfo.ratio : { w: 0, h: 0 };
 	}
 
 	/**
@@ -586,6 +584,7 @@ class Video extends EditorInjector {
 
 		// set size
 		if (changeSize) {
+			if (this._initRatioValue !== this.frameRatioOption?.value) this.figure.deleteTransform();
 			this._applySize(width, height);
 		}
 
@@ -605,7 +604,7 @@ class Video extends EditorInjector {
 			return;
 		}
 
-		if (this._resizing && changeSize && this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
+		if (!this._resizing || !changeSize || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
 		this.history.push(false);
 	}
 
@@ -821,7 +820,10 @@ class Video extends EditorInjector {
 		// size
 		this.figure.open(cloneFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 		const size = (cloneFrame.getAttribute('data-se-size') || ',').split(',');
-		this._applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
+
+		const width = size[0] || prevFrame.style.width || prevFrame.width || '';
+		const height = size[1] || prevFrame.style.height || prevFrame.height || '';
+		this._applySize(width, height);
 
 		// align
 		const format = this.format.getLine(prevFrame);
@@ -924,6 +926,8 @@ class Video extends EditorInjector {
 	 * @returns {boolean} Returns true if a ratio was selected.
 	 */
 	_setRatioSelect(value) {
+		if (!this.frameRatioOption) return;
+
 		let ratioSelected = false;
 		const ratioOption = this.frameRatioOption.options;
 
@@ -1062,7 +1066,7 @@ class Video extends EditorInjector {
 	}
 
 	#OnChangeRatio() {
-		this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 1, h: 1 };
+		this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 0, h: 0 };
 	}
 
 	/**
@@ -1079,7 +1083,7 @@ class Video extends EditorInjector {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (xy === 'x' && this._onlyPercentage && Number(eventTarget.value) > 100) {
 			eventTarget.value = '100';
-		} else if (this.proportion.checked) {
+		} else if (this.proportion.checked && !this.frameRatioOption?.value) {
 			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
 			if (xy === 'x') {
 				this.inputY.value = String(ratioSize.h);

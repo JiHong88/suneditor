@@ -103,7 +103,7 @@ class Embed extends EditorInjector {
 		// create HTML
 		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-		const figureControls = pluginOptions.controls || !this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']];
+		const figureControls = pluginOptions.controls || (!this.pluginOptions.canResize ? [['align', 'edit', 'copy', 'remove']] : [['resize_auto,75,50', 'align', 'edit', 'revert', 'copy', 'remove']]);
 
 		// show align
 		if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.figureAlignBtn.style.display = 'none';

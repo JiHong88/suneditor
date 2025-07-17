@@ -156,9 +156,7 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 	editor.reverseKeys.forEach((e) => {
 		const info = shortcutsKeyMap.get(e);
 		if (!info) return;
-		const temp = info.c;
-		info.c = info.r;
-		info.r = temp;
+		[info.command, info.r] = [info.r, info.command];
 	});
 
 	// change dir buttons

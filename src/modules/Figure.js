@@ -24,6 +24,7 @@ let __resizing_sw = 0;
  * @property {?HTMLElement} cover Cover element (FIGURE|null)
  * @property {?HTMLElement} inlineCover Inline cover element (span.se-inline-component)
  * @property {?HTMLElement} caption Caption element (FIGCAPTION)
+ * @property {boolean} isVertical Whether to rotate vertically
  */
 
 /**
@@ -33,6 +34,7 @@ let __resizing_sw = 0;
  * @property {?HTMLElement=} caption Caption element (FIGCAPTION)
  * @property {string} [align] - Alignment of the element.
  * @property {{w:number, h:number}} [ratio] - The aspect ratio of the element.
+ * @property {boolean} isVertical Whether to rotate vertically
  * @property {string|number} [w] - Width of the element.
  * @property {string|number} [h] - Height of the element.
  * @property {number} [t] - Top position.
@@ -214,7 +216,8 @@ class Figure extends EditorInjector {
 			container: /** @type {HTMLElement} */ (dom.query.getParentElement(element, Figure.is, 2) || cover),
 			cover: /** @type {HTMLElement} */ (cover),
 			inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
-			caption: /** @type {HTMLElement} */ (dom.query.getEdgeChild(element.parentElement, 'FIGCAPTION', false))
+			caption: /** @type {HTMLElement} */ (dom.query.getEdgeChild(element.parentElement, 'FIGCAPTION', false)),
+			isVertical: IsVertical(element)
 		};
 	}
 
@@ -226,8 +229,8 @@ class Figure extends EditorInjector {
 	 * @return {{w: number, h: number}}
 	 */
 	static GetRatio(w, h, defaultSizeUnit) {
-		let rw = 1,
-			rh = 1;
+		let rw = 0,
+			rh = 0;
 		if (/\d+/.test(w + '') && /\d+/.test(h + '')) {
 			const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 			const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
@@ -250,11 +253,11 @@ class Figure extends EditorInjector {
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
 	 * @param {string} defaultSizeUnit Default size unit (default: "px")
-	 * @param {{w: number, h: number}} ratio Ratio size (Figure.GetRatio)
+	 * @param {?{w: number, h: number}=} ratio Ratio size (Figure.GetRatio)
 	 * @return {{w: string|number, h: string|number}}
 	 */
 	static CalcRatio(w, h, defaultSizeUnit, ratio) {
-		if (/\d+/.test(w + '') && /\d+/.test(h + '')) {
+		if (ratio?.w && ratio?.h && /\d+/.test(w + '') && /\d+/.test(h + '')) {
 			const xUnit = (!numbers.is(w) && String(w).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 			const yUnit = (!numbers.is(h) && String(h).replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 			if (xUnit === yUnit) {
@@ -325,7 +328,8 @@ class Figure extends EditorInjector {
 					container: null,
 					cover: null,
 					width: target.style.width || /** @type {HTMLImageElement} */ (target).width || '',
-					height: target.style.height || /** @type {HTMLImageElement} */ (target).height || ''
+					height: target.style.height || /** @type {HTMLImageElement} */ (target).height || '',
+					isVertical: this.isVertical
 				};
 			}
 		}
@@ -340,13 +344,19 @@ class Figure extends EditorInjector {
 		const { top, left, scrollX, scrollY } = this.offset.getLocal(sizeTarget);
 
 		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
-		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
+
+		let rw = numbers.get(target.style.width, 2) || w;
+		let rh = numbers.get(target.style.height, 2) || h;
+		if (this.isVertical) [rw, rh] = [rh, rw];
+		const ratio = Figure.GetRatio(rw, rh, this.sizeUnit);
+
 		const targetInfo = {
 			container: figureInfo.container,
 			cover: figureInfo.cover,
 			caption: figureInfo.caption,
 			align: this.align,
 			ratio: ratio,
+			isVertical: this.isVertical,
 			w: w || '',
 			h: h || '',
 			t: top,
@@ -412,7 +422,7 @@ class Figure extends EditorInjector {
 			this.ui._visibleControllers(true, true);
 			// size
 			const size = this.getSize(target);
-			dom.utils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.w + ', ' + size.h + ')');
+			dom.utils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.dw + ', ' + size.dh + ')');
 			this._displayResizeHandles(!nonResizing);
 			// rotate, aption, align, onresize - display;
 			const transformButtons = this.controller.form.querySelectorAll(
@@ -483,7 +493,7 @@ class Figure extends EditorInjector {
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
 	 */
-	setSize(w, h) {
+	setFigureSize(w, h) {
 		if (/%$/.test(w + '')) {
 			this._setPercentSize(w, h);
 		} else if ((!w || w === 'auto') && (!h || h === 'auto')) {
@@ -495,41 +505,65 @@ class Figure extends EditorInjector {
 	}
 
 	/**
+	 * @description Set the element's container size from plugins input value
+	 * @param {string|number} w Width size
+	 * @param {string|number} h Height size
+	 */
+	setSize(w, h) {
+		const v = this.isVertical;
+		if (v) [w, h] = [h, w];
+		this.setFigureSize(w, h);
+		if (v) this.setTransform(this._element, w, h, 0);
+	}
+
+	/**
 	 * @description Gets the Figure size
 	 * @param {?Node=} targetNode Target element, default is the current element
-	 * @returns {{w: string, h: string}}
+	 * @returns {{w: string, h: string, dw: string, dh: string}}
 	 */
 	getSize(targetNode) {
 		if (!targetNode) targetNode = this._element;
-		if (!targetNode) return { w: '', h: '' };
+
+		const v = IsVertical(targetNode);
+		let w = '';
+		let h = '';
+		let dw = '';
+		let dh = '';
+
+		if (!targetNode) return { w, h, dw, dh };
 
 		const figure = Figure.GetContainer(targetNode);
 		const target = figure.target;
 		if (!figure.container) {
 			// exceptionFormat
 			if (!this.options.get('strictMode').formatFilter) {
-				return {
-					w: target.style.width || 'auto',
-					h: target.style.height || 'auto'
-				};
+				w = target.style.width || 'auto';
+				h = target.style.height || 'auto';
+			} else {
+				w = '';
+				h = target.style.height;
 			}
-			return {
-				w: '',
-				h: target.style.height
-			};
+		} else {
+			w = !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%';
+			h = figure.inlineCover
+				? figure.inlineCover.style.height || /** @type {HTMLElement} */ (targetNode).style.height || String(/** @type {HTMLImageElement} */ (targetNode).height || '')
+				: numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !v
+				? figure.cover.style.height
+				: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
+				? target.style.height
+				: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
+			w = w || 'auto';
+			h = h || 'auto';
 		}
 
-		const w = !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%';
-		const h = figure.inlineCover
-			? figure.inlineCover.style.height || /** @type {HTMLElement} */ (targetNode).style.height || String(/** @type {HTMLImageElement} */ (targetNode).height || '')
-			: numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !this.isVertical
-			? figure.cover.style.height
-			: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
-			? target.style.height
-			: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
+		dw = v ? h : w;
+		dh = v ? w : h;
+
 		return {
-			w: w || 'auto',
-			h: h || 'auto'
+			w,
+			h,
+			dw,
+			dh
 		};
 	}
 
@@ -662,7 +696,7 @@ class Figure extends EditorInjector {
 			this.deleteTransform();
 		}
 
-		this.setSize(w, h);
+		this.setFigureSize(w, h);
 	}
 
 	/**
@@ -679,7 +713,7 @@ class Figure extends EditorInjector {
 
 		switch (command) {
 			case 'mirror': {
-				const info = this.#GetRotateValue(element);
+				const info = GetRotateValue(element);
 				let x = info.x;
 				let y = info.y;
 
@@ -692,10 +726,11 @@ class Figure extends EditorInjector {
 				this._setRotate(element, info.r, x, y);
 				break;
 			}
-			case 'rotate':
-				this.setTransform(element, null, null, value);
+			case 'rotate': {
+				this.setTransform(element, null, null, Number(value));
 				break;
-			case 'caption':
+			}
+			case 'caption': {
 				if (!this._caption) {
 					const caption = Figure.CreateCaption(this._cover, this.lang.caption);
 					const captionText = dom.query.getEdgeChild(caption, (current) => current.nodeType === 3, false);
@@ -721,20 +756,24 @@ class Figure extends EditorInjector {
 					}
 				}
 				break;
-			case 'revert':
+			}
+			case 'revert': {
 				this._setRevert();
 				break;
-			case 'edit':
+			}
+			case 'edit': {
 				this.inst.edit(element);
 				break;
+			}
 			case 'copy': {
 				this.component.copy(this._container);
 				break;
 			}
-			case 'remove':
+			case 'remove': {
 				this.inst.destroy(element);
 				this.controller.close();
 				break;
+			}
 		}
 
 		if (/^__c__/.test(command)) {
@@ -815,20 +854,23 @@ class Figure extends EditorInjector {
 	 * @param {Node} node Target element
 	 * @param {?string|number} width Element's width size
 	 * @param {?string|number} height Element's height size
+	 * @param {?number} deg rotate value
 	 */
 	setTransform(node, width, height, deg) {
 		try {
 			this.__preventSizechange = true;
-			const info = this.#GetRotateValue(node);
+			const info = GetRotateValue(node);
 			const slope = info.r + (deg || 0) * 1;
 			deg = Math.abs(slope) >= 360 ? 0 : slope;
-			const isVertical = (this.isVertical = /^(90|270)$/.test(Math.abs(deg).toString()));
+			const isVertical = (this.isVertical = IsVertical(deg));
 
 			width = numbers.get(width, 0);
 			height = numbers.get(height, 0);
 
 			const element = /** @type {HTMLElement} */ (node);
 			const dataSize = (element.getAttribute('data-se-size') || 'auto,auto').split(',');
+			if (isVertical) this._setRotate(element, deg, info.x, info.y);
+
 			let transOrigin = '';
 			if (/auto|%$/.test(dataSize[0]) && !isVertical) {
 				if (dataSize[0] === 'auto' && dataSize[1] === 'auto') {
@@ -858,7 +900,7 @@ class Figure extends EditorInjector {
 			}
 
 			element.style.transformOrigin = transOrigin;
-			this._setRotate(element, deg, info.x, info.y);
+			if (!isVertical) this._setRotate(element, deg, info.x, info.y);
 
 			if (isVertical) element.style.maxWidth = 'none';
 			else element.style.maxWidth = '';
@@ -872,7 +914,7 @@ class Figure extends EditorInjector {
 	/**
 	 * @private
 	 * @description Sets figure component properties such as cover, container, caption, and alignment.
-	 * @param {FigureInfo} figureInfo - {target, container, cover, inlineCover, caption}
+	 * @param {FigureInfo} figureInfo - {target, container, cover, inlineCover, caption, isVertical}
 	 */
 	_setFigureInfo(figureInfo) {
 		this._inlineCover = figureInfo.inlineCover;
@@ -882,7 +924,7 @@ class Figure extends EditorInjector {
 		this._element = figureInfo.target;
 		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || figureInfo.target.style.float || 'none';
 		this.as = this._inlineCover ? 'inline' : 'block';
-		this.isVertical = /^(90|270)$/.test(Math.abs(this.#GetRotateValue(figureInfo.target).r).toString());
+		this.isVertical = IsVertical(figureInfo.target);
 	}
 
 	/**
@@ -971,6 +1013,10 @@ class Figure extends EditorInjector {
 	 */
 	__setCoverPaddingBottom(w, h) {
 		if (this._inlineCover === this._cover) return;
+
+		if (this.isVertical) {
+			[w, h] = [h, w];
+		}
 
 		this._cover.style.height = h;
 		if (/%$/.test(w) && this.align === 'center') {
@@ -1065,7 +1111,7 @@ class Figure extends EditorInjector {
 	 * @description Reverts the figure element to its previously saved size.
 	 */
 	_setRevert() {
-		this.setSize(this.__revertSize.w, this.__revertSize.h);
+		this.setFigureSize(this.__revertSize.w, this.__revertSize.h);
 	}
 
 	/**
@@ -1219,7 +1265,7 @@ class Figure extends EditorInjector {
 		inst.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 		this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
 
-		const { w, h } = this.getSize(inst._element);
+		const { w, h, dw, dh } = this.getSize(inst._element);
 		__resizing_p_wh = __resizing_p_ow = false;
 		__resizing_cw = __resizing_sw = 0;
 		if (!this.isVertical) {
@@ -1244,7 +1290,7 @@ class Figure extends EditorInjector {
 
 		const _display = this.editor.frameContext.get('_figure').display;
 		_display.style.display = 'block';
-		dom.utils.changeTxt(_display, w + ' x ' + h);
+		dom.utils.changeTxt(_display, dw + ' * ' + dh);
 	}
 
 	/**
@@ -1255,9 +1301,10 @@ class Figure extends EditorInjector {
 		const direction = this._resize_direction;
 		const clientX = e.clientX;
 		const clientY = e.clientY;
+		const v = this.isVertical;
 
-		let resultW = this._element_w;
-		let resultH = this._element_h;
+		let resultW = v ? this._element_h : this._element_w;
+		let resultH = v ? this._element_w : this._element_h;
 
 		const w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
 		const h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
@@ -1280,10 +1327,13 @@ class Figure extends EditorInjector {
 			resultH = h;
 		}
 
-		this._resize_w = /** @type {number} */ (/h$/.test(direction) ? this._width : Math.round(resultW));
-		this._resize_h = /** @type {number} */ (/w$/.test(direction) ? this._height : Math.round(resultH));
-		const rw = __resizing_cw ? (this._resize_w / __resizing_sw) * __resizing_cw * 100 : this._resize_w;
-		dom.utils.changeTxt(this.editor.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' x ' + this._resize_h);
+		const resize_w = /** @type {number} */ (!v && /h$/.test(direction) ? this._width : Math.round(resultW));
+		const resize_h = /** @type {number} */ (!v && /w$/.test(direction) ? this._height : Math.round(resultH));
+		const rw = __resizing_cw ? (resize_w / __resizing_sw) * __resizing_cw * 100 : resize_w;
+		dom.utils.changeTxt(this.editor.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' * ' + resize_h);
+
+		this._resize_w = resize_w;
+		this._resize_h = resize_h;
 	}
 
 	/**
@@ -1407,20 +1457,28 @@ class Figure extends EditorInjector {
 
 		this.selectMenu_resize.open('', '[data-command="' + command + '"]');
 	}
+}
 
-	/**
-	 * @param {Node} element Target element
-	 * @returns {{ r: *, x: *, y: * }} Rotation value
-	 */
-	#GetRotateValue(element) {
-		const transform = /** @type {HTMLElement} */ (element).style.transform;
-		if (!transform) return { r: 0, x: '', y: '' };
-		return {
-			r: Number((transform.match(/rotate\(([-0-9]+)deg\)/) || [])[1] || 0),
-			x: (transform.match(/rotateX\(([-0-9]+)deg\)/) || [])[1] || '',
-			y: (transform.match(/rotateY\(([-0-9]+)deg\)/) || [])[1] || ''
-		};
-	}
+/**
+ * @param {Node} element Target element
+ * @returns {{ r: *, x: *, y: * }} Rotation value
+ */
+function GetRotateValue(element) {
+	const transform = /** @type {HTMLElement} */ (element).style.transform;
+	if (!transform) return { r: 0, x: '', y: '' };
+	return {
+		r: Number((transform.match(/rotate\(([-0-9]+)deg\)/) || [])[1] || 0),
+		x: (transform.match(/rotateX\(([-0-9]+)deg\)/) || [])[1] || '',
+		y: (transform.match(/rotateY\(([-0-9]+)deg\)/) || [])[1] || ''
+	};
+}
+
+/**
+ * @param {Node|number} elementOrDeg Target element
+ * @returns {boolean} Whether to rotate vertically
+ */
+function IsVertical(elementOrDeg) {
+	return /^(90|270)$/.test(Math.abs(numbers.is(elementOrDeg) ? elementOrDeg : GetRotateValue(/** @type{Node} */ (elementOrDeg)).r).toString());
 }
 
 function CreateAlign(inst, button) {

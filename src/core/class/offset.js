@@ -137,7 +137,7 @@ Offset.prototype = {
 		}
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
-		offsetLeft += l;
+		offsetLeft += l - (wysiwyg ? wysiwyg.scrollLeft : 0);
 		offsetTop += t - (wysiwyg ? wysiwyg.scrollTop : 0);
 		return {
 			left: offsetLeft,

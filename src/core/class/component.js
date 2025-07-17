@@ -151,7 +151,10 @@ Component.prototype = {
 			this.editor.frameContext.get('documentType').reHeader();
 		}
 
-		return /** @type {HTMLElement} */ (oNode || element);
+		const targetElement = /** @type {HTMLElement} */ (oNode || element);
+		this.selection.scrollTo(targetElement);
+
+		return targetElement;
 	},
 
 	/**
@@ -733,10 +736,10 @@ async function OnKeyDown_component(e) {
 	if (ctrl) {
 		if (keyCode !== 'ControlRight' && keyCode !== 'ControlLeft') {
 			const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? '1000' : ''));
-			if (/^(redo|undo)$/.test(info?.c)) {
+			if (/^(redo|undo)$/.test(info?.command)) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.editor.run(info.c, info.t, info.e);
+				this.editor.run(info.command, info.type, info.button);
 			}
 		}
 		return;

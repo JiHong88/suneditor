@@ -246,7 +246,7 @@ function Constructor(editorTargets, options) {
  * @param {Element|null} button Command button element
  * @param {Map<string, *>} keyMap Map to store shortcut key info
  * @param {Array} rc "_reverseCommandArray" option
- * @param {Array} reverseKeys Reverse key array
+ * @param {Set} reverseKeys Reverse key array
  */
 export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys) {
 	if (!values || values.length < 2) return;
@@ -307,7 +307,7 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 			if (!keyMap.has(k)) {
 				r = rc.indexOf(command);
 				r = r === -1 ? '' : numbers.isOdd(r) ? rc[r + 1] : rc[r - 1];
-				if (r) reverseKeys.push(k);
+				if (r) reverseKeys.add(k);
 
 				keyMap.set(k, { c, s, edge, space, enter, textTrigger, plugin, command, method, r, type: button?.getAttribute('data-type'), button, key: k });
 			}

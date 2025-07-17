@@ -87,12 +87,13 @@ class Image_ extends EditorInjector {
 		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
 		const ctrlAs = this.pluginOptions.useFormatType ? 'as' : '';
 		const figureControls =
-			pluginOptions.controls || !this.pluginOptions.canResize
+			pluginOptions.controls ||
+			(!this.pluginOptions.canResize
 				? [[ctrlAs, 'mirror_h', 'mirror_v', 'align', 'caption', 'edit', 'revert', 'copy', 'remove']]
 				: [
 						[ctrlAs, 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
 						['edit', 'align', 'caption', 'revert', 'copy', 'remove']
-				  ];
+				  ]);
 
 		// show align
 		this.alignForm = modalEl.alignForm;
@@ -143,8 +144,8 @@ class Image_ extends EditorInjector {
 		this._container = null;
 		this._caption = null;
 		this._ratio = {
-			w: 1,
-			h: 1
+			w: 0,
+			h: 0
 		};
 		this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
 		this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
@@ -302,8 +303,8 @@ class Image_ extends EditorInjector {
 		this.captionCheckEl.checked = false;
 		this._element = null;
 		this._ratio = {
-			w: 1,
-			h: 1
+			w: 0,
+			h: 0
 		};
 		this.#OpenTab('init');
 
@@ -363,17 +364,9 @@ class Image_ extends EditorInjector {
 		if (!this._resizing) return;
 
 		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
-		let w = percentageRotation ? '' : figureInfo.width;
-		if (this._onlyPercentage) {
-			w = numbers.get(w, 2);
-			if (w > 100) w = 100;
-		}
-		this.inputX.value = String(w === 'auto' ? '' : w);
-
-		if (!this._onlyPercentage) {
-			const h = percentageRotation ? '' : figureInfo.height;
-			this.inputY.value = String(h === 'auto' ? '' : h);
-		}
+		const { dw, dh } = this.figure.getSize(target);
+		this.inputX.value = dw === 'auto' ? '' : dw;
+		this.inputY.value = dh === 'auto' ? '' : dh;
 
 		this.proportion.checked = true;
 		this.inputX.disabled = percentageRotation ? true : false;
@@ -383,8 +376,8 @@ class Image_ extends EditorInjector {
 		this._ratio = this.proportion.checked
 			? figureInfo.ratio
 			: {
-					w: 1,
-					h: 1
+					w: 0,
+					h: 0
 			  };
 
 		if (this.pluginOptions.useFormatType) {
@@ -641,13 +634,13 @@ class Image_ extends EditorInjector {
 			}
 		}
 
+		if (isNewAnchor) {
+			dom.utils.removeItem(anchor);
+		}
+
 		// size
 		if (this._resizing && changeSize) {
 			this._applySize(width, height);
-		}
-
-		if (isNewAnchor) {
-			dom.utils.removeItem(anchor);
 		}
 
 		// transform
@@ -655,7 +648,7 @@ class Image_ extends EditorInjector {
 			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
 				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
 					this.figure.deleteTransform(imageEl);
-				} else {
+				} else if (!this._resizing || !changeSize || !this.figure.isVertical) {
 					this.figure.setTransform(imageEl, width, height, 0);
 				}
 			}
@@ -668,8 +661,6 @@ class Image_ extends EditorInjector {
 		imageEl.onload = () => {
 			this.select(imageEl);
 		};
-
-		this._ready(imageEl);
 	}
 
 	/**
@@ -1145,12 +1136,7 @@ class Image_ extends EditorInjector {
 	}
 
 	#OnChangeRatio() {
-		this._ratio = this.proportion.checked
-			? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit)
-			: {
-					w: 1,
-					h: 1
-			  };
+		this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 0, h: 0 };
 	}
 
 	#OnClickRevert() {

@@ -180,9 +180,9 @@ declare class Editor {
 	/**
 	 * @description Shoutcuts reverse key array
 	 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
-	 * @type {Array<string>}
+	 * @type {Set<string>}
 	 */
-	reverseKeys: Array<string>;
+	reverseKeys: Set<string>;
 	/**
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
 	 * - Each button is contained in an array.

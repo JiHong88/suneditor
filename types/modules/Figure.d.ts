@@ -33,6 +33,10 @@ export type FigureInfo = {
 	 * Caption element (FIGCAPTION)
 	 */
 	caption: HTMLElement | null;
+	/**
+	 * Whether to rotate vertically
+	 */
+	isVertical: boolean;
 };
 export type FigureTargetInfo = {
 	/**
@@ -58,6 +62,10 @@ export type FigureTargetInfo = {
 		w: number;
 		h: number;
 	};
+	/**
+	 * Whether to rotate vertically
+	 */
+	isVertical: boolean;
 	/**
 	 * - Width of the element.
 	 */
@@ -118,6 +126,7 @@ export type FigureControls = Array<
  * @property {?HTMLElement} cover Cover element (FIGURE|null)
  * @property {?HTMLElement} inlineCover Inline cover element (span.se-inline-component)
  * @property {?HTMLElement} caption Caption element (FIGCAPTION)
+ * @property {boolean} isVertical Whether to rotate vertically
  */
 /**
  * @typedef {Object} FigureTargetInfo
@@ -126,6 +135,7 @@ export type FigureControls = Array<
  * @property {?HTMLElement=} caption Caption element (FIGCAPTION)
  * @property {string} [align] - Alignment of the element.
  * @property {{w:number, h:number}} [ratio] - The aspect ratio of the element.
+ * @property {boolean} isVertical Whether to rotate vertically
  * @property {string|number} [w] - Width of the element.
  * @property {string|number} [h] - Height of the element.
  * @property {number} [t] - Top position.
@@ -199,17 +209,19 @@ declare class Figure extends EditorInjector {
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
 	 * @param {string} defaultSizeUnit Default size unit (default: "px")
-	 * @param {{w: number, h: number}} ratio Ratio size (Figure.GetRatio)
+	 * @param {?{w: number, h: number}=} ratio Ratio size (Figure.GetRatio)
 	 * @return {{w: string|number, h: string|number}}
 	 */
 	static CalcRatio(
 		w: string | number,
 		h: string | number,
 		defaultSizeUnit: string,
-		ratio: {
-			w: number;
-			h: number;
-		}
+		ratio?:
+			| ({
+					w: number;
+					h: number;
+			  } | null)
+			| undefined
 	): {
 		w: string | number;
 		h: string | number;
@@ -358,15 +370,23 @@ declare class Figure extends EditorInjector {
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
 	 */
+	setFigureSize(w: string | number, h: string | number): void;
+	/**
+	 * @description Set the element's container size from plugins input value
+	 * @param {string|number} w Width size
+	 * @param {string|number} h Height size
+	 */
 	setSize(w: string | number, h: string | number): void;
 	/**
 	 * @description Gets the Figure size
 	 * @param {?Node=} targetNode Target element, default is the current element
-	 * @returns {{w: string, h: string}}
+	 * @returns {{w: string, h: string, dw: string, dh: string}}
 	 */
 	getSize(targetNode?: (Node | null) | undefined): {
 		w: string;
 		h: string;
+		dw: string;
+		dh: string;
 	};
 	/**
 	 * @description Align the container.
@@ -413,12 +433,13 @@ declare class Figure extends EditorInjector {
 	 * @param {Node} node Target element
 	 * @param {?string|number} width Element's width size
 	 * @param {?string|number} height Element's height size
+	 * @param {?number} deg rotate value
 	 */
-	setTransform(node: Node, width: (string | number) | null, height: (string | number) | null, deg: any): void;
+	setTransform(node: Node, width: (string | number) | null, height: (string | number) | null, deg: number | null): void;
 	/**
 	 * @private
 	 * @description Sets figure component properties such as cover, container, caption, and alignment.
-	 * @param {FigureInfo} figureInfo - {target, container, cover, inlineCover, caption}
+	 * @param {FigureInfo} figureInfo - {target, container, cover, inlineCover, caption, isVertical}
 	 */
 	private _setFigureInfo;
 	/**

@@ -37,7 +37,7 @@
 	direction: initial;
 }
 .sun-editor-editable .se-component > figure > * {
-	margin: 0 !important;
+	margin: 0;
 }
 
 /** component - figure - embed(blockquote) loading */
