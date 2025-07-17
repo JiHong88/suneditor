@@ -152,7 +152,7 @@ Component.prototype = {
 		}
 
 		const targetElement = /** @type {HTMLElement} */ (oNode || element);
-		this.selection.scrollTo(targetElement);
+		this.selection.scrollTo(targetElement, { behavior: 'auto' });
 
 		return targetElement;
 	},

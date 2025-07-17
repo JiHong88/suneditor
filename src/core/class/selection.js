@@ -377,10 +377,12 @@ Selection_.prototype = {
 		if (this.__hasScrollParents || (!isIframe && (!isTouchDevice || initViewportHeight - viewportHeight < 150))) {
 			el?.scrollIntoView(scrollOption);
 
-			if (toolbarHeight && scrollY > _w.scrollY) {
-				_w.scrollBy(0, -toolbarHeight);
-			} else if (isAutoHeight) {
-				_w.scrollBy(0, statusbarHeight);
+			if (scrollOption?.behavior !== 'smooth') {
+				if (toolbarHeight && scrollY > _w.scrollY) {
+					_w.scrollBy(0, -toolbarHeight);
+				} else if (isAutoHeight) {
+					_w.scrollBy(0, statusbarHeight);
+				}
 			}
 
 			return;
