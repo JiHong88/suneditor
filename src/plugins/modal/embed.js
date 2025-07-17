@@ -128,7 +128,7 @@ class Embed extends EditorInjector {
 		this._element = null;
 		this._cover = null;
 		this._container = null;
-		this._ratio = { w: 1, h: 1 };
+		this._ratio = { w: 0, h: 0 };
 		this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
 		this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 		this._resizing = this.pluginOptions.canResize;
@@ -241,6 +241,8 @@ class Embed extends EditorInjector {
 			this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
 			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.disabled = true;
+		} else if (isUpdate) {
+			this._linkValue = this.previewSrc.textContent = this.embedInput.value = this._cover.getAttribute('data-se-origin') || '';
 		}
 	}
 
@@ -300,7 +302,7 @@ class Embed extends EditorInjector {
 		this._linkValue = this.previewSrc.textContent = this.embedInput.value = '';
 
 		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]')).checked = true;
-		this._ratio = { w: 1, h: 1 };
+		this._ratio = { w: 0, h: 0 };
 		this._nonResizing = false;
 
 		if (this._resizing) {
@@ -348,18 +350,9 @@ class Embed extends EditorInjector {
 		if (!this._resizing) return;
 
 		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
-		let w = percentageRotation ? '' : figureInfo.width;
-		if (this._onlyPercentage) {
-			w = numbers.get(w, 2);
-			if (w > 100) w = 100;
-		}
-
-		this.inputX.value = String(w === 'auto' ? '' : w);
-
-		if (!this._onlyPercentage) {
-			const h = percentageRotation ? '' : figureInfo.height;
-			this.inputY.value = String(h === 'auto' ? '' : h);
-		}
+		const { dw, dh } = this.figure.getSize(target);
+		this.inputX.value = dw === 'auto' ? '' : dw;
+		this.inputY.value = dh === 'auto' ? '' : dh;
 
 		this.proportion.checked = true;
 		this.inputX.disabled = percentageRotation ? true : false;
@@ -369,8 +362,8 @@ class Embed extends EditorInjector {
 		this._ratio = this.proportion.checked
 			? figureInfo.ratio
 			: {
-					w: 1,
-					h: 1
+					w: 0,
+					h: 0
 			  };
 	}
 
@@ -467,7 +460,7 @@ class Embed extends EditorInjector {
 
 		const handler = function (infos, newInfos) {
 			infos = newInfos || infos;
-			this._create(infos.process, infos.url, infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
+			this._create(src, infos.process, infos.url, infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
 		}.bind(this, embedInfo);
 		// se-ts-ignore
 		void this._create;
@@ -511,15 +504,16 @@ class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
-	 * @param {?ProcessInfo_embed} process - Processed embed information.
-	 * @param {?string} src - The source URL.
-	 * @param {?Node[]} children - The embed elements.
+	 * @param {string} originSrc - The origin input source.
+	 * @param {ProcessInfo_embed} process - Processed embed information.
+	 * @param {string} src - The source URL.
+	 * @param {Node[]} children - The embed elements.
 	 * @param {string} width - The width of the embed component.
 	 * @param {string} height - The height of the embed component.
 	 * @param {string} align - The alignment of the embed component.
 	 * @param {boolean} isUpdate - Whether this is an update to an existing embed component.
 	 */
-	_create(process, src, children, width, height, align, isUpdate) {
+	_create(originSrc, process, src, children, width, height, align, isUpdate) {
 		let oFrame = null;
 		let cover = null;
 		let container = null;
@@ -593,6 +587,9 @@ class Embed extends EditorInjector {
 		// align
 		this.figure.setAlign(oFrame, align);
 
+		// origin src
+		cover.setAttribute('data-se-origin', originSrc);
+
 		if (!isUpdate) {
 			this.component.insert(container, { skipCharCount: false, skipSelection: true, skipHistory: true });
 
@@ -636,7 +633,7 @@ class Embed extends EditorInjector {
 			return;
 		}
 
-		if (this._resizing && changeSize && this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
+		if (!this._resizing || !changeSize || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
 		if (!scriptTag) this.history.push(false);
 	}
 

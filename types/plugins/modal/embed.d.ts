@@ -341,9 +341,10 @@ declare class Embed extends EditorInjector {
 	/**
 	 * @private
 	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
-	 * @param {?ProcessInfo_embed} process - Processed embed information.
-	 * @param {?string} src - The source URL.
-	 * @param {?Node[]} children - The embed elements.
+	 * @param {string} originSrc - The origin input source.
+	 * @param {ProcessInfo_embed} process - Processed embed information.
+	 * @param {string} src - The source URL.
+	 * @param {Node[]} children - The embed elements.
 	 * @param {string} width - The width of the embed component.
 	 * @param {string} height - The height of the embed component.
 	 * @param {string} align - The alignment of the embed component.
