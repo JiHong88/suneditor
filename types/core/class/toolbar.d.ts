@@ -9,10 +9,10 @@ export type ToolbarThis = Omit<Toolbar & Partial<__se__EditorInjector>, 'toolbar
  * @description Toolbar class
  * @param {__se__EditorCore} editor - The root editor instance
  * @param {Object} options - toolbar options
- * @param {String} options.keyName - toolbar key name
- * @param {Boolean} options.balloon - balloon toolbar
- * @param {Boolean} options.inline - inline toolbar
- * @param {Boolean} options.balloonAlways - balloon toolbar always show
+ * @param {"toolbar"|"toolbar_sub"} options.keyName - toolbar key name
+ * @param {boolean} options.balloon - balloon toolbar
+ * @param {boolean} options.inline - inline toolbar
+ * @param {boolean} options.balloonAlways - balloon toolbar always show
  * @param {Array<Node>} options.res - responsive toolbar button list
  */
 declare function Toolbar(
@@ -25,7 +25,7 @@ declare function Toolbar(
 		balloonAlways,
 		res
 	}: {
-		keyName: string;
+		keyName: 'toolbar' | 'toolbar_sub';
 		balloon: boolean;
 		inline: boolean;
 		balloonAlways: boolean;
@@ -42,10 +42,10 @@ declare class Toolbar {
 	 * @description Toolbar class
 	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @param {Object} options - toolbar options
-	 * @param {String} options.keyName - toolbar key name
-	 * @param {Boolean} options.balloon - balloon toolbar
-	 * @param {Boolean} options.inline - inline toolbar
-	 * @param {Boolean} options.balloonAlways - balloon toolbar always show
+	 * @param {"toolbar"|"toolbar_sub"} options.keyName - toolbar key name
+	 * @param {boolean} options.balloon - balloon toolbar
+	 * @param {boolean} options.inline - inline toolbar
+	 * @param {boolean} options.balloonAlways - balloon toolbar always show
 	 * @param {Array<Node>} options.res - responsive toolbar button list
 	 */
 	constructor(
@@ -57,15 +57,22 @@ declare class Toolbar {
 			balloonAlways,
 			res
 		}: {
-			keyName: string;
+			keyName: 'toolbar' | 'toolbar_sub';
 			balloon: boolean;
 			inline: boolean;
 			balloonAlways: boolean;
 			res: Array<Node>;
 		}
 	);
-	keyName: string;
 	isSub: boolean;
+	/**
+	 * @type {Object}
+	 * @description Key names for the toolbar elements.
+	 * @property {"toolbar_sub_main"|"toolbar_main"} main - Main toolbar key name
+	 * @property {"toolbar_sub_buttonTray"|"toolbar_buttonTray"} buttonTray - Button tray key name
+	 * @property {"toolbar_sub_width"|"toolbar_width"} width - Toolbar width key name
+	 */
+	keyName: any;
 	currentMoreLayerActiveButton: HTMLButtonElement;
 	_isBalloon: boolean;
 	_isInline: boolean;

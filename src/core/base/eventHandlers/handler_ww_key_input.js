@@ -712,7 +712,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 			this.component.deselect();
 			const brBlock = this.format.getBrLine(selectionNode, null);
 
-			if (this.editor.frameOptions.get('charCounter_type') === 'byte-html') {
+			if (this.frameOptions.get('charCounter_type') === 'byte-html') {
 				let enterHTML = '';
 				if ((!shift && brBlock) || shift) {
 					enterHTML = '<br>';
@@ -1020,7 +1020,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	}
 
 	// document type
-	if (fc.has('documentType-use-header') && !range.collapsed && !ctrl && !alt && !shift && !keyCodeMap.isDirectionKey(keyCode)) {
+	if (fc.has('documentType_use_header') && !range.collapsed && !ctrl && !alt && !shift && !keyCodeMap.isDirectionKey(keyCode)) {
 		_w.setTimeout(() => {
 			fc.get('documentType').reHeader();
 		}, 0);
@@ -1114,7 +1114,7 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 		this.history.push(false);
 
 		// document type
-		if (fc.has('documentType-use-header')) {
+		if (fc.has('documentType_use_header')) {
 			if (keyCodeMap.isDocumentTypeObserverKey(keyCode)) {
 				fc.get('documentType').reHeader();
 			}
@@ -1178,7 +1178,7 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	this.char.test('', false);
 
 	// document type
-	if (fc.has('documentType-use-header')) {
+	if (fc.has('documentType_use_header')) {
 		if (keyCodeMap.isDocumentTypeObserverKey(keyCode)) {
 			fc.get('documentType').reHeader();
 			const el = dom.query.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));

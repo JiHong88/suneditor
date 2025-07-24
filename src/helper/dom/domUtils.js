@@ -332,13 +332,13 @@ export function getStyle(element, styleName) {
 
 /**
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
- * @param {Array<HTMLButtonElement|HTMLInputElement>} buttonList (Button | Input) Element array
+ * @param {__se__NodeCollection} buttonList (Button | Input) Element array
  * @param {boolean} disabled Disabled value
  * @param {boolean} [important=false] If priveleged mode should be used (Necessary to switch importantDisabled buttons)
  */
 export function setDisabled(buttonList, disabled, important) {
 	for (let i = 0, len = buttonList.length; i < len; i++) {
-		const button = buttonList[i];
+		const button = /** @type {HTMLButtonElement|HTMLInputElement} */ (buttonList[i]);
 		if (important || !check.isImportantDisabled(button)) button.disabled = disabled;
 		if (important) {
 			if (disabled) {

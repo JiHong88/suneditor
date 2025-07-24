@@ -24,8 +24,8 @@ export default function History(editor) {
 
 		// user event
 		editor.triggerEvent('onChange', { frameContext: fc, data: fc.get('wysiwyg').innerHTML });
-		if (editor.context.get('toolbar.main').style.display === 'block') editor.toolbar._showBalloon();
-		else if (editor.isSubBalloon && editor.context.get('toolbar.sub.main').style.display === 'block') editor.subToolbar._showBalloon();
+		if (editor.context.get('toolbar_main').style.display === 'block') editor.toolbar._showBalloon();
+		else if (editor.isSubBalloon && editor.context.get('toolbar_sub_main').style.display === 'block') editor.subToolbar._showBalloon();
 	}
 
 	function setContentFromStack(increase) {
@@ -73,7 +73,7 @@ export default function History(editor) {
 		editor._resourcesStateChange(fc);
 
 		// document type
-		if (fc.has('documentType-use-header')) {
+		if (fc.has('documentType_use_header')) {
 			fc.get('documentType').reHeader();
 		}
 

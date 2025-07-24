@@ -78,8 +78,8 @@ Format.prototype = {
 		this.history.push(false);
 
 		// document type
-		if (this.editor.frameContext.has('documentType-use-header')) {
-			this.editor.frameContext.get('documentType').reHeader();
+		if (this.frameContext.has('documentType_use_header')) {
+			this.frameContext.get('documentType').reHeader();
 		}
 	},
 
@@ -1507,7 +1507,7 @@ Format.prototype = {
 		let range = this.selection.getRange();
 
 		if (dom.check.isWysiwygFrame(range.startContainer)) {
-			const children = this.editor.frameContext.get('wysiwyg').children;
+			const children = this.frameContext.get('wysiwyg').children;
 			if (children.length === 0) return [];
 
 			this.selection.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.trim().length);

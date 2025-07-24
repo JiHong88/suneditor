@@ -1,7 +1,8 @@
 import { env, converter, dom, numbers } from '../helper';
 import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar } from './section/constructor';
-import { OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG } from './section/options';
-import { UpdateStatusbarContext } from './section/context';
+import { OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG, BaseOptionsUtil, FrameOptionsUtil } from './config/options';
+import { ContextUtil } from './config/context';
+import { UpdateStatusbarContext, FrameContextUtil } from './config/frameContext';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
@@ -33,11 +34,11 @@ const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-e
 const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
 
 /**
- * @typedef {import('./section/options').EditorInitOptions} EditorInitOptions_editor
+ * @typedef {import('./config/options').EditorInitOptions} EditorInitOptions_editor
  */
 
 /**
- * @typedef {import('./section/options').EditorFrameOptions} EditorFrameOptions_editor
+ * @typedef {import('./config/options').EditorFrameOptions} EditorFrameOptions_editor
  */
 
 /**
@@ -68,24 +69,6 @@ function Editor(multiTargets, options) {
 	this.frameRoots = product.frameRoots;
 
 	/**
-	 * @description Editor context object
-	 * @type {__se__Context}
-	 */
-	this.context = product.context;
-
-	/**
-	 * @description Current focusing frame context
-	 * @type {__se__FrameContext}
-	 */
-	this.frameContext = new Map();
-
-	/**
-	 * @description Current focusing frame context options
-	 * @type {__se__FrameOptions}
-	 */
-	this.frameOptions = new Map();
-
-	/**
 	 * @description Document object
 	 * @type {Document}
 	 */
@@ -104,10 +87,56 @@ function Editor(multiTargets, options) {
 	this.carrierWrapper = product.carrierWrapper;
 
 	/**
-	 * @description Editor options
+	 * @description Editor context object
+	 * @type {__se__Context}
+	 */
+	this.__context = product.context;
+
+	/**
+	 * @description Utility object that manages the editor's runtime context.
+	 * Provides methods to get, set, and inspect internal context.
+	 * @type {ContextUtil}
+	 */
+	this.context = ContextUtil(this);
+
+	/**
+	 * @description Current focusing [frame] context
+	 * @type {import('./config/frameContext').FrameContextMap}
+	 */
+	this.__frameContext = new Map();
+
+	/**
+	 * @description Utility object that manages the editor's runtime [frame] context.
+	 * Provides methods to get, set, and inspect internal context.
+	 * @type {FrameContextUtil}
+	 */
+	this.frameContext = FrameContextUtil(this);
+
+	/**
+	 * @description Current focusing [frame] context options
+	 * @type {__se__FrameOptions}
+	 */
+	this.__frameOptions = new Map();
+
+	/**
+	 * @description Utility object that manages the editor's runtime [frame] options.
+	 * Provides methods to get, set, and inspect internal [frame] options.
+	 * @type {FrameOptionsUtil}
+	 */
+	this.frameOptions = FrameOptionsUtil(this);
+
+	/**
+	 * @description Editor row options
 	 * @type {Map<string, *>}
 	 */
-	this.options = product.options;
+	this.__options = product.options;
+
+	/**
+	 * @description Utility object that manages the editor's runtime options.
+	 * Provides methods to get, set, and inspect internal editor options.
+	 * @type {BaseOptionsUtil}
+	 */
+	this.options = BaseOptionsUtil(this);
 
 	/**
 	 * @description Plugins
@@ -694,8 +723,7 @@ Editor.prototype = {
 	 * @returns {boolean}
 	 */
 	isEmpty(fc) {
-		fc = fc || this.frameContext;
-		const wysiwyg = fc.get('wysiwyg');
+		const wysiwyg = (fc || this.frameContext).get('wysiwyg');
 		return dom.check.isZeroWidth(wysiwyg.textContent) && !wysiwyg.querySelector(this.options.get('allowedEmptyTags')) && (wysiwyg.innerText.match(/\n/g) || '').length <= 1;
 	},
 
@@ -717,8 +745,8 @@ Editor.prototype = {
 				if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
 			}
 
-			const toolbarWrapper = this.context.get('toolbar._wrapper');
-			const statusbarWrapper = this.context.get('statusbar._wrapper');
+			const toolbarWrapper = this.context.get('toolbar_wrapper');
+			const statusbarWrapper = this.context.get('statusbar_wrapper');
 			if (rtl) {
 				this.applyFrameRoots((e) => {
 					dom.utils.addClass([e.get('topArea'), e.get('wysiwyg'), e.get('documentTypePageMirror')], 'se-rtl');
@@ -753,11 +781,11 @@ Editor.prototype = {
 			DIR_BTN_ACTIVE(this, rtl);
 
 			// document type
-			if (fc.has('documentType-use-header')) {
+			if (fc.has('documentType_use_header')) {
 				if (rtl) fc.get('wrapper').appendChild(fc.get('documentTypeInner'));
 				else fc.get('wrapper').insertBefore(fc.get('documentTypeInner'), fc.get('wysiwygFrame'));
 			}
-			if (fc.has('documentType-use-page')) {
+			if (fc.has('documentType_use_page')) {
 				if (rtl) fc.get('wrapper').insertBefore(fc.get('documentTypePage'), fc.get('wysiwygFrame'));
 				else fc.get('wrapper').appendChild(fc.get('documentTypePage'));
 			}
@@ -825,7 +853,7 @@ Editor.prototype = {
 		const newFrameMap = newO.frameMap;
 		/** --------- [root start] --------- */
 		for (let i = 0, len = newOptionKeys.length, k; i < len; i++) {
-			k = newOptionKeys[i] || null;
+			k = /** @type {keyof import('./config/options').AllBaseOptions} */ (newOptionKeys[i] || null);
 
 			if (newRootKeys.has(k)) {
 				const diff = rootDiff.get(k);
@@ -932,7 +960,7 @@ Editor.prototype = {
 		this._originOptions = _originOptions;
 
 		// --- [toolbar] ---
-		const toolbar = this.context.get('toolbar.main');
+		const toolbar = this.context.get('toolbar_main');
 		// width
 		if (/inline|balloon/i.test(options.get('mode')) && newOptionKeys.includes('toolbar_width')) {
 			toolbar.style.width = options.get('toolbar_width');
@@ -1084,9 +1112,9 @@ Editor.prototype = {
 
 		/** remove element */
 		dom.utils.removeItem(this.carrierWrapper);
-		dom.utils.removeItem(this.context.get('toolbar._wrapper'));
-		dom.utils.removeItem(this.context.get('toolbar.sub._wrapper'));
-		dom.utils.removeItem(this.context.get('statusbar._wrapper'));
+		dom.utils.removeItem(this.context.get('toolbar_wrapper'));
+		dom.utils.removeItem(this.context.get('toolbar_sub_wrapper'));
+		dom.utils.removeItem(this.context.get('statusbar_wrapper'));
 		this.applyFrameRoots((e) => {
 			dom.utils.removeItem(e.get('topArea'));
 			e.get('options').clear();
@@ -1140,8 +1168,8 @@ Editor.prototype = {
 	 * @param {__se__FrameContext} rt Root target[key] FrameContext
 	 */
 	_setFrameInfo(rt) {
-		this.frameContext = rt;
-		this.frameOptions = rt.get('options');
+		this.frameContext.reset(rt);
+		this.frameOptions.reset(rt.get('options'));
 		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
 		this._lineBreaker_t = rt.get('lineBreaker_t');
 		this._lineBreaker_b = rt.get('lineBreaker_b');
@@ -1200,10 +1228,10 @@ Editor.prototype = {
 		if (this.options.get('type') === 'document') {
 			e.set('documentType', new DocumentType(this, e));
 			if (e.get('documentType').useHeader) {
-				e.set('documentType-use-header', true);
+				e.set('documentType_use_header', true);
 			}
 			if (e.get('documentType').usePage) {
-				e.set('documentType-use-page', true);
+				e.set('documentType_use_page', true);
 				e.get('documentTypePageMirror').innerHTML = e.get('wysiwyg').innerHTML;
 			}
 		}
@@ -1218,7 +1246,7 @@ Editor.prototype = {
 		this._iframeAutoHeight(fc);
 		this._checkPlaceholder(fc);
 		// document type page
-		if (fc.has('documentType-use-page') && fc.get('options').get('height') !== 'auto') {
+		if (fc.has('documentType_use_page') && fc.get('options').get('height') !== 'auto') {
 			fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
 			fc.get('documentType').rePage(true);
 		}
@@ -1227,7 +1255,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
-	 * @param {__se__FrameContext} fc - Frame context object
+	 * @param {__se__FrameContext|FrameContextUtil} fc - Frame context object
 	 */
 	_iframeAutoHeight(fc) {
 		const autoFrame = fc.get('_iframeAuto');
@@ -1246,7 +1274,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Call the "onResizeEditor" event
-	 * @param {__se__FrameContext} fc - Frame context object
+	 * @param {__se__FrameContext|FrameContextUtil} fc - Frame context object
 	 * @param {number} h - Height value
 	 * @param {ResizeObserverEntry} resizeObserverEntry - ResizeObserverEntry object
 	 */
@@ -1263,7 +1291,7 @@ Editor.prototype = {
 		}
 
 		// document type page
-		if (fc.has('documentType-use-page')) {
+		if (fc.has('documentType_use_page')) {
 			fc.get('documentType').resizePage();
 		}
 	},
@@ -1274,7 +1302,7 @@ Editor.prototype = {
 	 * @param {?__se__FrameContext=} fc - Frame context object, If null fc is this.frameContext
 	 */
 	_checkPlaceholder(fc) {
-		fc = fc || this.frameContext;
+		fc = /** @type {__se__FrameContext} */ (fc || this.frameContext);
 		const placeholder = fc.get('placeholder');
 
 		if (placeholder) {
@@ -1326,7 +1354,7 @@ Editor.prototype = {
 
 		this._w.setTimeout(() => {
 			// toolbar visibility
-			this.context.get('toolbar.main').style.visibility = '';
+			this.context.get('toolbar_main').style.visibility = '';
 			// roots
 			this.applyFrameRoots((e) => {
 				if (typeof this._resourcesStateChange !== 'function') return;
@@ -1470,9 +1498,9 @@ Editor.prototype = {
 	__cachingButtons() {
 		const ctx = this.context;
 		this.__setDisabledButtons();
-		this.__saveCommandButtons(this.allCommandButtons, ctx.get('toolbar.buttonTray'));
+		this.__saveCommandButtons(this.allCommandButtons, ctx.get('toolbar_buttonTray'));
 		if (this.options.has('_subMode')) {
-			this.__saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar.sub.buttonTray'));
+			this.__saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar_sub_buttonTray'));
 		}
 	},
 
@@ -1484,12 +1512,12 @@ Editor.prototype = {
 	__setDisabledButtons() {
 		const ctx = this.context;
 
-		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW));
-		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER));
+		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW));
+		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER));
 
 		if (this.options.has('_subMode')) {
-			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)));
-			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER)));
+			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)));
+			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER)));
 		}
 	},
 
@@ -1645,7 +1673,7 @@ Editor.prototype = {
 		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
 		if (this.options.has('_subMode')) {
 			this.subToolbar = new Toolbar(this, {
-				keyName: 'toolbar.sub',
+				keyName: 'toolbar_sub',
 				balloon: this.isSubBalloon,
 				balloonAlways: this.isSubBalloonAlways,
 				inline: false,
@@ -1732,7 +1760,7 @@ Editor.prototype = {
 			if (e.get('options').get('iframe')) {
 				const iframeLoaded = new Promise((resolve) => {
 					this.eventManager.addEvent(e.get('wysiwygFrame'), 'load', ({ target }) => {
-						this.__setIframeDocument(target, this.options, e.get('options'));
+						this.__setIframeDocument(target, this.__options, e.get('options'));
 						resolve();
 					});
 				});

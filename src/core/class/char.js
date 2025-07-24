@@ -28,11 +28,11 @@ Char.prototype = {
 	 * @returns {boolean}
 	 */
 	check(html) {
-		const maxCharCount = this.editor.frameOptions.get('charCounter_max');
+		const maxCharCount = this.frameOptions.get('charCounter_max');
 		if (maxCharCount) {
-			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? /** @type {HTMLElement} */ (html).outerHTML : html.textContent);
+			const length = this.getLength(typeof html === 'string' ? html : this.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? /** @type {HTMLElement} */ (html).outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > maxCharCount) {
-				CounterBlink(this.editor.frameContext.get('charWrapper'));
+				CounterBlink(this.frameContext.get('charWrapper'));
 				return false;
 			}
 		}
@@ -43,14 +43,14 @@ Char.prototype = {
 	 * @this {CharThis}
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
 	 * - If [content] is undefined, get the current editor's number of characters or binary data size.
-	 * @param {string=} content Content to count. (defalut: this.editor.frameContext.get('wysiwyg'))
+	 * @param {string=} content Content to count. (defalut: this.frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
 	getLength(content) {
 		if (typeof content !== 'string') {
-			content = this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? this.editor.frameContext.get('wysiwyg').innerHTML : this.editor.frameContext.get('wysiwyg').textContent;
+			content = this.frameOptions.get('charCounter_type') === 'byte-html' ? this.frameContext.get('wysiwyg').innerHTML : this.frameContext.get('wysiwyg').textContent;
 		}
-		return /byte/.test(this.editor.frameOptions.get('charCounter_type')) ? this.getByteLength(content) : content.length;
+		return /byte/.test(this.frameOptions.get('charCounter_type')) ? this.getByteLength(content) : content.length;
 	},
 
 	/**
@@ -91,7 +91,7 @@ Char.prototype = {
 	 * @param {?__se__FrameContext=} fc Frame context
 	 */
 	display(fc) {
-		const charCounter = (fc || this.editor.frameContext).get('charCounter');
+		const charCounter = (fc || this.frameContext).get('charCounter');
 		if (charCounter) {
 			_w.setTimeout(() => {
 				charCounter.textContent = this.getLength();
@@ -113,7 +113,7 @@ Char.prototype = {
 
 		this.display();
 
-		const maxCharCount = this.editor.frameOptions.get('charCounter_max');
+		const maxCharCount = this.frameOptions.get('charCounter_max');
 		if (maxCharCount > 0) {
 			let over = false;
 			const count = this.getLength();
@@ -135,7 +135,7 @@ Char.prototype = {
 			}
 
 			if (over) {
-				CounterBlink(this.editor.frameContext.get('charWrapper'));
+				CounterBlink(this.frameContext.get('charWrapper'));
 				if (nextCharCount > 0) return false;
 			}
 		}
@@ -149,7 +149,7 @@ Char.prototype = {
 /**
  * @private
  * @description The character counter blinks.
- * @param {Element} charWrapper this.editor.frameContext.get('charWrapper')
+ * @param {Element} charWrapper this.frameContext.get('charWrapper')
  */
 function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, 'se-blink')) {

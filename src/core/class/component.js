@@ -104,7 +104,7 @@ Component.prototype = {
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
 	insert(element, { skipCharCount, skipSelection, skipHistory } = {}) {
-		if (this.editor.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(element))) {
+		if (this.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(element))) {
 			return null;
 		}
 
@@ -147,8 +147,8 @@ Component.prototype = {
 		}
 
 		// document type
-		if (this.editor.frameContext.has('documentType-use-header')) {
-			this.editor.frameContext.get('documentType').reHeader();
+		if (this.frameContext.has('documentType_use_header')) {
+			this.frameContext.get('documentType').reHeader();
 		}
 
 		const targetElement = /** @type {HTMLElement} */ (oNode || element);
@@ -276,7 +276,7 @@ Component.prototype = {
 		}, 0)();
 
 		if (notOver && !this.status.hasFocus && !this.editor._preventFocus) {
-			this.eventManager.__postFocusEvent(this.editor.frameContext, null);
+			this.eventManager.__postFocusEvent(this.frameContext, null);
 			this.editor._preventFocus = true;
 		}
 
@@ -298,7 +298,7 @@ Component.prototype = {
 
 			this.editor.status.onSelected = true;
 		} else if (isBreakComponent || !dom.utils.hasClass(info.container, 'se-input-component')) {
-			const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
+			const dragHandle = this.frameContext.get('wrapper').querySelector('.se-drag-handle');
 			dom.utils.addClass(dragHandle, 'se-drag-handle-full');
 			this.ui._visibleControllers(false, false);
 
@@ -333,7 +333,7 @@ Component.prototype = {
 		this.ui.setControllerOnDisabledButtons(false);
 
 		if (this.editor._preventFocus && !this.status.hasFocus && !this.__prevent) {
-			this.eventManager.__postBlurEvent(this.editor.frameContext, null);
+			this.eventManager.__postBlurEvent(this.frameContext, null);
 			this.editor._preventFocus = false;
 		}
 	},
@@ -472,7 +472,7 @@ Component.prototype = {
 		const info = this.get(element);
 		if (!info) return;
 
-		const fc = this.editor.frameContext;
+		const fc = this.frameContext;
 		const container = info.container;
 		const isNonSelected = dom.utils.hasClass(container, 'se-flex-component');
 		const lb_t = fc.get('lineBreaker_t');

@@ -385,7 +385,7 @@ class Embed extends EditorInjector {
 		dom.utils.removeItem(container);
 		this.init();
 
-		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
+		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
 			this.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {
@@ -616,7 +616,7 @@ class Embed extends EditorInjector {
 						}
 					});
 
-					observer.observe(this.editor.frameContext.get('wysiwyg'), {
+					observer.observe(this.frameContext.get('wysiwyg'), {
 						subtree: true,
 						childList: true
 					});

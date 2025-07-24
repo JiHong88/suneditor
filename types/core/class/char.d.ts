@@ -32,7 +32,7 @@ declare class Char {
 	 * @this {CharThis}
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
 	 * - If [content] is undefined, get the current editor's number of characters or binary data size.
-	 * @param {string=} content Content to count. (defalut: this.editor.frameContext.get('wysiwyg'))
+	 * @param {string=} content Content to count. (defalut: this.frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
 	getLength(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, content?: string | undefined): number;

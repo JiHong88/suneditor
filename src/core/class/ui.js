@@ -55,7 +55,7 @@ UI.prototype = {
 	 * @param {__se__FrameContext|null} fc Frame context
 	 */
 	setEditorStyle(style, fc) {
-		fc = fc || this.editor.frameContext;
+		fc = fc || this.frameContext;
 
 		const fo = fc.get('options');
 		fo.set('editorStyle', style);
@@ -105,8 +105,8 @@ UI.prototype = {
 			applyTheme(e.get('wysiwyg'));
 		});
 
-		applyTheme(this.context.get('statusbar._wrapper'));
-		applyTheme(this.context.get('toolbar._wrapper'));
+		applyTheme(this.context.get('statusbar_wrapper'));
+		applyTheme(this.context.get('toolbar_wrapper'));
 	},
 
 	/**
@@ -116,7 +116,7 @@ UI.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	readOnly(value, rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.editor.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 
 		fc.set('isReadOnly', !!value);
 		dom.utils.setDisabled(this.editor._controllerOnDisabledButtons, !!value);
@@ -148,7 +148,7 @@ UI.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	disable(rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.editor.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 
 		this.toolbar.disable();
 		this._offCurrentController();
@@ -170,7 +170,7 @@ UI.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	enable(rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.editor.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 
 		this.toolbar.enable();
 		fc.get('wysiwyg').setAttribute('contenteditable', true);
@@ -189,7 +189,7 @@ UI.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	show(rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.editor.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 		const topAreaStyle = fc.get('topArea').style;
 		if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
 	},
@@ -200,7 +200,7 @@ UI.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	hide(rootKey) {
-		const fc = rootKey ? this.frameRoots.get(rootKey) : this.editor.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 		fc.get('topArea').style.display = 'none';
 	},
 

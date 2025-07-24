@@ -54,13 +54,13 @@ class PageNavigator extends EditorInjector {
 	 * @param {InputEvent} e - Event object
 	 */
 	#OnChangeInner(e) {
-		if (!this.editor.frameContext.has('documentType-use-page')) return;
+		if (!this.frameContext.has('documentType_use_page')) return;
 
 		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 
 		const value = Number(eventTarget.value) || 1;
-		this.editor.frameContext.get('documentType').pageGo(value);
+		this.frameContext.get('documentType').pageGo(value);
 	}
 }
 

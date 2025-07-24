@@ -33,7 +33,7 @@ declare class Viewer {
 	fullScreenSticky: boolean;
 	fullScreenBalloon: boolean;
 	fullScreenInline: boolean;
-	toolbarParent: any;
+	toolbarParent: HTMLElement;
 	/**
 	 * @this {ViewerThis}
 	 * @description Changes to code view or wysiwyg view

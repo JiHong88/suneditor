@@ -1,12 +1,12 @@
 export default Editor;
-export type EditorInitOptions_editor = import('./section/options').EditorInitOptions;
-export type EditorFrameOptions_editor = import('./section/options').EditorFrameOptions;
+export type EditorInitOptions_editor = import('./config/options').EditorInitOptions;
+export type EditorFrameOptions_editor = import('./config/options').EditorFrameOptions;
 export type ControllerInfo_editor = import('../modules/Controller').ControllerInfo;
 /**
- * @typedef {import('./section/options').EditorInitOptions} EditorInitOptions_editor
+ * @typedef {import('./config/options').EditorInitOptions} EditorInitOptions_editor
  */
 /**
- * @typedef {import('./section/options').EditorFrameOptions} EditorFrameOptions_editor
+ * @typedef {import('./config/options').EditorFrameOptions} EditorFrameOptions_editor
  */
 /**
  * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
@@ -27,10 +27,10 @@ declare function Editor(
 ): void;
 declare class Editor {
 	/**
-	 * @typedef {import('./section/options').EditorInitOptions} EditorInitOptions_editor
+	 * @typedef {import('./config/options').EditorInitOptions} EditorInitOptions_editor
 	 */
 	/**
-	 * @typedef {import('./section/options').EditorFrameOptions} EditorFrameOptions_editor
+	 * @typedef {import('./config/options').EditorFrameOptions} EditorFrameOptions_editor
 	 */
 	/**
 	 * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
@@ -60,21 +60,6 @@ declare class Editor {
 	 */
 	frameRoots: Map<any, __se__FrameContext>;
 	/**
-	 * @description Editor context object
-	 * @type {__se__Context}
-	 */
-	context: __se__Context;
-	/**
-	 * @description Current focusing frame context
-	 * @type {__se__FrameContext}
-	 */
-	frameContext: __se__FrameContext;
-	/**
-	 * @description Current focusing frame context options
-	 * @type {__se__FrameOptions}
-	 */
-	frameOptions: __se__FrameOptions;
-	/**
 	 * @description Document object
 	 * @type {Document}
 	 */
@@ -90,10 +75,49 @@ declare class Editor {
 	 */
 	carrierWrapper: HTMLElement;
 	/**
-	 * @description Editor options
+	 * @description Editor context object
+	 * @type {__se__Context}
+	 */
+	__context: __se__Context;
+	/**
+	 * @description Utility object that manages the editor's runtime context.
+	 * Provides methods to get, set, and inspect internal context.
+	 * @type {ContextUtil}
+	 */
+	context: ContextUtil;
+	/**
+	 * @description Current focusing [frame] context
+	 * @type {import('./config/frameContext').FrameContextMap}
+	 */
+	__frameContext: import('./config/frameContext').FrameContextMap;
+	/**
+	 * @description Utility object that manages the editor's runtime [frame] context.
+	 * Provides methods to get, set, and inspect internal context.
+	 * @type {FrameContextUtil}
+	 */
+	frameContext: FrameContextUtil;
+	/**
+	 * @description Current focusing [frame] context options
+	 * @type {__se__FrameOptions}
+	 */
+	__frameOptions: __se__FrameOptions;
+	/**
+	 * @description Utility object that manages the editor's runtime [frame] options.
+	 * Provides methods to get, set, and inspect internal [frame] options.
+	 * @type {FrameOptionsUtil}
+	 */
+	frameOptions: FrameOptionsUtil;
+	/**
+	 * @description Editor row options
 	 * @type {Map<string, *>}
 	 */
-	options: Map<string, any>;
+	__options: Map<string, any>;
+	/**
+	 * @description Utility object that manages the editor's runtime options.
+	 * Provides methods to get, set, and inspect internal editor options.
+	 * @type {BaseOptionsUtil}
+	 */
+	options: BaseOptionsUtil;
 	/**
 	 * @description Plugins
 	 * @type {Object<string, *>}
@@ -543,17 +567,17 @@ declare class Editor {
 	/**
 	 * @private
 	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
-	 * @param {__se__FrameContext} fc - Frame context object
+	 * @param {__se__FrameContext|FrameContextUtil} fc - Frame context object
 	 */
-	_iframeAutoHeight(fc: __se__FrameContext): void;
+	_iframeAutoHeight(fc: __se__FrameContext | FrameContextUtil): void;
 	/**
 	 * @private
 	 * @description Call the "onResizeEditor" event
-	 * @param {__se__FrameContext} fc - Frame context object
+	 * @param {__se__FrameContext|FrameContextUtil} fc - Frame context object
 	 * @param {number} h - Height value
 	 * @param {ResizeObserverEntry} resizeObserverEntry - ResizeObserverEntry object
 	 */
-	__callResizeFunction(fc: __se__FrameContext, h: number, resizeObserverEntry: ResizeObserverEntry): void;
+	__callResizeFunction(fc: __se__FrameContext | FrameContextUtil, h: number, resizeObserverEntry: ResizeObserverEntry): void;
 	/**
 	 * @private
 	 * @description Set display property when there is placeholder.
@@ -630,3 +654,7 @@ declare class Editor {
 	__Create(originOptions: EditorInitOptions_editor): Promise<void>;
 	Constructor: typeof Editor;
 }
+import { ContextUtil } from './config/context';
+import { FrameContextUtil } from './config/frameContext';
+import { FrameOptionsUtil } from './config/options';
+import { BaseOptionsUtil } from './config/options';

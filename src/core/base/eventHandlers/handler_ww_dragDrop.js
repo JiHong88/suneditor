@@ -27,7 +27,7 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 	const _offset = { y: 0, x: 0 };
 	if (_iframeTopArea) {
 		const iframeOffset = this.offset.getGlobal(_iframeTopArea);
-		const toolbarH = _innerToolbar ? this.context.get('toolbar.main').offsetHeight : 0;
+		const toolbarH = _innerToolbar ? this.context.get('toolbar_main').offsetHeight : 0;
 		_offset.y = iframeOffset.top + toolbarH - this._w.scrollY;
 		_offset.x = iframeOffset.left - this._w.scrollX;
 	}
@@ -98,7 +98,7 @@ export function OnDrop_wysiwyg(fc, dragCursor, e) {
 			this.html.insertNode(dragContainer, { afterNode: null, skipCharCount: true });
 
 			// document type page
-			if (fc.has('documentType-use-page')) {
+			if (fc.has('documentType_use_page')) {
 				fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
 				fc.get('documentType').rePage(true);
 			}

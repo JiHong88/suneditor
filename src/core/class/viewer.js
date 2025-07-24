@@ -41,7 +41,7 @@ Viewer.prototype = {
 	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
 	 */
 	codeView(value) {
-		const fc = this.editor.frameContext;
+		const fc = this.frameContext;
 		if (value === undefined) value = !fc.get('isCodeView');
 		if (value === fc.get('isCodeView')) return;
 
@@ -61,7 +61,7 @@ Viewer.prototype = {
 
 			if (fc.get('isFullScreen')) {
 				codeFrame.style.height = '100%';
-			} else if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
+			} else if (this.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
 				codeFrame.style.height = codeFrame.scrollHeight > 0 ? codeFrame.scrollHeight + 'px' : 'auto';
 			}
 
@@ -72,8 +72,8 @@ Viewer.prototype = {
 			if (!fc.get('isFullScreen')) {
 				this.editor._notHideToolbar = true;
 				if (this.editor.isBalloon) {
-					this.context.get('toolbar._arrow').style.display = 'none';
-					this.context.get('toolbar.main').style.left = '';
+					this.context.get('toolbar_arrow').style.display = 'none';
+					this.context.get('toolbar_main').style.left = '';
 					this.editor.isInline = this.toolbar._isInline = true;
 					this.editor.isBalloon = this.toolbar._isBalloon = false;
 					this.toolbar._showInline();
@@ -96,12 +96,12 @@ Viewer.prototype = {
 			codeWrapper.style.setProperty('display', 'none', 'important');
 			wysiwygFrame.style.display = 'block';
 
-			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
+			if (this.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
 
 			if (!fc.get('isFullScreen')) {
 				this.editor._notHideToolbar = false;
 				if (/balloon/.test(this.options.get('mode'))) {
-					this.context.get('toolbar._arrow').style.display = '';
+					this.context.get('toolbar_arrow').style.display = '';
 					this.editor.isInline = this.toolbar._isInline = false;
 					this.editor.isBalloon = this.toolbar._isBalloon = true;
 					this.eventManager._hideToolbar();
@@ -122,7 +122,7 @@ Viewer.prototype = {
 		dom.utils.setDisabled(this.editor._codeViewDisabledButtons, value);
 
 		// document type
-		if (fc.has('documentType-use-header')) {
+		if (fc.has('documentType_use_header')) {
 			if (value) {
 				fc.get('documentTypeInner').style.display = 'none';
 			} else {
@@ -141,20 +141,20 @@ Viewer.prototype = {
 	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
 	 */
 	fullScreen(value) {
-		const fc = this.editor.frameContext;
+		const fc = this.frameContext;
 		if (value === undefined) value = !fc.get('isFullScreen');
 		if (value === fc.get('isFullScreen')) return;
 
 		fc.set('isFullScreen', value);
 		const topArea = fc.get('topArea');
-		const toolbar = this.context.get('toolbar.main');
+		const toolbar = this.context.get('toolbar_main');
 		const editorArea = fc.get('wrapper');
 		const wysiwygFrame = fc.get('wysiwygFrame');
 		const codeWrapper = fc.get('codeWrapper');
 		const code = fc.get('code');
 		const codeNumbers = fc.get('codeNumbers');
-		const isCodeView = this.editor.frameContext.get('isCodeView');
-		const arrow = this.context.get('toolbar._arrow');
+		const isCodeView = this.frameContext.get('isCodeView');
+		const arrow = this.context.get('toolbar_arrow');
 
 		this.ui._offCurrentController();
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.editor.toolbar._inlineToolbarAttr.isShow);
@@ -201,7 +201,7 @@ Viewer.prototype = {
 
 			// frame
 			editorArea.style.cssText = toolbar.style.cssText = '';
-			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.editor.frameOptions.get('_defaultStyles').editor + (isCodeView ? 'display: none;' : '');
+			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.frameOptions.get('_defaultStyles').editor + (isCodeView ? 'display: none;' : '');
 
 			// code wrapper
 			codeWrapper.style.cssText = (codeWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
@@ -219,7 +219,7 @@ Viewer.prototype = {
 			this.fullScreenInnerHeight = this._w.innerHeight - toolbar.offsetHeight;
 			editorArea.style.height = this.fullScreenInnerHeight - (fc.has('statusbar') ? fc.get('statusbar').offsetHeight : 0) - this.options.get('fullScreenOffset') + 'px';
 
-			if (this.editor.frameOptions.get('iframe') && this.editor.frameOptions.get('height') === 'auto') {
+			if (this.frameOptions.get('iframe') && this.frameOptions.get('height') === 'auto') {
 				editorArea.style.overflow = 'auto';
 				this.editor._iframeAutoHeight(fc);
 			}
@@ -249,7 +249,7 @@ Viewer.prototype = {
 			if (arrow) arrow.style.cssText = this.arrowOriginCssText;
 			this._d.body.style.overflow = this.bodyOverflow;
 
-			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight(fc.get('code'), fc.get('codeNumbers'), true);
+			if (this.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight(fc.get('code'), fc.get('codeNumbers'), true);
 
 			if (this.toolbarParent) {
 				this.toolbarParent.appendChild(toolbar);
@@ -295,7 +295,7 @@ Viewer.prototype = {
 	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
 	 */
 	showBlocks(value) {
-		const fc = this.editor.frameContext;
+		const fc = this.frameContext;
 		if (value === undefined) value = !fc.get('isShowBlocks');
 		fc.set('isShowBlocks', !!value);
 
@@ -316,7 +316,7 @@ Viewer.prototype = {
 	 * @description Set the active class to the button of the toolbar
 	 */
 	_setButtonsActive() {
-		const fc = this.editor.frameContext;
+		const fc = this.frameContext;
 
 		// codeView
 		if (fc.get('isCodeView')) {
@@ -357,10 +357,10 @@ Viewer.prototype = {
 		const iframe = dom.utils.createElement('IFRAME', { style: 'display: none;' });
 		this._d.body.appendChild(iframe);
 
-		const innerPadding = this._w.getComputedStyle(this.editor.frameContext.get('wysiwyg')).padding;
+		const innerPadding = this._w.getComputedStyle(this.frameContext.get('wysiwyg')).padding;
 		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get()) : this.html.get();
 		const printDocument = dom.query.getIframeDocument(iframe);
-		const wDoc = this.editor.frameContext.get('_wd');
+		const wDoc = this.frameContext.get('_wd');
 		const rtlClass = this.options.get('_rtl') ? ' se-rtl' : '';
 		const pageCSS = /*html*/ `
 			<style>
@@ -370,10 +370,10 @@ Viewer.prototype = {
 				}
 			</style>`;
 
-		if (this.editor.frameOptions.get('iframe')) {
+		if (this.frameOptions.get('iframe')) {
 			const arrts = this.options.get('printClass')
 				? 'class="' + this.options.get('printClass') + rtlClass + '"'
-				: this.editor.frameOptions.get('iframe_fullPage')
+				: this.frameOptions.get('iframe_fullPage')
 				? dom.utils.getAttributesToString(wDoc.body, ['contenteditable'])
 				: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
 
@@ -449,13 +449,13 @@ Viewer.prototype = {
 
 		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get({ withFrame: true })) : this.html.get({ withFrame: true });
 		const windowObject = this._w.open('', '_blank');
-		const wDoc = this.editor.frameContext.get('_wd');
+		const wDoc = this.frameContext.get('_wd');
 		const rtlClass = this.options.get('_rtl') ? ' se-rtl' : '';
 
-		if (this.editor.frameOptions.get('iframe')) {
+		if (this.frameOptions.get('iframe')) {
 			const arrts = this.options.get('printClass')
 				? 'class="' + this.options.get('printClass') + rtlClass + '"'
-				: this.editor.frameOptions.get('iframe_fullPage')
+				: this.frameOptions.get('iframe_fullPage')
 				? dom.utils.getAttributesToString(wDoc.body, ['contenteditable'])
 				: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
 
@@ -504,10 +504,9 @@ Viewer.prototype = {
 	 * - Updates the editor's height dynamically when in full-screen mode.
 	 */
 	_resetFullScreenHeight() {
-		if (this.editor.frameContext.get('isFullScreen')) {
-			this.fullScreenInnerHeight +=
-				this._w.innerHeight - this.context.get('toolbar.main').offsetHeight - (this.editor.frameContext.has('statusbar') ? this.editor.frameContext.get('statusbar').offsetHeight : 0) - this.fullScreenInnerHeight;
-			this.editor.frameContext.get('wrapper').style.height = this.fullScreenInnerHeight + 'px';
+		if (this.frameContext.get('isFullScreen')) {
+			this.fullScreenInnerHeight += this._w.innerHeight - this.context.get('toolbar_main').offsetHeight - (this.frameContext.has('statusbar') ? this.frameContext.get('statusbar').offsetHeight : 0) - this.fullScreenInnerHeight;
+			this.frameContext.get('wrapper').style.height = this.fullScreenInnerHeight + 'px';
 			return true;
 		}
 	},
@@ -521,7 +520,7 @@ Viewer.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	_codeMirrorEditor(key, value, rootKey) {
-		const fo = rootKey ? this.frameRoots.get(rootKey).get('options') : this.editor.frameOptions;
+		const fo = rootKey ? this.frameRoots.get(rootKey).get('options') : this.frameOptions;
 		switch (key) {
 			case 'set':
 				if (fo.has('codeMirror5Editor')) {
@@ -565,7 +564,7 @@ Viewer.prototype = {
 		if (this.options.get('hasCodeMirror')) {
 			this._codeMirrorEditor('set', value, null);
 		} else {
-			this.editor.frameContext.get('code').value = value;
+			this.frameContext.get('code').value = value;
 		}
 	},
 
@@ -578,7 +577,7 @@ Viewer.prototype = {
 		if (this.options.get('hasCodeMirror')) {
 			return this._codeMirrorEditor('get', null, null);
 		} else {
-			return this.editor.frameContext.get('code').value;
+			return this.frameContext.get('code').value;
 		}
 	},
 
@@ -590,8 +589,8 @@ Viewer.prototype = {
 	_setCodeDataToEditor() {
 		const code_html = this._getCodeView();
 
-		if (this.editor.frameOptions.get('iframe_fullPage')) {
-			const wDoc = this.editor.frameContext.get('_wd');
+		if (this.frameOptions.get('iframe_fullPage')) {
+			const wDoc = this.frameContext.get('_wd');
 			const parseDocument = new DOMParser().parseFromString(code_html, 'text/html');
 
 			if (!this.options.get('__allowedScriptTag')) {
@@ -606,8 +605,8 @@ Viewer.prototype = {
 			}
 
 			let headers = parseDocument.head.innerHTML;
-			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.editor.frameOptions.get('height') === 'auto' && !parseDocument.head.querySelector('style'))) {
-				headers += converter._setIframeStyleLinks(this.editor.frameOptions.get('iframe_cssFileName')) + converter._setAutoHeightStyle(this.editor.frameOptions.get('height'));
+			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.frameOptions.get('height') === 'auto' && !parseDocument.head.querySelector('style'))) {
+				headers += converter._setIframeStyleLinks(this.frameOptions.get('iframe_cssFileName')) + converter._setAutoHeightStyle(this.frameOptions.get('height'));
 			}
 
 			wDoc.head.innerHTML = headers;
@@ -625,7 +624,7 @@ Viewer.prototype = {
 				}
 			}
 		} else {
-			this.editor.frameContext.get('wysiwyg').innerHTML =
+			this.frameContext.get('wysiwyg').innerHTML =
 				code_html.length > 0
 					? this.html.clean(code_html, { forceFormat: true, whitelist: null, blacklist: null, _freeCodeViewMode: this.options.get('freeCodeViewMode') })
 					: '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
@@ -638,12 +637,12 @@ Viewer.prototype = {
 	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
 	 */
 	_setEditorDataToCodeView() {
-		const codeContent = this.html._convertToCode(this.editor.frameContext.get('wysiwyg'), false);
+		const codeContent = this.html._convertToCode(this.frameContext.get('wysiwyg'), false);
 		let codeValue = '';
 
-		if (this.editor.frameOptions.get('iframe_fullPage')) {
-			const attrs = dom.utils.getAttributesToString(this.editor.frameContext.get('_wd').body, null);
-			codeValue = '<!DOCTYPE html>\n<html>\n' + this.editor.frameContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
+		if (this.frameOptions.get('iframe_fullPage')) {
+			const attrs = dom.utils.getAttributesToString(this.frameContext.get('_wd').body, null);
+			codeValue = '<!DOCTYPE html>\n<html>\n' + this.frameContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
 		} else {
 			codeValue = codeContent;
 		}

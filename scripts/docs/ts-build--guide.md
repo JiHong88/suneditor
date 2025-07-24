@@ -57,7 +57,7 @@ npm run ts-build
 
 7. **`gen-options-dts.cjs`**
 
-    - `core/section/options.js > DEFAULTS` 객체의 실제 값들을 기반으로 `options.d.ts` 내 `export namespace DEFAULTS` 타입 정의를 덮어씀
+    - `core/config/options.js > DEFAULTS` 객체의 실제 값들을 기반으로 `options.d.ts` 내 `export namespace DEFAULTS` 타입 정의를 덮어씀
     - 문자열, 배열, 객체 등의 값을 정확히 리터럴 타입으로 유지하여 자동으로 타입 갱신
 
 8. **`lint:fix-ts`**

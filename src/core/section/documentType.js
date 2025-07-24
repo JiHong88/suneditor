@@ -462,7 +462,7 @@ DocumentType.prototype = {
 				const scrollTop = i === 0 && !this.isAutoHeight ? 0 : c.offsetTop - this.page.offsetTop - c.offsetHeight + globalTop;
 				this._applyPageScroll(scrollTop, () => {
 					if (this.editor.toolbar._sticky) {
-						this.displayPage.scrollTo({ top: scrollTop - this.context.get('toolbar.main').offsetHeight, behavior: 'smooth' });
+						this.displayPage.scrollTo({ top: scrollTop - this.context.get('toolbar_main').offsetHeight, behavior: 'smooth' });
 					}
 				});
 

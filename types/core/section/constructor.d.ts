@@ -118,13 +118,13 @@ export function CreateToolBar(
 	}>;
 };
 export default Constructor;
-export type EditorFrameOptions = import('./options').EditorFrameOptions;
-export type EditorInitOptions = import('./options').EditorInitOptions;
+export type EditorFrameOptions = import('../config/options').EditorFrameOptions;
+export type EditorInitOptions = import('../config/options').EditorInitOptions;
 /**
- * @typedef {import('./options').EditorFrameOptions} EditorFrameOptions
+ * @typedef {import('../config/options').EditorFrameOptions} EditorFrameOptions
  */
 /**
- * @typedef {import('./options').EditorInitOptions} EditorInitOptions
+ * @typedef {import('../config/options').EditorInitOptions} EditorInitOptions
  */
 /**
  * @description Creates a new SunEditor instance with specified options.

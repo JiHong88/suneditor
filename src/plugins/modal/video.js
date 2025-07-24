@@ -425,7 +425,7 @@ class Video extends EditorInjector {
 		dom.utils.removeItem(container);
 		this.init();
 
-		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
+		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
 			this.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {

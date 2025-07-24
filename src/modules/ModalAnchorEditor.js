@@ -290,7 +290,7 @@ class ModalAnchorEditor extends EditorInjector {
 	 * @param {string} urlValue - The current URL input value.
 	 */
 	_createBookmarkList(urlValue) {
-		const headers = dom.query.getListChildren(this.editor.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id));
+		const headers = dom.query.getListChildren(this.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id));
 		if (headers.length === 0) return;
 
 		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');
@@ -595,7 +595,7 @@ function CreatetModalForm(editor, params, relList) {
 			<div class="se-modal-form">
 				<label>${lang.link_modal_url}</label>
 				<div class="se-modal-form-files">
-					<input data-focus class="se-input-form se-input-url" type="text" placeholder="${editor.options.get('protocol') || ''}" />
+					<input data-focus class="se-input-form se-input-url" type="text" placeholder="${editor.options.get('defaultUrlProtocol') || ''}" />
 					${
 						params.enableFileUpload
 							? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button _se_upload_button" aria-label="${lang.fileUpload}">

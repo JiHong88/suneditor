@@ -403,7 +403,7 @@ class Image_ extends EditorInjector {
 		dom.utils.removeItem(container);
 		this.init();
 
-		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
+		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
 			this.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {
@@ -1205,7 +1205,7 @@ class Image_ extends EditorInjector {
 			}
 		}
 
-		this.editor._iframeAutoHeight(this.editor.frameContext);
+		this.editor._iframeAutoHeight(this.frameContext);
 		this.history.push(false);
 
 		delete oImg.onload;

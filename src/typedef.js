@@ -115,15 +115,15 @@
 
 // --------------------------------------------------------- [Context] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Map<string, *>} __se__FrameOptions
+ * @typedef {Map<keyof import('./core/config/options').AllFrameOptions, *>} __se__FrameOptions
  */
 
 /**
- * @typedef {Map<string, *>} __se__FrameContext
+ * @typedef {import('./core/config/frameContext').FrameContextUtil} __se__FrameContext
  */
 
 /**
- * @typedef {Map<string, *>} __se__Context
+ * @typedef {Map<keyof import('./core/config/context').ContextUtil, *>} __se__Context
  */
 
 // --------------------------------------------------------- [core.class] ---------------------------------------------------------------------------------------------------

@@ -1,17 +1,18 @@
 import _icons from '../../assets/icons/defaultIcons';
 import _defaultLang from '../../langs/en';
-import { CreateContext, CreateFrameContext } from './context';
+import { CreateContext } from '../config/context';
+import { CreateFrameContext } from '../config/frameContext';
 import { dom, numbers, converter, env } from '../../helper';
-import { DEFAULTS } from './options';
+import { DEFAULTS } from '../config/options';
 
 const _d = env._d;
 
 /**
- * @typedef {import('./options').EditorFrameOptions} EditorFrameOptions
+ * @typedef {import('../config/options').EditorFrameOptions} EditorFrameOptions
  */
 
 /**
- * @typedef {import('./options').EditorInitOptions} EditorInitOptions
+ * @typedef {import('../config/options').EditorInitOptions} EditorInitOptions
  */
 
 /**
@@ -108,7 +109,7 @@ function Constructor(editorTargets, options) {
 		subbar.style.visibility = 'hidden';
 		// subbar mode must be balloon-*
 		subbar.className += ' se-toolbar-balloon se-toolbar-sub';
-		subbar.style.width = o.get('toolbar.sub_width');
+		subbar.style.width = o.get('toolbar_sub_width');
 		subbar.appendChild(dom.utils.createElement('DIV', { class: 'se-arrow' }));
 	}
 
@@ -577,7 +578,7 @@ export function InitOptions(options, editorTargets, plugins) {
 			console.warn('[SUNEDITOR.create.subToolbar.fail] When the "mode" option is "balloon-*", the "subToolbar" option is omitted.');
 		} else {
 			o.set('_subMode', subbar.mode || 'balloon');
-			o.set('toolbar.sub_width', subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto');
+			o.set('toolbar_sub_width', subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto');
 			subButtons = o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList;
 			o.set('buttons_sub', new Set(subButtons.toString().split(',')));
 		}

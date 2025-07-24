@@ -271,7 +271,7 @@ class Audio_ extends EditorInjector {
 		this.init();
 		this.controller.close();
 
-		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
+		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
 			this.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {

@@ -643,7 +643,7 @@ export function getScrollParents(element) {
 
 /**
  * @description Get the argument iframe's document object if use the "iframe" or "fullPage" options
- * @param {HTMLIFrameElement} iframe Iframe element (this.editor.frameContext.get('wysiwygFrame'))
+ * @param {HTMLIFrameElement} iframe Iframe element (this.frameContext.get('wysiwygFrame'))
  * @returns {Document}
  */
 export function getIframeDocument(iframe) {

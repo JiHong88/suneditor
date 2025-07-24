@@ -28,6 +28,10 @@ declare class EditorInjector {
 	plugins: import('./_core').default['plugins'];
 	/** @type {import('./_core').default['status']} */
 	status: import('./_core').default['status'];
+	/** @type {import('./_core').default['frameContext']}  */
+	frameContext: import('./_core').default['frameContext'];
+	/**  @type {import('./_core').default['frameOptions']} */
+	frameOptions: import('./_core').default['frameOptions'];
 	/** @type {import('./_core').default['context']} */
 	context: import('./_core').default['context'];
 	/** @type {import('./_core').default['options']} */

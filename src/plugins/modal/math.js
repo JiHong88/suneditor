@@ -54,7 +54,7 @@ class Math_ extends EditorInjector {
 		this.mathjax = null;
 
 		// exception
-		if (!(this.katex = this.#CheckKatex(editor.options.get('externalLibs').katex)) && !(this.mathjax = this.#CheckMathJax(editor.options.get('externalLibs').mathjax, editor))) {
+		if (!(this.katex = this.#CheckKatex(editor)) && !(this.mathjax = this.#CheckMathJax(editor))) {
 			console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need either "KaTeX" or "MathJax" library. Please add the katex or mathjax option.');
 		}
 
@@ -404,10 +404,11 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @param {*} katex - The KaTeX instance.
+	 * @param {__se__EditorCore} editor - The root editor instance.
 	 * @returns {*} - The KaTeX instance or null if the instance is invalid.
 	 */
-	#CheckKatex(katex) {
+	#CheckKatex(editor) {
+		const katex = editor.options.get('externalLibs').katex;
 		if (!katex) return null;
 		if (!katex.src) {
 			console.warn('[SUNEDITOR.math.katex.fail] The katex option is set incorrectly.');
@@ -431,11 +432,11 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @param {*} mathjax - The MathJax instance.
 	 * @param {__se__EditorCore} editor - The root editor instance.
 	 * @returns {*}
 	 */
-	#CheckMathJax(mathjax, editor) {
+	#CheckMathJax(editor) {
+		const mathjax = editor.options.get('externalLibs').mathjax;
 		if (!mathjax) return null;
 		if (editor.frameOptions.get('iframe')) {
 			console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is not supported in the iframe.');

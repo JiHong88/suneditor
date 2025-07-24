@@ -165,7 +165,7 @@ const bl = [
 			'|',
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll', 'save'],
 			[':Paragraph-default.more_paragraph', 'outdent', 'indent', '|', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
-			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
+			[':Text-default.more_text', 'bold', 'bold', 'bold', 'bold', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
 			[':Insert-default.more_plus', 'table', 'hr', 'link', 'anchor', 'math'],
 			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted'],
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'embed'],
@@ -642,144 +642,139 @@ const options1 = {
 	},
 	// autoLinkify: false,
 	// autoStyleify: [],
-	// componentAutoSelect: true,
+	componentAutoSelect: true,
 	// strictMode: false,
 	// freeCodeViewMode: true,
-	value: `<div class="wrap_800 article_type_1"><br />
-			<div class="section section_01">
-				<div class="detail_cont_box">
-					<h3 class="first_h3">
-						<img class="emoji like_pin" alt="📍" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f4cd.svg" />
-						
-						"상큼한 레몬수로 건강하고 활기찬 일상 시작하기!"
-					</h3>
-					<div class="img_box">
-						<img src="https://i.imgur.com/hfHHulc.png" alt="레몬수" title="컵에 담긴 레몬수 사진" />
-						
-					</div>
-					<div class="text_box">
-						<span>
-							레몬수가 요즘 핫한 웰빙 트렌드로 자리 잡고 있습니다.
-							새콤달콤한 레몬으로 만든 시원한 음료 한 잔이 더위를 날려줄 뿐만 아니라, 건강까지 챙길 수 있다면?<br />
-							오늘은 레몬수의 놀라운 효능과 함께, 레몬을 다양하게 활용할 수 있는 레몬큐브 만드는 법을 소개합니다.<br />
-							또한, 모든 과정에서 최고의 성능을 자랑하는 테팔 블렌드포스 믹서기의 활용법까지! 건강과 맛을 모두 잡는 방법, 지금부터
-							만나보세요.
-						</span>
-					</div>
-				
-				</div>
-				<hr />
-				<div class="detail_cont_box">
-					<h3>이 아티클은 이런 분들에게 유용합니다!</h3>
-					<div class="text_box">
-						<span class="contain_img"><img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" /> 새로운 주방용품 구입을 고민하는 분들</span>
-						<span class="contain_img"><img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" /> 품질 좋은 주방용품을 오랫동안 사용하고 싶은 분들</span>
-						<span class="contain_img"><img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" /> 환경보호를 생각하며 지속 가능한 소비를 추구하는 분들</span>
-						
-					</div>
-				
-				</div>
-				<hr />
-				<div class="detail_cont_box">
-					<h3>레몬수를 왜 먹을까요? 효능에 대한 모든 것!</h3>
-					<div class="text_box">
-						<span>레몬수는 단순히 상큼한 맛을 즐기기 위한 음료가 아닙니다.</span>
-						<span>하루 한 잔의 레몬수는 피부부터 신장까지 관리할 수 있는 '마법의 음료'라 불리는 이유가 따로 있죠.</span>
-						<span>그 안에 숨겨진 놀라운 건강 효능을 살펴보겠습니다. 레몬수를 마시면 어떤 효과를 기대할 수 있을까요?</span>
-					</div>
-				
-				</div>
-			</div>
-			<div class="section section_02">
-				<div class="img_box">
-					<img src="https://i.imgur.com/Z4gQNYt.png" alt="레몬수" title="컵에 레몬수를 따르는 사진" />
-					
-				</div>
-				<div class="text_box">
-					<span class="mini_title">1. 비타민 C 폭탄! 피부와 면역력을 동시에</span>
-					<span>레몬수 한 잔에 담긴 비타민 C는 피로 해소는 물론, 피부를 더욱 맑고 투명하게 가꿔줍니다.</span>
-					<span>하루 한 잔의 레몬수가 우리 몸의 항산화 작용을 촉진하고, 스트레스와 노화를 예방해 줍니다.</span>
-					<span>일상의 활력을 채워주는 비타민 C 폭탄을 경험해 보세요.</span>
-				</div>
-				<div class="text_box">
-					<span class="mini_title">2. 다이어트의 비밀, 체중 감소와 소화 개선</span>
-					<span>다이어트를 하고 있다면 레몬수를 절대 놓치지 마세요!</span>
-					<span>레몬수는 소화를 돕고 장운동을 촉진해 복부 팽만감을 해소해 줍니다.</span>
-					<span>또한, 칼륨이 나트륨을 조절해 부기를 완화해 주므로, 규칙적인 섭취로 체중 감소의 효과까지 기대할 수 있습니다..</span>
-				</div>
-				<div class="text_box">
-					<span class="mini_title">3. 심혈관 건강을 지키는 든든한 수호자</span>
-					<span>레몬에는 혈관을 강화해 주는 펙틴과 몸속 노폐물을 제거하는 구연산이 풍부합니다.</span>
-					<span>이러한 성분들은 혈압을 낮추고 심혈관 질환을 예방하는 데 탁월한 효과가 있어,</span>
-					<span>레몬수를 매일 마시는 것만으로도 심장 건강을 챙길 수 있습니다.</span>
-				</div>
-				<div class="text_box">
-					<span class="mini_title">4. 신장 결석 예방, 상큼한 디톡스 효과</span>
-					<span>신장 결석을 예방하고 싶은 분들에게도 레몬수는 훌륭한 해결책입니다.</span>
-					<span>레몬에 함유된 구연산이 체액을 증가시켜 소변을 중화하고, 요로에 노폐물이 쌓이지 않도록 도와줍니다.</span>
-					<span>간단하게 레몬수로 디톡스 하세요!</span>
-				</div>
-			</div>
-			<div class="section section_03">
-				<div class="img_box">
-					<img src="https://i.imgur.com/GKQEJZP.png" alt="대용량 레몬즙, 레몬즙 스틱, 직접 레몬즙 착즙하기" />
-					
-				</div>
-				<hr />
-				<div class="text_box">
-					<h3>레몬수는 어떻게 음용할 수 있을까요? 간편하게 즐기는 레몬수 섭취 방법!</h3>
-					<div class="h3_des">
-						<span>레몬수는 상쾌한 맛과 함께 건강 효과를 제공하는 훌륭한 음료이지만, 매일 꾸준히 마시는 게 생각보다 어려울 수 있죠.</span>
-						<span>그렇다면 여러분의 라이프스타일에 맞는 섭취 방법을 찾아보세요!</span>
-						<span>오늘은 레몬수를 즐길 수 있는 세 가지 간편한 음용 방식을 소개해 드리겠습니다.</span>
-						<span>어떤 방법이 여러분에게 가장 잘 맞을까요?</span>
-					</div>
-				</div>
-				<div class="text_box">
-					<span class="mini_title">1. 레몬즙 스틱: 언제 어디서나 간편하게!</span>
-					<span>레몬즙 스틱은 바쁜 일상에서도 쉽게 레몬수를 섭취할 수 있는 최고의 방법입니다. 출근길이나 여행 중에도 물만 있으면 상쾌한 레몬수를 빠르게 만들 수 있어 휴대가 간편하고 위생적이죠. 언제 어디서나 빠르고 간편하게 레몬수를 즐길 수 있습니다.</span>
-				</div>
-				<div class="text_box">
-					<span class="mini_title">2. 대용량 레몬즙 통: 자유로운 양 조절과 경제성!</span>
-					<span>레몬수를 자주 마시거나 요리에도 활용하고 싶다면 대용량 레몬즙이 좋은 선택입니다. 자유롭게 양을 조절할 수 있어 다용도로 활용할 수 있으며, 경제적인 면에서도 유리합니다. 보관 시 신선도를 유지하기에 어려움이 있지만, 꾸준히 섭취하고자 하신다면 효율적인 선택입니다.</span>
-				</div>
-				<div class="text_box">
-					<span class="mini_title">3. 직접 레몬즙 착즙하기: 신선함은 그대로!</span>
-					<span>가장 신선하고 건강한 방법을 찾고 있다면, 직접 레몬을 착즙해 섭취하는 것이 답입니다. 방부제나 첨가물 없이 레몬 본연의 영양을 그대로 섭취할 수 있죠. 시간과 노력이 들어가지만, 최고의 신선함을 원한다면 직접 착즙이 가장 좋은 방법입니다.</span>
-				</div>
-			</div>
-			<div class="section section_04">
-				<div class="img_box">
-					<img src="https://i.imgur.com/IU0cWFV.png" alt="테팔 블렌드포스 믹서기" />
-					
-				</div>
-				<hr />
-				<div class="detail_cont_box">
-					<h3>테팔 블렌드포스 믹서기로 일상을 더 편리하게 만드는 이유!”</h3>
-					<div class="text_box">
-						<span class="mini_title contain_img"><img class="emoji_rhombus" alt="🔸" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f538.svg" /> 강력한 성능과 간편한 사용성</span>
-						<span>테팔 블렌드포스 믹서기는 강력한 22000RPM 모터와 파워엘릭스 기술로 단단한 재료도 손쉽게 분쇄합니다.
-							편리하게 분리할 수 있는 칼날 덕분에 세척이 간편하며, 1.75L 대용량 내열 유리 용기로 많은 양을 한 번에 블렌딩할 수 있어
-							요리에 더욱 유용합니다.
-						</span>
-					</div>
-					<div class="text_box">
-						<span class="mini_title contain_img"><img class="emoji_rhombus" alt="🔸" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f538.svg" /> 이중 잠금으로 안전하게</span>
-						<span>스마트 잠금 방식으로 안전하게 사용할 수 있어, 언제나 안심하고 요리할 수 있습니다. 안전을 고려한 설계로, 블렌딩이 더욱 즐거워집니다.</span>
-						
-					</div>
-				
-				</div>				
-				<hr />
-				<div class="text_box">
-					<h3>레몬수와 레몬큐브로 매일 상쾌하고 건강하게 살아가는 법!</h3>
-					<span>레몬수와 레몬큐브는 단순한 음료를 넘어, 상큼함과 건강을 동시에 잡을 수 있는 최고의 아이템입니다.</span>
-					<span>특히 테팔 블렌드포스 믹서기를 사용하면 간편하게 레몬큐브를 만들어 매일매일 신선한 맛과 영양을 즐길 수 있습니다.</span>
-					<span>이제부터는 매일 아침 상큼한 레몬수로 건강을 챙기고, 레몬큐브로 다양한 요리에 생기를 불어넣어 보세요.</span>
-					<span>이 작은 변화가 당신의 하루를 얼마나 상쾌하고 특별하게 만들지 기대해 보세요!</span>
-				</div>
-			</div>
-		</div>`,
+	value: `
+	<div class="se-component se-image-container __se__float-none">
+  <figure class="" style="">
+    <img class="emoji like_pin" alt="📍" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f4cd.svg" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="1f4cd.svg" data-se-file-size="0" data-se-index="0" style="">
+  </figure>
+</div>
+
+<h3 class="first_h3">												&quot;상큼한 레몬수로 건강하</h3>
+
+<div class="se-component se-video-container __se__float-none">
+  <figure class="" style="width: 100%; height: 56.25%; padding-bottom: 56.25%;">
+    <iframe frameborder="0" allowfullscreen="" src="https://www.youtube.com/embed/eb6b4d0Jo_g" width="100%" height="56.25%" data-se-size="100%,56.25%" data-se-file-name="eb6b4d0Jo_g" data-se-file-size="0" data-se-index="0" style="width: 100%; height: 100%;"></iframe>
+  </figure>
+</div>
+
+<div class="se-component se-embed-container __se__float-none">
+  <figure style="" class="">
+    <div class="twitter-tweet twitter-tweet-rendered" style="display: flex; width: 100%; margin-top: 10px; margin-bottom: 10px;"><iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" class="" style="position: static; visibility: visible; width: 322px; height: 708px; display: block; flex-grow: 1;" title="X Post" src="https://platform.twitter.com/embed/Tweet.html?dnt=false&amp;embedId=twitter-widget-0&amp;features=eyJ0ZndfdGltZWxpbmVfbGlzdCI6eyJidWNrZXQiOltdLCJ2ZXJzaW9uIjpudWxsfSwidGZ3X2ZvbGxvd2VyX2NvdW50X3N1bnNldCI6eyJidWNrZXQiOnRydWUsInZlcnNpb24iOm51bGx9LCJ0ZndfdHdlZXRfZWRpdF9iYWNrZW5kIjp7ImJ1Y2tldCI6Im9uIiwidmVyc2lvbiI6bnVsbH0sInRmd19yZWZzcmNfc2Vzc2lvbiI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9LCJ0ZndfZm9zbnJfc29mdF9pbnRlcnZlbnRpb25zX2VuYWJsZWQiOnsiYnVja2V0Ijoib24iLCJ2ZXJzaW9uIjpudWxsfSwidGZ3X21peGVkX21lZGlhXzE1ODk3Ijp7ImJ1Y2tldCI6InRyZWF0bWVudCIsInZlcnNpb24iOm51bGx9LCJ0ZndfZXhwZXJpbWVudHNfY29va2llX2V4cGlyYXRpb24iOnsiYnVja2V0IjoxMjA5NjAwLCJ2ZXJzaW9uIjpudWxsfSwidGZ3X3Nob3dfYmlyZHdhdGNoX3Bpdm90c19lbmFibGVkIjp7ImJ1Y2tldCI6Im9uIiwidmVyc2lvbiI6bnVsbH0sInRmd19kdXBsaWNhdGVfc2NyaWJlc190b19zZXR0aW5ncyI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9LCJ0ZndfdXNlX3Byb2ZpbGVfaW1hZ2Vfc2hhcGVfZW5hYmxlZCI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9LCJ0ZndfdmlkZW9faGxzX2R5bmFtaWNfbWFuaWZlc3RzXzE1MDgyIjp7ImJ1Y2tldCI6InRydWVfYml0cmF0ZSIsInZlcnNpb24iOm51bGx9LCJ0ZndfbGVnYWN5X3RpbWVsaW5lX3N1bnNldCI6eyJidWNrZXQiOnRydWUsInZlcnNpb24iOm51bGx9LCJ0ZndfdHdlZXRfZWRpdF9mcm9udGVuZCI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9fQ%3D%3D&amp;frame=false&amp;hideCard=false&amp;hideThread=false&amp;id=1945744030064935105&amp;lang=en&amp;origin=http%3A%2F%2Flocalhost%3A8088%2F&amp;sessionId=1695bd6044821f03842dcef35667609cc4be2694&amp;theme=light&amp;widgetsVersion=2615f7e52b7e0%3A1702314776716&amp;width=auto" data-tweet-id="1945744030064935105" data-se-index="1" data-se-file-name="Tweet.html?dnt=false&amp;embedId=twitter-widget-0&amp;features=eyJ0ZndfdGltZWxpbmVfbGlzdCI6eyJidWNrZXQiOltdLCJ2ZXJzaW9uIjpudWxsfSwidGZ3X2ZvbGxvd2VyX2NvdW50X3N1bnNldCI6eyJidWNrZXQiOnRydWUsInZlcnNpb24iOm51bGx9LCJ0ZndfdHdlZXRfZWRpdF9iYWNrZW5kIjp7ImJ1Y2tldCI6Im9uIiwidmVyc2lvbiI6bnVsbH0sInRmd19yZWZzcmNfc2Vzc2lvbiI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9LCJ0ZndfZm9zbnJfc29mdF9pbnRlcnZlbnRpb25zX2VuYWJsZWQiOnsiYnVja2V0Ijoib24iLCJ2ZXJzaW9uIjpudWxsfSwidGZ3X21peGVkX21lZGlhXzE1ODk3Ijp7ImJ1Y2tldCI6InRyZWF0bWVudCIsInZlcnNpb24iOm51bGx9LCJ0ZndfZXhwZXJpbWVudHNfY29va2llX2V4cGlyYXRpb24iOnsiYnVja2V0IjoxMjA5NjAwLCJ2ZXJzaW9uIjpudWxsfSwidGZ3X3Nob3dfYmlyZHdhdGNoX3Bpdm90c19lbmFibGVkIjp7ImJ1Y2tldCI6Im9uIiwidmVyc2lvbiI6bnVsbH0sInRmd19kdXBsaWNhdGVfc2NyaWJlc190b19zZXR0aW5ncyI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9LCJ0ZndfdXNlX3Byb2ZpbGVfaW1hZ2Vfc2hhcGVfZW5hYmxlZCI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9LCJ0ZndfdmlkZW9faGxzX2R5bmFtaWNfbWFuaWZlc3RzXzE1MDgyIjp7ImJ1Y2tldCI6InRydWVfYml0cmF0ZSIsInZlcnNpb24iOm51bGx9LCJ0ZndfbGVnYWN5X3RpbWVsaW5lX3N1bnNldCI6eyJidWNrZXQiOnRydWUsInZlcnNpb24iOm51bGx9LCJ0ZndfdHdlZXRfZWRpdF9mcm9udGVuZCI6eyJidWNrZXQiOiJvbiIsInZlcnNpb24iOm51bGx9fQ%3D%3D&amp;frame=false&amp;hideCard=false&amp;hideThread=false&amp;id=1945744030064935105&amp;lang=en&amp;origin=http%3A%2F%2Flocalhost%3A8088%2F&amp;sessionId=1695bd6044821f03842dcef35667609cc4be2694&amp;theme=light&amp;widgetsVersion=2615f7e52b7e0%3A1702314776716&amp;width=auto" data-se-file-size="0"></iframe>
+    </div>
+  </figure>
+</div>
+
+<p><br>
+</p>
+
+<h3 class="first_h3">고 활기찬 일상 시작하기!&quot;					</h3>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure class="" style="">
+    <img src="https://i.imgur.com/hfHHulc.png" alt="레몬수" title="컵에 담긴 레몬수 사진" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="hfHHulc.png" data-se-file-size="0" data-se-index="1" style="">
+  </figure>
+</div>
+
+<div class="text_box">							레몬수가 요즘 핫한 웰빙 트렌드로 자리 잡고 있습니다.							새콤달콤한 레몬으로 만든 시원한 음료 한 잔이 더위를 날려줄 뿐만 아니라, 건강까지 챙길 수 있다면?<br>
+							오늘은 레몬수의 놀라운 효능과 함께, 레몬을 다양하게 활용할 수 있는 레몬큐브 만드는 법을 소개합니다.<br>
+							또한, 모든 과정에서 최고의 성능을 자랑하는 테팔 블렌드포스 믹서기의 활용법까지! 건강과 맛을 모두 잡는 방법, 지금부터							만나보세요.						</div>
+
+<h3>이 아티클은 이런 분들에게 유용합니다!</h3>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure style="">
+    <img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="2705.svg" data-se-file-size="0" data-se-index="2" style="">
+  </figure>
+</div>
+
+<div class="text_box"><span class="contain_img"> 새로운 주방용품 구입을 고민하는 분들</span></div>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure style="">
+    <img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="2705.svg" data-se-file-size="0" data-se-index="3" style="">
+  </figure>
+</div>
+
+<div class="text_box"><span class="contain_img"> 품질 좋은 주방용품을 오랫동안 사용하고 싶은 분들</span></div>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure style="">
+    <img class="emoji_chk" alt="✅" src="https://s.w.org/images/core/emoji/15.0.3/svg/2705.svg" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="2705.svg" data-se-file-size="0" data-se-index="4" style="">
+  </figure>
+</div>
+
+<div class="text_box"><span class="contain_img"> 환경보호를 생각하며 지속 가능한 소비를 추구하는 분들</span></div>
+
+<h3>레몬수를 왜 먹을까요? 효능에 대한 모든 것!</h3>
+
+<div class="text_box">레몬수는 단순히 상큼한 맛을 즐기기 위한 음료가 아닙니다.하루 한 잔의 레몬수는 피부부터 신장까지 관리할 수 있는 &apos;마법의 음료&apos;라 불리는 이유가 따로 있죠.그 안에 숨겨진 놀라운 건강 효능을 살펴보겠습니다. 레몬수를 마시면 어떤 효과를 기대할 수 있을까요?</div>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure style="">
+    <img id="a" src="https://i.imgur.com/Z4gQNYt.png" alt="레몬수" title="컵에 레몬수를 따르는 사진" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Z4gQNYt.png" data-se-file-size="0" data-se-index="5" style="">
+  </figure>
+</div>
+
+<div class="text_box"><span class="mini_title">1. 비타민 C 폭탄! 피부와 면역력을 동시에</span>레몬수 한 잔에 담긴 비타민 C는 피로 해소는 물론, 피부를 더욱 맑고 투명하게 가꿔줍니다.하루 한 잔의 레몬수가 우리 몸의 항산화 작용을 촉진하고, 스트레스와 노화를 예방해 줍니다.일상의 활력을 채워주는 비타민 C 폭탄을 경험해 보세요.</div>
+
+<div class="text_box"><span class="mini_title">2. 다이어트의 비밀, 체중 감소와 소화 개선</span>다이어트를 하고 있다면 레몬수를 절대 놓치지 마세요!레몬수는 소화를 돕고 장운동을 촉진해 복부 팽만감을 해소해 줍니다.또한, 칼륨이 나트륨을 조절해 부기를 완화해 주므로, 규칙적인 섭취로 체중 감소의 효과까지 기대할 수 있습니다..</div>
+
+<div class="text_box"><span class="mini_title">3. 심혈관 건강을 지키는 든든한 수호자</span>레몬에는 혈관을 강화해 주는 펙틴과 몸속 노폐물을 제거하는 구연산이 풍부합니다.이러한 성분들은 혈압을 낮추고 심혈관 질환을 예방하는 데 탁월한 효과가 있어,레몬수를 매일 마시는 것만으로도 심장 건강을 챙길 수 있습니다.</div>
+
+<div class="text_box"><span class="mini_title">4. 신장 결석 예방, 상큼한 디톡스 효과</span>신장 결석을 예방하고 싶은 분들에게도 레몬수는 훌륭한 해결책입니다.레몬에 함유된 구연산이 체액을 증가시켜 소변을 중화하고, 요로에 노폐물이 쌓이지 않도록 도와줍니다.간단하게 레몬수로 디톡스 하세요!</div>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure style="">
+    <img src="https://i.imgur.com/GKQEJZP.png" alt="대용량 레몬즙, 레몬즙 스틱, 직접 레몬즙 착즙하기" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="GKQEJZP.png" data-se-file-size="0" data-se-index="6" style="">
+  </figure>
+</div>
+
+<h3>레몬수는 어떻게 음용할 수 있을까요? 간편하게 즐기는 레몬수 섭취 방법!</h3>
+
+<div class="h3_des">레몬수는 상쾌한 맛과 함께 건강 효과를 제공하는 훌륭한 음료이지만, 매일 꾸준히 마시는 게 생각보다 어려울 수 있죠.그렇다면 여러분의 라이프스타일에 맞는 섭취 방법을 찾아보세요!오늘은 레몬수를 즐길 수 있는 세 가지 간편한 음용 방식을 소개해 드리겠습니다.어떤 방법이 여러분에게 가장 잘 맞을까요?</div>
+
+<div class="text_box"><span class="mini_title">1. 레몬즙 스틱: 언제 어디서나 간편하게!</span>레몬즙 스틱은 바쁜 일상에서도 쉽게 레몬수를 섭취할 수 있는 최고의 방법입니다. 출근길이나 여행 중에도 물만 있으면 상쾌한 레몬수를 빠르게 만들 수 있어 휴대가 간편하고 위생적이죠. 언제 어디서나 빠르고 간편하게 레몬수를 즐길 수 있습니다.</div>
+
+<div class="text_box"><span class="mini_title">2. 대용량 레몬즙 통: 자유로운 양 조절과 경제성!</span>레몬수를 자주 마시거나 요리에도 활용하고 싶다면 대용량 레몬즙이 좋은 선택입니다. 자유롭게 양을 조절할 수 있어 다용도로 활용할 수 있으며, 경제적인 면에서도 유리합니다. 보관 시 신선도를 유지하기에 어려움이 있지만, 꾸준히 섭취하고자 하신다면 효율적인 선택입니다.</div>
+
+<div class="text_box"><span class="mini_title">3. 직접 레몬즙 착즙하기: 신선함은 그대로!</span>가장 신선하고 건강한 방법을 찾고 있다면, 직접 레몬을 착즙해 섭취하는 것이 답입니다. 방부제나 첨가물 없이 레몬 본연의 영양을 그대로 섭취할 수 있죠. 시간과 노력이 들어가지만, 최고의 신선함을 원한다면 직접 착즙이 가장 좋은 방법입니다.</div>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure style="">
+    <img src="https://i.imgur.com/IU0cWFV.png" alt="테팔 블렌드포스 믹서기" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="IU0cWFV.png" data-se-file-size="0" data-se-index="7" style="">
+  </figure>
+</div>
+
+<h3>테팔 블렌드포스 믹서기로 일상을 더 편리하게 만드는 이유!”</h3>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure style="">
+    <img class="emoji_rhombus" alt="🔸" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f538.svg" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="1f538.svg" data-se-file-size="0" data-se-index="8" style="">
+  </figure>
+</div>
+
+<div class="text_box"><span class="mini_title contain_img"> 강력한 성능과 간편한 사용성</span></div>
+
+<div class="text_box">테팔 블렌드포스 믹서기는 강력한 22000RPM 모터와 파워엘릭스 기술로 단단한 재료도 손쉽게 분쇄합니다.							편리하게 분리할 수 있는 칼날 덕분에 세척이 간편하며, 1.75L 대용량 내열 유리 용기로 많은 양을 한 번에 블렌딩할 수 있어							요리에 더욱 유용합니다.						</div>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure style="">
+    <img class="emoji_rhombus" alt="🔸" src="https://s.w.org/images/core/emoji/15.0.3/svg/1f538.svg" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="1f538.svg" data-se-file-size="0" data-se-index="9" style="">
+  </figure>
+</div>
+
+<div class="text_box"><span class="mini_title contain_img"> 이중 잠금으로 안전하게</span></div>
+
+<div class="text_box">스마트 잠금 방식으로 안전하게 사용할 수 있어, 언제나 안심하고 요리할 수 있습니다. 안전을 고려한 설계로, 블렌딩이 더욱 즐거워집니다.</div>
+
+<h3>레몬수와 레몬큐브로 매일 상쾌하고 건강하게 살아가는 법!</h3>
+
+<div class="text_box">레몬수와 레몬큐브는 단순한 음료를 넘어, 상큼함과 건강을 동시에 잡을 수 있는 최고의 아이템입니다.특히 테팔 블렌드포스 믹서기를 사용하면 간편하게 레몬큐브를 만들어 매일매일 신선한 맛과 영양을 즐길 수 있습니다.이제부터는 매일 아침 상큼한 레몬수로 건강을 챙기고, 레몬큐브로 다양한 요리에 생기를 불어넣어 보세요.이 작은 변화가 당신의 하루를 얼마나 상쾌하고 특별하게 만들지 기대해 보세요!</div>
+
+	`,
 	// theme: 'dark',
 	// toolbar_container: document.getElementById('ttt'),
 	// iframe: true,
@@ -794,12 +789,14 @@ const options1 = {
 	},
 	video: {
 		uploadUrl: 'http://localhost:3000/editor/upload',
-		createFileInput: true
+		createFileInput: true,
+		controls: [['resize_auto,75,50', 'align', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v', 'edit', 'revert', 'copy', 'remove']]
 	},
 	videoGallery: {
 		url: 'http://localhost:3000/editor/gallery/video'
 	},
-	embed: {},
+	embed: {controls: [['resize_auto,75,50', 'align', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v', 'edit', 'revert', 'copy', 'remove']]},
+	attributeWhitelist: { '*': 'id' },
 	imageGallery: {
 		// data: [
 		// 	{
@@ -829,7 +826,8 @@ const options1 = {
 		linkEnableFileUpload: true,
 		allowMultiple: true,
 		useFormatType: true,
-		defaultFormatType: 'block'
+		defaultFormatType: 'block',
+		// percentageOnlySize: true
 	},
 	audio: {
 		uploadUrl: 'http://localhost:3000/editor/upload',

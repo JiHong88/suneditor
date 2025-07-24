@@ -15,10 +15,10 @@ declare class DocumentType {
 	 */
 	constructor(editor: __se__EditorCore, fc: __se__FrameContext);
 	editor: import('../editor').default;
-	context: __se__Context;
+	context: import('../config/context').ContextUtil;
 	selection: import('../class/selection').default;
 	offset: import('../class/offset').default;
-	fc: __se__FrameContext;
+	fc: import('../config/frameContext').FrameContextUtil;
 	ww: any;
 	wwFrame: any;
 	wwWidth: number;

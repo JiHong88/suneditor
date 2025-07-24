@@ -53,12 +53,22 @@ export default function CoreInjector(editor) {
 	 */
 	this.status = editor.status;
 	/**
-	 * @description The editor's context map.
+	 * @description The editor's [frame] context utility object.
+	 * @type {__se__EditorCore['frameContext']}
+	 */
+	this.frameContext = editor.frameContext;
+	/**
+	 * @description The editor's [frame] options utility object.
+	 * @type {__se__EditorCore['frameOptions']}
+	 */
+	this.frameOptions = editor.frameOptions;
+	/**
+	 * @description The editor's context utility object.
 	 * @type {__se__EditorCore['context']}
 	 */
 	this.context = editor.context;
 	/**
-	 * @description The editor's options map.
+	 * @description The editor's options utility object.
 	 * @type {__se__EditorCore['options']}
 	 */
 	this.options = editor.options;

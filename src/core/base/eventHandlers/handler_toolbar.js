@@ -15,7 +15,7 @@ export function ButtonsHandler(e) {
 	const eventTarget = dom.query.getEventTarget(e);
 	let target = eventTarget;
 
-	if (this.editor.isSubBalloon && !this.context.get('toolbar.sub.main')?.contains(target)) {
+	if (this.editor.isSubBalloon && !this.context.get('toolbar_sub_main')?.contains(target)) {
 		this._hideToolbar_sub();
 	}
 
@@ -23,7 +23,7 @@ export function ButtonsHandler(e) {
 
 	if (isInput) {
 		this.editor._preventBlur = false;
-	} else if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
+	} else if (!this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 		this.editor.focus();
 	}
 
@@ -82,7 +82,7 @@ export function ButtonsHandler(e) {
 
 			this.__removeInput();
 			return;
-		} else if (!this.editor.frameContext.get('isCodeView')) {
+		} else if (!this.frameContext.get('isCodeView')) {
 			if (isMobile) {
 				this.editor._preventBlur = true;
 			} else {

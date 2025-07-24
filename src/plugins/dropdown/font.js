@@ -51,7 +51,7 @@ class Font extends EditorInjector {
 
 		let fontFamily = '';
 		if (!element) {
-			const font = this.status.hasFocus ? this.editor.frameContext.get('wwComputedStyle').fontFamily : this.lang.font;
+			const font = this.status.hasFocus ? this.frameContext.get('wwComputedStyle').fontFamily : this.lang.font;
 			dom.utils.changeTxt(targetText, font);
 			dom.utils.changeTxt(tooltip, this.status.hasFocus ? this.lang.font + (font ? ' (' + font + ')' : '') : font);
 		} else if (this.format.isLine(element)) {

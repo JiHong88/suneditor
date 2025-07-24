@@ -151,20 +151,19 @@ export function spanToStyleNode(
  */
 export function addUrlQuery(url: string, query: string): string;
 /**
+ * @typedef {Object} OptionStyleResult
+ * @property {string} top - Styles applied to the top container (e.g. width, z-index, etc).
+ * @property {string} frame - Styles applied to the iframe container (e.g. height, min-height).
+ * @property {string} editor - Styles applied to the editable content area.
+ */
+/**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Map<string, *>} fo editor.frameOptions
  * @param {string} cssText Style string
- * @returns {{top: string, frame: string, editor: string}}
+ * @returns {OptionStyleResult}
  * @private
  */
-export function _setDefaultOptionStyle(
-	fo: Map<string, any>,
-	cssText: string
-): {
-	top: string;
-	frame: string;
-	editor: string;
-};
+export function _setDefaultOptionStyle(fo: Map<string, any>, cssText: string): OptionStyleResult;
 /**
  * @description Set default style tag of the iframe
  * @param {Array<string>} linkNames link names array of CSS files
@@ -178,6 +177,20 @@ export function _setIframeStyleLinks(linkNames: Array<string>): string;
  */
 export function _setAutoHeightStyle(frameHeight: string): string;
 export default converter;
+export type OptionStyleResult = {
+	/**
+	 * - Styles applied to the top container (e.g. width, z-index, etc).
+	 */
+	top: string;
+	/**
+	 * - Styles applied to the iframe container (e.g. height, min-height).
+	 */
+	frame: string;
+	/**
+	 * - Styles applied to the editable content area.
+	 */
+	editor: string;
+};
 declare namespace converter {
 	export { htmlToJson };
 	export { jsonToHtml };

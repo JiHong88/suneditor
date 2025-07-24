@@ -1,41 +1,39 @@
+/** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
 /**
  * ================================================================================================================================
- * === Create options utility
+ * === UTILITIES : Manage Option Map
  * =================================================================================================================================
  */
 /**
- * @typedef {EditorBaseOptions & PrivateBaseOptions & InternalBaseOptions} AllBaseOptions
- */
-/**
- * @typedef {Object} CreateBaseOptions
- * @property {(k: keyof AllBaseOptions) => *} get - Retrieves the value of a specific option.
- * @property {(k: keyof AllBaseOptions, v: *) => void} set - Sets the value of a specific option.
- * @property {(k: keyof AllBaseOptions) => boolean} has - Checks if a specific option exists.
- * @property {() => Object<keyof AllBaseOptions, *>} getAll - Retrieves all options as an object.
- * @property {(options: Object<keyof AllBaseOptions, *>) => void} setMany - Sets multiple options at once.
+ * @typedef {Object} FrameOptionsUtil
+ * @property {(k: keyof AllFrameOptions) => *} get - Retrieves the value of a specific option.
+ * @property {(k: keyof AllFrameOptions, v: *) => void} set - Sets the value of a specific option.
+ * @property {(k: keyof AllFrameOptions) => boolean} has - Checks if a specific option exists.
+ * @property {() => Object<keyof AllFrameOptions, *>} getAll - Retrieves all options as an object.
+ * @property {(options: Object<keyof AllFrameOptions, *>) => void} setMany - Sets multiple options at once.
  * @property {(newMap: Map<string, *>) => void} reset - Replaces all options with a new Map.
  * @property {() => void} clear - Clears all stored options.
  */
 /**
- * @description Creates a utility wrapper for editor base options.
- * - Provides get, set, has, getAll, and setMany methods with internal Map support.
+ * @description Creates a utility wrapper for editor frame options.
+ * Provides get, set, has, getAll, and setMany methods with internal Map support.
  * @param {*} editor - The editor instance
- * @returns {CreateBaseOptions}
+ * @returns {FrameOptionsUtil}
  */
-export function CreateBaseOptions(editor: any): CreateBaseOptions;
-export type CreateBaseOptions = {
+export function FrameOptionsUtil(editor: any): FrameOptionsUtil;
+export type FrameOptionsUtil = {
 	/**
 	 * - Retrieves the value of a specific option.
 	 */
-	get: (k: keyof AllBaseOptions) => any;
+	get: (k: keyof AllFrameOptions) => any;
 	/**
 	 * - Sets the value of a specific option.
 	 */
-	set: (k: keyof AllBaseOptions, v: any) => void;
+	set: (k: keyof AllFrameOptions, v: any) => void;
 	/**
 	 * - Checks if a specific option exists.
 	 */
-	has: (k: keyof AllBaseOptions) => boolean;
+	has: (k: keyof AllFrameOptions) => boolean;
 	/**
 	 * - Retrieves all options as an object.
 	 */
@@ -54,38 +52,35 @@ export type CreateBaseOptions = {
 	clear: () => void;
 };
 /**
- * @typedef {EditorFrameOptions & InternalFrameOptions} AllFrameOptions
- */
-/**
- * @typedef {Object} CreateFrameOptions
- * @property {(k: keyof AllFrameOptions) => *} get - Retrieves the value of a specific option.
- * @property {(k: keyof AllFrameOptions, v: *) => void} set - Sets the value of a specific option.
- * @property {(k: keyof AllFrameOptions) => boolean} has - Checks if a specific option exists.
- * @property {() => Object<keyof AllFrameOptions, *>} getAll - Retrieves all options as an object.
- * @property {(options: Object<keyof AllFrameOptions, *>) => void} setMany - Sets multiple options at once.
+ * @typedef {Object} BaseOptionsUtil
+ * @property {(k: keyof AllBaseOptions) => *} get - Retrieves the value of a specific option.
+ * @property {(k: keyof AllBaseOptions, v: *) => void} set - Sets the value of a specific option.
+ * @property {(k: keyof AllBaseOptions) => boolean} has - Checks if a specific option exists.
+ * @property {() => Object<keyof AllBaseOptions, *>} getAll - Retrieves all options as an object.
+ * @property {(options: Object<keyof AllBaseOptions, *>) => void} setMany - Sets multiple options at once.
  * @property {(newMap: Map<string, *>) => void} reset - Replaces all options with a new Map.
  * @property {() => void} clear - Clears all stored options.
  */
 /**
- * @description Creates a utility wrapper for editor frame options.
- * Provides get, set, has, getAll, and setMany methods with internal Map support.
+ * @description Creates a utility wrapper for editor base options.
+ * - Provides get, set, has, getAll, and setMany methods with internal Map support.
  * @param {*} editor - The editor instance
- * @returns {CreateFrameOptions}
+ * @returns {BaseOptionsUtil}
  */
-export function CreateFrameOptions(editor: any): CreateFrameOptions;
-export type CreateFrameOptions = {
+export function BaseOptionsUtil(editor: any): BaseOptionsUtil;
+export type BaseOptionsUtil = {
 	/**
 	 * - Retrieves the value of a specific option.
 	 */
-	get: (k: keyof AllFrameOptions) => any;
+	get: (k: keyof AllBaseOptions) => any;
 	/**
 	 * - Sets the value of a specific option.
 	 */
-	set: (k: keyof AllFrameOptions, v: any) => void;
+	set: (k: keyof AllBaseOptions, v: any) => void;
 	/**
 	 * - Checks if a specific option exists.
 	 */
-	has: (k: keyof AllFrameOptions) => boolean;
+	has: (k: keyof AllBaseOptions) => boolean;
 	/**
 	 * - Retrieves all options as an object.
 	 */
@@ -141,14 +136,22 @@ export namespace DEFAULTS {
 }
 /**
  * ================================================================================================================================
- * === Frame options
+ * === OPTIONS TYPES : Frame
  * =================================================================================================================================
  */
 /**
+ * ================================================================================================================================
  * @typedef {Object} EditorFrameOptions
+ *
+ * **Frame-level editable area options**
+ * -----------------
+ *
+ * === Content & Editing ===
  * @property {string} [value=""] - Initial value for the editor.
  * @property {string} [placeholder=""] - Placeholder text.
  * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+ *
+ * === Layout & Sizing ===
  * @property {string} [width="100%"] - Width for the editor.
  * @property {string} [minWidth=""] - Min width for the editor.
  * @property {string} [maxWidth=""] - Max width for the editor.
@@ -156,6 +159,8 @@ export namespace DEFAULTS {
  * @property {string} [minHeight=""] - Min height for the editor.
  * @property {string} [maxHeight=""] - Max height for the editor.
  * @property {string} [editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
+ *
+ * === Iframe Mode ===
  * @property {boolean} [iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
  * @property {boolean} [iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the "iframe".
  * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the "iframe". (e.g. {'scrolling': 'no'})
@@ -163,6 +168,8 @@ export namespace DEFAULTS {
  * - You can also use regular expressions.
  * - Applied by searching by filename in the link tag of document,
  * - or put the URL value (".css" can be omitted).
+ *
+ * === Statusbar & Character Counter ===
  * @property {boolean} [statusbar=true] - Enables the status bar.
  * @property {boolean} [statusbar_showPathLabel=true] - Displays the current node structure to status bar.
  * @property {boolean} [statusbar_resizeEnable=true] - Enables resize function of bottom status bar
@@ -174,25 +181,35 @@ export namespace DEFAULTS {
  * - 'char': Characters length.
  * - 'byte': Binary data size of characters.
  * - 'byte-html': Binary data size of the full HTML string.
- */
-/** -------------------------------- Internal ------------------------------ */
-/**
- * @typedef {Object} OptionStyleResult
- * @property {string} top - Styles applied to the top container (e.g. width, z-index, etc).
- * @property {string} frame - Styles applied to the iframe container (e.g. height, min-height).
- * @property {string} editor - Styles applied to the editable content area.
- */
-/**
- * @typedef {Object} InternalFrameOptions
- * @property {OptionStyleResult} [_defaultStyles] - Enables fixed positioning for the editor frame.
+ *
+ * === Advanced ===
+ * @property {Object} [__statusbarEvent] - Status bar event configuration.
+ * ================================================================================================================================
  */
 /**
  * ================================================================================================================================
- * === Base options
+ * @typedef {Object} InternalFrameOptions
+ * **Runtime-only frame options (computed internally, cannot be set by users)**
+ * @property {import('../../helper/converter').OptionStyleResult} [_defaultStyles] - Enables fixed positioning for the editor frame.
+ * ================================================================================================================================
+ */
+/**
+ * @typedef {EditorFrameOptions & InternalFrameOptions} AllFrameOptions
+ */
+/** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
+/**
+ * ================================================================================================================================
+ * === OPTIONS TYPES : Base
  * =================================================================================================================================
  */
 /**
+ * ================================================================================================================================
  * @typedef {Object} PrivateBaseOptions
+ *
+ * **Advanced internal options (user-configurable, prefixed with `__`)**
+ * -----------------
+ *
+ * === Defaults & Whitelists ===
  * @property {string} [__textStyleTags=CONSTANTS.TEXT_STYLE_TAGS] - The basic tags that serves as the base for "textStyleTags"
  * - The default follows {@link DEFAULTS.TEXT_STYLE_TAGS}
  * @property {Object<string, string>} [__tagStyles=CONSTANTS.TAG_STYLES] - The basic tags that serves as the base for "tagStyles"
@@ -208,6 +225,8 @@ export namespace DEFAULTS {
  * - 'a|img|custom|tags' (REQUIRED + options.__defaultElementWhitelist)
  * @property {string} [__defaultAttributeWhitelist=CONSTANTS.ATTRIBUTE_WHITELIST] - A complete list of attributes that are allowed by default on all tags. Delimiter: "|" (e.g. "href|target").
  * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}
+ *
+ *  === Formatting  ===
  * @property {string} [__defaultFormatLine=CONSTANTS.FORMAT_LINE] - Specifies the tag to be used as the editor's default "line" element.
  * - The default follows {@link DEFAULTS.FORMAT_LINE}
  * @property {string} [__defaultFormatBrLine=CONSTANTS.FORMAT_BR_LINE] - Specifies the tag to be used as the editor's default "brLine" element.
@@ -218,6 +237,8 @@ export namespace DEFAULTS {
  * - The default follows {@link DEFAULTS.FORMAT_BLOCK}
  * @property {string} [__defaultFormatClosureBlock=CONSTANTS.FORMAT_CLOSURE_BLOCK] - Specifies the tag to be used as the editor's default "closureBlock" element.
  * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BLOCK}
+ *
+ * === Filters & Behavior ===
  * @property {boolean} [__lineFormatFilter=true] - Line format filter configuration.
  * @property {Array<string>} [__listCommonStyle=["fontSize", "color", "fontFamily", "fontWeight", "fontStyle"]] - Defines the list of styles that are applied directly to the `<li>` element
  * - when a text style is applied to the entire list item.
@@ -226,37 +247,64 @@ export namespace DEFAULTS {
  * @property {{pluginName: string, we: boolean}|boolean} [__pluginRetainFilter=true] - Plugin retain filter configuration. (Internal use primarily)
  * - You can turn it off/on globally with true/false or set it per plugin. (e.g. { table: false })
  * @property {boolean} [__allowedScriptTag=false] - Allows the `<script>` tag to be used in the editor.
+ * ================================================================================================================================
  */
 /**
+ * ================================================================================================================================
  * @typedef {Object} EditorBaseOptions
+ *
+ * **Top-level editor configuration**
+ * -----------------
+ *
+ * === Plugins & Toolbar ===
  * @property {Object<string, *>|Array<Object<string, *>>} [plugins] - Plugin configuration.
  * @property {Array<string>} [excludedPlugins=[]] - Plugin configuration.
  * @property {Array<string[]|string>} [buttonList=CONSTANTS.BUTTON_LIST] - List of toolbar buttons, grouped by sub-arrays.
  * - The default follows {@link DEFAULTS.BUTTON_LIST}
+ *
+ * === Modes & Themes ===
  * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
- * @property {boolean|{tagFilter: boolean, formatFilter: boolean, classFilter: boolean, textStyleTagFilter: boolean, attrFilter: boolean, styleFilter: boolean}} [strictMode=true] - Enables strict filtering of tags, attributes, and styles.
  * @property {"classic"|"inline"|"balloon"|"balloon-always"} [mode="classic"] - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
  * @property {string} [type=""] - Editor type: "document:header,page".
  * @property {string} [theme=""] - Editor theme.
  * @property {Object<string, string>} [lang] - Language configuration. default : EN
- * @property {Array<string>} [fontSizeUnits=CONSTANTS.SIZE_UNITS] - Allowed font size units.
- * - The default follows {@link DEFAULTS.SIZE_UNITS}
+ * @property {Object<string, string>} [icons] - Overrides the default icons.
+ * @property {string} [textDirection="ltr"] - Text direction: "ltr" or "rtl".
+ * @property {Array<string>} [reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
+ *
+ * === Strict & Advanced Filtering ===
+ * @property {boolean | {
+ * 		tagFilter: boolean,
+ * 		formatFilter: boolean,
+ * 		classFilter: boolean,
+ * 		textStyleTagFilter: boolean,
+ * 		attrFilter: boolean,
+ * 		styleFilter: boolean
+ * 	}} [strictMode=true] - Enables strict filtering of tags, attributes, and styles.
+ * @property {Array<string>} [scopeSelectionTags=CONSTANTS.SCOPE_SELECTION_TAGS] - Tags treated as whole units when selecting all content.
+ * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}
+ *
+ * === Content Filtering & Formatting ===
+ * ==
+ * #### 1) Tag & Element Control
+ * @property {string} [elementWhitelist=""] - Specifies HTML elements to additionally allow beyond the 'default' allow list. Delimiter: "|" (e.g. "p|div", "*").
+ * - The value entered here will be added to the end of the default list determined by the {@link PrivateBaseOptions.__defaultElementWhitelist} logic above.
+ * @property {string} [elementBlacklist=""] - Filters by specifying HTML elements that should not be used. Delimiter: "|" (e.g. "script|style").
+ * - Tags specified here will eventually be removed, even if they are included in other whitelists.
+ * @property {string} [allowedEmptyTags=CONSTANTS.ALLOWED_EMPTY_NODE_LIST] - A list of tags that are allowed to be kept even if their values are empty.
+ * - The default follows {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST}
+ * - It is concatenated with the value of "ALLOWED_EMPTY_NODE_LIST" to form the final 'allowedEmptyTags' list.
  * @property {string} [allowedClassName=""] - Allowed class names.
  * - Added the default value {@link DEFAULTS.CLASS_NAME}
- * @property {boolean} [closeModalOutsideClick=false] - Closes modals when clicking outside.
- * @property {boolean} [copyFormatKeepOn=false] - Keeps the format of the copied content.
- * @property {boolean} [syncTabIndent=true] - Synchronizes tab indent with spaces.
- * @property {boolean} [tabDisable=false] - Disables tab key input.
- * @property {boolean} [autoLinkify] - Automatically converts URLs into hyperlinks. ("Link" plugin required)
- * - Default value is determined dynamically based on whether the 'link' plugin is enabled. (default : Boolean(plugins.link))
- * @property {Array<string>} [autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
- * @property {"repeat"|"always"|"none"} [retainStyleMode="repeat"] - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
- * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
- * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
- * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
- * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags.
- * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
- * @property {Object<string, (...args: *) => *>} [events={}] - Custom event handlers.
+ *
+ * #### 2) Attribute Control
+ * @property {Object<string, string>} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
+ * - Rules for objects specified here will be merged into the {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
+ * @property {Object<string, string>} [attributeBlacklist=null] - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
+ * - Attributes specified here will eventually be removed even if they are allowed by other settings.
+ * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
+ *
+ * #### 3) Text & Inline Style Control
  * @property {string} [textStyleTags=__textStyleTags] - Additional text style tags.
  * - The default follows {@link PrivateBaseOptions.__textStyleTags}
  * @property {Object<string, string>} [convertTextTags={bold: "strong", underline: "u", italic: "em", strike: "del", subscript: "sub", superscript: "sup"}] - Maps text styles to specific HTML tags.
@@ -266,11 +314,14 @@ export namespace DEFAULTS {
  * - The default follows {@link DEFAULTS.SPAN_STYLES}
  * @property {string} [lineStyles=CONSTANTS.LINE_STYLES] - Specifies allowed styles for the "line" element (p..).
  * - The default follows {@link DEFAULTS.LINE_STYLES}
- * @property {string} [textDirection="ltr"] - Text direction: "ltr" or "rtl".
- * @property {Array<string>} [reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
- * @property {number} [historyStackDelayTime=400] - Delay time for history stack updates (ms).
- * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
- * @property {string} [printClass=""] - Class name for printing.
+ * @property {Array<string>} [fontSizeUnits=CONSTANTS.SIZE_UNITS] - Allowed font size units.
+ * - The default follows {@link DEFAULTS.SIZE_UNITS}
+ * @property {"repeat"|"always"|"none"} [retainStyleMode="repeat"] - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
+ * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
+ * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
+ * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
+ *
+ * #### 4) Line & Block Formatting
  * @property {string} [defaultLine="p"] - Default line element when inserting new lines.
  * @property {"line"|"br"} [defaultLineBreakFormat="line"] - Specifies the default line break format.
  * - [Recommended] "line" :  is a line break that is divided into general tags.
@@ -280,17 +331,7 @@ export namespace DEFAULTS {
  * - Formats that include "line", such as "Quote", still operate on a "line" basis.
  * - ● suneditor processes work in "line" units.
  * - ● When set to "br", performance may decrease when editing a lot of data.
- * @property {Array<string>} [scopeSelectionTags=CONSTANTS.SCOPE_SELECTION_TAGS] - Tags treated as whole units when selecting all content.
- * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}
- * @property {string} [elementWhitelist=""] - Specifies HTML elements to additionally allow beyond the 'default' allow list. Delimiter: "|" (e.g. "p|div", "*").
- * - The value entered here will be added to the end of the default list determined by the {@link PrivateBaseOptions.__defaultElementWhitelist} logic above.
- * @property {string} [elementBlacklist=""] - Filters by specifying HTML elements that should not be used. Delimiter: "|" (e.g. "script|style").
- * - Tags specified here will eventually be removed, even if they are included in other whitelists.
- * @property {Object<string, string>} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
- * - Rules for objects specified here will be merged into the {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
- * @property {Object<string, string>} [attributeBlacklist=null] - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
- * - Attributes specified here will eventually be removed even if they are allowed by other settings.
- * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
+ * @property {string} [lineAttrReset=""] - Line properties that should be reset when changing lines (e.g. "id|name").
  * @property {string} [formatLine=__defaultFormatLine] - Additionally allowed "line" elements beyond the default. Delimiter: "|" (e.g. "p|div").
  * It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatLine} to form the final 'line' element list.
  * - "line" element also contain "brLine" element
@@ -314,9 +355,11 @@ export namespace DEFAULTS {
  * - "closureBlock" element is wrap the "line" and "component"
  * - ※ You cannot exit this format with the Enter key or Backspace key.
  * - ※ Use it only in special cases. (e.g. format of table cells)
- * @property {string} [allowedEmptyTags=CONSTANTS.ALLOWED_EMPTY_NODE_LIST] - A list of tags that are allowed to be kept even if their values are empty.
- * - The default follows {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST}
- * - It is concatenated with the value of {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST} to form the final 'allowedEmptyTags' list.
+ *
+ * === UI & Interaction ===
+ * @property {boolean} [closeModalOutsideClick=false] - Closes modals when clicking outside.
+ * @property {boolean} [syncTabIndent=true] - Synchronizes tab indent with spaces.
+ * @property {boolean} [tabDisable=false] - Disables tab key input.
  * @property {number|string} [toolbar_width="auto"] - Toolbar width.
  * @property {Element|string} [toolbar_container] - Container element for the toolbar.
  * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
@@ -329,24 +372,38 @@ export namespace DEFAULTS {
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
  * @property {Object<string, Array<string>>} [shortcuts={}] - Custom keyboard shortcuts.
+ *
+ * === Advanced Features ===
+ * @property {boolean} [copyFormatKeepOn=false] - Keeps the format of the copied content.
+ * @property {boolean} [autoLinkify] - Automatically converts URLs into hyperlinks. ("Link" plugin required)
+ * - Default value is determined dynamically based on whether the 'link' plugin is enabled. (default : Boolean(plugins.link))
+ * @property {Array<string>} [autoStyleify=["bold", "underline", "italic", "strike"]] - Styles applied automatically on text input.
+ * @property {number} [historyStackDelayTime=400] - Delay time for history stack updates (ms).
+ * @property {string} [printClass=""] - Class name for printing.
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
  * @property {string} [previewTemplate=null] - Custom template for preview mode.
  * @property {string} [printTemplate=null] - Custom template for print mode.
  * @property {boolean} [componentAutoSelect=false] - Enables automatic selection of inserted components.
  * @property {string} [defaultUrlProtocol=null] - Default URL protocol for links.
  * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - {"copy": 1500} - Duration for displaying toast messages.
- * @property {Object<string, string>} [icons] - Overrides the default icons.
  * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
- * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax.
  *
+ * === Dynamic Options ===
+ * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax.
+ * @property {Object<string, (...args: *) => *>} [events={}] - Custom event handlers.
+ * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags.
+ * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
+ *
+ * === Dynamic Plugin Options ===
  * @property {Object<string, *>} [Dynamic_pluginOptions] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
+ * ================================================================================================================================
  */
 /**
- * @typedef {EditorBaseOptions & PrivateBaseOptions & EditorFrameOptions} EditorInitOptions
- */
-/** -------------------------------- Internal ------------------------------ */
-/**
+ * ================================================================================================================================
  * @typedef {Object} InternalBaseOptions
+ * -----------------
+ * **Runtime-only base options (computed internally, cannot be set by users)**
+ *
  * @property {string} [_themeClass] - Computed className for the selected theme (e.g., 'se-theme-default').
  * @property {string} [_type_options] - Additional sub-type string from the `type` option (after `:`).
  * @property {string} [_allowedExtraTag] - Preprocessed allowed tag string for RegExp (e.g., "mark|figure").
@@ -370,10 +427,18 @@ export namespace DEFAULTS {
  * @property {boolean} [hasCodeMirror] - Uses CodeMirror for code view.
  * @property {*} [codeMirror5Editor] - CodeMirror5 support.
  * @property {*} [codeMirror6Editor] - CodeMirror6 support.
+ * ================================================================================================================================
  */
 /**
+ * @typedef {EditorBaseOptions & PrivateBaseOptions & EditorFrameOptions} EditorInitOptions
+ */
+/**
+ * @typedef {EditorBaseOptions & PrivateBaseOptions & InternalBaseOptions} AllBaseOptions
+ */
+/** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
+/**
  * ================================================================================================================================
- * === Options flags
+ * === OPTION FLAGS : Fixed / Resettable
  * =================================================================================================================================
  */
 /**
@@ -388,8 +453,12 @@ export const OPTION_FRAME_FIXED_FLAG: Partial<any>;
  * @type {Partial<Object<keyof EditorInitOptions, "fixed" | true>>}
  */
 export const OPTION_FIXED_FLAG: Partial<any>;
-export type AllBaseOptions = EditorBaseOptions & PrivateBaseOptions & InternalBaseOptions;
-export type AllFrameOptions = EditorFrameOptions & InternalFrameOptions;
+/**
+ * **Frame-level editable area options**
+ * -----------------
+ *
+ * === Content & Editing ===
+ */
 export type EditorFrameOptions = {
 	/**
 	 * - Initial value for the editor.
@@ -401,6 +470,8 @@ export type EditorFrameOptions = {
 	placeholder?: string;
 	/**
 	 * - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+	 *
+	 * === Layout & Sizing ===
 	 */
 	editableFrameAttributes?: {
 		[x: string]: string;
@@ -431,6 +502,8 @@ export type EditorFrameOptions = {
 	maxHeight?: string;
 	/**
 	 * - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
+	 *
+	 * === Iframe Mode ===
 	 */
 	editorStyle?: string;
 	/**
@@ -452,6 +525,8 @@ export type EditorFrameOptions = {
 	 * - You can also use regular expressions.
 	 * - Applied by searching by filename in the link tag of document,
 	 * - or put the URL value (".css" can be omitted).
+	 *
+	 * === Statusbar & Character Counter ===
 	 */
 	iframe_cssFileName?: string;
 	/**
@@ -484,29 +559,33 @@ export type EditorFrameOptions = {
 	 * - 'char': Characters length.
 	 * - 'byte': Binary data size of characters.
 	 * - 'byte-html': Binary data size of the full HTML string.
+	 *
+	 * === Advanced ===
 	 */
 	charCounter_type?: 'char' | 'byte' | 'byte-html';
+	/**
+	 * - Status bar event configuration.
+	 * ================================================================================================================================
+	 */
+	__statusbarEvent?: any;
 };
-export type OptionStyleResult = {
-	/**
-	 * - Styles applied to the top container (e.g. width, z-index, etc).
-	 */
-	top: string;
-	/**
-	 * - Styles applied to the iframe container (e.g. height, min-height).
-	 */
-	frame: string;
-	/**
-	 * - Styles applied to the editable content area.
-	 */
-	editor: string;
-};
+/**
+ * **Runtime-only frame options (computed internally, cannot be set by users)**
+ */
 export type InternalFrameOptions = {
 	/**
 	 * - Enables fixed positioning for the editor frame.
+	 * ================================================================================================================================
 	 */
-	_defaultStyles?: OptionStyleResult;
+	_defaultStyles?: import('../../helper/converter').OptionStyleResult;
 };
+export type AllFrameOptions = EditorFrameOptions & InternalFrameOptions;
+/**
+ * **Advanced internal options (user-configurable, prefixed with `__`)**
+ * -----------------
+ *
+ * === Defaults & Whitelists ===
+ */
 export type PrivateBaseOptions = {
 	/**
 	 * - The basic tags that serves as the base for "textStyleTags"
@@ -534,7 +613,7 @@ export type PrivateBaseOptions = {
 	__defaultElementWhitelist?: string;
 	/**
 	 * - A complete list of attributes that are allowed by default on all tags. Delimiter: "|" (e.g. "href|target").
-	 * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}
+	 * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}=== Formatting  ===
 	 */
 	__defaultAttributeWhitelist?: string;
 	/**
@@ -559,7 +638,7 @@ export type PrivateBaseOptions = {
 	__defaultFormatBlock?: string;
 	/**
 	 * - Specifies the tag to be used as the editor's default "closureBlock" element.
-	 * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BLOCK}
+	 * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BLOCK}=== Filters & Behavior ===
 	 */
 	__defaultFormatClosureBlock?: string;
 	/**
@@ -585,9 +664,16 @@ export type PrivateBaseOptions = {
 		| boolean;
 	/**
 	 * - Allows the `<script>` tag to be used in the editor.
+	 * ================================================================================================================================
 	 */
 	__allowedScriptTag?: boolean;
 };
+/**
+ * **Top-level editor configuration**
+ * -----------------
+ *
+ * === Plugins & Toolbar ===
+ */
 export type EditorBaseOptions = {
 	/**
 	 * - Plugin configuration.
@@ -605,26 +691,13 @@ export type EditorBaseOptions = {
 	excludedPlugins?: Array<string>;
 	/**
 	 * - List of toolbar buttons, grouped by sub-arrays.
-	 * - The default follows {@link DEFAULTS.BUTTON_LIST}
+	 * - The default follows {@link DEFAULTS.BUTTON_LIST}=== Modes & Themes ===
 	 */
 	buttonList?: Array<string[] | string>;
 	/**
 	 * - Enables migration mode for SunEditor v2.
 	 */
 	v2Migration?: boolean;
-	/**
-	 * - Enables strict filtering of tags, attributes, and styles.
-	 */
-	strictMode?:
-		| boolean
-		| {
-				tagFilter: boolean;
-				formatFilter: boolean;
-				classFilter: boolean;
-				textStyleTagFilter: boolean;
-				attrFilter: boolean;
-				styleFilter: boolean;
-		  };
 	/**
 	 * - Toolbar mode: "classic", "inline", "balloon", "balloon-always".
 	 */
@@ -644,59 +717,77 @@ export type EditorBaseOptions = {
 		[x: string]: string;
 	};
 	/**
-	 * - Allowed font size units.
-	 * - The default follows {@link DEFAULTS.SIZE_UNITS}
+	 * - Overrides the default icons.
 	 */
-	fontSizeUnits?: Array<string>;
+	icons?: {
+		[x: string]: string;
+	};
+	/**
+	 * - Text direction: "ltr" or "rtl".
+	 */
+	textDirection?: string;
+	/**
+	 * - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
+	 *
+	 * === Strict & Advanced Filtering ===
+	 */
+	reverseButtons?: Array<string>;
+	/**
+	 * - Enables strict filtering of tags, attributes, and styles.
+	 */
+	strictMode?:
+		| boolean
+		| {
+				tagFilter: boolean;
+				formatFilter: boolean;
+				classFilter: boolean;
+				textStyleTagFilter: boolean;
+				attrFilter: boolean;
+				styleFilter: boolean;
+		  };
+	/**
+	 * - Tags treated as whole units when selecting all content.
+	 * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}=== Content Filtering & Formatting ===
+	 * ==
+	 * #### 1) Tag & Element Control
+	 */
+	scopeSelectionTags?: Array<string>;
+	/**
+	 * - Specifies HTML elements to additionally allow beyond the 'default' allow list. Delimiter: "|" (e.g. "p|div", "*").
+	 * - The value entered here will be added to the end of the default list determined by the {@link PrivateBaseOptions.__defaultElementWhitelist} logic above.
+	 */
+	elementWhitelist?: string;
+	/**
+	 * - Filters by specifying HTML elements that should not be used. Delimiter: "|" (e.g. "script|style").
+	 * - Tags specified here will eventually be removed, even if they are included in other whitelists.
+	 */
+	elementBlacklist?: string;
+	/**
+	 * - A list of tags that are allowed to be kept even if their values are empty.
+	 * - The default follows {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST}- It is concatenated with the value of "ALLOWED_EMPTY_NODE_LIST" to form the final 'allowedEmptyTags' list.
+	 */
+	allowedEmptyTags?: string;
 	/**
 	 * - Allowed class names.
-	 * - Added the default value {@link DEFAULTS.CLASS_NAME}
+	 * - Added the default value {@link DEFAULTS.CLASS_NAME}#### 2) Attribute Control
 	 */
 	allowedClassName?: string;
 	/**
-	 * - Closes modals when clicking outside.
+	 * - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
+	 * - Rules for objects specified here will be merged into the {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
 	 */
-	closeModalOutsideClick?: boolean;
-	/**
-	 * - Keeps the format of the copied content.
-	 */
-	copyFormatKeepOn?: boolean;
-	/**
-	 * - Synchronizes tab indent with spaces.
-	 */
-	syncTabIndent?: boolean;
-	/**
-	 * - Disables tab key input.
-	 */
-	tabDisable?: boolean;
-	/**
-	 * - Automatically converts URLs into hyperlinks. ("Link" plugin required)
-	 * - Default value is determined dynamically based on whether the 'link' plugin is enabled. (default : Boolean(plugins.link))
-	 */
-	autoLinkify?: boolean;
-	/**
-	 * - Styles applied automatically on text input.
-	 */
-	autoStyleify?: Array<string>;
-	/**
-	 * - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
-	 * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
-	 * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
-	 * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
-	 */
-	retainStyleMode?: 'repeat' | 'always' | 'none';
-	/**
-	 * - Specifies extra allowed or disallowed tags.
-	 * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
-	 */
-	allowedExtraTags?: {
-		[x: string]: boolean;
+	attributeWhitelist?: {
+		[x: string]: string;
 	};
 	/**
-	 * - Custom event handlers.
+	 * - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
+	 * - Attributes specified here will eventually be removed even if they are allowed by other settings.
+	 * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
+	 *
+	 * #### 3) Text & Inline Style Control
 	 */
-	events?: {
-		[x: string]: (...args: any) => any;
+	attributeBlacklist?: {
+		[x: string]: string;
 	};
 	/**
 	 * - Additional text style tags.
@@ -730,25 +821,19 @@ export type EditorBaseOptions = {
 	 */
 	lineStyles?: string;
 	/**
-	 * - Text direction: "ltr" or "rtl".
+	 * - Allowed font size units.
+	 * - The default follows {@link DEFAULTS.SIZE_UNITS}
 	 */
-	textDirection?: string;
+	fontSizeUnits?: Array<string>;
 	/**
-	 * - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
+	 * - This option determines how inline elements (such as <span>, <strong>, etc.) are handled when deleting text.
+	 * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
+	 * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
+	 * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
+	 *
+	 * #### 4) Line & Block Formatting
 	 */
-	reverseButtons?: Array<string>;
-	/**
-	 * - Delay time for history stack updates (ms).
-	 */
-	historyStackDelayTime?: number;
-	/**
-	 * - Line properties that should be reset when changing lines (e.g. "id|name").
-	 */
-	lineAttrReset?: string;
-	/**
-	 * - Class name for printing.
-	 */
-	printClass?: string;
+	retainStyleMode?: 'repeat' | 'always' | 'none';
 	/**
 	 * - Default line element when inserting new lines.
 	 */
@@ -765,35 +850,9 @@ export type EditorBaseOptions = {
 	 */
 	defaultLineBreakFormat?: 'line' | 'br';
 	/**
-	 * - Tags treated as whole units when selecting all content.
-	 * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}
+	 * - Line properties that should be reset when changing lines (e.g. "id|name").
 	 */
-	scopeSelectionTags?: Array<string>;
-	/**
-	 * - Specifies HTML elements to additionally allow beyond the 'default' allow list. Delimiter: "|" (e.g. "p|div", "*").
-	 * - The value entered here will be added to the end of the default list determined by the {@link PrivateBaseOptions.__defaultElementWhitelist} logic above.
-	 */
-	elementWhitelist?: string;
-	/**
-	 * - Filters by specifying HTML elements that should not be used. Delimiter: "|" (e.g. "script|style").
-	 * - Tags specified here will eventually be removed, even if they are included in other whitelists.
-	 */
-	elementBlacklist?: string;
-	/**
-	 * - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
-	 * - Rules for objects specified here will be merged into the {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
-	 */
-	attributeWhitelist?: {
-		[x: string]: string;
-	};
-	/**
-	 * - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
-	 * - Attributes specified here will eventually be removed even if they are allowed by other settings.
-	 * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
-	 */
-	attributeBlacklist?: {
-		[x: string]: string;
-	};
+	lineAttrReset?: string;
 	/**
 	 * - Additionally allowed "line" elements beyond the default. Delimiter: "|" (e.g. "p|div").
 	 * It is concatenated with the value of {@link PrivateBaseOptions.__defaultFormatLine} to form the final 'line' element list.
@@ -830,14 +889,22 @@ export type EditorBaseOptions = {
 	 * - "closureBlock" element is wrap the "line" and "component"
 	 * - ※ You cannot exit this format with the Enter key or Backspace key.
 	 * - ※ Use it only in special cases. (e.g. format of table cells)
+	 *
+	 * === UI & Interaction ===
 	 */
 	formatClosureBlock?: string;
 	/**
-	 * - A list of tags that are allowed to be kept even if their values are empty.
-	 * - The default follows {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST}
-	 * - It is concatenated with the value of {@link DEFAULTS.ALLOWED_EMPTY_NODE_LIST} to form the final 'allowedEmptyTags' list.
+	 * - Closes modals when clicking outside.
 	 */
-	allowedEmptyTags?: string;
+	closeModalOutsideClick?: boolean;
+	/**
+	 * - Synchronizes tab indent with spaces.
+	 */
+	syncTabIndent?: boolean;
+	/**
+	 * - Disables tab key input.
+	 */
+	tabDisable?: boolean;
 	/**
 	 * - Toolbar width.
 	 */
@@ -876,10 +943,33 @@ export type EditorBaseOptions = {
 	shortcutsDisable?: boolean;
 	/**
 	 * - Custom keyboard shortcuts.
+	 *
+	 * === Advanced Features ===
 	 */
 	shortcuts?: {
 		[x: string]: string[];
 	};
+	/**
+	 * - Keeps the format of the copied content.
+	 */
+	copyFormatKeepOn?: boolean;
+	/**
+	 * - Automatically converts URLs into hyperlinks. ("Link" plugin required)
+	 * - Default value is determined dynamically based on whether the 'link' plugin is enabled. (default : Boolean(plugins.link))
+	 */
+	autoLinkify?: boolean;
+	/**
+	 * - Styles applied automatically on text input.
+	 */
+	autoStyleify?: Array<string>;
+	/**
+	 * - Delay time for history stack updates (ms).
+	 */
+	historyStackDelayTime?: number;
+	/**
+	 * - Class name for printing.
+	 */
+	printClass?: string;
 	/**
 	 * - Offset applied when entering fullscreen mode.
 	 */
@@ -905,13 +995,9 @@ export type EditorBaseOptions = {
 	 */
 	toastMessageTime?: any;
 	/**
-	 * - Overrides the default icons.
-	 */
-	icons?: {
-		[x: string]: string;
-	};
-	/**
 	 * - Enables free code view mode.
+	 *
+	 * === Dynamic Options ===
 	 */
 	freeCodeViewMode?: string;
 	/**
@@ -921,13 +1007,30 @@ export type EditorBaseOptions = {
 		[x: string]: any;
 	};
 	/**
+	 * - Custom event handlers.
+	 */
+	events?: {
+		[x: string]: (...args: any) => any;
+	};
+	/**
+	 * - Specifies extra allowed or disallowed tags.
+	 * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}=== Dynamic Plugin Options ===
+	 */
+	allowedExtraTags?: {
+		[x: string]: boolean;
+	};
+	/**
 	 * - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
+	 * ================================================================================================================================
 	 */
 	Dynamic_pluginOptions?: {
 		[x: string]: any;
 	};
 };
-export type EditorInitOptions = EditorBaseOptions & PrivateBaseOptions & EditorFrameOptions;
+/**
+ * -----------------
+ * **Runtime-only base options (computed internally, cannot be set by users)**
+ */
 export type InternalBaseOptions = {
 	/**
 	 * - Computed className for the selected theme (e.g., 'se-theme-default').
@@ -1017,6 +1120,9 @@ export type InternalBaseOptions = {
 	codeMirror5Editor?: any;
 	/**
 	 * - CodeMirror6 support.
+	 * ================================================================================================================================
 	 */
 	codeMirror6Editor?: any;
 };
+export type EditorInitOptions = EditorBaseOptions & PrivateBaseOptions & EditorFrameOptions;
+export type AllBaseOptions = EditorBaseOptions & PrivateBaseOptions & InternalBaseOptions;

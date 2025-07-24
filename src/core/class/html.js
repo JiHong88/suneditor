@@ -328,7 +328,7 @@ HTML.prototype = {
 	 * @returns {HTMLElement|null} The inserted element or null if insertion failed
 	 */
 	insert(html, { selectInserted, skipCharCount, skipCleaning } = {}) {
-		if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.get().focusNode)) this.editor.focus();
+		if (!this.frameContext.get('wysiwyg').contains(this.selection.get().focusNode)) this.editor.focus();
 
 		if (typeof html === 'string') {
 			if (!skipCleaning) html = this.clean(html, { forceFormat: false, whitelist: null, blacklist: null });
@@ -343,7 +343,7 @@ HTML.prototype = {
 				const domTree = domParser.childNodes;
 
 				if (!skipCharCount) {
-					const type = this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
+					const type = this.frameOptions.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
 					let checkHTML = '';
 					for (let i = 0, len = domTree.length; i < len; i++) {
 						checkHTML += domTree[i][type];
@@ -373,7 +373,7 @@ HTML.prototype = {
 					this.selection.setRange(a, offset, a, offset);
 				}
 			} catch (error) {
-				if (this.editor.frameContext.get('isReadOnly') || this.editor.frameContext.get('isDisabled')) return;
+				if (this.frameContext.get('isReadOnly') || this.frameContext.get('isDisabled')) return;
 				throw Error(`[SUNEDITOR.html.insert.error] ${error.message}`);
 			}
 		} else {
@@ -406,7 +406,7 @@ HTML.prototype = {
 	 */
 	insertNode(oNode, { afterNode, skipCharCount } = {}) {
 		let result = null;
-		if (this.editor.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(oNode))) {
+		if (this.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(oNode))) {
 			return result;
 		}
 
@@ -590,7 +590,7 @@ HTML.prototype = {
 
 		try {
 			// set node
-			const wysiwyg = this.editor.frameContext.get('wysiwyg');
+			const wysiwyg = this.frameContext.get('wysiwyg');
 			if (!insertListCell) {
 				if (dom.check.isWysiwygFrame(afterNode) || parentNode === wysiwyg.parentNode) {
 					parentNode = wysiwyg;
@@ -815,8 +815,8 @@ HTML.prototype = {
 				}
 			} else {
 				if ((commonCon.nodeType === 1 && startOff === 0 && endOff === 1) || (commonCon.nodeType === 3 && startOff === 0 && endOff === commonCon.textContent.length)) {
-					const nextEl = dom.query.getNextDeepestNode(commonCon, this.editor.frameContext.get('wysiwyg'));
-					const prevEl = dom.query.getPreviousDeepestNode(commonCon, this.editor.frameContext.get('wysiwyg'));
+					const nextEl = dom.query.getNextDeepestNode(commonCon, this.frameContext.get('wysiwyg'));
+					const prevEl = dom.query.getPreviousDeepestNode(commonCon, this.frameContext.get('wysiwyg'));
 					const line = this.format.getLine(commonCon);
 					dom.utils.removeItem(commonCon);
 
@@ -1005,7 +1005,7 @@ HTML.prototype = {
 
 		if (!dom.check.isWysiwygFrame(container) && container.childNodes.length === 0) {
 			const rc = this.nodeTransform.removeAllParents(container, null, null);
-			if (rc) container = rc.sc || rc.ec || this.editor.frameContext.get('wysiwyg');
+			if (rc) container = rc.sc || rc.ec || this.frameContext.get('wysiwyg');
 		}
 
 		// set range
@@ -1038,7 +1038,7 @@ HTML.prototype = {
 		for (let i = 0, len = rootKey.length, r; i < len; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
 
-			const fc = this.editor.frameContext;
+			const fc = this.frameContext;
 			const renderHTML = dom.utils.createElement('DIV', null, this._convertToCode(fc.get('wysiwyg'), true));
 
 			const isTableCell = dom.check.isTableCell;
@@ -1065,7 +1065,7 @@ HTML.prototype = {
 			}
 
 			const content = renderHTML.innerHTML;
-			if (this.editor.frameOptions.get('iframe_fullPage')) {
+			if (this.frameOptions.get('iframe_fullPage')) {
 				if (includeFullPage) {
 					const attrs = dom.utils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
 					r = `<!DOCTYPE html><html>${fc.get('_wd').head.outerHTML}<body ${attrs}>${content}</body></html>`;
@@ -1101,8 +1101,8 @@ HTML.prototype = {
 		for (let i = 0; i < rootKey.length; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
 
-			if (!this.editor.frameContext.get('isCodeView')) {
-				this.editor.frameContext.get('wysiwyg').innerHTML = convertValue;
+			if (!this.frameContext.get('isCodeView')) {
+				this.frameContext.get('wysiwyg').innerHTML = convertValue;
 				this.editor._resetComponents();
 				this.history.push(false, rootKey[i]);
 			} else {
@@ -1129,13 +1129,13 @@ HTML.prototype = {
 			this.editor.changeFrameContext(rootKey[i]);
 			const convertValue = this.clean(html, { forceFormat: true, whitelist: null, blacklist: null });
 
-			if (!this.editor.frameContext.get('isCodeView')) {
+			if (!this.frameContext.get('isCodeView')) {
 				const temp = dom.utils.createElement('DIV', null, convertValue);
 				const children = temp.children;
 				const len = children.length;
 				for (let j = 0; j < len; j++) {
 					if (!children[j]) continue;
-					this.editor.frameContext.get('wysiwyg').appendChild(children[j]);
+					this.frameContext.get('wysiwyg').appendChild(children[j]);
 				}
 				this.history.push(false, rootKey[i]);
 				this.selection.scrollTo(children[len - 1]);
@@ -1194,15 +1194,15 @@ HTML.prototype = {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	setFullPage(ctx, { rootKey } = {}) {
-		if (!this.editor.frameOptions.get('iframe')) return false;
+		if (!this.frameOptions.get('iframe')) return false;
 
 		if (!rootKey) rootKey = [this.status.rootKey];
 		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
-			if (ctx.head) this.editor.frameContext.get('_wd').head.innerHTML = ctx.head.replace(this.__disallowedTagsRegExp, '');
-			if (ctx.body) this.editor.frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, { forceFormat: true, whitelist: null, blacklist: null });
+			if (ctx.head) this.frameContext.get('_wd').head.innerHTML = ctx.head.replace(this.__disallowedTagsRegExp, '');
+			if (ctx.body) this.frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, { forceFormat: true, whitelist: null, blacklist: null });
 			this.editor._resetComponents();
 		}
 	},
@@ -1221,7 +1221,7 @@ HTML.prototype = {
 	 * @private
 	 * @this {HTMLThis}
 	 * @description construct wysiwyg area element to html string
-	 * @param {Node|string} html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
+	 * @param {Node|string} html WYSIWYG element (this.frameContext.get('wysiwyg')) or HTML string.
 	 * @param {boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
 	 */
@@ -1699,7 +1699,7 @@ HTML.prototype = {
 				r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"']+)/);
 				if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
 					const k = converter.kebabToCamelCase(r[1].trim());
-					const cs = this.editor.frameContext.get('wwComputedStyle')[k]?.replace(/"/g, '');
+					const cs = this.frameContext.get('wwComputedStyle')[k]?.replace(/"/g, '');
 					const c = r[3].trim();
 					switch (k) {
 						case 'fontFamily':

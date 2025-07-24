@@ -161,8 +161,8 @@ EventManager.prototype = {
 	 * @return {__se__GlobalEventInfo} Registered event information
 	 */
 	addGlobalEvent(type, listener, useCapture) {
-		if (this.editor.frameOptions.get('iframe')) {
-			this.editor.frameContext.get('_ww').addEventListener(type, listener, useCapture);
+		if (this.frameOptions.get('iframe')) {
+			this.frameContext.get('_ww').addEventListener(type, listener, useCapture);
 		}
 		this._w.addEventListener(type, listener, useCapture);
 		return {
@@ -189,8 +189,8 @@ EventManager.prototype = {
 			useCapture = type.useCapture;
 			type = type.type;
 		}
-		if (this.editor.frameOptions.get('iframe')) {
-			this.editor.frameContext.get('_ww').removeEventListener(type, listener, useCapture);
+		if (this.frameOptions.get('iframe')) {
+			this.frameContext.get('_ww').removeEventListener(type, listener, useCapture);
 		}
 		this._w.removeEventListener(type, listener, useCapture);
 
@@ -236,7 +236,7 @@ EventManager.prototype = {
 			selectionNode = selectionNode.firstChild;
 		}
 
-		const fc = this.editor.frameContext;
+		const fc = this.frameContext;
 		const notReadonly = !fc.get('isReadOnly');
 		for (let element = selectionNode; !dom.check.isWysiwygFrame(element); element = element.parentElement) {
 			if (!element) break;
@@ -320,7 +320,7 @@ EventManager.prototype = {
 		this.status.currentNodesMap = commandMapNodes;
 
 		/**  Displays the current node structure to statusbar */
-		if (this.editor.frameOptions.get('statusbar_showPathLabel') && fc.get('navigation')) {
+		if (this.frameOptions.get('statusbar_showPathLabel') && fc.get('navigation')) {
 			fc.get('navigation').textContent = this.options.get('_rtl') ? this.status.currentNodes.reverse().join(' < ') : this.status.currentNodes.join(' > ');
 		}
 
@@ -417,7 +417,7 @@ EventManager.prototype = {
 	 * @description Hide the toolbar.
 	 */
 	_hideToolbar() {
-		if (!this.editor._notHideToolbar && !this.editor.frameContext.get('isFullScreen')) {
+		if (!this.editor._notHideToolbar && !this.frameContext.get('isFullScreen')) {
 			this.toolbar.hide();
 		}
 	},
@@ -724,7 +724,7 @@ EventManager.prototype = {
 			cleanData = this.html.clean(cleanData, { forceFormat: false, whitelist: null, blacklist: null });
 		}
 
-		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText, false);
+		const maxCharCount = this.char.test(this.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText, false);
 		// user event - paste
 		if (type === 'paste') {
 			const value = await this.triggerEvent('onPaste', { frameContext, event: e, data: cleanData, maxCharCount, from });
@@ -767,7 +767,7 @@ EventManager.prototype = {
 			}
 
 			// document type
-			if (frameContext.has('documentType-use-header')) {
+			if (frameContext.has('documentType_use_header')) {
 				frameContext.get('documentType').reHeader();
 			}
 			return false;
@@ -789,12 +789,12 @@ EventManager.prototype = {
 		this.addEvent(this.context.get('menuTray'), 'click', OnClick_menuTray.bind(this), true);
 
 		/** toolbar event */
-		this.addEvent(this.context.get('toolbar.main'), 'mousedown', buttonsHandler, false);
-		this.addEvent(this.context.get('toolbar.main'), 'click', toolbarHandler, false);
+		this.addEvent(this.context.get('toolbar_main'), 'mousedown', buttonsHandler, false);
+		this.addEvent(this.context.get('toolbar_main'), 'click', toolbarHandler, false);
 		// subToolbar
 		if (this.options.has('_subMode')) {
-			this.addEvent(this.context.get('toolbar.sub.main'), 'mousedown', buttonsHandler, false);
-			this.addEvent(this.context.get('toolbar.sub.main'), 'click', toolbarHandler, false);
+			this.addEvent(this.context.get('toolbar_sub_main'), 'mousedown', buttonsHandler, false);
+			this.addEvent(this.context.get('toolbar_sub_main'), 'click', toolbarHandler, false);
 		}
 
 		/** set response toolbar */
@@ -869,7 +869,7 @@ EventManager.prototype = {
 		this.addEvent(
 			eventWysiwyg,
 			'dragover',
-			OnDragOver_wysiwyg.bind(this, fc, dragCursor, isIframe ? this.editor.frameContext.get('topArea') : null, !this.options.get('toolbar_container') && !this.editor.isBalloon && !this.editor.isInline),
+			OnDragOver_wysiwyg.bind(this, fc, dragCursor, isIframe ? this.frameContext.get('topArea') : null, !this.options.get('toolbar_container') && !this.editor.isBalloon && !this.editor.isInline),
 			false
 		);
 		this.addEvent(eventWysiwyg, 'dragend', OnDragEnd_wysiwyg.bind(this, dragCursor), false);
@@ -906,7 +906,7 @@ EventManager.prototype = {
 		/** code view area auto line */
 		if (!this.options.get('hasCodeMirror')) {
 			const codeNumbers = fc.get('codeNumbers');
-			const cvAuthHeight = this.viewer._codeViewAutoHeight.bind(this.viewer, fc.get('code'), codeNumbers, this.editor.frameOptions.get('height') === 'auto');
+			const cvAuthHeight = this.viewer._codeViewAutoHeight.bind(this.viewer, fc.get('code'), codeNumbers, this.frameOptions.get('height') === 'auto');
 
 			this.addEvent(codeArea, 'keydown', cvAuthHeight, false);
 			this.addEvent(codeArea, 'keyup', cvAuthHeight, false);
@@ -988,14 +988,14 @@ EventManager.prototype = {
 		const x = eventWysiwyg.scrollLeft || eventWysiwyg.scrollX || 0;
 
 		if (this.editor.isBalloon) {
-			this.context.get('toolbar.main').style.top = this.toolbar._balloonOffset.top - y + 'px';
-			this.context.get('toolbar.main').style.left = this.toolbar._balloonOffset.left - x + 'px';
+			this.context.get('toolbar_main').style.top = this.toolbar._balloonOffset.top - y + 'px';
+			this.context.get('toolbar_main').style.left = this.toolbar._balloonOffset.left - x + 'px';
 		} else if (this.editor.isSubBalloon) {
-			this.context.get('toolbar.sub.main').style.top = this.subToolbar._balloonOffset.top - y + 'px';
-			this.context.get('toolbar.sub.main').style.left = this.subToolbar._balloonOffset.left - x + 'px';
+			this.context.get('toolbar_sub_main').style.top = this.subToolbar._balloonOffset.top - y + 'px';
+			this.context.get('toolbar_sub_main').style.left = this.subToolbar._balloonOffset.left - x + 'px';
 		}
 
-		if (this.editor._controllerTargetContext !== this.editor.frameContext.get('topArea')) {
+		if (this.editor._controllerTargetContext !== this.frameContext.get('topArea')) {
 			this.ui._offCurrentController();
 		}
 
@@ -1071,7 +1071,7 @@ EventManager.prototype = {
 			if (this.options.get('_subMode')) this.subToolbar.resetResponsiveToolbar();
 		}
 
-		const toolbar = this.context.get('toolbar.main');
+		const toolbar = this.context.get('toolbar_main');
 		const isToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar._inlineToolbarAttr.isShow);
 		if (toolbar.offsetWidth === 0 && !isToolbarHidden) return;
 
@@ -1086,7 +1086,7 @@ EventManager.prototype = {
 
 		if (this.viewer._resetFullScreenHeight()) return;
 
-		const fc = this.editor.frameContext;
+		const fc = this.frameContext;
 		if (fc.get('isCodeView') && this.editor.isInline) {
 			this.toolbar._showInline();
 			return;
@@ -1095,7 +1095,7 @@ EventManager.prototype = {
 		this.editor._iframeAutoHeight(fc);
 
 		if (this.toolbar._sticky) {
-			this.context.get('toolbar.main').style.width = fc.get('topArea').offsetWidth - 2 + 'px';
+			this.context.get('toolbar_main').style.width = fc.get('topArea').offsetWidth - 2 + 'px';
 			this.toolbar._resetSticky();
 		}
 	},
@@ -1216,7 +1216,7 @@ EventManager.prototype = {
 		if (!isMobile) return;
 
 		this.__focusTemp.focus({ preventScroll: true });
-		this.editor.frameContext.get('wysiwyg').focus({ preventScroll: true });
+		this.frameContext.get('wysiwyg').focus({ preventScroll: true });
 	},
 
 	/**
@@ -1226,7 +1226,7 @@ EventManager.prototype = {
 	 * @param {*} range Range object
 	 */
 	__enterScrollTo(range) {
-		this.editor._iframeAutoHeight(this.editor.frameContext);
+		this.editor._iframeAutoHeight(this.frameContext);
 
 		// scroll to
 		if (env.isMobile && this.scrollparents.length > 0) return;
@@ -1294,7 +1294,7 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 	this._callPluginEvent('onScroll', { frameContext, event: e });
 
 	// document type page
-	if (frameContext.has('documentType-use-page')) {
+	if (frameContext.has('documentType_use_page')) {
 		frameContext.get('documentType').scrollPage();
 	}
 
@@ -1395,7 +1395,7 @@ function OnMouseDown_statusbar(e) {
  * @param {MouseEvent} e - Event object
  */
 function __resizeEditor(e) {
-	const fc = this.editor.frameContext;
+	const fc = this.frameContext;
 	const resizeInterval = fc.get('wrapper').offsetHeight + (e.clientY - this._resizeClientY);
 	const h = resizeInterval < fc.get('_minHeight') ? fc.get('_minHeight') : resizeInterval;
 	fc.get('wysiwygFrame').style.height = fc.get('code').style.height = h + 'px';
@@ -1427,7 +1427,7 @@ function DisplayLineBreak(dir, e) {
 	const format = dom.utils.createElement(isList ? 'BR' : dom.check.isTableCell(component.parentElement) ? 'DIV' : this.options.get('defaultLine'));
 	if (!isList) format.innerHTML = '<br>';
 
-	if (this.editor.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
+	if (this.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 	this.component.deselect();
@@ -1478,17 +1478,17 @@ function OnScroll_window() {
 		this.toolbar._resetSticky();
 	}
 
-	if (this.editor.isBalloon && this.context.get('toolbar.main').style.display === 'block') {
+	if (this.editor.isBalloon && this.context.get('toolbar_main').style.display === 'block') {
 		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
-	} else if (this.editor.isSubBalloon && this.context.get('toolbar.sub.main').style.display === 'block') {
+	} else if (this.editor.isSubBalloon && this.context.get('toolbar_sub_main').style.display === 'block') {
 		this.subToolbar._setBalloonOffset(this.subToolbar._balloonOffset.position === 'top');
 	}
 
 	this._scrollContainer();
 
 	// document type page
-	if (this.editor.frameContext.has('documentType-use-page')) {
-		this.editor.frameContext.get('documentType').scrollWindow();
+	if (this.frameContext.has('documentType_use_page')) {
+		this.frameContext.get('documentType').scrollWindow();
 	}
 }
 
@@ -1521,7 +1521,7 @@ function OnSelectionchange_document(_wd) {
 			this.applyTagEffect();
 
 			// document type
-			if (root.has('documentType-use-header')) {
+			if (root.has('documentType_use_header')) {
 				const el = dom.query.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
 				root.get('documentType').on(el);
 			}

@@ -298,7 +298,7 @@ declare class HTML {
 	 * @private
 	 * @this {HTMLThis}
 	 * @description construct wysiwyg area element to html string
-	 * @param {Node|string} html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
+	 * @param {Node|string} html WYSIWYG element (this.frameContext.get('wysiwyg')) or HTML string.
 	 * @param {boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
 	 */

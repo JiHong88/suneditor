@@ -25,6 +25,10 @@ function EditorInjector(editor) {
 	this.plugins;
 	/** @type {import('./_core').default['status']} */
 	this.status;
+	/** @type {import('./_core').default['frameContext']}  */
+	this.frameContext = editor.frameContext;
+	/**  @type {import('./_core').default['frameOptions']} */
+	this.frameOptions = editor.frameOptions;
 	/** @type {import('./_core').default['context']} */
 	this.context;
 	/** @type {import('./_core').default['options']} */

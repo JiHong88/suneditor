@@ -95,7 +95,7 @@ Offset.prototype = {
 	 * @returns {OffsetInfo} Position relative to the editor frame.
 	 */
 	get(node) {
-		const wFrame = this.editor.frameContext.get('wysiwygFrame');
+		const wFrame = this.frameContext.get('wysiwygFrame');
 		const iframe = /iframe/i.test(wFrame?.nodeName);
 		const off = this.getLocal(node);
 
@@ -129,14 +129,14 @@ Offset.prototype = {
 			offsetElement = /** @type {HTMLElement} */ (offsetElement.offsetParent);
 		}
 
-		const wwFrame = this.editor.frameContext.get('wysiwygFrame');
-		if (this.editor.frameContext.get('wysiwyg').contains(target)) {
+		const wwFrame = this.frameContext.get('wysiwygFrame');
+		if (this.frameContext.get('wysiwyg').contains(target)) {
 			l = wwFrame.offsetLeft;
 			t = wwFrame.offsetTop;
 			r = wwFrame.parentElement.offsetWidth - (wwFrame.offsetLeft + wwFrame.offsetWidth);
 		}
 
-		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
+		const eventWysiwyg = this.frameContext.get('eventWysiwyg');
 		offsetLeft += l - (wysiwyg ? wysiwyg.scrollLeft : 0);
 		offsetTop += t - (wysiwyg ? wysiwyg.scrollTop : 0);
 		return {
@@ -156,8 +156,8 @@ Offset.prototype = {
 	 * @returns {OffsetGlobalInfo} Global position and scroll values.
 	 */
 	getGlobal(node) {
-		const topArea = this.editor.frameContext.get('topArea');
-		const wFrame = this.editor.frameContext.get('wysiwygFrame');
+		const topArea = this.frameContext.get('topArea');
+		const wFrame = this.frameContext.get('wysiwygFrame');
 
 		node = node || topArea;
 
@@ -181,7 +181,7 @@ Offset.prototype = {
 
 		let wy = 0;
 		let wx = 0;
-		if (!this.editor.frameContext.get('isFullScreen')) {
+		if (!this.frameContext.get('isFullScreen')) {
 			wy += _w.scrollY;
 			wx += _w.scrollX;
 		}
@@ -203,7 +203,7 @@ Offset.prototype = {
 	 * @returns {OffsetGlobalScrollInfo} Global scroll information.
 	 */
 	getGlobalScroll(node) {
-		const topArea = this.editor.frameContext.get('topArea');
+		const topArea = this.frameContext.get('topArea');
 		let isTop = false;
 		let targetAbs = false;
 		if (!node) node = topArea;
@@ -251,8 +251,8 @@ Offset.prototype = {
 			el = el.parentElement;
 		}
 
-		if (!targetAbs && !isTop && /^iframe$/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName)) {
-			el = this.editor.frameContext.get('wrapper');
+		if (!targetAbs && !isTop && /^iframe$/i.test(this.frameContext.get('wysiwygFrame').nodeName)) {
+			el = this.frameContext.get('wrapper');
 			ohOffsetEl = owOffsetEl = topArea;
 			while (el) {
 				t += el.scrollTop;
@@ -311,7 +311,7 @@ Offset.prototype = {
 		oh = heightEditorRefer ? topArea.clientHeight : oh;
 		ow = widthEditorRefer ? topArea.clientWidth : ow;
 
-		const clientSize = getClientSize(this.editor.frameContext.get('_wd'));
+		const clientSize = getClientSize(this.frameContext.get('_wd'));
 		return {
 			top: t,
 			left: l,
@@ -336,7 +336,7 @@ Offset.prototype = {
 	 * @returns {OffsetWWScrollInfo} Scroll information within the editor.
 	 */
 	getWWScroll() {
-		const eventWysiwyg = this.editor.frameContext.get('wysiwyg');
+		const eventWysiwyg = this.frameContext.get('wysiwyg');
 		const rects = this.selection.getRects(eventWysiwyg, 'start').rects;
 		const top = eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0;
 		const height = eventWysiwyg.scrollHeight || eventWysiwyg.document?.documentElement.scrollHeight || 0;
@@ -444,8 +444,8 @@ Offset.prototype = {
 			addOffset.left *= -1;
 		}
 
-		const isIframe = this.editor.frameOptions.get('iframe');
-		const isWWTarget = this.editor.frameContext.get('wrapper').contains(target) || params.isWWTarget || (isIframe ? this.editor.frameContext.get('wysiwyg').contains(target) : false);
+		const isIframe = this.frameOptions.get('iframe');
+		const isWWTarget = this.frameContext.get('wrapper').contains(target) || params.isWWTarget || (isIframe ? this.frameContext.get('wysiwyg').contains(target) : false);
 
 		const isCtrlTarget = target.nodeType === 1;
 		const isTargetAbs = isWWTarget && !isCtrlTarget;
@@ -464,9 +464,9 @@ Offset.prototype = {
 		// margin
 		const tmtw = targetRect.top;
 		const tmbw = clientSize.h - targetRect.bottom;
-		const globalTop = this.getGlobal(this.editor.frameContext.get('topArea')).top;
+		const globalTop = this.getGlobal(this.frameContext.get('topArea')).top;
 		const wScrollY = _w.scrollY;
-		const th = this.context.get('toolbar.main').offsetHeight;
+		const th = this.context.get('toolbar_main').offsetHeight;
 		const containerToolbar = this.options.get('toolbar_container');
 		const headLess = this.editor.isBalloon || this.editor.isInline || containerToolbar;
 		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.editor.toolbar._sticky && headLess) ? 0 : th;
@@ -475,8 +475,8 @@ Offset.prototype = {
 		const { rmt, rmb, bMargin, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll);
 		if (isWWTarget && ((rmb > 0 ? bMargin : rmb) + targetH <= 0 || rmt + rt + targetH - (this.editor.toolbar._sticky && isInlineTarget ? toolbarH : 0) <= 0)) return;
 
-		const isSticky = this.editor.toolbar._sticky && this.context.get('toolbar.main').style.display !== 'none' && (!headLess || this.editor.frameContext.get('topArea').getBoundingClientRect().top <= th);
-		const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
+		const isSticky = this.editor.toolbar._sticky && this.context.get('toolbar_main').style.display !== 'none' && (!headLess || this.frameContext.get('topArea').getBoundingClientRect().top <= th);
+		const statusBarH = this.frameContext.get('statusbar')?.offsetHeight || 0;
 		let t = addOffset.top;
 		let y = 0;
 		let arrowDir = '';
@@ -496,7 +496,7 @@ Offset.prototype = {
 				// sticky the <top> position
 				if (y - siblingH < 0) {
 					arrowDir = '';
-					t -= y - siblingH - Math.max(1, y + elH + ah) + (!isSticky && trmt < 0 ? toolbarH : 0) - (isSticky ? this.context.get('toolbar.main').offsetTop : 0);
+					t -= y - siblingH - Math.max(1, y + elH + ah) + (!isSticky && trmt < 0 ? toolbarH : 0) - (isSticky ? this.context.get('toolbar_main').offsetTop : 0);
 				}
 			}
 		}
@@ -530,7 +530,7 @@ Offset.prototype = {
 		const tmlw = targetRect.left;
 		const tmrw = clientSize.w - targetRect.right;
 		let rml, rmr;
-		if (this.editor.frameContext.get('isFullScreen')) {
+		if (this.frameContext.get('isFullScreen')) {
 			rml = tmlw;
 			rmr = tmrw;
 		} else {
@@ -611,8 +611,8 @@ Offset.prototype = {
 		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
 		positionTop = rectsObj.position === 'start';
 
-		const isFullScreen = this.editor.frameContext.get('isFullScreen');
-		const topArea = this.editor.frameContext.get('topArea');
+		const isFullScreen = this.frameContext.get('isFullScreen');
+		const topArea = this.frameContext.get('topArea');
 		const rects = rectsObj.rects;
 		const scrollLeft = isFullScreen ? 0 : rectsObj.scrollLeft;
 		const scrollTop = isFullScreen ? 0 : rectsObj.scrollTop;
@@ -639,7 +639,7 @@ Offset.prototype = {
 		const targetH = rects.height;
 		const tmtw = rects.top;
 		const tmbw = clientSize.h - rects.bottom;
-		const toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar.main').offsetHeight;
+		const toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar_main').offsetHeight;
 
 		const { rmt, rmb, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, rects, isTargetAbs, wwScroll);
 		if (rmb + targetH <= 0 || rmt + rt + targetH <= 0) return;
@@ -680,7 +680,7 @@ Offset.prototype = {
 		const l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
 		let resetTop = false;
-		const space = t + (isDirTop ? this.getGlobal(this.editor.frameContext.get('topArea')).top : element.offsetHeight - this.editor.frameContext.get('wysiwyg').offsetHeight);
+		const space = t + (isDirTop ? this.getGlobal(this.frameContext.get('topArea')).top : element.offsetHeight - this.frameContext.get('wysiwyg').offsetHeight);
 		if (!isDirTop && space > 0 && this._getPageBottomSpace() < space) {
 			isDirTop = true;
 			resetTop = true;
@@ -713,7 +713,7 @@ Offset.prototype = {
 	 * @returns {number} Available space
 	 */
 	_getPageBottomSpace() {
-		const topArea = this.editor.frameContext.get('topArea');
+		const topArea = this.frameContext.get('topArea');
 		return _d.documentElement.scrollHeight - (this.getGlobal(topArea).top + topArea.offsetHeight);
 	},
 
@@ -744,26 +744,26 @@ Offset.prototype = {
 		let tMargin = 0;
 		let bMargin = 0;
 
-		if (this.editor.frameContext.get('isFullScreen')) {
+		if (this.frameContext.get('isFullScreen')) {
 			rmt = tmtw - toolbarH;
 			rmb = tmbw;
 		} else {
-			const isIframeAbs = isTargetAbs && this.editor.frameOptions.get('iframe');
+			const isIframeAbs = isTargetAbs && this.frameOptions.get('iframe');
 			tMargin = targetRect.top;
 			bMargin = clientSize.h - targetRect.bottom;
 			const editorOffset = this.getGlobal();
 			const editorScroll = this.getGlobalScroll();
-			const statusBarH = this.editor.frameContext.get('statusbar')?.offsetHeight || 0;
+			const statusBarH = this.frameContext.get('statusbar')?.offsetHeight || 0;
 
 			if (isIframeAbs) {
 				const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
-				const editorH = this.editor.frameContext.get('topArea').offsetHeight;
+				const editorH = this.frameContext.get('topArea').offsetHeight;
 				rmt = targetRect.top - emt;
 				rmb = bMargin - (editorScroll.oh - (editorH + emt) + statusBarH);
 			} else {
 				rt = !this.editor.toolbar._sticky && !this.options.get('toolbar_container') ? toolbarH : 0;
-				const wst = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? editorOffset.top - _w.scrollY + rt : 0;
-				const wsb = !isTargetAbs && /\d+/.test(this.editor.frameOptions.get('height')) ? this.status.currentViewportHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
+				const wst = !isTargetAbs && /\d+/.test(this.frameOptions.get('height')) ? editorOffset.top - _w.scrollY + rt : 0;
+				const wsb = !isTargetAbs && /\d+/.test(this.frameOptions.get('height')) ? this.status.currentViewportHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
 				let st = wst;
 				if (toolbarH > wst) {
 					if (this.editor.toolbar._sticky) {

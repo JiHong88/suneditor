@@ -226,7 +226,7 @@ class Controller extends EditorInjector {
 			notInCarrier: !this.carrierWrapper.contains(form)
 		};
 
-		if ((await this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.editor.frameContext, info })) === false) return;
+		if ((await this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.frameContext, info })) === false) return;
 
 		form.style.display = 'block';
 		if (this.editor._shadowRoot) {
@@ -235,7 +235,7 @@ class Controller extends EditorInjector {
 			form.addEventListener('mousedown', this.__shadowRootEventListener);
 		}
 
-		this.editor._controllerTargetContext = this.editor.frameContext.get('topArea');
+		this.editor._controllerTargetContext = this.frameContext.get('topArea');
 
 		if (!this.isOpen) {
 			this.editor.opendControllers.push(info);
@@ -244,7 +244,7 @@ class Controller extends EditorInjector {
 		this.isOpen = true;
 		this.editor._preventBlur = true;
 		this.editor.status.onSelected = true;
-		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.editor.frameContext, info });
+		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.frameContext, info });
 	}
 
 	/**
@@ -258,7 +258,7 @@ class Controller extends EditorInjector {
 
 		this.ui.setControllerOnDisabledButtons(false);
 
-		this.editor.frameContext.get('lineBreaker_t').style.display = this.editor.frameContext.get('lineBreaker_b').style.display = 'none';
+		this.frameContext.get('lineBreaker_t').style.display = this.frameContext.get('lineBreaker_b').style.display = 'none';
 		this.editor.effectNode = null;
 		this.editor.currentControllerName = '';
 		this.editor._preventBlur = false;
@@ -465,7 +465,7 @@ class Controller extends EditorInjector {
 	 * @param {HTMLElement} eventTarget - The target element that triggered the event.
 	 */
 	#PostCloseEvent(eventTarget) {
-		if (!this.editor.frameContext.get('wysiwyg').contains(eventTarget)) {
+		if (!this.frameContext.get('wysiwyg').contains(eventTarget)) {
 			this.component.__prevent = false;
 		}
 	}

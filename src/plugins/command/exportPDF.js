@@ -61,7 +61,7 @@ class ExportPDF extends EditorInjector {
 		let ww = null;
 
 		try {
-			const standardWW = this.editor.frameContext.get('documentTypePageMirror') || this.editor.frameContext.get('wysiwygFrame');
+			const standardWW = this.frameContext.get('documentTypePageMirror') || this.frameContext.get('wysiwygFrame');
 			const editableDiv = dom.utils.createElement('div', { class: standardWW.className }, standardWW.innerHTML);
 			ww = dom.utils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
 

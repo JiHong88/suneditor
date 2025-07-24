@@ -324,7 +324,7 @@ class FontSize extends EditorInjector {
 	 * @returns {string} - The computed font size from the editor.
 	 */
 	_getDefaultSize() {
-		return this.editor.frameContext.get('wwComputedStyle').fontSize;
+		return this.frameContext.get('wwComputedStyle').fontSize;
 	}
 
 	/**

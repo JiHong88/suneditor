@@ -1,4 +1,9 @@
 /**
+ * ================================================================================================================================
+ * === Frame context
+ * =================================================================================================================================
+ */
+/**
  * @description Elements and variables you should have
  * @param {{target: Element, key: *, options: __se__FrameOptions}} editorTarget Target textarea
  * @param {HTMLElement} top Editor top area
@@ -35,6 +40,11 @@ export function CreateFrameContext(
  */
 export function UpdateStatusbarContext(statusbar: HTMLElement, mapper: __se__FrameContext): void;
 /**
+ * ================================================================================================================================
+ * === Context
+ * =================================================================================================================================
+ */
+/**
  * @description Common elements and variables you should have
  * @param {HTMLElement} toolbar Toolbar frame
  * @param {HTMLElement|null} toolbarContainer Toolbar container
@@ -43,3 +53,15 @@ export function UpdateStatusbarContext(statusbar: HTMLElement, mapper: __se__Fra
  * @returns {__se__Context}
  */
 export function CreateContext(toolbar: HTMLElement, toolbarContainer: HTMLElement | null, menuTray: HTMLElement, subbar: HTMLElement | null, statusbarContainer: any): __se__Context;
+/**
+ * ================================================================================================================================
+ * === Create context utility
+ * =================================================================================================================================
+ */
+export function CreateEditorContext(editor: any): {
+	get(k: any): any;
+	set(k: any, v: any): any;
+	getAll(): {
+		[k: string]: any;
+	};
+};

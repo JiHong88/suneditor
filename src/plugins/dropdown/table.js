@@ -557,7 +557,7 @@ class Table extends EditorInjector {
 			if (this._element) this._element.style.cursor = '';
 			this.__removeGlobalEvents();
 			if (this._resizeLine?.style.display === 'block') this._resizeLine.style.display = 'none';
-			this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
+			this._resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
 			this._setResizeLinePosition(dom.query.getParentElement(target, dom.check.isTable), target, this._resizeLine, cellEdge.isLeft);
 			this._resizeLine.style.display = 'block';
 			return;
@@ -569,7 +569,7 @@ class Table extends EditorInjector {
 			this._element = dom.query.getParentElement(target, dom.check.isTable);
 			this._element.style.cursor = 'ns-resize';
 			if (this._resizeLine?.style.display === 'block') this._resizeLine.style.display = 'none';
-			this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
+			this._resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
 			this._setResizeRowPosition(dom.query.getParentElement(target, dom.check.isTable), target, this._resizeLine);
 			this._resizeLine.style.display = 'block';
 			return;
@@ -614,8 +614,8 @@ class Table extends EditorInjector {
 
 				// ready
 				this.ui.enableBackWrapper('ew-resize');
-				if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
-				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_PREV_CLASS);
+				if (!this._resizeLine) this._resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
+				this._resizeLinePrev = this.frameContext.get('wrapper').querySelector(RESIZE_CELL_PREV_CLASS);
 
 				// select figure
 				if (colIndex < 0 || colIndex === this._logical_cellCnt - 1) {
@@ -654,8 +654,8 @@ class Table extends EditorInjector {
 
 				// ready
 				this.ui.enableBackWrapper('ns-resize');
-				if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
-				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
+				if (!this._resizeLine) this._resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
+				this._resizeLinePrev = this.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
 
 				this._startRowResizing(row, rowEdge.startY, numbers.get(_w.getComputedStyle(row).height, CELL_DECIMAL_END));
 				this._toggleEditor(false);
@@ -928,7 +928,7 @@ class Table extends EditorInjector {
 
 				this._closeTableSelectInfo();
 
-				if (emptyDiv !== this.editor.frameContext.get('wysiwyg'))
+				if (emptyDiv !== this.frameContext.get('wysiwyg'))
 					this.nodeTransform.removeAllParents(
 						emptyDiv,
 						function (current) {
@@ -2468,7 +2468,7 @@ class Table extends EditorInjector {
 	 * @param {boolean} enabled Whether to enable or disable the editor.
 	 */
 	_toggleEditor(enabled) {
-		const wysiwyg = this.editor.frameContext.get('wysiwyg');
+		const wysiwyg = this.frameContext.get('wysiwyg');
 		wysiwyg.setAttribute('contenteditable', enabled.toString());
 		if (enabled) dom.utils.removeClass(wysiwyg, 'se-disabled');
 		else dom.utils.addClass(wysiwyg, 'se-disabled');

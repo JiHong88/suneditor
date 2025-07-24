@@ -233,7 +233,7 @@ class FileManager extends CoreInjector {
 	 * @param {boolean} loaded Whether the editor is loaded
 	 */
 	_checkInfo(loaded) {
-		const tags = [].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.query));
+		const tags = [].slice.call(this.frameContext.get('wysiwyg').querySelectorAll(this.query));
 		const infoList = this.infoList;
 		if (tags.length === infoList.length) {
 			// reset

@@ -371,7 +371,7 @@ class Figure extends EditorInjector {
 		this._height = targetInfo.height;
 		if (__fileManagerInfo || this.__fileManagerInfo) return targetInfo;
 
-		const _figure = this.editor.frameContext.get('_figure');
+		const _figure = this.frameContext.get('_figure');
 		this.editor._figureContainer = _figure.main;
 		_figure.main.style.top = top + 'px';
 		_figure.main.style.left = left + 'px';
@@ -1186,7 +1186,7 @@ class Figure extends EditorInjector {
 		const type = !display ? 'none' : 'flex';
 		this.controller.form.style.display = type;
 
-		const _figure = this.editor.frameContext.get('_figure');
+		const _figure = this.frameContext.get('_figure');
 		const resizeHandles = _figure.handles;
 		for (let i = 0, len = resizeHandles.length; i < len; i++) {
 			resizeHandles[i].style.display = type;
@@ -1221,7 +1221,7 @@ class Figure extends EditorInjector {
 	 * @param {Node} figureMain The main figure container element.
 	 */
 	_setDragEvent(figureMain) {
-		const dragHandle = this.editor.frameContext.get('wrapper').querySelector('.se-drag-handle');
+		const dragHandle = this.frameContext.get('wrapper').querySelector('.se-drag-handle');
 		dom.utils.removeClass(dragHandle, 'se-drag-handle-full');
 
 		dragHandle.style.opacity = '';
@@ -1262,7 +1262,7 @@ class Figure extends EditorInjector {
 		const direction = (inst._resize_direction = eventTarget.classList[0]);
 		inst._resizeClientX = e.clientX;
 		inst._resizeClientY = e.clientY;
-		inst.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
+		inst.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 		this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
 
 		const { w, h, dw, dh } = this.getSize(inst._element);
@@ -1280,7 +1280,7 @@ class Figure extends EditorInjector {
 			if (__resizing_p_wh || __resizing_p_ow) {
 				const sizeTarget = inst._cover || inst._element;
 				__resizing_sw = sizeTarget.offsetWidth;
-				__resizing_cw = converter.getWidthInPercentage(sizeTarget, this.editor.frameContext.get('wysiwygFrame')) / 100;
+				__resizing_cw = converter.getWidthInPercentage(sizeTarget, this.frameContext.get('wysiwygFrame')) / 100;
 			}
 		}
 
@@ -1288,7 +1288,7 @@ class Figure extends EditorInjector {
 		inst.__offContainerEvent = inst.eventManager.addGlobalEvent('mouseup', inst.__containerResizingOff);
 		inst._displayResizeHandles(false);
 
-		const _display = this.editor.frameContext.get('_figure').display;
+		const _display = this.frameContext.get('_figure').display;
 		_display.style.display = 'block';
 		dom.utils.changeTxt(_display, dw + ' * ' + dh);
 	}
@@ -1309,7 +1309,7 @@ class Figure extends EditorInjector {
 		const w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
 		const h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
 		const wh = (resultH / resultW) * w;
-		const resizeBorder = this.editor.frameContext.get('_figure').border;
+		const resizeBorder = this.frameContext.get('_figure').border;
 
 		if (/t/.test(direction)) resizeBorder.style.top = resultH - (/h/.test(direction) ? h : wh) + 'px';
 		if (/l/.test(direction)) resizeBorder.style.left = resultW - w + 'px';
@@ -1330,7 +1330,7 @@ class Figure extends EditorInjector {
 		const resize_w = /** @type {number} */ (!v && /h$/.test(direction) ? this._width : Math.round(resultW));
 		const resize_h = /** @type {number} */ (!v && /w$/.test(direction) ? this._height : Math.round(resultH));
 		const rw = __resizing_cw ? (resize_w / __resizing_sw) * __resizing_cw * 100 : resize_w;
-		dom.utils.changeTxt(this.editor.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' * ' + resize_h);
+		dom.utils.changeTxt(this.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' * ' + resize_h);
 
 		this._resize_w = resize_w;
 		this._resize_h = resize_h;
@@ -1350,9 +1350,9 @@ class Figure extends EditorInjector {
 
 		if (!this.isVertical && !/%$/.test(w + '')) {
 			const limit =
-				this.editor.frameContext.get('wysiwygFrame').clientWidth -
-				numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) +
-				numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) -
+				this.frameContext.get('wysiwygFrame').clientWidth -
+				numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) +
+				numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) -
 				2;
 			if (numbers.get(w, 0) > limit) {
 				h = Math.round((h / w) * limit);
@@ -1424,7 +1424,7 @@ class Figure extends EditorInjector {
 	}
 
 	#OffFigureContainer() {
-		this.editor.frameContext.get('_figure').main.style.display = 'none';
+		this.frameContext.get('_figure').main.style.display = 'none';
 		this.editor._figureContainer = null;
 	}
 

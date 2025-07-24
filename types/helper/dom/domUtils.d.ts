@@ -124,11 +124,11 @@ export function setStyle(elements: Node | Node[], styleName: string, value: stri
 export function getStyle(element: Node, styleName: string): string | undefined;
 /**
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
- * @param {Array<HTMLButtonElement|HTMLInputElement>} buttonList (Button | Input) Element array
+ * @param {__se__NodeCollection} buttonList (Button | Input) Element array
  * @param {boolean} disabled Disabled value
  * @param {boolean} [important=false] If priveleged mode should be used (Necessary to switch importantDisabled buttons)
  */
-export function setDisabled(buttonList: Array<HTMLButtonElement | HTMLInputElement>, disabled: boolean, important?: boolean): void;
+export function setDisabled(buttonList: __se__NodeCollection, disabled: boolean, important?: boolean): void;
 /**
  * @description Determine whether any of the matched elements are assigned the given class
  * @param {?Node} element Elements to search class name

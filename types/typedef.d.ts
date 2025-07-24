@@ -234,8 +234,8 @@ declare global {
 		 */
 		info: __se__ComponentInfo;
 	};
-	type __se__FrameOptions = Map<string, any>;
-	type __se__FrameContext = Map<string, any>;
-	type __se__Context = Map<string, any>;
+	type __se__FrameOptions = Map<keyof import('./core/config/options').AllFrameOptions, any>;
+	type __se__FrameContext = import('./core/config/frameContext').FrameContextUtil;
+	type __se__Context = Map<keyof import('./core/config/context').ContextUtil, any>;
 	type __se__Class_OffsetGlobalInfo = import('./core/class/offset').OffsetGlobalInfo;
 }

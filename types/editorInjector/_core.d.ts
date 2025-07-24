@@ -55,12 +55,22 @@ export default class CoreInjector {
 	 */
 	status: __se__EditorStatus;
 	/**
-	 * @description The editor's context map.
+	 * @description The editor's [frame] context utility object.
+	 * @type {__se__EditorCore['frameContext']}
+	 */
+	frameContext: __se__EditorCore['frameContext'];
+	/**
+	 * @description The editor's [frame] options utility object.
+	 * @type {__se__EditorCore['frameOptions']}
+	 */
+	frameOptions: __se__EditorCore['frameOptions'];
+	/**
+	 * @description The editor's context utility object.
 	 * @type {__se__EditorCore['context']}
 	 */
 	context: __se__EditorCore['context'];
 	/**
-	 * @description The editor's options map.
+	 * @description The editor's options utility object.
 	 * @type {__se__EditorCore['options']}
 	 */
 	options: __se__EditorCore['options'];

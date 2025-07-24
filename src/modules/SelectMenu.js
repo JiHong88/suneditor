@@ -98,7 +98,7 @@ class SelectMenu extends CoreInjector {
 	on(referElement, selectMethod, attr) {
 		if (!attr) attr = {};
 		this._refer = /** @type {HTMLElement} */ (referElement);
-		this._keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.editor.frameContext.get('_ww');
+		this._keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.frameContext.get('_ww');
 		this._selectMethod = selectMethod;
 		this.form = dom.utils.createElement(
 			'DIV',
