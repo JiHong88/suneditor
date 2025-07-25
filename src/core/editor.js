@@ -616,6 +616,10 @@ Editor.prototype = {
 				this.html.set(`<${this.options.get('defaultLine')}><br></${this.options.get('defaultLine')}>`);
 				this.focus();
 				this.history.push(false);
+				// document type
+				if (this.frameContext.has('documentType_use_header')) {
+					this.frameContext.get('documentType').reHeader();
+				}
 				break;
 			case 'codeView':
 				this.viewer.codeView(!this.frameContext.get('isCodeView'));

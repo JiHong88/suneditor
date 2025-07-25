@@ -378,13 +378,11 @@ Selection_.prototype = {
 			el?.scrollIntoView(scrollOption);
 
 			if (scrollOption?.behavior === 'auto') {
-				_w.setTimeout(() => {
-					if (toolbarHeight && scrollY > _w.scrollY) {
-						_w.scrollBy(0, -toolbarHeight);
-					} else if (isAutoHeight) {
-						_w.scrollBy(0, statusbarHeight);
-					}
-				}, 0);
+				if (toolbarHeight && scrollY > _w.scrollY) {
+					_w.scrollBy(0, -toolbarHeight);
+				} else if (isAutoHeight) {
+					_w.scrollBy(0, statusbarHeight);
+				}
 			}
 
 			return;
