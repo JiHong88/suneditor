@@ -832,7 +832,6 @@ Offset.prototype = {
 	 *   rects: RectsInfo
 	 * }} An object with scroll and viewport information.
 	 */
-
 	_getWindowScroll() {
 		const viewPort = getClientSize(_d);
 		return {
@@ -845,7 +844,7 @@ Offset.prototype = {
 				left: 0,
 				top: 0,
 				right: _w.innerWidth,
-				bottom: _w.innerHeight,
+				bottom: this.status.currentViewportHeight || _w.innerHeight,
 				noText: true
 			}
 		};

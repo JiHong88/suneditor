@@ -196,6 +196,18 @@ export function applyInlineStylesAll(wwTarget: Node, includeWW: boolean, styles:
  */
 export function waitForMediaLoad(target: Node, timeout?: number): Promise<void>;
 /**
+ * @description Gets a CSS variable on the root element of the editor.
+ * @param {string} name - The CSS variable name (e.g. `--se-color-primary`)
+ * @return {string} The value of the CSS variable
+ */
+export function getRootCssVar(name: string): string;
+/**
+ * @description Sets a CSS variable on the root element of the editor.
+ * @param {string} name - The CSS variable name (e.g. `--se-color-primary`)
+ * @param {string} value - The CSS variable value
+ */
+export function setRootCssVar(name: string, value: string): void;
+/**
  * @description Create tooltip HTML
  * @param {string} text Tooltip text
  * @returns {string} Tooltip HTML
@@ -230,5 +242,7 @@ declare namespace utils {
 	export { getViewportSize };
 	export { applyInlineStylesAll };
 	export { waitForMediaLoad };
+	export { getRootCssVar };
+	export { setRootCssVar };
 	export { createTooltipInner };
 }

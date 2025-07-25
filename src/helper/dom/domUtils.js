@@ -576,6 +576,24 @@ export function waitForMediaLoad(target, timeout = 5000) {
 }
 
 /**
+ * @description Gets a CSS variable on the root element of the editor.
+ * @param {string} name - The CSS variable name (e.g. `--se-color-primary`)
+ * @return {string} The value of the CSS variable
+ */
+export function getRootCssVar(name) {
+	return _d.documentElement.style.getPropertyValue(name);
+}
+
+/**
+ * @description Sets a CSS variable on the root element of the editor.
+ * @param {string} name - The CSS variable name (e.g. `--se-color-primary`)
+ * @param {string} value - The CSS variable value
+ */
+export function setRootCssVar(name, value) {
+	_d.documentElement.style.setProperty(name, value);
+}
+
+/**
  * @description Create tooltip HTML
  * @param {string} text Tooltip text
  * @returns {string} Tooltip HTML
@@ -612,6 +630,8 @@ const utils = {
 	getViewportSize,
 	applyInlineStylesAll,
 	waitForMediaLoad,
+	getRootCssVar,
+	setRootCssVar,
 	createTooltipInner
 };
 

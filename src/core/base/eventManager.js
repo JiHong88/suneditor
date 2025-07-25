@@ -1273,8 +1273,8 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 */
 	__setViewportSize() {
-		const currentVisibleHeight = (this.status.currentViewportHeight = numbers.get(_w.visualViewport.height, 0));
-		this.editor.setRootCssVar('--se-var-viewport-height', `${currentVisibleHeight}px`);
+		this.status.currentViewportHeight = numbers.get(_w.visualViewport.height, 0);
+		// dom.utils.setRootCssVar('--se-var-viewport-height', `${this.status.currentViewportHeight}px`);
 	},
 
 	constructor: EventManager

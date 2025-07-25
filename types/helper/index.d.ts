@@ -135,6 +135,8 @@ export const dom: {
 		getViewportSize: typeof import('./dom/domUtils').getViewportSize;
 		applyInlineStylesAll: typeof import('./dom/domUtils').applyInlineStylesAll;
 		waitForMediaLoad: typeof import('./dom/domUtils').waitForMediaLoad;
+		getRootCssVar: typeof import('./dom/domUtils').getRootCssVar;
+		setRootCssVar: typeof import('./dom/domUtils').setRootCssVar;
 		createTooltipInner: typeof import('./dom/domUtils').createTooltipInner;
 	};
 };
