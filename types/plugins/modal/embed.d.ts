@@ -90,6 +90,14 @@ export type EmbedPluginOptions = {
 	 * - Figure controls.
 	 */
 	controls?: FigureControls_embed;
+	/**
+	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+	 * - `select`: Always select the inserted component.
+	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+	 * - `none`: Do nothing.
+	 */
+	insertBehavior?: __se__ComponentInsertBehaviorType;
 };
 /**
  * @typedef {import('../../events').ProcessInfo} ProcessInfo_embed
@@ -132,6 +140,11 @@ export type EmbedPluginOptions = {
  *   // Additional services...
  * }
  * @property {FigureControls_embed} [controls] - Figure controls.
+ * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ * - `select`: Always select the inserted component.
+ * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ * - `none`: Do nothing.
  */
 /**
  * @class
@@ -173,6 +186,7 @@ declare class Embed extends EditorInjector {
 		};
 		query_youtube: string;
 		query_vimeo: string;
+		insertBehavior: __se__ComponentInsertBehaviorType;
 	};
 	modal: Modal;
 	figure: Figure;

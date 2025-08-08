@@ -633,7 +633,7 @@ export function InitOptions(options, editorTargets, plugins) {
 	o.set('printTemplate', typeof options.printTemplate === 'string' ? options.printTemplate : null);
 
 	/** --- Media select */
-	o.set('componentAutoSelect', options.componentAutoSelect === undefined ? false : !!options.componentAutoSelect);
+	o.set('componentInsertBehavior', ['auto', 'select', 'line', 'none'].includes(options.componentInsertBehavior) ? options.componentInsertBehavior : 'auto');
 
 	/** --- Url input protocol */
 	o.set('defaultUrlProtocol', typeof options.defaultUrlProtocol === 'string' ? options.defaultUrlProtocol : null);

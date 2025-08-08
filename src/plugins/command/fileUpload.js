@@ -34,6 +34,11 @@ class FileUpload extends EditorInjector {
 	 * @param {string=} pluginOptions.acceptedFormats - accepted formats
 	 * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
 	 * @param {Array<string>} pluginOptions.controls - Additional controls to be added to the figure
+	 * @param {__se__ComponentInsertBehaviorType} [pluginOptions.insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+	 * - `select`: Always select the inserted component.
+	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+	 * - `none`: Do nothing.
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
@@ -52,6 +57,7 @@ class FileUpload extends EditorInjector {
 		this.acceptedFormats = typeof pluginOptions.acceptedFormats !== 'string' ? '*' : pluginOptions.acceptedFormats.trim() || '*';
 		this._acceptedCheck = this.acceptedFormats.split(', ');
 		this.as = pluginOptions.as || 'box';
+		this.insertBehavior = pluginOptions.insertBehavior;
 		this.input = dom.utils.createElement('input', { type: 'file', accept: this.acceptedFormats });
 		if (this.allowMultiple) {
 			this.input.setAttribute('multiple', 'multiple');
@@ -350,21 +356,21 @@ class FileUpload extends EditorInjector {
 
 		if (this.as === 'link') {
 			a.className = 'se-component se-inline-component';
-			this.component.insert(a, { skipCharCount: false, skipSelection: false, skipHistory: false });
+			this.component.insert(a, { insertBehavior: this.insertBehavior });
 			return;
 		}
 
 		const figure = Figure.CreateContainer(a);
 		dom.utils.addClass(figure.container, 'se-file-figure|se-flex-component');
 
-		if (!this.component.insert(figure.container, { skipCharCount: false, skipSelection: isLast ? !this.options.get('componentAutoSelect') : true, skipHistory: false })) {
+		if (!this.component.insert(figure.container, { insertBehavior: this.insertBehavior })) {
 			this.editor.focus();
 			return;
 		}
 
 		if (!isLast) return;
 
-		if (!this.options.get('componentAutoSelect')) {
+		if (!this.options.get('componentInsertBehavior')) {
 			const line = this.format.addLine(figure.container, null);
 			if (line) this.selection.setRange(line, 0, line, 0);
 		} else {

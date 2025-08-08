@@ -37,6 +37,11 @@ const { NO_EVENT } = env;
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
  * @property {FigureControls_video} [controls] - Figure controls.
+ * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ * - `select`: Always select the inserted component.
+ * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ * - `none`: Do nothing.
  */
 
 /**
@@ -95,7 +100,8 @@ class Video extends EditorInjector {
 			videoTagAttributes: pluginOptions.videoTagAttributes || null,
 			iframeTagAttributes: pluginOptions.iframeTagAttributes || null,
 			query_youtube: pluginOptions.query_youtube || '',
-			query_vimeo: pluginOptions.query_vimeo || ''
+			query_vimeo: pluginOptions.query_vimeo || '',
+			insertBehavior: pluginOptions.insertBehavior
 		};
 
 		// create HTML
@@ -596,11 +602,7 @@ class Video extends EditorInjector {
 		this.fileManager.setFileData(oFrame, file);
 
 		if (!isUpdate) {
-			this.component.insert(container, { skipCharCount: false, skipSelection: true, skipHistory: false });
-			if (!this.options.get('componentAutoSelect')) {
-				const line = this.format.addLine(container, null);
-				if (line) this.selection.setRange(line, 0, line, 0);
-			}
+			this.component.insert(container, { insertBehavior: this.pluginOptions.insertBehavior });
 			return;
 		}
 

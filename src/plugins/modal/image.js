@@ -31,6 +31,13 @@ const { NO_EVENT } = env;
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
  * @property {FigureControls_image} [controls] - Figure controls.
+ * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
+ * - For block components: executes behavior based on `selectMode`:
+ * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ * - `select`: Always select the inserted component.
+ * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ * - `none`: Do nothing.
  */
 
 /**
@@ -79,7 +86,8 @@ class Image_ extends EditorInjector {
 			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
 			useFormatType: pluginOptions.useFormatType ?? true,
 			defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
-			keepFormatType: pluginOptions.keepFormatType ?? false
+			keepFormatType: pluginOptions.keepFormatType ?? false,
+			insertBehavior: pluginOptions.insertBehavior
 		};
 
 		// create HTML
@@ -892,7 +900,7 @@ class Image_ extends EditorInjector {
 		this.fileManager.setFileData(oImg, file);
 
 		oImg.onload = this.#OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		this.component.insert(container, { skipCharCount: false, skipSelection: !this.options.get('componentAutoSelect'), skipHistory: false });
+		this.component.insert(container, { insertBehavior: null });
 	}
 
 	/**
@@ -925,7 +933,7 @@ class Image_ extends EditorInjector {
 		this.fileManager.setFileData(oImg, file);
 
 		oImg.onload = this.#OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		this.component.insert(container, { skipCharCount: false, skipSelection: true, skipHistory: false });
+		this.component.insert(container, { insertBehavior: null });
 	}
 
 	/**
@@ -1189,21 +1197,8 @@ class Image_ extends EditorInjector {
 	#OnloadImg(oImg, _svgDefaultSize, container) {
 		// svg exception handling
 		if (oImg.offsetWidth === 0) this._applySize(_svgDefaultSize, '');
-		if (this.options.get('componentAutoSelect')) {
-			this.component.select(oImg, Image_.key);
-		} else {
-			if (!this.component.isInline(container)) {
-				const line = this.format.addLine(container, null);
-				if (line) this.selection.setRange(line, 0, line, 0);
-			} else {
-				const r = this.selection.getNearRange(container);
-				if (r) {
-					this.selection.setRange(r.container, r.offset, r.container, r.offset);
-				} else {
-					this.component.select(oImg, Image_.key);
-				}
-			}
-		}
+
+		this.component.applyInsertBehavior(container, null, this.pluginOptions.insertBehavior || this.options.get('componentInsertBehavior'));
 
 		this.editor._iframeAutoHeight(this.frameContext);
 		this.history.push(false);

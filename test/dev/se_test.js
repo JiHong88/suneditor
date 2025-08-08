@@ -642,7 +642,7 @@ const options1 = {
 	},
 	// autoLinkify: false,
 	// autoStyleify: [],
-	componentAutoSelect: true,
+	componentInsertBehavior: 'auto', // auto, select, line, none
 	// strictMode: false,
 	// freeCodeViewMode: true,
 	value: `

@@ -106,7 +106,7 @@ class HR extends EditorInjector {
 	submit(className) {
 		const hr = dom.utils.createElement('hr', { class: className });
 		this.editor.focus();
-		this.component.insert(hr, { skipCharCount: false, skipSelection: true, skipHistory: false });
+		this.component.insert(hr, { insertBehavior: 'line' });
 		return hr;
 	}
 }

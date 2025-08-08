@@ -46,6 +46,11 @@ const { NO_EVENT } = env;
  *   // Additional services...
  * }
  * @property {FigureControls_embed} [controls] - Figure controls.
+ * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ * - `select`: Always select the inserted component.
+ * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ * - `none`: Do nothing.
  */
 
 /**
@@ -97,7 +102,8 @@ class Embed extends EditorInjector {
 			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			iframeTagAttributes: pluginOptions.iframeTagAttributes || null,
 			query_youtube: pluginOptions.query_youtube || '',
-			query_vimeo: pluginOptions.query_vimeo || ''
+			query_vimeo: pluginOptions.query_vimeo || '',
+			insertBehavior: pluginOptions.insertBehavior
 		};
 
 		// create HTML
@@ -591,7 +597,7 @@ class Embed extends EditorInjector {
 		cover.setAttribute('data-se-origin', originSrc);
 
 		if (!isUpdate) {
-			this.component.insert(container, { skipCharCount: false, skipSelection: true, skipHistory: true });
+			this.component.insert(container, { skipHistory: true, scrollTo: false, insertBehavior: this.pluginOptions.insertBehavior });
 
 			if (scriptTag) {
 				try {
@@ -626,7 +632,7 @@ class Embed extends EditorInjector {
 				}
 			}
 
-			if (!this.options.get('componentAutoSelect')) {
+			if (!this.options.get('componentInsertBehavior')) {
 				const line = this.format.addLine(container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);
 			}

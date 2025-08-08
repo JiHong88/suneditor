@@ -378,7 +378,7 @@ HTML.prototype = {
 			}
 		} else {
 			if (this.component.is(html)) {
-				this.component.insert(html, { skipCharCount, skipSelection: false, skipHistory: false });
+				this.component.insert(html, { skipCharCount, insertBehavior: 'none' });
 			} else {
 				let afterNode = null;
 				if (this.format.isLine(html) || dom.check.isMedia(html)) {

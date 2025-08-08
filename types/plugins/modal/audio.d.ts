@@ -49,6 +49,14 @@ export type AudioPluginOptions = {
 	audioTagAttributes?: {
 		[x: string]: string;
 	};
+	/**
+	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+	 * - `select`: Always select the inserted component.
+	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+	 * - `none`: Do nothing.
+	 */
+	insertBehavior?: __se__ComponentInsertBehaviorType;
 };
 /**
  * @typedef {import('../../events').AudioInfo} AudioInfo_audio
@@ -66,6 +74,11 @@ export type AudioPluginOptions = {
  * @property {boolean} [allowMultiple] - Whether to allow multiple file uploads.
  * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
  * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the audio tag.
+ * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ * - `select`: Always select the inserted component.
+ * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ * - `none`: Do nothing.
  */
 /**
  * @class
@@ -105,6 +118,7 @@ declare class Audio_ extends EditorInjector {
 		audioTagAttributes: {
 			[x: string]: string;
 		};
+		insertBehavior: __se__ComponentInsertBehaviorType;
 	};
 	modal: Modal;
 	controller: Controller;

@@ -73,8 +73,10 @@ declare class Component {
 	 * @param {Node} element Element to be inserted
 	 * @param {Object} [options] Options
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
-	 * @param {boolean} [options.skipSelection=false] If true, do not automatically select the inserted component.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
+	 * @param {boolean} [options.scrollTo=true] true : Scroll to the inserted element, false : Do not scroll.
+	 * @param {?__se__ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
+	 * - If null, noting action is performed after insertion.
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
 	insert(
@@ -82,14 +84,24 @@ declare class Component {
 		element: Node,
 		{
 			skipCharCount,
-			skipSelection,
-			skipHistory
+			skipHistory,
+			scrollTo,
+			insertBehavior
 		}?: {
 			skipCharCount?: boolean;
-			skipSelection?: boolean;
 			skipHistory?: boolean;
+			scrollTo?: boolean;
+			insertBehavior?: __se__ComponentInsertBehaviorType | null;
 		}
 	): HTMLElement;
+	/**
+	 * @this {ComponentThis}
+	 * @description Handles post-insertion behavior for a newly created component based on the specified mode.
+	 * @param {Node} element The inserted component element.
+	 * @param {Node|null} [oNode] Optional node to use for selection if the component cannot be selected.
+	 * @param {__se__ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
+	 */
+	applyInsertBehavior(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node, oNode?: Node | null, insertBehavior?: __se__ComponentInsertBehaviorType): void;
 	/**
 	 * @this {ComponentThis}
 	 * @description Gets the file component and that plugin name
@@ -171,6 +183,18 @@ declare class Component {
 	 * - This method resets the selection state and hides UI elements related to the component selection.
 	 */
 	__deselect(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	/**
+	 * @private
+	 * @this {ComponentThis}
+	 * @description
+	 * Attempts to move the cursor to a valid line after the given container.
+	 * - If a valid next sibling line exists, moves the selection there.
+	 * - If no next sibling exists, creates a new line after the container and moves the selection there.
+	 * - If the next sibling exists but is not a valid line element and cannot create a new line, returns false.
+	 * @param {HTMLElement} container The component container element.
+	 * @returns {boolean} Returns true if the selection moved to a line (existing or newly created), otherwise false.
+	 */
+	__moveToNextLineOrAdd(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: HTMLElement): boolean;
 	/**
 	 * @private
 	 * @this {ComponentThis}

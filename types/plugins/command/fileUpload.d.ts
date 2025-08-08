@@ -28,6 +28,11 @@ declare class FileUpload extends EditorInjector {
 	 * @param {string=} pluginOptions.acceptedFormats - accepted formats
 	 * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
 	 * @param {Array<string>} pluginOptions.controls - Additional controls to be added to the figure
+	 * @param {__se__ComponentInsertBehaviorType} [pluginOptions.insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+	 * - `select`: Always select the inserted component.
+	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+	 * - `none`: Do nothing.
 	 */
 	constructor(
 		editor: __se__EditorCore,
@@ -44,6 +49,7 @@ declare class FileUpload extends EditorInjector {
 			acceptedFormats?: string | undefined;
 			as?: string | undefined;
 			controls: Array<string>;
+			insertBehavior?: __se__ComponentInsertBehaviorType;
 		}
 	);
 	title: any;
@@ -58,6 +64,7 @@ declare class FileUpload extends EditorInjector {
 	acceptedFormats: string;
 	_acceptedCheck: string[];
 	as: string;
+	insertBehavior: __se__ComponentInsertBehaviorType;
 	input: HTMLElement;
 	_element: HTMLElement;
 	figure: Figure;

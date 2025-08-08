@@ -334,7 +334,13 @@ export const DEFAULTS = {
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
  * @property {string} [previewTemplate=null] - Custom template for preview mode.
  * @property {string} [printTemplate=null] - Custom template for print mode.
- * @property {boolean} [componentAutoSelect=false] - Enables automatic selection of inserted components.
+ * @property {__se__ComponentInsertBehaviorType} [componentInsertBehavior="auto"] - Enables automatic selection of inserted components.
+ * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
+ * - For block components: executes behavior based on `selectMode`:
+ *    - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ *    - `select`: Always select the inserted component.
+ *    - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ *    - `none`: Do nothing.
  * @property {string} [defaultUrlProtocol=null] - Default URL protocol for links.
  * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - {"copy": 1500} - Duration for displaying toast messages.
  * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
@@ -497,7 +503,7 @@ export const OPTION_FIXED_FLAG = {
 	fullScreenOffset: true,
 	previewTemplate: true,
 	printTemplate: true,
-	componentAutoSelect: true,
+	componentInsertBehavior: true,
 	defaultUrlProtocol: true,
 	allUsedStyles: 'fixed',
 	toastMessageTime: true,

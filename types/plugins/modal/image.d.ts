@@ -95,6 +95,16 @@ export type ImagePluginOptions = {
 	 * - Figure controls.
 	 */
 	controls?: FigureControls_image;
+	/**
+	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+	 * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
+	 * - For block components: executes behavior based on `selectMode`:
+	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+	 * - `select`: Always select the inserted component.
+	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+	 * - `none`: Do nothing.
+	 */
+	insertBehavior?: __se__ComponentInsertBehaviorType;
 };
 /**
  * @typedef {import('../../events').ImageInfo} ImageInfo_image
@@ -122,6 +132,13 @@ export type ImagePluginOptions = {
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
  * @property {FigureControls_image} [controls] - Figure controls.
+ * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
+ * - For block components: executes behavior based on `selectMode`:
+ * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ * - `select`: Always select the inserted component.
+ * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ * - `none`: Do nothing.
  */
 /**
  * @class
@@ -165,6 +182,7 @@ declare class Image_ extends EditorInjector {
 		useFormatType: boolean;
 		defaultFormatType: string;
 		keepFormatType: boolean;
+		insertBehavior: __se__ComponentInsertBehaviorType;
 	};
 	alignForm: HTMLElement;
 	anchor: ModalAnchorEditor;

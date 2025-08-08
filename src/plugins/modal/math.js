@@ -251,9 +251,9 @@ class Math_ extends EditorInjector {
 
 			if (selectedFormats.length > 1) {
 				const oFormat = dom.utils.createElement(selectedFormats[0].nodeName, null, mathEl);
-				this.component.insert(oFormat, { skipCharCount: false, skipSelection: true, skipHistory: false });
+				this.component.insert(oFormat, { insertBehavior: 'none', scrollTo: false });
 			} else {
-				this.component.insert(mathEl, { skipCharCount: false, skipSelection: true, skipHistory: false });
+				this.component.insert(mathEl, { insertBehavior: 'none', scrollTo: false });
 			}
 		} else {
 			const containerEl = dom.query.getParentElement(this.controller.currentTarget, '.se-component');

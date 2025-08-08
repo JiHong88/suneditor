@@ -259,7 +259,7 @@ export function FONT_STYLE(editor, command) {
  */
 export function PAGE_BREAK(editor) {
 	const pageBreak = dom.utils.createElement('DIV', { class: 'se-component se-component-line-break se-page-break' });
-	editor.component.insert(pageBreak, { skipCharCount: true, skipSelection: true, skipHistory: false });
+	editor.component.insert(pageBreak, { skipCharCount: true, insertBehavior: 'line' });
 	const line = pageBreak.nextElementSibling || editor.format.addLine(pageBreak);
 	editor.selection.setRange(line, 1, line, 1);
 	editor.history.push(false);

@@ -20,6 +20,11 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
  * @property {boolean} [allowMultiple] - Whether to allow multiple file uploads.
  * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
  * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the audio tag.
+ * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ * - `select`: Always select the inserted component.
+ * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ * - `none`: Do nothing.
  */
 
 /**
@@ -62,7 +67,8 @@ class Audio_ extends EditorInjector {
 			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			allowMultiple: !!pluginOptions.allowMultiple,
 			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'audio/*' : pluginOptions.acceptedFormats.trim() || 'audio/*',
-			audioTagAttributes: pluginOptions.audioTagAttributes || null
+			audioTagAttributes: pluginOptions.audioTagAttributes || null,
+			insertBehavior: pluginOptions.insertBehavior
 		};
 
 		// create HTML
@@ -425,11 +431,11 @@ class Audio_ extends EditorInjector {
 			this.fileManager.setFileData(element, file);
 			element.src = src;
 			const figure = Figure.CreateContainer(element, 'se-flex-component');
-			if (!this.component.insert(figure.container, { skipCharCount: false, skipSelection: !this.options.get('componentAutoSelect'), skipHistory: false })) {
+			if (!this.component.insert(figure.container, { insertBehavior: this.pluginOptions.insertBehavior })) {
 				this.editor.focus();
 				return;
 			}
-			if (!this.options.get('componentAutoSelect')) {
+			if (!this.options.get('componentInsertBehavior')) {
 				const line = this.format.addLine(figure.container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);
 			}

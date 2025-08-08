@@ -91,6 +91,8 @@ class Anchor extends EditorInjector {
 
 		switch (command) {
 			case 'submit': {
+				this.controller.close();
+
 				if (!currentElement) {
 					const id = this.inputEl.value.trim();
 					if (!id) {
@@ -106,7 +108,7 @@ class Anchor extends EditorInjector {
 						class: 'se-component se-inline-component'
 					});
 
-					this.component.insert(a, { skipCharCount: false, skipSelection: true, skipHistory: false });
+					this.component.insert(a, { insertBehavior: 'none', scrollTo: false });
 
 					const r = this.selection.getNearRange(a);
 					if (r) {
@@ -114,14 +116,12 @@ class Anchor extends EditorInjector {
 					} else {
 						this.component.select(a, Anchor.key);
 					}
+
 					this._init();
 				} else {
-					this.controller.close();
 					currentElement.id = this.inputEl.value;
-					this.select(currentElement);
+					this.component.select(currentElement, Anchor.key);
 				}
-
-				this.controller.close();
 
 				break;
 			}
@@ -142,6 +142,7 @@ class Anchor extends EditorInjector {
 				this.inputEl.value = this.displayId.textContent;
 				this.controllerSelect.hide();
 				this.controller.open(currentElement);
+				this.inputEl.focus();
 
 				break;
 			}

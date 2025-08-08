@@ -99,14 +99,18 @@ Component.prototype = {
 	 * @param {Node} element Element to be inserted
 	 * @param {Object} [options] Options
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
-	 * @param {boolean} [options.skipSelection=false] If true, do not automatically select the inserted component.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
+	 * @param {boolean} [options.scrollTo=true] true : Scroll to the inserted element, false : Do not scroll.
+	 * @param {?__se__ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
+	 * - If null, noting action is performed after insertion.
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
-	insert(element, { skipCharCount, skipSelection, skipHistory } = {}) {
+	insert(element, { skipCharCount = false, skipHistory = false, scrollTo = true, insertBehavior } = {}) {
 		if (this.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(element))) {
 			return null;
 		}
+
+		if (!insertBehavior) insertBehavior = this.options.get('componentInsertBehavior');
 
 		const r = this.html.remove();
 		const isInline = this.isInline(element);
@@ -115,36 +119,29 @@ Component.prototype = {
 		let oNode = null;
 		let formatEl = this.format.getLine(selectionNode, null);
 
-		if (dom.check.isListCell(formatEl)) {
-			this.html.insertNode(element, { afterNode: isInline ? null : selectionNode === formatEl ? null : r.container.nextSibling, skipCharCount: true });
-			if (!isInline && !element.nextSibling) element.parentNode.appendChild(dom.utils.createElement('BR'));
-		} else {
-			if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || dom.check.isBreak(r.container))) {
-				const depthFormat = dom.query.getParentElement(r.container, this.format.isBlock.bind(this.format));
-				oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
-				if (oNode) formatEl = /** @type {HTMLElement} */ (oNode.previousSibling);
+		try {
+			if (dom.check.isListCell(formatEl)) {
+				this.html.insertNode(element, { afterNode: isInline ? null : selectionNode === formatEl ? null : r.container.nextSibling, skipCharCount: true });
+				if (!isInline && !element.nextSibling) element.parentNode.appendChild(dom.utils.createElement('BR'));
+			} else {
+				if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || dom.check.isBreak(r.container))) {
+					const depthFormat = dom.query.getParentElement(r.container, this.format.isBlock.bind(this.format));
+					oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
+					if (oNode) formatEl = /** @type {HTMLElement} */ (oNode.previousSibling);
+				}
+				this.html.insertNode(element, { afterNode: isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
+				if (!isInline && formatEl && dom.check.isZeroWidth(formatEl)) dom.utils.removeItem(formatEl);
 			}
-			this.html.insertNode(element, { afterNode: isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
-			if (!isInline && formatEl && dom.check.isZeroWidth(formatEl)) dom.utils.removeItem(formatEl);
-		}
 
-		if (isInline) {
-			const empty = dom.utils.createTextNode(unicode.zeroWidthSpace);
-			element.parentNode.insertBefore(empty, element.nextSibling);
+			if (isInline) {
+				const empty = dom.utils.createTextNode(unicode.zeroWidthSpace);
+				element.parentNode.insertBefore(empty, element.nextSibling);
+			}
+		} catch (e) {
+			console.error('Component insert error:', e);
 		}
 
 		if (!skipHistory) this.history.push(false);
-
-		if (!skipSelection) {
-			this.selection.setRange(element, 0, element, 0);
-			const fileComponentInfo = this.get(element);
-			if (fileComponentInfo) {
-				this.select(fileComponentInfo.target, fileComponentInfo.pluginName);
-			} else if (oNode) {
-				oNode = dom.query.getEdgeChildNodes(oNode, null).sc || oNode;
-				this.selection.setRange(oNode, 0, oNode, 0);
-			}
-		}
 
 		// document type
 		if (this.frameContext.has('documentType_use_header')) {
@@ -152,9 +149,67 @@ Component.prototype = {
 		}
 
 		const targetElement = /** @type {HTMLElement} */ (oNode || element);
-		this.selection.scrollTo(targetElement, { behavior: 'auto' });
+
+		if (scrollTo) this.selection.scrollTo(targetElement, { behavior: 'auto' });
+
+		if (insertBehavior !== null) this.applyInsertBehavior(element, oNode, insertBehavior);
 
 		return targetElement;
+	},
+
+	/**
+	 * @this {ComponentThis}
+	 * @description Handles post-insertion behavior for a newly created component based on the specified mode.
+	 * @param {Node} element The inserted component element.
+	 * @param {Node|null} [oNode] Optional node to use for selection if the component cannot be selected.
+	 * @param {__se__ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
+	 */
+	applyInsertBehavior(element, oNode, insertBehavior) {
+		const cInfo = this.get(element);
+		const container = cInfo.container;
+
+		if (this.isInline(container)) {
+			const nr = this.selection.getNearRange(cInfo.container);
+			if (nr) {
+				this.selection.setRange(nr.container, nr.offset, nr.container, nr.offset);
+			} else {
+				this.select(cInfo.target, cInfo.pluginName);
+			}
+			return;
+		}
+
+		switch (insertBehavior) {
+			case 'auto': {
+				if (!this.__moveToNextLineOrAdd(container)) {
+					this.select(cInfo.target, cInfo.pluginName);
+				}
+
+				break;
+			}
+			case 'select': {
+				this.selection.setRange(element, 0, element, 0);
+
+				if (cInfo) {
+					this.select(cInfo.target, cInfo.pluginName);
+				} else if (oNode) {
+					oNode = dom.query.getEdgeChildNodes(oNode, null).sc || oNode;
+					this.selection.setRange(oNode, 0, oNode, 0);
+				}
+				break;
+			}
+			case 'line': {
+				if (!this.__moveToNextLineOrAdd(container)) {
+					const line = this.format.addLine(container, null);
+					if (line) this.selection.setRange(line, 0, line, 0);
+				}
+
+				break;
+			}
+			case 'none': {
+				// Do not select the component and remove the editor focus
+				break;
+			}
+		}
 	},
 
 	/**
@@ -458,6 +513,29 @@ Component.prototype = {
 		this.currentInfo = null;
 		this.__removeGlobalEvent();
 		this.ui.__offControllers();
+	},
+
+	/**
+	 * @private
+	 * @this {ComponentThis}
+	 * @description
+	 * Attempts to move the cursor to a valid line after the given container.
+	 * - If a valid next sibling line exists, moves the selection there.
+	 * - If no next sibling exists, creates a new line after the container and moves the selection there.
+	 * - If the next sibling exists but is not a valid line element and cannot create a new line, returns false.
+	 * @param {HTMLElement} container The component container element.
+	 * @returns {boolean} Returns true if the selection moved to a line (existing or newly created), otherwise false.
+	 */
+	__moveToNextLineOrAdd(container) {
+		const nextSibling = container.nextElementSibling;
+		if (!nextSibling) {
+			const line = this.format.addLine(container, null);
+			if (line) this.selection.setRange(line, 0, line, 0);
+		} else if (this.format.isLine(nextSibling)) {
+			this.selection.setRange(nextSibling, 0, nextSibling, 0);
+		} else {
+			return false;
+		}
 	},
 
 	/**

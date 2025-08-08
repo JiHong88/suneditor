@@ -50,6 +50,17 @@
  * @property {boolean} _onMousedown Mouse down event status
  */
 
+/**
+ * @typedef {"auto"|"select"|"line"|"none"} __se__ComponentInsertBehaviorType
+ * @description Component insertion behavior for selection and cursor placement.
+ * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
+ * - For block components: executes behavior based on `selectMode`:
+ *    - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ *    - `select`: Always select the inserted component.
+ *    - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ *    - `none`: Do nothing.
+ */
+
 // --------------------------------------------------------- [Event] ---------------------------------------------------------------------------------------------------
 /**
  * @typedef {Object} __se__EventInfo

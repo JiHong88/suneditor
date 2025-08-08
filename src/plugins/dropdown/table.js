@@ -336,7 +336,7 @@ class Table extends EditorInjector {
 		figure.appendChild(oTable);
 		this._maxWidth = true;
 
-		if (this.component.insert(figure, { skipCharCount: false, skipSelection: false, skipHistory: false })) {
+		if (this.component.insert(figure, { insertBehavior: 'none' })) {
 			this._resetTablePicker();
 			const target = oTable.querySelector('td div');
 			this.selection.setRange(target, 0, target, 0);

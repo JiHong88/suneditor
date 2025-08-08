@@ -99,6 +99,7 @@ declare global {
 		 */
 		_onMousedown: boolean;
 	};
+	type __se__ComponentInsertBehaviorType = 'auto' | 'select' | 'line' | 'none';
 	type __se__EventInfo = {
 		/**
 		 * Target element
