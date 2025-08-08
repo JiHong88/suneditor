@@ -151,7 +151,7 @@ Selection_.prototype = {
 
 		try {
 			so = Math.min(so, sc.textContent?.length || 0);
-			eo = Math.min(eo, sc.textContent?.length || 0);
+			eo = Math.min(eo, ec.textContent?.length || 0);
 			range.setStart(sc, so);
 			range.setEnd(ec, eo);
 			this.status.hasFocus = true;
