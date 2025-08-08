@@ -2,6 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 /**
+ * @typedef {Object} HRPluginOptions
+ * @property {Array<{name: string, class: string}>} [items] - HR list
+ */
+
+/**
  * @class
  * @description HR Plugin
  */
@@ -21,8 +26,7 @@ class HR extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<{name: string, class: string}>} pluginOptions.items - HR list
+	 * @param {HRPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties

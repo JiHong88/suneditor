@@ -18,6 +18,31 @@ export type TableCtrlProps = {
 	font_italic: HTMLButtonElement;
 	font_strike: HTMLButtonElement;
 };
+export type TablePluginOptions = {
+	/**
+	 * - Scroll type ('x', 'y', 'xy')
+	 */
+	scrollType?: 'x' | 'y' | 'xy';
+	/**
+	 * - Caption position ('top', 'bottom')
+	 */
+	captionPosition?: 'top' | 'bottom';
+	/**
+	 * - Cell controller position ('cell', 'table')
+	 */
+	cellControllerPosition?: 'cell' | 'table';
+	/**
+	 * - Color list, used in cell color picker
+	 */
+	colorList?: any[];
+};
+/**
+ * @typedef {Object} TablePluginOptions
+ * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type ('x', 'y', 'xy')
+ * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position ('top', 'bottom')
+ * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
+ * @property {Array} [colorList] - Color list, used in cell color picker
+ */
 /**
  * @class
  * @description Table Plugin
@@ -38,21 +63,9 @@ declare class Table extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {"x"|"y"|"xy"} [pluginOptions.scrollType='x'] - Scroll type ('x', 'y', 'xy')
-	 * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')
-	 * @param {"cell"|"table"} [pluginOptions.cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
-	 * @param {Array} [pluginOptions.colorList] - Color list, used in cell color picker
+	 * @param {TablePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			scrollType?: 'x' | 'y' | 'xy';
-			captionPosition?: 'top' | 'bottom';
-			cellControllerPosition?: 'cell' | 'table';
-			colorList?: any[];
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: TablePluginOptions);
 	title: any;
 	icon: string;
 	figureScrollList: string[];

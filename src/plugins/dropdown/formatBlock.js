@@ -2,6 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 /**
+ * @typedef {Object} FormatBlockPluginOptions
+ * @property {Array<string>} [items] - Format list
+ */
+
+/**
  * @class
  * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
  */
@@ -13,8 +18,7 @@ class FormatBlock extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<string>} pluginOptions.items - Format list
+	 * @param {FormatBlockPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);

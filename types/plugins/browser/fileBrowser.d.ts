@@ -1,7 +1,43 @@
 export default FileBrowser;
 export type BrowserFile_fileBrowser = import('../../modules/Browser').BrowserFile;
+export type FileBrowserPluginOptions = {
+	/**
+	 * - Direct data without server calls
+	 */
+	data?:
+		| {
+				[x: string]: any;
+		  }
+		| Array<any>;
+	/**
+	 * - Server request URL
+	 */
+	url?: string;
+	/**
+	 * - Server request headers
+	 */
+	headers?: {
+		[x: string]: string;
+	};
+	/**
+	 * - Default thumbnail
+	 */
+	thumbnail?: string | ((item: BrowserFile_fileBrowser) => string);
+	/**
+	 * - Additional tag names
+	 */
+	props?: Array<string>;
+};
 /**
  * @typedef {import('../../modules/Browser').BrowserFile} BrowserFile_fileBrowser
+ */
+/**
+ * @typedef {Object} FileBrowserPluginOptions
+ * @property {Object<string, *>|Array<*>} [data] - Direct data without server calls
+ * @property {string} [url] - Server request URL
+ * @property {Object<string, string>} [headers] - Server request headers
+ * @property {string|((item: BrowserFile_fileBrowser) => string)} [thumbnail] - Default thumbnail
+ * @property {Array<string>} [props] - Additional tag names
  */
 /**
  * @class
@@ -15,34 +51,9 @@ declare class FileBrowser extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Object<string, *>|Array<*>=} pluginOptions.data - direct data without server calls
-	 * @param {string} pluginOptions.url - server request url
-	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
-	 * @param {string|((item: BrowserFile_fileBrowser) => string)} pluginOptions.thumbnail - default thumbnail
-	 * @param {Array<string>} pluginOptions.props - additional tag names
+	 * @param {FileBrowserPluginOptions} pluginOptions
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			data?:
-				| (
-						| {
-								[x: string]: any;
-						  }
-						| Array<any>
-				  )
-				| undefined;
-			url: string;
-			headers?:
-				| {
-						[x: string]: string;
-				  }
-				| undefined;
-			thumbnail: string | ((item: BrowserFile_fileBrowser) => string);
-			props: Array<string>;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: FileBrowserPluginOptions);
 	title: any;
 	icon: string;
 	onSelectfunction: (targe: Node) => any;

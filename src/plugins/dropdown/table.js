@@ -62,6 +62,14 @@ const DEFAULT_COLOR_LIST = [
 ];
 
 /**
+ * @typedef {Object} TablePluginOptions
+ * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type ('x', 'y', 'xy')
+ * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position ('top', 'bottom')
+ * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
+ * @property {Array} [colorList] - Color list, used in cell color picker
+ */
+
+/**
  * @class
  * @description Table Plugin
  */
@@ -82,11 +90,7 @@ class Table extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {"x"|"y"|"xy"} [pluginOptions.scrollType='x'] - Scroll type ('x', 'y', 'xy')
-	 * @param {"top"|"bottom"} [pluginOptions.captionPosition='bottom'] - Caption position ('top', 'bottom')
-	 * @param {"cell"|"table"} [pluginOptions.cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
-	 * @param {Array} [pluginOptions.colorList] - Color list, used in cell color picker
+	 * @param {TablePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties

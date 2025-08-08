@@ -1,4 +1,26 @@
 export default ImageGallery;
+export type ImageGalleryPluginOptions = {
+	/**
+	 * - Direct data without server calls
+	 */
+	data?: Array<any>;
+	/**
+	 * - Server request URL
+	 */
+	url?: string;
+	/**
+	 * - Server request headers
+	 */
+	headers?: {
+		[x: string]: string;
+	};
+};
+/**
+ * @typedef ImageGalleryPluginOptions
+ * @property {Array<*>} [data] - Direct data without server calls
+ * @property {string} [url] - Server request URL
+ * @property {Object<string, string>} [headers] - Server request headers
+ */
 /**
  * @class
  * @extends EditorInjector
@@ -11,23 +33,9 @@ declare class ImageGallery extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<*>=} pluginOptions.data - direct data without server calls
-	 * @param {string=} pluginOptions.url - server request url
-	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
+	 * @param {ImageGalleryPluginOptions} pluginOptions
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			data?: Array<any> | undefined;
-			url?: string | undefined;
-			headers?:
-				| {
-						[x: string]: string;
-				  }
-				| undefined;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: ImageGalleryPluginOptions);
 	title: any;
 	icon: string;
 	onSelectfunction: (targe: Node) => any;

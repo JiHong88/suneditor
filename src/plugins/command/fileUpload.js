@@ -5,6 +5,23 @@ import { FileManager, Figure, Controller } from '../../modules';
 const { NO_EVENT } = env;
 
 /**
+ * @typedef FileUploadPluginOptions
+ * @property {string} uploadUrl - Server request URL for file upload
+ * @property {Object<string, string>} [uploadHeaders] - Server request headers
+ * @property {string} [uploadSizeLimit] - Total upload size limit in bytes
+ * @property {string} [uploadSingleSizeLimit] - Single file size limit in bytes
+ * @property {boolean} [allowMultiple=false] - Allow multiple file uploads
+ * @property {string} [acceptedFormats="*"] - Accepted file formats (e.g., 'image/*, .pdf')
+ * @property {string} [as="box"] - Specify the default form of the file component as 'box' or 'link'
+ * @property {Array<string>} [controls] - Additional controls to be added to the figure
+ * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ * - `select`: Always select the inserted component.
+ * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ * - `none`: Do nothing.
+ */
+
+/**
  * @class
  * @description File upload plugin
  */
@@ -25,20 +42,7 @@ class FileUpload extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions - plugin options
-	 * @param {string} pluginOptions.uploadUrl - server request url
-	 * @param {Object<string, string>=} pluginOptions.uploadHeaders - server request headers
-	 * @param {string=} pluginOptions.uploadSizeLimit - upload size limit
-	 * @param {string=} pluginOptions.uploadSingleSizeLimit - upload single size limit
-	 * @param {boolean=} pluginOptions.allowMultiple - allow multiple files
-	 * @param {string=} pluginOptions.acceptedFormats - accepted formats
-	 * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
-	 * @param {Array<string>} pluginOptions.controls - Additional controls to be added to the figure
-	 * @param {__se__ComponentInsertBehaviorType} [pluginOptions.insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
-	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
-	 * - `select`: Always select the inserted component.
-	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
-	 * - `none`: Do nothing.
+	 * @param {FileUploadPluginOptions} pluginOptions - plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);

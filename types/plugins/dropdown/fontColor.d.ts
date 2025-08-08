@@ -1,4 +1,30 @@
 export default FontColor;
+export type FontColorPluginOptions = {
+	/**
+	 * - Color list
+	 */
+	items?: Array<
+		| string
+		| {
+				value: string;
+				name: string;
+		  }
+	>;
+	/**
+	 * - Number of colors per line
+	 */
+	splitNum?: number;
+	/**
+	 * - Disable HEX input
+	 */
+	disableHEXInput?: boolean;
+};
+/**
+ * @typedef {Object} FontColorPluginOptions
+ * @property {Array<string|{value: string, name: string}>} [items] - Color list
+ * @property {number} [splitNum] - Number of colors per line
+ * @property {boolean} [disableHEXInput] - Disable HEX input
+ */
 /**
  * @class
  * @description Font color plugin
@@ -10,25 +36,9 @@ declare class FontColor extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<string|{value: string, name: string}>} pluginOptions.items - Color list
-	 * @param {number} pluginOptions.splitNum - Number of colors per line
-	 * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+	 * @param {FontColorPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			items: Array<
-				| string
-				| {
-						value: string;
-						name: string;
-				  }
-			>;
-			splitNum: number;
-			disableHEXInput: boolean;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: FontColorPluginOptions);
 	title: any;
 	icon: string;
 	colorPicker: ColorPicker;

@@ -1,4 +1,46 @@
 export default FontSize;
+export type FontSizePluginOptions = {
+	/**
+	 * - The unit for the font size.
+	 * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
+	 * - If 'text' is used, a text-based font size list is applied.
+	 */
+	sizeUnit?: string;
+	/**
+	 * - Determines whether the default size label is displayed in the dropdown menu.
+	 */
+	showDefaultSizeLabel?: boolean;
+	/**
+	 * - When true, displays increase and decrease buttons for font size adjustments.
+	 */
+	showIncDecControls?: boolean;
+	/**
+	 * - When true, disables the direct font size input box.
+	 */
+	disableInput?: boolean;
+	/**
+	 * - Optional object to override or extend the default unit mapping for font sizes.
+	 */
+	unitMap?: {
+		[x: string]: {
+			default: number;
+			inc: number;
+			min: number;
+			max: number;
+			list: Array<number>;
+		};
+	};
+};
+/**
+ * @typedef {Object} FontSizePluginOptions
+ * @property {string} [sizeUnit='px'] - The unit for the font size.
+ * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
+ * - If 'text' is used, a text-based font size list is applied.
+ * @property {boolean} [showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
+ * @property {boolean} [showIncDecControls=false] - When true, displays increase and decrease buttons for font size adjustments.
+ * @property {boolean} [disableInput=true] - When true, disables the direct font size input box.
+ * @property {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}>} [unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
+ */
 /**
  * @class
  * @description FontSize Plugin
@@ -13,33 +55,9 @@ declare class FontSize extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions - Configuration options for the FontSize plugin.
-	 * @param {string=} [pluginOptions.sizeUnit='px'] - The unit for the font size.
-	 * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
-	 * - If 'text' is used, a text-based font size list is applied.
-	 * @param {boolean=} [pluginOptions.showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
-	 * @param {boolean=} [pluginOptions.showIncDecControls=false] - When true, displays increase and decrease buttons for font size adjustments.
-	 * @param {boolean=} [pluginOptions.disableInput=true] - When true, disables the direct font size input box.
-	 * @param {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}>} [pluginOptions.unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
+	 * @param {FontSizePluginOptions} pluginOptions - Configuration options for the FontSize plugin.
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			sizeUnit?: string | undefined;
-			showDefaultSizeLabel?: boolean | undefined;
-			showIncDecControls?: boolean | undefined;
-			disableInput?: boolean | undefined;
-			unitMap?: {
-				[x: string]: {
-					default: number;
-					inc: number;
-					min: number;
-					max: number;
-					list: Array<number>;
-				};
-			};
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: FontSizePluginOptions);
 	unitMap: {
 		text: {
 			default: string;

@@ -1,7 +1,34 @@
 export default AudioGallery;
 export type BrowserFile_audioGallery = import('../../modules/Browser').BrowserFile;
+export type AudioGalleryPluginOptions = {
+	/**
+	 * - Direct data without server calls
+	 */
+	data?: Array<BrowserFile_audioGallery>;
+	/**
+	 * - Server request URL
+	 */
+	url?: string;
+	/**
+	 * - Server request headers
+	 */
+	headers?: {
+		[x: string]: string;
+	};
+	/**
+	 * - Default thumbnail
+	 */
+	thumbnail?: string | ((item: BrowserFile_audioGallery) => string);
+};
 /**
  * @typedef {import('../../modules/Browser').BrowserFile} BrowserFile_audioGallery
+ */
+/**
+ * @typedef {Object} AudioGalleryPluginOptions
+ * @property {Array<BrowserFile_audioGallery>} [data] - Direct data without server calls
+ * @property {string} [url] - Server request URL
+ * @property {Object<string, string>} [headers] - Server request headers
+ * @property {string|((item: BrowserFile_audioGallery) => string)} [thumbnail] - Default thumbnail
  */
 /**
  * @class
@@ -15,25 +42,9 @@ declare class AudioGallery extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<*>=} pluginOptions.data - direct data without server calls
-	 * @param {string} pluginOptions.url - server request url
-	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
-	 * @param {string|((item: BrowserFile_audioGallery) => string)} pluginOptions.thumbnail - default thumbnail
+	 * @param {AudioGalleryPluginOptions} pluginOptions
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			data?: Array<any> | undefined;
-			url: string;
-			headers?:
-				| {
-						[x: string]: string;
-				  }
-				| undefined;
-			thumbnail: string | ((item: BrowserFile_audioGallery) => string);
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: AudioGalleryPluginOptions);
 	title: any;
 	icon: string;
 	onSelectfunction: (targe: Node) => any;

@@ -6,6 +6,15 @@ import { Browser } from '../../modules';
  */
 
 /**
+ * @typedef {Object} FileBrowserPluginOptions
+ * @property {Object<string, *>|Array<*>} [data] - Direct data without server calls
+ * @property {string} [url] - Server request URL
+ * @property {Object<string, string>} [headers] - Server request headers
+ * @property {string|((item: BrowserFile_fileBrowser) => string)} [thumbnail] - Default thumbnail
+ * @property {Array<string>} [props] - Additional tag names
+ */
+
+/**
  * @class
  * @extends EditorInjector
  * @description File browser plugin. Can contain any media type.
@@ -18,12 +27,7 @@ class FileBrowser extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Object<string, *>|Array<*>=} pluginOptions.data - direct data without server calls
-	 * @param {string} pluginOptions.url - server request url
-	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
-	 * @param {string|((item: BrowserFile_fileBrowser) => string)} pluginOptions.thumbnail - default thumbnail
-	 * @param {Array<string>} pluginOptions.props - additional tag names
+	 * @param {FileBrowserPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties

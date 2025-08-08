@@ -1,4 +1,17 @@
 export default Template;
+export type TemplatePluginOptions = {
+	/**
+	 * - Template list
+	 */
+	items?: Array<{
+		name: string;
+		html: string;
+	}>;
+};
+/**
+ * @typedef {Object} TemplatePluginOptions
+ * @property {Array<{name: string, html: string}>} [items] - Template list
+ */
 /**
  * @class
  * @description Template Plugin, Apply a template to the selection.
@@ -10,18 +23,9 @@ declare class Template extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<{name: string, html: string}>} pluginOptions.items - Template list
+	 * @param {TemplatePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			items: Array<{
-				name: string;
-				html: string;
-			}>;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: TemplatePluginOptions);
 	title: any;
 	icon: string;
 	selectedIndex: number;

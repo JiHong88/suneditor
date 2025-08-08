@@ -1,4 +1,30 @@
 export default BackgroundColor;
+export type BackgroundColorPluginOptions = {
+	/**
+	 * - Color list
+	 */
+	items?: Array<
+		| string
+		| {
+				value: string;
+				name: string;
+		  }
+	>;
+	/**
+	 * - Number of colors per line
+	 */
+	splitNum?: number;
+	/**
+	 * - Disable HEX input
+	 */
+	disableHEXInput?: boolean;
+};
+/**
+ * @typedef {Object} BackgroundColorPluginOptions
+ * @property {Array<string|{value: string, name: string}>} [items] - Color list
+ * @property {number} [splitNum] - Number of colors per line
+ * @property {boolean} [disableHEXInput] - Disable HEX input
+ */
 /**
  * @class
  * @description Text background color plugin
@@ -10,25 +36,9 @@ declare class BackgroundColor extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<string|{value: string, name: string}>} pluginOptions.items - Color list
-	 * @param {number} pluginOptions.splitNum - Number of colors per line
-	 * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+	 * @param {BackgroundColorPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			items: Array<
-				| string
-				| {
-						value: string;
-						name: string;
-				  }
-			>;
-			splitNum: number;
-			disableHEXInput: boolean;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: BackgroundColorPluginOptions);
 	title: any;
 	icon: string;
 	colorPicker: ColorPicker;

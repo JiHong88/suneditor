@@ -1,4 +1,17 @@
 export default LineHeight;
+export type LineHeightPluginOptions = {
+	/**
+	 * - Line height list
+	 */
+	items?: Array<{
+		text: string;
+		value: number;
+	}>;
+};
+/**
+ * @typedef {Object} LineHeightPluginOptions
+ * @property {Array<{text: string, value: number}>} [items] - Line height list
+ */
 /**
  * @class
  * @description Line height Plugin
@@ -10,18 +23,9 @@ declare class LineHeight extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<{text: string, value: number}>} pluginOptions.items - Line height list
+	 * @param {LineHeightPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			items: Array<{
-				text: string;
-				value: number;
-			}>;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: LineHeightPluginOptions);
 	title: any;
 	icon: string;
 	sizeList: NodeListOf<Element>;

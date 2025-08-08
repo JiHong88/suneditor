@@ -2,6 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 /**
+ * @typedef {Object} FontPluginOptions
+ * @property {Array<string>} [items] - Font list
+ */
+
+/**
  * @class
  * @description Text font plugin
  */
@@ -13,10 +18,7 @@ class Font extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<string>} pluginOptions.items - Font list
-	 * @param {number} pluginOptions.splitNum - Number of colors per line
-	 * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+	 * @param {FontPluginOptions} pluginOptions - plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);

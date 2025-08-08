@@ -1,4 +1,14 @@
 export default Align;
+export type AlignPluginOptions = {
+	/**
+	 * - Align items
+	 */
+	items?: Array<'right' | 'center' | 'left' | 'justify'>;
+};
+/**
+ * @typedef {Object} AlignPluginOptions
+ * @property {Array.<"right"|"center"|"left"|"justify">} [items] - Align items
+ */
 /**
  * @class
  * @description Align plugin
@@ -9,15 +19,9 @@ declare class Align extends EditorInjector {
 	static className: string;
 	/**
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array.<"right"|"center"|"left"|"justify">} pluginOptions.items - Align items
+	 * @param {AlignPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			items: Array<'right' | 'center' | 'left' | 'justify'>;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: AlignPluginOptions);
 	title: any;
 	icon: string;
 	_itemMenu: HTMLUListElement;

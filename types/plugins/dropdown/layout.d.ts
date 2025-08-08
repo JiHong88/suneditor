@@ -1,4 +1,17 @@
 export default Layout;
+export type LayoutPluginOptions = {
+	/**
+	 * - Layout list
+	 */
+	items?: Array<{
+		name: string;
+		html: string;
+	}>;
+};
+/**
+ * @typedef {Object} LayoutPluginOptions
+ * @property {Array<{name: string, html: string}>} [items] - Layout list
+ */
 /**
  * @class
  * @description Layout Plugin, Apply layout to the entire editor.
@@ -10,18 +23,9 @@ declare class Layout extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<{name: string, html: string}>} pluginOptions.items - Layout list
+	 * @param {LayoutPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			items: Array<{
-				name: string;
-				html: string;
-			}>;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: LayoutPluginOptions);
 	title: any;
 	icon: string;
 	selectedIndex: number;

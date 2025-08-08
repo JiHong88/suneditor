@@ -1,4 +1,14 @@
 export default Font;
+export type FontPluginOptions = {
+	/**
+	 * - Font list
+	 */
+	items?: Array<string>;
+};
+/**
+ * @typedef {Object} FontPluginOptions
+ * @property {Array<string>} [items] - Font list
+ */
 /**
  * @class
  * @description Text font plugin
@@ -10,19 +20,9 @@ declare class Font extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<string>} pluginOptions.items - Font list
-	 * @param {number} pluginOptions.splitNum - Number of colors per line
-	 * @param {boolean} pluginOptions.disableHEXInput - Disable HEX input
+	 * @param {FontPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			items: Array<string>;
-			splitNum: number;
-			disableHEXInput: boolean;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: FontPluginOptions);
 	title: any;
 	inner: string;
 	currentFont: string;

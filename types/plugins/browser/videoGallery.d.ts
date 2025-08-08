@@ -1,7 +1,34 @@
 export default VideoGallery;
 export type BrowserFile_videoGallery = import('../../modules/Browser').BrowserFile;
+export type VideoGalleryPluginOptions = {
+	/**
+	 * - Direct data without server calls
+	 */
+	data?: Array<BrowserFile_videoGallery>;
+	/**
+	 * - Server request URL
+	 */
+	url?: string;
+	/**
+	 * - Server request headers
+	 */
+	headers?: {
+		[x: string]: string;
+	};
+	/**
+	 * - Default thumbnail
+	 */
+	thumbnail?: string | ((item: BrowserFile_videoGallery) => string);
+};
 /**
  * @typedef {import('../../modules/Browser').BrowserFile} BrowserFile_videoGallery
+ */
+/**
+ * @typedef {Object} VideoGalleryPluginOptions
+ * @property {Array<BrowserFile_videoGallery>} [data] - Direct data without server calls
+ * @property {string} [url] - Server request URL
+ * @property {Object<string, string>} [headers] - Server request headers
+ * @property {string|((item: BrowserFile_videoGallery) => string)} [thumbnail] - Default thumbnail
  */
 /**
  * @class
@@ -15,25 +42,9 @@ declare class VideoGallery extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<*>=} pluginOptions.data - direct data without server calls
-	 * @param {string=} pluginOptions.url - server request url
-	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
-	 * @param {string|((item: BrowserFile_videoGallery) => string)} pluginOptions.thumbnail - default thumbnail
+	 * @param {VideoGalleryPluginOptions} pluginOptions
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			data?: Array<any> | undefined;
-			url?: string | undefined;
-			headers?:
-				| {
-						[x: string]: string;
-				  }
-				| undefined;
-			thumbnail: string | ((item: BrowserFile_videoGallery) => string);
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: VideoGalleryPluginOptions);
 	title: any;
 	icon: string;
 	onSelectfunction: (targe: Node) => any;

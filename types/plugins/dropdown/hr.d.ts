@@ -1,4 +1,17 @@
 export default HR;
+export type HRPluginOptions = {
+	/**
+	 * - HR list
+	 */
+	items?: Array<{
+		name: string;
+		class: string;
+	}>;
+};
+/**
+ * @typedef {Object} HRPluginOptions
+ * @property {Array<{name: string, class: string}>} [items] - HR list
+ */
 /**
  * @class
  * @description HR Plugin
@@ -16,18 +29,9 @@ declare class HR extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<{name: string, class: string}>} pluginOptions.items - HR list
+	 * @param {HRPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			items: Array<{
-				name: string;
-				class: string;
-			}>;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: HRPluginOptions);
 	title: any;
 	icon: string;
 	list: NodeListOf<HTMLButtonElement>;

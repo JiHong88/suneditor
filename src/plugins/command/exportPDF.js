@@ -5,6 +5,12 @@ import { ApiManager } from '../../modules';
 const { _w, _d } = env;
 
 /**
+ * @typedef ExportPDFPluginOptions
+ * @property {string} apiUrl - Server request URL for PDF generation
+ * @property {string} [fileName="suneditor-pdf"] - Name of the generated PDF file
+ */
+
+/**
  * @class
  * @description Export PDF plugin
  */
@@ -16,9 +22,7 @@ class ExportPDF extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions - plugin options
-	 * @param {string} pluginOptions.apiUrl - server request url
-	 * @param {string} pluginOptions.fileName - file name
+	 * @param {ExportPDFPluginOptions} pluginOptions - plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);

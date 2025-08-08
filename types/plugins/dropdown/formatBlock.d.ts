@@ -1,4 +1,14 @@
 export default FormatBlock;
+export type FormatBlockPluginOptions = {
+	/**
+	 * - Format list
+	 */
+	items?: Array<string>;
+};
+/**
+ * @typedef {Object} FormatBlockPluginOptions
+ * @property {Array<string>} [items] - Format list
+ */
 /**
  * @class
  * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
@@ -10,15 +20,9 @@ declare class FormatBlock extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<string>} pluginOptions.items - Format list
+	 * @param {FormatBlockPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			items: Array<string>;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: FormatBlockPluginOptions);
 	title: any;
 	inner: string;
 	formatList: NodeListOf<Element>;

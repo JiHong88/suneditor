@@ -1,4 +1,19 @@
 export default ExportPDF;
+export type ExportPDFPluginOptions = {
+	/**
+	 * - Server request URL for PDF generation
+	 */
+	apiUrl: string;
+	/**
+	 * - Name of the generated PDF file
+	 */
+	fileName?: string;
+};
+/**
+ * @typedef ExportPDFPluginOptions
+ * @property {string} apiUrl - Server request URL for PDF generation
+ * @property {string} [fileName="suneditor-pdf"] - Name of the generated PDF file
+ */
 /**
  * @class
  * @description Export PDF plugin
@@ -10,17 +25,9 @@ declare class ExportPDF extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions - plugin options
-	 * @param {string} pluginOptions.apiUrl - server request url
-	 * @param {string} pluginOptions.fileName - file name
+	 * @param {ExportPDFPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			apiUrl: string;
-			fileName: string;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: ExportPDFPluginOptions);
 	title: any;
 	icon: string;
 	apiUrl: string;

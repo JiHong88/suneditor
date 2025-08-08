@@ -2,6 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 /**
+ * @typedef {Object} TemplatePluginOptions
+ * @property {Array<{name: string, html: string}>} [items] - Template list
+ */
+
+/**
  * @class
  * @description Template Plugin, Apply a template to the selection.
  */
@@ -13,8 +18,7 @@ class Template extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<{name: string, html: string}>} pluginOptions.items - Template list
+	 * @param {TemplatePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties

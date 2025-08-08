@@ -2,6 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 /**
+ * @typedef {Object} LayoutPluginOptions
+ * @property {Array<{name: string, html: string}>} [items] - Layout list
+ */
+
+/**
  * @class
  * @description Layout Plugin, Apply layout to the entire editor.
  */
@@ -13,8 +18,7 @@ class Layout extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<{name: string, html: string}>} pluginOptions.items - Layout list
+	 * @param {LayoutPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties

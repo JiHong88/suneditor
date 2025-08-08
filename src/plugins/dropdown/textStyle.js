@@ -2,6 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 /**
+ * @typedef {Object} TextStylePluginOptions
+ * @property {Array<string|{name: string, class: string, tag: string}>} items - Text style item list
+ */
+
+/**
  * @class
  * @description Text style Plugin, Applies a tag that specifies text styles to a selection.
  */
@@ -13,8 +18,7 @@ class TextStyle extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<{name: string, html: string}>} pluginOptions.items - Template list
+	 * @param {TextStylePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties

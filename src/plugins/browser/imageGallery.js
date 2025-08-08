@@ -2,6 +2,13 @@ import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
 /**
+ * @typedef ImageGalleryPluginOptions
+ * @property {Array<*>} [data] - Direct data without server calls
+ * @property {string} [url] - Server request URL
+ * @property {Object<string, string>} [headers] - Server request headers
+ */
+
+/**
  * @class
  * @extends EditorInjector
  * @description Image gallery plugin
@@ -14,10 +21,7 @@ class ImageGallery extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<*>=} pluginOptions.data - direct data without server calls
-	 * @param {string=} pluginOptions.url - server request url
-	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
+	 * @param {ImageGalleryPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties

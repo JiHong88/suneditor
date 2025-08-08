@@ -2,6 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 /**
+ * @typedef {Object} AlignPluginOptions
+ * @property {Array.<"right"|"center"|"left"|"justify">} [items] - Align items
+ */
+
+/**
  * @class
  * @description Align plugin
  */
@@ -12,8 +17,7 @@ class Align extends EditorInjector {
 
 	/**
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array.<"right"|"center"|"left"|"justify">} pluginOptions.items - Align items
+	 * @param {AlignPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);

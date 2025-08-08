@@ -1,4 +1,64 @@
 export default FileUpload;
+export type FileUploadPluginOptions = {
+	/**
+	 * - Server request URL for file upload
+	 */
+	uploadUrl: string;
+	/**
+	 * - Server request headers
+	 */
+	uploadHeaders?: {
+		[x: string]: string;
+	};
+	/**
+	 * - Total upload size limit in bytes
+	 */
+	uploadSizeLimit?: string;
+	/**
+	 * - Single file size limit in bytes
+	 */
+	uploadSingleSizeLimit?: string;
+	/**
+	 * - Allow multiple file uploads
+	 */
+	allowMultiple?: boolean;
+	/**
+	 * - Accepted file formats (e.g., 'image/*, .pdf')
+	 */
+	acceptedFormats?: string;
+	/**
+	 * - Specify the default form of the file component as 'box' or 'link'
+	 */
+	as?: string;
+	/**
+	 * - Additional controls to be added to the figure
+	 */
+	controls?: Array<string>;
+	/**
+	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+	 * - `select`: Always select the inserted component.
+	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+	 * - `none`: Do nothing.
+	 */
+	insertBehavior?: __se__ComponentInsertBehaviorType;
+};
+/**
+ * @typedef FileUploadPluginOptions
+ * @property {string} uploadUrl - Server request URL for file upload
+ * @property {Object<string, string>} [uploadHeaders] - Server request headers
+ * @property {string} [uploadSizeLimit] - Total upload size limit in bytes
+ * @property {string} [uploadSingleSizeLimit] - Single file size limit in bytes
+ * @property {boolean} [allowMultiple=false] - Allow multiple file uploads
+ * @property {string} [acceptedFormats="*"] - Accepted file formats (e.g., 'image/*, .pdf')
+ * @property {string} [as="box"] - Specify the default form of the file component as 'box' or 'link'
+ * @property {Array<string>} [controls] - Additional controls to be added to the figure
+ * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * - `auto`: Move cursor to the next line if possible, otherwise select the component.
+ * - `select`: Always select the inserted component.
+ * - `line`: Move cursor to the next line if possible, or create a new line and move there.
+ * - `none`: Do nothing.
+ */
 /**
  * @class
  * @description File upload plugin
@@ -19,39 +79,9 @@ declare class FileUpload extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions - plugin options
-	 * @param {string} pluginOptions.uploadUrl - server request url
-	 * @param {Object<string, string>=} pluginOptions.uploadHeaders - server request headers
-	 * @param {string=} pluginOptions.uploadSizeLimit - upload size limit
-	 * @param {string=} pluginOptions.uploadSingleSizeLimit - upload single size limit
-	 * @param {boolean=} pluginOptions.allowMultiple - allow multiple files
-	 * @param {string=} pluginOptions.acceptedFormats - accepted formats
-	 * @param {string=} pluginOptions.as - Whether to use the 'Box' or 'Link' conversion button
-	 * @param {Array<string>} pluginOptions.controls - Additional controls to be added to the figure
-	 * @param {__se__ComponentInsertBehaviorType} [pluginOptions.insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
-	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
-	 * - `select`: Always select the inserted component.
-	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
-	 * - `none`: Do nothing.
+	 * @param {FileUploadPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			uploadUrl: string;
-			uploadHeaders?:
-				| {
-						[x: string]: string;
-				  }
-				| undefined;
-			uploadSizeLimit?: string | undefined;
-			uploadSingleSizeLimit?: string | undefined;
-			allowMultiple?: boolean | undefined;
-			acceptedFormats?: string | undefined;
-			as?: string | undefined;
-			controls: Array<string>;
-			insertBehavior?: __se__ComponentInsertBehaviorType;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: FileUploadPluginOptions);
 	title: any;
 	icon: string;
 	uploadUrl: string;

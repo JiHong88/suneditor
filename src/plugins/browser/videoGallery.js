@@ -6,6 +6,14 @@ import { Browser } from '../../modules';
  */
 
 /**
+ * @typedef {Object} VideoGalleryPluginOptions
+ * @property {Array<BrowserFile_videoGallery>} [data] - Direct data without server calls
+ * @property {string} [url] - Server request URL
+ * @property {Object<string, string>} [headers] - Server request headers
+ * @property {string|((item: BrowserFile_videoGallery) => string)} [thumbnail] - Default thumbnail
+ */
+
+/**
  * @class
  * @extends EditorInjector
  * @description Video gallery plugin
@@ -18,11 +26,7 @@ class VideoGallery extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {Array<*>=} pluginOptions.data - direct data without server calls
-	 * @param {string=} pluginOptions.url - server request url
-	 * @param {Object<string, string>=} pluginOptions.headers - server request headers
-	 * @param {string|((item: BrowserFile_videoGallery) => string)} pluginOptions.thumbnail - default thumbnail
+	 * @param {VideoGalleryPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
 		// plugin bisic properties

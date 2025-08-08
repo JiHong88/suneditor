@@ -1,4 +1,60 @@
 export default Mention;
+export type MentionPluginOptions = {
+	/**
+	 * - The character that triggers the mention list
+	 */
+	triggerText?: string;
+	/**
+	 * - The number of items to display in the mention list
+	 */
+	limitSize?: number;
+	/**
+	 * - The number of characters to start searching for the mention list
+	 */
+	searchStartLength?: number;
+	/**
+	 * - The time to wait before displaying the mention list
+	 */
+	delayTime?: number;
+	/**
+	 * - Use data without using API
+	 */
+	data?: Array<{
+		key: string;
+		name: string;
+		url: string;
+	}>;
+	/**
+	 * - The URL to call the mention list
+	 */
+	apiUrl?: string;
+	/**
+	 * - The headers to send with the API call
+	 */
+	apiHeaders?: {
+		[x: string]: string;
+	};
+	/**
+	 * - Whether to cache the mention list data
+	 */
+	useCachingData?: boolean;
+	/**
+	 * - Whether to cache the mention list data in the field
+	 */
+	useCachingFieldData?: boolean;
+};
+/**
+ * @typedef {Object} MentionPluginOptions
+ * @property {string} [triggerText="@"] - The character that triggers the mention list
+ * @property {number} [limitSize=5] - The number of items to display in the mention list
+ * @property {number} [searchStartLength=0] - The number of characters to start searching for the mention list
+ * @property {number} [delayTime=200] - The time to wait before displaying the mention list
+ * @property {Array<{key: string, name: string, url: string}>} [data] - Use data without using API
+ * @property {string} [apiUrl] - The URL to call the mention list
+ * @property {Object<string, string>} [apiHeaders] - The headers to send with the API call
+ * @property {boolean} [useCachingData=true] - Whether to cache the mention list data
+ * @property {boolean} [useCachingFieldData=true] - Whether to cache the mention list data in the field
+ */
 /**
  * @class
  * @description Mention Plugin
@@ -14,41 +70,9 @@ declare class Mention extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions
-	 * @param {string=} [pluginOptions.triggerText="@"] The character that triggers the mention list. Default is '@'.
-	 * @param {number=} [pluginOptions.limitSize=5] The number of items to display in the mention list. Default is 5.
-	 * @param {number=} [pluginOptions.searchStartLength=0] The number of characters to start searching for the mention list. Default is 0.
-	 * @param {number=} [pluginOptions.delayTime=200] The time to wait before displaying the mention list. Default is 200ms.
-	 * @param {Array<{key: string, name: string, url: string}>=} pluginOptions.data Use data without using API.
-	 * @param {string=} pluginOptions.apiUrl The URL to call the mention list. Default is ''.
-	 * @param {Object<string, string>=} pluginOptions.apiHeaders The headers to send with the API call. Default is {}.
-	 * @param {boolean=} [pluginOptions.useCachingData=true] Whether to cache the mention list data. Default is true.
-	 * @param {boolean=} [pluginOptions.useCachingFieldData=true] Whether to cache the mention list data in the field. Default is true.
+	 * @param {MentionPluginOptions} pluginOptions
 	 */
-	constructor(
-		editor: __se__EditorCore,
-		pluginOptions: {
-			triggerText?: string | undefined;
-			limitSize?: number | undefined;
-			searchStartLength?: number | undefined;
-			delayTime?: number | undefined;
-			data?:
-				| Array<{
-						key: string;
-						name: string;
-						url: string;
-				  }>
-				| undefined;
-			apiUrl?: string | undefined;
-			apiHeaders?:
-				| {
-						[x: string]: string;
-				  }
-				| undefined;
-			useCachingData?: boolean | undefined;
-			useCachingFieldData?: boolean | undefined;
-		}
-	);
+	constructor(editor: __se__EditorCore, pluginOptions: MentionPluginOptions);
 	title: any;
 	icon: string;
 	triggerText: string;

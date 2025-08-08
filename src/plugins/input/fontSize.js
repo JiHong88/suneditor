@@ -86,6 +86,17 @@ const DEFAULT_UNIT_MAP = {
 };
 
 /**
+ * @typedef {Object} FontSizePluginOptions
+ * @property {string} [sizeUnit='px'] - The unit for the font size.
+ * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
+ * - If 'text' is used, a text-based font size list is applied.
+ * @property {boolean} [showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
+ * @property {boolean} [showIncDecControls=false] - When true, displays increase and decrease buttons for font size adjustments.
+ * @property {boolean} [disableInput=true] - When true, disables the direct font size input box.
+ * @property {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}>} [unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
+ */
+
+/**
  * @class
  * @description FontSize Plugin
  * - This plugin enables users to modify the font size of selected text within the editor.
@@ -100,14 +111,7 @@ class FontSize extends EditorInjector {
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {Object} pluginOptions - Configuration options for the FontSize plugin.
-	 * @param {string=} [pluginOptions.sizeUnit='px'] - The unit for the font size.
-	 * - Accepted values include: 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%' or 'text'.
-	 * - If 'text' is used, a text-based font size list is applied.
-	 * @param {boolean=} [pluginOptions.showDefaultSizeLabel=true] - Determines whether the default size label is displayed in the dropdown menu.
-	 * @param {boolean=} [pluginOptions.showIncDecControls=false] - When true, displays increase and decrease buttons for font size adjustments.
-	 * @param {boolean=} [pluginOptions.disableInput=true] - When true, disables the direct font size input box.
-	 * @param {Object<string, {default: number, inc: number, min: number, max: number, list: Array<number>}>} [pluginOptions.unitMap={}] - Optional object to override or extend the default unit mapping for font sizes.
+	 * @param {FontSizePluginOptions} pluginOptions - Configuration options for the FontSize plugin.
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
