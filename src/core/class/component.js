@@ -531,11 +531,13 @@ Component.prototype = {
 		if (!nextSibling) {
 			const line = this.format.addLine(container, null);
 			if (line) this.selection.setRange(line, 0, line, 0);
+			return true;
 		} else if (this.format.isLine(nextSibling)) {
 			this.selection.setRange(nextSibling, 0, nextSibling, 0);
-		} else {
-			return false;
+			return true;
 		}
+
+		return false;
 	},
 
 	/**
