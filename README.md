@@ -152,6 +152,12 @@ See [Contribution Guide](./CONTRIBUTING.md#ai-plugin-helper) for tips and exampl
 
 ---
 
+## 💎 Sponsors
+
+[![Financial Contributors on Open Collective](https://opencollective.com/suneditor/contributors.svg?width=890&avatarHeight=64&button=false)](https://opencollective.com/suneditor)
+
+---
+
 ## 📄 License
 
 SunEditor is an open-source project available under the [MIT License](./LICENSE).
