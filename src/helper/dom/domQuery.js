@@ -112,11 +112,7 @@ export function getListChildren(element, validation) {
 	const el = /** @type {Element} */ (element);
 	if (!el.children || el.children.length === 0) return children;
 
-	validation =
-		validation ||
-		function () {
-			return true;
-		};
+	validation ||= () => true;
 
 	(function recursionFunc(current) {
 		if (el !== current && validation(current)) {
@@ -144,11 +140,7 @@ export function getListChildNodes(element, validation) {
 	const children = [];
 	if (!element || element.childNodes.length === 0) return children;
 
-	validation =
-		validation ||
-		function () {
-			return true;
-		};
+	validation ||= () => true;
 
 	(function recursionFunc(current) {
 		if (element !== current && validation(current)) {
@@ -275,7 +267,7 @@ export function getParentElement(element, query, depth) {
 		valid = (el) => regExp.test(el[attr]);
 	}
 
-	if (!depth) depth = Infinity;
+	depth ||= Infinity;
 	let index = 0;
 	while (element && !valid(element)) {
 		if (index >= depth || domCheck.isWysiwygFrame(element)) {
@@ -329,7 +321,7 @@ export function getParentElements(element, query, depth) {
 	}
 
 	const elementList = [];
-	if (!depth) depth = Infinity;
+	depth ||= Infinity;
 	let index = 0;
 	while (index <= depth && element && !domCheck.isWysiwygFrame(element)) {
 		if (valid(element)) {
@@ -426,7 +418,7 @@ export function getEdgeChild(node, query, last) {
  */
 export function getEdgeChildNodes(first, last) {
 	if (!first) return;
-	if (!last) last = first;
+	last ||= first;
 
 	while (first && first.nodeType === 1 && first.childNodes.length > 0 && !domCheck.isBreak(first)) first = first.firstChild;
 	while (last && last.nodeType === 1 && last.childNodes.length > 0 && !domCheck.isBreak(last)) last = last.lastChild;
@@ -501,7 +493,7 @@ export function getNextDeepestNode(node, ceiling) {
  */
 export function findTextIndexOnLine(line, offsetContainer, offset, validate) {
 	if (!line) return 0;
-	if (!validate) validate = () => true;
+	validate ||= () => true;
 
 	let index = 0;
 	let found = false;
@@ -584,7 +576,7 @@ export function findVisualLastCell(cells) {
 		const colSpan = cell.colSpan || 1;
 
 		// 현재 행에서 visual column index 찾기
-		if (!occupied[rowIndex]) occupied[rowIndex] = [];
+		occupied[rowIndex] ||= [];
 
 		let colIndex = 0;
 		const rowOcc = occupied[rowIndex];
@@ -596,7 +588,7 @@ export function findVisualLastCell(cells) {
 
 		for (let r = 1; r < rowSpan; r++) {
 			const nextRow = rowIndex + r;
-			if (!occupied[nextRow]) occupied[nextRow] = [];
+			occupied[nextRow] ||= [];
 			for (let i = 0; i < colSpan; i++) {
 				occupied[nextRow][colIndex + i] = true;
 			}

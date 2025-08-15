@@ -642,7 +642,7 @@ Selection_.prototype = {
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
-					tempCon = tempCon || tempConCache;
+					tempCon ||= tempConCache;
 					format = dom.utils.createElement(dom.query.getParentElement(tempCon, dom.check.isTableCell) ? 'DIV' : this.options.get('defaultLine'));
 					tempCon.parentNode.insertBefore(format, tempCon);
 					if (tempCon !== tempConCache) format.appendChild(tempCon);

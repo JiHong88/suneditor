@@ -110,7 +110,7 @@ Component.prototype = {
 			return null;
 		}
 
-		if (!insertBehavior) insertBehavior = this.options.get('componentInsertBehavior');
+		insertBehavior ||= this.options.get('componentInsertBehavior');
 
 		const r = this.html.remove();
 		const isInline = this.isInline(element);
@@ -639,9 +639,9 @@ Component.prototype = {
 	 */
 	__removeGlobalEvent() {
 		this.__removeNotFileGlobalEvent();
-		if (this._bindClose_copy) this._bindClose_copy = this.eventManager.removeGlobalEvent(this._bindClose_copy);
-		if (this._bindClose_cut) this._bindClose_cut = this.eventManager.removeGlobalEvent(this._bindClose_cut);
-		if (this._bindClose_keydown) this._bindClose_keydown = this.eventManager.removeGlobalEvent(this._bindClose_keydown);
+		this._bindClose_copy &&= this.eventManager.removeGlobalEvent(this._bindClose_copy);
+		this._bindClose_cut &&= this.eventManager.removeGlobalEvent(this._bindClose_cut);
+		this._bindClose_keydown &&= this.eventManager.removeGlobalEvent(this._bindClose_keydown);
 	},
 
 	/**
@@ -660,7 +660,7 @@ Component.prototype = {
 	 * @description Removes global event listeners related to non-file interactions.
 	 */
 	__removeNotFileGlobalEvent() {
-		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
+		this._bindClose_mousedown &&= this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
 	},
 
 	/**

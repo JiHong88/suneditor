@@ -159,7 +159,7 @@ Offset.prototype = {
 		const topArea = this.frameContext.get('topArea');
 		const wFrame = this.frameContext.get('wysiwygFrame');
 
-		node = node || topArea;
+		node ||= topArea;
 
 		if (!isElement(node)) {
 			return { top: 0, left: 0, fixedTop: 0, fixedLeft: 0, width: 0, height: 0 };
@@ -206,7 +206,7 @@ Offset.prototype = {
 		const topArea = this.frameContext.get('topArea');
 		let isTop = false;
 		let targetAbs = false;
-		if (!node) node = topArea;
+		node ||= topArea;
 		if (node === topArea) isTop = true;
 		if (!isTop && isElement(node)) {
 			targetAbs = _w.getComputedStyle(node).position === 'absolute';
@@ -607,7 +607,7 @@ Offset.prototype = {
 		element.style.display = 'block';
 
 		let positionTop = position === 'top';
-		range = range || this.selection.getRange();
+		range ||= this.selection.getRange();
 		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
 		positionTop = rectsObj.position === 'start';
 

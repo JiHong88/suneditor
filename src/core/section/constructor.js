@@ -719,7 +719,7 @@ export function CreateStatusbar(targetOptions, statusbar) {
 	let charCounter = null;
 
 	if (targetOptions.get('statusbar')) {
-		statusbar = statusbar || dom.utils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
+		statusbar ||= dom.utils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
 
 		/** navigation */
 		navigation = statusbar.querySelector('.se-navigation') || dom.utils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
@@ -1067,7 +1067,7 @@ function _createModuleGroup() {
  * @returns {{li: HTMLElement, button: HTMLElement}}
  */
 function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, icons) {
-	if (!innerHTML) innerHTML = '';
+	innerHTML ||= '';
 
 	const oLi = dom.utils.createElement('LI');
 	const label = title || '';

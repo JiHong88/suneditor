@@ -92,11 +92,8 @@ Format.prototype = {
 	 */
 	getLine(node, validation) {
 		if (!node) return null;
-		if (!validation) {
-			validation = function () {
-				return true;
-			};
-		}
+
+		validation ||= () => true;
 
 		while (node) {
 			if (dom.check.isWysiwygFrame(node)) return null;
@@ -187,11 +184,8 @@ Format.prototype = {
 	 */
 	getBrLine(element, validation) {
 		if (!element) return null;
-		if (!validation) {
-			validation = function () {
-				return true;
-			};
-		}
+
+		validation ||= () => true;
 
 		while (element) {
 			if (dom.check.isWysiwygFrame(element)) return null;
@@ -242,11 +236,8 @@ Format.prototype = {
 	 */
 	getBlock(element, validation) {
 		if (!element) return null;
-		if (!validation) {
-			validation = function () {
-				return true;
-			};
-		}
+
+		validation ||= () => true;
 
 		while (element) {
 			if (dom.check.isWysiwygFrame(element)) return null;
@@ -486,12 +477,12 @@ Format.prototype = {
 				c = insChildren[0];
 				if (this._notTextNode(c) && !dom.check.isBreak(c) && !dom.check.isListCell(format)) {
 					if (format.childNodes.length > 0) {
-						if (!first) first = format;
+						first ||= format;
 						parentEl.insertBefore(format, sibling);
 						format = insNode.cloneNode(false);
 					}
 					parentEl.insertBefore(c, sibling);
-					if (!first) first = c;
+					first ||= c;
 				} else {
 					format.appendChild(c);
 				}
@@ -523,7 +514,7 @@ Format.prototype = {
 					parentEl.insertBefore(format, sibling);
 				}
 
-				if (!first) first = format;
+				first ||= format;
 			}
 
 			return first;
@@ -545,7 +536,7 @@ Format.prototype = {
 
 			if (selectedFormats) lineIndex = selectedFormats.indexOf(insNode);
 			if (selectedFormats && lineIndex === -1) {
-				if (!rangeEl) rangeEl = /** @type {HTMLElement} */ (blockElement.cloneNode(false));
+				rangeEl ||= /** @type {HTMLElement} */ (blockElement.cloneNode(false));
 				rangeEl.appendChild(insNode);
 			} else {
 				if (selectedFormats) next = selectedFormats[lineIndex + 1];
@@ -601,9 +592,7 @@ Format.prototype = {
 						if (!reset) {
 							if (selectedFormats) {
 								lastNode = insNode;
-								if (!firstNode) {
-									firstNode = insNode;
-								}
+								firstNode ||= insNode;
 							} else if (!firstNode) {
 								firstNode = lastNode = insNode;
 							}
@@ -633,7 +622,7 @@ Format.prototype = {
 		}
 
 		if (newBlockElement) firstNode = newBlockElement.previousSibling;
-		else if (!firstNode) firstNode = blockElement.previousSibling;
+		else firstNode ||= blockElement.previousSibling;
 		rangeRight = blockElement.nextSibling !== rangeEl ? blockElement.nextSibling : rangeEl ? rangeEl.nextSibling : null;
 
 		if (/** @type {HTMLElement} */ (blockElement).children.length === 0 || blockElement.textContent.length === 0) {
@@ -653,8 +642,8 @@ Format.prototype = {
 				removeArray: removeArray
 			};
 		} else {
-			if (!firstNode) firstNode = lastNode;
-			if (!lastNode) lastNode = firstNode;
+			firstNode ||= lastNode;
+			lastNode ||= firstNode;
 			const childEdge = dom.query.getEdgeChildNodes(firstNode, lastNode.parentNode ? firstNode : lastNode);
 			edge = {
 				cc: (childEdge.sc || childEdge.ec).parentNode,
@@ -842,7 +831,7 @@ Format.prototype = {
 
 				// if (!next) lastList = list;
 				if (!next || parentTag !== nextParent || this.isBlock(siblingTag)) {
-					if (!firstList) firstList = list;
+					firstList ||= list;
 					if ((!mergeTop || !next || parentTag !== nextParent) && !(next && dom.check.isList(nextParent) && nextParent === originParent)) {
 						if (list.parentNode !== parentTag) parentTag.insertBefore(list, siblingTag);
 					}
@@ -2311,7 +2300,7 @@ Format.prototype = {
 			};
 		}
 
-		isRemoveFormat = isRemoveFormat && isRemoveNode;
+		isRemoveFormat &&= isRemoveNode;
 
 		if (isRemoveFormat) {
 			for (let i = 0; i < nNodeArray.length; i++) {
@@ -2648,7 +2637,7 @@ Format.prototype = {
 			};
 		}
 
-		isRemoveFormat = isRemoveFormat && isRemoveNode;
+		isRemoveFormat &&= isRemoveNode;
 
 		if (isRemoveFormat) {
 			for (let i = 0; i < nNodeArray.length; i++) {
@@ -3095,7 +3084,7 @@ Format.prototype = {
 			};
 		}
 
-		isRemoveFormat = isRemoveFormat && isRemoveNode;
+		isRemoveFormat &&= isRemoveNode;
 
 		if (isRemoveFormat) {
 			for (let i = 0; i < nNodeArray.length; i++) {
@@ -3273,7 +3262,7 @@ Format.prototype = {
 	 */
 	_sn_resetCommonListCell(el, styleArray) {
 		if (!dom.check.isListCell(el)) return;
-		if (!styleArray) styleArray = this._listKebab;
+		styleArray ||= this._listKebab;
 
 		const children = dom.utils.arrayFilter(el.childNodes, (current) => !dom.check.isBreak(current));
 		const elStyles = el.style;

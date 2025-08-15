@@ -582,8 +582,9 @@ class Video extends EditorInjector {
 		this._container = container;
 		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 
-		width = width || this._defaultSizeX;
-		height = height || this._frameRatio;
+		width ||= this._defaultSizeX;
+		height ||= this._frameRatio;
+
 		const size = this.figure.getSize(oFrame);
 		const inputUpdate = size.w !== width || size.h !== height;
 		const changeSize = !isUpdate || inputUpdate;
@@ -653,8 +654,9 @@ class Video extends EditorInjector {
 	 * @param {string|number} h - The height of the video.
 	 */
 	_applySize(w, h) {
-		if (!w) w = this.inputX?.value || this.pluginOptions.defaultWidth;
-		if (!h) h = this.inputY?.value || this.pluginOptions.defaultHeight;
+		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
+		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
+
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w + '')) w += '%';
@@ -753,8 +755,7 @@ class Video extends EditorInjector {
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitURL(url) {
-		if (!url) url = this._linkValue;
-		if (!url) return false;
+		if (!(url = this._linkValue)) return false;
 
 		/** iframe source */
 		if (/^<iframe.*\/iframe>$/.test(url)) {

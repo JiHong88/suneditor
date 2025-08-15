@@ -135,8 +135,7 @@ class Browser extends CoreInjector {
 	 * @param {string=} params.url - File server url. If not, use "this.url".
 	 * @param {Object<string, string>=} params.urlHeader - File server http header. If not, use "this.urlHeader".
 	 */
-	open(params) {
-		if (!params) params = {};
+	open(params = {}) {
 		this.__addGlobalEvent();
 
 		const listClassName = params.listClass || this.listClass;
@@ -297,7 +296,7 @@ class Browser extends CoreInjector {
 	 * @description Removes the global event listener for closing the browser.
 	 */
 	__removeGlobalEvent() {
-		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
+		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
 	}
 
 	/**
@@ -354,9 +353,7 @@ class Browser extends CoreInjector {
 			const parts = path.split('/');
 			const len = parts.length - 1;
 			parts.forEach((part, index) => {
-				if (!current[part]) {
-					current[part] = { children: {} };
-				}
+				current[part] ||= { children: {} };
 
 				if (index === len) {
 					current[part].key = path;

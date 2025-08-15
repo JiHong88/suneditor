@@ -123,11 +123,8 @@ export function getAttributesToString(element, exceptAttrs) {
 export function arrayFilter(array, validation) {
 	if (!array || array.length === 0) return null;
 
-	validation =
-		validation ||
-		function () {
-			return true;
-		};
+	validation ||= () => true;
+
 	const arr = [];
 
 	for (let i = 0, len = array.length, a; i < len; i++) {
@@ -149,11 +146,7 @@ export function arrayFilter(array, validation) {
 export function arrayFind(array, validation) {
 	if (!array || array.length === 0) return null;
 
-	validation =
-		validation ||
-		function () {
-			return true;
-		};
+	validation ||= () => true;
 
 	for (let i = 0, len = array.length, a; i < len; i++) {
 		a = array[i];

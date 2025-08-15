@@ -339,8 +339,8 @@ class Controller extends EditorInjector {
 	 */
 	__removeGlobalEvent() {
 		this.component.__removeGlobalEvent();
-		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
-		if (this._bindClose_mouse) this._bindClose_mouse = this.eventManager.removeGlobalEvent(this._bindClose_mouse);
+		this._bindClose_key &&= this.eventManager.removeGlobalEvent(this._bindClose_key);
+		this._bindClose_mouse &&= this.eventManager.removeGlobalEvent(this._bindClose_mouse);
 	}
 
 	/**

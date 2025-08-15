@@ -55,7 +55,7 @@ UI.prototype = {
 	 * @param {__se__FrameContext|null} fc Frame context
 	 */
 	setEditorStyle(style, fc) {
-		fc = fc || this.frameContext;
+		fc ||= this.frameContext;
 
 		const fo = fc.get('options');
 		fo.set('editorStyle', style);
@@ -270,7 +270,7 @@ UI.prototype = {
 		if (type) dom.utils.addClass(this.alertModal, `se-alert-${type}`);
 
 		if (this._closeSignal) this._alertInner.addEventListener('click', this._closeListener[1]);
-		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
+		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
 
 		this._alertArea.style.display = 'block';
@@ -286,7 +286,7 @@ UI.prototype = {
 		dom.utils.removeClass(this.alertModal, 'se-alert-*');
 		this._alertArea.style.display = 'none';
 		if (this._closeSignal) this._alertInner.removeEventListener('click', this._closeListener[1]);
-		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
+		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
 	},
 
 	/**

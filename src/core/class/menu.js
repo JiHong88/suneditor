@@ -263,8 +263,8 @@ Menu.prototype = {
 	 * @description Remove global event listeners
 	 */
 	__removeGlobalEvent() {
-		if (this._bindClose_dropdown_mouse) this._bindClose_dropdown_mouse = this.eventManager.removeGlobalEvent(this._bindClose_dropdown_mouse);
-		if (this._bindClose_cons_mouse) this._bindClose_cons_mouse = this.eventManager.removeGlobalEvent(this._bindClose_cons_mouse);
+		this._bindClose_dropdown_mouse &&= this.eventManager.removeGlobalEvent(this._bindClose_dropdown_mouse);
+		this._bindClose_cons_mouse &&= this.eventManager.removeGlobalEvent(this._bindClose_cons_mouse);
 		if (this._bindClose_dropdown_key) {
 			this._bindClose_dropdown_key = this.eventManager.removeGlobalEvent(this._bindClose_dropdown_key);
 			dom.utils.removeClass(this.menus, 'on');

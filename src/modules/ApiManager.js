@@ -59,13 +59,13 @@ class ApiManager {
 	call({ method, url, headers, data, callBack, errorCallBack, responseType }) {
 		this.cancel();
 
-		method = method || this.method;
+		method ||= this.method;
 		url = this._normalizeUrl(url || this.url);
-		headers = headers || this.headers;
-		data = data || this.data;
-		callBack = callBack || this.callBack;
-		errorCallBack = errorCallBack || this.errorCallBack;
-		responseType = responseType || this.responseType;
+		headers ||= this.headers;
+		data ||= this.data;
+		callBack ||= this.callBack;
+		errorCallBack ||= this.errorCallBack;
+		responseType ||= this.responseType;
 
 		const xhr = this._xhr;
 		if (responseType) xhr.responseType = responseType;
@@ -93,11 +93,11 @@ class ApiManager {
 	asyncCall({ method, url, headers, data, responseType }) {
 		this.cancel();
 
-		method = method || this.method;
+		method ||= this.method;
 		url = this._normalizeUrl(url || this.url);
-		headers = headers || this.headers;
-		data = data || this.data;
-		responseType = responseType || this.responseType;
+		headers ||= this.headers;
+		data ||= this.data;
+		responseType ||= this.responseType;
 
 		const xhr = this._xhr;
 		if (responseType) xhr.responseType = responseType;

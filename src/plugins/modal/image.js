@@ -544,8 +544,7 @@ class Image_ extends EditorInjector {
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitURL(url) {
-		if (!url) url = this._linkValue;
-		if (!url) return false;
+		if (!(url ||= this._linkValue)) return false;
 
 		const file = { name: url.split('/').pop(), size: 0 };
 		const imgInfo = {
@@ -582,8 +581,8 @@ class Image_ extends EditorInjector {
 	 * @param {string} height - New image height.
 	 */
 	_update(width, height) {
-		if (!width) width = this.inputX?.value || 'auto';
-		if (!height) height = this.inputY?.value || 'auto';
+		width ||= this.inputX?.value || 'auto';
+		height ||= this.inputY?.value || 'auto';
 
 		let imageEl = this._element;
 
@@ -678,8 +677,8 @@ class Image_ extends EditorInjector {
 	 * @param {string} height - The height of the image.
 	 */
 	_fileCheck(width, height) {
-		if (!width) width = this.inputX?.value || 'auto';
-		if (!height) height = this.inputY?.value || 'auto';
+		width ||= this.inputX?.value || 'auto';
+		height ||= this.inputY?.value || 'auto';
 
 		let imageEl = this._element;
 		let cover = this._cover;
@@ -850,8 +849,9 @@ class Image_ extends EditorInjector {
 	 * @param {string} h - Image height.
 	 */
 	_applySize(w, h) {
-		if (!w) w = this.inputX?.value || this.pluginOptions.defaultWidth;
-		if (!h) h = this.inputY?.value || this.pluginOptions.defaultHeight;
+		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
+		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
+
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w)) w += '%';

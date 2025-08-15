@@ -99,9 +99,7 @@ class HueSlider {
 	 * @param {HueSliderParams} [params={}] Hue slider options
 	 * @param {string} [className=""] The class name of the hue slider.
 	 */
-	constructor(inst, params, className) {
-		if (!params) params = {};
-
+	constructor(inst, params = {}, className = '') {
 		this.editor = inst.editor;
 		this.eventManager = inst.eventManager;
 		this.inst = inst;
@@ -248,13 +246,13 @@ class HueSlider {
 		isWheelragging = false;
 		isBarDragging = false;
 
-		if (this.__globalMouseDown) this.__globalMouseDown = this.eventManager.removeGlobalEvent(this.__globalMouseDown);
-		if (this.__globalMouseMove) this.__globalMouseMove = this.eventManager.removeGlobalEvent(this.__globalMouseMove);
-		if (this.__globalMouseUp) this.__globalMouseUp = this.eventManager.removeGlobalEvent(this.__globalMouseUp);
+		this.__globalMouseDown &&= this.eventManager.removeGlobalEvent(this.__globalMouseDown);
+		this.__globalMouseMove &&= this.eventManager.removeGlobalEvent(this.__globalMouseMove);
+		this.__globalMouseUp &&= this.eventManager.removeGlobalEvent(this.__globalMouseUp);
 
-		if (this.__globalTouchStart) this.__globalTouchStart = this.eventManager.removeGlobalEvent(this.__globalTouchStart);
-		if (this.__globalTouchMove) this.__globalTouchMove = this.eventManager.removeGlobalEvent(this.__globalTouchMove);
-		if (this.__globalTouchEnd) this.__globalTouchEnd = this.eventManager.removeGlobalEvent(this.__globalTouchEnd);
+		this.__globalTouchStart &&= this.eventManager.removeGlobalEvent(this.__globalTouchStart);
+		this.__globalTouchMove &&= this.eventManager.removeGlobalEvent(this.__globalTouchMove);
+		this.__globalTouchEnd &&= this.eventManager.removeGlobalEvent(this.__globalTouchEnd);
 	}
 }
 

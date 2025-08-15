@@ -287,7 +287,7 @@ HTML.prototype = {
 
 		if (formatFilter) {
 			let domTree = domParser.childNodes;
-			if (!forceFormat) forceFormat = this._isFormatData(domTree);
+			forceFormat ||= this._isFormatData(domTree);
 			if (forceFormat) domTree = this._editFormat(domParser).childNodes;
 
 			for (let i = 0, len = domTree.length, t; i < len; i++) {
@@ -301,7 +301,7 @@ HTML.prototype = {
 		}
 
 		// set clean data
-		if (!cleanData) cleanData = html;
+		cleanData ||= html;
 
 		// whitelist, blacklist
 		if (tagFilter) {
@@ -360,7 +360,7 @@ HTML.prototype = {
 					}
 					t = this.insertNode(c, { afterNode: a, skipCharCount: true });
 					a = t.container || t;
-					if (!firstCon) firstCon = t;
+					firstCon ||= t;
 					prev = c;
 				}
 
@@ -1581,7 +1581,7 @@ HTML.prototype = {
 			if (n.nodeType === 8) {
 				value += '<!-- ' + n.textContent + ' -->';
 			} else if (!/meta/i.test(n.nodeName) && !this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !dom.check.isExcludeFormat(n)) {
-				if (!f) f = dom.utils.createElement(this.options.get('defaultLine'));
+				f ||= dom.utils.createElement(this.options.get('defaultLine'));
 				if (this.format.isTextStyleNode(n)) {
 					/** @type {HTMLElement} */
 					(n).removeAttribute('style');
@@ -1680,7 +1680,7 @@ HTML.prototype = {
 		}
 
 		if (sv) {
-			if (!v) v = [];
+			v ||= [];
 
 			let mv;
 			for (const [key, value] of this._cleanStyleRegExpMap) {
@@ -1884,7 +1884,7 @@ function CleanElements(attrFilter, styleFilter, m, t) {
 	if (tagName === 'a') {
 		const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
 		if (sv) {
-			if (!v) v = [];
+			v ||= [];
 			v.push(sv[0]);
 		}
 	} else if (!v || !/style=/i.test(v.toString())) {
@@ -1900,7 +1900,7 @@ function CleanElements(attrFilter, styleFilter, m, t) {
 	// figure
 	if (dom.check.isMedia(tagName) || dom.check.isFigure(tagName)) {
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
-		if (!v) v = [];
+		v ||= [];
 		if (sv) v.push(sv[0]);
 	}
 

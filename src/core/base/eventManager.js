@@ -205,7 +205,7 @@ EventManager.prototype = {
 	 * @returns {Node|undefined} selectionNode
 	 */
 	applyTagEffect(selectionNode) {
-		selectionNode = selectionNode || this.selection.getNode();
+		selectionNode ||= this.selection.getNode();
 		if (selectionNode === this.editor.effectNode) return;
 		this.editor.effectNode = selectionNode;
 
@@ -1181,7 +1181,7 @@ EventManager.prototype = {
 		const figure = dom.query.getParentElement(target, dom.check.isFigure);
 		let info = this.component.get(target);
 		if (info || figure) {
-			if (!info) info = this.component.get(figure);
+			info ||= this.component.get(figure);
 			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
 				this.ui._offCurrentController();
 				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
@@ -1408,8 +1408,8 @@ function __resizeEditor(e) {
  */
 function __closeMove() {
 	this.ui.disableBackWrapper();
-	if (this.__resize_editor) this.__resize_editor = this.removeGlobalEvent(this.__resize_editor);
-	if (this.__close_move) this.__close_move = this.removeGlobalEvent(this.__close_move);
+	this.__resize_editor &&= this.removeGlobalEvent(this.__resize_editor);
+	this.__close_move &&= this.removeGlobalEvent(this.__close_move);
 }
 
 /**

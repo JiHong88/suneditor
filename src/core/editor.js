@@ -1050,7 +1050,7 @@ Editor.prototype = {
 	 */
 	focusEdge(focusEl) {
 		this._preventBlur = false;
-		if (!focusEl) focusEl = this.frameContext.get('wysiwyg').lastElementChild;
+		focusEl ||= this.frameContext.get('wysiwyg').lastElementChild;
 
 		const fileComponentInfo = this.component.get(focusEl);
 		if (fileComponentInfo) {
@@ -1290,7 +1290,7 @@ Editor.prototype = {
 	 * @param {?__se__FrameContext=} fc - Frame context object, If null fc is this.frameContext
 	 */
 	_checkPlaceholder(fc) {
-		fc = /** @type {__se__FrameContext} */ (fc || this.frameContext);
+		fc ||= /** @type {__se__FrameContext} */ (this.frameContext);
 		const placeholder = fc.get('placeholder');
 
 		if (placeholder) {

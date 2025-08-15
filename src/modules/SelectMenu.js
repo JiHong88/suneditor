@@ -73,7 +73,7 @@ class SelectMenu extends CoreInjector {
 	 */
 	create(items, menus) {
 		this.form.firstElementChild.innerHTML = '';
-		menus = menus || items;
+		menus ||= items;
 		let html = '';
 		for (let i = 0, len = menus.length; i < len; i++) {
 			if (i > 0 && i % this.splitNum === 0) {
@@ -95,8 +95,7 @@ class SelectMenu extends CoreInjector {
 	 * @param {(command: string) => void} selectMethod - The function to execute when an item is selected.
 	 * @param {{class?: string, style?: string}} [attr={}] - Additional attributes for the select menu container.
 	 */
-	on(referElement, selectMethod, attr) {
-		if (!attr) attr = {};
+	on(referElement, selectMethod, attr = {}) {
 		this._refer = /** @type {HTMLElement} */ (referElement);
 		this._keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.frameContext.get('_ww');
 		this._selectMethod = selectMethod;
@@ -419,9 +418,9 @@ class SelectMenu extends CoreInjector {
 	 * @description Removes global event listeners for closing the menu.
 	 */
 	__removeGlobalEvent() {
-		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
-		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
-		if (this._bindClose_click) this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
+		this._bindClose_key &&= this.eventManager.removeGlobalEvent(this._bindClose_key);
+		this._bindClose_mousedown &&= this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
+		this._bindClose_click &&= this.eventManager.removeGlobalEvent(this._bindClose_click);
 	}
 
 	/**

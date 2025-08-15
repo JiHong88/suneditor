@@ -305,7 +305,7 @@ class ColorPicker extends CoreInjector {
  * @returns
  */
 function CreateHTML({ lang, icons }, { colorList, disableHEXInput, disableRemove, splitNum }) {
-	colorList = colorList || DEFAULT_COLOR_LIST;
+	colorList ||= DEFAULT_COLOR_LIST;
 	splitNum = colorList === DEFAULT_COLOR_LIST ? DEFAULLT_COLOR_SPLITNUM : splitNum;
 
 	let list = '';

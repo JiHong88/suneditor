@@ -522,7 +522,7 @@ class Figure extends EditorInjector {
 	 * @returns {{w: string, h: string, dw: string, dh: string}}
 	 */
 	getSize(targetNode) {
-		if (!targetNode) targetNode = this._element;
+		targetNode ||= this._element;
 
 		const v = IsVertical(targetNode);
 		let w = '';
@@ -552,8 +552,9 @@ class Figure extends EditorInjector {
 				: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
 				? target.style.height
 				: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
-			w = w || 'auto';
-			h = h || 'auto';
+
+			w ||= 'auto';
+			h ||= 'auto';
 		}
 
 		dw = v ? h : w;
@@ -573,8 +574,8 @@ class Figure extends EditorInjector {
 	 * @param {string} align "none"|"left"|"center"|"right"
 	 */
 	setAlign(targetNode, align) {
-		if (!targetNode) targetNode = this._element;
-		this.align = align = align || 'none';
+		targetNode ||= this._element;
+		this.align = align ||= 'none';
 
 		const figure = Figure.GetContainer(targetNode);
 		if (!figure.cover) return;
@@ -610,7 +611,7 @@ class Figure extends EditorInjector {
 	 * @returns {HTMLElement} New target element after conversion
 	 */
 	convertAsFormat(targetNode, formatStyle) {
-		if (!targetNode) targetNode = this._element;
+		targetNode ||= this._element;
 		this.as = formatStyle || 'block';
 		const { container, inlineCover, target } = Figure.GetContainer(targetNode);
 		const { w, h } = this.getSize(target);
@@ -835,7 +836,7 @@ class Figure extends EditorInjector {
 	 * @param {?Node=} node Target element, default is the current element
 	 */
 	deleteTransform(node) {
-		if (!node) node = this._element;
+		node ||= this._element;
 
 		const element = /** @type {HTMLElement} */ (node);
 		const size = (element.getAttribute('data-se-size') || '').split(',');
@@ -1062,7 +1063,7 @@ class Figure extends EditorInjector {
 	 * @param {string|number} h Height percentage.
 	 */
 	_setPercentSize(w, h) {
-		if (!h) h = this.autoRatio ? (/%$/.test(this.autoRatio.current) ? this.autoRatio.current : this.autoRatio.default) : h;
+		h ||= this.autoRatio ? (/%$/.test(this.autoRatio.current) ? this.autoRatio.current : this.autoRatio.default) : h;
 		h = h && !/%$/.test(h + '') && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (this.autoRatio ? this.autoRatio.default : '');
 
 		const heightPercentage = /%$/.test(h + '');

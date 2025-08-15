@@ -323,13 +323,12 @@ NodeTransform.prototype = {
 	removeAllParents(item, validation, stopParent) {
 		if (!item) return null;
 		let cc = null;
-		if (!validation) {
-			validation = (current) => {
-				if (current === stopParent || this.component.is(current)) return false;
-				const text = current.textContent.trim();
-				return text.length === 0 || /^(\n|\u200B)+$/.test(text);
-			};
-		}
+
+		validation ||= (current) => {
+			if (current === stopParent || this.component.is(current)) return false;
+			const text = current.textContent.trim();
+			return text.length === 0 || /^(\n|\u200B)+$/.test(text);
+		};
 
 		(function recursionFunc(element) {
 			if (!dom.check.isWysiwygFrame(element)) {
@@ -360,9 +359,7 @@ NodeTransform.prototype = {
 		const inst = this;
 		const allowedEmptyTags = this.options.get('allowedEmptyTags');
 
-		if (notRemoveNode) {
-			notRemoveNode = dom.query.getParentElement(notRemoveNode, (current) => element === current.parentElement);
-		}
+		notRemoveNode &&= dom.query.getParentElement(notRemoveNode, (current) => element === current.parentElement);
 
 		(function recursionFunc(current) {
 			if (inst.format._notTextNode(current) || current === notRemoveNode || dom.check.isNonEditable(current)) return 0;

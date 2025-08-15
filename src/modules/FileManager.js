@@ -139,12 +139,10 @@ class FileManager extends CoreInjector {
 		let info = null;
 		let state = '';
 
-		if (!file) {
-			file = {
-				name: GetAttr(element, 'file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
-				size: Number(GetAttr(element, 'file-size')) || 0
-			};
-		}
+		file ||= {
+			name: GetAttr(element, 'file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
+			size: Number(GetAttr(element, 'file-size')) || 0
+		};
 
 		// create
 		if (!dataIndex || this.editor._componentsInfoInit) {

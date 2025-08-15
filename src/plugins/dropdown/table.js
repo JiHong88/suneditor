@@ -618,7 +618,7 @@ class Table extends EditorInjector {
 
 				// ready
 				this.ui.enableBackWrapper('ew-resize');
-				if (!this._resizeLine) this._resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
+				this._resizeLine ||= this.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
 				this._resizeLinePrev = this.frameContext.get('wrapper').querySelector(RESIZE_CELL_PREV_CLASS);
 
 				// select figure
@@ -658,7 +658,7 @@ class Table extends EditorInjector {
 
 				// ready
 				this.ui.enableBackWrapper('ns-resize');
-				if (!this._resizeLine) this._resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
+				this._resizeLine ||= this.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
 				this._resizeLinePrev = this.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
 
 				this._startRowResizing(row, rowEdge.startY, numbers.get(_w.getComputedStyle(row).height, CELL_DECIMAL_END));
@@ -778,7 +778,7 @@ class Table extends EditorInjector {
 
 		if (this._shift || this._ref) return;
 
-		cell = /** @type {HTMLTableCellElement} */ (cell || dom.query.getParentElement(line, dom.check.isTableCell));
+		cell ||= /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(line, dom.check.isTableCell));
 		if (cell) {
 			this.__s = false;
 			this._fixedCell = cell;
@@ -1514,7 +1514,7 @@ class Table extends EditorInjector {
 				row = /** @type {HTMLTableRowElement} */ (removeCell[r].parentNode);
 				dom.utils.removeItem(removeCell[r]);
 				if (row.cells.length === 0) {
-					if (!removeFirst) removeFirst = dom.utils.getArrayIndex(rows, row);
+					removeFirst ||= dom.utils.getArrayIndex(rows, row);
 					removeEnd = dom.utils.getArrayIndex(rows, row);
 					dom.utils.removeItem(row);
 				}
@@ -1658,7 +1658,7 @@ class Table extends EditorInjector {
 				if (rs > 1 || cs > 1) {
 					for (let rsOffset = 1; rsOffset < rs; rsOffset++) {
 						const rowIndex = r + rsOffset;
-						if (!un_mergeRowSpanMap[rowIndex]) un_mergeRowSpanMap[rowIndex] = [];
+						un_mergeRowSpanMap[rowIndex] ||= [];
 						for (let csOffset = 0; csOffset < cs; csOffset++) {
 							un_mergeRowSpanMap[rowIndex][logicalIndex + csOffset] = true;
 						}
@@ -1699,7 +1699,7 @@ class Table extends EditorInjector {
 
 				for (let rsOffset = 1; rsOffset < rs; rsOffset++) {
 					const rowIndex = r + rsOffset;
-					if (!copyCowSpanMap[rowIndex]) copyCowSpanMap[rowIndex] = [];
+					copyCowSpanMap[rowIndex] ||= [];
 					for (let csOffset = 0; csOffset < cs; csOffset++) {
 						copyCowSpanMap[rowIndex][copyIndex + csOffset] = true;
 					}
@@ -1736,7 +1736,7 @@ class Table extends EditorInjector {
 						if (trs > 1) {
 							for (let rsOffset = 1; rsOffset < trs; rsOffset++) {
 								const rIndex = targetR + rsOffset;
-								if (!targetRowSpanMap[rIndex]) targetRowSpanMap[rIndex] = [];
+								targetRowSpanMap[rIndex] ||= [];
 								for (let i = 0; i < tcs; i++) {
 									targetRowSpanMap[rIndex][logicalIndex + i] = true;
 								}
@@ -1799,7 +1799,7 @@ class Table extends EditorInjector {
 				if (trs > 1) {
 					for (let rs = 1; rs < trs; rs++) {
 						const rr = r + rs;
-						if (!rowSpanMap[rr]) rowSpanMap[rr] = [];
+						rowSpanMap[rr] ||= [];
 						for (let cs = 0; cs < tcs; cs++) {
 							rowSpanMap[rr][tLogicalIndex + cs] = true;
 						}
@@ -2554,7 +2554,7 @@ class Table extends EditorInjector {
 		dom.utils.removeClass(border_format, 'active');
 
 		// border - styles
-		b_style = b_style || BORDER_LIST[0];
+		b_style ||= BORDER_LIST[0];
 		border_style.textContent = b_style;
 		border_color.style.borderColor = border_color.value = b_color;
 		border_width.value = b_width;
@@ -3098,7 +3098,7 @@ class Table extends EditorInjector {
 		}
 		const globalEvents = this.__globalEvents;
 		for (const k in globalEvents) {
-			if (globalEvents[k]) globalEvents[k] = this.eventManager.removeGlobalEvent(globalEvents[k]);
+			globalEvents[k] &&= this.eventManager.removeGlobalEvent(globalEvents[k]);
 		}
 	}
 
@@ -3459,8 +3459,8 @@ class Table extends EditorInjector {
 		if (!this._shift) {
 			this._toggleEditor(true);
 			this.__removeGlobalEvents();
-		} else if (this.__globalEvents.touchOff) {
-			this.__globalEvents.touchOff = this.eventManager.removeGlobalEvent(this.__globalEvents.touchOff);
+		} else {
+			this.__globalEvents.touchOff &&= this.eventManager.removeGlobalEvent(this.__globalEvents.touchOff);
 		}
 
 		if (!this._fixedCell || !this._selectedTable) return;

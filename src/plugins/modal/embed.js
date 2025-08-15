@@ -449,8 +449,7 @@ class Embed extends EditorInjector {
 	 * @returns {Promise<boolean>} A promise that resolves to true on success or false on failure.
 	 */
 	async submitSRC(src) {
-		if (!src) src = this._linkValue;
-		if (!src) return false;
+		if (!(src ||= this._linkValue)) return false;
 
 		let embedInfo = null;
 		if (/^<iframe\s|^<blockquote\s/i.test(src)) {
@@ -579,8 +578,9 @@ class Embed extends EditorInjector {
 		this._container = container;
 		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 
-		width = width || this._defaultSizeX;
-		height = height || this._defaultSizeY;
+		width ||= this._defaultSizeX;
+		height ||= this._defaultSizeY;
+
 		const size = this.figure.getSize(oFrame);
 		const inputUpdate = size.w !== width || size.h !== height;
 		const changeSize = !isUpdate || inputUpdate;
@@ -697,8 +697,9 @@ class Embed extends EditorInjector {
 	 * @param {string|number} h - The height to apply.
 	 */
 	_applySize(w, h) {
-		if (!w) w = this.inputX?.value || this.pluginOptions.defaultWidth;
-		if (!h) h = this.inputY?.value || this.pluginOptions.defaultHeight;
+		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
+		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
+
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w + '')) w += '%';

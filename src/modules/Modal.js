@@ -138,7 +138,7 @@ class Modal extends CoreInjector {
 		this._fixCurrentController(true);
 
 		if (this._closeSignal) this._modalInner.addEventListener('click', this._closeListener[1]);
-		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
+		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
 		this.isUpdate = this.kind === this.editor.currentControllerName;
 		this.editor.opendModal = this;
@@ -174,7 +174,7 @@ class Modal extends CoreInjector {
 		}, 0);
 
 		if (this._closeSignal) this._modalInner.removeEventListener('click', this._closeListener[1]);
-		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
+		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
 
 		// close
 		dom.utils.removeClass(this._modalArea, 'se-backdrop-show');
@@ -228,8 +228,8 @@ class Modal extends CoreInjector {
 	 */
 	__removeGlobalEvent() {
 		this.ui.disableBackWrapper();
-		if (this._bindClose_mousemove) this._bindClose_mousemove = this.eventManager.removeGlobalEvent(this._bindClose_mousemove);
-		if (this._bindClose_mouseup) this._bindClose_mouseup = this.eventManager.removeGlobalEvent(this._bindClose_mouseup);
+		this._bindClose_mousemove &&= this.eventManager.removeGlobalEvent(this._bindClose_mousemove);
+		this._bindClose_mouseup &&= this.eventManager.removeGlobalEvent(this._bindClose_mouseup);
 	}
 
 	/**
