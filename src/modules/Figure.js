@@ -547,8 +547,8 @@ class Figure extends EditorInjector {
 			w = !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%';
 			h = figure.inlineCover
 				? figure.inlineCover.style.height || /** @type {HTMLElement} */ (targetNode).style.height || String(/** @type {HTMLImageElement} */ (targetNode).height || '')
-				: numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !v
-				? figure.cover.style.height
+				: numbers.get(figure.cover?.style.paddingBottom, 0) > 0 && !v
+				? figure.cover?.style.height
 				: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
 				? target.style.height
 				: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
@@ -889,8 +889,10 @@ class Figure extends EditorInjector {
 				this._deletePercentSize();
 				this._applySize(offsetW + 'px', offsetH + 'px', '');
 
-				cover.style.width = w;
-				cover.style.height = figureInfo.caption || figureInfo.inlineCover ? '' : h;
+				if (cover) {
+					cover.style.width = w;
+					cover.style.height = figureInfo.caption || figureInfo.inlineCover ? '' : h;
+				}
 
 				if (isVertical) {
 					const transW = offsetW / 2 + 'px ' + offsetW / 2 + 'px 0';
@@ -986,14 +988,14 @@ class Figure extends EditorInjector {
 
 		const sizeTarget = this._cover || this._element;
 
-		if (this.autoRatio) this._cover.style.width = w;
+		if (this.autoRatio && this._cover) this._cover.style.width = w;
 		if (!onlyH) {
 			sizeTarget.style.width = this._element.style.width = w;
 		}
 		if (!onlyW) {
 			h = numbers.is(h) ? h + this.sizeUnit : h;
 			sizeTarget.style.height = this._element.style.height = this.autoRatio && !this.isVertical ? '100%' : h;
-			if (this.autoRatio) {
+			if (this.autoRatio && this._cover) {
 				this._cover.style.height = h;
 				this.__setCoverPaddingBottom(w, h);
 			}
@@ -1041,8 +1043,10 @@ class Figure extends EditorInjector {
 			this._element.style.maxWidth = '';
 			this._element.style.width = '';
 			this._element.style.height = '';
-			this._cover.style.width = '';
-			this._cover.style.height = '';
+			if (this._cover) {
+				this._cover.style.width = '';
+				this._cover.style.height = '';
+			}
 		}
 
 		this.setAlign(this._element, this.align);
@@ -1071,10 +1075,11 @@ class Figure extends EditorInjector {
 			return;
 		}
 
-		if (this._inlineCover !== this._cover) {
+		if (this._inlineCover !== this._cover && this._cover) {
 			this._cover.style.width = '100%';
 			this._cover.style.height = String(h);
 		}
+
 		this._element.style.width = '100%';
 		this._element.style.maxWidth = '';
 		this._element.style.height = String(this.autoRatio ? '100%' : heightPercentage ? '' : h);
@@ -1095,8 +1100,11 @@ class Figure extends EditorInjector {
 	 * @description Deletes percentage-based sizing from the figure element.
 	 */
 	_deletePercentSize() {
-		this._cover.style.width = '';
-		this._cover.style.height = '';
+		if (this._cover) {
+			this._cover.style.width = '';
+			this._cover.style.height = '';
+		}
+
 		this._container.style.width = '';
 		this._container.style.height = '';
 
