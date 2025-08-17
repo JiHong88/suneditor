@@ -43,25 +43,43 @@ It's easy to integrate, highly customizable, and built for modern web applicatio
 
 ## 🌍 Browser Support
 
-| Browser                                                                                                                             | Since    | Version ≥ |
-| ----------------------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
-| ![Chrome](https://img.shields.io/badge/-Chrome-4285F4?logo=GoogleChrome&logoColor=white&style=flat-square)                          | Feb 2020 | 80        |
-| ![Firefox](https://img.shields.io/badge/-Firefox-FF7139?logo=FirefoxBrowser&logoColor=white&style=flat-square)                      | Jul 2021 | 90        |
-| ![Safari](https://img.shields.io/badge/-Safari-0D96F6?logo=Safari&logoColor=white&style=flat-square)                                | Apr 2021 | 14.1      |
-| ![Edge](https://img.shields.io/badge/-Edge-0078D7?logo=MicrosoftEdge&logoColor=white&style=flat-square)                             | Jan 2020 | 80        |
-| ![Opera](https://img.shields.io/badge/-Opera-FF1B2D?logo=Opera&logoColor=white&style=flat-square)                                   | Feb 2020 | 67        |
-| ![iOS Safari](https://img.shields.io/badge/-iOS%20Safari-000000?logo=apple&logoColor=white&style=flat-square)                       | Apr 2021 | 14.5      |
-| ![Android WebView](https://img.shields.io/badge/-Android%20WebView-3DDC84?logo=android&logoColor=white&style=flat-square)           | Feb 2020 | 80        |
-| ![Samsung Internet](https://img.shields.io/badge/-Samsung%20Internet-1428A0?logo=samsunginternet&logoColor=white&style=flat-square) | Apr 2020 | 13.0      |
+SunEditor's goal is to provide a modern, high-performance web editor by leveraging the latest native browser APIs without relying on heavy, performance-degrading polyfills.
+
+### 🛠️ Minimum Supported Versions
+
+> The following versions or newer are expected to work correctly.
+> We aim to maintain compatibility with this baseline, but active testing is not performed on these specific versions.
+
+| Browser                                                                                                                             | ≥ Version      |
+| ----------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| ![Chrome](https://img.shields.io/badge/-Chrome-4285F4?logo=GoogleChrome&logoColor=white&style=flat-square)                          | 119 (2023-10)  |
+| ![Edge](https://img.shields.io/badge/-Edge-0078D7?logo=MicrosoftEdge&logoColor=white&style=flat-square)                             | 119 (2023-11)  |
+| ![Firefox](https://img.shields.io/badge/-Firefox-FF7139?logo=FirefoxBrowser&logoColor=white&style=flat-square)                      | 121 (2023-12)  |
+| ![Safari (macOS, iOS)](https://img.shields.io/badge/-Safari-0D96F6?logo=Safari&logoColor=white&style=flat-square)                   | 17.0 (2023-09) |
+| ![Opera](https://img.shields.io/badge/-Opera-FF1B2D?logo=Opera&logoColor=white&style=flat-square)                                   | 105 (2023-11)  |
+| ![Android WebView](https://img.shields.io/badge/-Android%20WebView-3DDC84?logo=android&logoColor=white&style=flat-square)           | 119 (2023-10)  |
+| ![Samsung Internet](https://img.shields.io/badge/-Samsung%20Internet-1428A0?logo=samsunginternet&logoColor=white&style=flat-square) | 23.0 (2023-10) |
 
 ❌ Not Supported : IE, Legacy Edge
 
-> SunEditor is designed for modern browsers released since 2020.\
-> This includes support for ES2020+ features like optional chaining (?.), nullish coalescing (??), and private class fields (#field).
+### 📌 Why This Baseline? (Late 2023)
+
+This baseline marks the point where several crucial, modern web platform features became natively supported across all major browsers.
+
+-   **Powerful Native CSS**
+    -   Unlocks modern layouts and component-based styling with :has() and Container Queries.
+-   **Declarative UI APIs**
+    -   Simplifies complex UI like menus and pop-ups using the native Popover API, reducing JavaScript dependency.
+-   **Robust State Management**
+    -   Ensures data integrity with native structuredClone() and immutable array methods (.with()).
+-   **Enhanced Developer Experience**
+    -   Improves code readability and maintainability with native CSS Nesting.
 
 ---
 
 ## 📦 Legacy Version (v2-legacy)
+
+\* Supported IE11
 
 > **SunEditor v3 is the latest version.**  
 > This section refers to the **previous stable version, SunEditor v2**.

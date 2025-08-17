@@ -4,16 +4,20 @@
 
 ## 📘 Introduction
 
-The codebase is written in **JavaScript (ES2020)**, using **JSDoc** for type definitions.  
+The codebase is written in **JavaScript**, using **JSDoc** for type definitions.  
 Node.js **v14 or higher** is required to build and test.
 
 ### 📝 Notes
 
--   Uses modern syntax including:
+-   The codebase uses **modern ECMAScript syntax**, including:
     -   Optional chaining (`?.`)
     -   Nullish coalescing (`??`)
     -   Private class fields (`#myField`)
--   Polyfills are **not included** – make sure your target environment supports these features.
+    -   Logical assignment operators (`??=`, `||=`, `&&=`)
+    -   ClipboardItem API
+-   **Polyfills are not included**. Make sure your target environment (browser or runtime) natively supports these features.
+-   Target ECMAScript version: **ES2022**
+-   Supported browsers: [See Browser Support](./README.md#-browser-support)
 
 ---
 

@@ -30,7 +30,7 @@ declare class UI {
 	_alertInner: HTMLElement;
 	_closeListener: any[];
 	_closeSignal: boolean;
-	_bindClose: any;
+	_bindClose: __se__GlobalEventInfo;
 	_backWrapper: HTMLElement;
 	toastPopup: HTMLElement;
 	toastContainer: Element;

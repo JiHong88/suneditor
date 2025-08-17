@@ -133,8 +133,8 @@ declare class Controller extends EditorInjector {
 		keydown: any;
 		mousedown: any;
 	};
-	_bindClose_key: any;
-	_bindClose_mouse: any;
+	_bindClose_key: __se__GlobalEventInfo;
+	_bindClose_mouse: __se__GlobalEventInfo;
 	/** @type {{left?: number, top?: number, addOfffset?: {left?: number, top?: number}}} */
 	__offset: {
 		left?: number;

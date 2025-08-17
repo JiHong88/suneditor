@@ -81,16 +81,16 @@
 		"webpack-merge": "^5.9.0"
 	},
 	"browserslist": [
-		"chrome >= 80",
-		"firefox >= 90",
-		"safari >= 14.1",
-		"edge >= 80",
-		"opera >= 67",
-		"ios >= 14.5",
-		"android >= 80",
-		"samsung >= 13",
-		"not IE <= 11",
-		"not dead"
+		"Firefox ESR",
+		"chrome >= 119",
+		"edge >= 119",
+		"firefox >= 121",
+		"safari >= 17",
+		"opera >= 105",
+		"samsung >= 23",
+		"not dead",
+		"not IE 11",
+		"not op_mini all"
 	],
 	"ignore": [
 		"**/.*",

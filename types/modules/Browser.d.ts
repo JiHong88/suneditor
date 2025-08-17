@@ -228,7 +228,7 @@ declare class Browser extends CoreInjector {
 	keyword: string;
 	sideInner: HTMLElement;
 	_closeSignal: boolean;
-	_bindClose: any;
+	_bindClose: __se__GlobalEventInfo;
 	__globalEventHandler: (e: any) => void;
 	apiManager: ApiManager;
 	sideOpenBtn: HTMLButtonElement;

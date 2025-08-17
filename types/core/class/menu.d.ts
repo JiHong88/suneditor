@@ -42,9 +42,9 @@ declare class Menu {
 		mousemove: any;
 		mouseout: any;
 	};
-	_bindClose_dropdown_mouse: any;
+	_bindClose_dropdown_mouse: __se__GlobalEventInfo;
 	_bindClose_dropdown_key: any;
-	_bindClose_cons_mouse: any;
+	_bindClose_cons_mouse: __se__GlobalEventInfo;
 	currentDropdownPlugin: any;
 	__menuBtn: Node;
 	__menuContainer: HTMLElement;

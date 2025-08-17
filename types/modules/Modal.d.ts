@@ -58,7 +58,7 @@ declare class Modal extends CoreInjector {
 	/** @type {HTMLElement} */
 	_modalInner: HTMLElement;
 	_closeListener: any[];
-	_bindClose: any;
+	_bindClose: __se__GlobalEventInfo;
 	_onClickEvent: any;
 	_closeSignal: boolean;
 	/** @type {HTMLElement} */
@@ -71,8 +71,8 @@ declare class Modal extends CoreInjector {
 		mousemove: any;
 		mouseup: any;
 	};
-	_bindClose_mousemove: any;
-	_bindClose_mouseup: any;
+	_bindClose_mousemove: __se__GlobalEventInfo;
+	_bindClose_mouseup: __se__GlobalEventInfo;
 	/**
 	 * @description Open a modal plugin
 	 * - The plugin's "init" method is called.

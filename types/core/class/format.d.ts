@@ -433,17 +433,17 @@ declare class Format {
 	 * @private
 	 * @this {FormatThis}
 	 * @description Nest list cells or cancel nested cells.
-	 * @param selectedCells List cells.
-	 * @param nested Nested or cancel nested.
+	 * @param {Array<HTMLElement>} selectedCells List cells.
+	 * @param {boolean} nested Nested or cancel nested.
 	 */
 	_applyNestedList(
 		this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>,
-		selectedCells: any,
-		nested: any
+		selectedCells: Array<HTMLElement>,
+		nested: boolean
 	): {
-		sc: any;
+		sc: Node;
 		so: number;
-		ec: any;
+		ec: Node;
 		eo: number;
 	};
 	/**
