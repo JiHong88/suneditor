@@ -1660,6 +1660,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // line breaker
             this._lineBreaker.style.display = 'none';
             const container = util.getParentElement(element, util.isComponent);
+            if (!container) return;
+            
             const t_style = context.element.lineBreaker_t.style;
             const b_style = context.element.lineBreaker_b.style;
             const target = this.context.resizing.resizeContainer.style.display === 'block' ? this.context.resizing.resizeContainer : element;
