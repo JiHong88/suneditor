@@ -1197,7 +1197,7 @@ class Table extends EditorInjector {
 					}
 				} else {
 					// edit row
-					this.setCellInfo(option === 'up' ? selectedCells[0] : selectedCells[selectedCells.length - 1], true);
+					this.setCellInfo(option === 'up' ? selectedCells[0] : selectedCells.at(-1), true);
 					this.editRow(option, null, positionCell);
 				}
 			} else {

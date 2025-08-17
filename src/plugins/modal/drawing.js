@@ -455,8 +455,8 @@ class Drawing extends EditorInjector {
 			if (!this.pluginOptions.lineReconnect) {
 				this.points.push([e.offsetX, e.offsetY]);
 			} else {
-				const lastPath = this.paths[this.paths.length - 1];
-				const lastPoint = lastPath[lastPath.length - 1];
+				const lastPath = this.paths.at(-1);
+				const lastPoint = lastPath.at(-1);
 				this.points.push([lastPoint[0], lastPoint[1]]);
 				this.points.push([e.offsetX, e.offsetY]);
 			}

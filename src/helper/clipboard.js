@@ -44,14 +44,29 @@ export async function write(content) {
 		plainText = content.textContent;
 	}
 
-	/* eslint-disable-next-line compat/compat */
-	await navigator.clipboard.write([
+	try {
 		/* eslint-disable-next-line compat/compat */
-		new ClipboardItem({
-			'text/html': new Blob([htmlString], { type: 'text/html' }),
-			'text/plain': new Blob([plainText], { type: 'text/plain' })
-		})
-	]);
+		await navigator.clipboard.write([
+			/* eslint-disable-next-line compat/compat */
+			new ClipboardItem({
+				'text/html': new Blob([htmlString], { type: 'text/html' }),
+				'text/plain': new Blob([plainText], { type: 'text/plain' })
+			})
+		]);
+	} catch {
+		console.warn('[SUNEDITOR.copy.warn] This browser is not supported Clipboard API');
+		try {
+			await navigator.clipboard.writeText(plainText || stripHtml(htmlString));
+		} catch (err) {
+			console.error('[SUNEDITOR.copy.fail] ' + err);
+		}
+	}
+}
+
+function stripHtml(html) {
+	const div = document.createElement('div');
+	div.innerHTML = html;
+	return div.textContent || div.innerText || '';
 }
 
 export default {

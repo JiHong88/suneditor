@@ -287,7 +287,7 @@ Format.prototype = {
 			}
 		}
 
-		const last = rangeLines[rangeLines.length - 1];
+		const last = rangeLines.at(-1);
 		let standTag, beforeTag, pElement;
 
 		if (this.isBlock(last) || this.isLine(last)) {
@@ -376,7 +376,7 @@ Format.prototype = {
 					}
 
 					if (!nested) block.appendChild(listParent);
-					if (nextList) edge.removeArray[edge.removeArray.length - 1].appendChild(nextList);
+					if (nextList) edge.removeArray.at(-1).appendChild(nextList);
 					listParent = null;
 					nested = false;
 				}
@@ -694,7 +694,7 @@ Format.prototype = {
 
 		// merge
 		const firstSel = selectedFormats[0];
-		const lastSel = selectedFormats[selectedFormats.length - 1];
+		const lastSel = selectedFormats.at(-1);
 		let topEl = (dom.check.isListCell(firstSel) || this.component.is(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentElement.previousElementSibling : firstSel.previousElementSibling;
 		let bottomEl = (dom.check.isListCell(lastSel) || this.component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentElement.nextElementSibling : lastSel.nextElementSibling;
 
@@ -1253,7 +1253,7 @@ Format.prototype = {
 
 		if (!this.getLine(endCon, null)) {
 			endCon = dom.query.getEdgeChild(
-				lineNodes[lineNodes.length - 1],
+				lineNodes.at(-1),
 				function (current) {
 					return current.nodeType === 3;
 				},
@@ -1499,7 +1499,7 @@ Format.prototype = {
 			const children = this.frameContext.get('wysiwyg').children;
 			if (children.length === 0) return [];
 
-			this.selection.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.trim().length);
+			this.selection.setRange(children[0], 0, children.at(-1), children.at(-1).textContent.trim().length);
 			range = this.selection.getRange();
 		}
 
@@ -1664,7 +1664,7 @@ Format.prototype = {
 		const endOffset = range.endOffset;
 
 		let first = /** @type {Node} */ (selectedFormsts[0]);
-		let last = /** @type {Node} */ (selectedFormsts[selectedFormsts.length - 1]);
+		let last = /** @type {Node} */ (selectedFormsts.at(-1));
 		const firstPath = dom.query.getNodePath(range.startContainer, first, null);
 		const lastPath = dom.query.getNodePath(range.endContainer, last, null);
 
@@ -1765,7 +1765,7 @@ Format.prototype = {
 	 */
 	_detachNested(cells) {
 		const first = cells[0];
-		const last = cells[cells.length - 1];
+		const last = cells.at(-1);
 		const next = last.nextElementSibling;
 		const originList = first.parentElement;
 		const sibling = originList.parentElement.nextElementSibling;
@@ -1801,8 +1801,8 @@ Format.prototype = {
 	 * @private
 	 * @this {FormatThis}
 	 * @description Nest list cells or cancel nested cells.
-	 * @param selectedCells List cells.
-	 * @param nested Nested or cancel nested.
+	 * @param {Array<HTMLElement>} selectedCells List cells.
+	 * @param {boolean} nested Nested or cancel nested.
 	 */
 	_applyNestedList(selectedCells, nested) {
 		selectedCells = !selectedCells
@@ -1811,25 +1811,25 @@ Format.prototype = {
 			  })
 			: selectedCells;
 		const cellsLen = selectedCells.length;
-		if (cellsLen === 0 || (!nested && !dom.check.isListCell(selectedCells[0].previousElementSibling) && !dom.check.isListCell(selectedCells[cellsLen - 1].nextElementSibling))) {
+		if (cellsLen === 0 || (!nested && !dom.check.isListCell(selectedCells[0].previousElementSibling) && !dom.check.isListCell(selectedCells.at(-1).nextElementSibling))) {
 			return {
 				sc: selectedCells[0],
 				so: 0,
-				ec: selectedCells[cellsLen - 1],
+				ec: selectedCells.at(-1),
 				eo: 1
 			};
 		}
 
-		let originList = selectedCells[0].parentNode;
-		let lastCell = selectedCells[cellsLen - 1];
+		let originList = selectedCells[0].parentElement;
+		let lastCell = selectedCells.at(-1);
 		let range = null;
 
 		if (nested) {
-			if (originList !== lastCell.parentNode && dom.check.isList(lastCell.parentNode.parentNode) && lastCell.nextElementSibling) {
-				lastCell = lastCell.nextElementSibling;
+			if (originList !== lastCell.parentElement && dom.check.isList(lastCell.parentElement.parentElement) && lastCell.nextElementSibling) {
+				lastCell = /** @type {HTMLElement} */ (lastCell.nextElementSibling);
 				while (lastCell) {
 					selectedCells.push(lastCell);
-					lastCell = lastCell.nextElementSibling;
+					lastCell = /** @type {HTMLElement} */ (lastCell.nextElementSibling);
 				}
 			}
 			range = this.applyList(originList.nodeName + ':' + originList.style.listStyleType, selectedCells, true);
@@ -1846,9 +1846,9 @@ Format.prototype = {
 
 			for (let i = 0, len = cellsLen, c; i < len; i++) {
 				c = selectedCells[i];
-				if (c.parentNode !== originList) {
+				if (c.parentElement !== originList) {
 					this._attachNested(originList, innerList, prev, next, nodePath);
-					originList = c.parentNode;
+					originList = c.parentElement;
 					innerList = dom.utils.createElement(originList.nodeName);
 				}
 

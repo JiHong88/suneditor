@@ -598,7 +598,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 			const cells = [];
 			const lines = [];
 			const firstCell = dom.check.isListCell(selectedFormats[0]),
-				lastCell = dom.check.isListCell(selectedFormats[selectedFormats.length - 1]);
+				lastCell = dom.check.isListCell(selectedFormats.at(-1));
 			let r = {
 				sc: range.startContainer,
 				so: range.startOffset,

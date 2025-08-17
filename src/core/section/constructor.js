@@ -258,7 +258,7 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 		a = values[i].split('+');
 
 		plugin = null;
-		method = a[a.length - 1].trim?.();
+		method = a.at(-1).trim?.();
 		if (method.startsWith('~')) {
 			// plugin key, method
 			plugin = command;
