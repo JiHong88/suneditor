@@ -132,7 +132,7 @@ class FileUpload extends EditorInjector {
 		if (dom.check.isFigure(target.parentElement)) {
 			asBtn.innerHTML = this.icons.reduction + dom.utils.createTooltipInner(this.lang.asLink);
 			asBtn.setAttribute('data-value', 'link');
-			this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
+			this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
 		} else {
 			asBtn.innerHTML = this.icons.expansion + dom.utils.createTooltipInner(this.lang.asBlock);
 			asBtn.setAttribute('data-value', 'box');

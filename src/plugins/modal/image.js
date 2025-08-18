@@ -287,8 +287,8 @@ class Image_ extends EditorInjector {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && (figureInfo.cover || figureInfo.inlineCover)) return;
 
-				this._ready(element);
-				this._fileCheck(this._origin_w, this._origin_h);
+				const { w, h } = this._ready(element, true);
+				this._fileCheck(w, h);
 			}
 		};
 	}
@@ -344,10 +344,12 @@ class Image_ extends EditorInjector {
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
 	 * @param {HTMLElement} target - The selected element.
+	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
+	 * @returns {{w: string, h: string}} - The width and height of the component.
 	 */
-	_ready(target) {
+	_ready(target, infoOnly = false) {
 		if (!target) return;
-		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
+		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
 		this.anchor.set(dom.check.isAnchor(target.parentNode) ? target.parentNode : null);
 
 		this._linkElement = this.anchor.currentTarget;
@@ -369,13 +371,14 @@ class Image_ extends EditorInjector {
 		activeAlign.checked = true;
 		this.captionCheckEl.checked = !!this._caption;
 
-		if (!this._resizing) return;
-
-		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
 		const { dw, dh } = this.figure.getSize(target);
+
+		if (!this._resizing) return { w: dw, h: dh };
+
 		this.inputX.value = dw === 'auto' ? '' : dw;
 		this.inputY.value = dh === 'auto' ? '' : dh;
 
+		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
 		this.proportion.checked = true;
 		this.inputX.disabled = percentageRotation ? true : false;
 		this.inputY.disabled = percentageRotation ? true : false;
@@ -391,6 +394,8 @@ class Image_ extends EditorInjector {
 		if (this.pluginOptions.useFormatType) {
 			this._activeAsInline(this.component.isInline(figureInfo.container));
 		}
+
+		return { w: dw, h: dh };
 	}
 
 	/**
@@ -696,7 +701,7 @@ class Image_ extends EditorInjector {
 			cover = figureInfo.cover;
 			container = figureInfo.container;
 			inlineCover = figureInfo.inlineCover;
-			this.figure.open(imageEl, { nonResizing: true, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
+			this.figure.open(imageEl, { nonResizing: true, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 		}
 
 		// alt
@@ -889,7 +894,7 @@ class Image_ extends EditorInjector {
 		this._element = oImg;
 		this._cover = cover;
 		this._container = container;
-		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
+		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 
 		// set size
 		this._applySize(width, height);
@@ -925,7 +930,7 @@ class Image_ extends EditorInjector {
 
 		this._element = oImg;
 		this._container = container;
-		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
+		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 
 		// set size
 		this._applySize(width, height);

@@ -147,7 +147,6 @@ class Figure extends EditorInjector {
 		this.__onContainerEvent = null;
 		this.__offContainerEvent = null;
 		this.__onResizeESCEvent = null;
-		this.__fileManagerInfo = false;
 
 		// init
 		this.eventManager.addEvent(this.alignButton, 'click', this.#OnClick_alignButton.bind(this));
@@ -213,10 +212,10 @@ class Figure extends EditorInjector {
 		const inlineCover = dom.query.getParentElement(element, 'SPAN', 2);
 		return {
 			target: /** @type {HTMLElement} */ (element),
-			container: /** @type {HTMLElement} */ (dom.query.getParentElement(element, Figure.is, 2) || cover),
-			cover: /** @type {HTMLElement} */ (cover),
+			container: dom.query.getParentElement(element, Figure.is, 2) || cover,
+			cover: cover,
 			inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
-			caption: /** @type {HTMLElement} */ (dom.query.getEdgeChild(element.parentElement, 'FIGCAPTION', false)),
+			caption: dom.query.getEdgeChild(element.parentElement, 'FIGCAPTION', false),
 			isVertical: IsVertical(element)
 		};
 	}
@@ -302,10 +301,10 @@ class Figure extends EditorInjector {
 	 * @param {boolean} [params.nonSizeInfo=false] Do not display the size information
 	 * @param {boolean} [params.nonBorder=false] Do not display the selected style line
 	 * @param {boolean} [params.figureTarget=false] If true, the target is a figure element
-	 * @param {boolean} [params.__fileManagerInfo=false] If true, the file manager is called
+	 * @param {boolean} [params.infoOnly=false] If true, returns only the figure target info without opening the controller
 	 * @returns {FigureTargetInfo|undefined} figure target info
 	 */
-	open(targetNode, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
+	open(targetNode, { nonResizing, nonSizeInfo, nonBorder, figureTarget, infoOnly }) {
 		if (!targetNode) {
 			console.warn('[SUNEDITOR.modules.Figure.open] The "targetNode" is null.');
 			return;
@@ -369,7 +368,7 @@ class Figure extends EditorInjector {
 
 		this._width = targetInfo.width;
 		this._height = targetInfo.height;
-		if (__fileManagerInfo || this.__fileManagerInfo) return targetInfo;
+		if (infoOnly) return targetInfo;
 
 		const _figure = this.frameContext.get('_figure');
 		this.editor._figureContainer = _figure.main;
@@ -799,7 +798,12 @@ class Figure extends EditorInjector {
 	 */
 	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
 		const isInline = this.component.isInline(container);
-		let existElement = this.format.isBlock(originEl.parentNode) || dom.check.isWysiwygFrame(originEl.parentNode) ? originEl : dom.check.isAnchor(originEl.parentNode) ? originEl.parentNode : this.format.getLine(originEl) || originEl;
+		let existElement =
+			this.format.isBlock(originEl.parentNode) || dom.check.isWysiwygFrame(originEl.parentNode)
+				? originEl
+				: dom.check.isAnchor(originEl.parentNode)
+				? originEl.parentNode
+				: Figure.GetContainer(originEl)?.container || this.format.getLine(originEl) || originEl;
 
 		if (dom.query.getParentElement(originEl, dom.check.isExcludeFormat)) {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
@@ -1170,7 +1174,12 @@ class Figure extends EditorInjector {
 	_setCaptionPosition(element) {
 		const figcaption = /** @type {HTMLElement} */ (dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false));
 		if (figcaption) {
-			figcaption.style.marginTop = (this.isVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
+			figcaption.style.marginTop = (this.isVertical && !this.autoRatio ? element.offsetWidth - element.offsetHeight : 0) + 'px';
+			if (this.isVertical && this.autoRatio) {
+				element.style.marginTop = figcaption.offsetHeight + 'px';
+			} else {
+				element.style.marginTop = '';
+			}
 		}
 	}
 

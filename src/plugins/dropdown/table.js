@@ -2191,7 +2191,7 @@ class Table extends EditorInjector {
 	 * @param {Node} target - The target figure element.
 	 */
 	_figureOpen(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
+		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
 	}
 
 	/**

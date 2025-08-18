@@ -286,6 +286,8 @@ declare class Image_ extends EditorInjector {
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
 	 * @param {HTMLElement} target - The selected element.
+	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
+	 * @returns {{w: string, h: string}} - The width and height of the component.
 	 */
 	private _ready;
 	/**

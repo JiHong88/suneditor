@@ -302,7 +302,6 @@ declare class Figure extends EditorInjector {
 	__onContainerEvent: any;
 	__offContainerEvent: any;
 	__onResizeESCEvent: __se__GlobalEventInfo;
-	__fileManagerInfo: boolean;
 	/**
 	 * @description Close the figure's controller
 	 */
@@ -315,7 +314,7 @@ declare class Figure extends EditorInjector {
 	 * @param {boolean} [params.nonSizeInfo=false] Do not display the size information
 	 * @param {boolean} [params.nonBorder=false] Do not display the selected style line
 	 * @param {boolean} [params.figureTarget=false] If true, the target is a figure element
-	 * @param {boolean} [params.__fileManagerInfo=false] If true, the file manager is called
+	 * @param {boolean} [params.infoOnly=false] If true, returns only the figure target info without opening the controller
 	 * @returns {FigureTargetInfo|undefined} figure target info
 	 */
 	open(
@@ -325,13 +324,13 @@ declare class Figure extends EditorInjector {
 			nonSizeInfo,
 			nonBorder,
 			figureTarget,
-			__fileManagerInfo
+			infoOnly
 		}: {
 			nonResizing?: boolean;
 			nonSizeInfo?: boolean;
 			nonBorder?: boolean;
 			figureTarget?: boolean;
-			__fileManagerInfo?: boolean;
+			infoOnly?: boolean;
 		}
 	): FigureTargetInfo | undefined;
 	/**

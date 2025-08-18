@@ -290,7 +290,7 @@ class Embed extends EditorInjector {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
-				this._ready(element);
+				this._ready(element, true);
 				const line = this.format.getLine(element);
 				if (line) this._align = line.style.textAlign || line.style.float;
 
@@ -334,10 +334,11 @@ class Embed extends EditorInjector {
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
 	 * @param {HTMLElement} target - The selected element.
+	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
 	 */
-	_ready(target) {
+	_ready(target, infoOnly = false) {
 		if (!target) return;
-		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
+		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
 
 		this._element = target;
 		this._cover = figureInfo.cover;
@@ -576,7 +577,7 @@ class Embed extends EditorInjector {
 		this._element = oFrame;
 		this._cover = cover;
 		this._container = container;
-		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
+		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 
 		width ||= this._defaultSizeX;
 		height ||= this._defaultSizeY;
@@ -653,15 +654,13 @@ class Embed extends EditorInjector {
 
 		this._setIframeAttrs(oFrame);
 
-		let existElement = this.format.isBlock(oFrame.parentNode) || dom.check.isWysiwygFrame(oFrame.parentNode) ? oFrame : this.format.getLine(oFrame) || oFrame;
-
 		const prevFrame = oFrame;
 		oFrame = /** @type {HTMLIFrameElement} */ (oFrame.cloneNode(true));
 		const figure = Figure.CreateContainer(oFrame, 'se-embed-container');
 		const container = figure.container;
 
 		// size
-		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
+		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
 		this._applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 
@@ -670,22 +669,7 @@ class Embed extends EditorInjector {
 		if (format) this._align = format.style.textAlign || format.style.float;
 		this.figure.setAlign(oFrame, this._align);
 
-		if (dom.query.getParentElement(prevFrame, dom.check.isExcludeFormat)) {
-			prevFrame.replaceWith(container);
-		} else if (dom.check.isListCell(existElement)) {
-			const refer = dom.query.getParentElement(prevFrame, (current) => current.parentNode === existElement);
-			existElement.insertBefore(container, refer);
-			dom.utils.removeItem(prevFrame);
-			this.nodeTransform.removeEmptyNode(refer, null, true);
-		} else if (this.format.isLine(existElement)) {
-			const refer = dom.query.getParentElement(prevFrame, (current) => current.parentNode === existElement);
-			existElement = this.nodeTransform.split(existElement, refer);
-			existElement.parentNode.insertBefore(container, existElement);
-			dom.utils.removeItem(prevFrame);
-			this.nodeTransform.removeEmptyNode(existElement, null, true);
-		} else {
-			/** @type {Element} */ (existElement).replaceWith(container);
-		}
+		this.figure.retainFigureFormat(container, this._element, null, null);
 
 		return oFrame;
 	}

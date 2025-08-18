@@ -335,6 +335,7 @@ declare class Video extends EditorInjector {
 	 * - Ensures that the controller is properly positioned and initialized.
 	 * - Prevents duplicate event handling if the component is already selected.
 	 * @param {HTMLIFrameElement|HTMLVideoElement} target - The selected element.
+	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
 	 */
 	private _ready;
 	/**

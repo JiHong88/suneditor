@@ -240,7 +240,7 @@ class Audio_ extends EditorInjector {
 	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
+		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
 		this._ready(target);
 	}
 
