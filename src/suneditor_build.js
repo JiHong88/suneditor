@@ -11,8 +11,11 @@ if (!window.SUNEDITOR) {
         enumerable: true,
         writable: false,
         configurable: false,
-        value: suneditor.init({
-            plugins: plugins
-        })
+        value: {
+            init: suneditor.init,
+            create: suneditor.init({
+                plugins: plugins
+            }).create
+        }
     });
 }
