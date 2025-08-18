@@ -9,12 +9,6 @@ Node.js **v14 or higher** is required to build and test.
 
 ### 📝 Notes
 
--   The codebase uses **modern ECMAScript syntax**, including:
-    -   Optional chaining (`?.`)
-    -   Nullish coalescing (`??`)
-    -   Private class fields (`#myField`)
-    -   Logical assignment operators (`??=`, `||=`, `&&=`)
-    -   ClipboardItem API
 -   **Polyfills are not included**. Make sure your target environment (browser or runtime) natively supports these features.
 -   Target ECMAScript version: **ES2022**
 -   Supported browsers: [See Browser Support](./README.md#-browser-support)
