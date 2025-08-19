@@ -662,7 +662,10 @@ class Embed extends EditorInjector {
 		// size
 		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
-		this._applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
+
+		const width = size[0] || prevFrame.width || '';
+		const height = size[1] || prevFrame.height || '';
+		this._applySize(width, height);
 
 		// align
 		const format = this.format.getLine(prevFrame);

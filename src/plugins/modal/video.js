@@ -800,7 +800,8 @@ class Video extends EditorInjector {
 	_update(oFrame) {
 		if (!oFrame) return;
 
-		if (/^video$/i.test(oFrame.nodeName)) {
+		const isVideoTag = /^video$/i.test(oFrame.nodeName);
+		if (isVideoTag) {
 			this._setTagAttrs(/** @type {HTMLVideoElement} */ (oFrame));
 		} else if (/^iframe$/i.test(oFrame.nodeName)) {
 			this._setIframeAttrs(/** @type {HTMLIFrameElement} */ (oFrame));
@@ -811,7 +812,7 @@ class Video extends EditorInjector {
 		const figure = Figure.CreateContainer(cloneFrame, 'se-video-container');
 		const container = figure.container;
 
-		const figcaption = Figure.GetContainer(prevFrame)?.container.querySelector('figcaption');
+		const figcaption = Figure.GetContainer(prevFrame)?.container?.querySelector('figcaption');
 		let caption = null;
 		if (figcaption) {
 			caption = dom.utils.createElement('figcaption');
@@ -824,8 +825,8 @@ class Video extends EditorInjector {
 		this.figure.open(cloneFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 		const size = (cloneFrame.getAttribute('data-se-size') || ',').split(',');
 
-		const width = size[0] || prevFrame.style.width || prevFrame.width || '';
-		const height = size[1] || prevFrame.style.height || prevFrame.height || '';
+		const width = size[0] || prevFrame.width || '';
+		const height = size[1] || prevFrame.height || this._defaultRatio || '';
 		this._applySize(width, height);
 
 		// align
@@ -925,7 +926,9 @@ class Video extends EditorInjector {
 			if (ratioOption[i].value === value) {
 				ratioSelected = ratioOption[i].selected = true;
 				this.inputY.placeholder = !value ? '' : Number(value) * 100 + '%';
-			} else ratioOption[i].selected = false;
+			} else {
+				ratioOption[i].selected = false;
+			}
 		}
 
 		return ratioSelected;

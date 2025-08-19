@@ -798,12 +798,8 @@ class Figure extends EditorInjector {
 	 */
 	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
 		const isInline = this.component.isInline(container);
-		let existElement =
-			this.format.isBlock(originEl.parentNode) || dom.check.isWysiwygFrame(originEl.parentNode)
-				? originEl
-				: dom.check.isAnchor(originEl.parentNode)
-				? originEl.parentNode
-				: Figure.GetContainer(originEl)?.container || this.format.getLine(originEl) || originEl;
+		const originParent = originEl.parentNode;
+		let existElement = this.format.isBlock(originParent) || dom.check.isWysiwygFrame(originParent) ? originEl : Figure.GetContainer(originEl)?.container || originParent || originEl;
 
 		if (dom.query.getParentElement(originEl, dom.check.isExcludeFormat)) {
 			existElement = anchorCover && anchorCover !== originEl ? anchorCover : originEl;
