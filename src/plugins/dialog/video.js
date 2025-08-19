@@ -657,8 +657,8 @@ export default {
         if (/^video$/i.test(oFrame.nodeName)) this.plugins.video._setTagAttrs.call(this, oFrame);
         else this.plugins.video._setIframeAttrs.call(this, oFrame);
         
-        let existElement = (this.util.isRangeFormatElement(oFrame.parentNode) || this.util.isWysiwygDiv(oFrame.parentNode)) ? 
-            oFrame : this.util.getFormatElement(oFrame) || oFrame;
+        const frameParent = oFrame.parentNode;
+        let existElement = (this.util.isRangeFormatElement(frameParent) || this.util.isWysiwygDiv(frameParent)) ? oFrame : frameParent || oFrame;
 
         const prevFrame = oFrame;
         contextVideo._element = oFrame = oFrame.cloneNode(true);

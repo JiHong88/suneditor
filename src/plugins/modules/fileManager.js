@@ -26,8 +26,8 @@
         _xmlHttp: null,
 
         _checkMediaComponent: function (tag) {
-            if (/IMG/i.test(tag)) {
-                return !/FIGURE/i.test(tag.parentElement.nodeName) || !/FIGURE/i.test(tag.parentElement.parentElement.nodeName);
+            if (/IMG|IFRAME|VIDEO|AUDIO/i.test(tag.tagName)) {
+                return /FIGURE/i.test(tag.parentElement.nodeName) || /FIGURE/i.test(tag.parentElement.parentElement.nodeName);
             }
             return true;
         },

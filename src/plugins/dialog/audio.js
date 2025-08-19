@@ -455,9 +455,8 @@ export default {
         const contextAudio = this.context.audio;
         this.plugins.audio._setTagAttrs.call(this, element);
         
-        // find component element
-        let existElement = (this.util.isRangeFormatElement(element.parentNode) || this.util.isWysiwygDiv(element.parentNode)) ? 
-            element : this.util.getFormatElement(element) || element;
+        const elementParent = element.parentNode;
+        let existElement = (this.util.isRangeFormatElement(elementParent) || this.util.isWysiwygDiv(elementParent)) ? element : elementParent || element;
 
         // clone element
         const prevElement = element;

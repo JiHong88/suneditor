@@ -1065,6 +1065,33 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     //     all: 'style|class',
     // },
     // addTagsWhitelist: 'meta'
+    // value: `
+    // <div class="se-component se-video-container __se__float-none" style="width: 100%;">
+    //     <iframe frameborder="0" allowfullscreen="" src="https://www.youtube.com/embed/kU-bKMAlh18" data-proportion="true" data-percentage="100%,56.25%" width="100%" height="56.25%" data-size="100%,56.25%" data-align="none" style="width: 100%; height: 100%;" data-index="0" data-file-name="kU-bKMAlh18" data-file-size="0" data-origin="100%,56.25%"></iframe>
+    // </div>
+    // `,
+    value: `
+     <img
+                src="https://edgio.clien.net/F01/15516734/7e018a72fd072b.jpg?scale=width:740\"
+                alt="KakaoTalk_20250811_212213428.jpg"/>
+    <div class="se-component se-image-container __se__float-none">
+        <img
+                src="https://edgio.clien.net/F01/15516734/7e018a72fd072b.jpg?scale=width:740\"
+                alt="KakaoTalk_20250811_212213428.jpg"/>
+    </div>
+    <div class="se-component se-video-container __se__float-none" style="width: 100%;">
+        <iframe frameborder="0" allowfullscreen="" src="https://www.youtube.com/embed/kU-bKMAlh18" data-proportion="true" data-percentage="100%,56.25%" width="100%" height="56.25%" data-size="100%,56.25%" data-align="none" style="width: 100%; height: 100%;" data-index="0" data-file-name="kU-bKMAlh18" data-file-size="0" data-origin="100%,56.25%"></iframe>
+    </div>
+    <div class="se-component ">
+        <audio controls="true" origin-size="," src="custom://dsa" data-index="0" data-file-name="dsa" data-file-size="0" style=""></audio>
+    </div>
+    <div >
+	dsa
+	dsad
+	dsa
+        <audio controls="true" origin-size="," src="custom://dsa" data-index="0" data-file-name="dsa" data-file-size="0" style=""></audio>
+    </div>
+    `
 });
 
 s2.core._cleanStyleRegExp.span = new RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color|background-image)\\s*:[^;]+(?!;)*', 'ig'),

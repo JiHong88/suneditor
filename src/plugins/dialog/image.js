@@ -779,9 +779,8 @@ export default {
 
         let existElement = null;
         if (isNewContainer) {
-            existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
-                contextImage._element : 
-                this.util.isAnchor(contextImage._element.parentNode) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
+            const imgParent = contextImage._element.parentNode;
+            existElement = (this.util.isRangeFormatElement(imgParent) || this.util.isWysiwygDiv(imgParent)) ? contextImage._element : imgParent || contextImage._element;
                 
             if (this.util.getParentElement(contextImage._element, this.util.isNotCheckingNode)) {
                 existElement = isNewAnchor ? anchor : contextImage._element;
