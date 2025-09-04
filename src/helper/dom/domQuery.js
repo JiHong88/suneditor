@@ -99,6 +99,38 @@ export function getNodeFromPath(offsets, parentNode) {
 
 /**
  * @template {HTMLElement} T
+ * @description Get all "child node" of the argument value element
+ * @param {Node} element element to get child node
+ * @param {?(current: *) => boolean} validation Conditional function
+ * @returns {T|null}
+ */
+export function getChildNode(element, validation) {
+	let child = null;
+	if (!element) return child;
+
+	const el = /** @type {Element} */ (element);
+	if (!el.children || el.children.length === 0) return child;
+
+	validation ||= () => true;
+
+	(function recursionFunc(current) {
+		if (el !== current && validation(current)) {
+			child = current;
+			return true;
+		}
+
+		if (current.children) {
+			for (let i = 0, len = current.children.length; i < len; i++) {
+				recursionFunc(current.children[i]);
+			}
+		}
+	})(el);
+
+	return /** @type {T} */ (child);
+}
+
+/**
+ * @template {HTMLElement} T
  * @description Get all "children" of the argument value element (Without text nodes)
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
@@ -646,6 +678,7 @@ const query = {
 	getPositionIndex,
 	getNodePath,
 	getNodeFromPath,
+	getChildNode,
 	getListChildren,
 	getListChildNodes,
 	getNodeDepth,

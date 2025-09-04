@@ -30,6 +30,10 @@ class Mention extends EditorInjector {
 	static type = 'field';
 	static className = '';
 
+	#lastAtPos;
+	#anchorOffset;
+	#anchorNode;
+
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
@@ -48,14 +52,14 @@ class Mention extends EditorInjector {
 		this.delayTime = typeof pluginOptions.delayTime === 'number' ? pluginOptions.delayTime : 200;
 		this.directData = pluginOptions.data;
 		this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace(/\{limitSize\}/i, String(this.limitSize)) || '';
-		this._delay = 0;
-		this._lastAtPos = 0;
-		this._anchorOffset = 0;
-		this._anchorNode = null;
 		// members - api, caching
 		this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
 		this.cachingData = pluginOptions.useCachingData ?? true ? new Map() : null;
 		this.cachingFieldData = pluginOptions.useCachingFieldData ?? true ? [] : null;
+
+		this.#lastAtPos = 0;
+		this.#anchorOffset = 0;
+		this.#anchorNode = null;
 
 		// controller
 		const controllerEl = CreateHTML_controller();
@@ -111,10 +115,10 @@ class Mention extends EditorInjector {
 				}
 
 				try {
-					const result = await this._createMentionList(mentionQuery, anchorNode);
-					this._lastAtPos = lastAtPos;
-					this._anchorNode = anchorNode;
-					this._anchorOffset = anchorOffset;
+					const result = await this.#createMentionList(mentionQuery, anchorNode);
+					this.#lastAtPos = lastAtPos;
+					this.#anchorNode = anchorNode;
+					this.#anchorOffset = anchorOffset;
 					return !result;
 				} catch (error) {
 					console.warn('[SUNEDITOR.mention.api.file] ', error);
@@ -127,7 +131,6 @@ class Mention extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Generates the mention list based on user input.
 	 * - Fetches data from cache, direct data, or an API.
 	 * - Creates and opens the mention dropdown.
@@ -136,7 +139,7 @@ class Mention extends EditorInjector {
 	 * @param {Node} targetNode - The node where the mention is triggered.
 	 * @returns {Promise<boolean>} - Returns `true` if the mention list is displayed, `false` otherwise.
 	 */
-	async _createMentionList(value, targetNode) {
+	async #createMentionList(value, targetNode) {
 		const limit = this.limitSize;
 		const lowerValue = value.toLowerCase();
 		let response = null;
@@ -148,7 +151,7 @@ class Mention extends EditorInjector {
 			if (this.directData) {
 				response = this.directData.filter((item) => item.key.toLowerCase().startsWith(lowerValue)).slice(0, limit);
 			} else {
-				const xmlHttp = await this.apiManager.asyncCall({ method: 'GET', url: this._createUrl(value) });
+				const xmlHttp = await this.apiManager.asyncCall({ method: 'GET', url: this.#createUrl(value) });
 				response = JSON.parse(xmlHttp.responseText);
 			}
 		}
@@ -194,12 +197,11 @@ class Mention extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Constructs the API request URL with the mention query.
 	 * @param {string} key - The mention query text.
 	 * @returns {string} - The formatted API request URL.
 	 */
-	_createUrl(key) {
+	#createUrl(key) {
 		return this.apiUrl.replace(/\{key\}/i, key);
 	}
 
@@ -213,7 +215,7 @@ class Mention extends EditorInjector {
 
 		let oA = null;
 		const { key, name, url } = item;
-		const anchorParent = this._anchorNode.parentNode;
+		const anchorParent = this.#anchorNode.parentNode;
 
 		if (dom.check.isAnchor(anchorParent)) {
 			oA = anchorParent;
@@ -222,7 +224,7 @@ class Mention extends EditorInjector {
 			oA.setAttribute('title', name);
 			oA.textContent = this.triggerText + key;
 		} else {
-			this.selection.setRange(this._anchorNode, this._lastAtPos, this._anchorNode, this._anchorOffset);
+			this.selection.setRange(this.#anchorNode, this.#lastAtPos, this.#anchorNode, this.#anchorOffset);
 			oA = dom.utils.createElement('A', { 'data-se-mention': key, href: url, title: name, target: '_blank' }, this.triggerText + key);
 			if (!this.html.insertNode(oA, { afterNode: null, skipCharCount: false })) return false;
 		}

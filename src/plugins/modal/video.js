@@ -68,6 +68,22 @@ class Video extends EditorInjector {
 		return null;
 	}
 
+	#linkValue;
+	#align;
+	#frameRatio;
+	#defaultRatio;
+	#defaultSizeX;
+	#defaultSizeY;
+	#element;
+	#container;
+	#ratio;
+	#origin_w;
+	#origin_h;
+	#resizing;
+	#onlyPercentage;
+	#nonResizing;
+	#initRatioValue;
+
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
@@ -128,26 +144,27 @@ class Video extends EditorInjector {
 		this.videoUrlFile = modalEl.videoUrlFile;
 		this.focusElement = this.videoUrlFile || this.videoInputFile;
 		this.previewSrc = modalEl.previewSrc;
-		this._linkValue = '';
-		this._align = 'none';
-		this._frameRatio = defaultRatio;
-		this._defaultRatio = defaultRatio;
-		this._defaultSizeX = '100%';
-		this._defaultSizeY = this.pluginOptions.defaultRatio * 100 + '%';
 		this.sizeUnit = sizeUnit;
 		this.proportion = null;
 		this.frameRatioOption = null;
 		this.inputX = null;
 		this.inputY = null;
-		this._element = null;
-		this._cover = null;
-		this._container = null;
-		this._ratio = { w: 0, h: 0 };
-		this._origin_w = this.pluginOptions.defaultWidth === '100%' ? '' : this.pluginOptions.defaultWidth;
-		this._origin_h = this.pluginOptions.defaultHeight === defaultRatio ? '' : this.pluginOptions.defaultHeight;
-		this._resizing = this.pluginOptions.canResize;
-		this._onlyPercentage = this.pluginOptions.percentageOnlySize;
-		this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
+
+		this.#linkValue = '';
+		this.#align = 'none';
+		this.#frameRatio = defaultRatio;
+		this.#defaultRatio = defaultRatio;
+		this.#defaultSizeX = '100%';
+		this.#defaultSizeY = this.pluginOptions.defaultRatio * 100 + '%';
+		this.#element = null;
+		this.#container = null;
+		this.#ratio = { w: 0, h: 0 };
+		this.#origin_w = this.pluginOptions.defaultWidth === '100%' ? '' : this.pluginOptions.defaultWidth;
+		this.#origin_h = this.pluginOptions.defaultHeight === defaultRatio ? '' : this.pluginOptions.defaultHeight;
+		this.#resizing = this.pluginOptions.canResize;
+		this.#onlyPercentage = this.pluginOptions.percentageOnlySize;
+		this.#nonResizing = !this.#resizing || !this.pluginOptions.showHeightInput || this.#onlyPercentage;
+
 		this.query = {
 			youtube: {
 				pattern: /youtu\.?be/i,
@@ -201,8 +218,8 @@ class Video extends EditorInjector {
 		if (this.videoUrlFile) this.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
 		if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
 
-		if (this._resizing) {
-			this._initRatioValue = null;
+		if (this.#resizing) {
+			this.#initRatioValue = null;
 			this.proportion = modalEl.proportion;
 			this.frameRatioOption = modalEl.frameRatioOption;
 			this.inputX = modalEl.inputX;
@@ -244,9 +261,9 @@ class Video extends EditorInjector {
 	 */
 	on(isUpdate) {
 		if (!isUpdate) {
-			if (this._resizing) {
-				this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === this._defaultSizeX ? '' : this.pluginOptions.defaultWidth;
-				this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === this._defaultSizeY ? '' : this.pluginOptions.defaultHeight;
+			if (this.#resizing) {
+				this.inputX.value = this.#origin_w = this.pluginOptions.defaultWidth === this.#defaultSizeX ? '' : this.pluginOptions.defaultWidth;
+				this.inputY.value = this.#origin_h = this.pluginOptions.defaultHeight === this.#defaultSizeY ? '' : this.pluginOptions.defaultHeight;
 				this.proportion.disabled = true;
 			}
 			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.setAttribute('multiple', 'multiple');
@@ -254,9 +271,9 @@ class Video extends EditorInjector {
 			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.removeAttribute('multiple');
 		}
 
-		if (this._resizing) {
-			this._setRatioSelect(this.figure.isVertical ? '' : this._origin_h || this._defaultRatio);
-			this._initRatioValue = this.frameRatioOption?.value;
+		if (this.#resizing) {
+			this.#setRatioSelect(this.figure.isVertical ? '' : this.#origin_h || this.#defaultRatio);
+			this.#initRatioValue = this.frameRatioOption?.value;
 		}
 	}
 
@@ -284,16 +301,16 @@ class Video extends EditorInjector {
 	 * @returns {Promise<boolean>} Success / failure
 	 */
 	async modalAction() {
-		this._align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked')).value;
+		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked')).value;
 
 		let result = false;
 		if (this.videoInputFile && this.videoInputFile.files.length > 0) {
 			result = await this.submitFile(this.videoInputFile.files);
-		} else if (this.videoUrlFile && this._linkValue.length > 0) {
-			result = await this.submitURL(this._linkValue);
+		} else if (this.videoUrlFile && this.#linkValue.length > 0) {
+			result = await this.submitURL(this.#linkValue);
 		}
 
-		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, Video.key), 0);
+		if (result) this._w.setTimeout(this.component.select.bind(this.component, this.#element, Video.key), 0);
 
 		return result;
 	}
@@ -320,11 +337,11 @@ class Video extends EditorInjector {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
-				this._ready(element, true);
+				this.#ready(element, true);
 				const line = this.format.getLine(element);
-				if (line) this._align = line.style.textAlign || line.style.float;
+				if (line) this.#align = line.style.textAlign || line.style.float;
 
-				this._update(element);
+				this.#fixTagStructure(element);
 			}
 		};
 	}
@@ -336,22 +353,22 @@ class Video extends EditorInjector {
 	init() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
 		if (this.videoInputFile) this.videoInputFile.value = '';
-		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = '';
+		if (this.videoUrlFile) this.#linkValue = this.previewSrc.textContent = this.videoUrlFile.value = '';
 		if (this.videoInputFile && this.videoUrlFile) {
 			this.videoUrlFile.disabled = false;
 			this.previewSrc.style.textDecoration = '';
 		}
 
 		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
-		this._ratio = { w: 0, h: 0 };
-		this._nonResizing = false;
+		this.#ratio = { w: 0, h: 0 };
+		this.#nonResizing = false;
 
-		if (this._resizing) {
-			this.inputX.value = this.pluginOptions.defaultWidth === this._defaultSizeX ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this.pluginOptions.defaultHeight === this._defaultSizeY ? '' : this.pluginOptions.defaultHeight;
+		if (this.#resizing) {
+			this.inputX.value = this.pluginOptions.defaultWidth === this.#defaultSizeX ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value = this.pluginOptions.defaultHeight === this.#defaultSizeY ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.checked = false;
 			this.proportion.disabled = true;
-			this._setRatioSelect(this._defaultRatio);
+			this.#setRatioSelect(this.#defaultRatio);
 		}
 	}
 
@@ -361,57 +378,7 @@ class Video extends EditorInjector {
 	 * @param {HTMLIFrameElement|HTMLVideoElement} target Target component element
 	 */
 	select(target) {
-		this._ready(target);
-	}
-
-	/**
-	 * @private
-	 * @description Prepares the component for selection.
-	 * - Ensures that the controller is properly positioned and initialized.
-	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {HTMLIFrameElement|HTMLVideoElement} target - The selected element.
-	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
-	 */
-	_ready(target, infoOnly = false) {
-		if (!target) return;
-		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
-
-		this._element = target;
-		this._cover = figureInfo.cover;
-		this._container = figureInfo.container;
-		this._align = figureInfo.align;
-		target.style.float = '';
-
-		this._origin_w = String(figureInfo.width || figureInfo.originWidth || figureInfo.w || '');
-		this._origin_h = String(figureInfo.height || figureInfo.originHeight || figureInfo.h || '');
-
-		const h = figureInfo.height || figureInfo.h || this._origin_h || '';
-
-		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || this._element.querySelector('source')?.src || '';
-
-		/** @type {HTMLInputElement} */
-		const activeAlgin = this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]');
-		activeAlgin.checked = true;
-
-		if (!this._resizing) return;
-
-		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
-		const { dw, dh } = this.figure.getSize(target);
-		this.inputX.value = dw === 'auto' ? '' : dw;
-		this.inputY.value = dh === 'auto' ? '' : dh;
-
-		if (!this._setRatioSelect(h)) this.inputY.value = String(this._onlyPercentage ? numbers.get(h, 2) : h);
-
-		this.proportion.checked = true;
-		this.inputX.disabled = percentageRotation ? true : false;
-		this.inputY.disabled = percentageRotation ? true : false;
-		this.proportion.disabled = percentageRotation ? true : false;
-
-		if (figureInfo.isVertical) {
-			this.proportion.checked = false;
-		}
-
-		this._ratio = this.proportion.checked ? figureInfo.ratio : { w: 0, h: 0 };
+		this.#ready(target);
 	}
 
 	/**
@@ -421,12 +388,12 @@ class Video extends EditorInjector {
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
-		const targetEl = target || this._element;
+		const targetEl = target || this.#element;
 		const container = dom.query.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.triggerEvent('onVideoDeleteBefore', { element: targetEl, container, align: this._align, url: this._linkValue });
+		const message = await this.triggerEvent('onVideoDeleteBefore', { element: targetEl, container, align: this.#align, url: this.#linkValue });
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
@@ -542,49 +509,46 @@ class Video extends EditorInjector {
 	 * @param {string} align - The alignment to apply to the video element (e.g., 'left', 'center', 'right').
 	 * @param {boolean} isUpdate - Indicates whether this is an update to an existing component (true) or a new creation (false).
 	 * @param {{name: string, size: number}} file - File metadata associated with the video
+	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */
-	create(oFrame, src, width, height, align, isUpdate, file) {
-		let cover = null;
+	create(oFrame, src, width, height, align, isUpdate, file, isLast) {
 		let container = null;
 
 		/** update */
 		if (isUpdate) {
-			oFrame = this._element;
+			oFrame = this.#element;
 			if (oFrame.src !== src) {
 				const processUrl = this.findProcessUrl(src);
 				if (/^iframe$/i.test(processUrl?.tag) && !/^iframe$/i.test(oFrame.nodeName)) {
 					const newTag = this.createIframeTag();
 					newTag.src = src;
 					oFrame.replaceWith(newTag);
-					this._element = oFrame = newTag;
+					this.#element = oFrame = newTag;
 				} else if (/^video$/i.test(processUrl?.tag) && !/^video$/i.test(oFrame.nodeName)) {
 					const newTag = this.createVideoTag();
 					newTag.src = src;
 					oFrame.replaceWith(newTag);
-					this._element = oFrame = newTag;
+					this.#element = oFrame = newTag;
 				} else {
 					oFrame.src = src;
 				}
 			}
-			container = this._container;
-			cover = dom.query.getParentElement(oFrame, 'FIGURE');
+			container = this.#container;
 		} else {
 			/** create */
 			oFrame.src = src;
-			this._element = oFrame;
+			this.#element = oFrame;
 			const figure = Figure.CreateContainer(oFrame, 'se-video-container');
-			cover = figure.cover;
 			container = figure.container;
 		}
 
 		/** rendering */
-		this._element = oFrame;
-		this._cover = cover;
-		this._container = container;
-		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+		this.#element = oFrame;
+		this.#container = container;
+		this.figure.open(oFrame, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 
-		width ||= this._defaultSizeX;
-		height ||= this._frameRatio;
+		width ||= this.#defaultSizeX;
+		height ||= this.#frameRatio;
 
 		const size = this.figure.getSize(oFrame);
 		const inputUpdate = size.w !== width || size.h !== height;
@@ -592,8 +556,8 @@ class Video extends EditorInjector {
 
 		// set size
 		if (changeSize) {
-			if (this._initRatioValue !== this.frameRatioOption?.value) this.figure.deleteTransform();
-			this._applySize(width, height);
+			if (this.#initRatioValue !== this.frameRatioOption?.value) this.figure.deleteTransform();
+			this.#applySize(width, height);
 		}
 
 		// align
@@ -604,11 +568,11 @@ class Video extends EditorInjector {
 		this.fileManager.setFileData(oFrame, file);
 
 		if (!isUpdate) {
-			this.component.insert(container, { insertBehavior: this.pluginOptions.insertBehavior });
+			this.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line' });
 			return;
 		}
 
-		if (!this._resizing || !changeSize || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
+		if (!this.#resizing || !changeSize || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
 		this.history.push(false);
 	}
 
@@ -626,7 +590,7 @@ class Video extends EditorInjector {
 				iframeTag[key] = props[key];
 			}
 		}
-		this._setIframeAttrs(iframeTag);
+		this.#setIframeAttrs(iframeTag);
 		return iframeTag;
 	}
 
@@ -644,40 +608,8 @@ class Video extends EditorInjector {
 				videoTag[key] = props[key];
 			}
 		}
-		this._setTagAttrs(videoTag);
+		this.#setTagAttrs(videoTag);
 		return videoTag;
-	}
-
-	/**
-	 * @private
-	 * @description Sets the size of the video element.
-	 * @param {string|number} w - The width of the video.
-	 * @param {string|number} h - The height of the video.
-	 */
-	_applySize(w, h) {
-		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
-		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
-
-		if (this._onlyPercentage) {
-			if (!w) w = '100%';
-			else if (/%$/.test(w + '')) w += '%';
-		}
-		this.figure.setSize(w, h);
-	}
-
-	/**
-	 * @private
-	 * @description Retrieves video information including size and alignment.
-	 * @returns {*} Video information object.
-	 */
-	_getInfo() {
-		return {
-			inputWidth: this.inputX?.value || '',
-			inputHeight: this.inputY?.value || '',
-			align: this._align,
-			isUpdate: this.modal.isUpdate,
-			element: this._element
-		};
 	}
 
 	/**
@@ -728,15 +660,13 @@ class Video extends EditorInjector {
 		const videoInfo = {
 			url: null,
 			files,
-			...this._getInfo()
+			...this.#getInfo()
 		};
 
-		const handler = function (infos, newInfos) {
+		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
-			this._serverUpload(infos, infos.files);
-		}.bind(this, videoInfo);
-		// se-ts-ignore
-		this._serverUpload;
+			uploadCallback(infos, infos.files);
+		}.bind(this, this.#serverUpload.bind(this), videoInfo);
 
 		const result = await this.triggerEvent('onVideoUploadBefore', {
 			info: videoInfo,
@@ -756,7 +686,7 @@ class Video extends EditorInjector {
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitURL(url) {
-		if (!(url = this._linkValue)) return false;
+		if (!(url = this.#linkValue)) return false;
 
 		/** iframe source */
 		if (/^<iframe.*\/iframe>$/.test(url)) {
@@ -771,11 +701,11 @@ class Video extends EditorInjector {
 		}
 
 		const file = { name: url.split('/').pop(), size: 0 };
-		const videoInfo = { url, files: file, ...this._getInfo(), process: processUrl };
+		const videoInfo = { url, files: file, ...this.#getInfo(), process: processUrl };
 
 		const handler = function (infos, newInfos) {
 			infos = newInfos || infos;
-			this.create(this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](), infos.url, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate, infos.files);
+			this.create(this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](), infos.url, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate, infos.files, true);
 		}.bind(this, videoInfo);
 
 		const result = await this.triggerEvent('onVideoUploadBefore', {
@@ -793,18 +723,95 @@ class Video extends EditorInjector {
 	}
 
 	/**
-	 * @private
+	 * @description Prepares the component for selection.
+	 * - Ensures that the controller is properly positioned and initialized.
+	 * - Prevents duplicate event handling if the component is already selected.
+	 * @param {HTMLIFrameElement|HTMLVideoElement} target - The selected element.
+	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
+	 */
+	#ready(target, infoOnly = false) {
+		if (!target) return;
+		const figureInfo = this.figure.open(target, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
+
+		this.#element = target;
+		this.#container = figureInfo.container;
+		this.#align = figureInfo.align;
+		target.style.float = '';
+
+		this.#origin_w = String(figureInfo.width || figureInfo.originWidth || figureInfo.w || '');
+		this.#origin_h = String(figureInfo.height || figureInfo.originHeight || figureInfo.h || '');
+
+		const h = figureInfo.height || figureInfo.h || this.#origin_h || '';
+
+		if (this.videoUrlFile) this.#linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this.#element.src || this.#element.querySelector('source')?.src || '';
+
+		/** @type {HTMLInputElement} */
+		const activeAlgin = this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this.#align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]');
+		activeAlgin.checked = true;
+
+		if (!this.#resizing) return;
+
+		const percentageRotation = this.#onlyPercentage && this.figure.isVertical;
+		const { dw, dh } = this.figure.getSize(target);
+		this.inputX.value = dw === 'auto' ? '' : dw;
+		this.inputY.value = dh === 'auto' ? '' : dh;
+
+		if (!this.#setRatioSelect(h)) this.inputY.value = String(this.#onlyPercentage ? numbers.get(h, 2) : h);
+
+		this.proportion.checked = true;
+		this.inputX.disabled = percentageRotation ? true : false;
+		this.inputY.disabled = percentageRotation ? true : false;
+		this.proportion.disabled = percentageRotation ? true : false;
+
+		if (figureInfo.isVertical) {
+			this.proportion.checked = false;
+		}
+
+		this.#ratio = this.proportion.checked ? figureInfo.ratio : { w: 0, h: 0 };
+	}
+
+	/**
+	 * @description Sets the size of the video element.
+	 * @param {string|number} w - The width of the video.
+	 * @param {string|number} h - The height of the video.
+	 */
+	#applySize(w, h) {
+		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
+		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
+
+		if (this.#onlyPercentage) {
+			if (!w) w = '100%';
+			else if (/%$/.test(w + '')) w += '%';
+		}
+		this.figure.setSize(w, h);
+	}
+
+	/**
+	 * @description Retrieves video information including size and alignment.
+	 * @returns {*} Video information object.
+	 */
+	#getInfo() {
+		return {
+			inputWidth: this.inputX?.value || '',
+			inputHeight: this.inputY?.value || '',
+			align: this.#align,
+			isUpdate: this.modal.isUpdate,
+			element: this.#element
+		};
+	}
+
+	/**
 	 * @description Updates the video component within the editor.
 	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The video element to update.
 	 */
-	_update(oFrame) {
+	#fixTagStructure(oFrame) {
 		if (!oFrame) return;
 
 		const isVideoTag = /^video$/i.test(oFrame.nodeName);
 		if (isVideoTag) {
-			this._setTagAttrs(/** @type {HTMLVideoElement} */ (oFrame));
+			this.#setTagAttrs(/** @type {HTMLVideoElement} */ (oFrame));
 		} else if (/^iframe$/i.test(oFrame.nodeName)) {
-			this._setIframeAttrs(/** @type {HTMLIFrameElement} */ (oFrame));
+			this.#setIframeAttrs(/** @type {HTMLIFrameElement} */ (oFrame));
 		}
 
 		const prevFrame = oFrame;
@@ -822,63 +829,69 @@ class Video extends EditorInjector {
 		}
 
 		// size
-		this.figure.open(cloneFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+		this.figure.open(cloneFrame, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 		const size = (cloneFrame.getAttribute('data-se-size') || ',').split(',');
 
 		const width = size[0] || prevFrame.width || '';
-		const height = size[1] || prevFrame.height || this._defaultRatio || '';
-		this._applySize(width, height);
+		const height = size[1] || prevFrame.height || this.#defaultRatio || '';
+		this.#applySize(width, height);
 
 		// align
 		const format = this.format.getLine(prevFrame);
-		if (format) this._align = format.style.textAlign || format.style.float;
-		this.figure.setAlign(cloneFrame, this._align);
+		if (format) this.#align = format.style.textAlign || format.style.float;
+		this.figure.setAlign(cloneFrame, this.#align);
 
-		this.figure.retainFigureFormat(container, this._element, null, this.fileManager);
+		this.figure.retainFigureFormat(container, this.#element, null, this.fileManager);
 
 		return cloneFrame;
 	}
 
 	/**
-	 * @private
 	 * @description Registers the uploaded video in the editor.
 	 * @param {VideoInfo_video} info - Video information object.
 	 * @param {Object<string, *>} response - Server response containing video data.
 	 */
-	_register(info, response) {
+	#register(info, response) {
 		const fileList = response.result;
 		const videoTag = this.createVideoTag();
 
 		for (let i = 0, len = fileList.length; i < len; i++) {
 			const ctag = info.isUpdate ? info.element : /** @type {HTMLIFrameElement|HTMLVideoElement} */ (videoTag.cloneNode(false));
-			this.create(ctag, fileList[i].url, info.inputWidth, info.inputHeight, info.align, info.isUpdate, {
-				name: fileList[i].name,
-				size: fileList[i].size
-			});
+			this.create(
+				ctag,
+				fileList[i].url,
+				info.inputWidth,
+				info.inputHeight,
+				info.align,
+				info.isUpdate,
+				{
+					name: fileList[i].name,
+					size: fileList[i].size
+				},
+				i === len - 1
+			);
 		}
 	}
 
 	/**
-	 * @private
 	 * @description Uploads a video to the server using an external upload handler.
 	 * @param {VideoInfo_video} info - Video information object.
 	 * @param {FileList} files - The video files to upload.
 	 */
-	_serverUpload(info, files) {
+	#serverUpload(info, files) {
 		if (!files) return;
 
 		const videoUploadUrl = this.pluginOptions.uploadUrl;
 		if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
-			this.fileManager.upload(videoUploadUrl, this.pluginOptions.uploadHeaders, files, this.#UploadCallBack.bind(this, info), this._error.bind(this));
+			this.fileManager.upload(videoUploadUrl, this.pluginOptions.uploadHeaders, files, this.#UploadCallBack.bind(this, info), this.#error.bind(this));
 		}
 	}
 
 	/**
-	 * @private
 	 * @description Sets attributes for the video tag.
 	 * @param {HTMLVideoElement} element - The video element.
 	 */
-	_setTagAttrs(element) {
+	#setTagAttrs(element) {
 		element.setAttribute('controls', 'true');
 
 		const attrs = this.pluginOptions.videoTagAttributes;
@@ -890,11 +903,10 @@ class Video extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Sets attributes for the iframe tag.
 	 * @param {HTMLIFrameElement} element - The iframe element.
 	 */
-	_setIframeAttrs(element) {
+	#setIframeAttrs(element) {
 		element.frameBorder = '0';
 		element.allowFullscreen = true;
 
@@ -907,18 +919,17 @@ class Video extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Selects a ratio option in the ratio dropdown.
 	 * @param {string|number} value - The selected ratio value.
 	 * @returns {boolean} Returns true if a ratio was selected.
 	 */
-	_setRatioSelect(value) {
+	#setRatioSelect(value) {
 		if (!this.frameRatioOption) return;
 
 		let ratioSelected = false;
 		const ratioOption = this.frameRatioOption.options;
 
-		if (/%$/.test(value + '') || this._onlyPercentage) value = numbers.get(value, 2) / 100 + '';
+		if (/%$/.test(value + '') || this.#onlyPercentage) value = numbers.get(value, 2) / 100 + '';
 		else if (!numbers.is(value) || Number(value) >= 1) value = '';
 
 		this.inputY.placeholder = '';
@@ -935,12 +946,11 @@ class Video extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Handles video upload errors.
 	 * @param {Object<string, *>} response - The error response object.
 	 * @returns {Promise<void>}
 	 */
-	async _error(response) {
+	async #error(response) {
 		const message = await this.triggerEvent('onVideoUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.ui.alertOpen(err, 'error');
@@ -956,9 +966,9 @@ class Video extends EditorInjector {
 		if ((await this.triggerEvent('videoUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 			const response = JSON.parse(xmlHttp.responseText);
 			if (response.errorMessage) {
-				this._error(response);
+				this.#error(response);
 			} else {
-				this._register(info, response);
+				this.#register(info, response);
 			}
 		}
 	}
@@ -986,10 +996,10 @@ class Video extends EditorInjector {
 		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.value.trim();
 		if (/^<iframe.*\/iframe>$/.test(value)) {
-			this._linkValue = value;
+			this.#linkValue = value;
 			this.previewSrc.textContent = '<IFrame :src=".."></IFrame>';
 		} else {
-			this._linkValue = this.previewSrc.textContent = !value
+			this.#linkValue = this.previewSrc.textContent = !value
 				? ''
 				: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
 				? this.options.get('defaultUrlProtocol') + value
@@ -1011,7 +1021,7 @@ class Video extends EditorInjector {
 	 * @param {HTMLInputElement} target - The selected video element.
 	 */
 	#SetUrlInput(target) {
-		this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = target.getAttribute('data-command') || target.src;
+		this.#linkValue = this.previewSrc.textContent = this.videoUrlFile.value = target.getAttribute('data-command') || target.src;
 		this.videoUrlFile.focus();
 	}
 
@@ -1034,11 +1044,11 @@ class Video extends EditorInjector {
 	}
 
 	#OnClickRevert() {
-		if (this._onlyPercentage) {
-			this.inputX.value = Number(this._origin_w) > 100 ? '100' : this._origin_w;
+		if (this.#onlyPercentage) {
+			this.inputX.value = Number(this.#origin_w) > 100 ? '100' : this.#origin_w;
 		} else {
-			this.inputX.value = this._origin_w;
-			this.inputY.value = this._origin_h;
+			this.inputX.value = this.#origin_w;
+			this.inputY.value = this.#origin_h;
 		}
 	}
 
@@ -1049,13 +1059,13 @@ class Video extends EditorInjector {
 		/** @type {HTMLSelectElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.options[eventTarget.selectedIndex].value;
-		this._defaultSizeY = this.figure.autoRatio.current = this._frameRatio = !value ? this._defaultSizeY : Number(value) * 100 + '%';
+		this.#defaultSizeY = this.figure.autoRatio.current = this.#frameRatio = !value ? this.#defaultSizeY : Number(value) * 100 + '%';
 		this.inputY.placeholder = !value ? '' : Number(value) * 100 + '%';
 		this.inputY.value = '';
 	}
 
 	#OnChangeRatio() {
-		this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 0, h: 0 };
+		this.#ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 0, h: 0 };
 	}
 
 	/**
@@ -1070,10 +1080,10 @@ class Video extends EditorInjector {
 
 		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
-		if (xy === 'x' && this._onlyPercentage && Number(eventTarget.value) > 100) {
+		if (xy === 'x' && this.#onlyPercentage && Number(eventTarget.value) > 100) {
 			eventTarget.value = '100';
 		} else if (this.proportion.checked && !this.frameRatioOption?.value) {
-			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
+			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this.#ratio);
 			if (xy === 'x') {
 				this.inputY.value = String(ratioSize.h);
 			} else {
@@ -1082,7 +1092,7 @@ class Video extends EditorInjector {
 		}
 
 		if (xy === 'y') {
-			this._setRatioSelect(eventTarget.value || this._defaultRatio);
+			this.#setRatioSelect(eventTarget.value || this.#defaultRatio);
 		}
 	}
 }

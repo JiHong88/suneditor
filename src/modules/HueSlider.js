@@ -93,6 +93,13 @@ function CreateSliderCtx() {
  * It must be called every time it is used.
  */
 class HueSlider {
+	#globalMouseDown;
+	#globalTouchMove;
+	#globalMouseUp;
+	#globalMouseMove;
+	#globalTouchStart;
+	#globalTouchEnd;
+
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -117,12 +124,13 @@ class HueSlider {
 		};
 		this.isOpen = false;
 		this.controlle = null;
-		this.__globalMouseDown = null;
-		this.__globalTouchMove = null;
-		this.__globalMouseUp = null;
-		this.__globalMouseMove = null;
-		this.__globalTouchStart = null;
-		this.__globalTouchEnd = null;
+
+		this.#globalMouseDown = null;
+		this.#globalTouchMove = null;
+		this.#globalMouseUp = null;
+		this.#globalMouseMove = null;
+		this.#globalTouchStart = null;
+		this.#globalTouchEnd = null;
 
 		// init default controller
 		if (!params.isNewForm) {
@@ -210,9 +218,9 @@ class HueSlider {
 		// touch event
 		if (isTouchDevice) {
 			// mobile name
-			this.__globalTouchStart = this.eventManager.addGlobalEvent('touchstart', OnTouchstart, { passive: false, capture: true });
-			this.__globalTouchMove = this.eventManager.addGlobalEvent('touchmove', OnTouchmove, true);
-			this.__globalTouchEnd = this.eventManager.addGlobalEvent(
+			this.#globalTouchStart = this.eventManager.addGlobalEvent('touchstart', OnTouchstart, { passive: false, capture: true });
+			this.#globalTouchMove = this.eventManager.addGlobalEvent('touchmove', OnTouchmove, true);
+			this.#globalTouchEnd = this.eventManager.addGlobalEvent(
 				'touchend',
 				() => {
 					isWheelragging = false;
@@ -223,9 +231,9 @@ class HueSlider {
 		}
 
 		// mouse event
-		this.__globalMouseDown = this.eventManager.addGlobalEvent('mousedown', OnMousedown, { passive: false, capture: true });
-		this.__globalMouseMove = this.eventManager.addGlobalEvent('mousemove', OnMousemove, true);
-		this.__globalMouseUp = this.eventManager.addGlobalEvent(
+		this.#globalMouseDown = this.eventManager.addGlobalEvent('mousedown', OnMousedown, { passive: false, capture: true });
+		this.#globalMouseMove = this.eventManager.addGlobalEvent('mousemove', OnMousemove, true);
+		this.#globalMouseUp = this.eventManager.addGlobalEvent(
 			'mouseup',
 			() => {
 				isWheelragging = false;
@@ -246,13 +254,13 @@ class HueSlider {
 		isWheelragging = false;
 		isBarDragging = false;
 
-		this.__globalMouseDown &&= this.eventManager.removeGlobalEvent(this.__globalMouseDown);
-		this.__globalMouseMove &&= this.eventManager.removeGlobalEvent(this.__globalMouseMove);
-		this.__globalMouseUp &&= this.eventManager.removeGlobalEvent(this.__globalMouseUp);
+		this.#globalMouseDown &&= this.eventManager.removeGlobalEvent(this.#globalMouseDown);
+		this.#globalMouseMove &&= this.eventManager.removeGlobalEvent(this.#globalMouseMove);
+		this.#globalMouseUp &&= this.eventManager.removeGlobalEvent(this.#globalMouseUp);
 
-		this.__globalTouchStart &&= this.eventManager.removeGlobalEvent(this.__globalTouchStart);
-		this.__globalTouchMove &&= this.eventManager.removeGlobalEvent(this.__globalTouchMove);
-		this.__globalTouchEnd &&= this.eventManager.removeGlobalEvent(this.__globalTouchEnd);
+		this.#globalTouchStart &&= this.eventManager.removeGlobalEvent(this.#globalTouchStart);
+		this.#globalTouchMove &&= this.eventManager.removeGlobalEvent(this.#globalTouchMove);
+		this.#globalTouchEnd &&= this.eventManager.removeGlobalEvent(this.#globalTouchEnd);
 	}
 }
 

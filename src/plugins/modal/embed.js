@@ -68,15 +68,45 @@ class Embed extends EditorInjector {
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
+		const children = node.children;
 		let src = '';
-		if (dom.check.isIFrame(node)) src = node.src;
-		if (/^DIV$/i.test(node?.nodeName) && dom.check.isIFrame(node.firstElementChild)) src = node.firstElementChild.src;
+		let target = null;
+
+		if (dom.check.isIFrame(node)) {
+			target = node;
+			src = node.src;
+		}
+		if (!src && /^DIV$/i.test(node?.nodeName) && dom.check.isIFrame(children[0])) {
+			target = children[0];
+			src = target.src;
+		}
+		if (!src && dom.utils.hasClass(node, 'se-embed-container')) {
+			/** @type {*} */
+			const srcNode = dom.query.getChildNode(node, (current) => current.src || current.href);
+			target = srcNode;
+			src = target?.src || target?.href;
+		}
 
 		if (src) {
-			return this.checkContentType(src) ? node : null;
+			return this.checkContentType(src) ? target : null;
 		}
-		return null;
+
+		return target;
 	}
+
+	#linkValue;
+	#align;
+	#defaultSizeX;
+	#defaultSizeY;
+	#element;
+	#cover;
+	#container;
+	#ratio;
+	#origin_w;
+	#origin_h;
+	#resizing;
+	#onlyPercentage;
+	#nonResizing;
 
 	/**
 	 * @constructor
@@ -123,23 +153,25 @@ class Embed extends EditorInjector {
 		this.embedInput = modalEl.embedInput;
 		this.focusElement = this.embedInput;
 		this.previewSrc = modalEl.previewSrc;
-		this._linkValue = '';
-		this._align = 'none';
-		this._defaultSizeX = this.pluginOptions.defaultWidth;
-		this._defaultSizeY = this.pluginOptions.defaultHeight;
 		this.sizeUnit = sizeUnit;
 		this.proportion = null;
 		this.inputX = null;
 		this.inputY = null;
-		this._element = null;
-		this._cover = null;
-		this._container = null;
-		this._ratio = { w: 0, h: 0 };
-		this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-		this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
-		this._resizing = this.pluginOptions.canResize;
-		this._onlyPercentage = this.pluginOptions.percentageOnlySize;
-		this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
+
+		this.#linkValue = '';
+		this.#align = 'none';
+		this.#defaultSizeX = this.pluginOptions.defaultWidth;
+		this.#defaultSizeY = this.pluginOptions.defaultHeight;
+		this.#element = null;
+		this.#cover = null;
+		this.#container = null;
+		this.#ratio = { w: 0, h: 0 };
+		this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+		this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+		this.#resizing = this.pluginOptions.canResize;
+		this.#onlyPercentage = this.pluginOptions.percentageOnlySize;
+		this.#nonResizing = !this.#resizing || !this.pluginOptions.showHeightInput || this.#onlyPercentage;
+
 		this.query = {
 			facebook: {
 				pattern: /(?:https?:\/\/)?(?:www\.)?(?:facebook\.com)\/(.+)/i,
@@ -149,7 +181,7 @@ class Embed extends EditorInjector {
 				tag: 'iframe'
 			},
 			twitter: {
-				pattern: /(?:https?:\/\/)?(?:www\.)?(?:twitter\.com)\/(status|embed)\/(.+)/i,
+				pattern: /^(?:https?:\/\/)?(?:(?:www\.)?(?:twitter\.com|x\.com)\/(?:[^/?#]+\/)?status\/\d+(?:[/?#]|$)|platform\.twitter\.com\/embed\/Tweet\.html(?:[?#].*)?$)/i,
 				action: (url) => {
 					return `https://platform.twitter.com/embed/Tweet.html?url=${encodeURIComponent(url)}`;
 				},
@@ -208,7 +240,7 @@ class Embed extends EditorInjector {
 		// init
 		this.eventManager.addEvent(this.embedInput, 'input', this.#OnLinkPreview.bind(this));
 
-		if (this._resizing) {
+		if (this.#resizing) {
 			this.proportion = modalEl.proportion;
 			this.inputX = modalEl.inputX;
 			this.inputY = modalEl.inputY;
@@ -243,12 +275,12 @@ class Embed extends EditorInjector {
 	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
 	 */
 	on(isUpdate) {
-		if (!isUpdate && this._resizing) {
-			this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+		if (!isUpdate && this.#resizing) {
+			this.inputX.value = this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value = this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.disabled = true;
 		} else if (isUpdate) {
-			this._linkValue = this.previewSrc.textContent = this.embedInput.value = this._cover.getAttribute('data-se-origin') || '';
+			this.#linkValue = this.previewSrc.textContent = this.embedInput.value = this.#cover.getAttribute('data-se-origin') || '';
 		}
 	}
 
@@ -258,14 +290,14 @@ class Embed extends EditorInjector {
 	 * @returns {Promise<boolean>} Success / failure
 	 */
 	async modalAction() {
-		this._align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked')).value;
+		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked')).value;
 
 		let result = false;
-		if (this._linkValue.length > 0) {
-			result = await this.submitSRC(this._linkValue);
+		if (this.#linkValue.length > 0) {
+			result = await this.submitSRC(this.#linkValue);
 		}
 
-		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, Embed.key), 0);
+		if (result) this._w.setTimeout(this.component.select.bind(this.component, this.#element, Embed.key), 0);
 
 		return result;
 	}
@@ -290,11 +322,11 @@ class Embed extends EditorInjector {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
-				this._ready(element, true);
+				this.#ready(element, true);
 				const line = this.format.getLine(element);
-				if (line) this._align = line.style.textAlign || line.style.float;
+				if (line) this.#align = line.style.textAlign || line.style.float;
 
-				this._update(element);
+				this.#fixTagStructure(element);
 			}
 		};
 	}
@@ -305,15 +337,15 @@ class Embed extends EditorInjector {
 	 */
 	init() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
-		this._linkValue = this.previewSrc.textContent = this.embedInput.value = '';
+		this.#linkValue = this.previewSrc.textContent = this.embedInput.value = '';
 
 		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]')).checked = true;
-		this._ratio = { w: 0, h: 0 };
-		this._nonResizing = false;
+		this.#ratio = { w: 0, h: 0 };
+		this.#nonResizing = false;
 
-		if (this._resizing) {
-			this.inputX.value = this.pluginOptions.defaultWidth === this._defaultSizeX ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this.pluginOptions.defaultHeight === this._defaultSizeY ? '' : this.pluginOptions.defaultHeight;
+		if (this.#resizing) {
+			this.inputX.value = this.pluginOptions.defaultWidth === this.#defaultSizeX ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value = this.pluginOptions.defaultHeight === this.#defaultSizeY ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.checked = false;
 			this.proportion.disabled = true;
 		}
@@ -325,53 +357,7 @@ class Embed extends EditorInjector {
 	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
-		this._ready(target);
-	}
-
-	/**
-	 * @private
-	 * @description Prepares the component for selection.
-	 * - Ensures that the controller is properly positioned and initialized.
-	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {HTMLElement} target - The selected element.
-	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
-	 */
-	_ready(target, infoOnly = false) {
-		if (!target) return;
-		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
-
-		this._element = target;
-		this._cover = figureInfo.cover;
-		this._container = figureInfo.container;
-		this._caption = figureInfo.caption;
-		this._align = figureInfo.align;
-		target.style.float = '';
-
-		this._origin_w = String(figureInfo.originWidth || figureInfo.w || '');
-		this._origin_h = String(figureInfo.originHeight || figureInfo.h || '');
-
-		/** @type {HTMLInputElement} */
-		const activeAlign = this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]');
-		activeAlign.checked = true;
-
-		if (!this._resizing) return;
-
-		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
-		const { dw, dh } = this.figure.getSize(target);
-		this.inputX.value = dw === 'auto' ? '' : dw;
-		this.inputY.value = dh === 'auto' ? '' : dh;
-
-		this.proportion.checked = true;
-		this.inputX.disabled = percentageRotation ? true : false;
-		this.inputY.disabled = percentageRotation ? true : false;
-		this.proportion.disabled = percentageRotation ? true : false;
-
-		this._ratio = this.proportion.checked
-			? figureInfo.ratio
-			: {
-					w: 0,
-					h: 0
-			  };
+		this.#ready(target);
 	}
 
 	/**
@@ -381,12 +367,12 @@ class Embed extends EditorInjector {
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
-		const targetEl = target || this._element;
+		const targetEl = target || this.#element;
 		const container = dom.query.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.triggerEvent('onEmbedDeleteBefore', { element: targetEl, container, align: this._align, url: this._linkValue });
+		const message = await this.triggerEvent('onEmbedDeleteBefore', { element: targetEl, container, align: this.#align, url: this.#linkValue });
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
@@ -450,26 +436,24 @@ class Embed extends EditorInjector {
 	 * @returns {Promise<boolean>} A promise that resolves to true on success or false on failure.
 	 */
 	async submitSRC(src) {
-		if (!(src ||= this._linkValue)) return false;
+		if (!(src ||= this.#linkValue)) return false;
 
 		let embedInfo = null;
 		if (/^<iframe\s|^<blockquote\s/i.test(src)) {
 			const embedDOM = new DOMParser().parseFromString(src, 'text/html').body.children;
 			if (embedDOM.length === 0) return false;
-			embedInfo = { children: embedDOM, ...this._getInfo(), process: null };
+			embedInfo = { children: embedDOM, ...this.#getInfo(), process: null };
 		} else {
 			const processUrl = this.findProcessUrl(src);
 			if (!processUrl) return false;
 			src = processUrl.url;
-			embedInfo = { url: src, ...this._getInfo(), process: processUrl };
+			embedInfo = { url: src, ...this.#getInfo(), process: processUrl };
 		}
 
-		const handler = function (infos, newInfos) {
+		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
-			this._create(src, infos.process, infos.url, infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
-		}.bind(this, embedInfo);
-		// se-ts-ignore
-		void this._create;
+			uploadCallback(src, infos.process, infos.url, infos.children, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate);
+		}.bind(this, this.#create.bind(this), embedInfo);
 
 		const result = await this.triggerEvent('onEmbedInputBefore', {
 			...embedInfo,
@@ -486,29 +470,71 @@ class Embed extends EditorInjector {
 	}
 
 	/**
-	 * @private
+	 * @description Prepares the component for selection.
+	 * - Ensures that the controller is properly positioned and initialized.
+	 * - Prevents duplicate event handling if the component is already selected.
+	 * @param {HTMLElement} target - The selected element.
+	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
+	 */
+	#ready(target, infoOnly = false) {
+		if (!target) return;
+		const figureInfo = this.figure.open(target, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
+
+		this.#element = target;
+		this.#cover = figureInfo.cover;
+		this.#container = figureInfo.container;
+		this._caption = figureInfo.caption;
+		this.#align = figureInfo.align;
+		target.style.float = '';
+
+		this.#origin_w = String(figureInfo.originWidth || figureInfo.w || '');
+		this.#origin_h = String(figureInfo.originHeight || figureInfo.h || '');
+
+		/** @type {HTMLInputElement} */
+		const activeAlign = this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="' + this.#align + '"]') || this.modal.form.querySelector('input[name="suneditor_embed_radio"][value="none"]');
+		activeAlign.checked = true;
+
+		if (!this.#resizing) return;
+
+		const percentageRotation = this.#onlyPercentage && this.figure.isVertical;
+		const { dw, dh } = this.figure.getSize(target);
+		this.inputX.value = dw === 'auto' ? '' : dw;
+		this.inputY.value = dh === 'auto' ? '' : dh;
+
+		this.proportion.checked = true;
+		this.inputX.disabled = percentageRotation ? true : false;
+		this.inputY.disabled = percentageRotation ? true : false;
+		this.proportion.disabled = percentageRotation ? true : false;
+
+		this.#ratio = this.proportion.checked
+			? figureInfo.ratio
+			: {
+					w: 0,
+					h: 0
+			  };
+	}
+
+	/**
 	 * @description Creates an iframe element for embedding external content.
 	 * @returns {HTMLIFrameElement} The created iframe element.
 	 */
-	_createIframeTag() {
+	#createIframeTag() {
 		/** @type {HTMLIFrameElement} */
 		const iframeTag = dom.utils.createElement('IFRAME');
-		this._setIframeAttrs(iframeTag);
+		this.#setIframeAttrs(iframeTag);
 		return iframeTag;
 	}
 
 	/**
-	 * @private
 	 * @description Creates an blockquote element for embedding external content.
 	 * @returns {HTMLElement} The created iframe element.
 	 */
-	_createEmbedTag() {
+	#createEmbedTag() {
 		const quoteTag = dom.utils.createElement('BLOCKQUOTE');
 		return quoteTag;
 	}
 
 	/**
-	 * @private
 	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
 	 * @param {string} originSrc - The origin input source.
 	 * @param {ProcessInfo_embed} process - Processed embed information.
@@ -519,7 +545,7 @@ class Embed extends EditorInjector {
 	 * @param {string} align - The alignment of the embed component.
 	 * @param {boolean} isUpdate - Whether this is an update to an existing embed component.
 	 */
-	_create(originSrc, process, src, children, width, height, align, isUpdate) {
+	#create(originSrc, process, src, children, width, height, align, isUpdate) {
 		let oFrame = null;
 		let cover = null;
 		let container = null;
@@ -527,16 +553,16 @@ class Embed extends EditorInjector {
 
 		/** update */
 		if (isUpdate) {
-			oFrame = this._element;
+			oFrame = this.#element;
 			if (oFrame.src !== src) {
 				const processUrl = this.findProcessUrl(src);
 				if (/^iframe$/i.test(processUrl?.tag) && !/^iframe$/i.test(oFrame.nodeName)) {
-					const newTag = this._createIframeTag();
+					const newTag = this.#createIframeTag();
 					newTag.src = src;
 					oFrame.replaceWith(newTag);
 					oFrame = newTag;
 				} else if (/^blockquote$/i.test(processUrl?.tag) && !/^blockquote$/i.test(oFrame.nodeName)) {
-					const newTag = this._createEmbedTag();
+					const newTag = this.#createEmbedTag();
 					newTag.setAttribute('src', src);
 					oFrame.replaceWith(newTag);
 					oFrame = newTag;
@@ -544,12 +570,12 @@ class Embed extends EditorInjector {
 					oFrame.src = src;
 				}
 			}
-			container = this._container;
+			container = this.#container;
 			cover = dom.query.getParentElement(oFrame, 'FIGURE');
 		} else {
 			/** create */
 			if (process) {
-				oFrame = this._createIframeTag();
+				oFrame = this.#createIframeTag();
 				oFrame.src = src;
 				const figure = Figure.CreateContainer(oFrame, 'se-embed-container');
 				cover = figure.cover;
@@ -574,13 +600,13 @@ class Embed extends EditorInjector {
 		}
 
 		/** rendering */
-		this._element = oFrame;
-		this._cover = cover;
-		this._container = container;
-		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+		this.#element = oFrame;
+		this.#cover = cover;
+		this.#container = container;
+		this.figure.open(oFrame, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 
-		width ||= this._defaultSizeX;
-		height ||= this._defaultSizeY;
+		width ||= this.#defaultSizeX;
+		height ||= this.#defaultSizeY;
 
 		const size = this.figure.getSize(oFrame);
 		const inputUpdate = size.w !== width || size.h !== height;
@@ -588,7 +614,7 @@ class Embed extends EditorInjector {
 
 		// set size
 		if (changeSize) {
-			this._applySize(width, height);
+			this.#applySize(width, height);
 		}
 
 		// align
@@ -640,19 +666,18 @@ class Embed extends EditorInjector {
 			return;
 		}
 
-		if (!this._resizing || !changeSize || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
+		if (!this.#resizing || !changeSize || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
 		if (!scriptTag) this.history.push(false);
 	}
 
 	/**
-	 * @private
 	 * @description Updates an existing embed component within the editor.
 	 * @param {HTMLIFrameElement} oFrame - The existing embed element to be updated.
 	 */
-	_update(oFrame) {
+	#fixTagStructure(oFrame) {
 		if (!oFrame) return;
 
-		this._setIframeAttrs(oFrame);
+		this.#setIframeAttrs(oFrame);
 
 		const prevFrame = oFrame;
 		oFrame = /** @type {HTMLIFrameElement} */ (oFrame.cloneNode(true));
@@ -660,34 +685,33 @@ class Embed extends EditorInjector {
 		const container = figure.container;
 
 		// size
-		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+		this.figure.open(oFrame, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
 
 		const width = size[0] || prevFrame.width || '';
 		const height = size[1] || prevFrame.height || '';
-		this._applySize(width, height);
+		this.#applySize(width, height);
 
 		// align
 		const format = this.format.getLine(prevFrame);
-		if (format) this._align = format.style.textAlign || format.style.float;
-		this.figure.setAlign(oFrame, this._align);
+		if (format) this.#align = format.style.textAlign || format.style.float;
+		this.figure.setAlign(oFrame, this.#align);
 
-		this.figure.retainFigureFormat(container, this._element, null, null);
+		this.figure.retainFigureFormat(container, this.#element, null, null);
 
 		return oFrame;
 	}
 
 	/**
-	 * @private
 	 * @description Applies width and height to the embed component.
 	 * @param {string|number} w - The width to apply.
 	 * @param {string|number} h - The height to apply.
 	 */
-	_applySize(w, h) {
+	#applySize(w, h) {
 		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
 		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
 
-		if (this._onlyPercentage) {
+		if (this.#onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w + '')) w += '%';
 		}
@@ -695,7 +719,6 @@ class Embed extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Retrieves embed component size and alignment information.
 	 * @returns {{inputWidth: string, inputHeight: string, align: string, isUpdate: boolean, element: Element}} An object containing
 	 * - inputWidth : The width of the embed component.
@@ -704,22 +727,21 @@ class Embed extends EditorInjector {
 	 * - isUpdate : Whether the component is being updated.
 	 * - element : The target element.
 	 */
-	_getInfo() {
+	#getInfo() {
 		return {
 			inputWidth: this.inputX?.value || '',
 			inputHeight: this.inputY?.value || '',
-			align: this._align,
+			align: this.#align,
 			isUpdate: this.modal.isUpdate,
-			element: this._element
+			element: this.#element
 		};
 	}
 
 	/**
-	 * @private
 	 * @description Sets default attributes for an iframe element.
 	 * @param {HTMLIFrameElement} element - The iframe element to modify.
 	 */
-	_setIframeAttrs(element) {
+	#setIframeAttrs(element) {
 		element.frameBorder = '0';
 		element.allowFullscreen = true;
 
@@ -740,10 +762,10 @@ class Embed extends EditorInjector {
 		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.value.trim();
 		if (/^<iframe.*\/iframe>$/.test(value)) {
-			this._linkValue = value;
+			this.#linkValue = value;
 			this.previewSrc.textContent = '<IFrame :src=".."></IFrame>';
 		} else {
-			this._linkValue = this.previewSrc.textContent = !value
+			this.#linkValue = this.previewSrc.textContent = !value
 				? ''
 				: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
 				? this.options.get('defaultUrlProtocol') + value
@@ -754,11 +776,11 @@ class Embed extends EditorInjector {
 	}
 
 	#OnClickRevert() {
-		if (this._onlyPercentage) {
-			this.inputX.value = Number(this._origin_w) > 100 ? '100' : this._origin_w;
+		if (this.#onlyPercentage) {
+			this.inputX.value = Number(this.#origin_w) > 100 ? '100' : this.#origin_w;
 		} else {
-			this.inputX.value = this._origin_w;
-			this.inputY.value = this._origin_h;
+			this.inputX.value = this.#origin_w;
+			this.inputY.value = this.#origin_h;
 		}
 	}
 
@@ -775,10 +797,10 @@ class Embed extends EditorInjector {
 		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 
-		if (xy === 'x' && this._onlyPercentage && Number(eventTarget.value) > 100) {
+		if (xy === 'x' && this.#onlyPercentage && Number(eventTarget.value) > 100) {
 			eventTarget.value = '100';
 		} else if (this.proportion.checked) {
-			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
+			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this.#ratio);
 			if (xy === 'x') {
 				this.inputY.value = String(ratioSize.h);
 			} else {

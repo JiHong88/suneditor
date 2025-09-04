@@ -110,7 +110,7 @@ Component.prototype = {
 			return null;
 		}
 
-		insertBehavior ||= this.options.get('componentInsertBehavior');
+		if (insertBehavior === undefined) insertBehavior = this.options.get('componentInsertBehavior');
 
 		const r = this.html.remove();
 		const isInline = this.isInline(element);
@@ -151,7 +151,6 @@ Component.prototype = {
 		const targetElement = /** @type {HTMLElement} */ (oNode || element);
 
 		if (scrollTo) this.selection.scrollTo(targetElement, { behavior: 'auto' });
-
 		if (insertBehavior !== null) this.applyInsertBehavior(element, oNode, insertBehavior);
 
 		return targetElement;
@@ -160,16 +159,15 @@ Component.prototype = {
 	/**
 	 * @this {ComponentThis}
 	 * @description Handles post-insertion behavior for a newly created component based on the specified mode.
-	 * @param {Node} element The inserted component element.
+	 * @param {Node} container The inserted component element.
 	 * @param {Node|null} [oNode] Optional node to use for selection if the component cannot be selected.
 	 * @param {__se__ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
 	 */
-	applyInsertBehavior(element, oNode, insertBehavior) {
-		const cInfo = this.get(element);
-		const container = cInfo.container;
+	applyInsertBehavior(container, oNode, insertBehavior) {
+		const cInfo = this.get(container);
 
 		if (this.isInline(container)) {
-			const nr = this.selection.getNearRange(cInfo.container);
+			const nr = this.selection.getNearRange(container);
 			if (nr) {
 				this.selection.setRange(nr.container, nr.offset, nr.container, nr.offset);
 			} else {
@@ -187,7 +185,7 @@ Component.prototype = {
 				break;
 			}
 			case 'select': {
-				this.selection.setRange(element, 0, element, 0);
+				this.selection.setRange(container, 0, container, 0);
 
 				if (cInfo) {
 					this.select(cInfo.target, cInfo.pluginName);
@@ -260,7 +258,7 @@ Component.prototype = {
 		const figureInfo = Figure.GetContainer(target);
 		const container = figureInfo.container || figureInfo.cover || target;
 		return (this.info = {
-			target,
+			target: figureInfo.target,
 			pluginName,
 			options,
 			container: container,
@@ -523,11 +521,11 @@ Component.prototype = {
 	 * - If a valid next sibling line exists, moves the selection there.
 	 * - If no next sibling exists, creates a new line after the container and moves the selection there.
 	 * - If the next sibling exists but is not a valid line element and cannot create a new line, returns false.
-	 * @param {HTMLElement} container The component container element.
+	 * @param {Node} container The component container element.
 	 * @returns {boolean} Returns true if the selection moved to a line (existing or newly created), otherwise false.
 	 */
 	__moveToNextLineOrAdd(container) {
-		const nextSibling = container.nextElementSibling;
+		const nextSibling = /** @type {Element} */ (container).nextElementSibling;
 		if (!nextSibling) {
 			const line = this.format.addLine(container, null);
 			if (line) this.selection.setRange(line, 0, line, 0);

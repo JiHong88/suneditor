@@ -38,6 +38,8 @@ class Math_ extends EditorInjector {
 		return dom.utils.hasClass(node, 'se-math|katex') && dom.utils.hasClass(node, 'se-component') ? node : null;
 	}
 
+	#element;
+
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
@@ -112,7 +114,7 @@ class Math_ extends EditorInjector {
 		this.fontSizeElement = modalEl.querySelector('.se-math-size');
 
 		this.isUpdateState = false;
-		this._element = null;
+		this.#element = null;
 
 		// init
 		this.previewElement.style.fontSize = this.defaultFontSize;
@@ -136,7 +138,7 @@ class Math_ extends EditorInjector {
 	 */
 	select(target) {
 		if (dom.utils.hasClass(target, 'se-math|katex') && getValue(target)) {
-			this._element = target;
+			this.#element = target;
 			this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
 			return;
 		}
@@ -147,7 +149,7 @@ class Math_ extends EditorInjector {
 	 * @description This function is called before the "controller" before it is closed.
 	 */
 	close() {
-		this._element = null;
+		this.#element = null;
 	}
 
 	/**
@@ -170,7 +172,7 @@ class Math_ extends EditorInjector {
 				const value = getValue(element);
 				if (!value) return;
 
-				const domParser = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(this._escapeBackslashes(value, true))));
+				const domParser = this._d.createRange().createContextualFragment(this.#renderer(converter.entityToHTML(this.#escapeBackslashes(value, true))));
 				element.innerHTML = domParser.querySelector('.se-math, .katex').innerHTML;
 				element.setAttribute('contenteditable', 'false');
 				dom.utils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');
@@ -207,11 +209,11 @@ class Math_ extends EditorInjector {
 			this.init();
 		} else if (this.controller.currentTarget) {
 			const currentTarget = this.controller.currentTarget;
-			const exp = converter.entityToHTML(this._escapeBackslashes(getValue(currentTarget), true));
+			const exp = converter.entityToHTML(this.#escapeBackslashes(getValue(currentTarget), true));
 			const fontSize = getType(currentTarget) || '1em';
 			this.textArea.value = exp;
 			this.fontSizeElement.value = fontSize;
-			this.previewElement.innerHTML = this._renderer(exp);
+			this.previewElement.innerHTML = this.#renderer(exp);
 			this.previewElement.style.fontSize = fontSize;
 		}
 	}
@@ -235,7 +237,7 @@ class Math_ extends EditorInjector {
 		if (!mathEl) return false;
 		dom.utils.addClass(mathEl, 'se-component|se-inline-component|se-disable-pointer|se-math');
 		mathEl.setAttribute('contenteditable', 'false');
-		mathEl.setAttribute('data-se-value', converter.htmlToEntity(this._escapeBackslashes(mathExp, false)));
+		mathEl.setAttribute('data-se-value', converter.htmlToEntity(this.#escapeBackslashes(mathExp, false)));
 		mathEl.setAttribute('data-se-type', this.fontSizeElement.value);
 		mathEl.style.fontSize = this.fontSizeElement.value;
 
@@ -299,7 +301,7 @@ class Math_ extends EditorInjector {
 				this.modal.open();
 				break;
 			case 'copy':
-				this.#copyTextToClipboard(this._element);
+				this.#copyTextToClipboard(this.#element);
 				break;
 			case 'delete':
 				this.destroy(this.controller.currentTarget);
@@ -319,12 +321,11 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Renders the given math expression using KaTeX or MathJax.
 	 * @param {string} exp - The math expression to render.
 	 * @returns {string} - The rendered math expression as HTML.
 	 */
-	_renderer(exp) {
+	#renderer(exp) {
 		let result = '';
 		try {
 			dom.utils.removeClass(this.textArea, 'se-error');
@@ -348,13 +349,12 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Escapes or unescapes backslashes in a given string.
 	 * @param {string} str - The input string.
 	 * @param {boolean} decode - If true, decodes escaped backslashes; otherwise, encodes them.
 	 * @returns {string} - The processed string.
 	 */
-	_escapeBackslashes(str, decode) {
+	#escapeBackslashes(str, decode) {
 		return str.replace(/\\{2}/g, decode ? '\\' : '\\\\');
 	}
 
@@ -391,7 +391,7 @@ class Math_ extends EditorInjector {
 			eventTarget.style.height = eventTarget.scrollHeight + 5 + 'px';
 		}
 
-		this.previewElement.innerHTML = this._renderer(eventTarget.value);
+		this.previewElement.innerHTML = this.#renderer(eventTarget.value);
 		if (this.mathjax) this.#renderMathJax(this.mathjax);
 	}
 

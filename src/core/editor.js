@@ -1234,7 +1234,7 @@ Editor.prototype = {
 		this._iframeAutoHeight(fc);
 		this._checkPlaceholder(fc);
 		// document type page
-		if (fc.has('documentType_use_page') && fc.get('options').get('height') !== 'auto') {
+		if (fc.has('documentType_use_page')) {
 			fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
 			fc.get('documentType').rePage(true);
 		}

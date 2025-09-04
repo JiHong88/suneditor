@@ -108,6 +108,8 @@ class FontSize extends EditorInjector {
 	static type = 'input';
 	static className = 'se-btn-select se-btn-input se-btn-tool-font-size';
 
+	#disableInput;
+
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
@@ -168,7 +170,7 @@ class FontSize extends EditorInjector {
 		this.sizeList = menu.querySelectorAll('li button');
 		this.hasInputFocus = false;
 		this.isInputActive = false; // input target event
-		this._disableInput = disableInput;
+		this.#disableInput = disableInput;
 
 		// init
 		this.menu.initDropdownTarget(FontSize, menu);
@@ -187,11 +189,11 @@ class FontSize extends EditorInjector {
 
 		let fontSize = '';
 		if (!element) {
-			this._setSize(target, this._getDefaultSize());
+			this.#setSize(target, this.#getDefaultSize());
 		} else if (this.format.isLine(element)) {
 			return undefined;
 		} else if ((fontSize = dom.utils.getStyle(element, 'fontSize'))) {
-			this._setSize(target, fontSize);
+			this.#setSize(target, fontSize);
 			return true;
 		}
 
@@ -208,14 +210,14 @@ class FontSize extends EditorInjector {
 	onInputKeyDown({ target, event }) {
 		const keyCode = event.code;
 
-		if (this._disableInput || keyCodeMap.isSpace(keyCode)) {
+		if (this.#disableInput || keyCodeMap.isSpace(keyCode)) {
 			event.preventDefault();
 			return;
 		}
 
 		if (!/^(38|40|13)$/.test(keyCode)) return;
 
-		const { value, unit } = this._getSize(target);
+		const { value, unit } = this.#getSize(target);
 		if (!value) return;
 
 		const numValue = numbers.get(value);
@@ -235,8 +237,8 @@ class FontSize extends EditorInjector {
 
 		try {
 			this.isInputActive = true;
-			const size = this._setSize(target, changeValue + unit);
-			if (this._disableInput) return;
+			const size = this.#setSize(target, changeValue + unit);
+			if (this.#disableInput) return;
 
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + size + ';' });
 			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
@@ -253,17 +255,17 @@ class FontSize extends EditorInjector {
 	 * @param {__se__PluginToolbarInputChangeEventInfo} params
 	 */
 	onInputChange({ target, value: changeValue, event }) {
-		if (this._disableInput) return;
+		if (this.#disableInput) return;
 
 		try {
 			this.isInputActive = true;
 
 			// eslint-disable-next-line prefer-const
-			let { value, unit } = this._getSize(changeValue);
+			let { value, unit } = this.#getSize(changeValue);
 			const { max, min } = this.unitMap[unit];
 			value = value > max ? max : value < min ? min : value;
 
-			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + this._setSize(target, value + unit) + ';' });
+			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + this.#setSize(target, value + unit) + ';' });
 			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} finally {
 			this.isInputActive = false;
@@ -278,7 +280,7 @@ class FontSize extends EditorInjector {
 	 * @param {HTMLElement} target Line element at the current cursor position
 	 */
 	on(target) {
-		const { value, unit } = this._getSize(target);
+		const { value, unit } = this.#getSize(target);
 		const currentSize = value + unit;
 
 		if (currentSize === this.currentSize) return;
@@ -305,7 +307,7 @@ class FontSize extends EditorInjector {
 		const commandValue = target.getAttribute('data-command');
 
 		if (commandValue === FontSize.key) {
-			const { value, unit } = this._getSize(target);
+			const { value, unit } = this.#getSize(target);
 			let newSize = numbers.get(value) + (target.getAttribute('data-value') === 'inc' ? 1 : -1);
 			const { min, max } = this.unitMap[unit];
 			newSize = newSize < min ? min : newSize > max ? max : newSize;
@@ -323,23 +325,21 @@ class FontSize extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Retrieves the default font size of the editor.
 	 * @returns {string} - The computed font size from the editor.
 	 */
-	_getDefaultSize() {
+	#getDefaultSize() {
 		return this.frameContext.get('wwComputedStyle').fontSize;
 	}
 
 	/**
-	 * @private
 	 * @description Extracts the font size and unit from the given element or input value.
 	 * @param {string|Element} target - The target input or element.
 	 * @returns {{ unit: string, value: number|string }} - An object containing:
 	 * - `unit` (string): The detected font size unit.
 	 * - `value` (number|string): The numeric font size value or text-based size.
 	 */
-	_getSize(target) {
+	#getSize(target) {
 		target = typeof target === 'string' ? target : target.parentElement.querySelector('.__se__font_size');
 		if (!target)
 			return {
@@ -363,13 +363,12 @@ class FontSize extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Sets the font size in the toolbar input field or button label.
 	 * @param {HTMLElement} target - The target element in the toolbar.
 	 * @param {string|number} value - The font size value.
 	 * @returns {string|number} - The applied font size.
 	 */
-	_setSize(target, value) {
+	#setSize(target, value) {
 		target = target.parentElement.querySelector('.__se__font_size');
 		if (!target) return 0;
 

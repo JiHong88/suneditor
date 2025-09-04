@@ -37,6 +37,11 @@ const { NO_EVENT } = env;
  * - Use it by inserting it into Modal in a plugin that uses Modal.
  */
 class ModalAnchorEditor extends EditorInjector {
+	#modalForm;
+	#isRel;
+	#selectMenu_rel;
+	#selectMenu_bookmark;
+
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -74,7 +79,6 @@ class ModalAnchorEditor extends EditorInjector {
 		// members
 		this.kink = inst.constructor.key || inst.constructor.name;
 		this.inst = inst;
-		this.modalForm = /** @type {HTMLElement} */ (modalForm);
 		this.host = (this._w.location.origin + this._w.location.pathname).replace(/\/$/, '');
 
 		/** @type {HTMLInputElement} */
@@ -99,10 +103,10 @@ class ModalAnchorEditor extends EditorInjector {
 		this.currentRel = [];
 		this.currentTarget = null;
 		this.linkValue = '';
-		this._change = false;
-		this._isRel = this.relList.length > 0;
+
+		this.#isRel = this.relList.length > 0;
 		// members - rel
-		if (this._isRel) {
+		if (this.#isRel) {
 			/** @type {HTMLButtonElement} */
 			this.relButton = forms.querySelector('.se-anchor-rel-btn');
 			/** @type {HTMLElement} */
@@ -127,19 +131,19 @@ class ModalAnchorEditor extends EditorInjector {
 					)
 				);
 			}
-			this.selectMenu_rel = new SelectMenu(this, { checkList: true, position: 'right-middle', dir: 'ltr' });
-			this.selectMenu_rel.on(this.relButton, this.#SetRelItem.bind(this));
-			this.selectMenu_rel.create(list);
+			this.#selectMenu_rel = new SelectMenu(this, { checkList: true, position: 'right-middle', dir: 'ltr' });
+			this.#selectMenu_rel.on(this.relButton, this.#SetRelItem.bind(this));
+			this.#selectMenu_rel.create(list);
 			this.eventManager.addEvent(this.relButton, 'click', this.#OnClick_relbutton.bind(this));
 		}
 
 		// init
-		this.modalForm.querySelector('.se-anchor-editor').appendChild(forms);
-		this.selectMenu_bookmark = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
-		this.selectMenu_bookmark.on(this.urlInput, this.#SetHeaderBookmark.bind(this));
+		this.#modalForm = /** @type {HTMLElement} */ (modalForm);
+		this.#modalForm.querySelector('.se-anchor-editor').appendChild(forms);
+		this.#selectMenu_bookmark = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
+		this.#selectMenu_bookmark.on(this.urlInput, this.#SetHeaderBookmark.bind(this));
 		this.eventManager.addEvent(this.newWindowCheck, 'change', this.#OnChange_newWindowCheck.bind(this));
 		this.eventManager.addEvent(this.downloadCheck, 'change', this.#OnChange_downloadCheck.bind(this));
-		this.eventManager.addEvent(this.displayInput, 'input', this.#OnChange_displayInput.bind(this));
 		this.eventManager.addEvent(this.urlInput, 'input', this.#OnChange_urlInput.bind(this));
 		this.eventManager.addEvent(this.urlInput, 'focus', this.#OnFocus_urlInput.bind(this));
 		this.eventManager.addEvent(this.bookmarkButton, 'click', this.#OnClick_bookmarkButton.bind(this));
@@ -166,15 +170,15 @@ class ModalAnchorEditor extends EditorInjector {
 			this.titleInput.value = '';
 		} else if (this.currentTarget) {
 			const href = this.currentTarget.href;
-			this.linkValue = this.preview.textContent = this.urlInput.value = this._selfPathBookmark(href) ? href.substring(href.lastIndexOf('#')) : href;
+			this.linkValue = this.preview.textContent = this.urlInput.value = this.#selfPathBookmark(href) ? href.substring(href.lastIndexOf('#')) : href;
 			this.displayInput.value = this.currentTarget.textContent;
 			this.titleInput.value = this.currentTarget.title;
 			this.newWindowCheck.checked = /_blank/i.test(this.currentTarget.target) ? true : false;
 			this.downloadCheck.checked = !!this.currentTarget.download;
 		}
 
-		this._setRel(isUpdate && this.currentTarget ? this.currentTarget.rel : this.defaultRel.default || '');
-		this._setLinkPreview(this.linkValue);
+		this.#setRel(isUpdate && this.currentTarget ? this.currentTarget.rel : this.defaultRel.default || '');
+		this.#setLinkPreview(this.linkValue);
 	}
 
 	/**
@@ -189,7 +193,7 @@ class ModalAnchorEditor extends EditorInjector {
 		const displayText = this.displayInput.value.length === 0 ? url : this.displayInput.value;
 
 		const oA = /** @type {HTMLAnchorElement} */ (this.currentTarget || dom.utils.createElement('A'));
-		this._updateAnchor(oA, url, displayText, this.titleInput.value, notText);
+		this.#updateAnchor(oA, url, displayText, this.titleInput.value, notText);
 		this.linkValue = this.preview.textContent = this.urlInput.value = this.displayInput.value = '';
 
 		return oA;
@@ -204,12 +208,10 @@ class ModalAnchorEditor extends EditorInjector {
 		this.displayInput.value = '';
 		this.newWindowCheck.checked = false;
 		this.downloadCheck.checked = false;
-		this._change = false;
-		this._setRel(this.defaultRel.default || '');
+		this.#setRel(this.defaultRel.default || '');
 	}
 
 	/**
-	 * @private
 	 * @description Updates the anchor element with new attributes.
 	 * @param {HTMLAnchorElement} anchor - The anchor (`<a>`) element to update.
 	 * @param {string} url - The URL for the anchor's `href` attribute.
@@ -217,9 +219,9 @@ class ModalAnchorEditor extends EditorInjector {
 	 * @param {string} title - The tooltip text (title attribute).
 	 * @param {boolean} notText - If `true`, the anchor will not contain text content.
 	 */
-	_updateAnchor(anchor, url, displayText, title, notText) {
+	#updateAnchor(anchor, url, displayText, title, notText) {
 		// download
-		if (!this._selfPathBookmark(url) && this.downloadCheck.checked) {
+		if (!this.#selfPathBookmark(url) && this.downloadCheck.checked) {
 			anchor.setAttribute('download', displayText || url);
 		} else {
 			anchor.removeAttribute('download');
@@ -247,26 +249,24 @@ class ModalAnchorEditor extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Checks if the given path is an internal bookmark.
 	 * @param {string} path - The URL or anchor link.
 	 * @returns {boolean} - `true` if the path is an internal bookmark, otherwise `false`.
 	 */
-	_selfPathBookmark(path) {
+	#selfPathBookmark(path) {
 		const href = this._w.location.href.replace(/\/$/, '');
 		return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (!href.includes('#') ? href.length : href.substring(0, href.indexOf('#')).length));
 	}
 
 	/**
-	 * @private
 	 * @description Updates the `rel` attribute list in the modal and preview.
 	 * @param {string} relAttr - The `rel` attribute string to set.
 	 */
-	_setRel(relAttr) {
-		if (!this._isRel) return;
+	#setRel(relAttr) {
+		if (!this.#isRel) return;
 
 		const rels = (this.currentRel = !relAttr ? [] : relAttr.split(' '));
-		const checkedRel = this.selectMenu_rel.form.querySelectorAll('button');
+		const checkedRel = this.#selectMenu_rel.form.querySelectorAll('button');
 		for (let i = 0, len = checkedRel.length, cmd; i < len; i++) {
 			cmd = checkedRel[i].getAttribute('data-command');
 			if (rels.includes(cmd)) {
@@ -285,11 +285,10 @@ class ModalAnchorEditor extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Generates a list of bookmark headers within the editor.
 	 * @param {string} urlValue - The current URL input value.
 	 */
-	_createBookmarkList(urlValue) {
+	#createBookmarkList(urlValue) {
 		const headers = dom.query.getListChildren(this.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id));
 		if (headers.length === 0) return;
 
@@ -304,19 +303,18 @@ class ModalAnchorEditor extends EditorInjector {
 		}
 
 		if (list.length === 0) {
-			this.selectMenu_bookmark.close();
+			this.#selectMenu_bookmark.close();
 		} else {
-			this.selectMenu_bookmark.create(list, menus);
-			this.selectMenu_bookmark.open(this.options.get('_rtl') ? 'bottom-right' : '');
+			this.#selectMenu_bookmark.create(list, menus);
+			this.#selectMenu_bookmark.open(this.options.get('_rtl') ? 'bottom-right' : '');
 		}
 	}
 
 	/**
-	 * @private
 	 * @description Updates the preview of the anchor link.
 	 * @param {string} value - The current URL value.
 	 */
-	_setLinkPreview(value) {
+	#setLinkPreview(value) {
 		const preview = this.preview;
 		const protocol = this.options.get('defaultUrlProtocol');
 		const noPrefix = this.noAutoPrefix;
@@ -328,7 +326,7 @@ class ModalAnchorEditor extends EditorInjector {
 			preview.textContent =
 				!value ? '' : noPrefix ? value : protocol && !reservedProtocol && !sameProtocol ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.host + (/^\//.test(value) ? '' : '/') + value;
 
-		if (this._selfPathBookmark(value)) {
+		if (this.#selfPathBookmark(value)) {
 			this.bookmark.style.display = 'block';
 			dom.utils.addClass(this.bookmarkButton, 'active');
 		} else {
@@ -336,7 +334,7 @@ class ModalAnchorEditor extends EditorInjector {
 			dom.utils.removeClass(this.bookmarkButton, 'active');
 		}
 
-		if (!this._selfPathBookmark(value) && this.downloadCheck.checked) {
+		if (!this.#selfPathBookmark(value) && this.downloadCheck.checked) {
 			this.download.style.display = 'block';
 		} else {
 			this.download.style.display = 'none';
@@ -344,12 +342,11 @@ class ModalAnchorEditor extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Merges the given `rel` attribute value with the current list.
 	 * @param {string} relAttr - The `rel` attribute to merge.
 	 * @returns {string} - The updated `rel` attribute string.
 	 */
-	_relMerge(relAttr) {
+	#relMerge(relAttr) {
 		const current = this.currentRel;
 		if (!relAttr) return current.join(' ');
 
@@ -368,12 +365,11 @@ class ModalAnchorEditor extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Removes the specified `rel` attribute from the current list.
 	 * @param {string} relAttr - The `rel` attribute to remove.
 	 * @returns {string} - The updated `rel` attribute string.
 	 */
-	_relDelete(relAttr) {
+	#relDelete(relAttr) {
 		if (!relAttr) return this.currentRel.join(' ');
 		if (/^only:/.test(relAttr)) relAttr = relAttr.replace(/^only:/, '').trim();
 
@@ -383,11 +379,10 @@ class ModalAnchorEditor extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Registers a newly uploaded file and sets its URL in the modal form.
 	 * @param {Object<string, *>} response - The response object from the file upload request.
 	 */
-	_register(response) {
+	#register(response) {
 		const file = response.result[0];
 		this.linkValue = this.preview.textContent = this.urlInput.value = file.url;
 		this.displayInput.value = file.name;
@@ -396,12 +391,11 @@ class ModalAnchorEditor extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Handles file upload errors.
 	 * @param {Object<string, *>} response - The error response object.
 	 * @returns {Promise<void>}
 	 */
-	async _error(response) {
+	async #error(response) {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
@@ -413,12 +407,12 @@ class ModalAnchorEditor extends EditorInjector {
 	 * @description Handles the callback after a file upload completes.
 	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object containing the response.
 	 */
-	_uploadCallBack(xmlHttp) {
+	#uploadCallBack(xmlHttp) {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
-			this._error(response);
+			this.#error(response);
 		} else {
-			this._register(response);
+			this.#register(response);
 		}
 	}
 
@@ -438,13 +432,11 @@ class ModalAnchorEditor extends EditorInjector {
 			files
 		};
 
-		const handler = async function (infos, newInfos) {
+		const handler = async function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
 			const xmlHttp = await this.fileManager.asyncUpload(infos.url, infos.uploadHeaders, infos.files);
-			this._uploadCallBack(xmlHttp);
-		}.bind(this, fileInfo);
-		// se-ts-ignore
-		void this._uploadCallBack;
+			uploadCallback(xmlHttp);
+		}.bind(this, this.#uploadCallBack.bind(this), fileInfo);
 
 		const result = await this.triggerEvent('onFileUploadBefore', {
 			info: fileInfo,
@@ -462,7 +454,7 @@ class ModalAnchorEditor extends EditorInjector {
 	 * @description Opens the `rel` attribute selection menu.
 	 */
 	#OnClick_relbutton() {
-		this.selectMenu_rel.open(this.options.get('_rtl') ? 'left-middle' : '');
+		this.#selectMenu_rel.open(this.options.get('_rtl') ? 'left-middle' : '');
 	}
 
 	/**
@@ -474,8 +466,8 @@ class ModalAnchorEditor extends EditorInjector {
 		item.id = id;
 		this.urlInput.value = '#' + id;
 
-		this._setLinkPreview(this.urlInput.value);
-		this.selectMenu_bookmark.close();
+		this.#setLinkPreview(this.urlInput.value);
+		this.#selectMenu_bookmark.close();
 		this.urlInput.focus();
 	}
 
@@ -497,32 +489,23 @@ class ModalAnchorEditor extends EditorInjector {
 	/**
 	 * @param {InputEvent} e - Event object
 	 */
-	#OnChange_displayInput(e) {
-		/** @type {HTMLInputElement} */
-		const eventTarget = dom.query.getEventTarget(e);
-		this._change = !!eventTarget.value.trim();
-	}
-
-	/**
-	 * @param {InputEvent} e - Event object
-	 */
 	#OnChange_urlInput(e) {
 		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		const value = eventTarget.value.trim();
-		this._setLinkPreview(value);
-		if (this._selfPathBookmark(value)) this._createBookmarkList(value);
-		else this.selectMenu_bookmark.close();
+		this.#setLinkPreview(value);
+		if (this.#selfPathBookmark(value)) this.#createBookmarkList(value);
+		else this.#selectMenu_bookmark.close();
 	}
 
 	#OnFocus_urlInput() {
 		const value = this.urlInput.value;
-		if (this._selfPathBookmark(value)) this._createBookmarkList(value);
+		if (this.#selfPathBookmark(value)) this.#createBookmarkList(value);
 	}
 
 	#OnClick_bookmarkButton() {
 		let url = this.urlInput.value;
-		if (this._selfPathBookmark(url)) {
+		if (this.#selfPathBookmark(url)) {
 			url = url.substring(1);
 			this.bookmark.style.display = 'none';
 			dom.utils.removeClass(this.bookmarkButton, 'active');
@@ -532,11 +515,11 @@ class ModalAnchorEditor extends EditorInjector {
 			dom.utils.addClass(this.bookmarkButton, 'active');
 			this.downloadCheck.checked = false;
 			this.download.style.display = 'none';
-			this._createBookmarkList(url);
+			this.#createBookmarkList(url);
 		}
 
 		this.urlInput.value = url;
-		this._setLinkPreview(url);
+		this.#setLinkPreview(url);
 		this.urlInput.focus();
 	}
 
@@ -548,9 +531,9 @@ class ModalAnchorEditor extends EditorInjector {
 		/** @type {HTMLInputElement} */
 		const eventTarget = dom.query.getEventTarget(e);
 		if (eventTarget.checked) {
-			this._setRel(this._relMerge(this.defaultRel.check_new_window));
+			this.#setRel(this.#relMerge(this.defaultRel.check_new_window));
 		} else {
-			this._setRel(this._relDelete(this.defaultRel.check_new_window));
+			this.#setRel(this.#relDelete(this.defaultRel.check_new_window));
 		}
 	}
 
@@ -566,12 +549,12 @@ class ModalAnchorEditor extends EditorInjector {
 			dom.utils.removeClass(this.bookmarkButton, 'active');
 			this.linkValue = this.preview.textContent = this.urlInput.value = this.urlInput.value.replace(/^#+/, '');
 			if (typeof this.defaultRel.check_bookmark === 'string') {
-				this._setRel(this._relMerge(this.defaultRel.check_bookmark));
+				this.#setRel(this.#relMerge(this.defaultRel.check_bookmark));
 			}
 		} else {
 			this.download.style.display = 'none';
 			if (typeof this.defaultRel.check_bookmark === 'string') {
-				this._setRel(this._relDelete(this.defaultRel.check_bookmark));
+				this.#setRel(this.#relDelete(this.defaultRel.check_bookmark));
 			}
 		}
 	}

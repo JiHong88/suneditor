@@ -40,6 +40,15 @@ const INDEX_1 = '2147483640';
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  */
 class Controller extends EditorInjector {
+	#reserveIndex;
+	#initMethod;
+	#globalEventHandlers;
+	#bindClose_key;
+	#bindClose_mouse;
+	#addOffset;
+	#shadowRootEventForm;
+	#shadowRootEventListener;
+
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -67,16 +76,17 @@ class Controller extends EditorInjector {
 		this.isInsideForm = !!params.isInsideForm;
 		this.isOutsideForm = !!params.isOutsideForm;
 		this.toTop = false;
-		this._reserveIndex = false;
-		this._initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
-		this.__globalEventHandlers = { keydown: this.#CloseListener_keydown.bind(this), mousedown: this.#CloseListener_mousedown.bind(this) };
-		this._bindClose_key = null;
-		this._bindClose_mouse = null;
 		/** @type {{left?: number, top?: number, addOfffset?: {left?: number, top?: number}}} */
 		this.__offset = {};
-		this.__addOffset = { left: 0, top: 0 };
-		this.__shadowRootEventForm = null;
-		this.__shadowRootEventListener = null;
+
+		this.#reserveIndex = false;
+		this.#initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
+		this.#globalEventHandlers = { keydown: this.#CloseListener_keydown.bind(this), mousedown: this.#CloseListener_mousedown.bind(this) };
+		this.#bindClose_key = null;
+		this.#bindClose_mouse = null;
+		this.#addOffset = { left: 0, top: 0 };
+		this.#shadowRootEventForm = null;
+		this.#shadowRootEventListener = null;
 
 		// add element
 		this.carrierWrapper.appendChild(element);
@@ -120,11 +130,11 @@ class Controller extends EditorInjector {
 
 		this.currentPositionTarget = positionTarget || target;
 		this.isWWTarget = isWWTarget ?? this.isWWTarget;
-		if (typeof initMethod === 'function') this._initMethod = initMethod;
+		if (typeof initMethod === 'function') this.#initMethod = initMethod;
 		this.editor.currentControllerName = this.kind;
 
-		this.__addOffset = { left: 0, top: 0 };
-		if (addOffset) this.__addOffset = { ...this.__addOffset, ...addOffset };
+		this.#addOffset = { left: 0, top: 0 };
+		if (addOffset) this.#addOffset = { ...this.#addOffset, ...addOffset };
 
 		const parents = this.isOutsideForm ? this.parents : [];
 		this.editor.opendControllers?.forEach((e) => {
@@ -137,14 +147,14 @@ class Controller extends EditorInjector {
 			});
 		}
 
-		this.__addGlobalEvent();
+		this.#addGlobalEvent();
 
 		// display controller
-		this._setControllerPosition(this.form, this.currentPositionTarget, false);
+		this.#setControllerPosition(this.form, this.currentPositionTarget, false);
 
 		const isRangeTarget = this.instanceCheck.isRange(target);
 		this.currentTarget = isRangeTarget ? null : target;
-		this._controllerOn(this.form, target, isRangeTarget);
+		this.#controllerOn(this.form, target, isRangeTarget);
 		this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 	}
 
@@ -159,12 +169,12 @@ class Controller extends EditorInjector {
 		this.toTop = false;
 		this.isOpen = false;
 		this.__offset = {};
-		this.__addOffset = { left: 0, top: 0 };
+		this.#addOffset = { left: 0, top: 0 };
 
-		this.__removeGlobalEvent();
+		this.#removeGlobalEvent();
 
-		if (typeof this._initMethod === 'function') this._initMethod();
-		this._controllerOff();
+		if (typeof this.#initMethod === 'function') this.#initMethod();
+		this.#controllerOff();
 
 		if (this.parentsHide && !force) {
 			this.parents.forEach((e) => {
@@ -188,7 +198,7 @@ class Controller extends EditorInjector {
 	 * @description Show controller
 	 */
 	show() {
-		this._setControllerPosition(this.form, this.currentPositionTarget, false);
+		this.#setControllerPosition(this.form, this.currentPositionTarget, false);
 	}
 
 	/**
@@ -205,17 +215,16 @@ class Controller extends EditorInjector {
 	 * @param {Node=} target
 	 */
 	resetPosition(target) {
-		this._setControllerPosition(this.form, target || this.currentPositionTarget, true);
+		this.#setControllerPosition(this.form, target || this.currentPositionTarget, true);
 	}
 
 	/**
-	 * @private
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
 	 * @param {HTMLFormElement} form Controller element
 	 * @param {Node|Range} target Controller target element
 	 * @param {boolean} isRangeTarget If the target is a Range, set it to true.
 	 */
-	async _controllerOn(form, target, isRangeTarget) {
+	async #controllerOn(form, target, isRangeTarget) {
 		/** @type {ControllerInfo} */
 		const info = {
 			position: this.position,
@@ -230,9 +239,9 @@ class Controller extends EditorInjector {
 
 		form.style.display = 'block';
 		if (this.editor._shadowRoot) {
-			this.__shadowRootEventForm = form;
-			this.__shadowRootEventListener = (e) => e.stopPropagation();
-			form.addEventListener('mousedown', this.__shadowRootEventListener);
+			this.#shadowRootEventForm = form;
+			this.#shadowRootEventListener = (e) => e.stopPropagation();
+			form.addEventListener('mousedown', this.#shadowRootEventListener);
 		}
 
 		this.editor._controllerTargetContext = this.frameContext.get('topArea');
@@ -248,10 +257,9 @@ class Controller extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Hide controller at editor area (link button, image resize button..)
 	 */
-	_controllerOff() {
+	#controllerOff() {
 		this.form.style.display = 'none';
 		this.editor.opendControllers = this.editor.opendControllers.filter((v) => v.form !== this.form);
 		if (this.editor.currentControllerName !== this.kind && this.editor.opendControllers.length > 0) return;
@@ -266,21 +274,20 @@ class Controller extends EditorInjector {
 		_w.setTimeout(() => {
 			this.editor.status.onSelected = false;
 		}, 0);
-		if (this.__shadowRootEventForm) {
-			this.__shadowRootEventForm.removeEventListener('mousedown', this.__shadowRootEventListener);
-			this.__shadowRootEventForm = this.__shadowRootEventListener = null;
+		if (this.#shadowRootEventForm) {
+			this.#shadowRootEventForm.removeEventListener('mousedown', this.#shadowRootEventListener);
+			this.#shadowRootEventForm = this.#shadowRootEventListener = null;
 		}
 		if (typeof this.inst.reset === 'function') this.inst.reset();
 	}
 
 	/**
-	 * @private
 	 * @description Specify the position of the controller.
 	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
 	 * @param {boolean} [skipAutoReposition=false] If true, skips scroll/resize-based automatic positioning logic.
 	 */
-	_setControllerPosition(controller, refer, skipAutoReposition) {
+	#setControllerPosition(controller, refer, skipAutoReposition) {
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
@@ -296,59 +303,56 @@ class Controller extends EditorInjector {
 			}
 		} else {
 			if (refer) {
-				const positionResult = this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this, sibling: this.sibling });
+				const positionResult = this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), { addOffset: this.#addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this, sibling: this.sibling });
 				if (!positionResult) {
 					this.hide();
 					return;
 				}
 
 				if (!skipAutoReposition && this.sibling && !this.siblingMain) {
-					const resetPosition = controller.offsetTop - this.__addOffset.top;
+					const resetPosition = controller.offsetTop - this.#addOffset.top;
 					if (positionResult.position === 'bottom') {
-						this._reserveIndex = true;
+						this.#reserveIndex = true;
 						controller.style.top = resetPosition + this.sibling.offsetHeight - 1 + 'px';
 					} else {
-						this._reserveIndex = false;
+						this.#reserveIndex = false;
 						controller.style.top = resetPosition - this.sibling.offsetHeight + 2 + 'px';
 					}
 				} else {
-					this._reserveIndex = false;
+					this.#reserveIndex = false;
 				}
 			}
 		}
 
-		controller.style.zIndex = this.toTop ? INDEX_0 : this._reserveIndex ? INDEX_S_1 : INDEX_1;
+		controller.style.zIndex = this.toTop ? INDEX_0 : this.#reserveIndex ? INDEX_S_1 : INDEX_1;
 		controller.style.visibility = '';
 	}
 
 	/**
-	 * @private
 	 * @description Adds global event listeners.
 	 * - When the controller is opened
 	 */
-	__addGlobalEvent() {
-		this.__removeGlobalEvent();
-		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers.keydown, true);
-		this._bindClose_mouse = this.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.__globalEventHandlers.mousedown, true);
+	#addGlobalEvent() {
+		this.#removeGlobalEvent();
+		this.#bindClose_key = this.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
+		this.#bindClose_mouse = this.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.#globalEventHandlers.mousedown, true);
 	}
 
 	/**
-	 * @private
 	 * @description Removes global event listeners.
 	 * - When the ESC key is pressed, the controller is closed.
 	 */
-	__removeGlobalEvent() {
+	#removeGlobalEvent() {
 		this.component.__removeGlobalEvent();
-		this._bindClose_key &&= this.eventManager.removeGlobalEvent(this._bindClose_key);
-		this._bindClose_mouse &&= this.eventManager.removeGlobalEvent(this._bindClose_mouse);
+		this.#bindClose_key &&= this.eventManager.removeGlobalEvent(this.#bindClose_key);
+		this.#bindClose_mouse &&= this.eventManager.removeGlobalEvent(this.#bindClose_mouse);
 	}
 
 	/**
-	 * @private
 	 * @description Checks if the controller is fixed and should not be closed.
 	 * @returns {boolean} True if the controller is fixed.
 	 */
-	_checkFixed() {
+	#checkFixed() {
 		if (this.editor.selectMenuOn) return true;
 
 		const cont = this.editor.opendControllers;
@@ -361,12 +365,11 @@ class Controller extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Checks if the given target is within a form or controller.
 	 * @param {Node} target The target element.
 	 * @returns {boolean} True if the target is inside a form or controller.
 	 */
-	_checkForm(target) {
+	#checkForm(target) {
 		if (dom.check.isWysiwygFrame(target)) return false;
 		if (dom.utils.hasClass(target, 'se-drag-handle')) return true;
 
@@ -415,20 +418,20 @@ class Controller extends EditorInjector {
 		if (this.parents.length > 0 && this.isInsideForm) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
-		eventTarget.style.zIndex = this.toTop ? INDEX_0 : this._reserveIndex ? INDEX_S_1 : INDEX_1;
+		eventTarget.style.zIndex = this.toTop ? INDEX_0 : this.#reserveIndex ? INDEX_S_1 : INDEX_1;
 	}
 
 	/**
 	 * @param {KeyboardEvent} e - Event object
 	 */
 	#CloseListener_keydown(e) {
-		if (this._checkFixed()) return;
+		if (this.#checkFixed()) return;
 		const keyCode = e.code;
 		const ctrl = keyCodeMap.isCtrl(e);
 		if (ctrl || !keyCodeMap.isNonResponseKey(keyCode)) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
-		if (this.form.contains(eventTarget) || this._checkForm(eventTarget)) return;
+		if (this.form.contains(eventTarget) || this.#checkForm(eventTarget)) return;
 		if (this.editor._fileManager.pluginRegExp.test(this.kind) && !keyCodeMap.isEsc(keyCode)) return;
 
 		this.#PostCloseEvent(eventTarget);
@@ -449,9 +452,9 @@ class Controller extends EditorInjector {
 		if (
 			eventTarget === this.inst._element ||
 			eventTarget === this.currentTarget ||
-			this._checkFixed() ||
+			this.#checkFixed() ||
 			this.form.contains(eventTarget) ||
-			this._checkForm(eventTarget) ||
+			this.#checkForm(eventTarget) ||
 			dom.query.getParentElement(eventTarget, '.se-line-breaker-component')
 		) {
 			return;

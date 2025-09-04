@@ -40,6 +40,11 @@ import ApiManager from './ApiManager';
  * @description File browser plugin
  */
 class Browser extends CoreInjector {
+	#loading;
+	#closeSignal;
+	#bindClose;
+	#globalEventHandler;
+
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -65,7 +70,7 @@ class Browser extends CoreInjector {
 		this.list = contentHTML.list;
 		this.side = contentHTML.side;
 		this.wrapper = contentHTML.wrapper;
-		this._loading = contentHTML._loading;
+		this.#loading = contentHTML._loading;
 
 		this.title = params.title;
 		this.listClass = params.listClass || 'se-preview-list';
@@ -84,33 +89,27 @@ class Browser extends CoreInjector {
 		this.icon_folder_item = this.icons.side_menu_folder;
 		this.icon_item = this.icons.side_menu_item;
 
-		/**
-		 * @type {Array<BrowserFile>}
-		 */
+		/** @type {Array<BrowserFile>} */
 		this.items = [];
-		/**
-		 * @type {Object<string, {name: string, meta: Object<string, *>}>}
-		 */
+		/** @type {Object<string, {name: string, meta: Object<string, *>}>} */
 		this.folders = {};
-		/**
-		 * @type {Object<string, {key?: string, name?: string, children?: *}>}
-		 */
+		/** @type {Object<string, {key?: string, name?: string, children?: *}>} */
 		this.tree = {};
-		/**
-		 * @type {BrowserFile}
-		 */
+		/** @type {BrowserFile} */
 		this.data = {};
 		this.selectedTags = [];
 		this.keyword = '';
 		this.sideInner = null;
-		this._closeSignal = false;
-		this._bindClose = null;
-		this.__globalEventHandler = (e) => {
+
+		// api manager
+		this.apiManager = new ApiManager(this, { method: 'GET' });
+
+		this.#closeSignal = false;
+		this.#bindClose = null;
+		this.#globalEventHandler = (e) => {
 			if (!keyCodeMap.isEsc(e.code)) return;
 			this.close();
 		};
-		// api manager
-		this.apiManager = new ApiManager(this, { method: 'GET' });
 
 		// init
 		browserFrame.appendChild(dom.utils.createElement('DIV', { class: 'se-browser-back' }));
@@ -136,7 +135,7 @@ class Browser extends CoreInjector {
 	 * @param {Object<string, string>=} params.urlHeader - File server http header. If not, use "this.urlHeader".
 	 */
 	open(params = {}) {
-		this.__addGlobalEvent();
+		this.#addGlobalEvent();
 
 		const listClassName = params.listClass || this.listClass;
 		if (!dom.utils.hasClass(this.list, listClassName)) {
@@ -149,9 +148,9 @@ class Browser extends CoreInjector {
 		this.closeArrow = this.options.get('_rtl') ? this.icons.menu_arrow_left : this.icons.menu_arrow_right;
 
 		if (this.directData) {
-			this.__drowItems(this.directData);
+			this.#drowItems(this.directData);
 		} else {
-			this._drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
+			this.#drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
 		}
 
 		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.editor.offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
@@ -162,7 +161,7 @@ class Browser extends CoreInjector {
 	 * - The plugin's "init" method is called.
 	 */
 	close() {
-		this.__removeGlobalEvent();
+		this.#removeGlobalEvent();
 		this.apiManager.cancel();
 
 		this.area.style.display = 'none';
@@ -186,10 +185,10 @@ class Browser extends CoreInjector {
 	search(keyword) {
 		if (this.searchUrl) {
 			this.keyword = keyword;
-			this._drawFileList(this.searchUrl + '?keyword=' + keyword, this.searchUrlHeader, false);
+			this.#drawFileList(this.searchUrl + '?keyword=' + keyword, this.searchUrlHeader, false);
 		} else {
 			this.keyword = keyword.toLowerCase();
-			this._drawListItem(this.items, false);
+			this.#drawListItem(this.items, false);
 		}
 	}
 
@@ -207,24 +206,23 @@ class Browser extends CoreInjector {
 	 * @description Show file browser loading box
 	 */
 	showBrowserLoading() {
-		this._loading.style.display = 'block';
+		this.#loading.style.display = 'block';
 	}
 
 	/**
 	 * @description Close file browser loading box
 	 */
 	closeBrowserLoading() {
-		this._loading.style.display = 'none';
+		this.#loading.style.display = 'none';
 	}
 
 	/**
-	 * @private
 	 * @description Fetches the file list from the server.
 	 * @param {string} url - The file server URL.
 	 * @param {Object<string, string>} urlHeader - The HTTP headers for the request.
 	 * @param {boolean} pageLoading - Indicates if this is a paginated request.
 	 */
-	_drawFileList(url, urlHeader, pageLoading) {
+	#drawFileList(url, urlHeader, pageLoading) {
 		this.apiManager.call({ method: 'GET', url, headers: urlHeader, callBack: this.#CallBackGet.bind(this), errorCallBack: this.#CallBackError.bind(this) });
 		if (!pageLoading) {
 			this.sideOpenBtn.style.display = 'none';
@@ -233,12 +231,11 @@ class Browser extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Updates the displayed list of file items.
 	 * @param {Array<BrowserFile>} items - The file items to display.
 	 * @param {boolean} update - Whether to update the tags.
 	 */
-	_drawListItem(items, update) {
+	#drawListItem(items, update) {
 		const keyword = this.keyword;
 		items = this.tagfilter(items).filter((item) => item.name.toLowerCase().indexOf(keyword) > -1);
 
@@ -283,41 +280,38 @@ class Browser extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Adds a global event listener for closing the browser.
 	 */
-	__addGlobalEvent() {
-		this.__removeGlobalEvent();
-		this._bindClose = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler, true);
+	#addGlobalEvent() {
+		this.#removeGlobalEvent();
+		this.#bindClose = this.eventManager.addGlobalEvent('keydown', this.#globalEventHandler, true);
 	}
 
 	/**
-	 * @private
 	 * @description Removes the global event listener for closing the browser.
 	 */
-	__removeGlobalEvent() {
-		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
+	#removeGlobalEvent() {
+		this.#bindClose &&= this.eventManager.removeGlobalEvent(this.#bindClose);
 	}
 
 	/**
-	 * @private
 	 * @description Renders the file items or folder structure from data.
 	 * @param {BrowserFile[]|BrowserFile} data - The data representing the file structure.
 	 * @returns {boolean} True if rendering was successful, false otherwise.
 	 */
-	__drowItems(data) {
+	#drowItems(data) {
 		if (Array.isArray(data)) {
 			if (data.length > 0) {
-				this._drawListItem(data, true);
+				this.#drawListItem(data, true);
 			}
 			return true;
 		} else if (typeof data === 'object') {
 			this.sideOpenBtn.style.display = '';
-			this.__parseFolderData(data);
+			this.#parseFolderData(data);
 
 			this.side.innerHTML = '';
 			const sideInner = (this.sideInner = dom.utils.createElement('div', null));
-			this.__createFolderList(this.tree, sideInner);
+			this.#createFolderList(this.tree, sideInner);
 			this.side.appendChild(sideInner);
 
 			if (this.folderDefaultPath) {
@@ -335,12 +329,11 @@ class Browser extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Parses folder data into a structured format.
 	 * @param {BrowserFile} data - The folder data.
 	 * @param {string} [path] - The current path in the folder hierarchy.
 	 */
-	__parseFolderData(data, path) {
+	#parseFolderData(data, path) {
 		let current = this.tree;
 
 		// _data
@@ -378,17 +371,16 @@ class Browser extends CoreInjector {
 				meta: v.meta || {}
 			};
 
-			this.__parseFolderData(v, currentPath);
+			this.#parseFolderData(v, currentPath);
 		});
 	}
 
 	/**
-	 * @private
 	 * @description Creates a nested folder list from parsed data.
 	 * @param {BrowserFile[]|BrowserFile} folderData - The structured folder data.
 	 * @param {HTMLElement} parentElement - The parent element to append folder structure to.
 	 */
-	__createFolderList(folderData, parentElement) {
+	#createFolderList(folderData, parentElement) {
 		for (const key in folderData) {
 			const item = folderData[key];
 			if (!item) continue;
@@ -404,7 +396,7 @@ class Browser extends CoreInjector {
 				folderLabel.insertBefore(dom.utils.createElement('button', null, this.closeArrow), folderLabel.firstElementChild);
 				const childContainer = document.createElement('div');
 				dom.utils.addClass(childContainer, 'se-menu-child|se-menu-hidden');
-				this.__createFolderList(item.children, childContainer);
+				this.#createFolderList(item.children, childContainer);
 				folderDiv.appendChild(childContainer);
 
 				parentElement.appendChild(folderDiv);
@@ -427,7 +419,7 @@ class Browser extends CoreInjector {
 		try {
 			const res = JSON.parse(xmlHttp.responseText);
 			const data = res.result;
-			if (this.__drowItems(data)) return;
+			if (this.#drowItems(data)) return;
 
 			if (res.nullMessage) {
 				this.list.innerHTML = res.nullMessage;
@@ -467,7 +459,7 @@ class Browser extends CoreInjector {
 			dom.utils.addClass(selectTag, 'on');
 		}
 
-		this._drawListItem(this.items, false);
+		this.#drawListItem(this.items, false);
 	}
 
 	/**
@@ -517,9 +509,9 @@ class Browser extends CoreInjector {
 		this.tagArea.innerHTML = '';
 
 		if (typeof data === 'string') {
-			this._drawFileList(data, this.urlHeader, true);
+			this.#drawFileList(data, this.urlHeader, true);
 		} else {
-			this._drawListItem(data, false);
+			this.#drawListItem(data, false);
 		}
 	}
 
@@ -529,9 +521,9 @@ class Browser extends CoreInjector {
 	#OnMouseDown_browser(e) {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (/se-browser-inner/.test(eventTarget.className)) {
-			this._closeSignal = true;
+			this.#closeSignal = true;
 		} else {
-			this._closeSignal = false;
+			this.#closeSignal = false;
 		}
 	}
 
@@ -542,7 +534,7 @@ class Browser extends CoreInjector {
 		const eventTarget = dom.query.getEventTarget(e);
 		e.stopPropagation();
 
-		if (/close/.test(eventTarget.getAttribute('data-command')) || this._closeSignal) {
+		if (/close/.test(eventTarget.getAttribute('data-command')) || this.#closeSignal) {
 			this.close();
 		}
 	}

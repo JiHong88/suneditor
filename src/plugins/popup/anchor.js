@@ -22,6 +22,9 @@ class Anchor extends EditorInjector {
 		return dom.check.isAnchor(node) && node.hasAttribute('id') && node.hasAttribute('data-se-anchor') ? node : null;
 	}
 
+	#element;
+	#range;
+
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
@@ -36,8 +39,6 @@ class Anchor extends EditorInjector {
 		const parser = new DOMParser();
 		const svgDoc = parser.parseFromString(this.icons.bookmark_anchor, 'image/svg+xml');
 		this.bookmarkIcon = svgDoc.documentElement;
-		this._element = null;
-		this._range = null;
 
 		// controller
 		const controllerSelectEl = CreateHTML_controller_select(this);
@@ -47,6 +48,9 @@ class Anchor extends EditorInjector {
 		const controllerEl = CreateHTML_controller(this);
 		this.inputEl = controllerEl.querySelector('input');
 		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true }, Anchor.key);
+
+		this.#element = null;
+		this.#range = null;
 	}
 
 	/**
@@ -54,7 +58,7 @@ class Anchor extends EditorInjector {
 	 * @description Displays a popup and gives focus to the input field.
 	 */
 	show() {
-		this.controller.open((this._range = this.selection.getRange()));
+		this.controller.open((this.#range = this.selection.getRange()));
 		_w.setTimeout(() => {
 			this.inputEl.focus();
 		}, 0);
@@ -66,7 +70,7 @@ class Anchor extends EditorInjector {
 	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
-		this._element = target;
+		this.#element = target;
 		this.displayId.textContent = target.getAttribute('id');
 		this.controllerSelect.open(target);
 	}
@@ -76,7 +80,7 @@ class Anchor extends EditorInjector {
 	 * @description Called when a container is deselected.
 	 */
 	deselect() {
-		this._init();
+		this.#init();
 	}
 
 	/**
@@ -87,7 +91,7 @@ class Anchor extends EditorInjector {
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
 		if (!command) return;
-		const currentElement = this._element;
+		const currentElement = this.#element;
 
 		switch (command) {
 			case 'submit': {
@@ -117,7 +121,7 @@ class Anchor extends EditorInjector {
 						this.component.select(a, Anchor.key);
 					}
 
-					this._init();
+					this.#init();
 				} else {
 					currentElement.id = this.inputEl.value;
 					this.component.select(currentElement, Anchor.key);
@@ -127,11 +131,11 @@ class Anchor extends EditorInjector {
 			}
 			case 'cancel': {
 				this.controller.close(!currentElement);
-				if (this._range) {
-					this.selection.setRange(this._range);
+				if (this.#range) {
+					this.selection.setRange(this.#range);
 				}
 
-				this._init();
+				this.#init();
 				if (currentElement) {
 					this.select(currentElement);
 				}
@@ -156,7 +160,7 @@ class Anchor extends EditorInjector {
 					this.selection.setRange(r.container, r.offset, r.container, r.offset);
 				}
 
-				this._init();
+				this.#init();
 
 				break;
 			}
@@ -164,13 +168,12 @@ class Anchor extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Initializes state variables.
 	 * - called when the popup is closed
 	 */
-	_init() {
-		this._element = null;
-		this._range = null;
+	#init() {
+		this.#element = null;
+		this.#range = null;
 		this.inputEl.value = '';
 		this.displayId.textContent = '';
 	}

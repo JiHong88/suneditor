@@ -16,6 +16,9 @@ import { env } from '../helper';
  * @description API Manager
  */
 class ApiManager {
+	/** @type {XMLHttpRequest} */
+	#xhr;
+
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -41,7 +44,7 @@ class ApiManager {
 		this.kind = inst.constructor.key || inst.constructor.name;
 
 		// members
-		this._xhr = env.getXMLHttpRequest();
+		this.#xhr = env.getXMLHttpRequest();
 		// members - option
 		this.method = params?.method;
 		this.url = params?.url;
@@ -60,14 +63,14 @@ class ApiManager {
 		this.cancel();
 
 		method ||= this.method;
-		url = this._normalizeUrl(url || this.url);
+		url = this.#normalizeUrl(url || this.url);
 		headers ||= this.headers;
 		data ||= this.data;
 		callBack ||= this.callBack;
 		errorCallBack ||= this.errorCallBack;
 		responseType ||= this.responseType;
 
-		const xhr = this._xhr;
+		const xhr = this.#xhr;
 		if (responseType) xhr.responseType = responseType;
 		xhr.onreadystatechange = CallBackApi.bind(this, xhr, callBack, errorCallBack);
 		xhr.open(method, url, true);
@@ -94,12 +97,12 @@ class ApiManager {
 		this.cancel();
 
 		method ||= this.method;
-		url = this._normalizeUrl(url || this.url);
+		url = this.#normalizeUrl(url || this.url);
 		headers ||= this.headers;
 		data ||= this.data;
 		responseType ||= this.responseType;
 
-		const xhr = this._xhr;
+		const xhr = this.#xhr;
 		if (responseType) xhr.responseType = responseType;
 
 		return new Promise((resolve, reject) => {
@@ -138,16 +141,15 @@ class ApiManager {
 	 * @description Cancel API (xhr.abort())
 	 */
 	cancel() {
-		if (this._xhr) this._xhr.abort();
+		if (this.#xhr) this.#xhr.abort();
 	}
 
 	/**
-	 * @private
 	 * @description Remove unnecessary slashes in API URL.
 	 * @param {string} url url
 	 * @returns
 	 */
-	_normalizeUrl(url) {
+	#normalizeUrl(url) {
 		return url.replace(/([^:])\/+/g, '$1/').replace(/\/(\?|#|$)/, '$1');
 	}
 }

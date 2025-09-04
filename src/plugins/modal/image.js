@@ -59,6 +59,22 @@ class Image_ extends EditorInjector {
 		return /^IMG$/i.test(compNode?.nodeName) ? compNode : dom.check.isAnchor(compNode) && /^IMG$/i.test(compNode?.firstElementChild?.nodeName) ? compNode?.firstElementChild : null;
 	}
 
+	#produceIndex;
+	#linkElement;
+	#linkValue;
+	#align;
+	#svgDefaultSize;
+	#element;
+	#cover;
+	#container;
+	#caption;
+	#ratio;
+	#origin_w;
+	#origin_h;
+	#resizing;
+	#onlyPercentage;
+	#nonResizing;
+
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
@@ -110,13 +126,9 @@ class Image_ extends EditorInjector {
 		// modules
 		const Link = this.plugins.link ? this.plugins.link.pluginOptions : {};
 		this.anchor = new ModalAnchorEditor(this, modalEl.html, {
+			...Link,
 			textToDisplay: false,
-			title: true,
-			openNewWindow: Link.openNewWindow,
-			relList: Link.relList,
-			defaultRel: Link.defaultRel,
-			noAutoPrefix: Link.noAutoPrefix,
-			enableFileUpload: pluginOptions.linkEnableFileUpload
+			title: true
 		});
 		this.modal = new Modal(this, modalEl.html);
 		this.figure = new Figure(this, figureControls, {
@@ -142,24 +154,23 @@ class Image_ extends EditorInjector {
 		this.proportion = null;
 		this.inputX = null;
 		this.inputY = null;
-		this._linkElement = null;
-		this._linkValue = '';
-		this._align = 'none';
-		this._svgDefaultSize = '30%';
 		this._base64RenderIndex = 0;
-		this._element = null;
-		this._cover = null;
-		this._container = null;
-		this._caption = null;
-		this._ratio = {
-			w: 0,
-			h: 0
-		};
-		this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-		this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
-		this._resizing = this.pluginOptions.canResize;
-		this._onlyPercentage = this.pluginOptions.percentageOnlySize;
-		this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
+
+		this.#produceIndex = 0;
+		this.#linkElement = null;
+		this.#linkValue = '';
+		this.#align = 'none';
+		this.#svgDefaultSize = '30%';
+		this.#element = null;
+		this.#cover = null;
+		this.#container = null;
+		this.#caption = null;
+		this.#ratio = { w: 0, h: 0 };
+		this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+		this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+		this.#resizing = this.pluginOptions.canResize;
+		this.#onlyPercentage = this.pluginOptions.percentageOnlySize;
+		this.#nonResizing = !this.#resizing || !this.pluginOptions.showHeightInput || this.#onlyPercentage;
 
 		// init
 		this.eventManager.addEvent(modalEl.tabs, 'click', this.#OpenTab.bind(this));
@@ -170,7 +181,7 @@ class Image_ extends EditorInjector {
 		const galleryButton = modalEl.galleryButton;
 		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
-		if (this._resizing) {
+		if (this.#resizing) {
 			this.proportion = modalEl.proportion;
 			this.inputX = modalEl.inputX;
 			this.inputY = modalEl.inputY;
@@ -199,6 +210,7 @@ class Image_ extends EditorInjector {
 	 * @description Executes the method that is called when a "Modal" module's is opened.
 	 */
 	open() {
+		this.#produceIndex = 0;
 		this.modal.open();
 	}
 
@@ -217,9 +229,9 @@ class Image_ extends EditorInjector {
 	 */
 	on(isUpdate) {
 		if (!isUpdate) {
-			if (this._resizing) {
-				this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-				this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+			if (this.#resizing) {
+				this.inputX.value = this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+				this.inputY.value = this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 			}
 			if (this.imgInputFile && this.pluginOptions.allowMultiple) this.imgInputFile.setAttribute('multiple', 'multiple');
 		} else {
@@ -253,17 +265,17 @@ class Image_ extends EditorInjector {
 	 * @returns {Promise<boolean>} Success or failure
 	 */
 	async modalAction() {
-		this._align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked')).value;
+		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked')).value;
 
 		if (this.modal.isUpdate) {
-			this._update(this.inputX?.value, this.inputY?.value);
+			this.#fixTagStructure(this.inputX?.value, this.inputY?.value);
 			this.history.push(false);
 		}
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
 			return await this.submitFile(this.imgInputFile.files);
-		} else if (this.imgUrlFile && this._linkValue.length > 0) {
-			return await this.submitURL(this._linkValue);
+		} else if (this.imgUrlFile && this.#linkValue.length > 0) {
+			return await this.submitURL(this.#linkValue);
 		}
 
 		return false;
@@ -287,8 +299,8 @@ class Image_ extends EditorInjector {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && (figureInfo.cover || figureInfo.inlineCover)) return;
 
-				const { w, h } = this._ready(element, true);
-				this._fileCheck(w, h);
+				const { w, h } = this.#ready(element, true);
+				this.#fileCheck(w, h);
 			}
 		};
 	}
@@ -300,7 +312,7 @@ class Image_ extends EditorInjector {
 	init() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
 		if (this.imgInputFile) this.imgInputFile.value = '';
-		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = '';
+		if (this.imgUrlFile) this.#linkValue = this.previewSrc.textContent = this.imgUrlFile.value = '';
 		if (this.imgInputFile && this.imgUrlFile) {
 			this.imgUrlFile.disabled = false;
 			this.previewSrc.style.textDecoration = '';
@@ -309,21 +321,21 @@ class Image_ extends EditorInjector {
 		this.altText.value = '';
 		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
 		this.captionCheckEl.checked = false;
-		this._element = null;
-		this._ratio = {
+		this.#element = null;
+		this.#ratio = {
 			w: 0,
 			h: 0
 		};
 		this.#OpenTab('init');
 
-		if (this._resizing) {
+		if (this.#resizing) {
 			this.inputX.value = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
 			this.inputY.value = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.checked = true;
 		}
 
 		if (this.pluginOptions.useFormatType) {
-			this._activeAsInline((this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline');
+			this.#activeAsInline((this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline');
 		}
 
 		this.anchor.init();
@@ -335,67 +347,7 @@ class Image_ extends EditorInjector {
 	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
-		this._ready(target);
-	}
-
-	/**
-	 * @private
-	 * @description Prepares the component for selection.
-	 * - Ensures that the controller is properly positioned and initialized.
-	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {HTMLElement} target - The selected element.
-	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
-	 * @returns {{w: string, h: string}} - The width and height of the component.
-	 */
-	_ready(target, infoOnly = false) {
-		if (!target) return;
-		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
-		this.anchor.set(dom.check.isAnchor(target.parentNode) ? target.parentNode : null);
-
-		this._linkElement = this.anchor.currentTarget;
-		this._element = target;
-		this._cover = figureInfo.cover;
-		this._container = figureInfo.container;
-		this._caption = figureInfo.caption;
-		this._align = figureInfo.align;
-		target.style.float = '';
-
-		this._origin_w = String(figureInfo.originWidth || figureInfo.w || '');
-		this._origin_h = String(figureInfo.originHeight || figureInfo.h || '');
-		this.altText.value = this._element.alt;
-
-		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this._element.src;
-
-		/** @type {HTMLInputElement} */
-		const activeAlign = this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]');
-		activeAlign.checked = true;
-		this.captionCheckEl.checked = !!this._caption;
-
-		const { dw, dh } = this.figure.getSize(target);
-
-		if (!this._resizing) return { w: dw, h: dh };
-
-		this.inputX.value = dw === 'auto' ? '' : dw;
-		this.inputY.value = dh === 'auto' ? '' : dh;
-
-		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
-		this.proportion.checked = true;
-		this.inputX.disabled = percentageRotation ? true : false;
-		this.inputY.disabled = percentageRotation ? true : false;
-		this.proportion.disabled = percentageRotation ? true : false;
-
-		this._ratio = this.proportion.checked
-			? figureInfo.ratio
-			: {
-					w: 0,
-					h: 0
-			  };
-
-		if (this.pluginOptions.useFormatType) {
-			this._activeAsInline(this.component.isInline(figureInfo.container));
-		}
-
-		return { w: dw, h: dh };
+		this.#ready(target);
 	}
 
 	/**
@@ -405,12 +357,12 @@ class Image_ extends EditorInjector {
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
-		const targetEl = target || this._element;
+		const targetEl = target || this.#element;
 		const container = dom.query.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 
-		const message = await this.triggerEvent('onImageDeleteBefore', { element: targetEl, container, align: this._align, alt: this.altText.value, url: this._linkValue });
+		const message = await this.triggerEvent('onImageDeleteBefore', { element: targetEl, container, align: this.#align, alt: this.altText.value, url: this.#linkValue });
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
@@ -429,48 +381,6 @@ class Image_ extends EditorInjector {
 		// focus
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
-	}
-
-	/**
-	 * @private
-	 * @description Retrieves the current image information.
-	 * @returns {*} - The image data.
-	 */
-	_getInfo() {
-		return {
-			element: this._element,
-			anchor: this.anchor.create(true),
-			inputWidth: this.inputX?.value || '',
-			inputHeight: this.inputY?.value || '',
-			align: this._align,
-			isUpdate: this.modal.isUpdate,
-			alt: this.altText.value
-		};
-	}
-
-	/**
-	 * @private
-	 * @description Toggles between block and inline image format.
-	 * @param {boolean} isInline - Whether the image should be inline.
-	 */
-	_activeAsInline(isInline) {
-		if (isInline) {
-			dom.utils.addClass(this.asInline, 'on');
-			dom.utils.removeClass(this.asBlock, 'on');
-			this.as = 'inline';
-			// buttns
-			if (this.alignForm) this.alignForm.style.display = 'none';
-			// caption
-			if (this.captionEl) this.captionEl.style.display = 'none';
-		} else {
-			dom.utils.addClass(this.asBlock, 'on');
-			dom.utils.removeClass(this.asInline, 'on');
-			this.as = 'block';
-			// buttns
-			if (this.alignForm) this.alignForm.style.display = '';
-			// caption
-			if (this.captionEl) this.captionEl.style.display = '';
-		}
 	}
 
 	/**
@@ -523,13 +433,11 @@ class Image_ extends EditorInjector {
 			return false;
 		}
 
-		const imgInfo = { files, ...this._getInfo() };
-		const handler = function (infos, newInfos) {
+		const imgInfo = { files, ...this.#getInfo() };
+		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
-			this._serverUpload(infos, infos.files);
-		}.bind(this, imgInfo);
-		// se-ts-ignore
-		this._serverUpload;
+			uploadCallback(infos, infos.files);
+		}.bind(this, this.#serverUpload.bind(this), imgInfo);
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
 			info: imgInfo,
@@ -549,21 +457,19 @@ class Image_ extends EditorInjector {
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	async submitURL(url) {
-		if (!(url ||= this._linkValue)) return false;
+		if (!(url ||= this.#linkValue)) return false;
 
 		const file = { name: url.split('/').pop(), size: 0 };
 		const imgInfo = {
 			url,
 			files: file,
-			...this._getInfo()
+			...this.#getInfo()
 		};
 
-		const handler = function (infos, newInfos) {
+		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
-			const infoUrl = infos.url;
-			if (this.modal.isUpdate) this._updateSrc(infoUrl, infos.element, infos.files);
-			else this._produce(infoUrl, infos.anchor, infos.inputWidth, infos.inputHeight, infos.align, infos.files, infos.alt);
-		}.bind(this, imgInfo);
+			uploadCallback(infos);
+		}.bind(this, this.#urlUpload.bind(this), imgInfo);
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
 			info: imgInfo,
@@ -580,25 +486,204 @@ class Image_ extends EditorInjector {
 	}
 
 	/**
-	 * @private
+	 * @description Creates a new image component, wraps it in a figure container with an optional anchor,
+	 * - applies size and alignment settings, and inserts it into the editor.
+	 * @param {string} src - The URL of the image to be inserted.
+	 * @param {?Node} anchor - An optional anchor element to wrap the image. If provided, a clone is used.
+	 * @param {string} width - The width value to be applied to the image.
+	 * @param {string} height - The height value to be applied to the image.
+	 * @param {string} align - The alignment setting for the image (e.g., 'left', 'center', 'right').
+	 * @param {{name: string, size: number}} file - File metadata associated with the image
+	 * @param {string} alt - The alternative text for the image.
+	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
+	 */
+	create(src, anchor, width, height, align, file, alt, isLast) {
+		/** @type {HTMLImageElement} */
+		const oImg = dom.utils.createElement('IMG');
+		oImg.src = src;
+		oImg.alt = alt;
+		anchor = this.#setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
+
+		const figureInfo = Figure.CreateContainer(anchor, 'se-image-container');
+		const cover = figureInfo.cover;
+		const container = figureInfo.container;
+
+		// caption
+		if (this.captionCheckEl.checked) {
+			this.#caption = Figure.CreateCaption(cover, this.lang.caption);
+		}
+
+		this.#element = oImg;
+		this.#cover = cover;
+		this.#container = container;
+		this.figure.open(oImg, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+
+		// set size
+		this.#applySize(width, height);
+
+		// align
+		this.figure.setAlign(oImg, align);
+
+		this.fileManager.setFileData(oImg, file);
+
+		this.#produceIndex++;
+		oImg.onload = this.#OnloadImg.bind(this, oImg, this.#svgDefaultSize, container);
+		this.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? null : 'line' });
+	}
+
+	/**
+	 * @description Creates a new inline image component, wraps it in an inline figure container with an optional anchor,
+	 * - applies size settings, and inserts it into the editor.
+	 * @param {string} src - The URL of the image to be inserted.
+	 * @param {?Node} anchor - An optional anchor element to wrap the image. If provided, a clone is used.
+	 * @param {string} width - The width value to be applied to the image.
+	 * @param {string} height - The height value to be applied to the image.
+	 * @param {{name: string, size: number}} file - File metadata associated with the image
+	 * @param {string} alt - The alternative text for the image.
+	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
+	 */
+	createInline(src, anchor, width, height, file, alt, isLast) {
+		/** @type {HTMLImageElement} */
+		const oImg = dom.utils.createElement('IMG');
+		oImg.src = src;
+		oImg.alt = alt;
+		anchor = this.#setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
+
+		const figureInfo = Figure.CreateInlineContainer(anchor, 'se-image-container');
+		const container = figureInfo.container;
+
+		this.#element = oImg;
+		this.#container = container;
+		this.figure.open(oImg, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
+
+		// set size
+		this.#applySize(width, height);
+
+		this.fileManager.setFileData(oImg, file);
+
+		this.#produceIndex++;
+		oImg.onload = this.#OnloadImg.bind(this, oImg, this.#svgDefaultSize, container);
+		this.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? null : 'line' });
+	}
+
+	/**
+	 * @description Prepares the component for selection.
+	 * - Ensures that the controller is properly positioned and initialized.
+	 * - Prevents duplicate event handling if the component is already selected.
+	 * @param {HTMLElement} target - The selected element.
+	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
+	 * @returns {{w: string, h: string}} - The width and height of the component.
+	 */
+	#ready(target, infoOnly = false) {
+		if (!target) return;
+		const figureInfo = this.figure.open(target, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly });
+		this.anchor.set(dom.check.isAnchor(target.parentNode) ? target.parentNode : null);
+
+		this.#linkElement = this.anchor.currentTarget;
+		this.#element = target;
+		this.#cover = figureInfo.cover;
+		this.#container = figureInfo.container;
+		this.#caption = figureInfo.caption;
+		this.#align = figureInfo.align;
+		target.style.float = '';
+
+		this.#origin_w = String(figureInfo.originWidth || figureInfo.w || '');
+		this.#origin_h = String(figureInfo.originHeight || figureInfo.h || '');
+		this.altText.value = this.#element.alt;
+
+		if (this.imgUrlFile) this.#linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this.#element.src;
+
+		/** @type {HTMLInputElement} */
+		const activeAlign = this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this.#align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]');
+		activeAlign.checked = true;
+		this.captionCheckEl.checked = !!this.#caption;
+
+		const { dw, dh } = this.figure.getSize(target);
+
+		if (!this.#resizing) return { w: dw, h: dh };
+
+		this.inputX.value = dw === 'auto' ? '' : dw;
+		this.inputY.value = dh === 'auto' ? '' : dh;
+
+		const percentageRotation = this.#onlyPercentage && this.figure.isVertical;
+		this.proportion.checked = true;
+		this.inputX.disabled = percentageRotation ? true : false;
+		this.inputY.disabled = percentageRotation ? true : false;
+		this.proportion.disabled = percentageRotation ? true : false;
+
+		this.#ratio = this.proportion.checked
+			? figureInfo.ratio
+			: {
+					w: 0,
+					h: 0
+			  };
+
+		if (this.pluginOptions.useFormatType) {
+			this.#activeAsInline(this.component.isInline(figureInfo.container));
+		}
+
+		return { w: dw, h: dh };
+	}
+
+	/**
+	 * @description Retrieves the current image information.
+	 * @returns {*} - The image data.
+	 */
+	#getInfo() {
+		return {
+			element: this.#element,
+			anchor: this.anchor.create(true),
+			inputWidth: this.inputX?.value || '',
+			inputHeight: this.inputY?.value || '',
+			align: this.#align,
+			isUpdate: this.modal.isUpdate,
+			alt: this.altText.value
+		};
+	}
+
+	/**
+	 * @description Toggles between block and inline image format.
+	 * @param {boolean} isInline - Whether the image should be inline.
+	 */
+	#activeAsInline(isInline) {
+		if (isInline) {
+			dom.utils.addClass(this.asInline, 'on');
+			dom.utils.removeClass(this.asBlock, 'on');
+			this.as = 'inline';
+			// buttns
+			if (this.alignForm) this.alignForm.style.display = 'none';
+			// caption
+			if (this.captionEl) this.captionEl.style.display = 'none';
+		} else {
+			dom.utils.addClass(this.asBlock, 'on');
+			dom.utils.removeClass(this.asInline, 'on');
+			this.as = 'block';
+			// buttns
+			if (this.alignForm) this.alignForm.style.display = '';
+			// caption
+			if (this.captionEl) this.captionEl.style.display = '';
+		}
+	}
+
+	/**
 	 * @description Updates the selected image size, alt text, and caption.
 	 * @param {string} width - New image width.
 	 * @param {string} height - New image height.
 	 */
-	_update(width, height) {
+	#fixTagStructure(width, height) {
 		width ||= this.inputX?.value || 'auto';
 		height ||= this.inputY?.value || 'auto';
 
-		let imageEl = this._element;
+		let imageEl = this.#element;
 
 		// as (block | inline)
-		if ((this.as === 'block' && !this._cover) || (this.as === 'inline' && this._cover)) {
+		if ((this.as === 'block' && !this.#cover) || (this.as === 'inline' && this.#cover)) {
 			imageEl = this.figure.convertAsFormat(imageEl, this.as);
 		}
 
 		// --- update image ---
-		const cover = this._cover;
-		const container = this._container === this._cover ? null : this._container;
+		const cover = this.#cover;
+		const container = this.#container === this.#cover ? null : this.#container;
 
 		// check size
 		let changeSize;
@@ -616,14 +701,14 @@ class Image_ extends EditorInjector {
 		// caption
 		let modifiedCaption = false;
 		if (this.captionCheckEl.checked) {
-			if (!this._caption) {
-				this._caption = Figure.CreateCaption(cover, this.lang.caption);
+			if (!this.#caption) {
+				this.#caption = Figure.CreateCaption(cover, this.lang.caption);
 				modifiedCaption = true;
 			}
 		} else {
-			if (this._caption) {
-				dom.utils.removeItem(this._caption);
-				this._caption = null;
+			if (this.#caption) {
+				dom.utils.removeItem(this.#caption);
+				this.#caption = null;
 				modifiedCaption = true;
 			}
 		}
@@ -632,16 +717,16 @@ class Image_ extends EditorInjector {
 		let isNewAnchor = false;
 		const anchor = this.anchor.create(true);
 		if (anchor) {
-			if (this._linkElement !== anchor || !container.contains(anchor)) {
-				this._linkElement = anchor.cloneNode(false);
-				cover.insertBefore(this._setAnchor(imageEl, this._linkElement), this._caption);
+			if (this.#linkElement !== anchor || !container.contains(anchor)) {
+				this.#linkElement = anchor.cloneNode(false);
+				cover.insertBefore(this.#setAnchor(imageEl, this.#linkElement), this.#caption);
 				isNewAnchor = true;
 			}
-		} else if (this._linkElement !== null) {
-			if (cover.contains(this._linkElement)) {
+		} else if (this.#linkElement !== null) {
+			if (cover.contains(this.#linkElement)) {
 				const newEl = imageEl.cloneNode(true);
-				cover.removeChild(this._linkElement);
-				cover.insertBefore(newEl, this._caption);
+				cover.removeChild(this.#linkElement);
+				cover.insertBefore(newEl, this.#caption);
 				imageEl = newEl;
 			}
 		}
@@ -651,23 +736,23 @@ class Image_ extends EditorInjector {
 		}
 
 		// size
-		if (this._resizing && changeSize) {
-			this._applySize(width, height);
+		if (this.#resizing && changeSize) {
+			this.#applySize(width, height);
 		}
 
 		// transform
-		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
+		if (modifiedCaption || (!this.#onlyPercentage && changeSize)) {
 			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
 				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
 					this.figure.deleteTransform(imageEl);
-				} else if (!this._resizing || !changeSize || !this.figure.isVertical) {
+				} else if (!this.#resizing || !changeSize || !this.figure.isVertical) {
 					this.figure.setTransform(imageEl, width, height, 0);
 				}
 			}
 		}
 
 		// align
-		this.figure.setAlign(imageEl, this._align);
+		this.figure.setAlign(imageEl, this.#align);
 
 		// select
 		imageEl.onload = () => {
@@ -676,26 +761,25 @@ class Image_ extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Validates the image size and applies necessary transformations.
 	 * @param {string} width - The width of the image.
 	 * @param {string} height - The height of the image.
 	 */
-	_fileCheck(width, height) {
+	#fileCheck(width, height) {
 		width ||= this.inputX?.value || 'auto';
 		height ||= this.inputY?.value || 'auto';
 
-		let imageEl = this._element;
-		let cover = this._cover;
+		let imageEl = this.#element;
+		let cover = this.#cover;
 		let inlineCover = null;
-		let container = this._container === this._cover ? null : this._container;
+		let container = this.#container === this.#cover ? null : this.#container;
 		let isNewContainer = false;
 
 		if (!cover || !container) {
 			isNewContainer = true;
-			imageEl = this._element.cloneNode(true);
+			imageEl = this.#element.cloneNode(true);
 			const figureInfo =
-				this.pluginOptions.useFormatType && width !== 'auto' && (/^span$/i.test(this._element.parentElement?.nodeName) || this.format.isLine(this._element.parentElement))
+				this.pluginOptions.useFormatType && width !== 'auto' && (/^span$/i.test(this.#element.parentElement?.nodeName) || this.format.isLine(this.#element.parentElement))
 					? Figure.CreateInlineContainer(imageEl, 'se-image-container')
 					: Figure.CreateContainer(imageEl, 'se-image-container');
 			cover = figureInfo.cover;
@@ -711,14 +795,14 @@ class Image_ extends EditorInjector {
 		let modifiedCaption = false;
 		if (!inlineCover) {
 			if (this.captionCheckEl.checked) {
-				if (!this._caption || isNewContainer) {
-					this._caption = Figure.CreateCaption(cover, this.lang.caption);
+				if (!this.#caption || isNewContainer) {
+					this.#caption = Figure.CreateCaption(cover, this.lang.caption);
 					modifiedCaption = true;
 				}
 			} else {
-				if (this._caption) {
-					dom.utils.removeItem(this._caption);
-					this._caption = null;
+				if (this.#caption) {
+					dom.utils.removeItem(this.#caption);
+					this.#caption = null;
 					modifiedCaption = true;
 				}
 			}
@@ -728,26 +812,26 @@ class Image_ extends EditorInjector {
 		let isNewAnchor = null;
 		const anchor = this.anchor.create(true);
 		if (anchor) {
-			if (this._linkElement !== anchor || (isNewContainer && !container.contains(anchor))) {
-				this._linkElement = anchor.cloneNode(false);
-				cover.insertBefore(this._setAnchor(imageEl, this._linkElement), this._caption);
-				isNewAnchor = this._element;
+			if (this.#linkElement !== anchor || (isNewContainer && !container.contains(anchor))) {
+				this.#linkElement = anchor.cloneNode(false);
+				cover.insertBefore(this.#setAnchor(imageEl, this.#linkElement), this.#caption);
+				isNewAnchor = this.#element;
 			}
-		} else if (this._linkElement !== null) {
-			if (cover.contains(this._linkElement)) {
+		} else if (this.#linkElement !== null) {
+			if (cover.contains(this.#linkElement)) {
 				const newEl = imageEl.cloneNode(true);
-				cover.removeChild(this._linkElement);
-				cover.insertBefore(newEl, this._caption);
+				cover.removeChild(this.#linkElement);
+				cover.insertBefore(newEl, this.#caption);
 				imageEl = newEl;
 			}
 		}
 
 		if (isNewContainer) {
-			imageEl = this._element;
-			this.figure.retainFigureFormat(container, this._element, isNewAnchor ? anchor : null, this.fileManager);
-			this._element = imageEl = container.querySelector('img');
-			this._cover = cover;
-			this._container = container;
+			imageEl = this.#element;
+			this.figure.retainFigureFormat(container, this.#element, isNewAnchor ? anchor : null, this.fileManager);
+			this.#element = imageEl = container.querySelector('img');
+			this.#cover = cover;
+			this.#container = container;
 		}
 
 		// size
@@ -755,7 +839,7 @@ class Image_ extends EditorInjector {
 		imageEl.style.height = '';
 		imageEl.removeAttribute('width');
 		imageEl.removeAttribute('height');
-		this._applySize(width, height);
+		this.#applySize(width, height);
 
 		if (isNewAnchor) {
 			if (!isNewContainer) {
@@ -769,7 +853,7 @@ class Image_ extends EditorInjector {
 		}
 
 		// transform
-		if (modifiedCaption || !this._onlyPercentage) {
+		if (modifiedCaption || !this.#onlyPercentage) {
 			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
 				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
 					this.figure.deleteTransform(imageEl);
@@ -780,7 +864,226 @@ class Image_ extends EditorInjector {
 		}
 
 		// align
-		this.figure.setAlign(imageEl, this._align);
+		this.figure.setAlign(imageEl, this.#align);
+	}
+
+	/**
+	 * @description Creates a new image component based on provided parameters.
+	 * @param {string} src - The image source URL.
+	 * @param {?Node} anchor - Optional anchor wrapping the image.
+	 * @param {string} width - Image width.
+	 * @param {string} height - Image height.
+	 * @param {string} align - Image alignment.
+	 * @param {{name: string, size: number}} file - File metadata.
+	 * @param {string} alt - Alternative text.
+	 * @param {boolean} isLast - Indicates if this is the last image in a batch (for scroll and insert behavior).
+	 */
+	#produce(src, anchor, width, height, align, file, alt, isLast) {
+		if (this.as !== 'inline') {
+			this.create(src, anchor, width, height, align, file, alt, isLast);
+		} else {
+			this.createInline(src, anchor, width, height, file, alt, isLast);
+		}
+	}
+
+	/**
+	 * @description Applies the specified width and height to the image.
+	 * @param {string} w - Image width.
+	 * @param {string} h - Image height.
+	 */
+	#applySize(w, h) {
+		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
+		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
+
+		if (this.#onlyPercentage) {
+			if (!w) w = '100%';
+			else if (/%$/.test(w)) w += '%';
+		}
+		this.figure.setSize(w, h);
+	}
+
+	/**
+	 * @description Updates the image source URL.
+	 * @param {string} src - The new image source.
+	 * @param {HTMLImageElement} element - The image element.
+	 * @param {{ name: string, size: number }} file - File metadata.
+	 */
+	#updateSrc(src, element, file) {
+		element.src = src;
+		this.fileManager.setFileData(element, file);
+		this.component.select(element, Image_.key);
+	}
+
+	/**
+	 * @description Registers the uploaded image and inserts it into the editor.
+	 * @param {ImageInfo_image} info - Image info.
+	 * @param {Object<string, *>} response - Server response data.
+	 */
+	#register(info, response) {
+		this.#produceIndex = 0;
+		const fileList = response.result;
+
+		for (let i = 0, len = fileList.length, file; i < len; i++) {
+			file = {
+				name: fileList[i].name,
+				size: fileList[i].size
+			};
+			if (info.isUpdate) {
+				this.#updateSrc(fileList[i].url, info.element, file);
+				break;
+			} else {
+				this.#produce(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt, i === len - 1);
+			}
+		}
+	}
+
+	/**
+	 * @description Uploads the image to the server.
+	 * @param {ImageInfo_image} info - Image upload info.
+	 * @param {FileList} files - List of image files.
+	 */
+	#serverUpload(info, files) {
+		if (!files) return;
+
+		// server upload
+		const imageUploadUrl = this.pluginOptions.uploadUrl;
+		if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
+			this.fileManager.upload(imageUploadUrl, this.pluginOptions.uploadHeaders, files, this.#UploadCallBack.bind(this, info), this.#error.bind(this));
+		} else {
+			this.#setBase64(files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, info.isUpdate);
+		}
+	}
+
+	/**
+	 * @description Handles image upload via URL.
+	 * @param {*} info - Image information.
+	 */
+	#urlUpload(info) {
+		this.#produceIndex = 0;
+		const infoUrl = info.url;
+
+		if (this.modal.isUpdate) this.#updateSrc(infoUrl, info.element, info.files);
+		else this.#produce(infoUrl, info.anchor, info.inputWidth, info.inputHeight, info.align, info.files, info.alt, true);
+	}
+
+	/**
+	 * @description Converts an image file to Base64 and inserts it into the editor.
+	 * @param {FileList|File[]} files - List of image files.
+	 * @param {?Node} anchor - Optional anchor wrapping the image.
+	 * @param {string} width - Image width.
+	 * @param {string} height - Image height.
+	 * @param {string} align - Image alignment.
+	 * @param {string} alt - Alternative text.
+	 * @param {boolean} isUpdate - Whether the image is being updated.
+	 */
+	#setBase64(files, anchor, width, height, align, alt, isUpdate) {
+		try {
+			const filesLen = this.modal.isUpdate ? 1 : files.length;
+
+			if (filesLen === 0) {
+				this.ui.hideLoading();
+				console.warn('[SUNEDITOR.image.base64.fail] cause : No applicable files');
+				return;
+			}
+
+			this._base64RenderIndex = filesLen;
+			const filesStack = new Array(filesLen);
+
+			if (this.#resizing) {
+				this.inputX.value = width;
+				this.inputY.value = height;
+			}
+
+			for (let i = 0, renderFunc = this.#onRenderBase64.bind(this), reader, file; i < filesLen; i++) {
+				reader = new FileReader();
+				file = files[i];
+
+				reader.onload = function (loadCallback, on_reader, update, updateElement, on_file, index) {
+					filesStack[index] = {
+						result: on_reader.result,
+						file: on_file
+					};
+
+					if (--this._base64RenderIndex === 0) {
+						loadCallback(update, filesStack, updateElement, anchor, width, height, align, alt);
+						this.ui.hideLoading();
+					}
+				}.bind(this, renderFunc, reader, isUpdate, this.#element, file, i);
+
+				reader.readAsDataURL(file);
+			}
+		} catch (error) {
+			this.ui.hideLoading();
+			throw Error(`[SUNEDITOR.plugins.image._setBase64.fail] ${error.message}`);
+		}
+	}
+
+	/**
+	 * @description Inserts an image using a Base64-encoded string.
+	 * @param {boolean} update - Whether the image is being updated.
+	 * @param {Array<{result: string, file: { name: string, size: number }}>} filesStack - Stack of Base64-encoded files.
+	 * - result: Image url or Base64-encoded string
+	 * - file: File metadata ({ name: string, size: number })
+	 * @param {HTMLImageElement} updateElement - The image element being updated.
+	 * @param {?HTMLAnchorElement} anchor - Optional anchor wrapping the image.
+	 * @param {string} width - Image width.
+	 * @param {string} height - Image height.
+	 * @param {string} align - Image alignment.
+	 * @param {string} alt - Alternative text.
+	 */
+	#onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt) {
+		this.#produceIndex = 0;
+
+		for (let i = 0, len = filesStack.length; i < len; i++) {
+			if (update) {
+				this.#updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
+			} else {
+				this.#produce(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt, i === len - 1);
+			}
+		}
+	}
+
+	/**
+	 * @description Wraps an image element with an anchor if provided.
+	 * @param {Node} imgTag - The image element to be wrapped.
+	 * @param {?Node} anchor - The anchor element to wrap around the image. If null, returns the image itself.
+	 * @returns {Node} - The wrapped image inside the anchor or the original image element.
+	 */
+	#setAnchor(imgTag, anchor) {
+		if (anchor) {
+			anchor.appendChild(imgTag);
+			return anchor;
+		}
+
+		return imgTag;
+	}
+
+	/**
+	 * @description Handles errors during image upload and displays appropriate messages.
+	 * @param {Object<string, *>} response - The error response from the server.
+	 * @returns {Promise<void>}
+	 */
+	async #error(response) {
+		const message = await this.triggerEvent('onImageUploadError', { error: response });
+		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
+		this.ui.alertOpen(err, 'error');
+		console.error('[SUNEDITOR.plugin.image.error]', err);
+	}
+
+	/**
+	 * @description Handles the callback function for image upload completion.
+	 * @param {ImageInfo_image} info - Image information.
+	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
+	 */
+	async #UploadCallBack(info, xmlHttp) {
+		if ((await this.triggerEvent('imageUploadHandler', { xmlHttp, info })) === NO_EVENT) {
+			const response = JSON.parse(xmlHttp.responseText);
+			if (response.errorMessage) {
+				this.#error(response);
+			} else {
+				this.#register(info, response);
+			}
+		}
 	}
 
 	/**
@@ -828,297 +1131,6 @@ class Image_ extends EditorInjector {
 		return false;
 	}
 
-	/**
-	 * @private
-	 * @description Creates a new image component based on provided parameters.
-	 * @param {string} src - The image source URL.
-	 * @param {?Node} anchor - Optional anchor wrapping the image.
-	 * @param {string} width - Image width.
-	 * @param {string} height - Image height.
-	 * @param {string} align - Image alignment.
-	 * @param {{name: string, size: number}} file - File metadata.
-	 * @param {string} alt - Alternative text.
-	 */
-	_produce(src, anchor, width, height, align, file, alt) {
-		if (this.as !== 'inline') {
-			this.create(src, anchor, width, height, align, file, alt);
-		} else {
-			this.createInline(src, anchor, width, height, file, alt);
-		}
-	}
-
-	/**
-	 * @private
-	 * @description Applies the specified width and height to the image.
-	 * @param {string} w - Image width.
-	 * @param {string} h - Image height.
-	 */
-	_applySize(w, h) {
-		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
-		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
-
-		if (this._onlyPercentage) {
-			if (!w) w = '100%';
-			else if (/%$/.test(w)) w += '%';
-		}
-		this.figure.setSize(w, h);
-	}
-
-	/**
-	 * @description Creates a new image component, wraps it in a figure container with an optional anchor,
-	 * - applies size and alignment settings, and inserts it into the editor.
-	 * @param {string} src - The URL of the image to be inserted.
-	 * @param {?Node} anchor - An optional anchor element to wrap the image. If provided, a clone is used.
-	 * @param {string} width - The width value to be applied to the image.
-	 * @param {string} height - The height value to be applied to the image.
-	 * @param {string} align - The alignment setting for the image (e.g., 'left', 'center', 'right').
-	 * @param {{name: string, size: number}} file - File metadata associated with the image
-	 * @param {string} alt - The alternative text for the image.
-	 */
-	create(src, anchor, width, height, align, file, alt) {
-		/** @type {HTMLImageElement} */
-		const oImg = dom.utils.createElement('IMG');
-		oImg.src = src;
-		oImg.alt = alt;
-		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
-
-		const figureInfo = Figure.CreateContainer(anchor, 'se-image-container');
-		const cover = figureInfo.cover;
-		const container = figureInfo.container;
-
-		// caption
-		if (this.captionCheckEl.checked) {
-			this._caption = Figure.CreateCaption(cover, this.lang.caption);
-		}
-
-		this._element = oImg;
-		this._cover = cover;
-		this._container = container;
-		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
-
-		// set size
-		this._applySize(width, height);
-
-		// align
-		this.figure.setAlign(oImg, align);
-
-		this.fileManager.setFileData(oImg, file);
-
-		oImg.onload = this.#OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		this.component.insert(container, { insertBehavior: null });
-	}
-
-	/**
-	 * @description Creates a new inline image component, wraps it in an inline figure container with an optional anchor,
-	 * - applies size settings, and inserts it into the editor.
-	 * @param {string} src - The URL of the image to be inserted.
-	 * @param {?Node} anchor - An optional anchor element to wrap the image. If provided, a clone is used.
-	 * @param {string} width - The width value to be applied to the image.
-	 * @param {string} height - The height value to be applied to the image.
-	 * @param {{name: string, size: number}} file - File metadata associated with the image
-	 * @param {string} alt - The alternative text for the image.
-	 */
-	createInline(src, anchor, width, height, file, alt) {
-		/** @type {HTMLImageElement} */
-		const oImg = dom.utils.createElement('IMG');
-		oImg.src = src;
-		oImg.alt = alt;
-		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
-
-		const figureInfo = Figure.CreateInlineContainer(anchor, 'se-image-container');
-		const container = figureInfo.container;
-
-		this._element = oImg;
-		this._container = container;
-		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
-
-		// set size
-		this._applySize(width, height);
-
-		this.fileManager.setFileData(oImg, file);
-
-		oImg.onload = this.#OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		this.component.insert(container, { insertBehavior: null });
-	}
-
-	/**
-	 * @private
-	 * @description Updates the image source URL.
-	 * @param {string} src - The new image source.
-	 * @param {HTMLImageElement} element - The image element.
-	 * @param {{ name: string, size: number }} file - File metadata.
-	 */
-	_updateSrc(src, element, file) {
-		element.src = src;
-		this.fileManager.setFileData(element, file);
-		this.component.select(element, Image_.key);
-	}
-
-	/**
-	 * @private
-	 * @description Registers the uploaded image and inserts it into the editor.
-	 * @param {ImageInfo_image} info - Image info.
-	 * @param {Object<string, *>} response - Server response data.
-	 */
-	_register(info, response) {
-		const fileList = response.result;
-
-		for (let i = 0, len = fileList.length, file; i < len; i++) {
-			file = {
-				name: fileList[i].name,
-				size: fileList[i].size
-			};
-			if (info.isUpdate) {
-				this._updateSrc(fileList[i].url, info.element, file);
-				break;
-			} else {
-				this._produce(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
-			}
-		}
-	}
-
-	/**
-	 * @private
-	 * @description Uploads the image to the server.
-	 * @param {ImageInfo_image} info - Image upload info.
-	 * @param {FileList} files - List of image files.
-	 */
-	_serverUpload(info, files) {
-		if (!files) return;
-
-		// server upload
-		const imageUploadUrl = this.pluginOptions.uploadUrl;
-		if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
-			this.fileManager.upload(imageUploadUrl, this.pluginOptions.uploadHeaders, files, this.#UploadCallBack.bind(this, info), this._error.bind(this));
-		} else {
-			this._setBase64(files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, info.isUpdate);
-		}
-	}
-
-	/**
-	 * @private
-	 * @description Converts an image file to Base64 and inserts it into the editor.
-	 * @param {FileList|File[]} files - List of image files.
-	 * @param {?Node} anchor - Optional anchor wrapping the image.
-	 * @param {string} width - Image width.
-	 * @param {string} height - Image height.
-	 * @param {string} align - Image alignment.
-	 * @param {string} alt - Alternative text.
-	 * @param {boolean} isUpdate - Whether the image is being updated.
-	 */
-	_setBase64(files, anchor, width, height, align, alt, isUpdate) {
-		try {
-			const filesLen = this.modal.isUpdate ? 1 : files.length;
-
-			if (filesLen === 0) {
-				this.ui.hideLoading();
-				console.warn('[SUNEDITOR.image.base64.fail] cause : No applicable files');
-				return;
-			}
-
-			this._base64RenderIndex = filesLen;
-			const filesStack = new Array(filesLen);
-
-			if (this._resizing) {
-				this.inputX.value = width;
-				this.inputY.value = height;
-			}
-
-			for (let i = 0, reader, file; i < filesLen; i++) {
-				reader = new FileReader();
-				file = files[i];
-
-				reader.onload = function (on_reader, update, updateElement, on_file, index) {
-					filesStack[index] = {
-						result: on_reader.result,
-						file: on_file
-					};
-
-					if (--this._base64RenderIndex === 0) {
-						this._onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt);
-						this.ui.hideLoading();
-					}
-				}.bind(this, reader, isUpdate, this._element, file, i);
-				// se-ts-ignore
-				this._onRenderBase64;
-
-				reader.readAsDataURL(file);
-			}
-		} catch (error) {
-			this.ui.hideLoading();
-			throw Error(`[SUNEDITOR.plugins.image._setBase64.fail] ${error.message}`);
-		}
-	}
-
-	/**
-	 * @private
-	 * @description Inserts an image using a Base64-encoded string.
-	 * @param {boolean} update - Whether the image is being updated.
-	 * @param {Array<{result: string, file: { name: string, size: number }}>} filesStack - Stack of Base64-encoded files.
-	 * - result: Image url or Base64-encoded string
-	 * - file: File metadata ({ name: string, size: number })
-	 * @param {HTMLImageElement} updateElement - The image element being updated.
-	 * @param {?HTMLAnchorElement} anchor - Optional anchor wrapping the image.
-	 * @param {string} width - Image width.
-	 * @param {string} height - Image height.
-	 * @param {string} align - Image alignment.
-	 * @param {string} alt - Alternative text.
-	 */
-	_onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt) {
-		for (let i = 0, len = filesStack.length; i < len; i++) {
-			if (update) {
-				this._updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
-			} else {
-				this._produce(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
-			}
-		}
-	}
-
-	/**
-	 * @private
-	 * @description Wraps an image element with an anchor if provided.
-	 * @param {Node} imgTag - The image element to be wrapped.
-	 * @param {?Node} anchor - The anchor element to wrap around the image. If null, returns the image itself.
-	 * @returns {Node} - The wrapped image inside the anchor or the original image element.
-	 */
-	_setAnchor(imgTag, anchor) {
-		if (anchor) {
-			anchor.appendChild(imgTag);
-			return anchor;
-		}
-
-		return imgTag;
-	}
-
-	/**
-	 * @private
-	 * @description Handles errors during image upload and displays appropriate messages.
-	 * @param {Object<string, *>} response - The error response from the server.
-	 * @returns {Promise<void>}
-	 */
-	async _error(response) {
-		const message = await this.triggerEvent('onImageUploadError', { error: response });
-		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.ui.alertOpen(err, 'error');
-		console.error('[SUNEDITOR.plugin.image.error]', err);
-	}
-
-	/**
-	 * @description Handles the callback function for image upload completion.
-	 * @param {ImageInfo_image} info - Image information.
-	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
-	 */
-	async #UploadCallBack(info, xmlHttp) {
-		if ((await this.triggerEvent('imageUploadHandler', { xmlHttp, info })) === NO_EVENT) {
-			const response = JSON.parse(xmlHttp.responseText);
-			if (response.errorMessage) {
-				this._error(response);
-			} else {
-				this._register(info, response);
-			}
-		}
-	}
-
 	#RemoveSelectedFiles() {
 		this.imgInputFile.value = '';
 		if (this.imgUrlFile) {
@@ -1136,10 +1148,10 @@ class Image_ extends EditorInjector {
 			return;
 		}
 
-		if (xy === 'x' && this._onlyPercentage && e.target.value > 100) {
+		if (xy === 'x' && this.#onlyPercentage && e.target.value > 100) {
 			e.target.value = 100;
 		} else if (this.proportion.checked) {
-			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
+			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this.#ratio);
 			if (xy === 'x') {
 				this.inputY.value = String(ratioSize.h);
 			} else {
@@ -1149,25 +1161,25 @@ class Image_ extends EditorInjector {
 	}
 
 	#OnChangeRatio() {
-		this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 0, h: 0 };
+		this.#ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 0, h: 0 };
 	}
 
 	#OnClickRevert() {
-		if (this._onlyPercentage) {
-			this.inputX.value = Number(this._origin_w) > 100 ? '100' : this._origin_w;
+		if (this.#onlyPercentage) {
+			this.inputX.value = Number(this.#origin_w) > 100 ? '100' : this.#origin_w;
 		} else {
-			this.inputX.value = this._origin_w;
-			this.inputY.value = this._origin_h;
+			this.inputX.value = this.#origin_w;
+			this.inputY.value = this.#origin_h;
 		}
 	}
 
 	#OnClickAsButton({ target }) {
-		this._activeAsInline(target.getAttribute('data-command') === 'asInline');
+		this.#activeAsInline(target.getAttribute('data-command') === 'asInline');
 	}
 
 	#OnLinkPreview(e) {
 		const value = e.target.value.trim();
-		this._linkValue = this.previewSrc.textContent = !value
+		this.#linkValue = this.previewSrc.textContent = !value
 			? ''
 			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
 			? this.options.get('defaultUrlProtocol') + value
@@ -1195,20 +1207,23 @@ class Image_ extends EditorInjector {
 
 	#SetUrlInput(target) {
 		this.altText.value = target.getAttribute('data-value') || target.alt;
-		this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.getAttribute('data-command') || target.src;
+		this.#linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.getAttribute('data-command') || target.src;
 		this.imgUrlFile.focus();
 	}
 
 	#OnloadImg(oImg, _svgDefaultSize, container) {
-		// svg exception handling
-		if (oImg.offsetWidth === 0) this._applySize(_svgDefaultSize, '');
-
-		this.component.applyInsertBehavior(container, null, this.pluginOptions.insertBehavior || this.options.get('componentInsertBehavior'));
-
-		this.editor._iframeAutoHeight(this.frameContext);
-		this.history.push(false);
-
+		this.#produceIndex--;
 		delete oImg.onload;
+
+		// svg exception handling
+		if (oImg.offsetWidth === 0) this.#applySize(_svgDefaultSize, '');
+
+		if (this.#produceIndex === 0) {
+			this.component.applyInsertBehavior(container, null, this.pluginOptions.insertBehavior || this.options.get('componentInsertBehavior'));
+
+			this.editor._iframeAutoHeight(this.frameContext);
+			this.history.push(false);
+		}
 	}
 }
 

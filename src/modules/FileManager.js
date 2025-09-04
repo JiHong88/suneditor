@@ -129,12 +129,132 @@ class FileManager extends CoreInjector {
 	}
 
 	/**
+	 * @description Gets the sum of the sizes of the currently saved files.
+	 * @returns {number} Size
+	 */
+	getSize() {
+		let size = 0;
+		for (let i = 0, len = this.infoList.length; i < len; i++) {
+			size += this.infoList[i].size * 1;
+		}
+		return size;
+	}
+
+	/**
 	 * @private
+	 * @description Checke the file's information and modify the tag that does not fit the format.
+	 * @param {boolean} loaded Whether the editor is loaded
+	 */
+	_checkInfo(loaded) {
+		const tags = [].slice.call(this.frameContext.get('wysiwyg').querySelectorAll(this.query));
+		const infoList = this.infoList;
+		if (tags.length === infoList.length) {
+			// reset
+			if (this.editor._componentsInfoReset) {
+				for (let i = 0, len = tags.length; i < len; i++) {
+					this.#setInfo(tags[i], null);
+				}
+				return;
+			} else {
+				let infoUpdate = false;
+				for (let i = 0, len = infoList.length, info; i < len; i++) {
+					info = infoList[i];
+					if (
+						tags.filter(function (t) {
+							return info.src === t.src && info.index.toString() === GetAttr(t, 'index');
+						}).length === 0
+					) {
+						infoUpdate = true;
+						break;
+					}
+				}
+				// pass
+				if (!infoUpdate) return;
+			}
+		}
+
+		// check
+		const currentTags = [];
+		const infoIndex = [];
+		for (let i = 0, len = infoList.length; i < len; i++) {
+			infoIndex[i] = infoList[i].index;
+		}
+
+		this.__updateTags = tags;
+
+		while (tags.length > 0) {
+			const tag = tags.shift();
+			if (!GetAttr(tag, 'index') || !infoIndex.includes(Number(GetAttr(tag, 'index')))) {
+				currentTags.push(this.infoIndex);
+				tag.removeAttribute('data-se-index');
+				this.#setInfo(tag, null);
+			} else {
+				currentTags.push(Number(GetAttr(tag, 'index')));
+			}
+		}
+
+		// editor load
+		if (loaded && typeof this.loadHandler === 'function') {
+			this.loadHandler(infoList);
+			return;
+		}
+
+		for (let i = 0, dataIndex; i < infoList.length; i++) {
+			dataIndex = infoList[i].index;
+			if (currentTags.includes(dataIndex)) continue;
+
+			infoList.splice(i, 1);
+
+			const params = { editor: this.editor, element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
+			if (typeof this.eventHandler === 'function') {
+				this.eventHandler(params);
+			}
+			this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
+
+			i--;
+		}
+	}
+
+	/**
+	 * @private
+	 * @description Reset info object and "infoList = []", "infoIndex = 0"
+	 */
+	_resetInfo() {
+		const eh = typeof this.eventHandler === 'function';
+		const params = { editor: this.editor, element: null, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
+		for (let i = 0, len = this.infoList.length; i < len; i++) {
+			if (eh) this.eventHandler({ ...params, index: this.infoList[i].index, pluginName: this.kind });
+			this.triggerEvent('onFileManagerAction', { ...params, index: this.infoList[i].index, pluginName: this.kind });
+		}
+
+		this.infoList = [];
+		this.infoIndex = 0;
+	}
+
+	/**
+	 * @description Delete info object at "infoList"
+	 * @param {number} index index of info object infoList[].index)
+	 */
+	#deleteInfo(index) {
+		if (index >= 0) {
+			for (let i = 0, len = this.infoList.length; i < len; i++) {
+				if (index === this.infoList[i].index) {
+					this.infoList.splice(i, 1);
+					if (typeof this.eventHandler === 'function') {
+						this.eventHandler({ editor: this.editor, element: null, index, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind });
+					}
+					return;
+				}
+			}
+		}
+	}
+
+	/**
 	 * @description Create info object of file and add it to "infoList"
 	 * @param {HTMLMediaElement} element
 	 * @param {{name: string, size: number}|null} file File information
 	 */
-	_setInfo(element, file) {
+	#setInfo(element, file) {
 		let dataIndex = Number(GetAttr(element, 'index'));
 		let info = null;
 		let state = '';
@@ -189,12 +309,10 @@ class FileManager extends CoreInjector {
 		// method bind
 		info.element = element;
 
-		info.delete = function (el) {
+		info.delete = function (deleteCallback, el) {
 			if (typeof this.inst.destroy === 'function') this.inst.destroy.call(this.inst, el);
-			this._deleteInfo(Number(GetAttr(el, 'index')));
-		}.bind(this, element);
-		// se-ts-ignore
-		void this._deleteInfo;
+			deleteCallback(Number(GetAttr(el, 'index')));
+		}.bind(this, this.#deleteInfo.bind(this), element);
 
 		info.select = function (el) {
 			el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
@@ -211,128 +329,6 @@ class FileManager extends CoreInjector {
 			this.eventHandler(params);
 		}
 		this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
-	}
-
-	/**
-	 * @description Gets the sum of the sizes of the currently saved files.
-	 * @returns {number} Size
-	 */
-	getSize() {
-		let size = 0;
-		for (let i = 0, len = this.infoList.length; i < len; i++) {
-			size += this.infoList[i].size * 1;
-		}
-		return size;
-	}
-
-	/**
-	 * @private
-	 * @description Checke the file's information and modify the tag that does not fit the format.
-	 * @param {boolean} loaded Whether the editor is loaded
-	 */
-	_checkInfo(loaded) {
-		const tags = [].slice.call(this.frameContext.get('wysiwyg').querySelectorAll(this.query));
-		const infoList = this.infoList;
-		if (tags.length === infoList.length) {
-			// reset
-			if (this.editor._componentsInfoReset) {
-				for (let i = 0, len = tags.length; i < len; i++) {
-					this._setInfo(tags[i], null);
-				}
-				return;
-			} else {
-				let infoUpdate = false;
-				for (let i = 0, len = infoList.length, info; i < len; i++) {
-					info = infoList[i];
-					if (
-						tags.filter(function (t) {
-							return info.src === t.src && info.index.toString() === GetAttr(t, 'index');
-						}).length === 0
-					) {
-						infoUpdate = true;
-						break;
-					}
-				}
-				// pass
-				if (!infoUpdate) return;
-			}
-		}
-
-		// check
-		const currentTags = [];
-		const infoIndex = [];
-		for (let i = 0, len = infoList.length; i < len; i++) {
-			infoIndex[i] = infoList[i].index;
-		}
-
-		this.__updateTags = tags;
-
-		while (tags.length > 0) {
-			const tag = tags.shift();
-			if (!GetAttr(tag, 'index') || !infoIndex.includes(Number(GetAttr(tag, 'index')))) {
-				currentTags.push(this.infoIndex);
-				tag.removeAttribute('data-se-index');
-				this._setInfo(tag, null);
-			} else {
-				currentTags.push(Number(GetAttr(tag, 'index')));
-			}
-		}
-
-		// editor load
-		if (loaded && typeof this.loadHandler === 'function') {
-			this.loadHandler(infoList);
-			return;
-		}
-
-		for (let i = 0, dataIndex; i < infoList.length; i++) {
-			dataIndex = infoList[i].index;
-			if (currentTags.includes(dataIndex)) continue;
-
-			infoList.splice(i, 1);
-
-			const params = { editor: this.editor, element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
-			if (typeof this.eventHandler === 'function') {
-				this.eventHandler(params);
-			}
-			this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
-
-			i--;
-		}
-	}
-
-	/**
-	 * @private
-	 * @description Reset info object and "infoList = []", "infoIndex = 0"
-	 */
-	_resetInfo() {
-		const eh = typeof this.eventHandler === 'function';
-		const params = { editor: this.editor, element: null, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
-		for (let i = 0, len = this.infoList.length; i < len; i++) {
-			if (eh) this.eventHandler({ ...params, index: this.infoList[i].index, pluginName: this.kind });
-			this.triggerEvent('onFileManagerAction', { ...params, index: this.infoList[i].index, pluginName: this.kind });
-		}
-
-		this.infoList = [];
-		this.infoIndex = 0;
-	}
-
-	/**
-	 * @private
-	 * @description Delete info object at "infoList"
-	 * @param {number} index index of info object infoList[].index)
-	 */
-	_deleteInfo(index) {
-		if (index >= 0) {
-			for (let i = 0, len = this.infoList.length; i < len; i++) {
-				if (index === this.infoList[i].index) {
-					this.infoList.splice(i, 1);
-					if (typeof this.eventHandler === 'function') {
-						this.eventHandler({ editor: this.editor, element: null, index, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind });
-					}
-					return;
-				}
-			}
-		}
 	}
 }
 

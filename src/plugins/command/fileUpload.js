@@ -39,6 +39,9 @@ class FileUpload extends EditorInjector {
 		return dom.check.isAnchor(node) && node.hasAttribute('data-se-file-download') ? node : null;
 	}
 
+	#acceptedCheck;
+	#element;
+
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
@@ -59,14 +62,15 @@ class FileUpload extends EditorInjector {
 		this.uploadSingleSizeLimit = numbers.get(pluginOptions.uploadSingleSizeLimit, 0);
 		this.allowMultiple = !!pluginOptions.allowMultiple;
 		this.acceptedFormats = typeof pluginOptions.acceptedFormats !== 'string' ? '*' : pluginOptions.acceptedFormats.trim() || '*';
-		this._acceptedCheck = this.acceptedFormats.split(', ');
 		this.as = pluginOptions.as || 'box';
 		this.insertBehavior = pluginOptions.insertBehavior;
 		this.input = dom.utils.createElement('input', { type: 'file', accept: this.acceptedFormats });
 		if (this.allowMultiple) {
 			this.input.setAttribute('multiple', 'multiple');
 		}
-		this._element = null;
+
+		this.#acceptedCheck = this.acceptedFormats.split(', ');
+		this.#element = null;
 
 		// figure
 		const customItems = {
@@ -127,7 +131,7 @@ class FileUpload extends EditorInjector {
 	 * @param {HTMLElement} target Target component element
 	 */
 	select(target) {
-		this._element = target;
+		this.#element = target;
 		const asBtn = this.figure.controller.form.querySelector('[data-command="__c__as"]');
 		if (dom.check.isFigure(target.parentElement)) {
 			asBtn.innerHTML = this.icons.reduction + dom.utils.createTooltipInner(this.lang.asLink);
@@ -153,7 +157,7 @@ class FileUpload extends EditorInjector {
 	onFilePasteAndDrop({ file }) {
 		const fileType = file.type;
 		if (
-			!this._acceptedCheck.some((format) => {
+			!this.#acceptedCheck.some((format) => {
 				if (format.startsWith('*')) return true;
 				if (format.startsWith(fileType)) return true;
 			})
@@ -190,11 +194,11 @@ class FileUpload extends EditorInjector {
 
 		if (command === 'edit') {
 			if (this.editInput.value.trim().length === 0) return;
-			this._element.textContent = this.editInput.value;
+			this.#element.textContent = this.editInput.value;
 		}
 
 		this.controller.close();
-		this.component.select(this._element, FileUpload.key);
+		this.component.select(this.#element, FileUpload.key);
 	}
 
 	/**
@@ -279,7 +283,7 @@ class FileUpload extends EditorInjector {
 			infos = newInfos || infos;
 			const xmlHttp = await this.fileManager.asyncUpload(infos.url, infos.uploadHeaders, infos.files);
 			uploadCallback(xmlHttp);
-		}.bind(this, this.#_uploadCallBack.bind(this), fileInfo);
+		}.bind(this, this.#uploadCallBack.bind(this), fileInfo);
 
 		const result = await this.triggerEvent('onFileUploadBefore', {
 			info: fileInfo,
@@ -338,7 +342,7 @@ class FileUpload extends EditorInjector {
 	 * @description Create file element
 	 * @param {string} url File URL
 	 * @param {File|{name: string, size: number}} file File object
-	 * @param {boolean} isLast Is last file
+	 * @param {boolean} isLast Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */
 	create(url, file, isLast) {
 		const name = file.name || url;
@@ -360,14 +364,14 @@ class FileUpload extends EditorInjector {
 
 		if (this.as === 'link') {
 			a.className = 'se-component se-inline-component';
-			this.component.insert(a, { insertBehavior: this.insertBehavior });
+			this.component.insert(a, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.insertBehavior : null });
 			return;
 		}
 
 		const figure = Figure.CreateContainer(a);
 		dom.utils.addClass(figure.container, 'se-file-figure|se-flex-component');
 
-		if (!this.component.insert(figure.container, { insertBehavior: this.insertBehavior })) {
+		if (!this.component.insert(figure.container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.insertBehavior : null })) {
 			this.editor.focus();
 			return;
 		}
@@ -383,12 +387,11 @@ class FileUpload extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Processes the server response after file upload.
 	 * - Registers the uploaded files in the editor.
 	 * @param {Object<string, *>} response - The response object from the server.
 	 */
-	_register(response) {
+	#register(response) {
 		response.result.forEach((file, i, a) => {
 			this.create(
 				file.url,
@@ -402,13 +405,12 @@ class FileUpload extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Handles file upload errors.
 	 * - Displays an error message if the upload fails.
 	 * @param {Object<string, *>} response - The error response from the server.
 	 * @returns {Promise<void>}
 	 */
-	async _error(response) {
+	async #error(response) {
 		const message = await this.triggerEvent('onFileUploadError', { error: response });
 		if (message === false) return;
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
@@ -421,12 +423,12 @@ class FileUpload extends EditorInjector {
 	 * - Parses the response and registers the uploaded file.
 	 * @param {XMLHttpRequest} xmlHttp - The completed XHR request.
 	 */
-	#_uploadCallBack(xmlHttp) {
+	#uploadCallBack(xmlHttp) {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
-			this._error(response);
+			this.#error(response);
 		} else {
-			this._register(response);
+			this.#register(response);
 		}
 	}
 

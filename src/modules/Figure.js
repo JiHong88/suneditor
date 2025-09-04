@@ -64,6 +64,21 @@ let __resizing_sw = 0;
  * @description Controller module class
  */
 class Figure extends EditorInjector {
+	#width;
+	#height;
+	#resize_w;
+	#resize_h;
+	#element_w;
+	#element_h;
+	#element_l;
+	#element_t;
+	#floatClassStr;
+	#preventSizechange;
+	#revertSize;
+	#offContainer;
+	#containerResizingESC;
+	#onResizeESCEvent;
+
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -119,34 +134,35 @@ class Figure extends EditorInjector {
 		this.captionButton = controllerEl.querySelector('[data-command="caption"]');
 		this.align = 'none';
 		this.as = 'block';
+		/** @type {{left?: number, top?: number}} */
+		this.__offset = {};
 		this._element = null;
 		this._cover = null;
 		this._inlineCover = null;
 		this._container = null;
 		this._caption = null;
-		this._width = '';
-		this._height = '';
-		this._resize_w = 0;
-		this._resize_h = 0;
-		this._element_w = 0;
-		this._element_h = 0;
-		this._element_l = 0;
-		this._element_t = 0;
 		this._resizeClientX = 0;
 		this._resizeClientY = 0;
 		this._resize_direction = '';
-		this._floatClassStr = '__se__float-none|__se__float-left|__se__float-center|__se__float-right';
-		this.__preventSizechange = false;
-		this.__revertSize = { w: '', h: '' };
-		/** @type {{left?: number, top?: number}} */
-		this.__offset = {};
-		this.__offContainer = this.#OffFigureContainer.bind(this);
-		this.__containerResizing = this.#ContainerResizing.bind(this);
 		this.__containerResizingOff = this.#ContainerResizingOff.bind(this);
-		this.__containerResizingESC = this.#ContainerResizingESC.bind(this);
+		this.__containerResizing = this.#ContainerResizing.bind(this);
 		this.__onContainerEvent = null;
 		this.__offContainerEvent = null;
-		this.__onResizeESCEvent = null;
+
+		this.#width = '';
+		this.#height = '';
+		this.#resize_w = 0;
+		this.#resize_h = 0;
+		this.#element_w = 0;
+		this.#element_h = 0;
+		this.#element_l = 0;
+		this.#element_t = 0;
+		this.#floatClassStr = '__se__float-none|__se__float-left|__se__float-center|__se__float-right';
+		this.#preventSizechange = false;
+		this.#revertSize = { w: '', h: '' };
+		this.#offContainer = this.#OffFigureContainer.bind(this);
+		this.#containerResizingESC = this.#ContainerResizingESC.bind(this);
+		this.#onResizeESCEvent = null;
 
 		// init
 		this.eventManager.addEvent(this.alignButton, 'click', this.#OnClick_alignButton.bind(this));
@@ -210,13 +226,16 @@ class Figure extends EditorInjector {
 	static GetContainer(element) {
 		const cover = dom.query.getParentElement(element, 'FIGURE', 2);
 		const inlineCover = dom.query.getParentElement(element, 'SPAN', 2);
+		const anyCover = cover || inlineCover;
+		const target = dom.query.getParentElement(element, (current) => current.parentElement === anyCover, 0) || /** @type {HTMLElement} */ (element);
+
 		return {
-			target: /** @type {HTMLElement} */ (element),
-			container: dom.query.getParentElement(element, Figure.is, 2) || cover,
+			target,
+			container: dom.query.getParentElement(target, Figure.is, 3) || cover,
 			cover: cover,
 			inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
-			caption: dom.query.getEdgeChild(element.parentElement, 'FIGCAPTION', false),
-			isVertical: IsVertical(element)
+			caption: dom.query.getEdgeChild(target.parentElement, 'FIGCAPTION', false),
+			isVertical: IsVertical(target)
 		};
 	}
 
@@ -366,8 +385,8 @@ class Figure extends EditorInjector {
 			originHeight: /** @type {HTMLImageElement} */ (target).naturalHeight || target.offsetHeight
 		};
 
-		this._width = targetInfo.width;
-		this._height = targetInfo.height;
+		this.#width = targetInfo.width;
+		this.#height = targetInfo.height;
 		if (infoOnly) return targetInfo;
 
 		const _figure = this.frameContext.get('_figure');
@@ -438,7 +457,7 @@ class Figure extends EditorInjector {
 			}
 			// selecte
 			dom.utils.removeClass(this._cover, 'se-figure-over-selected');
-			this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
+			this.controller.open(_figure.main, null, { initMethod: this.#offContainer, isWWTarget: false, addOffset: null });
 			this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 		} else {
 			dom.utils.addClass(this._cover, 'se-figure-over-selected');
@@ -446,10 +465,10 @@ class Figure extends EditorInjector {
 
 		// set members
 		dom.utils.addClass(this._cover, 'se-figure-selected');
-		this._element_w = this._resize_w = w;
-		this._element_h = this._resize_h = h;
-		this._element_l = left;
-		this._element_t = top;
+		this.#element_w = this.#resize_w = w;
+		this.#element_h = this.#resize_h = h;
+		this.#element_l = left;
+		this.#element_t = top;
 
 		// drag
 		if (!this._inlineCover && (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || dom.utils.hasClass(figureInfo.container, 'se-input-component'))) {
@@ -591,7 +610,7 @@ class Figure extends EditorInjector {
 		}
 
 		if (!dom.utils.hasClass(container, '__se__float-' + align)) {
-			dom.utils.removeClass(container, this._floatClassStr);
+			dom.utils.removeClass(container, this.#floatClassStr);
 			dom.utils.addClass(container, '__se__float-' + align);
 		}
 
@@ -676,27 +695,6 @@ class Figure extends EditorInjector {
 		}
 
 		return newTarget;
-	}
-
-	/**
-	 * @private
-	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
-	 * @param {FigureInfo} figureinfo {target, container, cover, inlineCover, caption}
-	 * @param {string|number} w Width value.
-	 * @param {string|number} h Height value.
-	 */
-	_asFormatChange(figureinfo, w, h) {
-		const kind = this.kind;
-		figureinfo.target.onload = () => this.component.select(figureinfo.target, kind);
-
-		this._setFigureInfo(figureinfo);
-
-		if (figureinfo.inlineCover) {
-			this.setAlign(figureinfo.target, 'none');
-			this.deleteTransform();
-		}
-
-		this.setFigureSize(w, h);
 	}
 
 	/**
@@ -859,7 +857,7 @@ class Figure extends EditorInjector {
 	 */
 	setTransform(node, width, height, deg) {
 		try {
-			this.__preventSizechange = true;
+			this.#preventSizechange = true;
 			const info = GetRotateValue(node);
 			const slope = info.r + (deg || 0) * 1;
 			deg = Math.abs(slope) >= 360 ? 0 : slope;
@@ -910,8 +908,52 @@ class Figure extends EditorInjector {
 
 			this._setCaptionPosition(element);
 		} finally {
-			this.__preventSizechange = false;
+			this.#preventSizechange = false;
 		}
+	}
+
+	/**
+	 * @private
+	 * @description Displays or hides the resize handles of the figure component.
+	 * @param {boolean} display Whether to display resize handles.
+	 */
+	_displayResizeHandles(display) {
+		const type = !display ? 'none' : 'flex';
+		this.controller.form.style.display = type;
+
+		const _figure = this.frameContext.get('_figure');
+		const resizeHandles = _figure.handles;
+		for (let i = 0, len = resizeHandles.length; i < len; i++) {
+			resizeHandles[i].style.display = type;
+		}
+
+		if (type === 'none') {
+			dom.utils.addClass(_figure.main, 'se-resize-ing');
+			this.#onResizeESCEvent = this.eventManager.addGlobalEvent('keydown', this.#containerResizingESC);
+		} else {
+			dom.utils.removeClass(_figure.main, 'se-resize-ing');
+		}
+	}
+
+	/**
+	 * @private
+	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
+	 * @param {FigureInfo} figureinfo {target, container, cover, inlineCover, caption}
+	 * @param {string|number} w Width value.
+	 * @param {string|number} h Height value.
+	 */
+	_asFormatChange(figureinfo, w, h) {
+		const kind = this.kind;
+		figureinfo.target.onload = () => this.component.select(figureinfo.target, kind);
+
+		this._setFigureInfo(figureinfo);
+
+		if (figureinfo.inlineCover) {
+			this.setAlign(figureinfo.target, 'none');
+			this.deleteTransform();
+		}
+
+		this.setFigureSize(w, h);
 	}
 
 	/**
@@ -1109,7 +1151,7 @@ class Figure extends EditorInjector {
 		this._container.style.width = '';
 		this._container.style.height = '';
 
-		dom.utils.removeClass(this._container, this._floatClassStr);
+		dom.utils.removeClass(this._container, this.#floatClassStr);
 		dom.utils.addClass(this._container, '__se__float-' + this.align);
 
 		if (this.align === 'center') this.setAlign(this._element, this.align);
@@ -1120,7 +1162,7 @@ class Figure extends EditorInjector {
 	 * @description Reverts the figure element to its previously saved size.
 	 */
 	_setRevert() {
-		this.setFigureSize(this.__revertSize.w, this.__revertSize.h);
+		this.setFigureSize(this.#revertSize.w, this.#revertSize.h);
 	}
 
 	/**
@@ -1146,11 +1188,11 @@ class Figure extends EditorInjector {
 	 * @description Saves the current size of the figure component.
 	 */
 	_saveCurrentSize() {
-		if (this.__preventSizechange) return;
+		if (this.#preventSizechange) return;
 
 		const dataSize = (this._element.getAttribute('data-se-size') || ',').split(',');
-		this.__revertSize.w = dataSize[0];
-		this.__revertSize.h = dataSize[1];
+		this.#revertSize.w = dataSize[0];
+		this.#revertSize.h = dataSize[1];
 
 		const size = this.getSize(this._element);
 		// add too width, height attribute
@@ -1193,36 +1235,13 @@ class Figure extends EditorInjector {
 
 	/**
 	 * @private
-	 * @description Displays or hides the resize handles of the figure component.
-	 * @param {boolean} display Whether to display resize handles.
-	 */
-	_displayResizeHandles(display) {
-		const type = !display ? 'none' : 'flex';
-		this.controller.form.style.display = type;
-
-		const _figure = this.frameContext.get('_figure');
-		const resizeHandles = _figure.handles;
-		for (let i = 0, len = resizeHandles.length; i < len; i++) {
-			resizeHandles[i].style.display = type;
-		}
-
-		if (type === 'none') {
-			dom.utils.addClass(_figure.main, 'se-resize-ing');
-			this.__onResizeESCEvent = this.eventManager.addGlobalEvent('keydown', this.__containerResizingESC);
-		} else {
-			dom.utils.removeClass(_figure.main, 'se-resize-ing');
-		}
-	}
-
-	/**
-	 * @private
 	 * @description Removes the resize event listeners.
 	 */
 	_offResizeEvent() {
 		this.component._removeDragEvent();
 		this.eventManager.removeGlobalEvent(this.__onContainerEvent);
 		this.eventManager.removeGlobalEvent(this.__offContainerEvent);
-		this.eventManager.removeGlobalEvent(this.__onResizeESCEvent);
+		this.eventManager.removeGlobalEvent(this.#onResizeESCEvent);
 
 		this._displayResizeHandles(true);
 		this.ui._offCurrentController();
@@ -1317,8 +1336,8 @@ class Figure extends EditorInjector {
 		const clientY = e.clientY;
 		const v = this.isVertical;
 
-		let resultW = v ? this._element_h : this._element_w;
-		let resultH = v ? this._element_w : this._element_h;
+		let resultW = v ? this.#element_h : this.#element_w;
+		let resultH = v ? this.#element_w : this.#element_h;
 
 		const w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
 		const h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
@@ -1341,13 +1360,13 @@ class Figure extends EditorInjector {
 			resultH = h;
 		}
 
-		const resize_w = /** @type {number} */ (!v && /h$/.test(direction) ? this._width : Math.round(resultW));
-		const resize_h = /** @type {number} */ (!v && /w$/.test(direction) ? this._height : Math.round(resultH));
+		const resize_w = /** @type {number} */ (!v && /h$/.test(direction) ? this.#width : Math.round(resultW));
+		const resize_h = /** @type {number} */ (!v && /w$/.test(direction) ? this.#height : Math.round(resultH));
 		const rw = __resizing_cw ? (resize_w / __resizing_sw) * __resizing_cw * 100 : resize_w;
 		dom.utils.changeTxt(this.frameContext.get('_figure').display, __resizing_cw ? numbers.get(rw > 100 ? 100 : rw, 2).toFixed(2) + '%' : rw + ' * ' + resize_h);
 
-		this._resize_w = resize_w;
-		this._resize_h = resize_h;
+		this.#resize_w = resize_w;
+		this.#resize_h = resize_h;
 	}
 
 	/**
@@ -1357,8 +1376,8 @@ class Figure extends EditorInjector {
 		this._offResizeEvent();
 
 		// set size
-		let w = this.isVertical ? this._resize_h : this._resize_w;
-		let h = this.isVertical ? this._resize_w : this._resize_h;
+		let w = this.isVertical ? this.#resize_h : this.#resize_w;
+		let h = this.isVertical ? this.#resize_w : this.#resize_h;
 		w = Math.round(w) || w;
 		h = Math.round(h) || h;
 

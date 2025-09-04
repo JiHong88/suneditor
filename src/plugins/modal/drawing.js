@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { Modal } from '../../modules';
 import { dom, env } from '../../helper';
 
-const { _w, isTouchDevice } = env;
+const { _w } = env;
 
 /**
  * @typedef {Object} DrawingPluginOptions
@@ -33,6 +33,9 @@ class Drawing extends EditorInjector {
 	static key = 'drawing';
 	static type = 'modal';
 	static className = '';
+
+	#events;
+	#eventsRegister;
 
 	/**
 	 * @constructor
@@ -96,7 +99,8 @@ class Drawing extends EditorInjector {
 		this.points = [];
 		this.paths = [];
 		this.resizeObserver = null;
-		this.__events = {
+
+		this.#events = {
 			touchstart: this.#OnCanvasTouchStart.bind(this),
 			touchmove: this.#OnCanvasTouchMove.bind(this),
 			mousedown: this.#OnCanvasMouseDown.bind(this),
@@ -105,7 +109,7 @@ class Drawing extends EditorInjector {
 			mouseleave: this.#OnCanvasMouseLeave.bind(this),
 			mouseenter: this.#OnCanvasMouseEnter.bind(this)
 		};
-		this.__eventsRegister = {
+		this.#eventsRegister = {
 			touchstart: null,
 			touchmove: null,
 			mousedown: null,
@@ -113,13 +117,6 @@ class Drawing extends EditorInjector {
 			mouseup: null,
 			mouseleave: null,
 			mouseenter: null
-		};
-		this.__eventNameMap = {
-			mousedown: isTouchDevice ? 'touchstart' : 'mousedown',
-			mousemove: isTouchDevice ? 'touchmove' : 'mousemove',
-			mouseup: isTouchDevice ? 'touchend' : 'mouseup',
-			mouseleave: 'mouseleave',
-			mouseenter: 'mouseenter'
 		};
 
 		// init
@@ -132,10 +129,10 @@ class Drawing extends EditorInjector {
 	 */
 	open() {
 		if (this.pluginOptions.useFormatType) {
-			this._activeAsInline((this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline');
+			this.#activeAsInline((this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline');
 		}
 		this.modal.open();
-		this._initDrawing();
+		this.#initDrawing();
 	}
 
 	/**
@@ -143,7 +140,7 @@ class Drawing extends EditorInjector {
 	 * @description Executes the method that is called when a plugin's "modal" is closed.
 	 */
 	off() {
-		this._destroyDrawing();
+		this.#destroyDrawing();
 	}
 
 	/**
@@ -153,7 +150,7 @@ class Drawing extends EditorInjector {
 	 */
 	modalAction() {
 		if (this.pluginOptions.outputFormat === 'svg') {
-			const files = this._getSVGFileList();
+			const files = this.#getSVGFileList();
 			this.plugins.image.init();
 			this.plugins.image.submitFile(files);
 		} else {
@@ -172,10 +169,9 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Initializes the drawing canvas, sets up event listeners, and configures resize handling.
 	 */
-	_initDrawing() {
+	#initDrawing() {
 		const canvas = (this.canvas = this.modal.form.querySelector('.se-drawing-canvas'));
 		this.ctx = canvas.getContext('2d');
 		canvas.width = canvas.offsetWidth;
@@ -184,15 +180,15 @@ class Drawing extends EditorInjector {
 		this.points = [];
 		this.paths = [];
 
-		this._setCtx();
+		this.#setCtx();
 
-		this.__eventsRegister.touchstart = this.eventManager.addEvent(canvas, 'touchstart', this.__events.touchstart, { passive: false, capture: true });
-		this.__eventsRegister.touchmove = this.eventManager.addEvent(canvas, 'touchmove', this.__events.touchmove, true);
-		this.__eventsRegister.mousedown = this.eventManager.addEvent(canvas, 'mousedown', this.__events.mousedown, { passive: false, capture: true });
-		this.__eventsRegister.mousemove = this.eventManager.addEvent(canvas, 'mousemove', this.__events.mousemove, true);
-		this.__eventsRegister.mouseup = this.eventManager.addEvent(canvas, 'mouseup', this.__events.mouseup, true);
-		this.__eventsRegister.mouseleave = this.eventManager.addEvent(canvas, 'mouseleave', this.__events.mouseleave);
-		this.__eventsRegister.mouseenter = this.eventManager.addEvent(canvas, 'mouseenter', this.__events.mouseenter);
+		this.#eventsRegister.touchstart = this.eventManager.addEvent(canvas, 'touchstart', this.#events.touchstart, { passive: false, capture: true });
+		this.#eventsRegister.touchmove = this.eventManager.addEvent(canvas, 'touchmove', this.#events.touchmove, true);
+		this.#eventsRegister.mousedown = this.eventManager.addEvent(canvas, 'mousedown', this.#events.mousedown, { passive: false, capture: true });
+		this.#eventsRegister.mousemove = this.eventManager.addEvent(canvas, 'mousemove', this.#events.mousemove, true);
+		this.#eventsRegister.mouseup = this.eventManager.addEvent(canvas, 'mouseup', this.#events.mouseup, true);
+		this.#eventsRegister.mouseleave = this.eventManager.addEvent(canvas, 'mouseleave', this.#events.mouseleave);
+		this.#eventsRegister.mouseenter = this.eventManager.addEvent(canvas, 'mouseenter', this.#events.mouseenter);
 
 		if (this.resizeObserver) {
 			this.resizeObserver.disconnect();
@@ -208,8 +204,8 @@ class Drawing extends EditorInjector {
 				canvas.width = newWidth;
 				canvas.height = newHeight;
 				if (prevWidth !== canvas.width || prevHeight !== canvas.height) {
-					if (this.pluginOptions.maintainRatio) this._adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight);
-					this._drawAll();
+					if (this.pluginOptions.maintainRatio) this.#adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight);
+					this.#drawAll();
 				}
 			});
 
@@ -218,21 +214,20 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Destroys the drawing canvas, removes event listeners, and clears stored drawing data.
 	 */
-	_destroyDrawing() {
+	#destroyDrawing() {
 		if (this.resizeObserver) {
 			this.resizeObserver.disconnect();
 			this.resizeObserver = null;
 		}
 
 		if (this.canvas) {
-			this.eventManager.removeEvent(this.__eventsRegister.mousedown);
-			this.eventManager.removeEvent(this.__eventsRegister.mousemove);
-			this.eventManager.removeEvent(this.__eventsRegister.mouseup);
-			this.eventManager.removeEvent(this.__eventsRegister.mouseleave);
-			this.eventManager.removeEvent(this.__eventsRegister.mouseenter);
+			this.eventManager.removeEvent(this.#eventsRegister.mousedown);
+			this.eventManager.removeEvent(this.#eventsRegister.mousemove);
+			this.eventManager.removeEvent(this.#eventsRegister.mouseup);
+			this.eventManager.removeEvent(this.#eventsRegister.mouseleave);
+			this.eventManager.removeEvent(this.#eventsRegister.mouseenter);
 		}
 
 		this.canvas = null;
@@ -243,21 +238,19 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Configures the drawing context (canvas settings like line width, color, etc.).
 	 */
-	_setCtx() {
+	#setCtx() {
 		this.ctx.lineWidth = this.pluginOptions.lineWidth;
 		this.ctx.lineCap = this.pluginOptions.lineCap;
 		this.ctx.strokeStyle = this.pluginOptions.lineColor || _w.getComputedStyle(this.carrierWrapper).color;
 	}
 
 	/**
-	 * @private
 	 * @description Draws the current stroke based on collected points.
 	 */
-	_draw() {
-		this._setCtx();
+	#draw() {
+		this.#setCtx();
 		this.ctx.beginPath();
 		this.points.forEach(([x, y], i) => {
 			if (i === 0) {
@@ -270,28 +263,26 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Redraws all stored paths onto the canvas.
 	 */
-	_drawAll() {
-		this._setCtx();
+	#drawAll() {
+		this.#setCtx();
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.paths.forEach((path) => {
 			this.points = path;
-			this._draw();
+			this.#draw();
 		});
 		this.points = [];
 	}
 
 	/**
-	 * @private
 	 * @description Adjusts all stored paths to fit new canvas dimensions after a resize event.
 	 * @param {number} prevWidth - The previous width of the canvas.
 	 * @param {number} prevHeight - The previous height of the canvas.
 	 * @param {number} newWidth - The new width of the canvas.
 	 * @param {number} newHeight - The new height of the canvas.
 	 */
-	_adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight) {
+	#adjustPathsToNewDimensions(prevWidth, prevHeight, newWidth, newHeight) {
 		const xRatio = newWidth / prevWidth;
 		const yRatio = newHeight / prevHeight;
 
@@ -299,21 +290,19 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Clears the canvas and resets stored drawing paths.
 	 */
-	_clearCanvas() {
+	#clearCanvas() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 		this.points = [];
 		this.paths = [];
 	}
 
 	/**
-	 * @private
 	 * @description Generates an SVG representation of the drawn content.
 	 * @returns {*} The generated SVG element.
 	 */
-	_getSVG() {
+	#getSVG() {
 		const svgNS = 'http://www.w3.org/2000/svg';
 		const svg = document.createElementNS(svgNS, 'svg');
 		svg.setAttribute('width', this.canvas.width + '');
@@ -337,12 +326,11 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Converts the SVG element into a downloadable file.
 	 * @returns {FileList} A FileList containing the generated SVG file.
 	 */
-	_getSVGFileList() {
-		const svgElement = this._getSVG();
+	#getSVGFileList() {
+		const svgElement = this.#getSVG();
 		const serializer = new XMLSerializer();
 		const svgString = serializer.serializeToString(svgElement);
 		const blob = new Blob([svgString], { type: 'image/svg+xml' });
@@ -356,12 +344,11 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Retrieves touch coordinates relative to the canvas.
 	 * @param {TouchEvent} e - The touch event.
 	 * @returns {{x: number, y: number}} An object containing the x and y coordinates.
 	 */
-	_getCanvasTouchPointer(e) {
+	#getCanvasTouchPointer(e) {
 		const { touches } = e;
 		const rect = this.canvas.getBoundingClientRect();
 		const x = touches[0].clientX - rect.left;
@@ -370,11 +357,10 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Activates either block or inline format mode for inserted drawings.
 	 * @param {boolean} isInline - Whether the drawing should be inserted as an inline element.
 	 */
-	_activeAsInline(isInline) {
+	#activeAsInline(isInline) {
 		if (isInline) {
 			dom.utils.addClass(this.asInline, 'on');
 			dom.utils.removeClass(this.asBlock, 'on');
@@ -393,7 +379,7 @@ class Drawing extends EditorInjector {
 		e.preventDefault();
 		this.isDrawing = true;
 		this.points.push([e.offsetX, e.offsetY]);
-		this._draw();
+		this.#draw();
 	}
 
 	/**
@@ -403,7 +389,7 @@ class Drawing extends EditorInjector {
 		e.preventDefault();
 		if (!this.isDrawing) return;
 		this.points.push([e.offsetX, e.offsetY]);
-		this._draw();
+		this.#draw();
 	}
 
 	/**
@@ -411,10 +397,10 @@ class Drawing extends EditorInjector {
 	 */
 	#OnCanvasTouchStart(e) {
 		e.preventDefault();
-		const { x, y } = this._getCanvasTouchPointer(e);
+		const { x, y } = this.#getCanvasTouchPointer(e);
 		this.isDrawing = true;
 		this.points.push([x, y]);
-		this._draw();
+		this.#draw();
 	}
 
 	/**
@@ -422,10 +408,10 @@ class Drawing extends EditorInjector {
 	 */
 	#OnCanvasTouchMove(e) {
 		e.preventDefault();
-		const { x, y } = this._getCanvasTouchPointer(e);
+		const { x, y } = this.#getCanvasTouchPointer(e);
 		if (!this.isDrawing) return;
 		this.points.push([x, y]);
-		this._draw();
+		this.#draw();
 	}
 
 	#OnCanvasMouseUp() {
@@ -460,19 +446,19 @@ class Drawing extends EditorInjector {
 				this.points.push([lastPoint[0], lastPoint[1]]);
 				this.points.push([e.offsetX, e.offsetY]);
 			}
-			this._draw();
+			this.#draw();
 		}
 	}
 
 	#OnRemove() {
-		this._clearCanvas();
+		this.#clearCanvas();
 	}
 
 	/**
 	 * @param {MouseEvent} e - Event object
 	 */
 	#OnClickAsButton(e) {
-		this._activeAsInline(dom.query.getEventTarget(e).getAttribute('data-command') === 'asInline');
+		this.#activeAsInline(dom.query.getEventTarget(e).getAttribute('data-command') === 'asInline');
 	}
 }
 

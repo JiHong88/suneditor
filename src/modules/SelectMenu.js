@@ -18,6 +18,19 @@ const MENU_MIN_HEIGHT = 38;
  * @description Creates a select menu
  */
 class SelectMenu extends CoreInjector {
+	#dirPosition;
+	#dirSubPosition;
+	#textDirDiff;
+	#refer;
+	#keydownTarget;
+	#selectMethod;
+	#bindClose_key;
+	#bindClose_mousedown;
+	#bindClose_click;
+	#events;
+	#eventHandlers;
+	#globalEventHandlers;
+
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -42,28 +55,28 @@ class SelectMenu extends CoreInjector {
 		this.checkList = !!params.checkList;
 		this.position = positionItems[0];
 		this.subPosition = positionItems[1];
-		this._dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
-		this._dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
-		this._textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
 		this.splitNum = params.splitNum || 0;
 		this.horizontal = !!this.splitNum;
 		this.openMethod = params.openMethod;
 		this.closeMethod = params.closeMethod;
-		this._refer = null;
-		this._keydownTarget = null;
-		this._selectMethod = null;
-		this._bindClose_key = null;
-		this._bindClose_mousedown = null;
-		this._bindClose_click = null;
-		this._closeSignal = false;
-		this.__events = null;
-		this.__eventHandlers = {
+
+		this.#dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
+		this.#dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
+		this.#textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
+		this.#refer = null;
+		this.#keydownTarget = null;
+		this.#selectMethod = null;
+		this.#bindClose_key = null;
+		this.#bindClose_mousedown = null;
+		this.#bindClose_click = null;
+		this.#events = null;
+		this.#eventHandlers = {
 			mousedown: this.#OnMousedown_list.bind(this),
 			mousemove: this.#OnMouseMove_list.bind(this),
 			click: this.#OnClick_list.bind(this),
 			keydown: this.#OnKeyDown_refer.bind(this)
 		};
-		this.__globalEventHandlers = { keydown: this.#CloseListener_key.bind(this), mousedown: this.#CloseListener_mousedown.bind(this), click: this.#CloseListener_click.bind(this) };
+		this.#globalEventHandlers = { keydown: this.#CloseListener_key.bind(this), mousedown: this.#CloseListener_mousedown.bind(this), click: this.#CloseListener_click.bind(this) };
 	}
 
 	/**
@@ -77,12 +90,12 @@ class SelectMenu extends CoreInjector {
 		let html = '';
 		for (let i = 0, len = menus.length; i < len; i++) {
 			if (i > 0 && i % this.splitNum === 0) {
-				this._createFormat(html);
+				this.#createFormat(html);
 				html = '';
 			}
 			html += `<li class="se-select-item" data-index="${i}">${typeof menus[i] === 'string' ? menus[i] : /** @type {HTMLElement} */ (menus[i]).outerHTML}</li>`;
 		}
-		this._createFormat(html);
+		this.#createFormat(html);
 
 		this.items = /** @type {Array<string|Node>} */ (items);
 		this.menus = Array.from(this.form.querySelectorAll('li'));
@@ -96,9 +109,9 @@ class SelectMenu extends CoreInjector {
 	 * @param {{class?: string, style?: string}} [attr={}] - Additional attributes for the select menu container.
 	 */
 	on(referElement, selectMethod, attr = {}) {
-		this._refer = /** @type {HTMLElement} */ (referElement);
-		this._keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.frameContext.get('_ww');
-		this._selectMethod = selectMethod;
+		this.#refer = /** @type {HTMLElement} */ (referElement);
+		this.#keydownTarget = dom.check.isInputElement(referElement) ? referElement : this.frameContext.get('_ww');
+		this.#selectMethod = selectMethod;
 		this.form = dom.utils.createElement(
 			'DIV',
 			{
@@ -118,12 +131,12 @@ class SelectMenu extends CoreInjector {
 	open(position, onItemQuerySelector) {
 		this.editor.selectMenuOn = true;
 		if (typeof this.openMethod === 'function') this.openMethod();
-		this.__addEvents();
-		this.__addGlobalEvent();
+		this.#addEvents();
+		this.#addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
-		const mainPosition = positionItems[0] || (this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl') ? this._dirPosition : this.position);
-		const subPosition = positionItems[1] || (this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl') ? this._dirSubPosition : this.subPosition);
-		this._setPosition(mainPosition, subPosition, onItemQuerySelector);
+		const mainPosition = positionItems[0] || (this.#textDirDiff !== null && this.#textDirDiff !== this.options.get('_rtl') ? this.#dirPosition : this.position);
+		const subPosition = positionItems[1] || (this.#textDirDiff !== null && this.#textDirDiff !== this.options.get('_rtl') ? this.#dirSubPosition : this.subPosition);
+		this.#setPosition(mainPosition, subPosition, onItemQuerySelector);
 		this.isOpen = true;
 	}
 
@@ -132,8 +145,8 @@ class SelectMenu extends CoreInjector {
 	 */
 	close() {
 		this.editor.selectMenuOn = false;
-		dom.utils.removeClass(this._refer, 'on');
-		this._init();
+		dom.utils.removeClass(this.#refer, 'on');
+		this.#init();
 		if (this.form) this.form.style.cssText = '';
 		this.isOpen = false;
 		if (typeof this.closeMethod === 'function') this.closeMethod();
@@ -153,25 +166,23 @@ class SelectMenu extends CoreInjector {
 	 * @param {number} index Item index
 	 */
 	setItem(index) {
-		this._selectItem(index);
+		this.#selectItem(index);
 	}
 
 	/**
-	 * @private
 	 * @description Appends a formatted list of items to the menu.
 	 * @param {string} html - The HTML string representing the menu items.
 	 */
-	_createFormat(html) {
+	#createFormat(html) {
 		this.form.firstElementChild.innerHTML += `<ul class="se-list-basic se-list-checked${this.horizontal ? ' se-list-horizontal' : ''}">${html}</ul>`;
 	}
 
 	/**
-	 * @private
 	 * @description Resets the menu state and removes event listeners.
 	 */
-	_init() {
-		this.__removeEvents();
-		this.__removeGlobalEvent();
+	#init() {
+		this.#removeEvents();
+		this.#removeGlobalEvent();
 		this.index = -1;
 		this.item = null;
 		if (this._onItem) {
@@ -181,24 +192,22 @@ class SelectMenu extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Moves the selection up or down by a specified number of items.
 	 * @param {number} num - The number of items to move (negative for up, positive for down).
 	 */
-	_moveItem(num) {
+	#moveItem(num) {
 		num = this.index + num;
 		const len = this.menuLen;
 		const selectIndex = (this.index = num >= len ? 0 : num < 0 ? len - 1 : num);
 
-		this._selectItem(selectIndex);
+		this.#selectItem(selectIndex);
 	}
 
 	/**
-	 * @private
 	 * @description Highlights and selects an item by index.
 	 * @param {number} selectIndex - The index of the item to select.
 	 */
-	_selectItem(selectIndex) {
+	#selectItem(selectIndex) {
 		dom.utils.removeClass(this.form, 'se-select-menu-mouse-move');
 
 		const len = this.menuLen;
@@ -215,17 +224,16 @@ class SelectMenu extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Sets the position of the select menu relative to the reference element.
 	 * @param {string} position Menu position ("left"|"right") | ("top"|"bottom")
 	 * @param {string} subPosition Sub position ("middle"|"top"|"bottom") | ("center"|"left"|"right")
 	 * @param {string} [onItemQuerySelector] - A query selector string to highlight a specific item.
 	 * @param {boolean} [_re=false] - Whether this is a retry after adjusting the position.
 	 */
-	_setPosition(position, subPosition, onItemQuerySelector, _re) {
+	#setPosition(position, subPosition, onItemQuerySelector, _re) {
 		const originP = position;
 		const form = this.form;
-		const target = this._refer;
+		const target = this.#refer;
 		form.style.visibility = 'hidden';
 		form.style.display = 'block';
 		dom.utils.removeClass(form, 'se-select-menu-scroll');
@@ -307,7 +315,7 @@ class SelectMenu extends CoreInjector {
 		}
 
 		if (overH < MENU_MIN_HEIGHT && !_re && position !== 'middle') {
-			this._setPosition(position === 'top' ? 'bottpm' : 'top', subPosition, onItemQuerySelector, true);
+			this.#setPosition(position === 'top' ? 'bottpm' : 'top', subPosition, onItemQuerySelector, true);
 			return;
 		}
 
@@ -368,59 +376,54 @@ class SelectMenu extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Selects an item and triggers the callback function.
 	 * @param {number} index - The index of the item to select.
 	 */
-	_select(index) {
+	#select(index) {
 		if (this.checkList) dom.utils.toggleClass(this.menus[index], 'se-checked');
-		this._selectMethod(this.getItem(index));
+		this.#selectMethod(this.getItem(index));
 	}
 
 	/**
-	 * @private
 	 * @description Adds event listeners for menu interactions.
 	 */
-	__addEvents() {
-		this.__removeEvents();
-		this.__events = this.__eventHandlers;
-		this.form.addEventListener('mousedown', this.__events.mousedown);
-		this.form.addEventListener('mousemove', this.__events.mousemove);
-		this.form.addEventListener('click', this.__events.click);
-		this._keydownTarget.addEventListener('keydown', this.__events.keydown);
+	#addEvents() {
+		this.#removeEvents();
+		this.#events = this.#eventHandlers;
+		this.form.addEventListener('mousedown', this.#events.mousedown);
+		this.form.addEventListener('mousemove', this.#events.mousemove);
+		this.form.addEventListener('click', this.#events.click);
+		this.#keydownTarget.addEventListener('keydown', this.#events.keydown);
 	}
 
 	/**
-	 * @private
 	 * @description Removes event listeners for menu interactions.
 	 */
-	__removeEvents() {
-		if (!this.__events) return;
-		this.form.removeEventListener('mousedown', this.__events.mousedown);
-		this.form.removeEventListener('mousemove', this.__events.mousemove);
-		this.form.removeEventListener('click', this.__events.click);
-		this._keydownTarget.removeEventListener('keydown', this.__events.keydown);
-		this.__events = null;
+	#removeEvents() {
+		if (!this.#events) return;
+		this.form.removeEventListener('mousedown', this.#events.mousedown);
+		this.form.removeEventListener('mousemove', this.#events.mousemove);
+		this.form.removeEventListener('click', this.#events.click);
+		this.#keydownTarget.removeEventListener('keydown', this.#events.keydown);
+		this.#events = null;
 	}
 
 	/**
-	 * @private
 	 * @description Adds global event listeners for closing the menu.
 	 */
-	__addGlobalEvent() {
-		this.__removeGlobalEvent();
-		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers.keydown, true);
-		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers.mousedown, true);
+	#addGlobalEvent() {
+		this.#removeGlobalEvent();
+		this.#bindClose_key = this.eventManager.addGlobalEvent('keydown', this.#globalEventHandlers.keydown, true);
+		this.#bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.#globalEventHandlers.mousedown, true);
 	}
 
 	/**
-	 * @private
 	 * @description Removes global event listeners for closing the menu.
 	 */
-	__removeGlobalEvent() {
-		this._bindClose_key &&= this.eventManager.removeGlobalEvent(this._bindClose_key);
-		this._bindClose_mousedown &&= this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
-		this._bindClose_click &&= this.eventManager.removeGlobalEvent(this._bindClose_click);
+	#removeGlobalEvent() {
+		this.#bindClose_key &&= this.eventManager.removeGlobalEvent(this.#bindClose_key);
+		this.#bindClose_mousedown &&= this.eventManager.removeGlobalEvent(this.#bindClose_mousedown);
+		this.#bindClose_click &&= this.eventManager.removeGlobalEvent(this.#bindClose_click);
 	}
 
 	/**
@@ -464,14 +467,14 @@ class SelectMenu extends CoreInjector {
 				if (this.index > -1) {
 					e.preventDefault();
 					e.stopPropagation();
-					this._select(this.index);
+					this.#select(this.index);
 				} else {
 					this.close();
 				}
 				break;
 		}
 
-		if (moveIndex) this._moveItem(moveIndex);
+		if (moveIndex) this.#moveItem(moveIndex);
 	}
 
 	/**
@@ -509,7 +512,7 @@ class SelectMenu extends CoreInjector {
 		}
 
 		if (!index) return;
-		this._select(Number(index));
+		this.#select(Number(index));
 	}
 
 	/**
@@ -526,10 +529,10 @@ class SelectMenu extends CoreInjector {
 	#CloseListener_mousedown(e) {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (this.form.contains(eventTarget)) return;
-		if (e.target !== this._refer) {
+		if (e.target !== this.#refer) {
 			this.close();
 		} else if (!dom.check.isInputElement(eventTarget)) {
-			this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers.click, true);
+			this.#bindClose_click = this.eventManager.addGlobalEvent('click', this.#globalEventHandlers.click, true);
 		}
 	}
 
@@ -537,8 +540,8 @@ class SelectMenu extends CoreInjector {
 	 * @param {MouseEvent} e - Event object
 	 */
 	#CloseListener_click(e) {
-		this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
-		if (e.target === this._refer) {
+		this.#bindClose_click = this.eventManager.removeGlobalEvent(this.#bindClose_click);
+		if (e.target === this.#refer) {
 			e.stopPropagation();
 			this.close();
 		}

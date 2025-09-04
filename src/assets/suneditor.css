@@ -811,7 +811,7 @@
 	opacity: 0.95;
 	border-radius: var(--se-border-radius);
 	cursor: pointer;
-	z-index: 2147483646;
+	z-index: 2147483647;
 	transition: opacity 0.3s ease, color 0.3s ease, background-color 0.3s ease;
 }
 .sun-editor .se-line-breaker-component.se-on-selected {

@@ -9,6 +9,23 @@ const DIRECTION_CURSOR_MAP = { w: 'ns-resize', h: 'ew-resize', c: 'nwse-resize',
  * @description Modal window module
  */
 class Modal extends CoreInjector {
+	/** @type {HTMLElement} */
+	#modalArea;
+	/** @type {HTMLElement} */
+	#modalInner;
+	/** @type {HTMLElement} */
+	#resizeBody;
+	#closeListener;
+	#bindClose;
+	#closeSignal;
+	#currentHandle;
+	#resizeDir;
+	#offetTop;
+	#offetLeft;
+	#globalEventHandlers;
+	#bindClose_mousemove;
+	#bindClose_mouseup;
+
 	/**
 	 * @description Modal window module
 	 * @param {* & {editor: __se__EditorCore}} inst The instance object that called the constructor.
@@ -27,44 +44,38 @@ class Modal extends CoreInjector {
 
 		/** @type {HTMLInputElement} */
 		this.focusElement = element.querySelector('[data-focus]');
-		/** @type {HTMLElement} */
-		this._modalArea = this.carrierWrapper.querySelector('.se-modal');
-		/** @type {HTMLElement} */
-		this._modalInner = this.carrierWrapper.querySelector('.se-modal .se-modal-inner');
 
-		this._closeListener = [this.#CloseListener.bind(this), this.#OnClick_dialog.bind(this)];
-		this._bindClose = null;
-		this._onClickEvent = null;
-		this._closeSignal = false;
-
-		// resie
-		/** @type {HTMLElement} */
-		this._resizeBody = null;
+		this.#modalArea = this.carrierWrapper.querySelector('.se-modal');
+		this.#modalInner = this.carrierWrapper.querySelector('.se-modal .se-modal-inner');
+		this.#closeListener = [this.#CloseListener.bind(this), this.#OnClick_dialog.bind(this)];
+		this.#bindClose = null;
+		this.#closeSignal = false;
+		this.#resizeBody = null;
 
 		// add element
-		this._modalInner.appendChild(element);
+		this.#modalInner.appendChild(element);
 
 		// init
 		this.eventManager.addEvent(element.querySelector('form'), 'submit', this.#Action.bind(this));
-		this._closeSignal = !this.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
+		this.#closeSignal = !this.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
 
 		// resize
 		if (element.querySelector('.se-modal-resize-handle-w') || element.querySelector('.se-modal-resize-handle-h') || element.querySelector('.se-modal-resize-handle-c') || element.querySelector('.se-modal-resize-form')) {
-			if (!(this._resizeBody = element.querySelector('.se-modal-resize-form')) && (this._resizeBody = element.querySelector('.se-modal-body'))) {
+			if (!(this.#resizeBody = element.querySelector('.se-modal-resize-form')) && (this.#resizeBody = element.querySelector('.se-modal-body'))) {
 				this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-w'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'w'));
 				this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-h'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'h'));
 				this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-c'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'c'));
 
-				this._currentHandle = null;
-				this.__resizeDir = '';
-				this.__offetTop = 0;
-				this.__offetLeft = 0;
-				this.__globalEventHandlers = {
+				this.#currentHandle = null;
+				this.#resizeDir = '';
+				this.#offetTop = 0;
+				this.#offetLeft = 0;
+				this.#globalEventHandlers = {
 					mousemove: this.#OnResize.bind(this),
 					mouseup: this.#OnResizeMouseUp.bind(this)
 				};
-				this._bindClose_mousemove = null;
-				this._bindClose_mouseup = null;
+				this.#bindClose_mousemove = null;
+				this.#bindClose_mouseup = null;
 			}
 		}
 	}
@@ -135,28 +146,28 @@ class Modal extends CoreInjector {
 	 */
 	open() {
 		this.ui._offCurrentModal();
-		this._fixCurrentController(true);
+		this.#fixCurrentController(true);
 
-		if (this._closeSignal) this._modalInner.addEventListener('click', this._closeListener[1]);
-		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
-		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
+		if (this.#closeSignal) this.#modalInner.addEventListener('click', this.#closeListener[1]);
+		this.#bindClose &&= this.eventManager.removeGlobalEvent(this.#bindClose);
+		this.#bindClose = this.eventManager.addGlobalEvent('keydown', this.#closeListener[0]);
 		this.isUpdate = this.kind === this.editor.currentControllerName;
 		this.editor.opendModal = this;
 
 		if (!this.isUpdate && typeof this.inst.init === 'function') this.inst.init();
 		if (typeof this.inst.on === 'function') this.inst.on(this.isUpdate);
 
-		dom.utils.addClass(this._modalArea, 'se-backdrop-show');
+		dom.utils.addClass(this.#modalArea, 'se-backdrop-show');
 		dom.utils.addClass(this.form, 'se-modal-show');
 
-		if (this._resizeBody) {
-			const offset = this._saveOffset();
+		if (this.#resizeBody) {
+			const offset = this.#saveOffset();
 			const { maxWidth, maxHeight } = _w.getComputedStyle(this.form);
 			const mw = `${this.form.offsetWidth - offset.width}px`;
-			const mh = `${this.form.offsetTop + (this.form.offsetHeight - this._resizeBody.offsetHeight)}px`;
+			const mh = `${this.form.offsetTop + (this.form.offsetHeight - this.#resizeBody.offsetHeight)}px`;
 			// set max
-			if (maxWidth && typeof this.__resizeDir === 'string') dom.utils.setStyle(this._resizeBody, 'max-width', `calc(${maxWidth} - ${mw})`);
-			if (maxHeight) dom.utils.setStyle(this._resizeBody, 'max-height', `calc(${maxHeight} - ${mh})`);
+			if (maxWidth && typeof this.#resizeDir === 'string') dom.utils.setStyle(this.#resizeBody, 'max-width', `calc(${maxWidth} - ${mw})`);
+			if (maxHeight) dom.utils.setStyle(this.#resizeBody, 'max-height', `calc(${maxHeight} - ${mh})`);
 		}
 
 		if (this.focusElement) this.focusElement.focus();
@@ -167,30 +178,29 @@ class Modal extends CoreInjector {
 	 * - The plugin's "init" and "off" method is called.
 	 */
 	close() {
-		this.__removeGlobalEvent();
-		this._fixCurrentController(false);
+		this.#removeGlobalEvent();
+		this.#fixCurrentController(false);
 		_w.setTimeout(() => {
 			this.editor.opendModal = null;
 		}, 0);
 
-		if (this._closeSignal) this._modalInner.removeEventListener('click', this._closeListener[1]);
-		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
+		if (this.#closeSignal) this.#modalInner.removeEventListener('click', this.#closeListener[1]);
+		this.#bindClose &&= this.eventManager.removeGlobalEvent(this.#bindClose);
 
 		// close
-		dom.utils.removeClass(this._modalArea, 'se-backdrop-show');
+		dom.utils.removeClass(this.#modalArea, 'se-backdrop-show');
 		dom.utils.removeClass(this.form, 'se-modal-show');
 
 		if (typeof this.inst.init === 'function') this.inst.init();
 		if (typeof this.inst.off === 'function') this.inst.off(this.isUpdate);
-		this.editor.focus();
+		if (!this.isUpdate) this.editor.focus();
 	}
 
 	/**
-	 * @private
 	 * @description Fixes the current controller's display state when the modal is opened or closed.
 	 * @param {boolean} fixed - Whether to fix or unfix the controller.
 	 */
-	_fixCurrentController(fixed) {
+	#fixCurrentController(fixed) {
 		const cont = this.editor.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
 			cont[i].fixed = fixed;
@@ -199,37 +209,34 @@ class Modal extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Saves the current offset position of the modal for resizing calculations.
 	 * @returns {__se__Class_OffsetGlobalInfo} The offset position of the modal.
 	 */
-	_saveOffset() {
-		const offset = this.offset.getGlobal(this._resizeBody);
-		this.__offetTop = offset.top;
-		this.__offetLeft = offset.left;
+	#saveOffset() {
+		const offset = this.offset.getGlobal(this.#resizeBody);
+		this.#offetTop = offset.top;
+		this.#offetLeft = offset.left;
 		return offset;
 	}
 
 	/**
-	 * @private
 	 * @description Adds global event listeners for resizing the modal.
 	 * @param {string} dir - The direction in which resizing is occurring.
 	 */
-	__addGlobalEvent(dir) {
-		this.__removeGlobalEvent();
+	#addGlobalEvent(dir) {
+		this.#removeGlobalEvent();
 		this.ui.enableBackWrapper(DIRECTION_CURSOR_MAP[dir]);
-		this._bindClose_mousemove = this.eventManager.addGlobalEvent('mousemove', this.__globalEventHandlers.mousemove, true);
-		this._bindClose_mouseup = this.eventManager.addGlobalEvent('mouseup', this.__globalEventHandlers.mouseup, true);
+		this.#bindClose_mousemove = this.eventManager.addGlobalEvent('mousemove', this.#globalEventHandlers.mousemove, true);
+		this.#bindClose_mouseup = this.eventManager.addGlobalEvent('mouseup', this.#globalEventHandlers.mouseup, true);
 	}
 
 	/**
-	 * @private
 	 * @description Removes global event listeners related to modal resizing.
 	 */
-	__removeGlobalEvent() {
+	#removeGlobalEvent() {
 		this.ui.disableBackWrapper();
-		this._bindClose_mousemove &&= this.eventManager.removeGlobalEvent(this._bindClose_mousemove);
-		this._bindClose_mouseup &&= this.eventManager.removeGlobalEvent(this._bindClose_mouseup);
+		this.#bindClose_mousemove &&= this.eventManager.removeGlobalEvent(this.#bindClose_mousemove);
+		this.#bindClose_mouseup &&= this.eventManager.removeGlobalEvent(this.#bindClose_mouseup);
 	}
 
 	/**
@@ -270,7 +277,7 @@ class Modal extends CoreInjector {
 	 */
 	#OnClick_dialog(e) {
 		const eventTarget = dom.query.getEventTarget(e);
-		if (/close/.test(eventTarget.getAttribute('data-command')) || eventTarget === this._modalInner) {
+		if (/close/.test(eventTarget.getAttribute('data-command')) || eventTarget === this.#modalInner) {
 			this.close();
 		}
 	}
@@ -289,57 +296,57 @@ class Modal extends CoreInjector {
 	 * @param {MouseEvent} e - Event object
 	 */
 	#OnResizeMouseDown(dir, e) {
-		this._currentHandle = dom.query.getEventTarget(e);
-		dom.utils.addClass(this._currentHandle, 'active');
-		this.__addGlobalEvent((this.__resizeDir = dir + (this.options.get('_rtl') ? 'RTL' : '')));
+		this.#currentHandle = dom.query.getEventTarget(e);
+		dom.utils.addClass(this.#currentHandle, 'active');
+		this.#addGlobalEvent((this.#resizeDir = dir + (this.options.get('_rtl') ? 'RTL' : '')));
 	}
 
 	/**
 	 * @param {MouseEvent} e - Event object
 	 */
 	#OnResize(e) {
-		switch (this.__resizeDir) {
+		switch (this.#resizeDir) {
 			case 'w':
 			case 'wRTL': {
-				const h = e.clientY - this.__offetTop - this._resizeBody.offsetHeight;
-				this._resizeBody.style.height = this._resizeBody.offsetHeight + h + 'px';
+				const h = e.clientY - this.#offetTop - this.#resizeBody.offsetHeight;
+				this.#resizeBody.style.height = this.#resizeBody.offsetHeight + h + 'px';
 				break;
 			}
 			case 'h': {
-				const w = e.clientX - this.__offetLeft - this._resizeBody.offsetWidth;
-				this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
+				const w = e.clientX - this.#offetLeft - this.#resizeBody.offsetWidth;
+				this.#resizeBody.style.width = this.#resizeBody.offsetWidth + w + 'px';
 				break;
 			}
 			case 'hRTL': {
-				const w = this.__offetLeft - e.clientX;
-				this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
+				const w = this.#offetLeft - e.clientX;
+				this.#resizeBody.style.width = this.#resizeBody.offsetWidth + w + 'px';
 				break;
 			}
 			case 'c': {
-				const w = e.clientX - this.__offetLeft - this._resizeBody.offsetWidth;
-				const h = e.clientY - this.__offetTop - this._resizeBody.offsetHeight;
-				this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
-				this._resizeBody.style.height = this._resizeBody.offsetHeight + h + 'px';
+				const w = e.clientX - this.#offetLeft - this.#resizeBody.offsetWidth;
+				const h = e.clientY - this.#offetTop - this.#resizeBody.offsetHeight;
+				this.#resizeBody.style.width = this.#resizeBody.offsetWidth + w + 'px';
+				this.#resizeBody.style.height = this.#resizeBody.offsetHeight + h + 'px';
 				break;
 			}
 			case 'cRTL': {
-				const w = this.__offetLeft - e.clientX;
-				const h = e.clientY - this.__offetTop - this._resizeBody.offsetHeight;
-				this._resizeBody.style.width = this._resizeBody.offsetWidth + w + 'px';
-				this._resizeBody.style.height = this._resizeBody.offsetHeight + h + 'px';
+				const w = this.#offetLeft - e.clientX;
+				const h = e.clientY - this.#offetTop - this.#resizeBody.offsetHeight;
+				this.#resizeBody.style.width = this.#resizeBody.offsetWidth + w + 'px';
+				this.#resizeBody.style.height = this.#resizeBody.offsetHeight + h + 'px';
 				break;
 			}
 		}
 
-		this._saveOffset();
+		this.#saveOffset();
 
 		if (typeof this.inst.modalResize === 'function') this.inst.modalResize();
 	}
 
 	#OnResizeMouseUp() {
-		dom.utils.removeClass(this._currentHandle, 'active');
-		this._currentHandle = null;
-		this.__removeGlobalEvent();
+		dom.utils.removeClass(this.#currentHandle, 'active');
+		this.#currentHandle = null;
+		this.#removeGlobalEvent();
 	}
 }
 

@@ -44,6 +44,11 @@ class Audio_ extends EditorInjector {
 		return /^AUDIO$/i.test(node?.nodeName) ? node : null;
 	}
 
+	#element;
+	#defaultWidth;
+	#defaultHeight;
+	#urlValue;
+
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
@@ -95,12 +100,12 @@ class Audio_ extends EditorInjector {
 		this.audioUrlFile = modalEl.querySelector('.se-input-url');
 		/** @type {HTMLElement} */
 		this.preview = modalEl.querySelector('.se-link-preview');
-		/** @type {HTMLAudioElement} */
-		this._element = null;
 
-		this.defaultWidth = this.pluginOptions.defaultWidth;
-		this.defaultHeight = this.pluginOptions.defaultHeight;
-		this.urlValue = '';
+		/** @type {HTMLAudioElement} */
+		this.#element = null;
+		this.#defaultWidth = this.pluginOptions.defaultWidth;
+		this.#defaultHeight = this.pluginOptions.defaultHeight;
+		this.#urlValue = '';
 
 		const galleryButton = modalEl.querySelector('.__se__gallery');
 		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
@@ -133,8 +138,8 @@ class Audio_ extends EditorInjector {
 	on(isUpdate) {
 		if (!isUpdate) {
 			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.setAttribute('multiple', 'multiple');
-		} else if (this._element) {
-			this.urlValue = this.preview.textContent = this.audioUrlFile.value = this._element.src;
+		} else if (this.#element) {
+			this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
 			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
 		} else {
 			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
@@ -167,8 +172,8 @@ class Audio_ extends EditorInjector {
 	async modalAction() {
 		if (this.audioInputFile && this.audioInputFile?.files.length > 0) {
 			return await this.submitFile(this.audioInputFile.files);
-		} else if (this.audioUrlFile && this.urlValue.length > 0) {
-			return await this.submitURL(this.urlValue);
+		} else if (this.audioUrlFile && this.#urlValue.length > 0) {
+			return await this.submitURL(this.#urlValue);
 		}
 		return false;
 	}
@@ -180,7 +185,7 @@ class Audio_ extends EditorInjector {
 	init() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
 		if (this.audioInputFile) this.audioInputFile.value = '';
-		if (this.audioUrlFile) this.urlValue = this.preview.textContent = this.audioUrlFile.value = '';
+		if (this.audioUrlFile) this.#urlValue = this.preview.textContent = this.audioUrlFile.value = '';
 		if (this.audioInputFile && this.audioUrlFile) {
 			this.audioUrlFile.disabled = false;
 			this.preview.style.textDecoration = '';
@@ -195,11 +200,11 @@ class Audio_ extends EditorInjector {
 	controllerAction(target) {
 		switch (target.getAttribute('data-command')) {
 			case 'update':
-				if (this.audioUrlFile) this.urlValue = this.preview.textContent = this.audioUrlFile.value = this._element.src;
+				if (this.audioUrlFile) this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
 				this.open();
 				break;
 			case 'copy': {
-				const figure = Figure.GetContainer(this._element);
+				const figure = Figure.GetContainer(this.#element);
 				this.component.copy(figure.container);
 				break;
 			}
@@ -227,7 +232,7 @@ class Audio_ extends EditorInjector {
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
 
-				this._setTagAttrs(element);
+				this.#setTagAttrs(element);
 				const figure = Figure.CreateContainer(element.cloneNode(true), 'se-flex-component');
 				this.figure.retainFigureFormat(figure.container, element, null, this.fileManager);
 			}
@@ -241,20 +246,7 @@ class Audio_ extends EditorInjector {
 	 */
 	select(target) {
 		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
-		this._ready(target);
-	}
-
-	/**
-	 * @private
-	 * @description Prepares the component for selection.
-	 * - Ensures that the controller is properly positioned and initialized.
-	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {HTMLElement} target - The selected element.
-	 */
-	_ready(target) {
-		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
-		this._element = /** @type {HTMLAudioElement} */ (target);
-		this.controller.open(target, null, { isWWTarget: false, addOffset: null });
+		this.#ready(target);
 	}
 
 	/**
@@ -264,7 +256,7 @@ class Audio_ extends EditorInjector {
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {
-		const element = target || this._element;
+		const element = target || this.#element;
 		const figure = Figure.GetContainer(element);
 		const container = figure.container || element;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
@@ -290,25 +282,6 @@ class Audio_ extends EditorInjector {
 		// focus
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
-	}
-
-	/**
-	 * @private
-	 * @description Registers uploaded audio files and creates the corresponding audio elements.
-	 * - Iterates through the uploaded files and inserts them into the editor.
-	 * @param {AudioInfo_audio} info - Upload metadata, including `isUpdate` flag and `element`.
-	 * @param {Object<string, *>} response - Server response containing uploaded file details.
-	 */
-	_register(info, response) {
-		const fileList = response.result;
-
-		for (let i = 0, len = fileList.length, file, oAudio; i < len; i++) {
-			if (info.isUpdate) oAudio = info.element;
-			else oAudio = this._createAudioTag();
-
-			file = { name: fileList[i].name, size: fileList[i].size };
-			this._createComp(oAudio, fileList[i].url, file, info.isUpdate);
-		}
 	}
 
 	/**
@@ -358,13 +331,13 @@ class Audio_ extends EditorInjector {
 		const audioInfo = {
 			files,
 			isUpdate: this.modal.isUpdate,
-			element: this._element
+			element: this.#element
 		};
 
-		const handler = function (newInfos, infos) {
+		const handler = function (uploadCallback, newInfos, infos) {
 			infos = newInfos || infos;
-			this._serverUpload(infos, infos.files);
-		}.bind(this, audioInfo);
+			uploadCallback(infos, infos.files);
+		}.bind(this, this.#serverUpload.bind(this), audioInfo);
 
 		const result = await this.triggerEvent('onAudioUploadBefore', {
 			info: audioInfo,
@@ -393,13 +366,13 @@ class Audio_ extends EditorInjector {
 			url,
 			files: file,
 			isUpdate: this.modal.isUpdate,
-			element: this._createAudioTag()
+			element: this.#createAudioTag()
 		};
 
-		const handler = function (newInfos, infos) {
+		const handler = function (uploadCallback, newInfos, infos) {
 			infos = newInfos || infos;
-			this._createComp(infos.element, infos.url, infos.files, infos.isUpdate);
-		}.bind(this, audioInfo);
+			uploadCallback(infos.element, infos.url, infos.files, infos.isUpdate, true);
+		}.bind(this, this.create.bind(this), audioInfo);
 
 		const result = await this.triggerEvent('onAudioUploadBefore', {
 			info: audioInfo,
@@ -416,7 +389,6 @@ class Audio_ extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Creates or updates an audio component within the editor.
 	 * - If `isUpdate` is `true`, updates the existing element's `src`.
 	 * - Otherwise, inserts a new audio component with the given file.
@@ -424,15 +396,16 @@ class Audio_ extends EditorInjector {
 	 * @param {string} src - The source URL of the audio file.
 	 * @param {{name: string, size: number}} file - The file metadata (name, size).
 	 * @param {boolean} isUpdate - Whether to update an existing element.
+	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */
-	_createComp(element, src, file, isUpdate) {
+	create(element, src, file, isUpdate, isLast) {
 		// create new tag
 		if (!isUpdate) {
 			this.fileManager.setFileData(element, file);
 			element.src = src;
 			const figure = Figure.CreateContainer(element, 'se-flex-component');
-			if (!this.component.insert(figure.container, { insertBehavior: this.pluginOptions.insertBehavior })) {
-				this.editor.focus();
+			if (!this.component.insert(figure.container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? this.pluginOptions.insertBehavior : 'line' })) {
+				if (isLast) this.editor.focus();
 				return;
 			}
 			if (!this.options.get('componentInsertBehavior')) {
@@ -440,7 +413,7 @@ class Audio_ extends EditorInjector {
 				if (line) this.selection.setRange(line, 0, line, 0);
 			}
 		} else {
-			if (this._element) element = this._element;
+			if (this.#element) element = this.#element;
 			this.fileManager.setFileData(element, file);
 			if (element && element.src !== src) {
 				element.src = src;
@@ -455,27 +428,55 @@ class Audio_ extends EditorInjector {
 	}
 
 	/**
-	 * @private
+	 * @description Prepares the component for selection.
+	 * - Ensures that the controller is properly positioned and initialized.
+	 * - Prevents duplicate event handling if the component is already selected.
+	 * @param {HTMLElement} target - The selected element.
+	 */
+	#ready(target) {
+		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
+		this.#element = /** @type {HTMLAudioElement} */ (target);
+		this.controller.open(target, null, { isWWTarget: false, addOffset: null });
+	}
+
+	/**
+	 * @description Registers uploaded audio files and creates the corresponding audio elements.
+	 * - Iterates through the uploaded files and inserts them into the editor.
+	 * @param {AudioInfo_audio} info - Upload metadata, including `isUpdate` flag and `element`.
+	 * @param {Object<string, *>} response - Server response containing uploaded file details.
+	 */
+	#register(info, response) {
+		const fileList = response.result;
+
+		for (let i = 0, len = fileList.length, file, oAudio; i < len; i++) {
+			if (info.isUpdate) oAudio = info.element;
+			else oAudio = this.#createAudioTag();
+
+			file = { name: fileList[i].name, size: fileList[i].size };
+			this.create(oAudio, fileList[i].url, file, info.isUpdate, i === len - 1);
+		}
+	}
+
+	/**
 	 * @description Creates a new `<audio>` element with default attributes.
 	 * - Applies width, height, and additional attributes from plugin options.
 	 * @returns {HTMLAudioElement} - The newly created `<audio>` element.
 	 */
-	_createAudioTag() {
-		const w = this.defaultWidth;
-		const h = this.defaultHeight;
+	#createAudioTag() {
+		const w = this.#defaultWidth;
+		const h = this.#defaultHeight;
 		/** @type {HTMLAudioElement} */
 		const oAudio = dom.utils.createElement('AUDIO', { style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
-		this._setTagAttrs(oAudio);
+		this.#setTagAttrs(oAudio);
 		return oAudio;
 	}
 
 	/**
-	 * @private
 	 * @description Sets attributes on an audio element based on plugin options.
 	 * - Adds the `controls` attribute and applies any custom attributes.
 	 * @param {HTMLElement} element - The `<audio>` element to modify.
 	 */
-	_setTagAttrs(element) {
+	#setTagAttrs(element) {
 		element.setAttribute('controls', 'true');
 
 		const attrs = this.pluginOptions.audioTagAttributes;
@@ -487,21 +488,19 @@ class Audio_ extends EditorInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Uploads audio files to the server.
 	 * - Sends a request to the configured upload URL and processes the response.
 	 * @param {AudioInfo_audio} info - Upload metadata, including `files` and `isUpdate`.
 	 * @param {FileList|File[]} files - The files to be uploaded.
 	 */
-	_serverUpload(info, files) {
+	#serverUpload(info, files) {
 		if (!files) return;
 
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
-		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, this.#UploadCallBack.bind(this, info), this._error.bind(this));
+		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, this.#UploadCallBack.bind(this, info), this.#error.bind(this));
 	}
 
 	/**
-	 * @private
 	 * @description Handles errors that occur during the audio upload process.
 	 * - Triggers the `onAudioUploadError` event to allow custom handling of errors.
 	 * - Displays an error message in the editor's UI.
@@ -509,7 +508,7 @@ class Audio_ extends EditorInjector {
 	 * @param {Object<string, *>} response - The error response object from the server or upload process.
 	 * @returns {Promise<void>}
 	 */
-	async _error(response) {
+	async #error(response) {
 		const message = await this.triggerEvent('onAudioUploadError', { error: response });
 		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.ui.alertOpen(err, 'error');
@@ -527,9 +526,9 @@ class Audio_ extends EditorInjector {
 		if ((await this.triggerEvent('audioUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 			const response = JSON.parse(xmlHttp.responseText);
 			if (response.errorMessage) {
-				this._error(response);
+				this.#error(response);
 			} else {
-				this._register(info, response);
+				this.#register(info, response);
 			}
 		}
 	}
@@ -543,7 +542,7 @@ class Audio_ extends EditorInjector {
 		/** @type {HTMLInputElement} */
 		const target = dom.query.getEventTarget(e);
 		const value = target.value.trim();
-		this.urlValue = this.preview.textContent = !value
+		this.#urlValue = this.preview.textContent = !value
 			? ''
 			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
 			? this.options.get('defaultUrlProtocol') + value
@@ -564,7 +563,7 @@ class Audio_ extends EditorInjector {
 	 * @param {HTMLInputElement} target - The target element.
 	 */
 	#SetUrlInput(target) {
-		this.urlValue = this.preview.textContent = this.audioUrlFile.value = target.getAttribute('data-command') || target.src;
+		this.#urlValue = this.preview.textContent = this.audioUrlFile.value = target.getAttribute('data-command') || target.src;
 		this.audioUrlFile.focus();
 	}
 

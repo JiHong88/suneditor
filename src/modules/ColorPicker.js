@@ -148,7 +148,7 @@ class ColorPicker extends CoreInjector {
 		this.targetButton = target;
 		if (typeof stopCondition !== 'function') stopCondition = () => false;
 
-		let fillColor = (typeof nodeOrColor === 'string' ? nodeOrColor : this._getColorInNode(nodeOrColor, stopCondition)) || this.defaultColor;
+		let fillColor = (typeof nodeOrColor === 'string' ? nodeOrColor : this.#getColorInNode(nodeOrColor, stopCondition)) || this.defaultColor;
 		fillColor = converter.isHexColor(fillColor) ? fillColor : converter.rgb2hex(fillColor) || fillColor || '';
 
 		const colorList = this.colorList;
@@ -163,7 +163,7 @@ class ColorPicker extends CoreInjector {
 			}
 		}
 
-		this._setInputText(this._colorName2hex(fillColor));
+		this.#setInputText(this.#colorName2hex(fillColor));
 	}
 
 	/**
@@ -183,24 +183,41 @@ class ColorPicker extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @editorMethod Modules.HueSlider
+	 * @description This method is called when the color is selected in the hue slider.
+	 * @param {HueSliderColor_colorPicker} color - Color object
+	 */
+	hueSliderAction(color) {
+		this.#setInputText(color.hex);
+	}
+
+	/**
+	 * @editorMethod Modules.HueSlider
+	 * @description This method is called when the hue slider is closed.
+	 */
+	hueSliderCancelAction() {
+		if (this.parentForm?.length > 0) {
+			this.parentFormDisplay.forEach((e) => (e[0].style.display = e[1]));
+		}
+	}
+
+	/**
 	 * @description Set color at input element
 	 * @param {string} hexColorStr Hax color value
 	 */
-	_setInputText(hexColorStr) {
+	#setInputText(hexColorStr) {
 		hexColorStr = !hexColorStr || /^#/.test(hexColorStr) ? hexColorStr : '#' + hexColorStr;
 		this.inputElement.value = hexColorStr;
 		this.setHexColor.call(this, hexColorStr);
 	}
 
 	/**
-	 * @private
 	 * @description Gets color value at color property of node
 	 * @param {Node} node Selected node
 	 * @param {(current: Node) => boolean} stopCondition - A function used to stop traversing parent nodes while finding the color.
 	 * @returns {string}
 	 */
-	_getColorInNode(node, stopCondition) {
+	#getColorInNode(node, stopCondition) {
 		let findColor = '';
 		const sp = this.styleProperties;
 
@@ -213,12 +230,11 @@ class ColorPicker extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Converts color values of other formats to hex color values and returns.
 	 * @param {string} colorName Color value
 	 * @returns {string}
 	 */
-	_colorName2hex(colorName) {
+	#colorName2hex(colorName) {
 		if (!colorName || /^#/.test(colorName)) return colorName;
 		const temp = dom.utils.createElement('div', { style: 'display: none; color: ' + colorName });
 		const colors = this._w
@@ -229,25 +245,6 @@ class ColorPicker extends CoreInjector {
 			});
 		dom.utils.removeItem(temp);
 		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substring(1) : '';
-	}
-
-	/**
-	 * @editorMethod Modules.HueSlider
-	 * @description This method is called when the color is selected in the hue slider.
-	 * @param {HueSliderColor_colorPicker} color - Color object
-	 */
-	hueSliderAction(color) {
-		this._setInputText(color.hex);
-	}
-
-	/**
-	 * @editorMethod Modules.HueSlider
-	 * @description This method is called when the hue slider is closed.
-	 */
-	hueSliderCancelAction() {
-		if (this.parentForm?.length > 0) {
-			this.parentFormDisplay.forEach((e) => (e[0].style.display = e[1]));
-		}
 	}
 
 	#OnColorPalette() {
