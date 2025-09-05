@@ -568,7 +568,7 @@ Component.prototype = {
 		const { top, left, right, scrollX, scrollY } = this.offset.getLocal(offsetTarget);
 		const sideOffset = isRtl ? right : left;
 
-		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
+		if (isList ? !container.previousSibling || this.is(container.previousElementSibling) : !this.format.isLine(container.previousElementSibling)) {
 			const cStyle = _w.getComputedStyle(lb_t);
 			const cH = numbers.get(cStyle.height, 1);
 			const cW = numbers.get(cStyle.width, 1);
@@ -592,7 +592,7 @@ Component.prototype = {
 		}
 
 		// bottom
-		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
+		if (isList ? !container.nextSibling || this.is(container.nextElementSibling) : !this.format.isLine(container.nextElementSibling)) {
 			const cStyle = _w.getComputedStyle(lb_b);
 			const cH = numbers.get(cStyle.height, 1);
 			const cW = numbers.get(cStyle.width, 1);
