@@ -457,7 +457,9 @@ HTML.prototype = {
 				});
 				afterNode = this.nodeTransform.split(container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
 				if (!afterNode) {
-					tempAfterNode = afterNode = line;
+					if (!dom.check.isListCell(line)) {
+						tempAfterNode = afterNode = line;
+					}
 				} else if (insertListCell) {
 					if (line.contains(container)) {
 						const subList = dom.check.isList(line.lastElementChild);

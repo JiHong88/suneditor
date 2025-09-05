@@ -111,7 +111,7 @@ NodeTransform.prototype = {
 			}
 		}
 
-		if (depthEl.childNodes.length <= 1 && (!depthEl.firstChild || depthEl.firstChild.textContent.length === 0)) /** @type {HTMLElement} */ (depthEl).innerHTML = '<br>';
+		if (depthEl.nodeType === 1 && depthEl.childNodes.length <= 1 && !depthEl.firstChild?.textContent?.length) /** @type {HTMLElement} */ (depthEl).innerHTML = '<br>';
 
 		const pElement = depthEl.parentNode;
 		if (next) depthEl = depthEl.nextSibling;
