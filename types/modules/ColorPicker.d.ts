@@ -98,27 +98,6 @@ declare class ColorPicker extends CoreInjector {
 	 */
 	hueSliderClose(): void;
 	/**
-	 * @private
-	 * @description Set color at input element
-	 * @param {string} hexColorStr Hax color value
-	 */
-	private _setInputText;
-	/**
-	 * @private
-	 * @description Gets color value at color property of node
-	 * @param {Node} node Selected node
-	 * @param {(current: Node) => boolean} stopCondition - A function used to stop traversing parent nodes while finding the color.
-	 * @returns {string}
-	 */
-	private _getColorInNode;
-	/**
-	 * @private
-	 * @description Converts color values of other formats to hex color values and returns.
-	 * @param {string} colorName Color value
-	 * @returns {string}
-	 */
-	private _colorName2hex;
-	/**
 	 * @editorMethod Modules.HueSlider
 	 * @description This method is called when the color is selected in the hue slider.
 	 * @param {HueSliderColor_colorPicker} color - Color object

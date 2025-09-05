@@ -130,65 +130,6 @@ declare class Table extends EditorInjector {
 	mergeButton: HTMLButtonElement;
 	/** @type {HTMLButtonElement} */
 	unmergeButton: HTMLButtonElement;
-	_resizing: boolean;
-	_resizeLine: any;
-	_resizeLinePrev: any;
-	/** @type {HTMLElement} */
-	_figure: HTMLElement;
-	/**
-	 * @description Same value a "this._selectedTable", but it maintain prev table element
-	 * @type {HTMLTableElement}
-	 */
-	_element: HTMLTableElement;
-	/** @type {HTMLTableCellElement} */
-	_tdElement: HTMLTableCellElement;
-	/** @type {HTMLTableRowElement} */
-	_trElement: HTMLTableRowElement;
-	/** @type {HTMLTableRowElement[]|HTMLCollectionOf<HTMLTableRowElement>} */
-	_trElements: HTMLTableRowElement[] | HTMLCollectionOf<HTMLTableRowElement>;
-	_tableXY: any[];
-	_maxWidth: boolean;
-	_fixedColumn: boolean;
-	_physical_cellCnt: number;
-	_logical_cellCnt: number;
-	_cellCnt: number;
-	_rowCnt: number;
-	_rowIndex: number;
-	_physical_cellIndex: number;
-	_logical_cellIndex: number;
-	_current_colSpan: number;
-	_current_rowSpan: number;
-	/** @type {HTMLTableElement} */
-	_selectedTable: HTMLTableElement;
-	/** @type {HTMLTableCellElement} */
-	_fixedCell: HTMLTableCellElement;
-	/** @type {HTMLTableCellElement} */
-	_selectedCell: HTMLTableCellElement;
-	/** @type {HTMLTableCellElement[]} */
-	_selectedCells: HTMLTableCellElement[];
-	_shift: boolean;
-	__s: boolean;
-	_fixedCellName: string;
-	_ref: {
-		_i: number;
-		cs: any;
-		ce: any;
-		rs: any;
-		re: any;
-	};
-	_bindMultiOn: any;
-	_bindMultiOff: any;
-	_bindShiftOff: any;
-	_bindTouchOff: any;
-	__globalEvents: {
-		on: any;
-		off: any;
-		shiftOff: any;
-		touchOff: any;
-		resize: any;
-		resizeStop: any;
-		resizeKeyDown: any;
-	};
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
@@ -381,23 +322,6 @@ declare class Table extends EditorInjector {
 	 * @description Toggles the visibility of the table caption (`<caption>`). If the caption is present, it is removed; if absent, it is added.
 	 */
 	toggleCaption(): void;
-	/**
-	 * @private
-	 * @description Updates table styles.
-	 * @param {string} styles - Styles to update.
-	 * @param {boolean} ondisplay - Whether to update display.
-	 */
-	private _setTableStyle;
-	/**
-	 * @private
-	 * @description Sets the merge/split button visibility.
-	 */
-	private _setMergeSplitButton;
-	/**
-	 * @private
-	 * @description Sets the unmerge button visibility.
-	 */
-	private _setUnMergeButton;
 	/**
 	 * @private
 	 * @description Sets the controller position for a cell.

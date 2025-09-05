@@ -69,7 +69,6 @@ declare class ApiManager {
 	 * @type {string}
 	 */
 	kind: string;
-	_xhr: XMLHttpRequest;
 	method: string;
 	url: string;
 	headers: {
@@ -115,11 +114,5 @@ declare class ApiManager {
 	 * @description Cancel API (xhr.abort())
 	 */
 	cancel(): void;
-	/**
-	 * @private
-	 * @description Remove unnecessary slashes in API URL.
-	 * @param {string} url url
-	 * @returns
-	 */
-	private _normalizeUrl;
+	#private;
 }

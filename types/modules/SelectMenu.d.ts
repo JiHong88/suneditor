@@ -58,37 +58,10 @@ declare class SelectMenu extends CoreInjector {
 	checkList: boolean;
 	position: string;
 	subPosition: string;
-	_dirPosition: string;
-	_dirSubPosition: string;
-	_textDirDiff: boolean;
 	splitNum: number;
 	horizontal: boolean;
 	openMethod: () => void;
 	closeMethod: () => void;
-	_refer: HTMLElement;
-	_keydownTarget: any;
-	_selectMethod: (command: string) => void;
-	_bindClose_key: __se__GlobalEventInfo;
-	_bindClose_mousedown: __se__GlobalEventInfo;
-	_bindClose_click: any;
-	_closeSignal: boolean;
-	__events: {
-		mousedown: any;
-		mousemove: any;
-		click: any;
-		keydown: any;
-	};
-	__eventHandlers: {
-		mousedown: any;
-		mousemove: any;
-		click: any;
-		keydown: any;
-	};
-	__globalEventHandlers: {
-		keydown: any;
-		mousedown: any;
-		click: any;
-	};
 	/**
 	 * @description Creates the select menu items.
 	 * @param {Array<string>|__se__NodeCollection} items - Command list of selectable items.
@@ -130,65 +103,7 @@ declare class SelectMenu extends CoreInjector {
 	 * @param {number} index Item index
 	 */
 	setItem(index: number): void;
-	/**
-	 * @private
-	 * @description Appends a formatted list of items to the menu.
-	 * @param {string} html - The HTML string representing the menu items.
-	 */
-	private _createFormat;
-	/**
-	 * @private
-	 * @description Resets the menu state and removes event listeners.
-	 */
-	private _init;
 	_onItem: Element;
-	/**
-	 * @private
-	 * @description Moves the selection up or down by a specified number of items.
-	 * @param {number} num - The number of items to move (negative for up, positive for down).
-	 */
-	private _moveItem;
-	/**
-	 * @private
-	 * @description Highlights and selects an item by index.
-	 * @param {number} selectIndex - The index of the item to select.
-	 */
-	private _selectItem;
-	/**
-	 * @private
-	 * @description Sets the position of the select menu relative to the reference element.
-	 * @param {string} position Menu position ("left"|"right") | ("top"|"bottom")
-	 * @param {string} subPosition Sub position ("middle"|"top"|"bottom") | ("center"|"left"|"right")
-	 * @param {string} [onItemQuerySelector] - A query selector string to highlight a specific item.
-	 * @param {boolean} [_re=false] - Whether this is a retry after adjusting the position.
-	 */
-	private _setPosition;
-	/**
-	 * @private
-	 * @description Selects an item and triggers the callback function.
-	 * @param {number} index - The index of the item to select.
-	 */
-	private _select;
-	/**
-	 * @private
-	 * @description Adds event listeners for menu interactions.
-	 */
-	private __addEvents;
-	/**
-	 * @private
-	 * @description Removes event listeners for menu interactions.
-	 */
-	private __removeEvents;
-	/**
-	 * @private
-	 * @description Adds global event listeners for closing the menu.
-	 */
-	private __addGlobalEvent;
-	/**
-	 * @private
-	 * @description Removes global event listeners for closing the menu.
-	 */
-	private __removeGlobalEvent;
 	#private;
 }
 import CoreInjector from '../editorInjector/_core';

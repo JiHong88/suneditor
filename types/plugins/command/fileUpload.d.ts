@@ -92,11 +92,9 @@ declare class FileUpload extends EditorInjector {
 	uploadSingleSizeLimit: number;
 	allowMultiple: boolean;
 	acceptedFormats: string;
-	_acceptedCheck: string[];
 	as: string;
 	insertBehavior: __se__ComponentInsertBehaviorType;
 	input: HTMLElement;
-	_element: HTMLElement;
 	figure: Figure;
 	fileManager: FileManager;
 	controller: Controller;
@@ -158,7 +156,7 @@ declare class FileUpload extends EditorInjector {
 	 * @description Create file element
 	 * @param {string} url File URL
 	 * @param {File|{name: string, size: number}} file File object
-	 * @param {boolean} isLast Is last file
+	 * @param {boolean} isLast Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */
 	create(
 		url: string,
@@ -170,21 +168,6 @@ declare class FileUpload extends EditorInjector {
 			  },
 		isLast: boolean
 	): void;
-	/**
-	 * @private
-	 * @description Processes the server response after file upload.
-	 * - Registers the uploaded files in the editor.
-	 * @param {Object<string, *>} response - The response object from the server.
-	 */
-	private _register;
-	/**
-	 * @private
-	 * @description Handles file upload errors.
-	 * - Displays an error message if the upload fails.
-	 * @param {Object<string, *>} response - The error response from the server.
-	 * @returns {Promise<void>}
-	 */
-	private _error;
 	#private;
 }
 import EditorInjector from '../../editorInjector';

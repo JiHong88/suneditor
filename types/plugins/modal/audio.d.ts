@@ -132,11 +132,6 @@ declare class Audio_ extends EditorInjector {
 	audioUrlFile: HTMLInputElement;
 	/** @type {HTMLElement} */
 	preview: HTMLElement;
-	/** @type {HTMLAudioElement} */
-	_element: HTMLAudioElement;
-	defaultWidth: string;
-	defaultHeight: string;
-	urlValue: string;
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description Executes the method that is called when a "Modal" module's is opened.
@@ -197,28 +192,12 @@ declare class Audio_ extends EditorInjector {
 	 */
 	select(target: HTMLElement): void;
 	/**
-	 * @private
-	 * @description Prepares the component for selection.
-	 * - Ensures that the controller is properly positioned and initialized.
-	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {HTMLElement} target - The selected element.
-	 */
-	private _ready;
-	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
 	 * @param {HTMLElement=} target Target element, if null current selected element
 	 * @returns {Promise<void>}
 	 */
 	destroy(target?: HTMLElement | undefined): Promise<void>;
-	/**
-	 * @private
-	 * @description Registers uploaded audio files and creates the corresponding audio elements.
-	 * - Iterates through the uploaded files and inserts them into the editor.
-	 * @param {AudioInfo_audio} info - Upload metadata, including `isUpdate` flag and `element`.
-	 * @param {Object<string, *>} response - Server response containing uploaded file details.
-	 */
-	private _register;
 	/**
 	 * @description Create an "audio" component using the provided files.
 	 * @param {FileList|File[]} fileList File object list
@@ -232,7 +211,6 @@ declare class Audio_ extends EditorInjector {
 	 */
 	submitURL(url: string): Promise<boolean>;
 	/**
-	 * @private
 	 * @description Creates or updates an audio component within the editor.
 	 * - If `isUpdate` is `true`, updates the existing element's `src`.
 	 * - Otherwise, inserts a new audio component with the given file.
@@ -240,40 +218,18 @@ declare class Audio_ extends EditorInjector {
 	 * @param {string} src - The source URL of the audio file.
 	 * @param {{name: string, size: number}} file - The file metadata (name, size).
 	 * @param {boolean} isUpdate - Whether to update an existing element.
+	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */
-	private _createComp;
-	/**
-	 * @private
-	 * @description Creates a new `<audio>` element with default attributes.
-	 * - Applies width, height, and additional attributes from plugin options.
-	 * @returns {HTMLAudioElement} - The newly created `<audio>` element.
-	 */
-	private _createAudioTag;
-	/**
-	 * @private
-	 * @description Sets attributes on an audio element based on plugin options.
-	 * - Adds the `controls` attribute and applies any custom attributes.
-	 * @param {HTMLElement} element - The `<audio>` element to modify.
-	 */
-	private _setTagAttrs;
-	/**
-	 * @private
-	 * @description Uploads audio files to the server.
-	 * - Sends a request to the configured upload URL and processes the response.
-	 * @param {AudioInfo_audio} info - Upload metadata, including `files` and `isUpdate`.
-	 * @param {FileList|File[]} files - The files to be uploaded.
-	 */
-	private _serverUpload;
-	/**
-	 * @private
-	 * @description Handles errors that occur during the audio upload process.
-	 * - Triggers the `onAudioUploadError` event to allow custom handling of errors.
-	 * - Displays an error message in the editor's UI.
-	 * - Logs the error to the console for debugging.
-	 * @param {Object<string, *>} response - The error response object from the server or upload process.
-	 * @returns {Promise<void>}
-	 */
-	private _error;
+	create(
+		element: HTMLAudioElement,
+		src: string,
+		file: {
+			name: string;
+			size: number;
+		},
+		isUpdate: boolean,
+		isLast: boolean
+	): void;
 	#private;
 }
 import EditorInjector from '../../editorInjector';

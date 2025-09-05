@@ -170,7 +170,6 @@ declare class Browser extends CoreInjector {
 	list: HTMLElement;
 	side: HTMLElement;
 	wrapper: HTMLElement;
-	_loading: HTMLElement;
 	title: string;
 	listClass: string;
 	directData:
@@ -195,13 +194,9 @@ declare class Browser extends CoreInjector {
 	icon_folder: string;
 	icon_folder_item: string;
 	icon_item: string;
-	/**
-	 * @type {Array<BrowserFile>}
-	 */
+	/** @type {Array<BrowserFile>} */
 	items: Array<BrowserFile>;
-	/**
-	 * @type {Object<string, {name: string, meta: Object<string, *>}>}
-	 */
+	/** @type {Object<string, {name: string, meta: Object<string, *>}>} */
 	folders: {
 		[x: string]: {
 			name: string;
@@ -210,9 +205,7 @@ declare class Browser extends CoreInjector {
 			};
 		};
 	};
-	/**
-	 * @type {Object<string, {key?: string, name?: string, children?: *}>}
-	 */
+	/** @type {Object<string, {key?: string, name?: string, children?: *}>} */
 	tree: {
 		[x: string]: {
 			key?: string;
@@ -220,16 +213,11 @@ declare class Browser extends CoreInjector {
 			children?: any;
 		};
 	};
-	/**
-	 * @type {BrowserFile}
-	 */
+	/** @type {BrowserFile} */
 	data: BrowserFile;
 	selectedTags: any[];
 	keyword: string;
 	sideInner: HTMLElement;
-	_closeSignal: boolean;
-	_bindClose: __se__GlobalEventInfo;
-	__globalEventHandler: (e: any) => void;
 	apiManager: ApiManager;
 	sideOpenBtn: HTMLButtonElement;
 	/**
@@ -274,52 +262,6 @@ declare class Browser extends CoreInjector {
 	 * @description Close file browser loading box
 	 */
 	closeBrowserLoading(): void;
-	/**
-	 * @private
-	 * @description Fetches the file list from the server.
-	 * @param {string} url - The file server URL.
-	 * @param {Object<string, string>} urlHeader - The HTTP headers for the request.
-	 * @param {boolean} pageLoading - Indicates if this is a paginated request.
-	 */
-	private _drawFileList;
-	/**
-	 * @private
-	 * @description Updates the displayed list of file items.
-	 * @param {Array<BrowserFile>} items - The file items to display.
-	 * @param {boolean} update - Whether to update the tags.
-	 */
-	private _drawListItem;
-	/**
-	 * @private
-	 * @description Adds a global event listener for closing the browser.
-	 */
-	private __addGlobalEvent;
-	/**
-	 * @private
-	 * @description Removes the global event listener for closing the browser.
-	 */
-	private __removeGlobalEvent;
-	/**
-	 * @private
-	 * @description Renders the file items or folder structure from data.
-	 * @param {BrowserFile[]|BrowserFile} data - The data representing the file structure.
-	 * @returns {boolean} True if rendering was successful, false otherwise.
-	 */
-	private __drowItems;
-	/**
-	 * @private
-	 * @description Parses folder data into a structured format.
-	 * @param {BrowserFile} data - The folder data.
-	 * @param {string} [path] - The current path in the folder hierarchy.
-	 */
-	private __parseFolderData;
-	/**
-	 * @private
-	 * @description Creates a nested folder list from parsed data.
-	 * @param {BrowserFile[]|BrowserFile} folderData - The structured folder data.
-	 * @param {HTMLElement} parentElement - The parent element to append folder structure to.
-	 */
-	private __createFolderList;
 	#private;
 }
 import CoreInjector from '../editorInjector/_core';

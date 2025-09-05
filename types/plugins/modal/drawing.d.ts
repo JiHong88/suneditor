@@ -139,31 +139,6 @@ declare class Drawing extends EditorInjector {
 	points: any[];
 	paths: any[];
 	resizeObserver: ResizeObserver;
-	__events: {
-		touchstart: any;
-		touchmove: any;
-		mousedown: any;
-		mousemove: any;
-		mouseup: any;
-		mouseleave: any;
-		mouseenter: any;
-	};
-	__eventsRegister: {
-		touchstart: any;
-		touchmove: any;
-		mousedown: any;
-		mousemove: any;
-		mouseup: any;
-		mouseleave: any;
-		mouseenter: any;
-	};
-	__eventNameMap: {
-		mousedown: string;
-		mousemove: string;
-		mouseup: string;
-		mouseleave: string;
-		mouseenter: string;
-	};
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description Executes the method that is called when a "Modal" module's is opened.
@@ -180,70 +155,6 @@ declare class Drawing extends EditorInjector {
 	 * @returns {boolean} Success or failure
 	 */
 	modalAction(): boolean;
-	/**
-	 * @private
-	 * @description Initializes the drawing canvas, sets up event listeners, and configures resize handling.
-	 */
-	private _initDrawing;
-	/**
-	 * @private
-	 * @description Destroys the drawing canvas, removes event listeners, and clears stored drawing data.
-	 */
-	private _destroyDrawing;
-	/**
-	 * @private
-	 * @description Configures the drawing context (canvas settings like line width, color, etc.).
-	 */
-	private _setCtx;
-	/**
-	 * @private
-	 * @description Draws the current stroke based on collected points.
-	 */
-	private _draw;
-	/**
-	 * @private
-	 * @description Redraws all stored paths onto the canvas.
-	 */
-	private _drawAll;
-	/**
-	 * @private
-	 * @description Adjusts all stored paths to fit new canvas dimensions after a resize event.
-	 * @param {number} prevWidth - The previous width of the canvas.
-	 * @param {number} prevHeight - The previous height of the canvas.
-	 * @param {number} newWidth - The new width of the canvas.
-	 * @param {number} newHeight - The new height of the canvas.
-	 */
-	private _adjustPathsToNewDimensions;
-	/**
-	 * @private
-	 * @description Clears the canvas and resets stored drawing paths.
-	 */
-	private _clearCanvas;
-	/**
-	 * @private
-	 * @description Generates an SVG representation of the drawn content.
-	 * @returns {*} The generated SVG element.
-	 */
-	private _getSVG;
-	/**
-	 * @private
-	 * @description Converts the SVG element into a downloadable file.
-	 * @returns {FileList} A FileList containing the generated SVG file.
-	 */
-	private _getSVGFileList;
-	/**
-	 * @private
-	 * @description Retrieves touch coordinates relative to the canvas.
-	 * @param {TouchEvent} e - The touch event.
-	 * @returns {{x: number, y: number}} An object containing the x and y coordinates.
-	 */
-	private _getCanvasTouchPointer;
-	/**
-	 * @private
-	 * @description Activates either block or inline format mode for inserted drawings.
-	 * @param {boolean} isInline - Whether the drawing should be inserted as an inline element.
-	 */
-	private _activeAsInline;
 	#private;
 }
 import EditorInjector from '../../editorInjector';

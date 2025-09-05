@@ -110,7 +110,6 @@ declare class ModalAnchorEditor extends EditorInjector {
 	fileManager: FileManager;
 	kink: any;
 	inst: any;
-	modalForm: HTMLElement;
 	host: string;
 	/** @type {HTMLInputElement} */
 	urlInput: HTMLInputElement;
@@ -133,14 +132,10 @@ declare class ModalAnchorEditor extends EditorInjector {
 	currentRel: any[];
 	currentTarget: HTMLAnchorElement;
 	linkValue: string;
-	_change: boolean;
-	_isRel: boolean;
 	/** @type {HTMLButtonElement} */
 	relButton: HTMLButtonElement;
 	/** @type {HTMLElement} */
 	relPreview: HTMLElement;
-	selectMenu_rel: SelectMenu;
-	selectMenu_bookmark: SelectMenu;
 	/**
 	 * @description Initialize.
 	 * - Sets the current anchor element to be edited.
@@ -162,75 +157,7 @@ declare class ModalAnchorEditor extends EditorInjector {
 	 * @description Resets the ModalAnchorEditor to its initial state.
 	 */
 	init(): void;
-	/**
-	 * @private
-	 * @description Updates the anchor element with new attributes.
-	 * @param {HTMLAnchorElement} anchor - The anchor (`<a>`) element to update.
-	 * @param {string} url - The URL for the anchor's `href` attribute.
-	 * @param {string} displayText - The text to be displayed inside the anchor.
-	 * @param {string} title - The tooltip text (title attribute).
-	 * @param {boolean} notText - If `true`, the anchor will not contain text content.
-	 */
-	private _updateAnchor;
-	/**
-	 * @private
-	 * @description Checks if the given path is an internal bookmark.
-	 * @param {string} path - The URL or anchor link.
-	 * @returns {boolean} - `true` if the path is an internal bookmark, otherwise `false`.
-	 */
-	private _selfPathBookmark;
-	/**
-	 * @private
-	 * @description Updates the `rel` attribute list in the modal and preview.
-	 * @param {string} relAttr - The `rel` attribute string to set.
-	 */
-	private _setRel;
-	/**
-	 * @private
-	 * @description Generates a list of bookmark headers within the editor.
-	 * @param {string} urlValue - The current URL input value.
-	 */
-	private _createBookmarkList;
-	/**
-	 * @private
-	 * @description Updates the preview of the anchor link.
-	 * @param {string} value - The current URL value.
-	 */
-	private _setLinkPreview;
-	/**
-	 * @private
-	 * @description Merges the given `rel` attribute value with the current list.
-	 * @param {string} relAttr - The `rel` attribute to merge.
-	 * @returns {string} - The updated `rel` attribute string.
-	 */
-	private _relMerge;
-	/**
-	 * @private
-	 * @description Removes the specified `rel` attribute from the current list.
-	 * @param {string} relAttr - The `rel` attribute to remove.
-	 * @returns {string} - The updated `rel` attribute string.
-	 */
-	private _relDelete;
-	/**
-	 * @private
-	 * @description Registers a newly uploaded file and sets its URL in the modal form.
-	 * @param {Object<string, *>} response - The response object from the file upload request.
-	 */
-	private _register;
-	/**
-	 * @private
-	 * @description Handles file upload errors.
-	 * @param {Object<string, *>} response - The error response object.
-	 * @returns {Promise<void>}
-	 */
-	private _error;
-	/**
-	 * @description Handles the callback after a file upload completes.
-	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object containing the response.
-	 */
-	_uploadCallBack(xmlHttp: XMLHttpRequest): void;
 	#private;
 }
 import EditorInjector from '../editorInjector';
 import FileManager from './FileManager';
-import SelectMenu from './SelectMenu';

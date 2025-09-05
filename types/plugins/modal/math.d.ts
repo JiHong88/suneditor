@@ -110,7 +110,6 @@ declare class Math_ extends EditorInjector {
 	/** @type {HTMLSelectElement} */
 	fontSizeElement: HTMLSelectElement;
 	isUpdateState: boolean;
-	_element: HTMLElement;
 	/**
 	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component of a plugin is selected.
@@ -171,21 +170,6 @@ declare class Math_ extends EditorInjector {
 	 * @param {Node} target Target element
 	 */
 	destroy(target: Node): void;
-	/**
-	 * @private
-	 * @description Renders the given math expression using KaTeX or MathJax.
-	 * @param {string} exp - The math expression to render.
-	 * @returns {string} - The rendered math expression as HTML.
-	 */
-	private _renderer;
-	/**
-	 * @private
-	 * @description Escapes or unescapes backslashes in a given string.
-	 * @param {string} str - The input string.
-	 * @param {boolean} decode - If true, decodes escaped backslashes; otherwise, encodes them.
-	 * @returns {string} - The processed string.
-	 */
-	private _escapeBackslashes;
 	#private;
 }
 import EditorInjector from '../../editorInjector';

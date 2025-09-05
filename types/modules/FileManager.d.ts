@@ -169,13 +169,6 @@ declare class FileManager extends CoreInjector {
 		}
 	): void;
 	/**
-	 * @private
-	 * @description Create info object of file and add it to "infoList"
-	 * @param {HTMLMediaElement} element
-	 * @param {{name: string, size: number}|null} file File information
-	 */
-	private _setInfo;
-	/**
 	 * @description Gets the sum of the sizes of the currently saved files.
 	 * @returns {number} Size
 	 */
@@ -191,12 +184,7 @@ declare class FileManager extends CoreInjector {
 	 * @description Reset info object and "infoList = []", "infoIndex = 0"
 	 */
 	private _resetInfo;
-	/**
-	 * @private
-	 * @description Delete info object at "infoList"
-	 * @param {number} index index of info object infoList[].index)
-	 */
-	private _deleteInfo;
+	#private;
 }
 import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';

@@ -34,6 +34,14 @@ export function getNodePath(
 export function getNodeFromPath<T extends Node>(offsets: Array<number>, parentNode: Node): T;
 /**
  * @template {HTMLElement} T
+ * @description Get all "child node" of the argument value element
+ * @param {Node} element element to get child node
+ * @param {?(current: *) => boolean} validation Conditional function
+ * @returns {T|null}
+ */
+export function getChildNode<T extends HTMLElement>(element: Node, validation: ((current: any) => boolean) | null): T | null;
+/**
+ * @template {HTMLElement} T
  * @description Get all "children" of the argument value element (Without text nodes)
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
@@ -202,6 +210,7 @@ declare namespace query {
 	export { getPositionIndex };
 	export { getNodePath };
 	export { getNodeFromPath };
+	export { getChildNode };
 	export { getListChildren };
 	export { getListChildNodes };
 	export { getNodeDepth };

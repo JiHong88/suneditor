@@ -268,40 +268,23 @@ declare class Figure extends EditorInjector {
 	captionButton: Element;
 	align: string;
 	as: string;
-	_element: HTMLElement;
-	_cover: HTMLElement;
-	_inlineCover: HTMLElement;
-	_container: HTMLElement;
-	_caption: any;
-	_width: string;
-	_height: string;
-	_resize_w: number;
-	_resize_h: number;
-	_element_w: number;
-	_element_h: number;
-	_element_l: number;
-	_element_t: number;
-	_resizeClientX: number;
-	_resizeClientY: number;
-	_resize_direction: string;
-	_floatClassStr: string;
-	__preventSizechange: boolean;
-	__revertSize: {
-		w: string;
-		h: string;
-	};
 	/** @type {{left?: number, top?: number}} */
 	__offset: {
 		left?: number;
 		top?: number;
 	};
-	__offContainer: any;
-	__containerResizing: any;
+	_element: HTMLElement;
+	_cover: HTMLElement;
+	_inlineCover: HTMLElement;
+	_container: HTMLElement;
+	_caption: any;
+	_resizeClientX: number;
+	_resizeClientY: number;
+	_resize_direction: string;
 	__containerResizingOff: any;
-	__containerResizingESC: any;
+	__containerResizing: any;
 	__onContainerEvent: any;
 	__offContainerEvent: any;
-	__onResizeESCEvent: __se__GlobalEventInfo;
 	/**
 	 * @description Close the figure's controller
 	 */
@@ -401,14 +384,6 @@ declare class Figure extends EditorInjector {
 	 */
 	convertAsFormat(targetNode: Node | null, formatStyle: 'block' | 'inline'): HTMLElement;
 	/**
-	 * @private
-	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
-	 * @param {FigureInfo} figureinfo {target, container, cover, inlineCover, caption}
-	 * @param {string|number} w Width value.
-	 * @param {string|number} h Height value.
-	 */
-	private _asFormatChange;
-	/**
 	 * @description Controller button action
 	 * @param {HTMLButtonElement} target Target button element
 	 * @returns
@@ -435,6 +410,20 @@ declare class Figure extends EditorInjector {
 	 * @param {?number} deg rotate value
 	 */
 	setTransform(node: Node, width: (string | number) | null, height: (string | number) | null, deg: number | null): void;
+	/**
+	 * @private
+	 * @description Displays or hides the resize handles of the figure component.
+	 * @param {boolean} display Whether to display resize handles.
+	 */
+	private _displayResizeHandles;
+	/**
+	 * @private
+	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
+	 * @param {FigureInfo} figureinfo {target, container, cover, inlineCover, caption}
+	 * @param {string|number} w Width value.
+	 * @param {string|number} h Height value.
+	 */
+	private _asFormatChange;
 	/**
 	 * @private
 	 * @description Sets figure component properties such as cover, container, caption, and alignment.
@@ -514,12 +503,6 @@ declare class Figure extends EditorInjector {
 	 * @param {HTMLElement} element Target element.
 	 */
 	private _deleteCaptionPosition;
-	/**
-	 * @private
-	 * @description Displays or hides the resize handles of the figure component.
-	 * @param {boolean} display Whether to display resize handles.
-	 */
-	private _displayResizeHandles;
 	/**
 	 * @private
 	 * @description Removes the resize event listeners.

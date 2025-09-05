@@ -194,26 +194,10 @@ declare class Embed extends EditorInjector {
 	embedInput: HTMLInputElement;
 	focusElement: HTMLInputElement;
 	previewSrc: HTMLElement;
-	_linkValue: string;
-	_align: string;
-	_defaultSizeX: string;
-	_defaultSizeY: string;
 	sizeUnit: string;
 	proportion: HTMLInputElement;
 	inputX: HTMLInputElement;
 	inputY: HTMLInputElement;
-	_element: any;
-	_cover: HTMLElement;
-	_container: any;
-	_ratio: {
-		w: number;
-		h: number;
-	};
-	_origin_w: string;
-	_origin_h: string;
-	_resizing: boolean;
-	_onlyPercentage: boolean;
-	_nonResizing: boolean;
 	query: {
 		facebook: {
 			pattern: RegExp;
@@ -301,16 +285,6 @@ declare class Embed extends EditorInjector {
 	 */
 	select(target: HTMLElement): void;
 	/**
-	 * @private
-	 * @description Prepares the component for selection.
-	 * - Ensures that the controller is properly positioned and initialized.
-	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {HTMLElement} target - The selected element.
-	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
-	 */
-	private _ready;
-	_caption: HTMLElement;
-	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
 	 * @param {HTMLElement} target Target element
@@ -341,61 +315,7 @@ declare class Embed extends EditorInjector {
 	 * @returns {Promise<boolean>} A promise that resolves to true on success or false on failure.
 	 */
 	submitSRC(src?: string): Promise<boolean>;
-	/**
-	 * @private
-	 * @description Creates an iframe element for embedding external content.
-	 * @returns {HTMLIFrameElement} The created iframe element.
-	 */
-	private _createIframeTag;
-	/**
-	 * @private
-	 * @description Creates an blockquote element for embedding external content.
-	 * @returns {HTMLElement} The created iframe element.
-	 */
-	private _createEmbedTag;
-	/**
-	 * @private
-	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
-	 * @param {string} originSrc - The origin input source.
-	 * @param {ProcessInfo_embed} process - Processed embed information.
-	 * @param {string} src - The source URL.
-	 * @param {Node[]} children - The embed elements.
-	 * @param {string} width - The width of the embed component.
-	 * @param {string} height - The height of the embed component.
-	 * @param {string} align - The alignment of the embed component.
-	 * @param {boolean} isUpdate - Whether this is an update to an existing embed component.
-	 */
-	private _create;
-	/**
-	 * @private
-	 * @description Updates an existing embed component within the editor.
-	 * @param {HTMLIFrameElement} oFrame - The existing embed element to be updated.
-	 */
-	private _update;
-	/**
-	 * @private
-	 * @description Applies width and height to the embed component.
-	 * @param {string|number} w - The width to apply.
-	 * @param {string|number} h - The height to apply.
-	 */
-	private _applySize;
-	/**
-	 * @private
-	 * @description Retrieves embed component size and alignment information.
-	 * @returns {{inputWidth: string, inputHeight: string, align: string, isUpdate: boolean, element: Element}} An object containing
-	 * - inputWidth : The width of the embed component.
-	 * - inputHeight : The height of the embed component.
-	 * - align : The alignment of the embed component.
-	 * - isUpdate : Whether the component is being updated.
-	 * - element : The target element.
-	 */
-	private _getInfo;
-	/**
-	 * @private
-	 * @description Sets default attributes for an iframe element.
-	 * @param {HTMLIFrameElement} element - The iframe element to modify.
-	 */
-	private _setIframeAttrs;
+	_caption: HTMLElement;
 	#private;
 }
 import EditorInjector from '../../editorInjector';

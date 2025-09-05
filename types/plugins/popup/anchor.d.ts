@@ -17,8 +17,6 @@ declare class Anchor extends EditorInjector {
 	title: any;
 	icon: string;
 	bookmarkIcon: HTMLElement;
-	_element: HTMLElement;
-	_range: Range;
 	displayId: Element;
 	controllerSelect: Controller;
 	inputEl: HTMLInputElement;
@@ -45,12 +43,7 @@ declare class Anchor extends EditorInjector {
 	 * @param {HTMLButtonElement} target Target button element
 	 */
 	controllerAction(target: HTMLButtonElement): void;
-	/**
-	 * @private
-	 * @description Initializes state variables.
-	 * - called when the popup is closed
-	 */
-	private _init;
+	#private;
 }
 import EditorInjector from '../../editorInjector';
 import { Controller } from '../../modules';

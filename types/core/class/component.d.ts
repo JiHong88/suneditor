@@ -97,11 +97,11 @@ declare class Component {
 	/**
 	 * @this {ComponentThis}
 	 * @description Handles post-insertion behavior for a newly created component based on the specified mode.
-	 * @param {Node} element The inserted component element.
+	 * @param {Node} container The inserted component element.
 	 * @param {Node|null} [oNode] Optional node to use for selection if the component cannot be selected.
 	 * @param {__se__ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
 	 */
-	applyInsertBehavior(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node, oNode?: Node | null, insertBehavior?: __se__ComponentInsertBehaviorType): void;
+	applyInsertBehavior(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node, oNode?: Node | null, insertBehavior?: __se__ComponentInsertBehaviorType): void;
 	/**
 	 * @this {ComponentThis}
 	 * @description Gets the file component and that plugin name
@@ -191,10 +191,10 @@ declare class Component {
 	 * - If a valid next sibling line exists, moves the selection there.
 	 * - If no next sibling exists, creates a new line after the container and moves the selection there.
 	 * - If the next sibling exists but is not a valid line element and cannot create a new line, returns false.
-	 * @param {HTMLElement} container The component container element.
+	 * @param {Node} container The component container element.
 	 * @returns {boolean} Returns true if the selection moved to a line (existing or newly created), otherwise false.
 	 */
-	__moveToNextLineOrAdd(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: HTMLElement): boolean;
+	__moveToNextLineOrAdd(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node): boolean;
 	/**
 	 * @private
 	 * @this {ComponentThis}

@@ -40,14 +40,7 @@ declare class ExportPDF extends EditorInjector {
 	 * @returns {Promise<void>}
 	 */
 	action(): Promise<void>;
-	/**
-	 * @private
-	 * @description Sends the editor content to the server for PDF generation.
-	 * @param {HTMLElement} ww - A temporary container holding the formatted editor content.
-	 * @returns {Promise<void>} Resolves when the PDF file is successfully downloaded.
-	 * @throws {Error} Throws an error if the server response indicates a failure.
-	 */
-	private _createByServer;
+	#private;
 }
 import EditorInjector from '../../editorInjector';
 import { ApiManager } from '../../modules';

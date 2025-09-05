@@ -53,26 +53,6 @@ declare class Modal extends CoreInjector {
 	isUpdate: boolean;
 	/** @type {HTMLInputElement} */
 	focusElement: HTMLInputElement;
-	/** @type {HTMLElement} */
-	_modalArea: HTMLElement;
-	/** @type {HTMLElement} */
-	_modalInner: HTMLElement;
-	_closeListener: any[];
-	_bindClose: __se__GlobalEventInfo;
-	_onClickEvent: any;
-	_closeSignal: boolean;
-	/** @type {HTMLElement} */
-	_resizeBody: HTMLElement;
-	_currentHandle: HTMLElement;
-	__resizeDir: string;
-	__offetTop: number;
-	__offetLeft: number;
-	__globalEventHandlers: {
-		mousemove: any;
-		mouseup: any;
-	};
-	_bindClose_mousemove: __se__GlobalEventInfo;
-	_bindClose_mouseup: __se__GlobalEventInfo;
 	/**
 	 * @description Open a modal plugin
 	 * - The plugin's "init" method is called.
@@ -83,29 +63,6 @@ declare class Modal extends CoreInjector {
 	 * - The plugin's "init" and "off" method is called.
 	 */
 	close(): void;
-	/**
-	 * @private
-	 * @description Fixes the current controller's display state when the modal is opened or closed.
-	 * @param {boolean} fixed - Whether to fix or unfix the controller.
-	 */
-	private _fixCurrentController;
-	/**
-	 * @private
-	 * @description Saves the current offset position of the modal for resizing calculations.
-	 * @returns {__se__Class_OffsetGlobalInfo} The offset position of the modal.
-	 */
-	private _saveOffset;
-	/**
-	 * @private
-	 * @description Adds global event listeners for resizing the modal.
-	 * @param {string} dir - The direction in which resizing is occurring.
-	 */
-	private __addGlobalEvent;
-	/**
-	 * @private
-	 * @description Removes global event listeners related to modal resizing.
-	 */
-	private __removeGlobalEvent;
 	#private;
 }
 import CoreInjector from '../editorInjector/_core';

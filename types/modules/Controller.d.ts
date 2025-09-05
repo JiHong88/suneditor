@@ -127,14 +127,6 @@ declare class Controller extends EditorInjector {
 	isInsideForm: boolean;
 	isOutsideForm: boolean;
 	toTop: boolean;
-	_reserveIndex: boolean;
-	_initMethod: () => void;
-	__globalEventHandlers: {
-		keydown: any;
-		mousedown: any;
-	};
-	_bindClose_key: __se__GlobalEventInfo;
-	_bindClose_mouse: __se__GlobalEventInfo;
 	/** @type {{left?: number, top?: number, addOfffset?: {left?: number, top?: number}}} */
 	__offset: {
 		left?: number;
@@ -144,12 +136,6 @@ declare class Controller extends EditorInjector {
 			top?: number;
 		};
 	};
-	__addOffset: {
-		left: number;
-		top: number;
-	};
-	__shadowRootEventForm: HTMLFormElement;
-	__shadowRootEventListener: (e: any) => any;
 	/**
 	 * @description Open a modal plugin
 	 * @param {Node|Range} target Target element
@@ -204,52 +190,6 @@ declare class Controller extends EditorInjector {
 	 * @param {Node=} target
 	 */
 	resetPosition(target?: Node | undefined): void;
-	/**
-	 * @private
-	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
-	 * @param {HTMLFormElement} form Controller element
-	 * @param {Node|Range} target Controller target element
-	 * @param {boolean} isRangeTarget If the target is a Range, set it to true.
-	 */
-	private _controllerOn;
-	/**
-	 * @private
-	 * @description Hide controller at editor area (link button, image resize button..)
-	 */
-	private _controllerOff;
-	/**
-	 * @private
-	 * @description Specify the position of the controller.
-	 * @param {HTMLElement} controller Controller element.
-	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
-	 * @param {boolean} [skipAutoReposition=false] If true, skips scroll/resize-based automatic positioning logic.
-	 */
-	private _setControllerPosition;
-	/**
-	 * @private
-	 * @description Adds global event listeners.
-	 * - When the controller is opened
-	 */
-	private __addGlobalEvent;
-	/**
-	 * @private
-	 * @description Removes global event listeners.
-	 * - When the ESC key is pressed, the controller is closed.
-	 */
-	private __removeGlobalEvent;
-	/**
-	 * @private
-	 * @description Checks if the controller is fixed and should not be closed.
-	 * @returns {boolean} True if the controller is fixed.
-	 */
-	private _checkFixed;
-	/**
-	 * @private
-	 * @description Checks if the given target is within a form or controller.
-	 * @param {Node} target The target element.
-	 * @returns {boolean} True if the target is inside a form or controller.
-	 */
-	private _checkForm;
 	#private;
 }
 import EditorInjector from '../editorInjector';

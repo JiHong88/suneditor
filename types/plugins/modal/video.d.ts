@@ -233,29 +233,11 @@ declare class Video extends EditorInjector {
 	videoUrlFile: HTMLInputElement;
 	focusElement: HTMLInputElement;
 	previewSrc: HTMLElement;
-	_linkValue: string;
-	_align: string;
-	_frameRatio: string;
-	_defaultRatio: string;
-	_defaultSizeX: string;
-	_defaultSizeY: string;
 	sizeUnit: string;
 	proportion: HTMLInputElement;
 	frameRatioOption: HTMLSelectElement;
 	inputX: HTMLInputElement;
 	inputY: HTMLInputElement;
-	_element: any;
-	_cover: HTMLElement;
-	_container: any;
-	_ratio: {
-		w: number;
-		h: number;
-	};
-	_origin_w: string;
-	_origin_h: string;
-	_resizing: boolean;
-	_onlyPercentage: boolean;
-	_nonResizing: boolean;
 	query: {
 		youtube: {
 			pattern: RegExp;
@@ -270,7 +252,6 @@ declare class Video extends EditorInjector {
 	};
 	extensions: string[];
 	urlPatterns: RegExp[];
-	_initRatioValue: string;
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description Executes the method that is called when a "Modal" module's is opened.
@@ -330,15 +311,6 @@ declare class Video extends EditorInjector {
 	 */
 	select(target: HTMLIFrameElement | HTMLVideoElement): void;
 	/**
-	 * @private
-	 * @description Prepares the component for selection.
-	 * - Ensures that the controller is properly positioned and initialized.
-	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {HTMLIFrameElement|HTMLVideoElement} target - The selected element.
-	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
-	 */
-	private _ready;
-	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
 	 * @param {HTMLElement} target Target element
@@ -395,6 +367,7 @@ declare class Video extends EditorInjector {
 	 * @param {string} align - The alignment to apply to the video element (e.g., 'left', 'center', 'right').
 	 * @param {boolean} isUpdate - Indicates whether this is an update to an existing component (true) or a new creation (false).
 	 * @param {{name: string, size: number}} file - File metadata associated with the video
+	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */
 	create(
 		oFrame: HTMLIFrameElement | HTMLVideoElement,
@@ -406,7 +379,8 @@ declare class Video extends EditorInjector {
 		file: {
 			name: string;
 			size: number;
-		}
+		},
+		isLast: boolean
 	): void;
 	/**
 	 * @description Creates a new iframe element for video embedding.
@@ -423,19 +397,6 @@ declare class Video extends EditorInjector {
 	 */
 	createVideoTag(props?: { [x: string]: string }): HTMLVideoElement;
 	/**
-	 * @private
-	 * @description Sets the size of the video element.
-	 * @param {string|number} w - The width of the video.
-	 * @param {string|number} h - The height of the video.
-	 */
-	private _applySize;
-	/**
-	 * @private
-	 * @description Retrieves video information including size and alignment.
-	 * @returns {*} Video information object.
-	 */
-	private _getInfo;
-	/**
 	 * @description Create an "video" component using the provided files.
 	 * @param {FileList|File[]} fileList File object list
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
@@ -447,52 +408,6 @@ declare class Video extends EditorInjector {
 	 * @returns {Promise<boolean>} If return false, the file upload will be canceled
 	 */
 	submitURL(url: string): Promise<boolean>;
-	/**
-	 * @private
-	 * @description Updates the video component within the editor.
-	 * @param {HTMLIFrameElement|HTMLVideoElement} oFrame - The video element to update.
-	 */
-	private _update;
-	/**
-	 * @private
-	 * @description Registers the uploaded video in the editor.
-	 * @param {VideoInfo_video} info - Video information object.
-	 * @param {Object<string, *>} response - Server response containing video data.
-	 */
-	private _register;
-	/**
-	 * @private
-	 * @description Uploads a video to the server using an external upload handler.
-	 * @param {VideoInfo_video} info - Video information object.
-	 * @param {FileList} files - The video files to upload.
-	 */
-	private _serverUpload;
-	/**
-	 * @private
-	 * @description Sets attributes for the video tag.
-	 * @param {HTMLVideoElement} element - The video element.
-	 */
-	private _setTagAttrs;
-	/**
-	 * @private
-	 * @description Sets attributes for the iframe tag.
-	 * @param {HTMLIFrameElement} element - The iframe element.
-	 */
-	private _setIframeAttrs;
-	/**
-	 * @private
-	 * @description Selects a ratio option in the ratio dropdown.
-	 * @param {string|number} value - The selected ratio value.
-	 * @returns {boolean} Returns true if a ratio was selected.
-	 */
-	private _setRatioSelect;
-	/**
-	 * @private
-	 * @description Handles video upload errors.
-	 * @param {Object<string, *>} response - The error response object.
-	 * @returns {Promise<void>}
-	 */
-	private _error;
 	#private;
 }
 import EditorInjector from '../../editorInjector';

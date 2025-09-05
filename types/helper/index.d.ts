@@ -60,6 +60,7 @@ export const dom: {
 		getPositionIndex: typeof import('./dom/domQuery').getPositionIndex;
 		getNodePath: typeof import('./dom/domQuery').getNodePath;
 		getNodeFromPath: typeof import('./dom/domQuery').getNodeFromPath;
+		getChildNode: typeof import('./dom/domQuery').getChildNode;
 		getListChildren: typeof import('./dom/domQuery').getListChildren;
 		getListChildNodes: typeof import('./dom/domQuery').getListChildNodes;
 		getNodeDepth: typeof import('./dom/domQuery').getNodeDepth;

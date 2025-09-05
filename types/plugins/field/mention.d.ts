@@ -85,10 +85,6 @@ declare class Mention extends EditorInjector {
 		url: string;
 	}[];
 	apiUrl: string;
-	_delay: number;
-	_lastAtPos: number;
-	_anchorOffset: number;
-	_anchorNode: Node;
 	apiManager: ApiManager;
 	cachingData: Map<any, any>;
 	cachingFieldData: any[];
@@ -100,24 +96,6 @@ declare class Mention extends EditorInjector {
 	 * @returns {Promise<boolean>}
 	 */
 	onInput(): Promise<boolean>;
-	/**
-	 * @private
-	 * @description Generates the mention list based on user input.
-	 * - Fetches data from cache, direct data, or an API.
-	 * - Creates and opens the mention dropdown.
-	 * - Caches the fetched data for future use.
-	 * @param {string} value - The mention query text.
-	 * @param {Node} targetNode - The node where the mention is triggered.
-	 * @returns {Promise<boolean>} - Returns `true` if the mention list is displayed, `false` otherwise.
-	 */
-	private _createMentionList;
-	/**
-	 * @private
-	 * @description Constructs the API request URL with the mention query.
-	 * @param {string} key - The mention query text.
-	 * @returns {string} - The formatted API request URL.
-	 */
-	private _createUrl;
 	#private;
 }
 import EditorInjector from '../../editorInjector';

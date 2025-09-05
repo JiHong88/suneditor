@@ -202,24 +202,7 @@ declare class Image_ extends EditorInjector {
 	proportion: HTMLInputElement;
 	inputX: HTMLInputElement;
 	inputY: HTMLInputElement;
-	_linkElement: any;
-	_linkValue: string;
-	_align: string;
-	_svgDefaultSize: string;
 	_base64RenderIndex: number;
-	_element: any;
-	_cover: any;
-	_container: any;
-	_caption: HTMLElement;
-	_ratio: {
-		w: number;
-		h: number;
-	};
-	_origin_w: string;
-	_origin_h: string;
-	_resizing: boolean;
-	_onlyPercentage: boolean;
-	_nonResizing: boolean;
 	asBlock: HTMLButtonElement;
 	asInline: HTMLButtonElement;
 	/**
@@ -281,34 +264,12 @@ declare class Image_ extends EditorInjector {
 	 */
 	select(target: HTMLElement): void;
 	/**
-	 * @private
-	 * @description Prepares the component for selection.
-	 * - Ensures that the controller is properly positioned and initialized.
-	 * - Prevents duplicate event handling if the component is already selected.
-	 * @param {HTMLElement} target - The selected element.
-	 * @param {boolean} [infoOnly=false] - If true, only retrieves information without opening the controller.
-	 * @returns {{w: string, h: string}} - The width and height of the component.
-	 */
-	private _ready;
-	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
 	 * @param {HTMLElement} target Target element
 	 * @returns {Promise<void>}
 	 */
 	destroy(target: HTMLElement): Promise<void>;
-	/**
-	 * @private
-	 * @description Retrieves the current image information.
-	 * @returns {*} - The image data.
-	 */
-	private _getInfo;
-	/**
-	 * @private
-	 * @description Toggles between block and inline image format.
-	 * @param {boolean} isInline - Whether the image should be inline.
-	 */
-	private _activeAsInline;
 	/**
 	 * @description Create an "image" component using the provided files.
 	 * @param {FileList|File[]} fileList File object list
@@ -322,39 +283,6 @@ declare class Image_ extends EditorInjector {
 	 */
 	submitURL(url: string): Promise<boolean>;
 	/**
-	 * @private
-	 * @description Updates the selected image size, alt text, and caption.
-	 * @param {string} width - New image width.
-	 * @param {string} height - New image height.
-	 */
-	private _update;
-	/**
-	 * @private
-	 * @description Validates the image size and applies necessary transformations.
-	 * @param {string} width - The width of the image.
-	 * @param {string} height - The height of the image.
-	 */
-	private _fileCheck;
-	/**
-	 * @private
-	 * @description Creates a new image component based on provided parameters.
-	 * @param {string} src - The image source URL.
-	 * @param {?Node} anchor - Optional anchor wrapping the image.
-	 * @param {string} width - Image width.
-	 * @param {string} height - Image height.
-	 * @param {string} align - Image alignment.
-	 * @param {{name: string, size: number}} file - File metadata.
-	 * @param {string} alt - Alternative text.
-	 */
-	private _produce;
-	/**
-	 * @private
-	 * @description Applies the specified width and height to the image.
-	 * @param {string} w - Image width.
-	 * @param {string} h - Image height.
-	 */
-	private _applySize;
-	/**
 	 * @description Creates a new image component, wraps it in a figure container with an optional anchor,
 	 * - applies size and alignment settings, and inserts it into the editor.
 	 * @param {string} src - The URL of the image to be inserted.
@@ -364,6 +292,7 @@ declare class Image_ extends EditorInjector {
 	 * @param {string} align - The alignment setting for the image (e.g., 'left', 'center', 'right').
 	 * @param {{name: string, size: number}} file - File metadata associated with the image
 	 * @param {string} alt - The alternative text for the image.
+	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */
 	create(
 		src: string,
@@ -375,7 +304,8 @@ declare class Image_ extends EditorInjector {
 			name: string;
 			size: number;
 		},
-		alt: string
+		alt: string,
+		isLast: boolean
 	): void;
 	/**
 	 * @description Creates a new inline image component, wraps it in an inline figure container with an optional anchor,
@@ -386,6 +316,7 @@ declare class Image_ extends EditorInjector {
 	 * @param {string} height - The height value to be applied to the image.
 	 * @param {{name: string, size: number}} file - File metadata associated with the image
 	 * @param {string} alt - The alternative text for the image.
+	 * @param {boolean} isLast - Indicates whether this is the last file in the batch (used for scroll and insert actions).
 	 */
 	createInline(
 		src: string,
@@ -396,72 +327,9 @@ declare class Image_ extends EditorInjector {
 			name: string;
 			size: number;
 		},
-		alt: string
+		alt: string,
+		isLast: boolean
 	): void;
-	/**
-	 * @private
-	 * @description Updates the image source URL.
-	 * @param {string} src - The new image source.
-	 * @param {HTMLImageElement} element - The image element.
-	 * @param {{ name: string, size: number }} file - File metadata.
-	 */
-	private _updateSrc;
-	/**
-	 * @private
-	 * @description Registers the uploaded image and inserts it into the editor.
-	 * @param {ImageInfo_image} info - Image info.
-	 * @param {Object<string, *>} response - Server response data.
-	 */
-	private _register;
-	/**
-	 * @private
-	 * @description Uploads the image to the server.
-	 * @param {ImageInfo_image} info - Image upload info.
-	 * @param {FileList} files - List of image files.
-	 */
-	private _serverUpload;
-	/**
-	 * @private
-	 * @description Converts an image file to Base64 and inserts it into the editor.
-	 * @param {FileList|File[]} files - List of image files.
-	 * @param {?Node} anchor - Optional anchor wrapping the image.
-	 * @param {string} width - Image width.
-	 * @param {string} height - Image height.
-	 * @param {string} align - Image alignment.
-	 * @param {string} alt - Alternative text.
-	 * @param {boolean} isUpdate - Whether the image is being updated.
-	 */
-	private _setBase64;
-	/**
-	 * @private
-	 * @description Inserts an image using a Base64-encoded string.
-	 * @param {boolean} update - Whether the image is being updated.
-	 * @param {Array<{result: string, file: { name: string, size: number }}>} filesStack - Stack of Base64-encoded files.
-	 * - result: Image url or Base64-encoded string
-	 * - file: File metadata ({ name: string, size: number })
-	 * @param {HTMLImageElement} updateElement - The image element being updated.
-	 * @param {?HTMLAnchorElement} anchor - Optional anchor wrapping the image.
-	 * @param {string} width - Image width.
-	 * @param {string} height - Image height.
-	 * @param {string} align - Image alignment.
-	 * @param {string} alt - Alternative text.
-	 */
-	private _onRenderBase64;
-	/**
-	 * @private
-	 * @description Wraps an image element with an anchor if provided.
-	 * @param {Node} imgTag - The image element to be wrapped.
-	 * @param {?Node} anchor - The anchor element to wrap around the image. If null, returns the image itself.
-	 * @returns {Node} - The wrapped image inside the anchor or the original image element.
-	 */
-	private _setAnchor;
-	/**
-	 * @private
-	 * @description Handles errors during image upload and displays appropriate messages.
-	 * @param {Object<string, *>} response - The error response from the server.
-	 * @returns {Promise<void>}
-	 */
-	private _error;
 	#private;
 }
 import EditorInjector from '../../editorInjector';
