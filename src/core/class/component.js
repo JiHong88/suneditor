@@ -121,7 +121,7 @@ Component.prototype = {
 
 		try {
 			if (dom.check.isListCell(formatEl)) {
-				this.html.insertNode(element, { afterNode: isInline ? null : selectionNode === formatEl ? null : r.container.nextSibling, skipCharCount: true });
+				this.html.insertNode(element, { afterNode: isInline ? null : selectionNode === formatEl ? null : (selectionNode || r.container).nextSibling, skipCharCount: true });
 				if (!isInline && !element.nextSibling) element.parentNode.appendChild(dom.utils.createElement('BR'));
 			} else {
 				if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || dom.check.isBreak(r.container))) {
