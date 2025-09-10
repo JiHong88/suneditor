@@ -19,10 +19,10 @@ export function isCtrl(e: KeyboardEvent): boolean;
 export function isAlt(e: KeyboardEvent): boolean;
 /**
  * @description event.isComposing check
- * @param {KeyboardEvent} e Event object
+ * @param {KeyboardEvent|InputEvent} e Event object
  * @returns {boolean}
  */
-export function isComposing(e: KeyboardEvent): boolean;
+export function isComposing(e: KeyboardEvent | InputEvent): boolean;
 /**
  * @description Backspace key check
  * @param {string} code Event.code

@@ -3,6 +3,7 @@ declare namespace _default {
 	let onScroll: any;
 	let onMouseDown: any;
 	let onClick: any;
+	let onBeforeInput: any;
 	let onInput: any;
 	let onMouseLeave: any;
 	let onKeyDown: any;

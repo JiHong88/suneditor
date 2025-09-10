@@ -1,7 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure } from '../../modules';
 import { dom, numbers, env, keyCodeMap } from '../../helper';
-const { NO_EVENT } = env;
+const { _w, NO_EVENT } = env;
 
 /**
  * @typedef {import('../../events').ProcessInfo} ProcessInfo_embed
@@ -297,7 +297,7 @@ class Embed extends EditorInjector {
 			result = await this.submitSRC(this.#linkValue);
 		}
 
-		if (result) this._w.setTimeout(this.component.select.bind(this.component, this.#element, Embed.key), 0);
+		if (result) _w.setTimeout(this.component.select.bind(this.component, this.#element, Embed.key), 0);
 
 		return result;
 	}

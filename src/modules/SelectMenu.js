@@ -1,6 +1,7 @@
 import CoreInjector from '../editorInjector/_core';
 import { dom, env, keyCodeMap } from '../helper';
 
+const { _w } = env;
 const MENU_MIN_HEIGHT = 38;
 
 /**
@@ -261,7 +262,7 @@ class SelectMenu extends CoreInjector {
 		const targetOffsetTop = target.offsetTop;
 		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;
-		const wbottom = dom.utils.getClientSize().h - (targetGlobalTop - this._w.scrollY + targetHeight);
+		const wbottom = dom.utils.getClientSize().h - (targetGlobalTop - _w.scrollY + targetHeight);
 		const sideAddH = side ? targetHeight : 0;
 		let overH = 10000;
 		switch (position) {
@@ -338,15 +339,15 @@ class SelectMenu extends CoreInjector {
 		let overW = 0;
 		switch (side + '-' + (side ? originP : subPosition)) {
 			case 'true-left':
-				overW = globalTarget.left - this._w.scrollX + fl;
+				overW = globalTarget.left - _w.scrollX + fl;
 				if (overW < 0) l = l = targetL + targetW + 1;
 				break;
 			case 'true-right':
-				overW = this._w.innerWidth - (fl + formW);
+				overW = _w.innerWidth - (fl + formW);
 				if (overW < 0) l = targetL - formW - 1;
 				break;
 			case 'false-center': {
-				overW = this._w.innerWidth - (fl + formW);
+				overW = _w.innerWidth - (fl + formW);
 				if (overW < 0) l += overW - 4;
 				form.style.left = l + 'px';
 				const centerfl = this.editor.offset.getGlobal(form).left;
@@ -354,7 +355,7 @@ class SelectMenu extends CoreInjector {
 				break;
 			}
 			case 'false-left':
-				overW = this._w.innerWidth - (globalTarget.left - this._w.scrollX + formW);
+				overW = _w.innerWidth - (globalTarget.left - _w.scrollX + formW);
 				if (overW < 0) l += overW - 4;
 				break;
 			case 'false-right':

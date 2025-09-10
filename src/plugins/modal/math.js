@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Controller } from '../../modules';
 import { dom, env, converter } from '../../helper';
 
-const { _w } = env;
+const { _w, _d } = env;
 
 /**
  * @typedef {Object} MathPluginOptions
@@ -172,7 +172,7 @@ class Math_ extends EditorInjector {
 				const value = getValue(element);
 				if (!value) return;
 
-				const domParser = this._d.createRange().createContextualFragment(this.#renderer(converter.entityToHTML(this.#escapeBackslashes(value, true))));
+				const domParser = _d.createRange().createContextualFragment(this.#renderer(converter.entityToHTML(this.#escapeBackslashes(value, true))));
 				element.innerHTML = domParser.querySelector('.se-math, .katex').innerHTML;
 				element.setAttribute('contenteditable', 'false');
 				dom.utils.addClass(element, 'se-component|se-inline-component|se-disable-pointer|se-math');

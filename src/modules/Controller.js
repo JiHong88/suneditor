@@ -155,7 +155,7 @@ class Controller extends EditorInjector {
 		const isRangeTarget = this.instanceCheck.isRange(target);
 		this.currentTarget = isRangeTarget ? null : target;
 		this.#controllerOn(this.form, target, isRangeTarget);
-		this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
+		_w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 	}
 
 	/**

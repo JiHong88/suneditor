@@ -135,6 +135,12 @@ export default {
 	 * @description Event call back function
 	 * @param {BaseEvent} params
 	 */
+	onBeforeInput: null,
+
+	/**
+	 * @description Event call back function
+	 * @param {BaseEvent} params
+	 */
 	onInput: null,
 
 	/**

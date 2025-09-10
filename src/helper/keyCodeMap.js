@@ -49,10 +49,12 @@ export function isAlt(e) {
 
 /**
  * @description event.isComposing check
- * @param {KeyboardEvent} e Event object
+ * @param {KeyboardEvent|InputEvent} e Event object
  * @returns {boolean}
  */
 export function isComposing(e) {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	return e.isComposing || e.keyCode === 229;
 }
 

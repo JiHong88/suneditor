@@ -2,7 +2,7 @@ import EditorInjector from '../editorInjector';
 import SelectMenu from './SelectMenu';
 import FileManager from './FileManager';
 import { dom, numbers, env, unicode } from '../helper';
-const { NO_EVENT } = env;
+const { _w, NO_EVENT } = env;
 
 /**
  * @typedef {{default?: string, check_new_window?: string, check_bookmark?: string}} RELAttr
@@ -79,7 +79,7 @@ class ModalAnchorEditor extends EditorInjector {
 		// members
 		this.kink = inst.constructor.key || inst.constructor.name;
 		this.inst = inst;
-		this.host = (this._w.location.origin + this._w.location.pathname).replace(/\/$/, '');
+		this.host = (_w.location.origin + _w.location.pathname).replace(/\/$/, '');
 
 		/** @type {HTMLInputElement} */
 		this.urlInput = forms.querySelector('.se-input-url');
@@ -254,7 +254,7 @@ class ModalAnchorEditor extends EditorInjector {
 	 * @returns {boolean} - `true` if the path is an internal bookmark, otherwise `false`.
 	 */
 	#selfPathBookmark(path) {
-		const href = this._w.location.href.replace(/\/$/, '');
+		const href = _w.location.href.replace(/\/$/, '');
 		return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (!href.includes('#') ? href.length : href.substring(0, href.indexOf('#')).length));
 	}
 

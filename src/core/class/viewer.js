@@ -5,6 +5,8 @@
 import CoreInjector from '../../editorInjector/_core';
 import { dom, env, converter, numbers } from '../../helper';
 
+const { _w, _d } = env;
+
 /**
  * @typedef {Omit<Viewer & Partial<__se__EditorInjector>, 'viewer'>} ViewerThis
  */
@@ -196,8 +198,8 @@ Viewer.prototype = {
 				dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			this.bodyOverflow = this._d.body.style.overflow;
-			this._d.body.style.overflow = 'hidden';
+			this.bodyOverflow = _d.body.style.overflow;
+			_d.body.style.overflow = 'hidden';
 
 			// frame
 			editorArea.style.cssText = toolbar.style.cssText = '';
@@ -216,7 +218,7 @@ Viewer.prototype = {
 			toolbar.style.position = 'relative';
 			toolbar.style.display = 'block';
 
-			this.fullScreenInnerHeight = this._w.innerHeight - toolbar.offsetHeight;
+			this.fullScreenInnerHeight = _w.innerHeight - toolbar.offsetHeight;
 			editorArea.style.height = this.fullScreenInnerHeight - (fc.has('statusbar') ? fc.get('statusbar').offsetHeight : 0) - this.options.get('fullScreenOffset') + 'px';
 
 			if (this.frameOptions.get('iframe') && this.frameOptions.get('height') === 'auto') {
@@ -247,7 +249,7 @@ Viewer.prototype = {
 			editorArea.style.cssText = this.editorAreaOriginCssText;
 			topArea.style.cssText = this._originCssText;
 			if (arrow) arrow.style.cssText = this.arrowOriginCssText;
-			this._d.body.style.overflow = this.bodyOverflow;
+			_d.body.style.overflow = this.bodyOverflow;
 
 			if (this.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight(fc.get('code'), fc.get('codeNumbers'), true);
 
@@ -355,9 +357,9 @@ Viewer.prototype = {
 	print() {
 		/** @type {HTMLIFrameElement} */
 		const iframe = dom.utils.createElement('IFRAME', { style: 'display: none;' });
-		this._d.body.appendChild(iframe);
+		_d.body.appendChild(iframe);
 
-		const innerPadding = this._w.getComputedStyle(this.frameContext.get('wysiwyg')).padding;
+		const innerPadding = _w.getComputedStyle(this.frameContext.get('wysiwyg')).padding;
 		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get()) : this.html.get();
 		const printDocument = dom.query.getIframeDocument(iframe);
 		const wDoc = this.frameContext.get('_wd');
@@ -389,8 +391,8 @@ Viewer.prototype = {
 					</body>
 				</html>`);
 		} else {
-			const links = this._d.head.getElementsByTagName('link');
-			const styles = this._d.head.getElementsByTagName('style');
+			const links = _d.head.getElementsByTagName('link');
+			const styles = _d.head.getElementsByTagName('style');
 			let linkHTML = '';
 			for (let i = 0, len = links.length; i < len; i++) {
 				linkHTML += links[i].outerHTML;
@@ -413,7 +415,7 @@ Viewer.prototype = {
 		}
 
 		this.ui.showLoading();
-		this._w.setTimeout(() => {
+		_w.setTimeout(() => {
 			try {
 				iframe.focus();
 				// Edge, Chromium
@@ -448,7 +450,7 @@ Viewer.prototype = {
 		this.ui._offCurrentModal();
 
 		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get({ withFrame: true })) : this.html.get({ withFrame: true });
-		const windowObject = this._w.open('', '_blank');
+		const windowObject = _w.open('', '_blank');
 		const wDoc = this.frameContext.get('_wd');
 		const rtlClass = this.options.get('_rtl') ? ' se-rtl' : '';
 
@@ -472,8 +474,8 @@ Viewer.prototype = {
 					</body>
 				</html>`);
 		} else {
-			const links = this._d.head.getElementsByTagName('link');
-			const styles = this._d.head.getElementsByTagName('style');
+			const links = _d.head.getElementsByTagName('link');
+			const styles = _d.head.getElementsByTagName('style');
 			let linkHTML = '';
 			for (let i = 0, len = links.length; i < len; i++) {
 				linkHTML += links[i].outerHTML;
@@ -505,7 +507,7 @@ Viewer.prototype = {
 	 */
 	_resetFullScreenHeight() {
 		if (this.frameContext.get('isFullScreen')) {
-			this.fullScreenInnerHeight += this._w.innerHeight - this.context.get('toolbar_main').offsetHeight - (this.frameContext.has('statusbar') ? this.frameContext.get('statusbar').offsetHeight : 0) - this.fullScreenInnerHeight;
+			this.fullScreenInnerHeight += _w.innerHeight - this.context.get('toolbar_main').offsetHeight - (this.frameContext.has('statusbar') ? this.frameContext.get('statusbar').offsetHeight : 0) - this.fullScreenInnerHeight;
 			this.frameContext.get('wrapper').style.height = this.fullScreenInnerHeight + 'px';
 			return true;
 		}

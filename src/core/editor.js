@@ -1381,6 +1381,7 @@ Editor.prototype = {
 			['onMouseUp', []],
 			['onScroll', []],
 			['onClick', []],
+			['onBeforeInput', []],
 			['onInput', []],
 			['onKeyDown', []],
 			['onKeyUp', []],

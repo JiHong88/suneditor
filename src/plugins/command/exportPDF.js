@@ -69,7 +69,7 @@ class ExportPDF extends EditorInjector {
 			const editableDiv = dom.utils.createElement('div', { class: standardWW.className }, standardWW.innerHTML);
 			ww = dom.utils.createElement('div', { style: `position: absolute; top: -10000px; left: -10000px; width: 21cm; columns: 21cm; height: auto;` }, editableDiv);
 
-			const innerPadding = this._w.getComputedStyle(standardWW).padding;
+			const innerPadding = _w.getComputedStyle(standardWW).padding;
 			const inlineWW = dom.utils.applyInlineStylesAll(editableDiv, true, this.options.get('allUsedStyles'));
 			inlineWW.style.padding = inlineWW.style.paddingTop = inlineWW.style.paddingBottom = inlineWW.style.paddingLeft = inlineWW.style.paddingRight = '0';
 			ww.innerHTML = `

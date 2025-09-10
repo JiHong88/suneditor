@@ -1,7 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager } from '../../modules';
 import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
-const { NO_EVENT } = env;
+const { _w, NO_EVENT } = env;
 
 /**
  * @typedef {import('../../events').VideoInfo} VideoInfo_video
@@ -310,7 +310,7 @@ class Video extends EditorInjector {
 			result = await this.submitURL(this.#linkValue);
 		}
 
-		if (result) this._w.setTimeout(this.component.select.bind(this.component, this.#element, Video.key), 0);
+		if (result) _w.setTimeout(this.component.select.bind(this.component, this.#element, Video.key), 0);
 
 		return result;
 	}

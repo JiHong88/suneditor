@@ -9,11 +9,11 @@ import { _DragHandle } from '../../modules';
 // event handlers
 import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from './eventHandlers/handler_toolbar';
 import { OnMouseDown_wysiwyg, OnMouseUp_wysiwyg, OnClick_wysiwyg, OnMouseMove_wysiwyg, OnMouseLeave_wysiwyg } from './eventHandlers/handler_ww_mouse';
-import { OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './eventHandlers/handler_ww_key_input';
+import { OnBeforeInput_wysiwyg, OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './eventHandlers/handler_ww_key_input';
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './eventHandlers/handler_ww_clipboard';
 import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './eventHandlers/handler_ww_dragDrop';
 
-const { _w, _d, ON_OVER_COMPONENT, isMobile, isTouchDevice } = env;
+const { _w, ON_OVER_COMPONENT, isMobile, isTouchDevice } = env;
 
 /**
  * @typedef {Omit<EventManager & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
@@ -47,6 +47,8 @@ function EventManager(editor) {
 	this._onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
 	/** @type {boolean} */
 	this._onShortcutKey = false;
+	/** @type {boolean} */
+	this._handledInBefore = false;
 	/** @type {number} */
 	this._balloonDelay = null;
 	/** @type {ResizeObserver} */
@@ -164,7 +166,7 @@ EventManager.prototype = {
 		if (this.frameOptions.get('iframe')) {
 			this.frameContext.get('_ww').addEventListener(type, listener, useCapture);
 		}
-		this._w.addEventListener(type, listener, useCapture);
+		_w.addEventListener(type, listener, useCapture);
 		return {
 			type,
 			listener,
@@ -192,7 +194,7 @@ EventManager.prototype = {
 		if (this.frameOptions.get('iframe')) {
 			this.frameContext.get('_ww').removeEventListener(type, listener, useCapture);
 		}
-		this._w.removeEventListener(type, listener, useCapture);
+		_w.removeEventListener(type, listener, useCapture);
 
 		return null;
 	},
@@ -228,6 +230,7 @@ EventManager.prototype = {
 		if (this.component.is(selectionNode) && !this.component.__selectionSelected) {
 			const component = this.component.get(selectionNode);
 			if (!component) return;
+			this.editor.effectNode = null;
 			this.component.select(component.target, component.pluginName);
 			return;
 		}
@@ -625,9 +628,8 @@ EventManager.prototype = {
 			}
 		} catch (e) {
 			this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
-			this.selection.removeRange();
-			this.selection._init();
 			this.editor.effectNode = null;
+			this.selection._init();
 			return;
 		}
 		/* eslint-disable @typescript-eslint/no-unused-vars */
@@ -860,6 +862,7 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'mousedown', OnMouseDown_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'mouseup', OnMouseUp_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'beforeinput', OnBeforeInput_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'input', OnInput_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this, fc), false);
@@ -1321,7 +1324,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 
 	if (this._inputFocus) {
 		if (this.editor.isInline) {
-			this._w.setTimeout(() => {
+			_w.setTimeout(() => {
 				this.toolbar._showInline();
 			}, 0);
 		}
@@ -1331,7 +1334,6 @@ function OnFocus_wysiwyg(frameContext, e) {
 	if ((this.status.rootKey === rootKey && this.editor._preventBlur) || this.editor._preventFocus) return;
 	this.editor._preventFocus = true;
 
-	const onSelected = this.editor.status.onSelected || this.editor.opendModal;
 	this.ui._offCurrentController();
 
 	dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
@@ -1340,11 +1342,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 	this.editor.changeFrameContext(rootKey);
 	this.history.resetButtons(rootKey, null);
 
-	if (!onSelected) {
-		this.applyTagEffect();
-	}
-
-	this._w.setTimeout(() => {
+	_w.setTimeout(() => {
 		this.__postFocusEvent(frameContext, e);
 	}, 0);
 }

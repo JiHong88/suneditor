@@ -4,7 +4,34 @@
  * @param {__se__FrameContext} fc - Frame context object
  * @param {InputEvent} e - Event object
  */
+export function OnBeforeInput_wysiwyg(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, fc: __se__FrameContext, e: InputEvent): Promise<boolean>;
+export class OnBeforeInput_wysiwyg {
+	/**
+	 * @private
+	 * @this {EventManagerThis_handler_ww_key_input}
+	 * @param {__se__FrameContext} fc - Frame context object
+	 * @param {InputEvent} e - Event object
+	 */
+	private constructor();
+	_handledInBefore: boolean;
+}
+/**
+ * @private
+ * @this {EventManagerThis_handler_ww_key_input}
+ * @param {__se__FrameContext} fc - Frame context object
+ * @param {InputEvent} e - Event object
+ */
 export function OnInput_wysiwyg(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, fc: __se__FrameContext, e: InputEvent): Promise<boolean>;
+export class OnInput_wysiwyg {
+	/**
+	 * @private
+	 * @this {EventManagerThis_handler_ww_key_input}
+	 * @param {__se__FrameContext} fc - Frame context object
+	 * @param {InputEvent} e - Event object
+	 */
+	private constructor();
+	_handledInBefore: boolean;
+}
 /**
  * @private
  * @this {EventManagerThis_handler_ww_key_input}

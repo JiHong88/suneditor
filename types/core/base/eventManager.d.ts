@@ -39,6 +39,8 @@ declare class EventManager {
 	_onButtonsCheck: RegExp;
 	/** @type {boolean} */
 	_onShortcutKey: boolean;
+	/** @type {boolean} */
+	_handledInBefore: boolean;
 	/** @type {number} */
 	_balloonDelay: number;
 	/** @type {ResizeObserver} */

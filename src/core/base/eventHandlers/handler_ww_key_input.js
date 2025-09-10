@@ -77,6 +77,37 @@ function LineDelete_prev(formatEl) {
  * @param {__se__FrameContext} fc - Frame context object
  * @param {InputEvent} e - Event object
  */
+export async function OnBeforeInput_wysiwyg(fc, e) {
+	if (fc.get('isReadOnly') || fc.get('isDisabled')) {
+		e.preventDefault();
+		e.stopPropagation();
+		return false;
+	}
+
+	const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
+	if (!keyCodeMap.isComposing(e)) {
+		if (!this.char.test(data, false)) {
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
+		this._handledInBefore = true;
+	} else {
+		this._handledInBefore = false;
+	}
+
+	// user event
+	if ((await this.triggerEvent('onBeforeInput', { frameContext: fc, event: e, data })) === false) return;
+	// plugin event
+	if (this._callPluginEvent('onBeforeInput', { frameContext: fc, event: e, data }) === false) return;
+}
+
+/**
+ * @private
+ * @this {EventManagerThis_handler_ww_key_input}
+ * @param {__se__FrameContext} fc - Frame context object
+ * @param {InputEvent} e - Event object
+ */
 export async function OnInput_wysiwyg(fc, e) {
 	if (fc.get('isReadOnly') || fc.get('isDisabled')) {
 		e.preventDefault();
@@ -95,11 +126,14 @@ export async function OnInput_wysiwyg(fc, e) {
 	this.selection._init();
 
 	const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
-	if (!this.char.test(data, true)) {
-		e.preventDefault();
-		e.stopPropagation();
-		return false;
+	if (!this._handledInBefore) {
+		if (!this.char.test(data, true)) {
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
 	}
+	this._handledInBefore = false;
 
 	// user event
 	if ((await this.triggerEvent('onInput', { frameContext: fc, event: e, data })) === false) return;
@@ -1174,8 +1208,6 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 			this._clearRetainStyleNodes(formatEl);
 		}
 	}
-
-	this.char.test('', false);
 
 	// document type
 	if (fc.has('documentType_use_header')) {

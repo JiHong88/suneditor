@@ -2,7 +2,7 @@ import EditorInjector from '../editorInjector';
 import { Controller, SelectMenu, _DragHandle } from '../modules';
 import { dom, numbers, env, converter, keyCodeMap } from '../helper';
 
-const { ON_OVER_COMPONENT } = env;
+const { _w, ON_OVER_COMPONENT } = env;
 const DIRECTION_CURSOR_MAP = { tl: 'nwse-resize', tr: 'nesw-resize', bl: 'nesw-resize', br: 'nwse-resize', lw: 'ew-resize', th: 'ns-resize', rw: 'ew-resize', bh: 'ns-resize' };
 const DIR_DIAGONAL = 'tl|bl|tr|br';
 const DIR_W = 'lw|rw';
@@ -458,7 +458,7 @@ class Figure extends EditorInjector {
 			// selecte
 			dom.utils.removeClass(this._cover, 'se-figure-over-selected');
 			this.controller.open(_figure.main, null, { initMethod: this.#offContainer, isWWTarget: false, addOffset: null });
-			this._w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
+			_w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 		} else {
 			dom.utils.addClass(this._cover, 'se-figure-over-selected');
 		}
@@ -742,7 +742,7 @@ class Figure extends EditorInjector {
 					this.controller.close();
 				} else {
 					dom.utils.removeItem(this._caption);
-					this._w.setTimeout(this.component.select.bind(this.component, element, this.kind), 0);
+					_w.setTimeout(this.component.select.bind(this.component, element, this.kind), 0);
 				}
 
 				this._caption = !this._caption;
