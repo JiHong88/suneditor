@@ -592,8 +592,9 @@ declare class Editor {
 	/**
 	 * @private
 	 * @description Caching basic buttons to use
+	 * @param {string} mode 'all' | 'main' | 'sub'
 	 */
-	__cachingButtons(): void;
+	__cachingButtons(mode: string): void;
 	/**
 	 * @private
 	 * @description Set the disabled button list

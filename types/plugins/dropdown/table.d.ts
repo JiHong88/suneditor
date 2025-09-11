@@ -131,6 +131,11 @@ declare class Table extends EditorInjector {
 	/** @type {HTMLButtonElement} */
 	unmergeButton: HTMLButtonElement;
 	/**
+	 * @description Same value a "this._selectedTable", but it maintain prev table element
+	 * @type {HTMLTableElement}
+	 */
+	_element: HTMLTableElement;
+	/**
 	 * @editorMethod Editor.core
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.

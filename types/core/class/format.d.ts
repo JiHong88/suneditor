@@ -262,11 +262,11 @@ declare class Format {
 	isLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
 	/**
 	 * @this {FormatThis}
-	 * @description It is judged whether it is the only "line" element, not "brLine".
+	 * @description It is judged whether it is the only "line" element.
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
-	isLineOnly(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
+	isNormalLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description It is judged whether it is the "brLine" element.
