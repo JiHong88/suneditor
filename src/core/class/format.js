@@ -97,8 +97,19 @@ Format.prototype = {
 
 		while (node) {
 			if (dom.check.isWysiwygFrame(node)) return null;
-			if (this.isBlock(node)) return /** @type {HTMLElement} */ (node.firstElementChild);
-			if (this.isLine(node) && validation(node)) return /** @type {HTMLElement} */ (node);
+
+			if (this.isBlock(node)) {
+				if (this.isLine(node.firstElementChild)) {
+					return /** @type {HTMLElement} */ (node.firstElementChild);
+				}
+				if (this.isLine(node)) {
+					return /** @type {HTMLElement} */ (node);
+				}
+			}
+
+			if (this.isLine(node) && validation(node)) {
+				return /** @type {HTMLElement} */ (node);
+			}
 
 			node = node.parentNode;
 		}
@@ -214,7 +225,7 @@ Format.prototype = {
 		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode) && !this.component.is(element)) {
 			oFormat = dom.utils.createElement('BR');
 		} else {
-			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLineOnly(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLine');
+			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isNormalLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLine');
 			oFormat = dom.utils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
 				dom.utils.copyTagAttributes(oFormat, /** @type {Node} */ (lineNode || currentFormatEl), ['id']);
@@ -1234,6 +1245,11 @@ Format.prototype = {
 
 		// get line nodes
 		const lineNodes = this.getLines(null);
+		if (lineNodes.length === 0) {
+			console.warn('[SUNEDITOR.format.applyInlineElement.warn] There is no line to apply.');
+			return;
+		}
+
 		range = this.selection.getRange();
 		startCon = range.startContainer;
 		startOff = range.startOffset;
@@ -1402,7 +1418,6 @@ Format.prototype = {
 	 * @returns {element is HTMLElement}
 	 */
 	isLine(element) {
-		if (this.isBlock(element)) return false;
 		return typeof element === 'string'
 			? this._formatLineCheck.test(element)
 			: element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this._nonFormat(element);
@@ -1410,12 +1425,12 @@ Format.prototype = {
 
 	/**
 	 * @this {FormatThis}
-	 * @description It is judged whether it is the only "line" element, not "brLine".
+	 * @description It is judged whether it is the only "line" element.
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
-	isLineOnly(element) {
-		return this.isLine(element) && (this._brLineBreak || !this.isBrLine(element));
+	isNormalLine(element) {
+		return this.isLine(element) && (this._brLineBreak || !this.isBrLine(element)) && !this.isBlock(element);
 	},
 
 	/**
@@ -1508,11 +1523,10 @@ Format.prototype = {
 		const commonCon = range.commonAncestorContainer;
 
 		// get line nodes
-		const lineNodes = dom.query.getListChildren(commonCon, (current) => {
-			return validation ? validation(current) : this.isLine(current);
-		});
+		validation ||= this.isLine.bind(this);
+		const lineNodes = dom.query.getListChildren(commonCon, (current) => validation(current));
 
-		if (!dom.check.isWysiwygFrame(commonCon) && !this.isBlock(commonCon)) lineNodes.unshift(this.getLine(commonCon, null));
+		if (commonCon.nodeType === 3 || (!dom.check.isWysiwygFrame(commonCon) && !this.isBlock(commonCon))) lineNodes.unshift(this.getLine(commonCon, null));
 		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
 
 		const startLine = this.getLine(startCon, null);

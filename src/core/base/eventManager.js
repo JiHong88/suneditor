@@ -547,6 +547,7 @@ EventManager.prototype = {
 		const range = this.selection.getRange();
 		const commonCon = /** @type {HTMLElement} */ (range.commonAncestorContainer);
 		const startCon = range.startContainer;
+		const endOffset = range.endOffset;
 		const rangeEl = this.format.getBlock(commonCon, null);
 
 		/** @type {Node} */
@@ -560,7 +561,7 @@ EventManager.prototype = {
 
 			rangeEl.innerHTML = format.outerHTML;
 			format = rangeEl.firstChild;
-			focusNode = dom.query.getEdgeChildNodes(format, null).sc;
+			focusNode = format.childNodes[endOffset] || dom.query.getEdgeChildNodes(format, null).sc;
 
 			if (!focusNode) {
 				focusNode = dom.utils.createTextNode(unicode.zeroWidthSpace);

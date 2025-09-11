@@ -118,7 +118,7 @@ export async function OnInput_wysiwyg(fc, e) {
 	const range = this.selection.getRange();
 	const selectionNode = this.selection.getNode();
 	const formatEl = this.format.getLine(selectionNode, null);
-	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !dom.check.isList(selectionNode)) {
+	if (!this.format.isNormalLine(formatEl) && range.collapsed && !this.component.is(selectionNode) && !dom.check.isList(selectionNode)) {
 		const rangeEl = this.format.getBlock(selectionNode, null);
 		this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine'));
 	}
@@ -220,7 +220,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 				break;
 			}
 
-			if (!this.format.isLine(formatEl) && !fc.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.get('defaultLine')) !== null) {
+			if (!this.format.isNormalLine(formatEl) && !fc.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.get('defaultLine')) !== null) {
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
@@ -839,7 +839,8 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					}
 				}
 
-				if (brBlock) {
+				// br line | closure block exception
+				if (brBlock || (rangeEl === formatEl && this.format.isClosureBlock(rangeEl) && this.format.isLine(formatEl))) {
 					this.__enterPrevent(e);
 					const selectionFormat = selectionNode === brBlock;
 					const wSelection = this.selection.get();
@@ -1172,7 +1173,13 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 		this._formatAttrsTemp = null;
 	}
 
-	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !dom.check.isList(selectionNode) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine')) !== null) {
+	if (
+		!this.format.isNormalLine(formatEl) &&
+		range.collapsed &&
+		!this.component.is(selectionNode) &&
+		!dom.check.isList(selectionNode) &&
+		this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine')) !== null
+	) {
 		selectionNode = this.selection.getNode();
 	}
 
