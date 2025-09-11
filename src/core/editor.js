@@ -1476,19 +1476,23 @@ Editor.prototype = {
 		delete this._pluginCallButtons;
 		delete this._pluginCallButtons_sub;
 
-		this.__cachingButtons();
+		this.__cachingButtons('all');
 		this.__cachingShortcuts();
 	},
 
 	/**
 	 * @private
 	 * @description Caching basic buttons to use
+	 * @param {string} mode 'all' | 'main' | 'sub'
 	 */
-	__cachingButtons() {
+	__cachingButtons(mode) {
 		const ctx = this.context;
 		this.__setDisabledButtons();
-		this.__saveCommandButtons(this.allCommandButtons, ctx.get('toolbar_buttonTray'));
-		if (this.options.has('_subMode')) {
+
+		if (/all|main/.test(mode)) {
+			this.__saveCommandButtons(this.allCommandButtons, ctx.get('toolbar_buttonTray'));
+		}
+		if (/all|sub/.test(mode) && this.options.has('_subMode')) {
 			this.__saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar_sub_buttonTray'));
 		}
 	},

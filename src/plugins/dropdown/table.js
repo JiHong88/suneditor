@@ -89,11 +89,6 @@ class Table extends EditorInjector {
 
 	/** @type {HTMLElement} */
 	#figure;
-	/**
-	 * @description Same value a "this._selectedTable", but it maintain prev table element
-	 * @type {HTMLTableElement}
-	 */
-	#element;
 	/** @type {HTMLTableCellElement} */
 	#tdElement;
 	/** @type {HTMLTableRowElement} */
@@ -294,12 +289,17 @@ class Table extends EditorInjector {
 		/** @type {HTMLButtonElement} */
 		this.unmergeButton = controller_cell.unmergeButton;
 
+		/**
+		 * @description Same value a "this._selectedTable", but it maintain prev table element
+		 * @type {HTMLTableElement}
+		 */
+		this._element = null;
+
 		// members - private
 		this.#resizing = false;
 		this.#resizeLine = null;
 		this.#resizeLinePrev = null;
 		this.#figure = null;
-		this.#element = null;
 		this.#tdElement = null;
 		this.#trElement = null;
 		this.#trElements = null;
@@ -589,7 +589,7 @@ class Table extends EditorInjector {
 
 		const cellEdge = CheckCellEdge(event, target);
 		if (cellEdge.is) {
-			if (this.#element) this.#element.style.cursor = '';
+			if (this._element) this._element.style.cursor = '';
 			this.__removeGlobalEvents();
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
 			this.#resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
@@ -601,8 +601,8 @@ class Table extends EditorInjector {
 		const rowEdge = CheckRowEdge(event, target);
 		if (rowEdge.is) {
 			this.__removeGlobalEvents();
-			this.#element = dom.query.getParentElement(target, dom.check.isTable);
-			this.#element.style.cursor = 'ns-resize';
+			this._element = dom.query.getParentElement(target, dom.check.isTable);
+			this._element.style.cursor = 'ns-resize';
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
 			this.#resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
 			this._setResizeRowPosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine);
@@ -610,7 +610,7 @@ class Table extends EditorInjector {
 			return;
 		}
 
-		if (this.#element) this.#element.style.cursor = '';
+		if (this._element) this._element.style.cursor = '';
 		this.__hideResizeLine();
 	}
 
@@ -621,7 +621,7 @@ class Table extends EditorInjector {
 	onScroll() {
 		if (this.#resizeLine?.style.display !== 'block') return;
 		// delete resize line position
-		if (this.#element) this.#element.style.cursor = '';
+		if (this._element) this._element.style.cursor = '';
 		this.#resizeLine.style.display = 'none';
 	}
 
@@ -658,7 +658,7 @@ class Table extends EditorInjector {
 					return;
 				}
 
-				const col = this.#element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
+				const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
 				this._startCellResizing(col, cellEdge.startX, numbers.get(_w.getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
 				this._toggleEditor(false);
 			} catch (err) {
@@ -718,6 +718,9 @@ class Table extends EditorInjector {
 	 */
 	onMouseUp() {
 		this.#shift = false;
+		if (this.cellControllerTop) {
+			this.controller_cell.resetPosition(this.#fixedCell);
+		}
 	}
 
 	/**
@@ -940,7 +943,7 @@ class Table extends EditorInjector {
 				this.#setTableStyle('width', false);
 				this._historyPush();
 				_w.setTimeout(() => {
-					this.component.select(this.#element, Table.key, { isInput: true });
+					this.component.select(this._element, Table.key, { isInput: true });
 				}, 0);
 				break;
 			case 'layout':
@@ -948,7 +951,7 @@ class Table extends EditorInjector {
 				this.#setTableStyle('column', false);
 				this._historyPush();
 				_w.setTimeout(() => {
-					this.component.select(this.#element, Table.key, { isInput: true });
+					this.component.select(this._element, Table.key, { isInput: true });
 				}, 0);
 				break;
 			case 'copy':
@@ -993,8 +996,8 @@ class Table extends EditorInjector {
 		this._deleteStyleSelectedCells();
 		this._toggleEditor(true);
 
+		this._element = null;
 		this.#figure = null;
-		this.#element = null;
 		this.#trElement = null;
 		this.#trElements = null;
 		this.#tableXY = [];
@@ -1045,7 +1048,7 @@ class Table extends EditorInjector {
 	 * @returns {HTMLTableElement} The `<table>` element that is the parent of the provided `element`.
 	 */
 	setTableInfo(element) {
-		const table = (this.#element = this.#selectedTable = dom.query.getParentElement(element, 'TABLE'));
+		const table = (this._element = this.#selectedTable = dom.query.getParentElement(element, 'TABLE'));
 		this.#figure = dom.query.getParentElement(table, dom.check.isFigure) || table;
 		return /** @type {HTMLTableElement} */ (table);
 	}
@@ -1180,7 +1183,7 @@ class Table extends EditorInjector {
 	 * @param {?"up"|"down"|"left"|"right"} option The action to perform: 'up', 'down', 'left', 'right', or `null` for removing.
 	 */
 	editTable(type, option) {
-		const table = this.#element;
+		const table = this._element;
 		const isRow = type === 'row';
 
 		if (isRow) {
@@ -1369,9 +1372,9 @@ class Table extends EditorInjector {
 				}
 			}
 
-			this.#element.deleteRow(rowIndex);
+			this._element.deleteRow(rowIndex);
 		} else {
-			this.insertBodyRow(this.#element, rowIndex, cellCnt);
+			this.insertBodyRow(this._element, rowIndex, cellCnt);
 		}
 
 		if (!remove) {
@@ -1518,7 +1521,7 @@ class Table extends EditorInjector {
 			}
 		}
 
-		const colgroup = this.#element.querySelector('colgroup');
+		const colgroup = this._element.querySelector('colgroup');
 		if (colgroup) {
 			const cols = colgroup.querySelectorAll('col');
 			if (remove) {
@@ -2068,7 +2071,7 @@ class Table extends EditorInjector {
 	toggleHeader() {
 		const btn = this.headerButton;
 		const active = dom.utils.hasClass(btn, 'active');
-		const table = this.#element;
+		const table = this._element;
 
 		if (!active) {
 			const header = dom.utils.createElement('THEAD');
@@ -2093,7 +2096,7 @@ class Table extends EditorInjector {
 	toggleCaption() {
 		const btn = this.captionButton;
 		const active = dom.utils.hasClass(btn, 'active');
-		const table = this.#element;
+		const table = this._element;
 
 		if (!active) {
 			const caption = dom.utils.createElement('CAPTION', { class: `se-table-caption-${this.captionPosition}` });
@@ -2134,12 +2137,12 @@ class Table extends EditorInjector {
 
 		if (styles.includes('column')) {
 			if (!this.#fixedColumn) {
-				dom.utils.removeClass(this.#element, 'se-table-layout-fixed');
-				dom.utils.addClass(this.#element, 'se-table-layout-auto');
+				dom.utils.removeClass(this._element, 'se-table-layout-fixed');
+				dom.utils.addClass(this._element, 'se-table-layout-auto');
 				dom.utils.removeClass(this.columnFixedButton, 'active');
 			} else {
-				dom.utils.removeClass(this.#element, 'se-table-layout-auto');
-				dom.utils.addClass(this.#element, 'se-table-layout-fixed');
+				dom.utils.removeClass(this._element, 'se-table-layout-auto');
+				dom.utils.addClass(this._element, 'se-table-layout-fixed');
 				dom.utils.addClass(this.columnFixedButton, 'active');
 			}
 		}
@@ -2185,7 +2188,7 @@ class Table extends EditorInjector {
 		this.#tdElement = tdElement;
 		if (this.#fixedCell === tdElement) dom.utils.addClass(tdElement, 'se-selected-cell-focus');
 		if (!this.#selectedCells?.length) this.#selectedCells = [tdElement];
-		const tableElement = this.#selectedTable || this.#element || dom.query.getParentElement(tdElement, 'TABLE');
+		const tableElement = this.#selectedTable || this._element || dom.query.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, { isInput: true });
 	}
 
@@ -2248,13 +2251,13 @@ class Table extends EditorInjector {
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
-		this._resizePercentCol(this.#element);
+		this._resizePercentCol(this._element);
 		this._setResizeLinePosition(this.#figure, this.#tdElement, this.#resizeLinePrev, isLeftEdge);
 		this.#resizeLinePrev.style.display = 'block';
 		const prevValue = col.style.width;
 		const nextCol = /** @type {HTMLElement} */ (col.nextElementSibling);
 		const nextColPrevValue = nextCol.style.width;
-		const realWidth = dom.utils.hasClass(this.#element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(nextCol || col);
+		const realWidth = dom.utils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(nextCol || col);
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 		this._addResizeGlobalEvents(
@@ -2270,13 +2273,13 @@ class Table extends EditorInjector {
 				startWidth,
 				numbers.get(prevValue, CELL_DECIMAL_END),
 				numbers.get(realWidth, CELL_DECIMAL_END),
-				this.#element.offsetWidth
+				this._element.offsetWidth
 			),
 			() => {
 				this.__removeGlobalEvents();
-				this._resizePercentCol(this.#element);
+				this._resizePercentCol(this._element);
 				this.history.push(true);
-				this.component.select(this.#element, Table.key, { isInput: true });
+				this.component.select(this._element, Table.key, { isInput: true });
 			},
 			(e) => {
 				this._stopResize(col, prevValue, 'width', e);
@@ -2372,7 +2375,7 @@ class Table extends EditorInjector {
 				this.__removeGlobalEvents();
 				if (numbers.get(figure.style.width, 0) > 100) figure.style.width = '100%';
 				// figure reopen
-				this.component.select(this.#element, Table.key, { isInput: true });
+				this.component.select(this._element, Table.key, { isInput: true });
 			},
 			this._stopResize.bind(this, figure, figure.style.width, 'width')
 		);
@@ -2445,7 +2448,7 @@ class Table extends EditorInjector {
 		target.style[styleProp] = prevValue;
 		// figure reopen
 		if (styleProp === 'width') {
-			this.component.select(this.#element, Table.key, { isInput: true });
+			this.component.select(this._element, Table.key, { isInput: true });
 		}
 	}
 
@@ -2511,7 +2514,7 @@ class Table extends EditorInjector {
 	_setCtrlProps(type) {
 		this._typeCache = type;
 		const isTable = type === 'table';
-		const targets = isTable ? [this.#element] : this.#selectedCells;
+		const targets = isTable ? [this._element] : this.#selectedCells;
 		if (!targets || targets.length === 0) return;
 
 		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, cell_alignment_table_text, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
@@ -2687,7 +2690,7 @@ class Table extends EditorInjector {
 			target.disabled = true;
 
 			const isTable = this.controller_table.form.contains(this.controller_props.currentTarget);
-			const targets = isTable ? [this.#element] : this.#selectedCells;
+			const targets = isTable ? [this._element] : this.#selectedCells;
 			const tr = /** @type {HTMLTableCellElement} */ (targets[0]);
 			const trStyles = _w.getComputedStyle(tr);
 			const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical } = this.propTargets;
