@@ -6232,9 +6232,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     commonCon.parentNode.insertBefore(format, commonCon);
                     format.appendChild(commonCon);
                 }
+
+                if (util.isWysiwygDiv(commonCon)) {
+                    format = util.createElement(formatName || options.defaultTag);
+                    format.innerHTML = commonCon.innerHTML;
+                    commonCon.innerHTML = '';
+                    commonCon.appendChild(format);
+                    this.effectNode = null;
+                    this.setRange(format, 1, format, 1);
+                    return;
+                }
                 
-                if (util.isBreak(format.nextSibling)) util.removeItem(format.nextSibling);
-                if (util.isBreak(format.previousSibling)) util.removeItem(format.previousSibling);
+                if (format) {
+                    if (util.isBreak(format.nextSibling)) util.removeItem(format.nextSibling);
+                    if (util.isBreak(format.previousSibling)) util.removeItem(format.previousSibling);
+                }
+
                 if (util.isBreak(focusNode)) {
                     const zeroWidth = util.createTextNode(util.zeroWidthSpace);
                     focusNode.parentNode.insertBefore(zeroWidth, focusNode);
