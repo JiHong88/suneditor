@@ -845,8 +845,8 @@ const options1 = {
 		url: 'http://localhost:3000/editor/filebrowser'
 	},
 	table: {
-		scrollType: 'x'
-		// cellControllerPosition: 'cell'
+		scrollType: 'x',
+		cellControllerPosition: 'cell'
 	},
 	fontColor: {
 		// disableHEXInput: true,

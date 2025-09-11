@@ -718,9 +718,6 @@ class Table extends EditorInjector {
 	 */
 	onMouseUp() {
 		this.#shift = false;
-		if (!this.cellControllerTop) {
-			this.controller_cell.resetPosition(this.#fixedCell);
-		}
 	}
 
 	/**
