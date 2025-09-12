@@ -98,7 +98,8 @@ class VideoGallery extends EditorInjector {
 				this.width,
 				this.height,
 				false,
-				file
+				file,
+				true
 			);
 		}
 	}
