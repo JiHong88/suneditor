@@ -68,7 +68,7 @@
 	--se-drag-over-color: #f0c20a;
 
 	/* modal, browser, dropdown */
-	--se-modal-background-color: #f9f9f9;
+	--se-modal-background-color: #fff;
 	--se-modal-color: #333;
 	--se-modal-border-color: #e5e5e5;
 	--se-modal-anchor-color: #004cff;
@@ -82,7 +82,7 @@
 
 	/* controller */
 	--se-controller-border-color: #999;
-	--se-controller-background-color: #f9f9f9;
+	--se-controller-background-color: #fff;
 	--se-controller-color: #333;
 	--se-shadow-controller-color: rgba(0, 0, 0, 0.2);
 
