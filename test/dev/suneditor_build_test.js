@@ -1091,7 +1091,25 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
 	dsa
         <audio controls="true" origin-size="," src="custom://dsa" data-index="0" data-file-name="dsa" data-file-size="0" style=""></audio>
     </div>
-    `
+    `,
+    value: `<ol>
+  <li>123456789<br>
+
+<div class="se-component se-image-container __se__float-none">
+      <figure>
+        <img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" width="" height="" data-size="," data-align="none" data-percentage="auto,auto" style="" data-index="0" data-file-name="cat.jpg" data-file-size="0" origin-size="640,404" data-origin=",">
+      </figure>
+</div>
+<br>
+  </li>
+</ol>
+<div class="se-component se-image-container __se__float-none">
+      <figure>
+        <img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" width="" height="" data-size="," data-align="none" data-percentage="auto,auto" style="" data-index="0" data-file-name="cat.jpg" data-file-size="0" origin-size="640,404" data-origin=",">
+      </figure>
+</div>
+<p><br></p>
+`,
 });
 
 s2.core._cleanStyleRegExp.span = new RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color|background-image)\\s*:[^;]+(?!;)*', 'ig'),

@@ -7213,16 +7213,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                     // component
                     if (!selectRange && formatEl && (range.startOffset === 0 || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
+                        const isList = util.isListCell(formatEl);
                         const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
-                        const prev = formatEl.previousSibling;
+                        const prev = isList ? sel.previousSibling : formatEl.previousSibling;
                         // select file component
-                        const ignoreZWS = (commonCon.nodeType === 3 || util.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
-                        if (sel && !sel.previousSibling && ( (commonCon && util.isComponent(commonCon.previousSibling)) || (ignoreZWS && util.isComponent(prev)))) {
+                        const ignoreZWS = isList || (commonCon.nodeType === 3 || util.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
+                        if (sel && ((isList || !sel.previousSibling)) && ((commonCon && util.isComponent(commonCon.previousSibling)) || (ignoreZWS && util.isComponent(prev)))) {
                             const fileComponentInfo = core.getFileComponent(prev);
                             if (fileComponentInfo) {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                if (formatEl.textContent.length === 0) util.removeItem(formatEl);
+                                
+                                if (isList) util.removeItem(sel);
+                                else if (formatEl.textContent.length === 0) util.removeItem(formatEl);
+
                                 if (core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
                             } else if (util.isComponent(prev)) {
                                 e.preventDefault();
@@ -7753,6 +7757,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
             }
 
+            if (core.currentFileComponentInfo) core.controllersOff();
+
             if (shift && keyCode === 16) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -7893,7 +7899,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const selectedComponentInfo = core.getFileComponent(selectionNodeDeepestFirstChild);
             if (!(e.keyCode === 16 || e.shiftKey) && selectedComponentInfo) core.selectComponent(selectedComponentInfo.target, selectedComponentInfo.pluginName);
-            else if (core.currentFileComponentInfo) core.controllersOff();
 
             /** when format tag deleted */
             if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {
