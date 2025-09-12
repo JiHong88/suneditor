@@ -1057,20 +1057,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         setRange: function (startCon, startOff, endCon, endOff) {
             if (!startCon || !endCon) return;
-            if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
-            if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
+            if ((util.isBreak(startCon) || startCon.nodeType === 3) && startOff > startCon.textContent.length) startOff = startCon.textContent.length;
+		    if ((util.isBreak(endCon) || endCon.nodeType === 3) && endOff > endCon.textContent.length) endOff = endCon.textContent.length;
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff] || startCon.childNodes[startOff - 1] || startCon;
-                startOff = startOff > 0 ? startCon.nodeType === 1 ? 1 : startCon.textContent ? startCon.textContent.length : 0 : 0;
+                startCon = startCon.childNodes[startOff > 0 ? startCon.childNodes.length - 1 : 0] || startCon;
+                startOff = startOff > 0 ? (startCon.nodeType === 1 && !util.isBreak(startCon) ? 1 : startCon.textContent ? startCon.textContent.length : 0) : 0;
             }
             if (util.isFormatElement(endCon)) {
-                endCon = endCon.childNodes[endOff] || endCon.childNodes[endOff - 1] || endCon;
-                endOff = endOff > 0 ? endCon.nodeType === 1 ? 1 : endCon.textContent ? endCon.textContent.length : 0 : 0;
+                endCon = endCon.childNodes[endOff > 0 ? endCon.childNodes.length - 1 : 0] || endCon;
+                endOff = endOff > 0 ? (endCon.nodeType === 1 && !util.isBreak(endCon) ? 1 : endCon.textContent ? endCon.textContent.length : 0) : 0;
             }
 
             const range = this._wd.createRange();
 
             try {
+                if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
+                if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
                 range.setStart(startCon, startOff);
                 range.setEnd(endCon, endOff);
             } catch (error) {
@@ -1574,7 +1576,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let formatEl = util.getFormatElement(selectionNode, null);
 
             if (util.isListCell(formatEl)) {
-                this.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
+                this.insertNode(element, selectionNode === formatEl ? null : (selectionNode || r.container).nextSibling, false);
                 if (!element.nextSibling) element.parentNode.appendChild(util.createElement('BR'));
             } else {
                 if (this.getRange().collapsed && (r.container.nodeType === 3 || util.isBreak(r.container))) {
@@ -1669,7 +1671,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const isList = util.isListCell(container.parentNode);
             let componentTop, wScroll, w;
             // top
-            if (isList ? !container.previousSibling : !util.isFormatElement(container.previousElementSibling)) {
+            if (isList ? !container.previousSibling || util.isComponent(container.previousElementSibling) : !util.isFormatElement(container.previousElementSibling)) {
                 this._variable._lineBreakComp = container;
                 wScroll = context.element.wysiwyg.scrollTop;
                 componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
@@ -1682,7 +1684,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 t_style.display = 'none';
             }
             // bottom
-            if (isList ? !container.nextSibling : !util.isFormatElement(container.nextElementSibling)) {
+            if (isList ? !container.nextSibling || util.isComponent(container.nextElementSibling)  : !util.isFormatElement(container.nextElementSibling)) {
                 if (!componentTop) {
                     this._variable._lineBreakComp = container;
                     wScroll = context.element.wysiwyg.scrollTop;
@@ -1803,7 +1805,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const depthFormat = util.getParentElement(container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
                     afterNode = util.splitElement(container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (!afterNode) {
-                        tempAfterNode = afterNode = line;
+                        if (!util.isListCell(line)) {
+                            tempAfterNode = afterNode = line;
+                        }
                     } else if (insertListCell) {
                         if (line.contains(container)) {
                             const subList = util.isList(line.lastElementChild);
