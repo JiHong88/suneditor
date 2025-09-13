@@ -1027,7 +1027,7 @@ value: `<ol style="list-style-type: ">
 </ol>
 
 `,
-charCounter_max: 26,
+// charCounter_max: 26,
 placeholder: 'Start typing here...',
 	// defaultLineBreakFormat: 'br',
 	events: {

@@ -636,7 +636,6 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 			e.preventDefault();
 			if (ctrl || alt || dom.check.isWysiwygFrame(selectionNode)) break;
 
-			const isEdge = !range.collapsed || dom.check.isEdgePoint(range.startContainer, range.startOffset);
 			const selectedFormats = this.format.getLines(null);
 			selectionNode = this.selection.getNode();
 			const cells = [];
@@ -663,7 +662,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 			}
 
 			// Nested list
-			if (cells.length > 0 && isEdge) {
+			if (cells.length > 0) {
 				r = this.format._applyNestedList(cells, shift);
 			}
 
