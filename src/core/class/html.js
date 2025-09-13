@@ -921,11 +921,12 @@ HTML.prototype = {
 
 		const _isText = dom.check.isText;
 		const _isElement = dom.check.isElement;
+		let nextFocusNodes = null;
 		for (let i = startIndex; i <= endIndex; i++) {
 			const item = /** @type {Text} */ (childNodes[i]);
 
 			if (_isText(item) && (item.data === undefined || item.length === 0)) {
-				this._nodeRemoveListItem(item);
+				nextFocusNodes = this._nodeRemoveListItem(item);
 				continue;
 			}
 
@@ -947,7 +948,7 @@ HTML.prototype = {
 				if (beforeNode.length > 0) {
 					/** @type {Text} */ (startCon).data = beforeNode.data;
 				} else {
-					this._nodeRemoveListItem(startCon);
+					nextFocusNodes = this._nodeRemoveListItem(startCon);
 				}
 
 				if (item === endCon) break;
@@ -965,13 +966,13 @@ HTML.prototype = {
 				if (afterNode.length > 0) {
 					/** @type {Text} */ (endCon).data = afterNode.data;
 				} else {
-					this._nodeRemoveListItem(endCon);
+					nextFocusNodes = this._nodeRemoveListItem(endCon);
 				}
 
 				continue;
 			}
 
-			this._nodeRemoveListItem(item);
+			nextFocusNodes = this._nodeRemoveListItem(item);
 		}
 
 		const endUl = dom.query.getParentElement(endCon, 'ul');
@@ -1008,6 +1009,11 @@ HTML.prototype = {
 		if (!dom.check.isWysiwygFrame(container) && container.childNodes.length === 0) {
 			const rc = this.nodeTransform.removeAllParents(container, null, null);
 			if (rc) container = rc.sc || rc.ec || this.frameContext.get('wysiwyg');
+		}
+
+		if (!container || (container.nodeType === 1 && !this.format.isLine(container) && !dom.check.isBreak(container))) {
+			container = nextFocusNodes?.sc || nextFocusNodes?.ec;
+			offset = container?.nodeType === 3 ? container.textContent.length : 1;
 		}
 
 		// set range
@@ -1288,6 +1294,7 @@ HTML.prototype = {
 	 * @this {HTMLThis}
 	 * @description Checks whether the given list item node should be removed and handles necessary clean-up.
 	 * @param {Node} item The list item node to be checked.
+	 * @returns {{sc:Node, ec:Node}|null} An object containing the start and end containers if any transformations were made, otherwise null.
 	 */
 	_nodeRemoveListItem(item) {
 		const line = this.format.getLine(item, null);
@@ -1295,11 +1302,13 @@ HTML.prototype = {
 
 		if (!dom.check.isListCell(line)) return;
 
-		this.nodeTransform.removeAllParents(line, null, null);
+		const { sc, ec } = this.nodeTransform.removeAllParents(line, null, null);
 
 		if (dom.check.isList(line?.firstChild)) {
 			line.insertBefore(dom.utils.createTextNode(unicode.zeroWidthSpace), line.firstChild);
 		}
+
+		return { sc, ec };
 	},
 
 	/**
