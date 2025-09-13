@@ -1027,6 +1027,118 @@ value: `<ol style="list-style-type: ">
 </ol>
 
 `,
+value: `<pre>​dsadsa</pre>
+
+<figure class="se-flex-component se-input-component se-scroll-figure-x" style="width: 100%;">
+  <table class="se-table-layout-auto" style="">
+    <colgroup><col style="width: 20%;"><col style="width: 20%;"><col style="width: 20%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup>
+    <tbody>
+      <tr>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td class="">
+          <div>dsadsa</div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="">
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div>dsa</div>
+        </td>
+        <td class="">
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td class="">
+          <div>dsadasdsa</div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+
+<p>​dsadsa</p>
+<ol style="list-style-type: ">
+  <li>dsadsa</li>
+  <li>bbdadas
+    <ol>
+      <li>dsadsadsa</li>
+      <li>dsadsadas
+        <ol>
+          <li>dsadsa</li>
+          <li>dsadsa</li>
+          <li>dsadas</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
+`,
 // charCounter_max: 26,
 placeholder: 'Start typing here...',
 	// defaultLineBreakFormat: 'br',

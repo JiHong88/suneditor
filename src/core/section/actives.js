@@ -1,4 +1,5 @@
 import { dom, env, keyCodeMap } from '../../helper';
+import { isTable, isList } from '../../helper/dom/domCheck';
 const { NO_EVENT } = env;
 
 /**
@@ -39,12 +40,11 @@ const __RemoveCopyformt = function (ww, button) {
  */
 const __findFirstAndLast = function (selectArea) {
 	const isContentLess = dom.check.isContentLess;
-	const isTable = dom.check.isTable;
 	const first =
 		dom.query.getEdgeChild(
 			dom.query.getEdgeChild(selectArea, (current) => !isContentLess(current), false),
 			(current) => {
-				return current.childNodes.length === 0 || current.nodeType === 3 || isTable(current);
+				return current.childNodes.length === 0 || current.nodeType === 3 || isTable(current) || isList(current);
 			},
 			false
 		) || selectArea.firstChild;
@@ -52,7 +52,7 @@ const __findFirstAndLast = function (selectArea) {
 		dom.query.getEdgeChild(
 			selectArea.lastChild,
 			(current) => {
-				return current.childNodes.length === 0 || current.nodeType === 3 || isTable(current);
+				return current.childNodes.length === 0 || current.nodeType === 3 || isTable(current) || isList(current);
 			},
 			true
 		) || selectArea.lastChild;
@@ -89,9 +89,16 @@ export function SELECT_ALL(editor) {
 	const scopeSelectionTags = editor.options.get('scopeSelectionTags');
 	const range = editor.selection.getRange();
 	if (!range.collapsed) {
+		let commonNodeName = '';
 		let commonNode = range.commonAncestorContainer;
-		let commonNodeName = commonNode.nodeName?.toLowerCase();
+		if (range.startOffset === 0 && range.endOffset === range.endContainer.textContent?.length) {
+			const commonParent = commonNode.parentElement;
+			if ((dom.check.isList(commonParent) || dom.check.isListCell(commonParent)) && commonParent.firstChild.contains?.(range.startContainer) && commonParent.lastChild?.contains(range.endContainer)) {
+				commonNode = commonParent.parentElement;
+			}
+		}
 
+		commonNodeName = commonNode.nodeName?.toLowerCase();
 		while (commonNode && ((!commonNode.nextSibling && !commonNode.previousSibling && !scopeSelectionTags.includes(commonNodeName)) || dom.check.isContentLess(commonNodeName)) && commonNode !== ww) {
 			commonNode = commonNode.parentElement;
 			commonNodeName = commonNode.nodeName?.toLowerCase();

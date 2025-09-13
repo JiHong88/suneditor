@@ -451,6 +451,7 @@ class Controller extends EditorInjector {
 			return;
 		}
 
+		this.#preventClose = false;
 		if (
 			eventTarget === this.inst._element ||
 			eventTarget === this.currentTarget ||

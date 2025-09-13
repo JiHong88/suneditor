@@ -983,7 +983,7 @@ HTML.prototype = {
 		} else {
 			container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : range.endContainer || range.startContainer;
 			if (isStartEdge || isEndEdge) {
-				if (isEndEdge) {
+				if (nextFocusNodes && isEndEdge) {
 					if (container.nodeType === 1 && container.childNodes.length === 0) {
 						container.appendChild(dom.utils.createElement('BR'));
 						offset = 1;
