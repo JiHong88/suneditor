@@ -1302,13 +1302,13 @@ HTML.prototype = {
 
 		if (!dom.check.isListCell(line)) return;
 
-		const { sc, ec } = this.nodeTransform.removeAllParents(line, null, null);
+		const result = this.nodeTransform.removeAllParents(line, null, null);
 
 		if (dom.check.isList(line?.firstChild)) {
 			line.insertBefore(dom.utils.createTextNode(unicode.zeroWidthSpace), line.firstChild);
 		}
 
-		return { sc, ec };
+		return result ? { sc: result.sc, ec: result.ec } : null;
 	},
 
 	/**
