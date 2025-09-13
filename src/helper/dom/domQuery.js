@@ -137,9 +137,10 @@ export function getChildNode(element, validation) {
  * @param {?number} depth Number of child levels to depth.
  * @returns {Array<T>}
  */
-export function getListChildren(element, validation, depth = Infinity) {
+export function getListChildren(element, validation, depth) {
 	/** @type {Array<T>} */
 	const children = [];
+	depth ??= Infinity;
 	if (!element || depth <= 0) return /** @type {Array<T>} */ (children);
 
 	const el = /** @type {Element} */ (element);
@@ -174,8 +175,9 @@ export function getListChildren(element, validation, depth = Infinity) {
  * @param {?number} depth Number of child levels to depth.
  * @returns {Array<T>}
  */
-export function getListChildNodes(element, validation, depth = Infinity) {
+export function getListChildNodes(element, validation, depth) {
 	const children = [];
+	depth ??= Infinity;
 	if (!element || depth <= 0 || element.childNodes.length === 0) return /** @type {Array<T>} */ (children);
 
 	validation ||= () => true;
