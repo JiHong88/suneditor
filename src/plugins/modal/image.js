@@ -55,7 +55,7 @@ class Image_ extends EditorInjector {
 	 * @returns {Element|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
-		const compNode = dom.check.isFigure(node) || (/^span$/i.test(node.nodeName) && dom.utils.hasClass(node, 'se-component')) ? node.firstElementChild : node;
+		const compNode = dom.check.isFigure(node) || (/^span$/i.test(node.nodeName) && dom.check.isComponentContainer(node)) ? node.firstElementChild : node;
 		return /^IMG$/i.test(compNode?.nodeName) ? compNode : dom.check.isAnchor(compNode) && /^IMG$/i.test(compNode?.firstElementChild?.nodeName) ? compNode?.firstElementChild : null;
 	}
 
@@ -846,7 +846,7 @@ class Image_ extends EditorInjector {
 				dom.utils.removeItem(anchor);
 			} else {
 				dom.utils.removeItem(isNewAnchor);
-				if (dom.query.getListChildren(anchor, (current) => /IMG/i.test(current.tagName)).length === 0) {
+				if (dom.query.getListChildren(anchor, (current) => /IMG/i.test(current.tagName), null).length === 0) {
 					dom.utils.removeItem(anchor);
 				}
 			}

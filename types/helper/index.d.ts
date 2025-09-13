@@ -100,6 +100,7 @@ export const dom: {
 		isFigure: typeof import('./dom/domCheck').isFigure;
 		isContentLess: typeof import('./dom/domCheck').isContentLess;
 		isEmptyLine: typeof import('./dom/domCheck').isEmptyLine;
+		isComponentContainer: typeof import('./dom/domCheck').isComponentContainer;
 		isWysiwygFrame: typeof import('./dom/domCheck').isWysiwygFrame;
 		isNonEditable: typeof import('./dom/domCheck').isNonEditable;
 		isSpanWithoutAttr: typeof import('./dom/domCheck').isSpanWithoutAttr;

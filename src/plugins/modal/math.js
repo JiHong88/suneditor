@@ -35,7 +35,7 @@ class Math_ extends EditorInjector {
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
 	static component(node) {
-		return dom.utils.hasClass(node, 'se-math|katex') && dom.utils.hasClass(node, 'se-component') ? node : null;
+		return dom.utils.hasClass(node, 'se-math|katex') && dom.check.isComponentContainer(node) ? node : null;
 	}
 
 	#element;

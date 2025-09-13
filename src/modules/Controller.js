@@ -48,6 +48,7 @@ class Controller extends EditorInjector {
 	#addOffset;
 	#shadowRootEventForm;
 	#shadowRootEventListener;
+	#preventClose;
 
 	/**
 	 * @constructor
@@ -87,6 +88,7 @@ class Controller extends EditorInjector {
 		this.#addOffset = { left: 0, top: 0 };
 		this.#shadowRootEventForm = null;
 		this.#shadowRootEventListener = null;
+		this.#preventClose = false;
 
 		// add element
 		this.carrierWrapper.appendChild(element);
@@ -164,10 +166,11 @@ class Controller extends EditorInjector {
 	 * @param {boolean=} force If true, parent controllers are forcibly closed.
 	 */
 	close(force) {
-		if (!this.isOpen) return;
+		if (!this.isOpen || this.#preventClose) return;
 
 		this.toTop = false;
 		this.isOpen = false;
+		this.#preventClose = false;
 		this.__offset = {};
 		this.#addOffset = { left: 0, top: 0 };
 
@@ -444,11 +447,10 @@ class Controller extends EditorInjector {
 	#CloseListener_mousedown(e) {
 		const eventTarget = dom.query.getEventTarget(e);
 		if (this.inst?._element?.contains(eventTarget)) {
-			this.isOpen = false;
+			this.#preventClose = true;
 			return;
 		}
 
-		this.isOpen = true;
 		if (
 			eventTarget === this.inst._element ||
 			eventTarget === this.currentTarget ||

@@ -12,7 +12,16 @@ import domUtils from './domUtils';
  */
 export function isZeroWidth(text) {
 	if (text === null || text === undefined) return false;
-	if (typeof text !== 'string') text = text.textContent;
+	if (typeof text !== 'string') {
+		if (isElement(text)) {
+			const children = text.children;
+			for (let i = 0, len = children.length; i < len; i++) {
+				const child = children[i];
+				if (!isContentLess(child)) return false;
+			}
+		}
+		text = text.textContent;
+	}
 	return text === '' || onlyZeroWidthRegExp.test(text);
 }
 
@@ -183,6 +192,15 @@ export function isEmptyLine(node) {
 }
 
 /**
+ * @description Checks if the given node is a container component (class "se-component-container").
+ * @param {Node} element
+ * @returns {boolean} True if the node is a container component, otherwise false.
+ */
+export function isComponentContainer(element) {
+	return domUtils.hasClass(element, 'se-component');
+}
+
+/**
  * @description It is judged whether it is the edit region top div element or iframe's body tag.
  * @param {?Node} node The node to check
  * @returns {node is HTMLElement}
@@ -292,6 +310,7 @@ const check = {
 	isFigure,
 	isContentLess,
 	isEmptyLine,
+	isComponentContainer,
 	isWysiwygFrame,
 	isNonEditable,
 	isSpanWithoutAttr,

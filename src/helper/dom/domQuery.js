@@ -134,29 +134,34 @@ export function getChildNode(element, validation) {
  * @description Get all "children" of the argument value element (Without text nodes)
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
+ * @param {?number} depth Number of child levels to depth.
  * @returns {Array<T>}
  */
-export function getListChildren(element, validation) {
+export function getListChildren(element, validation, depth = Infinity) {
 	/** @type {Array<T>} */
 	const children = [];
-	if (!element) return children;
+	if (!element || depth <= 0) return /** @type {Array<T>} */ (children);
 
 	const el = /** @type {Element} */ (element);
 	if (!el.children || el.children.length === 0) return children;
 
 	validation ||= () => true;
 
-	(function recursionFunc(current) {
-		if (el !== current && validation(current)) {
+	(function recursionFunc(current, level) {
+		if (level > depth) return;
+
+		if (level > 0 && el !== current && validation(current)) {
 			children.push(/** @type {T} */ (current));
 		}
 
+		if (level === depth) return;
+
 		if (current.children) {
 			for (let i = 0, len = current.children.length; i < len; i++) {
-				recursionFunc(current.children[i]);
+				recursionFunc(current.children[i], level + 1);
 			}
 		}
-	})(el);
+	})(el, 0);
 
 	return /** @type {Array<T>} */ (children);
 }
@@ -166,23 +171,29 @@ export function getListChildren(element, validation) {
  * @description Get all "childNodes" of the argument value element (Include text nodes)
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
+ * @param {?number} depth Number of child levels to depth.
  * @returns {Array<T>}
  */
-export function getListChildNodes(element, validation) {
+export function getListChildNodes(element, validation, depth = Infinity) {
 	const children = [];
-	if (!element || element.childNodes.length === 0) return children;
+	if (!element || depth <= 0 || element.childNodes.length === 0) return /** @type {Array<T>} */ (children);
 
 	validation ||= () => true;
 
-	(function recursionFunc(current) {
-		if (element !== current && validation(current)) {
+	(function recursionFunc(current, level) {
+		if (level > depth) return;
+
+		if (level > 0 && validation(current)) {
 			children.push(current);
 		}
 
-		for (let i = 0, len = current.childNodes.length; i < len; i++) {
-			recursionFunc(current.childNodes[i]);
+		if (level === depth) return;
+
+		const nodes = current.childNodes;
+		for (let i = 0, len = nodes.length; i < len; i++) {
+			recursionFunc(nodes[i], level + 1);
 		}
-	})(element);
+	})(element, 0);
 
 	return /** @type {Array<T>} */ (children);
 }
@@ -434,7 +445,7 @@ export function getEdgeChild(node, query, last) {
 		};
 	}
 
-	const childList = getListChildNodes(node, (current) => valid(current));
+	const childList = getListChildNodes(node, (current) => valid(current), null);
 
 	return /** @type {T} */ (childList[last ? childList.length - 1 : 0]);
 }

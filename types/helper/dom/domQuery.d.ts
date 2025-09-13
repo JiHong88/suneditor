@@ -45,17 +45,19 @@ export function getChildNode<T extends HTMLElement>(element: Node, validation: (
  * @description Get all "children" of the argument value element (Without text nodes)
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
+ * @param {?number} depth Number of child levels to depth.
  * @returns {Array<T>}
  */
-export function getListChildren<T extends HTMLElement>(element: Node, validation: ((current: any) => boolean) | null): Array<T>;
+export function getListChildren<T extends HTMLElement>(element: Node, validation: ((current: any) => boolean) | null, depth?: number | null): Array<T>;
 /**
  * @template {Node} T
  * @description Get all "childNodes" of the argument value element (Include text nodes)
  * @param {Node} element element to get child node
  * @param {?(current: *) => boolean} validation Conditional function
+ * @param {?number} depth Number of child levels to depth.
  * @returns {Array<T>}
  */
-export function getListChildNodes<T extends Node>(element: Node, validation: ((current: any) => boolean) | null): Array<T>;
+export function getListChildNodes<T extends Node>(element: Node, validation: ((current: any) => boolean) | null, depth?: number | null): Array<T>;
 /**
  * @description Returns the number of parents nodes.
  * - "0" when the parent node is the WYSIWYG area.

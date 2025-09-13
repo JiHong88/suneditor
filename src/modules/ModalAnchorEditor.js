@@ -289,7 +289,7 @@ class ModalAnchorEditor extends EditorInjector {
 	 * @param {string} urlValue - The current URL input value.
 	 */
 	#createBookmarkList(urlValue) {
-		const headers = dom.query.getListChildren(this.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id));
+		const headers = dom.query.getListChildren(this.frameContext.get('wysiwyg'), (current) => /h[1-6]/i.test(current.nodeName) || (dom.check.isAnchor(current) && !!current.id), null);
 		if (headers.length === 0) return;
 
 		const valueRegExp = new RegExp(`^${urlValue.replace(/^#/, '')}`, 'i');

@@ -28,7 +28,7 @@ require('codemirror5/mode/htmlmixed/htmlmixed');
 // perfect-freehand
 // import PerfectFreehand from 'perfect-freehand';
 
-import langs from '../../src/langs';
+import langs, { pl } from '../../src/langs';
 // import blockquote from '../../src/plugins/command/blockquote';
 // import align from '../../src/plugins/dropdown/align';
 // import font from '../../src/plugins/dropdown/font';
@@ -1015,6 +1015,20 @@ const options1 = {
   </table>
 </figure>
 `,
+value: `<ol style="list-style-type: ">
+  <li>comp12insert<br>
+<div class="se-component se-image-container __se__float-none">
+      <figure class="" style="">
+        <img src="http://suneditor.com/docs/retriever.jpg" alt="Retriever" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Retriever" data-se-file-size="0" style="" data-se-index="3">
+      </figure>
+</div>
+  </li>
+  <li>bb</li>
+</ol>
+
+`,
+charCounter_max: 26,
+placeholder: 'Start typing here...',
 	// defaultLineBreakFormat: 'br',
 	events: {
 		// onFileAction: (data) => {

@@ -763,9 +763,13 @@ Editor.prototype = {
 				dom.utils.removeClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 			}
 
-			const lineNodes = dom.query.getListChildren(fc.get('wysiwyg'), (current) => {
-				return this.format.isLine(current) && !!(current.style.marginRight || current.style.marginLeft || current.style.textAlign);
-			});
+			const lineNodes = dom.query.getListChildren(
+				fc.get('wysiwyg'),
+				(current) => {
+					return this.format.isLine(current) && !!(current.style.marginRight || current.style.marginLeft || current.style.textAlign);
+				},
+				null
+			);
 
 			for (let i = 0, n, l, r; (n = lineNodes[i]); i++) {
 				n = lineNodes[i];
@@ -1643,7 +1647,7 @@ Editor.prototype = {
 		this.events = { ...Events, ...this.options.get('events') };
 		this.triggerEvent = async (eventName, eventData) => {
 			// [iframe] wysiwyg is disabled, the event is not called.
-			if (eventData?.frameContext?.get('wysiwyg').getAttribute('contenteditable') === 'false') return false;
+			if (dom.check.isNonEditable(eventData?.frameContext?.get('wysiwyg'))) return false;
 			const eventHandler = this.events[eventName];
 			if (typeof eventHandler === 'function') {
 				return await eventHandler({ editor: this, ...eventData });

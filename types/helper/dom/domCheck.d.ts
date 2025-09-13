@@ -115,6 +115,12 @@ export function isContentLess(node: (Node | string) | null): boolean;
  */
 export function isEmptyLine(node: Node): boolean;
 /**
+ * @description Checks if the given node is a container component (class "se-component-container").
+ * @param {Node} element
+ * @returns {boolean} True if the node is a container component, otherwise false.
+ */
+export function isComponentContainer(element: Node): boolean;
+/**
  * @description It is judged whether it is the edit region top div element or iframe's body tag.
  * @param {?Node} node The node to check
  * @returns {node is HTMLElement}
@@ -179,6 +185,7 @@ declare namespace check {
 	export { isFigure };
 	export { isContentLess };
 	export { isEmptyLine };
+	export { isComponentContainer };
 	export { isWysiwygFrame };
 	export { isNonEditable };
 	export { isSpanWithoutAttr };

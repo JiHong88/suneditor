@@ -720,15 +720,15 @@
 	display: block;
 	width: 0;
 	height: 0;
-	border: 11px solid transparent;
+	border: 12px solid transparent;
 	margin-right: 0;
-	margin-left: -11px;
+	margin-left: -12px;
 }
 
 .sun-editor .se-controller .se-arrow {
 	left: 20px;
 	right: auto;
-	margin-left: -11px;
+	margin-left: -12px;
 	margin-right: 0;
 }
 

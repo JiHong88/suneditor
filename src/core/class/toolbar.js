@@ -341,7 +341,7 @@ Toolbar.prototype = {
 		} else if (selection.focusNode === selection.anchorNode) {
 			isDirTop = selection.focusOffset < selection.anchorOffset;
 		} else {
-			const childNodes = dom.query.getListChildNodes(range.commonAncestorContainer, null);
+			const childNodes = dom.query.getListChildNodes(range.commonAncestorContainer, null, null);
 			isDirTop = dom.utils.getArrayIndex(childNodes, selection.focusNode) < dom.utils.getArrayIndex(childNodes, selection.anchorNode);
 		}
 

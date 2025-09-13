@@ -121,7 +121,7 @@ Component.prototype = {
 
 		try {
 			if (dom.check.isListCell(formatEl)) {
-				this.html.insertNode(element, { afterNode: isInline ? null : selectionNode === formatEl ? null : (selectionNode || r.container).nextSibling, skipCharCount: true });
+				this.html.insertNode(element, { afterNode: isInline ? null : !dom.check.isZeroWidth(selectionNode) ? null : (selectionNode || r.container).nextSibling, skipCharCount: true });
 				if (!isInline && !element.nextSibling) element.parentNode.appendChild(dom.utils.createElement('BR'));
 			} else {
 				if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || dom.check.isBreak(r.container))) {
@@ -227,7 +227,7 @@ Component.prototype = {
 		let launcher = null;
 
 		if (this.is(element)) {
-			if (dom.utils.hasClass(element, 'se-component') && !dom.utils.hasClass(element, 'se-inline-component')) element = /** @type {HTMLElement} */ (element).firstElementChild || element;
+			if (dom.check.isComponentContainer(element) && !dom.utils.hasClass(element, 'se-inline-component')) element = /** @type {HTMLElement} */ (element).firstElementChild || element;
 			if (/^FIGURE$/i.test(element.nodeName)) element = /** @type {HTMLElement} */ (element).firstElementChild;
 			if (!element) return null;
 
@@ -402,7 +402,7 @@ Component.prototype = {
 	is(element) {
 		if (!element) return false;
 
-		if (/^FIGURE$/i.test(element.nodeName) || dom.utils.hasClass(element, 'se-component')) return true;
+		if (/^FIGURE$/i.test(element.nodeName) || dom.check.isComponentContainer(element)) return true;
 		if (this.editor._componentManager.find((f) => f(element))) return true;
 
 		return false;
@@ -568,7 +568,7 @@ Component.prototype = {
 		const { top, left, right, scrollX, scrollY } = this.offset.getLocal(offsetTarget);
 		const sideOffset = isRtl ? right : left;
 
-		if (isList ? !container.previousSibling || this.is(container.previousElementSibling) : !this.format.isLine(container.previousElementSibling)) {
+		if (isList ? (!dom.check.isBreak(container.previousElementSibling) && !container.previousSibling?.textContent?.trim()) || this.is(container.previousElementSibling) : !this.format.isLine(container.previousElementSibling)) {
 			const cStyle = _w.getComputedStyle(lb_t);
 			const cH = numbers.get(cStyle.height, 1);
 			const cW = numbers.get(cStyle.width, 1);
@@ -592,7 +592,7 @@ Component.prototype = {
 		}
 
 		// bottom
-		if (isList ? !container.nextSibling || this.is(container.nextElementSibling) : !this.format.isLine(container.nextElementSibling)) {
+		if (isList ? (!dom.check.isBreak(container.nextElementSibling) && !container.nextSibling?.textContent?.trim()) || this.is(container.nextElementSibling) : !this.format.isLine(container.nextElementSibling)) {
 			const cStyle = _w.getComputedStyle(lb_b);
 			const cH = numbers.get(cStyle.height, 1);
 			const cW = numbers.get(cStyle.width, 1);
@@ -828,9 +828,15 @@ async function OnKeyDown_component(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		if (typeof this.currentPlugin?.destroy === 'function') {
+			const focusNode = this.info.container.previousSibling;
 			await this.currentPlugin.destroy(this.currentTarget);
 			this.deselect();
-			this.editor.focus();
+			if (focusNode) {
+				const offset = focusNode.nodeType === 3 ? focusNode.textContent.length : 1;
+				this.selection.setRange(focusNode, offset, focusNode, offset);
+			} else {
+				this.editor.focus();
+			}
 			return;
 		}
 	}

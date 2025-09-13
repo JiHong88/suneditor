@@ -456,7 +456,7 @@ Format.prototype = {
 		let so = range.startOffset;
 		let eo = range.endOffset;
 
-		let children = dom.query.getListChildNodes(blockElement, (current) => current.parentNode === blockElement);
+		let children = dom.query.getListChildNodes(blockElement, null, 1);
 		let parent = blockElement.parentNode;
 		let firstNode = null;
 		let lastNode = null;
@@ -469,7 +469,7 @@ Format.prototype = {
 		let moveComplete = false;
 
 		const appendNode = (parentEl, insNode, sibling, originNode) => {
-			if (dom.check.isZeroWidth(insNode)) {
+			if (insNode.childNodes.length === 1 && dom.check.isZeroWidth(insNode)) {
 				insNode.innerHTML = unicode.zeroWidthSpace;
 				so = eo = 1;
 			}
@@ -615,7 +615,7 @@ Format.prototype = {
 
 					if (reset) {
 						reset = moveComplete = false;
-						children = dom.query.getListChildNodes(blockElement, (current) => current.parentNode === blockElement);
+						children = dom.query.getListChildNodes(blockElement, null, 1);
 						rangeEl = /** @type {HTMLElement} */ (blockElement.cloneNode(false));
 						parent = blockElement.parentNode;
 						i = -1;
@@ -744,7 +744,7 @@ Format.prototype = {
 			const cancel = currentFormat?.tagName === listTag;
 			let rangeArr, tempList;
 			const passComponent = (current) => {
-				return !this.component.is(current);
+				return !dom.check.isComponentContainer(current);
 			};
 
 			if (!cancel) {
@@ -808,7 +808,7 @@ Format.prototype = {
 			// let bottomNumber = null;
 
 			const passComponent = (current) => {
-				return !this.component.is(current) && !dom.check.isList(current);
+				return !dom.check.isComponentContainer(current) && !dom.check.isList(current);
 			};
 
 			for (let i = 0, len = selectedFormats.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
@@ -826,13 +826,14 @@ Format.prototype = {
 				siblingTag = isCell && !dom.check.isWysiwygFrame(originParent) ? (!next || dom.check.isListCell(parentTag) ? originParent : originParent.nextSibling) : fTag.nextSibling;
 
 				newCell = dom.utils.createElement('LI');
-				dom.utils.copyFormatAttributes(newCell, fTag);
+
 				if (this.component.is(fTag)) {
 					const isHR = /^HR$/i.test(fTag.nodeName);
 					if (!isHR) newCell.innerHTML = '<br>';
 					newCell.innerHTML += fTag.outerHTML;
 					if (isHR) newCell.innerHTML += '<br>';
 				} else {
+					dom.utils.copyFormatAttributes(newCell, fTag);
 					const fChildren = fTag.childNodes;
 					while (fChildren[0]) {
 						newCell.appendChild(fChildren[0]);
@@ -894,7 +895,7 @@ Format.prototype = {
 		let first = null;
 		let last = null;
 		const passComponent = (current) => {
-			return !this.component.is(current);
+			return !dom.check.isComponentContainer(current);
 		};
 
 		for (let i = 0, len = selectedCells.length, r, o, lastIndex, isList; i < len; i++) {
@@ -1524,7 +1525,7 @@ Format.prototype = {
 
 		// get line nodes
 		validation ||= this.isLine.bind(this);
-		const lineNodes = dom.query.getListChildren(commonCon, (current) => validation(current));
+		const lineNodes = dom.query.getListChildren(commonCon, (current) => validation(current), null);
 
 		if (commonCon.nodeType === 3 || (!dom.check.isWysiwygFrame(commonCon) && !this.isBlock(commonCon))) lineNodes.unshift(this.getLine(commonCon, null));
 		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
@@ -1578,7 +1579,7 @@ Format.prototype = {
 			? this.getLines(null)
 			: this.getLines((current) => {
 					const component = dom.query.getParentElement(current, this.component.is.bind(this.component));
-					return (this.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.getLine(current));
+					return (this.isLine(current) && (!component || component === myComponent)) || (dom.check.isComponentContainer(current) && !this.getLine(current));
 			  });
 
 		if (removeDuplicate) {
@@ -1913,13 +1914,21 @@ Format.prototype = {
 		let rChildren;
 		if (!all) {
 			const depth = dom.query.getNodeDepth(baseNode) + 2;
-			rChildren = dom.query.getListChildren(baseNode, (current) => {
-				return dom.check.isListCell(current) && !current.previousElementSibling && dom.query.getNodeDepth(current) === depth;
-			});
+			rChildren = dom.query.getListChildren(
+				baseNode,
+				(current) => {
+					return dom.check.isListCell(current) && !current.previousElementSibling && dom.query.getNodeDepth(current) === depth;
+				},
+				null
+			);
 		} else {
-			rChildren = dom.query.getListChildren(rangeElement, (current) => {
-				return dom.check.isListCell(current) && !current.previousElementSibling;
-			});
+			rChildren = dom.query.getListChildren(
+				rangeElement,
+				(current) => {
+					return dom.check.isListCell(current) && !current.previousElementSibling;
+				},
+				null
+			);
 		}
 
 		for (let i = 0, len = rChildren.length; i < len; i++) {

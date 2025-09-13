@@ -242,7 +242,7 @@ HTML.prototype = {
 
 		if (this._autoStyleify) {
 			const domParser = new DOMParser().parseFromString(html, 'text/html');
-			dom.query.getListChildNodes(domParser.body, converter.spanToStyleNode.bind(null, this._autoStyleify));
+			dom.query.getListChildNodes(domParser.body, converter.spanToStyleNode.bind(null, this._autoStyleify), null);
 			html = domParser.body.innerHTML;
 		}
 
@@ -869,7 +869,7 @@ HTML.prototype = {
 		let beforeNode = null;
 		let afterNode = null;
 
-		const childNodes = dom.query.getListChildNodes(commonCon, null);
+		const childNodes = dom.query.getListChildNodes(commonCon, null, null);
 		let startIndex = dom.utils.getArrayIndex(childNodes, startCon);
 		let endIndex = dom.utils.getArrayIndex(childNodes, endCon);
 
@@ -1047,17 +1047,21 @@ HTML.prototype = {
 			const isEmptyLine = dom.check.isEmptyLine;
 			const editableEls = [];
 			const emptyCells = [];
-			dom.query.getListChildren(renderHTML, (current) => {
-				if (current.hasAttribute('contenteditable')) {
-					editableEls.push(current);
-				}
+			dom.query.getListChildren(
+				renderHTML,
+				(current) => {
+					if (current.hasAttribute('contenteditable')) {
+						editableEls.push(current);
+					}
 
-				const parent = current.parentElement;
-				if (isTableCell(parent) && parent.children.length <= 1 && isEmptyLine(current)) {
-					emptyCells.push(parent);
-				}
-				return false;
-			});
+					const parent = current.parentElement;
+					if (isTableCell(parent) && parent.children.length <= 1 && isEmptyLine(current)) {
+						emptyCells.push(parent);
+					}
+					return false;
+				},
+				null
+			);
 
 			for (let j = 0, jlen = editableEls.length; j < jlen; j++) {
 				editableEls[j].removeAttribute('contenteditable');
@@ -1348,9 +1352,13 @@ HTML.prototype = {
 			if (dom.check.isExcludeFormat(node)) return node.outerHTML;
 
 			const ch =
-				dom.query.getListChildNodes(node, (current) => {
-					return dom.check.isSpanWithoutAttr(current) && !dom.query.getParentElement(current, dom.check.isExcludeFormat);
-				}) || [];
+				dom.query.getListChildNodes(
+					node,
+					(current) => {
+						return dom.check.isSpanWithoutAttr(current) && !dom.query.getParentElement(current, dom.check.isExcludeFormat);
+					},
+					null
+				) || [];
 			for (let i = ch.length - 1, c; i >= 0; i--) {
 				c = /** @type {HTMLElement} */ (ch[i]);
 				c.outerHTML = c.innerHTML;
@@ -1410,78 +1418,82 @@ HTML.prototype = {
 			withoutFormatCells = [];
 
 		// wrong position
-		const wrongTags = dom.query.getListChildNodes(documentFragment, (current) => {
-			if (current.nodeType !== 1) {
-				if (formatFilter && dom.check.isList(current.parentElement)) removeTags.push(current);
-				if (current.nodeType === 3 && !current.textContent.trim()) removeTags.push(current);
-				return false;
-			}
-
-			// tag filter
-			if (tagFilter) {
-				// white list
-				if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && dom.check.isExcludeFormat(current))) {
-					removeTags.push(current);
-					return false;
-				}
-			}
-
-			const nrtag = !dom.query.getParentElement(current, dom.check.isExcludeFormat);
-
-			// formatFilter
-			if (formatFilter) {
-				// empty tags
-				if (
-					!dom.check.isTableElements(current) &&
-					!dom.check.isListCell(current) &&
-					!dom.check.isAnchor(current) &&
-					(this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) &&
-					current.childNodes.length === 0 &&
-					nrtag
-				) {
-					emptyTags.push(current);
+		const wrongTags = dom.query.getListChildNodes(
+			documentFragment,
+			(current) => {
+				if (current.nodeType !== 1) {
+					if (formatFilter && dom.check.isList(current.parentElement)) removeTags.push(current);
+					if (current.nodeType === 3 && !current.textContent.trim()) removeTags.push(current);
 					return false;
 				}
 
-				// wrong list
-				if (dom.check.isList(current.parentNode) && !dom.check.isList(current) && !dom.check.isListCell(current)) {
-					wrongList.push(current);
-					return false;
-				}
-
-				// table cells
-				if (dom.check.isTableCell(current)) {
-					const fel = current.firstElementChild;
-					if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
-						withoutFormatCells.push(current);
+				// tag filter
+				if (tagFilter) {
+					// white list
+					if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && dom.check.isExcludeFormat(current))) {
+						removeTags.push(current);
 						return false;
 					}
 				}
-			}
 
-			// class filter
-			if (classFilter) {
-				if (nrtag && current.className) {
-					const className = new Array(current.classList).map(this._isAllowedClassName).join(' ').trim();
-					if (className) current.className = className;
-					else current.removeAttribute('class');
+				const nrtag = !dom.query.getParentElement(current, dom.check.isExcludeFormat);
+
+				// formatFilter
+				if (formatFilter) {
+					// empty tags
+					if (
+						!dom.check.isTableElements(current) &&
+						!dom.check.isListCell(current) &&
+						!dom.check.isAnchor(current) &&
+						(this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) &&
+						current.childNodes.length === 0 &&
+						nrtag
+					) {
+						emptyTags.push(current);
+						return false;
+					}
+
+					// wrong list
+					if (dom.check.isList(current.parentNode) && !dom.check.isList(current) && !dom.check.isListCell(current)) {
+						wrongList.push(current);
+						return false;
+					}
+
+					// table cells
+					if (dom.check.isTableCell(current)) {
+						const fel = current.firstElementChild;
+						if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
+							withoutFormatCells.push(current);
+							return false;
+						}
+					}
 				}
-			}
 
-			// format filter
-			if (!formatFilter) {
-				return false;
-			}
+				// class filter
+				if (classFilter) {
+					if (nrtag && current.className) {
+						const className = new Array(current.classList).map(this._isAllowedClassName).join(' ').trim();
+						if (className) current.className = className;
+						else current.removeAttribute('class');
+					}
+				}
 
-			const result =
-				!_freeCodeViewMode &&
-				current.parentNode !== documentFragment &&
-				nrtag &&
-				((dom.check.isListCell(current) && !dom.check.isList(current.parentNode)) ||
-					((this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !dom.query.getParentElement(current, this.component.is.bind(this.component))));
+				// format filter
+				if (!formatFilter) {
+					return false;
+				}
 
-			return result;
-		});
+				const result =
+					!_freeCodeViewMode &&
+					current.parentNode !== documentFragment &&
+					nrtag &&
+					((dom.check.isListCell(current) && !dom.check.isList(current.parentNode)) ||
+						((this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !dom.query.getParentElement(current, this.component.is.bind(this.component))));
+
+				return result;
+			},
+			null
+		);
 
 		for (let i = 0, len = removeTags.length; i < len; i++) {
 			dom.utils.removeItem(removeTags[i]);

@@ -718,7 +718,7 @@ class Table extends EditorInjector {
 	 */
 	onMouseUp() {
 		this.#shift = false;
-		if (this.cellControllerTop) {
+		if (this.cellControllerTop && this.controller_cell.isOpen) {
 			this.controller_cell.resetPosition(this.#fixedCell);
 		}
 	}
@@ -762,7 +762,7 @@ class Table extends EditorInjector {
 				/** @type {HTMLTableElement} */
 				const table = dom.query.getParentElement(tableCell, 'table');
 				/** @type {HTMLTableCellElement[]} */
-				const cells = dom.query.getListChildren(table, dom.check.isTableCell);
+				const cells = dom.query.getListChildren(table, dom.check.isTableCell, null);
 				const idx = shift ? dom.utils.prevIndex(cells, tableCell) : dom.utils.nextIndex(cells, tableCell);
 
 				if (idx === cells.length && !shift) {

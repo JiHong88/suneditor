@@ -150,6 +150,7 @@ export async function OnInput_wysiwyg(fc, e) {
  * @param {KeyboardEvent} e - Event object
  */
 export async function OnKeyDown_wysiwyg(fc, e) {
+	if ((this.isComposing = keyCodeMap.isComposing(e))) return true;
 	if (this.editor.selectMenuOn || !e.isTrusted) return;
 
 	let selectionNode = this.selection.getNode();
@@ -160,7 +161,6 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	const shift = keyCodeMap.isShift(e);
 	const ctrl = (keyState.ctrl = keyCodeMap.isCtrl(e));
 	const alt = (keyState.alt = keyCodeMap.isAlt(e));
-	this.isComposing = keyCodeMap.isComposing(e);
 
 	if (!ctrl && fc.get('isReadOnly') && !keyCodeMap.isDirectionKey(keyCode)) {
 		e.preventDefault();
@@ -323,6 +323,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					if (fileComponentInfo) {
 						e.preventDefault();
 						e.stopPropagation();
+						if (dom.check.isBreak(selectionNode)) dom.utils.removeItem(selectionNode);
 						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
 						break;
 					}
@@ -428,15 +429,17 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 
 			// component
 			if (!selectRange && formatEl && (range.startOffset === 0 || (selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : false))) {
+				const isList = dom.check.isListCell(formatEl);
 				const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
-				const prev = formatEl.previousSibling;
+				const prev = (isList ? sel : formatEl).previousSibling;
 				// select file component
-				const ignoreZWS = (commonCon.nodeType === 3 || dom.check.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
-				if (sel && !sel.previousSibling && ((commonCon && this.component.is(commonCon.previousSibling)) || (ignoreZWS && this.component.is(prev)))) {
+				const ignoreZWS = isList || ((commonCon.nodeType === 3 || dom.check.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0);
+				if (sel && (isList || !sel.previousSibling) && ((commonCon && this.component.is(commonCon.previousSibling)) || (ignoreZWS && this.component.is(prev)))) {
 					const fileComponentInfo = this.component.get(prev);
 					if (fileComponentInfo) {
 						e.preventDefault();
 						e.stopPropagation();
+						if (isList) dom.utils.removeItem(sel);
 						if (formatEl.textContent.length === 0) dom.utils.removeItem(formatEl);
 						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
 					} else if (this.component.is(prev)) {
@@ -507,7 +510,14 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					if (fileComponentInfo) {
 						e.preventDefault();
 						e.stopPropagation();
-						if (dom.check.isZeroWidth(formatEl.textContent)) dom.utils.removeItem(formatEl);
+
+						if (dom.check.isListCell(formatEl)) {
+							const prev = fileComponentInfo.container.previousSibling;
+							if (dom.check.isZeroWidth(prev)) dom.utils.removeItem(prev);
+						} else if (dom.check.isZeroWidth(formatEl)) {
+							dom.utils.removeItem(formatEl);
+						}
+
 						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
 						break;
 					}
@@ -1194,7 +1204,7 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 		this.selection.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
 	}
 
-	if (keyCodeMap.isRemoveKey(keyCode) && dom.check.isZeroWidth(formatEl?.textContent) && !formatEl.previousElementSibling) {
+	if (keyCodeMap.isRemoveKey(keyCode) && dom.check.isZeroWidth(formatEl?.textContent) && !formatEl.previousElementSibling && !dom.check.isListCell(formatEl)) {
 		const rsMode = this.options.get('retainStyleMode');
 		if (rsMode !== 'none' && _styleNodes?.length > 0) {
 			if (rsMode === 'repeat') {

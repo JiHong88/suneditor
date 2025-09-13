@@ -464,17 +464,17 @@ EventManager.prototype = {
 		let siblingNode;
 		if (isElement) {
 			siblingNode = /** @type {HTMLElement} */ (this._isUneditableNode_getSibling(container.childNodes[offset], siblingKey, container));
-			return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false' ? siblingNode : null;
+			return dom.check.isComponentContainer(siblingNode) || dom.check.isNonEditable(siblingNode) ? siblingNode : null;
 		} else {
 			siblingNode = /** @type {HTMLElement} */ (this._isUneditableNode_getSibling(container, siblingKey, container));
-			return dom.check.isEdgePoint(container, offset, isFront ? 'front' : 'end') && siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false' ? siblingNode : null;
+			return dom.check.isEdgePoint(container, offset, isFront ? 'front' : 'end') && (dom.check.isComponentContainer(siblingNode) || dom.check.isNonEditable(siblingNode)) ? siblingNode : null;
 		}
 	},
 
 	/**
 	 * @private
 	 * @this {EventManagerThis}
-	 * @description Retrieves the sibling node of a selected node if it is uneditable.
+	 * @description Retrieves the sibling node of a selected node if it is uneditable. || component node.
 	 * - Used only in `_isUneditableNode`.
 	 * @param {Node} selectNode The selected node
 	 * @param {string} siblingKey The key to access the sibling (`previousSibling` or `nextSibling`)
@@ -718,7 +718,7 @@ EventManager.prototype = {
 			const autoLinkify = this.options.get('autoLinkify');
 			if (autoLinkify) {
 				const domParser = new DOMParser().parseFromString(cleanData, 'text/html');
-				dom.query.getListChildNodes(domParser.body, converter.textToAnchor);
+				dom.query.getListChildNodes(domParser.body, converter.textToAnchor, null);
 				cleanData = domParser.body.innerHTML;
 			}
 		}

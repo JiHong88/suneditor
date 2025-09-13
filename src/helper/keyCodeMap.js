@@ -48,14 +48,14 @@ export function isAlt(e) {
 }
 
 /**
- * @description event.isComposing check
+ * @description Check if the event is related to IME composition (in-progress or commit).
  * @param {KeyboardEvent|InputEvent} e Event object
  * @returns {boolean}
  */
 export function isComposing(e) {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
-	return e.isComposing || e.keyCode === 229;
+	return e.isComposing || e.key === 'Process' || e.keyCode === 229;
 }
 
 /**

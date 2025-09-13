@@ -299,7 +299,7 @@ class Figure extends EditorInjector {
 	 * @returns {boolean}
 	 */
 	static is(element) {
-		return dom.utils.hasClass(element, 'se-component') || /^(HR)$/.test(element?.nodeName);
+		return dom.check.isComponentContainer(element) || /^(HR)$/.test(element?.nodeName);
 	}
 
 	/**

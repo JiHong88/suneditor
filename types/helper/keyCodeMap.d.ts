@@ -18,7 +18,7 @@ export function isCtrl(e: KeyboardEvent): boolean;
  */
 export function isAlt(e: KeyboardEvent): boolean;
 /**
- * @description event.isComposing check
+ * @description Check if the event is related to IME composition (in-progress or commit).
  * @param {KeyboardEvent|InputEvent} e Event object
  * @returns {boolean}
  */

@@ -205,7 +205,7 @@ declare class EventManager {
 	/**
 	 * @private
 	 * @this {EventManagerThis}
-	 * @description Retrieves the sibling node of a selected node if it is uneditable.
+	 * @description Retrieves the sibling node of a selected node if it is uneditable. || component node.
 	 * - Used only in `_isUneditableNode`.
 	 * @param {Node} selectNode The selected node
 	 * @param {string} siblingKey The key to access the sibling (`previousSibling` or `nextSibling`)
