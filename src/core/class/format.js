@@ -1859,6 +1859,7 @@ Format.prototype = {
 				el: originList
 			};
 
+			const { startContainer, startOffset, endContainer, endOffset } = this.selection.getRange();
 			for (let i = 0, len = cellsLen, c; i < len; i++) {
 				c = selectedCells[i];
 				if (c.parentElement !== originList) {
@@ -1874,14 +1875,23 @@ Format.prototype = {
 
 			this._attachNested(originList, innerList, prev, next, nodePath);
 
-			const sc = dom.query.getNodeFromPath(nodePath.s, nodePath.sl);
-			const ec = dom.query.getNodeFromPath(nodePath.e, nodePath.el);
-			range = {
-				sc: sc,
-				so: 0,
-				ec: ec,
-				eo: ec.textContent.length
-			};
+			if (cellsLen > 1) {
+				const sc = dom.query.getNodeFromPath(nodePath.s, nodePath.sl);
+				const ec = dom.query.getNodeFromPath(nodePath.e, nodePath.el);
+				range = {
+					sc: sc,
+					so: 0,
+					ec: ec,
+					eo: ec.textContent.length
+				};
+			} else {
+				range = {
+					sc: startContainer,
+					so: startOffset,
+					ec: endContainer,
+					eo: endOffset
+				};
+			}
 		}
 
 		return range;
