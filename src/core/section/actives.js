@@ -94,7 +94,8 @@ export function SELECT_ALL(editor) {
 		if (range.startOffset === 0 && range.endOffset === range.endContainer.textContent?.length) {
 			const commonParent = commonNode.parentElement;
 			if ((dom.check.isList(commonParent) || dom.check.isListCell(commonParent)) && commonParent.firstChild.contains?.(range.startContainer) && commonParent.lastChild?.contains(range.endContainer)) {
-				commonNode = commonParent.parentElement;
+				prevScopeTag = commonNode = commonParent.parentElement;
+				prevScopeTagName = commonNode.nodeName?.toLowerCase();
 			}
 		}
 

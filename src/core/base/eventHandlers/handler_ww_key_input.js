@@ -227,7 +227,12 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 			}
 
 			// line delete
-			if (this.format.isLine(formatEl) && (!range.collapsed || dom.check.isEdgePoint(range.endContainer, range.endOffset, 'front')) && !range.endContainer.previousSibling && this.format.isLine(formatEl.previousElementSibling)) {
+			if (
+				this.format.isLine(formatEl) &&
+				(!range.collapsed || dom.check.isEdgePoint(range.endContainer, range.endOffset, 'front')) &&
+				(!range.endContainer.previousSibling || dom.check.isZeroWidth(range.endContainer.previousSibling)) &&
+				(this.format.isLine(formatEl.previousElementSibling) || dom.check.isListCell(formatEl))
+			) {
 				e.preventDefault();
 				e.stopPropagation();
 
@@ -476,7 +481,12 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 			}
 
 			// line delete
-			if (this.format.isLine(formatEl) && (!range.collapsed || dom.check.isEdgePoint(range.startContainer, range.endOffset, 'end')) && !range.startContainer.nextSibling && this.format.isLine(formatEl.nextElementSibling)) {
+			if (
+				this.format.isLine(formatEl) &&
+				(!range.collapsed || dom.check.isEdgePoint(range.startContainer, range.endOffset, 'end')) &&
+				(!range.startContainer.nextSibling || dom.check.isZeroWidth(range.startContainer.nextSibling)) &&
+				(this.format.isLine(formatEl.nextElementSibling) || dom.check.isListCell(formatEl))
+			) {
 				e.preventDefault();
 				e.stopPropagation();
 
