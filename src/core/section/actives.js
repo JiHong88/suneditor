@@ -89,8 +89,8 @@ export function SELECT_ALL(editor) {
 	const scopeSelectionTags = editor.options.get('scopeSelectionTags');
 	const range = editor.selection.getRange();
 	if (!range.collapsed) {
-		let commonNodeName = '';
-		let commonNode = range.commonAncestorContainer;
+		let commonNode = (prevScopeTag = range.commonAncestorContainer);
+		let commonNodeName = (prevScopeTagName = commonNode.nodeName?.toLowerCase());
 		if (range.startOffset === 0 && range.endOffset === range.endContainer.textContent?.length) {
 			const commonParent = commonNode.parentElement;
 			if ((dom.check.isList(commonParent) || dom.check.isListCell(commonParent)) && commonParent.firstChild.contains?.(range.startContainer) && commonParent.lastChild?.contains(range.endContainer)) {

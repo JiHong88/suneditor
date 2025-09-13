@@ -1138,6 +1138,19 @@ value: `<pre>​dsadsa</pre>
     </ol>
   </li>
 </ol>
+<ol style="list-style-type: ">
+  <li>dsadsa
+    <ol>
+      <li>dsadas
+        <ol>
+          <li>dsa<br>
+<br>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+</ol>
 `,
 // charCounter_max: 26,
 placeholder: 'Start typing here...',

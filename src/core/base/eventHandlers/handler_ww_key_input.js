@@ -229,8 +229,10 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 			// line delete
 			if (
 				this.format.isLine(formatEl) &&
-				(!range.collapsed || dom.check.isEdgePoint(range.endContainer, range.endOffset, 'front')) &&
-				(!range.endContainer.previousSibling || dom.check.isZeroWidth(range.endContainer.previousSibling)) &&
+				!range.collapsed &&
+				dom.check.isEdgePoint(range.startContainer, range.startOffset, 'front') &&
+				(!range.startContainer.previousSibling || dom.check.isZeroWidth(range.startContainer.previousSibling)) &&
+				this.format.getLine(range.startContainer) !== this.format.getLine(range.endContainer) &&
 				(this.format.isLine(formatEl.previousElementSibling) || dom.check.isListCell(formatEl))
 			) {
 				e.preventDefault();
@@ -483,8 +485,10 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 			// line delete
 			if (
 				this.format.isLine(formatEl) &&
-				(!range.collapsed || dom.check.isEdgePoint(range.startContainer, range.endOffset, 'end')) &&
-				(!range.startContainer.nextSibling || dom.check.isZeroWidth(range.startContainer.nextSibling)) &&
+				!range.collapsed &&
+				dom.check.isEdgePoint(range.endContainer, range.endOffset, 'end') &&
+				(!range.endContainer.nextSibling || dom.check.isZeroWidth(range.endContainer.nextSibling)) &&
+				this.format.getLine(range.startContainer) !== this.format.getLine(range.endContainer) &&
 				(this.format.isLine(formatEl.nextElementSibling) || dom.check.isListCell(formatEl))
 			) {
 				e.preventDefault();
@@ -494,7 +498,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 				if (!range.collapsed) {
 					const rInfo = this.html.remove();
 					if (rInfo.commonCon !== rInfo.container && formatEl.parentElement) {
-						if (formatEl.contains(range.startContainer)) {
+						if (formatEl.contains(range.endContainer)) {
 							focusNode = LineDelete_next(formatEl);
 							this.selection.setRange(focusNode, focusNode.textContent.length, focusNode, focusNode.textContent.length);
 						} else {
