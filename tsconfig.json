@@ -1,8 +1,8 @@
 {
 	"compilerOptions": {
-		"module": "ES2022",
+		"module": "ESNext",
 		"target": "ES2022",
-		"lib": ["ES2022", "dom"],
+		"lib": ["ES2022", "DOM"],
 		"sourceMap": true,
 		"allowJs": true,
 		"checkJs": true,
@@ -12,17 +12,17 @@
 		"allowSyntheticDefaultImports": true,
 		"strict": false,
 		"forceConsistentCasingInFileNames": true,
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"jsx": "preserve",
 		"noImplicitAny": false,
 		"declaration": true,
-		"declarationMap": false,
 		"emitDeclarationOnly": true,
 		"rootDir": "./src",
 		"declarationDir": "./types",
 		"outDir": "./types",
+		"declarationMap": false,
 		"noEmit": false
 	},
 	"include": ["./src/**/*.js"]
