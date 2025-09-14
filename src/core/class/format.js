@@ -643,6 +643,8 @@ Format.prototype = {
 		}
 
 		let edge = null;
+		this.editor.effectNode = null;
+
 		if (shouldDelete) {
 			edge = {
 				cc: rangeParent,
@@ -655,18 +657,21 @@ Format.prototype = {
 		} else {
 			firstNode ||= lastNode;
 			lastNode ||= firstNode;
-			const childEdge = dom.query.getEdgeChildNodes(firstNode, lastNode.parentNode ? firstNode : lastNode);
-			edge = {
-				cc: (childEdge.sc || childEdge.ec).parentNode,
-				sc: childEdge.sc,
-				so: so,
-				ec: childEdge.ec,
-				eo: eo,
-				removeArray: null
-			};
+			const childEdge = dom.query.getEdgeChildNodes(firstNode, lastNode?.parentNode ? firstNode : lastNode);
+			if (!childEdge) {
+				this.editor.focus();
+			} else {
+				edge = {
+					cc: (childEdge.sc || childEdge.ec).parentNode,
+					sc: childEdge.sc,
+					so: so,
+					ec: childEdge.ec,
+					eo: eo,
+					removeArray: null
+				};
+			}
 		}
 
-		this.editor.effectNode = null;
 		if (skipHistory) return edge;
 
 		if (!shouldDelete && edge) {

@@ -308,11 +308,13 @@ declare class HTML {
 	 * @this {HTMLThis}
 	 * @description Checks whether the given list item node should be removed and handles necessary clean-up.
 	 * @param {Node} item The list item node to be checked.
+	 * @param {boolean} isSingleItem Single item
 	 * @returns {{sc:Node, ec:Node}|null} An object containing the start and end containers if any transformations were made, otherwise null.
 	 */
 	_nodeRemoveListItem(
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
-		item: Node
+		item: Node,
+		isSingleItem: boolean
 	): {
 		sc: Node;
 		ec: Node;

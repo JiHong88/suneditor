@@ -121,10 +121,10 @@ Component.prototype = {
 
 		try {
 			if (dom.check.isListCell(formatEl)) {
-				this.html.insertNode(element, { afterNode: isInline ? null : !dom.check.isZeroWidth(selectionNode) ? null : (selectionNode || r.container).nextSibling, skipCharCount: true });
+				this.html.insertNode(element, { afterNode: isInline ? null : !dom.check.isZeroWidth(selectionNode) ? null : (selectionNode || r.container || {}).nextSibling, skipCharCount: true });
 				if (!isInline && !element.nextSibling) element.parentNode.appendChild(dom.utils.createElement('BR'));
 			} else {
-				if (!isInline && this.selection.getRange().collapsed && (r.container.nodeType === 3 || dom.check.isBreak(r.container))) {
+				if (!isInline && this.selection.getRange().collapsed && (r.container?.nodeType === 3 || dom.check.isBreak(r.container))) {
 					const depthFormat = dom.query.getParentElement(r.container, this.format.isBlock.bind(this.format));
 					oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
 					if (oNode) formatEl = /** @type {HTMLElement} */ (oNode.previousSibling);

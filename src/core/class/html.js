@@ -330,6 +330,9 @@ HTML.prototype = {
 	insert(html, { selectInserted, skipCharCount, skipCleaning } = {}) {
 		if (!this.frameContext.get('wysiwyg').contains(this.selection.get().focusNode)) this.editor.focus();
 
+		this.remove();
+		this.editor.focus();
+
 		if (typeof html === 'string') {
 			if (!skipCleaning) html = this.clean(html, { forceFormat: false, whitelist: null, blacklist: null });
 			try {
@@ -709,7 +712,7 @@ HTML.prototype = {
 				}
 			}
 
-			if (freeFormat && (this.format.isLine(oNode) || this.format.isBlock(oNode))) {
+			if (freeFormat && !dom.check.isList(oNode) && (this.format.isLine(oNode) || this.format.isBlock(oNode))) {
 				oNode = this._setIntoFreeFormat(oNode);
 			}
 
@@ -921,12 +924,13 @@ HTML.prototype = {
 
 		const _isText = dom.check.isText;
 		const _isElement = dom.check.isElement;
+		const _isSingleItem = startIndex === endIndex;
 		let nextFocusNodes = null;
 		for (let i = startIndex; i <= endIndex; i++) {
 			const item = /** @type {Text} */ (childNodes[i]);
 
 			if (_isText(item) && (item.data === undefined || item.length === 0)) {
-				nextFocusNodes = this._nodeRemoveListItem(item);
+				nextFocusNodes = this._nodeRemoveListItem(item, _isSingleItem);
 				continue;
 			}
 
@@ -948,7 +952,7 @@ HTML.prototype = {
 				if (beforeNode.length > 0) {
 					/** @type {Text} */ (startCon).data = beforeNode.data;
 				} else {
-					nextFocusNodes = this._nodeRemoveListItem(startCon);
+					nextFocusNodes = this._nodeRemoveListItem(startCon, _isSingleItem);
 				}
 
 				if (item === endCon) break;
@@ -966,13 +970,13 @@ HTML.prototype = {
 				if (afterNode.length > 0) {
 					/** @type {Text} */ (endCon).data = afterNode.data;
 				} else {
-					nextFocusNodes = this._nodeRemoveListItem(endCon);
+					nextFocusNodes = this._nodeRemoveListItem(endCon, _isSingleItem);
 				}
 
 				continue;
 			}
 
-			nextFocusNodes = this._nodeRemoveListItem(item);
+			nextFocusNodes = this._nodeRemoveListItem(item, _isSingleItem);
 		}
 
 		const endUl = dom.query.getParentElement(endCon, 'ul');
@@ -1023,7 +1027,7 @@ HTML.prototype = {
 			container,
 			offset,
 			prevContainer,
-			commonCon
+			commonCon: commonCon?.parentElement ? commonCon : null
 		};
 	},
 
@@ -1294,13 +1298,14 @@ HTML.prototype = {
 	 * @this {HTMLThis}
 	 * @description Checks whether the given list item node should be removed and handles necessary clean-up.
 	 * @param {Node} item The list item node to be checked.
+	 * @param {boolean} isSingleItem Single item
 	 * @returns {{sc:Node, ec:Node}|null} An object containing the start and end containers if any transformations were made, otherwise null.
 	 */
-	_nodeRemoveListItem(item) {
+	_nodeRemoveListItem(item, isSingleItem) {
 		const line = this.format.getLine(item, null);
 		dom.utils.removeItem(item);
 
-		if (!dom.check.isListCell(line)) return;
+		if (!dom.check.isListCell(line) || isSingleItem) return;
 
 		const result = this.nodeTransform.removeAllParents(line, null, null);
 
