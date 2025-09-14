@@ -827,7 +827,7 @@ async function OnKeyDown_component(e) {
 	if (keyCodeMap.isRemoveKey(keyCode)) {
 		e.preventDefault();
 		e.stopPropagation();
-		if (typeof this.currentPlugin?.destroy === 'function') {
+		if (typeof this.currentPlugin?.destroy === 'function' && (!this.info.isInputType || !this.status.hasFocus)) {
 			const focusNode = this.info.container.previousSibling;
 			await this.currentPlugin.destroy(this.currentTarget);
 			this.deselect();

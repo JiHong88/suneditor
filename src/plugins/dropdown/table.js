@@ -408,6 +408,32 @@ class Table extends EditorInjector {
 	}
 
 	/**
+	 * @editorMethod Editor.Component
+	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
+	 * @param {HTMLElement} target Target element
+	 * @returns {Promise<void>}
+	 */
+	destroy(target) {
+		if (!target) return;
+
+		const emptyDiv = target.parentNode;
+		dom.utils.removeItem(target);
+
+		this._closeTableSelectInfo();
+
+		if (emptyDiv !== this.frameContext.get('wysiwyg'))
+			this.nodeTransform.removeAllParents(
+				emptyDiv,
+				function (current) {
+					return current.childNodes.length === 0;
+				},
+				null
+			);
+		this.editor.focus();
+		this.history.push(false);
+	}
+
+	/**
 	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component copy is requested.
 	 * @param {__se__PluginCopyComponentParams} params
@@ -958,21 +984,7 @@ class Table extends EditorInjector {
 				this.component.copy(this.#figure);
 				break;
 			case 'remove': {
-				const emptyDiv = this.#figure?.parentNode;
-				dom.utils.removeItem(this.#figure);
-
-				this._closeTableSelectInfo();
-
-				if (emptyDiv !== this.frameContext.get('wysiwyg'))
-					this.nodeTransform.removeAllParents(
-						emptyDiv,
-						function (current) {
-							return current.childNodes.length === 0;
-						},
-						null
-					);
-				this.editor.focus();
-				this.history.push(false);
+				this.destroy(this.#figure);
 			}
 		}
 

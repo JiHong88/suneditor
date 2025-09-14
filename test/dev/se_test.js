@@ -1152,6 +1152,98 @@ value: `<pre>​dsadsa</pre>
   </li>
 </ol>
 `,
+value: `<p>​dsadsa</p>
+
+<figure class="se-flex-component se-input-component se-scroll-figure-x se-figure-over-selected se-figure-selected se-component-selected" style="width: 100%;">
+  <table class="se-table-layout-auto" style="">
+    <colgroup><col style="width: 50%;"><col style="width: 50%;"></colgroup>
+    <tbody>
+      <tr>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div><br>
+          </div>
+        </td>
+        <td>
+          <div><br>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</figure>
+
+<p>​dsa</p>
+
+<p>dsa1</p>
+
+<p>dsa</p>
+
+<div class="se-component se-image-container __se__float-none">
+  <figure style="" class="">
+    <img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" style="" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Welsh Corgi" data-se-file-size="0" data-se-index="0">
+  </figure>
+</div>
+
+<p>dsadsa</p>
+`,
+value: `<p><br>
+</p>
+
+<ol style="list-style-type: upper-latin">
+  <li><br>
+
+    <ol>
+      <li>ds        
+        <figure class="se-flex-component se-input-component se-scroll-figure-x se-component-selected se-figure-selected" style="width: 100%;">
+          <table class="se-table-layout-auto">
+            <colgroup><col style="width: 50%"><col style="width: 50%"></colgroup>
+            <tbody>
+              <tr>
+                <td class="" colspan="1" rowspan="2">
+                  <div>dsa</div>
+                  <div>dsa</div>
+                </td>
+                <td>
+                  <div><br>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div>dsa</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </figure>
+      </li>
+    </ol>
+  </li>
+  <li>​dsa</li>
+  <li>dsa1</li>
+  <li>dsa</li>
+  <li><br>
+
+<div class="se-component se-image-container __se__float-none">
+      <figure class="" style="">
+        <img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Welsh Corgi" data-se-file-size="0" style="" data-se-index="0">
+      </figure>
+</div>
+  </li>
+  <li>dsadsa</li>
+</ol>
+
+`,
 // charCounter_max: 26,
 placeholder: 'Start typing here...',
 	// defaultLineBreakFormat: 'br',

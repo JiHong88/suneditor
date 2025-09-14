@@ -148,6 +148,13 @@ declare class Table extends EditorInjector {
 	 */
 	select(target: HTMLElement): void;
 	/**
+	 * @editorMethod Editor.Component
+	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
+	 * @param {HTMLElement} target Target element
+	 * @returns {Promise<void>}
+	 */
+	destroy(target: HTMLElement): Promise<void>;
+	/**
 	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component copy is requested.
 	 * @param {__se__PluginCopyComponentParams} params
