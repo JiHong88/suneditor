@@ -333,6 +333,7 @@ HTML.prototype = {
 		this.remove();
 		this.editor.focus();
 
+		let focusNode = null;
 		if (typeof html === 'string') {
 			if (!skipCleaning) html = this.clean(html, { forceFormat: false, whitelist: null, blacklist: null });
 			try {
@@ -369,6 +370,7 @@ HTML.prototype = {
 
 				if (prev?.nodeType === 3 && a?.nodeType === 1) a = prev;
 				const offset = a.nodeType === 3 ? t.endOffset || a.textContent.length : a.childNodes.length;
+				focusNode = a;
 
 				if (selectInserted) {
 					this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
@@ -391,8 +393,22 @@ HTML.prototype = {
 			}
 		}
 
+		// focus
 		this.editor.effectNode = null;
-		this.editor.focus();
+
+		if (focusNode) {
+			const children = dom.query.getListChildNodes(focusNode, null, null);
+			if (children.length > 0) {
+				focusNode = children.at(-1);
+				const offset = focusNode?.nodeType === 3 ? focusNode.textContent.length : 1;
+				this.selection.setRange(focusNode, offset, focusNode, offset);
+			} else {
+				this.editor.focus();
+			}
+		} else {
+			this.editor.focus();
+		}
+
 		this.history.push(false);
 	},
 
@@ -604,10 +620,7 @@ HTML.prototype = {
 
 				if (this.format.isLine(oNode) || this.format.isBlock(oNode) || (!dom.check.isListCell(parentNode) && this.component.isBasic(oNode))) {
 					const oldParent = parentNode;
-					if (dom.check.isList(afterNode)) {
-						parentNode = afterNode;
-						afterNode = null;
-					} else if (dom.check.isListCell(afterNode)) {
+					if (dom.check.isListCell(afterNode)) {
 						parentNode = afterNode.previousElementSibling || afterNode;
 					} else if (!originAfter && !afterNode) {
 						const r = this.remove();
