@@ -197,7 +197,7 @@ export function isEmptyLine(node) {
  * @returns {boolean} True if the node is a container component, otherwise false.
  */
 export function isComponentContainer(element) {
-	return domUtils.hasClass(element, 'se-component');
+	return domUtils.hasClass(element, 'se-component|se-flex-component');
 }
 
 /**
