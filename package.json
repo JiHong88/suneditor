@@ -7,7 +7,7 @@
 	"main": "src/suneditor.js",
 	"types": "types/index.d.ts",
 	"sideEffects": [
-		"./src/assets/css/*.css"
+		"./src/assets/*.css"
 	],
 	"engines": {
 		"node": ">=14.0.0"
