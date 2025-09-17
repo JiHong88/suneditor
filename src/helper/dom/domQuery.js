@@ -252,7 +252,7 @@ export function compareElements(a, b) {
 		bNode = bNode.parentElement;
 	}
 
-	if (!aNode || !bNode)
+	if (!aNode?.parentNode || !bNode?.parentNode)
 		return {
 			ancestor: null,
 			a: a,
