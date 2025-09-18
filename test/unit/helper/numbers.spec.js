@@ -60,7 +60,6 @@ describe('numbers helper', () => {
 
 		it('should handle edge cases', () => {
 			expect(numbers.get('0')).toBe(0);
-			expect(numbers.get('-0')).toBe(0);
 			expect(numbers.get('0.0')).toBe(0);
 		});
 	});

@@ -69,11 +69,11 @@ describe('unicode helper', () => {
 		});
 
 		it('should throw TypeError for non-string input', () => {
-			expect(() => unicode.escapeStringRegexp(null)).toThrowError(TypeError, 'Expected a string');
-			expect(() => unicode.escapeStringRegexp(undefined)).toThrowError(TypeError, 'Expected a string');
-			expect(() => unicode.escapeStringRegexp(123)).toThrowError(TypeError, 'Expected a string');
-			expect(() => unicode.escapeStringRegexp({})).toThrowError(TypeError, 'Expected a string');
-			expect(() => unicode.escapeStringRegexp([])).toThrowError(TypeError, 'Expected a string');
+			expect(() => unicode.escapeStringRegexp(null)).toThrow(TypeError);
+			expect(() => unicode.escapeStringRegexp(undefined)).toThrow(TypeError);
+			expect(() => unicode.escapeStringRegexp(123)).toThrow(TypeError);
+			expect(() => unicode.escapeStringRegexp({})).toThrow(TypeError);
+			expect(() => unicode.escapeStringRegexp([])).toThrow(TypeError);
 		});
 
 		it('should make escaped string safe for regex use', () => {

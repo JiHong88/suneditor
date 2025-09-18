@@ -15,6 +15,7 @@ node_modules/**
 #dev
 .git/**
 /.vs
+.claude/**
 
 #only release branch, npm
 dist/**

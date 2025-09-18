@@ -15,7 +15,7 @@ describe('InstanceCheck', () => {
 
 		mockEditor = {
 			frameContext: {
-				get: jasmine.createSpy('frameContext.get').and.returnValue(mockWindow)
+				get: jest.fn().mockReturnValue(mockWindow)
 			}
 		};
 
@@ -24,7 +24,7 @@ describe('InstanceCheck', () => {
 
 	describe('constructor', () => {
 		it('should create an instance with editor reference', () => {
-			expect(instanceCheck).toEqual(jasmine.any(InstanceCheck));
+			expect(instanceCheck).toBeInstanceOf(InstanceCheck);
 			expect(instanceCheck.editor).toBe(mockEditor);
 		});
 	});
@@ -148,7 +148,7 @@ describe('InstanceCheck', () => {
 
 			const iframeMockEditor = {
 				frameContext: {
-					get: jasmine.createSpy('iframeFrameContext.get').and.returnValue(iframeWindow)
+					get: jest.fn().mockReturnValue(iframeWindow)
 				}
 			};
 
@@ -208,7 +208,7 @@ describe('InstanceCheck', () => {
 		it('should handle missing _ww in frameContext', () => {
 			const editorWithMissingWw = {
 				frameContext: {
-					get: jasmine.createSpy('missingWw.get').and.returnValue(null)
+					get: jest.fn().mockReturnValue(null)
 				}
 			};
 			const instanceCheckWithMissingWw = new InstanceCheck(editorWithMissingWw);
