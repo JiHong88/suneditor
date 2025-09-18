@@ -25,6 +25,8 @@ let wheelY = SIZE / 2;
 let finalColor = DEFAULT_COLOR_VALUE;
 let ctx;
 
+let _bootstrapped = false;
+
 function CreateSliderCtx() {
 	const offscreenCanvas = document.createElement('canvas');
 	offscreenCanvas.width = SIZE;
@@ -198,6 +200,8 @@ class HueSlider {
 	 * @param {?Node=} form The element to attach the hue slider.
 	 */
 	attach(form) {
+		if (_bootstrapped) InitRender();
+
 		// drow
 		this.init();
 		(form || this.form).appendChild(slider);
@@ -457,7 +461,10 @@ function drawWheelGradient() {
 }
 
 function drawColorWheelToContext(context) {
-	if (!context) throw new Error('Context not found.');
+	if (!context) {
+		console.warn('[HueSlider.fail] Context not found.');
+		return;
+	}
 
 	const fixedSaturation = SATURATION * 100;
 
@@ -560,9 +567,14 @@ function roundNumber(num) {
 	return Math.round(num * factor) / factor;
 }
 
-// create
-drawColorWheelToContext(offscreenCtx);
-drawColorWheel();
+function InitRender() {
+	// create
+	drawColorWheelToContext(offscreenCtx);
+	drawColorWheel();
+	_bootstrapped = true;
+}
+
+InitRender();
 
 function CreateHTML_basicControllerForm({ lang, icons }, className) {
 	const hueController = dom.utils.createElement(
