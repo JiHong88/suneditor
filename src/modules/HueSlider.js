@@ -200,7 +200,7 @@ class HueSlider {
 	 * @param {?Node=} form The element to attach the hue slider.
 	 */
 	attach(form) {
-		if (_bootstrapped) InitRender();
+		if (!_bootstrapped) InitRender();
 
 		// drow
 		this.init();
@@ -483,6 +483,8 @@ function drawColorWheelToContext(context) {
 			context.fill();
 		}
 	}
+
+	_bootstrapped = true;
 }
 
 function degreeToRadian(deg) {
@@ -570,8 +572,7 @@ function roundNumber(num) {
 function InitRender() {
 	// create
 	drawColorWheelToContext(offscreenCtx);
-	drawColorWheel();
-	_bootstrapped = true;
+	if (_bootstrapped) drawColorWheel();
 }
 
 InitRender();
