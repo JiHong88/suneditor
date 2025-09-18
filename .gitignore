@@ -17,5 +17,8 @@ node_modules/**
 /.vs
 .claude/**
 
+#jest
+coverage/
+
 #only release branch, npm
 dist/**
