@@ -33,11 +33,11 @@
             bold: 'Negrito',
             underline: 'Sublinhado',
             italic: 'Itálico',
-            strike: 'Riscado',
-            subscript: 'Subescrito',
+            strike: 'Tachado',
+            subscript: 'Subscrito',
             superscript: 'Sobrescrito',
-            removeFormat: 'Remover Formatação',
-            fontColor: 'Cor da Fonte',
+            removeFormat: 'Remover formatação',
+            fontColor: 'Cor da fonte',
             hiliteColor: 'Cor de destaque',
             indent: 'Recuo',
             outdent: 'Avançar',
@@ -66,7 +66,7 @@
             redo: 'Refazer',
             preview: 'Prever',
             print: 'Imprimir',
-            tag_p: 'Paragráfo',
+            tag_p: 'Parágrafo',
             tag_div: '(DIV) Normal',
             tag_h: 'Cabeçalho',
             tag_blockquote: 'Citar',
@@ -83,9 +83,9 @@
         dialogBox: {
             linkBox: {
                 title: 'Inserir link',
-                url: 'URL para link',
-                text: 'Texto a mostrar',
-                newWindowCheck: 'Abrir em nova guia',
+                url: 'Endereço do link',
+                text: 'Texto exibido',
+                newWindowCheck: 'Abrir em uma nova guia',
                 downloadLinkCheck: 'Link para Download',
                 bookmark: 'marcar páginas'
             },
@@ -109,7 +109,7 @@
             audioBox: {
                 title: 'Inserir áudio',
                 file: 'Selecionar arquivos',
-                url: 'URL da áudio'
+                url: 'URL do áudio'
             },
             browser: {
                 tags: 'Tag',
