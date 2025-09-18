@@ -1,6 +1,5 @@
 import { _d, _w } from './env';
 
-const URLPattern = /https?:\/\/[^\s]+/g;
 const FONT_VALUES_MAP = {
 	'xx-small': 0.5625,
 	'x-small': 0.625,
@@ -377,6 +376,8 @@ export function getWidthInPercentage(target, parentTarget) {
  * @returns {boolean} Return true if the text node is converted to an anchor node
  */
 export function textToAnchor(node) {
+	const URLPattern = /https?:\/\/[^\s]+/g;
+
 	if (node.nodeType === 3 && URLPattern.test(node.textContent) && !/^A$/i.test(node.parentNode?.nodeName)) {
 		const textContent = node.textContent;
 		const fragment = _d.createDocumentFragment();

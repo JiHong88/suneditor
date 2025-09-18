@@ -864,6 +864,7 @@ async function OnKeyDown_component(e) {
 	}
 
 	// up down, left right
+	DIR_KEYCODE.lastIndex = 0;
 	if (DIR_KEYCODE.test(keyCode)) {
 		const { container } = this.get(this.currentTarget);
 		const isInline = this.isInline(container || this.currentTarget);
@@ -895,6 +896,7 @@ async function OnKeyDown_component(e) {
 				}
 			}
 		} else {
+			DIR_UP_KEYCODE.lastIndex = 0;
 			if (DIR_UP_KEYCODE.test(keyCode)) {
 				el = container.previousElementSibling;
 			} else {
