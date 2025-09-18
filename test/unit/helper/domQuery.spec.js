@@ -1,4 +1,4 @@
-import { dom } from '../../src/helper';
+import { dom } from '../../../src/helper';
 
 describe('dom.query helper', () => {
 	describe('getPositionIndex', () => {

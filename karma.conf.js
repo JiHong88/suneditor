@@ -11,7 +11,7 @@ module.exports = function (config) {
 		frameworks: ['jasmine'],
 
 		// list of files / patterns to load in the browser
-		files: ['./test/unit/*.spec.js'],
+		files: ['./test/unit/**/*.spec.js'],
 
 		// list of files / patterns to exclude
 		exclude: [],
@@ -47,8 +47,7 @@ module.exports = function (config) {
 
 		// start these browsers
 		// available browser launchers: https://www.npmjs.com/search?q=keywords:karma-launcher
-		// browsers: ['Chrome', 'Firefox', 'Safari', 'Opera', 'IE'],
-		browsers: ['Chrome'],
+		browsers: ['Chrome', 'Firefox', 'Opera', 'Safari'],
 
 		// Continuous Integration mode
 		// if true, Karma captures browsers, runs the tests and exits

@@ -1,4 +1,4 @@
-import { clipboard } from '../../src/helper';
+import { clipboard } from '../../../src/helper';
 
 describe('clipboard helper', () => {
 	// Mock navigator.clipboard for testing

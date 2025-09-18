@@ -1,4 +1,4 @@
-import { keyCodeMap } from '../../src/helper';
+import { keyCodeMap } from '../../../src/helper';
 
 describe('keyCodeMap helper', () => {
 	describe('meta key checks', () => {

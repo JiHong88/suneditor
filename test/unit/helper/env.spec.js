@@ -1,4 +1,4 @@
-import { env } from '../../src/helper';
+import { env } from '../../../src/helper';
 
 describe('env helper', () => {
 	describe('global references', () => {

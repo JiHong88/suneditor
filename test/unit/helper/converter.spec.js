@@ -1,4 +1,4 @@
-import { converter } from '../../src/helper';
+import { converter } from '../../../src/helper';
 
 describe('converter helper', () => {
 	describe('htmlToJson', () => {

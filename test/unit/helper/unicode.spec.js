@@ -1,4 +1,4 @@
-import { unicode } from '../../src/helper';
+import { unicode } from '../../../src/helper';
 
 describe('unicode helper', () => {
 	describe('zeroWidthSpace', () => {

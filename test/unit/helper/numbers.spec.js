@@ -1,4 +1,4 @@
-import { numbers } from '../../src/helper';
+import { numbers } from '../../../src/helper';
 
 describe('numbers helper', () => {
 	describe('is', () => {
