@@ -1848,7 +1848,7 @@ HTML.prototype = {
 				oNode.setAttribute('style', '');
 				oNode.removeAttribute('style');
 			}
-			if (!oNode.attributes.length) {
+			if (oNode.attributes.length === 0) {
 				oNode.setAttribute('data-duple', 'true');
 			}
 		}

@@ -1043,7 +1043,7 @@ EventManager.prototype = {
 		}
 
 		const openCont = this.editor.opendControllers;
-		if (!openCont.length) return;
+		if (openCont.length === 0) return;
 
 		this.__rePositionController(openCont);
 	},

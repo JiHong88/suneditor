@@ -148,7 +148,7 @@ class SelectMenu extends CoreInjector {
 		this.editor.selectMenuOn = false;
 		dom.utils.removeClass(this.#refer, 'on');
 		this.#init();
-		if (this.form) this.form.style.cssText = '';
+		this.form?.removeAttribute('style');
 		this.isOpen = false;
 		if (typeof this.closeMethod === 'function') this.closeMethod();
 	}

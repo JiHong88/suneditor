@@ -3280,7 +3280,7 @@ Format.prototype = {
 		if (!appliedEl) return;
 
 		// common style
-		if (!childStyle.length) {
+		if (childStyle.length === 0) {
 			const ch = child.childNodes;
 			const p = child.parentNode;
 			const n = child.nextSibling;
@@ -3315,7 +3315,7 @@ Format.prototype = {
 			}
 		}
 
-		if (!ec.length) return;
+		if (ec.length === 0) return;
 
 		// reset cell style---
 		const refer = dom.utils.createElement('SPAN');
@@ -3355,7 +3355,7 @@ Format.prototype = {
 			el.insertBefore(sel, r);
 			appliedEl = true;
 		}
-		if (!elStyles.length) {
+		if (elStyles.length === 0) {
 			el.removeAttribute('style');
 		}
 

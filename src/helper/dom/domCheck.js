@@ -226,7 +226,7 @@ export function isNonEditable(node) {
 export function isSpanWithoutAttr(node) {
 	if (node?.nodeType !== 1) return false;
 	const el = /** @type {HTMLElement} */ (node);
-	return /^SPAN$/i.test(el.nodeName) && !el.className && !el.style.cssText;
+	return /^SPAN$/i.test(el.nodeName) && !el.className && el.style.length === 0;
 }
 
 /**

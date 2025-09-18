@@ -224,7 +224,7 @@ export function prevIndex(array, item) {
 export function copyTagAttributes(originEl, copyEl, blacklist) {
 	const o = /** @type {HTMLElement} */ (originEl);
 	const c = /** @type {HTMLElement} */ (copyEl);
-	if (c.style.cssText) {
+	if (c.style.length > 0) {
 		const copyStyles = c.style;
 		for (let i = 0, len = copyStyles.length; i < len; i++) {
 			o.style[copyStyles[i]] = copyStyles[copyStyles[i]];
@@ -303,7 +303,7 @@ export function setStyle(elements, styleName, value) {
 	for (let i = 0, len = elements.length, e; i < len; i++) {
 		e = /** @type {HTMLElement} */ (elements[i]);
 		e.style[styleName] = value;
-		if (!e.style.cssText) {
+		if (e.style.length === 0) {
 			e.removeAttribute('style');
 		}
 	}
