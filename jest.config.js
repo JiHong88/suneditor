@@ -3,9 +3,7 @@ module.exports = {
 	testEnvironment: 'jsdom',
 
 	// Test file patterns
-	testMatch: [
-		'<rootDir>/test/unit/**/*.spec.js'
-	],
+	testMatch: ['<rootDir>/test/unit/**/*.spec.js'],
 
 	// Setup files
 	setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
@@ -21,10 +19,7 @@ module.exports = {
 	},
 
 	// Collect coverage information
-	collectCoverageFrom: [
-		'src/**/*.js',
-		'!src/**/*.spec.js'
-	],
+	collectCoverageFrom: ['src/**/*.js', '!src/**/*.spec.js'],
 
 	// Coverage thresholds
 	coverageThreshold: {

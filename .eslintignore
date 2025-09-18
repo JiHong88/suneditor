@@ -1,7 +1,8 @@
 node_modules
 dist
 sample
+coverage
 test
-karma.conf.js
+jest.conf.js
 webpack/**/*
 **/*.css
