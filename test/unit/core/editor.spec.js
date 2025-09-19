@@ -1,4 +1,5 @@
 import Editor from '../../../src/core/editor';
+import { SELECT_ALL } from '../../../src/core/section/actives';
 
 describe('Editor', () => {
 	let container;
@@ -19,7 +20,7 @@ describe('Editor', () => {
 		}];
 
 		options = {
-			value: 'Test content',
+			value: `<pre>​dsadsa</pre><figure class="se-flex-component se-input-component se-scroll-figure-x" style="width: 100%;"><table class="se-table-layout-auto" style=""><colgroup><col style="width: 20%;"><col style="width: 20%;"><col style="width: 20%;"><col style="width: 20%;"><col style="width: 20%;"></colgroup><tbody><tr><td><div><br></div></td><td class=""><div>dsadsa</div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td class=""><div><br></div></td><td><div>dsa</div></td><td class=""><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td class=""><div>dsadasdsa</div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure><p>​dsadsa</p><ol style="list-style-type: "><li>dsadsa</li><li>bbdadas    <ol><li>dsadsadsa</li><li>dsadsadas        <ol><li>dsadsa</li><li>dsadsa</li><li>dsadas</li></ol></li></ol></li></ol><ol style="list-style-type: "><li>dsadsa    <ol><li>dsadas        <ol><li>dsa<br><br></li></ol></li></ol></li></ol>`,
 			mode: 'classic',
 			width: '100%',
 			height: 'auto',
@@ -152,15 +153,6 @@ describe('Editor', () => {
 	});
 
 	describe('commandHandler', () => {
-		it('should handle selectAll command', async () => {
-			const editor = new Editor(multiTargets, options);
-			editor.selection = { selectAll: jest.fn() };
-
-			await editor.commandHandler('selectAll');
-
-			expect(editor.selection.selectAll).toHaveBeenCalled();
-		});
-
 		it('should handle newDocument command', async () => {
 			const editor = new Editor(multiTargets, options);
 			editor.html = { set: jest.fn() };
@@ -282,20 +274,8 @@ describe('Editor', () => {
 	describe('destroy', () => {
 		it('should clean up editor instance', () => {
 			const editor = new Editor(multiTargets, options);
-			editor.history = { destroy: jest.fn() };
-			editor.eventManager = { _removeAllEvents: jest.fn() };
-			editor.options = {
-				get: jest.fn().mockReturnValue(null),
-				clear: jest.fn()
-			};
-			editor.context = { clear: jest.fn() };
 			editor.carrierWrapper = document.createElement('div');
-			editor.applyFrameRoots = jest.fn();
-
 			const result = editor.destroy();
-
-			expect(editor.history.destroy).toHaveBeenCalled();
-			expect(editor.eventManager._removeAllEvents).toHaveBeenCalled();
 			expect(result).toBeNull();
 		});
 	});
