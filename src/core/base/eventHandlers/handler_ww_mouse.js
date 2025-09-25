@@ -48,7 +48,7 @@ export async function OnMouseDown_wysiwyg(fc, e) {
 		this._hideToolbar_sub();
 	}
 
-	if (/FIGURE/i.test(eventTarget.nodeName)) e.preventDefault();
+	if (/FIGURE/i.test(eventTarget?.nodeName)) e.preventDefault();
 }
 
 /**

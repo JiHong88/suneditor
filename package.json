@@ -26,7 +26,7 @@
 		"i18n-build": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/i18n-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix",
 		"test": "jest --silent",
 		"test:unit": "npm test -- --selectProjects unit",
-		"test:integra": "npm test -- --selectProjects integration",
+		"test:integration": "npm test -- --selectProjects integration",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
 		"update-browserslist": "npx browserslist@latest --update-db"

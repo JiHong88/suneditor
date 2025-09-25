@@ -113,7 +113,7 @@ export function OnClick_menuTray(e) {
 	let k = '';
 	while (t && !/se-menu-tray/.test(t.className) && !k) {
 		t = t.parentElement;
-		k = t.getAttribute('data-key');
+		k = t?.getAttribute('data-key');
 	}
 	if (!k) return;
 
