@@ -154,6 +154,10 @@ export function createTestEditor(customOptions = {}) {
 		imageResizing: false,
 		stickyToolbar: false,
 		iframe: false,
+		// Disable auto height to prevent iframe-related DOM operations
+		height: 'auto',
+		minHeight: null,
+		maxHeight: null,
 		codeMirror: false,
 		katex: false,
 		mathJax: false,
@@ -223,6 +227,45 @@ export function waitForEditorReady(editor, timeout = 5000) {
 						document.body.appendChild(mockWysiwyg); // Add to DOM
 						editor.context.set('wysiwyg', mockWysiwyg);
 						hasWysiwyg = mockWysiwyg; // Update for later use
+					}
+
+					// Add mock wysiwygFrame to fix offsetHeight errors for all contexts
+					if (hasContext) {
+						const createMockFrame = () => {
+							const mockWysiwygFrame = document.createElement('div');
+							mockWysiwygFrame.style.height = '200px';
+							mockWysiwygFrame.style.width = '100%';
+							// Set offsetHeight property to prevent errors
+							Object.defineProperty(mockWysiwygFrame, 'offsetHeight', {
+								get: () => 200,
+								configurable: true
+							});
+							Object.defineProperty(mockWysiwygFrame, 'offsetWidth', {
+								get: () => 400,
+								configurable: true
+							});
+							document.body.appendChild(mockWysiwygFrame);
+							return mockWysiwygFrame;
+						};
+
+						// Add to main context
+						if (!editor.context.get('wysiwygFrame')) {
+							editor.context.set('wysiwygFrame', createMockFrame());
+						}
+
+						// Add to all frame contexts if they exist
+						if (editor.multiTargets) {
+							editor.multiTargets.forEach(target => {
+								if (target.context && !target.context.get('wysiwygFrame')) {
+									target.context.set('wysiwygFrame', createMockFrame());
+								}
+							});
+						}
+
+						// Also add to currentFrame if it exists and is different
+						if (editor.currentFrame && editor.currentFrame !== editor.context && !editor.currentFrame.get('wysiwygFrame')) {
+							editor.currentFrame.set('wysiwygFrame', createMockFrame());
+						}
 					}
 
 					// Ensure core object exists with essential properties
@@ -347,6 +390,24 @@ export function waitForEditorReady(editor, timeout = 5000) {
 								editor.onClick(data);
 							}
 							return true;
+						});
+					}
+
+					// Mock iframe auto height functionality to prevent DOM errors
+					if (editor && typeof editor._iframeAutoHeight === 'function') {
+						editor._iframeAutoHeight = jest.fn();
+					}
+					if (editor && typeof editor._resourcesStateChange === 'function') {
+						const originalResourcesStateChange = editor._resourcesStateChange;
+						editor._resourcesStateChange = jest.fn((fc) => {
+							try {
+								// Skip iframe operations, just do placeholder check
+								if (typeof editor._checkPlaceholder === 'function') {
+									editor._checkPlaceholder(fc);
+								}
+							} catch (e) {
+								// Silently ignore any errors in resource state change
+							}
 						});
 					}
 

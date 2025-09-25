@@ -3,7 +3,7 @@ module.exports = {
 	testEnvironment: 'jsdom',
 
 	// Test file patterns
-	testMatch: ['<rootDir>/test/unit/**/*.spec.js', '<rootDir>/test/unit/**/*.integration.spec.js'],
+	testMatch: ['<rootDir>/test/unit/**/*.spec.js', '<rootDir>/test/unit/**/*.integration.spec.js', '<rootDir>/test/integration/**/*.spec.js', '<rootDir>/test/e2e/**/*.spec.js'],
 
 	// Setup files
 	setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
@@ -42,6 +42,11 @@ module.exports = {
 		{
 			displayName: 'integration',
 			testMatch: ['<rootDir>/test/integration/**/*.spec.js'],
+			testEnvironment: 'jsdom'
+		},
+		{
+			displayName: 'e2e',
+			testMatch: ['<rootDir>/test/e2e/**/*.spec.js'],
 			testEnvironment: 'jsdom'
 		}
 	],
