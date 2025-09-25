@@ -1,5 +1,5 @@
 import { OnBeforeInput_wysiwyg, OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from '../../../../../src/core/base/eventHandlers/handler_ww_key_input';
-import { createMockThis, createMockKeyboardEvent, createMockInputEvent } from '../../../../__mocks__/editor';
+import { createMockThis, createMockKeyboardEvent, createMockInputEvent } from '../../../../__mocks__/editorMock';
 
 // Mock keyCodeMap module
 jest.mock('../../../../../src/helper/keyCodeMap', () => ({

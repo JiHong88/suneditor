@@ -1,5 +1,5 @@
 import EventManager from '../../../../src/core/base/eventManager';
-import { createMockEditor } from '../../../__mocks__/editor';
+import { createMockEditor } from '../../../__mocks__/editorMock';
 import { dom } from '../../../../src/helper';
 
 describe('EventManager', () => {

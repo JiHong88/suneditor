@@ -12,8 +12,7 @@ module.exports = {
 
 	// Module resolution
 	moduleNameMapper: {
-		'^@/(.*)$': '<rootDir>/src/$1',
-		'^../../../../src/helper/env$': '<rootDir>/test/__mocks__/mock_env.js'
+		'^@/(.*)$': '<rootDir>/src/$1'
 	},
 
 	// Transform files using Babel

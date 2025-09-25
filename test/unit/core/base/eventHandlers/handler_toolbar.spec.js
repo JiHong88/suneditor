@@ -1,5 +1,5 @@
 import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from '../../../../../src/core/base/eventHandlers/handler_toolbar';
-import { createMockThis, createMockEvent } from '../../../../__mocks__/editor';
+import { createMockThis, createMockEvent } from '../../../../__mocks__/editorMock';
 import { dom } from '../../../../../src/helper';
 
 describe('handler_toolbar', () => {
