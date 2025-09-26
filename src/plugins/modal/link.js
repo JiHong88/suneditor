@@ -30,6 +30,8 @@ class Link extends EditorInjector {
 	static type = 'modal';
 	static className = 'se-icon-flip-rtl';
 
+	#controllerATarget;
+
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
@@ -66,6 +68,8 @@ class Link extends EditorInjector {
 		this.anchor = new ModalAnchorEditor(this, modalEl, this.pluginOptions);
 		this.modal = new Modal(this, modalEl);
 		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: false });
+
+		this.#controllerATarget = this.controller.form.querySelector('a');
 	}
 
 	/**
@@ -77,10 +81,11 @@ class Link extends EditorInjector {
 	 */
 	active(element) {
 		if (dom.check.isAnchor(element) && !element.hasAttribute('data-se-non-link')) {
-			const tempLink = this.controller.form.querySelector('a');
-			tempLink.href = element.href;
-			tempLink.title = element.textContent;
-			tempLink.textContent = element.textContent;
+			const a = this.#controllerATarget;
+			const href = element.getAttribute('href');
+			a.href = href;
+			a.textContent = a.title = element.textContent;
+			a.target = href?.startsWith('#') ? element.target : '_blank';
 
 			dom.utils.addClass(element, 'on');
 

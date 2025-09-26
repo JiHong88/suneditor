@@ -138,6 +138,7 @@ declare class Link extends EditorInjector {
 	 * @description This function is called before the "controller" before it is closed.
 	 */
 	close(): void;
+	#private;
 }
 import EditorInjector from '../../editorInjector';
 import { ModalAnchorEditor } from '../../modules';
