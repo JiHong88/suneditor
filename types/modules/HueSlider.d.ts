@@ -44,6 +44,18 @@ export type HueSliderParams = {
 	 */
 	controllerOptions?: ControllerParams_hueSlider;
 };
+export function CreateSliderCtx(): {
+	slider: HTMLElement;
+	offscreenCanvas: HTMLCanvasElement;
+	offscreenCtx: CanvasRenderingContext2D;
+	wheel: HTMLCanvasElement;
+	wheelCtx: CanvasRenderingContext2D;
+	wheelPointer: HTMLElement;
+	gradientBar: HTMLCanvasElement;
+	gradientPointer: HTMLElement;
+	fanalColorHex: HTMLElement;
+	fanalColorBackground: HTMLElement;
+};
 /**
  * @typedef {import('../modules/Controller').ControllerParams} ControllerParams_hueSlider
  */

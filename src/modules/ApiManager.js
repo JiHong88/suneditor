@@ -70,6 +70,11 @@ class ApiManager {
 		errorCallBack ||= this.errorCallBack;
 		responseType ||= this.responseType;
 
+		// Validate required callback parameter
+		if (typeof callBack !== 'function') {
+			throw new Error(`[SUNEDITOR.ApiManager[${this.kind}].upload.callBack.fail] callBack is not a function`);
+		}
+
 		const xhr = this.#xhr;
 		if (responseType) xhr.responseType = responseType;
 		xhr.onreadystatechange = CallBackApi.bind(this, xhr, callBack, errorCallBack);

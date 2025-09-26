@@ -593,4 +593,5 @@ function CreateHTML_basicControllerForm({ lang, icons }, className) {
 	return hueController;
 }
 
+export { CreateSliderCtx };
 export default HueSlider;
