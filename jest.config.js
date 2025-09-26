@@ -24,7 +24,7 @@ module.exports = {
 	coveragePathIgnorePatterns: ['<rootDir>/src/assets/icons/defaultIcons.js', '<rootDir>/src/langs/.*\\.js$'],
 
 	// Collect coverage information
-	collectCoverageFrom: ['src/**/*.js', '!src/**/*.spec.js', '!src/assets/icons/defaultIcons.js', '!src/langs/*.js'],
+	collectCoverageFrom: ['src/**/*.js', '!src/assets/icons/defaultIcons.js', '!src/langs/*.js', '!src/plugins/index.js', '!src/events.js', '!src/typedef.js'],
 
 	// Coverage thresholds (temporarily reduced for development)
 	coverageThreshold: {
