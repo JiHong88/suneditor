@@ -136,10 +136,10 @@ export async function OnClick_wysiwyg(fc, e) {
 			const _styleNode = [...this.editor._onCopyFormatInfo];
 			const n = _styleNode.pop();
 
-			this.format.removeInlineElement();
+			this.inline.remove();
 
 			if (n) {
-				const insertedNode = this.format.applyInlineElement(n, { stylesToModify: null, nodesToRemove: [n.nodeName], strictRemove: false });
+				const insertedNode = this.inline.apply(n, { stylesToModify: null, nodesToRemove: [n.nodeName], strictRemove: false });
 				const { parent, inner } = this.nodeTransform.createNestedNode(_styleNode);
 				insertedNode.parentNode.insertBefore(parent, insertedNode);
 				inner.appendChild(insertedNode);

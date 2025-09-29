@@ -57,6 +57,8 @@ function EditorInjector(editor) {
 	this.format;
 	/** @type {import('./_classes').default['html']} */
 	this.html;
+	/** @type {import('./_classes').default['inline']} */
+	this.inline;
 	/** @type {import('./_classes').default['menu']} */
 	this.menu;
 	/** @type {import('./_classes').default['nodeTransform']} */

@@ -97,9 +97,9 @@ class FontColor extends EditorInjector {
 	colorPickerAction(color) {
 		if (color) {
 			const newNode = dom.utils.createElement('SPAN', { style: 'color: ' + color + ';' });
-			this.format.applyInlineElement(newNode, { stylesToModify: ['color'], nodesToRemove: null, strictRemove: null });
+			this.inline.apply(newNode, { stylesToModify: ['color'], nodesToRemove: null, strictRemove: null });
 		} else {
-			this.format.applyInlineElement(null, { stylesToModify: ['color'], nodesToRemove: ['span'], strictRemove: true });
+			this.inline.apply(null, { stylesToModify: ['color'], nodesToRemove: ['span'], strictRemove: true });
 		}
 
 		this.menu.dropdownOff();

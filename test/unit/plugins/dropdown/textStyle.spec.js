@@ -72,12 +72,13 @@ jest.mock('../../../../src/helper', () => ({
 }));
 
 // Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
+jest.mock('../../../../src/editorInjector', () => {
     return jest.fn().mockImplementation(function(editor) {
         this.editor = editor;
         this.lang = editor.lang;
         this.selection = editor.selection;
         this.format = editor.format;
+        this.inline = editor.inline;
         this.component = editor.component;
         this.menu = editor.menu;
         this.frameContext = editor.frameContext;
@@ -103,8 +104,10 @@ describe('Plugins - Dropdown - TextStyle', () => {
                 getNode: jest.fn().mockReturnValue(document.createElement('span'))
             },
             format: {
-                isLine: jest.fn().mockReturnValue(false),
-                applyInlineElement: jest.fn()
+                isLine: jest.fn().mockReturnValue(false)
+            },
+            inline: {
+                apply: jest.fn()
             },
             component: {
                 is: jest.fn().mockReturnValue(false)
@@ -352,10 +355,10 @@ describe('Plugins - Dropdown - TextStyle', () => {
             textStyle.action(mockTarget);
 
             expect(mockTarget.firstElementChild.cloneNode).toHaveBeenCalledWith(false);
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
-                    stylesToModify: ['color', '.__se__t-custom', '.highlight'],
+                    stylesToModify: ['color', 'font-weight', '.__se__t-custom', '.highlight'],
                     nodesToRemove: null,
                     strictRemove: true
                 }
@@ -369,10 +372,10 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
             textStyle.action(mockTarget);
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 null,
                 {
-                    stylesToModify: ['color', '.__se__t-custom', '.highlight'],
+                    stylesToModify: ['color', 'font-weight', '.__se__t-custom', '.highlight'],
                     nodesToRemove: ['SPAN'],
                     strictRemove: true
                 }
@@ -386,10 +389,10 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
             textStyle.action(mockTarget);
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
-                    stylesToModify: ['color'],
+                    stylesToModify: ['color', 'font-weight'],
                     nodesToRemove: null,
                     strictRemove: true
                 }
@@ -403,7 +406,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
             textStyle.action(mockTarget);
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
                     stylesToModify: ['.__se__t-custom', '.highlight'],
@@ -421,10 +424,10 @@ describe('Plugins - Dropdown - TextStyle', () => {
 
             textStyle.action(mockTarget);
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
-                    stylesToModify: ['font-family'],
+                    stylesToModify: ['font-family', 'line-height', 'margin'],
                     nodesToRemove: null,
                     strictRemove: true
                 }
@@ -557,7 +560,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
                 textStyle.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalled();
+            expect(mockEditor.inline.apply).toHaveBeenCalled();
         });
 
         it('should work with editor selection module', () => {

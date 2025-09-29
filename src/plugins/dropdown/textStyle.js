@@ -88,7 +88,7 @@ class TextStyle extends EditorInjector {
 
 		const newNode = dom.utils.hasClass(target, 'active') ? null : tempElement.cloneNode(false);
 		const removeNodes = newNode ? null : [tempElement.nodeName];
-		this.format.applyInlineElement(newNode, { stylesToModify: checkStyles, nodesToRemove: removeNodes, strictRemove: true });
+		this.inline.apply(newNode, { stylesToModify: checkStyles, nodesToRemove: removeNodes, strictRemove: true });
 
 		this.menu.dropdownOff();
 	}

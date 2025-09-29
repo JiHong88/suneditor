@@ -181,7 +181,7 @@ class Link extends EditorInjector {
 				true
 			);
 			this.selection.setRange(sc, 0, ec, ec.textContent.length);
-			this.format.applyInlineElement(null, { stylesToModify: null, nodesToRemove: ['A'], strictRemove: false });
+			this.inline.apply(null, { stylesToModify: null, nodesToRemove: ['A'], strictRemove: false });
 		} else {
 			/** delete */
 			dom.utils.removeItem(this.controller.currentTarget);

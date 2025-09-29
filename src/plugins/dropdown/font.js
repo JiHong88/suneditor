@@ -108,9 +108,9 @@ class Font extends EditorInjector {
 			if ((await this.triggerEvent('onFontActionBefore', { value })) === false) return;
 
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
-			this.format.applyInlineElement(newNode, { stylesToModify: ['font-family'], nodesToRemove: null, strictRemove: null });
+			this.inline.apply(newNode, { stylesToModify: ['font-family'], nodesToRemove: null, strictRemove: null });
 		} else {
-			this.format.applyInlineElement(null, { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true });
+			this.inline.apply(null, { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true });
 		}
 
 		this.menu.dropdownOff();

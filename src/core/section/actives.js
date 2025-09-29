@@ -257,7 +257,7 @@ export function FONT_STYLE(editor, command) {
 		nodeName = 'sub';
 	}
 
-	editor.format.applyInlineElement(el, { stylesToModify: StyleMap[command] || null, nodesToRemove: [nodeName], strictRemove: false });
+	editor.inline.apply(el, { stylesToModify: StyleMap[command] || null, nodesToRemove: [nodeName], strictRemove: false });
 	editor.focus();
 }
 

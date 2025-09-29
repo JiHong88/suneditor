@@ -746,7 +746,7 @@ HTML.prototype = {
 						oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
 					}
 
-					if (this.format._isIgnoreNodeChange(oNode)) {
+					if (this.inline._isIgnoreNodeChange(oNode)) {
 						oNode = oNode.nextSibling;
 						offset = 0;
 					}

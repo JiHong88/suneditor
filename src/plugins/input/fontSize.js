@@ -241,7 +241,7 @@ class FontSize extends EditorInjector {
 			if (this.#disableInput) return;
 
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + size + ';' });
-			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
+			this.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 
 			if (!keyCodeMap.isEnter(keyCode)) target.focus();
 		} finally {
@@ -266,7 +266,7 @@ class FontSize extends EditorInjector {
 			value = value > max ? max : value < min ? min : value;
 
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + this.#setSize(target, value + unit) + ';' });
-			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
+			this.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} finally {
 			this.isInputActive = false;
 			event.preventDefault();
@@ -313,12 +313,12 @@ class FontSize extends EditorInjector {
 			newSize = newSize < min ? min : newSize > max ? max : newSize;
 
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + newSize + unit + ';' });
-			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
+			this.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} else if (commandValue) {
 			const newNode = dom.utils.createElement('SPAN', { style: 'font-size: ' + commandValue + ';' });
-			this.format.applyInlineElement(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
+			this.inline.apply(newNode, { stylesToModify: ['font-size'], nodesToRemove: null, strictRemove: null });
 		} else {
-			this.format.applyInlineElement(null, { stylesToModify: ['font-size'], nodesToRemove: ['span'], strictRemove: true });
+			this.inline.apply(null, { stylesToModify: ['font-size'], nodesToRemove: ['span'], strictRemove: true });
 		}
 
 		this.menu.dropdownOff();

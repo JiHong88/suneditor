@@ -55,12 +55,13 @@ jest.mock('../../../../src/helper', () => ({
 }));
 
 // Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
+jest.mock('../../../../src/editorInjector', () => {
     return jest.fn().mockImplementation(function(editor) {
         this.editor = editor;
         this.lang = editor.lang;
         this.selection = editor.selection;
         this.format = editor.format;
+        this.inline = editor.inline;
         this.menu = editor.menu;
         this.frameContext = editor.frameContext;
         this.triggerEvent = editor.triggerEvent || jest.fn();
@@ -83,8 +84,10 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
                 getNode: jest.fn().mockReturnValue(document.createElement('span'))
             },
             format: {
-                isLine: jest.fn().mockReturnValue(false),
-                applyInlineElement: jest.fn()
+                isLine: jest.fn().mockReturnValue(false)
+            },
+            inline: {
+                apply: jest.fn()
             },
             menu: {
                 initDropdownTarget: jest.fn(),
@@ -268,7 +271,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
             expect(dom.utils.createElement).toHaveBeenCalledWith('SPAN', {
                 style: 'background-color: #ff0000;'
             });
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 { stylesToModify: ['background-color'], nodesToRemove: null, strictRemove: null }
             );
@@ -278,7 +281,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         it('should remove background color when no color provided', () => {
             backgroundColor.colorPickerAction('');
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true }
             );
@@ -288,7 +291,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         it('should remove background color when null color provided', () => {
             backgroundColor.colorPickerAction(null);
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true }
             );

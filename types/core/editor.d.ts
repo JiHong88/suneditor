@@ -266,6 +266,8 @@ declare class Editor {
 	format: import('./class/format').default;
 	/** @description HTML class instance @type {import('./class/html').default} */
 	html: import('./class/html').default;
+	/** @description Inline format class instance @type {import('./class/inline').default} */
+	inline: import('./class/inline').default;
 	/** @description Menu class instance @type {import('./class/menu').default} */
 	menu: import('./class/menu').default;
 	/** @description NodeTransform class instance @type {import('./class/nodeTransform').default} */

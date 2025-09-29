@@ -51,13 +51,14 @@ jest.mock('../../../../src/helper', () => ({
 }));
 
 // Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
+jest.mock('../../../../src/editorInjector', () => {
     return jest.fn().mockImplementation(function(editor) {
         this.editor = editor;
         this.lang = editor.lang;
         this.icons = editor.icons;
         this.status = editor.status;
         this.format = editor.format;
+        this.inline = editor.inline;
         this.menu = editor.menu;
         this.frameContext = editor.frameContext;
         this.triggerEvent = editor.triggerEvent || jest.fn();
@@ -84,8 +85,10 @@ describe('Plugins - Dropdown - Font', () => {
                 hasFocus: true
             },
             format: {
-                isLine: jest.fn().mockReturnValue(false),
-                applyInlineElement: jest.fn()
+                isLine: jest.fn().mockReturnValue(false)
+            },
+            inline: {
+                apply: jest.fn()
             },
             menu: {
                 initDropdownTarget: jest.fn(),
@@ -345,7 +348,7 @@ describe('Plugins - Dropdown - Font', () => {
             expect(dom.utils.createElement).toHaveBeenCalledWith('SPAN', {
                 style: 'font-family: Arial;'
             });
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 { stylesToModify: ['font-family'], nodesToRemove: null, strictRemove: null }
             );
@@ -379,7 +382,7 @@ describe('Plugins - Dropdown - Font', () => {
 
             await font.action(mockTarget);
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true }
             );
@@ -396,7 +399,7 @@ describe('Plugins - Dropdown - Font', () => {
             await font.action(mockTarget);
 
             expect(dom.utils.createElement).not.toHaveBeenCalled();
-            expect(mockEditor.format.applyInlineElement).not.toHaveBeenCalled();
+            expect(mockEditor.inline.apply).not.toHaveBeenCalled();
             expect(mockEditor.menu.dropdownOff).not.toHaveBeenCalled();
         });
 
@@ -405,7 +408,7 @@ describe('Plugins - Dropdown - Font', () => {
 
             await font.action(mockTarget);
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['font-family'], nodesToRemove: ['span'], strictRemove: true }
             );
@@ -492,7 +495,7 @@ describe('Plugins - Dropdown - Font', () => {
 
             await font.action(mockTarget);
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalled();
+            expect(mockEditor.inline.apply).toHaveBeenCalled();
         });
 
         it('should work with editor triggerEvent', async () => {

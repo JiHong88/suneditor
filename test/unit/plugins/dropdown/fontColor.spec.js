@@ -55,12 +55,13 @@ jest.mock('../../../../src/helper', () => ({
 }));
 
 // Mock EditorInjector
-jest.mock('../../../../src/editorInjector/_core.js', () => {
+jest.mock('../../../../src/editorInjector', () => {
     return jest.fn().mockImplementation(function(editor) {
         this.editor = editor;
         this.lang = editor.lang;
         this.selection = editor.selection;
         this.format = editor.format;
+        this.inline = editor.inline;
         this.menu = editor.menu;
         this.frameContext = editor.frameContext;
         this.triggerEvent = editor.triggerEvent || jest.fn();
@@ -83,8 +84,10 @@ describe('Plugins - Dropdown - FontColor', () => {
                 getNode: jest.fn().mockReturnValue(document.createElement('span'))
             },
             format: {
-                isLine: jest.fn().mockReturnValue(false),
-                applyInlineElement: jest.fn()
+                isLine: jest.fn().mockReturnValue(false)
+            },
+            inline: {
+                apply: jest.fn()
             },
             menu: {
                 initDropdownTarget: jest.fn(),
@@ -276,7 +279,7 @@ describe('Plugins - Dropdown - FontColor', () => {
             expect(dom.utils.createElement).toHaveBeenCalledWith('SPAN', {
                 style: 'color: #00ff00;'
             });
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 { stylesToModify: ['color'], nodesToRemove: null, strictRemove: null }
             );
@@ -286,7 +289,7 @@ describe('Plugins - Dropdown - FontColor', () => {
         it('should remove font color when no color provided', () => {
             fontColor.colorPickerAction('');
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['color'], nodesToRemove: ['span'], strictRemove: true }
             );
@@ -296,7 +299,7 @@ describe('Plugins - Dropdown - FontColor', () => {
         it('should remove font color when null color provided', () => {
             fontColor.colorPickerAction(null);
 
-            expect(mockEditor.format.applyInlineElement).toHaveBeenCalledWith(
+            expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 null,
                 { stylesToModify: ['color'], nodesToRemove: ['span'], strictRemove: true }
             );

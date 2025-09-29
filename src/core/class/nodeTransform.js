@@ -160,7 +160,7 @@ NodeTransform.prototype = {
 				next = /** @type {HTMLElement} */ (children[i + 1]);
 				if (!child) break;
 				if (dom.check.isBreak(child) || dom.check.isMedia(child) || dom.check.isInputElement(child)) continue;
-				if ((onlyText && inst.format._isIgnoreNodeChange(child)) || (!onlyText && (dom.check.isTableElements(child) || dom.check.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))) {
+				if ((onlyText && inst.inline._isIgnoreNodeChange(child)) || (!onlyText && (dom.check.isTableElements(child) || dom.check.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))) {
 					if (dom.check.isTableElements(child) || dom.check.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}

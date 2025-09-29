@@ -58,6 +58,8 @@ declare class EditorInjector {
 	format: import('./_classes').default['format'];
 	/** @type {import('./_classes').default['html']} */
 	html: import('./_classes').default['html'];
+	/** @type {import('./_classes').default['inline']} */
+	inline: import('./_classes').default['inline'];
 	/** @type {import('./_classes').default['menu']} */
 	menu: import('./_classes').default['menu'];
 	/** @type {import('./_classes').default['nodeTransform']} */

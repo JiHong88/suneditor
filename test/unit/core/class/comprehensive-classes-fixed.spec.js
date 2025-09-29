@@ -112,8 +112,6 @@ describe('Comprehensive Core Classes - Unit Tests', () => {
 			expect(typeof format.removeList).toBe('function');
 			expect(typeof format.indent).toBe('function');
 			expect(typeof format.outdent).toBe('function');
-			expect(typeof format.applyInlineElement).toBe('function');
-			expect(typeof format.removeInlineElement).toBe('function');
 			expect(typeof format.isLine).toBe('function');
 			expect(typeof format.isBlock).toBe('function');
 			expect(typeof format.getLines).toBe('function');
@@ -495,27 +493,6 @@ describe('Comprehensive Core Classes - Unit Tests', () => {
 		beforeEach(() => {
 			format = editor.core.eventManager.format;
 			wysiwyg = editor.context.get('wysiwyg');
-		});
-
-		it('should handle applyInlineElement method', () => {
-			wysiwyg.innerHTML = '<p>Test content</p>';
-
-			// Create selection
-			const textNode = wysiwyg.firstChild.firstChild;
-			const range = document.createRange();
-			range.setStart(textNode, 0);
-			range.setEnd(textNode, 4);
-
-			const selection = window.getSelection();
-			selection.removeAllRanges();
-			selection.addRange(range);
-
-			// Create strong node for inline formatting
-			const strongNode = document.createElement('strong');
-
-			expect(() => {
-				format.applyInlineElement(strongNode);
-			}).not.toThrow();
 		});
 
 		it('should have text style node identification method', () => {

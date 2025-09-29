@@ -20,6 +20,7 @@ import Char from './class/char';
 import Component from './class/component';
 import Format from './class/format';
 import HTML from './class/html';
+import Inline from './class/inline';
 import Menu from './class/menu';
 import NodeTransform from './class/nodeTransform';
 import Offset from './class/offset';
@@ -320,6 +321,8 @@ function Editor(multiTargets, options) {
 	this.format = null;
 	/** @description HTML class instance @type {import('./class/html').default} */
 	this.html = null;
+	/** @description Inline format class instance @type {import('./class/inline').default} */
+	this.inline = null;
 	/** @description Menu class instance @type {import('./class/menu').default} */
 	this.menu = null;
 	/** @description NodeTransform class instance @type {import('./class/nodeTransform').default} */
@@ -640,7 +643,7 @@ Editor.prototype = {
 				this.history.redo();
 				break;
 			case 'removeFormat':
-				this.format.removeInlineElement();
+				this.inline.remove();
 				this.focus();
 				break;
 			case 'print':
@@ -1682,6 +1685,7 @@ Editor.prototype = {
 		this.nodeTransform = new NodeTransform(this);
 		this.component = new Component(this);
 		this.format = new Format(this);
+		this.inline = new Inline(this);
 		this.menu = new Menu(this);
 		this.char = new Char(this);
 		this.ui = new UI(this);
@@ -1694,6 +1698,7 @@ Editor.prototype = {
 		ClassInjector.call(this.component, this);
 		ClassInjector.call(this.format, this);
 		ClassInjector.call(this.html, this);
+		ClassInjector.call(this.inline, this);
 		ClassInjector.call(this.menu, this);
 		ClassInjector.call(this.nodeTransform, this);
 		ClassInjector.call(this.offset, this);
@@ -1710,6 +1715,7 @@ Editor.prototype = {
 		delete this.component['component'];
 		delete this.format['format'];
 		delete this.html['html'];
+		delete this.inline['inline'];
 		delete this.menu['menu'];
 		delete this.nodeTransform['nodeTransform'];
 		delete this.offset['offset'];

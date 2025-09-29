@@ -96,9 +96,9 @@ class BackgroundColor extends EditorInjector {
 	colorPickerAction(color) {
 		if (color) {
 			const newNode = dom.utils.createElement('SPAN', { style: 'background-color: ' + color + ';' });
-			this.format.applyInlineElement(newNode, { stylesToModify: ['background-color'], nodesToRemove: null, strictRemove: null });
+			this.inline.apply(newNode, { stylesToModify: ['background-color'], nodesToRemove: null, strictRemove: null });
 		} else {
-			this.format.applyInlineElement(null, { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true });
+			this.inline.apply(null, { stylesToModify: ['background-color'], nodesToRemove: ['span'], strictRemove: true });
 		}
 
 		this.menu.dropdownOff();

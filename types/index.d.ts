@@ -18,6 +18,7 @@ export * from './core/class/char';
 export * from './core/class/component';
 export * from './core/class/format';
 export * from './core/class/html';
+export * from './core/class/inline';
 export * from './core/class/menu';
 export * from './core/class/nodeTransform';
 export * from './core/class/offset';

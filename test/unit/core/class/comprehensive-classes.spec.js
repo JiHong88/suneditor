@@ -509,26 +509,6 @@ describe('Comprehensive Core Classes - Unit Tests', () => {
 			wysiwyg = editor.context.get('wysiwyg');
 		});
 
-		it('should handle applyInlineElement method', () => {
-			wysiwyg.innerHTML = '<p>Test content for styling</p>';
-
-			// Create selection
-			const range = document.createRange();
-			const textNode = wysiwyg.firstChild.firstChild;
-			range.setStart(textNode, 0);
-			range.setEnd(textNode, 4);
-
-			const windowSelection = window.getSelection();
-			windowSelection.removeAllRanges();
-			windowSelection.addRange(range);
-
-			const strongNode = document.createElement('strong');
-
-			expect(() => {
-				format.applyInlineElement(strongNode);
-			}).not.toThrow();
-		});
-
 		it('should identify text style nodes', () => {
 			wysiwyg.innerHTML = '<p>Text with <strong>bold</strong> and <em>italic</em></p>';
 
