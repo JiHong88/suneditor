@@ -3,6 +3,7 @@
  */
 
 import Editor from '../../../src/core/editor';
+import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../__mocks__/editorIntegration';
 
 describe('Core - Editor', () => {
     describe('Editor constructor function', () => {
@@ -357,6 +358,46 @@ describe('Core - Editor', () => {
                            editorString.includes('@constructor');
 
             expect(hasJSDoc).toBe(true);
+        });
+    });
+
+    describe('Instance methods', () => {
+        let editor;
+
+        beforeEach(async () => {
+            editor = createTestEditor();
+            await waitForEditorReady(editor);
+        });
+
+        afterEach(() => {
+            destroyTestEditor(editor);
+        });
+
+        describe('setDir', () => {
+            it('should set the text direction to rtl', () => {
+                // when
+                editor.setDir('rtl');
+
+                // then
+                const frame = editor.frameContext;
+                const wysiwyg = frame.get('wysiwyg');
+                expect(wysiwyg.classList.contains('se-rtl')).toBe(true);
+                expect(editor.options.get('_rtl')).toBe(true);
+            });
+
+            it('should set the text direction to ltr', () => {
+                // given
+                editor.setDir('rtl');
+
+                // when
+                editor.setDir('ltr');
+
+                // then
+                const frame = editor.frameContext;
+                const wysiwyg = frame.get('wysiwyg');
+                expect(wysiwyg.classList.contains('se-rtl')).toBe(false);
+                expect(editor.options.get('_rtl')).toBe(false);
+            });
         });
     });
 });
