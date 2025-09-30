@@ -51,6 +51,7 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
         this.icons = editor.icons;
         this.selection = editor.selection;
         this.format = editor.format;
+        this.listFormat = editor.listFormat;
         this.history = editor.history;
         this.menu = editor.menu;
         this.frameContext = editor.frameContext;
@@ -78,7 +79,9 @@ describe('Plugins - Command - List_numbered', () => {
             },
             format: {
                 getBlock: jest.fn(),
-                applyList: jest.fn()
+            },
+            listFormat: {
+                apply: jest.fn()
             },
             history: {
                 push: jest.fn()
@@ -293,11 +296,11 @@ describe('Plugins - Command - List_numbered', () => {
     describe('submit method', () => {
         it('should apply numbered list with type', () => {
             const mockRange = { sc: 'start', so: 0, ec: 'end', eo: 1 };
-            mockEditor.format.applyList.mockReturnValue(mockRange);
+            mockEditor.listFormat.apply.mockReturnValue(mockRange);
 
             listNumbered.submit('upper-alpha');
 
-            expect(mockEditor.format.applyList).toHaveBeenCalledWith('ol:upper-alpha', null, false);
+            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ol:upper-alpha', null, false);
             expect(mockEditor.selection.setRange).toHaveBeenCalledWith('start', 0, 'end', 1);
             expect(mockEditor.focus).toHaveBeenCalled();
             expect(mockEditor.history.push).toHaveBeenCalledWith(false);
@@ -305,15 +308,15 @@ describe('Plugins - Command - List_numbered', () => {
 
         it('should apply numbered list without type', () => {
             const mockRange = { sc: 'start', so: 0, ec: 'end', eo: 1 };
-            mockEditor.format.applyList.mockReturnValue(mockRange);
+            mockEditor.listFormat.apply.mockReturnValue(mockRange);
 
             listNumbered.submit();
 
-            expect(mockEditor.format.applyList).toHaveBeenCalledWith('ol:', null, false);
+            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ol:', null, false);
         });
 
-        it('should handle null range from applyList', () => {
-            mockEditor.format.applyList.mockReturnValue(null);
+        it('should handle null range from apply', () => {
+            mockEditor.listFormat.apply.mockReturnValue(null);
 
             listNumbered.submit('decimal');
 

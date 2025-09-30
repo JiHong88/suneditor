@@ -49,6 +49,7 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
         this.icons = editor.icons;
         this.selection = editor.selection;
         this.format = editor.format;
+        this.listFormat = editor.listFormat;
         this.history = editor.history;
         this.menu = editor.menu;
         this.frameContext = editor.frameContext;
@@ -76,7 +77,9 @@ describe('Plugins - Command - List_bulleted', () => {
             },
             format: {
                 getBlock: jest.fn(),
-                applyList: jest.fn()
+            },
+            listFormat: {
+                apply: jest.fn()
             },
             history: {
                 push: jest.fn()
@@ -345,11 +348,11 @@ describe('Plugins - Command - List_bulleted', () => {
     describe('submit method', () => {
         it('should apply list with type and update selection', () => {
             const mockRange = { sc: 'start', so: 0, ec: 'end', eo: 1 };
-            mockEditor.format.applyList.mockReturnValue(mockRange);
+            mockEditor.listFormat.apply.mockReturnValue(mockRange);
 
             listBulleted.submit('circle');
 
-            expect(mockEditor.format.applyList).toHaveBeenCalledWith('ul:circle', null, false);
+            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ul:circle', null, false);
             expect(mockEditor.selection.setRange).toHaveBeenCalledWith('start', 0, 'end', 1);
             expect(mockEditor.focus).toHaveBeenCalled();
             expect(mockEditor.history.push).toHaveBeenCalledWith(false);
@@ -357,15 +360,15 @@ describe('Plugins - Command - List_bulleted', () => {
 
         it('should apply list without type', () => {
             const mockRange = { sc: 'start', so: 0, ec: 'end', eo: 1 };
-            mockEditor.format.applyList.mockReturnValue(mockRange);
+            mockEditor.listFormat.apply.mockReturnValue(mockRange);
 
             listBulleted.submit();
 
-            expect(mockEditor.format.applyList).toHaveBeenCalledWith('ul:', null, false);
+            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ul:', null, false);
         });
 
-        it('should handle null range from applyList', () => {
-            mockEditor.format.applyList.mockReturnValue(null);
+        it('should handle null range from apply', () => {
+            mockEditor.listFormat.apply.mockReturnValue(null);
 
             listBulleted.submit('disc');
 

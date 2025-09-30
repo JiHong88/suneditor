@@ -358,7 +358,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
             expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
-                    stylesToModify: ['color', 'font-weight', '.__se__t-custom', '.highlight'],
+                    stylesToModify: ['color', '.__se__t-custom', '.highlight'],
                     nodesToRemove: null,
                     strictRemove: true
                 }
@@ -375,7 +375,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
             expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 null,
                 {
-                    stylesToModify: ['color', 'font-weight', '.__se__t-custom', '.highlight'],
+                    stylesToModify: ['color', '.__se__t-custom', '.highlight'],
                     nodesToRemove: ['SPAN'],
                     strictRemove: true
                 }
@@ -392,7 +392,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
             expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
-                    stylesToModify: ['color', 'font-weight'],
+                    stylesToModify: ['color'],
                     nodesToRemove: null,
                     strictRemove: true
                 }
@@ -427,7 +427,7 @@ describe('Plugins - Dropdown - TextStyle', () => {
             expect(mockEditor.inline.apply).toHaveBeenCalledWith(
                 expect.any(Object),
                 {
-                    stylesToModify: ['font-family', 'line-height', 'margin'],
+                    stylesToModify: ['font-family'],
                     nodesToRemove: null,
                     strictRemove: true
                 }

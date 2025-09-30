@@ -108,8 +108,8 @@ describe('Comprehensive Core Classes - Unit Tests', () => {
 			expect(typeof format.getBlock).toBe('function');
 			expect(typeof format.applyBlock).toBe('function');
 			expect(typeof format.removeBlock).toBe('function');
-			expect(typeof format.applyList).toBe('function');
-			expect(typeof format.removeList).toBe('function');
+			expect(typeof editor.core.eventManager.listFormat.apply).toBe('function');
+			expect(typeof editor.core.eventManager.listFormat.remove).toBe('function');
 			expect(typeof format.indent).toBe('function');
 			expect(typeof format.outdent).toBe('function');
 			expect(typeof format.isLine).toBe('function');

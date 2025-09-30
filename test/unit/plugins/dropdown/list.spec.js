@@ -58,6 +58,7 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
         this.lang = editor.lang;
         this.selection = editor.selection;
         this.format = editor.format;
+        this.listFormat = editor.listFormat;
         this.history = editor.history;
         this.menu = editor.menu;
         this.frameContext = editor.frameContext;
@@ -86,7 +87,9 @@ describe('Plugins - Dropdown - List', () => {
                 setRange: jest.fn()
             },
             format: {
-                applyList: jest.fn().mockReturnValue({
+            },
+            listFormat: {
+                apply: jest.fn().mockReturnValue({
                     sc: 'start', so: 0, ec: 'end', eo: 1
                 })
             },
@@ -299,7 +302,7 @@ describe('Plugins - Dropdown - List', () => {
 
             list.action(mockTarget);
 
-            expect(mockEditor.format.applyList).toHaveBeenCalledWith('ol:decimal', null, false);
+            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ol:decimal', null, false);
             expect(mockEditor.selection.setRange).toHaveBeenCalledWith('start', 0, 'end', 1);
             expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
             expect(mockEditor.history.push).toHaveBeenCalledWith(false);
@@ -314,7 +317,7 @@ describe('Plugins - Dropdown - List', () => {
 
             list.action(mockTarget);
 
-            expect(mockEditor.format.applyList).toHaveBeenCalledWith('ul:disc', null, false);
+            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ul:disc', null, false);
             expect(mockEditor.selection.setRange).toHaveBeenCalledWith('start', 0, 'end', 1);
         });
 
@@ -327,15 +330,15 @@ describe('Plugins - Dropdown - List', () => {
 
             list.action(mockTarget);
 
-            expect(mockEditor.format.applyList).toHaveBeenCalledWith('ol:', null, false);
+            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('ol:', null, false);
         });
 
-        it('should handle null range from applyList', () => {
+        it('should handle null range from apply', () => {
             mockTarget.getAttribute.mockImplementation((attr) => {
                 if (attr === 'data-command') return 'ul';
                 return null;
             });
-            mockEditor.format.applyList.mockReturnValue(null);
+            mockEditor.listFormat.apply.mockReturnValue(null);
 
             list.action(mockTarget);
 
@@ -351,7 +354,7 @@ describe('Plugins - Dropdown - List', () => {
                 list.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.applyList).toHaveBeenCalledWith('null:', null, false);
+            expect(mockEditor.listFormat.apply).toHaveBeenCalledWith('null:', null, false);
         });
     });
 
@@ -395,7 +398,7 @@ describe('Plugins - Dropdown - List', () => {
                 list.action(mockTarget);
             }).not.toThrow();
 
-            expect(mockEditor.format.applyList).toHaveBeenCalled();
+            expect(mockEditor.listFormat.apply).toHaveBeenCalled();
         });
 
         it('should work with editor selection module', () => {
