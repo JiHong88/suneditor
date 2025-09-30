@@ -35,73 +35,73 @@ declare namespace _default {
 	export { anchor };
 }
 export default _default;
+import audioGallery from './browser/audioGallery';
+import fileBrowser from './browser/fileBrowser';
+import fileGallery from './browser/fileGallery';
+import imageGallery from './browser/imageGallery';
+import videoGallery from './browser/videoGallery';
 import blockquote from './command/blockquote';
 import exportPDF from './command/exportPDF';
 import fileUpload from './command/fileUpload';
 import list_bulleted from './command/list_bulleted';
 import list_numbered from './command/list_numbered';
-import mention from './field/mention';
 import align from './dropdown/align';
+import backgroundColor from './dropdown/backgroundColor';
 import font from './dropdown/font';
 import fontColor from './dropdown/fontColor';
-import backgroundColor from './dropdown/backgroundColor';
-import list from './dropdown/list';
-import table from './dropdown/table';
 import formatBlock from './dropdown/formatBlock';
 import hr from './dropdown/hr';
 import layout from './dropdown/layout';
 import lineHeight from './dropdown/lineHeight';
-import template from './dropdown/template';
+import list from './dropdown/list';
 import paragraphStyle from './dropdown/paragraphStyle';
+import table from './dropdown/table';
+import template from './dropdown/template';
 import textStyle from './dropdown/textStyle';
-import link from './modal/link';
-import image from './modal/image';
-import video from './modal/video';
-import audio from './modal/audio';
-import embed from './modal/embed';
-import math from './modal/math';
-import drawing from './modal/drawing';
-import imageGallery from './browser/imageGallery';
-import videoGallery from './browser/videoGallery';
-import audioGallery from './browser/audioGallery';
-import fileGallery from './browser/fileGallery';
-import fileBrowser from './browser/fileBrowser';
+import mention from './field/mention';
 import fontSize from './input/fontSize';
 import pageNavigator from './input/pageNavigator';
+import audio from './modal/audio';
+import drawing from './modal/drawing';
+import embed from './modal/embed';
+import image from './modal/image';
+import link from './modal/link';
+import math from './modal/math';
+import video from './modal/video';
 import anchor from './popup/anchor';
 export {
-	blockquote,
-	exportPDF,
-	fileUpload,
-	list_bulleted,
-	list_numbered,
-	mention,
 	align,
+	anchor,
+	audio,
+	audioGallery,
+	backgroundColor,
+	blockquote,
+	drawing,
+	embed,
+	exportPDF,
+	fileBrowser,
+	fileGallery,
+	fileUpload,
 	font,
 	fontColor,
-	backgroundColor,
-	list,
-	table,
+	fontSize,
 	formatBlock,
 	hr,
+	image,
+	imageGallery,
 	layout,
 	lineHeight,
-	template,
-	paragraphStyle,
-	textStyle,
 	link,
-	image,
-	video,
-	audio,
-	embed,
+	list,
+	list_bulleted,
+	list_numbered,
 	math,
-	drawing,
-	imageGallery,
-	videoGallery,
-	audioGallery,
-	fileGallery,
-	fileBrowser,
-	fontSize,
+	mention,
 	pageNavigator,
-	anchor
+	paragraphStyle,
+	table,
+	template,
+	textStyle,
+	video,
+	videoGallery
 };

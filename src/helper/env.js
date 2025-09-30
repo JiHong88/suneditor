@@ -40,13 +40,11 @@ export function getPageStyle(doc) {
 	const sheets = (doc || _d).styleSheets;
 
 	for (let i = 0, len = sheets.length, rules; i < len; i++) {
-		/* eslint-disable @typescript-eslint/no-unused-vars */
 		try {
 			rules = sheets[i].cssRules;
-		} catch (e) {
+		} catch {
 			continue;
 		}
-		/* eslint-disable @typescript-eslint/no-unused-vars */
 
 		if (rules) {
 			for (let c = 0, cLen = rules.length; c < cLen; c++) {
@@ -120,7 +118,6 @@ export const isResizeObserverSupported = (() => {
  * @returns {boolean} Whether support navigator.clipboard or not.
  */
 export const isClipboardSupported = (() => {
-	/* eslint-disable-next-line compat/compat */
 	return typeof navigator.clipboard?.write === 'function';
 })();
 
@@ -177,7 +174,6 @@ export const isSafari = (() => {
  * @type {boolean}
  */
 export const isMobile = (() => {
-	/* eslint-disable-next-line compat/compat */
 	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 })();
 
@@ -186,7 +182,6 @@ export const isMobile = (() => {
  * @type {boolean}
  */
 export const isTouchDevice = (() => {
-	/* eslint-disable-next-line compat/compat */
 	return navigator.maxTouchPoints > 0 && 'ontouchstart' in _w;
 })();
 

@@ -2764,7 +2764,6 @@ class Table extends EditorInjector {
 						c++;
 					}
 
-					/* eslint-disable @typescript-eslint/no-unused-vars */
 					try {
 						if (rowspan > 1) {
 							const rowspanNum = rowspan - 1;
@@ -2774,10 +2773,9 @@ class Table extends EditorInjector {
 						} else if (colspan > 1) {
 							mergeInfo[rowIndex][cellIndex] += colspan - 1;
 						}
-					} catch (err) {
+					} catch {
 						// ignore error
 					}
-					/* eslint-disable @typescript-eslint/no-unused-vars */
 
 					const isBottom = rowIndex + rowspan - 1 === re;
 					if (rowIndex === rs) cells.top.push(e);

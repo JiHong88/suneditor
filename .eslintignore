@@ -1,8 +1,0 @@
-node_modules
-dist
-sample
-coverage
-test
-jest.conf.js
-webpack/**/*
-**/*.css

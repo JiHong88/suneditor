@@ -496,7 +496,6 @@ Inline.prototype = {
 
 		// add tag
 		_removeCheck.v = false;
-		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		const el = element;
 		const nNodeArray = [newInnerNode];
@@ -951,7 +950,6 @@ Inline.prototype = {
 
 		// add tag
 		_removeCheck.v = false;
-		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		const el = element;
 		const nNodeArray = [newInnerNode];
@@ -1269,7 +1267,6 @@ Inline.prototype = {
 
 		// add tag
 		_removeCheck.v = false;
-		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		const pNode = element.cloneNode(false);
 		const nNodeArray = [newInnerNode];
@@ -1397,7 +1394,6 @@ Inline.prototype = {
 
 		// add tag
 		_removeCheck.v = false;
-		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		const el = element;
 		const nNodeArray = [newInnerNode];

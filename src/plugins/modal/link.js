@@ -3,7 +3,7 @@ import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { dom, numbers } from '../../helper';
 
 /**
- * @typedef {import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams} ModalAnchorEditorParams
+ * @typedef {import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams} ModalAnchorEditorParams_link
  */
 
 /**
@@ -16,7 +16,7 @@ import { dom, numbers } from '../../helper';
  */
 
 /**
- * @typedef {Omit<LinkOptions & ModalAnchorEditorParams, ''>} LinkPluginOptions
+ * @typedef {Omit<LinkOptions & ModalAnchorEditorParams_link, ''>} LinkPluginOptions
  */
 
 /**

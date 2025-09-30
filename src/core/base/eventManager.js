@@ -612,7 +612,6 @@ EventManager.prototype = {
 			return;
 		}
 
-		/* eslint-disable @typescript-eslint/no-unused-vars */
 		try {
 			if (commonCon.nodeType === 3) {
 				format = dom.utils.createElement(formatName || this.options.get('defaultLine'));
@@ -627,13 +626,12 @@ EventManager.prototype = {
 				focusNode.parentNode.insertBefore(zeroWidth, focusNode);
 				focusNode = zeroWidth;
 			}
-		} catch (e) {
+		} catch {
 			this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
 			this.editor.effectNode = null;
 			this.selection._init();
 			return;
 		}
-		/* eslint-disable @typescript-eslint/no-unused-vars */
 
 		if (format) {
 			if (dom.check.isBreak(format.nextSibling)) dom.utils.removeItem(format.nextSibling);

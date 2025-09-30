@@ -19,6 +19,8 @@ function ClassInjector(editor) {
 	this.html = editor.html;
 	/** @description Inline format class instance @type {__se__EditorCore['inline']} */
 	this.inline = editor.inline;
+	/** @description List format class instance @type {__se__EditorCore['listFormat']} */
+	this.listFormat = editor.listFormat;
 	/** @description Menu class instance @type {__se__EditorCore['menu']} */
 	this.menu = editor.menu;
 	/** @description NodeTransform class instance @type {__se__EditorCore['nodeTransform']} */

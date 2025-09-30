@@ -112,7 +112,7 @@ class List_bulleted extends EditorInjector {
 	 * @param {string} [type=""] List type
 	 */
 	submit(type) {
-		const range = this.format.applyList(`ul:${type || ''}`, null, false);
+		const range = this.listFormat.apply(`ul:${type || ''}`, null, false);
 		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
 		this.editor.focus();
 		this.history.push(false);

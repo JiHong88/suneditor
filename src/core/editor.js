@@ -21,6 +21,7 @@ import Component from './class/component';
 import Format from './class/format';
 import HTML from './class/html';
 import Inline from './class/inline';
+import ListFormat from './class/listFormat';
 import Menu from './class/menu';
 import NodeTransform from './class/nodeTransform';
 import Offset from './class/offset';
@@ -323,6 +324,8 @@ function Editor(multiTargets, options) {
 	this.html = null;
 	/** @description Inline format class instance @type {import('./class/inline').default} */
 	this.inline = null;
+	/** @description List format class instance @type {import('./class/listFormat').default} */
+	this.listFormat = null;
 	/** @description Menu class instance @type {import('./class/menu').default} */
 	this.menu = null;
 	/** @description NodeTransform class instance @type {import('./class/nodeTransform').default} */
@@ -1134,7 +1137,7 @@ Editor.prototype = {
 			delete obj[k];
 		}
 
-		obj = ['eventManager', 'instanceCheck', 'char', 'component', 'format', 'html', 'menu', 'nodeTransform', 'offset', 'selection', 'shortcuts', 'toolbar', 'ui', 'viewer'];
+		obj = ['eventManager', 'instanceCheck', 'char', 'component', 'format', 'html', 'inline', 'listFormat', 'menu', 'nodeTransform', 'offset', 'selection', 'shortcuts', 'toolbar', 'ui', 'viewer'];
 		for (let i = 0, len = obj.length, c; i < len; i++) {
 			c = this[obj[i]];
 			for (const k in c) {
@@ -1686,6 +1689,7 @@ Editor.prototype = {
 		this.component = new Component(this);
 		this.format = new Format(this);
 		this.inline = new Inline(this);
+		this.listFormat = new ListFormat(this);
 		this.menu = new Menu(this);
 		this.char = new Char(this);
 		this.ui = new UI(this);
@@ -1699,6 +1703,7 @@ Editor.prototype = {
 		ClassInjector.call(this.format, this);
 		ClassInjector.call(this.html, this);
 		ClassInjector.call(this.inline, this);
+		ClassInjector.call(this.listFormat, this);
 		ClassInjector.call(this.menu, this);
 		ClassInjector.call(this.nodeTransform, this);
 		ClassInjector.call(this.offset, this);
@@ -1716,6 +1721,7 @@ Editor.prototype = {
 		delete this.format['format'];
 		delete this.html['html'];
 		delete this.inline['inline'];
+		delete this.listFormat['listFormat'];
 		delete this.menu['menu'];
 		delete this.nodeTransform['nodeTransform'];
 		delete this.offset['offset'];

@@ -92,7 +92,7 @@ class List extends EditorInjector {
 	action(target) {
 		const command = target.getAttribute('data-command');
 		const type = target.getAttribute('data-value') || '';
-		const range = this.format.applyList(`${command}:${type}`, null, false);
+		const range = this.listFormat.apply(`${command}:${type}`, null, false);
 		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
 
 		this.menu.dropdownOff();

@@ -1,25 +1,12 @@
 export default Format;
 export type FormatThis = Omit<Format & Partial<__se__EditorInjector>, 'format'>;
-export type NodeStyleContainerType = {
-	ancestor?: (Node | null) | undefined;
-	offset?: (number | null) | undefined;
-	container?: (Node | null) | undefined;
-	endContainer?: (Node | null) | undefined;
-};
 /**
  * @typedef {Omit<Format & Partial<__se__EditorInjector>, 'format'>} FormatThis
  */
 /**
- * @typedef {Object} NodeStyleContainerType
- * @property {?Node=} ancestor
- * @property {?number=} offset
- * @property {?Node=} container
- * @property {?Node=} endContainer
- */
-/**
  * @constructor
  * @this {FormatThis}
- * @description Classes related to editor formats such as line creation, line retrieval from selected range, etc.
+ * @description Classes related to editor formats such as "line" and "block".
  * @param {__se__EditorCore} editor - The root editor instance
  */
 declare function Format(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, editor: __se__EditorCore): void;
@@ -28,16 +15,9 @@ declare class Format {
 	 * @typedef {Omit<Format & Partial<__se__EditorInjector>, 'format'>} FormatThis
 	 */
 	/**
-	 * @typedef {Object} NodeStyleContainerType
-	 * @property {?Node=} ancestor
-	 * @property {?number=} offset
-	 * @property {?Node=} container
-	 * @property {?Node=} endContainer
-	 */
-	/**
 	 * @constructor
 	 * @this {FormatThis}
-	 * @description Classes related to editor formats such as line creation, line retrieval from selected range, etc.
+	 * @description Classes related to editor formats such as "line" and "block".
 	 * @param {__se__EditorCore} editor - The root editor instance
 	 */
 	constructor(editor: __se__EditorCore);
@@ -140,42 +120,6 @@ declare class Format {
 		ec: Node;
 		eo: number;
 		removeArray: Array<Node> | null;
-	};
-	/**
-	 * @this {FormatThis}
-	 * @description Append all selected "line" element to the list and insert.
-	 * @param {string} type List type. (ol | ul):[listStyleType]
-	 * @param {Array<Node>} selectedCells "line" elements or list cells.
-	 * @param {boolean} nested If true, indenting existing list cells.
-	 */
-	applyList(
-		this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>,
-		type: string,
-		selectedCells: Array<Node>,
-		nested: boolean
-	): {
-		sc: Node;
-		so: number;
-		ec: Node;
-		eo: number;
-	};
-	/**
-	 * @this {FormatThis}
-	 * @description "selectedCells" array are detached from the list element.
-	 * - The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
-	 * @param {Array<Node>} selectedCells Array of ["line", li] elements(LI, P...) to remove.
-	 * @param {boolean} shouldDelete If true, It does not just remove the list, it deletes the content.
-	 * @returns {{sc: Node, ec: Node}} Node information after deletion
-	 * - sc: Start container node
-	 * - ec: End container node
-	 */
-	removeList(
-		this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>,
-		selectedCells: Array<Node>,
-		shouldDelete: boolean
-	): {
-		sc: Node;
-		ec: Node;
 	};
 	/**
 	 * @this {FormatThis}
@@ -319,81 +263,6 @@ declare class Format {
 		startOffset: number;
 		endOffset: number;
 	};
-	/**
-	 * @private
-	 * @this {FormatThis}
-	 * @description Attaches a nested list structure by merging adjacent lists if applicable.
-	 * - Ensures that the nested list is placed correctly in the document structure.
-	 * @param {Element} originList The original list element where the nested list is inserted.
-	 * @param {Element} innerList The nested list element.
-	 * @param {Element} prev The previous sibling element.
-	 * @param {Element} next The next sibling element.
-	 * @param {{s: Array<number> | null, e: Array<number> | null, sl: Node | null, el: Node | null}} nodePath Object storing the start and end node paths.
-	 * - s : Start node path.
-	 * - e : End node path.
-	 * - sl : Start node's parent element.
-	 * - el : End node's parent element.
-	 * @returns {Node} The attached inner list.
-	 */
-	_attachNested(
-		this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>,
-		originList: Element,
-		innerList: Element,
-		prev: Element,
-		next: Element,
-		nodePath: {
-			s: Array<number> | null;
-			e: Array<number> | null;
-			sl: Node | null;
-			el: Node | null;
-		}
-	): Node;
-	/**
-	 * @private
-	 * @this {FormatThis}
-	 * @description Detaches a nested list structure by extracting list items from their parent list.
-	 * - Ensures proper restructuring of the list elements.
-	 * @param {Array<HTMLElement>} cells The list items to be detached.
-	 * @returns {{cc: Node, sc: Node, ec: Node}} An object containing reference nodes for repositioning.
-	 * - cc : The parent node of the first list item.
-	 * - sc : The first list item.
-	 * - ec : The last list item.
-	 */
-	_detachNested(
-		this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>,
-		cells: Array<HTMLElement>
-	): {
-		cc: Node;
-		sc: Node;
-		ec: Node;
-	};
-	/**
-	 * @private
-	 * @this {FormatThis}
-	 * @description Nest list cells or cancel nested cells.
-	 * @param {Array<HTMLElement>} selectedCells List cells.
-	 * @param {boolean} nested Nested or cancel nested.
-	 */
-	_applyNestedList(
-		this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>,
-		selectedCells: Array<HTMLElement>,
-		nested: boolean
-	): {
-		sc: Node;
-		so: number;
-		ec: Node;
-		eo: number;
-	};
-	/**
-	 * @private
-	 * @this {FormatThis}
-	 * @description Detach Nested all nested lists under the "baseNode".
-	 * - Returns a list with nested removed.
-	 * @param {HTMLElement} baseNode Element on which to base.
-	 * @param {boolean} all If true, it also detach all nested lists of a returned list.
-	 * @returns {Node} Result element
-	 */
-	_removeNestedList(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, baseNode: HTMLElement, all: boolean): Node;
 	/**
 	 * @private
 	 * @this {FormatThis}

@@ -2,7 +2,7 @@ module.exports = {
 	// The environment supports arrow functions ('() => { ... }').
 	arrowFunction: true,
 	// The environment supports BigInt as literal (123n).
-	bigIntLiteral: false,
+	bigIntLiteral: true,
 	// The environment supports const and let for variable declarations.
 	const: true,
 	// The environment supports destructuring ('{ a, b } = obj').

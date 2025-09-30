@@ -1,5 +1,5 @@
 export default Link;
-export type ModalAnchorEditorParams = import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams;
+export type ModalAnchorEditorParams_link = import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams;
 export type LinkOptions = {
 	/**
 	 * - The URL endpoint for file uploads.
@@ -24,9 +24,9 @@ export type LinkOptions = {
 	 */
 	acceptedFormats?: string;
 };
-export type LinkPluginOptions = Omit<LinkOptions & ModalAnchorEditorParams, ''>;
+export type LinkPluginOptions = Omit<LinkOptions & ModalAnchorEditorParams_link, ''>;
 /**
- * @typedef {import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams} ModalAnchorEditorParams
+ * @typedef {import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams} ModalAnchorEditorParams_link
  */
 /**
  * @typedef {Object} LinkOptions
@@ -37,7 +37,7 @@ export type LinkPluginOptions = Omit<LinkOptions & ModalAnchorEditorParams, ''>;
  * @property {string} [acceptedFormats] - Accepted file formats for link uploads.
  */
 /**
- * @typedef {Omit<LinkOptions & ModalAnchorEditorParams, ''>} LinkPluginOptions
+ * @typedef {Omit<LinkOptions & ModalAnchorEditorParams_link, ''>} LinkPluginOptions
  */
 /**
  * @class

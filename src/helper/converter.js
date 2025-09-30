@@ -470,16 +470,14 @@ export function addUrlQuery(url, query) {
 }
 
 /**
- * @typedef {Object} OptionStyleResult
- * @property {string} top - Styles applied to the top container (e.g. width, z-index, etc).
- * @property {string} frame - Styles applied to the iframe container (e.g. height, min-height).
- * @property {string} editor - Styles applied to the editable content area.
+ * @typedef {import('../core/config/options').OptionStyleResult} OptionStyleResult_converter
  */
+
 /**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Map<string, *>} fo editor.frameOptions
  * @param {string} cssText Style string
- * @returns {OptionStyleResult}
+ * @returns {OptionStyleResult_converter}
  * @private
  */
 export function _setDefaultOptionStyle(fo, cssText) {

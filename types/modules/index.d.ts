@@ -14,13 +14,13 @@ declare namespace _default {
 export default _default;
 import _DragHandle from './_DragHandle';
 import ApiManager from './ApiManager';
+import Browser from './Browser';
 import ColorPicker from './ColorPicker';
 import Controller from './Controller';
-import Browser from './Browser';
+import Figure from './Figure';
 import FileManager from './FileManager';
 import HueSlider from './HueSlider';
-import Figure from './Figure';
 import Modal from './Modal';
 import ModalAnchorEditor from './ModalAnchorEditor';
 import SelectMenu from './SelectMenu';
-export { _DragHandle, ApiManager, ColorPicker, Controller, Browser, FileManager, HueSlider, Figure, Modal, ModalAnchorEditor, SelectMenu };
+export { _DragHandle, ApiManager, Browser, ColorPicker, Controller, Figure, FileManager, HueSlider, Modal, ModalAnchorEditor, SelectMenu };

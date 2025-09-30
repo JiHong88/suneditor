@@ -70,8 +70,6 @@ class Figure extends EditorInjector {
 	#resize_h;
 	#element_w;
 	#element_h;
-	#element_l;
-	#element_t;
 	#floatClassStr;
 	#preventSizechange;
 	#revertSize;
@@ -155,8 +153,6 @@ class Figure extends EditorInjector {
 		this.#resize_h = 0;
 		this.#element_w = 0;
 		this.#element_h = 0;
-		this.#element_l = 0;
-		this.#element_t = 0;
 		this.#floatClassStr = '__se__float-none|__se__float-left|__se__float-center|__se__float-right';
 		this.#preventSizechange = false;
 		this.#revertSize = { w: '', h: '' };
@@ -467,8 +463,6 @@ class Figure extends EditorInjector {
 		dom.utils.addClass(this._cover, 'se-figure-selected');
 		this.#element_w = this.#resize_w = w;
 		this.#element_h = this.#resize_h = h;
-		this.#element_l = left;
-		this.#element_t = top;
 
 		// drag
 		if (!this._inlineCover && (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || dom.utils.hasClass(figureInfo.container, 'se-input-component'))) {

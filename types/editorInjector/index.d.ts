@@ -60,6 +60,8 @@ declare class EditorInjector {
 	html: import('./_classes').default['html'];
 	/** @type {import('./_classes').default['inline']} */
 	inline: import('./_classes').default['inline'];
+	/** @type {import('./_classes').default['listFormat']} */
+	listFormat: import('./_classes').default['listFormat'];
 	/** @type {import('./_classes').default['menu']} */
 	menu: import('./_classes').default['menu'];
 	/** @type {import('./_classes').default['nodeTransform']} */

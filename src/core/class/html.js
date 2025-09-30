@@ -1794,7 +1794,6 @@ HTML.prototype = {
 	 * @param {Node} parentNode The parent node where the duplicate check occurs.
 	 */
 	_checkDuplicateNode(oNode, parentNode) {
-		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const inst = this;
 		(function recursionFunc(current) {
 			inst._dupleCheck(current, parentNode);

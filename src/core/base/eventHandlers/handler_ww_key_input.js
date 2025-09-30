@@ -681,7 +681,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 
 			// Nested list
 			if (cells.length > 0) {
-				r = this.format._applyNestedList(cells, shift);
+				r = this.listFormat.applyNested(cells, shift);
 			}
 
 			// Lines tab

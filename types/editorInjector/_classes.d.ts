@@ -26,6 +26,8 @@ declare class ClassInjector {
 	html: __se__EditorCore['html'];
 	/** @description Inline format class instance @type {__se__EditorCore['inline']} */
 	inline: __se__EditorCore['inline'];
+	/** @description List format class instance @type {__se__EditorCore['listFormat']} */
+	listFormat: __se__EditorCore['listFormat'];
 	/** @description Menu class instance @type {__se__EditorCore['menu']} */
 	menu: __se__EditorCore['menu'];
 	/** @description NodeTransform class instance @type {__se__EditorCore['nodeTransform']} */

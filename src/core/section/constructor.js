@@ -8,17 +8,17 @@ import { DEFAULTS } from '../config/options';
 const _d = env._d;
 
 /**
- * @typedef {import('../config/options').EditorFrameOptions} EditorFrameOptions
+ * @typedef {import('../config/options').EditorFrameOptions} EditorFrameOptions_constructor
  */
 
 /**
- * @typedef {import('../config/options').EditorInitOptions} EditorInitOptions
+ * @typedef {import('../config/options').EditorInitOptions} EditorInitOptions_constructor
  */
 
 /**
  * @description Creates a new SunEditor instance with specified options.
- * @param {Array<{target: Element, key: *, options: EditorFrameOptions}>} editorTargets - Target element or multi-root object.
- * @param {EditorInitOptions} options - Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets - Target element or multi-root object.
+ * @param {EditorInitOptions_constructor} options - Configuration options for the editor.
  * @returns {Object<string, *>} - SunEditor instance with context, options, and DOM elements.
  */
 function Constructor(editorTargets, options) {
@@ -341,8 +341,8 @@ function _mergeObject(a, b) {
 
 /**
  * @description Initialize options
- * @param {EditorInitOptions} options Configuration options for the editor.
- * @param {Array<{target: Element, key: *, options: EditorFrameOptions}>} editorTargets Target textarea
+ * @param {EditorInitOptions_constructor} options Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets Target textarea
  * @param {Object<string, *>} plugins Plugins object
  * @returns {{o: Map<string, *>, i: Object<string, string>, l: Object<string, string>, v: string, buttons: Array<string[]|string>, subButtons: Array<string[]|string>, statusbarContainer: Element|null, frameMap: Map<*, *>}}
  * - o: options
@@ -759,8 +759,8 @@ export function CreateStatusbar(targetOptions, statusbar) {
 
 /**
  * @description Initialize options.
- * @param {EditorFrameOptions} o - Target options
- * @param {EditorInitOptions} origin - Full options
+ * @param {EditorFrameOptions_constructor} o - Target options
+ * @param {EditorInitOptions_constructor} origin - Full options
  * @returns {Map<string, *>}
  */
 function InitFrameOptions(o, origin) {

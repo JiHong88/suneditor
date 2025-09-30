@@ -1,6 +1,12 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
+	// plugins: [new BundleAnalyzerPlugin()],
+	performance: {
+		maxAssetSize: 716800, // (700 * 1024 = 716800)
+		maxEntrypointSize: 819200 // (800 * 1024 = 819200)
+	},
 	module: {
 		rules: [
 			{

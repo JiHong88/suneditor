@@ -10,8 +10,8 @@
 export function CreateShortcuts(command: string, button: Element | null, values: Array<string>, keyMap: Map<string, any>, rc: any[], reverseKeys: Set<any>): void;
 /**
  * @description Initialize options
- * @param {EditorInitOptions} options Configuration options for the editor.
- * @param {Array<{target: Element, key: *, options: EditorFrameOptions}>} editorTargets Target textarea
+ * @param {EditorInitOptions_constructor} options Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets Target textarea
  * @param {Object<string, *>} plugins Plugins object
  * @returns {{o: Map<string, *>, i: Object<string, string>, l: Object<string, string>, v: string, buttons: Array<string[]|string>, subButtons: Array<string[]|string>, statusbarContainer: Element|null, frameMap: Map<*, *>}}
  * - o: options
@@ -24,11 +24,11 @@ export function CreateShortcuts(command: string, button: Element | null, values:
  * - frameMap: converted options map
  */
 export function InitOptions(
-	options: EditorInitOptions,
+	options: EditorInitOptions_constructor,
 	editorTargets: Array<{
 		target: Element;
 		key: any;
-		options: EditorFrameOptions;
+		options: EditorFrameOptions_constructor;
 	}>,
 	plugins: {
 		[x: string]: any;
@@ -118,27 +118,27 @@ export function CreateToolBar(
 	}>;
 };
 export default Constructor;
-export type EditorFrameOptions = import('../config/options').EditorFrameOptions;
-export type EditorInitOptions = import('../config/options').EditorInitOptions;
+export type EditorFrameOptions_constructor = import('../config/options').EditorFrameOptions;
+export type EditorInitOptions_constructor = import('../config/options').EditorInitOptions;
 /**
- * @typedef {import('../config/options').EditorFrameOptions} EditorFrameOptions
+ * @typedef {import('../config/options').EditorFrameOptions} EditorFrameOptions_constructor
  */
 /**
- * @typedef {import('../config/options').EditorInitOptions} EditorInitOptions
+ * @typedef {import('../config/options').EditorInitOptions} EditorInitOptions_constructor
  */
 /**
  * @description Creates a new SunEditor instance with specified options.
- * @param {Array<{target: Element, key: *, options: EditorFrameOptions}>} editorTargets - Target element or multi-root object.
- * @param {EditorInitOptions} options - Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets - Target element or multi-root object.
+ * @param {EditorInitOptions_constructor} options - Configuration options for the editor.
  * @returns {Object<string, *>} - SunEditor instance with context, options, and DOM elements.
  */
 declare function Constructor(
 	editorTargets: Array<{
 		target: Element;
 		key: any;
-		options: EditorFrameOptions;
+		options: EditorFrameOptions_constructor;
 	}>,
-	options: EditorInitOptions
+	options: EditorInitOptions_constructor
 ): {
 	[x: string]: any;
 };

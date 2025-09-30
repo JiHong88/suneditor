@@ -133,10 +133,16 @@ export const DEFAULTS = {
  */
 
 /**
+ * @typedef {Object} OptionStyleResult
+ * @property {string} top - Styles applied to the top container (e.g. width, z-index, etc).
+ * @property {string} frame - Styles applied to the iframe container (e.g. height, min-height).
+ * @property {string} editor - Styles applied to the editable content area.
+ */
+/**
  * ================================================================================================================================
  * @typedef {Object} InternalFrameOptions
  * **Runtime-only frame options (computed internally, cannot be set by users)**
- * @property {import('../../helper/converter').OptionStyleResult} [_defaultStyles] - Enables fixed positioning for the editor frame.
+ * @property {OptionStyleResult} [_defaultStyles] - Enables fixed positioning for the editor frame.
  * ================================================================================================================================
  */
 

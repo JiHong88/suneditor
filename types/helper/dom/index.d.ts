@@ -4,6 +4,6 @@ declare namespace dom {
 	export { check };
 	export { utils };
 }
-import query from './domQuery';
 import check from './domCheck';
+import query from './domQuery';
 import utils from './domUtils';

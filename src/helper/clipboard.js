@@ -45,7 +45,6 @@ export async function write(content) {
 	}
 
 	try {
-		/* eslint-disable-next-line compat/compat */
 		await navigator.clipboard.write([
 			/* eslint-disable-next-line compat/compat */
 			new ClipboardItem({

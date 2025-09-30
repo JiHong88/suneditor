@@ -53,7 +53,6 @@ export function isAlt(e) {
  * @returns {boolean}
  */
 export function isComposing(e) {
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	return e.isComposing || e.key === 'Process' || e.keyCode === 229;
 }
