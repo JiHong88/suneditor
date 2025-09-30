@@ -1,11 +1,5 @@
 import Editor from './core/editor';
 
-import editorInjector from './editorInjector';
-import plugins from './plugins';
-import langs from './langs';
-import modules from './modules';
-import helper from './helper';
-
 /**
  * @module SunEditorExports
  */
@@ -17,31 +11,6 @@ import helper from './helper';
 /**
  * @typedef {import('./core/config/options').EditorInitOptions} EditorInitOptions_suneditor
  */
-
-/**
- * Editor Injector module, Inject "editor" and basic frequently used objects by calling it with "call(this, editor)".
- */
-export { editorInjector };
-
-/**
- * Available editor plugins
- */
-export { plugins };
-
-/**
- * Editor modules
- */
-export { modules };
-
-/**
- * Language packs for the editor
- */
-export { langs };
-
-/**
- * Helper functions for the editor
- */
-export { helper };
 
 /**
  * SunEditor Factory Object

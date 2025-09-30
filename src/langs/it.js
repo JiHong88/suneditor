@@ -9,7 +9,7 @@
 						throw new Error('SUNEDITOR_LANG una finestra con un documento');
 					}
 					return factory(w);
-			  };
+				};
 	} else {
 		factory(global);
 	}

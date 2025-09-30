@@ -117,7 +117,7 @@ class Image_ extends EditorInjector {
 				: [
 						[ctrlAs, 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
 						['edit', 'align', 'caption', 'revert', 'copy', 'remove']
-				  ]);
+					]);
 
 		// show align
 		this.alignForm = modalEl.alignForm;
@@ -616,7 +616,7 @@ class Image_ extends EditorInjector {
 			: {
 					w: 0,
 					h: 0
-			  };
+				};
 
 		if (this.pluginOptions.useFormatType) {
 			this.#activeAsInline(this.component.isInline(figureInfo.container));
@@ -1182,10 +1182,10 @@ class Image_ extends EditorInjector {
 		this.#linkValue = this.previewSrc.textContent = !value
 			? ''
 			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-			? this.options.get('defaultUrlProtocol') + value
-			: !value.includes('://')
-			? '/' + value
-			: value;
+				? this.options.get('defaultUrlProtocol') + value
+				: !value.includes('://')
+					? '/' + value
+					: value;
 	}
 
 	#OnfileInputChange({ target }) {

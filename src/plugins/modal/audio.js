@@ -545,10 +545,10 @@ class Audio_ extends EditorInjector {
 		this.#urlValue = this.preview.textContent = !value
 			? ''
 			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-			? this.options.get('defaultUrlProtocol') + value
-			: !value.includes('://')
-			? '/' + value
-			: value;
+				? this.options.get('defaultUrlProtocol') + value
+				: !value.includes('://')
+					? '/' + value
+					: value;
 	}
 
 	/**

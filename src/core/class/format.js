@@ -560,10 +560,10 @@ Format.prototype = {
 							shouldDelete
 								? inner.nodeName
 								: dom.check.isList(blockElement.parentNode) || dom.check.isListCell(blockElement.parentNode)
-								? 'LI'
-								: dom.check.isTableCell(blockElement.parentNode)
-								? 'DIV'
-								: this.options.get('defaultLine')
+									? 'LI'
+									: dom.check.isTableCell(blockElement.parentNode)
+										? 'DIV'
+										: this.options.get('defaultLine')
 						);
 						const isCell = dom.check.isListCell(insNode);
 						const innerChildren = inner.childNodes;
@@ -930,7 +930,7 @@ Format.prototype = {
 			: this.getLines((current) => {
 					const component = dom.query.getParentElement(current, this.component.is.bind(this.component));
 					return (this.isLine(current) && (!component || component === myComponent)) || (dom.check.isComponentContainer(current) && !this.getLine(current));
-			  });
+				});
 
 		if (removeDuplicate) {
 			for (let i = 0, len = selectedLines.length; i < len; i++) {

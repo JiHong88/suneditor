@@ -511,7 +511,7 @@ class Embed extends EditorInjector {
 			: {
 					w: 0,
 					h: 0
-			  };
+				};
 	}
 
 	/**
@@ -768,10 +768,10 @@ class Embed extends EditorInjector {
 			this.#linkValue = this.previewSrc.textContent = !value
 				? ''
 				: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-				? this.options.get('defaultUrlProtocol') + value
-				: !value.includes('://')
-				? '/' + value
-				: value;
+					? this.options.get('defaultUrlProtocol') + value
+					: !value.includes('://')
+						? '/' + value
+						: value;
 		}
 	}
 

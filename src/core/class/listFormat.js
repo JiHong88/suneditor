@@ -299,7 +299,7 @@ ListFormat.prototype = {
 		selectedCells = !selectedCells
 			? this.format.getLines().filter(function (el) {
 					return dom.check.isListCell(el);
-			  })
+				})
 			: selectedCells;
 		const cellsLen = selectedCells.length;
 		if (cellsLen === 0 || (!nested && !dom.check.isListCell(selectedCells[0].previousElementSibling) && !dom.check.isListCell(selectedCells.at(-1).nextElementSibling))) {

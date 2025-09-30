@@ -126,16 +126,16 @@ class FontSize extends EditorInjector {
 		const menu = CreateHTML(editor, unitMap, this.sizeUnit, pluginOptions.showDefaultSizeLabel);
 
 		// plugin basic properties
-		const showIncDec = this.sizeUnit ? pluginOptions.showIncDecControls ?? false : false;
-		const disableInput = this.sizeUnit ? pluginOptions.disableInput ?? false : true;
+		const showIncDec = this.sizeUnit ? (pluginOptions.showIncDecControls ?? false) : false;
+		const disableInput = this.sizeUnit ? (pluginOptions.disableInput ?? false) : true;
 
 		this.title = this.lang.fontSize;
 		this.inner =
 			disableInput && !showIncDec
 				? false
 				: disableInput
-				? `<span class="se-txt se-not-arrow-text __se__font_size">${this.lang.fontSize}</span>`
-				: `<input type="text" class="__se__font_size se-not-arrow-text" placeholder="${this.lang.fontSize}" />`;
+					? `<span class="se-txt se-not-arrow-text __se__font_size">${this.lang.fontSize}</span>`
+					: `<input type="text" class="__se__font_size se-not-arrow-text" placeholder="${this.lang.fontSize}" />`;
 
 		// increase, decrease buttons
 		if (showIncDec) {

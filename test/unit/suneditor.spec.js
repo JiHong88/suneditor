@@ -22,32 +22,6 @@ describe('SunEditor Main Entry', () => {
 		mockQuerySelector.mockClear();
 	});
 
-	describe('Named exports', () => {
-		it('should export editorInjector', () => {
-			expect(editorInjector).toBeDefined();
-		});
-
-		it('should export plugins', () => {
-			expect(plugins).toBeDefined();
-			expect(typeof plugins).toBe('object');
-		});
-
-		it('should export modules', () => {
-			expect(modules).toBeDefined();
-			expect(typeof modules).toBe('object');
-		});
-
-		it('should export langs', () => {
-			expect(langs).toBeDefined();
-			expect(typeof langs).toBe('object');
-		});
-
-		it('should export helper', () => {
-			expect(helper).toBeDefined();
-			expect(typeof helper).toBe('object');
-		});
-	});
-
 	describe('Default export - SunEditor factory', () => {
 		it('should export factory object with init and create methods', () => {
 			expect(suneditor).toBeDefined();
@@ -75,10 +49,7 @@ describe('SunEditor Main Entry', () => {
 			factory.create(mockElement, createOptions);
 
 			const Editor = require('../../src/core/editor');
-			expect(Editor).toHaveBeenCalledWith(
-				[{ key: null, target: mockElement }],
-				expect.objectContaining({ height: '300px', width: '100%' })
-			);
+			expect(Editor).toHaveBeenCalledWith([{ key: null, target: mockElement }], expect.objectContaining({ height: '300px', width: '100%' }));
 		});
 	});
 
@@ -115,8 +86,7 @@ describe('SunEditor Main Entry', () => {
 				const selector = '#nonexistent';
 				mockQuerySelector.mockReturnValue(null);
 
-				expect(() => suneditor.create(selector))
-					.toThrow('[SUNEDITOR.create.fail]-[document.querySelector(#nonexistent)] Cannot find target element. Make sure "#nonexistent" is a valid selector and exists in the document.');
+				expect(() => suneditor.create(selector)).toThrow('[SUNEDITOR.create.fail]-[document.querySelector(#nonexistent)] Cannot find target element. Make sure "#nonexistent" is a valid selector and exists in the document.');
 			});
 
 			it('should handle multi-root object target', () => {
@@ -128,10 +98,13 @@ describe('SunEditor Main Entry', () => {
 				suneditor.create(targets);
 
 				const Editor = require('../../src/core/editor');
-				expect(Editor).toHaveBeenCalledWith([
-					{ target: { nodeType: 1 }, key: 'editor1' },
-					{ target: { nodeType: 1 }, key: 'editor2' }
-				], {});
+				expect(Editor).toHaveBeenCalledWith(
+					[
+						{ target: { nodeType: 1 }, key: 'editor1' },
+						{ target: { nodeType: 1 }, key: 'editor2' }
+					],
+					{}
+				);
 			});
 
 			it('should throw error for invalid multi-root target', () => {
@@ -139,8 +112,7 @@ describe('SunEditor Main Entry', () => {
 					editor1: { target: null }
 				};
 
-				expect(() => suneditor.create(invalidTargets))
-					.toThrow('[SUNEDITOR.create.fail] suneditor multi root requires textarea\'s element at the "target" property.');
+				expect(() => suneditor.create(invalidTargets)).toThrow('[SUNEDITOR.create.fail] suneditor multi root requires textarea\'s element at the "target" property.');
 			});
 		});
 
@@ -171,10 +143,7 @@ describe('SunEditor Main Entry', () => {
 				suneditor.create(mockElement, createOptions, initOptions);
 
 				const Editor = require('../../src/core/editor');
-				expect(Editor).toHaveBeenCalledWith(
-					[{ key: null, target: mockElement }],
-					{ height: '300px', width: '100%', plugins: ['bold'] }
-				);
+				expect(Editor).toHaveBeenCalledWith([{ key: null, target: mockElement }], { height: '300px', width: '100%', plugins: ['bold'] });
 			});
 
 			it('should merge plugin arrays correctly', () => {
@@ -213,18 +182,6 @@ describe('SunEditor Main Entry', () => {
 				expect(typeof result.getContents).toBe('function');
 				expect(typeof result.setContents).toBe('function');
 			});
-		});
-	});
-
-	describe('Integration', () => {
-		it('should work with all exported modules together', () => {
-			expect(editorInjector).toBeDefined();
-			expect(plugins).toBeDefined();
-			expect(modules).toBeDefined();
-			expect(langs).toBeDefined();
-			expect(helper).toBeDefined();
-			expect(suneditor.create).toBeDefined();
-			expect(suneditor.init).toBeDefined();
 		});
 	});
 });

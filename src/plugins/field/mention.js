@@ -54,8 +54,8 @@ class Mention extends EditorInjector {
 		this.apiUrl = pluginOptions.apiUrl?.replace(/\s/g, '').replace(/\{limitSize\}/i, String(this.limitSize)) || '';
 		// members - api, caching
 		this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
-		this.cachingData = pluginOptions.useCachingData ?? true ? new Map() : null;
-		this.cachingFieldData = pluginOptions.useCachingFieldData ?? true ? [] : null;
+		this.cachingData = (pluginOptions.useCachingData ?? true) ? new Map() : null;
+		this.cachingFieldData = (pluginOptions.useCachingFieldData ?? true) ? [] : null;
 
 		this.#lastAtPos = 0;
 		this.#anchorOffset = 0;

@@ -560,10 +560,10 @@ class Figure extends EditorInjector {
 			h = figure.inlineCover
 				? figure.inlineCover.style.height || /** @type {HTMLElement} */ (targetNode).style.height || String(/** @type {HTMLImageElement} */ (targetNode).height || '')
 				: numbers.get(figure.cover?.style.paddingBottom, 0) > 0 && !v
-				? figure.cover?.style.height
-				: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
-				? target.style.height
-				: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
+					? figure.cover?.style.height
+					: !/%$/.test(target.style.height) || !/%$/.test(target.style.width)
+						? target.style.height
+						: ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
 
 			w ||= 'auto';
 			h ||= 'auto';

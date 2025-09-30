@@ -619,12 +619,12 @@ export function InitOptions(options, editorTargets, plugins) {
 					_h3: ['c+s+Digit3|Numpad3+$~formatBlock.applyHeaderByShortcut', '']
 				},
 				options.shortcuts || {}
-		  ].reduce((_default, _new) => {
+			].reduce((_default, _new) => {
 				for (const key in _new) {
 					_default[key] = _new[key];
 				}
 				return _default;
-		  }, {});
+			}, {});
 	o.set('shortcuts', shortcuts);
 
 	/** View */
@@ -665,7 +665,7 @@ export function InitOptions(options, editorTargets, plugins) {
 						_default[key] = _new[key];
 					}
 					return _default;
-			  }, {});
+				}, {});
 	o.set('icons', icons);
 
 	/** Create all used styles  */
@@ -1081,7 +1081,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 					'data-type': dataType,
 					'aria-label': label.replace(/<span .+<\/span>/, ''),
 					tabindex: '-1'
-			  })
+				})
 	);
 
 	if (!isDiv) {

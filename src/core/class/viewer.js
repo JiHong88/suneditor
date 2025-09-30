@@ -376,8 +376,8 @@ Viewer.prototype = {
 			const arrts = this.options.get('printClass')
 				? 'class="' + this.options.get('printClass') + rtlClass + '"'
 				: this.frameOptions.get('iframe_fullPage')
-				? dom.utils.getAttributesToString(wDoc.body, ['contenteditable'])
-				: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
+					? dom.utils.getAttributesToString(wDoc.body, ['contenteditable'])
+					: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
 
 			printDocument.write(/*html*/ `
 				<!DOCTYPE html>
@@ -458,8 +458,8 @@ Viewer.prototype = {
 			const arrts = this.options.get('printClass')
 				? 'class="' + this.options.get('printClass') + rtlClass + '"'
 				: this.frameOptions.get('iframe_fullPage')
-				? dom.utils.getAttributesToString(wDoc.body, ['contenteditable'])
-				: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
+					? dom.utils.getAttributesToString(wDoc.body, ['contenteditable'])
+					: 'class="' + this.options.get('_editableClass') + rtlClass + '"';
 
 			windowObject.document.write(/*html*/ `<!DOCTYPE html>
 				<html>

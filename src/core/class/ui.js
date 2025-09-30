@@ -332,7 +332,7 @@ UI.prototype = {
 	 */
 	_visibleControllers(value, lineBreakShow) {
 		const visible = value ? '' : 'hidden';
-		const breakerVisible = lineBreakShow ?? visible ? '' : 'hidden';
+		const breakerVisible = (lineBreakShow ?? visible) ? '' : 'hidden';
 
 		const cont = this.editor.opendControllers;
 		for (let i = 0, c; i < cont.length; i++) {

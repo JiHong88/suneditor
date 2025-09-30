@@ -1002,10 +1002,10 @@ class Video extends EditorInjector {
 			this.#linkValue = this.previewSrc.textContent = !value
 				? ''
 				: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
-				? this.options.get('defaultUrlProtocol') + value
-				: !value.includes('://')
-				? '/' + value
-				: value;
+					? this.options.get('defaultUrlProtocol') + value
+					: !value.includes('://')
+						? '/' + value
+						: value;
 		}
 	}
 

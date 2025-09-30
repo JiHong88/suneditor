@@ -199,7 +199,7 @@ export function getValues(obj) {
 		? []
 		: Object.keys(obj).map(function (i) {
 				return obj[i];
-		  });
+			});
 }
 
 /**
