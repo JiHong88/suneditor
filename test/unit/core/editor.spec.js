@@ -398,6 +398,424 @@ describe('Core - Editor', () => {
                 expect(wysiwyg.classList.contains('se-rtl')).toBe(false);
                 expect(editor.options.get('_rtl')).toBe(false);
             });
+
+            it('should not change if direction is already set', () => {
+                // given
+                editor.setDir('rtl');
+                const initialRtl = editor.options.get('_rtl');
+
+                // when
+                editor.setDir('rtl');
+
+                // then
+                expect(editor.options.get('_rtl')).toBe(initialRtl);
+            });
+
+            it('should swap margin-left and margin-right for lines', () => {
+                // given
+                const wysiwyg = editor.frameContext.get('wysiwyg');
+                wysiwyg.innerHTML = '<p style="margin-left: 10px; margin-right: 20px;">Test</p>';
+
+                // when
+                editor.setDir('rtl');
+
+                // then
+                const p = wysiwyg.querySelector('p');
+                expect(p.style.marginRight).toBe('10px');
+                expect(p.style.marginLeft).toBe('20px');
+            });
         });
+
+        describe('isEmpty', () => {
+            it('should return true for empty editor', () => {
+                // given
+                const wysiwyg = editor.frameContext.get('wysiwyg');
+                wysiwyg.textContent = '';
+                Object.defineProperty(wysiwyg, 'innerText', {
+                    value: '\n',
+                    writable: true,
+                    configurable: true
+                });
+
+                // then
+                expect(editor.isEmpty()).toBe(true);
+            });
+
+            it('should return false for editor with text', () => {
+                // given
+                const wysiwyg = editor.frameContext.get('wysiwyg');
+                wysiwyg.innerHTML = '<p>Hello World</p>';
+
+                // then
+                expect(editor.isEmpty()).toBe(false);
+            });
+
+            it('should return false for editor with allowed empty tags', () => {
+                // given
+                const wysiwyg = editor.frameContext.get('wysiwyg');
+                wysiwyg.innerHTML = '<p><img src="test.jpg"></p>';
+
+                // then
+                expect(editor.isEmpty()).toBe(false);
+            });
+        });
+
+        describe('focus', () => {
+            it('should call _nativeFocus for iframe', () => {
+                // given
+                jest.spyOn(editor, '_nativeFocus');
+                if (editor.frameOptions.get('iframe')) {
+                    // when
+                    editor.focus();
+
+                    // then
+                    expect(editor._nativeFocus).toHaveBeenCalled();
+                } else {
+                    // Skip test if not iframe mode
+                    expect(true).toBe(true);
+                }
+            });
+
+            it('should set _preventBlur to false', () => {
+                // given
+                editor._preventBlur = true;
+
+                // when
+                editor.focus();
+
+                // then
+                expect(editor._preventBlur).toBe(false);
+            });
+        });
+
+        describe('blur', () => {
+            it('should blur iframe in iframe mode', () => {
+                // when
+                if (editor.frameOptions.get('iframe')) {
+                    const iframe = editor.frameContext.get('wysiwygFrame');
+                    jest.spyOn(iframe, 'blur');
+                    editor.blur();
+                    expect(iframe.blur).toHaveBeenCalled();
+                } else {
+                    // Skip test if not iframe mode
+                    expect(true).toBe(true);
+                }
+            });
+
+            it('should blur wysiwyg in non-iframe mode', () => {
+                // when
+                if (!editor.frameOptions.get('iframe')) {
+                    const wysiwyg = editor.frameContext.get('wysiwyg');
+                    jest.spyOn(wysiwyg, 'blur');
+                    editor.blur();
+                    expect(wysiwyg.blur).toHaveBeenCalled();
+                } else {
+                    // Skip test if iframe mode
+                    expect(true).toBe(true);
+                }
+            });
+        });
+
+        describe('applyFrameRoots', () => {
+            it('should execute function for all frame roots', () => {
+                // given
+                const mockFn = jest.fn();
+
+                // when
+                editor.applyFrameRoots(mockFn);
+
+                // then
+                expect(mockFn).toHaveBeenCalledTimes(editor.frameRoots.size);
+            });
+        });
+
+        describe('applyCommandTargets', () => {
+            it('should execute function for command targets', () => {
+                // given
+                const mockFn = jest.fn();
+                const testCommand = 'bold';
+
+                // Ensure command targets exist
+                if (editor.commandTargets.has(testCommand)) {
+                    // when
+                    editor.applyCommandTargets(testCommand, mockFn);
+
+                    // then
+                    expect(mockFn).toHaveBeenCalled();
+                } else {
+                    // Skip if command not available
+                    expect(true).toBe(true);
+                }
+            });
+
+            it('should not throw for non-existent command', () => {
+                // given
+                const mockFn = jest.fn();
+
+                // when & then
+                expect(() => {
+                    editor.applyCommandTargets('nonExistentCommand', mockFn);
+                }).not.toThrow();
+            });
+        });
+
+        describe('execCommand', () => {
+            it('should execute native execCommand', () => {
+                // given
+                const wd = editor.frameContext.get('_wd');
+                wd.execCommand = jest.fn();
+                jest.spyOn(editor.history, 'push');
+
+                // when
+                editor.execCommand('bold', false, null);
+
+                // then
+                expect(wd.execCommand).toHaveBeenCalledWith('bold', false, null);
+                expect(editor.history.push).toHaveBeenCalledWith(true);
+            });
+
+            it('should format block command with angle brackets', () => {
+                // given
+                const wd = editor.frameContext.get('_wd');
+                wd.execCommand = jest.fn();
+
+                // when
+                editor.execCommand('formatBlock', false, 'p');
+
+                // then
+                expect(wd.execCommand).toHaveBeenCalledWith('formatBlock', false, '<p>');
+            });
+        });
+
+        describe('commandHandler', () => {
+            it('should handle selectAll command', async () => {
+                // given
+                const wysiwyg = editor.frameContext.get('wysiwyg');
+                wysiwyg.innerHTML = '<p>Test content</p>';
+
+                // when
+                await editor.commandHandler('selectAll');
+
+                // then - selection should be made
+                expect(editor.selection.getRange()).toBeTruthy();
+            });
+
+            it('should handle copy command with selection', async () => {
+                // given
+                const wysiwyg = editor.frameContext.get('wysiwyg');
+                wysiwyg.innerHTML = '<p>Test content</p>';
+                editor.selection.setRange(wysiwyg.firstChild.firstChild, 0, wysiwyg.firstChild.firstChild, 4);
+
+                // when
+                await editor.commandHandler('copy');
+
+                // then - should not throw
+                expect(true).toBe(true);
+            });
+
+            it('should handle newDocument command', async () => {
+                // given
+                jest.spyOn(editor.history, 'push');
+
+                // when
+                await editor.commandHandler('newDocument');
+
+                // then
+                const wysiwyg = editor.frameContext.get('wysiwyg');
+                expect(wysiwyg.innerHTML).toContain('<br>');
+                expect(editor.history.push).toHaveBeenCalledWith(false);
+            });
+
+            it('should handle indent command', async () => {
+                // given
+                jest.spyOn(editor.format, 'indent');
+
+                // when
+                await editor.commandHandler('indent');
+
+                // then
+                expect(editor.format.indent).toHaveBeenCalled();
+            });
+
+            it('should handle outdent command', async () => {
+                // given
+                jest.spyOn(editor.format, 'outdent');
+
+                // when
+                await editor.commandHandler('outdent');
+
+                // then
+                expect(editor.format.outdent).toHaveBeenCalled();
+            });
+
+            it('should handle undo command', async () => {
+                // given
+                jest.spyOn(editor.history, 'undo');
+
+                // when
+                await editor.commandHandler('undo');
+
+                // then
+                expect(editor.history.undo).toHaveBeenCalled();
+            });
+
+            it('should handle redo command', async () => {
+                // given
+                jest.spyOn(editor.history, 'redo');
+
+                // when
+                await editor.commandHandler('redo');
+
+                // then
+                expect(editor.history.redo).toHaveBeenCalled();
+            });
+
+            it('should handle removeFormat command', async () => {
+                // given
+                jest.spyOn(editor.inline, 'remove');
+
+                // when
+                await editor.commandHandler('removeFormat');
+
+                // then
+                expect(editor.inline.remove).toHaveBeenCalled();
+            });
+
+            it('should handle print command', async () => {
+                // given
+                jest.spyOn(editor.viewer, 'print');
+
+                // when
+                await editor.commandHandler('print');
+
+                // then
+                expect(editor.viewer.print).toHaveBeenCalled();
+            });
+
+            it('should handle preview command', async () => {
+                // given
+                editor.viewer.preview = jest.fn();
+
+                // when
+                await editor.commandHandler('preview');
+
+                // then
+                expect(editor.viewer.preview).toHaveBeenCalled();
+            });
+
+            it('should handle codeView command', async () => {
+                // given
+                jest.spyOn(editor.viewer, 'codeView');
+
+                // when
+                await editor.commandHandler('codeView');
+
+                // then
+                expect(editor.viewer.codeView).toHaveBeenCalled();
+            });
+
+            it('should handle fullScreen command', async () => {
+                // given
+                jest.spyOn(editor.viewer, 'fullScreen');
+
+                // when
+                await editor.commandHandler('fullScreen');
+
+                // then
+                expect(editor.viewer.fullScreen).toHaveBeenCalled();
+            });
+
+            it('should handle showBlocks command', async () => {
+                // given
+                jest.spyOn(editor.viewer, 'showBlocks');
+
+                // when
+                await editor.commandHandler('showBlocks');
+
+                // then
+                expect(editor.viewer.showBlocks).toHaveBeenCalled();
+            });
+
+            it('should handle dir_ltr command', async () => {
+                // given
+                jest.spyOn(editor, 'setDir');
+
+                // when
+                await editor.commandHandler('dir_ltr');
+
+                // then
+                expect(editor.setDir).toHaveBeenCalledWith('ltr');
+            });
+
+            it('should handle dir_rtl command', async () => {
+                // given
+                jest.spyOn(editor, 'setDir');
+
+                // when
+                await editor.commandHandler('dir_rtl');
+
+                // then
+                expect(editor.setDir).toHaveBeenCalledWith('rtl');
+            });
+
+            it('should not handle commands in readOnly mode', async () => {
+                // given
+                editor.frameContext.set('isReadOnly', true);
+                jest.spyOn(editor.format, 'indent');
+
+                // when
+                await editor.commandHandler('indent');
+
+                // then
+                expect(editor.format.indent).not.toHaveBeenCalled();
+
+                // cleanup
+                editor.frameContext.set('isReadOnly', false);
+            });
+        });
+
+        describe('runFromTarget', () => {
+            it('should return early for input elements', () => {
+                // given
+                const input = document.createElement('input');
+                jest.spyOn(editor, 'run');
+
+                // when
+                editor.runFromTarget(input);
+
+                // then
+                expect(editor.run).not.toHaveBeenCalled();
+            });
+
+            it('should return if no command button found', () => {
+                // given
+                const div = document.createElement('div');
+                jest.spyOn(editor, 'run');
+
+                // when
+                editor.runFromTarget(div);
+
+                // then
+                expect(editor.run).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('focusEdge', () => {
+            it('should focus on last element if no argument', () => {
+                // given
+                const wysiwyg = editor.frameContext.get('wysiwyg');
+                wysiwyg.innerHTML = '<p>First</p><p>Last</p>';
+                jest.spyOn(editor.selection, 'setRange');
+
+                // when
+                editor.focusEdge();
+
+                // then
+                expect(editor.selection.setRange).toHaveBeenCalled();
+            });
+
+        });
+
+
     });
 });

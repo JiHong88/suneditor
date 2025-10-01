@@ -757,7 +757,7 @@ Format.prototype = {
 	 * @returns {element is HTMLElement}
 	 */
 	isTextStyleNode(element) {
-		return typeof element === 'string' ? this._textStyleTagsCheck.test(element) : element && element.nodeType === 1 && this._textStyleTagsCheck.test(element.nodeName);
+		return typeof element === 'string' ? this._textStyleTagsCheck.test(element) : element?.nodeType === 1 && this._textStyleTagsCheck.test(element.nodeName);
 	},
 
 	/**
@@ -771,7 +771,7 @@ Format.prototype = {
 	isLine(element) {
 		return typeof element === 'string'
 			? this._formatLineCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this._nonFormat(element);
+			: element?.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -799,7 +799,7 @@ Format.prototype = {
 			(this._brLineBreak && this.isLine(element)) ||
 			(typeof element === 'string'
 				? this._formatBrLineCheck.test(element)
-				: element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element))
+				: element?.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element))
 		);
 	},
 
@@ -814,7 +814,7 @@ Format.prototype = {
 	isBlock(element) {
 		return typeof element === 'string'
 			? this._formatBlockCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_.+')) && !this._nonFormat(element);
+			: element?.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -831,7 +831,7 @@ Format.prototype = {
 	isClosureBlock(element) {
 		return typeof element === 'string'
 			? this._formatClosureBlockCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_closure_.+')) && !this._nonFormat(element);
+			: element?.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_closure_.+')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -848,7 +848,7 @@ Format.prototype = {
 	isClosureBrLine(element) {
 		return typeof element === 'string'
 			? this._formatClosureBrLineCheck.test(element)
-			: element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line__closure_.+')) && !this._nonFormat(element);
+			: element?.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line__closure_.+')) && !this._nonFormat(element);
 	},
 
 	/**
