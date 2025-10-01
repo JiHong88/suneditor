@@ -586,6 +586,574 @@ describe('Core - Format', () => {
 		});
 	});
 
+	describe('applyBlock method', () => {
+		it('should wrap single line with block element', () => {
+			wysiwyg.innerHTML = '<p>text content</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const blockquote = dom.utils.createElement('blockquote');
+			format.applyBlock(blockquote);
+
+			expect(wysiwyg.querySelector('blockquote')).toBeTruthy();
+			expect(wysiwyg.querySelector('blockquote p')).toBeTruthy();
+		});
+
+		it('should wrap multiple lines with block element', () => {
+			wysiwyg.innerHTML = '<p>line1</p><p>line2</p><p>line3</p>';
+			const firstText = wysiwyg.querySelectorAll('p')[0].firstChild;
+			const lastText = wysiwyg.querySelectorAll('p')[2].firstChild;
+			editor.selection.setRange(firstText, 0, lastText, 5);
+
+			const blockquote = dom.utils.createElement('blockquote');
+			format.applyBlock(blockquote);
+
+			const bq = wysiwyg.querySelector('blockquote');
+			expect(bq).toBeTruthy();
+			expect(bq.querySelectorAll('p').length).toBe(3);
+		});
+
+		it('should handle list cells in selection', () => {
+			wysiwyg.innerHTML = '<ul><li>item1</li><li>item2</li></ul>';
+			const firstLi = wysiwyg.querySelectorAll('li')[0];
+			const lastLi = wysiwyg.querySelectorAll('li')[1];
+			editor.selection.setRange(firstLi.firstChild, 0, lastLi.firstChild, 5);
+
+			const blockquote = dom.utils.createElement('blockquote');
+			format.applyBlock(blockquote);
+
+			expect(wysiwyg.querySelector('blockquote')).toBeTruthy();
+		});
+
+		it('should handle nested list structures', () => {
+			wysiwyg.innerHTML = '<ul><li>item1<ul><li>nested</li></ul></li><li>item2</li></ul>';
+			const firstLi = wysiwyg.querySelector('li');
+			const lastLi = wysiwyg.querySelectorAll('ul')[0].querySelectorAll('li')[1];
+			editor.selection.setRange(firstLi.firstChild, 0, lastLi.firstChild, 5);
+
+			const blockquote = dom.utils.createElement('blockquote');
+			format.applyBlock(blockquote);
+
+			expect(wysiwyg.querySelector('blockquote')).toBeTruthy();
+		});
+
+		it('should maintain selection after applying block', () => {
+			wysiwyg.innerHTML = '<p>text</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const blockquote = dom.utils.createElement('blockquote');
+			format.applyBlock(blockquote);
+
+			const range = editor.selection.getRange();
+			expect(range.startContainer).toBeTruthy();
+			expect(range.endContainer).toBeTruthy();
+		});
+	});
+
+	describe('removeBlock method', () => {
+		it('should remove block wrapper and keep content', () => {
+			wysiwyg.innerHTML = '<blockquote><p>quoted text</p></blockquote>';
+			const blockquote = wysiwyg.querySelector('blockquote');
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 6);
+
+			format.removeBlock(blockquote);
+
+			expect(wysiwyg.querySelector('blockquote')).toBeFalsy();
+			expect(wysiwyg.querySelector('p')).toBeTruthy();
+		});
+
+		it('should handle shouldDelete option', () => {
+			wysiwyg.innerHTML = '<blockquote><p>text1</p><p>text2</p></blockquote>';
+			const blockquote = wysiwyg.querySelector('blockquote');
+			const p = wysiwyg.querySelector('p');
+
+			const result = format.removeBlock(blockquote, {
+				selectedFormats: [p],
+				shouldDelete: true,
+				skipHistory: true
+			});
+
+			expect(result).toBeTruthy();
+			expect(result.removeArray).toBeTruthy();
+			expect(Array.isArray(result.removeArray)).toBe(true);
+		});
+
+		it('should handle newBlockElement option', () => {
+			wysiwyg.innerHTML = '<blockquote><p>text</p></blockquote>';
+			const blockquote = wysiwyg.querySelector('blockquote');
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const newBlock = dom.utils.createElement('div');
+			format.removeBlock(blockquote, {
+				newBlockElement: newBlock,
+				skipHistory: true
+			});
+
+			expect(wysiwyg.querySelector('blockquote')).toBeFalsy();
+		});
+
+		it('should convert list items to paragraphs', () => {
+			wysiwyg.innerHTML = '<ul><li>item1</li><li>item2</li></ul>';
+			const ul = wysiwyg.querySelector('ul');
+			const firstLi = wysiwyg.querySelectorAll('li')[0];
+			const lastLi = wysiwyg.querySelectorAll('li')[1];
+			editor.selection.setRange(firstLi.firstChild, 0, lastLi.firstChild, 5);
+
+			format.removeBlock(ul);
+
+			expect(wysiwyg.querySelector('ul')).toBeFalsy();
+		});
+
+		it('should handle skipHistory option', () => {
+			wysiwyg.innerHTML = '<blockquote><p>text</p></blockquote>';
+			const blockquote = wysiwyg.querySelector('blockquote');
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const result = format.removeBlock(blockquote, { skipHistory: true });
+
+			expect(result).toBeTruthy();
+			expect(result.cc).toBeTruthy();
+			expect(result.sc).toBeTruthy();
+			expect(result.ec).toBeTruthy();
+		});
+
+		it('should handle selectedFormats parameter', () => {
+			wysiwyg.innerHTML = '<blockquote><p>text1</p><p>text2</p><p>text3</p></blockquote>';
+			const blockquote = wysiwyg.querySelector('blockquote');
+			const paragraphs = wysiwyg.querySelectorAll('p');
+			editor.selection.setRange(paragraphs[0].firstChild, 0, paragraphs[1].firstChild, 5);
+
+			const result = format.removeBlock(blockquote, {
+				selectedFormats: [paragraphs[0], paragraphs[1]],
+				skipHistory: true
+			});
+
+			expect(result).toBeTruthy();
+			expect(wysiwyg.querySelector('blockquote')).toBeTruthy();
+			expect(wysiwyg.querySelector('blockquote').children.length).toBeLessThan(3);
+		});
+	});
+
+	describe('indent method', () => {
+		it('should indent single line', () => {
+			wysiwyg.innerHTML = '<p>text</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const p = wysiwyg.querySelector('p');
+			const beforeMargin = p.style.marginLeft;
+
+			format.indent();
+
+			const afterMargin = p.style.marginLeft;
+			expect(afterMargin).not.toBe(beforeMargin);
+		});
+
+		it('should indent multiple lines', () => {
+			wysiwyg.innerHTML = '<p>line1</p><p>line2</p><p>line3</p>';
+			const firstText = wysiwyg.querySelectorAll('p')[0].firstChild;
+			const lastText = wysiwyg.querySelectorAll('p')[2].firstChild;
+			editor.selection.setRange(firstText, 0, lastText, 5);
+
+			format.indent();
+
+			const paragraphs = wysiwyg.querySelectorAll('p');
+			expect(paragraphs[0].style.marginLeft).toBeTruthy();
+			expect(paragraphs[1].style.marginLeft).toBeTruthy();
+			expect(paragraphs[2].style.marginLeft).toBeTruthy();
+		});
+
+		it('should handle list cells with nesting', () => {
+			wysiwyg.innerHTML = '<ul><li>item1</li><li>item2</li></ul>';
+			const firstLi = wysiwyg.querySelectorAll('li')[0];
+			editor.selection.setRange(firstLi.firstChild, 0, firstLi.firstChild, 5);
+
+			format.indent();
+
+			expect(wysiwyg.querySelector('ul')).toBeTruthy();
+		});
+
+		it('should maintain selection after indent', () => {
+			wysiwyg.innerHTML = '<p>text</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			format.indent();
+
+			const range = editor.selection.getRange();
+			expect(range.startContainer).toBeTruthy();
+			expect(range.endContainer).toBeTruthy();
+		});
+	});
+
+	describe('outdent method', () => {
+		it('should outdent indented line', () => {
+			wysiwyg.innerHTML = '<p style="margin-left: 20px;">text</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const p = wysiwyg.querySelector('p');
+			const beforeMargin = p.style.marginLeft;
+
+			format.outdent();
+
+			const afterMargin = p.style.marginLeft;
+			expect(afterMargin).not.toBe(beforeMargin);
+		});
+
+		it('should outdent multiple lines', () => {
+			wysiwyg.innerHTML = '<p style="margin-left: 20px;">line1</p><p style="margin-left: 20px;">line2</p>';
+			const firstText = wysiwyg.querySelectorAll('p')[0].firstChild;
+			const lastText = wysiwyg.querySelectorAll('p')[1].firstChild;
+			editor.selection.setRange(firstText, 0, lastText, 5);
+
+			format.outdent();
+
+			const paragraphs = wysiwyg.querySelectorAll('p');
+			expect(paragraphs[0].style.marginLeft).not.toBe('20px');
+			expect(paragraphs[1].style.marginLeft).not.toBe('20px');
+		});
+
+		it('should handle list cells with unnesting', () => {
+			wysiwyg.innerHTML = '<ul><li>item1<ul><li>nested</li></ul></li></ul>';
+			const nestedLi = wysiwyg.querySelectorAll('li')[1];
+			editor.selection.setRange(nestedLi.firstChild, 0, nestedLi.firstChild, 6);
+
+			format.outdent();
+
+			expect(wysiwyg.querySelector('ul')).toBeTruthy();
+		});
+
+		it('should maintain selection after outdent', () => {
+			wysiwyg.innerHTML = '<p style="margin-left: 20px;">text</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			format.outdent();
+
+			const range = editor.selection.getRange();
+			expect(range.startContainer).toBeTruthy();
+			expect(range.endContainer).toBeTruthy();
+		});
+	});
+
+	describe('isEdgeLine method', () => {
+		it('should return true for front edge of line', () => {
+			wysiwyg.innerHTML = '<p>text content</p>';
+			const p = wysiwyg.querySelector('p');
+			const textNode = p.firstChild;
+
+			const result = format.isEdgeLine(textNode, 0, 'front');
+
+			expect(result).toBe(true);
+		});
+
+		it('should return true for end edge of line', () => {
+			wysiwyg.innerHTML = '<p>text</p>';
+			const p = wysiwyg.querySelector('p');
+			const textNode = p.firstChild;
+
+			const result = format.isEdgeLine(textNode, textNode.textContent.length, 'end');
+
+			expect(result).toBe(true);
+		});
+
+		it('should return false for middle position', () => {
+			wysiwyg.innerHTML = '<p>text content</p>';
+			const p = wysiwyg.querySelector('p');
+			const textNode = p.firstChild;
+
+			const result = format.isEdgeLine(textNode, 2, 'front');
+
+			expect(result).toBe(false);
+		});
+
+		it('should handle nested elements', () => {
+			wysiwyg.innerHTML = '<p><strong>text</strong></p>';
+			const textNode = wysiwyg.querySelector('strong').firstChild;
+
+			const result = format.isEdgeLine(textNode, 0, 'front');
+
+			expect(result).toBe(true);
+		});
+
+		it('should handle BR siblings', () => {
+			wysiwyg.innerHTML = '<p><br>text</p>';
+			const textNode = wysiwyg.querySelector('p').childNodes[1];
+
+			const result = format.isEdgeLine(textNode, 0, 'front');
+
+			expect(result).toBe(true);
+		});
+	});
+
+	describe('getLinesAndComponents method', () => {
+		it('should get lines from selection', () => {
+			wysiwyg.innerHTML = '<p>line1</p><p>line2</p><p>line3</p>';
+			const firstText = wysiwyg.querySelectorAll('p')[0].firstChild;
+			const lastText = wysiwyg.querySelectorAll('p')[2].firstChild;
+			editor.selection.setRange(firstText, 0, lastText, 5);
+
+			const lines = format.getLinesAndComponents(false);
+
+			expect(lines.length).toBeGreaterThan(0);
+			expect(lines.every((line) => format.isLine(line) || editor.component.is(line))).toBe(true);
+		});
+
+		it('should include components in selection', () => {
+			wysiwyg.innerHTML = '<p>text</p><div data-component="image">img</div><p>text2</p>';
+			const firstText = wysiwyg.querySelectorAll('p')[0].firstChild;
+			const lastText = wysiwyg.querySelectorAll('p')[1].firstChild;
+			editor.selection.setRange(firstText, 0, lastText, 5);
+
+			const lines = format.getLinesAndComponents(false);
+
+			expect(lines.length).toBeGreaterThan(0);
+		});
+
+		it('should remove duplicates when removeDuplicate is true', () => {
+			wysiwyg.innerHTML = '<blockquote><p>nested1</p><p>nested2</p></blockquote>';
+			const firstText = wysiwyg.querySelectorAll('p')[0].firstChild;
+			const lastText = wysiwyg.querySelectorAll('p')[1].firstChild;
+			editor.selection.setRange(firstText, 0, lastText, 7);
+
+			const linesWithDuplicates = format.getLinesAndComponents(false);
+			const linesWithoutDuplicates = format.getLinesAndComponents(true);
+
+			expect(linesWithoutDuplicates.length).toBeLessThanOrEqual(linesWithDuplicates.length);
+		});
+
+		it('should handle table elements', () => {
+			wysiwyg.innerHTML = '<table><tr><td><p>cell1</p></td><td><p>cell2</p></td></tr></table>';
+			const firstP = wysiwyg.querySelectorAll('p')[0];
+			const lastP = wysiwyg.querySelectorAll('p')[1];
+			editor.selection.setRange(firstP.firstChild, 0, lastP.firstChild, 5);
+
+			const lines = format.getLinesAndComponents(false);
+
+			expect(lines.length).toBeGreaterThan(0);
+		});
+
+		it('should filter by component context', () => {
+			wysiwyg.innerHTML = '<p>outside</p><div data-component="test"><p>inside</p></div>';
+			const p = wysiwyg.querySelectorAll('p')[0];
+			editor.selection.setRange(p.firstChild, 0, p.firstChild, 7);
+
+			const lines = format.getLinesAndComponents(false);
+
+			expect(lines.length).toBeGreaterThan(0);
+		});
+	});
+
+	describe('private methods', () => {
+		describe('_isExcludeSelectionElement', () => {
+			it('should return true for FIGURE elements', () => {
+				const figure = dom.utils.createElement('figure');
+
+				const result = format._isExcludeSelectionElement(figure);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return false for FIGCAPTION elements', () => {
+				const figcaption = dom.utils.createElement('figcaption');
+
+				const result = format._isExcludeSelectionElement(figcaption);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return false for regular elements', () => {
+				const p = dom.utils.createElement('p');
+
+				const result = format._isExcludeSelectionElement(p);
+
+				expect(result).toBe(false);
+			});
+		});
+
+		describe('_nonFormat', () => {
+			it('should return true for wysiwyg frame', () => {
+				const result = format._nonFormat(wysiwyg);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return false for regular format elements', () => {
+				const p = dom.utils.createElement('p');
+
+				const result = format._nonFormat(p);
+
+				expect(result).toBe(false);
+			});
+		});
+
+		describe('_notTextNode', () => {
+			it('should return true for BR element', () => {
+				const br = dom.utils.createElement('br');
+
+				const result = format._notTextNode(br);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return true for IMG element', () => {
+				const img = dom.utils.createElement('img');
+
+				const result = format._notTextNode(img);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return true for INPUT element', () => {
+				const input = dom.utils.createElement('input');
+
+				const result = format._notTextNode(input);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return true for VIDEO element', () => {
+				const video = dom.utils.createElement('video');
+
+				const result = format._notTextNode(video);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return true for AUDIO element', () => {
+				const audio = dom.utils.createElement('audio');
+
+				const result = format._notTextNode(audio);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return true for IFRAME element', () => {
+				const iframe = dom.utils.createElement('iframe');
+
+				const result = format._notTextNode(iframe);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return true for SELECT element', () => {
+				const select = dom.utils.createElement('select');
+
+				const result = format._notTextNode(select);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return true for CANVAS element', () => {
+				const canvas = dom.utils.createElement('canvas');
+
+				const result = format._notTextNode(canvas);
+
+				expect(result).toBe(true);
+			});
+
+			it('should return false for text containers', () => {
+				const p = dom.utils.createElement('p');
+
+				const result = format._notTextNode(p);
+
+				expect(result).toBe(false);
+			});
+
+			it('should return false for null', () => {
+				const result = format._notTextNode(null);
+
+				expect(result).toBe(false);
+			});
+
+			it('should handle string input for BR', () => {
+				const result = format._notTextNode('br');
+
+				expect(result).toBe(true);
+			});
+
+			it('should handle string input for IMG', () => {
+				const result = format._notTextNode('img');
+
+				expect(result).toBe(true);
+			});
+
+			it('should handle string input for P', () => {
+				const result = format._notTextNode('p');
+
+				expect(result).toBe(false);
+			});
+		});
+
+		describe('_lineWork', () => {
+			it('should return line work information', () => {
+				wysiwyg.innerHTML = '<p>text</p>';
+				const textNode = wysiwyg.querySelector('p').firstChild;
+				editor.selection.setRange(textNode, 0, textNode, 4);
+
+				const result = format._lineWork();
+
+				expect(result).toBeTruthy();
+				expect(result.lines).toBeTruthy();
+				expect(result.firstNode).toBeTruthy();
+				expect(result.lastNode).toBeTruthy();
+				expect(result.firstPath).toBeTruthy();
+				expect(result.lastPath).toBeTruthy();
+				expect(typeof result.startOffset).toBe('number');
+				expect(typeof result.endOffset).toBe('number');
+			});
+
+			it('should handle multiple lines', () => {
+				wysiwyg.innerHTML = '<p>line1</p><p>line2</p>';
+				const firstText = wysiwyg.querySelectorAll('p')[0].firstChild;
+				const lastText = wysiwyg.querySelectorAll('p')[1].firstChild;
+				editor.selection.setRange(firstText, 0, lastText, 5);
+
+				const result = format._lineWork();
+
+				expect(result.lines.length).toBeGreaterThan(0);
+			});
+
+			it('should handle list removal', () => {
+				wysiwyg.innerHTML = '<ul><li>item</li></ul>';
+				const li = wysiwyg.querySelector('li');
+				editor.selection.setRange(li.firstChild, 0, li.firstChild, 4);
+
+				const result = format._lineWork();
+
+				expect(result).toBeTruthy();
+			});
+		});
+
+		describe('__resetBrLineBreak', () => {
+			it('should set _brLineBreak to true for "br" format', () => {
+				format.__resetBrLineBreak('br');
+
+				expect(format._brLineBreak).toBe(true);
+			});
+
+			it('should set _brLineBreak to false for "line" format', () => {
+				format.__resetBrLineBreak('line');
+
+				expect(format._brLineBreak).toBe(false);
+			});
+
+			it('should affect isBrLine behavior', () => {
+				format.__resetBrLineBreak('br');
+				const p = dom.utils.createElement('p');
+
+				const result = format.isBrLine(p);
+
+				expect(result).toBe(true);
+			});
+		});
+	});
+
 	describe('edge cases and integration', () => {
 		it('should handle complex nested structure', () => {
 			wysiwyg.innerHTML = '<blockquote><div><p><strong>nested</strong></p></div></blockquote>';
@@ -616,6 +1184,30 @@ describe('Core - Format', () => {
 
 			expect(line).toBe(p);
 			expect(format.isClosureBlock(block)).toBe(true);
+		});
+
+		it('should handle empty editor state', () => {
+			wysiwyg.innerHTML = '';
+
+			const lines = format.getLines();
+
+			expect(Array.isArray(lines)).toBe(true);
+		});
+
+		it('should handle RTL text direction for indent', () => {
+			const originalRtl = editor.options.get('_rtl');
+			editor.options.set('_rtl', true);
+
+			wysiwyg.innerHTML = '<p>text</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			format.indent();
+
+			const p = wysiwyg.querySelector('p');
+			expect(p.style.marginRight || p.style.marginLeft).toBeTruthy();
+
+			editor.options.set('_rtl', originalRtl);
 		});
 	});
 });

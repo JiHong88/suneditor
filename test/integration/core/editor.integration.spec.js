@@ -11,6 +11,17 @@ describe('Core - Editor Integration Tests', () => {
 	beforeEach(async () => {
 		editor = createTestEditor();
 		await waitForEditorReady(editor);
+
+		// Mock UI methods to prevent side effects during cleanup
+		if (editor.ui) {
+			editor.ui.showLoading = jest.fn();
+			editor.ui.hideLoading = jest.fn();
+			editor.ui.showToast = jest.fn();
+			editor.ui.closeToast = jest.fn();
+		}
+		if (editor.viewer) {
+			editor.viewer.print = jest.fn();
+		}
 	});
 
 	afterEach(() => {
@@ -426,6 +437,31 @@ describe('Core - Editor Integration Tests', () => {
 
 			editor.resetOptions({ toolbar_hide: false });
 			expect(toolbar.style.display).toBe('');
+		});
+
+		it('should reset height option', () => {
+			editor.resetOptions({ height: '400px' });
+			const wysiwygFrame = editor.frameContext.get('wysiwygFrame');
+			expect(wysiwygFrame.style.height).toBe('400px');
+		});
+
+		it('should reset minHeight option', () => {
+			editor.resetOptions({ minHeight: '200px' });
+			const wysiwygFrame = editor.frameContext.get('wysiwygFrame');
+			expect(wysiwygFrame.style.minHeight).toBe('200px');
+		});
+
+		it('should reset maxHeight option', () => {
+			editor.resetOptions({ maxHeight: '800px' });
+			const wysiwygFrame = editor.frameContext.get('wysiwygFrame');
+			expect(wysiwygFrame.style.maxHeight).toBe('800px');
+		});
+	});
+
+	describe('Editor state management', () => {
+		it('should check isEmpty correctly', () => {
+			const result = editor.isEmpty();
+			expect(typeof result).toBe('boolean');
 		});
 	});
 });
