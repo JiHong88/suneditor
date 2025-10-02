@@ -19,6 +19,7 @@ node_modules/**
 
 #jest
 coverage/
+temp_coverage/
 
 #only release branch, npm
 dist/**
