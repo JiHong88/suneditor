@@ -75,14 +75,9 @@ Inline.prototype = {
 
 		if ((isRemoveFormat && range.collapsed && this.format.isLine(startCon.parentNode) && this.format.isLine(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && dom.check.isNonEditable(startCon))) {
 			const format = startCon.parentNode;
-			if (
-				!dom.check.isListCell(format) ||
-				!converter.getValues(format.style).some((k) => {
-					return this._listKebab.includes(k);
-				})
-			)
+			if (!dom.check.isListCell(format) || !converter.getValues(format.style).some((k) => this._listKebab.includes(k))) {
 				return;
-			return;
+			}
 		}
 
 		if (range.collapsed && !isRemoveFormat) {

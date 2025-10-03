@@ -7,7 +7,7 @@ const keyState = {
 	ctrl: false,
 	alt: false
 };
-let _styleNodes = null;
+const _styleNodes = Object.preventExtensions({ value: [] });
 
 /**
  * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_ww_key_input
@@ -70,6 +70,8 @@ function LineDelete_prev(formatEl) {
 
 	return { focusNode, focusOffset };
 }
+
+export { LineDelete_next, LineDelete_prev };
 
 /**
  * @private
@@ -213,7 +215,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	switch (keyCode) {
 		case 'Backspace' /** backspace key */: {
 			this.component.deselect();
-			_styleNodes = this.__cacheStyleNodes;
+			_styleNodes.value = this.__cacheStyleNodes;
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -250,7 +252,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					}
 				}
 				this.history.push(true);
-				return;
+				return false;
 			}
 
 			if (
@@ -320,10 +322,10 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					selectionNode === formatEl
 						? this._isUneditableNode(range, true)
 						: dom.check.isElement(selectionNode.previousSibling)
-							? selectionNode.previousSibling
-							: dom.check.isEdgePoint(range.startContainer, range.startOffset)
-								? dom.query.getPreviousDeepestNode(range.startContainer)
-								: null;
+						? selectionNode.previousSibling
+						: dom.check.isEdgePoint(range.startContainer, range.startOffset)
+						? dom.query.getPreviousDeepestNode(range.startContainer)
+						: null;
 				if (this.component.is(sel)) {
 					const fileComponentInfo = this.component.get(sel);
 					if (fileComponentInfo) {
@@ -472,7 +474,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 		}
 		case 'Delete' /** delete key */: {
 			this.component.deselect();
-			_styleNodes = this.__cacheStyleNodes;
+			_styleNodes.value = this.__cacheStyleNodes;
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -482,7 +484,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 			if (!selectRange && this.format.isEdgeLine(range.endContainer, range.endOffset, 'end') && !formatEl.nextSibling) {
 				e.preventDefault();
 				e.stopPropagation();
-				return;
+				return false;
 			}
 
 			// line delete
@@ -510,7 +512,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 				}
 
 				this.history.push(true);
-				return;
+				return false;
 			}
 
 			// line component
@@ -519,10 +521,10 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					selectionNode === formatEl
 						? this._isUneditableNode(range, false)
 						: dom.check.isElement(selectionNode.nextSibling)
-							? selectionNode.nextSibling
-							: dom.check.isEdgePoint(range.endContainer, range.endOffset)
-								? dom.query.getNextDeepestNode(range.endContainer, null)
-								: null;
+						? selectionNode.nextSibling
+						: dom.check.isEdgePoint(range.endContainer, range.endOffset)
+						? dom.query.getNextDeepestNode(range.endContainer, null)
+						: null;
 				if (this.component.is(sel)) {
 					const fileComponentInfo = this.component.get(sel);
 					if (fileComponentInfo) {
@@ -1224,7 +1226,7 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 
 	if (keyCodeMap.isRemoveKey(keyCode) && dom.check.isZeroWidth(formatEl?.textContent) && !formatEl.previousElementSibling && !dom.check.isListCell(formatEl)) {
 		const rsMode = this.options.get('retainStyleMode');
-		if (rsMode !== 'none' && _styleNodes?.length > 0) {
+		if (rsMode !== 'none' && _styleNodes.value?.length > 0) {
 			if (rsMode === 'repeat') {
 				if (this.__retainTimer) {
 					this.__retainTimer = _w.clearTimeout(this.__retainTimer);
@@ -1233,11 +1235,11 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 					this.__retainTimer = _w.setTimeout(() => {
 						this.__retainTimer = null;
 					}, 0);
-					this._retainStyleNodes(formatEl, _styleNodes);
+					this._retainStyleNodes(formatEl, _styleNodes.value);
 				}
 			} else {
 				this.__retainTimer = null;
-				this._retainStyleNodes(formatEl, _styleNodes);
+				this._retainStyleNodes(formatEl, _styleNodes.value);
 			}
 		} else {
 			this._clearRetainStyleNodes(formatEl);
