@@ -22,7 +22,7 @@ declare class EventManager {
 	 * @param {__se__EditorCore} editor - The root editor instance
 	 * @property {__se__EditorCore} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, editor: __se__EditorCore);
 	/**
 	 * @description Old browsers: When there is no 'e.isComposing' in the keyup event
 	 * @type {boolean}

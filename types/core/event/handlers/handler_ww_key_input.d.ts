@@ -70,3 +70,21 @@ export class OnKeyUp_wysiwyg {
 	__retainTimer: number | void;
 }
 export type EventManagerThis_handler_ww_key_input = Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>;
+/**
+ * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_ww_key_input
+ */
+/**
+ * @private
+ * @param {HTMLElement} formatEl - Format element
+ * @returns {Node}
+ */
+export function LineDelete_next(formatEl: HTMLElement): Node;
+/**
+ * @private
+ * @param {HTMLElement} formatEl - Format element
+ * @returns {{focusNode: Node, focusOffset: number}}
+ */
+export function LineDelete_prev(formatEl: HTMLElement): {
+	focusNode: Node;
+	focusOffset: number;
+};

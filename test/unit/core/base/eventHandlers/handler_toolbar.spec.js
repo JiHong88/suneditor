@@ -1,4 +1,4 @@
-import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from '../../../../../src/core/base/eventHandlers/handler_toolbar';
+import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from '../../../../../src/core/event/handlers/handler_toolbar';
 import { createMockThis, createMockEvent } from '../../../../__mocks__/editorMock';
 import { dom } from '../../../../../src/helper';
 

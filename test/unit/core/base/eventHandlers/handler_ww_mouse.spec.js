@@ -1,4 +1,4 @@
-import { OnMouseDown_wysiwyg, OnMouseUp_wysiwyg, OnClick_wysiwyg, OnMouseMove_wysiwyg, OnMouseLeave_wysiwyg } from '../../../../../src/core/base/eventHandlers/handler_ww_mouse';
+import { OnMouseDown_wysiwyg, OnMouseUp_wysiwyg, OnClick_wysiwyg, OnMouseMove_wysiwyg, OnMouseLeave_wysiwyg } from '../../../../../src/core/event/handlers/handler_ww_mouse';
 import { createMockThis, createMockMouseEvent } from '../../../../__mocks__/editorMock';
 
 describe('handler_ww_mouse', () => {

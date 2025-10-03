@@ -250,8 +250,8 @@ declare class Editor {
 	selectMenuOn: boolean;
 	/** @description History class instance @type {ReturnType<typeof import('./base/history').default>} */
 	history: ReturnType<typeof import('./base/history').default>;
-	/** @description EventManager class instance @type {import('./base/eventManager').default} */
-	eventManager: import('./base/eventManager').default;
+	/** @description EventManager class instance @type {import('./event/eventManager').default} */
+	eventManager: import('./event/eventManager').default;
 	/** @description iframe-safe instanceof check utility class @type {import('./util/instanceCheck').default} */
 	instanceCheck: import('./util/instanceCheck').default;
 	/** @description Toolbar class instance @type {import('./class/toolbar').default} */

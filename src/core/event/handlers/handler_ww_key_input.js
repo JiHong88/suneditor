@@ -322,10 +322,10 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					selectionNode === formatEl
 						? this._isUneditableNode(range, true)
 						: dom.check.isElement(selectionNode.previousSibling)
-						? selectionNode.previousSibling
-						: dom.check.isEdgePoint(range.startContainer, range.startOffset)
-						? dom.query.getPreviousDeepestNode(range.startContainer)
-						: null;
+							? selectionNode.previousSibling
+							: dom.check.isEdgePoint(range.startContainer, range.startOffset)
+								? dom.query.getPreviousDeepestNode(range.startContainer)
+								: null;
 				if (this.component.is(sel)) {
 					const fileComponentInfo = this.component.get(sel);
 					if (fileComponentInfo) {
@@ -521,10 +521,10 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 					selectionNode === formatEl
 						? this._isUneditableNode(range, false)
 						: dom.check.isElement(selectionNode.nextSibling)
-						? selectionNode.nextSibling
-						: dom.check.isEdgePoint(range.endContainer, range.endOffset)
-						? dom.query.getNextDeepestNode(range.endContainer, null)
-						: null;
+							? selectionNode.nextSibling
+							: dom.check.isEdgePoint(range.endContainer, range.endOffset)
+								? dom.query.getNextDeepestNode(range.endContainer, null)
+								: null;
 				if (this.component.is(sel)) {
 					const fileComponentInfo = this.component.get(sel);
 					if (fileComponentInfo) {

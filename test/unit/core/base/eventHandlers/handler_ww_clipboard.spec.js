@@ -1,4 +1,4 @@
-import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from '../../../../../src/core/base/eventHandlers/handler_ww_clipboard';
+import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from '../../../../../src/core/event/handlers/handler_ww_clipboard';
 import { createMockThis, createMockClipboardData } from '../../../../__mocks__/editorMock';
 
 describe('handler_ww_clipboard', () => {

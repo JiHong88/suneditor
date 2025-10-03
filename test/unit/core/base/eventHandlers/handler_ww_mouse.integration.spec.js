@@ -1,5 +1,5 @@
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../../__mocks__/editorIntegration';
-import { OnClick_wysiwyg, OnMouseUp_wysiwyg } from '../../../../../src/core/base/eventHandlers/handler_ww_mouse';
+import { OnClick_wysiwyg, OnMouseUp_wysiwyg } from '../../../../../src/core/event/handlers/handler_ww_mouse';
 
 describe('Mouse Event Handlers - Integration Tests', () => {
 	let editor;

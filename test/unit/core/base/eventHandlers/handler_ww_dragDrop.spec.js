@@ -1,4 +1,4 @@
-import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from '../../../../../src/core/base/eventHandlers/handler_ww_dragDrop';
+import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from '../../../../../src/core/event/handlers/handler_ww_dragDrop';
 import { createMockThis, createMockDragEvent } from '../../../../__mocks__/editorMock';
 
 describe('handler_ww_dragDrop', () => {

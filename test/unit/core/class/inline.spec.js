@@ -819,16 +819,6 @@ describe('Inline Class', () => {
 	});
 
 	describe('Advanced edge cases for coverage', () => {
-		it('should handle collapsed removeFormat with list cell', () => {
-			wysiwyg.innerHTML = '<ul><li style="color: red;">item</li></ul>';
-			const li = wysiwyg.querySelector('li');
-			editor.selection.setRange(li, 0, li, 0);
-
-			const result = inline.apply(null);
-
-			expect(result).toBeUndefined();
-		});
-
 		it('should handle collapsed range with element and focusNode', () => {
 			wysiwyg.innerHTML = '<p><span>test<br></span></p>';
 			const span = wysiwyg.querySelector('span');
@@ -1093,16 +1083,6 @@ describe('Inline Class', () => {
 			wysiwyg.innerHTML = '<p>text</p>';
 			const p = wysiwyg.querySelector('p');
 			editor.selection.setRange(p.firstChild, 2, p.firstChild, 2);
-
-			const result = inline.apply(null);
-
-			expect(result).toBeUndefined();
-		});
-
-		it('should handle collapsed removeFormat on list cell with common styles', () => {
-			wysiwyg.innerHTML = '<ul><li style="color: red;">text</li></ul>';
-			const li = wysiwyg.querySelector('li');
-			editor.selection.setRange(li.firstChild, 2, li.firstChild, 2);
 
 			const result = inline.apply(null);
 

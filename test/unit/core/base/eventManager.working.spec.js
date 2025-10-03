@@ -1,4 +1,4 @@
-import EventManager from '../../../../src/core/base/eventManager';
+import EventManager from '../../../../src/core/event/eventManager';
 import { createMockEditor } from '../../../__mocks__/editorMock';
 import { dom, unicode } from '../../../../src/helper';
 

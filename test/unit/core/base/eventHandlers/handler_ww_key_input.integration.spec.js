@@ -1,5 +1,5 @@
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../../__mocks__/editorIntegration';
-import { OnKeyDown_wysiwyg } from '../../../../../src/core/base/eventHandlers/handler_ww_key_input';
+import { OnKeyDown_wysiwyg } from '../../../../../src/core/event/handlers/handler_ww_key_input';
 
 describe('Key Input Handlers - Integration Tests', () => {
 	let editor;

@@ -3,12 +3,7 @@
  */
 
 export * from './assets/icons/defaultIcons';
-export * from './core/base/eventHandlers/handler_toolbar';
-export * from './core/base/eventHandlers/handler_ww_clipboard';
-export * from './core/base/eventHandlers/handler_ww_dragDrop';
-export * from './core/base/eventHandlers/handler_ww_key_input';
-export * from './core/base/eventHandlers/handler_ww_mouse';
-export * from './core/base/eventManager';
+export * from './core/base/actives';
 export * from './core/base/history';
 export * from './core/class/char';
 export * from './core/class/component';
@@ -28,7 +23,12 @@ export * from './core/config/context';
 export * from './core/config/frameContext';
 export * from './core/config/options';
 export * from './core/editor';
-export * from './core/section/actives';
+export * from './core/event/eventManager';
+export * from './core/event/handlers/handler_toolbar';
+export * from './core/event/handlers/handler_ww_clipboard';
+export * from './core/event/handlers/handler_ww_dragDrop';
+export * from './core/event/handlers/handler_ww_key_input';
+export * from './core/event/handlers/handler_ww_mouse';
 export * from './core/section/constructor';
 export * from './core/section/documentType';
 export * from './core/util/instanceCheck';
@@ -47,7 +47,6 @@ export * from './helper/index';
 export * from './helper/keyCodeMap';
 export * from './helper/numbers';
 export * from './helper/unicode';
-export * from './index';
 export * from './langs/ckb';
 export * from './langs/cs';
 export * from './langs/da';

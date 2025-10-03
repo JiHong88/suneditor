@@ -3,9 +3,9 @@ import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusba
 import { OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG, BaseOptionsUtil, FrameOptionsUtil } from './config/options';
 import { ContextUtil } from './config/context';
 import { UpdateStatusbarContext, FrameContextUtil } from './config/frameContext';
-import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './section/actives';
+import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './base/actives';
 import History from './base/history';
-import EventManager from './base/eventManager';
+import EventManager from './event/eventManager';
 import Events from '../events';
 import DocumentType from './section/documentType';
 
@@ -302,7 +302,7 @@ function Editor(multiTargets, options) {
 	// ------ base ------
 	/** @description History class instance @type {ReturnType<typeof import('./base/history').default>} */
 	this.history = null;
-	/** @description EventManager class instance @type {import('./base/eventManager').default} */
+	/** @description EventManager class instance @type {import('./event/eventManager').default} */
 	this.eventManager = null;
 
 	//  ----- util -----
