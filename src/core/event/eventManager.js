@@ -9,7 +9,8 @@ import { _DragHandle } from '../../modules';
 // event handlers
 import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from './handlers/handler_toolbar';
 import { OnMouseDown_wysiwyg, OnMouseUp_wysiwyg, OnClick_wysiwyg, OnMouseMove_wysiwyg, OnMouseLeave_wysiwyg } from './handlers/handler_ww_mouse';
-import { OnBeforeInput_wysiwyg, OnInput_wysiwyg, OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './handlers/handler_ww_key_input';
+import { OnBeforeInput_wysiwyg, OnInput_wysiwyg } from './handlers/handler_ww_input';
+import { OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './handlers/handler_ww_key';
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './handlers/handler_ww_clipboard';
 import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './handlers/handler_ww_dragDrop';
 
