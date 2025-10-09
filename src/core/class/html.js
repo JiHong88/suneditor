@@ -1200,11 +1200,13 @@ HTML.prototype = {
 	/**
 	 * @this {HTMLThis}
 	 * @description Call "clipboard.write" to copy the contents and display a success/failure toast message.
-	 * @param {Element|Text|string} content Content to be copied to the clipboard
+	 * @param {Node|Element|Text|string} content Content to be copied to the clipboard
 	 * @returns {Promise<boolean>} Success or failure
 	 */
 	async copy(content) {
 		try {
+			if (typeof content !== 'string' && !dom.check.isElement(content) && !dom.check.isText(content)) return false;
+
 			await clipboard.write(content);
 			this.editor.ui.showToast(this.lang.message_copy_success, this.options.get('toastMessageTime').copy);
 			return true;

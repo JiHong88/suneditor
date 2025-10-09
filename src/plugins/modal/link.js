@@ -53,6 +53,7 @@ class Link extends EditorInjector {
 
 		// members
 		const uploadUrl = typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null;
+		this.target = null;
 		this.isUpdateState = false;
 		this.pluginOptions = {
 			...pluginOptions,
@@ -91,6 +92,7 @@ class Link extends EditorInjector {
 
 			this.anchor.set(element);
 			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
+			this.target = element;
 
 			return true;
 		}
@@ -163,7 +165,9 @@ class Link extends EditorInjector {
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
 
-		if (/update/.test(command)) {
+		if (/copy/.test(command)) {
+			this.html.copy(this.target);
+		} else if (/update/.test(command)) {
 			this.modal.open();
 		} else if (/unlink/.test(command)) {
 			const sc = dom.query.getEdgeChild(
@@ -226,6 +230,12 @@ function CreateHTML_controller({ lang, icons }) {
 	<div class="link-content">
 		<span><a target="_blank" href=""></a>&nbsp;</span>
 		<div class="se-btn-group">
+			<button type="button" data-command="copy" tabindex="-1" class="se-btn se-tooltip">
+				${icons.copy}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${lang.copy}</span>
+				</span>
+			</button>
 			<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">
 				${icons.edit}
 				<span class="se-tooltip-inner">
