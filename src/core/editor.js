@@ -1,6 +1,6 @@
 import { env, converter, dom, numbers } from '../helper';
 import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar } from './section/constructor';
-import { OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG, BaseOptionsUtil, FrameOptionsUtil } from './config/options';
+import { OPTION_FRAME_FIXED_FLAG, OPTION_FIXED_FLAG, BaseOptionsMap, FrameOptionsMap } from './config/options';
 import { ContextUtil } from './config/context';
 import { UpdateStatusbarContext, FrameContextUtil } from './config/frameContext';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './base/actives';
@@ -123,9 +123,9 @@ function Editor(multiTargets, options) {
 	/**
 	 * @description Utility object that manages the editor's runtime [frame] options.
 	 * Provides methods to get, set, and inspect internal [frame] options.
-	 * @type {FrameOptionsUtil}
+	 * @type {FrameOptionsMap}
 	 */
-	this.frameOptions = FrameOptionsUtil(this);
+	this.frameOptions = FrameOptionsMap(this);
 
 	/**
 	 * @description Editor row options
@@ -136,9 +136,9 @@ function Editor(multiTargets, options) {
 	/**
 	 * @description Utility object that manages the editor's runtime options.
 	 * Provides methods to get, set, and inspect internal editor options.
-	 * @type {BaseOptionsUtil}
+	 * @type {BaseOptionsMap}
 	 */
-	this.options = BaseOptionsUtil(this);
+	this.options = BaseOptionsMap(this);
 
 	/**
 	 * @description Plugins
@@ -399,13 +399,13 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description List of buttons to run plugins in the toolbar
-	 * @type {Array<HTMLElement>}
+	 * @type {Object<string, Array<HTMLElement>>}
 	 */
 	this._pluginCallButtons = product.pluginCallButtons;
 
 	/**
 	 * @description List of buttons to run plugins in the Sub-Toolbar
-	 * @type {Array<HTMLElement>}
+	 * @type {Object<string, Array<HTMLElement>>|[]}
 	 */
 	this._pluginCallButtons_sub = product.pluginCallButtons_sub;
 

@@ -525,12 +525,33 @@ export const OPTION_FIXED_FLAG = {
 
 /**
  * ================================================================================================================================
- * === UTILITIES : Manage Option Map
+ * === UTILITIES : Manage Option Map ⭐️
  * =================================================================================================================================
  */
 
 /**
- * @typedef {Object} FrameOptionsUtil
+ * @typedef {Object} BaseOptionsMap
+ * @description A Map containing all processed editor base options.
+ * - This Map contains all keys from {@link AllBaseOptions}, where:
+ * - Keys are option names (string)
+ * - Values depend on the specific option (see {@link AllBaseOptions} for details)
+ *
+ * @property {(k: keyof AllBaseOptions) => *} get - Retrieves the value of a specific option.
+ * @property {(k: keyof AllBaseOptions, v: *) => void} set - Sets the value of a specific option.
+ * @property {(k: keyof AllBaseOptions) => boolean} has - Checks if a specific option exists.
+ * @property {() => Object<keyof AllBaseOptions, *>} getAll - Retrieves all options as an object.
+ * @property {(options: Object<keyof AllBaseOptions, *>) => void} setMany - Sets multiple options at once.
+ * @property {(newMap: Map<string, *>) => void} reset - Replaces all options with a new Map.
+ * @property {() => void} clear - Clears all stored options.
+ */
+
+/**
+ * @typedef {Object} FrameOptionsMap
+ * @description A Map containing all processed frame-level options.
+ * - This Map contains all keys from {@link AllFrameOptions}, where:
+ * - Keys are option names (string)
+ * - Values depend on the specific option (see {@link AllFrameOptions} for details)
+ *
  * @property {(k: keyof AllFrameOptions) => *} get - Retrieves the value of a specific option.
  * @property {(k: keyof AllFrameOptions, v: *) => void} set - Sets the value of a specific option.
  * @property {(k: keyof AllFrameOptions) => boolean} has - Checks if a specific option exists.
@@ -540,13 +561,16 @@ export const OPTION_FIXED_FLAG = {
  * @property {() => void} clear - Clears all stored options.
  */
 
+/** ================================================================================================================================= */
+/** ================================================================================================================================= */
+
 /**
  * @description Creates a utility wrapper for editor frame options.
  * Provides get, set, has, getAll, and setMany methods with internal Map support.
  * @param {*} editor - The editor instance
- * @returns {FrameOptionsUtil}
+ * @returns {FrameOptionsMap}
  */
-export function FrameOptionsUtil(editor) {
+export function FrameOptionsMap(editor) {
 	let store = editor.__frameOptions;
 
 	return {
@@ -575,23 +599,12 @@ export function FrameOptionsUtil(editor) {
 }
 
 /**
- * @typedef {Object} BaseOptionsUtil
- * @property {(k: keyof AllBaseOptions) => *} get - Retrieves the value of a specific option.
- * @property {(k: keyof AllBaseOptions, v: *) => void} set - Sets the value of a specific option.
- * @property {(k: keyof AllBaseOptions) => boolean} has - Checks if a specific option exists.
- * @property {() => Object<keyof AllBaseOptions, *>} getAll - Retrieves all options as an object.
- * @property {(options: Object<keyof AllBaseOptions, *>) => void} setMany - Sets multiple options at once.
- * @property {(newMap: Map<string, *>) => void} reset - Replaces all options with a new Map.
- * @property {() => void} clear - Clears all stored options.
- */
-
-/**
  * @description Creates a utility wrapper for editor base options.
  * - Provides get, set, has, getAll, and setMany methods with internal Map support.
  * @param {*} editor - The editor instance
- * @returns {BaseOptionsUtil}
+ * @returns {BaseOptionsMap}
  */
-export function BaseOptionsUtil(editor) {
+export function BaseOptionsMap(editor) {
 	let store = editor.__options;
 
 	return {

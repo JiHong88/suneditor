@@ -45,7 +45,7 @@
  * @property {number} currentViewportHeight Current visual viewport height size
  * @property {number} initViewportHeight Height of the initial visual viewport height size
  * @property {boolean} onSelected Boolean value of whether component is selected
- * @property {number} rootKey Current root key
+ * @property {*} rootKey Current root key
  * @property {Range} _range Current range object
  * @property {boolean} _onMousedown Mouse down event status
  */
