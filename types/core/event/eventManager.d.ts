@@ -196,34 +196,6 @@ declare class EventManager {
 	/**
 	 * @private
 	 * @this {EventManagerThis}
-	 * @description Determines if the "range" is within an uneditable node.
-	 * @param {Range} range The range object
-	 * @param {boolean} isFront Whether to check the start or end of the range
-	 * @returns {Node|null} The uneditable node if found, otherwise null
-	 */
-	_isUneditableNode(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, range: Range, isFront: boolean): Node | null;
-	/**
-	 * @private
-	 * @this {EventManagerThis}
-	 * @description Retrieves the sibling node of a selected node if it is uneditable. || component node.
-	 * - Used only in `_isUneditableNode`.
-	 * @param {Node} selectNode The selected node
-	 * @param {string} siblingKey The key to access the sibling (`previousSibling` or `nextSibling`)
-	 * @param {Node} container The parent container node
-	 * @returns {Node|null} The sibling node if found, otherwise null
-	 */
-	_isUneditableNode_getSibling(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, selectNode: Node, siblingKey: string, container: Node): Node | null;
-	/**
-	 * @private
-	 * @this {EventManagerThis}
-	 * @description Deletes specific elements such as tables in "Firefox" and media elements (image, video, audio) in "Chrome".
-	 * - Handles deletion logic based on selection range and node types.
-	 * @returns {boolean} Returns `true` if an element was deleted and focus was adjusted, otherwise `false`.
-	 */
-	_hardDelete(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): boolean;
-	/**
-	 * @private
-	 * @this {EventManagerThis}
 	 * @description If there is no default format, add a line and move 'selection'.
 	 * @param {string|null} formatName Format tag name (default: 'P')
 	 */
@@ -373,20 +345,6 @@ declare class EventManager {
 	 * @description Removes input event listeners and resets input-related properties.
 	 */
 	__removeInput(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
-	/**
-	 * @private
-	 * @this {EventManagerThis}
-	 * @description Prevents the default behavior of the Enter key and refocuses the editor.
-	 * @param {Event} e The keyboard event
-	 */
-	__enterPrevent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, e: Event): void;
-	/**
-	 * @private
-	 * @description Scrolls the editor view to the caret position after pressing Enter. (Ignored on mobile devices)
-	 * @this {EventManagerThis}
-	 * @param {*} range Range object
-	 */
-	__enterScrollTo(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, range: any): void;
 	/**
 	 * @private
 	 * @description Focus Event Postprocessing

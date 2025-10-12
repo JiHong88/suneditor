@@ -9,19 +9,22 @@
  */
 export function CreateShortcuts(command: string, button: Element | null, values: Array<string>, keyMap: Map<string, any>, rc: any[], reverseKeys: Set<any>): void;
 /**
+ * @typedef {Object} InitOptionsReturnType
+ * @property {BaseOptionsMap_constructor} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+ * @property {Object<string, string>} i - Icon set
+ * @property {Object<string, string>} l - Language pack
+ * @property {string|null} v - Initial editor value
+ * @property {Array<string[]|string>} buttons - Toolbar button list (arrays for groups, strings for single buttons)
+ * @property {Array<string[]|string>|null} subButtons - Sub-toolbar button list
+ * @property {Element|null} statusbarContainer - Container element for status bar (if specified)
+ * @property {Map<string|null, FrameOptionsMap_constructor>} frameMap - Map of frame-specific options (frame key => {@link FrameOptionsMap})
+ */
+/**
  * @description Initialize options
  * @param {EditorInitOptions_constructor} options Configuration options for the editor.
  * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets Target textarea
  * @param {Object<string, *>} plugins Plugins object
- * @returns {{o: Map<string, *>, i: Object<string, string>, l: Object<string, string>, v: string, buttons: Array<string[]|string>, subButtons: Array<string[]|string>, statusbarContainer: Element|null, frameMap: Map<*, *>}}
- * - o: options
- * - i: icons
- * - l: lang
- * - v: value
- * - buttons: Toolbar button list
- * - subButtons: Sub-Toolbar button list
- * - statusbarContainer: statusbar container
- * - frameMap: converted options map
+ * @returns {InitOptionsReturnType} Initialized options and configuration
  */
 export function InitOptions(
 	options: EditorInitOptions_constructor,
@@ -33,20 +36,7 @@ export function InitOptions(
 	plugins: {
 		[x: string]: any;
 	}
-): {
-	o: Map<string, any>;
-	i: {
-		[x: string]: string;
-	};
-	l: {
-		[x: string]: string;
-	};
-	v: string;
-	buttons: Array<string[] | string>;
-	subButtons: Array<string[] | string>;
-	statusbarContainer: Element | null;
-	frameMap: Map<any, any>;
-};
+): InitOptionsReturnType;
 /**
  * @description Create a context object for the editor frame.
  * @param {Map<string, *>} targetOptions - editor.frameOptions
@@ -120,6 +110,117 @@ export function CreateToolBar(
 export default Constructor;
 export type EditorFrameOptions_constructor = import('../config/options').EditorFrameOptions;
 export type EditorInitOptions_constructor = import('../config/options').EditorInitOptions;
+export type AllBaseOptions_constructor = import('../config/options').AllBaseOptions;
+export type BaseOptionsMap_constructor = import('../config/options').BaseOptionsMap;
+export type FrameOptionsMap_constructor = import('../config/options').FrameOptionsMap;
+export type ConstructorReturnType = {
+	/**
+	 * - Editor context object
+	 */
+	context: __se__Context;
+	/**
+	 * - Carrier wrapper element
+	 */
+	carrierWrapper: HTMLElement;
+	/**
+	 * - Processed editor options (Map)
+	 */
+	options: __se__BaseOptions;
+	/**
+	 * - Loaded plugins
+	 */
+	plugins: {
+		[x: string]: any;
+	};
+	/**
+	 * - Icon set
+	 */
+	icons: {
+		[x: string]: string;
+	};
+	/**
+	 * - Language pack
+	 */
+	lang: {
+		[x: string]: string;
+	};
+	/**
+	 * - Initial editor value
+	 */
+	value: string | null;
+	/**
+	 * - Root frame ID
+	 */
+	rootId: string | null;
+	/**
+	 * - Array of frame keys
+	 */
+	rootKeys: Array<string | null>;
+	/**
+	 * - Map of frame contexts
+	 */
+	frameRoots: Map<string | null, ReturnType<typeof CreateFrameContext>>;
+	/**
+	 * - Plugin toolbar buttons
+	 */
+	pluginCallButtons: {
+		[x: string]: HTMLElement[];
+	};
+	/**
+	 * - Responsive toolbar buttons
+	 */
+	responsiveButtons: Array<HTMLElement>;
+	/**
+	 * - Sub-toolbar plugin buttons
+	 */
+	pluginCallButtons_sub:
+		| {
+				[x: string]: Array<HTMLElement>;
+		  }
+		| [];
+	/**
+	 * - Sub-toolbar responsive buttons
+	 */
+	responsiveButtons_sub: Array<HTMLElement>;
+};
+export type InitOptionsReturnType = {
+	/**
+	 * - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+	 */
+	o: BaseOptionsMap_constructor;
+	/**
+	 * - Icon set
+	 */
+	i: {
+		[x: string]: string;
+	};
+	/**
+	 * - Language pack
+	 */
+	l: {
+		[x: string]: string;
+	};
+	/**
+	 * - Initial editor value
+	 */
+	v: string | null;
+	/**
+	 * - Toolbar button list (arrays for groups, strings for single buttons)
+	 */
+	buttons: Array<string[] | string>;
+	/**
+	 * - Sub-toolbar button list
+	 */
+	subButtons: Array<string[] | string> | null;
+	/**
+	 * - Container element for status bar (if specified)
+	 */
+	statusbarContainer: Element | null;
+	/**
+	 * - Map of frame-specific options (frame key => {@link FrameOptionsMap})
+	 */
+	frameMap: Map<string | null, FrameOptionsMap_constructor>;
+};
 /**
  * @typedef {import('../config/options').EditorFrameOptions} EditorFrameOptions_constructor
  */
@@ -127,10 +228,36 @@ export type EditorInitOptions_constructor = import('../config/options').EditorIn
  * @typedef {import('../config/options').EditorInitOptions} EditorInitOptions_constructor
  */
 /**
+ * @typedef {import('../config/options').AllBaseOptions} AllBaseOptions_constructor
+ */
+/**
+ * @typedef {import('../config/options').BaseOptionsMap} BaseOptionsMap_constructor
+ */
+/**
+ * @typedef {import('../config/options').FrameOptionsMap} FrameOptionsMap_constructor
+ */
+/**
+ * @typedef {Object} ConstructorReturnType
+ * @property {__se__Context} context - Editor context object
+ * @property {HTMLElement} carrierWrapper - Carrier wrapper element
+ * @property {__se__BaseOptions} options - Processed editor options (Map)
+ * @property {Object<string, *>} plugins - Loaded plugins
+ * @property {Object<string, string>} icons - Icon set
+ * @property {Object<string, string>} lang - Language pack
+ * @property {string|null} value - Initial editor value
+ * @property {string|null} rootId - Root frame ID
+ * @property {Array<string|null>} rootKeys - Array of frame keys
+ * @property {Map<string|null, ReturnType<import('../config/frameContext').CreateFrameContext>>} frameRoots - Map of frame contexts
+ * @property {Object<string, Array<HTMLElement>>} pluginCallButtons - Plugin toolbar buttons
+ * @property {Array<HTMLElement>} responsiveButtons - Responsive toolbar buttons
+ * @property {Object<string, Array<HTMLElement>>|[]} pluginCallButtons_sub - Sub-toolbar plugin buttons
+ * @property {Array<HTMLElement>} responsiveButtons_sub - Sub-toolbar responsive buttons
+ */
+/**
  * @description Creates a new SunEditor instance with specified options.
  * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets - Target element or multi-root object.
  * @param {EditorInitOptions_constructor} options - Configuration options for the editor.
- * @returns {Object<string, *>} - SunEditor instance with context, options, and DOM elements.
+ * @returns {ConstructorReturnType} - SunEditor instance with context, options, and DOM elements.
  */
 declare function Constructor(
 	editorTargets: Array<{
@@ -139,6 +266,5 @@ declare function Constructor(
 		options: EditorFrameOptions_constructor;
 	}>,
 	options: EditorInitOptions_constructor
-): {
-	[x: string]: any;
-};
+): ConstructorReturnType;
+import { CreateFrameContext } from '../config/frameContext';

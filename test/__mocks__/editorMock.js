@@ -134,12 +134,15 @@ function createMockFrameContext(key = 'test-frame', elements) {
 		['historyIndex', -1],
 		['isChanged', false],
 		['_minHeight', 100],
-		['options', new Map([
-			['iframe', false],
-			['statusbar_resizeEnable', true],
-			['charCounter_type', 'char'],
-			['hasCodeMirror', false]
-		])]
+		[
+			'options',
+			new Map([
+				['iframe', false],
+				['statusbar_resizeEnable', true],
+				['charCounter_type', 'char'],
+				['hasCodeMirror', false]
+			])
+		]
 	]);
 }
 
@@ -147,9 +150,7 @@ function createMockFrameContext(key = 'test-frame', elements) {
  * Creates a mock frame roots map
  */
 function createMockFrameRoots(frameContext) {
-	return new Map([
-		['test-frame', frameContext]
-	]);
+	return new Map([['test-frame', frameContext]]);
 }
 
 /**
@@ -159,25 +160,31 @@ function createMockOptions() {
 	return new Map([
 		['historyStackDelayTime', 400],
 		['defaultLine', 'P'],
-		['_defaultStyleTagMap', {
-			strong: 'bold',
-			em: 'italic',
-			b: 'bold',
-			i: 'italic',
-			u: 'underline',
-			s: 'strikethrough',
-			sub: 'subscript',
-			sup: 'superscript'
-		}],
+		[
+			'_defaultStyleTagMap',
+			{
+				strong: 'bold',
+				em: 'italic',
+				b: 'bold',
+				i: 'italic',
+				u: 'underline',
+				s: 'strikethrough',
+				sub: 'subscript',
+				sup: 'superscript'
+			}
+		],
 		['_rtl', false],
-		['_styleCommandMap', {
-			strong: 'bold',
-			em: 'italic',
-			b: 'bold',
-			i: 'italic',
-			u: 'underline',
-			s: 'strikethrough'
-		}],
+		[
+			'_styleCommandMap',
+			{
+				strong: 'bold',
+				em: 'italic',
+				b: 'bold',
+				i: 'italic',
+				u: 'underline',
+				s: 'strikethrough'
+			}
+		],
 		['_textStyleTags', ['strong', 'em', 'b', 'i', 'u', 's', 'sub', 'sup']],
 		['statusbar_showPathLabel', true],
 		['iframe', false],
@@ -399,19 +406,18 @@ export function createMockEditor(customOptions = {}) {
 		context: {
 			get: jest.fn((key) => {
 				const contextMap = {
-					'menuTray': elements.menuTray,
-					'toolbar_main': elements.toolbarMain,
-					'toolbar_sub_main': elements.toolbarSub,
-					'topArea': elements.topArea,
-					'wrapper': elements.wrapper,
-					'wysiwyg': elements.wysiwyg,
-					'code': elements.codeArea,
-					'statusbar': elements.statusbar
+					menuTray: elements.menuTray,
+					toolbar_main: elements.toolbarMain,
+					toolbar_sub_main: elements.toolbarSub,
+					topArea: elements.topArea,
+					wrapper: elements.wrapper,
+					wysiwyg: elements.wysiwyg,
+					code: elements.codeArea,
+					statusbar: elements.statusbar
 				};
 				return contextMap[key] || document.createElement('div');
 			})
 		},
-
 
 		format: {
 			isLine: jest.fn().mockReturnValue(true),
@@ -749,9 +755,6 @@ export function createMockThis(editor = null, customProps = {}) {
 		triggerEvent: mockEditor.triggerEvent,
 		_dataTransferAction: jest.fn().mockResolvedValue(false),
 		_setClipboardData: jest.fn(),
-		_isUneditableNode: jest.fn().mockReturnValue(null),
-		_isUneditableNode_getSibling: jest.fn(),
-		_hardDelete: jest.fn().mockReturnValue(false),
 		_setDefaultLine: jest.fn(),
 		_toggleToolbarBalloon: jest.fn(),
 		_showToolbarBalloonDelay: jest.fn(),
@@ -768,8 +771,6 @@ export function createMockThis(editor = null, customProps = {}) {
 		_callPluginEvent: jest.fn(),
 		_overComponentSelect: jest.fn(),
 		__removeInput: jest.fn(),
-		__enterPrevent: jest.fn(),
-		__enterScrollTo: jest.fn(),
 		__postFocusEvent: jest.fn(),
 		__postBlurEvent: jest.fn(),
 		__setViewportSize: jest.fn(),

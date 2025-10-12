@@ -57,6 +57,7 @@ declare class Link extends EditorInjector {
 	constructor(editor: __se__EditorCore, pluginOptions: LinkPluginOptions);
 	title: any;
 	icon: string;
+	target: HTMLAnchorElement;
 	isUpdateState: boolean;
 	pluginOptions: {
 		uploadUrl: string;

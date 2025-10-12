@@ -49,7 +49,8 @@ export default [
 				'warn',
 				{
 					argsIgnorePattern: '^_',
-					varsIgnorePattern: '_'
+					varsIgnorePattern: '^_',
+					ignoreRestSiblings: true
 				}
 			]
 		}
@@ -77,7 +78,8 @@ export default [
 				'warn',
 				{
 					argsIgnorePattern: '^_',
-					varsIgnorePattern: '_'
+					varsIgnorePattern: '^_',
+					ignoreRestSiblings: true
 				}
 			]
 		}

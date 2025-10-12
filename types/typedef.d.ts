@@ -89,7 +89,7 @@ declare global {
 		/**
 		 * Current root key
 		 */
-		rootKey: number;
+		rootKey: any;
 		/**
 		 * Current range object
 		 */
@@ -235,8 +235,12 @@ declare global {
 		 */
 		info: __se__ComponentInfo;
 	};
-	type __se__FrameOptions = Map<keyof import('./core/config/options').AllFrameOptions, any>;
+	type __se__FrameOptions = import('./core/config/options').FrameOptionsMap;
+	type __se__BaseOptions = import('./core/config/options').BaseOptionsMap;
 	type __se__FrameContext = import('./core/config/frameContext').FrameContextUtil;
 	type __se__Context = Map<keyof import('./core/config/context').ContextUtil, any>;
 	type __se__Class_OffsetGlobalInfo = import('./core/class/offset').OffsetGlobalInfo;
+	type __se__EventKeydownCtx = import('./core/event/reducers/keydown.reducer').KeydownReducerCtx;
+	type __se__EventActions = import('./core/event/actions').Action[];
+	type __se__EventPorts = import('./core/event/ports').EventReducerPorts;
 }

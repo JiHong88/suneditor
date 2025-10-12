@@ -14,9 +14,6 @@
 
 /**
  * @typedef {import('./editorInjector').default} __se__EditorInjector
- */
-
-/**
  * @typedef {import('./editorInjector/_core').default} __se__CoreInjector
  */
 
@@ -124,20 +121,29 @@
  * @property {__se__ComponentInfo} info Component information
  */
 
+// --------------------------------------------------------- [Options] ---------------------------------------------------------------------------------------------------
+/**
+ * @typedef {import('./core/config/options').FrameOptionsMap} __se__FrameOptions
+ * @typedef {import('./core/config/options').BaseOptionsMap} __se__BaseOptions
+ */
+
 // --------------------------------------------------------- [Context] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Map<keyof import('./core/config/options').AllFrameOptions, *>} __se__FrameOptions
- */
-
-/**
  * @typedef {import('./core/config/frameContext').FrameContextUtil} __se__FrameContext
- */
-
-/**
  * @typedef {Map<keyof import('./core/config/context').ContextUtil, *>} __se__Context
  */
 
 // --------------------------------------------------------- [core.class] ---------------------------------------------------------------------------------------------------
 /**
  * @typedef {import('./core/class/offset').OffsetGlobalInfo} __se__Class_OffsetGlobalInfo
+ */
+
+// --------------------------------------------------------- [event.reducer/action] ------------------------------------------------------------------------------------------
+/**
+ * @typedef {import('./core/event/reducers/keydown.reducer').KeydownReducerCtx} __se__EventKeydownCtx
+ */
+
+/**
+ * @typedef {import('./core/event/actions').Action[]} __se__EventActions
+ * @typedef {import('./core/event/ports').EventReducerPorts} __se__EventPorts
  */

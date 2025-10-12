@@ -16,10 +16,40 @@ const _d = env._d;
  */
 
 /**
+ * @typedef {import('../config/options').AllBaseOptions} AllBaseOptions_constructor
+ */
+
+/**
+ * @typedef {import('../config/options').BaseOptionsMap} BaseOptionsMap_constructor
+ */
+
+/**
+ * @typedef {import('../config/options').FrameOptionsMap} FrameOptionsMap_constructor
+ */
+
+/**
+ * @typedef {Object} ConstructorReturnType
+ * @property {__se__Context} context - Editor context object
+ * @property {HTMLElement} carrierWrapper - Carrier wrapper element
+ * @property {__se__BaseOptions} options - Processed editor options (Map)
+ * @property {Object<string, *>} plugins - Loaded plugins
+ * @property {Object<string, string>} icons - Icon set
+ * @property {Object<string, string>} lang - Language pack
+ * @property {string|null} value - Initial editor value
+ * @property {string|null} rootId - Root frame ID
+ * @property {Array<string|null>} rootKeys - Array of frame keys
+ * @property {Map<string|null, ReturnType<import('../config/frameContext').CreateFrameContext>>} frameRoots - Map of frame contexts
+ * @property {Object<string, Array<HTMLElement>>} pluginCallButtons - Plugin toolbar buttons
+ * @property {Array<HTMLElement>} responsiveButtons - Responsive toolbar buttons
+ * @property {Object<string, Array<HTMLElement>>|[]} pluginCallButtons_sub - Sub-toolbar plugin buttons
+ * @property {Array<HTMLElement>} responsiveButtons_sub - Sub-toolbar responsive buttons
+ */
+
+/**
  * @description Creates a new SunEditor instance with specified options.
  * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets - Target element or multi-root object.
  * @param {EditorInitOptions_constructor} options - Configuration options for the editor.
- * @returns {Object<string, *>} - SunEditor instance with context, options, and DOM elements.
+ * @returns {ConstructorReturnType} - SunEditor instance with context, options, and DOM elements.
  */
 function Constructor(editorTargets, options) {
 	if (typeof options !== 'object') options = {};
@@ -340,19 +370,23 @@ function _mergeObject(a, b) {
 }
 
 /**
+ * @typedef {Object} InitOptionsReturnType
+ * @property {BaseOptionsMap_constructor} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+ * @property {Object<string, string>} i - Icon set
+ * @property {Object<string, string>} l - Language pack
+ * @property {string|null} v - Initial editor value
+ * @property {Array<string[]|string>} buttons - Toolbar button list (arrays for groups, strings for single buttons)
+ * @property {Array<string[]|string>|null} subButtons - Sub-toolbar button list
+ * @property {Element|null} statusbarContainer - Container element for status bar (if specified)
+ * @property {Map<string|null, FrameOptionsMap_constructor>} frameMap - Map of frame-specific options (frame key => {@link FrameOptionsMap})
+ */
+
+/**
  * @description Initialize options
  * @param {EditorInitOptions_constructor} options Configuration options for the editor.
  * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets Target textarea
  * @param {Object<string, *>} plugins Plugins object
- * @returns {{o: Map<string, *>, i: Object<string, string>, l: Object<string, string>, v: string, buttons: Array<string[]|string>, subButtons: Array<string[]|string>, statusbarContainer: Element|null, frameMap: Map<*, *>}}
- * - o: options
- * - i: icons
- * - l: lang
- * - v: value
- * - buttons: Toolbar button list
- * - subButtons: Sub-Toolbar button list
- * - statusbarContainer: statusbar container
- * - frameMap: converted options map
+ * @returns {InitOptionsReturnType} Initialized options and configuration
  */
 export function InitOptions(options, editorTargets, plugins) {
 	const buttonList = options.buttonList || DEFAULTS.BUTTON_LIST;
@@ -761,7 +795,7 @@ export function CreateStatusbar(targetOptions, statusbar) {
  * @description Initialize options.
  * @param {EditorFrameOptions_constructor} o - Target options
  * @param {EditorInitOptions_constructor} origin - Full options
- * @returns {Map<string, *>}
+ * @returns {FrameOptionsMap_constructor} Processed frame options Map
  */
 function InitFrameOptions(o, origin) {
 	const fo = new Map();

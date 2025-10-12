@@ -104,9 +104,9 @@ declare class Editor {
 	/**
 	 * @description Utility object that manages the editor's runtime [frame] options.
 	 * Provides methods to get, set, and inspect internal [frame] options.
-	 * @type {FrameOptionsUtil}
+	 * @type {FrameOptionsMap}
 	 */
-	frameOptions: FrameOptionsUtil;
+	frameOptions: FrameOptionsMap;
 	/**
 	 * @description Editor row options
 	 * @type {Map<string, *>}
@@ -115,9 +115,9 @@ declare class Editor {
 	/**
 	 * @description Utility object that manages the editor's runtime options.
 	 * Provides methods to get, set, and inspect internal editor options.
-	 * @type {BaseOptionsUtil}
+	 * @type {BaseOptionsMap}
 	 */
-	options: BaseOptionsUtil;
+	options: BaseOptionsMap;
 	/**
 	 * @description Plugins
 	 * @type {Object<string, *>}
@@ -341,14 +341,20 @@ declare class Editor {
 	_codeViewDisabledButtons: Array<HTMLButtonElement | HTMLInputElement>;
 	/**
 	 * @description List of buttons to run plugins in the toolbar
-	 * @type {Array<HTMLElement>}
+	 * @type {Object<string, Array<HTMLElement>>}
 	 */
-	_pluginCallButtons: Array<HTMLElement>;
+	_pluginCallButtons: {
+		[x: string]: HTMLElement[];
+	};
 	/**
 	 * @description List of buttons to run plugins in the Sub-Toolbar
-	 * @type {Array<HTMLElement>}
+	 * @type {Object<string, Array<HTMLElement>>|[]}
 	 */
-	_pluginCallButtons_sub: Array<HTMLElement>;
+	_pluginCallButtons_sub:
+		| {
+				[x: string]: Array<HTMLElement>;
+		  }
+		| [];
 	/**
 	 * @description Responsive Toolbar Button Structure array
 	 * @type {Array<*>}
@@ -654,5 +660,5 @@ declare class Editor {
 }
 import { ContextUtil } from './config/context';
 import { FrameContextUtil } from './config/frameContext';
-import { FrameOptionsUtil } from './config/options';
-import { BaseOptionsUtil } from './config/options';
+import { FrameOptionsMap } from './config/options';
+import { BaseOptionsMap } from './config/options';
