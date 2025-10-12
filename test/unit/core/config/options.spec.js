@@ -6,8 +6,8 @@ import {
     DEFAULTS,
     OPTION_FRAME_FIXED_FLAG,
     OPTION_FIXED_FLAG,
-    FrameOptionsUtil,
-    BaseOptionsUtil
+    FrameOptionsMap,
+    BaseOptionsMap
 } from '../../../../src/core/config/options';
 
 describe('Core Config - Options', () => {
@@ -183,7 +183,7 @@ describe('Core Config - Options', () => {
         });
     });
 
-    describe('FrameOptionsUtil function', () => {
+    describe('FrameOptionsMap function', () => {
         let mockEditor;
         let frameOptions;
 
@@ -198,7 +198,7 @@ describe('Core Config - Options', () => {
                 __frameOptions: mockMap
             };
 
-            frameOptions = FrameOptionsUtil(mockEditor);
+            frameOptions = FrameOptionsMap(mockEditor);
         });
 
         it('should create utility with proper methods', () => {
@@ -266,7 +266,7 @@ describe('Core Config - Options', () => {
         });
     });
 
-    describe('BaseOptionsUtil function', () => {
+    describe('BaseOptionsMap function', () => {
         let mockEditor;
         let baseOptions;
 
@@ -281,7 +281,7 @@ describe('Core Config - Options', () => {
                 __options: mockMap
             };
 
-            baseOptions = BaseOptionsUtil(mockEditor);
+            baseOptions = BaseOptionsMap(mockEditor);
         });
 
         it('should create utility with proper methods', () => {
@@ -374,8 +374,8 @@ describe('Core Config - Options', () => {
                 __frameOptions: new Map([['width', '100%']])
             };
 
-            const baseUtil = BaseOptionsUtil(mockEditor);
-            const frameUtil = FrameOptionsUtil(mockEditor);
+            const baseUtil = BaseOptionsMap(mockEditor);
+            const frameUtil = FrameOptionsMap(mockEditor);
 
             expect(baseUtil.get('mode')).toBe('classic');
             expect(frameUtil.get('width')).toBe('100%');
