@@ -628,7 +628,7 @@ class Video extends EditorInjector {
 			if (!/video/i.test(f.type)) continue;
 
 			s = f.size;
-			if (slngleSizeLimit && slngleSizeLimit > s) {
+			if (slngleSizeLimit > 0 && s > slngleSizeLimit) {
 				const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
 				const message = await this.triggerEvent('onVideoUploadError', {
 					error: err,

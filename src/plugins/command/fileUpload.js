@@ -239,7 +239,7 @@ class FileUpload extends EditorInjector {
 		for (let i = 0, len = fileList.length, f, s; i < len; i++) {
 			f = fileList[i];
 			s = f.size;
-			if (slngleSizeLimit && slngleSizeLimit > s) {
+			if (slngleSizeLimit > 0 && s > slngleSizeLimit) {
 				const err = '[SUNEDITOR.fileUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
 				const message = await this.triggerEvent('onFileUploadError', {
 					error: err,

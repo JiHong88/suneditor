@@ -300,7 +300,7 @@ class Audio_ extends EditorInjector {
 			if (!/audio/i.test(f.type)) continue;
 
 			s = f.size;
-			if (slngleSizeLimit && slngleSizeLimit > s) {
+			if (slngleSizeLimit > 0 && s > slngleSizeLimit) {
 				const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
 				const message = await this.triggerEvent('onAudioUploadError', {
 					error: err,

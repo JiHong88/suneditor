@@ -399,7 +399,7 @@ class Image_ extends EditorInjector {
 			if (!/image/i.test(f.type)) continue;
 
 			s = f.size;
-			if (slngleSizeLimit && slngleSizeLimit > s) {
+			if (slngleSizeLimit > 0 && s > slngleSizeLimit) {
 				const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
 				const message = await this.triggerEvent('onImageUploadError', {
 					error: err,
