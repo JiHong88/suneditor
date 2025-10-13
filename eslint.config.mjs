@@ -97,6 +97,15 @@ export default [
 		}
 	},
 
+	{
+		files: ['**/*.cjs'],
+		rules: {
+			'no-unused-vars': 'off',
+			'no-redeclare': 'off',
+			'no-console': 'off'
+		}
+	},
+
 	prettierConfig,
 	{
 		files: ['**/*.{js,ts,jsx,tsx}'],

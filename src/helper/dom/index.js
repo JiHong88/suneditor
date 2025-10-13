@@ -9,4 +9,8 @@ const dom = {
 	utils
 };
 
+export const domQuery = query;
+export const domCheck = check;
+export const domUtils = utils;
+
 export default dom;

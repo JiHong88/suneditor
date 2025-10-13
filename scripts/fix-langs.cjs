@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 const fs = require('fs');
 const path = require('path');
 const { glob } = require('glob');
@@ -28,7 +26,7 @@ export default ${baseName};
 `;
 			await fs.promises.writeFile(file, newContent, 'utf8');
 		}
-		// eslint-disable-next-line no-console
+
 		console.log('[fix-langs]');
 	} catch (error) {
 		console.error('fix-langs - error:', error);

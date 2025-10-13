@@ -6,6 +6,34 @@
 	"license": "MIT",
 	"main": "src/suneditor.js",
 	"types": "types/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./types/index.d.ts",
+			"default": "./src/suneditor.js"
+		},
+		"./src/plugins": {
+			"types": "./types/plugins/index.d.ts",
+			"default": "./src/plugins/index.js"
+		},
+		"./src/modules": {
+			"types": "./types/modules/index.d.ts",
+			"default": "./src/modules/index.js"
+		},
+		"./src/helper": {
+			"types": "./types/helper/index.d.ts",
+			"default": "./src/helper/index.js"
+		},
+		"./src/helper/dom": {
+			"types": "./types/helper/dom/index.d.ts",
+			"default": "./src/helper/dom/index.js"
+		},
+		"./src/langs": {
+			"types": "./types/langs/index.d.ts",
+			"default": "./src/langs/index.js"
+		},
+		"./src/*": "./src/*",
+		"./types/*": "./types/*"
+	},
 	"sideEffects": [
 		"./src/assets/*.css"
 	],
@@ -22,7 +50,7 @@
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
 		"lint": "npm run lint:fix-all && npm run lint:type",
-		"ts-build": "(npx tsc || true) && barrelsby --delete --directory types --exclude \"typedef.d.ts\" && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && node scripts/gen-options-dts.cjs && npm run lint:fix-ts",
+		"ts-build": "(npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/format-index.cjs && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && node scripts/gen-options-dts.cjs && npm run lint:fix-ts",
 		"i18n-build": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/i18n-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix",
 		"test": "jest --silent",
 		"test:watch": "jest --watch",

@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 const fs = require('fs');
 const path = require('path');
 const args = require('minimist')(process.argv.slice(2));
@@ -69,10 +67,8 @@ const injectKeys = async (filePath, langCode, baseLangObj) => {
 			const baseValue = baseLangObj[key];
 			if (autoTranslate) {
 				try {
-					// eslint-disable-next-line no-console
 					console.log(`[↻] Translating (${BASE_LANG} → ${googleLangCode}) ${key}: ${baseValue}`);
 					value = await googleTranslate(baseValue, BASE_LANG, googleLangCode);
-					// eslint-disable-next-line no-console
 					console.log(`[✓] Translated (${langCode}:${key}) → ${value}`);
 				} catch (e) {
 					console.warn(`[WARN] Auto-translate failed for ${langCode}:${key}`, e);
@@ -129,7 +125,6 @@ const injectKeys = async (filePath, langCode, baseLangObj) => {
 
 	fs.writeFileSync(filePath, file, 'utf8');
 
-	// eslint-disable-next-line no-console
 	console.log(`[✔] Updated ${langCode}`);
 };
 
@@ -149,7 +144,6 @@ const updateTypeDef = (baseLangObj) => {
 
 	fs.writeFileSync(TYPE_FILE, typeFile, 'utf8');
 
-	// eslint-disable-next-line no-console
 	console.log(`[✔] Updated _Lang.d.ts`);
 };
 

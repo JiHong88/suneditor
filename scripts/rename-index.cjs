@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 const fs = require('fs');
 const path = require('path');
 
@@ -21,5 +19,5 @@ fs.copyFile(sourcePath, targetPath, (copyErr) => {
 		}
 	});
 });
-// eslint-disable-next-line no-console
+
 console.log('[rename-index]');

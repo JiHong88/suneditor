@@ -5,11 +5,11 @@ import Editor from './core/editor';
  */
 
 /**
- * @typedef {import('./core/config/options').EditorFrameOptions} EditorFrameOptions_suneditor
+ * @typedef {import('./core/config/options').EditorFrameOptions} SunEditorFrameOptionsType
  */
 
 /**
- * @typedef {import('./core/config/options').EditorInitOptions} EditorInitOptions_suneditor
+ * @typedef {import('./core/config/options').EditorInitOptions} SunEditorOptionsType
  */
 
 /**
@@ -20,8 +20,8 @@ export default {
 	/**
 	 * Returns the create function with preset options.
 	 * If the options overlap, the options of the 'create' function take precedence.
-	 * @param {EditorInitOptions_suneditor} init_options - Initialization options
-	 * @returns {{create: (targets: Element|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>, options: EditorInitOptions_suneditor) => Editor}}}
+	 * @param {SunEditorOptionsType} init_options - Initialization options
+	 * @returns {{create: (targets: Element|Object<string, {target: Element, options: SunEditorFrameOptionsType}>, options: SunEditorOptionsType) => Editor}}}
 	 */
 	init(init_options) {
 		return {
@@ -31,12 +31,12 @@ export default {
 
 	/**
 	 * Creates a new instance of the SunEditor
-	 * @param {Element|string|Object<string, {target: Element, options: EditorFrameOptions_suneditor}>} target
+	 * @param {Element|string|Object<string, {target: Element, options: SunEditorFrameOptionsType}>} target
 	 * - Element: The direct DOM element to initialize the editor on.
 	 * - string: A CSS selector string. The corresponding element is selected using `document.querySelector`.
 	 * - Object: For multi-root setup. Each key maps to a config with `{target, options}`.
-	 * @param {EditorInitOptions_suneditor} options - Initialization options
-	 * @param {EditorInitOptions_suneditor} [_init_options] - Optional preset initialization options
+	 * @param {SunEditorOptionsType} options - Initialization options
+	 * @param {SunEditorOptionsType} [_init_options] - Optional preset initialization options
 	 * @returns {Editor} - Instance of the SunEditor
 	 * @throws {Error} If the target element is not provided or is invalid
 	 */

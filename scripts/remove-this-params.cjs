@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 const fs = require('fs');
 const { glob } = require('glob');
 
-const filePath = ['types/core/class/*.d.ts', 'types/core/base/eventManager.d.ts'];
+const filePath = ['types/core/class/*.d.ts', 'types/core/event/eventManager.d.ts'];
 
 async function updateConstructorThis() {
 	try {
@@ -27,7 +25,7 @@ async function updateConstructorThis() {
 				await fs.promises.writeFile(file, updatedContent, 'utf8');
 			}
 		}
-		// eslint-disable-next-line no-console
+
 		console.log('[remove-this-params]');
 	} catch (error) {
 		console.error('remove-this-param error:', error);

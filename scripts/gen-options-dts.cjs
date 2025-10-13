@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 const fs = require('fs');
 const path = require('path');
 const { DEFAULTS } = require('../src/core/config/options.js');
@@ -29,5 +27,4 @@ const replaced = original.replace(/export namespace DEFAULTS\s*{[\s\S]*?}(?=\s*e
 
 fs.writeFileSync(targetPath, replaced, 'utf-8');
 
-// eslint-disable-next-line no-console
 console.log('[gen-options-dts]');
