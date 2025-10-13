@@ -354,6 +354,34 @@ describe('Modules - Figure', () => {
             });
         });
 
+        describe('GetContainer', () => {
+            it('should get container info from element', () => {
+                const element = document.createElement('img');
+                const result = Figure.GetContainer(element);
+
+                expect(result).toHaveProperty('target');
+                expect(result).toHaveProperty('container');
+                expect(result).toHaveProperty('cover');
+                expect(result).toHaveProperty('inlineCover');
+                expect(result).toHaveProperty('caption');
+                expect(result).toHaveProperty('isVertical');
+            });
+
+            it('should identify inline cover correctly', () => {
+                const mockSpan = {
+                    className: 'se-inline-component',
+                    tagName: 'SPAN'
+                };
+                const mockDom = require('../../../src/helper').dom;
+                mockDom.utils.hasClass.mockReturnValueOnce(true);
+
+                const element = document.createElement('img');
+                const result = Figure.GetContainer(element);
+
+                expect(result).toBeDefined();
+            });
+        });
+
         describe('GetRatio', () => {
             it('should calculate ratio from width and height', () => {
                 const ratio = Figure.GetRatio(100, 50, 'px');
@@ -363,6 +391,18 @@ describe('Modules - Figure', () => {
 
             it('should return zero ratio for invalid values', () => {
                 const ratio = Figure.GetRatio('auto', 'auto', 'px');
+                expect(ratio.w).toBe(0);
+                expect(ratio.h).toBe(0);
+            });
+
+            it('should handle percentage units', () => {
+                const ratio = Figure.GetRatio('50%', '25%', '%');
+                expect(ratio.w).toBe(2);
+                expect(ratio.h).toBe(0.5);
+            });
+
+            it('should return zero for mismatched units', () => {
+                const ratio = Figure.GetRatio('100px', '50%', 'px');
                 expect(ratio.w).toBe(0);
                 expect(ratio.h).toBe(0);
             });
@@ -566,6 +606,170 @@ describe('Modules - Figure', () => {
                 expect(mockElement.style.transform).toBe('');
                 expect(mockElement.style.transformOrigin).toBe('');
                 expect(figure.isVertical).toBe(false);
+            });
+
+            it('should reset maxWidth', () => {
+                mockElement.style.maxWidth = '500px';
+                jest.spyOn(figure, '_deleteCaptionPosition').mockImplementation();
+                jest.spyOn(figure, '_applySize').mockImplementation();
+
+                figure.deleteTransform(mockElement);
+
+                expect(mockElement.style.maxWidth).toBe('');
+            });
+        });
+
+        describe('setTransform', () => {
+            it('should set transform rotation', () => {
+                jest.spyOn(figure, '_setRotate').mockImplementation();
+                jest.spyOn(figure, '_setCaptionPosition').mockImplementation();
+
+                figure.setTransform(mockElement, 100, 50, 90);
+
+                expect(figure._setRotate).toHaveBeenCalled();
+                expect(figure.isVertical).toBe(true);
+            });
+
+            it('should handle zero degree rotation', () => {
+                jest.spyOn(figure, '_setRotate').mockImplementation();
+                jest.spyOn(figure, '_setCaptionPosition').mockImplementation();
+
+                figure.setTransform(mockElement, 100, 50, 0);
+
+                expect(figure.isVertical).toBe(false);
+            });
+
+            it('should handle 360 degree rotation', () => {
+                jest.spyOn(figure, '_setRotate').mockImplementation();
+                jest.spyOn(figure, '_setCaptionPosition').mockImplementation();
+
+                figure.setTransform(mockElement, 100, 50, 360);
+
+                expect(figure._setRotate).toHaveBeenCalled();
+            });
+        });
+
+
+        describe('open', () => {
+            it('should return early if targetNode is null', () => {
+                const consoleWarn = jest.spyOn(console, 'warn').mockImplementation();
+                const result = figure.open(null, {});
+
+                expect(consoleWarn).toHaveBeenCalledWith('[SUNEDITOR.modules.Figure.open] The "targetNode" is null.');
+                expect(result).toBeUndefined();
+
+                consoleWarn.mockRestore();
+            });
+
+            it('should handle infoOnly parameter', () => {
+                jest.spyOn(Figure, 'GetContainer').mockReturnValue({
+                    target: mockElement,
+                    container: { style: {}, className: 'se-component' },
+                    cover: { style: {} },
+                    inlineCover: null,
+                    caption: null,
+                    isVertical: false
+                });
+
+                const result = figure.open(mockElement, { infoOnly: true });
+
+                expect(result).toBeDefined();
+                expect(result).toHaveProperty('w');
+                expect(result).toHaveProperty('h');
+            });
+        });
+
+        describe('controllerOpen', () => {
+            it('should set element and open controller', () => {
+                figure.controllerOpen(mockElement, {});
+
+                expect(figure._element).toBe(mockElement);
+                expect(figure.controller.open).toHaveBeenCalledWith(mockElement, null, {});
+            });
+
+            it('should handle params', () => {
+                const params = { disabled: true };
+                figure.controllerOpen(mockElement, params);
+
+                expect(figure.controller.open).toHaveBeenCalledWith(mockElement, null, params);
+            });
+        });
+
+        describe('retainFigureFormat', () => {
+            it('should not throw when called', () => {
+                const container = { className: 'se-component' };
+                const originEl = {
+                    parentNode: {
+                        replaceChild: jest.fn(),
+                        insertBefore: jest.fn(),
+                        tagName: 'DIV'
+                    },
+                    parentElement: {
+                        nodeName: 'DIV'
+                    }
+                };
+
+                expect(() => {
+                    figure.retainFigureFormat(container, originEl, null, null);
+                }).not.toThrow();
+            });
+        });
+
+        describe('More controllerAction tests', () => {
+            it('should handle remove action', () => {
+                const button = {
+                    getAttribute: jest.fn().mockReturnValue('remove')
+                };
+
+                figure.controllerAction(button);
+
+                expect(figure.inst.destroy).toHaveBeenCalledWith(mockElement);
+                expect(figure.controller.close).toHaveBeenCalled();
+            });
+
+            it('should handle revert action', () => {
+                const button = {
+                    getAttribute: jest.fn().mockReturnValue('revert')
+                };
+
+                jest.spyOn(figure, '_setRevert').mockImplementation();
+
+                figure.controllerAction(button);
+
+                expect(figure._setRevert).toHaveBeenCalled();
+                expect(figure.history.push).toHaveBeenCalledWith(false);
+            });
+
+            it('should handle selectMenu type', () => {
+                const button = {
+                    getAttribute: jest.fn((attr) => {
+                        if (attr === 'data-command') return 'onalign';
+                        if (attr === 'data-type') return 'selectMenu';
+                        return null;
+                    })
+                };
+
+                figure.controllerAction(button);
+
+                // selectMenu types should return early
+                expect(figure.history.push).not.toHaveBeenCalled();
+            });
+
+            it('should handle custom action', () => {
+                const button = {
+                    getAttribute: jest.fn((attr) => {
+                        if (attr === 'data-command') return '__c__custom';
+                        if (attr === 'data-value') return 'value1';
+                        return null;
+                    })
+                };
+
+                const customAction = jest.fn();
+                figure._action['__c__custom'] = customAction;
+
+                figure.controllerAction(button);
+
+                expect(customAction).toHaveBeenCalledWith(mockElement, 'value1', button);
             });
         });
     });

@@ -1,69 +1,227 @@
 import Image from '../../../../src/plugins/modal/image';
 
-// Mock dependencies with minimal setup
+// Mock dependencies with comprehensive setup
 jest.mock('../../../../src/editorInjector', () => {
 	return class MockEditorInjector {
 		constructor() {
-			this.lang = { image: 'Image', close: 'Close', submitButton: 'Submit' };
-			this.icons = { cancel: '<svg>cancel</svg>' };
+			this.lang = { image: 'Image', close: 'Close', submitButton: 'Submit', caption: 'Caption' };
+			this.icons = { cancel: '<svg>cancel</svg>', image: '<svg>image</svg>', as_block: '<svg>block</svg>', as_inline: '<svg>inline</svg>' };
 			this.eventManager = { addEvent: jest.fn() };
-			this.plugins = { link: { pluginOptions: {} } };
 			this.events = { onImageLoad: jest.fn(), onImageAction: jest.fn() };
-			this.previewSrc = { style: {} };
-			this.imgInputFile = { value: '' };
-			this.imgUrlFile = { disabled: false };
-			this.altText = { value: '' };
+			this.options = { get: jest.fn().mockReturnValue('auto') };
+			// Editor methods for comprehensive coverage
+			this.editor = {
+				focus: jest.fn(),
+				focusEdge: jest.fn(),
+				_iframeAutoHeight: jest.fn()
+			};
+			this.format = {
+				getLine: jest.fn().mockReturnValue(null),
+				addLine: jest.fn().mockReturnValue(null),
+				isLine: jest.fn().mockReturnValue(false)
+			};
+			this.history = {
+				push: jest.fn()
+			};
+			this.selection = {
+				setRange: jest.fn()
+			};
+			this.frameContext = new Map([['wysiwyg', { nodeType: 1 }]]);
+			this.nodeTransform = {
+				removeAllParents: jest.fn()
+			};
+			this.component = {
+				select: jest.fn(),
+				copy: jest.fn(),
+				insert: jest.fn().mockReturnValue(true),
+				applyInsertBehavior: jest.fn(),
+				isInline: jest.fn().mockReturnValue(false)
+			};
+			this.triggerEvent = jest.fn().mockResolvedValue(true);
+			this.ui = {
+				alertOpen: jest.fn(),
+				hideLoading: jest.fn()
+			};
+			this.plugins = { link: { pluginOptions: {} } };
 		}
 	};
 });
 
 jest.mock('../../../../src/modules', () => ({
-	Modal: jest.fn().mockImplementation(() => ({ open: jest.fn(), close: jest.fn() })),
-	Figure: jest.fn().mockImplementation(() => ({ open: jest.fn() })),
-	FileManager: jest.fn().mockImplementation(() => ({ getSize: jest.fn(), upload: jest.fn() })),
-	ModalAnchorEditor: jest.fn().mockImplementation(() => ({ open: jest.fn(), close: jest.fn() }))
+	Modal: jest.fn().mockImplementation(() => ({
+		open: jest.fn(),
+		close: jest.fn(),
+		form: {
+			querySelector: jest.fn().mockReturnValue({
+				style: {},
+				disabled: false,
+				value: '',
+				checked: true
+			})
+		},
+		isUpdate: false
+	})),
+	Figure: jest.fn().mockImplementation(() => ({
+		open: jest.fn().mockReturnValue({
+			container: { nodeType: 1, style: {}, contains: jest.fn().mockReturnValue(true) },
+			cover: { nodeType: 1, appendChild: jest.fn(), insertBefore: jest.fn(), contains: jest.fn().mockReturnValue(true), removeChild: jest.fn() },
+			align: 'center',
+			width: '300px',
+			height: '150px',
+			w: '300px',
+			h: '150px',
+			ratio: { w: 16, h: 9 },
+			isVertical: false
+		}),
+		setSize: jest.fn(),
+		setAlign: jest.fn(),
+		getSize: jest.fn().mockReturnValue({ dw: '300px', dh: '150px' }),
+		setTransform: jest.fn(),
+		deleteTransform: jest.fn(),
+		convertAsFormat: jest.fn().mockReturnValue({ nodeName: 'IMG' }),
+		retainFigureFormat: jest.fn()
+	})),
+	FileManager: jest.fn().mockImplementation(() => ({
+		getSize: jest.fn().mockReturnValue(0),
+		upload: jest.fn(),
+		setFileData: jest.fn()
+	})),
+	ModalAnchorEditor: jest.fn().mockImplementation(() => ({
+		on: jest.fn(),
+		init: jest.fn(),
+		create: jest.fn().mockReturnValue(null),
+		set: jest.fn(),
+		currentTarget: null,
+		urlInput: { focus: jest.fn() }
+	})),
+	_DragHandle: { get: jest.fn().mockReturnValue({ style: {} }) }
 }));
 
+// Add static methods to modules
+const mockModal = require('../../../../src/modules').Modal;
+const mockFigure = require('../../../../src/modules').Figure;
+
 // Add static methods to Modal
-Object.assign(require('../../../../src/modules').Modal, {
+Object.assign(mockModal, {
 	OnChangeFile: jest.fn(),
-	CreateFileInput: jest.fn().mockReturnValue(''),
-	CreateGallery: jest.fn().mockReturnValue('')
+	CreateFileInput: jest.fn().mockReturnValue('')
+});
+
+// Add static methods to Figure
+Object.assign(mockFigure, {
+	GetContainer: jest.fn().mockReturnValue({
+		container: { nodeType: 1, style: {}, querySelector: jest.fn() },
+		cover: { nodeType: 1 },
+		align: 'center'
+	}),
+	CreateContainer: jest.fn().mockReturnValue({
+		container: { nodeType: 1, style: {}, querySelector: jest.fn().mockReturnValue({ nodeName: 'IMG' }) },
+		cover: { nodeType: 1, appendChild: jest.fn(), insertBefore: jest.fn() }
+	}),
+	CreateInlineContainer: jest.fn().mockReturnValue({
+		container: { nodeType: 1, style: {} },
+		inlineCover: { nodeType: 1 }
+	}),
+	CreateCaption: jest.fn().mockReturnValue({ nodeType: 1 }),
+	is: jest.fn().mockReturnValue(false),
+	GetRatio: jest.fn().mockReturnValue({ w: 16, h: 9 }),
+	CalcRatio: jest.fn().mockReturnValue({ w: 16, h: 9 })
 });
 
 jest.mock('../../../../src/helper', () => ({
 	dom: {
+		utils: {
+			createElement: jest.fn().mockReturnValue({
+				querySelector: jest.fn().mockReturnValue({ value: '', files: [] }),
+				removeItem: jest.fn(),
+				setAttribute: jest.fn(),
+				cloneNode: jest.fn().mockReturnValue({ nodeName: 'IMG', setAttribute: jest.fn() }),
+				appendChild: jest.fn(),
+				addClass: jest.fn(),
+				removeClass: jest.fn()
+			}),
+			removeItem: jest.fn(),
+			createTooltipInner: jest.fn().mockReturnValue(''),
+			addClass: jest.fn(),
+			removeClass: jest.fn()
+		},
+		query: {
+			getParentElement: jest.fn().mockReturnValue(null),
+			getEventTarget: jest.fn((e) => e.target || e),
+			getListChildren: jest.fn().mockReturnValue([])
+		},
 		check: {
 			isFigure: jest.fn().mockReturnValue(false),
 			isComponentContainer: jest.fn().mockReturnValue(false),
 			isAnchor: jest.fn().mockReturnValue(false)
-		},
-		utils: {
-			createElement: jest.fn().mockReturnValue({
-				querySelector: jest.fn().mockReturnValue({ value: '', files: [] })
-			}),
-			createTooltipInner: jest.fn().mockReturnValue('')
 		}
 	},
-	numbers: { is: jest.fn(), get: jest.fn((val, def) => val || def) },
-	env: { NO_EVENT: Symbol('NO_EVENT') },
-	keyCodeMap: { key: { 13: 'Enter' } }
+	numbers: {
+		is: jest.fn((val) => typeof val === 'number'),
+		get: jest.fn((val, def) => (val !== undefined && val !== null && val !== '' ? val : def))
+	},
+	env: {
+		_w: {
+			setTimeout: jest.fn((fn, ms) => setTimeout(fn, ms))
+		},
+		NO_EVENT: Symbol('NO_EVENT'),
+		ON_OVER_COMPONENT: Symbol('ON_OVER_COMPONENT')
+	},
+	keyCodeMap: {
+		isSpace: jest.fn(() => false)
+	}
 }));
 
 describe('Image Plugin', () => {
 	let mockEditor;
+	let image;
 
 	beforeEach(() => {
 		mockEditor = {
-			lang: { image: 'Image', close: 'Close', submitButton: 'Submit' },
-			icons: { cancel: '<svg>cancel</svg>' },
+			lang: { image: 'Image', close: 'Close', submitButton: 'Submit', caption: 'Caption' },
+			icons: { cancel: '<svg>cancel</svg>', image: '<svg>image</svg>', as_block: '<svg>block</svg>', as_inline: '<svg>inline</svg>' },
 			plugins: {}
 		};
+		image = new Image(mockEditor, {});
 	});
 
 	describe('Constructor', () => {
 		it('should create Image instance', () => {
 			expect(() => new Image(mockEditor, {})).not.toThrow();
+		});
+
+		it('should initialize with custom plugin options', () => {
+			const customOptions = {
+				canResize: true,
+				showHeightInput: true,
+				defaultWidth: '400px',
+				defaultHeight: '200px',
+				percentageOnlySize: false,
+				createFileInput: true,
+				createUrlInput: true,
+				uploadUrl: '/api/image/upload',
+				uploadHeaders: { 'X-Custom': 'value' },
+				uploadSizeLimit: 10485760,
+				uploadSingleSizeLimit: 5242880,
+				allowMultiple: true,
+				acceptedFormats: 'image/jpeg,image/png',
+				useFormatType: true,
+				defaultFormatType: 'block',
+				keepFormatType: false,
+				insertBehavior: 'select'
+			};
+			const customImage = new Image(mockEditor, customOptions);
+			expect(customImage.pluginOptions.defaultWidth).toBe('400px');
+			expect(customImage.pluginOptions.uploadUrl).toBe('/api/image/upload');
+			expect(customImage.pluginOptions.allowMultiple).toBe(true);
+			expect(customImage.pluginOptions.useFormatType).toBe(true);
+		});
+
+		it('should set up default properties correctly', () => {
+			expect(image.title).toBe('Image');
+			expect(image.icon).toBe('image');
+			expect(image.pluginOptions).toBeDefined();
+			expect(image.as).toBe('block');
 		});
 	});
 
@@ -94,24 +252,411 @@ describe('Image Plugin', () => {
 	});
 
 	describe('Instance methods', () => {
-		let image;
-
 		beforeEach(() => {
-			image = new Image(mockEditor, {});
+			// Mock required DOM elements
+			image.imgInputFile = { files: [], value: '', setAttribute: jest.fn(), removeAttribute: jest.fn() };
+			image.imgUrlFile = { disabled: false, value: '' };
+			image.altText = { value: '' };
+			image.captionCheckEl = { checked: false };
+			image.previewSrc = { textContent: '', style: {} };
+			image.alignForm = { style: { display: '' } };
+			image.captionEl = { style: { display: '' } };
+			image.asBlock = {};
+			image.asInline = {};
 		});
 
 		it('should have required methods', () => {
-			const methods = ['open', 'on', 'modalAction'];
-			methods.forEach(method => {
+			const methods = ['open', 'on', 'modalAction', 'init', 'select', 'destroy', 'onFilePasteAndDrop', 'create', 'createInline'];
+			methods.forEach((method) => {
 				expect(typeof image[method]).toBe('function');
 			});
 		});
 
-		it('should handle method calls without errors', () => {
-			expect(() => image.open()).not.toThrow();
-			// image.on calls this.anchor.on, so we mock it properly
-			image.anchor = { on: jest.fn() };
-			expect(() => image.on(false)).not.toThrow();
+		describe('open', () => {
+			it('should call modal.open', () => {
+				image.open();
+				expect(image.modal.open).toHaveBeenCalled();
+			});
+		});
+
+		describe('on', () => {
+			it('should handle new image creation (isUpdate=false) when allowMultiple=true', () => {
+				image.pluginOptions.allowMultiple = true;
+				image.anchor = { on: jest.fn() };
+				image.on(false);
+				expect(image.imgInputFile.setAttribute).toHaveBeenCalledWith('multiple', 'multiple');
+			});
+
+			it('should handle image editing (isUpdate=true) when allowMultiple=true', () => {
+				image.pluginOptions.allowMultiple = true;
+				image.anchor = { on: jest.fn() };
+				image.on(true);
+				expect(image.imgInputFile.removeAttribute).toHaveBeenCalledWith('multiple');
+			});
+
+			it('should not modify multiple attribute when allowMultiple=false', () => {
+				image.pluginOptions.allowMultiple = false;
+				image.anchor = { on: jest.fn() };
+				image.on(false);
+				expect(image.imgInputFile.setAttribute).not.toHaveBeenCalled();
+			});
+		});
+
+		describe('modalAction', () => {
+			it('should process file upload when files are selected', async () => {
+				image.imgInputFile.files = [{ name: 'test.jpg', type: 'image/jpeg' }];
+				image.submitFile = jest.fn().mockResolvedValue(true);
+
+				const result = await image.modalAction();
+
+				expect(image.submitFile).toHaveBeenCalledWith(image.imgInputFile.files);
+				expect(result).toBe(true);
+			});
+
+			it('should process URL input when URL is provided', async () => {
+				image.imgInputFile.files = [];
+				image.submitURL = jest.fn().mockResolvedValue(true);
+
+				const result = await image.modalAction();
+				expect(result).toBeDefined();
+			});
+		});
+
+		describe('init', () => {
+			it('should reset form values', () => {
+				image.init();
+
+				expect(image.imgInputFile.value).toBe('');
+				expect(image.imgUrlFile.value).toBe('');
+				expect(image.imgUrlFile.disabled).toBe(false);
+				expect(image.altText.value).toBe('');
+				expect(image.captionCheckEl.checked).toBe(false);
+				expect(image.previewSrc.textContent).toBe('');
+			});
+		});
+
+		describe('select', () => {
+			it('should call ready with target element', () => {
+				const mockTarget = {
+					nodeName: 'IMG',
+					src: 'test.jpg',
+					style: {},
+					parentNode: null
+				};
+
+				expect(() => image.select(mockTarget)).not.toThrow();
+				expect(typeof image.select).toBe('function');
+			});
+		});
+
+		describe('onFilePasteAndDrop', () => {
+			it('should handle image file drop', () => {
+				const mockFile = { type: 'image/jpeg', name: 'test.jpg' };
+				image.submitFile = jest.fn();
+
+				const result = image.onFilePasteAndDrop({ file: mockFile });
+
+				expect(image.submitFile).toHaveBeenCalledWith([mockFile]);
+				expect(result).toBe(false);
+			});
+
+			it('should ignore non-image files', () => {
+				const mockFile = { type: 'video/mp4', name: 'test.mp4' };
+				image.submitFile = jest.fn();
+
+				const result = image.onFilePasteAndDrop({ file: mockFile });
+
+				expect(image.submitFile).not.toHaveBeenCalled();
+				expect(result).toBeUndefined();
+			});
+		});
+
+		describe('destroy', () => {
+			it('should remove image element and handle cleanup', async () => {
+				const mockTarget = {
+					nodeName: 'IMG',
+					parentNode: { nodeType: 1 },
+					previousElementSibling: { nodeType: 1 },
+					getAttribute: jest.fn().mockReturnValue('test.jpg')
+				};
+
+				image.init = jest.fn();
+
+				await image.destroy(mockTarget);
+
+				expect(image.triggerEvent).toHaveBeenCalledWith('onImageDeleteBefore', expect.any(Object));
+				expect(image.init).toHaveBeenCalled();
+			});
+
+			it('should cancel destroy if event returns false', async () => {
+				const mockTarget = {
+					nodeName: 'IMG',
+					getAttribute: jest.fn().mockReturnValue('test.jpg')
+				};
+				image.triggerEvent = jest.fn().mockResolvedValue(false);
+				image.init = jest.fn();
+
+				await image.destroy(mockTarget);
+
+				expect(image.init).not.toHaveBeenCalled();
+			});
+		});
+	});
+
+	describe('Plugin options handling', () => {
+		it('should handle default values for undefined options', () => {
+			const image = new Image(mockEditor, {});
+			expect(image.pluginOptions.createUrlInput).toBe(true);
+			expect(image.pluginOptions.allowMultiple).toBe(false);
+			expect(image.pluginOptions.acceptedFormats).toBe('image/*');
+			expect(image.pluginOptions.useFormatType).toBe(true);
+			expect(image.pluginOptions.defaultFormatType).toBe('block');
+		});
+
+		it('should process size options correctly', () => {
+			const image = new Image(mockEditor, {
+				defaultWidth: 400,
+				defaultHeight: 300
+			});
+			expect(image.pluginOptions.defaultWidth).toBe('400px');
+			expect(image.pluginOptions.defaultHeight).toBe('300px');
+		});
+
+		it('should handle upload configuration', () => {
+			const image = new Image(mockEditor, {
+				uploadUrl: '/api/upload',
+				uploadHeaders: { Authorization: 'Bearer token' },
+				uploadSizeLimit: 10485760,
+				acceptedFormats: 'image/jpeg,image/png'
+			});
+			expect(image.pluginOptions.uploadUrl).toBe('/api/upload');
+			expect(image.pluginOptions.uploadHeaders).toEqual({ Authorization: 'Bearer token' });
+			expect(image.pluginOptions.uploadSizeLimit).toBe(10485760);
+			expect(image.pluginOptions.acceptedFormats).toBe('image/jpeg,image/png');
+		});
+	});
+
+	describe('Image file extensions', () => {
+		it('should handle common image formats', () => {
+			const imageFormats = ['jpeg', 'jpg', 'png', 'gif', 'webp', 'svg'];
+			imageFormats.forEach((format) => {
+				const mockFile = { type: `image/${format}`, name: `test.${format}` };
+				image.submitFile = jest.fn();
+
+				image.onFilePasteAndDrop({ file: mockFile });
+
+				expect(image.submitFile).toHaveBeenCalledWith([mockFile]);
+			});
+		});
+	});
+
+	describe('submitFile', () => {
+		beforeEach(() => {
+			image.pluginOptions.uploadSingleSizeLimit = 0;
+			image.pluginOptions.uploadSizeLimit = 0;
+			image.pluginOptions.uploadUrl = null;
+			image.fileManager = {
+				getSize: jest.fn().mockReturnValue(0),
+				upload: jest.fn()
+			};
+			image.modal = { isUpdate: false };
+			image.ui = {
+				alertOpen: jest.fn(),
+				hideLoading: jest.fn()
+			};
+			image.inputX = { value: '300px' };
+			image.inputY = { value: '200px' };
+		});
+
+		it('should return false for empty file list', async () => {
+			const result = await image.submitFile([]);
+			expect(result).toBe(false);
+		});
+
+		it('should filter non-image files', async () => {
+			const files = [
+				{ type: 'video/mp4', name: 'test.mp4', size: 1000 },
+				{ type: 'image/jpeg', name: 'test.jpg', size: 1000 }
+			];
+
+			image.triggerEvent = jest.fn().mockResolvedValue(true);
+			image.anchor = { create: jest.fn().mockReturnValue(null) };
+			// Skip base64 by setting uploadUrl
+			image.pluginOptions.uploadUrl = '/api/upload';
+			image.fileManager.upload = jest.fn();
+
+			await image.submitFile(files);
+			expect(image.fileManager.upload).toHaveBeenCalled();
+		});
+
+		it('should handle single file size limit exceeded', async () => {
+			image.pluginOptions.uploadSingleSizeLimit = 5000;
+			const files = [{ type: 'image/jpeg', name: 'test.jpg', size: 10000 }];
+
+			const result = await image.submitFile(files);
+
+			expect(image.triggerEvent).toHaveBeenCalledWith('onImageUploadError', expect.any(Object));
+			expect(result).toBe(false);
+		});
+
+		it('should handle total size limit exceeded', async () => {
+			image.pluginOptions.uploadSizeLimit = 10000;
+			image.fileManager.getSize.mockReturnValue(5000);
+			const files = [{ type: 'image/jpeg', name: 'test.jpg', size: 6000 }];
+
+			const result = await image.submitFile(files);
+
+			expect(image.triggerEvent).toHaveBeenCalledWith('onImageUploadError', expect.any(Object));
+			expect(result).toBe(false);
+		});
+
+		it('should trigger onImageUploadBefore event', async () => {
+			const files = [{ type: 'image/jpeg', name: 'test.jpg', size: 1000 }];
+
+			image.triggerEvent = jest.fn().mockResolvedValue(true);
+			image.anchor = { create: jest.fn().mockReturnValue(null) };
+			// Skip base64 by setting uploadUrl
+			image.pluginOptions.uploadUrl = '/api/upload';
+			image.fileManager.upload = jest.fn();
+
+			await image.submitFile(files);
+
+			expect(image.triggerEvent).toHaveBeenCalledWith('onImageUploadBefore', expect.any(Object));
+		});
+
+		it('should return false when event returns false', async () => {
+			const files = [{ type: 'image/jpeg', name: 'test.jpg', size: 1000 }];
+
+			image.triggerEvent = jest.fn().mockResolvedValue(false);
+
+			const result = await image.submitFile(files);
+
+			expect(result).toBe(false);
+		});
+	});
+
+	describe('submitURL', () => {
+		beforeEach(() => {
+			image.modal = { isUpdate: false };
+			image.inputX = { value: '300px' };
+			image.inputY = { value: '200px' };
+			image.anchor = { create: jest.fn().mockReturnValue(null) };
+			image.altText = { value: 'Test image' };
+		});
+
+		it('should return false for empty URL', async () => {
+			const result = await image.submitURL('');
+			expect(result).toBe(false);
+		});
+
+		it('should trigger onImageUploadBefore event with URL', async () => {
+			image.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await image.submitURL('https://example.com/image.jpg');
+
+			expect(image.triggerEvent).toHaveBeenCalledWith(
+				'onImageUploadBefore',
+				expect.objectContaining({
+					info: expect.objectContaining({
+						url: 'https://example.com/image.jpg'
+					})
+				})
+			);
+			expect(result).toBe(true);
+		});
+
+		it('should return false when event returns false', async () => {
+			image.triggerEvent = jest.fn().mockResolvedValue(false);
+
+			const result = await image.submitURL('https://example.com/image.jpg');
+
+			expect(result).toBe(false);
+		});
+	});
+
+	describe('create', () => {
+		beforeEach(() => {
+			image.fileManager = {
+				setFileData: jest.fn()
+			};
+			image.component = {
+				insert: jest.fn().mockReturnValue(true)
+			};
+			image.captionCheckEl = { checked: false };
+			image.inputX = { value: '300px' };
+			image.inputY = { value: '200px' };
+			const mockFigure = require('../../../../src/modules').Figure;
+			mockFigure.CreateContainer.mockReturnValue({
+				container: { nodeType: 1 },
+				cover: { nodeType: 1, appendChild: jest.fn(), insertBefore: jest.fn() }
+			});
+			mockFigure.CreateCaption.mockReturnValue({ nodeType: 1 });
+		});
+
+		it('should create new image element', () => {
+			const file = { name: 'test.jpg', size: 1000 };
+
+			image.create('https://example.com/image.jpg', null, '300px', '200px', 'center', file, 'Test image', true);
+
+			expect(image.fileManager.setFileData).toHaveBeenCalled();
+			expect(image.component.insert).toHaveBeenCalled();
+		});
+
+		it('should create image with caption when checked', () => {
+			image.captionCheckEl.checked = true;
+			const file = { name: 'test.jpg', size: 1000 };
+			const mockFigure = require('../../../../src/modules').Figure;
+
+			image.create('https://example.com/image.jpg', null, '300px', '200px', 'center', file, 'Test image', true);
+
+			expect(mockFigure.CreateCaption).toHaveBeenCalled();
+		});
+	});
+
+	describe('createInline', () => {
+		beforeEach(() => {
+			image.fileManager = {
+				setFileData: jest.fn()
+			};
+			image.component = {
+				insert: jest.fn().mockReturnValue(true)
+			};
+			image.inputX = { value: '300px' };
+			image.inputY = { value: '200px' };
+			const mockFigure = require('../../../../src/modules').Figure;
+			mockFigure.CreateInlineContainer.mockReturnValue({
+				container: { nodeType: 1 }
+			});
+		});
+
+		it('should create new inline image element', () => {
+			const file = { name: 'test.jpg', size: 1000 };
+
+			image.createInline('https://example.com/image.jpg', null, '300px', '200px', file, 'Test image', true);
+
+			expect(image.fileManager.setFileData).toHaveBeenCalled();
+			expect(image.component.insert).toHaveBeenCalled();
+		});
+	});
+
+	describe('retainFormat', () => {
+		it('should return format retention object', () => {
+			const result = image.retainFormat();
+
+			expect(result.query).toBe('img');
+			expect(typeof result.method).toBe('function');
+		});
+	});
+
+	describe('Format type (block/inline)', () => {
+		it('should default to block format', () => {
+			const image = new Image(mockEditor, { useFormatType: true });
+			expect(image.as).toBe('block');
+		});
+
+		it('should use inline format when specified', () => {
+			const image = new Image(mockEditor, { useFormatType: true, defaultFormatType: 'inline' });
+			expect(image.as).toBe('inline');
 		});
 	});
 });

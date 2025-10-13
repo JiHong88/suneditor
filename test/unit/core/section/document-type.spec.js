@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for document type features in core/editor.js
  */
 
-import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../__mocks__/editorIntegration';
+import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../__mocks__/editorIntegration';
 
 describe('Core - Editor Document Type Features', () => {
 	let editor;
@@ -164,10 +164,10 @@ describe('Core - Editor Document Type Features', () => {
 
 		it('should handle non-ResizeObserver environment', () => {
 			const fc = editor.frameContext;
-			const originalSupport = require('../../../src/helper/env').default.isResizeObserverSupported;
+			const originalSupport = require('../../../../src/helper/env').default.isResizeObserverSupported;
 
 			// Mock as not supported
-			require('../../../src/helper/env').default.isResizeObserverSupported = false;
+			require('../../../../src/helper/env').default.isResizeObserverSupported = false;
 
 			jest.spyOn(editor, '__callResizeFunction');
 
@@ -179,7 +179,7 @@ describe('Core - Editor Document Type Features', () => {
 			}, 10);
 
 			// Restore
-			require('../../../src/helper/env').default.isResizeObserverSupported = originalSupport;
+			require('../../../../src/helper/env').default.isResizeObserverSupported = originalSupport;
 		});
 	});
 });

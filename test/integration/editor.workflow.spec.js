@@ -1,18 +1,18 @@
 /**
- * @fileoverview E2E tests for core/editor.js
+ * @fileoverview Workflow tests for core/editor.js
  * These tests simulate real user interactions and browser behavior
  */
 
-import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../__mocks__/editorIntegration';
+import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../__mocks__/editorIntegration';
 
-describe('Core - Editor E2E Tests', () => {
+describe('Core - Editor workflow Tests', () => {
 	let editor;
 	let container;
 
 	beforeEach(async () => {
 		// Create container for editor
 		container = document.createElement('div');
-		container.id = 'e2e-editor-container';
+		container.id = 'w-editor-container';
 		document.body.appendChild(container);
 
 		editor = createTestEditor({ element: container });
@@ -301,10 +301,10 @@ describe('Core - Editor E2E Tests', () => {
 				this.init = jest.fn();
 				this.action = jest.fn();
 			});
-			MockPlugin.key = 'e2ePlugin';
+			MockPlugin.key = 'wPlugin';
 
-			editor.plugins['e2ePlugin'] = MockPlugin;
-			editor.registerPlugin('e2ePlugin', null, {});
+			editor.plugins['wPlugin'] = MockPlugin;
+			editor.registerPlugin('wPlugin', null, {});
 
 			expect(MockPlugin).toHaveBeenCalled();
 		});

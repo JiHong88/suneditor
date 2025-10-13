@@ -1,10 +1,10 @@
 /**
- * @fileoverview E2E tests for eventManager.js to cover real user interactions
+ * @fileoverview Workflow tests for eventManager.js to cover real user interactions
  */
 
-import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../__mocks__/editorIntegration';
+import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../__mocks__/editorIntegration';
 
-describe('EventManager - E2E Tests', () => {
+describe('EventManager - workflow Tests', () => {
 	let editor;
 
 	afterEach(() => {

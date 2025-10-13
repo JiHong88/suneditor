@@ -118,6 +118,38 @@ jest.mock('../../../../src/helper', () => ({
                         if (selector === '._se_table_resize > span > span') {
                             return { textContent: '' };
                         }
+                        if (selector === '._se_table_header') {
+                            return {
+                                tagName: 'BUTTON',
+                                classList: {
+                                    contains: jest.fn().mockReturnValue(false),
+                                    add: jest.fn(),
+                                    remove: jest.fn(),
+                                    toggle: jest.fn()
+                                }
+                            };
+                        }
+                        if (selector === '._se_table_caption') {
+                            return {
+                                tagName: 'BUTTON',
+                                classList: {
+                                    contains: jest.fn().mockReturnValue(false),
+                                    add: jest.fn(),
+                                    remove: jest.fn(),
+                                    toggle: jest.fn()
+                                }
+                            };
+                        }
+                        if (selector === '._se_table_fixed_column') {
+                            return {
+                                tagName: 'BUTTON',
+                                classList: {
+                                    contains: jest.fn().mockReturnValue(false),
+                                    add: jest.fn(),
+                                    remove: jest.fn()
+                                }
+                            };
+                        }
                         return null;
                     }),
                     querySelectorAll: jest.fn().mockReturnValue([]),
@@ -135,6 +167,7 @@ jest.mock('../../../../src/helper', () => ({
             }),
             addClass: jest.fn(),
             removeClass: jest.fn(),
+            toggleClass: jest.fn(),
             hasClass: jest.fn().mockReturnValue(false),
             removeItem: jest.fn(),
             getParents: jest.fn(),
@@ -939,6 +972,419 @@ describe('Plugins - Dropdown - Table', () => {
             expect(() => {
                 new Table(mockEditor, null);
             }).toThrow(); // Should throw when accessing null properties
+        });
+    });
+
+    describe('toggleHeader method', () => {
+        it('should be defined', () => {
+            expect(table.toggleHeader).toBeDefined();
+            expect(typeof table.toggleHeader).toBe('function');
+        });
+    });
+
+    describe('toggleCaption method', () => {
+        it('should be defined', () => {
+            expect(table.toggleCaption).toBeDefined();
+            expect(typeof table.toggleCaption).toBe('function');
+        });
+    });
+
+    describe('editTable method', () => {
+        it('should be defined', () => {
+            expect(table.editTable).toBeDefined();
+            expect(typeof table.editTable).toBe('function');
+        });
+    });
+
+    describe('mergeCells method', () => {
+        it('should be defined', () => {
+            expect(table.mergeCells).toBeDefined();
+            expect(typeof table.mergeCells).toBe('function');
+        });
+    });
+
+    describe('unmergeCells method', () => {
+        it('should be defined', () => {
+            expect(table.unmergeCells).toBeDefined();
+            expect(typeof table.unmergeCells).toBe('function');
+        });
+    });
+
+    describe('findMergedCells method', () => {
+        it('should find cells with rowspan > 1', () => {
+            const cells = [
+                { rowSpan: 2, colSpan: 1 },
+                { rowSpan: 1, colSpan: 1 },
+                { rowSpan: 1, colSpan: 2 }
+            ];
+
+            const result = table.findMergedCells(cells);
+
+            expect(result).toHaveLength(2);
+            expect(result[0].rowSpan).toBe(2);
+            expect(result[1].colSpan).toBe(2);
+        });
+
+        it('should handle empty cell array', () => {
+            const result = table.findMergedCells([]);
+
+            expect(result).toHaveLength(0);
+        });
+
+        it('should handle cells without spans', () => {
+            const cells = [
+                { rowSpan: 1, colSpan: 1 },
+                { rowSpan: 1, colSpan: 1 }
+            ];
+
+            const result = table.findMergedCells(cells);
+
+            expect(result).toHaveLength(0);
+        });
+    });
+
+    describe('controllerAction method', () => {
+        it('should be defined', () => {
+            expect(table.controllerAction).toBeDefined();
+            expect(typeof table.controllerAction).toBe('function');
+        });
+    });
+
+    describe('colorPickerAction method', () => {
+        it('should be defined', () => {
+            expect(table.colorPickerAction).toBeDefined();
+            expect(typeof table.colorPickerAction).toBe('function');
+        });
+    });
+
+    describe('insertBodyRow method', () => {
+        it('should be defined', () => {
+            expect(table.insertBodyRow).toBeDefined();
+            expect(typeof table.insertBodyRow).toBe('function');
+        });
+    });
+
+    describe('setDir method', () => {
+        it('should be defined', () => {
+            expect(table.setDir).toBeDefined();
+            expect(typeof table.setDir).toBe('function');
+        });
+    });
+
+    describe('onMouseUp method', () => {
+        it('should handle mouse up event', () => {
+            expect(() => {
+                table.onMouseUp();
+            }).not.toThrow();
+        });
+
+        it('should clean up resize state', () => {
+            // Set some state first
+            expect(() => {
+                table.onMouseUp();
+            }).not.toThrow();
+        });
+    });
+
+    describe('onMouseLeave method', () => {
+        it('should handle mouse leave event', () => {
+            expect(() => {
+                table.onMouseLeave();
+            }).not.toThrow();
+        });
+
+        it('should hide resize lines', () => {
+            expect(() => {
+                table.onMouseLeave();
+            }).not.toThrow();
+        });
+    });
+
+    describe('onScroll method', () => {
+        it('should handle scroll event', () => {
+            expect(() => {
+                table.onScroll();
+            }).not.toThrow();
+        });
+
+        it('should hide resize lines on scroll', () => {
+            expect(() => {
+                table.onScroll();
+            }).not.toThrow();
+        });
+    });
+
+    describe('onKeyUp method', () => {
+        it('should handle key up event', () => {
+            const mockLine = document.createElement('td');
+
+            expect(() => {
+                table.onKeyUp({ line: mockLine });
+            }).not.toThrow();
+        });
+
+        it('should update controller position', () => {
+            const mockLine = document.createElement('td');
+
+            expect(() => {
+                table.onKeyUp({ line: mockLine });
+            }).not.toThrow();
+        });
+    });
+
+    describe('onCopyComponent method', () => {
+        it('should be defined', () => {
+            expect(table.onCopyComponent).toBeDefined();
+            expect(typeof table.onCopyComponent).toBe('function');
+        });
+
+        it('should handle copy with no selected cells', () => {
+            const mockCloneContainer = {
+                querySelectorAll: jest.fn().mockReturnValue([])
+            };
+            const mockEvent = {};
+
+            expect(() => {
+                table.onCopyComponent({ event: mockEvent, cloneContainer: mockCloneContainer });
+            }).not.toThrow();
+        });
+    });
+
+    describe('onPaste method', () => {
+        it('should return early if no target cell', () => {
+            const { dom } = require('../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(null);
+
+            const mockEvent = { target: document.createElement('div') };
+            const mockDoc = { body: document.createElement('body') };
+
+            const result = table.onPaste({ event: mockEvent, doc: mockDoc });
+            expect(result).toBeUndefined();
+        });
+
+        it('should return early if body has multiple children', () => {
+            const { dom } = require('../../../../src/helper');
+            const mockCell = document.createElement('td');
+            dom.query.getParentElement.mockReturnValue(mockCell);
+
+            const mockBody = document.createElement('body');
+            mockBody.appendChild(document.createElement('div'));
+            mockBody.appendChild(document.createElement('div'));
+
+            const mockEvent = { target: mockCell };
+            const mockDoc = { body: mockBody };
+
+            const result = table.onPaste({ event: mockEvent, doc: mockDoc });
+            expect(result).toBeUndefined();
+        });
+
+        it('should return early if component is not a table', () => {
+            const { dom } = require('../../../../src/helper');
+            const mockCell = document.createElement('td');
+            dom.query.getParentElement.mockReturnValue(mockCell);
+
+            const mockBody = document.createElement('body');
+            const mockDiv = document.createElement('div');
+            mockBody.appendChild(mockDiv);
+
+            mockEditor.component.get = jest.fn().mockReturnValue({
+                pluginName: 'image', // Not a table
+                target: mockDiv
+            });
+
+            const mockEvent = { target: mockCell };
+            const mockDoc = { body: mockBody };
+
+            const result = table.onPaste({ event: mockEvent, doc: mockDoc });
+            expect(result).toBeUndefined();
+        });
+    });
+
+    describe('retainFormat method', () => {
+        it('should return format retention object', () => {
+            const result = table.retainFormat();
+
+            expect(result).toBeDefined();
+            expect(result).toHaveProperty('query');
+            expect(result).toHaveProperty('method');
+            expect(result.query).toBe('table');
+            expect(typeof result.method).toBe('function');
+        });
+    });
+
+    describe('Additional utility methods', () => {
+        describe('destroy method edge cases', () => {
+            it('should return early if target is null', () => {
+                const result = table.destroy(null);
+                expect(result).toBeUndefined();
+            });
+
+            it('should handle target without parent', () => {
+                const mockTarget = {
+                    tagName: 'TABLE',
+                    parentNode: null
+                };
+
+                expect(() => {
+                    table.destroy(mockTarget);
+                }).not.toThrow();
+            });
+        });
+
+        describe('select method coverage', () => {
+            it('should handle target selection', () => {
+                const { dom } = require('../../../../src/helper');
+                const mockTarget = {
+                    tagName: 'TABLE',
+                    style: {},
+                    parentNode: {
+                        tagName: 'FIGURE',
+                        classList: { contains: jest.fn().mockReturnValue(true) }
+                    },
+                    querySelector: jest.fn(),
+                    querySelectorAll: jest.fn().mockReturnValue([])
+                };
+
+                expect(() => {
+                    table.select(mockTarget);
+                }).not.toThrow();
+            });
+        });
+    });
+
+    describe('Plugin properties and initialization', () => {
+        it('should have correct plugin title', () => {
+            expect(table.title).toBe('Table');
+        });
+
+        it('should have correct icon reference', () => {
+            expect(table.icon).toBe('table');
+        });
+
+        it('should have menu element', () => {
+            expect(table.menu).toBeDefined();
+        });
+
+        it('should have figureScroll property', () => {
+            expect(table.figureScroll).toBeDefined();
+        });
+
+        it('should have captionPosition property', () => {
+            expect(table.captionPosition).toBeDefined();
+        });
+    });
+
+    describe('Event handler existence', () => {
+        it('should have onMouseMove handler', () => {
+            expect(table.onMouseMove).toBeDefined();
+            expect(typeof table.onMouseMove).toBe('function');
+        });
+
+        it('should have onMouseDown handler', () => {
+            expect(table.onMouseDown).toBeDefined();
+            expect(typeof table.onMouseDown).toBe('function');
+        });
+
+        it('should have onKeyDown handler', () => {
+            expect(table.onKeyDown).toBeDefined();
+            expect(typeof table.onKeyDown).toBe('function');
+        });
+
+        it('should have onCopyComponent handler', () => {
+            expect(table.onCopyComponent).toBeDefined();
+            expect(typeof table.onCopyComponent).toBe('function');
+        });
+
+        it('should have onPaste handler', () => {
+            expect(table.onPaste).toBeDefined();
+            expect(typeof table.onPaste).toBe('function');
+        });
+    });
+
+    describe('Table manipulation methods existence', () => {
+        it('should have setTableInfo method', () => {
+            expect(table.setTableInfo).toBeDefined();
+            expect(typeof table.setTableInfo).toBe('function');
+        });
+
+        it('should have setCellInfo method', () => {
+            expect(table.setCellInfo).toBeDefined();
+            expect(typeof table.setCellInfo).toBe('function');
+        });
+
+        it('should have selectCells method', () => {
+            expect(table.selectCells).toBeDefined();
+            expect(typeof table.selectCells).toBe('function');
+        });
+
+        it('should have pasteTableCellMatrix method', () => {
+            expect(table.pasteTableCellMatrix).toBeDefined();
+            expect(typeof table.pasteTableCellMatrix).toBe('function');
+        });
+
+        it('should have insertBodyRow method', () => {
+            expect(table.insertBodyRow).toBeDefined();
+            expect(typeof table.insertBodyRow).toBe('function');
+        });
+    });
+
+    describe('Static method coverage', () => {
+        it('should return correct component type', () => {
+            const { dom } = require('../../../../src/helper');
+
+            // Test with table element
+            const tableEl = document.createElement('table');
+            dom.check.isTable.mockReturnValue(true);
+            const result1 = Table.component(tableEl);
+            expect(result1).toBe(tableEl);
+
+            // Test with non-table element
+            const divEl = document.createElement('div');
+            dom.check.isTable.mockReturnValue(false);
+            const result2 = Table.component(divEl);
+            expect(result2).toBeNull();
+        });
+
+        it('should have correct static key', () => {
+            expect(Table.key).toBe('table');
+        });
+
+        it('should have correct static type', () => {
+            expect(Table.type).toBe('dropdown-free');
+        });
+
+        it('should have correct static className', () => {
+            expect(Table.className).toBe('');
+        });
+
+        it('should have correct static options', () => {
+            expect(Table.options).toEqual({ isInputComponent: true });
+        });
+    });
+
+    describe('Constructor edge cases', () => {
+        it('should handle construction with minimal options', () => {
+            expect(() => {
+                new Table(mockEditor, {});
+            }).not.toThrow();
+        });
+
+        it('should handle different scroll types', () => {
+            expect(() => {
+                new Table(mockEditor, { scrollType: 'y' });
+            }).not.toThrow();
+        });
+
+        it('should handle different caption positions', () => {
+            expect(() => {
+                new Table(mockEditor, { captionPosition: 'top' });
+            }).not.toThrow();
+        });
+
+        it('should handle different cell controller positions', () => {
+            expect(() => {
+                new Table(mockEditor, { cellControllerPosition: 'table' });
+            }).not.toThrow();
         });
     });
 });

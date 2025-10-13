@@ -15,19 +15,29 @@ jest.mock('../../../../src/editorInjector', () => {
 				focusEdge: jest.fn()
 			};
 			this.format = {
-				getLine: jest.fn().mockReturnValue(null)
+				getLine: jest.fn().mockReturnValue(null),
+				addLine: jest.fn().mockReturnValue(null)
 			};
 			this.history = {
 				push: jest.fn()
+			};
+			this.selection = {
+				setRange: jest.fn()
 			};
 			this.frameContext = new Map([['wysiwyg', { nodeType: 1 }]]);
 			this.nodeTransform = {
 				removeAllParents: jest.fn()
 			};
 			this.component = {
-				select: jest.fn()
+				select: jest.fn(),
+				copy: jest.fn(),
+				insert: jest.fn().mockReturnValue(true)
 			};
 			this.triggerEvent = jest.fn().mockResolvedValue(true);
+			this.ui = {
+				alertOpen: jest.fn()
+			};
+			this.plugins = {};
 		}
 	};
 });
@@ -50,8 +60,9 @@ jest.mock('../../../../src/modules', () => ({
 		off: jest.fn()
 	})),
 	FileManager: jest.fn().mockImplementation(() => ({
-		getSize: jest.fn(),
-		upload: jest.fn().mockResolvedValue(true)
+		getSize: jest.fn().mockReturnValue(0),
+		upload: jest.fn(),
+		setFileData: jest.fn()
 	})),
 	Figure: jest.fn().mockImplementation(() => ({
 		open: jest.fn().mockReturnValue({
@@ -92,17 +103,21 @@ jest.mock('../../../../src/helper', () => ({
 		utils: {
 			createElement: jest.fn().mockReturnValue({
 				querySelector: jest.fn().mockReturnValue({ value: '', files: [] }),
-				removeItem: jest.fn()
+				removeItem: jest.fn(),
+				setAttribute: jest.fn(),
+				cloneNode: jest.fn().mockReturnValue({ nodeName: 'AUDIO', setAttribute: jest.fn() })
 			}),
-			removeItem: jest.fn()
+			removeItem: jest.fn(),
+			createTooltipInner: jest.fn().mockReturnValue('')
 		},
 		query: {
-			getParentElement: jest.fn().mockReturnValue(null)
+			getParentElement: jest.fn().mockReturnValue(null),
+			getEventTarget: jest.fn((e) => e.target || e)
 		}
 	},
 	numbers: {
 		is: jest.fn((val) => typeof val === 'number'),
-		get: jest.fn((val, def) => val !== undefined && val !== null && val !== '' ? val : def)
+		get: jest.fn((val, def) => (val !== undefined && val !== null && val !== '' ? val : def))
 	},
 	env: {
 		_w: {
@@ -195,7 +210,7 @@ describe('Audio Plugin', () => {
 
 		it('should have required methods', () => {
 			const methods = ['open', 'on', 'modalAction', 'init', 'select', 'destroy', 'onFilePasteAndDrop'];
-			methods.forEach(method => {
+			methods.forEach((method) => {
 				expect(typeof audio[method]).toBe('function');
 			});
 		});
@@ -248,7 +263,9 @@ describe('Audio Plugin', () => {
 				audio.submitURL = jest.fn().mockResolvedValue(true);
 				// Mock private field
 				Object.defineProperty(audio, '_Audio__urlValue', {
-					get: function() { return 'https://example.com/audio.mp3'; },
+					get: function () {
+						return 'https://example.com/audio.mp3';
+					},
 					configurable: true
 				});
 
@@ -356,12 +373,12 @@ describe('Audio Plugin', () => {
 		it('should handle upload configuration', () => {
 			const audio = new Audio(mockEditor, {
 				uploadUrl: '/api/upload',
-				uploadHeaders: { 'Authorization': 'Bearer token' },
+				uploadHeaders: { Authorization: 'Bearer token' },
 				uploadSizeLimit: 10485760,
 				acceptedFormats: 'audio/mp3,audio/wav'
 			});
 			expect(audio.pluginOptions.uploadUrl).toBe('/api/upload');
-			expect(audio.pluginOptions.uploadHeaders).toEqual({ 'Authorization': 'Bearer token' });
+			expect(audio.pluginOptions.uploadHeaders).toEqual({ Authorization: 'Bearer token' });
 			expect(audio.pluginOptions.uploadSizeLimit).toBe(10485760);
 			expect(audio.pluginOptions.acceptedFormats).toBe('audio/mp3,audio/wav');
 		});
@@ -370,13 +387,342 @@ describe('Audio Plugin', () => {
 	describe('Audio file extensions', () => {
 		it('should handle common audio formats', () => {
 			const audioFormats = ['mp3', 'wav', 'ogg', 'flac', 'm4a'];
-			audioFormats.forEach(format => {
+			audioFormats.forEach((format) => {
 				const mockFile = { type: `audio/${format}`, name: `test.${format}` };
 				audio.submitFile = jest.fn();
 
 				audio.onFilePasteAndDrop({ file: mockFile });
 
 				expect(audio.submitFile).toHaveBeenCalledWith([mockFile]);
+			});
+		});
+	});
+
+	describe('controllerAction', () => {
+		let mockTarget;
+
+		beforeEach(() => {
+			mockTarget = {
+				getAttribute: jest.fn()
+			};
+			audio.audioUrlFile = { value: '' };
+			audio.preview = { textContent: '' };
+			audio.figure = {
+				open: jest.fn()
+			};
+			// Use select() to properly set #element
+			const mockElement = { nodeName: 'AUDIO', src: 'test.mp3' };
+			audio.select(mockElement);
+		});
+
+		it('should handle update command', () => {
+			mockTarget.getAttribute.mockReturnValue('update');
+
+			audio.controllerAction(mockTarget);
+
+			expect(audio.audioUrlFile.value).toBe('test.mp3');
+			expect(audio.preview.textContent).toBe('test.mp3');
+			expect(audio.modal.open).toHaveBeenCalled();
+		});
+
+		it('should handle copy command', () => {
+			mockTarget.getAttribute.mockReturnValue('copy');
+			const mockFigure = require('../../../../src/modules').Figure;
+			mockFigure.GetContainer.mockReturnValue({
+				container: { nodeType: 1 }
+			});
+
+			audio.controllerAction(mockTarget);
+
+			expect(mockFigure.GetContainer).toHaveBeenCalled();
+			expect(audio.component.copy).toHaveBeenCalled();
+		});
+
+		it('should handle delete command', () => {
+			mockTarget.getAttribute.mockReturnValue('delete');
+			audio.destroy = jest.fn();
+
+			audio.controllerAction(mockTarget);
+
+			expect(audio.destroy).toHaveBeenCalled();
+		});
+	});
+
+	describe('submitFile', () => {
+		beforeEach(() => {
+			audio.pluginOptions.uploadSingleSizeLimit = 0;
+			audio.pluginOptions.uploadSizeLimit = 0;
+			audio.pluginOptions.uploadUrl = null; // Disable actual upload
+			audio.fileManager = {
+				getSize: jest.fn().mockReturnValue(0),
+				upload: jest.fn()
+			};
+			audio.modal = { isUpdate: false };
+			audio.ui = {
+				alertOpen: jest.fn()
+			};
+		});
+
+		it('should return false for empty file list', async () => {
+			const result = await audio.submitFile([]);
+			expect(result).toBe(false);
+		});
+
+		it('should filter non-audio files', async () => {
+			const files = [
+				{ type: 'image/jpeg', name: 'test.jpg', size: 1000 },
+				{ type: 'audio/mp3', name: 'test.mp3', size: 1000 }
+			];
+
+			audio.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await audio.submitFile(files);
+			expect(result).toBe(true);
+		});
+
+		it('should handle single file size limit exceeded', async () => {
+			audio.pluginOptions.uploadSingleSizeLimit = 5000;
+			const files = [{ type: 'audio/mp3', name: 'test.mp3', size: 10000 }];
+
+			const result = await audio.submitFile(files);
+
+			expect(audio.triggerEvent).toHaveBeenCalledWith('onAudioUploadError', expect.any(Object));
+			expect(result).toBe(false);
+		});
+
+		it('should handle total size limit exceeded', async () => {
+			audio.pluginOptions.uploadSizeLimit = 10000;
+			audio.fileManager.getSize.mockReturnValue(5000);
+			const files = [{ type: 'audio/mp3', name: 'test.mp3', size: 6000 }];
+
+			const result = await audio.submitFile(files);
+
+			expect(audio.triggerEvent).toHaveBeenCalledWith('onAudioUploadError', expect.any(Object));
+			expect(result).toBe(false);
+		});
+
+		it('should trigger onAudioUploadBefore event', async () => {
+			const files = [{ type: 'audio/mp3', name: 'test.mp3', size: 1000 }];
+
+			audio.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await audio.submitFile(files);
+
+			expect(audio.triggerEvent).toHaveBeenCalledWith('onAudioUploadBefore', expect.any(Object));
+			expect(result).toBe(true);
+		});
+
+		it('should return false when event returns false', async () => {
+			const files = [{ type: 'audio/mp3', name: 'test.mp3', size: 1000 }];
+
+			audio.triggerEvent = jest.fn().mockResolvedValue(false);
+
+			const result = await audio.submitFile(files);
+
+			expect(result).toBe(false);
+		});
+
+		it('should call handler with result object', async () => {
+			const files = [{ type: 'audio/mp3', name: 'test.mp3', size: 1000 }];
+
+			const resultObject = { files, isUpdate: false };
+			audio.triggerEvent = jest.fn().mockResolvedValue(resultObject);
+
+			const result = await audio.submitFile(files);
+
+			expect(result).toBe(true);
+		});
+	});
+
+	describe('submitURL', () => {
+		beforeEach(() => {
+			audio.modal = { isUpdate: false };
+			audio.create = jest.fn();
+		});
+
+		it('should return false for empty URL', async () => {
+			const result = await audio.submitURL('');
+			expect(result).toBe(false);
+		});
+
+		it('should trigger onAudioUploadBefore event with URL', async () => {
+			audio.triggerEvent = jest.fn().mockResolvedValue(true);
+
+			const result = await audio.submitURL('https://example.com/audio.mp3');
+
+			expect(audio.triggerEvent).toHaveBeenCalledWith(
+				'onAudioUploadBefore',
+				expect.objectContaining({
+					info: expect.objectContaining({
+						url: 'https://example.com/audio.mp3'
+					})
+				})
+			);
+			expect(result).toBe(true);
+		});
+
+		it('should return false when event returns false', async () => {
+			audio.triggerEvent = jest.fn().mockResolvedValue(false);
+
+			const result = await audio.submitURL('https://example.com/audio.mp3');
+
+			expect(result).toBe(false);
+		});
+
+		it('should call handler with result object', async () => {
+			const resultObject = {
+				element: { nodeName: 'AUDIO' },
+				url: 'https://example.com/audio.mp3'
+			};
+			audio.triggerEvent = jest.fn().mockResolvedValue(resultObject);
+
+			const result = await audio.submitURL('https://example.com/audio.mp3');
+
+			expect(result).toBe(true);
+		});
+	});
+
+	describe('create', () => {
+		beforeEach(() => {
+			audio.fileManager = {
+				setFileData: jest.fn()
+			};
+			audio.component = {
+				insert: jest.fn().mockReturnValue(true),
+				select: jest.fn()
+			};
+			audio.format = {
+				addLine: jest.fn().mockReturnValue({ nodeType: 3 })
+			};
+			audio.selection = {
+				setRange: jest.fn()
+			};
+			const mockFigure = require('../../../../src/modules').Figure;
+			mockFigure.CreateContainer.mockReturnValue({
+				container: { nodeType: 1 }
+			});
+		});
+
+		it('should create new audio element when not updating', () => {
+			const mockElement = { nodeName: 'AUDIO', src: '', setAttribute: jest.fn() };
+			const file = { name: 'test.mp3', size: 1000 };
+
+			audio.create(mockElement, 'https://example.com/audio.mp3', file, false, true);
+
+			expect(audio.fileManager.setFileData).toHaveBeenCalledWith(mockElement, file);
+			expect(mockElement.src).toBe('https://example.com/audio.mp3');
+			expect(audio.component.insert).toHaveBeenCalled();
+		});
+
+		it('should update existing audio element', () => {
+			const mockElement = { nodeName: 'AUDIO', src: 'old.mp3', setAttribute: jest.fn() };
+			// Use select to set #element
+			audio.figure = { open: jest.fn() };
+			audio.select(mockElement);
+
+			const file = { name: 'test.mp3', size: 1000 };
+
+			audio.create(mockElement, 'https://example.com/audio.mp3', file, true, true);
+
+			expect(audio.fileManager.setFileData).toHaveBeenCalledWith(mockElement, file);
+			expect(mockElement.src).toBe('https://example.com/audio.mp3');
+			expect(audio.component.select).toHaveBeenCalled();
+			expect(audio.history.push).toHaveBeenCalledWith(false);
+		});
+
+		it('should handle insert failure', () => {
+			audio.component.insert.mockReturnValue(false);
+			const mockElement = { nodeName: 'AUDIO', src: '', setAttribute: jest.fn() };
+			const file = { name: 'test.mp3', size: 1000 };
+
+			audio.create(mockElement, 'https://example.com/audio.mp3', file, false, true);
+
+			expect(audio.editor.focus).toHaveBeenCalled();
+		});
+
+		it('should not re-select if src is same on update', () => {
+			const mockElement = { nodeName: 'AUDIO', src: 'https://example.com/audio.mp3', setAttribute: jest.fn() };
+			// Use select to set #element
+			audio.figure = { open: jest.fn() };
+			audio.select(mockElement);
+
+			const file = { name: 'test.mp3', size: 1000 };
+
+			audio.component.select.mockClear();
+			audio.history.push.mockClear();
+
+			audio.create(mockElement, 'https://example.com/audio.mp3', file, true, true);
+
+			expect(audio.component.select).toHaveBeenCalled();
+			expect(audio.history.push).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('retainFormat', () => {
+		it('should return format retention object', () => {
+			const result = audio.retainFormat();
+
+			expect(result.query).toBe('audio');
+			expect(typeof result.method).toBe('function');
+		});
+
+		it('should process element without valid container', () => {
+			const mockFigure = require('../../../../src/modules').Figure;
+			mockFigure.GetContainer.mockReturnValue({ container: null, cover: null });
+			mockFigure.CreateContainer.mockReturnValue({
+				container: { nodeType: 1 }
+			});
+			audio.figure = {
+				retainFigureFormat: jest.fn()
+			};
+
+			const retainFormat = audio.retainFormat();
+			const mockElement = {
+				nodeName: 'AUDIO',
+				setAttribute: jest.fn(),
+				cloneNode: jest.fn().mockReturnValue({ nodeName: 'AUDIO', setAttribute: jest.fn() })
+			};
+
+			retainFormat.method(mockElement);
+
+			expect(mockElement.cloneNode).toHaveBeenCalledWith(true);
+			expect(mockFigure.CreateContainer).toHaveBeenCalled();
+		});
+
+		it('should skip processing for already contained element', () => {
+			const mockFigure = require('../../../../src/modules').Figure;
+			mockFigure.GetContainer.mockReturnValue({
+				container: { nodeType: 1 },
+				cover: { nodeType: 1 }
+			});
+
+			const retainFormat = audio.retainFormat();
+			const mockElement = {
+				nodeName: 'AUDIO',
+				cloneNode: jest.fn()
+			};
+
+			retainFormat.method(mockElement);
+
+			expect(mockElement.cloneNode).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('select', () => {
+		it('should open figure and prepare element', () => {
+			const mockTarget = { nodeName: 'AUDIO', src: 'test.mp3' };
+			audio.figure = {
+				open: jest.fn()
+			};
+
+			audio.select(mockTarget);
+
+			expect(audio.figure.open).toHaveBeenCalledWith(mockTarget, {
+				nonResizing: true,
+				nonSizeInfo: true,
+				nonBorder: true,
+				figureTarget: true,
+				infoOnly: false
 			});
 		});
 	});

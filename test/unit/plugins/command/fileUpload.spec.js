@@ -600,10 +600,10 @@ describe('Plugins - Command - FileUpload', () => {
         });
 
         it('should process valid files', async () => {
-            // Use larger file sizes to avoid single size limit trigger
+            // Use smaller file sizes to pass single size limit check
             const mockFiles = [
-                { name: 'test1.pdf', size: 1200 },  // Larger than single limit
-                { name: 'test2.pdf', size: 1300 }
+                { name: 'test1.pdf', size: 800 },  // Smaller than single limit (1000)
+                { name: 'test2.pdf', size: 900 }
             ];
 
             mockEditor.triggerEvent.mockResolvedValue(undefined);
@@ -613,9 +613,9 @@ describe('Plugins - Command - FileUpload', () => {
             expect(result).toBe(true);
         });
 
-        it('should reject files below single size limit', async () => {
-            // Based on source code logic: slngleSizeLimit > s triggers error
-            const mockFiles = [{ name: 'small.pdf', size: 500 }];
+        it('should reject files exceeding single size limit', async () => {
+            // Bug fixed: now s > slngleSizeLimit triggers error
+            const mockFiles = [{ name: 'large.pdf', size: 1500 }];
             const { env } = require('../../../../src/helper');
             mockEditor.triggerEvent.mockResolvedValue(env.NO_EVENT);
 
@@ -624,27 +624,37 @@ describe('Plugins - Command - FileUpload', () => {
             expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onFileUploadError', expect.objectContaining({
                 error: expect.stringContaining('Size of uploadable single file'),
                 limitSize: 1000,
-                uploadSize: 500
+                uploadSize: 1500
             }));
             expect(mockEditor.ui.alertOpen).toHaveBeenCalled();
             expect(result).toBe(false);
         });
 
         it('should reject files exceeding total size limit', async () => {
-            // Use files that won't trigger single size limit but will trigger total limit
+            // Use files that pass single size limit but trigger total limit
             const mockFiles = [
-                { name: 'test1.pdf', size: 1200 }, // Above single limit (good)
-                { name: 'test2.pdf', size: 2500 }  // Above single limit (good)
+                { name: 'test1.pdf', size: 800 }, // Below single limit (good)
+                { name: 'test2.pdf', size: 900 }  // Below single limit (good)
             ];
-            // Total: 3700 + current 2000 = 5700 > 5000 limit
+            // Total: 1700 + current 2000 = 3700 < 5000 limit, need larger files
+            // Actually we need to exceed 5000, so:
+            // 2000 (current) + files need to exceed 5000
+            mockFileManager.getSize.mockReturnValue(2000);
+            const largerFiles = [
+                { name: 'test1.pdf', size: 900 },
+                { name: 'test2.pdf', size: 900 },
+                { name: 'test3.pdf', size: 900 },
+                { name: 'test4.pdf', size: 900 }
+            ];
+            // Total: 3600 + 2000 = 5600 > 5000 limit
 
-            const result = await fileUpload.submitFile(mockFiles);
+            const result = await fileUpload.submitFile(largerFiles);
 
             expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onFileUploadError', expect.objectContaining({
                 error: expect.stringContaining('Size of uploadable total files'),
                 limitSize: 5000,
                 currentSize: 2000,
-                uploadSize: 3700
+                uploadSize: 3600
             }));
             expect(result).toBe(false);
         });
@@ -659,7 +669,7 @@ describe('Plugins - Command - FileUpload', () => {
         });
 
         it('should handle custom upload handler', async () => {
-            const mockFiles = [{ name: 'test.pdf', size: 1200 }]; // Above single limit
+            const mockFiles = [{ name: 'test.pdf', size: 800 }]; // Below single limit
             const customHandler = jest.fn();
             mockEditor.triggerEvent.mockImplementation((event, data) => {
                 if (event === 'onFileUploadBefore') {

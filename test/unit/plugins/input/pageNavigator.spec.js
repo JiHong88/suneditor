@@ -56,9 +56,6 @@ describe('PageNavigator Plugin', () => {
 
 		pageNavigator = new PageNavigator(mockEditor);
 
-		// Bind mockThis context to pageNavigator methods
-		Object.setPrototypeOf(pageNavigator, mockThis);
-
 		// Add missing mock properties that are assigned from the actual constructor
 		// We need to overwrite what the constructor created
 		const mockInner = {
@@ -74,15 +71,6 @@ describe('PageNavigator Plugin', () => {
 
 		pageNavigator.inner = mockInner;
 		pageNavigator.afterItem = mockAfterItem;
-
-		// Add the display method that exists in the real class
-		pageNavigator.display = jest.fn().mockImplementation((pageNum, totalPages) => {
-			pageNavigator.pageNum = pageNum;
-			pageNavigator.totalPages = totalPages;
-			pageNavigator.inner.value = String(pageNum);
-			pageNavigator.inner.max = String(totalPages);
-			pageNavigator.afterItem.textContent = String(totalPages);
-		});
 	});
 
 	describe('Constructor', () => {
@@ -149,6 +137,84 @@ describe('PageNavigator Plugin', () => {
 			// Test that frameContext is properly configured
 			expect(pageNavigator.frameContext.has('documentType_use_page')).toBe(true);
 			expect(pageNavigator.frameContext.get('documentType')).toBeDefined();
+		});
+
+		it('should call pageGo when change event fires', () => {
+			// Setup
+			const mockPageGo = jest.fn();
+			pageNavigator.frameContext.set('documentType', { pageGo: mockPageGo });
+			pageNavigator.frameContext.set('documentType_use_page', true);
+
+			// Create a change event
+			const changeEvent = {
+				target: {
+					value: '5'
+				}
+			};
+
+			// Get the event handler that was registered
+			const addEventCalls = pageNavigator.eventManager.addEvent.mock.calls;
+			const changeHandler = addEventCalls.find(call => call[1] === 'change');
+
+			if (changeHandler) {
+				// Call the handler
+				changeHandler[2](changeEvent);
+
+				// Verify pageGo was called with the correct value
+				expect(mockPageGo).toHaveBeenCalledWith(5);
+			}
+		});
+
+		it('should return early if documentType_use_page is not set', () => {
+			// Setup
+			const mockPageGo = jest.fn();
+			pageNavigator.frameContext.set('documentType', { pageGo: mockPageGo });
+			pageNavigator.frameContext.delete('documentType_use_page');
+
+			// Create a change event
+			const changeEvent = {
+				target: {
+					value: '5'
+				}
+			};
+
+			// Get the event handler
+			const addEventCalls = pageNavigator.eventManager.addEvent.mock.calls;
+			const changeHandler = addEventCalls.find(call => call[1] === 'change');
+
+			if (changeHandler) {
+				// Call the handler
+				changeHandler[2](changeEvent);
+
+				// Verify pageGo was NOT called
+				expect(mockPageGo).not.toHaveBeenCalled();
+			}
+		});
+
+		it('should handle invalid input values by defaulting to 1', () => {
+			// Setup
+			const mockPageGo = jest.fn();
+			pageNavigator.frameContext.set('documentType', { pageGo: mockPageGo });
+			pageNavigator.frameContext.set('documentType_use_page', true);
+
+			// Create a change event with invalid value
+			const changeEvent = {
+				target: {
+					value: 'invalid'
+				}
+			};
+
+			// Get the event handler
+			const addEventCalls = pageNavigator.eventManager.addEvent.mock.calls;
+			const changeHandler = addEventCalls.find(call => call[1] === 'change');
+
+			if (changeHandler) {
+				// Call the handler
+				changeHandler[2](changeEvent);
+
+				// Verify pageGo was called with 1 (default)
+				expect(mockPageGo).toHaveBeenCalledWith(1);
+			}
 		});
 	});
 

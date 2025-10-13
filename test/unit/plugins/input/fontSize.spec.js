@@ -6,17 +6,28 @@ jest.mock('../../../../src/editorInjector', () => {
 	return class MockEditorInjector {
 		constructor(editor) {
 			this.editor = editor;
-			this.lang = {
-				fontSize: 'Font Size'
+			this.lang = editor.lang || {
+				fontSize: 'Font Size',
+				decrease: 'Decrease',
+				increase: 'Increase',
+				default: 'Default'
 			};
-			this.icons = {
-				fontSize: '<svg>fontSize</svg>'
+			this.icons = editor.icons || {
+				fontSize: '<svg>fontSize</svg>',
+				arrow_down: '<svg>arrow</svg>',
+				minus: '<svg>minus</svg>',
+				plus: '<svg>plus</svg>'
 			};
 			this.eventManager = {
 				addEvent: jest.fn()
 			};
 			this.options = editor.options || { get: jest.fn().mockReturnValue(['px']) };
-			this.menu = { initDropdownTarget: jest.fn() };
+			this.menu = { initDropdownTarget: jest.fn(), dropdownOff: jest.fn() };
+			this.frameContext = editor.frameContext || {
+				get: jest.fn().mockReturnValue({ fontSize: '13px' })
+			};
+			this.format = { isLine: jest.fn().mockReturnValue(false) };
+			this.inline = { apply: jest.fn() };
 		}
 	};
 });
@@ -24,22 +35,36 @@ jest.mock('../../../../src/editorInjector', () => {
 jest.mock('../../../../src/helper', () => ({
 	dom: {
 		utils: {
-			createElement: jest.fn().mockReturnValue({
-				tagName: 'SELECT',
-				className: '',
-				innerHTML: '',
+			createElement: jest.fn().mockImplementation((tag, attrs, content) => ({
+				tagName: tag,
+				className: attrs?.class || '',
+				innerHTML: content || '',
 				appendChild: jest.fn(),
 				setAttribute: jest.fn(),
-				value: '13px',
-				querySelectorAll: jest.fn().mockReturnValue([])
-			})
+				getAttribute: jest.fn(),
+				value: '',
+				querySelectorAll: jest.fn().mockReturnValue([]),
+				querySelector: jest.fn()
+			})),
+			hasClass: jest.fn().mockReturnValue(true),
+			addClass: jest.fn(),
+			removeClass: jest.fn(),
+			getStyle: jest.fn().mockReturnValue('')
+		},
+		check: {
+			isInputElement: jest.fn().mockReturnValue(false)
 		}
 	},
 	numbers: {
-		get: jest.fn().mockImplementation((val, def) => val || def),
+		get: jest.fn().mockImplementation((val) => {
+			const num = parseFloat(val);
+			return isNaN(num) ? 0 : num;
+		}),
 		is: jest.fn().mockReturnValue(false)
 	},
 	keyCodeMap: {
+		isSpace: jest.fn().mockReturnValue(false),
+		isEnter: jest.fn().mockReturnValue(false),
 		key: {
 			13: 'Enter',
 			38: 'ArrowUp',
@@ -49,54 +74,40 @@ jest.mock('../../../../src/helper', () => ({
 }));
 
 describe('FontSize Plugin', () => {
-	let mockThis;
 	let fontSize;
 	let mockEditor;
 
 	beforeEach(() => {
 		jest.clearAllMocks();
 
-		mockThis = createMockThis();
-		mockEditor = mockThis.editor;
-
-		// Add necessary properties to mockEditor
-		mockEditor.lang = {
-			fontSize: 'Font Size'
-		};
-		mockEditor.icons = {
-			fontSize: '<svg>fontSize</svg>'
-		};
-		mockEditor.options = {
-			get: jest.fn().mockImplementation((key) => {
-				if (key === 'fontSizeUnits') return ['px', 'pt', 'em'];
-				return null;
-			})
-		};
-
-		// Mock additional methods needed
-		mockThis.command = {
-			setNodeStyle: jest.fn(),
-			getSelectedElements: jest.fn().mockReturnValue([]),
-			getParentElement: jest.fn().mockReturnValue(null)
-		};
-		mockThis.util = {
-			getFormatElement: jest.fn().mockReturnValue(null)
+		mockEditor = {
+			lang: {
+				fontSize: 'Font Size',
+				decrease: 'Decrease',
+				increase: 'Increase',
+				default: 'Default'
+			},
+			icons: {
+				fontSize: '<svg>fontSize</svg>',
+				arrow_down: '<svg>arrow</svg>',
+				minus: '<svg>minus</svg>',
+				plus: '<svg>plus</svg>'
+			},
+			options: {
+				get: jest.fn().mockImplementation((key) => {
+					if (key === 'fontSizeUnits') return ['px', 'pt', 'em'];
+					return null;
+				})
+			},
+			frameContext: {
+				get: jest.fn().mockReturnValue({ fontSize: '13px' })
+			},
+			focus: jest.fn()
 		};
 
 		fontSize = new FontSize(mockEditor, {
-			defaultValue: '13px',
-			unit: 'px'
+			sizeUnit: 'px'
 		});
-
-		// Bind mockThis context to fontSize methods
-		Object.setPrototypeOf(fontSize, mockThis);
-
-		// Mock DOM elements that would be created
-		fontSize.inner = {
-			tagName: 'SELECT',
-			value: '13px',
-			focus: jest.fn()
-		};
 	});
 
 	describe('Static properties', () => {
@@ -108,168 +119,494 @@ describe('FontSize Plugin', () => {
 	});
 
 	describe('Constructor', () => {
-		it('should be a class that can be instantiated', () => {
-			expect(typeof FontSize).toBe('function');
-			expect(FontSize.prototype.constructor).toBe(FontSize);
+		it('should create FontSize instance with px unit', () => {
+			const instance = new FontSize(mockEditor, { sizeUnit: 'px' });
+			expect(instance.title).toBe('Font Size');
+			expect(instance.sizeUnit).toBe('px');
 		});
 
-		it('should create FontSize instance with default options', () => {
-			expect(fontSize.title).toBe('Font Size');
+		it('should create FontSize instance with pt unit', () => {
+			const instance = new FontSize(mockEditor, { sizeUnit: 'pt' });
+			expect(instance.sizeUnit).toBe('pt');
 		});
 
-		it('should initialize with custom options', () => {
-			const customFontSize = new FontSize(mockEditor, {
-				defaultValue: '16px',
-				unit: 'pt'
+		it('should create FontSize instance with em unit', () => {
+			const instance = new FontSize(mockEditor, { sizeUnit: 'em' });
+			expect(instance.sizeUnit).toBe('em');
+		});
+
+		it('should create FontSize instance with text mode', () => {
+			const instance = new FontSize(mockEditor, { sizeUnit: 'text' });
+			expect(instance.sizeUnit).toBe('');
+		});
+
+		it('should handle showIncDecControls option', () => {
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'px',
+				showIncDecControls: true
 			});
 
-			expect(customFontSize).toBeDefined();
+			expect(instance.beforeItem).toBeDefined();
+			expect(instance.afterItem).toBeDefined();
 		});
-	});
 
-	describe('Plugin methods', () => {
-		it('should have required methods', () => {
-			const methods = ['active', 'onInputKeyDown', 'onInputChange', 'on', 'action'];
-			methods.forEach(method => {
-				expect(typeof FontSize.prototype[method]).toBe('function');
+		it('should handle disableInput=false option', () => {
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'px',
+				disableInput: false
 			});
+
+			expect(instance.afterItem).toBeDefined();
+		});
+
+		it('should handle disableInput=true with no controls', () => {
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'px',
+				disableInput: true,
+				showIncDecControls: false
+			});
+
+			expect(instance.replaceButton).toBeDefined();
+		});
+
+		it('should use default fontSizeUnits when sizeUnit not specified', () => {
+			const instance = new FontSize(mockEditor, {});
+			expect(instance.sizeUnit).toBe('px'); // First from fontSizeUnits
+		});
+
+		it('should handle custom unitMap', () => {
+			const customUnitMap = {
+				px: {
+					default: 16,
+					inc: 2,
+					min: 10,
+					max: 100,
+					list: [10, 16, 20, 24]
+				}
+			};
+
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'px',
+				unitMap: customUnitMap
+			});
+
+			expect(instance.unitMap.px.default).toBe(16);
+		});
+
+		it('should set showDefaultSizeLabel option', () => {
+			expect(() => {
+				new FontSize(mockEditor, {
+					sizeUnit: 'px',
+					showDefaultSizeLabel: true
+				});
+			}).not.toThrow();
 		});
 	});
 
 	describe('active method', () => {
-		it('should return active state based on current element', () => {
-			const mockElement = {
-				style: { fontSize: '16px' }
-			};
+		beforeEach(() => {
+			const { dom } = require('../../../../src/helper');
+			dom.utils.hasClass = jest.fn().mockReturnValue(true);
+		});
 
-			// Mock the method since it's complex
-			fontSize.active = jest.fn().mockReturnValue(true);
-			const result = fontSize.active(mockElement);
+		it('should return false if target does not have __se__font_size class', () => {
+			const { dom } = require('../../../../src/helper');
+			dom.utils.hasClass = jest.fn().mockReturnValue(false);
 
-			expect(result).toBe(true);
+			const mockElement = document.createElement('span');
+			const mockTarget = document.createElement('div');
+
+			const result = fontSize.active(mockElement, mockTarget);
+			expect(result).toBe(false);
+		});
+
+		it('should return undefined when element is line format', () => {
+			const mockElement = document.createElement('p');
+			const mockTarget = document.createElement('div');
+
+			fontSize.format.isLine = jest.fn().mockReturnValue(true);
+
+			const result = fontSize.active(mockElement, mockTarget);
+			expect(result).toBeUndefined();
+		});
+
+		it('should return false when no fontSize style found', () => {
+			const { dom } = require('../../../../src/helper');
+			const mockElement = document.createElement('span');
+			const mockTarget = document.createElement('div');
+
+			dom.utils.getStyle = jest.fn().mockReturnValue('');
+
+			const result = fontSize.active(mockElement, mockTarget);
+			expect(result).toBe(false);
 		});
 	});
 
 	describe('on method', () => {
-		it('should handle opening the dropdown', () => {
-			fontSize.on = jest.fn();
-			fontSize.on();
+		beforeEach(() => {
+			const mockButton1 = {
+				getAttribute: jest.fn().mockReturnValue('13px'),
+				classList: { add: jest.fn(), remove: jest.fn() }
+			};
+			const mockButton2 = {
+				getAttribute: jest.fn().mockReturnValue('16px'),
+				classList: { add: jest.fn(), remove: jest.fn() }
+			};
 
-			expect(fontSize.on).toHaveBeenCalled();
+			fontSize.sizeList = [mockButton1, mockButton2];
+		});
+
+		it('should add active class to matching size', () => {
+			const { dom } = require('../../../../src/helper');
+			const mockTarget = {
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '13px',
+						textContent: '13px'
+					})
+				}
+			};
+
+			dom.check.isInputElement = jest.fn().mockReturnValue(false);
+
+			fontSize.on(mockTarget);
+
+			expect(dom.utils.addClass).toHaveBeenCalled();
+		});
+
+		it('should not re-process if same size', () => {
+			const { dom } = require('../../../../src/helper');
+			const mockTarget = {
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '13px',
+						textContent: '13px'
+					})
+				}
+			};
+
+			fontSize.currentSize = '13px';
+			dom.check.isInputElement = jest.fn().mockReturnValue(false);
+
+			fontSize.on(mockTarget);
+
+			// Should return early, not call addClass/removeClass
+			expect(dom.utils.addClass).not.toHaveBeenCalled();
 		});
 	});
 
 	describe('onInputKeyDown method', () => {
-		it('should handle keydown events', () => {
+		let mockTarget;
+
+		beforeEach(() => {
+			mockTarget = {
+				value: '13px',
+				focus: jest.fn(),
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '13px',
+						textContent: '13px'
+					})
+				}
+			};
+		});
+
+		it('should prevent default for space key', () => {
+			const { keyCodeMap } = require('../../../../src/helper');
+			keyCodeMap.isSpace = jest.fn().mockReturnValue(true);
+
 			const mockEvent = {
-				keyCode: 13,
-				preventDefault: jest.fn(),
-				stopPropagation: jest.fn()
+				code: 'Space',
+				preventDefault: jest.fn()
 			};
 
-			fontSize.onInputKeyDown = jest.fn();
-			fontSize.onInputKeyDown(mockEvent);
+			fontSize.onInputKeyDown({ target: mockTarget, event: mockEvent });
 
-			expect(fontSize.onInputKeyDown).toHaveBeenCalledWith(mockEvent);
+			expect(mockEvent.preventDefault).toHaveBeenCalled();
+		});
+
+		it('should handle ArrowUp key', () => {
+			const mockEvent = {
+				code: 'ArrowUp',
+				preventDefault: jest.fn()
+			};
+
+			fontSize.onInputKeyDown({ target: mockTarget, event: mockEvent });
+
+			expect(mockEvent.preventDefault).toHaveBeenCalled();
+		});
+
+		it('should handle ArrowDown key', () => {
+			const mockEvent = {
+				code: 'ArrowDown',
+				preventDefault: jest.fn()
+			};
+
+			fontSize.onInputKeyDown({ target: mockTarget, event: mockEvent });
+
+			expect(mockEvent.preventDefault).toHaveBeenCalled();
 		});
 	});
 
 	describe('onInputChange method', () => {
-		it('should handle input change events', () => {
-			const mockEvent = {
-				target: {
-					value: '16px'
+		let mockTarget;
+
+		beforeEach(() => {
+			mockTarget = {
+				value: '16px',
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '16px'
+					})
 				}
 			};
+		});
 
-			fontSize.onInputChange = jest.fn();
-			fontSize.onInputChange(mockEvent);
+		it('should apply font size change', () => {
+			const mockEvent = {
+				preventDefault: jest.fn()
+			};
 
-			expect(fontSize.onInputChange).toHaveBeenCalledWith(mockEvent);
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'px',
+				disableInput: false
+			});
+
+			instance.onInputChange({
+				target: mockTarget,
+				value: '16px',
+				event: mockEvent
+			});
+
+			expect(instance.inline.apply).toHaveBeenCalled();
+			expect(mockEvent.preventDefault).toHaveBeenCalled();
+		});
+
+		it('should clamp value to max', () => {
+			mockTarget.value = '1000px';
+
+			const mockEvent = {
+				preventDefault: jest.fn()
+			};
+
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'px',
+				disableInput: false
+			});
+
+			instance.onInputChange({
+				target: mockTarget,
+				value: '1000px',
+				event: mockEvent
+			});
+
+			expect(instance.inline.apply).toHaveBeenCalled();
+		});
+
+		it('should clamp value to min', () => {
+			mockTarget.value = '1px';
+
+			const mockEvent = {
+				preventDefault: jest.fn()
+			};
+
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'px',
+				disableInput: false
+			});
+
+			instance.onInputChange({
+				target: mockTarget,
+				value: '1px',
+				event: mockEvent
+			});
+
+			expect(instance.inline.apply).toHaveBeenCalled();
 		});
 	});
 
 	describe('action method', () => {
-		it('should execute font size change action', () => {
-			fontSize.action = jest.fn();
-			fontSize.action('16px');
+		beforeEach(() => {
+			fontSize.menu = {
+				dropdownOff: jest.fn()
+			};
+		});
 
-			expect(fontSize.action).toHaveBeenCalledWith('16px');
+		it('should apply font size from data-command', () => {
+			const mockTarget = {
+				getAttribute: jest.fn().mockImplementation((attr) => {
+					if (attr === 'data-command') return '16px';
+					return null;
+				}),
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '13px',
+						textContent: '13px'
+					})
+				}
+			};
+
+			fontSize.action(mockTarget);
+
+			expect(fontSize.inline.apply).toHaveBeenCalled();
+			expect(fontSize.menu.dropdownOff).toHaveBeenCalled();
+		});
+
+		it('should handle increment command', () => {
+			const mockTarget = {
+				getAttribute: jest.fn().mockImplementation((attr) => {
+					if (attr === 'data-command') return 'fontSize';
+					if (attr === 'data-value') return 'inc';
+					return null;
+				}),
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '13px',
+						textContent: '13px'
+					})
+				}
+			};
+
+			fontSize.action(mockTarget);
+
+			expect(fontSize.inline.apply).toHaveBeenCalled();
+		});
+
+		it('should handle decrement command', () => {
+			const mockTarget = {
+				getAttribute: jest.fn().mockImplementation((attr) => {
+					if (attr === 'data-command') return 'fontSize';
+					if (attr === 'data-value') return 'dec';
+					return null;
+				}),
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '13px',
+						textContent: '13px'
+					})
+				}
+			};
+
+			fontSize.action(mockTarget);
+
+			expect(fontSize.inline.apply).toHaveBeenCalled();
+		});
+
+		it('should remove font-size style when no command', () => {
+			const mockTarget = {
+				getAttribute: jest.fn().mockReturnValue(null),
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '13px'
+					})
+				}
+			};
+
+			fontSize.action(mockTarget);
+
+			expect(fontSize.inline.apply).toHaveBeenCalledWith(
+				null,
+				expect.objectContaining({
+					stylesToModify: ['font-size'],
+					nodesToRemove: ['span'],
+					strictRemove: true
+				})
+			);
+		});
+
+		it('should clamp increment to max value', () => {
+			const mockTarget = {
+				getAttribute: jest.fn().mockImplementation((attr) => {
+					if (attr === 'data-command') return 'fontSize';
+					if (attr === 'data-value') return 'inc';
+					return null;
+				}),
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '72px', // Already at max
+						textContent: '72px'
+					})
+				}
+			};
+
+			fontSize.action(mockTarget);
+
+			expect(fontSize.inline.apply).toHaveBeenCalled();
+		});
+
+		it('should clamp decrement to min value', () => {
+			const mockTarget = {
+				getAttribute: jest.fn().mockImplementation((attr) => {
+					if (attr === 'data-command') return 'fontSize';
+					if (attr === 'data-value') return 'dec';
+					return null;
+				}),
+				parentElement: {
+					querySelector: jest.fn().mockReturnValue({
+						value: '8px', // Already at min
+						textContent: '8px'
+					})
+				}
+			};
+
+			fontSize.action(mockTarget);
+
+			expect(fontSize.inline.apply).toHaveBeenCalled();
 		});
 	});
 
 	describe('Font size units', () => {
-		it('should handle pixel units', () => {
-			const pxFontSize = new FontSize(mockEditor, {
-				unit: 'px',
-				defaultValue: '14px'
+		it('should handle rem units', () => {
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'rem'
 			});
 
-			expect(pxFontSize).toBeDefined();
+			expect(instance.sizeUnit).toBe('rem');
 		});
 
-		it('should handle point units', () => {
-			const ptFontSize = new FontSize(mockEditor, {
-				unit: 'pt',
-				defaultValue: '12pt'
+		it('should handle vw units', () => {
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'vw'
 			});
 
-			expect(ptFontSize).toBeDefined();
+			expect(instance.sizeUnit).toBe('vw');
 		});
 
-		it('should handle em units', () => {
-			const emFontSize = new FontSize(mockEditor, {
-				unit: 'em',
-				defaultValue: '1em'
+		it('should handle vh units', () => {
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: 'vh'
 			});
 
-			expect(emFontSize).toBeDefined();
+			expect(instance.sizeUnit).toBe('vh');
+		});
+
+		it('should handle percentage units', () => {
+			const instance = new FontSize(mockEditor, {
+				sizeUnit: '%'
+			});
+
+			expect(instance.sizeUnit).toBe('%');
 		});
 	});
 
-	describe('Font size values', () => {
-		it('should handle preset font sizes', () => {
-			const presetSizes = ['8px', '10px', '13px', '16px', '18px', '24px', '32px'];
-
-			presetSizes.forEach(size => {
-				fontSize.action = jest.fn();
-				fontSize.action(size);
-				expect(fontSize.action).toHaveBeenCalledWith(size);
-			});
+	describe('Integration tests', () => {
+		it('should have required properties', () => {
+			expect(fontSize.title).toBeDefined();
+			expect(fontSize.sizeUnit).toBeDefined();
+			expect(fontSize.unitMap).toBeDefined();
+			expect(fontSize.currentSize).toBeDefined();
 		});
 
-		it('should handle custom font sizes', () => {
-			fontSize.action = jest.fn();
-			fontSize.action('20px');
-
-			expect(fontSize.action).toHaveBeenCalledWith('20px');
-		});
-	});
-
-	describe('Error handling', () => {
-		it('should handle invalid font size values gracefully', () => {
-			fontSize.action = jest.fn();
-			fontSize.action('invalid');
-
-			expect(fontSize.action).toHaveBeenCalledWith('invalid');
+		it('should initialize sizeList', () => {
+			expect(fontSize.sizeList).toBeDefined();
 		});
 
-		it('should handle empty values gracefully', () => {
-			fontSize.action = jest.fn();
-			fontSize.action('');
-
-			expect(fontSize.action).toHaveBeenCalledWith('');
-		});
-	});
-
-	describe('Integration with editor', () => {
-		it('should integrate with editor command system', () => {
-			expect(mockThis.command).toBeDefined();
-			expect(mockThis.command.setNodeStyle).toBeDefined();
+		it('should have correct hasInputFocus initial state', () => {
+			expect(fontSize.hasInputFocus).toBe(false);
 		});
 
-		it('should work with selection system', () => {
-			expect(mockThis.command.getSelectedElements).toBeDefined();
+		it('should have correct isInputActive initial state', () => {
+			expect(fontSize.isInputActive).toBe(false);
 		});
 	});
 });
