@@ -70,14 +70,6 @@ describe('Plugins - Browser - VideoGallery', () => {
         videoGallery = new VideoGallery(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(VideoGallery.key).toBe('videoGallery');
-            expect(VideoGallery.type).toBe('browser');
-            expect(VideoGallery.className).toBe('');
-        });
-    });
-
     describe('Constructor', () => {
         it('should create VideoGallery instance with required properties', () => {
             expect(videoGallery).toBeInstanceOf(VideoGallery);

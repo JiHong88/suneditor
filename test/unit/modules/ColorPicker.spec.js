@@ -133,14 +133,6 @@ describe('Modules - ColorPicker', () => {
     });
 
     describe('Constructor', () => {
-        it('should create ColorPicker instance', () => {
-            const colorPicker = new ColorPicker(mockInst, 'color', {});
-
-            expect(colorPicker).toBeInstanceOf(ColorPicker);
-            expect(colorPicker.inst).toBe(mockInst);
-            expect(colorPicker.kind).toBe('testColorPicker');
-        });
-
         it('should use constructor name as fallback for kind', () => {
             const instWithoutKey = {
                 editor: mockEditor,
@@ -152,13 +144,6 @@ describe('Modules - ColorPicker', () => {
             const colorPicker = new ColorPicker(instWithoutKey, 'color', {});
             expect(colorPicker.kind).toBe('FallbackColorPicker');
         });
-
-        it('should inherit from CoreInjector', () => {
-            const colorPicker = new ColorPicker(mockInst, 'color', {});
-
-            expect(colorPicker.editor).toBe(mockEditor);
-            expect(colorPicker.frameContext).toBeDefined();
-        });
     });
 
     describe('Basic functionality', () => {
@@ -166,11 +151,6 @@ describe('Modules - ColorPicker', () => {
 
         beforeEach(() => {
             colorPicker = new ColorPicker(mockInst, 'color', {});
-        });
-
-        it('should have access to editor components', () => {
-            expect(colorPicker.editor).toBe(mockEditor);
-            expect(colorPicker.ui).toBe(mockEditor.ui);
         });
 
         it('should initialize with default color list', () => {

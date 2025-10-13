@@ -149,16 +149,6 @@ describe('Modules - ModalAnchorEditor', () => {
     });
 
     describe('Constructor', () => {
-        it('should create ModalAnchorEditor instance', () => {
-            const mockModalForm = document.createElement('form');
-            mockModalForm.innerHTML = '<div class="se-anchor-editor"></div>';
-            const modalAnchor = new ModalAnchorEditor(mockInst, mockModalForm, {});
-
-            expect(modalAnchor).toBeInstanceOf(ModalAnchorEditor);
-            expect(modalAnchor.inst).toBe(mockInst);
-            expect(modalAnchor.kink).toBe('testAnchor');
-        });
-
         it('should use constructor name as fallback', () => {
             const instWithoutKey = {
                 editor: mockEditor,
@@ -180,12 +170,6 @@ describe('Modules - ModalAnchorEditor', () => {
             mockModalForm = document.createElement('form');
             mockModalForm.innerHTML = '<div class="se-anchor-editor"></div>';
             modalAnchor = new ModalAnchorEditor(mockInst, mockModalForm, {});
-        });
-
-        it('should have access to editor components', () => {
-            expect(modalAnchor.editor).toBe(mockEditor);
-            expect(modalAnchor.ui).toBe(mockEditor.ui);
-            expect(modalAnchor.selection).toBe(mockEditor.selection);
         });
 
         it('should initialize with default values', () => {

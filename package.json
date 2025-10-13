@@ -5,6 +5,7 @@
 	"author": "Yi JiHong",
 	"license": "MIT",
 	"main": "src/suneditor.js",
+	"module": "src/suneditor.js",
 	"types": "types/index.d.ts",
 	"exports": {
 		".": {
@@ -32,7 +33,8 @@
 			"default": "./src/langs/index.js"
 		},
 		"./src/*": "./src/*",
-		"./types/*": "./types/*"
+		"./types/*": "./types/*",
+		"./dist/*": "./dist/*"
 	},
 	"sideEffects": [
 		"./src/assets/*.css"
@@ -55,6 +57,10 @@
 		"test": "jest --silent",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:headed": "playwright test --headed",
+		"test:all": "jest --silent && playwright test",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},
 	"bugs": {
@@ -72,6 +78,7 @@
 		"@codemirror/lang-javascript": "^6.2.4",
 		"@google-cloud/translate": "^9.2.0",
 		"@octokit/rest": "^21.1.1",
+		"@playwright/test": "^1.56.0",
 		"@typescript-eslint/eslint-plugin": "^8.45.0",
 		"@typescript-eslint/parser": "^8.45.0",
 		"@webpack-cli/serve": "^3.0.1",
@@ -93,6 +100,7 @@
 		"file-loader": "^6.2.0",
 		"glob": "^11.0.3",
 		"html-webpack-plugin": "^5.6.4",
+		"http-server": "^14.1.1",
 		"jest": "^30.2.0",
 		"jest-environment-jsdom": "^30.2.0",
 		"jsdoc": "^4.0.4",

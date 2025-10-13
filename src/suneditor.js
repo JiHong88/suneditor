@@ -1,8 +1,14 @@
 import Editor from './core/editor';
 
+import plugins from './plugins';
+import modules from './modules';
+import helper from './helper';
+import langs from './langs';
+
 /**
  * @module SunEditorExports
  */
+export { plugins, modules, helper, langs };
 
 /**
  * @typedef {import('./core/config/options').EditorFrameOptions} SunEditorFrameOptionsType

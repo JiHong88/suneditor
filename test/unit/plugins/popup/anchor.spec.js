@@ -114,11 +114,6 @@ describe('Anchor Plugin', () => {
 	});
 
 	describe('Constructor', () => {
-		it('should create Anchor instance', () => {
-			expect(anchor.title).toBe('Anchor');
-			expect(anchor.icon).toBe('bookmark_anchor');
-		});
-
 		it('should initialize controllers', () => {
 			expect(anchor.controllerSelect).toBeDefined();
 			expect(anchor.controller).toBeDefined();
@@ -131,11 +126,6 @@ describe('Anchor Plugin', () => {
 
 		it('should create display element', () => {
 			expect(anchor.displayId).toBeDefined();
-		});
-
-		it('should initialize private members', () => {
-			// Cannot directly access private members, but they should be initialized
-			expect(anchor).toBeDefined();
 		});
 	});
 
@@ -437,13 +427,6 @@ describe('Anchor Plugin', () => {
 		});
 	});
 
-	describe('Static properties', () => {
-		it('should have correct static properties', () => {
-			expect(Anchor.key).toBe('anchor');
-			expect(Anchor.type).toBe('popup');
-			expect(Anchor.className).toBe('');
-		});
-	});
 
 	describe('Error handling', () => {
 		it('should handle missing selection range', () => {

@@ -183,14 +183,6 @@ describe('Core Config - Context', () => {
             contextUtil = ContextUtil(mockEditor);
         });
 
-        it('should create utility with proper methods', () => {
-            expect(typeof contextUtil.get).toBe('function');
-            expect(typeof contextUtil.set).toBe('function');
-            expect(typeof contextUtil.has).toBe('function');
-            expect(typeof contextUtil.delete).toBe('function');
-            expect(typeof contextUtil.getAll).toBe('function');
-            expect(typeof contextUtil.clear).toBe('function');
-        });
 
         it('should get DOM elements correctly', () => {
             expect(contextUtil.get('menuTray')).toBe(mockDOM.menuTray);

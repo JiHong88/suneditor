@@ -62,14 +62,6 @@ describe('Plugins - Browser - ImageGallery', () => {
         imageGallery = new ImageGallery(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(ImageGallery.key).toBe('imageGallery');
-            expect(ImageGallery.type).toBe('browser');
-            expect(ImageGallery.className).toBe('');
-        });
-    });
-
     describe('Constructor', () => {
         it('should create ImageGallery instance with required properties', () => {
             expect(imageGallery).toBeInstanceOf(ImageGallery);

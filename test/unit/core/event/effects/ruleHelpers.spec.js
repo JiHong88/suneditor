@@ -255,6 +255,18 @@ describe('Rule Helpers', () => {
 			const result = isUneditableNode(mockPorts, range, true);
 			expect(result).toBeNull();
 		});
+
+		it('should check chidren null', () => {
+			const range = document.createRange();
+			const div = document.createElement('div');
+
+			range.setStart(div, 0);
+
+			mockPorts.format.getLine.mockReturnValue(null);
+
+			const result = isUneditableNode(mockPorts, range, true);
+			expect(result).toBeNull();
+		});
 	});
 
 	describe('setDefaultLine', () => {

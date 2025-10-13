@@ -47,3 +47,8 @@ export default _default;
 export type SunEditorFrameOptionsType = import('./core/config/options').EditorFrameOptions;
 export type SunEditorOptionsType = import('./core/config/options').EditorInitOptions;
 import Editor from './core/editor';
+import helper from './helper';
+import langs from './langs';
+import modules from './modules';
+import plugins from './plugins';
+export { helper, langs, modules, plugins };

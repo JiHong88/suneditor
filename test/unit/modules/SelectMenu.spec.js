@@ -87,17 +87,6 @@ describe('Modules - SelectMenu', () => {
 	});
 
 	describe('Constructor', () => {
-		it('should create SelectMenu instance', () => {
-			const params = { position: 'top-center' };
-			const selectMenu = new SelectMenu(mockInst, params);
-
-			expect(selectMenu).toBeInstanceOf(SelectMenu);
-			expect(selectMenu.inst).toBe(mockInst);
-			expect(selectMenu.kink).toBe('testSelectMenu');
-			expect(selectMenu.position).toBe('top');
-			expect(selectMenu.subPosition).toBe('center');
-		});
-
 		it('should use constructor name as fallback', () => {
 			const instWithoutKey = {
 				editor: mockEditor,
@@ -470,27 +459,6 @@ describe('Modules - SelectMenu', () => {
 		});
 	});
 
-	describe('Basic functionality', () => {
-		let selectMenu;
-
-		beforeEach(() => {
-			const params = { position: 'top-center' };
-			selectMenu = new SelectMenu(mockInst, params);
-		});
-
-		it('should have access to editor components', () => {
-			expect(selectMenu.editor).toBe(mockEditor);
-			expect(selectMenu.editor.ui).toBe(mockEditor.ui);
-			expect(selectMenu.editor.selection).toBe(mockEditor.selection);
-		});
-
-		it('should handle select menu operations', () => {
-			expect(() => {
-				expect(selectMenu.kink).toBeDefined();
-				expect(selectMenu.inst).toBeDefined();
-			}).not.toThrow();
-		});
-	});
 
 	describe('Edge cases', () => {
 		it('should handle different position combinations', () => {

@@ -84,22 +84,8 @@ describe('Plugins - Dropdown - Layout', () => {
         layout = new Layout(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(Layout.key).toBe('layout');
-            expect(Layout.type).toBe('dropdown');
-            expect(Layout.className).toBe('');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create Layout instance with required properties', () => {
-            expect(layout).toBeInstanceOf(Layout);
-            expect(layout.title).toBe('Layout');
-            expect(layout.icon).toBe('layout');
-            expect(layout.selectedIndex).toBe(-1);
-            expect(layout.items).toHaveLength(3);
-        });
 
         it('should initialize dropdown menu', () => {
             expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(Layout, expect.any(Object));

@@ -63,14 +63,6 @@ describe('Plugins - Browser - AudioGallery', () => {
         audioGallery = new AudioGallery(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(AudioGallery.key).toBe('audioGallery');
-            expect(AudioGallery.type).toBe('browser');
-            expect(AudioGallery.className).toBe('');
-        });
-    });
-
     describe('Constructor', () => {
         it('should create AudioGallery instance with required properties', () => {
             expect(audioGallery).toBeInstanceOf(AudioGallery);

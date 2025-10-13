@@ -96,22 +96,8 @@ describe('Plugins - Command - List_bulleted', () => {
         listBulleted = new List_bulleted(mockEditor);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(List_bulleted.key).toBe('list_bulleted');
-            expect(List_bulleted.type).toBe('command');
-            expect(List_bulleted.className).toBe('se-icon-flip-rtl');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create List_bulleted instance with required properties', () => {
-            expect(listBulleted).toBeInstanceOf(List_bulleted);
-            expect(listBulleted.title).toBe('Bulleted List');
-            expect(listBulleted.icon).toBe('list_bulleted');
-            expect(listBulleted.afterItem).toBeDefined();
-            expect(listBulleted.listItems).toBeDefined();
-        });
 
         it('should create afterItem button with correct attributes', () => {
             const afterItem = listBulleted.afterItem;

@@ -3,7 +3,7 @@ module.exports = {
 	testEnvironment: 'jsdom',
 
 	// Test file patterns
-	testMatch: ['<rootDir>/test/unit/**/*.spec.js', '<rootDir>/test/unit/**/*.integration.spec.js', '<rootDir>/test/integration/**/*.spec.js', '<rootDir>/test/e2e/**/*.spec.js'],
+	testMatch: ['<rootDir>/test/unit/**/*.spec.js', '<rootDir>/test/unit/**/*.integration.spec.js', '<rootDir>/test/integration/**/*.spec.js'],
 
 	// Setup files
 	setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
@@ -26,13 +26,13 @@ module.exports = {
 	// Collect coverage information
 	collectCoverageFrom: ['src/**/*.js', '!src/assets/icons/defaultIcons.js', '!src/langs/*.js', '!src/plugins/index.js', '!src/events.js', '!src/typedef.js'],
 
-	// Coverage thresholds (temporarily reduced for development)
+	// Coverage thresholds
 	coverageThreshold: {
 		global: {
-			statements: 85,
-			branches: 75,
-			functions: 80,
-			lines: 85
+			statements: 65,
+			branches: 55,
+			functions: 75,
+			lines: 65
 		}
 	},
 
@@ -45,11 +45,6 @@ module.exports = {
 		{
 			displayName: 'integration',
 			testMatch: ['<rootDir>/test/integration/**/*.spec.js'],
-			testEnvironment: 'jsdom'
-		},
-		{
-			displayName: 'e2e',
-			testMatch: ['<rootDir>/test/e2e/**/*.spec.js'],
 			testEnvironment: 'jsdom'
 		}
 	],

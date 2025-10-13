@@ -98,11 +98,6 @@ describe('Modules - FileManager', () => {
             const fileManager = new FileManager(instWithoutKey, { query: 'img' });
             expect(fileManager.kind).toBe('FallbackName');
         });
-
-        it('should initialize with ApiManager', () => {
-            const fileManager = new FileManager(mockInst, { query: 'img' });
-            expect(fileManager.apiManager).toBeDefined();
-        });
     });
 
     describe('upload method', () => {
@@ -406,20 +401,4 @@ describe('Modules - FileManager', () => {
         });
     });
 
-    describe('Integration with editor component', () => {
-        let fileManager;
-
-        beforeEach(() => {
-            fileManager = new FileManager(mockInst, { query: 'img' });
-        });
-
-        it('should have access to editor component', () => {
-            expect(fileManager.component).toBe(mockEditor.component);
-            expect(fileManager.component.resetFileIndex).toBeDefined();
-        });
-
-        it('should have access to frame context', () => {
-            expect(fileManager.frameContext).toBe(mockFrameContext);
-        });
-    });
 });

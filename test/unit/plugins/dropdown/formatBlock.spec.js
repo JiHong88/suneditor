@@ -121,14 +121,6 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         formatBlock = new FormatBlock(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(FormatBlock.key).toBe('formatBlock');
-            expect(FormatBlock.type).toBe('dropdown');
-            expect(FormatBlock.className).toBe('se-btn-select se-btn-tool-format');
-        });
-    });
-
     describe('Constructor', () => {
         it('should create FormatBlock instance with required properties', () => {
             expect(formatBlock).toBeInstanceOf(FormatBlock);

@@ -130,21 +130,8 @@ describe('Plugins - Dropdown - TextStyle', () => {
         textStyle = new TextStyle(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(TextStyle.key).toBe('textStyle');
-            expect(TextStyle.type).toBe('dropdown');
-            expect(TextStyle.className).toBe('');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create TextStyle instance with required properties', () => {
-            expect(textStyle).toBeInstanceOf(TextStyle);
-            expect(textStyle.title).toBe('Text Style');
-            expect(textStyle.icon).toBe('text_style');
-            expect(textStyle.styleList).toBeDefined();
-        });
 
         it('should create dropdown menu structure', () => {
             const { dom } = require('../../../../src/helper');

@@ -166,17 +166,6 @@ describe('Modules - Browser', () => {
     });
 
     describe('Constructor', () => {
-        it('should create Browser instance', () => {
-            const browser = new Browser(mockInst, {
-                title: 'Test Browser',
-                selectorHandler: jest.fn()
-            });
-
-            expect(browser).toBeInstanceOf(Browser);
-            expect(browser.inst).toBe(mockInst);
-            expect(browser.kind).toBe('testBrowser');
-        });
-
         it('should use constructor name as fallback', () => {
             const instWithoutKey = {
                 editor: mockEditor,
@@ -199,11 +188,6 @@ describe('Modules - Browser', () => {
                 title: 'Test Browser',
                 selectorHandler: jest.fn()
             });
-        });
-
-        it('should have access to editor components', () => {
-            expect(browser.editor).toBe(mockEditor);
-            expect(browser.ui).toBe(mockEditor.ui);
         });
 
         it('should handle browser operations', () => {

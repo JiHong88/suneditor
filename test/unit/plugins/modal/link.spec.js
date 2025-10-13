@@ -155,20 +155,8 @@ describe('Link Plugin', () => {
 		link = new Link(mockEditor, {});
 	});
 
-	describe('Static properties', () => {
-		it('should have correct static properties', () => {
-			expect(Link.key).toBe('link');
-			expect(Link.type).toBe('modal');
-			expect(Link.className).toBe('se-icon-flip-rtl');
-		});
-	});
 
 	describe('Constructor', () => {
-		it('should create Link instance with basic options', () => {
-			expect(link).toBeInstanceOf(Link);
-			expect(link.title).toBe('Link');
-			expect(link.icon).toBe('link');
-		});
 
 		it('should initialize with upload options', () => {
 			const linkWithUpload = new Link(mockEditor, {

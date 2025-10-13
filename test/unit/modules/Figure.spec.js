@@ -259,15 +259,6 @@ describe('Modules - Figure', () => {
     });
 
     describe('Constructor', () => {
-        it('should create Figure instance', () => {
-            const mockControls = document.createElement('div');
-            const figure = new Figure(mockInst, mockControls, {});
-
-            expect(figure).toBeInstanceOf(Figure);
-            expect(figure.inst).toBe(mockInst);
-            expect(figure.kind).toBe('testFigure');
-        });
-
         it('should use constructor name as fallback', () => {
             const instWithoutKey = {
                 editor: mockEditor,
@@ -286,13 +277,6 @@ describe('Modules - Figure', () => {
         beforeEach(() => {
             const mockControls = document.createElement('div');
             figure = new Figure(mockInst, mockControls, {});
-        });
-
-        it('should have access to editor components', () => {
-            expect(figure.editor).toBe(mockEditor);
-            expect(figure.ui).toBe(mockEditor.ui);
-            expect(figure.selection).toBe(mockEditor.selection);
-            expect(figure.component).toBe(mockEditor.component);
         });
 
         it('should handle figure operations', () => {

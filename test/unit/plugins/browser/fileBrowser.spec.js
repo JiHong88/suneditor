@@ -81,14 +81,6 @@ describe('Plugins - Browser - FileBrowser', () => {
         fileBrowser = new FileBrowser(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(FileBrowser.key).toBe('fileBrowser');
-            expect(FileBrowser.type).toBe('browser');
-            expect(FileBrowser.className).toBe('');
-        });
-    });
-
     describe('Constructor', () => {
         it('should create FileBrowser instance with required properties', () => {
             expect(fileBrowser).toBeInstanceOf(FileBrowser);

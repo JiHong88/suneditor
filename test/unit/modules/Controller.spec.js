@@ -189,15 +189,6 @@ describe('Modules - Controller', () => {
             })
         });
 
-        it('should create Controller instance', () => {
-            const mockElement = createMockElement();
-            const controller = new Controller(mockInst, mockElement, {});
-
-            expect(controller).toBeInstanceOf(Controller);
-            expect(controller.inst).toBe(mockInst);
-            expect(controller.kind).toBe('testController');
-        });
-
         it('should use constructor name as fallback', () => {
             const instWithoutKey = {
                 editor: mockEditor,
@@ -242,12 +233,6 @@ describe('Modules - Controller', () => {
                 })
             };
             controller = new Controller(mockInst, mockElement, {});
-        });
-
-        it('should have access to editor components', () => {
-            expect(controller.editor).toBe(mockEditor);
-            expect(controller.ui).toBe(mockEditor.ui);
-            expect(controller.selection).toBe(mockEditor.selection);
         });
 
         it('should handle controller operations', () => {

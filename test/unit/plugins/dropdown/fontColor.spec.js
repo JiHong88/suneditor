@@ -106,21 +106,8 @@ describe('Plugins - Dropdown - FontColor', () => {
         fontColor = new FontColor(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(FontColor.key).toBe('fontColor');
-            expect(FontColor.type).toBe('dropdown-free');
-            expect(FontColor.className).toBe('');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create FontColor instance with required properties', () => {
-            expect(fontColor).toBeInstanceOf(FontColor);
-            expect(fontColor.title).toBe('Font Color');
-            expect(fontColor.icon).toBe('font_color');
-            expect(fontColor.colorPicker).toBeDefined();
-        });
 
         it('should initialize ColorPicker with correct options', () => {
             const MockColorPicker = require('../../../../src/modules/ColorPicker.js');

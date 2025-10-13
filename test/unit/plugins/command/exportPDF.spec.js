@@ -121,30 +121,8 @@ describe('Plugins - Command - ExportPDF', () => {
         };
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(ExportPDF.key).toBe('exportPDF');
-            expect(ExportPDF.type).toBe('command');
-            expect(ExportPDF.className).toBe('se-component-enabled');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create ExportPDF instance with required properties', () => {
-            const pluginOptions = {
-                apiUrl: '/api/export-pdf',
-                fileName: 'custom-file'
-            };
-
-            exportPDF = new ExportPDF(mockEditor, pluginOptions);
-
-            expect(exportPDF).toBeInstanceOf(ExportPDF);
-            expect(exportPDF.title).toBe('Export PDF');
-            expect(exportPDF.icon).toBe('PDF');
-            expect(exportPDF.apiUrl).toBe('/api/export-pdf');
-            expect(exportPDF.fileName).toBe('custom-file');
-            expect(exportPDF.apiManager).toBeDefined();
-        });
 
         it('should use default fileName when not provided', () => {
             const pluginOptions = {

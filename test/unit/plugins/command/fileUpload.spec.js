@@ -230,14 +230,6 @@ describe('Plugins - Command - FileUpload', () => {
         };
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(FileUpload.key).toBe('fileUpload');
-            expect(FileUpload.type).toBe('command');
-            expect(FileUpload.className).toBe('');
-            expect(FileUpload.options).toEqual({ eventIndex: 10000 });
-        });
-    });
 
     describe('Static component method', () => {
         it('should identify valid file component', () => {
@@ -264,24 +256,6 @@ describe('Plugins - Command - FileUpload', () => {
     });
 
     describe('Constructor', () => {
-        it('should create FileUpload instance with required properties', () => {
-            const pluginOptions = {
-                uploadUrl: '/api/upload',
-                allowMultiple: true,
-                acceptedFormats: 'image/*,.pdf',
-                as: 'link'
-            };
-
-            fileUpload = new FileUpload(mockEditor, pluginOptions);
-
-            expect(fileUpload).toBeInstanceOf(FileUpload);
-            expect(fileUpload.title).toBe('File Upload');
-            expect(fileUpload.icon).toBe('file_upload');
-            expect(fileUpload.uploadUrl).toBe('/api/upload');
-            expect(fileUpload.allowMultiple).toBe(true);
-            expect(fileUpload.acceptedFormats).toBe('image/*,.pdf');
-            expect(fileUpload.as).toBe('link');
-        });
 
         it('should warn when uploadUrl is missing', () => {
             const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();

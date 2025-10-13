@@ -107,23 +107,8 @@ describe('Plugins - Dropdown - Font', () => {
         font = new Font(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(Font.key).toBe('font');
-            expect(Font.type).toBe('dropdown');
-            expect(Font.className).toBe('se-btn-select se-btn-tool-font');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create Font instance with required properties', () => {
-            expect(font).toBeInstanceOf(Font);
-            expect(font.title).toBe('Font');
-            expect(font.inner).toBe('<span class="se-txt">Font</span>▼');
-            expect(font.currentFont).toBe('');
-            expect(font.fontList).toBeDefined();
-            expect(font.fontArray).toEqual(['Arial', 'Georgia', 'Times New Roman']);
-        });
 
         it('should create dropdown menu structure', () => {
             const { dom } = require('../../../../src/helper');

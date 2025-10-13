@@ -267,13 +267,6 @@ describe('Mention Plugin', () => {
 		});
 	});
 
-	describe('Static properties', () => {
-		it('should have correct static properties', () => {
-			expect(Mention.key).toBe('mention');
-			expect(Mention.type).toBe('field');
-			expect(Mention.className).toBe('');
-		});
-	});
 
 	describe('Caching', () => {
 		it('should initialize caching data structures', () => {

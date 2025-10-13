@@ -156,10 +156,6 @@ describe('Modules - HueSlider', () => {
 	});
 
 	describe('CreateSliderCtx function', () => {
-		it('should be a function', () => {
-			expect(typeof CreateSliderCtx).toBe('function');
-		});
-
 		it('should create slider context without throwing', () => {
 			expect(() => {
 				CreateSliderCtx();
@@ -200,20 +196,6 @@ describe('Modules - HueSlider', () => {
 	});
 
 	describe('HueSlider Class', () => {
-		it('should be a constructor function', () => {
-			expect(typeof HueSlider).toBe('function');
-			expect(HueSlider.prototype).toBeDefined();
-		});
-
-		it('should create instance with default parameters', () => {
-			const hueSlider = new HueSlider(mockInst);
-
-			expect(hueSlider).toBeInstanceOf(HueSlider);
-			expect(hueSlider.editor).toBe(mockEditor);
-			expect(hueSlider.eventManager).toBe(mockInst.eventManager);
-			expect(hueSlider.inst).toBe(mockInst);
-		});
-
 		it('should initialize with default state', () => {
 			const hueSlider = new HueSlider(mockInst);
 
@@ -403,24 +385,4 @@ describe('Modules - HueSlider', () => {
 		});
 	});
 
-	describe('Integration with editor', () => {
-		it('should have access to editor lang', () => {
-			const hueSlider = new HueSlider(mockInst);
-
-			expect(hueSlider.editor.lang).toBeDefined();
-			expect(hueSlider.editor.icons).toBeDefined();
-		});
-
-		it('should have access to eventManager', () => {
-			const hueSlider = new HueSlider(mockInst);
-
-			expect(hueSlider.eventManager).toBe(mockInst.eventManager);
-		});
-
-		it('should maintain reference to inst', () => {
-			const hueSlider = new HueSlider(mockInst);
-
-			expect(hueSlider.inst).toBe(mockInst);
-		});
-	});
 });

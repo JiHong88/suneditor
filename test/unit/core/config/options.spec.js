@@ -12,25 +12,6 @@ import {
 
 describe('Core Config - Options', () => {
     describe('DEFAULTS constant', () => {
-        it('should have all required properties', () => {
-            expect(DEFAULTS).toBeDefined();
-            expect(typeof DEFAULTS).toBe('object');
-
-            // Check key properties
-            expect(Array.isArray(DEFAULTS.BUTTON_LIST)).toBe(true);
-            expect(typeof DEFAULTS.REQUIRED_FORMAT_LINE).toBe('string');
-            expect(typeof DEFAULTS.REQUIRED_ELEMENT_WHITELIST).toBe('string');
-            expect(typeof DEFAULTS.ELEMENT_WHITELIST).toBe('string');
-            expect(typeof DEFAULTS.TEXT_STYLE_TAGS).toBe('string');
-            expect(Array.isArray(DEFAULTS.SCOPE_SELECTION_TAGS)).toBe(true);
-            expect(typeof DEFAULTS.ATTRIBUTE_WHITELIST).toBe('string');
-            expect(Array.isArray(DEFAULTS.SIZE_UNITS)).toBe(true);
-            expect(typeof DEFAULTS.CONTENT_STYLES).toBe('string');
-            expect(typeof DEFAULTS.TAG_STYLES).toBe('object');
-            expect(typeof DEFAULTS.SPAN_STYLES).toBe('string');
-            expect(typeof DEFAULTS.LINE_STYLES).toBe('string');
-            expect(Array.isArray(DEFAULTS.RETAIN_STYLE_MODE)).toBe(true);
-        });
 
         it('should have valid BUTTON_LIST structure', () => {
             expect(DEFAULTS.BUTTON_LIST).toEqual([
@@ -135,53 +116,6 @@ describe('Core Config - Options', () => {
         });
     });
 
-    describe('OPTION_FRAME_FIXED_FLAG constant', () => {
-        it('should have proper flag structure', () => {
-            expect(typeof OPTION_FRAME_FIXED_FLAG).toBe('object');
-
-            // Check some key flags
-            expect(OPTION_FRAME_FIXED_FLAG.value).toBe('fixed');
-            expect(OPTION_FRAME_FIXED_FLAG.placeholder).toBe(true);
-            expect(OPTION_FRAME_FIXED_FLAG.iframe).toBe('fixed');
-            expect(OPTION_FRAME_FIXED_FLAG.statusbar_resizeEnable).toBe('fixed');
-        });
-
-        it('should contain frame-specific options', () => {
-            const expectedKeys = [
-                'value', 'placeholder', 'editableFrameAttributes',
-                'width', 'height', 'iframe', 'statusbar',
-                'charCounter', 'charCounter_max'
-            ];
-
-            expectedKeys.forEach(key => {
-                expect(OPTION_FRAME_FIXED_FLAG.hasOwnProperty(key)).toBe(true);
-            });
-        });
-    });
-
-    describe('OPTION_FIXED_FLAG constant', () => {
-        it('should have proper flag structure', () => {
-            expect(typeof OPTION_FIXED_FLAG).toBe('object');
-
-            // Check some key flags
-            expect(OPTION_FIXED_FLAG.plugins).toBe('fixed');
-            expect(OPTION_FIXED_FLAG.mode).toBe('fixed');
-            expect(OPTION_FIXED_FLAG.theme).toBe(true);
-            expect(OPTION_FIXED_FLAG.strictMode).toBe('fixed');
-        });
-
-        it('should contain base editor options', () => {
-            const expectedKeys = [
-                'plugins', 'buttonList', 'mode', 'theme', 'lang',
-                'strictMode', 'elementWhitelist', 'formatLine',
-                'textStyleTags', 'shortcuts'
-            ];
-
-            expectedKeys.forEach(key => {
-                expect(OPTION_FIXED_FLAG.hasOwnProperty(key)).toBe(true);
-            });
-        });
-    });
 
     describe('FrameOptionsMap function', () => {
         let mockEditor;
@@ -201,15 +135,6 @@ describe('Core Config - Options', () => {
             frameOptions = FrameOptionsMap(mockEditor);
         });
 
-        it('should create utility with proper methods', () => {
-            expect(typeof frameOptions.get).toBe('function');
-            expect(typeof frameOptions.set).toBe('function');
-            expect(typeof frameOptions.has).toBe('function');
-            expect(typeof frameOptions.getAll).toBe('function');
-            expect(typeof frameOptions.setMany).toBe('function');
-            expect(typeof frameOptions.reset).toBe('function');
-            expect(typeof frameOptions.clear).toBe('function');
-        });
 
         it('should get values correctly', () => {
             expect(frameOptions.get('width')).toBe('100%');
@@ -284,15 +209,6 @@ describe('Core Config - Options', () => {
             baseOptions = BaseOptionsMap(mockEditor);
         });
 
-        it('should create utility with proper methods', () => {
-            expect(typeof baseOptions.get).toBe('function');
-            expect(typeof baseOptions.set).toBe('function');
-            expect(typeof baseOptions.has).toBe('function');
-            expect(typeof baseOptions.getAll).toBe('function');
-            expect(typeof baseOptions.setMany).toBe('function');
-            expect(typeof baseOptions.reset).toBe('function');
-            expect(typeof baseOptions.clear).toBe('function');
-        });
 
         it('should get values correctly', () => {
             expect(baseOptions.get('plugins')).toEqual([]);

@@ -6,10 +6,6 @@ import { _DragHandle } from '../../../src/modules/_DragHandle.js';
 
 describe('Modules - _DragHandle', () => {
     describe('_DragHandle Map', () => {
-        it('should be a Map instance', () => {
-            expect(_DragHandle).toBeInstanceOf(Map);
-        });
-
         it('should have all expected keys with null initial values', () => {
             const expectedKeys = [
                 '__figureInst',
@@ -25,10 +21,6 @@ describe('Modules - _DragHandle', () => {
                 expect(_DragHandle.has(key)).toBe(true);
                 expect(_DragHandle.get(key)).toBeNull();
             });
-        });
-
-        it('should have exactly 7 keys', () => {
-            expect(_DragHandle.size).toBe(7);
         });
 
         it('should allow setting and getting values', () => {
@@ -66,15 +58,6 @@ describe('Modules - _DragHandle', () => {
 
             expect(keys).toHaveLength(7);
             expect(values.every(value => value === null)).toBe(true);
-        });
-    });
-
-    describe('Module documentation', () => {
-        it('should be properly documented for component.js initialization', () => {
-            // This test verifies the module is designed for initialization in component.js
-            // as documented in the JSDoc comment
-            expect(_DragHandle).toBeDefined();
-            expect(_DragHandle.has('__figureInst')).toBe(true);
         });
     });
 

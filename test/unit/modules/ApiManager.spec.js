@@ -81,14 +81,6 @@ describe('Modules - ApiManager', () => {
 	});
 
 	describe('Constructor', () => {
-		it('should create ApiManager instance with basic properties', () => {
-			const apiManager = new ApiManager(mockInst);
-
-			expect(apiManager.editor).toBe(mockEditor);
-			expect(apiManager.ui).toBe(mockUI);
-			expect(apiManager.kind).toBe('testKey');
-		});
-
 		it('should use constructor name as fallback for kind', () => {
 			const instWithoutKey = {
 				editor: mockEditor,

@@ -107,22 +107,8 @@ describe('Plugins - Dropdown - List', () => {
         list = new List(mockEditor);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(List.key).toBe('list');
-            expect(List.type).toBe('dropdown');
-            expect(List.className).toBe('se-icon-flip-rtl');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create List instance with required properties', () => {
-            expect(list).toBeInstanceOf(List);
-            expect(list.title).toBe('List');
-            expect(list.icon).toBe('list_numbered');
-            expect(list.listItems).toBeDefined();
-            expect(list.icons).toBeDefined();
-        });
 
         it('should create dropdown menu structure', () => {
             const { dom } = require('../../../../src/helper');

@@ -23,3 +23,8 @@ temp_coverage/
 
 #only release branch, npm
 dist/**
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/

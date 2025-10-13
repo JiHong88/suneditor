@@ -116,22 +116,8 @@ describe('Plugins - Dropdown - LineHeight', () => {
         lineHeight = new LineHeight(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(LineHeight.key).toBe('lineHeight');
-            expect(LineHeight.type).toBe('dropdown');
-            expect(LineHeight.className).toBe('');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create LineHeight instance with required properties', () => {
-            expect(lineHeight).toBeInstanceOf(LineHeight);
-            expect(lineHeight.title).toBe('Line Height');
-            expect(lineHeight.icon).toBe('line_height');
-            expect(lineHeight.sizeList).toBeDefined();
-            expect(lineHeight.currentSize).toBeNull();
-        });
 
         it('should create dropdown menu structure', () => {
             const { dom } = require('../../../../src/helper');

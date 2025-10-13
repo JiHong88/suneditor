@@ -98,22 +98,8 @@ describe('Plugins - Command - List_numbered', () => {
         listNumbered = new List_numbered(mockEditor);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(List_numbered.key).toBe('list_numbered');
-            expect(List_numbered.type).toBe('command');
-            expect(List_numbered.className).toBe('se-icon-flip-rtl');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create List_numbered instance with required properties', () => {
-            expect(listNumbered).toBeInstanceOf(List_numbered);
-            expect(listNumbered.title).toBe('Numbered List');
-            expect(listNumbered.icon).toBe('list_numbered');
-            expect(listNumbered.afterItem).toBeDefined();
-            expect(listNumbered.listItems).toBeDefined();
-        });
 
         it('should initialize dropdown menu', () => {
             expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(

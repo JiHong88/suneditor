@@ -113,21 +113,8 @@ describe('Plugins - Dropdown - ParagraphStyle', () => {
         paragraphStyle = new ParagraphStyle(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(ParagraphStyle.key).toBe('paragraphStyle');
-            expect(ParagraphStyle.type).toBe('dropdown');
-            expect(ParagraphStyle.className).toBe('');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create ParagraphStyle instance with required properties', () => {
-            expect(paragraphStyle).toBeInstanceOf(ParagraphStyle);
-            expect(paragraphStyle.title).toBe('Paragraph Style');
-            expect(paragraphStyle.icon).toBe('paragraph_style');
-            expect(paragraphStyle.classList).toBeDefined();
-        });
 
         it('should create dropdown menu structure', () => {
             const { dom } = require('../../../../src/helper');

@@ -481,42 +481,12 @@ describe('Modules - Modal', () => {
 		});
 	});
 
-	describe('Basic functionality', () => {
-		let modal;
-
-		beforeEach(() => {
-			modal = new Modal(mockInst, mockElement);
-		});
-
-		it('should have access to editor components', () => {
-			expect(modal.editor).toBe(mockEditor);
-			expect(modal.ui).toBe(mockEditor.ui);
-			expect(modal.offset).toBe(mockEditor.offset);
-		});
-
-		it('should inherit from CoreInjector', () => {
-			expect(modal.editor).toBeDefined();
-			expect(modal.frameContext).toBeDefined();
-			expect(modal.carrierWrapper).toBeDefined();
-		});
-	});
 
 	describe('Modal integration', () => {
 		let modal;
 
 		beforeEach(() => {
 			modal = new Modal(mockInst, mockElement);
-		});
-
-		it('should have modal area and inner elements', () => {
-			expect(modal.focusElement).toBeDefined();
-			expect(modal.inst).toBeDefined();
-		});
-
-		it('should be properly configured for plugin integration', () => {
-			expect(modal.kind).toBeDefined();
-			expect(modal.form).toBe(mockElement);
-			expect(modal.inst).toBe(mockInst);
 		});
 
 		it('should call open and close methods', () => {

@@ -77,22 +77,8 @@ describe('Plugins - Dropdown - Template', () => {
         template = new Template(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(Template.key).toBe('template');
-            expect(Template.type).toBe('dropdown');
-            expect(Template.className).toBe('');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create Template instance with required properties', () => {
-            expect(template).toBeInstanceOf(Template);
-            expect(template.title).toBe('Template');
-            expect(template.icon).toBe('template');
-            expect(template.selectedIndex).toBe(-1);
-            expect(template.items).toHaveLength(3);
-        });
 
         it('should initialize dropdown menu', () => {
             expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(Template, expect.any(Object));

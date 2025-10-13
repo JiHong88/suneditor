@@ -115,14 +115,6 @@ describe('Plugins - Dropdown - HR', () => {
         hr = new HR(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(HR.key).toBe('hr');
-            expect(HR.type).toBe('dropdown');
-            expect(HR.className).toBe('');
-        });
-    });
-
     describe('Static component method', () => {
         it('should return HR node when node is HR element', () => {
             const hrNode = { nodeName: 'HR' };

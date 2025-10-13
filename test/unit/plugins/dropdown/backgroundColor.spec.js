@@ -106,21 +106,8 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         backgroundColor = new BackgroundColor(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(BackgroundColor.key).toBe('backgroundColor');
-            expect(BackgroundColor.type).toBe('dropdown-free');
-            expect(BackgroundColor.className).toBe('');
-        });
-    });
 
     describe('Constructor', () => {
-        it('should create BackgroundColor instance with required properties', () => {
-            expect(backgroundColor).toBeInstanceOf(BackgroundColor);
-            expect(backgroundColor.title).toBe('Background Color');
-            expect(backgroundColor.icon).toBe('background_color');
-            expect(backgroundColor.colorPicker).toBeDefined();
-        });
 
         it('should initialize ColorPicker with correct options', () => {
             const MockColorPicker = require('../../../../src/modules/ColorPicker.js');

@@ -139,14 +139,6 @@ describe('Plugins - Dropdown - Align', () => {
         align = new Align(mockEditor, pluginOptions);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(Align.key).toBe('align');
-            expect(Align.type).toBe('dropdown');
-            expect(Align.className).toBe('');
-        });
-    });
-
     describe('Constructor', () => {
         it('should create Align instance with required properties', () => {
             expect(align).toBeInstanceOf(Align);

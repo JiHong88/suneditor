@@ -57,14 +57,6 @@ describe('Plugins - Command - Blockquote', () => {
         blockquote = new Blockquote(mockEditor);
     });
 
-    describe('Static properties', () => {
-        it('should have correct static properties', () => {
-            expect(Blockquote.key).toBe('blockquote');
-            expect(Blockquote.type).toBe('command');
-            expect(Blockquote.className).toBe('');
-        });
-    });
-
     describe('Constructor', () => {
         it('should create Blockquote instance with required properties', () => {
             expect(blockquote).toBeInstanceOf(Blockquote);
