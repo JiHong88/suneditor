@@ -1350,23 +1350,25 @@ Editor.prototype = {
 		this._componentsInfoReset = false;
 		this._checkComponents(true);
 
-		this._w.setTimeout(() => {
-			// toolbar visibility
-			this.context.get('toolbar_main').style.visibility = '';
-			// roots
-			this.applyFrameRoots((e) => {
-				if (typeof this._resourcesStateChange !== 'function') return;
-				// observer
-				if (this.eventManager._wwFrameObserver) this.eventManager._wwFrameObserver.observe(e.get('wysiwygFrame'));
-				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(e.get('_toolbarShadow'));
-				// resource state
-				this._resourcesStateChange(e);
-			});
-			// history reset
-			this.history.reset();
-			// user event
-			this.triggerEvent('onload', {});
-		}, 0);
+		this._w.setTimeout(
+			function () {
+				// toolbar visibility
+				this.context.get('toolbar_main').style.visibility = '';
+				// roots
+				this.applyFrameRoots((e) => {
+					// observer
+					if (this.eventManager._wwFrameObserver) this.eventManager._wwFrameObserver.observe(e.get('wysiwygFrame'));
+					if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(e.get('_toolbarShadow'));
+					// resource state
+					this._resourcesStateChange(e);
+				});
+				// history reset
+				this.history.reset();
+				// user event
+				this.triggerEvent('onload', {});
+			}.bind(this),
+			0
+		);
 	},
 
 	/**
