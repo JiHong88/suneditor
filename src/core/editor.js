@@ -1352,6 +1352,12 @@ Editor.prototype = {
 
 		this._w.setTimeout(
 			function () {
+				// Check if instance was destroyed (e.g., in SSR with dynamic imports mistake)
+				if (!this.context) {
+					console.warn('[SUNEDITOR:E_INIT_FAIL] Editor instance was destroyed before initialization completed. Check if destroy() was called.');
+					return;
+				}
+
 				// toolbar visibility
 				this.context.get('toolbar_main').style.visibility = '';
 				// roots
