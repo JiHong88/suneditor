@@ -1,6 +1,6 @@
-import EditorInjector from '../../editorInjector';
-import { dom, numbers, converter, env, keyCodeMap } from '../../helper';
-import { Controller, SelectMenu, ColorPicker, Figure, _DragHandle } from '../../modules';
+import EditorInjector from '../../../editorInjector';
+import { dom, numbers, converter, env, keyCodeMap } from '../../../helper';
+import { Controller, SelectMenu, ColorPicker, Figure, _DragHandle } from '../../../modules';
 
 const { _w, ON_OVER_COMPONENT } = env;
 

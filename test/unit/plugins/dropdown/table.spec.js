@@ -1,8 +1,8 @@
 /**
- * @fileoverview Unit tests for plugins/dropdown/table.js
+ * @fileoverview Unit tests for plugins/dropdown/table
  */
 
-import Table from '../../../../src/plugins/dropdown/table.js';
+import Table from '../../../../src/plugins/dropdown/table';
 
 // Mock all required modules
 jest.mock('../../../../src/modules/HueSlider.js', () => ({
