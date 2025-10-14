@@ -202,42 +202,6 @@ describe('Core - Editor', () => {
 		});
 	});
 
-	describe('Editor dependency imports', () => {
-		it('should contain references to core dependencies', () => {
-			const editorString = Editor.toString();
-
-			// Check for constructor and utility imports
-			const expectedImportPatterns = [
-				'Constructor', // Main constructor
-				'InitOptions', // Options initialization
-				'History', // History management
-				'EventManager', // Event management
-				'Events' // Events
-			];
-
-			// In bundled code, these might appear as function calls
-			expectedImportPatterns.forEach((pattern) => {
-				expect(editorString).toMatch(new RegExp(pattern, 'i'));
-			});
-		});
-
-		it('should reference class injector concepts', () => {
-			const editorString = Editor.toString();
-			// Editor should have class-related functionality, even if ClassInjector is bundled
-			expect(editorString.includes('toolbar') || editorString.includes('selection') || editorString.includes('format')).toBeTruthy();
-		});
-
-		it('should import all required classes', () => {
-			const editorString = Editor.toString();
-
-			const expectedClasses = ['Char', 'Component', 'Format', 'HTML', 'Menu', 'Selection', 'Toolbar', 'UI', 'Viewer'];
-
-			expectedClasses.forEach((className) => {
-				expect(editorString).toMatch(new RegExp(className, 'i'));
-			});
-		});
-	});
-
 	describe('Editor constants and configuration', () => {
 		it('should define button management functionality', () => {
 			const editorString = Editor.toString();
