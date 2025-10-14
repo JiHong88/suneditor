@@ -430,7 +430,14 @@ HTML.prototype = {
 		}
 
 		let fNode = null;
-		let range = this.selection.getRange();
+		let range = null;
+
+		if (afterNode) {
+			const afterOffset = dom.check.isText(afterNode) ? afterNode.textContent.length : 1;
+			range = this.selection.setRange(afterNode, afterOffset, afterNode, afterOffset);
+		} else {
+			range = this.selection.getRange();
+		}
 		let line = dom.check.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : this.format.getLine(this.selection.getNode(), null);
 		let insertListCell = dom.check.isListCell(line) && (dom.check.isListCell(oNode) || dom.check.isList(oNode));
 

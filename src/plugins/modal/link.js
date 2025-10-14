@@ -165,10 +165,10 @@ class Link extends EditorInjector {
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
 
-		if (/copy/.test(command)) {
-			this.html.copy(this.target);
-		} else if (/update/.test(command)) {
+		if (/update/.test(command)) {
 			this.modal.open();
+		} else if (/copy/.test(command)) {
+			this.html.copy(this.target);
 		} else if (/unlink/.test(command)) {
 			const sc = dom.query.getEdgeChild(
 				this.controller.currentTarget,
@@ -230,16 +230,16 @@ function CreateHTML_controller({ lang, icons }) {
 	<div class="link-content">
 		<span><a target="_blank" href=""></a>&nbsp;</span>
 		<div class="se-btn-group">
-			<button type="button" data-command="copy" tabindex="-1" class="se-btn se-tooltip">
-				${icons.copy}
-				<span class="se-tooltip-inner">
-					<span class="se-tooltip-text">${lang.copy}</span>
-				</span>
-			</button>
 			<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">
 				${icons.edit}
 				<span class="se-tooltip-inner">
 					<span class="se-tooltip-text">${lang.edit}</span>
+				</span>
+			</button>
+			<button type="button" data-command="copy" tabindex="-1" class="se-btn se-tooltip">
+				${icons.copy}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${lang.copy}</span>
 				</span>
 			</button>
 			<button type="button" data-command="unlink" tabindex="-1" class="se-btn se-tooltip se-icon-flip-rtl">

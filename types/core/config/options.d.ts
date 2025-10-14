@@ -82,7 +82,12 @@ export namespace DEFAULTS {
 		'table|td': string;
 		tr: string;
 		col: string;
+		caption: string;
 		'ol|ul': string;
+		figure: string;
+		figcaption: string;
+		'img|video|iframe': string;
+		hr: string;
 	};
 	let SPAN_STYLES: string;
 	let LINE_STYLES: string;

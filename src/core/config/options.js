@@ -52,28 +52,34 @@ export const DEFAULTS = {
 		'border|border-bottom|border-collapse|border-color|border-image|border-left-width|border-radius|border-right-width|border-spacing|border-style|border-top|border-width|' +
 		'box-shadow|box-sizing|' +
 		'caption-side|color|content|' +
-		'direction|display|' +
+		'direction|display|position|' +
 		'float|font|font-family|font-size|font-style|font-weight|' +
-		'height|' +
+		'height|min-height|max-height|' +
+		'width|min-width|max-width|' +
 		'left|letter-spacing|line-height|list-style-position|list-style-type|' +
-		'margin|margin-block-end|margin-block-start|margin-bottom|margin-inline-end|margin-inline-start|margin-left|margin-right|margin-top|max-width|min-width|' +
+		'margin|margin-block-end|margin-block-start|margin-bottom|margin-inline-end|margin-inline-start|margin-left|margin-right|margin-top|' +
+		'padding|padding-bottom|padding-inline-start|padding-left|padding-right|padding-top|' +
 		'outline|overflow|' +
-		'position|padding|padding-bottom|padding-inline-start|padding-left|padding-right|padding-top|' +
 		'page-break-before|page-break-after|page-break-inside|' +
 		'rotate|rotateX|rotateY|' +
 		'table-layout|text-align|text-decoration|text-shadow|text-transform|top|' +
 		'text-indent|text-rendering|' +
 		'vertical-align|visibility|' +
-		'white-space|width|word-break|word-wrap',
+		'white-space|word-break|word-wrap',
 	TAG_STYLES: {
-		'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align|text-align',
+		'table|th|td': 'border|border-[a-z]+|color|background-color|text-align|float|font-weight|text-decoration|font-style|vertical-align',
 		'table|td': 'width',
 		tr: 'height',
 		col: 'width',
-		'ol|ul': 'list-style-type'
+		caption: 'text-align|caption-side',
+		'ol|ul': 'list-style-type',
+		figure: 'display|width|height|padding|padding-bottom',
+		figcaption: 'margin|margin-top|margin-bottom|text-align',
+		'img|video|iframe': 'transform|transform-origin|width|min-width|max-width|height|min-height|max-height|float|margin|margin-top',
+		hr: ''
 	},
 	SPAN_STYLES: 'font-family|font-size|color|background-color|width|height',
-	LINE_STYLES: 'text-align|margin-left|margin-right|line-height',
+	LINE_STYLES: 'text-align|margin|margin-left|margin-right|line-height',
 
 	RETAIN_STYLE_MODE: ['repeat', 'always', 'none']
 };
