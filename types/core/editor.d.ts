@@ -1,53 +1,39 @@
 export default Editor;
-export type EditorInitOptions_editor = import('./config/options').EditorInitOptions;
-export type EditorFrameOptions_editor = import('./config/options').EditorFrameOptions;
 export type ControllerInfo_editor = import('../modules/Controller').ControllerInfo;
-/**
- * @typedef {import('./config/options').EditorInitOptions} EditorInitOptions_editor
- */
-/**
- * @typedef {import('./config/options').EditorFrameOptions} EditorFrameOptions_editor
- */
 /**
  * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
  */
 /**
  * @constructor
  * @description SunEditor constructor function.
- * @param {Array<{target: Element, key: *, options: EditorFrameOptions_editor}>} multiTargets Target element
- * @param {EditorInitOptions_editor} options options
+ * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} multiTargets Target element
+ * @param {__se__EditorOptions} options options
  */
 declare function Editor(
 	multiTargets: Array<{
 		target: Element;
 		key: any;
-		options: EditorFrameOptions_editor;
+		options: __se__EditorFrameOptions;
 	}>,
-	options: EditorInitOptions_editor
+	options: __se__EditorOptions
 ): void;
 declare class Editor {
-	/**
-	 * @typedef {import('./config/options').EditorInitOptions} EditorInitOptions_editor
-	 */
-	/**
-	 * @typedef {import('./config/options').EditorFrameOptions} EditorFrameOptions_editor
-	 */
 	/**
 	 * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
 	 */
 	/**
 	 * @constructor
 	 * @description SunEditor constructor function.
-	 * @param {Array<{target: Element, key: *, options: EditorFrameOptions_editor}>} multiTargets Target element
-	 * @param {EditorInitOptions_editor} options options
+	 * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} multiTargets Target element
+	 * @param {__se__EditorOptions} options options
 	 */
 	constructor(
 		multiTargets: Array<{
 			target: Element;
 			key: any;
-			options: EditorFrameOptions_editor;
+			options: __se__EditorFrameOptions;
 		}>,
-		options: EditorInitOptions_editor
+		options: __se__EditorOptions
 	);
 	/**
 	 * @description Frame root key array
@@ -434,9 +420,9 @@ declare class Editor {
 	_figureContainer: HTMLElement | null;
 	/**
 	 * @description Origin options
-	 * @type {EditorInitOptions_editor}
+	 * @type {__se__EditorOptions}
 	 */
-	_originOptions: EditorInitOptions_editor;
+	_originOptions: __se__EditorOptions;
 	/**
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * - If the plugin is added call callBack function.
@@ -497,9 +483,9 @@ declare class Editor {
 	setDir(dir: string): void;
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
-	 * @param {EditorInitOptions_editor} newOptions Options
+	 * @param {__se__EditorOptions} newOptions Options
 	 */
-	resetOptions(newOptions: EditorInitOptions_editor): void;
+	resetOptions(newOptions: __se__EditorOptions): void;
 	/**
 	 * @description Change the current root index.
 	 * @param {*} rootKey
@@ -590,15 +576,15 @@ declare class Editor {
 	/**
 	 * @private
 	 * @description Initializ editor
-	 * @param {EditorInitOptions_editor} options Options
+	 * @param {__se__EditorOptions} options Options
 	 */
-	__editorInit(options: EditorInitOptions_editor): void;
+	__editorInit(options: __se__EditorOptions): void;
 	/**
 	 * @private
 	 * @description Initializ core variable
-	 * @param {EditorInitOptions_editor} options Options
+	 * @param {__se__EditorOptions} options Options
 	 */
-	__init(options: EditorInitOptions_editor): void;
+	__init(options: __se__EditorOptions): void;
 	/**
 	 * @private
 	 * @description Caching basic buttons to use
@@ -652,10 +638,10 @@ declare class Editor {
 	/**
 	 * @private
 	 * @description Creates the editor instance and initializes components.
-	 * @param {EditorInitOptions_editor} originOptions - The initial editor options.
+	 * @param {__se__EditorOptions} originOptions - The initial editor options.
 	 * @returns {Promise<void>}
 	 */
-	__Create(originOptions: EditorInitOptions_editor): Promise<void>;
+	__Create(originOptions: __se__EditorOptions): Promise<void>;
 	Constructor: typeof Editor;
 }
 import { ContextUtil } from './config/context';

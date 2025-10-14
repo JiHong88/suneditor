@@ -8,23 +8,7 @@ import { DEFAULTS } from '../config/options';
 const _d = env._d;
 
 /**
- * @typedef {import('../config/options').EditorFrameOptions} EditorFrameOptions_constructor
- */
-
-/**
- * @typedef {import('../config/options').EditorInitOptions} EditorInitOptions_constructor
- */
-
-/**
  * @typedef {import('../config/options').AllBaseOptions} AllBaseOptions_constructor
- */
-
-/**
- * @typedef {import('../config/options').BaseOptionsMap} BaseOptionsMap_constructor
- */
-
-/**
- * @typedef {import('../config/options').FrameOptionsMap} FrameOptionsMap_constructor
  */
 
 /**
@@ -47,8 +31,8 @@ const _d = env._d;
 
 /**
  * @description Creates a new SunEditor instance with specified options.
- * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets - Target element or multi-root object.
- * @param {EditorInitOptions_constructor} options - Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} editorTargets - Target element or multi-root object.
+ * @param {__se__EditorOptions} options - Configuration options for the editor.
  * @returns {ConstructorReturnType} - SunEditor instance with context, options, and DOM elements.
  */
 function Constructor(editorTargets, options) {
@@ -371,20 +355,20 @@ function _mergeObject(a, b) {
 
 /**
  * @typedef {Object} InitOptionsReturnType
- * @property {BaseOptionsMap_constructor} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+ * @property {__se__BaseOptions} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
  * @property {Object<string, string>} i - Icon set
  * @property {Object<string, string>} l - Language pack
  * @property {string|null} v - Initial editor value
  * @property {Array<string[]|string>} buttons - Toolbar button list (arrays for groups, strings for single buttons)
  * @property {Array<string[]|string>|null} subButtons - Sub-toolbar button list
  * @property {Element|null} statusbarContainer - Container element for status bar (if specified)
- * @property {Map<string|null, FrameOptionsMap_constructor>} frameMap - Map of frame-specific options (frame key => {@link FrameOptionsMap})
+ * @property {Map<string|null, __se__FrameOptions>} frameMap - Map of frame-specific options (frame key => {@link __se__FrameOptions})
  */
 
 /**
  * @description Initialize options
- * @param {EditorInitOptions_constructor} options Configuration options for the editor.
- * @param {Array<{target: Element, key: *, options: EditorFrameOptions_constructor}>} editorTargets Target textarea
+ * @param {__se__EditorOptions} options Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} editorTargets Target textarea
  * @param {Object<string, *>} plugins Plugins object
  * @returns {InitOptionsReturnType} Initialized options and configuration
  */
@@ -793,9 +777,9 @@ export function CreateStatusbar(targetOptions, statusbar) {
 
 /**
  * @description Initialize options.
- * @param {EditorFrameOptions_constructor} o - Target options
- * @param {EditorInitOptions_constructor} origin - Full options
- * @returns {FrameOptionsMap_constructor} Processed frame options Map
+ * @param {__se__EditorFrameOptions} o - Target options
+ * @param {__se__EditorOptions} origin - Full options
+ * @returns {__se__FrameOptions} Processed frame options Map
  */
 function InitFrameOptions(o, origin) {
 	const fo = new Map();

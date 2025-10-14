@@ -36,22 +36,14 @@ const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-e
 const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
 
 /**
- * @typedef {import('./config/options').EditorInitOptions} EditorInitOptions_editor
- */
-
-/**
- * @typedef {import('./config/options').EditorFrameOptions} EditorFrameOptions_editor
- */
-
-/**
  * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
  */
 
 /**
  * @constructor
  * @description SunEditor constructor function.
- * @param {Array<{target: Element, key: *, options: EditorFrameOptions_editor}>} multiTargets Target element
- * @param {EditorInitOptions_editor} options options
+ * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} multiTargets Target element
+ * @param {__se__EditorOptions} options options
  */
 function Editor(multiTargets, options) {
 	const _d = multiTargets[0].target.ownerDocument || env._d;
@@ -499,7 +491,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Origin options
-	 * @type {EditorInitOptions_editor}
+	 * @type {__se__EditorOptions}
 	 */
 	this._originOptions = options;
 
@@ -817,7 +809,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
-	 * @param {EditorInitOptions_editor} newOptions Options
+	 * @param {__se__EditorOptions} newOptions Options
 	 */
 	resetOptions(newOptions) {
 		this.viewer.codeView(false);
@@ -1320,7 +1312,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Initializ editor
-	 * @param {EditorInitOptions_editor} options Options
+	 * @param {__se__EditorOptions} options Options
 	 */
 	__editorInit(options) {
 		this.status.initViewportHeight = this._w.visualViewport.height;
@@ -1380,7 +1372,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Initializ core variable
-	 * @param {EditorInitOptions_editor} options Options
+	 * @param {__se__EditorOptions} options Options
 	 */
 	__init(options) {
 		// file components
@@ -1746,7 +1738,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Creates the editor instance and initializes components.
-	 * @param {EditorInitOptions_editor} originOptions - The initial editor options.
+	 * @param {__se__EditorOptions} originOptions - The initial editor options.
 	 * @returns {Promise<void>}
 	 */
 	async __Create(originOptions) {

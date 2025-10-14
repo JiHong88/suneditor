@@ -10,27 +10,22 @@
 // --------------------------------------------------------- [Editor] ---------------------------------------------------------------------------------------------------
 /**
  * @typedef {import('./core/editor').default} __se__EditorCore
- */
-
-/**
  * @typedef {import('./editorInjector').default} __se__EditorInjector
- * @typedef {import('./editorInjector/_core').default} __se__CoreInjector
  */
 
+// --------------------------------------------------------- [Options] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Object} __se__ComponentInfo
- * @property {HTMLElement} target - The target element associated with the component.
- * @property {string} pluginName - The name of the plugin related to the component.
- * @property {Object<string, *>} options - Options related to the component.
- * @property {HTMLElement} container - The main container element for the component.
- * @property {?HTMLElement} cover - The cover element, if applicable.
- * @property {?HTMLElement} inlineCover - The inline cover element, if applicable.
- * @property {?HTMLElement} caption - The caption element, if applicable.
- * @property {boolean} isFile - Whether the component is a file-related component.
- * @property {?HTMLElement} launcher - The element that triggered the component, if applicable.
- * @property {boolean} isInputType - Whether the component is an input component (e.g., table).
+ * @typedef {import('./core/config/options').EditorInitOptions} __se__EditorOptions
+ * @typedef {import('./core/config/options').EditorFrameOptions} __se__EditorFrameOptions
  */
 
+// --------------------------------------------------------- [Context] ---------------------------------------------------------------------------------------------------
+/**
+ * @typedef {import('./core/config/frameContext').FrameContextUtil} __se__FrameContext
+ * @typedef {Map<keyof import('./core/config/context').ContextUtil, *>} __se__Context
+ */
+
+// --------------------------------------------------------- [Editor Status] ---------------------------------------------------------------------------------------------------
 /**
  * @typedef {Object} __se__EditorStatus
  * @property {boolean} hasFocus Boolean value of whether the editor has focus
@@ -45,6 +40,21 @@
  * @property {*} rootKey Current root key
  * @property {Range} _range Current range object
  * @property {boolean} _onMousedown Mouse down event status
+ */
+
+// --------------------------------------------------------- [component] ---------------------------------------------------------------------------------------------------
+/**
+ * @typedef {Object} __se__ComponentInfo
+ * @property {HTMLElement} target - The target element associated with the component.
+ * @property {string} pluginName - The name of the plugin related to the component.
+ * @property {Object<string, *>} options - Options related to the component.
+ * @property {HTMLElement} container - The main container element for the component.
+ * @property {?HTMLElement} cover - The cover element, if applicable.
+ * @property {?HTMLElement} inlineCover - The inline cover element, if applicable.
+ * @property {?HTMLElement} caption - The caption element, if applicable.
+ * @property {boolean} isFile - Whether the component is a file-related component.
+ * @property {?HTMLElement} launcher - The element that triggered the component, if applicable.
+ * @property {boolean} isInputType - Whether the component is an input component (e.g., table).
  */
 
 /**
@@ -121,16 +131,10 @@
  * @property {__se__ComponentInfo} info Component information
  */
 
-// --------------------------------------------------------- [Options] ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------- [Options Map] ---------------------------------------------------------------------------------------------------
 /**
  * @typedef {import('./core/config/options').FrameOptionsMap} __se__FrameOptions
  * @typedef {import('./core/config/options').BaseOptionsMap} __se__BaseOptions
- */
-
-// --------------------------------------------------------- [Context] ---------------------------------------------------------------------------------------------------
-/**
- * @typedef {import('./core/config/frameContext').FrameContextUtil} __se__FrameContext
- * @typedef {Map<keyof import('./core/config/context').ContextUtil, *>} __se__Context
  */
 
 // --------------------------------------------------------- [core.class] ---------------------------------------------------------------------------------------------------

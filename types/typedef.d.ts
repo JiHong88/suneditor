@@ -4,51 +4,10 @@ declare global {
 	type __se__NodeCollection = Array<Node> | HTMLCollection | NodeList;
 	type __se__EditorCore = import('./core/editor').default;
 	type __se__EditorInjector = import('./editorInjector').default;
-	type __se__CoreInjector = import('./editorInjector/_core').default;
-	type __se__ComponentInfo = {
-		/**
-		 * - The target element associated with the component.
-		 */
-		target: HTMLElement;
-		/**
-		 * - The name of the plugin related to the component.
-		 */
-		pluginName: string;
-		/**
-		 * - Options related to the component.
-		 */
-		options: {
-			[x: string]: any;
-		};
-		/**
-		 * - The main container element for the component.
-		 */
-		container: HTMLElement;
-		/**
-		 * - The cover element, if applicable.
-		 */
-		cover: HTMLElement | null;
-		/**
-		 * - The inline cover element, if applicable.
-		 */
-		inlineCover: HTMLElement | null;
-		/**
-		 * - The caption element, if applicable.
-		 */
-		caption: HTMLElement | null;
-		/**
-		 * - Whether the component is a file-related component.
-		 */
-		isFile: boolean;
-		/**
-		 * - The element that triggered the component, if applicable.
-		 */
-		launcher: HTMLElement | null;
-		/**
-		 * - Whether the component is an input component (e.g., table).
-		 */
-		isInputType: boolean;
-	};
+	type __se__EditorOptions = import('./core/config/options').EditorInitOptions;
+	type __se__EditorFrameOptions = import('./core/config/options').EditorFrameOptions;
+	type __se__FrameContext = import('./core/config/frameContext').FrameContextUtil;
+	type __se__Context = Map<keyof import('./core/config/context').ContextUtil, any>;
 	type __se__EditorStatus = {
 		/**
 		 * Boolean value of whether the editor has focus
@@ -98,6 +57,50 @@ declare global {
 		 * Mouse down event status
 		 */
 		_onMousedown: boolean;
+	};
+	type __se__ComponentInfo = {
+		/**
+		 * - The target element associated with the component.
+		 */
+		target: HTMLElement;
+		/**
+		 * - The name of the plugin related to the component.
+		 */
+		pluginName: string;
+		/**
+		 * - Options related to the component.
+		 */
+		options: {
+			[x: string]: any;
+		};
+		/**
+		 * - The main container element for the component.
+		 */
+		container: HTMLElement;
+		/**
+		 * - The cover element, if applicable.
+		 */
+		cover: HTMLElement | null;
+		/**
+		 * - The inline cover element, if applicable.
+		 */
+		inlineCover: HTMLElement | null;
+		/**
+		 * - The caption element, if applicable.
+		 */
+		caption: HTMLElement | null;
+		/**
+		 * - Whether the component is a file-related component.
+		 */
+		isFile: boolean;
+		/**
+		 * - The element that triggered the component, if applicable.
+		 */
+		launcher: HTMLElement | null;
+		/**
+		 * - Whether the component is an input component (e.g., table).
+		 */
+		isInputType: boolean;
 	};
 	type __se__ComponentInsertBehaviorType = 'auto' | 'select' | 'line' | 'none';
 	type __se__EventInfo = {
@@ -237,8 +240,6 @@ declare global {
 	};
 	type __se__FrameOptions = import('./core/config/options').FrameOptionsMap;
 	type __se__BaseOptions = import('./core/config/options').BaseOptionsMap;
-	type __se__FrameContext = import('./core/config/frameContext').FrameContextUtil;
-	type __se__Context = Map<keyof import('./core/config/context').ContextUtil, any>;
 	type __se__Class_OffsetGlobalInfo = import('./core/class/offset').OffsetGlobalInfo;
 	type __se__EventKeydownCtx = import('./core/event/reducers/keydown.reducer').KeydownReducerCtx;
 	type __se__EventActions = import('./core/event/actions').Action[];
