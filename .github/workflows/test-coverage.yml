@@ -2,9 +2,9 @@ name: Test & Coverage
 
 on:
     push:
-        branches: [develop]
+        branches: [master, develop]
     pull_request:
-        branches: [release]
+        branches: [master, develop]
 
 jobs:
     test:
