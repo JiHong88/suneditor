@@ -11,6 +11,7 @@
 	<a href="https://www.npmjs.com/package/suneditor" title="npm release"><img src="https://img.shields.io/npm/v/suneditor.svg?style=flat-square" alt="npm"></a>
 	<a href="https://www.npmjs.com/package/suneditor" title="npm month downloads"><img src="https://img.shields.io/npm/dm/suneditor.svg?logo=npm&style=flat-square" alt="npm weekly downloads"></a>
 	<a href="https://www.jsdelivr.com/package/npm/suneditor" title="jsDelivr CDN month downloads"><img src="https://img.shields.io/jsdelivr/npm/hm/suneditor?label=CDN&style=flat-square" alt="jsDelivr CDN" /></a>
+	<a href="https://codecov.io/gh/jihong88/suneditor" title="Test coverage"><img src="https://codecov.io/gh/jihong88/suneditor/branch/develop/graph/badge.svg" alt="Test coverage" /></a>
 </p>
 
 #
@@ -24,16 +25,16 @@ It's easy to integrate, highly customizable, and built for modern web applicatio
 
 ### Key Features
 
--   ⚡ **No dependencies** — Optimized for speed and simplicity
--   🧩 **Modular architecture** — Enable only the plugins you need
--   📱 **Responsive UI** — Works smoothly on all modern devices
--   🔌 **Framework-friendly** — Easy to use with React, Vue, Svelte, etc.
--   💼 **Feature-rich plugin ecosystem**, including:
-    -   🏷 @Mentions with autocomplete
-    -   🎨 Advanced table editing & custom layouts
-    -   🧮 Math (LaTeX), drawing, and code block support
-    -   📂 Built-in media galleries (image, video, audio, file)
-    -   📄 PDF export, templates, and embedded content (audio/video/iframe)
+- ⚡ **No dependencies** — Optimized for speed and simplicity
+- 🧩 **Modular architecture** — Enable only the plugins you need
+- 📱 **Responsive UI** — Works smoothly on all modern devices
+- 🔌 **Framework-friendly** — Easy to use with React, Vue, Svelte, etc.
+- 💼 **Feature-rich plugin ecosystem**, including:
+    - 🏷 @Mentions with autocomplete
+    - 🎨 Advanced table editing & custom layouts
+    - 🧮 Math (LaTeX), drawing, and code block support
+    - 📂 Built-in media galleries (image, video, audio, file)
+    - 📄 PDF export, templates, and embedded content (audio/video/iframe)
 
 🌤 **[Explore all plugins](https://suneditor.com/plugins)**
 
@@ -63,10 +64,10 @@ It does not ship with polyfills by default, but you can add them if your project
 
 ### 📌 Why This Baseline? (Late 2023)
 
--   This is based on features commonly supported by modern browsers.
--   Most modern web APIs and CSS features are supported reliably in versions after this point.
--   Unless specific compatibility issues arise, you can use it out of the box without additional polyfills.
--   If you need support for older browsers, you can extend it by adding your own polyfills.
+- This is based on features commonly supported by modern browsers.
+- Most modern web APIs and CSS features are supported reliably in versions after this point.
+- Unless specific compatibility issues arise, you can use it out of the box without additional polyfills.
+- If you need support for older browsers, you can extend it by adding your own polyfills.
 
 ---
 
