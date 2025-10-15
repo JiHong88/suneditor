@@ -1215,7 +1215,10 @@ HTML.prototype = {
 		try {
 			if (typeof content !== 'string' && !dom.check.isElement(content) && !dom.check.isText(content)) return false;
 
-			await clipboard.write(content);
+			if ((await clipboard.write(content)) === false) {
+				this.editor.ui.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
+				return false;
+			}
 			this.editor.ui.showToast(this.lang.message_copy_success, this.options.get('toastMessageTime').copy);
 			return true;
 		} catch (err) {

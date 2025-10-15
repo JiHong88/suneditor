@@ -9,12 +9,12 @@ import { isElement } from './dom/domCheck';
  * - Iframe is replaced with a placeholder : <div data-se-iframe-holder-src="iframe.src">[iframe: iframe.src]</div>
  * - "iframe placeholder" is re-rendered in html.clean when pasted into the editor.
  * @param {Element|Text|string} content Content to be copied to the clipboard
- * @returns {Promise<void>}
+ * @returns {Promise<void|false>} If it fails, it returns false.
  */
 export async function write(content) {
 	if (!isClipboardSupported) {
 		console.error('Clipboard is not supported in this browser.');
-		return;
+		return false;
 	}
 
 	let htmlString = '';

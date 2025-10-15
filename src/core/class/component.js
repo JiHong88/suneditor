@@ -446,7 +446,7 @@ Component.prototype = {
 	 * - This function is different from the one called when the user presses the "Ctrl + C" key combination.
 	 * @param {Node} container The DOM node to check.
 	 */
-	copy(container) {
+	async copy(container) {
 		const cloneContainer = /** @type {HTMLElement} */ (dom.utils.clone(container, true));
 
 		// remove selected class
@@ -456,7 +456,7 @@ Component.prototype = {
 		dom.utils.removeClass(cloneContainer.querySelector('.se-selected-cell-focus'), 'se-selected-cell-focus');
 
 		// copy to clipboard
-		this.html.copy(cloneContainer);
+		if ((await this.html.copy(cloneContainer)) === false) return;
 
 		// copy effect
 		dom.utils.flashClass(container, 'se-copy');

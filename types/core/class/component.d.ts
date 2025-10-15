@@ -166,7 +166,7 @@ declare class Component {
 	 * - This function is different from the one called when the user presses the "Ctrl + C" key combination.
 	 * @param {Node} container The DOM node to check.
 	 */
-	copy(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node): void;
+	copy(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node): Promise<void>;
 	/**
 	 * @private
 	 * @this {ComponentThis}
