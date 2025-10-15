@@ -1279,7 +1279,6 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 						// default command
 						if (button === 'copy' && !env.isClipboardSupported) {
 							console.warn('[SUNEDITOR.constructor.warn] Clipboard is not supported in this browser. : [copy] button is not rendered.');
-							continue;
 						}
 						modules = defaultButtonList[button];
 					}
