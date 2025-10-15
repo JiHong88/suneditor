@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             # 1) 소스 체크아웃
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
             # 2) Node.js 세팅
             - name: Setup Node.js
