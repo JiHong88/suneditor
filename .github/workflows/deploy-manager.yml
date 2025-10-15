@@ -14,9 +14,10 @@ jobs:
 
             # 2) Node.js 세팅
             - name: Setup Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
                   node-version: '22'
+                  cache: 'npm'
                   registry-url: 'https://registry.npmjs.org/'
 
             # 3) package.json 버전이 기존 태그와 다른지 확인
