@@ -100,6 +100,14 @@ function createTestDOM() {
 			};
 		}
 
+		// Mock TextEncoder and TextDecoder for char.getByteLength() tests
+		if (!window.TextEncoder) {
+			// Use Node.js util.TextEncoder if available
+			const util = require('util');
+			window.TextEncoder = util.TextEncoder;
+			window.TextDecoder = util.TextDecoder;
+		}
+
 		// Mock querySelectorAll to return proper NodeList-like objects
 		const originalQuerySelectorAll = document.querySelectorAll;
 		document.querySelectorAll = function(selector) {

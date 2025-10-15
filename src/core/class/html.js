@@ -433,11 +433,12 @@ HTML.prototype = {
 		let range = null;
 
 		if (afterNode) {
-			const afterOffset = dom.check.isText(afterNode) ? afterNode.textContent.length : 1;
-			range = this.selection.setRange(afterNode, afterOffset, afterNode, afterOffset);
+			const afterNewLine = this.format.isLine(afterNode) || this.format.isBlock(afterNode) || this.component.is(afterNode) ? this.format.addLine(afterNode, null) : afterNode;
+			range = this.selection.setRange(afterNewLine, 1, afterNewLine, 1);
 		} else {
 			range = this.selection.getRange();
 		}
+
 		let line = dom.check.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : this.format.getLine(this.selection.getNode(), null);
 		let insertListCell = dom.check.isListCell(line) && (dom.check.isListCell(oNode) || dom.check.isList(oNode));
 
@@ -446,7 +447,7 @@ HTML.prototype = {
 			tempAfterNode,
 			tempParentNode = null;
 		const freeFormat = this.format.isBrLine(line);
-		const isFormats = (!freeFormat && (this.format.isLine(oNode) || this.format.isBlock(oNode))) || this.component.isBasic(oNode);
+		const isFormats = this.format.isLine(oNode) || this.format.isBlock(oNode) || this.component.isBasic(oNode);
 
 		if (insertListCell) {
 			tempAfterNode = afterNode || dom.check.isList(oNode) ? line.lastChild : line.nextElementSibling;

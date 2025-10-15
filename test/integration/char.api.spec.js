@@ -101,7 +101,7 @@ describe('Char API integration tests', () => {
 	});
 
 	describe('char.getByteLength() - Get byte length', () => {
-		it.skip('should get byte length of ASCII text (requires browser TextEncoder)', () => {
+		it('should get byte length of ASCII text (requires browser TextEncoder)', () => {
 			const text = 'Hello';
 			const byteLength = editor.char.getByteLength(text);
 
@@ -109,12 +109,12 @@ describe('Char API integration tests', () => {
 			expect(byteLength).toBeGreaterThanOrEqual(5);
 		});
 
-		it.skip('should get byte length of unicode text (requires browser TextEncoder)', () => {
+		it('should get byte length of unicode text (requires browser TextEncoder)', () => {
 			const text = '안녕';
 			const byteLength = editor.char.getByteLength(text);
 
 			// Korean characters are multiple bytes
-			expect(byteLength).toBeGreaterThan(2);
+			expect(byteLength).toBeGreaterThan(4);
 		});
 
 		it('should handle empty string', () => {
@@ -124,12 +124,12 @@ describe('Char API integration tests', () => {
 			expect(byteLength).toBe(0);
 		});
 
-		it.skip('should handle emoji (requires browser TextEncoder)', () => {
+		it('should handle emoji (requires browser TextEncoder)', () => {
 			const text = '😀';
 			const byteLength = editor.char.getByteLength(text);
 
-			// Emoji are multiple bytes
-			expect(byteLength).toBeGreaterThan(1);
+			// Emoji are multiple bytes (4 bytes in UTF-8)
+			expect(byteLength).toBeGreaterThanOrEqual(4);
 		});
 	});
 
@@ -385,7 +385,7 @@ describe('Char API integration tests', () => {
 	});
 
 	describe('Byte counting mode', () => {
-		it.skip('should count bytes for ASCII (requires browser TextEncoder)', () => {
+		it('should count bytes for ASCII (requires browser TextEncoder)', () => {
 			const text = 'ASCII';
 			const bytes = editor.char.getByteLength(text);
 
@@ -393,19 +393,11 @@ describe('Char API integration tests', () => {
 			expect(bytes).toBeGreaterThanOrEqual(5);
 		});
 
-		it.skip('should count bytes for multibyte characters (requires browser TextEncoder)', () => {
-			const asciiBytes = editor.char.getByteLength('Hello');
-			const unicodeBytes = editor.char.getByteLength('안녕하세요');
-
-			// Unicode should be more bytes
-			expect(unicodeBytes).toBeGreaterThan(asciiBytes);
-		});
-
-		it.skip('should count bytes for emoji (requires browser TextEncoder)', () => {
+		it('should count bytes for emoji (requires browser TextEncoder)', () => {
 			const emojiBytes = editor.char.getByteLength('😀😃😄');
 
-			// Emoji are multiple bytes each
-			expect(emojiBytes).toBeGreaterThan(3);
+			// Emoji are 4 bytes each in UTF-8, so 3 emoji = 12 bytes
+			expect(emojiBytes).toBeGreaterThanOrEqual(12);
 		});
 	});
 });

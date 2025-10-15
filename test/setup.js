@@ -133,3 +133,16 @@ if (typeof global.DataTransfer === 'undefined' && typeof jest !== 'undefined') {
 		window.DataTransfer = global.DataTransfer;
 	}
 }
+
+// Add TextEncoder and TextDecoder polyfills for jsdom environment
+// These are needed for char.getByteLength() tests
+if (typeof global.TextEncoder === 'undefined') {
+	const util = require('util');
+	global.TextEncoder = util.TextEncoder;
+	global.TextDecoder = util.TextDecoder;
+
+	if (typeof window !== 'undefined') {
+		window.TextEncoder = global.TextEncoder;
+		window.TextDecoder = global.TextDecoder;
+	}
+}
