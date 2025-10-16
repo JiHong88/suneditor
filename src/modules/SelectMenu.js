@@ -38,8 +38,10 @@ class SelectMenu extends CoreInjector {
 	 * @param {SelectMenuParams} params Select menu options
 	 */
 	constructor(inst, params) {
-		// plugin bisic properties
 		super(inst.editor);
+
+		// editor class
+		this.offset = this.editor.offset;
 
 		// members
 		this.kink = inst.constructor.key || inst.constructor.name;
@@ -258,7 +260,7 @@ class SelectMenu extends CoreInjector {
 		}
 
 		// set top position
-		const globalTarget = this.editor.offset.get(target);
+		const globalTarget = this.offset.get(target);
 		const targetOffsetTop = target.offsetTop;
 		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;
@@ -276,14 +278,14 @@ class SelectMenu extends CoreInjector {
 					form.style.top = t + 'px';
 				}
 				// over bottom
-				let formT = this.editor.offset.getGlobal(form).top;
+				let formT = this.offset.getGlobal(form).top;
 				const modH = h - (targetGlobalTop - formT) - wbottom - targetHeight;
 				if (modH > 0) {
 					t -= modH + 4;
 					form.style.top = t + 'px';
 				}
 				// over height
-				formT = this.editor.offset.getGlobal(form).top;
+				formT = this.offset.getGlobal(form).top;
 				if (formT < 0) {
 					h += formT - 4;
 					t -= formT - 4;
@@ -335,7 +337,7 @@ class SelectMenu extends CoreInjector {
 		}
 
 		form.style.left = l + 'px';
-		const fl = this.editor.offset.getGlobal(form).left;
+		const fl = this.offset.getGlobal(form).left;
 		let overW = 0;
 		switch (side + '-' + (side ? originP : subPosition)) {
 			case 'true-left':
@@ -350,7 +352,7 @@ class SelectMenu extends CoreInjector {
 				overW = _w.innerWidth - (fl + formW);
 				if (overW < 0) l += overW - 4;
 				form.style.left = l + 'px';
-				const centerfl = this.editor.offset.getGlobal(form).left;
+				const centerfl = this.offset.getGlobal(form).left;
 				if (centerfl < 0) l -= centerfl - 4;
 				break;
 			}

@@ -1,7 +1,7 @@
 import { dom, converter } from '../helper';
 import { isElement } from '../helper/dom/domCheck';
 import CoreInjector from '../editorInjector/_core';
-import { HueSlider } from '../modules';
+import HueSlider from './HueSlider';
 
 const DEFAULT_COLOR_LIST = [
 	'#ff0000',

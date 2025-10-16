@@ -162,7 +162,7 @@ export type FigureControls = Array<
  * @class
  * @description Controller module class
  */
-declare class Figure extends EditorInjector {
+declare class Figure extends CoreInjector {
 	/**
 	 * @description Create a container for the resizing component and insert the element.
 	 * @param {Node} element Target element
@@ -246,6 +246,13 @@ declare class Figure extends EditorInjector {
 		right: string;
 		center: string;
 	};
+	component: import('../core/class/component').default;
+	ui: import('../core/class/ui').default;
+	offset: import('../core/class/offset').default;
+	selection: import('../core/class/selection').default;
+	html: import('../core/class/html').default;
+	format: import('../core/class/format').default;
+	nodeTransform: import('../core/class/nodeTransform').default;
 	/** @type {Object<string, *>} */
 	_action: {
 		[x: string]: any;
@@ -516,6 +523,6 @@ declare class Figure extends EditorInjector {
 	private _setDragEvent;
 	#private;
 }
-import EditorInjector from '../editorInjector';
-import { Controller } from '../modules';
-import { SelectMenu } from '../modules';
+import CoreInjector from '../editorInjector/_core';
+import Controller from './Controller';
+import SelectMenu from './SelectMenu';

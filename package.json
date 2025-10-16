@@ -51,7 +51,7 @@
 		"lint:fix-js": "npx eslint \"src/**/*.js\" --fix",
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
-		"lint": "npm run lint:fix-all && npm run lint:type",
+		"lint": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" && npm run lint:type && npm run check:arch",
 		"ts-build": "(npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/format-index.cjs && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && node scripts/gen-options-dts.cjs && npm run lint:fix-ts",
 		"i18n-build": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/i18n-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix",
 		"test": "jest --silent",
@@ -61,6 +61,7 @@
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:headed": "playwright test --headed",
 		"test:all": "jest --silent && playwright test",
+		"check:arch": "dependency-cruiser --config .dependency-cruiser.js src",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},
 	"bugs": {
@@ -92,6 +93,7 @@
 		"css-loader": "^7.1.2",
 		"css-minimizer-webpack-plugin": "^7.0.2",
 		"csstype": "^3.1.3",
+		"dependency-cruiser": "^17.1.0",
 		"eslint": "^9.36.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-compat": "^6.0.2",

@@ -45,8 +45,8 @@ declare class Modal extends CoreInjector {
 		},
 		element: Element
 	);
-	offset: import('../core/class/offset').default;
 	ui: import('../core/class/ui').default;
+	offset: import('../core/class/offset').default;
 	inst: any;
 	kind: any;
 	form: HTMLElement;

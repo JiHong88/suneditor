@@ -111,4 +111,4 @@ declare class ColorPicker extends CoreInjector {
 	#private;
 }
 import CoreInjector from '../editorInjector/_core';
-import { HueSlider } from '../modules';
+import HueSlider from './HueSlider';

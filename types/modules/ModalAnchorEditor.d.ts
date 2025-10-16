@@ -88,7 +88,7 @@ export type ModalAnchorEditorParams = {
  * @description Modal form Anchor tag editor
  * - Use it by inserting it into Modal in a plugin that uses Modal.
  */
-declare class ModalAnchorEditor extends EditorInjector {
+declare class ModalAnchorEditor extends CoreInjector {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -96,6 +96,8 @@ declare class ModalAnchorEditor extends EditorInjector {
 	 * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
 	 */
 	constructor(inst: any, modalForm: Node, params: ModalAnchorEditorParams);
+	selection: import('../core/class/selection').default;
+	ui: import('../core/class/ui').default;
 	openNewWindow: boolean;
 	relList: string[];
 	defaultRel: RELAttr;
@@ -159,5 +161,5 @@ declare class ModalAnchorEditor extends EditorInjector {
 	init(): void;
 	#private;
 }
-import EditorInjector from '../editorInjector';
+import CoreInjector from '../editorInjector/_core';
 import FileManager from './FileManager';

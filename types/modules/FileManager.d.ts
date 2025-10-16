@@ -98,7 +98,6 @@ declare class FileManager extends CoreInjector {
 	ui: import('../core/class/ui').default;
 	kind: any;
 	inst: any;
-	component: any;
 	query: string;
 	loadHandler: (params: Array<FileStateInfo>) => void;
 	eventHandler: (info: FileStateParams) => void;

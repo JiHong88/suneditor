@@ -6,17 +6,22 @@ import Figure from '../../../src/modules/Figure.js';
 
 // Mock dependencies
 jest.mock('../../../src/modules', () => ({
-    Controller: jest.fn().mockImplementation(() => ({
-        open: jest.fn(),
-        close: jest.fn(),
-        hide: jest.fn(),
-        show: jest.fn(),
-        form: {
+    Controller: jest.fn().mockImplementation(function() {
+        this.open = jest.fn();
+        this.close = jest.fn();
+        this.hide = jest.fn();
+        this.show = jest.fn();
+        this.form = {
             style: {},
             querySelector: jest.fn(),
             querySelectorAll: jest.fn().mockReturnValue([])
-        }
-    })),
+        };
+        // Add eventManager with addGlobalEvent
+        this.eventManager = {
+            addGlobalEvent: jest.fn(() => 'event-id'),
+            removeGlobalEvent: jest.fn()
+        };
+    }),
     SelectMenu: jest.fn().mockImplementation(() => ({
         on: jest.fn(),
         create: jest.fn(),
@@ -37,11 +42,24 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
         this.icons = editor.icons;
         this.lang = editor.lang;
         this.carrierWrapper = {
-            appendChild: jest.fn()
+            appendChild: jest.fn(),
+            contains: jest.fn().mockReturnValue(true)
         };
-        this.eventManager = {
-            addEvent: jest.fn()
+        this.eventManager = (editor && editor.eventManager) || {
+            addEvent: jest.fn(),
+            addGlobalEvent: jest.fn(() => 'event-id'),
+            removeGlobalEvent: jest.fn()
         };
+        this.instanceCheck = {
+            isRange: jest.fn().mockReturnValue(false)
+        };
+        this.status = editor.status;
+        this.ui = editor.ui;
+        this.selection = editor.selection;
+        this.offset = editor.offset;
+        this.component = editor.component;
+        this.toolbar = editor.toolbar;
+        this.subToolbar = editor.subToolbar;
     });
 });
 
@@ -155,7 +173,13 @@ describe('Modules - Figure', () => {
                 select: jest.fn(),
                 copy: jest.fn(),
                 deselect: jest.fn(),
-                isInline: jest.fn().mockReturnValue(false)
+                isInline: jest.fn().mockReturnValue(false),
+                __removeGlobalEvent: jest.fn()
+            },
+            eventManager: {
+                addEvent: jest.fn(),
+                addGlobalEvent: jest.fn(() => 'event-id'),
+                removeGlobalEvent: jest.fn()
             },
             triggerEvent: jest.fn(),
             applyFrameRoots: jest.fn((callback) => {
@@ -226,8 +250,21 @@ describe('Modules - Figure', () => {
                     left: 200,
                     scrollX: 0,
                     scrollY: 0
-                })
+                }),
+                setAbsPosition: jest.fn().mockReturnValue(true),
+                setRangePosition: jest.fn().mockReturnValue(true)
             },
+            status: {
+                hasFocus: true
+            },
+            toolbar: {
+                hide: jest.fn()
+            },
+            subToolbar: {
+                hide: jest.fn()
+            },
+            isBalloon: false,
+            isSubBalloon: false,
             format: {
                 isBlock: jest.fn().mockReturnValue(true),
                 isLine: jest.fn().mockReturnValue(false)
@@ -449,11 +486,12 @@ describe('Modules - Figure', () => {
         describe('close', () => {
             it('should close controller and clean up', () => {
                 figure._cover = { className: 'se-figure-selected' };
+                const closeSpy = jest.spyOn(figure.controller, 'close');
 
                 figure.close();
 
                 expect(mockEditor._preventBlur).toBe(false);
-                expect(figure.controller.close).toHaveBeenCalled();
+                expect(closeSpy).toHaveBeenCalled();
                 expect(figure.component._removeDragEvent).toHaveBeenCalled();
             });
         });
@@ -665,17 +703,21 @@ describe('Modules - Figure', () => {
 
         describe('controllerOpen', () => {
             it('should set element and open controller', () => {
+                const openSpy = jest.spyOn(figure.controller, 'open');
+
                 figure.controllerOpen(mockElement, {});
 
                 expect(figure._element).toBe(mockElement);
-                expect(figure.controller.open).toHaveBeenCalledWith(mockElement, null, {});
+                expect(openSpy).toHaveBeenCalledWith(mockElement, null, {});
             });
 
             it('should handle params', () => {
                 const params = { disabled: true };
+                const openSpy = jest.spyOn(figure.controller, 'open');
+
                 figure.controllerOpen(mockElement, params);
 
-                expect(figure.controller.open).toHaveBeenCalledWith(mockElement, null, params);
+                expect(openSpy).toHaveBeenCalledWith(mockElement, null, params);
             });
         });
 
@@ -704,11 +746,12 @@ describe('Modules - Figure', () => {
                 const button = {
                     getAttribute: jest.fn().mockReturnValue('remove')
                 };
+                const closeSpy = jest.spyOn(figure.controller, 'close');
 
                 figure.controllerAction(button);
 
                 expect(figure.inst.destroy).toHaveBeenCalledWith(mockElement);
-                expect(figure.controller.close).toHaveBeenCalled();
+                expect(closeSpy).toHaveBeenCalled();
             });
 
             it('should handle revert action', () => {

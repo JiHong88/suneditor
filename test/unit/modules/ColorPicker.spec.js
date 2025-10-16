@@ -2,7 +2,30 @@
  * @fileoverview Unit tests for modules/ColorPicker.js
  */
 
-import ColorPicker from '../../../src/modules/ColorPicker.js';
+// Setup canvas mocks before any imports
+HTMLCanvasElement.prototype.getContext = jest.fn(() => ({
+    clearRect: jest.fn(),
+    fillRect: jest.fn(),
+    drawImage: jest.fn(),
+    beginPath: jest.fn(),
+    arc: jest.fn(),
+    fill: jest.fn(),
+    createLinearGradient: jest.fn(() => ({
+        addColorStop: jest.fn()
+    })),
+    getImageData: jest.fn(() => ({
+        data: [255, 255, 255, 255]
+    })),
+    fillStyle: '',
+    globalAlpha: 1
+}));
+
+HTMLCanvasElement.prototype.getBoundingClientRect = jest.fn(() => ({
+    left: 0,
+    top: 0,
+    width: 240,
+    height: 240
+}));
 
 // Mock dependencies
 jest.mock('../../../src/editorInjector/_core.js', () => {
@@ -13,8 +36,14 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
         this.icons = (editor && editor.icons) || {};
         this.lang = (editor && editor.lang) || {};
         this.ui = (editor && editor.ui) || {};
-        this.eventManager = {
+        this.carrierWrapper = {
+            appendChild: jest.fn(),
+            contains: jest.fn().mockReturnValue(true)
+        };
+        this.eventManager = (editor && editor.eventManager) || {
             addEvent: jest.fn(),
+            addGlobalEvent: jest.fn(() => 'event-id'),
+            removeGlobalEvent: jest.fn(),
             removeEvent: jest.fn()
         };
         this._w = {
@@ -31,48 +60,121 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
     });
 });
 
-jest.mock('../../../src/helper', () => ({
-    dom: {
-        check: { isElement: jest.fn().mockReturnValue(true) },
-        utils: {
-            addClass: jest.fn(),
-            removeClass: jest.fn(),
-            removeItem: jest.fn(),
-            createElement: jest.fn().mockReturnValue({
+jest.mock('../../../src/helper', () => {
+    // Create mock canvas element
+    const createMockCanvas = () => ({
+        width: 240,
+        height: 240,
+        getContext: jest.fn(() => ({
+            clearRect: jest.fn(),
+            fillRect: jest.fn(),
+            drawImage: jest.fn(),
+            beginPath: jest.fn(),
+            arc: jest.fn(),
+            fill: jest.fn(),
+            createLinearGradient: jest.fn(() => ({
+                addColorStop: jest.fn()
+            })),
+            getImageData: jest.fn(() => ({
+                data: [255, 255, 255, 255]
+            })),
+            fillStyle: '',
+            globalAlpha: 1
+        })),
+        getBoundingClientRect: jest.fn(() => ({
+            left: 0,
+            top: 0,
+            width: 240,
+            height: 240
+        })),
+        style: {}
+    });
+
+    // Create mock pointer element
+    const createMockPointer = () => ({
+        style: {
+            left: '',
+            top: ''
+        }
+    });
+
+    // Create mock final hex container with children
+    const createMockFinalHex = () => ({
+        children: [
+            { textContent: '#FFFFFF', style: {} }, // fanalColorHex
+            { style: { backgroundColor: '' } } // fanalColorBackground
+        ]
+    });
+
+    return {
+        dom: {
+            check: { isElement: jest.fn().mockReturnValue(true) },
+            utils: {
+                addClass: jest.fn(),
+                removeClass: jest.fn(),
+                removeItem: jest.fn(),
+                createElement: jest.fn(() => {
+                    const mockWheel = createMockCanvas();
+                    const mockGradient = createMockCanvas();
+                    const mockWheelPointer = createMockPointer();
+                    const mockGradientPointer = createMockPointer();
+                    const mockFinalHex = createMockFinalHex();
+
+                    const mockElement = {
+                        appendChild: jest.fn(),
+                        querySelector: jest.fn((selector) => {
+                            if (selector === '.se-hue-wheel') return mockWheel;
+                            if (selector === '.se-hue-gradient') return mockGradient;
+                            if (selector === '.se-hue-wheel-pointer') return mockWheelPointer;
+                            if (selector === '.se-hue-gradient-pointer') return mockGradientPointer;
+                            if (selector === '.se-hue-final-hex') return mockFinalHex;
+                            if (selector === '.se-hue') return mockElement;
+                            return {
+                                children: [{}, {}],
+                                querySelector: jest.fn().mockReturnValue({
+                                    children: [{}, {}]
+                                }),
+                                style: {
+                                    display: ''
+                                }
+                            };
+                        }),
+                        querySelectorAll: jest.fn().mockReturnValue([]),
+                        classList: {
+                            add: jest.fn(),
+                            remove: jest.fn()
+                        },
+                        style: {},
+                        className: '',
+                        innerHTML: '',
+                        children: []
+                    };
+                    return mockElement;
+                })
+            },
+            create: { element: jest.fn().mockReturnValue({
                 style: {},
                 appendChild: jest.fn(),
-                querySelector: jest.fn().mockImplementation(() => ({
-                    children: [{}, {}],
-                    querySelector: jest.fn().mockReturnValue({
-                        children: [{}, {}]
-                    }),
-                    style: {
-                        display: ''
-                    }
-                })),
-                querySelectorAll: jest.fn().mockReturnValue([]),
+                querySelector: jest.fn(),
                 classList: {
                     add: jest.fn(),
                     remove: jest.fn()
                 }
-            })
+            }) }
         },
-        create: { element: jest.fn().mockReturnValue({
-            style: {},
-            appendChild: jest.fn(),
-            querySelector: jest.fn(),
-            classList: {
-                add: jest.fn(),
-                remove: jest.fn()
-            }
-        }) }
-    },
-    converter: {
-        hex2rgb: jest.fn().mockReturnValue([255, 0, 0]),
-        rgb2hex: jest.fn().mockReturnValue('#ff0000'),
-        isHexColor: jest.fn().mockReturnValue(true)
-    }
-}));
+        converter: {
+            hex2rgb: jest.fn().mockReturnValue([255, 0, 0]),
+            rgb2hex: jest.fn().mockReturnValue('#ff0000'),
+            isHexColor: jest.fn().mockReturnValue(true)
+        },
+        env: {
+            _w: { setTimeout: jest.fn((fn) => fn()) },
+            isMobile: false,
+            isTouchDevice: false,
+            ON_OVER_COMPONENT: false
+        }
+    };
+});
 
 jest.mock('../../../src/modules', () => ({
     HueSlider: jest.fn().mockImplementation(function() {
@@ -83,6 +185,8 @@ jest.mock('../../../src/modules', () => ({
         this.off = jest.fn();
     })
 }));
+
+import ColorPicker from '../../../src/modules/ColorPicker.js';
 
 describe('Modules - ColorPicker', () => {
     let mockInst;
@@ -290,9 +394,11 @@ describe('Modules - ColorPicker', () => {
         });
 
         it('should close hue slider', () => {
+            const offSpy = jest.spyOn(colorPicker.hueSlider, 'off');
+
             colorPicker.hueSliderClose();
 
-            expect(colorPicker.hueSlider.off).toHaveBeenCalled();
+            expect(offSpy).toHaveBeenCalled();
         });
 
         it('should handle hueSliderAction', () => {

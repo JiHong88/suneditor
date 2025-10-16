@@ -27,6 +27,20 @@ HTMLCanvasElement.prototype.getBoundingClientRect = jest.fn(() => ({
 	height: 240
 }));
 
+// Mock CoreInjector
+jest.mock('../../../src/editorInjector/_core.js', () => {
+	return jest.fn().mockImplementation(function(editor) {
+		this.editor = editor;
+		this.frameContext = editor ? editor.frameContext : new Map();
+		this.triggerEvent = (editor && editor.triggerEvent) || jest.fn();
+		this.eventManager = (editor && editor.eventManager) || {
+			addEvent: jest.fn(),
+			addGlobalEvent: jest.fn(() => 'event-id'),
+			removeGlobalEvent: jest.fn()
+		};
+	});
+});
+
 // Mock Controller
 jest.mock('../../../src/modules/Controller.js', () => {
 	return jest.fn().mockImplementation(function() {
@@ -140,16 +154,16 @@ describe('Modules - HueSlider', () => {
 			icons: {
 				checked: '<svg>check</svg>',
 				cancel: '<svg>cancel</svg>'
+			},
+			eventManager: {
+				addEvent: jest.fn(),
+				addGlobalEvent: jest.fn(() => 'event-id'),
+				removeGlobalEvent: jest.fn()
 			}
 		};
 
 		mockInst = {
 			editor: mockEditor,
-			eventManager: {
-				addEvent: jest.fn(),
-				addGlobalEvent: jest.fn(() => 'event-id'),
-				removeGlobalEvent: jest.fn()
-			},
 			hueSliderAction: jest.fn(),
 			hueSliderCancelAction: jest.fn()
 		};
@@ -217,7 +231,7 @@ describe('Modules - HueSlider', () => {
 			const hueSlider = new HueSlider(mockInst, {});
 
 			expect(hueSlider.controller).toBeDefined();
-			expect(mockInst.eventManager.addEvent).toHaveBeenCalled();
+			expect(mockEditor.eventManager.addEvent).toHaveBeenCalled();
 		});
 
 		it('should not create default controller when isNewForm', () => {
@@ -311,7 +325,7 @@ describe('Modules - HueSlider', () => {
 		it('should setup success button handler', () => {
 			new HueSlider(mockInst);
 
-			const successButtonCall = mockInst.eventManager.addEvent.mock.calls.find(
+			const successButtonCall = mockEditor.eventManager.addEvent.mock.calls.find(
 				call => call[1] === 'click'
 			);
 
@@ -321,7 +335,7 @@ describe('Modules - HueSlider', () => {
 		it('should call hueSliderAction when success button clicked', () => {
 			new HueSlider(mockInst);
 
-			const successButtonCall = mockInst.eventManager.addEvent.mock.calls.find(
+			const successButtonCall = mockEditor.eventManager.addEvent.mock.calls.find(
 				call => call[1] === 'click'
 			);
 
@@ -336,7 +350,7 @@ describe('Modules - HueSlider', () => {
 		it('should setup cancel button handler', () => {
 			new HueSlider(mockInst);
 
-			const cancelButtonCalls = mockInst.eventManager.addEvent.mock.calls.filter(
+			const cancelButtonCalls = mockEditor.eventManager.addEvent.mock.calls.filter(
 				call => call[1] === 'click'
 			);
 

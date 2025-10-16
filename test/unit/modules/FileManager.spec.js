@@ -10,6 +10,8 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
         this.editor = editor;
         this.frameContext = editor.frameContext;
         this.triggerEvent = editor.triggerEvent || jest.fn();
+        this.ui = editor.ui;
+        this.component = editor.component;
     });
 });
 

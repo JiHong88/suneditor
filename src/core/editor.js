@@ -1089,6 +1089,17 @@ Editor.prototype = {
 	 * @description Destroy the suneditor
 	 */
 	destroy() {
+		/** destroy plugins first (they may use editor references) */
+		let obj = this.plugins;
+		for (const k in obj) {
+			const p = obj[k];
+			if (typeof p._destroy === 'function') p._destroy();
+			for (const pk in p) {
+				delete p[pk];
+			}
+			delete obj[k];
+		}
+
 		/** remove history */
 		this.history.destroy();
 
@@ -1100,35 +1111,42 @@ Editor.prototype = {
 			this.options.get('codeMirror6Editor').destroy();
 		}
 
-		/** remove element */
+		/** remove DOM elements */
 		dom.utils.removeItem(this.carrierWrapper);
 		dom.utils.removeItem(this.context.get('toolbar_wrapper'));
 		dom.utils.removeItem(this.context.get('toolbar_sub_wrapper'));
 		dom.utils.removeItem(this.context.get('statusbar_wrapper'));
+
+		/** clear frame roots */
 		this.applyFrameRoots((e) => {
 			dom.utils.removeItem(e.get('topArea'));
 			e.get('options').clear();
 			e.clear();
 		});
 
-		/** remove object reference */
+		/** clear Map/Set objects */
+		this.allCommandButtons.clear();
+		this.subAllCommandButtons.clear();
+		this.shortcutsKeyMap.clear();
+		this.reverseKeys.clear();
+		this.commandTargets.clear();
+		this.__frameContext.clear();
+		this.__frameOptions.clear();
+		if (this._MELInfo) this._MELInfo.clear();
+		if (this._onPluginEvents) this._onPluginEvents.clear();
+
+		/** clear other object references */
 		this.options.clear();
 		this.context.clear();
+		this.frameRoots.clear();
 
-		let obj = this.plugins;
-		for (const k in obj) {
-			const p = obj[k];
-			if (typeof p._destroy === 'function') p._destroy();
-			for (const pk in p) {
-				delete p[pk];
-			}
-			delete obj[k];
-		}
+		/** clear events */
 		obj = this.events;
 		for (const k in obj) {
 			delete obj[k];
 		}
 
+		/** clear class instances */
 		obj = ['eventManager', 'instanceCheck', 'char', 'component', 'format', 'html', 'inline', 'listFormat', 'menu', 'nodeTransform', 'offset', 'selection', 'shortcuts', 'toolbar', 'ui', 'viewer'];
 		for (let i = 0, len = obj.length, c; i < len; i++) {
 			c = this[obj[i]];
@@ -1143,6 +1161,7 @@ Editor.prototype = {
 			}
 		}
 
+		/** clear all remaining properties */
 		obj = null;
 		for (const k in this) {
 			delete this[k];

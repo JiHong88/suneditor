@@ -1,6 +1,6 @@
-import EditorInjector from '../editorInjector';
+import CoreInjector from '../editorInjector/_core';
 import { dom, env, keyCodeMap } from '../helper';
-import { _DragHandle } from '../modules';
+import { _DragHandle } from './_DragHandle';
 
 const { _w, isMobile, ON_OVER_COMPONENT } = env;
 const INDEX_00 = '2147483646';
@@ -39,7 +39,7 @@ const INDEX_1 = '2147483640';
  * @class
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  */
-class Controller extends EditorInjector {
+class Controller extends CoreInjector {
 	#reserveIndex;
 	#initMethod;
 	#globalEventHandlers;
@@ -59,6 +59,14 @@ class Controller extends EditorInjector {
 	 */
 	constructor(inst, element, params, _name) {
 		super(inst.editor);
+
+		// editor class
+		this.toolbar = this.editor.toolbar;
+		this.subToolbar = this.editor.subToolbar;
+		this.component = this.editor.component;
+		this.ui = this.editor.ui;
+		this.selection = this.editor.selection;
+		this.offset = this.editor.offset;
 
 		// members
 		this.kind = _name || inst.constructor.key || inst.constructor.name;

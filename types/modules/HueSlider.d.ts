@@ -81,7 +81,7 @@ export function CreateSliderCtx(): {
  * - When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
  */
-declare class HueSlider {
+declare class HueSlider extends CoreInjector {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -89,8 +89,6 @@ declare class HueSlider {
 	 * @param {string} [className=""] The class name of the hue slider.
 	 */
 	constructor(inst: any, params?: HueSliderParams, className?: string);
-	editor: any;
-	eventManager: any;
 	inst: any;
 	form: Node;
 	ctx: {
@@ -143,4 +141,5 @@ declare class HueSlider {
 	init(): void;
 	#private;
 }
+import CoreInjector from '../editorInjector/_core';
 import Controller from './Controller';

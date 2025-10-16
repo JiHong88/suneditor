@@ -33,8 +33,10 @@ class Modal extends CoreInjector {
 	 */
 	constructor(inst, element) {
 		super(inst.editor);
-		this.offset = this.editor.offset;
+
+		// editor class
 		this.ui = this.editor.ui;
+		this.offset = this.editor.offset;
 
 		// members
 		this.inst = inst;

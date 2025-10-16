@@ -1,4 +1,4 @@
-import EditorInjector from '../editorInjector';
+import CoreInjector from '../editorInjector/_core';
 import SelectMenu from './SelectMenu';
 import FileManager from './FileManager';
 import { dom, numbers, env, unicode } from '../helper';
@@ -36,7 +36,7 @@ const { _w, NO_EVENT } = env;
  * @description Modal form Anchor tag editor
  * - Use it by inserting it into Modal in a plugin that uses Modal.
  */
-class ModalAnchorEditor extends EditorInjector {
+class ModalAnchorEditor extends CoreInjector {
 	#modalForm;
 	#isRel;
 	#selectMenu_rel;
@@ -49,8 +49,11 @@ class ModalAnchorEditor extends EditorInjector {
 	 * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
 	 */
 	constructor(inst, modalForm, params) {
-		// plugin bisic properties
 		super(inst.editor);
+
+		// editor class
+		this.selection = this.editor.selection;
+		this.ui = this.editor.ui;
 
 		// params
 		this.openNewWindow = !!params.openNewWindow;

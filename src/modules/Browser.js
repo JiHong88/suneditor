@@ -53,6 +53,9 @@ class Browser extends CoreInjector {
 	constructor(inst, params) {
 		super(inst.editor);
 
+		// editor class
+		this.offset = this.editor.offset;
+
 		// create HTML
 		this.useSearch = params.useSearch ?? true;
 		const browserFrame = dom.utils.createElement('DIV', { class: 'se-browser sun-editor-common' + (params.className ? ` ${params.className}` : '') });
@@ -153,7 +156,7 @@ class Browser extends CoreInjector {
 			this.#drawFileList(params.url || this.url, params.urlHeader || this.urlHeader, false);
 		}
 
-		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.editor.offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
+		this.body.style.maxHeight = dom.utils.getClientSize().h - (this.offset.getGlobal(this.body).top - _w.scrollY) - 20 + 'px';
 	}
 
 	/**

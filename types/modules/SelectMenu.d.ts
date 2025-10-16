@@ -45,6 +45,7 @@ declare class SelectMenu extends CoreInjector {
 	 * @param {SelectMenuParams} params Select menu options
 	 */
 	constructor(inst: any, params: SelectMenuParams);
+	offset: import('../core/class/offset').default;
 	kink: any;
 	inst: any;
 	form: HTMLElement;

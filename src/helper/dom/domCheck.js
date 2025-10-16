@@ -3,7 +3,6 @@
  */
 
 import { onlyZeroWidthRegExp } from '../unicode';
-import domUtils from './domUtils';
 
 /**
  * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (unicode.zeroWidthSpace)
@@ -197,7 +196,13 @@ export function isEmptyLine(node) {
  * @returns {boolean} True if the node is a container component, otherwise false.
  */
 export function isComponentContainer(element) {
-	return domUtils.hasClass(element, 'se-component|se-flex-component');
+	if (element?.nodeType !== 1) return false;
+
+	const el = /** @type {Element} */ (element);
+	const cls = el.classList;
+
+	if (!cls) return false;
+	return cls.contains('se-component') || cls.contains('se-flex-component');
 }
 
 /**
@@ -206,7 +211,13 @@ export function isComponentContainer(element) {
  * @returns {node is HTMLElement}
  */
 export function isWysiwygFrame(node) {
-	return node?.nodeType === 1 && (domUtils.hasClass(node, 'se-wrapper-wysiwyg|sun-editor-carrier-wrapper|se-wrapper') || /^BODY$/i.test(node.nodeName));
+	if (node?.nodeType !== 1) return false;
+
+	const el = /** @type {Element} */ (node);
+	const cls = el.classList;
+
+	if (!cls) return false;
+	return node.nodeName.toUpperCase() === 'BODY' || cls.contains('se-wrapper-wysiwyg') || cls.contains('sun-editor-carrier-wrapper') || cls.contains('se-wrapper');
 }
 
 /**
@@ -278,7 +289,7 @@ export function isExcludeFormat(node) {
  * @returns {boolean}
  */
 export function isUneditable(node) {
-	return domUtils.hasClass(node, '__se__uneditable');
+	return /** @type {HTMLElement} */ (node)?.classList.contains('__se__uneditable');
 }
 
 /**
@@ -287,7 +298,7 @@ export function isUneditable(node) {
  * @returns {boolean}
  */
 export function isImportantDisabled(node) {
-	return /** @type {HTMLElement} */ (node).hasAttribute('data-important-disabled');
+	return /** @type {HTMLElement} */ (node)?.hasAttribute('data-important-disabled');
 }
 
 const check = {

@@ -1,5 +1,5 @@
 import { _d, _w } from '../env';
-import check from './domCheck';
+import { isImportantDisabled } from './domCheck';
 
 // ----- iframe-safe type check [START] -----
 /**
@@ -332,7 +332,7 @@ export function getStyle(element, styleName) {
 export function setDisabled(buttonList, disabled, important) {
 	for (let i = 0, len = buttonList.length; i < len; i++) {
 		const button = /** @type {HTMLButtonElement|HTMLInputElement} */ (buttonList[i]);
-		if (important || !check.isImportantDisabled(button)) button.disabled = disabled;
+		if (important || !isImportantDisabled(button)) button.disabled = disabled;
 		if (important) {
 			if (disabled) {
 				button.setAttribute('data-important-disabled', '');

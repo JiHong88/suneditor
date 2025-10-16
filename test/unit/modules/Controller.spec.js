@@ -5,7 +5,7 @@
 import Controller from '../../../src/modules/Controller.js';
 
 // Mock dependencies
-jest.mock('../../../src/editorInjector/index.js', () => {
+jest.mock('../../../src/editorInjector/_core.js', () => {
     return jest.fn().mockImplementation(function(editor) {
         this.editor = editor;
         this.frameContext = editor.frameContext || new Map([
@@ -149,7 +149,19 @@ describe('Modules - Controller', () => {
             },
             status: {
                 hasFocus: true
-            }
+            },
+            component: {
+                __removeGlobalEvent: jest.fn(),
+                deselect: jest.fn()
+            },
+            toolbar: {
+                hide: jest.fn()
+            },
+            subToolbar: {
+                hide: jest.fn()
+            },
+            isBalloon: false,
+            isSubBalloon: false
         };
 
         mockInst = {

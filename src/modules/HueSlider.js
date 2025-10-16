@@ -2,6 +2,7 @@
  * @fileoverview Implements HueSlider.
  */
 
+import CoreInjector from '../editorInjector/_core';
 import { dom, env } from '../helper';
 import Controller from './Controller';
 
@@ -94,7 +95,7 @@ function CreateSliderCtx() {
  * - When you call the .attach() method, the hue slider is appended to the form element.
  * It must be called every time it is used.
  */
-class HueSlider {
+class HueSlider extends CoreInjector {
 	#globalMouseDown;
 	#globalTouchMove;
 	#globalMouseUp;
@@ -109,11 +110,10 @@ class HueSlider {
 	 * @param {string} [className=""] The class name of the hue slider.
 	 */
 	constructor(inst, params = {}, className = '') {
-		this.editor = inst.editor;
-		this.eventManager = inst.eventManager;
-		this.inst = inst;
+		super(inst.editor);
 
 		// members
+		this.inst = inst;
 		this.form = params.form;
 		this.ctx = {
 			wheelX: wheelX,

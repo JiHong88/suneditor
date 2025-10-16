@@ -102,7 +102,7 @@ export type ControllerParams = {
  * @class
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
  */
-declare class Controller extends EditorInjector {
+declare class Controller extends CoreInjector {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
@@ -111,6 +111,12 @@ declare class Controller extends EditorInjector {
 	 * @param {?string=} _name An optional name for the controller key.
 	 */
 	constructor(inst: any, element: Node, params: ControllerParams, _name?: (string | null) | undefined);
+	toolbar: import('../core/class/toolbar').default;
+	subToolbar: import('../core/class/toolbar').default;
+	component: import('../core/class/component').default;
+	ui: import('../core/class/ui').default;
+	selection: import('../core/class/selection').default;
+	offset: import('../core/class/offset').default;
 	kind: any;
 	inst: any;
 	form: HTMLFormElement;
@@ -192,4 +198,4 @@ declare class Controller extends EditorInjector {
 	resetPosition(target?: Node | undefined): void;
 	#private;
 }
-import EditorInjector from '../editorInjector';
+import CoreInjector from '../editorInjector/_core';

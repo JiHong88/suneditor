@@ -1,3 +1,4 @@
+import CoreInjector from '../editorInjector/_core';
 import { env } from '../helper';
 
 /**
@@ -15,7 +16,7 @@ import { env } from '../helper';
  * @class
  * @description API Manager
  */
-class ApiManager {
+class ApiManager extends CoreInjector {
 	/** @type {XMLHttpRequest} */
 	#xhr;
 
@@ -25,16 +26,9 @@ class ApiManager {
 	 * @param {ApiManagerParams=} params API options
 	 */
 	constructor(inst, params) {
-		/**
-		 * @description Editor instance
-		 * @type {__se__EditorCore}
-		 */
-		this.editor = inst.editor;
+		super(inst.editor);
 
-		/**
-		 * @description UI class
-		 * @type {__se__EditorCore["ui"]}
-		 */
+		// editor class
 		this.ui = this.editor.ui;
 
 		/**

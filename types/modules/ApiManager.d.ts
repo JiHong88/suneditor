@@ -47,23 +47,14 @@ export type ApiManagerParams = {
  * @class
  * @description API Manager
  */
-declare class ApiManager {
+declare class ApiManager extends CoreInjector {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
 	 * @param {ApiManagerParams=} params API options
 	 */
 	constructor(inst: any, params?: ApiManagerParams | undefined);
-	/**
-	 * @description Editor instance
-	 * @type {__se__EditorCore}
-	 */
-	editor: __se__EditorCore;
-	/**
-	 * @description UI class
-	 * @type {__se__EditorCore["ui"]}
-	 */
-	ui: __se__EditorCore['ui'];
+	ui: import('../core/class/ui').default;
 	/**
 	 * @description Caller instance key name
 	 * @type {string}
@@ -116,3 +107,4 @@ declare class ApiManager {
 	cancel(): void;
 	#private;
 }
+import CoreInjector from '../editorInjector/_core';

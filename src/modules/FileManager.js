@@ -39,13 +39,14 @@ class FileManager extends CoreInjector {
 	 */
 	constructor(inst, params) {
 		super(inst.editor);
+
+		// editor class
 		this.ui = this.editor.ui;
 
 		// members
 		inst.__fileManagement = this;
 		this.kind = inst.constructor.key || inst.constructor.name;
 		this.inst = inst;
-		this.component = inst.editor.component;
 		this.query = params.query;
 		this.loadHandler = params.loadHandler;
 		this.eventHandler = params.eventHandler;

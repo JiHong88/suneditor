@@ -3,14 +3,43 @@ name: Test & Coverage
 on:
     push:
         branches: [master, develop]
+        paths-ignore:
+            - '**/*.md'
+            - 'docs/**'
+            - '.github/**'
+            - 'guide/**'
+            - 'scripts/**'
+            - 'webpack/**'
+            - '.barrelsby.json'
+            - '.dependency-cruiser.js'
+            - '.editorconfig'
+            - '.gitignore'
+            - 'codecov.yml'
+            - 'eslint.config.mjs'
+            - 'playwright.config.js'
+            - 'LICENSE'
     pull_request:
         branches: [master, develop]
+        paths-ignore:
+            - '**/*.md'
+            - 'docs/**'
+            - '.github/**'
+            - 'guide/**'
+            - 'scripts/**'
+            - 'webpack/**'
+            - '.barrelsby.json'
+            - '.dependency-cruiser.js'
+            - '.editorconfig'
+            - '.gitignore'
+            - 'codecov.yml'
+            - 'eslint.config.mjs'
+            - 'playwright.config.js'
+            - 'LICENSE'
 
 jobs:
     test:
         runs-on: ubuntu-latest
         timeout-minutes: 10
-
         steps:
             - name: Checkout code
               uses: actions/checkout@v4

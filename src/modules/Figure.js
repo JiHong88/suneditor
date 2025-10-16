@@ -1,5 +1,7 @@
-import EditorInjector from '../editorInjector';
-import { Controller, SelectMenu, _DragHandle } from '../modules';
+import CoreInjector from '../editorInjector/_core';
+import Controller from './Controller';
+import SelectMenu from './SelectMenu';
+import { _DragHandle } from './_DragHandle';
 import { dom, numbers, env, converter, keyCodeMap } from '../helper';
 
 const { _w, ON_OVER_COMPONENT } = env;
@@ -63,7 +65,7 @@ let __resizing_sw = 0;
  * @class
  * @description Controller module class
  */
-class Figure extends EditorInjector {
+class Figure extends CoreInjector {
 	#width;
 	#height;
 	#resize_w;
@@ -92,6 +94,15 @@ class Figure extends EditorInjector {
 			right: this.icons.format_float_right,
 			center: this.icons.format_float_center
 		};
+
+		// editor class
+		this.component = this.editor.component;
+		this.ui = this.editor.ui;
+		this.offset = this.editor.offset;
+		this.selection = this.editor.selection;
+		this.html = this.editor.html;
+		this.format = this.editor.format;
+		this.nodeTransform = this.editor.nodeTransform;
 
 		// modules
 		/** @type {Object<string, *>} */
