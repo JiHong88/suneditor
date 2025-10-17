@@ -17,7 +17,7 @@ on:
             - 'codecov.yml'
             - 'eslint.config.mjs'
             - 'playwright.config.js'
-            - 'LICENSE'
+            - 'LICENSE.txt'
     pull_request:
         branches: [master, develop]
         paths-ignore:
@@ -34,7 +34,7 @@ on:
             - 'codecov.yml'
             - 'eslint.config.mjs'
             - 'playwright.config.js'
-            - 'LICENSE'
+            - 'LICENSE.txt'
 
 jobs:
     test:
