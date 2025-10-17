@@ -9,17 +9,17 @@ Node.js **v14 or higher** is required to build and test.
 
 ### 📝 Notes
 
--   **Polyfills are not included**. Make sure your target environment (browser or runtime) natively supports these features.
--   Target ECMAScript version: **ES2022**
--   Supported browsers: [See Browser Support](./README.md#-browser-support)
+- **Polyfills are not included**. Make sure your target environment (browser or runtime) natively supports these features.
+- Target ECMAScript version: **ES2022**
+- Supported browsers: [See Browser Support](./README.md#-browser-support)
 
 ---
 
 ## 🐛 Before Submitting an Issue
 
--   Make sure you're using the latest `master` branch. Your issue may already be fixed.
--   Search the [open issues](https://github.com/jihong88/suneditor/issues) and [closed issues](https://github.com/jihong88/suneditor/issues?q=is%3Aissue+is%3Aclosed) to avoid duplicates.
--   If your issue is new, [file a ticket](https://github.com/jihong88/suneditor/issues/new) with detailed info, including reproduction steps if possible.
+- Make sure you're using the latest `master` branch. Your issue may already be fixed.
+- Search the [open issues](https://github.com/jihong88/suneditor/issues) and [closed issues](https://github.com/jihong88/suneditor/issues?q=is%3Aissue+is%3Aclosed) to avoid duplicates.
+- If your issue is new, [file a ticket](https://github.com/jihong88/suneditor/issues/new) with detailed info, including reproduction steps if possible.
 
 ---
 
@@ -27,10 +27,10 @@ Node.js **v14 or higher** is required to build and test.
 
 > [commit-guide](./guide/commit-types.md)
 
--   Check that no one is working on the same thing in [open issues](https://github.com/jihong88/suneditor/issues).
--   For new features or major changes, please open an issue first to gather feedback.
--   Use a **feature branch** (not `master`) for your pull request.
--   Make sure your code passes tests and doesn’t break existing functionality.
+- Check that no one is working on the same thing in [open issues](https://github.com/jihong88/suneditor/issues).
+- For new features or major changes, please open an issue first to gather feedback.
+- Use a **feature branch** (not `master`) for your pull request.
+- Make sure your code passes tests and doesn’t break existing functionality.
 
 ---
 
@@ -40,9 +40,9 @@ We welcome code contributions, bug reports, documentation improvements, or plugi
 
 ### 🧹 Code Formatting
 
--   Use the provided **ESLint** configuration.
--   4-space indentation
--   Single quotes (`'`) for strings
+- Use the provided **ESLint** configuration.
+- 4-space indentation
+- Single quotes (`'`) for strings
 
 ---
 
@@ -68,8 +68,8 @@ SunEditor allows custom plugins using a flexible API.
 
 If you're contributing to framework integrations:
 
--   React: [suneditor-react](https://github.com/JiHong88/suneditor-react)
--   Vue: [suneditor-vue](https://github.com/JiHong88/suneditor-vue)
+- React: [suneditor-react](https://github.com/JiHong88/suneditor-react)
+- Vue: [suneditor-vue](https://github.com/JiHong88/suneditor-vue)
 
 💡 Feel free to propose wrappers for other frameworks too!
 
@@ -85,94 +85,9 @@ Check out **[SunEditor Devs AI](https://chatgpt.com/g/g-JViNPCrkD-suneditor-devs
 
 ---
 
-## 🗂️ Code Architecture
+## 🗂️ Architecture guide
 
-A quick overview of the `src/` directory:
-
-### `/core/` – 🧠 Editor Core Logic
-
--   `editor.js`: Defines the main Editor class, managing lifecycle, commands, and overall orchestration
--   `section/`: Context management and document setup
--   `class/`: Core classes like toolbars, selections, HTML parsing, etc.
--   `base/`: Undo/redo history, event manager, and shared core logic
-
-### `/helper/` – 🛠️ Utility Functions
-
--   String converters, clipboard helpers, DOM queries
--   `helper/dom/`: Low-level DOM operations
-
-### `/modules/` – 🧩 Reusable UI Modules
-
--   Functional components like:
-    -   `Modal`, `ColorPicker`, `SelectMenu`, `FileManager`, etc.
--   Useful for building consistent plugin UIs
-
-### `/editorInjector/` – 🧬 Plugin Integration Point
-
--   Wraps and initializes the core editor
--   Plugins must inherit from this to register correctly
-
-### `/plugins/` – ✨ Feature Extensions
-
--   Modular plugins organized by type:
-    -   Examples: `image`, `video`, `link`, `blockquote`, etc.
--   Each plugin is isolated and optional
-
-### `/langs/` – 🌍 i18n Support
-
--   Language packs in separate JS files
-
-### `/assets/` – 🎨 Styles & Icons
-
--   CSS for editor layout and themes
--   SVG icon sets (`icons/defaultIcons.js`)
-
-### `/themes/` – 🧪 Theme Stylesheets
-
--   Includes variants like `dark.css`
-
-### `suneditor.js` – 🚪 Main Entry Point
-
--   Bootstraps and exports the editor instance
-
----
-
-## 🚀 Useful Commands
-
-> [scripts-guide](./guide/scripts-guide.md)
-
-```bash
-# Start local dev server
-npm run dev
-
-# Build for development
-npm run build:dev
-
-# Build for production
-npm run build:prod
-
-# lint
-npm run lint
-
-# Auto-fix JavaScript issues
-npm run lint:fix-js
-
-# Auto-fix TypeScript issues
-npm run lint:fix-ts
-
-# ✅ Run before committing!
-# Fix all lint issues (JS + TS)
-npm run lint:fix-all
-
-# Build types and update barrels
-npm run ts-build
-
-# Sync language files (base: en.js)
-npm run i18n-build
-
-# test
-npm run test
-```
+**[GUIDE.md](./GUIDE.md)**
 
 ---
 

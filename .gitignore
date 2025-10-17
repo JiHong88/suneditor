@@ -2,20 +2,20 @@
 .DS_Store
 
 # project files
-.vscode/**
-.idea/**
-.out/**
-.gen/**
-.env/**
+.vscode/
+.idea/
+.out/
+.gen/
+.env/
 
 # modules
-node_modules/**
+node_modules/
 *.log
 
 #dev
-.git/**
+.git/
 /.vs
-.claude/**
+.claude/
 
 #jest
 coverage/
