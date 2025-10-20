@@ -496,7 +496,12 @@ function Editor(multiTargets, options) {
 	this._originOptions = options;
 
 	/** ----- Create editor ------------------------------------------------------------ */
-	this.__Create(options);
+	try {
+		this.__Create(options);
+	} catch (e) {
+		console.error('[SUNEDITOR:E_CREATE_FAIL] Failed to create editor instance.', e);
+		throw e;
+	}
 }
 
 Editor.prototype = {
