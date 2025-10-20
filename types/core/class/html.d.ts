@@ -64,6 +64,26 @@ declare class HTML {
 	 *   - Return a `string` to replace the node's outerHTML.
 	 * @param {boolean} [params.validateAll] - Whether to apply validation to all nodes.
 	 * @returns {string} - The filtered HTML string.
+	 * @example
+	 * // Remove script and iframe tags using blacklist
+	 * const filtered = editor.html.filter('<div>Content<script>alert("xss")</script></div>', {
+	 *   tagBlacklist: 'script|iframe'
+	 * });
+	 *
+	 * // Keep only specific tags using whitelist
+	 * const filtered = editor.html.filter('<div><span>Text</span><img src="x"></div>', {
+	 *   tagWhitelist: 'div|span'
+	 * });
+	 *
+	 * // Custom validation to modify nodes
+	 * const filtered = editor.html.filter('<div class="test"><a href="#">Link</a></div>', {
+	 *   validate: (node) => {
+	 *     if (node.tagName === 'A') {
+	 *       node.setAttribute('target', '_blank');
+	 *       return node;
+	 *     }
+	 *   }
+	 * });
 	 */
 	filter(
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
@@ -92,6 +112,17 @@ declare class HTML {
 	 * Create RegExp object using helper.converter.createElementBlacklist method.
 	 * @param {boolean} [options._freeCodeViewMode=false] If true, the free code view mode is enabled.
 	 * @returns {string} Cleaned and compressed HTML string
+	 * @example
+	 * // Basic cleaning
+	 * const cleaned = editor.html.clean('<div>  <p>Hello</p>  </div>');
+	 *
+	 * // Clean with format wrapping
+	 * const cleaned = editor.html.clean('Plain text content', { forceFormat: true });
+	 *
+	 * // Clean with blacklist to remove specific tags
+	 * const cleaned = editor.html.clean('<div><script>alert(1)</script>Content</div>', {
+	 *   blacklist: 'script|style'
+	 * });
 	 */
 	clean(
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
@@ -118,6 +149,15 @@ declare class HTML {
 	 * @param {boolean} [options.skipCharCount=false] If true, inserts even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipCleaning=false] If true, inserts the HTML string without refining it with html.clean.
 	 * @returns {HTMLElement|null} The inserted element or null if insertion failed
+	 * @example
+	 * // Insert HTML string at cursor
+	 * editor.html.insert('<strong>Bold text</strong>');
+	 *
+	 * // Insert and select the inserted content
+	 * editor.html.insert('<p>New paragraph</p>', { selectInserted: true });
+	 *
+	 * // Insert raw HTML without cleaning
+	 * editor.html.insert('<div class="custom">Content</div>', { skipCleaning: true });
 	 */
 	insert(
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
@@ -142,6 +182,19 @@ declare class HTML {
 	 * @param {Node} [options.afterNode=null] If the node exists, it is inserted after the node
 	 * @param {boolean} [options.skipCharCount=null] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @returns {Object|Node|null}
+	 * @example
+	 * // Insert node at current selection
+	 * const strongNode = document.createElement('strong');
+	 * strongNode.textContent = 'Bold';
+	 * editor.html.insertNode(strongNode);
+	 *
+	 * // Insert node after a specific element
+	 * const paragraph = editor.html.getNode();
+	 * const newSpan = document.createElement('span');
+	 * editor.html.insertNode(newSpan, { afterNode: paragraph });
+	 *
+	 * // Insert bypassing character count limit
+	 * editor.html.insertNode(largeContentNode, { skipCharCount: true });
 	 */
 	insertNode(
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,

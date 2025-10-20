@@ -35,7 +35,18 @@ Inline.prototype = {
 	/**
 	 * @this {InlineThis}
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
-	 * @param {?Node} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
+	 * - 1. If styleNode is provided, a node with the same tags and attributes is added to the selected text.
+	 * - 2. If the same tag already exists, only its attributes are updated.
+	 * - 3. If styleNode is null, existing nodes are updated or removed without adding new ones.
+	 * - 4. Styles matching those in stylesToModify are removed. (Use CSS attribute names, e.g., "background-color")
+	 * - 5. Classes matching those in stylesToModify (prefixed with ".") are removed.
+	 * - 6. stylesToModify is used to avoid duplicate property values from styleNode.
+	 * - 7. Nodes with all styles and classes removed are deleted if they match styleNode, are in nodesToRemove, or if styleNode is null.
+	 * - 8. Tags matching names in nodesToRemove are deleted regardless of their style and class.
+	 * - 9. If strictRemove is true, nodes in nodesToRemove are only removed if all their styles and classes are removed.
+	 * - 10. The function won't modify nodes if the parent has the same class and style values.
+	 * - However, if nodesToRemove has values, it will work and separate text nodes even if there's no node to replace.
+	 * @param {Node|null} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
 	 * @param {Object} [options] Options
 	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
 	 *        (e.g., ['font-size'], ['.className'], ['font-family', 'color', '.className'])
@@ -44,19 +55,16 @@ Inline.prototype = {
 	 *        (e.g., ['span'], ['strong', 'em'])
 	 * @param {boolean} [options.strictRemove=false] If true, only removes nodes from nodesToRemove if all styles and classes are removed.
 	 * @returns {HTMLElement} The element that was added to or modified in the selection.
+	 * @example
+	 * // Apply bold formatting
+	 * const bold = dom.utils.createElement('STRONG');
+	 * editor.inline.apply(bold);
 	 *
-	 * @details
-	 * 1. If styleNode is provided, a node with the same tags and attributes is added to the selected text.
-	 * 2. If the same tag already exists, only its attributes are updated.
-	 * 3. If styleNode is null, existing nodes are updated or removed without adding new ones.
-	 * 4. Styles matching those in stylesToModify are removed. (Use CSS attribute names, e.g., "background-color")
-	 * 5. Classes matching those in stylesToModify (prefixed with ".") are removed.
-	 * 6. stylesToModify is used to avoid duplicate property values from styleNode.
-	 * 7. Nodes with all styles and classes removed are deleted if they match styleNode, are in nodesToRemove, or if styleNode is null.
-	 * 8. Tags matching names in nodesToRemove are deleted regardless of their style and class.
-	 * 9. If strictRemove is true, nodes in nodesToRemove are only removed if all their styles and classes are removed.
-	 * 10. The function won't modify nodes if the parent has the same class and style values.
-	 * - However, if nodesToRemove has values, it will work and separate text nodes even if there's no node to replace.
+	 * // Remove specific styles
+	 * editor.inline.apply(null, { stylesToModify: ['font-size'] });
+	 *
+	 * // Remove specific tags
+	 * editor.inline.apply(null, { nodesToRemove: ['span'] });
 	 */
 	apply(styleNode, { stylesToModify, nodesToRemove, strictRemove } = {}) {
 		if (dom.query.getParentElement(this.selection.getNode(), dom.check.isNonEditable)) return;
@@ -398,7 +406,11 @@ Inline.prototype = {
 
 	/**
 	 * @this {InlineThis}
-	 * @description Remove format of the currently selected text.
+	 * @description Remove all inline formats (styles and tags) from the currently selected text.
+	 * - This is a convenience method that calls apply() with null parameters to strip all formatting.
+	 * - Removes all inline style nodes (span, strong, em, a, etc.)
+	 * - Preserves only the plain text content
+	 * - Works on the current selection or collapsed cursor position
 	 */
 	remove() {
 		this.apply(null, { stylesToModify: null, nodesToRemove: null, strictRemove: null });
@@ -443,6 +455,9 @@ Inline.prototype = {
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @param {boolean} collapsed range.collapsed
+	 * @param {Object} _removeCheck Object with "v" property tracking removal state.
+	 * @param {(element: Node) => Node|null} _getMaintainedNode Function to get maintained parent node.
+	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
 	 * @returns {{ancestor: *, startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
 	 */
 	_setNode_oneLine(element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
@@ -911,6 +926,10 @@ Inline.prototype = {
 	 * @param {number} startOff The startOffset property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {Object} _removeCheck Object tracking removal state.
+	 * @param {(element: Node) => Node|null} _getMaintainedNode Function to get maintained parent node.
+	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
+	 * @param {Node} _endContainer End container node.
 	 * @returns {NodeStyleContainerType} { ancestor, container, offset, endContainer }
 	 */
 	_setNode_startLine(element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
@@ -1215,6 +1234,7 @@ Inline.prototype = {
 	 * @param {(current: Node) => Node|null} validation Check if the node should be stripped.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {Object} _removeCheck Object tracking removal state.
 	 * @param {Node} _endContainer Offset node of last line already modified (end.container)
 	 * @returns {NodeStyleContainerType} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
 	 */
@@ -1355,6 +1375,9 @@ Inline.prototype = {
 	 * @param {number} endOff The endOffset property of the selection object.
 	 * @param {boolean} isRemoveFormat Is the remove all formats command?
 	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {Object} _removeCheck Object tracking removal state.
+	 * @param {(element: Node) => Node|null} _getMaintainedNode Function to get maintained parent node.
+	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
 	 * @returns {NodeStyleContainerType} { ancestor, container, offset }
 	 */
 	_setNode_endLine(element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
@@ -1711,7 +1734,7 @@ Inline.prototype = {
 	 * @this {InlineThis}
 	 * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
 	 * @param {Node} el List cell element. <li>
-	 * @param {?Node} child Variable for recursive call. ("null" on the first call)
+	 * @param {Node|null} child Variable for recursive call. ("null" on the first call)
 	 */
 	_sn_setCommonListStyle(el, child) {
 		if (!dom.check.isListCell(el)) return;

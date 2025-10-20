@@ -60,40 +60,40 @@ declare class UI {
 	readOnly(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, value: boolean, rootKey: string | undefined): void;
 	/**
 	 * @this {UIThis}
-	 * @description Disable the suneditor
+	 * @description Disables the editor.
 	 * @param {string|undefined} rootKey Root key
 	 */
 	disable(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey: string | undefined): void;
 	/**
 	 * @this {UIThis}
-	 * @description Enable the suneditor
+	 * @description Enables the editor.
 	 * @param {string|undefined} rootKey Root key
 	 */
 	enable(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey: string | undefined): void;
 	/**
 	 * @this {UIThis}
-	 * @description Show the suneditor
+	 * @description Shows the editor interface.
 	 * @param {string|undefined} rootKey Root key
 	 */
 	show(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey: string | undefined): void;
 	/**
 	 * @this {UIThis}
-	 * @description Hide the suneditor
+	 * @description Hides the editor interface.
 	 * @param {string|undefined} rootKey Root key
 	 */
 	hide(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey: string | undefined): void;
 	/**
 	 * @this {UIThis}
-	 * @description Show loading box
-	 * @param {string=} rootKey Root key
+	 * @description Shows the loading spinner.
+	 * @param {string} [rootKey] Root key
 	 */
-	showLoading(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string | undefined): void;
+	showLoading(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
-	 * @description Hide loading box
-	 * @param {string=} rootKey Root key
+	 * @description Hides the loading spinner.
+	 * @param {string} [rootKey] Root key
 	 */
-	hideLoading(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string | undefined): void;
+	hideLoading(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description This method disables or enables the toolbar buttons when the controller is activated or deactivated.
@@ -140,9 +140,9 @@ declare class UI {
 	 * @this {UIThis}
 	 * @description visible controllers
 	 * @param {boolean} value hidden/show
-	 * @param {?boolean=} lineBreakShow Line break hidden/show (default: Follows the value "value".)
+	 * @param {boolean|null} [lineBreakShow] Line break hidden/show (default: Follows the value "value".)
 	 */
-	_visibleControllers(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, value: boolean, lineBreakShow?: (boolean | null) | undefined): void;
+	_visibleControllers(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, value: boolean, lineBreakShow?: boolean | null): void;
 	/**
 	 * @private
 	 * @this {UIThis}

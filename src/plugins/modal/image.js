@@ -975,6 +975,7 @@ class Image_ extends EditorInjector {
 	 * @param {string} align - Image alignment.
 	 * @param {string} alt - Alternative text.
 	 * @param {boolean} isUpdate - Whether the image is being updated.
+	 * @throws {Error} Throws error if base64 conversion fails.
 	 */
 	#setBase64(files, anchor, width, height, align, alt, isUpdate) {
 		try {

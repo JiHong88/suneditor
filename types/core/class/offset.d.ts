@@ -330,17 +330,17 @@ declare class Offset {
 	 * @this {OffsetThis}
 	 * @description Returns the position of the argument relative to the global document.
 	 * This is a refactored version using getBoundingClientRect for better performance and accuracy.
-	 * @param {?Node=} node Target element.
+	 * @param {?Node} [node] Target element.
 	 * @returns {OffsetGlobalInfo} Global position and scroll values.
 	 */
-	getGlobal(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, node?: (Node | null) | undefined): OffsetGlobalInfo;
+	getGlobal(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, node?: Node | null): OffsetGlobalInfo;
 	/**
 	 * @this {OffsetThis}
 	 * @description Gets the current editor-relative scroll offset.
-	 * @param {?Node=} node Target element.
+	 * @param {?Node} [node] Target element.
 	 * @returns {OffsetGlobalScrollInfo} Global scroll information.
 	 */
-	getGlobalScroll(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, node?: (Node | null) | undefined): OffsetGlobalScrollInfo;
+	getGlobalScroll(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, node?: Node | null): OffsetGlobalScrollInfo;
 	/**
 	 * @this {OffsetThis}
 	 * @description Get the scroll info of the WYSIWYG area.
@@ -392,7 +392,7 @@ declare class Offset {
 	 * @this {OffsetThis}
 	 * @description Sets the position of an element relative to a range
 	 * @param {HTMLElement} element Element to position
-	 * @param {?Range} range Range to position against.
+	 * @param {Range|null} range Range to position against.
 	 * - if null, the current selection range is used
 	 * @param {Object} [options={}] Position options
 	 * @param {"bottom"|"top"} [options.position="bottom"] Position ('bottom'|'top')

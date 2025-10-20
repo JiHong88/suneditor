@@ -70,7 +70,7 @@ function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 Toolbar.prototype = {
 	/**
 	 * @this {ToolbarThis}
-	 * @description Disable the toolbar
+	 * @description Disables all toolbar buttons.
 	 */
 	disable() {
 		/** off menus */
@@ -82,7 +82,7 @@ Toolbar.prototype = {
 
 	/**
 	 * @this {ToolbarThis}
-	 * @description Enable the toolbar
+	 * @description Enables all toolbar buttons.
 	 */
 	enable() {
 		dom.utils.setDisabled(this.context.get(this.keyName.buttonTray).querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), false);
@@ -90,7 +90,7 @@ Toolbar.prototype = {
 
 	/**
 	 * @this {ToolbarThis}
-	 * @description Show the toolbar
+	 * @description Shows the toolbar.
 	 */
 	show() {
 		if (this._isInline) {
@@ -107,7 +107,7 @@ Toolbar.prototype = {
 
 	/**
 	 * @this {ToolbarThis}
-	 * @description Hide the toolbar
+	 * @description Hides the toolbar.
 	 */
 	hide() {
 		if (this._isInline) {
@@ -323,7 +323,7 @@ Toolbar.prototype = {
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Show the balloon toolbar based on the current selection.
-	 * @param {?Range=} rangeObj - Selection range
+	 * @param {Range|null} [rangeObj] - Selection range
 	 */
 	_showBalloon(rangeObj) {
 		if (!this._isBalloon) {

@@ -77,7 +77,7 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
 	 * @param {Node} node Reference node.
-	 * @param {?(current: Node) => boolean=} validation Additional validation function.
+	 * @param {((current: Node) => boolean)|null} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 */
 	getLine(node, validation) {
@@ -180,7 +180,7 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a "brLine" (format.isBrLine), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {?(current: Node) => boolean=} validation Additional validation function.
+	 * @param {((current: Node) => boolean)|null} [validation] Additional validation function.
 	 * @returns {HTMLBRElement|null}
 	 */
 	getBrLine(element, validation) {
@@ -204,7 +204,7 @@ Format.prototype = {
 	 * - If the "lineNode" argument value is present, the tag of that argument value is inserted,
 	 * - If not, the currently selected format tag is inserted.
 	 * @param {Node} element Insert as siblings of that element
-	 * @param {?string|Node=} lineNode Node name or node obejct to be inserted
+	 * @param {string|Node|null} [lineNode] Node name or node obejct to be inserted
 	 * @returns {HTMLElement}
 	 */
 	addLine(element, lineNode) {
@@ -232,7 +232,7 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isBlock), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {?(current: Node) => boolean=} validation Additional validation function.
+	 * @param {((current: Node) => boolean)|null} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 */
 	getBlock(element, validation) {
@@ -253,6 +253,10 @@ Format.prototype = {
 	 * @this {FormatThis}
 	 * @description Appended all selected "line" element to the argument element("block") and insert
 	 * @param {Node} blockElement Element of wrap the arguments (BLOCKQUOTE...)
+	 * @example
+	 * // Wrap selected lines in a blockquote
+	 * const blockquote = document.createElement('blockquote');
+	 * editor.format.applyBlock(blockquote);
 	 */
 	applyBlock(blockElement) {
 		this.selection.getRangeAndAddLine(this.selection.getRange(), null);
@@ -440,6 +444,19 @@ Format.prototype = {
 	 * - ec: End container node
 	 * - eo: End offset
 	 * - removeArray: Array of removed elements
+	 * @example
+	 * // Remove all list items from a list
+	 * const listElement = editor.selection.getNode().closest('ul');
+	 * editor.format.removeBlock(listElement);
+	 *
+	 * // Remove specific list items only
+	 * const selectedItems = [liElement1, liElement2];
+	 * editor.format.removeBlock(listElement, { selectedFormats: selectedItems });
+	 *
+	 * // Replace blockquote with div
+	 * const blockquote = editor.selection.getNode().closest('blockquote');
+	 * const newDiv = document.createElement('div');
+	 * editor.format.removeBlock(blockquote, { newBlockElement: newDiv });
 	 */
 	removeBlock(blockElement, { selectedFormats, newBlockElement, shouldDelete, skipHistory } = {}) {
 		const range = this.selection.getRange();
@@ -854,7 +871,7 @@ Format.prototype = {
 	/**
 	 * @this {FormatThis}
 	 * @description Returns a "line" array from selected range.
-	 * @param {?(current: Node) => boolean=} validation The validation function. (Replaces the default validation format.isLine(current))
+	 * @param {((current: Node) => boolean)|null} [validation] The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array<HTMLElement>}
 	 */
 	getLines(validation) {

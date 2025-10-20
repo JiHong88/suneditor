@@ -74,7 +74,7 @@ Menu.prototype = {
 
 	/**
 	 * @this {MenuThis}
-	 * @description On dropdown
+	 * @description Opens the dropdown menu for the specified button.
 	 * @param {Node} button Dropdown's button element to call
 	 */
 	dropdownOn(button) {
@@ -113,7 +113,7 @@ Menu.prototype = {
 
 	/**
 	 * @this {MenuThis}
-	 * @description Off dropdown
+	 * @description Closes the currently open dropdown menu.
 	 */
 	dropdownOff() {
 		this.__removeGlobalEvent();
@@ -142,7 +142,7 @@ Menu.prototype = {
 
 	/**
 	 * @this {MenuThis}
-	 * @description On menu container
+	 * @description Opens the menu container for the specified button.
 	 * @param {Node} button Container's button element to call
 	 */
 	containerOn(button) {
@@ -160,7 +160,7 @@ Menu.prototype = {
 
 	/**
 	 * @this {MenuThis}
-	 * @description Off menu container
+	 * @description Closes the currently open menu container.
 	 */
 	containerOff() {
 		this.__removeGlobalEvent();

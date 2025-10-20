@@ -27,6 +27,17 @@ ListFormat.prototype = {
 	 * @param {string} type List type. (ol | ul):[listStyleType]
 	 * @param {Array<Node>} selectedCells "line" elements or list cells.
 	 * @param {boolean} nested If true, indenting existing list cells.
+	 * @example
+	 * // Create ordered list from selected lines
+	 * const lines = editor.format.getLines();
+	 * editor.listFormat.apply('ol', lines, false);
+	 *
+	 * // Create unordered list with custom style
+	 * editor.listFormat.apply('ul:circle', selectedElements, false);
+	 *
+	 * // Indent existing list items
+	 * const listItems = [li1, li2, li3];
+	 * editor.listFormat.apply('ul', listItems, true);
 	 */
 	apply(type, selectedCells, nested) {
 		const listTag = (type.split(':')[0] || 'ol').toUpperCase();
@@ -294,6 +305,17 @@ ListFormat.prototype = {
 	 * @description Nest list cells or cancel nested cells.
 	 * @param {Array<HTMLElement>} selectedCells List cells.
 	 * @param {boolean} nested Nested or cancel nested.
+	 * @example
+	 * // Indent list items (increase nesting)
+	 * const selectedItems = [liElement1, liElement2];
+	 * editor.listFormat.applyNested(selectedItems, true);
+	 *
+	 * // Outdent list items (decrease nesting)
+	 * editor.listFormat.applyNested(selectedItems, false);
+	 *
+	 * // Get current list cells and nest them
+	 * const cells = editor.format.getLines().filter(el => el.tagName === 'LI');
+	 * editor.listFormat.applyNested(cells, true);
 	 */
 	applyNested(selectedCells, nested) {
 		selectedCells = !selectedCells
@@ -380,6 +402,17 @@ ListFormat.prototype = {
 	 * @param {HTMLElement} baseNode Element on which to base.
 	 * @param {boolean} all If true, it also detach all nested lists of a returned list.
 	 * @returns {Node} Result element
+	 * @example
+	 * // Remove first level of nesting
+	 * const listItem = document.querySelector('li');
+	 * editor.listFormat.removeNested(listItem, false);
+	 *
+	 * // Flatten all nested lists completely
+	 * editor.listFormat.removeNested(listItem, true);
+	 *
+	 * // Remove nesting and get result
+	 * const result = editor.listFormat.removeNested(nestedLi, false);
+	 * console.log(result); // parent list element
 	 */
 	removeNested(baseNode, all) {
 		const rNode = DeleteNestedList(baseNode);
@@ -543,6 +576,7 @@ ListFormat.prototype = {
 
 /**
  * @private
+ * @description Removes nested list structure by unwrapping child list elements and promoting their items to the parent level.
  * @param {Node} baseNode Node
  */
 function DeleteNestedList(baseNode) {

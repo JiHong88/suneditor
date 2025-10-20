@@ -18,6 +18,13 @@ export default function History(editor) {
 	let waiting = false;
 	let waitingTime = null;
 
+	/**
+	 * @private
+	 * @description Triggers onChange event and updates UI after history state changes.
+	 * @param {__se__FrameContext} fc The frame context.
+	 * @param {number} index The current history index.
+	 * @param {boolean} isSetFocus Whether to apply tag effects if editor has focus.
+	 */
 	function change(fc, index, isSetFocus) {
 		if (isSetFocus && editor.status.hasFocus) editor.eventManager.applyTagEffect();
 		editor.history.resetButtons(fc.get('key'), index);
@@ -28,6 +35,11 @@ export default function History(editor) {
 		else if (editor.isSubBalloon && editor.context.get('toolbar_sub_main').style.display === 'block') editor.subToolbar._showBalloon();
 	}
 
+	/**
+	 * @private
+	 * @description Restores content from the history stack and updates the editor state.
+	 * @param {number} increase Direction to move in the stack: -1 for undo, +1 for redo.
+	 */
 	function setContentFromStack(increase) {
 		const prevKey = stack[stackIndex];
 		const prevRoot = rootStack[prevKey];
@@ -81,6 +93,14 @@ export default function History(editor) {
 		change(fc, root.index, true);
 	}
 
+	/**
+	 * @private
+	 * @description Saves content and selection to the history stack.
+	 * @param {string} content HTML content to save.
+	 * @param {Range} range Selection range.
+	 * @param {*} rootKey Root frame key.
+	 * @param {number} increase Stack index increment.
+	 */
 	function setStack(content, range, rootKey, increase) {
 		let s, e;
 		if (!range) {
@@ -110,6 +130,11 @@ export default function History(editor) {
 		};
 	}
 
+	/**
+	 * @private
+	 * @description Resets a root frame's history stack.
+	 * @param {*} rootKey Root frame key.
+	 */
 	function resetRoot(rootKey) {
 		stackIndex++;
 		stack[stackIndex] = rootKey;
@@ -123,11 +148,21 @@ export default function History(editor) {
 		};
 	}
 
+	/**
+	 * @private
+	 * @description Initializes a root frame's history stack.
+	 * @param {*} rootKey Root frame key.
+	 */
 	function initRoot(rootKey) {
 		rootStack[rootKey] = { value: [], index: -1 };
 		rootInitContents[rootKey] = frameRoots.get(rootKey).get('wysiwyg').innerHTML;
 	}
 
+	/**
+	 * @private
+	 * @description Clears future history and reinitializes deleted roots.
+	 * @param {Object} root Root stack object.
+	 */
 	function refreshRoots(root) {
 		const deleteRoot = [];
 		for (let i = stackIndex + 1, len = stack.length; i < len; i++) {
@@ -146,6 +181,12 @@ export default function History(editor) {
 		}
 	}
 
+	/**
+	 * @private
+	 * @description Pushes current content to the history stack.
+	 * @param {*} rootKey Root frame key.
+	 * @param {Range} range Selection range.
+	 */
 	function pushStack(rootKey, range) {
 		editor._checkComponents(false);
 

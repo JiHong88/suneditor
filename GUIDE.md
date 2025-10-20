@@ -193,71 +193,72 @@ suneditor/
 ### Overall Architecture
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                            suneditor.js                                │
-│                         (Factory Entry Point)                          │
-│  • create(target, options) → new Editor()                              │
-│  • init(options) → { create() }                                        │
-└───────────────────────────────┬────────────────────────────────────────┘
-                                │ creates
-                                ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                            editor.js                                   │
-│                     (Main Editor Class Instance)                       │
-│                                                                        │
-│  Public API: focus/blur, html.get/set, run, registerPlugin...          │
-│                                                                        │
-│  Internal Management:                                                  │
-│  • Multi-root frame contexts (frameRoots Map)                          │
-│  • Two-tier options (Base + Frame Options Map)                         │
-│  • Plugin lifecycle (load → init → on/off)                             │
-│  • Command execution routing                                           │
-│  • History stack coordination                                          │
-└─┬────────┬────────┬──────────────┬────────────┬────────────┬───────────┘
-  │        │        │              │            │            │
-  │injects │manages │   manages    │coordinates │    uses    │manages
-  │        │        │              │            │            │
-  ▼        ▼        ▼              ▼            ▼            ▼
-┌──────┐┌──────┐┌──────────────┐┌──────────┐┌──────────┐┌─────────┐
-│ Core ││Plugin││   Context    ││  Event   ││ Helper   ││ History │
-│Class ││System││  & Options   ││ Manager  ││ Utils    ││ Manager │
-└──┬───┘└──┬───┘└──────┬───────┘└────┬─────┘└────┬─────┘└────┬────┘
-   │       │           │             │           │           │
-   │       │           │             │           │(stateless)│
-   │       ▼           ▼             ▼           ▼           ▼
-   │ ┌───────────┐┌──────────────────────┐┌────────────┐┌───────────┐┌─────────┐
-   │ │ command/  ││ context              ││ Redux      ││ dom.*     ││ Stack   │
-   │ │ dropdown/ ││  Map (Global UI)     ││ Pattern:   ││ • check,  ││ based:  │
-   │ │ modal/    ││  • toolbar           ││ Reducer    ││ • query   ││ push()  │
-   │ │ browser/  ││  • statusbar         ││ → Action   ││ • utils   ││ undo()  │
-   │ │ field/    ││  • modalOverlay      ││ → Effect   ││ converter ││ redo()  │
-   │ │ input/    ││                      ││            ││ env       ││ reset() │
-   │ │ popup/    ││ frameContext         ││ handlers/  ││ unicode   ││         │
-   │ └────┬──────┘│  → current frame     ││ reducers/  ││ keyboard  │└─────────┘
-   │      │       │                      ││ effects/   │| numbers   │
-   │      │       │ frameOptions         │└────────────┘| clipboard │
-   │      │       │  → current opts      │              └───────────┘
-   │      │       │                      │
-   │      │       │ options              │
-   │      │       │  Map (Base Cfg)      │
-   │      │       │                      │
-   │      │       │ frameRoots           │
-   │      │       │  Map<rootKey,        │
-   │      │       │   FrameContext>      │
-   │      │uses   │  (All FrameContext)  │
-   │      ▼       └──────────────────────┘
-   │  ┌───────────┐
-   │  │ Modules   │ (UI Components)
-   │  ├───────────┤
-   │  │ Modal     │ ← modal plugins
-   │  │ Contrllr  │ ← component plugins
-   │  │ Figure    │ ← image/video/audio
-   │  │ SelectMnu │ ← font/formatBlock
-   │  │ ColorPckr │ ← fontColor/bgColor
-   │  │ FileMngr  │ ← file upload plugins
-   │  │ Browser   │ ← gallery plugins
-   │  │ Anchor    │ ← link plugin
-   │  └───────────┘
+┌────────────────────────────────────────────────────────────────────────┐               ┌──────────────┐
+│                            suneditor.js                                │               │ Helper Utils │
+│                         (Factory Entry Point)                          │               └──────┬───────┘
+│  • create(target, options) → new Editor()                              │                      │
+│  • init(options) → { create() }                                        │                      │(stateless)
+└───────────────────────────────┬────────────────────────────────────────┘                      ▼
+                                │ creates                                                 ┌───────────┐
+                                │                                                         │ dom.*     │
+                                ▼                                                         │ • check,  │
+┌─────────────────────────────────────────────────────────────────────────────┐           │ • query   │
+│                            editor.js                                        │           │ • utils   │
+│                     (Main Editor Class Instance)                            │           │ converter │
+│                                                                             │           │ env       │
+│  Public API: focus/blur, html.get/set, run, registerPlugin...               │           │ unicode   │
+│                                                                             │           │ keyboard  │
+│  Internal Management:                                                       │           | numbers   │
+│  • Multi-root frame contexts (frameRoots Map)                               │           | clipboard │
+│  • Two-tier options (Base + Frame Options Map)                              │           └───────────┘
+│  • Plugin lifecycle (load → init → on/off)                                  │
+│  • Command execution routing                                                │
+│  • History stack coordination                                               │
+└─┬────────────┬──────────────────┬───────────────────────┬────────────────┬──┘
+  │            │                  │                       │                │
+  │injects     │manages           │manages                │coordinates     │manages
+  │            │                  │                       │                │
+  ▼            ▼                  ▼                       ▼                ▼
+┌──────┐   ┌────────┐       ┌──────────────┐        ┌────────────┐    ┌─────────┐
+│ Core │   │ Plugin │       │   Context    │        │   Event    │    │ History │
+│Class │   │ System │       │  & Options   │        │  Manager   │    │ Manager │
+└──┬───┘   └───┬────┘       └──────┬───────┘        └─────┬──────┘    └────┬────┘
+   │           │                   │                      │                │
+   │           │                   │                      │                │
+   │           ▼                   ▼                      ▼                ▼
+   │    ┌────────────┐  ┌──────────────────────┐    ┌────────────┐    ┌─────────┐
+   │    │ command/   │  │ context              │    │ Redux      │    │ Stack   │
+   │    │ dropdown/  │  │  Map (Global UI)     │    │ Pattern:   │    │ based:  │
+   │    │ modal/     │  │  • toolbar           │    │ Reducer    │    │ push()  │
+   │    │ browser/   │  │  • statusbar         │    │ → Action   │    │ undo()  │
+   │    │ field/     │  │  • modalOverlay      │    │ → Effect   │    │ redo()  │
+   │    │ input/     │  │                      │    │            │    │ reset() │
+   │    │ popup/     │  │ frameContext         │    │ handlers/  │    │         │
+   │    └─────┬──────┘  │  → current frame     │    │ reducers/  │    └─────────┘
+   │          │         │                      │    │ effects/   │
+   │          │         │ frameOptions         │    └────────────┘
+   │          │         │  → current opts      │
+   │          │         │                      │
+   │          │         │ options              │
+   │          │         │  Map (Base Cfg)      │
+   │          │         │                      │
+   │          │         │ frameRoots           │
+   │          │         │  Map<rootKey,        │
+   │          │         │   FrameContext>      │
+   │          │uses     │  (All FrameContext)  │
+   │          ▼         └──────────────────────┘
+   │     ┌───────────┐
+   │     │ Modules   │ (UI Components)
+   │     ├───────────┤
+   │     │ Modal     │ ← modal plugins
+   │     │ Contrllr  │ ← component plugins
+   │     │ Figure    │ ← image/video/audio
+   │     │ SelectMnu │ ← font/formatBlock
+   │     │ ColorPckr │ ← fontColor/bgColor
+   │     │ FileMngr  │ ← file upload plugins
+   │     │ Browser   │ ← gallery plugins
+   │     │ Anchor    │ ← link plugin
+   │     └───────────┘
    │
    ▼ (all extend EditorInjector)
 ┌────────────────────────────────────────┐

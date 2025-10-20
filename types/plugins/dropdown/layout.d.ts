@@ -38,6 +38,7 @@ declare class Layout extends EditorInjector {
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
 	 * @param {HTMLElement} target - The plugin's toolbar button element
+	 * @throws {Error} Throws error if layout HTML is not found.
 	 */
 	action(target: HTMLElement): void;
 }

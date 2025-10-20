@@ -38,6 +38,7 @@ declare class Template extends EditorInjector {
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
 	 * @param {HTMLElement} target - The plugin's toolbar button element
+	 * @throws {Error} Throws error if template HTML is not found.
 	 */
 	action(target: HTMLElement): void;
 }

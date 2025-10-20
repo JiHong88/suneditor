@@ -75,7 +75,7 @@ declare class Component {
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
 	 * @param {boolean} [options.scrollTo=true] true : Scroll to the inserted element, false : Do not scroll.
-	 * @param {?__se__ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
+	 * @param {__se__ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
 	 * - If null, noting action is performed after insertion.
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
@@ -91,7 +91,7 @@ declare class Component {
 			skipCharCount?: boolean;
 			skipHistory?: boolean;
 			scrollTo?: boolean;
-			insertBehavior?: __se__ComponentInsertBehaviorType | null;
+			insertBehavior?: __se__ComponentInsertBehaviorType;
 		}
 	): HTMLElement;
 	/**

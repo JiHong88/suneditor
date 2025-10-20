@@ -37,22 +37,22 @@ declare class Viewer {
 	/**
 	 * @this {ViewerThis}
 	 * @description Changes to code view or wysiwyg view
-	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
-	codeView(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean | undefined): void;
+	codeView(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean): void;
 	/**
 	 * @this {ViewerThis}
 	 * @description Changes to full screen or default screen
-	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
-	fullScreen(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean | undefined): void;
+	fullScreen(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean): void;
 	_originCssText: any;
 	/**
 	 * @this {ViewerThis}
 	 * @description Add or remove the class name of "body" so that the code block is visible
-	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
-	showBlocks(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean | undefined): void;
+	showBlocks(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean): void;
 	/**
 	 * @private
 	 * @this {ViewerThis}
@@ -62,6 +62,7 @@ declare class Viewer {
 	/**
 	 * @this {ViewerThis}
 	 * @description Prints the current content of the editor.
+	 * @throws {Error} Throws error if print operation fails.
 	 */
 	print(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
 	/**

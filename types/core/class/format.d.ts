@@ -38,10 +38,10 @@ declare class Format {
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
 	 * @param {Node} node Reference node.
-	 * @param {?(current: Node) => boolean=} validation Additional validation function.
+	 * @param {((current: Node) => boolean)|null} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 */
-	getLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, node: Node, validation?: (((current: Node) => boolean) | null) | undefined): HTMLElement | null;
+	getLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, node: Node, validation?: ((current: Node) => boolean) | null): HTMLElement | null;
 	/**
 	 * @this {FormatThis}
 	 * @description Replace the br-line tag of the current selection.
@@ -52,32 +52,36 @@ declare class Format {
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a "brLine" (format.isBrLine), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {?(current: Node) => boolean=} validation Additional validation function.
+	 * @param {((current: Node) => boolean)|null} [validation] Additional validation function.
 	 * @returns {HTMLBRElement|null}
 	 */
-	getBrLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, validation?: (((current: Node) => boolean) | null) | undefined): HTMLBRElement | null;
+	getBrLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, validation?: ((current: Node) => boolean) | null): HTMLBRElement | null;
 	/**
 	 * @this {FormatThis}
 	 * @description Append "line" element to sibling node of argument element.
 	 * - If the "lineNode" argument value is present, the tag of that argument value is inserted,
 	 * - If not, the currently selected format tag is inserted.
 	 * @param {Node} element Insert as siblings of that element
-	 * @param {?string|Node=} lineNode Node name or node obejct to be inserted
+	 * @param {string|Node|null} [lineNode] Node name or node obejct to be inserted
 	 * @returns {HTMLElement}
 	 */
-	addLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, lineNode?: ((string | Node) | null) | undefined): HTMLElement;
+	addLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, lineNode?: string | Node | null): HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isBlock), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {?(current: Node) => boolean=} validation Additional validation function.
+	 * @param {((current: Node) => boolean)|null} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 */
-	getBlock(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, validation?: (((current: Node) => boolean) | null) | undefined): HTMLElement | null;
+	getBlock(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, validation?: ((current: Node) => boolean) | null): HTMLElement | null;
 	/**
 	 * @this {FormatThis}
 	 * @description Appended all selected "line" element to the argument element("block") and insert
 	 * @param {Node} blockElement Element of wrap the arguments (BLOCKQUOTE...)
+	 * @example
+	 * // Wrap selected lines in a blockquote
+	 * const blockquote = document.createElement('blockquote');
+	 * editor.format.applyBlock(blockquote);
 	 */
 	applyBlock(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, blockElement: Node): void;
 	/**
@@ -98,6 +102,19 @@ declare class Format {
 	 * - ec: End container node
 	 * - eo: End offset
 	 * - removeArray: Array of removed elements
+	 * @example
+	 * // Remove all list items from a list
+	 * const listElement = editor.selection.getNode().closest('ul');
+	 * editor.format.removeBlock(listElement);
+	 *
+	 * // Remove specific list items only
+	 * const selectedItems = [liElement1, liElement2];
+	 * editor.format.removeBlock(listElement, { selectedFormats: selectedItems });
+	 *
+	 * // Replace blockquote with div
+	 * const blockquote = editor.selection.getNode().closest('blockquote');
+	 * const newDiv = document.createElement('div');
+	 * editor.format.removeBlock(blockquote, { newBlockElement: newDiv });
 	 */
 	removeBlock(
 		this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>,
@@ -212,10 +229,10 @@ declare class Format {
 	/**
 	 * @this {FormatThis}
 	 * @description Returns a "line" array from selected range.
-	 * @param {?(current: Node) => boolean=} validation The validation function. (Replaces the default validation format.isLine(current))
+	 * @param {((current: Node) => boolean)|null} [validation] The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array<HTMLElement>}
 	 */
-	getLines(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, validation?: (((current: Node) => boolean) | null) | undefined): Array<HTMLElement>;
+	getLines(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, validation?: ((current: Node) => boolean) | null): Array<HTMLElement>;
 	/**
 	 * @this {FormatThis}
 	 * @description Get lines and components from the selected range. (P, DIV, H[1-6], OL, UL, TABLE..)

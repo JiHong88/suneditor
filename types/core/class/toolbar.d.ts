@@ -97,22 +97,22 @@ declare class Toolbar {
 	};
 	/**
 	 * @this {ToolbarThis}
-	 * @description Disable the toolbar
+	 * @description Disables all toolbar buttons.
 	 */
 	disable(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
 	/**
 	 * @this {ToolbarThis}
-	 * @description Enable the toolbar
+	 * @description Enables all toolbar buttons.
 	 */
 	enable(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
 	/**
 	 * @this {ToolbarThis}
-	 * @description Show the toolbar
+	 * @description Shows the toolbar.
 	 */
 	show(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
 	/**
 	 * @this {ToolbarThis}
-	 * @description Hide the toolbar
+	 * @description Hides the toolbar.
 	 */
 	hide(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>): void;
 	/**
@@ -168,9 +168,9 @@ declare class Toolbar {
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Show the balloon toolbar based on the current selection.
-	 * @param {?Range=} rangeObj - Selection range
+	 * @param {Range|null} [rangeObj] - Selection range
 	 */
-	_showBalloon(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>, rangeObj?: (Range | null) | undefined): void;
+	_showBalloon(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'subToolbar' | 'toolbar'>, rangeObj?: Range | null): void;
 	/**
 	 * @private
 	 * @this {ToolbarThis}

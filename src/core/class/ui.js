@@ -144,7 +144,7 @@ UI.prototype = {
 
 	/**
 	 * @this {UIThis}
-	 * @description Disable the suneditor
+	 * @description Disables the editor.
 	 * @param {string|undefined} rootKey Root key
 	 */
 	disable(rootKey) {
@@ -166,7 +166,7 @@ UI.prototype = {
 
 	/**
 	 * @this {UIThis}
-	 * @description Enable the suneditor
+	 * @description Enables the editor.
 	 * @param {string|undefined} rootKey Root key
 	 */
 	enable(rootKey) {
@@ -185,7 +185,7 @@ UI.prototype = {
 
 	/**
 	 * @this {UIThis}
-	 * @description Show the suneditor
+	 * @description Shows the editor interface.
 	 * @param {string|undefined} rootKey Root key
 	 */
 	show(rootKey) {
@@ -196,7 +196,7 @@ UI.prototype = {
 
 	/**
 	 * @this {UIThis}
-	 * @description Hide the suneditor
+	 * @description Hides the editor interface.
 	 * @param {string|undefined} rootKey Root key
 	 */
 	hide(rootKey) {
@@ -206,8 +206,8 @@ UI.prototype = {
 
 	/**
 	 * @this {UIThis}
-	 * @description Show loading box
-	 * @param {string=} rootKey Root key
+	 * @description Shows the loading spinner.
+	 * @param {string} [rootKey] Root key
 	 */
 	showLoading(rootKey) {
 		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'block';
@@ -215,8 +215,8 @@ UI.prototype = {
 
 	/**
 	 * @this {UIThis}
-	 * @description Hide loading box
-	 * @param {string=} rootKey Root key
+	 * @description Hides the loading spinner.
+	 * @param {string} [rootKey] Root key
 	 */
 	hideLoading(rootKey) {
 		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'none';
@@ -328,7 +328,7 @@ UI.prototype = {
 	 * @this {UIThis}
 	 * @description visible controllers
 	 * @param {boolean} value hidden/show
-	 * @param {?boolean=} lineBreakShow Line break hidden/show (default: Follows the value "value".)
+	 * @param {boolean|null} [lineBreakShow] Line break hidden/show (default: Follows the value "value".)
 	 */
 	_visibleControllers(value, lineBreakShow) {
 		const visible = value ? '' : 'hidden';

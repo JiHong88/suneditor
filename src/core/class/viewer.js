@@ -40,7 +40,7 @@ Viewer.prototype = {
 	/**
 	 * @this {ViewerThis}
 	 * @description Changes to code view or wysiwyg view
-	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
 	codeView(value) {
 		const fc = this.frameContext;
@@ -140,7 +140,7 @@ Viewer.prototype = {
 	/**
 	 * @this {ViewerThis}
 	 * @description Changes to full screen or default screen
-	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
 	fullScreen(value) {
 		const fc = this.frameContext;
@@ -294,7 +294,7 @@ Viewer.prototype = {
 	/**
 	 * @this {ViewerThis}
 	 * @description Add or remove the class name of "body" so that the code block is visible
-	 * @param {boolean=} value true/false, If undefined toggle the codeView mode.
+	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
 	showBlocks(value) {
 		const fc = this.frameContext;
@@ -353,6 +353,7 @@ Viewer.prototype = {
 	/**
 	 * @this {ViewerThis}
 	 * @description Prints the current content of the editor.
+	 * @throws {Error} Throws error if print operation fails.
 	 */
 	print() {
 		/** @type {HTMLIFrameElement} */

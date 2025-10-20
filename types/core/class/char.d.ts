@@ -32,10 +32,10 @@ declare class Char {
 	 * @this {CharThis}
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
 	 * - If [content] is undefined, get the current editor's number of characters or binary data size.
-	 * @param {string=} content Content to count. (defalut: this.frameContext.get('wysiwyg'))
+	 * @param {string} [content] Content to count. (defalut: this.frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
-	getLength(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, content?: string | undefined): number;
+	getLength(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, content?: string): number;
 	/**
 	 * @this {CharThis}
 	 * @descriptionGets Get the length in bytes of a string.
@@ -46,16 +46,17 @@ declare class Char {
 	/**
 	 * @this {CharThis}
 	 * @description Set the char count to charCounter element textContent.
-	 * @param {?__se__FrameContext=} fc Frame context
+	 * @param {__se__FrameContext|null} [fc] Frame context
 	 */
-	display(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, fc?: (__se__FrameContext | null) | undefined): void;
+	display(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, fc?: __se__FrameContext | null): void;
 	/**
 	 * @this {CharThis}
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "inputText" is added to the current editor.
 	 * - If the current number of characters is greater than "charCounter_max", the excess characters are removed.
 	 * And call the char.display()
 	 * @param {string} inputText Text added.
+	 * @param {boolean} _fromInputEvent Whether the test is triggered from an input event.
 	 * @returns {boolean}
 	 */
-	test(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, inputText: string, _fromInputEvent: any): boolean;
+	test(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, inputText: string, _fromInputEvent: boolean): boolean;
 }

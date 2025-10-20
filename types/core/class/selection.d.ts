@@ -62,6 +62,18 @@ declare class Selection_ {
 	 * @param {Node} [endCon] The endContainer property of the selection object.
 	 * @param {number} [endOff] The endOffset property of the selection object.
 	 * @returns {Range}
+	 * @example
+	 * // Set range using container and offset
+	 * const textNode = editor.selection.getNode();
+	 * editor.selection.setRange(textNode, 0, textNode, 5);
+	 *
+	 * // Set range using Range object
+	 * const range = document.createRange();
+	 * range.selectNodeContents(someElement);
+	 * editor.selection.setRange(range);
+	 *
+	 * // Collapse cursor to start of element
+	 * editor.selection.setRange(element, 0, element, 0);
 	 */
 	setRange(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, startCon: Node | Range, startOff?: number, endCon?: Node, endOff?: number): Range;
 	/**
@@ -88,10 +100,10 @@ declare class Selection_ {
 	 * @this {SelectionThis}
 	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
 	 * @param {Range} range core.getRange()
-	 * @param {?Node=} container If there is "container" argument, it creates a line in front of the container.
+	 * @param {Node|null} [container] If there is "container" argument, it creates a line in front of the container.
 	 * @returns {Range} a new "range" or argument "range".
 	 */
-	getRangeAndAddLine(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: Range, container?: (Node | null) | undefined): Range;
+	getRangeAndAddLine(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: Range, container?: Node | null): Range;
 	/**
 	 * @this {SelectionThis}
 	 * @description Get current select node
@@ -101,13 +113,26 @@ declare class Selection_ {
 	/**
 	 * @this {SelectionThis}
 	 * @description Get the Rects object.
-	 * @param {?Range|Node} target Range | Node | null
+	 * @param {Range|Node|null} target Range | Node | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
 	 * @returns {{rects: RectsInfo_selection, position: "start"|"end", scrollLeft: number, scrollTop: number}}
+	 * @example
+	 * // Get rects at start of selection
+	 * const { rects, position, scrollLeft, scrollTop } = editor.selection.getRects(null, 'start');
+	 * console.log(rects.left, rects.top, rects.right, rects.bottom);
+	 *
+	 * // Get rects for specific node
+	 * const node = editor.selection.getNode();
+	 * const rectsInfo = editor.selection.getRects(node, 'end');
+	 *
+	 * // Use rects for positioning UI elements
+	 * const { rects } = editor.selection.getRects(null, 'start');
+	 * tooltip.style.left = rects.left + 'px';
+	 * tooltip.style.top = rects.top + 'px';
 	 */
 	getRects(
 		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
-		target: (Range | Node) | null,
+		target: Range | Node | null,
 		position: 'start' | 'end'
 	): {
 		rects: RectsInfo_selection;
@@ -134,16 +159,27 @@ declare class Selection_ {
 	 * @this {SelectionThis}
 	 * @description Scroll to the corresponding selection or range position.
 	 * @param {Selection|Range|Node} ref selection or range object
-	 * @param {?Object<string, *>=} scrollOption option of scrollTo
+	 * @param {Object<string, *>} [scrollOption] option of scrollTo
+	 * @example
+	 * // Scroll to current selection smoothly
+	 * editor.selection.scrollTo(editor.selection.get());
+	 *
+	 * // Scroll to specific node
+	 * const targetNode = document.querySelector('.target-element');
+	 * editor.selection.scrollTo(targetNode);
+	 *
+	 * // Scroll with custom options
+	 * editor.selection.scrollTo(editor.selection.getRange(), {
+	 *   behavior: 'auto',
+	 *   block: 'center'
+	 * });
 	 */
 	scrollTo(
 		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
 		ref: Selection | Range | Node,
-		scrollOption?:
-			| ({
-					[x: string]: any;
-			  } | null)
-			| undefined
+		scrollOption?: {
+			[x: string]: any;
+		}
 	): void;
 	/**
 	 * @private
@@ -177,13 +213,13 @@ declare class Selection_ {
 	/**
 	 * @private
 	 * @this {SelectionThis}
-	 * @description Focus method
+	 * @description Sets focus to the editor's wysiwyg contenteditable area and restores the last selection range within iframe context.
 	 */
 	__focus(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
 	/**
 	 * @private
 	 * @this {SelectionThis}
-	 * @description Reset range object to text node selected status.
+	 * @description Normalizes and resets the selection range to properly target text nodes instead of element nodes for accurate text editing.
 	 * @returns {boolean} Returns false if there is no valid selection.
 	 */
 	_resetRangeToTextNode(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): boolean;

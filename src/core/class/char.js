@@ -43,7 +43,7 @@ Char.prototype = {
 	 * @this {CharThis}
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
 	 * - If [content] is undefined, get the current editor's number of characters or binary data size.
-	 * @param {string=} content Content to count. (defalut: this.frameContext.get('wysiwyg'))
+	 * @param {string} [content] Content to count. (defalut: this.frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
 	getLength(content) {
@@ -88,7 +88,7 @@ Char.prototype = {
 	/**
 	 * @this {CharThis}
 	 * @description Set the char count to charCounter element textContent.
-	 * @param {?__se__FrameContext=} fc Frame context
+	 * @param {__se__FrameContext|null} [fc] Frame context
 	 */
 	display(fc) {
 		const charCounter = (fc || this.frameContext).get('charCounter');
@@ -105,6 +105,7 @@ Char.prototype = {
 	 * - If the current number of characters is greater than "charCounter_max", the excess characters are removed.
 	 * And call the char.display()
 	 * @param {string} inputText Text added.
+	 * @param {boolean} _fromInputEvent Whether the test is triggered from an input event.
 	 * @returns {boolean}
 	 */
 	test(inputText, _fromInputEvent) {
