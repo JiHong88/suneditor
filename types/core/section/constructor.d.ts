@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 /**
  * @description Create shortcuts desc span.
  * @param {string} command Command string

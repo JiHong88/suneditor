@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 /**
  * @description Add default properties to the editor core object.
  * @param {__se__EditorCore} editor - The root editor instance

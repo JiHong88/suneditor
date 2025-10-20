@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 /**
  * @module _DragHandle
  * @description A module that handles drag and drop events.

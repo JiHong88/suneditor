@@ -1,3 +1,4 @@
+import type {} from '../../../typedef';
 declare const _default: {
 	/** @action delFormatRemoveAndMove */
 	'del.format.removeAndMove': ({ ports }: EffectContext_keydown, { container, formatEl }: any) => void;

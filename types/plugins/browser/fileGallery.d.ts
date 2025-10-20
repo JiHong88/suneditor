@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default FileGallery;
 export type BrowserFile_fileGallery = import('../../modules/Browser').BrowserFile;
 export type FileGalleryPluginOptions = {

@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 export default ApiManager;
 export type ApiManagerParams = {
 	/**

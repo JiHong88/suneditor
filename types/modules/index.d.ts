@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 declare namespace _default {
 	export { _DragHandle };
 	export { ApiManager };

@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Component;
 export type ComponentThis = Omit<Component & Partial<__se__EditorInjector>, 'component'>;
 /**

@@ -1,3 +1,4 @@
+import type {} from '../../../typedef';
 /**
  * @this {void}
  * @description Enter key down rule

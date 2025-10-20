@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Audio_;
 export type AudioInfo_audio = import('../../events').AudioInfo;
 export type AudioPluginOptions = {

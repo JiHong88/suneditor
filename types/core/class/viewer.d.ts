@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Viewer;
 export type ViewerThis = Omit<Viewer & Partial<__se__EditorInjector>, 'viewer'>;
 /**

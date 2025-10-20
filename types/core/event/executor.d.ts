@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 /**
  * @description Execute actions sequentially
  * @param {__se__EventActions} actions - Array of actions to execute

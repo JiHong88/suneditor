@@ -1,3 +1,4 @@
+import type {} from '../../../typedef';
 declare const _default: {
 	/** @action prevent */
 	'event.prevent': ({ ctx }: EffectContext) => void;

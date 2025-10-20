@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 /**
  * @description Selects all content in the editor.
  * @param {__se__EditorCore} editor - The root editor instance

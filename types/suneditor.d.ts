@@ -1,3 +1,4 @@
+import type {} from 'typedef';
 declare namespace _default {
 	/**
 	 * Returns the create function with preset options.

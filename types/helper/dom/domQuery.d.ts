@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 /**
  * @description Returns the index compared to other sibling nodes.
  * @param {Node} node The Node to find index

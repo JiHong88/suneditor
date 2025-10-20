@@ -1,3 +1,4 @@
+import type {} from '../../../typedef';
 /**
  * @this {void}
  * @description Backspace key down rule

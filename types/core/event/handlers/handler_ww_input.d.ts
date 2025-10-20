@@ -1,3 +1,4 @@
+import type {} from '../../../typedef';
 /**
  * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_ww_input
  */

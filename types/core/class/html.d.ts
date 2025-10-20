@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default HTML;
 export type HTMLThis = Omit<HTML & Partial<__se__EditorInjector>, 'html'>;
 /**

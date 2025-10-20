@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Offset;
 export type OffsetThis = Omit<Offset & Partial<__se__EditorInjector>, 'offset'>;
 /**

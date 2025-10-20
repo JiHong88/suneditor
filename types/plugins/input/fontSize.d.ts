@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default FontSize;
 export type FontSizePluginOptions = {
 	/**

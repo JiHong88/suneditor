@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 export default HueSlider;
 export type ControllerParams_hueSlider = import('../modules/Controller').ControllerParams;
 export type HueSliderColor = {

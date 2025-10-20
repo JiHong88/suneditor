@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Link;
 export type ModalAnchorEditorParams_link = import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams;
 export type LinkOptions = {

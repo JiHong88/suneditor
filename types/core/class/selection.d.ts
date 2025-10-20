@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Selection_;
 export type SelectionThis = Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>;
 export type RectsInfo_selection = import('./offset').RectsInfo;

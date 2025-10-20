@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 export default Editor;
 export type ControllerInfo_editor = import('../modules/Controller').ControllerInfo;
 /**

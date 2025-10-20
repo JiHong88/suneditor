@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 /**
  * @typedef {import('./eventManager').EventManagerThis} EventManagerInstanceType
  */

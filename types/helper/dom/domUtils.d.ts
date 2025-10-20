@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 /**
  * @template {Node} T
  * @description Clones a node while preserving its type.

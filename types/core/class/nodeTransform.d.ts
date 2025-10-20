@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default NodeTransform;
 export type NodeTransformThis = Omit<NodeTransform & Partial<__se__EditorInjector>, 'nodeTransform'>;
 /**

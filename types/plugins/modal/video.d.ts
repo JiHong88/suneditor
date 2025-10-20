@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Video;
 export type ModalReturns_video = {
 	html: HTMLElement;

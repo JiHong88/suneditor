@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default FontColor;
 export type FontColorPluginOptions = {
 	/**

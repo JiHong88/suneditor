@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default EventManager;
 export type EventManagerThis = Omit<EventManager & Partial<__se__EditorInjector>, 'eventManager'>;
 /**

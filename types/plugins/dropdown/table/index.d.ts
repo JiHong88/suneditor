@@ -1,3 +1,4 @@
+import type {} from '../../../typedef';
 export default Table;
 export type TableCtrlProps = {
 	html: HTMLElement;

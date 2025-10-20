@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 /**
  * @description Parses an HTML string into a DOM tree, then recursively traverses the nodes to convert them into a structured JSON representation.
  * -Each element includes its tag name, attributes, and children.

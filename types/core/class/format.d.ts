@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Format;
 export type FormatThis = Omit<Format & Partial<__se__EditorInjector>, 'format'>;
 /**

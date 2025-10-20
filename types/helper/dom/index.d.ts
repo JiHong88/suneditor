@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export const domQuery: {
 	getPositionIndex: typeof import('./domQuery').getPositionIndex;
 	getNodePath: typeof import('./domQuery').getNodePath;

@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Char;
 export type CharThis = Omit<Char & Partial<__se__EditorInjector>, 'char'>;
 /**

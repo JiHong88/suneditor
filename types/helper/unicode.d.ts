@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 /**
  * @description Escape a string for safe use in regular expressions.
  * @param {string} string String to escape

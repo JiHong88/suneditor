@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Inline;
 export type InlineThis = Omit<Inline & Partial<__se__EditorInjector>, 'inline'>;
 export type NodeStyleContainerType = {

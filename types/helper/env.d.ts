@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 /**
  * @description Gets XMLHttpRequest object
  * @returns {XMLHttpRequest}

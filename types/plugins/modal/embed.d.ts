@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Embed;
 export type ProcessInfo_embed = import('../../events').ProcessInfo;
 export type FigureControls_embed = import('../../modules/Figure').FigureControls;

@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 export const env: {
 	_w: Window;
 	_d: Document;

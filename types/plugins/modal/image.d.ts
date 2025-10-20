@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Image_;
 export type ModalReturns_image = {
 	html: HTMLElement;

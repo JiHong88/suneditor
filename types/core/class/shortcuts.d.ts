@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Shortcuts;
 export type ShortcutsThis = Omit<Shortcuts & Partial<__se__EditorInjector>, 'shortcuts'>;
 export type ShortcutInfo = {

@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default FileBrowser;
 export type BrowserFile_fileBrowser = import('../../modules/Browser').BrowserFile;
 export type FileBrowserPluginOptions = {

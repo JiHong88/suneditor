@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default ListFormat;
 export type ListFormatThis = Omit<ListFormat & Partial<__se__EditorInjector>, 'ListFormat'>;
 /**

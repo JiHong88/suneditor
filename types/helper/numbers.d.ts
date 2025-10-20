@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 /**
  * @fileoverview Number-related helper functions
  */

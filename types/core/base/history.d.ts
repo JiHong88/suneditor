@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 /**
  * @description History stack closure
  * @param {__se__EditorCore} editor - The root editor instance

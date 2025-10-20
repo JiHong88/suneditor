@@ -1,3 +1,4 @@
+import type {} from '../../../typedef';
 export namespace A {
 	function prevent(): Action;
 	function stop(): Action;

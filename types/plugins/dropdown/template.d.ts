@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Template;
 export type TemplatePluginOptions = {
 	/**

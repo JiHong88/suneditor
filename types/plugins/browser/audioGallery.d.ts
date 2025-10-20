@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default AudioGallery;
 export type BrowserFile_audioGallery = import('../../modules/Browser').BrowserFile;
 export type AudioGalleryPluginOptions = {

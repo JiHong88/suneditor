@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 export default ColorPicker;
 export type HueSliderParams_colorPicker = import('./HueSlider').HueSliderParams;
 export type HueSliderColor_colorPicker = import('./HueSlider').HueSliderColor;

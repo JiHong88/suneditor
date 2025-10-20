@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 /**
  * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (unicode.zeroWidthSpace)
  * @param {string|Node} text String value or Node

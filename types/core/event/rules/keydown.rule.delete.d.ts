@@ -1,3 +1,4 @@
+import type {} from '../../../typedef';
 /**
  * @this {void}
  * @description Delete key down rule

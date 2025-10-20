@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 /**
  * @description Write the content to the clipboard
  * - Iframe is replaced with a placeholder : <div data-se-iframe-holder-src="iframe.src">[iframe: iframe.src]</div>

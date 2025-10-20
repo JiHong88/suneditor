@@ -1,3 +1,4 @@
+import type {} from '../typedef';
 export default EditorInjector;
 /**
  * @description Initializes and adds inner classes and default properties of the editor.

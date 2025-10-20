@@ -1,3 +1,4 @@
+import type {} from '../../../typedef';
 /**
  * @description Deletes specific elements such as tables in "Firefox" and media elements (image, video, audio) in "Chrome".
  * - Handles deletion logic based on selection range and node types.

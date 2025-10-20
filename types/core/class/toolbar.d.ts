@@ -1,3 +1,4 @@
+import type {} from '../../typedef';
 export default Toolbar;
 export type ToolbarThis = Omit<Toolbar & Partial<__se__EditorInjector>, 'toolbar' | 'subToolbar'>;
 /**
