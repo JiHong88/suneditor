@@ -1,4 +1,4 @@
-import type {} from 'typedef';
+import type {} from './typedef';
 declare namespace _default {
 	/**
 	 * Returns the create function with preset options.
@@ -27,7 +27,7 @@ declare namespace _default {
 	 * - Object: For multi-root setup. Each key maps to a config with `{target, options}`.
 	 * @param {SunEditorOptions} options - Initialization options
 	 * @param {SunEditorOptions} [_init_options] - Optional preset initialization options
-	 * @returns {Editor} - Instance of the SunEditor
+	 * @returns {SunEditorInstance} - Instance of the SunEditor
 	 * @throws {Error} If the target element is not provided or is invalid
 	 */
 	function create(
@@ -42,7 +42,7 @@ declare namespace _default {
 			  },
 		options: SunEditorOptions,
 		_init_options?: SunEditorOptions
-	): Editor;
+	): SunEditorInstance;
 }
 export default _default;
 /**
@@ -95,6 +95,7 @@ export type SunEditorPluginPaste = __se__PluginPasteParams;
  * Includes the clipboard event, cloned container, and component info.
  */
 export type SunEditorPluginCopyComponent = __se__PluginCopyComponentParams;
+export type SunEditorInstance = Editor;
 import Editor from './core/editor';
 import helper from './helper';
 import langs from './langs';

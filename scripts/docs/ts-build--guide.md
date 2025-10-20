@@ -17,7 +17,7 @@ npm run ts-build
 ```
 
 ```json
-"ts-build": "(npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/format-index.cjs && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && node scripts/gen-options-dts.cjs && npm run lint:fix-ts"
+"ts-build": "(npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/format-index.cjs && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && node scripts/gen-options-dts.cjs && node scripts/inject-typedef-import.cjs && npm run lint:fix-ts"
 ```
 
 ---
@@ -60,7 +60,13 @@ npm run ts-build
     - `core/config/options.js > DEFAULTS` 객체의 실제 값들을 기반으로 `options.d.ts` 내 `export namespace DEFAULTS` 타입 정의를 덮어씀
     - 문자열, 배열, 객체 등의 값을 정확히 리터럴 타입으로 유지하여 자동으로 타입 갱신
 
-9. **`lint:fix-ts`**
+9. **`inject-typedef-import.cjs`**
+    - `types/` 폴더의 모든 `.d.ts` 파일에 `typedef.d.ts`의 전역 타입 import를 자동 주입
+    - `typedef.d.ts`와 `index.d.ts`를 제외한 모든 파일에 `import type {} from './relative/path/typedef';` 추가
+    - 이미 import가 있는 파일은 건너뛰어 중복 방지
+    - 전역 타입(`__se__`로 시작하는 타입들)을 모든 타입 파일에서 사용 가능하게 만듦
+
+10. **`lint:fix-ts`**
     - 최종 `.d.ts` 파일에 대해 ESLint를 적용하여 포맷팅 및 스타일 정리 수행
 
 ---
@@ -90,14 +96,15 @@ types/
 
 ## 🛠 커스텀 스크립트 역할 정리
 
-| 스크립트 파일            | 설명                                                                                  |
-| ------------------------ | ------------------------------------------------------------------------------------- |
-| `format-index.cjs`       | `barrelsby`가 생성한 `index.ts`를 재구성, 모듈 re-export 및 공개 API 타입 10개 export |
-| `fix-langs.cjs`          | UMD 스타일 `langs/*.js` → TypeScript 형식으로 `export` 구조 변환                      |
-| `wrap-dts.cjs`           | `typedef.d.ts`에 `global {}` 래핑 추가                                                |
-| `rename-index.cjs`       | `index.ts` → `index.d.ts` 이름 변경                                                   |
-| `remove-this-params.cjs` | `prototype` 기반 constructor의 잘못된 `this` 파라미터 제거                            |
-| `gen-options-dts.cjs`    | `DEFAULTS` 객체 기반으로 `options.d.ts` 타입 정의 자동 갱신                           |
+| 스크립트 파일               | 설명                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| `format-index.cjs`          | `barrelsby`가 생성한 `index.ts`를 재구성, 모듈 re-export 및 공개 API 타입 10개 export |
+| `fix-langs.cjs`             | UMD 스타일 `langs/*.js` → TypeScript 형식으로 `export` 구조 변환                      |
+| `wrap-dts.cjs`              | `typedef.d.ts`에 `global {}` 래핑 추가                                                |
+| `rename-index.cjs`          | `index.ts` → `index.d.ts` 이름 변경                                                   |
+| `remove-this-params.cjs`    | `prototype` 기반 constructor의 잘못된 `this` 파라미터 제거                            |
+| `gen-options-dts.cjs`       | `DEFAULTS` 객체 기반으로 `options.d.ts` 타입 정의 자동 갱신                           |
+| `inject-typedef-import.cjs` | 모든 `.d.ts` 파일에 `typedef.d.ts`의 전역 타입 import 자동 주입                       |
 
 ---
 

@@ -1,4 +1,3 @@
-import type {} from '../../typedef';
 declare namespace _default {
 	export let redo: string;
 	export let undo: string;

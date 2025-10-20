@@ -13,23 +13,40 @@ function getTypedefImportPath(filePath) {
 	const dir = path.dirname(filePath);
 	const relativePath = path.relative(dir, path.join(typesDir, 'typedef'));
 	// Convert Windows paths to Unix-style for imports
-	return relativePath.split(path.sep).join('/');
+	let importPath = relativePath.split(path.sep).join('/');
+	// Ensure same-directory imports have './' prefix
+	if (!importPath.startsWith('.')) {
+		importPath = './' + importPath;
+	}
+	return importPath;
 }
 
 /**
- * Check if file already has typedef import
+ * Check if file already has correct typedef import
  * @param {string} content - File content
+ * @param {string} expectedPath - Expected import path
  * @returns {boolean}
  */
-function hasTypedefImport(content) {
-	return /import\s+type\s*\{\s*\}\s*from\s+['"].*typedef['"];?/.test(content);
+function hasCorrectTypedefImport(content, expectedPath) {
+	const escapedPath = expectedPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	const regex = new RegExp(`import\\s+type\\s*\\{\\s*\\}\\s*from\\s+['"]${escapedPath}['"];?`);
+	return regex.test(content);
+}
+
+/**
+ * Remove any existing typedef import (correct or incorrect)
+ * @param {string} content - File content
+ * @returns {string} - Content without typedef import
+ */
+function removeTypedefImport(content) {
+	return content.replace(/import\s+type\s*\{\s*\}\s*from\s+['"].*typedef['"];?\n?/g, '');
 }
 
 async function injectTypedefImport() {
 	try {
 		// Find all .d.ts files except typedef.d.ts itself and index.d.ts files in root
 		const files = await glob('types/**/*.d.ts', {
-			ignore: ['types/typedef.d.ts', 'types/index.d.ts']
+			ignore: ['types/typedef.d.ts', 'types/index.d.ts', 'types/langs/*.d.ts', 'types/assets/**/*.d.ts']
 		});
 
 		if (files.length === 0) {
@@ -42,17 +59,20 @@ async function injectTypedefImport() {
 		for (const file of files) {
 			const content = await fs.promises.readFile(file, 'utf8');
 
-			// Skip if already has typedef import
-			if (hasTypedefImport(content)) {
+			// Calculate the correct import path
+			const importPath = getTypedefImportPath(file);
+
+			// Skip if already has correct typedef import
+			if (hasCorrectTypedefImport(content, importPath)) {
 				continue;
 			}
 
-			// Calculate the correct import path
-			const importPath = getTypedefImportPath(file);
-			const importStatement = `import type {} from '${importPath}';\n`;
+			// Remove any existing (incorrect) typedef import
+			const cleanedContent = removeTypedefImport(content);
 
-			// Add import at the beginning of the file
-			const updatedContent = importStatement + content;
+			// Add correct import at the beginning of the file
+			const importStatement = `import type {} from '${importPath}';\n`;
+			const updatedContent = importStatement + cleanedContent;
 
 			await fs.promises.writeFile(file, updatedContent, 'utf8');
 			updatedCount++;

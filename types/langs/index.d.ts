@@ -1,4 +1,3 @@
-import type {} from '../typedef';
 declare namespace _default {
 	export { ckb };
 	export { cs };

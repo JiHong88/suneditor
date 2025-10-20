@@ -1,4 +1,4 @@
-import type {} from 'typedef';
+import type {} from './typedef';
 declare namespace _default {
 	let onload: any;
 	let onScroll: any;
