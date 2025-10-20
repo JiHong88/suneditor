@@ -77,6 +77,10 @@ export { plugins, modules, helper, langs };
  * @typedef {__se__PluginCopyComponentParams} SunEditorPluginCopyComponent
  */
 
+/**
+ * @typedef {Editor} SunEditorInstance
+ */
+
 // ================================================================================================================================
 // === SUNEDITOR FACTORY
 // ================================================================================================================================
@@ -106,7 +110,7 @@ export default {
 	 * - Object: For multi-root setup. Each key maps to a config with `{target, options}`.
 	 * @param {SunEditorOptions} options - Initialization options
 	 * @param {SunEditorOptions} [_init_options] - Optional preset initialization options
-	 * @returns {Editor} - Instance of the SunEditor
+	 * @returns {SunEditorInstance} - Instance of the SunEditor
 	 * @throws {Error} If the target element is not provided or is invalid
 	 */
 	create(target, options, _init_options) {

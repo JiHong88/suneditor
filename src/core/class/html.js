@@ -1334,7 +1334,9 @@ HTML.prototype = {
 		const indentSize = codeSize > 0 ? new Array(codeSize + 1).join(' ') : '';
 
 		(function recursionFunc(element, indent) {
-			const children = element.childNodes;
+			const children = element?.childNodes;
+			if (!children) return;
+
 			const elementRegTest = brReg.test(element.nodeName);
 			const elementIndent = elementRegTest ? indent : '';
 
