@@ -13,6 +13,7 @@ export type {
 	SunEditorComponentInfo,
 	SunEditorCore,
 	SunEditorFrameOptions,
+	SunEditorInstance,
 	SunEditorOptions,
 	SunEditorPluginCopyComponent,
 	SunEditorPluginKeyEvent,

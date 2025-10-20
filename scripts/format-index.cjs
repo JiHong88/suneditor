@@ -29,6 +29,7 @@ ${modules.map((mod) => `export { default as ${mod} } from './${mod}';`).join('\n
 
 // Export types
 export type {
+	SunEditorInstance,
 	SunEditorOptions,
 	SunEditorFrameOptions,
 	SunEditorCore,
