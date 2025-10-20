@@ -264,9 +264,9 @@ export namespace DEFAULTS {
  * - Added the default value {@link DEFAULTS.CLASS_NAME}
  *
  * #### 2) Attribute Control
- * @property {Object<string, string>} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
+ * @property {{[key: string]: string|undefined}} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
  * - Rules for objects specified here will be merged into the {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
- * @property {Object<string, string>} [attributeBlacklist=null] - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
+ * @property {{[key: string]: string|undefined}} [attributeBlacklist=null] - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
  * - Attributes specified here will eventually be removed even if they are allowed by other settings.
  * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
  *
@@ -337,7 +337,7 @@ export namespace DEFAULTS {
  * @property {Element|string} [statusbar_container] - Container element for the status bar.
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
- * @property {Object<string, Array<string>>} [shortcuts={}] - Custom keyboard shortcuts.
+ * @property {{[key: string]: Array<string>|undefined}} [shortcuts={}] - Custom keyboard shortcuts.
  *
  * === Advanced Features ===
  * @property {boolean} [copyFormatKeepOn=false] - Keeps the format of the copied content.
@@ -362,7 +362,7 @@ export namespace DEFAULTS {
  *
  * === Dynamic Options ===
  * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax.
- * @property {Object<string, (...args: *) => *>} [events={}] - Custom event handlers.
+ * @property {{[key: string]: ((...args: *) => *)|undefined}} [events={}] - Custom event handlers.
  * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags.
  * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
  *
@@ -763,7 +763,7 @@ export type EditorBaseOptions = {
 	 * - Rules for objects specified here will be merged into the {@link PrivateBaseOptions.__defaultAttributeWhitelist}.
 	 */
 	attributeWhitelist?: {
-		[x: string]: string;
+		[key: string]: string | undefined;
 	};
 	/**
 	 * - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
@@ -773,7 +773,7 @@ export type EditorBaseOptions = {
 	 * #### 3) Text & Inline Style Control
 	 */
 	attributeBlacklist?: {
-		[x: string]: string;
+		[key: string]: string | undefined;
 	};
 	/**
 	 * - Additional text style tags.
@@ -933,7 +933,7 @@ export type EditorBaseOptions = {
 	 * === Advanced Features ===
 	 */
 	shortcuts?: {
-		[x: string]: string[];
+		[key: string]: Array<string> | undefined;
 	};
 	/**
 	 * - Keeps the format of the copied content.
@@ -1002,7 +1002,7 @@ export type EditorBaseOptions = {
 	 * - Custom event handlers.
 	 */
 	events?: {
-		[x: string]: (...args: any) => any;
+		[key: string]: ((...args: any) => any) | undefined;
 	};
 	/**
 	 * - Specifies extra allowed or disallowed tags.
