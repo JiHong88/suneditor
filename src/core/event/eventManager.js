@@ -14,7 +14,7 @@ import { OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './handlers/handler_ww_key';
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './handlers/handler_ww_clipboard';
 import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './handlers/handler_ww_dragDrop';
 
-const { _w, ON_OVER_COMPONENT, isMobile, isTouchDevice } = env;
+const { _w, _d, ON_OVER_COMPONENT, isMobile, isTouchDevice } = env;
 
 /**
  * @typedef {Omit<EventManager & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
@@ -107,7 +107,7 @@ EventManager.prototype = {
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return null;
-		if (!numbers.is(target.length) || target.nodeName || (!Array.isArray(target) && target.length < 1)) target = [target];
+		if (target === _w || target === _d || typeof target.length !== 'number' || target.nodeType || (!Array.isArray(target) && target.length < 1)) target = [target];
 		if (target.length === 0) return null;
 
 		const len = target.length;
