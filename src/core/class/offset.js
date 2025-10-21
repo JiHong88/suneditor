@@ -644,9 +644,7 @@ Offset.prototype = {
 		const { rmt, rmb, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, rects, isTargetAbs, wwScroll);
 		if (rmb + targetH <= 0 || rmt + rt + targetH <= 0) return;
 
-		_w.setTimeout(() => {
-			element.style.visibility = '';
-		}, 0);
+		element.style.visibility = '';
 
 		return true;
 	},
