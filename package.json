@@ -141,8 +141,7 @@
 		"types",
 		"dist",
 		"README.md",
-		"CONTRIBUTING.md",
-		"LICENSE"
+		"LICENSE.txt"
 	],
 	"keywords": [
 		"suneditor",
