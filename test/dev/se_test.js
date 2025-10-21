@@ -35,7 +35,7 @@ import langs, { pl } from '../../src/langs';
 // import fontColor from '../../src/plugins/dropdown/fontColor';
 // import backgroundColor from '../../src/plugins/dropdown/backgroundColor';
 // import fontSize from '../../src/plugins/dropdown/fontSize';
-// import formatBlock from '../../src/plugins/dropdown/formatBlock';
+// import blockStyle from '../../src/plugins/dropdown/blockStyle';
 // import hr from '../../src/plugins/dropdown/hr';
 // import lineHeight from '../../src/plugins/dropdown/lineHeight';
 // import list from '../../src/plugins/dropdown/list';
@@ -57,7 +57,7 @@ const bl = [
 	// full size
 	['undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
 	'|',
-	['blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle', 'textStyle'],
+	['blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle', 'textStyle'],
 	'|',
 	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
 	['fontColor', 'backgroundColor'],
@@ -89,7 +89,7 @@ const bl = [
 		[
 			['undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
 			'|',
-			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
+			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
 			'|',
 			['textStyle'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -120,7 +120,7 @@ const bl = [
 		[
 			['undo', 'redo', '|', 'dir', 'newDocument', 'selectAll', 'save', 'preview', 'print', 'exportPDF'],
 			'|',
-			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
+			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
 			'|',
 			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
 			['outdent', 'indent'],
@@ -143,7 +143,7 @@ const bl = [
 			'|',
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll'],
 			['save'],
-			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
+			[':Paragraph-default.more_paragraph', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
 			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
 			['outdent', 'indent'],
 			[':Insert-default.more_plus', 'table', 'hr', 'link', 'anchor', 'math'],
@@ -164,7 +164,7 @@ const bl = [
 			['undo', 'redo'],
 			'|',
 			[':Docs-default.more_horizontal', 'dir', 'newDocument', 'selectAll', 'save'],
-			[':Paragraph-default.more_paragraph', 'outdent', 'indent', '|', 'blockquote', '|', 'formatBlock', 'font', 'fontSize', '|', 'paragraphStyle'],
+			[':Paragraph-default.more_paragraph', 'outdent', 'indent', '|', 'blockquote', '|', 'blockStyle', 'font', 'fontSize', '|', 'paragraphStyle'],
 			[':Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', '|', 'removeFormat', 'copyFormat', 'textStyle', 'copy'],
 			[':Insert-default.more_plus', 'table', 'hr', 'link', 'anchor', 'math'],
 			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted'],
@@ -178,7 +178,7 @@ const bl = [
 const bb = [
 	['anchor', 'newDocument', 'selectAll', 'undo', 'redo', 'drawing', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak', 'dir'],
 	['dir_ltr', 'dir_rtl'],
-	['font', 'fontSize', 'formatBlock'],
+	['font', 'fontSize', 'blockStyle'],
 	['paragraphStyle', 'blockquote'],
 	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
 	['fontColor', 'backgroundColor', 'textStyle'],
@@ -320,7 +320,7 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	// 	['outdent', 'indent'],
 // 	// 	['fullScreen', 'showBlocks', 'codeView'],
 // 	// 	['preview', 'print'],
-// 	// 	['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'hr'],
+// 	// 	['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'blockStyle', 'hr'],
 // 	// 	['lineHeight', 'list', 'paragraphStyle', 'template', 'layout', 'textStyle', 'table'],
 // 	// 	['math', 'link', 'audio', 'image', 'video']
 // 	// ],
@@ -599,7 +599,7 @@ const options1 = {
 	// buttonList: [
 	// 	['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 	// 	'|',
-	// 	[':문단&글꼴-default.more_paragraph', 'font', 'fontSize', 'formatBlock', '|', 'paragraphStyle', 'blockquote'],
+	// 	[':문단&글꼴-default.more_paragraph', 'font', 'fontSize', 'blockStyle', '|', 'paragraphStyle', 'blockquote'],
 	// 	'|',
 	// 	[':글자 스타일-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'copyFormat', 'removeFormat'],
 	// 	'|',

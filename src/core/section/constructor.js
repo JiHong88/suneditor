@@ -632,9 +632,9 @@ export function InitOptions(options, editorTargets, plugins) {
 					list_numbered: ['!+1.+_+~shortcut', ''],
 					list_bulleted: ['!+*.+_+~shortcut', ''],
 					// custom
-					_h1: ['c+s+Digit1|Numpad1+$~formatBlock.applyHeaderByShortcut', ''],
-					_h2: ['c+s+Digit2|Numpad2+$~formatBlock.applyHeaderByShortcut', ''],
-					_h3: ['c+s+Digit3|Numpad3+$~formatBlock.applyHeaderByShortcut', '']
+					_h1: ['c+s+Digit1|Numpad1+$~blockStyle.applyHeaderByShortcut', ''],
+					_h2: ['c+s+Digit2|Numpad2+$~blockStyle.applyHeaderByShortcut', ''],
+					_h3: ['c+s+Digit3|Numpad3+$~blockStyle.applyHeaderByShortcut', '']
 				},
 				options.shortcuts || {}
 			].reduce((_default, _new) => {

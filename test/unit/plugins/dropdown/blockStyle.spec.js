@@ -1,8 +1,8 @@
 /**
- * @fileoverview Unit tests for plugins/dropdown/formatBlock.js
+ * @fileoverview Unit tests for plugins/dropdown/blockStyle.js
  */
 
-import FormatBlock from '../../../../src/plugins/dropdown/formatBlock.js';
+import BlockStyle from '../../../../src/plugins/dropdown/blockStyle.js';
 
 // Mock helper
 jest.mock('../../../../src/helper', () => ({
@@ -78,9 +78,9 @@ jest.mock('../../../../src/editorInjector/_core.js', () => {
     });
 });
 
-describe('Plugins - Dropdown - FormatBlock', () => {
+describe('Plugins - Dropdown - blockStyle', () => {
     let mockEditor;
-    let formatBlock;
+    let blockStyle;
     let pluginOptions;
 
     beforeEach(() => {
@@ -118,21 +118,21 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             items: ['p', 'h1', 'h2', 'blockquote', 'pre']
         };
 
-        formatBlock = new FormatBlock(mockEditor, pluginOptions);
+        blockStyle = new BlockStyle(mockEditor, pluginOptions);
     });
 
     describe('Constructor', () => {
-        it('should create FormatBlock instance with required properties', () => {
-            expect(formatBlock).toBeInstanceOf(FormatBlock);
-            expect(formatBlock.title).toBe('Formats');
-            expect(formatBlock.inner).toContain('<span class="se-txt">Formats</span>');
-            expect(formatBlock.inner).toContain('<svg>down</svg>');
-            expect(formatBlock.formatList).toBeDefined();
-            expect(formatBlock.currentFormat).toBe('');
+        it('should create BlockStyle instance with required properties', () => {
+            expect(blockStyle).toBeInstanceOf(BlockStyle);
+            expect(blockStyle.title).toBe('Formats');
+            expect(blockStyle.inner).toContain('<span class="se-txt">Formats</span>');
+            expect(blockStyle.inner).toContain('<svg>down</svg>');
+            expect(blockStyle.formatList).toBeDefined();
+            expect(blockStyle.currentFormat).toBe('');
         });
 
         it('should create dropdown menu structure', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
             expect(dom.utils.createElement).toHaveBeenCalledWith(
                 'DIV',
                 { class: 'se-dropdown se-list-layer se-list-format' },
@@ -141,20 +141,20 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         });
 
         it('should initialize dropdown menu', () => {
-            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(FormatBlock, expect.any(Object));
+            expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(BlockStyle, expect.any(Object));
         });
 
         it('should initialize format list from menu', () => {
-            expect(formatBlock.formatList).toHaveLength(3);
+            expect(blockStyle.formatList).toHaveLength(3);
         });
 
         it('should use default formats when none provided', () => {
-            const defaultFormatBlock = new FormatBlock(mockEditor, {});
+            const defaultFormatBlock = new BlockStyle(mockEditor, {});
             expect(defaultFormatBlock.formatList).toBeDefined();
         });
 
         it('should use default formats when items is empty', () => {
-            const emptyFormatBlock = new FormatBlock(mockEditor, { items: [] });
+            const emptyFormatBlock = new BlockStyle(mockEditor, { items: [] });
             expect(emptyFormatBlock.formatList).toBeDefined();
         });
     });
@@ -174,9 +174,9 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         });
 
         it('should set default format title when no element provided', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            const result = formatBlock.active(null, mockTarget);
+            const result = blockStyle.active(null, mockTarget);
 
             expect(dom.utils.changeTxt).toHaveBeenCalledWith(mockTargetText, 'Formats');
             expect(result).toBe(false);
@@ -186,7 +186,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             const mockElement = document.createElement('span');
             mockEditor.format.isLine.mockReturnValue(false);
 
-            const result = formatBlock.active(mockElement, mockTarget);
+            const result = blockStyle.active(mockElement, mockTarget);
 
             expect(result).toBe(false);
         });
@@ -197,9 +197,9 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 className: ''
             };
             mockEditor.format.isLine.mockReturnValue(true);
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            const result = formatBlock.active(mockElement, mockTarget);
+            const result = blockStyle.active(mockElement, mockTarget);
 
             expect(dom.utils.changeTxt).toHaveBeenCalledWith(mockTargetText, 'Paragraph');
             expect(mockTargetText.setAttribute).toHaveBeenCalledWith('data-value', 'p');
@@ -214,7 +214,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             };
             mockEditor.format.isLine.mockReturnValue(true);
 
-            formatBlock.formatList = [{
+            blockStyle.formatList = [{
                 getAttribute: jest.fn().mockImplementation((attr) => {
                     if (attr === 'data-value') return 'div';
                     if (attr === 'data-class') return '__se__format__custom';
@@ -223,9 +223,9 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 title: 'Custom Div'
             }];
 
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            const result = formatBlock.active(mockElement, mockTarget);
+            const result = blockStyle.active(mockElement, mockTarget);
 
             expect(dom.utils.changeTxt).toHaveBeenCalledWith(mockTargetText, 'Custom Div');
             expect(mockTargetText.setAttribute).toHaveBeenCalledWith('data-value', 'div');
@@ -239,9 +239,9 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 className: ''
             };
             mockEditor.format.isLine.mockReturnValue(true);
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            const result = formatBlock.active(mockElement, mockTarget);
+            const result = blockStyle.active(mockElement, mockTarget);
 
             expect(dom.utils.changeTxt).toHaveBeenCalledWith(mockTargetText, 'Formats');
             expect(mockTargetText.setAttribute).toHaveBeenCalledWith('data-value', 'span');
@@ -255,9 +255,9 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 className: ''
             };
             mockEditor.format.isLine.mockReturnValue(true);
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            const result = formatBlock.active(mockElement, mockTarget);
+            const result = blockStyle.active(mockElement, mockTarget);
 
             expect(dom.utils.changeTxt).toHaveBeenCalledWith(mockTargetText, 'Header 1');
             expect(mockTargetText.setAttribute).toHaveBeenCalledWith('data-value', 'h1');
@@ -270,9 +270,9 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 className: ''
             };
             mockEditor.format.isLine.mockReturnValue(true);
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            const result = formatBlock.active(mockElement, mockTarget);
+            const result = blockStyle.active(mockElement, mockTarget);
 
             expect(dom.utils.changeTxt).toHaveBeenCalledWith(mockTargetText, 'Blockquote');
             expect(mockTargetText.setAttribute).toHaveBeenCalledWith('data-value', 'blockquote');
@@ -285,20 +285,20 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 className: undefined // No className property
             };
             mockEditor.format.isLine.mockReturnValue(true);
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
             // This will throw because className.match is called on undefined
             expect(() => {
-                formatBlock.active(mockElement, mockTarget);
+                blockStyle.active(mockElement, mockTarget);
             }).toThrow();
         });
 
         it('should handle missing querySelector result', () => {
             mockTarget.querySelector.mockReturnValue(null);
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
             // Will call changeTxt with null target, should not throw
-            const result = formatBlock.active(null, mockTarget);
+            const result = blockStyle.active(null, mockTarget);
 
             expect(dom.utils.changeTxt).toHaveBeenCalledWith(null, 'Formats');
             expect(result).toBe(false);
@@ -317,7 +317,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 querySelector: jest.fn().mockReturnValue(mockTargetText)
             };
 
-            formatBlock.formatList = [
+            blockStyle.formatList = [
                 {
                     getAttribute: jest.fn().mockImplementation((attr) => {
                         if (attr === 'data-value') return 'p';
@@ -348,15 +348,15 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 if (attr === 'data-class') return '';
                 return null;
             });
-            formatBlock.currentFormat = 'different'; // Force update
-            const { dom } = require('../../../../src/helper');
+            blockStyle.currentFormat = 'different'; // Force update
+            const { dom } = require('../../../../src/helper/index.js');
 
-            formatBlock.on(mockTarget);
+            blockStyle.on(mockTarget);
 
-            expect(dom.utils.removeClass).toHaveBeenCalledWith(formatBlock.formatList[0], 'active');
-            expect(dom.utils.addClass).toHaveBeenCalledWith(formatBlock.formatList[1], 'active');
-            expect(dom.utils.removeClass).toHaveBeenCalledWith(formatBlock.formatList[2], 'active');
-            expect(formatBlock.currentFormat).toBe('h1');
+            expect(dom.utils.removeClass).toHaveBeenCalledWith(blockStyle.formatList[0], 'active');
+            expect(dom.utils.addClass).toHaveBeenCalledWith(blockStyle.formatList[1], 'active');
+            expect(dom.utils.removeClass).toHaveBeenCalledWith(blockStyle.formatList[2], 'active');
+            expect(blockStyle.currentFormat).toBe('h1');
         });
 
         it('should handle format with class', () => {
@@ -365,20 +365,20 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 if (attr === 'data-class') return '__se__format__custom';
                 return null;
             });
-            formatBlock.currentFormat = 'different'; // Force update
+            blockStyle.currentFormat = 'different'; // Force update
 
-            formatBlock.formatList[0].getAttribute.mockImplementation((attr) => {
+            blockStyle.formatList[0].getAttribute.mockImplementation((attr) => {
                 if (attr === 'data-value') return 'div';
                 if (attr === 'data-class') return '__se__format__custom';
                 return null;
             });
 
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            formatBlock.on(mockTarget);
+            blockStyle.on(mockTarget);
 
-            expect(dom.utils.addClass).toHaveBeenCalledWith(formatBlock.formatList[0], 'active');
-            expect(formatBlock.currentFormat).toBe('div__se__format__custom');
+            expect(dom.utils.addClass).toHaveBeenCalledWith(blockStyle.formatList[0], 'active');
+            expect(blockStyle.currentFormat).toBe('div__se__format__custom');
         });
 
         it('should not update when current format is same', () => {
@@ -387,10 +387,10 @@ describe('Plugins - Dropdown - FormatBlock', () => {
                 if (attr === 'data-class') return '';
                 return null;
             });
-            formatBlock.currentFormat = 'p'; // Same as current
-            const { dom } = require('../../../../src/helper');
+            blockStyle.currentFormat = 'p'; // Same as current
+            const { dom } = require('../../../../src/helper/index.js');
 
-            formatBlock.on(mockTarget);
+            blockStyle.on(mockTarget);
 
             expect(dom.utils.addClass).not.toHaveBeenCalled();
             expect(dom.utils.removeClass).not.toHaveBeenCalled();
@@ -398,20 +398,20 @@ describe('Plugins - Dropdown - FormatBlock', () => {
 
         it('should handle null data attributes', () => {
             mockTargetText.getAttribute.mockReturnValue(null);
-            formatBlock.currentFormat = 'different'; // Force update
-            const { dom } = require('../../../../src/helper');
+            blockStyle.currentFormat = 'different'; // Force update
+            const { dom } = require('../../../../src/helper/index.js');
 
-            formatBlock.on(mockTarget);
+            blockStyle.on(mockTarget);
 
-            expect(formatBlock.currentFormat).toBe('');
+            expect(blockStyle.currentFormat).toBe('');
         });
 
         it('should handle empty format list', () => {
-            formatBlock.formatList = [];
+            blockStyle.formatList = [];
             mockTargetText.getAttribute.mockReturnValue('p');
 
             expect(() => {
-                formatBlock.on(mockTarget);
+                blockStyle.on(mockTarget);
             }).not.toThrow();
         });
 
@@ -419,7 +419,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             mockTarget.querySelector.mockReturnValue(null);
 
             expect(() => {
-                formatBlock.on(mockTarget);
+                blockStyle.on(mockTarget);
             }).toThrow();
         });
     });
@@ -437,7 +437,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         it('should apply block format when command is "block"', () => {
             mockTarget.getAttribute.mockReturnValue('block');
 
-            formatBlock.action(mockTarget);
+            blockStyle.action(mockTarget);
 
             expect(mockEditor.format.applyBlock).toHaveBeenCalledWith(mockTarget.firstElementChild);
             expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
@@ -446,7 +446,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         it('should set br-line format when command is "br-line"', () => {
             mockTarget.getAttribute.mockReturnValue('br-line');
 
-            formatBlock.action(mockTarget);
+            blockStyle.action(mockTarget);
 
             expect(mockEditor.format.setBrLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
             expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
@@ -455,7 +455,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         it('should set line format when command is "line"', () => {
             mockTarget.getAttribute.mockReturnValue('line');
 
-            formatBlock.action(mockTarget);
+            blockStyle.action(mockTarget);
 
             expect(mockEditor.format.setLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
             expect(mockEditor.menu.dropdownOff).toHaveBeenCalled();
@@ -464,7 +464,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         it('should set line format for unknown commands', () => {
             mockTarget.getAttribute.mockReturnValue('unknown');
 
-            formatBlock.action(mockTarget);
+            blockStyle.action(mockTarget);
 
             expect(mockEditor.format.setLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
         });
@@ -472,7 +472,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         it('should handle null data-command', () => {
             mockTarget.getAttribute.mockReturnValue(null);
 
-            formatBlock.action(mockTarget);
+            blockStyle.action(mockTarget);
 
             expect(mockEditor.format.setLine).toHaveBeenCalledWith(mockTarget.firstElementChild);
         });
@@ -481,7 +481,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             mockTarget.firstElementChild = null;
             mockTarget.getAttribute.mockReturnValue('line');
 
-            formatBlock.action(mockTarget);
+            blockStyle.action(mockTarget);
 
             expect(mockEditor.format.setLine).toHaveBeenCalledWith(null);
         });
@@ -490,9 +490,9 @@ describe('Plugins - Dropdown - FormatBlock', () => {
     describe('applyHeaderByShortcut method', () => {
         it('should create and apply H1 header', () => {
             const mockParams = { keyCode: 'ctrl+shift+1' }; // Key code ending with '1'
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            formatBlock.applyHeaderByShortcut(mockParams);
+            blockStyle.applyHeaderByShortcut(mockParams);
 
             expect(dom.utils.createElement).toHaveBeenCalledWith('H1');
             expect(mockEditor.format.setLine).toHaveBeenCalled();
@@ -500,36 +500,36 @@ describe('Plugins - Dropdown - FormatBlock', () => {
 
         it('should create and apply H2 header', () => {
             const mockParams = { keyCode: 'ctrl+shift+2' }; // Key code ending with '2'
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            formatBlock.applyHeaderByShortcut(mockParams);
+            blockStyle.applyHeaderByShortcut(mockParams);
 
             expect(dom.utils.createElement).toHaveBeenCalledWith('H2');
         });
 
         it('should create and apply H6 header', () => {
             const mockParams = { keyCode: 'ctrl+shift+6' }; // Key code ending with '6'
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            formatBlock.applyHeaderByShortcut(mockParams);
+            blockStyle.applyHeaderByShortcut(mockParams);
 
             expect(dom.utils.createElement).toHaveBeenCalledWith('H6');
         });
 
         it('should handle complex key codes', () => {
             const mockParams = { keyCode: 'ctrl+shift+3' }; // Contains '3' at the end
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            formatBlock.applyHeaderByShortcut(mockParams);
+            blockStyle.applyHeaderByShortcut(mockParams);
 
             expect(dom.utils.createElement).toHaveBeenCalledWith('H3');
         });
 
         it('should handle key code without number', () => {
             const mockParams = { keyCode: 'ctrl+shift+a' }; // No number
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
-            formatBlock.applyHeaderByShortcut(mockParams);
+            blockStyle.applyHeaderByShortcut(mockParams);
 
             expect(dom.utils.createElement).toHaveBeenCalledWith('Hundefined'); // No number found
         });
@@ -538,14 +538,14 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             const mockParams = { keyCode: null };
 
             expect(() => {
-                formatBlock.applyHeaderByShortcut(mockParams);
+                blockStyle.applyHeaderByShortcut(mockParams);
             }).toThrow();
         });
     });
 
     describe('CreateHTML function', () => {
         it('should create dropdown menu with custom items', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
 
             const createCallArgs = dom.utils.createElement.mock.calls.find(
                 call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
@@ -563,10 +563,10 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         });
 
         it('should include default formats when no items provided', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const defaultFormatBlock = new FormatBlock(mockEditor, {});
+            const defaultFormatBlock = new BlockStyle(mockEditor, {});
 
             const createCallArgs = dom.utils.createElement.mock.calls.find(
                 call => call[1]?.class === 'se-dropdown se-list-layer se-list-format'
@@ -584,10 +584,10 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         });
 
         it('should handle custom format objects', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const customFormatBlock = new FormatBlock(mockEditor, {
+            const customFormatBlock = new BlockStyle(mockEditor, {
                 items: [
                     {
                         tag: 'DIV',
@@ -610,10 +610,10 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         });
 
         it('should handle format objects without name', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const noNameFormatBlock = new FormatBlock(mockEditor, {
+            const noNameFormatBlock = new BlockStyle(mockEditor, {
                 items: [
                     {
                         tag: 'SPAN',
@@ -630,10 +630,10 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         });
 
         it('should handle format objects without class', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const noClassFormatBlock = new FormatBlock(mockEditor, {
+            const noClassFormatBlock = new BlockStyle(mockEditor, {
                 items: [
                     {
                         tag: 'SPAN',
@@ -653,10 +653,10 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         });
 
         it('should handle all header types', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const headerFormatBlock = new FormatBlock(mockEditor, {
+            const headerFormatBlock = new BlockStyle(mockEditor, {
                 items: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
             });
 
@@ -673,10 +673,10 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         });
 
         it('should handle mixed string and object formats', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
-            const mixedFormatBlock = new FormatBlock(mockEditor, {
+            const mixedFormatBlock = new BlockStyle(mockEditor, {
                 items: [
                     'p',
                     { tag: 'DIV', name: 'Custom Div', command: 'line' },
@@ -695,12 +695,12 @@ describe('Plugins - Dropdown - FormatBlock', () => {
         });
 
         it('should process invalid string formats as objects', () => {
-            const { dom } = require('../../../../src/helper');
+            const { dom } = require('../../../../src/helper/index.js');
             dom.utils.createElement.mockClear();
 
             // Invalid string items that are not in default list are processed as objects and will error
             expect(() => {
-                new FormatBlock(mockEditor, {
+                new BlockStyle(mockEditor, {
                     items: ['p', 'invalid-tag', 'h1']
                 });
             }).toThrow(); // Will throw when trying to process 'invalid-tag' as format object
@@ -715,7 +715,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             };
 
             expect(() => {
-                formatBlock.action(mockTarget);
+                blockStyle.action(mockTarget);
             }).not.toThrow();
 
             expect(mockEditor.format.setLine).toHaveBeenCalled();
@@ -732,7 +732,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             mockEditor.format.isLine.mockReturnValue(true);
 
             expect(() => {
-                formatBlock.active(mockElement, mockTarget);
+                blockStyle.active(mockElement, mockTarget);
             }).not.toThrow();
 
             expect(mockEditor.format.isLine).toHaveBeenCalledWith(mockElement);
@@ -742,7 +742,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             const mockParams = { keyCode: '49' };
 
             expect(() => {
-                formatBlock.applyHeaderByShortcut(mockParams);
+                blockStyle.applyHeaderByShortcut(mockParams);
             }).not.toThrow();
 
             expect(mockEditor.format.setLine).toHaveBeenCalled();
@@ -754,12 +754,12 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             mockEditor.format = undefined;
 
             expect(() => {
-                new FormatBlock(mockEditor, {});
+                new BlockStyle(mockEditor, {});
             }).not.toThrow();
         });
 
         it('should handle missing format list gracefully', () => {
-            formatBlock.formatList = [];
+            blockStyle.formatList = [];
             const mockTarget = {
                 querySelector: jest.fn().mockReturnValue({
                     getAttribute: jest.fn().mockReturnValue('')
@@ -767,7 +767,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             };
 
             expect(() => {
-                formatBlock.on(mockTarget);
+                blockStyle.on(mockTarget);
             }).not.toThrow();
         });
 
@@ -775,19 +775,19 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             const mockTarget = {};
 
             expect(() => {
-                formatBlock.action(mockTarget);
+                blockStyle.action(mockTarget);
             }).toThrow();
         });
 
         it('should handle missing plugin options', () => {
             expect(() => {
-                new FormatBlock(mockEditor, {});
+                new BlockStyle(mockEditor, {});
             }).not.toThrow();
         });
 
         it('should handle null plugin options', () => {
             expect(() => {
-                new FormatBlock(mockEditor, null);
+                new BlockStyle(mockEditor, null);
             }).toThrow();
         });
 
@@ -798,7 +798,7 @@ describe('Plugins - Dropdown - FormatBlock', () => {
             ];
 
             expect(() => {
-                new FormatBlock(mockEditor, { items: invalidItems });
+                new BlockStyle(mockEditor, { items: invalidItems });
             }).toThrow(); // Will throw when trying to access undefined.toLowerCase
         });
     });

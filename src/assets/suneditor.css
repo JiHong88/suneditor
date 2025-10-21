@@ -983,7 +983,7 @@
 	border-color: transparent;
 }
 
-/* tool bar select button (font, fontSize, formatBlock) */
+/* tool bar select button (font, fontSize, blockStyle) */
 .sun-editor .se-btn-select {
 	width: auto;
 	display: flex;

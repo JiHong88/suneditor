@@ -1,29 +1,29 @@
 import type {} from '../../typedef';
-export default FormatBlock;
-export type FormatBlockPluginOptions = {
+export default BlockStyle;
+export type BlockStylePluginOptions = {
 	/**
 	 * - Format list
 	 */
 	items?: Array<string>;
 };
 /**
- * @typedef {Object} FormatBlockPluginOptions
+ * @typedef {Object} BlockStylePluginOptions
  * @property {Array<string>} [items] - Format list
  */
 /**
  * @class
- * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
+ * @description BlockStyle Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
  */
-declare class FormatBlock extends EditorInjector {
+declare class BlockStyle extends EditorInjector {
 	static key: string;
 	static type: string;
 	static className: string;
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {FormatBlockPluginOptions} pluginOptions - Plugin options
+	 * @param {BlockStylePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: FormatBlockPluginOptions);
+	constructor(editor: __se__EditorCore, pluginOptions: BlockStylePluginOptions);
 	title: any;
 	inner: string;
 	formatList: NodeListOf<Element>;
@@ -52,7 +52,7 @@ declare class FormatBlock extends EditorInjector {
 	action(target: HTMLElement): void;
 	/**
 	 * @description Create a header tag, call by "shortcut" class
-	 * - (e.g. shortcuts._h1: ['c+s+49+$~formatBlock.applyHeaderByShortcut', ''])
+	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])
 	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
 	applyHeaderByShortcut({ keyCode }: __se__PluginShortcutInfo): void;

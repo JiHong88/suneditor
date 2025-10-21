@@ -70,9 +70,21 @@ async function injectTypedefImport() {
 			// Remove any existing (incorrect) typedef import
 			const cleanedContent = removeTypedefImport(content);
 
-			// Add correct import at the beginning of the file
+			// Find existing imports to preserve them
+			const existingImports = [];
+			const importRegex = /^import\s+type\s*\{[^}]*\}\s*from\s*['"][^'"]+['"];?\s*$/gm;
+			let importMatch;
+			while ((importMatch = importRegex.exec(cleanedContent)) !== null) {
+				existingImports.push(importMatch[0]);
+			}
+
+			// Remove all imports from content
+			const contentWithoutImports = cleanedContent.replace(importRegex, '').replace(/^\s*\n/gm, '');
+
+			// Add typedef import + existing imports at the beginning
 			const importStatement = `import type {} from '${importPath}';\n`;
-			const updatedContent = importStatement + cleanedContent;
+			const allImports = existingImports.length > 0 ? importStatement + existingImports.join('\n') + '\n' : importStatement;
+			const updatedContent = allImports + contentWithoutImports;
 
 			await fs.promises.writeFile(file, updatedContent, 'utf8');
 			updatedCount++;

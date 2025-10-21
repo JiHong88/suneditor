@@ -12,7 +12,7 @@ declare namespace _default {
 	export { backgroundColor };
 	export { list };
 	export { table };
-	export { formatBlock };
+	export { blockStyle };
 	export { hr };
 	export { layout };
 	export { lineHeight };
@@ -48,9 +48,9 @@ import list_bulleted from './command/list_bulleted';
 import list_numbered from './command/list_numbered';
 import align from './dropdown/align';
 import backgroundColor from './dropdown/backgroundColor';
+import blockStyle from './dropdown/blockStyle';
 import font from './dropdown/font';
 import fontColor from './dropdown/fontColor';
-import formatBlock from './dropdown/formatBlock';
 import hr from './dropdown/hr';
 import layout from './dropdown/layout';
 import lineHeight from './dropdown/lineHeight';
@@ -77,6 +77,7 @@ export {
 	audioGallery,
 	backgroundColor,
 	blockquote,
+	blockStyle,
 	drawing,
 	embed,
 	exportPDF,
@@ -86,7 +87,6 @@ export {
 	font,
 	fontColor,
 	fontSize,
-	formatBlock,
 	hr,
 	image,
 	imageGallery,

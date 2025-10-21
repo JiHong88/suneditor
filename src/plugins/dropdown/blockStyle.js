@@ -2,23 +2,23 @@ import EditorInjector from '../../editorInjector';
 import { dom } from '../../helper';
 
 /**
- * @typedef {Object} FormatBlockPluginOptions
+ * @typedef {Object} BlockStylePluginOptions
  * @property {Array<string>} [items] - Format list
  */
 
 /**
  * @class
- * @description FormatBlock Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
+ * @description BlockStyle Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
  */
-class FormatBlock extends EditorInjector {
-	static key = 'formatBlock';
+class BlockStyle extends EditorInjector {
+	static key = 'blockStyle';
 	static type = 'dropdown';
 	static className = 'se-btn-select se-btn-tool-format';
 
 	/**
 	 * @constructor
 	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {FormatBlockPluginOptions} pluginOptions - Plugin options
+	 * @param {BlockStylePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
 		super(editor);
@@ -34,7 +34,7 @@ class FormatBlock extends EditorInjector {
 		this.currentFormat = '';
 
 		// init
-		this.menu.initDropdownTarget(FormatBlock, menu);
+		this.menu.initDropdownTarget(BlockStyle, menu);
 	}
 
 	/**
@@ -121,7 +121,7 @@ class FormatBlock extends EditorInjector {
 
 	/**
 	 * @description Create a header tag, call by "shortcut" class
-	 * - (e.g. shortcuts._h1: ['c+s+49+$~formatBlock.applyHeaderByShortcut', ''])
+	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])
 	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
 	applyHeaderByShortcut({ keyCode }) {
@@ -171,4 +171,4 @@ function CreateHTML({ lang }, items) {
 	return dom.utils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
 }
 
-export default FormatBlock;
+export default BlockStyle;

@@ -363,8 +363,9 @@ export const DEFAULTS = {
  * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags.
  * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
  *
- * === Dynamic Plugin Options ===
- * @property {Object<string, *>} [Dynamic_pluginOptions] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
+ * **Note:** This type also supports dynamic plugin options via index signature `[pluginName: string]: { [key: string]: any }`
+ * to allow plugin-specific configurations (e.g., `image: {}`, `video: {}`).
+ * The index signature is defined in the TypeScript `.d.ts` file but cannot be expressed in JSDoc.
  * ================================================================================================================================
  */
 

@@ -16,7 +16,7 @@ import backgroundColor from './dropdown/backgroundColor';
 import hr from './dropdown/hr';
 import list from './dropdown/list';
 import table from './dropdown/table';
-import formatBlock from './dropdown/formatBlock';
+import blockStyle from './dropdown/blockStyle';
 import layout from './dropdown/layout';
 import lineHeight from './dropdown/lineHeight';
 import template from './dropdown/template';
@@ -59,7 +59,7 @@ export {
 	backgroundColor,
 	list,
 	table,
-	formatBlock,
+	blockStyle,
 	hr,
 	layout,
 	lineHeight,
@@ -95,7 +95,7 @@ export default {
 	backgroundColor,
 	list,
 	table,
-	formatBlock,
+	blockStyle,
 	hr,
 	layout,
 	lineHeight,

@@ -145,31 +145,31 @@ describe('handler_toolbar', () => {
 		it('should handle button with data-value', () => {
 			const menuTrayDiv = document.createElement('div');
 			menuTrayDiv.className = 'se-menu-tray';
-			menuTrayDiv.setAttribute('data-key', 'formatBlock');
+			menuTrayDiv.setAttribute('data-key', 'blockStyle');
 
 			mockTarget.setAttribute('data-value', 'test-value');
-			mockTarget.setAttribute('data-command', 'formatBlock');
+			mockTarget.setAttribute('data-command', 'blockStyle');
 			menuTrayDiv.appendChild(mockTarget);
 
-			mockThis.plugins.formatBlock = {
+			mockThis.plugins.blockStyle = {
 				action: jest.fn()
 			};
 
 			OnClick_menuTray.call(mockThis, mockEvent);
 
 			expect(mockEvent.stopPropagation).toHaveBeenCalled();
-			expect(mockThis.plugins.formatBlock.action).toHaveBeenCalledWith(mockTarget);
+			expect(mockThis.plugins.blockStyle.action).toHaveBeenCalledWith(mockTarget);
 		});
 
 		it('should handle submenu items', () => {
 			const submenuItem = document.createElement('li');
 			submenuItem.setAttribute('data-value', 'h1');
-			submenuItem.setAttribute('data-command', 'formatBlock');
+			submenuItem.setAttribute('data-command', 'blockStyle');
 
 			// Create a parent with se-menu-tray class and data-key to satisfy the while loop
 			const menuTrayParent = document.createElement('div');
 			menuTrayParent.className = 'se-menu-tray some-other-class'; // className contains se-menu-tray
-			menuTrayParent.setAttribute('data-key', 'formatBlock');
+			menuTrayParent.setAttribute('data-key', 'blockStyle');
 
 			// Set up proper parent chain: menuTray -> submenuItem
 			menuTrayParent.appendChild(submenuItem);
@@ -181,14 +181,14 @@ describe('handler_toolbar', () => {
 			dom.query.getEventTarget.mockReturnValue(submenuItem);
 			dom.query.getCommandTarget.mockReturnValue(submenuItem);
 
-			mockThis.plugins.formatBlock = {
+			mockThis.plugins.blockStyle = {
 				action: jest.fn()
 			};
 
 			OnClick_menuTray.call(mockThis, mockEvent);
 
 			expect(mockEvent.stopPropagation).toHaveBeenCalled();
-			expect(mockThis.plugins.formatBlock.action).toHaveBeenCalledWith(submenuItem);
+			expect(mockThis.plugins.blockStyle.action).toHaveBeenCalledWith(submenuItem);
 
 			// Cleanup
 			document.body.removeChild(menuTrayParent);

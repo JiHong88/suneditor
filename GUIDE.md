@@ -105,7 +105,7 @@ suneditor/
 │   │   └── util/            # Core utilities (instanceCheck)
 │   ├── plugins/             # Modular features
 │   │   ├── command/         # Direct actions (blockquote, list, exportPDF)
-│   │   ├── dropdown/        # Dropdown menus (align, font, formatBlock, table)
+│   │   ├── dropdown/        # Dropdown menus (align, font, blockStyle, table)
 │   │   ├── modal/           # Dialog plugins (image, video, link, math)
 │   │   ├── browser/         # Gallery plugins (imageGallery, videoGallery)
 │   │   ├── field/           # Autocomplete (mention)
@@ -253,7 +253,7 @@ suneditor/
    │     │ Modal     │ ← modal plugins
    │     │ Contrllr  │ ← component plugins
    │     │ Figure    │ ← image/video/audio
-   │     │ SelectMnu │ ← font/formatBlock
+   │     │ SelectMnu │ ← font/blockStyle
    │     │ ColorPckr │ ← fontColor/bgColor
    │     │ FileMngr  │ ← file upload plugins
    │     │ Browser   │ ← gallery plugins
@@ -565,15 +565,15 @@ Plugins are modular features that extend editor functionality. Each plugin type 
 
 **Plugins organized by type:**
 
-| Type            | Purpose               | Examples                        |
-| --------------- | --------------------- | ------------------------------- |
-| **`command/`**  | Direct actions, no UI | blockquote, list, exportPDF     |
-| **`dropdown/`** | Dropdown menus        | align, font, formatBlock, table |
-| **`modal/`**    | Dialog windows        | image, video, link, math        |
-| **`browser/`**  | Gallery interfaces    | imageGallery, videoGallery      |
-| **`field/`**    | Inline autocomplete   | mention                         |
-| **`input/`**    | Toolbar input fields  | fontSize, pageNavigator         |
-| **`popup/`**    | Inline controllers    | anchor                          |
+| Type            | Purpose               | Examples                       |
+| --------------- | --------------------- | ------------------------------ |
+| **`command/`**  | Direct actions, no UI | blockquote, list, exportPDF    |
+| **`dropdown/`** | Dropdown menus        | align, font, blockStyle, table |
+| **`modal/`**    | Dialog windows        | image, video, link, math       |
+| **`browser/`**  | Gallery interfaces    | imageGallery, videoGallery     |
+| **`field/`**    | Inline autocomplete   | mention                        |
+| **`input/`**    | Toolbar input fields  | fontSize, pageNavigator        |
+| **`popup/`**    | Inline controllers    | anchor                         |
 
 **Key Differences from Core Classes:**
 
@@ -670,7 +670,7 @@ All plugins must define:
 | **`Modal`**             | Dialog windows       | Instance + callbacks      | modal plugins              |
 | **`Controller`**        | Floating tooltips    | Instance + positioning    | component plugins          |
 | **`Figure`**            | Resize/align wrapper | Instance + static helpers | image, video, audio        |
-| **`SelectMenu`**        | Custom dropdowns     | Instance + items          | font, formatBlock          |
+| **`SelectMenu`**        | Custom dropdowns     | Instance + items          | font, blockStyle           |
 | **`ColorPicker`**       | Color palette        | Instance + callbacks      | fontColor, backgroundColor |
 | **`HueSlider`**         | HSL color wheel      | Instance + attach         | ColorPicker                |
 | **`FileManager`**       | File uploads         | Instance + async          | image, video, audio        |
@@ -895,7 +895,7 @@ npm run i18n-build      # Sync language files (requires Google API credentials)
 
 **Plugin Naming:**
 
-- **Plugin keys**: lowercase string (e.g., `'image'`, `'video'`, `'formatBlock'`)
+- **Plugin keys**: lowercase string (e.g., `'image'`, `'video'`, `'blockStyle'`)
 - **Plugin types**: lowercase string (e.g., `'command'`, `'modal'`, `'dropdown'`)
 - **Plugin class names**: PascalCase with type suffix (e.g., `ImagePlugin`, `AlignDropdown`)
 
@@ -1148,7 +1148,7 @@ Different components call plugin methods at different lifecycle stages:
 **Dropdown Plugin:**
 
 - `src/plugins/dropdown/align.js` - Simple dropdown menu
-- `src/plugins/dropdown/formatBlock.js` - Dropdown with SelectMenu module
+- `src/plugins/dropdown/blockStyle.js` - Dropdown with SelectMenu module
 
 **Component Plugin:**
 

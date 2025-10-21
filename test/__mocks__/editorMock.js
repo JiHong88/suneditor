@@ -258,7 +258,7 @@ function createMockPlugins() {
 			action: mockPluginAction,
 			active: mockPluginActive
 		},
-		formatBlock: {
+		blockStyle: {
 			action: mockPluginAction,
 			active: mockPluginActive
 		},
@@ -335,7 +335,7 @@ function createMockCommandTargets() {
 		['outdent', [createButton('outdent')]],
 		['align', [createButton('align')]],
 		['list', [createButton('list')]],
-		['formatBlock', [createButton('formatBlock')]],
+		['blockStyle', [createButton('blockStyle')]],
 		['lineHeight', [createButton('lineHeight')]],
 		['table', [createButton('table')]],
 		['link', [createButton('link')]],

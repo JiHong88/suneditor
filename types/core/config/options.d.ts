@@ -1,3 +1,31 @@
+import type { AudioGalleryPluginOptions } from '../../plugins/browser/audioGallery';
+import type { FileBrowserPluginOptions } from '../../plugins/browser/fileBrowser';
+import type { FileGalleryPluginOptions } from '../../plugins/browser/fileGallery';
+import type { ImageGalleryPluginOptions } from '../../plugins/browser/imageGallery';
+import type { VideoGalleryPluginOptions } from '../../plugins/browser/videoGallery';
+import type { ExportPDFPluginOptions } from '../../plugins/command/exportPDF';
+import type { FileUploadPluginOptions } from '../../plugins/command/fileUpload';
+import type { AlignPluginOptions } from '../../plugins/dropdown/align';
+import type { BackgroundColorPluginOptions } from '../../plugins/dropdown/backgroundColor';
+import type { BlockStylePluginOptions } from '../../plugins/dropdown/blockStyle';
+import type { FontPluginOptions } from '../../plugins/dropdown/font';
+import type { FontColorPluginOptions } from '../../plugins/dropdown/fontColor';
+import type { HRPluginOptions } from '../../plugins/dropdown/hr';
+import type { LayoutPluginOptions } from '../../plugins/dropdown/layout';
+import type { LineHeightPluginOptions } from '../../plugins/dropdown/lineHeight';
+import type { ParagraphStylePluginOptions } from '../../plugins/dropdown/paragraphStyle';
+import type { TablePluginOptions } from '../../plugins/dropdown/table/index';
+import type { TemplatePluginOptions } from '../../plugins/dropdown/template';
+import type { TextStylePluginOptions } from '../../plugins/dropdown/textStyle';
+import type { MentionPluginOptions } from '../../plugins/field/mention';
+import type { FontSizePluginOptions } from '../../plugins/input/fontSize';
+import type { AudioPluginOptions } from '../../plugins/modal/audio';
+import type { DrawingPluginOptions } from '../../plugins/modal/drawing';
+import type { EmbedPluginOptions } from '../../plugins/modal/embed';
+import type { ImagePluginOptions } from '../../plugins/modal/image';
+import type { LinkPluginOptions } from '../../plugins/modal/link';
+import type { MathPluginOptions } from '../../plugins/modal/math';
+import type { VideoPluginOptions } from '../../plugins/modal/video';
 import type {} from '../../typedef';
 /** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
 /**
@@ -366,8 +394,9 @@ export namespace DEFAULTS {
  * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags.
  * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
  *
- * === Dynamic Plugin Options ===
- * @property {Object<string, *>} [Dynamic_pluginOptions] - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
+ * **Note:** This type also supports dynamic plugin options via index signature `[pluginName: string]: { [key: string]: any }`
+ * to allow plugin-specific configurations (e.g., `image: {}`, `video: {}`).
+ * The index signature is defined in the TypeScript `.d.ts` file but cannot be expressed in JSDoc.
  * ================================================================================================================================
  */
 /**
@@ -1006,18 +1035,50 @@ export type EditorBaseOptions = {
 	};
 	/**
 	 * - Specifies extra allowed or disallowed tags.
-	 * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}=== Dynamic Plugin Options ===
+	 * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}**Note:** This type also supports dynamic plugin options via index signature `[pluginName: string]: { [key: string]: any }`
+	 * to allow plugin-specific configurations (e.g., `image: {}`, `video: {}`).
+	 * The index signature is defined in the TypeScript `.d.ts` file but cannot be expressed in JSDoc.
+	 * ================================================================================================================================
 	 */
 	allowedExtraTags?: {
 		[x: string]: boolean;
 	};
 	/**
-	 * - Dynamic plugin options, where the key is the plugin name and the value is its configuration.
-	 * ================================================================================================================================
+	 * === Plugin-Specific Options ===
+	 * Each plugin can have its own configuration options.
 	 */
-	Dynamic_pluginOptions?: {
-		[x: string]: any;
-	};
+	align?: AlignPluginOptions;
+	audio?: AudioPluginOptions;
+	audioGallery?: AudioGalleryPluginOptions;
+	backgroundColor?: BackgroundColorPluginOptions;
+	blockStyle?: BlockStylePluginOptions;
+	drawing?: DrawingPluginOptions;
+	embed?: EmbedPluginOptions;
+	exportPDF?: ExportPDFPluginOptions;
+	fileBrowser?: FileBrowserPluginOptions;
+	fileGallery?: FileGalleryPluginOptions;
+	fileUpload?: FileUploadPluginOptions;
+	font?: FontPluginOptions;
+	fontColor?: FontColorPluginOptions;
+	fontSize?: FontSizePluginOptions;
+	hr?: HRPluginOptions;
+	image?: ImagePluginOptions;
+	imageGallery?: ImageGalleryPluginOptions;
+	layout?: LayoutPluginOptions;
+	lineHeight?: LineHeightPluginOptions;
+	link?: LinkPluginOptions;
+	math?: MathPluginOptions;
+	mention?: MentionPluginOptions;
+	paragraphStyle?: ParagraphStylePluginOptions;
+	table?: TablePluginOptions;
+	template?: TemplatePluginOptions;
+	textStyle?: TextStylePluginOptions;
+	video?: VideoPluginOptions;
+	videoGallery?: VideoGalleryPluginOptions;
+	/**
+	 * - Index signature: Allows any other plugin name with custom options.
+	 */
+	[pluginName: string]: any;
 };
 /**
  * -----------------
