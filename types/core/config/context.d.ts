@@ -48,9 +48,9 @@ import type {} from '../../typedef';
  * @param {Element} menuTray - Main menu tray element.
  * @param {Element|null} subbar - Sub-toolbar element.
  * @param {Element|null} statusbarContainer - Status bar container element.
- * @returns {__se__Context} - A map of key DOM nodes used throughout the editor.
+ * @returns {SunEditor.Context} - A map of key DOM nodes used throughout the editor.
  */
-export function CreateContext(toolbar: Element, toolbarContainer: Element | null, menuTray: Element, subbar: Element | null, statusbarContainer: Element | null): __se__Context;
+export function CreateContext(toolbar: Element, toolbarContainer: Element | null, menuTray: Element, subbar: Element | null, statusbarContainer: Element | null): SunEditor.Context;
 /**
  * @typedef {Object} ContextUtil
  * @property {(k: keyof ContextStore) => HTMLElement|null} get - Get a DOM element from the context by key.

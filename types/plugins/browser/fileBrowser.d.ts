@@ -51,10 +51,10 @@ declare class FileBrowser extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {FileBrowserPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: FileBrowserPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: FileBrowserPluginOptions);
 	title: any;
 	icon: string;
 	onSelectfunction: (targe: Node) => any;

@@ -12,14 +12,14 @@ export namespace A {
 	function selectionSetRange(sc: Node, so: number, ec: Node, eo: number): Action;
 	function formatRemoveBlock(rangeEl: Element, selectedFormats: Element[] | null, newBlockElement: Element | null, shouldDelete: boolean, skipHistory: boolean): Action;
 	function domUtilsRemoveItem(item: Node): Action;
-	function selectComponentFallback(cmponentInfo: __se__ComponentInfo): Action;
+	function selectComponentFallback(cmponentInfo: SunEditor.ComponentInfo): Action;
 	function delFormatRemoveAndMove(container: Node, formatEl: Element): Action;
 	function backspaceFormatMaintain(formatEl: Element): Action;
-	function backspaceComponentSelect(selectionNode: Node, range: Range, fileComponentInfo: __se__ComponentInfo): Action;
-	function backspaceComponentRemove(isList: boolean, sel: Node, formatEl: Element, fileComponentInfo: __se__ComponentInfo): Action;
+	function backspaceComponentSelect(selectionNode: Node, range: Range, fileComponentInfo: SunEditor.ComponentInfo): Action;
+	function backspaceComponentRemove(isList: boolean, sel: Node, formatEl: Element, fileComponentInfo: SunEditor.ComponentInfo): Action;
 	function backspaceListMergePrev(prev: Element, formatEl: Element, rangeEl: Element): Action;
 	function backspaceListRemoveNested(range: Range): Action;
-	function deleteComponentSelect(formatEl: Element, fileComponentInfo: __se__ComponentInfo): Action;
+	function deleteComponentSelect(formatEl: Element, fileComponentInfo: SunEditor.ComponentInfo): Action;
 	function deleteComponentSelectNext(formatEl: any, nextEl: Element): Action;
 	function deleteListRemoveNested(range: Range, formatEl: Element, rangeEl: Element): Action;
 	function tabFormatIndent(range: Range, formatEl: Element, shift: boolean): Action;
@@ -41,8 +41,10 @@ export type Action = {
 	t: string;
 	p?: any;
 };
-export type __se__ComponentInfo = {
-	target: Element;
-	pluginName: string;
-	options?: any;
-};
+export namespace SunEditor {
+	type ComponentInfo = {
+		target: Element;
+		pluginName: string;
+		options?: any;
+	};
+}

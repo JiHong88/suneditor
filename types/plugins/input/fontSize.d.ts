@@ -55,10 +55,10 @@ declare class FontSize extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {FontSizePluginOptions} pluginOptions - Configuration options for the FontSize plugin.
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: FontSizePluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: FontSizePluginOptions);
 	unitMap: {
 		text: {
 			default: string;
@@ -146,9 +146,9 @@ declare class FontSize extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Toolbar
 	 * @description Executes the event function of toolbar's input tag - "change".
-	 * @param {__se__PluginToolbarInputChangeEventInfo} params
+	 * @param {SunEditor.PluginToolbarInputChangeEventInfo} params
 	 */
-	onInputChange({ target, value: changeValue, event }: __se__PluginToolbarInputChangeEventInfo): void;
+	onInputChange({ target, value: changeValue, event }: SunEditor.PluginToolbarInputChangeEventInfo): void;
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.

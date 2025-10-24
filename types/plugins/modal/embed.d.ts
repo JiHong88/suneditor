@@ -1,7 +1,6 @@
 import type {} from '../../typedef';
 export default Embed;
 export type ProcessInfo_embed = import('../../events').ProcessInfo;
-export type FigureControls_embed = import('../../modules/Figure').FigureControls;
 export type EmbedPluginOptions = {
 	/**
 	 * - Whether the embed element can be resized.
@@ -90,7 +89,7 @@ export type EmbedPluginOptions = {
 	/**
 	 * - Figure controls.
 	 */
-	controls?: FigureControls_embed;
+	controls?: import('../../modules/Figure').FigureControls;
 	/**
 	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -98,13 +97,10 @@ export type EmbedPluginOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	insertBehavior?: __se__ComponentInsertBehaviorType;
+	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
 };
 /**
  * @typedef {import('../../events').ProcessInfo} ProcessInfo_embed
- */
-/**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls_embed
  */
 /**
  * @typedef {Object} EmbedPluginOptions
@@ -140,8 +136,8 @@ export type EmbedPluginOptions = {
  *   },
  *   // Additional services...
  * }
- * @property {FigureControls_embed} [controls] - Figure controls.
- * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -164,10 +160,10 @@ declare class Embed extends EditorInjector {
 	static component(this: Embed, node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {EmbedPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: EmbedPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: EmbedPluginOptions);
 	title: any;
 	icon: string;
 	pluginOptions: {
@@ -187,7 +183,7 @@ declare class Embed extends EditorInjector {
 		};
 		query_youtube: string;
 		query_vimeo: string;
-		insertBehavior: __se__ComponentInsertBehaviorType;
+		insertBehavior: SunEditor.ComponentInsertBehaviorType;
 	};
 	modal: Modal;
 	figure: Figure;

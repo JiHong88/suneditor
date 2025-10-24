@@ -23,10 +23,10 @@ declare class Template extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {TemplatePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: TemplatePluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: TemplatePluginOptions);
 	title: any;
 	icon: string;
 	selectedIndex: number;

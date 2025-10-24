@@ -9,14 +9,14 @@ const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
 
 /**
- * @typedef {Omit<HTML & Partial<__se__EditorInjector>, 'html'>} HTMLThis
+ * @typedef {Omit<HTML & Partial<SunEditor.Injector>, 'html'>} HTMLThis
  */
 
 /**
  * @constructor
  * @this {HTMLThis}
  * @description All HTML related classes involved in the editing area
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function HTML(editor) {
 	CoreInjector.call(this, editor);
@@ -1718,7 +1718,7 @@ HTML.prototype = {
 	 * @description Converts a list of DOM nodes into an HTML list structure.
 	 * - If the node is already a list, its innerHTML is used. If it is a block element,
 	 * - the function is called recursively.
-	 * @param {__se__NodeCollection} domTree List of DOM nodes to be converted.
+	 * @param {SunEditor.NodeCollection} domTree List of DOM nodes to be converted.
 	 * @returns {string} The generated HTML list.
 	 */
 	_convertListCell(domTree) {

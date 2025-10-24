@@ -22,7 +22,7 @@ export type FileStateParams = {
 	/**
 	 * - The root editor instance
 	 */
-	editor: __se__EditorCore;
+	editor: SunEditor.Core;
 	/**
 	 * File element
 	 */
@@ -54,13 +54,13 @@ export type FileManagerParams = {
 	 */
 	query: string;
 	/**
-	 * A function to handle the loaded file information
+	 * Event name for file load (e.g., 'onImageLoad')
 	 */
-	loadHandler?: ((params: Array<FileStateInfo>) => void) | undefined;
+	loadEventName: string;
 	/**
-	 * A function to handle file-related events
+	 * Event name for file action (e.g., 'onImageAction')
 	 */
-	eventHandler?: ((info: FileStateParams) => void) | undefined;
+	actionEventName: string;
 };
 /**
  * @typedef {Object} FileStateInfo
@@ -71,7 +71,7 @@ export type FileManagerParams = {
  */
 /**
  * @typedef {Object} FileStateParams
- * @property {__se__EditorCore} editor - The root editor instance
+ * @property {SunEditor.Core} editor - The root editor instance
  * @property {Node} element File element
  * @property {number} index File index
  * @property {string} state File state ("create"|"update"|"delete")
@@ -82,8 +82,8 @@ export type FileManagerParams = {
 /**
  * @typedef {Object} FileManagerParams
  * @property {string} query The query selector used to find file elements in the editor
- * @property {(params: Array<FileStateInfo>) => void=} loadHandler A function to handle the loaded file information
- * @property {(info: FileStateParams) => void=} eventHandler A function to handle file-related events
+ * @property {string} loadEventName Event name for file load (e.g., 'onImageLoad')
+ * @property {string} actionEventName Event name for file action (e.g., 'onImageAction')
  */
 /**
  * @class
@@ -100,8 +100,8 @@ declare class FileManager extends CoreInjector {
 	kind: any;
 	inst: any;
 	query: string;
-	loadHandler: (params: Array<FileStateInfo>) => void;
-	eventHandler: (info: FileStateParams) => void;
+	loadEventName: string;
+	actionEventName: string;
 	infoList: any[];
 	infoIndex: number;
 	uploadFileLength: number;

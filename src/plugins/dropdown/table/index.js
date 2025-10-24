@@ -130,7 +130,7 @@ class Table extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {TablePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
@@ -436,7 +436,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component copy is requested.
-	 * @param {__se__PluginCopyComponentParams} params
+	 * @param {SunEditor.PluginCopyComponentParams} params
 	 * @returns {boolean|void}
 	 */
 	onCopyComponent({ event, cloneContainer }) {
@@ -453,7 +453,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "copy".
-	 * @param {__se__PluginPasteParams} params
+	 * @param {SunEditor.PluginPasteParams} params
 	 * @returns {boolean|void}
 	 */
 	onPaste({ event, doc }) {
@@ -601,7 +601,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousemove".
-	 * @param {__se__PluginMouseEventInfo} params
+	 * @param {SunEditor.PluginMouseEventInfo} params
 	 */
 	onMouseMove({ event }) {
 		if (this.#resizing) return;
@@ -654,7 +654,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousedown".
-	 * @param {__se__PluginMouseEventInfo} params
+	 * @param {SunEditor.PluginMouseEventInfo} params
 	 */
 	onMouseDown({ event }) {
 		this.#ref = this.#selectedCell = null;
@@ -760,7 +760,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keydown".
-	 * @param {__se__PluginKeyEventInfo} params
+	 * @param {SunEditor.PluginKeyEventInfo} params
 	 */
 	onKeyDown({ event, range, line }) {
 		this.#ref = null;
@@ -848,7 +848,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keyup".
-	 * @param {__se__PluginKeyEventInfo} params
+	 * @param {SunEditor.PluginKeyEventInfo} params
 	 */
 	onKeyUp({ line }) {
 		this.#_s = false;
@@ -3919,7 +3919,7 @@ function CreateHTML_controller_table({ lang, icons }) {
 }
 
 /**
- * @param {__se__EditorCore} editor
+ * @param {SunEditor.Core} editor
  * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement, unmergeButton: HTMLButtonElement }}
  */
 function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
@@ -3996,7 +3996,7 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
  * @property {HTMLButtonElement} font_italic
  * @property {HTMLButtonElement} font_strike
  *
- * @param {__se__EditorCore} editor - Editor instance
+ * @param {SunEditor.Core} editor - Editor instance
  * @returns {TableCtrlProps}
  */
 function CreateHTML_controller_properties({ lang, icons, options }) {

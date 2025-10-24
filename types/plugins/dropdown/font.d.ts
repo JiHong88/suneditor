@@ -20,10 +20,10 @@ declare class Font extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {FontPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: FontPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: FontPluginOptions);
 	title: any;
 	inner: string;
 	currentFont: string;

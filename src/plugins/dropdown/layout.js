@@ -17,7 +17,7 @@ class Layout extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {LayoutPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {

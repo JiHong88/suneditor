@@ -66,10 +66,10 @@ declare class SelectMenu extends CoreInjector {
 	closeMethod: () => void;
 	/**
 	 * @description Creates the select menu items.
-	 * @param {Array<string>|__se__NodeCollection} items - Command list of selectable items.
-	 * @param {Array<string>|__se__NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
+	 * @param {Array<string>|SunEditor.NodeCollection} items - Command list of selectable items.
+	 * @param {Array<string>|SunEditor.NodeCollection} [menus] - Optional list of menu display elements; defaults to `items`.
 	 */
-	create(items: Array<string> | __se__NodeCollection, menus?: Array<string> | __se__NodeCollection): void;
+	create(items: Array<string> | SunEditor.NodeCollection, menus?: Array<string> | SunEditor.NodeCollection): void;
 	/**
 	 * @description Initializes the select menu and attaches it to a reference element.
 	 * @param {Node} referElement - The element that triggers the select menu.

@@ -33,10 +33,10 @@ declare class ImageGallery extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {ImageGalleryPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: ImageGalleryPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: ImageGalleryPluginOptions);
 	title: any;
 	icon: string;
 	onSelectfunction: (targe: Node) => any;

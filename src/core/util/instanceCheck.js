@@ -6,7 +6,7 @@
  * @constructor
  * @this {InstanceCheck}
  * @description iframe-safe instanceof check utility class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function InstanceCheck(editor) {
 	this.editor = editor;

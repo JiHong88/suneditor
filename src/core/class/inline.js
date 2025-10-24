@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, converter } from '../../helper';
 
 /**
- * @typedef {Omit<Inline & Partial<__se__EditorInjector>, 'inline'>} InlineThis
+ * @typedef {Omit<Inline & Partial<SunEditor.Injector>, 'inline'>} InlineThis
  */
 
 /**
@@ -21,7 +21,7 @@ import { dom, unicode, converter } from '../../helper';
  * @constructor
  * @this {InlineThis}
  * @description Classes related to editor inline formats such as style node like strong, span, etc.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function Inline(editor) {
 	CoreInjector.call(this, editor);

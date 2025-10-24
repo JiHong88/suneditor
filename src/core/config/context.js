@@ -51,7 +51,7 @@
  * @param {Element} menuTray - Main menu tray element.
  * @param {Element|null} subbar - Sub-toolbar element.
  * @param {Element|null} statusbarContainer - Status bar container element.
- * @returns {__se__Context} - A map of key DOM nodes used throughout the editor.
+ * @returns {SunEditor.Context} - A map of key DOM nodes used throughout the editor.
  */
 export function CreateContext(toolbar, toolbarContainer, menuTray, subbar, statusbarContainer) {
 	const m = new Map([
@@ -77,7 +77,7 @@ export function CreateContext(toolbar, toolbarContainer, menuTray, subbar, statu
 		m.set('statusbar_wrapper', statusbarContainer.querySelector('.sun-editor'));
 	}
 
-	return /** @type {__se__Context} */ (m);
+	return /** @type {SunEditor.Context} */ (m);
 }
 
 /**

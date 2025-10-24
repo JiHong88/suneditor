@@ -1,29 +1,29 @@
 import type {} from '../../typedef';
 export default UI;
-export type UIThis = Omit<UI & Partial<__se__EditorInjector>, 'ui'>;
+export type UIThis = Omit<UI & Partial<SunEditor.Injector>, 'ui'>;
 /**
- * @typedef {Omit<UI & Partial<__se__EditorInjector>, 'ui'>} UIThis
+ * @typedef {Omit<UI & Partial<SunEditor.Injector>, 'ui'>} UIThis
  */
 /**
  * @constructor
  * @this {UIThis}
  * @description The UI class is a class that handles operations related to the user interface of SunEditor.
  * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function UI(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, editor: __se__EditorCore): void;
+declare function UI(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, editor: SunEditor.Core): void;
 declare class UI {
 	/**
-	 * @typedef {Omit<UI & Partial<__se__EditorInjector>, 'ui'>} UIThis
+	 * @typedef {Omit<UI & Partial<SunEditor.Injector>, 'ui'>} UIThis
 	 */
 	/**
 	 * @constructor
 	 * @this {UIThis}
 	 * @description The UI class is a class that handles operations related to the user interface of SunEditor.
 	 * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	_controllerOnBtnDisabled: boolean;
 	alertModal: HTMLElement;
 	alertMessage: HTMLSpanElement;
@@ -31,7 +31,7 @@ declare class UI {
 	_alertInner: HTMLElement;
 	_closeListener: any[];
 	_closeSignal: boolean;
-	_bindClose: __se__GlobalEventInfo;
+	_bindClose: SunEditor.GlobalEventInfo;
 	_backWrapper: HTMLElement;
 	toastPopup: HTMLElement;
 	toastContainer: Element;
@@ -43,9 +43,9 @@ declare class UI {
 	 * - Define the style of the edit area
 	 * - It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param {string} style Style string
-	 * @param {__se__FrameContext|null} fc Frame context
+	 * @param {?SunEditor.FrameContext=} fc Frame context
 	 */
-	setEditorStyle(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, style: string, fc: __se__FrameContext | null): void;
+	setEditorStyle(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, style: string, fc?: (SunEditor.FrameContext | null) | undefined): void;
 	/**
 	 * @this {UIThis}
 	 * @description Set the theme to the editor

@@ -20,7 +20,7 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
  * @property {boolean} [allowMultiple] - Whether to allow multiple file uploads.
  * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
  * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the audio tag.
- * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -51,7 +51,7 @@ class Audio_ extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {AudioPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
@@ -85,8 +85,8 @@ class Audio_ extends EditorInjector {
 		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
 		this.fileManager = new FileManager(this, {
 			query: 'audio',
-			loadHandler: this.events.onAudioLoad,
-			eventHandler: this.events.onAudioAction
+			loadEventName: 'onAudioLoad',
+			actionEventName: 'onAudioAction'
 		});
 
 		// members
@@ -150,7 +150,7 @@ class Audio_ extends EditorInjector {
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
-	 * @param {__se__FrameContext} params.frameContext Frame context
+	 * @param {SunEditor.FrameContext} params.frameContext Frame context
 	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled

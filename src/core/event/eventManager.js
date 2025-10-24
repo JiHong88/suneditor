@@ -17,15 +17,15 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './handler
 const { _w, _d, ON_OVER_COMPONENT, isMobile, isTouchDevice } = env;
 
 /**
- * @typedef {Omit<EventManager & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
+ * @typedef {Omit<EventManager & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis
  */
 
 /**
  * @constructor
  * @this {EventManagerThis}
  * @description Event manager, editor's all event management class
- * @param {__se__EditorCore} editor - The root editor instance
- * @property {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
+ * @property {SunEditor.Core} editor - The root editor instance
  */
 function EventManager(editor) {
 	CoreInjector.call(this, editor);
@@ -62,15 +62,15 @@ function EventManager(editor) {
 	this._formatAttrsTemp = null;
 	/** @type {number} */
 	this._resizeClientY = 0;
-	/** @type {__se__GlobalEventInfo|null} */
+	/** @type {SunEditor.GlobalEventInfo|null} */
 	this.__resize_editor = null;
-	/** @type {__se__GlobalEventInfo|null} */
+	/** @type {SunEditor.GlobalEventInfo|null} */
 	this.__close_move = null;
-	/** @type {__se__GlobalEventInfo|null} */
+	/** @type {SunEditor.GlobalEventInfo|null} */
 	this.__geckoActiveEvent = null;
 	/** @type {Array<Node>} */
 	this.__cacheStyleNodes = [];
-	/** @type {__se__GlobalEventInfo|null} */
+	/** @type {SunEditor.GlobalEventInfo|null} */
 	this.__selectionSyncEvent = null;
 
 	// input plugins
@@ -78,9 +78,9 @@ function EventManager(editor) {
 	this._inputFocus = false;
 	/** @type {Object<string, *>|null} */
 	this.__inputPlugin = null;
-	/** @type {?__se__EventInfo=} */
+	/** @type {?SunEditor.EventInfo=} */
 	this.__inputBlurEvent = null;
-	/** @type {?__se__EventInfo=} */
+	/** @type {?SunEditor.EventInfo=} */
 	this.__inputKeyEvent = null;
 
 	// viewport
@@ -103,7 +103,7 @@ EventManager.prototype = {
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event handler
 	 * @param {boolean|AddEventListenerOptions=} useCapture Event useCapture option
-	 * @return {__se__EventInfo|null} Registered event information
+	 * @return {SunEditor.EventInfo|null} Registered event information
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return null;
@@ -132,7 +132,7 @@ EventManager.prototype = {
 	/**
 	 * @this {EventManagerThis}
 	 * @description Remove event
-	 * @param {__se__EventInfo} params event info = this.addEvent()
+	 * @param {SunEditor.EventInfo} params event info = this.addEvent()
 	 * @returns {undefined|null} Success: null, Not found: undefined
 	 */
 	removeEvent(params) {
@@ -161,7 +161,7 @@ EventManager.prototype = {
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event listener
 	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
-	 * @return {__se__GlobalEventInfo} Registered event information
+	 * @return {SunEditor.GlobalEventInfo} Registered event information
 	 */
 	addGlobalEvent(type, listener, useCapture) {
 		if (this.frameOptions.get('iframe')) {
@@ -179,7 +179,7 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
-	 * @param {string|__se__GlobalEventInfo} type Event type or (Event info = this.addGlobalEvent())
+	 * @param {string|SunEditor.GlobalEventInfo} type Event type or (Event info = this.addGlobalEvent())
 	 * @param {(...args: *) => *=} listener Event listener
 	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
 	 * @returns {undefined|null} Success: null, Not found: undefined
@@ -573,7 +573,7 @@ EventManager.prototype = {
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
 	 * @param {DataTransfer} clipboardData The clipboard data object
-	 * @param {__se__FrameContext} frameContext The frame context
+	 * @param {SunEditor.FrameContext} frameContext The frame context
 	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
 	 */
 	async _dataTransferAction(type, e, clipboardData, frameContext) {
@@ -598,7 +598,7 @@ EventManager.prototype = {
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
 	 * @param {DataTransfer} clipboardData The clipboard data object
-	 * @param {__se__FrameContext} frameContext The frame context
+	 * @param {SunEditor.FrameContext} frameContext The frame context
 	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
 	 */
 	async _setClipboardData(type, e, clipboardData, frameContext) {
@@ -759,7 +759,7 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 * @description Registers event listeners for the editor's frame, including text input, selection, and UI interactions.
 	 * - Handles events inside an iframe or within the standard wysiwyg editor.
-	 * @param {__se__FrameContext} fc The frame context object
+	 * @param {SunEditor.FrameContext} fc The frame context object
 	 */
 	_addFrameEvents(fc) {
 		const isIframe = fc.get('options').get('iframe');
@@ -856,8 +856,8 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
 	 * - If resizing is not enabled, applies a non-resizable class.
-	 * @param {__se__FrameContext} fc The frame context object
-	 * @param {__se__FrameOptions} fo The frame options object
+	 * @param {SunEditor.FrameContext} fc The frame context object
+	 * @param {SunEditor.FrameOptions} fo The frame options object
 	 */
 	__addStatusbarEvent(fc, fo) {
 		if (/\d+/.test(fo.get('height')) && fo.get('statusbar_resizeEnable')) {
@@ -1075,7 +1075,7 @@ EventManager.prototype = {
 	 * @description Calls a registered plugin event and executes associated handlers.
 	 * - If any handler returns `false`, the event propagation stops.
 	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: __se__FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
+	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
 	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
 	 */
 	_callPluginEvent(name, e) {
@@ -1125,7 +1125,7 @@ EventManager.prototype = {
 	 * @private
 	 * @description Focus Event Postprocessing
 	 * @this {EventManagerThis}
-	 * @param {__se__FrameContext} frameContext - frame context object
+	 * @param {SunEditor.FrameContext} frameContext - frame context object
 	 * @param {Event} event - Event object
 	 */
 	__postFocusEvent(frameContext, event) {
@@ -1142,7 +1142,7 @@ EventManager.prototype = {
 	 * @private
 	 * @description Blur Event Postprocessing
 	 * @this {EventManagerThis}
-	 * @param {__se__FrameContext} frameContext - frame context object
+	 * @param {SunEditor.FrameContext} frameContext - frame context object
 	 * @param {Event} event - Event object
 	 */
 	__postBlurEvent(frameContext, event) {
@@ -1170,7 +1170,7 @@ EventManager.prototype = {
 
 /**
  * @this {EventManagerThis}
- * @param {__se__FrameContext} frameContext - frame context object
+ * @param {SunEditor.FrameContext} frameContext - frame context object
  * @param {Element|Window} eventWysiwyg - wysiwyg event object
  * @param {Event} e - Event object
  */
@@ -1192,7 +1192,7 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 
 /**
  * @this {EventManagerThis}
- * @param {__se__FrameContext} frameContext - frame context object
+ * @param {SunEditor.FrameContext} frameContext - frame context object
  * @param {Event} e - Event object
  */
 function OnFocus_wysiwyg(frameContext, e) {
@@ -1234,7 +1234,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 
 /**
  * @this {EventManagerThis}
- * @param {__se__FrameContext} frameContext - frame context object
+ * @param {SunEditor.FrameContext} frameContext - frame context object
  * @param {Event} e - Event object
  */
 function OnBlur_wysiwyg(frameContext, e) {
@@ -1422,7 +1422,7 @@ function OnScroll_Abs() {
 
 /**
  * @this {EventManagerThis}
- * @param {__se__FrameContext} frameContext - frame context object
+ * @param {SunEditor.FrameContext} frameContext - frame context object
  */
 function OnFocus_code(frameContext) {
 	this.editor.changeFrameContext(frameContext.get('key'));

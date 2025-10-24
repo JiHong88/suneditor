@@ -20,7 +20,6 @@ export type ModalReturns_image = {
 	fileRemoveBtn: HTMLButtonElement;
 };
 export type ImageInfo_image = import('../../events').ImageInfo;
-export type FigureControls_image = import('../../modules/Figure').FigureControls;
 export type ImagePluginOptions = {
 	/**
 	 * - Whether the image element can be resized.
@@ -95,7 +94,7 @@ export type ImagePluginOptions = {
 	/**
 	 * - Figure controls.
 	 */
-	controls?: FigureControls_image;
+	controls?: import('../../modules/Figure').FigureControls;
 	/**
 	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
 	 * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
@@ -105,13 +104,10 @@ export type ImagePluginOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	insertBehavior?: __se__ComponentInsertBehaviorType;
+	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
 };
 /**
  * @typedef {import('../../events').ImageInfo} ImageInfo_image
- */
-/**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls_image
  */
 /**
  * @typedef {Object} ImagePluginOptions
@@ -132,8 +128,8 @@ export type ImagePluginOptions = {
  * @property {string} [defaultFormatType="block"] - The default image format type ("block" or "inline").
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
- * @property {FigureControls_image} [controls] - Figure controls.
- * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -158,10 +154,10 @@ declare class Image_ extends EditorInjector {
 	static component(this: Image_, node: Element): Element | null;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {ImagePluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: ImagePluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: ImagePluginOptions);
 	title: any;
 	icon: string;
 	pluginOptions: {
@@ -183,7 +179,7 @@ declare class Image_ extends EditorInjector {
 		useFormatType: boolean;
 		defaultFormatType: string;
 		keepFormatType: boolean;
-		insertBehavior: __se__ComponentInsertBehaviorType;
+		insertBehavior: SunEditor.ComponentInsertBehaviorType;
 	};
 	alignForm: HTMLElement;
 	anchor: ModalAnchorEditor;
@@ -226,12 +222,12 @@ declare class Image_ extends EditorInjector {
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
-	 * @param {__se__FrameContext} params.frameContext Frame context
+	 * @param {SunEditor.FrameContext} params.frameContext Frame context
 	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
-	onFilePasteAndDrop({ file }: { frameContext: __se__FrameContext; event: ClipboardEvent; file: File }): boolean;
+	onFilePasteAndDrop({ file }: { frameContext: SunEditor.FrameContext; event: ClipboardEvent; file: File }): boolean;
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description This function is called when a form within a modal window is "submit".

@@ -14,7 +14,7 @@ const { NO_EVENT } = env;
  * @property {string} [acceptedFormats="*"] - Accepted file formats (e.g., 'image/*, .pdf')
  * @property {string} [as="box"] - Specify the default form of the file component as 'box' or 'link'
  * @property {Array<string>} [controls] - Additional controls to be added to the figure
- * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -44,7 +44,7 @@ class FileUpload extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {FileUploadPluginOptions} pluginOptions - plugin options
 	 */
 	constructor(editor, pluginOptions) {
@@ -100,8 +100,8 @@ class FileUpload extends EditorInjector {
 		// file manager
 		this.fileManager = new FileManager(this, {
 			query: 'a[download][data-se-file-download]',
-			loadHandler: this.events.onFileLoad,
-			eventHandler: this.events.onFileAction
+			loadEventName: 'onFileLoad',
+			actionEventName: 'onFileAction'
 		});
 
 		// controller
@@ -149,7 +149,7 @@ class FileUpload extends EditorInjector {
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
-	 * @param {__se__FrameContext} params.frameContext Frame context
+	 * @param {SunEditor.FrameContext} params.frameContext Frame context
 	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled

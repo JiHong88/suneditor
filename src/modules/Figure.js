@@ -48,17 +48,72 @@ let __resizing_sw = 0;
  */
 
 /**
- * @typedef {Array<Array<
- *   string |
+ * Figure control button type
+ * @typedef {"mirror_h" | "mirror_v" | "rotate_l" | "rotate_r" | "caption" | "revert" | "edit" | "copy" | "remove" | "as" | "align" | "onalign" | "onresize"} FigureControlButton
+ */
+
+/**
+ * Figure control resize value type (auto, or percentage numbers)
+ * @typedef {`resize_auto,${number}` | `resize_auto,${number},${number}` | `resize_auto,${number},${number},${number}` | `resize_auto,${number},${number},${number},${number}`} FigureControlResize
+ */
+
+/**
+ * Figure control custom action object
+ * @typedef {{
+ *   action: (element: Node, value: string, target: Node) => void,
+ *   command: string,
+ *   value: string,
+ *   title: string,
+ *   icon: string
+ * }} FigureControlCustomAction
+ */
+
+/**
+ * Figure controls configuration
+ * 2D array of control buttons for the figure component toolbar
+ *
+ * **Available control buttons**:
+ * - `"mirror_h"`: Mirror horizontally
+ * - `"mirror_v"`: Mirror vertically
+ * - `"rotate_l"`: Rotate left (-90°)
+ * - `"rotate_r"`: Rotate right (90°)
+ * - `"caption"`: Toggle caption (FIGCAPTION)
+ * - `"revert"`: Revert to original size
+ * - `"edit"`: Open edit modal
+ * - `"copy"`: Copy component
+ * - `"remove"`: Remove component
+ * - `"as"`: Format type (block/inline) - requires `useFormatType` option
+ * - `"align"`: Alignment (none/left/center/right)
+ * - `"onalign"`: Alignment button (opens alignment menu)
+ * - `"onresize"`: Resize button (opens resize menu)
+ * - `"resize_auto,50,75,100"`: Auto-resize with percentage values (e.g., "resize_auto,100,75,50")
+ * - Custom action object with action, command, value, title, icon
+ *
+ * @example
+ * // Basic controls
+ * [['mirror_h', 'mirror_v', 'align', 'caption', 'edit', 'copy', 'remove']]
+ *
+ * @example
+ * // Multi-row controls with resize options
+ * [
+ *   ['as', 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
+ *   ['edit', 'align', 'caption', 'revert', 'copy', 'remove']
+ * ]
+ *
+ * @example
+ * // Custom action example
+ * [[
  *   {
- *     action: (element: Node, value: string, target: Node) => void,
- *     command: string,
- *     value: string,
- *     title: string,
- *     icon: string
- *   }
- * >>} FigureControls
- * "mirror". "rotate", "caption", "revert", "edit", "copy", "remove", "as", "resize_auto,[number]"
+ *     action: (element, value, target) => { console.log('Custom action'); },
+ *     command: 'custom-download',
+ *     value: 'download',
+ *     title: 'Download',
+ *     icon: '<svg>...</svg>'
+ *   },
+ *   'edit', 'copy', 'remove'
+ * ]]
+ *
+ * @typedef {Array<Array<FigureControlButton | FigureControlResize | FigureControlCustomAction | string>>} FigureControls
  */
 
 /**

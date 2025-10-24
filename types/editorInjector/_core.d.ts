@@ -1,95 +1,95 @@
 import type {} from '../typedef';
 /**
  * @description Add default properties to the editor core object.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-export default function CoreInjector(editor: __se__EditorCore): void;
+export default function CoreInjector(editor: SunEditor.Core): void;
 export default class CoreInjector {
 	/**
 	 * @description Add default properties to the editor core object.
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	/**
 	 * @description The root editor instance.
-	 * @type {__se__EditorCore}
+	 * @type {SunEditor.Core}
 	 */
-	editor: __se__EditorCore;
+	editor: SunEditor.Core;
 	/**
 	 * @description The event manager instance.
-	 * @type {__se__EditorCore['eventManager']}
+	 * @type {SunEditor.Core['eventManager']}
 	 */
-	eventManager: __se__EditorCore['eventManager'];
+	eventManager: SunEditor.Core['eventManager'];
 	/**
 	 * @description The util/instanceCheck instance.
-	 * @type {__se__EditorCore['instanceCheck']}
+	 * @type {SunEditor.Core['instanceCheck']}
 	 */
-	instanceCheck: __se__EditorCore['instanceCheck'];
+	instanceCheck: SunEditor.Core['instanceCheck'];
 	/**
 	 * @description The history manager instance.
-	 * @type {__se__EditorCore['history']}
+	 * @type {SunEditor.Core['history']}
 	 */
-	history: __se__EditorCore['history'];
+	history: SunEditor.Core['history'];
 	/**
 	 * @description The events instance.
-	 * @type {__se__EditorCore['events']}
+	 * @type {SunEditor.Core['events']}
 	 */
-	events: __se__EditorCore['events'];
+	events: SunEditor.Core['events'];
 	/**
 	 * @description The function to trigger an event.
-	 * @type {__se__EditorCore['triggerEvent']}
+	 * @type {SunEditor.Core['triggerEvent']}
 	 */
-	triggerEvent: __se__EditorCore['triggerEvent'];
+	triggerEvent: SunEditor.Core['triggerEvent'];
 	/**
 	 * @description The wrapper element for carrying elements.
-	 * @type {__se__EditorCore['carrierWrapper']}
+	 * @type {SunEditor.Core['carrierWrapper']}
 	 */
-	carrierWrapper: __se__EditorCore['carrierWrapper'];
+	carrierWrapper: SunEditor.Core['carrierWrapper'];
 	/**
 	 * @description The plugins used by the editor.
-	 * @type {__se__EditorCore['plugins']}
+	 * @type {SunEditor.Core['plugins']}
 	 */
-	plugins: __se__EditorCore['plugins'];
+	plugins: SunEditor.Core['plugins'];
 	/**
 	 * @description The status of the editor.
-	 * @type {__se__EditorStatus}
+	 * @type {SunEditor.Status}
 	 */
-	status: __se__EditorStatus;
+	status: SunEditor.Status;
 	/**
 	 * @description The editor's [frame] context utility object.
-	 * @type {__se__EditorCore['frameContext']}
+	 * @type {SunEditor.Core['frameContext']}
 	 */
-	frameContext: __se__EditorCore['frameContext'];
+	frameContext: SunEditor.Core['frameContext'];
 	/**
 	 * @description The editor's [frame] options utility object.
-	 * @type {__se__EditorCore['frameOptions']}
+	 * @type {SunEditor.Core['frameOptions']}
 	 */
-	frameOptions: __se__EditorCore['frameOptions'];
+	frameOptions: SunEditor.Core['frameOptions'];
 	/**
 	 * @description The editor's context utility object.
-	 * @type {__se__EditorCore['context']}
+	 * @type {SunEditor.Core['context']}
 	 */
-	context: __se__EditorCore['context'];
+	context: SunEditor.Core['context'];
 	/**
 	 * @description The editor's options utility object.
-	 * @type {__se__EditorCore['options']}
+	 * @type {SunEditor.Core['options']}
 	 */
-	options: __se__EditorCore['options'];
+	options: SunEditor.Core['options'];
 	/**
 	 * @description The editor's icons.
-	 * @type {__se__EditorCore['icons']}
+	 * @type {SunEditor.Core['icons']}
 	 */
-	icons: __se__EditorCore['icons'];
+	icons: SunEditor.Core['icons'];
 	/**
 	 * @description The language settings.
-	 * @type {__se__EditorCore['lang']}
+	 * @type {SunEditor.Core['lang']}
 	 */
-	lang: __se__EditorCore['lang'];
+	lang: SunEditor.Core['lang'];
 	/**
 	 * @description editor.frameRoots map.
-	 * @type {__se__EditorCore['frameRoots']}
+	 * @type {SunEditor.Core['frameRoots']}
 	 */
-	frameRoots: __se__EditorCore['frameRoots'];
+	frameRoots: SunEditor.Core['frameRoots'];
 	/**
 	 * @description The window object.
 	 * @type {Window}

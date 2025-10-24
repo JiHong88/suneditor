@@ -1,13 +1,13 @@
 import { dom, keyCodeMap } from '../../../helper';
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_ww_input
+ * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_input
  */
 
 /**
  * @private
  * @this {EventManagerThis_handler_ww_input}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {InputEvent} e - Event object
  */
 export async function OnBeforeInput_wysiwyg(fc, e) {
@@ -38,7 +38,7 @@ export async function OnBeforeInput_wysiwyg(fc, e) {
 /**
  * @private
  * @this {EventManagerThis_handler_ww_input}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {InputEvent} e - Event object
  */
 export async function OnInput_wysiwyg(fc, e) {

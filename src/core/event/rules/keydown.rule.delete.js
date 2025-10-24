@@ -5,9 +5,9 @@ import { A } from '../actions';
 /**
  * @this {void}
  * @description Delete key down rule
- * @param {__se__EventActions} actions - Action list
- * @param {__se__EventPorts} ports - Ports for interacting with editor
- * @param {__se__EventKeydownCtx} ctx - Context object
+ * @param {SunEditor.EventActions} actions - Action list
+ * @param {SunEditor.EventPorts} ports - Ports for interacting with editor
+ * @param {SunEditor.EventKeydownCtx} ctx - Context object
  * @returns {boolean} Return false to stop the processing
  */
 export function reduceDeleteDown(actions, ports, ctx) {

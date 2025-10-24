@@ -61,10 +61,10 @@ declare class Math_ extends EditorInjector {
 	static component(this: Math_, node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {MathPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: MathPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: MathPluginOptions);
 	title: any;
 	icon: string;
 	katex: any;

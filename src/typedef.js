@@ -2,32 +2,61 @@
  * @fileoverview Global Type Declarations for SunEditor Custom Types
  */
 
-// --------------------------------------------------------- [Node] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Array<Node>|HTMLCollection|NodeList} __se__NodeCollection
+ * @namespace SunEditor
  */
 
-// --------------------------------------------------------- [Editor] ---------------------------------------------------------------------------------------------------
+// ================================================================================================================================
+// === PUBLIC API TYPES (User-facing types for common use cases)
+// ================================================================================================================================
+
+// --------------------------------------------------------- [Editor Types] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./core/editor').default} __se__EditorCore
- * @typedef {import('./editorInjector').default} __se__EditorInjector
+ * @typedef {import('./core/editor').default} SunEditor.Instance
  */
 
-// --------------------------------------------------------- [Options] ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------- [Init Options] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./core/config/options').EditorInitOptions} __se__EditorOptions
- * @typedef {import('./core/config/options').EditorFrameOptions} __se__EditorFrameOptions
+ * @typedef {import('./core/config/options.js').EditorInitOptions} SunEditor.InitOptions
  */
 
-// --------------------------------------------------------- [Context] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./core/config/frameContext').FrameContextUtil} __se__FrameContext
- * @typedef {Map<keyof import('./core/config/context').ContextUtil, *>} __se__Context
+ * @typedef {import('./core/config/options.js').EditorFrameOptions} SunEditor.InitFrameOptions
  */
 
-// --------------------------------------------------------- [Editor Status] ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------- [Context & Options] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Object} __se__EditorStatus
+ * @typedef {Map<keyof import('./core/config/context').ContextUtil, *>} SunEditor.Context
+ */
+
+/**
+ * @typedef {import('./core/config/options').BaseOptionsMap} SunEditor.Options
+ *
+ */
+
+// --------------------------------------------------------- [{Frame} Context & Options] ---------------------------------------------------------------------------------------------------
+/**
+ * @typedef {import('./core/config/frameContext').FrameContextUtil} SunEditor.FrameContext
+ */
+
+/**
+ * @typedef {import('./core/config/options').FrameOptionsMap} SunEditor.FrameOptions
+ *
+ */
+
+// --------------------------------------------------------- [Internal Core Types] ---------------------------------------------------------------------------------------------------
+/**
+ * @typedef {import('./core/editor').default} SunEditor.Core
+ * @deprecated Use SunEditor.Instance instead
+ */
+
+/**
+ * @typedef {import('./editorInjector').default} SunEditor.Injector
+ */
+
+/**
+ * @typedef {Object} SunEditor.Status
+ *
  * @property {boolean} hasFocus Boolean value of whether the editor has focus
  * @property {number} tabSize Indent size of tab (4)
  * @property {number} indentSize Indent size (25)px
@@ -42,9 +71,10 @@
  * @property {boolean} _onMousedown Mouse down event status
  */
 
-// --------------------------------------------------------- [component] ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------- [Component Types] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Object} __se__ComponentInfo
+ * @typedef {Object} SunEditor.ComponentInfo
+ *
  * @property {HTMLElement} target - The target element associated with the component.
  * @property {string} pluginName - The name of the plugin related to the component.
  * @property {Object<string, *>} options - Options related to the component.
@@ -58,7 +88,8 @@
  */
 
 /**
- * @typedef {"auto"|"select"|"line"|"none"} __se__ComponentInsertBehaviorType
+ * @typedef {"auto"|"select"|"line"|"none"} SunEditor.ComponentInsertBehaviorType
+ *
  * @description Component insertion behavior for selection and cursor placement.
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
@@ -68,9 +99,72 @@
  *    - `none`: Do nothing.
  */
 
-// --------------------------------------------------------- [Event] ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------- [DOM/Utility Types] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Object} __se__EventInfo
+ * @typedef {Array<Node>|HTMLCollection|NodeList} SunEditor.NodeCollection
+ */
+
+// --------------------------------------------------------- [Plugin Event Types] ---------------------------------------------------------------------------------------------------
+/**
+ * @typedef {Object} SunEditor.PluginMouseEventInfo
+ *
+ * @property {SunEditor.FrameContext} frameContext Frame context
+ * @property {MouseEvent} event Event object
+ */
+
+/**
+ * @typedef {Object} SunEditor.PluginKeyEventInfo
+ *
+ * @property {SunEditor.FrameContext} frameContext Frame context
+ * @property {KeyboardEvent} event Event object
+ * @property {Range} range range object
+ * @property {HTMLElement} line Current line element
+ */
+
+/**
+ * @typedef {Object} SunEditor.PluginToolbarInputChangeEventInfo
+ *
+ * @property {HTMLElement} target Input element
+ * @property {Event} event Event object
+ * @property {string} value Input value
+ */
+
+/**
+ * @typedef {Object} SunEditor.PluginShortcutInfo Information of the "shortcut" plugin
+ *
+ * @property {Range} range - Range object
+ * @property {HTMLElement} line - The line element of the current range
+ * @property {import('./core/class/shortcuts').ShortcutInfo} info - Information of the shortcut
+ * @property {KeyboardEvent} event - Key event object
+ * @property {string} keyCode - KeyBoardEvent.code
+ * @property {SunEditor.Core} editor - The root editor instance
+ */
+
+/**
+ * @typedef {Object} SunEditor.PluginPasteParams
+ *
+ * @property {SunEditor.FrameContext} frameContext Frame context
+ * @property {ClipboardEvent} event Clipboard event object
+ * @property {string} data Format cleaned paste data (HTML string)
+ * @property {Document} doc DomParser data (new DOMParser().parseFromString(data, 'text/html');)
+ */
+
+/**
+ * @typedef {Object} SunEditor.PluginCopyComponentParams
+ *
+ * @property {ClipboardEvent} event Clipboard event object
+ * @property {HTMLElement} cloneContainer Cloned component container
+ * @property {SunEditor.ComponentInfo} info Component information
+ */
+
+// ================================================================================================================================
+// === INTERNAL/ADVANCED TYPES (Framework internals and advanced use cases)
+// ================================================================================================================================
+
+// --------------------------------------------------------- [Event System Types] ---------------------------------------------------------------------------------------------------
+/**
+ * @typedef {Object} SunEditor.EventInfo
+ *
  * @property {*} target Target element
  * @property {string} type Event type
  * @property {(...args: *) => *} listener Event listener
@@ -78,76 +172,58 @@
  */
 
 /**
- * @typedef {Object} __se__GlobalEventInfo
+ * @typedef {Object} SunEditor.GlobalEventInfo
+ *
  * @property {string} type Event type
  * @property {(...args: *) => *} listener Event listener
  * @property {boolean|AddEventListenerOptions=} useCapture Use event capture
  */
 
-// --------------------------------------------------------- [Plugin Event] ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------- [Event System Internals] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Object} __se__PluginMouseEventInfo
- * @property {__se__FrameContext} frameContext Frame context
- * @property {MouseEvent} event Event object
+ * @typedef {import('./core/event/reducers/keydown.reducer').KeydownReducerCtx} SunEditor.EventKeydownCtx
+ *
  */
 
 /**
- * @typedef {Object} __se__PluginKeyEventInfo
- * @property {__se__FrameContext} frameContext Frame context
- * @property {KeyboardEvent} event Event object
- * @property {Range} range range object
- * @property {HTMLElement} line Current line element
+ * @typedef {import('./core/event/actions').Action[]} SunEditor.EventActions
+ *
  */
 
 /**
- * @typedef {Object} __se__PluginToolbarInputChangeEventInfo
- * @property {HTMLElement} target Input element
- * @property {Event} event Event object
- * @property {string} value Input value
+ * @typedef {import('./core/event/ports').EventReducerPorts} SunEditor.EventPorts
+ *
  */
 
+// --------------------------------------------------------- [Button/Toolbar Types] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Object} __se__PluginShortcutInfo Information of the "shortcut" plugin
- * @property {Range} range - Range object
- * @property {HTMLElement} line - The line element of the current range
- * @property {import('./core/class/shortcuts').ShortcutInfo} info - Information of the shortcut
- * @property {KeyboardEvent} event - Key event object
- * @property {string} keyCode - KeyBoardEvent.code
- * @property {__se__EditorCore} editor - The root editor instance
+ * Special toolbar control strings
+ * - `"|"`: Vertical separator
+ * - `"/"`: Line break
+ * - `":title-icon"`: More button (e.g., ":More-default.more_vertical")
+ * - `"-left"|"-right"|"-center"`: Float alignment
+ * - `"#fix"`: RTL direction fix
+ * - `"%100"|"%50"`: Responsive breakpoint (percentage)
+ * @typedef {"|"|"/"|`-${"left"|"right"|"center"}`|"#fix"|`:${string}-${string}`|`%${number}`} SunEditor.ButtonSpecial
  */
 
+// ========================================================= [ButtonList Generate] ===================================================================================================
 /**
- * @typedef {Object} __se__PluginPasteParams
- * @property {__se__FrameContext} frameContext Frame context
- * @property {ClipboardEvent} event Clipboard event object
- * @property {string} data Format cleaned paste data (HTML string)
- * @property {Document} doc DomParser data (new DOMParser().parseFromString(data, 'text/html');)
- */
-
-/**
- * @typedef {Object} __se__PluginCopyComponentParams
- * @property {ClipboardEvent} event Clipboard event object
- * @property {HTMLElement} cloneContainer Cloned component container
- * @property {__se__ComponentInfo} info Component information
- */
-
-// --------------------------------------------------------- [Options Map] ---------------------------------------------------------------------------------------------------
-/**
- * @typedef {import('./core/config/options').FrameOptionsMap} __se__FrameOptions
- * @typedef {import('./core/config/options').BaseOptionsMap} __se__BaseOptions
- */
-
-// --------------------------------------------------------- [core.class] ---------------------------------------------------------------------------------------------------
-/**
- * @typedef {import('./core/class/offset').OffsetGlobalInfo} __se__Class_OffsetGlobalInfo
- */
-
-// --------------------------------------------------------- [event.reducer/action] ------------------------------------------------------------------------------------------
-/**
- * @typedef {import('./core/event/reducers/keydown.reducer').KeydownReducerCtx} __se__EventKeydownCtx
- */
-
-/**
- * @typedef {import('./core/event/actions').Action[]} __se__EventActions
- * @typedef {import('./core/event/ports').EventReducerPorts} __se__EventPorts
+ * === [ Button Types - Auto-generated ] ===
+ * ---[ Auto-generated by scripts/check/gen-button-types.cjs - DO NOT EDIT MANUALLY ]---
+ *
+ * Default command buttons available in the toolbar
+ * @typedef {"bold"|"underline"|"italic"|"strike"|"subscript"|"superscript"|"removeFormat"|"copyFormat"|"indent"|"outdent"|"fullScreen"|"showBlocks"|"codeView"|"undo"|"redo"|"preview"|"print"|"copy"|"dir"|"dir_ltr"|"dir_rtl"|"save"|"newDocument"|"selectAll"|"pageBreak"|"pageUp"|"pageDown"|"pageNavigator"} SunEditor.ButtonCommand
+ *
+ * Plugin buttons available in the toolbar
+ * @typedef {"blockquote"|"exportPDF"|"fileUpload"|"list_bulleted"|"list_numbered"|"mention"|"align"|"font"|"fontColor"|"backgroundColor"|"list"|"table"|"blockStyle"|"hr"|"layout"|"lineHeight"|"template"|"paragraphStyle"|"textStyle"|"link"|"image"|"video"|"audio"|"embed"|"math"|"drawing"|"imageGallery"|"videoGallery"|"audioGallery"|"fileGallery"|"fileBrowser"|"fontSize"|"pageNavigator"|"anchor"} SunEditor.ButtonPlugin
+ *
+ * Single button item in the toolbar (includes special controls and custom strings)
+ * @typedef {SunEditor.ButtonCommand|SunEditor.ButtonPlugin|SunEditor.ButtonSpecial|string} SunEditor.ButtonItem
+ *
+ * Button list configuration for the toolbar
+ * 2D array of button items, where each sub-array represents a button group
+ * @typedef {Array<Array<SunEditor.ButtonItem>|SunEditor.ButtonSpecial>} SunEditor.ButtonList
+ * ///
+ * ---[ End of auto-generated button types ]---
  */

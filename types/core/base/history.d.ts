@@ -1,9 +1,9 @@
 import type {} from '../../typedef';
 /**
  * @description History stack closure
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-export default function History(editor: __se__EditorCore): {
+export default function History(editor: SunEditor.Core): {
 	/**
 	 * @description Saving the current status to the history object stack
 	 * - If "delay" is true, it will be saved after (options.get('historyStackDelayTime') || 400) milliseconds.

@@ -19,10 +19,10 @@ declare class Align extends EditorInjector {
 	static type: string;
 	static className: string;
 	/**
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {AlignPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: AlignPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: AlignPluginOptions);
 	title: any;
 	icon: string;
 	_itemMenu: HTMLUListElement;

@@ -7,7 +7,7 @@ import { dom, unicode, env, numbers } from '../../helper';
 const { _w, isTouchDevice } = env;
 
 /**
- * @typedef {Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>} SelectionThis
+ * @typedef {Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>} SelectionThis
  */
 
 /**
@@ -18,7 +18,7 @@ const { _w, isTouchDevice } = env;
  * @constructor
  * @this {SelectionThis}
  * @description Selection, Range related class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function Selection_(editor) {
 	CoreInjector.call(this, editor);

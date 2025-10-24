@@ -63,10 +63,10 @@ declare class Table extends EditorInjector {
 	static component(this: Table, node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {TablePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: TablePluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: TablePluginOptions);
 	title: any;
 	icon: string;
 	figureScrollList: string[];
@@ -158,17 +158,17 @@ declare class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component copy is requested.
-	 * @param {__se__PluginCopyComponentParams} params
+	 * @param {SunEditor.PluginCopyComponentParams} params
 	 * @returns {boolean|void}
 	 */
-	onCopyComponent({ event, cloneContainer }: __se__PluginCopyComponentParams): boolean | void;
+	onCopyComponent({ event, cloneContainer }: SunEditor.PluginCopyComponentParams): boolean | void;
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "copy".
-	 * @param {__se__PluginPasteParams} params
+	 * @param {SunEditor.PluginPasteParams} params
 	 * @returns {boolean|void}
 	 */
-	onPaste({ event, doc }: __se__PluginPasteParams): boolean | void;
+	onPaste({ event, doc }: SunEditor.PluginPasteParams): boolean | void;
 	/**
 	 * @editorMethod Editor.core
 	 * @description This method is used to validate and preserve the format of the component within the editor.
@@ -193,9 +193,9 @@ declare class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousemove".
-	 * @param {__se__PluginMouseEventInfo} params
+	 * @param {SunEditor.PluginMouseEventInfo} params
 	 */
-	onMouseMove({ event }: __se__PluginMouseEventInfo): void;
+	onMouseMove({ event }: SunEditor.PluginMouseEventInfo): void;
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "scroll".
@@ -204,9 +204,9 @@ declare class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousedown".
-	 * @param {__se__PluginMouseEventInfo} params
+	 * @param {SunEditor.PluginMouseEventInfo} params
 	 */
-	onMouseDown({ event }: __se__PluginMouseEventInfo): void;
+	onMouseDown({ event }: SunEditor.PluginMouseEventInfo): void;
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mouseup".
@@ -220,15 +220,15 @@ declare class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keydown".
-	 * @param {__se__PluginKeyEventInfo} params
+	 * @param {SunEditor.PluginKeyEventInfo} params
 	 */
-	onKeyDown({ event, range, line }: __se__PluginKeyEventInfo): boolean;
+	onKeyDown({ event, range, line }: SunEditor.PluginKeyEventInfo): boolean;
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keyup".
-	 * @param {__se__PluginKeyEventInfo} params
+	 * @param {SunEditor.PluginKeyEventInfo} params
 	 */
-	onKeyUp({ line }: __se__PluginKeyEventInfo): void;
+	onKeyUp({ line }: SunEditor.PluginKeyEventInfo): void;
 	/**
 	 * @editorMethod Modules.ColorPicker
 	 * @description Executes the method called when a button of "ColorPicker" module is clicked.

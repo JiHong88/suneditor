@@ -3,44 +3,44 @@ export default ClassInjector;
 /**
  * @private
  * @description Add all inner classes to the editor instance.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function ClassInjector(editor: __se__EditorCore): void;
+declare function ClassInjector(editor: SunEditor.Core): void;
 declare class ClassInjector {
 	/**
 	 * @private
 	 * @description Add all inner classes to the editor instance.
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
 	private constructor();
-	/** @description Toolbar class instance @type {__se__EditorCore['toolbar']} */
-	toolbar: __se__EditorCore['toolbar'];
-	/** @description Sub-Toolbar class instance @type {__se__EditorCore['subToolbar']|null} */
-	subToolbar: __se__EditorCore['subToolbar'] | null;
-	/** @description Char class instance @type {__se__EditorCore['char']} */
-	char: __se__EditorCore['char'];
-	/** @description Component class instance @type {__se__EditorCore['component']} */
-	component: __se__EditorCore['component'];
-	/** @description Format class instance @type {__se__EditorCore['format']} */
-	format: __se__EditorCore['format'];
-	/** @description HTML class instance @type {__se__EditorCore['html']} */
-	html: __se__EditorCore['html'];
-	/** @description Inline format class instance @type {__se__EditorCore['inline']} */
-	inline: __se__EditorCore['inline'];
-	/** @description List format class instance @type {__se__EditorCore['listFormat']} */
-	listFormat: __se__EditorCore['listFormat'];
-	/** @description Menu class instance @type {__se__EditorCore['menu']} */
-	menu: __se__EditorCore['menu'];
-	/** @description NodeTransform class instance @type {__se__EditorCore['nodeTransform']} */
-	nodeTransform: __se__EditorCore['nodeTransform'];
-	/** @description Offset class instance @type {__se__EditorCore['offset']} */
-	offset: __se__EditorCore['offset'];
-	/** @description Selection class instance @type {__se__EditorCore['selection']} */
-	selection: __se__EditorCore['selection'];
-	/** @description Shortcuts class instance @type {__se__EditorCore['shortcuts']} */
-	shortcuts: __se__EditorCore['shortcuts'];
-	/** @description UI class instance @type {__se__EditorCore['ui']} */
-	ui: __se__EditorCore['ui'];
-	/** @description Viewer class instance @type {__se__EditorCore['viewer']} */
-	viewer: __se__EditorCore['viewer'];
+	/** @description Toolbar class instance @type {SunEditor.Core['toolbar']} */
+	toolbar: SunEditor.Core['toolbar'];
+	/** @description Sub-Toolbar class instance @type {SunEditor.Core['subToolbar']|null} */
+	subToolbar: SunEditor.Core['subToolbar'] | null;
+	/** @description Char class instance @type {SunEditor.Core['char']} */
+	char: SunEditor.Core['char'];
+	/** @description Component class instance @type {SunEditor.Core['component']} */
+	component: SunEditor.Core['component'];
+	/** @description Format class instance @type {SunEditor.Core['format']} */
+	format: SunEditor.Core['format'];
+	/** @description HTML class instance @type {SunEditor.Core['html']} */
+	html: SunEditor.Core['html'];
+	/** @description Inline format class instance @type {SunEditor.Core['inline']} */
+	inline: SunEditor.Core['inline'];
+	/** @description List format class instance @type {SunEditor.Core['listFormat']} */
+	listFormat: SunEditor.Core['listFormat'];
+	/** @description Menu class instance @type {SunEditor.Core['menu']} */
+	menu: SunEditor.Core['menu'];
+	/** @description NodeTransform class instance @type {SunEditor.Core['nodeTransform']} */
+	nodeTransform: SunEditor.Core['nodeTransform'];
+	/** @description Offset class instance @type {SunEditor.Core['offset']} */
+	offset: SunEditor.Core['offset'];
+	/** @description Selection class instance @type {SunEditor.Core['selection']} */
+	selection: SunEditor.Core['selection'];
+	/** @description Shortcuts class instance @type {SunEditor.Core['shortcuts']} */
+	shortcuts: SunEditor.Core['shortcuts'];
+	/** @description UI class instance @type {SunEditor.Core['ui']} */
+	ui: SunEditor.Core['ui'];
+	/** @description Viewer class instance @type {SunEditor.Core['viewer']} */
+	viewer: SunEditor.Core['viewer'];
 }

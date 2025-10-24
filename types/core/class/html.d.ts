@@ -1,27 +1,27 @@
 import type {} from '../../typedef';
 export default HTML;
-export type HTMLThis = Omit<HTML & Partial<__se__EditorInjector>, 'html'>;
+export type HTMLThis = Omit<HTML & Partial<SunEditor.Injector>, 'html'>;
 /**
- * @typedef {Omit<HTML & Partial<__se__EditorInjector>, 'html'>} HTMLThis
+ * @typedef {Omit<HTML & Partial<SunEditor.Injector>, 'html'>} HTMLThis
  */
 /**
  * @constructor
  * @this {HTMLThis}
  * @description All HTML related classes involved in the editing area
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function HTML(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, editor: __se__EditorCore): void;
+declare function HTML(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, editor: SunEditor.Core): void;
 declare class HTML {
 	/**
-	 * @typedef {Omit<HTML & Partial<__se__EditorInjector>, 'html'>} HTMLThis
+	 * @typedef {Omit<HTML & Partial<SunEditor.Injector>, 'html'>} HTMLThis
 	 */
 	/**
 	 * @constructor
 	 * @this {HTMLThis}
 	 * @description All HTML related classes involved in the editing area
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	fontSizeUnitRegExp: RegExp;
 	_isAllowedClassName: any;
 	_allowHTMLComment: any;
@@ -433,10 +433,10 @@ declare class HTML {
 	 * @description Converts a list of DOM nodes into an HTML list structure.
 	 * - If the node is already a list, its innerHTML is used. If it is a block element,
 	 * - the function is called recursively.
-	 * @param {__se__NodeCollection} domTree List of DOM nodes to be converted.
+	 * @param {SunEditor.NodeCollection} domTree List of DOM nodes to be converted.
 	 * @returns {string} The generated HTML list.
 	 */
-	_convertListCell(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, domTree: __se__NodeCollection): string;
+	_convertListCell(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, domTree: SunEditor.NodeCollection): string;
 	/**
 	 * @private
 	 * @this {HTMLThis}

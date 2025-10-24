@@ -25,7 +25,7 @@ class HR extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {HRPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
@@ -94,7 +94,7 @@ class HR extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
 	shortcut({ line, range }) {
 		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);

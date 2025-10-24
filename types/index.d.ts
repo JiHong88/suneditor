@@ -8,20 +8,5 @@ export { default as langs } from './langs';
 export { default as modules } from './modules';
 export { default as plugins } from './plugins';
 
-// Export types
-export type {
-	SunEditorComponentInfo,
-	SunEditorCore,
-	SunEditorFrameOptions,
-	SunEditorInstance,
-	SunEditorOptions,
-	SunEditorPluginCopyComponent,
-	SunEditorPluginKeyEvent,
-	SunEditorPluginMouseEvent,
-	SunEditorPluginPaste,
-	SunEditorPluginShortcut,
-	SunEditorPluginToolbarInputChange
-} from './suneditor';
-
 // Main default export
 export { default } from './suneditor';

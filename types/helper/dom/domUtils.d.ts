@@ -39,46 +39,46 @@ export function createTextNode(text: string): Text;
 export function getAttributesToString(element: Node, exceptAttrs: Array<string> | null): string;
 /**
  * @description Get the items array from the array that matches the condition.
- * @param {__se__NodeCollection} array Array to get item
+ * @param {SunEditor.NodeCollection} array Array to get item
  * @param {?(current: *) => boolean} validation Conditional function
  * @returns {Array<Node>|null}
  */
-export function arrayFilter(array: __se__NodeCollection, validation: ((current: any) => boolean) | null): Array<Node> | null;
+export function arrayFilter(array: SunEditor.NodeCollection, validation: ((current: any) => boolean) | null): Array<Node> | null;
 /**
  * @description Get the item from the array that matches the condition.
- * @param {__se__NodeCollection} array Array to get item
+ * @param {SunEditor.NodeCollection} array Array to get item
  * @param {?(current: *) => boolean} validation Conditional function
  * @returns {Node|null}
  */
-export function arrayFind(array: __se__NodeCollection, validation: ((current: any) => boolean) | null): Node | null;
+export function arrayFind(array: SunEditor.NodeCollection, validation: ((current: any) => boolean) | null): Node | null;
 /**
  * @description Check if an array contains an element
- * @param {__se__NodeCollection} array element array
+ * @param {SunEditor.NodeCollection} array element array
  * @param {Node} node The node to check for
  * @returns {boolean}
  */
-export function arrayIncludes(array: __se__NodeCollection, node: Node): boolean;
+export function arrayIncludes(array: SunEditor.NodeCollection, node: Node): boolean;
 /**
  * @description Get the index of the argument value in the element array
- * @param {__se__NodeCollection} array element array
+ * @param {SunEditor.NodeCollection} array element array
  * @param {Node} node The element to find index
  * @returns {number}
  */
-export function getArrayIndex(array: __se__NodeCollection, node: Node): number;
+export function getArrayIndex(array: SunEditor.NodeCollection, node: Node): number;
 /**
  * @description Get the next index of the argument value in the element array
- * @param {__se__NodeCollection} array element array
+ * @param {SunEditor.NodeCollection} array element array
  * @param {Node} item The element to find index
  * @returns {number}
  */
-export function nextIndex(array: __se__NodeCollection, item: Node): number;
+export function nextIndex(array: SunEditor.NodeCollection, item: Node): number;
 /**
  * @description Get the previous index of the argument value in the element array
- * @param {__se__NodeCollection} array Element array
+ * @param {SunEditor.NodeCollection} array Element array
  * @param {Node} item The element to find index
  * @returns {number}
  */
-export function prevIndex(array: __se__NodeCollection, item: Node): number;
+export function prevIndex(array: SunEditor.NodeCollection, item: Node): number;
 /**
  * @description Add style and className of copyEl to originEl
  * @param {Node} originEl Origin element
@@ -125,11 +125,11 @@ export function setStyle(elements: Node | Node[], styleName: string, value: stri
 export function getStyle(element: Node, styleName: string): string | undefined;
 /**
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
- * @param {__se__NodeCollection} buttonList (Button | Input) Element array
+ * @param {SunEditor.NodeCollection} buttonList (Button | Input) Element array
  * @param {boolean} disabled Disabled value
  * @param {boolean} [important=false] If priveleged mode should be used (Necessary to switch importantDisabled buttons)
  */
-export function setDisabled(buttonList: __se__NodeCollection, disabled: boolean, important?: boolean): void;
+export function setDisabled(buttonList: SunEditor.NodeCollection, disabled: boolean, important?: boolean): void;
 /**
  * @description Determine whether any of the matched elements are assigned the given class
  * @param {?Node} element Elements to search class name
@@ -139,16 +139,16 @@ export function setDisabled(buttonList: __se__NodeCollection, disabled: boolean,
 export function hasClass(element: Node | null, className: string): boolean;
 /**
  * @description Append the className value of the argument value element
- * @param {Node|__se__NodeCollection} element Elements to add class name
+ * @param {Node|SunEditor.NodeCollection} element Elements to add class name
  * @param {string} className Class name to be add
  */
-export function addClass(element: Node | __se__NodeCollection, className: string): void;
+export function addClass(element: Node | SunEditor.NodeCollection, className: string): void;
 /**
  * @description Delete the className value of the argument value element
- * @param {Node|__se__NodeCollection} element Elements to remove class name
+ * @param {Node|SunEditor.NodeCollection} element Elements to remove class name
  * @param {string} className Class name to be remove
  */
-export function removeClass(element: Node | __se__NodeCollection, className: string): void;
+export function removeClass(element: Node | SunEditor.NodeCollection, className: string): void;
 /**
  * @description Argument value If there is no class name, insert it and delete the class name if it exists
  * @param {Node} element Element to replace class name

@@ -12,10 +12,10 @@ const { isOSX_IOS } = env;
 /**
  * @typedef {Object} KeydownReducerCtx - Keydown Reducer Context object
  * @property {KeyboardEvent} ctx.e - The keyboard event
- * @property {__se__FrameContext} ctx.fc - Frame context object
- * @property {__se__EditorStatus} ctx.status - Editor status object
- * @property {__se__BaseOptions} ctx.options - Options object
- * @property {__se__FrameOptions} ctx.frameOptions - Frame options object
+ * @property {SunEditor.FrameContext} ctx.fc - Frame context object
+ * @property {SunEditor.Status} ctx.status - Editor status object
+ * @property {SunEditor.Options} ctx.options - Options object
+ * @property {SunEditor.FrameOptions} ctx.frameOptions - Frame options object
  * @property {Range} ctx.range - Current selection range
  * @property {HTMLElement|Text} ctx.selectionNode - Current selection node
  * @property {HTMLElement} ctx.formatEl - Current format element
@@ -27,9 +27,9 @@ const { isOSX_IOS } = env;
 
 /**
  * @description Keydown event reducer
- * @param {__se__EventPorts} ports - Ports for interacting with editor
+ * @param {SunEditor.EventPorts} ports - Ports for interacting with editor
  * @param {KeydownReducerCtx} ctx - Context object
- * @returns {Promise<__se__EventActions>} Action list
+ * @returns {Promise<SunEditor.EventActions>} Action list
  */
 export async function reduceKeydown(ports, ctx) {
 	const actions = [];

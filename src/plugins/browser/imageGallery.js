@@ -20,7 +20,7 @@ class ImageGallery extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {ImageGalleryPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {

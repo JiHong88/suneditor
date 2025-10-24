@@ -25,10 +25,10 @@ declare class ExportPDF extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {ExportPDFPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: ExportPDFPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: ExportPDFPluginOptions);
 	title: any;
 	icon: string;
 	apiUrl: string;

@@ -8,7 +8,7 @@ import { numbers } from '../../helper';
 
 /**
  * @description History stack closure
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 export default function History(editor) {
 	const frameRoots = editor.frameRoots;
@@ -21,7 +21,7 @@ export default function History(editor) {
 	/**
 	 * @private
 	 * @description Triggers onChange event and updates UI after history state changes.
-	 * @param {__se__FrameContext} fc The frame context.
+	 * @param {SunEditor.FrameContext} fc The frame context.
 	 * @param {number} index The current history index.
 	 * @param {boolean} isSetFocus Whether to apply tag effects if editor has focus.
 	 */

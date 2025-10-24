@@ -1,6 +1,6 @@
 import type {} from '../../typedef';
 export default Shortcuts;
-export type ShortcutsThis = Omit<Shortcuts & Partial<__se__EditorInjector>, 'shortcuts'>;
+export type ShortcutsThis = Omit<Shortcuts & Partial<SunEditor.Injector>, 'shortcuts'>;
 export type ShortcutInfo = {
 	/**
 	 * - Whether the [Ctrl, Command] key is pressed.
@@ -60,7 +60,7 @@ export type ShortcutInfo = {
 	textTrigger: string;
 };
 /**
- * @typedef {Omit<Shortcuts & Partial<__se__EditorInjector>, 'shortcuts'>} ShortcutsThis
+ * @typedef {Omit<Shortcuts & Partial<SunEditor.Injector>, 'shortcuts'>} ShortcutsThis
  */
 /**
  * @typedef {Object} ShortcutInfo
@@ -83,12 +83,12 @@ export type ShortcutInfo = {
  * @constructor
  * @this {ShortcutsThis}
  * @description Shortcuts class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Shortcuts(this: Omit<Shortcuts & Partial<import('../../editorInjector').default>, 'shortcuts'>, editor: __se__EditorCore): void;
+declare function Shortcuts(this: Omit<Shortcuts & Partial<import('../../editorInjector').default>, 'shortcuts'>, editor: SunEditor.Core): void;
 declare class Shortcuts {
 	/**
-	 * @typedef {Omit<Shortcuts & Partial<__se__EditorInjector>, 'shortcuts'>} ShortcutsThis
+	 * @typedef {Omit<Shortcuts & Partial<SunEditor.Injector>, 'shortcuts'>} ShortcutsThis
 	 */
 	/**
 	 * @typedef {Object} ShortcutInfo
@@ -111,9 +111,9 @@ declare class Shortcuts {
 	 * @constructor
 	 * @this {ShortcutsThis}
 	 * @description Shortcuts class
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	editor: import('../editor').default;
 	isDisabled: boolean;
 	/**

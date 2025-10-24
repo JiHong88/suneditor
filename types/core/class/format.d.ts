@@ -1,27 +1,27 @@
 import type {} from '../../typedef';
 export default Format;
-export type FormatThis = Omit<Format & Partial<__se__EditorInjector>, 'format'>;
+export type FormatThis = Omit<Format & Partial<SunEditor.Injector>, 'format'>;
 /**
- * @typedef {Omit<Format & Partial<__se__EditorInjector>, 'format'>} FormatThis
+ * @typedef {Omit<Format & Partial<SunEditor.Injector>, 'format'>} FormatThis
  */
 /**
  * @constructor
  * @this {FormatThis}
  * @description Classes related to editor formats such as "line" and "block".
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Format(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, editor: __se__EditorCore): void;
+declare function Format(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, editor: SunEditor.Core): void;
 declare class Format {
 	/**
-	 * @typedef {Omit<Format & Partial<__se__EditorInjector>, 'format'>} FormatThis
+	 * @typedef {Omit<Format & Partial<SunEditor.Injector>, 'format'>} FormatThis
 	 */
 	/**
 	 * @constructor
 	 * @this {FormatThis}
 	 * @description Classes related to editor formats such as "line" and "block".
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	_formatLineCheck: any;
 	_formatBrLineCheck: any;
 	_formatBlockCheck: any;

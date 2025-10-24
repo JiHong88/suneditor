@@ -36,10 +36,10 @@ declare class BackgroundColor extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {BackgroundColorPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: BackgroundColorPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: BackgroundColorPluginOptions);
 	title: any;
 	icon: string;
 	colorPicker: ColorPicker;

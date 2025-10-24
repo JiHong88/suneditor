@@ -36,9 +36,9 @@ declare class List_numbered extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	shortcut({ range, info }: __se__PluginShortcutInfo): void;
+	shortcut({ range, info }: SunEditor.PluginShortcutInfo): void;
 	/**
 	 * @description Add a numbered list
 	 * @param {string} [type=""] List type

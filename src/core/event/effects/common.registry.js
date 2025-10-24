@@ -3,8 +3,8 @@ import { _w } from '../../../helper/env';
 
 /**
  * @typedef {Object} EffectContext
- * @property {__se__EventPorts} ports - Ports for interacting with editor
- * @property {__se__EventKeydownCtx} ctx - Reducer context
+ * @property {SunEditor.EventPorts} ports - Ports for interacting with editor
+ * @property {SunEditor.EventKeydownCtx} ctx - Reducer context
  */
 
 /**

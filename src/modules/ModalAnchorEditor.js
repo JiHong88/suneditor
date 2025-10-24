@@ -71,8 +71,8 @@ class ModalAnchorEditor extends CoreInjector {
 			// file manager
 			this.fileManager = new FileManager(this, {
 				query: 'a[download]:not([data-se-file-download])',
-				loadHandler: this.events.onFileLoad,
-				eventHandler: this.events.onFileAction
+				loadEventName: 'onFileLoad',
+				actionEventName: 'onFileAction'
 			});
 		}
 
@@ -565,7 +565,7 @@ class ModalAnchorEditor extends CoreInjector {
 
 /**
  * @private
- * @param {__se__EditorCore} editor - Editor instance
+ * @param {SunEditor.Core} editor - Editor instance
  * @param {ModalAnchorEditorParams} params - ModalAnchorEditor options
  * @param {Array<string>} relList - REL attribute list
  * @returns {HTMLElement} - Modal form element

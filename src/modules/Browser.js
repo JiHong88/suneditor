@@ -579,7 +579,7 @@ class Browser extends CoreInjector {
 
 /**
  * @private
- * @param {__se__EditorCore} editor - editor instance
+ * @param {SunEditor.Core} editor - editor instance
  * @param {boolean} useSearch - Whether to use the search function
  * @returns {{ html: HTMLElement, header: HTMLElement, titleArea: HTMLElement, tagArea: HTMLElement, body: HTMLElement, list: HTMLElement, side: HTMLElement, wrapper: HTMLElement, _loading: HTMLElement }} HTML
  */

@@ -10,13 +10,13 @@ function _offDownFn() {
 }
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_ww_mouse
+ * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_mouse
  */
 
 /**
  * @private
  * @this {EventManagerThis_handler_ww_mouse}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object
  */
 export async function OnMouseDown_wysiwyg(fc, e) {
@@ -54,7 +54,7 @@ export async function OnMouseDown_wysiwyg(fc, e) {
 /**
  * @private
  * @this {EventManagerThis_handler_ww_mouse}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object
  */
 export async function OnMouseUp_wysiwyg(fc, e) {
@@ -68,7 +68,7 @@ export async function OnMouseUp_wysiwyg(fc, e) {
 /**
  * @private
  * @this {EventManagerThis_handler_ww_mouse}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object
  */
 export async function OnClick_wysiwyg(fc, e) {
@@ -165,7 +165,7 @@ export async function OnClick_wysiwyg(fc, e) {
 /**
  * @private
  * @this {EventManagerThis_handler_ww_mouse}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object
  */
 export function OnMouseMove_wysiwyg(fc, e) {
@@ -183,7 +183,7 @@ export function OnMouseMove_wysiwyg(fc, e) {
 /**
  * @private
  * @this {EventManagerThis_handler_ww_mouse}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object
  */
 export async function OnMouseLeave_wysiwyg(fc, e) {

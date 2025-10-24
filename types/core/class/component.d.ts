@@ -1,32 +1,32 @@
 import type {} from '../../typedef';
 export default Component;
-export type ComponentThis = Omit<Component & Partial<__se__EditorInjector>, 'component'>;
+export type ComponentThis = Omit<Component & Partial<SunEditor.Injector>, 'component'>;
 /**
- * @typedef {Omit<Component & Partial<__se__EditorInjector>, 'component'>} ComponentThis
+ * @typedef {Omit<Component & Partial<SunEditor.Injector>, 'component'>} ComponentThis
  */
 /**
  * @constructor
  * @this {ComponentThis}
  * @description Class for managing components such as images and tables that are not in line format
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Component(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, editor: __se__EditorCore): void;
+declare function Component(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, editor: SunEditor.Core): void;
 declare class Component {
 	/**
-	 * @typedef {Omit<Component & Partial<__se__EditorInjector>, 'component'>} ComponentThis
+	 * @typedef {Omit<Component & Partial<SunEditor.Injector>, 'component'>} ComponentThis
 	 */
 	/**
 	 * @constructor
 	 * @this {ComponentThis}
 	 * @description Class for managing components such as images and tables that are not in line format
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	/**
 	 * @description The current component information, used copy, cut, and keydown events
-	 * @type {__se__ComponentInfo}
+	 * @type {SunEditor.ComponentInfo}
 	 */
-	info: __se__ComponentInfo;
+	info: SunEditor.ComponentInfo;
 	/**
 	 * @description Component is selected
 	 * @type {boolean}
@@ -49,21 +49,21 @@ declare class Component {
 	currentPluginName: any;
 	/**
 	 * @description Currently selected component information
-	 * @type {__se__ComponentInfo|null}
+	 * @type {SunEditor.ComponentInfo|null}
 	 */
-	currentInfo: __se__ComponentInfo | null;
+	currentInfo: SunEditor.ComponentInfo | null;
 	/** @type {Object<string, (...args: *) => *>} */
 	__globalEvents: {
 		[x: string]: (...args: any) => any;
 	};
-	/** @type {__se__GlobalEventInfo|void} */
-	_bindClose_copy: __se__GlobalEventInfo | void;
-	/** @type {__se__GlobalEventInfo|void} */
-	_bindClose_cut: __se__GlobalEventInfo | void;
-	/** @type {__se__GlobalEventInfo|void} */
-	_bindClose_keydown: __se__GlobalEventInfo | void;
-	/** @type {__se__GlobalEventInfo|void} */
-	_bindClose_mousedown: __se__GlobalEventInfo | void;
+	/** @type {SunEditor.GlobalEventInfo|null} */
+	_bindClose_copy: SunEditor.GlobalEventInfo | null;
+	/** @type {SunEditor.GlobalEventInfo|null} */
+	_bindClose_cut: SunEditor.GlobalEventInfo | null;
+	/** @type {SunEditor.GlobalEventInfo|null} */
+	_bindClose_keydown: SunEditor.GlobalEventInfo | null;
+	/** @type {SunEditor.GlobalEventInfo|null} */
+	_bindClose_mousedown: SunEditor.GlobalEventInfo | null;
 	/** @type {boolean} */
 	__selectionSelected: boolean;
 	__prevent: boolean;
@@ -76,7 +76,7 @@ declare class Component {
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
 	 * @param {boolean} [options.scrollTo=true] true : Scroll to the inserted element, false : Do not scroll.
-	 * @param {__se__ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
+	 * @param {SunEditor.ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
 	 * - If null, noting action is performed after insertion.
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
@@ -92,7 +92,7 @@ declare class Component {
 			skipCharCount?: boolean;
 			skipHistory?: boolean;
 			scrollTo?: boolean;
-			insertBehavior?: __se__ComponentInsertBehaviorType;
+			insertBehavior?: SunEditor.ComponentInsertBehaviorType;
 		}
 	): HTMLElement;
 	/**
@@ -100,17 +100,17 @@ declare class Component {
 	 * @description Handles post-insertion behavior for a newly created component based on the specified mode.
 	 * @param {Node} container The inserted component element.
 	 * @param {Node|null} [oNode] Optional node to use for selection if the component cannot be selected.
-	 * @param {__se__ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
+	 * @param {SunEditor.ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
 	 */
-	applyInsertBehavior(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node, oNode?: Node | null, insertBehavior?: __se__ComponentInsertBehaviorType): void;
+	applyInsertBehavior(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node, oNode?: Node | null, insertBehavior?: SunEditor.ComponentInsertBehaviorType): void;
 	/**
 	 * @this {ComponentThis}
 	 * @description Gets the file component and that plugin name
 	 * - return: {target, component, pluginName} | null
 	 * @param {Node} element Target element (figure tag, component div, file tag)
-	 * @returns {__se__ComponentInfo|null}
+	 * @returns {SunEditor.ComponentInfo|null}
 	 */
-	get(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): __se__ComponentInfo | null;
+	get(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): SunEditor.ComponentInfo | null;
 	/**
 	 * @this {ComponentThis}
 	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.

@@ -52,10 +52,10 @@ declare class Link extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {LinkPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: LinkPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: LinkPluginOptions);
 	title: any;
 	icon: string;
 	target: HTMLAnchorElement;

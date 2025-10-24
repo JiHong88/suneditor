@@ -28,7 +28,7 @@ class Modal extends CoreInjector {
 
 	/**
 	 * @description Modal window module
-	 * @param {* & {editor: __se__EditorCore}} inst The instance object that called the constructor.
+	 * @param {* & {editor: SunEditor.Core}} inst The instance object that called the constructor.
 	 * @param {Element} element Modal element
 	 */
 	constructor(inst, element) {
@@ -84,7 +84,7 @@ class Modal extends CoreInjector {
 
 	/**
 	 * @description Create a file input tag in the modal window.
-	 * @param {{icons: __se__EditorCore['icons'], lang: __se__EditorCore['lang']}} param0 - icons and language object
+	 * @param {{icons: SunEditor.Core['icons'], lang: SunEditor.Core['lang']}} param0 - icons and language object
 	 * @param {{acceptedFormats: string, allowMultiple}} param1 - options
 	 * - acceptedFormats: "image/*, video/*, audio/*", etc.
 	 * - allowMultiple: true or false
@@ -212,7 +212,7 @@ class Modal extends CoreInjector {
 
 	/**
 	 * @description Saves the current offset position of the modal for resizing calculations.
-	 * @returns {__se__Class_OffsetGlobalInfo} The offset position of the modal.
+	 * @returns {import('../core/class/offset').OffsetGlobalInfo} The offset position of the modal.
 	 */
 	#saveOffset() {
 		const offset = this.offset.getGlobal(this.#resizeBody);

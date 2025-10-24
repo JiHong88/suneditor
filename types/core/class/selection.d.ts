@@ -1,9 +1,9 @@
 import type {} from '../../typedef';
 export default Selection_;
-export type SelectionThis = Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>;
+export type SelectionThis = Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>;
 export type RectsInfo_selection = import('./offset').RectsInfo;
 /**
- * @typedef {Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>} SelectionThis
+ * @typedef {Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>} SelectionThis
  */
 /**
  * @typedef {import('./offset').RectsInfo} RectsInfo_selection
@@ -12,12 +12,12 @@ export type RectsInfo_selection = import('./offset').RectsInfo;
  * @constructor
  * @this {SelectionThis}
  * @description Selection, Range related class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Selection_(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, editor: __se__EditorCore): void;
+declare function Selection_(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, editor: SunEditor.Core): void;
 declare class Selection_ {
 	/**
-	 * @typedef {Omit<Selection_ & Partial<__se__EditorInjector>, 'selection'>} SelectionThis
+	 * @typedef {Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>} SelectionThis
 	 */
 	/**
 	 * @typedef {import('./offset').RectsInfo} RectsInfo_selection
@@ -26,9 +26,9 @@ declare class Selection_ {
 	 * @constructor
 	 * @this {SelectionThis}
 	 * @description Selection, Range related class
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	/** @type {Range} */
 	range: Range;
 	/** @type {HTMLElement|Text} */

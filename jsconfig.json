@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"target": "ES2022",
+		"lib": ["ES2022", "DOM"],
+		"sourceMap": true,
+		"allowJs": true,
+		"checkJs": true,
+		"noUnusedLocals": false,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": false,
+		"forceConsistentCasingInFileNames": true,
+		"moduleResolution": "bundler",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"jsx": "preserve",
+		"noImplicitAny": false
+	},
+	"include": ["./src/**/*.js"],
+	"exclude": ["node_modules"]
+}

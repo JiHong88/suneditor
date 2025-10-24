@@ -1,29 +1,29 @@
 import type {} from '../../typedef';
 export default EventManager;
-export type EventManagerThis = Omit<EventManager & Partial<__se__EditorInjector>, 'eventManager'>;
+export type EventManagerThis = Omit<EventManager & Partial<SunEditor.Injector>, 'eventManager'>;
 /**
- * @typedef {Omit<EventManager & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
+ * @typedef {Omit<EventManager & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis
  */
 /**
  * @constructor
  * @this {EventManagerThis}
  * @description Event manager, editor's all event management class
- * @param {__se__EditorCore} editor - The root editor instance
- * @property {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
+ * @property {SunEditor.Core} editor - The root editor instance
  */
-declare function EventManager(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, editor: __se__EditorCore): void;
+declare function EventManager(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, editor: SunEditor.Core): void;
 declare class EventManager {
 	/**
-	 * @typedef {Omit<EventManager & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis
+	 * @typedef {Omit<EventManager & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis
 	 */
 	/**
 	 * @constructor
 	 * @this {EventManagerThis}
 	 * @description Event manager, editor's all event management class
-	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @property {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @property {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	/**
 	 * @description Old browsers: When there is no 'e.isComposing' in the keyup event
 	 * @type {boolean}
@@ -56,26 +56,26 @@ declare class EventManager {
 	} | null;
 	/** @type {number} */
 	_resizeClientY: number;
-	/** @type {__se__GlobalEventInfo|null} */
-	__resize_editor: __se__GlobalEventInfo | null;
-	/** @type {__se__GlobalEventInfo|null} */
-	__close_move: __se__GlobalEventInfo | null;
-	/** @type {__se__GlobalEventInfo|null} */
-	__geckoActiveEvent: __se__GlobalEventInfo | null;
+	/** @type {SunEditor.GlobalEventInfo|null} */
+	__resize_editor: SunEditor.GlobalEventInfo | null;
+	/** @type {SunEditor.GlobalEventInfo|null} */
+	__close_move: SunEditor.GlobalEventInfo | null;
+	/** @type {SunEditor.GlobalEventInfo|null} */
+	__geckoActiveEvent: SunEditor.GlobalEventInfo | null;
 	/** @type {Array<Node>} */
 	__cacheStyleNodes: Array<Node>;
-	/** @type {__se__GlobalEventInfo|null} */
-	__selectionSyncEvent: __se__GlobalEventInfo | null;
+	/** @type {SunEditor.GlobalEventInfo|null} */
+	__selectionSyncEvent: SunEditor.GlobalEventInfo | null;
 	/** @type {boolean} */
 	_inputFocus: boolean;
 	/** @type {Object<string, *>|null} */
 	__inputPlugin: {
 		[x: string]: any;
 	} | null;
-	/** @type {?__se__EventInfo=} */
-	__inputBlurEvent: (__se__EventInfo | null) | undefined;
-	/** @type {?__se__EventInfo=} */
-	__inputKeyEvent: (__se__EventInfo | null) | undefined;
+	/** @type {?SunEditor.EventInfo=} */
+	__inputBlurEvent: (SunEditor.EventInfo | null) | undefined;
+	/** @type {?SunEditor.EventInfo=} */
+	__inputKeyEvent: (SunEditor.EventInfo | null) | undefined;
 	/** @type {HTMLInputElement} */
 	__focusTemp: HTMLInputElement;
 	/** @type {number|void} */
@@ -92,7 +92,7 @@ declare class EventManager {
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event handler
 	 * @param {boolean|AddEventListenerOptions=} useCapture Event useCapture option
-	 * @return {__se__EventInfo|null} Registered event information
+	 * @return {SunEditor.EventInfo|null} Registered event information
 	 */
 	addEvent(
 		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
@@ -100,14 +100,14 @@ declare class EventManager {
 		type: string,
 		listener: (...args: any) => any,
 		useCapture?: (boolean | AddEventListenerOptions) | undefined
-	): __se__EventInfo | null;
+	): SunEditor.EventInfo | null;
 	/**
 	 * @this {EventManagerThis}
 	 * @description Remove event
-	 * @param {__se__EventInfo} params event info = this.addEvent()
+	 * @param {SunEditor.EventInfo} params event info = this.addEvent()
 	 * @returns {undefined|null} Success: null, Not found: undefined
 	 */
-	removeEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, params: __se__EventInfo): undefined | null;
+	removeEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, params: SunEditor.EventInfo): undefined | null;
 	/**
 	 * @this {EventManagerThis}
 	 * @description Add an event to document.
@@ -115,26 +115,26 @@ declare class EventManager {
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event listener
 	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
-	 * @return {__se__GlobalEventInfo} Registered event information
+	 * @return {SunEditor.GlobalEventInfo} Registered event information
 	 */
 	addGlobalEvent(
 		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
 		type: string,
 		listener: (...args: any) => any,
 		useCapture?: (boolean | AddEventListenerOptions) | undefined
-	): __se__GlobalEventInfo;
+	): SunEditor.GlobalEventInfo;
 	/**
 	 * @this {EventManagerThis}
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
-	 * @param {string|__se__GlobalEventInfo} type Event type or (Event info = this.addGlobalEvent())
+	 * @param {string|SunEditor.GlobalEventInfo} type Event type or (Event info = this.addGlobalEvent())
 	 * @param {(...args: *) => *=} listener Event listener
 	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
 	 * @returns {undefined|null} Success: null, Not found: undefined
 	 */
 	removeGlobalEvent(
 		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
-		type: string | __se__GlobalEventInfo,
+		type: string | SunEditor.GlobalEventInfo,
 		listener?: ((...args: any) => any) | undefined,
 		useCapture?: (boolean | AddEventListenerOptions) | undefined
 	): undefined | null;
@@ -209,10 +209,10 @@ declare class EventManager {
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
 	 * @param {DataTransfer} clipboardData The clipboard data object
-	 * @param {__se__FrameContext} frameContext The frame context
+	 * @param {SunEditor.FrameContext} frameContext The frame context
 	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
 	 */
-	_dataTransferAction(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, type: 'paste' | 'drop', e: Event, clipboardData: DataTransfer, frameContext: __se__FrameContext): Promise<boolean>;
+	_dataTransferAction(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, type: 'paste' | 'drop', e: Event, clipboardData: DataTransfer, frameContext: SunEditor.FrameContext): Promise<boolean>;
 	/**
 	 * @private
 	 * @this {EventManagerThis}
@@ -221,10 +221,10 @@ declare class EventManager {
 	 * @param {"paste"|"drop"} type The type of event
 	 * @param {Event} e The original event object
 	 * @param {DataTransfer} clipboardData The clipboard data object
-	 * @param {__se__FrameContext} frameContext The frame context
+	 * @param {SunEditor.FrameContext} frameContext The frame context
 	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
 	 */
-	_setClipboardData(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, type: 'paste' | 'drop', e: Event, clipboardData: DataTransfer, frameContext: __se__FrameContext): Promise<boolean>;
+	_setClipboardData(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, type: 'paste' | 'drop', e: Event, clipboardData: DataTransfer, frameContext: SunEditor.FrameContext): Promise<boolean>;
 	/**
 	 * @private
 	 * @this {EventManagerThis}
@@ -237,18 +237,18 @@ declare class EventManager {
 	 * @this {EventManagerThis}
 	 * @description Registers event listeners for the editor's frame, including text input, selection, and UI interactions.
 	 * - Handles events inside an iframe or within the standard wysiwyg editor.
-	 * @param {__se__FrameContext} fc The frame context object
+	 * @param {SunEditor.FrameContext} fc The frame context object
 	 */
-	_addFrameEvents(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, fc: __se__FrameContext): void;
+	_addFrameEvents(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, fc: SunEditor.FrameContext): void;
 	/**
 	 * @private
 	 * @this {EventManagerThis}
 	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
 	 * - If resizing is not enabled, applies a non-resizable class.
-	 * @param {__se__FrameContext} fc The frame context object
-	 * @param {__se__FrameOptions} fo The frame options object
+	 * @param {SunEditor.FrameContext} fc The frame context object
+	 * @param {SunEditor.FrameOptions} fo The frame options object
 	 */
-	__addStatusbarEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, fc: __se__FrameContext, fo: __se__FrameOptions): void;
+	__addStatusbarEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, fc: SunEditor.FrameContext, fo: SunEditor.FrameOptions): void;
 	/**
 	 * @private
 	 * @this {EventManagerThis}
@@ -316,14 +316,14 @@ declare class EventManager {
 	 * @description Calls a registered plugin event and executes associated handlers.
 	 * - If any handler returns `false`, the event propagation stops.
 	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: __se__FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
+	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
 	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
 	 */
 	_callPluginEvent(
 		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
 		name: string,
 		e: {
-			frameContext: __se__FrameContext;
+			frameContext: SunEditor.FrameContext;
 			event: Event;
 			data?: string;
 			line?: Node;
@@ -350,18 +350,18 @@ declare class EventManager {
 	 * @private
 	 * @description Focus Event Postprocessing
 	 * @this {EventManagerThis}
-	 * @param {__se__FrameContext} frameContext - frame context object
+	 * @param {SunEditor.FrameContext} frameContext - frame context object
 	 * @param {Event} event - Event object
 	 */
-	__postFocusEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: __se__FrameContext, event: Event): void;
+	__postFocusEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: SunEditor.FrameContext, event: Event): void;
 	/**
 	 * @private
 	 * @description Blur Event Postprocessing
 	 * @this {EventManagerThis}
-	 * @param {__se__FrameContext} frameContext - frame context object
+	 * @param {SunEditor.FrameContext} frameContext - frame context object
 	 * @param {Event} event - Event object
 	 */
-	__postBlurEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: __se__FrameContext, event: Event): void;
+	__postBlurEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: SunEditor.FrameContext, event: Event): void;
 	/**
 	 * @private
 	 * @description Records the current viewport size.

@@ -7,16 +7,16 @@ export type ControllerInfo_editor = import('../modules/Controller').ControllerIn
 /**
  * @constructor
  * @description SunEditor constructor function.
- * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} multiTargets Target element
- * @param {__se__EditorOptions} options options
+ * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} multiTargets Target element
+ * @param {SunEditor.InitOptions} options options
  */
 declare function Editor(
 	multiTargets: Array<{
 		target: Element;
 		key: any;
-		options: __se__EditorFrameOptions;
+		options: SunEditor.InitFrameOptions;
 	}>,
-	options: __se__EditorOptions
+	options: SunEditor.InitOptions
 ): void;
 declare class Editor {
 	/**
@@ -25,16 +25,16 @@ declare class Editor {
 	/**
 	 * @constructor
 	 * @description SunEditor constructor function.
-	 * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} multiTargets Target element
-	 * @param {__se__EditorOptions} options options
+	 * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} multiTargets Target element
+	 * @param {SunEditor.InitOptions} options options
 	 */
 	constructor(
 		multiTargets: Array<{
 			target: Element;
 			key: any;
-			options: __se__EditorFrameOptions;
+			options: SunEditor.InitFrameOptions;
 		}>,
-		options: __se__EditorOptions
+		options: SunEditor.InitOptions
 	);
 	/**
 	 * @description Frame root key array
@@ -43,9 +43,9 @@ declare class Editor {
 	rootKeys: Array<any>;
 	/**
 	 * @description Frame root map
-	 * @type {Map<*, __se__FrameContext>}
+	 * @type {Map<*, SunEditor.FrameContext>}
 	 */
-	frameRoots: Map<any, __se__FrameContext>;
+	frameRoots: Map<any, SunEditor.FrameContext>;
 	/**
 	 * @description Document object
 	 * @type {Document}
@@ -63,9 +63,9 @@ declare class Editor {
 	carrierWrapper: HTMLElement;
 	/**
 	 * @description Editor context object
-	 * @type {__se__Context}
+	 * @type {SunEditor.Context}
 	 */
-	__context: __se__Context;
+	__context: SunEditor.Context;
 	/**
 	 * @description Utility object that manages the editor's runtime context.
 	 * Provides methods to get, set, and inspect internal context.
@@ -85,9 +85,9 @@ declare class Editor {
 	frameContext: FrameContextUtil;
 	/**
 	 * @description Current focusing [frame] context options
-	 * @type {__se__FrameOptions}
+	 * @type {SunEditor.FrameOptions}
 	 */
-	__frameOptions: __se__FrameOptions;
+	__frameOptions: SunEditor.FrameOptions;
 	/**
 	 * @description Utility object that manages the editor's runtime [frame] options.
 	 * Provides methods to get, set, and inspect internal [frame] options.
@@ -114,11 +114,9 @@ declare class Editor {
 	};
 	/**
 	 * @description Events object, call by triggerEvent function
-	 * @type {Object<string, *>}
+	 * @type {Partial<typeof import('../events.js').default>}
 	 */
-	events: {
-		[x: string]: any;
-	};
+	events: Partial<typeof import('../events.js').default>;
 	/**
 	 * @description Call the event function by injecting self: this.
 	 * @type {(eventName: string, ...args: *) => Promise<*>}
@@ -140,9 +138,9 @@ declare class Editor {
 	};
 	/**
 	 * @description Variables used internally in editor operation
-	 * @type {__se__EditorStatus}
+	 * @type {SunEditor.Status}
 	 */
-	status: __se__EditorStatus;
+	status: SunEditor.Status;
 	/**
 	 * @description Is classic mode?
 	 * @type {boolean}
@@ -421,9 +419,9 @@ declare class Editor {
 	_figureContainer: HTMLElement | null;
 	/**
 	 * @description Origin options
-	 * @type {__se__EditorOptions}
+	 * @type {SunEditor.InitOptions}
 	 */
-	_originOptions: __se__EditorOptions;
+	_originOptions: SunEditor.InitOptions;
 	/**
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * - If the plugin is added call callBack function.
@@ -473,10 +471,10 @@ declare class Editor {
 	/**
 	 * @description Checks if the content of the editor is empty.
 	 * - Display criteria for "placeholder".
-	 * @param {?__se__FrameContext=} fc Frame context, if not present, currently selected frame context.
+	 * @param {?SunEditor.FrameContext=} fc Frame context, if not present, currently selected frame context.
 	 * @returns {boolean}
 	 */
-	isEmpty(fc?: (__se__FrameContext | null) | undefined): boolean;
+	isEmpty(fc?: (SunEditor.FrameContext | null) | undefined): boolean;
 	/**
 	 * @description Set direction to "rtl" or "ltr".
 	 * @param {string} dir "rtl" or "ltr"
@@ -484,9 +482,9 @@ declare class Editor {
 	setDir(dir: string): void;
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
-	 * @param {__se__EditorOptions} newOptions Options
+	 * @param {SunEditor.InitOptions} newOptions Options
 	 */
-	resetOptions(newOptions: __se__EditorOptions): void;
+	resetOptions(newOptions: SunEditor.InitOptions): void;
 	/**
 	 * @description Change the current root index.
 	 * @param {*} rootKey
@@ -522,9 +520,9 @@ declare class Editor {
 	/**
 	 * @private
 	 * @description Set frameContext, frameOptions
-	 * @param {__se__FrameContext} rt Root target[key] FrameContext
+	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
 	 */
-	_setFrameInfo(rt: __se__FrameContext): void;
+	_setFrameInfo(rt: SunEditor.FrameContext): void;
 	/**
 	 * @private
 	 * @description Focus to wysiwyg area using "native focus function"
@@ -544,48 +542,48 @@ declare class Editor {
 	/**
 	 * @private
 	 * @description Initializ wysiwyg area (Only called from core._init)
-	 * @param {__se__FrameContext} e frameContext
+	 * @param {SunEditor.FrameContext} e frameContext
 	 * @param {string} value initial html string
 	 */
-	_initWysiwygArea(e: __se__FrameContext, value: string): void;
+	_initWysiwygArea(e: SunEditor.FrameContext, value: string): void;
 	/**
 	 * @private
 	 * @description Called when there are changes to tags in the wysiwyg region.
-	 * @param {__se__FrameContext} fc - Frame context object
+	 * @param {SunEditor.FrameContext} fc - Frame context object
 	 */
-	_resourcesStateChange(fc: __se__FrameContext): void;
+	_resourcesStateChange(fc: SunEditor.FrameContext): void;
 	/**
 	 * @private
 	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
-	 * @param {__se__FrameContext|FrameContextUtil} fc - Frame context object
+	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
 	 */
-	_iframeAutoHeight(fc: __se__FrameContext | FrameContextUtil): void;
+	_iframeAutoHeight(fc: SunEditor.FrameContext | FrameContextUtil): void;
 	/**
 	 * @private
 	 * @description Call the "onResizeEditor" event
-	 * @param {__se__FrameContext|FrameContextUtil} fc - Frame context object
+	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
 	 * @param {number} h - Height value
 	 * @param {ResizeObserverEntry} resizeObserverEntry - ResizeObserverEntry object
 	 */
-	__callResizeFunction(fc: __se__FrameContext | FrameContextUtil, h: number, resizeObserverEntry: ResizeObserverEntry): void;
+	__callResizeFunction(fc: SunEditor.FrameContext | FrameContextUtil, h: number, resizeObserverEntry: ResizeObserverEntry): void;
 	/**
 	 * @private
 	 * @description Set display property when there is placeholder.
-	 * @param {?__se__FrameContext=} fc - Frame context object, If null fc is this.frameContext
+	 * @param {?SunEditor.FrameContext=} fc - Frame context object, If null fc is this.frameContext
 	 */
-	_checkPlaceholder(fc?: (__se__FrameContext | null) | undefined): void;
+	_checkPlaceholder(fc?: (SunEditor.FrameContext | null) | undefined): void;
 	/**
 	 * @private
 	 * @description Initializ editor
-	 * @param {__se__EditorOptions} options Options
+	 * @param {SunEditor.InitOptions} options Options
 	 */
-	__editorInit(options: __se__EditorOptions): void;
+	__editorInit(options: SunEditor.InitOptions): void;
 	/**
 	 * @private
 	 * @description Initializ core variable
-	 * @param {__se__EditorOptions} options Options
+	 * @param {SunEditor.InitOptions} options Options
 	 */
-	__init(options: __se__EditorOptions): void;
+	__init(options: SunEditor.InitOptions): void;
 	/**
 	 * @private
 	 * @description Caching basic buttons to use
@@ -622,15 +620,15 @@ declare class Editor {
 	 * @description Configures the document properties of an iframe editor.
 	 * @param {HTMLIFrameElement} frame - The editor iframe.
 	 * @param {Map<string, *>} originOptions - The original options.
-	 * @param {__se__FrameOptions} targetOptions - The new options.
+	 * @param {SunEditor.FrameOptions} targetOptions - The new options.
 	 */
-	__setIframeDocument(frame: HTMLIFrameElement, originOptions: Map<string, any>, targetOptions: __se__FrameOptions): void;
+	__setIframeDocument(frame: HTMLIFrameElement, originOptions: Map<string, any>, targetOptions: SunEditor.FrameOptions): void;
 	/**
 	 * @private
 	 * @description Set the FrameContext parameters and options
-	 * @param {__se__FrameContext} e - Frame context object
+	 * @param {SunEditor.FrameContext} e - Frame context object
 	 */
-	__setEditorParams(e: __se__FrameContext): void;
+	__setEditorParams(e: SunEditor.FrameContext): void;
 	/**
 	 * @private
 	 * @description Registers and initializes editor classes.
@@ -639,10 +637,10 @@ declare class Editor {
 	/**
 	 * @private
 	 * @description Creates the editor instance and initializes components.
-	 * @param {__se__EditorOptions} originOptions - The initial editor options.
+	 * @param {SunEditor.InitOptions} originOptions - The initial editor options.
 	 * @returns {Promise<void>}
 	 */
-	__Create(originOptions: __se__EditorOptions): Promise<void>;
+	__Create(originOptions: SunEditor.InitOptions): Promise<void>;
 	Constructor: typeof Editor;
 }
 import { ContextUtil } from './config/context';

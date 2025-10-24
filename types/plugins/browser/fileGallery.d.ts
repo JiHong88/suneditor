@@ -42,10 +42,10 @@ declare class FileGallery extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {FileGalleryPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: FileGalleryPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: FileGalleryPluginOptions);
 	title: any;
 	icon: string;
 	onSelectfunction: (targe: Node) => any;

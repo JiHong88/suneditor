@@ -1,29 +1,29 @@
 import type {} from '../../typedef';
 export default ListFormat;
-export type ListFormatThis = Omit<ListFormat & Partial<__se__EditorInjector>, 'ListFormat'>;
+export type ListFormatThis = Omit<ListFormat & Partial<SunEditor.Injector>, 'ListFormat'>;
 /**
- * @typedef {Omit<ListFormat & Partial<__se__EditorInjector>, 'ListFormat'>} ListFormatThis
+ * @typedef {Omit<ListFormat & Partial<SunEditor.Injector>, 'ListFormat'>} ListFormatThis
  */
 /**
  * @constructor
  * @this {ListFormatThis}
  * @description Classes related to editor formats such as "list" (ol, ul, li)
  * - "list" is a special "line", "block" format.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function ListFormat(this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>, editor: __se__EditorCore): void;
+declare function ListFormat(this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>, editor: SunEditor.Core): void;
 declare class ListFormat {
 	/**
-	 * @typedef {Omit<ListFormat & Partial<__se__EditorInjector>, 'ListFormat'>} ListFormatThis
+	 * @typedef {Omit<ListFormat & Partial<SunEditor.Injector>, 'ListFormat'>} ListFormatThis
 	 */
 	/**
 	 * @constructor
 	 * @this {ListFormatThis}
 	 * @description Classes related to editor formats such as "list" (ol, ul, li)
 	 * - "list" is a special "line", "block" format.
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	/**
 	 * @this {ListFormatThis}
 	 * @description Append all selected "line" element to the list and insert.

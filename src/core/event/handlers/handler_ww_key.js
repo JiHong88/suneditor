@@ -13,13 +13,13 @@ const keyState = {
 const _styleNodes = Object.preventExtensions({ value: [] });
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_ww_key_input
+ * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_key_input
  */
 
 /**
  * @private
  * @this {EventManagerThis_handler_ww_key_input}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {KeyboardEvent} e - Event object
  */
 export async function OnKeyDown_wysiwyg(fc, e) {
@@ -82,7 +82,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	if (this._callPluginEvent('onKeyDown', { frameContext: fc, event: e, range, line: formatEl }) === false) return;
 
 	// reducer / actions
-	/** @type {__se__EventKeydownCtx} */
+	/** @type {SunEditor.EventKeydownCtx} */
 	const ctx = { e, fc, status: this.status, options: this.options, frameOptions: this.frameOptions, range, selectionNode, formatEl, keyCode, ctrl, alt, shift };
 	const ports = makePorts(this, { _styleNodes });
 
@@ -94,7 +94,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 /**
  * @private
  * @this {EventManagerThis_handler_ww_key_input}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {KeyboardEvent} e - Event object
  */
 export async function OnKeyUp_wysiwyg(fc, e) {

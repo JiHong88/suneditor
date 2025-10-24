@@ -42,7 +42,7 @@ class Math_ extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {MathPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
@@ -404,7 +404,7 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @param {__se__EditorCore} editor - The root editor instance.
+	 * @param {SunEditor.Core} editor - The root editor instance.
 	 * @returns {*} - The KaTeX instance or null if the instance is invalid.
 	 */
 	#CheckKatex(editor) {
@@ -432,7 +432,7 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @param {__se__EditorCore} editor - The root editor instance.
+	 * @param {SunEditor.Core} editor - The root editor instance.
 	 * @returns {*}
 	 */
 	#CheckMathJax(editor) {

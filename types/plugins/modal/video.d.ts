@@ -16,7 +16,6 @@ export type ModalReturns_video = {
 	fileRemoveBtn: HTMLButtonElement;
 };
 export type VideoInfo_video = import('../../events').VideoInfo;
-export type FigureControls_video = import('../../modules/Figure').FigureControls;
 export type VideoPluginOptions = {
 	/**
 	 * - Whether the video element can be resized.
@@ -125,7 +124,7 @@ export type VideoPluginOptions = {
 	/**
 	 * - Figure controls.
 	 */
-	controls?: FigureControls_video;
+	controls?: import('../../modules/Figure').FigureControls;
 	/**
 	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -133,13 +132,10 @@ export type VideoPluginOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	insertBehavior?: __se__ComponentInsertBehaviorType;
+	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
 };
 /**
  * @typedef {import('../../events').VideoInfo} VideoInfo_video
- */
-/**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls_video
  */
 /**
  * @typedef {Object} VideoPluginOptions
@@ -166,8 +162,8 @@ export type VideoPluginOptions = {
  * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
- * @property {FigureControls_video} [controls] - Figure controls.
- * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -191,10 +187,10 @@ declare class Video extends EditorInjector {
 	static component(this: Video, node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {VideoPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: VideoPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: VideoPluginOptions);
 	title: any;
 	icon: string;
 	pluginOptions: {
@@ -224,7 +220,7 @@ declare class Video extends EditorInjector {
 		};
 		query_youtube: string;
 		query_vimeo: string;
-		insertBehavior: __se__ComponentInsertBehaviorType;
+		insertBehavior: SunEditor.ComponentInsertBehaviorType;
 	};
 	modal: Modal;
 	figure: Figure;
@@ -273,12 +269,12 @@ declare class Video extends EditorInjector {
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
-	 * @param {__se__FrameContext} params.frameContext Frame context
+	 * @param {SunEditor.FrameContext} params.frameContext Frame context
 	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
-	onFilePasteAndDrop({ file }: { frameContext: __se__FrameContext; event: ClipboardEvent; file: File }): boolean;
+	onFilePasteAndDrop({ file }: { frameContext: SunEditor.FrameContext; event: ClipboardEvent; file: File }): boolean;
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description This function is called when a form within a modal window is "submit".

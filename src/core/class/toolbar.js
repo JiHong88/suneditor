@@ -9,14 +9,14 @@ import { CreateToolBar, UpdateButton } from '../section/constructor';
 const { _w } = env;
 
 /**
- * @typedef {Omit<Toolbar & Partial<__se__EditorInjector>, 'toolbar' | 'subToolbar'>} ToolbarThis
+ * @typedef {Omit<Toolbar & Partial<SunEditor.Injector>, 'toolbar' | 'subToolbar'>} ToolbarThis
  */
 
 /**
  * @constructor
  * @this {ToolbarThis}
  * @description Toolbar class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  * @param {Object} options - toolbar options
  * @param {"toolbar"|"toolbar_sub"} options.keyName - toolbar key name
  * @param {boolean} options.balloon - balloon toolbar

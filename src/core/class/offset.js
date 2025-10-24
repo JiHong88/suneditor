@@ -10,7 +10,7 @@ import { numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
 /**
- * @typedef {Omit<Offset & Partial<__se__EditorInjector>, 'offset'>} OffsetThis
+ * @typedef {Omit<Offset & Partial<SunEditor.Injector>, 'offset'>} OffsetThis
  */
 
 /**
@@ -81,7 +81,7 @@ import { _w, _d } from '../../helper/env';
  * @constructor
  * @this {OffsetThis}
  * @description Offset class, get the position of the element
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function Offset(editor) {
 	CoreInjector.call(this, editor);

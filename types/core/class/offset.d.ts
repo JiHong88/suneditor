@@ -1,6 +1,6 @@
 import type {} from '../../typedef';
 export default Offset;
-export type OffsetThis = Omit<Offset & Partial<__se__EditorInjector>, 'offset'>;
+export type OffsetThis = Omit<Offset & Partial<SunEditor.Injector>, 'offset'>;
 /**
  * Bounding rectangle information of the selection range.
  */
@@ -177,7 +177,7 @@ export type OffsetWWScrollInfo = {
 	rects: RectsInfo;
 };
 /**
- * @typedef {Omit<Offset & Partial<__se__EditorInjector>, 'offset'>} OffsetThis
+ * @typedef {Omit<Offset & Partial<SunEditor.Injector>, 'offset'>} OffsetThis
  */
 /**
  * @typedef {Object} RectsInfo Bounding rectangle information of the selection range.
@@ -241,12 +241,12 @@ export type OffsetWWScrollInfo = {
  * @constructor
  * @this {OffsetThis}
  * @description Offset class, get the position of the element
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Offset(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, editor: __se__EditorCore): void;
+declare function Offset(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, editor: SunEditor.Core): void;
 declare class Offset {
 	/**
-	 * @typedef {Omit<Offset & Partial<__se__EditorInjector>, 'offset'>} OffsetThis
+	 * @typedef {Omit<Offset & Partial<SunEditor.Injector>, 'offset'>} OffsetThis
 	 */
 	/**
 	 * @typedef {Object} RectsInfo Bounding rectangle information of the selection range.
@@ -310,9 +310,9 @@ declare class Offset {
 	 * @constructor
 	 * @this {OffsetThis}
 	 * @description Offset class, get the position of the element
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	/**
 	 * @this {OffsetThis}
 	 * @description Gets the position just outside the argument's internal editor (wysiwygFrame).

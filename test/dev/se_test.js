@@ -1,5 +1,6 @@
 import suneditor from '../../src/suneditor';
 import { getPageStyle } from '../../src/helper/env';
+import '../../src/typedef'; // Import typedef for global SunEditor namespace
 require('../../src/assets/suneditor.css');
 require('../../src/assets/suneditor-contents.css');
 require('../../src/themes/dark.css');
@@ -50,7 +51,8 @@ import langs, { pl } from '../../src/langs';
 // import image from '../../src/plugins/modal/image';
 // import video from '../../src/plugins/modal/video';
 // import imageGallery from '../../src/plugins/browser/imageGallery';
-import plugins, { audio, exportPDF } from '../../src/plugins';
+import plugins from '../../src/plugins';
+import { getClientSize } from '../../src/helper/dom/domUtils';
 
 // , 'dir_ltr', 'dir_rtl', 'list'
 const bl = [
@@ -336,6 +338,7 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // shadow.appendChild(appStyle);
 // shadow.appendChild(appEl);
 
+/** @type {__se__EditorOptions} */
 const options1 = {
 	// mode: 'inline',
 	// editorStyle: 'height:100px',
@@ -345,6 +348,15 @@ const options1 = {
 	// editorStyle: 'font-size:40px',
 	allowedExtraTags: { script: true },
 	// closeModalOutsideClick: true,
+	events: {
+		onChange() {
+			
+		}
+	},
+	image: {
+		uploadSizeLimit: '1a',
+		
+	},
 	previewTemplate: `
                 <div style="width:auto; max-width:1136px; min-height:400px; margin:auto;">
                 {{ contents }}
@@ -353,6 +365,7 @@ const options1 = {
 	// tagStyles: { '.+': '.+' },
 	strictMode: {
 		// styleFilter: false
+		
 	},
 	// strictMode: false,
 	// lang: langs.ko,
@@ -613,6 +626,8 @@ const options1 = {
 	// 	'|'
 	// ],
 	// iframe: true,
+
+	video: null,
 	subToolbar: {
 		buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
 		width: 'auto',
@@ -796,7 +811,7 @@ const options1 = {
 	videoGallery: {
 		url: 'http://localhost:3000/editor/gallery/video'
 	},
-	embed: {controls: [['resize_auto,75,50', 'align', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v', 'edit', 'revert', 'copy', 'remove']]},
+	embed: { controls: [['resize_auto,75,50', 'align', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v', 'edit', 'revert', 'copy', 'remove']] },
 	attributeWhitelist: { '*': 'id' },
 	imageGallery: {
 		// data: [
@@ -827,7 +842,7 @@ const options1 = {
 		linkEnableFileUpload: true,
 		allowMultiple: true,
 		useFormatType: true,
-		defaultFormatType: 'block',
+		defaultFormatType: 'block'
 		// percentageOnlySize: true
 	},
 	audio: {
@@ -1015,7 +1030,7 @@ const options1 = {
   </table>
 </figure>
 `,
-value: `<ol style="list-style-type: ">
+	value: `<ol style="list-style-type: ">
   <li>comp12insert<br>
 <div class="se-component se-image-container __se__float-none">
       <figure class="" style="">
@@ -1027,7 +1042,7 @@ value: `<ol style="list-style-type: ">
 </ol>
 
 `,
-value: `<pre>​dsadsa</pre>
+	value: `<pre>​dsadsa</pre>
 
 <figure class="se-flex-component se-input-component se-scroll-figure-x" style="width: 100%;">
   <table class="se-table-layout-auto" style="">
@@ -1152,101 +1167,101 @@ value: `<pre>​dsadsa</pre>
   </li>
 </ol>
 `,
-// value: `<p>​dsadsa</p>
+	// value: `<p>​dsadsa</p>
 
-// <figure class="se-flex-component se-input-component se-scroll-figure-x se-figure-over-selected se-figure-selected se-component-selected" style="width: 100%;">
-//   <table class="se-table-layout-auto" style="">
-//     <colgroup><col style="width: 50%;"><col style="width: 50%;"></colgroup>
-//     <tbody>
-//       <tr>
-//         <td>
-//           <div><br>
-//           </div>
-//         </td>
-//         <td>
-//           <div><br>
-//           </div>
-//         </td>
-//       </tr>
-//       <tr>
-//         <td>
-//           <div><br>
-//           </div>
-//         </td>
-//         <td>
-//           <div><br>
-//           </div>
-//         </td>
-//       </tr>
-//     </tbody>
-//   </table>
-// </figure>
+	// <figure class="se-flex-component se-input-component se-scroll-figure-x se-figure-over-selected se-figure-selected se-component-selected" style="width: 100%;">
+	//   <table class="se-table-layout-auto" style="">
+	//     <colgroup><col style="width: 50%;"><col style="width: 50%;"></colgroup>
+	//     <tbody>
+	//       <tr>
+	//         <td>
+	//           <div><br>
+	//           </div>
+	//         </td>
+	//         <td>
+	//           <div><br>
+	//           </div>
+	//         </td>
+	//       </tr>
+	//       <tr>
+	//         <td>
+	//           <div><br>
+	//           </div>
+	//         </td>
+	//         <td>
+	//           <div><br>
+	//           </div>
+	//         </td>
+	//       </tr>
+	//     </tbody>
+	//   </table>
+	// </figure>
 
-// <p>​dsa</p>
+	// <p>​dsa</p>
 
-// <p>dsa1</p>
+	// <p>dsa1</p>
 
-// <p>dsa</p>
+	// <p>dsa</p>
 
-// <div class="se-component se-image-container __se__float-none">
-//   <figure style="" class="">
-//     <img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" style="" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Welsh Corgi" data-se-file-size="0" data-se-index="0">
-//   </figure>
-// </div>
+	// <div class="se-component se-image-container __se__float-none">
+	//   <figure style="" class="">
+	//     <img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" style="" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Welsh Corgi" data-se-file-size="0" data-se-index="0">
+	//   </figure>
+	// </div>
 
-// <p>dsadsa</p>
-// `,
-// value: `<p><br>
-// </p>
+	// <p>dsadsa</p>
+	// `,
+	// value: `<p><br>
+	// </p>
 
-// <ol style="list-style-type: upper-latin">
-//   <li><br>
+	// <ol style="list-style-type: upper-latin">
+	//   <li><br>
 
-//     <ol>
-//       <li>ds        
-//         <figure class="se-flex-component se-input-component se-scroll-figure-x se-component-selected se-figure-selected" style="width: 100%;">
-//           <table class="se-table-layout-auto">
-//             <colgroup><col style="width: 50%"><col style="width: 50%"></colgroup>
-//             <tbody>
-//               <tr>
-//                 <td class="" colspan="1" rowspan="2">
-//                   <div>dsa</div>
-//                   <div>dsa</div>
-//                 </td>
-//                 <td>
-//                   <div><br>
-//                   </div>
-//                 </td>
-//               </tr>
-//               <tr>
-//                 <td>
-//                   <div>dsa</div>
-//                 </td>
-//               </tr>
-//             </tbody>
-//           </table>
-//         </figure>
-//       </li>
-//     </ol>
-//   </li>
-//   <li>​dsa</li>
-//   <li>dsa1</li>
-//   <li>dsa</li>
-//   <li><br>
+	//     <ol>
+	//       <li>ds
+	//         <figure class="se-flex-component se-input-component se-scroll-figure-x se-component-selected se-figure-selected" style="width: 100%;">
+	//           <table class="se-table-layout-auto">
+	//             <colgroup><col style="width: 50%"><col style="width: 50%"></colgroup>
+	//             <tbody>
+	//               <tr>
+	//                 <td class="" colspan="1" rowspan="2">
+	//                   <div>dsa</div>
+	//                   <div>dsa</div>
+	//                 </td>
+	//                 <td>
+	//                   <div><br>
+	//                   </div>
+	//                 </td>
+	//               </tr>
+	//               <tr>
+	//                 <td>
+	//                   <div>dsa</div>
+	//                 </td>
+	//               </tr>
+	//             </tbody>
+	//           </table>
+	//         </figure>
+	//       </li>
+	//     </ol>
+	//   </li>
+	//   <li>​dsa</li>
+	//   <li>dsa1</li>
+	//   <li>dsa</li>
+	//   <li><br>
 
-// <div class="se-component se-image-container __se__float-none">
-//       <figure class="" style="">
-//         <img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Welsh Corgi" data-se-file-size="0" style="" data-se-index="0">
-//       </figure>
-// </div>
-//   </li>
-//   <li>dsadsa</li>
-// </ol>
+	// <div class="se-component se-image-container __se__float-none">
+	//       <figure class="" style="">
+	//         <img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" width="auto" height="auto" data-se-size="auto,auto" data-se-file-name="Welsh Corgi" data-se-file-size="0" style="" data-se-index="0">
+	//       </figure>
+	// </div>
+	//   </li>
+	//   <li>dsadsa</li>
+	// </ol>
 
-// `,
-// value: '<ol><li></li></ol>',
-// charCounter_max: 26,
-placeholder: 'Start typing here...',
+	// `,
+	// value: '<ol><li></li></ol>',
+	// charCounter_max: 26,
+	placeholder: 'Start typing here...',
 	// defaultLineBreakFormat: 'br',
 	events: {
 		// onFileAction: (data) => {
@@ -1276,7 +1291,8 @@ placeholder: 'Start typing here...',
 		},
 		onFontActionBefore(data) {
 			console.log('fontbefore', data);
-		}
+		},
+		onabc() {}
 		// onPaste(params) {
 		// 	console.log('paste', params);
 		// 	return params.editor.html.filter(params.html, { validate: (el) => {
@@ -1482,3 +1498,470 @@ window.editor_root = suneditor.create('#editor_classic', options1);
 // // editor_root.events.onChange = function (c) {
 // // 	console.log(c);
 // // };
+
+// ================================================================================================================================
+// === COMPREHENSIVE OPTIONS TEST OBJECT (for type checking)
+// ================================================================================================================================
+
+/**
+ * @type {SunEditor.InitOptions}
+ */
+const options_test = {
+	// === Frame Options ===
+	// Content & Editing
+	value: '<p>Initial HTML content</p>',
+	placeholder: 'Enter text here...',
+	editableFrameAttributes: { spellcheck: 'true', 'data-test': 'value' },
+
+	// Layout & Sizing
+	width: '100%',
+	minWidth: '300px',
+	maxWidth: '1200px',
+	height: 'auto',
+	minHeight: '200px',
+	maxHeight: '600px',
+	editorStyle: 'border: 1px solid #ccc; border-radius: 4px;',
+
+	// Iframe Mode
+	iframe: false,
+	iframe_fullPage: false,
+	iframe_attributes: { scrolling: 'no', sandbox: 'allow-scripts' },
+	iframe_cssFileName: ['suneditor', 'custom-styles'],
+
+	// Statusbar & Character Counter
+	statusbar: true,
+	statusbar_showPathLabel: true,
+	statusbar_resizeEnable: true,
+	charCounter: true,
+	charCounter_max: 5000,
+	charCounter_label: 'Characters: {char}/{maxChar}',
+	charCounter_type: 'char',
+
+	// === Base Options ===
+	// Plugins & Toolbar
+	plugins: plugins,
+	excludedPlugins: ['drawing'],
+	buttonList: bl,
+
+	// Modes & Themes
+	v2Migration: false,
+	mode: 'classic',
+	type: 'document:header,page',
+	theme: '',
+	lang: langs.en,
+	icons: {},
+	textDirection: 'ltr',
+	reverseButtons: ['indent-outdent'],
+
+	// Strict Mode & Filtering
+	strictMode: {
+		tagFilter: true,
+		formatFilter: true,
+		classFilter: true,
+		textStyleTagFilter: true,
+		attrFilter: true,
+		styleFilter: true
+	},
+	scopeSelectionTags: ['td', 'table', 'li', 'ol', 'ul', 'pre'],
+
+	// Content Filtering & Formatting
+	elementWhitelist: 'mark|figure',
+	elementBlacklist: 'script|style',
+	allowedEmptyTags: '.custom-component',
+	allowedClassName: 'custom-class',
+
+	// Attribute Control
+	attributeWhitelist: {
+		a: 'href|target|rel',
+		img: 'src|alt|title',
+		'*': 'data-id'
+	},
+	attributeBlacklist: {
+		'*': 'onclick|onload'
+	},
+
+	// Text & Inline Style Control
+	textStyleTags: 'mark',
+	convertTextTags: {
+		bold: 'strong',
+		underline: 'u',
+		italic: 'em',
+		strike: 'del',
+		subscript: 'sub',
+		superscript: 'sup'
+	},
+	allUsedStyles: 'text-shadow|letter-spacing',
+	tagStyles: {
+		table: 'border|border-collapse',
+		th: 'background-color|font-weight',
+		td: 'vertical-align'
+	},
+	spanStyles: 'font-family|font-size|color|background-color',
+	lineStyles: 'text-align|margin|line-height',
+	fontSizeUnits: ['px', 'pt', 'em', 'rem', '%'],
+	retainStyleMode: 'repeat',
+
+	// Line & Block Formatting
+	defaultLine: 'p',
+	defaultLineBreakFormat: 'line',
+	lineAttrReset: 'id|data-temp',
+	formatLine: 'section',
+	formatBrLine: 'code',
+	formatClosureBrLine: '',
+	formatBlock: 'aside',
+	formatClosureBlock: '',
+
+	// UI & Interaction
+	closeModalOutsideClick: false,
+	syncTabIndent: true,
+	tabDisable: false,
+	toolbar_width: 'auto',
+	toolbar_container: null,
+	toolbar_sticky: 0,
+	toolbar_hide: false,
+	subToolbar: {
+		buttonList: [['bold', 'italic', 'underline']],
+		mode: 'balloon',
+		width: 'auto'
+	},
+	statusbar_container: null,
+	shortcutsHint: true,
+	shortcutsDisable: false,
+	shortcuts: {
+		bold: ['ctrl+b', 'cmd+b'],
+		save: ['ctrl+s', 'cmd+s']
+	},
+
+	// Advanced Features
+	copyFormatKeepOn: false,
+	autoLinkify: true,
+	autoStyleify: ['bold', 'underline', 'italic', 'strike'],
+	historyStackDelayTime: 400,
+	printClass: 'print-page',
+	fullScreenOffset: 0,
+	previewTemplate: '<div class="preview-wrapper">{contents}</div>',
+	printTemplate: '<html><head><title>Print</title></head><body>{contents}</body></html>',
+	componentInsertBehavior: 'auto',
+	defaultUrlProtocol: 'https://',
+	toastMessageTime: { copy: 1500 },
+	freeCodeViewMode: false,
+
+	// Dynamic Options
+	externalLibs: {
+		katex: Katex,
+		mathJax: {
+			src: mathjax.document(document, {
+				InputJax: new TeX(),
+				OutputJax: new CHTML()
+			}),
+			tex: {}
+		}
+	},
+	allowedExtraTags: {
+		script: false,
+		style: false,
+		meta: false
+	},
+
+	// Advanced Internal Options (prefixed with __)
+	__textStyleTags: 'mark|label',
+	__tagStyles: {
+		table: 'border-collapse'
+	},
+	__defaultElementWhitelist: 'p|div|span|a|img',
+	__defaultAttributeWhitelist: 'href|src|alt|class',
+	__defaultFormatLine: 'P|DIV',
+	__defaultFormatBrLine: 'PRE',
+	__defaultFormatClosureBrLine: '',
+	__defaultFormatBlock: 'BLOCKQUOTE',
+	__defaultFormatClosureBlock: 'TH|TD',
+	__lineFormatFilter: true,
+	__listCommonStyle: ['fontSize', 'color', 'fontFamily'],
+	__pluginRetainFilter: true,
+	__allowedScriptTag: false,
+
+	// === Plugin-Specific Options ===
+	align: {
+		icons: {
+			justify: '<svg>...</svg>'
+		}
+	},
+	audio: {
+		multiple: true,
+		width: '100%',
+		height: 'auto',
+		sizeOnlyPercentage: false,
+		videoFileInput: true,
+		audioUrlInput: true,
+		audioRotation: true,
+		audioRatio: 0.5625,
+		audioSizeOnlyPercentage: false
+	},
+	audioGallery: {
+		title: 'Audio Gallery',
+		url: '/api/audio-gallery',
+		header: {
+			Authorization: 'Bearer token'
+		}
+	},
+	backgroundColor: {
+		colors: [
+			['#ff0000', '#00ff00', '#0000ff'],
+			['#ffff00', '#ff00ff', '#00ffff']
+		]
+	},
+	blockStyle: {
+		_default: 'Default',
+		spaced: 'Spaced',
+		bordered: 'Bordered'
+	},
+	drawing: {
+		width: 500,
+		height: 300
+	},
+	embed: {
+		width: '100%',
+		height: 'auto'
+	},
+	exportPDF: {
+		options: {
+			margin: 10,
+			filename: 'document.pdf'
+		}
+	},
+	fileBrowser: {
+		title: 'File Browser',
+		url: '/api/files'
+	},
+	fileGallery: {
+		title: 'File Gallery',
+		url: '/api/file-gallery'
+	},
+	fileUpload: {
+		url: '/upload',
+		header: {
+			Authorization: 'Bearer token'
+		}
+	},
+	font: {
+		list: [
+			{ text: 'Arial', value: 'Arial' },
+			{ text: 'Georgia', value: 'Georgia' }
+		],
+		default: 'Arial'
+	},
+	fontColor: {
+		colors: [
+			['#000000', '#ffffff'],
+			['#ff0000', '#00ff00']
+		]
+	},
+	fontSize: {
+		list: [
+			{ text: '8pt', value: '8pt' },
+			{ text: '12pt', value: '12pt' },
+			{ text: '16pt', value: '16pt' }
+		],
+		default: '12pt'
+	},
+	hr: {
+		_default: 'solid',
+		dashed: 'Dashed',
+		dotted: 'Dotted'
+	},
+	image: {
+		multiple: true,
+		width: '100%',
+		height: 'auto',
+		sizeOnlyPercentage: false,
+		imageFileInput: true,
+		imageUrlInput: true,
+		imageRotation: true,
+		imageRatio: 0.5625,
+		imageSizeOnlyPercentage: false
+	},
+	imageGallery: {
+		title: 'Image Gallery',
+		url: '/api/image-gallery',
+		header: {
+			Authorization: 'Bearer token'
+		}
+	},
+	layout: {
+		layoutBlockWidth: '33.33%'
+	},
+	lineHeight: {
+		list: [
+			{ text: '1.0', value: 1.0 },
+			{ text: '1.5', value: 1.5 },
+			{ text: '2.0', value: 2.0 }
+		],
+		default: 1.5
+	},
+	link: {
+		linkProtocol: 'https://',
+		linkNoPrefix: false,
+		linkRel: ['nofollow', 'noopener'],
+		linkRelDefault: {
+			default: 'nofollow',
+			check_new_window: 'noopener'
+		}
+	},
+	math: {
+		katexOptions: {
+			throwOnError: false
+		},
+		mathJaxOptions: {
+			tex: {}
+		}
+	},
+	mention: {
+		list: [
+			{ value: '@user1', label: 'User 1' },
+			{ value: '@user2', label: 'User 2' }
+		]
+	},
+	paragraphStyle: {
+		_default: 'Default',
+		spaced: 'Spaced paragraph'
+	},
+	table: {
+		minSize: { row: 3, col: 3 },
+		maxSize: { row: 20, col: 20 },
+		editText: {
+			columns: 'Columns',
+			rows: 'Rows'
+		}
+	},
+	template: {
+		list: [
+			{
+				name: 'Template 1',
+				html: '<div>Template content 1</div>'
+			},
+			{
+				name: 'Template 2',
+				html: '<div>Template content 2</div>'
+			}
+		]
+	},
+	textStyle: {
+		_default: 'Default',
+		code: 'Code',
+		translucent: 'Translucent'
+	},
+	video: {
+		multiple: true,
+		width: '100%',
+		height: 'auto',
+		videoFileInput: true,
+		videoUrlInput: true,
+		videoRatio: 0.5625
+	},
+	videoGallery: {
+		title: 'Video Gallery',
+		url: '/api/video-gallery',
+		header: {
+			Authorization: 'Bearer token'
+		}
+	},
+
+	// === User Events ===
+	events: {
+		onload: (core) => {
+			console.log('Editor loaded', core);
+		},
+		onChange: (contents) => {
+			console.log('Content changed', contents);
+		},
+		onScroll: (e) => {
+			console.log('Scroll event', e);
+		},
+		onClick: (e) => {
+			console.log('Click event', e);
+		},
+		onMouseDown: (e) => {
+			console.log('Mouse down', e);
+		},
+		onInput: (e) => {
+			console.log('Input event', e);
+		},
+		onKeyDown: (e) => {
+			console.log('Key down', e);
+		},
+		onKeyUp: (e) => {
+			console.log('Key up', e);
+		},
+		onFocus: (e) => {
+			console.log('Focus event', e);
+		},
+		onBlur: (e) => {
+			console.log('Blur event', e);
+		},
+		onSave: (contents) => {
+			console.log('Save event', contents);
+		},
+		imageUploadHandler: (xmlHttp, info, core) => {
+			console.log('Image upload handler', xmlHttp, info, core);
+		},
+		onImageUploadBefore: (files, info, core, uploadHandler) => {
+			console.log('Before image upload', files, info, core);
+			uploadHandler();
+		},
+		onImageUpload: (targetElement, index, state, info, remainingFilesCount, core) => {
+			console.log('Image upload', targetElement, index, state, info, remainingFilesCount, core);
+		},
+		onImageUploadError: (errorMessage, result, core) => {
+			console.log('Image upload error', errorMessage, result, core);
+		},
+		onVideoUploadBefore: (files, info, core, uploadHandler) => {
+			console.log('Before video upload', files);
+			uploadHandler();
+		},
+		onVideoUpload: (targetElement, index, state, info, remainingFilesCount, core) => {
+			console.log('Video upload', targetElement);
+		},
+		onVideoUploadError: (errorMessage, result, core) => {
+			console.log('Video upload error', errorMessage);
+		},
+		onAudioUploadBefore: (files, info, core, uploadHandler) => {
+			console.log('Before audio upload', files);
+			uploadHandler();
+		},
+		onAudioUpload: (targetElement, index, state, info, remainingFilesCount, core) => {
+			console.log('Audio upload', targetElement);
+		},
+		onAudioUploadError: (errorMessage, result, core) => {
+			console.log('Audio upload error', errorMessage);
+		},
+		onResizeEditor: (height, prevHeight, core) => {
+			console.log('Editor resized', height, prevHeight);
+		},
+		showController: (name, caller, core) => {
+			console.log('Show controller', name, caller);
+		},
+		toggleCodeView: (isCodeView, core) => {
+			console.log('Toggle code view', isCodeView);
+		},
+		toggleFullScreen: (isFullScreen, core) => {
+			console.log('Toggle fullscreen', isFullScreen);
+		},
+		showInline: (toolbar, context, core) => {
+			console.log('Show inline toolbar', toolbar, context);
+		},
+		onCopy: (e, clipboardData, core) => {
+			console.log('Copy event', e, clipboardData);
+		},
+		onCut: (e, clipboardData, core) => {
+			console.log('Cut event', e, clipboardData);
+		},
+		onPaste: (e, cleanData, maxCharCount, core) => {
+			console.log('Paste event', e, cleanData, maxCharCount);
+		},
+		onDrop: (e, cleanData, maxCharCount, core) => {
+			console.log('Drop event', e, cleanData);
+		}
+	}
+};
+
+console.log('Options test object created:', options_test);

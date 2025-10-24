@@ -70,10 +70,10 @@ declare class Mention extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {MentionPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: MentionPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: MentionPluginOptions);
 	title: any;
 	icon: string;
 	triggerText: string;

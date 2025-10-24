@@ -23,10 +23,10 @@ declare class LineHeight extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {LineHeightPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: LineHeightPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: LineHeightPluginOptions);
 	title: any;
 	icon: string;
 	sizeList: NodeListOf<Element>;

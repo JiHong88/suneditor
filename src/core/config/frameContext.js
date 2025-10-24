@@ -24,7 +24,7 @@ import { get as getNumber } from '../../helper/numbers';
  *
  * === Identification ===
  * @property {*} key - Unique key identifying this editor instance (useful for multi-root editors).
- * @property {__se__FrameOptions} options - Frame-specific options (toolbar, plugins, behaviors, etc.).
+ * @property {SunEditor.FrameOptions} options - Frame-specific options (toolbar, plugins, behaviors, etc.).
  *
  * === Core DOM References ===
  * @property {Element} originElement - The original source element (usually a <textarea> or target element).
@@ -103,7 +103,7 @@ import { get as getNumber } from '../../helper/numbers';
 
 /**
  * @description Elements and variables you should have
- * @param {{target: Element, key: *, options: __se__FrameOptions}} editorTarget Target textarea
+ * @param {{target: Element, key: *, options: SunEditor.FrameOptions}} editorTarget Target textarea
  * @param {HTMLElement} top Editor top area
  * @param {HTMLElement} wwFrame Editor wysiwyg frame
  * @param {HTMLElement} codeWrapper Editor code view wrapper

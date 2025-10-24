@@ -1,33 +1,4 @@
-import type { AudioGalleryPluginOptions } from '../../plugins/browser/audioGallery';
-import type { FileBrowserPluginOptions } from '../../plugins/browser/fileBrowser';
-import type { FileGalleryPluginOptions } from '../../plugins/browser/fileGallery';
-import type { ImageGalleryPluginOptions } from '../../plugins/browser/imageGallery';
-import type { VideoGalleryPluginOptions } from '../../plugins/browser/videoGallery';
-import type { ExportPDFPluginOptions } from '../../plugins/command/exportPDF';
-import type { FileUploadPluginOptions } from '../../plugins/command/fileUpload';
-import type { AlignPluginOptions } from '../../plugins/dropdown/align';
-import type { BackgroundColorPluginOptions } from '../../plugins/dropdown/backgroundColor';
-import type { BlockStylePluginOptions } from '../../plugins/dropdown/blockStyle';
-import type { FontPluginOptions } from '../../plugins/dropdown/font';
-import type { FontColorPluginOptions } from '../../plugins/dropdown/fontColor';
-import type { HRPluginOptions } from '../../plugins/dropdown/hr';
-import type { LayoutPluginOptions } from '../../plugins/dropdown/layout';
-import type { LineHeightPluginOptions } from '../../plugins/dropdown/lineHeight';
-import type { ParagraphStylePluginOptions } from '../../plugins/dropdown/paragraphStyle';
-import type { TablePluginOptions } from '../../plugins/dropdown/table/index';
-import type { TemplatePluginOptions } from '../../plugins/dropdown/template';
-import type { TextStylePluginOptions } from '../../plugins/dropdown/textStyle';
-import type { MentionPluginOptions } from '../../plugins/field/mention';
-import type { FontSizePluginOptions } from '../../plugins/input/fontSize';
-import type { AudioPluginOptions } from '../../plugins/modal/audio';
-import type { DrawingPluginOptions } from '../../plugins/modal/drawing';
-import type { EmbedPluginOptions } from '../../plugins/modal/embed';
-import type { ImagePluginOptions } from '../../plugins/modal/image';
-import type { LinkPluginOptions } from '../../plugins/modal/link';
-import type { MathPluginOptions } from '../../plugins/modal/math';
-import type { VideoPluginOptions } from '../../plugins/modal/video';
 import type {} from '../../typedef';
-/** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
 /**
  * ================================================================================================================================
  * === UTILITIES : Manage Option Map ⭐️
@@ -138,6 +109,7 @@ export namespace DEFAULTS {
  * @property {string} [value=""] - Initial value for the editor.
  * @property {string} [placeholder=""] - Placeholder text.
  * @property {Object<string, string>} [editableFrameAttributes={spellcheck: "false"}] - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+ * ///
  *
  * === Layout & Sizing ===
  * @property {string} [width="100%"] - Width for the editor.
@@ -147,6 +119,7 @@ export namespace DEFAULTS {
  * @property {string} [minHeight=""] - Min height for the editor.
  * @property {string} [maxHeight=""] - Max height for the editor.
  * @property {string} [editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
+ * ///
  *
  * === Iframe Mode ===
  * @property {boolean} [iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
@@ -156,6 +129,7 @@ export namespace DEFAULTS {
  * - You can also use regular expressions.
  * - Applied by searching by filename in the link tag of document,
  * - or put the URL value (".css" can be omitted).
+ * ///
  *
  * === Statusbar & Character Counter ===
  * @property {boolean} [statusbar=true] - Enables the status bar.
@@ -169,11 +143,12 @@ export namespace DEFAULTS {
  * - 'char': Characters length.
  * - 'byte': Binary data size of characters.
  * - 'byte-html': Binary data size of the full HTML string.
+ * ///
  *
  * === Advanced ===
  * @property {Object} [__statusbarEvent] - Status bar event configuration.
- * ================================================================================================================================
  */
+/** ================================================================================================================================ */
 /**
  * @typedef {Object} OptionStyleResult
  * @property {string} top - Styles applied to the top container (e.g. width, z-index, etc).
@@ -181,16 +156,13 @@ export namespace DEFAULTS {
  * @property {string} editor - Styles applied to the editable content area.
  */
 /**
- * ================================================================================================================================
  * @typedef {Object} InternalFrameOptions
  * **Runtime-only frame options (computed internally, cannot be set by users)**
  * @property {OptionStyleResult} [_defaultStyles] - Enables fixed positioning for the editor frame.
- * ================================================================================================================================
  */
 /**
  * @typedef {EditorFrameOptions & InternalFrameOptions} AllFrameOptions
  */
-/** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
 /**
  * ================================================================================================================================
  * === OPTIONS TYPES : Base
@@ -219,6 +191,7 @@ export namespace DEFAULTS {
  * - 'a|img|custom|tags' (REQUIRED + options.__defaultElementWhitelist)
  * @property {string} [__defaultAttributeWhitelist=CONSTANTS.ATTRIBUTE_WHITELIST] - A complete list of attributes that are allowed by default on all tags. Delimiter: "|" (e.g. "href|target").
  * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}
+ * ///
  *
  *  === Formatting  ===
  * @property {string} [__defaultFormatLine=CONSTANTS.FORMAT_LINE] - Specifies the tag to be used as the editor's default "line" element.
@@ -231,6 +204,7 @@ export namespace DEFAULTS {
  * - The default follows {@link DEFAULTS.FORMAT_BLOCK}
  * @property {string} [__defaultFormatClosureBlock=CONSTANTS.FORMAT_CLOSURE_BLOCK] - Specifies the tag to be used as the editor's default "closureBlock" element.
  * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BLOCK}
+ * ///
  *
  * === Filters & Behavior ===
  * @property {boolean} [__lineFormatFilter=true] - Line format filter configuration.
@@ -241,7 +215,6 @@ export namespace DEFAULTS {
  * @property {{pluginName: string, we: boolean}|boolean} [__pluginRetainFilter=true] - Plugin retain filter configuration. (Internal use primarily)
  * - You can turn it off/on globally with true/false or set it per plugin. (e.g. { table: false })
  * @property {boolean} [__allowedScriptTag=false] - Allows the `<script>` tag to be used in the editor.
- * ================================================================================================================================
  */
 /**
  * ================================================================================================================================
@@ -253,8 +226,9 @@ export namespace DEFAULTS {
  * === Plugins & Toolbar ===
  * @property {Object<string, *>|Array<Object<string, *>>} [plugins] - Plugin configuration.
  * @property {Array<string>} [excludedPlugins=[]] - Plugin configuration.
- * @property {Array<string[]|string>} [buttonList=CONSTANTS.BUTTON_LIST] - List of toolbar buttons, grouped by sub-arrays.
+ * @property {SunEditor.ButtonList} [buttonList=CONSTANTS.BUTTON_LIST] - List of toolbar buttons, grouped by sub-arrays.
  * - The default follows {@link DEFAULTS.BUTTON_LIST}
+ * ///
  *
  * === Modes & Themes ===
  * @property {boolean} [v2Migration=false] - Enables migration mode for SunEditor v2.
@@ -265,6 +239,7 @@ export namespace DEFAULTS {
  * @property {Object<string, string>} [icons] - Overrides the default icons.
  * @property {string} [textDirection="ltr"] - Text direction: "ltr" or "rtl".
  * @property {Array<string>} [reverseButtons=['indent-outdent']] - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
+ * ///
  *
  * === Strict & Advanced Filtering ===
  * @property {boolean | {
@@ -277,6 +252,7 @@ export namespace DEFAULTS {
  * 	}} [strictMode=true] - Enables strict filtering of tags, attributes, and styles.
  * @property {Array<string>} [scopeSelectionTags=CONSTANTS.SCOPE_SELECTION_TAGS] - Tags treated as whole units when selecting all content.
  * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}
+ * ///
  *
  * === Content Filtering & Formatting ===
  * ==
@@ -290,6 +266,7 @@ export namespace DEFAULTS {
  * - It is concatenated with the value of "ALLOWED_EMPTY_NODE_LIST" to form the final 'allowedEmptyTags' list.
  * @property {string} [allowedClassName=""] - Allowed class names.
  * - Added the default value {@link DEFAULTS.CLASS_NAME}
+ * ///
  *
  * #### 2) Attribute Control
  * @property {{[key: string]: string|undefined}} [attributeWhitelist=null] - Specifies additional attributes to allow for each tag. (e.g. {a: "href|target", img: "src|alt", "*": "id"}).
@@ -297,6 +274,7 @@ export namespace DEFAULTS {
  * @property {{[key: string]: string|undefined}} [attributeBlacklist=null] - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
  * - Attributes specified here will eventually be removed even if they are allowed by other settings.
  * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
+ * ///
  *
  * #### 3) Text & Inline Style Control
  * @property {string} [textStyleTags=__textStyleTags] - Additional text style tags.
@@ -314,6 +292,7 @@ export namespace DEFAULTS {
  * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
  * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
  * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
+ * ///
  *
  * #### 4) Line & Block Formatting
  * @property {string} [defaultLine="p"] - Default line element when inserting new lines.
@@ -349,6 +328,7 @@ export namespace DEFAULTS {
  * - "closureBlock" element is wrap the "line" and "component"
  * - ※ You cannot exit this format with the Enter key or Backspace key.
  * - ※ Use it only in special cases. (e.g. format of table cells)
+ * ///
  *
  * === UI & Interaction ===
  * @property {boolean} [closeModalOutsideClick=false] - Closes modals when clicking outside.
@@ -359,13 +339,14 @@ export namespace DEFAULTS {
  * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
  * @property {Object} [subToolbar={}] - Sub-toolbar configuration.
- * @property {Array<Array<string>>} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
+ * @property {SunEditor.ButtonList} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
  * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
  * @property {number|string} [subToolbar.width="auto"] - Sub-toolbar width.
  * @property {Element|string} [statusbar_container] - Container element for the status bar.
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
  * @property {{[key: string]: Array<string>|undefined}} [shortcuts={}] - Custom keyboard shortcuts.
+ * ///
  *
  * === Advanced Features ===
  * @property {boolean} [copyFormatKeepOn=false] - Keeps the format of the copied content.
@@ -377,7 +358,7 @@ export namespace DEFAULTS {
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
  * @property {string} [previewTemplate=null] - Custom template for preview mode.
  * @property {string} [printTemplate=null] - Custom template for print mode.
- * @property {__se__ComponentInsertBehaviorType} [componentInsertBehavior="auto"] - Enables automatic selection of inserted components.
+ * @property {SunEditor.ComponentInsertBehaviorType} [componentInsertBehavior="auto"] - Enables automatic selection of inserted components.
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
  *    - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -390,19 +371,52 @@ export namespace DEFAULTS {
  *
  * === Dynamic Options ===
  * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax.
- * @property {{[key: string]: ((...args: *) => *)|undefined}} [events={}] - Custom event handlers.
  * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags.
  * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
+ * ///
  *
- * **Note:** This type also supports dynamic plugin options via index signature `[pluginName: string]: { [key: string]: any }`
- * to allow plugin-specific configurations (e.g., `image: {}`, `video: {}`).
- * The index signature is defined in the TypeScript `.d.ts` file but cannot be expressed in JSDoc.
+ * === User Events ===
+ * @property {Partial<typeof import('../../events.js').default>} [events] - User event handlers configuration
+ * ///
+ *
+ * === [ Plugin-Specific Options ] ===
+ * ---[ Auto-generated by scripts/check/inject-plugin-jsdoc.cjs - DO NOT EDIT MANUALLY ]---
+ * @property {import('../../plugins/dropdown/align.js').AlignPluginOptions} [align]
+ * @property {import('../../plugins/modal/audio.js').AudioPluginOptions} [audio]
+ * @property {import('../../plugins/browser/audioGallery.js').AudioGalleryPluginOptions} [audioGallery]
+ * @property {import('../../plugins/dropdown/backgroundColor.js').BackgroundColorPluginOptions} [backgroundColor]
+ * @property {import('../../plugins/dropdown/blockStyle.js').BlockStylePluginOptions} [blockStyle]
+ * @property {import('../../plugins/modal/drawing.js').DrawingPluginOptions} [drawing]
+ * @property {import('../../plugins/modal/embed.js').EmbedPluginOptions} [embed]
+ * @property {import('../../plugins/command/exportPDF.js').ExportPDFPluginOptions} [exportPDF]
+ * @property {import('../../plugins/browser/fileBrowser.js').FileBrowserPluginOptions} [fileBrowser]
+ * @property {import('../../plugins/browser/fileGallery.js').FileGalleryPluginOptions} [fileGallery]
+ * @property {import('../../plugins/command/fileUpload.js').FileUploadPluginOptions} [fileUpload]
+ * @property {import('../../plugins/dropdown/font.js').FontPluginOptions} [font]
+ * @property {import('../../plugins/dropdown/fontColor.js').FontColorPluginOptions} [fontColor]
+ * @property {import('../../plugins/input/fontSize.js').FontSizePluginOptions} [fontSize]
+ * @property {import('../../plugins/dropdown/hr.js').HRPluginOptions} [hr]
+ * @property {import('../../plugins/modal/image.js').ImagePluginOptions} [image]
+ * @property {import('../../plugins/browser/imageGallery.js').ImageGalleryPluginOptions} [imageGallery]
+ * @property {import('../../plugins/dropdown/layout.js').LayoutPluginOptions} [layout]
+ * @property {import('../../plugins/dropdown/lineHeight.js').LineHeightPluginOptions} [lineHeight]
+ * @property {import('../../plugins/modal/link.js').LinkPluginOptions} [link]
+ * @property {import('../../plugins/modal/math.js').MathPluginOptions} [math]
+ * @property {import('../../plugins/field/mention.js').MentionPluginOptions} [mention]
+ * @property {import('../../plugins/dropdown/paragraphStyle.js').ParagraphStylePluginOptions} [paragraphStyle]
+ * @property {import('../../plugins/dropdown/table/index.js').TablePluginOptions} [table]
+ * @property {import('../../plugins/dropdown/template.js').TemplatePluginOptions} [template]
+ * @property {import('../../plugins/dropdown/textStyle.js').TextStylePluginOptions} [textStyle]
+ * @property {import('../../plugins/modal/video.js').VideoPluginOptions} [video]
+ * @property {import('../../plugins/browser/videoGallery.js').VideoGalleryPluginOptions} [videoGallery]
+ * ///
+ * ---[ End of auto-generated plugin options ]---
  * ================================================================================================================================
  */
 /**
  * ================================================================================================================================
  * @typedef {Object} InternalBaseOptions
- * -----------------
+ *
  * **Runtime-only base options (computed internally, cannot be set by users)**
  *
  * @property {string} [_themeClass] - Computed className for the selected theme (e.g., 'se-theme-default').
@@ -428,7 +442,6 @@ export namespace DEFAULTS {
  * @property {boolean} [hasCodeMirror] - Uses CodeMirror for code view.
  * @property {*} [codeMirror5Editor] - CodeMirror5 support.
  * @property {*} [codeMirror6Editor] - CodeMirror6 support.
- * ================================================================================================================================
  */
 /**
  * @typedef {EditorBaseOptions & PrivateBaseOptions & EditorFrameOptions} EditorInitOptions
@@ -436,7 +449,6 @@ export namespace DEFAULTS {
 /**
  * @typedef {EditorBaseOptions & PrivateBaseOptions & InternalBaseOptions} AllBaseOptions
  */
-/** --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+-- */
 /**
  * ================================================================================================================================
  * === OPTION FLAGS : Fixed / Resettable
@@ -471,6 +483,7 @@ export type EditorFrameOptions = {
 	placeholder?: string;
 	/**
 	 * - Attributes for the editable frame[.sun-editor-editable]. (e.g. [key]: value)
+	 * ///
 	 *
 	 * === Layout & Sizing ===
 	 */
@@ -503,6 +516,7 @@ export type EditorFrameOptions = {
 	maxHeight?: string;
 	/**
 	 * - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
+	 * ///
 	 *
 	 * === Iframe Mode ===
 	 */
@@ -526,6 +540,7 @@ export type EditorFrameOptions = {
 	 * - You can also use regular expressions.
 	 * - Applied by searching by filename in the link tag of document,
 	 * - or put the URL value (".css" can be omitted).
+	 * ///
 	 *
 	 * === Statusbar & Character Counter ===
 	 */
@@ -560,13 +575,13 @@ export type EditorFrameOptions = {
 	 * - 'char': Characters length.
 	 * - 'byte': Binary data size of characters.
 	 * - 'byte-html': Binary data size of the full HTML string.
+	 * ///
 	 *
 	 * === Advanced ===
 	 */
 	charCounter_type?: 'char' | 'byte' | 'byte-html';
 	/**
 	 * - Status bar event configuration.
-	 * ================================================================================================================================
 	 */
 	__statusbarEvent?: any;
 };
@@ -590,7 +605,6 @@ export type OptionStyleResult = {
 export type InternalFrameOptions = {
 	/**
 	 * - Enables fixed positioning for the editor frame.
-	 * ================================================================================================================================
 	 */
 	_defaultStyles?: OptionStyleResult;
 };
@@ -628,7 +642,9 @@ export type PrivateBaseOptions = {
 	__defaultElementWhitelist?: string;
 	/**
 	 * - A complete list of attributes that are allowed by default on all tags. Delimiter: "|" (e.g. "href|target").
-	 * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}=== Formatting  ===
+	 * - The default follows {@link DEFAULTS.ATTRIBUTE_WHITELIST}///
+	 *
+	 * === Formatting  ===
 	 */
 	__defaultAttributeWhitelist?: string;
 	/**
@@ -653,7 +669,9 @@ export type PrivateBaseOptions = {
 	__defaultFormatBlock?: string;
 	/**
 	 * - Specifies the tag to be used as the editor's default "closureBlock" element.
-	 * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BLOCK}=== Filters & Behavior ===
+	 * - The default follows {@link DEFAULTS.FORMAT_CLOSURE_BLOCK}///
+	 *
+	 * === Filters & Behavior ===
 	 */
 	__defaultFormatClosureBlock?: string;
 	/**
@@ -679,7 +697,6 @@ export type PrivateBaseOptions = {
 		| boolean;
 	/**
 	 * - Allows the `<script>` tag to be used in the editor.
-	 * ================================================================================================================================
 	 */
 	__allowedScriptTag?: boolean;
 };
@@ -706,9 +723,11 @@ export type EditorBaseOptions = {
 	excludedPlugins?: Array<string>;
 	/**
 	 * - List of toolbar buttons, grouped by sub-arrays.
-	 * - The default follows {@link DEFAULTS.BUTTON_LIST}=== Modes & Themes ===
+	 * - The default follows {@link DEFAULTS.BUTTON_LIST}///
+	 *
+	 * === Modes & Themes ===
 	 */
-	buttonList?: Array<string[] | string>;
+	buttonList?: SunEditor.ButtonList;
 	/**
 	 * - Enables migration mode for SunEditor v2.
 	 */
@@ -743,6 +762,7 @@ export type EditorBaseOptions = {
 	textDirection?: string;
 	/**
 	 * - An array of command pairs whose shortcut icons should be opposite each other, depending on the "textDirection" mode.
+	 * ///
 	 *
 	 * === Strict & Advanced Filtering ===
 	 */
@@ -762,7 +782,9 @@ export type EditorBaseOptions = {
 		  };
 	/**
 	 * - Tags treated as whole units when selecting all content.
-	 * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}=== Content Filtering & Formatting ===
+	 * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}///
+	 *
+	 * === Content Filtering & Formatting ===
 	 * ==
 	 * #### 1) Tag & Element Control
 	 */
@@ -784,7 +806,9 @@ export type EditorBaseOptions = {
 	allowedEmptyTags?: string;
 	/**
 	 * - Allowed class names.
-	 * - Added the default value {@link DEFAULTS.CLASS_NAME}#### 2) Attribute Control
+	 * - Added the default value {@link DEFAULTS.CLASS_NAME}///
+	 *
+	 * #### 2) Attribute Control
 	 */
 	allowedClassName?: string;
 	/**
@@ -798,6 +822,7 @@ export type EditorBaseOptions = {
 	 * - Filter by specifying attributes to disallow by tag. (e.g. {a: "href|target", img: "src|alt", "*": "name"}).
 	 * - Attributes specified here will eventually be removed even if they are allowed by other settings.
 	 * - A list of required elements, {@link DEFAULTS.REQUIRED_FORMAT_LINE}, is always included.
+	 * ///
 	 *
 	 * #### 3) Text & Inline Style Control
 	 */
@@ -845,6 +870,7 @@ export type EditorBaseOptions = {
 	 * - "repeat": Inline styles are retained unless the backspace key is repeatedly pressed. If the user continuously presses backspace, the styles will eventually be removed.
 	 * - "none": Inline styles are not retained at all. When deleting text, the associated inline elements are immediately removed along with it.
 	 * - "always": Inline styles persist indefinitely unless explicitly removed. Even if all text inside an inline element is deleted, the element itself remains until manually removed.
+	 * ///
 	 *
 	 * #### 4) Line & Block Formatting
 	 */
@@ -904,6 +930,7 @@ export type EditorBaseOptions = {
 	 * - "closureBlock" element is wrap the "line" and "component"
 	 * - ※ You cannot exit this format with the Enter key or Backspace key.
 	 * - ※ Use it only in special cases. (e.g. format of table cells)
+	 * ///
 	 *
 	 * === UI & Interaction ===
 	 */
@@ -940,7 +967,7 @@ export type EditorBaseOptions = {
 	 * - Sub-toolbar configuration.
 	 */
 	subToolbar?: {
-		buttonList?: Array<Array<string>>;
+		buttonList?: SunEditor.ButtonList;
 		mode?: 'balloon' | 'balloon-always';
 		width?: number | string;
 	};
@@ -958,6 +985,7 @@ export type EditorBaseOptions = {
 	shortcutsDisable?: boolean;
 	/**
 	 * - Custom keyboard shortcuts.
+	 * ///
 	 *
 	 * === Advanced Features ===
 	 */
@@ -1006,7 +1034,7 @@ export type EditorBaseOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	componentInsertBehavior?: __se__ComponentInsertBehaviorType;
+	componentInsertBehavior?: SunEditor.ComponentInsertBehaviorType;
 	/**
 	 * - Default URL protocol for links.
 	 */
@@ -1028,60 +1056,57 @@ export type EditorBaseOptions = {
 		[x: string]: any;
 	};
 	/**
-	 * - Custom event handlers.
-	 */
-	events?: {
-		[key: string]: ((...args: any) => any) | undefined;
-	};
-	/**
 	 * - Specifies extra allowed or disallowed tags.
-	 * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}**Note:** This type also supports dynamic plugin options via index signature `[pluginName: string]: { [key: string]: any }`
-	 * to allow plugin-specific configurations (e.g., `image: {}`, `video: {}`).
-	 * The index signature is defined in the TypeScript `.d.ts` file but cannot be expressed in JSDoc.
-	 * ================================================================================================================================
+	 * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}///
+	 *
+	 * === User Events ===
 	 */
 	allowedExtraTags?: {
 		[x: string]: boolean;
 	};
 	/**
-	 * === Plugin-Specific Options ===
-	 * Each plugin can have its own configuration options.
+	 * - User event handlers configuration
+	 * ///
+	 *
+	 * === [ Plugin-Specific Options ] ===
+	 * ---[ Auto-generated by scripts/check/inject-plugin-jsdoc.cjs - DO NOT EDIT MANUALLY ]---
 	 */
-	align?: AlignPluginOptions;
-	audio?: AudioPluginOptions;
-	audioGallery?: AudioGalleryPluginOptions;
-	backgroundColor?: BackgroundColorPluginOptions;
-	blockStyle?: BlockStylePluginOptions;
-	drawing?: DrawingPluginOptions;
-	embed?: EmbedPluginOptions;
-	exportPDF?: ExportPDFPluginOptions;
-	fileBrowser?: FileBrowserPluginOptions;
-	fileGallery?: FileGalleryPluginOptions;
-	fileUpload?: FileUploadPluginOptions;
-	font?: FontPluginOptions;
-	fontColor?: FontColorPluginOptions;
-	fontSize?: FontSizePluginOptions;
-	hr?: HRPluginOptions;
-	image?: ImagePluginOptions;
-	imageGallery?: ImageGalleryPluginOptions;
-	layout?: LayoutPluginOptions;
-	lineHeight?: LineHeightPluginOptions;
-	link?: LinkPluginOptions;
-	math?: MathPluginOptions;
-	mention?: MentionPluginOptions;
-	paragraphStyle?: ParagraphStylePluginOptions;
-	table?: TablePluginOptions;
-	template?: TemplatePluginOptions;
-	textStyle?: TextStylePluginOptions;
-	video?: VideoPluginOptions;
-	videoGallery?: VideoGalleryPluginOptions;
+	events?: Partial<typeof import('../../events.js').default>;
+	align?: import('../../plugins/dropdown/align.js').AlignPluginOptions;
+	audio?: import('../../plugins/modal/audio.js').AudioPluginOptions;
+	audioGallery?: import('../../plugins/browser/audioGallery.js').AudioGalleryPluginOptions;
+	backgroundColor?: import('../../plugins/dropdown/backgroundColor.js').BackgroundColorPluginOptions;
+	blockStyle?: import('../../plugins/dropdown/blockStyle.js').BlockStylePluginOptions;
+	drawing?: import('../../plugins/modal/drawing.js').DrawingPluginOptions;
+	embed?: import('../../plugins/modal/embed.js').EmbedPluginOptions;
+	exportPDF?: import('../../plugins/command/exportPDF.js').ExportPDFPluginOptions;
+	fileBrowser?: import('../../plugins/browser/fileBrowser.js').FileBrowserPluginOptions;
+	fileGallery?: import('../../plugins/browser/fileGallery.js').FileGalleryPluginOptions;
+	fileUpload?: import('../../plugins/command/fileUpload.js').FileUploadPluginOptions;
+	font?: import('../../plugins/dropdown/font.js').FontPluginOptions;
+	fontColor?: import('../../plugins/dropdown/fontColor.js').FontColorPluginOptions;
+	fontSize?: import('../../plugins/input/fontSize.js').FontSizePluginOptions;
+	hr?: import('../../plugins/dropdown/hr.js').HRPluginOptions;
+	image?: import('../../plugins/modal/image.js').ImagePluginOptions;
+	imageGallery?: import('../../plugins/browser/imageGallery.js').ImageGalleryPluginOptions;
+	layout?: import('../../plugins/dropdown/layout.js').LayoutPluginOptions;
+	lineHeight?: import('../../plugins/dropdown/lineHeight.js').LineHeightPluginOptions;
+	link?: import('../../plugins/modal/link.js').LinkPluginOptions;
+	math?: import('../../plugins/modal/math.js').MathPluginOptions;
+	mention?: import('../../plugins/field/mention.js').MentionPluginOptions;
+	paragraphStyle?: import('../../plugins/dropdown/paragraphStyle.js').ParagraphStylePluginOptions;
+	table?: import('../../plugins/dropdown/table/index.js').TablePluginOptions;
+	template?: import('../../plugins/dropdown/template.js').TemplatePluginOptions;
+	textStyle?: import('../../plugins/dropdown/textStyle.js').TextStylePluginOptions;
+	video?: import('../../plugins/modal/video.js').VideoPluginOptions;
 	/**
-	 * - Index signature: Allows any other plugin name with custom options.
+	 * ///
+	 * ---[ End of auto-generated plugin options ]---
+	 * ================================================================================================================================
 	 */
-	[pluginName: string]: any;
+	videoGallery?: import('../../plugins/browser/videoGallery.js').VideoGalleryPluginOptions;
 };
 /**
- * -----------------
  * **Runtime-only base options (computed internally, cannot be set by users)**
  */
 export type InternalBaseOptions = {
@@ -1173,7 +1198,6 @@ export type InternalBaseOptions = {
 	codeMirror5Editor?: any;
 	/**
 	 * - CodeMirror6 support.
-	 * ================================================================================================================================
 	 */
 	codeMirror6Editor?: any;
 };

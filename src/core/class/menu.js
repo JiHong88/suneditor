@@ -6,14 +6,14 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, converter } from '../../helper';
 
 /**
- * @typedef {Omit<Menu & Partial<__se__EditorInjector>, 'menu'>} MenuThis
+ * @typedef {Omit<Menu & Partial<SunEditor.Injector>, 'menu'>} MenuThis
  */
 
 /**
  * @constructor
  * @this {MenuThis}
  * @description Dropdown and container menu management class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function Menu(editor) {
 	CoreInjector.call(this, editor);

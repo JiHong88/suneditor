@@ -1,27 +1,27 @@
 import type {} from '../../typedef';
 export default Char;
-export type CharThis = Omit<Char & Partial<__se__EditorInjector>, 'char'>;
+export type CharThis = Omit<Char & Partial<SunEditor.Injector>, 'char'>;
 /**
- * @typedef {Omit<Char & Partial<__se__EditorInjector>, 'char'>} CharThis
+ * @typedef {Omit<Char & Partial<SunEditor.Injector>, 'char'>} CharThis
  */
 /**
  * @constructor
  * @this {CharThis}
  * @description character count, character limit, etc. management class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Char(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, editor: __se__EditorCore): void;
+declare function Char(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, editor: SunEditor.Core): void;
 declare class Char {
 	/**
-	 * @typedef {Omit<Char & Partial<__se__EditorInjector>, 'char'>} CharThis
+	 * @typedef {Omit<Char & Partial<SunEditor.Injector>, 'char'>} CharThis
 	 */
 	/**
 	 * @constructor
 	 * @this {CharThis}
 	 * @description character count, character limit, etc. management class
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	/**
 	 * @this {CharThis}
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "html" is added to the current editor.
@@ -47,9 +47,9 @@ declare class Char {
 	/**
 	 * @this {CharThis}
 	 * @description Set the char count to charCounter element textContent.
-	 * @param {__se__FrameContext|null} [fc] Frame context
+	 * @param {SunEditor.FrameContext|null} [fc] Frame context
 	 */
-	display(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, fc?: __se__FrameContext | null): void;
+	display(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, fc?: SunEditor.FrameContext | null): void;
 	/**
 	 * @this {CharThis}
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "inputText" is added to the current editor.

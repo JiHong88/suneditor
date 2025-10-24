@@ -11,21 +11,21 @@ const DIR_KEYCODE = /^Arrow(Left|Up|Right|Down)$/;
 const DIR_UP_KEYCODE = /^Arrow(Left|Up)$/;
 
 /**
- * @typedef {Omit<Component & Partial<__se__EditorInjector>, 'component'>} ComponentThis
+ * @typedef {Omit<Component & Partial<SunEditor.Injector>, 'component'>} ComponentThis
  */
 
 /**
  * @constructor
  * @this {ComponentThis}
  * @description Class for managing components such as images and tables that are not in line format
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function Component(editor) {
 	CoreInjector.call(this, editor);
 
 	/**
 	 * @description The current component information, used copy, cut, and keydown events
-	 * @type {__se__ComponentInfo}
+	 * @type {SunEditor.ComponentInfo}
 	 */
 	this.info = null;
 
@@ -55,7 +55,7 @@ function Component(editor) {
 
 	/**
 	 * @description Currently selected component information
-	 * @type {__se__ComponentInfo|null}
+	 * @type {SunEditor.ComponentInfo|null}
 	 */
 	this.currentInfo = null;
 
@@ -66,13 +66,13 @@ function Component(editor) {
 		keydown: OnKeyDown_component.bind(this),
 		mousedown: CloseListener_mousedown.bind(this)
 	};
-	/** @type {__se__GlobalEventInfo|void} */
+	/** @type {SunEditor.GlobalEventInfo|null} */
 	this._bindClose_copy = null;
-	/** @type {__se__GlobalEventInfo|void} */
+	/** @type {SunEditor.GlobalEventInfo|null} */
 	this._bindClose_cut = null;
-	/** @type {__se__GlobalEventInfo|void} */
+	/** @type {SunEditor.GlobalEventInfo|null} */
 	this._bindClose_keydown = null;
-	/** @type {__se__GlobalEventInfo|void} */
+	/** @type {SunEditor.GlobalEventInfo|null} */
 	this._bindClose_mousedown = null;
 	/** @type {boolean} */
 	this.__selectionSelected = false;
@@ -101,7 +101,7 @@ Component.prototype = {
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
 	 * @param {boolean} [options.scrollTo=true] true : Scroll to the inserted element, false : Do not scroll.
-	 * @param {__se__ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
+	 * @param {SunEditor.ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
 	 * - If null, noting action is performed after insertion.
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
@@ -161,7 +161,7 @@ Component.prototype = {
 	 * @description Handles post-insertion behavior for a newly created component based on the specified mode.
 	 * @param {Node} container The inserted component element.
 	 * @param {Node|null} [oNode] Optional node to use for selection if the component cannot be selected.
-	 * @param {__se__ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
+	 * @param {SunEditor.ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
 	 */
 	applyInsertBehavior(container, oNode, insertBehavior) {
 		const cInfo = this.get(container);
@@ -215,7 +215,7 @@ Component.prototype = {
 	 * @description Gets the file component and that plugin name
 	 * - return: {target, component, pluginName} | null
 	 * @param {Node} element Target element (figure tag, component div, file tag)
-	 * @returns {__se__ComponentInfo|null}
+	 * @returns {SunEditor.ComponentInfo|null}
 	 */
 	get(element) {
 		if (!element) return null;

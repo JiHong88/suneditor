@@ -42,10 +42,10 @@ declare class VideoGallery extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {VideoGalleryPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: VideoGalleryPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: VideoGalleryPluginOptions);
 	title: any;
 	icon: string;
 	onSelectfunction: (targe: Node) => any;

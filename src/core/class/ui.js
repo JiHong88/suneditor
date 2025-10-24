@@ -7,7 +7,7 @@ import { dom, converter, keyCodeMap, env } from '../../helper';
 const { _w } = env;
 
 /**
- * @typedef {Omit<UI & Partial<__se__EditorInjector>, 'ui'>} UIThis
+ * @typedef {Omit<UI & Partial<SunEditor.Injector>, 'ui'>} UIThis
  */
 
 /**
@@ -15,7 +15,7 @@ const { _w } = env;
  * @this {UIThis}
  * @description The UI class is a class that handles operations related to the user interface of SunEditor.
  * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function UI(editor) {
 	CoreInjector.call(this, editor);
@@ -52,7 +52,7 @@ UI.prototype = {
 	 * - Define the style of the edit area
 	 * - It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param {string} style Style string
-	 * @param {__se__FrameContext|null} fc Frame context
+	 * @param {?SunEditor.FrameContext=} fc Frame context
 	 */
 	setEditorStyle(style, fc) {
 		fc ||= this.frameContext;

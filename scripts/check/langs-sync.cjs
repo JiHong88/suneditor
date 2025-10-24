@@ -4,8 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const args = require('minimist')(process.argv.slice(2));
 
-const LANG_DIR = path.join(__dirname, '../src/langs');
-const TYPE_FILE = path.join(__dirname, '../types/langs/_Lang.d.ts');
+const LANG_DIR = path.join(__dirname, '../../src/langs');
 
 const BASE_LANG = args.base || 'en';
 const targets = args.target ? args.target.split(',') : null;
@@ -128,25 +127,6 @@ const injectKeys = async (filePath, langCode, baseLangObj) => {
 	console.log(`[✔] Updated ${langCode}`);
 };
 
-const updateTypeDef = (baseLangObj) => {
-	let typeFile = fs.readFileSync(TYPE_FILE, 'utf8');
-	const existingKeys = new Set((typeFile.match(/\b(\w+): string;/g) || []).map((k) => k.split(':')[0]));
-	const keyOrder = Object.keys(baseLangObj);
-	const toInsert = keyOrder.filter((k) => !existingKeys.has(k)).map((k) => `\t${k}: string;`);
-	if (toInsert.length === 0) return;
-
-	typeFile = typeFile.replace(/(interface _Lang\s*{)([\s\S]*?)(\n?})/, (match, p1, body, p3) => {
-		const existingLines = body.trimEnd().split('\n').filter(Boolean);
-		const existingLineMap = new Map(existingLines.map((line) => [line.trim().split(':')[0], line]));
-		const sorted = keyOrder.map((k) => existingLineMap.get(k) || `\t${k}: string;`);
-		return `${p1}\n${sorted.join('\n')}\n${p3}`;
-	});
-
-	fs.writeFileSync(TYPE_FILE, typeFile, 'utf8');
-
-	console.log(`[✔] Updated _Lang.d.ts`);
-};
-
 (async () => {
 	const files = fs.readdirSync(LANG_DIR);
 	const baseFilePath = path.join(LANG_DIR, `${BASE_LANG}.js`);
@@ -159,6 +139,4 @@ const updateTypeDef = (baseLangObj) => {
 		if (targets && !targets.includes(langCode)) continue;
 		await injectKeys(path.join(LANG_DIR, file), langCode, baseLangObj);
 	}
-
-	updateTypeDef(baseLangObj);
 })();

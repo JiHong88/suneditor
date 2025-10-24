@@ -8,9 +8,9 @@ export type InstanceCheckThis = InstanceCheck;
  * @constructor
  * @this {InstanceCheck}
  * @description iframe-safe instanceof check utility class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function InstanceCheck(this: InstanceCheck, editor: __se__EditorCore): void;
+declare function InstanceCheck(this: InstanceCheck, editor: SunEditor.Core): void;
 declare class InstanceCheck {
 	/**
 	 * @typedef {InstanceCheck} InstanceCheckThis
@@ -19,9 +19,9 @@ declare class InstanceCheck {
 	 * @constructor
 	 * @this {InstanceCheck}
 	 * @description iframe-safe instanceof check utility class
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(this: InstanceCheck, editor: __se__EditorCore);
+	constructor(this: InstanceCheck, editor: SunEditor.Core);
 	editor: import('../editor').default;
 	/**
 	 * @param {*} obj

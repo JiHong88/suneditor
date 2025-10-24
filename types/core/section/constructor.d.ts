@@ -11,28 +11,28 @@ import type {} from '../../typedef';
 export function CreateShortcuts(command: string, button: Element | null, values: Array<string>, keyMap: Map<string, any>, rc: any[], reverseKeys: Set<any>): void;
 /**
  * @typedef {Object} InitOptionsReturnType
- * @property {__se__BaseOptions} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+ * @property {SunEditor.Options} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
  * @property {Object<string, string>} i - Icon set
  * @property {Object<string, string>} l - Language pack
  * @property {string|null} v - Initial editor value
  * @property {Array<string[]|string>} buttons - Toolbar button list (arrays for groups, strings for single buttons)
  * @property {Array<string[]|string>|null} subButtons - Sub-toolbar button list
  * @property {Element|null} statusbarContainer - Container element for status bar (if specified)
- * @property {Map<string|null, __se__FrameOptions>} frameMap - Map of frame-specific options (frame key => {@link __se__FrameOptions})
+ * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => {@link SunEditor.FrameOptions})
  */
 /**
  * @description Initialize options
- * @param {__se__EditorOptions} options Configuration options for the editor.
- * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} editorTargets Target textarea
+ * @param {SunEditor.InitOptions} options Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} editorTargets Target textarea
  * @param {Object<string, *>} plugins Plugins object
  * @returns {InitOptionsReturnType} Initialized options and configuration
  */
 export function InitOptions(
-	options: __se__EditorOptions,
+	options: SunEditor.InitOptions,
 	editorTargets: Array<{
 		target: Element;
 		key: any;
-		options: __se__EditorFrameOptions;
+		options: SunEditor.InitFrameOptions;
 	}>,
 	plugins: {
 		[x: string]: any;
@@ -114,7 +114,7 @@ export type ConstructorReturnType = {
 	/**
 	 * - Editor context object
 	 */
-	context: __se__Context;
+	context: SunEditor.Context;
 	/**
 	 * - Carrier wrapper element
 	 */
@@ -122,7 +122,7 @@ export type ConstructorReturnType = {
 	/**
 	 * - Processed editor options (Map)
 	 */
-	options: __se__BaseOptions;
+	options: SunEditor.Options;
 	/**
 	 * - Loaded plugins
 	 */
@@ -184,7 +184,7 @@ export type InitOptionsReturnType = {
 	/**
 	 * - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
 	 */
-	o: __se__BaseOptions;
+	o: SunEditor.Options;
 	/**
 	 * - Icon set
 	 */
@@ -214,18 +214,18 @@ export type InitOptionsReturnType = {
 	 */
 	statusbarContainer: Element | null;
 	/**
-	 * - Map of frame-specific options (frame key => {@link __se__FrameOptions})
+	 * - Map of frame-specific options (frame key => {@link SunEditor.FrameOptions})
 	 */
-	frameMap: Map<string | null, __se__FrameOptions>;
+	frameMap: Map<string | null, SunEditor.FrameOptions>;
 };
 /**
  * @typedef {import('../config/options').AllBaseOptions} AllBaseOptions_constructor
  */
 /**
  * @typedef {Object} ConstructorReturnType
- * @property {__se__Context} context - Editor context object
+ * @property {SunEditor.Context} context - Editor context object
  * @property {HTMLElement} carrierWrapper - Carrier wrapper element
- * @property {__se__BaseOptions} options - Processed editor options (Map)
+ * @property {SunEditor.Options} options - Processed editor options (Map)
  * @property {Object<string, *>} plugins - Loaded plugins
  * @property {Object<string, string>} icons - Icon set
  * @property {Object<string, string>} lang - Language pack
@@ -240,16 +240,16 @@ export type InitOptionsReturnType = {
  */
 /**
  * @description Creates a new SunEditor instance with specified options.
- * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} editorTargets - Target element or multi-root object.
- * @param {__se__EditorOptions} options - Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} editorTargets - Target element or multi-root object.
+ * @param {SunEditor.InitOptions} options - Configuration options for the editor.
  * @returns {ConstructorReturnType} - SunEditor instance with context, options, and DOM elements.
  */
 declare function Constructor(
 	editorTargets: Array<{
 		target: Element;
 		key: any;
-		options: __se__EditorFrameOptions;
+		options: SunEditor.InitFrameOptions;
 	}>,
-	options: __se__EditorOptions
+	options: SunEditor.InitOptions
 ): ConstructorReturnType;
 import { CreateFrameContext } from '../config/frameContext';

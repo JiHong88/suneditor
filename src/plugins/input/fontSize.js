@@ -112,7 +112,7 @@ class FontSize extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {FontSizePluginOptions} pluginOptions - Configuration options for the FontSize plugin.
 	 */
 	constructor(editor, pluginOptions) {
@@ -252,7 +252,7 @@ class FontSize extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Toolbar
 	 * @description Executes the event function of toolbar's input tag - "change".
-	 * @param {__se__PluginToolbarInputChangeEventInfo} params
+	 * @param {SunEditor.PluginToolbarInputChangeEventInfo} params
 	 */
 	onInputChange({ target, value: changeValue, event }) {
 		if (this.#disableInput) return;

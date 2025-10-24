@@ -6,14 +6,14 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, numbers } from '../../helper';
 
 /**
- * @typedef {Omit<NodeTransform & Partial<__se__EditorInjector>, 'nodeTransform'>} NodeTransformThis
+ * @typedef {Omit<NodeTransform & Partial<SunEditor.Injector>, 'nodeTransform'>} NodeTransformThis
  */
 
 /**
  * @constructor
  * @this {NodeTransformThis}
  * @description Node utility class. split, merge, etc.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function NodeTransform(editor) {
 	CoreInjector.call(this, editor);
@@ -425,7 +425,7 @@ NodeTransform.prototype = {
 	/**
 	 * @this {NodeTransformThis}
 	 * @description Creates a nested node structure from the given array of nodes.
-	 * @param {__se__NodeCollection} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
+	 * @param {SunEditor.NodeCollection} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
 	 * @param {((current: Node) => boolean)|null} [validate] A validate function.
 	 * @returns {{ parent: Node, inner: Node }} An object containing the top-level parent node and the innermost child node.
 	 */

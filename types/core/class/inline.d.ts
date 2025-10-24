@@ -1,6 +1,6 @@
 import type {} from '../../typedef';
 export default Inline;
-export type InlineThis = Omit<Inline & Partial<__se__EditorInjector>, 'inline'>;
+export type InlineThis = Omit<Inline & Partial<SunEditor.Injector>, 'inline'>;
 export type NodeStyleContainerType = {
 	ancestor?: (Node | null) | undefined;
 	offset?: (number | null) | undefined;
@@ -8,7 +8,7 @@ export type NodeStyleContainerType = {
 	endContainer?: (Node | null) | undefined;
 };
 /**
- * @typedef {Omit<Inline & Partial<__se__EditorInjector>, 'inline'>} InlineThis
+ * @typedef {Omit<Inline & Partial<SunEditor.Injector>, 'inline'>} InlineThis
  */
 /**
  * @typedef {Object} NodeStyleContainerType
@@ -21,12 +21,12 @@ export type NodeStyleContainerType = {
  * @constructor
  * @this {InlineThis}
  * @description Classes related to editor inline formats such as style node like strong, span, etc.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Inline(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, editor: __se__EditorCore): void;
+declare function Inline(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, editor: SunEditor.Core): void;
 declare class Inline {
 	/**
-	 * @typedef {Omit<Inline & Partial<__se__EditorInjector>, 'inline'>} InlineThis
+	 * @typedef {Omit<Inline & Partial<SunEditor.Injector>, 'inline'>} InlineThis
 	 */
 	/**
 	 * @typedef {Object} NodeStyleContainerType
@@ -39,9 +39,9 @@ declare class Inline {
 	 * @constructor
 	 * @this {InlineThis}
 	 * @description Classes related to editor inline formats such as style node like strong, span, etc.
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	_listCamel: any;
 	_listKebab: any;
 	/**

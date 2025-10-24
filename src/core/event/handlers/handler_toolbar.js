@@ -3,7 +3,7 @@ import { dom, env } from '../../../helper';
 const { isMobile } = env;
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_toolbar
+ * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_toolbar
  */
 
 /**

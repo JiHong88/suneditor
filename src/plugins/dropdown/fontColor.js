@@ -20,7 +20,7 @@ class FontColor extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {FontColorPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {

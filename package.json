@@ -12,6 +12,9 @@
 			"types": "./types/index.d.ts",
 			"default": "./src/suneditor.js"
 		},
+		"./types": {
+			"types": "./types/typedef.d.ts"
+		},
 		"./src/plugins": {
 			"types": "./types/plugins/index.d.ts",
 			"default": "./src/plugins/index.js"
@@ -52,8 +55,7 @@
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
 		"lint": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" && npm run lint:type && npm run check:arch",
-		"ts-build": "(npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/format-index.cjs && node scripts/fix-langs.cjs && node scripts/wrap-dts.cjs && node scripts/rename-index.cjs && node scripts/remove-this-params.cjs && node scripts/gen-options-dts.cjs && node scripts/inject-plugin-index-signature.cjs && node scripts/inject-typedef-import.cjs && npm run lint:fix-ts",
-		"i18n-build": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/i18n-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix",
+		"ts-build": "npm run check:inject && (npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/ts-build/format-index.cjs && node scripts/ts-build/fix-langs.cjs && node scripts/ts-build/wrap-dts.cjs && node scripts/ts-build/rename-index.cjs && node scripts/ts-build/remove-this-params.cjs && node scripts/ts-build/gen-options-dts.cjs && node scripts/ts-build/inject-typedef-import.cjs && npm run lint:fix-ts",
 		"test": "jest --silent",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
@@ -61,7 +63,10 @@
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:headed": "playwright test --headed",
 		"test:all": "jest --silent && playwright test",
+		"check": "npm run check:arch && npm run check:inject && npm run check:langs",
 		"check:arch": "dependency-cruiser --config .dependency-cruiser.js src",
+		"check:inject": "node scripts/check/gen-button-types.cjs && node scripts/check/inject-plugin-jsdoc.cjs",
+		"check:langs": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/check/langs-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix",
 		"update-browserslist": "npx browserslist@latest --update-db"
 	},
 	"bugs": {

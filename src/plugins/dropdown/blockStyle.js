@@ -3,7 +3,7 @@ import { dom } from '../../helper';
 
 /**
  * @typedef {Object} BlockStylePluginOptions
- * @property {Array<string>} [items] - Format list
+ * @property {Array<"p"|"div"|"blockquote"|"pre"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|string>} [items] - Format list
  */
 
 /**
@@ -17,7 +17,7 @@ class BlockStyle extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {BlockStylePluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {
@@ -122,7 +122,7 @@ class BlockStyle extends EditorInjector {
 	/**
 	 * @description Create a header tag, call by "shortcut" class
 	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])
-	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
 	applyHeaderByShortcut({ keyCode }) {
 		const headerNum = keyCode.match(/\d+$/)?.[0];

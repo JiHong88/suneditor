@@ -8,10 +8,6 @@ const { _w, NO_EVENT } = env;
  */
 
 /**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls_video
- */
-
-/**
  * @typedef {Object} VideoPluginOptions
  * @property {boolean} [canResize=true] - Whether the video element can be resized.
  * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
@@ -36,8 +32,8 @@ const { _w, NO_EVENT } = env;
  * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
- * @property {FigureControls_video} [controls] - Figure controls.
- * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -86,7 +82,7 @@ class Video extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {VideoPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
@@ -134,8 +130,8 @@ class Video extends EditorInjector {
 		this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
 		this.fileManager = new FileManager(this, {
 			query: 'iframe, video',
-			loadHandler: this.events.onVideoLoad,
-			eventHandler: this.events.onVideoAction
+			loadEventName: 'onVideoLoad',
+			actionEventName: 'onVideoAction'
 		});
 
 		// members
@@ -281,7 +277,7 @@ class Video extends EditorInjector {
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
-	 * @param {__se__FrameContext} params.frameContext Frame context
+	 * @param {SunEditor.FrameContext} params.frameContext Frame context
 	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
@@ -1113,7 +1109,7 @@ class Video extends EditorInjector {
  * @property {HTMLButtonElement} revertBtn
  * @property {HTMLButtonElement} fileRemoveBtn
  *
- * @param {__se__EditorCore} editor
+ * @param {SunEditor.Core} editor
  * @param {*} pluginOptions
  * @returns {ModalReturns_video}
  */

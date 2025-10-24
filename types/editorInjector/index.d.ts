@@ -2,17 +2,17 @@ import type {} from '../typedef';
 export default EditorInjector;
 /**
  * @description Initializes and adds inner classes and default properties of the editor.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function EditorInjector(editor: __se__EditorCore): void;
+declare function EditorInjector(editor: SunEditor.Core): void;
 declare class EditorInjector {
 	/**
 	 * @description Initializes and adds inner classes and default properties of the editor.
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
-	/** @type {__se__EditorCore} */
-	editor: __se__EditorCore;
+	constructor(editor: SunEditor.Core);
+	/** @type {SunEditor.Core} */
+	editor: SunEditor.Core;
 	/** @type {import('./_core').default['eventManager']} */
 	eventManager: import('./_core').default['eventManager'];
 	/** @type {import('./_core').default['instanceCheck']} */

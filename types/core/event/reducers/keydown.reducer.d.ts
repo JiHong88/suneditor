@@ -2,10 +2,10 @@ import type {} from '../../../typedef';
 /**
  * @typedef {Object} KeydownReducerCtx - Keydown Reducer Context object
  * @property {KeyboardEvent} ctx.e - The keyboard event
- * @property {__se__FrameContext} ctx.fc - Frame context object
- * @property {__se__EditorStatus} ctx.status - Editor status object
- * @property {__se__BaseOptions} ctx.options - Options object
- * @property {__se__FrameOptions} ctx.frameOptions - Frame options object
+ * @property {SunEditor.FrameContext} ctx.fc - Frame context object
+ * @property {SunEditor.Status} ctx.status - Editor status object
+ * @property {SunEditor.Options} ctx.options - Options object
+ * @property {SunEditor.FrameOptions} ctx.frameOptions - Frame options object
  * @property {Range} ctx.range - Current selection range
  * @property {HTMLElement|Text} ctx.selectionNode - Current selection node
  * @property {HTMLElement} ctx.formatEl - Current format element
@@ -16,11 +16,11 @@ import type {} from '../../../typedef';
  */
 /**
  * @description Keydown event reducer
- * @param {__se__EventPorts} ports - Ports for interacting with editor
+ * @param {SunEditor.EventPorts} ports - Ports for interacting with editor
  * @param {KeydownReducerCtx} ctx - Context object
- * @returns {Promise<__se__EventActions>} Action list
+ * @returns {Promise<SunEditor.EventActions>} Action list
  */
-export function reduceKeydown(ports: __se__EventPorts, ctx: KeydownReducerCtx): Promise<__se__EventActions>;
+export function reduceKeydown(ports: SunEditor.EventPorts, ctx: KeydownReducerCtx): Promise<SunEditor.EventActions>;
 /**
  * - Keydown Reducer Context object
  */
@@ -32,19 +32,19 @@ export type KeydownReducerCtx = {
 	/**
 	 * - Frame context object
 	 */
-	fc: __se__FrameContext;
+	fc: SunEditor.FrameContext;
 	/**
 	 * - Editor status object
 	 */
-	status: __se__EditorStatus;
+	status: SunEditor.Status;
 	/**
 	 * - Options object
 	 */
-	options: __se__BaseOptions;
+	options: SunEditor.Options;
 	/**
 	 * - Frame options object
 	 */
-	frameOptions: __se__FrameOptions;
+	frameOptions: SunEditor.FrameOptions;
 	/**
 	 * - Current selection range
 	 */

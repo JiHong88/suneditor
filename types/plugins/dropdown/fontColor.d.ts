@@ -36,10 +36,10 @@ declare class FontColor extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {FontColorPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: FontColorPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: FontColorPluginOptions);
 	title: any;
 	icon: string;
 	colorPicker: ColorPicker;

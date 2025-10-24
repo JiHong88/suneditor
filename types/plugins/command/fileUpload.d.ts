@@ -42,7 +42,7 @@ export type FileUploadPluginOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	insertBehavior?: __se__ComponentInsertBehaviorType;
+	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
 };
 /**
  * @typedef FileUploadPluginOptions
@@ -54,7 +54,7 @@ export type FileUploadPluginOptions = {
  * @property {string} [acceptedFormats="*"] - Accepted file formats (e.g., 'image/*, .pdf')
  * @property {string} [as="box"] - Specify the default form of the file component as 'box' or 'link'
  * @property {Array<string>} [controls] - Additional controls to be added to the figure
- * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -79,10 +79,10 @@ declare class FileUpload extends EditorInjector {
 	static component(this: FileUpload, node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {FileUploadPluginOptions} pluginOptions - plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: FileUploadPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: FileUploadPluginOptions);
 	title: any;
 	icon: string;
 	uploadUrl: string;
@@ -94,7 +94,7 @@ declare class FileUpload extends EditorInjector {
 	allowMultiple: boolean;
 	acceptedFormats: string;
 	as: string;
-	insertBehavior: __se__ComponentInsertBehaviorType;
+	insertBehavior: SunEditor.ComponentInsertBehaviorType;
 	input: HTMLElement;
 	figure: Figure;
 	fileManager: FileManager;
@@ -116,12 +116,12 @@ declare class FileUpload extends EditorInjector {
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
-	 * @param {__se__FrameContext} params.frameContext Frame context
+	 * @param {SunEditor.FrameContext} params.frameContext Frame context
 	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
 	 */
-	onFilePasteAndDrop({ file }: { frameContext: __se__FrameContext; event: ClipboardEvent; file: File }): boolean;
+	onFilePasteAndDrop({ file }: { frameContext: SunEditor.FrameContext; event: ClipboardEvent; file: File }): boolean;
 	/**
 	 * @editorMethod Modules.Controller
 	 * @description Executes the method that is called when a target component is edited.

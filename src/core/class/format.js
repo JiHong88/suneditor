@@ -6,14 +6,14 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, numbers } from '../../helper';
 
 /**
- * @typedef {Omit<Format & Partial<__se__EditorInjector>, 'format'>} FormatThis
+ * @typedef {Omit<Format & Partial<SunEditor.Injector>, 'format'>} FormatThis
  */
 
 /**
  * @constructor
  * @this {FormatThis}
  * @description Classes related to editor formats such as "line" and "block".
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function Format(editor) {
 	CoreInjector.call(this, editor);

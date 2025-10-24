@@ -320,8 +320,8 @@ describe('Plugins - Command - FileUpload', () => {
             const { FileManager, Controller } = require('../../../../src/modules');
             expect(FileManager).toHaveBeenCalledWith(fileUpload, {
                 query: 'a[download][data-se-file-download]',
-                loadHandler: expect.any(Function),
-                eventHandler: expect.any(Function)
+                loadEventName: 'onFileLoad',
+                actionEventName: 'onFileAction'
             });
             expect(Controller).toHaveBeenCalledWith(fileUpload, expect.any(Object), { position: 'bottom', disabled: true }, FileUpload.key);
         });

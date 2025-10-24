@@ -1,6 +1,6 @@
 /**
  * @typedef {{ t: string, p?: * }} Action
- * @typedef {Object} __se__ComponentInfo
+ * @typedef {Object} SunEditor.ComponentInfo
  * @property {Element} target
  * @property {string} pluginName
  * @property {Object} [options]
@@ -68,7 +68,7 @@ export const A = {
 
 	// === utils ===
 	/**
-	 * @param {__se__ComponentInfo} cmponentInfo
+	 * @param {SunEditor.ComponentInfo} cmponentInfo
 	 * @returns {Action}
 	 */
 	selectComponentFallback: (cmponentInfo) => ({ t: 'select.component.fallback', p: { cmponentInfo } }),
@@ -94,7 +94,7 @@ export const A = {
 	/**
 	 * @param {Node} selectionNode
 	 * @param {Range} range
-	 * @param {__se__ComponentInfo} fileComponentInfo
+	 * @param {SunEditor.ComponentInfo} fileComponentInfo
 	 * @returns {Action}
 	 */
 	backspaceComponentSelect: (selectionNode, range, fileComponentInfo) => ({ t: 'backspace.component.select', p: { selectionNode, range, fileComponentInfo } }),
@@ -102,7 +102,7 @@ export const A = {
 	 * @param {boolean} isList
 	 * @param {Node} sel
 	 * @param {Element} formatEl
-	 * @param {__se__ComponentInfo} fileComponentInfo
+	 * @param {SunEditor.ComponentInfo} fileComponentInfo
 	 * @returns {Action}
 	 */
 	backspaceComponentRemove: (isList, sel, formatEl, fileComponentInfo) => ({ t: 'backspace.component.remove', p: { isList, sel, formatEl, fileComponentInfo } }),
@@ -122,7 +122,7 @@ export const A = {
 	// === delete ===
 	/**
 	 * @param {Element} formatEl
-	 * @param {__se__ComponentInfo} fileComponentInfo
+	 * @param {SunEditor.ComponentInfo} fileComponentInfo
 	 * @returns {Action}
 	 */
 	deleteComponentSelect: (formatEl, fileComponentInfo) => ({ t: 'delete.component.select', p: { formatEl, fileComponentInfo } }),

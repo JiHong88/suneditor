@@ -7,14 +7,14 @@ import { _w, isEdge } from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/dom/domUtils';
 
 /**
- * @typedef {Omit<Char & Partial<__se__EditorInjector>, 'char'>} CharThis
+ * @typedef {Omit<Char & Partial<SunEditor.Injector>, 'char'>} CharThis
  */
 
 /**
  * @constructor
  * @this {CharThis}
  * @description character count, character limit, etc. management class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function Char(editor) {
 	CoreInjector.call(this, editor);
@@ -88,7 +88,7 @@ Char.prototype = {
 	/**
 	 * @this {CharThis}
 	 * @description Set the char count to charCounter element textContent.
-	 * @param {__se__FrameContext|null} [fc] Frame context
+	 * @param {SunEditor.FrameContext|null} [fc] Frame context
 	 */
 	display(fc) {
 		const charCounter = (fc || this.frameContext).get('charCounter');

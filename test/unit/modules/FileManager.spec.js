@@ -70,8 +70,8 @@ describe('Modules - FileManager', () => {
         it('should create FileManager instance with required properties', () => {
             const params = {
                 query: 'img[data-se-file]',
-                loadHandler: jest.fn(),
-                eventHandler: jest.fn()
+                loadEventName: 'onImageLoad',
+                actionEventName: 'onImageAction'
             };
 
             const fileManager = new FileManager(mockInst, params);
@@ -79,10 +79,9 @@ describe('Modules - FileManager', () => {
             expect(fileManager.ui).toBe(mockUI);
             expect(fileManager.kind).toBe('testPlugin');
             expect(fileManager.inst).toBe(mockInst);
-            expect(fileManager.component).toBe(mockEditor.component);
             expect(fileManager.query).toBe('img[data-se-file]');
-            expect(fileManager.loadHandler).toBe(params.loadHandler);
-            expect(fileManager.eventHandler).toBe(params.eventHandler);
+            expect(fileManager.loadEventName).toBe(params.loadEventName);
+            expect(fileManager.actionEventName).toBe(params.actionEventName);
             expect(fileManager.infoList).toEqual([]);
             expect(fileManager.infoIndex).toBe(0);
             expect(fileManager.uploadFileLength).toBe(0);
@@ -280,8 +279,8 @@ describe('Modules - FileManager', () => {
         beforeEach(() => {
             fileManager = new FileManager(mockInst, {
                 query: 'img[data-se-file]',
-                loadHandler: jest.fn(),
-                eventHandler: jest.fn()
+                loadEventName: 'onImageLoad',
+                actionEventName: 'onImageAction'
             });
 
             mockTags = [
@@ -309,7 +308,7 @@ describe('Modules - FileManager', () => {
             fileManager._checkInfo(true);
 
             expect(mockWysiwyg.querySelectorAll).toHaveBeenCalledWith('img[data-se-file]');
-            expect(fileManager.loadHandler).toHaveBeenCalledWith(fileManager.infoList);
+            expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onImageLoad', mockEditor, fileManager.infoList);
         });
 
         it('should handle orphaned tags by resetting attributes', () => {
@@ -343,11 +342,11 @@ describe('Modules - FileManager', () => {
         beforeEach(() => {
             fileManager = new FileManager(mockInst, {
                 query: 'img',
-                eventHandler: jest.fn()
+                actionEventName: 'onImageAction'
             });
         });
 
-        it('should call eventHandler for each file in infoList', () => {
+        it('should call triggerEvent for each file in infoList', () => {
             fileManager.infoList = [
                 { index: 1, src: 'test1.jpg' },
                 { index: 2, src: 'test2.jpg' }
@@ -355,7 +354,7 @@ describe('Modules - FileManager', () => {
 
             fileManager._resetInfo();
 
-            expect(fileManager.eventHandler).toHaveBeenCalledTimes(2);
+            expect(mockEditor.triggerEvent).toHaveBeenCalledTimes(4); // 2 files × 2 events (actionEventName + onFileManagerAction)
         });
 
         it('should reset infoList and infoIndex', () => {
@@ -384,7 +383,7 @@ describe('Modules - FileManager', () => {
             }).not.toThrow();
         });
 
-        it('should handle missing loadHandler gracefully', () => {
+        it('should handle missing loadEventName gracefully', () => {
             const fileManagerWithoutHandler = new FileManager(mockInst, { query: 'img' });
             fileManagerWithoutHandler.infoList = [{ index: 1 }];
 
@@ -393,7 +392,7 @@ describe('Modules - FileManager', () => {
             }).not.toThrow();
         });
 
-        it('should handle missing eventHandler gracefully', () => {
+        it('should handle missing actionEventName gracefully', () => {
             const fileManagerWithoutHandler = new FileManager(mockInst, { query: 'img' });
             fileManagerWithoutHandler.infoList = [{ index: 1 }];
 

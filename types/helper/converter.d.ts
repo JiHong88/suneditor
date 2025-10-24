@@ -85,10 +85,10 @@ export function kebabToCamelCase(param: Array<string>): Array<string>;
 export function toFontUnit(to: 'em' | 'rem' | '%' | 'pt' | 'px', size: string): string;
 /**
  * @description Convert the node list to an array. If not, returns an empty array.
- * @param {?__se__NodeCollection} nodeList
+ * @param {?SunEditor.NodeCollection=} nodeList
  * @returns Array
  */
-export function nodeListToArray(nodeList: __se__NodeCollection | null): any;
+export function nodeListToArray(nodeList?: (SunEditor.NodeCollection | null) | undefined): any;
 /**
  * @description Returns a new object with keys and values swapped.
  * @param {Object<*, *>} obj object

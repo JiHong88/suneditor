@@ -83,10 +83,10 @@ declare class Drawing extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {DrawingPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: DrawingPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: DrawingPluginOptions);
 	title: any;
 	icon: string;
 	pluginOptions: {

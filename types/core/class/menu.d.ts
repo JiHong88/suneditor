@@ -1,27 +1,27 @@
 import type {} from '../../typedef';
 export default Menu;
-export type MenuThis = Omit<Menu & Partial<__se__EditorInjector>, 'menu'>;
+export type MenuThis = Omit<Menu & Partial<SunEditor.Injector>, 'menu'>;
 /**
- * @typedef {Omit<Menu & Partial<__se__EditorInjector>, 'menu'>} MenuThis
+ * @typedef {Omit<Menu & Partial<SunEditor.Injector>, 'menu'>} MenuThis
  */
 /**
  * @constructor
  * @this {MenuThis}
  * @description Dropdown and container menu management class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Menu(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, editor: __se__EditorCore): void;
+declare function Menu(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, editor: SunEditor.Core): void;
 declare class Menu {
 	/**
-	 * @typedef {Omit<Menu & Partial<__se__EditorInjector>, 'menu'>} MenuThis
+	 * @typedef {Omit<Menu & Partial<SunEditor.Injector>, 'menu'>} MenuThis
 	 */
 	/**
 	 * @constructor
 	 * @this {MenuThis}
 	 * @description Dropdown and container menu management class
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	/** @type {Object<string, HTMLElement>} */
 	targetMap: {
 		[x: string]: HTMLElement;
@@ -43,9 +43,9 @@ declare class Menu {
 		mousemove: any;
 		mouseout: any;
 	};
-	_bindClose_dropdown_mouse: __se__GlobalEventInfo;
+	_bindClose_dropdown_mouse: SunEditor.GlobalEventInfo;
 	_bindClose_dropdown_key: any;
-	_bindClose_cons_mouse: __se__GlobalEventInfo;
+	_bindClose_cons_mouse: SunEditor.GlobalEventInfo;
 	currentDropdownPlugin: any;
 	__menuBtn: Node;
 	__menuContainer: HTMLElement;

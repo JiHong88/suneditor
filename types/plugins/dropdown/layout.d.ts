@@ -23,10 +23,10 @@ declare class Layout extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {LayoutPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: LayoutPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: LayoutPluginOptions);
 	title: any;
 	icon: string;
 	selectedIndex: number;

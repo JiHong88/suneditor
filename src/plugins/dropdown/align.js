@@ -16,7 +16,7 @@ class Align extends EditorInjector {
 	static className = '';
 
 	/**
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {AlignPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor, pluginOptions) {

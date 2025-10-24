@@ -8,10 +8,6 @@ const { NO_EVENT } = env;
  */
 
 /**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls_image
- */
-
-/**
  * @typedef {Object} ImagePluginOptions
  * @property {boolean} [canResize=true] - Whether the image element can be resized.
  * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
@@ -30,8 +26,8 @@ const { NO_EVENT } = env;
  * @property {string} [defaultFormatType="block"] - The default image format type ("block" or "inline").
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
- * @property {FigureControls_image} [controls] - Figure controls.
- * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -77,7 +73,7 @@ class Image_ extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {ImagePluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
@@ -136,8 +132,8 @@ class Image_ extends EditorInjector {
 		});
 		this.fileManager = new FileManager(this, {
 			query: 'img',
-			loadHandler: this.events.onImageLoad,
-			eventHandler: this.events.onImageAction
+			loadEventName: 'onImageLoad',
+			actionEventName: 'onImageAction'
 		});
 
 		// members
@@ -245,7 +241,7 @@ class Image_ extends EditorInjector {
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "paste" or "drop".
 	 * @param {Object} params { frameContext, event, file }
-	 * @param {__se__FrameContext} params.frameContext Frame context
+	 * @param {SunEditor.FrameContext} params.frameContext Frame context
 	 * @param {ClipboardEvent} params.event Event object
 	 * @param {File} params.file File object
 	 * @returns {boolean} - If return false, the file upload will be canceled
@@ -1248,7 +1244,7 @@ class Image_ extends EditorInjector {
  * @property {HTMLButtonElement} asInline
  * @property {HTMLButtonElement} fileRemoveBtn
  *
- * @param {__se__EditorCore} editor
+ * @param {SunEditor.Core} editor
  * @param {*} pluginOptions
  * @returns {ModalReturns_image}
  */

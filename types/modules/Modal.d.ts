@@ -7,7 +7,7 @@ export default Modal;
 declare class Modal extends CoreInjector {
 	/**
 	 * @description Create a file input tag in the modal window.
-	 * @param {{icons: __se__EditorCore['icons'], lang: __se__EditorCore['lang']}} param0 - icons and language object
+	 * @param {{icons: SunEditor.Core['icons'], lang: SunEditor.Core['lang']}} param0 - icons and language object
 	 * @param {{acceptedFormats: string, allowMultiple}} param1 - options
 	 * - acceptedFormats: "image/*, video/*, audio/*", etc.
 	 * - allowMultiple: true or false
@@ -18,8 +18,8 @@ declare class Modal extends CoreInjector {
 			icons,
 			lang
 		}: {
-			icons: __se__EditorCore['icons'];
-			lang: __se__EditorCore['lang'];
+			icons: SunEditor.Core['icons'];
+			lang: SunEditor.Core['lang'];
 		},
 		{
 			acceptedFormats,
@@ -37,12 +37,12 @@ declare class Modal extends CoreInjector {
 	static OnChangeFile(wrapper: Element, files: FileList | File[]): void;
 	/**
 	 * @description Modal window module
-	 * @param {* & {editor: __se__EditorCore}} inst The instance object that called the constructor.
+	 * @param {* & {editor: SunEditor.Core}} inst The instance object that called the constructor.
 	 * @param {Element} element Modal element
 	 */
 	constructor(
 		inst: any & {
-			editor: __se__EditorCore;
+			editor: SunEditor.Core;
 		},
 		element: Element
 	);

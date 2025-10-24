@@ -42,10 +42,10 @@ declare class AudioGallery extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {AudioGalleryPluginOptions} pluginOptions
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: AudioGalleryPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: AudioGalleryPluginOptions);
 	title: any;
 	icon: string;
 	onSelectfunction: (targe: Node) => any;

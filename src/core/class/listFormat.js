@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom } from '../../helper';
 
 /**
- * @typedef {Omit<ListFormat & Partial<__se__EditorInjector>, 'ListFormat'>} ListFormatThis
+ * @typedef {Omit<ListFormat & Partial<SunEditor.Injector>, 'ListFormat'>} ListFormatThis
  */
 
 /**
@@ -14,7 +14,7 @@ import { dom } from '../../helper';
  * @this {ListFormatThis}
  * @description Classes related to editor formats such as "list" (ol, ul, li)
  * - "list" is a special "line", "block" format.
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function ListFormat(editor) {
 	CoreInjector.call(this, editor);

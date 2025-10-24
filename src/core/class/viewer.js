@@ -8,14 +8,14 @@ import { dom, env, converter, numbers } from '../../helper';
 const { _w, _d } = env;
 
 /**
- * @typedef {Omit<Viewer & Partial<__se__EditorInjector>, 'viewer'>} ViewerThis
+ * @typedef {Omit<Viewer & Partial<SunEditor.Injector>, 'viewer'>} ViewerThis
  */
 
 /**
  * @constructor
  * @this {ViewerThis}
  * @description Viewer(codeView, fullScreen, showBlocks) class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
 function Viewer(editor) {
 	CoreInjector.call(this, editor);
@@ -709,7 +709,7 @@ Viewer.prototype = {
 /**
  * @private
  * @description Create line numbers for the code view area
- * @param {__se__FrameContext} fc - Frame context
+ * @param {SunEditor.FrameContext} fc - Frame context
  */
 function CreateLineNumbers(fc) {
 	const codeNumbers = fc.get('codeNumbers');

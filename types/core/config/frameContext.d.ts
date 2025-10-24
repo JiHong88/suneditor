@@ -22,7 +22,7 @@ import type {} from '../../typedef';
  *
  * === Identification ===
  * @property {*} key - Unique key identifying this editor instance (useful for multi-root editors).
- * @property {__se__FrameOptions} options - Frame-specific options (toolbar, plugins, behaviors, etc.).
+ * @property {SunEditor.FrameOptions} options - Frame-specific options (toolbar, plugins, behaviors, etc.).
  *
  * === Core DOM References ===
  * @property {Element} originElement - The original source element (usually a <textarea> or target element).
@@ -96,7 +96,7 @@ import type {} from '../../typedef';
  */
 /**
  * @description Elements and variables you should have
- * @param {{target: Element, key: *, options: __se__FrameOptions}} editorTarget Target textarea
+ * @param {{target: Element, key: *, options: SunEditor.FrameOptions}} editorTarget Target textarea
  * @param {HTMLElement} top Editor top area
  * @param {HTMLElement} wwFrame Editor wysiwyg frame
  * @param {HTMLElement} codeWrapper Editor code view wrapper
@@ -110,7 +110,7 @@ export function CreateFrameContext(
 	editorTarget: {
 		target: Element;
 		key: any;
-		options: __se__FrameOptions;
+		options: SunEditor.FrameOptions;
 	},
 	top: HTMLElement,
 	wwFrame: HTMLElement,
@@ -192,7 +192,7 @@ export type FrameContextStore = {
 	 *
 	 * === Core DOM References ===
 	 */
-	options: __se__FrameOptions;
+	options: SunEditor.FrameOptions;
 	/**
 	 * - The original source element (usually a <textarea> or target element).
 	 */

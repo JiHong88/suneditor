@@ -4,11 +4,11 @@ export type BlockStylePluginOptions = {
 	/**
 	 * - Format list
 	 */
-	items?: Array<string>;
+	items?: Array<'p' | 'div' | 'blockquote' | 'pre' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | string>;
 };
 /**
  * @typedef {Object} BlockStylePluginOptions
- * @property {Array<string>} [items] - Format list
+ * @property {Array<"p"|"div"|"blockquote"|"pre"|"h1"|"h2"|"h3"|"h4"|"h5"|"h6"|string>} [items] - Format list
  */
 /**
  * @class
@@ -20,10 +20,10 @@ declare class BlockStyle extends EditorInjector {
 	static className: string;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {BlockStylePluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: BlockStylePluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: BlockStylePluginOptions);
 	title: any;
 	inner: string;
 	formatList: NodeListOf<Element>;
@@ -53,8 +53,8 @@ declare class BlockStyle extends EditorInjector {
 	/**
 	 * @description Create a header tag, call by "shortcut" class
 	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])
-	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	applyHeaderByShortcut({ keyCode }: __se__PluginShortcutInfo): void;
+	applyHeaderByShortcut({ keyCode }: SunEditor.PluginShortcutInfo): void;
 }
 import EditorInjector from '../../editorInjector';

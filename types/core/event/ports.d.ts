@@ -126,7 +126,7 @@ export function makePorts(
 	component: {
 		deselect: () => void;
 		is: (n: any) => boolean;
-		get: (n: any) => __se__ComponentInfo;
+		get: (n: any) => SunEditor.ComponentInfo;
 		select: (t: any, p: any) => boolean;
 	};
 	html: {

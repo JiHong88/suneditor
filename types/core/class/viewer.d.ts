@@ -1,27 +1,27 @@
 import type {} from '../../typedef';
 export default Viewer;
-export type ViewerThis = Omit<Viewer & Partial<__se__EditorInjector>, 'viewer'>;
+export type ViewerThis = Omit<Viewer & Partial<SunEditor.Injector>, 'viewer'>;
 /**
- * @typedef {Omit<Viewer & Partial<__se__EditorInjector>, 'viewer'>} ViewerThis
+ * @typedef {Omit<Viewer & Partial<SunEditor.Injector>, 'viewer'>} ViewerThis
  */
 /**
  * @constructor
  * @this {ViewerThis}
  * @description Viewer(codeView, fullScreen, showBlocks) class
- * @param {__se__EditorCore} editor - The root editor instance
+ * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Viewer(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, editor: __se__EditorCore): void;
+declare function Viewer(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, editor: SunEditor.Core): void;
 declare class Viewer {
 	/**
-	 * @typedef {Omit<Viewer & Partial<__se__EditorInjector>, 'viewer'>} ViewerThis
+	 * @typedef {Omit<Viewer & Partial<SunEditor.Injector>, 'viewer'>} ViewerThis
 	 */
 	/**
 	 * @constructor
 	 * @this {ViewerThis}
 	 * @description Viewer(codeView, fullScreen, showBlocks) class
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(editor: __se__EditorCore);
+	constructor(editor: SunEditor.Core);
 	bodyOverflow: string;
 	editorAreaOriginCssText: string;
 	wysiwygOriginCssText: string;

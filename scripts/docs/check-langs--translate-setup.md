@@ -1,10 +1,10 @@
-⭐️ `npm run i18n-build`
+⭐️ `npm run langs-build`
 
 ---
 
 # 🌐 Google Cloud Translation API 설정 가이드
 
-이 문서는 `i18n-sync.cjs` 자동 번역 스크립트를 실행하기 위한 **Google Cloud Translation API** 사용 설정 과정을 정리한 가이드입니다.
+이 문서는 `langs-sync.cjs` 자동 번역 스크립트를 실행하기 위한 **Google Cloud Translation API** 사용 설정 과정을 정리한 가이드입니다.
 
 ---
 
@@ -54,11 +54,11 @@
 
 ## ✅ 4. 환경변수 등록
 
-package.json > scripts > i18n-build 에서 환경 변수를 설정 하고 있습니다.
+package.json > scripts > check:langs 에서 환경 변수를 설정 하고 있습니다.
 
 ```json
 "scripts": {
-  "i18n-build": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/i18n-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix"
+  "check:langs": "cross-env GOOGLE_APPLICATION_CREDENTIALS=./.env/google-api-service-account.json node scripts/check/langs-sync.cjs --auto-translate && npx eslint \"src/langs/*.js\" --fix && npx eslint \"types/langs/_Lang.d.ts\" --fix"
 }
 ```
 
@@ -77,7 +77,7 @@ package.json > scripts > i18n-build 에서 환경 변수를 설정 하고 있습
 ## ✅ 6. 실행
 
 ```bash
-npm run i18n-build
+npm run check:langs
 ```
 
 이 명령은 다음을 수행합니다:
@@ -86,7 +86,7 @@ npm run i18n-build
 -   타입 선언 파일(`_Lang.d.ts`) 업데이트
 -   ESLint 자동 수정 실행
 
-> 👀 !"node run ts-build" 는 실행하지 않습니다. (types 파일 업데이트)
+> 👀 `npm run ts-build` 는 실행하지 않습니다. (types 파일 업데이트)
 
 ---
 

@@ -272,7 +272,7 @@ export function toFontUnit(to, size) {
 
 /**
  * @description Convert the node list to an array. If not, returns an empty array.
- * @param {?__se__NodeCollection} nodeList
+ * @param {?SunEditor.NodeCollection=} nodeList
  * @returns Array
  */
 export function nodeListToArray(nodeList) {

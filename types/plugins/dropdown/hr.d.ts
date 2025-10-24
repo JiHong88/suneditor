@@ -29,10 +29,10 @@ declare class HR extends EditorInjector {
 	static component(this: HR, node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {HRPluginOptions} pluginOptions - Plugin options
 	 */
-	constructor(editor: __se__EditorCore, pluginOptions: HRPluginOptions);
+	constructor(editor: SunEditor.Core, pluginOptions: HRPluginOptions);
 	title: any;
 	icon: string;
 	list: NodeListOf<HTMLButtonElement>;
@@ -64,9 +64,9 @@ declare class HR extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	shortcut({ line, range }: __se__PluginShortcutInfo): void;
+	shortcut({ line, range }: SunEditor.PluginShortcutInfo): void;
 	/**
 	 * @description Add a hr element
 	 * @param {string} className HR class name

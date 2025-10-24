@@ -5,7 +5,7 @@ const HALT = 'action.stop';
 
 /**
  * @description Execute actions sequentially
- * @param {__se__EventActions} actions - Array of actions to execute
+ * @param {SunEditor.EventActions} actions - Array of actions to execute
  * @param {*} effContext - Effect context containing ports, ctx, and event
  */
 export async function actionExecutor(actions, effContext) {

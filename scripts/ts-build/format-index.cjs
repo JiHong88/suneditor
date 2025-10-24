@@ -8,7 +8,7 @@ const path = require('path');
  * - Main default export
  */
 
-const indexPath = path.join(__dirname, '../types/index.ts');
+const indexPath = path.join(__dirname, '../../types/index.ts');
 
 // Check if file exists
 if (!fs.existsSync(indexPath)) {
@@ -26,21 +26,6 @@ const newContent = `/**
 
 // Re-export default exports as named exports
 ${modules.map((mod) => `export { default as ${mod} } from './${mod}';`).join('\n')}
-
-// Export types
-export type {
-	SunEditorInstance,
-	SunEditorOptions,
-	SunEditorFrameOptions,
-	SunEditorCore,
-	SunEditorComponentInfo,
-	SunEditorPluginMouseEvent,
-	SunEditorPluginKeyEvent,
-	SunEditorPluginToolbarInputChange,
-	SunEditorPluginShortcut,
-	SunEditorPluginPaste,
-	SunEditorPluginCopyComponent
-} from './suneditor';
 
 // Main default export
 export { default } from './suneditor';

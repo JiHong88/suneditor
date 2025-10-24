@@ -14,7 +14,7 @@ class List_bulleted extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
 	constructor(editor) {
 		// plugin bisic properties
@@ -96,7 +96,7 @@ class List_bulleted extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {__se__PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
 	 */
 	shortcut({ range, info }) {
 		const { startContainer } = range;

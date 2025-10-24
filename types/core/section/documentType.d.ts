@@ -3,18 +3,18 @@ export default DocumentType;
 /**
  * @constructor
  * @description DocumentType, page, header management class
- * @param {__se__EditorCore} editor - The root editor instance
- * @param {__se__FrameContext} fc - frame context object
+ * @param {SunEditor.Core} editor - The root editor instance
+ * @param {SunEditor.FrameContext} fc - frame context object
  */
-declare function DocumentType(editor: __se__EditorCore, fc: __se__FrameContext): void;
+declare function DocumentType(editor: SunEditor.Core, fc: SunEditor.FrameContext): void;
 declare class DocumentType {
 	/**
 	 * @constructor
 	 * @description DocumentType, page, header management class
-	 * @param {__se__EditorCore} editor - The root editor instance
-	 * @param {__se__FrameContext} fc - frame context object
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.FrameContext} fc - frame context object
 	 */
-	constructor(editor: __se__EditorCore, fc: __se__FrameContext);
+	constructor(editor: SunEditor.Core, fc: SunEditor.FrameContext);
 	editor: import('../editor').default;
 	context: import('../config/context').ContextUtil;
 	selection: import('../class/selection').default;

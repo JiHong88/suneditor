@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { glob } = require('glob');
 
-const typesDir = path.join(__dirname, '../types');
+const typesDir = path.join(__dirname, '../../types');
 
 /**
  * Calculate relative path from source file to typedef.d.ts

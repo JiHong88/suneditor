@@ -11,7 +11,7 @@ import ApiManager from './ApiManager';
 
 /**
  * @typedef {Object} FileStateParams
- * @property {__se__EditorCore} editor - The root editor instance
+ * @property {SunEditor.Core} editor - The root editor instance
  * @property {Node} element File element
  * @property {number} index File index
  * @property {string} state File state ("create"|"update"|"delete")
@@ -23,8 +23,8 @@ import ApiManager from './ApiManager';
 /**
  * @typedef {Object} FileManagerParams
  * @property {string} query The query selector used to find file elements in the editor
- * @property {(params: Array<FileStateInfo>) => void=} loadHandler A function to handle the loaded file information
- * @property {(info: FileStateParams) => void=} eventHandler A function to handle file-related events
+ * @property {string} loadEventName Event name for file load (e.g., 'onImageLoad')
+ * @property {string} actionEventName Event name for file action (e.g., 'onImageAction')
  */
 
 /**
@@ -48,8 +48,8 @@ class FileManager extends CoreInjector {
 		this.kind = inst.constructor.key || inst.constructor.name;
 		this.inst = inst;
 		this.query = params.query;
-		this.loadHandler = params.loadHandler;
-		this.eventHandler = params.eventHandler;
+		this.loadEventName = params.loadEventName;
+		this.actionEventName = params.actionEventName;
 		this.infoList = [];
 		this.infoIndex = 0;
 		this.uploadFileLength = 0;
@@ -195,8 +195,8 @@ class FileManager extends CoreInjector {
 		}
 
 		// editor load
-		if (loaded && typeof this.loadHandler === 'function') {
-			this.loadHandler(infoList);
+		if (loaded && this.loadEventName) {
+			this.triggerEvent(this.loadEventName, this.editor, infoList);
 			return;
 		}
 
@@ -207,8 +207,8 @@ class FileManager extends CoreInjector {
 			infoList.splice(i, 1);
 
 			const params = { editor: this.editor, element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
-			if (typeof this.eventHandler === 'function') {
-				this.eventHandler(params);
+			if (this.actionEventName) {
+				this.triggerEvent(this.actionEventName, params);
 			}
 			this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
 
@@ -221,10 +221,11 @@ class FileManager extends CoreInjector {
 	 * @description Reset info object and "infoList = []", "infoIndex = 0"
 	 */
 	_resetInfo() {
-		const eh = typeof this.eventHandler === 'function';
 		const params = { editor: this.editor, element: null, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind };
 		for (let i = 0, len = this.infoList.length; i < len; i++) {
-			if (eh) this.eventHandler({ ...params, index: this.infoList[i].index, pluginName: this.kind });
+			if (this.actionEventName) {
+				this.triggerEvent(this.actionEventName, { ...params, index: this.infoList[i].index, pluginName: this.kind });
+			}
 			this.triggerEvent('onFileManagerAction', { ...params, index: this.infoList[i].index, pluginName: this.kind });
 		}
 
@@ -241,8 +242,8 @@ class FileManager extends CoreInjector {
 			for (let i = 0, len = this.infoList.length; i < len; i++) {
 				if (index === this.infoList[i].index) {
 					this.infoList.splice(i, 1);
-					if (typeof this.eventHandler === 'function') {
-						this.eventHandler({ editor: this.editor, element: null, index, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind });
+					if (this.actionEventName) {
+						this.triggerEvent(this.actionEventName, { editor: this.editor, element: null, index, state: 'delete', info: null, remainingFilesCount: 0, pluginName: this.kind });
 					}
 					return;
 				}
@@ -326,8 +327,8 @@ class FileManager extends CoreInjector {
 		}.bind(this, element);
 
 		const params = { editor: this.editor, element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength, pluginName: this.kind };
-		if (typeof this.eventHandler === 'function') {
-			this.eventHandler(params);
+		if (this.actionEventName) {
+			this.triggerEvent(this.actionEventName, params);
 		}
 		this.triggerEvent('onFileManagerAction', { ...params, pluginName: this.kind });
 	}

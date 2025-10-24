@@ -1,11 +1,11 @@
 import type {} from '../../../typedef';
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>} EventManagerThis_handler_ww_dragDrop
+ * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_dragDrop
  */
 /**
  * @private
  * @this {EventManagerThis_handler_ww_dragDrop}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {HTMLElement} dragCursor - Drag cursor element
  * @param {?HTMLElement} _iframeTopArea - Iframe top area element
  * @param {?HTMLElement} _innerToolbar - Inner toolbar element
@@ -13,7 +13,7 @@ import type {} from '../../../typedef';
  */
 export function OnDragOver_wysiwyg(
 	this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>,
-	fc: __se__FrameContext,
+	fc: SunEditor.FrameContext,
 	dragCursor: HTMLElement,
 	_iframeTopArea: HTMLElement | null,
 	_innerToolbar: HTMLElement | null,
@@ -28,9 +28,14 @@ export function OnDragEnd_wysiwyg(this: Omit<import('../eventManager').default &
 /**
  * @private
  * @this {EventManagerThis_handler_ww_dragDrop}
- * @param {__se__FrameContext} fc - Frame context object
+ * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {HTMLElement} dragCursor - Drag cursor element
  * @param {DragEvent} e - Event object
  */
-export function OnDrop_wysiwyg(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, fc: __se__FrameContext, dragCursor: HTMLElement, e: DragEvent): boolean | Promise<boolean>;
-export type EventManagerThis_handler_ww_dragDrop = Omit<import('../eventManager').default & Partial<__se__EditorInjector>, 'eventManager'>;
+export function OnDrop_wysiwyg(
+	this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>,
+	fc: SunEditor.FrameContext,
+	dragCursor: HTMLElement,
+	e: DragEvent
+): boolean | Promise<boolean>;
+export type EventManagerThis_handler_ww_dragDrop = Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>;

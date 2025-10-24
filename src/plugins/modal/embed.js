@@ -8,10 +8,6 @@ const { _w, NO_EVENT } = env;
  */
 
 /**
- * @typedef {import('../../modules/Figure').FigureControls} FigureControls_embed
- */
-
-/**
  * @typedef {Object} EmbedPluginOptions
  * @property {boolean} [canResize=true] - Whether the embed element can be resized.
  * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
@@ -45,8 +41,8 @@ const { _w, NO_EVENT } = env;
  *   },
  *   // Additional services...
  * }
- * @property {FigureControls_embed} [controls] - Figure controls.
- * @property {__se__ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -110,7 +106,7 @@ class Embed extends EditorInjector {
 
 	/**
 	 * @constructor
-	 * @param {__se__EditorCore} editor - The root editor instance
+	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {EmbedPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
@@ -811,7 +807,7 @@ class Embed extends EditorInjector {
 }
 
 /**
- * @param {__se__EditorCore} editor Editor instance
+ * @param {SunEditor.Core} editor Editor instance
  * @param {*} pluginOptions
  * @returns {{
  * html: HTMLElement,

@@ -13,9 +13,9 @@ const _d = env._d;
 
 /**
  * @typedef {Object} ConstructorReturnType
- * @property {__se__Context} context - Editor context object
+ * @property {SunEditor.Context} context - Editor context object
  * @property {HTMLElement} carrierWrapper - Carrier wrapper element
- * @property {__se__BaseOptions} options - Processed editor options (Map)
+ * @property {SunEditor.Options} options - Processed editor options (Map)
  * @property {Object<string, *>} plugins - Loaded plugins
  * @property {Object<string, string>} icons - Icon set
  * @property {Object<string, string>} lang - Language pack
@@ -31,8 +31,8 @@ const _d = env._d;
 
 /**
  * @description Creates a new SunEditor instance with specified options.
- * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} editorTargets - Target element or multi-root object.
- * @param {__se__EditorOptions} options - Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} editorTargets - Target element or multi-root object.
+ * @param {SunEditor.InitOptions} options - Configuration options for the editor.
  * @returns {ConstructorReturnType} - SunEditor instance with context, options, and DOM elements.
  */
 function Constructor(editorTargets, options) {
@@ -355,20 +355,20 @@ function _mergeObject(a, b) {
 
 /**
  * @typedef {Object} InitOptionsReturnType
- * @property {__se__BaseOptions} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
+ * @property {SunEditor.Options} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
  * @property {Object<string, string>} i - Icon set
  * @property {Object<string, string>} l - Language pack
  * @property {string|null} v - Initial editor value
  * @property {Array<string[]|string>} buttons - Toolbar button list (arrays for groups, strings for single buttons)
  * @property {Array<string[]|string>|null} subButtons - Sub-toolbar button list
  * @property {Element|null} statusbarContainer - Container element for status bar (if specified)
- * @property {Map<string|null, __se__FrameOptions>} frameMap - Map of frame-specific options (frame key => {@link __se__FrameOptions})
+ * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => {@link SunEditor.FrameOptions})
  */
 
 /**
  * @description Initialize options
- * @param {__se__EditorOptions} options Configuration options for the editor.
- * @param {Array<{target: Element, key: *, options: __se__EditorFrameOptions}>} editorTargets Target textarea
+ * @param {SunEditor.InitOptions} options Configuration options for the editor.
+ * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} editorTargets Target textarea
  * @param {Object<string, *>} plugins Plugins object
  * @returns {InitOptionsReturnType} Initialized options and configuration
  */
@@ -777,9 +777,9 @@ export function CreateStatusbar(targetOptions, statusbar) {
 
 /**
  * @description Initialize options.
- * @param {__se__EditorFrameOptions} o - Target options
- * @param {__se__EditorOptions} origin - Full options
- * @returns {__se__FrameOptions} Processed frame options Map
+ * @param {SunEditor.InitFrameOptions} o - Target options
+ * @param {SunEditor.InitOptions} origin - Full options
+ * @returns {SunEditor.FrameOptions} Processed frame options Map
  */
 function InitFrameOptions(o, origin) {
 	const fo = new Map();
@@ -827,7 +827,7 @@ function InitFrameOptions(o, origin) {
 	fo.set('iframe', !!(iframe_fullPage || iframe));
 	fo.set('iframe_fullPage', !!iframe_fullPage);
 	fo.set('iframe_attributes', iframe_attributes || {});
-	fo.set('iframe_cssFileName', iframe ? (typeof iframe_cssFileName === 'string' ? [iframe_cssFileName] : iframe_cssFileName || ['suneditor']) : null);
+	fo.set('iframe_cssFileName', iframe ? (typeof iframe_cssFileName === 'string' ? [iframe_cssFileName] : iframe_cssFileName) || ['suneditor'] : null);
 	// status bar
 	const hasStatusbar = statusbar === undefined ? true : !!statusbar;
 	fo.set('statusbar', hasStatusbar);

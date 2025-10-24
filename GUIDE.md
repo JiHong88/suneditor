@@ -826,6 +826,38 @@ Types are defined in JSDoc format in source files and generated into TypeScript 
 - `types/**/*.d.ts`: Generated TypeScript definitions (built via `npm run ts-build`)
 - Type generation uses `barrelsby` for barrel exports and custom scripts for processing
 
+**Global Type Namespace:**
+
+All internal types are exposed through the `SunEditor` global namespace to minimize global scope pollution:
+
+```typescript
+// In JSDoc (src files)
+/** @param {SunEditor.Core} editor */
+/** @type {SunEditor.Context} */
+
+// In TypeScript (user projects)
+import SunEditor from 'suneditor';
+const editor: SunEditor.Core = SunEditor.create(...);
+```
+
+**Available Types in `SunEditor` namespace:**
+
+- `SunEditor.Core` - Main editor instance
+- `SunEditor.InitOptions` - Editor initialization options
+- `SunEditor.Context` - Editor context map
+- `SunEditor.FrameContext` - Frame context utilities
+- `SunEditor.ComponentInfo` - Component metadata
+- ... and 20+ more types (see `src/typedef.js`)
+
+**Public API Types:**
+
+The package also exports user-facing types directly (without `SunEditor.` prefix):
+
+- `SunEditorOptions`, `SunEditorCore`, `SunEditorInstance`
+- `SunEditorComponentInfo`, `SunEditorPluginKeyEvent`, etc.
+
+These are defined in `src/suneditor.js` and re-exported from `types/index.d.ts`.
+
 ---
 
 ## Essential Commands
@@ -871,7 +903,8 @@ npm run check:arch      # Check architecture dependencies with dependency-cruise
 
 ```bash
 npm run ts-build        # Build TypeScript definitions from JSDoc
-npm run i18n-build      # Sync language files (requires Google API credentials)
+npm run check:langs     # Sync language files (requires Google API credentials)
+npm run check:inject    # Inject plugin JSDoc types into options.js
 ```
 
 ---
