@@ -21,5 +21,5 @@ export default {
 	dom,
 	numbers,
 	keyCodeMap,
-	clipboard
+	clipboard,
 };

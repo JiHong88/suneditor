@@ -206,7 +206,7 @@
 		video_modal_url: 'Посилання на відео, Youtube, Vimeo',
 		width: 'Ширина',
 		message_copy_success: 'Скопійовано в буфер обміну',
-		message_copy_fail: 'Не вдалося скопіювати. Будь ласка, скопіюйте вручну.'
+		message_copy_fail: 'Не вдалося скопіювати. Будь ласка, скопіюйте вручну.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

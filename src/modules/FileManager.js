@@ -263,7 +263,7 @@ class FileManager extends CoreInjector {
 
 		file ||= {
 			name: GetAttr(element, 'file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
-			size: Number(GetAttr(element, 'file-size')) || 0
+			size: Number(GetAttr(element, 'file-size')) || 0,
 		};
 
 		// create
@@ -279,7 +279,7 @@ class FileManager extends CoreInjector {
 				src: element.src,
 				index: dataIndex,
 				name: file.name,
-				size: file.size
+				size: file.size,
 			};
 
 			this.infoList.push(info);
@@ -298,7 +298,7 @@ class FileManager extends CoreInjector {
 			if (!info) {
 				dataIndex = this.infoIndex++;
 				info = {
-					index: dataIndex
+					index: dataIndex,
 				};
 				this.infoList.push(info);
 			}

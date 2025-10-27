@@ -206,7 +206,7 @@
 		video_modal_url: 'כתובת הטמעה YouTube/Vimeo',
 		width: 'רוחב',
 		message_copy_success: 'הועתק ללוח',
-		message_copy_fail: 'ההעתקה נכשלה. נא להעתיק ידנית.'
+		message_copy_fail: 'ההעתקה נכשלה. נא להעתיק ידנית.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

@@ -206,7 +206,7 @@
 		video_modal_url: 'Indlejr video / YouTube,Vimeo',
 		width: 'Bredde',
 		message_copy_success: 'Kopieret til udklipsholderen',
-		message_copy_fail: 'Kopiering mislykkedes. Kopiér venligst manuelt.'
+		message_copy_fail: 'Kopiering mislykkedes. Kopiér venligst manuelt.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

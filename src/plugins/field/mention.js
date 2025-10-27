@@ -72,9 +72,9 @@ class Mention extends EditorInjector {
 				initMethod: () => {
 					this.apiManager.cancel();
 					this.selectMenu.close();
-				}
+				},
 			},
-			null
+			null,
 		);
 		this.selectMenu.on(controllerEl.firstElementChild, this.#SelectMention.bind(this));
 

@@ -371,7 +371,7 @@ class Browser extends CoreInjector {
 
 			this.folders[currentPath] = {
 				name: v.name || key,
-				meta: v.meta || {}
+				meta: v.meta || {},
 			};
 
 			this.#parseFolderData(v, currentPath);
@@ -392,7 +392,7 @@ class Browser extends CoreInjector {
 				const folderLabel = dom.utils.createElement(
 					'div',
 					item.key ? { 'data-command': item.key, 'aria-label': item.name } : null,
-					`<span class="se-menu-icon">${item.key ? this.icon_folder : this.icon_folder_item}</span><span>${item.name}</span>`
+					`<span class="se-menu-icon">${item.key ? this.icon_folder : this.icon_folder_item}</span><span>${item.name}</span>`,
 				);
 				const folderDiv = dom.utils.createElement('div', { class: 'se-menu-folder' }, folderLabel);
 
@@ -632,7 +632,7 @@ function CreateHTMLInfos(editor, useSearch) {
 		list: content.querySelector('.se-browser-list'),
 		side: content.querySelector('.se-browser-side'),
 		wrapper: content.querySelector('.se-browser-wrapper'),
-		_loading: content.querySelector('.se-loading-box')
+		_loading: content.querySelector('.se-loading-box'),
 	};
 }
 

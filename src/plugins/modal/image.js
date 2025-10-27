@@ -95,7 +95,7 @@ class Image_ extends EditorInjector {
 			useFormatType: pluginOptions.useFormatType ?? true,
 			defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
 			keepFormatType: pluginOptions.keepFormatType ?? false,
-			insertBehavior: pluginOptions.insertBehavior
+			insertBehavior: pluginOptions.insertBehavior,
 		};
 
 		// create HTML
@@ -108,7 +108,7 @@ class Image_ extends EditorInjector {
 				? [[ctrlAs, 'mirror_h', 'mirror_v', 'align', 'caption', 'edit', 'revert', 'copy', 'remove']]
 				: [
 						[ctrlAs, 'resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-						['edit', 'align', 'caption', 'revert', 'copy', 'remove']
+						['edit', 'align', 'caption', 'revert', 'copy', 'remove'],
 					]);
 
 		// show align
@@ -120,16 +120,16 @@ class Image_ extends EditorInjector {
 		this.anchor = new ModalAnchorEditor(this, modalEl.html, {
 			...Link,
 			textToDisplay: false,
-			title: true
+			title: true,
 		});
 		this.modal = new Modal(this, modalEl.html);
 		this.figure = new Figure(this, figureControls, {
-			sizeUnit: sizeUnit
+			sizeUnit: sizeUnit,
 		});
 		this.fileManager = new FileManager(this, {
 			query: 'img',
 			loadEventName: 'onImageLoad',
-			actionEventName: 'onImageAction'
+			actionEventName: 'onImageAction',
 		});
 
 		// members
@@ -293,7 +293,7 @@ class Image_ extends EditorInjector {
 
 				const { w, h } = this.#ready(element, true);
 				this.#fileCheck(w, h);
-			}
+			},
 		};
 	}
 
@@ -316,7 +316,7 @@ class Image_ extends EditorInjector {
 		this.#element = null;
 		this.#ratio = {
 			w: 0,
-			h: 0
+			h: 0,
 		};
 		this.#OpenTab('init');
 
@@ -366,7 +366,7 @@ class Image_ extends EditorInjector {
 				function (current) {
 					return current.childNodes.length === 0;
 				},
-				null
+				null,
 			);
 		}
 
@@ -397,7 +397,7 @@ class Image_ extends EditorInjector {
 					error: err,
 					limitSize: slngleSizeLimit,
 					uploadSize: s,
-					file: f
+					file: f,
 				});
 
 				this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
@@ -417,7 +417,7 @@ class Image_ extends EditorInjector {
 				error: err,
 				limitSize,
 				currentSize,
-				uploadSize: fileSize
+				uploadSize: fileSize,
 			});
 
 			this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
@@ -433,7 +433,7 @@ class Image_ extends EditorInjector {
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
 			info: imgInfo,
-			handler
+			handler,
 		});
 
 		if (result === undefined) return true;
@@ -455,7 +455,7 @@ class Image_ extends EditorInjector {
 		const imgInfo = {
 			url,
 			files: file,
-			...this.#getInfo()
+			...this.#getInfo(),
 		};
 
 		const handler = function (uploadCallback, infos, newInfos) {
@@ -465,7 +465,7 @@ class Image_ extends EditorInjector {
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
 			info: imgInfo,
-			handler
+			handler,
 		});
 
 		if (result === undefined) return true;
@@ -607,7 +607,7 @@ class Image_ extends EditorInjector {
 			? figureInfo.ratio
 			: {
 					w: 0,
-					h: 0
+					h: 0,
 				};
 
 		if (this.pluginOptions.useFormatType) {
@@ -629,7 +629,7 @@ class Image_ extends EditorInjector {
 			inputHeight: this.inputY?.value || '',
 			align: this.#align,
 			isUpdate: this.modal.isUpdate,
-			alt: this.altText.value
+			alt: this.altText.value,
 		};
 	}
 
@@ -918,7 +918,7 @@ class Image_ extends EditorInjector {
 		for (let i = 0, len = fileList.length, file; i < len; i++) {
 			file = {
 				name: fileList[i].name,
-				size: fileList[i].size
+				size: fileList[i].size,
 			};
 			if (info.isUpdate) {
 				this.#updateSrc(fileList[i].url, info.element, file);
@@ -994,7 +994,7 @@ class Image_ extends EditorInjector {
 				reader.onload = function (loadCallback, on_reader, update, updateElement, on_file, index) {
 					filesStack[index] = {
 						result: on_reader.result,
-						file: on_file
+						file: on_file,
 					};
 
 					if (--this._base64RenderIndex === 0) {
@@ -1364,7 +1364,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 		revertBtn: content.querySelector('.se-modal-btn-revert'),
 		asBlock: content.querySelector('[data-command="asBlock"]'),
 		asInline: content.querySelector('[data-command="asInline"]'),
-		fileRemoveBtn: content.querySelector('.se-file-remove')
+		fileRemoveBtn: content.querySelector('.se-file-remove'),
 	};
 }
 

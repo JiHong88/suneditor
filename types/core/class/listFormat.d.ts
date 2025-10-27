@@ -46,7 +46,7 @@ declare class ListFormat {
 		this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>,
 		type: string,
 		selectedCells: Array<Node>,
-		nested: boolean
+		nested: boolean,
 	): {
 		sc: Node;
 		so: number;
@@ -66,7 +66,7 @@ declare class ListFormat {
 	remove(
 		this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>,
 		selectedCells: Array<Node>,
-		shouldDelete: boolean
+		shouldDelete: boolean,
 	): {
 		sc: Node;
 		ec: Node;
@@ -91,7 +91,7 @@ declare class ListFormat {
 	applyNested(
 		this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>,
 		selectedCells: Array<HTMLElement>,
-		nested: boolean
+		nested: boolean,
 	): {
 		sc: Node;
 		so: number;
@@ -145,7 +145,7 @@ declare class ListFormat {
 			e: Array<number> | null;
 			sl: Node | null;
 			el: Node | null;
-		}
+		},
 	): Node;
 	/**
 	 * @private
@@ -160,7 +160,7 @@ declare class ListFormat {
 	 */
 	_detachNested(
 		this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>,
-		cells: Array<HTMLElement>
+		cells: Array<HTMLElement>,
 	): {
 		cc: Node;
 		sc: Node;

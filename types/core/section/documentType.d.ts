@@ -86,7 +86,7 @@ declare class DocumentType {
 	 */
 	_getElementAtPosition(
 		pageTop: number,
-		mChr: HTMLElement[]
+		mChr: HTMLElement[],
 	): {
 		ci: number;
 		cm: number;

@@ -58,7 +58,7 @@ export const A = {
 	 */
 	formatRemoveBlock: (rangeEl, selectedFormats, newBlockElement, shouldDelete, skipHistory) => ({
 		t: 'format.removeBlock',
-		p: { rangeEl, selectedFormats, newBlockElement, shouldDelete, skipHistory }
+		p: { rangeEl, selectedFormats, newBlockElement, shouldDelete, skipHistory },
 	}),
 	/**
 	 * @param {Node} item
@@ -225,5 +225,5 @@ export const A = {
 	/** @returns {Action} */
 	keydownInputInsertNbsp: () => ({ t: 'keydown.input.insertNbsp' }),
 	/** @returns {Action} */
-	keydownInputInsertZWS: () => ({ t: 'keydown.input.insertZWS' })
+	keydownInputInsertZWS: () => ({ t: 'keydown.input.insertZWS' }),
 };

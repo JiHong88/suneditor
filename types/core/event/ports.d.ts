@@ -73,10 +73,10 @@ import type {} from '../../typedef';
 export function makePorts(
 	inst: EventManagerInstanceType,
 	{
-		_styleNodes
+		_styleNodes,
 	}: {
 		_styleNodes: any;
-	}
+	},
 ): {
 	editor: {
 		_nativeFocus: () => void;
@@ -101,7 +101,7 @@ export function makePorts(
 		isEdgeLine: (node: any, offset: any, dir: any) => node is HTMLElement;
 		removeBlock: (
 			n: any,
-			p: any
+			p: any,
 		) => {
 			cc: Node;
 			sc: Node;
@@ -115,7 +115,7 @@ export function makePorts(
 	listFormat: {
 		applyNested: (
 			cells: any,
-			shift: any
+			shift: any,
 		) => {
 			sc: Node;
 			so: number;
@@ -146,7 +146,7 @@ export function makePorts(
 		removeAllParents: (
 			s: any,
 			n: any,
-			p: any
+			p: any,
 		) => {
 			sc: Node | null;
 			ec: Node | null;

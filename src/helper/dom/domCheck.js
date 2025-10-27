@@ -328,7 +328,7 @@ const check = {
 	isSameAttributes,
 	isExcludeFormat,
 	isUneditable,
-	isImportantDisabled
+	isImportantDisabled,
 };
 
 export default check;

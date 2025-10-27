@@ -24,7 +24,7 @@ class List_bulleted extends EditorInjector {
 		this.afterItem = dom.utils.createElement(
 			'button',
 			{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': List_bulleted.key, 'data-type': 'dropdown' },
-			`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.bulletedList}</span></span>`
+			`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.bulletedList}</span></span>`,
 		);
 
 		// create HTML

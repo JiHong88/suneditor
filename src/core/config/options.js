@@ -16,7 +16,7 @@ export const DEFAULTS = {
 		'|',
 		['fullScreen', 'showBlocks', 'codeView'],
 		'|',
-		['preview', 'print']
+		['preview', 'print'],
 	],
 
 	REQUIRED_FORMAT_LINE: 'div',
@@ -76,12 +76,12 @@ export const DEFAULTS = {
 		figure: 'display|width|height|padding|padding-bottom',
 		figcaption: 'margin|margin-top|margin-bottom|text-align',
 		'img|video|iframe': 'transform|transform-origin|width|min-width|max-width|height|min-height|max-height|float|margin|margin-top',
-		hr: ''
+		hr: '',
 	},
 	SPAN_STYLES: 'font-family|font-size|color|background-color|width|height',
 	LINE_STYLES: 'text-align|margin|margin-left|margin-right|line-height',
 
-	RETAIN_STYLE_MODE: ['repeat', 'always', 'none']
+	RETAIN_STYLE_MODE: ['repeat', 'always', 'none'],
 };
 
 /**
@@ -485,7 +485,7 @@ export const OPTION_FRAME_FIXED_FLAG = {
 	charCounter: true,
 	charCounter_max: true,
 	charCounter_label: true,
-	charCounter_type: true
+	charCounter_type: true,
 };
 
 /**
@@ -567,7 +567,7 @@ export const OPTION_FIXED_FLAG = {
 	__lineFormatFilter: true,
 	__pluginRetainFilter: true,
 	__listCommonStyle: 'fixed',
-	externalLibs: 'fixed'
+	externalLibs: 'fixed',
 };
 
 /**
@@ -641,7 +641,7 @@ export function FrameOptionsMap(editor) {
 		},
 		clear() {
 			store.clear();
-		}
+		},
 	};
 }
 
@@ -675,6 +675,6 @@ export function BaseOptionsMap(editor) {
 		},
 		clear() {
 			store.clear();
-		}
+		},
 	};
 }

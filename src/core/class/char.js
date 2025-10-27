@@ -144,7 +144,7 @@ Char.prototype = {
 		return true;
 	},
 
-	constructor: Char
+	constructor: Char,
 };
 
 /**

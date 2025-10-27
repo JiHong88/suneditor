@@ -99,7 +99,7 @@ declare class EventManager {
 		target: any,
 		type: string,
 		listener: (...args: any) => any,
-		useCapture?: (boolean | AddEventListenerOptions) | undefined
+		useCapture?: (boolean | AddEventListenerOptions) | undefined,
 	): SunEditor.EventInfo | null;
 	/**
 	 * @this {EventManagerThis}
@@ -121,7 +121,7 @@ declare class EventManager {
 		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
 		type: string,
 		listener: (...args: any) => any,
-		useCapture?: (boolean | AddEventListenerOptions) | undefined
+		useCapture?: (boolean | AddEventListenerOptions) | undefined,
 	): SunEditor.GlobalEventInfo;
 	/**
 	 * @this {EventManagerThis}
@@ -136,7 +136,7 @@ declare class EventManager {
 		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
 		type: string | SunEditor.GlobalEventInfo,
 		listener?: ((...args: any) => any) | undefined,
-		useCapture?: (boolean | AddEventListenerOptions) | undefined
+		useCapture?: (boolean | AddEventListenerOptions) | undefined,
 	): undefined | null;
 	/**
 	 * @this {EventManagerThis}
@@ -330,7 +330,7 @@ declare class EventManager {
 			range?: Range;
 			file?: File;
 			doc?: Document;
-		}
+		},
 	): boolean | undefined;
 	/**
 	 * @private

@@ -206,7 +206,7 @@
 		video_modal_url: 'URL pro vložení médií, YouTube/Vimeo',
 		width: 'Šířka',
 		message_copy_success: 'Zkopírováno do schránky',
-		message_copy_fail: 'Kopírování selhalo. Zkopírujte prosím ručně.'
+		message_copy_fail: 'Kopírování selhalo. Zkopírujte prosím ručně.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

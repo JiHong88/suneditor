@@ -99,13 +99,13 @@ function CreateHTML({ lang }, items) {
 		code: {
 			name: lang.menu_code,
 			class: '__se__t-code',
-			tag: 'code'
+			tag: 'code',
 		},
 		shadow: {
 			name: lang.menu_shadow,
 			class: '__se__t-shadow',
-			tag: 'span'
-		}
+			tag: 'span',
+		},
 	};
 	const styleList = items || Object.keys(defaultList);
 

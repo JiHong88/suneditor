@@ -40,7 +40,7 @@ function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 	this.keyName = {
 		main: this.isSub ? 'toolbar_sub_main' : 'toolbar_main',
 		buttonTray: this.isSub ? 'toolbar_sub_buttonTray' : 'toolbar_buttonTray',
-		width: this.isSub ? 'toolbar_sub_width' : 'toolbar_width'
+		width: this.isSub ? 'toolbar_sub_width' : 'toolbar_width',
 	};
 
 	this.currentMoreLayerActiveButton = null;
@@ -57,11 +57,11 @@ function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 	this._inlineToolbarAttr = {
 		top: '',
 		width: '',
-		isShow: false
+		isShow: false,
 	};
 	this._balloonOffset = {
 		top: 0,
-		left: 0
+		left: 0,
 	};
 
 	this._setResponsive();
@@ -120,7 +120,7 @@ Toolbar.prototype = {
 			if (this._isBalloon) {
 				this._balloonOffset = {
 					top: 0,
-					left: 0
+					left: 0,
 				};
 			}
 		}
@@ -306,7 +306,7 @@ Toolbar.prototype = {
 		const _rButtonsize = (this._rButtonsize = []);
 		const _responsiveButtons = this._originRes;
 		const buttonsObj = (this._rButtonsInfo = {
-			default: _responsiveButtons[0]
+			default: _responsiveButtons[0],
 		});
 
 		for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {
@@ -389,7 +389,7 @@ Toolbar.prototype = {
 		this._balloonOffset = {
 			top: toolbar.offsetTop + wwScroll.top,
 			left: toolbar.offsetLeft + wwScroll.left,
-			position: positionTop ? 'top' : 'bottom'
+			position: positionTop ? 'top' : 'bottom',
 		};
 	},
 
@@ -446,7 +446,7 @@ Toolbar.prototype = {
 		}
 	},
 
-	constructor: Toolbar
+	constructor: Toolbar,
 };
 
 export default Toolbar;

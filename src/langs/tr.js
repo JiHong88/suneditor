@@ -206,7 +206,7 @@
 		video_modal_url: "Medya Ekleme URL'si (YouTube/Vimeo)",
 		width: 'Genişlik',
 		message_copy_success: 'Panoya kopyalandı',
-		message_copy_fail: 'Kopyalama başarısız oldu. Lütfen manuel olarak kopyalayın.'
+		message_copy_fail: 'Kopyalama başarısız oldu. Lütfen manuel olarak kopyalayın.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

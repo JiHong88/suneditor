@@ -62,7 +62,7 @@ class Link extends EditorInjector {
 			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
 			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			acceptedFormats: typeof pluginOptions.acceptedFormats === 'string' ? pluginOptions.acceptedFormats.trim() : null,
-			enableFileUpload: !!uploadUrl
+			enableFileUpload: !!uploadUrl,
 		};
 
 		// modules
@@ -175,14 +175,14 @@ class Link extends EditorInjector {
 				function (current) {
 					return current.childNodes.length === 0 || current.nodeType === 3;
 				},
-				false
+				false,
 			);
 			const ec = dom.query.getEdgeChild(
 				this.controller.currentTarget,
 				function (current) {
 					return current.childNodes.length === 0 || current.nodeType === 3;
 				},
-				true
+				true,
 			);
 			this.selection.setRange(sc, 0, ec, ec.textContent.length);
 			this.inline.apply(null, { stylesToModify: null, nodesToRemove: ['A'], strictRemove: false });

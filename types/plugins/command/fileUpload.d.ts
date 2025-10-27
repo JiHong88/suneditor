@@ -167,7 +167,7 @@ declare class FileUpload extends EditorInjector {
 					name: string;
 					size: number;
 			  },
-		isLast: boolean
+		isLast: boolean,
 	): void;
 	#private;
 }

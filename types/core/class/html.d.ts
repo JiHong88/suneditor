@@ -93,13 +93,13 @@ declare class HTML {
 			tagWhitelist,
 			tagBlacklist,
 			validate,
-			validateAll
+			validateAll,
 		}: {
 			tagWhitelist?: string;
 			tagBlacklist?: string;
 			validate?: (node: Node) => Node | string | null;
 			validateAll?: boolean;
-		}
+		},
 	): string;
 	/**
 	 * @this {HTMLThis}
@@ -132,13 +132,13 @@ declare class HTML {
 			forceFormat,
 			whitelist,
 			blacklist,
-			_freeCodeViewMode
+			_freeCodeViewMode,
 		}?: {
 			forceFormat?: boolean;
 			whitelist?: string | RegExp | null;
 			blacklist?: string | RegExp | null;
 			_freeCodeViewMode?: boolean;
-		}
+		},
 	): string;
 	/**
 	 * @this {HTMLThis}
@@ -166,12 +166,12 @@ declare class HTML {
 		{
 			selectInserted,
 			skipCharCount,
-			skipCleaning
+			skipCleaning,
 		}?: {
 			selectInserted?: boolean;
 			skipCharCount?: boolean;
 			skipCleaning?: boolean;
-		}
+		},
 	): HTMLElement | null;
 	/**
 	 * @this {HTMLThis}
@@ -202,11 +202,11 @@ declare class HTML {
 		oNode: Node,
 		{
 			afterNode,
-			skipCharCount
+			skipCharCount,
 		}?: {
 			afterNode?: Node;
 			skipCharCount?: boolean;
-		}
+		},
 	): any | Node | null;
 	/**
 	 * @this {HTMLThis}
@@ -238,12 +238,12 @@ declare class HTML {
 		{
 			withFrame,
 			includeFullPage,
-			rootKey
+			rootKey,
 		}?: {
 			withFrame?: boolean;
 			includeFullPage?: boolean;
 			rootKey?: number | Array<number>;
-		}
+		},
 	): string | any;
 	/**
 	 * @this {HTMLThis}
@@ -256,10 +256,10 @@ declare class HTML {
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
 		html: string,
 		{
-			rootKey
+			rootKey,
 		}?: {
 			rootKey?: number | Array<number>;
-		}
+		},
 	): void;
 	/**
 	 * @this {HTMLThis}
@@ -272,10 +272,10 @@ declare class HTML {
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
 		html: string,
 		{
-			rootKey
+			rootKey,
 		}?: {
 			rootKey?: number | Array<number>;
-		}
+		},
 	): void;
 	/**
 	 * @this {HTMLThis}
@@ -289,11 +289,11 @@ declare class HTML {
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
 		{
 			withFrame,
-			rootKey
+			rootKey,
 		}?: {
 			withFrame?: boolean;
 			rootKey?: number | Array<number>;
-		}
+		},
 	): {
 		[x: string]: any;
 	};
@@ -310,10 +310,10 @@ declare class HTML {
 			[x: string]: any;
 		},
 		{
-			rootKey
+			rootKey,
 		}?: {
 			rootKey?: number | Array<number>;
-		}
+		},
 	): void;
 	/**
 	 * @this {HTMLThis}
@@ -336,10 +336,10 @@ declare class HTML {
 			body: string;
 		},
 		{
-			rootKey
+			rootKey,
 		}?: {
 			rootKey?: number | Array<number>;
-		}
+		},
 	): boolean;
 	/**
 	 * @this {HTMLThis}
@@ -368,7 +368,7 @@ declare class HTML {
 	_nodeRemoveListItem(
 		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
 		item: Node,
-		isSingleItem: boolean
+		isSingleItem: boolean,
 	): {
 		sc: Node;
 		ec: Node;
@@ -409,7 +409,7 @@ declare class HTML {
 		tagFilter: boolean,
 		formatFilter: boolean,
 		classFilter: boolean,
-		_freeCodeViewMode: boolean
+		_freeCodeViewMode: boolean,
 	): void;
 	/**
 	 * @private

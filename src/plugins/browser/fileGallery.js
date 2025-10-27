@@ -47,7 +47,7 @@ class FileGallery extends EditorInjector {
 			selectorHandler: this.#SetItem.bind(this),
 			columnSize: 4,
 			className: 'se-file-gallery',
-			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail
+			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail,
 		});
 	}
 

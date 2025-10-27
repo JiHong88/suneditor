@@ -214,7 +214,7 @@ Inline.prototype = {
 
 		/** validation check function*/
 		const _removeCheck = {
-			v: false
+			v: false,
 		};
 		const validation = function (checkNode) {
 			const vNode = checkNode.cloneNode(false);
@@ -300,7 +300,7 @@ Inline.prototype = {
 				function (current) {
 					return current.nodeType === 3;
 				},
-				false
+				false,
 			);
 			startOff = 0;
 		}
@@ -311,7 +311,7 @@ Inline.prototype = {
 				function (current) {
 					return current.nodeType === 3;
 				},
-				false
+				false,
 			);
 			endOff = endCon.textContent.length;
 		}
@@ -498,7 +498,7 @@ Inline.prototype = {
 						startContainer: startCon,
 						startOffset: startOff,
 						endContainer: endCon,
-						endOffset: endOff
+						endOffset: endOff,
 					};
 				}
 			}
@@ -819,7 +819,7 @@ Inline.prototype = {
 				startContainer: startCon,
 				startOffset: startOff,
 				endContainer: endCon,
-				endOffset: endOff
+				endOffset: endOff,
 			};
 		}
 
@@ -883,7 +883,7 @@ Inline.prototype = {
 		// node change
 		const newStartOffset = {
 			s: 0,
-			e: 0
+			e: 0,
 		};
 		const startPath = dom.query.getNodePath(startContainer, pNode, newStartOffset);
 
@@ -891,7 +891,7 @@ Inline.prototype = {
 		if (mergeEndCon) endContainer = startContainer;
 		const newEndOffset = {
 			s: 0,
-			e: 0
+			e: 0,
 		};
 		const endPath = dom.query.getNodePath(endContainer, pNode, !mergeEndCon && !endConReset ? newEndOffset : null);
 
@@ -911,7 +911,7 @@ Inline.prototype = {
 			startContainer: startContainer,
 			startOffset: startOffset + newOffsets[0],
 			endContainer: endContainer,
-			endOffset: endOffset + newOffsets[1]
+			endOffset: endOffset + newOffsets[1],
 		};
 	},
 
@@ -957,7 +957,7 @@ Inline.prototype = {
 				return {
 					ancestor: element,
 					container: startCon,
-					offset: startOff
+					offset: startOff,
 				};
 			}
 		}
@@ -1159,7 +1159,7 @@ Inline.prototype = {
 				ancestor: element,
 				container: startCon,
 				offset: startOff,
-				endContainer: _endContainer
+				endContainer: _endContainer,
 			};
 		}
 
@@ -1203,7 +1203,7 @@ Inline.prototype = {
 			// node change
 			const offsets = {
 				s: 0,
-				e: 0
+				e: 0,
 			};
 			const path = dom.query.getNodePath(container, pNode, offsets);
 			offset += offsets.s;
@@ -1221,7 +1221,7 @@ Inline.prototype = {
 			ancestor: pNode,
 			container: container,
 			offset: offset,
-			endContainer: _endContainer
+			endContainer: _endContainer,
 		};
 	},
 
@@ -1275,7 +1275,7 @@ Inline.prototype = {
 				element.innerHTML = /** @type {HTMLElement} */ (tempNode).innerHTML;
 				return {
 					ancestor: element,
-					endContainer: endPath ? dom.query.getNodeFromPath(endPath, element) : null
+					endContainer: endPath ? dom.query.getNodeFromPath(endPath, element) : null,
 				};
 			}
 		}
@@ -1331,7 +1331,7 @@ Inline.prototype = {
 		if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v))
 			return {
 				ancestor: element,
-				endContainer: _endContainer
+				endContainer: _endContainer,
 			};
 
 		pNode.appendChild(newInnerNode);
@@ -1360,7 +1360,7 @@ Inline.prototype = {
 		element.parentNode.replaceChild(pNode, element);
 		return {
 			ancestor: pNode,
-			endContainer: _endContainer
+			endContainer: _endContainer,
 		};
 	},
 
@@ -1405,7 +1405,7 @@ Inline.prototype = {
 				return {
 					ancestor: element,
 					container: endCon,
-					offset: endOff
+					offset: endOff,
 				};
 			}
 		}
@@ -1608,7 +1608,7 @@ Inline.prototype = {
 			return {
 				ancestor: element,
 				container: endCon,
-				offset: endOff
+				offset: endOff,
 			};
 		}
 
@@ -1651,7 +1651,7 @@ Inline.prototype = {
 				return {
 					ancestor: null,
 					container: null,
-					offset: 0
+					offset: 0,
 				};
 			}
 
@@ -1668,7 +1668,7 @@ Inline.prototype = {
 			// node change
 			const offsets = {
 				s: 0,
-				e: 0
+				e: 0,
 			};
 			const path = dom.query.getNodePath(container, pNode, offsets);
 			offset += offsets.s;
@@ -1685,7 +1685,7 @@ Inline.prototype = {
 		return {
 			ancestor: pNode,
 			container: container,
-			offset: container.nodeType === 1 && offset === 1 ? container.childNodes.length : offset
+			offset: container.nodeType === 1 && offset === 1 ? container.childNodes.length : offset,
 		};
 	},
 
@@ -1852,7 +1852,7 @@ Inline.prototype = {
 		return appliedEl;
 	},
 
-	constructor: Inline
+	constructor: Inline,
 };
 
 /**

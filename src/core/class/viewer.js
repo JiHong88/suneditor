@@ -530,7 +530,7 @@ Viewer.prototype = {
 					fo.get('codeMirror5Editor').getDoc().setValue(value);
 				} else if (fo.has('codeMirror6Editor')) {
 					fo.get('codeMirror6Editor').dispatch({
-						changes: { from: 0, to: fo.get('codeMirror6Editor').state.doc.length, insert: value }
+						changes: { from: 0, to: fo.get('codeMirror6Editor').state.doc.length, insert: value },
 					});
 				}
 				break;
@@ -703,7 +703,7 @@ Viewer.prototype = {
 		codeNumbers.scrollLeft = this.scrollLeft;
 	},
 
-	constructor: Viewer
+	constructor: Viewer,
 };
 
 /**

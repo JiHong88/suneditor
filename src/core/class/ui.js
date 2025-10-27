@@ -386,7 +386,7 @@ UI.prototype = {
 		}
 	},
 
-	constructor: UI
+	constructor: UI,
 };
 
 /**

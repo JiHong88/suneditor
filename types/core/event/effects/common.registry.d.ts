@@ -23,7 +23,7 @@ declare const _default: {
 	/** @action formatRemoveBlock */
 	'format.removeBlock': (
 		{ ports }: EffectContext,
-		{ rangeEl, selectedFormats, newBlockElement, shouldDelete, skipHistory }: any
+		{ rangeEl, selectedFormats, newBlockElement, shouldDelete, skipHistory }: any,
 	) => {
 		cc: Node;
 		sc: Node;

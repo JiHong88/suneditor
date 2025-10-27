@@ -22,7 +22,7 @@ export function createElement<T extends HTMLElement>(
 				[x: string]: string;
 		  } | null)
 		| undefined,
-	inner?: ((string | Node) | null) | undefined
+	inner?: ((string | Node) | null) | undefined,
 ): T;
 /**
  * @description Create text node

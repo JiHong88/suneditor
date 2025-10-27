@@ -250,7 +250,7 @@ export type onImageLoad = (
 	params: {
 		editor: SunEditor.Core;
 	},
-	infoList: Array<FileManagementInfo>
+	infoList: Array<FileManagementInfo>,
 ) => any;
 export type onImageAction = (params: { editor: SunEditor.Core; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }) => any;
 export type onImageUploadError = (params: { editor: SunEditor.Core; error: string; limitSize?: number | undefined; uploadSize?: number | undefined; currentSize?: number | undefined; file?: File | undefined }) => Promise<string | undefined>;
@@ -261,7 +261,7 @@ export type onVideoLoad = (
 	params: {
 		editor: SunEditor.Core;
 	},
-	infoList: Array<FileManagementInfo>
+	infoList: Array<FileManagementInfo>,
 ) => any;
 export type onVideoAction = (params: { editor: SunEditor.Core; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }) => any;
 export type onVideoUploadError = (params: { editor: SunEditor.Core; error: string; limitSize?: number | undefined; uploadSize?: number | undefined; currentSize?: number | undefined; file?: File | undefined }) => Promise<string | undefined>;
@@ -273,7 +273,7 @@ export type onAudioLoad = (
 	params: {
 		editor: SunEditor.Core;
 	},
-	infoList: Array<FileManagementInfo>
+	infoList: Array<FileManagementInfo>,
 ) => any;
 export type onAudioAction = (params: { editor: SunEditor.Core; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }) => any;
 export type onAudioDeleteBefore = (params: { editor: SunEditor.Core; element: HTMLElement; container: HTMLElement; url: string }) => Promise<boolean>;
@@ -282,7 +282,7 @@ export type onFileLoad = (
 	params: {
 		editor: SunEditor.Core;
 	},
-	infoList: Array<FileManagementInfo>
+	infoList: Array<FileManagementInfo>,
 ) => any;
 export type onFileAction = (params: { editor: SunEditor.Core; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }) => any;
 export type onFileUploadError = (params: { editor: SunEditor.Core; error: string; limitSize?: number | undefined; uploadSize?: number | undefined; currentSize?: number | undefined; file?: File | undefined }) => Promise<string | undefined>;

@@ -99,7 +99,7 @@ declare class NodeTransform {
 		this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>,
 		item: Node,
 		validation?: ((current: Node) => boolean) | null,
-		stopParent?: Node | null
+		stopParent?: Node | null,
 	): {
 		sc: Node | null;
 		ec: Node | null;
@@ -122,7 +122,7 @@ declare class NodeTransform {
 	createNestedNode(
 		this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>,
 		nodeArray: SunEditor.NodeCollection,
-		validate?: ((current: Node) => boolean) | null
+		validate?: ((current: Node) => boolean) | null,
 	): {
 		parent: Node;
 		inner: Node;

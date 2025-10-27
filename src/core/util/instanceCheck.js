@@ -53,7 +53,7 @@ InstanceCheck.prototype = {
 		return this.editor.frameContext.get('_ww');
 	},
 
-	constructor: InstanceCheck
+	constructor: InstanceCheck,
 };
 
 export default InstanceCheck;

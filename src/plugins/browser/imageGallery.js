@@ -40,7 +40,7 @@ class ImageGallery extends EditorInjector {
 			headers: pluginOptions.headers,
 			selectorHandler: this.#SetItem.bind(this),
 			columnSize: 4,
-			className: 'se-image-gallery'
+			className: 'se-image-gallery',
 		});
 
 		// members

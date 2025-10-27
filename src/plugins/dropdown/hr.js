@@ -119,16 +119,16 @@ function CreateHTML({ lang }, HRItems) {
 	const items = HRItems || [
 		{
 			name: lang.hr_solid,
-			class: '__se__solid'
+			class: '__se__solid',
 		},
 		{
 			name: lang.hr_dashed,
-			class: '__se__dashed'
+			class: '__se__dashed',
 		},
 		{
 			name: lang.hr_dotted,
-			class: '__se__dotted'
-		}
+			class: '__se__dotted',
+		},
 	];
 
 	let list = '';
@@ -144,12 +144,12 @@ function CreateHTML({ lang }, HRItems) {
 	return dom.utils.createElement(
 		'DIV',
 		{
-			class: 'se-dropdown se-list-layer se-list-line'
+			class: 'se-dropdown se-list-layer se-list-line',
 		},
 		/*html*/ `
 		<div class="se-list-inner">
 			<ul class="se-list-basic">${list}</ul>
-		</div>`
+		</div>`,
 	);
 }
 

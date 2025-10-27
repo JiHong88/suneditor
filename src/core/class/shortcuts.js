@@ -92,7 +92,7 @@ Shortcuts.prototype = {
 		this.isDisabled = false;
 	},
 
-	constructor: Shortcuts
+	constructor: Shortcuts,
 };
 
 export default Shortcuts;

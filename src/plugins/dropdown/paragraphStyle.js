@@ -93,18 +93,18 @@ function CreateHTML({ lang }, items) {
 		spaced: {
 			name: lang.menu_spaced,
 			class: '__se__p-spaced',
-			_class: ''
+			_class: '',
 		},
 		bordered: {
 			name: lang.menu_bordered,
 			class: '__se__p-bordered',
-			_class: ''
+			_class: '',
 		},
 		neon: {
 			name: lang.menu_neon,
 			class: '__se__p-neon',
-			_class: ''
-		}
+			_class: '',
+		},
 	};
 	const paragraphStyles = !items || items.length === 0 ? ['spaced', 'bordered', 'neon'] : items;
 

@@ -216,12 +216,12 @@ Selection_.prototype = {
 		if (next) {
 			return {
 				container: next,
-				offset: 0
+				offset: 0,
 			};
 		} else if (prev) {
 			return {
 				container: prev,
-				offset: 1
+				offset: 1,
 			};
 		}
 
@@ -314,7 +314,7 @@ Selection_.prototype = {
 					top: nodeOffset.top,
 					right: nodeOffset.left + /** @type {HTMLElement} */ (node).offsetWidth,
 					bottom: nodeOffset.top + /** @type {HTMLElement} */ (node).offsetHeight,
-					noText: true
+					noText: true,
 				};
 				scrollLeft = 0;
 				scrollTop = 0;
@@ -329,7 +329,7 @@ Selection_.prototype = {
 				left: rects.left + iframeRects.left,
 				top: rects.top + iframeRects.top,
 				right: rects.right + iframeRects.right - iframeRects.width,
-				bottom: rects.bottom + iframeRects.bottom - iframeRects.height
+				bottom: rects.bottom + iframeRects.bottom - iframeRects.height,
 			};
 		}
 
@@ -337,7 +337,7 @@ Selection_.prototype = {
 			rects: rects,
 			position: isStartPosition ? 'start' : 'end',
 			scrollLeft: scrollLeft,
-			scrollTop: scrollTop
+			scrollTop: scrollTop,
 		};
 	},
 
@@ -369,7 +369,7 @@ Selection_.prototype = {
 			sc,
 			so,
 			ec,
-			eo
+			eo,
 		};
 	},
 
@@ -446,7 +446,7 @@ Selection_.prototype = {
 				const newScrollTop = scrollY - (topMargin < 0 ? -(topMargin - PADDING) : bottomMargin);
 				_w.scrollTo({
 					top: newScrollTop,
-					behavior
+					behavior,
 				});
 			} else {
 				const rect = this.offset.getGlobal(el);
@@ -457,7 +457,7 @@ Selection_.prototype = {
 				const newScrollTop = scrollMargin <= PADDING ? scrollY - scrollMargin + PADDING + statusbarHeight : scrollY - scrollMargin + (viewHeight - elH - PADDING);
 				_w.scrollTo({
 					top: newScrollTop,
-					behavior
+					behavior,
 				});
 			}
 		} else {
@@ -481,7 +481,7 @@ Selection_.prototype = {
 					newScrollTop += realToolbarHeight;
 					_w.scrollTo({
 						top: gy + newFrameY,
-						behavior: 'smooth'
+						behavior: 'smooth',
 					});
 				}
 			}
@@ -491,7 +491,7 @@ Selection_.prototype = {
 					newScrollTop += statusbarHeight;
 					_w.scrollTo({
 						top: gy + newFrameY,
-						behavior: 'smooth'
+						behavior: 'smooth',
 					});
 				}
 			}
@@ -500,7 +500,7 @@ Selection_.prototype = {
 			if (!keepLocalScroll) {
 				(isIframe ? ww : wwFrame).scrollTo({
 					top: newScrollTop,
-					behavior
+					behavior,
 				});
 			}
 		}
@@ -748,7 +748,7 @@ Selection_.prototype = {
 		return true;
 	},
 
-	constructor: Selection_
+	constructor: Selection_,
 };
 
 export default Selection_;

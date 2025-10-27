@@ -383,7 +383,7 @@ declare class Offset {
 			position?: 'bottom' | 'top';
 			inst: any;
 			sibling?: HTMLElement;
-		}
+		},
 	):
 		| {
 				position: 'top' | 'bottom';
@@ -406,11 +406,11 @@ declare class Offset {
 		range: Range | null,
 		{
 			position,
-			addTop
+			addTop,
 		}?: {
 			position?: 'bottom' | 'top';
 			addTop?: number;
-		}
+		},
 	): boolean;
 	/**
 	 * @private
@@ -436,7 +436,7 @@ declare class Offset {
 		editorWidth: number,
 		scrollLeft: number,
 		scrollTop: number,
-		addTop?: number
+		addTop?: number,
 	): void;
 	/**
 	 * @private
@@ -476,7 +476,7 @@ declare class Offset {
 		},
 		targetRect: RectsInfo,
 		isTargetAbs: boolean,
-		wwScroll: OffsetWWScrollInfo
+		wwScroll: OffsetWWScrollInfo,
 	): {
 		rmt: number;
 		rmb: number;

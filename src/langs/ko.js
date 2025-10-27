@@ -205,7 +205,7 @@
 		video_modal_url: '미디어 임베드 주소, 유튜브/비메오',
 		width: '가로',
 		message_copy_success: '클립보드에 복사되었습니다',
-		message_copy_fail: '복사에 실패했습니다. 수동으로 복사해주세요.'
+		message_copy_fail: '복사에 실패했습니다. 수동으로 복사해주세요.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -214,7 +214,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -222,7 +222,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

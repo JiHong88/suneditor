@@ -206,7 +206,7 @@
 		video_modal_url: 'Indirizzo video di embed, YouTube/Vimeo',
 		width: 'Larghezza',
 		message_copy_success: 'Copiato negli appunti',
-		message_copy_fail: 'Copia non riuscita. Copia manuale richiesta.'
+		message_copy_fail: 'Copia non riuscita. Copia manuale richiesta.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

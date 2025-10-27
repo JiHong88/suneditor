@@ -117,7 +117,7 @@ EventManager.prototype = {
 				target: target[i],
 				type,
 				listener,
-				useCapture
+				useCapture,
 			});
 		}
 
@@ -125,7 +125,7 @@ EventManager.prototype = {
 			target: len > 1 ? target : target[0],
 			type,
 			listener,
-			useCapture
+			useCapture,
 		};
 	},
 
@@ -171,7 +171,7 @@ EventManager.prototype = {
 		return {
 			type,
 			listener,
-			useCapture
+			useCapture,
 		};
 	},
 
@@ -741,7 +741,7 @@ EventManager.prototype = {
 						this.ui._offCurrentModal();
 					}
 				},
-				false
+				false,
 			);
 		}
 
@@ -786,7 +786,7 @@ EventManager.prototype = {
 			eventWysiwyg,
 			'dragover',
 			OnDragOver_wysiwyg.bind(this, fc, dragCursor, isIframe ? this.frameContext.get('topArea') : null, !this.options.get('toolbar_container') && !this.editor.isBalloon && !this.editor.isInline),
-			false
+			false,
 		);
 		this.addEvent(eventWysiwyg, 'dragend', OnDragEnd_wysiwyg.bind(this, dragCursor), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc, dragCursor), false);
@@ -804,7 +804,7 @@ EventManager.prototype = {
 				event.preventDefault();
 				this.component.deselect();
 			},
-			false
+			false,
 		);
 
 		/** line breaker */
@@ -815,7 +815,7 @@ EventManager.prototype = {
 		if (isTouchDevice) {
 			this.addEvent(eventWysiwyg, 'touchstart', wwMouseMove, {
 				passive: true,
-				capture: false
+				capture: false,
 			});
 		}
 
@@ -1165,7 +1165,7 @@ EventManager.prototype = {
 		// dom.utils.setRootCssVar('--se-var-viewport-height', `${this.status.currentViewportHeight}px`);
 	},
 
-	constructor: EventManager
+	constructor: EventManager,
 };
 
 /**

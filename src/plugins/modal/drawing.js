@@ -63,10 +63,10 @@ class Drawing extends EditorInjector {
 				maxHeight: '',
 				minWidth: '150px',
 				minHeight: '100px',
-				...pluginOptions.formSize
+				...pluginOptions.formSize,
 			},
 			canResize: pluginOptions.canResize ?? true,
-			maintainRatio: pluginOptions.maintainRatio ?? true
+			maintainRatio: pluginOptions.maintainRatio ?? true,
 		};
 
 		// exception
@@ -107,7 +107,7 @@ class Drawing extends EditorInjector {
 			mousemove: this.#OnCanvasMouseMove.bind(this),
 			mouseup: this.#OnCanvasMouseUp.bind(this),
 			mouseleave: this.#OnCanvasMouseLeave.bind(this),
-			mouseenter: this.#OnCanvasMouseEnter.bind(this)
+			mouseenter: this.#OnCanvasMouseEnter.bind(this),
 		};
 		this.#eventsRegister = {
 			touchstart: null,
@@ -116,7 +116,7 @@ class Drawing extends EditorInjector {
 			mousemove: null,
 			mouseup: null,
 			mouseleave: null,
-			mouseenter: null
+			mouseenter: null,
 		};
 
 		// init
@@ -514,9 +514,9 @@ function CreateHTML_modal({ lang, icons, pluginOptions }) {
 		'DIV',
 		{
 			class: 'se-modal-content se-modal-responsive',
-			style: `max-width: ${maxWidth}; max-height: ${maxHeight};`
+			style: `max-width: ${maxWidth}; max-height: ${maxHeight};`,
 		},
-		html
+		html,
 	);
 }
 

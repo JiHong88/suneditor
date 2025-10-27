@@ -66,7 +66,7 @@ const numbers = {
 	get,
 	getOverlapRangeAtIndex,
 	isEven,
-	isOdd
+	isOdd,
 };
 
 export default numbers;

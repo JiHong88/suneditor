@@ -97,7 +97,8 @@ npm install suneditor --save
 ```
 
 ```js
-import 'suneditor/dist/suneditor.min.css';
+import 'suneditor/css'; // Editor UI
+import 'suneditor/css/contents'; // For displaying HTML
 import suneditor from 'suneditor';
 
 // HTML: <div id="editor"></div> or <textarea id="editor"></textarea>
@@ -144,8 +145,8 @@ You can enable only the plugins you need or even create your own custom ones.
 suneditor.create('#editor', {
 	plugins: ['font', 'image', 'video'],
 	image: {
-		uploadUrl: 'https://upload.image'
-	}
+		uploadUrl: 'https://upload.image',
+	},
 });
 ```
 

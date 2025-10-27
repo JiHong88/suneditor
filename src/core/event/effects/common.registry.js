@@ -56,5 +56,5 @@ export default {
 	/** @action selectComponentFallback */
 	'select.component.fallback': ({ ports }, { cmponentInfo }) => {
 		if (ports.component.select(cmponentInfo.target, cmponentInfo.pluginName) === false) ports.editor.blur();
-	}
+	},
 };

@@ -206,7 +206,7 @@
 		video_modal_url: 'Bädda in video / YouTube,Vimeo',
 		width: 'Bredd',
 		message_copy_success: 'Kopierat till urklipp',
-		message_copy_fail: 'Kopieringen misslyckades. Kopiera manuellt.'
+		message_copy_fail: 'Kopieringen misslyckades. Kopiera manuellt.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

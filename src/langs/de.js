@@ -206,7 +206,7 @@
 		video_modal_url: 'Video-URL, YouTube/Vimeo',
 		width: 'Breite',
 		message_copy_success: 'In die Zwischenablage kopiert',
-		message_copy_fail: 'Kopieren fehlgeschlagen. Bitte manuell kopieren.'
+		message_copy_fail: 'Kopieren fehlgeschlagen. Bitte manuell kopieren.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

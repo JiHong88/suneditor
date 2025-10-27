@@ -206,7 +206,7 @@
 		video_modal_url: 'Ссылка на видео, Youtube,Vimeo',
 		width: 'Ширина',
 		message_copy_success: 'Скопировано в буфер обмена',
-		message_copy_fail: 'Не удалось скопировать. Пожалуйста, скопируйте вручную.'
+		message_copy_fail: 'Не удалось скопировать. Пожалуйста, скопируйте вручную.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

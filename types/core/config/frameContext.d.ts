@@ -122,7 +122,7 @@ export function CreateFrameContext(
 		page: HTMLElement;
 		pageMirror: HTMLElement;
 	},
-	key: any
+	key: any,
 ): FrameContextMap;
 /**
  * @description Update statusbar context

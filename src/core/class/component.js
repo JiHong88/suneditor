@@ -64,7 +64,7 @@ function Component(editor) {
 		copy: OnCopy_component.bind(this),
 		cut: OnCut_component.bind(this),
 		keydown: OnKeyDown_component.bind(this),
-		mousedown: CloseListener_mousedown.bind(this)
+		mousedown: CloseListener_mousedown.bind(this),
 	};
 	/** @type {SunEditor.GlobalEventInfo|null} */
 	this._bindClose_copy = null;
@@ -267,7 +267,7 @@ Component.prototype = {
 			caption: figureInfo.caption,
 			isFile,
 			launcher,
-			isInputType: dom.utils.hasClass(container, 'se-input-component')
+			isInputType: dom.utils.hasClass(container, 'se-input-component'),
 		});
 	},
 
@@ -682,7 +682,7 @@ Component.prototype = {
 		_DragHandle.set('__overInfo', null);
 	},
 
-	constructor: Component
+	constructor: Component,
 };
 
 /**

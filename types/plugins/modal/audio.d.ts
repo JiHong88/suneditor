@@ -225,7 +225,7 @@ declare class Audio_ extends EditorInjector {
 			size: number;
 		},
 		isUpdate: boolean,
-		isLast: boolean
+		isLast: boolean,
 	): void;
 	#private;
 }

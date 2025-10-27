@@ -42,9 +42,9 @@ class ExportPDF extends EditorInjector {
 				method: 'POST',
 				url: this.apiUrl,
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
 				},
-				responseType: 'blob'
+				responseType: 'blob',
 			});
 		}
 	}
@@ -106,7 +106,7 @@ class ExportPDF extends EditorInjector {
 	async #createByServer(ww) {
 		const data = {
 			fileName: this.fileName,
-			htmlContent: ww.innerHTML
+			htmlContent: ww.innerHTML,
 		};
 
 		const xhr = await this.apiManager.asyncCall({ data: JSON.stringify(data) });

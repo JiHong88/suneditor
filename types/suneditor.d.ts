@@ -16,7 +16,7 @@ declare namespace _default {
 							options: SunEditor.InitFrameOptions;
 						};
 				  },
-			options: SunEditor.InitOptions
+			options: SunEditor.InitOptions,
 		) => SunEditor.Instance;
 	};
 	/**
@@ -41,7 +41,7 @@ declare namespace _default {
 					};
 			  },
 		options: SunEditor.InitOptions,
-		_init_options?: SunEditor.InitOptions
+		_init_options?: SunEditor.InitOptions,
 	): SunEditor.Instance;
 }
 export default _default;

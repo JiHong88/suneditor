@@ -277,7 +277,7 @@ declare class Figure extends CoreInjector {
 	static GetRatio(
 		w: string | number,
 		h: string | number,
-		defaultSizeUnit?: (string | null) | undefined
+		defaultSizeUnit?: (string | null) | undefined,
 	): {
 		w: number;
 		h: number;
@@ -299,7 +299,7 @@ declare class Figure extends CoreInjector {
 					w: number;
 					h: number;
 			  } | null)
-			| undefined
+			| undefined,
 	): {
 		w: string | number;
 		h: string | number;
@@ -392,14 +392,14 @@ declare class Figure extends CoreInjector {
 			nonSizeInfo,
 			nonBorder,
 			figureTarget,
-			infoOnly
+			infoOnly,
 		}: {
 			nonResizing?: boolean;
 			nonSizeInfo?: boolean;
 			nonBorder?: boolean;
 			figureTarget?: boolean;
 			infoOnly?: boolean;
-		}
+		},
 	): FigureTargetInfo | undefined;
 	/**
 	 * @description Hide the controller
@@ -430,7 +430,7 @@ declare class Figure extends CoreInjector {
 						top: number;
 				  }
 				| undefined;
-		}
+		},
 	): void;
 	/**
 	 * @description Set the element's container size

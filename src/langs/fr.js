@@ -206,7 +206,7 @@
 		video_modal_url: 'URL d’intégration du média, YouTube/Vimeo',
 		width: 'Largeur',
 		message_copy_success: 'Copié dans le presse-papiers',
-		message_copy_fail: 'Échec de la copie. Veuillez copier manuellement.'
+		message_copy_fail: 'Échec de la copie. Veuillez copier manuellement.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

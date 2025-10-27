@@ -238,7 +238,7 @@ const env = {
 	shiftIcon,
 	DPI,
 	KATEX_WEBSITE,
-	MATHJAX_WEBSITE
+	MATHJAX_WEBSITE,
 };
 
 export default env;

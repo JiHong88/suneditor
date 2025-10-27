@@ -206,7 +206,7 @@
 		video_modal_url: '嵌入网址, Youtube,Vimeo',
 		width: '宽度',
 		message_copy_success: '已复制到剪贴板',
-		message_copy_fail: '复制失败，请手动复制。'
+		message_copy_fail: '复制失败，请手动复制。',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

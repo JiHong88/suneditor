@@ -109,7 +109,7 @@ class Anchor extends EditorInjector {
 						'data-se-anchor': this.inputEl.value,
 						'data-se-non-link': 'true',
 						contenteditable: 'false',
-						class: 'se-component se-inline-component'
+						class: 'se-component se-inline-component',
 					});
 
 					this.component.insert(a, { insertBehavior: 'none', scrollTo: false });

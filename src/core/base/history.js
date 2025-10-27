@@ -109,11 +109,11 @@ export default function History(editor) {
 		} else {
 			s = {
 				path: getNodePath(range.startContainer, null, null),
-				offset: range.startOffset
+				offset: range.startOffset,
 			};
 			e = {
 				path: getNodePath(range.endContainer, null, null),
-				offset: range.endOffset
+				offset: range.endOffset,
 			};
 		}
 
@@ -126,7 +126,7 @@ export default function History(editor) {
 			content: content,
 			s: s,
 			e: e,
-			frame: frameRoots.get(rootKey).get('wysiwyg')
+			frame: frameRoots.get(rootKey).get('wysiwyg'),
 		};
 	}
 
@@ -144,7 +144,7 @@ export default function History(editor) {
 			content: rootInitContents[rootKey],
 			s: { path: [0, 0], offset: [0, 0] },
 			e: { path: 0, offset: 0 },
-			frame: frameRoots.get(rootKey).get('wysiwyg')
+			frame: frameRoots.get(rootKey).get('wysiwyg'),
 		};
 	}
 
@@ -391,6 +391,6 @@ export default function History(editor) {
 		destroy() {
 			if (pushDelay) _w.clearTimeout(pushDelay);
 			stackIndex = stack = rootStack = rootInitContents = null;
-		}
+		},
 	};
 }

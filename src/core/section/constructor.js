@@ -67,7 +67,7 @@ function Constructor(editorTargets, options) {
 	const focusTemp = /** @type {HTMLInputElement} */ (
 		dom.utils.createElement('INPUT', {
 			class: '__se__focus__temp__',
-			style: 'position: fixed !important; top: -10000px !important; left: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;'
+			style: 'position: fixed !important; top: -10000px !important; left: -10000px !important; display: block !important; width: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important;',
 		})
 	);
 	focusTemp.tabIndex = 0;
@@ -207,9 +207,9 @@ function Constructor(editorTargets, options) {
 				'DIV',
 				{
 					class: 'sun-editor-editable se-document-page-mirror-a4',
-					style: `position: absolute; width: 21cm; columns: 21cm; border: 0; overflow: hidden; height: auto; top: -10000px; left: -10000px;`
+					style: `position: absolute; width: 21cm; columns: 21cm; border: 0; overflow: hidden; height: auto; top: -10000px; left: -10000px;`,
 				},
-				null
+				null,
 			);
 		}
 
@@ -250,7 +250,7 @@ function Constructor(editorTargets, options) {
 		pluginCallButtons: tool_bar_main.pluginCallButtons,
 		responsiveButtons: tool_bar_main.responsiveButtons,
 		pluginCallButtons_sub: sub_main ? sub_main.pluginCallButtons : [],
-		responsiveButtons_sub: sub_main ? sub_main.responsiveButtons : []
+		responsiveButtons_sub: sub_main ? sub_main.responsiveButtons : [],
 	};
 }
 
@@ -394,7 +394,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		textStyleTagFilter: modeValue,
 		attrFilter: modeValue,
 		styleFilter: modeValue,
-		...(typeof options.strictMode === 'boolean' ? {} : options.strictMode)
+		...(typeof options.strictMode === 'boolean' ? {} : options.strictMode),
 	});
 	o.set('freeCodeViewMode', !!options.freeCodeViewMode);
 	o.set('__lineFormatFilter', options.__lineFormatFilter ?? true);
@@ -442,9 +442,9 @@ export function InitOptions(options, editorTargets, plugins) {
 			italic: 'em',
 			strike: 'del',
 			subscript: 'sub',
-			superscript: 'sup'
+			superscript: 'sup',
 		},
-		options.convertTextTags || {}
+		options.convertTextTags || {},
 	);
 	o.set('convertTextTags', textTags);
 	o.set('_textStyleTags', Object.values(textTags).concat(['span', 'li']));
@@ -455,7 +455,7 @@ export function InitOptions(options, editorTargets, plugins) {
 				_default[key] = _new[key];
 			}
 			return _default;
-		}, {})
+		}, {}),
 	);
 	o.set('_textStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULTS.SPAN_STYLES}${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](${DEFAULTS.LINE_STYLES}${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
@@ -470,7 +470,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		strike: textTags.strike,
 		s: textTags.strike,
 		sub: textTags.subscript,
-		sup: textTags.superscript
+		sup: textTags.superscript,
 	});
 	o.set(
 		'_styleCommandMap',
@@ -485,8 +485,8 @@ export function InitOptions(options, editorTargets, plugins) {
 			strike: 'strike',
 			s: 'strike',
 			sub: 'subscript',
-			sup: 'superscript'
-		})
+			sup: 'superscript',
+		}),
 	);
 	o.set('_defaultTagCommand', {
 		bold: textTags.bold,
@@ -494,7 +494,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		italic: textTags.italic,
 		strike: textTags.strike,
 		subscript: textTags.sub,
-		superscript: textTags.sup
+		superscript: textTags.sup,
 	});
 	// text direction
 	o.set('textDirection', typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection);
@@ -532,24 +532,24 @@ export function InitOptions(options, editorTargets, plugins) {
 		_createFormatInfo(
 			options.formatClosureBrLine,
 			(options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULTS.FORMAT_CLOSURE_BR_LINE).toLowerCase(),
-			o.get('elementBlacklist')
-		)
+			o.get('elementBlacklist'),
+		),
 	);
 	o.set(
 		'formatBrLine',
 		_createFormatInfo(
 			(options.formatBrLine || '') + '|' + o.get('formatClosureBrLine').str,
 			(options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULTS.FORMAT_BR_LINE).toLowerCase(),
-			o.get('elementBlacklist')
-		)
+			o.get('elementBlacklist'),
+		),
 	);
 	o.set(
 		'formatLine',
 		_createFormatInfo(
 			DEFAULTS.REQUIRED_FORMAT_LINE + '|' + (options.formatLine || '') + '|' + o.get('formatBrLine').str,
 			(options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULTS.FORMAT_LINE).toLowerCase(),
-			o.get('elementBlacklist')
-		)
+			o.get('elementBlacklist'),
+		),
 	);
 
 	// Error - default line
@@ -562,16 +562,16 @@ export function InitOptions(options, editorTargets, plugins) {
 		_createFormatInfo(
 			options.formatClosureBlock,
 			(options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULTS.FORMAT_CLOSURE_BLOCK).toLowerCase(),
-			o.get('elementBlacklist')
-		)
+			o.get('elementBlacklist'),
+		),
 	);
 	o.set(
 		'formatBlock',
 		_createFormatInfo(
 			(options.formatBlock || '') + '|' + o.get('formatClosureBlock').str,
 			(options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULTS.FORMAT_BLOCK).toLowerCase(),
-			o.get('elementBlacklist')
-		)
+			o.get('elementBlacklist'),
+		),
 	);
 
 	o.set('allowedEmptyTags', DEFAULTS.ALLOWED_EMPTY_NODE_LIST + (options.allowedEmptyTags ? ', ' + options.allowedEmptyTags : ''));
@@ -634,9 +634,9 @@ export function InitOptions(options, editorTargets, plugins) {
 					// custom
 					_h1: ['c+s+Digit1|Numpad1+$~blockStyle.applyHeaderByShortcut', ''],
 					_h2: ['c+s+Digit2|Numpad2+$~blockStyle.applyHeaderByShortcut', ''],
-					_h3: ['c+s+Digit3|Numpad3+$~blockStyle.applyHeaderByShortcut', '']
+					_h3: ['c+s+Digit3|Numpad3+$~blockStyle.applyHeaderByShortcut', ''],
 				},
-				options.shortcuts || {}
+				options.shortcuts || {},
 			].reduce((_default, _new) => {
 				for (const key in _new) {
 					_default[key] = _new[key];
@@ -721,7 +721,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		buttons: o.get('_rtl') ? buttonList.reverse() : buttonList,
 		subButtons: subButtons,
 		statusbarContainer: typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container,
-		frameMap: frameMap
+		frameMap: frameMap,
 	};
 }
 
@@ -771,7 +771,7 @@ export function CreateStatusbar(targetOptions, statusbar) {
 		statusbar: statusbar,
 		navigation: /** @type {HTMLElement} */ (navigation),
 		charWrapper: /** @type {HTMLElement} */ (charWrapper),
-		charCounter: /** @type {HTMLElement} */ (charCounter)
+		charCounter: /** @type {HTMLElement} */ (charCounter),
 	};
 }
 
@@ -860,7 +860,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 	// wysiwyg div or iframe
 	const wysiwygDiv = dom.utils.createElement(!targetOptions.get('iframe') ? 'DIV' : 'IFRAME', {
 		class: 'se-wrapper-inner se-wrapper-wysiwyg' + (options.get('type') === 'document' ? ' se-type-document-iframe-a4' : ''),
-		'data-root-key': key
+		'data-root-key': key,
 	});
 
 	if (!targetOptions.get('iframe')) {
@@ -891,7 +891,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 		bottomBar: CreateStatusbar(targetOptions, null),
 		wysiwygFrame: wysiwygDiv,
 		codeView: textarea,
-		placeholder: placeholder
+		placeholder: placeholder,
 	};
 }
 
@@ -911,7 +911,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 		const cm = new codeMirror.EditorView({
 			parent: textarea.parentElement,
 			extensions: codeMirror.extensions,
-			state: codeMirror.state
+			state: codeMirror.state,
 		});
 
 		targetOptions.set('codeMirror6Editor', cm);
@@ -925,9 +925,9 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 				mode: 'htmlmixed',
 				htmlMode: true,
 				lineNumbers: true,
-				lineWrapping: true
+				lineWrapping: true,
 			},
-			codeMirror.options || {}
+			codeMirror.options || {},
 		].reduce((init, option) => {
 			for (const key in option) {
 				init[key] = option[key];
@@ -997,7 +997,7 @@ function _createFormatInfo(value, defaultValue, blacklist) {
 		.join('|');
 	return {
 		reg: new RegExp(`^(${str})$`, 'i'),
-		str: str
+		str: str,
 	};
 }
 
@@ -1053,7 +1053,7 @@ function _defaultButtons(options, icons, lang) {
 		// document type buttons
 		pageUp: ['se-component-enabled', lang.pageUp, 'pageUp', '', icons.page_up],
 		pageDown: ['se-component-enabled', lang.pageDown, 'pageDown', '', icons.page_down],
-		pageNavigator: ['se-component-enabled', '', 'pageNavigator', 'input', '']
+		pageNavigator: ['se-component-enabled', '', 'pageNavigator', 'input', ''],
 	};
 }
 
@@ -1068,7 +1068,7 @@ function _createModuleGroup() {
 
 	return {
 		div: oDiv,
-		ul: oUl
+		ul: oUl,
 	};
 }
 
@@ -1098,7 +1098,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 					'data-command': dataCommand,
 					'data-type': dataType,
 					'aria-label': label.replace(/<span .+<\/span>/, ''),
-					tabindex: '-1'
+					tabindex: '-1',
 				})
 	);
 
@@ -1125,7 +1125,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 
 	return {
 		li: oLi,
-		button: oButton
+		button: oButton,
 	};
 }
 
@@ -1359,7 +1359,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 		pluginCallButtons,
 		responsiveButtons,
 		buttonTray,
-		updateButtons
+		updateButtons,
 	};
 }
 

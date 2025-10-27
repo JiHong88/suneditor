@@ -23,7 +23,7 @@ export default {
 	 */
 	init(init_options) {
 		return {
-			create: (targets, options) => this.create(targets, options, init_options)
+			create: (targets, options) => this.create(targets, options, init_options),
 		};
 	},
 
@@ -77,5 +77,5 @@ export default {
 		}
 
 		return new Editor(multiTargets, options);
-	}
+	},
 };

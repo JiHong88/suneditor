@@ -57,7 +57,7 @@ const DEFAULT_COLOR_LIST = [
 	'#002266',
 	'#290066',
 	'#660058',
-	'#222222'
+	'#222222',
 ];
 
 const DEFAULLT_COLOR_SPLITNUM = 9;

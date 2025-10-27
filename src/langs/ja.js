@@ -205,7 +205,7 @@
 		video_modal_url: 'メディア埋め込みアドレス, YouTube/Vimeo',
 		width: '横',
 		message_copy_success: 'クリップボードにコピーしました',
-		message_copy_fail: 'コピーに失敗しました。手動でコピーしてください。'
+		message_copy_fail: 'コピーに失敗しました。手動でコピーしてください。',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -214,7 +214,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -222,7 +222,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

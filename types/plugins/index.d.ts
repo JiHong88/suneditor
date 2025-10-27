@@ -104,5 +104,5 @@ export {
 	template,
 	textStyle,
 	video,
-	videoGallery
+	videoGallery,
 };

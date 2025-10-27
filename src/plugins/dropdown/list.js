@@ -27,7 +27,7 @@ class List extends EditorInjector {
 		this.listItems = menu.querySelectorAll('li button');
 		this.icons = {
 			bulleted: editor.icons.list_bulleted,
-			numbered: editor.icons.list_numbered
+			numbered: editor.icons.list_numbered,
 		};
 
 		// init

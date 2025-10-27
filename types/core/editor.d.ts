@@ -16,7 +16,7 @@ declare function Editor(
 		key: any;
 		options: SunEditor.InitFrameOptions;
 	}>,
-	options: SunEditor.InitOptions
+	options: SunEditor.InitOptions,
 ): void;
 declare class Editor {
 	/**
@@ -34,7 +34,7 @@ declare class Editor {
 			key: any;
 			options: SunEditor.InitFrameOptions;
 		}>,
-		options: SunEditor.InitOptions
+		options: SunEditor.InitOptions,
 	);
 	/**
 	 * @description Frame root key array
@@ -434,7 +434,7 @@ declare class Editor {
 		targets: Array<HTMLElement> | null,
 		pluginOptions: {
 			[x: string]: any;
-		} | null
+		} | null,
 	): void;
 	/**
 	 * @description Run plugin calls and basic commands.

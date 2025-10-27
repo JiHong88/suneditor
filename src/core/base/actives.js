@@ -9,7 +9,7 @@ const StyleMap = {
 	bold: ['font-weight'],
 	underline: ['text-decoration'],
 	italic: ['font-style'],
-	strike: ['text-decoration']
+	strike: ['text-decoration'],
 };
 
 let __globalEventKeydown = null;
@@ -46,7 +46,7 @@ const __findFirstAndLast = function (selectArea) {
 			(current) => {
 				return current.childNodes.length === 0 || current.nodeType === 3 || isTable(current) || isList(current);
 			},
-			false
+			false,
 		) || selectArea.firstChild;
 	const last =
 		dom.query.getEdgeChild(
@@ -54,7 +54,7 @@ const __findFirstAndLast = function (selectArea) {
 			(current) => {
 				return current.childNodes.length === 0 || current.nodeType === 3 || isTable(current) || isList(current);
 			},
-			true
+			true,
 		) || selectArea.lastChild;
 
 	return { first, last };

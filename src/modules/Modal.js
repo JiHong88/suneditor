@@ -74,7 +74,7 @@ class Modal extends CoreInjector {
 				this.#offetLeft = 0;
 				this.#globalEventHandlers = {
 					mousemove: this.#OnResize.bind(this),
-					mouseup: this.#OnResizeMouseUp.bind(this)
+					mouseup: this.#OnResizeMouseUp.bind(this),
 				};
 				this.#bindClose_mousemove = null;
 				this.#bindClose_mouseup = null;

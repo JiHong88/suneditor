@@ -23,7 +23,7 @@ export function getNodePath(
 				s: number;
 				e: number;
 		  } | null)
-		| undefined
+		| undefined,
 ): Array<number>;
 /**
  * @template {Node} T
@@ -81,7 +81,7 @@ export function sortNodeByDepth(array: Array<Node>, des: boolean): void;
  */
 export function compareElements(
 	a: Node,
-	b: Node
+	b: Node,
 ): {
 	ancestor: HTMLElement | null;
 	a: Node;
@@ -149,7 +149,7 @@ export function getEdgeChild<T extends Node>(node: Node, query: string | ((curre
  */
 export function getEdgeChildNodes(
 	first: Node,
-	last: Node | null
+	last: Node | null,
 ): {
 	sc: Node;
 	ec: Node;

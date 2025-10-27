@@ -8,7 +8,7 @@ const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 
 const keyState = {
 	ctrl: false,
-	alt: false
+	alt: false,
 };
 const _styleNodes = Object.preventExtensions({ value: [] });
 

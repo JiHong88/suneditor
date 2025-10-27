@@ -88,7 +88,7 @@ export function makePorts(inst, { _styleNodes }) {
 		// editor
 		editor: {
 			_nativeFocus: () => inst.editor._nativeFocus(),
-			blur: () => inst.editor.blur()
+			blur: () => inst.editor.blur(),
 		},
 
 		// === class ===
@@ -96,7 +96,7 @@ export function makePorts(inst, { _styleNodes }) {
 			getRange: () => selection.getRange(),
 			getNode: () => selection.getNode(),
 			setRange: (se, so, ec, eo) => selection.setRange(se, so, ec, eo),
-			get: () => selection.get()
+			get: () => selection.get(),
 		},
 
 		format: {
@@ -111,41 +111,41 @@ export function makePorts(inst, { _styleNodes }) {
 			isClosureBlock: (n) => format.isClosureBlock(n),
 			isEdgeLine: (node, offset, dir) => format.isEdgeLine(node, offset, dir),
 			removeBlock: (n, p) => format.removeBlock(n, p),
-			addLine: (el, nextOrTag) => format.addLine(el, nextOrTag)
+			addLine: (el, nextOrTag) => format.addLine(el, nextOrTag),
 		},
 
 		listFormat: {
-			applyNested: (cells, shift) => listFormat.applyNested(cells, shift)
+			applyNested: (cells, shift) => listFormat.applyNested(cells, shift),
 		},
 
 		component: {
 			deselect: () => component.deselect(),
 			is: (n) => component.is(n),
 			get: (n) => component.get(n),
-			select: (t, p) => component.select(t, p)
+			select: (t, p) => component.select(t, p),
 		},
 
 		html: {
 			remove: () => html.remove(),
 			insert: (h, p) => html.insert(h, p),
-			insertNode: (n, p) => html.insertNode(n, p)
+			insertNode: (n, p) => html.insertNode(n, p),
 		},
 
 		history: {
-			push: (hard) => history.push(!!hard)
+			push: (hard) => history.push(!!hard),
 		},
 
 		nodeTransform: {
 			removeAllParents: (s, n, p) => nodeTransform.removeAllParents(s, n, p),
-			split: (n, o, d) => nodeTransform.split(n, o, d)
+			split: (n, o, d) => nodeTransform.split(n, o, d),
 		},
 
 		char: {
-			check: (content) => char.check(content)
+			check: (content) => char.check(content),
 		},
 
 		menu: {
-			dropdownOff: () => menu.dropdownOff()
+			dropdownOff: () => menu.dropdownOff(),
 		},
 
 		// === inst(eventManager) commands ===
@@ -178,7 +178,7 @@ export function makePorts(inst, { _styleNodes }) {
 
 			inst.__focusTemp.focus({ preventScroll: true });
 			inst.frameContext.get('wysiwyg').focus({ preventScroll: true });
-		}
+		},
 	};
 }
 

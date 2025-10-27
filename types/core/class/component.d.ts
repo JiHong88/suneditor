@@ -87,13 +87,13 @@ declare class Component {
 			skipCharCount,
 			skipHistory,
 			scrollTo,
-			insertBehavior
+			insertBehavior,
 		}?: {
 			skipCharCount?: boolean;
 			skipHistory?: boolean;
 			scrollTo?: boolean;
 			insertBehavior?: SunEditor.ComponentInsertBehaviorType;
-		}
+		},
 	): HTMLElement;
 	/**
 	 * @this {ComponentThis}
@@ -124,10 +124,10 @@ declare class Component {
 		element: Node,
 		pluginName: string,
 		{
-			isInput
+			isInput,
 		}?: {
 			isInput?: boolean;
-		}
+		},
 	): boolean;
 	/**
 	 * @this {ComponentThis}

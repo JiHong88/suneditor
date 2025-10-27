@@ -206,7 +206,7 @@
 		video_modal_url: 'URL del vídeo',
 		width: 'Ancho',
 		message_copy_success: 'Copiado al portapapeles',
-		message_copy_fail: 'Error al copiar. Por favor, copie manualmente.'
+		message_copy_fail: 'Error al copiar. Por favor, copie manualmente.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

@@ -206,7 +206,7 @@
 		video_modal_url: 'آدرس Url ویدئو, YouTube/Vimeo',
 		width: 'پهنا',
 		message_copy_success: 'در کلیپ‌بورد کپی شد',
-		message_copy_fail: 'کپی انجام نشد. لطفاً به صورت دستی کپی کنید.'
+		message_copy_fail: 'کپی انجام نشد. لطفاً به صورت دستی کپی کنید.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

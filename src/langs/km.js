@@ -205,7 +205,7 @@
 		video_modal_url: 'URL បង្កប់មេឌៀ, YouTube/Vimeo',
 		width: 'ទទឹង',
 		message_copy_success: 'បានចម្លងទៅក្តារចម្លង',
-		message_copy_fail: 'ការចម្លងបរាជ័យ។ សូមចម្លងដោយដៃ។'
+		message_copy_fail: 'ការចម្លងបរាជ័យ។ សូមចម្លងដោយដៃ។',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -214,7 +214,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -222,7 +222,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

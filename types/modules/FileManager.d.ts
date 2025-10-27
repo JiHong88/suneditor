@@ -128,7 +128,7 @@ declare class FileManager extends CoreInjector {
 					size: number;
 			  },
 		callBack?: (((xmlHttp: XMLHttpRequest) => boolean) | null) | undefined,
-		errorCallBack?: (((res: any, xmlHttp: XMLHttpRequest) => string) | null) | undefined
+		errorCallBack?: (((res: any, xmlHttp: XMLHttpRequest) => string) | null) | undefined,
 	): void;
 	/**
 	 * @description Upload the file to the server.
@@ -148,7 +148,7 @@ declare class FileManager extends CoreInjector {
 			| {
 					formData: FormData;
 					size: number;
-			  }
+			  },
 	): Promise<XMLHttpRequest>;
 	/**
 	 * @description Set the file information to the element.
@@ -162,11 +162,11 @@ declare class FileManager extends CoreInjector {
 		element: Node,
 		{
 			name,
-			size
+			size,
 		}: {
 			name: string;
 			size: number;
-		}
+		},
 	): void;
 	/**
 	 * @description Gets the sum of the sizes of the currently saved files.

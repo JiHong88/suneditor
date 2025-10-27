@@ -373,7 +373,7 @@ declare class Video extends EditorInjector {
 			name: string;
 			size: number;
 		},
-		isLast: boolean
+		isLast: boolean,
 	): void;
 	/**
 	 * @description Creates a new iframe element for video embedding.

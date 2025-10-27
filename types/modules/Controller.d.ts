@@ -160,7 +160,7 @@ declare class Controller extends CoreInjector {
 			isWWTarget,
 			initMethod,
 			disabled,
-			addOffset
+			addOffset,
 		}?: {
 			isWWTarget?: boolean | undefined;
 			initMethod?: (() => void) | undefined;
@@ -171,7 +171,7 @@ declare class Controller extends CoreInjector {
 						top?: number;
 				  }
 				| undefined;
-		}
+		},
 	): void;
 	/**
 	 * @description Close a modal plugin

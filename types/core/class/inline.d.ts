@@ -84,12 +84,12 @@ declare class Inline {
 		{
 			stylesToModify,
 			nodesToRemove,
-			strictRemove
+			strictRemove,
 		}?: {
 			stylesToModify?: Array<string>;
 			nodesToRemove?: Array<string>;
 			strictRemove?: boolean;
-		}
+		},
 	): HTMLElement;
 	/**
 	 * @this {InlineThis}
@@ -149,7 +149,7 @@ declare class Inline {
 		collapsed: boolean,
 		_removeCheck: any,
 		_getMaintainedNode: (element: Node) => Node | null,
-		_isMaintainedNode: (element: Node) => boolean
+		_isMaintainedNode: (element: Node) => boolean,
 	): {
 		ancestor: any;
 		startContainer: any;
@@ -186,7 +186,7 @@ declare class Inline {
 		_removeCheck: any,
 		_getMaintainedNode: (element: Node) => Node | null,
 		_isMaintainedNode: (element: Node) => boolean,
-		_endContainer: Node
+		_endContainer: Node,
 	): NodeStyleContainerType;
 	/**
 	 * @private
@@ -209,7 +209,7 @@ declare class Inline {
 		isRemoveFormat: boolean,
 		isRemoveNode: boolean,
 		_removeCheck: any,
-		_endContainer: Node
+		_endContainer: Node,
 	): NodeStyleContainerType;
 	/**
 	 * @private
@@ -238,7 +238,7 @@ declare class Inline {
 		isRemoveNode: boolean,
 		_removeCheck: any,
 		_getMaintainedNode: (element: Node) => Node | null,
-		_isMaintainedNode: (element: Node) => boolean
+		_isMaintainedNode: (element: Node) => boolean,
 	): NodeStyleContainerType;
 	/**
 	 * @private

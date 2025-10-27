@@ -206,7 +206,7 @@
 		video_modal_url: 'Adres URL video, np. YouTube/Vimeo',
 		width: 'Szerokość',
 		message_copy_success: 'Skopiowano do schowka',
-		message_copy_fail: 'Nie udało się skopiować. Skopiuj ręcznie.'
+		message_copy_fail: 'Nie udało się skopiować. Skopiuj ręcznie.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

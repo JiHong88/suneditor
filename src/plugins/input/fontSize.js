@@ -7,82 +7,82 @@ const DEFAULT_UNIT_MAP = {
 		list: [
 			{
 				title: 'XX-Small',
-				size: '8px'
+				size: '8px',
 			},
 			{
 				title: 'X-Small',
-				size: '10px'
+				size: '10px',
 			},
 			{
 				title: 'Small',
-				size: '13px'
+				size: '13px',
 			},
 			{
 				title: 'Medium',
-				size: '16px'
+				size: '16px',
 			},
 			{
 				title: 'Large',
-				size: '18px'
+				size: '18px',
 			},
 			{
 				title: 'X-Large',
-				size: '24px'
+				size: '24px',
 			},
 			{
 				title: 'XX-Large',
-				size: '32px'
-			}
-		]
+				size: '32px',
+			},
+		],
 	},
 	px: {
 		default: 13,
 		inc: 1,
 		min: 8,
 		max: 72,
-		list: [8, 10, 13, 15, 18, 20, 22, 26, 28, 36, 48, 72]
+		list: [8, 10, 13, 15, 18, 20, 22, 26, 28, 36, 48, 72],
 	},
 	pt: {
 		default: 10,
 		inc: 1,
 		min: 6,
 		max: 72,
-		list: [6, 8, 10, 12, 14, 18, 22, 26, 32]
+		list: [6, 8, 10, 12, 14, 18, 22, 26, 32],
 	},
 	em: {
 		default: 1,
 		inc: 0.1,
 		min: 0.5,
 		max: 5,
-		list: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
+		list: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3],
 	},
 	rem: {
 		default: 1,
 		inc: 0.1,
 		min: 0.5,
 		max: 5,
-		list: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
+		list: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3],
 	},
 	vw: {
 		inc: 0.1,
 		min: 0.5,
 		max: 10,
-		list: [2, 3.5, 4, 4.5, 6, 8]
+		list: [2, 3.5, 4, 4.5, 6, 8],
 	},
 	vh: {
 		default: 1.5,
 		inc: 0.1,
 		min: 0.5,
 		max: 10,
-		list: [1, 1.5, 2, 2.5, 3, 3.5, 4]
+		list: [1, 1.5, 2, 2.5, 3, 3.5, 4],
 	},
 	'%': {
 		default: 100,
 		inc: 1,
 		min: 50,
 		max: 200,
-		list: [50, 70, 90, 100, 120, 140, 160, 180, 200]
-	}
+		list: [50, 70, 90, 100, 120, 140, 160, 180, 200],
+	},
 };
 
 /**
@@ -142,25 +142,25 @@ class FontSize extends EditorInjector {
 			this.beforeItem = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'dec' },
-				`${this.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.decrease}</span></span>`
+				`${this.icons.minus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.decrease}</span></span>`,
 			);
 			this.afterItem = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-sub-btn', 'data-command': FontSize.key, 'data-type': 'command', 'data-value': 'inc' },
-				`${this.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.increase}</span></span>`
+				`${this.icons.plus}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.increase}</span></span>`,
 			);
 		} else if (!disableInput) {
 			this.afterItem = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-sub-arrow-btn', 'data-command': FontSize.key, 'data-type': 'dropdown' },
-				`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
+				`${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`,
 			);
 			this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
 		} else if (disableInput && !showIncDec) {
 			this.replaceButton = dom.utils.createElement(
 				'button',
 				{ class: 'se-btn se-tooltip se-btn-select se-btn-tool-font-size', 'data-command': FontSize.key, 'data-type': 'dropdown' },
-				`<span class="se-txt __se__font_size">${this.lang.fontSize}</span>${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`
+				`<span class="se-txt __se__font_size">${this.lang.fontSize}</span>${this.icons.arrow_down}<span class="se-tooltip-inner"><span class="se-tooltip-text">${this.lang.fontSize}</span></span>`,
 			);
 			this.menu.initDropdownTarget({ key: FontSize.key, type: 'dropdown' }, menu);
 		}
@@ -344,7 +344,7 @@ class FontSize extends EditorInjector {
 		if (!target)
 			return {
 				unit: this.sizeUnit,
-				value: this.sizeUnit ? 0 : ''
+				value: this.sizeUnit ? 0 : '',
 			};
 
 		const size = typeof target === 'string' ? target : dom.check.isInputElement(target) ? target.value : target.textContent;
@@ -358,7 +358,7 @@ class FontSize extends EditorInjector {
 
 		return {
 			unit,
-			value
+			value,
 		};
 	}
 

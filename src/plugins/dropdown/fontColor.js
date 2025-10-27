@@ -37,7 +37,7 @@ class FontColor extends EditorInjector {
 			colorList: pluginOptions.items,
 			splitNum: pluginOptions.splitNum,
 			disableHEXInput: pluginOptions.disableHEXInput,
-			hueSliderOptions: { controllerOptions: { parents: [menu], isOutsideForm: true } }
+			hueSliderOptions: { controllerOptions: { parents: [menu], isOutsideForm: true } },
 		});
 
 		// itit

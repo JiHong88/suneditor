@@ -206,7 +206,7 @@
 		video_modal_url: 'YouTube/Vimeo به‌سته‌ری له‌ناودانان وه‌ك ',
 		width: 'پانی',
 		message_copy_success: 'لە پەڕگەی لەبەرگرتووەدا هاوپەڕ کرا',
-		message_copy_fail: 'هاوپەڕکردن سەرکەوتوو نەبوو. تکایە بەدەست هاوپەڕ بکە.'
+		message_copy_fail: 'هاوپەڕکردن سەرکەوتوو نەبوو. تکایە بەدەست هاوپەڕ بکە.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

@@ -371,7 +371,7 @@ NodeTransform.prototype = {
 				if (parent && validation(element)) {
 					cc = {
 						sc: element.previousElementSibling,
-						ec: element.nextElementSibling
+						ec: element.nextElementSibling,
 					};
 					dom.utils.removeItem(element);
 					recursionFunc(/** @type {Element} */ (parent));
@@ -445,11 +445,11 @@ NodeTransform.prototype = {
 
 		return {
 			parent: el,
-			inner: n
+			inner: n,
 		};
 	},
 
-	constructor: NodeTransform
+	constructor: NodeTransform,
 };
 
 export default NodeTransform;

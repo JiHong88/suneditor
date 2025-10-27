@@ -17,7 +17,7 @@ export function OnDragOver_wysiwyg(
 	dragCursor: HTMLElement,
 	_iframeTopArea: HTMLElement | null,
 	_innerToolbar: HTMLElement | null,
-	e: DragEvent
+	e: DragEvent,
 ): void;
 /**
  * @private
@@ -36,6 +36,6 @@ export function OnDrop_wysiwyg(
 	this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>,
 	fc: SunEditor.FrameContext,
 	dragCursor: HTMLElement,
-	e: DragEvent
+	e: DragEvent,
 ): boolean | Promise<boolean>;
 export type EventManagerThis_handler_ww_dragDrop = Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>;

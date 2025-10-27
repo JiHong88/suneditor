@@ -201,9 +201,9 @@ DocumentType.prototype = {
 					'DIV',
 					{
 						style: `top:${t - scrollTop}px`,
-						innerHTML: String(i + 1)
+						innerHTML: String(i + 1),
 					},
-					`<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`
+					`<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`,
 				);
 
 				this.page.appendChild(pageNumber);
@@ -254,7 +254,7 @@ DocumentType.prototype = {
 			this._positionCache.set(i, {
 				top,
 				height,
-				bottom: bottom
+				bottom: bottom,
 			});
 		}
 	},
@@ -551,7 +551,7 @@ DocumentType.prototype = {
 		return (this._wwHeaders = this.ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));
 	},
 
-	constructor: DocumentType
+	constructor: DocumentType,
 };
 
 /**

@@ -177,7 +177,7 @@ function Editor(multiTargets, options) {
 		onSelected: false,
 		rootKey: product.rootId,
 		_range: null,
-		_onMousedown: false
+		_onMousedown: false,
 	};
 
 	/**
@@ -473,7 +473,7 @@ function Editor(multiTargets, options) {
 		tags: null,
 		regExp: null,
 		pluginRegExp: null,
-		pluginMap: null
+		pluginMap: null,
 	};
 
 	/**
@@ -770,7 +770,7 @@ Editor.prototype = {
 				(current) => {
 					return this.format.isLine(current) && !!(current.style.marginRight || current.style.marginLeft || current.style.textAlign);
 				},
-				null
+				null,
 			);
 
 			for (let i = 0, n, l, r; (n = lineNodes[i]); i++) {
@@ -1068,7 +1068,7 @@ Editor.prototype = {
 					function (current) {
 						return current.childNodes.length === 0 || current.nodeType === 3;
 					},
-					true
+					true,
 				);
 			}
 			if (!focusEl) this._nativeFocus();
@@ -1231,7 +1231,7 @@ Editor.prototype = {
 				forceFormat: true,
 				whitelist: null,
 				blacklist: null,
-				_freeCodeViewMode: this.options.get('freeCodeViewMode')
+				_freeCodeViewMode: this.options.get('freeCodeViewMode'),
 			}) || '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 
 		// char counter
@@ -1388,7 +1388,7 @@ Editor.prototype = {
 				// user event
 				this.triggerEvent('onload', {});
 			}.bind(this),
-			0
+			0,
 		);
 	},
 
@@ -1421,7 +1421,7 @@ Editor.prototype = {
 			['onFocus', []],
 			['onBlur', []],
 			['onPaste', []],
-			['onFilePasteAndDrop', []]
+			['onFilePasteAndDrop', []],
 		]);
 		this._fileManager.tags = [];
 		this._fileManager.pluginMap = {};
@@ -1462,9 +1462,9 @@ Editor.prototype = {
 						return {
 							target: element,
 							pluginName: launcher.key,
-							options: launcher.options
+							options: launcher.options,
 						};
-					}.bind(plugin, plugin.constructor)
+					}.bind(plugin, plugin.constructor),
 				);
 			}
 
@@ -1497,8 +1497,8 @@ Editor.prototype = {
 							// focus
 							this.focusEdge(focusEl);
 							this.history.push(false);
-						}
-					}
+						},
+					},
 				};
 			});
 		}
@@ -1703,7 +1703,7 @@ Editor.prototype = {
 				balloon: this.isSubBalloon,
 				balloonAlways: this.isSubBalloonAlways,
 				inline: false,
-				res: this._responsiveButtons_sub
+				res: this._responsiveButtons_sub,
 			});
 		}
 		this.selection = new Selection_(this);
@@ -1823,7 +1823,7 @@ Editor.prototype = {
 		this.__editorInit(originOptions);
 	},
 
-	Constructor: Editor
+	Constructor: Editor,
 };
 
 function RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots) {

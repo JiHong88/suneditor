@@ -11,7 +11,7 @@ export const _DragHandle = new Map([
 	['__dragContainer', null],
 	['__dragCover', null],
 	['__dragMove', null],
-	['__overInfo', null]
+	['__overInfo', null],
 ]);
 
 export default _DragHandle;

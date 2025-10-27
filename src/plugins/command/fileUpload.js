@@ -81,7 +81,7 @@ class FileUpload extends EditorInjector {
 				action: (target) => {
 					const url = target.getAttribute('href');
 					if (url) dom.utils.createElement('A', { href: url }, null).click();
-				}
+				},
 			},
 			'custom-as': {
 				command: 'as',
@@ -90,8 +90,8 @@ class FileUpload extends EditorInjector {
 				icon: 'reduction',
 				action: (target, value) => {
 					this.convertFormat(target, value);
-				}
-			}
+				},
+			},
 		};
 
 		const figureControls = (pluginOptions.controls || [['custom-as', 'align', 'edit', 'custom-download', 'copy', 'remove']]).map((subArray) => subArray.map((item) => (item.startsWith('custom-') ? customItems[item] : item)));
@@ -101,7 +101,7 @@ class FileUpload extends EditorInjector {
 		this.fileManager = new FileManager(this, {
 			query: 'a[download][data-se-file-download]',
 			loadEventName: 'onFileLoad',
-			actionEventName: 'onFileAction'
+			actionEventName: 'onFileAction',
 		});
 
 		// controller
@@ -245,7 +245,7 @@ class FileUpload extends EditorInjector {
 					error: err,
 					limitSize: slngleSizeLimit,
 					uploadSize: s,
-					file: f
+					file: f,
 				});
 
 				this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
@@ -265,7 +265,7 @@ class FileUpload extends EditorInjector {
 				error: err,
 				limitSize,
 				currentSize,
-				uploadSize: fileSize
+				uploadSize: fileSize,
 			});
 
 			this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
@@ -276,7 +276,7 @@ class FileUpload extends EditorInjector {
 		const fileInfo = {
 			url: this.uploadUrl,
 			uploadHeaders: this.uploadHeaders,
-			files
+			files,
 		};
 
 		const handler = async function (uploadCallback, infos, newInfos) {
@@ -287,7 +287,7 @@ class FileUpload extends EditorInjector {
 
 		const result = await this.triggerEvent('onFileUploadBefore', {
 			info: fileInfo,
-			handler
+			handler,
 		});
 
 		if (result === undefined) return true;
@@ -355,9 +355,9 @@ class FileUpload extends EditorInjector {
 				'data-se-file-download': '',
 				contenteditable: 'false',
 				'data-se-non-focus': 'true',
-				'data-se-non-link': 'true'
+				'data-se-non-link': 'true',
 			},
-			name
+			name,
 		);
 
 		this.fileManager.setFileData(a, file);
@@ -397,9 +397,9 @@ class FileUpload extends EditorInjector {
 				file.url,
 				{
 					name: file.name,
-					size: file.size
+					size: file.size,
 				},
-				i === a.length - 1
+				i === a.length - 1,
 			);
 		});
 	}

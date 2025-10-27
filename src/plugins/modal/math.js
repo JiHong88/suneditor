@@ -68,29 +68,29 @@ class Math_ extends EditorInjector {
 				maxHeight: '',
 				minWidth: '400px',
 				minHeight: '40px',
-				...pluginOptions.formSize
+				...pluginOptions.formSize,
 			},
 			canResize: pluginOptions.canResize ?? true,
 			autoHeight: !!pluginOptions.autoHeight,
 			fontSizeList: pluginOptions.fontSizeList || [
 				{
 					text: '1',
-					value: '1em'
+					value: '1em',
 				},
 				{
 					text: '1.5',
-					value: '1.5em'
+					value: '1.5em',
 				},
 				{
 					text: '2',
-					value: '2em'
+					value: '2em',
 				},
 				{
 					text: '2.5',
-					value: '2.5em'
-				}
+					value: '2.5em',
+				},
 			],
-			onPaste: typeof pluginOptions.onPaste === 'function' ? pluginOptions.onPaste : null
+			onPaste: typeof pluginOptions.onPaste === 'function' ? pluginOptions.onPaste : null,
 		};
 		if (this.pluginOptions.autoHeight) {
 			this.pluginOptions.formSize.height = this.pluginOptions.formSize.minHeight;
@@ -124,7 +124,7 @@ class Math_ extends EditorInjector {
 			'change',
 			function (e) {
 				this.fontSize = e.target.value;
-			}.bind(this.previewElement.style)
+			}.bind(this.previewElement.style),
 		);
 		if (this.pluginOptions.onPaste) {
 			this.eventManager.addEvent(this.textArea, 'paste', this.pluginOptions.onPaste.bind(this));
@@ -186,7 +186,7 @@ class Math_ extends EditorInjector {
 				if (this.mathjax) {
 					this.#renderMathJax(this.mathjax);
 				}
-			}
+			},
 		};
 	}
 
@@ -417,9 +417,9 @@ class Math_ extends EditorInjector {
 
 		const katexOptions = [
 			{
-				throwOnError: false
+				throwOnError: false,
 			},
-			katex.options || {}
+			katex.options || {},
 		].reduce((init, option) => {
 			for (const key in option) {
 				init[key] = option[key];
@@ -451,7 +451,7 @@ class Math_ extends EditorInjector {
 
 			return mathjax.src.document(document, {
 				InputJax: tex,
-				OutputJax: chtml
+				OutputJax: chtml,
 			});
 		} catch (error) {
 			console.warn('[SUNEDITOR.math.mathjax.fail] The MathJax option is set incorrectly.', error);

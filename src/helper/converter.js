@@ -8,7 +8,7 @@ const FONT_VALUES_MAP = {
 	large: 1.125,
 	'x-large': 1.5,
 	'xx-large': 2,
-	'xxx-large': 2.5
+	'xxx-large': 2.5,
 };
 
 function NodeToJson(node) {
@@ -25,7 +25,7 @@ function NodeToJson(node) {
 			type: 'element',
 			tag: node.tagName.toLowerCase(),
 			attributes: {},
-			children: []
+			children: [],
 		};
 
 		// get attribute
@@ -105,7 +105,7 @@ export function htmlToEntity(content) {
 		"'": '&apos;',
 		'"': '&quot;',
 		'<': '&lt;',
-		'>': '&gt;'
+		'>': '&gt;',
 	};
 	return content.replace(/&|\u00A0|'|"|<|>/g, (m) => {
 		return typeof ec[m] === 'string' ? ec[m] : m;
@@ -124,7 +124,7 @@ export function entityToHTML(content) {
 		'&apos;': "'",
 		'&quot;': '"',
 		'&lt;': '<',
-		'&gt;': '>'
+		'&gt;': '>',
 	};
 	return content.replace(/&amp;|&nbsp;|&apos;|&quot;|\$lt;|\$gt;/g, (m) => {
 		return typeof ec[m] === 'string' ? ec[m] : m;
@@ -514,7 +514,7 @@ export function _setDefaultOptionStyle(fo, cssText) {
 	return {
 		top: top,
 		frame: frame,
-		editor: editor
+		editor: editor,
 	};
 }
 
@@ -585,7 +585,7 @@ const converter = {
 	addUrlQuery,
 	_setDefaultOptionStyle,
 	_setIframeStyleLinks,
-	_setAutoHeightStyle
+	_setAutoHeightStyle,
 };
 
 export default converter;

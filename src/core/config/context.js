@@ -58,7 +58,7 @@ export function CreateContext(toolbar, toolbarContainer, menuTray, subbar, statu
 		['menuTray', menuTray],
 		['toolbar_main', toolbar],
 		['toolbar_buttonTray', toolbar.querySelector('.se-btn-tray')],
-		['toolbar_arrow', toolbar.querySelector('.se-arrow')]
+		['toolbar_arrow', toolbar.querySelector('.se-arrow')],
 	]);
 
 	if (subbar) {
@@ -117,6 +117,6 @@ export function ContextUtil(editor) {
 		},
 		clear() {
 			store.clear();
-		}
+		},
 	};
 }

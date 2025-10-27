@@ -130,7 +130,7 @@ export default [
 					semi: true,
 					singleQuote: true,
 					tabWidth: 4,
-					trailingComma: 'none',
+					trailingComma: 'all',
 					useTabs: true,
 					vueIndentScriptAndStyle: false
 				}

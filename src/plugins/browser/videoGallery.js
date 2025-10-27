@@ -48,7 +48,7 @@ class VideoGallery extends EditorInjector {
 			columnSize: 4,
 			className: 'se-video-gallery',
 			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : () => thumbnail,
-			props: ['frame']
+			props: ['frame'],
 		});
 
 		// members
@@ -99,7 +99,7 @@ class VideoGallery extends EditorInjector {
 				this.height,
 				false,
 				file,
-				true
+				true,
 			);
 		}
 	}

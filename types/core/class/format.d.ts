@@ -124,13 +124,13 @@ declare class Format {
 			selectedFormats,
 			newBlockElement,
 			shouldDelete,
-			skipHistory
+			skipHistory,
 		}?: {
 			selectedFormats?: Array<Node>;
 			newBlockElement?: Node;
 			shouldDelete?: boolean;
 			skipHistory?: boolean;
-		}
+		},
 	): {
 		cc: Node;
 		sc: Node;

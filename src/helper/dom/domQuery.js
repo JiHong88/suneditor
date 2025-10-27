@@ -257,7 +257,7 @@ export function compareElements(a, b) {
 			ancestor: null,
 			a: a,
 			b: b,
-			result: 0
+			result: 0,
 		};
 
 	const children = aNode.parentNode.childNodes;
@@ -268,7 +268,7 @@ export function compareElements(a, b) {
 		ancestor: aNode.parentElement,
 		a: aNode,
 		b: bNode,
-		result: aIndex > bIndex ? 1 : aIndex < bIndex ? -1 : 0
+		result: aIndex > bIndex ? 1 : aIndex < bIndex ? -1 : 0,
 	};
 }
 
@@ -470,7 +470,7 @@ export function getEdgeChildNodes(first, last) {
 
 	return {
 		sc: first,
-		ec: last || first
+		ec: last || first,
 	};
 }
 
@@ -709,7 +709,7 @@ const query = {
 	findTabEndIndex,
 	findVisualLastCell,
 	getScrollParents,
-	getIframeDocument
+	getIframeDocument,
 };
 
 export default query;

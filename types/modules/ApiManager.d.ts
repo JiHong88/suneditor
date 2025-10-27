@@ -90,7 +90,7 @@ declare class ApiManager extends CoreInjector {
 		url,
 		headers,
 		data,
-		responseType
+		responseType,
 	}: {
 		method?: string | undefined;
 		url?: string | undefined;

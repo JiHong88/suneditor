@@ -142,7 +142,7 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 			['eventwysiwyg', null],
 			['documentTypeInner', documentTypeInner.inner],
 			['documentTypePage', documentTypeInner.page],
-			['documentTypePageMirror', documentTypeInner.pageMirror]
+			['documentTypePageMirror', documentTypeInner.pageMirror],
 		])
 	);
 
@@ -199,6 +199,6 @@ export function FrameContextUtil(editor) {
 		},
 		clear() {
 			store.clear();
-		}
+		},
 	};
 }

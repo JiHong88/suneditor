@@ -69,7 +69,7 @@ class Audio_ extends EditorInjector {
 			allowMultiple: !!pluginOptions.allowMultiple,
 			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'audio/*' : pluginOptions.acceptedFormats.trim() || 'audio/*',
 			audioTagAttributes: pluginOptions.audioTagAttributes || null,
-			insertBehavior: pluginOptions.insertBehavior
+			insertBehavior: pluginOptions.insertBehavior,
 		};
 
 		// create HTML
@@ -82,7 +82,7 @@ class Audio_ extends EditorInjector {
 		this.fileManager = new FileManager(this, {
 			query: 'audio',
 			loadEventName: 'onAudioLoad',
-			actionEventName: 'onAudioAction'
+			actionEventName: 'onAudioAction',
 		});
 
 		// members
@@ -231,7 +231,7 @@ class Audio_ extends EditorInjector {
 				this.#setTagAttrs(element);
 				const figure = Figure.CreateContainer(element.cloneNode(true), 'se-flex-component');
 				this.figure.retainFigureFormat(figure.container, element, null, this.fileManager);
-			}
+			},
 		};
 	}
 
@@ -271,7 +271,7 @@ class Audio_ extends EditorInjector {
 				function (current) {
 					return current.childNodes.length === 0;
 				},
-				null
+				null,
 			);
 		}
 
@@ -302,7 +302,7 @@ class Audio_ extends EditorInjector {
 					error: err,
 					limitSize: slngleSizeLimit,
 					uploadSize: s,
-					file: f
+					file: f,
 				});
 
 				this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
@@ -327,7 +327,7 @@ class Audio_ extends EditorInjector {
 		const audioInfo = {
 			files,
 			isUpdate: this.modal.isUpdate,
-			element: this.#element
+			element: this.#element,
 		};
 
 		const handler = function (uploadCallback, newInfos, infos) {
@@ -337,7 +337,7 @@ class Audio_ extends EditorInjector {
 
 		const result = await this.triggerEvent('onAudioUploadBefore', {
 			info: audioInfo,
-			handler
+			handler,
 		});
 
 		if (typeof result === 'undefined') return true;
@@ -362,7 +362,7 @@ class Audio_ extends EditorInjector {
 			url,
 			files: file,
 			isUpdate: this.modal.isUpdate,
-			element: this.#createAudioTag()
+			element: this.#createAudioTag(),
 		};
 
 		const handler = function (uploadCallback, newInfos, infos) {
@@ -372,7 +372,7 @@ class Audio_ extends EditorInjector {
 
 		const result = await this.triggerEvent('onAudioUploadBefore', {
 			info: audioInfo,
-			handler
+			handler,
 		});
 
 		if (typeof result === 'undefined') return true;

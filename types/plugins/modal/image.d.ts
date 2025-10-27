@@ -298,7 +298,7 @@ declare class Image_ extends EditorInjector {
 			size: number;
 		},
 		alt: string,
-		isLast: boolean
+		isLast: boolean,
 	): void;
 	/**
 	 * @description Creates a new inline image component, wraps it in an inline figure container with an optional anchor,
@@ -321,7 +321,7 @@ declare class Image_ extends EditorInjector {
 			size: number;
 		},
 		alt: string,
-		isLast: boolean
+		isLast: boolean,
 	): void;
 	#private;
 }

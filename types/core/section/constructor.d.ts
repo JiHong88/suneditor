@@ -36,7 +36,7 @@ export function InitOptions(
 	}>,
 	plugins: {
 		[x: string]: any;
-	}
+	},
 ): InitOptionsReturnType;
 /**
  * @description Create a context object for the editor frame.
@@ -46,7 +46,7 @@ export function InitOptions(
  */
 export function CreateStatusbar(
 	targetOptions: Map<string, any>,
-	statusbar: HTMLElement
+	statusbar: HTMLElement,
 ): {
 	statusbar: HTMLElement;
 	navigation: HTMLElement;
@@ -70,7 +70,7 @@ export function UpdateButton(
 	},
 	lang: {
 		[x: string]: string;
-	}
+	},
 ): void;
 /**
  * @description Create editor HTML
@@ -94,7 +94,7 @@ export function CreateToolBar(
 	lang: {
 		[x: string]: string;
 	},
-	isUpdate: boolean
+	isUpdate: boolean,
 ): {
 	element: HTMLElement;
 	pluginCallButtons: {
@@ -250,6 +250,6 @@ declare function Constructor(
 		key: any;
 		options: SunEditor.InitFrameOptions;
 	}>,
-	options: SunEditor.InitOptions
+	options: SunEditor.InitOptions,
 ): ConstructorReturnType;
 import { CreateFrameContext } from '../config/frameContext';

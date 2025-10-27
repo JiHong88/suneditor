@@ -580,7 +580,7 @@ Format.prototype = {
 									? 'LI'
 									: dom.check.isTableCell(blockElement.parentNode)
 										? 'DIV'
-										: this.options.get('defaultLine')
+										: this.options.get('defaultLine'),
 						);
 						const isCell = dom.check.isListCell(insNode);
 						const innerChildren = inner.childNodes;
@@ -659,7 +659,7 @@ Format.prototype = {
 				so: so,
 				ec: rangeRight,
 				eo: eo,
-				removeArray: removeArray
+				removeArray: removeArray,
 			};
 		} else {
 			firstNode ||= lastNode;
@@ -674,7 +674,7 @@ Format.prototype = {
 					so: so,
 					ec: childEdge.ec,
 					eo: eo,
-					removeArray: null
+					removeArray: null,
 				};
 			}
 		}
@@ -1040,7 +1040,7 @@ Format.prototype = {
 			firstPath: firstPath,
 			lastPath: lastPath,
 			startOffset: startOffset,
-			endOffset: endOffset
+			endOffset: endOffset,
 		};
 	},
 
@@ -1054,7 +1054,7 @@ Format.prototype = {
 		this._brLineBreak = breakFormat === 'br';
 	},
 
-	constructor: Format
+	constructor: Format,
 };
 
 /**

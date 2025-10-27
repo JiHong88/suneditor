@@ -206,7 +206,7 @@
 		video_modal_url: 'URL do YouTube/Vimeo',
 		width: 'Largura',
 		message_copy_success: 'Copiado para a área de transferência',
-		message_copy_fail: 'Falha ao copiar. Copie manualmente, por favor.'
+		message_copy_fail: 'Falha ao copiar. Copie manualmente, por favor.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

@@ -163,7 +163,7 @@ export default {
 			sc: range.startContainer,
 			so: range.startOffset,
 			ec: range.endContainer,
-			eo: range.endOffset
+			eo: range.endOffset,
 		};
 		for (let i = 0, len = selectedFormats.length, f; i < len; i++) {
 			f = selectedFormats[i];
@@ -488,7 +488,7 @@ export default {
 		const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 		ports.html.insertNode(zeroWidth, { afterNode: null, skipCharCount: true });
 		ports.selection.setRange(zeroWidth, 1, zeroWidth, 1);
-	}
+	},
 };
 
 /**

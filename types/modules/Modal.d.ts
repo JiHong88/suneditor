@@ -16,18 +16,18 @@ declare class Modal extends CoreInjector {
 	static CreateFileInput(
 		{
 			icons,
-			lang
+			lang,
 		}: {
 			icons: SunEditor.Core['icons'];
 			lang: SunEditor.Core['lang'];
 		},
 		{
 			acceptedFormats,
-			allowMultiple
+			allowMultiple,
 		}: {
 			acceptedFormats: string;
 			allowMultiple: any;
-		}
+		},
 	): string;
 	/**
 	 * @description A function called when the contents of "input" have changed and you want to adjust the style.
@@ -44,7 +44,7 @@ declare class Modal extends CoreInjector {
 		inst: any & {
 			editor: SunEditor.Core;
 		},
-		element: Element
+		element: Element,
 	);
 	ui: import('../core/class/ui').default;
 	offset: import('../core/class/offset').default;

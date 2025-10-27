@@ -41,7 +41,7 @@ const unicode = {
 	zeroWidthSpace,
 	zeroWidthRegExp,
 	onlyZeroWidthRegExp,
-	escapeStringRegexp
+	escapeStringRegexp,
 };
 
 export default unicode;

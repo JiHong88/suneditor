@@ -24,14 +24,14 @@ const BORDER_FORMATS = {
 	top: 'border_top',
 	right: 'border_right',
 	bottom: 'border_bottom',
-	none: 'border_none'
+	none: 'border_none',
 };
 const BORDER_FORMAT_INSIDE = ['all', 'inside', 'horizon', 'vertical'];
 const BORDER_NS = {
 	l: 'borderLeft',
 	t: 'borderTop',
 	r: 'borderRight',
-	b: 'borderBottom'
+	b: 'borderBottom',
 };
 const DEFAULT_BORDER_UNIT = 'px';
 const DEFAULT_COLOR_LIST = [
@@ -58,7 +58,7 @@ const DEFAULT_COLOR_LIST = [
 	'#B3B3B3',
 	'#808080',
 	'#4D4D4D',
-	'#000000'
+	'#000000',
 ];
 
 /**
@@ -181,7 +181,7 @@ class Table extends EditorInjector {
 			colorList: pluginOptions.colorList || DEFAULT_COLOR_LIST,
 			splitNum: 5,
 			disableRemove: true,
-			hueSliderOptions: { controllerOptions: { parents: [colorForm], isOutsideForm: true } }
+			hueSliderOptions: { controllerOptions: { parents: [colorForm], isOutsideForm: true } },
 		});
 
 		colorForm.appendChild(this.colorPicker.target);
@@ -193,7 +193,7 @@ class Table extends EditorInjector {
 			initMethod: () => {
 				this.colorPicker.hueSlider.close();
 				dom.utils.removeClass(this.controller_colorPicker.currentTarget, 'on');
-			}
+			},
 		});
 
 		this.figure = new Figure(this, null, {});
@@ -260,7 +260,7 @@ class Table extends EditorInjector {
 			font_bold: controller_props.font_bold,
 			font_underline: controller_props.font_underline,
 			font_italic: controller_props.font_italic,
-			font_strike: controller_props.font_strike
+			font_strike: controller_props.font_strike,
 		};
 		this._propsCache = [];
 		this._currentFontStyles = [];
@@ -338,7 +338,7 @@ class Table extends EditorInjector {
 			touchOff: null,
 			resize: null,
 			resizeStop: null,
-			resizeKeyDown: null
+			resizeKeyDown: null,
 		};
 
 		// init
@@ -427,7 +427,7 @@ class Table extends EditorInjector {
 				function (current) {
 					return current.childNodes.length === 0;
 				},
-				null
+				null,
 			);
 		this.editor.focus();
 		this.history.push(false);
@@ -583,7 +583,7 @@ class Table extends EditorInjector {
 					dom.utils.addClass(FigureEl, scrollTypeClass);
 					dom.utils.removeClass(FigureEl, this.figureScrollList.filter((v) => v !== scrollTypeClass).join('|'));
 				}
-			}
+			},
 		};
 	}
 
@@ -1160,7 +1160,7 @@ class Table extends EditorInjector {
 							index: logcalIndex,
 							cs: cs + 1,
 							rs: rs,
-							row: -1
+							row: -1,
 						});
 					}
 
@@ -1495,7 +1495,7 @@ class Table extends EditorInjector {
 							rs: rs,
 							cs: cs + 1,
 							index: removeIndex,
-							row: -1
+							row: -1,
 						});
 					}
 
@@ -1507,7 +1507,7 @@ class Table extends EditorInjector {
 						removeSpanArr.push({
 							cell: cell,
 							i: i,
-							rs: i + rs
+							rs: i + rs,
 						});
 					}
 
@@ -1626,7 +1626,7 @@ class Table extends EditorInjector {
 
 		const copyInfo = {
 			rowCnt: rowCnt,
-			logicalCellCnt: logicalColCount
+			logicalCellCnt: logicalColCount,
 		};
 
 		// --- target info ---
@@ -1648,7 +1648,7 @@ class Table extends EditorInjector {
 			physicalCellIndex: this.#physical_cellIndex,
 			logicalCellIndex: this.#logical_cellIndex,
 			currentColSpan: this.#current_colSpan,
-			currentRowSpan: this.#current_rowSpan
+			currentRowSpan: this.#current_rowSpan,
 		};
 
 		// --- [expand] target table ---
@@ -2285,7 +2285,7 @@ class Table extends EditorInjector {
 				startWidth,
 				numbers.get(prevValue, CELL_DECIMAL_END),
 				numbers.get(realWidth, CELL_DECIMAL_END),
-				this._element.offsetWidth
+				this._element.offsetWidth,
 			),
 			() => {
 				this.__removeGlobalEvents();
@@ -2296,7 +2296,7 @@ class Table extends EditorInjector {
 			(e) => {
 				this._stopResize(col, prevValue, 'width', e);
 				this._stopResize(nextCol, nextColPrevValue, 'width', e);
-			}
+			},
 		);
 	}
 
@@ -2347,7 +2347,7 @@ class Table extends EditorInjector {
 				this.__removeGlobalEvents();
 				this.history.push(true);
 			},
-			this._stopResize.bind(this, row, prevValue, 'height')
+			this._stopResize.bind(this, row, prevValue, 'height'),
 		);
 	}
 
@@ -2389,7 +2389,7 @@ class Table extends EditorInjector {
 				// figure reopen
 				this.component.select(this._element, Table.key, { isInput: true });
 			},
-			this._stopResize.bind(this, figure, figure.style.width, 'width')
+			this._stopResize.bind(this, figure, figure.style.width, 'width'),
 		);
 	}
 
@@ -2727,7 +2727,7 @@ class Table extends EditorInjector {
 				right: [],
 				bottom: [],
 				middle: [],
-				all: null
+				all: null,
 			};
 
 			if (!isTable) {
@@ -2737,7 +2737,7 @@ class Table extends EditorInjector {
 					rs: trRow.rowIndex || 0,
 					re: trRow.rowIndex || 0,
 					cs: tr.cellIndex || 0,
-					ce: tr.cellIndex || 0
+					ce: tr.cellIndex || 0,
 				};
 				const mergeInfo = new Array(re - rs + 1).fill(0).map(() => new Array(ce - cs + 1).fill(0));
 				const cellStartIndex = cs;
@@ -2885,12 +2885,12 @@ class Table extends EditorInjector {
 				dom.utils.setStyle(
 					all.filter((c) => !bottom.includes(c)),
 					BORDER_NS.b,
-					s
+					s,
 				);
 				dom.utils.setStyle(
 					all.filter((c) => !right.includes(c)),
 					BORDER_NS.r,
-					s
+					s,
 				);
 				break;
 			case 'horizon':
@@ -2898,7 +2898,7 @@ class Table extends EditorInjector {
 				dom.utils.setStyle(
 					all.filter((c) => !bottom.includes(c)),
 					BORDER_NS.b,
-					s
+					s,
 				);
 				break;
 			case 'vertical':
@@ -2906,7 +2906,7 @@ class Table extends EditorInjector {
 				dom.utils.setStyle(
 					all.filter((c) => !right.includes(c)),
 					BORDER_NS.r,
-					s
+					s,
 				);
 				break;
 			case 'outside':
@@ -3027,7 +3027,7 @@ class Table extends EditorInjector {
 						index: logcalIndex,
 						cs: cs + 1,
 						rs: rs,
-						row: -1
+						row: -1,
 					});
 				}
 
@@ -3164,7 +3164,7 @@ class Table extends EditorInjector {
 
 		return {
 			cloneTable,
-			clonedSelectedCells
+			clonedSelectedCells,
 		};
 	}
 
@@ -3264,7 +3264,7 @@ class Table extends EditorInjector {
 								index: logcalIndex,
 								cs: cs + 1,
 								rs: rs,
-								row: -1
+								row: -1,
 							});
 						}
 
@@ -3311,7 +3311,7 @@ class Table extends EditorInjector {
 						if (cs > 0 && cs + i >= nextRowIndex && logcalIndex < index) {
 							rowSpanArr.push({
 								index: logcalIndex,
-								cs: cell.colSpan
+								cs: cell.colSpan,
 							});
 						}
 						colSpan += cell.colSpan - 1;
@@ -3580,7 +3580,7 @@ function CheckCellEdge(event, tableCell) {
 	return {
 		is,
 		isLeft,
-		startX
+		startX,
 	};
 }
 
@@ -3599,7 +3599,7 @@ function CheckRowEdge(event, tableCell) {
 
 	return {
 		is,
-		startY
+		startY,
 	};
 }
 
@@ -3775,7 +3775,7 @@ function CreateSplitMenu(lang) {
 		</div>
 		<div title="${lang.horizontalSplit}" aria-label="${lang.horizontalSplit}">
 			${lang.horizontalSplit}
-		</div>`
+		</div>`,
 	);
 
 	return { items: ['vertical', 'horizontal'], menus: menus.querySelectorAll('div') };
@@ -3794,7 +3794,7 @@ function CreateColumnMenu(lang, icons) {
 		</div>
 		<div title="${lang.deleteColumn}" aria-label="${lang.deleteColumn}">
 			<span class="se-list-icon">${icons.delete_column}</span><span class="se-txt">${lang.deleteColumn}</span>
-		</div>`
+		</div>`,
 	);
 
 	return { items: ['insert-left', 'insert-right', 'delete'], menus: menus.querySelectorAll('div') };
@@ -3813,7 +3813,7 @@ function CreateRowMenu(lang, icons) {
 		</div>
 		<div title="${lang.deleteRow}" aria-label="${lang.deleteRow}">
 			<span class="se-list-icon">${icons.delete_row}</span><span class="se-txt">${lang.deleteRow}</span>
-		</div>`
+		</div>`,
 	);
 
 	return { items: ['insert-above', 'insert-below', 'delete'], menus: menus.querySelectorAll('div') };
@@ -3972,7 +3972,7 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
 		columnButton: content.querySelector('[data-command="oncolumn"]'),
 		rowButton: content.querySelector('[data-command="onrow"]'),
 		mergeButton: content.querySelector('[data-command="merge"]'),
-		unmergeButton: content.querySelector('[data-command="unmerge"]')
+		unmergeButton: content.querySelector('[data-command="unmerge"]'),
 	};
 }
 
@@ -4145,7 +4145,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 		font_bold: content.querySelector('[data-command="props_font_style"][data-value="bold"]'),
 		font_underline: content.querySelector('[data-command="props_font_style"][data-value="underline"]'),
 		font_italic: content.querySelector('[data-command="props_font_style"][data-value="italic"]'),
-		font_strike: content.querySelector('[data-command="props_font_style"][data-value="strike"]')
+		font_strike: content.querySelector('[data-command="props_font_style"][data-value="strike"]'),
 	};
 }
 

@@ -6,7 +6,7 @@ import utils from './domUtils';
 const dom = {
 	query,
 	check,
-	utils
+	utils,
 };
 
 export const domQuery = query;

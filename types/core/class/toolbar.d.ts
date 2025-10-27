@@ -24,14 +24,14 @@ declare function Toolbar(
 		balloon,
 		inline,
 		balloonAlways,
-		res
+		res,
 	}: {
 		keyName: 'toolbar' | 'toolbar_sub';
 		balloon: boolean;
 		inline: boolean;
 		balloonAlways: boolean;
 		res: Array<Node>;
-	}
+	},
 ): void;
 declare class Toolbar {
 	/**
@@ -56,14 +56,14 @@ declare class Toolbar {
 			balloon,
 			inline,
 			balloonAlways,
-			res
+			res,
 		}: {
 			keyName: 'toolbar' | 'toolbar_sub';
 			balloon: boolean;
 			inline: boolean;
 			balloonAlways: boolean;
 			res: Array<Node>;
-		}
+		},
 	);
 	isSub: boolean;
 	/**

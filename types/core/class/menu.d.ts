@@ -60,12 +60,12 @@ declare class Menu {
 		this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>,
 		{
 			key,
-			type
+			type,
 		}: {
 			key: string;
 			type: string;
 		},
-		menu: Node
+		menu: Node,
 	): void;
 	/**
 	 * @this {MenuThis}

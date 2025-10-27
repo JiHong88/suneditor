@@ -441,7 +441,7 @@ export function flashClass(element, className, duration = 120) {
 export function getClientSize(doc = _d) {
 	return {
 		w: doc.documentElement.clientWidth,
-		h: doc.documentElement.clientHeight
+		h: doc.documentElement.clientHeight,
 	};
 }
 
@@ -454,14 +454,14 @@ export function getViewportSize() {
 		return {
 			top: _w.visualViewport.pageTop,
 			left: _w.visualViewport.pageLeft,
-			scale: _w.visualViewport.scale
+			scale: _w.visualViewport.scale,
 		};
 	}
 
 	return {
 		top: 0,
 		left: 0,
-		scale: 1
+		scale: 1,
 	};
 }
 
@@ -625,7 +625,7 @@ const utils = {
 	waitForMediaLoad,
 	getRootCssVar,
 	setRootCssVar,
-	createTooltipInner
+	createTooltipInner,
 };
 
 export default utils;

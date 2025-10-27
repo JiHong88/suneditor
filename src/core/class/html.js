@@ -68,7 +68,7 @@ function HTML(editor) {
 	const stylesMap = new Map();
 	const stylesObj = {
 		...splitTagStyles,
-		line: options.get('_lineStylesRegExp')
+		line: options.get('_lineStylesRegExp'),
 	};
 	this._textStyleTags.forEach((v) => {
 		stylesObj[v] = options.get('_textStylesRegExp');
@@ -876,20 +876,20 @@ HTML.prototype = {
 						return {
 							container: parentNext,
 							offset: parentNextOffset,
-							commonCon
+							commonCon,
 						};
 					} else {
 						return {
 							container: next,
 							offset: nextOffset,
-							commonCon
+							commonCon,
 						};
 					}
 				} else {
 					return {
 						container: parentNext,
 						offset: parentNextOffset,
-						commonCon
+						commonCon,
 					};
 				}
 			} else {
@@ -915,7 +915,7 @@ HTML.prototype = {
 					return {
 						container: rEl,
 						offset: rOffset,
-						commonCon
+						commonCon,
 					};
 				}
 
@@ -929,7 +929,7 @@ HTML.prototype = {
 			return {
 				container: commonCon,
 				offset: 0,
-				commonCon
+				commonCon,
 			};
 
 		if (startCon === endCon && range.collapsed) {
@@ -938,7 +938,7 @@ HTML.prototype = {
 					container: startCon,
 					offset: startOff,
 					prevContainer: startCon && startCon.parentNode ? startCon : null,
-					commonCon
+					commonCon,
 				};
 			}
 		}
@@ -971,13 +971,13 @@ HTML.prototype = {
 					return {
 						container: commonCon,
 						offset: 0,
-						commonCon
+						commonCon,
 					};
 				} else if (dom.check.isText(commonCon)) {
 					return {
 						container: commonCon,
 						offset: endOff,
-						commonCon
+						commonCon,
 					};
 				}
 				childNodes.push(commonCon);
@@ -988,7 +988,7 @@ HTML.prototype = {
 					return {
 						container: dom.check.isMedia(commonCon) ? commonCon : startCon,
 						offset: 0,
-						commonCon
+						commonCon,
 					};
 				}
 			}
@@ -1101,7 +1101,7 @@ HTML.prototype = {
 			container,
 			offset,
 			prevContainer,
-			commonCon: commonCon?.parentElement ? commonCon : null
+			commonCon: commonCon?.parentElement ? commonCon : null,
 		};
 	},
 
@@ -1144,7 +1144,7 @@ HTML.prototype = {
 					}
 					return false;
 				},
-				null
+				null,
 			);
 
 			for (let j = 0, jlen = editableEls.length; j < jlen; j++) {
@@ -1452,7 +1452,7 @@ HTML.prototype = {
 					(current) => {
 						return dom.check.isSpanWithoutAttr(current) && !dom.query.getParentElement(current, dom.check.isExcludeFormat);
 					},
-					null
+					null,
 				) || [];
 			for (let i = ch.length - 1, c; i >= 0; i--) {
 				c = /** @type {HTMLElement} */ (ch[i]);
@@ -1587,7 +1587,7 @@ HTML.prototype = {
 
 				return result;
 			},
-			null
+			null,
 		);
 
 		for (let i = 0, len = removeTags.length; i < len; i++) {
@@ -1956,7 +1956,7 @@ HTML.prototype = {
 		}
 	},
 
-	constructor: HTML
+	constructor: HTML,
 };
 
 /**

@@ -63,7 +63,7 @@ function CreateSliderCtx() {
 		gradientBar: gradientBarCanvas,
 		gradientPointer: /** @type {HTMLElement} */ (slider.querySelector('.se-hue-gradient-pointer')),
 		fanalColorHex: /** @type {HTMLElement} */ (currentColors[0]),
-		fanalColorBackground: /** @type {HTMLElement} */ (currentColors[1])
+		fanalColorBackground: /** @type {HTMLElement} */ (currentColors[1]),
 	};
 }
 
@@ -122,7 +122,7 @@ class HueSlider extends CoreInjector {
 			wheelPointerX: '50%',
 			wheelPointerY: '50%',
 			gradientPointerX: 'calc(100% - 14px)',
-			color: DEFAULT_COLOR_VALUE
+			color: DEFAULT_COLOR_VALUE,
 		};
 		this.isOpen = false;
 		this.controlle = null;
@@ -179,7 +179,7 @@ class HueSlider extends CoreInjector {
 			wheelX: wheelX,
 			wheelY: wheelY,
 			lightness: LIGHTNESS,
-			color: ctx?.color || getWheelColor(wheelCtx)
+			color: ctx?.color || getWheelColor(wheelCtx),
 		};
 
 		this.controller.close();
@@ -230,7 +230,7 @@ class HueSlider extends CoreInjector {
 					isWheelragging = false;
 					isBarDragging = false;
 				},
-				true
+				true,
 			);
 		}
 
@@ -243,7 +243,7 @@ class HueSlider extends CoreInjector {
 				isWheelragging = false;
 				isBarDragging = false;
 			},
-			true
+			true,
 		);
 
 		// open
@@ -414,7 +414,7 @@ function getWheelColor(wCtx) {
 		b,
 		h,
 		s,
-		l: roundNumber(l)
+		l: roundNumber(l),
 	};
 }
 
@@ -550,7 +550,7 @@ function hslToRgb([h, s, l]) {
 	return {
 		r: Math.round(r * 255),
 		g: Math.round(g * 255),
-		b: Math.round(b * 255)
+		b: Math.round(b * 255),
 	};
 }
 
@@ -587,7 +587,7 @@ function CreateHTML_basicControllerForm({ lang, icons }, className) {
 			<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
 			<button type="button" class="se-btn se-btn-danger" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
 		</div>
-	`
+	`,
 	);
 
 	return hueController;

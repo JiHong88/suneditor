@@ -206,7 +206,7 @@
 		video_modal_url: 'Beágyazható URL, YouTube/Vimeo',
 		width: 'Szélesség',
 		message_copy_success: 'Vágólapra másolva',
-		message_copy_fail: 'A másolás sikertelen. Kérjük, másolja kézzel.'
+		message_copy_fail: 'A másolás sikertelen. Kérjük, másolja kézzel.',
 	};
 
 	if (typeof noGlobal === 'undefined') {
@@ -215,14 +215,14 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 		Object.defineProperty(window.SUNEDITOR_LANG, 'hu', {
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

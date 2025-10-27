@@ -72,7 +72,7 @@ class ModalAnchorEditor extends CoreInjector {
 			this.fileManager = new FileManager(this, {
 				query: 'a[download]:not([data-se-file-download])',
 				loadEventName: 'onFileLoad',
-				actionEventName: 'onFileAction'
+				actionEventName: 'onFileAction',
 			});
 		}
 
@@ -128,10 +128,10 @@ class ModalAnchorEditor extends CoreInjector {
 							class: 'se-btn-list' + (defaultRel.includes(rel) ? ' se-checked' : ''),
 							'data-command': rel,
 							title: rel,
-							'aria-label': rel
+							'aria-label': rel,
 						},
-						rel + '<span class="se-svg">' + this.icons.checked + '</span>'
-					)
+						rel + '<span class="se-svg">' + this.icons.checked + '</span>',
+					),
 				);
 			}
 			this.#selectMenu_rel = new SelectMenu(this, { checkList: true, position: 'right-middle', dir: 'ltr' });
@@ -432,7 +432,7 @@ class ModalAnchorEditor extends CoreInjector {
 		const fileInfo = {
 			url: this.uploadUrl,
 			uploadHeaders: this.uploadHeaders,
-			files
+			files,
 		};
 
 		const handler = async function (uploadCallback, infos, newInfos) {
@@ -443,7 +443,7 @@ class ModalAnchorEditor extends CoreInjector {
 
 		const result = await this.triggerEvent('onFileUploadBefore', {
 			info: fileInfo,
-			handler
+			handler,
 		});
 
 		if (result === undefined) return true;

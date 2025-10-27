@@ -80,7 +80,7 @@ export {
 	fileBrowser,
 	fontSize,
 	pageNavigator,
-	anchor
+	anchor,
 };
 export default {
 	blockquote,
@@ -116,5 +116,5 @@ export default {
 	fileBrowser,
 	fontSize,
 	pageNavigator,
-	anchor
+	anchor,
 };

@@ -178,7 +178,7 @@ const keyCodeMap = {
 	isNonTextKey,
 	isHistoryRelevantKey,
 	isDocumentTypeObserverKey,
-	isNonResponseKey
+	isNonResponseKey,
 };
 
 export default keyCodeMap;

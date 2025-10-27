@@ -147,7 +147,7 @@ class Figure extends CoreInjector {
 			none: this.icons.format_float_none,
 			left: this.icons.format_float_left,
 			right: this.icons.format_float_right,
-			center: this.icons.format_float_center
+			center: this.icons.format_float_center,
 		};
 
 		// editor class
@@ -239,7 +239,7 @@ class Figure extends CoreInjector {
 					main: main,
 					border: main.querySelector('.se-resize-dot'),
 					display: main.querySelector('.se-resize-display'),
-					handles: handles
+					handles: handles,
 				});
 				e.get('wrapper').appendChild(main);
 				this.eventManager.addEvent(handles, 'mousedown', this.#OnResizeContainer.bind(this));
@@ -297,7 +297,7 @@ class Figure extends CoreInjector {
 			cover: cover,
 			inlineCover: dom.utils.hasClass(inlineCover, 'se-inline-component') ? /** @type {HTMLElement} */ (inlineCover) : null,
 			caption: dom.query.getEdgeChild(target.parentElement, 'FIGCAPTION', false),
-			isVertical: IsVertical(target)
+			isVertical: IsVertical(target),
 		};
 	}
 
@@ -324,7 +324,7 @@ class Figure extends CoreInjector {
 
 		return {
 			w: numbers.get(rw, 4),
-			h: numbers.get(rh, 4)
+			h: numbers.get(rh, 4),
 		};
 	}
 
@@ -351,7 +351,7 @@ class Figure extends CoreInjector {
 
 		return {
 			w: w,
-			h: h
+			h: h,
 		};
 	}
 
@@ -409,7 +409,7 @@ class Figure extends CoreInjector {
 					cover: null,
 					width: target.style.width || /** @type {HTMLImageElement} */ (target).width || '',
 					height: target.style.height || /** @type {HTMLImageElement} */ (target).height || '',
-					isVertical: this.isVertical
+					isVertical: this.isVertical,
 				};
 			}
 		}
@@ -444,7 +444,7 @@ class Figure extends CoreInjector {
 			width: dataSize[0] || 'auto',
 			height: dataSize[1] || 'auto',
 			originWidth: /** @type {HTMLImageElement} */ (target).naturalWidth || target.offsetWidth,
-			originHeight: /** @type {HTMLImageElement} */ (target).naturalHeight || target.offsetHeight
+			originHeight: /** @type {HTMLImageElement} */ (target).naturalHeight || target.offsetHeight,
 		};
 
 		this.#width = targetInfo.width;
@@ -468,7 +468,7 @@ class Figure extends CoreInjector {
 			form: _figure.main,
 			target: sizeTarget,
 			inst: this,
-			notInCarrier: true
+			notInCarrier: true,
 		});
 
 		// percentage active
@@ -506,7 +506,7 @@ class Figure extends CoreInjector {
 			this._displayResizeHandles(!nonResizing);
 			// rotate, aption, align, onresize - display;
 			const transformButtons = this.controller.form.querySelectorAll(
-				'[data-command="rotate"][data-value="90"], [data-command="rotate"][data-value="-90"], [data-command="caption"], [data-command="onalign"], [data-command="onresize"]'
+				'[data-command="rotate"][data-value="90"], [data-command="rotate"][data-value="-90"], [data-command="caption"], [data-command="onalign"], [data-command="onresize"]',
 			);
 			const display = this._inlineCover || exceptionFormat ? 'none' : '';
 			transformButtons.forEach((button) => {
@@ -642,7 +642,7 @@ class Figure extends CoreInjector {
 			w,
 			h,
 			dw,
-			dh
+			dh,
 		};
 	}
 
@@ -714,7 +714,7 @@ class Figure extends CoreInjector {
 					container.className
 						.split(' ')
 						.filter((v) => v !== 'se-figure-selected' && v !== 'se-component-selected')
-						.join('|')
+						.join('|'),
 				);
 
 				this._asFormatChange(figure, w, h);
@@ -743,7 +743,7 @@ class Figure extends CoreInjector {
 					container.className
 						.split(' ')
 						.filter((v) => v !== 'se-inline-component' && v !== 'se-figure-selected' && v !== 'se-component-selected')
-						.join('|')
+						.join('|'),
 				);
 
 				this._asFormatChange(figure, w, h);
@@ -1562,7 +1562,7 @@ function GetRotateValue(element) {
 	return {
 		r: Number((transform.match(/rotate\(([-0-9]+)deg\)/) || [])[1] || 0),
 		x: (transform.match(/rotateX\(([-0-9]+)deg\)/) || [])[1] || '',
-		y: (transform.match(/rotateY\(([-0-9]+)deg\)/) || [])[1] || ''
+		y: (transform.match(/rotateY\(([-0-9]+)deg\)/) || [])[1] || '',
 	};
 }
 
@@ -1725,7 +1725,7 @@ function GET_CONTROLLER_BUTTONS(group) {
 		v: v,
 		l: l,
 		t: t,
-		i: i
+		i: i,
 	};
 }
 
@@ -1747,7 +1747,7 @@ function CreateHTML_controller(inst, controls) {
 						c: `__c__${g.command}`,
 						v: g.value || '',
 						l: g.title,
-						i: g.icon
+						i: g.icon,
 					};
 					inst._action[m.c] = g.action;
 				} else {

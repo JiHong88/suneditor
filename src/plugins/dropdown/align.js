@@ -34,7 +34,7 @@ class Align extends EditorInjector {
 			justify: editor.icons.align_justify,
 			left: editor.icons.align_left,
 			right: editor.icons.align_right,
-			center: editor.icons.align_center
+			center: editor.icons.align_center,
 		};
 		this.alignList = commandArea.querySelectorAll('li button');
 
@@ -149,12 +149,12 @@ function CreateHTML({ lang, icons, options }, items) {
 	return dom.utils.createElement(
 		'div',
 		{
-			class: 'se-dropdown se-list-layer se-list-align'
+			class: 'se-dropdown se-list-layer se-list-align',
 		},
 		/*html*/ `
 		<div class="se-list-inner">
 			<ul class="se-list-basic">${html}</ul>
-		</div>`
+		</div>`,
 	);
 }
 

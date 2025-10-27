@@ -101,7 +101,7 @@ Offset.prototype = {
 
 		return {
 			left: off.left + (iframe ? wFrame.parentElement.offsetLeft : 0),
-			top: off.top + (iframe ? wFrame.parentElement.offsetTop : 0)
+			top: off.top + (iframe ? wFrame.parentElement.offsetTop : 0),
 		};
 	},
 
@@ -144,7 +144,7 @@ Offset.prototype = {
 			top: offsetTop,
 			right: offsetElement?.offsetWidth ? offsetElement.offsetWidth - (offsetLeft - l + targetWidth) + r : 0,
 			scrollX: eventWysiwyg.scrollLeft || eventWysiwyg.scrollX || 0,
-			scrollY: eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0
+			scrollY: eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0,
 		};
 	},
 
@@ -192,7 +192,7 @@ Offset.prototype = {
 			fixedTop: top,
 			fixedLeft: left,
 			width: element.offsetWidth,
-			height: element.offsetHeight
+			height: element.offsetHeight,
 		};
 	},
 
@@ -326,7 +326,7 @@ Offset.prototype = {
 			oh: targetAbs ? clientSize.h : oh,
 			ow: targetAbs ? clientSize.w : ow,
 			heightEditorRefer: heightEditorRefer,
-			widthEditorRefer: widthEditorRefer
+			widthEditorRefer: widthEditorRefer,
 		};
 	},
 
@@ -347,7 +347,7 @@ Offset.prototype = {
 			width: eventWysiwyg.scrollWidth || eventWysiwyg.document?.documentElement.scrollWidth || 0,
 			height,
 			bottom: top + height,
-			rects
+			rects,
 		};
 	},
 
@@ -434,7 +434,7 @@ Offset.prototype = {
 		const addOffset = {
 			left: 0,
 			top: 0,
-			...params.addOffset
+			...params.addOffset,
 		};
 		const position = params.position || 'bottom';
 		const inst = params.inst;
@@ -584,7 +584,7 @@ Offset.prototype = {
 		inst.__offset = {
 			left: element.offsetLeft + wwScroll.left,
 			top: element.offsetTop + wwScroll.top,
-			addOffset: addOffset
+			addOffset: addOffset,
 		};
 
 		return { position: arrowDir === 'up' ? 'bottom' : 'top' };
@@ -787,7 +787,7 @@ Offset.prototype = {
 			rmb,
 			rt,
 			tMargin,
-			bMargin
+			bMargin,
 		};
 	},
 
@@ -843,12 +843,12 @@ Offset.prototype = {
 				top: 0,
 				right: _w.innerWidth,
 				bottom: this.status.currentViewportHeight || _w.innerHeight,
-				noText: true
-			}
+				noText: true,
+			},
 		};
 	},
 
-	constructor: Offset
+	constructor: Offset,
 };
 
 export default Offset;

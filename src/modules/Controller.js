@@ -243,7 +243,7 @@ class Controller extends CoreInjector {
 			form: /** @type {HTMLElement} */ (form),
 			target: /** @type {HTMLElement} */ (target),
 			isRangeTarget,
-			notInCarrier: !this.carrierWrapper.contains(form)
+			notInCarrier: !this.carrierWrapper.contains(form),
 		};
 
 		if ((await this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.frameContext, info })) === false) return;

@@ -205,7 +205,7 @@
 		video_modal_url: 'Media embed URL, YouTube/Vimeo',
 		width: 'Width',
 		message_copy_success: 'Copied to clipboard',
-		message_copy_fail: 'Copy failed. Please copy manually.'
+		message_copy_fail: 'Copy failed. Please copy manually.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -214,7 +214,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -222,7 +222,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

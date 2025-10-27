@@ -66,7 +66,7 @@ ListFormat.prototype = {
 			sc: range.startContainer,
 			so: range.startContainer === range.endContainer && dom.check.isZeroWidth(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
 			ec: range.endContainer,
-			eo: range.endOffset
+			eo: range.endOffset,
 		};
 		let afterRange = null;
 		let isRemove = true;
@@ -111,7 +111,7 @@ ListFormat.prototype = {
 					r = o;
 					rangeArr = {
 						r: r,
-						f: [dom.query.getParentElement(selectedFormats[i], 'LI')]
+						f: [dom.query.getParentElement(selectedFormats[i], 'LI')],
 					};
 				} else {
 					if (r !== o) {
@@ -129,7 +129,7 @@ ListFormat.prototype = {
 						r = o;
 						rangeArr = {
 							r: r,
-							f: [dom.query.getParentElement(selectedFormats[i], 'LI')]
+							f: [dom.query.getParentElement(selectedFormats[i], 'LI')],
 						};
 					} else {
 						rangeArr.f.push(dom.query.getParentElement(selectedFormats[i], 'LI'));
@@ -258,7 +258,7 @@ ListFormat.prototype = {
 				r = o;
 				rangeArr = {
 					r: r,
-					f: [dom.query.getParentElement(selectedCells[i], 'LI')]
+					f: [dom.query.getParentElement(selectedCells[i], 'LI')],
 				};
 				if (i === 0) listFirst = true;
 			} else if (r && isList) {
@@ -275,7 +275,7 @@ ListFormat.prototype = {
 						r = o;
 						rangeArr = {
 							r: r,
-							f: [dom.query.getParentElement(selectedCells[i], 'LI')]
+							f: [dom.query.getParentElement(selectedCells[i], 'LI')],
 						};
 						if (lastIndex) listLast = true;
 					} else {
@@ -296,7 +296,7 @@ ListFormat.prototype = {
 
 		return {
 			sc: first,
-			ec: last
+			ec: last,
 		};
 	},
 
@@ -329,7 +329,7 @@ ListFormat.prototype = {
 				sc: selectedCells[0],
 				so: 0,
 				ec: selectedCells.at(-1),
-				eo: 1
+				eo: 1,
 			};
 		}
 
@@ -354,7 +354,7 @@ ListFormat.prototype = {
 				s: null,
 				e: null,
 				sl: originList,
-				el: originList
+				el: originList,
 			};
 
 			const { startContainer, startOffset, endContainer, endOffset } = this.selection.getRange();
@@ -380,14 +380,14 @@ ListFormat.prototype = {
 					sc: sc,
 					so: 0,
 					ec: ec,
-					eo: ec.textContent.length
+					eo: ec.textContent.length,
 				};
 			} else {
 				range = {
 					sc: startContainer,
 					so: startOffset,
 					ec: endContainer,
-					eo: endOffset
+					eo: endOffset,
 				};
 			}
 		}
@@ -437,7 +437,7 @@ ListFormat.prototype = {
 				(current) => {
 					return dom.check.isListCell(current) && !current.previousElementSibling && dom.query.getNodeDepth(current) === depth;
 				},
-				null
+				null,
 			);
 		} else {
 			rChildren = dom.query.getListChildren(
@@ -445,7 +445,7 @@ ListFormat.prototype = {
 				(current) => {
 					return dom.check.isListCell(current) && !current.previousElementSibling;
 				},
-				null
+				null,
 			);
 		}
 
@@ -567,11 +567,11 @@ ListFormat.prototype = {
 		return {
 			cc: first.parentNode,
 			sc: edge.sc,
-			ec: edge.ec
+			ec: edge.ec,
 		};
 	},
 
-	constructor: ListFormat
+	constructor: ListFormat,
 };
 
 /**

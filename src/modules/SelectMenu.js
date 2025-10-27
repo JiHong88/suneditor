@@ -77,7 +77,7 @@ class SelectMenu extends CoreInjector {
 			mousedown: this.#OnMousedown_list.bind(this),
 			mousemove: this.#OnMouseMove_list.bind(this),
 			click: this.#OnClick_list.bind(this),
-			keydown: this.#OnKeyDown_refer.bind(this)
+			keydown: this.#OnKeyDown_refer.bind(this),
 		};
 		this.#globalEventHandlers = { keydown: this.#CloseListener_key.bind(this), mousedown: this.#CloseListener_mousedown.bind(this), click: this.#CloseListener_click.bind(this) };
 	}
@@ -119,9 +119,9 @@ class SelectMenu extends CoreInjector {
 			'DIV',
 			{
 				class: 'se-select-menu' + (attr.class ? ' ' + attr.class : ''),
-				style: attr.style || ''
+				style: attr.style || '',
 			},
-			'<div class="se-list-inner"></div>'
+			'<div class="se-list-inner"></div>',
 		);
 		referElement.parentNode.insertBefore(this.form, referElement);
 	}

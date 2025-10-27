@@ -142,7 +142,7 @@ export function spanToStyleNode(
 		regex: RegExp;
 		tag: string;
 	},
-	node: Node
+	node: Node,
 ): void;
 /**
  * Adds a query string to a URL. If the URL already contains a query string, the new query is appended to the existing one.

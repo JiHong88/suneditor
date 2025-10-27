@@ -206,7 +206,7 @@
 		video_modal_url: 'Embedded URL (YouTube/Vimeo)',
 		width: 'Breedte',
 		message_copy_success: 'Gekopieerd naar klembord',
-		message_copy_fail: 'Kopiëren mislukt. Kopieer handmatig.'
+		message_copy_fail: 'Kopiëren mislukt. Kopieer handmatig.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

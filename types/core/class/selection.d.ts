@@ -92,7 +92,7 @@ declare class Selection_ {
 	 */
 	getNearRange(
 		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
-		target: Node
+		target: Node,
 	): {
 		container: Node;
 		offset: number;
@@ -134,7 +134,7 @@ declare class Selection_ {
 	getRects(
 		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
 		target: Range | Node | null,
-		position: 'start' | 'end'
+		position: 'start' | 'end',
 	): {
 		rects: RectsInfo_selection;
 		position: 'start' | 'end';
@@ -149,7 +149,7 @@ declare class Selection_ {
 	 */
 	getDragEventLocationRange(
 		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
-		e: DragEvent
+		e: DragEvent,
 	): {
 		sc: Node;
 		so: number;
@@ -180,7 +180,7 @@ declare class Selection_ {
 		ref: Selection | Range | Node,
 		scrollOption?: {
 			[x: string]: any;
-		}
+		},
 	): void;
 	/**
 	 * @private

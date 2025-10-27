@@ -82,7 +82,7 @@ declare class SelectMenu extends CoreInjector {
 		attr?: {
 			class?: string;
 			style?: string;
-		}
+		},
 	): void;
 	/**
 	 * @description Select menu open

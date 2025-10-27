@@ -15,29 +15,24 @@
 		"./types": {
 			"types": "./types/typedef.d.ts"
 		},
-		"./src/plugins": {
+		"./plugins": {
 			"types": "./types/plugins/index.d.ts",
 			"default": "./src/plugins/index.js"
 		},
-		"./src/modules": {
-			"types": "./types/modules/index.d.ts",
-			"default": "./src/modules/index.js"
+		"./langs/*": {
+			"types": "./types/langs/*.d.ts",
+			"default": "./src/langs/*.js"
 		},
-		"./src/helper": {
-			"types": "./types/helper/index.d.ts",
-			"default": "./src/helper/index.js"
+		"./css": {
+			"types": "./types/assets/suneditor.css.d.ts",
+			"default": "./src/assets/suneditor.css"
 		},
-		"./src/helper/dom": {
-			"types": "./types/helper/dom/index.d.ts",
-			"default": "./src/helper/dom/index.js"
-		},
-		"./src/langs": {
-			"types": "./types/langs/index.d.ts",
-			"default": "./src/langs/index.js"
+		"./css/contents": {
+			"types": "./types/assets/suneditor-contents.css.d.ts",
+			"default": "./src/assets/suneditor-contents.css"
 		},
 		"./src/*": "./src/*",
-		"./types/*": "./types/*",
-		"./dist/*": "./dist/*"
+		"./package.json": "./package.json"
 	},
 	"sideEffects": [
 		"./src/assets/*.css"
@@ -55,7 +50,7 @@
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
 		"lint": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" && npm run lint:type && npm run check:arch",
-		"ts-build": "npm run check:inject && (npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/ts-build/format-index.cjs && node scripts/ts-build/fix-langs.cjs && node scripts/ts-build/wrap-dts.cjs && node scripts/ts-build/rename-index.cjs && node scripts/ts-build/remove-this-params.cjs && node scripts/ts-build/gen-options-dts.cjs && node scripts/ts-build/inject-typedef-import.cjs && npm run lint:fix-ts",
+		"ts-build": "npm run check:inject && (npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/ts-build/format-index.cjs && node scripts/ts-build/fix-langs.cjs && node scripts/ts-build/wrap-dts.cjs && node scripts/ts-build/rename-index.cjs && node scripts/ts-build/remove-this-params.cjs && node scripts/ts-build/gen-options-dts.cjs && node scripts/ts-build/gen-css-dts.cjs && node scripts/ts-build/inject-typedef-import.cjs && npm run lint:fix-ts",
 		"test": "jest --silent",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",

@@ -109,7 +109,7 @@ class Video extends EditorInjector {
 			iframeTagAttributes: pluginOptions.iframeTagAttributes || null,
 			query_youtube: pluginOptions.query_youtube || '',
 			query_vimeo: pluginOptions.query_vimeo || '',
-			insertBehavior: pluginOptions.insertBehavior
+			insertBehavior: pluginOptions.insertBehavior,
 		};
 
 		// create HTML
@@ -127,7 +127,7 @@ class Video extends EditorInjector {
 		this.fileManager = new FileManager(this, {
 			query: 'iframe, video',
 			loadEventName: 'onVideoLoad',
-			actionEventName: 'onVideoAction'
+			actionEventName: 'onVideoAction',
 		});
 
 		// members
@@ -164,7 +164,7 @@ class Video extends EditorInjector {
 					url = this.convertUrlYoutube(url);
 					return converter.addUrlQuery(url, this.pluginOptions.query_youtube);
 				},
-				tag: 'iframe'
+				tag: 'iframe',
 			},
 			vimeo: {
 				pattern: /vimeo\.com/i,
@@ -172,9 +172,9 @@ class Video extends EditorInjector {
 					url = this.convertUrlVimeo(url);
 					return converter.addUrlQuery(url, this.pluginOptions.query_vimeo);
 				},
-				tag: 'iframe'
+				tag: 'iframe',
 			},
-			...pluginOptions.embedQuery
+			...pluginOptions.embedQuery,
 		};
 
 		const urlPatterns = [];
@@ -198,7 +198,7 @@ class Video extends EditorInjector {
 				/instagram\.com\/reel\//,
 				/linkedin\.com\/posts\//,
 				/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
-				/loom\.com\/share\//
+				/loom\.com\/share\//,
 			])
 			.concat(pluginOptions.urlPatterns || []);
 
@@ -334,7 +334,7 @@ class Video extends EditorInjector {
 				if (line) this.#align = line.style.textAlign || line.style.float;
 
 				this.#fixTagStructure(element);
-			}
+			},
 		};
 	}
 
@@ -397,7 +397,7 @@ class Video extends EditorInjector {
 				function (current) {
 					return current.childNodes.length === 0;
 				},
-				null
+				null,
 			);
 		}
 
@@ -434,7 +434,7 @@ class Video extends EditorInjector {
 				return {
 					origin: url,
 					url: service.action(url),
-					tag: service.tag
+					tag: service.tag,
 				};
 			}
 		}
@@ -626,7 +626,7 @@ class Video extends EditorInjector {
 					error: err,
 					limitSize: slngleSizeLimit,
 					uploadSize: s,
-					file: f
+					file: f,
 				});
 
 				this.ui.alertOpen(message === NO_EVENT ? err : message || err, 'error');
@@ -652,7 +652,7 @@ class Video extends EditorInjector {
 		const videoInfo = {
 			url: null,
 			files,
-			...this.#getInfo()
+			...this.#getInfo(),
 		};
 
 		const handler = function (uploadCallback, infos, newInfos) {
@@ -662,7 +662,7 @@ class Video extends EditorInjector {
 
 		const result = await this.triggerEvent('onVideoUploadBefore', {
 			info: videoInfo,
-			handler
+			handler,
 		});
 
 		if (result === undefined) return true;
@@ -702,7 +702,7 @@ class Video extends EditorInjector {
 
 		const result = await this.triggerEvent('onVideoUploadBefore', {
 			info: videoInfo,
-			handler
+			handler,
 		});
 
 		if (result === undefined) return true;
@@ -788,7 +788,7 @@ class Video extends EditorInjector {
 			inputHeight: this.inputY?.value || '',
 			align: this.#align,
 			isUpdate: this.modal.isUpdate,
-			element: this.#element
+			element: this.#element,
 		};
 	}
 
@@ -858,9 +858,9 @@ class Video extends EditorInjector {
 				info.isUpdate,
 				{
 					name: fileList[i].name,
-					size: fileList[i].size
+					size: fileList[i].size,
 				},
-				i === len - 1
+				i === len - 1,
 			);
 		}
 	}
@@ -1152,7 +1152,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			{ name: '16:9', value: 0.5625 },
 			{ name: '4:3', value: 0.75 },
 			{ name: '21:9', value: 0.4285 },
-			{ name: '9:16', value: 1.78 }
+			{ name: '9:16', value: 1.78 },
 		];
 		const ratio = pluginOptions.defaultRatio;
 		const onlyPercentage = pluginOptions.percentageOnlySize;
@@ -1214,7 +1214,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 		inputX: content.querySelector('._se_size_x'),
 		inputY: content.querySelector('._se_size_y'),
 		revertBtn: content.querySelector('.se-modal-btn-revert'),
-		fileRemoveBtn: content.querySelector('.se-file-remove')
+		fileRemoveBtn: content.querySelector('.se-file-remove'),
 	};
 }
 

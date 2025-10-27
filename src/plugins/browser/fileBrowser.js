@@ -50,7 +50,7 @@ class FileBrowser extends EditorInjector {
 			columnSize: 4,
 			className: 'se-file-browser',
 			thumbnail: typeof pluginOptions.thumbnail === 'function' ? pluginOptions.thumbnail : (item) => thumbnail[item.type] || defaultThumbnail,
-			props: [...new Set((pluginOptions.props ?? []).concat(['frame']))]
+			props: [...new Set((pluginOptions.props ?? []).concat(['frame']))],
 		});
 	}
 

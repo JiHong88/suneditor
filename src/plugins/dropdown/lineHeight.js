@@ -103,7 +103,7 @@ function CreateHTML({ lang }, items) {
 		{ text: '1', value: '1em' },
 		{ text: '1.2', value: '1.2em' },
 		{ text: '1.7', value: '1.7em' },
-		{ text: '2', value: '2em' }
+		{ text: '2', value: '2em' },
 	];
 
 	let list = /*html*/ `

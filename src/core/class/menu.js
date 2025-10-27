@@ -39,7 +39,7 @@ function Menu(editor) {
 		containerDown: this.containerOff.bind(this),
 		keydown: OnKeyDown_dropdown.bind(this),
 		mousemove: OnMousemove_dropdown.bind(this),
-		mouseout: OnMouseout_dropdown.bind(this)
+		mouseout: OnMouseout_dropdown.bind(this),
 	};
 	this._bindClose_dropdown_mouse = null;
 	this._bindClose_dropdown_key = null;
@@ -274,7 +274,7 @@ Menu.prototype = {
 		}
 	},
 
-	constructor: Menu
+	constructor: Menu,
 };
 
 /**

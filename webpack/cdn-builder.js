@@ -1,9 +1,9 @@
-require('../src/assets/suneditor.css');
-require('../src/assets/suneditor-contents.css');
+import '../src/assets/suneditor.css';
+import '../src/assets/suneditor-contents.css';
 
 import suneditor from '../src/suneditor';
-import editorInjector from '../src/editorInjector';
 import plugins from '../src/plugins';
+import editorInjector from '../src/editorInjector';
 import modules from '../src/modules';
 import helper from '../src/helper';
 
@@ -13,8 +13,8 @@ Object.defineProperty(window, 'SUNEDITOR', {
 	configurable: false,
 	value: {
 		...suneditor, // create(), init()
-		editorInjector,
 		plugins,
+		editorInjector,
 		modules,
 		helper
 	}

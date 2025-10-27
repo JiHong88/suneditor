@@ -125,7 +125,7 @@ class Embed extends EditorInjector {
 			iframeTagAttributes: pluginOptions.iframeTagAttributes || null,
 			query_youtube: pluginOptions.query_youtube || '',
 			query_vimeo: pluginOptions.query_vimeo || '',
-			insertBehavior: pluginOptions.insertBehavior
+			insertBehavior: pluginOptions.insertBehavior,
 		};
 
 		// create HTML
@@ -170,14 +170,14 @@ class Embed extends EditorInjector {
 				action: (url) => {
 					return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=true&width=500`;
 				},
-				tag: 'iframe'
+				tag: 'iframe',
 			},
 			twitter: {
 				pattern: /^(?:https?:\/\/)?(?:(?:www\.)?(?:twitter\.com|x\.com)\/(?:[^/?#]+\/)?status\/\d+(?:[/?#]|$)|platform\.twitter\.com\/embed\/Tweet\.html(?:[?#].*)?$)/i,
 				action: (url) => {
 					return `https://platform.twitter.com/embed/Tweet.html?url=${encodeURIComponent(url)}`;
 				},
-				tag: 'iframe'
+				tag: 'iframe',
 			},
 			instagram: {
 				pattern: /(?:https?:\/\/)?(?:www\.)?(?:instagram\.com)\/p\/(.+)/i,
@@ -185,14 +185,14 @@ class Embed extends EditorInjector {
 					const postId = url.match(this.query.instagram.pattern)[1];
 					return `https://www.instagram.com/p/${postId}/embed`;
 				},
-				tag: 'iframe'
+				tag: 'iframe',
 			},
 			linkedin: {
 				pattern: /(?:https?:\/\/)?(?:www\.)?(?:linkedin\.com)\/(.+)\/(.+)/i,
 				action: (url) => {
 					return `https://www.linkedin.com/embed/feed/update/${encodeURIComponent(url.split('/').pop())}`;
 				},
-				tag: 'iframe'
+				tag: 'iframe',
 			},
 			pinterest: {
 				pattern: /(?:https?:\/\/)?(?:www\.)?(?:pinterest\.com)\/pin\/(.+)/i,
@@ -200,7 +200,7 @@ class Embed extends EditorInjector {
 					const pinId = url.match(this.query.pinterest.pattern)[1];
 					return `https://assets.pinterest.com/ext/embed.html?id=${pinId}`;
 				},
-				tag: 'iframe'
+				tag: 'iframe',
 			},
 			spotify: {
 				pattern: /(?:https?:\/\/)?(?:open\.)?(?:spotify\.com)\/(track|album|playlist|show|episode)\/(.+)/i,
@@ -210,7 +210,7 @@ class Embed extends EditorInjector {
 					const id = match[2];
 					return `https://open.spotify.com/embed/${type}/${id}`;
 				},
-				tag: 'iframe'
+				tag: 'iframe',
 			},
 			codepen: {
 				pattern: /(?:https?:\/\/)?(?:www\.)?(?:codepen\.io)\/(.+)\/pen\/(.+)/i,
@@ -218,9 +218,9 @@ class Embed extends EditorInjector {
 					const [, user, penId] = url.match(this.query.codepen.pattern);
 					return `https://codepen.io/${user}/embed/${penId}`;
 				},
-				tag: 'iframe'
+				tag: 'iframe',
 			},
-			...pluginOptions.embedQuery
+			...pluginOptions.embedQuery,
 		};
 
 		const urlPatterns = [];
@@ -319,7 +319,7 @@ class Embed extends EditorInjector {
 				if (line) this.#align = line.style.textAlign || line.style.float;
 
 				this.#fixTagStructure(element);
-			}
+			},
 		};
 	}
 
@@ -376,7 +376,7 @@ class Embed extends EditorInjector {
 				function (current) {
 					return current.childNodes.length === 0;
 				},
-				null
+				null,
 			);
 		}
 
@@ -413,7 +413,7 @@ class Embed extends EditorInjector {
 				return {
 					origin: url,
 					url: service.action(url),
-					tag: service.tag
+					tag: service.tag,
 				};
 			}
 		}
@@ -449,7 +449,7 @@ class Embed extends EditorInjector {
 
 		const result = await this.triggerEvent('onEmbedInputBefore', {
 			...embedInfo,
-			handler
+			handler,
 		});
 
 		if (result === undefined) return true;
@@ -502,7 +502,7 @@ class Embed extends EditorInjector {
 			? figureInfo.ratio
 			: {
 					w: 0,
-					h: 0
+					h: 0,
 				};
 	}
 
@@ -643,7 +643,7 @@ class Embed extends EditorInjector {
 
 					observer.observe(this.frameContext.get('wysiwyg'), {
 						subtree: true,
-						childList: true
+						childList: true,
 					});
 				} catch (e) {
 					this.history.resume();
@@ -725,7 +725,7 @@ class Embed extends EditorInjector {
 			inputHeight: this.inputY?.value || '',
 			align: this.#align,
 			isUpdate: this.modal.isUpdate,
-			element: this.#element
+			element: this.#element,
 		};
 	}
 
@@ -884,7 +884,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		proportion: content.querySelector('._se_check_proportion'),
 		inputX: content.querySelector('._se_size_x'),
 		inputY: content.querySelector('._se_size_y'),
-		revertBtn: content.querySelector('.se-modal-btn-revert')
+		revertBtn: content.querySelector('.se-modal-btn-revert'),
 	};
 }
 

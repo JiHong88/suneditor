@@ -206,7 +206,7 @@
 		video_modal_url: 'Include URL, youtube/vimeo',
 		width: 'Lățime',
 		message_copy_success: 'Copiat în clipboard',
-		message_copy_fail: 'Copiere eșuată. Vă rugăm să copiați manual.'
+		message_copy_fail: 'Copiere eșuată. Vă rugăm să copiați manual.',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 

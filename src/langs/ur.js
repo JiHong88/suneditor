@@ -206,7 +206,7 @@
 		video_modal_url: 'ذرائع ابلاغ کا یو آر ایل، یوٹیوب/ویمیو',
 		width: 'چوڑائی',
 		message_copy_success: 'کلپ بورڈ میں کاپی ہو گیا',
-		message_copy_fail: 'کاپی ناکام۔ براہ کرم دستی طور پر کاپی کریں۔'
+		message_copy_fail: 'کاپی ناکام۔ براہ کرم دستی طور پر کاپی کریں۔',
 	};
 
 	if (typeof noGlobal === typeof undefined) {
@@ -215,7 +215,7 @@
 				enumerable: true,
 				writable: false,
 				configurable: false,
-				value: {}
+				value: {},
 			});
 		}
 
@@ -223,7 +223,7 @@
 			enumerable: true,
 			writable: true,
 			configurable: true,
-			value: lang
+			value: lang,
 		});
 	}
 
