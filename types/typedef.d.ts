@@ -1,7 +1,8 @@
+import type {} from './events';
 export {};
 
 declare global {
-	declare namespace SunEditor {
+	namespace SunEditor {
 		type Instance = import('./core/editor').default;
 		type InitOptions = import('./core/config/options.js').EditorInitOptions;
 		type InitFrameOptions = import('./core/config/options.js').EditorFrameOptions;
@@ -246,11 +247,57 @@ declare global {
 		type EventActions = import('./core/event/actions').Action[];
 		type EventPorts = import('./core/event/ports').EventReducerPorts;
 		/**
+		 * EventHandlers
+		 */
+		type EventHandlers = import('./events').EventHandlers;
+		export namespace EventParams {
+			/**
+			 * EventParams
+			 */
+			type BaseEvent = import('./events').BaseEvent;
+			/**
+			 * EventParams
+			 */
+			type ClipboardEvent = import('./events').ClipboardEvent;
+			/**
+			 * EventParams
+			 */
+			type ControllerInfo = import('./events').ControllerInfo;
+			/**
+			 * EventParams
+			 */
+			type FileManagementInfo = import('./events').FileManagementInfo;
+			/**
+			 * EventParams
+			 */
+			type ProcessInfo = import('./events').ProcessInfo;
+			/**
+			 * EventParams
+			 */
+			type ImageInfo = import('./events').ImageInfo;
+			/**
+			 * EventParams
+			 */
+			type VideoInfo = import('./events').VideoInfo;
+			/**
+			 * EventParams
+			 */
+			type AudioInfo = import('./events').AudioInfo;
+			/**
+			 * EventParams
+			 */
+			type FileInfo = import('./events').FileInfo;
+			/**
+			 * EventParams
+			 */
+			type EmbedInfo = import('./events').EmbedInfo;
+		}
+		/**
 		 * Special toolbar control strings
-		 * - `"|"`: Vertical separator
-		 * - `"/"`: Line break
-		 * - `":title-icon"`: More button (e.g., ":More-default.more_vertical")
-		 * - `"-left"|"-right"|"-center"`: Float alignment
+		 * - `"|"`: Vertical separator between buttons
+		 * - `"/"`: Line break (start new row)
+		 * - `":[title]-[icon]"`: More button with dropdown (e.g., ":More Button-default.more_vertical")
+		 * - `"-left"|"-right"`: Float alignment for button groups
 		 * - `"#fix"`: RTL direction fix
 		 * - `"%100"|"%50"`: Responsive breakpoint (percentage)
 		 */

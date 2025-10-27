@@ -195,15 +195,50 @@
  *
  */
 
+// --------------------------------------------------------- [Event Types] ---------------------------------------------------------------------------------------------------
+/**
+ * EventHandlers
+ * @typedef {import('./events').EventHandlers} SunEditor.EventHandlers
+ */
+
+/**
+ * EventParams
+ * @typedef {import('./events').BaseEvent} SunEditor.EventParams.BaseEvent
+ * @typedef {import('./events').ClipboardEvent} SunEditor.EventParams.ClipboardEvent
+ * @typedef {import('./events').ControllerInfo} SunEditor.EventParams.ControllerInfo
+ * @typedef {import('./events').FileManagementInfo} SunEditor.EventParams.FileManagementInfo
+ * @typedef {import('./events').ProcessInfo} SunEditor.EventParams.ProcessInfo
+ * @typedef {import('./events').ImageInfo} SunEditor.EventParams.ImageInfo
+ * @typedef {import('./events').VideoInfo} SunEditor.EventParams.VideoInfo
+ * @typedef {import('./events').AudioInfo} SunEditor.EventParams.AudioInfo
+ * @typedef {import('./events').FileInfo} SunEditor.EventParams.FileInfo
+ * @typedef {import('./events').EmbedInfo} SunEditor.EventParams.EmbedInfo
+ */
+
 // --------------------------------------------------------- [Button/Toolbar Types] ---------------------------------------------------------------------------------------------------
 /**
  * Special toolbar control strings
- * - `"|"`: Vertical separator
- * - `"/"`: Line break
- * - `":title-icon"`: More button (e.g., ":More-default.more_vertical")
- * - `"-left"|"-right"|"-center"`: Float alignment
+ * - `"|"`: Vertical separator between buttons
+ * - `"/"`: Line break (start new row)
+ * - `":[title]-[icon]"`: More button with dropdown (e.g., ":More Button-default.more_vertical")
+ * - `"-left"|"-right"`: Float alignment for button groups
  * - `"#fix"`: RTL direction fix
  * - `"%100"|"%50"`: Responsive breakpoint (percentage)
+ *
+ * @example
+ * // Basic separators and layout
+ * [['bold', 'italic', '|', 'underline'],]  // Separator between buttons
+ * [['font', 'fontSize'], '/', ['align'],]  // Line break between rows
+ *
+ * // Float alignment
+ * [['-right', 'undo', 'redo'],]          // Float right side
+ *
+ * // More button (collapsible group)
+ * [[':Paragraph-More', 'fontSize', 'align'],]      // Dropdown with title
+ *
+ * // Responsive breakpoint
+ * ['%50', ['bold', 'italic'],]           // Show at 50% width breakpoint
+ *
  * @typedef {"|"|"/"|`-${"left"|"right"|"center"}`|"#fix"|`:${string}-${string}`|`%${number}`} SunEditor.ButtonSpecial
  */
 

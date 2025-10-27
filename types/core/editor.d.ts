@@ -114,9 +114,9 @@ declare class Editor {
 	};
 	/**
 	 * @description Events object, call by triggerEvent function
-	 * @type {Partial<typeof import('../events.js').default>}
+	 * @type {SunEditor.EventHandlers}
 	 */
-	events: Partial<typeof import('../events.js').default>;
+	events: SunEditor.EventHandlers;
 	/**
 	 * @description Call the event function by injecting self: this.
 	 * @type {(eventName: string, ...args: *) => Promise<*>}

@@ -4,10 +4,6 @@ import { dom, numbers, env, keyCodeMap } from '../../helper';
 const { _w, NO_EVENT } = env;
 
 /**
- * @typedef {import('../../events').ProcessInfo} ProcessInfo_embed
- */
-
-/**
  * @typedef {Object} EmbedPluginOptions
  * @property {boolean} [canResize=true] - Whether the embed element can be resized.
  * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
@@ -533,7 +529,7 @@ class Embed extends EditorInjector {
 	/**
 	 * @description Creates an embed component (iframe or blockquote) and inserts it into the editor.
 	 * @param {string} originSrc - The origin input source.
-	 * @param {ProcessInfo_embed} process - Processed embed information.
+	 * @param {SunEditor.EventParams.ProcessInfo} process - Processed embed information.
 	 * @param {string} src - The source URL.
 	 * @param {Node[]} children - The embed elements.
 	 * @param {string} width - The width of the embed component.

@@ -22,7 +22,7 @@
 
 // --- controller
 /**
- * @typedef {import('./modules/Controller').ControllerInfo} ControllerInfo_events
+ * @typedef {import('./modules/Controller').ControllerInfo} ControllerInfo
  */
 
 // --- media
@@ -100,590 +100,504 @@
  * @property {?ProcessInfo} process - embed process info
  */
 
-// event function collection
-export default {
-	/**
-	 * @description Event call back function
-	 * @type {((params: {editor: SunEditor.Core}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 */
-	onload: null,
+// ----------------- [handlers] ---------------------------------------------------------------------------------------
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onScroll: null,
+/**
+ * @callback onload
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onMouseDown: null,
+/**
+ * @callback onScroll
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onClick: null,
+/**
+ * @callback onMouseDown
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onBeforeInput: null,
+/**
+ * @callback onClick
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onInput: null,
+/**
+ * @callback onBeforeInput
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onMouseLeave: null,
+/**
+ * @callback onInput
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onKeyDown: null,
+/**
+ * @callback onMouseLeave
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onKeyUp: null,
+/**
+ * @callback onKeyDown
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onFocus: null,
+/**
+ * @callback onKeyUp
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onNativeFocus: null,
+/**
+ * @callback onFocus
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onBlur: null,
+/**
+ * @callback onNativeFocus
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: BaseEvent) => void) | null}
-	 * @param {BaseEvent} params
-	 */
-	onNativeBlur: null,
+/**
+ * @callback onBlur
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event function on copy
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, event: Event, clipboardData: Event}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {Event} params.event - event object
-	 * @param {Event} params.clipboardData - clipboardData
-	 */
-	onCopy: null,
+/**
+ * @callback onNativeBlur
+ * @param {BaseEvent} params
+ */
 
-	/**
-	 * @description Event function on cut
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, event: Event, clipboardData: Event}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {Event} params.event - event object
-	 * @param {Event} params.clipboardData - clipboardData
-	 */
-	onCut: null,
+/**
+ * @callback onCopy
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {Event} params.event - event object
+ * @param {Event} params.clipboardData - clipboardData
+ */
 
-	/**
-	 * @description Event call back function
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, event: Event, data: Event}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {Event} params.event - event object
-	 * @param {Event} params.data - editor data
-	 */
-	onChange: null,
+/**
+ * @callback onCut
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {Event} params.event - event object
+ * @param {Event} params.clipboardData - clipboardData
+ */
 
-	/**
-	 * @description Called just before the inline toolbar is positioned and displayed on the screen.
-	 * @type {((toolbar: HTMLElement, mode: string) => void) | null}
-	 * @param {HTMLElement} toolbar - Toolbar element
-	 * @param {string} mode - Toolbar mode
-	 */
-	onShowToolbar: null,
+/**
+ * @callback onChange
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {Event} params.event - event object
+ * @param {Event} params.data - editor data
+ */
 
-	/**
-	 * @description Called just after the controller is positioned and displayed on the screen.
-	 * - controller : editing elements displayed on the screen [image resizing, table editor, link editor..]]
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, caller: string, info: ControllerInfo_events}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {string} params.caller - caller plugin name
-	 * @param {ControllerInfo_events} params.info - info object
-	 */
-	onShowController: null,
+/**
+ * @callback onShowToolbar
+ * @param {HTMLElement} toolbar - Toolbar element
+ * @param {string} mode - Toolbar mode
+ */
 
-	/**
-	 * @description Called just after the controller is positioned and displayed on the screen.
-	 * - controller : editing elements displayed on the screen [image resizing, table editor, link editor..]]
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, caller: string, info: ControllerInfo_events}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {string} params.caller - caller plugin name
-	 * @param {ControllerInfo_events} params.info - info object
-	 */
-	onBeforeShowController: null,
+/**
+ * @callback onShowController
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {string} params.caller - caller plugin name
+ * @param {ControllerInfo} params.info - info object
+ */
 
-	/**
-	 * @description An event when toggling between code view and wysiwyg view.
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, is: boolean}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {boolean} params.is - code view status
-	 */
-	onToggleCodeView: null,
+/**
+ * @callback onBeforeShowController
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {string} params.caller - caller plugin name
+ * @param {ControllerInfo} params.info - info object
+ */
 
-	/**
-	 * @description An event when toggling full screen.
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, is: boolean}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {boolean} params.is - full screen status
-	 */
-	onToggleFullScreen: null,
+/**
+ * @callback onToggleCodeView
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {boolean} params.is - code view status
+ */
 
-	/**
-	 * @description Called when the editor is resized using the bottom bar
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, height: number, prevHeight: boolean, observerEntry: ResizeObserverEntry}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {number} params.height - wysiwyg area frame height
-	 * @param {boolean} params.prevHeight - wysiwyg area previous height
-	 * @param {ResizeObserverEntry} params.observerEntry - ResizeObserverEntry
-	 */
-	onResizeEditor: null,
+/**
+ * @callback onToggleFullScreen
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {boolean} params.is - full screen status
+ */
 
-	/**
-	 * @description Called after the "setToolbarButtons" invocation.
-	 * - Can be used to tweak buttons properties (useful for custom buttons)
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, buttonTray: HTMLElement}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {HTMLElement} params.buttonTray - button tray element
-	 */
-	onSetToolbarButtons: null,
+/**
+ * @callback onResizeEditor
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {number} params.height - wysiwyg area frame height
+ * @param {boolean} params.prevHeight - wysiwyg area previous height
+ * @param {ResizeObserverEntry} params.observerEntry - ResizeObserverEntry
+ */
 
-	/**
-	 * --------------------------------------------------- async function ---------------------------------------------------
-	 */
+/**
+ * @callback onSetToolbarButtons
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {HTMLElement} params.buttonTray - button tray element
+ */
 
-	/**
-	 * @description Event callback function on save
-	 * @type {((params: {editor: SunEditor.Core, frameContext: SunEditor.FrameContext, data: Event}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {SunEditor.FrameContext} params.frameContext - frame context
-	 * @param {Event} params.data - editor data
-	 * @returns {Promise<boolean>}
-	 */
-	onSave: null,
+/**
+ * @callback onSave
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {SunEditor.FrameContext} params.frameContext - frame context
+ * @param {Event} params.data - editor data
+ * @returns {Promise<boolean>}
+ */
 
-	/**
-	 * @description Event function on [drop, paste] before
-	 * - When false is returned, the default behavior is stopped.
-	 * - If the string is returned, the cleanData value is modified to the return value.
-	 * @type {((params: ClipboardEvent) => Promise<boolean | string>) | null}
-	 * @param {ClipboardEvent} params
-	 * @returns {Promise<boolean|string>}
-	 */
-	onDrop: null,
+/**
+ * @callback onDrop
+ * @param {ClipboardEvent} params
+ * @returns {Promise<boolean | string>}
+ */
 
-	/**
-	 * @description Event function on [drop, paste] before
-	 * - When false is returned, the default behavior is stopped.
-	 * - If the string is returned, the cleanData value is modified to the return value.
-	 * @type {((params: ClipboardEvent) => Promise<boolean | string>) | null}
-	 * @param {ClipboardEvent} params
-	 * @returns {Promise<boolean|string>}
-	 */
-	onPaste: null,
+/**
+ * @callback onPaste
+ * @param {ClipboardEvent} params
+ * @returns {Promise<boolean | string>}
+ */
 
-	// --- image
-	/**
-	 * @description It replaces the default callback function of the image upload
-	 * @type {((params: {editor: SunEditor.Core, xmlHttp: XMLHttpRequest, info: ImageInfo}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
-	 * @param {ImageInfo} params.info - info object
-	 * @returns {Promise<boolean>}
-	 */
-	imageUploadHandler: null,
+/**
+ * @callback imageUploadHandler
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
+ * @param {ImageInfo} params.info - info object
+ * @returns {Promise<boolean>}
+ */
 
-	/**
-	 * @description Called before the image is uploaded
-	 * @type {((params: {editor: SunEditor.Core, info: ImageInfo, handler: (newInfo?: ImageInfo | null) => void}) => Promise<boolean | undefined | ImageInfo>) | null}
-	 * - If true is returned, the internal upload process runs normally.
-	 * - If false is returned, no image upload is performed.
-	 * - If new "info" are returned, replaced the previous "params.info"
-	 * - If undefined is returned, it waits until "uploadHandler" is executed.
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {ImageInfo} params.info - info object
-	 * @param {(newInfo?: ImageInfo|null) => void} params.handler - handler function
-	 * @returns {Promise<boolean|undefined|ImageInfo>}
-	 */
-	onImageUploadBefore: null,
+/**
+ * @callback onImageUploadBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {ImageInfo} params.info - info object
+ * @param {(newInfo?: ImageInfo | null) => void} params.handler - handler function
+ * @returns {Promise<boolean | undefined | ImageInfo>}
+ */
 
-	/**
-	 * @description Called when the editor loaded, file Current editor value
-	 * @type {((params: {editor: SunEditor.Core}, infoList: Array<FileManagementInfo>) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {Array<FileManagementInfo>} infoList - info list
-	 */
-	onImageLoad: null,
+/**
+ * @callback onImageLoad
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {Array<FileManagementInfo>} infoList - info list
+ */
 
-	/**
-	 * @description Called when the image is uploaded, updated, deleted
-	 * @type {((params: {editor: SunEditor.Core, info: FileManagementInfo, element: HTMLElement | null, state: "create" | "update" | "delete", index: number, remainingFilesCount: number, pluginName: string}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {FileManagementInfo} params.info - info object
-	 * @param {HTMLElement|null} params.element - target element
-	 * @param {"create"|"update"|"delete"} params.state - state
-	 * @param {number} params.index - data index
-	 * @param {number} params.remainingFilesCount - remaining files count
-	 * @param {string} params.pluginName - plugin name
-	 */
-	onImageAction: null,
+/**
+ * @callback onImageAction
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {FileManagementInfo} params.info - info object
+ * @param {HTMLElement | null} params.element - target element
+ * @param {"create" | "update" | "delete"} params.state - state
+ * @param {number} params.index - data index
+ * @param {number} params.remainingFilesCount - remaining files count
+ * @param {string} params.pluginName - plugin name
+ */
 
-	/**
-	 * @description Called when the image is upload failed
-	 * @type {((params: {editor: SunEditor.Core, error: string, limitSize?: number, uploadSize?: number, currentSize?: number, file?: File}) => Promise<string | undefined>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {string} params.error - error message
-	 * @param {number=} params.limitSize - limit size
-	 * @param {number=} params.uploadSize - upload size
-	 * @param {number=} params.currentSize - current size
-	 * @param {File=} params.file - File object
-	 * @returns {Promise<string|undefined>}
-	 */
-	onImageUploadError: null,
+/**
+ * @callback onImageUploadError
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {string} params.error - error message
+ * @param {number=} params.limitSize - limit size
+ * @param {number=} params.uploadSize - upload size
+ * @param {number=} params.currentSize - current size
+ * @param {File=} params.file - File object
+ * @returns {Promise<string | undefined>}
+ */
 
-	/**
-	 * @description Called before the image is deleted
-	 * @type {((params: {editor: SunEditor.Core, element: HTMLElement, container: HTMLElement, align: string, alt: string, url: string | null}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {HTMLElement} params.element - target element
-	 * @param {HTMLElement} params.container - target's container element (div)
-	 * @param {string} params.align - align value
-	 * @param {string} params.alt - alt text value
-	 * @param {?string} params.url - Anchor url, if it exists
-	 * @returns {Promise<boolean>}
-	 */
-	onImageDeleteBefore: null,
+/**
+ * @callback onImageDeleteBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {HTMLElement} params.element - target element
+ * @param {HTMLElement} params.container - target's container element (div)
+ * @param {string} params.align - align value
+ * @param {string} params.alt - alt text value
+ * @param {?string} params.url - Anchor url, if it exists
+ * @returns {Promise<boolean>}
+ */
 
-	// --- video
-	/**
-	 * @description It replaces the default callback function of the video upload
-	 * @type {((params: {editor: SunEditor.Core, xmlHttp: XMLHttpRequest, info: VideoInfo}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
-	 * @param {VideoInfo} params.info - info object
-	 * @returns {Promise<boolean>}
-	 */
-	videoUploadHandler: null,
+/**
+ * @callback videoUploadHandler
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
+ * @param {VideoInfo} params.info - info object
+ * @returns {Promise<boolean>}
+ */
 
-	/**
-	 * @description Called before the video is uploaded
-	 * @type {((params: {editor: SunEditor.Core, info: VideoInfo, handler: (newInfo?: VideoInfo | null) => void}) => Promise<boolean | undefined | VideoInfo>) | null}
-	 * - If true is returned, the internal upload process runs normally.
-	 * - If false is returned, no video(iframe, video) upload is performed.
-	 * - If new "info" are returned, replaced the previous "params.info"
-	 * - If undefined is returned, it waits until "uploadHandler" is executed.
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {VideoInfo} params.info - info object
-	 * @param {(newInfo?: VideoInfo|null) => void} params.handler - handler function
-	 * @returns {Promise<boolean|undefined|VideoInfo>}
-	 */
-	onVideoUploadBefore: null,
+/**
+ * @callback onVideoUploadBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {VideoInfo} params.info - info object
+ * @param {(newInfo?: VideoInfo | null) => void} params.handler - handler function
+ * @returns {Promise<boolean | undefined | VideoInfo>}
+ */
 
-	/**
-	 * @description Called when the editor loaded, file Current editor value
-	 * @type {((params: {editor: SunEditor.Core}, infoList: Array<FileManagementInfo>) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {Array<FileManagementInfo>} infoList - info list
-	 */
-	onVideoLoad: null,
+/**
+ * @callback onVideoLoad
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {Array<FileManagementInfo>} infoList - info list
+ */
 
-	/**
-	 * @description Called when the video(iframe, video) is is uploaded, updated, deleted
-	 * @type {((params: {editor: SunEditor.Core, info: FileManagementInfo, element: HTMLElement | null, state: "create" | "update" | "delete", index: number, remainingFilesCount: number, pluginName: string}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {FileManagementInfo} params.info - info object
-	 * @param {HTMLElement|null} params.element - target element
-	 * @param {"create"|"update"|"delete"} params.state - state
-	 * @param {number} params.index - data index
-	 * @param {number} params.remainingFilesCount - remaining files count
-	 * @param {string} params.pluginName - plugin name
-	 */
-	onVideoAction: null,
+/**
+ * @callback onVideoAction
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {FileManagementInfo} params.info - info object
+ * @param {HTMLElement | null} params.element - target element
+ * @param {"create" | "update" | "delete"} params.state - state
+ * @param {number} params.index - data index
+ * @param {number} params.remainingFilesCount - remaining files count
+ * @param {string} params.pluginName - plugin name
+ */
 
-	/**
-	 * @description Called when the video(iframe, video) upload failed
-	 * @type {((params: {editor: SunEditor.Core, error: string, limitSize?: number, uploadSize?: number, currentSize?: number, file?: File}) => Promise<string | undefined>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {string} params.error - error message
-	 * @param {number=} params.limitSize - limit size
-	 * @param {number=} params.uploadSize - upload size
-	 * @param {number=} params.currentSize - current size
-	 * @param {File=} params.file - File object
-	 * @returns {Promise<string|undefined>}
-	 */
-	onVideoUploadError: null,
+/**
+ * @callback onVideoUploadError
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {string} params.error - error message
+ * @param {number=} params.limitSize - limit size
+ * @param {number=} params.uploadSize - upload size
+ * @param {number=} params.currentSize - current size
+ * @param {File=} params.file - File object
+ * @returns {Promise<string | undefined>}
+ */
 
-	/**
-	 * @description Called before the video is deleted
-	 * @type {((params: {editor: SunEditor.Core, element: HTMLElement, container: HTMLElement, align: string, url: string}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {HTMLElement} params.element - target element
-	 * @param {HTMLElement} params.container - target's container element (div)
-	 * @param {string} params.align - align value
-	 * @param {string} params.url - video url
-	 * @returns {Promise<boolean>}
-	 */
-	onVideoDeleteBefore: null,
+/**
+ * @callback onVideoDeleteBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {HTMLElement} params.element - target element
+ * @param {HTMLElement} params.container - target's container element (div)
+ * @param {string} params.align - align value
+ * @param {string} params.url - video url
+ * @returns {Promise<boolean>}
+ */
 
-	/**
-	 * @description It replaces the default callback function of the audio upload
-	 * @type {((params: {editor: SunEditor.Core, xmlHttp: XMLHttpRequest, info: AudioInfo}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
-	 * @param {AudioInfo} params.info - info object
-	 * @returns {Promise<boolean>}
-	 */
-	audioUploadHandler: null,
+/**
+ * @callback audioUploadHandler
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {XMLHttpRequest} params.xmlHttp - XMLHttpRequest
+ * @param {AudioInfo} params.info - info object
+ * @returns {Promise<boolean>}
+ */
 
-	// --- audio
-	/**
-	 * @description Called before the audio is uploaded
-	 * @type {((params: {editor: SunEditor.Core, info: AudioInfo, handler: (newInfo?: AudioInfo | null) => void}) => Promise<boolean | undefined | AudioInfo>) | null}
-	 * - If true is returned, the internal upload process runs normally.
-	 * - If false is returned, no audio upload is performed.
-	 * - If new "info" are returned, replaced the previous "params.info"
-	 * - If undefined is returned, it waits until "uploadHandler" is executed.
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {AudioInfo} params.info - info object
-	 * @param {(newInfo?: AudioInfo|null) => void} params.handler - handler function
-	 * @returns {Promise<boolean|undefined|AudioInfo>}
-	 */
-	onAudioUploadBefore: null,
+/**
+ * @callback onAudioUploadBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {AudioInfo} params.info - info object
+ * @param {(newInfo?: AudioInfo | null) => void} params.handler - handler function
+ * @returns {Promise<boolean | undefined | AudioInfo>}
+ */
 
-	/**
-	 * @description Called when the audio upload failed
-	 * @type {((params: {editor: SunEditor.Core, error: string, limitSize?: number, uploadSize?: number, currentSize?: number, file?: File}) => Promise<string | undefined>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {string} params.error - error message
-	 * @param {number=} params.limitSize - limit size
-	 * @param {number=} params.uploadSize - upload size
-	 * @param {number=} params.currentSize - current size
-	 * @param {File=} params.file - File object
-	 * @returns {Promise<string|undefined>}
-	 */
-	onAudioUploadError: null,
+/**
+ * @callback onAudioUploadError
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {string} params.error - error message
+ * @param {number=} params.limitSize - limit size
+ * @param {number=} params.uploadSize - upload size
+ * @param {number=} params.currentSize - current size
+ * @param {File=} params.file - File object
+ * @returns {Promise<string | undefined>}
+ */
 
-	/**
-	 * @description Called when the editor loaded, file Current editor value
-	 * @type {((params: {editor: SunEditor.Core}, infoList: Array<FileManagementInfo>) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {Array<FileManagementInfo>} infoList - info list
-	 */
-	onAudioLoad: null,
+/**
+ * @callback onAudioLoad
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {Array<FileManagementInfo>} infoList - info list
+ */
 
-	/**
-	 * @description Called when the audio is is uploaded, updated, deleted
-	 * @type {((params: {editor: SunEditor.Core, info: FileManagementInfo, element: HTMLElement | null, state: "create" | "update" | "delete", index: number, remainingFilesCount: number, pluginName: string}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {FileManagementInfo} params.info - info object
-	 * @param {HTMLElement|null} params.element - target element
-	 * @param {"create"|"update"|"delete"} params.state - state
-	 * @param {number} params.index - data index
-	 * @param {number} params.remainingFilesCount - remaining files count
-	 * @param {string} params.pluginName - plugin name
-	 */
-	onAudioAction: null,
+/**
+ * @callback onAudioAction
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {FileManagementInfo} params.info - info object
+ * @param {HTMLElement | null} params.element - target element
+ * @param {"create" | "update" | "delete"} params.state - state
+ * @param {number} params.index - data index
+ * @param {number} params.remainingFilesCount - remaining files count
+ * @param {string} params.pluginName - plugin name
+ */
 
-	/**
-	 * @description Called before the audio is deleted
-	 * @type {((params: {editor: SunEditor.Core, element: HTMLElement, container: HTMLElement, url: string}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {HTMLElement} params.element - target element
-	 * @param {HTMLElement} params.container - target's container element (div)
-	 * @param {string} params.url - audio url
-	 * @returns {Promise<boolean>}
-	 */
-	onAudioDeleteBefore: null,
+/**
+ * @callback onAudioDeleteBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {HTMLElement} params.element - target element
+ * @param {HTMLElement} params.container - target's container element (div)
+ * @param {string} params.url - audio url
+ * @returns {Promise<boolean>}
+ */
 
-	// --- fileUpload
-	/**
-	 * @description Called when the file is uploaded
-	 * @type {((params: {editor: SunEditor.Core, info: FileInfo, handler: (newInfo?: FileInfo | null) => void}) => Promise<boolean | undefined | FileInfo>) | null}
-	 * - If true is returned, the internal upload process runs normally.
-	 * - If false is returned, no image upload is performed.
-	 * - If new "info" are returned, replaced the previous "params.info"
-	 * - If undefined is returned, it waits until "uploadHandler" is executed.
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {FileInfo} params.info - info object
-	 * @param {(newInfo?: FileInfo|null) => void} params.handler - handler function
-	 * @returns {Promise<boolean|undefined|AudioInfo>}
-	 */
-	onFileUploadBefore: null,
+/**
+ * @callback onFileUploadBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {FileInfo} params.info - info object
+ * @param {(newInfo?: FileInfo | null) => void} params.handler - handler function
+ * @returns {Promise<boolean | undefined | FileInfo>}
+ */
 
-	/**
-	 * @description Called when the editor loaded, file Current editor value
-	 * @type {((params: {editor: SunEditor.Core}, infoList: Array<FileManagementInfo>) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {Array<FileManagementInfo>} infoList - info list
-	 */
-	onFileLoad: null,
+/**
+ * @callback onFileLoad
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {Array<FileManagementInfo>} infoList - info list
+ */
 
-	/**
-	 * @description Called when the file is is uploaded, updated, deleted
-	 * @type {((params: {editor: SunEditor.Core, info: FileManagementInfo, element: HTMLElement | null, state: "create" | "update" | "delete", index: number, remainingFilesCount: number, pluginName: string}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {FileManagementInfo} params.info - info object
-	 * @param {HTMLElement|null} params.element - target element
-	 * @param {"create"|"update"|"delete"} params.state - state
-	 * @param {number} params.index - data index
-	 * @param {number} params.remainingFilesCount - remaining files count
-	 * @param {string} params.pluginName - plugin name
-	 */
-	onFileAction: null,
+/**
+ * @callback onFileAction
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {FileManagementInfo} params.info - info object
+ * @param {HTMLElement | null} params.element - target element
+ * @param {"create" | "update" | "delete"} params.state - state
+ * @param {number} params.index - data index
+ * @param {number} params.remainingFilesCount - remaining files count
+ * @param {string} params.pluginName - plugin name
+ */
 
-	/**
-	 * @description Called when the file is upload failed
-	 * @type {((params: {editor: SunEditor.Core, error: string, limitSize?: number, uploadSize?: number, currentSize?: number, file?: File}) => Promise<string | undefined>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {string} params.error - error message
-	 * @param {number=} params.limitSize - limit size
-	 * @param {number=} params.uploadSize - upload size
-	 * @param {number=} params.currentSize - current size
-	 * @param {File=} params.file - File object
-	 * @returns {Promise<string|undefined>}
-	 */
-	onFileUploadError: null,
+/**
+ * @callback onFileUploadError
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {string} params.error - error message
+ * @param {number=} params.limitSize - limit size
+ * @param {number=} params.uploadSize - upload size
+ * @param {number=} params.currentSize - current size
+ * @param {File=} params.file - File object
+ * @returns {Promise<string | undefined>}
+ */
 
-	/**
-	 * @description Called before the file is deleted
-	 * @type {((params: {editor: SunEditor.Core, element: HTMLElement, container: HTMLElement, url: string}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {HTMLElement} params.element - target element
-	 * @param {HTMLElement} params.container - target's container element (div)
-	 * @param {string} params.url - file url
-	 * @returns {Promise<boolean>}
-	 */
-	onFileDeleteBefore: null,
+/**
+ * @callback onFileDeleteBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {HTMLElement} params.element - target element
+ * @param {HTMLElement} params.container - target's container element (div)
+ * @param {string} params.url - file url
+ * @returns {Promise<boolean>}
+ */
 
-	// --- exportPDF
-	/**
-	 * @description Called before the PDF export is started
-	 * @type {((params: {editor: SunEditor.Core, target: HTMLElement}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {HTMLElement} params.target - wysiwyg editable element
-	 * @returns {Promise<boolean>}
-	 */
-	onExportPDFBefore: null,
+/**
+ * @callback onExportPDFBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {HTMLElement} params.target - wysiwyg editable element
+ * @returns {Promise<boolean>}
+ */
 
-	// --- fileManager
-	/**
-	 * @description Events that occur when actions such as uploading or deleting all files are performed in the file manager
-	 * @type {((params: {editor: SunEditor.Core, info: FileManagementInfo, element: HTMLElement | null, state: "create" | "update" | "delete", index: number, remainingFilesCount: number, pluginName: string}) => void) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {FileManagementInfo} params.info - info object
-	 * @param {HTMLElement|null} params.element - target element
-	 * @param {"create"|"update"|"delete"} params.state - state
-	 * @param {number} params.index - data index
-	 * @param {number} params.remainingFilesCount - remaining files count
-	 * @param {string} params.pluginName - plugin name
-	 */
-	onFileManagerAction: null,
+/**
+ * @callback onFileManagerAction
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {FileManagementInfo} params.info - info object
+ * @param {HTMLElement | null} params.element - target element
+ * @param {"create" | "update" | "delete"} params.state - state
+ * @param {number} params.index - data index
+ * @param {number} params.remainingFilesCount - remaining files count
+ * @param {string} params.pluginName - plugin name
+ */
 
-	// --- embed
-	/**
-	 * @description Called before the embed is inserted
-	 * @type {((params: {editor: SunEditor.Core, info: EmbedInfo, handler: (newInfo?: EmbedInfo | null) => void}) => void) | null}
-	 * - If true is returned, the internal upload process runs normally.
-	 * - If false is returned, no image upload is performed.
-	 * - If new fileList are returned,  replaced the previous fileList
-	 * - If undefined is returned, it waits until "uploadHandler" is executed.
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {EmbedInfo} params.info - info object
-	 * @param {(newInfo?: EmbedInfo|null) => void} params.handler - handler function
-	 */
-	onEmbedInputBefore: null,
+/**
+ * @callback onEmbedInputBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {EmbedInfo} params.info - info object
+ * @param {(newInfo?: EmbedInfo | null) => void} params.handler - handler function
+ */
 
-	/**
-	 * @description Called before the embed is deleted
-	 * @type {((params: {editor: SunEditor.Core, element: HTMLElement, container: HTMLElement, align: string, url: string}) => Promise<boolean>) | null}
-	 * @param {Object} params
-	 * @param {SunEditor.Core} params.editor - The root editor instance
-	 * @param {HTMLElement} params.element - target element
-	 * @param {HTMLElement} params.container - target's container element (div)
-	 * @param {string} params.align - align value
-	 * @param {string} params.url - embed url
-	 * @returns {Promise<boolean>}
-	 */
-	onEmbedDeleteBefore: null
-};
+/**
+ * @callback onEmbedDeleteBefore
+ * @param {Object} params
+ * @param {SunEditor.Core} params.editor - The root editor instance
+ * @param {HTMLElement} params.element - target element
+ * @param {HTMLElement} params.container - target's container element (div)
+ * @param {string} params.align - align value
+ * @param {string} params.url - embed url
+ * @returns {Promise<boolean>}
+ */
+
+/**
+ * @typedef {Object} EventHandlers
+ * @property {onload | null} [onload]
+ * @property {onScroll | null} [onScroll]
+ * @property {onMouseDown | null} [onMouseDown]
+ * @property {onClick | null} [onClick]
+ * @property {onBeforeInput | null} [onBeforeInput]
+ * @property {onInput | null} [onInput]
+ * @property {onMouseLeave | null} [onMouseLeave]
+ * @property {onKeyDown | null} [onKeyDown]
+ * @property {onKeyUp | null} [onKeyUp]
+ * @property {onFocus | null} [onFocus]
+ * @property {onNativeFocus | null} [onNativeFocus]
+ * @property {onBlur | null} [onBlur]
+ * @property {onNativeBlur | null} [onNativeBlur]
+ * @property {onCopy | null} [onCopy]
+ * @property {onCut | null} [onCut]
+ * @property {onChange | null} [onChange]
+ * @property {onShowToolbar | null} [onShowToolbar]
+ * @property {onShowController | null} [onShowController]
+ * @property {onBeforeShowController | null} [onBeforeShowController]
+ * @property {onToggleCodeView | null} [onToggleCodeView]
+ * @property {onToggleFullScreen | null} [onToggleFullScreen]
+ * @property {onResizeEditor | null} [onResizeEditor]
+ * @property {onSetToolbarButtons | null} [onSetToolbarButtons]
+ * @property {onSave | null} [onSave]
+ * @property {onDrop | null} [onDrop]
+ * @property {onPaste | null} [onPaste]
+ * @property {imageUploadHandler | null} [imageUploadHandler]
+ * @property {onImageUploadBefore | null} [onImageUploadBefore]
+ * @property {onImageLoad | null} [onImageLoad]
+ * @property {onImageAction | null} [onImageAction]
+ * @property {onImageUploadError | null} [onImageUploadError]
+ * @property {onImageDeleteBefore | null} [onImageDeleteBefore]
+ * @property {videoUploadHandler | null} [videoUploadHandler]
+ * @property {onVideoUploadBefore | null} [onVideoUploadBefore]
+ * @property {onVideoLoad | null} [onVideoLoad]
+ * @property {onVideoAction | null} [onVideoAction]
+ * @property {onVideoUploadError | null} [onVideoUploadError]
+ * @property {onVideoDeleteBefore | null} [onVideoDeleteBefore]
+ * @property {audioUploadHandler | null} [audioUploadHandler]
+ * @property {onAudioUploadBefore | null} [onAudioUploadBefore]
+ * @property {onAudioUploadError | null} [onAudioUploadError]
+ * @property {onAudioLoad | null} [onAudioLoad]
+ * @property {onAudioAction | null} [onAudioAction]
+ * @property {onAudioDeleteBefore | null} [onAudioDeleteBefore]
+ * @property {onFileUploadBefore | null} [onFileUploadBefore]
+ * @property {onFileLoad | null} [onFileLoad]
+ * @property {onFileAction | null} [onFileAction]
+ * @property {onFileUploadError | null} [onFileUploadError]
+ * @property {onFileDeleteBefore | null} [onFileDeleteBefore]
+ * @property {onExportPDFBefore | null} [onExportPDFBefore]
+ * @property {onFileManagerAction | null} [onFileManagerAction]
+ * @property {onEmbedInputBefore | null} [onEmbedInputBefore]
+ * @property {onEmbedDeleteBefore | null} [onEmbedDeleteBefore]
+ */
+
+export {};

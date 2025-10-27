@@ -4,10 +4,6 @@ import { dom, numbers, env } from '../../helper';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
 /**
- * @typedef {import('../../events').AudioInfo} AudioInfo_audio
- */
-
-/**
  * @typedef {Object} AudioPluginOptions
  * @property {string} [defaultWidth="300px"] - The default width of the audio tag (e.g., "300px").
  * @property {string} [defaultHeight="150px"] - The default height of the audio tag (e.g., "150px").
@@ -442,7 +438,7 @@ class Audio_ extends EditorInjector {
 	/**
 	 * @description Registers uploaded audio files and creates the corresponding audio elements.
 	 * - Iterates through the uploaded files and inserts them into the editor.
-	 * @param {AudioInfo_audio} info - Upload metadata, including `isUpdate` flag and `element`.
+	 * @param {SunEditor.EventParams.AudioInfo} info - Upload metadata, including `isUpdate` flag and `element`.
 	 * @param {Object<string, *>} response - Server response containing uploaded file details.
 	 */
 	#register(info, response) {
@@ -490,7 +486,7 @@ class Audio_ extends EditorInjector {
 	/**
 	 * @description Uploads audio files to the server.
 	 * - Sends a request to the configured upload URL and processes the response.
-	 * @param {AudioInfo_audio} info - Upload metadata, including `files` and `isUpdate`.
+	 * @param {SunEditor.EventParams.AudioInfo} info - Upload metadata, including `files` and `isUpdate`.
 	 * @param {FileList|File[]} files - The files to be uploaded.
 	 */
 	#serverUpload(info, files) {
@@ -519,7 +515,7 @@ class Audio_ extends EditorInjector {
 	 * @description Handles the server response after a file upload.
 	 * - If the upload is successful, registers the uploaded audio.
 	 * - If an error occurs, triggers an error event.
-	 * @param {AudioInfo_audio} info - Upload metadata.
+	 * @param {SunEditor.EventParams.AudioInfo} info - Upload metadata.
 	 * @param {XMLHttpRequest} xmlHttp - The completed XHR request.
 	 */
 	async #UploadCallBack(info, xmlHttp) {

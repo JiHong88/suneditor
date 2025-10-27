@@ -6,7 +6,6 @@ import { UpdateStatusbarContext, FrameContextUtil } from './config/frameContext'
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, COPY_FORMAT, FONT_STYLE, PAGE_BREAK } from './base/actives';
 import History from './base/history';
 import EventManager from './event/eventManager';
-import Events from '../events';
 import DocumentType from './section/documentType';
 
 // util
@@ -140,7 +139,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Events object, call by triggerEvent function
-	 * @type {Partial<typeof import('../events.js').default>}
+	 * @type {SunEditor.EventHandlers}
 	 */
 	this.events = null;
 
@@ -1674,7 +1673,7 @@ Editor.prototype = {
 	 */
 	__registerClass() {
 		// use events
-		this.events = { ...Events, ...this.options.get('events') };
+		this.events = this.options.get('events') || {};
 		this.triggerEvent = async (eventName, eventData) => {
 			// [iframe] wysiwyg is disabled, the event is not called.
 			if (dom.check.isNonEditable(eventData?.frameContext?.get('wysiwyg'))) return false;

@@ -1,6 +1,5 @@
 import type {} from '../../typedef';
 export default Audio_;
-export type AudioInfo_audio = import('../../events').AudioInfo;
 export type AudioPluginOptions = {
 	/**
 	 * - The default width of the audio tag (e.g., "300px").
@@ -59,9 +58,6 @@ export type AudioPluginOptions = {
 	 */
 	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
 };
-/**
- * @typedef {import('../../events').AudioInfo} AudioInfo_audio
- */
 /**
  * @typedef {Object} AudioPluginOptions
  * @property {string} [defaultWidth="300px"] - The default width of the audio tag (e.g., "300px").

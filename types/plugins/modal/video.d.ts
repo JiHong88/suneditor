@@ -15,7 +15,6 @@ export type ModalReturns_video = {
 	revertBtn: HTMLButtonElement;
 	fileRemoveBtn: HTMLButtonElement;
 };
-export type VideoInfo_video = import('../../events').VideoInfo;
 export type VideoPluginOptions = {
 	/**
 	 * - Whether the video element can be resized.
@@ -134,9 +133,6 @@ export type VideoPluginOptions = {
 	 */
 	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
 };
-/**
- * @typedef {import('../../events').VideoInfo} VideoInfo_video
- */
 /**
  * @typedef {Object} VideoPluginOptions
  * @property {boolean} [canResize=true] - Whether the video element can be resized.

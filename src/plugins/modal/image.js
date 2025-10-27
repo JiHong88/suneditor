@@ -4,10 +4,6 @@ import { dom, numbers, env, keyCodeMap } from '../../helper';
 const { NO_EVENT } = env;
 
 /**
- * @typedef {import('../../events').ImageInfo} ImageInfo_image
- */
-
-/**
  * @typedef {Object} ImagePluginOptions
  * @property {boolean} [canResize=true] - Whether the image element can be resized.
  * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
@@ -912,7 +908,7 @@ class Image_ extends EditorInjector {
 
 	/**
 	 * @description Registers the uploaded image and inserts it into the editor.
-	 * @param {ImageInfo_image} info - Image info.
+	 * @param {SunEditor.EventParams.ImageInfo} info - Image info.
 	 * @param {Object<string, *>} response - Server response data.
 	 */
 	#register(info, response) {
@@ -935,7 +931,7 @@ class Image_ extends EditorInjector {
 
 	/**
 	 * @description Uploads the image to the server.
-	 * @param {ImageInfo_image} info - Image upload info.
+	 * @param {SunEditor.EventParams.ImageInfo} info - Image upload info.
 	 * @param {FileList} files - List of image files.
 	 */
 	#serverUpload(info, files) {
@@ -1069,7 +1065,7 @@ class Image_ extends EditorInjector {
 
 	/**
 	 * @description Handles the callback function for image upload completion.
-	 * @param {ImageInfo_image} info - Image information.
+	 * @param {SunEditor.EventParams.ImageInfo} info - Image information.
 	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
 	 */
 	async #UploadCallBack(info, xmlHttp) {

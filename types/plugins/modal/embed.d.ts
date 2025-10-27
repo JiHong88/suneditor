@@ -1,6 +1,5 @@
 import type {} from '../../typedef';
 export default Embed;
-export type ProcessInfo_embed = import('../../events').ProcessInfo;
 export type EmbedPluginOptions = {
 	/**
 	 * - Whether the embed element can be resized.
@@ -99,9 +98,6 @@ export type EmbedPluginOptions = {
 	 */
 	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
 };
-/**
- * @typedef {import('../../events').ProcessInfo} ProcessInfo_embed
- */
 /**
  * @typedef {Object} EmbedPluginOptions
  * @property {boolean} [canResize=true] - Whether the embed element can be resized.

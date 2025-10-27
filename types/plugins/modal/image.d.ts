@@ -19,7 +19,6 @@ export type ModalReturns_image = {
 	asInline: HTMLButtonElement;
 	fileRemoveBtn: HTMLButtonElement;
 };
-export type ImageInfo_image = import('../../events').ImageInfo;
 export type ImagePluginOptions = {
 	/**
 	 * - Whether the image element can be resized.
@@ -106,9 +105,6 @@ export type ImagePluginOptions = {
 	 */
 	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
 };
-/**
- * @typedef {import('../../events').ImageInfo} ImageInfo_image
- */
 /**
  * @typedef {Object} ImagePluginOptions
  * @property {boolean} [canResize=true] - Whether the image element can be resized.

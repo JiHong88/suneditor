@@ -4,10 +4,6 @@ import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
 const { _w, NO_EVENT } = env;
 
 /**
- * @typedef {import('../../events').VideoInfo} VideoInfo_video
- */
-
-/**
  * @typedef {Object} VideoPluginOptions
  * @property {boolean} [canResize=true] - Whether the video element can be resized.
  * @property {boolean} [showHeightInput=true] - Whether to display the height input field.
@@ -844,7 +840,7 @@ class Video extends EditorInjector {
 
 	/**
 	 * @description Registers the uploaded video in the editor.
-	 * @param {VideoInfo_video} info - Video information object.
+	 * @param {SunEditor.EventParams.VideoInfo} info - Video information object.
 	 * @param {Object<string, *>} response - Server response containing video data.
 	 */
 	#register(info, response) {
@@ -871,7 +867,7 @@ class Video extends EditorInjector {
 
 	/**
 	 * @description Uploads a video to the server using an external upload handler.
-	 * @param {VideoInfo_video} info - Video information object.
+	 * @param {SunEditor.EventParams.VideoInfo} info - Video information object.
 	 * @param {FileList} files - The video files to upload.
 	 */
 	#serverUpload(info, files) {
@@ -955,7 +951,7 @@ class Video extends EditorInjector {
 
 	/**
 	 * @description Handles the callback function for video upload completion.
-	 * @param {VideoInfo_video} info - Video information.
+	 * @param {SunEditor.EventParams.VideoInfo} info - Video information.
 	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
 	 */
 	async #UploadCallBack(info, xmlHttp) {

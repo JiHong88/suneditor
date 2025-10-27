@@ -374,7 +374,7 @@ export const DEFAULTS = {
  * ///
  *
  * === User Events ===
- * @property {Partial<typeof import('../../events.js').default>} [events] - User event handlers configuration
+ * @property {SunEditor.EventHandlers} [events] - User event handlers configuration
  * ///
  *
  * === [ Plugin-Specific Options ] ===
