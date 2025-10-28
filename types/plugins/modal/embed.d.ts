@@ -88,7 +88,7 @@ export type EmbedPluginOptions = {
 	/**
 	 * - Figure controls.
 	 */
-	controls?: import('../../modules/Figure').FigureControls;
+	controls?: SunEditor.Module.Figure.Controls;
 	/**
 	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -96,7 +96,7 @@ export type EmbedPluginOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
+	insertBehavior?: SunEditor.ComponentInsertType;
 };
 /**
  * @typedef {Object} EmbedPluginOptions
@@ -132,8 +132,8 @@ export type EmbedPluginOptions = {
  *   },
  *   // Additional services...
  * }
- * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -179,7 +179,7 @@ declare class Embed extends EditorInjector {
 		};
 		query_youtube: string;
 		query_vimeo: string;
-		insertBehavior: SunEditor.ComponentInsertBehaviorType;
+		insertBehavior: SunEditor.ComponentInsertType;
 	};
 	modal: Modal;
 	figure: Figure;

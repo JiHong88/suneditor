@@ -25,7 +25,7 @@ export function getPositionIndex(node) {
  * - e.g.) <p><span>aa</span><span>bb</span></p> : getNodePath(node: "bb", parentNode: "<P>") -> [1, 0]
  * @param {Node} node The Node to find position path
  * @param {?Node} parentNode Parent node. If null, wysiwyg div area
- * @param {?{s: number, e: number}=} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
+ * @param {?{s: number, e: number}} [_newOffsets] If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
  * "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".
  * Do not use unless absolutely necessary.
  * @returns {Array<number>}
@@ -242,7 +242,7 @@ export function sortNodeByDepth(array, des) {
  * @description Compares two elements to find a common ancestor, and returns the order of the two elements.
  * @param {Node} a Node to compare.
  * @param {Node} b Node to compare.
- * @returns {{ancestor: HTMLElement|null, a: Node, b: Node, result: number}} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
+ * @returns {{ancestor: ?HTMLElement, a: Node, b: Node, result: number}} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
  */
 export function compareElements(a, b) {
 	let aNode = a,
@@ -280,7 +280,7 @@ export function compareElements(a, b) {
  * @param {string|((current: *) => boolean)|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * - Not use it like jquery.
  * - Only one condition can be entered at a time.
- * @param {?number=} depth Number of parent levels to depth.
+ * @param {?number} [depth] Number of parent levels to depth.
  * @returns {T|null} Not found: null
  */
 export function getParentElement(element, query, depth) {
@@ -333,7 +333,7 @@ export function getParentElement(element, query, depth) {
  * @param {string|((current: *) => boolean)|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
- * @param {?number=} depth Number of parent levels to depth.
+ * @param {?number} [depth] Number of parent levels to depth.
  * @returns {Array<T>} Returned in an array in order.
  */
 export function getParentElements(element, query, depth) {
@@ -458,7 +458,7 @@ export function getEdgeChild(node, query, last) {
  * - 2. The last node of all the child nodes of the "last" element is returned.
  * - 3. When there is no "last" element, the first and last nodes of all the children of the "first" element are returned.
  * @param {Node} first First element
- * @param {Node|null} last Last element
+ * @param {?Node} last Last element
  * @returns {{sc: Node, ec: Node}} { sc: "first", ec: "last" }
  */
 export function getEdgeChildNodes(first, last) {
@@ -478,7 +478,7 @@ export function getEdgeChildNodes(first, last) {
  * @template {Node} T
  * @description Gets the previous sibling last child. If there is no sibling, then it'll take it from the closest ancestor with child
  * @param {Node} node Reference element
- * @param {?Node=} ceiling Highest boundary allowed
+ * @param {?Node} [ceiling] Highest boundary allowed
  * @returns {T|null} Not found: null
  */
 export function getPreviousDeepestNode(node, ceiling) {
@@ -505,7 +505,7 @@ export function getPreviousDeepestNode(node, ceiling) {
  * @template {Node} T
  * @description Gets the next sibling first child. If there is no sibling, then it'll take it from the closest ancestor with child
  * @param {Node} node Reference element
- * @param {?Node=} ceiling Highest boundary allowed
+ * @param {?Node} [ceiling] Highest boundary allowed
  * @returns {T|null} Not found: null
  */
 export function getNextDeepestNode(node, ceiling) {
@@ -533,7 +533,7 @@ export function getNextDeepestNode(node, ceiling) {
  * @param {Node} line Line element (p, div, etc.)
  * @param {Node} offsetContainer Base node to start searching
  * @param {number} offset Base offset to start searching
- * @param {?(current: *) => boolean=} validate Validation function
+ * @param {?(current: *) => boolean} [validate] Validation function
  * @returns {number}
  */
 export function findTextIndexOnLine(line, offsetContainer, offset, validate) {

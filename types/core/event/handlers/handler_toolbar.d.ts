@@ -24,8 +24,8 @@ export class ButtonsHandler {
 		target: HTMLInputElement;
 		value: string;
 	};
-	__inputBlurEvent: SunEditor.EventInfo;
-	__inputKeyEvent: SunEditor.EventInfo;
+	__inputBlurEvent: SunEditor.Event.Info;
+	__inputKeyEvent: SunEditor.Event.Info;
 }
 /**
  * @private

@@ -3,11 +3,17 @@ import { cleanRemovedTags, hardDelete, isUneditableNode, setDefaultLine } from '
 import { A } from '../actions';
 
 /**
+ * @typedef {import('../actions').Action[]} EventActions
+ * @typedef {import('../ports').EventReducerPorts} EventPorts
+ * @typedef {import('../reducers/keydown.reducer').KeydownReducerCtx} EventKeydownCtx
+ */
+
+/**
  * @this {void}
  * @description Backspace key down rule
- * @param {SunEditor.EventActions} actions - Action list
- * @param {SunEditor.EventPorts} ports - Ports for interacting with editor
- * @param {SunEditor.EventKeydownCtx} ctx - Context object
+ * @param {EventActions} actions - Action list
+ * @param {EventPorts} ports - Ports for interacting with editor
+ * @param {EventKeydownCtx} ctx - Context object
  * @returns {boolean} Return false to stop the processing
  */
 export function reduceBackspaceDown(actions, ports, ctx) {

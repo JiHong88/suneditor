@@ -3,13 +3,13 @@ import { env } from '../helper';
 
 /**
  * @typedef ApiManagerParams
- * @property {string=} method - HTTP method (GET, POST, PUT, DELETE...)
- * @property {string=} url - API's URL
- * @property {Object<string, string>=} headers - HTTP headers
- * @property {*=} data - API data
- * @property {(xmlHttp: XMLHttpRequest) => boolean=} callBack - API success callback
- * @property {(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack - API fail callback
- * @property {XMLHttpRequestResponseType=} responseType - XMLHttpRequest.responseType
+ * @property {string} [method] - HTTP method (GET, POST, PUT, DELETE...)
+ * @property {string} [url] - API's URL
+ * @property {Object<string, string>} [headers] - HTTP headers
+ * @property {*} [data] - API data
+ * @property {(xmlHttp: XMLHttpRequest) => boolean} [callBack] - API success callback
+ * @property {(res: *, xmlHttp: XMLHttpRequest) => string} [errorCallBack] - API fail callback
+ * @property {XMLHttpRequestResponseType} [responseType] - XMLHttpRequest.responseType
  */
 
 /**
@@ -23,7 +23,7 @@ class ApiManager extends CoreInjector {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
-	 * @param {ApiManagerParams=} params API options
+	 * @param {ApiManagerParams} [params] API options
 	 */
 	constructor(inst, params) {
 		super(inst.editor);
@@ -85,11 +85,11 @@ class ApiManager extends CoreInjector {
 	/**
 	 * @description Call Async API
 	 * @param {Object} params
-	 * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
-	 * @param {string=} params.url - API's URL
-	 * @param {Object<string, string>=} params.headers - HTTP headers
-	 * @param {*=} params.data - API data
-	 * @param {XMLHttpRequestResponseType=} params.responseType - XMLHttpRequest.responseType
+	 * @param {string} [params.method] - HTTP method (GET, POST, PUT, DELETE...)
+	 * @param {string} [params.url] - API's URL
+	 * @param {Object<string, string>} [params.headers] - HTTP headers
+	 * @param {*} [params.data] - API data
+	 * @param {XMLHttpRequestResponseType} [params.responseType] - XMLHttpRequest.responseType
 	 * @returns {Promise<XMLHttpRequest>}
 	 */
 	asyncCall({ method, url, headers, data, responseType }) {

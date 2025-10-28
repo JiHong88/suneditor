@@ -272,7 +272,7 @@ export function toFontUnit(to, size) {
 
 /**
  * @description Convert the node list to an array. If not, returns an empty array.
- * @param {?SunEditor.NodeCollection=} nodeList
+ * @param {?SunEditor.NodeCollection} [nodeList]
  * @returns Array
  */
 export function nodeListToArray(nodeList) {
@@ -356,7 +356,7 @@ export function rgb2hex(rgba) {
 /**
  * @description Computes the width as a percentage of the parent's width, and returns this value rounded to two decimal places.
  * @param {HTMLElement} target The target element for which to calculate the width percentage.
- * @param {?HTMLElement=} parentTarget The parent element to use as the reference for the width calculation. If not provided, the target's parent element is used.
+ * @param {?HTMLElement} [parentTarget] The parent element to use as the reference for the width calculation. If not provided, the target's parent element is used.
  * @returns {number}
  */
 export function getWidthInPercentage(target, parentTarget) {

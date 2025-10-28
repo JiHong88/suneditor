@@ -39,7 +39,7 @@ declare class Format {
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
 	 * @param {Node} node Reference node.
-	 * @param {((current: Node) => boolean)|null} [validation] Additional validation function.
+	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 */
 	getLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, node: Node, validation?: ((current: Node) => boolean) | null): HTMLElement | null;
@@ -53,7 +53,7 @@ declare class Format {
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a "brLine" (format.isBrLine), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {((current: Node) => boolean)|null} [validation] Additional validation function.
+	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLBRElement|null}
 	 */
 	getBrLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, validation?: ((current: Node) => boolean) | null): HTMLBRElement | null;
@@ -63,15 +63,15 @@ declare class Format {
 	 * - If the "lineNode" argument value is present, the tag of that argument value is inserted,
 	 * - If not, the currently selected format tag is inserted.
 	 * @param {Node} element Insert as siblings of that element
-	 * @param {string|Node|null} [lineNode] Node name or node obejct to be inserted
+	 * @param {?(string|Node)} [lineNode] Node name or node obejct to be inserted
 	 * @returns {HTMLElement}
 	 */
-	addLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, lineNode?: string | Node | null): HTMLElement;
+	addLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, lineNode?: (string | Node) | null): HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isBlock), it returns that node.
 	 * @param {Node} element Reference node.
-	 * @param {((current: Node) => boolean)|null} [validation] Additional validation function.
+	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 */
 	getBlock(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, validation?: ((current: Node) => boolean) | null): HTMLElement | null;
@@ -96,7 +96,7 @@ declare class Format {
 	 * @param {Node} [options.newBlockElement=null] The node(blockElement) to replace the currently wrapped node.
 	 * @param {boolean} [options.shouldDelete=false] If true, deleted without detached.
 	 * @param {boolean} [options.skipHistory=false] When true, it does not update the history stack and the selection object and return EdgeNodes (dom-query-GetEdgeChildNodes)
-	 * @returns {{cc: Node, sc: Node, so: number, ec: Node, eo: number, removeArray: Array<Node>|null}} Node information after deletion
+	 * @returns {{cc: Node, sc: Node, so: number, ec: Node, eo: number, removeArray: ?Array<Node>}} Node information after deletion
 	 * - cc: Common parent container node
 	 * - sc: Start container node
 	 * - so: Start offset
@@ -230,7 +230,7 @@ declare class Format {
 	/**
 	 * @this {FormatThis}
 	 * @description Returns a "line" array from selected range.
-	 * @param {((current: Node) => boolean)|null} [validation] The validation function. (Replaces the default validation format.isLine(current))
+	 * @param {?(current: Node) => boolean} [validation] The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array<HTMLElement>}
 	 */
 	getLines(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, validation?: ((current: Node) => boolean) | null): Array<HTMLElement>;

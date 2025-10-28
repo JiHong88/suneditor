@@ -64,9 +64,9 @@ declare class HR extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	shortcut({ line, range }: SunEditor.PluginShortcutInfo): void;
+	shortcut({ line, range }: SunEditor.Plugin.ShortcutInfo): void;
 	/**
 	 * @description Add a hr element
 	 * @param {string} className HR class name

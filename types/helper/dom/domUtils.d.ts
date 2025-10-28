@@ -11,18 +11,16 @@ export function clone<T extends Node>(node: T, deep?: boolean): T;
  * @template {HTMLElement} T
  * @description Create Element node
  * @param {string} elementName Element name
- * @param {?Object<string, string>=} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
- * @param {?string|Node=} inner A innerHTML string or inner node.
+ * @param {?Object<string, string>} [attributes] The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
+ * @param {?string|Node} [inner] A innerHTML string or inner node.
  * @returns {T}
  */
 export function createElement<T extends HTMLElement>(
 	elementName: string,
-	attributes?:
-		| ({
-				[x: string]: string;
-		  } | null)
-		| undefined,
-	inner?: ((string | Node) | null) | undefined,
+	attributes?: {
+		[x: string]: string;
+	} | null,
+	inner?: (string | Node) | null,
 ): T;
 /**
  * @description Create text node
@@ -33,7 +31,7 @@ export function createTextNode(text: string): Text;
 /**
  * @description Get attributes of argument element to string ('class="---" name="---" ')
  * @param {Node} element Element object
- * @param {Array<string>|null} exceptAttrs Array of attribute names to exclude from the result
+ * @param {?Array<string>} exceptAttrs Array of attribute names to exclude from the result
  * @returns {string}
  */
 export function getAttributesToString(element: Node, exceptAttrs: Array<string> | null): string;
@@ -83,9 +81,9 @@ export function prevIndex(array: SunEditor.NodeCollection, item: Node): number;
  * @description Add style and className of copyEl to originEl
  * @param {Node} originEl Origin element
  * @param {Node} copyEl Element to copy
- * @param {?Array<string>=} blacklist Blacklist array(LowerCase)
+ * @param {?Array<string>} [blacklist] Blacklist array(LowerCase)
  */
-export function copyTagAttributes(originEl: Node, copyEl: Node, blacklist?: (Array<string> | null) | undefined): void;
+export function copyTagAttributes(originEl: Node, copyEl: Node, blacklist?: Array<string> | null): void;
 /**
  * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
  * @param {Node} originEl Origin element

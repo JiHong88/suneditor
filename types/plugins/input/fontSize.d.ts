@@ -129,12 +129,12 @@ declare class FontSize extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
-	 * @param {?HTMLElement=} target - The plugin's toolbar button element
+	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
+	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
-	active(element?: (HTMLElement | null) | undefined, target?: (HTMLElement | null) | undefined): boolean;
+	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean;
 	/**
 	 * @editorMethod Editor.Toolbar
 	 * @description Executes the event function of toolbar's input tag - "keydown".
@@ -146,9 +146,9 @@ declare class FontSize extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Toolbar
 	 * @description Executes the event function of toolbar's input tag - "change".
-	 * @param {SunEditor.PluginToolbarInputChangeEventInfo} params
+	 * @param {SunEditor.Plugin.ToolbarInputChangeEventInfo} params
 	 */
-	onInputChange({ target, value: changeValue, event }: SunEditor.PluginToolbarInputChangeEventInfo): void;
+	onInputChange({ target, value: changeValue, event }: SunEditor.Plugin.ToolbarInputChangeEventInfo): void;
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.

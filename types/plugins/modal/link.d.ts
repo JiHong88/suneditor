@@ -94,7 +94,11 @@ declare class Link extends EditorInjector {
 		/**
 		 * - Default "rel" attributes of anchor tag.
 		 */
-		defaultRel?: import('../../modules/ModalAnchorEditor').RELAttr;
+		defaultRel?: {
+			default?: string;
+			check_new_window?: string;
+			check_bookmark?: string;
+		};
 	};
 	anchor: ModalAnchorEditor;
 	modal: Modal;
@@ -102,11 +106,11 @@ declare class Link extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
 	 * @returns {boolean} - Whether the plugin is active
 	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
-	active(element?: (HTMLElement | null) | undefined): boolean;
+	active(element?: HTMLElement | null): boolean;
 	/**
 	 * @editorMethod Modules.Modal
 	 * @description Executes the method that is called when a "Modal" module's is opened.

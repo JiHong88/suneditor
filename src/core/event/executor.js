@@ -4,8 +4,12 @@ import keydown from './effects/keydown.registry';
 const HALT = 'action.stop';
 
 /**
+ * @typedef {import('./actions').Action[]} EventActions
+ */
+
+/**
  * @description Execute actions sequentially
- * @param {SunEditor.EventActions} actions - Array of actions to execute
+ * @param {EventActions} actions - Array of actions to execute
  * @param {*} effContext - Effect context containing ports, ctx, and event
  */
 export async function actionExecutor(actions, effContext) {

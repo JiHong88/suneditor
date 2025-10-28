@@ -4,45 +4,43 @@ export type ApiManagerParams = {
 	/**
 	 * - HTTP method (GET, POST, PUT, DELETE...)
 	 */
-	method?: string | undefined;
+	method?: string;
 	/**
 	 * - API's URL
 	 */
-	url?: string | undefined;
+	url?: string;
 	/**
 	 * - HTTP headers
 	 */
-	headers?:
-		| {
-				[x: string]: string;
-		  }
-		| undefined;
+	headers?: {
+		[x: string]: string;
+	};
 	/**
 	 * - API data
 	 */
-	data?: any | undefined;
+	data?: any;
 	/**
 	 * - API success callback
 	 */
-	callBack?: ((xmlHttp: XMLHttpRequest) => boolean) | undefined;
+	callBack?: (xmlHttp: XMLHttpRequest) => boolean;
 	/**
 	 * - API fail callback
 	 */
-	errorCallBack?: ((res: any, xmlHttp: XMLHttpRequest) => string) | undefined;
+	errorCallBack?: (res: any, xmlHttp: XMLHttpRequest) => string;
 	/**
 	 * - XMLHttpRequest.responseType
 	 */
-	responseType?: XMLHttpRequestResponseType | undefined;
+	responseType?: XMLHttpRequestResponseType;
 };
 /**
  * @typedef ApiManagerParams
- * @property {string=} method - HTTP method (GET, POST, PUT, DELETE...)
- * @property {string=} url - API's URL
- * @property {Object<string, string>=} headers - HTTP headers
- * @property {*=} data - API data
- * @property {(xmlHttp: XMLHttpRequest) => boolean=} callBack - API success callback
- * @property {(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack - API fail callback
- * @property {XMLHttpRequestResponseType=} responseType - XMLHttpRequest.responseType
+ * @property {string} [method] - HTTP method (GET, POST, PUT, DELETE...)
+ * @property {string} [url] - API's URL
+ * @property {Object<string, string>} [headers] - HTTP headers
+ * @property {*} [data] - API data
+ * @property {(xmlHttp: XMLHttpRequest) => boolean} [callBack] - API success callback
+ * @property {(res: *, xmlHttp: XMLHttpRequest) => string} [errorCallBack] - API fail callback
+ * @property {XMLHttpRequestResponseType} [responseType] - XMLHttpRequest.responseType
  */
 /**
  * @class
@@ -52,9 +50,9 @@ declare class ApiManager extends CoreInjector {
 	/**
 	 * @constructor
 	 * @param {*} inst The instance object that called the constructor.
-	 * @param {ApiManagerParams=} params API options
+	 * @param {ApiManagerParams} [params] API options
 	 */
-	constructor(inst: any, params?: ApiManagerParams | undefined);
+	constructor(inst: any, params?: ApiManagerParams);
 	ui: import('../core/class/ui').default;
 	/**
 	 * @description Caller instance key name
@@ -78,11 +76,11 @@ declare class ApiManager extends CoreInjector {
 	/**
 	 * @description Call Async API
 	 * @param {Object} params
-	 * @param {string=} params.method - HTTP method (GET, POST, PUT, DELETE...)
-	 * @param {string=} params.url - API's URL
-	 * @param {Object<string, string>=} params.headers - HTTP headers
-	 * @param {*=} params.data - API data
-	 * @param {XMLHttpRequestResponseType=} params.responseType - XMLHttpRequest.responseType
+	 * @param {string} [params.method] - HTTP method (GET, POST, PUT, DELETE...)
+	 * @param {string} [params.url] - API's URL
+	 * @param {Object<string, string>} [params.headers] - HTTP headers
+	 * @param {*} [params.data] - API data
+	 * @param {XMLHttpRequestResponseType} [params.responseType] - XMLHttpRequest.responseType
 	 * @returns {Promise<XMLHttpRequest>}
 	 */
 	asyncCall({
@@ -92,15 +90,13 @@ declare class ApiManager extends CoreInjector {
 		data,
 		responseType,
 	}: {
-		method?: string | undefined;
-		url?: string | undefined;
-		headers?:
-			| {
-					[x: string]: string;
-			  }
-			| undefined;
-		data?: any | undefined;
-		responseType?: XMLHttpRequestResponseType | undefined;
+		method?: string;
+		url?: string;
+		headers?: {
+			[x: string]: string;
+		};
+		data?: any;
+		responseType?: XMLHttpRequestResponseType;
 	}): Promise<XMLHttpRequest>;
 	/**
 	 * @description Cancel API (xhr.abort())

@@ -37,8 +37,8 @@ const { _w, NO_EVENT } = env;
  *   },
  *   // Additional services...
  * }
- * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.

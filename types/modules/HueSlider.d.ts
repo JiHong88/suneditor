@@ -1,6 +1,8 @@
 import type {} from '../typedef';
 export default HueSlider;
-export type ControllerParams_hueSlider = import('../modules/Controller').ControllerParams;
+/**
+ * HueSlider color information object
+ */
 export type HueSliderColor = {
 	/**
 	 * - HEX color
@@ -43,7 +45,7 @@ export type HueSliderParams = {
 	/**
 	 * Controller options
 	 */
-	controllerOptions?: ControllerParams_hueSlider;
+	controllerOptions?: import('../modules/Controller').ControllerParams;
 };
 export function CreateSliderCtx(): {
 	slider: HTMLElement;
@@ -58,9 +60,7 @@ export function CreateSliderCtx(): {
 	fanalColorBackground: HTMLElement;
 };
 /**
- * @typedef {import('../modules/Controller').ControllerParams} ControllerParams_hueSlider
- */
-/**
+ * HueSlider color information object
  * @typedef {Object} HueSliderColor
  * @property {string} hex - HEX color
  * @property {number} r - Red color value
@@ -74,7 +74,7 @@ export function CreateSliderCtx(): {
  * @typedef {Object} HueSliderParams
  * @property {Node} [form] The form element to attach the hue slider.
  * @property {boolean} [isNewForm] Whether to create a new form element.
- * @property {ControllerParams_hueSlider} [controllerOptions] Controller options
+ * @property {import('../modules/Controller').ControllerParams} [controllerOptions] Controller options
  */
 /**
  * @class
@@ -133,9 +133,9 @@ declare class HueSlider extends CoreInjector {
 	close(): void;
 	/**
 	 * @description Attach the hue slider to the form element.
-	 * @param {?Node=} form The element to attach the hue slider.
+	 * @param {?Node} [form] The element to attach the hue slider.
 	 */
-	attach(form?: (Node | null) | undefined): void;
+	attach(form?: Node | null): void;
 	/**
 	 * @description Initialize the hue slider information.
 	 */

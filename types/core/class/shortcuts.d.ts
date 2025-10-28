@@ -29,15 +29,15 @@ export type ShortcutInfo = {
 	/**
 	 * - The key pressed (e.g., "1.").
 	 */
-	key?: string | undefined;
+	key?: string;
 	/**
 	 * - The keyEvent.code.
 	 */
-	keyCode?: string | undefined;
+	keyCode?: string;
 	/**
 	 * - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
 	 */
-	method?: (string | ((...args: any) => any)) | undefined;
+	method?: string | ((...args: any) => any);
 	/**
 	 * - The plugin name.
 	 */
@@ -70,9 +70,9 @@ export type ShortcutInfo = {
  * @property {boolean} enter - Whether the Enter key is pressed.
  * @property {string} command - The command key. (e.g. "bold")
  * @property {boolean} edge - Whether the cursor is at the end of the line.
- * @property {string=} key - The key pressed (e.g., "1.").
- * @property {string=} keyCode - The keyEvent.code.
- * @property {string|((...args: *) => *)=} method - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
+ * @property {string} [key] - The key pressed (e.g., "1.").
+ * @property {string} [keyCode] - The keyEvent.code.
+ * @property {string|((...args: *) => *)} [method] - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
  * @property {string} plugin - The plugin name.
  * @property {string} type - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
  * @property {Node} button - The plugin command button.
@@ -98,9 +98,9 @@ declare class Shortcuts {
 	 * @property {boolean} enter - Whether the Enter key is pressed.
 	 * @property {string} command - The command key. (e.g. "bold")
 	 * @property {boolean} edge - Whether the cursor is at the end of the line.
-	 * @property {string=} key - The key pressed (e.g., "1.").
-	 * @property {string=} keyCode - The keyEvent.code.
-	 * @property {string|((...args: *) => *)=} method - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
+	 * @property {string} [key] - The key pressed (e.g., "1.").
+	 * @property {string} [keyCode] - The keyEvent.code.
+	 * @property {string|((...args: *) => *)} [method] - A plugin's "shortcut" method that is called instead of the default "editor.run" method.
 	 * @property {string} plugin - The plugin name.
 	 * @property {string} type - Plugin's type. ("command", "dropdown", "modal", "browser", "input", "field", "popup").
 	 * @property {Node} button - The plugin command button.

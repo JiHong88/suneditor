@@ -10,6 +10,10 @@ import { A } from '../actions';
 const { isOSX_IOS } = env;
 
 /**
+ * @typedef {import('../ports').EventReducerPorts} EventPorts
+ */
+
+/**
  * @typedef {Object} KeydownReducerCtx - Keydown Reducer Context object
  * @property {KeyboardEvent} ctx.e - The keyboard event
  * @property {SunEditor.FrameContext} ctx.fc - Frame context object
@@ -26,10 +30,14 @@ const { isOSX_IOS } = env;
  */
 
 /**
+ * @typedef {import('../actions').Action[]} EventActions
+ */
+
+/**
  * @description Keydown event reducer
- * @param {SunEditor.EventPorts} ports - Ports for interacting with editor
+ * @param {EventPorts} ports - Ports for interacting with editor
  * @param {KeydownReducerCtx} ctx - Context object
- * @returns {Promise<SunEditor.EventActions>} Action list
+ * @returns {Promise<EventActions>} Action list
  */
 export async function reduceKeydown(ports, ctx) {
 	const actions = [];

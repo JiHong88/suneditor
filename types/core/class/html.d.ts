@@ -107,9 +107,9 @@ declare class HTML {
 	 * @param {string} html HTML string to clean and compress
 	 * @param {Object} [options] Cleaning options
 	 * @param {boolean} [options.forceFormat=false] If true, wraps text nodes without a format node in the format tag.
-	 * @param {string|RegExp|null} [options.whitelist=null] Regular expression of allowed tags.
+	 * @param {?(string|RegExp)} [options.whitelist] Regular expression of allowed tags.
 	 * Create RegExp object using helper.converter.createElementWhitelist method.
-	 * @param {string|RegExp|null} [options.blacklist=null] Regular expression of disallowed tags.
+	 * @param {?(string|RegExp)} [options.blacklist] Regular expression of disallowed tags.
 	 * Create RegExp object using helper.converter.createElementBlacklist method.
 	 * @param {boolean} [options._freeCodeViewMode=false] If true, the free code view mode is enabled.
 	 * @returns {string} Cleaned and compressed HTML string
@@ -135,8 +135,8 @@ declare class HTML {
 			_freeCodeViewMode,
 		}?: {
 			forceFormat?: boolean;
-			whitelist?: string | RegExp | null;
-			blacklist?: string | RegExp | null;
+			whitelist?: (string | RegExp) | null;
+			blacklist?: (string | RegExp) | null;
 			_freeCodeViewMode?: boolean;
 		},
 	): string;
@@ -211,7 +211,7 @@ declare class HTML {
 	/**
 	 * @this {HTMLThis}
 	 * @description Delete the selected range.
-	 * @returns {{container: Node, offset: number, commonCon?: Node|null, prevContainer?: Node|null}}
+	 * @returns {{container: Node, offset: number, commonCon?: ?Node, prevContainer?: ?Node}}
 	 * - container: "the last element after deletion"
 	 * - offset: "offset"
 	 * - commonCon: "commonAncestorContainer"
@@ -451,7 +451,7 @@ declare class HTML {
 	 * @description Cleans the inline style attributes of an HTML element.
 	 * - Extracts allowed styles and removes disallowed ones based on editor settings.
 	 * @param {string} m The full matched string from a regular expression.
-	 * @param {Array|null} v The list of allowed attributes.
+	 * @param {?Array} v The list of allowed attributes.
 	 * @param {string} name The tag name of the element being cleaned.
 	 * @returns {Array} The updated list of allowed attributes including cleaned styles.
 	 */

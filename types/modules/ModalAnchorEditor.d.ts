@@ -1,10 +1,5 @@
 import type {} from '../typedef';
 export default ModalAnchorEditor;
-export type RELAttr = {
-	default?: string;
-	check_new_window?: string;
-	check_bookmark?: string;
-};
 export type ModalAnchorEditorParams = {
 	/**
 	 * - Modal title display.
@@ -29,39 +24,38 @@ export type ModalAnchorEditorParams = {
 	/**
 	 * - Default "rel" attributes of anchor tag.
 	 */
-	defaultRel?: RELAttr;
+	defaultRel?: {
+		default?: string;
+		check_new_window?: string;
+		check_bookmark?: string;
+	};
 	/**
 	 * - File upload URL.
 	 */
-	uploadUrl?: string | undefined;
+	uploadUrl?: string;
 	/**
 	 * - File upload headers.
 	 */
-	uploadHeaders?:
-		| {
-				[x: string]: string;
-		  }
-		| undefined;
+	uploadHeaders?: {
+		[x: string]: string;
+	};
 	/**
 	 * - File upload size limit.
 	 */
-	uploadSizeLimit?: number | undefined;
+	uploadSizeLimit?: number;
 	/**
 	 * - File upload single size limit.
 	 */
-	uploadSingleSizeLimit?: number | undefined;
+	uploadSingleSizeLimit?: number;
 	/**
 	 * - File upload accepted formats.
 	 */
-	acceptedFormats?: string | undefined;
+	acceptedFormats?: string;
 	/**
 	 * - If true, enables file upload.
 	 */
-	enableFileUpload?: boolean | undefined;
+	enableFileUpload?: boolean;
 };
-/**
- * @typedef {{default?: string, check_new_window?: string, check_bookmark?: string}} RELAttr
- */
 /**
  * @typedef {Object} ModalAnchorEditorParams
  * @property {boolean} [title=false] - Modal title display.
@@ -69,20 +63,13 @@ export type ModalAnchorEditorParams = {
  * @property {boolean} [openNewWindow=false] - Default checked value of the "Open in new window" checkbox.
  * @property {boolean} [noAutoPrefix=false] - If true, disables the automatic prefixing of the host URL to the value of the link.
  * @property {Array<string>} [relList=[]] - The "rel" attribute list of anchor tag.
- * @property {RELAttr} [defaultRel={}] - Default "rel" attributes of anchor tag.
- * @property {string=} uploadUrl - File upload URL.
- * @property {Object<string, string>=} uploadHeaders - File upload headers.
- * @property {number=} uploadSizeLimit - File upload size limit.
- * @property {number=} uploadSingleSizeLimit - File upload single size limit.
- * @property {string=} acceptedFormats - File upload accepted formats.
- * @property {boolean=} enableFileUpload - If true, enables file upload.
- * @example "REL" structure
-    {
-        default: 'nofollow', // Default rel
-        check_new_window: 'noreferrer noopener', // When "open new window" is checked
-        check_bookmark: 'bookmark' // When "bookmark" is checked
-    }
-    If true, disables the automatic prefixing of the host URL to the value of the link.
+ * @property {{default?: string, check_new_window?: string, check_bookmark?: string}} [defaultRel={}] - Default "rel" attributes of anchor tag.
+ * @property {string} [uploadUrl] - File upload URL.
+ * @property {Object<string, string>} [uploadHeaders] - File upload headers.
+ * @property {number} [uploadSizeLimit] - File upload size limit.
+ * @property {number} [uploadSingleSizeLimit] - File upload single size limit.
+ * @property {string} [acceptedFormats] - File upload accepted formats.
+ * @property {boolean} [enableFileUpload] - If true, enables file upload.
  */
 /**
  * @class
@@ -101,7 +88,11 @@ declare class ModalAnchorEditor extends CoreInjector {
 	ui: import('../core/class/ui').default;
 	openNewWindow: boolean;
 	relList: string[];
-	defaultRel: RELAttr;
+	defaultRel: {
+		default?: string;
+		check_new_window?: string;
+		check_bookmark?: string;
+	};
 	noAutoPrefix: boolean;
 	uploadUrl: string;
 	uploadHeaders: {

@@ -2,20 +2,20 @@ import type {} from '../../typedef';
 export default Inline;
 export type InlineThis = Omit<Inline & Partial<SunEditor.Injector>, 'inline'>;
 export type NodeStyleContainerType = {
-	ancestor?: (Node | null) | undefined;
-	offset?: (number | null) | undefined;
-	container?: (Node | null) | undefined;
-	endContainer?: (Node | null) | undefined;
+	ancestor?: Node | null;
+	offset?: number | null;
+	container?: Node | null;
+	endContainer?: Node | null;
 };
 /**
  * @typedef {Omit<Inline & Partial<SunEditor.Injector>, 'inline'>} InlineThis
  */
 /**
  * @typedef {Object} NodeStyleContainerType
- * @property {?Node=} ancestor
- * @property {?number=} offset
- * @property {?Node=} container
- * @property {?Node=} endContainer
+ * @property {?Node} [ancestor]
+ * @property {?number} [offset]
+ * @property {?Node} [container]
+ * @property {?Node} [endContainer]
  */
 /**
  * @constructor
@@ -30,10 +30,10 @@ declare class Inline {
 	 */
 	/**
 	 * @typedef {Object} NodeStyleContainerType
-	 * @property {?Node=} ancestor
-	 * @property {?number=} offset
-	 * @property {?Node=} container
-	 * @property {?Node=} endContainer
+	 * @property {?Node} [ancestor]
+	 * @property {?number} [offset]
+	 * @property {?Node} [container]
+	 * @property {?Node} [endContainer]
 	 */
 	/**
 	 * @constructor
@@ -58,7 +58,7 @@ declare class Inline {
 	 * - 9. If strictRemove is true, nodes in nodesToRemove are only removed if all their styles and classes are removed.
 	 * - 10. The function won't modify nodes if the parent has the same class and style values.
 	 * - However, if nodesToRemove has values, it will work and separate text nodes even if there's no node to replace.
-	 * @param {Node|null} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
+	 * @param {?Node} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
 	 * @param {Object} [options] Options
 	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
 	 *        (e.g., ['font-size'], ['.className'], ['font-family', 'color', '.className'])
@@ -273,7 +273,7 @@ declare class Inline {
 	 * @this {InlineThis}
 	 * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
 	 * @param {Node} el List cell element. <li>
-	 * @param {Node|null} child Variable for recursive call. ("null" on the first call)
+	 * @param {?Node} child Variable for recursive call. ("null" on the first call)
 	 */
 	_sn_setCommonListStyle(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, el: Node, child: Node | null): void;
 	/**
@@ -281,7 +281,7 @@ declare class Inline {
 	 * @this {InlineThis}
 	 * @description Watch the applied text nodes and adjust the common styles of the list.
 	 * @param {Node} el "LI" element
-	 * @param {Array|null} styleArray Refer style array
+	 * @param {?Array} styleArray Refer style array
 	 */
 	_sn_resetCommonListCell(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, el: Node, styleArray: any[] | null): boolean;
 }

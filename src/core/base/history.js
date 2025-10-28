@@ -216,7 +216,7 @@ export default function History(editor) {
 		 * - If the function is called again with the "delay" argument true before it is saved, the delay time is renewed.
 		 * - You can specify the delay time by sending a number.
 		 * @param {boolean|number} delay If true, add stack without delay time.
-		 * @param {*=} [rootKey] The key of the root frame to save history for.
+		 * @param {*} [rootKey] The key of the root frame to save history for.
 		 */
 		push(delay, rootKey) {
 			if (waiting) return;
@@ -275,7 +275,7 @@ export default function History(editor) {
 
 		/**
 		 * @description Overwrites the current state in the history stack with the latest content.
-		 * @param {string=} [rootKey] The key of the root frame to overwrite.
+		 * @param {string} [rootKey] The key of the root frame to overwrite.
 		 */
 		overwrite(rootKey) {
 			setStack(frameRoots.get(rootKey || editor.status.rootKey).get('wysiwyg').innerHTML, null, editor.status.rootKey, 0);

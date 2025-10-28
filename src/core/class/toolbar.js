@@ -323,7 +323,7 @@ Toolbar.prototype = {
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Show the balloon toolbar based on the current selection.
-	 * @param {Range|null} [rangeObj] - Selection range
+	 * @param {?Range} [rangeObj] - Selection range
 	 */
 	_showBalloon(rangeObj) {
 		if (!this._isBalloon) {

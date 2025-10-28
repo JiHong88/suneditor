@@ -11,10 +11,6 @@ const { _w, isTouchDevice } = env;
  */
 
 /**
- * @typedef {import('./offset').RectsInfo} RectsInfo_selection
- */
-
-/**
  * @constructor
  * @this {SelectionThis}
  * @description Selection, Range related class
@@ -232,7 +228,7 @@ Selection_.prototype = {
 	 * @this {SelectionThis}
 	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
 	 * @param {Range} range core.getRange()
-	 * @param {Node|null} [container] If there is "container" argument, it creates a line in front of the container.
+	 * @param {?Node} [container] If there is "container" argument, it creates a line in front of the container.
 	 * @returns {Range} a new "range" or argument "range".
 	 */
 	getRangeAndAddLine(range, container) {
@@ -268,9 +264,9 @@ Selection_.prototype = {
 	/**
 	 * @this {SelectionThis}
 	 * @description Get the Rects object.
-	 * @param {Range|Node|null} target Range | Node | null
+	 * @param {?(Range|Node)} target Range | Node | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
-	 * @returns {{rects: RectsInfo_selection, position: "start"|"end", scrollLeft: number, scrollTop: number}}
+	 * @returns {{rects: import('./offset').RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 * @example
 	 * // Get rects at start of selection
 	 * const { rects, position, scrollLeft, scrollTop } = editor.selection.getRects(null, 'start');

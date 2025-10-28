@@ -224,7 +224,7 @@ export const DEFAULTS = {
  * === Plugins & Toolbar ===
  * @property {Object<string, *>|Array<Object<string, *>>} [plugins] - Plugin configuration.
  * @property {Array<string>} [excludedPlugins=[]] - Plugin configuration.
- * @property {SunEditor.ButtonList} [buttonList=CONSTANTS.BUTTON_LIST] - List of toolbar buttons, grouped by sub-arrays.
+ * @property {SunEditor.UI.ButtonList} [buttonList=CONSTANTS.BUTTON_LIST] - List of toolbar buttons, grouped by sub-arrays.
  * - The default follows {@link DEFAULTS.BUTTON_LIST}
  * ///
  *
@@ -337,7 +337,7 @@ export const DEFAULTS = {
  * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
  * @property {Object} [subToolbar={}] - Sub-toolbar configuration.
- * @property {SunEditor.ButtonList} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
+ * @property {SunEditor.UI.ButtonList} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
  * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
  * @property {number|string} [subToolbar.width="auto"] - Sub-toolbar width.
  * @property {Element|string} [statusbar_container] - Container element for the status bar.
@@ -356,7 +356,7 @@ export const DEFAULTS = {
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
  * @property {string} [previewTemplate=null] - Custom template for preview mode.
  * @property {string} [printTemplate=null] - Custom template for print mode.
- * @property {SunEditor.ComponentInsertBehaviorType} [componentInsertBehavior="auto"] - Enables automatic selection of inserted components.
+ * @property {SunEditor.ComponentInsertType} [componentInsertBehavior="auto"] - Enables automatic selection of inserted components.
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
  *    - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -374,7 +374,7 @@ export const DEFAULTS = {
  * ///
  *
  * === User Events ===
- * @property {SunEditor.EventHandlers} [events] - User event handlers configuration
+ * @property {SunEditor.Event.Handlers} [events] - User event handlers configuration
  * ///
  *
  * === [ Plugin-Specific Options ] ===

@@ -123,7 +123,7 @@ export type VideoPluginOptions = {
 	/**
 	 * - Figure controls.
 	 */
-	controls?: import('../../modules/Figure').FigureControls;
+	controls?: SunEditor.Module.Figure.Controls;
 	/**
 	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
 	 * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -131,7 +131,7 @@ export type VideoPluginOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
+	insertBehavior?: SunEditor.ComponentInsertType;
 };
 /**
  * @typedef {Object} VideoPluginOptions
@@ -158,8 +158,8 @@ export type VideoPluginOptions = {
  * @property {Object<string, {pattern: RegExp, action: (url: string) => string, tag: string}>} [embedQuery] - Custom query objects for additional embedding services.
  * @property {Array<RegExp>} [urlPatterns] - Additional URL patterns for video embedding.
  * @property {Array<string>} [extensions] - Additional file extensions to be recognized for video uploads.
- * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -216,7 +216,7 @@ declare class Video extends EditorInjector {
 		};
 		query_youtube: string;
 		query_vimeo: string;
-		insertBehavior: SunEditor.ComponentInsertBehaviorType;
+		insertBehavior: SunEditor.ComponentInsertType;
 	};
 	modal: Modal;
 	figure: Figure;

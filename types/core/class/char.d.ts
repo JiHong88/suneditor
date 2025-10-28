@@ -47,7 +47,7 @@ declare class Char {
 	/**
 	 * @this {CharThis}
 	 * @description Set the char count to charCounter element textContent.
-	 * @param {SunEditor.FrameContext|null} [fc] Frame context
+	 * @param {?SunEditor.FrameContext} [fc] Frame context
 	 */
 	display(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, fc?: SunEditor.FrameContext | null): void;
 	/**

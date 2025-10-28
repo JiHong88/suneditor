@@ -1,53 +1,5 @@
 import type {} from '../typedef';
 export default FileManager;
-export type FileStateInfo = {
-	/**
-	 * File source
-	 */
-	src: string;
-	/**
-	 * File index
-	 */
-	index: number;
-	/**
-	 * File name
-	 */
-	name: string;
-	/**
-	 * File size
-	 */
-	size: number;
-};
-export type FileStateParams = {
-	/**
-	 * - The root editor instance
-	 */
-	editor: SunEditor.Core;
-	/**
-	 * File element
-	 */
-	element: Node;
-	/**
-	 * File index
-	 */
-	index: number;
-	/**
-	 * File state ("create"|"update"|"delete")
-	 */
-	state: string;
-	/**
-	 * File information
-	 */
-	info: FileStateInfo;
-	/**
-	 * Remaining file count
-	 */
-	remainingFilesCount: number;
-	/**
-	 * Plugin name
-	 */
-	pluginName: string;
-};
 export type FileManagerParams = {
 	/**
 	 * The query selector used to find file elements in the editor
@@ -62,23 +14,6 @@ export type FileManagerParams = {
 	 */
 	actionEventName: string;
 };
-/**
- * @typedef {Object} FileStateInfo
- * @property {string} src File source
- * @property {number} index File index
- * @property {string} name File name
- * @property {number} size File size
- */
-/**
- * @typedef {Object} FileStateParams
- * @property {SunEditor.Core} editor - The root editor instance
- * @property {Node} element File element
- * @property {number} index File index
- * @property {string} state File state ("create"|"update"|"delete")
- * @property {FileStateInfo} info File information
- * @property {number} remainingFilesCount Remaining file count
- * @property {string} pluginName Plugin name
- */
 /**
  * @typedef {Object} FileManagerParams
  * @property {string} query The query selector used to find file elements in the editor
@@ -112,8 +47,8 @@ declare class FileManager extends CoreInjector {
 	 * @param {string} uploadUrl Upload server url
 	 * @param {?Object<string, string>} uploadHeader Request header
 	 * @param {FileList|File[]|{formData: FormData, size: number}} data FormData in body or Files array
-	 * @param {?(xmlHttp: XMLHttpRequest) => boolean=} callBack Success call back function
-	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack Error call back function
+	 * @param {?(xmlHttp: XMLHttpRequest) => boolean} [callBack] Success call back function
+	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string} [errorCallBack] Error call back function
 	 */
 	upload(
 		uploadUrl: string,
@@ -127,8 +62,8 @@ declare class FileManager extends CoreInjector {
 					formData: FormData;
 					size: number;
 			  },
-		callBack?: (((xmlHttp: XMLHttpRequest) => boolean) | null) | undefined,
-		errorCallBack?: (((res: any, xmlHttp: XMLHttpRequest) => string) | null) | undefined,
+		callBack?: ((xmlHttp: XMLHttpRequest) => boolean) | null,
+		errorCallBack?: ((res: any, xmlHttp: XMLHttpRequest) => string) | null,
 	): void;
 	/**
 	 * @description Upload the file to the server.

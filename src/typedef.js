@@ -17,11 +17,11 @@
 
 // --------------------------------------------------------- [Init Options] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./core/config/options.js').EditorInitOptions} SunEditor.InitOptions
+ * @typedef {import('./core/config/options').EditorInitOptions} SunEditor.InitOptions
  */
 
 /**
- * @typedef {import('./core/config/options.js').EditorFrameOptions} SunEditor.InitFrameOptions
+ * @typedef {import('./core/config/options').EditorFrameOptions} SunEditor.InitFrameOptions
  */
 
 // --------------------------------------------------------- [Context & Options] ---------------------------------------------------------------------------------------------------
@@ -55,8 +55,11 @@
  */
 
 /**
+ * Editor status object containing current state information
+ *
  * @typedef {Object} SunEditor.Status
  *
+ * **Public Properties:**
  * @property {boolean} hasFocus Boolean value of whether the editor has focus
  * @property {number} tabSize Indent size of tab (4)
  * @property {number} indentSize Indent size (25)px
@@ -67,14 +70,15 @@
  * @property {number} initViewportHeight Height of the initial visual viewport height size
  * @property {boolean} onSelected Boolean value of whether component is selected
  * @property {*} rootKey Current root key
- * @property {Range} _range Current range object
- * @property {boolean} _onMousedown Mouse down event status
+ *
+ * **Internal Properties (⚠️ DO NOT USE - subject to change without notice):**
+ * @property {Range} _range Internal: Current range object
+ * @property {boolean} _onMousedown Internal: Mouse down event status
  */
 
 // --------------------------------------------------------- [Component Types] ---------------------------------------------------------------------------------------------------
 /**
  * @typedef {Object} SunEditor.ComponentInfo
- *
  * @property {HTMLElement} target - The target element associated with the component.
  * @property {string} pluginName - The name of the plugin related to the component.
  * @property {Object<string, *>} options - Options related to the component.
@@ -88,8 +92,7 @@
  */
 
 /**
- * @typedef {"auto"|"select"|"line"|"none"} SunEditor.ComponentInsertBehaviorType
- *
+ * @typedef {"auto"|"select"|"line"|"none"} SunEditor.ComponentInsertType
  * @description Component insertion behavior for selection and cursor placement.
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
@@ -104,17 +107,39 @@
  * @typedef {Array<Node>|HTMLCollection|NodeList} SunEditor.NodeCollection
  */
 
-// --------------------------------------------------------- [Plugin Event Types] ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------- [Module Types - Cross-module Public API] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Object} SunEditor.PluginMouseEventInfo
- *
- * @property {SunEditor.FrameContext} frameContext Frame context
- * @property {MouseEvent} event Event object
+ * @typedef {import('./modules/Controller').ControllerInfo} SunEditor.Module.Controller.Info
  */
 
 /**
- * @typedef {Object} SunEditor.PluginKeyEventInfo
- *
+ * @typedef {import('./modules/Figure').FigureInfo} SunEditor.Module.Figure.Info
+ * @typedef {import('./modules/Figure').FigureTargetInfo} SunEditor.Module.Figure.TargetInfo
+ * @typedef {import('./modules/Figure').FigureControlButton} SunEditor.Module.Figure.ControlButton
+ * @typedef {import('./modules/Figure').FigureControlResize} SunEditor.Module.Figure.ControlResize
+ * @typedef {import('./modules/Figure').ControlCustomAction} SunEditor.Module.Figure.ControlCustomAction
+ * @typedef {import('./modules/Figure').FigureControls} SunEditor.Module.Figure.Controls
+ */
+
+/**
+ * @typedef {import('./modules/Browser').BrowserFile} SunEditor.Module.Browser.File
+ */
+
+/**
+ * @typedef {import('./modules/HueSlider').HueSliderColor} SunEditor.Module.HueSlider.Color
+ */
+
+// --------------------------------------------------------- [Plugin Types] ---------------------------------------------------------------------------------------------------
+// 🌐 Note: These types use browser DOM APIs (MouseEvent, KeyboardEvent, Range, HTMLElement, Node)
+
+/**
+ * @typedef {Object} SunEditor.Plugin.MouseEventInfo
+ * @property {SunEditor.FrameContext} frameContext Frame context
+ * @property {MouseEvent} event Event object (browser DOM API)
+ */
+
+/**
+ * @typedef {Object} SunEditor.Plugin.KeyEventInfo
  * @property {SunEditor.FrameContext} frameContext Frame context
  * @property {KeyboardEvent} event Event object
  * @property {Range} range range object
@@ -122,16 +147,14 @@
  */
 
 /**
- * @typedef {Object} SunEditor.PluginToolbarInputChangeEventInfo
- *
+ * @typedef {Object} SunEditor.Plugin.ToolbarInputChangeEventInfo
  * @property {HTMLElement} target Input element
  * @property {Event} event Event object
  * @property {string} value Input value
  */
 
 /**
- * @typedef {Object} SunEditor.PluginShortcutInfo Information of the "shortcut" plugin
- *
+ * @typedef {Object} SunEditor.Plugin.ShortcutInfo Information of the "shortcut" plugin
  * @property {Range} range - Range object
  * @property {HTMLElement} line - The line element of the current range
  * @property {import('./core/class/shortcuts').ShortcutInfo} info - Information of the shortcut
@@ -141,8 +164,7 @@
  */
 
 /**
- * @typedef {Object} SunEditor.PluginPasteParams
- *
+ * @typedef {Object} SunEditor.Plugin.PasteParams
  * @property {SunEditor.FrameContext} frameContext Frame context
  * @property {ClipboardEvent} event Clipboard event object
  * @property {string} data Format cleaned paste data (HTML string)
@@ -150,8 +172,7 @@
  */
 
 /**
- * @typedef {Object} SunEditor.PluginCopyComponentParams
- *
+ * @typedef {Object} SunEditor.Plugin.CopyComponentParams
  * @property {ClipboardEvent} event Clipboard event object
  * @property {HTMLElement} cloneContainer Cloned component container
  * @property {SunEditor.ComponentInfo} info Component information
@@ -161,51 +182,33 @@
 // === INTERNAL/ADVANCED TYPES (Framework internals and advanced use cases)
 // ================================================================================================================================
 
-// --------------------------------------------------------- [Event System Types] ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------- [Event Types] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Object} SunEditor.EventInfo
- *
+ * EventManager event information
+ * @typedef {Object} SunEditor.Event.Info
  * @property {*} target Target element
  * @property {string} type Event type
  * @property {(...args: *) => *} listener Event listener
- * @property {boolean|AddEventListenerOptions=} useCapture Event useCapture option
+ * @property {boolean|AddEventListenerOptions} [useCapture] Event useCapture option
  */
 
 /**
- * @typedef {Object} SunEditor.GlobalEventInfo
- *
+ * EventManager global event information
+ * @typedef {Object} SunEditor.Event.GlobalInfo
  * @property {string} type Event type
  * @property {(...args: *) => *} listener Event listener
- * @property {boolean|AddEventListenerOptions=} useCapture Use event capture
+ * @property {boolean|AddEventListenerOptions} [useCapture] Use event capture
  */
 
-// --------------------------------------------------------- [Event System Internals] ---------------------------------------------------------------------------------------------------
-/**
- * @typedef {import('./core/event/reducers/keydown.reducer').KeydownReducerCtx} SunEditor.EventKeydownCtx
- *
- */
-
-/**
- * @typedef {import('./core/event/actions').Action[]} SunEditor.EventActions
- *
- */
-
-/**
- * @typedef {import('./core/event/ports').EventReducerPorts} SunEditor.EventPorts
- *
- */
-
-// --------------------------------------------------------- [Event Types] ---------------------------------------------------------------------------------------------------
 /**
  * EventHandlers
- * @typedef {import('./events').EventHandlers} SunEditor.EventHandlers
+ * @typedef {import('./events').EventHandlers} SunEditor.Event.Handlers
  */
 
 /**
- * EventParams
+ * EventParams - Event callback parameters
  * @typedef {import('./events').BaseEvent} SunEditor.EventParams.BaseEvent
  * @typedef {import('./events').ClipboardEvent} SunEditor.EventParams.ClipboardEvent
- * @typedef {import('./events').ControllerInfo} SunEditor.EventParams.ControllerInfo
  * @typedef {import('./events').FileManagementInfo} SunEditor.EventParams.FileManagementInfo
  * @typedef {import('./events').ProcessInfo} SunEditor.EventParams.ProcessInfo
  * @typedef {import('./events').ImageInfo} SunEditor.EventParams.ImageInfo
@@ -215,7 +218,7 @@
  * @typedef {import('./events').EmbedInfo} SunEditor.EventParams.EmbedInfo
  */
 
-// --------------------------------------------------------- [Button/Toolbar Types] ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------- [UI Types] ---------------------------------------------------------------------------------------------------
 /**
  * Special toolbar control strings
  * - `"|"`: Vertical separator between buttons
@@ -239,7 +242,7 @@
  * // Responsive breakpoint
  * ['%50', ['bold', 'italic'],]           // Show at 50% width breakpoint
  *
- * @typedef {"|"|"/"|`-${"left"|"right"|"center"}`|"#fix"|`:${string}-${string}`|`%${number}`} SunEditor.ButtonSpecial
+ * @typedef {"|"|"/"|`-${"left"|"right"|"center"}`|"#fix"|`:${string}-${string}`|`%${number}`} SunEditor.UI.ButtonSpecial
  */
 
 // ========================================================= [ButtonList Generate] ===================================================================================================
@@ -248,17 +251,17 @@
  * ---[ Auto-generated by scripts/check/gen-button-types.cjs - DO NOT EDIT MANUALLY ]---
  *
  * Default command buttons available in the toolbar
- * @typedef {"bold"|"underline"|"italic"|"strike"|"subscript"|"superscript"|"removeFormat"|"copyFormat"|"indent"|"outdent"|"fullScreen"|"showBlocks"|"codeView"|"undo"|"redo"|"preview"|"print"|"copy"|"dir"|"dir_ltr"|"dir_rtl"|"save"|"newDocument"|"selectAll"|"pageBreak"|"pageUp"|"pageDown"|"pageNavigator"} SunEditor.ButtonCommand
+ * @typedef {"bold"|"underline"|"italic"|"strike"|"subscript"|"superscript"|"removeFormat"|"copyFormat"|"indent"|"outdent"|"fullScreen"|"showBlocks"|"codeView"|"undo"|"redo"|"preview"|"print"|"copy"|"dir"|"dir_ltr"|"dir_rtl"|"save"|"newDocument"|"selectAll"|"pageBreak"|"pageUp"|"pageDown"|"pageNavigator"} SunEditor.UI.ButtonCommand
  *
  * Plugin buttons available in the toolbar
- * @typedef {"blockquote"|"exportPDF"|"fileUpload"|"list_bulleted"|"list_numbered"|"mention"|"align"|"font"|"fontColor"|"backgroundColor"|"list"|"table"|"blockStyle"|"hr"|"layout"|"lineHeight"|"template"|"paragraphStyle"|"textStyle"|"link"|"image"|"video"|"audio"|"embed"|"math"|"drawing"|"imageGallery"|"videoGallery"|"audioGallery"|"fileGallery"|"fileBrowser"|"fontSize"|"pageNavigator"|"anchor"} SunEditor.ButtonPlugin
+ * @typedef {"blockquote"|"exportPDF"|"fileUpload"|"list_bulleted"|"list_numbered"|"mention"|"align"|"font"|"fontColor"|"backgroundColor"|"list"|"table"|"blockStyle"|"hr"|"layout"|"lineHeight"|"template"|"paragraphStyle"|"textStyle"|"link"|"image"|"video"|"audio"|"embed"|"math"|"drawing"|"imageGallery"|"videoGallery"|"audioGallery"|"fileGallery"|"fileBrowser"|"fontSize"|"pageNavigator"|"anchor"} SunEditor.UI.ButtonPlugin
  *
  * Single button item in the toolbar (includes special controls and custom strings)
- * @typedef {SunEditor.ButtonCommand|SunEditor.ButtonPlugin|SunEditor.ButtonSpecial|string} SunEditor.ButtonItem
+ * @typedef {SunEditor.UI.ButtonCommand|SunEditor.UI.ButtonPlugin|SunEditor.UI.ButtonSpecial|string} SunEditor.UI.ButtonItem
  *
  * Button list configuration for the toolbar
  * 2D array of button items, where each sub-array represents a button group
- * @typedef {Array<Array<SunEditor.ButtonItem>|SunEditor.ButtonSpecial>} SunEditor.ButtonList
+ * @typedef {Array<Array<SunEditor.UI.ButtonItem>|SunEditor.UI.ButtonSpecial>} SunEditor.UI.ButtonList
  * ///
  * ---[ End of auto-generated button types ]---
  */

@@ -15,12 +15,12 @@ declare class List_bulleted extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
-	 * @param {?HTMLElement=} target - The plugin's toolbar button element
+	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
+	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
-	active(element?: (HTMLElement | null) | undefined, target?: (HTMLElement | null) | undefined): boolean;
+	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean;
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
@@ -36,9 +36,9 @@ declare class List_bulleted extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	shortcut({ range, info }: SunEditor.PluginShortcutInfo): void;
+	shortcut({ range, info }: SunEditor.Plugin.ShortcutInfo): void;
 	/**
 	 * @description Add a bulleted list
 	 * @param {string} [type=""] List type

@@ -158,17 +158,17 @@ declare class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component copy is requested.
-	 * @param {SunEditor.PluginCopyComponentParams} params
+	 * @param {SunEditor.Plugin.CopyComponentParams} params
 	 * @returns {boolean|void}
 	 */
-	onCopyComponent({ event, cloneContainer }: SunEditor.PluginCopyComponentParams): boolean | void;
+	onCopyComponent({ event, cloneContainer }: SunEditor.Plugin.CopyComponentParams): boolean | void;
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "copy".
-	 * @param {SunEditor.PluginPasteParams} params
+	 * @param {SunEditor.Plugin.PasteParams} params
 	 * @returns {boolean|void}
 	 */
-	onPaste({ event, doc }: SunEditor.PluginPasteParams): boolean | void;
+	onPaste({ event, doc }: SunEditor.Plugin.PasteParams): boolean | void;
 	/**
 	 * @editorMethod Editor.core
 	 * @description This method is used to validate and preserve the format of the component within the editor.
@@ -193,9 +193,9 @@ declare class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousemove".
-	 * @param {SunEditor.PluginMouseEventInfo} params
+	 * @param {SunEditor.Plugin.MouseEventInfo} params
 	 */
-	onMouseMove({ event }: SunEditor.PluginMouseEventInfo): void;
+	onMouseMove({ event }: SunEditor.Plugin.MouseEventInfo): void;
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "scroll".
@@ -204,9 +204,9 @@ declare class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousedown".
-	 * @param {SunEditor.PluginMouseEventInfo} params
+	 * @param {SunEditor.Plugin.MouseEventInfo} params
 	 */
-	onMouseDown({ event }: SunEditor.PluginMouseEventInfo): void;
+	onMouseDown({ event }: SunEditor.Plugin.MouseEventInfo): void;
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mouseup".
@@ -220,15 +220,15 @@ declare class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keydown".
-	 * @param {SunEditor.PluginKeyEventInfo} params
+	 * @param {SunEditor.Plugin.KeyEventInfo} params
 	 */
-	onKeyDown({ event, range, line }: SunEditor.PluginKeyEventInfo): boolean;
+	onKeyDown({ event, range, line }: SunEditor.Plugin.KeyEventInfo): boolean;
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keyup".
-	 * @param {SunEditor.PluginKeyEventInfo} params
+	 * @param {SunEditor.Plugin.KeyEventInfo} params
 	 */
-	onKeyUp({ line }: SunEditor.PluginKeyEventInfo): void;
+	onKeyUp({ line }: SunEditor.Plugin.KeyEventInfo): void;
 	/**
 	 * @editorMethod Modules.ColorPicker
 	 * @description Executes the method called when a button of "ColorPicker" module is clicked.
@@ -280,21 +280,21 @@ declare class Table extends EditorInjector {
 	 * - null: to remove the row
 	 * - 'up': to insert the row up
 	 * - 'down': to insert the row down, or null to remove.
-	 * @param {?HTMLTableCellElement=} targetCell Target cell, (default: current selected cell)
-	 * @param {?HTMLTableCellElement=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
+	 * @param {?HTMLTableCellElement} [targetCell] Target cell, (default: current selected cell)
+	 * @param {?HTMLTableCellElement} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
 	 */
-	editRow(option: string | null, targetCell?: (HTMLTableCellElement | null) | undefined, positionResetElement?: (HTMLTableCellElement | null) | undefined): void;
+	editRow(option: string | null, targetCell?: HTMLTableCellElement | null, positionResetElement?: HTMLTableCellElement | null): void;
 	/**
 	 * @description Edits a table cell(column), either adding, removing, or modifying the cell based on the provided option.
 	 * @param {?string} option The action to perform on the cell ("left"|"right"|null)
 	 * - null: to remove the cell
 	 * - left: to insert a new cell to the left
 	 * - right: to insert a new cell to the right
-	 * @param {?HTMLTableCellElement=} targetCell Target cell, (default: current selected cell)
-	 * @param {?HTMLTableCellElement=} positionResetElement The element to reset the position of (optional). This can be the cell that triggered the column edit.
+	 * @param {?HTMLTableCellElement} [targetCell] Target cell, (default: current selected cell)
+	 * @param {?HTMLTableCellElement} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
 	 * @returns {HTMLTableCellElement} Target table cell
 	 */
-	editCell(option: string | null, targetCell?: (HTMLTableCellElement | null) | undefined, positionResetElement?: (HTMLTableCellElement | null) | undefined): HTMLTableCellElement;
+	editCell(option: string | null, targetCell?: HTMLTableCellElement | null, positionResetElement?: HTMLTableCellElement | null): HTMLTableCellElement;
 	/**
 	 * @description Updates the target table's cells with the data from the copied table.
 	 * @param {HTMLTableElement} copyTable The table containing the copied data.

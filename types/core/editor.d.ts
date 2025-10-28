@@ -1,9 +1,5 @@
 import type {} from '../typedef';
 export default Editor;
-export type ControllerInfo_editor = import('../modules/Controller').ControllerInfo;
-/**
- * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
- */
 /**
  * @constructor
  * @description SunEditor constructor function.
@@ -19,9 +15,6 @@ declare function Editor(
 	options: SunEditor.InitOptions,
 ): void;
 declare class Editor {
-	/**
-	 * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
-	 */
 	/**
 	 * @constructor
 	 * @description SunEditor constructor function.
@@ -114,9 +107,9 @@ declare class Editor {
 	};
 	/**
 	 * @description Events object, call by triggerEvent function
-	 * @type {SunEditor.EventHandlers}
+	 * @type {SunEditor.Event.Handlers}
 	 */
-	events: SunEditor.EventHandlers;
+	events: SunEditor.Event.Handlers;
 	/**
 	 * @description Call the event function by injecting self: this.
 	 * @type {(eventName: string, ...args: *) => Promise<*>}
@@ -206,7 +199,7 @@ declare class Editor {
 	activeCommands: Array<string>;
 	/**
 	 * @description The selection node (selection.getNode()) to which the effect was last applied
-	 * @type {Node|null}
+	 * @type {?Node}
 	 */
 	effectNode: Node | null;
 	/**
@@ -216,9 +209,9 @@ declare class Editor {
 	opendModal: any;
 	/**
 	 * @description Currently open "Controller" info array
-	 * @type {Array<ControllerInfo_editor>}
+	 * @type {Array<SunEditor.Module.Controller.Info>}
 	 */
-	opendControllers: Array<ControllerInfo_editor>;
+	opendControllers: Array<SunEditor.Module.Controller.Info>;
 	/**
 	 * @description Currently open "Controller" caller plugin name
 	 */
@@ -241,7 +234,7 @@ declare class Editor {
 	instanceCheck: import('./util/instanceCheck').default;
 	/** @description Toolbar class instance @type {import('./class/toolbar').default} */
 	toolbar: import('./class/toolbar').default;
-	/** @description Sub-Toolbar class instance @type {import('./class/toolbar').default|null} */
+	/** @description Sub-Toolbar class instance @type {?import('./class/toolbar').default} */
 	subToolbar: import('./class/toolbar').default | null;
 	/** @description Char class instance @type {import('./class/char').default} */
 	char: import('./class/char').default;
@@ -301,17 +294,17 @@ declare class Editor {
 	/**
 	 * @description Copy format info
 	 * - eventManager.__cacheStyleNodes copied
-	 * @type {Array<Node>|null}
+	 * @type {?Array<Node>}
 	 */
 	_onCopyFormatInfo: Array<Node> | null;
 	/**
 	 * @description Copy format init method
-	 * @type {(...args: *) => *|null}
+	 * @type {?(...args: *) => *}
 	 */
-	_onCopyFormatInitMethod: (...args: any) => any | null;
+	_onCopyFormatInitMethod: ((...args: any) => any) | null;
 	/**
 	 * @description Controller target's frame div (editor.frameContext.get('topArea'))
-	 * @type {HTMLElement|null}
+	 * @type {?HTMLElement}
 	 */
 	_controllerTargetContext: HTMLElement | null;
 	/**
@@ -414,7 +407,7 @@ declare class Editor {
 	_componentManager: Array<any>;
 	/**
 	 * @description Current Figure container.
-	 * @type {HTMLElement|null}
+	 * @type {?HTMLElement}
 	 */
 	_figureContainer: HTMLElement | null;
 	/**
@@ -440,17 +433,17 @@ declare class Editor {
 	 * @description Run plugin calls and basic commands.
 	 * @param {string} command Command string
 	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
-	 * @param {?Node=} button The element of command button
+	 * @param {?Node} [button] The element of command button
 	 */
-	run(command: string, type: string, button?: (Node | null) | undefined): void;
+	run(command: string, type: string, button?: Node | null): void;
 	/**
 	 * @description Execute default command of command button
 	 * - (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
-	 * @param {?Node=} button Command button
+	 * @param {?Node} [button] Command button
 	 * @returns {Promise<void>}
 	 */
-	commandHandler(command: string, button?: (Node | null) | undefined): Promise<void>;
+	commandHandler(command: string, button?: Node | null): Promise<void>;
 	/**
 	 * @description Execute "editor.run" with command button.
 	 * @param {Node} target Command target
@@ -471,10 +464,10 @@ declare class Editor {
 	/**
 	 * @description Checks if the content of the editor is empty.
 	 * - Display criteria for "placeholder".
-	 * @param {?SunEditor.FrameContext=} fc Frame context, if not present, currently selected frame context.
+	 * @param {?SunEditor.FrameContext} [fc] Frame context, if not present, currently selected frame context.
 	 * @returns {boolean}
 	 */
-	isEmpty(fc?: (SunEditor.FrameContext | null) | undefined): boolean;
+	isEmpty(fc?: SunEditor.FrameContext | null): boolean;
 	/**
 	 * @description Set direction to "rtl" or "ltr".
 	 * @param {string} dir "rtl" or "ltr"
@@ -493,10 +486,10 @@ declare class Editor {
 	/**
 	 * @description javascript execCommand
 	 * @param {string} command javascript execCommand function property
-	 * @param {boolean=} showDefaultUI javascript execCommand function property
-	 * @param {string=} value javascript execCommand function property
+	 * @param {boolean} [showDefaultUI] javascript execCommand function property
+	 * @param {string} [value] javascript execCommand function property
 	 */
-	execCommand(command: string, showDefaultUI?: boolean | undefined, value?: string | undefined): void;
+	execCommand(command: string, showDefaultUI?: boolean, value?: string): void;
 	/**
 	 * @description Focus to wysiwyg area
 	 * @param {*} rootKey Root index
@@ -505,9 +498,9 @@ declare class Editor {
 	/**
 	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
 	 * - If "focusEdge" is null, then selected last element
-	 * @param {?Node=} focusEl Focus element
+	 * @param {?Node} [focusEl] Focus element
 	 */
-	focusEdge(focusEl?: (Node | null) | undefined): void;
+	focusEdge(focusEl?: Node | null): void;
 	/**
 	 * @description Focusout to wysiwyg area (.blur())
 	 */
@@ -569,9 +562,9 @@ declare class Editor {
 	/**
 	 * @private
 	 * @description Set display property when there is placeholder.
-	 * @param {?SunEditor.FrameContext=} fc - Frame context object, If null fc is this.frameContext
+	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
 	 */
-	_checkPlaceholder(fc?: (SunEditor.FrameContext | null) | undefined): void;
+	_checkPlaceholder(fc?: SunEditor.FrameContext | null): void;
 	/**
 	 * @private
 	 * @description Initializ editor

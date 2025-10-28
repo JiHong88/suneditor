@@ -85,10 +85,10 @@ export function kebabToCamelCase(param: Array<string>): Array<string>;
 export function toFontUnit(to: 'em' | 'rem' | '%' | 'pt' | 'px', size: string): string;
 /**
  * @description Convert the node list to an array. If not, returns an empty array.
- * @param {?SunEditor.NodeCollection=} nodeList
+ * @param {?SunEditor.NodeCollection} [nodeList]
  * @returns Array
  */
-export function nodeListToArray(nodeList?: (SunEditor.NodeCollection | null) | undefined): any;
+export function nodeListToArray(nodeList?: SunEditor.NodeCollection | null): any;
 /**
  * @description Returns a new object with keys and values swapped.
  * @param {Object<*, *>} obj object
@@ -121,10 +121,10 @@ export function rgb2hex(rgba: string): string;
 /**
  * @description Computes the width as a percentage of the parent's width, and returns this value rounded to two decimal places.
  * @param {HTMLElement} target The target element for which to calculate the width percentage.
- * @param {?HTMLElement=} parentTarget The parent element to use as the reference for the width calculation. If not provided, the target's parent element is used.
+ * @param {?HTMLElement} [parentTarget] The parent element to use as the reference for the width calculation. If not provided, the target's parent element is used.
  * @returns {number}
  */
-export function getWidthInPercentage(target: HTMLElement, parentTarget?: (HTMLElement | null) | undefined): number;
+export function getWidthInPercentage(target: HTMLElement, parentTarget?: HTMLElement | null): number;
 /**
  * @description Convert url pattern text node to anchor node
  * @param {Node} node Text node

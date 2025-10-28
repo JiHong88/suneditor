@@ -42,10 +42,10 @@ export type EffectContext = {
 	/**
 	 * - Ports for interacting with editor
 	 */
-	ports: SunEditor.EventPorts;
+	ports: import('../ports').EventReducerPorts;
 	/**
 	 * - Reducer context
 	 */
-	ctx: SunEditor.EventKeydownCtx;
+	ctx: import('../reducers/keydown.reducer').KeydownReducerCtx;
 };
 export type Effect = (ctx: EffectContext, payload?: any) => any;

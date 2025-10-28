@@ -47,10 +47,10 @@
 /**
  * @description Creates a context map of commonly accessed DOM elements for the editor.
  * @param {Element} toolbar - Main toolbar element.
- * @param {Element|null} toolbarContainer - Container element for the toolbar.
+ * @param {?Element} toolbarContainer - Container element for the toolbar.
  * @param {Element} menuTray - Main menu tray element.
- * @param {Element|null} subbar - Sub-toolbar element.
- * @param {Element|null} statusbarContainer - Status bar container element.
+ * @param {?Element} subbar - Sub-toolbar element.
+ * @param {?Element} statusbarContainer - Status bar container element.
  * @returns {SunEditor.Context} - A map of key DOM nodes used throughout the editor.
  */
 export function CreateContext(toolbar, toolbarContainer, menuTray, subbar, statusbarContainer) {

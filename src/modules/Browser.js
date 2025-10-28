@@ -4,35 +4,36 @@ import { _w } from '../helper/env';
 import ApiManager from './ApiManager';
 
 /**
+ * Browser file item structure
  * @typedef {Object} BrowserFile
  * @property {string} [src=""] - Source url
  * @property {string} [name=""] - File name | Folder name
- * @property {string=} thumbnail - Thumbnail url
- * @property {string=} alt - Image alt
- * @property {Array<string>|string=} tag - Tag name list
- * @property {string=} type - Type (image, video, audio, etc.)
- * @property {string=} frame - Frame name (iframe, video, etc.)
- * @property {BrowserFile | string=} _data - The folder's contents or an API URL.
- * @property {boolean=} default - Whether this folder is the default selection.
- * @property {Object<string, *>=} meta - Metadata
+ * @property {string} [thumbnail] - Thumbnail url
+ * @property {string} [alt] - Image alt
+ * @property {Array<string>|string} [tag] - Tag name list
+ * @property {string} [type] - Type (image, video, audio, etc.)
+ * @property {string} [frame] - Frame name (iframe, video, etc.)
+ * @property {boolean} [default] - Whether this folder is the default selection.
+ * @property {Object<string, *>} [meta] - Metadata
+ * @property {BrowserFile | string} [_data] - Internal: The folder's contents or an API URL (⚠️ DO NOT USE directly)
  */
 
 /**
  * @typedef BrowserParams
  * @property {string} title - File browser window title. Required. Can be overridden in browser.
- * @property {string=} className - Class name of the file browser. Optional. Default: ''.
- * @property {Object<string, *>|Array<*>=} data - direct data without server calls
- * @property {string=} url - File server url. Required. Can be overridden in browser.
- * @property {Object<string, string>=} headers - File server http header. Required. Can be overridden in browser.
+ * @property {string} [className] - Class name of the file browser. Optional. Default: ''.
+ * @property {Object<string, *>|Array<*>} [data] - direct data without server calls
+ * @property {string} [url] - File server url. Required. Can be overridden in browser.
+ * @property {Object<string, string>} [headers] - File server http header. Required. Can be overridden in browser.
  * @property {(target: Node) => void} selectorHandler - Function that actions when an item is clicked. Required. Can be overridden in browser.
- * @property {boolean=} useSearch - Whether to use the search function. Optional. Default: true.
- * @property {string=} searchUrl - File server search url. Optional. Can be overridden in browser.
- * @property {Object<string, string>=} searchUrlHeader - File server search http header. Optional. Can be overridden in browser.
- * @property {string=} listClass - Class name of list div. Required. Can be overridden in browser.
- * @property {(item: BrowserFile) => string=} drawItemHandler - Function that defines the HTML of a file item. Required. Can be overridden in browser.
- * @property {Array<*>=} props - "props" argument to "drawItemHandler" function. Optional. Can be overridden in browser.
- * @property {number=} columnSize - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
- * @property {((item: BrowserFile) => string)=} thumbnail - Default thumbnail
+ * @property {boolean} [useSearch] - Whether to use the search function. Optional. Default: true.
+ * @property {string} [searchUrl] - File server search url. Optional. Can be overridden in browser.
+ * @property {Object<string, string>} [searchUrlHeader] - File server search http header. Optional. Can be overridden in browser.
+ * @property {string} [listClass] - Class name of list div. Required. Can be overridden in browser.
+ * @property {(item: BrowserFile) => string} [drawItemHandler] - Function that defines the HTML of a file item. Required. Can be overridden in browser.
+ * @property {Array<*>} [props] - "props" argument to "drawItemHandler" function. Optional. Can be overridden in browser.
+ * @property {number} [columnSize] - Number of "div.se-file-item-column" to be created. Optional. Can be overridden in browser. Default: 4.
+ * @property {((item: BrowserFile) => string)} [thumbnail] - Default thumbnail
  */
 
 /**
@@ -132,10 +133,10 @@ class Browser extends CoreInjector {
 	/**
 	 * @description Open a file browser plugin
 	 * @param {Object} [params={}]
-	 * @param {string=} params.listClass - Class name of list div. If not, use "this.listClass".
-	 * @param {string=} params.title - File browser window title. If not, use "this.title".
-	 * @param {string=} params.url - File server url. If not, use "this.url".
-	 * @param {Object<string, string>=} params.urlHeader - File server http header. If not, use "this.urlHeader".
+	 * @param {string} [params.listClass] - Class name of list div. If not, use "this.listClass".
+	 * @param {string} [params.title] - File browser window title. If not, use "this.title".
+	 * @param {string} [params.url] - File server url. If not, use "this.url".
+	 * @param {Object<string, string>} [params.urlHeader] - File server http header. If not, use "this.urlHeader".
 	 */
 	open(params = {}) {
 		this.#addGlobalEvent();

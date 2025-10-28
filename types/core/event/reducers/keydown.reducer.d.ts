@@ -1,5 +1,8 @@
 import type {} from '../../../typedef';
 /**
+ * @typedef {import('../ports').EventReducerPorts} EventPorts
+ */
+/**
  * @typedef {Object} KeydownReducerCtx - Keydown Reducer Context object
  * @property {KeyboardEvent} ctx.e - The keyboard event
  * @property {SunEditor.FrameContext} ctx.fc - Frame context object
@@ -15,12 +18,16 @@ import type {} from '../../../typedef';
  * @property {boolean} ctx.shift - Whether the shift key is pressed
  */
 /**
- * @description Keydown event reducer
- * @param {SunEditor.EventPorts} ports - Ports for interacting with editor
- * @param {KeydownReducerCtx} ctx - Context object
- * @returns {Promise<SunEditor.EventActions>} Action list
+ * @typedef {import('../actions').Action[]} EventActions
  */
-export function reduceKeydown(ports: SunEditor.EventPorts, ctx: KeydownReducerCtx): Promise<SunEditor.EventActions>;
+/**
+ * @description Keydown event reducer
+ * @param {EventPorts} ports - Ports for interacting with editor
+ * @param {KeydownReducerCtx} ctx - Context object
+ * @returns {Promise<EventActions>} Action list
+ */
+export function reduceKeydown(ports: EventPorts, ctx: KeydownReducerCtx): Promise<EventActions>;
+export type EventPorts = import('../ports').EventReducerPorts;
 /**
  * - Keydown Reducer Context object
  */
@@ -74,3 +81,4 @@ export type KeydownReducerCtx = {
 	 */
 	shift: boolean;
 };
+export type EventActions = import('../actions').Action[];

@@ -42,7 +42,7 @@ export type FileUploadPluginOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
+	insertBehavior?: SunEditor.ComponentInsertType;
 };
 /**
  * @typedef FileUploadPluginOptions
@@ -54,7 +54,7 @@ export type FileUploadPluginOptions = {
  * @property {string} [acceptedFormats="*"] - Accepted file formats (e.g., 'image/*, .pdf')
  * @property {string} [as="box"] - Specify the default form of the file component as 'box' or 'link'
  * @property {Array<string>} [controls] - Additional controls to be added to the figure
- * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -94,7 +94,7 @@ declare class FileUpload extends EditorInjector {
 	allowMultiple: boolean;
 	acceptedFormats: string;
 	as: string;
-	insertBehavior: SunEditor.ComponentInsertBehaviorType;
+	insertBehavior: SunEditor.ComponentInsertType;
 	input: HTMLElement;
 	figure: Figure;
 	fileManager: FileManager;

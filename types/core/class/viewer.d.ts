@@ -84,9 +84,9 @@ declare class Viewer {
 	 * @description Run CodeMirror Editor
 	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
 	 * @param {*} value CodeMirror params
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
-	_codeMirrorEditor(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, key: 'set' | 'get' | 'readonly' | 'refresh', value: any, rootKey: string | undefined): any;
+	_codeMirrorEditor(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, key: 'set' | 'get' | 'readonly' | 'refresh', value: any, rootKey?: string): any;
 	/**
 	 * @private
 	 * @this {ViewerThis}

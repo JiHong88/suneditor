@@ -52,7 +52,7 @@ UI.prototype = {
 	 * - Define the style of the edit area
 	 * - It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param {string} style Style string
-	 * @param {?SunEditor.FrameContext=} fc Frame context
+	 * @param {?SunEditor.FrameContext} [fc] Frame context
 	 */
 	setEditorStyle(style, fc) {
 		fc ||= this.frameContext;
@@ -113,7 +113,7 @@ UI.prototype = {
 	 * @this {UIThis}
 	 * @description Switch to or off "ReadOnly" mode.
 	 * @param {boolean} value "readOnly" boolean value.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
 	readOnly(value, rootKey) {
 		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
@@ -145,7 +145,7 @@ UI.prototype = {
 	/**
 	 * @this {UIThis}
 	 * @description Disables the editor.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
 	disable(rootKey) {
 		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
@@ -167,7 +167,7 @@ UI.prototype = {
 	/**
 	 * @this {UIThis}
 	 * @description Enables the editor.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
 	enable(rootKey) {
 		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
@@ -186,7 +186,7 @@ UI.prototype = {
 	/**
 	 * @this {UIThis}
 	 * @description Shows the editor interface.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
 	show(rootKey) {
 		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
@@ -197,7 +197,7 @@ UI.prototype = {
 	/**
 	 * @this {UIThis}
 	 * @description Hides the editor interface.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
 	hide(rootKey) {
 		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
@@ -328,7 +328,7 @@ UI.prototype = {
 	 * @this {UIThis}
 	 * @description visible controllers
 	 * @param {boolean} value hidden/show
-	 * @param {boolean|null} [lineBreakShow] Line break hidden/show (default: Follows the value "value".)
+	 * @param {?boolean} [lineBreakShow] Line break hidden/show (default: Follows the value "value".)
 	 */
 	_visibleControllers(value, lineBreakShow) {
 		const visible = value ? '' : 'hidden';

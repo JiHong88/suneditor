@@ -25,7 +25,7 @@ NodeTransform.prototype = {
 	 * @template {HTMLElement} T
 	 * @description Split all tags based on "baseNode"
 	 * @param {Node} baseNode Element or text node on which to base
-	 * @param {number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+	 * @param {?(number|Node)} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
 	 * @param {number} [depth=0] The nesting depth of the element being split. (default: 0)
 	 * @returns {T} The last element of the splited tag.
 	 * @example
@@ -149,8 +149,8 @@ NodeTransform.prototype = {
 	 * - If "offset" has been changed, it will return as much "offset" as it has been modified.
 	 * - An array containing change offsets is returned in the order of the "nodePathArray" array.
 	 * @param {Node} element Element
-	 * @param {number[][]|null} [nodePathArray] Array of NodePath object ([dom-query-GetNodePath(), ..])
-	 * @param {boolean|null} [onlyText] If true, non-text nodes like 'span', 'strong'.. are ignored.
+	 * @param {?number[][]} [nodePathArray] Array of NodePath object ([dom-query-GetNodePath(), ..])
+	 * @param {?boolean} [onlyText] If true, non-text nodes like 'span', 'strong'.. are ignored.
 	 * @returns {Array<number>} [offset, ..]
 	 * @example
 	 * // Merge adjacent tags with same attributes
@@ -306,7 +306,7 @@ NodeTransform.prototype = {
 	 * @this {NodeTransformThis}
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Node} element Element object
-	 * @param {((current: Node) => boolean)|string|null} [validation] Validation function / String("tag1|tag2..") / If null, all tags are applicable.
+	 * @param {?(((current: Node) => boolean)|string)} [validation] Validation function / String("tag1|tag2..") / If null, all tags are applicable.
 	 */
 	mergeNestedTags(element, validation) {
 		if (typeof validation === 'string') {
@@ -338,8 +338,8 @@ NodeTransform.prototype = {
 	 * @description Delete itself and all parent nodes that match the condition.
 	 * - Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
 	 * @param {Node} item Node to be remove
-	 * @param {((current: Node) => boolean)|null} [validation] Validation function. default(Deleted if it only have breakLine and blanks)
-	 * @param {Node|null} [stopParent] Stop when the parent node reaches stopParent
+	 * @param {?(current: Node) => boolean} [validation] Validation function. default(Deleted if it only have breakLine and blanks)
+	 * @param {?Node} [stopParent] Stop when the parent node reaches stopParent
 	 * @returns {{sc: Node|null, ec: Node|null}|null} {sc: previousSibling, ec: nextSibling} (the deleted node reference) or null.
 	 * @example
 	 * // Remove empty parent elements recursively
@@ -386,7 +386,7 @@ NodeTransform.prototype = {
 	 * @this {NodeTransformThis}
 	 * @description Delete a empty child node of argument element
 	 * @param {Node} element Element node
-	 * @param {Node|null} notRemoveNode Do not remove node
+	 * @param {?Node} notRemoveNode Do not remove node
 	 * @param {boolean} forceDelete When all child nodes are deleted, the parent node is also deleted.
 	 */
 	removeEmptyNode(element, notRemoveNode, forceDelete) {
@@ -426,7 +426,7 @@ NodeTransform.prototype = {
 	 * @this {NodeTransformThis}
 	 * @description Creates a nested node structure from the given array of nodes.
 	 * @param {SunEditor.NodeCollection} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
-	 * @param {((current: Node) => boolean)|null} [validate] A validate function.
+	 * @param {?(current: Node) => boolean} [validate] A validate function.
 	 * @returns {{ parent: Node, inner: Node }} An object containing the top-level parent node and the innermost child node.
 	 */
 	createNestedNode(nodeArray, validate) {

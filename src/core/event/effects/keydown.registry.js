@@ -2,8 +2,8 @@ import { dom, unicode } from '../../../helper';
 
 /**
  * @typedef {Object} EffectContext_keydown
- * @property {SunEditor.EventPorts} ports - Ports for interacting with editor
- * @property {SunEditor.EventKeydownCtx} ctx - Reducer context
+ * @property {import('../ports').EventReducerPorts} ports - Ports for interacting with editor
+ * @property {import('../reducers/keydown.reducer').KeydownReducerCtx} ctx - Reducer context
  */
 
 /**

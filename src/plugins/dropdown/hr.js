@@ -94,7 +94,7 @@ class HR extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
 	 */
 	shortcut({ line, range }) {
 		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);

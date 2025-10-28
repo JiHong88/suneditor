@@ -48,34 +48,34 @@ declare class EventManager {
 	_wwFrameObserver: ResizeObserver;
 	/** @type {ResizeObserver} */
 	_toolbarObserver: ResizeObserver;
-	/** @type {Element|null} */
+	/** @type {?Element} */
 	_lineBreakComp: Element | null;
-	/** @type {Object<string, *>|null} */
+	/** @type {?Object<string, *>} */
 	_formatAttrsTemp: {
 		[x: string]: any;
 	} | null;
 	/** @type {number} */
 	_resizeClientY: number;
-	/** @type {SunEditor.GlobalEventInfo|null} */
-	__resize_editor: SunEditor.GlobalEventInfo | null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
-	__close_move: SunEditor.GlobalEventInfo | null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
-	__geckoActiveEvent: SunEditor.GlobalEventInfo | null;
+	/** @type {?SunEditor.Event.GlobalInfo} */
+	__resize_editor: SunEditor.Event.GlobalInfo | null;
+	/** @type {?SunEditor.Event.GlobalInfo} */
+	__close_move: SunEditor.Event.GlobalInfo | null;
+	/** @type {?SunEditor.Event.GlobalInfo} */
+	__geckoActiveEvent: SunEditor.Event.GlobalInfo | null;
 	/** @type {Array<Node>} */
 	__cacheStyleNodes: Array<Node>;
-	/** @type {SunEditor.GlobalEventInfo|null} */
-	__selectionSyncEvent: SunEditor.GlobalEventInfo | null;
+	/** @type {?SunEditor.Event.GlobalInfo} */
+	__selectionSyncEvent: SunEditor.Event.GlobalInfo | null;
 	/** @type {boolean} */
 	_inputFocus: boolean;
-	/** @type {Object<string, *>|null} */
+	/** @type {?Object<string, *>} */
 	__inputPlugin: {
 		[x: string]: any;
 	} | null;
-	/** @type {?SunEditor.EventInfo=} */
-	__inputBlurEvent: (SunEditor.EventInfo | null) | undefined;
-	/** @type {?SunEditor.EventInfo=} */
-	__inputKeyEvent: (SunEditor.EventInfo | null) | undefined;
+	/** @type {?SunEditor.Event.Info=} */
+	__inputBlurEvent: (SunEditor.Event.Info | null) | undefined;
+	/** @type {?SunEditor.Event.Info=} */
+	__inputKeyEvent: (SunEditor.Event.Info | null) | undefined;
 	/** @type {HTMLInputElement} */
 	__focusTemp: HTMLInputElement;
 	/** @type {number|void} */
@@ -91,61 +91,56 @@ declare class EventManager {
 	 * @param {*} target Target element
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event handler
-	 * @param {boolean|AddEventListenerOptions=} useCapture Event useCapture option
-	 * @return {SunEditor.EventInfo|null} Registered event information
+	 * @param {boolean|AddEventListenerOptions} [useCapture] Event useCapture option
+	 * @return {?SunEditor.Event.Info} Registered event information
 	 */
 	addEvent(
 		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
 		target: any,
 		type: string,
 		listener: (...args: any) => any,
-		useCapture?: (boolean | AddEventListenerOptions) | undefined,
-	): SunEditor.EventInfo | null;
+		useCapture?: boolean | AddEventListenerOptions,
+	): SunEditor.Event.Info | null;
 	/**
 	 * @this {EventManagerThis}
 	 * @description Remove event
-	 * @param {SunEditor.EventInfo} params event info = this.addEvent()
+	 * @param {SunEditor.Event.Info} params event info = this.addEvent()
 	 * @returns {undefined|null} Success: null, Not found: undefined
 	 */
-	removeEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, params: SunEditor.EventInfo): undefined | null;
+	removeEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, params: SunEditor.Event.Info): undefined | null;
 	/**
 	 * @this {EventManagerThis}
 	 * @description Add an event to document.
 	 * - When created as an Iframe, the same event is added to the document in the Iframe.
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event listener
-	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
-	 * @return {SunEditor.GlobalEventInfo} Registered event information
+	 * @param {boolean|AddEventListenerOptions} [useCapture] Use event capture
+	 * @return {SunEditor.Event.GlobalInfo} Registered event information
 	 */
-	addGlobalEvent(
-		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
-		type: string,
-		listener: (...args: any) => any,
-		useCapture?: (boolean | AddEventListenerOptions) | undefined,
-	): SunEditor.GlobalEventInfo;
+	addGlobalEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, type: string, listener: (...args: any) => any, useCapture?: boolean | AddEventListenerOptions): SunEditor.Event.GlobalInfo;
 	/**
 	 * @this {EventManagerThis}
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
-	 * @param {string|SunEditor.GlobalEventInfo} type Event type or (Event info = this.addGlobalEvent())
-	 * @param {(...args: *) => *=} listener Event listener
-	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
+	 * @param {string|SunEditor.Event.GlobalInfo} type Event type or (Event info = this.addGlobalEvent())
+	 * @param {(...args: *) => *} [listener] Event listener
+	 * @param {boolean|AddEventListenerOptions} [useCapture] Use event capture
 	 * @returns {undefined|null} Success: null, Not found: undefined
 	 */
 	removeGlobalEvent(
 		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
-		type: string | SunEditor.GlobalEventInfo,
-		listener?: ((...args: any) => any) | undefined,
-		useCapture?: (boolean | AddEventListenerOptions) | undefined,
+		type: string | SunEditor.Event.GlobalInfo,
+		listener?: (...args: any) => any,
+		useCapture?: boolean | AddEventListenerOptions,
 	): undefined | null;
 	/**
 	 * @this {EventManagerThis}
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * - such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
-	 * @param {?Node=} selectionNode selectionNode
+	 * @param {?Node} [selectionNode] selectionNode
 	 * @returns {Node|undefined} selectionNode
 	 */
-	applyTagEffect(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, selectionNode?: (Node | null) | undefined): Node | undefined;
+	applyTagEffect(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, selectionNode?: Node | null): Node | undefined;
 	/**
 	 * @private
 	 * @this {EventManagerThis}
@@ -198,7 +193,7 @@ declare class EventManager {
 	 * @private
 	 * @this {EventManagerThis}
 	 * @description If there is no default format, add a line and move 'selection'.
-	 * @param {string|null} formatName Format tag name (default: 'P')
+	 * @param {?string} formatName Format tag name (default: 'P')
 	 */
 	_setDefaultLine(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, formatName: string | null): any;
 	/**

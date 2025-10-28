@@ -16,7 +16,7 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
  * @property {boolean} [allowMultiple] - Whether to allow multiple file uploads.
  * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
  * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the audio tag.
- * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -248,7 +248,7 @@ class Audio_ extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement=} target Target element, if null current selected element
+	 * @param {HTMLElement} [target] Target element, if null current selected element
 	 * @returns {Promise<void>}
 	 */
 	async destroy(target) {

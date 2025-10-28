@@ -40,8 +40,8 @@ class List_numbered extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
-	 * @param {?HTMLElement=} target - The plugin's toolbar button element
+	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
+	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
@@ -96,7 +96,7 @@ class List_numbered extends EditorInjector {
 	/**
 	 * @editorMethod Editor.core
 	 * @description Executes methods called by shortcut keys.
-	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
 	 */
 	shortcut({ range, info }) {
 		const { startContainer } = range;

@@ -31,7 +31,7 @@ declare class UI {
 	_alertInner: HTMLElement;
 	_closeListener: any[];
 	_closeSignal: boolean;
-	_bindClose: SunEditor.GlobalEventInfo;
+	_bindClose: SunEditor.Event.GlobalInfo;
 	_backWrapper: HTMLElement;
 	toastPopup: HTMLElement;
 	toastContainer: Element;
@@ -43,9 +43,9 @@ declare class UI {
 	 * - Define the style of the edit area
 	 * - It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param {string} style Style string
-	 * @param {?SunEditor.FrameContext=} fc Frame context
+	 * @param {?SunEditor.FrameContext} [fc] Frame context
 	 */
-	setEditorStyle(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, style: string, fc?: (SunEditor.FrameContext | null) | undefined): void;
+	setEditorStyle(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, style: string, fc?: SunEditor.FrameContext | null): void;
 	/**
 	 * @this {UIThis}
 	 * @description Set the theme to the editor
@@ -56,33 +56,33 @@ declare class UI {
 	 * @this {UIThis}
 	 * @description Switch to or off "ReadOnly" mode.
 	 * @param {boolean} value "readOnly" boolean value.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
-	readOnly(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, value: boolean, rootKey: string | undefined): void;
+	readOnly(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, value: boolean, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Disables the editor.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
-	disable(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey: string | undefined): void;
+	disable(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Enables the editor.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
-	enable(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey: string | undefined): void;
+	enable(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Shows the editor interface.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
-	show(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey: string | undefined): void;
+	show(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Hides the editor interface.
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
-	hide(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey: string | undefined): void;
+	hide(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Shows the loading spinner.
@@ -141,7 +141,7 @@ declare class UI {
 	 * @this {UIThis}
 	 * @description visible controllers
 	 * @param {boolean} value hidden/show
-	 * @param {boolean|null} [lineBreakShow] Line break hidden/show (default: Follows the value "value".)
+	 * @param {?boolean} [lineBreakShow] Line break hidden/show (default: Follows the value "value".)
 	 */
 	_visibleControllers(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, value: boolean, lineBreakShow?: boolean | null): void;
 	/**

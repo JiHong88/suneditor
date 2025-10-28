@@ -2,25 +2,6 @@ import CoreInjector from '../editorInjector/_core';
 import ApiManager from './ApiManager';
 
 /**
- * @typedef {Object} FileStateInfo
- * @property {string} src File source
- * @property {number} index File index
- * @property {string} name File name
- * @property {number} size File size
- */
-
-/**
- * @typedef {Object} FileStateParams
- * @property {SunEditor.Core} editor - The root editor instance
- * @property {Node} element File element
- * @property {number} index File index
- * @property {string} state File state ("create"|"update"|"delete")
- * @property {FileStateInfo} info File information
- * @property {number} remainingFilesCount Remaining file count
- * @property {string} pluginName Plugin name
- */
-
-/**
  * @typedef {Object} FileManagerParams
  * @property {string} query The query selector used to find file elements in the editor
  * @property {string} loadEventName Event name for file load (e.g., 'onImageLoad')
@@ -67,8 +48,8 @@ class FileManager extends CoreInjector {
 	 * @param {string} uploadUrl Upload server url
 	 * @param {?Object<string, string>} uploadHeader Request header
 	 * @param {FileList|File[]|{formData: FormData, size: number}} data FormData in body or Files array
-	 * @param {?(xmlHttp: XMLHttpRequest) => boolean=} callBack Success call back function
-	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string=} errorCallBack Error call back function
+	 * @param {?(xmlHttp: XMLHttpRequest) => boolean} [callBack] Success call back function
+	 * @param {?(res: *, xmlHttp: XMLHttpRequest) => string} [errorCallBack] Error call back function
 	 */
 	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
 		this.ui.showLoading();

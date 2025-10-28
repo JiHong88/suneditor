@@ -56,7 +56,7 @@ export type AudioPluginOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
+	insertBehavior?: SunEditor.ComponentInsertType;
 };
 /**
  * @typedef {Object} AudioPluginOptions
@@ -71,7 +71,7 @@ export type AudioPluginOptions = {
  * @property {boolean} [allowMultiple] - Whether to allow multiple file uploads.
  * @property {string} [acceptedFormats="audio/*"] - Accepted file formats (default is "audio/*").
  * @property {Object<string, string>} [audioTagAttributes] - Additional attributes to set on the audio tag.
- * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
@@ -115,7 +115,7 @@ declare class Audio_ extends EditorInjector {
 		audioTagAttributes: {
 			[x: string]: string;
 		};
-		insertBehavior: SunEditor.ComponentInsertBehaviorType;
+		insertBehavior: SunEditor.ComponentInsertType;
 	};
 	modal: Modal;
 	controller: Controller;
@@ -191,10 +191,10 @@ declare class Audio_ extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Component
 	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement=} target Target element, if null current selected element
+	 * @param {HTMLElement} [target] Target element, if null current selected element
 	 * @returns {Promise<void>}
 	 */
-	destroy(target?: HTMLElement | undefined): Promise<void>;
+	destroy(target?: HTMLElement): Promise<void>;
 	/**
 	 * @description Create an "audio" component using the provided files.
 	 * @param {FileList|File[]} fileList File object list

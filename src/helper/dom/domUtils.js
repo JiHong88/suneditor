@@ -62,8 +62,8 @@ export function clone(node, deep = false) {
  * @template {HTMLElement} T
  * @description Create Element node
  * @param {string} elementName Element name
- * @param {?Object<string, string>=} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
- * @param {?string|Node=} inner A innerHTML string or inner node.
+ * @param {?Object<string, string>} [attributes] The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
+ * @param {?string|Node} [inner] A innerHTML string or inner node.
  * @returns {T}
  */
 export function createElement(elementName, attributes, inner) {
@@ -98,7 +98,7 @@ export function createTextNode(text) {
 /**
  * @description Get attributes of argument element to string ('class="---" name="---" ')
  * @param {Node} element Element object
- * @param {Array<string>|null} exceptAttrs Array of attribute names to exclude from the result
+ * @param {?Array<string>} exceptAttrs Array of attribute names to exclude from the result
  * @returns {string}
  */
 export function getAttributesToString(element, exceptAttrs) {
@@ -219,7 +219,7 @@ export function prevIndex(array, item) {
  * @description Add style and className of copyEl to originEl
  * @param {Node} originEl Origin element
  * @param {Node} copyEl Element to copy
- * @param {?Array<string>=} blacklist Blacklist array(LowerCase)
+ * @param {?Array<string>} [blacklist] Blacklist array(LowerCase)
  */
 export function copyTagAttributes(originEl, copyEl, blacklist) {
 	const o = /** @type {HTMLElement} */ (originEl);

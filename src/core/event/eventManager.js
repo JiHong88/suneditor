@@ -56,31 +56,31 @@ function EventManager(editor) {
 	this._wwFrameObserver = null;
 	/** @type {ResizeObserver} */
 	this._toolbarObserver = null;
-	/** @type {Element|null} */
+	/** @type {?Element} */
 	this._lineBreakComp = null;
-	/** @type {Object<string, *>|null} */
+	/** @type {?Object<string, *>} */
 	this._formatAttrsTemp = null;
 	/** @type {number} */
 	this._resizeClientY = 0;
-	/** @type {SunEditor.GlobalEventInfo|null} */
+	/** @type {?SunEditor.Event.GlobalInfo} */
 	this.__resize_editor = null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
+	/** @type {?SunEditor.Event.GlobalInfo} */
 	this.__close_move = null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
+	/** @type {?SunEditor.Event.GlobalInfo} */
 	this.__geckoActiveEvent = null;
 	/** @type {Array<Node>} */
 	this.__cacheStyleNodes = [];
-	/** @type {SunEditor.GlobalEventInfo|null} */
+	/** @type {?SunEditor.Event.GlobalInfo} */
 	this.__selectionSyncEvent = null;
 
 	// input plugins
 	/** @type {boolean} */
 	this._inputFocus = false;
-	/** @type {Object<string, *>|null} */
+	/** @type {?Object<string, *>} */
 	this.__inputPlugin = null;
-	/** @type {?SunEditor.EventInfo=} */
+	/** @type {?SunEditor.Event.Info=} */
 	this.__inputBlurEvent = null;
-	/** @type {?SunEditor.EventInfo=} */
+	/** @type {?SunEditor.Event.Info=} */
 	this.__inputKeyEvent = null;
 
 	// viewport
@@ -102,8 +102,8 @@ EventManager.prototype = {
 	 * @param {*} target Target element
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event handler
-	 * @param {boolean|AddEventListenerOptions=} useCapture Event useCapture option
-	 * @return {SunEditor.EventInfo|null} Registered event information
+	 * @param {boolean|AddEventListenerOptions} [useCapture] Event useCapture option
+	 * @return {?SunEditor.Event.Info} Registered event information
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return null;
@@ -132,7 +132,7 @@ EventManager.prototype = {
 	/**
 	 * @this {EventManagerThis}
 	 * @description Remove event
-	 * @param {SunEditor.EventInfo} params event info = this.addEvent()
+	 * @param {SunEditor.Event.Info} params event info = this.addEvent()
 	 * @returns {undefined|null} Success: null, Not found: undefined
 	 */
 	removeEvent(params) {
@@ -160,8 +160,8 @@ EventManager.prototype = {
 	 * - When created as an Iframe, the same event is added to the document in the Iframe.
 	 * @param {string} type Event type
 	 * @param {(...args: *) => *} listener Event listener
-	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
-	 * @return {SunEditor.GlobalEventInfo} Registered event information
+	 * @param {boolean|AddEventListenerOptions} [useCapture] Use event capture
+	 * @return {SunEditor.Event.GlobalInfo} Registered event information
 	 */
 	addGlobalEvent(type, listener, useCapture) {
 		if (this.frameOptions.get('iframe')) {
@@ -179,9 +179,9 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
-	 * @param {string|SunEditor.GlobalEventInfo} type Event type or (Event info = this.addGlobalEvent())
-	 * @param {(...args: *) => *=} listener Event listener
-	 * @param {boolean|AddEventListenerOptions=} useCapture Use event capture
+	 * @param {string|SunEditor.Event.GlobalInfo} type Event type or (Event info = this.addGlobalEvent())
+	 * @param {(...args: *) => *} [listener] Event listener
+	 * @param {boolean|AddEventListenerOptions} [useCapture] Use event capture
 	 * @returns {undefined|null} Success: null, Not found: undefined
 	 */
 	removeGlobalEvent(type, listener, useCapture) {
@@ -204,7 +204,7 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * - such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
-	 * @param {?Node=} selectionNode selectionNode
+	 * @param {?Node} [selectionNode] selectionNode
 	 * @returns {Node|undefined} selectionNode
 	 */
 	applyTagEffect(selectionNode) {
@@ -452,7 +452,7 @@ EventManager.prototype = {
 	 * @private
 	 * @this {EventManagerThis}
 	 * @description If there is no default format, add a line and move 'selection'.
-	 * @param {string|null} formatName Format tag name (default: 'P')
+	 * @param {?string} formatName Format tag name (default: 'P')
 	 */
 	_setDefaultLine(formatName) {
 		if (!this.options.get('__lineFormatFilter')) return null;

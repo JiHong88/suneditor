@@ -1,55 +1,45 @@
 import type {} from '../typedef';
 export default ColorPicker;
-export type HueSliderParams_colorPicker = import('./HueSlider').HueSliderParams;
-export type HueSliderColor_colorPicker = import('./HueSlider').HueSliderColor;
 export type ColorPickerParams = {
 	/**
 	 * color list
 	 */
-	colorList?:
-		| Array<
-				| string
-				| {
-						value: string;
-						name: string;
-				  }
-		  >
-		| undefined;
+	colorList?: Array<
+		| string
+		| {
+				value: string;
+				name: string;
+		  }
+	>;
 	/**
 	 * Number of colors to be displayed in one line
 	 */
-	splitNum?: number | undefined;
+	splitNum?: number;
 	/**
 	 * Default color
 	 */
-	defaultColor?: string | undefined;
+	defaultColor?: string;
 	/**
 	 * Disable HEX input
 	 */
-	disableHEXInput?: boolean | undefined;
+	disableHEXInput?: boolean;
 	/**
 	 * Disable remove button
 	 */
-	disableRemove?: boolean | undefined;
+	disableRemove?: boolean;
 	/**
 	 * hue slider options
 	 */
-	hueSliderOptions?: HueSliderParams_colorPicker | undefined;
+	hueSliderOptions?: import('./HueSlider').HueSliderParams;
 };
 /**
- * @typedef {import('./HueSlider').HueSliderParams} HueSliderParams_colorPicker
- */
-/**
- * @typedef {import('./HueSlider').HueSliderColor} HueSliderColor_colorPicker
- */
-/**
  * @typedef {Object} ColorPickerParams
- * @property {Array<string|{value: string, name: string}>=} [colorList=[]] color list
- * @property {number=} [splitNum=0] Number of colors to be displayed in one line
- * @property {string=} [defaultColor] Default color
- * @property {boolean=} [disableHEXInput=false] Disable HEX input
- * @property {boolean=} [disableRemove=false] Disable remove button
- * @property {HueSliderParams_colorPicker=} [hueSliderOptions] hue slider options
+ * @property {Array<string|{value: string, name: string}>} [colorList=[]] color list
+ * @property {number} [splitNum=0] Number of colors to be displayed in one line
+ * @property {string} [defaultColor] Default color
+ * @property {boolean} [disableHEXInput=false] Disable HEX input
+ * @property {boolean} [disableRemove=false] Disable remove button
+ * @property {import('./HueSlider').HueSliderParams} [hueSliderOptions] hue slider options
  */
 /**
  * @class
@@ -84,11 +74,11 @@ declare class ColorPicker extends CoreInjector {
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node
 	 * @param {Node} target target
-	 * @param {?((current: Node) => boolean)=} stopCondition - A function used to stop traversing parent nodes while finding the color.
+	 * @param {?(current: Node) => boolean} [stopCondition] - A function used to stop traversing parent nodes while finding the color.
 	 * - When this function returns true, the traversal ends at that node.
 	 * - e.g., `(node) => this.format.isLine(node)` stops at line-level elements like <p>, <div>.
 	 */
-	init(nodeOrColor: Node | string, target: Node, stopCondition?: (((current: Node) => boolean) | null) | undefined): void;
+	init(nodeOrColor: Node | string, target: Node, stopCondition?: ((current: Node) => boolean) | null): void;
 	/**
 	 * @description Store color values
 	 * @param {string} hexColorStr Hax color value
@@ -101,9 +91,9 @@ declare class ColorPicker extends CoreInjector {
 	/**
 	 * @editorMethod Modules.HueSlider
 	 * @description This method is called when the color is selected in the hue slider.
-	 * @param {HueSliderColor_colorPicker} color - Color object
+	 * @param {SunEditor.Module.HueSlider.Color} color - Color object
 	 */
-	hueSliderAction(color: HueSliderColor_colorPicker): void;
+	hueSliderAction(color: SunEditor.Module.HueSlider.Color): void;
 	/**
 	 * @editorMethod Modules.HueSlider
 	 * @description This method is called when the hue slider is closed.

@@ -179,8 +179,8 @@ class FontSize extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
-	 * @param {?HTMLElement=} target - The plugin's toolbar button element
+	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
+	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
@@ -252,7 +252,7 @@ class FontSize extends EditorInjector {
 	/**
 	 * @editorMethod Editor.Toolbar
 	 * @description Executes the event function of toolbar's input tag - "change".
-	 * @param {SunEditor.PluginToolbarInputChangeEventInfo} params
+	 * @param {SunEditor.Plugin.ToolbarInputChangeEventInfo} params
 	 */
 	onInputChange({ target, value: changeValue, event }) {
 		if (this.#disableInput) return;

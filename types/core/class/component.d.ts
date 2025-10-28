@@ -34,7 +34,7 @@ declare class Component {
 	isSelected: boolean;
 	/**
 	 * @description Currently selected component target
-	 * @type {Node|null}
+	 * @type {?Node}
 	 */
 	currentTarget: Node | null;
 	/**
@@ -49,21 +49,21 @@ declare class Component {
 	currentPluginName: any;
 	/**
 	 * @description Currently selected component information
-	 * @type {SunEditor.ComponentInfo|null}
+	 * @type {?SunEditor.ComponentInfo}
 	 */
 	currentInfo: SunEditor.ComponentInfo | null;
 	/** @type {Object<string, (...args: *) => *>} */
 	__globalEvents: {
 		[x: string]: (...args: any) => any;
 	};
-	/** @type {SunEditor.GlobalEventInfo|null} */
-	_bindClose_copy: SunEditor.GlobalEventInfo | null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
-	_bindClose_cut: SunEditor.GlobalEventInfo | null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
-	_bindClose_keydown: SunEditor.GlobalEventInfo | null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
-	_bindClose_mousedown: SunEditor.GlobalEventInfo | null;
+	/** @type {?SunEditor.Event.GlobalInfo} */
+	_bindClose_copy: SunEditor.Event.GlobalInfo | null;
+	/** @type {?SunEditor.Event.GlobalInfo} */
+	_bindClose_cut: SunEditor.Event.GlobalInfo | null;
+	/** @type {?SunEditor.Event.GlobalInfo} */
+	_bindClose_keydown: SunEditor.Event.GlobalInfo | null;
+	/** @type {?SunEditor.Event.GlobalInfo} */
+	_bindClose_mousedown: SunEditor.Event.GlobalInfo | null;
 	/** @type {boolean} */
 	__selectionSelected: boolean;
 	__prevent: boolean;
@@ -76,7 +76,7 @@ declare class Component {
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
 	 * @param {boolean} [options.scrollTo=true] true : Scroll to the inserted element, false : Do not scroll.
-	 * @param {SunEditor.ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
+	 * @param {SunEditor.ComponentInsertType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
 	 * - If null, noting action is performed after insertion.
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
@@ -92,17 +92,17 @@ declare class Component {
 			skipCharCount?: boolean;
 			skipHistory?: boolean;
 			scrollTo?: boolean;
-			insertBehavior?: SunEditor.ComponentInsertBehaviorType;
+			insertBehavior?: SunEditor.ComponentInsertType;
 		},
 	): HTMLElement;
 	/**
 	 * @this {ComponentThis}
 	 * @description Handles post-insertion behavior for a newly created component based on the specified mode.
 	 * @param {Node} container The inserted component element.
-	 * @param {Node|null} [oNode] Optional node to use for selection if the component cannot be selected.
-	 * @param {SunEditor.ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
+	 * @param {?Node} [oNode] Optional node to use for selection if the component cannot be selected.
+	 * @param {SunEditor.ComponentInsertType} [insertBehavior] Behavior mode after component insertion.
 	 */
-	applyInsertBehavior(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node, oNode?: Node | null, insertBehavior?: SunEditor.ComponentInsertBehaviorType): void;
+	applyInsertBehavior(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node, oNode?: Node | null, insertBehavior?: SunEditor.ComponentInsertType): void;
 	/**
 	 * @this {ComponentThis}
 	 * @description Gets the file component and that plugin name

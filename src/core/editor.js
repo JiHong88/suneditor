@@ -35,10 +35,6 @@ const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-e
 const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
 
 /**
- * @typedef {import('../modules/Controller').ControllerInfo} ControllerInfo_editor
- */
-
-/**
  * @constructor
  * @description SunEditor constructor function.
  * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} multiTargets Target element
@@ -139,7 +135,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Events object, call by triggerEvent function
-	 * @type {SunEditor.EventHandlers}
+	 * @type {SunEditor.Event.Handlers}
 	 */
 	this.events = null;
 
@@ -257,7 +253,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description The selection node (selection.getNode()) to which the effect was last applied
-	 * @type {Node|null}
+	 * @type {?Node}
 	 */
 	this.effectNode = null;
 
@@ -269,7 +265,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Currently open "Controller" info array
-	 * @type {Array<ControllerInfo_editor>}
+	 * @type {Array<SunEditor.Module.Controller.Info>}
 	 */
 	this.opendControllers = [];
 
@@ -303,7 +299,7 @@ function Editor(multiTargets, options) {
 	// ------ class ------
 	/** @description Toolbar class instance @type {import('./class/toolbar').default} */
 	this.toolbar = null;
-	/** @description Sub-Toolbar class instance @type {import('./class/toolbar').default|null} */
+	/** @description Sub-Toolbar class instance @type {?import('./class/toolbar').default} */
 	this.subToolbar = null;
 	/** @description Char class instance @type {import('./class/char').default} */
 	this.char = null;
@@ -360,19 +356,19 @@ function Editor(multiTargets, options) {
 	/**
 	 * @description Copy format info
 	 * - eventManager.__cacheStyleNodes copied
-	 * @type {Array<Node>|null}
+	 * @type {?Array<Node>}
 	 */
 	this._onCopyFormatInfo = null;
 
 	/**
 	 * @description Copy format init method
-	 * @type {(...args: *) => *|null}
+	 * @type {?(...args: *) => *}
 	 */
 	this._onCopyFormatInitMethod = null;
 
 	/**
 	 * @description Controller target's frame div (editor.frameContext.get('topArea'))
-	 * @type {HTMLElement|null}
+	 * @type {?HTMLElement}
 	 */
 	this._controllerTargetContext = null;
 
@@ -484,7 +480,7 @@ function Editor(multiTargets, options) {
 
 	/**
 	 * @description Current Figure container.
-	 * @type {HTMLElement|null}
+	 * @type {?HTMLElement}
 	 */
 	this._figureContainer = null;
 
@@ -535,7 +531,7 @@ Editor.prototype = {
 	 * @description Run plugin calls and basic commands.
 	 * @param {string} command Command string
 	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
-	 * @param {?Node=} button The element of command button
+	 * @param {?Node} [button] The element of command button
 	 */
 	run(command, type, button) {
 		if (type) {
@@ -595,7 +591,7 @@ Editor.prototype = {
 	 * @description Execute default command of command button
 	 * - (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
-	 * @param {?Node=} button Command button
+	 * @param {?Node} [button] Command button
 	 * @returns {Promise<void>}
 	 */
 	async commandHandler(command, button) {
@@ -725,7 +721,7 @@ Editor.prototype = {
 	/**
 	 * @description Checks if the content of the editor is empty.
 	 * - Display criteria for "placeholder".
-	 * @param {?SunEditor.FrameContext=} fc Frame context, if not present, currently selected frame context.
+	 * @param {?SunEditor.FrameContext} [fc] Frame context, if not present, currently selected frame context.
 	 * @returns {boolean}
 	 */
 	isEmpty(fc) {
@@ -1007,8 +1003,8 @@ Editor.prototype = {
 	/**
 	 * @description javascript execCommand
 	 * @param {string} command javascript execCommand function property
-	 * @param {boolean=} showDefaultUI javascript execCommand function property
-	 * @param {string=} value javascript execCommand function property
+	 * @param {boolean} [showDefaultUI] javascript execCommand function property
+	 * @param {string} [value] javascript execCommand function property
 	 */
 	execCommand(command, showDefaultUI, value) {
 		this.frameContext.get('_wd').execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
@@ -1052,7 +1048,7 @@ Editor.prototype = {
 	/**
 	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
 	 * - If "focusEdge" is null, then selected last element
-	 * @param {?Node=} focusEl Focus element
+	 * @param {?Node} [focusEl] Focus element
 	 */
 	focusEdge(focusEl) {
 		this._preventBlur = false;
@@ -1312,7 +1308,7 @@ Editor.prototype = {
 	/**
 	 * @private
 	 * @description Set display property when there is placeholder.
-	 * @param {?SunEditor.FrameContext=} fc - Frame context object, If null fc is this.frameContext
+	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
 	 */
 	_checkPlaceholder(fc) {
 		fc ||= /** @type {SunEditor.FrameContext} */ (this.frameContext);

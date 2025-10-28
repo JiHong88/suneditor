@@ -3,7 +3,7 @@ import type {} from '../../typedef';
  * @description Create shortcuts desc span.
  * @param {string} command Command string
  * @param {Array<string>} values options.shortcuts[command]
- * @param {Element|null} button Command button element
+ * @param {?Element} button Command button element
  * @param {Map<string, *>} keyMap Map to store shortcut key info
  * @param {Array} rc "_reverseCommandArray" option
  * @param {Set} reverseKeys Reverse key array
@@ -14,10 +14,10 @@ export function CreateShortcuts(command: string, button: Element | null, values:
  * @property {SunEditor.Options} o - Processed base options (Map containing {@link AllBaseOptions_constructor} keys)
  * @property {Object<string, string>} i - Icon set
  * @property {Object<string, string>} l - Language pack
- * @property {string|null} v - Initial editor value
+ * @property {?string} v - Initial editor value
  * @property {Array<string[]|string>} buttons - Toolbar button list (arrays for groups, strings for single buttons)
- * @property {Array<string[]|string>|null} subButtons - Sub-toolbar button list
- * @property {Element|null} statusbarContainer - Container element for status bar (if specified)
+ * @property {?Array<string[]|string>} subButtons - Sub-toolbar button list
+ * @property {?Element} statusbarContainer - Container element for status bar (if specified)
  * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => {@link SunEditor.FrameOptions})
  */
 /**
@@ -55,7 +55,7 @@ export function CreateStatusbar(
 };
 /**
  * @description Update a button state, attributes, and icons
- * @param {HTMLElement|null} element Button element
+ * @param {?HTMLElement} element Button element
  * @param {Object<string, *>} plugin Plugin
  * @param {Object<string, string>} icons Icons
  * @param {Object<string, string>} lang lang
@@ -229,8 +229,8 @@ export type InitOptionsReturnType = {
  * @property {Object<string, *>} plugins - Loaded plugins
  * @property {Object<string, string>} icons - Icon set
  * @property {Object<string, string>} lang - Language pack
- * @property {string|null} value - Initial editor value
- * @property {string|null} rootId - Root frame ID
+ * @property {?string} value - Initial editor value
+ * @property {?string} rootId - Root frame ID
  * @property {Array<string|null>} rootKeys - Array of frame keys
  * @property {Map<string|null, ReturnType<import('../config/frameContext').CreateFrameContext>>} frameRoots - Map of frame contexts
  * @property {Object<string, Array<HTMLElement>>} pluginCallButtons - Plugin toolbar buttons

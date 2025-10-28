@@ -10,9 +10,9 @@ export default function History(editor: SunEditor.Core): {
 	 * - If the function is called again with the "delay" argument true before it is saved, the delay time is renewed.
 	 * - You can specify the delay time by sending a number.
 	 * @param {boolean|number} delay If true, add stack without delay time.
-	 * @param {*=} [rootKey] The key of the root frame to save history for.
+	 * @param {*} [rootKey] The key of the root frame to save history for.
 	 */
-	push(delay: boolean | number, rootKey?: any | undefined): void;
+	push(delay: boolean | number, rootKey?: any): void;
 	/**
 	 * @description Immediately saves the current state to the history stack if a delayed save is pending.
 	 * @param {*} rootKey The key of the root frame.
@@ -29,9 +29,9 @@ export default function History(editor: SunEditor.Core): {
 	redo(): void;
 	/**
 	 * @description Overwrites the current state in the history stack with the latest content.
-	 * @param {string=} [rootKey] The key of the root frame to overwrite.
+	 * @param {string} [rootKey] The key of the root frame to overwrite.
 	 */
-	overwrite(rootKey?: string | undefined): void;
+	overwrite(rootKey?: string): void;
 	/**
 	 * @description Pauses the history stack, preventing new entries from being added for up to 5 seconds.
 	 */

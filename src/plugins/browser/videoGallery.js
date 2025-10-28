@@ -2,15 +2,11 @@ import EditorInjector from '../../editorInjector';
 import { Browser } from '../../modules';
 
 /**
- * @typedef {import('../../modules/Browser').BrowserFile} BrowserFile_videoGallery
- */
-
-/**
  * @typedef {Object} VideoGalleryPluginOptions
- * @property {Array<BrowserFile_videoGallery>} [data] - Direct data without server calls
+ * @property {Array<SunEditor.Module.Browser.File>} [data] - Direct data without server calls
  * @property {string} [url] - Server request URL
  * @property {Object<string, string>} [headers] - Server request headers
- * @property {string|((item: BrowserFile_videoGallery) => string)} [thumbnail] - Default thumbnail
+ * @property {string|((item: SunEditor.Module.Browser.File) => string)} [thumbnail] - Default thumbnail
  */
 
 /**
@@ -59,7 +55,7 @@ class VideoGallery extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Browser
 	 * @description Executes the method that is called when a "Browser" module's is opened.
-	 * @param {?(targe: Node) => *=} onSelectfunction method to be executed after selecting an item in the gallery
+	 * @param {?(targe: Node) => *} [onSelectfunction] method to be executed after selecting an item in the gallery
 	 */
 	open(onSelectfunction) {
 		this.onSelectfunction = onSelectfunction;

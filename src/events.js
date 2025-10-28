@@ -20,11 +20,6 @@
  * @property {string} from - "SE"|"MS"|"" - source
  */
 
-// --- controller
-/**
- * @typedef {import('./modules/Controller').ControllerInfo} ControllerInfo
- */
-
 // --- media
 /**
  * @typedef {Object} FileManagementInfo
@@ -207,7 +202,7 @@
  * @param {SunEditor.Core} params.editor - The root editor instance
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {string} params.caller - caller plugin name
- * @param {ControllerInfo} params.info - info object
+ * @param {SunEditor.Module.Controller.Info} params.info - info object
  */
 
 /**
@@ -216,7 +211,7 @@
  * @param {SunEditor.Core} params.editor - The root editor instance
  * @param {SunEditor.FrameContext} params.frameContext - frame context
  * @param {string} params.caller - caller plugin name
- * @param {ControllerInfo} params.info - info object
+ * @param {SunEditor.Module.Controller.Info} params.info - info object
  */
 
 /**
@@ -316,10 +311,10 @@
  * @param {Object} params
  * @param {SunEditor.Core} params.editor - The root editor instance
  * @param {string} params.error - error message
- * @param {number=} params.limitSize - limit size
- * @param {number=} params.uploadSize - upload size
- * @param {number=} params.currentSize - current size
- * @param {File=} params.file - File object
+ * @param {number} [params.limitSize] - limit size
+ * @param {number} [params.uploadSize] - upload size
+ * @param {number} [params.currentSize] - current size
+ * @param {File} [params.file] - File object
  * @returns {Promise<string | undefined>}
  */
 
@@ -377,10 +372,10 @@
  * @param {Object} params
  * @param {SunEditor.Core} params.editor - The root editor instance
  * @param {string} params.error - error message
- * @param {number=} params.limitSize - limit size
- * @param {number=} params.uploadSize - upload size
- * @param {number=} params.currentSize - current size
- * @param {File=} params.file - File object
+ * @param {number} [params.limitSize] - limit size
+ * @param {number} [params.uploadSize] - upload size
+ * @param {number} [params.currentSize] - current size
+ * @param {File} [params.file] - File object
  * @returns {Promise<string | undefined>}
  */
 
@@ -418,10 +413,10 @@
  * @param {Object} params
  * @param {SunEditor.Core} params.editor - The root editor instance
  * @param {string} params.error - error message
- * @param {number=} params.limitSize - limit size
- * @param {number=} params.uploadSize - upload size
- * @param {number=} params.currentSize - current size
- * @param {File=} params.file - File object
+ * @param {number} [params.limitSize] - limit size
+ * @param {number} [params.uploadSize] - upload size
+ * @param {number} [params.currentSize] - current size
+ * @param {File} [params.file] - File object
  * @returns {Promise<string | undefined>}
  */
 
@@ -487,10 +482,10 @@
  * @param {Object} params
  * @param {SunEditor.Core} params.editor - The root editor instance
  * @param {string} params.error - error message
- * @param {number=} params.limitSize - limit size
- * @param {number=} params.uploadSize - upload size
- * @param {number=} params.currentSize - current size
- * @param {File=} params.file - File object
+ * @param {number} [params.limitSize] - limit size
+ * @param {number} [params.uploadSize] - upload size
+ * @param {number} [params.currentSize] - current size
+ * @param {File} [params.file] - File object
  * @returns {Promise<string | undefined>}
  */
 

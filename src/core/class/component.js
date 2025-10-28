@@ -37,7 +37,7 @@ function Component(editor) {
 
 	/**
 	 * @description Currently selected component target
-	 * @type {Node|null}
+	 * @type {?Node}
 	 */
 	this.currentTarget = null;
 
@@ -55,7 +55,7 @@ function Component(editor) {
 
 	/**
 	 * @description Currently selected component information
-	 * @type {SunEditor.ComponentInfo|null}
+	 * @type {?SunEditor.ComponentInfo}
 	 */
 	this.currentInfo = null;
 
@@ -66,13 +66,13 @@ function Component(editor) {
 		keydown: OnKeyDown_component.bind(this),
 		mousedown: CloseListener_mousedown.bind(this),
 	};
-	/** @type {SunEditor.GlobalEventInfo|null} */
+	/** @type {?SunEditor.Event.GlobalInfo} */
 	this._bindClose_copy = null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
+	/** @type {?SunEditor.Event.GlobalInfo} */
 	this._bindClose_cut = null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
+	/** @type {?SunEditor.Event.GlobalInfo} */
 	this._bindClose_keydown = null;
-	/** @type {SunEditor.GlobalEventInfo|null} */
+	/** @type {?SunEditor.Event.GlobalInfo} */
 	this._bindClose_mousedown = null;
 	/** @type {boolean} */
 	this.__selectionSelected = false;
@@ -101,7 +101,7 @@ Component.prototype = {
 	 * @param {boolean} [options.skipCharCount=false] If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} [options.skipHistory=false] If true, do not push to history.
 	 * @param {boolean} [options.scrollTo=true] true : Scroll to the inserted element, false : Do not scroll.
-	 * @param {SunEditor.ComponentInsertBehaviorType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
+	 * @param {SunEditor.ComponentInsertType} [options.insertBehavior] If true, do not automatically select the inserted component. [default: options.get('componentInsertBehavior')]
 	 * - If null, noting action is performed after insertion.
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
@@ -160,8 +160,8 @@ Component.prototype = {
 	 * @this {ComponentThis}
 	 * @description Handles post-insertion behavior for a newly created component based on the specified mode.
 	 * @param {Node} container The inserted component element.
-	 * @param {Node|null} [oNode] Optional node to use for selection if the component cannot be selected.
-	 * @param {SunEditor.ComponentInsertBehaviorType} [insertBehavior] Behavior mode after component insertion.
+	 * @param {?Node} [oNode] Optional node to use for selection if the component cannot be selected.
+	 * @param {SunEditor.ComponentInsertType} [insertBehavior] Behavior mode after component insertion.
 	 */
 	applyInsertBehavior(container, oNode, insertBehavior) {
 		const cInfo = this.get(container);

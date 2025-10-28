@@ -1,12 +1,8 @@
 import type {} from '../../typedef';
 export default Selection_;
 export type SelectionThis = Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>;
-export type RectsInfo_selection = import('./offset').RectsInfo;
 /**
  * @typedef {Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>} SelectionThis
- */
-/**
- * @typedef {import('./offset').RectsInfo} RectsInfo_selection
  */
 /**
  * @constructor
@@ -18,9 +14,6 @@ declare function Selection_(this: Omit<Selection_ & Partial<import('../../editor
 declare class Selection_ {
 	/**
 	 * @typedef {Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>} SelectionThis
-	 */
-	/**
-	 * @typedef {import('./offset').RectsInfo} RectsInfo_selection
 	 */
 	/**
 	 * @constructor
@@ -101,7 +94,7 @@ declare class Selection_ {
 	 * @this {SelectionThis}
 	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
 	 * @param {Range} range core.getRange()
-	 * @param {Node|null} [container] If there is "container" argument, it creates a line in front of the container.
+	 * @param {?Node} [container] If there is "container" argument, it creates a line in front of the container.
 	 * @returns {Range} a new "range" or argument "range".
 	 */
 	getRangeAndAddLine(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: Range, container?: Node | null): Range;
@@ -114,9 +107,9 @@ declare class Selection_ {
 	/**
 	 * @this {SelectionThis}
 	 * @description Get the Rects object.
-	 * @param {Range|Node|null} target Range | Node | null
+	 * @param {?(Range|Node)} target Range | Node | null
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
-	 * @returns {{rects: RectsInfo_selection, position: "start"|"end", scrollLeft: number, scrollTop: number}}
+	 * @returns {{rects: import('./offset').RectsInfo, position: "start"|"end", scrollLeft: number, scrollTop: number}}
 	 * @example
 	 * // Get rects at start of selection
 	 * const { rects, position, scrollLeft, scrollTop } = editor.selection.getRects(null, 'start');
@@ -133,10 +126,10 @@ declare class Selection_ {
 	 */
 	getRects(
 		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
-		target: Range | Node | null,
+		target: (Range | Node) | null,
 		position: 'start' | 'end',
 	): {
-		rects: RectsInfo_selection;
+		rects: import('./offset').RectsInfo;
 		position: 'start' | 'end';
 		scrollLeft: number;
 		scrollTop: number;

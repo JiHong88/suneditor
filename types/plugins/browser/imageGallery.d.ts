@@ -46,9 +46,9 @@ declare class ImageGallery extends EditorInjector {
 	/**
 	 * @editorMethod Modules.Browser
 	 * @description Executes the method that is called when a "Browser" module's is opened.
-	 * @param {?(targe: Node) => *=} onSelectfunction method to be executed after selecting an item in the gallery
+	 * @param {?(targe: Node) => *} [onSelectfunction] method to be executed after selecting an item in the gallery
 	 */
-	open(onSelectfunction?: (((targe: Node) => any) | null) | undefined): void;
+	open(onSelectfunction?: ((targe: Node) => any) | null): void;
 	/**
 	 * @editorMethod Modules.Browser
 	 * @description Executes the method that is called when a "Browser" module's is closed.

@@ -20,11 +20,11 @@ export type SelectMenuParams = {
 	/**
 	 * Optional method to call when the menu is opened
 	 */
-	openMethod?: (() => void) | undefined;
+	openMethod?: () => void;
 	/**
 	 * Optional method to call when the menu is closed
 	 */
-	closeMethod?: (() => void) | undefined;
+	closeMethod?: () => void;
 };
 /**
  * @typedef {Object} SelectMenuParams
@@ -32,8 +32,8 @@ export type SelectMenuParams = {
  * @property {boolean} [checkList=false] Flag to determine if the checklist is enabled (true or false)
  * @property {"rtl" | "ltr"} [dir="ltr"] Optional text direction: "rtl" for right-to-left, "ltr" for left-to-right
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
- * @property {() => void=} openMethod Optional method to call when the menu is opened
- * @property {() => void=} closeMethod Optional method to call when the menu is closed
+ * @property {() => void} [openMethod] Optional method to call when the menu is opened
+ * @property {() => void} [closeMethod] Optional method to call when the menu is closed
  */
 /**
  * @class
@@ -86,10 +86,10 @@ declare class SelectMenu extends CoreInjector {
 	): void;
 	/**
 	 * @description Select menu open
-	 * @param {?string=} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
-	 * @param {?string=} onItemQuerySelector The querySelector string of the menu to be activated
+	 * @param {?string} [position] "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
+	 * @param {?string} [onItemQuerySelector] The querySelector string of the menu to be activated
 	 */
-	open(position?: (string | null) | undefined, onItemQuerySelector?: (string | null) | undefined): void;
+	open(position?: string | null, onItemQuerySelector?: string | null): void;
 	/**
 	 * @description Select menu close
 	 */

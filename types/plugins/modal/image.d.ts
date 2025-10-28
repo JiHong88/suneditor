@@ -93,7 +93,7 @@ export type ImagePluginOptions = {
 	/**
 	 * - Figure controls.
 	 */
-	controls?: import('../../modules/Figure').FigureControls;
+	controls?: SunEditor.Module.Figure.Controls;
 	/**
 	 * - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
 	 * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
@@ -103,7 +103,7 @@ export type ImagePluginOptions = {
 	 * - `line`: Move cursor to the next line if possible, or create a new line and move there.
 	 * - `none`: Do nothing.
 	 */
-	insertBehavior?: SunEditor.ComponentInsertBehaviorType;
+	insertBehavior?: SunEditor.ComponentInsertType;
 };
 /**
  * @typedef {Object} ImagePluginOptions
@@ -124,8 +124,8 @@ export type ImagePluginOptions = {
  * @property {string} [defaultFormatType="block"] - The default image format type ("block" or "inline").
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
- * @property {import('../../modules/Figure').FigureControls} [controls] - Figure controls.
- * @property {SunEditor.ComponentInsertBehaviorType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
+ * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
+ * @property {SunEditor.ComponentInsertType} [insertBehavior] - Component insertion behavior for selection and cursor placement. [default: options.get('componentInsertBehavior')]
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
  * - `auto`: Move cursor to the next line if possible, otherwise select the component.
@@ -175,7 +175,7 @@ declare class Image_ extends EditorInjector {
 		useFormatType: boolean;
 		defaultFormatType: string;
 		keepFormatType: boolean;
-		insertBehavior: SunEditor.ComponentInsertBehaviorType;
+		insertBehavior: SunEditor.ComponentInsertType;
 	};
 	alignForm: HTMLElement;
 	anchor: ModalAnchorEditor;

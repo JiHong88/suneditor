@@ -50,8 +50,8 @@ export const A = {
 	selectionSetRange: (sc, so, ec, eo) => ({ t: 'selection.setRange', p: { sc, so, ec, eo } }),
 	/**
 	 * @param {Element} rangeEl
-	 * @param {Element[]|null} selectedFormats
-	 * @param {Element|null} newBlockElement
+	 * @param {?Element[]} selectedFormats
+	 * @param {?Element} newBlockElement
 	 * @param {boolean} shouldDelete
 	 * @param {boolean} skipHistory
 	 * @returns {Action}

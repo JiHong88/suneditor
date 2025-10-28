@@ -436,7 +436,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.component
 	 * @description Executes the method that is called when a component copy is requested.
-	 * @param {SunEditor.PluginCopyComponentParams} params
+	 * @param {SunEditor.Plugin.CopyComponentParams} params
 	 * @returns {boolean|void}
 	 */
 	onCopyComponent({ event, cloneContainer }) {
@@ -453,7 +453,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "copy".
-	 * @param {SunEditor.PluginPasteParams} params
+	 * @param {SunEditor.Plugin.PasteParams} params
 	 * @returns {boolean|void}
 	 */
 	onPaste({ event, doc }) {
@@ -601,7 +601,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousemove".
-	 * @param {SunEditor.PluginMouseEventInfo} params
+	 * @param {SunEditor.Plugin.MouseEventInfo} params
 	 */
 	onMouseMove({ event }) {
 		if (this.#resizing) return;
@@ -654,7 +654,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "mousedown".
-	 * @param {SunEditor.PluginMouseEventInfo} params
+	 * @param {SunEditor.Plugin.MouseEventInfo} params
 	 */
 	onMouseDown({ event }) {
 		this.#ref = this.#selectedCell = null;
@@ -760,7 +760,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keydown".
-	 * @param {SunEditor.PluginKeyEventInfo} params
+	 * @param {SunEditor.Plugin.KeyEventInfo} params
 	 */
 	onKeyDown({ event, range, line }) {
 		this.#ref = null;
@@ -848,7 +848,7 @@ class Table extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the event function of "keyup".
-	 * @param {SunEditor.PluginKeyEventInfo} params
+	 * @param {SunEditor.Plugin.KeyEventInfo} params
 	 */
 	onKeyUp({ line }) {
 		this.#_s = false;
@@ -1305,8 +1305,8 @@ class Table extends EditorInjector {
 	 * - null: to remove the row
 	 * - 'up': to insert the row up
 	 * - 'down': to insert the row down, or null to remove.
-	 * @param {?HTMLTableCellElement=} targetCell Target cell, (default: current selected cell)
-	 * @param {?HTMLTableCellElement=} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
+	 * @param {?HTMLTableCellElement} [targetCell] Target cell, (default: current selected cell)
+	 * @param {?HTMLTableCellElement} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
 	 */
 	editRow(option, targetCell, positionResetElement) {
 		this._deleteStyleSelectedCells();
@@ -1402,8 +1402,8 @@ class Table extends EditorInjector {
 	 * - null: to remove the cell
 	 * - left: to insert a new cell to the left
 	 * - right: to insert a new cell to the right
-	 * @param {?HTMLTableCellElement=} targetCell Target cell, (default: current selected cell)
-	 * @param {?HTMLTableCellElement=} positionResetElement The element to reset the position of (optional). This can be the cell that triggered the column edit.
+	 * @param {?HTMLTableCellElement} [targetCell] Target cell, (default: current selected cell)
+	 * @param {?HTMLTableCellElement} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the column edit.
 	 * @returns {HTMLTableCellElement} Target table cell
 	 */
 	editCell(option, targetCell, positionResetElement) {

@@ -82,7 +82,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	if (this._callPluginEvent('onKeyDown', { frameContext: fc, event: e, range, line: formatEl }) === false) return;
 
 	// reducer / actions
-	/** @type {SunEditor.EventKeydownCtx} */
+	/** @type {import('../reducers/keydown.reducer').KeydownReducerCtx} */
 	const ctx = { e, fc, status: this.status, options: this.options, frameOptions: this.frameOptions, range, selectionNode, formatEl, keyCode, ctrl, alt, shift };
 	const ports = makePorts(this, { _styleNodes });
 

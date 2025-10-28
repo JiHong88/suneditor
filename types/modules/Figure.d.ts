@@ -1,57 +1,50 @@
 import type {} from '../typedef';
 export default Figure;
-export type FigureParams = {
-	/**
-	 * Size unit
-	 */
-	sizeUnit?: string;
-	/**
-	 * Auto ratio { current: '00%', default: '00%' }
-	 */
-	autoRatio?: {
-		current: string;
-		default: string;
-	};
-};
+/**
+ * Figure information object
+ */
 export type FigureInfo = {
 	/**
-	 * Target element (img, iframe, video, audio, table, etc.)
+	 * - Target element (img, iframe, video, audio, table, etc.)
 	 */
 	target: HTMLElement;
 	/**
-	 * Container element (div.se-component|span.se-component.se-inline-component)
+	 * - Container element (div.se-component|span.se-component.se-inline-component)
 	 */
 	container: HTMLElement;
 	/**
-	 * Cover element (FIGURE|null)
+	 * - Cover element (FIGURE|null)
 	 */
 	cover: HTMLElement | null;
 	/**
-	 * Inline cover element (span.se-inline-component)
+	 * - Inline cover element (span.se-inline-component)
 	 */
 	inlineCover: HTMLElement | null;
 	/**
-	 * Caption element (FIGCAPTION)
+	 * - Caption element (FIGCAPTION)
 	 */
 	caption: HTMLElement | null;
 	/**
-	 * Whether to rotate vertically
+	 * - Whether to rotate vertically
 	 */
 	isVertical: boolean;
 };
+/**
+ * Figure target information object (for resize/align operations)
+ */
 export type FigureTargetInfo = {
 	/**
-	 * Container element (div.se-component|span.se-component.se-inline-component)
+	 * - Container element (div.se-component|span.se-component.se-inline-component)
 	 */
 	container: HTMLElement;
 	/**
-	 * Cover element (FIGURE|null)
+	 * - Cover element (FIGURE|null)
 	 */
-	cover?: (HTMLElement | null) | undefined;
+	cover?: HTMLElement | null;
 	/**
-	 * Caption element (FIGCAPTION)
+	 * - Caption element (FIGCAPTION)
 	 */
-	caption?: (HTMLElement | null) | undefined;
+	caption?: HTMLElement | null;
 	/**
 	 * - Alignment of the element.
 	 */
@@ -64,7 +57,7 @@ export type FigureTargetInfo = {
 		h: number;
 	};
 	/**
-	 * Whether to rotate vertically
+	 * - Whether to rotate vertically
 	 */
 	isVertical: boolean;
 	/**
@@ -111,7 +104,7 @@ export type FigureControlResize = `resize_auto,${number}` | `resize_auto,${numbe
 /**
  * Figure control custom action object
  */
-export type FigureControlCustomAction = {
+export type ControlCustomAction = {
 	action: (element: Node, value: string, target: Node) => void;
 	command: string;
 	value: string;
@@ -139,29 +132,39 @@ export type FigureControlCustomAction = {
  * - `"resize_auto,50,75,100"`: Auto-resize with percentage values (e.g., "resize_auto,100,75,50")
  * - Custom action object with action, command, value, title, icon
  */
-export type FigureControls = Array<Array<FigureControlButton | FigureControlResize | FigureControlCustomAction | string>>;
+export type FigureControls = Array<Array<FigureControlButton | FigureControlResize | ControlCustomAction | string>>;
+export type FigureParams = {
+	/**
+	 * Size unit
+	 */
+	sizeUnit?: string;
+	/**
+	 * Auto ratio { current: '00%', default: '00%' }
+	 */
+	autoRatio?: {
+		current: string;
+		default: string;
+	};
+};
 /**
- * @typedef {Object} FigureParams
- * @property {string} [sizeUnit="px"] Size unit
- * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio { current: '00%', default: '00%' }
- */
-/**
+ * Figure information object
  * @typedef {Object} FigureInfo
- * @property {HTMLElement} target Target element (img, iframe, video, audio, table, etc.)
- * @property {HTMLElement} container Container element (div.se-component|span.se-component.se-inline-component)
- * @property {?HTMLElement} cover Cover element (FIGURE|null)
- * @property {?HTMLElement} inlineCover Inline cover element (span.se-inline-component)
- * @property {?HTMLElement} caption Caption element (FIGCAPTION)
- * @property {boolean} isVertical Whether to rotate vertically
+ * @property {HTMLElement} target - Target element (img, iframe, video, audio, table, etc.)
+ * @property {HTMLElement} container - Container element (div.se-component|span.se-component.se-inline-component)
+ * @property {?HTMLElement} cover - Cover element (FIGURE|null)
+ * @property {?HTMLElement} inlineCover - Inline cover element (span.se-inline-component)
+ * @property {?HTMLElement} caption - Caption element (FIGCAPTION)
+ * @property {boolean} isVertical - Whether to rotate vertically
  */
 /**
+ * Figure target information object (for resize/align operations)
  * @typedef {Object} FigureTargetInfo
- * @property {HTMLElement} container Container element (div.se-component|span.se-component.se-inline-component)
- * @property {?HTMLElement=} cover Cover element (FIGURE|null)
- * @property {?HTMLElement=} caption Caption element (FIGCAPTION)
+ * @property {HTMLElement} container - Container element (div.se-component|span.se-component.se-inline-component)
+ * @property {?HTMLElement} [cover] - Cover element (FIGURE|null)
+ * @property {?HTMLElement} [caption] - Caption element (FIGCAPTION)
  * @property {string} [align] - Alignment of the element.
  * @property {{w:number, h:number}} [ratio] - The aspect ratio of the element.
- * @property {boolean} isVertical Whether to rotate vertically
+ * @property {boolean} isVertical - Whether to rotate vertically
  * @property {string|number} [w] - Width of the element.
  * @property {string|number} [h] - Height of the element.
  * @property {number} [t] - Top position.
@@ -187,7 +190,7 @@ export type FigureControls = Array<Array<FigureControlButton | FigureControlResi
  *   value: string,
  *   title: string,
  *   icon: string
- * }} FigureControlCustomAction
+ * }} ControlCustomAction
  */
 /**
  * Figure controls configuration
@@ -221,20 +224,12 @@ export type FigureControls = Array<Array<FigureControlButton | FigureControlResi
  *   ['edit', 'align', 'caption', 'revert', 'copy', 'remove']
  * ]
  *
- * @example
- * // Custom action example
- * [[
- *   {
- *     action: (element, value, target) => { console.log('Custom action'); },
- *     command: 'custom-download',
- *     value: 'download',
- *     title: 'Download',
- *     icon: '<svg>...</svg>'
- *   },
- *   'edit', 'copy', 'remove'
- * ]]
- *
- * @typedef {Array<Array<FigureControlButton | FigureControlResize | FigureControlCustomAction | string>>} FigureControls
+ * @typedef {Array<Array<FigureControlButton | FigureControlResize | ControlCustomAction | string>>} FigureControls
+ */
+/**
+ * @typedef {Object} FigureParams
+ * @property {string} [sizeUnit="px"] Size unit
+ * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio { current: '00%', default: '00%' }
  */
 /**
  * @class
@@ -244,10 +239,10 @@ declare class Figure extends CoreInjector {
 	/**
 	 * @description Create a container for the resizing component and insert the element.
 	 * @param {Node} element Target element
-	 * @param {string=} className Class name of container (fixed: se-component)
+	 * @param {string} [className] Class name of container (fixed: se-component)
 	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
 	 */
-	static CreateContainer(element: Node, className?: string | undefined): FigureInfo;
+	static CreateContainer(element: Node, className?: string): FigureInfo;
 	/**
 	 * @description Create a container for the inline resizing component and insert the element.
 	 * @param {Node} element Target element
@@ -271,13 +266,13 @@ declare class Figure extends CoreInjector {
 	 * @description Ratio calculation
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
-	 * @param {?string=} [defaultSizeUnit="px"] Default size unit (default: "px")
+	 * @param {?string} [defaultSizeUnit="px"] Default size unit (default: "px")
 	 * @return {{w: number, h: number}}
 	 */
 	static GetRatio(
 		w: string | number,
 		h: string | number,
-		defaultSizeUnit?: (string | null) | undefined,
+		defaultSizeUnit?: string | null,
 	): {
 		w: number;
 		h: number;
@@ -287,19 +282,17 @@ declare class Figure extends CoreInjector {
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
 	 * @param {string} defaultSizeUnit Default size unit (default: "px")
-	 * @param {?{w: number, h: number}=} ratio Ratio size (Figure.GetRatio)
+	 * @param {?{w: number, h: number}} [ratio] Ratio size (Figure.GetRatio)
 	 * @return {{w: string|number, h: string|number}}
 	 */
 	static CalcRatio(
 		w: string | number,
 		h: string | number,
 		defaultSizeUnit: string,
-		ratio?:
-			| ({
-					w: number;
-					h: number;
-			  } | null)
-			| undefined,
+		ratio?: {
+			w: number;
+			h: number;
+		} | null,
 	): {
 		w: string | number;
 		h: string | number;
@@ -413,23 +406,21 @@ declare class Figure extends CoreInjector {
 	 * @description Open the figure's controller
 	 * @param {Node} target Target element
 	 * @param {Object} [params={}] params
-	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
-	 * @param {() => void=} params.initMethod Method to be called when the controller is closed.
-	 * @param {boolean=} params.disabled If true, the controller is disabled.
-	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
+	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to true.
+	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
+	 * @param {boolean} [params.disabled] If true, the controller is disabled.
+	 * @param {{left: number, top: number}} [params.addOffset] Additional offset values
 	 */
 	controllerOpen(
 		target: Node,
 		params?: {
-			isWWTarget?: boolean | undefined;
-			initMethod?: (() => void) | undefined;
-			disabled?: boolean | undefined;
-			addOffset?:
-				| {
-						left: number;
-						top: number;
-				  }
-				| undefined;
+			isWWTarget?: boolean;
+			initMethod?: () => void;
+			disabled?: boolean;
+			addOffset?: {
+				left: number;
+				top: number;
+			};
 		},
 	): void;
 	/**
@@ -446,10 +437,10 @@ declare class Figure extends CoreInjector {
 	setSize(w: string | number, h: string | number): void;
 	/**
 	 * @description Gets the Figure size
-	 * @param {?Node=} targetNode Target element, default is the current element
+	 * @param {?Node} [targetNode] Target element, default is the current element
 	 * @returns {{w: string, h: string, dw: string, dh: string}}
 	 */
-	getSize(targetNode?: (Node | null) | undefined): {
+	getSize(targetNode?: Node | null): {
 		w: string;
 		h: string;
 		dw: string;
@@ -484,9 +475,9 @@ declare class Figure extends CoreInjector {
 	retainFigureFormat(container: Node, originEl: Node, anchorCover: Node, fileManagerInst?: import('./FileManager').default): void;
 	/**
 	 * @description Initialize the transform style (rotation) of the element.
-	 * @param {?Node=} node Target element, default is the current element
+	 * @param {?Node} [node] Target element, default is the current element
 	 */
-	deleteTransform(node?: (Node | null) | undefined): void;
+	deleteTransform(node?: Node | null): void;
 	/**
 	 * @description Set the transform style (rotation) of the element.
 	 * @param {Node} node Target element

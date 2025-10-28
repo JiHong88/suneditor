@@ -169,7 +169,7 @@ declare class Toolbar {
 	 * @private
 	 * @this {ToolbarThis}
 	 * @description Show the balloon toolbar based on the current selection.
-	 * @param {Range|null} [rangeObj] - Selection range
+	 * @param {?Range} [rangeObj] - Selection range
 	 */
 	_showBalloon(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, rangeObj?: Range | null): void;
 	/**

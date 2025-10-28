@@ -1,32 +1,35 @@
 import type {} from '../typedef';
 export default Controller;
+/**
+ * Controller information object
+ */
 export type ControllerInfo = {
 	/**
-	 * The controller instance
+	 * - The controller instance
 	 */
 	inst: any;
 	/**
-	 * The controller position ("bottom"|"top")
+	 * - The controller position ("bottom"|"top")
 	 */
 	position?: string;
 	/**
-	 * The controller element
+	 * - The controller element
 	 */
 	form?: HTMLElement;
 	/**
-	 * The controller target element
+	 * - The controller target element
 	 */
 	target?: HTMLElement | Range;
 	/**
-	 * If the controller is not in the "carrierWrapper", set it to true.
+	 * - If the controller is not in the "carrierWrapper", set it to true.
 	 */
 	notInCarrier?: boolean;
 	/**
-	 * If the target is a Range, set it to true.
+	 * - If the target is a Range, set it to true.
 	 */
 	isRangeTarget?: boolean;
 	/**
-	 * If the controller is fixed and should not be closed, set it to true.
+	 * - If the controller is fixed and should not be closed, set it to true.
 	 */
 	fixed?: boolean;
 };
@@ -38,66 +41,67 @@ export type ControllerParams = {
 	/**
 	 * If the controller is in the WYSIWYG area, set it to true.
 	 */
-	isWWTarget?: boolean | undefined;
+	isWWTarget?: boolean;
 	/**
 	 * Method to be called when the controller is closed.
 	 */
-	initMethod?: (() => void) | undefined;
+	initMethod?: () => void;
 	/**
 	 * If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
 	 */
-	disabled?: boolean | undefined;
+	disabled?: boolean;
 	/**
 	 * The parent "controller" array when "controller" is opened nested.
 	 */
-	parents?: Array<HTMLElement> | undefined;
+	parents?: Array<HTMLElement>;
 	/**
 	 * If true, the parent element is hidden when the controller is opened.
 	 */
-	parentsHide?: boolean | undefined;
+	parentsHide?: boolean;
 	/**
 	 * The related sibling controller element that this controller is positioned relative to.
 	 * - e.g.) table plugin :: 118
 	 */
-	sibling?: HTMLElement | undefined;
+	sibling?: HTMLElement;
 	/**
 	 * If true, This sibling controller is the main controller.
 	 * - You must specify this option, if use "sibling"
 	 */
-	siblingMain?: boolean | undefined;
+	siblingMain?: boolean;
 	/**
 	 * If the controller is inside a form, set it to true.
 	 */
-	isInsideForm?: boolean | undefined;
+	isInsideForm?: boolean;
 	/**
 	 * If the controller is outside a form, set it to true.
 	 */
-	isOutsideForm?: boolean | undefined;
+	isOutsideForm?: boolean;
 };
 /**
+ * Controller information object
  * @typedef {Object} ControllerInfo
- * @property {*} inst The controller instance
- * @property {string} [position="bottom"] The controller position ("bottom"|"top")
- * @property {HTMLElement} [form=null] The controller element
- * @property {HTMLElement|Range} [target=null] The controller target element
- * @property {boolean} [notInCarrier=false] If the controller is not in the "carrierWrapper", set it to true.
- * @property {boolean} [isRangeTarget=false] If the target is a Range, set it to true.
- * @property {boolean} [fixed=false] If the controller is fixed and should not be closed, set it to true.
+ * @property {*} inst - The controller instance
+ * @property {string} [position="bottom"] - The controller position ("bottom"|"top")
+ * @property {HTMLElement} [form=null] - The controller element
+ * @property {HTMLElement|Range} [target=null] - The controller target element
+ * @property {boolean} [notInCarrier=false] - If the controller is not in the "carrierWrapper", set it to true.
+ * @property {boolean} [isRangeTarget=false] - If the target is a Range, set it to true.
+ * @property {boolean} [fixed=false] - If the controller is fixed and should not be closed, set it to true.
  */
 /**
  * @typedef {Object} ControllerParams
  * @property {"top"|"bottom"} [position="bottom"] Controller position
- * @property {boolean=} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to true.
- * @property {() => void=} [initMethod=null] Method to be called when the controller is closed.
- * @property {boolean=} [disabled=false] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
- * @property {Array<HTMLElement>=} [parents=[]] The parent "controller" array when "controller" is opened nested.
- * @property {boolean=} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
- * @property {HTMLElement=} [sibling=null] The related sibling controller element that this controller is positioned relative to.
+ * @property {boolean} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to true.
+ * @property {() => void} [initMethod=null] Method to be called when the controller is closed.
+ * @property {boolean} [disabled=false] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
+ * @property {Array<HTMLElement>} [parents=[]] The parent "controller" array when "controller" is opened nested.
+ * @property {boolean} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
+ * @property {HTMLElement} [sibling=null] The related sibling controller element that this controller is positioned relative to.
  * - e.g.) table plugin :: 118
- * @property {boolean=} [siblingMain=false] If true, This sibling controller is the main controller.
+ * @property {boolean} [siblingMain=false] If true, This sibling controller is the main controller.
  * - You must specify this option, if use "sibling"
- * @property {boolean=} [isInsideForm=false] If the controller is inside a form, set it to true.
- * @property {boolean=} [isOutsideForm=false] If the controller is outside a form, set it to true.
+ * @property {boolean} [isInsideForm=false] If the controller is inside a form, set it to true.
+ * @property {boolean} [isOutsideForm=false] If the controller is outside a form, set it to true.
  */
 /**
  * @class
@@ -109,9 +113,9 @@ declare class Controller extends CoreInjector {
 	 * @param {*} inst The instance object that called the constructor.
 	 * @param {Node} element Controller element
 	 * @param {ControllerParams} params Controller options
-	 * @param {?string=} _name An optional name for the controller key.
+	 * @param {?string} [_name] An optional name for the controller key.
 	 */
-	constructor(inst: any, element: Node, params: ControllerParams, _name?: (string | null) | undefined);
+	constructor(inst: any, element: Node, params: ControllerParams, _name?: string | null);
 	toolbar: import('../core/class/toolbar').default;
 	subToolbar: import('../core/class/toolbar').default;
 	component: import('../core/class/component').default;
@@ -123,7 +127,7 @@ declare class Controller extends CoreInjector {
 	form: HTMLFormElement;
 	isOpen: boolean;
 	currentTarget: Node;
-	currentPositionTarget: Range | Node;
+	currentPositionTarget: Node | Range;
 	isWWTarget: boolean;
 	position: 'top' | 'bottom';
 	disabled: boolean;
@@ -148,10 +152,10 @@ declare class Controller extends CoreInjector {
 	 * @param {Node|Range} target Target element
 	 * @param {Node} [positionTarget] Position target element
 	 * @param {Object} [params={}] params
-	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
-	 * @param {() => void=} params.initMethod Method to be called when the controller is closed.
-	 * @param {boolean=} params.disabled If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled. (default: this.disabled)
-	 * @param {{left?: number, top?: number}=} params.addOffset Additional offset values
+	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to true.
+	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
+	 * @param {boolean} [params.disabled] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled. (default: this.disabled)
+	 * @param {{left?: number, top?: number}} [params.addOffset] Additional offset values
 	 */
 	open(
 		target: Node | Range,
@@ -162,23 +166,21 @@ declare class Controller extends CoreInjector {
 			disabled,
 			addOffset,
 		}?: {
-			isWWTarget?: boolean | undefined;
-			initMethod?: (() => void) | undefined;
-			disabled?: boolean | undefined;
-			addOffset?:
-				| {
-						left?: number;
-						top?: number;
-				  }
-				| undefined;
+			isWWTarget?: boolean;
+			initMethod?: () => void;
+			disabled?: boolean;
+			addOffset?: {
+				left?: number;
+				top?: number;
+			};
 		},
 	): void;
 	/**
 	 * @description Close a modal plugin
 	 * - The plugin's "init" method is called.
-	 * @param {boolean=} force If true, parent controllers are forcibly closed.
+	 * @param {boolean} [force] If true, parent controllers are forcibly closed.
 	 */
-	close(force?: boolean | undefined): void;
+	close(force?: boolean): void;
 	/**
 	 * @description Hide controller
 	 */
@@ -194,9 +196,9 @@ declare class Controller extends CoreInjector {
 	bringToTop(value: boolean): void;
 	/**
 	 * @description Reset controller position
-	 * @param {Node=} target
+	 * @param {Node} [target]
 	 */
-	resetPosition(target?: Node | undefined): void;
+	resetPosition(target?: Node): void;
 	#private;
 }
 import CoreInjector from '../editorInjector/_core';

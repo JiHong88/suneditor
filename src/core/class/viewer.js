@@ -520,7 +520,7 @@ Viewer.prototype = {
 	 * @description Run CodeMirror Editor
 	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
 	 * @param {*} value CodeMirror params
-	 * @param {string|undefined} rootKey Root key
+	 * @param {string} [rootKey] Root key
 	 */
 	_codeMirrorEditor(key, value, rootKey) {
 		const fo = rootKey ? this.frameRoots.get(rootKey).get('options') : this.frameOptions;

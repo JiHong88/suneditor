@@ -68,10 +68,7 @@ function CreateSliderCtx() {
 }
 
 /**
- * @typedef {import('../modules/Controller').ControllerParams} ControllerParams_hueSlider
- */
-
-/**
+ * HueSlider color information object
  * @typedef {Object} HueSliderColor
  * @property {string} hex - HEX color
  * @property {number} r - Red color value
@@ -86,7 +83,7 @@ function CreateSliderCtx() {
  * @typedef {Object} HueSliderParams
  * @property {Node} [form] The form element to attach the hue slider.
  * @property {boolean} [isNewForm] Whether to create a new form element.
- * @property {ControllerParams_hueSlider} [controllerOptions] Controller options
+ * @property {import('../modules/Controller').ControllerParams} [controllerOptions] Controller options
  */
 
 /**
@@ -197,7 +194,7 @@ class HueSlider extends CoreInjector {
 
 	/**
 	 * @description Attach the hue slider to the form element.
-	 * @param {?Node=} form The element to attach the hue slider.
+	 * @param {?Node} [form] The element to attach the hue slider.
 	 */
 	attach(form) {
 		if (!_bootstrapped) InitRender();

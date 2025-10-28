@@ -11,10 +11,10 @@ import { dom, unicode, converter } from '../../helper';
 
 /**
  * @typedef {Object} NodeStyleContainerType
- * @property {?Node=} ancestor
- * @property {?number=} offset
- * @property {?Node=} container
- * @property {?Node=} endContainer
+ * @property {?Node} [ancestor]
+ * @property {?number} [offset]
+ * @property {?Node} [container]
+ * @property {?Node} [endContainer]
  */
 
 /**
@@ -46,7 +46,7 @@ Inline.prototype = {
 	 * - 9. If strictRemove is true, nodes in nodesToRemove are only removed if all their styles and classes are removed.
 	 * - 10. The function won't modify nodes if the parent has the same class and style values.
 	 * - However, if nodesToRemove has values, it will work and separate text nodes even if there's no node to replace.
-	 * @param {Node|null} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
+	 * @param {?Node} styleNode The element to be added to the selection. If null, only existing nodes are modified or removed.
 	 * @param {Object} [options] Options
 	 * @param {Array<string>} [options.stylesToModify=null] Array of style or class names to check and modify.
 	 *        (e.g., ['font-size'], ['.className'], ['font-family', 'color', '.className'])
@@ -1734,7 +1734,7 @@ Inline.prototype = {
 	 * @this {InlineThis}
 	 * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
 	 * @param {Node} el List cell element. <li>
-	 * @param {Node|null} child Variable for recursive call. ("null" on the first call)
+	 * @param {?Node} child Variable for recursive call. ("null" on the first call)
 	 */
 	_sn_setCommonListStyle(el, child) {
 		if (!dom.check.isListCell(el)) return;
@@ -1786,7 +1786,7 @@ Inline.prototype = {
 	 * @this {InlineThis}
 	 * @description Watch the applied text nodes and adjust the common styles of the list.
 	 * @param {Node} el "LI" element
-	 * @param {Array|null} styleArray Refer style array
+	 * @param {?Array} styleArray Refer style array
 	 */
 	_sn_resetCommonListCell(el, styleArray) {
 		if (!dom.check.isListCell(el)) return;

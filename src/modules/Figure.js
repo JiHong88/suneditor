@@ -14,29 +14,25 @@ let __resizing_cw = 0;
 let __resizing_sw = 0;
 
 /**
- * @typedef {Object} FigureParams
- * @property {string} [sizeUnit="px"] Size unit
- * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio { current: '00%', default: '00%' }
- */
-
-/**
+ * Figure information object
  * @typedef {Object} FigureInfo
- * @property {HTMLElement} target Target element (img, iframe, video, audio, table, etc.)
- * @property {HTMLElement} container Container element (div.se-component|span.se-component.se-inline-component)
- * @property {?HTMLElement} cover Cover element (FIGURE|null)
- * @property {?HTMLElement} inlineCover Inline cover element (span.se-inline-component)
- * @property {?HTMLElement} caption Caption element (FIGCAPTION)
- * @property {boolean} isVertical Whether to rotate vertically
+ * @property {HTMLElement} target - Target element (img, iframe, video, audio, table, etc.)
+ * @property {HTMLElement} container - Container element (div.se-component|span.se-component.se-inline-component)
+ * @property {?HTMLElement} cover - Cover element (FIGURE|null)
+ * @property {?HTMLElement} inlineCover - Inline cover element (span.se-inline-component)
+ * @property {?HTMLElement} caption - Caption element (FIGCAPTION)
+ * @property {boolean} isVertical - Whether to rotate vertically
  */
 
 /**
+ * Figure target information object (for resize/align operations)
  * @typedef {Object} FigureTargetInfo
- * @property {HTMLElement} container Container element (div.se-component|span.se-component.se-inline-component)
- * @property {?HTMLElement=} cover Cover element (FIGURE|null)
- * @property {?HTMLElement=} caption Caption element (FIGCAPTION)
+ * @property {HTMLElement} container - Container element (div.se-component|span.se-component.se-inline-component)
+ * @property {?HTMLElement} [cover] - Cover element (FIGURE|null)
+ * @property {?HTMLElement} [caption] - Caption element (FIGCAPTION)
  * @property {string} [align] - Alignment of the element.
  * @property {{w:number, h:number}} [ratio] - The aspect ratio of the element.
- * @property {boolean} isVertical Whether to rotate vertically
+ * @property {boolean} isVertical - Whether to rotate vertically
  * @property {string|number} [w] - Width of the element.
  * @property {string|number} [h] - Height of the element.
  * @property {number} [t] - Top position.
@@ -65,7 +61,7 @@ let __resizing_sw = 0;
  *   value: string,
  *   title: string,
  *   icon: string
- * }} FigureControlCustomAction
+ * }} ControlCustomAction
  */
 
 /**
@@ -100,20 +96,15 @@ let __resizing_sw = 0;
  *   ['edit', 'align', 'caption', 'revert', 'copy', 'remove']
  * ]
  *
- * @example
- * // Custom action example
- * [[
- *   {
- *     action: (element, value, target) => { console.log('Custom action'); },
- *     command: 'custom-download',
- *     value: 'download',
- *     title: 'Download',
- *     icon: '<svg>...</svg>'
- *   },
- *   'edit', 'copy', 'remove'
- * ]]
- *
- * @typedef {Array<Array<FigureControlButton | FigureControlResize | FigureControlCustomAction | string>>} FigureControls
+ * @typedef {Array<Array<FigureControlButton | FigureControlResize | ControlCustomAction | string>>} FigureControls
+ */
+
+// -------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @typedef {Object} FigureParams
+ * @property {string} [sizeUnit="px"] Size unit
+ * @property {{ current: string, default: string }} [autoRatio=null] Auto ratio { current: '00%', default: '00%' }
  */
 
 /**
@@ -250,7 +241,7 @@ class Figure extends CoreInjector {
 	/**
 	 * @description Create a container for the resizing component and insert the element.
 	 * @param {Node} element Target element
-	 * @param {string=} className Class name of container (fixed: se-component)
+	 * @param {string} [className] Class name of container (fixed: se-component)
 	 * @returns {FigureInfo} {target, container, cover, inlineCover, caption}
 	 */
 	static CreateContainer(element, className) {
@@ -305,7 +296,7 @@ class Figure extends CoreInjector {
 	 * @description Ratio calculation
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
-	 * @param {?string=} [defaultSizeUnit="px"] Default size unit (default: "px")
+	 * @param {?string} [defaultSizeUnit="px"] Default size unit (default: "px")
 	 * @return {{w: number, h: number}}
 	 */
 	static GetRatio(w, h, defaultSizeUnit) {
@@ -333,7 +324,7 @@ class Figure extends CoreInjector {
 	 * @param {string|number} w Width size
 	 * @param {string|number} h Height size
 	 * @param {string} defaultSizeUnit Default size unit (default: "px")
-	 * @param {?{w: number, h: number}=} ratio Ratio size (Figure.GetRatio)
+	 * @param {?{w: number, h: number}} [ratio] Ratio size (Figure.GetRatio)
 	 * @return {{w: string|number, h: string|number}}
 	 */
 	static CalcRatio(w, h, defaultSizeUnit, ratio) {
@@ -556,10 +547,10 @@ class Figure extends CoreInjector {
 	 * @description Open the figure's controller
 	 * @param {Node} target Target element
 	 * @param {Object} [params={}] params
-	 * @param {boolean=} params.isWWTarget If the controller is in the WYSIWYG area, set it to true.
-	 * @param {() => void=} params.initMethod Method to be called when the controller is closed.
-	 * @param {boolean=} params.disabled If true, the controller is disabled.
-	 * @param {{left: number, top: number}=} params.addOffset Additional offset values
+	 * @param {boolean} [params.isWWTarget] If the controller is in the WYSIWYG area, set it to true.
+	 * @param {() => void} [params.initMethod] Method to be called when the controller is closed.
+	 * @param {boolean} [params.disabled] If true, the controller is disabled.
+	 * @param {{left: number, top: number}} [params.addOffset] Additional offset values
 	 */
 	controllerOpen(target, params) {
 		this._element = /** @type {HTMLElement}  */ (target);
@@ -596,7 +587,7 @@ class Figure extends CoreInjector {
 
 	/**
 	 * @description Gets the Figure size
-	 * @param {?Node=} targetNode Target element, default is the current element
+	 * @param {?Node} [targetNode] Target element, default is the current element
 	 * @returns {{w: string, h: string, dw: string, dh: string}}
 	 */
 	getSize(targetNode) {
@@ -891,7 +882,7 @@ class Figure extends CoreInjector {
 
 	/**
 	 * @description Initialize the transform style (rotation) of the element.
-	 * @param {?Node=} node Target element, default is the current element
+	 * @param {?Node} [node] Target element, default is the current element
 	 */
 	deleteTransform(node) {
 		node ||= this._element;

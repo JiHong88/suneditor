@@ -31,12 +31,12 @@ declare class BlockStyle extends EditorInjector {
 	/**
 	 * @editorMethod Editor.EventManager
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement=} element - Node element where the cursor is currently located
-	 * @param {?HTMLElement=} target - The plugin's toolbar button element
+	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
+	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
 	 * @returns {boolean} - Whether the plugin is active
 	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
-	active(element?: (HTMLElement | null) | undefined, target?: (HTMLElement | null) | undefined): boolean;
+	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean;
 	/**
 	 * @editorMethod Modules.Dropdown
 	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
@@ -53,8 +53,8 @@ declare class BlockStyle extends EditorInjector {
 	/**
 	 * @description Create a header tag, call by "shortcut" class
 	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])
-	 * @param {SunEditor.PluginShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
 	 */
-	applyHeaderByShortcut({ keyCode }: SunEditor.PluginShortcutInfo): void;
+	applyHeaderByShortcut({ keyCode }: SunEditor.Plugin.ShortcutInfo): void;
 }
 import EditorInjector from '../../editorInjector';

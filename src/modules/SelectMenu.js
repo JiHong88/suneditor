@@ -10,8 +10,8 @@ const MENU_MIN_HEIGHT = 38;
  * @property {boolean} [checkList=false] Flag to determine if the checklist is enabled (true or false)
  * @property {"rtl" | "ltr"} [dir="ltr"] Optional text direction: "rtl" for right-to-left, "ltr" for left-to-right
  * @property {number} [splitNum=0] Optional split number for horizontal positioning; defines how many items per row
- * @property {() => void=} openMethod Optional method to call when the menu is opened
- * @property {() => void=} closeMethod Optional method to call when the menu is closed
+ * @property {() => void} [openMethod] Optional method to call when the menu is opened
+ * @property {() => void} [closeMethod] Optional method to call when the menu is closed
  */
 
 /**
@@ -128,8 +128,8 @@ class SelectMenu extends CoreInjector {
 
 	/**
 	 * @description Select menu open
-	 * @param {?string=} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
-	 * @param {?string=} onItemQuerySelector The querySelector string of the menu to be activated
+	 * @param {?string} [position] "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
+	 * @param {?string} [onItemQuerySelector] The querySelector string of the menu to be activated
 	 */
 	open(position, onItemQuerySelector) {
 		this.editor.selectMenuOn = true;
