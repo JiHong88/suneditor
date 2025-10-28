@@ -1,4 +1,4 @@
-⭐️ `npm run langs-build`
+⭐️ `npm run check:langs`
 
 ---
 
@@ -10,10 +10,10 @@
 
 ## 📌 사전 설정
 
--   Google Cloud Platform (GCP) 계정
--   프로젝트 생성 또는 기존 프로젝트 사용
--   Node.js 개발 환경
--   `@google-cloud/translate` 패키지 설치되어 있음
+- Google Cloud Platform (GCP) 계정
+- 프로젝트 생성 또는 기존 프로젝트 사용
+- Node.js 개발 환경
+- `@google-cloud/translate` 패키지 설치되어 있음
 
 ---
 
@@ -82,9 +82,9 @@ npm run check:langs
 
 이 명령은 다음을 수행합니다:
 
--   `en.js`를 기준으로 모든 언어 파일에 누락된 키를 자동 번역 후 각 언어 파일에 추가
--   타입 선언 파일(`_Lang.d.ts`) 업데이트
--   ESLint 자동 수정 실행
+- `en.js`를 기준으로 모든 언어 파일에 누락된 키를 자동 번역 후 각 언어 파일에 추가
+- 타입 선언 파일(`_Lang.d.ts`) 업데이트
+- ESLint 자동 수정 실행
 
 > 👀 `npm run ts-build` 는 실행하지 않습니다. (types 파일 업데이트)
 
@@ -92,8 +92,8 @@ npm run check:langs
 
 ## ✅ 참고
 
--   [Cloud Translation API 공식 문서](https://cloud.google.com/translate/docs)
--   [@google-cloud/translate npm 패키지](https://www.npmjs.com/package/@google-cloud/translate)
+- [Cloud Translation API 공식 문서](https://cloud.google.com/translate/docs)
+- [@google-cloud/translate npm 패키지](https://www.npmjs.com/package/@google-cloud/translate)
 
 ---
 
