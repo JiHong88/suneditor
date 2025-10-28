@@ -1505,25 +1505,20 @@ Editor.prototype = {
 		delete this._pluginCallButtons;
 		delete this._pluginCallButtons_sub;
 
-		this.__cachingButtons('all');
+		this.__cachingButtons();
 		this.__cachingShortcuts();
 	},
 
 	/**
 	 * @private
 	 * @description Caching basic buttons to use
-	 * @param {string} mode 'all' | 'main' | 'sub'
 	 */
-	__cachingButtons(mode) {
+	__cachingButtons() {
 		const ctx = this.context;
 		this.__setDisabledButtons();
 
-		if (/all|main/.test(mode)) {
-			this.__saveCommandButtons(this.allCommandButtons, ctx.get('toolbar_buttonTray'));
-		}
-		if (/all|sub/.test(mode) && this.options.has('_subMode')) {
-			this.__saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar_sub_buttonTray'));
-		}
+		this.__saveCommandButtons(this.allCommandButtons, ctx.get('toolbar_buttonTray'));
+		this.__saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar_sub_buttonTray'));
 	},
 
 	/**
@@ -1547,9 +1542,11 @@ Editor.prototype = {
 	 * @private
 	 * @description Save the current buttons
 	 * @param {Map<string, Element>} cmdButtons Command button map
-	 * @param {Element} tray Button tray
+	 * @param {?Element} tray Button tray
 	 */
 	__saveCommandButtons(cmdButtons, tray) {
+		if (!tray) return;
+
 		const currentButtons = tray.querySelectorAll(COMMAND_BUTTONS);
 		const shortcuts = this.options.get('shortcuts');
 		const reverseCommandArray = this.options.get('_reverseCommandArray');

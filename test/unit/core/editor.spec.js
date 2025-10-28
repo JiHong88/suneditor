@@ -89,7 +89,7 @@ describe('Core - Editor', () => {
 				'_actives', // Active commands
 				'_history', // History class
 				'_eventManager', // EventManager class
-				'_events' // Events
+				'_events', // Events
 			];
 
 			// Note: In bundled code, imports might be renamed
@@ -119,7 +119,7 @@ describe('Core - Editor', () => {
 				'menu',
 				'char',
 				'ui',
-				'viewer'
+				'viewer',
 			];
 
 			expectedStructuralComponents.forEach((component) => {
@@ -347,7 +347,7 @@ describe('Core - Editor', () => {
 				Object.defineProperty(wysiwyg, 'innerText', {
 					value: '\n',
 					writable: true,
-					configurable: true
+					configurable: true,
 				});
 
 				// then
@@ -744,25 +744,14 @@ describe('Core - Editor', () => {
 		});
 
 		describe('__cachingButtons', () => {
-			it('should cache all buttons in "all" mode', () => {
+			it('should cache all buttons', () => {
 				// given
 				editor.allCommandButtons.clear();
 
 				// when
-				editor.__cachingButtons('all');
+				editor.__cachingButtons();
 
 				// then
-				expect(editor.allCommandButtons.size).toBeGreaterThanOrEqual(0);
-			});
-
-			it('should cache main buttons in "main" mode', () => {
-				// given
-				const initialSize = editor.allCommandButtons.size;
-
-				// when
-				editor.__cachingButtons('main');
-
-				// then - method should execute without error
 				expect(editor.allCommandButtons.size).toBeGreaterThanOrEqual(0);
 			});
 		});
@@ -888,7 +877,7 @@ describe('Core - Editor', () => {
 				// Mock component.get to return component info
 				jest.spyOn(editor.component, 'get').mockReturnValue({
 					target: component,
-					pluginName: 'image'
+					pluginName: 'image',
 				});
 				jest.spyOn(editor.component, 'select');
 
@@ -942,7 +931,7 @@ describe('Core - Editor', () => {
 
 				// given
 				const mockCodeMirror = {
-					destroy: jest.fn()
+					destroy: jest.fn(),
 				};
 				testEditor.options.set('codeMirror6Editor', mockCodeMirror);
 
@@ -962,7 +951,7 @@ describe('Core - Editor', () => {
 				const mockDestroy = jest.fn();
 				const mockPlugin = {
 					_destroy: mockDestroy,
-					someProperty: 'test'
+					someProperty: 'test',
 				};
 				testEditor.plugins['testDestroyPlugin'] = mockPlugin;
 
@@ -989,7 +978,7 @@ describe('Core - Editor', () => {
 				Object.defineProperty(wysiwyg, 'innerText', {
 					value: '\n',
 					writable: true,
-					configurable: true
+					configurable: true,
 				});
 
 				// when
@@ -1231,7 +1220,7 @@ describe('Core - Editor', () => {
 					startOffset: 0,
 					endOffset: 0,
 					commonAncestorContainer: wysiwyg,
-					collapsed: false
+					collapsed: false,
 				};
 
 				jest.spyOn(editor.selection, 'getRange').mockReturnValue(range);

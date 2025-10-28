@@ -193,7 +193,7 @@ Toolbar.prototype = {
 		this.editor.commandTargets = new Map();
 		this.editor.shortcutsKeyMap = new Map();
 
-		this.editor.__cachingButtons(this.isSub ? 'sub' : 'main');
+		this.editor.__cachingButtons();
 		this.editor.__cachingShortcuts();
 
 		this.history.resetButtons(this.frameContext.get('key'), null);

@@ -580,9 +580,8 @@ declare class Editor {
 	/**
 	 * @private
 	 * @description Caching basic buttons to use
-	 * @param {string} mode 'all' | 'main' | 'sub'
 	 */
-	__cachingButtons(mode: string): void;
+	__cachingButtons(): void;
 	/**
 	 * @private
 	 * @description Set the disabled button list
@@ -593,9 +592,9 @@ declare class Editor {
 	 * @private
 	 * @description Save the current buttons
 	 * @param {Map<string, Element>} cmdButtons Command button map
-	 * @param {Element} tray Button tray
+	 * @param {?Element} tray Button tray
 	 */
-	__saveCommandButtons(cmdButtons: Map<string, Element>, tray: Element): void;
+	__saveCommandButtons(cmdButtons: Map<string, Element>, tray: Element | null): void;
 	/**
 	 * @private
 	 * @description Caches custom(starts with "_") shortcut keys for commands.
