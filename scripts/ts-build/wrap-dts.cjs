@@ -22,7 +22,7 @@ function processTypedef() {
 
 		const wrappedContent = `import type {} from './events';\nexport {};\n\ndeclare global {\n${indentContent}\n}\n\nexport type { SunEditor };\n`;
 		fs.writeFileSync(typedefPath, wrappedContent, 'utf8');
-		console.log('[wrap-dts] Wrapped existing SunEditor namespace in global');
+		console.log('✨ wrap-dts: Wrapped existing SunEditor namespace in global');
 	} else {
 		// No namespace yet, create one
 		const indentContent = content
@@ -32,7 +32,7 @@ function processTypedef() {
 
 		const wrappedContent = `import type {} from './events';\nexport {};\n\ndeclare global {\n\tnamespace SunEditor {\n${indentContent}\n\t}\n}\n\nexport type { SunEditor };\n`;
 		fs.writeFileSync(typedefPath, wrappedContent, 'utf8');
-		console.log('[wrap-dts] Created SunEditor namespace and wrapped in global');
+		console.log('✨ wrap-dts: Created SunEditor namespace and wrapped in global');
 	}
 }
 

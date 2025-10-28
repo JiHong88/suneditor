@@ -27,4 +27,4 @@ const replaced = original.replace(/export namespace DEFAULTS\s*{[\s\S]*?}(?=\s*e
 
 fs.writeFileSync(targetPath, replaced, 'utf-8');
 
-console.log('[gen-options-dts]');
+console.log('✨ gen-options-dts:');

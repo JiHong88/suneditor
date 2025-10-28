@@ -21,7 +21,7 @@ const googleTranslate = async (text, from, to) => {
 		contents: [text],
 		mimeType: 'text/plain',
 		sourceLanguageCode: from,
-		targetLanguageCode: to
+		targetLanguageCode: to,
 	};
 
 	const [response] = await translationClient.translateText(request);
@@ -38,7 +38,7 @@ const langMap = {
 	fr_ca: 'fr-CA',
 	ms_arab: 'ms-Arab',
 	mni_mtei: 'mni-Mtei',
-	pa_arab: 'pa-Arab'
+	pa_arab: 'pa-Arab',
 };
 
 const getLangObject = (fileContent) => {
@@ -66,11 +66,11 @@ const injectKeys = async (filePath, langCode, baseLangObj) => {
 			const baseValue = baseLangObj[key];
 			if (autoTranslate) {
 				try {
-					console.log(`[↻] Translating (${BASE_LANG} → ${googleLangCode}) ${key}: ${baseValue}`);
+					console.log(`🔄 langs-sync: Translating (${BASE_LANG} → ${googleLangCode}) ${key}: ${baseValue}`);
 					value = await googleTranslate(baseValue, BASE_LANG, googleLangCode);
-					console.log(`[✓] Translated (${langCode}:${key}) → ${value}`);
+					console.log(`✅ langs-sync: Translated (${langCode}:${key}) → ${value}`);
 				} catch (e) {
-					console.warn(`[WARN] Auto-translate failed for ${langCode}:${key}`, e);
+					console.warn(`⚠️  langs-sync: Auto-translate failed for ${langCode}:${key}`, e);
 					value = fillEmpty ? '' : baseValue;
 				}
 			} else {
@@ -124,7 +124,7 @@ const injectKeys = async (filePath, langCode, baseLangObj) => {
 
 	fs.writeFileSync(filePath, file, 'utf8');
 
-	console.log(`[✔] Updated ${langCode}`);
+	console.log(`✨ langs-sync: Updated ${langCode}`);
 };
 
 (async () => {

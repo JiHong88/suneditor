@@ -7,7 +7,7 @@ async function updateConstructorThis() {
 	try {
 		const files = await glob(filePath, { ignore: [] });
 		if (files.length === 0) {
-			console.warn('remove-this-param files 0');
+			console.warn('⚠️  remove-this-params: No files found');
 			return;
 		}
 
@@ -26,9 +26,9 @@ async function updateConstructorThis() {
 			}
 		}
 
-		console.log('[remove-this-params]');
+		console.log('✨ remove-this-params:');
 	} catch (error) {
-		console.error('remove-this-param error:', error);
+		console.error('❌ remove-this-params: Error:', error);
 	}
 }
 

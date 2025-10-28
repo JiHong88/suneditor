@@ -38,7 +38,7 @@ function findPluginOptions() {
 				plugins.set(pluginName, {
 					name: pluginName,
 					typeName: typeName,
-					relativePath: relativePath.split(path.sep).join('/')
+					relativePath: relativePath.split(path.sep).join('/'),
 				});
 			}
 		}
@@ -52,9 +52,7 @@ const pluginOptions = findPluginOptions();
 
 // Generate JSDoc property annotations
 // Import from source .js files
-const jsdocProperties = pluginOptions
-	.map((p) => ` * @property {import('${p.relativePath}').${p.typeName}} [${p.name}]`)
-	.join('\n');
+const jsdocProperties = pluginOptions.map((p) => ` * @property {import('${p.relativePath}').${p.typeName}} [${p.name}]`).join('\n');
 
 // Strategy: Find the "=== [ Plugin-Specific Options ] ===" marker and replace everything until the next "===" (3+ equals)
 // This allows for flexible content replacement regardless of what's between the markers
@@ -70,7 +68,7 @@ const replaced = original.replace(fullPattern, (_, markerLine) => {
 
 if (wasInjected) {
 	fs.writeFileSync(targetPath, replaced, 'utf-8');
-	console.log(`[inject-plugin-jsdoc] ✓ Added ${pluginOptions.length} plugin option JSDoc properties to options.js`);
+	console.log(`✨ inject-plugin-jsdoc: Added ${pluginOptions.length} plugin option JSDoc properties to options.js`);
 } else if (replaced === original) {
-	console.log(`[inject-plugin-jsdoc] ⚠ Warning: Could not find injection marker "=== [ Plugin-Specific Options ] ===" in options.js`);
+	console.warn(`⚠️  inject-plugin-jsdoc: Could not find injection marker "=== [ Plugin-Specific Options ] ===" in options.js`);
 }

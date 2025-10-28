@@ -46,11 +46,11 @@ async function injectTypedefImport() {
 	try {
 		// Find all .d.ts files except typedef.d.ts itself and index.d.ts files in root
 		const files = await glob('types/**/*.d.ts', {
-			ignore: ['types/typedef.d.ts', 'types/index.d.ts', 'types/langs/*.d.ts', 'types/assets/**/*.d.ts']
+			ignore: ['types/typedef.d.ts', 'types/index.d.ts', 'types/langs/*.d.ts', 'types/assets/**/*.d.ts'],
 		});
 
 		if (files.length === 0) {
-			console.warn('inject-typedef-import: No files found');
+			console.warn('⚠️  inject-typedef-import: No files found');
 			return;
 		}
 
@@ -90,9 +90,9 @@ async function injectTypedefImport() {
 			updatedCount++;
 		}
 
-		console.log(`[inject-typedef-import] Updated ${updatedCount} files`);
+		console.log(`✨ inject-typedef-import: Updated ${updatedCount} files`);
 	} catch (error) {
-		console.error('inject-typedef-import error:', error);
+		console.error('❌ inject-typedef-import: Error:', error);
 		process.exit(1);
 	}
 }

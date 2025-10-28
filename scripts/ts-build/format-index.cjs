@@ -12,7 +12,7 @@ const indexPath = path.join(__dirname, '../../types/index.ts');
 
 // Check if file exists
 if (!fs.existsSync(indexPath)) {
-	console.log('[format-index] index.ts not found, skipping...');
+	console.log('⚠️  format-index: index.ts not found, skipping...');
 	process.exit(0);
 }
 
@@ -34,4 +34,4 @@ export { default } from './suneditor';
 // Write the formatted content
 fs.writeFileSync(indexPath, newContent, 'utf8');
 
-console.log('[format-index] Formatted types/index.ts');
+console.log('✨ format-index: Formatted types/index.ts');

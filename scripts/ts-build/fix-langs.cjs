@@ -41,7 +41,7 @@ function updateTypeDef() {
 			// Create new _Lang.d.ts file
 			const typeContent = `export type _Lang = {\n${keyOrder.map((k) => `\t${k}: string;`).join('\n')}\n};\n`;
 			fs.writeFileSync(TYPE_FILE, typeContent, 'utf8');
-			console.log('[✔] Created _Lang.d.ts');
+			console.log('✨ fix-langs: Created _Lang.d.ts');
 			return;
 		}
 
@@ -51,7 +51,7 @@ function updateTypeDef() {
 		const toInsert = keyOrder.filter((k) => !existingKeys.has(k)).map((k) => `\t${k}: string;`);
 
 		if (toInsert.length === 0) {
-			console.log('[✔] _Lang.d.ts is up to date');
+			console.log('✅ fix-langs: _Lang.d.ts is up to date');
 			return;
 		}
 
@@ -63,7 +63,7 @@ function updateTypeDef() {
 		});
 
 		fs.writeFileSync(TYPE_FILE, typeFile, 'utf8');
-		console.log(`[✔] Updated _Lang.d.ts (${toInsert.length} new keys)`);
+		console.log(`✨ fix-langs: Updated _Lang.d.ts (${toInsert.length} new keys)`);
 	} catch (error) {
 		console.error('Error updating _Lang.d.ts:', error);
 		throw error;
@@ -78,7 +78,7 @@ async function updateLangFiles() {
 		const files = await glob(filesPath, { ignore: ignorePath });
 
 		if (files.length === 0) {
-			console.warn('fix-langs - not found.');
+			console.warn('⚠️  fix-langs: No lang files found');
 			return;
 		}
 
@@ -95,9 +95,9 @@ export default ${baseName};
 			await fs.promises.writeFile(file, newContent, 'utf8');
 		}
 
-		console.log('[✔] fix-langs completed');
+		console.log('✅ fix-langs: Completed');
 	} catch (error) {
-		console.error('fix-langs - error:', error);
+		console.error('❌ fix-langs: Error:', error);
 	}
 }
 
