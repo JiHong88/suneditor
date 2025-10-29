@@ -37,6 +37,7 @@ import { _w, _d } from '../../helper/env';
  * @property {number} right - The right position of the node relative to the WYSIWYG editor.
  * @property {number} scrollX - The horizontal scroll offset inside the WYSIWYG editor.
  * @property {number} scrollY - The vertical scroll offset inside the WYSIWYG editor.
+ * @property {number} scrollH - The vertical scroll height inside the WYSIWYG editor.
  */
 
 /**
@@ -145,6 +146,7 @@ Offset.prototype = {
 			right: offsetElement?.offsetWidth ? offsetElement.offsetWidth - (offsetLeft - l + targetWidth) + r : 0,
 			scrollX: eventWysiwyg.scrollLeft || eventWysiwyg.scrollX || 0,
 			scrollY: eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0,
+			scrollH: this.frameContext.get('wysiwyg').scrollHeight || 0,
 		};
 	},
 
@@ -469,13 +471,13 @@ Offset.prototype = {
 		const th = this.context.get('toolbar_main').offsetHeight;
 		const containerToolbar = this.options.get('toolbar_container');
 		const headLess = this.editor.isBalloon || this.editor.isInline || containerToolbar;
-		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.editor.toolbar._sticky && headLess) ? 0 : th;
+		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.editor.toolbar.isSticky && headLess) ? 0 : th;
 
 		// check margin
 		const { rmt, rmb, bMargin, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll);
-		if (isWWTarget && ((rmb > 0 ? bMargin : rmb) + targetH <= 0 || rmt + rt + targetH - (this.editor.toolbar._sticky && isInlineTarget ? toolbarH : 0) <= 0)) return;
+		if (isWWTarget && ((rmb > 0 ? bMargin : rmb) + targetH <= 0 || rmt + rt + targetH - (this.editor.toolbar.isSticky && isInlineTarget ? toolbarH : 0) <= 0)) return;
 
-		const isSticky = this.editor.toolbar._sticky && this.context.get('toolbar_main').style.display !== 'none' && (!headLess || this.frameContext.get('topArea').getBoundingClientRect().top <= th);
+		const isSticky = this.editor.toolbar.isSticky && this.context.get('toolbar_main').style.display !== 'none' && (!headLess || this.frameContext.get('topArea').getBoundingClientRect().top <= th);
 		const statusBarH = this.frameContext.get('statusbar')?.offsetHeight || 0;
 		let t = addOffset.top;
 		let y = 0;
@@ -639,7 +641,7 @@ Offset.prototype = {
 		const targetH = rects.height;
 		const tmtw = rects.top;
 		const tmbw = clientSize.h - rects.bottom;
-		const toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar_main').offsetHeight;
+		const toolbarH = !this.editor.toolbar.isSticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar_main').offsetHeight;
 
 		const { rmt, rmb, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, rects, isTargetAbs, wwScroll);
 		if (rmb + targetH <= 0 || rmt + rt + targetH <= 0) return;
@@ -759,17 +761,17 @@ Offset.prototype = {
 				rmt = targetRect.top - emt;
 				rmb = bMargin - (editorScroll.oh - (editorH + emt) + statusBarH);
 			} else {
-				rt = !this.editor.toolbar._sticky && !this.options.get('toolbar_container') ? toolbarH : 0;
+				rt = !this.editor.toolbar.isSticky && !this.options.get('toolbar_container') ? toolbarH : 0;
 				const wst = !isTargetAbs && /\d+/.test(this.frameOptions.get('height')) ? editorOffset.top - _w.scrollY + rt : 0;
 				const wsb = !isTargetAbs && /\d+/.test(this.frameOptions.get('height')) ? this.status.currentViewportHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
 				let st = wst;
 				if (toolbarH > wst) {
-					if (this.editor.toolbar._sticky) {
+					if (this.editor.toolbar.isSticky) {
 						st = toolbarH;
 					} else {
 						st = wst + toolbarH;
 					}
-				} else if (this.options.get('toolbar_container') && !this.editor.toolbar._sticky) {
+				} else if (this.options.get('toolbar_container') && !this.editor.toolbar.isSticky) {
 					toolbarH = 0;
 				} else {
 					st = wst + toolbarH;

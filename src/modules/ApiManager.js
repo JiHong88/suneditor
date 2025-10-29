@@ -129,6 +129,7 @@ class ApiManager extends CoreInjector {
 			};
 
 			xhr.onerror = () => {
+				this.ui.hideLoading();
 				reject(new Error('Network error'));
 			};
 

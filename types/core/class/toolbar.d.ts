@@ -75,6 +75,7 @@ declare class Toolbar {
 	 */
 	keyName: any;
 	currentMoreLayerActiveButton: HTMLButtonElement;
+	isSticky: boolean;
 	_isBalloon: boolean;
 	_isInline: boolean;
 	_isBalloonAlways: boolean;
@@ -85,7 +86,6 @@ declare class Toolbar {
 		default: Node;
 	};
 	_rButtonsize: any[];
-	_sticky: boolean;
 	_isViewPortSize: boolean;
 	_inlineToolbarAttr: {
 		top: string;

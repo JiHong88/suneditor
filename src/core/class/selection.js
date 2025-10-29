@@ -4,7 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, env, numbers } from '../../helper';
-const { _w, isTouchDevice } = env;
+const { _w } = env;
 
 /**
  * @typedef {Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>} SelectionThis
@@ -30,7 +30,9 @@ function Selection_(editor) {
 
 	_w.setTimeout(() => {
 		this.__hasScrollParents = this.eventManager?.scrollparents.length > 0;
-		this._scrollMargin = !this.frameContext ? 40 : (numbers.get(_w.getComputedStyle(this.frameContext.get('wysiwyg')).scrollMargin, 0) || 40) + numbers.get(_w.getComputedStyle(this.frameContext.get('wrapper')).paddingBottom, 0);
+		this._scrollMargin = !this.frameContext?.get('wysiwyg')
+			? 40
+			: (numbers.get(_w.getComputedStyle(this.frameContext.get('wysiwyg')).scrollMargin, 0) || 40) + numbers.get(_w.getComputedStyle(this.frameContext.get('wrapper')).paddingBottom, 0);
 	}, 1000);
 }
 
@@ -404,20 +406,21 @@ Selection_.prototype = {
 		const ww = frameContext.get('_ww');
 		const wwFrame = frameContext.get('wysiwygFrame');
 		const isIframe = frameOptions.get('iframe');
-		const isAutoHeight = frameOptions.get('height') === 'auto';
-		const initViewportHeight = this.status.initViewportHeight;
+		const isAutoHeight = !this.status.isScrollable();
 		const viewportHeight = this.status.currentViewportHeight;
 		const scrollY = isAutoHeight ? _w.scrollY : isIframe ? ww.scrollY : wwFrame.scrollTop;
 		const realToolbarHeight = this.context.get('toolbar_main').offsetHeight;
-		const toolbarHeight = this.toolbar._sticky ? realToolbarHeight : 0;
+		const toolbarHeight = this.toolbar.isSticky ? realToolbarHeight : 0;
 		const statusbarHeight = frameContext.get('statusbar')?.offsetHeight || 0;
 
-		if (this.__hasScrollParents || (!isIframe && (!isTouchDevice || initViewportHeight - viewportHeight < 150))) {
+		// if (this.__hasScrollParents || (!isIframe && (!isTouchDevice || this.status.initViewportHeight - viewportHeight < 150))) {
+		if (this.__hasScrollParents) {
 			el?.scrollIntoView(scrollOption);
 
-			if (scrollOption?.behavior === 'auto') {
-				if (toolbarHeight && scrollY > _w.scrollY) {
-					_w.scrollBy(0, -toolbarHeight);
+			if (scrollOption?.behavior === 'auto' && scrollY !== _w.scrollY) {
+				const positionHeight = this.toolbar.isSticky ? toolbarHeight + this.options.get('toolbar_sticky') : toolbarHeight;
+				if (positionHeight && scrollY > _w.scrollY) {
+					_w.scrollBy(0, -positionHeight);
 				} else if (isAutoHeight) {
 					_w.scrollBy(0, statusbarHeight);
 				}
@@ -458,10 +461,12 @@ Selection_.prototype = {
 			}
 		} else {
 			// local scroll
+			const { rects } = this.getRects(el, 'start');
 			const { top } = this.offset.getLocal(el);
+			const innerTop = top < 0 && rects.top < 0 ? top : rects.top;
 
-			const keepLocalScroll = top - PADDING > 0 && top + PADDING <= viewHeight;
-			const rectScroll = top - PADDING > 0 ? top + PADDING - viewHeight : top - (toolbarHeight + elH);
+			const keepLocalScroll = innerTop - PADDING > 0 && innerTop + PADDING <= viewHeight;
+			const rectScroll = innerTop - PADDING > 0 ? innerTop + PADDING - viewHeight : innerTop - (toolbarHeight + elH);
 			let newScrollTop = scrollY + rectScroll;
 
 			// frame scroll
@@ -472,7 +477,7 @@ Selection_.prototype = {
 
 			// set frame scroll
 			if (topMargin > 0) {
-				const newFrameY = (keepLocalScroll ? top : top + scrollY - newScrollTop) - elH - PADDING - topMargin;
+				const newFrameY = (keepLocalScroll ? innerTop : innerTop + scrollY - newScrollTop) - elH - PADDING - topMargin;
 				if (newFrameY < 0) {
 					newScrollTop += realToolbarHeight;
 					_w.scrollTo({
@@ -482,7 +487,7 @@ Selection_.prototype = {
 				}
 			}
 			if (bottomMargin > 0) {
-				const newFrameY = (keepLocalScroll ? top : top + scrollY - newScrollTop) + elH + PADDING - (globalRect.height - bottomMargin);
+				const newFrameY = (keepLocalScroll ? innerTop : innerTop + scrollY - newScrollTop) + elH + PADDING - (globalRect.height - bottomMargin);
 				if (newFrameY > 0) {
 					newScrollTop += statusbarHeight;
 					_w.scrollTo({

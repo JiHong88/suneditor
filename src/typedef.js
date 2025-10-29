@@ -70,6 +70,10 @@
  * @property {number} initViewportHeight Height of the initial visual viewport height size
  * @property {boolean} onSelected Boolean value of whether component is selected
  * @property {*} rootKey Current root key
+ * @property {(fc?: SunEditor.FrameContext) => boolean} isScrollable Checks if the editor frame is currently scrollable.
+ * - default fc parameter is this.frameContext
+ * - Returns true if: (1) height is not 'auto' (fixed height always has scroll),
+ * - or (2) height is 'auto' with maxHeight set and content exceeds maxHeight
  *
  * **Internal Properties (⚠️ DO NOT USE - subject to change without notice):**
  * @property {Range} _range Internal: Current range object

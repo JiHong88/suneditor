@@ -865,18 +865,41 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 
 	if (!targetOptions.get('iframe')) {
 		wysiwygDiv.setAttribute('contenteditable', 'true');
-		wysiwygDiv.setAttribute('scrolling', 'auto');
 		wysiwygDiv.className += ' ' + options.get('_editableClass');
 		wysiwygDiv.style.cssText = editorStyles.frame + editorStyles.editor;
 	} else {
+		const iframeWW = /** @type {HTMLIFrameElement} */ (wysiwygDiv);
 		const frameAttrs = targetOptions.get('iframe_attributes');
-		for (const frameKey in frameAttrs) {
-			wysiwygDiv.setAttribute(frameKey, frameAttrs[frameKey]);
+
+		// [sandbox] prop
+		let sandboxValue = frameAttrs.sandbox;
+		if (sandboxValue) {
+			const requiredSandbox = ['allow-same-origin'];
+			const userSandbox = sandboxValue.split(/\s+/);
+			const missingSandbox = requiredSandbox.filter((req) => !userSandbox.includes(req));
+
+			if (missingSandbox.length > 0) {
+				// Add missing required value
+				sandboxValue = userSandbox.concat(missingSandbox).join(' ');
+			}
+		} else {
+			sandboxValue = 'allow-same-origin';
 		}
 
-		const iframeWW = /** @type {HTMLIFrameElement} */ (wysiwygDiv);
+		// iframe [sandbox] attr
+		iframeWW.setAttribute('sandbox', sandboxValue);
+
+		// iframe [default border]
+		iframeWW.setAttribute('frameBorder', '0');
+
+		// iframe attr
+		for (const frameKey in frameAttrs) {
+			if (frameKey === 'sandbox') continue;
+			iframeWW.setAttribute(frameKey, frameAttrs[frameKey]);
+		}
+
 		iframeWW.allowFullscreen = true;
-		iframeWW.frameBorder = '0';
+		iframeWW.setAttribute('scrolling', targetOptions.get('height') === 'auto' ? 'no' : 'auto');
 		iframeWW.style.cssText = editorStyles.frame;
 	}
 

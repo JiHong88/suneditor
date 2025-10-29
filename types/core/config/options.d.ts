@@ -124,11 +124,12 @@ export namespace DEFAULTS {
  * === Iframe Mode ===
  * @property {boolean} [iframe=false] - Content will be placed in an iframe and isolated from the rest of the page.
  * @property {boolean} [iframe_fullPage=false] - Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration on the "iframe".
- * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the "iframe". (e.g. {'scrolling': 'no'})
- * @property {string} [iframe_cssFileName="suneditor"] - Name or Array of the CSS file to apply inside the iframe.
- * - You can also use regular expressions.
- * - Applied by searching by filename in the link tag of document,
- * - or put the URL value (".css" can be omitted).
+ * @property {Object<string, string>} [iframe_attributes={}] - Attributes of the "iframe". (e.g. {'allow-scripts': 'true'})
+ * @property {string|Array<string>} [iframe_cssFileName="suneditor"] - CSS files to apply inside the iframe.
+ * - String: Filename pattern to search in document <link> tags (e.g. "suneditor" or "suneditor.[a-z0-9]+" matches "suneditor.abc123.css")
+ * - "*": Wildcard to include ALL stylesheets from the page
+ * - Array: Multiple patterns (e.g. ["suneditor", "custom", "*"])
+ * - Absolute URLs and data URLs (data:text/css,) are also supported
  * ///
  *
  * === Statusbar & Character Counter ===
@@ -530,21 +531,22 @@ export type EditorFrameOptions = {
 	 */
 	iframe_fullPage?: boolean;
 	/**
-	 * - Attributes of the "iframe". (e.g. {'scrolling': 'no'})
+	 * - Attributes of the "iframe". (e.g. {'allow-scripts': 'true'})
 	 */
 	iframe_attributes?: {
 		[x: string]: string;
 	};
 	/**
-	 * - Name or Array of the CSS file to apply inside the iframe.
-	 * - You can also use regular expressions.
-	 * - Applied by searching by filename in the link tag of document,
-	 * - or put the URL value (".css" can be omitted).
+	 * - CSS files to apply inside the iframe.
+	 * - String: Filename pattern to search in document <link> tags (e.g. "suneditor" or "suneditor.[a-z0-9]+" matches "suneditor.abc123.css")
+	 * - "*": Wildcard to include ALL stylesheets from the page
+	 * - Array: Multiple patterns (e.g. ["suneditor", "custom", "*"])
+	 * - Absolute URLs and data URLs (data:text/css,) are also supported
 	 * ///
 	 *
 	 * === Statusbar & Character Counter ===
 	 */
-	iframe_cssFileName?: string;
+	iframe_cssFileName?: string | Array<string>;
 	/**
 	 * - Enables the status bar.
 	 */

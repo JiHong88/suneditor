@@ -164,7 +164,7 @@ export function addUrlQuery(url: string, query: string): string;
 export function _setDefaultOptionStyle(fo: Map<string, any>, cssText: string): OptionStyleResult_converter;
 /**
  * @description Set default style tag of the iframe
- * @param {Array<string>} linkNames link names array of CSS files
+ * @param {Array<string>} linkNames link names array of CSS files or '*' for all stylesheets
  * @returns {string} "<link rel="stylesheet" href=".." />.."
  */
 export function _setIframeStyleLinks(linkNames: Array<string>): string;

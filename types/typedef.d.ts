@@ -54,10 +54,17 @@ declare global {
 			onSelected: boolean;
 			/**
 			 * Current root key
+			 */
+			rootKey: any;
+			/**
+			 * Checks if the editor frame is currently scrollable.
+			 * - default fc parameter is this.frameContext
+			 * - Returns true if: (1) height is not 'auto' (fixed height always has scroll),
+			 * - or (2) height is 'auto' with maxHeight set and content exceeds maxHeight
 			 *
 			 * **Internal Properties (⚠️ DO NOT USE - subject to change without notice):**
 			 */
-			rootKey: any;
+			isScrollable: (fc?: SunEditor.FrameContext) => boolean;
 			/**
 			 * Internal: Current range object
 			 */

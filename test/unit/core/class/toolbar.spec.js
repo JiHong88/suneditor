@@ -203,7 +203,7 @@ describe('Toolbar', () => {
 			expect(toolbar._isBalloon).toBe(false);
 			expect(toolbar._isInline).toBe(false);
 			expect(toolbar._isBalloonAlways).toBe(false);
-			expect(toolbar._sticky).toBe(false);
+			expect(toolbar.isSticky).toBe(false);
 			expect(toolbar._responsiveCurrentSize).toBe('default');
 		});
 
@@ -529,7 +529,7 @@ describe('Toolbar', () => {
 			expect(mockToolbar.style.top).toBe('1px');
 			expect(mockToolbar.style.width).toBe('800px');
 			expect(dom.utils.addClass).toHaveBeenCalledWith(mockToolbar, 'se-toolbar-sticky');
-			expect(toolbar._sticky).toBe(true);
+			expect(toolbar.isSticky).toBe(true);
 		});
 
 		it('should handle inline toolbar width', () => {
@@ -553,7 +553,7 @@ describe('Toolbar', () => {
 
 			toolbar._onSticky(1);
 
-			expect(toolbar._sticky).toBe(true);
+			expect(toolbar.isSticky).toBe(true);
 		});
 	});
 
@@ -589,7 +589,7 @@ describe('Toolbar', () => {
 			expect(mockToolbar.style.width).toBe('');
 			expect(mockWrapper.style.marginTop).toBe('');
 			expect(dom.utils.removeClass).toHaveBeenCalledWith(mockToolbar, 'se-toolbar-sticky');
-			expect(toolbar._sticky).toBe(false);
+			expect(toolbar.isSticky).toBe(false);
 		});
 
 		it('should handle inline toolbar attributes', () => {

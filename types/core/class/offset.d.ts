@@ -65,6 +65,10 @@ export type OffsetLocalInfo = {
 	 * - The vertical scroll offset inside the WYSIWYG editor.
 	 */
 	scrollY: number;
+	/**
+	 * - The vertical scroll height inside the WYSIWYG editor.
+	 */
+	scrollH: number;
 };
 export type OffsetGlobalInfo = {
 	/**
@@ -201,6 +205,7 @@ export type OffsetWWScrollInfo = {
  * @property {number} right - The right position of the node relative to the WYSIWYG editor.
  * @property {number} scrollX - The horizontal scroll offset inside the WYSIWYG editor.
  * @property {number} scrollY - The vertical scroll offset inside the WYSIWYG editor.
+ * @property {number} scrollH - The vertical scroll height inside the WYSIWYG editor.
  */
 /**
  * @typedef {Object} OffsetGlobalInfo
@@ -270,6 +275,7 @@ declare class Offset {
 	 * @property {number} right - The right position of the node relative to the WYSIWYG editor.
 	 * @property {number} scrollX - The horizontal scroll offset inside the WYSIWYG editor.
 	 * @property {number} scrollY - The vertical scroll offset inside the WYSIWYG editor.
+	 * @property {number} scrollH - The vertical scroll height inside the WYSIWYG editor.
 	 */
 	/**
 	 * @typedef {Object} OffsetGlobalInfo

@@ -520,28 +520,43 @@ export function _setDefaultOptionStyle(fo, cssText) {
 
 /**
  * @description Set default style tag of the iframe
- * @param {Array<string>} linkNames link names array of CSS files
+ * @param {Array<string>} linkNames link names array of CSS files or '*' for all stylesheets
  * @returns {string} "<link rel="stylesheet" href=".." />.."
  */
 export function _setIframeStyleLinks(linkNames) {
 	let tagString = '';
 
 	if (linkNames) {
+		const allLinks = _d.getElementsByTagName('link');
+
 		for (let f = 0, len = linkNames.length, path; f < len; f++) {
 			path = [];
+			const linkName = linkNames[f];
 
-			if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
-				path.push(linkNames[f]);
-			} else {
-				const CSSFileName = new RegExp(`(^|.*[\\/])${linkNames[f]}(\\..+)?.css((\\??.+?)|\\b)$`, 'i');
-				for (let c = _d.getElementsByTagName('link'), i = 0, cLen = c.length, styleTag; i < cLen; i++) {
-					styleTag = c[i].href.match(CSSFileName);
+			// Wildcard: include all stylesheets
+			if (linkName === '*') {
+				for (let i = 0, cLen = allLinks.length; i < cLen; i++) {
+					if (allLinks[i].rel === 'stylesheet' && allLinks[i].href) {
+						path.push(allLinks[i].href);
+					}
+				}
+			}
+			// Absolute URL or data URL
+			else if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkName)) {
+				path.push(linkName);
+			}
+			// String pattern (convert to regex)
+			else {
+				const CSSFileName = new RegExp(`(^|.*[\\/])${linkName}(\\..+)?.css((\\??.+?)|\\b)$`, 'i');
+				for (let i = 0, cLen = allLinks.length, styleTag; i < cLen; i++) {
+					styleTag = allLinks[i].href.match(CSSFileName);
 					if (styleTag) path.push(styleTag[0]);
 				}
 			}
 
-			if (!path || path.length === 0)
+			if (!path || path.length === 0) {
 				throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.';
+			}
 
 			for (let i = 0, pLen = path.length; i < pLen; i++) {
 				tagString += '<link href="' + path[i] + '" rel="stylesheet">';

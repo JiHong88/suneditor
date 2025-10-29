@@ -19,18 +19,19 @@ const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS
  * @param {SunEditor.FrameContext} fc - frame context object
  */
 function DocumentType(editor, fc) {
-	// members
+	// core members
 	this.editor = editor;
+	this.status = editor.status;
 	this.context = editor.context;
 	this.selection = editor.selection;
 	this.offset = editor.offset;
+
+	// members
 	this.fc = fc;
 	this.ww = fc.get('wysiwyg');
 	this.wwFrame = fc.get('wysiwygFrame');
 	this.wwWidth = -1;
 	this.wwHeight = -1;
-	this.isAutoHeight = fc.get('options').get('height') === 'auto';
-	this.displayPage = this.isAutoHeight ? _w : fc.get('wysiwyg');
 	this.innerHeaders = [];
 	this._wwHeaders = [];
 	this.documentTypeInner = fc.get('documentTypeInner');
@@ -155,7 +156,7 @@ DocumentType.prototype = {
 				if (lastSectionHeight > 0 && lastSectionHeight % A4_PAGE_HEIGHT !== 0) additionalPages++;
 			}
 
-			const scrollTop = this.isAutoHeight ? 0 : this._getWWScrollTop();
+			const scrollTop = !this.status.isScrollable(this.fc) ? 0 : this._getWWScrollTop();
 			const totalPages = Math.ceil(mirrorHeight / A4_PAGE_HEIGHT) + additionalPages;
 			const wwWidth = this.wwFrame.offsetWidth + 1;
 			const pages = [];
@@ -214,6 +215,10 @@ DocumentType.prototype = {
 			this.totalPages = this.pages.length;
 			this._displayCurrentPage();
 		}, 400);
+	},
+
+	_getDisplayPage() {
+		return !this.status.isScrollable(this.fc) ? _w : this.fc.get('wysiwyg');
 	},
 
 	/**
@@ -342,7 +347,7 @@ DocumentType.prototype = {
 	 * @description Scrolls the window to a specific position.
 	 */
 	scrollWindow() {
-		if (!this.isAutoHeight) return;
+		if (this.status.isScrollable(this.fc)) return;
 		this._displayCurrentPage();
 	},
 
@@ -354,7 +359,7 @@ DocumentType.prototype = {
 		if (this.totalPages <= 1) return 1;
 
 		let targetPosition = 0;
-		if (this.isAutoHeight) {
+		if (!this.status.isScrollable(this.fc)) {
 			const globalTop = this._getGlobalTop();
 			targetPosition = _w.scrollY - globalTop + A4_PAGE_HEIGHT / 2;
 			if (targetPosition <= 0) return 1;
@@ -443,7 +448,8 @@ DocumentType.prototype = {
 	 * @returns {number} The current scroll position.
 	 */
 	_getWWScrollTop() {
-		return this.displayPage.scrollTop || this.displayPage.scrollY || 0;
+		const displayPage = this._getDisplayPage();
+		return displayPage.scrollTop || displayPage.scrollY || 0;
 	},
 
 	/**
@@ -453,16 +459,17 @@ DocumentType.prototype = {
 	 */
 	_movePage(pageNum, force) {
 		const globalTop = this._getGlobalTop();
+		const isScrollable = this.status.isScrollable(this.fc);
 		const children = converter.nodeListToArray(this.ww.children);
-		const pageTop = this.page.offsetTop + numbers.get(this.pages[pageNum - 1].style.top) + (this.isAutoHeight ? 0 : this._getWWScrollTop());
+		const pageTop = this.page.offsetTop + numbers.get(this.pages[pageNum - 1].style.top) + (!isScrollable ? 0 : this._getWWScrollTop());
 		for (let i = 0, len = children.length, c; i < len; i++) {
 			c = children[i];
 			if (c.offsetTop >= pageTop) {
 				if (!force) this.selection.setRange(c, 0, c, 0);
-				const scrollTop = i === 0 && !this.isAutoHeight ? 0 : c.offsetTop - this.page.offsetTop - c.offsetHeight + globalTop;
+				const scrollTop = i === 0 && isScrollable ? 0 : c.offsetTop - this.page.offsetTop - c.offsetHeight + globalTop;
 				this._applyPageScroll(scrollTop, () => {
-					if (this.editor.toolbar._sticky) {
-						this.displayPage.scrollTo({ top: scrollTop - this.context.get('toolbar_main').offsetHeight, behavior: 'smooth' });
+					if (this.editor.toolbar.isSticky) {
+						this._getDisplayPage().scrollTo({ top: scrollTop - this.context.get('toolbar_main').offsetHeight, behavior: 'smooth' });
 					}
 				});
 
@@ -477,9 +484,11 @@ DocumentType.prototype = {
 	 * @description Applies smooth scrolling for page navigation.
 	 */
 	_applyPageScroll(top, callback) {
-		this.displayPage.scrollTo({ top, behavior: 'smooth' });
+		const displayPage = this._getDisplayPage();
+
+		displayPage.scrollTo({ top, behavior: 'smooth' });
 		const checkScrollEnd = () => {
-			if (Math.abs((this.displayPage.scrollY ?? this.displayPage.scrollTop) - top) < 1) {
+			if (Math.abs((displayPage.scrollY ?? displayPage.scrollTop) - top) < 1) {
 				callback();
 			} else {
 				_w.requestAnimationFrame(checkScrollEnd);
@@ -495,7 +504,7 @@ DocumentType.prototype = {
 	 * @returns {number} The top offset of the element.
 	 */
 	_getGlobalTop() {
-		return this.isAutoHeight ? this.offset.getGlobal(this.wwFrame).top : 0;
+		return !this.status.isScrollable(this.fc) ? this.offset.getGlobal(this.wwFrame).top : 0;
 	},
 
 	/**

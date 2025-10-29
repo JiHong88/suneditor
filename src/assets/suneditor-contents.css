@@ -2,6 +2,7 @@
 
 /* suneditor content */
 .sun-editor-editable {
+	box-sizing: border-box;
 	font-family: Helvetica Neue;
 	font-size: var(--se-edit-font-size);
 	color: var(--se-edit-font-color);
@@ -730,8 +731,21 @@
 	54%,
 	56%,
 	100% {
-		text-shadow: -0.2rem -0.2rem 1rem #fff, 0.2rem 0.2rem 1rem #fff, 0 0 2px #f40, 0 0 4px #f40, 0 0 6px #f40, 0 0 8px #f40, 0 0 10px #f40;
-		box-shadow: 0 0 0.5px #fff, inset 0 0 0.5px #fff, 0 0 2px #08f, inset 0 0 2px #08f, 0 0 4px #08f, inset 0 0 4px #08f;
+		text-shadow:
+			-0.2rem -0.2rem 1rem #fff,
+			0.2rem 0.2rem 1rem #fff,
+			0 0 2px #f40,
+			0 0 4px #f40,
+			0 0 6px #f40,
+			0 0 8px #f40,
+			0 0 10px #f40;
+		box-shadow:
+			0 0 0.5px #fff,
+			inset 0 0 0.5px #fff,
+			0 0 2px #08f,
+			inset 0 0 2px #08f,
+			0 0 4px #08f,
+			inset 0 0 4px #08f;
 	}
 	20%,
 	24%,
@@ -750,8 +764,21 @@
 	54%,
 	56%,
 	100% {
-		text-shadow: -0.2rem -0.2rem 1rem #fff, 0.2rem 0.2rem 1rem #fff, 0 0 2px #f40, 0 0 4px #f40, 0 0 6px #f40, 0 0 8px #f40, 0 0 10px #f40;
-		box-shadow: 0 0 0.5px #fff, inset 0 0 0.5px #fff, 0 0 2px #08f, inset 0 0 2px #08f, 0 0 4px #08f, inset 0 0 4px #08f;
+		text-shadow:
+			-0.2rem -0.2rem 1rem #fff,
+			0.2rem 0.2rem 1rem #fff,
+			0 0 2px #f40,
+			0 0 4px #f40,
+			0 0 6px #f40,
+			0 0 8px #f40,
+			0 0 10px #f40;
+		box-shadow:
+			0 0 0.5px #fff,
+			inset 0 0 0.5px #fff,
+			0 0 2px #08f,
+			inset 0 0 2px #08f,
+			0 0 4px #08f,
+			inset 0 0 4px #08f;
 	}
 	20%,
 	24%,
@@ -765,7 +792,14 @@
 /* Shadow */
 .sun-editor-editable .__se__t-shadow,
 .sun-editor .__se__t-shadow {
-	text-shadow: -0.2rem -0.2rem 1rem #fff, 0.2rem 0.2rem 1rem #fff, 0 0 0.2rem #999, 0 0 0.4rem #888, 0 0 0.6rem #777, 0 0 0.8rem #666, 0 0 1rem #555;
+	text-shadow:
+		-0.2rem -0.2rem 1rem #fff,
+		0.2rem 0.2rem 1rem #fff,
+		0 0 0.2rem #999,
+		0 0 0.4rem #888,
+		0 0 0.6rem #777,
+		0 0 0.8rem #666,
+		0 0 1rem #555;
 }
 
 /* Code */

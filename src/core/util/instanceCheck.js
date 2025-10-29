@@ -18,7 +18,8 @@ InstanceCheck.prototype = {
 	 * @returns {obj is Node}
 	 */
 	isNode(obj) {
-		return obj instanceof this._getFrameWindow().Node;
+		// Check nodeType first for cross-context compatibility (e.g., elements created from main document in iframe mode)
+		return (obj && typeof obj.nodeType === 'number') || obj instanceof this._getFrameWindow().Node;
 	},
 
 	/**
@@ -26,7 +27,8 @@ InstanceCheck.prototype = {
 	 * @returns {obj is Element}
 	 */
 	isElement(obj) {
-		return obj instanceof this._getFrameWindow().Element;
+		// Check nodeType === 1 for cross-context compatibility
+		return (obj && obj.nodeType === 1) || obj instanceof this._getFrameWindow().Element;
 	},
 
 	/**
@@ -34,7 +36,8 @@ InstanceCheck.prototype = {
 	 * @returns {obj is Range}
 	 */
 	isRange(obj) {
-		return obj instanceof this._getFrameWindow().Range;
+		// Check constructor name for cross-context compatibility
+		return (obj && obj.constructor?.name === 'Range') || obj instanceof this._getFrameWindow().Range;
 	},
 
 	/**
@@ -42,7 +45,8 @@ InstanceCheck.prototype = {
 	 * @returns {obj is Selection}
 	 */
 	isSelection(obj) {
-		return obj instanceof this._getFrameWindow().Selection;
+		// Check constructor name for cross-context compatibility
+		return (obj && obj.constructor?.name === 'Selection') || obj instanceof this._getFrameWindow().Selection;
 	},
 
 	/**

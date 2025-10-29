@@ -44,6 +44,7 @@ function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 	};
 
 	this.currentMoreLayerActiveButton = null;
+	this.isSticky = false;
 	this._isBalloon = balloon;
 	this._isInline = inline;
 	this._isBalloonAlways = balloonAlways;
@@ -52,7 +53,6 @@ function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 	this._rButtonArray = res;
 	this._rButtonsInfo = null;
 	this._rButtonsize = null;
-	this._sticky = false;
 	this._isViewPortSize = 'visualViewport' in _w;
 	this._inlineToolbarAttr = {
 		top: '',
@@ -232,7 +232,7 @@ Toolbar.prototype = {
 		if (y < t) {
 			this._offSticky();
 		} else if (offSticky < 0) {
-			if (!this._sticky) this._onSticky(inlineOffset);
+			if (!this.isSticky) this._onSticky(inlineOffset);
 			toolbar.style.top = inlineOffset + offSticky + this.__getViewportTop() + 'px';
 		} else {
 			this._onSticky(inlineOffset);
@@ -257,7 +257,7 @@ Toolbar.prototype = {
 		toolbar.style.top = `${toolbarTopPosition}px`;
 		toolbar.style.width = this._isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
 		dom.utils.addClass(toolbar, 'se-toolbar-sticky');
-		this._sticky = true;
+		this.isSticky = true;
 	},
 
 	/**
@@ -288,7 +288,7 @@ Toolbar.prototype = {
 		this.frameContext.get('wrapper').style.marginTop = '';
 
 		dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
-		this._sticky = false;
+		this.isSticky = false;
 	},
 
 	/**

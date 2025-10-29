@@ -1010,7 +1010,7 @@ EventManager.prototype = {
 
 		this.editor._iframeAutoHeight(fc);
 
-		if (this.toolbar._sticky) {
+		if (this.toolbar.isSticky) {
 			this.context.get('toolbar_main').style.width = fc.get('topArea').offsetWidth - 2 + 'px';
 			this.toolbar._resetSticky();
 		}

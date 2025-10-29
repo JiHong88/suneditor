@@ -113,8 +113,8 @@ const bl = [
 			'|',
 			['pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
 			'|',
-			['copy']
-		]
+			['copy'],
+		],
 	],
 	// (min-width: 992)
 	[
@@ -134,8 +134,8 @@ const bl = [
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'embed'],
 			[':Galleries-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
-			['-right', ':View-default.more_view', 'preview', 'print', 'fullScreen', 'showBlocks', 'codeView']
-		]
+			['-right', ':View-default.more_view', 'preview', 'print', 'fullScreen', 'showBlocks', 'codeView'],
+		],
 	],
 	// (min-width: 768)
 	[
@@ -156,8 +156,8 @@ const bl = [
 			[':File-default.more_file', 'fileUpload', 'template', 'layout'],
 			'|',
 			['-right', ':Pages-default.more_page', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
-			['-right', ':View-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView']
-		]
+			['-right', ':View-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView'],
+		],
 	],
 	// (min-width: 525)
 	[
@@ -172,9 +172,9 @@ const bl = [
 			[':Lists & Align-default.more_list', 'align', 'lineHeight', 'list_numbered', 'list_bulleted'],
 			[':Media-default.more_media', 'image', 'drawing', 'video', 'audio', 'embed'],
 			[':Galleries & File-default.more_gallery', 'imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser', '|', 'fileUpload', 'template', 'layout'],
-			[':View & Pages-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView', '|', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown']
-		]
-	]
+			[':View & Pages-default.more_view', 'preview', 'print', 'exportPDF', 'fullScreen', 'showBlocks', 'codeView', '|', 'pageBreak', 'pageNavigator', 'pageUp', 'pageDown'],
+		],
+	],
 ];
 
 const bb = [
@@ -192,7 +192,7 @@ const bb = [
 	['imageGallery', 'videoGallery', 'audioGallery', 'fileGallery', 'fileBrowser'],
 	['fullScreen', 'showBlocks', 'codeView', 'copy'],
 	['preview', 'print', 'exportPDF'],
-	['save', 'template', 'layout', 'fileUpload', 'mention']
+	['save', 'template', 'layout', 'fileUpload', 'mention'],
 ];
 
 const begContent = `
@@ -349,13 +349,10 @@ const options1 = {
 	allowedExtraTags: { script: true },
 	// closeModalOutsideClick: true,
 	events: {
-		onChange() {
-			
-		}
+		onChange() {},
 	},
 	image: {
 		uploadSizeLimit: '1a',
-		
 	},
 	previewTemplate: `
                 <div style="width:auto; max-width:1136px; min-height:400px; margin:auto;">
@@ -365,7 +362,6 @@ const options1 = {
 	// tagStyles: { '.+': '.+' },
 	strictMode: {
 		// styleFilter: false
-		
 	},
 	// strictMode: false,
 	// lang: langs.ko,
@@ -565,7 +561,7 @@ const options1 = {
 	// 	</div>
 	// </div>`,
 	// type: 'document:header,page',
-	iframe_cssFileName: ['suneditor', 'katex'],
+	iframe_cssFileName: ['*'],
 	copyFormatKeepOn: true,
 	// 		value: `<figure>
 	//     <img src="https://blog.kakaocdn.net/dn/0QCnX/btqU7cMuFOZ/uVPVj1aIBNqINLQZGkuwa0/img.png" alt="">
@@ -598,6 +594,7 @@ const options1 = {
 	// },
 	/** -- codemirror5 */
 	// iframe: true,
+	// iframe_attributes: 'abc',
 	// defaultLine: 'p',
 	// __defaultFormatLine: 'H[1-6]|LI|TH|TD|DETAILS',
 	retainStyleMode: 'none', // repeat, always, none
@@ -631,13 +628,13 @@ const options1 = {
 	subToolbar: {
 		buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
 		width: 'auto',
-		mode: 'balloon' // balloon, balloon-always, balloon-block
+		mode: 'balloon', // balloon, balloon-always, balloon-block
 	},
 	shortcuts: {
 		// bold: ['s75', 'K'],
 		italic: [],
 		image: ['c+73', 'I'],
-		list: ['c+76', 'L']
+		list: ['c+76', 'L'],
 	},
 	// theme: 'dark',
 	math: {
@@ -647,13 +644,13 @@ const options1 = {
 		fontSizeList: [
 			{
 				text: '1',
-				value: '1em'
+				value: '1em',
 			},
 			{
 				text: '1.5',
-				value: '1.5em'
-			}
-		]
+				value: '1.5em',
+			},
+		],
 	},
 	// autoLinkify: false,
 	// autoStyleify: [],
@@ -794,22 +791,22 @@ const options1 = {
 	// toolbar_container: document.getElementById('ttt'),
 	// iframe: true,
 	// height: 1500,
-	iframe_attributes: { aaa: true },
+	// iframe_attributes: { aaa: true },
 	type: 'document:header,page',
 
 	link: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
 		relList: ['alternate', 'author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
-		defaultRel: 'tag'
+		defaultRel: 'tag',
 	},
 	video: {
 		allowMultiple: true,
 		uploadUrl: 'http://localhost:3000/editor/upload',
 		createFileInput: true,
-		controls: [['resize_auto,75,50', 'align', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v', 'edit', 'revert', 'copy', 'remove']]
+		controls: [['resize_auto,75,50', 'align', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v', 'edit', 'revert', 'copy', 'remove']],
 	},
 	videoGallery: {
-		url: 'http://localhost:3000/editor/gallery/video'
+		url: 'http://localhost:3000/editor/gallery/video',
 	},
 	embed: { controls: [['resize_auto,75,50', 'align', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v', 'edit', 'revert', 'copy', 'remove']] },
 	attributeWhitelist: { '*': 'id' },
@@ -834,7 +831,7 @@ const options1 = {
 		// 		tag: 'Cat'
 		// 	}
 		// ],
-		url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
+		url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
 	},
 	image: {
 		// canResize: false,
@@ -842,38 +839,38 @@ const options1 = {
 		linkEnableFileUpload: true,
 		allowMultiple: true,
 		useFormatType: true,
-		defaultFormatType: 'block'
+		defaultFormatType: 'block',
 		// percentageOnlySize: true
 	},
 	audio: {
 		allowMultiple: true,
 		uploadUrl: 'http://localhost:3000/editor/upload',
-		createFileInput: true
+		createFileInput: true,
 	},
 	audioGallery: {
-		url: 'http://localhost:3000/editor/gallery/audio'
+		url: 'http://localhost:3000/editor/gallery/audio',
 	},
 	fileGallery: {
-		url: 'http://localhost:3000/editor/gallery/file'
+		url: 'http://localhost:3000/editor/gallery/file',
 	},
 	fileBrowser: {
-		url: 'http://localhost:3000/editor/filebrowser'
+		url: 'http://localhost:3000/editor/filebrowser',
 	},
 	table: {
 		scrollType: 'x',
-		cellControllerPosition: 'cell'
+		cellControllerPosition: 'cell',
 	},
 	fontColor: {
 		// disableHEXInput: true,
-		items: [{ name: 'red', value: '#ff0000' }, '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000']
+		items: [{ name: 'red', value: '#ff0000' }, '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000'],
 	},
 	fileUpload: {
 		uploadUrl: 'http://localhost:3000/editor/files/upload',
 		as: 'link',
-		allowMultiple: true
+		allowMultiple: true,
 	},
 	exportPDF: {
-		apiUrl: 'http://localhost:3000/editor/download-pdf'
+		apiUrl: 'http://localhost:3000/editor/download-pdf',
 	},
 	fontSize: {
 		// showIncDecControls: true
@@ -884,7 +881,7 @@ const options1 = {
 	mention: {
 		// data: [{"key":"rwhilnj","name":"Riley White (Product Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/rwhilnj/info"},{"key":"mwil298","name":"Morgan Wilson (Project Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/mwil298/info"},{"key":"eand3d1","name":"Elliott Anderson (UX Designer)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/eand3d1/info"},{"key":"ztaya65","name":"Zane Taylor (Project Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/ztaya65/info"},{"key":"stho9wt","name":"Sawyer Thomas (Product Manager)","url":"https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/stho9wt/info"}],
 		apiUrl: 'https://74iuojmw16.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo/SunEditor-sample-mention/{ key }?limit={limitSize}',
-		useCachingFieldData: true
+		useCachingFieldData: true,
 	},
 	drawing: {
 		// size: 22,
@@ -894,34 +891,34 @@ const options1 = {
 		// modalSizeWidth: '750px',
 		// modalSizeHeight: '50vh'
 	},
-	externalLibs: {
-		// math
-		// katex: {
-		// 	src: Katex
-		// },
-		mathjax: {
-			src: mathjax,
-			TeX,
-			CHTML,
-			browserAdaptor,
-			RegisterHTMLHandler
-		},
-		// perfectFreehand: PerfectFreehand,
-		// codemirror
-		codeMirror: {
-			EditorView: EditorView,
-			extensions: [
-				basicSetup,
-				html({
-					matchClosingTags: true,
-					autoCloseTags: true
-				}),
-				javascript()
-			],
-			minimalSetup: minimalSetup
-			// src: Codemirror5
-		}
-	},
+	// externalLibs: {
+	// 	// math
+	// 	// katex: {
+	// 	// 	src: Katex
+	// 	// },
+	// 	mathjax: {
+	// 		src: mathjax,
+	// 		TeX,
+	// 		CHTML,
+	// 		browserAdaptor,
+	// 		RegisterHTMLHandler,
+	// 	},
+	// 	// perfectFreehand: PerfectFreehand,
+	// 	// codemirror
+	// 	codeMirror: {
+	// 		EditorView: EditorView,
+	// 		extensions: [
+	// 			basicSetup,
+	// 			html({
+	// 				matchClosingTags: true,
+	// 				autoCloseTags: true,
+	// 			}),
+	// 			javascript(),
+	// 		],
+	// 		minimalSetup: minimalSetup,
+	// 		// src: Codemirror5
+	// 	},
+	// },
 	value: `
     <div >
         <img
@@ -1292,7 +1289,7 @@ const options1 = {
 		onFontActionBefore(data) {
 			console.log('fontbefore', data);
 		},
-		onabc() {}
+		onabc() {},
 		// onPaste(params) {
 		// 	console.log('paste', params);
 		// 	return params.editor.html.filter(params.html, { validate: (el) => {
@@ -1321,7 +1318,26 @@ const options1 = {
 		// 	console.log('delete video', arg);
 		// 	return false;
 		// },
-	}
+	},
+	iframe: true,
+	maxHeight: 600,
+	toolbar_sticky: 50,
+	iframe_attributes: { frameborder: '1' },
+	value: `<pre style="line-height: 1.45;margin: 0px 0px 10px">​dsadsa</pre><figure class="se-flex-component se-input-component se-scroll-figure-x" style="padding: 0px 1px; width: 280px;"><table class="se-table-layout-auto" style="border-width: 1px; border-style: solid; border-color: rgb(225, 225, 225); background-color: rgb(255, 255, 255); border-collapse: collapse;"><colgroup><col style="width: 49.5547px"><col style="width: 55.3672px"><col style="width: 74.9609px"><col style="width: 49.5547px"><col style="width: 49.5625px"></colgroup><tbody><tr><td style="line-height: 19.5px"><br></td><td class="" style="line-height: 19.5px"><div style="line-height: 19.5px">dsadsa</div></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td></tr><tr><td class="" style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><div style="line-height: 19.5px">dsa</div></td><td class="" style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td></tr><tr><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td class="" style="line-height: 19.5px"><div style="line-height: 19.5px">dsadasdsa</div></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td></tr><tr><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td></tr></tbody></table></figure><p style="line-height: 19.5px;margin: 0px 0px 10px">​dsadsa</p><p style="line-height: 19.5px;margin: 0px 0px 10px">dsa</p><p style="line-height: 19.5px;margin: 0px 0px 10px">d</p><p style="line-height: 19.5px;margin: 0px 0px 10px">​d</p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px">​sa</p><p style="line-height: 19.5px;margin: 0px 0px 10px">​s</p><p style="line-height: 19.5px;margin: 0px 0px 10px">ada</p><p style="line-height: 19.5px;margin: 0px 0px 10px">asd</p><p style="line-height: 19.5px;margin: 0px 0px 10px">d</p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px">​d</p><p style="line-height: 19.5px;margin: 0px 0px 10px">asd</p><p style="line-height: 19.5px;margin: 0px 0px 10px">sad</p><p style="line-height: 19.5px;margin: 0px 0px 10px">sad</p><p style="line-height: 19.5px;margin: 0px 0px 10px">sad</p><p style="line-height: 19.5px;margin: 0px 0px 10px">sa</p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px">121</p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px"><br></p><p style="line-height: 19.5px;margin: 0px 0px 10px">qe</p><p style="line-height: 19.5px;margin: 0px 0px 10px">​2</p><p style="line-height: 19.5px;margin: 0px 0px 10px">​f</p><p style="line-height: 19.5px;margin: 0px 0px 10px">​f</p><p style="line-height: 19.5px;margin: 0px 0px 10px">​g</p><p style="line-height: 19.5px;margin: 0px 0px 10px">2g4</p><p style="line-height: 19.5px;margin: 0px 0px 10px">24</p><p style="line-height: 19.5px;margin: 0px 0px 10px">g2</p><p style="line-height: 19.5px;margin: 0px 0px 10px">h</p><p style="line-height: 19.5px;margin: 0px 0px 10px">h4</p><p style="line-height: 19.5px;margin: 0px 0px 10px">hh</p><p style="line-height: 19.5px;margin: 0px 0px 10px">2h</p><p style="line-height: 19.5px;margin: 0px 0px 10px">h2</p><p style="line-height: 19.5px;margin: 0px 0px 10px">42h</p><p style="line-height: 19.5px;margin: 0px 0px 10px">42</p><p style="line-height: 19.5px;margin: 0px 0px 10px">h42</p><p style="line-height: 19.5px;margin: 0px 0px 10px">2</p><p style="line-height: 19.5px;margin: 0px 0px 10px">h2</p><p style="line-height: 19.5px;margin: 0px 0px 10px">h2</p><p style="line-height: 19.5px;margin: 0px 0px 10px">​h4</p><p style="line-height: 19.5px;margin: 0px 0px 10px">4h</p><p style="line-height: 19.5px;margin: 0px 0px 10px">​h</p><p style="line-height: 19.5px;margin: 0px 0px 10px">​24</p><p style="line-height: 19.5px;margin: 0px 0px 10px">h<br></p><ol style="list-style-type: decimal"><li><br></li><li>dsadsa</li><li>bbdadas<ol style="list-style-type: lower-alpha"><li>dsadsadsa</li><li>dsa</li><li>dsa<br></li><li>dsadsadas<ol style="list-style-type: upper-roman"><li>dsadsa</li><li>dsadsa</li><li>dsadas</li></ol></li></ol></li></ol><ol style="list-style-type: decimal"><li>dsadsa<ol style="list-style-type: lower-alpha"><li>dsadas<ol style="list-style-type: upper-roman"><li>dsa<br>​</li><li>dsa</li><li>​dsadsa</li><li><figure class="se-flex-component se-input-component se-scroll-figure-x" style="padding: 0px 1px; width: 280px;"><table class="se-table-layout-auto" style="border-width: 1px; border-style: solid; border-color: rgb(225, 225, 225); background-color: rgb(255, 255, 255); border-collapse: collapse;"><colgroup><col style="width: 49.5547px"><col style="width: 55.3672px"><col style="width: 74.9609px"><col style="width: 49.5547px"><col style="width: 49.5625px"></colgroup><tbody><tr><td style="line-height: 19.5px"><br></td><td class="" style="line-height: 19.5px"><div style="line-height: 19.5px">dsadsa</div></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td></tr><tr><td class="" style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><div style="line-height: 19.5px">dsa</div></td><td class="" style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td></tr><tr><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td class="" style="line-height: 19.5px"><div style="line-height: 19.5px">dsadasdsa</div></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td></tr><tr><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td><td style="line-height: 19.5px"><br></td></tr></tbody></table></figure></li><li>​dsadsa</li><li>dsa</li><li>d</li><li>​d</li><li>​sa</li><li>​s</li><li>ada</li><li>asd</li><li>d</li><li><br></li><li>​d</li><li>asd</li><li>sad</li><li>sad</li><li>sad</li><li>sa</li><li>121</li><li><br></li><li>qe</li><li>​2</li><li>​f</li><li>​f</li><li>​g</li><li>2g4</li><li>24</li><li>g2</li><li>h</li><li>h4</li><li>hh</li><li>2h</li><li>h2</li><li>42h</li><li>42</li><li>h42</li><li>2</li><li>h2</li><li>h2</li><li>​h4</li><li>4h</li><li>​h</li><li>​24</li><li>h<br></li><li>dsadsa</li><li>bbdadas<ol style="list-style-type: lower-alpha"><li>dsadsadsa</li><li>dsa</li><li>dsa<br></li><li>dsadsadas<ol style="list-style-type: upper-roman"><li>dsadsa</li><li>dsadsa</li><li>dsadas</li></ol></li></ol></li><li>dsadsa<ol style="list-style-type: lower-alpha"><li>dsadas<ol style="list-style-type: upper-roman"><li>dsa<br>​</li><li>dsa</li></ol></li></ol></li></ol></li></ol></li></ol><p><br></p><p><br></p>`,
+	// externalLibs: {
+	// 	// katex: Katex,
+	// 	// mathJax: {
+	// 	// 	src: (() => {
+	// 	// 		// Register HTML handler before creating document
+	// 	// 		RegisterHTMLHandler(browserAdaptor());
+	// 	// 		return mathjax.document(document, {
+	// 	// 			InputJax: new TeX(),
+	// 	// 			OutputJax: new CHTML(),
+	// 	// 		});
+	// 	// 	})(),
+	// 	// 	tex: {},
+	// 	// },
+	// },
 };
 
 window.editor_root = suneditor.create('#editor_classic', options1);
@@ -1525,8 +1541,10 @@ const options_test = {
 	// Iframe Mode
 	iframe: false,
 	iframe_fullPage: false,
-	iframe_attributes: { scrolling: 'no', sandbox: 'allow-scripts' },
-	iframe_cssFileName: ['suneditor', 'custom-styles'],
+	iframe_attributes: { scrolling: 'no', sandbox: 'allow-aa' },
+	// Test wildcard and string patterns
+	iframe_cssFileName: ['suneditor', 'custom-styles'], // Original
+	// iframe_cssFileName: ['*'], // Wildcard: include all stylesheets
 
 	// Statusbar & Character Counter
 	statusbar: true,
@@ -1560,7 +1578,7 @@ const options_test = {
 		classFilter: true,
 		textStyleTagFilter: true,
 		attrFilter: true,
-		styleFilter: true
+		styleFilter: true,
 	},
 	scopeSelectionTags: ['td', 'table', 'li', 'ol', 'ul', 'pre'],
 
@@ -1574,10 +1592,10 @@ const options_test = {
 	attributeWhitelist: {
 		a: 'href|target|rel',
 		img: 'src|alt|title',
-		'*': 'data-id'
+		'*': 'data-id',
 	},
 	attributeBlacklist: {
-		'*': 'onclick|onload'
+		'*': 'onclick|onload',
 	},
 
 	// Text & Inline Style Control
@@ -1588,13 +1606,13 @@ const options_test = {
 		italic: 'em',
 		strike: 'del',
 		subscript: 'sub',
-		superscript: 'sup'
+		superscript: 'sup',
 	},
 	allUsedStyles: 'text-shadow|letter-spacing',
 	tagStyles: {
 		table: 'border|border-collapse',
 		th: 'background-color|font-weight',
-		td: 'vertical-align'
+		td: 'vertical-align',
 	},
 	spanStyles: 'font-family|font-size|color|background-color',
 	lineStyles: 'text-align|margin|line-height',
@@ -1622,14 +1640,14 @@ const options_test = {
 	subToolbar: {
 		buttonList: [['bold', 'italic', 'underline']],
 		mode: 'balloon',
-		width: 'auto'
+		width: 'auto',
 	},
 	statusbar_container: null,
 	shortcutsHint: true,
 	shortcutsDisable: false,
 	shortcuts: {
 		bold: ['ctrl+b', 'cmd+b'],
-		save: ['ctrl+s', 'cmd+s']
+		save: ['ctrl+s', 'cmd+s'],
 	},
 
 	// Advanced Features
@@ -1650,23 +1668,27 @@ const options_test = {
 	externalLibs: {
 		katex: Katex,
 		mathJax: {
-			src: mathjax.document(document, {
-				InputJax: new TeX(),
-				OutputJax: new CHTML()
-			}),
-			tex: {}
-		}
+			src: (() => {
+				// Register HTML handler before creating document
+				RegisterHTMLHandler(browserAdaptor());
+				return mathjax.document(document, {
+					InputJax: new TeX(),
+					OutputJax: new CHTML(),
+				});
+			})(),
+			tex: {},
+		},
 	},
 	allowedExtraTags: {
 		script: false,
 		style: false,
-		meta: false
+		meta: false,
 	},
 
 	// Advanced Internal Options (prefixed with __)
 	__textStyleTags: 'mark|label',
 	__tagStyles: {
-		table: 'border-collapse'
+		table: 'border-collapse',
 	},
 	__defaultElementWhitelist: 'p|div|span|a|img',
 	__defaultAttributeWhitelist: 'href|src|alt|class',
@@ -1683,8 +1705,8 @@ const options_test = {
 	// === Plugin-Specific Options ===
 	align: {
 		icons: {
-			justify: '<svg>...</svg>'
-		}
+			justify: '<svg>...</svg>',
+		},
 	},
 	audio: {
 		multiple: true,
@@ -1695,79 +1717,79 @@ const options_test = {
 		audioUrlInput: true,
 		audioRotation: true,
 		audioRatio: 0.5625,
-		audioSizeOnlyPercentage: false
+		audioSizeOnlyPercentage: false,
 	},
 	audioGallery: {
 		title: 'Audio Gallery',
 		url: '/api/audio-gallery',
 		header: {
-			Authorization: 'Bearer token'
-		}
+			Authorization: 'Bearer token',
+		},
 	},
 	backgroundColor: {
 		colors: [
 			['#ff0000', '#00ff00', '#0000ff'],
-			['#ffff00', '#ff00ff', '#00ffff']
-		]
+			['#ffff00', '#ff00ff', '#00ffff'],
+		],
 	},
 	blockStyle: {
 		_default: 'Default',
 		spaced: 'Spaced',
-		bordered: 'Bordered'
+		bordered: 'Bordered',
 	},
 	drawing: {
 		width: 500,
-		height: 300
+		height: 300,
 	},
 	embed: {
 		width: '100%',
-		height: 'auto'
+		height: 'auto',
 	},
 	exportPDF: {
 		options: {
 			margin: 10,
-			filename: 'document.pdf'
-		}
+			filename: 'document.pdf',
+		},
 	},
 	fileBrowser: {
 		title: 'File Browser',
-		url: '/api/files'
+		url: '/api/files',
 	},
 	fileGallery: {
 		title: 'File Gallery',
-		url: '/api/file-gallery'
+		url: '/api/file-gallery',
 	},
 	fileUpload: {
 		url: '/upload',
 		header: {
-			Authorization: 'Bearer token'
-		}
+			Authorization: 'Bearer token',
+		},
 	},
 	font: {
 		list: [
 			{ text: 'Arial', value: 'Arial' },
-			{ text: 'Georgia', value: 'Georgia' }
+			{ text: 'Georgia', value: 'Georgia' },
 		],
-		default: 'Arial'
+		default: 'Arial',
 	},
 	fontColor: {
 		colors: [
 			['#000000', '#ffffff'],
-			['#ff0000', '#00ff00']
-		]
+			['#ff0000', '#00ff00'],
+		],
 	},
 	fontSize: {
 		list: [
 			{ text: '8pt', value: '8pt' },
 			{ text: '12pt', value: '12pt' },
-			{ text: '16pt', value: '16pt' }
+			{ text: '16pt', value: '16pt' },
 		],
-		default: '12pt'
+		default: '12pt',
 	},
 	hr: {
 		_default: 'solid',
 		dashed: 'Dashed',
-		dotted: 'Dotted'
+		dotted: 'Dotted',
 	},
 	image: {
 		multiple: true,
@@ -1778,25 +1800,25 @@ const options_test = {
 		imageUrlInput: true,
 		imageRotation: true,
 		imageRatio: 0.5625,
-		imageSizeOnlyPercentage: false
+		imageSizeOnlyPercentage: false,
 	},
 	imageGallery: {
 		title: 'Image Gallery',
 		url: '/api/image-gallery',
 		header: {
-			Authorization: 'Bearer token'
-		}
+			Authorization: 'Bearer token',
+		},
 	},
 	layout: {
-		layoutBlockWidth: '33.33%'
+		layoutBlockWidth: '33.33%',
 	},
 	lineHeight: {
 		list: [
 			{ text: '1.0', value: 1.0 },
 			{ text: '1.5', value: 1.5 },
-			{ text: '2.0', value: 2.0 }
+			{ text: '2.0', value: 2.0 },
 		],
-		default: 1.5
+		default: 1.5,
 	},
 	link: {
 		linkProtocol: 'https://',
@@ -1804,51 +1826,51 @@ const options_test = {
 		linkRel: ['nofollow', 'noopener'],
 		linkRelDefault: {
 			default: 'nofollow',
-			check_new_window: 'noopener'
-		}
+			check_new_window: 'noopener',
+		},
 	},
 	math: {
 		katexOptions: {
-			throwOnError: false
+			throwOnError: false,
 		},
 		mathJaxOptions: {
-			tex: {}
-		}
+			tex: {},
+		},
 	},
 	mention: {
 		list: [
 			{ value: '@user1', label: 'User 1' },
-			{ value: '@user2', label: 'User 2' }
-		]
+			{ value: '@user2', label: 'User 2' },
+		],
 	},
 	paragraphStyle: {
 		_default: 'Default',
-		spaced: 'Spaced paragraph'
+		spaced: 'Spaced paragraph',
 	},
 	table: {
 		minSize: { row: 3, col: 3 },
 		maxSize: { row: 20, col: 20 },
 		editText: {
 			columns: 'Columns',
-			rows: 'Rows'
-		}
+			rows: 'Rows',
+		},
 	},
 	template: {
 		list: [
 			{
 				name: 'Template 1',
-				html: '<div>Template content 1</div>'
+				html: '<div>Template content 1</div>',
 			},
 			{
 				name: 'Template 2',
-				html: '<div>Template content 2</div>'
-			}
-		]
+				html: '<div>Template content 2</div>',
+			},
+		],
 	},
 	textStyle: {
 		_default: 'Default',
 		code: 'Code',
-		translucent: 'Translucent'
+		translucent: 'Translucent',
 	},
 	video: {
 		multiple: true,
@@ -1856,14 +1878,14 @@ const options_test = {
 		height: 'auto',
 		videoFileInput: true,
 		videoUrlInput: true,
-		videoRatio: 0.5625
+		videoRatio: 0.5625,
 	},
 	videoGallery: {
 		title: 'Video Gallery',
 		url: '/api/video-gallery',
 		header: {
-			Authorization: 'Bearer token'
-		}
+			Authorization: 'Bearer token',
+		},
 	},
 
 	// === User Events ===
@@ -1960,8 +1982,8 @@ const options_test = {
 		},
 		onDrop: (e, cleanData, maxCharCount, core) => {
 			console.log('Drop event', e, cleanData);
-		}
-	}
+		},
+	},
 };
 
 console.log('Options test object created:', options_test);

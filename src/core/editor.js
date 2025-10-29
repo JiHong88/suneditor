@@ -172,6 +172,23 @@ function Editor(multiTargets, options) {
 		currentViewportHeight: 0,
 		onSelected: false,
 		rootKey: product.rootId,
+		isScrollable: (fc) => {
+			fc ||= this.frameContext;
+			const fo = fc.get('options');
+			const height = fo.get('height');
+			const maxHeight = fo.get('maxHeight');
+
+			if (height !== 'auto') {
+				return true;
+			}
+
+			if (!maxHeight) {
+				return false;
+			}
+
+			// height === 'auto' && maxHeight
+			return fc.get('wysiwyg').offsetHeight >= numbers.get(maxHeight);
+		},
 		_range: null,
 		_onMousedown: false,
 	};
@@ -1272,7 +1289,18 @@ Editor.prototype = {
 		if (autoFrame) {
 			this._w.setTimeout(() => {
 				const h = autoFrame.offsetHeight;
-				fc.get('wysiwygFrame').style.height = h + 'px';
+				const wysiwygFrame = fc.get('wysiwygFrame');
+				wysiwygFrame.style.height = h + 'px';
+
+				// maxHeight
+				const fo = fc.get('options');
+				if (fo.get('iframe')) {
+					const maxHeight = fo.get('maxHeight');
+					if (maxHeight) {
+						wysiwygFrame.setAttribute('scrolling', h > numbers.get(maxHeight) ? 'auto' : 'no');
+					}
+				}
+
 				if (!env.isResizeObserverSupported) this.__callResizeFunction(fc, h, null);
 			}, 0);
 		} else if (!env.isResizeObserverSupported) {
@@ -1606,7 +1634,7 @@ Editor.prototype = {
 	 * @param {SunEditor.FrameOptions} targetOptions - The new options.
 	 */
 	__setIframeDocument(frame, originOptions, targetOptions) {
-		frame.setAttribute('scrolling', 'auto');
+		frame.contentDocument.documentElement.className = 'sun-editor';
 		frame.contentDocument.head.innerHTML =
 			'<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
 			converter._setIframeStyleLinks(targetOptions.get('iframe_cssFileName')) +

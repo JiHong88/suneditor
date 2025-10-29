@@ -16,6 +16,7 @@ declare class DocumentType {
 	 */
 	constructor(editor: SunEditor.Core, fc: SunEditor.FrameContext);
 	editor: import('../editor').default;
+	status: SunEditor.Status;
 	context: import('../config/context').ContextUtil;
 	selection: import('../class/selection').default;
 	offset: import('../class/offset').default;
@@ -24,8 +25,6 @@ declare class DocumentType {
 	wwFrame: any;
 	wwWidth: number;
 	wwHeight: number;
-	isAutoHeight: boolean;
-	displayPage: any;
 	innerHeaders: any;
 	_wwHeaders: any[];
 	documentTypeInner: any;
@@ -58,6 +57,7 @@ declare class DocumentType {
 	 * @returns {Promise<void>}
 	 */
 	rePage(force: boolean): Promise<void>;
+	_getDisplayPage(): any;
 	/**
 	 * @private
 	 * @description Calculates and compensates for the vertical gap between the rendered content (current page)
