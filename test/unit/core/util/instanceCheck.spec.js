@@ -46,8 +46,17 @@ describe('InstanceCheck', () => {
 			expect(instanceCheck.isNode(undefined)).toBe(false);
 		});
 
-		it('should use frame window for instanceof check', () => {
-			instanceCheck.isNode(document.createElement('div'));
+		it('should check nodeType first for cross-context compatibility', () => {
+			const div = document.createElement('div');
+			expect(instanceCheck.isNode(div)).toBe(true);
+			// Should not call _getFrameWindow since nodeType check succeeds
+			expect(mockEditor.frameContext.get).not.toHaveBeenCalled();
+		});
+
+		it('should fallback to instanceof check when nodeType is absent', () => {
+			// Mock an object without nodeType that should fallback to instanceof
+			const mockNode = { fake: 'node' };
+			instanceCheck.isNode(mockNode);
 			expect(mockEditor.frameContext.get).toHaveBeenCalledWith('_ww');
 		});
 	});
@@ -77,8 +86,17 @@ describe('InstanceCheck', () => {
 			expect(instanceCheck.isElement(undefined)).toBe(false);
 		});
 
-		it('should use frame window for instanceof check', () => {
-			instanceCheck.isElement(document.createElement('div'));
+		it('should check nodeType === 1 first for cross-context compatibility', () => {
+			const div = document.createElement('div');
+			expect(instanceCheck.isElement(div)).toBe(true);
+			// Should not call _getFrameWindow since nodeType check succeeds
+			expect(mockEditor.frameContext.get).not.toHaveBeenCalled();
+		});
+
+		it('should fallback to instanceof check when nodeType check fails', () => {
+			// Mock an object without nodeType === 1 that should fallback to instanceof
+			const mockElement = { nodeType: 3 }; // Text node type
+			instanceCheck.isElement(mockElement);
 			expect(mockEditor.frameContext.get).toHaveBeenCalledWith('_ww');
 		});
 	});
@@ -99,8 +117,17 @@ describe('InstanceCheck', () => {
 			expect(instanceCheck.isRange(undefined)).toBe(false);
 		});
 
-		it('should use frame window for instanceof check', () => {
-			instanceCheck.isRange(document.createRange());
+		it('should check constructor name first for cross-context compatibility', () => {
+			const range = document.createRange();
+			expect(instanceCheck.isRange(range)).toBe(true);
+			// Should not call _getFrameWindow since constructor.name check succeeds
+			expect(mockEditor.frameContext.get).not.toHaveBeenCalled();
+		});
+
+		it('should fallback to instanceof check when constructor name is not Range', () => {
+			// Mock an object without constructor name 'Range' that should fallback to instanceof
+			const mockRange = { constructor: { name: 'NotRange' } };
+			instanceCheck.isRange(mockRange);
 			expect(mockEditor.frameContext.get).toHaveBeenCalledWith('_ww');
 		});
 	});
@@ -122,8 +149,17 @@ describe('InstanceCheck', () => {
 			expect(instanceCheck.isSelection(undefined)).toBe(false);
 		});
 
-		it('should use frame window for instanceof check', () => {
-			instanceCheck.isSelection(window.getSelection());
+		it('should check constructor name first for cross-context compatibility', () => {
+			const selection = window.getSelection();
+			expect(instanceCheck.isSelection(selection)).toBe(true);
+			// Should not call _getFrameWindow since constructor.name check succeeds
+			expect(mockEditor.frameContext.get).not.toHaveBeenCalled();
+		});
+
+		it('should fallback to instanceof check when constructor name is not Selection', () => {
+			// Mock an object without constructor name 'Selection' that should fallback to instanceof
+			const mockSelection = { constructor: { name: 'NotSelection' } };
+			instanceCheck.isSelection(mockSelection);
 			expect(mockEditor.frameContext.get).toHaveBeenCalledWith('_ww');
 		});
 	});
@@ -162,7 +198,7 @@ describe('InstanceCheck', () => {
 			}
 		});
 
-		it('should correctly identify elements from different iframe contexts', () => {
+		it('should identify elements from different iframe contexts using nodeType', () => {
 			if (!iframeWindow) {
 				pending('Iframe not accessible in test environment');
 				return;
@@ -171,14 +207,15 @@ describe('InstanceCheck', () => {
 			const mainWindowDiv = document.createElement('div');
 			const iframeDiv = iframeWindow.document.createElement('div');
 
+			// Both should return true because nodeType check works across contexts
 			expect(instanceCheck.isElement(mainWindowDiv)).toBe(true);
-			expect(instanceCheck.isElement(iframeDiv)).toBe(false);
+			expect(instanceCheck.isElement(iframeDiv)).toBe(true);
 
 			expect(iframeInstanceCheck.isElement(iframeDiv)).toBe(true);
-			expect(iframeInstanceCheck.isElement(mainWindowDiv)).toBe(false);
+			expect(iframeInstanceCheck.isElement(mainWindowDiv)).toBe(true);
 		});
 
-		it('should correctly identify ranges from different iframe contexts', () => {
+		it('should identify ranges from different iframe contexts using constructor name', () => {
 			if (!iframeWindow) {
 				pending('Iframe not accessible in test environment');
 				return;
@@ -187,25 +224,39 @@ describe('InstanceCheck', () => {
 			const mainWindowRange = document.createRange();
 			const iframeRange = iframeWindow.document.createRange();
 
+			// Both should return true because constructor.name check works across contexts
 			expect(instanceCheck.isRange(mainWindowRange)).toBe(true);
-			expect(instanceCheck.isRange(iframeRange)).toBe(false);
+			expect(instanceCheck.isRange(iframeRange)).toBe(true);
 
 			expect(iframeInstanceCheck.isRange(iframeRange)).toBe(true);
-			expect(iframeInstanceCheck.isRange(mainWindowRange)).toBe(false);
+			expect(iframeInstanceCheck.isRange(mainWindowRange)).toBe(true);
 		});
 	});
 
 	describe('edge cases', () => {
-		it('should handle null frameContext gracefully', () => {
+		it('should handle null frameContext when nodeType check succeeds', () => {
 			const brokenEditor = {
 				frameContext: null
 			};
 			const brokenInstanceCheck = new InstanceCheck(brokenEditor);
 
-			expect(() => brokenInstanceCheck.isNode(document.createElement('div'))).toThrow();
+			// Should still return true because nodeType check happens first
+			const div = document.createElement('div');
+			expect(brokenInstanceCheck.isNode(div)).toBe(true);
+			expect(brokenInstanceCheck.isElement(div)).toBe(true);
 		});
 
-		it('should handle missing _ww in frameContext', () => {
+		it('should throw when accessing frameContext for fallback check', () => {
+			const brokenEditor = {
+				frameContext: null
+			};
+			const brokenInstanceCheck = new InstanceCheck(brokenEditor);
+
+			// When nodeType check fails, it will try to access frameContext and throw
+			expect(() => brokenInstanceCheck.isNode({ fake: 'object' })).toThrow();
+		});
+
+		it('should handle missing _ww when nodeType check succeeds', () => {
 			const editorWithMissingWw = {
 				frameContext: {
 					get: jest.fn().mockReturnValue(null)
@@ -213,7 +264,21 @@ describe('InstanceCheck', () => {
 			};
 			const instanceCheckWithMissingWw = new InstanceCheck(editorWithMissingWw);
 
-			expect(() => instanceCheckWithMissingWw.isNode(document.createElement('div'))).toThrow();
+			// Should still return true because nodeType check happens first
+			const div = document.createElement('div');
+			expect(instanceCheckWithMissingWw.isElement(div)).toBe(true);
+		});
+
+		it('should throw when using instanceof with missing _ww', () => {
+			const editorWithMissingWw = {
+				frameContext: {
+					get: jest.fn().mockReturnValue(null)
+				}
+			};
+			const instanceCheckWithMissingWw = new InstanceCheck(editorWithMissingWw);
+
+			// When nodeType check fails, it will try to use instanceof and throw
+			expect(() => instanceCheckWithMissingWw.isElement({ nodeType: 3 })).toThrow();
 		});
 
 		it('should maintain constructor reference', () => {
@@ -234,13 +299,27 @@ describe('InstanceCheck', () => {
 			}
 		});
 
-		it('should call frameContext.get for each method call', () => {
+		it('should not call frameContext.get when nodeType/constructor.name checks succeed', () => {
 			const div = document.createElement('div');
 
 			instanceCheck.isNode(div);
 			instanceCheck.isElement(div);
 
-			expect(mockEditor.frameContext.get).toHaveBeenCalledTimes(2);
+			// Should not call frameContext.get since nodeType checks succeed
+			expect(mockEditor.frameContext.get).not.toHaveBeenCalled();
+		});
+
+		it('should call frameContext.get only when fallback is needed', () => {
+			const mockObj = { fake: 'object' };
+
+			try {
+				instanceCheck.isNode(mockObj);
+			} catch (e) {
+				// Expected to throw
+			}
+
+			// Should have called frameContext.get for instanceof fallback
+			expect(mockEditor.frameContext.get).toHaveBeenCalledWith('_ww');
 		});
 	});
 });

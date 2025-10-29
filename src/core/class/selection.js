@@ -411,6 +411,7 @@ Selection_.prototype = {
 		const scrollY = isAutoHeight ? _w.scrollY : isIframe ? ww.scrollY : wwFrame.scrollTop;
 		const realToolbarHeight = this.context.get('toolbar_main').offsetHeight;
 		const toolbarHeight = this.toolbar.isSticky ? realToolbarHeight : 0;
+		const positionToolbarHeight = this.toolbar.isSticky ? toolbarHeight + this.options.get('toolbar_sticky') : toolbarHeight;
 		const statusbarHeight = frameContext.get('statusbar')?.offsetHeight || 0;
 
 		// if (this.__hasScrollParents || (!isIframe && (!isTouchDevice || this.status.initViewportHeight - viewportHeight < 150))) {
@@ -418,9 +419,8 @@ Selection_.prototype = {
 			el?.scrollIntoView(scrollOption);
 
 			if (scrollOption?.behavior === 'auto' && scrollY !== _w.scrollY) {
-				const positionHeight = this.toolbar.isSticky ? toolbarHeight + this.options.get('toolbar_sticky') : toolbarHeight;
-				if (positionHeight && scrollY > _w.scrollY) {
-					_w.scrollBy(0, -positionHeight);
+				if (positionToolbarHeight && scrollY > _w.scrollY) {
+					_w.scrollBy(0, -positionToolbarHeight);
 				} else if (isAutoHeight) {
 					_w.scrollBy(0, statusbarHeight);
 				}
@@ -438,24 +438,24 @@ Selection_.prototype = {
 		if (isAutoHeight) {
 			if (isIframe) {
 				const rect = this.getRects(ref, 'end').rects;
-				const topMargin = rect.top + elH - toolbarHeight;
+				const topMargin = rect.top + elH - positionToolbarHeight;
 				const bottomMargin = viewHeight - PADDING - (rect.top + elH);
 				if (topMargin >= 0 && bottomMargin >= 0) return;
 
 				const newScrollTop = scrollY - (topMargin < 0 ? -(topMargin - PADDING) : bottomMargin);
 				_w.scrollTo({
-					top: newScrollTop,
+					top: newScrollTop < scrollY ? newScrollTop - positionToolbarHeight : newScrollTop,
 					behavior,
 				});
 			} else {
 				const rect = this.offset.getGlobal(el);
 				const scrollMargin = viewHeight + scrollY - rect.top - elH;
 
-				if (scrollMargin - PADDING > 0 && viewHeight > scrollMargin + PADDING + toolbarHeight) return;
+				if (scrollMargin - PADDING > 0 && viewHeight > scrollMargin + PADDING + positionToolbarHeight) return;
 
 				const newScrollTop = scrollMargin <= PADDING ? scrollY - scrollMargin + PADDING + statusbarHeight : scrollY - scrollMargin + (viewHeight - elH - PADDING);
 				_w.scrollTo({
-					top: newScrollTop,
+					top: newScrollTop < scrollY ? newScrollTop - positionToolbarHeight : newScrollTop,
 					behavior,
 				});
 			}
