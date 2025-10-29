@@ -39,6 +39,7 @@
 - [Common Development Patterns](#common-development-patterns)
 - [Example Implementations](#example-implementations)
 - [Testing Strategy](#testing-strategy)
+- [Using the `onload` Event](#using-the-onload-event)
 - [Build System](#build-system)
 
 ---
@@ -161,7 +162,7 @@ suneditor/
     	},
     	setRange() {
     		/* ... */
-    	}
+    	},
     };
     ```
 
@@ -1033,7 +1034,7 @@ Understanding how plugins are registered helps when debugging or creating custom
 
 ```javascript
 const editor = suneditor.create(element, {
-	plugins: [image, video, link, table] // Plugin classes
+	plugins: [image, video, link, table], // Plugin classes
 	// ... other options
 });
 ```
@@ -1047,9 +1048,9 @@ const product = {
 	plugins: {
 		image: ImagePlugin, // Class reference
 		video: VideoPlugin,
-		link: LinkPlugin
+		link: LinkPlugin,
 		// ... etc
-	}
+	},
 	// ...
 };
 ```
@@ -1253,6 +1254,182 @@ Different components call plugin methods at different lifecycle stages:
 - Playwright tests running against local dev server
 - Test full user workflows and browser interactions
 - Run on Chromium by default
+
+---
+
+## Using the `onload` Event
+
+### Why `onload` Exists
+
+SunEditor's initialization process completes asynchronously. While the editor instance is returned immediately from `suneditor.create()`, some critical initialization steps are deferred to a `setTimeout(..., 0)` callback in the `__editorInit` method ([editor.js:1364-1388](src/core/editor.js#L1364-L1388)).
+
+**Initialization Timeline:**
+
+```
+T=0ms:   suneditor.create() starts
+T=0ms:   Constructor builds DOM
+T=0ms:   Synchronous initialization (plugins, events, content)
+T=0ms:   __editorInit() queues setTimeout callback
+T=0ms:   User receives editor instance ← YOU HAVE THE INSTANCE
+T=1ms:   setTimeout callback executes:
+         - Toolbar visibility set
+         - ResizeObserver registration
+         - History stack reset
+         - Resource state initialization
+         - onload event fires ← FULLY INITIALIZED
+```
+
+**What Happens in the setTimeout Callback:**
+
+1. **Toolbar Visibility** - Toolbar is initially hidden to prevent FOUC (Flash of Unstyled Content), then shown after layout calculations complete
+2. **ResizeObserver Registration** - Observers for wysiwyg frame and toolbar are attached after DOM layout is stable
+3. **History Reset** - Undo/redo stack is initialized to baseline state
+4. **Resource State** - Placeholder visibility, iframe auto-height, and other state updates
+5. **`onload` Event** - User callback fires signaling complete initialization
+
+**Why This Design:**
+
+- **SSR Safety**: Prevents crashes in Next.js/Nuxt when instances are destroyed during initialization
+- **Layout Stability**: Ensures browser has completed all layout calculations before observers attach
+- **Visual Polish**: Prevents toolbar flickering and positioning issues
+- **Accurate Measurements**: ResizeObserver gets correct initial dimensions
+
+### When to Use `onload`
+
+You **must** use the `onload` event callback when you need to:
+
+1. **Access editor methods immediately after creation**
+2. **Set initial content programmatically**
+3. **Integrate with frameworks** (React, Vue, Angular, Svelte)
+4. **Register external integrations** (analytics, state management)
+
+#### ❌ DON'T:
+
+1. **Don't call methods immediately after `create()`:**
+
+    ```javascript
+    // ❌ WRONG
+    const editor = SUNEDITOR.create('editor');
+    editor.focus(); // May fail!
+
+    // ✅ CORRECT
+    const editor = SUNEDITOR.create('editor', {
+    	events: {
+    		onload: ({ editor }) => {
+    			editor.focus();
+    		},
+    	},
+    });
+    ```
+
+2. **Don't assume toolbar is visible:**
+
+    ```javascript
+    // ❌ WRONG
+    const editor = SUNEDITOR.create('editor');
+    const toolbar = editor.context.get('toolbar_main');
+    const height = toolbar.offsetHeight; // May be 0!
+
+    // ✅ CORRECT
+    onload: ({ editor }) => {
+    	const toolbar = editor.context.get('toolbar_main');
+    	const height = toolbar.offsetHeight; // Accurate
+    };
+    ```
+
+3. **Don't start timers before initialization:**
+
+    ```javascript
+    // ❌ WRONG
+    const editor = SUNEDITOR.create('editor');
+    setInterval(() => {
+    	saveContent(editor.html.get()); // May fail!
+    }, 30000);
+
+    // ✅ CORRECT
+    onload: ({ editor }) => {
+    	setInterval(() => {
+    		saveContent(editor.html.get());
+    	}, 30000);
+    };
+    ```
+
+### What Can Break Without `onload`
+
+The following operations may fail or return incorrect results if called before `onload` fires:
+
+| Operation                  | Issue                              | Reason                               |
+| -------------------------- | ---------------------------------- | ------------------------------------ |
+| `editor.focus()`           | Focus fails                        | Selection not initialized            |
+| `editor.html.get/set()`    | May fail or return incomplete data | HTML class may not be fully injected |
+| `editor.char.getLength()`  | Returns 0 or throws                | Character counter DOM not created    |
+| `editor.history.*`         | Inconsistent state                 | History not reset                    |
+| `toolbar.offsetHeight`     | Returns 0                          | Toolbar hidden                       |
+| `editor.selection.*`       | Range errors                       | Selection class not initialized      |
+| Toolbar button states      | Incorrect active states            | Tag effects not applied              |
+| Iframe height calculations | Wrong dimensions                   | ResizeObserver not registered        |
+| Placeholder visibility     | Stays visible                      | Resource state not updated           |
+
+### Summary
+
+The `onload` event is **essential** for reliable editor initialization across all environments. It guarantees that:
+
+✅ All DOM elements are created and visible
+✅ ResizeObservers are registered and active
+✅ History stack is properly initialized
+✅ Core classes (`selection`, `html`, `char`, etc.) are fully injected
+✅ Toolbar is visible and positioned correctly
+✅ Browser layout calculations are complete
+
+**Always use `onload` when:**
+
+- Integrating with frameworks (React, Vue, Angular, Svelte)
+- Setting initial content programmatically
+- Calling editor methods immediately after creation
+- Measuring dimensions or positions
+- Registering external integrations
+
+### Using iframe Mode in Modern Frameworks
+
+SunEditor supports two modes: **DIV mode** (default) and **iframe mode** (`iframe: true`). The iframe mode provides better content isolation but requires special attention in modern frameworks.
+
+#### iframe Security Attributes (Automatic Since v3.x)
+
+SunEditor automatically sets these attributes on iframes:
+
+- `sandbox="allow-same-origin"` - Required for editor functionality
+    - `allow-same-origin`: Enables contentDocument access and DOM manipulation from parent window
+    - Note: Editor does NOT execute scripts in iframe context (only uses DOM APIs from parent window)
+- `allowfullscreen` - Fullscreen API support
+
+#### Common iframe Issue: contentDocument is null
+
+**Symptoms:** `Cannot read property 'head' of null` or `Cannot access iframe document`
+
+**Causes:**
+
+1. Missing `allow-same-origin` in sandbox
+2. SSR environment (Next.js/Nuxt)
+3. iframe not loaded before access
+
+**Solutions:**
+
+```javascript
+// Use dynamic import in Next.js
+import dynamic from 'next/dynamic';
+const SunEditor = dynamic(() => import('suneditor-react'), { ssr: false });
+
+// Custom sandbox (required values will be auto-added)
+SUNEDITOR.create('editor', {
+	iframe: true,
+	iframe_attributes: {
+		// allow-same-origin is always added automatically
+		sandbox: 'allow-downloads', // Just add your additional permissions
+	},
+});
+```
+
+---
 
 ## Common Development Patterns
 

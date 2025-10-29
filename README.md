@@ -36,7 +36,7 @@ It's easy to integrate, highly customizable, and built for modern web applicatio
     - 📂 Built-in media galleries (image, video, audio, file)
     - 📄 PDF export, templates, and embedded content (audio/video/iframe)
 
-🌤 **[Explore all plugins](https://suneditor.com/plugins)**
+🌤 **[Try all plugins in Playground](https://suneditor.com/playground)**
 
 ⭐ **Contributions welcome!** Please refer to [Contribution Guidelines](/CONTRIBUTING.md) and check out our [open tasks](https://github.com/jihong88/suneditor/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22). ⭐
 
@@ -150,7 +150,7 @@ suneditor.create('#editor', {
 });
 ```
 
-📘 [Learn how to build your own plugin →](https://suneditor.com/plugins)
+📘 [Learn how to build your own plugin →](https://suneditor.com/plugin-guide)
 
 🤖 Want to build plugins? Get real-time help from [SunEditor Devs AI](https://chatgpt.com/g/g-JViNPCrkD-suneditor-devs).\
 See [Contribution Guide](./CONTRIBUTING.md#ai-plugin-helper) for tips and examples.
