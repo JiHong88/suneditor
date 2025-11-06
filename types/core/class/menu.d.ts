@@ -28,6 +28,7 @@ declare class Menu {
 	};
 	index: number;
 	menus: any[];
+	currentButton: HTMLButtonElement;
 	currentDropdown: HTMLElement;
 	currentDropdownActiveButton: HTMLButtonElement;
 	currentDropdownName: string;
@@ -78,6 +79,22 @@ declare class Menu {
 	 * @description Closes the currently open dropdown menu.
 	 */
 	dropdownOff(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	/**
+	 * @this {MenuThis}
+	 * @description Shows a previously hidden dropdown menu that is still in "on" state.
+	 * - Only works when a dropdown is active (currentButton exists)
+	 * - Re-displays the dropdown that was hidden by dropdownHide()
+	 * - Recalculates menu position by calling dropdownOn() again
+	 */
+	dropdownShow(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	/**
+	 * @this {MenuThis}
+	 * @description Temporarily hides the currently active dropdown menu without closing it.
+	 * - Unlike dropdownOff(), this does not clear the dropdown state or event listeners
+	 * - The dropdown remains "on" but visually hidden
+	 * - Use dropdownShow() to make it visible again
+	 */
+	dropdownHide(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
 	/**
 	 * @this {MenuThis}
 	 * @description Opens the menu container for the specified button.

@@ -172,28 +172,29 @@ class Table extends EditorInjector {
 		}
 
 		// props
-		const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
-		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
+		const propsTargets = [this.controller_table, this.controller_cell];
+		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargets, isInsideForm: true });
 		this.controller_props_title = controller_props.controller_props_title;
+
 		// color picker
 		const colorForm = dom.utils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
-		this.colorPicker = new ColorPicker(this, '', {
-			colorList: pluginOptions.colorList || DEFAULT_COLOR_LIST,
-			splitNum: 5,
-			disableRemove: true,
-			hueSliderOptions: { controllerOptions: { parents: [colorForm], isOutsideForm: true } },
-		});
-
-		colorForm.appendChild(this.colorPicker.target);
 		this.controller_colorPicker = new Controller(this, colorForm, {
 			position: 'bottom',
-			parents: [this.controller_props.form].concat(propsTargetForms),
+			parents: [this.controller_props].concat(propsTargets),
 			isInsideForm: true,
 			isWWTarget: false,
 			initMethod: () => {
 				this.colorPicker.hueSlider.close();
 				dom.utils.removeClass(this.controller_colorPicker.currentTarget, 'on');
 			},
+		});
+
+		this.colorPicker = new ColorPicker(this, '', {
+			form: colorForm,
+			colorList: pluginOptions.colorList || DEFAULT_COLOR_LIST,
+			splitNum: 5,
+			disableRemove: true,
+			hueSliderOptions: { controllerOptions: { isOutsideForm: true, parents: [this.controller_colorPicker], parentsHide: true } },
 		});
 
 		this.figure = new Figure(this, null, {});
@@ -4037,7 +4038,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 			</div>
 			<div class="se-controller-body">
 
-				<label>${lang.border}</label>
+				<span>${lang.border}</span>
 				<div class="se-form-group se-form-w0">
 					<button type="button" data-command="props_onborder_format" class="se-btn se-tooltip">
 						${icons[BORDER_FORMATS.all]}
@@ -4062,7 +4063,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 					<input type="text" class="se-input-control __se__border_size" placeholder="${lang.width}" />
 				</div>
 
-				<label>${lang.color}</label>
+				<span>${lang.color}</span>
 				<div class="se-form-group se-form-w0">
 					<button type="button" data-command="props_onpalette" data-value="font" class="se-btn se-tooltip">
 						${icons.font_color}
@@ -4080,7 +4081,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 					<input type="text" class="se-color-input __se_back_color" placeholder="${lang.backgroundColor}" />
 				</div>
 
-				<label>${lang.font}</label>
+				<span>${lang.font}</span>
 				<div class="se-form-group se-form-w0">
 					<button type="button" data-command="props_font_style" data-value="bold" class="se-btn se-tooltip">
 						${icons.bold}
@@ -4109,7 +4110,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 				</div>
 
 				<div class="se-table-props-align">
-					<label>${lang.align} <span class="__se__a_table_t">( ${lang.table} )</span></label>
+					<span>${lang.align} <span class="__se__a_table_t">( ${lang.table} )</span></span>
 					<div class="se-form-group se-form-w0 se-list-inner">
 						<div class="__se__a_h">
 							${alignHtml}

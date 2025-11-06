@@ -24,6 +24,7 @@ function Menu(editor) {
 	this.index = -1;
 	this.menus = [];
 	// dropdown
+	this.currentButton = null;
 	this.currentDropdown = null;
 	this.currentDropdownActiveButton = null;
 	this.currentDropdownName = '';
@@ -89,7 +90,7 @@ Menu.prototype = {
 			}
 		}
 
-		const btnEl = /** @type {HTMLButtonElement} */ (button);
+		const btnEl = (this.currentButton = /** @type {HTMLButtonElement} */ (button));
 		const dropdownName = (this.currentDropdownName = btnEl.getAttribute('data-command'));
 		this.currentDropdownType = btnEl.getAttribute('data-type');
 		const menu = (this.currentDropdown = this.targetMap[dropdownName]);
@@ -121,6 +122,7 @@ Menu.prototype = {
 		this.menus = [];
 		this.__menuBtn = null;
 		this.__menuContainer = null;
+		this.currentButton = null;
 
 		if (this.currentDropdown) {
 			this.currentDropdownName = '';
@@ -138,6 +140,32 @@ Menu.prototype = {
 
 		if (typeof this.currentDropdownPlugin?.off === 'function') this.currentDropdownPlugin.off();
 		this.currentDropdownPlugin = null;
+	},
+
+	/**
+	 * @this {MenuThis}
+	 * @description Shows a previously hidden dropdown menu that is still in "on" state.
+	 * - Only works when a dropdown is active (currentButton exists)
+	 * - Re-displays the dropdown that was hidden by dropdownHide()
+	 * - Recalculates menu position by calling dropdownOn() again
+	 */
+	dropdownShow() {
+		if (this.currentButton) {
+			this.dropdownOn(this.currentButton);
+		}
+	},
+
+	/**
+	 * @this {MenuThis}
+	 * @description Temporarily hides the currently active dropdown menu without closing it.
+	 * - Unlike dropdownOff(), this does not clear the dropdown state or event listeners
+	 * - The dropdown remains "on" but visually hidden
+	 * - Use dropdownShow() to make it visible again
+	 */
+	dropdownHide() {
+		if (this.currentDropdown) {
+			this.currentDropdown.style.display = 'none';
+		}
 	},
 
 	/**

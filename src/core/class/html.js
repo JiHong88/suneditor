@@ -857,6 +857,17 @@ HTML.prototype = {
 		let startOff = range.startOffset;
 		let endOff = range.endOffset;
 		const commonCon = /** @type {HTMLElement} */ (range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode ? startCon.parentNode : range.commonAncestorContainer);
+
+		if (dom.check.isWysiwygFrame(startCon) && dom.check.isWysiwygFrame(endCon)) {
+			this.set('');
+			const newInitBR = this.selection.getNode();
+			return {
+				container: newInitBR,
+				offset: 0,
+				commonCon,
+			};
+		}
+
 		if (commonCon === startCon && commonCon === endCon) {
 			if (this.component.isBasic(commonCon)) {
 				const compInfo = this.component.get(commonCon);

@@ -64,6 +64,7 @@ const DEFAULLT_COLOR_SPLITNUM = 9;
 
 /**
  * @typedef {Object} ColorPickerParams
+ * @property {HTMLElement} form The form element to attach the color picker.
  * @property {Array<string|{value: string, name: string}>} [colorList=[]] color list
  * @property {number} [splitNum=0] Number of colors to be displayed in one line
  * @property {string} [defaultColor] Default color
@@ -91,6 +92,7 @@ class ColorPicker extends CoreInjector {
 		// members
 		this.kind = inst.constructor.key || inst.constructor.name;
 		this.inst = inst;
+		this.form = params.form;
 		this.target = CreateHTML(editor, params);
 		this.targetButton = null;
 		this.inputElement = /** @type {HTMLInputElement} */ (this.target.querySelector('.se-color-input'));
@@ -98,9 +100,7 @@ class ColorPicker extends CoreInjector {
 		this.splitNum = params.splitNum || 0;
 		this.defaultColor = params.defaultColor || '';
 		this.hueSliderOptions = params.hueSliderOptions;
-		this.parentDisplay = '';
 		this.currentColor = '';
-		this.parentForm = null;
 		this.colorList = this.target.querySelectorAll('li button') || [];
 		this.hueSlider = null;
 
@@ -112,8 +112,6 @@ class ColorPicker extends CoreInjector {
 		// modules - hex, hue slider
 		if (!params.disableHEXInput) {
 			this.hueSlider = new HueSlider(this, params.hueSliderOptions, 'se-dropdown');
-			this.parentFormDisplay = [];
-			this.parentForm = params.hueSliderOptions?.controllerOptions?.parents?.length > 0 && !params.hueSliderOptions?.controllerOptions?.isInsideForm ? params.hueSliderOptions.controllerOptions.parents : null;
 			// hue open
 			this.eventManager.addEvent(this.target.querySelector('.__se_hue'), 'click', this.#OnColorPalette.bind(this));
 			this.eventManager.addEvent(this.inputElement, 'input', this.#OnChangeInput.bind(this));
@@ -126,6 +124,9 @@ class ColorPicker extends CoreInjector {
 		}
 
 		this.eventManager.addEvent(this.target, 'click', this.#OnClickColor.bind(this));
+
+		// append to form
+		this.form.appendChild(this.target);
 	}
 
 	/**
@@ -188,9 +189,7 @@ class ColorPicker extends CoreInjector {
 	 * @description This method is called when the hue slider is closed.
 	 */
 	hueSliderCancelAction() {
-		if (this.parentForm?.length > 0) {
-			this.parentFormDisplay.forEach((e) => (e[0].style.display = e[1]));
-		}
+		this.inst.colorPickerHueSliderClose?.();
 	}
 
 	/**
@@ -240,12 +239,7 @@ class ColorPicker extends CoreInjector {
 	}
 
 	#OnColorPalette() {
-		if (this.parentForm?.length > 0) {
-			this.parentForm.forEach((e) => {
-				this.parentFormDisplay.push([e, e.style.display]);
-				e.style.display = 'none';
-			});
-		}
+		this.inst.colorPickerHueSliderOpen?.();
 		this.hueSlider.open(this.targetButton);
 	}
 

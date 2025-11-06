@@ -112,12 +112,12 @@ export namespace DEFAULTS {
  * ///
  *
  * === Layout & Sizing ===
- * @property {string} [width="100%"] - Width for the editor.
- * @property {string} [minWidth=""] - Min width for the editor.
- * @property {string} [maxWidth=""] - Max width for the editor.
- * @property {string} [height="auto"] - Height for the editor.
- * @property {string} [minHeight=""] - Min height for the editor.
- * @property {string} [maxHeight=""] - Max height for the editor.
+ * @property {string|number} [width="100%"] - Width for the editor.
+ * @property {string|number} [minWidth=""] - Min width for the editor.
+ * @property {string|number} [maxWidth=""] - Max width for the editor.
+ * @property {string|number} [height="auto"] - Height for the editor.
+ * @property {string|number} [minHeight=""] - Min height for the editor.
+ * @property {string|number} [maxHeight=""] - Max height for the editor.
  * @property {string} [editorStyle=""] - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
  * ///
  *
@@ -335,14 +335,14 @@ export namespace DEFAULTS {
  * @property {boolean} [closeModalOutsideClick=false] - Closes modals when clicking outside.
  * @property {boolean} [syncTabIndent=true] - Synchronizes tab indent with spaces.
  * @property {boolean} [tabDisable=false] - Disables tab key input.
- * @property {number|string} [toolbar_width="auto"] - Toolbar width.
+ * @property {string|number} [toolbar_width="auto"] - Toolbar width.
  * @property {Element|string} [toolbar_container] - Container element for the toolbar.
  * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
  * @property {Object} [subToolbar={}] - Sub-toolbar configuration.
  * @property {SunEditor.UI.ButtonList} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
  * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
- * @property {number|string} [subToolbar.width="auto"] - Sub-toolbar width.
+ * @property {string|number} [subToolbar.width="auto"] - Sub-toolbar width.
  * @property {Element|string} [statusbar_container] - Container element for the status bar.
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
@@ -494,27 +494,27 @@ export type EditorFrameOptions = {
 	/**
 	 * - Width for the editor.
 	 */
-	width?: string;
+	width?: string | number;
 	/**
 	 * - Min width for the editor.
 	 */
-	minWidth?: string;
+	minWidth?: string | number;
 	/**
 	 * - Max width for the editor.
 	 */
-	maxWidth?: string;
+	maxWidth?: string | number;
 	/**
 	 * - Height for the editor.
 	 */
-	height?: string;
+	height?: string | number;
 	/**
 	 * - Min height for the editor.
 	 */
-	minHeight?: string;
+	minHeight?: string | number;
 	/**
 	 * - Max height for the editor.
 	 */
-	maxHeight?: string;
+	maxHeight?: string | number;
 	/**
 	 * - Style string of the top frame of the editor. (e.g. "border: 1px solid #ccc;").
 	 * ///
@@ -952,7 +952,7 @@ export type EditorBaseOptions = {
 	/**
 	 * - Toolbar width.
 	 */
-	toolbar_width?: number | string;
+	toolbar_width?: string | number;
 	/**
 	 * - Container element for the toolbar.
 	 */
@@ -971,7 +971,7 @@ export type EditorBaseOptions = {
 	subToolbar?: {
 		buttonList?: SunEditor.UI.ButtonList;
 		mode?: 'balloon' | 'balloon-always';
-		width?: number | string;
+		width?: string | number;
 	};
 	/**
 	 * - Container element for the status bar.

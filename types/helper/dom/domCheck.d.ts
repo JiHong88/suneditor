@@ -15,28 +15,28 @@ export function isZeroWidth(text: string | Node): boolean;
 export function isEdgePoint(container: Node, offset: number, dir?: ('front' | 'end') | null): boolean;
 /**
  * @description Check the node is a text node.
- * @param {?Node} node The node to check
+ * @param {?*} node The node to check
  * @returns {node is Text}
  */
-export function isText(node: Node | null): node is Text;
+export function isText(node: any | null): node is Text;
 /**
  * @description Check the node is an HTMLElement node.
- * @param {?Node} node The node to check
+ * @param {?*} node The node to check
  * @returns {node is HTMLElement}
  */
-export function isElement(node: Node | null): node is HTMLElement;
+export function isElement(node: any | null): node is HTMLElement;
 /**
  * @description It is judged whether it is the input element (INPUT, TEXTAREA)
- * @param {?Node} node The node to check
+ * @param {?*} node The node to check
  * @returns {node is HTMLInputElement}
  */
-export function isInputElement(node: Node | null): node is HTMLInputElement;
+export function isInputElement(node: any | null): node is HTMLInputElement;
 /**
  * @description It is judged whether it is the button element
- * @param {?Node} node The node to check
+ * @param {?*} node The node to check
  * @returns {node is HTMLButtonElement}
  */
-export function isButtonElement(node: Node | null): node is HTMLButtonElement;
+export function isButtonElement(node: any | null): node is HTMLButtonElement;
 /**
  * @description Check the node is a list (ol, ul)
  * @param {?Node|string} node The element or element name to check

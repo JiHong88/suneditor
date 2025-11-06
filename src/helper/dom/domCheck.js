@@ -37,7 +37,7 @@ export function isEdgePoint(container, offset, dir) {
 
 /**
  * @description Check the node is a text node.
- * @param {?Node} node The node to check
+ * @param {?*} node The node to check
  * @returns {node is Text}
  */
 export function isText(node) {
@@ -46,7 +46,7 @@ export function isText(node) {
 
 /**
  * @description Check the node is an HTMLElement node.
- * @param {?Node} node The node to check
+ * @param {?*} node The node to check
  * @returns {node is HTMLElement}
  */
 export function isElement(node) {
@@ -55,7 +55,7 @@ export function isElement(node) {
 
 /**
  * @description It is judged whether it is the input element (INPUT, TEXTAREA)
- * @param {?Node} node The node to check
+ * @param {?*} node The node to check
  * @returns {node is HTMLInputElement}
  */
 export function isInputElement(node) {
@@ -64,7 +64,7 @@ export function isInputElement(node) {
 
 /**
  * @description It is judged whether it is the button element
- * @param {?Node} node The node to check
+ * @param {?*} node The node to check
  * @returns {node is HTMLButtonElement}
  */
 export function isButtonElement(node) {

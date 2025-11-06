@@ -65,6 +65,16 @@ declare class FontColor extends EditorInjector {
 	off(): void;
 	/**
 	 * @editorMethod Modules.ColorPicker
+	 * @description Executes the method called when the "HueSlider" module is opened.
+	 */
+	colorPickerHueSliderOpen(): void;
+	/**
+	 * @editorMethod Modules.ColorPicker
+	 * @description Executes the method called when the "HueSlider" module is closed.
+	 */
+	colorPickerHueSliderClose(): void;
+	/**
+	 * @editorMethod Modules.ColorPicker
 	 * @description Executes the method called when a button of "ColorPicker" module is clicked.
 	 * - This plugin is by applying the "ColorPicker" module globally to the "dropdown" menu, the default "action" method is not called.
 	 * @param {string} color - Color code (hex)

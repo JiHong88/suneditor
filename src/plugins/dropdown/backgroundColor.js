@@ -34,14 +34,14 @@ class BackgroundColor extends EditorInjector {
 
 		// members
 		this.colorPicker = new ColorPicker(this, 'backgroundColor', {
+			form: menu,
 			colorList: pluginOptions.items,
 			splitNum: pluginOptions.splitNum,
 			disableHEXInput: pluginOptions.disableHEXInput,
-			hueSliderOptions: { controllerOptions: { parents: [menu], isOutsideForm: true } },
+			hueSliderOptions: { controllerOptions: { isOutsideForm: true } },
 		});
 
-		// itit
-		menu.appendChild(this.colorPicker.target);
+		// init
 		this.menu.initDropdownTarget(BackgroundColor, menu);
 	}
 
@@ -85,6 +85,22 @@ class BackgroundColor extends EditorInjector {
 	 */
 	off() {
 		this.colorPicker.hueSliderClose();
+	}
+
+	/**
+	 * @editorMethod Modules.ColorPicker
+	 * @description Executes the method called when the "HueSlider" module is opened.
+	 */
+	colorPickerHueSliderOpen() {
+		this.menu.dropdownHide();
+	}
+
+	/**
+	 * @editorMethod Modules.ColorPicker
+	 * @description Executes the method called when the "HueSlider" module is closed.
+	 */
+	colorPickerHueSliderClose() {
+		this.menu.dropdownShow();
 	}
 
 	/**

@@ -81,9 +81,9 @@ function CreateSliderCtx() {
 
 /**
  * @typedef {Object} HueSliderParams
- * @property {Node} [form] The form element to attach the hue slider.
  * @property {boolean} [isNewForm] Whether to create a new form element.
- * @property {import('../modules/Controller').ControllerParams} [controllerOptions] Controller options
+ * @property {Array<HTMLElement>} [parents] Parent elements for controller positioning.
+ * @property {import('../modules/Controller').ControllerParams} [controllerOptions] Controller options (excluding 'parents')
  */
 
 /**
@@ -102,7 +102,7 @@ class HueSlider extends CoreInjector {
 
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
+	 * @param {import('./ColorPicker').default} inst The instance object that called the constructor.
 	 * @param {HueSliderParams} [params={}] Hue slider options
 	 * @param {string} [className=""] The class name of the hue slider.
 	 */
@@ -111,7 +111,6 @@ class HueSlider extends CoreInjector {
 
 		// members
 		this.inst = inst;
-		this.form = params.form;
 		this.ctx = {
 			wheelX: wheelX,
 			wheelY: wheelY,
@@ -134,12 +133,12 @@ class HueSlider extends CoreInjector {
 		// init default controller
 		if (!params.isNewForm) {
 			const hueController = CreateHTML_basicControllerForm(inst.editor, className);
-			this.form = hueController.querySelector('.se-hue');
-			this.controller = new Controller(this, hueController, { position: 'top', isWWTarget: false, ...params.controllerOptions });
+			this.circle = hueController.querySelector('.se-hue');
+			this.controller = new Controller(this, hueController, { position: 'bottom', isWWTarget: false, parents: [inst.form], ...params.controllerOptions });
 
 			// buttons
 			this.eventManager.addEvent(hueController.querySelector('.se-btn-success'), 'click', () => {
-				inst.hueSliderAction(this.get());
+				inst.hueSliderAction?.(this.get());
 				this.close();
 			});
 			this.eventManager.addEvent(hueController.querySelector('.se-btn-danger'), 'click', () => {
@@ -189,7 +188,7 @@ class HueSlider extends CoreInjector {
 	 */
 	close() {
 		this.off();
-		this.inst.hueSliderCancelAction();
+		this.inst.hueSliderCancelAction?.();
 	}
 
 	/**
@@ -201,7 +200,7 @@ class HueSlider extends CoreInjector {
 
 		// drow
 		this.init();
-		(form || this.form).appendChild(slider);
+		(form || this.circle).appendChild(slider);
 		ctx = this.ctx;
 		if (ctx) {
 			wheelX = ctx.wheelX;

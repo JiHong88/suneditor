@@ -51,9 +51,9 @@ export type ControllerParams = {
 	 */
 	disabled?: boolean;
 	/**
-	 * The parent "controller" array when "controller" is opened nested.
+	 * The parent "controller" instance array when "controller" is opened nested.
 	 */
-	parents?: Array<HTMLElement>;
+	parents?: Array<Controller | HTMLElement>;
 	/**
 	 * If true, the parent element is hidden when the controller is opened.
 	 */
@@ -94,7 +94,7 @@ export type ControllerParams = {
  * @property {boolean} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to true.
  * @property {() => void} [initMethod=null] Method to be called when the controller is closed.
  * @property {boolean} [disabled=false] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
- * @property {Array<HTMLElement>} [parents=[]] The parent "controller" array when "controller" is opened nested.
+ * @property {Array<Controller|HTMLElement>} [parents=[]] The parent "controller" instance array when "controller" is opened nested.
  * @property {boolean} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
  * @property {HTMLElement} [sibling=null] The related sibling controller element that this controller is positioned relative to.
  * - e.g.) table plugin :: 118
@@ -131,7 +131,8 @@ declare class Controller extends CoreInjector {
 	isWWTarget: boolean;
 	position: 'top' | 'bottom';
 	disabled: boolean;
-	parents: HTMLElement[];
+	parents: (HTMLElement | Controller)[];
+	parentsForm: any[];
 	parentsHide: boolean;
 	sibling: HTMLElement;
 	siblingMain: boolean;
@@ -199,6 +200,11 @@ declare class Controller extends CoreInjector {
 	 * @param {Node} [target]
 	 */
 	resetPosition(target?: Node): void;
+	/**
+	 * @description Reposition controller on scroll event
+	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
+	 */
+	_scrollReposition(isWWScroll: boolean): void;
 	#private;
 }
 import CoreInjector from '../editorInjector/_core';

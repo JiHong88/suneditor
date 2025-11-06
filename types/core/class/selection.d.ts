@@ -39,9 +39,9 @@ declare class Selection_ {
 	 * @this {SelectionThis}
 	 * @description Check if the range object is valid
 	 * @param {*} range Range object
-	 * @returns {boolean}
+	 * @returns {range is Range}
 	 */
-	isRange(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: any): boolean;
+	isRange(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: any): range is Range;
 	/**
 	 * @this {SelectionThis}
 	 * @description Get current editor's range object

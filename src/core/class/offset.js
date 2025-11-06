@@ -75,7 +75,6 @@ import { _w, _d } from '../../helper/env';
  * @property {number} width - The total width of the WYSIWYG editor's scrollable area.
  * @property {number} height - The total height of the WYSIWYG editor's scrollable area.
  * @property {number} bottom - The sum of `top` and `height`, representing the bottom-most scrollable position.
- * @property {RectsInfo} rects - The bounding rectangle of the editor's visible area.
  */
 
 /**
@@ -339,7 +338,6 @@ Offset.prototype = {
 	 */
 	getWWScroll() {
 		const eventWysiwyg = this.frameContext.get('wysiwyg');
-		const rects = this.selection.getRects(eventWysiwyg, 'start').rects;
 		const top = eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0;
 		const height = eventWysiwyg.scrollHeight || eventWysiwyg.document?.documentElement.scrollHeight || 0;
 
@@ -349,7 +347,6 @@ Offset.prototype = {
 			width: eventWysiwyg.scrollWidth || eventWysiwyg.document?.documentElement.scrollWidth || 0,
 			height,
 			bottom: top + height,
-			rects,
 		};
 	},
 
@@ -429,7 +426,8 @@ Offset.prototype = {
 	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
 	 * @param {*} params.inst Instance object of caller
-	 * @param {HTMLElement} [params.sibling] The sibling controller element
+	 * @param {HTMLElement} [params.sibling=null] The sibling controller element
+	 * @param {boolean} [params.isWWScroll=false] Indicates if the scroll event is from the wysiwyg area
 	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 */
 	setAbsPosition(element, target, params) {
@@ -448,13 +446,14 @@ Offset.prototype = {
 
 		const isIframe = this.frameOptions.get('iframe');
 		const isWWTarget = this.frameContext.get('wrapper').contains(target) || params.isWWTarget || (isIframe ? this.frameContext.get('wysiwyg').contains(target) : false);
+		const isToolbarTarget = Boolean(getParentElement(target, '.se-toolbar'));
+		const isElTarget = target.nodeType === 1;
 
-		const isCtrlTarget = target.nodeType === 1;
-		const isTargetAbs = isWWTarget && !isCtrlTarget;
-		const isInlineTarget = isCtrlTarget && /inline/.test(_w.getComputedStyle(target).display);
+		const isTextSelection = isWWTarget && !isElTarget;
+		const isInlineTarget = isElTarget && /inline/.test(_w.getComputedStyle(target).display);
 		const clientSize = getClientSize(_d);
-		const wwScroll = isTargetAbs ? this.getWWScroll() : this._getWindowScroll();
-		const targetRect = !isIframe && isCtrlTarget ? target.getBoundingClientRect() : this.selection.getRects(target, 'start').rects;
+		const wwScroll = isTextSelection ? this.getWWScroll() : this._getWindowScroll();
+		const targetRect = !isWWTarget || (!isIframe && isElTarget) ? target.getBoundingClientRect() : this.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
 		const arrow = /** @type {HTMLElement} */ (hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null);
 
@@ -471,11 +470,11 @@ Offset.prototype = {
 		const th = this.context.get('toolbar_main').offsetHeight;
 		const containerToolbar = this.options.get('toolbar_container');
 		const headLess = this.editor.isBalloon || this.editor.isInline || containerToolbar;
-		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.editor.toolbar.isSticky && headLess) ? 0 : th;
+		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.editor.toolbar.isSticky && headLess) ? 0 : th + (this.editor.toolbar.isSticky ? this.options.get('toolbar_sticky') : 0);
 
 		// check margin
-		const { rmt, rmb, bMargin, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll);
-		if (isWWTarget && ((rmb > 0 ? bMargin : rmb) + targetH <= 0 || rmt + rt + targetH - (this.editor.toolbar.isSticky && isInlineTarget ? toolbarH : 0) <= 0)) return;
+		const { rmt, rmb, bMargin, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTextSelection, params.isWWScroll, isToolbarTarget);
+		if ((isWWTarget && ((rmb > 0 ? bMargin : rmb) + targetH <= 0 || rmt + rt + targetH - (this.editor.toolbar.isSticky && isInlineTarget ? toolbarH : 0) <= 0)) || rmt + targetH < 0) return;
 
 		const isSticky = this.editor.toolbar.isSticky && this.context.get('toolbar_main').style.display !== 'none' && (!headLess || this.frameContext.get('topArea').getBoundingClientRect().top <= th);
 		const statusBarH = this.frameContext.get('statusbar')?.offsetHeight || 0;
@@ -635,15 +634,14 @@ Offset.prototype = {
 		}
 
 		// check margin
-		const isTargetAbs = !this.carrierWrapper.contains(element);
+		const isTextSelection = !this.carrierWrapper.contains(element);
 		const clientSize = getClientSize(_d);
-		const wwScroll = isTargetAbs ? this.getWWScroll() : this._getWindowScroll();
 		const targetH = rects.height;
 		const tmtw = rects.top;
 		const tmbw = clientSize.h - rects.bottom;
 		const toolbarH = !this.editor.toolbar.isSticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar_main').offsetHeight;
 
-		const { rmt, rmb, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, rects, isTargetAbs, wwScroll);
+		const { rmt, rmb, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, rects, isTextSelection, false, false);
 		if (rmb + targetH <= 0 || rmt + rt + targetH <= 0) return;
 
 		element.style.visibility = '';
@@ -728,8 +726,9 @@ Offset.prototype = {
 	 * @param {number} toolbarH Toolbar height
 	 * @param {{w: number, h: number}} clientSize documentElement.clientWidth, documentElement.clientHeight
 	 * @param {RectsInfo} targetRect Target rect object
-	 * @param {boolean} isTargetAbs Is target absolute position
-	 * @param {OffsetWWScrollInfo} wwScroll WYSIWYG scroll info
+	 * @param {boolean} isTextSelection Is text selection or Range
+	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
+	 * @param {boolean} isToolbarTarget Indicates if the target is a toolbar element
 	 * @returns {{rmt:number, rmb:number, rt:number, tMargin:number, bMargin:number}} Margin values
 	 * - rmt: top margin to frame
 	 * - rmb: bottom margin to frame
@@ -737,7 +736,10 @@ Offset.prototype = {
 	 * - tMargin: top margin
 	 * - bMargin: bottom margin
 	 */
-	_getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTargetAbs, wwScroll) {
+	_getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTextSelection, isWWScroll, isToolbarTarget) {
+		const isScrollable = this.status.isScrollable();
+		const wwRects = this.selection.getRects(this.frameContext.get('wysiwyg'), 'start').rects;
+
 		let rmt = 0;
 		let rmb = 0;
 		let rt = 0;
@@ -748,22 +750,23 @@ Offset.prototype = {
 			rmt = tmtw - toolbarH;
 			rmb = tmbw;
 		} else {
-			const isIframeAbs = isTargetAbs && this.frameOptions.get('iframe');
+			const isIframe = this.frameOptions.get('iframe');
 			tMargin = targetRect.top;
 			bMargin = clientSize.h - targetRect.bottom;
 			const editorOffset = this.getGlobal();
 			const editorScroll = this.getGlobalScroll();
 			const statusBarH = this.frameContext.get('statusbar')?.offsetHeight || 0;
 
-			if (isIframeAbs) {
-				const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
+			if (!isTextSelection) {
+				const emt = !isToolbarTarget ? editorOffset.top - editorScroll.top - editorScroll.ts : 0;
 				const editorH = this.frameContext.get('topArea').offsetHeight;
-				rmt = targetRect.top - emt;
-				rmb = bMargin - (editorScroll.oh - (editorH + emt) + statusBarH);
+				rt = !isToolbarTarget && (this.editor.toolbar.isSticky || (isScrollable && !this.toolbar._isBalloon)) ? toolbarH : 0;
+				rmt = targetRect.top - (targetRect.top < 0 && emt < 0 ? 0 : emt) - rt;
+				rmb = bMargin - (isWWScroll ? editorScroll.oh - (editorH + emt) : 0) - statusBarH;
 			} else {
-				rt = !this.editor.toolbar.isSticky && !this.options.get('toolbar_container') ? toolbarH : 0;
-				const wst = !isTargetAbs && /\d+/.test(this.frameOptions.get('height')) ? editorOffset.top - _w.scrollY + rt : 0;
-				const wsb = !isTargetAbs && /\d+/.test(this.frameOptions.get('height')) ? this.status.currentViewportHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
+				rt = !isToolbarTarget && !this.editor.toolbar.isSticky && !this.options.get('toolbar_container') ? toolbarH : 0;
+				const wst = !isIframe ? editorOffset.top - _w.scrollY + rt : 0;
+				const wsb = !isIframe ? this.status.currentViewportHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
 				let st = wst;
 				if (toolbarH > wst) {
 					if (this.editor.toolbar.isSticky) {
@@ -777,8 +780,8 @@ Offset.prototype = {
 					st = wst + toolbarH;
 				}
 
-				rmt = targetRect.top - wwScroll.rects.top - st + toolbarH;
-				rmb = wwScroll.rects.bottom - targetRect.bottom - wsb;
+				rmt = targetRect.top - wwRects.top - st + toolbarH;
+				rmb = wwRects.bottom - targetRect.bottom - wsb;
 				// display margin
 				rmt = rmt > 0 ? rmt : rmt - toolbarH;
 			}

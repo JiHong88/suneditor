@@ -1329,7 +1329,7 @@ class Figure extends CoreInjector {
 	#OnScrollDragHandler(dragHandle, figureMain) {
 		dragHandle.style.display = 'block';
 		dragHandle.style.left = figureMain.offsetLeft + (this.options.get('_rtl') ? dragHandle.offsetWidth : figureMain.offsetWidth - dragHandle.offsetWidth * 1.5) + 'px';
-		dragHandle.style.top = figureMain.offsetTop - dragHandle.offsetHeight + 'px';
+		dragHandle.style.top = figureMain.offsetTop - dragHandle.offsetHeight + 0.5 + 'px';
 	}
 
 	/**

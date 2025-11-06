@@ -2,6 +2,10 @@ import type {} from '../typedef';
 export default ColorPicker;
 export type ColorPickerParams = {
 	/**
+	 * The form element to attach the color picker.
+	 */
+	form: HTMLElement;
+	/**
 	 * color list
 	 */
 	colorList?: Array<
@@ -34,6 +38,7 @@ export type ColorPickerParams = {
 };
 /**
  * @typedef {Object} ColorPickerParams
+ * @property {HTMLElement} form The form element to attach the color picker.
  * @property {Array<string|{value: string, name: string}>} [colorList=[]] color list
  * @property {number} [splitNum=0] Number of colors to be displayed in one line
  * @property {string} [defaultColor] Default color
@@ -56,6 +61,7 @@ declare class ColorPicker extends CoreInjector {
 	constructor(inst: any, styles: string, params: ColorPickerParams);
 	kind: any;
 	inst: any;
+	form: HTMLElement;
 	target: HTMLElement;
 	targetButton: Node;
 	inputElement: HTMLInputElement;
@@ -63,13 +69,10 @@ declare class ColorPicker extends CoreInjector {
 	splitNum: number;
 	defaultColor: string;
 	hueSliderOptions: import('./HueSlider').HueSliderParams;
-	parentDisplay: string;
 	currentColor: string;
-	parentForm: HTMLElement[];
 	colorList: any[] | NodeListOf<Element>;
 	hueSlider: HueSlider;
 	checkedIcon: HTMLElement;
-	parentFormDisplay: any[];
 	/**
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node|string} nodeOrColor Current Selected node

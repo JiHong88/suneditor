@@ -5,8 +5,8 @@ import { _DragHandle } from './_DragHandle';
 const { _w, isMobile, ON_OVER_COMPONENT } = env;
 const INDEX_00 = '2147483646';
 const INDEX_0 = '2147483645';
-const INDEX_S_1 = '2147483641';
-const INDEX_1 = '2147483640';
+const INDEX_S_1 = '2147483642';
+const INDEX_1 = '2147483641';
 
 /**
  * Controller information object
@@ -26,7 +26,7 @@ const INDEX_1 = '2147483640';
  * @property {boolean} [isWWTarget=true] If the controller is in the WYSIWYG area, set it to true.
  * @property {() => void} [initMethod=null] Method to be called when the controller is closed.
  * @property {boolean} [disabled=false] If true, When the "controller" is opened, buttons without the "se-component-enabled" class are disabled.
- * @property {Array<HTMLElement>} [parents=[]] The parent "controller" array when "controller" is opened nested.
+ * @property {Array<Controller|HTMLElement>} [parents=[]] The parent "controller" instance array when "controller" is opened nested.
  * @property {boolean} [parentsHide=false] If true, the parent element is hidden when the controller is opened.
  * @property {HTMLElement} [sibling=null] The related sibling controller element that this controller is positioned relative to.
  * - e.g.) table plugin :: 118
@@ -50,6 +50,8 @@ class Controller extends CoreInjector {
 	#shadowRootEventForm;
 	#shadowRootEventListener;
 	#preventClose;
+	#__childrenControllers__;
+	#__hiddenByParents__;
 
 	/**
 	 * @constructor
@@ -79,7 +81,8 @@ class Controller extends CoreInjector {
 		this.isWWTarget = params.isWWTarget ?? true;
 		this.position = params.position || 'bottom';
 		this.disabled = !!params.disabled;
-		this.parents = /** @type {Array<HTMLElement>} */ (params.parents || []);
+		this.parents = params.parents || [];
+		this.parentsForm = [];
 		this.parentsHide = !!params.parentsHide;
 		this.sibling = /** @type {HTMLElement} */ (params.sibling || null);
 		this.siblingMain = !!params.siblingMain;
@@ -98,6 +101,26 @@ class Controller extends CoreInjector {
 		this.#shadowRootEventForm = null;
 		this.#shadowRootEventListener = null;
 		this.#preventClose = false;
+
+		/**
+		 * @type {Array<Controller>}
+		 * @description Child controllers opened by this controller
+		 */
+		this.#__childrenControllers__ = [];
+		/**
+		 * @type {Map<Controller, boolean>}
+		 * @description Track each parent's desired visibility state: true = wants hidden, false = wants visible
+		 */
+		this.#__hiddenByParents__ = new Map();
+
+		for (const parent of this.parents) {
+			if (dom.check.isElement(parent)) {
+				this.parentsForm.push(parent);
+				continue;
+			}
+			parent.#__childrenControllers__.push(this);
+			this.parentsForm.push(parent.form);
+		}
 
 		// add element
 		this.carrierWrapper.appendChild(element);
@@ -128,6 +151,10 @@ class Controller extends CoreInjector {
 			return;
 		}
 
+		this.form.removeAttribute('data-se-hidden-by-parent');
+		this.form.removeAttribute('data-se-hidden-by-children');
+		this.#__hiddenByParents__.clear();
+
 		if (this.editor.isBalloon) this.toolbar.hide();
 		else if (this.editor.isSubBalloon) this.subToolbar.hide();
 
@@ -147,14 +174,15 @@ class Controller extends CoreInjector {
 		this.#addOffset = { left: 0, top: 0 };
 		if (addOffset) this.#addOffset = { ...this.#addOffset, ...addOffset };
 
-		const parents = this.isOutsideForm ? this.parents : [];
+		const parents = this.isOutsideForm ? this.parentsForm : [];
 		this.editor.opendControllers?.forEach((e) => {
 			if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_1;
 		});
 
 		if (this.parentsHide) {
-			this.parents.forEach((e) => {
+			this.parentsForm.forEach((e) => {
 				e.style.display = 'none';
+				e.setAttribute('data-se-hidden-by-children', '1');
 			});
 		}
 
@@ -175,7 +203,12 @@ class Controller extends CoreInjector {
 	 * @param {boolean} [force] If true, parent controllers are forcibly closed.
 	 */
 	close(force) {
-		if (!this.isOpen || this.#preventClose) return;
+		if (!force && (!this.isOpen || this.#preventClose)) return;
+
+		this.form.removeAttribute('data-se-hidden-by-parent');
+		this.form.removeAttribute('data-se-hidden-by-children');
+		this.#__hiddenByParents__.clear();
+		this.#childrenSync('close');
 
 		this.toTop = false;
 		this.isOpen = false;
@@ -189,12 +222,13 @@ class Controller extends CoreInjector {
 		this.#controllerOff();
 
 		if (this.parentsHide && !force) {
-			this.parents.forEach((e) => {
+			this.parentsForm.forEach((e) => {
 				e.style.display = 'block';
+				e.removeAttribute('data-se-hidden-by-children');
 			});
 		}
 
-		if (this.parents.length > 0) return;
+		if (this.parentsForm.length > 0) return;
 		if (typeof this.inst.close === 'function') this.inst.close();
 		this.component.deselect();
 	}
@@ -203,6 +237,7 @@ class Controller extends CoreInjector {
 	 * @description Hide controller
 	 */
 	hide() {
+		this.#childrenSync('hide');
 		this.form.style.display = 'none';
 	}
 
@@ -228,6 +263,68 @@ class Controller extends CoreInjector {
 	 */
 	resetPosition(target) {
 		this.#setControllerPosition(this.form, target || this.currentPositionTarget, true);
+	}
+
+	/**
+	 * @description Reposition controller on scroll event
+	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
+	 */
+	_scrollReposition(isWWScroll) {
+		if (this.form.hasAttribute('data-se-hidden-by-parent') || this.form.hasAttribute('data-se-hidden-by-children')) return;
+		if (this.#setControllerPosition(this.form, this.currentPositionTarget, false, isWWScroll)) {
+			_w.setTimeout(() => {
+				this.#childrenSync('show');
+			}, 0);
+		}
+	}
+
+	/**
+	 * @description Synchronously all child controllers.
+	 * @param {"show"|"hide"|"close"} state - State to apply to child controllers.
+	 */
+	#childrenSync(state) {
+		for (const children of this.#__childrenControllers__) {
+			if (state === 'hide' && children.form.style.display !== 'none') {
+				const wasHidden = this.#calculateShouldBeHidden(children);
+				children.#__hiddenByParents__.set(this, true);
+				const shouldBeHidden = this.#calculateShouldBeHidden(children);
+
+				// Only hide if state changed from visible to hidden
+				if (!wasHidden && shouldBeHidden) {
+					children.form.setAttribute('data-se-hidden-by-parent', '1');
+					children.hide();
+				}
+			} else if (state === 'show') {
+				if (children.form.hasAttribute('data-se-hidden-by-children')) {
+					children.#childrenSync('show');
+					continue;
+				}
+
+				const wasHidden = this.#calculateShouldBeHidden(children);
+				children.#__hiddenByParents__.set(this, false);
+				const shouldBeHidden = this.#calculateShouldBeHidden(children);
+
+				// Only show if state changed from hidden to visible
+				if (wasHidden && !shouldBeHidden) {
+					children.form.removeAttribute('data-se-hidden-by-parent');
+					children.show();
+				}
+			} else {
+				children[state]?.(true);
+			}
+		}
+	}
+
+	/**
+	 * @description Calculate if a child controller should be hidden based on all parent states
+	 * @param {Controller} children - The child controller
+	 * @returns {boolean} True if any parent wants it hidden
+	 */
+	#calculateShouldBeHidden(children) {
+		for (const wantsHidden of children.#__hiddenByParents__.values()) {
+			if (wantsHidden === true) return true;
+		}
+		return false;
 	}
 
 	/**
@@ -298,8 +395,12 @@ class Controller extends CoreInjector {
 	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
 	 * @param {boolean} [skipAutoReposition=false] If true, skips scroll/resize-based automatic positioning logic.
+	 * @param {boolean} [isWWScroll] Indicates if the scroll event is from the wysiwyg area
+	 * @returns {boolean} - view : true || hide : false
 	 */
-	#setControllerPosition(controller, refer, skipAutoReposition) {
+	#setControllerPosition(controller, refer, skipAutoReposition, isWWScroll) {
+		if (!refer) return false;
+
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
@@ -311,33 +412,39 @@ class Controller extends CoreInjector {
 		if (this.selection.isRange(refer)) {
 			if (!this.offset.setRangePosition(this.form, /** @type {Range} */ (refer), { position: 'bottom' })) {
 				this.hide();
-				return;
+				return false;
 			}
 		} else {
-			if (refer) {
-				const positionResult = this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), { addOffset: this.#addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this, sibling: this.sibling });
-				if (!positionResult) {
-					this.hide();
-					return;
-				}
+			const positionResult = this.offset.setAbsPosition(controller, /** @type {HTMLElement} */ (refer), {
+				addOffset: this.#addOffset,
+				position: this.position,
+				isWWTarget: this.isWWTarget,
+				inst: this,
+				sibling: this.sibling,
+				isWWScroll,
+			});
+			if (!positionResult) {
+				this.hide();
+				return false;
+			}
 
-				if (!skipAutoReposition && this.sibling && !this.siblingMain) {
-					const resetPosition = controller.offsetTop - this.#addOffset.top;
-					if (positionResult.position === 'bottom') {
-						this.#reserveIndex = true;
-						controller.style.top = resetPosition + this.sibling.offsetHeight - 1 + 'px';
-					} else {
-						this.#reserveIndex = false;
-						controller.style.top = resetPosition - this.sibling.offsetHeight + 2 + 'px';
-					}
+			if (!skipAutoReposition && this.sibling && !this.siblingMain) {
+				const resetPosition = controller.offsetTop - this.#addOffset.top;
+				if (positionResult.position === 'bottom') {
+					this.#reserveIndex = true;
+					controller.style.top = resetPosition + this.sibling.offsetHeight - 1 + 'px';
 				} else {
 					this.#reserveIndex = false;
+					controller.style.top = resetPosition - this.sibling.offsetHeight + 2 + 'px';
 				}
+			} else {
+				this.#reserveIndex = false;
 			}
 		}
 
 		controller.style.zIndex = this.toTop ? INDEX_0 : this.#reserveIndex ? INDEX_S_1 : INDEX_1;
 		controller.style.visibility = '';
+		return true;
 	}
 
 	/**
@@ -386,8 +493,8 @@ class Controller extends CoreInjector {
 		if (dom.utils.hasClass(target, 'se-drag-handle')) return true;
 
 		let isParentForm = false;
-		if (this.isInsideForm && this.parents?.length > 0) {
-			this.parents.some((e) => {
+		if (this.isInsideForm && this.parentsForm?.length > 0) {
+			this.parentsForm.some((e) => {
 				if (e.contains(target)) {
 					isParentForm = true;
 					return true;
@@ -417,7 +524,7 @@ class Controller extends CoreInjector {
 	 */
 	#MouseEnter(e) {
 		this.editor.currentControllerName = this.kind;
-		if (this.parents.length > 0 && this.isInsideForm) return;
+		if (this.parentsForm.length > 0 && this.isInsideForm) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
 		eventTarget.style.zIndex = this.toTop ? INDEX_00 : INDEX_0;
@@ -427,7 +534,7 @@ class Controller extends CoreInjector {
 	 * @param {MouseEvent} e - Event object
 	 */
 	#MouseLeave(e) {
-		if (this.parents.length > 0 && this.isInsideForm) return;
+		if (this.parentsForm.length > 0 && this.isInsideForm) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
 		eventTarget.style.zIndex = this.toTop ? INDEX_0 : this.#reserveIndex ? INDEX_S_1 : INDEX_1;

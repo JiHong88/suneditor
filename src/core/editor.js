@@ -1007,7 +1007,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Change the current root index.
-	 * @param {*} rootKey
+	 * @param {*} rootKey Root frame key.
 	 */
 	changeFrameContext(rootKey) {
 		if (rootKey === this.status.rootKey) return;
@@ -1030,7 +1030,7 @@ Editor.prototype = {
 
 	/**
 	 * @description Focus to wysiwyg area
-	 * @param {*} rootKey Root index
+	 * @param {*} [rootKey] Root frame key.
 	 */
 	focus(rootKey) {
 		if (rootKey) this.changeFrameContext(rootKey);
@@ -1164,22 +1164,16 @@ Editor.prototype = {
 		}
 
 		/** clear class instances */
-		obj = ['eventManager', 'instanceCheck', 'char', 'component', 'format', 'html', 'inline', 'listFormat', 'menu', 'nodeTransform', 'offset', 'selection', 'shortcuts', 'toolbar', 'ui', 'viewer'];
+		obj = ['eventManager', 'instanceCheck', 'char', 'component', 'format', 'html', 'inline', 'listFormat', 'menu', 'nodeTransform', 'offset', 'selection', 'shortcuts', 'ui', 'viewer', 'toolbar', 'subToolbar'];
 		for (let i = 0, len = obj.length, c; i < len; i++) {
 			c = this[obj[i]];
 			for (const k in c) {
 				delete c[k];
 			}
 		}
-		obj = this.subToolbar;
-		if (obj) {
-			for (const k in obj) {
-				delete obj[k];
-			}
-		}
+		obj = null;
 
 		/** clear all remaining properties */
-		obj = null;
 		for (const k in this) {
 			delete this[k];
 		}

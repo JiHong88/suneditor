@@ -77,8 +77,8 @@ declare class Table extends EditorInjector {
 	controller_table: Controller;
 	controller_props: Controller;
 	controller_props_title: HTMLElement;
-	colorPicker: ColorPicker;
 	controller_colorPicker: Controller;
+	colorPicker: ColorPicker;
 	figure: Figure;
 	sliderType: string;
 	splitButton: HTMLButtonElement;

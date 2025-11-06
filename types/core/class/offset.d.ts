@@ -175,10 +175,6 @@ export type OffsetWWScrollInfo = {
 	 * - The sum of `top` and `height`, representing the bottom-most scrollable position.
 	 */
 	bottom: number;
-	/**
-	 * - The bounding rectangle of the editor's visible area.
-	 */
-	rects: RectsInfo;
 };
 /**
  * @typedef {Omit<Offset & Partial<SunEditor.Injector>, 'offset'>} OffsetThis
@@ -240,7 +236,6 @@ export type OffsetWWScrollInfo = {
  * @property {number} width - The total width of the WYSIWYG editor's scrollable area.
  * @property {number} height - The total height of the WYSIWYG editor's scrollable area.
  * @property {number} bottom - The sum of `top` and `height`, representing the bottom-most scrollable position.
- * @property {RectsInfo} rects - The bounding rectangle of the editor's visible area.
  */
 /**
  * @constructor
@@ -310,7 +305,6 @@ declare class Offset {
 	 * @property {number} width - The total width of the WYSIWYG editor's scrollable area.
 	 * @property {number} height - The total height of the WYSIWYG editor's scrollable area.
 	 * @property {number} bottom - The sum of `top` and `height`, representing the bottom-most scrollable position.
-	 * @property {RectsInfo} rects - The bounding rectangle of the editor's visible area.
 	 */
 	/**
 	 * @constructor
@@ -373,7 +367,8 @@ declare class Offset {
 	 * @param {{left:number, top:number}} [params.addOffset={left:0, top:0}] Additional offset
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
 	 * @param {*} params.inst Instance object of caller
-	 * @param {HTMLElement} [params.sibling] The sibling controller element
+	 * @param {HTMLElement} [params.sibling=null] The sibling controller element
+	 * @param {boolean} [params.isWWScroll=false] Indicates if the scroll event is from the wysiwyg area
 	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 */
 	setAbsPosition(
@@ -389,6 +384,7 @@ declare class Offset {
 			position?: 'bottom' | 'top';
 			inst: any;
 			sibling?: HTMLElement;
+			isWWScroll?: boolean;
 		},
 	):
 		| {
@@ -462,8 +458,9 @@ declare class Offset {
 	 * @param {number} toolbarH Toolbar height
 	 * @param {{w: number, h: number}} clientSize documentElement.clientWidth, documentElement.clientHeight
 	 * @param {RectsInfo} targetRect Target rect object
-	 * @param {boolean} isTargetAbs Is target absolute position
-	 * @param {OffsetWWScrollInfo} wwScroll WYSIWYG scroll info
+	 * @param {boolean} isTextSelection Is text selection or Range
+	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
+	 * @param {boolean} isToolbarTarget Indicates if the target is a toolbar element
 	 * @returns {{rmt:number, rmb:number, rt:number, tMargin:number, bMargin:number}} Margin values
 	 * - rmt: top margin to frame
 	 * - rmb: bottom margin to frame
@@ -481,8 +478,9 @@ declare class Offset {
 			h: number;
 		},
 		targetRect: RectsInfo,
-		isTargetAbs: boolean,
-		wwScroll: OffsetWWScrollInfo,
+		isTextSelection: boolean,
+		isWWScroll: boolean,
+		isToolbarTarget: boolean,
 	): {
 		rmt: number;
 		rmb: number;

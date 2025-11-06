@@ -63,7 +63,7 @@ Selection_.prototype = {
 	 * @this {SelectionThis}
 	 * @description Check if the range object is valid
 	 * @param {*} range Range object
-	 * @returns {boolean}
+	 * @returns {range is Range}
 	 */
 	isRange(range) {
 		// return /Range/.test(Object.prototype.toString.call(range?.__proto__));

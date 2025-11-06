@@ -35,15 +35,15 @@ export type HueSliderColor = {
 };
 export type HueSliderParams = {
 	/**
-	 * The form element to attach the hue slider.
-	 */
-	form?: Node;
-	/**
 	 * Whether to create a new form element.
 	 */
 	isNewForm?: boolean;
 	/**
-	 * Controller options
+	 * Parent elements for controller positioning.
+	 */
+	parents?: Array<HTMLElement>;
+	/**
+	 * Controller options (excluding 'parents')
 	 */
 	controllerOptions?: import('../modules/Controller').ControllerParams;
 };
@@ -72,9 +72,9 @@ export function CreateSliderCtx(): {
  */
 /**
  * @typedef {Object} HueSliderParams
- * @property {Node} [form] The form element to attach the hue slider.
  * @property {boolean} [isNewForm] Whether to create a new form element.
- * @property {import('../modules/Controller').ControllerParams} [controllerOptions] Controller options
+ * @property {Array<HTMLElement>} [parents] Parent elements for controller positioning.
+ * @property {import('../modules/Controller').ControllerParams} [controllerOptions] Controller options (excluding 'parents')
  */
 /**
  * @class
@@ -85,13 +85,12 @@ export function CreateSliderCtx(): {
 declare class HueSlider extends CoreInjector {
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
+	 * @param {import('./ColorPicker').default} inst The instance object that called the constructor.
 	 * @param {HueSliderParams} [params={}] Hue slider options
 	 * @param {string} [className=""] The class name of the hue slider.
 	 */
-	constructor(inst: any, params?: HueSliderParams, className?: string);
-	inst: any;
-	form: Node;
+	constructor(inst: import('./ColorPicker').default, params?: HueSliderParams, className?: string);
+	inst: import('./ColorPicker').default;
 	ctx: {
 		wheelX: number;
 		wheelY: number;
@@ -111,6 +110,7 @@ declare class HueSlider extends CoreInjector {
 	};
 	isOpen: boolean;
 	controlle: any;
+	circle: Element;
 	controller: Controller;
 	/**
 	 * @description Get the current color information.

@@ -480,7 +480,7 @@ declare class Editor {
 	resetOptions(newOptions: SunEditor.InitOptions): void;
 	/**
 	 * @description Change the current root index.
-	 * @param {*} rootKey
+	 * @param {*} rootKey Root frame key.
 	 */
 	changeFrameContext(rootKey: any): void;
 	/**
@@ -492,9 +492,9 @@ declare class Editor {
 	execCommand(command: string, showDefaultUI?: boolean, value?: string): void;
 	/**
 	 * @description Focus to wysiwyg area
-	 * @param {*} rootKey Root index
+	 * @param {*} [rootKey] Root frame key.
 	 */
-	focus(rootKey: any): void;
+	focus(rootKey?: any): void;
 	/**
 	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
 	 * - If "focusEdge" is null, then selected last element
