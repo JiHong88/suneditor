@@ -64,10 +64,7 @@ export type FileUploadPluginOptions = {
  * @class
  * @description File upload plugin
  */
-declare class FileUpload extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class FileUpload extends PluginCommand {
 	static options: {
 		eventIndex: number;
 	};
@@ -84,7 +81,6 @@ declare class FileUpload extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: FileUploadPluginOptions);
 	title: any;
-	icon: string;
 	uploadUrl: string;
 	uploadHeaders: {
 		[x: string]: string;
@@ -100,47 +96,11 @@ declare class FileUpload extends EditorInjector {
 	fileManager: FileManager;
 	controller: Controller;
 	editInput: HTMLInputElement;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - It is executed by clicking a toolbar "command" button or calling an API.
-	 */
-	action(): void;
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
-	 */
-	select(target: HTMLElement): boolean;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "paste" or "drop".
-	 * @param {Object} params { frameContext, event, file }
-	 * @param {SunEditor.FrameContext} params.frameContext Frame context
-	 * @param {ClipboardEvent} params.event Event object
-	 * @param {File} params.file File object
-	 * @returns {boolean} - If return false, the file upload will be canceled
-	 */
-	onFilePasteAndDrop({ file }: { frameContext: SunEditor.FrameContext; event: ClipboardEvent; file: File }): boolean;
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a target component is edited.
-	 * @param {HTMLElement|Text} target Target element
-	 */
-	edit(target: HTMLElement | Text): void;
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
-	 */
+	onFilePasteAndDrop(params: SunEditor.HookParams.FilePasteDrop): void;
 	controllerAction(target: HTMLButtonElement): void;
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
-	 * @returns {Promise<void>}
-	 */
-	destroy(target: HTMLElement): Promise<void>;
+	componentSelect(target: HTMLElement): void | boolean;
+	componentEdit(target: HTMLElement): void;
+	componentDestroy(target: HTMLElement): Promise<void>;
 	/**
 	 * @description Create an "file" component using the provided files.
 	 * @param {File[]|FileList} fileList File object list
@@ -171,7 +131,7 @@ declare class FileUpload extends EditorInjector {
 	): void;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { Figure } from '../../modules';
-import { FileManager } from '../../modules';
-import { Controller } from '../../modules';
+import { PluginCommand } from '../../interfaces';
+import { Figure } from '../../modules/contracts';
+import { Controller } from '../../modules/contracts';
+import { FileManager } from '../../modules/utils';

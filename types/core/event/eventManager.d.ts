@@ -310,7 +310,8 @@ declare class EventManager {
 	/**
 	 * @private
 	 * @this {EventManagerThis}
-	 * @description Calls a registered plugin event and executes associated handlers.
+	 * @description Calls a registered plugin event and executes associated handlers synchronously (fire-and-forget).
+	 * - Use this for performance-critical events like onMouseMove, onScroll
 	 * - If any handler returns `false`, the event propagation stops.
 	 * @param {string} name The name of the plugin event
 	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
@@ -332,6 +333,30 @@ declare class EventManager {
 	/**
 	 * @private
 	 * @this {EventManagerThis}
+	 * @description Calls a registered plugin event and executes associated handlers asynchronously.
+	 * - Use this for events that need to check return values or ensure completion
+	 * - Waits for each handler to complete (including async handlers)
+	 * - If any handler returns `false`, the event propagation stops.
+	 * @param {string} name The name of the plugin event
+	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
+	 * @returns {Promise<boolean|undefined>} Returns `false` if any handler stops the event, otherwise `undefined`
+	 */
+	_callPluginEventAsync(
+		this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>,
+		name: string,
+		e: {
+			frameContext: SunEditor.FrameContext;
+			event: Event;
+			data?: string;
+			line?: Node;
+			range?: Range;
+			file?: File;
+			doc?: Document;
+		},
+	): Promise<boolean | undefined>;
+	/**
+	 * @private
+	 * @this {EventManagerThis}
 	 * @description Handles the selection of a component when hovering over it.
 	 * - If the target is a component, it ensures that the component is selected properly.
 	 * @param {Element} target The element being hovered over
@@ -348,17 +373,17 @@ declare class EventManager {
 	 * @description Focus Event Postprocessing
 	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
-	 * @param {Event} event - Event object
+	 * @param {FocusEvent} event - Focus event object
 	 */
-	__postFocusEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: SunEditor.FrameContext, event: Event): void;
+	__postFocusEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: SunEditor.FrameContext, event: FocusEvent): void;
 	/**
 	 * @private
 	 * @description Blur Event Postprocessing
 	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
-	 * @param {Event} event - Event object
+	 * @param {FocusEvent} event - Focus event object
 	 */
-	__postBlurEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: SunEditor.FrameContext, event: Event): void;
+	__postBlurEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: SunEditor.FrameContext, event: FocusEvent): void;
 	/**
 	 * @private
 	 * @description Records the current viewport size.

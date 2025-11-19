@@ -1,4 +1,4 @@
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
@@ -10,9 +10,8 @@ import { dom } from '../../helper';
  * @class
  * @description Text style Plugin, Applies a tag that specifies text styles to a selection.
  */
-class TextStyle extends EditorInjector {
+class TextStyle extends PluginDropdown {
 	static key = 'textStyle';
-	static type = 'dropdown';
 	static className = '';
 
 	/**
@@ -37,8 +36,8 @@ class TextStyle extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
+	 * @override
+	 * @type {PluginDropdown['on']}
 	 */
 	on() {
 		const styleButtonList = this.styleList;
@@ -71,10 +70,8 @@ class TextStyle extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
+	 * @override
+	 * @type {PluginDropdown['action']}
 	 */
 	action(target) {
 		const tempElement = /** @type {HTMLElement} */ (target.firstElementChild);

@@ -49,7 +49,7 @@ describe('handler_ww_mouse', () => {
 	describe('OnMouseDown_wysiwyg', () => {
 		it('should handle normal mouse down', async () => {
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -59,7 +59,7 @@ describe('handler_ww_mouse', () => {
 				frameContext: mockFrameContext,
 				event: mockEvent
 			});
-			expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onMouseDown', {
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalledWith('onMouseDown', {
 				frameContext: mockFrameContext,
 				event: mockEvent
 			});
@@ -68,7 +68,7 @@ describe('handler_ww_mouse', () => {
 		it('should handle right-click (context menu)', async () => {
 			mockEvent.button = 2;
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -89,7 +89,7 @@ describe('handler_ww_mouse', () => {
 		it('should handle disabled mode', async () => {
 			mockFrameContext.set('isDisabled', true);
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -101,7 +101,7 @@ describe('handler_ww_mouse', () => {
 		it('should handle code view mode', async () => {
 			mockFrameContext.set('isCodeView', true);
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -122,7 +122,7 @@ describe('handler_ww_mouse', () => {
 		it('should handle FIGURE elements', async () => {
 			mockEvent.target = document.createElement('figure');
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -132,7 +132,7 @@ describe('handler_ww_mouse', () => {
 		it('should hide balloon toolbar when isBalloon is true', async () => {
 			mockThis.editor.isBalloon = true;
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -142,7 +142,7 @@ describe('handler_ww_mouse', () => {
 		it('should hide sub-balloon toolbar when isSubBalloon is true', async () => {
 			mockThis.editor.isSubBalloon = true;
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -154,16 +154,16 @@ describe('handler_ww_mouse', () => {
 
 			await OnMouseDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-			expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).not.toHaveBeenCalled();
 		});
 
-		it('should handle _callPluginEvent returning false', async () => {
+		it('should handle _callPluginEventAsync returning false', async () => {
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(false);
+			mockThis._callPluginEventAsync.mockResolvedValue(false);
 
 			await OnMouseDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-			expect(mockThis._callPluginEvent).toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalled();
 			// Should return early, not hiding toolbars
 			expect(mockThis._hideToolbar).not.toHaveBeenCalled();
 		});
@@ -172,7 +172,7 @@ describe('handler_ww_mouse', () => {
 	describe('OnMouseUp_wysiwyg', () => {
 		it('should handle normal mouse up', async () => {
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -180,7 +180,7 @@ describe('handler_ww_mouse', () => {
 				frameContext: mockFrameContext,
 				event: mockEvent
 			});
-			expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onMouseUp', {
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalledWith('onMouseUp', {
 				frameContext: mockFrameContext,
 				event: mockEvent
 			});
@@ -189,12 +189,12 @@ describe('handler_ww_mouse', () => {
 		it('should handle readonly mode', async () => {
 			mockFrameContext.set('isReadOnly', true);
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(mockThis.triggerEvent).toHaveBeenCalled();
-			expect(mockThis._callPluginEvent).toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalled();
 		});
 
 		it('should handle triggerEvent returning false', async () => {
@@ -203,24 +203,24 @@ describe('handler_ww_mouse', () => {
 			await OnMouseUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(mockThis.triggerEvent).toHaveBeenCalled();
-			expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).not.toHaveBeenCalled();
 		});
 
-		it('should handle _callPluginEvent returning false', async () => {
+		it('should handle _callPluginEventAsync returning false', async () => {
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(false);
+			mockThis._callPluginEventAsync.mockResolvedValue(false);
 
 			await OnMouseUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(mockThis.triggerEvent).toHaveBeenCalled();
-			expect(mockThis._callPluginEvent).toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalled();
 		});
 	});
 
 	describe('OnClick_wysiwyg', () => {
 		it('should handle normal click', async () => {
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 			mockThis.component.get.mockReturnValue(null);
 
 			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
@@ -229,7 +229,7 @@ describe('handler_ww_mouse', () => {
 				frameContext: mockFrameContext,
 				event: mockEvent
 			});
-			expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onClick', {
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalledWith('onClick', {
 				frameContext: mockFrameContext,
 				event: mockEvent
 			});
@@ -264,7 +264,7 @@ describe('handler_ww_mouse', () => {
 			};
 			mockThis.component.get.mockReturnValue(componentInfo);
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -275,7 +275,7 @@ describe('handler_ww_mouse', () => {
 		it('should handle triple click', async () => {
 			mockEvent.detail = 3;
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 			mockThis.component.get.mockReturnValue(null);
 			const mockRange = {
 				startContainer: document.createTextNode('text'),
@@ -297,17 +297,17 @@ describe('handler_ww_mouse', () => {
 			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(mockThis.triggerEvent).toHaveBeenCalled();
-			expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).not.toHaveBeenCalled();
 		});
 
-		it('should handle _callPluginEvent returning false', async () => {
+		it('should handle _callPluginEventAsync returning false', async () => {
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(false);
+			mockThis._callPluginEventAsync.mockResolvedValue(false);
 
 			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(mockThis.triggerEvent).toHaveBeenCalled();
-			expect(mockThis._callPluginEvent).toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalled();
 		});
 	});
 
@@ -370,7 +370,7 @@ describe('handler_ww_mouse', () => {
 	describe('OnMouseLeave_wysiwyg', () => {
 		it('should handle normal mouse leave', async () => {
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseLeave_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -378,7 +378,7 @@ describe('handler_ww_mouse', () => {
 				frameContext: mockFrameContext,
 				event: mockEvent
 			});
-			expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onMouseLeave', {
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalledWith('onMouseLeave', {
 				frameContext: mockFrameContext,
 				event: mockEvent
 			});
@@ -387,12 +387,12 @@ describe('handler_ww_mouse', () => {
 		it('should handle readonly mode', async () => {
 			mockFrameContext.set('isReadOnly', true);
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 
 			await OnMouseLeave_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(mockThis.triggerEvent).toHaveBeenCalled();
-			expect(mockThis._callPluginEvent).toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalled();
 		});
 
 		it('should handle triggerEvent returning false', async () => {
@@ -401,17 +401,17 @@ describe('handler_ww_mouse', () => {
 			await OnMouseLeave_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(mockThis.triggerEvent).toHaveBeenCalled();
-			expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).not.toHaveBeenCalled();
 		});
 
-		it('should handle _callPluginEvent returning false', async () => {
+		it('should handle _callPluginEventAsync returning false', async () => {
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(false);
+			mockThis._callPluginEventAsync.mockResolvedValue(false);
 
 			await OnMouseLeave_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(mockThis.triggerEvent).toHaveBeenCalled();
-			expect(mockThis._callPluginEvent).toHaveBeenCalled();
+			expect(mockThis._callPluginEventAsync).toHaveBeenCalled();
 		});
 	});
 
@@ -419,7 +419,7 @@ describe('handler_ww_mouse', () => {
 		it('should handle balloon mode in OnClick', async () => {
 			mockThis.editor.isBalloon = true;
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 			mockThis.component.get.mockReturnValue(null);
 
 			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
@@ -432,7 +432,7 @@ describe('handler_ww_mouse', () => {
 		it('should handle sub-balloon mode in OnClick', async () => {
 			mockThis.editor.isSubBalloon = true;
 			mockThis.triggerEvent.mockResolvedValue(undefined);
-			mockThis._callPluginEvent.mockReturnValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
 			mockThis.component.get.mockReturnValue(null);
 
 			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);

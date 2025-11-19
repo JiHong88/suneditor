@@ -29,13 +29,9 @@ export type AudioGalleryPluginOptions = {
  */
 /**
  * @class
- * @extends EditorInjector
  * @description Audio gallery plugin
  */
-declare class AudioGallery extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class AudioGallery extends PluginBrowser {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -43,21 +39,9 @@ declare class AudioGallery extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: AudioGalleryPluginOptions);
 	title: any;
-	icon: string;
-	onSelectfunction: (targe: Node) => any;
+	onSelectfunction: (target: Node) => any;
 	browser: Browser;
-	/**
-	 * @editorMethod Modules.Browser
-	 * @description Executes the method that is called when a "Browser" module's is opened.
-	 * @param {?(targe: Node) => *} [onSelectfunction] method to be executed after selecting an item in the gallery
-	 */
-	open(onSelectfunction?: ((targe: Node) => any) | null): void;
-	/**
-	 * @editorMethod Modules.Browser
-	 * @description Executes the method that is called when a "Browser" module's is closed.
-	 */
-	close(): void;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { Browser } from '../../modules';
+import { PluginBrowser } from '../../interfaces';
+import { Browser } from '../../modules/contracts';

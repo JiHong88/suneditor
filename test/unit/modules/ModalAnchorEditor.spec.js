@@ -2,10 +2,10 @@
  * @fileoverview Unit tests for modules/ModalAnchorEditor.js
  */
 
-import ModalAnchorEditor from '../../../src/modules/ModalAnchorEditor.js';
+import ModalAnchorEditor from '../../../src/modules/utils/ModalAnchorEditor.js';
 
 // Mock SelectMenu
-jest.mock('../../../src/modules/SelectMenu.js', () => {
+jest.mock('../../../src/modules/utils/SelectMenu.js', () => {
     return jest.fn().mockImplementation(function() {
         this.on = jest.fn();
         this.create = jest.fn();
@@ -18,7 +18,7 @@ jest.mock('../../../src/modules/SelectMenu.js', () => {
 });
 
 // Mock FileManager
-jest.mock('../../../src/modules/FileManager.js', () => {
+jest.mock('../../../src/modules/utils/FileManager.js', () => {
     return jest.fn().mockImplementation(function() {
         this.asyncUpload = jest.fn().mockResolvedValue({ responseText: JSON.stringify({ result: [{ url: 'http://test.com/file.pdf', name: 'file.pdf' }] }) });
     });

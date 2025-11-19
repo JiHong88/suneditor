@@ -64,10 +64,7 @@ export type MentionPluginOptions = {
  * - Supports fetching mention data from an API or a predefined data array.
  * - Uses caching for optimized performance.
  */
-declare class Mention extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Mention extends PluginField {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -75,7 +72,6 @@ declare class Mention extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: MentionPluginOptions);
 	title: any;
-	icon: string;
 	triggerText: string;
 	limitSize: number;
 	searchStartLength: number;
@@ -91,15 +87,10 @@ declare class Mention extends EditorInjector {
 	cachingFieldData: any[];
 	selectMenu: SelectMenu;
 	controller: Controller;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "input".
-	 * @returns {Promise<boolean>}
-	 */
-	onInput(): Promise<boolean>;
+	onInput(params: SunEditor.HookParams.InputWithData): Promise<void>;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { ApiManager } from '../../modules';
-import { SelectMenu } from '../../modules';
-import { Controller } from '../../modules';
+import { PluginField } from '../../interfaces';
+import { Controller } from '../../modules/contracts';
+import { ApiManager } from '../../modules/utils';
+import { SelectMenu } from '../../modules/utils';

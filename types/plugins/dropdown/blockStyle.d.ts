@@ -14,10 +14,7 @@ export type BlockStylePluginOptions = {
  * @class
  * @description BlockStyle Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
  */
-declare class BlockStyle extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class BlockStyle extends PluginDropdown {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -28,33 +25,12 @@ declare class BlockStyle extends EditorInjector {
 	inner: string;
 	formatList: NodeListOf<Element>;
 	currentFormat: string;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
-	 */
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean;
-	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {HTMLElement} target Line element at the current cursor position
-	 */
-	on(target: HTMLElement): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 */
-	action(target: HTMLElement): void;
+	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
 	/**
 	 * @description Create a header tag, call by "shortcut" class
 	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])
-	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.HookParams.Shortcut} params - Information of the "shortcut" plugin
 	 */
-	applyHeaderByShortcut({ keyCode }: SunEditor.Plugin.ShortcutInfo): void;
+	applyHeaderByShortcut({ keyCode }: SunEditor.HookParams.Shortcut): void;
 }
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';

@@ -32,7 +32,7 @@ export async function OnBeforeInput_wysiwyg(fc, e) {
 	// user event
 	if ((await this.triggerEvent('onBeforeInput', { frameContext: fc, event: e, data })) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onBeforeInput', { frameContext: fc, event: e, data }) === false) return;
+	await this._callPluginEventAsync('onBeforeInput', { frameContext: fc, event: e, data });
 }
 
 /**
@@ -71,7 +71,7 @@ export async function OnInput_wysiwyg(fc, e) {
 	// user event
 	if ((await this.triggerEvent('onInput', { frameContext: fc, event: e, data })) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onInput', { frameContext: fc, event: e, data }) === false) return;
+	await this._callPluginEventAsync('onInput', { frameContext: fc, event: e, data });
 
 	this.history.push(true);
 }

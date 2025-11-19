@@ -8,22 +8,18 @@ export default PageNavigator;
  * - the total number of pages. When the user changes the value in the input field, the plugin triggers
  * - a page navigation event through the editor's document context.
  */
-declare class PageNavigator extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class PageNavigator extends PluginInput {
 	title: any;
 	inner: HTMLInputElement;
-	afterItem: HTMLElement;
 	pageNum: number;
 	totalPages: number;
 	/**
-	 * @editorMethod Editor.documentType
-	 * @description Updates the displayed page number and total pages in the navigator.
+	 * Updates the displayed page number and total pages in the navigator.
 	 * @param {number} pageNum - The current page number to display.
 	 * @param {number} totalPages - The total number of pages in the document.
+	 * @returns {void}
 	 */
 	display(pageNum: number, totalPages: number): void;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
+import { PluginInput } from '../../interfaces';

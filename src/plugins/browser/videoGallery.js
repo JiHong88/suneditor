@@ -1,5 +1,5 @@
-import EditorInjector from '../../editorInjector';
-import { Browser } from '../../modules';
+import { PluginBrowser } from '../../interfaces';
+import { Browser } from '../../modules/contracts';
 
 /**
  * @typedef {Object} VideoGalleryPluginOptions
@@ -11,12 +11,10 @@ import { Browser } from '../../modules';
 
 /**
  * @class
- * @extends EditorInjector
  * @description Video gallery plugin
  */
-class VideoGallery extends EditorInjector {
+class VideoGallery extends PluginBrowser {
 	static key = 'videoGallery';
-	static type = 'browser';
 	static className = '';
 
 	/**
@@ -53,9 +51,8 @@ class VideoGallery extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Browser
-	 * @description Executes the method that is called when a "Browser" module's is opened.
-	 * @param {?(targe: Node) => *} [onSelectfunction] method to be executed after selecting an item in the gallery
+	 * @override
+	 * @type {PluginBrowser['open']}
 	 */
 	open(onSelectfunction) {
 		this.onSelectfunction = onSelectfunction;
@@ -63,8 +60,8 @@ class VideoGallery extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Browser
-	 * @description Executes the method that is called when a "Browser" module's is closed.
+	 * @override
+	 * @type {PluginBrowser['close']}
 	 */
 	close() {
 		this.onSelectfunction = null;

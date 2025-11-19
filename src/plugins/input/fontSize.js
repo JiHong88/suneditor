@@ -1,5 +1,8 @@
-import EditorInjector from '../../editorInjector';
+import { PluginCommand, PluginDropdown, PluginInput } from '../../interfaces';
 import { dom, numbers, keyCodeMap } from '../../helper';
+
+void PluginCommand;
+void PluginDropdown;
 
 const DEFAULT_UNIT_MAP = {
 	text: {
@@ -98,14 +101,15 @@ const DEFAULT_UNIT_MAP = {
 
 /**
  * @class
+ * @implements {PluginCommand}
+ * @implements {PluginDropdown}
  * @description FontSize Plugin
  * - This plugin enables users to modify the font size of selected text within the editor.
  * - It supports various measurement units (e.g., 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%') and
  * - provides multiple interfaces: dropdown menus, direct input, and optional increment/decrement buttons.
  */
-class FontSize extends EditorInjector {
+class FontSize extends PluginInput {
 	static key = 'fontSize';
-	static type = 'input';
 	static className = 'se-btn-select se-btn-input se-btn-tool-font-size';
 
 	#disableInput;
@@ -177,12 +181,8 @@ class FontSize extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
 		if (!dom.utils.hasClass(target, '__se__font_size')) return false;
@@ -201,13 +201,10 @@ class FontSize extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Toolbar
-	 * @description Executes the event function of toolbar's input tag - "keydown".
-	 * @param {Object} params
-	 * @param {HTMLElement} params.target Input element
-	 * @param {KeyboardEvent} params.event Event object
+	 * @override
+	 * @type {PluginInput['toolbarInputKeyDown']}
 	 */
-	onInputKeyDown({ target, event }) {
+	toolbarInputKeyDown({ target, event }) {
 		const keyCode = event.code;
 
 		if (this.#disableInput || keyCodeMap.isSpace(keyCode)) {
@@ -215,7 +212,7 @@ class FontSize extends EditorInjector {
 			return;
 		}
 
-		if (!/^(38|40|13)$/.test(keyCode)) return;
+		if (!/^(ArrowUp|ArrowDown|Enter)$/.test(keyCode)) return;
 
 		const { value, unit } = this.#getSize(target);
 		if (!value) return;
@@ -250,11 +247,10 @@ class FontSize extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Toolbar
-	 * @description Executes the event function of toolbar's input tag - "change".
-	 * @param {SunEditor.Plugin.ToolbarInputChangeEventInfo} params
+	 * @override
+	 * @type {PluginInput['toolbarInputChange']}
 	 */
-	onInputChange({ target, value: changeValue, event }) {
+	toolbarInputChange({ target, value: changeValue, event }) {
 		if (this.#disableInput) return;
 
 		try {
@@ -275,9 +271,8 @@ class FontSize extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {HTMLElement} target Line element at the current cursor position
+	 * @imple Dropdown
+	 * @type {PluginDropdown['on']}
 	 */
 	on(target) {
 		const { value, unit } = this.#getSize(target);
@@ -298,10 +293,8 @@ class FontSize extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
+	 * @imple Command
+	 * @type {PluginCommand['action']}
 	 */
 	action(target) {
 		const commandValue = target.getAttribute('data-command');

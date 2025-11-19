@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for modules/SelectMenu.js
  */
 
-import SelectMenu from '../../../src/modules/SelectMenu.js';
+import SelectMenu from '../../../src/modules/utils/SelectMenu.js';
 
 // Mock dependencies
 jest.mock('../../../src/editorInjector/_core.js', () => {

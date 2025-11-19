@@ -41,7 +41,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -89,7 +89,10 @@ jest.mock('../../../../src/modules', () => ({
 		setTransform: jest.fn(),
 		deleteTransform: jest.fn(),
 		isVertical: false
-	})),
+	}))
+}));
+
+jest.mock('../../../../src/modules/utils', () => ({
 	FileManager: jest.fn().mockImplementation(() => ({
 		getSize: jest.fn().mockReturnValue(0),
 		upload: jest.fn().mockResolvedValue(true),
@@ -98,8 +101,8 @@ jest.mock('../../../../src/modules', () => ({
 }));
 
 // Add static methods to modules
-const mockModal = require('../../../../src/modules').Modal;
-const mockFigure = require('../../../../src/modules').Figure;
+const mockModal = require('../../../../src/modules/contracts').Modal;
+const mockFigure = require('../../../../src/modules/contracts').Figure;
 
 // Mock Figure static methods
 Object.assign(mockFigure, {
@@ -372,7 +375,7 @@ describe('Video Plugin', () => {
 		});
 
 		it('should have required methods', () => {
-			const methods = ['open', 'edit', 'on', 'modalAction', 'init', 'select', 'destroy', 'onFilePasteAndDrop', 'create', 'createIframeTag', 'createVideoTag'];
+			const methods = ['open', 'componentEdit', 'modalOn', 'modalAction', 'modalInit', 'componentSelect', 'componentDestroy', 'onFilePasteAndDrop', 'create', 'createIframeTag', 'createVideoTag'];
 			methods.forEach((method) => {
 				expect(typeof video[method]).toBe('function');
 			});
@@ -387,7 +390,7 @@ describe('Video Plugin', () => {
 
 		describe('edit', () => {
 			it('should call modal.open', () => {
-				video.edit();
+				video.componentEdit();
 				expect(video.modal.open).toHaveBeenCalled();
 			});
 		});
@@ -395,19 +398,19 @@ describe('Video Plugin', () => {
 		describe('on', () => {
 			it('should handle new video creation (isUpdate=false) when allowMultiple=true', () => {
 				video.pluginOptions.allowMultiple = true;
-				video.on(false);
+				video.modalOn(false);
 				expect(video.videoInputFile.setAttribute).toHaveBeenCalledWith('multiple', 'multiple');
 			});
 
 			it('should handle video editing (isUpdate=true) when allowMultiple=true', () => {
 				video.pluginOptions.allowMultiple = true;
-				video.on(true);
+				video.modalOn(true);
 				expect(video.videoInputFile.removeAttribute).toHaveBeenCalledWith('multiple');
 			});
 
 			it('should not modify multiple attribute when allowMultiple=false', () => {
 				video.pluginOptions.allowMultiple = false;
-				video.on(false);
+				video.modalOn(false);
 				expect(video.videoInputFile.setAttribute).not.toHaveBeenCalled();
 			});
 		});
@@ -426,7 +429,7 @@ describe('Video Plugin', () => {
 
 		describe('init', () => {
 			it('should reset form values', () => {
-				video.init();
+				video.modalInit();
 
 				expect(video.videoInputFile.value).toBe('');
 				expect(video.videoUrlFile.value).toBe('');
@@ -444,8 +447,8 @@ describe('Video Plugin', () => {
 					querySelector: jest.fn().mockReturnValue({ src: 'source.mp4' })
 				};
 
-				expect(() => video.select(mockTarget)).not.toThrow();
-				expect(typeof video.select).toBe('function');
+				expect(() => video.componentSelect(mockTarget)).not.toThrow();
+				expect(typeof video.componentSelect).toBe('function');
 			});
 		});
 
@@ -479,22 +482,22 @@ describe('Video Plugin', () => {
 					previousElementSibling: { nodeType: 1 }
 				};
 
-				video.init = jest.fn();
+				video.modalInit = jest.fn();
 
-				await video.destroy(mockTarget);
+				await video.componentDestroy(mockTarget);
 
 				expect(video.triggerEvent).toHaveBeenCalledWith('onVideoDeleteBefore', expect.any(Object));
-				expect(video.init).toHaveBeenCalled();
+				expect(video.modalInit).toHaveBeenCalled();
 			});
 
 			it('should cancel destroy if event returns false', async () => {
 				const mockTarget = { nodeName: 'VIDEO' };
 				video.triggerEvent = jest.fn().mockResolvedValue(false);
-				video.init = jest.fn();
+				video.modalInit = jest.fn();
 
-				await video.destroy(mockTarget);
+				await video.componentDestroy(mockTarget);
 
-				expect(video.init).not.toHaveBeenCalled();
+				expect(video.modalInit).not.toHaveBeenCalled();
 			});
 		});
 	});
@@ -680,7 +683,7 @@ describe('Video Plugin', () => {
 			};
 			video.inputX = { value: '100%' };
 			video.inputY = { value: '56.25%' };
-			const mockFigure = require('../../../../src/modules').Figure;
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
 			mockFigure.CreateContainer.mockReturnValue({
 				container: { nodeType: 1 }
 			});
@@ -717,7 +720,7 @@ describe('Video Plugin', () => {
 			};
 			video.inputY = { value: '56.25%', placeholder: '' };
 			// Use select to set #element
-			video.select(mockElement);
+			video.componentSelect(mockElement);
 
 			const file = { name: 'test.mp4', size: 1000 };
 

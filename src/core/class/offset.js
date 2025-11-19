@@ -236,7 +236,7 @@ Offset.prototype = {
 			if (el.scrollTop > 0) {
 				y += el.offsetTop;
 			}
-			if (el.scrollHeight > el.clientHeight) {
+			if (el.scrollHeight >= el.clientHeight) {
 				oh = /^html$/i.test(el.nodeName) ? oh || el.clientHeight : el.clientHeight + (ohel ? -ohel.clientTop : 0);
 				ohOffsetEl = ohel || ohOffsetEl || el;
 				ohel = el;
@@ -244,7 +244,7 @@ Offset.prototype = {
 			if (el.scrollLeft > 0) {
 				x += el.offsetLeft;
 			}
-			if (el.scrollWidth > el.clientWidth) {
+			if (el.scrollWidth >= el.clientWidth) {
 				ow = /^html$/i.test(el.nodeName) ? ow || el.clientWidth : el.clientWidth + (owel ? -owel.clientLeft : 0);
 				owOffsetEl = owel || owOffsetEl || el;
 				owel = el;
@@ -263,14 +263,14 @@ Offset.prototype = {
 				if (el.scrollTop > 0) {
 					y += el.offsetTop;
 				}
-				if (el.scrollHeight > el.clientHeight) {
+				if (el.scrollHeight >= el.clientHeight) {
 					oh = /^html$/i.test(el.nodeName) ? oh || el.clientHeight : el.clientHeight + (ohel ? -ohel.clientTop : 0);
 					ohel = el;
 				}
 				if (el.scrollLeft > 0) {
 					x += el.offsetLeft;
 				}
-				if (el.scrollWidth > el.clientWidth) {
+				if (el.scrollWidth >= el.clientWidth) {
 					ow = /^html$/i.test(el.nodeName) ? ow || el.clientWidth : el.clientWidth + (owel ? -owel.clientLeft : 0);
 					owel = el;
 				}
@@ -288,14 +288,14 @@ Offset.prototype = {
 			if (el.scrollTop > 0) {
 				y += el.offsetTop;
 			}
-			if (el.scrollHeight > el.clientHeight) {
+			if (el.scrollHeight >= el.clientHeight) {
 				oh = /^html$/i.test(el.nodeName) ? oh || el.clientHeight : el.clientHeight + (ohel ? -ohel.clientTop : 0);
 				ohel = el;
 			}
 			if (el.scrollLeft > 0) {
 				x += el.offsetLeft;
 			}
-			if (el.scrollWidth > el.clientWidth) {
+			if (el.scrollWidth >= el.clientWidth) {
 				ow = /^html$/i.test(el.nodeName) ? ow || el.clientWidth : el.clientWidth + (owel ? -owel.clientLeft : 0);
 				owel = el;
 			}

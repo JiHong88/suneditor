@@ -5,7 +5,7 @@
 import Table from '../../../../src/plugins/dropdown/table';
 
 // Mock all required modules
-jest.mock('../../../../src/modules/HueSlider.js', () => ({
+jest.mock('../../../../src/modules/contracts/HueSlider.js', () => ({
     CreateSliderCtx: jest.fn().mockReturnValue({
         slider: { style: {} },
         changeEvent: jest.fn(),
@@ -14,7 +14,7 @@ jest.mock('../../../../src/modules/HueSlider.js', () => ({
     })
 }));
 
-jest.mock('../../../../src/modules/Controller.js', () => jest.fn().mockImplementation(() => ({
+jest.mock('../../../../src/modules/contracts/Controller.js', () => jest.fn().mockImplementation(() => ({
     target: { style: {} },
     init: jest.fn(),
     close: jest.fn(),
@@ -22,7 +22,7 @@ jest.mock('../../../../src/modules/Controller.js', () => jest.fn().mockImplement
     off: jest.fn()
 })));
 
-jest.mock('../../../../src/modules/SelectMenu.js', () => jest.fn().mockImplementation(() => ({
+jest.mock('../../../../src/modules/utils/SelectMenu.js', () => jest.fn().mockImplementation(() => ({
     target: { style: {} },
     init: jest.fn(),
     close: jest.fn(),
@@ -31,21 +31,21 @@ jest.mock('../../../../src/modules/SelectMenu.js', () => jest.fn().mockImplement
     off: jest.fn()
 })));
 
-jest.mock('../../../../src/modules/ColorPicker.js', () => jest.fn().mockImplementation(() => ({
+jest.mock('../../../../src/modules/contracts/ColorPicker.js', () => jest.fn().mockImplementation(() => ({
     target: { style: {} },
     init: jest.fn(),
     close: jest.fn(),
     hueSliderClose: jest.fn()
 })));
 
-jest.mock('../../../../src/modules/Figure.js', () => jest.fn().mockImplementation(() => ({
+jest.mock('../../../../src/modules/contracts/Figure.js', () => jest.fn().mockImplementation(() => ({
     target: { style: {} },
     init: jest.fn(),
     close: jest.fn(),
     open: jest.fn()
 })));
 
-jest.mock('../../../../src/modules/_DragHandle.js', () => ({
+jest.mock('../../../../src/modules/utils/_DragHandle.js', () => ({
     default: jest.fn().mockImplementation(() => ({
         target: { style: {} },
         init: jest.fn(),
@@ -54,7 +54,7 @@ jest.mock('../../../../src/modules/_DragHandle.js', () => ({
     get: jest.fn().mockReturnValue(null)
 }));
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
     Controller: jest.fn().mockImplementation(() => ({
         target: { style: {} },
         init: jest.fn(),
@@ -488,7 +488,7 @@ describe('Plugins - Dropdown - Table', () => {
         });
 
         it('should initialize color list', () => {
-            const { ColorPicker } = require('../../../../src/modules');
+            const { ColorPicker } = require('../../../../src/modules/contracts');
             expect(ColorPicker).toHaveBeenCalledWith(
                 expect.any(Object),
                 '',
@@ -499,7 +499,7 @@ describe('Plugins - Dropdown - Table', () => {
         });
 
         it('should use default color list when none provided', () => {
-            const { ColorPicker } = require('../../../../src/modules');
+            const { ColorPicker } = require('../../../../src/modules/contracts');
             new Table(mockEditor, {});
             // Should use DEFAULT_COLOR_LIST when none provided
             expect(ColorPicker).toHaveBeenCalledWith(
@@ -563,7 +563,7 @@ describe('Plugins - Dropdown - Table', () => {
             it('should select table component', () => {
                 const { dom } = require('../../../../src/helper');
 
-                table.select(mockTable);
+                table.componentSelect(mockTable);
 
                 expect(dom.utils.addClass).toHaveBeenCalled();
             });
@@ -585,7 +585,7 @@ describe('Plugins - Dropdown - Table', () => {
                 const { dom } = require('../../../../src/helper');
                 dom.check.isTableCell.mockReturnValue(true);
 
-                table.select(mockCell);
+                table.componentSelect(mockCell);
 
                 // Method should execute without throwing
                 expect(table).toBeDefined();
@@ -596,7 +596,7 @@ describe('Plugins - Dropdown - Table', () => {
                 expect(() => {
                     // Create a minimal valid target instead of null
                     const validTarget = { style: { tableLayout: 'auto' } };
-                    table.select(validTarget);
+                    table.componentSelect(validTarget);
                 }).not.toThrow();
             });
         });
@@ -610,7 +610,7 @@ describe('Plugins - Dropdown - Table', () => {
                 mockTable.parentNode = mockFigure;
                 const { dom } = require('../../../../src/helper');
 
-                table.destroy(mockTable);
+                table.componentDestroy(mockTable);
 
                 // Method should execute without throwing
                 expect(table).toBeDefined();
@@ -619,7 +619,7 @@ describe('Plugins - Dropdown - Table', () => {
             it('should handle table without figure', () => {
                 const { dom } = require('../../../../src/helper');
 
-                table.destroy(mockTable);
+                table.componentDestroy(mockTable);
 
                 // Method should execute without throwing
                 expect(table).toBeDefined();
@@ -627,7 +627,7 @@ describe('Plugins - Dropdown - Table', () => {
 
             it('should handle null target', () => {
                 expect(() => {
-                    table.destroy(null);
+                    table.componentDestroy(null);
                 }).not.toThrow();
             });
         });
@@ -639,7 +639,7 @@ describe('Plugins - Dropdown - Table', () => {
                 table.selectMenu = { close: jest.fn() };
                 table.colorPicker = { close: jest.fn(), hueSliderClose: jest.fn() };
 
-                table.close();
+                table.controllerClose();
 
                 // Method should execute without throwing
                 expect(table).toBeDefined();
@@ -651,75 +651,9 @@ describe('Plugins - Dropdown - Table', () => {
                 table.colorPicker = null;
 
                 expect(() => {
-                    table.close();
+                    table.controllerClose();
                 }).not.toThrow();
             });
-        });
-    });
-
-    describe('action method', () => {
-        it('should create and insert new table', () => {
-            const { dom } = require('../../../../src/helper');
-
-            table.action();
-
-            // Method should execute without throwing
-            expect(table).toBeDefined();
-        });
-
-        it('should create table with default dimensions', () => {
-            const { dom } = require('../../../../src/helper');
-
-            table.action();
-
-            // Should create a 3x3 table by default
-            // Method should execute without throwing
-            expect(table).toBeDefined();
-        });
-
-        it('should close dropdown menu after creating table', () => {
-            table.action();
-            // Method should execute without throwing
-            expect(table).toBeDefined();
-        });
-    });
-
-    describe('Table structure creation', () => {
-        it('should create table with specified dimensions', () => {
-            const { dom } = require('../../../../src/helper');
-
-            // Mock the action to create 2x2 table
-            table.action();
-
-            // Method should execute without throwing
-            expect(table).toBeDefined();
-        });
-
-        it('should create table with proper styling classes', () => {
-            const { dom } = require('../../../../src/helper');
-
-            table.action();
-
-            // Method should execute without throwing
-            expect(table).toBeDefined();
-        });
-
-        it('should handle different scroll types', () => {
-            table.scrollType = 'y';
-            const { dom } = require('../../../../src/helper');
-
-            table.action();
-
-            expect(dom.utils.createElement).toHaveBeenCalled();
-        });
-
-        it('should create figure wrapper for table', () => {
-            const { dom } = require('../../../../src/helper');
-
-            table.action();
-
-            // Method should execute without throwing
-            expect(table).toBeDefined();
         });
     });
 
@@ -904,37 +838,21 @@ describe('Plugins - Dropdown - Table', () => {
 
     describe('Integration tests', () => {
         it('should work with editor component system', () => {
-            expect(() => {
-                table.action();
-            }).not.toThrow();
+            const mockTarget = {
+                getAttribute: jest.fn().mockReturnValue(null)
+            };
 
-            expect(mockEditor.component.insert).toHaveBeenCalled();
+            expect(() => {
+                table.controllerAction(mockTarget);
+            }).not.toThrow();
         });
 
         it('should work with editor selection system', () => {
             const mockElement = document.createElement('table');
 
             expect(() => {
-                table.select(mockElement);
+                table.componentSelect(mockElement);
             }).not.toThrow();
-        });
-
-        it('should work with editor history system', () => {
-            // Mock the table dimensions - we cannot access private fields directly
-            // but we can test the behavior by mocking numbers.get to return expected values
-            const { numbers } = require('../../../../src/helper');
-            numbers.get.mockReturnValue(50); // Mock the width calculation
-
-            try {
-                table.action();
-            } catch (e) {
-                // If it throws due to empty tableXY, that's expected in test environment
-                // The important thing is that the method structure is correct
-            }
-
-            // The history.push will only be called if the action completes successfully
-            // Since we can't easily set private fields, we'll test component behavior instead
-            expect(mockEditor.component.insert).toHaveBeenCalled();
         });
 
         it('should integrate with menu system', () => {
@@ -1132,10 +1050,10 @@ describe('Plugins - Dropdown - Table', () => {
         });
     });
 
-    describe('onCopyComponent method', () => {
+    describe('componentCopy method', () => {
         it('should be defined', () => {
-            expect(table.onCopyComponent).toBeDefined();
-            expect(typeof table.onCopyComponent).toBe('function');
+            expect(table.componentCopy).toBeDefined();
+            expect(typeof table.componentCopy).toBe('function');
         });
 
         it('should handle copy with no selected cells', () => {
@@ -1145,7 +1063,7 @@ describe('Plugins - Dropdown - Table', () => {
             const mockEvent = {};
 
             expect(() => {
-                table.onCopyComponent({ event: mockEvent, cloneContainer: mockCloneContainer });
+                table.componentCopy({ event: mockEvent, cloneContainer: mockCloneContainer });
             }).not.toThrow();
         });
     });
@@ -1215,7 +1133,7 @@ describe('Plugins - Dropdown - Table', () => {
     describe('Additional utility methods', () => {
         describe('destroy method edge cases', () => {
             it('should return early if target is null', () => {
-                const result = table.destroy(null);
+                const result = table.componentDestroy(null);
                 expect(result).toBeUndefined();
             });
 
@@ -1226,7 +1144,7 @@ describe('Plugins - Dropdown - Table', () => {
                 };
 
                 expect(() => {
-                    table.destroy(mockTarget);
+                    table.componentDestroy(mockTarget);
                 }).not.toThrow();
             });
         });
@@ -1246,7 +1164,7 @@ describe('Plugins - Dropdown - Table', () => {
                 };
 
                 expect(() => {
-                    table.select(mockTarget);
+                    table.componentSelect(mockTarget);
                 }).not.toThrow();
             });
         });
@@ -1290,9 +1208,9 @@ describe('Plugins - Dropdown - Table', () => {
             expect(typeof table.onKeyDown).toBe('function');
         });
 
-        it('should have onCopyComponent handler', () => {
-            expect(table.onCopyComponent).toBeDefined();
-            expect(typeof table.onCopyComponent).toBe('function');
+        it('should have componentCopy handler', () => {
+            expect(table.componentCopy).toBeDefined();
+            expect(typeof table.componentCopy).toBe('function');
         });
 
         it('should have onPaste handler', () => {

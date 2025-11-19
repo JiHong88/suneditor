@@ -1,4 +1,4 @@
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
@@ -10,9 +10,8 @@ import { dom } from '../../helper';
  * @class
  * @description Line height Plugin
  */
-class LineHeight extends EditorInjector {
+class LineHeight extends PluginDropdown {
 	static key = 'lineHeight';
-	static type = 'dropdown';
 	static className = '';
 
 	/**
@@ -38,12 +37,8 @@ class LineHeight extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
 		if (this.format.isLine(element) && element.style.lineHeight.length > 0) {
@@ -56,8 +51,8 @@ class LineHeight extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
+	 * @override
+	 * @type {PluginDropdown['on']}
 	 */
 	on() {
 		const format = this.format.getLine(this.selection.getNode());
@@ -78,10 +73,8 @@ class LineHeight extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
+	 * @override
+	 * @type {PluginDropdown['action']}
 	 */
 	action(target) {
 		const value = target.getAttribute('data-command') || '';

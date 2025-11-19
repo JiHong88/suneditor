@@ -1,4 +1,4 @@
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
@@ -10,9 +10,8 @@ import { dom } from '../../helper';
  * @class
  * @description Text font plugin
  */
-class Font extends EditorInjector {
+class Font extends PluginDropdown {
 	static key = 'font';
-	static type = 'dropdown';
 	static className = 'se-btn-select se-btn-tool-font';
 
 	/**
@@ -40,12 +39,8 @@ class Font extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
 		const targetText = target.querySelector('.se-txt');
@@ -69,9 +64,8 @@ class Font extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {HTMLElement} target Line element at the current cursor position
+	 * @override
+	 * @type {PluginDropdown['on']}
 	 */
 	on(target) {
 		const fontList = this.fontList;
@@ -91,11 +85,8 @@ class Font extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 * @returns {Promise<void>}
+	 * @override
+	 * @type {PluginDropdown['action']}
 	 */
 	async action(target) {
 		let value = target.getAttribute('data-command');

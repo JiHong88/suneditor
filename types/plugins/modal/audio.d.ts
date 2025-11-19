@@ -81,10 +81,7 @@ export type AudioPluginOptions = {
  * @class
  * @description Audio modal plugin.
  */
-declare class Audio_ extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Audio_ extends PluginModal {
 	/**
 	 * @this {Audio_}
 	 * @param {HTMLElement} node - The node to check.
@@ -98,7 +95,6 @@ declare class Audio_ extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: AudioPluginOptions);
 	title: any;
-	icon: string;
 	pluginOptions: {
 		defaultWidth: string;
 		defaultHeight: string;
@@ -129,72 +125,17 @@ declare class Audio_ extends EditorInjector {
 	audioUrlFile: HTMLInputElement;
 	/** @type {HTMLElement} */
 	preview: HTMLElement;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
-	 */
-	open(): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
-	 */
-	on(isUpdate: boolean): void;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "paste" or "drop".
-	 * @param {Object} params { frameContext, event, file }
-	 * @param {SunEditor.FrameContext} params.frameContext Frame context
-	 * @param {ClipboardEvent} params.event Event object
-	 * @param {File} params.file File object
-	 * @returns {boolean} - If return false, the file upload will be canceled
-	 */
-	onFilePasteAndDrop({ file }: { frameContext: SunEditor.FrameContext; event: ClipboardEvent; file: File }): boolean;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {Promise<boolean>} Success or failure
-	 */
-	modalAction(): Promise<boolean>;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
-	 */
-	init(): void;
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
-	 */
-	controllerAction(target: HTMLButtonElement): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLAudioElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
-	 */
 	retainFormat(): {
 		query: string;
-		method: (element: HTMLAudioElement) => void;
+		method: (element: HTMLElement) => void;
 	};
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
-	 */
-	select(target: HTMLElement): void;
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} [target] Target element, if null current selected element
-	 * @returns {Promise<void>}
-	 */
-	destroy(target?: HTMLElement): Promise<void>;
+	onFilePasteAndDrop(params: SunEditor.HookParams.FilePasteDrop): void;
+	modalOn(isUpdate: boolean): void;
+	modalAction(): Promise<boolean>;
+	modalInit(): void;
+	controllerAction(target: HTMLButtonElement): void;
+	componentSelect(target: HTMLElement): void | boolean;
+	componentDestroy(target: HTMLElement): Promise<void>;
 	/**
 	 * @description Create an "audio" component using the provided files.
 	 * @param {FileList|File[]} fileList File object list
@@ -229,8 +170,8 @@ declare class Audio_ extends EditorInjector {
 	): void;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { Modal } from '../../modules';
-import { Controller } from '../../modules';
-import { FileManager } from '../../modules';
-import { Figure } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal } from '../../modules/contracts';
+import { Controller } from '../../modules/contracts';
+import { Figure } from '../../modules/contracts';
+import { FileManager } from '../../modules/utils';

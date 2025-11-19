@@ -9,7 +9,7 @@ import prettierConfig from 'eslint-config-prettier';
 
 export default [
 	{
-		ignores: ['node_modules/', 'dist/', 'sample/', 'coverage/', 'test/', 'webpack/', 'jest.conf.js', '*.css']
+		ignores: ['node_modules/', 'dist/', 'sample/', 'coverage/', 'test/', 'webpack/', '*.js', '**/*.css'],
 	},
 
 	js.configs.recommended,
@@ -18,7 +18,7 @@ export default [
 		plugins: {
 			prettier: prettierPlugin,
 			compat: compatPlugin,
-			'simple-import-sort': simpleImportSortPlugin
+			'simple-import-sort': simpleImportSortPlugin,
 		},
 		languageOptions: {
 			ecmaVersion: 2022,
@@ -30,8 +30,8 @@ export default [
 				ActiveXObject: 'writable',
 				Selection: 'writable',
 				Node: 'writable',
-				Range: 'writable'
-			}
+				Range: 'writable',
+			},
 		},
 		rules: {
 			'compat/compat': 'error',
@@ -50,23 +50,23 @@ export default [
 				{
 					argsIgnorePattern: '^_',
 					varsIgnorePattern: '^_',
-					ignoreRestSiblings: true
-				}
-			]
-		}
+					ignoreRestSiblings: true,
+				},
+			],
+		},
 	},
 
 	{
 		files: ['**/*.ts', '**/*.tsx'],
 		plugins: {
-			'@typescript-eslint': tsPlugin
+			'@typescript-eslint': tsPlugin,
 		},
 		languageOptions: {
 			parser: tsParser,
 			parserOptions: {
 				sourceType: 'module',
-				ecmaVersion: 2022
-			}
+				ecmaVersion: 2022,
+			},
 		},
 		rules: {
 			...tsPlugin.configs['eslint-recommended'].rules,
@@ -79,10 +79,10 @@ export default [
 				{
 					argsIgnorePattern: '^_',
 					varsIgnorePattern: '^_',
-					ignoreRestSiblings: true
-				}
-			]
-		}
+					ignoreRestSiblings: true,
+				},
+			],
+		},
 	},
 
 	{
@@ -92,9 +92,11 @@ export default [
 			'no-unused-private-class-members': 'off',
 			'no-redeclare': 'off',
 			'@typescript-eslint/no-unused-vars': 'off',
+			'@typescript-eslint/no-unsafe-declaration-merging': 'off',
+			'@typescript-eslint/no-empty-object-type': 'off',
 			'simple-import-sort/imports': 'error',
-			'simple-import-sort/exports': 'error'
-		}
+			'simple-import-sort/exports': 'error',
+		},
 	},
 
 	{
@@ -102,15 +104,22 @@ export default [
 		rules: {
 			'no-unused-vars': 'off',
 			'no-redeclare': 'off',
-			'no-console': 'off'
-		}
+			'no-console': 'off',
+		},
+	},
+
+	{
+		files: ['./src/interfaces/*.js', './src/hooks/*.js'],
+		rules: {
+			'no-unused-vars': 'off',
+		},
 	},
 
 	prettierConfig,
 	{
 		files: ['**/*.{js,ts,jsx,tsx}'],
 		plugins: {
-			prettier: prettierPlugin
+			prettier: prettierPlugin,
 		},
 		rules: {
 			'prettier/prettier': [
@@ -132,9 +141,9 @@ export default [
 					tabWidth: 4,
 					trailingComma: 'all',
 					useTabs: true,
-					vueIndentScriptAndStyle: false
-				}
-			]
-		}
-	}
+					vueIndentScriptAndStyle: false,
+				},
+			],
+		},
+	},
 ];

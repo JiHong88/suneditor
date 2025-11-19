@@ -48,10 +48,7 @@ export type TablePluginOptions = {
  * @class
  * @description Table Plugin
  */
-declare class Table extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Table extends PluginDropdownFree {
 	static options: {
 		isInputComponent: boolean;
 	};
@@ -68,7 +65,6 @@ declare class Table extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: TablePluginOptions);
 	title: any;
-	icon: string;
 	figureScrollList: string[];
 	figureScroll: string;
 	captionPosition: string;
@@ -136,116 +132,25 @@ declare class Table extends EditorInjector {
 	 * @type {HTMLTableElement}
 	 */
 	_element: HTMLTableElement;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 */
-	action(): void;
-	/**
-	 * @editorMethod Editor.component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
-	 */
-	select(target: HTMLElement): void;
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
-	 * @returns {Promise<void>}
-	 */
-	destroy(target: HTMLElement): Promise<void>;
-	/**
-	 * @editorMethod Editor.component
-	 * @description Executes the method that is called when a component copy is requested.
-	 * @param {SunEditor.Plugin.CopyComponentParams} params
-	 * @returns {boolean|void}
-	 */
-	onCopyComponent({ event, cloneContainer }: SunEditor.Plugin.CopyComponentParams): boolean | void;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "copy".
-	 * @param {SunEditor.Plugin.PasteParams} params
-	 * @returns {boolean|void}
-	 */
-	onPaste({ event, doc }: SunEditor.Plugin.PasteParams): boolean | void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLTableElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
-	 */
+	componentSelect(target: HTMLElement): void | boolean;
+	componentDestroy(target: HTMLElement): Promise<void>;
+	componentCopy(params: SunEditor.HookParams.CopyComponent): boolean | void;
+	onPaste(params: SunEditor.HookParams.Paste): void | boolean;
 	retainFormat(): {
 		query: string;
-		method: (element: HTMLTableElement) => void;
+		method: (element: HTMLElement) => void;
 	};
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the method called when the rtl, ltr mode changes. ("editor.setDir")
-	 * @param {string} dir Direction ("rtl" or "ltr")
-	 */
 	setDir(dir: string): void;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "mousemove".
-	 * @param {SunEditor.Plugin.MouseEventInfo} params
-	 */
-	onMouseMove({ event }: SunEditor.Plugin.MouseEventInfo): void;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "scroll".
-	 */
-	onScroll(): void;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "mousedown".
-	 * @param {SunEditor.Plugin.MouseEventInfo} params
-	 */
-	onMouseDown({ event }: SunEditor.Plugin.MouseEventInfo): void;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "mouseup".
-	 */
-	onMouseUp(): void;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "mouseleave".
-	 */
-	onMouseLeave(): void;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "keydown".
-	 * @param {SunEditor.Plugin.KeyEventInfo} params
-	 */
-	onKeyDown({ event, range, line }: SunEditor.Plugin.KeyEventInfo): boolean;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "keyup".
-	 * @param {SunEditor.Plugin.KeyEventInfo} params
-	 */
-	onKeyUp({ line }: SunEditor.Plugin.KeyEventInfo): void;
-	/**
-	 * @editorMethod Modules.ColorPicker
-	 * @description Executes the method called when a button of "ColorPicker" module is clicked.
-	 * @param {string} color - Color code (hex)
-	 */
-	colorPickerAction(color: string): void;
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
-	 */
+	onMouseMove(params: SunEditor.HookParams.MouseEvent): void;
+	onScroll(params: SunEditor.HookParams.Scroll): void;
+	onMouseDown(params: SunEditor.HookParams.MouseEvent): void | boolean;
+	onMouseUp(params: SunEditor.HookParams.MouseEvent): void;
+	onMouseLeave(params: SunEditor.HookParams.MouseEvent): void;
+	onKeyDown(params: SunEditor.HookParams.KeyEvent): void | boolean;
+	onKeyUp(params: SunEditor.HookParams.KeyEvent): void | boolean;
+	colorPickerAction(color: SunEditor.Module.HueSlider.Color): void;
 	controllerAction(target: HTMLButtonElement): void;
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method called when the "controller" is closed.
-	 */
-	close(): void;
+	controllerClose(): void;
 	/**
 	 * @description Selects a group of table cells and sets internal state related to multi-cell selection.
 	 * @param {HTMLTableCellElement[]} cells - An array of table cell elements to be selected.
@@ -576,8 +481,8 @@ declare class Table extends EditorInjector {
 	private __removeGlobalEvents;
 	#private;
 }
-import EditorInjector from '../../../editorInjector';
-import { Controller } from '../../../modules';
-import { ColorPicker } from '../../../modules';
-import { Figure } from '../../../modules';
-import { SelectMenu } from '../../../modules';
+import { PluginDropdownFree } from '../../../interfaces';
+import { Controller } from '../../../modules/contracts';
+import { ColorPicker } from '../../../modules/contracts';
+import { Figure } from '../../../modules/contracts';
+import { SelectMenu } from '../../../modules/utils';

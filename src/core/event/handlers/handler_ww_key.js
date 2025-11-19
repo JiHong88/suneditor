@@ -79,7 +79,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 	}
 
 	// plugin event
-	if (this._callPluginEvent('onKeyDown', { frameContext: fc, event: e, range, line: formatEl }) === false) return;
+	if ((await this._callPluginEventAsync('onKeyDown', { frameContext: fc, event: e, range, line: formatEl })) === false) return;
 
 	// reducer / actions
 	/** @type {import('../reducers/keydown.reducer').KeydownReducerCtx} */
@@ -220,7 +220,7 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 	// user event
 	if ((await this.triggerEvent('onKeyUp', { frameContext: fc, event: e })) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onKeyUp', { frameContext: fc, event: e, range, line: formatEl }) === false) return;
+	if ((await this._callPluginEventAsync('onKeyUp', { frameContext: fc, event: e, range, line: formatEl })) === false) return;
 
 	if (keyCodeMap.isHistoryRelevantKey(keyCode)) {
 		this.history.push(true);

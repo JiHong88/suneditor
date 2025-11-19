@@ -14,17 +14,13 @@ export type AlignPluginOptions = {
  * @class
  * @description Align plugin
  */
-declare class Align extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Align extends PluginDropdown {
 	/**
 	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {AlignPluginOptions} pluginOptions - Plugin options
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: AlignPluginOptions);
 	title: any;
-	icon: string;
 	_itemMenu: HTMLUListElement;
 	defaultDir: string;
 	alignIcons: {
@@ -34,33 +30,7 @@ declare class Align extends EditorInjector {
 		center: string;
 	};
 	alignList: NodeListOf<Element>;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
-	 */
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean;
-	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {HTMLElement} target Line element at the current cursor position
-	 */
-	on(target: HTMLElement): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the method called when the rtl, ltr mode changes. ("editor.setDir")
-	 * @param {string} dir Direction ("rtl" or "ltr")
-	 */
+	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
 	setDir(dir: string): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 */
-	action(target: HTMLElement): void;
 }
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';

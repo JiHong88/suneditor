@@ -17,10 +17,7 @@ export type LineHeightPluginOptions = {
  * @class
  * @description Line height Plugin
  */
-declare class LineHeight extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class LineHeight extends PluginDropdown {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -28,29 +25,8 @@ declare class LineHeight extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: LineHeightPluginOptions);
 	title: any;
-	icon: string;
 	sizeList: NodeListOf<Element>;
 	currentSize: any;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
-	 */
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean;
-	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 */
-	on(): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 */
-	action(target: HTMLElement): void;
+	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
 }
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';

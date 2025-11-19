@@ -176,7 +176,7 @@ jest.mock('../../../src/helper', () => {
     };
 });
 
-jest.mock('../../../src/modules', () => ({
+jest.mock('../../../src/modules/contracts', () => ({
     HueSlider: jest.fn().mockImplementation(function() {
         this.get = jest.fn().mockReturnValue({ hex: '#ff0000', r: 255, g: 0, b: 0 });
         this.open = jest.fn();
@@ -186,7 +186,7 @@ jest.mock('../../../src/modules', () => ({
     })
 }));
 
-import ColorPicker from '../../../src/modules/ColorPicker.js';
+import ColorPicker from '../../../src/modules/contracts/ColorPicker.js';
 
 describe('Modules - ColorPicker', () => {
     let mockInst;
@@ -229,6 +229,7 @@ describe('Modules - ColorPicker', () => {
 
         mockInst = {
             editor: mockEditor,
+            form: mockElement, // ColorPicker needs form element
             constructor: {
                 key: 'testColorPicker',
                 name: 'TestColorPicker'
@@ -240,12 +241,13 @@ describe('Modules - ColorPicker', () => {
         it('should use constructor name as fallback for kind', () => {
             const instWithoutKey = {
                 editor: mockEditor,
+                form: mockElement, // ColorPicker needs form element
                 constructor: {
                     name: 'FallbackColorPicker'
                 }
             };
 
-            const colorPicker = new ColorPicker(instWithoutKey, 'color', {});
+            const colorPicker = new ColorPicker(instWithoutKey, 'color', { form: mockElement });
             expect(colorPicker.kind).toBe('FallbackColorPicker');
         });
     });
@@ -254,7 +256,7 @@ describe('Modules - ColorPicker', () => {
         let colorPicker;
 
         beforeEach(() => {
-            colorPicker = new ColorPicker(mockInst, 'color', {});
+            colorPicker = new ColorPicker(mockInst, 'color', { form: mockElement });
         });
 
         it('should initialize with default color list', () => {
@@ -272,7 +274,7 @@ describe('Modules - ColorPicker', () => {
         let colorPicker;
 
         beforeEach(() => {
-            colorPicker = new ColorPicker(mockInst, 'color', {});
+            colorPicker = new ColorPicker(mockInst, 'color', { form: mockElement });
         });
 
         it('should handle color validation', () => {
@@ -292,7 +294,7 @@ describe('Modules - ColorPicker', () => {
         let colorPicker;
 
         beforeEach(() => {
-            colorPicker = new ColorPicker(mockInst, 'color', {});
+            colorPicker = new ColorPicker(mockInst, 'color', { form: mockElement });
         });
 
         it('should have hue slider components', () => {
@@ -333,7 +335,7 @@ describe('Modules - ColorPicker', () => {
                 classList: { add: jest.fn(), remove: jest.fn() }
             };
 
-            colorPicker = new ColorPicker(mockInst, 'color', {});
+            colorPicker = new ColorPicker(mockInst, 'color', { form: mockElement });
             colorPicker.colorList = [mockButton1, mockButton2, mockButton3];
 
             mockTarget = document.createElement('button');
@@ -390,7 +392,7 @@ describe('Modules - ColorPicker', () => {
         let colorPicker;
 
         beforeEach(() => {
-            colorPicker = new ColorPicker(mockInst, 'color', {});
+            colorPicker = new ColorPicker(mockInst, 'color', { form: mockElement });
         });
 
         it('should close hue slider', () => {
@@ -409,23 +411,16 @@ describe('Modules - ColorPicker', () => {
             expect(colorPicker.inputElement.value).toBe('#ff5500');
         });
 
-        it('should handle hueSliderCancelAction with parentForm', () => {
-            const mockForm1 = { style: { display: 'none' } };
-            const mockForm2 = { style: { display: 'none' } };
-            colorPicker.parentForm = [mockForm1, mockForm2];
-            colorPicker.parentFormDisplay = [
-                [mockForm1, 'block'],
-                [mockForm2, 'flex']
-            ];
+        it('should handle hueSliderCancelAction and call callback', () => {
+            mockInst.colorPickerHueSliderClose = jest.fn();
 
             colorPicker.hueSliderCancelAction();
 
-            expect(mockForm1.style.display).toBe('block');
-            expect(mockForm2.style.display).toBe('flex');
+            expect(mockInst.colorPickerHueSliderClose).toHaveBeenCalled();
         });
 
-        it('should handle hueSliderCancelAction without parentForm', () => {
-            colorPicker.parentForm = null;
+        it('should handle hueSliderCancelAction without callback', () => {
+            mockInst.colorPickerHueSliderClose = undefined;
 
             expect(() => {
                 colorPicker.hueSliderCancelAction();
@@ -438,7 +433,7 @@ describe('Modules - ColorPicker', () => {
 
         beforeEach(() => {
             mockInst.colorPickerAction = jest.fn();
-            colorPicker = new ColorPicker(mockInst, 'color', {});
+            colorPicker = new ColorPicker(mockInst, 'color', { form: mockElement });
         });
 
         it('should register event handlers', () => {
@@ -556,7 +551,7 @@ describe('Modules - ColorPicker', () => {
         let colorPicker;
 
         beforeEach(() => {
-            colorPicker = new ColorPicker(mockInst, 'color', {});
+            colorPicker = new ColorPicker(mockInst, 'color', { form: mockElement });
         });
 
         it('should set current color and border color', () => {
@@ -570,6 +565,7 @@ describe('Modules - ColorPicker', () => {
     describe('Constructor with options', () => {
         it('should disable HEX input when option is set', () => {
             const colorPicker = new ColorPicker(mockInst, 'color', {
+                form: mockElement,
                 disableHEXInput: true
             });
 
@@ -581,6 +577,7 @@ describe('Modules - ColorPicker', () => {
 
             expect(() => {
                 new ColorPicker(mockInst, 'color', {
+                    form: mockElement,
                     colorList: customColorList
                 });
             }).not.toThrow();
@@ -589,6 +586,7 @@ describe('Modules - ColorPicker', () => {
         it('should handle custom splitNum', () => {
             expect(() => {
                 new ColorPicker(mockInst, 'color', {
+                    form: mockElement,
                     splitNum: 5
                 });
             }).not.toThrow();
@@ -596,6 +594,7 @@ describe('Modules - ColorPicker', () => {
 
         it('should handle defaultColor option', () => {
             const colorPicker = new ColorPicker(mockInst, 'color', {
+                form: mockElement,
                 defaultColor: '#ff0000'
             });
 
@@ -605,6 +604,7 @@ describe('Modules - ColorPicker', () => {
         it('should handle disableRemove option', () => {
             expect(() => {
                 new ColorPicker(mockInst, 'color', {
+                    form: mockElement,
                     disableRemove: true
                 });
             }).not.toThrow();
@@ -619,6 +619,7 @@ describe('Modules - ColorPicker', () => {
             };
 
             const colorPicker = new ColorPicker(mockInst, 'color', {
+                form: mockElement,
                 hueSliderOptions: hueOptions
             });
 
@@ -629,7 +630,7 @@ describe('Modules - ColorPicker', () => {
     describe('Error handling', () => {
         it('should handle missing element parameter', () => {
             expect(() => {
-                new ColorPicker(mockInst, 'color', {});
+                new ColorPicker(mockInst, 'color', { form: mockElement });
             }).not.toThrow();
         });
 
@@ -639,7 +640,7 @@ describe('Modules - ColorPicker', () => {
             };
 
             expect(() => {
-                new ColorPicker(instWithoutEditor, 'color', {});
+                new ColorPicker(instWithoutEditor, 'color', { form: mockElement });
             }).toThrow();
         });
 
@@ -655,9 +656,10 @@ describe('Modules - ColorPicker', () => {
             };
             const instWithoutAction = {
                 editor: testEditor,
+                form: mockElement,
                 constructor: { key: 'test' }
             };
-            const colorPicker = new ColorPicker(instWithoutAction, 'color', {});
+            const colorPicker = new ColorPicker(instWithoutAction, 'color', { form: mockElement });
 
             // Get submit event handler
             const submitCall = testEventManager.addEvent.mock.calls.find(

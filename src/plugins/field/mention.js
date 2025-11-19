@@ -1,5 +1,6 @@
-import EditorInjector from '../../editorInjector';
-import { ApiManager, SelectMenu, Controller } from '../../modules';
+import { PluginField } from '../../interfaces';
+import { Controller } from '../../modules/contracts';
+import { ApiManager, SelectMenu } from '../../modules/utils';
 import { dom, converter } from '../../helper';
 
 const { debounce } = converter;
@@ -25,9 +26,8 @@ const { debounce } = converter;
  * - Supports fetching mention data from an API or a predefined data array.
  * - Uses caching for optimized performance.
  */
-class Mention extends EditorInjector {
+class Mention extends PluginField {
 	static key = 'mention';
-	static type = 'field';
 	static className = '';
 
 	#lastAtPos;
@@ -83,9 +83,8 @@ class Mention extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "input".
-	 * @returns {Promise<boolean>}
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnInputAsync}
 	 */
 	async onInput() {
 		if (!this.directData) {
@@ -95,7 +94,7 @@ class Mention extends EditorInjector {
 		const sel = this.selection.get();
 		if (!sel.rangeCount) {
 			this.selectMenu.close();
-			return true;
+			return;
 		}
 
 		const anchorNode = sel.anchorNode;
@@ -107,19 +106,19 @@ class Mention extends EditorInjector {
 			const mentionQuery = textBeforeCursor.substring(lastAtPos + 1, anchorOffset);
 			const beforeText = textBeforeCursor[lastAtPos - 1]?.trim();
 			if (!/\s/.test(mentionQuery) && (!beforeText || dom.check.isZeroWidth(beforeText))) {
-				if (mentionQuery.length < this.searchStartLength) return true;
+				if (mentionQuery.length < this.searchStartLength) return;
 
 				const anchorParent = anchorNode.parentNode;
 				if (dom.check.isAnchor(anchorParent) && !anchorParent.getAttribute('data-se-mention')) {
-					return true;
+					return;
 				}
 
 				try {
-					const result = await this.#createMentionList(mentionQuery, anchorNode);
+					await this.#createMentionList(mentionQuery, anchorNode);
 					this.#lastAtPos = lastAtPos;
 					this.#anchorNode = anchorNode;
 					this.#anchorOffset = anchorOffset;
-					return !result;
+					return;
 				} catch (error) {
 					console.warn('[SUNEDITOR.mention.api.file] ', error);
 				}
@@ -127,7 +126,6 @@ class Mention extends EditorInjector {
 		}
 
 		this.selectMenu.close();
-		return true;
 	}
 
 	/**

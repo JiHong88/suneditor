@@ -159,7 +159,7 @@ Viewer.prototype = {
 		const arrow = this.context.get('toolbar_arrow');
 
 		this.ui._offCurrentController();
-		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.editor.toolbar._inlineToolbarAttr.isShow);
+		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar._inlineToolbarAttr.isShow);
 
 		if (value) {
 			this._originCssText = topArea.style.cssText;
@@ -271,11 +271,11 @@ Viewer.prototype = {
 			this.editor.isInline = this.toolbar._isInline = this.fullScreenInline;
 			this.editor.isBalloon = this.toolbar._isBalloon = this.fullScreenBalloon;
 			if (!fc.get('isCodeView')) {
-				if (this.editor.isInline) this.editor.toolbar._showInline();
-				else if (this.editor.isBalloon) this.editor.toolbar._showBalloon();
+				if (this.editor.isInline) this.toolbar._showInline();
+				else if (this.editor.isBalloon) this.toolbar._showBalloon();
 			}
 
-			this.editor.toolbar._resetSticky();
+			this.toolbar._resetSticky();
 			fc.get('topArea').style.marginTop = '';
 
 			const expansionIcon = this.icons.expansion;
@@ -285,7 +285,7 @@ Viewer.prototype = {
 			});
 		}
 
-		if (wasToolbarHidden && !fc.get('isCodeView')) this.editor.toolbar.hide();
+		if (wasToolbarHidden && !fc.get('isCodeView')) this.toolbar.hide();
 
 		// user event
 		this.triggerEvent('onToggleFullScreen', { frameContext: fc, is: fc.get('isFullScreen') });

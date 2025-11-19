@@ -1,6 +1,5 @@
 import type {} from '../../typedef';
 export default Link;
-export type ModalAnchorEditorParams_link = import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams;
 export type LinkOptions = {
 	/**
 	 * - The URL endpoint for file uploads.
@@ -25,10 +24,7 @@ export type LinkOptions = {
 	 */
 	acceptedFormats?: string;
 };
-export type LinkPluginOptions = Omit<LinkOptions & ModalAnchorEditorParams_link, ''>;
-/**
- * @typedef {import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams} ModalAnchorEditorParams_link
- */
+export type LinkPluginOptions = Omit<LinkOptions & import('../../modules/utils/ModalAnchorEditor').ModalAnchorEditorParams, ''>;
 /**
  * @typedef {Object} LinkOptions
  * @property {string} [uploadUrl] - The URL endpoint for file uploads.
@@ -38,7 +34,7 @@ export type LinkPluginOptions = Omit<LinkOptions & ModalAnchorEditorParams_link,
  * @property {string} [acceptedFormats] - Accepted file formats for link uploads.
  */
 /**
- * @typedef {Omit<LinkOptions & ModalAnchorEditorParams_link, ''>} LinkPluginOptions
+ * @typedef {Omit<LinkOptions & import('../../modules/utils/ModalAnchorEditor').ModalAnchorEditorParams, ''>} LinkPluginOptions
  */
 /**
  * @class
@@ -46,10 +42,7 @@ export type LinkPluginOptions = Omit<LinkOptions & ModalAnchorEditorParams_link,
  * - This plugin provides link insertion and editing functionality within the editor.
  * - It also supports file uploads if an upload URL is provided.
  */
-declare class Link extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Link extends PluginModal {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -57,7 +50,6 @@ declare class Link extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: LinkPluginOptions);
 	title: any;
-	icon: string;
 	target: HTMLAnchorElement;
 	isUpdateState: boolean;
 	pluginOptions: {
@@ -103,50 +95,15 @@ declare class Link extends EditorInjector {
 	anchor: ModalAnchorEditor;
 	modal: Modal;
 	controller: Controller;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
-	 */
-	active(element?: HTMLElement | null): boolean;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
-	 */
-	open(): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
-	 */
-	on(isUpdate: boolean): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {boolean} Success or failure
-	 */
-	modalAction(): boolean;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
-	 */
-	init(): void;
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
-	 */
+	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	modalOn(isUpdate: boolean): void;
+	modalAction(): Promise<boolean>;
+	modalInit(): void;
 	controllerAction(target: HTMLButtonElement): void;
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description This function is called before the "controller" before it is closed.
-	 */
-	close(): void;
+	controllerClose(): void;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { ModalAnchorEditor } from '../../modules';
-import { Modal } from '../../modules';
-import { Controller } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal } from '../../modules/contracts';
+import { Controller } from '../../modules/contracts';
+import { ModalAnchorEditor } from '../../modules/utils';

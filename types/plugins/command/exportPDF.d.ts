@@ -19,10 +19,7 @@ export type ExportPDFPluginOptions = {
  * @class
  * @description Export PDF plugin
  */
-declare class ExportPDF extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class ExportPDF extends PluginCommand {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -30,18 +27,10 @@ declare class ExportPDF extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: ExportPDFPluginOptions);
 	title: any;
-	icon: string;
 	apiUrl: string;
 	fileName: string;
 	apiManager: ApiManager;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - It is executed by clicking a toolbar "command" button or calling an API.
-	 * @returns {Promise<void>}
-	 */
-	action(): Promise<void>;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { ApiManager } from '../../modules';
+import { PluginCommand } from '../../interfaces';
+import { ApiManager } from '../../modules/utils';

@@ -1,6 +1,6 @@
-import EditorInjector from '../../editorInjector';
+import { PluginCommand } from '../../interfaces';
 import { dom, env } from '../../helper';
-import { ApiManager } from '../../modules';
+import { ApiManager } from '../../modules/utils';
 
 const { _w, _d } = env;
 
@@ -14,9 +14,8 @@ const { _w, _d } = env;
  * @class
  * @description Export PDF plugin
  */
-class ExportPDF extends EditorInjector {
+class ExportPDF extends PluginCommand {
 	static key = 'exportPDF';
-	static type = 'command';
 	static className = 'se-component-enabled';
 
 	/**
@@ -50,10 +49,8 @@ class ExportPDF extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - It is executed by clicking a toolbar "command" button or calling an API.
-	 * @returns {Promise<void>}
+	 * @override
+	 * @type {PluginCommand['action']}
 	 */
 	async action() {
 		if (!this.apiUrl) {

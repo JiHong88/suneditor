@@ -43,7 +43,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn()
@@ -60,7 +60,10 @@ jest.mock('../../../../src/modules', () => ({
 				target: ''
 			})
 		}
-	})),
+	}))
+}));
+
+jest.mock('../../../../src/modules/utils', () => ({
 	ModalAnchorEditor: jest.fn().mockImplementation(() => ({
 		on: jest.fn(),
 		set: jest.fn(),
@@ -104,6 +107,11 @@ jest.mock('../../../../src/helper', () => ({
 	},
 	numbers: {
 		get: jest.fn((val, def) => val || def)
+	},
+	env: {
+		isTouchDevice: false,
+		_w: global.window || {},
+		ON_OVER_COMPONENT: 'data-se-on-over-component'
 	}
 }));
 
@@ -158,7 +166,7 @@ describe('Link Plugin', () => {
 
 	describe('Constructor', () => {
 
-		it('should initialize with upload options', () => {
+		it('should initialize with upload options', async () => {
 			const linkWithUpload = new Link(mockEditor, {
 				uploadUrl: 'http://example.com/upload',
 				uploadHeaders: { 'X-Custom': 'header' },
@@ -172,13 +180,13 @@ describe('Link Plugin', () => {
 			expect(linkWithUpload.pluginOptions.uploadHeaders).toEqual({ 'X-Custom': 'header' });
 		});
 
-		it('should handle missing upload options', () => {
+		it('should handle missing upload options', async () => {
 			const linkNoUpload = new Link(mockEditor, {});
 			expect(linkNoUpload.pluginOptions.uploadUrl).toBeNull();
 			expect(linkNoUpload.pluginOptions.enableFileUpload).toBe(false);
 		});
 
-		it('should initialize modules', () => {
+		it('should initialize modules', async () => {
 			expect(link.modal).toBeDefined();
 			expect(link.controller).toBeDefined();
 			expect(link.anchor).toBeDefined();
@@ -186,7 +194,7 @@ describe('Link Plugin', () => {
 	});
 
 	describe('active method', () => {
-		it('should return false for non-anchor elements', () => {
+		it('should return false for non-anchor elements', async () => {
 			const { dom } = require('../../../../src/helper');
 			dom.check.isAnchor.mockReturnValue(false);
 
@@ -197,7 +205,7 @@ describe('Link Plugin', () => {
 			expect(link.controller.close).toHaveBeenCalled();
 		});
 
-		it('should return false for anchor with data-se-non-link attribute', () => {
+		it('should return false for anchor with data-se-non-link attribute', async () => {
 			const { dom } = require('../../../../src/helper');
 			dom.check.isAnchor.mockReturnValue(true);
 
@@ -212,7 +220,7 @@ describe('Link Plugin', () => {
 			expect(result).toBe(false);
 		});
 
-		it('should activate controller for valid link', () => {
+		it('should activate controller for valid link', async () => {
 			const { dom } = require('../../../../src/helper');
 			dom.check.isAnchor.mockReturnValue(true);
 
@@ -233,7 +241,7 @@ describe('Link Plugin', () => {
 			expect(link.target).toBe(mockElement);
 		});
 
-		it('should handle anchor link with hash', () => {
+		it('should handle anchor link with hash', async () => {
 			const { dom } = require('../../../../src/helper');
 			dom.check.isAnchor.mockReturnValue(true);
 
@@ -253,7 +261,7 @@ describe('Link Plugin', () => {
 	});
 
 	describe('open method', () => {
-		it('should open modal', () => {
+		it('should open modal', async () => {
 			link.open();
 
 			expect(link.modal.open).toHaveBeenCalled();
@@ -261,15 +269,15 @@ describe('Link Plugin', () => {
 	});
 
 	describe('on method', () => {
-		it('should set update state and call anchor.on', () => {
-			link.on(true);
+		it('should set update state and call anchor.on', async () => {
+			link.modalOn(true);
 
 			expect(link.isUpdateState).toBe(true);
 			expect(link.anchor.on).toHaveBeenCalledWith(true);
 		});
 
-		it('should handle non-update state', () => {
-			link.on(false);
+		it('should handle non-update state', async () => {
+			link.modalOn(false);
 
 			expect(link.isUpdateState).toBe(false);
 			expect(link.anchor.on).toHaveBeenCalledWith(false);
@@ -277,15 +285,15 @@ describe('Link Plugin', () => {
 	});
 
 	describe('modalAction method', () => {
-		it('should return false if anchor creation fails', () => {
+		it('should return false if anchor creation fails', async () => {
 			link.anchor.create = jest.fn().mockReturnValue(null);
 
-			const result = link.modalAction();
+			const result = await await link.modalAction();
 
 			expect(result).toBe(false);
 		});
 
-		it('should insert new link for non-update state', () => {
+		it('should insert new link for non-update state', async () => {
 			link.isUpdateState = false;
 			const mockAnchor = {
 				tagName: 'A',
@@ -295,7 +303,7 @@ describe('Link Plugin', () => {
 			};
 			link.anchor.create = jest.fn().mockReturnValue(mockAnchor);
 
-			const result = link.modalAction();
+			const result = await await link.modalAction();
 
 			expect(result).toBe(true);
 			expect(mockEditor.html.insertNode).toHaveBeenCalled();
@@ -303,7 +311,7 @@ describe('Link Plugin', () => {
 			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
 		});
 
-		it('should handle multiple selected lines', () => {
+		it('should handle multiple selected lines', async () => {
 			link.isUpdateState = false;
 			mockEditor.format.getLines.mockReturnValue([
 				{ nodeName: 'P' },
@@ -317,12 +325,12 @@ describe('Link Plugin', () => {
 			};
 			link.anchor.create = jest.fn().mockReturnValue(mockAnchor);
 
-			link.modalAction();
+			await link.modalAction();
 
 			expect(mockEditor.html.insertNode).toHaveBeenCalled();
 		});
 
-		it('should update existing link', () => {
+		it('should update existing link', async () => {
 			link.isUpdateState = true;
 			link.controller.currentTarget = {
 				childNodes: [{ textContent: 'Old Link' }]
@@ -335,14 +343,14 @@ describe('Link Plugin', () => {
 			};
 			link.anchor.create = jest.fn().mockReturnValue(mockAnchor);
 
-			const result = link.modalAction();
+			const result = await await link.modalAction();
 
 			expect(result).toBe(true);
 			expect(mockEditor.selection.setRange).toHaveBeenCalled();
 			expect(mockEditor.history.push).toHaveBeenCalledWith(false);
 		});
 
-		it('should return true if insertNode fails', () => {
+		it('should return true if insertNode fails', async () => {
 			link.isUpdateState = false;
 			mockEditor.html.insertNode.mockReturnValue(false);
 
@@ -353,15 +361,15 @@ describe('Link Plugin', () => {
 			};
 			link.anchor.create = jest.fn().mockReturnValue(mockAnchor);
 
-			const result = link.modalAction();
+			const result = await await link.modalAction();
 
 			expect(result).toBe(true);
 		});
 	});
 
 	describe('init method', () => {
-		it('should close controller and init anchor', () => {
-			link.init();
+		it('should close controller and init anchor', async () => {
+			link.modalInit();
 
 			expect(link.controller.close).toHaveBeenCalled();
 			expect(link.anchor.init).toHaveBeenCalled();
@@ -379,7 +387,7 @@ describe('Link Plugin', () => {
 			link.controller.currentTarget = document.createElement('a');
 		});
 
-		it('should copy link', () => {
+		it('should copy link', async () => {
 			mockTarget.getAttribute.mockReturnValue('copy');
 
 			link.controllerAction(mockTarget);
@@ -387,7 +395,7 @@ describe('Link Plugin', () => {
 			expect(mockEditor.html.copy).toHaveBeenCalledWith(link.target);
 		});
 
-		it('should open modal for update', () => {
+		it('should open modal for update', async () => {
 			mockTarget.getAttribute.mockReturnValue('update');
 
 			link.controllerAction(mockTarget);
@@ -395,7 +403,7 @@ describe('Link Plugin', () => {
 			expect(link.modal.open).toHaveBeenCalled();
 		});
 
-		it('should unlink the link', () => {
+		it('should unlink the link', async () => {
 			mockTarget.getAttribute.mockReturnValue('unlink');
 
 			link.controllerAction(mockTarget);
@@ -407,7 +415,7 @@ describe('Link Plugin', () => {
 			);
 		});
 
-		it('should delete the link', () => {
+		it('should delete the link', async () => {
 			mockTarget.getAttribute.mockReturnValue('delete');
 			const { dom } = require('../../../../src/helper');
 
@@ -423,41 +431,28 @@ describe('Link Plugin', () => {
 		});
 	});
 
-	describe('close method', () => {
-		it('should remove "on" class from current target', () => {
-			const { dom } = require('../../../../src/helper');
-			link.controller.currentTarget = document.createElement('a');
-
-			link.close();
-
-			expect(dom.utils.removeClass).toHaveBeenCalledWith(
-				link.controller.currentTarget,
-				'on'
-			);
-		});
-	});
 
 	describe('Integration scenarios', () => {
-		it('should handle complete link creation flow', () => {
+		it('should handle complete link creation flow', async () => {
 			// Open modal
 			link.open();
 			expect(link.modal.open).toHaveBeenCalled();
 
 			// Set non-update state
-			link.on(false);
+			link.modalOn(false);
 			expect(link.isUpdateState).toBe(false);
 
 			// Submit modal
-			const result = link.modalAction();
+			const result = await await link.modalAction();
 			expect(result).toBe(true);
 			expect(mockEditor.history.push).toHaveBeenCalled();
 
 			// Close/init
-			link.init();
+			link.modalInit();
 			expect(link.controller.close).toHaveBeenCalled();
 		});
 
-		it('should handle complete link update flow', () => {
+		it('should handle complete link update flow', async () => {
 			const { dom } = require('../../../../src/helper');
 			dom.check.isAnchor.mockReturnValue(true);
 
@@ -474,14 +469,14 @@ describe('Link Plugin', () => {
 			expect(link.target).toBe(mockElement);
 
 			// Open for edit
-			link.on(true);
+			link.modalOn(true);
 			expect(link.isUpdateState).toBe(true);
 
 			// Update
 			link.controller.currentTarget = {
 				childNodes: [{ textContent: 'Old Link' }]
 			};
-			link.modalAction();
+			await link.modalAction();
 			expect(mockEditor.history.push).toHaveBeenCalled();
 		});
 	});

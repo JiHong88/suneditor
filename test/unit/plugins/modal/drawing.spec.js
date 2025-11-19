@@ -34,7 +34,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
 	Modal: jest.fn().mockImplementation((plugin, modalEl) => {
 		// Setup proper querySelector support for modal
 		if (!modalEl.querySelector) {
@@ -190,7 +190,7 @@ describe('Drawing Plugin', () => {
 	});
 
 	describe('Static properties', () => {
-		it('should have correct static properties', () => {
+		it('should have correct static properties', async () => {
 			expect(Drawing.key).toBe('drawing');
 			expect(Drawing.type).toBe('modal');
 			expect(Drawing.className).toBe('');
@@ -198,7 +198,7 @@ describe('Drawing Plugin', () => {
 	});
 
 	describe('Constructor', () => {
-		it('should create Drawing instance with default options', () => {
+		it('should create Drawing instance with default options', async () => {
 			drawing = new Drawing(mockEditor, {});
 
 			expect(drawing.title).toBe('Drawing');
@@ -210,7 +210,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.pluginOptions.maintainRatio).toBe(true);
 		});
 
-		it('should create Drawing instance with custom options', () => {
+		it('should create Drawing instance with custom options', async () => {
 			drawing = new Drawing(mockEditor, {
 				outputFormat: 'svg',
 				useFormatType: true,
@@ -242,17 +242,17 @@ describe('Drawing Plugin', () => {
 			expect(drawing.pluginOptions.formSize.height).toBe('400px');
 		});
 
-		it('should normalize invalid lineCap to "round"', () => {
+		it('should normalize invalid lineCap to "round"', async () => {
 			drawing = new Drawing(mockEditor, { lineCap: 'invalid' });
 			expect(drawing.pluginOptions.lineCap).toBe('round');
 		});
 
-		it('should normalize invalid defaultFormatType to "block"', () => {
+		it('should normalize invalid defaultFormatType to "block"', async () => {
 			drawing = new Drawing(mockEditor, { defaultFormatType: 'invalid' });
 			expect(drawing.pluginOptions.defaultFormatType).toBe('block');
 		});
 
-		it('should warn if image plugin is not available', () => {
+		it('should warn if image plugin is not available', async () => {
 			const editorNoImage = { ...mockEditor, plugins: {} };
 			drawing = new Drawing(editorNoImage, {});
 
@@ -261,7 +261,7 @@ describe('Drawing Plugin', () => {
 			);
 		});
 
-		it('should warn if SVG output is used without uploadUrl', () => {
+		it('should warn if SVG output is used without uploadUrl', async () => {
 			const editorNoUpload = {
 				...mockEditor,
 				plugins: {
@@ -277,12 +277,12 @@ describe('Drawing Plugin', () => {
 			);
 		});
 
-		it('should initialize modal', () => {
+		it('should initialize modal', async () => {
 			drawing = new Drawing(mockEditor, {});
 			expect(drawing.modal).toBeDefined();
 		});
 
-		it('should initialize drawing state', () => {
+		it('should initialize drawing state', async () => {
 			drawing = new Drawing(mockEditor, {});
 			expect(drawing.canvas).toBeNull();
 			expect(drawing.ctx).toBeNull();
@@ -292,7 +292,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.resizeObserver).toBeNull();
 		});
 
-		it('should setup format type buttons when useFormatType is true', () => {
+		it('should setup format type buttons when useFormatType is true', async () => {
 			drawing = new Drawing(mockEditor, { useFormatType: true });
 			// asBlock and asInline should be populated by querySelector in constructor
 			expect(drawing.asBlock).toBeTruthy();
@@ -305,7 +305,7 @@ describe('Drawing Plugin', () => {
 			drawing = new Drawing(mockEditor, {});
 		});
 
-		it('should open modal and initialize drawing', () => {
+		it('should open modal and initialize drawing', async () => {
 			// Mock canvas element
 			const mockCanvas = createMockCanvas();
 
@@ -320,7 +320,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.canvas.height).toBe(400);
 		});
 
-		it('should use default format type when opening', () => {
+		it('should use default format type when opening', async () => {
 			const { dom } = require('../../../../src/helper');
 			drawing = new Drawing(mockEditor, { useFormatType: true, defaultFormatType: 'block' });
 
@@ -341,7 +341,7 @@ describe('Drawing Plugin', () => {
 			expect(dom.utils.addClass).toHaveBeenCalled();
 		});
 
-		it('should keep format type when keepFormatType is true', () => {
+		it('should keep format type when keepFormatType is true', async () => {
 			drawing = new Drawing(mockEditor, { useFormatType: true, keepFormatType: true, defaultFormatType: 'inline' });
 			drawing.as = 'inline';
 
@@ -390,8 +390,8 @@ describe('Drawing Plugin', () => {
 			drawing.open();
 		});
 
-		it('should destroy drawing and clean up', () => {
-			drawing.off();
+		it('should destroy drawing and clean up', async () => {
+			drawing.modalOff();
 
 			expect(drawing.canvas).toBeNull();
 			expect(drawing.ctx).toBeNull();
@@ -400,14 +400,14 @@ describe('Drawing Plugin', () => {
 			expect(drawing.isDrawing).toBe(false);
 		});
 
-		it('should remove event listeners', () => {
+		it('should remove event listeners', async () => {
 			const mockEventManager = drawing.eventManager;
-			drawing.off();
+			drawing.modalOff();
 
 			expect(mockEventManager.removeEvent).toHaveBeenCalled();
 		});
 
-		it('should disconnect ResizeObserver if exists', () => {
+		it('should disconnect ResizeObserver if exists', async () => {
 			const { env } = require('../../../../src/helper');
 			env.isResizeObserverSupported = true;
 
@@ -426,7 +426,7 @@ describe('Drawing Plugin', () => {
 			drawing.open();
 
 			const mockObserver = drawing.resizeObserver;
-			drawing.off();
+			drawing.modalOff();
 
 			if (mockObserver) {
 				expect(mockObserver.disconnect).toHaveBeenCalled();
@@ -463,8 +463,8 @@ describe('Drawing Plugin', () => {
 			drawing.open();
 		});
 
-		it('should create dataurl image as block by default', () => {
-			const result = drawing.modalAction();
+		it('should create dataurl image as block by default', async () => {
+			const result = await drawing.modalAction();
 
 			expect(mockEditor.plugins.image.init).toHaveBeenCalled();
 			expect(mockEditor.plugins.image.create).toHaveBeenCalledWith(
@@ -479,9 +479,9 @@ describe('Drawing Plugin', () => {
 			expect(result).toBe(true);
 		});
 
-		it('should create dataurl image as inline when as is "inline"', () => {
+		it('should create dataurl image as inline when as is "inline"', async () => {
 			drawing.as = 'inline';
-			const result = drawing.modalAction();
+			const result = await drawing.modalAction();
 
 			expect(mockEditor.plugins.image.init).toHaveBeenCalled();
 			expect(mockEditor.plugins.image.createInline).toHaveBeenCalledWith(
@@ -496,7 +496,7 @@ describe('Drawing Plugin', () => {
 			expect(result).toBe(true);
 		});
 
-		it('should submit SVG file when outputFormat is svg', () => {
+		it('should submit SVG file when outputFormat is svg', async () => {
 			drawing = new Drawing(mockEditor, { outputFormat: 'svg' });
 
 			const mockCanvas = createMockCanvas();
@@ -521,7 +521,7 @@ describe('Drawing Plugin', () => {
 			// Add some paths
 			drawing.paths = [[[10, 10], [20, 20], [30, 30]]];
 
-			const result = drawing.modalAction();
+			const result = await drawing.modalAction();
 
 			expect(mockEditor.plugins.image.init).toHaveBeenCalled();
 			expect(mockEditor.plugins.image.submitFile).toHaveBeenCalled();
@@ -560,7 +560,7 @@ describe('Drawing Plugin', () => {
 			drawing.open();
 		});
 
-		it('should handle mousedown event', () => {
+		it('should handle mousedown event', async () => {
 			const mouseEvent = {
 				preventDefault: jest.fn(),
 				offsetX: 100,
@@ -578,7 +578,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.points).toContainEqual([100, 150]);
 		});
 
-		it('should handle mousemove event while drawing', () => {
+		it('should handle mousemove event while drawing', async () => {
 			drawing.isDrawing = true;
 			drawing.points = [[50, 50]];
 
@@ -599,7 +599,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.points).toContainEqual([100, 150]);
 		});
 
-		it('should not draw on mousemove when not drawing', () => {
+		it('should not draw on mousemove when not drawing', async () => {
 			drawing.isDrawing = false;
 			const initialLength = drawing.points.length;
 
@@ -618,7 +618,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.points.length).toBe(initialLength);
 		});
 
-		it('should handle mouseup event', () => {
+		it('should handle mouseup event', async () => {
 			drawing.isDrawing = true;
 			drawing.points = [[50, 50], [100, 100]];
 
@@ -633,7 +633,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.points).toEqual([]);
 		});
 
-		it('should handle mouseleave event without lineReconnect', () => {
+		it('should handle mouseleave event without lineReconnect', async () => {
 			drawing.isDrawing = true;
 			drawing.points = [[50, 50], [100, 100]];
 
@@ -648,7 +648,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.points).toEqual([]);
 		});
 
-		it('should handle mouseleave event with lineReconnect', () => {
+		it('should handle mouseleave event with lineReconnect', async () => {
 			drawing = new Drawing(mockEditor, { lineReconnect: true });
 
 			const mockCanvas = createMockCanvas();
@@ -689,7 +689,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.paths.length).toBe(1);
 		});
 
-		it('should handle mouseenter event without lineReconnect', () => {
+		it('should handle mouseenter event without lineReconnect', async () => {
 			drawing.paths = [[[50, 50], [100, 100]]];
 
 			const mouseEvent = {
@@ -708,7 +708,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.points).toContainEqual([150, 200]);
 		});
 
-		it('should handle mouseenter event with lineReconnect', () => {
+		it('should handle mouseenter event with lineReconnect', async () => {
 			drawing = new Drawing(mockEditor, { lineReconnect: true });
 
 			const mockCanvas = createMockCanvas();
@@ -754,7 +754,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.points.length).toBeGreaterThan(0);
 		});
 
-		it('should handle touchstart event', () => {
+		it('should handle touchstart event', async () => {
 			const touchEvent = {
 				preventDefault: jest.fn(),
 				touches: [{ clientX: 100, clientY: 150 }]
@@ -770,7 +770,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.isDrawing).toBe(true);
 		});
 
-		it('should handle touchmove event while drawing', () => {
+		it('should handle touchmove event while drawing', async () => {
 			drawing.isDrawing = true;
 			drawing.points = [[50, 50]];
 
@@ -789,7 +789,7 @@ describe('Drawing Plugin', () => {
 			expect(drawing.points.length).toBeGreaterThan(1);
 		});
 
-		it('should not draw on touchmove when not drawing', () => {
+		it('should not draw on touchmove when not drawing', async () => {
 			drawing.isDrawing = false;
 			const initialLength = drawing.points.length;
 
@@ -832,7 +832,7 @@ describe('Drawing Plugin', () => {
 			drawing.open();
 		});
 
-		it('should clear canvas on remove button click', () => {
+		it('should clear canvas on remove button click', async () => {
 			drawing.points = [[10, 10], [20, 20]];
 			drawing.paths = [[[30, 30], [40, 40]]];
 
@@ -866,7 +866,7 @@ describe('Drawing Plugin', () => {
 			drawing.modal.form.querySelector = jest.fn().mockReturnValue(mockCanvas);
 		});
 
-		it('should switch to inline format', () => {
+		it('should switch to inline format', async () => {
 			const { dom } = require('../../../../src/helper');
 
 			const mockEvent = {
@@ -886,7 +886,7 @@ describe('Drawing Plugin', () => {
 			}
 		});
 
-		it('should switch to block format', () => {
+		it('should switch to block format', async () => {
 			const { dom } = require('../../../../src/helper');
 			drawing.as = 'inline';
 
@@ -909,7 +909,7 @@ describe('Drawing Plugin', () => {
 	});
 
 	describe('ResizeObserver integration', () => {
-		it('should setup ResizeObserver when supported', () => {
+		it('should setup ResizeObserver when supported', async () => {
 			const { env } = require('../../../../src/helper');
 			env.isResizeObserverSupported = true;
 
@@ -940,7 +940,7 @@ describe('Drawing Plugin', () => {
 			env.isResizeObserverSupported = false;
 		});
 
-		it('should adjust paths on resize with maintainRatio', () => {
+		it('should adjust paths on resize with maintainRatio', async () => {
 			const { env } = require('../../../../src/helper');
 			env.isResizeObserverSupported = true;
 
@@ -981,7 +981,7 @@ describe('Drawing Plugin', () => {
 			env.isResizeObserverSupported = false;
 		});
 
-		it('should not adjust paths on resize without maintainRatio', () => {
+		it('should not adjust paths on resize without maintainRatio', async () => {
 			const { env } = require('../../../../src/helper');
 			env.isResizeObserverSupported = true;
 
@@ -1023,7 +1023,7 @@ describe('Drawing Plugin', () => {
 			env.isResizeObserverSupported = false;
 		});
 
-		it('should disconnect existing ResizeObserver when opening again', () => {
+		it('should disconnect existing ResizeObserver when opening again', async () => {
 			const { env } = require('../../../../src/helper');
 			env.isResizeObserverSupported = true;
 
@@ -1050,7 +1050,7 @@ describe('Drawing Plugin', () => {
 	});
 
 	describe('Integration scenarios', () => {
-		it('should handle complete drawing flow', () => {
+		it('should handle complete drawing flow', async () => {
 			drawing = new Drawing(mockEditor, {});
 
 			const mockCanvas = createMockCanvas();
@@ -1102,12 +1102,12 @@ describe('Drawing Plugin', () => {
 			expect(drawing.paths.length).toBe(1);
 
 			// Submit
-			const result = drawing.modalAction();
+			const result = await drawing.modalAction();
 			expect(result).toBe(true);
 			expect(mockEditor.plugins.image.create).toHaveBeenCalled();
 
 			// Close
-			drawing.off();
+			drawing.modalOff();
 			expect(drawing.canvas).toBeNull();
 		});
 	});

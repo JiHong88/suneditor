@@ -126,7 +126,7 @@ describe('Offset', () => {
 	});
 
 	describe('getWWScroll', () => {
-		it('should get wysiwyg scroll info', () => {
+		it('should get wysiwyg scroll info without rects (removed in commit 9f43ca04)', () => {
 			wysiwyg.innerHTML = '<p>test</p>';
 
 			const result = offset.getWWScroll();
@@ -137,7 +137,8 @@ describe('Offset', () => {
 			expect(result.width).toBeDefined();
 			expect(result.height).toBeDefined();
 			expect(result.bottom).toBeDefined();
-			expect(result.rects).toBeDefined();
+			// IMPORTANT: rects property was removed in commit 9f43ca04
+			expect(result.rects).toBeUndefined();
 		});
 
 		it('should calculate bottom position', () => {

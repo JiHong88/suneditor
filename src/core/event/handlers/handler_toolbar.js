@@ -53,13 +53,13 @@ export function ButtonsHandler(e) {
 			if (this.__inputBlurEvent) this.__removeInput();
 
 			// blur event
-			if (typeof plugin.onInputChange === 'function') this.__inputPlugin = { obj: plugin, target: eventTarget, value: eventTarget.value };
+			if (typeof plugin.toolbarInputChange === 'function') this.__inputPlugin = { obj: plugin, target: eventTarget, value: eventTarget.value };
 			this.__inputBlurEvent = this.addEvent(eventTarget, 'blur', (ev) => {
 				if (plugin.isInputActive) return;
 
 				try {
 					const value = eventTarget.value.trim();
-					if (typeof plugin.onInputChange === 'function' && value !== this.__inputPlugin.value) plugin.onInputChange({ target: eventTarget, value, event: ev });
+					if (typeof plugin.toolbarInputChange === 'function' && value !== this.__inputPlugin.value) plugin.toolbarInputChange({ target: eventTarget, value, event: ev });
 				} finally {
 					this._w.setTimeout(() => (this._inputFocus = false), 0);
 					this.__removeInput();
@@ -69,15 +69,15 @@ export function ButtonsHandler(e) {
 			if (!plugin) return;
 
 			// keydown event
-			if (typeof plugin.onInputKeyDown === 'function') {
+			if (typeof plugin.toolbarInputKeyDown === 'function') {
 				this.__inputKeyEvent = this.addEvent(eventTarget, 'keydown', (event) => {
-					plugin.onInputKeyDown({ target: eventTarget, event });
+					plugin.toolbarInputKeyDown({ target: eventTarget, event });
 				});
 			}
 		} else if (this.__inputBlurEvent && this.__inputPlugin) {
 			const value = this.__inputPlugin.target.value.trim();
 			if (value !== this.__inputPlugin.value) {
-				this.__inputPlugin.obj.onInputChange({ target: this.__inputPlugin.target, value, event: e });
+				this.__inputPlugin.obj.toolbarInputChange({ target: this.__inputPlugin.target, value, event: e });
 			}
 
 			this.__removeInput();

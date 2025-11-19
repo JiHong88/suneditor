@@ -1,9 +1,15 @@
 import Editor from './core/editor';
 
 import plugins from './plugins';
-import modules from './modules';
+import * as moduleContracts from './modules/contracts';
+import * as moduleUtils from './modules/utils';
 import helper from './helper';
 import langs from './langs';
+
+const modules = {
+	contracts: moduleContracts,
+	utils: moduleUtils,
+};
 
 /**
  * @module SunEditorExports

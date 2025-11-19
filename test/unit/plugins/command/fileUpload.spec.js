@@ -30,14 +30,17 @@ const mockController = {
     close: jest.fn()
 };
 
-jest.mock('../../../../src/modules', () => ({
-    FileManager: jest.fn().mockImplementation(() => mockFileManager),
+jest.mock('../../../../src/modules/contracts', () => ({
     Figure: jest.fn().mockImplementation(() => mockFigure),
     Controller: jest.fn().mockImplementation(() => mockController)
 }));
 
+jest.mock('../../../../src/modules/utils', () => ({
+    FileManager: jest.fn().mockImplementation(() => mockFileManager)
+}));
+
 // Static methods for Figure
-Object.assign(require('../../../../src/modules').Figure, {
+Object.assign(require('../../../../src/modules/contracts').Figure, {
     GetContainer: jest.fn().mockReturnValue({
         target: { getAttribute: jest.fn().mockReturnValue('/test.pdf') },
         container: { nextElementSibling: null, parentElement: null }
@@ -306,7 +309,7 @@ describe('Plugins - Command - FileUpload', () => {
 
             fileUpload = new FileUpload(mockEditor, pluginOptions);
 
-            const { Figure } = require('../../../../src/modules');
+            const { Figure } = require('../../../../src/modules/contracts');
             expect(Figure).toHaveBeenCalledWith(fileUpload, expect.any(Array), {});
         });
 
@@ -317,7 +320,8 @@ describe('Plugins - Command - FileUpload', () => {
 
             fileUpload = new FileUpload(mockEditor, pluginOptions);
 
-            const { FileManager, Controller } = require('../../../../src/modules');
+            const { FileManager } = require('../../../../src/modules/utils');
+            const { Controller } = require('../../../../src/modules/contracts');
             expect(FileManager).toHaveBeenCalledWith(fileUpload, {
                 query: 'a[download][data-se-file-download]',
                 loadEventName: 'onFileLoad',
@@ -361,7 +365,7 @@ describe('Plugins - Command - FileUpload', () => {
             const { dom } = require('../../../../src/helper');
             dom.check.isFigure.mockReturnValue(true);
 
-            const result = fileUpload.select(mockTarget);
+            const result = fileUpload.componentSelect(mockTarget);
 
             // Just verify the method completed without error since we can't easily test private properties
             expect(mockFigure.open).toHaveBeenCalledWith(mockTarget, {
@@ -379,7 +383,7 @@ describe('Plugins - Command - FileUpload', () => {
             const { dom } = require('../../../../src/helper');
             dom.check.isFigure.mockReturnValue(false);
 
-            const result = fileUpload.select(mockTarget);
+            const result = fileUpload.componentSelect(mockTarget);
 
             expect(mockFigure.controllerOpen).toHaveBeenCalledWith(mockTarget, { isWWTarget: true });
             expect(result).toBe(true);
@@ -452,7 +456,7 @@ describe('Plugins - Command - FileUpload', () => {
             const { dom } = require('../../../../src/helper');
             dom.check.isFigure.mockReturnValue(false);
 
-            fileUpload.edit(mockTarget);
+            fileUpload.componentEdit(mockTarget);
 
             expect(fileUpload.editInput.value).toBe('Test file name');
             expect(mockFigure.controllerHide).toHaveBeenCalled();
@@ -529,7 +533,7 @@ describe('Plugins - Command - FileUpload', () => {
             const mockTarget = { getAttribute: jest.fn().mockReturnValue('/test.pdf') };
             const mockContainer = { previousElementSibling: null, nextElementSibling: null };
 
-            const { Figure } = require('../../../../src/modules');
+            const { Figure } = require('../../../../src/modules/contracts');
             Figure.GetContainer.mockReturnValue({
                 target: mockTarget,
                 container: mockContainer
@@ -539,7 +543,7 @@ describe('Plugins - Command - FileUpload', () => {
             dom.query.getParentElement.mockReturnValue(mockContainer);
             mockEditor.component.isInline.mockReturnValue(false);
 
-            await fileUpload.destroy(mockTarget);
+            await fileUpload.componentDestroy(mockTarget);
 
             expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onFileDeleteBefore', {
                 element: mockTarget,
@@ -556,7 +560,7 @@ describe('Plugins - Command - FileUpload', () => {
             mockEditor.triggerEvent.mockResolvedValue(false);
 
             const { dom } = require('../../../../src/helper');
-            await fileUpload.destroy(mockTarget);
+            await fileUpload.componentDestroy(mockTarget);
 
             expect(dom.utils.removeItem).not.toHaveBeenCalled();
         });
@@ -679,7 +683,7 @@ describe('Plugins - Command - FileUpload', () => {
                 parentElement: { insertBefore: jest.fn() }
             };
 
-            const { Figure } = require('../../../../src/modules');
+            const { Figure } = require('../../../../src/modules/contracts');
             Figure.GetContainer.mockReturnValue({ container: mockContainer });
 
             // Import dom from helper instead of modules
@@ -752,7 +756,7 @@ describe('Plugins - Command - FileUpload', () => {
             fileUpload.as = 'box';
             const mockFile = { name: 'test.pdf', size: 1000 };
 
-            const { Figure } = require('../../../../src/modules');
+            const { Figure } = require('../../../../src/modules/contracts');
             Figure.CreateContainer.mockReturnValue({
                 container: { className: '' }
             });

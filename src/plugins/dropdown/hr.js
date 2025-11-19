@@ -1,4 +1,4 @@
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
@@ -10,9 +10,8 @@ import { dom } from '../../helper';
  * @class
  * @description HR Plugin
  */
-class HR extends EditorInjector {
+class HR extends PluginDropdown {
 	static key = 'hr';
-	static type = 'dropdown';
 	static className = '';
 	/**
 	 * @this {HR}
@@ -45,29 +44,26 @@ class HR extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Select}
 	 */
-	select(target) {
+	componentSelect(target) {
 		dom.utils.addClass(target, 'on');
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Called when a container is deselected.
-	 * @param {HTMLElement} element Target element
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Deselect}
 	 */
-	deselect(element) {
+	componentDeselect(element) {
 		dom.utils.removeClass(element, 'on');
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Destroy}
 	 */
-	destroy(target) {
+	componentDestroy(target) {
 		if (!target) return;
 
 		const focusEl = target.previousElementSibling || target.nextElementSibling;
@@ -79,28 +75,25 @@ class HR extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 */
-	action(target) {
-		const hr = this.submit(target.firstElementChild.className);
-		const line = this.format.addLine(hr);
-		this.selection.setRange(line, 1, line, 1);
-		this.menu.dropdownOff();
-	}
-
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes methods called by shortcut keys.
-	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.Shortcut}
 	 */
 	shortcut({ line, range }) {
 		const newLine = this.nodeTransform.split(range.endContainer, range.endOffset, 0);
 		this.submit('__se__solid');
 		dom.utils.removeItem(line);
 		this.selection.setRange(newLine, 0, newLine, 0);
+	}
+
+	/**
+	 * @override
+	 * @type {PluginDropdown['action']}
+	 */
+	action(target) {
+		const hr = this.submit(target.firstElementChild.className);
+		const line = this.format.addLine(hr);
+		this.selection.setRange(line, 1, line, 1);
+		this.menu.dropdownOff();
 	}
 
 	/**

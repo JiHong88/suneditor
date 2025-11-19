@@ -2,32 +2,36 @@
  * @fileoverview Unit tests for modules/Figure.js
  */
 
-import Figure from '../../../src/modules/Figure.js';
+import Figure from '../../../src/modules/contracts/Figure.js';
 
-// Mock dependencies
-jest.mock('../../../src/modules', () => ({
-    Controller: jest.fn().mockImplementation(function() {
+// Mock Controller directly since Figure imports it from './Controller'
+jest.mock('../../../src/modules/contracts/Controller.js', () => {
+    return jest.fn().mockImplementation(function(inst, form, options) {
         this.open = jest.fn();
         this.close = jest.fn();
         this.hide = jest.fn();
         this.show = jest.fn();
-        this.form = {
-            style: {},
-            querySelector: jest.fn(),
-            querySelectorAll: jest.fn().mockReturnValue([])
-        };
+        this.form = form;
+        this.position = options?.position || 'bottom';
         // Add eventManager with addGlobalEvent
         this.eventManager = {
             addGlobalEvent: jest.fn(() => 'event-id'),
             removeGlobalEvent: jest.fn()
         };
-    }),
-    SelectMenu: jest.fn().mockImplementation(() => ({
+    });
+});
+
+// Mock other dependencies
+jest.mock('../../../src/modules/utils/SelectMenu.js', () => {
+    return jest.fn().mockImplementation(() => ({
         on: jest.fn(),
         create: jest.fn(),
         open: jest.fn(),
         close: jest.fn()
-    })),
+    }));
+});
+
+jest.mock('../../../src/modules/utils/_DragHandle.js', () => ({
     _DragHandle: {
         get: jest.fn().mockReturnValue(null),
         set: jest.fn()
@@ -290,8 +294,8 @@ describe('Modules - Figure', () => {
                 key: 'testFigure',
                 name: 'TestFigure'
             },
-            edit: jest.fn(),
-            destroy: jest.fn()
+            componentEdit: jest.fn(),
+            componentDestroy: jest.fn()
         };
     });
 
@@ -302,6 +306,10 @@ describe('Modules - Figure', () => {
                 constructor: { name: 'FallbackFigure' }
             };
             const mockControls = document.createElement('div');
+            // Add necessary methods for Controller
+            mockControls.removeAttribute = jest.fn();
+            mockControls.setAttribute = jest.fn();
+            mockControls.hasAttribute = jest.fn().mockReturnValue(false);
 
             const figure = new Figure(instWithoutKey, mockControls, {});
             expect(figure.kind).toBe('FallbackFigure');
@@ -313,6 +321,10 @@ describe('Modules - Figure', () => {
 
         beforeEach(() => {
             const mockControls = document.createElement('div');
+            // Add necessary methods for Controller
+            mockControls.removeAttribute = jest.fn();
+            mockControls.setAttribute = jest.fn();
+            mockControls.hasAttribute = jest.fn().mockReturnValue(false);
             figure = new Figure(mockInst, mockControls, {});
         });
 
@@ -468,6 +480,10 @@ describe('Modules - Figure', () => {
 
         beforeEach(() => {
             const mockControls = document.createElement('div');
+            // Add necessary methods for Controller
+            mockControls.removeAttribute = jest.fn();
+            mockControls.setAttribute = jest.fn();
+            mockControls.hasAttribute = jest.fn().mockReturnValue(false);
             figure = new Figure(mockInst, mockControls, {});
             mockElement = {
                 tagName: 'IMG',
@@ -601,7 +617,7 @@ describe('Modules - Figure', () => {
                 };
 
                 figure.controllerAction(button);
-                expect(figure.inst.edit).toHaveBeenCalledWith(mockElement);
+                expect(figure.inst.componentEdit).toHaveBeenCalledWith(mockElement);
             });
 
             it('should handle copy action', () => {
@@ -750,7 +766,7 @@ describe('Modules - Figure', () => {
 
                 figure.controllerAction(button);
 
-                expect(figure.inst.destroy).toHaveBeenCalledWith(mockElement);
+                expect(figure.inst.componentDestroy).toHaveBeenCalledWith(mockElement);
                 expect(closeSpy).toHaveBeenCalled();
             });
 

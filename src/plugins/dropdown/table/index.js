@@ -1,6 +1,7 @@
-import EditorInjector from '../../../editorInjector';
+import { PluginDropdownFree } from '../../../interfaces';
 import { dom, numbers, converter, env, keyCodeMap } from '../../../helper';
-import { Controller, SelectMenu, ColorPicker, Figure, _DragHandle } from '../../../modules';
+import { Controller, ColorPicker, Figure } from '../../../modules/contracts';
+import { SelectMenu, _DragHandle } from '../../../modules/utils';
 
 const { _w, ON_OVER_COMPONENT } = env;
 
@@ -73,9 +74,8 @@ const DEFAULT_COLOR_LIST = [
  * @class
  * @description Table Plugin
  */
-class Table extends EditorInjector {
+class Table extends PluginDropdownFree {
 	static key = 'table';
-	static type = 'dropdown-free';
 	static className = '';
 	static options = { isInputComponent: true };
 	/**
@@ -349,42 +349,18 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
+	 * @override
+	 * @type {PluginDropdownFree['off']}
 	 */
-	action() {
-		const oTable = dom.utils.createElement('TABLE');
-		const x = this.#tableXY[0];
-		const y = this.#tableXY[1];
-
-		const body = `<tbody>${`<tr>${CreateCellsString('td', x)}</tr>`.repeat(y)}</tbody>`;
-		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
-		oTable.innerHTML = colGroup + body;
-
-		// scroll
-		let scrollTypeClass = '';
-		if (this.figureScroll) {
-			scrollTypeClass = ` se-scroll-figure-${this.figureScroll}`;
-		}
-
-		const figure = dom.utils.createElement('FIGURE', { class: 'se-flex-component se-input-component' + scrollTypeClass, style: 'width: 100%;' });
-		figure.appendChild(oTable);
-		this.#maxWidth = true;
-
-		if (this.component.insert(figure, { insertBehavior: 'none' })) {
-			this._resetTablePicker();
-			const target = oTable.querySelector('td div');
-			this.selection.setRange(target, 0, target, 0);
-		}
+	off() {
+		this._resetTablePicker();
 	}
 
 	/**
-	 * @editorMethod Editor.component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Select}
 	 */
-	select(target) {
+	componentSelect(target) {
 		this._figureOpen(target);
 		if (!this.#figure) this.setTableInfo(target);
 
@@ -409,12 +385,10 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
-	 * @returns {Promise<void>}
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Destroy}
 	 */
-	destroy(target) {
+	componentDestroy(target) {
 		if (!target) return;
 
 		const emptyDiv = target.parentNode;
@@ -435,12 +409,10 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.component
-	 * @description Executes the method that is called when a component copy is requested.
-	 * @param {SunEditor.Plugin.CopyComponentParams} params
-	 * @returns {boolean|void}
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Copy}
 	 */
-	onCopyComponent({ event, cloneContainer }) {
+	componentCopy({ event, cloneContainer }) {
 		/** @type {NodeListOf<HTMLTableCellElement>} */
 		const selectedCells = cloneContainer.querySelectorAll('.se-selected-table-cell');
 		dom.utils.removeClass(selectedCells, 'se-selected-table-cell|se-selected-cell-focus');
@@ -452,10 +424,8 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "copy".
-	 * @param {SunEditor.Plugin.PasteParams} params
-	 * @returns {boolean|void}
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnPaste}
 	 */
 	onPaste({ event, doc }) {
 		/** @type {HTMLTableCellElement} */
@@ -471,23 +441,17 @@ class Table extends EditorInjector {
 		const copyTable = /** @type {HTMLTableElement} */ (componentInfo.target);
 		this.pasteTableCellMatrix(copyTable, targetCell);
 
-		return true;
+		return false;
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLTableElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.RetainFormat}
 	 */
 	retainFormat() {
 		return {
 			query: 'table',
+			/** @param {HTMLTableElement} element */
 			method: (element) => {
 				const ColgroupEl = element.querySelector('colgroup');
 				let FigureEl = /** @type {HTMLElement} */ (dom.check.isFigure(element.parentNode) ? element.parentNode : null);
@@ -589,9 +553,8 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the method called when the rtl, ltr mode changes. ("editor.setDir")
-	 * @param {string} dir Direction ("rtl" or "ltr")
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.SetDir}
 	 */
 	setDir(dir) {
 		this.tableHighlight.style.left = dir === 'rtl' ? 10 * 18 - 13 + 'px' : '';
@@ -600,9 +563,8 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "mousemove".
-	 * @param {SunEditor.Plugin.MouseEventInfo} params
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnMouseMove}
 	 */
 	onMouseMove({ event }) {
 		if (this.#resizing) return;
@@ -642,8 +604,8 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "scroll".
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnScroll}
 	 */
 	onScroll() {
 		if (this.#resizeLine?.style.display !== 'block') return;
@@ -653,9 +615,8 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "mousedown".
-	 * @param {SunEditor.Plugin.MouseEventInfo} params
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnMouseDown}
 	 */
 	onMouseDown({ event }) {
 		this.#ref = this.#selectedCell = null;
@@ -740,8 +701,8 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "mouseup".
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnMouseUp}
 	 */
 	onMouseUp() {
 		this.#shift = false;
@@ -751,17 +712,16 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "mouseleave".
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnMouseLeave}
 	 */
 	onMouseLeave() {
 		this.__hideResizeLine();
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "keydown".
-	 * @param {SunEditor.Plugin.KeyEventInfo} params
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnKeyDown}
 	 */
 	onKeyDown({ event, range, line }) {
 		this.#ref = null;
@@ -847,9 +807,8 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "keyup".
-	 * @param {SunEditor.Plugin.KeyEventInfo} params
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnKeyUp}
 	 */
 	onKeyUp({ line }) {
 		this.#_s = false;
@@ -862,9 +821,8 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.ColorPicker
-	 * @description Executes the method called when a button of "ColorPicker" module is clicked.
-	 * @param {string} color - Color code (hex)
+	 * @hook Modules.ColorPicker
+	 * @type {SunEditor.Hook.ColorPicker.Action}
 	 */
 	colorPickerAction(color) {
 		const target = this.propTargets[`${this.sliderType}_color`];
@@ -873,9 +831,8 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Action}
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -985,7 +942,7 @@ class Table extends EditorInjector {
 				this.component.copy(this.#figure);
 				break;
 			case 'remove': {
-				this.destroy(this.#figure);
+				this.componentDestroy(this.#figure);
 			}
 		}
 
@@ -1001,10 +958,10 @@ class Table extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method called when the "controller" is closed.
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Close}
 	 */
-	close() {
+	controllerClose() {
 		this.__removeGlobalEvents();
 		this._deleteStyleSelectedCells();
 		this._toggleEditor(true);
@@ -1280,7 +1237,7 @@ class Table extends EditorInjector {
 				}
 			}
 
-			if (!option) this.close();
+			if (!option) this.controllerClose();
 		} // one
 		else {
 			this[isRow ? 'editRow' : 'editCell'](option);
@@ -3054,11 +3011,10 @@ class Table extends EditorInjector {
 
 		highlight.width = '1em';
 		highlight.height = '1em';
-		unHighlight.width = '10em';
-		unHighlight.height = '10em';
+		unHighlight.width = '5em';
+		unHighlight.height = '5em';
 
 		dom.utils.changeTxt(this.tableDisplay, '1 x 1');
-		this.menu.dropdownOff();
 	}
 
 	/**
@@ -3455,7 +3411,30 @@ class Table extends EditorInjector {
 	 * @description Executes the selected action when the table picker is clicked.
 	 */
 	#OnClickTablePicker() {
-		this.action();
+		const oTable = dom.utils.createElement('TABLE');
+		const x = this.#tableXY[0];
+		const y = this.#tableXY[1];
+
+		const body = `<tbody>${`<tr>${CreateCellsString('td', x)}</tr>`.repeat(y)}</tbody>`;
+		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
+		oTable.innerHTML = colGroup + body;
+
+		// scroll
+		let scrollTypeClass = '';
+		if (this.figureScroll) {
+			scrollTypeClass = ` se-scroll-figure-${this.figureScroll}`;
+		}
+
+		const figure = dom.utils.createElement('FIGURE', { class: 'se-flex-component se-input-component' + scrollTypeClass, style: 'width: 100%;' });
+		figure.appendChild(oTable);
+		this.#maxWidth = true;
+
+		if (this.component.insert(figure, { insertBehavior: 'none' })) {
+			this._resetTablePicker();
+			this.menu.dropdownOff();
+			const target = oTable.querySelector('td div');
+			this.selection.setRange(target, 0, target, 0);
+		}
 	}
 
 	/**
@@ -3541,7 +3520,7 @@ class Table extends EditorInjector {
 	 * @description Handles the removal of touch-based selection.
 	 */
 	#OffCellTouch() {
-		this.close();
+		this.controllerClose();
 	}
 
 	/**

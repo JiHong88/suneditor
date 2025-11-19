@@ -1,5 +1,5 @@
-import EditorInjector from '../../editorInjector';
-import { Controller } from '../../modules';
+import { PluginPopup } from '../../interfaces';
+import { Controller } from '../../modules/contracts';
 import { dom, env } from '../../helper';
 
 const { _w } = env;
@@ -9,9 +9,8 @@ const { _w } = env;
  * @description Anchor plugin
  * - Allows you to create, edit, and delete elements that act as anchors (bookmarks) within a document.
  */
-class Anchor extends EditorInjector {
+class Anchor extends PluginPopup {
 	static key = 'anchor';
-	static type = 'popup';
 	static className = '';
 	/**
 	 * @this {Anchor}
@@ -54,8 +53,8 @@ class Anchor extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Plugin<popup>
-	 * @description Displays a popup and gives focus to the input field.
+	 * @override
+	 * @type {PluginPopup['show']}
 	 */
 	show() {
 		this.controller.open((this.#range = this.selection.getRange()));
@@ -65,28 +64,26 @@ class Anchor extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Select}
 	 */
-	select(target) {
+	componentSelect(target) {
 		this.#element = target;
 		this.displayId.textContent = target.getAttribute('id');
 		this.controllerSelect.open(target);
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Called when a container is deselected.
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Deselect}
 	 */
-	deselect() {
+	componentDeselect() {
 		this.#init();
 	}
 
 	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Action}
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -137,7 +134,7 @@ class Anchor extends EditorInjector {
 
 				this.#init();
 				if (currentElement) {
-					this.select(currentElement);
+					this.componentSelect(currentElement);
 				}
 
 				break;

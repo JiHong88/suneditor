@@ -45,6 +45,7 @@ function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 
 	this.currentMoreLayerActiveButton = null;
 	this.isSticky = false;
+
 	this._isBalloon = balloon;
 	this._isInline = inline;
 	this._isBalloonAlways = balloonAlways;
@@ -215,20 +216,19 @@ Toolbar.prototype = {
 		if (!wrapper) return;
 
 		const toolbar = this.context.get(this.keyName.main);
-		if (this.frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || this.options.get('toolbar_sticky') < 0) return;
+		const stickyTop = this.options.get('toolbar_sticky');
+		if (this.frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || stickyTop < 0) return;
 
 		const currentScrollY = this._isViewPortSize ? _w.visualViewport.pageTop : _w.scrollY;
 
 		const minHeight = this.frameContext.get('_minHeight');
 		const editorHeight = wrapper.offsetHeight;
 		const editorOffset = this.offset.getGlobal(this.frameContext.get('topArea'));
-		const y = currentScrollY + this.options.get('toolbar_sticky');
+		const y = currentScrollY + stickyTop;
 		const t = (this._isBalloon || this._isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this._isInline ? toolbar.offsetHeight : 0);
 		const inlineOffset = 1;
 
-		const offSticky = !this.options.get('toolbar_container')
-			? editorHeight + t + this.options.get('toolbar_sticky') - y - minHeight
-			: editorOffset.top - currentScrollY + editorHeight - minHeight - this.options.get('toolbar_sticky') - toolbar.offsetHeight;
+		const offSticky = !this.options.get('toolbar_container') ? editorHeight + t + stickyTop - y - minHeight : editorOffset.top - currentScrollY + editorHeight - minHeight - stickyTop - toolbar.offsetHeight;
 		if (y < t) {
 			this._offSticky();
 		} else if (offSticky < 0) {
@@ -413,7 +413,7 @@ Toolbar.prototype = {
 		this._resetSticky();
 		this._inlineToolbarAttr.isShow = true;
 
-		this.triggerEvent('onShowToolbar', { toolbar, mode: 'inline' });
+		this.triggerEvent('onShowToolbar', { toolbar, mode: 'inline', frameContext: this.frameContext });
 
 		toolbar.style.visibility = '';
 	},

@@ -530,7 +530,6 @@ Editor.prototype = {
 			throw Error(`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`);
 		} else if (typeof this.plugins[pluginName] === 'function') {
 			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this, pluginOptions || {});
-			if (typeof plugin.init === 'function') plugin.init();
 		}
 
 		if (targets) {
@@ -579,6 +578,7 @@ Editor.prototype = {
 			}
 
 			if (this.frameContext.get('isReadOnly') && dom.utils.arrayIncludes(this._controllerOnDisabledButtons, button)) return;
+
 			if (/dropdown/.test(type) && (this.menu.targetMap[command] === null || button !== this.menu.currentDropdownActiveButton)) {
 				this.menu.dropdownOn(button);
 				return;
@@ -761,7 +761,7 @@ Editor.prototype = {
 			const fc = this.frameContext;
 			const plugins = this.plugins;
 			for (const k in plugins) {
-				if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
+				plugins[k].setDir?.(dir);
 			}
 
 			const toolbarWrapper = this.context.get('toolbar_wrapper');
@@ -1110,10 +1110,12 @@ Editor.prototype = {
 		let obj = this.plugins;
 		for (const k in obj) {
 			const p = obj[k];
-			if (typeof p._destroy === 'function') p._destroy();
+			p._destroy?.();
+
 			for (const pk in p) {
 				delete p[pk];
 			}
+
 			delete obj[k];
 		}
 

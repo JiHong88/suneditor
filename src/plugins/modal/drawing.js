@@ -1,5 +1,5 @@
-import EditorInjector from '../../editorInjector';
-import { Modal } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal } from '../../modules/contracts';
 import { dom, env } from '../../helper';
 
 const { _w } = env;
@@ -29,9 +29,8 @@ const { _w } = env;
  * @class
  * @description Drawing modal plugin.
  */
-class Drawing extends EditorInjector {
+class Drawing extends PluginModal {
 	static key = 'drawing';
-	static type = 'modal';
 	static className = '';
 
 	#events;
@@ -124,8 +123,8 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
+	 * @override
+	 * @type {PluginModal['open']}
 	 */
 	open() {
 		if (this.pluginOptions.useFormatType) {
@@ -136,19 +135,18 @@ class Drawing extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's "modal" is closed.
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Off}
 	 */
-	off() {
+	modalOff() {
 		this.#destroyDrawing();
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {boolean} Success or failure
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Action}
 	 */
-	modalAction() {
+	async modalAction() {
 		if (this.pluginOptions.outputFormat === 'svg') {
 			const files = this.#getSVGFileList();
 			this.plugins.image.init();

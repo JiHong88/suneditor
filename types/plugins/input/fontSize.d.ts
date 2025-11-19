@@ -44,15 +44,14 @@ export type FontSizePluginOptions = {
  */
 /**
  * @class
+ * @implements {PluginCommand}
+ * @implements {PluginDropdown}
  * @description FontSize Plugin
  * - This plugin enables users to modify the font size of selected text within the editor.
  * - It supports various measurement units (e.g., 'px', 'pt', 'em', 'rem', 'vw', 'vh', '%') and
  * - provides multiple interfaces: dropdown menus, direct input, and optional increment/decrement buttons.
  */
-declare class FontSize extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class FontSize extends PluginInput implements PluginCommand, PluginDropdown {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -119,49 +118,16 @@ declare class FontSize extends EditorInjector {
 	sizeUnit: any;
 	title: any;
 	inner: string | boolean;
-	beforeItem: HTMLElement;
-	afterItem: HTMLElement;
-	replaceButton: HTMLElement;
 	currentSize: string;
 	sizeList: NodeListOf<Element>;
 	hasInputFocus: boolean;
 	isInputActive: boolean;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
-	 */
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean;
-	/**
-	 * @editorMethod Editor.Toolbar
-	 * @description Executes the event function of toolbar's input tag - "keydown".
-	 * @param {Object} params
-	 * @param {HTMLElement} params.target Input element
-	 * @param {KeyboardEvent} params.event Event object
-	 */
-	onInputKeyDown({ target, event }: { target: HTMLElement; event: KeyboardEvent }): void;
-	/**
-	 * @editorMethod Editor.Toolbar
-	 * @description Executes the event function of toolbar's input tag - "change".
-	 * @param {SunEditor.Plugin.ToolbarInputChangeEventInfo} params
-	 */
-	onInputChange({ target, value: changeValue, event }: SunEditor.Plugin.ToolbarInputChangeEventInfo): void;
-	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {HTMLElement} target Line element at the current cursor position
-	 */
-	on(target: HTMLElement): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 */
-	action(target: HTMLElement): void;
+	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	on(target?: HTMLElement): void;
+	off(): void;
+	action(target?: HTMLElement): void | Promise<void>;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
+import { PluginCommand } from '../../interfaces';
+import { PluginDropdown } from '../../interfaces';
+import { PluginInput } from '../../interfaces';

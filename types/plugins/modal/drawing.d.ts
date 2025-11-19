@@ -77,10 +77,7 @@ export type DrawingPluginOptions = {
  * @class
  * @description Drawing modal plugin.
  */
-declare class Drawing extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Drawing extends PluginModal {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -88,7 +85,6 @@ declare class Drawing extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: DrawingPluginOptions);
 	title: any;
-	icon: string;
 	pluginOptions: {
 		outputFormat: string;
 		useFormatType: boolean;
@@ -140,23 +136,9 @@ declare class Drawing extends EditorInjector {
 	points: any[];
 	paths: any[];
 	resizeObserver: ResizeObserver;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
-	 */
-	open(): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's "modal" is closed.
-	 */
-	off(): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {boolean} Success or failure
-	 */
-	modalAction(): boolean;
+	modalOff(isUpdate: boolean): void;
+	modalAction(): Promise<boolean>;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { Modal } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal } from '../../modules/contracts';

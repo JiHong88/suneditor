@@ -1,5 +1,5 @@
 import { dom } from '../../../helper';
-import { _DragHandle } from '../../../modules';
+import { _DragHandle } from '../../../modules/utils';
 
 /**
  * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_dragDrop

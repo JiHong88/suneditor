@@ -1,5 +1,6 @@
-import EditorInjector from '../../editorInjector';
-import { Modal, Controller, FileManager, Figure, _DragHandle } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal, Controller, Figure } from '../../modules/contracts';
+import { FileManager, _DragHandle } from '../../modules/utils';
 import { dom, numbers, env } from '../../helper';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 
@@ -27,9 +28,8 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
  * @class
  * @description Audio modal plugin.
  */
-class Audio_ extends EditorInjector {
+class Audio_ extends PluginModal {
 	static key = 'audio';
-	static type = 'modal';
 	static className = '';
 	/**
 	 * @this {Audio_}
@@ -119,107 +119,16 @@ class Audio_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
+	 * @override
+	 * @type {PluginModal['open']}
 	 */
 	open() {
 		this.modal.open();
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
-	 */
-	on(isUpdate) {
-		if (!isUpdate) {
-			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.setAttribute('multiple', 'multiple');
-		} else if (this.#element) {
-			this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
-			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
-		} else {
-			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
-		}
-	}
-
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "paste" or "drop".
-	 * @param {Object} params { frameContext, event, file }
-	 * @param {SunEditor.FrameContext} params.frameContext Frame context
-	 * @param {ClipboardEvent} params.event Event object
-	 * @param {File} params.file File object
-	 * @returns {boolean} - If return false, the file upload will be canceled
-	 */
-	onFilePasteAndDrop({ file }) {
-		if (!/^audio/.test(file.type)) return;
-
-		this.submitFile([file]);
-		this.editor.focus();
-
-		return false;
-	}
-
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {Promise<boolean>} Success or failure
-	 */
-	async modalAction() {
-		if (this.audioInputFile && this.audioInputFile?.files.length > 0) {
-			return await this.submitFile(this.audioInputFile.files);
-		} else if (this.audioUrlFile && this.#urlValue.length > 0) {
-			return await this.submitURL(this.#urlValue);
-		}
-		return false;
-	}
-
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
-	 */
-	init() {
-		Modal.OnChangeFile(this.fileModalWrapper, []);
-		if (this.audioInputFile) this.audioInputFile.value = '';
-		if (this.audioUrlFile) this.#urlValue = this.preview.textContent = this.audioUrlFile.value = '';
-		if (this.audioInputFile && this.audioUrlFile) {
-			this.audioUrlFile.disabled = false;
-			this.preview.style.textDecoration = '';
-		}
-	}
-
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
-	 */
-	controllerAction(target) {
-		switch (target.getAttribute('data-command')) {
-			case 'update':
-				if (this.audioUrlFile) this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
-				this.open();
-				break;
-			case 'copy': {
-				const figure = Figure.GetContainer(this.#element);
-				this.component.copy(figure.container);
-				break;
-			}
-			case 'delete':
-				this.destroy();
-				break;
-		}
-	}
-
-	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLAudioElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * @hook Editor.core
+	 * @type {SunEditor.Hook.Core.RetainFormat}
 	 */
 	retainFormat() {
 		return {
@@ -236,22 +145,93 @@ class Audio_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnFilePasteAndDrop}
 	 */
-	select(target) {
+	onFilePasteAndDrop({ file }) {
+		if (!/^audio/.test(file.type)) return;
+
+		this.submitFile([file]);
+		this.editor.focus();
+	}
+
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.On}
+	 */
+	modalOn(isUpdate) {
+		if (!isUpdate) {
+			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.setAttribute('multiple', 'multiple');
+		} else if (this.#element) {
+			this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
+			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
+		} else {
+			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
+		}
+	}
+
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Action}
+	 */
+	async modalAction() {
+		if (this.audioInputFile && this.audioInputFile?.files.length > 0) {
+			return await this.submitFile(this.audioInputFile.files);
+		} else if (this.audioUrlFile && this.#urlValue.length > 0) {
+			return await this.submitURL(this.#urlValue);
+		}
+		return false;
+	}
+
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Init}
+	 */
+	modalInit() {
+		Modal.OnChangeFile(this.fileModalWrapper, []);
+		if (this.audioInputFile) this.audioInputFile.value = '';
+		if (this.audioUrlFile) this.#urlValue = this.preview.textContent = this.audioUrlFile.value = '';
+		if (this.audioInputFile && this.audioUrlFile) {
+			this.audioUrlFile.disabled = false;
+			this.preview.style.textDecoration = '';
+		}
+	}
+
+	/**
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Action}
+	 */
+	controllerAction(target) {
+		switch (target.getAttribute('data-command')) {
+			case 'update':
+				if (this.audioUrlFile) this.#urlValue = this.preview.textContent = this.audioUrlFile.value = this.#element.src;
+				this.open();
+				break;
+			case 'copy': {
+				const figure = Figure.GetContainer(this.#element);
+				this.component.copy(figure.container);
+				break;
+			}
+			case 'delete':
+				this.componentDestroy(null);
+				break;
+		}
+	}
+
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Select}
+	 */
+	componentSelect(target) {
 		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
 		this.#ready(target);
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} [target] Target element, if null current selected element
-	 * @returns {Promise<void>}
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Destroy}
 	 */
-	async destroy(target) {
+	async componentDestroy(target) {
 		const element = target || this.#element;
 		const figure = Figure.GetContainer(element);
 		const container = figure.container || element;
@@ -262,7 +242,7 @@ class Audio_ extends EditorInjector {
 
 		const emptyDiv = container.parentNode;
 		dom.utils.removeItem(container);
-		this.init();
+		this.modalInit();
 		this.controller.close();
 
 		if (emptyDiv !== this.frameContext.get('wysiwyg')) {

@@ -1,4 +1,4 @@
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
@@ -19,9 +19,8 @@ import { dom } from '../../helper';
  * @class
  * @description A plugin to style lines using classes.
  */
-class ParagraphStyle extends EditorInjector {
+class ParagraphStyle extends PluginDropdown {
 	static key = 'paragraphStyle';
-	static type = 'dropdown';
 	static className = '';
 
 	/**
@@ -46,8 +45,8 @@ class ParagraphStyle extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
+	 * @override
+	 * @type {PluginDropdown['on']}
 	 */
 	on() {
 		const paragraphList = this.classList;
@@ -63,10 +62,8 @@ class ParagraphStyle extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
+	 * @override
+	 * @type {PluginDropdown['action']}
 	 */
 	action(target) {
 		const value = target.getAttribute('data-command');

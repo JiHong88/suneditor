@@ -17,10 +17,7 @@ export type LayoutPluginOptions = {
  * @class
  * @description Layout Plugin, Apply layout to the entire editor.
  */
-declare class Layout extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Layout extends PluginDropdown {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -28,19 +25,10 @@ declare class Layout extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: LayoutPluginOptions);
 	title: any;
-	icon: string;
 	selectedIndex: number;
 	items: {
 		name: string;
 		html: string;
 	}[];
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 * @throws {Error} Throws error if layout HTML is not found.
-	 */
-	action(target: HTMLElement): void;
 }
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';

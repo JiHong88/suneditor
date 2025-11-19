@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for modules/Modal.js
  */
 
-import Modal from '../../../src/modules/Modal.js';
+import Modal from '../../../src/modules/contracts/Modal.js';
 
 // Mock dependencies
 jest.mock('../../../src/editorInjector/_core.js', () => {
@@ -115,9 +115,9 @@ describe('Modules - Modal', () => {
 				key: 'testModal',
 				name: 'TestModal'
 			},
-			init: jest.fn(),
-			on: jest.fn(),
-			off: jest.fn(),
+			modalInit: jest.fn(),
+			modalOn: jest.fn(),
+			modalOff: jest.fn(),
 			modalAction: jest.fn(),
 			modalResize: jest.fn()
 		};
@@ -303,8 +303,8 @@ describe('Modules - Modal', () => {
 
 			expect(mockEditor.ui._offCurrentModal).toHaveBeenCalled();
 			expect(mockEditor.eventManager.addGlobalEvent).toHaveBeenCalled();
-			expect(mockInst.init).toHaveBeenCalled();
-			expect(mockInst.on).toHaveBeenCalledWith(false);
+			expect(mockInst.modalInit).toHaveBeenCalled();
+			expect(mockInst.modalOn).toHaveBeenCalledWith(false);
 		});
 
 		it('should focus element if exists', () => {
@@ -313,14 +313,14 @@ describe('Modules - Modal', () => {
 		});
 
 		it('should not call init if not provided', () => {
-			mockInst.init = undefined;
+			mockInst.modalInit = undefined;
 			expect(() => {
 				modal.open();
 			}).not.toThrow();
 		});
 
 		it('should not call on if not provided', () => {
-			mockInst.on = undefined;
+			mockInst.modalOn = undefined;
 			expect(() => {
 				modal.open();
 			}).not.toThrow();
@@ -334,15 +334,15 @@ describe('Modules - Modal', () => {
 
 		it('should not call init when updating', () => {
 			mockEditor.currentControllerName = 'testModal';
-			mockInst.init.mockClear();
+			mockInst.modalInit.mockClear();
 			modal.open();
-			expect(mockInst.init).not.toHaveBeenCalled();
+			expect(mockInst.modalInit).not.toHaveBeenCalled();
 		});
 
 		it('should call on with true when updating', () => {
 			mockEditor.currentControllerName = 'testModal';
 			modal.open();
-			expect(mockInst.on).toHaveBeenCalledWith(true);
+			expect(mockInst.modalOn).toHaveBeenCalledWith(true);
 		});
 	});
 
@@ -358,20 +358,20 @@ describe('Modules - Modal', () => {
 			modal.close();
 
 			expect(mockEditor.eventManager.removeGlobalEvent).toHaveBeenCalled();
-			expect(mockInst.init).toHaveBeenCalled();
-			expect(mockInst.off).toHaveBeenCalledWith(false);
+			expect(mockInst.modalInit).toHaveBeenCalled();
+			expect(mockInst.modalOff).toHaveBeenCalledWith(false);
 			expect(mockEditor.focus).toHaveBeenCalled();
 		});
 
 		it('should not call init if not provided', () => {
-			mockInst.init = undefined;
+			mockInst.modalInit = undefined;
 			expect(() => {
 				modal.close();
 			}).not.toThrow();
 		});
 
 		it('should not call off if not provided', () => {
-			mockInst.off = undefined;
+			mockInst.modalOff = undefined;
 			expect(() => {
 				modal.close();
 			}).not.toThrow();
@@ -387,7 +387,7 @@ describe('Modules - Modal', () => {
 		it('should call off with true when updating', () => {
 			modal.isUpdate = true;
 			modal.close();
-			expect(mockInst.off).toHaveBeenCalledWith(true);
+			expect(mockInst.modalOff).toHaveBeenCalledWith(true);
 		});
 	});
 
@@ -461,7 +461,7 @@ describe('Modules - Modal', () => {
 			}
 
 			// When undefined, close is called but hideLoading should not be called
-			expect(mockInst.init).toHaveBeenCalled();
+			expect(mockInst.modalInit).toHaveBeenCalled();
 		});
 
 		it('should handle action error', async () => {

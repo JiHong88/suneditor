@@ -42,10 +42,11 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
 });
 
 // Mock Controller
-jest.mock('../../../src/modules/Controller.js', () => {
-	return jest.fn().mockImplementation(function() {
+jest.mock('../../../src/modules/contracts/Controller.js', () => {
+	return jest.fn().mockImplementation(function(inst, form, options) {
 		this.open = jest.fn();
 		this.close = jest.fn();
+		this.position = options?.position || 'bottom';
 	});
 });
 
@@ -137,7 +138,7 @@ jest.mock('../../../src/helper', () => {
 	};
 });
 
-import HueSlider, { CreateSliderCtx } from '../../../src/modules/HueSlider.js';
+import HueSlider, { CreateSliderCtx } from '../../../src/modules/contracts/HueSlider.js';
 
 describe('Modules - HueSlider', () => {
 	let mockInst;
@@ -164,6 +165,7 @@ describe('Modules - HueSlider', () => {
 
 		mockInst = {
 			editor: mockEditor,
+			form: document.createElement('div'), // HueSlider needs form element for Controller
 			hueSliderAction: jest.fn(),
 			hueSliderCancelAction: jest.fn()
 		};
@@ -219,12 +221,11 @@ describe('Modules - HueSlider', () => {
 			expect(hueSlider.ctx.color.hex).toBe('#FFFFFF');
 		});
 
-		it('should accept form parameter with isNewForm', () => {
-			const mockForm = document.createElement('div');
-			const hueSlider = new HueSlider(mockInst, { form: mockForm, isNewForm: true });
+		it('should not create controller when isNewForm is true', () => {
+			const hueSlider = new HueSlider(mockInst, { isNewForm: true });
 
-			// When isNewForm, form is used as-is
-			expect(hueSlider.form).toBe(mockForm);
+			// When isNewForm, controller is not created
+			expect(hueSlider.controller).toBeUndefined();
 		});
 
 		it('should create default controller when not isNewForm', () => {
@@ -234,11 +235,11 @@ describe('Modules - HueSlider', () => {
 			expect(mockEditor.eventManager.addEvent).toHaveBeenCalled();
 		});
 
-		it('should not create default controller when isNewForm', () => {
-			const mockForm = document.createElement('div');
-			const hueSlider = new HueSlider(mockInst, { form: mockForm, isNewForm: true });
+		it('should accept controllerOptions parameter', () => {
+			const hueSlider = new HueSlider(mockInst, { controllerOptions: { position: 'top' } });
 
-			expect(hueSlider.controller).toBeUndefined();
+			expect(hueSlider.controller).toBeDefined();
+			expect(hueSlider.controller.position).toBe('top');
 		});
 
 		it('should accept className parameter', () => {

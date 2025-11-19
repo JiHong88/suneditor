@@ -1,6 +1,7 @@
-import EditorInjector from '../../editorInjector';
+import { PluginCommand } from '../../interfaces';
 import { dom, env, numbers } from '../../helper';
-import { FileManager, Figure, Controller } from '../../modules';
+import { Controller, Figure } from '../../modules/contracts';
+import { FileManager } from '../../modules/utils';
 
 const { NO_EVENT } = env;
 
@@ -25,9 +26,8 @@ const { NO_EVENT } = env;
  * @class
  * @description File upload plugin
  */
-class FileUpload extends EditorInjector {
+class FileUpload extends PluginCommand {
 	static key = 'fileUpload';
-	static type = 'command';
 	static className = '';
 	static options = { eventIndex: 10000 };
 	/**
@@ -116,9 +116,8 @@ class FileUpload extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - It is executed by clicking a toolbar "command" button or calling an API.
+	 * @override
+	 * @type {PluginCommand['action']}
 	 */
 	action() {
 		this.editor._preventBlur = true;
@@ -126,33 +125,8 @@ class FileUpload extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
-	 */
-	select(target) {
-		this.#element = target;
-		const asBtn = this.figure.controller.form.querySelector('[data-command="__c__as"]');
-		if (dom.check.isFigure(target.parentElement)) {
-			asBtn.innerHTML = this.icons.reduction + dom.utils.createTooltipInner(this.lang.asLink);
-			asBtn.setAttribute('data-value', 'link');
-			this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
-		} else {
-			asBtn.innerHTML = this.icons.expansion + dom.utils.createTooltipInner(this.lang.asBlock);
-			asBtn.setAttribute('data-value', 'box');
-			this.figure.controllerOpen(target, { isWWTarget: true });
-			return true;
-		}
-	}
-
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "paste" or "drop".
-	 * @param {Object} params { frameContext, event, file }
-	 * @param {SunEditor.FrameContext} params.frameContext Frame context
-	 * @param {ClipboardEvent} params.event Event object
-	 * @param {File} params.file File object
-	 * @returns {boolean} - If return false, the file upload will be canceled
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnFilePasteAndDrop}
 	 */
 	onFilePasteAndDrop({ file }) {
 		const fileType = file.type;
@@ -167,26 +141,11 @@ class FileUpload extends EditorInjector {
 
 		this.submitFile([file]);
 		this.editor.focus();
-
-		return false;
 	}
 
 	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a target component is edited.
-	 * @param {HTMLElement|Text} target Target element
-	 */
-	edit(target) {
-		this.editInput.value = target.textContent;
-		this.figure.controllerHide();
-		this.controller.open(target, null, { isWWTarget: !dom.check.isFigure(target.parentElement), initMethod: null, addOffset: null });
-		this.editInput.focus();
-	}
-
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Action}
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -202,12 +161,40 @@ class FileUpload extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
-	 * @returns {Promise<void>}
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Select}
 	 */
-	async destroy(target) {
+	componentSelect(target) {
+		this.#element = target;
+		const asBtn = this.figure.controller.form.querySelector('[data-command="__c__as"]');
+		if (dom.check.isFigure(target.parentElement)) {
+			asBtn.innerHTML = this.icons.reduction + dom.utils.createTooltipInner(this.lang.asLink);
+			asBtn.setAttribute('data-value', 'link');
+			this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
+		} else {
+			asBtn.innerHTML = this.icons.expansion + dom.utils.createTooltipInner(this.lang.asBlock);
+			asBtn.setAttribute('data-value', 'box');
+			this.figure.controllerOpen(target, { isWWTarget: true });
+			return true;
+		}
+	}
+
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Edit}
+	 */
+	componentEdit(target) {
+		this.editInput.value = target.textContent;
+		this.figure.controllerHide();
+		this.controller.open(target, null, { isWWTarget: !dom.check.isFigure(target.parentElement), initMethod: null, addOffset: null });
+		this.editInput.focus();
+	}
+
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Destroy}
+	 */
+	async componentDestroy(target) {
 		if (!target) return;
 
 		const figure = Figure.GetContainer(target);

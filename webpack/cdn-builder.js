@@ -4,8 +4,14 @@ import '../src/assets/suneditor-contents.css';
 import suneditor from '../src/suneditor';
 import plugins from '../src/plugins';
 import editorInjector from '../src/editorInjector';
-import modules from '../src/modules';
+import * as moduleContracts from '../src/modules/contracts';
+import * as moduleUtils from '../src/modules/utils';
 import helper from '../src/helper';
+
+const modules = {
+	contracts: moduleContracts,
+	utils: moduleUtils,
+};
 
 Object.defineProperty(window, 'SUNEDITOR', {
 	enumerable: true,
@@ -16,6 +22,6 @@ Object.defineProperty(window, 'SUNEDITOR', {
 		plugins,
 		editorInjector,
 		modules,
-		helper
-	}
+		helper,
+	},
 });

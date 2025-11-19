@@ -54,6 +54,7 @@ describe('Key Handler', () => {
 			_hideToolbar_sub: jest.fn(),
 			triggerEvent: jest.fn(async () => true),
 			_callPluginEvent: jest.fn(() => true),
+			_callPluginEventAsync: jest.fn(async () => true),
 			shortcuts: {
 				command: jest.fn(() => false)
 			},
@@ -247,7 +248,7 @@ describe('Key Handler', () => {
 				await OnKeyDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 				// Should not proceed to plugin event
-				expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
+				expect(mockThis._callPluginEventAsync).not.toHaveBeenCalled();
 			});
 		});
 
@@ -314,14 +315,14 @@ describe('Key Handler', () => {
 			it('should call plugin event', async () => {
 				await OnKeyDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-				expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onKeyDown', expect.objectContaining({
+				expect(mockThis._callPluginEventAsync).toHaveBeenCalledWith('onKeyDown', expect.objectContaining({
 					frameContext: mockFrameContext,
 					event: mockEvent
 				}));
 			});
 
 			it('should return early if plugin event returns false', async () => {
-				mockThis._callPluginEvent.mockReturnValue(false);
+				mockThis._callPluginEventAsync.mockResolvedValue(false);
 
 				await OnKeyDown_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -468,7 +469,7 @@ describe('Key Handler', () => {
 			it('should call plugin event', async () => {
 				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-				expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onKeyUp', expect.objectContaining({
+				expect(mockThis._callPluginEventAsync).toHaveBeenCalledWith('onKeyUp', expect.objectContaining({
 					frameContext: mockFrameContext,
 					event: mockEvent
 				}));
@@ -479,11 +480,11 @@ describe('Key Handler', () => {
 
 				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-				expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
+				expect(mockThis._callPluginEventAsync).not.toHaveBeenCalled();
 			});
 
 			it('should return early if plugin event returns false', async () => {
-				mockThis._callPluginEvent.mockReturnValue(false);
+				mockThis._callPluginEventAsync.mockResolvedValue(false);
 
 				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 

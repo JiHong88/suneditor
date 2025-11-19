@@ -1,4 +1,4 @@
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
@@ -10,9 +10,8 @@ import { dom } from '../../helper';
  * @class
  * @description Align plugin
  */
-class Align extends EditorInjector {
+class Align extends PluginDropdown {
 	static key = 'align';
-	static type = 'dropdown';
 	static className = '';
 
 	/**
@@ -43,12 +42,8 @@ class Align extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
 		const targetChild = target.firstElementChild;
@@ -70,9 +65,8 @@ class Align extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {HTMLElement} target Line element at the current cursor position
+	 * @override
+	 * @type {PluginDropdown['on']}
 	 */
 	on(target) {
 		const currentAlign = target.getAttribute('data-focus') || this.defaultDir;
@@ -89,30 +83,8 @@ class Align extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the method called when the rtl, ltr mode changes. ("editor.setDir")
-	 * @param {string} dir Direction ("rtl" or "ltr")
-	 */
-	setDir(dir) {
-		const _dir = dir === 'rtl' ? 'right' : 'left';
-		if (this.defaultDir === _dir) return;
-
-		this.defaultDir = _dir;
-		const leftBtn = this._itemMenu.querySelector('[data-command="left"]');
-		const rightBtn = this._itemMenu.querySelector('[data-command="right"]');
-		if (leftBtn && rightBtn) {
-			const lp = leftBtn.parentElement;
-			const rp = rightBtn.parentElement;
-			lp.appendChild(rightBtn);
-			rp.appendChild(leftBtn);
-		}
-	}
-
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
+	 * @override
+	 * @type {PluginDropdown['action']}
 	 */
 	action(target) {
 		const value = target.getAttribute('data-command');
@@ -128,6 +100,25 @@ class Align extends EditorInjector {
 		this.menu.dropdownOff();
 		this.editor.focus();
 		this.history.push(false);
+	}
+
+	/**
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.SetDir}
+	 */
+	setDir(dir) {
+		const _dir = dir === 'rtl' ? 'right' : 'left';
+		if (this.defaultDir === _dir) return;
+
+		this.defaultDir = _dir;
+		const leftBtn = this._itemMenu.querySelector('[data-command="left"]');
+		const rightBtn = this._itemMenu.querySelector('[data-command="right"]');
+		if (leftBtn && rightBtn) {
+			const lp = leftBtn.parentElement;
+			const rp = rightBtn.parentElement;
+			lp.appendChild(rightBtn);
+			rp.appendChild(leftBtn);
+		}
 	}
 }
 

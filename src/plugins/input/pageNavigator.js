@@ -1,4 +1,4 @@
-import EditorInjector from '../../editorInjector';
+import { PluginInput } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
@@ -9,9 +9,8 @@ import { dom } from '../../helper';
  * - the total number of pages. When the user changes the value in the input field, the plugin triggers
  * - a page navigation event through the editor's document context.
  */
-class PageNavigator extends EditorInjector {
+class PageNavigator extends PluginInput {
 	static key = 'pageNavigator';
-	static type = 'input';
 	static className = 'se-btn-input se-btn-tool-pageNavigator';
 
 	/**
@@ -35,10 +34,10 @@ class PageNavigator extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.documentType
-	 * @description Updates the displayed page number and total pages in the navigator.
+	 * Updates the displayed page number and total pages in the navigator.
 	 * @param {number} pageNum - The current page number to display.
 	 * @param {number} totalPages - The total number of pages in the document.
+	 * @returns {void}
 	 */
 	display(pageNum, totalPages) {
 		// data update

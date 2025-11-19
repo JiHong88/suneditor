@@ -144,10 +144,7 @@ export type EmbedPluginOptions = {
  * @description Embed modal plugin.
  * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
  */
-declare class Embed extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Embed extends PluginModal {
 	/**
 	 * @this {Embed}
 	 * @param {HTMLElement} node - The node to check.
@@ -161,7 +158,6 @@ declare class Embed extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: EmbedPluginOptions);
 	title: any;
-	icon: string;
 	pluginOptions: {
 		canResize: boolean;
 		showHeightInput: boolean;
@@ -229,61 +225,16 @@ declare class Embed extends EditorInjector {
 		};
 	};
 	urlPatterns: RegExp[];
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
-	 */
-	open(): void;
-	/**
-	 * @editorMethod Modules.Controller(Figure)
-	 * @description Executes the method that is called when a target component is edited.
-	 */
-	edit(): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
-	 */
-	on(isUpdate: boolean): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {Promise<boolean>} Success / failure
-	 */
-	modalAction(): Promise<boolean>;
-	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLIFrameElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
-	 */
 	retainFormat(): {
 		query: string;
-		method: (element: HTMLIFrameElement) => void;
+		method: (element: HTMLElement) => void;
 	};
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
-	 */
-	init(): void;
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
-	 */
-	select(target: HTMLElement): void;
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
-	 * @returns {Promise<void>}
-	 */
-	destroy(target: HTMLElement): Promise<void>;
+	modalOn(isUpdate: boolean): void;
+	modalAction(): Promise<boolean>;
+	modalInit(): void;
+	componentSelect(target: HTMLElement): void | boolean;
+	componentEdit(target: HTMLElement): void;
+	componentDestroy(target: HTMLElement): Promise<void>;
 	/**
 	 * @description Checks if the given URL matches any of the defined URL patterns.
 	 * @param {string} url - The URL to check.
@@ -311,6 +262,6 @@ declare class Embed extends EditorInjector {
 	_caption: HTMLElement;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { Modal } from '../../modules';
-import { Figure } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal } from '../../modules/contracts';
+import { Figure } from '../../modules/contracts';

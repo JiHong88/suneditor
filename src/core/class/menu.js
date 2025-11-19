@@ -62,7 +62,7 @@ Menu.prototype = {
 	 */
 	initDropdownTarget({ key, type }, menu) {
 		if (key) {
-			if (!/free$/.test(type)) {
+			if (!IsFree(type)) {
 				/** @type {HTMLElement} */ (menu).setAttribute('data-key', key);
 				this._dropdownCommands.push(key);
 			}
@@ -108,7 +108,8 @@ Menu.prototype = {
 		}
 
 		this.currentDropdownPlugin = this.plugins[dropdownName];
-		if (typeof this.currentDropdownPlugin?.on === 'function') this.currentDropdownPlugin.on(btnEl);
+		this.currentDropdownPlugin?.on(btnEl);
+
 		this.editor._preventBlur = true;
 	},
 
@@ -138,7 +139,7 @@ Menu.prototype = {
 
 		this.editor._preventBlur = false;
 
-		if (typeof this.currentDropdownPlugin?.off === 'function') this.currentDropdownPlugin.off();
+		if (IsFree(this.currentDropdownType)) this.currentDropdownPlugin?.off?.();
 		this.currentDropdownPlugin = null;
 	},
 
@@ -380,6 +381,15 @@ function OnMousemove_dropdown(e) {
 	const index = this.menus.indexOf(e.target);
 	if (index === -1) return;
 	this.index = index * 1;
+}
+
+/**
+ * @private
+ * @param {string} type Type
+ * @returns {boolean}
+ */
+function IsFree(type) {
+	return /free$/.test(type);
 }
 
 export default Menu;

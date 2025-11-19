@@ -1,15 +1,17 @@
-import EditorInjector from '../../editorInjector';
+import { PluginCommand, PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
+
+void PluginDropdown;
 
 const DEFAULT_TYPE = 'decimal';
 
 /**
  * @class
+ * @implements {PluginDropdown}
  * @description List numbered plugin, Several types of lists are provided.
  */
-class List_numbered extends EditorInjector {
+class List_numbered extends PluginCommand {
 	static key = 'list_numbered';
-	static type = 'command';
 	static className = 'se-icon-flip-rtl';
 
 	/**
@@ -38,12 +40,8 @@ class List_numbered extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
 		if (dom.check.isListCell(element) && /^OL$/i.test(element.parentElement.nodeName)) {
@@ -56,8 +54,25 @@ class List_numbered extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
+	 * @override
+	 * @type {PluginCommand['action']}
+	 */
+	action(target) {
+		const el = this.format.getBlock(this.selection.getNode());
+		const type = target?.querySelector('ol')?.style.listStyleType;
+
+		if (dom.check.isList(el) && type) {
+			el.style.listStyleType = type;
+		} else {
+			this.submit(type);
+		}
+
+		this.menu.dropdownOff();
+	}
+
+	/**
+	 * @hook Dropdown
+	 * @type {PluginDropdown['on']}
 	 */
 	on() {
 		const list = this.listItems;
@@ -75,28 +90,8 @@ class List_numbered extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 */
-	action(target) {
-		const el = this.format.getBlock(this.selection.getNode());
-		const type = target?.querySelector('ol')?.style.listStyleType;
-
-		if (dom.check.isList(el) && type) {
-			el.style.listStyleType = type;
-		} else {
-			this.submit(type);
-		}
-
-		this.menu.dropdownOff();
-	}
-
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes methods called by shortcut keys.
-	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.Shortcut}
 	 */
 	shortcut({ range, info }) {
 		const { startContainer } = range;

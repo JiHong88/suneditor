@@ -4,7 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, numbers, env, converter } from '../../helper';
-import { _DragHandle } from '../../modules';
+import { _DragHandle } from '../../modules/utils';
 
 // event handlers
 import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from './handlers/handler_toolbar';
@@ -665,7 +665,7 @@ EventManager.prototype = {
 		const files = clipboardData.files;
 		if (files.length > 0 && !MSData) {
 			for (let i = 0, len = files.length; i < len; i++) {
-				this._callPluginEvent('onFilePasteAndDrop', { frameContext, event: e, file: files[i] });
+				await this._callPluginEventAsync('onFilePasteAndDrop', { frameContext, event: e, file: files[i] });
 			}
 
 			return false;
@@ -677,7 +677,7 @@ EventManager.prototype = {
 
 		if (cleanData) {
 			const domParser = new DOMParser().parseFromString(cleanData, 'text/html');
-			if (this._callPluginEvent('onPaste', { frameContext, event: e, data: cleanData, doc: domParser }) !== true) {
+			if ((await this._callPluginEventAsync('onPaste', { frameContext, event: e, data: cleanData, doc: domParser })) !== false) {
 				this.html.insert(cleanData, { selectInserted: false, skipCharCount: true, skipCleaning: true });
 			}
 
@@ -1074,7 +1074,8 @@ EventManager.prototype = {
 	/**
 	 * @private
 	 * @this {EventManagerThis}
-	 * @description Calls a registered plugin event and executes associated handlers.
+	 * @description Calls a registered plugin event and executes associated handlers synchronously (fire-and-forget).
+	 * - Use this for performance-critical events like onMouseMove, onScroll
 	 * - If any handler returns `false`, the event propagation stops.
 	 * @param {string} name The name of the plugin event
 	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
@@ -1084,6 +1085,25 @@ EventManager.prototype = {
 		const eventPlugins = this.editor._onPluginEvents.get(name);
 		for (let i = 0, r; i < eventPlugins.length; i++) {
 			r = eventPlugins[i](e);
+			if (typeof r === 'boolean') return r;
+		}
+	},
+
+	/**
+	 * @private
+	 * @this {EventManagerThis}
+	 * @description Calls a registered plugin event and executes associated handlers asynchronously.
+	 * - Use this for events that need to check return values or ensure completion
+	 * - Waits for each handler to complete (including async handlers)
+	 * - If any handler returns `false`, the event propagation stops.
+	 * @param {string} name The name of the plugin event
+	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
+	 * @returns {Promise<boolean|undefined>} Returns `false` if any handler stops the event, otherwise `undefined`
+	 */
+	async _callPluginEventAsync(name, e) {
+		const eventPlugins = this.editor._onPluginEvents.get(name);
+		for (let i = 0, r; i < eventPlugins.length; i++) {
+			r = await eventPlugins[i](e);
 			if (typeof r === 'boolean') return r;
 		}
 	},
@@ -1128,7 +1148,7 @@ EventManager.prototype = {
 	 * @description Focus Event Postprocessing
 	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
-	 * @param {Event} event - Event object
+	 * @param {FocusEvent} event - Focus event object
 	 */
 	__postFocusEvent(frameContext, event) {
 		if (this.editor.isInline || this.editor.isBalloonAlways) this.toolbar.show();
@@ -1145,7 +1165,7 @@ EventManager.prototype = {
 	 * @description Blur Event Postprocessing
 	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
-	 * @param {Event} event - Event object
+	 * @param {FocusEvent} event - Focus event object
 	 */
 	__postBlurEvent(frameContext, event) {
 		if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
@@ -1195,7 +1215,7 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 /**
  * @this {EventManagerThis}
  * @param {SunEditor.FrameContext} frameContext - frame context object
- * @param {Event} e - Event object
+ * @param {FocusEvent} e - Focus event object
  */
 function OnFocus_wysiwyg(frameContext, e) {
 	if (this.selection.__iframeFocus || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
@@ -1237,7 +1257,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 /**
  * @this {EventManagerThis}
  * @param {SunEditor.FrameContext} frameContext - frame context object
- * @param {Event} e - Event object
+ * @param {FocusEvent} e - Focus event object
  */
 function OnBlur_wysiwyg(frameContext, e) {
 	if (frameContext.get('isCodeView') || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return;
@@ -1300,7 +1320,7 @@ function __closeMove() {
 /**
  * @this {EventManagerThis}
  * @param {"t"|"b"} dir - Direction
- * @param {Event} e - Event object
+ * @param {PointerEvent} e - Pointer event object
  */
 function DisplayLineBreak(dir, e) {
 	e.preventDefault();

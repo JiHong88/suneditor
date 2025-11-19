@@ -2,47 +2,21 @@ import type {} from '../../typedef';
 export default List_bulleted;
 /**
  * @class
+ * @implements {PluginDropdown}
  * @description List bulleted plugin, Several types of lists are provided.
  */
-declare class List_bulleted extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class List_bulleted extends PluginCommand implements PluginDropdown {
 	title: any;
-	icon: string;
-	afterItem: HTMLElement;
 	listItems: NodeListOf<Element>;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
-	 */
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean;
-	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 */
-	on(): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 */
-	action(target: HTMLElement): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes methods called by shortcut keys.
-	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
-	 */
-	shortcut({ range, info }: SunEditor.Plugin.ShortcutInfo): void;
+	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	on(target?: HTMLElement): void;
+	off(): void;
+	shortcut(params: SunEditor.HookParams.Shortcut): void;
 	/**
 	 * @description Add a bulleted list
 	 * @param {string} [type=""] List type
 	 */
 	submit(type?: string): void;
 }
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
+import { PluginCommand } from '../../interfaces';

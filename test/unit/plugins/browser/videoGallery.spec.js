@@ -10,7 +10,7 @@ const mockBrowser = {
     close: jest.fn()
 };
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
     Browser: jest.fn().mockImplementation(() => mockBrowser)
 }));
 
@@ -111,7 +111,7 @@ describe('Plugins - Browser - VideoGallery', () => {
 
             new VideoGallery(mockEditor, pluginOptions);
 
-            const { Browser } = require('../../../../src/modules');
+            const { Browser } = require('../../../../src/modules/contracts');
             const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
 
             expect(browserOptions.thumbnail).toBeInstanceOf(Function);
@@ -126,7 +126,7 @@ describe('Plugins - Browser - VideoGallery', () => {
 
             new VideoGallery(mockEditor, pluginOptions);
 
-            const { Browser } = require('../../../../src/modules');
+            const { Browser } = require('../../../../src/modules/contracts');
             const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
 
             expect(browserOptions.thumbnail).toBe(thumbnailFn);
@@ -135,7 +135,7 @@ describe('Plugins - Browser - VideoGallery', () => {
         it('should use default icon thumbnail when no thumbnail provided', () => {
             new VideoGallery(mockEditor, {});
 
-            const { Browser } = require('../../../../src/modules');
+            const { Browser } = require('../../../../src/modules/contracts');
             const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
 
             expect(browserOptions.thumbnail()).toBe('🎥');
@@ -187,7 +187,7 @@ describe('Plugins - Browser - VideoGallery', () => {
                 videoGallery.open(customHandler);
 
                 // Get the selectorHandler from Browser constructor
-                const browserConstructorCall = require('../../../../src/modules').Browser.mock.calls[0];
+                const browserConstructorCall = require('../../../../src/modules/contracts').Browser.mock.calls[0];
                 const browserOptions = browserConstructorCall[1];
                 const selectorHandler = browserOptions.selectorHandler;
 
@@ -213,7 +213,7 @@ describe('Plugins - Browser - VideoGallery', () => {
                 videoGallery.open();
 
                 // Get the selectorHandler from Browser constructor
-                const browserConstructorCall = require('../../../../src/modules').Browser.mock.calls[0];
+                const browserConstructorCall = require('../../../../src/modules/contracts').Browser.mock.calls[0];
                 const browserOptions = browserConstructorCall[1];
                 const selectorHandler = browserOptions.selectorHandler;
 
@@ -247,7 +247,7 @@ describe('Plugins - Browser - VideoGallery', () => {
 
                 videoGallery.open();
 
-                const browserConstructorCall = require('../../../../src/modules').Browser.mock.calls[0];
+                const browserConstructorCall = require('../../../../src/modules/contracts').Browser.mock.calls[0];
                 const browserOptions = browserConstructorCall[1];
                 const selectorHandler = browserOptions.selectorHandler;
 
@@ -281,7 +281,7 @@ describe('Plugins - Browser - VideoGallery', () => {
 
                 videoGallery.open();
 
-                const browserConstructorCall = require('../../../../src/modules').Browser.mock.calls[0];
+                const browserConstructorCall = require('../../../../src/modules/contracts').Browser.mock.calls[0];
                 const browserOptions = browserConstructorCall[1];
                 const selectorHandler = browserOptions.selectorHandler;
 
@@ -303,7 +303,7 @@ describe('Plugins - Browser - VideoGallery', () => {
 
     describe('Browser integration', () => {
         it('should create Browser with correct options', () => {
-            const { Browser } = require('../../../../src/modules');
+            const { Browser } = require('../../../../src/modules/contracts');
             const constructorCall = Browser.mock.calls[0];
 
             expect(constructorCall[0]).toBe(videoGallery); // instance
@@ -326,7 +326,7 @@ describe('Plugins - Browser - VideoGallery', () => {
 
             new VideoGallery(mockEditor, pluginOptions);
 
-            const { Browser } = require('../../../../src/modules');
+            const { Browser } = require('../../../../src/modules/contracts');
             const lastCall = Browser.mock.calls[Browser.mock.calls.length - 1];
             const browserOptions = lastCall[1];
 
@@ -363,7 +363,7 @@ describe('Plugins - Browser - VideoGallery', () => {
 
             videoGallery.open();
 
-            const { Browser } = require('../../../../src/modules');
+            const { Browser } = require('../../../../src/modules/contracts');
             const browserOptions = Browser.mock.calls[0][1];
             const selectorHandler = browserOptions.selectorHandler;
 

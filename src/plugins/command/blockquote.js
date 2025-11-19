@@ -1,13 +1,12 @@
-import EditorInjector from '../../editorInjector';
+import { PluginCommand } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
  * @class
  * @description Blockquote plugin
  */
-class Blockquote extends EditorInjector {
+class Blockquote extends PluginCommand {
 	static key = 'blockquote';
-	static type = 'command';
 	static className = '';
 
 	/**
@@ -25,12 +24,8 @@ class Blockquote extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
 		if (/blockquote/i.test(element?.nodeName)) {
@@ -43,9 +38,8 @@ class Blockquote extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - It is executed by clicking a toolbar "command" button or calling an API.
+	 * @override
+	 * @type {PluginCommand['action']}
 	 */
 	action() {
 		const currentBlockquote = dom.query.getParentElement(this.selection.getNode(), 'blockquote');

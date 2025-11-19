@@ -1,5 +1,5 @@
-import EditorInjector from '../../editorInjector';
-import ColorPicker from '../../modules/ColorPicker';
+import { PluginDropdownFree } from '../../interfaces';
+import { ColorPicker } from '../../modules/contracts';
 import { dom } from '../../helper';
 
 /**
@@ -13,9 +13,8 @@ import { dom } from '../../helper';
  * @class
  * @description Text background color plugin
  */
-class BackgroundColor extends EditorInjector {
+class BackgroundColor extends PluginDropdownFree {
 	static key = 'backgroundColor';
-	static type = 'dropdown-free';
 	static className = '';
 
 	/**
@@ -46,12 +45,8 @@ class BackgroundColor extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
 		const colorHelper = /** @type {SVGPathElement} */ (target.querySelector('path.se-svg-color-helper'));
@@ -71,43 +66,40 @@ class BackgroundColor extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's "dropdown" menu is opened.
-	 * @param {HTMLElement} target Line element at the current cursor position
+	 * @override
+	 * @type {PluginDropdownFree['on']}
 	 */
 	on(target) {
 		this.colorPicker.init(this.selection.getNode(), target, (current) => this.format.isLine(current));
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's "dropdown" menu is closed.
+	 * @override
+	 * @type {PluginDropdownFree['off']}
 	 */
 	off() {
 		this.colorPicker.hueSliderClose();
 	}
 
 	/**
-	 * @editorMethod Modules.ColorPicker
-	 * @description Executes the method called when the "HueSlider" module is opened.
+	 * @hook Modules.ColorPicker
+	 * @type {SunEditor.Hook.ColorPicker.HueSliderOpen}
 	 */
 	colorPickerHueSliderOpen() {
 		this.menu.dropdownHide();
 	}
 
 	/**
-	 * @editorMethod Modules.ColorPicker
-	 * @description Executes the method called when the "HueSlider" module is closed.
+	 * @hook Modules.ColorPicker
+	 * @type {SunEditor.Hook.ColorPicker.HueSliderClose}
 	 */
 	colorPickerHueSliderClose() {
 		this.menu.dropdownShow();
 	}
 
 	/**
-	 * @editorMethod Modules.ColorPicker
-	 * @description Executes the method called when a button of "ColorPicker" module is clicked.
-	 * - This plugin is by applying the "ColorPicker" module globally to the "dropdown" menu, the default "action" method is not called.
-	 * @param {string} color - Color code (hex)
+	 * @hook Modules.ColorPicker
+	 * @type {SunEditor.Hook.ColorPicker.Action}
 	 */
 	colorPickerAction(color) {
 		if (color) {

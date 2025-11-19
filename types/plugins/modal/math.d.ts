@@ -49,10 +49,7 @@ export type MathPluginOptions = {
  * - This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
  * - If external library is provided, a warning is issued.
  */
-declare class Math_ extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Math_ extends PluginModal {
 	/**
 	 * @this {Math_}
 	 * @param {HTMLElement} node - The node to check.
@@ -66,7 +63,6 @@ declare class Math_ extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: MathPluginOptions);
 	title: any;
-	icon: string;
 	katex: any;
 	mathjax: any;
 	pluginOptions: {
@@ -111,68 +107,19 @@ declare class Math_ extends EditorInjector {
 	/** @type {HTMLSelectElement} */
 	fontSizeElement: HTMLSelectElement;
 	isUpdateState: boolean;
-	/**
-	 * @editorMethod Editor.component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
-	 */
-	select(target: HTMLElement): void;
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description This function is called before the "controller" before it is closed.
-	 */
-	close(): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
-	 */
 	retainFormat(): {
 		query: string;
 		method: (element: HTMLElement) => void;
 	};
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
-	 */
-	open(): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
-	 */
-	on(isUpdate: boolean): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {boolean} Success or failure
-	 */
-	modalAction(): boolean;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
-	 */
-	init(): void;
-	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
-	 */
+	modalOn(isUpdate: boolean): void;
+	modalAction(): Promise<boolean>;
+	modalInit(): void;
 	controllerAction(target: HTMLButtonElement): void;
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Node} target Target element
-	 */
-	destroy(target: Node): void;
+	controllerClose(): void;
+	componentSelect(target: HTMLElement): void | boolean;
+	componentDestroy(target: HTMLElement): Promise<void>;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { Modal } from '../../modules';
-import { Controller } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal } from '../../modules/contracts';
+import { Controller } from '../../modules/contracts';

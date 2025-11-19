@@ -1,4 +1,4 @@
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
@@ -10,9 +10,8 @@ import { dom } from '../../helper';
  * @class
  * @description Layout Plugin, Apply layout to the entire editor.
  */
-class Layout extends EditorInjector {
+class Layout extends PluginDropdown {
 	static key = 'layout';
-	static type = 'dropdown';
 	static className = '';
 
 	/**
@@ -38,11 +37,8 @@ class Layout extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 * @throws {Error} Throws error if layout HTML is not found.
+	 * @override
+	 * @type {PluginDropdown['action']}
 	 */
 	action(target) {
 		const index = Number(target.getAttribute('data-value'));

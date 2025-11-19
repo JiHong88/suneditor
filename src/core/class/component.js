@@ -4,7 +4,8 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { dom, env, numbers, unicode, keyCodeMap, converter } from '../../helper';
-import { Figure, _DragHandle } from '../../modules';
+import { Figure } from '../../modules/contracts';
+import { _DragHandle } from '../../modules/utils';
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
 const DIR_KEYCODE = /^Arrow(Left|Up|Right|Down)$/;
@@ -288,7 +289,7 @@ Component.prototype = {
 
 		const notOver = _DragHandle.get('__overInfo') !== ON_OVER_COMPONENT;
 		if (!isInput && notOver) {
-			if (this.editor.status._onMousedown) return;
+			if (this.status._onMousedown) return;
 
 			this.editor._preventBlur = true;
 			this.__selectionSelected = true;
@@ -305,7 +306,7 @@ Component.prototype = {
 		this.__prevent = true;
 
 		let isNonFigureComponent;
-		if (typeof plugin.select === 'function') isNonFigureComponent = plugin.select(element);
+		if (typeof plugin.componentSelect === 'function') isNonFigureComponent = plugin.componentSelect(element);
 
 		const isBreakComponent = dom.utils.hasClass(info.target, 'se-component-line-break');
 		if (isBreakComponent || (!isNonFigureComponent && !dom.utils.hasClass(info.container, 'se-inline-component'))) this._setComponentLineBreaker(/** @type {HTMLElement} */ (info.container || info.cover || element));
@@ -349,7 +350,7 @@ Component.prototype = {
 				oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
 			}
 
-			this.editor.status.onSelected = true;
+			this.status.onSelected = true;
 		} else if (isBreakComponent || !dom.utils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = this.frameContext.get('wrapper').querySelector('.se-drag-handle');
 			dom.utils.addClass(dragHandle, 'se-drag-handle-full');
@@ -380,7 +381,7 @@ Component.prototype = {
 	 */
 	deselect() {
 		_w.setTimeout(() => {
-			this.editor.status.onSelected = false;
+			this.status.onSelected = false;
 		}, 0);
 		this.__deselect();
 		this.ui.setControllerOnDisabledButtons(false);
@@ -500,8 +501,8 @@ Component.prototype = {
 			frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = 'none';
 		}
 
-		if (this.currentPlugin && typeof this.currentPlugin.deselect === 'function') {
-			this.currentPlugin.deselect(this.currentTarget);
+		if (this.currentPlugin) {
+			this.currentPlugin.componentDeselect?.(this.currentTarget);
 		}
 
 		this.isSelected = false;
@@ -776,7 +777,7 @@ function OnCopy_component(e) {
 	const cloneContainer = info.container.cloneNode(true);
 	dom.utils.removeClass(cloneContainer, 'se-component-selected');
 
-	if (typeof this.plugins[info.pluginName]?.onCopyComponent !== 'function' || this.plugins[info.pluginName].onCopyComponent({ event: e, cloneContainer, info }) === false) {
+	if (typeof this.plugins[info.pluginName]?.componentCopy !== 'function' || this.plugins[info.pluginName].componentCopy({ event: e, cloneContainer, info }) === false) {
 		SetClipboardComponent(e, cloneContainer, e.clipboardData);
 	}
 
@@ -827,9 +828,10 @@ async function OnKeyDown_component(e) {
 	if (keyCodeMap.isRemoveKey(keyCode)) {
 		e.preventDefault();
 		e.stopPropagation();
-		if (typeof this.currentPlugin?.destroy === 'function' && (!this.info.isInputType || !this.status.hasFocus)) {
+
+		if (typeof this.currentPlugin?.componentDestroy === 'function' && (!this.info.isInputType || !this.status.hasFocus)) {
 			const focusNode = this.info.container.previousSibling;
-			await this.currentPlugin.destroy(this.currentTarget);
+			await this.currentPlugin.componentDestroy(this.currentTarget);
 			this.deselect();
 			if (focusNode) {
 				const offset = focusNode.nodeType === 3 ? focusNode.textContent.length : 1;

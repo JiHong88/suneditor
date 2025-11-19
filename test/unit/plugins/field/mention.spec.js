@@ -1,4 +1,9 @@
 import Mention from '../../../../src/plugins/field/mention';
+
+// Mock HueSlider module to prevent canvas initialization errors
+jest.mock('../../../../src/modules/contracts/HueSlider.js', () => {
+	return jest.fn().mockImplementation(() => ({}));
+});
 import { createMockThis } from '../../../__mocks__/editorMock';
 
 // Mock dependencies
@@ -11,34 +16,37 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
+	Controller: jest.fn().mockImplementation((plugin, element, options, additional) => ({
+		open: jest.fn(),
+		close: jest.fn(),
+	})),
+}));
+
+jest.mock('../../../../src/modules/utils', () => ({
 	ApiManager: jest.fn().mockImplementation((plugin, options) => ({
 		cancel: jest.fn(),
 		asyncCall: jest.fn().mockResolvedValue({
 			responseText: JSON.stringify([
 				{ key: 'user1', name: 'User One', url: '/user1' },
-				{ key: 'user2', name: 'User Two', url: '/user2' }
-			])
-		})
+				{ key: 'user2', name: 'User Two', url: '/user2' },
+			]),
+		}),
 	})),
 	SelectMenu: jest.fn().mockImplementation((plugin, options) => ({
 		on: jest.fn(),
 		close: jest.fn(),
 		create: jest.fn(),
 		open: jest.fn(),
-		setItem: jest.fn()
+		setItem: jest.fn(),
 	})),
-	Controller: jest.fn().mockImplementation((plugin, element, options, additional) => ({
-		open: jest.fn(),
-		close: jest.fn()
-	}))
 }));
 
 jest.mock('../../../../src/helper', () => ({
 	dom: {
 		check: {
 			isAnchor: jest.fn().mockReturnValue(false),
-			isZeroWidth: jest.fn().mockReturnValue(false)
+			isZeroWidth: jest.fn().mockReturnValue(false),
 		},
 		utils: {
 			createElement: jest.fn().mockReturnValue({
@@ -46,17 +54,22 @@ jest.mock('../../../../src/helper', () => ({
 				className: '',
 				innerHTML: '',
 				setAttribute: jest.fn(),
-				getAttribute: jest.fn()
+				getAttribute: jest.fn(),
 			}),
 			createTextNode: jest.fn().mockReturnValue({
 				nodeType: 3,
-				textContent: ''
-			})
-		}
+				textContent: '',
+			}),
+		},
 	},
 	converter: {
-		debounce: jest.fn().mockImplementation(fn => fn)
-	}
+		debounce: jest.fn().mockImplementation((fn) => fn),
+	},
+	env: {
+		isTouchDevice: false,
+		_w: global.window || {},
+		ON_OVER_COMPONENT: 'data-se-on-over-component',
+	},
 }));
 
 describe('Mention Plugin', () => {
@@ -76,23 +89,23 @@ describe('Mention Plugin', () => {
 				rangeCount: 1,
 				anchorNode: {
 					textContent: '@test user',
-					parentNode: document.createElement('div')
+					parentNode: document.createElement('div'),
 				},
-				anchorOffset: 5
+				anchorOffset: 5,
 			}),
-			setRange: jest.fn()
+			setRange: jest.fn(),
 		};
 
 		// Mock html methods
 		mockThis.html = {
-			insertNode: jest.fn().mockReturnValue(true)
+			insertNode: jest.fn().mockReturnValue(true),
 		};
 
 		mention = new Mention(mockEditor, {
 			triggerText: '@',
 			limitSize: 5,
 			searchStartLength: 0,
-			delayTime: 200
+			delayTime: 200,
 		});
 
 		// Bind mockThis context to mention methods
@@ -114,7 +127,7 @@ describe('Mention Plugin', () => {
 				searchStartLength: 2,
 				delayTime: 500,
 				useCachingData: false,
-				useCachingFieldData: false
+				useCachingFieldData: false,
 			});
 
 			expect(customMention.triggerText).toBe('#');
@@ -126,12 +139,10 @@ describe('Mention Plugin', () => {
 		});
 
 		it('should initialize with direct data', () => {
-			const data = [
-				{ key: 'user1', name: 'User One', url: '/user1' }
-			];
+			const data = [{ key: 'user1', name: 'User One', url: '/user1' }];
 
 			const mentionWithData = new Mention(mockEditor, {
-				data: data
+				data: data,
 			});
 
 			expect(mentionWithData.directData).toBe(data);
@@ -140,7 +151,7 @@ describe('Mention Plugin', () => {
 		it('should initialize API URL correctly', () => {
 			const mentionWithApi = new Mention(mockEditor, {
 				apiUrl: '/api/mentions?limit={limitSize}&q={key}',
-				limitSize: 10
+				limitSize: 10,
 			});
 
 			expect(mentionWithApi.apiUrl).toBe('/api/mentions?limit=10&q={key}');
@@ -149,9 +160,7 @@ describe('Mention Plugin', () => {
 
 	describe('onInput', () => {
 		it('should handle input with trigger character', async () => {
-			mention.directData = [
-				{ key: 'test', name: 'Test User', url: '/test' }
-			];
+			mention.directData = [{ key: 'test', name: 'Test User', url: '/test' }];
 
 			const result = await mention.onInput();
 
@@ -164,7 +173,7 @@ describe('Mention Plugin', () => {
 			const result = await mention.onInput();
 
 			expect(mention.selectMenu.close).toHaveBeenCalled();
-			expect(result).toBe(true);
+			expect(result).toBe(undefined);
 		});
 
 		it('should handle text without trigger character', async () => {
@@ -172,15 +181,15 @@ describe('Mention Plugin', () => {
 				rangeCount: 1,
 				anchorNode: {
 					textContent: 'normal text',
-					parentNode: document.createElement('div')
+					parentNode: document.createElement('div'),
 				},
-				anchorOffset: 11
+				anchorOffset: 11,
 			});
 
 			const result = await mention.onInput();
 
 			expect(mention.selectMenu.close).toHaveBeenCalled();
-			expect(result).toBe(true);
+			expect(result).toBe(undefined);
 		});
 
 		it('should handle minimum search length requirement', async () => {
@@ -189,14 +198,14 @@ describe('Mention Plugin', () => {
 				rangeCount: 1,
 				anchorNode: {
 					textContent: '@te', // Only 2 characters after @
-					parentNode: document.createElement('div')
+					parentNode: document.createElement('div'),
 				},
-				anchorOffset: 3
+				anchorOffset: 3,
 			});
 
 			const result = await mention.onInput();
 
-			expect(result).toBe(true);
+			expect(result).toBe(undefined);
 		});
 
 		it('should handle API error gracefully', async () => {
@@ -209,7 +218,7 @@ describe('Mention Plugin', () => {
 			const result = await mention.onInput();
 
 			expect(consoleSpy).toHaveBeenCalledWith('[SUNEDITOR.mention.api.file] ', expect.any(Error));
-			expect(result).toBe(true);
+			expect(result).toBe(undefined);
 
 			consoleSpy.mockRestore();
 		});
@@ -220,7 +229,7 @@ describe('Mention Plugin', () => {
 			mention.directData = [
 				{ key: 'alice', name: 'Alice Smith', url: '/alice' },
 				{ key: 'bob', name: 'Bob Jones', url: '/bob' },
-				{ key: 'alicia', name: 'Alicia Brown', url: '/alicia' }
+				{ key: 'alicia', name: 'Alicia Brown', url: '/alicia' },
 			];
 
 			// Mock the method since it's private - test through onInput instead
@@ -228,9 +237,9 @@ describe('Mention Plugin', () => {
 				rangeCount: 1,
 				anchorNode: {
 					textContent: '@al',
-					parentNode: { tagName: 'DIV' }
+					parentNode: { tagName: 'DIV' },
 				},
-				anchorOffset: 3
+				anchorOffset: 3,
 			});
 
 			await mention.onInput();
@@ -248,9 +257,9 @@ describe('Mention Plugin', () => {
 				rangeCount: 1,
 				anchorNode: {
 					textContent: '@cached',
-					parentNode: { tagName: 'DIV' }
+					parentNode: { tagName: 'DIV' },
 				},
-				anchorOffset: 7
+				anchorOffset: 7,
 			});
 
 			await mention.onInput();
@@ -267,7 +276,6 @@ describe('Mention Plugin', () => {
 		});
 	});
 
-
 	describe('Caching', () => {
 		it('should initialize caching data structures', () => {
 			// Test that caching structures are properly initialized
@@ -278,7 +286,7 @@ describe('Mention Plugin', () => {
 		it('should handle disabled caching', () => {
 			const mentionNoCache = new Mention(mockEditor, {
 				useCachingData: false,
-				useCachingFieldData: false
+				useCachingFieldData: false,
 			});
 
 			expect(mentionNoCache.cachingData).toBeNull();

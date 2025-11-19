@@ -138,10 +138,7 @@ export type ImagePluginOptions = {
  * @description Image plugin.
  * - This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
  */
-declare class Image_ extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class Image_ extends PluginModal {
 	/**
 	 * @this {Image_}
 	 * @param {Element} node - The node to check.
@@ -155,7 +152,6 @@ declare class Image_ extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: ImagePluginOptions);
 	title: any;
-	icon: string;
 	pluginOptions: {
 		canResize: boolean;
 		showHeightInput: boolean;
@@ -198,71 +194,17 @@ declare class Image_ extends EditorInjector {
 	_base64RenderIndex: number;
 	asBlock: HTMLButtonElement;
 	asInline: HTMLButtonElement;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
-	 */
-	open(): void;
-	/**
-	 * @editorMethod Modules.Controller(Figure)
-	 * @description Executes the method that is called when a target component is edited.
-	 */
-	edit(): void;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
-	 */
-	on(isUpdate: boolean): void;
-	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "paste" or "drop".
-	 * @param {Object} params { frameContext, event, file }
-	 * @param {SunEditor.FrameContext} params.frameContext Frame context
-	 * @param {ClipboardEvent} params.event Event object
-	 * @param {File} params.file File object
-	 * @returns {boolean} - If return false, the file upload will be canceled
-	 */
-	onFilePasteAndDrop({ file }: { frameContext: SunEditor.FrameContext; event: ClipboardEvent; file: File }): boolean;
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {Promise<boolean>} Success or failure
-	 */
-	modalAction(): Promise<boolean>;
-	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLImageElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
-	 */
 	retainFormat(): {
 		query: string;
-		method: (element: HTMLImageElement) => void;
+		method: (element: HTMLElement) => void;
 	};
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
-	 */
-	init(): void;
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
-	 */
-	select(target: HTMLElement): void;
-	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
-	 * @returns {Promise<void>}
-	 */
-	destroy(target: HTMLElement): Promise<void>;
+	onFilePasteAndDrop(params: SunEditor.HookParams.FilePasteDrop): void;
+	modalOn(isUpdate: boolean): void;
+	modalAction(): Promise<boolean>;
+	modalInit(): void;
+	componentSelect(target: HTMLElement): void | boolean;
+	componentEdit(target: HTMLElement): void;
+	componentDestroy(target: HTMLElement): Promise<void>;
 	/**
 	 * @description Create an "image" component using the provided files.
 	 * @param {FileList|File[]} fileList File object list
@@ -325,8 +267,8 @@ declare class Image_ extends EditorInjector {
 	): void;
 	#private;
 }
-import EditorInjector from '../../editorInjector';
-import { ModalAnchorEditor } from '../../modules';
-import { Modal } from '../../modules';
-import { Figure } from '../../modules';
-import { FileManager } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal } from '../../modules/contracts';
+import { Figure } from '../../modules/contracts';
+import { ModalAnchorEditor } from '../../modules/utils';
+import { FileManager } from '../../modules/utils';

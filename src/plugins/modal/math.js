@@ -1,5 +1,5 @@
-import EditorInjector from '../../editorInjector';
-import { Modal, Controller } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal, Controller } from '../../modules/contracts';
 import { dom, env, converter } from '../../helper';
 
 const { _w, _d } = env;
@@ -25,9 +25,8 @@ const { _w, _d } = env;
  * - This plugin provides support for rendering mathematical expressions using either the KaTeX or MathJax libraries.
  * - If external library is provided, a warning is issued.
  */
-class Math_ extends EditorInjector {
+class Math_ extends PluginModal {
 	static key = 'math';
-	static type = 'modal';
 	static className = '';
 	/**
 	 * @this {Math_}
@@ -132,36 +131,16 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
+	 * @override
+	 * @type {PluginModal['open']}
 	 */
-	select(target) {
-		if (dom.utils.hasClass(target, 'se-math|katex') && getValue(target)) {
-			this.#element = target;
-			this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
-			return;
-		}
+	open() {
+		this.modal.open();
 	}
 
 	/**
-	 * @editorMethod Modules.Controller
-	 * @description This function is called before the "controller" before it is closed.
-	 */
-	close() {
-		this.#element = null;
-	}
-
-	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.RetainFormat}
 	 */
 	retainFormat() {
 		return {
@@ -191,22 +170,13 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.On}
 	 */
-	open() {
-		this.modal.open();
-	}
-
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
-	 */
-	on(isUpdate) {
+	modalOn(isUpdate) {
 		this.isUpdateState = isUpdate;
 		if (!isUpdate) {
-			this.init();
+			this.modalInit();
 		} else if (this.controller.currentTarget) {
 			const currentTarget = this.controller.currentTarget;
 			const exp = converter.entityToHTML(this.#escapeBackslashes(getValue(currentTarget), true));
@@ -219,11 +189,10 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {boolean} Success or failure
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Action}
 	 */
-	modalAction() {
+	async modalAction() {
 		if (this.textArea.value.trim().length === 0 || dom.utils.hasClass(this.textArea, 'se-error')) {
 			this.textArea.focus();
 			return false;
@@ -280,19 +249,18 @@ class Math_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Init}
 	 */
-	init() {
+	modalInit() {
 		this.textArea.value = '';
 		this.previewElement.innerHTML = '';
 		dom.utils.removeClass(this.textArea, 'se-error');
 	}
 
 	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Action}
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -304,16 +272,35 @@ class Math_ extends EditorInjector {
 				this.#copyTextToClipboard(this.#element);
 				break;
 			case 'delete':
-				this.destroy(this.controller.currentTarget);
+				this.componentDestroy(this.controller.currentTarget);
 		}
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {Node} target Target element
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Close}
 	 */
-	destroy(target) {
+	controllerClose() {
+		this.#element = null;
+	}
+
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Select}
+	 */
+	componentSelect(target) {
+		if (dom.utils.hasClass(target, 'se-math|katex') && getValue(target)) {
+			this.#element = target;
+			this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
+			return;
+		}
+	}
+
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Destroy}
+	 */
+	async componentDestroy(target) {
 		dom.utils.removeItem(target);
 		this.controller.close();
 		this.editor.focus();

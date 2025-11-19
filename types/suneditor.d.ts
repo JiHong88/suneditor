@@ -45,8 +45,13 @@ declare namespace _default {
 	): SunEditor.Instance;
 }
 export default _default;
+import plugins from './plugins';
+export namespace modules {
+	export { moduleContracts as contracts };
+	export { moduleUtils as utils };
+}
 import helper from './helper';
 import langs from './langs';
-import modules from './modules';
-import plugins from './plugins';
-export { helper, langs, modules, plugins };
+import * as moduleContracts from './modules/contracts';
+import * as moduleUtils from './modules/utils';
+export { helper, langs, plugins };

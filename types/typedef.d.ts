@@ -122,127 +122,97 @@ declare global {
 		type NodeCollection = Array<Node> | HTMLCollection | NodeList;
 		export namespace Module {
 			namespace Controller {
-				type Info = import('./modules/Controller').ControllerInfo;
+				type Info = import('./modules/contracts/Controller').ControllerInfo;
 			}
 			namespace Figure {
-				type Info = import('./modules/Figure').FigureInfo;
-				type TargetInfo = import('./modules/Figure').FigureTargetInfo;
-				type ControlButton = import('./modules/Figure').FigureControlButton;
-				type ControlResize = import('./modules/Figure').FigureControlResize;
-				type ControlCustomAction = import('./modules/Figure').ControlCustomAction;
-				type Controls = import('./modules/Figure').FigureControls;
+				type Info = import('./modules/contracts/Figure').FigureInfo;
+				type TargetInfo = import('./modules/contracts/Figure').FigureTargetInfo;
+				type ControlButton = import('./modules/contracts/Figure').FigureControlButton;
+				type ControlResize = import('./modules/contracts/Figure').FigureControlResize;
+				type ControlCustomAction = import('./modules/contracts/Figure').ControlCustomAction;
+				type Controls = import('./modules/contracts/Figure').FigureControls;
 			}
 			namespace Browser {
-				type File = import('./modules/Browser').BrowserFile;
+				type File = import('./modules/contracts/Browser').BrowserFile;
 			}
 			namespace HueSlider {
-				type Color = import('./modules/HueSlider').HueSliderColor;
+				type Color = import('./modules/contracts/HueSlider').HueSliderColor;
 			}
 		}
-		export namespace Plugin {
-			type MouseEventInfo = {
-				/**
-				 * Frame context
-				 */
-				frameContext: SunEditor.FrameContext;
-				/**
-				 * Event object (browser DOM API)
-				 */
-				event: MouseEvent;
-			};
-			type KeyEventInfo = {
-				/**
-				 * Frame context
-				 */
-				frameContext: SunEditor.FrameContext;
-				/**
-				 * Event object
-				 */
-				event: KeyboardEvent;
-				/**
-				 * range object
-				 */
-				range: Range;
-				/**
-				 * Current line element
-				 */
-				line: HTMLElement;
-			};
-			type ToolbarInputChangeEventInfo = {
-				/**
-				 * Input element
-				 */
-				target: HTMLElement;
-				/**
-				 * Event object
-				 */
-				event: Event;
-				/**
-				 * Input value
-				 */
-				value: string;
-			};
-			/**
-			 * Information of the "shortcut" plugin
-			 */
-			type ShortcutInfo = {
-				/**
-				 * - Range object
-				 */
-				range: Range;
-				/**
-				 * - The line element of the current range
-				 */
-				line: HTMLElement;
-				/**
-				 * - Information of the shortcut
-				 */
-				info: import('./core/class/shortcuts').ShortcutInfo;
-				/**
-				 * - Key event object
-				 */
-				event: KeyboardEvent;
-				/**
-				 * - KeyBoardEvent.code
-				 */
-				keyCode: string;
-				/**
-				 * - The root editor instance
-				 */
-				editor: SunEditor.Core;
-			};
-			type PasteParams = {
-				/**
-				 * Frame context
-				 */
-				frameContext: SunEditor.FrameContext;
-				/**
-				 * Clipboard event object
-				 */
-				event: ClipboardEvent;
-				/**
-				 * Format cleaned paste data (HTML string)
-				 */
-				data: string;
-				/**
-				 * DomParser data (new DOMParser().parseFromString(data, 'text/html');)
-				 */
-				doc: Document;
-			};
-			type CopyComponentParams = {
-				/**
-				 * Clipboard event object
-				 */
-				event: ClipboardEvent;
-				/**
-				 * Cloned component container
-				 */
-				cloneContainer: HTMLElement;
-				/**
-				 * Component information
-				 */
-				info: SunEditor.ComponentInfo;
-			};
+		export namespace Hook {
+			namespace Event {
+				type Active = typeof import('./hooks/core').Event.Active;
+				type OnFocus = typeof import('./hooks/core').Event.OnFocus;
+				type OnBlur = typeof import('./hooks/core').Event.OnBlur;
+				type OnMouseMove = typeof import('./hooks/core').Event.OnMouseMove;
+				type OnScroll = typeof import('./hooks/core').Event.OnScroll;
+				type OnBeforeInput = typeof import('./hooks/core').Event.OnBeforeInput;
+				type OnBeforeInputAsync = typeof import('./hooks/core').Event.OnBeforeInputAsync;
+				type OnInput = typeof import('./hooks/core').Event.OnInput;
+				type OnInputAsync = typeof import('./hooks/core').Event.OnInputAsync;
+				type OnKeyDown = typeof import('./hooks/core').Event.OnKeyDown;
+				type OnKeyDownAsync = typeof import('./hooks/core').Event.OnKeyDownAsync;
+				type OnKeyUp = typeof import('./hooks/core').Event.OnKeyUp;
+				type OnKeyUpAsync = typeof import('./hooks/core').Event.OnKeyUpAsync;
+				type OnMouseDown = typeof import('./hooks/core').Event.OnMouseDown;
+				type OnMouseDownAsync = typeof import('./hooks/core').Event.OnMouseDownAsync;
+				type OnMouseUp = typeof import('./hooks/core').Event.OnMouseUp;
+				type OnMouseUpAsync = typeof import('./hooks/core').Event.OnMouseUpAsync;
+				type OnClick = typeof import('./hooks/core').Event.OnClick;
+				type OnClickAsync = typeof import('./hooks/core').Event.OnClickAsync;
+				type OnMouseLeave = typeof import('./hooks/core').Event.OnMouseLeave;
+				type OnMouseLeaveAsync = typeof import('./hooks/core').Event.OnMouseLeaveAsync;
+				type OnFilePasteAndDrop = typeof import('./hooks/core').Event.OnFilePasteAndDrop;
+				type OnFilePasteAndDropAsync = typeof import('./hooks/core').Event.OnFilePasteAndDropAsync;
+				type OnPaste = typeof import('./hooks/core').Event.OnPaste;
+				type OnPasteAsync = typeof import('./hooks/core').Event.OnPasteAsync;
+			}
+			namespace Core {
+				type RetainFormat = typeof import('./hooks/core').Core.RetainFormat;
+				type Shortcut = typeof import('./hooks/core').Core.Shortcut;
+				type SetDir = typeof import('./hooks/core').Core.SetDir;
+			}
+			namespace Component {
+				type Select = typeof import('./hooks/core').Component.Select;
+				type Deselect = typeof import('./hooks/core').Component.Deselect;
+				type Edit = typeof import('./hooks/core').Component.Edit;
+				type Destroy = typeof import('./hooks/core').Component.Destroy;
+				type Copy = typeof import('./hooks/core').Component.Copy;
+			}
+			namespace Modal {
+				type On = typeof import('./hooks/module').Modal.On;
+				type Init = typeof import('./hooks/module').Modal.Init;
+				type Off = typeof import('./hooks/module').Modal.Off;
+				type Action = typeof import('./hooks/module').Modal.Action;
+				type Resize = typeof import('./hooks/module').Modal.Resize;
+			}
+			namespace Controller {
+				type Close = typeof import('./hooks/module').Controller.Close;
+				type Action = typeof import('./hooks/module').Controller.Action;
+			}
+			namespace Browser {
+				type Init = typeof import('./hooks/module').Browser.Init;
+			}
+			namespace ColorPicker {
+				type Action = typeof import('./hooks/module').ColorPicker.Action;
+				type HueSliderOpen = typeof import('./hooks/module').ColorPicker.HueSliderOpen;
+				type HueSliderClose = typeof import('./hooks/module').ColorPicker.HueSliderClose;
+			}
+		}
+		export namespace HookParams {
+			type MouseEvent = import('./hooks/params').MouseEventInfo;
+			type KeyEvent = import('./hooks/params').KeyEventInfo;
+			type Shortcut = import('./hooks/params').ShortcutInfo;
+			type FilePasteDrop = import('./hooks/params').FilePasteDrop;
+			type FocusBlur = import('./hooks/params').FocusBlurEvent;
+			type Scroll = import('./hooks/params').ScrollEvent;
+			type InputWithData = import('./hooks/params').InputEventWithData;
+			type Paste = import('./hooks/params').Paste;
+			type Mouse = import('./hooks/params').Mouse;
+			type Keyboard = import('./hooks/params').Keyboard;
+			type InputKeyDown = import('./hooks/params').InputKeyDown;
+			type InputChange = import('./hooks/params').InputChange;
+			type CopyComponent = import('./hooks/params').CopyComponent;
 		}
 		export namespace Event {
 			/**

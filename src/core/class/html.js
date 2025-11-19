@@ -1280,14 +1280,14 @@ HTML.prototype = {
 			if (typeof content !== 'string' && !dom.check.isElement(content) && !dom.check.isText(content)) return false;
 
 			if ((await clipboard.write(content)) === false) {
-				this.editor.ui.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
+				this.ui.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
 				return false;
 			}
-			this.editor.ui.showToast(this.lang.message_copy_success, this.options.get('toastMessageTime').copy);
+			this.ui.showToast(this.lang.message_copy_success, this.options.get('toastMessageTime').copy);
 			return true;
 		} catch (err) {
 			console.error('[SUNEDITOR.html.copy.fail] :', err);
-			this.editor.ui.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
+			this.ui.showToast(this.lang.message_copy_fail, this.options.get('toastMessageTime').copy, 'error');
 			return false;
 		}
 	},

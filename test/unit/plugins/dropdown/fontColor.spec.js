@@ -4,6 +4,11 @@
 
 import FontColor from '../../../../src/plugins/dropdown/fontColor.js';
 
+// Mock HueSlider module to prevent canvas initialization errors
+jest.mock('../../../../src/modules/contracts/HueSlider.js', () => {
+    return jest.fn().mockImplementation(() => ({}));
+});
+
 // Mock ColorPicker module
 const mockColorPicker = {
     target: {
@@ -14,7 +19,7 @@ const mockColorPicker = {
     hueSliderClose: jest.fn()
 };
 
-jest.mock('../../../../src/modules/ColorPicker.js', () => {
+jest.mock('../../../../src/modules/contracts/ColorPicker.js', () => {
     return jest.fn().mockImplementation((plugin, type, options) => {
         mockColorPicker.plugin = plugin;
         mockColorPicker.type = type;
@@ -51,6 +56,11 @@ jest.mock('../../../../src/helper', () => ({
             }),
             getStyle: jest.fn()
         }
+    },
+    env: {
+        isTouchDevice: false,
+        _w: global.window || {},
+        ON_OVER_COMPONENT: 'data-se-on-over-component'
     }
 }));
 
@@ -110,13 +120,14 @@ describe('Plugins - Dropdown - FontColor', () => {
     describe('Constructor', () => {
 
         it('should initialize ColorPicker with correct options', () => {
-            const MockColorPicker = require('../../../../src/modules/ColorPicker.js');
+            const MockColorPicker = require('../../../../src/modules/contracts/ColorPicker.js');
 
             expect(MockColorPicker).toHaveBeenCalledWith(fontColor, 'color', {
+                form: expect.any(Object), // Added in commit 9f43ca04
                 colorList: pluginOptions.items,
                 splitNum: pluginOptions.splitNum,
                 disableHEXInput: pluginOptions.disableHEXInput,
-                hueSliderOptions: { controllerOptions: { parents: [expect.any(Object)], isOutsideForm: true } }
+                hueSliderOptions: { controllerOptions: { isOutsideForm: true } }
             });
         });
 
@@ -129,12 +140,16 @@ describe('Plugins - Dropdown - FontColor', () => {
             expect(mockEditor.menu.initDropdownTarget).toHaveBeenCalledWith(FontColor, expect.any(Object));
         });
 
-        it('should append colorPicker target to menu', () => {
+        it('should pass menu as form to ColorPicker', () => {
+            const MockColorPicker = require('../../../../src/modules/contracts/ColorPicker.js');
             const { dom } = require('../../../../src/helper');
-            const menuElement = dom.utils.createElement.mock.results.find(
-                result => result.value.className === 'se-dropdown se-list-layer'
-            );
-            expect(menuElement.value.appendChild).toHaveBeenCalledWith(mockColorPicker.target);
+
+            const callArgs = MockColorPicker.mock.calls[MockColorPicker.mock.calls.length - 1];
+            const passedOptions = callArgs[2];
+
+            // form should be the menu element created
+            expect(passedOptions.form).toBeDefined();
+            expect(passedOptions.form.className).toBe('se-dropdown se-list-layer');
         });
     });
 

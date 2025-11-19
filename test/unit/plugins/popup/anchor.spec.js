@@ -25,7 +25,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
 	Controller: jest.fn().mockImplementation((plugin, element, options, key) => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -105,8 +105,8 @@ describe('Anchor Plugin', () => {
 		anchor = new Anchor(mockEditor);
 
 		// Override methods that need mockThis context
-		const originalSelect = anchor.select.bind(anchor);
-		const originalDeselect = anchor.deselect.bind(anchor);
+		const originalComponentSelect = anchor.componentSelect.bind(anchor);
+		const originalComponentDeselect = anchor.componentDeselect.bind(anchor);
 		const originalControllerAction = anchor.controllerAction.bind(anchor);
 
 		anchor.selection = mockThis.selection;
@@ -189,7 +189,7 @@ describe('Anchor Plugin', () => {
 				getAttribute: jest.fn().mockReturnValue('test-anchor')
 			};
 
-			anchor.select(mockElement);
+			anchor.componentSelect(mockElement);
 
 			expect(anchor.displayId.textContent).toBe('test-anchor');
 			expect(anchor.controllerSelect.open).toHaveBeenCalledWith(mockElement);
@@ -202,7 +202,7 @@ describe('Anchor Plugin', () => {
 			anchor.inputEl.value = 'test';
 			anchor.displayId.textContent = 'test';
 
-			anchor.deselect();
+			anchor.componentDeselect();
 
 			expect(anchor.inputEl.value).toBe('');
 			expect(anchor.displayId.textContent).toBe('');
@@ -258,7 +258,7 @@ describe('Anchor Plugin', () => {
 					hasAttribute: jest.fn().mockReturnValue(true)
 				};
 				// Use select() to properly set #element
-				anchor.select(mockElement);
+				anchor.componentSelect(mockElement);
 				anchor.inputEl.value = 'updated-anchor';
 
 				anchor.controllerAction(mockTarget);
@@ -292,7 +292,7 @@ describe('Anchor Plugin', () => {
 					hasAttribute: jest.fn().mockReturnValue(true)
 				};
 				// Use select() to properly set #element
-				anchor.select(mockElement);
+				anchor.componentSelect(mockElement);
 
 				anchor.controllerAction(mockTarget);
 
@@ -328,7 +328,7 @@ describe('Anchor Plugin', () => {
 					hasAttribute: jest.fn().mockReturnValue(true)
 				};
 				// Use select() to properly set #element
-				anchor.select(mockElement);
+				anchor.componentSelect(mockElement);
 				const { dom } = require('../../../../src/helper');
 
 				anchor.controllerAction(mockTarget);
@@ -344,7 +344,7 @@ describe('Anchor Plugin', () => {
 					hasAttribute: jest.fn().mockReturnValue(true)
 				};
 				// Use select() to properly set #element
-				anchor.select(mockElement);
+				anchor.componentSelect(mockElement);
 				const mockRange = { container: { textContent: 'test', nodeType: 3 }, offset: 0 };
 				mockThis.selection.getNearRange.mockReturnValue(mockRange);
 
@@ -368,7 +368,7 @@ describe('Anchor Plugin', () => {
 				anchor.displayId.textContent = 'test';
 
 				// Access private method indirectly through public method
-				anchor.deselect();
+				anchor.componentDeselect();
 
 				expect(anchor.inputEl.value).toBe('');
 				expect(anchor.displayId.textContent).toBe('');
@@ -403,7 +403,7 @@ describe('Anchor Plugin', () => {
 				getAttribute: jest.fn().mockReturnValue('existing-anchor'),
 				id: 'existing-anchor'
 			};
-			anchor.select(mockElement);
+			anchor.componentSelect(mockElement);
 
 			// Edit
 			const editButton = {

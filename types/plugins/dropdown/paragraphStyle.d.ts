@@ -30,10 +30,7 @@ export type ParagraphStylePluginOptions = {
  * @class
  * @description A plugin to style lines using classes.
  */
-declare class ParagraphStyle extends EditorInjector {
-	static key: string;
-	static type: string;
-	static className: string;
+declare class ParagraphStyle extends PluginDropdown {
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -41,19 +38,6 @@ declare class ParagraphStyle extends EditorInjector {
 	 */
 	constructor(editor: SunEditor.Core, pluginOptions: ParagraphStylePluginOptions);
 	title: any;
-	icon: string;
 	classList: NodeListOf<Element>;
-	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 */
-	on(): void;
-	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
-	 */
-	action(target: HTMLElement): void;
 }
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';

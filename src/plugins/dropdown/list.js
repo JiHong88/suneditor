@@ -1,13 +1,12 @@
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
  * @class
  * @description List Plugin (OL, UL)
  */
-class List extends EditorInjector {
+class List extends PluginDropdown {
 	static key = 'list';
-	static type = 'dropdown';
 	static className = 'se-icon-flip-rtl';
 
 	/**
@@ -35,12 +34,8 @@ class List extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
 		const icon = target.firstElementChild;
@@ -67,9 +62,8 @@ class List extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {HTMLElement} target Line element at the current cursor position
+	 * @override
+	 * @type {PluginDropdown['on']}
 	 */
 	on(target) {
 		const currentList = target.getAttribute('data-focus') || '';
@@ -84,10 +78,8 @@ class List extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
+	 * @override
+	 * @type {PluginDropdown['action']}
 	 */
 	action(target) {
 		const command = target.getAttribute('data-command');

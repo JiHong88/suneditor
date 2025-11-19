@@ -1,4 +1,4 @@
-import EditorInjector from '../../editorInjector';
+import { PluginDropdown } from '../../interfaces';
 import { dom } from '../../helper';
 
 /**
@@ -10,9 +10,8 @@ import { dom } from '../../helper';
  * @class
  * @description BlockStyle Plugin (P, BLOCKQUOTE, PRE, H1, H2...)
  */
-class BlockStyle extends EditorInjector {
+class BlockStyle extends PluginDropdown {
 	static key = 'blockStyle';
-	static type = 'dropdown';
 	static className = 'se-btn-select se-btn-tool-format';
 
 	/**
@@ -38,12 +37,8 @@ class BlockStyle extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element, target) {
 		let formatTitle = this.lang.formats;
@@ -75,9 +70,8 @@ class BlockStyle extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Dropdown
-	 * @description Executes the method that is called when a plugin's dropdown menu is opened.
-	 * @param {HTMLElement} target Line element at the current cursor position
+	 * @override
+	 * @type {PluginDropdown['on']}
 	 */
 	on(target) {
 		const formatList = this.formatList;
@@ -99,10 +93,8 @@ class BlockStyle extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description Executes the main execution method of the plugin.
-	 * - Called when an item in the "dropdown" menu is clicked.
-	 * @param {HTMLElement} target - The plugin's toolbar button element
+	 * @override
+	 * @type {PluginDropdown['action']}
 	 */
 	action(target) {
 		// "line"|"br-line"|"block"
@@ -122,7 +114,7 @@ class BlockStyle extends EditorInjector {
 	/**
 	 * @description Create a header tag, call by "shortcut" class
 	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])
-	 * @param {SunEditor.Plugin.ShortcutInfo} params - Information of the "shortcut" plugin
+	 * @param {SunEditor.HookParams.Shortcut} params - Information of the "shortcut" plugin
 	 */
 	applyHeaderByShortcut({ keyCode }) {
 		const headerNum = keyCode.match(/\d+$/)?.[0];

@@ -60,7 +60,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
 	Modal: jest.fn().mockImplementation((plugin, modalEl) => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -242,7 +242,7 @@ describe('Math Plugin', () => {
 	});
 
 	describe('Static properties', () => {
-		it('should have correct static properties', () => {
+		it('should have correct static properties', async () => {
 			expect(Math.key).toBe('math');
 			expect(Math.type).toBe('modal');
 			expect(Math.className).toBe('');
@@ -250,7 +250,7 @@ describe('Math Plugin', () => {
 	});
 
 	describe('Static component method', () => {
-		it('should return element if valid math component', () => {
+		it('should return element if valid math component', async () => {
 			const { dom } = require('../../../../src/helper');
 			const mockElement = { tagName: 'SPAN' };
 			dom.utils.hasClass.mockReturnValue(true);
@@ -260,7 +260,7 @@ describe('Math Plugin', () => {
 			expect(result).toBe(mockElement);
 		});
 
-		it('should return null for invalid element', () => {
+		it('should return null for invalid element', async () => {
 			const { dom } = require('../../../../src/helper');
 			const mockElement = { tagName: 'DIV' };
 			dom.utils.hasClass.mockReturnValue(false);
@@ -269,7 +269,7 @@ describe('Math Plugin', () => {
 			expect(result).toBeNull();
 		});
 
-		it('should return null if not component container', () => {
+		it('should return null if not component container', async () => {
 			const { dom } = require('../../../../src/helper');
 			const mockElement = { tagName: 'SPAN' };
 			dom.utils.hasClass.mockReturnValue(true);
@@ -281,7 +281,7 @@ describe('Math Plugin', () => {
 	});
 
 	describe('Constructor', () => {
-		it('should create Math instance without external library', () => {
+		it('should create Math instance without external library', async () => {
 			math = new Math(mockEditor, {});
 
 			expect(math.title).toBe('Math');
@@ -293,7 +293,7 @@ describe('Math Plugin', () => {
 			);
 		});
 
-		it('should create Math instance with KaTeX', () => {
+		it('should create Math instance with KaTeX', async () => {
 			mockEditor.options.get = jest.fn((key) => {
 				if (key === 'externalLibs') {
 					return {
@@ -312,7 +312,7 @@ describe('Math Plugin', () => {
 			expect(math.katex.src.renderToString).toBeDefined();
 		});
 
-		it('should warn if KaTeX is set incorrectly', () => {
+		it('should warn if KaTeX is set incorrectly', async () => {
 			mockEditor.options.get = jest.fn((key) => {
 				if (key === 'externalLibs') {
 					return { katex: {} }; // No src property
@@ -327,7 +327,7 @@ describe('Math Plugin', () => {
 			);
 		});
 
-		it('should create Math instance with custom options', () => {
+		it('should create Math instance with custom options', async () => {
 			math = new Math(mockEditor, {
 				canResize: false,
 				autoHeight: true,
@@ -346,7 +346,7 @@ describe('Math Plugin', () => {
 			expect(math.pluginOptions.formSize.width).toBe('600px');
 		});
 
-		it('should set height to minHeight when autoHeight is true', () => {
+		it('should set height to minHeight when autoHeight is true', async () => {
 			math = new Math(mockEditor, {
 				autoHeight: true,
 				formSize: {
@@ -357,7 +357,7 @@ describe('Math Plugin', () => {
 			expect(math.pluginOptions.formSize.height).toBe('50px');
 		});
 
-		it('should initialize with onPaste callback', () => {
+		it('should initialize with onPaste callback', async () => {
 			const onPaste = jest.fn();
 			math = new Math(mockEditor, { onPaste });
 
@@ -370,7 +370,7 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should open modal', () => {
+		it('should open modal', async () => {
 			math.open();
 			expect(math.modal.open).toHaveBeenCalled();
 		});
@@ -391,18 +391,18 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should initialize when not updating', () => {
+		it('should initialize when not updating', async () => {
 			math.textArea.value = 'old value';
 			math.previewElement.innerHTML = 'old preview';
 
-			math.on(false);
+			math.modalOn(false);
 
 			expect(math.isUpdateState).toBe(false);
 			expect(math.textArea.value).toBe('');
 			expect(math.previewElement.innerHTML).toBe('');
 		});
 
-		it('should populate fields when updating', () => {
+		it('should populate fields when updating', async () => {
 			math.controller.currentTarget = {
 				getAttribute: jest.fn((attr) => {
 					if (attr === 'data-se-value') return 'x^2';
@@ -411,14 +411,14 @@ describe('Math Plugin', () => {
 				})
 			};
 
-			math.on(true);
+			math.modalOn(true);
 
 			expect(math.isUpdateState).toBe(true);
 			expect(math.textArea.value).toBe('x^2');
 			expect(math.fontSizeElement.value).toBe('2em');
 		});
 
-		it('should use default font size when no type attribute', () => {
+		it('should use default font size when no type attribute', async () => {
 			math.controller.currentTarget = {
 				getAttribute: jest.fn((attr) => {
 					if (attr === 'data-se-value') return 'y=mx+b';
@@ -426,7 +426,7 @@ describe('Math Plugin', () => {
 				})
 			};
 
-			math.on(true);
+			math.modalOn(true);
 
 			expect(math.fontSizeElement.value).toBe('1em');
 		});
@@ -447,35 +447,35 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should return false if textarea is empty', () => {
+		it('should return false if textarea is empty', async () => {
 			math.textArea.value = '';
 
-			const result = math.modalAction();
+			const result = await math.modalAction();
 
 			expect(result).toBe(false);
 			expect(math.textArea.focus).toHaveBeenCalled();
 		});
 
-		it('should return false if textarea has error class', () => {
+		it('should return false if textarea has error class', async () => {
 			const { dom } = require('../../../../src/helper');
 			math.textArea.value = 'x^2';
 			dom.utils.hasClass.mockReturnValue(true);
 
-			const result = math.modalAction();
+			const result = await math.modalAction();
 
 			expect(result).toBe(false);
 		});
 
-		it('should return false if preview has no math element', () => {
+		it('should return false if preview has no math element', async () => {
 			math.textArea.value = 'x^2';
 			math.previewElement.querySelector = jest.fn().mockReturnValue(null);
 
-			const result = math.modalAction();
+			const result = await math.modalAction();
 
 			expect(result).toBe(false);
 		});
 
-		it('should insert new math component successfully', () => {
+		it('should insert new math component successfully', async () => {
 			const { dom } = require('../../../../src/helper');
 			dom.utils.hasClass.mockReturnValue(false); // Ensure no error class
 
@@ -489,7 +489,7 @@ describe('Math Plugin', () => {
 			};
 			math.previewElement.querySelector = jest.fn().mockReturnValue(mockMathEl);
 
-			const result = math.modalAction();
+			const result = await math.modalAction();
 
 			expect(result).toBe(true);
 			expect(mockMathEl.setAttribute).toHaveBeenCalledWith('contenteditable', 'false');
@@ -498,7 +498,7 @@ describe('Math Plugin', () => {
 			expect(mockEditor.component.insert).toHaveBeenCalled();
 		});
 
-		it('should handle multiple selected lines', () => {
+		it('should handle multiple selected lines', async () => {
 			mockEditor.format.getLines.mockReturnValue([
 				{ nodeName: 'P' },
 				{ nodeName: 'P' }
@@ -515,13 +515,13 @@ describe('Math Plugin', () => {
 			};
 			math.previewElement.querySelector = jest.fn().mockReturnValue(mockMathEl);
 
-			const result = math.modalAction();
+			const result = await math.modalAction();
 
 			expect(result).toBe(true);
 			expect(dom.utils.createElement).toHaveBeenCalledWith('P', null, mockMathEl);
 		});
 
-		it('should update existing math component', () => {
+		it('should update existing math component', async () => {
 			const { dom } = require('../../../../src/helper');
 			dom.utils.hasClass.mockReturnValue(false); // Ensure no error class
 
@@ -540,7 +540,7 @@ describe('Math Plugin', () => {
 				replaceWith: jest.fn()
 			});
 
-			const result = math.modalAction();
+			const result = await math.modalAction();
 
 			expect(result).toBe(true);
 			expect(dom.query.getParentElement).toHaveBeenCalled();
@@ -552,12 +552,12 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should reset all fields', () => {
+		it('should reset all fields', async () => {
 			const { dom } = require('../../../../src/helper');
 			math.textArea.value = 'test';
 			math.previewElement.innerHTML = '<span>test</span>';
 
-			math.init();
+			math.modalInit();
 
 			expect(math.textArea.value).toBe('');
 			expect(math.previewElement.innerHTML).toBe('');
@@ -570,14 +570,14 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should open controller for valid math element', () => {
+		it('should open controller for valid math element', async () => {
 			const { dom } = require('../../../../src/helper');
 			const mockElement = {
 				getAttribute: jest.fn().mockReturnValue('x^2')
 			};
 			dom.utils.hasClass.mockReturnValue(true);
 
-			math.select(mockElement);
+			math.componentSelect(mockElement);
 
 			expect(math.controller.open).toHaveBeenCalledWith(mockElement, null, {
 				isWWTarget: false,
@@ -586,14 +586,14 @@ describe('Math Plugin', () => {
 			});
 		});
 
-		it('should not open controller if no value', () => {
+		it('should not open controller if no value', async () => {
 			const { dom } = require('../../../../src/helper');
 			const mockElement = {
 				getAttribute: jest.fn().mockReturnValue(null)
 			};
 			dom.utils.hasClass.mockReturnValue(true);
 
-			math.select(mockElement);
+			math.componentSelect(mockElement);
 
 			expect(math.controller.open).not.toHaveBeenCalled();
 		});
@@ -604,10 +604,10 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should clear element reference', () => {
-			math.close();
+		it('should clear element reference', async () => {
+			math.controllerClose();
 			// Element is private, we can only test that the method doesn't throw
-			expect(() => math.close()).not.toThrow();
+			expect(() => math.controllerClose()).not.toThrow();
 		});
 	});
 
@@ -626,7 +626,7 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should open modal for update command', () => {
+		it('should open modal for update command', async () => {
 			const mockTarget = {
 				getAttribute: jest.fn().mockReturnValue('update')
 			};
@@ -646,7 +646,7 @@ describe('Math Plugin', () => {
 			// Set private element through select
 			const { dom } = require('../../../../src/helper');
 			dom.utils.hasClass.mockReturnValue(true);
-			math.select(mockElement);
+			math.componentSelect(mockElement);
 
 			await math.controllerAction(mockTarget);
 
@@ -655,7 +655,7 @@ describe('Math Plugin', () => {
 			expect(mockEditor.html.copy).toHaveBeenCalled();
 		});
 
-		it('should destroy element for delete command', () => {
+		it('should destroy element for delete command', async () => {
 			const { dom } = require('../../../../src/helper');
 			const mockTarget = {
 				getAttribute: jest.fn().mockReturnValue('delete')
@@ -675,11 +675,11 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should remove element and clean up', () => {
+		it('should remove element and clean up', async () => {
 			const { dom } = require('../../../../src/helper');
 			const mockTarget = document.createElement('span');
 
-			math.destroy(mockTarget);
+			math.componentDestroy(mockTarget);
 
 			expect(dom.utils.removeItem).toHaveBeenCalledWith(mockTarget);
 			expect(math.controller.close).toHaveBeenCalled();
@@ -703,14 +703,14 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should return query and method', () => {
+		it('should return query and method', async () => {
 			const result = math.retainFormat();
 
 			expect(result.query).toBe('.se-math, .katex, .MathJax');
 			expect(typeof result.method).toBe('function');
 		});
 
-		it('should process element with valid value', () => {
+		it('should process element with valid value', async () => {
 			const { dom } = require('../../../../src/helper');
 			const mockElement = {
 				getAttribute: jest.fn().mockReturnValue('x^2'),
@@ -725,7 +725,7 @@ describe('Math Plugin', () => {
 			expect(dom.utils.addClass).toHaveBeenCalled();
 		});
 
-		it('should skip element without value', () => {
+		it('should skip element without value', async () => {
 			const mockElement = {
 				getAttribute: jest.fn().mockReturnValue(null)
 			};
@@ -736,7 +736,7 @@ describe('Math Plugin', () => {
 			expect(mockElement.getAttribute).toHaveBeenCalled();
 		});
 
-		it('should skip when no katex or mathjax', () => {
+		it('should skip when no katex or mathjax', async () => {
 			math.katex = null;
 			math.mathjax = null;
 
@@ -773,7 +773,7 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should render valid expression', () => {
+		it('should render valid expression', async () => {
 			const { dom } = require('../../../../src/helper');
 			math.textArea.value = 'x^2';
 
@@ -788,7 +788,7 @@ describe('Math Plugin', () => {
 			expect(dom.utils.removeClass).toHaveBeenCalledWith(math.textArea, 'se-error');
 		});
 
-		it('should handle rendering error', () => {
+		it('should handle rendering error', async () => {
 			const { dom } = require('../../../../src/helper');
 			math.textArea.value = 'invalid\\syntax';
 
@@ -802,7 +802,7 @@ describe('Math Plugin', () => {
 			expect(math.previewElement.innerHTML).toContain('error');
 		});
 
-		it('should handle autoHeight adjustment', () => {
+		it('should handle autoHeight adjustment', async () => {
 			math = new Math(mockEditor, { autoHeight: true });
 			math.textArea.style = { height: '' };
 			math.textArea.scrollHeight = 100;
@@ -849,7 +849,7 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should render valid MathJax expression', () => {
+		it('should render valid MathJax expression', async () => {
 			const { dom } = require('../../../../src/helper');
 			math.textArea.value = 'x^2';
 
@@ -863,7 +863,7 @@ describe('Math Plugin', () => {
 			expect(dom.utils.removeClass).toHaveBeenCalledWith(math.textArea, 'se-error');
 		});
 
-		it('should handle MathJax error', () => {
+		it('should handle MathJax error', async () => {
 			const { dom } = require('../../../../src/helper');
 			math.textArea.value = 'error expression';
 
@@ -892,7 +892,7 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should update preview font size on change', () => {
+		it('should update preview font size on change', async () => {
 			math.fontSizeElement.value = '2em';
 
 			const changeHandler = math.eventManager.addEvent.mock.calls.find(
@@ -917,7 +917,7 @@ describe('Math Plugin', () => {
 			};
 
 			dom.utils.hasClass.mockReturnValue(true);
-			math.select(mockElement);
+			math.componentSelect(mockElement);
 
 			const copyButton = { getAttribute: jest.fn().mockReturnValue('copy') };
 			await math.controllerAction(copyButton);
@@ -936,7 +936,7 @@ describe('Math Plugin', () => {
 
 			const { dom } = require('../../../../src/helper');
 			dom.utils.hasClass.mockReturnValue(true);
-			math.select(mockElement);
+			math.componentSelect(mockElement);
 
 			const copyButton = { getAttribute: jest.fn().mockReturnValue('copy') };
 
@@ -963,7 +963,7 @@ describe('Math Plugin', () => {
 			math = new Math(mockEditor, {});
 		});
 
-		it('should handle complete create flow', () => {
+		it('should handle complete create flow', async () => {
 			const { dom } = require('../../../../src/helper');
 			dom.utils.hasClass.mockReturnValue(false); // Ensure no error class
 
@@ -972,7 +972,7 @@ describe('Math Plugin', () => {
 			expect(math.modal.open).toHaveBeenCalled();
 
 			// Set as new (not update)
-			math.on(false);
+			math.modalOn(false);
 			expect(math.isUpdateState).toBe(false);
 
 			// Enter expression
@@ -984,12 +984,12 @@ describe('Math Plugin', () => {
 			math.previewElement.querySelector = jest.fn().mockReturnValue(mockMathEl);
 
 			// Submit
-			const result = math.modalAction();
+			const result = await math.modalAction();
 			expect(result).toBe(true);
 			expect(mockEditor.component.insert).toHaveBeenCalled();
 		});
 
-		it('should handle complete update flow', () => {
+		it('should handle complete update flow', async () => {
 			const { dom } = require('../../../../src/helper');
 
 			// Select existing math element
@@ -1001,11 +1001,11 @@ describe('Math Plugin', () => {
 				})
 			};
 			dom.utils.hasClass.mockReturnValueOnce(true); // For select check
-			math.select(existingElement);
+			math.componentSelect(existingElement);
 
 			// Open for edit
 			math.controller.currentTarget = existingElement;
-			math.on(true);
+			math.modalOn(true);
 			expect(math.isUpdateState).toBe(true);
 			expect(math.textArea.value).toBe('old expression');
 
@@ -1022,7 +1022,7 @@ describe('Math Plugin', () => {
 			});
 
 			// Submit
-			const result = math.modalAction();
+			const result = await math.modalAction();
 			expect(result).toBe(true);
 		});
 	});

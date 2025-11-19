@@ -42,7 +42,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -59,11 +59,6 @@ jest.mock('../../../../src/modules', () => ({
 		close: jest.fn(),
 		off: jest.fn()
 	})),
-	FileManager: jest.fn().mockImplementation(() => ({
-		getSize: jest.fn().mockReturnValue(0),
-		upload: jest.fn(),
-		setFileData: jest.fn()
-	})),
 	Figure: jest.fn().mockImplementation(() => ({
 		open: jest.fn().mockReturnValue({
 			container: { nodeType: 1, style: {} },
@@ -71,13 +66,21 @@ jest.mock('../../../../src/modules', () => ({
 			width: '300px',
 			height: '150px'
 		})
+	}))
+}));
+
+jest.mock('../../../../src/modules/utils', () => ({
+	FileManager: jest.fn().mockImplementation(() => ({
+		getSize: jest.fn().mockReturnValue(0),
+		upload: jest.fn(),
+		setFileData: jest.fn()
 	})),
 	_DragHandle: { get: jest.fn().mockReturnValue({ style: {} }) }
 }));
 
 // Add static methods to modules
-const mockModal = require('../../../../src/modules').Modal;
-const mockFigure = require('../../../../src/modules').Figure;
+const mockModal = require('../../../../src/modules/contracts').Modal;
+const mockFigure = require('../../../../src/modules/contracts').Figure;
 
 // Add static methods to Modal
 Object.assign(mockModal, {
@@ -209,7 +212,7 @@ describe('Audio Plugin', () => {
 		});
 
 		it('should have required methods', () => {
-			const methods = ['open', 'on', 'modalAction', 'init', 'select', 'destroy', 'onFilePasteAndDrop'];
+			const methods = ['open', 'modalOn', 'modalAction', 'modalInit', 'componentSelect', 'componentDestroy', 'onFilePasteAndDrop'];
 			methods.forEach((method) => {
 				expect(typeof audio[method]).toBe('function');
 			});
@@ -222,10 +225,10 @@ describe('Audio Plugin', () => {
 			});
 		});
 
-		describe('on', () => {
+		describe('modalOn', () => {
 			it('should handle new audio creation (isUpdate=false) when allowMultiple=true', () => {
 				audio.pluginOptions.allowMultiple = true;
-				audio.on(false);
+				audio.modalOn(false);
 				expect(audio.audioInputFile.setAttribute).toHaveBeenCalledWith('multiple', 'multiple');
 			});
 
@@ -236,13 +239,13 @@ describe('Audio Plugin', () => {
 					value: { src: 'test.mp3' },
 					configurable: true
 				});
-				audio.on(true);
+				audio.modalOn(true);
 				expect(audio.audioInputFile.removeAttribute).toHaveBeenCalledWith('multiple');
 			});
 
 			it('should not modify multiple attribute when allowMultiple=false', () => {
 				audio.pluginOptions.allowMultiple = false;
-				audio.on(false);
+				audio.modalOn(false);
 				expect(audio.audioInputFile.setAttribute).not.toHaveBeenCalled();
 			});
 		});
@@ -275,9 +278,9 @@ describe('Audio Plugin', () => {
 			});
 		});
 
-		describe('init', () => {
+		describe('modalInit', () => {
 			it('should reset form values', () => {
-				audio.init();
+				audio.modalInit();
 
 				expect(audio.audioInputFile.value).toBe('');
 				expect(audio.audioUrlFile.value).toBe('');
@@ -286,7 +289,7 @@ describe('Audio Plugin', () => {
 			});
 		});
 
-		describe('select', () => {
+		describe('componentSelect', () => {
 			it('should call ready with target element', () => {
 				const mockTarget = {
 					nodeName: 'AUDIO',
@@ -294,8 +297,8 @@ describe('Audio Plugin', () => {
 					style: {}
 				};
 
-				expect(() => audio.select(mockTarget)).not.toThrow();
-				expect(typeof audio.select).toBe('function');
+				expect(() => audio.componentSelect(mockTarget)).not.toThrow();
+				expect(typeof audio.componentSelect).toBe('function');
 			});
 		});
 
@@ -321,7 +324,7 @@ describe('Audio Plugin', () => {
 			});
 		});
 
-		describe('destroy', () => {
+		describe('componentDestroy', () => {
 			it('should remove audio element and handle cleanup', async () => {
 				const mockTarget = {
 					nodeName: 'AUDIO',
@@ -330,12 +333,12 @@ describe('Audio Plugin', () => {
 					getAttribute: jest.fn().mockReturnValue('test.mp3')
 				};
 
-				audio.init = jest.fn();
+				audio.modalInit = jest.fn();
 
-				await audio.destroy(mockTarget);
+				await audio.componentDestroy(mockTarget);
 
 				expect(audio.triggerEvent).toHaveBeenCalledWith('onAudioDeleteBefore', expect.any(Object));
-				expect(audio.init).toHaveBeenCalled();
+				expect(audio.modalInit).toHaveBeenCalled();
 			});
 
 			it('should cancel destroy if event returns false', async () => {
@@ -344,11 +347,11 @@ describe('Audio Plugin', () => {
 					getAttribute: jest.fn().mockReturnValue('test.mp3')
 				};
 				audio.triggerEvent = jest.fn().mockResolvedValue(false);
-				audio.init = jest.fn();
+				audio.modalInit = jest.fn();
 
-				await audio.destroy(mockTarget);
+				await audio.componentDestroy(mockTarget);
 
-				expect(audio.init).not.toHaveBeenCalled();
+				expect(audio.modalInit).not.toHaveBeenCalled();
 			});
 		});
 	});
@@ -410,9 +413,9 @@ describe('Audio Plugin', () => {
 			audio.figure = {
 				open: jest.fn()
 			};
-			// Use select() to properly set #element
+			// Use componentSelect() to properly set #element
 			const mockElement = { nodeName: 'AUDIO', src: 'test.mp3' };
-			audio.select(mockElement);
+			audio.componentSelect(mockElement);
 		});
 
 		it('should handle update command', () => {
@@ -427,7 +430,7 @@ describe('Audio Plugin', () => {
 
 		it('should handle copy command', () => {
 			mockTarget.getAttribute.mockReturnValue('copy');
-			const mockFigure = require('../../../../src/modules').Figure;
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
 			mockFigure.GetContainer.mockReturnValue({
 				container: { nodeType: 1 }
 			});
@@ -440,11 +443,11 @@ describe('Audio Plugin', () => {
 
 		it('should handle delete command', () => {
 			mockTarget.getAttribute.mockReturnValue('delete');
-			audio.destroy = jest.fn();
+			audio.componentDestroy = jest.fn();
 
 			audio.controllerAction(mockTarget);
 
-			expect(audio.destroy).toHaveBeenCalled();
+			expect(audio.componentDestroy).toHaveBeenCalled();
 		});
 	});
 
@@ -597,7 +600,7 @@ describe('Audio Plugin', () => {
 			audio.selection = {
 				setRange: jest.fn()
 			};
-			const mockFigure = require('../../../../src/modules').Figure;
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
 			mockFigure.CreateContainer.mockReturnValue({
 				container: { nodeType: 1 }
 			});
@@ -616,9 +619,9 @@ describe('Audio Plugin', () => {
 
 		it('should update existing audio element', () => {
 			const mockElement = { nodeName: 'AUDIO', src: 'old.mp3', setAttribute: jest.fn() };
-			// Use select to set #element
+			// Use componentSelect to set #element
 			audio.figure = { open: jest.fn() };
-			audio.select(mockElement);
+			audio.componentSelect(mockElement);
 
 			const file = { name: 'test.mp3', size: 1000 };
 
@@ -642,9 +645,9 @@ describe('Audio Plugin', () => {
 
 		it('should not re-select if src is same on update', () => {
 			const mockElement = { nodeName: 'AUDIO', src: 'https://example.com/audio.mp3', setAttribute: jest.fn() };
-			// Use select to set #element
+			// Use componentSelect to set #element
 			audio.figure = { open: jest.fn() };
-			audio.select(mockElement);
+			audio.componentSelect(mockElement);
 
 			const file = { name: 'test.mp3', size: 1000 };
 
@@ -667,7 +670,7 @@ describe('Audio Plugin', () => {
 		});
 
 		it('should process element without valid container', () => {
-			const mockFigure = require('../../../../src/modules').Figure;
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
 			mockFigure.GetContainer.mockReturnValue({ container: null, cover: null });
 			mockFigure.CreateContainer.mockReturnValue({
 				container: { nodeType: 1 }
@@ -690,7 +693,7 @@ describe('Audio Plugin', () => {
 		});
 
 		it('should skip processing for already contained element', () => {
-			const mockFigure = require('../../../../src/modules').Figure;
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
 			mockFigure.GetContainer.mockReturnValue({
 				container: { nodeType: 1 },
 				cover: { nodeType: 1 }
@@ -708,14 +711,14 @@ describe('Audio Plugin', () => {
 		});
 	});
 
-	describe('select', () => {
+	describe('componentSelect', () => {
 		it('should open figure and prepare element', () => {
 			const mockTarget = { nodeName: 'AUDIO', src: 'test.mp3' };
 			audio.figure = {
 				open: jest.fn()
 			};
 
-			audio.select(mockTarget);
+			audio.componentSelect(mockTarget);
 
 			expect(audio.figure.open).toHaveBeenCalledWith(mockTarget, {
 				nonResizing: true,

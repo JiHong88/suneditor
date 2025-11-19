@@ -47,7 +47,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -80,7 +80,10 @@ jest.mock('../../../../src/modules', () => ({
 		deleteTransform: jest.fn(),
 		convertAsFormat: jest.fn().mockReturnValue({ nodeName: 'IMG' }),
 		retainFigureFormat: jest.fn()
-	})),
+	}))
+}));
+
+jest.mock('../../../../src/modules/utils', () => ({
 	FileManager: jest.fn().mockImplementation(() => ({
 		getSize: jest.fn().mockReturnValue(0),
 		upload: jest.fn(),
@@ -98,8 +101,8 @@ jest.mock('../../../../src/modules', () => ({
 }));
 
 // Add static methods to modules
-const mockModal = require('../../../../src/modules').Modal;
-const mockFigure = require('../../../../src/modules').Figure;
+const mockModal = require('../../../../src/modules/contracts').Modal;
+const mockFigure = require('../../../../src/modules/contracts').Figure;
 
 // Add static methods to Modal
 Object.assign(mockModal, {
@@ -266,7 +269,7 @@ describe('Image Plugin', () => {
 		});
 
 		it('should have required methods', () => {
-			const methods = ['open', 'on', 'modalAction', 'init', 'select', 'destroy', 'onFilePasteAndDrop', 'create', 'createInline'];
+			const methods = ['open', 'modalOn', 'modalAction', 'modalInit', 'componentSelect', 'componentDestroy', 'onFilePasteAndDrop', 'create', 'createInline'];
 			methods.forEach((method) => {
 				expect(typeof image[method]).toBe('function');
 			});
@@ -283,21 +286,21 @@ describe('Image Plugin', () => {
 			it('should handle new image creation (isUpdate=false) when allowMultiple=true', () => {
 				image.pluginOptions.allowMultiple = true;
 				image.anchor = { on: jest.fn() };
-				image.on(false);
+				image.modalOn(false);
 				expect(image.imgInputFile.setAttribute).toHaveBeenCalledWith('multiple', 'multiple');
 			});
 
 			it('should handle image editing (isUpdate=true) when allowMultiple=true', () => {
 				image.pluginOptions.allowMultiple = true;
 				image.anchor = { on: jest.fn() };
-				image.on(true);
+				image.modalOn(true);
 				expect(image.imgInputFile.removeAttribute).toHaveBeenCalledWith('multiple');
 			});
 
 			it('should not modify multiple attribute when allowMultiple=false', () => {
 				image.pluginOptions.allowMultiple = false;
 				image.anchor = { on: jest.fn() };
-				image.on(false);
+				image.modalOn(false);
 				expect(image.imgInputFile.setAttribute).not.toHaveBeenCalled();
 			});
 		});
@@ -324,7 +327,7 @@ describe('Image Plugin', () => {
 
 		describe('init', () => {
 			it('should reset form values', () => {
-				image.init();
+				image.modalInit();
 
 				expect(image.imgInputFile.value).toBe('');
 				expect(image.imgUrlFile.value).toBe('');
@@ -344,8 +347,8 @@ describe('Image Plugin', () => {
 					parentNode: null
 				};
 
-				expect(() => image.select(mockTarget)).not.toThrow();
-				expect(typeof image.select).toBe('function');
+				expect(() => image.componentSelect(mockTarget)).not.toThrow();
+				expect(typeof image.componentSelect).toBe('function');
 			});
 		});
 
@@ -380,12 +383,12 @@ describe('Image Plugin', () => {
 					getAttribute: jest.fn().mockReturnValue('test.jpg')
 				};
 
-				image.init = jest.fn();
+				image.modalInit = jest.fn();
 
-				await image.destroy(mockTarget);
+				await image.componentDestroy(mockTarget);
 
 				expect(image.triggerEvent).toHaveBeenCalledWith('onImageDeleteBefore', expect.any(Object));
-				expect(image.init).toHaveBeenCalled();
+				expect(image.modalInit).toHaveBeenCalled();
 			});
 
 			it('should cancel destroy if event returns false', async () => {
@@ -396,7 +399,7 @@ describe('Image Plugin', () => {
 				image.triggerEvent = jest.fn().mockResolvedValue(false);
 				image.init = jest.fn();
 
-				await image.destroy(mockTarget);
+				await image.componentDestroy(mockTarget);
 
 				expect(image.init).not.toHaveBeenCalled();
 			});
@@ -585,7 +588,7 @@ describe('Image Plugin', () => {
 			image.captionCheckEl = { checked: false };
 			image.inputX = { value: '300px' };
 			image.inputY = { value: '200px' };
-			const mockFigure = require('../../../../src/modules').Figure;
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
 			mockFigure.CreateContainer.mockReturnValue({
 				container: { nodeType: 1 },
 				cover: { nodeType: 1, appendChild: jest.fn(), insertBefore: jest.fn() }
@@ -605,7 +608,7 @@ describe('Image Plugin', () => {
 		it('should create image with caption when checked', () => {
 			image.captionCheckEl.checked = true;
 			const file = { name: 'test.jpg', size: 1000 };
-			const mockFigure = require('../../../../src/modules').Figure;
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
 
 			image.create('https://example.com/image.jpg', null, '300px', '200px', 'center', file, 'Test image', true);
 
@@ -623,7 +626,7 @@ describe('Image Plugin', () => {
 			};
 			image.inputX = { value: '300px' };
 			image.inputY = { value: '200px' };
-			const mockFigure = require('../../../../src/modules').Figure;
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
 			mockFigure.CreateInlineContainer.mockReturnValue({
 				container: { nodeType: 1 }
 			});

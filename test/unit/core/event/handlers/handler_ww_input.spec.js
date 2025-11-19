@@ -17,6 +17,7 @@ describe('Input Handler', () => {
 				test: jest.fn(() => true)
 			},
 			triggerEvent: jest.fn(async () => true),
+			_callPluginEventAsync: jest.fn(async () => true),
 			_callPluginEvent: jest.fn(() => true),
 			_handledInBefore: false,
 			selection: {
@@ -186,7 +187,7 @@ describe('Input Handler', () => {
 
 				await OnBeforeInput_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-				expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onBeforeInput', {
+				expect(mockThis._callPluginEventAsync).toHaveBeenCalledWith('onBeforeInput', {
 					frameContext: mockFrameContext,
 					event: mockEvent,
 					data: 'a'
@@ -195,7 +196,7 @@ describe('Input Handler', () => {
 
 			it('should return early if plugin event returns false', async () => {
 				jest.spyOn(keyCodeMap, 'isComposing').mockReturnValue(false);
-				mockThis._callPluginEvent.mockReturnValue(false);
+				mockThis._callPluginEventAsync.mockResolvedValue(false);
 
 				const result = await OnBeforeInput_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
@@ -327,13 +328,13 @@ describe('Input Handler', () => {
 
 				await OnInput_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-				expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
+				expect(mockThis._callPluginEventAsync).not.toHaveBeenCalled();
 			});
 
 			it('should call plugin event', async () => {
 				await OnInput_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-				expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onInput', {
+				expect(mockThis._callPluginEventAsync).toHaveBeenCalledWith('onInput', {
 					frameContext: mockFrameContext,
 					event: mockEvent,
 					data: 'a'
@@ -341,7 +342,7 @@ describe('Input Handler', () => {
 			});
 
 			it('should return early if plugin event returns false', async () => {
-				mockThis._callPluginEvent.mockReturnValue(false);
+				mockThis._callPluginEventAsync.mockResolvedValue(false);
 
 				await OnInput_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 

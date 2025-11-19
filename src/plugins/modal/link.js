@@ -1,10 +1,7 @@
-import EditorInjector from '../../editorInjector';
-import { Modal, Controller, ModalAnchorEditor } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal, Controller } from '../../modules/contracts';
+import { ModalAnchorEditor } from '../../modules/utils';
 import { dom, numbers } from '../../helper';
-
-/**
- * @typedef {import('../../modules/ModalAnchorEditor').ModalAnchorEditorParams} ModalAnchorEditorParams_link
- */
 
 /**
  * @typedef {Object} LinkOptions
@@ -16,7 +13,7 @@ import { dom, numbers } from '../../helper';
  */
 
 /**
- * @typedef {Omit<LinkOptions & ModalAnchorEditorParams_link, ''>} LinkPluginOptions
+ * @typedef {Omit<LinkOptions & import('../../modules/utils/ModalAnchorEditor').ModalAnchorEditorParams, ''>} LinkPluginOptions
  */
 
 /**
@@ -25,9 +22,8 @@ import { dom, numbers } from '../../helper';
  * - This plugin provides link insertion and editing functionality within the editor.
  * - It also supports file uploads if an upload URL is provided.
  */
-class Link extends EditorInjector {
+class Link extends PluginModal {
 	static key = 'link';
-	static type = 'modal';
 	static className = 'se-icon-flip-rtl';
 
 	#controllerATarget;
@@ -74,11 +70,8 @@ class Link extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @returns {boolean} - Whether the plugin is active
-	 * - If it returns "undefined", it will no longer be called in this scope.
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.Active}
 	 */
 	active(element) {
 		if (dom.check.isAnchor(element) && !element.hasAttribute('data-se-non-link')) {
@@ -103,29 +96,27 @@ class Link extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
+	 * @override
+	 * @type {PluginModal['open']}
 	 */
 	open() {
 		this.modal.open();
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.On}
 	 */
-	on(isUpdate) {
+	modalOn(isUpdate) {
 		this.isUpdateState = isUpdate;
 		this.anchor.on(isUpdate);
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {boolean} Success or failure
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Action}
 	 */
-	modalAction() {
+	async modalAction() {
 		const oA = this.anchor.create(false);
 		if (oA === null) return false;
 
@@ -149,18 +140,17 @@ class Link extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Init}
 	 */
-	init() {
+	modalInit() {
 		this.controller.close();
 		this.anchor.init();
 	}
 
 	/**
-	 * @editorMethod Modules.Controller
-	 * @description Executes the method that is called when a button is clicked in the "controller".
-	 * @param {HTMLButtonElement} target Target button element
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Action}
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
@@ -196,10 +186,10 @@ class Link extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Controller
-	 * @description This function is called before the "controller" before it is closed.
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Close}
 	 */
-	close() {
+	controllerClose() {
 		dom.utils.removeClass(this.controller.currentTarget, 'on');
 	}
 }

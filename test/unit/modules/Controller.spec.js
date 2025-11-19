@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for modules/Controller.js
  */
 
-import Controller from '../../../src/modules/Controller.js';
+import Controller from '../../../src/modules/contracts/Controller.js';
 
 // Mock dependencies
 jest.mock('../../../src/editorInjector/_core.js', () => {

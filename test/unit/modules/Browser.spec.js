@@ -2,10 +2,10 @@
  * @fileoverview Unit tests for modules/Browser.js
  */
 
-import Browser from '../../../src/modules/Browser.js';
+import Browser from '../../../src/modules/contracts/Browser.js';
 
 // Mock ApiManager
-jest.mock('../../../src/modules/ApiManager.js', () => {
+jest.mock('../../../src/modules/utils/ApiManager.js', () => {
     return jest.fn().mockImplementation(function() {
         this.call = jest.fn();
         this.cancel = jest.fn();
@@ -436,14 +436,14 @@ describe('Modules - Browser', () => {
             expect(browser.apiManager.cancel).toHaveBeenCalled();
         });
 
-        it('should call inst.init if available', () => {
-            mockInst.init = jest.fn();
+        it('should call inst.browserInit if available', () => {
+            mockInst.browserInit = jest.fn();
             browser.close();
-            expect(mockInst.init).toHaveBeenCalled();
+            expect(mockInst.browserInit).toHaveBeenCalled();
         });
 
-        it('should not throw if inst.init is not available', () => {
-            delete mockInst.init;
+        it('should not throw if inst.browserInit is not available', () => {
+            delete mockInst.browserInit;
             expect(() => {
                 browser.close();
             }).not.toThrow();

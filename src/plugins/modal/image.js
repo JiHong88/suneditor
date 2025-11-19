@@ -1,5 +1,6 @@
-import EditorInjector from '../../editorInjector';
-import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal, Figure } from '../../modules/contracts';
+import { FileManager, ModalAnchorEditor } from '../../modules/utils';
 import { dom, numbers, env, keyCodeMap } from '../../helper';
 const { NO_EVENT } = env;
 
@@ -37,9 +38,8 @@ const { NO_EVENT } = env;
  * @description Image plugin.
  * - This plugin provides image insertion functionality within the editor, supporting both file upload and URL input.
  */
-class Image_ extends EditorInjector {
+class Image_ extends PluginModal {
 	static key = 'image';
-	static type = 'modal';
 	static className = '';
 	/**
 	 * @this {Image_}
@@ -198,8 +198,8 @@ class Image_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
+	 * @override
+	 * @type {PluginModal['open']}
 	 */
 	open() {
 		this.#produceIndex = 0;
@@ -207,19 +207,39 @@ class Image_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Controller(Figure)
-	 * @description Executes the method that is called when a target component is edited.
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.RetainFormat}
 	 */
-	edit() {
-		this.modal.open();
+	retainFormat() {
+		return {
+			query: 'img',
+			/** @param {HTMLImageElement} element */
+			method: (element) => {
+				const figureInfo = Figure.GetContainer(element);
+				if (figureInfo && figureInfo.container && (figureInfo.cover || figureInfo.inlineCover)) return;
+
+				const { w, h } = this.#ready(element, true);
+				this.#fileCheck(w, h);
+			},
+		};
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnFilePasteAndDrop}
 	 */
-	on(isUpdate) {
+	onFilePasteAndDrop({ file }) {
+		if (!/^image/.test(file.type)) return;
+
+		this.submitFile([file]);
+		this.editor.focus();
+	}
+
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.On}
+	 */
+	modalOn(isUpdate) {
 		if (!isUpdate) {
 			if (this.#resizing) {
 				this.inputX.value = this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
@@ -234,27 +254,8 @@ class Image_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.EventManager
-	 * @description Executes the event function of "paste" or "drop".
-	 * @param {Object} params { frameContext, event, file }
-	 * @param {SunEditor.FrameContext} params.frameContext Frame context
-	 * @param {ClipboardEvent} params.event Event object
-	 * @param {File} params.file File object
-	 * @returns {boolean} - If return false, the file upload will be canceled
-	 */
-	onFilePasteAndDrop({ file }) {
-		if (!/^image/.test(file.type)) return;
-
-		this.submitFile([file]);
-		this.editor.focus();
-
-		return false;
-	}
-
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {Promise<boolean>} Success or failure
+	 * @hook Modules.Modal
+	 * @type {typeof import('../../hooks/module').Modal.Action}
 	 */
 	async modalAction() {
 		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked')).value;
@@ -274,34 +275,10 @@ class Image_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLImageElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Init}
 	 */
-	retainFormat() {
-		return {
-			query: 'img',
-			method: (element) => {
-				const figureInfo = Figure.GetContainer(element);
-				if (figureInfo && figureInfo.container && (figureInfo.cover || figureInfo.inlineCover)) return;
-
-				const { w, h } = this.#ready(element, true);
-				this.#fileCheck(w, h);
-			},
-		};
-	}
-
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
-	 */
-	init() {
+	modalInit() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
 		if (this.imgInputFile) this.imgInputFile.value = '';
 		if (this.imgUrlFile) this.#linkValue = this.previewSrc.textContent = this.imgUrlFile.value = '';
@@ -334,21 +311,26 @@ class Image_ extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Select}
 	 */
-	select(target) {
+	componentSelect(target) {
 		this.#ready(target);
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
-	 * @returns {Promise<void>}
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Edit}
 	 */
-	async destroy(target) {
+	componentEdit() {
+		this.modal.open();
+	}
+
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Destroy}
+	 */
+	async componentDestroy(target) {
 		const targetEl = target || this.#element;
 		const container = dom.query.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
@@ -358,7 +340,7 @@ class Image_ extends EditorInjector {
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
-		this.init();
+		this.modalInit();
 
 		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
 			this.nodeTransform.removeAllParents(
@@ -748,7 +730,7 @@ class Image_ extends EditorInjector {
 
 		// select
 		imageEl.onload = () => {
-			this.select(imageEl);
+			this.componentSelect(imageEl);
 		};
 	}
 

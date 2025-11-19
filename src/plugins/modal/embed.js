@@ -1,5 +1,5 @@
-import EditorInjector from '../../editorInjector';
-import { Modal, Figure } from '../../modules';
+import { PluginModal } from '../../interfaces';
+import { Modal, Figure } from '../../modules/contracts';
 import { dom, numbers, env, keyCodeMap } from '../../helper';
 const { _w, NO_EVENT } = env;
 
@@ -50,9 +50,8 @@ const { _w, NO_EVENT } = env;
  * @description Embed modal plugin.
  * - This plugin provides a modal interface for embedding external content (e.g., videos, iframes) into the editor.
  */
-class Embed extends EditorInjector {
+class Embed extends PluginModal {
 	static key = 'embed';
-	static type = 'modal';
 	static className = '';
 	/**
 	 * @this {Embed}
@@ -246,68 +245,21 @@ class Embed extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a "Modal" module's is opened.
+	 * @override
+	 * @type {PluginModal['open']}
 	 */
 	open() {
 		this.modal.open();
 	}
 
 	/**
-	 * @editorMethod Modules.Controller(Figure)
-	 * @description Executes the method that is called when a target component is edited.
-	 */
-	edit() {
-		this.modal.open();
-	}
-
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description Executes the method that is called when a plugin's modal is opened.
-	 * @param {boolean} isUpdate "Indicates whether the modal is for editing an existing component (true) or registering a new one (false)."
-	 */
-	on(isUpdate) {
-		if (!isUpdate && this.#resizing) {
-			this.inputX.value = this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
-			this.proportion.disabled = true;
-		} else if (isUpdate) {
-			this.#linkValue = this.previewSrc.textContent = this.embedInput.value = this.#cover.getAttribute('data-se-origin') || '';
-		}
-	}
-
-	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called when a form within a modal window is "submit".
-	 * @returns {Promise<boolean>} Success / failure
-	 */
-	async modalAction() {
-		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked')).value;
-
-		let result = false;
-		if (this.#linkValue.length > 0) {
-			result = await this.submitSRC(this.#linkValue);
-		}
-
-		if (result) _w.setTimeout(this.component.select.bind(this.component, this.#element, Embed.key), 0);
-
-		return result;
-	}
-
-	/**
-	 * @editorMethod Editor.core
-	 * @description This method is used to validate and preserve the format of the component within the editor.
-	 * - It ensures that the structure and attributes of the element are maintained and secure.
-	 * - The method checks if the element is already wrapped in a valid container and updates its attributes if necessary.
-	 * - If the element isn't properly contained, a new container is created to retain the format.
-	 * @returns {{query: string, method: (element: HTMLIFrameElement) => void}} The format retention object containing the query and method to process the element.
-	 * - query: The selector query to identify the relevant elements (in this case, 'audio').
-	 * - method:The function to execute on the element to validate and preserve its format.
-	 * - The function takes the element as an argument, checks if it is contained correctly, and applies necessary adjustments.
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.RetainFormat}
 	 */
 	retainFormat() {
 		return {
 			query: 'iframe',
+			/** @param {HTMLIFrameElement} element */
 			method: async (element) => {
 				if (!this.checkContentType(element.src)) return;
 
@@ -324,10 +276,41 @@ class Embed extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Modules.Modal
-	 * @description This function is called before the modal window is opened, but before it is closed.
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.On}
 	 */
-	init() {
+	modalOn(isUpdate) {
+		if (!isUpdate && this.#resizing) {
+			this.inputX.value = this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value = this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+			this.proportion.disabled = true;
+		} else if (isUpdate) {
+			this.#linkValue = this.previewSrc.textContent = this.embedInput.value = this.#cover.getAttribute('data-se-origin') || '';
+		}
+	}
+
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Action}
+	 */
+	async modalAction() {
+		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_embed_radio"]:checked')).value;
+
+		let result = false;
+		if (this.#linkValue.length > 0) {
+			result = await this.submitSRC(this.#linkValue);
+		}
+
+		if (result) _w.setTimeout(this.component.select.bind(this.component, this.#element, Embed.key), 0);
+
+		return result;
+	}
+
+	/**
+	 * @hook Modules.Modal
+	 * @type {SunEditor.Hook.Modal.Init}
+	 */
+	modalInit() {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
 		this.#linkValue = this.previewSrc.textContent = this.embedInput.value = '';
 
@@ -344,21 +327,26 @@ class Embed extends EditorInjector {
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Executes the method that is called when a component of a plugin is selected.
-	 * @param {HTMLElement} target Target component element
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Select}
 	 */
-	select(target) {
+	componentSelect(target) {
 		this.#ready(target);
 	}
 
 	/**
-	 * @editorMethod Editor.Component
-	 * @description Method to delete a component of a plugin, called by the "FileManager", "Controller" module.
-	 * @param {HTMLElement} target Target element
-	 * @returns {Promise<void>}
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Edit}
 	 */
-	async destroy(target) {
+	componentEdit() {
+		this.modal.open();
+	}
+
+	/**
+	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Destroy}
+	 */
+	async componentDestroy(target) {
 		const targetEl = target || this.#element;
 		const container = dom.query.getParentElement(targetEl, Figure.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
@@ -368,7 +356,7 @@ class Embed extends EditorInjector {
 		if (message === false) return;
 
 		dom.utils.removeItem(container);
-		this.init();
+		this.modalInit();
 
 		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
 			this.nodeTransform.removeAllParents(

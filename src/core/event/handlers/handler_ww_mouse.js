@@ -1,5 +1,5 @@
 import { dom, env } from '../../../helper';
-import { _DragHandle } from '../../../modules';
+import { _DragHandle } from '../../../modules/utils';
 
 const { _w } = env;
 
@@ -40,7 +40,7 @@ export async function OnMouseDown_wysiwyg(fc, e) {
 	if ((await this.triggerEvent('onMouseDown', { frameContext: fc, event: e })) === false) return;
 
 	// plugin event
-	if (this._callPluginEvent('onMouseDown', { frameContext: fc, event: e }) === false) return;
+	if ((await this._callPluginEventAsync('onMouseDown', { frameContext: fc, event: e })) === false) return;
 
 	if (this.editor.isBalloon) {
 		this._hideToolbar();
@@ -62,7 +62,7 @@ export async function OnMouseUp_wysiwyg(fc, e) {
 	if ((await this.triggerEvent('onMouseUp', { frameContext: fc, event: e })) === false) return;
 
 	// plugin event
-	if (this._callPluginEvent('onMouseUp', { frameContext: fc, event: e }) === false) return;
+	await this._callPluginEventAsync('onMouseUp', { frameContext: fc, event: e });
 }
 
 /**
@@ -87,7 +87,7 @@ export async function OnClick_wysiwyg(fc, e) {
 	// user event
 	if ((await this.triggerEvent('onClick', { frameContext: fc, event: e })) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onClick', { frameContext: fc, event: e }) === false) return;
+	if ((await this._callPluginEventAsync('onClick', { frameContext: fc, event: e })) === false) return;
 
 	const componentInfo = this.component.get(eventTarget);
 	if (componentInfo) {
@@ -190,5 +190,5 @@ export async function OnMouseLeave_wysiwyg(fc, e) {
 	// user event
 	if ((await this.triggerEvent('onMouseLeave', { frameContext: fc, event: e })) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onMouseLeave', { frameContext: fc, event: e }) === false) return;
+	await this._callPluginEventAsync('onMouseLeave', { frameContext: fc, event: e });
 }

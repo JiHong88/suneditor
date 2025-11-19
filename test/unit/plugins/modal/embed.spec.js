@@ -45,7 +45,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/contracts', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -84,8 +84,8 @@ jest.mock('../../../../src/modules', () => ({
 	}))
 }));
 
-const mockModal = require('../../../../src/modules').Modal;
-const mockFigure = require('../../../../src/modules').Figure;
+const mockModal = require('../../../../src/modules/contracts').Modal;
+const mockFigure = require('../../../../src/modules/contracts').Figure;
 
 Object.assign(mockModal, {
 	OnChangeFile: jest.fn(),
@@ -362,7 +362,7 @@ describe('Embed Plugin', () => {
 
 	describe('Instance methods', () => {
 		it('should have required methods', () => {
-			const methods = ['open', 'edit', 'on', 'modalAction', 'init', 'select', 'destroy', 'submitSRC', 'checkContentType', 'findProcessUrl', 'retainFormat'];
+			const methods = ['open', 'componentEdit', 'modalOn', 'modalAction', 'modalInit', 'componentSelect', 'componentDestroy', 'submitSRC', 'checkContentType', 'findProcessUrl', 'retainFormat'];
 			methods.forEach((method) => {
 				expect(typeof embed[method]).toBe('function');
 			});
@@ -377,14 +377,14 @@ describe('Embed Plugin', () => {
 
 		describe('edit', () => {
 			it('should open modal', () => {
-				embed.edit();
+				embed.componentEdit();
 				expect(embed.modal.open).toHaveBeenCalled();
 			});
 		});
 
 		describe('on', () => {
 			it('should initialize values when not updating', () => {
-				embed.on(false);
+				embed.modalOn(false);
 				expect(embed.inputX.value).toBe('');
 				expect(embed.inputY.value).toBe('');
 			});
@@ -403,9 +403,9 @@ describe('Embed Plugin', () => {
 				});
 
 				const mockElement = { nodeName: 'IFRAME', src: 'https://example.com/embed', style: {} };
-				embed.select(mockElement);
+				embed.componentSelect(mockElement);
 				embed.modal.isUpdate = true;
-				embed.on(true);
+				embed.modalOn(true);
 
 				expect(embed.embedInput.value).toBe('https://example.com/video');
 			});
@@ -414,7 +414,7 @@ describe('Embed Plugin', () => {
 		describe('init', () => {
 			it('should reset form values', () => {
 				embed.embedInput.value = 'test';
-				embed.init();
+				embed.modalInit();
 				expect(embed.embedInput.value).toBe('');
 				expect(embed.previewSrc.textContent).toBe('');
 			});
@@ -422,7 +422,7 @@ describe('Embed Plugin', () => {
 			it('should reset size inputs', () => {
 				embed.inputX.value = '500px';
 				embed.inputY.value = '300px';
-				embed.init();
+				embed.modalInit();
 				expect(embed.proportion.checked).toBe(false);
 				expect(embed.proportion.disabled).toBe(true);
 			});
@@ -469,7 +469,7 @@ describe('Embed Plugin', () => {
 		describe('select', () => {
 			it('should prepare component for editing', () => {
 				const iframe = { nodeName: 'IFRAME', src: 'https://www.youtube.com/embed/test', style: {} };
-				embed.select(iframe);
+				embed.componentSelect(iframe);
 				expect(embed.figure.open).toHaveBeenCalledWith(iframe, expect.any(Object));
 			});
 		});
@@ -480,8 +480,8 @@ describe('Embed Plugin', () => {
 				const container = { nodeType: 1, parentNode: { nodeType: 1 }, previousElementSibling: { nodeType: 1 } };
 				embed.triggerEvent = jest.fn().mockResolvedValue(undefined);
 
-				embed.select(iframe);
-				await embed.destroy(iframe);
+				embed.componentSelect(iframe);
+				await embed.componentDestroy(iframe);
 
 				expect(embed.triggerEvent).toHaveBeenCalledWith('onEmbedDeleteBefore', expect.any(Object));
 			});
@@ -492,8 +492,8 @@ describe('Embed Plugin', () => {
 			const { dom } = require('../../../../src/helper');
 			dom.utils.removeItem.mockClear();
 
-			embed.select(iframe);
-			await embed.destroy(iframe);
+			embed.componentSelect(iframe);
+			await embed.componentDestroy(iframe);
 
 			expect(embed.triggerEvent).toHaveBeenCalledWith('onEmbedDeleteBefore', expect.any(Object));
 			expect(dom.utils.removeItem).not.toHaveBeenCalled();

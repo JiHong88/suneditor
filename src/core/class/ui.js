@@ -367,7 +367,7 @@ UI.prototype = {
 				fixedCont.push(c);
 				continue;
 			}
-			if (typeof c.inst.close === 'function') c.inst.close();
+			c.inst.controllerClose?.();
 			if (c.form) c.form.style.display = 'none';
 		}
 		this.editor.opendControllers = fixedCont;

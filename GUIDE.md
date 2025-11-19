@@ -112,7 +112,27 @@ suneditor/
 │   │   ├── field/           # Autocomplete (mention)
 │   │   ├── input/           # Toolbar inputs (fontSize, pageNavigator)
 │   │   └── popup/           # Inline controllers (anchor)
-│   ├── modules/             # UI components (Modal, Controller, Figure, ColorPicker, etc.)
+│   ├── modules/             # UI components
+│   │   ├── contracts/       # Module contracts (required hooks)
+│   │   │   ├── Modal.js     # Modal contract (modalAction, modalOn, modalOff, etc.)
+│   │   │   ├── Controller.js # Controller contract (controllerAction, controllerClose, etc.)
+│   │   │   ├── Figure.js    # Figure wrapper (component resize/align)
+│   │   │   ├── Browser.js   # Browser contract (browserInit)
+│   │   │   ├── ColorPicker.js # ColorPicker contract (colorPickerAction, etc.)
+│   │   │   └── HueSlider.js # HueSlider contract (hueSliderAction, etc.)
+│   │   └── utils/           # Module utilities (no required hooks)
+│   │       ├── ModalAnchorEditor.js # Link form helper
+│   │       ├── SelectMenu.js # Custom dropdown menu
+│   │       ├── FileManager.js # File upload handler
+│   │       ├── ApiManager.js # XHR request helper
+│   │       └── _DragHandle.js # Drag state manager
+│   ├── hooks/               # Hook interface definitions
+│   │   ├── core.js          # Editor core hooks (Event, Component, Toolbar, Core)
+│   │   ├── module.js        # Module contract hooks (Modal, Browser, ColorPicker, etc.)
+│   │   └── params.js        # Hook parameter type definitions
+│   ├── interfaces/          # Plugin base classes
+│   │   ├── plugin.js        # Plugin type classes (PluginCommand, PluginModal, etc.)
+│   │   └── index.js         # Interface exports
 │   ├── helper/              # Pure utility functions
 │   │   ├── converter.js     # String/HTML conversion
 │   │   ├── env.js           # Browser/device detection
@@ -442,6 +462,80 @@ SunEditor's content is organized into **three fundamental units** with exactly *
 </div>
 ```
 
+#### Content Filtering: strictMode
+
+The `strictMode` option controls how strictly SunEditor validates and cleans HTML content. It ensures content conforms to the editor's structural rules and security policies.
+
+**Configuration:**
+
+```javascript
+SUNEDITOR.create('editor', {
+	// Boolean mode (all filters on/off)
+	strictMode: true, // default - all filters enabled
+	strictMode: false, // disable all filters
+
+	// Granular control
+	strictMode: {
+		tagFilter: true, // Filter disallowed HTML tags
+		formatFilter: true, // Enforce line/block/component structure
+		classFilter: true, // Validate CSS classes
+		textStyleTagFilter: true, // Convert inline style tags to styled text
+		attrFilter: true, // Filter HTML attributes
+		styleFilter: true, // Filter inline styles
+	},
+});
+```
+
+**Filter Types:**
+
+| Filter                   | Purpose                                                       | When Disabled                                         |
+| ------------------------ | ------------------------------------------------------------- | ----------------------------------------------------- |
+| **`tagFilter`**          | Removes disallowed HTML tags based on whitelist/blacklist     | Allows any HTML tags (security risk)                  |
+| **`formatFilter`**       | Enforces line/block/component structure rules                 | Components may not wrap properly in figure containers |
+| **`classFilter`**        | Validates CSS classes against allowedClassName                | Allows any CSS classes                                |
+| **`textStyleTagFilter`** | Converts `<B>`, `<I>`, `<U>` to styled `<SPAN>` elements      | Keeps original inline style tags                      |
+| **`attrFilter`**         | Filters attributes based on allowedAttributes/pasteTagsFilter | Allows any attributes (XSS risk)                      |
+| **`styleFilter`**        | Filters inline styles based on pasteTagsFilter                | Allows any inline styles                              |
+
+**How Filters Work:**
+
+```javascript
+// tagFilter: Removes disallowed tags
+// Input:  <script>alert('xss')</script><p>text</p>
+// Output: <p>text</p>
+
+// formatFilter: Wraps components in proper containers
+// Input:  <img src="...">
+// Output: <div class="se-component"><figure><img src="..."></figure></div>
+
+// classFilter: Validates against allowedClassName
+// Input:  <div class="custom-class invalid-class">text</div>
+// Output: <div class="custom-class">text</div> (if 'custom-class' in allowedClassName)
+
+// textStyleTagFilter: Converts style tags to styled spans
+// Input:  <b>bold</b> <i>italic</i> <u>underline</u>
+// Output: <span style="font-weight: bold;">bold</span> <span style="font-style: italic;">italic</span> <span style="text-decoration: underline;">underline</span>
+
+// attrFilter + styleFilter: Cleans attributes and styles
+// Input:  <p onclick="hack()" style="color: red; position: fixed;">text</p>
+// Output: <p style="color: red;">text</p> (removes onclick, filters dangerous styles)
+```
+
+**When to Disable Filters:**
+
+- **`formatFilter: false`**: Allow components without figure wrappers (legacy content compatibility)
+- **`textStyleTagFilter: false`**: Preserve original `<b>`, `<i>`, `<u>` tags (some frameworks require specific tags)
+- **Other filters**: Generally should stay enabled for security
+
+**Security Note:** Disabling `tagFilter`, `attrFilter`, or `styleFilter` can expose your application to XSS attacks. Only disable if you fully trust the content source and have server-side sanitization.
+
+**Related Options:**
+
+- `elementWhitelist` - Additional allowed HTML tags
+- `elementBlacklist` - Explicitly blocked HTML tags
+- `allowedClassName` - Allowed CSS class names
+- `pasteTagsFilter` - Per-tag attribute/style filtering rules
+
 ### Multi-Root Architecture
 
 SunEditor v3 uses a unified frame architecture for both single and multi-root editing.
@@ -557,92 +651,134 @@ src/core/
 
 Plugins are modular features that extend editor functionality. Each plugin type serves a specific UI pattern.
 
-**Architecture Pattern**: ES6 classes extending `EditorInjector`
+**Architecture Pattern**: ES6 classes extending plugin type base classes from `src/interfaces/plugin.js`
 
 - Constructor: `constructor(editor, pluginOptions)` → calls `super(editor)`
-- Static properties: `static key`, `static type`, `static className`
+- Static properties: `static key`, `static type`, `static className` (type is auto-set by base class)
 - Full editor access via inherited properties: `this.editor`, `this.selection`, `this.html`, `this.format`, etc.
 - Lifecycle controlled by editor and modules (Modal, Controller, etc.)
+- Each plugin type has specific required methods defined by its base class
 
-**Plugins organized by type:**
+**Plugin Type Base Classes:**
 
-| Type            | Purpose               | Examples                       |
-| --------------- | --------------------- | ------------------------------ |
-| **`command/`**  | Direct actions, no UI | blockquote, list, exportPDF    |
-| **`dropdown/`** | Dropdown menus        | align, font, blockStyle, table |
-| **`modal/`**    | Dialog windows        | image, video, link, math       |
-| **`browser/`**  | Gallery interfaces    | imageGallery, videoGallery     |
-| **`field/`**    | Inline autocomplete   | mention                        |
-| **`input/`**    | Toolbar input fields  | fontSize, pageNavigator        |
-| **`popup/`**    | Inline controllers    | anchor                         |
+| Base Class               | Type            | Folder      | Required Methods           | Examples                    |
+| ------------------------ | --------------- | ----------- | -------------------------- | --------------------------- |
+| **`PluginCommand`**      | `command`       | `command/`  | `action()`, `active()`     | blockquote, list, exportPDF |
+| **`PluginDropdown`**     | `dropdown`      | `dropdown/` | `action()`                 | align, font, blockStyle     |
+| **`PluginDropdownFree`** | `dropdown-free` | `dropdown/` | (none - handle own events) | table                       |
+| **`PluginModal`**        | `modal`         | `modal/`    | `open()`                   | image, video, link, math    |
+| **`PluginBrowser`**      | `browser`       | `browser/`  | `open()`, `close()`        | imageGallery, videoGallery  |
+| **`PluginField`**        | `field`         | `field/`    | (none - uses hooks)        | mention                     |
+| **`PluginInput`**        | `input`         | `input/`    | (none - uses hooks)        | fontSize, pageNavigator     |
+| **`PluginPopup`**        | `popup`         | `popup/`    | `show()`                   | anchor                      |
 
-**Key Differences from Core Classes:**
+**Example Usage:**
 
-- **Plugins**: Feature implementation, extend `EditorInjector` (full editor access)
-- **Core Classes**: Operational APIs, extend `EditorInjector` (full editor access)
-- **Modules**: UI components, extend `CoreInjector` (minimal coupling)
+```javascript
+import { PluginModal } from '../../interfaces';
+
+class MyPlugin extends PluginModal {
+	static key = 'myPlugin';
+	// type is automatically 'modal' from PluginModal
+	static className = 'se-btn-my-plugin';
+
+	constructor(editor, options) {
+		super(editor);
+		// Full editor access via inherited properties
+	}
+
+	open(target) {
+		// Required by PluginModal
+	}
+}
+```
+
+**Key Differences:**
+
+- **Plugins**: Extend type-specific base classes from `src/interfaces/plugin.js` (full editor access)
+- **Core Classes**: Extend `EditorInjector` (full editor access)
+- **Modules**: Extend `CoreInjector` (minimal coupling)
 
 #### Plugin Lifecycle Methods
 
-Plugin methods marked with `@editorMethod` are lifecycle hooks called by specific editor components. The annotation indicates **who calls** the method:
+Plugin methods marked with `@hook` are lifecycle hooks called by specific editor components. The annotation indicates **who calls** the method:
 
 **Core lifecycle methods:**
 
-| Method                    | Called by             | When                                                        | Return                 | Required                       |
-| ------------------------- | --------------------- | ----------------------------------------------------------- | ---------------------- | ------------------------------ |
-| `active(element, target)` | `Editor.EventManager` | On selection change                                         | `boolean \| undefined` | Yes (command/dropdown only)    |
-| `action()`                | `Editor.core`         | Button click or API call                                    | `void`                 | Yes (command plugins)          |
-| `open()`                  | `Modules.Modal`       | Modal open request                                          | `void`                 | Yes (modal plugins)            |
-| `close()`                 | `Modules.Modal`       | Modal close                                                 | `void`                 | Optional                       |
-| `init()`                  | `Modules.Modal`       | Before modal open/close                                     | `void`                 | Optional                       |
-| `on(isUpdate)`            | `Modules.Modal`       | After modal opens                                           | `void`                 | Optional                       |
-| `on(target)`              | `Modules.Dropdown`    | After dropdown opens (note: different signature than modal) | `void`                 | Optional                       |
-| `off(isUpdate)`           | `Modules.Modal`       | After modal closes                                          | `void`                 | Optional                       |
-| `modalAction()`           | `Modules.Modal`       | Form submit                                                 | `Promise<boolean>`     | Yes (modal plugins with forms) |
+| Method                    | Called by             | When                     | Return                 | Plugin Type                             |
+| ------------------------- | --------------------- | ------------------------ | ---------------------- | --------------------------------------- |
+| `active(element, target)` | `Editor.EventManager` | On selection change      | `boolean \| undefined` | command, dropdown                       |
+| `action(target)`          | `Editor.Core`         | Button click or API call | `void \| Promise`      | command (required), dropdown (required) |
+| `open(target)`            | `Editor.Core`         | Modal open request       | `void`                 | modal (required)                        |
+| `open(onSelectFunction)`  | `Modules.Browser`     | Browser open request     | `void`                 | browser (required)                      |
+| `close()`                 | `Modules.Browser`     | Browser close            | `void`                 | browser (required)                      |
+| `show()`                  | `Editor.Plugin`       | Popup shown              | `void`                 | popup (required)                        |
+
+**Dropdown lifecycle methods:**
+
+| Method       | Called by          | When                  | Return | Plugin Type                                   |
+| ------------ | ------------------ | --------------------- | ------ | --------------------------------------------- |
+| `on(target)` | `Modules.Dropdown` | After dropdown opens  | `void` | dropdown (optional), dropdown-free (optional) |
+| `off()`      | `Modules.Dropdown` | After dropdown closes | `void` | dropdown-free (optional)                      |
 
 **Component lifecycle methods:**
 
-| Method                     | Called by                    | When                        | Return            | Required                        |
-| -------------------------- | ---------------------------- | --------------------------- | ----------------- | ------------------------------- |
-| `select(target)`           | `Editor.Component`           | Component selected          | `void`            | Yes (component plugins)         |
-| `deselect()`               | `Editor.Component`           | Component deselected        | `void`            | Optional                        |
-| `edit()`                   | `Modules.Controller(Figure)` | Component edit button click | `void`            | Yes (modal plugins with Figure) |
-| `controllerAction(target)` | `Modules.Controller`         | Controller button click     | `void`            | Optional                        |
-| `destroy(target)`          | `Editor.Component`           | Component delete            | `Promise<void>`   | Yes (component plugins)         |
-| `show()`                   | `Editor.Component`           | Component shown             | `void`            | Optional                        |
-| `retainFormat()`           | `Editor.core`                | HTML cleaning/validation    | `{query, method}` | Yes (component plugins)         |
+| Method                      | Called by                    | When                        | Return            | Plugin Type                  |
+| --------------------------- | ---------------------------- | --------------------------- | ----------------- | ---------------------------- |
+| `componentSelect(target)`   | `Editor.Component`           | Component selected          | `void \| boolean` | component plugins (required) |
+| `componentDeselect(target)` | `Editor.Component`           | Component deselected        | `void`            | component plugins (optional) |
+| `componentEdit(target)`     | `Modules.Controller(Figure)` | Component edit button click | `void`            | modal + Figure (required)    |
+| `componentDestroy(target)`  | `Editor.Component`           | Component delete            | `Promise<void>`   | component plugins (required) |
+| `retainFormat()`            | `Editor.Core`                | HTML cleaning/validation    | `{query, method}` | component plugins (required) |
 
 **Event handler methods:**
 
-| Method                                            | Called by             | When                 | Return             | Required                 |
-| ------------------------------------------------- | --------------------- | -------------------- | ------------------ | ------------------------ |
-| `onFilePasteAndDrop({file, event, frameContext})` | `Editor.EventManager` | File paste/drop      | `boolean \| void`  | Optional (modal plugins) |
-| `onInput()`                                       | `Editor.EventManager` | Editor content input | `Promise<boolean>` | Optional (field plugins) |
-| `onCopy(params)`                                  | `Editor.EventManager` | Copy event           | `boolean \| void`  | Optional (table plugin)  |
-| `onPaste(params)`                                 | `Editor.EventManager` | Paste event          | `boolean \| void`  | Optional (table plugin)  |
-| `onMouseDown(params)`                             | `Editor.EventManager` | Mouse down in editor | `void`             | Optional (table plugin)  |
-| `onMouseUp()`                                     | `Editor.EventManager` | Mouse up in editor   | `void`             | Optional (table plugin)  |
-| `onMouseMove(params)`                             | `Editor.EventManager` | Mouse move in editor | `void`             | Optional (table plugin)  |
-| `onMouseLeave()`                                  | `Editor.EventManager` | Mouse leave editor   | `void`             | Optional (table plugin)  |
-| `onScroll()`                                      | `Editor.EventManager` | Editor scroll        | `void`             | Optional (table plugin)  |
-| `onKeyDown(params)`                               | `Editor.EventManager` | Key down in editor   | `void`             | Optional (table plugin)  |
-| `onKeyUp(params)`                                 | `Editor.EventManager` | Key up in editor     | `void`             | Optional (table plugin)  |
+> **Note**: Hooks marked with ✨ have async variants (e.g., `onInput` → `onInputAsync`) for asynchronous operations. Async versions should return `Promise<boolean|void>`.
+
+| Method                                               | Called by             | When                 | Return            | Async? | Required                 |
+| ---------------------------------------------------- | --------------------- | -------------------- | ----------------- | ------ | ------------------------ |
+| `onFilePasteAndDrop({file, event, frameContext})` ✨ | `Editor.EventManager` | File paste/drop      | `boolean \| void` | ✨     | Optional (modal plugins) |
+| `onInput()` ✨                                       | `Editor.EventManager` | Editor content input | `boolean \| void` | ✨     | Optional (field plugins) |
+| `onPaste(params)` ✨                                 | `Editor.EventManager` | Paste event          | `boolean \| void` | ✨     | Optional (table plugin)  |
+| `onBeforeInput()` ✨                                 | `Editor.EventManager` | Before input event   | `boolean \| void` | ✨     | Optional                 |
+| `onKeyDown(params)` ✨                               | `Editor.EventManager` | Key down in editor   | `boolean \| void` | ✨     | Optional (table plugin)  |
+| `onKeyUp(params)` ✨                                 | `Editor.EventManager` | Key up in editor     | `boolean \| void` | ✨     | Optional (table plugin)  |
+| `onMouseDown(params)` ✨                             | `Editor.EventManager` | Mouse down in editor | `boolean \| void` | ✨     | Optional (table plugin)  |
+| `onMouseUp()` ✨                                     | `Editor.EventManager` | Mouse up in editor   | `boolean \| void` | ✨     | Optional (table plugin)  |
+| `onClick(params)` ✨                                 | `Editor.EventManager` | Click in editor      | `boolean \| void` | ✨     | Optional                 |
+| `onMouseLeave()` ✨                                  | `Editor.EventManager` | Mouse leave editor   | `boolean \| void` | ✨     | Optional (table plugin)  |
+| `onMouseMove(params)`                                | `Editor.EventManager` | Mouse move in editor | `void`            | -      | Optional (table plugin)  |
+| `onScroll()`                                         | `Editor.EventManager` | Editor scroll        | `void`            | -      | Optional (table plugin)  |
+| `onFocus(params)`                                    | `Editor.EventManager` | Editor focus         | `void`            | -      | Optional                 |
+| `onBlur(params)`                                     | `Editor.EventManager` | Editor blur          | `void`            | -      | Optional                 |
+| `componentCopy(params)`                              | `Editor.Component`    | Copy event           | `boolean \| void` | -      | Optional (table plugin)  |
 
 **Module-specific callback methods:**
 
-| Method                          | Called by             | When                     | Return | Required                 |
-| ------------------------------- | --------------------- | ------------------------ | ------ | ------------------------ |
-| `onColorChange(color)`          | `Modules.ColorPicker` | Color selected           | `void` | Optional (table plugin)  |
-| `onToolbarInputKeyDown(params)` | `Editor.Toolbar`      | Keydown in toolbar input | `void` | Optional (input plugins) |
-| `onToolbarInputChange(params)`  | `Editor.Toolbar`      | Toolbar input change     | `void` | Optional (input plugins) |
+> **Note**: Module contract hooks use the naming pattern `{moduleName}{MethodName}` (e.g., `modalOn`, `controllerClose`).
+
+| Method                        | Called by             | When                      | Return             | Plugin Type                          |
+| ----------------------------- | --------------------- | ------------------------- | ------------------ | ------------------------------------ |
+| `modalOn(isUpdate)`           | `Modules.Modal`       | After modal opens         | `void`             | modal (optional)                     |
+| `modalOff(isUpdate)`          | `Modules.Modal`       | After modal closes        | `void`             | modal (optional)                     |
+| `modalInit()`                 | `Modules.Modal`       | Before modal open/close   | `void`             | modal (optional)                     |
+| `modalResize()`               | `Modules.Modal`       | Modal window resized      | `void`             | modal (optional)                     |
+| `modalAction()`               | `Modules.Modal`       | Form submit               | `Promise<boolean>` | modal with forms (required)          |
+| `controllerAction(target)`    | `Modules.Controller`  | Controller button click   | `void`             | component plugins (optional)         |
+| `controllerClose()`           | `Modules.Controller`  | Before controller closes  | `void`             | component plugins (optional)         |
+| `colorPickerAction(color)`    | `Modules.ColorPicker` | Color selected            | `void`             | plugins using ColorPicker (required) |
+| `colorPickerHueSliderOpen()`  | `Modules.ColorPicker` | Before hue slider opens   | `void`             | dropdown-free (optional)             |
+| `colorPickerHueSliderClose()` | `Modules.ColorPicker` | When hue slider cancelled | `void`             | dropdown-free (optional)             |
+| `browserInit()`               | `Modules.Browser`     | Before browser opens      | `void`             | browser (optional)                   |
+| `toolbarInputKeyDown(params)` | `Editor.Toolbar`      | Keydown in toolbar input  | `void`             | input (optional)                     |
+| `toolbarInputChange(params)`  | `Editor.Toolbar`      | Toolbar input change      | `void`             | input (optional)                     |
 
 **Special plugin methods:**
 
-| Method                                     | Called by             | When                   | Return | Required                   |
-| ------------------------------------------ | --------------------- | ---------------------- | ------ | -------------------------- |
-| `shortcut(params)`                         | `Editor.core`         | Shortcut key triggered | `void` | Optional (command plugins) |
-| `updatePageNavigator(pageNum, totalPages)` | `Editor.documentType` | Page navigation update | `void` | Yes (pageNavigator only)   |
-| `setDir(dir)`                              | `Editor.core`         | RTL direction change   | `void` | Optional (for RTL support) |
+| Method             | Called by     | When                   | Return | Plugin Type            |
+| ------------------ | ------------- | ---------------------- | ------ | ---------------------- |
+| `shortcut(params)` | `Editor.Core` | Shortcut key triggered | `void` | command (optional)     |
+| `setDir(dir)`      | `Editor.Core` | RTL direction change   | `void` | all plugins (optional) |
 
 **Static Properties:**
 
@@ -652,6 +788,87 @@ All plugins must define:
 - **`static type`** - Plugin category (string)
 - **`static className`** - CSS class for toolbar button (string)
 - **`static component(node)?`** (optional) - Validates if node is this plugin's component
+
+#### Hook Parameter Types
+
+Many hook methods receive standardized parameter objects defined in [`src/hooks/params.js`](src/hooks/params.js). These types are exposed as `SunEditor.HookParams.*` in the public API.
+
+**Common Parameter Types:**
+
+| Type                                 | Properties                                      | Used By                                                              |
+| ------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------- |
+| **`HookParams.MouseEvent`**          | `{ frameContext, event }`                       | `onMouseDown`, `onMouseUp`, `onClick`, `onMouseMove`, `onMouseLeave` |
+| **`HookParams.KeyEvent`**            | `{ frameContext, event, range, line }`          | `onKeyDown`, `onKeyUp`                                               |
+| **`HookParams.Frame`**               | `{ frameContext, event }`                       | `onFocus`, `onBlur`, `onScroll`, `onBeforeInput`, `onInput`          |
+| **`HookParams.Paste`**               | `{ frameContext, event, data, doc }`            | `onPaste`, `onPasteAsync`                                            |
+| **`HookParams.FilePasteDrop`**       | `{ frameContext, event, file }`                 | `onFilePasteAndDrop`, `onFilePasteAndDropAsync`                      |
+| **`HookParams.ToolbarInputKeydown`** | `{ target, event, value }`                      | `toolbarInputKeyDown`                                                |
+| **`HookParams.ToolbarInputChange`**  | `{ target, event, value }`                      | `toolbarInputChange`                                                 |
+| **`HookParams.Shortcut`**            | `{ range, line, info, event, keyCode, editor }` | `shortcut`                                                           |
+| **`HookParams.CopyComponent`**       | `{ event, cloneContainer, info }`               | `componentCopy`                                                      |
+
+**Property Descriptions:**
+
+- **`frameContext`** (`SunEditor.FrameContext`) - Current editing frame context (contains wysiwyg, options, state)
+- **`event`** (DOM Event) - Original browser event (MouseEvent, KeyboardEvent, ClipboardEvent, etc.)
+- **`range`** (`Range`) - Current selection range
+- **`line`** (`HTMLElement`) - Current format line element
+- **`data`** (`string`) - Clipboard data or input data
+- **`doc`** (`Document`) - Document fragment from clipboard
+- **`file`** (`File`) - Pasted or dropped file object
+- **`target`** (`HTMLElement`) - Event target element
+- **`value`** (`string`) - Input value
+- **`info`** (varies) - Context-specific information object
+
+**Usage Example:**
+
+```javascript
+import { PluginField } from '../../interfaces';
+
+class MyFieldPlugin extends PluginField {
+	/**
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnKeyDown}
+	 */
+	onKeyDown(params) {
+		const { frameContext, event, range, line } = params;
+
+		// Access frame state
+		if (frameContext.get('isReadOnly')) return;
+
+		// Handle keyboard events
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			// Custom enter key handling
+		}
+
+		// Work with selection
+		console.log('Current line:', line.tagName);
+		console.log('Cursor position:', range.startOffset);
+	}
+
+	/**
+	 * @hook Editor.EventManager
+	 * @type {SunEditor.Hook.Event.OnPasteAsync}
+	 */
+	async onPaste(params) {
+		const { frameContext, event, data, doc } = params;
+
+		// Process pasted content
+		if (data.includes('forbidden')) {
+			event.preventDefault();
+			return false; // Cancel paste
+		}
+
+		// Async processing of clipboard document
+		await this.processClipboard(doc);
+	}
+}
+```
+
+**Type Definitions:**
+
+All hook parameter types are fully documented with JSDoc in [`src/hooks/params.js`](src/hooks/params.js) and exposed through [`src/typedef.js`](src/typedef.js) for IDE autocomplete and type checking.
 
 ---
 
@@ -679,6 +896,54 @@ All plugins must define:
 | **`ModalAnchorEditor`** | Link form            | Instance + form           | link, image                |
 | **`Browser`**           | Gallery UI           | Instance + API            | imageGallery, videoGallery |
 | **`_DragHandle`**       | Drag state           | Map (not class)           | component.js               |
+
+#### Module Contracts (`src/modules/contracts/`)
+
+Module contracts are interfaces that define plugin hooks called by specific modules. Plugins using these modules **must implement required hooks** and may optionally implement optional hooks.
+
+**Contract Types:**
+
+| Contract File        | Module                | Required Hooks                           | Optional Hooks                                              |
+| -------------------- | --------------------- | ---------------------------------------- | ----------------------------------------------------------- |
+| **`Modal.js`**       | `Modules.Modal`       | `modalAction()` (async, returns boolean) | `modalOn()`, `modalOff()`, `modalInit()`, `modalResize()`   |
+| **`Controller.js`**  | `Modules.Controller`  | `controllerAction()`                     | `controllerClose()`                                         |
+| **`ColorPicker.js`** | `Modules.ColorPicker` | `colorPickerAction(hex, rgb)`            | `colorPickerHueSliderOpen()`, `colorPickerHueSliderClose()` |
+| **`HueSlider.js`**   | `Modules.HueSlider`   | `hueSliderAction(color)`                 | `hueSliderCancelAction()`                                   |
+| **`Browser.js`**     | `Modules.Browser`     | _(none)_                                 | `browserInit()`                                             |
+| **`Figure.js`**      | `Modules.Figure`      | _(see Component hooks)_                  | `figureCustomResize()`, `figureBeforeSizeUpdate()`          |
+
+**Hook Naming Convention**: `{moduleName}{MethodName}` (e.g., `modalAction`, `controllerClose`)
+
+**Implementation Example:**
+
+```javascript
+import { PluginModal } from '../../interfaces';
+
+class MyModalPlugin extends PluginModal {
+	// Required by Modal contract
+	async modalAction() {
+		// Handle form submission
+		// Return false to prevent modal close
+		return true;
+	}
+
+	// Optional Modal hooks
+	modalOn() {
+		// Called after modal opens
+	}
+
+	modalOff() {
+		// Called after modal closes
+	}
+}
+```
+
+**Key Notes:**
+
+- **Required hooks** will cause errors if not implemented (modules call them directly)
+- **Optional hooks** are called with optional chaining (`?.()`) - safe to omit
+- **Async hooks** (like `modalAction`) must return `Promise<boolean>`
+- Module contracts are defined in `src/modules/contracts/` for type inference and documentation
 
 **Key Differences:**
 
@@ -717,18 +982,22 @@ All plugins must define:
 
 ### EditorInjector Pattern (`src/editorInjector/`)
 
-EditorInjector provides dependency injection for plugins, giving full access to editor APIs and core classes.
+EditorInjector provides dependency injection for plugins, giving full access to editor APIs and core classes. **All plugin base classes** (PluginCommand, PluginModal, etc.) extend EditorInjector, so you get these properties automatically.
 
-**Usage (Custom Plugins):**
+**Usage (Plugin Development):**
 
 ```javascript
-import EditorInjector from 'suneditor/src/editorInjector';
+// Recommended: Extend plugin type-specific base classes
+import { PluginCommand } from '../../interfaces';
 
-class MyCustomPlugin extends EditorInjector {
+class MyCustomPlugin extends PluginCommand {
+	static key = 'myPlugin';
+	static className = 'se-btn-my-plugin';
+
 	constructor(editor, pluginOptions) {
-		super(editor); // Injects all editor properties
+		super(editor); // EditorInjector is inherited through PluginCommand
 
-		// Now you have access to:
+		// Now you have access to all injected properties:
 		// - this.editor (main editor instance)
 		// - this.selection, this.html, this.format (core classes)
 		// - this.options, this.context, this.frameContext
@@ -738,13 +1007,27 @@ class MyCustomPlugin extends EditorInjector {
 
 	action() {
 		// Use injected properties
-		const range = this.selection.getRange();
+		const range = this.selection.get();
 		this.html.insert('<strong>Bold</strong>');
+		this.history.push(false);
 	}
 }
 ```
 
-**What EditorInjector Provides:**
+**Legacy Pattern (Direct Extension):**
+
+```javascript
+// Only use for advanced cases where plugin type classes don't fit
+import EditorInjector from 'suneditor/src/editorInjector';
+
+class AdvancedCustomPlugin extends EditorInjector {
+	constructor(editor) {
+		super(editor);
+	}
+}
+```
+
+**What EditorInjector Provides (Inherited by All Plugins):**
 
 - **Editor Instance**: `editor`, `eventManager`, `history`, `triggerEvent`
 - **Core Classes**: `selection`, `html`, `format`, `inline`, `listFormat`, `component`, `toolbar`, `menu`, `ui`, `viewer`, `offset`, `char`, `shortcuts`, `nodeTransform`
@@ -981,7 +1264,7 @@ npm run check:inject    # Inject plugin JSDoc types into options.js
     this.eventManager.addEvent(element, 'click', handler);
     ```
 
-- ❌ Create new plugin without extending EditorInjector
+- ❌ Create new plugin without extending plugin base classes
 
     ```javascript
     // BAD
@@ -991,10 +1274,19 @@ npm run check:inject    # Inject plugin JSDoc types into options.js
     	}
     }
 
-    // GOOD
-    class MyPlugin extends EditorInjector {
+    // GOOD - Extend plugin type base class
+    import { PluginCommand } from '../../interfaces';
+
+    class MyPlugin extends PluginCommand {
+    	static key = 'myPlugin';
+    	static className = 'se-btn-my-plugin';
+
     	constructor(editor) {
-    		super(editor); // Injects all dependencies
+    		super(editor); // Injects all dependencies via EditorInjector
+    	}
+
+    	action() {
+    		// Required by PluginCommand
     	}
     }
     ```
@@ -1108,9 +1400,6 @@ registerPlugin(pluginName, targets, pluginOptions) {
 
 		// 2. Plugin constructor calls super(editor)
 		//    → EditorInjector injects all dependencies
-
-		// 3. Call init() if exists
-		if (typeof plugin.init === 'function') plugin.init();
 	}
 
 	// 4. Update toolbar buttons if provided

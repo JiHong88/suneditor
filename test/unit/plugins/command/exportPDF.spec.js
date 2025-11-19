@@ -9,7 +9,7 @@ const mockApiManager = {
     asyncCall: jest.fn()
 };
 
-jest.mock('../../../../src/modules', () => ({
+jest.mock('../../../../src/modules/utils', () => ({
     ApiManager: jest.fn().mockImplementation(() => mockApiManager)
 }));
 
@@ -153,7 +153,7 @@ describe('Plugins - Command - ExportPDF', () => {
 
             exportPDF = new ExportPDF(mockEditor, pluginOptions);
 
-            const { ApiManager } = require('../../../../src/modules');
+            const { ApiManager } = require('../../../../src/modules/utils');
             expect(ApiManager).toHaveBeenCalledWith(exportPDF, {
                 method: 'POST',
                 url: '/api/export-pdf',

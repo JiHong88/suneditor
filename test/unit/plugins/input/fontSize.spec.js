@@ -10,21 +10,21 @@ jest.mock('../../../../src/editorInjector', () => {
 				fontSize: 'Font Size',
 				decrease: 'Decrease',
 				increase: 'Increase',
-				default: 'Default'
+				default: 'Default',
 			};
 			this.icons = editor.icons || {
 				fontSize: '<svg>fontSize</svg>',
 				arrow_down: '<svg>arrow</svg>',
 				minus: '<svg>minus</svg>',
-				plus: '<svg>plus</svg>'
+				plus: '<svg>plus</svg>',
 			};
 			this.eventManager = {
-				addEvent: jest.fn()
+				addEvent: jest.fn(),
 			};
 			this.options = editor.options || { get: jest.fn().mockReturnValue(['px']) };
 			this.menu = { initDropdownTarget: jest.fn(), dropdownOff: jest.fn() };
 			this.frameContext = editor.frameContext || {
-				get: jest.fn().mockReturnValue({ fontSize: '13px' })
+				get: jest.fn().mockReturnValue({ fontSize: '13px' }),
 			};
 			this.format = { isLine: jest.fn().mockReturnValue(false) };
 			this.inline = { apply: jest.fn() };
@@ -44,23 +44,23 @@ jest.mock('../../../../src/helper', () => ({
 				getAttribute: jest.fn(),
 				value: '',
 				querySelectorAll: jest.fn().mockReturnValue([]),
-				querySelector: jest.fn()
+				querySelector: jest.fn(),
 			})),
 			hasClass: jest.fn().mockReturnValue(true),
 			addClass: jest.fn(),
 			removeClass: jest.fn(),
-			getStyle: jest.fn().mockReturnValue('')
+			getStyle: jest.fn().mockReturnValue(''),
 		},
 		check: {
-			isInputElement: jest.fn().mockReturnValue(false)
-		}
+			isInputElement: jest.fn().mockReturnValue(false),
+		},
 	},
 	numbers: {
 		get: jest.fn().mockImplementation((val) => {
 			const num = parseFloat(val);
 			return isNaN(num) ? 0 : num;
 		}),
-		is: jest.fn().mockReturnValue(false)
+		is: jest.fn().mockReturnValue(false),
 	},
 	keyCodeMap: {
 		isSpace: jest.fn().mockReturnValue(false),
@@ -68,9 +68,9 @@ jest.mock('../../../../src/helper', () => ({
 		key: {
 			13: 'Enter',
 			38: 'ArrowUp',
-			40: 'ArrowDown'
-		}
-	}
+			40: 'ArrowDown',
+		},
+	},
 }));
 
 describe('FontSize Plugin', () => {
@@ -85,28 +85,28 @@ describe('FontSize Plugin', () => {
 				fontSize: 'Font Size',
 				decrease: 'Decrease',
 				increase: 'Increase',
-				default: 'Default'
+				default: 'Default',
 			},
 			icons: {
 				fontSize: '<svg>fontSize</svg>',
 				arrow_down: '<svg>arrow</svg>',
 				minus: '<svg>minus</svg>',
-				plus: '<svg>plus</svg>'
+				plus: '<svg>plus</svg>',
 			},
 			options: {
 				get: jest.fn().mockImplementation((key) => {
 					if (key === 'fontSizeUnits') return ['px', 'pt', 'em'];
 					return null;
-				})
+				}),
 			},
 			frameContext: {
-				get: jest.fn().mockReturnValue({ fontSize: '13px' })
+				get: jest.fn().mockReturnValue({ fontSize: '13px' }),
 			},
-			focus: jest.fn()
+			focus: jest.fn(),
 		};
 
 		fontSize = new FontSize(mockEditor, {
-			sizeUnit: 'px'
+			sizeUnit: 'px',
 		});
 	});
 
@@ -143,7 +143,7 @@ describe('FontSize Plugin', () => {
 		it('should handle showIncDecControls option', () => {
 			const instance = new FontSize(mockEditor, {
 				sizeUnit: 'px',
-				showIncDecControls: true
+				showIncDecControls: true,
 			});
 
 			expect(instance.beforeItem).toBeDefined();
@@ -153,7 +153,7 @@ describe('FontSize Plugin', () => {
 		it('should handle disableInput=false option', () => {
 			const instance = new FontSize(mockEditor, {
 				sizeUnit: 'px',
-				disableInput: false
+				disableInput: false,
 			});
 
 			expect(instance.afterItem).toBeDefined();
@@ -163,7 +163,7 @@ describe('FontSize Plugin', () => {
 			const instance = new FontSize(mockEditor, {
 				sizeUnit: 'px',
 				disableInput: true,
-				showIncDecControls: false
+				showIncDecControls: false,
 			});
 
 			expect(instance.replaceButton).toBeDefined();
@@ -181,13 +181,13 @@ describe('FontSize Plugin', () => {
 					inc: 2,
 					min: 10,
 					max: 100,
-					list: [10, 16, 20, 24]
-				}
+					list: [10, 16, 20, 24],
+				},
 			};
 
 			const instance = new FontSize(mockEditor, {
 				sizeUnit: 'px',
-				unitMap: customUnitMap
+				unitMap: customUnitMap,
 			});
 
 			expect(instance.unitMap.px.default).toBe(16);
@@ -197,7 +197,7 @@ describe('FontSize Plugin', () => {
 			expect(() => {
 				new FontSize(mockEditor, {
 					sizeUnit: 'px',
-					showDefaultSizeLabel: true
+					showDefaultSizeLabel: true,
 				});
 			}).not.toThrow();
 		});
@@ -246,11 +246,11 @@ describe('FontSize Plugin', () => {
 		beforeEach(() => {
 			const mockButton1 = {
 				getAttribute: jest.fn().mockReturnValue('13px'),
-				classList: { add: jest.fn(), remove: jest.fn() }
+				classList: { add: jest.fn(), remove: jest.fn() },
 			};
 			const mockButton2 = {
 				getAttribute: jest.fn().mockReturnValue('16px'),
-				classList: { add: jest.fn(), remove: jest.fn() }
+				classList: { add: jest.fn(), remove: jest.fn() },
 			};
 
 			fontSize.sizeList = [mockButton1, mockButton2];
@@ -262,9 +262,9 @@ describe('FontSize Plugin', () => {
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
 						value: '13px',
-						textContent: '13px'
-					})
-				}
+						textContent: '13px',
+					}),
+				},
 			};
 
 			dom.check.isInputElement = jest.fn().mockReturnValue(false);
@@ -280,9 +280,9 @@ describe('FontSize Plugin', () => {
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
 						value: '13px',
-						textContent: '13px'
-					})
-				}
+						textContent: '13px',
+					}),
+				},
 			};
 
 			fontSize.currentSize = '13px';
@@ -295,7 +295,7 @@ describe('FontSize Plugin', () => {
 		});
 	});
 
-	describe('onInputKeyDown method', () => {
+	describe('toolbarInputKeyDown method', () => {
 		let mockTarget;
 
 		beforeEach(() => {
@@ -305,9 +305,9 @@ describe('FontSize Plugin', () => {
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
 						value: '13px',
-						textContent: '13px'
-					})
-				}
+						textContent: '13px',
+					}),
+				},
 			};
 		});
 
@@ -317,10 +317,10 @@ describe('FontSize Plugin', () => {
 
 			const mockEvent = {
 				code: 'Space',
-				preventDefault: jest.fn()
+				preventDefault: jest.fn(),
 			};
 
-			fontSize.onInputKeyDown({ target: mockTarget, event: mockEvent });
+			fontSize.toolbarInputKeyDown({ target: mockTarget, event: mockEvent });
 
 			expect(mockEvent.preventDefault).toHaveBeenCalled();
 		});
@@ -328,10 +328,10 @@ describe('FontSize Plugin', () => {
 		it('should handle ArrowUp key', () => {
 			const mockEvent = {
 				code: 'ArrowUp',
-				preventDefault: jest.fn()
+				preventDefault: jest.fn(),
 			};
 
-			fontSize.onInputKeyDown({ target: mockTarget, event: mockEvent });
+			fontSize.toolbarInputKeyDown({ target: mockTarget, event: mockEvent });
 
 			expect(mockEvent.preventDefault).toHaveBeenCalled();
 		});
@@ -339,16 +339,16 @@ describe('FontSize Plugin', () => {
 		it('should handle ArrowDown key', () => {
 			const mockEvent = {
 				code: 'ArrowDown',
-				preventDefault: jest.fn()
+				preventDefault: jest.fn(),
 			};
 
-			fontSize.onInputKeyDown({ target: mockTarget, event: mockEvent });
+			fontSize.toolbarInputKeyDown({ target: mockTarget, event: mockEvent });
 
 			expect(mockEvent.preventDefault).toHaveBeenCalled();
 		});
 	});
 
-	describe('onInputChange method', () => {
+	describe('toolbarInputChange method', () => {
 		let mockTarget;
 
 		beforeEach(() => {
@@ -356,26 +356,26 @@ describe('FontSize Plugin', () => {
 				value: '16px',
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
-						value: '16px'
-					})
-				}
+						value: '16px',
+					}),
+				},
 			};
 		});
 
 		it('should apply font size change', () => {
 			const mockEvent = {
-				preventDefault: jest.fn()
+				preventDefault: jest.fn(),
 			};
 
 			const instance = new FontSize(mockEditor, {
 				sizeUnit: 'px',
-				disableInput: false
+				disableInput: false,
 			});
 
-			instance.onInputChange({
+			instance.toolbarInputChange({
 				target: mockTarget,
 				value: '16px',
-				event: mockEvent
+				event: mockEvent,
 			});
 
 			expect(instance.inline.apply).toHaveBeenCalled();
@@ -386,18 +386,18 @@ describe('FontSize Plugin', () => {
 			mockTarget.value = '1000px';
 
 			const mockEvent = {
-				preventDefault: jest.fn()
+				preventDefault: jest.fn(),
 			};
 
 			const instance = new FontSize(mockEditor, {
 				sizeUnit: 'px',
-				disableInput: false
+				disableInput: false,
 			});
 
-			instance.onInputChange({
+			instance.toolbarInputChange({
 				target: mockTarget,
 				value: '1000px',
-				event: mockEvent
+				event: mockEvent,
 			});
 
 			expect(instance.inline.apply).toHaveBeenCalled();
@@ -407,18 +407,18 @@ describe('FontSize Plugin', () => {
 			mockTarget.value = '1px';
 
 			const mockEvent = {
-				preventDefault: jest.fn()
+				preventDefault: jest.fn(),
 			};
 
 			const instance = new FontSize(mockEditor, {
 				sizeUnit: 'px',
-				disableInput: false
+				disableInput: false,
 			});
 
-			instance.onInputChange({
+			instance.toolbarInputChange({
 				target: mockTarget,
 				value: '1px',
-				event: mockEvent
+				event: mockEvent,
 			});
 
 			expect(instance.inline.apply).toHaveBeenCalled();
@@ -428,7 +428,7 @@ describe('FontSize Plugin', () => {
 	describe('action method', () => {
 		beforeEach(() => {
 			fontSize.menu = {
-				dropdownOff: jest.fn()
+				dropdownOff: jest.fn(),
 			};
 		});
 
@@ -441,9 +441,9 @@ describe('FontSize Plugin', () => {
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
 						value: '13px',
-						textContent: '13px'
-					})
-				}
+						textContent: '13px',
+					}),
+				},
 			};
 
 			fontSize.action(mockTarget);
@@ -462,9 +462,9 @@ describe('FontSize Plugin', () => {
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
 						value: '13px',
-						textContent: '13px'
-					})
-				}
+						textContent: '13px',
+					}),
+				},
 			};
 
 			fontSize.action(mockTarget);
@@ -482,9 +482,9 @@ describe('FontSize Plugin', () => {
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
 						value: '13px',
-						textContent: '13px'
-					})
-				}
+						textContent: '13px',
+					}),
+				},
 			};
 
 			fontSize.action(mockTarget);
@@ -497,9 +497,9 @@ describe('FontSize Plugin', () => {
 				getAttribute: jest.fn().mockReturnValue(null),
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
-						value: '13px'
-					})
-				}
+						value: '13px',
+					}),
+				},
 			};
 
 			fontSize.action(mockTarget);
@@ -509,8 +509,8 @@ describe('FontSize Plugin', () => {
 				expect.objectContaining({
 					stylesToModify: ['font-size'],
 					nodesToRemove: ['span'],
-					strictRemove: true
-				})
+					strictRemove: true,
+				}),
 			);
 		});
 
@@ -524,9 +524,9 @@ describe('FontSize Plugin', () => {
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
 						value: '72px', // Already at max
-						textContent: '72px'
-					})
-				}
+						textContent: '72px',
+					}),
+				},
 			};
 
 			fontSize.action(mockTarget);
@@ -544,9 +544,9 @@ describe('FontSize Plugin', () => {
 				parentElement: {
 					querySelector: jest.fn().mockReturnValue({
 						value: '8px', // Already at min
-						textContent: '8px'
-					})
-				}
+						textContent: '8px',
+					}),
+				},
 			};
 
 			fontSize.action(mockTarget);
@@ -558,7 +558,7 @@ describe('FontSize Plugin', () => {
 	describe('Font size units', () => {
 		it('should handle rem units', () => {
 			const instance = new FontSize(mockEditor, {
-				sizeUnit: 'rem'
+				sizeUnit: 'rem',
 			});
 
 			expect(instance.sizeUnit).toBe('rem');
@@ -566,7 +566,7 @@ describe('FontSize Plugin', () => {
 
 		it('should handle vw units', () => {
 			const instance = new FontSize(mockEditor, {
-				sizeUnit: 'vw'
+				sizeUnit: 'vw',
 			});
 
 			expect(instance.sizeUnit).toBe('vw');
@@ -574,7 +574,7 @@ describe('FontSize Plugin', () => {
 
 		it('should handle vh units', () => {
 			const instance = new FontSize(mockEditor, {
-				sizeUnit: 'vh'
+				sizeUnit: 'vh',
 			});
 
 			expect(instance.sizeUnit).toBe('vh');
@@ -582,7 +582,7 @@ describe('FontSize Plugin', () => {
 
 		it('should handle percentage units', () => {
 			const instance = new FontSize(mockEditor, {
-				sizeUnit: '%'
+				sizeUnit: '%',
 			});
 
 			expect(instance.sizeUnit).toBe('%');

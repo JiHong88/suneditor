@@ -113,74 +113,107 @@
 
 // --------------------------------------------------------- [Module Types - Cross-module Public API] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./modules/Controller').ControllerInfo} SunEditor.Module.Controller.Info
+ * @typedef {import('./modules/contracts/Controller').ControllerInfo} SunEditor.Module.Controller.Info
+ *
+ * @typedef {import('./modules/contracts/Figure').FigureInfo} SunEditor.Module.Figure.Info
+ * @typedef {import('./modules/contracts/Figure').FigureTargetInfo} SunEditor.Module.Figure.TargetInfo
+ * @typedef {import('./modules/contracts/Figure').FigureControlButton} SunEditor.Module.Figure.ControlButton
+ * @typedef {import('./modules/contracts/Figure').FigureControlResize} SunEditor.Module.Figure.ControlResize
+ * @typedef {import('./modules/contracts/Figure').ControlCustomAction} SunEditor.Module.Figure.ControlCustomAction
+ * @typedef {import('./modules/contracts/Figure').FigureControls} SunEditor.Module.Figure.Controls
+ *
+ * @typedef {import('./modules/contracts/Browser').BrowserFile} SunEditor.Module.Browser.File
+ *
+ * @typedef {import('./modules/contracts/HueSlider').HueSliderColor} SunEditor.Module.HueSlider.Color
  */
 
+// --------------------------------------------------------- [Plugin Hook Types] ---------------------------------------------------------------------------------------------------
+// Editor hooks - Called by Editor core
+// Event sync
 /**
- * @typedef {import('./modules/Figure').FigureInfo} SunEditor.Module.Figure.Info
- * @typedef {import('./modules/Figure').FigureTargetInfo} SunEditor.Module.Figure.TargetInfo
- * @typedef {import('./modules/Figure').FigureControlButton} SunEditor.Module.Figure.ControlButton
- * @typedef {import('./modules/Figure').FigureControlResize} SunEditor.Module.Figure.ControlResize
- * @typedef {import('./modules/Figure').ControlCustomAction} SunEditor.Module.Figure.ControlCustomAction
- * @typedef {import('./modules/Figure').FigureControls} SunEditor.Module.Figure.Controls
+ * @typedef {typeof import('./hooks/core').Event.Active} SunEditor.Hook.Event.Active
+ * @typedef {typeof import('./hooks/core').Event.OnFocus} SunEditor.Hook.Event.OnFocus
+ * @typedef {typeof import('./hooks/core').Event.OnBlur} SunEditor.Hook.Event.OnBlur
+ * @typedef {typeof import('./hooks/core').Event.OnMouseMove} SunEditor.Hook.Event.OnMouseMove
+ * @typedef {typeof import('./hooks/core').Event.OnScroll} SunEditor.Hook.Event.OnScroll
  */
 
+// Event sync/async
 /**
- * @typedef {import('./modules/Browser').BrowserFile} SunEditor.Module.Browser.File
+ * @typedef {typeof import('./hooks/core').Event.OnBeforeInput} SunEditor.Hook.Event.OnBeforeInput
+ * @typedef {typeof import('./hooks/core').Event.OnBeforeInputAsync} SunEditor.Hook.Event.OnBeforeInputAsync
+ * @typedef {typeof import('./hooks/core').Event.OnInput} SunEditor.Hook.Event.OnInput
+ * @typedef {typeof import('./hooks/core').Event.OnInputAsync} SunEditor.Hook.Event.OnInputAsync
+ * @typedef {typeof import('./hooks/core').Event.OnKeyDown} SunEditor.Hook.Event.OnKeyDown
+ * @typedef {typeof import('./hooks/core').Event.OnKeyDownAsync} SunEditor.Hook.Event.OnKeyDownAsync
+ * @typedef {typeof import('./hooks/core').Event.OnKeyUp} SunEditor.Hook.Event.OnKeyUp
+ * @typedef {typeof import('./hooks/core').Event.OnKeyUpAsync} SunEditor.Hook.Event.OnKeyUpAsync
+ * @typedef {typeof import('./hooks/core').Event.OnMouseDown} SunEditor.Hook.Event.OnMouseDown
+ * @typedef {typeof import('./hooks/core').Event.OnMouseDownAsync} SunEditor.Hook.Event.OnMouseDownAsync
+ * @typedef {typeof import('./hooks/core').Event.OnMouseUp} SunEditor.Hook.Event.OnMouseUp
+ * @typedef {typeof import('./hooks/core').Event.OnMouseUpAsync} SunEditor.Hook.Event.OnMouseUpAsync
+ * @typedef {typeof import('./hooks/core').Event.OnClick} SunEditor.Hook.Event.OnClick
+ * @typedef {typeof import('./hooks/core').Event.OnClickAsync} SunEditor.Hook.Event.OnClickAsync
+ * @typedef {typeof import('./hooks/core').Event.OnMouseLeave} SunEditor.Hook.Event.OnMouseLeave
+ * @typedef {typeof import('./hooks/core').Event.OnMouseLeaveAsync} SunEditor.Hook.Event.OnMouseLeaveAsync
+ * @typedef {typeof import('./hooks/core').Event.OnFilePasteAndDrop} SunEditor.Hook.Event.OnFilePasteAndDrop
+ * @typedef {typeof import('./hooks/core').Event.OnFilePasteAndDropAsync} SunEditor.Hook.Event.OnFilePasteAndDropAsync
+ * @typedef {typeof import('./hooks/core').Event.OnPaste} SunEditor.Hook.Event.OnPaste
+ * @typedef {typeof import('./hooks/core').Event.OnPasteAsync} SunEditor.Hook.Event.OnPasteAsync
  */
 
+// Core etc
 /**
- * @typedef {import('./modules/HueSlider').HueSliderColor} SunEditor.Module.HueSlider.Color
+ * @typedef {typeof import('./hooks/core').Core.RetainFormat} SunEditor.Hook.Core.RetainFormat
+ * @typedef {typeof import('./hooks/core').Core.Shortcut} SunEditor.Hook.Core.Shortcut
+ * @typedef {typeof import('./hooks/core').Core.SetDir} SunEditor.Hook.Core.SetDir
  */
 
-// --------------------------------------------------------- [Plugin Types] ---------------------------------------------------------------------------------------------------
-// 🌐 Note: These types use browser DOM APIs (MouseEvent, KeyboardEvent, Range, HTMLElement, Node)
-
+// component
 /**
- * @typedef {Object} SunEditor.Plugin.MouseEventInfo
- * @property {SunEditor.FrameContext} frameContext Frame context
- * @property {MouseEvent} event Event object (browser DOM API)
+ * @typedef {typeof import('./hooks/core').Component.Select} SunEditor.Hook.Component.Select
+ * @typedef {typeof import('./hooks/core').Component.Deselect} SunEditor.Hook.Component.Deselect
+ * @typedef {typeof import('./hooks/core').Component.Edit} SunEditor.Hook.Component.Edit
+ * @typedef {typeof import('./hooks/core').Component.Destroy} SunEditor.Hook.Component.Destroy
+ * @typedef {typeof import('./hooks/core').Component.Copy} SunEditor.Hook.Component.Copy
  */
 
+// Module hooks - Called by Module instances
 /**
- * @typedef {Object} SunEditor.Plugin.KeyEventInfo
- * @property {SunEditor.FrameContext} frameContext Frame context
- * @property {KeyboardEvent} event Event object
- * @property {Range} range range object
- * @property {HTMLElement} line Current line element
+ * @typedef {typeof import('./hooks/module').Modal.On} SunEditor.Hook.Modal.On
+ * @typedef {typeof import('./hooks/module').Modal.Init} SunEditor.Hook.Modal.Init
+ * @typedef {typeof import('./hooks/module').Modal.Off} SunEditor.Hook.Modal.Off
+ * @typedef {typeof import('./hooks/module').Modal.Action} SunEditor.Hook.Modal.Action
+ * @typedef {typeof import('./hooks/module').Modal.Resize} SunEditor.Hook.Modal.Resize
+ *
+ * @typedef {typeof import('./hooks/module').Controller.Close} SunEditor.Hook.Controller.Close
+ * @typedef {typeof import('./hooks/module').Controller.Action} SunEditor.Hook.Controller.Action
+ *
+ * @typedef {typeof import('./hooks/module').Browser.Init} SunEditor.Hook.Browser.Init
+ *
+ * @typedef {typeof import('./hooks/module').ColorPicker.Action} SunEditor.Hook.ColorPicker.Action
+ * @typedef {typeof import('./hooks/module').ColorPicker.HueSliderOpen} SunEditor.Hook.ColorPicker.HueSliderOpen
+ * @typedef {typeof import('./hooks/module').ColorPicker.HueSliderClose} SunEditor.Hook.ColorPicker.HueSliderClose
  */
 
+// --------------------------------------------------------- [Plugin Hook parameter types] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {Object} SunEditor.Plugin.ToolbarInputChangeEventInfo
- * @property {HTMLElement} target Input element
- * @property {Event} event Event object
- * @property {string} value Input value
+ * @typedef {import('./hooks/params').MouseEventInfo} SunEditor.HookParams.MouseEvent
+ * @typedef {import('./hooks/params').KeyEventInfo} SunEditor.HookParams.KeyEvent
+ * @typedef {import('./hooks/params').ShortcutInfo} SunEditor.HookParams.Shortcut
+ * @typedef {import('./hooks/params').FilePasteDrop} SunEditor.HookParams.FilePasteDrop
+ * @typedef {import('./hooks/params').FocusBlurEvent} SunEditor.HookParams.FocusBlur
+ * @typedef {import('./hooks/params').ScrollEvent} SunEditor.HookParams.Scroll
+ * @typedef {import('./hooks/params').InputEventWithData} SunEditor.HookParams.InputWithData
+ * @typedef {import('./hooks/params').Paste} SunEditor.HookParams.Paste
+ * @typedef {import('./hooks/params').Mouse} SunEditor.HookParams.Mouse
+ * @typedef {import('./hooks/params').Keyboard} SunEditor.HookParams.Keyboard
+ * @typedef {import('./hooks/params').InputKeyDown} SunEditor.HookParams.InputKeyDown
+ * @typedef {import('./hooks/params').InputChange} SunEditor.HookParams.InputChange
+ * @typedef {import('./hooks/params').CopyComponent} SunEditor.HookParams.CopyComponent
  */
 
-/**
- * @typedef {Object} SunEditor.Plugin.ShortcutInfo Information of the "shortcut" plugin
- * @property {Range} range - Range object
- * @property {HTMLElement} line - The line element of the current range
- * @property {import('./core/class/shortcuts').ShortcutInfo} info - Information of the shortcut
- * @property {KeyboardEvent} event - Key event object
- * @property {string} keyCode - KeyBoardEvent.code
- * @property {SunEditor.Core} editor - The root editor instance
- */
-
-/**
- * @typedef {Object} SunEditor.Plugin.PasteParams
- * @property {SunEditor.FrameContext} frameContext Frame context
- * @property {ClipboardEvent} event Clipboard event object
- * @property {string} data Format cleaned paste data (HTML string)
- * @property {Document} doc DomParser data (new DOMParser().parseFromString(data, 'text/html');)
- */
-
-/**
- * @typedef {Object} SunEditor.Plugin.CopyComponentParams
- * @property {ClipboardEvent} event Clipboard event object
- * @property {HTMLElement} cloneContainer Cloned component container
- * @property {SunEditor.ComponentInfo} info Component information
- */
+//** ****************************************************************************************************************************************************************************************** */
 
 // ================================================================================================================================
 // === INTERNAL/ADVANCED TYPES (Framework internals and advanced use cases)
