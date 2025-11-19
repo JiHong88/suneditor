@@ -310,7 +310,7 @@ describe('Audio Plugin', () => {
 				const result = audio.onFilePasteAndDrop({ file: mockFile });
 
 				expect(audio.submitFile).toHaveBeenCalledWith([mockFile]);
-				expect(result).toBe(false);
+				expect(result).toBe(undefined);
 			});
 
 			it('should ignore non-audio files', () => {

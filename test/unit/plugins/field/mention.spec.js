@@ -164,7 +164,7 @@ describe('Mention Plugin', () => {
 
 			const result = await mention.onInput();
 
-			expect(result).toBe(false); // Returns false when mention list is shown
+			expect(result).toBe(undefined); // Returns false when mention list is shown
 		});
 
 		it('should close menu when no selection', async () => {

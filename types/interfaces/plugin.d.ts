@@ -53,12 +53,6 @@ export class PluginDropdown extends Base {
 	 */
 	on(target?: HTMLElement): void;
 	/**
-	 * @optional
-	 * @description Executes the method that is called when a plugin's dropdown menu is closed.
-	 * @returns {void}
-	 */
-	off(): void;
-	/**
 	 * @abstract
 	 * @description Executes the main execution method of the plugin.
 	 * - Called when an item in the "dropdown" menu is clicked.
@@ -91,6 +85,19 @@ export class PluginDropdownFree extends Base {
 	 */
 	off(): void;
 }
+/**
+ * @abstract
+ * @interface
+ * Base class for Field plugins
+ * These plugins typically respond to input events in the wysiwyg area
+ *
+ * **Commonly used hooks:**
+ * - `onInput()` - Responds to input events in the editor (See: mention plugin)
+ * - Other event hooks can be used as needed (onKeydown, onClick, etc.)
+ *
+ * Child classes MAY optionally implement event hook methods
+ * @see {Mention} - Example implementation using onInput hook
+ */
 export class PluginField extends Base {}
 export class PluginInput extends Base {
 	/**

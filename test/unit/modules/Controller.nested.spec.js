@@ -2,7 +2,6 @@
  * @fileoverview Essential tests for Controller nested state management
  * Testing the critical changes in commit 9f43ca04:
  * - Parent-child controller relationship (Controller instance vs HTMLElement)
- * - Scroll repositioning with isWWScroll parameter
  * - parentsForm separation from parents array
  */
 
@@ -262,38 +261,6 @@ describe('Controller - Nested State Management (Essential Tests)', () => {
 			controller._scrollReposition(false);
 
 			expect(setPositionSpy).not.toHaveBeenCalled();
-		});
-
-		it('should pass isWWScroll=true parameter correctly', () => {
-			const element = createMockElement();
-			const controller = new Controller(mockInst, element, {});
-			controller.currentPositionTarget = { getBoundingClientRect: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 }) };
-
-			controller._scrollReposition(true);
-
-			expect(mockEditor.offset.setAbsPosition).toHaveBeenCalledWith(
-				expect.anything(),
-				expect.anything(),
-				expect.objectContaining({
-					isWWScroll: true,
-				})
-			);
-		});
-
-		it('should pass isWWScroll=false parameter correctly', () => {
-			const element = createMockElement();
-			const controller = new Controller(mockInst, element, {});
-			controller.currentPositionTarget = { getBoundingClientRect: jest.fn().mockReturnValue({ top: 0, left: 0, right: 100, bottom: 50, width: 100, height: 50 }) };
-
-			controller._scrollReposition(false);
-
-			expect(mockEditor.offset.setAbsPosition).toHaveBeenCalledWith(
-				expect.anything(),
-				expect.anything(),
-				expect.objectContaining({
-					isWWScroll: false,
-				})
-			);
 		});
 	});
 

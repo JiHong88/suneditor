@@ -460,7 +460,7 @@ describe('Video Plugin', () => {
 				const result = video.onFilePasteAndDrop({ file: mockFile });
 
 				expect(video.submitFile).toHaveBeenCalledWith([mockFile]);
-				expect(result).toBe(false);
+				expect(result).toBe(undefined);
 			});
 
 			it('should ignore non-video files', () => {

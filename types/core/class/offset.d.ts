@@ -368,7 +368,6 @@ declare class Offset {
 	 * @param {"bottom"|"top"} [params.position="bottom"] Position ('bottom'|'top')
 	 * @param {*} params.inst Instance object of caller
 	 * @param {HTMLElement} [params.sibling=null] The sibling controller element
-	 * @param {boolean} [params.isWWScroll=false] Indicates if the scroll event is from the wysiwyg area
 	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 */
 	setAbsPosition(
@@ -384,7 +383,6 @@ declare class Offset {
 			position?: 'bottom' | 'top';
 			inst: any;
 			sibling?: HTMLElement;
-			isWWScroll?: boolean;
 		},
 	):
 		| {
@@ -459,7 +457,6 @@ declare class Offset {
 	 * @param {{w: number, h: number}} clientSize documentElement.clientWidth, documentElement.clientHeight
 	 * @param {RectsInfo} targetRect Target rect object
 	 * @param {boolean} isTextSelection Is text selection or Range
-	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
 	 * @param {boolean} isToolbarTarget Indicates if the target is a toolbar element
 	 * @returns {{rmt:number, rmb:number, rt:number, tMargin:number, bMargin:number}} Margin values
 	 * - rmt: top margin to frame
@@ -479,7 +476,6 @@ declare class Offset {
 		},
 		targetRect: RectsInfo,
 		isTextSelection: boolean,
-		isWWScroll: boolean,
 		isToolbarTarget: boolean,
 	): {
 		rmt: number;

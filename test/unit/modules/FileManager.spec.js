@@ -308,7 +308,7 @@ describe('Modules - FileManager', () => {
             fileManager._checkInfo(true);
 
             expect(mockWysiwyg.querySelectorAll).toHaveBeenCalledWith('img[data-se-file]');
-            expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onImageLoad', mockEditor, fileManager.infoList);
+            expect(mockEditor.triggerEvent).toHaveBeenCalledWith('onImageLoad', { infoList: fileManager.infoList });
         });
 
         it('should handle orphaned tags by resetting attributes', () => {

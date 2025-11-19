@@ -8,16 +8,16 @@ jest.mock('../../../../src/helper', () => ({
 	dom: {
 		query: {
 			getParentElement: jest.fn(),
-			getEventTarget: jest.fn()
+			getEventTarget: jest.fn(),
 		},
 		utils: {
 			removeClass: jest.fn(),
-			addClass: jest.fn()
-		}
+			addClass: jest.fn(),
+		},
 	},
 	converter: {
-		nodeListToArray: jest.fn(nodeList => Array.from(nodeList || []))
-	}
+		nodeListToArray: jest.fn((nodeList) => Array.from(nodeList || [])),
+	},
 }));
 
 describe('Menu', () => {
@@ -32,31 +32,29 @@ describe('Menu', () => {
 
 		const mockMenuTray = document.createElement('div');
 
-		mockContext = new Map([
-			['menuTray', mockMenuTray]
-		]);
-		mockContext.get = jest.fn().mockImplementation(key => {
+		mockContext = new Map([['menuTray', mockMenuTray]]);
+		mockContext.get = jest.fn().mockImplementation((key) => {
 			const map = new Map([['menuTray', mockMenuTray]]);
 			return map.get(key);
 		});
 
 		mockEventManager = {
 			addGlobalEvent: jest.fn().mockReturnValue('mock-event-id'),
-			removeGlobalEvent: jest.fn()
+			removeGlobalEvent: jest.fn(),
 		};
 
 		mockOffset = {
-			setRelPosition: jest.fn()
+			setRelPosition: jest.fn(),
 		};
 
 		mockEditor = {
 			runFromTarget: jest.fn(),
 			_preventBlur: false,
-			_notHideToolbar: false
+			_notHideToolbar: false,
 		};
 
 		// Mock CoreInjector.call
-		CoreInjector.mockImplementation(function(editor) {
+		CoreInjector.mockImplementation(function (editor) {
 			this.editor = editor;
 			this.context = mockContext;
 			this.eventManager = mockEventManager;
@@ -243,9 +241,6 @@ describe('Menu', () => {
 			menu.index = 5;
 			menu.menus = [document.createElement('div')];
 
-			const mockPlugin = { off: jest.fn() };
-			menu.currentDropdownPlugin = mockPlugin;
-
 			menu.dropdownOff();
 
 			expect(menu.__removeGlobalEvent).toHaveBeenCalled();
@@ -259,7 +254,6 @@ describe('Menu', () => {
 			expect(dom.utils.removeClass).toHaveBeenCalledWith(mockParent.children, 'on');
 			expect(mockEditor._notHideToolbar).toBe(false);
 			expect(mockEditor._preventBlur).toBe(false);
-			expect(mockPlugin.off).toHaveBeenCalled();
 			expect(menu.currentDropdownPlugin).toBeNull();
 		});
 
@@ -439,11 +433,7 @@ describe('Menu', () => {
 		beforeEach(() => {
 			const mockDropdown = document.createElement('div');
 			menu.currentDropdown = mockDropdown;
-			menu.menus = [
-				document.createElement('div'),
-				document.createElement('div'),
-				document.createElement('div')
-			];
+			menu.menus = [document.createElement('div'), document.createElement('div'), document.createElement('div')];
 			menu.index = 1;
 		});
 
@@ -560,7 +550,7 @@ describe('Menu', () => {
 				const mockEvent = {
 					code: 'ArrowUp',
 					preventDefault: jest.fn(),
-					stopPropagation: jest.fn()
+					stopPropagation: jest.fn(),
 				};
 
 				menu.__globalEventHandler.keydown(mockEvent);
@@ -574,7 +564,7 @@ describe('Menu', () => {
 				const mockEvent = {
 					code: 'ArrowDown',
 					preventDefault: jest.fn(),
-					stopPropagation: jest.fn()
+					stopPropagation: jest.fn(),
 				};
 
 				menu.__globalEventHandler.keydown(mockEvent);
@@ -588,7 +578,7 @@ describe('Menu', () => {
 				const mockEvent = {
 					code: 'Enter',
 					preventDefault: jest.fn(),
-					stopPropagation: jest.fn()
+					stopPropagation: jest.fn(),
 				};
 
 				const mockTarget = document.createElement('div');
@@ -611,7 +601,7 @@ describe('Menu', () => {
 				const mockEvent = {
 					code: 'Enter',
 					preventDefault: jest.fn(),
-					stopPropagation: jest.fn()
+					stopPropagation: jest.fn(),
 				};
 
 				menu.index = -1;

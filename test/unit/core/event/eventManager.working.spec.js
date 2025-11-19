@@ -422,11 +422,11 @@ describe('EventManager - Working Tests', () => {
 		it('should handle files when present', async () => {
 			mockClipboardData.files = [new File([''], 'test.txt')];
 			mockClipboardData.getData.mockReturnValue('');
-			eventManager._callPluginEvent = jest.fn();
+			eventManager._callPluginEventAsync = jest.fn();
 
 			const result = await eventManager._setClipboardData('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
 
-			expect(eventManager._callPluginEvent).toHaveBeenCalledWith('onFilePasteAndDrop', expect.any(Object));
+			expect(eventManager._callPluginEventAsync).toHaveBeenCalledWith('onFilePasteAndDrop', expect.any(Object));
 			expect(result).toBe(false);
 		});
 

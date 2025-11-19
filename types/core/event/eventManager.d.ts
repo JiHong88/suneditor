@@ -264,18 +264,16 @@ declare class EventManager {
 	 * @this {EventManagerThis}
 	 * @description Handles the scrolling of the editor container.
 	 * - Repositions open controllers if necessary.
-	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
 	 */
-	_scrollContainer(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, isWWScroll: boolean): void;
+	_scrollContainer(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
 	 * @private
 	 * @this {EventManagerThis}
 	 * @description Repositions the currently open controllers within the editor.
 	 * - Ensures elements are displayed in their correct positions after scrolling.
 	 * @param {Array<object>} cont List of controllers to reposition
-	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
 	 */
-	__rePositionController(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, cont: Array<object>, isWWScroll: boolean): void;
+	__rePositionController(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, cont: Array<object>): void;
 	/**
 	 * @private
 	 * @this {EventManagerThis}

@@ -407,7 +407,7 @@ describe('Plugins - Command - FileUpload', () => {
 
             expect(fileUpload.submitFile).toHaveBeenCalledWith([mockFile]);
             expect(mockEditor.focus).toHaveBeenCalled();
-            expect(result).toBe(false);
+            expect(result).toBe(undefined);
         });
 
         it('should reject unaccepted file types', () => {
@@ -440,7 +440,7 @@ describe('Plugins - Command - FileUpload', () => {
             const result = fileUpload.onFilePasteAndDrop({ file: mockFile });
 
             expect(fileUpload.submitFile).toHaveBeenCalledWith([mockFile]);
-            expect(result).toBe(false);
+            expect(result).toBe(undefined);
         });
     });
 

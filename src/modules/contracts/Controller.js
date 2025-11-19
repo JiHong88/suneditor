@@ -269,11 +269,10 @@ class Controller extends CoreInjector {
 
 	/**
 	 * @description Reposition controller on scroll event
-	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
 	 */
-	_scrollReposition(isWWScroll) {
+	_scrollReposition() {
 		if (this.form.hasAttribute('data-se-hidden-by-parent') || this.form.hasAttribute('data-se-hidden-by-children')) return;
-		if (this.#setControllerPosition(this.form, this.currentPositionTarget, false, isWWScroll)) {
+		if (this.#setControllerPosition(this.form, this.currentPositionTarget, false)) {
 			_w.setTimeout(() => {
 				this.#childrenSync('show');
 			}, 0);
@@ -397,10 +396,9 @@ class Controller extends CoreInjector {
 	 * @param {HTMLElement} controller Controller element.
 	 * @param {Node|Range} refer Element or Range that is the basis of the controller's position.
 	 * @param {boolean} [skipAutoReposition=false] If true, skips scroll/resize-based automatic positioning logic.
-	 * @param {boolean} [isWWScroll] Indicates if the scroll event is from the wysiwyg area
 	 * @returns {boolean} - view : true || hide : false
 	 */
-	#setControllerPosition(controller, refer, skipAutoReposition, isWWScroll) {
+	#setControllerPosition(controller, refer, skipAutoReposition) {
 		if (!refer) return false;
 
 		controller.style.visibility = 'hidden';
@@ -423,7 +421,6 @@ class Controller extends CoreInjector {
 				isWWTarget: this.isWWTarget,
 				inst: this,
 				sibling: this.sibling,
-				isWWScroll,
 			});
 			if (!positionResult) {
 				this.hide();

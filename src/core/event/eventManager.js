@@ -948,9 +948,8 @@ EventManager.prototype = {
 	 * @this {EventManagerThis}
 	 * @description Handles the scrolling of the editor container.
 	 * - Repositions open controllers if necessary.
-	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
 	 */
-	_scrollContainer(isWWScroll) {
+	_scrollContainer() {
 		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
 			this.menu._resetMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
 		}
@@ -958,7 +957,7 @@ EventManager.prototype = {
 		const openCont = this.editor.opendControllers;
 		if (openCont.length === 0) return;
 
-		this.__rePositionController(openCont, isWWScroll);
+		this.__rePositionController(openCont);
 	},
 
 	/**
@@ -967,13 +966,12 @@ EventManager.prototype = {
 	 * @description Repositions the currently open controllers within the editor.
 	 * - Ensures elements are displayed in their correct positions after scrolling.
 	 * @param {Array<object>} cont List of controllers to reposition
-	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
 	 */
-	__rePositionController(cont, isWWScroll) {
+	__rePositionController(cont) {
 		if (_DragHandle.get('__dragMove')) _DragHandle.get('__dragMove')();
 		for (let i = 0; i < cont.length; i++) {
 			if (cont[i].notInCarrier) continue;
-			cont[i].inst?._scrollReposition(isWWScroll);
+			cont[i].inst?._scrollReposition();
 		}
 	},
 
@@ -1198,7 +1196,7 @@ EventManager.prototype = {
  */
 function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
-	this._scrollContainer(true);
+	this._scrollContainer();
 
 	// plugin event
 	this._callPluginEvent('onScroll', { frameContext, event: e });
@@ -1371,7 +1369,7 @@ function OnResize_viewport() {
 		this.editor.menu._restoreMenuPosition();
 	}
 
-	this._scrollContainer(false);
+	this._scrollContainer();
 	this.__setViewportSize();
 }
 
@@ -1389,7 +1387,7 @@ function OnScroll_window() {
 		this.subToolbar._setBalloonOffset(this.subToolbar._balloonOffset.position === 'top');
 	}
 
-	this._scrollContainer(false);
+	this._scrollContainer();
 
 	// document type page
 	if (this.frameContext.has('documentType_use_page')) {
@@ -1439,7 +1437,7 @@ function OnSelectionchange_document(_wd) {
  */
 function OnScroll_Abs() {
 	this.menu.dropdownOff();
-	this._scrollContainer(false);
+	this._scrollContainer();
 }
 
 /**

@@ -217,79 +217,62 @@ export type EmbedInfo = {
 	 */
 	process: ProcessInfo | null;
 };
-export type onload = (params: { editor: SunEditor.Core }) => any;
-export type onScroll = (params: BaseEvent) => any;
-export type onMouseDown = (params: BaseEvent) => any;
-export type onClick = (params: BaseEvent) => any;
-export type onBeforeInput = (params: BaseEvent) => any;
-export type onInput = (params: BaseEvent) => any;
-export type onMouseLeave = (params: BaseEvent) => any;
-export type onKeyDown = (params: BaseEvent) => any;
-export type onKeyUp = (params: BaseEvent) => any;
-export type onFocus = (params: BaseEvent) => any;
-export type onNativeFocus = (params: BaseEvent) => any;
-export type onBlur = (params: BaseEvent) => any;
-export type onNativeBlur = (params: BaseEvent) => any;
-export type onCopy = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; event: Event; clipboardData: Event }) => any;
-export type onCut = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; event: Event; clipboardData: Event }) => any;
-export type onChange = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; event: Event; data: Event }) => any;
-export type onShowToolbar = (toolbar: HTMLElement, mode: string) => any;
-export type onShowController = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; caller: string; info: SunEditor.Module.Controller.Info }) => any;
-export type onBeforeShowController = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; caller: string; info: SunEditor.Module.Controller.Info }) => any;
-export type onToggleCodeView = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; is: boolean }) => any;
-export type onToggleFullScreen = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; is: boolean }) => any;
-export type onResizeEditor = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; height: number; prevHeight: boolean; observerEntry: ResizeObserverEntry }) => any;
-export type onSetToolbarButtons = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; buttonTray: HTMLElement }) => any;
-export type onSave = (params: { editor: SunEditor.Core; frameContext: SunEditor.FrameContext; data: Event }) => Promise<boolean>;
-export type onDrop = (params: ClipboardEvent) => Promise<boolean | string>;
-export type onPaste = (params: ClipboardEvent) => Promise<boolean | string>;
-export type imageUploadHandler = (params: { editor: SunEditor.Core; xmlHttp: XMLHttpRequest; info: ImageInfo }) => Promise<boolean>;
-export type onImageUploadBefore = (params: { editor: SunEditor.Core; info: ImageInfo; handler: (newInfo?: ImageInfo | null) => void }) => Promise<boolean | undefined | ImageInfo>;
-export type onImageLoad = (
-	params: {
-		editor: SunEditor.Core;
-	},
-	infoList: Array<FileManagementInfo>,
-) => any;
-export type onImageAction = (params: { editor: SunEditor.Core; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }) => any;
-export type onImageUploadError = (params: { editor: SunEditor.Core; error: string; limitSize?: number; uploadSize?: number; currentSize?: number; file?: File }) => Promise<string | undefined>;
-export type onImageDeleteBefore = (params: { editor: SunEditor.Core; element: HTMLElement; container: HTMLElement; align: string; alt: string; url: string | null }) => Promise<boolean>;
-export type videoUploadHandler = (params: { editor: SunEditor.Core; xmlHttp: XMLHttpRequest; info: VideoInfo }) => Promise<boolean>;
-export type onVideoUploadBefore = (params: { editor: SunEditor.Core; info: VideoInfo; handler: (newInfo?: VideoInfo | null) => void }) => Promise<boolean | undefined | VideoInfo>;
-export type onVideoLoad = (
-	params: {
-		editor: SunEditor.Core;
-	},
-	infoList: Array<FileManagementInfo>,
-) => any;
-export type onVideoAction = (params: { editor: SunEditor.Core; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }) => any;
-export type onVideoUploadError = (params: { editor: SunEditor.Core; error: string; limitSize?: number; uploadSize?: number; currentSize?: number; file?: File }) => Promise<string | undefined>;
-export type onVideoDeleteBefore = (params: { editor: SunEditor.Core; element: HTMLElement; container: HTMLElement; align: string; url: string }) => Promise<boolean>;
-export type audioUploadHandler = (params: { editor: SunEditor.Core; xmlHttp: XMLHttpRequest; info: AudioInfo }) => Promise<boolean>;
-export type onAudioUploadBefore = (params: { editor: SunEditor.Core; info: AudioInfo; handler: (newInfo?: AudioInfo | null) => void }) => Promise<boolean | undefined | AudioInfo>;
-export type onAudioUploadError = (params: { editor: SunEditor.Core; error: string; limitSize?: number; uploadSize?: number; currentSize?: number; file?: File }) => Promise<string | undefined>;
-export type onAudioLoad = (
-	params: {
-		editor: SunEditor.Core;
-	},
-	infoList: Array<FileManagementInfo>,
-) => any;
-export type onAudioAction = (params: { editor: SunEditor.Core; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }) => any;
-export type onAudioDeleteBefore = (params: { editor: SunEditor.Core; element: HTMLElement; container: HTMLElement; url: string }) => Promise<boolean>;
-export type onFileUploadBefore = (params: { editor: SunEditor.Core; info: FileInfo; handler: (newInfo?: FileInfo | null) => void }) => Promise<boolean | undefined | FileInfo>;
-export type onFileLoad = (
-	params: {
-		editor: SunEditor.Core;
-	},
-	infoList: Array<FileManagementInfo>,
-) => any;
-export type onFileAction = (params: { editor: SunEditor.Core; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }) => any;
-export type onFileUploadError = (params: { editor: SunEditor.Core; error: string; limitSize?: number; uploadSize?: number; currentSize?: number; file?: File }) => Promise<string | undefined>;
-export type onFileDeleteBefore = (params: { editor: SunEditor.Core; element: HTMLElement; container: HTMLElement; url: string }) => Promise<boolean>;
-export type onExportPDFBefore = (params: { editor: SunEditor.Core; target: HTMLElement }) => Promise<boolean>;
-export type onFileManagerAction = (params: { editor: SunEditor.Core; info: FileManagementInfo; element: HTMLElement | null; state: 'create' | 'update' | 'delete'; index: number; remainingFilesCount: number; pluginName: string }) => any;
-export type onEmbedInputBefore = (params: { editor: SunEditor.Core; info: EmbedInfo; handler: (newInfo?: EmbedInfo | null) => void }) => any;
-export type onEmbedDeleteBefore = (params: { editor: SunEditor.Core; element: HTMLElement; container: HTMLElement; align: string; url: string }) => Promise<boolean>;
+export type onload = () => any;
+export type onScroll = () => any;
+export type onMouseDown = () => any;
+export type onClick = () => any;
+export type onBeforeInput = () => any;
+export type onInput = () => any;
+export type onMouseLeave = () => any;
+export type onMouseUp = () => any;
+export type onKeyDown = () => any;
+export type onKeyUp = () => any;
+export type onFocus = () => any;
+export type onNativeFocus = () => any;
+export type onBlur = () => any;
+export type onNativeBlur = () => any;
+export type onCopy = () => any;
+export type onCut = () => any;
+export type onChange = () => any;
+export type onShowToolbar = () => any;
+export type onShowController = () => any;
+export type onBeforeShowController = () => any;
+export type onToggleCodeView = () => any;
+export type onToggleFullScreen = () => any;
+export type onResizeEditor = () => any;
+export type onSetToolbarButtons = () => any;
+export type onSave = () => any;
+export type onResetButtons = () => any;
+export type onFontActionBefore = () => any;
+export type onDrop = () => any;
+export type onPaste = () => any;
+export type imageUploadHandler = () => any;
+export type onImageUploadBefore = () => any;
+export type onImageLoad = () => any;
+export type onImageAction = () => any;
+export type onImageUploadError = () => any;
+export type onImageDeleteBefore = () => any;
+export type videoUploadHandler = () => any;
+export type onVideoUploadBefore = () => any;
+export type onVideoLoad = () => any;
+export type onVideoAction = () => any;
+export type onVideoUploadError = () => any;
+export type onVideoDeleteBefore = () => any;
+export type audioUploadHandler = () => any;
+export type onAudioUploadBefore = () => any;
+export type onAudioUploadError = () => any;
+export type onAudioLoad = () => any;
+export type onAudioAction = () => any;
+export type onAudioDeleteBefore = () => any;
+export type onFileUploadBefore = () => any;
+export type onFileLoad = () => any;
+export type onFileAction = () => any;
+export type onFileUploadError = () => any;
+export type onFileDeleteBefore = () => any;
+export type onExportPDFBefore = () => any;
+export type onFileManagerAction = () => any;
+export type onEmbedInputBefore = () => any;
+export type onEmbedDeleteBefore = () => any;
 export type EventHandlers = {
 	onload?: onload | null;
 	onScroll?: onScroll | null;
@@ -298,6 +281,7 @@ export type EventHandlers = {
 	onBeforeInput?: onBeforeInput | null;
 	onInput?: onInput | null;
 	onMouseLeave?: onMouseLeave | null;
+	onMouseUp?: onMouseUp | null;
 	onKeyDown?: onKeyDown | null;
 	onKeyUp?: onKeyUp | null;
 	onFocus?: onFocus | null;
@@ -315,6 +299,8 @@ export type EventHandlers = {
 	onResizeEditor?: onResizeEditor | null;
 	onSetToolbarButtons?: onSetToolbarButtons | null;
 	onSave?: onSave | null;
+	onResetButtons?: onResetButtons | null;
+	onFontActionBefore?: onFontActionBefore | null;
 	onDrop?: onDrop | null;
 	onPaste?: onPaste | null;
 	imageUploadHandler?: imageUploadHandler | null;

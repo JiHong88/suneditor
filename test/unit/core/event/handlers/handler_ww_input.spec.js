@@ -340,14 +340,6 @@ describe('Input Handler', () => {
 					data: 'a'
 				});
 			});
-
-			it('should return early if plugin event returns false', async () => {
-				mockThis._callPluginEventAsync.mockResolvedValue(false);
-
-				await OnInput_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
-
-				expect(mockThis.history.push).not.toHaveBeenCalled();
-			});
 		});
 
 		describe('History', () => {

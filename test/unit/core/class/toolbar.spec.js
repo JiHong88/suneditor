@@ -784,6 +784,7 @@ describe('Toolbar', () => {
 			expect(toolbar.triggerEvent).toHaveBeenCalledWith('onShowToolbar', {
 				toolbar: mockToolbar,
 				mode: 'inline',
+				frameContext: mockFrameContext,
 			});
 		});
 	});

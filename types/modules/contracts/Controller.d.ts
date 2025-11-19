@@ -202,9 +202,8 @@ declare class Controller extends CoreInjector {
 	resetPosition(target?: Node): void;
 	/**
 	 * @description Reposition controller on scroll event
-	 * @param {boolean} isWWScroll Indicates if the scroll event is from the wysiwyg area
 	 */
-	_scrollReposition(isWWScroll: boolean): void;
+	_scrollReposition(): void;
 	#private;
 }
 import CoreInjector from '../../editorInjector/_core';

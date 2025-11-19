@@ -360,7 +360,7 @@ describe('Image Plugin', () => {
 				const result = image.onFilePasteAndDrop({ file: mockFile });
 
 				expect(image.submitFile).toHaveBeenCalledWith([mockFile]);
-				expect(result).toBe(false);
+				expect(result).toBe(undefined);
 			});
 
 			it('should ignore non-image files', () => {
