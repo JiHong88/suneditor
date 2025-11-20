@@ -31,6 +31,10 @@
 			"types": "./types/assets/suneditor-contents.css.d.ts",
 			"default": "./src/assets/suneditor-contents.css"
 		},
+		"./interfaces": {
+			"types": "./types/interfaces/index.d.ts",
+			"default": "./src/interfaces/index.js"
+		},
 		"./src/*": "./src/*",
 		"./package.json": "./package.json"
 	},

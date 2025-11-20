@@ -32,5 +32,7 @@ declare class Align extends PluginDropdown {
 	alignList: NodeListOf<Element>;
 	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
 	setDir(dir: string): void;
+	init(): void;
+	#private;
 }
 import { PluginDropdown } from '../../interfaces';

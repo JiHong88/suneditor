@@ -27,13 +27,6 @@ function Selection_(editor) {
 	this.__iframeFocus = false;
 	this.__hasScrollParents = false;
 	this._scrollMargin = 0;
-
-	_w.setTimeout(() => {
-		this.__hasScrollParents = this.eventManager?.scrollparents.length > 0;
-		this._scrollMargin = !this.frameContext?.get('wysiwyg')
-			? 40
-			: (numbers.get(_w.getComputedStyle(this.frameContext.get('wysiwyg')).scrollMargin, 0) || 40) + numbers.get(_w.getComputedStyle(this.frameContext.get('wrapper')).paddingBottom, 0);
-	}, 1000);
 }
 
 Selection_.prototype = {
@@ -747,6 +740,18 @@ Selection_.prototype = {
 		// set Range
 		this.setRange(startCon, startOff, endCon, endOff);
 		return true;
+	},
+
+	/**
+	 * @private
+	 * @this {SelectionThis}
+	 * @description Initialize the scroll information when the editor first loads
+	 */
+	__init() {
+		this.__hasScrollParents = this.eventManager?.scrollparents.length > 0;
+		this._scrollMargin = !this.frameContext?.get('wysiwyg')
+			? 40
+			: (numbers.get(_w.getComputedStyle(this.frameContext.get('wysiwyg')).scrollMargin, 0) || 40) + numbers.get(_w.getComputedStyle(this.frameContext.get('wrapper')).paddingBottom, 0);
 	},
 
 	constructor: Selection_,

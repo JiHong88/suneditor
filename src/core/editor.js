@@ -1003,6 +1003,11 @@ Editor.prototype = {
 
 		this.effectNode = null;
 		this._setFrameInfo(this.frameRoots.get(this.status.rootKey));
+
+		// plugin hook
+		for (const plugin of Object.values(this.plugins)) {
+			plugin.init?.();
+		}
 	},
 
 	/**
@@ -1403,8 +1408,16 @@ Editor.prototype = {
 					// resource state
 					this._resourcesStateChange(e);
 				});
+
 				// history reset
 				this.history.reset();
+				// plugin hook
+				for (const plugin of Object.values(this.plugins)) {
+					plugin.init?.();
+				}
+				// class init
+				this.selection.__init();
+
 				// user event
 				this.triggerEvent('onload', {});
 			}.bind(this),

@@ -14,6 +14,8 @@ class LineHeight extends PluginDropdown {
 	static key = 'lineHeight';
 	static className = '';
 
+	#defaultValue;
+
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -31,6 +33,8 @@ class LineHeight extends PluginDropdown {
 		// members
 		this.sizeList = menu.querySelectorAll('li button');
 		this.currentSize = null;
+
+		this.#defaultValue = /** @type {HTMLSpanElement} */ (menu.querySelector('.se-sub-list span'));
 
 		// init
 		this.menu.initDropdownTarget(LineHeight, menu);
@@ -59,16 +63,25 @@ class LineHeight extends PluginDropdown {
 		const currentSize = !format ? '' : format.style.lineHeight + '';
 
 		if (currentSize !== this.currentSize) {
+			let found = false;
 			const sizeList = this.sizeList;
 			for (let i = 0, len = sizeList.length; i < len; i++) {
 				if (currentSize === sizeList[i].getAttribute('data-command')) {
 					dom.utils.addClass(sizeList[i], 'active');
+					found = true;
 				} else {
 					dom.utils.removeClass(sizeList[i], 'active');
 				}
 			}
 
 			this.currentSize = currentSize;
+
+			if (!found) {
+				this.#defaultValue.textContent = currentSize;
+				this.#defaultValue.style.display = 'block';
+			} else {
+				this.#defaultValue.style.display = 'none';
+			}
 		}
 	}
 
@@ -104,9 +117,10 @@ function CreateHTML({ lang }, items) {
 		<ul class="se-list-basic">
 			<li>
 				<button type="button" class="se-btn se-btn-list default_value" data-command="" title="${lang.default}" aria-label="${lang.default}">
-					(${lang.default})
+					${lang.default}
 				</button>
-			</li>`;
+			</li>
+			<li class="se-btn-list se-sub-list"><span></span></li>`;
 
 	for (let i = 0, len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];

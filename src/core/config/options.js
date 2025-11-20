@@ -212,7 +212,6 @@ export const DEFAULTS = {
  * - these styles will be applied to the `<li>` tag instead of wrapping the content inside additional tags.
  * @property {{pluginName: string, we: boolean}|boolean} [__pluginRetainFilter=true] - Plugin retain filter configuration. (Internal use primarily)
  * - You can turn it off/on globally with true/false or set it per plugin. (e.g. { table: false })
- * @property {boolean} [__allowedScriptTag=false] - Allows the `<script>` tag to be used in the editor.
  */
 
 /**

@@ -36,6 +36,11 @@ jest.mock('../../../../src/helper', () => ({
                             textContent: '1.7'
                         }
                     ]),
+                    querySelector: jest.fn().mockReturnValue({
+                        tagName: 'SPAN',
+                        textContent: '',
+                        style: { display: 'none' }
+                    }),
                     getAttribute: jest.fn(),
                     setAttribute: jest.fn()
                 };
@@ -281,6 +286,29 @@ describe('Plugins - Dropdown - LineHeight', () => {
 
             expect(lineHeight.currentSize).toBe('1.5');
         });
+
+        it('should handle custom value not in list', () => {
+            mockEditor.format.getLine.mockReturnValue({
+                style: { lineHeight: '3.5em' }
+            });
+
+            lineHeight.on();
+
+            expect(lineHeight.currentSize).toBe('3.5em');
+            const { dom } = require('../../../../src/helper');
+            // All buttons should be deactivated when value is not in list
+            expect(dom.utils.removeClass).toHaveBeenCalled();
+        });
+
+        it('should handle numeric custom values', () => {
+            mockEditor.format.getLine.mockReturnValue({
+                style: { lineHeight: 2.5 }
+            });
+
+            lineHeight.on();
+
+            expect(lineHeight.currentSize).toBe('2.5');
+        });
     });
 
     describe('action method', () => {
@@ -368,7 +396,7 @@ describe('Plugins - Dropdown - LineHeight', () => {
 
             expect(createCallArgs[2]).toContain('se-list-inner');
             expect(createCallArgs[2]).toContain('default_value');
-            expect(createCallArgs[2]).toContain('(Default)');
+            expect(createCallArgs[2]).toContain('Default');
             expect(createCallArgs[2]).toContain('data-command="1em"');
             expect(createCallArgs[2]).toContain('data-command="1.5em"');
             expect(createCallArgs[2]).toContain('data-command="2em"');

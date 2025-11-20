@@ -206,8 +206,8 @@
 	padding: var(--se-edit-inner-padding-doc-type);
 }
 .sun-editor .se-wrapper.se-type-document.se-type-document-header .se-placeholder {
-	left: var(--se-doc-info-width);
-	right: var(--se-doc-info-width);
+	padding-left: var(--se-doc-info-width);
+	padding-right: var(--se-doc-info-width);
 }
 /** --- se-type-document end ---------------------------------------------------------- */
 
@@ -565,6 +565,18 @@
 
 .sun-editor .se-btn-list.default_value {
 	border: 1px dashed var(--se-main-outline-color);
+}
+
+.sun-editor .se-sub-list:has(:not([style*='display: none'])) {
+	font-size: 0.75rem;
+	letter-spacing: 0.25px;
+	color: color-mix(in srgb, currentColor 45%, transparent);
+	padding: 14px 14px 3px 14px;
+	cursor: auto;
+}
+
+.sun-editor .se-sub-list:has(:not([style*='display: none'])) {
+	border-bottom: 1px dashed var(--se-main-outline-color);
 }
 
 /* page navigator */

@@ -46,7 +46,103 @@ export const Event = {
 	 */
 	OnScroll(params) {},
 
-	// ------- sync/async -----------------------------------------------------
+	// ====== Sync / Async Event Methods ======
+
+	// ------- Interruptible events (returning boolean stops event processing) ---
+
+	/**
+	 * Executes the event function of "keydown" (sync).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
+	 * @returns {void|boolean} - Return false to prevent the editor's keydown processing (shortcuts, actions)
+	 */
+	OnKeyDown(params) {},
+
+	/**
+	 * Executes the event function of "keydown" (async).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
+	 * @returns {Promise<void|boolean>} - Return false to prevent the editor's keydown processing (shortcuts, actions)
+	 */
+	async OnKeyDownAsync(params) {
+		return;
+	},
+
+	/**
+	 * Executes the event function of "keyup" (sync).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
+	 * @returns {void|boolean} - Return false to prevent adding to history
+	 */
+	OnKeyUp(params) {},
+
+	/**
+	 * Executes the event function of "keyup" (async).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
+	 * @returns {Promise<void|boolean>} - Return false to prevent adding to history
+	 */
+	async OnKeyUpAsync(params) {
+		return;
+	},
+
+	/**
+	 * Executes the event function of "mousedown" (sync).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
+	 * @returns {void|boolean} - Return false to prevent the editor's mousedown processing
+	 */
+	OnMouseDown(params) {},
+
+	/**
+	 * Executes the event function of "mousedown" (async).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
+	 * @returns {Promise<void|boolean>} - Return false to prevent the editor's mousedown processing
+	 */
+	async OnMouseDownAsync(params) {
+		return;
+	},
+
+	/**
+	 * Executes the event function of "click" (sync).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
+	 * @returns {void|boolean} - Return false to prevent the editor's click processing (component selection)
+	 */
+	OnClick(params) {},
+
+	/**
+	 * Executes the event function of "click" (async).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
+	 * @returns {Promise<void|boolean>} - Return false to prevent the editor's click processing (component selection)
+	 */
+	async OnClickAsync(params) {
+		return;
+	},
+
+	/**
+	 * Executes the event function of "paste" (sync).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * Returning false will stop event propagation and cancel the paste.
+	 * @param {SunEditor.HookParams.Paste} params - Paste event information
+	 * @returns {void|boolean}
+	 */
+	OnPaste(params) {},
+
+	/**
+	 * Executes the event function of "paste" (async).
+	 * Called sequentially on all plugins. Returning a boolean stops the loop.
+	 * Returning false will stop event propagation and cancel the paste.
+	 * @param {SunEditor.HookParams.Paste} params - Paste event information
+	 * @returns {Promise<void|boolean>}
+	 */
+	async OnPasteAsync(params) {
+		return;
+	},
+
+	// ------- Observation events (non-interruptible) ------
 
 	/**
 	 * Executes the event function of "beforeinput" (sync).
@@ -85,54 +181,6 @@ export const Event = {
 	},
 
 	/**
-	 * Executes the event function of "keydown" (sync).
-	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
-	 * @returns {void|boolean} - Return false to prevent the editor's keydown processing (shortcuts, actions)
-	 */
-	OnKeyDown(params) {},
-
-	/**
-	 * Executes the event function of "keydown" (async).
-	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
-	 * @returns {Promise<void|boolean>} - Return false to prevent the editor's keydown processing (shortcuts, actions)
-	 */
-	async OnKeyDownAsync(params) {
-		return;
-	},
-
-	/**
-	 * Executes the event function of "keyup" (sync).
-	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
-	 * @returns {void|boolean} - Return false to prevent adding to history
-	 */
-	OnKeyUp(params) {},
-
-	/**
-	 * Executes the event function of "keyup" (async).
-	 * @param {SunEditor.HookParams.KeyEvent} params - Key event information
-	 * @returns {Promise<void|boolean>} - Return false to prevent adding to history
-	 */
-	async OnKeyUpAsync(params) {
-		return;
-	},
-
-	/**
-	 * Executes the event function of "mousedown" (sync).
-	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
-	 * @returns {void|boolean} - Return false to prevent the editor's mousedown processing
-	 */
-	OnMouseDown(params) {},
-
-	/**
-	 * Executes the event function of "mousedown" (async).
-	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
-	 * @returns {Promise<void|boolean>} - Return false to prevent the editor's mousedown processing
-	 */
-	async OnMouseDownAsync(params) {
-		return;
-	},
-
-	/**
 	 * Executes the event function of "mouseup" (sync).
 	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
 	 * @returns {void}
@@ -145,22 +193,6 @@ export const Event = {
 	 * @returns {Promise<void>}
 	 */
 	async OnMouseUpAsync(params) {
-		return;
-	},
-
-	/**
-	 * Executes the event function of "click" (sync).
-	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
-	 * @returns {void|boolean} - Return false to prevent the editor's click processing (component selection)
-	 */
-	OnClick(params) {},
-
-	/**
-	 * Executes the event function of "click" (async).
-	 * @param {SunEditor.HookParams.MouseEvent} params - Mouse event information
-	 * @returns {Promise<void|boolean>} - Return false to prevent the editor's click processing (component selection)
-	 */
-	async OnClickAsync(params) {
 		return;
 	},
 
@@ -195,24 +227,6 @@ export const Event = {
 	 * @returns {Promise<void>}
 	 */
 	async OnFilePasteAndDropAsync(params) {
-		return;
-	},
-
-	/**
-	 * Executes the event function of "paste" (sync).
-	 * Returning false will stop event propagation and cancel the paste.
-	 * @param {SunEditor.HookParams.Paste} params - Paste event information
-	 * @returns {void|boolean}
-	 */
-	OnPaste(params) {},
-
-	/**
-	 * Executes the event function of "paste" (async).
-	 * Returning false will stop event propagation and cancel the paste.
-	 * @param {SunEditor.HookParams.Paste} params - Paste event information
-	 * @returns {Promise<void|boolean>}
-	 */
-	async OnPasteAsync(params) {
 		return;
 	},
 };
@@ -283,4 +297,11 @@ export const Core = {
 	 * @returns {void}
 	 */
 	SetDir(dir) {},
+
+	/**
+	 * Executes when the editor or plugin is initialized.
+	 * Called during editor initialization and when resetOptions is called.
+	 * @returns {void}
+	 */
+	Init() {},
 };

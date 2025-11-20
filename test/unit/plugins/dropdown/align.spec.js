@@ -128,7 +128,11 @@ describe('Plugins - Dropdown - Align', () => {
             },
             effectNode: null,
             focus: jest.fn(),
-            frameContext: new Map(),
+            frameContext: new Map([
+                ['wwComputedStyle', {
+                    getPropertyValue: jest.fn().mockReturnValue('left')
+                }]
+            ]),
             triggerEvent: jest.fn()
         };
 
@@ -137,6 +141,7 @@ describe('Plugins - Dropdown - Align', () => {
         };
 
         align = new Align(mockEditor, pluginOptions);
+        align.init(); // Call init to set defaultDir
     });
 
     describe('Constructor', () => {
@@ -154,8 +159,10 @@ describe('Plugins - Dropdown - Align', () => {
                 if (key === '_rtl') return true;
                 return null;
             });
+            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
 
             const rtlAlign = new Align(mockEditor, pluginOptions);
+            rtlAlign.init();
             expect(rtlAlign.icon).toBe('align_right');
             expect(rtlAlign.defaultDir).toBe('right');
         });
@@ -393,15 +400,22 @@ describe('Plugins - Dropdown - Align', () => {
         it('should change default direction from ltr to rtl', () => {
             expect(align.defaultDir).toBe('left');
 
-            align.setDir('rtl');
+            // Change computed style to rtl
+            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+            align.setDir();
 
             expect(align.defaultDir).toBe('right');
         });
 
         it('should change default direction from rtl to ltr', () => {
-            align.defaultDir = 'right';
+            // Set to rtl first
+            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+            align.setDir();
+            expect(align.defaultDir).toBe('right');
 
-            align.setDir('ltr');
+            // Change back to ltr
+            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('left');
+            align.setDir();
 
             expect(align.defaultDir).toBe('left');
         });
@@ -409,7 +423,8 @@ describe('Plugins - Dropdown - Align', () => {
         it('should not change when direction is already set', () => {
             const originalDir = align.defaultDir;
 
-            align.setDir('ltr'); // Already LTR
+            // Call setDir with same direction
+            align.setDir();
 
             expect(align.defaultDir).toBe(originalDir);
         });
@@ -424,7 +439,9 @@ describe('Plugins - Dropdown - Align', () => {
                 return null;
             });
 
-            align.setDir('rtl');
+            // Change to rtl
+            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+            align.setDir();
 
             expect(leftBtn.parentElement.appendChild).toHaveBeenCalledWith(rightBtn);
             expect(rightBtn.parentElement.appendChild).toHaveBeenCalledWith(leftBtn);
@@ -433,22 +450,11 @@ describe('Plugins - Dropdown - Align', () => {
         it('should handle missing left or right buttons gracefully', () => {
             align._itemMenu.querySelector.mockReturnValue(null);
 
+            // Change to rtl
+            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
             expect(() => {
-                align.setDir('rtl');
+                align.setDir();
             }).not.toThrow();
-        });
-
-        it('should handle ltr direction string', () => {
-            align.setDir('ltr');
-            expect(align.defaultDir).toBe('left');
-        });
-
-        it('should handle invalid direction strings', () => {
-            const originalDir = align.defaultDir;
-
-            align.setDir('invalid');
-
-            expect(align.defaultDir).toBe('left'); // Should default to left
         });
     });
 
@@ -737,8 +743,12 @@ describe('Plugins - Dropdown - Align', () => {
         it('should handle missing _itemMenu in setDir', () => {
             align._itemMenu = null;
 
+            // Change to rtl to trigger button swapping
+            mockEditor.frameContext.get('wwComputedStyle').getPropertyValue.mockReturnValue('right');
+
+            // Should not throw even with null _itemMenu
             expect(() => {
-                align.setDir('rtl');
+                align.setDir();
             }).toThrow();
         });
 

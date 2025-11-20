@@ -28,7 +28,7 @@ class Align extends PluginDropdown {
 		const commandArea = (this._itemMenu = menu.querySelector('ul'));
 
 		// members
-		this.defaultDir = editor.options.get('_rtl') ? 'right' : 'left';
+		this.defaultDir = '';
 		this.alignIcons = {
 			justify: editor.icons.align_justify,
 			left: editor.icons.align_left,
@@ -106,8 +106,8 @@ class Align extends PluginDropdown {
 	 * @hook Editor.Core
 	 * @type {SunEditor.Hook.Core.SetDir}
 	 */
-	setDir(dir) {
-		const _dir = dir === 'rtl' ? 'right' : 'left';
+	setDir() {
+		const _dir = this.#findDefaultDir();
 		if (this.defaultDir === _dir) return;
 
 		this.defaultDir = _dir;
@@ -119,6 +119,20 @@ class Align extends PluginDropdown {
 			lp.appendChild(rightBtn);
 			rp.appendChild(leftBtn);
 		}
+	}
+
+	/**
+	 * @hook Editor.Core
+	 * @type {SunEditor.Hook.Core.Init}
+	 */
+	init() {
+		this.defaultDir = this.#findDefaultDir();
+	}
+
+	#findDefaultDir() {
+		const align = this.frameContext.get('wwComputedStyle').getPropertyValue('text-align');
+		const valid = ['left', 'center', 'right', 'justify'];
+		return valid.includes(align) ? align : this.options.get('_rtl') ? 'right' : 'left';
 	}
 }
 

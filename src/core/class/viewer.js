@@ -596,7 +596,7 @@ Viewer.prototype = {
 			const wDoc = this.frameContext.get('_wd');
 			const parseDocument = new DOMParser().parseFromString(code_html, 'text/html');
 
-			if (!this.options.get('__allowedScriptTag')) {
+			if (!this.html.__disallowedTagNameRegExp.test('script')) {
 				const headChildren = parseDocument.head.children;
 				for (let i = 0, len = headChildren.length; i < len; i++) {
 					if (/^script$/i.test(headChildren[i].tagName)) {

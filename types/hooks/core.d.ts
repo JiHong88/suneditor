@@ -220,4 +220,10 @@ export namespace Core {
 	 * @returns {void}
 	 */
 	function SetDir(dir: string): void;
+	/**
+	 * Executes when the editor or plugin is initialized.
+	 * Called during editor initialization and when resetOptions is called.
+	 * @returns {void}
+	 */
+	function Init(): void;
 }

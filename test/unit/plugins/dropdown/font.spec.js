@@ -31,6 +31,11 @@ jest.mock('../../../../src/helper', () => ({
                             textContent: 'Georgia'
                         }
                     ]),
+                    querySelector: jest.fn().mockReturnValue({
+                        tagName: 'SPAN',
+                        textContent: '',
+                        style: { display: 'none' }
+                    }),
                     getAttribute: jest.fn(),
                     setAttribute: jest.fn()
                 };
@@ -432,7 +437,7 @@ describe('Plugins - Dropdown - Font', () => {
 
             expect(createCallArgs[2]).toContain('se-list-inner');
             expect(createCallArgs[2]).toContain('default_value');
-            expect(createCallArgs[2]).toContain('(Default)');
+            expect(createCallArgs[2]).toContain('Default'); // Uses lang.default
             expect(createCallArgs[2]).toContain('data-command="Arial"');
             expect(createCallArgs[2]).toContain('data-command="Georgia"');
             expect(createCallArgs[2]).toContain('data-command="Times New Roman"');

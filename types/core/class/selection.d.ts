@@ -217,4 +217,10 @@ declare class Selection_ {
 	 * @returns {boolean} Returns false if there is no valid selection.
 	 */
 	_resetRangeToTextNode(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): boolean;
+	/**
+	 * @private
+	 * @this {SelectionThis}
+	 * @description Initialize the scroll information when the editor first loads
+	 */
+	__initScrollInfo(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
 }

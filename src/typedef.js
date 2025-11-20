@@ -167,6 +167,7 @@
  * @typedef {typeof import('./hooks/core').Core.RetainFormat} SunEditor.Hook.Core.RetainFormat
  * @typedef {typeof import('./hooks/core').Core.Shortcut} SunEditor.Hook.Core.Shortcut
  * @typedef {typeof import('./hooks/core').Core.SetDir} SunEditor.Hook.Core.SetDir
+ * @typedef {typeof import('./hooks/core').Core.Init} SunEditor.Hook.Core.Init
  */
 
 // component

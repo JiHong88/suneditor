@@ -171,6 +171,7 @@ declare global {
 				type RetainFormat = typeof import('./hooks/core').Core.RetainFormat;
 				type Shortcut = typeof import('./hooks/core').Core.Shortcut;
 				type SetDir = typeof import('./hooks/core').Core.SetDir;
+				type Init = typeof import('./hooks/core').Core.Init;
 			}
 			namespace Component {
 				type Select = typeof import('./hooks/core').Component.Select;

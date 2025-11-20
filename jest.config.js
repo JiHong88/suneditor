@@ -12,19 +12,19 @@ module.exports = {
 
 	// Module resolution
 	moduleNameMapper: {
-		'^@/(.*)$': '<rootDir>/src/$1'
+		'^@/(.*)$': '<rootDir>/src/$1',
 	},
 
 	// Transform files using Babel
 	transform: {
-		'^.+\\.js$': 'babel-jest'
+		'^.+\\.js$': 'babel-jest',
 	},
 
 	// Ignore
-	coveragePathIgnorePatterns: ['<rootDir>/src/assets/icons/defaultIcons.js', '<rootDir>/src/langs/.*\\.js$'],
+	coveragePathIgnorePatterns: ['<rootDir>/src/assets/icons/defaultIcons.js', '<rootDir>/src/langs/.*\\.js$', '<rootDir>/src/hooks/.*\\.js$', '<rootDir>/src/interfaces/.*\\.js$'],
 
 	// Collect coverage information
-	collectCoverageFrom: ['src/**/*.js', '!src/assets/icons/defaultIcons.js', '!src/langs/*.js', '!src/plugins/index.js', '!src/events.js', '!src/typedef.js'],
+	collectCoverageFrom: ['src/**/*.js', '!src/assets/icons/defaultIcons.js', '!src/langs/*.js', '!src/hooks/*.js', '!src/interfaces/*.js', '!src/plugins/index.js', '!src/events.js', '!src/typedef.js'],
 
 	// Coverage thresholds
 	coverageThreshold: {
@@ -32,23 +32,23 @@ module.exports = {
 			statements: 62,
 			branches: 53,
 			functions: 75,
-			lines: 63
-		}
+			lines: 63,
+		},
 	},
 
 	projects: [
 		{
 			displayName: 'unit',
 			testMatch: ['<rootDir>/test/unit/**/*.spec.js', '<rootDir>/test/unit/**/*.integration.spec.js'],
-			testEnvironment: 'jsdom'
+			testEnvironment: 'jsdom',
 		},
 		{
 			displayName: 'integration',
 			testMatch: ['<rootDir>/test/integration/**/*.spec.js'],
-			testEnvironment: 'jsdom'
-		}
+			testEnvironment: 'jsdom',
+		},
 	],
 
 	// Verbose output
-	verbose: true
+	verbose: true,
 };

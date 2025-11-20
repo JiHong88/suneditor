@@ -74,7 +74,10 @@ import { get as getNumber } from '../../helper/numbers';
  *
  * === Runtime / Computed Values ===
  * @property {number} _minHeight - Minimum height of the wysiwyg area (parsed from inline style or options).
- * @property {*} [wwComputedStyle] - Cached computed styles for the wysiwyg frame.
+ * @property {CSSStyleDeclaration} [wwComputedStyle] - Cached computed styles for the wysiwyg element.
+ *   - Set during editor initialization via `window.getComputedStyle(wysiwyg)`.
+ *   - Used for retrieving runtime CSS values (padding, margins, font-family, etc.).
+ *   - Improves performance by avoiding repeated `getComputedStyle()` calls.
  * @property {HTMLIFrameElement} [_iframeAuto] - Auto-resizing helper iframe (used for dynamic sizing).
  * @property {number} [_editorHeight] - Current height of the editor.
  * ================================================================================================================================
@@ -139,10 +142,23 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 			['isChanged', -1],
 			['historyIndex', -1],
 			['savedIndex', -1],
-			['eventwysiwyg', null],
 			['documentTypeInner', documentTypeInner.inner],
 			['documentTypePage', documentTypeInner.page],
 			['documentTypePageMirror', documentTypeInner.pageMirror],
+			// Runtime properties (set dynamically during editor lifecycle)
+			/*
+			['eventWysiwyg', null], // Set in eventManager.js during event initialization
+			['wwComputedStyle', null], // Set in editor.js (__setEditorParams) via getComputedStyle
+			['_ww', null], // Set in editor.js (__setEditorParams) - iframe window object
+			['_wd', null], // Set in editor.js (__setEditorParams) - iframe document object
+			['_iframeAuto', null], // Set in editor.js for iframe auto-resize mode
+			['_editorHeight', null], // Set during resize operations
+			['_figure', null], // Set when figure component (image/table) is active
+			['isShowBlocks', false], // Set by toggleShowBlocks in viewer.js
+			['documentType', null], // Set for document-type editors
+			['documentType_use_header', false], // Set when document uses headers
+			['documentType_use_page', false], // Set when document uses page layout
+			*/
 		])
 	);
 

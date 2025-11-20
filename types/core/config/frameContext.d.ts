@@ -72,7 +72,10 @@ import type {} from '../../typedef';
  *
  * === Runtime / Computed Values ===
  * @property {number} _minHeight - Minimum height of the wysiwyg area (parsed from inline style or options).
- * @property {*} [wwComputedStyle] - Cached computed styles for the wysiwyg frame.
+ * @property {CSSStyleDeclaration} [wwComputedStyle] - Cached computed styles for the wysiwyg element.
+ *   - Set during editor initialization via `window.getComputedStyle(wysiwyg)`.
+ *   - Used for retrieving runtime CSS values (padding, margins, font-family, etc.).
+ *   - Improves performance by avoiding repeated `getComputedStyle()` calls.
  * @property {HTMLIFrameElement} [_iframeAuto] - Auto-resizing helper iframe (used for dynamic sizing).
  * @property {number} [_editorHeight] - Current height of the editor.
  * ================================================================================================================================
@@ -352,9 +355,12 @@ export type FrameContextStore = {
 	 */
 	_minHeight: number;
 	/**
-	 * - Cached computed styles for the wysiwyg frame.
+	 * - Cached computed styles for the wysiwyg element.
+	 * - Set during editor initialization via `window.getComputedStyle(wysiwyg)`.
+	 * - Used for retrieving runtime CSS values (padding, margins, font-family, etc.).
+	 * - Improves performance by avoiding repeated `getComputedStyle()` calls.
 	 */
-	wwComputedStyle?: any;
+	wwComputedStyle?: CSSStyleDeclaration;
 	/**
 	 * - Auto-resizing helper iframe (used for dynamic sizing).
 	 */

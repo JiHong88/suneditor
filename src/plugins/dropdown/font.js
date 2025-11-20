@@ -14,6 +14,8 @@ class Font extends PluginDropdown {
 	static key = 'font';
 	static className = 'se-btn-select se-btn-tool-font';
 
+	#defaultValue;
+
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -33,6 +35,8 @@ class Font extends PluginDropdown {
 		this.currentFont = '';
 		this.fontList = menu.querySelectorAll('ul li button');
 		this.fontArray = fontList;
+
+		this.#defaultValue = /** @type {HTMLSpanElement} */ (menu.querySelector('.se-sub-list span'));
 
 		// init
 		this.menu.initDropdownTarget(Font, menu);
@@ -72,15 +76,24 @@ class Font extends PluginDropdown {
 		const currentFont = target.querySelector('.se-txt').textContent;
 
 		if (currentFont !== this.currentFont) {
+			let found = false;
 			for (let i = 0, len = fontList.length; i < len; i++) {
 				if (currentFont === (fontList[i].getAttribute('data-command') || '').replace(/'|"/g, '')) {
 					dom.utils.addClass(fontList[i], 'active');
+					found = true;
 				} else {
 					dom.utils.removeClass(fontList[i], 'active');
 				}
 			}
 
 			this.currentFont = currentFont;
+
+			if (!found) {
+				this.#defaultValue.textContent = currentFont;
+				this.#defaultValue.style.display = 'block';
+			} else {
+				this.#defaultValue.style.display = 'none';
+			}
 		}
 	}
 
@@ -113,8 +126,11 @@ function CreateHTML({ lang }, fontList) {
 	<div class="se-list-inner">
 		<ul class="se-list-basic">
 			<li>
-				<button type="button" class="se-btn se-btn-list default_value" data-command="" title="${lang.default}" aria-label="${lang.default}">(${lang.default})</button>
-			</li>`;
+				<button type="button" class="se-btn se-btn-list default_value" data-command="" title="${lang.default}" aria-label="${lang.default}">
+					${lang.default}
+				</button>
+			</li>
+			<li class="se-btn-list se-sub-list"><span></span></li>`;
 
 	for (let i = 0, len = fontList.length, font, text; i < len; i++) {
 		font = fontList[i];
