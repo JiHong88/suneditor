@@ -93,29 +93,7 @@ If you're contributing to framework integrations:
 
 ### Essential Commands
 
-```bash
-# Development
-npm run dev              # Start local dev server (http://localhost:8088)
-npm start               # Alias for npm run dev
-
-# Building
-npm run build:dev       # Build for development (with source maps)
-npm run build:prod      # Build for production (minified)
-
-# Testing
-npm test                # Run Jest unit tests (silent mode)
-npm run test:watch      # Run Jest in watch mode
-npm run test:coverage   # Run tests with coverage report
-npm run test:e2e        # Run Playwright E2E tests (requires dev server)
-npm run test:all        # Run all tests (Jest + Playwright)
-
-# Linting
-npm run lint            # All: ESLint + TypeScript check + Architecture check
-npm run lint:fix-all    # Fix all lint issues (JS + TS)
-
-# TypeScript
-npm run ts-build        # Build TypeScript definitions from JSDoc
-```
+[guide@Essential Command](./GUIDE.md#essential-commands)
 
 ---
 

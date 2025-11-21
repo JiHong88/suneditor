@@ -1,76 +1,24 @@
 # GUIDE.md
 
 > **Purpose:**
-> This document serves as a unified reference for both human developers and AI agents (e.g., Claude, Gemini, ChatGPT) working on this repository.
-> It defines the project's architecture, conventions, and development workflow, ensuring consistency and shared understanding between human contributors and AI-based coding assistants.
+> Unified technical reference for developers and AI agents.
+> Defines architecture, conventions, and development workflow.
 
 ---
 
 ## Table of Contents
 
-### Quick Navigation
-
-- [Overview](#-overview)
-- [How to Use This Guide](#how-ai-agents-should-use-this-file)
 - [Project Overview](#project-overview)
 - [Directory Structure](#directory-structure)
 - [Technical Requirements](#technical-requirements)
-
-### Architecture
-
 - [Overall Architecture](#overall-architecture)
 - [Content Structure Design](#content-structure-design)
 - [Multi-Root Architecture](#multi-root-architecture)
-- [Core Components](#core-components-srccore)
 - [Plugin System](#plugin-system-srcplugins)
+- [Core Components](#core-components-srccore)
 - [Modules](#modules-srcmodules)
-- [Helper Utilities](#helper-utilities-srchelper)
-- [EditorInjector Pattern](#editorinjector-pattern-srceditorinjector)
-- [Options System](#options-system)
-- [Context System](#context-system)
-- [Type System](#type-system)
-
-### Development
-
 - [Essential Commands](#essential-commands)
-- [Naming Conventions](#naming-conventions)
-- [Common Pitfalls](#common-pitfalls)
-- [Plugin Registration Flow](#plugin-registration-flow)
-- [Common Development Patterns](#common-development-patterns)
-- [Example Implementations](#example-implementations)
 - [Testing Strategy](#testing-strategy)
-- [Using the `onload` Event](#using-the-onload-event)
-- [Build System](#build-system)
-
----
-
-## 🧭 Overview
-
-This file functions as:
-
-- A **source of context** for AI agents performing code analysis, refactoring, or documentation assistance.
-- A **technical guide** for developers contributing to the project, describing its structure, tools, and workflows.
-- A **living document** that evolves alongside the codebase to keep both human and AI collaborators aligned.
-
----
-
-## 📘 How AI Agents Should Use This File
-
-- Treat this document as the **primary entry point** for understanding the repository.
-- Use it to interpret project conventions, dependencies, and development practices.
-- When uncertain about file purposes, naming, or patterns, consult this guide before making assumptions.
-- Avoid modifying this document automatically unless explicitly instructed.
-
----
-
-## 👩‍💻 How Developers Should Use This File
-
-- Use it as an **onboarding guide** to understand the architecture and workflow.
-- Follow the conventions and structures outlined here when adding new components, locales, or documentation.
-- Keep this guide updated whenever major architectural or tooling changes occur.
-- When integrating AI tools, configure them to reference this file for repository context.
-
----
 
 ---
 
@@ -163,36 +111,17 @@ suneditor/
 
 - **JavaScript**: ES2022+ (modern browsers only)
 - **Zero dependencies**: No external libraries in production bundle
-- **Legacy syntax**: Core directory (`src/core/`) still use constructor functions, migration to ES6 classes planned
-
-    ```javascript
-    // Example: selection.js
-    function Selection_(editor) {
-    	CoreInjector.call(this, editor);
-    	this.range = null;
-    	this.selectionNode = null;
-    }
-
-    Selection_.prototype = {
-    	get() {
-    		/* ... */
-    	},
-    	getRange() {
-    		/* ... */
-    	},
-    	setRange() {
-    		/* ... */
-    	},
-    };
-    ```
-
-    - Uses `function` + `prototype` instead of ES6 `class`
-    - Dependency injection via `CoreInjector.call(this, editor)`
+- **Legacy syntax**: The `src/core/` directory still uses constructor functions with prototype patterns
+- Originally kept for IE compatibility, but IE support has been dropped.
+    - All other directories have migrated to ES6+ class syntax, but the core remains as-is due to:
+    - A large, deeply interconnected codebase with high refactoring risk
+        - Stable and well-tested logic that gains little practical benefit from migration
+        - Development resources being more effectively spent on new features and improvements
+        - This is a decision based on the current cost–benefit trade-offs of a full migration
 
 **Development Environment:**
 
 - **Node.js**: 22 recommended, minimum 14+
-- **npm**: 11 recommended
 - **Build tools**: Webpack 5, Babel, ESLint, Prettier
 
 **Type System:**
@@ -268,18 +197,23 @@ suneditor/
    │          │         │   FrameContext>      │
    │          │uses     │  (All FrameContext)  │
    │          ▼         └──────────────────────┘
-   │     ┌───────────┐
-   │     │ Modules   │ (UI Components)
-   │     ├───────────┤
-   │     │ Modal     │ ← modal plugins
-   │     │ Contrllr  │ ← component plugins
-   │     │ Figure    │ ← image/video/audio
-   │     │ SelectMnu │ ← font/blockStyle
-   │     │ ColorPckr │ ← fontColor/bgColor
-   │     │ FileMngr  │ ← file upload plugins
-   │     │ Browser   │ ← gallery plugins
-   │     │ Anchor    │ ← link plugin
-   │     └───────────┘
+   │     ┌────────────────────────────────────┐
+   │     │ Modules                            │
+   │     ├────────────────────────────────────┤
+   │     │ contracts/                         │
+   │     │  • Modal      ← modal plugins      │
+   │     │  • Controller ← component plugins  │
+   │     │  • Figure     ← image/video/audio  │
+   │     │  • Browser    ← gallery plugins    │
+   │     │  • ColorPicker ← color plugins     │
+   │     │  • HueSlider  ← color plugins      │
+   │     │                                    │
+   │     │ utils/                             │
+   │     │  • SelectMenu     ← dropdowns      │
+   │     │  • ModalAnchorEditor ← link plugin │
+   │     │  • FileManager    ← file uploads   │
+   │     │  • ApiManager     ← external APIs  │
+   │     └────────────────────────────────────┘
    │
    ▼ (all extend EditorInjector)
 ┌────────────────────────────────────────┐
@@ -363,6 +297,8 @@ suneditor/
 
 SunEditor's content is organized into **three fundamental units** with exactly **one state being mandatory** at any position:
 
+> All formatting is option-based. You can customize by defining `block`, `line`, and `component` types to match this format.
+
 #### **1. Line** (Format Line)
 
 - **Definition**: Basic text container elements that hold inline content and text
@@ -382,7 +318,7 @@ SunEditor's content is organized into **three fundamental units** with exactly *
 #### **2. Block** (Format Block)
 
 - **Definition**: Structural container elements that wrap lines
-- **Purpose**: Provides structural hierarchy - **blocks contain lines**
+- **Purpose**: Provides structural hierarchy - **blocks contain lines and components**
 - **Validation**: `format.isBlock(element)` - checks against `formatBlock` regex
 - **Default Tags**: `BLOCKQUOTE`, `OL`, `UL`, `FIGCAPTION`, `TABLE`, `THEAD`, `TBODY`, `TR`, `CAPTION`, `DETAILS`
 - **Relationship**: Blocks structurally contain lines (e.g., `<blockquote><p>quoted text</p></blockquote>`)
@@ -396,6 +332,25 @@ SunEditor's content is organized into **three fundamental units** with exactly *
         - Cannot be exited: Enter/Backspace always stays within the block
         - Example: Table cells where Enter creates new line/BR inside cell, never exits
 
+**Special Case: Lists (OL/UL/LI)**
+
+Lists are a special Block-Line combination where:
+
+- **List Container** (`OL`, `UL`): Block-level elements
+- **List Item** (`LI`): Line-level elements that can ONLY exist inside list containers
+- **Special Handling**: Many operations (Enter, Tab, Backspace) require different logic than regular Block-Line structures
+- **Dedicated Class**: `listFormat.js` handles list-specific operations (nesting, indentation, merging)
+- **Common Checks**: `dom.check.isList()`, `dom.check.isListCell()`
+
+Example pattern in code:
+
+```javascript
+if (dom.check.isList(block) || dom.check.isListCell(line)) {
+    // Special list handling via listFormat
+    this.listFormat.apply(...);
+}
+```
+
 #### **3. Component**
 
 - **Definition**: Self-contained interactive elements (images, videos, tables, embedded content)
@@ -407,26 +362,33 @@ SunEditor's content is organized into **three fundamental units** with exactly *
     - **Tables**: `<figure class="se-flex-component"><table>...</table></figure>`
     - **Audio, File uploads**: `<div class="se-component se-flex-component"><figure><audio|a></figure></div>`
     - **Math, Drawing, Embed**: Typically `<div class="se-component"><figure>...</figure></div>`
-- **Examples**: Images, videos, audio, tables, math formulas, drawings
+- **Examples**: Images, videos, audio, tables, drawings
+
+#### **3.1. Inline Component** (Special Case)
+
+- **Definition**: Components that exist **inside** lines (exception to the component-line sibling rule)
+- **Purpose**: Small interactive elements that flow with text (math formulas, inline images/anchors)
+- **Validation**: `component.isInline(element)` - checks for `se-inline-component` class
+- **Container**: Uses `<span class="se-component se-inline-component">` wrapper (not `<div>`)
+- **Examples**: Math formulas, inline anchors
+- **Key Difference**: These are the **only** components that can exist inside a line
 
 **Key Design Rules:**
 
-- Every position must be in exactly one state: `line`, `block`, or `component`
-- Blocks contain lines; components and lines are siblings (never parent-child)
-- Components cannot be inside lines
-
-1. **Mandatory State**: Every content position must be in exactly one of: `line`, `block`, or `component`
+1. **Mandatory State**: Every position must be in exactly one of: `line`, `block`, `component`, or `inline-component`
 2. **Hierarchy**: `block` → contains → `line` (structural containment)
-3. **Same Level**: `component` and `line` exist at the same hierarchy level
-4. **Never Mixed**: A `line` cannot contain a `component` (they're siblings, not parent-child)
-5. **Block Wrapping**: Blocks provide structure by wrapping multiple lines or components
+3. **Siblings**: **Block components** and `line` exist at the same hierarchy level (never parent-child)
+4. **Inline Exception**: **Inline components** can exist inside a `line` (only exception to sibling rule)
+5. **Block Wrapping**: Blocks provide structure by wrapping multiple lines
 
 **Example Structure:**
 
 ```html
 <div class="se-wrapper-wysiwyg">
-	<p>Line 1: text content</p>
-	<!-- line -->
+	<p>
+		Line 1: text with <span class="se-component se-inline-component"><katex>E=mc^2</katex></span> formula
+	</p>
+	<!-- line with inline component inside -->
 	<blockquote>
 		<!-- block -->
 		<p>Line 2: quoted text</p>
@@ -438,20 +400,6 @@ SunEditor's content is organized into **three fundamental units** with exactly *
 			<img src="..." />
 		</figure>
 	</div>
-	<figure class="se-flex-component">
-		<!-- component: table (same level as line) -->
-		<table>
-			<tbody>
-				<tr>
-					<td>
-						<!-- closure block -->
-						<div>Cell 1</div>
-					</td>
-					<td><div>Cell 2</div></td>
-				</tr>
-			</tbody>
-		</table>
-	</figure>
 	<ul>
 		<!-- block -->
 		<li>Line 3: list item</li>
@@ -699,95 +647,174 @@ class MyPlugin extends PluginModal {
 - **Core Classes**: Extend `EditorInjector` (full editor access)
 - **Modules**: Extend `CoreInjector` (minimal coupling)
 
-#### Plugin Lifecycle Methods
+#### Plugin Methods Reference
 
-Plugin methods marked with `@hook` are lifecycle hooks called by specific editor components. The annotation indicates **who calls** the method:
+Plugin methods are organized into three categories:
 
-**Core lifecycle methods:**
+1. **Interface Methods** - Type-specific methods defined by plugin base classes
+2. **Common Hooks** - Lifecycle and event hooks available to ALL plugins
+3. **Module Hooks** - Hooks for plugins using specific modules (Modal, Controller, etc.)
 
-| Method                    | Called by             | When                     | Return                 | Plugin Type                             |
-| ------------------------- | --------------------- | ------------------------ | ---------------------- | --------------------------------------- |
-| `active(element, target)` | `Editor.EventManager` | On selection change      | `boolean \| undefined` | command, dropdown                       |
-| `action(target)`          | `Editor.Core`         | Button click or API call | `void \| Promise`      | command (required), dropdown (required) |
-| `open(target)`            | `Editor.Core`         | Modal open request       | `void`                 | modal (required)                        |
-| `open(onSelectFunction)`  | `Modules.Browser`     | Browser open request     | `void`                 | browser (required)                      |
-| `close()`                 | `Modules.Browser`     | Browser close            | `void`                 | browser (required)                      |
-| `show()`                  | `Editor.Plugin`       | Popup shown              | `void`                 | popup (required)                        |
+> **Legend:**
+>
+> - ✅ Required | 📝 Optional
+> - ⭐⭐⭐ Very common | ⭐⭐ Moderate | ⭐ Rare
 
-**Dropdown lifecycle methods:**
+---
 
-| Method       | Called by          | When                  | Return | Plugin Type                                   |
-| ------------ | ------------------ | --------------------- | ------ | --------------------------------------------- |
-| `on(target)` | `Modules.Dropdown` | After dropdown opens  | `void` | dropdown (optional), dropdown-free (optional) |
-| `off()`      | `Modules.Dropdown` | After dropdown closes | `void` | dropdown-free (optional)                      |
+##### 1. Interface Methods (Type-Specific)
 
-**Component lifecycle methods:**
+**PluginCommand** - Examples: blockquote, list_bulleted, exportPDF
 
-| Method                      | Called by                    | When                        | Return            | Plugin Type                  |
-| --------------------------- | ---------------------------- | --------------------------- | ----------------- | ---------------------------- |
-| `componentSelect(target)`   | `Editor.Component`           | Component selected          | `void \| boolean` | component plugins (required) |
-| `componentDeselect(target)` | `Editor.Component`           | Component deselected        | `void`            | component plugins (optional) |
-| `componentEdit(target)`     | `Modules.Controller(Figure)` | Component edit button click | `void`            | modal + Figure (required)    |
-| `componentDestroy(target)`  | `Editor.Component`           | Component delete            | `Promise<void>`   | component plugins (required) |
-| `retainFormat()`            | `Editor.Core`                | HTML cleaning/validation    | `{query, method}` | component plugins (required) |
+| Method           | Required | When Called              | Return            |
+| ---------------- | -------- | ------------------------ | ----------------- |
+| `action(target)` | ✅       | Button click or API call | `void \| Promise` |
 
-**Event handler methods:**
+**PluginDropdown** - Examples: align, font, blockStyle
 
-> **Note**: Hooks marked with ✨ have async variants (e.g., `onInput` → `onInputAsync`) for asynchronous operations. Async versions should return `Promise<boolean|void>`.
+| Method           | Required | When Called           | Return            |
+| ---------------- | -------- | --------------------- | ----------------- |
+| `action(target)` | ✅       | Dropdown item clicked | `void \| Promise` |
+| `on(target)`     | 📝       | After dropdown opens  | `void`            |
 
-| Method                                               | Called by             | When                 | Return            | Async? | Required                 |
-| ---------------------------------------------------- | --------------------- | -------------------- | ----------------- | ------ | ------------------------ |
-| `onFilePasteAndDrop({file, event, frameContext})` ✨ | `Editor.EventManager` | File paste/drop      | `boolean \| void` | ✨     | Optional (modal plugins) |
-| `onInput()` ✨                                       | `Editor.EventManager` | Editor content input | `boolean \| void` | ✨     | Optional (field plugins) |
-| `onPaste(params)` ✨                                 | `Editor.EventManager` | Paste event          | `boolean \| void` | ✨     | Optional (table plugin)  |
-| `onBeforeInput()` ✨                                 | `Editor.EventManager` | Before input event   | `boolean \| void` | ✨     | Optional                 |
-| `onKeyDown(params)` ✨                               | `Editor.EventManager` | Key down in editor   | `boolean \| void` | ✨     | Optional (table plugin)  |
-| `onKeyUp(params)` ✨                                 | `Editor.EventManager` | Key up in editor     | `boolean \| void` | ✨     | Optional (table plugin)  |
-| `onMouseDown(params)` ✨                             | `Editor.EventManager` | Mouse down in editor | `boolean \| void` | ✨     | Optional (table plugin)  |
-| `onMouseUp()` ✨                                     | `Editor.EventManager` | Mouse up in editor   | `boolean \| void` | ✨     | Optional (table plugin)  |
-| `onClick(params)` ✨                                 | `Editor.EventManager` | Click in editor      | `boolean \| void` | ✨     | Optional                 |
-| `onMouseLeave()` ✨                                  | `Editor.EventManager` | Mouse leave editor   | `boolean \| void` | ✨     | Optional (table plugin)  |
-| `onMouseMove(params)`                                | `Editor.EventManager` | Mouse move in editor | `void`            | -      | Optional (table plugin)  |
-| `onScroll()`                                         | `Editor.EventManager` | Editor scroll        | `void`            | -      | Optional (table plugin)  |
-| `onFocus(params)`                                    | `Editor.EventManager` | Editor focus         | `void`            | -      | Optional                 |
-| `onBlur(params)`                                     | `Editor.EventManager` | Editor blur          | `void`            | -      | Optional                 |
-| `componentCopy(params)`                              | `Editor.Component`    | Copy event           | `boolean \| void` | -      | Optional (table plugin)  |
+**PluginDropdownFree** - Examples: table
 
-**Module-specific callback methods:**
+| Method       | Required | When Called           | Return |
+| ------------ | -------- | --------------------- | ------ |
+| `on(target)` | 📝       | After dropdown opens  | `void` |
+| `off()`      | 📝       | After dropdown closes | `void` |
 
-> **Note**: Module contract hooks use the naming pattern `{moduleName}{MethodName}` (e.g., `modalOn`, `controllerClose`).
+**PluginModal** - Examples: image, video, link, math
 
-| Method                        | Called by             | When                      | Return             | Plugin Type                          |
-| ----------------------------- | --------------------- | ------------------------- | ------------------ | ------------------------------------ |
-| `modalOn(isUpdate)`           | `Modules.Modal`       | After modal opens         | `void`             | modal (optional)                     |
-| `modalOff(isUpdate)`          | `Modules.Modal`       | After modal closes        | `void`             | modal (optional)                     |
-| `modalInit()`                 | `Modules.Modal`       | Before modal open/close   | `void`             | modal (optional)                     |
-| `modalResize()`               | `Modules.Modal`       | Modal window resized      | `void`             | modal (optional)                     |
-| `modalAction()`               | `Modules.Modal`       | Form submit               | `Promise<boolean>` | modal with forms (required)          |
-| `controllerAction(target)`    | `Modules.Controller`  | Controller button click   | `void`             | component plugins (optional)         |
-| `controllerClose()`           | `Modules.Controller`  | Before controller closes  | `void`             | component plugins (optional)         |
-| `colorPickerAction(color)`    | `Modules.ColorPicker` | Color selected            | `void`             | plugins using ColorPicker (required) |
-| `colorPickerHueSliderOpen()`  | `Modules.ColorPicker` | Before hue slider opens   | `void`             | dropdown-free (optional)             |
-| `colorPickerHueSliderClose()` | `Modules.ColorPicker` | When hue slider cancelled | `void`             | dropdown-free (optional)             |
-| `browserInit()`               | `Modules.Browser`     | Before browser opens      | `void`             | browser (optional)                   |
-| `toolbarInputKeyDown(params)` | `Editor.Toolbar`      | Keydown in toolbar input  | `void`             | input (optional)                     |
-| `toolbarInputChange(params)`  | `Editor.Toolbar`      | Toolbar input change      | `void`             | input (optional)                     |
+| Method         | Required | When Called        | Return |
+| -------------- | -------- | ------------------ | ------ |
+| `open(target)` | ✅       | Modal open request | `void` |
 
-**Special plugin methods:**
+**PluginBrowser** - Examples: imageGallery, videoGallery, fileGallery
 
-| Method             | Called by     | When                   | Return | Plugin Type            |
-| ------------------ | ------------- | ---------------------- | ------ | ---------------------- |
-| `shortcut(params)` | `Editor.Core` | Shortcut key triggered | `void` | command (optional)     |
-| `setDir(dir)`      | `Editor.Core` | RTL direction change   | `void` | all plugins (optional) |
+| Method                   | Required | When Called          | Return |
+| ------------------------ | -------- | -------------------- | ------ |
+| `open(onSelectFunction)` | ✅       | Browser open request | `void` |
+| `close()`                | ✅       | Browser close        | `void` |
 
-**Static Properties:**
+**PluginField** - Examples: mention
 
-All plugins must define:
+No required interface methods (uses hooks exclusively).
 
-- **`static key`** - Unique plugin identifier (string)
-- **`static type`** - Plugin category (string)
-- **`static className`** - CSS class for toolbar button (string)
-- **`static component(node)?`** (optional) - Validates if node is this plugin's component
+**PluginInput** - Examples: fontSize, pageNavigator
+
+| Method                        | Required | When Called              | Return |
+| ----------------------------- | -------- | ------------------------ | ------ |
+| `toolbarInputKeyDown(params)` | 📝       | Keydown in toolbar input | `void` |
+| `toolbarInputChange(params)`  | 📝       | Toolbar input change     | `void` |
+
+**PluginPopup** - Examples: anchor
+
+| Method   | Required | When Called | Return |
+| -------- | -------- | ----------- | ------ |
+| `show()` | ✅       | Popup shown | `void` |
+
+---
+
+##### 2. Common Hooks (All Plugins)
+
+These hooks from `src/hooks/core.js` can be implemented by **any plugin type**.
+
+| Hook                      | When Called                          | Return                 | Common Usage             |
+| ------------------------- | ------------------------------------ | ---------------------- | ------------------------ |
+| `active(element, target)` | Selection change                     | `boolean \| undefined` | ⭐⭐⭐ command, dropdown |
+| `init()`                  | Editor initialization / resetOptions | `void`                 | ⭐ align (rare)          |
+| `retainFormat()`          | HTML cleaning/validation             | `{query, method}`      | ⭐⭐ modal, dropdown     |
+| `shortcut(params)`        | Shortcut key triggered               | `void`                 | ⭐ command               |
+| `setDir(dir)`             | RTL direction change                 | `void`                 | ⭐ dropdown              |
+
+###### Component Lifecycle Hooks
+
+| Hook                        | When Called                 | Return            | Common Usage    |
+| --------------------------- | --------------------------- | ----------------- | --------------- |
+| `componentSelect(target)`   | Component selected          | `void \| boolean` | ⭐⭐⭐ modal    |
+| `componentDeselect(target)` | Component deselected        | `void`            | ⭐ modal, popup |
+| `componentEdit(target)`     | Component edit button click | `void`            | ⭐⭐⭐ modal    |
+| `componentDestroy(target)`  | Component delete            | `Promise<void>`   | ⭐⭐ modal      |
+| `componentCopy(params)`     | Copy event                  | `boolean \| void` | ⭐ modal        |
+
+###### Event Hooks
+
+> ✨ = Has async variant using same method name
+>
+> - Sync: `@type {SunEditor.Hook.Event.OnInput} onInput`
+> - Async: `@type {SunEditor.Hook.Event.OnInputAsync} async onInput`
+>
+> 🔸 = Interruptible event (returning boolean stops event loop and prevents default behavior)
+
+| Hook                    | When Called          | Return            | Common Usage  |
+| ----------------------- | -------------------- | ----------------- | ------------- |
+| `onKeyDown` ✨ 🔸       | Key down in editor   | `boolean \| void` | ⭐ table      |
+| `onKeyUp` ✨ 🔸         | Key up in editor     | `boolean \| void` | ⭐ table      |
+| `onMouseDown` ✨ 🔸     | Mouse down in editor | `boolean \| void` | ⭐ table      |
+| `onClick` ✨ 🔸         | Click in editor      | `boolean \| void` | ⭐ -          |
+| `onPaste` ✨ 🔸         | Paste event          | `boolean \| void` | ⭐⭐ table    |
+| `onBeforeInput` ✨      | Before input event   | `boolean \| void` | ⭐ -          |
+| `onInput` ✨            | Editor content input | `boolean \| void` | ⭐⭐⭐ field/ |
+| `onMouseUp` ✨          | Mouse up in editor   | `boolean \| void` | ⭐ table      |
+| `onMouseLeave` ✨       | Mouse leave editor   | `boolean \| void` | ⭐ table      |
+| `onMouseMove`           | Mouse move in editor | `void`            | ⭐ table      |
+| `onScroll`              | Editor scroll        | `void`            | ⭐ table      |
+| `onFocus`               | Editor focus         | `void`            | ⭐ -          |
+| `onBlur`                | Editor blur          | `void`            | ⭐ -          |
+| `onFilePasteAndDrop` ✨ | File paste/drop      | `boolean \| void` | ⭐⭐ modal/   |
+
+**Event Hook Return Values:**
+
+- `false` - Stops remaining plugins + prevents default editor behavior
+- `true` - Stops remaining plugins + allows default editor behavior
+- `void`/`undefined` - Continues to next plugin
+
+---
+
+##### 3. Module Hooks (When Using Modules)
+
+These hooks from `src/hooks/module.js` are implemented by plugins using specific modules.
+
+###### Modal Module (used by modal plugins)
+
+| Hook                 | Required | When Called             | Return             | Usage  |
+| -------------------- | -------- | ----------------------- | ------------------ | ------ |
+| `modalAction()`      | ✅       | Form submit             | `Promise<boolean>` | ⭐⭐⭐ |
+| `modalOn(isUpdate)`  | 📝       | After modal opens       | `void`             | ⭐⭐⭐ |
+| `modalOff(isUpdate)` | 📝       | After modal closes      | `void`             | ⭐⭐⭐ |
+| `modalInit()`        | 📝       | Before modal open/close | `void`             | ⭐     |
+| `modalResize()`      | 📝       | Modal window resized    | `void`             | ⭐     |
+
+###### Controller Module (used by component plugins)
+
+| Hook                       | Required | When Called              | Return | Usage |
+| -------------------------- | -------- | ------------------------ | ------ | ----- |
+| `controllerAction(target)` | 📝       | Controller button click  | `void` | ⭐⭐  |
+| `controllerClose()`        | 📝       | Before controller closes | `void` | ⭐    |
+
+###### ColorPicker Module (used by color plugins)
+
+| Hook                          | Required | When Called               | Return | Usage  |
+| ----------------------------- | -------- | ------------------------- | ------ | ------ |
+| `colorPickerAction(color)`    | ✅       | Color selected            | `void` | ⭐⭐⭐ |
+| `colorPickerHueSliderOpen()`  | 📝       | Before hue slider opens   | `void` | ⭐     |
+| `colorPickerHueSliderClose()` | 📝       | When hue slider cancelled | `void` | ⭐     |
+
+###### HueSlider Module (used by ColorPicker)
+
+| Hook                      | Required | When Called              | Return | Usage |
+| ------------------------- | -------- | ------------------------ | ------ | ----- |
+| `hueSliderAction(color)`  | ✅       | Color selected in slider | `void` | ⭐⭐  |
+| `hueSliderCancelAction()` | 📝       | Hue slider cancelled     | `void` | ⭐    |
+
+###### Browser Module (used by browser plugins)
+
+| Hook            | Required | When Called          | Return | Usage |
+| --------------- | -------- | -------------------- | ------ | ----- |
+| `browserInit()` | 📝       | Before browser opens | `void` | ⭐    |
+
+---
 
 #### Hook Parameter Types
 
@@ -901,6 +928,8 @@ All hook parameter types are fully documented with JSDoc in [`src/hooks/params.j
 
 Module contracts are interfaces that define plugin hooks called by specific modules. Plugins using these modules **must implement required hooks** and may optionally implement optional hooks.
 
+> **For plugin development perspective**, see [Module-specific callback methods](#hook-methods-optional-callbacks) in the Plugin Lifecycle section.
+
 **Contract Types:**
 
 | Contract File        | Module                | Required Hooks                           | Optional Hooks                                              |
@@ -1010,19 +1039,6 @@ class MyCustomPlugin extends PluginCommand {
 		const range = this.selection.get();
 		this.html.insert('<strong>Bold</strong>');
 		this.history.push(false);
-	}
-}
-```
-
-**Legacy Pattern (Direct Extension):**
-
-```javascript
-// Only use for advanced cases where plugin type classes don't fit
-import EditorInjector from 'suneditor/src/editorInjector';
-
-class AdvancedCustomPlugin extends EditorInjector {
-	constructor(editor) {
-		super(editor);
 	}
 }
 ```
@@ -1310,10 +1326,7 @@ npm run check:inject    # Inject plugin JSDoc types into options.js
 2. **Not restoring selection after DOM changes**
     - User loses cursor position
 
-3. **Using `instanceof` checks in iframe context**
-    - Use `dom.check.isElement()` instead
-
-4. **Directly mutating `options` or `context` Maps**
+3. **Directly mutating `options` or `context` Maps**
     - Use getter/setter methods instead
 
 ---
@@ -1682,7 +1695,7 @@ The `onload` event is **essential** for reliable editor initialization across al
 
 SunEditor supports two modes: **DIV mode** (default) and **iframe mode** (`iframe: true`). The iframe mode provides better content isolation but requires special attention in modern frameworks.
 
-#### iframe Security Attributes (Automatic Since v3.x)
+#### iframe Security Attributes
 
 SunEditor automatically sets these attributes on iframes:
 
