@@ -8,7 +8,7 @@ export default List_numbered;
 declare class List_numbered extends PluginCommand implements PluginDropdown {
 	title: any;
 	listItems: NodeListOf<Element>;
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	on(target?: HTMLElement): void;
 	shortcut(params: SunEditor.HookParams.Shortcut): void;
 	/**

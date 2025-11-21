@@ -239,7 +239,9 @@
  */
 
 /**
- * EventHandlers
+ * EventHandlers object containing all event callback functions
+ * To access individual handler types, use indexed access:
+ * Use SunEditor.Event.Handlers["onload"] to get the onload callback type
  * @typedef {import('./events').EventHandlers} SunEditor.Event.Handlers
  */
 

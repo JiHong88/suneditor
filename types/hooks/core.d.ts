@@ -3,12 +3,12 @@ export namespace Event {
 	/**
 	 * Executes the method that is called whenever the cursor position changes.
 	 * @description Executes the method that is called whenever the cursor position changes.
-	 * @param {?HTMLElement} [element] - Node element where the cursor is currently located
-	 * @param {?HTMLElement} [target] - The plugin's toolbar button element
+	 * @param {?HTMLElement} element - Node element where the cursor is currently located
+	 * @param {?HTMLElement} target - The plugin's toolbar button element
 	 * @returns {boolean|void} - Whether the plugin is active
 	 * - If it returns "undefined", it will no longer be called in this scope.
 	 */
-	function Active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	function Active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	/**
 	 * Executes the event function of "focus".
 	 * @param {SunEditor.HookParams.FocusBlur} params - Event parameters

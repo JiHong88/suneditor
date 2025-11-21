@@ -5,6 +5,7 @@ import * as moduleContracts from './modules/contracts';
 import * as moduleUtils from './modules/utils';
 import helper from './helper';
 import langs from './langs';
+import interfaces from './interfaces';
 
 const modules = {
 	contracts: moduleContracts,
@@ -14,7 +15,7 @@ const modules = {
 /**
  * @module SunEditorExports
  */
-export { plugins, modules, helper, langs };
+export { plugins, modules, helper, langs, interfaces };
 
 /**
  * SunEditor Factory Object

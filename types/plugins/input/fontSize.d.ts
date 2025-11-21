@@ -122,7 +122,7 @@ declare class FontSize extends PluginInput implements PluginCommand, PluginDropd
 	sizeList: NodeListOf<Element>;
 	hasInputFocus: boolean;
 	isInputActive: boolean;
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	on(target?: HTMLElement): void;
 	action(target?: HTMLElement): void | Promise<void>;
 	#private;

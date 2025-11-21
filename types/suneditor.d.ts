@@ -51,7 +51,8 @@ export namespace modules {
 	export { moduleUtils as utils };
 }
 import helper from './helper';
+import interfaces from './interfaces';
 import langs from './langs';
 import * as moduleContracts from './modules/contracts';
 import * as moduleUtils from './modules/utils';
-export { helper, langs, plugins };
+export { helper, interfaces, langs, plugins };

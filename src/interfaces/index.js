@@ -4,3 +4,7 @@
  */
 
 export * from './plugin';
+
+// Default export for bundle
+import * as interfaces from './plugin';
+export default interfaces;

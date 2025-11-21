@@ -25,7 +25,7 @@ declare class BlockStyle extends PluginDropdown {
 	inner: string;
 	formatList: NodeListOf<Element>;
 	currentFormat: string;
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	/**
 	 * @description Create a header tag, call by "shortcut" class
 	 * - (e.g. shortcuts._h1: ['c+s+49+$~blockStyle.applyHeaderByShortcut', ''])

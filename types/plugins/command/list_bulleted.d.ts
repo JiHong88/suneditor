@@ -8,7 +8,7 @@ export default List_bulleted;
 declare class List_bulleted extends PluginCommand implements PluginDropdown {
 	title: any;
 	listItems: NodeListOf<Element>;
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	on(target?: HTMLElement): void;
 	shortcut(params: SunEditor.HookParams.Shortcut): void;
 	/**

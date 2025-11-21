@@ -95,7 +95,7 @@ declare class Link extends PluginModal {
 	anchor: ModalAnchorEditor;
 	modal: Modal;
 	controller: Controller;
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	modalOn(isUpdate: boolean): void;
 	modalAction(): Promise<boolean>;
 	modalInit(): void;

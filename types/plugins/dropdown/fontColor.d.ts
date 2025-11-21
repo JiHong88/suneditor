@@ -39,7 +39,7 @@ declare class FontColor extends PluginDropdownFree {
 	constructor(editor: SunEditor.Core, pluginOptions: FontColorPluginOptions);
 	title: any;
 	colorPicker: ColorPicker;
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	colorPickerHueSliderOpen(): void;
 	colorPickerHueSliderClose(): void;
 	colorPickerAction(color: SunEditor.Module.HueSlider.Color): void;

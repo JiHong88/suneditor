@@ -11,6 +11,6 @@ declare class List extends PluginDropdown {
 		bulleted: string;
 		numbered: string;
 	};
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 }
 import { PluginDropdown } from '../../interfaces';

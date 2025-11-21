@@ -4,6 +4,7 @@
 
 // Re-export default exports as named exports
 export { default as helper } from './helper';
+export { default as interfaces } from './interfaces';
 export { default as langs } from './langs';
 export { default as modules } from './modules';
 export { default as plugins } from './plugins';

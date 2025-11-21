@@ -30,7 +30,7 @@ declare class Align extends PluginDropdown {
 		center: string;
 	};
 	alignList: NodeListOf<Element>;
-	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
 	setDir(dir: string): void;
 	init(): void;
 	#private;

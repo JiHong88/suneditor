@@ -17,7 +17,7 @@ if (!fs.existsSync(indexPath)) {
 }
 
 // Define the modules to export
-const modules = ['helper', 'langs', 'modules', 'plugins'];
+const modules = ['helper', 'langs', 'modules', 'plugins', 'interfaces'];
 
 // Generate the new content
 const newContent = `/**

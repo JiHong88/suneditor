@@ -109,7 +109,7 @@ export default [
 	},
 
 	{
-		files: ['./src/interfaces/*.js', './src/hooks/*.js'],
+		files: ['./src/interfaces/*.js', './src/hooks/*.js', './src/events.js'],
 		rules: {
 			'no-unused-vars': 'off',
 		},
