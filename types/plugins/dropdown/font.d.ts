@@ -27,5 +27,6 @@ declare class Font extends PluginDropdown {
 	fontList: NodeListOf<Element>;
 	fontArray: string[];
 	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	#private;
 }
 import { PluginDropdown } from '../../interfaces';

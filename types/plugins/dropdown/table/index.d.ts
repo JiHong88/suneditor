@@ -108,6 +108,8 @@ declare class Table extends PluginDropdownFree {
 	_propsVerticalAlignCache: string;
 	_typeCache: string;
 	/** @type {HTMLElement} */
+	tableMenu: HTMLElement;
+	/** @type {HTMLElement} */
 	tableHighlight: HTMLElement;
 	/** @type {HTMLElement} */
 	tableUnHighlight: HTMLElement;

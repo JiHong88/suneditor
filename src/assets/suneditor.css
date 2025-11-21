@@ -1407,6 +1407,7 @@
 	padding: 0 5px;
 }
 
+/* When modifying the values ​​of this style, you must also adjust the values ​​of "table/index:#OnMouseMoveTablePicke()" */
 .sun-editor .se-selector-table .se-table-size-picker {
 	position: absolute !important;
 	z-index: 3;
@@ -3924,6 +3925,16 @@
 	cursor: nesw-resize;
 	left: 4px;
 	right: unset;
+}
+
+/* table picker */
+.sun-editor.se-rtl .se-selector-table .se-table-size-picker,
+.sun-editor.se-rtl .se-selector-table .se-table-size-unhighlighted {
+	right: 0;
+}
+.sun-editor.se-rtl .se-selector-table .se-table-size-highlighted {
+	/* .se-table-size : padding - 5px*/
+	right: 5px;
 }
 
 /** --- RTL end -------------------------------------------------------------------------------------------------------------------------------------------------- */

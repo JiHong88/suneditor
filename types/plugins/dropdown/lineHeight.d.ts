@@ -28,5 +28,6 @@ declare class LineHeight extends PluginDropdown {
 	sizeList: NodeListOf<Element>;
 	currentSize: any;
 	active(element?: HTMLElement | null, target?: HTMLElement | null): boolean | void;
+	#private;
 }
 import { PluginDropdown } from '../../interfaces';

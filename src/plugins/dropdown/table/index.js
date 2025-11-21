@@ -107,6 +107,7 @@ class Table extends PluginDropdownFree {
 	#resizeLine;
 	#resizeLinePrev;
 	#tableXY;
+	#prevUnhighlightX;
 	#maxWidth;
 	#fixedColumn;
 	#physical_cellCnt;
@@ -269,6 +270,8 @@ class Table extends PluginDropdownFree {
 		this._propsVerticalAlignCache = '';
 		this._typeCache = '';
 
+		/** @type {HTMLElement} */
+		this.tableMenu = menu;
 		/** @type {HTMLElement} */
 		this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
 		/** @type {HTMLElement} */
@@ -556,8 +559,7 @@ class Table extends PluginDropdownFree {
 	 * @hook Editor.Core
 	 * @type {SunEditor.Hook.Core.SetDir}
 	 */
-	setDir(dir) {
-		this.tableHighlight.style.left = dir === 'rtl' ? 10 * 18 - 13 + 'px' : '';
+	setDir() {
 		this._resetTablePicker();
 		this._resetPropsAlign();
 	}
@@ -3390,8 +3392,8 @@ class Table extends PluginDropdownFree {
 		x = x < 1 ? 1 : x;
 		y = y < 1 ? 1 : y;
 
-		if (this.options.get('_rtl')) {
-			this.tableHighlight.style.left = x * 18 - 13 + 'px';
+		const isRTL = this.options.get('_rtl');
+		if (isRTL) {
 			x = 11 - x;
 		}
 
@@ -3402,6 +3404,17 @@ class Table extends PluginDropdownFree {
 		const y_u = y < 5 ? 5 : y > 8 ? 10 : y + 2;
 		this.tableUnHighlight.style.width = x_u + 'em';
 		this.tableUnHighlight.style.height = y_u + 'em';
+
+		// RTL mode - menu's left position based on unhighlight width change
+		if (isRTL) {
+			const prevX_u = this.#prevUnhighlightX || 5;
+			const diff = x_u - prevX_u;
+			if (diff !== 0) {
+				const currentLeft = numbers.get(this.tableMenu.style.left);
+				this.tableMenu.style.left = currentLeft - diff * 18 + 'px';
+				this.#prevUnhighlightX = x_u;
+			}
+		}
 
 		dom.utils.changeTxt(this.tableDisplay, x + ' x ' + y);
 		this.#tableXY = [x, y];

@@ -119,6 +119,8 @@ Menu.prototype = {
 	 */
 	dropdownOff() {
 		this.__removeGlobalEvent();
+		if (IsFree(this.currentDropdownType)) this.currentDropdownPlugin?.off?.();
+
 		this.index = -1;
 		this.menus = [];
 		this.__menuBtn = null;
@@ -138,8 +140,6 @@ Menu.prototype = {
 		}
 
 		this.editor._preventBlur = false;
-
-		if (IsFree(this.currentDropdownType)) this.currentDropdownPlugin?.off?.();
 		this.currentDropdownPlugin = null;
 	},
 

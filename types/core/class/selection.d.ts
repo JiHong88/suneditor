@@ -222,5 +222,5 @@ declare class Selection_ {
 	 * @this {SelectionThis}
 	 * @description Initialize the scroll information when the editor first loads
 	 */
-	__initScrollInfo(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
+	__init(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
 }
