@@ -131,70 +131,73 @@
 // Editor hooks - Called by Editor core
 // Event sync
 /**
- * @typedef {typeof import('./hooks/core').Event.Active} SunEditor.Hook.Event.Active
- * @typedef {typeof import('./hooks/core').Event.OnFocus} SunEditor.Hook.Event.OnFocus
- * @typedef {typeof import('./hooks/core').Event.OnBlur} SunEditor.Hook.Event.OnBlur
- * @typedef {typeof import('./hooks/core').Event.OnMouseMove} SunEditor.Hook.Event.OnMouseMove
- * @typedef {typeof import('./hooks/core').Event.OnScroll} SunEditor.Hook.Event.OnScroll
+ * @typedef {typeof import('./hooks/base').Event.Active} SunEditor.Hook.Event.Active
+ * @typedef {typeof import('./hooks/base').Event.OnFocus} SunEditor.Hook.Event.OnFocus
+ * @typedef {typeof import('./hooks/base').Event.OnBlur} SunEditor.Hook.Event.OnBlur
+ * @typedef {typeof import('./hooks/base').Event.OnMouseMove} SunEditor.Hook.Event.OnMouseMove
+ * @typedef {typeof import('./hooks/base').Event.OnScroll} SunEditor.Hook.Event.OnScroll
  */
 
 // Event sync/async
 /**
- * @typedef {typeof import('./hooks/core').Event.OnBeforeInput} SunEditor.Hook.Event.OnBeforeInput
- * @typedef {typeof import('./hooks/core').Event.OnBeforeInputAsync} SunEditor.Hook.Event.OnBeforeInputAsync
- * @typedef {typeof import('./hooks/core').Event.OnInput} SunEditor.Hook.Event.OnInput
- * @typedef {typeof import('./hooks/core').Event.OnInputAsync} SunEditor.Hook.Event.OnInputAsync
- * @typedef {typeof import('./hooks/core').Event.OnKeyDown} SunEditor.Hook.Event.OnKeyDown
- * @typedef {typeof import('./hooks/core').Event.OnKeyDownAsync} SunEditor.Hook.Event.OnKeyDownAsync
- * @typedef {typeof import('./hooks/core').Event.OnKeyUp} SunEditor.Hook.Event.OnKeyUp
- * @typedef {typeof import('./hooks/core').Event.OnKeyUpAsync} SunEditor.Hook.Event.OnKeyUpAsync
- * @typedef {typeof import('./hooks/core').Event.OnMouseDown} SunEditor.Hook.Event.OnMouseDown
- * @typedef {typeof import('./hooks/core').Event.OnMouseDownAsync} SunEditor.Hook.Event.OnMouseDownAsync
- * @typedef {typeof import('./hooks/core').Event.OnMouseUp} SunEditor.Hook.Event.OnMouseUp
- * @typedef {typeof import('./hooks/core').Event.OnMouseUpAsync} SunEditor.Hook.Event.OnMouseUpAsync
- * @typedef {typeof import('./hooks/core').Event.OnClick} SunEditor.Hook.Event.OnClick
- * @typedef {typeof import('./hooks/core').Event.OnClickAsync} SunEditor.Hook.Event.OnClickAsync
- * @typedef {typeof import('./hooks/core').Event.OnMouseLeave} SunEditor.Hook.Event.OnMouseLeave
- * @typedef {typeof import('./hooks/core').Event.OnMouseLeaveAsync} SunEditor.Hook.Event.OnMouseLeaveAsync
- * @typedef {typeof import('./hooks/core').Event.OnFilePasteAndDrop} SunEditor.Hook.Event.OnFilePasteAndDrop
- * @typedef {typeof import('./hooks/core').Event.OnFilePasteAndDropAsync} SunEditor.Hook.Event.OnFilePasteAndDropAsync
- * @typedef {typeof import('./hooks/core').Event.OnPaste} SunEditor.Hook.Event.OnPaste
- * @typedef {typeof import('./hooks/core').Event.OnPasteAsync} SunEditor.Hook.Event.OnPasteAsync
+ * @typedef {typeof import('./hooks/base').Event.OnBeforeInput} SunEditor.Hook.Event.OnBeforeInput
+ * @typedef {typeof import('./hooks/base').Event.OnBeforeInputAsync} SunEditor.Hook.Event.OnBeforeInputAsync
+ * @typedef {typeof import('./hooks/base').Event.OnInput} SunEditor.Hook.Event.OnInput
+ * @typedef {typeof import('./hooks/base').Event.OnInputAsync} SunEditor.Hook.Event.OnInputAsync
+ * @typedef {typeof import('./hooks/base').Event.OnKeyDown} SunEditor.Hook.Event.OnKeyDown
+ * @typedef {typeof import('./hooks/base').Event.OnKeyDownAsync} SunEditor.Hook.Event.OnKeyDownAsync
+ * @typedef {typeof import('./hooks/base').Event.OnKeyUp} SunEditor.Hook.Event.OnKeyUp
+ * @typedef {typeof import('./hooks/base').Event.OnKeyUpAsync} SunEditor.Hook.Event.OnKeyUpAsync
+ * @typedef {typeof import('./hooks/base').Event.OnMouseDown} SunEditor.Hook.Event.OnMouseDown
+ * @typedef {typeof import('./hooks/base').Event.OnMouseDownAsync} SunEditor.Hook.Event.OnMouseDownAsync
+ * @typedef {typeof import('./hooks/base').Event.OnMouseUp} SunEditor.Hook.Event.OnMouseUp
+ * @typedef {typeof import('./hooks/base').Event.OnMouseUpAsync} SunEditor.Hook.Event.OnMouseUpAsync
+ * @typedef {typeof import('./hooks/base').Event.OnClick} SunEditor.Hook.Event.OnClick
+ * @typedef {typeof import('./hooks/base').Event.OnClickAsync} SunEditor.Hook.Event.OnClickAsync
+ * @typedef {typeof import('./hooks/base').Event.OnMouseLeave} SunEditor.Hook.Event.OnMouseLeave
+ * @typedef {typeof import('./hooks/base').Event.OnMouseLeaveAsync} SunEditor.Hook.Event.OnMouseLeaveAsync
+ * @typedef {typeof import('./hooks/base').Event.OnFilePasteAndDrop} SunEditor.Hook.Event.OnFilePasteAndDrop
+ * @typedef {typeof import('./hooks/base').Event.OnFilePasteAndDropAsync} SunEditor.Hook.Event.OnFilePasteAndDropAsync
+ * @typedef {typeof import('./hooks/base').Event.OnPaste} SunEditor.Hook.Event.OnPaste
+ * @typedef {typeof import('./hooks/base').Event.OnPasteAsync} SunEditor.Hook.Event.OnPasteAsync
  */
 
 // Core etc
 /**
- * @typedef {typeof import('./hooks/core').Core.RetainFormat} SunEditor.Hook.Core.RetainFormat
- * @typedef {typeof import('./hooks/core').Core.Shortcut} SunEditor.Hook.Core.Shortcut
- * @typedef {typeof import('./hooks/core').Core.SetDir} SunEditor.Hook.Core.SetDir
- * @typedef {typeof import('./hooks/core').Core.Init} SunEditor.Hook.Core.Init
+ * @typedef {typeof import('./hooks/base').Core.RetainFormat} SunEditor.Hook.Core.RetainFormat
+ * @typedef {typeof import('./hooks/base').Core.Shortcut} SunEditor.Hook.Core.Shortcut
+ * @typedef {typeof import('./hooks/base').Core.SetDir} SunEditor.Hook.Core.SetDir
+ * @typedef {typeof import('./hooks/base').Core.Init} SunEditor.Hook.Core.Init
  */
 
 // component
 /**
- * @typedef {typeof import('./hooks/core').Component.Select} SunEditor.Hook.Component.Select
- * @typedef {typeof import('./hooks/core').Component.Deselect} SunEditor.Hook.Component.Deselect
- * @typedef {typeof import('./hooks/core').Component.Edit} SunEditor.Hook.Component.Edit
- * @typedef {typeof import('./hooks/core').Component.Destroy} SunEditor.Hook.Component.Destroy
- * @typedef {typeof import('./hooks/core').Component.Copy} SunEditor.Hook.Component.Copy
+ * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentSelect} SunEditor.Hook.Component.Select
+ * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentDeselect} SunEditor.Hook.Component.Deselect
+ * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentEdit} SunEditor.Hook.Component.Edit
+ * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentDestroy} SunEditor.Hook.Component.Destroy
+ * @typedef {typeof import('./interfaces/contracts').EditorComponent.prototype.componentCopy} SunEditor.Hook.Component.Copy
  */
 
-// Module hooks - Called by Module instances
+// Module hooks - Called by Module instances (defined in interfaces/contracts.js)
 /**
- * @typedef {typeof import('./hooks/module').Modal.On} SunEditor.Hook.Modal.On
- * @typedef {typeof import('./hooks/module').Modal.Init} SunEditor.Hook.Modal.Init
- * @typedef {typeof import('./hooks/module').Modal.Off} SunEditor.Hook.Modal.Off
- * @typedef {typeof import('./hooks/module').Modal.Action} SunEditor.Hook.Modal.Action
- * @typedef {typeof import('./hooks/module').Modal.Resize} SunEditor.Hook.Modal.Resize
+ * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalAction} SunEditor.Hook.Modal.Action
+ * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalOn} SunEditor.Hook.Modal.On
+ * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalInit} SunEditor.Hook.Modal.Init
+ * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalOff} SunEditor.Hook.Modal.Off
+ * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalResize} SunEditor.Hook.Modal.Resize
  *
- * @typedef {typeof import('./hooks/module').Controller.Close} SunEditor.Hook.Controller.Close
- * @typedef {typeof import('./hooks/module').Controller.Action} SunEditor.Hook.Controller.Action
+ * @typedef {typeof import('./interfaces/contracts').ModuleController.prototype.controllerAction} SunEditor.Hook.Controller.Action
+ * @typedef {typeof import('./interfaces/contracts').ModuleController.prototype.controllerClose} SunEditor.Hook.Controller.Close
  *
- * @typedef {typeof import('./hooks/module').Browser.Init} SunEditor.Hook.Browser.Init
+ * @typedef {typeof import('./interfaces/contracts').ModuleBrowser.prototype.browserInit} SunEditor.Hook.Browser.Init
  *
- * @typedef {typeof import('./hooks/module').ColorPicker.Action} SunEditor.Hook.ColorPicker.Action
- * @typedef {typeof import('./hooks/module').ColorPicker.HueSliderOpen} SunEditor.Hook.ColorPicker.HueSliderOpen
- * @typedef {typeof import('./hooks/module').ColorPicker.HueSliderClose} SunEditor.Hook.ColorPicker.HueSliderClose
+ * @typedef {typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerAction} SunEditor.Hook.ColorPicker.Action
+ * @typedef {typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderOpen} SunEditor.Hook.ColorPicker.HueSliderOpen
+ * @typedef {typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderClose} SunEditor.Hook.ColorPicker.HueSliderClose
+ *
+ * @typedef {typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderAction} SunEditor.Hook.HueSlider.Action
+ * @typedef {typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderCancelAction} SunEditor.Hook.HueSlider.CancelAction
  */
 
 // --------------------------------------------------------- [Plugin Hook parameter types] ---------------------------------------------------------------------------------------------------

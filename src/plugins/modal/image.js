@@ -255,7 +255,7 @@ class Image_ extends PluginModal {
 
 	/**
 	 * @hook Modules.Modal
-	 * @type {typeof import('../../hooks/module').Modal.Action}
+	 * @type {SunEditor.Hook.Modal.Action}
 	 */
 	async modalAction() {
 		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked')).value;

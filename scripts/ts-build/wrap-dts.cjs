@@ -2,7 +2,6 @@ const fs = require('fs');
 const { join } = require('path');
 
 const typedefPath = join(__dirname, '../../types/typedef.d.ts');
-const eventsPath = join(__dirname, '../../types/events.d.ts');
 
 /**
  * Process typedef.d.ts

@@ -51,7 +51,7 @@ export class PluginDropdown extends Base {
 	 * @param {HTMLElement} [target] - The dropdown target element
 	 * @returns {void}
 	 */
-	on(target?: HTMLElement): void;
+	on?(target?: HTMLElement): void;
 	/**
 	 * @abstract
 	 * @description Executes the main execution method of the plugin.
@@ -77,13 +77,13 @@ export class PluginDropdownFree extends Base {
 	 * @param {HTMLElement} [target] - The dropdown target element
 	 * @returns {void}
 	 */
-	on(target?: HTMLElement): void;
+	on?(target?: HTMLElement): void;
 	/**
 	 * @optional
 	 * @description Executes the method that is called when a plugin's dropdown menu is closed.
 	 * @returns {void}
 	 */
-	off(): void;
+	off?(): void;
 }
 /**
  * @abstract
@@ -109,7 +109,7 @@ export class PluginInput extends Base {
 	 * @param {string} params.value - The input value
 	 * @returns {void}
 	 */
-	toolbarInputKeyDown(params: { target: HTMLElement; event: KeyboardEvent; value: string }): void;
+	toolbarInputKeyDown?(params: { target: HTMLElement; event: KeyboardEvent; value: string }): void;
 	/**
 	 * @optional
 	 * @description Executes the event function of toolbar's input tag - "change".
@@ -119,7 +119,7 @@ export class PluginInput extends Base {
 	 * @param {string} params.value - The input value
 	 * @returns {void}
 	 */
-	toolbarInputChange(params: { target: HTMLElement; event: FocusEvent | MouseEvent; value: string }): void;
+	toolbarInputChange?(params: { target: HTMLElement; event: FocusEvent | MouseEvent; value: string }): void;
 }
 export class PluginModal extends Base {
 	/**

@@ -5,7 +5,7 @@ import * as moduleContracts from './modules/contracts';
 import * as moduleUtils from './modules/utils';
 import helper from './helper';
 import langs from './langs';
-import interfaces from './interfaces';
+import * as interfaces from './interfaces';
 
 const modules = {
 	contracts: moduleContracts,

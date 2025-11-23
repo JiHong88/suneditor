@@ -54,7 +54,7 @@
 		"lint:fix-ts": "npx eslint \"types/**/*.ts\" --fix",
 		"lint:fix-all": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" --fix",
 		"lint": "npx eslint \"src/**/*.js\" \"types/**/*.ts\" && npm run lint:type && npm run check:arch",
-		"ts-build": "npm run check:inject && (npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/ts-build/format-index.cjs && node scripts/ts-build/fix-langs.cjs && node scripts/ts-build/wrap-dts.cjs && node scripts/ts-build/rename-index.cjs && node scripts/ts-build/remove-this-params.cjs && node scripts/ts-build/gen-options-dts.cjs && node scripts/ts-build/gen-css-dts.cjs && node scripts/ts-build/inject-typedef-import.cjs && npm run lint:fix-ts",
+		"ts-build": "npm run check:inject && (npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/ts-build/format-index.cjs && node scripts/ts-build/fix-langs.cjs && node scripts/ts-build/wrap-dts.cjs && node scripts/ts-build/rename-index.cjs && node scripts/ts-build/remove-this-params.cjs && node scripts/ts-build/interfaces-convert.cjs && node scripts/ts-build/gen-options-dts.cjs && node scripts/ts-build/gen-css-dts.cjs && node scripts/ts-build/inject-typedef-import.cjs && npm run lint:fix-ts",
 		"test": "jest --silent",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",

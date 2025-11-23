@@ -141,63 +141,67 @@ declare global {
 		}
 		export namespace Hook {
 			namespace Event {
-				type Active = typeof import('./hooks/core').Event.Active;
-				type OnFocus = typeof import('./hooks/core').Event.OnFocus;
-				type OnBlur = typeof import('./hooks/core').Event.OnBlur;
-				type OnMouseMove = typeof import('./hooks/core').Event.OnMouseMove;
-				type OnScroll = typeof import('./hooks/core').Event.OnScroll;
-				type OnBeforeInput = typeof import('./hooks/core').Event.OnBeforeInput;
-				type OnBeforeInputAsync = typeof import('./hooks/core').Event.OnBeforeInputAsync;
-				type OnInput = typeof import('./hooks/core').Event.OnInput;
-				type OnInputAsync = typeof import('./hooks/core').Event.OnInputAsync;
-				type OnKeyDown = typeof import('./hooks/core').Event.OnKeyDown;
-				type OnKeyDownAsync = typeof import('./hooks/core').Event.OnKeyDownAsync;
-				type OnKeyUp = typeof import('./hooks/core').Event.OnKeyUp;
-				type OnKeyUpAsync = typeof import('./hooks/core').Event.OnKeyUpAsync;
-				type OnMouseDown = typeof import('./hooks/core').Event.OnMouseDown;
-				type OnMouseDownAsync = typeof import('./hooks/core').Event.OnMouseDownAsync;
-				type OnMouseUp = typeof import('./hooks/core').Event.OnMouseUp;
-				type OnMouseUpAsync = typeof import('./hooks/core').Event.OnMouseUpAsync;
-				type OnClick = typeof import('./hooks/core').Event.OnClick;
-				type OnClickAsync = typeof import('./hooks/core').Event.OnClickAsync;
-				type OnMouseLeave = typeof import('./hooks/core').Event.OnMouseLeave;
-				type OnMouseLeaveAsync = typeof import('./hooks/core').Event.OnMouseLeaveAsync;
-				type OnFilePasteAndDrop = typeof import('./hooks/core').Event.OnFilePasteAndDrop;
-				type OnFilePasteAndDropAsync = typeof import('./hooks/core').Event.OnFilePasteAndDropAsync;
-				type OnPaste = typeof import('./hooks/core').Event.OnPaste;
-				type OnPasteAsync = typeof import('./hooks/core').Event.OnPasteAsync;
+				type Active = typeof import('./hooks/base').Event.Active;
+				type OnFocus = typeof import('./hooks/base').Event.OnFocus;
+				type OnBlur = typeof import('./hooks/base').Event.OnBlur;
+				type OnMouseMove = typeof import('./hooks/base').Event.OnMouseMove;
+				type OnScroll = typeof import('./hooks/base').Event.OnScroll;
+				type OnBeforeInput = typeof import('./hooks/base').Event.OnBeforeInput;
+				type OnBeforeInputAsync = typeof import('./hooks/base').Event.OnBeforeInputAsync;
+				type OnInput = typeof import('./hooks/base').Event.OnInput;
+				type OnInputAsync = typeof import('./hooks/base').Event.OnInputAsync;
+				type OnKeyDown = typeof import('./hooks/base').Event.OnKeyDown;
+				type OnKeyDownAsync = typeof import('./hooks/base').Event.OnKeyDownAsync;
+				type OnKeyUp = typeof import('./hooks/base').Event.OnKeyUp;
+				type OnKeyUpAsync = typeof import('./hooks/base').Event.OnKeyUpAsync;
+				type OnMouseDown = typeof import('./hooks/base').Event.OnMouseDown;
+				type OnMouseDownAsync = typeof import('./hooks/base').Event.OnMouseDownAsync;
+				type OnMouseUp = typeof import('./hooks/base').Event.OnMouseUp;
+				type OnMouseUpAsync = typeof import('./hooks/base').Event.OnMouseUpAsync;
+				type OnClick = typeof import('./hooks/base').Event.OnClick;
+				type OnClickAsync = typeof import('./hooks/base').Event.OnClickAsync;
+				type OnMouseLeave = typeof import('./hooks/base').Event.OnMouseLeave;
+				type OnMouseLeaveAsync = typeof import('./hooks/base').Event.OnMouseLeaveAsync;
+				type OnFilePasteAndDrop = typeof import('./hooks/base').Event.OnFilePasteAndDrop;
+				type OnFilePasteAndDropAsync = typeof import('./hooks/base').Event.OnFilePasteAndDropAsync;
+				type OnPaste = typeof import('./hooks/base').Event.OnPaste;
+				type OnPasteAsync = typeof import('./hooks/base').Event.OnPasteAsync;
 			}
 			namespace Core {
-				type RetainFormat = typeof import('./hooks/core').Core.RetainFormat;
-				type Shortcut = typeof import('./hooks/core').Core.Shortcut;
-				type SetDir = typeof import('./hooks/core').Core.SetDir;
-				type Init = typeof import('./hooks/core').Core.Init;
+				type RetainFormat = typeof import('./hooks/base').Core.RetainFormat;
+				type Shortcut = typeof import('./hooks/base').Core.Shortcut;
+				type SetDir = typeof import('./hooks/base').Core.SetDir;
+				type Init = typeof import('./hooks/base').Core.Init;
 			}
 			namespace Component {
-				type Select = typeof import('./hooks/core').Component.Select;
-				type Deselect = typeof import('./hooks/core').Component.Deselect;
-				type Edit = typeof import('./hooks/core').Component.Edit;
-				type Destroy = typeof import('./hooks/core').Component.Destroy;
-				type Copy = typeof import('./hooks/core').Component.Copy;
+				type Select = typeof import('./interfaces/contracts').EditorComponent.prototype.componentSelect;
+				type Deselect = typeof import('./interfaces/contracts').EditorComponent.prototype.componentDeselect;
+				type Edit = typeof import('./interfaces/contracts').EditorComponent.prototype.componentEdit;
+				type Destroy = typeof import('./interfaces/contracts').EditorComponent.prototype.componentDestroy;
+				type Copy = typeof import('./interfaces/contracts').EditorComponent.prototype.componentCopy;
 			}
 			namespace Modal {
-				type On = typeof import('./hooks/module').Modal.On;
-				type Init = typeof import('./hooks/module').Modal.Init;
-				type Off = typeof import('./hooks/module').Modal.Off;
-				type Action = typeof import('./hooks/module').Modal.Action;
-				type Resize = typeof import('./hooks/module').Modal.Resize;
+				type Action = typeof import('./interfaces/contracts').ModuleModal.prototype.modalAction;
+				type On = typeof import('./interfaces/contracts').ModuleModal.prototype.modalOn;
+				type Init = typeof import('./interfaces/contracts').ModuleModal.prototype.modalInit;
+				type Off = typeof import('./interfaces/contracts').ModuleModal.prototype.modalOff;
+				type Resize = typeof import('./interfaces/contracts').ModuleModal.prototype.modalResize;
 			}
 			namespace Controller {
-				type Close = typeof import('./hooks/module').Controller.Close;
-				type Action = typeof import('./hooks/module').Controller.Action;
+				type Action = typeof import('./interfaces/contracts').ModuleController.prototype.controllerAction;
+				type Close = typeof import('./interfaces/contracts').ModuleController.prototype.controllerClose;
 			}
 			namespace Browser {
-				type Init = typeof import('./hooks/module').Browser.Init;
+				type Init = typeof import('./interfaces/contracts').ModuleBrowser.prototype.browserInit;
 			}
 			namespace ColorPicker {
-				type Action = typeof import('./hooks/module').ColorPicker.Action;
-				type HueSliderOpen = typeof import('./hooks/module').ColorPicker.HueSliderOpen;
-				type HueSliderClose = typeof import('./hooks/module').ColorPicker.HueSliderClose;
+				type Action = typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerAction;
+				type HueSliderOpen = typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderOpen;
+				type HueSliderClose = typeof import('./interfaces/contracts').ModuleColorPicker.prototype.colorPickerHueSliderClose;
+			}
+			namespace HueSlider {
+				type Action = typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderAction;
+				type CancelAction = typeof import('./interfaces/contracts').ModuleHueSlider.prototype.hueSliderCancelAction;
 			}
 		}
 		export namespace HookParams {

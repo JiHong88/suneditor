@@ -75,11 +75,11 @@ suneditor/
 │   │       ├── ApiManager.js # XHR request helper
 │   │       └── _DragHandle.js # Drag state manager
 │   ├── hooks/               # Hook interface definitions
-│   │   ├── core.js          # Editor core hooks (Event, Component, Toolbar, Core)
-│   │   ├── module.js        # Module contract hooks (Modal, Browser, ColorPicker, etc.)
+│   │   ├── base.js          # Base hooks (Event, Component, Core)
 │   │   └── params.js        # Hook parameter type definitions
-│   ├── interfaces/          # Plugin base classes
+│   ├── interfaces/          # Plugin base classes & contracts
 │   │   ├── plugin.js        # Plugin type classes (PluginCommand, PluginModal, etc.)
+│   │   ├── contracts.js     # Contract interfaces (ModuleModal, EditorComponent, etc.)
 │   │   └── index.js         # Interface exports
 │   ├── helper/              # Pure utility functions
 │   │   ├── converter.js     # String/HTML conversion
@@ -716,27 +716,80 @@ No required interface methods (uses hooks exclusively).
 
 ---
 
-##### 2. Common Hooks (All Plugins)
+##### 2. Module Hooks (When Using Modules)
 
-These hooks from `src/hooks/core.js` can be implemented by **any plugin type**.
+Interface definitions: [`src/interfaces/contracts.js`](src/interfaces/contracts.js)
 
-| Hook                      | When Called                          | Return                 | Common Usage             |
-| ------------------------- | ------------------------------------ | ---------------------- | ------------------------ |
-| `active(element, target)` | Selection change                     | `boolean \| undefined` | ⭐⭐⭐ command, dropdown |
-| `init()`                  | Editor initialization / resetOptions | `void`                 | ⭐ align (rare)          |
-| `retainFormat()`          | HTML cleaning/validation             | `{query, method}`      | ⭐⭐ modal, dropdown     |
-| `shortcut(params)`        | Shortcut key triggered               | `void`                 | ⭐ command               |
-| `setDir(dir)`             | RTL direction change                 | `void`                 | ⭐ dropdown              |
+- **TypeScript**: `implements ModuleModal`, `implements ModuleController`, etc.
+- **JavaScript**: `@type {SunEditor.Hook.Modal.Action}`, etc.
 
-###### Component Lifecycle Hooks
+###### Modal Module — Interface: `ModuleModal`
 
-| Hook                        | When Called                 | Return            | Common Usage    |
-| --------------------------- | --------------------------- | ----------------- | --------------- |
-| `componentSelect(target)`   | Component selected          | `void \| boolean` | ⭐⭐⭐ modal    |
-| `componentDeselect(target)` | Component deselected        | `void`            | ⭐ modal, popup |
-| `componentEdit(target)`     | Component edit button click | `void`            | ⭐⭐⭐ modal    |
-| `componentDestroy(target)`  | Component delete            | `Promise<void>`   | ⭐⭐ modal      |
-| `componentCopy(params)`     | Copy event                  | `boolean \| void` | ⭐ modal        |
+| Hook                 | Required | Type                          | When Called             | Return             | Usage  |
+| -------------------- | -------- | ----------------------------- | ----------------------- | ------------------ | ------ |
+| `modalAction()`      | ✅       | `SunEditor.Hook.Modal.Action` | Form submit             | `Promise<boolean>` | ⭐⭐⭐ |
+| `modalOn(isUpdate)`  | 📝       | `SunEditor.Hook.Modal.On`     | After modal opens       | `void`             | ⭐⭐⭐ |
+| `modalOff(isUpdate)` | 📝       | `SunEditor.Hook.Modal.Off`    | After modal closes      | `void`             | ⭐⭐⭐ |
+| `modalInit()`        | 📝       | `SunEditor.Hook.Modal.Init`   | Before modal open/close | `void`             | ⭐     |
+| `modalResize()`      | 📝       | `SunEditor.Hook.Modal.Resize` | Modal window resized    | `void`             | ⭐     |
+
+###### Controller Module — Interface: `ModuleController`
+
+| Hook                       | Required | Type                               | When Called              | Return | Usage |
+| -------------------------- | -------- | ---------------------------------- | ------------------------ | ------ | ----- |
+| `controllerAction(target)` | ✅       | `SunEditor.Hook.Controller.Action` | Controller button click  | `void` | ⭐⭐  |
+| `controllerClose()`        | 📝       | `SunEditor.Hook.Controller.Close`  | Before controller closes | `void` | ⭐    |
+
+###### ColorPicker Module — Interface: `ModuleColorPicker`
+
+| Hook                          | Required | Type                                        | When Called               | Return | Usage  |
+| ----------------------------- | -------- | ------------------------------------------- | ------------------------- | ------ | ------ |
+| `colorPickerAction(color)`    | 📝       | `SunEditor.Hook.ColorPicker.Action`         | Color selected            | `void` | ⭐⭐⭐ |
+| `colorPickerHueSliderOpen()`  | 📝       | `SunEditor.Hook.ColorPicker.HueSliderOpen`  | Before hue slider opens   | `void` | ⭐     |
+| `colorPickerHueSliderClose()` | 📝       | `SunEditor.Hook.ColorPicker.HueSliderClose` | When hue slider cancelled | `void` | ⭐     |
+
+###### HueSlider Module — Interface: `ModuleHueSlider`
+
+| Hook                      | Required | Type                                    | When Called              | Return | Usage |
+| ------------------------- | -------- | --------------------------------------- | ------------------------ | ------ | ----- |
+| `hueSliderAction(color)`  | ✅       | `SunEditor.Hook.HueSlider.Action`       | Color selected in slider | `void` | ⭐⭐  |
+| `hueSliderCancelAction()` | 📝       | `SunEditor.Hook.HueSlider.CancelAction` | Hue slider cancelled     | `void` | ⭐    |
+
+###### Browser Module — Interface: `ModuleBrowser`
+
+| Hook            | Required | Type                          | When Called          | Return | Usage |
+| --------------- | -------- | ----------------------------- | -------------------- | ------ | ----- |
+| `browserInit()` | 📝       | `SunEditor.Hook.Browser.Init` | Before browser opens | `void` | ⭐    |
+
+---
+
+##### 3. Component Hooks (Static Component Plugins) — Interface: `EditorComponent`
+
+For plugins that create **static components** (e.g., image, video, embed) using `this.component.setInfo()`.
+
+- **TypeScript**: `implements EditorComponent`
+- **JavaScript**: `@type {SunEditor.Hook.Component.Select}`, etc.
+- **Definition**: `src/interfaces/contracts.js`
+
+| Hook                        | Required | Type                                | When Called                 | Return            | Usage  |
+| --------------------------- | -------- | ----------------------------------- | --------------------------- | ----------------- | ------ |
+| `componentSelect(target)`   | ✅       | `SunEditor.Hook.Component.Select`   | Component selected          | `void \| boolean` | ⭐⭐⭐ |
+| `componentDeselect(target)` | 📝       | `SunEditor.Hook.Component.Deselect` | Component deselected        | `void`            | ⭐     |
+| `componentEdit(target)`     | 📝       | `SunEditor.Hook.Component.Edit`     | Component edit button click | `void`            | ⭐⭐⭐ |
+| `componentDestroy(target)`  | 📝       | `SunEditor.Hook.Component.Destroy`  | Component delete            | `Promise<void>`   | ⭐⭐   |
+| `componentCopy(params)`     | 📝       | `SunEditor.Hook.Component.Copy`     | Copy event                  | `boolean \| void` | ⭐     |
+
+##### 4. Common Hooks (All Plugins)
+
+These hooks from `src/hooks/base.js` can be implemented by **any plugin type**.
+
+| Hook                      | Type                               | When Called                          | Return                 | Common Usage             |
+| ------------------------- | ---------------------------------- | ------------------------------------ | ---------------------- | ------------------------ |
+| `active(element, target)` | `SunEditor.Hook.Event.Active`      | Selection change                     | `boolean \| undefined` | ⭐⭐⭐ command, dropdown |
+| `init()`                  | `SunEditor.Hook.Core.Init`         | Editor initialization / resetOptions | `void`                 | ⭐ align (rare)          |
+| `retainFormat()`          | `SunEditor.Hook.Core.RetainFormat` | HTML cleaning/validation             | `{query, method}`      | ⭐⭐ modal, dropdown     |
+| `shortcut(params)`        | `SunEditor.Hook.Core.Shortcut`     | Shortcut key triggered               | `void`                 | ⭐ command               |
+| `setDir(dir)`             | `SunEditor.Hook.Core.SetDir`       | RTL direction change                 | `void`                 | ⭐ dropdown              |
 
 ###### Event Hooks
 
@@ -747,72 +800,28 @@ These hooks from `src/hooks/core.js` can be implemented by **any plugin type**.
 >
 > 🔸 = Interruptible event (returning boolean stops event loop and prevents default behavior)
 
-| Hook                    | When Called          | Return            | Common Usage  |
-| ----------------------- | -------------------- | ----------------- | ------------- |
-| `onKeyDown` ✨ 🔸       | Key down in editor   | `boolean \| void` | ⭐ table      |
-| `onKeyUp` ✨ 🔸         | Key up in editor     | `boolean \| void` | ⭐ table      |
-| `onMouseDown` ✨ 🔸     | Mouse down in editor | `boolean \| void` | ⭐ table      |
-| `onClick` ✨ 🔸         | Click in editor      | `boolean \| void` | ⭐ -          |
-| `onPaste` ✨ 🔸         | Paste event          | `boolean \| void` | ⭐⭐ table    |
-| `onBeforeInput` ✨      | Before input event   | `boolean \| void` | ⭐ -          |
-| `onInput` ✨            | Editor content input | `boolean \| void` | ⭐⭐⭐ field/ |
-| `onMouseUp` ✨          | Mouse up in editor   | `boolean \| void` | ⭐ table      |
-| `onMouseLeave` ✨       | Mouse leave editor   | `boolean \| void` | ⭐ table      |
-| `onMouseMove`           | Mouse move in editor | `void`            | ⭐ table      |
-| `onScroll`              | Editor scroll        | `void`            | ⭐ table      |
-| `onFocus`               | Editor focus         | `void`            | ⭐ -          |
-| `onBlur`                | Editor blur          | `void`            | ⭐ -          |
-| `onFilePasteAndDrop` ✨ | File paste/drop      | `boolean \| void` | ⭐⭐ modal/   |
+| Hook                    | Type                                      | When Called          | Return            | Common Usage  |
+| ----------------------- | ----------------------------------------- | -------------------- | ----------------- | ------------- |
+| `onKeyDown` ✨ 🔸       | `SunEditor.Hook.Event.OnKeyDown`          | Key down in editor   | `boolean \| void` | ⭐ table      |
+| `onKeyUp` ✨ 🔸         | `SunEditor.Hook.Event.OnKeyUp`            | Key up in editor     | `boolean \| void` | ⭐ table      |
+| `onMouseDown` ✨ 🔸     | `SunEditor.Hook.Event.OnMouseDown`        | Mouse down in editor | `boolean \| void` | ⭐ table      |
+| `onClick` ✨ 🔸         | `SunEditor.Hook.Event.OnClick`            | Click in editor      | `boolean \| void` | ⭐ -          |
+| `onPaste` ✨ 🔸         | `SunEditor.Hook.Event.OnPaste`            | Paste event          | `boolean \| void` | ⭐⭐ table    |
+| `onBeforeInput` ✨      | `SunEditor.Hook.Event.OnBeforeInput`      | Before input event   | `boolean \| void` | ⭐ -          |
+| `onInput` ✨            | `SunEditor.Hook.Event.OnInput`            | Editor content input | `boolean \| void` | ⭐⭐⭐ field/ |
+| `onMouseUp` ✨          | `SunEditor.Hook.Event.OnMouseUp`          | Mouse up in editor   | `boolean \| void` | ⭐ table      |
+| `onMouseLeave` ✨       | `SunEditor.Hook.Event.OnMouseLeave`       | Mouse leave editor   | `boolean \| void` | ⭐ table      |
+| `onMouseMove`           | `SunEditor.Hook.Event.OnMouseMove`        | Mouse move in editor | `void`            | ⭐ table      |
+| `onScroll`              | `SunEditor.Hook.Event.OnScroll`           | Editor scroll        | `void`            | ⭐ table      |
+| `onFocus`               | `SunEditor.Hook.Event.OnFocus`            | Editor focus         | `void`            | ⭐ -          |
+| `onBlur`                | `SunEditor.Hook.Event.OnBlur`             | Editor blur          | `void`            | ⭐ -          |
+| `onFilePasteAndDrop` ✨ | `SunEditor.Hook.Event.OnFilePasteAndDrop` | File paste/drop      | `boolean \| void` | ⭐⭐ modal/   |
 
 **Event Hook Return Values:**
 
 - `false` - Stops remaining plugins + prevents default editor behavior
 - `true` - Stops remaining plugins + allows default editor behavior
 - `void`/`undefined` - Continues to next plugin
-
----
-
-##### 3. Module Hooks (When Using Modules)
-
-These hooks from `src/hooks/module.js` are implemented by plugins using specific modules.
-
-###### Modal Module (used by modal plugins)
-
-| Hook                 | Required | When Called             | Return             | Usage  |
-| -------------------- | -------- | ----------------------- | ------------------ | ------ |
-| `modalAction()`      | ✅       | Form submit             | `Promise<boolean>` | ⭐⭐⭐ |
-| `modalOn(isUpdate)`  | 📝       | After modal opens       | `void`             | ⭐⭐⭐ |
-| `modalOff(isUpdate)` | 📝       | After modal closes      | `void`             | ⭐⭐⭐ |
-| `modalInit()`        | 📝       | Before modal open/close | `void`             | ⭐     |
-| `modalResize()`      | 📝       | Modal window resized    | `void`             | ⭐     |
-
-###### Controller Module (used by component plugins)
-
-| Hook                       | Required | When Called              | Return | Usage |
-| -------------------------- | -------- | ------------------------ | ------ | ----- |
-| `controllerAction(target)` | 📝       | Controller button click  | `void` | ⭐⭐  |
-| `controllerClose()`        | 📝       | Before controller closes | `void` | ⭐    |
-
-###### ColorPicker Module (used by color plugins)
-
-| Hook                          | Required | When Called               | Return | Usage  |
-| ----------------------------- | -------- | ------------------------- | ------ | ------ |
-| `colorPickerAction(color)`    | ✅       | Color selected            | `void` | ⭐⭐⭐ |
-| `colorPickerHueSliderOpen()`  | 📝       | Before hue slider opens   | `void` | ⭐     |
-| `colorPickerHueSliderClose()` | 📝       | When hue slider cancelled | `void` | ⭐     |
-
-###### HueSlider Module (used by ColorPicker)
-
-| Hook                      | Required | When Called              | Return | Usage |
-| ------------------------- | -------- | ------------------------ | ------ | ----- |
-| `hueSliderAction(color)`  | ✅       | Color selected in slider | `void` | ⭐⭐  |
-| `hueSliderCancelAction()` | 📝       | Hue slider cancelled     | `void` | ⭐    |
-
-###### Browser Module (used by browser plugins)
-
-| Hook            | Required | When Called          | Return | Usage |
-| --------------- | -------- | -------------------- | ------ | ----- |
-| `browserInit()` | 📝       | Before browser opens | `void` | ⭐    |
 
 ---
 
