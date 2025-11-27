@@ -7,7 +7,7 @@ import editorInjector from '../src/editorInjector';
 import * as moduleContracts from '../src/modules/contracts';
 import * as moduleUtils from '../src/modules/utils';
 import helper from '../src/helper';
-import interfaces from '../src/interfaces';
+import * as interfaces from '../src/interfaces';
 
 const modules = {
 	contracts: moduleContracts,

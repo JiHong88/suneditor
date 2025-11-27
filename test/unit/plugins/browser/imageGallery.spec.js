@@ -42,7 +42,7 @@ describe('Plugins - Browser - ImageGallery', () => {
                         defaultWidth: '100%',
                         defaultHeight: 'auto'
                     },
-                    init: jest.fn(),
+                    modalInit: jest.fn(),
                     create: jest.fn()
                 }
             },
@@ -150,7 +150,7 @@ describe('Plugins - Browser - ImageGallery', () => {
                 selectorHandler(mockTarget);
 
                 expect(customHandler).toHaveBeenCalledWith(mockTarget);
-                expect(mockEditor.plugins.image.init).not.toHaveBeenCalled();
+                expect(mockEditor.plugins.image.modalInit).not.toHaveBeenCalled();
             });
         });
 
@@ -174,7 +174,7 @@ describe('Plugins - Browser - ImageGallery', () => {
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.image.init).toHaveBeenCalled();
+                expect(mockEditor.plugins.image.modalInit).toHaveBeenCalled();
                 expect(mockEditor.plugins.image.create).toHaveBeenCalledWith(
                     '/path/to/image.jpg',
                     null,

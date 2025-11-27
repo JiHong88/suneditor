@@ -73,7 +73,7 @@ class ImageGallery extends PluginBrowser {
 			this.onSelectfunction(target);
 		} else {
 			const file = { name: target.getAttribute('data-name'), size: 0 };
-			this.plugins.image.init();
+			this.plugins.image.modalInit();
 			this.plugins.image.create(target.getAttribute('data-command'), null, this.width, this.height, 'none', file, target.alt, true);
 		}
 	}

@@ -174,7 +174,7 @@ export function OnMouseMove_wysiwyg(fc, e) {
 
 	// over component
 	if (_DragHandle.get('__overInfo') !== false) {
-		this._overComponentSelect(eventTarget);
+		this.component.hoverSelect(eventTarget);
 	}
 
 	this._callPluginEvent('onMouseMove', { frameContext: fc, event: e });

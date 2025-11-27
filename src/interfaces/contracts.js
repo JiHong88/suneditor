@@ -63,7 +63,7 @@ export class ModuleModal {
 
 /**
  * Controller plugin hook methods interface.
- * `controllerAction` is required, `controllerClose` is optional.
+ * `controllerAction` is required, other methods are optional.
  * @interface
  */
 export class ModuleController {
@@ -77,7 +77,16 @@ export class ModuleController {
 
 	/**
 	 * @optional
-	 * This function is called before the "controller" before it is closed.
+	 * This function is called after the "controller" is opened.
+	 * @param {HTMLFormElement} form Controller form element
+	 * @param {Node|Range} target Controller target element
+	 * @returns {void}
+	 */
+	controllerOn(form, target) {}
+
+	/**
+	 * @optional
+	 * This function is called before the "controller" is closed.
 	 * @returns {void}
 	 */
 	controllerClose() {}
@@ -167,6 +176,12 @@ export class ModuleHueSlider {
 /**
  * Component plugin hook methods interface.
  * `componentSelect` is required, other methods are optional.
+ *
+ * **`inst._element` Requirement:**
+ * Plugins with `static component` method must define a public `_element` property
+ * that references the currently controlled DOM element.
+ * - Used to detect clicks on the target element and prevent accidental controller closure.
+ *
  * @interface
  */
 export class EditorComponent {

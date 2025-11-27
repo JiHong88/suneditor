@@ -551,6 +551,7 @@ export function createMockEditor(customOptions = {}) {
 			get: jest.fn().mockReturnValue(null),
 			select: jest.fn(),
 			deselect: jest.fn(),
+			hoverSelect: jest.fn(),
 			__deselect: jest.fn(),
 			__prevent: false,
 			__selectionSelected: false
@@ -771,7 +772,6 @@ export function createMockThis(editor = null, customProps = {}) {
 		_clearRetainStyleNodes: jest.fn(),
 		_callPluginEvent: jest.fn(),
 		_callPluginEventAsync: jest.fn().mockResolvedValue(undefined),
-		_overComponentSelect: jest.fn(),
 		__removeInput: jest.fn(),
 		__postFocusEvent: jest.fn(),
 		__postBlurEvent: jest.fn(),

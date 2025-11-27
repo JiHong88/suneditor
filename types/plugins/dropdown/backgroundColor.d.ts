@@ -40,8 +40,6 @@ declare class BackgroundColor extends PluginDropdownFree {
 	title: any;
 	colorPicker: ColorPicker;
 	active(element: HTMLElement | null, target: HTMLElement | null): boolean | void;
-	colorPickerHueSliderOpen(): void;
-	colorPickerHueSliderClose(): void;
 	colorPickerAction(color: SunEditor.Module.HueSlider.Color): void;
 }
 import { PluginDropdownFree } from '../../interfaces';

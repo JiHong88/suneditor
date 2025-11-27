@@ -396,11 +396,11 @@ describe('Modules - ColorPicker', () => {
         });
 
         it('should close hue slider', () => {
-            const offSpy = jest.spyOn(colorPicker.hueSlider, 'off');
+            const closeSpy = jest.spyOn(colorPicker.hueSlider, 'close');
 
             colorPicker.hueSliderClose();
 
-            expect(offSpy).toHaveBeenCalled();
+            expect(closeSpy).toHaveBeenCalled();
         });
 
         it('should handle hueSliderAction', () => {

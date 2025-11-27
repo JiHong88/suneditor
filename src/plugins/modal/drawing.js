@@ -149,13 +149,13 @@ class Drawing extends PluginModal {
 	async modalAction() {
 		if (this.pluginOptions.outputFormat === 'svg') {
 			const files = this.#getSVGFileList();
-			this.plugins.image.init();
+			this.plugins.image.modalInit();
 			this.plugins.image.submitFile(files);
 		} else {
 			// dataurl | svg
 			const data = this.canvas.toDataURL();
 			const file = { name: 'drawing', size: 0 };
-			this.plugins.image.init();
+			this.plugins.image.modalInit();
 			if (this.as !== 'inline') {
 				this.plugins.image.create(data, null, 'auto', '', 'none', file, '');
 			} else {

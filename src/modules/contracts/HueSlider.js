@@ -134,17 +134,31 @@ class HueSlider extends CoreInjector {
 		if (!params.isNewForm) {
 			const hueController = CreateHTML_basicControllerForm(inst.editor, className);
 			this.circle = hueController.querySelector('.se-hue');
-			this.controller = new Controller(this, hueController, { position: 'bottom', isWWTarget: false, parents: [inst.form], ...params.controllerOptions });
-
-			// buttons
-			this.eventManager.addEvent(hueController.querySelector('.se-btn-success'), 'click', () => {
-				inst.hueSliderAction?.(this.get());
-				this.close();
-			});
-			this.eventManager.addEvent(hueController.querySelector('.se-btn-danger'), 'click', () => {
-				this.close();
-			});
+			this.controller = new Controller(this, hueController, { position: 'bottom', isWWTarget: false, parents: [inst.form], parentsHide: true, ...params.controllerOptions });
 		}
+	}
+
+	/**
+	 * @hook Module.Controller
+	 * @type {SunEditor.Hook.Controller.Action}
+	 */
+	controllerAction(target) {
+		const command = target.getAttribute('data-command');
+		if (command === 'submit') {
+			this.inst.hueSliderAction?.(this.get());
+			this.close();
+		} else if (command === 'close') {
+			this.close();
+		}
+	}
+
+	/**
+	 * @hook Module.Controller
+	 * @type {SunEditor.Hook.Controller.Close}
+	 */
+	controllerClose() {
+		this.init();
+		this.inst.hueSliderCancelAction?.();
 	}
 
 	/**
@@ -165,9 +179,10 @@ class HueSlider extends CoreInjector {
 	}
 
 	/**
-	 * @description Reset information and close the hue slider.
+	 * @description Close the hue slider.
+	 * - Call the instance's hueSliderCancelAction method.
 	 */
-	off() {
+	close() {
 		this.ctx = {
 			gradientPointerX: gradientPointer.style.left,
 			wheelPointerX: wheelPointer.style.left,
@@ -175,20 +190,10 @@ class HueSlider extends CoreInjector {
 			wheelX: wheelX,
 			wheelY: wheelY,
 			lightness: LIGHTNESS,
-			color: ctx?.color || getWheelColor(wheelCtx),
+			color: ctx?.color || '',
 		};
 
 		this.controller.close();
-		this.init();
-	}
-
-	/**
-	 * @description Close the hue slider. (include off method)
-	 * - Call the instance's hueSliderCancelAction method.
-	 */
-	close() {
-		this.off();
-		this.inst.hueSliderCancelAction?.();
 	}
 
 	/**
@@ -580,8 +585,8 @@ function CreateHTML_basicControllerForm({ lang, icons }, className) {
 		/*html*/ `
 		<div class="se-hue"></div>
 		<div class="se-form-group se-form-w0 se-form-flex-btn">
-			<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
-			<button type="button" class="se-btn se-btn-danger" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
+			<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}" data-command="submit">${icons.checked}</button>
+			<button type="button" class="se-btn se-btn-danger" title="${lang.close}" aria-label="${lang.close}" data-command="close">${icons.cancel}</button>
 		</div>
 	`,
 	);

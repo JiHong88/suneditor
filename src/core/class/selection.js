@@ -156,7 +156,7 @@ Selection_.prototype = {
 
 		try {
 			so = Math.min(so, sc.textContent?.length || 0);
-			eo = Math.min(eo, ec.textContent?.length || 0);
+			eo = eo > 0 && (ec.textContent?.length || 0) === 0 && ec.nodeType === 1 ? 1 : Math.min(Math.max(eo, 0), ec.textContent?.length || 0);
 			range.setStart(sc, so);
 			range.setEnd(ec, eo);
 			this.status.hasFocus = true;

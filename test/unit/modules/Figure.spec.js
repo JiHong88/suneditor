@@ -500,15 +500,27 @@ describe('Modules - Figure', () => {
         });
 
         describe('close', () => {
-            it('should close controller and clean up', () => {
-                figure._cover = { className: 'se-figure-selected' };
-                const closeSpy = jest.spyOn(figure.controller, 'close');
+            it('should close controller and clean up when controller exists', () => {
+                // Create figure with controls array to have a controller
+                // controls should be an array of button groups, e.g., [['edit', 'remove']]
+                const controlsWithButtons = [['edit', 'remove']];
+                const figureWithController = new Figure(mockInst, controlsWithButtons, {});
+                figureWithController._cover = { className: 'se-figure-selected' };
 
-                figure.close();
+                const closeSpy = jest.spyOn(figureWithController.controller, 'close');
 
-                expect(mockEditor._preventBlur).toBe(false);
+                figureWithController.close();
+
                 expect(closeSpy).toHaveBeenCalled();
-                expect(figure.component._removeDragEvent).toHaveBeenCalled();
+            });
+
+            it('should handle close when controller is null', () => {
+                // Figure without controls has no controller
+                figure._cover = { className: 'se-figure-selected' };
+
+                expect(() => {
+                    figure.close();
+                }).not.toThrow();
             });
         });
 
@@ -636,9 +648,6 @@ describe('Modules - Figure', () => {
                 mockElement.style.transformOrigin = '50% 50%';
                 mockElement.setAttribute('data-se-size', '100,50');
 
-                jest.spyOn(figure, '_deleteCaptionPosition').mockImplementation();
-                jest.spyOn(figure, '_applySize').mockImplementation();
-
                 figure.deleteTransform(mockElement);
 
                 expect(mockElement.style.transform).toBe('');
@@ -648,8 +657,6 @@ describe('Modules - Figure', () => {
 
             it('should reset maxWidth', () => {
                 mockElement.style.maxWidth = '500px';
-                jest.spyOn(figure, '_deleteCaptionPosition').mockImplementation();
-                jest.spyOn(figure, '_applySize').mockImplementation();
 
                 figure.deleteTransform(mockElement);
 
@@ -660,7 +667,6 @@ describe('Modules - Figure', () => {
         describe('setTransform', () => {
             it('should set transform rotation', () => {
                 jest.spyOn(figure, '_setRotate').mockImplementation();
-                jest.spyOn(figure, '_setCaptionPosition').mockImplementation();
 
                 figure.setTransform(mockElement, 100, 50, 90);
 
@@ -670,7 +676,6 @@ describe('Modules - Figure', () => {
 
             it('should handle zero degree rotation', () => {
                 jest.spyOn(figure, '_setRotate').mockImplementation();
-                jest.spyOn(figure, '_setCaptionPosition').mockImplementation();
 
                 figure.setTransform(mockElement, 100, 50, 0);
 
@@ -679,7 +684,6 @@ describe('Modules - Figure', () => {
 
             it('should handle 360 degree rotation', () => {
                 jest.spyOn(figure, '_setRotate').mockImplementation();
-                jest.spyOn(figure, '_setCaptionPosition').mockImplementation();
 
                 figure.setTransform(mockElement, 100, 50, 360);
 
@@ -718,22 +722,37 @@ describe('Modules - Figure', () => {
         });
 
         describe('controllerOpen', () => {
-            it('should set element and open controller', () => {
-                const openSpy = jest.spyOn(figure.controller, 'open');
+            it('should set element and open controller when controller exists', () => {
+                // Create figure with controls array to have a controller
+                const controlsWithButtons = [['edit', 'remove']];
+                const figureWithController = new Figure(mockInst, controlsWithButtons, {});
 
-                figure.controllerOpen(mockElement, {});
+                const openSpy = jest.spyOn(figureWithController.controller, 'open');
 
-                expect(figure._element).toBe(mockElement);
+                figureWithController.controllerOpen(mockElement, {});
+
+                expect(figureWithController._element).toBe(mockElement);
                 expect(openSpy).toHaveBeenCalledWith(mockElement, null, {});
             });
 
-            it('should handle params', () => {
-                const params = { disabled: true };
-                const openSpy = jest.spyOn(figure.controller, 'open');
+            it('should handle params when controller exists', () => {
+                // Create figure with controls array to have a controller
+                const controlsWithButtons = [['edit', 'remove']];
+                const figureWithController = new Figure(mockInst, controlsWithButtons, {});
 
-                figure.controllerOpen(mockElement, params);
+                const params = { disabled: true };
+                const openSpy = jest.spyOn(figureWithController.controller, 'open');
+
+                figureWithController.controllerOpen(mockElement, params);
 
                 expect(openSpy).toHaveBeenCalledWith(mockElement, null, params);
+            });
+
+            it('should handle controllerOpen when controller is null', () => {
+                figure.controllerOpen(mockElement, {});
+
+                expect(figure._element).toBe(mockElement);
+                // Should not throw
             });
         });
 
@@ -762,12 +781,14 @@ describe('Modules - Figure', () => {
                 const button = {
                     getAttribute: jest.fn().mockReturnValue('remove')
                 };
-                const closeSpy = jest.spyOn(figure.controller, 'close');
+
+                // Mock controller for remove action (remove calls controller.close())
+                figure.controller = { close: jest.fn() };
 
                 figure.controllerAction(button);
 
                 expect(figure.inst.componentDestroy).toHaveBeenCalledWith(mockElement);
-                expect(closeSpy).toHaveBeenCalled();
+                expect(figure.controller.close).toHaveBeenCalled();
             });
 
             it('should handle revert action', () => {

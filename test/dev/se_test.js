@@ -859,7 +859,7 @@ const options1 = {
 	},
 	table: {
 		scrollType: 'x',
-		// cellControllerPosition: 'cell',
+		cellControllerPosition: 'cell',
 	},
 	fontColor: {
 		// disableHEXInput: true,

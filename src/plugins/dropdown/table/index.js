@@ -209,21 +209,21 @@ class Table extends PluginDropdownFree {
 		const splitMenu = CreateSplitMenu(this.lang);
 		this.splitButton = controller_cell.splitButton;
 		this.selectMenu_split = new SelectMenu(this, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
-		this.selectMenu_split.on(this.splitButton, this.#OnSplitCells.bind(this));
+		this.selectMenu_split.on(this.splitButton, this._OnSplitCells.bind(this));
 		this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 
 		// members - SelectMenu - column
 		const columnMenu = CreateColumnMenu(this.lang, this.icons);
 		const columnButton = controller_cell.columnButton;
 		this.selectMenu_column = new SelectMenu(this, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
-		this.selectMenu_column.on(columnButton, this.#OnColumnEdit.bind(this));
+		this.selectMenu_column.on(columnButton, this._OnColumnEdit.bind(this));
 		this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
 
 		// members - SelectMenu - row
 		const rownMenu = CreateRowMenu(this.lang, this.icons);
 		const rowButton = controller_cell.rowButton;
 		this.selectMenu_row = new SelectMenu(this, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
-		this.selectMenu_row.on(rowButton, this.#OnRowEdit.bind(this));
+		this.selectMenu_row.on(rowButton, this._OnRowEdit.bind(this));
 		this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 
 		// members - SelectMenu - properties - border style
@@ -356,7 +356,7 @@ class Table extends PluginDropdownFree {
 	 * @type {PluginDropdownFree['off']}
 	 */
 	off() {
-		this._resetTablePicker();
+		this.#resetTablePicker();
 	}
 
 	/**
@@ -364,7 +364,7 @@ class Table extends PluginDropdownFree {
 	 * @type {SunEditor.Hook.Component.Select}
 	 */
 	componentSelect(target) {
-		this._figureOpen(target);
+		this.#figureOpen(target);
 		if (!this.#figure) this.setTableInfo(target);
 
 		this.#maxWidth = this.#figure?.style.width === '100%';
@@ -389,6 +389,14 @@ class Table extends PluginDropdownFree {
 
 	/**
 	 * @hook Editor.Component
+	 * @type {SunEditor.Hook.Component.Deselect}
+	 */
+	componentDeselect() {
+		this.resetSelectInfo();
+	}
+
+	/**
+	 * @hook Editor.Component
 	 * @type {SunEditor.Hook.Component.Destroy}
 	 */
 	componentDestroy(target) {
@@ -397,7 +405,7 @@ class Table extends PluginDropdownFree {
 		const emptyDiv = target.parentNode;
 		dom.utils.removeItem(target);
 
-		this._closeTableSelectInfo();
+		this.#closeTableSelectInfo();
 
 		if (emptyDiv !== this.frameContext.get('wysiwyg'))
 			this.nodeTransform.removeAllParents(
@@ -560,8 +568,8 @@ class Table extends PluginDropdownFree {
 	 * @type {SunEditor.Hook.Core.SetDir}
 	 */
 	setDir() {
-		this._resetTablePicker();
-		this._resetPropsAlign();
+		this.#resetTablePicker();
+		this.#resetPropsAlign();
 	}
 
 	/**
@@ -574,35 +582,35 @@ class Table extends PluginDropdownFree {
 		const eventTarget = dom.query.getEventTarget(event);
 		const target = dom.query.getParentElement(eventTarget, IsResizeEls);
 		if (!target || event.buttons === 1) {
-			this.__hideResizeLine();
+			this.#hideResizeLine();
 			return;
 		}
 
 		const cellEdge = CheckCellEdge(event, target);
 		if (cellEdge.is) {
 			if (this._element) this._element.style.cursor = '';
-			this.__removeGlobalEvents();
+			this.#removeGlobalEvents();
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
 			this.#resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
-			this._setResizeLinePosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine, cellEdge.isLeft);
+			this.#setResizeLinePosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine, cellEdge.isLeft);
 			this.#resizeLine.style.display = 'block';
 			return;
 		}
 
 		const rowEdge = CheckRowEdge(event, target);
 		if (rowEdge.is) {
-			this.__removeGlobalEvents();
+			this.#removeGlobalEvents();
 			this._element = dom.query.getParentElement(target, dom.check.isTable);
 			this._element.style.cursor = 'ns-resize';
 			if (this.#resizeLine?.style.display === 'block') this.#resizeLine.style.display = 'none';
 			this.#resizeLine = this.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
-			this._setResizeRowPosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine);
+			this.#setResizeRowPosition(dom.query.getParentElement(target, dom.check.isTable), target, this.#resizeLine);
 			this.#resizeLine.style.display = 'block';
 			return;
 		}
 
 		if (this._element) this._element.style.cursor = '';
-		this.__hideResizeLine();
+		this.#hideResizeLine();
 	}
 
 	/**
@@ -633,7 +641,7 @@ class Table extends PluginDropdownFree {
 		const cellEdge = CheckCellEdge(event, target);
 		if (cellEdge.is) {
 			try {
-				this._deleteStyleSelectedCells();
+				this.#deleteStyleSelectedCells();
 				this.setCellInfo(target, true);
 				const colIndex = this.#logical_cellIndex + this.#current_colSpan - (cellEdge.isLeft ? 1 : 0);
 
@@ -645,17 +653,21 @@ class Table extends PluginDropdownFree {
 				// select figure
 				if (colIndex < 0 || colIndex === this.#logical_cellCnt - 1) {
 					this._startFigureResizing(cellEdge.startX, colIndex < 0);
+					this.#toggleEditor(false);
 					return;
 				}
 
 				const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
 				this._startCellResizing(col, cellEdge.startX, numbers.get(_w.getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
-				this._toggleEditor(false);
+				this.#toggleEditor(false);
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
-				this.__removeGlobalEvents();
+				this.#toggleEditor(true);
+				this.#removeGlobalEvents();
 			} finally {
 				this.#fixedCell = this.#selectedCell = null;
+				this.controller_table.hide();
+				this.controller_cell.hide();
 			}
 
 			return;
@@ -674,7 +686,7 @@ class Table extends PluginDropdownFree {
 					}
 				}
 
-				this._deleteStyleSelectedCells();
+				this.#deleteStyleSelectedCells();
 				this.setRowInfo(row);
 
 				// ready
@@ -683,12 +695,15 @@ class Table extends PluginDropdownFree {
 				this.#resizeLinePrev = this.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
 
 				this._startRowResizing(row, rowEdge.startY, numbers.get(_w.getComputedStyle(row).height, CELL_DECIMAL_END));
-				this._toggleEditor(false);
+				this.#toggleEditor(false);
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
-				this.__removeGlobalEvents();
+				this.#toggleEditor(true);
+				this.#removeGlobalEvents();
 			} finally {
 				this.#fixedCell = this.#selectedCell = null;
+				this.controller_table.hide();
+				this.controller_cell.hide();
 			}
 
 			return;
@@ -696,7 +711,7 @@ class Table extends PluginDropdownFree {
 
 		if (this.#shift && target !== this.#fixedCell) return;
 
-		this._deleteStyleSelectedCells();
+		this.#deleteStyleSelectedCells();
 		if (/^TR$/i.test(target.nodeName)) return;
 
 		this.#StyleSelectCells(target, false);
@@ -708,9 +723,6 @@ class Table extends PluginDropdownFree {
 	 */
 	onMouseUp() {
 		this.#shift = false;
-		if (this.cellControllerTop && this.controller_cell.isOpen) {
-			this.controller_cell.resetPosition(this.#fixedCell);
-		}
 	}
 
 	/**
@@ -718,7 +730,7 @@ class Table extends PluginDropdownFree {
 	 * @type {SunEditor.Hook.Event.OnMouseLeave}
 	 */
 	onMouseLeave() {
-		this.__hideResizeLine();
+		this.#hideResizeLine();
 	}
 
 	/**
@@ -740,10 +752,10 @@ class Table extends PluginDropdownFree {
 
 		// table tabkey
 		if (isTab) {
-			this._deleteStyleSelectedCells();
+			this.#deleteStyleSelectedCells();
 			const tableCell = dom.query.getParentElement(line, dom.check.isTableCell);
 			if (tableCell && range.collapsed && dom.check.isEdgePoint(range.startContainer, range.startOffset)) {
-				this._closeController();
+				this.#closeController();
 
 				const shift = this.#_s;
 				this.#shift = this.#_s = false;
@@ -788,10 +800,10 @@ class Table extends PluginDropdownFree {
 			cell = dom.query.getParentElement(line, dom.check.isTableCell);
 			if (!dom.utils.hasClass(cell, 'se-selected-cell-focus')) return;
 
-			this._deleteStyleSelectedCells();
-			this._toggleEditor(true);
-			this.__removeGlobalEvents();
-			this._closeController();
+			this.#deleteStyleSelectedCells();
+			this.#toggleEditor(true);
+			this.#removeGlobalEvents();
+			this.#closeController();
 
 			return;
 		}
@@ -802,7 +814,7 @@ class Table extends PluginDropdownFree {
 		if (cell) {
 			this.#_s = false;
 			this.#fixedCell = cell;
-			this._closeController();
+			this.#closeController();
 			this.#StyleSelectCells(cell, event.shiftKey);
 			return false;
 		}
@@ -815,9 +827,9 @@ class Table extends PluginDropdownFree {
 	onKeyUp({ line }) {
 		this.#_s = false;
 		if (this.#shift && dom.query.getParentElement(line, dom.check.isTableCell) === this.#fixedCell) {
-			this._deleteStyleSelectedCells();
-			this._toggleEditor(true);
-			this.__removeGlobalEvents();
+			this.#deleteStyleSelectedCells();
+			this.#toggleEditor(true);
+			this.#removeGlobalEvents();
 		}
 		this.#shift = false;
 	}
@@ -867,7 +879,7 @@ class Table extends PluginDropdownFree {
 					this.controller_props.close();
 				} else {
 					this.controller_props_title.textContent = this.lang.tableProperties;
-					this._setCtrlProps('table');
+					this.#setCtrlProps('table');
 					this.controller_props.open(target, this.controller_table.form, { isWWTarget: false, initMethod: null, addOffset: null });
 				}
 				break;
@@ -876,7 +888,7 @@ class Table extends PluginDropdownFree {
 					this.controller_props.close();
 				} else {
 					this.controller_props_title.textContent = this.lang.cellProperties;
-					this._setCtrlProps('cell');
+					this.#setCtrlProps('cell');
 					this.controller_props.open(target, this.controller_cell.form, { isWWTarget: false, initMethod: null, addOffset: null });
 				}
 				break;
@@ -891,7 +903,7 @@ class Table extends PluginDropdownFree {
 				this.selectMenu_props_border.open();
 				break;
 			case 'props_onpalette':
-				this._onColorPalette(target, value, value === 'border' ? border_color : value === 'back' ? back_color : font_color);
+				this.#onColorPalette(target, value, value === 'border' ? border_color : value === 'back' ? back_color : font_color);
 				break;
 			case 'props_font_style':
 				dom.utils.toggleClass(this.propTargets[`font_${value}`], 'on');
@@ -905,18 +917,18 @@ class Table extends PluginDropdownFree {
 					propsCache[i][0].style.cssText = propsCache[i][1];
 				}
 				// alignment
-				this._setAlignProps(this.propTargets.cell_alignment, this._propsAlignCache, true);
-				this._setAlignProps(this.propTargets.cell_alignment_vertical, this._propsVerticalAlignCache, true);
+				this.#setAlignProps(this.propTargets.cell_alignment, this._propsAlignCache, true);
+				this.#setAlignProps(this.propTargets.cell_alignment_vertical, this._propsVerticalAlignCache, true);
 				if (dom.check.isTable(propsCache[0][0]) && this.#figure) {
 					this.#figure.style.float = this._propsAlignCache;
 				}
 				break;
 			}
 			case 'props_align':
-				this._setAlignProps(this.propTargets.cell_alignment, target.getAttribute('data-value'), false);
+				this.#setAlignProps(this.propTargets.cell_alignment, target.getAttribute('data-value'), false);
 				break;
 			case 'props_align_vertical':
-				this._setAlignProps(this.propTargets.cell_alignment_vertical, target.getAttribute('data-value'), false);
+				this.#setAlignProps(this.propTargets.cell_alignment_vertical, target.getAttribute('data-value'), false);
 				break;
 			case 'merge':
 				this.mergeCells(this.#selectedCells);
@@ -960,13 +972,13 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @hook Modules.Controller
-	 * @type {SunEditor.Hook.Controller.Close}
+	 * @description Resets the internal state related to table cell selection,
+	 * - clearing any selected cells and removing associated styles and event listeners.
 	 */
-	controllerClose() {
-		this.__removeGlobalEvents();
-		this._deleteStyleSelectedCells();
-		this._toggleEditor(true);
+	resetSelectInfo() {
+		this.#removeGlobalEvents();
+		this.#deleteStyleSelectedCells();
+		this.#toggleEditor(true);
 
 		this._element = null;
 		this.#figure = null;
@@ -1166,7 +1178,7 @@ class Table extends PluginDropdownFree {
 				} else if (!tableAttr.nextElementSibling || !/^TBODY$/i.test(tableAttr.nextElementSibling.nodeName)) {
 					if (!option) {
 						dom.utils.removeItem(this.#figure);
-						this._closeTableSelectInfo();
+						this.#closeTableSelectInfo();
 					} else {
 						table.innerHTML += '<tbody><tr>' + CreateCellsString('td', this.#logical_cellCnt) + '</tr></tbody>';
 					}
@@ -1239,7 +1251,7 @@ class Table extends PluginDropdownFree {
 				}
 			}
 
-			if (!option) this.controllerClose();
+			if (!option) this.resetSelectInfo();
 		} // one
 		else {
 			this[isRow ? 'editRow' : 'editCell'](option);
@@ -1269,7 +1281,7 @@ class Table extends PluginDropdownFree {
 	 * @param {?HTMLTableCellElement} [positionResetElement] The element to reset the position of (optional). This can be the cell that triggered the row edit.
 	 */
 	editRow(option, targetCell, positionResetElement) {
-		this._deleteStyleSelectedCells();
+		this.#deleteStyleSelectedCells();
 		if (targetCell) this.setCellInfo(targetCell, true);
 
 		const remove = !option;
@@ -1352,7 +1364,7 @@ class Table extends PluginDropdownFree {
 		if (!remove) {
 			this._setCellControllerPosition(positionResetElement || this.#tdElement, true);
 		} else {
-			this._closeController();
+			this.#closeController();
 		}
 	}
 
@@ -1528,7 +1540,7 @@ class Table extends PluginDropdownFree {
 				rowSpanCell.cell.rowSpan = numbers.getOverlapRangeAtIndex(removeFirst, removeEnd, rowSpanCell.i, rowSpanCell.rs);
 			}
 
-			this._closeController();
+			this.#closeController();
 		} else {
 			this._setCellControllerPosition(positionResetElement || this.#tdElement, true);
 		}
@@ -1590,9 +1602,9 @@ class Table extends PluginDropdownFree {
 		};
 
 		// --- target info ---
-		this._deleteStyleSelectedCells();
+		this.#deleteStyleSelectedCells();
 		const originTable = targetTD.closest('table');
-		const { cloneTable, clonedSelectedCells } = this.#cloneTable(originTable, [targetTD]);
+		const { cloneTable, clonedSelectedCells } = this._cloneTable(originTable, [targetTD]);
 
 		const targetTable = cloneTable;
 		targetTD = clonedSelectedCells[0];
@@ -1821,7 +1833,7 @@ class Table extends PluginDropdownFree {
 
 		// replace table
 		originTable.replaceWith(targetTable);
-		this._closeTableSelectInfo();
+		this.#closeTableSelectInfo();
 		this.setTableInfo(targetTable);
 
 		// select cell
@@ -1855,7 +1867,7 @@ class Table extends PluginDropdownFree {
 	 */
 	mergeCells(selectedCells, skipPostProcess = false) {
 		const originTable = selectedCells[0].closest('table');
-		const { cloneTable, clonedSelectedCells } = skipPostProcess ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this.#cloneTable(originTable, selectedCells);
+		const { cloneTable, clonedSelectedCells } = skipPostProcess ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this._cloneTable(originTable, selectedCells);
 
 		this.setTableInfo(cloneTable);
 		selectedCells = clonedSelectedCells;
@@ -1928,7 +1940,7 @@ class Table extends PluginDropdownFree {
 
 		// replace table
 		originTable.replaceWith(cloneTable);
-		this._closeTableSelectInfo();
+		this.#closeTableSelectInfo();
 
 		this.#setMergeSplitButton();
 		this._setController(mergeCell);
@@ -1948,7 +1960,7 @@ class Table extends PluginDropdownFree {
 		if (!selectedCells?.length) return;
 
 		const originTable = selectedCells[0].closest('table');
-		const { cloneTable, clonedSelectedCells } = skipPostProcess ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this.#cloneTable(originTable, selectedCells);
+		const { cloneTable, clonedSelectedCells } = skipPostProcess ? { cloneTable: originTable, clonedSelectedCells: selectedCells } : this._cloneTable(originTable, selectedCells);
 
 		this.#ref = null;
 		this.setTableInfo(cloneTable);
@@ -2000,7 +2012,7 @@ class Table extends PluginDropdownFree {
 
 		// replace table
 		originTable.replaceWith(cloneTable);
-		this._closeTableSelectInfo();
+		this.#closeTableSelectInfo();
 		this.setTableInfo(cloneTable);
 
 		// set info
@@ -2056,7 +2068,7 @@ class Table extends PluginDropdownFree {
 		dom.utils.toggleClass(btn, 'active');
 
 		if (/TH/i.test(this.#tdElement.nodeName)) {
-			this._closeController();
+			this.#closeController();
 		} else {
 			this._setCellControllerPosition(this.#tdElement, false);
 		}
@@ -2151,7 +2163,7 @@ class Table extends PluginDropdownFree {
 	 */
 	_setController(tdElement) {
 		if (!this.selection.get().isCollapsed && !this.#selectedCell) {
-			this._deleteStyleSelectedCells();
+			this.#deleteStyleSelectedCells();
 			return;
 		}
 
@@ -2180,26 +2192,24 @@ class Table extends PluginDropdownFree {
 	 * @description Adds a new entry to the history stack.
 	 */
 	_historyPush() {
-		this._deleteStyleSelectedCells();
+		this.#deleteStyleSelectedCells();
 		this.history.push(false);
-		this._recallStyleSelectedCells();
+		this.#recallStyleSelectedCells();
 	}
 
 	/**
-	 * @private
 	 * @description Opens the figure.
 	 * @param {Node} target - The target figure element.
 	 */
-	_figureOpen(target) {
+	#figureOpen(target) {
 		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, infoOnly: false });
 	}
 
 	/**
-	 * @private
 	 * @description Converts the width of <col> elements to percentages.
 	 * @param {HTMLTableElement} target - The target table element.
 	 */
-	_resizePercentCol(target) {
+	#resizePercentCol(target) {
 		const cols = target.querySelector('colgroup').querySelectorAll('col');
 		const tableTotalWidth = target.offsetWidth;
 
@@ -2223,8 +2233,10 @@ class Table extends PluginDropdownFree {
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
-		this._resizePercentCol(this._element);
-		this._setResizeLinePosition(this.#figure, this.#tdElement, this.#resizeLinePrev, isLeftEdge);
+		dom.utils.removeClass(this.#figure, 'se-component-selected');
+
+		this.#resizePercentCol(this._element);
+		this.#setResizeLinePosition(this.#figure, this.#tdElement, this.#resizeLinePrev, isLeftEdge);
 		this.#resizeLinePrev.style.display = 'block';
 		const prevValue = col.style.width;
 		const nextCol = /** @type {HTMLElement} */ (col.nextElementSibling);
@@ -2232,8 +2244,8 @@ class Table extends PluginDropdownFree {
 		const realWidth = dom.utils.hasClass(this._element, 'se-table-layout-fixed') ? nextColPrevValue : converter.getWidthInPercentage(nextCol || col);
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
-		this._addResizeGlobalEvents(
-			this._cellResize.bind(
+		this.#addResizeGlobalEvents(
+			this.#cellResize.bind(
 				this,
 				col,
 				nextCol,
@@ -2248,10 +2260,11 @@ class Table extends PluginDropdownFree {
 				this._element.offsetWidth,
 			),
 			() => {
-				this.__removeGlobalEvents();
-				this._resizePercentCol(this._element);
+				this.#removeGlobalEvents();
+				this.#resizePercentCol(this._element);
 				this.history.push(true);
-				this.component.select(this._element, Table.key, { isInput: true });
+				this.component.hoverSelect(this._element);
+				this.#toggleEditor(true);
 			},
 			(e) => {
 				this._stopResize(col, prevValue, 'width', e);
@@ -2261,7 +2274,6 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Resizes a table cell.
 	 * @param {HTMLElement} col The column element.
 	 * @param {HTMLElement} nextCol The next column element.
@@ -2276,7 +2288,7 @@ class Table extends PluginDropdownFree {
 	 * @param {number} tableWidth The total width of the table.
 	 * @param {MouseEvent} e The mouse event.
 	 */
-	_cellResize(col, nextCol, figure, tdEl, resizeLine, isLeftEdge, startX, startWidth, prevWidthPercent, nextColWidthPercent, tableWidth, e) {
+	#cellResize(col, nextCol, figure, tdEl, resizeLine, isLeftEdge, startX, startWidth, prevWidthPercent, nextColWidthPercent, tableWidth, e) {
 		const deltaX = e.clientX - startX;
 		const newWidthPx = startWidth + deltaX;
 		const newWidthPercent = (newWidthPx / tableWidth) * 100;
@@ -2285,7 +2297,7 @@ class Table extends PluginDropdownFree {
 			col.style.width = `${newWidthPercent}%`;
 			const delta = prevWidthPercent - newWidthPercent;
 			nextCol.style.width = `${nextColWidthPercent + delta}%`;
-			this._setResizeLinePosition(figure, tdEl, resizeLine, isLeftEdge);
+			this.#setResizeLinePosition(figure, tdEl, resizeLine, isLeftEdge);
 		}
 	}
 
@@ -2297,22 +2309,26 @@ class Table extends PluginDropdownFree {
 	 * @param {number} startHeight The initial height of the row.
 	 */
 	_startRowResizing(row, startY, startHeight) {
-		this._setResizeRowPosition(this.#figure, row, this.#resizeLinePrev);
+		dom.utils.removeClass(this.#figure, 'se-component-selected');
+
+		this.#setResizeRowPosition(this.#figure, row, this.#resizeLinePrev);
 		this.#resizeLinePrev.style.display = 'block';
 		const prevValue = row.style.height;
 
-		this._addResizeGlobalEvents(
-			this._rowResize.bind(this, row, this.#figure, this.#resizeLine, startY, startHeight),
+		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
+		this.#addResizeGlobalEvents(
+			this.#rowResize.bind(this, row, this.#figure, this.#resizeLine, startY, startHeight),
 			() => {
-				this.__removeGlobalEvents();
+				this.#removeGlobalEvents();
 				this.history.push(true);
+				this.component.hoverSelect(this._element);
+				this.#toggleEditor(true);
 			},
 			this._stopResize.bind(this, row, prevValue, 'height'),
 		);
 	}
 
 	/**
-	 * @private
 	 * @description Resizes a table row.
 	 * @param {HTMLElement} row The table row element.
 	 * @param {HTMLElement} figure The table figure element.
@@ -2321,11 +2337,11 @@ class Table extends PluginDropdownFree {
 	 * @param {number} startHeight The initial height of the row.
 	 * @param {MouseEvent} e The mouse event.
 	 */
-	_rowResize(row, figure, resizeLine, startY, startHeight, e) {
+	#rowResize(row, figure, resizeLine, startY, startHeight, e) {
 		const deltaY = e.clientY - startY;
 		const newHeightPx = startHeight + deltaY;
 		row.style.height = `${newHeightPx}px`;
-		this._setResizeRowPosition(figure, row, resizeLine);
+		this.#setResizeRowPosition(figure, row, resizeLine);
 	}
 
 	/**
@@ -2336,25 +2352,27 @@ class Table extends PluginDropdownFree {
 	 */
 	_startFigureResizing(startX, isLeftEdge) {
 		const figure = this.#figure;
-		this._setResizeLinePosition(figure, figure, this.#resizeLinePrev, isLeftEdge);
+		dom.utils.removeClass(figure, 'se-component-selected');
+
+		this.#setResizeLinePosition(figure, figure, this.#resizeLinePrev, isLeftEdge);
 		this.#resizeLinePrev.style.display = 'block';
 		const realWidth = converter.getWidthInPercentage(figure);
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
-		this._addResizeGlobalEvents(
-			this._figureResize.bind(this, figure, this.#resizeLine, isLeftEdge, startX, figure.offsetWidth, numbers.get(realWidth, CELL_DECIMAL_END)),
+		this.#addResizeGlobalEvents(
+			this.#figureResize.bind(this, figure, this.#resizeLine, isLeftEdge, startX, figure.offsetWidth, numbers.get(realWidth, CELL_DECIMAL_END)),
 			() => {
-				this.__removeGlobalEvents();
+				this.#removeGlobalEvents();
 				if (numbers.get(figure.style.width, 0) > 100) figure.style.width = '100%';
-				// figure reopen
-				this.component.select(this._element, Table.key, { isInput: true });
+				this.history.push(true);
+				this.component.hoverSelect(this._element);
+				this.#toggleEditor(true);
 			},
 			this._stopResize.bind(this, figure, figure.style.width, 'width'),
 		);
 	}
 
 	/**
-	 * @private
 	 * @description Resizes the table figure.
 	 * @param {HTMLElement} figure The table figure element.
 	 * @param {HTMLElement} resizeLine The resize line element.
@@ -2364,26 +2382,25 @@ class Table extends PluginDropdownFree {
 	 * @param {number} constNum A constant number used for width calculation.
 	 * @param {MouseEvent} e The mouse event.
 	 */
-	_figureResize(figure, resizeLine, isLeftEdge, startX, startWidth, constNum, e) {
+	#figureResize(figure, resizeLine, isLeftEdge, startX, startWidth, constNum, e) {
 		const deltaX = isLeftEdge ? startX - e.clientX : e.clientX - startX;
 		const newWidthPx = startWidth + deltaX;
 		const newWidthPercent = (newWidthPx / startWidth) * constNum;
 
 		if (newWidthPercent > 0) {
 			figure.style.width = `${newWidthPercent}%`;
-			this._setResizeLinePosition(figure, figure, resizeLine, isLeftEdge);
+			this.#setResizeLinePosition(figure, figure, resizeLine, isLeftEdge);
 		}
 	}
 
 	/**
-	 * @private
 	 * @description Sets the resize line position.
 	 * @param {HTMLElement} figure The table figure element.
 	 * @param {HTMLElement} target The target element.
 	 * @param {HTMLElement} resizeLine The resize line element.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
-	_setResizeLinePosition(figure, target, resizeLine, isLeftEdge) {
+	#setResizeLinePosition(figure, target, resizeLine, isLeftEdge) {
 		const tdOffset = this.offset.getLocal(target);
 		const tableOffset = this.offset.getLocal(figure);
 		resizeLine.style.left = `${tdOffset.left + (isLeftEdge ? 0 : target.offsetWidth)}px`;
@@ -2392,13 +2409,12 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Sets the resize row position.
 	 * @param {HTMLElement} figure The table figure element.
 	 * @param {HTMLElement} target The target row element.
 	 * @param {HTMLElement} resizeLine The resize line element.
 	 */
-	_setResizeRowPosition(figure, target, resizeLine) {
+	#setResizeRowPosition(figure, target, resizeLine) {
 		const rowOffset = this.offset.getLocal(target);
 		const tableOffset = this.offset.getLocal(figure);
 		resizeLine.style.top = `${rowOffset.top + target.offsetHeight}px`;
@@ -2416,7 +2432,9 @@ class Table extends PluginDropdownFree {
 	 */
 	_stopResize(target, prevValue, styleProp, e) {
 		if (!keyCodeMap.isEsc(e.code)) return;
-		this.__removeGlobalEvents();
+		this.#removeGlobalEvents();
+		this.component.hoverSelect(this._element);
+		this.#toggleEditor(true);
 		target.style[styleProp] = prevValue;
 		// figure reopen
 		if (styleProp === 'width') {
@@ -2425,10 +2443,9 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Deletes styles from selected table cells.
 	 */
-	_deleteStyleSelectedCells() {
+	#deleteStyleSelectedCells() {
 		dom.utils.removeClass([this.#fixedCell, this.#selectedCell], 'se-selected-cell-focus');
 		const table = this.#fixedCell?.closest('table');
 		if (table) {
@@ -2440,10 +2457,9 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Restores styles for selected table cells.
 	 */
-	_recallStyleSelectedCells() {
+	#recallStyleSelectedCells() {
 		if (this.#selectedCells) {
 			const selectedCells = this.#selectedCells;
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
@@ -2453,13 +2469,12 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Adds global event listeners for resizing.
 	 * @param {(...args: *) => void} resizeFn The function handling the resize event.
 	 * @param {(...args: *) => void} stopFn The function handling the stop event.
 	 * @param {(...args: *) => void} keyDownFn The function handling the keydown event.
 	 */
-	_addResizeGlobalEvents(resizeFn, stopFn, keyDownFn) {
+	#addResizeGlobalEvents(resizeFn, stopFn, keyDownFn) {
 		this.#globalEvents.resize = this.eventManager.addGlobalEvent('mousemove', resizeFn, false);
 		this.#globalEvents.resizeStop = this.eventManager.addGlobalEvent('mouseup', stopFn, false);
 		this.#globalEvents.resizeKeyDown = this.eventManager.addGlobalEvent('keydown', keyDownFn, false);
@@ -2467,11 +2482,10 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Enables or disables editor mode.
 	 * @param {boolean} enabled Whether to enable or disable the editor.
 	 */
-	_toggleEditor(enabled) {
+	#toggleEditor(enabled) {
 		const wysiwyg = this.frameContext.get('wysiwyg');
 		wysiwyg.setAttribute('contenteditable', enabled.toString());
 		if (enabled) dom.utils.removeClass(wysiwyg, 'se-disabled');
@@ -2479,19 +2493,18 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Updates control properties.
 	 * @param {string} type The type of control property.
 	 */
-	_setCtrlProps(type) {
+	#setCtrlProps(type) {
 		this._typeCache = type;
 		const isTable = type === 'table';
 		const targets = isTable ? [this._element] : this.#selectedCells;
-		if (!targets || targets.length === 0) return;
+		if (!targets?.[0]) return;
 
 		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, cell_alignment_table_text, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
 		const { border, backgroundColor, color, textAlign, verticalAlign, fontWeight, textDecoration, fontStyle } = _w.getComputedStyle(targets[0]);
-		const cellBorder = this._getBorderStyle(border);
+		const cellBorder = this.#getBorderStyle(border);
 
 		/** @type {HTMLElement} */ (cell_alignment.querySelector('[data-value="justify"]')).style.display = isTable ? 'none' : '';
 		cell_alignment_table_text.style.display = isTable ? '' : 'none';
@@ -2518,7 +2531,7 @@ class Table extends PluginDropdownFree {
 			this._propsCache.push([t, cssText]);
 			if (isBreak) continue;
 
-			const { c, s, w } = this._getBorderStyle(border);
+			const { c, s, w } = this.#getBorderStyle(border);
 
 			// colors
 			let hexBackColor = backgroundColor;
@@ -2571,18 +2584,17 @@ class Table extends PluginDropdownFree {
 		if (italic) dom.utils.addClass(font_italic, 'on');
 
 		// align
-		this._setAlignProps(cell_alignment, (this._propsAlignCache = align), true);
-		this._setAlignProps(cell_alignment_vertical, (this._propsVerticalAlignCache = align_v), true);
+		this.#setAlignProps(cell_alignment, (this._propsAlignCache = align), true);
+		this.#setAlignProps(cell_alignment_vertical, (this._propsVerticalAlignCache = align_v), true);
 	}
 
 	/**
-	 * @private
 	 * @description Sets text alignment properties.
 	 * @param {Element} el The element to apply alignment to.
 	 * @param {string} align The alignment value.
 	 * @param {boolean} reset Whether to reset the alignment.
 	 */
-	_setAlignProps(el, align, reset) {
+	#setAlignProps(el, align, reset) {
 		dom.utils.removeClass(el.querySelectorAll('button'), 'on');
 
 		if (!reset && el.getAttribute('se-cell-align') === align) {
@@ -2615,7 +2627,6 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Gets the border style.
 	 * @param {string} borderStyle The border style string.
 	 * @returns {{w: string, s: string, c: string}} The parsed border style object.
@@ -2623,7 +2634,7 @@ class Table extends PluginDropdownFree {
 	 * - s: The border style.
 	 * - c: The border color.
 	 */
-	_getBorderStyle(borderStyle) {
+	#getBorderStyle(borderStyle) {
 		const parts = borderStyle.split(/\s(?![^()]*\))/);
 		let w = '',
 			s = '',
@@ -2754,7 +2765,7 @@ class Table extends PluginDropdownFree {
 					// font
 					es.color = fontColor;
 					// font style
-					this._setFontStyle(es);
+					this.#setFontStyle(es);
 					// border
 					if (hasBorder) continue;
 					// border - all || none
@@ -2781,7 +2792,7 @@ class Table extends PluginDropdownFree {
 				// font
 				es.color = fontColor;
 				// font style
-				this._setFontStyle(es);
+				this.#setFontStyle(es);
 				// border
 				if (!hasBorder) {
 					// border - all || none
@@ -2799,7 +2810,7 @@ class Table extends PluginDropdownFree {
 
 			// border format
 			if (hasBorder) {
-				this._setBorderStyles(cells, borderFormat, borderCss);
+				this.#setBorderStyles(cells, borderFormat, borderCss);
 			}
 
 			this._historyPush();
@@ -2807,7 +2818,7 @@ class Table extends PluginDropdownFree {
 			// set cells style
 			this.controller_props.close();
 			if (this.#tdElement) {
-				this._recallStyleSelectedCells();
+				this.#recallStyleSelectedCells();
 				this.setCellInfo(this.#tdElement, true);
 				dom.utils.addClass(this.#tdElement, 'se-selected-cell-focus');
 			}
@@ -2819,11 +2830,10 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Sets font styles.
 	 * @param {CSSStyleDeclaration} styles The style object to modify.
 	 */
-	_setFontStyle(styles) {
+	#setFontStyle(styles) {
 		const { font_bold, font_italic, font_strike, font_underline } = this.propTargets;
 		styles.fontWeight = dom.utils.hasClass(font_bold, 'on') ? 'bold' : '';
 		styles.fontStyle = dom.utils.hasClass(font_italic, 'on') ? 'italic' : '';
@@ -2831,13 +2841,12 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Sets border format and styles.
 	 * @param {{left: Node[], top: Node[], right: Node[], bottom: Node[], all: Node[]}} cells The table cells categorized by border positions.
 	 * @param {string} borderKey Border style ("all"|"inside"|"horizon"|"vertical"|"outside"|"left"|"top"|"right"|"bottom")
 	 * @param {string} s The border style value.
 	 */
-	_setBorderStyles(cells, borderKey, s) {
+	#setBorderStyles(cells, borderKey, s) {
 		const { left, top, right, bottom, all } = cells;
 		switch (borderKey) {
 			case 'inside':
@@ -2898,7 +2907,7 @@ class Table extends PluginDropdownFree {
 	 */
 	_setMultiCells(startCell, endCell) {
 		const rows = this.#selectedTable.rows;
-		this._deleteStyleSelectedCells();
+		this.#deleteStyleSelectedCells();
 
 		dom.utils.addClass(startCell, 'se-selected-table-cell');
 
@@ -3002,10 +3011,9 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Resets the table picker display.
 	 */
-	_resetTablePicker() {
+	#resetTablePicker() {
 		if (!this.tableHighlight) return;
 
 		const highlight = this.tableHighlight.style;
@@ -3020,10 +3028,9 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Resets the alignment properties for table cells.
 	 */
-	_resetPropsAlign() {
+	#resetPropsAlign() {
 		const { cell_alignment } = this.propTargets;
 		const left = cell_alignment.querySelector('[data-value="left"]');
 		const right = cell_alignment.querySelector('[data-value="right"]');
@@ -3034,13 +3041,12 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Handles color selection from the color palette.
 	 * @param {Node} button The button triggering the color palette.
 	 * @param {string} type The type of color selection.
 	 * @param {HTMLInputElement} color Color text input element.
 	 */
-	_onColorPalette(button, type, color) {
+	#onColorPalette(button, type, color) {
 		if (this.controller_colorPicker.isOpen && type === this.sliderType) {
 			this.controller_colorPicker.close();
 		} else {
@@ -3052,28 +3058,25 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Closes table-related controllers.
 	 */
-	_closeController() {
+	#closeController() {
 		this.controller_table.close();
 		this.controller_cell.close();
 	}
 
 	/**
-	 * @private
 	 * @description Closes table-related controllers and table figure
 	 */
-	_closeTableSelectInfo() {
+	#closeTableSelectInfo() {
 		this.component.deselect();
-		this._closeController();
+		this.#closeController();
 	}
 
 	/**
-	 * @private
 	 * @description Hides the resize line if it is visible.
 	 */
-	__hideResizeLine() {
+	#hideResizeLine() {
 		if (this.#resizeLine) {
 			this.#resizeLine.style.display = 'none';
 			this.#resizeLine = null;
@@ -3081,14 +3084,12 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
 	 * @description Removes global event listeners and resets resize-related properties.
 	 */
-	__removeGlobalEvents() {
-		this._toggleEditor(true);
+	#removeGlobalEvents() {
 		this.#resizing = false;
 		this.ui.disableBackWrapper();
-		this.__hideResizeLine();
+		this.#hideResizeLine();
 		if (this.#resizeLinePrev) {
 			this.#resizeLinePrev.style.display = 'none';
 			this.#resizeLinePrev = null;
@@ -3100,12 +3101,13 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
+	 * @private
 	 * @description Clone a table element and map selected cells to the cloned table
 	 * @param {HTMLTableElement} table <table> element
 	 * @param {HTMLTableCellElement[]} selectedCells Selected cells array
 	 * @returns {{ cloneTable: HTMLTableElement, clonedSelectedCells: HTMLTableCellElement[] }}
 	 */
-	#cloneTable(table, selectedCells) {
+	_cloneTable(table, selectedCells) {
 		/** @type {HTMLTableElement} */
 		const cloneTable = dom.utils.clone(table, true);
 
@@ -3135,7 +3137,7 @@ class Table extends PluginDropdownFree {
 	 */
 	#StyleSelectCells(tdElement, shift) {
 		this.#_s = shift;
-		if (!this.#shift && !this.#ref) this.__removeGlobalEvents();
+		if (!this.#shift && !this.#ref) this.#removeGlobalEvents();
 
 		this.#shift = shift;
 		this.#fixedCell = tdElement;
@@ -3143,7 +3145,7 @@ class Table extends PluginDropdownFree {
 		this.#fixedCellName = tdElement.nodeName;
 		this.#selectedTable = dom.query.getParentElement(tdElement, 'TABLE');
 
-		this._deleteStyleSelectedCells();
+		this.#deleteStyleSelectedCells();
 		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
 
 		if (!shift) {
@@ -3158,10 +3160,11 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
+	 * @private
 	 * @description Splits a table cell either vertically or horizontally.
 	 * @param {"vertical"|"horizontal"} direction The direction to split the cell.
 	 */
-	#OnSplitCells(direction) {
+	_OnSplitCells(direction) {
 		const vertical = direction === 'vertical';
 		const currentCell = this.#tdElement;
 		const rows = this.#trElements;
@@ -3334,7 +3337,7 @@ class Table extends PluginDropdownFree {
 		this.selectMenu_split.close();
 		this.#focusEdge(currentCell);
 
-		this._deleteStyleSelectedCells();
+		this.#deleteStyleSelectedCells();
 		this.history.push(false);
 
 		this._setController(currentCell);
@@ -3343,10 +3346,11 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
+	 * @private
 	 * @description Handles column operations such as insert and delete.
 	 * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
 	 */
-	#OnColumnEdit(command) {
+	_OnColumnEdit(command) {
 		switch (command) {
 			case 'insert-left':
 				this.editTable('cell', 'left');
@@ -3362,10 +3366,11 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
+	 * @private
 	 * @description Handles row operations such as insert and delete.
 	 * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
 	 */
-	#OnRowEdit(command) {
+	_OnRowEdit(command) {
 		switch (command) {
 			case 'insert-above':
 				this.editTable('row', 'up');
@@ -3443,7 +3448,7 @@ class Table extends PluginDropdownFree {
 		this.#maxWidth = true;
 
 		if (this.component.insert(figure, { insertBehavior: 'none' })) {
-			this._resetTablePicker();
+			this.#resetTablePicker();
 			this.menu.dropdownOff();
 			const target = oTable.querySelector('td div');
 			this.selection.setRange(target, 0, target, 0);
@@ -3461,16 +3466,16 @@ class Table extends PluginDropdownFree {
 		if (this.#shift) {
 			if (target === this.#fixedCell) {
 				this.#shift = false;
-				this._deleteStyleSelectedCells();
-				this._toggleEditor(true);
-				this.__removeGlobalEvents();
+				this.#deleteStyleSelectedCells();
+				this.#toggleEditor(true);
+				this.#removeGlobalEvents();
 				return;
 			} else {
-				this._toggleEditor(false);
+				this.#toggleEditor(false);
 			}
 		} else if (!this.#ref) {
 			if (target === this.#fixedCell) return;
-			else this._toggleEditor(false);
+			else this.#toggleEditor(false);
 		}
 
 		if (!target || target === this.#selectedCell || this.#fixedCellName !== target.nodeName || this.#selectedTable !== dom.query.getParentElement(target, 'TABLE')) {
@@ -3488,8 +3493,8 @@ class Table extends PluginDropdownFree {
 		e.stopPropagation();
 
 		if (!this.#shift) {
-			this._toggleEditor(true);
-			this.__removeGlobalEvents();
+			this.#toggleEditor(true);
+			this.#removeGlobalEvents();
 		} else {
 			this.#globalEvents.touchOff &&= this.eventManager.removeGlobalEvent(this.#globalEvents.touchOff);
 		}
@@ -3517,10 +3522,10 @@ class Table extends PluginDropdownFree {
 	 */
 	#OffCellShift() {
 		if (!this.#ref) {
-			this._closeController();
+			this.#closeController();
 		} else {
-			this.__removeGlobalEvents();
-			this._toggleEditor(true);
+			this.#removeGlobalEvents();
+			this.#toggleEditor(true);
 
 			this.#focusEdge(this.#fixedCell);
 
@@ -3533,7 +3538,7 @@ class Table extends PluginDropdownFree {
 	 * @description Handles the removal of touch-based selection.
 	 */
 	#OffCellTouch() {
-		this.controllerClose();
+		this.resetSelectInfo();
 	}
 
 	/**

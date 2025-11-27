@@ -135,6 +135,7 @@ declare class Table extends PluginDropdownFree {
 	 */
 	_element: HTMLTableElement;
 	componentSelect(target: HTMLElement): void | boolean;
+	componentDeselect(target: HTMLElement): void;
 	componentDestroy(target: HTMLElement): Promise<void>;
 	componentCopy(params: SunEditor.HookParams.CopyComponent): boolean | void;
 	onPaste(params: SunEditor.HookParams.Paste): void | boolean;
@@ -152,7 +153,11 @@ declare class Table extends PluginDropdownFree {
 	onKeyUp(params: SunEditor.HookParams.KeyEvent): void | boolean;
 	colorPickerAction(color: SunEditor.Module.HueSlider.Color): void;
 	controllerAction(target: HTMLButtonElement): void;
-	controllerClose(): void;
+	/**
+	 * @description Resets the internal state related to table cell selection,
+	 * - clearing any selected cells and removing associated styles and event listeners.
+	 */
+	resetSelectInfo(): void;
 	/**
 	 * @description Selects a group of table cells and sets internal state related to multi-cell selection.
 	 * @param {HTMLTableCellElement[]} cells - An array of table cell elements to be selected.
@@ -262,18 +267,6 @@ declare class Table extends PluginDropdownFree {
 	private _historyPush;
 	/**
 	 * @private
-	 * @description Opens the figure.
-	 * @param {Node} target - The target figure element.
-	 */
-	private _figureOpen;
-	/**
-	 * @private
-	 * @description Converts the width of <col> elements to percentages.
-	 * @param {HTMLTableElement} target - The target table element.
-	 */
-	private _resizePercentCol;
-	/**
-	 * @private
 	 * @description Starts resizing a table cell.
 	 * @param {HTMLElement} col The column element.
 	 * @param {number} startX The starting X position.
@@ -281,23 +274,6 @@ declare class Table extends PluginDropdownFree {
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	private _startCellResizing;
-	/**
-	 * @private
-	 * @description Resizes a table cell.
-	 * @param {HTMLElement} col The column element.
-	 * @param {HTMLElement} nextCol The next column element.
-	 * @param {HTMLElement} figure The table figure element.
-	 * @param {HTMLElement} tdEl The table cell element.
-	 * @param {HTMLElement} resizeLine The resize line element.
-	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
-	 * @param {number} startX The starting X position.
-	 * @param {number} startWidth The initial width of the column.
-	 * @param {number} prevWidthPercent The previous width percentage.
-	 * @param {number} nextColWidthPercent The next column's width percentage.
-	 * @param {number} tableWidth The total width of the table.
-	 * @param {MouseEvent} e The mouse event.
-	 */
-	private _cellResize;
 	/**
 	 * @private
 	 * @description Starts resizing a table row.
@@ -308,51 +284,11 @@ declare class Table extends PluginDropdownFree {
 	private _startRowResizing;
 	/**
 	 * @private
-	 * @description Resizes a table row.
-	 * @param {HTMLElement} row The table row element.
-	 * @param {HTMLElement} figure The table figure element.
-	 * @param {HTMLElement} resizeLine The resize line element.
-	 * @param {number} startY The starting Y position.
-	 * @param {number} startHeight The initial height of the row.
-	 * @param {MouseEvent} e The mouse event.
-	 */
-	private _rowResize;
-	/**
-	 * @private
 	 * @description Starts resizing the table figure.
 	 * @param {number} startX The starting X position.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	private _startFigureResizing;
-	/**
-	 * @private
-	 * @description Resizes the table figure.
-	 * @param {HTMLElement} figure The table figure element.
-	 * @param {HTMLElement} resizeLine The resize line element.
-	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
-	 * @param {number} startX The starting X position.
-	 * @param {number} startWidth The initial width of the figure.
-	 * @param {number} constNum A constant number used for width calculation.
-	 * @param {MouseEvent} e The mouse event.
-	 */
-	private _figureResize;
-	/**
-	 * @private
-	 * @description Sets the resize line position.
-	 * @param {HTMLElement} figure The table figure element.
-	 * @param {HTMLElement} target The target element.
-	 * @param {HTMLElement} resizeLine The resize line element.
-	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
-	 */
-	private _setResizeLinePosition;
-	/**
-	 * @private
-	 * @description Sets the resize row position.
-	 * @param {HTMLElement} figure The table figure element.
-	 * @param {HTMLElement} target The target row element.
-	 * @param {HTMLElement} resizeLine The resize line element.
-	 */
-	private _setResizeRowPosition;
 	/**
 	 * @private
 	 * @description Stops resizing the table.
@@ -364,78 +300,16 @@ declare class Table extends PluginDropdownFree {
 	private _stopResize;
 	/**
 	 * @private
-	 * @description Deletes styles from selected table cells.
-	 */
-	private _deleteStyleSelectedCells;
-	/**
-	 * @private
-	 * @description Restores styles for selected table cells.
-	 */
-	private _recallStyleSelectedCells;
-	/**
-	 * @private
-	 * @description Adds global event listeners for resizing.
-	 * @param {(...args: *) => void} resizeFn The function handling the resize event.
-	 * @param {(...args: *) => void} stopFn The function handling the stop event.
-	 * @param {(...args: *) => void} keyDownFn The function handling the keydown event.
-	 */
-	private _addResizeGlobalEvents;
-	/**
-	 * @private
-	 * @description Enables or disables editor mode.
-	 * @param {boolean} enabled Whether to enable or disable the editor.
-	 */
-	private _toggleEditor;
-	/**
-	 * @private
-	 * @description Updates control properties.
-	 * @param {string} type The type of control property.
-	 */
-	private _setCtrlProps;
-	/**
-	 * @private
-	 * @description Sets text alignment properties.
-	 * @param {Element} el The element to apply alignment to.
-	 * @param {string} align The alignment value.
-	 * @param {boolean} reset Whether to reset the alignment.
-	 */
-	private _setAlignProps;
-	/**
-	 * @private
 	 * @description Disables or enables border properties.
 	 * @param {boolean} disabled Whether to disable or enable border properties.
 	 */
 	private _disableBorderProps;
 	/**
 	 * @private
-	 * @description Gets the border style.
-	 * @param {string} borderStyle The border style string.
-	 * @returns {{w: string, s: string, c: string}} The parsed border style object.
-	 * - w: The border width.
-	 * - s: The border style.
-	 * - c: The border color.
-	 */
-	private _getBorderStyle;
-	/**
-	 * @private
 	 * @description Applies properties to table cells.
 	 * @param {HTMLButtonElement} target The target element.
 	 */
 	private _submitProps;
-	/**
-	 * @private
-	 * @description Sets font styles.
-	 * @param {CSSStyleDeclaration} styles The style object to modify.
-	 */
-	private _setFontStyle;
-	/**
-	 * @private
-	 * @description Sets border format and styles.
-	 * @param {{left: Node[], top: Node[], right: Node[], bottom: Node[], all: Node[]}} cells The table cells categorized by border positions.
-	 * @param {string} borderKey Border style ("all"|"inside"|"horizon"|"vertical"|"outside"|"left"|"top"|"right"|"bottom")
-	 * @param {string} s The border style value.
-	 */
-	private _setBorderStyles;
 	/**
 	 * @private
 	 * @description Selects multiple table cells and applies selection styles.
@@ -445,42 +319,30 @@ declare class Table extends PluginDropdownFree {
 	private _setMultiCells;
 	/**
 	 * @private
-	 * @description Resets the table picker display.
+	 * @description Clone a table element and map selected cells to the cloned table
+	 * @param {HTMLTableElement} table <table> element
+	 * @param {HTMLTableCellElement[]} selectedCells Selected cells array
+	 * @returns {{ cloneTable: HTMLTableElement, clonedSelectedCells: HTMLTableCellElement[] }}
 	 */
-	private _resetTablePicker;
+	private _cloneTable;
 	/**
 	 * @private
-	 * @description Resets the alignment properties for table cells.
+	 * @description Splits a table cell either vertically or horizontally.
+	 * @param {"vertical"|"horizontal"} direction The direction to split the cell.
 	 */
-	private _resetPropsAlign;
+	private _OnSplitCells;
 	/**
 	 * @private
-	 * @description Handles color selection from the color palette.
-	 * @param {Node} button The button triggering the color palette.
-	 * @param {string} type The type of color selection.
-	 * @param {HTMLInputElement} color Color text input element.
+	 * @description Handles column operations such as insert and delete.
+	 * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
 	 */
-	private _onColorPalette;
+	private _OnColumnEdit;
 	/**
 	 * @private
-	 * @description Closes table-related controllers.
+	 * @description Handles row operations such as insert and delete.
+	 * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
 	 */
-	private _closeController;
-	/**
-	 * @private
-	 * @description Closes table-related controllers and table figure
-	 */
-	private _closeTableSelectInfo;
-	/**
-	 * @private
-	 * @description Hides the resize line if it is visible.
-	 */
-	private __hideResizeLine;
-	/**
-	 * @private
-	 * @description Removes global event listeners and resets resize-related properties.
-	 */
-	private __removeGlobalEvents;
+	private _OnRowEdit;
 	#private;
 }
 import { PluginDropdownFree } from '../../../interfaces';

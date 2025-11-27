@@ -106,6 +106,7 @@ export type ControllerParams = {
 /**
  * @class
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
+ * @see EditorComponent for `inst._element` requirement
  */
 declare class Controller extends CoreInjector {
 	/**

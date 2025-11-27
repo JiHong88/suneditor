@@ -71,7 +71,7 @@ class AudioGallery extends PluginBrowser {
 		if (this.onSelectfunction) {
 			this.onSelectfunction(target);
 		} else {
-			this.plugins.audio.init();
+			this.plugins.audio.modalInit();
 			this.plugins.audio.submitURL(target.getAttribute('data-command'));
 		}
 	}

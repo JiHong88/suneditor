@@ -83,7 +83,7 @@ class VideoGallery extends PluginBrowser {
 			}
 
 			const file = { name: target.getAttribute('data-name'), size: 0 };
-			this.plugins.video.init();
+			this.plugins.video.modalInit();
 			this.plugins.video.create(
 				this.plugins.video[target.getAttribute('data-frame') === 'iframe' ? 'createIframeTag' : 'createVideoTag']({ poster: target.getAttribute('data-thumbnail') }),
 				url,

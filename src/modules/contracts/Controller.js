@@ -39,6 +39,7 @@ const INDEX_1 = '2147483641';
 /**
  * @class
  * @description Controller module class that handles the UI and interaction logic for a specific editor controller element.
+ * @see EditorComponent for `inst._element` requirement
  */
 class Controller extends CoreInjector {
 	#reserveIndex;
@@ -228,9 +229,9 @@ class Controller extends CoreInjector {
 			});
 		}
 
-		if (this.parentsForm.length > 0) return;
-
 		this.inst.controllerClose?.();
+
+		if (this.parentsForm.length > 0) return;
 
 		this.component.deselect();
 	}
@@ -363,6 +364,8 @@ class Controller extends CoreInjector {
 		this.isOpen = true;
 		this.editor._preventBlur = true;
 		this.editor.status.onSelected = true;
+
+		this.inst.controllerOn?.(form, target);
 		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.frameContext, info });
 	}
 
@@ -488,7 +491,7 @@ class Controller extends CoreInjector {
 	 * @returns {boolean} True if the target is inside a form or controller.
 	 */
 	#checkForm(target) {
-		if (dom.check.isWysiwygFrame(target)) return false;
+		if (dom.check.isWysiwygFrame(target) || target.contains(this.form)) return false;
 		if (dom.utils.hasClass(target, 'se-drag-handle')) return true;
 
 		let isParentForm = false;
@@ -501,7 +504,8 @@ class Controller extends CoreInjector {
 			});
 		}
 
-		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || target?.contains(this.inst._element));
+		const _element = this.inst._element;
+		return !isParentForm && (!!dom.query.getParentElement(target, '.se-controller') || (this.component.isInline(_element) ? target === _element : target?.contains(_element)));
 	}
 
 	/**
@@ -549,8 +553,12 @@ class Controller extends CoreInjector {
 		if (ctrl || !keyCodeMap.isNonResponseKey(keyCode)) return;
 
 		const eventTarget = dom.query.getEventTarget(e);
-		if (this.form.contains(eventTarget) || this.#checkForm(eventTarget)) return;
-		if (this.editor._fileManager.pluginRegExp.test(this.kind) && !keyCodeMap.isEsc(keyCode)) return;
+		if (!keyCodeMap.isEsc(keyCode)) {
+			if (this.form.contains(eventTarget) || this.#checkForm(eventTarget)) return;
+			if (this.editor._fileManager.pluginRegExp.test(this.kind)) return;
+		} else {
+			if (this.#__childrenControllers__.some(({ isOpen }) => isOpen)) return;
+		}
 
 		this.#PostCloseEvent(eventTarget);
 		this.close();

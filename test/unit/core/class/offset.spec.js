@@ -193,6 +193,45 @@ describe('Offset', () => {
 			expect(result.x).toBeDefined();
 			expect(result.y).toBeDefined();
 		});
+
+		it('should handle specific node', () => {
+			wysiwyg.innerHTML = '<p>test</p>';
+			const p = wysiwyg.firstChild;
+
+			const result = offset.getGlobalScroll(p);
+
+			expect(result).toBeDefined();
+			expect(typeof result.top).toBe('number');
+		});
+	});
+
+	describe('edge cases', () => {
+		it('should handle empty wysiwyg', () => {
+			wysiwyg.innerHTML = '';
+
+			const result = offset.getWWScroll();
+
+			expect(result).toBeDefined();
+		});
+
+		it('should handle getGlobal with no argument', () => {
+			const result = offset.getGlobal();
+
+			expect(result).toBeDefined();
+			expect(typeof result.top).toBe('number');
+			expect(typeof result.left).toBe('number');
+		});
+
+		it('should handle deeply nested elements', () => {
+			wysiwyg.innerHTML = '<div><div><div><p><span><strong>deep</strong></span></p></div></div></div>';
+			const strong = wysiwyg.querySelector('strong');
+
+			const result = offset.getLocal(strong);
+
+			expect(result).toBeDefined();
+			expect(typeof result.left).toBe('number');
+			expect(typeof result.top).toBe('number');
+		});
 	});
 
 });

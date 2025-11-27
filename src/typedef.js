@@ -188,6 +188,7 @@
  * @typedef {typeof import('./interfaces/contracts').ModuleModal.prototype.modalResize} SunEditor.Hook.Modal.Resize
  *
  * @typedef {typeof import('./interfaces/contracts').ModuleController.prototype.controllerAction} SunEditor.Hook.Controller.Action
+ * @typedef {typeof import('./interfaces/contracts').ModuleController.prototype.controllerOn} SunEditor.Hook.Controller.On
  * @typedef {typeof import('./interfaces/contracts').ModuleController.prototype.controllerClose} SunEditor.Hook.Controller.Close
  *
  * @typedef {typeof import('./interfaces/contracts').ModuleBrowser.prototype.browserInit} SunEditor.Hook.Browser.Init

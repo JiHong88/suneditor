@@ -172,7 +172,7 @@ class ColorPicker extends CoreInjector {
 	 * @description Close hue slider
 	 */
 	hueSliderClose() {
-		this.hueSlider.off();
+		this.hueSlider.close();
 	}
 
 	/**
@@ -188,6 +188,7 @@ class ColorPicker extends CoreInjector {
 	 * @type {SunEditor.Hook.ColorPicker.HueSliderClose}
 	 */
 	hueSliderCancelAction() {
+		this.form.style.display = 'block';
 		this.inst.colorPickerHueSliderClose?.();
 	}
 
@@ -238,8 +239,8 @@ class ColorPicker extends CoreInjector {
 	}
 
 	#OnColorPalette() {
-		this.inst.colorPickerHueSliderOpen?.();
 		this.hueSlider.open(this.targetButton);
+		this.inst.colorPickerHueSliderOpen?.();
 	}
 
 	/**

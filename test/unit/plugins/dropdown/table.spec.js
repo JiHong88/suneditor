@@ -632,26 +632,16 @@ describe('Plugins - Dropdown - Table', () => {
             });
         });
 
-        describe('close method', () => {
-            it('should close all controllers and clean state', () => {
-                // Mock controller instances
-                table.controller = { close: jest.fn() };
-                table.selectMenu = { close: jest.fn() };
-                table.colorPicker = { close: jest.fn(), hueSliderClose: jest.fn() };
-
-                table.controllerClose();
-
-                // Method should execute without throwing
-                expect(table).toBeDefined();
+        describe('resetSelectInfo method', () => {
+            it('should reset selection state and clean up', () => {
+                expect(() => {
+                    table.resetSelectInfo();
+                }).not.toThrow();
             });
 
-            it('should handle missing controllers gracefully', () => {
-                table.controller = null;
-                table.selectMenu = null;
-                table.colorPicker = null;
-
+            it('should handle resetSelectInfo gracefully', () => {
                 expect(() => {
-                    table.controllerClose();
+                    table.resetSelectInfo();
                 }).not.toThrow();
             });
         });

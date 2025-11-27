@@ -218,6 +218,48 @@ describe('Selection', () => {
 
 			editor.frameOptions.get = origGet;
 		});
+
+		it('should set eo to 1 when ec is empty element node with eo > 0 (line 159)', () => {
+			// Exception rule: eo > 0 && textContent.length === 0 && nodeType === 1 → eo = 1
+			wysiwyg.innerHTML = '<p>text<span><br></span></p>';
+			const text = wysiwyg.firstChild.firstChild;
+			const spanWithBr = wysiwyg.querySelector('span');
+
+			// All 3 conditions met: eo=5 > 0, textContent='', nodeType=1
+			const range = selection.setRange(text, 0, spanWithBr, 5);
+
+			expect(range).toBeDefined();
+			expect(range.endContainer).toBe(spanWithBr);
+			expect(range.endOffset).toBe(1); // Always 1 when exception rule applies
+		});
+
+		it('should clamp eo to range [0, textContent.length] (line 159)', () => {
+			// Default rule: min 0, max textContent.length
+			wysiwyg.innerHTML = '<p>test</p>';
+			const text = wysiwyg.firstChild.firstChild; // textContent.length = 4
+
+			// Test negative → clamped to 0
+			const range1 = selection.setRange(text, 0, text, -5);
+			expect(range1).toBeDefined();
+			expect(range1.endOffset).toBe(0);
+
+			// Test overflow → clamped to textContent.length
+			const range2 = selection.setRange(text, 0, text, 100);
+			expect(range2).toBeDefined();
+			expect(range2.endOffset).toBe(4);
+		});
+
+		it('should not apply exception rule when eo = 0 (line 159)', () => {
+			// Exception rule requires eo > 0, so eo = 0 stays as 0
+			wysiwyg.innerHTML = '<p>text<span><br></span></p>';
+			const text = wysiwyg.firstChild.firstChild;
+			const spanWithBr = wysiwyg.querySelector('span');
+
+			const range = selection.setRange(text, 0, spanWithBr, 0);
+
+			expect(range).toBeDefined();
+			expect(range.endOffset).toBe(0); // Not 1, because eo > 0 condition fails
+		});
 	});
 
 	describe('removeRange', () => {

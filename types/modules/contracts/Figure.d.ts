@@ -233,7 +233,8 @@ export type FigureParams = {
  */
 /**
  * @class
- * @description Controller module class
+ * @description Figure module class for handling resizable/alignable components (images, videos, iframes, etc.)
+ * @see EditorComponent for `inst._element` requirement
  */
 declare class Figure extends CoreInjector {
 	/**
@@ -342,7 +343,7 @@ declare class Figure extends CoreInjector {
 		default: string;
 	};
 	isVertical: boolean;
-	percentageButtons: NodeListOf<Element>;
+	percentageButtons: any[] | NodeListOf<Element>;
 	captionButton: Element;
 	align: string;
 	as: string;
@@ -489,20 +490,6 @@ declare class Figure extends CoreInjector {
 	private _displayResizeHandles;
 	/**
 	 * @private
-	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
-	 * @param {FigureInfo} figureinfo {target, container, cover, inlineCover, caption}
-	 * @param {string|number} w Width value.
-	 * @param {string|number} h Height value.
-	 */
-	private _asFormatChange;
-	/**
-	 * @private
-	 * @description Sets figure component properties such as cover, container, caption, and alignment.
-	 * @param {FigureInfo} figureInfo - {target, container, cover, inlineCover, caption, isVertical}
-	 */
-	private _setFigureInfo;
-	/**
-	 * @private
 	 * @description Applies rotation transformation to the target element.
 	 * @param {HTMLElement} element Target element.
 	 * @param {number} r Rotation degree.
@@ -539,52 +526,9 @@ declare class Figure extends CoreInjector {
 	private _setPercentSize;
 	/**
 	 * @private
-	 * @description Deletes percentage-based sizing from the figure element.
-	 */
-	private _deletePercentSize;
-	/**
-	 * @private
 	 * @description Reverts the figure element to its previously saved size.
 	 */
 	private _setRevert;
-	/**
-	 * @private
-	 * @description Updates the figure's alignment icon.
-	 */
-	private _setAlignIcon;
-	/**
-	 * @private
-	 * @description Updates the figure's block/inline format icon.
-	 */
-	private _setAsIcon;
-	/**
-	 * @private
-	 * @description Saves the current size of the figure component.
-	 */
-	private _saveCurrentSize;
-	/**
-	 * @private
-	 * @description Adjusts the position of the caption within the figure.
-	 * @param {HTMLElement} element Target element.
-	 */
-	private _setCaptionPosition;
-	/**
-	 * @private
-	 * @description Removes the margin top property from the figure caption.
-	 * @param {HTMLElement} element Target element.
-	 */
-	private _deleteCaptionPosition;
-	/**
-	 * @private
-	 * @description Removes the resize event listeners.
-	 */
-	private _offResizeEvent;
-	/**
-	 * @private
-	 * @description Sets up drag event handling for the figure component.
-	 * @param {Node} figureMain The main figure container element.
-	 */
-	private _setDragEvent;
 	#private;
 }
 import CoreInjector from '../../editorInjector/_core';

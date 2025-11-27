@@ -320,7 +320,7 @@ describe('handler_ww_mouse', () => {
 
 			OnMouseMove_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-			expect(mockThis._overComponentSelect).toHaveBeenCalledWith(mockEvent.target);
+			expect(mockThis.component.hoverSelect).toHaveBeenCalledWith(mockEvent.target);
 			expect(mockThis._callPluginEvent).toHaveBeenCalledWith('onMouseMove', {
 				frameContext: mockFrameContext,
 				event: mockEvent
@@ -333,7 +333,7 @@ describe('handler_ww_mouse', () => {
 			const result = OnMouseMove_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(result).toBe(false);
-			expect(mockThis._overComponentSelect).not.toHaveBeenCalled();
+			expect(mockThis.component.hoverSelect).not.toHaveBeenCalled();
 			expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
 		});
 
@@ -343,7 +343,7 @@ describe('handler_ww_mouse', () => {
 			const result = OnMouseMove_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
 			expect(result).toBe(false);
-			expect(mockThis._overComponentSelect).not.toHaveBeenCalled();
+			expect(mockThis.component.hoverSelect).not.toHaveBeenCalled();
 			expect(mockThis._callPluginEvent).not.toHaveBeenCalled();
 		});
 
@@ -358,12 +358,12 @@ describe('handler_ww_mouse', () => {
 			});
 		});
 
-		it('should not call _overComponentSelect in restricted modes', () => {
+		it('should not call component.hoverSelect in restricted modes', () => {
 			mockFrameContext.set('isReadOnly', true);
 
 			OnMouseMove_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-			expect(mockThis._overComponentSelect).not.toHaveBeenCalled();
+			expect(mockThis.component.hoverSelect).not.toHaveBeenCalled();
 		});
 	});
 

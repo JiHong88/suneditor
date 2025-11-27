@@ -46,7 +46,7 @@ describe('Plugins - Browser - VideoGallery', () => {
                         defaultWidth: '560px',
                         defaultHeight: '315px'
                     },
-                    init: jest.fn(),
+                    modalInit: jest.fn(),
                     create: jest.fn(),
                     findProcessUrl: jest.fn().mockReturnValue({ url: 'processed-url' }),
                     createIframeTag: jest.fn().mockReturnValue('<iframe></iframe>'),
@@ -194,7 +194,7 @@ describe('Plugins - Browser - VideoGallery', () => {
                 selectorHandler(mockTarget);
 
                 expect(customHandler).toHaveBeenCalledWith(mockTarget);
-                expect(mockEditor.plugins.video.init).not.toHaveBeenCalled();
+                expect(mockEditor.plugins.video.modalInit).not.toHaveBeenCalled();
             });
         });
 
@@ -220,7 +220,7 @@ describe('Plugins - Browser - VideoGallery', () => {
                 selectorHandler(mockTarget);
 
                 expect(mockEditor.plugins.video.findProcessUrl).toHaveBeenCalledWith('/path/to/video.mp4');
-                expect(mockEditor.plugins.video.init).toHaveBeenCalled();
+                expect(mockEditor.plugins.video.modalInit).toHaveBeenCalled();
                 expect(mockEditor.plugins.video.createVideoTag).toHaveBeenCalledWith({ poster: '/thumb.jpg' });
                 expect(mockEditor.plugins.video.create).toHaveBeenCalledWith(
                     '<video></video>',

@@ -109,7 +109,8 @@ let __resizing_sw = 0;
 
 /**
  * @class
- * @description Controller module class
+ * @description Figure module class for handling resizable/alignable components (images, videos, iframes, etc.)
+ * @see EditorComponent for `inst._element` requirement
  */
 class Figure extends CoreInjector {
 	#width;
@@ -153,31 +154,35 @@ class Figure extends CoreInjector {
 		// modules
 		/** @type {Object<string, *>} */
 		this._action = {};
+
 		const controllerEl = CreateHTML_controller(this, controls || []);
-		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, this.kind);
-		// align selectmenu
-		this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
-		const alignMenus = CreateAlign(this, this.alignButton);
-		if (alignMenus) {
-			this.selectMenu_align = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-			this.selectMenu_align.on(this.alignButton, this.#SetMenuAlign.bind(this), { class: 'se-figure-select-list' });
-			this.selectMenu_align.create(alignMenus.items, alignMenus.html);
-		}
-		// as [block, inline] selectmenu
-		this.asButton = controllerEl.querySelector('[data-command="onas"]');
-		const asMenus = CreateAs(this, this.asButton);
-		if (asMenus) {
-			this.selectMenu_as = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
-			this.selectMenu_as.on(this.asButton, this.#SetMenuAs.bind(this), { class: 'se-figure-select-list' });
-			this.selectMenu_as.create(asMenus.items, asMenus.html);
-		}
-		// resize selectmenu
-		this.resizeButton = controllerEl.querySelector('[data-command="onresize"]');
-		const resizeMenus = CreateResize(this, this.resizeButton);
-		if (resizeMenus) {
-			this.selectMenu_resize = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
-			this.selectMenu_resize.on(this.resizeButton, this.#SetResize.bind(this));
-			this.selectMenu_resize.create(resizeMenus.items, resizeMenus.html);
+		this.controller = controllerEl ? new Controller(this, controllerEl, { position: 'bottom', disabled: true }, this.kind) : null;
+
+		if (controllerEl) {
+			// align selectmenu
+			this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
+			const alignMenus = CreateAlign(this, this.alignButton);
+			if (alignMenus) {
+				this.selectMenu_align = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+				this.selectMenu_align.on(this.alignButton, this.#SetMenuAlign.bind(this), { class: 'se-figure-select-list' });
+				this.selectMenu_align.create(alignMenus.items, alignMenus.html);
+			}
+			// as [block, inline] selectmenu
+			this.asButton = controllerEl.querySelector('[data-command="onas"]');
+			const asMenus = CreateAs(this, this.asButton);
+			if (asMenus) {
+				this.selectMenu_as = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+				this.selectMenu_as.on(this.asButton, this.#SetMenuAs.bind(this), { class: 'se-figure-select-list' });
+				this.selectMenu_as.create(asMenus.items, asMenus.html);
+			}
+			// resize selectmenu
+			this.resizeButton = controllerEl.querySelector('[data-command="onresize"]');
+			const resizeMenus = CreateResize(this, this.resizeButton);
+			if (resizeMenus) {
+				this.selectMenu_resize = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
+				this.selectMenu_resize.on(this.resizeButton, this.#SetResize.bind(this));
+				this.selectMenu_resize.create(resizeMenus.items, resizeMenus.html);
+			}
 		}
 
 		// members
@@ -185,8 +190,8 @@ class Figure extends CoreInjector {
 		this.sizeUnit = params.sizeUnit || 'px';
 		this.autoRatio = params.autoRatio;
 		this.isVertical = false;
-		this.percentageButtons = controllerEl.querySelectorAll('[data-command="resize_percent"]');
-		this.captionButton = controllerEl.querySelector('[data-command="caption"]');
+		this.percentageButtons = controllerEl?.querySelectorAll('[data-command="resize_percent"]') || [];
+		this.captionButton = controllerEl?.querySelector('[data-command="caption"]');
 		this.align = 'none';
 		this.as = 'block';
 		/** @type {{left?: number, top?: number}} */
@@ -361,8 +366,9 @@ class Figure extends CoreInjector {
 	close() {
 		this.editor._preventBlur = false;
 		dom.utils.removeClass(this._cover, 'se-figure-selected');
-		this.controller.close();
 		this.component._removeDragEvent();
+		this.#removeGlobalEvents();
+		this.controller?.close();
 	}
 
 	/**
@@ -407,7 +413,7 @@ class Figure extends CoreInjector {
 
 		_DragHandle.set('__figureInst', this);
 
-		this._setFigureInfo(figureInfo);
+		this.#setFigureInfo(figureInfo);
 
 		const sizeTarget = /** @type {HTMLElement} */ (figureTarget ? this._cover || this._container || target : target);
 		const w = sizeTarget.offsetWidth || null;
@@ -444,6 +450,8 @@ class Figure extends CoreInjector {
 
 		const _figure = this.frameContext.get('_figure');
 		this.editor._figureContainer = _figure.main;
+		this.editor.opendControllers = this.editor.opendControllers.filter((c) => c.form !== _figure.main);
+
 		_figure.main.style.top = top + 'px';
 		_figure.main.style.left = left + 'px';
 		_figure.main.style.width = (this.isVertical ? h : w) + 'px';
@@ -454,6 +462,7 @@ class Figure extends CoreInjector {
 		_figure.border.style.height = (this.isVertical ? w : h) + 'px';
 
 		this.__offset = { left: left + scrollX, top: top + scrollY };
+
 		this.editor.opendControllers.push({
 			position: 'none',
 			form: _figure.main,
@@ -486,31 +495,42 @@ class Figure extends CoreInjector {
 		_figure.main.style.display = 'block';
 
 		if (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT) {
-			// align button
-			this._setAlignIcon();
-			// as button
-			this._setAsIcon();
-			this.ui._visibleControllers(true, true);
-			// size
-			const size = this.getSize(target);
-			dom.utils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.dw + ', ' + size.dh + ')');
-			this._displayResizeHandles(!nonResizing);
-			// rotate, aption, align, onresize - display;
-			const transformButtons = this.controller.form.querySelectorAll(
-				'[data-command="rotate"][data-value="90"], [data-command="rotate"][data-value="-90"], [data-command="caption"], [data-command="onalign"], [data-command="onresize"]',
-			);
-			const display = this._inlineCover || exceptionFormat ? 'none' : '';
-			transformButtons.forEach((button) => {
-				/** @type {HTMLButtonElement} */ (button).style.display = display;
-			});
-			// onas
-			const onas = this.controller.form.querySelector('[data-command="onas"]');
-			if (onas) {
-				/** @type {HTMLButtonElement} */ (onas).style.display = exceptionFormat ? 'none' : '';
+			// resize handles
+			const displayType = nonResizing ? 'none' : 'flex';
+			const resizeHandles = _figure.handles;
+			for (let i = 0, len = resizeHandles.length; i < len; i++) {
+				resizeHandles[i].style.display = displayType;
 			}
+
+			if (this.controller) {
+				// size display
+				const size = this.getSize(target);
+				dom.utils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.dw + ', ' + size.dh + ')');
+
+				// align button
+				this.#setAlignIcon();
+				// as button
+				this.#setAsIcon();
+				this.ui._visibleControllers(true, true);
+
+				// rotate, aption, align, onresize - display;
+				const transformButtons = this.controller.form.querySelectorAll(
+					'[data-command="rotate"][data-value="90"], [data-command="rotate"][data-value="-90"], [data-command="caption"], [data-command="onalign"], [data-command="onresize"]',
+				);
+				const display = this._inlineCover || exceptionFormat ? 'none' : '';
+				transformButtons?.forEach((button) => {
+					/** @type {HTMLButtonElement} */ (button).style.display = display;
+				});
+				// onas
+				const onas = this.controller.form.querySelector('[data-command="onas"]');
+				if (onas) {
+					/** @type {HTMLButtonElement} */ (onas).style.display = exceptionFormat ? 'none' : '';
+				}
+			}
+
 			// selecte
 			dom.utils.removeClass(this._cover, 'se-figure-over-selected');
-			this.controller.open(_figure.main, null, { initMethod: this.#offContainer, isWWTarget: false, addOffset: null });
+			this.controller?.open(_figure.main, null, { initMethod: this.#offContainer, isWWTarget: false, addOffset: null });
 			_w.setTimeout(() => _DragHandle.set('__overInfo', false), 0);
 		} else {
 			dom.utils.addClass(this._cover, 'se-figure-over-selected');
@@ -523,7 +543,7 @@ class Figure extends CoreInjector {
 
 		// drag
 		if (!this._inlineCover && (_DragHandle.get('__overInfo') !== ON_OVER_COMPONENT || dom.utils.hasClass(figureInfo.container, 'se-input-component'))) {
-			this._setDragEvent(_figure.main);
+			this.#setDragEvent(_figure.main);
 		}
 
 		return targetInfo;
@@ -533,14 +553,14 @@ class Figure extends CoreInjector {
 	 * @description Hide the controller
 	 */
 	controllerHide() {
-		this.controller.hide();
+		this.controller?.hide();
 	}
 
 	/**
 	 * @description Hide the controller
 	 */
 	controllerShow() {
-		this.controller.show();
+		this.controller?.show();
 	}
 
 	/**
@@ -554,7 +574,7 @@ class Figure extends CoreInjector {
 	 */
 	controllerOpen(target, params) {
 		this._element = /** @type {HTMLElement}  */ (target);
-		this.controller.open(target, null, params);
+		this.controller?.open(target, null, params);
 	}
 
 	/**
@@ -670,7 +690,7 @@ class Figure extends CoreInjector {
 			this.__setCoverPaddingBottom(w, h);
 		}
 
-		this._setAlignIcon();
+		this.#setAlignIcon();
 	}
 
 	/**
@@ -708,7 +728,7 @@ class Figure extends CoreInjector {
 						.join('|'),
 				);
 
-				this._asFormatChange(figure, w, h);
+				this.#asFormatChange(figure, w, h);
 
 				const line = dom.utils.createElement(this.options.get('defaultLine'), null, figure.container);
 				parent.insertBefore(line, next);
@@ -737,7 +757,7 @@ class Figure extends CoreInjector {
 						.join('|'),
 				);
 
-				this._asFormatChange(figure, w, h);
+				this.#asFormatChange(figure, w, h);
 
 				(s || r.container).parentElement.insertBefore(figure.container, s);
 
@@ -749,7 +769,7 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @description Controller button action
+	 * @hook Module.Controller
 	 * @type {SunEditor.Hook.Controller.Action}
 	 */
 	controllerAction(target) {
@@ -894,7 +914,7 @@ class Figure extends CoreInjector {
 		element.style.transform = '';
 		element.style.transformOrigin = '';
 
-		this._deleteCaptionPosition(element);
+		this.#deleteCaptionPosition(element);
 		this._applySize(size[0] || 'auto', size[1] || '', '');
 	}
 
@@ -935,7 +955,7 @@ class Figure extends CoreInjector {
 				const w = (isVertical ? offsetH : offsetW) + 'px';
 				const h = (isVertical ? offsetW : offsetH) + 'px';
 
-				this._deletePercentSize();
+				this.#deletePercentSize();
 				this._applySize(offsetW + 'px', offsetH + 'px', '');
 
 				if (cover) {
@@ -956,7 +976,7 @@ class Figure extends CoreInjector {
 			if (isVertical) element.style.maxWidth = 'none';
 			else element.style.maxWidth = '';
 
-			this._setCaptionPosition(element);
+			this.#setCaptionPosition(element);
 		} finally {
 			this.#preventSizechange = false;
 		}
@@ -969,7 +989,7 @@ class Figure extends CoreInjector {
 	 */
 	_displayResizeHandles(display) {
 		const type = !display ? 'none' : 'flex';
-		this.controller.form.style.display = type;
+		if (this.controller) this.controller.form.style.display = type;
 
 		const _figure = this.frameContext.get('_figure');
 		const resizeHandles = _figure.handles;
@@ -986,17 +1006,16 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Handles format conversion (block/inline) for the figure component and applies size changes.
 	 * @param {FigureInfo} figureinfo {target, container, cover, inlineCover, caption}
 	 * @param {string|number} w Width value.
 	 * @param {string|number} h Height value.
 	 */
-	_asFormatChange(figureinfo, w, h) {
+	#asFormatChange(figureinfo, w, h) {
 		const kind = this.kind;
 		figureinfo.target.onload = () => this.component.select(figureinfo.target, kind);
 
-		this._setFigureInfo(figureinfo);
+		this.#setFigureInfo(figureinfo);
 
 		if (figureinfo.inlineCover) {
 			this.setAlign(figureinfo.target, 'none');
@@ -1007,11 +1026,10 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Sets figure component properties such as cover, container, caption, and alignment.
 	 * @param {FigureInfo} figureInfo - {target, container, cover, inlineCover, caption, isVertical}
 	 */
-	_setFigureInfo(figureInfo) {
+	#setFigureInfo(figureInfo) {
 		this._inlineCover = figureInfo.inlineCover;
 		this._cover = figureInfo.cover || this._inlineCover;
 		this._container = figureInfo.container;
@@ -1077,7 +1095,7 @@ class Figure extends CoreInjector {
 		h = /** @type {string} */ (h || (this.autoRatio ? this.autoRatio.current || this.autoRatio.default : h));
 		w = /** @type {string} */ (numbers.is(w) ? w + this.sizeUnit : w);
 
-		if (!/%$/.test(w) && !/%$/.test(h) && !onlyW && !onlyH) this._deletePercentSize();
+		if (!/%$/.test(w) && !/%$/.test(h) && !onlyW && !onlyH) this.#deletePercentSize();
 
 		const sizeTarget = this._cover || this._element;
 
@@ -1097,7 +1115,7 @@ class Figure extends CoreInjector {
 		if (this.align === 'center') this.setAlign(this._element, this.align);
 
 		// save current size
-		this._saveCurrentSize();
+		this.#saveCurrentSize();
 	}
 
 	/**
@@ -1128,7 +1146,7 @@ class Figure extends CoreInjector {
 	_setAutoSize() {
 		if (this._caption) this._caption.style.marginTop = '';
 		this.deleteTransform();
-		this._deletePercentSize();
+		this.#deletePercentSize();
 
 		if (this.autoRatio) {
 			this._setPercentSize('100%', this.autoRatio.current || this.autoRatio.default);
@@ -1145,7 +1163,7 @@ class Figure extends CoreInjector {
 		this.setAlign(this._element, this.align);
 
 		// save current size
-		this._saveCurrentSize();
+		this.#saveCurrentSize();
 	}
 
 	/**
@@ -1164,7 +1182,7 @@ class Figure extends CoreInjector {
 
 		// exceptionFormat
 		if (this._element === this._cover && !this.options.get('strictMode').formatFilter) {
-			this._saveCurrentSize();
+			this.#saveCurrentSize();
 			return;
 		}
 
@@ -1182,17 +1200,16 @@ class Figure extends CoreInjector {
 			this.__setCoverPaddingBottom(String(w), String(h));
 		}
 
-		this._setCaptionPosition(this._element);
+		this.#setCaptionPosition(this._element);
 
 		// save current size
-		this._saveCurrentSize();
+		this.#saveCurrentSize();
 	}
 
 	/**
-	 * @private
 	 * @description Deletes percentage-based sizing from the figure element.
 	 */
-	_deletePercentSize() {
+	#deletePercentSize() {
 		if (this._cover) {
 			this._cover.style.width = '';
 			this._cover.style.height = '';
@@ -1216,28 +1233,25 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Updates the figure's alignment icon.
 	 */
-	_setAlignIcon() {
+	#setAlignIcon() {
 		if (!this.alignButton) return;
 		dom.utils.changeElement(this.alignButton.firstElementChild, this._alignIcons[this.align]);
 	}
 
 	/**
-	 * @private
 	 * @description Updates the figure's block/inline format icon.
 	 */
-	_setAsIcon() {
+	#setAsIcon() {
 		if (!this.asButton) return;
 		dom.utils.changeElement(this.asButton.firstElementChild, this.icons[`as_${this.as}`]);
 	}
 
 	/**
-	 * @private
 	 * @description Saves the current size of the figure component.
 	 */
-	_saveCurrentSize() {
+	#saveCurrentSize() {
 		if (this.#preventSizechange) return;
 
 		const dataSize = (this._element.getAttribute('data-se-size') || ',').split(',');
@@ -1255,11 +1269,10 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Adjusts the position of the caption within the figure.
 	 * @param {HTMLElement} element Target element.
 	 */
-	_setCaptionPosition(element) {
+	#setCaptionPosition(element) {
 		const figcaption = /** @type {HTMLElement} */ (dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false));
 		if (figcaption) {
 			figcaption.style.marginTop = (this.isVertical && !this.autoRatio ? element.offsetWidth - element.offsetHeight : 0) + 'px';
@@ -1272,11 +1285,10 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Removes the margin top property from the figure caption.
 	 * @param {HTMLElement} element Target element.
 	 */
-	_deleteCaptionPosition(element) {
+	#deleteCaptionPosition(element) {
 		const figcaption = /** @type {HTMLElement} */ (dom.query.getEdgeChild(dom.query.getParentElement(element, 'FIGURE'), 'FIGCAPTION', false));
 		if (figcaption) {
 			figcaption.style.marginTop = '';
@@ -1284,14 +1296,11 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
 	 * @description Removes the resize event listeners.
 	 */
-	_offResizeEvent() {
+	#offResizeEvent() {
 		this.component._removeDragEvent();
-		this.eventManager.removeGlobalEvent(this.__onContainerEvent);
-		this.eventManager.removeGlobalEvent(this.__offContainerEvent);
-		this.eventManager.removeGlobalEvent(this.#onResizeESCEvent);
+		this.#removeGlobalEvents();
 
 		this._displayResizeHandles(true);
 		this.ui._offCurrentController();
@@ -1299,11 +1308,19 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @description Removes global event listeners related to resizing.
+	 */
+	#removeGlobalEvents() {
+		this.eventManager.removeGlobalEvent(this.__onContainerEvent);
+		this.eventManager.removeGlobalEvent(this.__offContainerEvent);
+		this.eventManager.removeGlobalEvent(this.#onResizeESCEvent);
+	}
+
+	/**
 	 * @description Sets up drag event handling for the figure component.
 	 * @param {Node} figureMain The main figure container element.
 	 */
-	_setDragEvent(figureMain) {
+	#setDragEvent(figureMain) {
 		const dragHandle = this.frameContext.get('wrapper').querySelector('.se-drag-handle');
 		dom.utils.removeClass(dragHandle, 'se-drag-handle-full');
 
@@ -1423,7 +1440,7 @@ class Figure extends CoreInjector {
 	 * @description Finalizes the resizing process of the figure container.
 	 */
 	#ContainerResizingOff() {
-		this._offResizeEvent();
+		this.#offResizeEvent();
 
 		// set size
 		let w = this.isVertical ? this.#resize_h : this.#resize_w;
@@ -1463,7 +1480,7 @@ class Figure extends CoreInjector {
 	 */
 	#ContainerResizingESC(e) {
 		if (!keyCodeMap.isEsc(e.code)) return;
-		this._offResizeEvent();
+		this.#offResizeEvent();
 		this.component.select(this._element, this.kind);
 	}
 
@@ -1507,8 +1524,10 @@ class Figure extends CoreInjector {
 	}
 
 	#OffFigureContainer() {
-		this.frameContext.get('_figure').main.style.display = 'none';
+		const _figure = this.frameContext.get('_figure');
+		_figure.main.style.display = 'none';
 		this.editor._figureContainer = null;
+		this.editor.opendControllers = this.editor.opendControllers.filter((c) => c.form !== _figure.main);
 	}
 
 	#OnClick_alignButton() {
@@ -1755,7 +1774,9 @@ function CreateHTML_controller(inst, controls) {
 		}
 	}
 
-	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-resizing' + (!html ? ' se-empty-controller' : '') }, html);
+	if (!html) return null;
+
+	return dom.utils.createElement('DIV', { class: 'se-controller se-controller-resizing' }, html);
 }
 
 export default Figure;

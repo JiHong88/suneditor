@@ -42,7 +42,7 @@ describe('Plugins - Browser - AudioGallery', () => {
             },
             plugins: {
                 audio: {
-                    init: jest.fn(),
+                    modalInit: jest.fn(),
                     submitURL: jest.fn()
                 }
             },
@@ -173,7 +173,7 @@ describe('Plugins - Browser - AudioGallery', () => {
                 selectorHandler(mockTarget);
 
                 expect(customHandler).toHaveBeenCalledWith(mockTarget);
-                expect(mockEditor.plugins.audio.init).not.toHaveBeenCalled();
+                expect(mockEditor.plugins.audio.modalInit).not.toHaveBeenCalled();
                 expect(mockEditor.plugins.audio.submitURL).not.toHaveBeenCalled();
             });
         });
@@ -196,7 +196,7 @@ describe('Plugins - Browser - AudioGallery', () => {
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.audio.init).toHaveBeenCalled();
+                expect(mockEditor.plugins.audio.modalInit).toHaveBeenCalled();
                 expect(mockEditor.plugins.audio.submitURL).toHaveBeenCalledWith('/path/to/audio.mp3');
             });
 
@@ -213,7 +213,7 @@ describe('Plugins - Browser - AudioGallery', () => {
 
                 selectorHandler(mockTarget);
 
-                expect(mockEditor.plugins.audio.init).toHaveBeenCalled();
+                expect(mockEditor.plugins.audio.modalInit).toHaveBeenCalled();
                 expect(mockEditor.plugins.audio.submitURL).toHaveBeenCalledWith(null);
             });
         });

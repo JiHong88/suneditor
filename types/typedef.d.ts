@@ -189,6 +189,7 @@ declare global {
 			}
 			namespace Controller {
 				type Action = typeof import('./interfaces/contracts').ModuleController.prototype.controllerAction;
+				type On = typeof import('./interfaces/contracts').ModuleController.prototype.controllerOn;
 				type Close = typeof import('./interfaces/contracts').ModuleController.prototype.controllerClose;
 			}
 			namespace Browser {

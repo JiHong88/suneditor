@@ -397,11 +397,11 @@ describe('Image Plugin', () => {
 					getAttribute: jest.fn().mockReturnValue('test.jpg')
 				};
 				image.triggerEvent = jest.fn().mockResolvedValue(false);
-				image.init = jest.fn();
+				image.modalInit = jest.fn();
 
 				await image.componentDestroy(mockTarget);
 
-				expect(image.init).not.toHaveBeenCalled();
+				expect(image.modalInit).not.toHaveBeenCalled();
 			});
 		});
 	});

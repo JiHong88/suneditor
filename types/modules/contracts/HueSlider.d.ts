@@ -112,6 +112,8 @@ declare class HueSlider extends CoreInjector {
 	controlle: any;
 	circle: Element;
 	controller: Controller;
+	controllerAction(target: HTMLButtonElement): void;
+	controllerClose(): void;
 	/**
 	 * @description Get the current color information.
 	 * @returns {HueSliderColor} color information
@@ -123,11 +125,7 @@ declare class HueSlider extends CoreInjector {
 	 */
 	open(target: Node): void;
 	/**
-	 * @description Reset information and close the hue slider.
-	 */
-	off(): void;
-	/**
-	 * @description Close the hue slider. (include off method)
+	 * @description Close the hue slider.
 	 * - Call the instance's hueSliderCancelAction method.
 	 */
 	close(): void;

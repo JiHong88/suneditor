@@ -232,7 +232,8 @@ describe('Modules - HueSlider', () => {
 			const hueSlider = new HueSlider(mockInst, {});
 
 			expect(hueSlider.controller).toBeDefined();
-			expect(mockEditor.eventManager.addEvent).toHaveBeenCalled();
+			// Controller buttons now use data-command and controllerAction hook instead of addEvent
+			expect(hueSlider.controllerAction).toBeDefined();
 		});
 
 		it('should accept controllerOptions parameter', () => {
@@ -279,13 +280,24 @@ describe('Modules - HueSlider', () => {
 
 
 	describe('close method', () => {
-		it('should call off and hueSliderCancelAction', () => {
+		it('should close controller and reset state', () => {
 			const hueSlider = new HueSlider(mockInst);
 
 			hueSlider.close();
 
-			expect(mockInst.hueSliderCancelAction).toHaveBeenCalled();
+			expect(hueSlider.controller.close).toHaveBeenCalled();
 			expect(hueSlider.isOpen).toBe(false);
+		});
+	});
+
+	describe('controllerClose hook', () => {
+		it('should call hueSliderCancelAction when controller closes', () => {
+			const hueSlider = new HueSlider(mockInst);
+
+			// controllerClose hook is called by Controller when closing
+			hueSlider.controllerClose();
+
+			expect(mockInst.hueSliderCancelAction).toHaveBeenCalled();
 		});
 	});
 
@@ -293,7 +305,7 @@ describe('Modules - HueSlider', () => {
 		it('should close controller and reset state', () => {
 			const hueSlider = new HueSlider(mockInst);
 
-			hueSlider.off();
+			hueSlider.close();
 
 			expect(hueSlider.controller.close).toHaveBeenCalled();
 			expect(hueSlider.isOpen).toBe(false);
@@ -302,7 +314,7 @@ describe('Modules - HueSlider', () => {
 		it('should save current context', () => {
 			const hueSlider = new HueSlider(mockInst);
 
-			hueSlider.off();
+			hueSlider.close();
 
 			expect(hueSlider.ctx).toBeDefined();
 			expect(hueSlider.ctx.color).toBeDefined();
@@ -322,40 +334,33 @@ describe('Modules - HueSlider', () => {
 
 
 
-	describe('Controller integration', () => {
-		it('should setup success button handler', () => {
-			new HueSlider(mockInst);
+	describe('controllerAction hook', () => {
+		it('should call hueSliderAction and close when submit command', () => {
+			const hueSlider = new HueSlider(mockInst);
+			const mockButton = { getAttribute: jest.fn().mockReturnValue('submit') };
 
-			const successButtonCall = mockEditor.eventManager.addEvent.mock.calls.find(
-				call => call[1] === 'click'
-			);
+			hueSlider.controllerAction(mockButton);
 
-			expect(successButtonCall).toBeDefined();
+			expect(mockInst.hueSliderAction).toHaveBeenCalled();
+			expect(hueSlider.controller.close).toHaveBeenCalled();
 		});
 
-		it('should call hueSliderAction when success button clicked', () => {
-			new HueSlider(mockInst);
+		it('should close when close command', () => {
+			const hueSlider = new HueSlider(mockInst);
+			const mockButton = { getAttribute: jest.fn().mockReturnValue('close') };
 
-			const successButtonCall = mockEditor.eventManager.addEvent.mock.calls.find(
-				call => call[1] === 'click'
-			);
+			hueSlider.controllerAction(mockButton);
 
-			if (successButtonCall) {
-				const handler = successButtonCall[2];
-				handler();
-
-				expect(mockInst.hueSliderAction).toHaveBeenCalled();
-			}
+			expect(hueSlider.controller.close).toHaveBeenCalled();
 		});
 
-		it('should setup cancel button handler', () => {
-			new HueSlider(mockInst);
+		it('should ignore unknown commands', () => {
+			const hueSlider = new HueSlider(mockInst);
+			const mockButton = { getAttribute: jest.fn().mockReturnValue('unknown') };
 
-			const cancelButtonCalls = mockEditor.eventManager.addEvent.mock.calls.filter(
-				call => call[1] === 'click'
-			);
+			hueSlider.controllerAction(mockButton);
 
-			expect(cancelButtonCalls.length).toBeGreaterThan(0);
+			expect(mockInst.hueSliderAction).not.toHaveBeenCalled();
 		});
 	});
 
@@ -364,7 +369,7 @@ describe('Modules - HueSlider', () => {
 			const hueSlider = new HueSlider(mockInst);
 			const initialCtx = hueSlider.ctx;
 
-			hueSlider.off();
+			hueSlider.close();
 
 			expect(hueSlider.ctx).toBeDefined();
 			expect(hueSlider.ctx.color).toBeDefined();
@@ -395,7 +400,7 @@ describe('Modules - HueSlider', () => {
 			const hueSlider = new HueSlider(mockInst);
 
 			expect(() => {
-				hueSlider.off();
+				hueSlider.close();
 			}).not.toThrow();
 		});
 	});

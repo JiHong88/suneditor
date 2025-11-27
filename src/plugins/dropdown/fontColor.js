@@ -84,22 +84,6 @@ class FontColor extends PluginDropdownFree {
 
 	/**
 	 * @hook Modules.ColorPicker
-	 * @type {SunEditor.Hook.ColorPicker.HueSliderOpen}
-	 */
-	colorPickerHueSliderOpen() {
-		this.menu.dropdownHide();
-	}
-
-	/**
-	 * @hook Modules.ColorPicker
-	 * @type {SunEditor.Hook.ColorPicker.HueSliderClose}
-	 */
-	colorPickerHueSliderClose() {
-		this.menu.dropdownShow();
-	}
-
-	/**
-	 * @hook Modules.ColorPicker
 	 * @type {SunEditor.Hook.ColorPicker.Action}
 	 */
 	colorPickerAction(color) {

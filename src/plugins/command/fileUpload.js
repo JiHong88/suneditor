@@ -166,7 +166,10 @@ class FileUpload extends PluginCommand {
 	 */
 	componentSelect(target) {
 		this.#element = target;
+
 		const asBtn = this.figure.controller.form.querySelector('[data-command="__c__as"]');
+		if (!asBtn) return;
+
 		if (dom.check.isFigure(target.parentElement)) {
 			asBtn.innerHTML = this.icons.reduction + dom.utils.createTooltipInner(this.lang.asLink);
 			asBtn.setAttribute('data-value', 'link');

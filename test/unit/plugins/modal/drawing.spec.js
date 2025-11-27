@@ -180,7 +180,7 @@ describe('Drawing Plugin', () => {
 			plugins: {
 				image: {
 					pluginOptions: { uploadUrl: 'http://example.com/upload' },
-					init: jest.fn(),
+					modalInit: jest.fn(),
 					submitFile: jest.fn(),
 					create: jest.fn(),
 					createInline: jest.fn()
@@ -466,7 +466,7 @@ describe('Drawing Plugin', () => {
 		it('should create dataurl image as block by default', async () => {
 			const result = await drawing.modalAction();
 
-			expect(mockEditor.plugins.image.init).toHaveBeenCalled();
+			expect(mockEditor.plugins.image.modalInit).toHaveBeenCalled();
 			expect(mockEditor.plugins.image.create).toHaveBeenCalledWith(
 				'data:image/png;base64,test',
 				null,
@@ -483,7 +483,7 @@ describe('Drawing Plugin', () => {
 			drawing.as = 'inline';
 			const result = await drawing.modalAction();
 
-			expect(mockEditor.plugins.image.init).toHaveBeenCalled();
+			expect(mockEditor.plugins.image.modalInit).toHaveBeenCalled();
 			expect(mockEditor.plugins.image.createInline).toHaveBeenCalledWith(
 				'data:image/png;base64,test',
 				null,
@@ -523,7 +523,7 @@ describe('Drawing Plugin', () => {
 
 			const result = await drawing.modalAction();
 
-			expect(mockEditor.plugins.image.init).toHaveBeenCalled();
+			expect(mockEditor.plugins.image.modalInit).toHaveBeenCalled();
 			expect(mockEditor.plugins.image.submitFile).toHaveBeenCalled();
 			expect(result).toBe(true);
 		});

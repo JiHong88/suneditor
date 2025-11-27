@@ -335,4 +335,138 @@ describe('EventManager', () => {
 			expect(() => eventManager.applyTagEffect()).not.toThrow();
 		});
 	});
+
+	describe('triggerEvent', () => {
+		it('should have triggerEvent method', () => {
+			expect(typeof eventManager.triggerEvent).toBe('function');
+		});
+
+		it('should handle missing event type', async () => {
+			const result = await eventManager.triggerEvent('nonExistentEvent', {});
+			expect(result).toBeUndefined();
+		});
+	});
+
+	describe('_callPluginEvent', () => {
+		it('should have _callPluginEvent method', () => {
+			expect(typeof eventManager._callPluginEvent).toBe('function');
+		});
+
+		it('should handle empty plugins', () => {
+			expect(() => {
+				eventManager._callPluginEvent('onMouseMove', { frameContext: mockEditor.frameContext, event: {} });
+			}).not.toThrow();
+		});
+	});
+
+	describe('_callPluginEventAsync', () => {
+		it('should have _callPluginEventAsync method', () => {
+			expect(typeof eventManager._callPluginEventAsync).toBe('function');
+		});
+
+		it('should handle empty plugins async', async () => {
+			const result = await eventManager._callPluginEventAsync('onMouseDown', { frameContext: mockEditor.frameContext, event: {} });
+			expect(result).toBeUndefined();
+		});
+	});
+
+	describe('_setClipboardData', () => {
+		it('should have _setClipboardData method', () => {
+			expect(typeof eventManager._setClipboardData).toBe('function');
+		});
+	});
+
+	describe('_toggleToolbarBalloon', () => {
+		it('should have _toggleToolbarBalloon method', () => {
+			expect(typeof eventManager._toggleToolbarBalloon).toBe('function');
+		});
+
+		it('should not throw when called', () => {
+			expect(() => {
+				eventManager._toggleToolbarBalloon();
+			}).not.toThrow();
+		});
+	});
+
+	describe('_showToolbarBalloonDelay', () => {
+		it('should have _showToolbarBalloonDelay method', () => {
+			expect(typeof eventManager._showToolbarBalloonDelay).toBe('function');
+		});
+
+		it('should not throw when called', () => {
+			expect(() => {
+				eventManager._showToolbarBalloonDelay();
+			}).not.toThrow();
+		});
+	});
+
+	describe('_hideToolbar', () => {
+		it('should have _hideToolbar method', () => {
+			expect(typeof eventManager._hideToolbar).toBe('function');
+		});
+
+		it('should not throw when called', () => {
+			expect(() => {
+				eventManager._hideToolbar();
+			}).not.toThrow();
+		});
+	});
+
+	describe('__postFocusEvent', () => {
+		it('should have __postFocusEvent method', () => {
+			expect(typeof eventManager.__postFocusEvent).toBe('function');
+		});
+	});
+
+	describe('__postBlurEvent', () => {
+		it('should have __postBlurEvent method', () => {
+			expect(typeof eventManager.__postBlurEvent).toBe('function');
+		});
+	});
+
+	describe('_setSelectionSync', () => {
+		it('should have _setSelectionSync method', () => {
+			expect(typeof eventManager._setSelectionSync).toBe('function');
+		});
+
+		it('should not throw when called', () => {
+			expect(() => {
+				eventManager._setSelectionSync();
+			}).not.toThrow();
+		});
+	});
+
+	describe('_resetFrameStatus', () => {
+		it('should have _resetFrameStatus method', () => {
+			expect(typeof eventManager._resetFrameStatus).toBe('function');
+		});
+	});
+
+	describe('_isNonFocusNode', () => {
+		it('should have _isNonFocusNode method', () => {
+			expect(typeof eventManager._isNonFocusNode).toBe('function');
+		});
+
+		it('should return false for regular element', () => {
+			const div = document.createElement('div');
+			const result = eventManager._isNonFocusNode(div);
+			expect(typeof result).toBe('boolean');
+		});
+	});
+
+	describe('__removeInput', () => {
+		it('should have __removeInput method', () => {
+			expect(typeof eventManager.__removeInput).toBe('function');
+		});
+
+		it('should reset input state', () => {
+			eventManager._inputFocus = true;
+			eventManager.__inputPlugin = {};
+
+			eventManager.__removeInput();
+
+			expect(eventManager._inputFocus).toBe(false);
+			expect(eventManager.__inputPlugin).toBe(null);
+		});
+	});
 });

@@ -423,8 +423,8 @@ Component.prototype = {
 		if (/^FIGURE$/i.test(element.nodeName)) element = element.parentElement;
 		if (dom.utils.hasClass(element, 'se-inline-component')) return true;
 
-		const container = this.editor._componentManager.find((f) => f(element));
-		if (container && dom.utils.hasClass(element, 'se-inline-component')) return true;
+		const comp = this.editor._componentManager.find((f) => f(element));
+		if (comp && (dom.utils.hasClass(element, 'se-inline-component') || dom.utils.hasClass(element.parentElement, 'se-inline-component'))) return true;
 
 		return false;
 	},
@@ -461,6 +461,36 @@ Component.prototype = {
 
 		// copy effect
 		dom.utils.flashClass(container, 'se-copy');
+	},
+
+	/**
+	 * @this {ComponentThis}
+	 * @description Temporarily selects a component without showing its controller.
+	 * This is a lightweight selection mode used for:
+	 * - Mouse hover: Shows visual selection while hovering, auto-deselects on mouse out
+	 * - Table column/row resize: Maintains selection after resize without showing controller
+	 *
+	 * Key differences from `select()`:
+	 * - Does NOT show the component's controller (resize handles, toolbar, etc.)
+	 * - Sets `__overInfo` flag so selection is automatically cleared on mouse out
+	 * - Calling `select()` afterward will upgrade to full selection with controller
+	 *
+	 * @param {Element} target The element to hover-select
+	 */
+	hoverSelect(target) {
+		const figure = dom.query.getParentElement(target, dom.check.isFigure);
+		let info = this.get(target);
+		if (info || figure) {
+			info ||= this.get(figure);
+			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
+				this.ui._offCurrentController();
+				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
+				this.select(info.target, info.pluginName);
+			}
+		} else if (_DragHandle.get('__overInfo') !== null && !dom.utils.hasClass(target, 'se-drag-handle')) {
+			this.__deselect();
+			_DragHandle.set('__overInfo', null);
+		}
 	},
 
 	/**

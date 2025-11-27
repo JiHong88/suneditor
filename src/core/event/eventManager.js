@@ -14,7 +14,7 @@ import { OnKeyDown_wysiwyg, OnKeyUp_wysiwyg } from './handlers/handler_ww_key';
 import { OnPaste_wysiwyg, OnCopy_wysiwyg, OnCut_wysiwyg } from './handlers/handler_ww_clipboard';
 import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './handlers/handler_ww_dragDrop';
 
-const { _w, _d, ON_OVER_COMPONENT, isMobile, isTouchDevice } = env;
+const { _w, _d, isMobile, isTouchDevice } = env;
 
 /**
  * @typedef {Omit<EventManager & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis
@@ -1109,29 +1109,6 @@ EventManager.prototype = {
 	/**
 	 * @private
 	 * @this {EventManagerThis}
-	 * @description Handles the selection of a component when hovering over it.
-	 * - If the target is a component, it ensures that the component is selected properly.
-	 * @param {Element} target The element being hovered over
-	 */
-	_overComponentSelect(target) {
-		const figure = dom.query.getParentElement(target, dom.check.isFigure);
-		let info = this.component.get(target);
-		if (info || figure) {
-			info ||= this.component.get(figure);
-			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
-				this.ui._offCurrentController();
-				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
-				this.component.select(info.target, info.pluginName);
-			}
-		} else if (_DragHandle.get('__overInfo') !== null && !dom.utils.hasClass(target, 'se-drag-handle')) {
-			this.component.__deselect();
-			_DragHandle.set('__overInfo', null);
-		}
-	},
-
-	/**
-	 * @private
-	 * @this {EventManagerThis}
 	 * @description Removes input event listeners and resets input-related properties.
 	 */
 	__removeInput() {
@@ -1239,8 +1216,6 @@ function OnFocus_wysiwyg(frameContext, e) {
 	if ((this.status.rootKey === rootKey && this.editor._preventBlur) || this.editor._preventFocus) return;
 	this.editor._preventFocus = true;
 
-	this.ui._offCurrentController();
-
 	dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
 	dom.utils.setDisabled(this.editor._codeViewDisabledButtons, false);
 
@@ -1271,6 +1246,8 @@ function OnBlur_wysiwyg(frameContext, e) {
 
 	this.status.currentNodes = [];
 	this.status.currentNodesMap = [];
+
+	this.ui._offCurrentController();
 
 	this.editor.applyFrameRoots((root) => {
 		if (root.get('navigation')) root.get('navigation').textContent = '';

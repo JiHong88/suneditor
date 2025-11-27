@@ -169,6 +169,21 @@ declare class Component {
 	 */
 	copy(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node): Promise<void>;
 	/**
+	 * @this {ComponentThis}
+	 * @description Temporarily selects a component without showing its controller.
+	 * This is a lightweight selection mode used for:
+	 * - Mouse hover: Shows visual selection while hovering, auto-deselects on mouse out
+	 * - Table column/row resize: Maintains selection after resize without showing controller
+	 *
+	 * Key differences from `select()`:
+	 * - Does NOT show the component's controller (resize handles, toolbar, etc.)
+	 * - Sets `__overInfo` flag so selection is automatically cleared on mouse out
+	 * - Calling `select()` afterward will upgrade to full selection with controller
+	 *
+	 * @param {Element} target The element to hover-select
+	 */
+	hoverSelect(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, target: Element): void;
+	/**
 	 * @private
 	 * @this {ComponentThis}
 	 * @description Checks if the given element is a file component by matching its tag name against the file manager's regular expressions.

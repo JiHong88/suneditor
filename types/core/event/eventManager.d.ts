@@ -355,14 +355,6 @@ declare class EventManager {
 	/**
 	 * @private
 	 * @this {EventManagerThis}
-	 * @description Handles the selection of a component when hovering over it.
-	 * - If the target is a component, it ensures that the component is selected properly.
-	 * @param {Element} target The element being hovered over
-	 */
-	_overComponentSelect(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, target: Element): void;
-	/**
-	 * @private
-	 * @this {EventManagerThis}
 	 * @description Removes input event listeners and resets input-related properties.
 	 */
 	__removeInput(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
