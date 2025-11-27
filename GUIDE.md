@@ -78,7 +78,7 @@ suneditor/
 │   │   ├── base.js          # Base hooks (Event, Component, Core)
 │   │   └── params.js        # Hook parameter type definitions
 │   ├── interfaces/          # Plugin base classes & contracts
-│   │   ├── plugin.js        # Plugin type classes (PluginCommand, PluginModal, etc.)
+│   │   ├── plugins.js       # Plugin type classes (PluginCommand, PluginModal, etc.)
 │   │   ├── contracts.js     # Contract interfaces (ModuleModal, EditorComponent, etc.)
 │   │   └── index.js         # Interface exports
 │   ├── helper/              # Pure utility functions
@@ -267,11 +267,7 @@ suneditor/
     - **Modules**: UI Component layer (reusable widgets)
     - **Helpers**: Utility layer (pure functions, no state)
 
-2. **Dependency Injection via EditorInjector**
-    - Plugins extend `EditorInjector` to access editor API and core classes
-    - See [EditorInjector Pattern](#editorinjector-pattern-srceditorinjector) for implementation details
-
-3. **Multi-Root Frame Architecture**
+2. **Multi-Root Frame Architecture**
     - **frameRoots Map**: Stores all frame contexts by rootKey (actual data storage)
     - **Global Context** (`editor.context`): Shared UI (toolbar, statusbar, modal overlay)
     - **Current Frame References**:
@@ -279,13 +275,13 @@ suneditor/
         - `editor.frameOptions` → Points to current frame's options (from frameContext.get('options'))
     - Single editor instance manages multiple editable frames
 
-4. **Two-Tier Options System**
+3. **Two-Tier Options System**
     - **Base Options** (`editor.options`): Shared config (plugins, mode, toolbar, shortcuts, events)
     - **Frame Options** (`editor.frameOptions`): Per-frame config (height, placeholder, iframe, statusbar)
     - Map-based storage with `'fixed'` flags for immutable options
     - Dynamic updates via `editor.resetOptions()` for resettable options
 
-5. **Event-Driven with Redux Pattern**
+4. **Event-Driven with Redux Pattern**
     - **Reducers**: Pure functions analyzing events → return action lists
     - **Actions**: Plain objects `{t: 'ACTION_TYPE', p: payload}`
     - **Effects**: Side effect functions mapped by action type
@@ -409,6 +405,36 @@ if (dom.check.isList(block) || dom.check.isListCell(line)) {
 	</ul>
 </div>
 ```
+
+#### Design Philosophy: Structured Content
+
+SunEditor is designed for **structured content editing**, not arbitrary HTML input.
+
+**What this means:**
+
+- Content is validated against line/block/component rules
+- Invalid structures are automatically corrected
+- `strictMode` filters enforce content consistency
+
+**When `strictMode` filters are disabled:**
+
+- Defensive code prevents crashes
+- However, correct behavior is **not guaranteed**
+- Edge cases may produce unexpected results
+
+**Critical Filter: `formatFilter`**
+
+`strictMode.formatFilter` enforces the line/block/component structure. When disabled:
+
+- Components may lack required wrapper elements (`se-component`)
+- Line/block hierarchy validation is skipped
+- **Core operations (selection, formatting) may behave unexpectedly**
+
+**Use cases:**
+
+- ✅ Blog posts, articles, documentation (structured content)
+- ✅ Email templates with defined layouts
+- ⚠️ Arbitrary HTML editing (consider a code editor instead)
 
 #### Content Filtering: strictMode
 
@@ -599,7 +625,7 @@ src/core/
 
 Plugins are modular features that extend editor functionality. Each plugin type serves a specific UI pattern.
 
-**Architecture Pattern**: ES6 classes extending plugin type base classes from `src/interfaces/plugin.js`
+**Architecture Pattern**: ES6 classes extending plugin type base classes from `src/interfaces/plugins.js`
 
 - Constructor: `constructor(editor, pluginOptions)` → calls `super(editor)`
 - Static properties: `static key`, `static type`, `static className` (type is auto-set by base class)
@@ -619,6 +645,18 @@ Plugins are modular features that extend editor functionality. Each plugin type 
 | **`PluginField`**        | `field`         | `field/`    | (none - uses hooks)        | mention                     |
 | **`PluginInput`**        | `input`         | `input/`    | (none - uses hooks)        | fontSize, pageNavigator     |
 | **`PluginPopup`**        | `popup`         | `popup/`    | `show()`                   | anchor                      |
+
+**Inheritance Chain:**
+
+All plugin base classes extend `EditorInjector`, providing automatic access to editor APIs:
+
+```
+PluginCommand ─┐
+PluginModal ───┼── extends EditorInjector → { editor, selection, html, format, ... }
+PluginDropdown─┘
+```
+
+See [EditorInjector Pattern](#editorinjector-pattern-srceditorinjector) for full list of injected properties.
 
 **Example Usage:**
 
@@ -735,10 +773,11 @@ Interface definitions: [`src/interfaces/contracts.js`](src/interfaces/contracts.
 
 ###### Controller Module — Interface: `ModuleController`
 
-| Hook                       | Required | Type                               | When Called              | Return | Usage |
-| -------------------------- | -------- | ---------------------------------- | ------------------------ | ------ | ----- |
-| `controllerAction(target)` | ✅       | `SunEditor.Hook.Controller.Action` | Controller button click  | `void` | ⭐⭐  |
-| `controllerClose()`        | 📝       | `SunEditor.Hook.Controller.Close`  | Before controller closes | `void` | ⭐    |
+| Hook                         | Required | Type                               | When Called              | Return | Usage |
+| ---------------------------- | -------- | ---------------------------------- | ------------------------ | ------ | ----- |
+| `controllerAction(target)`   | ✅       | `SunEditor.Hook.Controller.Action` | Controller button click  | `void` | ⭐⭐  |
+| `controllerOn(form, target)` | 📝       | `SunEditor.Hook.Controller.On`     | After controller opens   | `void` | ⭐    |
+| `controllerClose()`          | 📝       | `SunEditor.Hook.Controller.Close`  | Before controller closes | `void` | ⭐    |
 
 ###### ColorPicker Module — Interface: `ModuleColorPicker`
 
@@ -770,6 +809,46 @@ For plugins that create **static components** (e.g., image, video, embed) using 
 - **TypeScript**: `implements EditorComponent`
 - **JavaScript**: `@type {SunEditor.Hook.Component.Select}`, etc.
 - **Definition**: `src/interfaces/contracts.js`
+
+**`static component(node)` Method:**
+
+Component plugins must define a static `component` method that identifies whether a DOM node belongs to this plugin.
+This method is registered to `editor._componentManager` during plugin initialization and called when:
+
+- Detecting component type on mouse hover/click
+- Determining which plugin handles a selected element
+
+```javascript
+class MyComponentPlugin extends PluginModal {
+	/**
+	 * @param {Element} node - The node to check
+	 * @returns {Element|null} - The component element if valid, null otherwise
+	 */
+	static component(node) {
+		// Return the actual component element (e.g., IMG, VIDEO, IFRAME)
+		// Return null if node is not this plugin's component
+		return /^IMG$/i.test(node?.nodeName) ? node : null;
+	}
+}
+```
+
+**`_element` Property Requirement:**
+
+Component plugins must define a public `_element` property that references the currently controlled DOM element.
+This property is used by `Controller` and `Figure` modules for click detection and controller positioning.
+
+```javascript
+class MyComponentPlugin extends PluginModal {
+	constructor(editor, pluginOptions) {
+		super(editor);
+		this._element = null; // Required for Controller/Figure modules
+	}
+
+	componentSelect(element) {
+		this._element = element; // Set when component is selected
+	}
+}
+```
 
 | Hook                        | Required | Type                                | When Called                 | Return            | Usage  |
 | --------------------------- | -------- | ----------------------------------- | --------------------------- | ----------------- | ------ |
@@ -831,17 +910,19 @@ Many hook methods receive standardized parameter objects defined in [`src/hooks/
 
 **Common Parameter Types:**
 
-| Type                                 | Properties                                      | Used By                                                              |
-| ------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------- |
-| **`HookParams.MouseEvent`**          | `{ frameContext, event }`                       | `onMouseDown`, `onMouseUp`, `onClick`, `onMouseMove`, `onMouseLeave` |
-| **`HookParams.KeyEvent`**            | `{ frameContext, event, range, line }`          | `onKeyDown`, `onKeyUp`                                               |
-| **`HookParams.Frame`**               | `{ frameContext, event }`                       | `onFocus`, `onBlur`, `onScroll`, `onBeforeInput`, `onInput`          |
-| **`HookParams.Paste`**               | `{ frameContext, event, data, doc }`            | `onPaste`, `onPasteAsync`                                            |
-| **`HookParams.FilePasteDrop`**       | `{ frameContext, event, file }`                 | `onFilePasteAndDrop`, `onFilePasteAndDropAsync`                      |
-| **`HookParams.ToolbarInputKeydown`** | `{ target, event, value }`                      | `toolbarInputKeyDown`                                                |
-| **`HookParams.ToolbarInputChange`**  | `{ target, event, value }`                      | `toolbarInputChange`                                                 |
-| **`HookParams.Shortcut`**            | `{ range, line, info, event, keyCode, editor }` | `shortcut`                                                           |
-| **`HookParams.CopyComponent`**       | `{ event, cloneContainer, info }`               | `componentCopy`                                                      |
+| Type                           | Properties                                      | Used By                                                              |
+| ------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------- |
+| **`HookParams.MouseEvent`**    | `{ frameContext, event }`                       | `onMouseDown`, `onMouseUp`, `onClick`, `onMouseMove`, `onMouseLeave` |
+| **`HookParams.KeyEvent`**      | `{ frameContext, event, range, line }`          | `onKeyDown`, `onKeyUp`                                               |
+| **`HookParams.FocusBlur`**     | `{ frameContext, event }`                       | `onFocus`, `onBlur`                                                  |
+| **`HookParams.Scroll`**        | `{ frameContext, event }`                       | `onScroll`                                                           |
+| **`HookParams.InputWithData`** | `{ frameContext, event, data }`                 | `onBeforeInput`, `onInput`                                           |
+| **`HookParams.Paste`**         | `{ frameContext, event, data, doc }`            | `onPaste`, `onPasteAsync`                                            |
+| **`HookParams.FilePasteDrop`** | `{ frameContext, event, file }`                 | `onFilePasteAndDrop`, `onFilePasteAndDropAsync`                      |
+| **`HookParams.InputKeyDown`**  | `{ target, event }`                             | `toolbarInputKeyDown`                                                |
+| **`HookParams.InputChange`**   | `{ target, event, value }`                      | `toolbarInputChange`                                                 |
+| **`HookParams.Shortcut`**      | `{ range, line, info, event, keyCode, editor }` | `shortcut`                                                           |
+| **`HookParams.CopyComponent`** | `{ event, cloneContainer, info }`               | `componentCopy`                                                      |
 
 **Property Descriptions:**
 
@@ -944,11 +1025,11 @@ Module contracts are interfaces that define plugin hooks called by specific modu
 | Contract File        | Module                | Required Hooks                           | Optional Hooks                                              |
 | -------------------- | --------------------- | ---------------------------------------- | ----------------------------------------------------------- |
 | **`Modal.js`**       | `Modules.Modal`       | `modalAction()` (async, returns boolean) | `modalOn()`, `modalOff()`, `modalInit()`, `modalResize()`   |
-| **`Controller.js`**  | `Modules.Controller`  | `controllerAction()`                     | `controllerClose()`                                         |
-| **`ColorPicker.js`** | `Modules.ColorPicker` | `colorPickerAction(hex, rgb)`            | `colorPickerHueSliderOpen()`, `colorPickerHueSliderClose()` |
+| **`Controller.js`**  | `Modules.Controller`  | `controllerAction()`                     | `controllerOn()`, `controllerClose()`                       |
+| **`ColorPicker.js`** | `Modules.ColorPicker` | `colorPickerAction(color)`               | `colorPickerHueSliderOpen()`, `colorPickerHueSliderClose()` |
 | **`HueSlider.js`**   | `Modules.HueSlider`   | `hueSliderAction(color)`                 | `hueSliderCancelAction()`                                   |
 | **`Browser.js`**     | `Modules.Browser`     | _(none)_                                 | `browserInit()`                                             |
-| **`Figure.js`**      | `Modules.Figure`      | _(see Component hooks)_                  | `figureCustomResize()`, `figureBeforeSizeUpdate()`          |
+| **`Figure.js`**      | `Modules.Figure`      | _(see Component hooks)_                  | _(none)_                                                    |
 
 **Hook Naming Convention**: `{moduleName}{MethodName}` (e.g., `modalAction`, `controllerClose`)
 
@@ -1460,11 +1541,11 @@ button.click → editor.run(command, 'browser', button) → plugin.open(null)
 
 Different components call plugin methods at different lifecycle stages:
 
-- **Editor**: `registerPlugin()` → instantiation, `init()`, `run()` → `action()`, `shortcut()`
+- **Editor**: `registerPlugin()` → instantiation, `run()` → `action()`, `shortcut()`, `retainFormat()`,`init()`
 - **EventManager**: `active()`, `onInput()`, `onFilePasteAndDrop()`, `onKeyDown()`, etc.
-- **Modal Module**: `open()`, `close()`, `init()`, `on()`, `off()`, `modalAction()`
-- **Controller Module**: `select()`, `deselect()`, `edit()`, `destroy()`, `controllerAction()`
-- **Component Class**: `retainFormat()`, `show()`
+- **Modal Module**: `modalAction()`, `modalOn()`, `modalOff()`, `modalInit()`, `modalResize()`
+- **Controller Module**: `controllerAction()`, `controllerOn()`, `controllerClose()`
+- **Component Class**: `componentSelect()`, `componentDeselect()`, `componentEdit()`, `componentDestroy()`
 
 **Key Points:**
 

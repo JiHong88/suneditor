@@ -36,6 +36,12 @@ It's easy to integrate, highly customizable, and built for modern web applicatio
     - 📂 Built-in media galleries (image, video, audio, file)
     - 📄 PDF export, templates, and embedded content (audio/video/iframe)
 
+### 📝 Content Editing Approach
+
+SunEditor is optimized for **structured content** (articles, documentation, emails) rather than arbitrary HTML editing. Content is validated and auto-corrected to maintain consistency.
+
+> For raw HTML editing needs, see [`strictMode` configuration](./GUIDE.md#design-philosophy-structured-content) in the Developer Guide.
+
 🌤 **[Try all plugins in Playground](https://suneditor.com/playground)**
 
 ⭐ **Contributions welcome!** Please refer to [Contribution Guidelines](/CONTRIBUTING.md) and check out our [open tasks](https://github.com/jihong88/suneditor/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22). ⭐
