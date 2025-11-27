@@ -55,6 +55,9 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
+            - name: Check architecture
+              run: npm run check:arch
+
             - name: Run tests with coverage
               run: npm run test:coverage
 
