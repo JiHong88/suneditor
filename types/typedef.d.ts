@@ -387,14 +387,14 @@ declare global {
 				| 'anchor';
 			/**
 			 * Button list configuration for the toolbar
-			 * 2D array of button items, where each sub-array represents a button group
+			 * Supports nested arrays, special controls, and responsive breakpoint configurations
 			 */
 			type ButtonItem = SunEditor.UI.ButtonCommand | SunEditor.UI.ButtonPlugin | SunEditor.UI.ButtonSpecial | string;
 			/**
 			 * ///
 			 * ---[ End of auto-generated button types ]---
 			 */
-			type ButtonList = Array<Array<SunEditor.UI.ButtonItem> | SunEditor.UI.ButtonSpecial>;
+			type ButtonList = Array<SunEditor.UI.ButtonItem | SunEditor.UI.ButtonList | SunEditor.UI.ButtonSpecial>;
 		}
 	}
 }

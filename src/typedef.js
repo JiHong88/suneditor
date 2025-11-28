@@ -304,8 +304,8 @@
  * @typedef {SunEditor.UI.ButtonCommand|SunEditor.UI.ButtonPlugin|SunEditor.UI.ButtonSpecial|string} SunEditor.UI.ButtonItem
  *
  * Button list configuration for the toolbar
- * 2D array of button items, where each sub-array represents a button group
- * @typedef {Array<Array<SunEditor.UI.ButtonItem>|SunEditor.UI.ButtonSpecial>} SunEditor.UI.ButtonList
+ * Supports nested arrays, special controls, and responsive breakpoint configurations
+ * @typedef {Array<SunEditor.UI.ButtonItem|SunEditor.UI.ButtonList|SunEditor.UI.ButtonSpecial>} SunEditor.UI.ButtonList
  * ///
  * ---[ End of auto-generated button types ]---
  */

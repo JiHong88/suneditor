@@ -95,8 +95,8 @@ function updateTypedef(commands, plugins) {
 				` * @typedef {SunEditor.UI.ButtonCommand|SunEditor.UI.ButtonPlugin|SunEditor.UI.ButtonSpecial|string} SunEditor.UI.ButtonItem\n` +
 				` *\n` +
 				` * Button list configuration for the toolbar\n` +
-				` * 2D array of button items, where each sub-array represents a button group\n` +
-				` * @typedef {Array<Array<SunEditor.UI.ButtonItem>|SunEditor.UI.ButtonSpecial>} SunEditor.UI.ButtonList\n` +
+				` * Supports nested arrays, special controls, and responsive breakpoint configurations\n` +
+				` * @typedef {Array<SunEditor.UI.ButtonItem|SunEditor.UI.ButtonList|SunEditor.UI.ButtonSpecial>} SunEditor.UI.ButtonList\n` +
 				` * ///\n` +
 				` * ---[ End of auto-generated button types ]---\n` +
 				` */\n`

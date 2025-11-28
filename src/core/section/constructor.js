@@ -359,8 +359,8 @@ function _mergeObject(a, b) {
  * @property {Object<string, string>} i - Icon set
  * @property {Object<string, string>} l - Language pack
  * @property {?string} v - Initial editor value
- * @property {Array<string[]|string>} buttons - Toolbar button list (arrays for groups, strings for single buttons)
- * @property {?Array<string[]|string>} subButtons - Sub-toolbar button list
+ * @property {SunEditor.UI.ButtonList} buttons - Toolbar button list (arrays for groups, strings for single buttons)
+ * @property {?SunEditor.UI.ButtonList} subButtons - Sub-toolbar button list
  * @property {?Element} statusbarContainer - Container element for status bar (if specified)
  * @property {Map<string|null, SunEditor.FrameOptions>} frameMap - Map of frame-specific options (frame key => {@link SunEditor.FrameOptions})
  */
