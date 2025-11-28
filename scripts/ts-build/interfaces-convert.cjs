@@ -32,8 +32,8 @@ const interfaceFiles = ['types/interfaces/*.d.ts'];
  * @returns {Promise<Set<string>>} - Set of member names marked as optional
  */
 async function getOptionalMembers(dtsFilePath) {
-	// Convert .d.ts path to .js path
-	const jsFilePath = dtsFilePath.replace('types/', 'src/').replace('.d.ts', '.js');
+	// Convert .d.ts path to .js path (handle both / and \ for cross-platform)
+	const jsFilePath = dtsFilePath.replace(/types[/\\]/, 'src/').replace('.d.ts', '.js');
 
 	const optionalMembers = new Set();
 

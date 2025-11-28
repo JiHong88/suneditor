@@ -56,7 +56,9 @@ class Math_ extends PluginModal {
 
 		// exception
 		if (!(this.katex = this.#CheckKatex(editor)) && !(this.mathjax = this.#CheckMathJax(editor))) {
-			console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need either "KaTeX" or "MathJax" library. Please add the katex or mathjax option.');
+			console.warn(
+				'[SUNEDITOR.plugins.math.warn] The math plugin must need either "KaTeX" or "MathJax" library. Please add the katex or mathjax option. See: https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md',
+			);
 		}
 
 		this.pluginOptions = {

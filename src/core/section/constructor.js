@@ -666,7 +666,7 @@ export function InitOptions(options, editorTargets, plugins) {
 		} else if (cm.src) {
 			o.set('codeMirror5Editor', true);
 		} else {
-			console.warn('[SUNEDITOR.options.externalLibs.codeMirror.fail] The codeMirror option is set incorrectly.');
+			console.warn('[SUNEDITOR.options.externalLibs.codeMirror.fail] The codeMirror option is set incorrectly. See: https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md');
 			o.set('codeMirror', null);
 		}
 	}

@@ -370,7 +370,7 @@ export namespace DEFAULTS {
  * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
  *
  * === Dynamic Options ===
- * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax.
+ * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax. See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
  * @property {Object<string, boolean>} [allowedExtraTags=CONSTANTS.EXTRA_TAG_MAP] - Specifies extra allowed or disallowed tags.
  * - The default follows {@link DEFAULTS.EXTRA_TAG_MAP}
  * ///
@@ -1047,7 +1047,7 @@ export type EditorBaseOptions = {
 	 */
 	freeCodeViewMode?: string;
 	/**
-	 * - External libraries like CodeMirror or MathJax.
+	 * - External libraries like CodeMirror or MathJax. See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
 	 */
 	externalLibs?: {
 		[x: string]: any;

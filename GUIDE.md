@@ -19,6 +19,8 @@
 - [Modules](#modules-srcmodules)
 - [Essential Commands](#essential-commands)
 - [Testing Strategy](#testing-strategy)
+- Supplementary Guides
+    - [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax
 
 ---
 
@@ -1908,3 +1910,9 @@ this.selection.setRange(range.startContainer, range.startOffset, range.endContai
 - **Output**: `dist/suneditor.min.js` and `dist/suneditor.min.css`
 
 The `dist/` folder is NOT tracked in git and is built via CI/CD when changes are pushed to the `release` branch.
+
+---
+
+## Supplementary Guides
+
+- [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax integration
