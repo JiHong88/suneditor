@@ -6,12 +6,12 @@ export type LineHeightPluginOptions = {
 	 */
 	items?: Array<{
 		text: string;
-		value: number;
+		value: string;
 	}>;
 };
 /**
  * @typedef {Object} LineHeightPluginOptions
- * @property {Array<{text: string, value: number}>} [items] - Line height list
+ * @property {Array<{text: string, value: string}>} [items] - Line height list
  */
 /**
  * @class

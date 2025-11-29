@@ -14,11 +14,11 @@ export type FileUploadPluginOptions = {
 	/**
 	 * - Total upload size limit in bytes
 	 */
-	uploadSizeLimit?: string;
+	uploadSizeLimit?: number;
 	/**
 	 * - Single file size limit in bytes
 	 */
-	uploadSingleSizeLimit?: string;
+	uploadSingleSizeLimit?: number;
 	/**
 	 * - Allow multiple file uploads
 	 */
@@ -48,8 +48,8 @@ export type FileUploadPluginOptions = {
  * @typedef FileUploadPluginOptions
  * @property {string} uploadUrl - Server request URL for file upload
  * @property {Object<string, string>} [uploadHeaders] - Server request headers
- * @property {string} [uploadSizeLimit] - Total upload size limit in bytes
- * @property {string} [uploadSingleSizeLimit] - Single file size limit in bytes
+ * @property {number} [uploadSizeLimit] - Total upload size limit in bytes
+ * @property {number} [uploadSingleSizeLimit] - Single file size limit in bytes
  * @property {boolean} [allowMultiple=false] - Allow multiple file uploads
  * @property {string} [acceptedFormats="*"] - Accepted file formats (e.g., 'image/*, .pdf')
  * @property {string} [as="box"] - Specify the default form of the file component as 'box' or 'link'

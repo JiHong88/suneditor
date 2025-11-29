@@ -3,7 +3,7 @@ import { dom } from '../../helper';
 
 /**
  * @typedef {Object} LineHeightPluginOptions
- * @property {Array<{text: string, value: number}>} [items] - Line height list
+ * @property {Array<{text: string, value: string}>} [items] - Line height list
  */
 
 /**

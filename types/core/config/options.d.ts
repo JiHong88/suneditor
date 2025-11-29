@@ -138,8 +138,8 @@ export namespace DEFAULTS {
  * @property {boolean} [statusbar_resizeEnable=true] - Enables resize function of bottom status bar
  * @property {boolean} [charCounter=false] - Shows the number of characters in the editor.
  * - If the maxCharCount option has a value, it becomes true.
- * @property {number} [charCounter_max=null] - The maximum number of characters allowed to be inserted into the editor.
- * @property {string} [charCounter_label=null] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
+ * @property {?number} [charCounter_max=null] - The maximum number of characters allowed to be inserted into the editor.
+ * @property {?string} [charCounter_label=null] - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
  * @property {"char"|"byte"|"byte-html"} [charCounter_type="char"] - Defines the calculation method of the "charCounter" option.
  * - 'char': Characters length.
  * - 'byte': Binary data size of characters.
@@ -335,14 +335,14 @@ export namespace DEFAULTS {
  * @property {boolean} [syncTabIndent=true] - Synchronizes tab indent with spaces.
  * @property {boolean} [tabDisable=false] - Disables tab key input.
  * @property {string|number} [toolbar_width="auto"] - Toolbar width.
- * @property {Element|string} [toolbar_container] - Container element for the toolbar.
+ * @property {?(Element|string)} [toolbar_container] - Container element for the toolbar.
  * @property {number} [toolbar_sticky=0] - Enables sticky toolbar with optional offset.
  * @property {boolean} [toolbar_hide=false] - Hides toolbar initially.
  * @property {Object} [subToolbar={}] - Sub-toolbar configuration.
  * @property {SunEditor.UI.ButtonList} [subToolbar.buttonList] - List of Sub-toolbar buttons, grouped by sub-arrays.
  * @property {"balloon"|"balloon-always"} [subToolbar.mode="balloon"] - Sub-toolbar mode: "balloon", "balloon-always".
  * @property {string|number} [subToolbar.width="auto"] - Sub-toolbar width.
- * @property {Element|string} [statusbar_container] - Container element for the status bar.
+ * @property {?(Element|string)} [statusbar_container] - Container element for the status bar.
  * @property {boolean} [shortcutsHint=true] - Displays shortcut hints in tooltips.
  * @property {boolean} [shortcutsDisable=false] - Disables keyboard shortcuts.
  * @property {{[key: string]: Array<string>|undefined}} [shortcuts={}] - Custom keyboard shortcuts.
@@ -356,8 +356,8 @@ export namespace DEFAULTS {
  * @property {number} [historyStackDelayTime=400] - Delay time for history stack updates (ms).
  * @property {string} [printClass=""] - Class name for printing.
  * @property {number} [fullScreenOffset=0] - Offset applied when entering fullscreen mode.
- * @property {string} [previewTemplate=null] - Custom template for preview mode.
- * @property {string} [printTemplate=null] - Custom template for print mode.
+ * @property {?string} [previewTemplate=null] - Custom template for preview mode.
+ * @property {?string} [printTemplate=null] - Custom template for print mode.
  * @property {SunEditor.ComponentInsertType} [componentInsertBehavior="auto"] - Enables automatic selection of inserted components.
  * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
  * - For block components: executes behavior based on `selectMode`:
@@ -365,9 +365,9 @@ export namespace DEFAULTS {
  *    - `select`: Always select the inserted component.
  *    - `line`: Move cursor to the next line if possible, or create a new line and move there.
  *    - `none`: Do nothing.
- * @property {string} [defaultUrlProtocol=null] - Default URL protocol for links.
+ * @property {?string} [defaultUrlProtocol=null] - Default URL protocol for links.
  * @property {Object<"copy", number>} [toastMessageTime={copy: 1500}] - {"copy": 1500} - Duration for displaying toast messages.
- * @property {string} [freeCodeViewMode=false] - Enables free code view mode.
+ * @property {boolean} [freeCodeViewMode=false] - Enables free code view mode.
  *
  * === Dynamic Options ===
  * @property {Object<string, *>} [externalLibs] - External libraries like CodeMirror or MathJax. See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
@@ -566,11 +566,11 @@ export type EditorFrameOptions = {
 	/**
 	 * - The maximum number of characters allowed to be inserted into the editor.
 	 */
-	charCounter_max?: number;
+	charCounter_max?: number | null;
 	/**
 	 * - Text to be displayed in the "charCounter" area of the bottom bar. (e.g. "Characters : 20/200")
 	 */
-	charCounter_label?: string;
+	charCounter_label?: string | null;
 	/**
 	 * - Defines the calculation method of the "charCounter" option.
 	 * - 'char': Characters length.
@@ -951,7 +951,7 @@ export type EditorBaseOptions = {
 	/**
 	 * - Container element for the toolbar.
 	 */
-	toolbar_container?: Element | string;
+	toolbar_container?: (Element | string) | null;
 	/**
 	 * - Enables sticky toolbar with optional offset.
 	 */
@@ -971,7 +971,7 @@ export type EditorBaseOptions = {
 	/**
 	 * - Container element for the status bar.
 	 */
-	statusbar_container?: Element | string;
+	statusbar_container?: (Element | string) | null;
 	/**
 	 * - Displays shortcut hints in tooltips.
 	 */
@@ -1017,11 +1017,11 @@ export type EditorBaseOptions = {
 	/**
 	 * - Custom template for preview mode.
 	 */
-	previewTemplate?: string;
+	previewTemplate?: string | null;
 	/**
 	 * - Custom template for print mode.
 	 */
-	printTemplate?: string;
+	printTemplate?: string | null;
 	/**
 	 * - Enables automatic selection of inserted components.
 	 * - For inline components: places the cursor near the inserted component or selects it if no nearby range is available.
@@ -1035,7 +1035,7 @@ export type EditorBaseOptions = {
 	/**
 	 * - Default URL protocol for links.
 	 */
-	defaultUrlProtocol?: string;
+	defaultUrlProtocol?: string | null;
 	/**
 	 * - {"copy": 1500} - Duration for displaying toast messages.
 	 */
@@ -1045,7 +1045,7 @@ export type EditorBaseOptions = {
 	 *
 	 * === Dynamic Options ===
 	 */
-	freeCodeViewMode?: string;
+	freeCodeViewMode?: boolean;
 	/**
 	 * - External libraries like CodeMirror or MathJax. See {@link https://github.com/ARA-developer/suneditor/blob/develop/guide/external-libraries.md External Libraries Guide}
 	 */
