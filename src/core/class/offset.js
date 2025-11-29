@@ -736,7 +736,6 @@ Offset.prototype = {
 	 * - bMargin: bottom margin
 	 */
 	_getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTextSelection, isToolbarTarget) {
-		const isScrollable = this.status.isScrollable();
 		const wwRects = this.selection.getRects(this.frameContext.get('wysiwyg'), 'start').rects;
 
 		let rmt = 0;
@@ -757,7 +756,7 @@ Offset.prototype = {
 			if (!isTextSelection) {
 				const emt = editorOffset.fixedTop > 0 ? editorOffset.fixedTop : 0;
 				const emb = _w.innerHeight - (editorOffset.fixedTop + editorOffset.height);
-				rt = !isToolbarTarget && (this.toolbar.isSticky || (isScrollable && !this.toolbar._isBalloon)) ? toolbarH : 0;
+				rt = !isToolbarTarget && (this.toolbar.isSticky || !this.toolbar._isBalloon) ? toolbarH : 0;
 				rmt = tMargin - (!isToolbarTarget ? emt : 0) - rt;
 				rmb = bMargin - (emb > 0 ? emb : 0);
 			} else {
