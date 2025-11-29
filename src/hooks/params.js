@@ -71,8 +71,8 @@
  * @typedef {{
  *   target: HTMLElement,
  *   event: KeyboardEvent
- * }} InputKeyDown
- * @description Parameters for input keydown events
+ * }} ToolbarInputKeyDown
+ * @description Parameters for toolbar input keydown events
  */
 
 /**
@@ -80,8 +80,8 @@
  *   target: HTMLElement,
  *   value: string,
  *   event: FocusEvent | MouseEvent
- * }} InputChange
- * @description Parameters for input change events (triggered by blur or other input click)
+ * }} ToolbarInputChange
+ * @description Parameters for toolbar input change events (triggered by blur or other input click)
  */
 
 /**

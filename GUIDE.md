@@ -912,19 +912,19 @@ Many hook methods receive standardized parameter objects defined in [`src/hooks/
 
 **Common Parameter Types:**
 
-| Type                           | Properties                                      | Used By                                                              |
-| ------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------- |
-| **`HookParams.MouseEvent`**    | `{ frameContext, event }`                       | `onMouseDown`, `onMouseUp`, `onClick`, `onMouseMove`, `onMouseLeave` |
-| **`HookParams.KeyEvent`**      | `{ frameContext, event, range, line }`          | `onKeyDown`, `onKeyUp`                                               |
-| **`HookParams.FocusBlur`**     | `{ frameContext, event }`                       | `onFocus`, `onBlur`                                                  |
-| **`HookParams.Scroll`**        | `{ frameContext, event }`                       | `onScroll`                                                           |
-| **`HookParams.InputWithData`** | `{ frameContext, event, data }`                 | `onBeforeInput`, `onInput`                                           |
-| **`HookParams.Paste`**         | `{ frameContext, event, data, doc }`            | `onPaste`, `onPasteAsync`                                            |
-| **`HookParams.FilePasteDrop`** | `{ frameContext, event, file }`                 | `onFilePasteAndDrop`, `onFilePasteAndDropAsync`                      |
-| **`HookParams.InputKeyDown`**  | `{ target, event }`                             | `toolbarInputKeyDown`                                                |
-| **`HookParams.InputChange`**   | `{ target, event, value }`                      | `toolbarInputChange`                                                 |
-| **`HookParams.Shortcut`**      | `{ range, line, info, event, keyCode, editor }` | `shortcut`                                                           |
-| **`HookParams.CopyComponent`** | `{ event, cloneContainer, info }`               | `componentCopy`                                                      |
+| Type                                 | Properties                                      | Used By                                                              |
+| ------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------- |
+| **`HookParams.MouseEvent`**          | `{ frameContext, event }`                       | `onMouseDown`, `onMouseUp`, `onClick`, `onMouseMove`, `onMouseLeave` |
+| **`HookParams.KeyEvent`**            | `{ frameContext, event, range, line }`          | `onKeyDown`, `onKeyUp`                                               |
+| **`HookParams.FocusBlur`**           | `{ frameContext, event }`                       | `onFocus`, `onBlur`                                                  |
+| **`HookParams.Scroll`**              | `{ frameContext, event }`                       | `onScroll`                                                           |
+| **`HookParams.InputWithData`**       | `{ frameContext, event, data }`                 | `onBeforeInput`, `onInput`                                           |
+| **`HookParams.Paste`**               | `{ frameContext, event, data, doc }`            | `onPaste`, `onPasteAsync`                                            |
+| **`HookParams.FilePasteDrop`**       | `{ frameContext, event, file }`                 | `onFilePasteAndDrop`, `onFilePasteAndDropAsync`                      |
+| **`HookParams.ToolbarInputKeyDown`** | `{ target, event }`                             | `toolbarInputKeyDown`                                                |
+| **`HookParams.ToolbarInputChange`**  | `{ target, event, value }`                      | `toolbarInputChange`                                                 |
+| **`HookParams.Shortcut`**            | `{ range, line, info, event, keyCode, editor }` | `shortcut`                                                           |
+| **`HookParams.CopyComponent`**       | `{ event, cloneContainer, info }`               | `componentCopy`                                                      |
 
 **Property Descriptions:**
 
@@ -1916,3 +1916,4 @@ The `dist/` folder is NOT tracked in git and is built via CI/CD when changes are
 ## Supplementary Guides
 
 - [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax integration
+- [Type Definitions](./guide/typedef-guide.md) - SunEditor namespace types reference

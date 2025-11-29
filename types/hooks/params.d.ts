@@ -31,11 +31,11 @@ export type Keyboard = {
 	frameContext: SunEditor.FrameContext;
 	event: KeyboardEvent;
 };
-export type InputKeyDown = {
+export type ToolbarInputKeyDown = {
 	target: HTMLElement;
 	event: KeyboardEvent;
 };
-export type InputChange = {
+export type ToolbarInputChange = {
 	target: HTMLElement;
 	value: string;
 	event: FocusEvent | MouseEvent;

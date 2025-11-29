@@ -213,8 +213,10 @@
  * @typedef {import('./hooks/params').Paste} SunEditor.HookParams.Paste
  * @typedef {import('./hooks/params').Mouse} SunEditor.HookParams.Mouse
  * @typedef {import('./hooks/params').Keyboard} SunEditor.HookParams.Keyboard
- * @typedef {import('./hooks/params').InputKeyDown} SunEditor.HookParams.InputKeyDown
- * @typedef {import('./hooks/params').InputChange} SunEditor.HookParams.InputChange
+ *
+ * @typedef {import('./hooks/params').ToolbarInputKeyDown} SunEditor.HookParams.ToolbarInputKeyDown
+ * @typedef {import('./hooks/params').ToolbarInputChange} SunEditor.HookParams.ToolbarInputChange
+ *
  * @typedef {import('./hooks/params').CopyComponent} SunEditor.HookParams.CopyComponent
  */
 

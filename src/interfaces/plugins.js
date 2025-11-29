@@ -193,10 +193,7 @@ export class PluginInput extends Base {
 	/**
 	 * @optional
 	 * @description Executes the event function of toolbar's input tag - "keydown".
-	 * @param {Object} params - Input event information
-	 * @param {HTMLElement} params.target - The input element
-	 * @param {KeyboardEvent} params.event - The keyboard event
-	 * @param {string} params.value - The input value
+	 * @param {SunEditor.HookParams.ToolbarInputKeyDown} params - Input event information
 	 * @returns {void}
 	 */
 	toolbarInputKeyDown(params) {
@@ -206,10 +203,7 @@ export class PluginInput extends Base {
 	/**
 	 * @optional
 	 * @description Executes the event function of toolbar's input tag - "change".
-	 * @param {Object} params - Input event information
-	 * @param {HTMLElement} params.target - The input element
-	 * @param {FocusEvent | MouseEvent} params.event - The change event
-	 * @param {string} params.value - The input value
+	 * @param {SunEditor.HookParams.ToolbarInputChange} params - Input event information
 	 * @returns {void}
 	 */
 	toolbarInputChange(params) {

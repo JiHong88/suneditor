@@ -216,8 +216,8 @@ declare global {
 			type Paste = import('./hooks/params').Paste;
 			type Mouse = import('./hooks/params').Mouse;
 			type Keyboard = import('./hooks/params').Keyboard;
-			type InputKeyDown = import('./hooks/params').InputKeyDown;
-			type InputChange = import('./hooks/params').InputChange;
+			type ToolbarInputKeyDown = import('./hooks/params').ToolbarInputKeyDown;
+			type ToolbarInputChange = import('./hooks/params').ToolbarInputChange;
 			type CopyComponent = import('./hooks/params').CopyComponent;
 		}
 		export namespace Event {
