@@ -511,48 +511,48 @@ declare class Editor {
 	destroy(): any;
 	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
 	/**
-	 * @private
+	 * @internal
 	 * @description Set frameContext, frameOptions
 	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
 	 */
 	_setFrameInfo(rt: SunEditor.FrameContext): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Focus to wysiwyg area using "native focus function"
 	 */
 	_nativeFocus(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Check the components such as image and video and modify them according to the format.
 	 * @param {boolean} loaded If true, the component is loaded.
 	 */
 	_checkComponents(loaded: boolean): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Initialize the information of the components.
 	 */
 	_resetComponents(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Initializ wysiwyg area (Only called from core._init)
 	 * @param {SunEditor.FrameContext} e frameContext
 	 * @param {string} value initial html string
 	 */
 	_initWysiwygArea(e: SunEditor.FrameContext, value: string): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Called when there are changes to tags in the wysiwyg region.
 	 * @param {SunEditor.FrameContext} fc - Frame context object
 	 */
 	_resourcesStateChange(fc: SunEditor.FrameContext): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
 	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
 	 */
 	_iframeAutoHeight(fc: SunEditor.FrameContext | FrameContextUtil): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Call the "onResizeEditor" event
 	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
 	 * @param {number} h - Height value
@@ -560,55 +560,55 @@ declare class Editor {
 	 */
 	__callResizeFunction(fc: SunEditor.FrameContext | FrameContextUtil, h: number, resizeObserverEntry: ResizeObserverEntry): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Set display property when there is placeholder.
 	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
 	 */
 	_checkPlaceholder(fc?: SunEditor.FrameContext | null): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Initializ editor
 	 * @param {SunEditor.InitOptions} options Options
 	 */
 	__editorInit(options: SunEditor.InitOptions): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Initializ core variable
 	 * @param {SunEditor.InitOptions} options Options
 	 */
 	__init(options: SunEditor.InitOptions): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Caching basic buttons to use
 	 */
 	__cachingButtons(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Set the disabled button list
 	 * - this._codeViewDisabledButtons, this._controllerOnDisabledButtons
 	 */
 	__setDisabledButtons(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Save the current buttons
 	 * @param {Map<string, Element>} cmdButtons Command button map
 	 * @param {?Element} tray Button tray
 	 */
 	__saveCommandButtons(cmdButtons: Map<string, Element>, tray: Element | null): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Caches custom(starts with "_") shortcut keys for commands.
 	 */
 	__cachingShortcuts(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets command target elements.
 	 * @param {string} cmd - The command identifier.
 	 * @param {HTMLButtonElement} target - The associated command button.
 	 */
 	__setCommandTargets(cmd: string, target: HTMLButtonElement): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Configures the document properties of an iframe editor.
 	 * @param {HTMLIFrameElement} frame - The editor iframe.
 	 * @param {Map<string, *>} originOptions - The original options.
@@ -616,18 +616,18 @@ declare class Editor {
 	 */
 	__setIframeDocument(frame: HTMLIFrameElement, originOptions: Map<string, any>, targetOptions: SunEditor.FrameOptions): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Set the FrameContext parameters and options
 	 * @param {SunEditor.FrameContext} e - Frame context object
 	 */
 	__setEditorParams(e: SunEditor.FrameContext): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Registers and initializes editor classes.
 	 */
 	__registerClass(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Creates the editor instance and initializes components.
 	 * @param {SunEditor.InitOptions} originOptions - The initial editor options.
 	 * @returns {Promise<void>}

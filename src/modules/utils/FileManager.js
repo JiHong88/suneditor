@@ -123,7 +123,7 @@ class FileManager extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Checke the file's information and modify the tag that does not fit the format.
 	 * @param {boolean} loaded Whether the editor is loaded
 	 */
@@ -198,7 +198,7 @@ class FileManager extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Reset info object and "infoList = []", "infoIndex = 0"
 	 */
 	_resetInfo() {
@@ -316,7 +316,6 @@ class FileManager extends CoreInjector {
 }
 
 /**
- * @private
  * @param {Element} element - Element
  * @param {string} name - Attribute name
  * @returns {string|null}

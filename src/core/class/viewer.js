@@ -313,7 +313,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Set the active class to the button of the toolbar
 	 */
@@ -501,7 +501,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Resets the full-screen height of the editor.
 	 * - Updates the editor's height dynamically when in full-screen mode.
@@ -515,7 +515,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Run CodeMirror Editor
 	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
@@ -558,7 +558,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Set method in the code view area
 	 * @param {string} value HTML string
@@ -572,7 +572,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Get method in the code view area
 	 */
@@ -585,7 +585,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Convert the data of the code view and put it in the WYSIWYG area.
 	 */
@@ -635,7 +635,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
 	 */
@@ -654,7 +654,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Adjusts the height of the code view area.
 	 * - Ensures the code block auto-resizes based on its content.
@@ -668,7 +668,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Updates the line numbers for the code editor.
 	 * - Dynamically adjusts line numbers as content grows.
@@ -692,7 +692,7 @@ Viewer.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLElement} Code numbers area
 	 * @description Synchronizes scrolling of line numbers with the code editor.
 	 * - Keeps the line numbers aligned with the text.
@@ -707,7 +707,6 @@ Viewer.prototype = {
 };
 
 /**
- * @private
  * @description Create line numbers for the code view area
  * @param {SunEditor.FrameContext} fc - Frame context
  */
@@ -730,7 +729,6 @@ function CreateLineNumbers(fc) {
 }
 
 /**
- * @private
  * @description Get the line height of the textarea
  * @param {HTMLTextAreaElement} textarea Textarea element
  * @returns {number}

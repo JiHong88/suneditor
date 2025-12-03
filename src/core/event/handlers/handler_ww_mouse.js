@@ -14,7 +14,6 @@ function _offDownFn() {
  */
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_mouse}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object
@@ -52,7 +51,6 @@ export async function OnMouseDown_wysiwyg(fc, e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_mouse}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object
@@ -66,7 +64,6 @@ export async function OnMouseUp_wysiwyg(fc, e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_mouse}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object
@@ -163,7 +160,6 @@ export async function OnClick_wysiwyg(fc, e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_mouse}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object
@@ -181,7 +177,6 @@ export function OnMouseMove_wysiwyg(fc, e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_mouse}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {MouseEvent} e - Event object

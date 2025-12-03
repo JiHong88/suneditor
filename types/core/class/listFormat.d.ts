@@ -119,7 +119,7 @@ declare class ListFormat {
 	 */
 	removeNested(this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>, baseNode: HTMLElement, all: boolean): Node;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ListFormatThis}
 	 * @description Attaches a nested list structure by merging adjacent lists if applicable.
 	 * - Ensures that the nested list is placed correctly in the document structure.
@@ -148,7 +148,7 @@ declare class ListFormat {
 		},
 	): Node;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ListFormatThis}
 	 * @description Detaches a nested list structure by extracting list items from their parent list.
 	 * - Ensures proper restructuring of the list elements.

@@ -501,7 +501,7 @@ Selection_.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Returns true if there is no valid selection.
 	 * @param {Range} range selection.getRange()
@@ -518,7 +518,7 @@ Selection_.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Return the range object of editor's first child node
 	 * @returns {Range}
@@ -548,7 +548,7 @@ Selection_.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Set "range" and "selection" info.
 	 * @param {Range} range range object.
@@ -569,7 +569,7 @@ Selection_.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Saving the range object and the currently selected node of editor
 	 */
@@ -595,7 +595,7 @@ Selection_.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Sets focus to the editor's wysiwyg contenteditable area and restores the last selection range within iframe context.
 	 */
@@ -614,7 +614,7 @@ Selection_.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Normalizes and resets the selection range to properly target text nodes instead of element nodes for accurate text editing.
 	 * @returns {boolean} Returns false if there is no valid selection.
@@ -743,7 +743,7 @@ Selection_.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Initialize the scroll information when the editor first loads
 	 */

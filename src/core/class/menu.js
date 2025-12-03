@@ -207,7 +207,7 @@ Menu.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Set the menu position.
 	 * @param {Node} element Button element
@@ -228,7 +228,7 @@ Menu.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Reset the menu position.
 	 * @param {Node} element Button element
@@ -239,7 +239,7 @@ Menu.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Restore the last menu position using previously stored button and menu elements.
 	 */
@@ -249,7 +249,7 @@ Menu.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Check if the element is part of a more layer
 	 * @param {Node} element The element to check
@@ -265,7 +265,7 @@ Menu.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Move the selected item in the dropdown menu
 	 * @param {number} num Direction and amount to move (-1 for up, 1 for down)
@@ -287,7 +287,7 @@ Menu.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Remove global event listeners
 	 */
@@ -307,7 +307,6 @@ Menu.prototype = {
 };
 
 /**
- * @private
  * @this {MenuThis}
  * @param {MouseEvent} e - Event object
  */
@@ -318,7 +317,6 @@ function OnMouseDown_dropdown(e) {
 }
 
 /**
- * @private
  * @this {MenuThis}
  */
 function OnMouseout_dropdown() {
@@ -326,7 +324,6 @@ function OnMouseout_dropdown() {
 }
 
 /**
- * @private
  * @this {MenuThis}
  * @param {KeyboardEvent} e - Event object
  */
@@ -370,7 +367,6 @@ function OnKeyDown_dropdown(e) {
 }
 
 /**
- * @private
  * @this {MenuThis}
  * @param {MouseEvent} e - Event object
  */
@@ -384,7 +380,6 @@ function OnMousemove_dropdown(e) {
 }
 
 /**
- * @private
  * @param {string} type Type
  * @returns {boolean}
  */

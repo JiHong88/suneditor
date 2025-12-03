@@ -44,7 +44,7 @@ declare class InstanceCheck {
 	 */
 	isSelection(obj: any): obj is Selection;
 	/**
-	 * @private
+	 * @internal
 	 * @returns {window}
 	 */
 	_getFrameWindow(): Window & typeof globalThis;

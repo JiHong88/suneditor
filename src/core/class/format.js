@@ -966,7 +966,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description A function that distinguishes areas where "selection" should not be placed
 	 * @param {Node} element Element
@@ -977,7 +977,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description A function that distinguishes non-formatting HTML elements or tags from formatting ones.
 	 * @param {Node} element Element
@@ -988,7 +988,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description Nodes without text
 	 * @param {Node|string} element Element to check
@@ -1002,7 +1002,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description Get current selected lines and selected node info.
 	 * @returns {{lines: Array<HTMLElement>, firstNode: Node,  lastNode: Node, firstPath: Array<number>, lastPath: Array<number>, startOffset: number, endOffset: number}}
@@ -1045,7 +1045,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description Reset the line break format.
 	 * @param {"line"|"br"} breakFormat options.get('defaultLineBreakFormat')
@@ -1058,7 +1058,6 @@ Format.prototype = {
 };
 
 /**
- * @private
  * @param {Array<HTMLElement>} lines - Line elements
  * @param {number} size - Margin size
  * @param {string} dir - Direction

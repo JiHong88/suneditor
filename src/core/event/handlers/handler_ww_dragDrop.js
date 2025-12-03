@@ -6,7 +6,6 @@ import { _DragHandle } from '../../../modules/utils';
  */
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {HTMLElement} dragCursor - Drag cursor element
@@ -51,7 +50,6 @@ export function OnDragOver_wysiwyg(fc, dragCursor, _iframeTopArea, _innerToolbar
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {HTMLElement} dragCursor - Drag cursor element
  */
@@ -60,7 +58,6 @@ export function OnDragEnd_wysiwyg(dragCursor) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {HTMLElement} dragCursor - Drag cursor element

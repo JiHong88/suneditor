@@ -3,7 +3,6 @@
  */
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_clipboard}
  * @param {ClipboardEvent} e - Event object
  */
@@ -14,7 +13,6 @@ export function OnPaste_wysiwyg(frameContext, e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_clipboard}
  * @param {ClipboardEvent} e - Event object
  */
@@ -33,7 +31,6 @@ export async function OnCopy_wysiwyg(frameContext, e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_clipboard}
  * @param {ClipboardEvent} e - Event object
  */

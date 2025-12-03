@@ -22,7 +22,6 @@ export function jsonToHtml(jsonData: { [x: string]: any }): string;
  * @description Convert HTML string to HTML Entity
  * @param {string} content
  * @returns {string} Content string
- * @private
  */
 export function htmlToEntity(content: string): string;
 /**
@@ -159,7 +158,6 @@ export function addUrlQuery(url: string, query: string): string;
  * @param {Map<string, *>} fo editor.frameOptions
  * @param {string} cssText Style string
  * @returns {OptionStyleResult_converter}
- * @private
  */
 export function _setDefaultOptionStyle(fo: Map<string, any>, cssText: string): OptionStyleResult_converter;
 /**

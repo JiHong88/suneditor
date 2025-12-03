@@ -1,18 +1,16 @@
 import type {} from '../typedef';
 export default ClassInjector;
 /**
- * @private
  * @description Add all inner classes to the editor instance.
  * @param {SunEditor.Core} editor - The root editor instance
  */
 declare function ClassInjector(editor: SunEditor.Core): void;
 declare class ClassInjector {
 	/**
-	 * @private
 	 * @description Add all inner classes to the editor instance.
 	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	private constructor();
+	constructor(editor: SunEditor.Core);
 	/** @description Toolbar class instance @type {SunEditor.Core['toolbar']} */
 	toolbar: SunEditor.Core['toolbar'];
 	/** @description Sub-Toolbar class instance @type {SunEditor.Core['subToolbar']|null} */

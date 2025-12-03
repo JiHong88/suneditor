@@ -142,47 +142,45 @@ declare class EventManager {
 	 */
 	applyTagEffect(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, selectionNode?: Node | null): Node | undefined;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is true)
 	 * @param {Node} target Target element
-	 * @private
 	 */
 	_injectActiveEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, target: Node): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description remove class, display text.
 	 * @param {Array<string>} ignoredList Igonred button list
-	 * @private
 	 */
 	_setKeyEffect(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, ignoredList: Array<string>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Show toolbar-balloon with delay.
 	 */
 	_showToolbarBalloonDelay(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Show or hide the toolbar-balloon.
 	 */
 	_toggleToolbarBalloon(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Hide the toolbar.
 	 */
 	_hideToolbar(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Hide the Sub-Toolbar.
 	 */
 	_hideToolbar_sub(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Checks if a node is a non-focusable element(.data-se-non-focus). (e.g. fileUpload.component > span)
 	 * @param {Node} node Node to check
@@ -190,14 +188,14 @@ declare class EventManager {
 	 */
 	_isNonFocusNode(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, node: Node): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description If there is no default format, add a line and move 'selection'.
 	 * @param {?string} formatName Format tag name (default: 'P')
 	 */
 	_setDefaultLine(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, formatName: string | null): any;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Handles data transfer actions for paste and drop events.
 	 * - It processes clipboard data, triggers relevant events, and inserts cleaned data into the editor.
@@ -209,7 +207,7 @@ declare class EventManager {
 	 */
 	_dataTransferAction(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, type: 'paste' | 'drop', e: Event, clipboardData: DataTransfer, frameContext: SunEditor.FrameContext): Promise<boolean>;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Processes clipboard data for paste and drop events, handling text and HTML cleanup.
 	 * - Supports specific handling for content from Microsoft Office applications.
@@ -221,14 +219,14 @@ declare class EventManager {
 	 */
 	_setClipboardData(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, type: 'paste' | 'drop', e: Event, clipboardData: DataTransfer, frameContext: SunEditor.FrameContext): Promise<boolean>;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Registers common UI events such as toolbar and menu interactions.
 	 * - Adds event listeners for various UI elements, sets up observers, and configures window events.
 	 */
 	_addCommonEvents(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Registers event listeners for the editor's frame, including text input, selection, and UI interactions.
 	 * - Handles events inside an iframe or within the standard wysiwyg editor.
@@ -236,7 +234,7 @@ declare class EventManager {
 	 */
 	_addFrameEvents(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, fc: SunEditor.FrameContext): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
 	 * - If resizing is not enabled, applies a non-resizable class.
@@ -245,14 +243,14 @@ declare class EventManager {
 	 */
 	__addStatusbarEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, fc: SunEditor.FrameContext, fo: SunEditor.FrameOptions): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Removes all registered event listeners from the editor.
 	 * - Disconnects observers and clears stored event references.
 	 */
 	_removeAllEvents(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Adjusts the position of the editor's toolbar, controllers, and other floating elements based on scroll position.
 	 * - Ensures UI elements maintain their intended relative positions when scrolling.
@@ -260,14 +258,14 @@ declare class EventManager {
 	 */
 	_moveContainer(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, eventWysiwyg: any): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Handles the scrolling of the editor container.
 	 * - Repositions open controllers if necessary.
 	 */
 	_scrollContainer(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Repositions the currently open controllers within the editor.
 	 * - Ensures elements are displayed in their correct positions after scrolling.
@@ -275,21 +273,21 @@ declare class EventManager {
 	 */
 	__rePositionController(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, cont: Array<object>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Resets the frame status, adjusting toolbar and UI elements based on the current state.
 	 * - Handles inline editor adjustments, fullscreen mode, and responsive toolbar updates.
 	 */
 	_resetFrameStatus(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Synchronizes the selection state by resetting it on mouseup.
 	 * - Ensures selection updates correctly across different interactions.
 	 */
 	_setSelectionSync(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Retains the style nodes for formatting consistency when applying styles.
 	 * - Preserves nested styling by cloning and restructuring the style nodes.
@@ -298,7 +296,7 @@ declare class EventManager {
 	 */
 	_retainStyleNodes(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, formatEl: HTMLElement, _styleNodes: Array<Node>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Clears retained style nodes by replacing content with a single line break.
 	 * - Resets the selection to the start of the cleared element.
@@ -306,7 +304,7 @@ declare class EventManager {
 	 */
 	_clearRetainStyleNodes(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, formatEl: HTMLElement): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Calls a registered plugin event and executes associated handlers synchronously (fire-and-forget).
 	 * - Use this for performance-critical events like onMouseMove, onScroll
@@ -329,7 +327,7 @@ declare class EventManager {
 		},
 	): boolean | undefined;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Calls a registered plugin event and executes associated handlers asynchronously.
 	 * - Use this for events that need to check return values or ensure completion
@@ -353,13 +351,13 @@ declare class EventManager {
 		},
 	): Promise<boolean | undefined>;
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Removes input event listeners and resets input-related properties.
 	 */
 	__removeInput(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Focus Event Postprocessing
 	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
@@ -367,7 +365,7 @@ declare class EventManager {
 	 */
 	__postFocusEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: SunEditor.FrameContext, event: FocusEvent): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Blur Event Postprocessing
 	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
@@ -375,7 +373,7 @@ declare class EventManager {
 	 */
 	__postBlurEvent(this: Omit<EventManager & Partial<import('../../editorInjector').default>, 'eventManager'>, frameContext: SunEditor.FrameContext, event: FocusEvent): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Records the current viewport size.
 	 * @this {EventManagerThis}
 	 */

@@ -243,7 +243,7 @@ declare class Format {
 	 */
 	getLinesAndComponents(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, removeDuplicate: boolean): Array<HTMLElement>;
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description A function that distinguishes areas where "selection" should not be placed
 	 * @param {Node} element Element
@@ -251,7 +251,7 @@ declare class Format {
 	 */
 	_isExcludeSelectionElement(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description A function that distinguishes non-formatting HTML elements or tags from formatting ones.
 	 * @param {Node} element Element
@@ -259,7 +259,7 @@ declare class Format {
 	 */
 	_nonFormat(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description Nodes without text
 	 * @param {Node|string} element Element to check
@@ -267,7 +267,7 @@ declare class Format {
 	 */
 	_notTextNode(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description Get current selected lines and selected node info.
 	 * @returns {{lines: Array<HTMLElement>, firstNode: Node,  lastNode: Node, firstPath: Array<number>, lastPath: Array<number>, startOffset: number, endOffset: number}}
@@ -282,7 +282,7 @@ declare class Format {
 		endOffset: number;
 	};
 	/**
-	 * @private
+	 * @internal
 	 * @this {FormatThis}
 	 * @description Reset the line break format.
 	 * @param {"line"|"br"} breakFormat options.get('defaultLineBreakFormat')

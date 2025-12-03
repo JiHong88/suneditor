@@ -1324,7 +1324,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description construct wysiwyg area element to html string
 	 * @param {Node|string} html WYSIWYG element (this.frameContext.get('wysiwyg')) or HTML string.
@@ -1386,7 +1386,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Checks whether the given list item node should be removed and handles necessary clean-up.
 	 * @param {Node} item The list item node to be checked.
@@ -1409,7 +1409,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Recursive function  when used to place a node in "BrLine" in "html.insertNode"
 	 * @param {Node} oNode Node to be inserted
@@ -1444,7 +1444,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Returns HTML string according to tag type and configurati isExcludeFormat.
 	 * @param {Node} node Node
@@ -1506,7 +1506,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Fix tags that do not fit the editor format.
 	 * @param {DocumentFragment} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
@@ -1664,7 +1664,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
 	 * @param {string} html HTML string
@@ -1680,7 +1680,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Determines if formatting is required and returns a domTree
 	 * @param {DocumentFragment} domFrag documentFragment
@@ -1724,7 +1724,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Converts a list of DOM nodes into an HTML list structure.
 	 * - If the node is already a list, its innerHTML is used. If it is a block element,
@@ -1758,7 +1758,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Checks whether the provided DOM nodes require formatting.
 	 * @param {NodeList} domTree List of DOM nodes to check.
@@ -1779,7 +1779,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Cleans the inline style attributes of an HTML element.
 	 * - Extracts allowed styles and removes disallowed ones based on editor settings.
@@ -1851,7 +1851,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Delete disallowed tags
 	 * @param {string} html HTML string
@@ -1866,7 +1866,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Recursively checks for duplicate text style nodes within a given parent node.
 	 * @param {Node} oNode The node to check for duplicate styles.
@@ -1884,7 +1884,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Recursively checks for duplicate text style nodes within a given parent node.
 	 * - If duplicate styles are found, redundant attributes are removed.
@@ -1935,7 +1935,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Reset autoStyleify options.
 	 * @param {Array.<string>} autoStyleify Styles applied automatically on text input.
@@ -1971,7 +1971,6 @@ HTML.prototype = {
 };
 
 /**
- * @private
  * @this {HTMLThis}
  * @description Tag and tag attribute check RegExp function.
  * @param {string} m RegExp value
@@ -2034,7 +2033,6 @@ function CleanElements(attrFilter, styleFilter, m, t) {
 }
 
 /**
- * @private
  * @description Get related list
  * @param {string} str Regular expression string
  * @param {string} str2 Regular expression string

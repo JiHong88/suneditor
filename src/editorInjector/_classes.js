@@ -1,5 +1,4 @@
 /**
- * @private
  * @description Add all inner classes to the editor instance.
  * @param {SunEditor.Core} editor - The root editor instance
  */

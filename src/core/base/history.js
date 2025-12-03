@@ -19,7 +19,6 @@ export default function History(editor) {
 	let waitingTime = null;
 
 	/**
-	 * @private
 	 * @description Triggers onChange event and updates UI after history state changes.
 	 * @param {SunEditor.FrameContext} fc The frame context.
 	 * @param {number} index The current history index.
@@ -36,7 +35,6 @@ export default function History(editor) {
 	}
 
 	/**
-	 * @private
 	 * @description Restores content from the history stack and updates the editor state.
 	 * @param {number} increase Direction to move in the stack: -1 for undo, +1 for redo.
 	 */
@@ -94,7 +92,6 @@ export default function History(editor) {
 	}
 
 	/**
-	 * @private
 	 * @description Saves content and selection to the history stack.
 	 * @param {string} content HTML content to save.
 	 * @param {Range} range Selection range.
@@ -131,7 +128,6 @@ export default function History(editor) {
 	}
 
 	/**
-	 * @private
 	 * @description Resets a root frame's history stack.
 	 * @param {*} rootKey Root frame key.
 	 */
@@ -149,7 +145,6 @@ export default function History(editor) {
 	}
 
 	/**
-	 * @private
 	 * @description Initializes a root frame's history stack.
 	 * @param {*} rootKey Root frame key.
 	 */
@@ -159,7 +154,6 @@ export default function History(editor) {
 	}
 
 	/**
-	 * @private
 	 * @description Clears future history and reinitializes deleted roots.
 	 * @param {Object} root Root stack object.
 	 */
@@ -182,7 +176,6 @@ export default function History(editor) {
 	}
 
 	/**
-	 * @private
 	 * @description Pushes current content to the history stack.
 	 * @param {*} rootKey Root frame key.
 	 * @param {Range} range Selection range.

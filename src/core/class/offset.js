@@ -650,7 +650,7 @@ Offset.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Sets the position of an element relative to the selection range in the editor.
 	 * - This method calculates the top and left offsets for the element, ensuring it
@@ -705,7 +705,7 @@ Offset.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Get available space from page bottom
 	 * @returns {number} Available space
@@ -716,7 +716,7 @@ Offset.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Calculates the vertical margin offsets for the target element relative to the editor frame.
 	 * - This method determines the top and bottom margins based on various conditions such as
@@ -793,7 +793,7 @@ Offset.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Sets the visibility and direction of the arrow element.
 	 * - This method applies the appropriate class (`se-arrow-up` or `se-arrow-down`)
@@ -818,7 +818,7 @@ Offset.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Retrieves the current window scroll position and viewport size.
 	 * - Returns an object containing the scroll offsets, viewport dimensions, and boundary rects.

@@ -55,7 +55,7 @@ declare class Viewer {
 	 */
 	showBlocks(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Set the active class to the button of the toolbar
 	 */
@@ -72,14 +72,14 @@ declare class Viewer {
 	 */
 	preview(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Resets the full-screen height of the editor.
 	 * - Updates the editor's height dynamically when in full-screen mode.
 	 */
 	_resetFullScreenHeight(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Run CodeMirror Editor
 	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
@@ -88,32 +88,32 @@ declare class Viewer {
 	 */
 	_codeMirrorEditor(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, key: 'set' | 'get' | 'readonly' | 'refresh', value: any, rootKey?: string): any;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Set method in the code view area
 	 * @param {string} value HTML string
 	 */
 	_setCodeView(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value: string): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Get method in the code view area
 	 */
 	_getCodeView(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): any;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Convert the data of the code view and put it in the WYSIWYG area.
 	 */
 	_setCodeDataToEditor(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
 	 */
 	_setEditorDataToCodeView(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Adjusts the height of the code view area.
 	 * - Ensures the code block auto-resizes based on its content.
@@ -123,7 +123,7 @@ declare class Viewer {
 	 */
 	_codeViewAutoHeight(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, code: HTMLElement, codeNumbers: HTMLTextAreaElement, isAuto: boolean): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ViewerThis}
 	 * @description Updates the line numbers for the code editor.
 	 * - Dynamically adjusts line numbers as content grows.
@@ -132,7 +132,7 @@ declare class Viewer {
 	 */
 	_updateLineNumbers(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, lineNumbers: HTMLTextAreaElement, code: HTMLElement): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLElement} Code numbers area
 	 * @description Synchronizes scrolling of line numbers with the code editor.
 	 * - Keeps the line numbers aligned with the text.

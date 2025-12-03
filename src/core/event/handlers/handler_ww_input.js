@@ -5,7 +5,6 @@ import { dom, keyCodeMap } from '../../../helper';
  */
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_input}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {InputEvent} e - Event object
@@ -36,7 +35,6 @@ export async function OnBeforeInput_wysiwyg(fc, e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_input}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {InputEvent} e - Event object

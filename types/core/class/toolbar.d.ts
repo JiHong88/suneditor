@@ -129,51 +129,51 @@ declare class Toolbar {
 	 */
 	setButtons(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, buttonList: any[]): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Reset the common buttons info.
 	 */
 	_resetButtonInfo(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Reset the sticky toolbar position based on the editor state.
 	 */
 	_resetSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Enable sticky toolbar mode and adjust position.
 	 */
 	_onSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, inlineOffset: any): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Get the viewport's top offset.
 	 * @returns {number}
 	 */
 	__getViewportTop(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): number;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Disable sticky toolbar mode.
 	 */
 	_offSticky(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Set up responsive behavior for the toolbar buttons.
 	 */
 	_setResponsive(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Show the balloon toolbar based on the current selection.
 	 * @param {?Range} [rangeObj] - Selection range
 	 */
 	_showBalloon(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, rangeObj?: Range | null): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Adjust the balloon toolbar's position.
 	 * @param {boolean} positionTop - Whether the toolbar should be positioned above the selection
@@ -181,13 +181,13 @@ declare class Toolbar {
 	 */
 	_setBalloonOffset(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, positionTop: boolean, range?: Range): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Show the inline toolbar mode.
 	 */
 	_showInline(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Show a more options layer for toolbar buttons.
 	 * @param {Node} button - Button element
@@ -195,7 +195,7 @@ declare class Toolbar {
 	 */
 	_moreLayerOn(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>, button: Node, layer: Node): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Hide the currently active more options layer.
 	 */

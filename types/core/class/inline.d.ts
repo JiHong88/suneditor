@@ -101,7 +101,7 @@ declare class Inline {
 	 */
 	remove(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
 	 * @param {Node|string} element Element to check
@@ -109,7 +109,7 @@ declare class Inline {
 	 */
 	_isNonSplitNode(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, element: Node | string): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Nodes that need to be added without modification when changing text nodes
 	 * @param {Node} element Element to check
@@ -117,7 +117,7 @@ declare class Inline {
 	 */
 	_isIgnoreNodeChange(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, element: Node): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description wraps text nodes of line selected text.
 	 * @param {Node} element The node of the line that contains the selected text node.
@@ -158,7 +158,7 @@ declare class Inline {
 		endOffset: any;
 	};
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description wraps first line selected text.
 	 * @param {Node} element The node of the line that contains the selected text node.
@@ -189,7 +189,7 @@ declare class Inline {
 		_endContainer: Node,
 	): NodeStyleContainerType;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description wraps mid lines selected text.
 	 * @param {HTMLElement} element The node of the line that contains the selected text node.
@@ -212,7 +212,7 @@ declare class Inline {
 		_endContainer: Node,
 	): NodeStyleContainerType;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description wraps last line selected text.
 	 * @param {Node} element The node of the line that contains the selected text node.
@@ -241,7 +241,7 @@ declare class Inline {
 		_isMaintainedNode: (element: Node) => boolean,
 	): NodeStyleContainerType;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Node with font-size style
 	 * @param {Node} element Element to check
@@ -249,7 +249,7 @@ declare class Inline {
 	 */
 	_sn_isSizeNode(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, element: Node): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Return the parent maintained tag. (bind and use a util object)
 	 * @param {boolean} _isRemove is remove anchor
@@ -259,7 +259,7 @@ declare class Inline {
 	 */
 	_sn_getMaintainedNode(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, _isRemove: boolean, _isSizeNode: boolean, element: Node): Node | null;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Check if element is a tag that should be persisted. (bind and use a util object)
 	 * @param {boolean} _isRemove is remove anchor
@@ -269,7 +269,7 @@ declare class Inline {
 	 */
 	_sn_isMaintainedNode(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, _isRemove: boolean, _isSizeNode: boolean, element: Node): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
 	 * @param {Node} el List cell element. <li>
@@ -277,7 +277,7 @@ declare class Inline {
 	 */
 	_sn_setCommonListStyle(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, el: Node, child: Node | null): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Watch the applied text nodes and adjust the common styles of the list.
 	 * @param {Node} el "LI" element

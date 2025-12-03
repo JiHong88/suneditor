@@ -462,7 +462,7 @@ ListFormat.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ListFormatThis}
 	 * @description Attaches a nested list structure by merging adjacent lists if applicable.
 	 * - Ensures that the nested list is placed correctly in the document structure.
@@ -527,7 +527,7 @@ ListFormat.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ListFormatThis}
 	 * @description Detaches a nested list structure by extracting list items from their parent list.
 	 * - Ensures proper restructuring of the list elements.
@@ -575,7 +575,6 @@ ListFormat.prototype = {
 };
 
 /**
- * @private
  * @description Removes nested list structure by unwrapping child list elements and promoting their items to the parent level.
  * @param {Node} baseNode Node
  */

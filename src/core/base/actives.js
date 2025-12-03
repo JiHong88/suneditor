@@ -16,7 +16,6 @@ let __globalEventKeydown = null;
 let __globalEventMousedown = null;
 
 /**
- * @private
  * @this {SunEditor.Core}
  * @param {Node} ww Wywsiwyg element
  * @param {Node} button Button element
@@ -33,7 +32,6 @@ const __RemoveCopyformt = function (ww, button) {
 };
 
 /**
- * @private
  * @description Finds the first and last child elements in a selection area.
  * @param {Element} selectArea Selection area element
  * @returns {{ first: Node, last: Node}} Object containing the first and last child elements

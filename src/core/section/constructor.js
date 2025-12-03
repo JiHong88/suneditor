@@ -338,7 +338,6 @@ function _addTooltip(tooptipBtn, shift, shortcut) {
 }
 
 /**
- * @private
  * @description Returns a new object with merge "a" and "b"
  * @param {Object<*, *>} a object
  * @param {Object<*, *>} b object
@@ -843,7 +842,6 @@ function InitFrameOptions(o, origin) {
 }
 
 /**
- * @private
  * @description Initialize property of suneditor elements
  * @param {string} key - The key of the editor frame
  * @param {Map<string, *>} options - options
@@ -919,7 +917,6 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 }
 
 /**
- * @private
  * @description Check the CodeMirror option to apply the CodeMirror and return the CodeMirror element.
  * @param {Map<string, *>} options options
  * @param {HTMLElement} textarea textarea element
@@ -982,7 +979,6 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 }
 
 /**
- * @private
  * @description create blacklist
  * @param {string} blacklist blacklist
  * @param {string} defaultLine options.get('defaultLine')
@@ -1004,7 +1000,6 @@ function _createBlacklist(blacklist, defaultLine) {
 }
 
 /**
- * @private
  * @description create formats regexp object.
  * @param {string} value value
  * @param {string} defaultValue default value
@@ -1025,7 +1020,6 @@ function _createFormatInfo(value, defaultValue, blacklist) {
 }
 
 /**
- * @private
  * @description create whitelist or blacklist.
  * @param {Map<string, *>} o options
  * @returns {string} whitelist
@@ -1041,7 +1035,6 @@ function _createWhitelist(o) {
 }
 
 /**
- * @private
  * @description Suneditor's Default button list
  * @param {Map<string, *>} options options
  */
@@ -1081,7 +1074,6 @@ function _defaultButtons(options, icons, lang) {
 }
 
 /**
- * @private
  * @description Create a group div containing each module
  * @returns {{div: Element, ul: Element}}
  */
@@ -1096,7 +1088,6 @@ function _createModuleGroup() {
 }
 
 /**
- * @private
  * @description Create a button element
  * @param {string} className className in button
  * @param {string} title Title in button

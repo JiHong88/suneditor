@@ -332,11 +332,10 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is true)
 	 * @param {Node} target Target element
-	 * @private
 	 */
 	_injectActiveEvent(target) {
 		dom.utils.addClass(target, '__se__active');
@@ -347,11 +346,10 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description remove class, display text.
 	 * @param {Array<string>} ignoredList Igonred button list
-	 * @private
 	 */
 	_setKeyEffect(ignoredList) {
 		const activeCommands = this.editor.activeCommands;
@@ -379,7 +377,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Show toolbar-balloon with delay.
 	 */
@@ -397,7 +395,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Show or hide the toolbar-balloon.
 	 */
@@ -416,7 +414,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Hide the toolbar.
 	 */
@@ -427,7 +425,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Hide the Sub-Toolbar.
 	 */
@@ -438,7 +436,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Checks if a node is a non-focusable element(.data-se-non-focus). (e.g. fileUpload.component > span)
 	 * @param {Node} node Node to check
@@ -449,7 +447,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description If there is no default format, add a line and move 'selection'.
 	 * @param {?string} formatName Format tag name (default: 'P')
@@ -566,7 +564,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Handles data transfer actions for paste and drop events.
 	 * - It processes clipboard data, triggers relevant events, and inserts cleaned data into the editor.
@@ -591,7 +589,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Processes clipboard data for paste and drop events, handling text and HTML cleanup.
 	 * - Supports specific handling for content from Microsoft Office applications.
@@ -690,7 +688,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Registers common UI events such as toolbar and menu interactions.
 	 * - Adds event listeners for various UI elements, sets up observers, and configures window events.
@@ -755,7 +753,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Registers event listeners for the editor's frame, including text input, selection, and UI interactions.
 	 * - Handles events inside an iframe or within the standard wysiwyg editor.
@@ -852,7 +850,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
 	 * - If resizing is not enabled, applies a non-resizable class.
@@ -868,7 +866,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Removes all registered event listeners from the editor.
 	 * - Disconnects observers and clears stored event references.
@@ -893,7 +891,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Adjusts the position of the editor's toolbar, controllers, and other floating elements based on scroll position.
 	 * - Ensures UI elements maintain their intended relative positions when scrolling.
@@ -944,7 +942,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Handles the scrolling of the editor container.
 	 * - Repositions open controllers if necessary.
@@ -961,7 +959,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Repositions the currently open controllers within the editor.
 	 * - Ensures elements are displayed in their correct positions after scrolling.
@@ -976,7 +974,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Resets the frame status, adjusting toolbar and UI elements based on the current state.
 	 * - Handles inline editor adjustments, fullscreen mode, and responsive toolbar updates.
@@ -1017,7 +1015,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Synchronizes the selection state by resetting it on mouseup.
 	 * - Ensures selection updates correctly across different interactions.
@@ -1031,7 +1029,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Retains the style nodes for formatting consistency when applying styles.
 	 * - Preserves nested styling by cloning and restructuring the style nodes.
@@ -1058,7 +1056,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Clears retained style nodes by replacing content with a single line break.
 	 * - Resets the selection to the start of the cleared element.
@@ -1070,7 +1068,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Calls a registered plugin event and executes associated handlers synchronously (fire-and-forget).
 	 * - Use this for performance-critical events like onMouseMove, onScroll
@@ -1088,7 +1086,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Calls a registered plugin event and executes associated handlers asynchronously.
 	 * - Use this for events that need to check return values or ensure completion
@@ -1107,7 +1105,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {EventManagerThis}
 	 * @description Removes input event listeners and resets input-related properties.
 	 */
@@ -1119,7 +1117,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Focus Event Postprocessing
 	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
@@ -1136,7 +1134,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Blur Event Postprocessing
 	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
@@ -1153,7 +1151,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Records the current viewport size.
 	 * @this {EventManagerThis}
 	 */

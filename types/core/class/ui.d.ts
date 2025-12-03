@@ -137,7 +137,7 @@ declare class UI {
 	 */
 	closeToast(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {UIThis}
 	 * @description visible controllers
 	 * @param {boolean} value hidden/show
@@ -145,19 +145,19 @@ declare class UI {
 	 */
 	_visibleControllers(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, value: boolean, lineBreakShow?: boolean | null): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {UIThis}
 	 * @description Off current controllers
 	 */
 	_offCurrentController(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {UIThis}
 	 * @description Off controllers
 	 */
 	__offControllers(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {UIThis}
 	 * @description Off current modal
 	 */

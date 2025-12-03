@@ -107,7 +107,7 @@ declare class Menu {
 	 */
 	containerOff(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Set the menu position.
 	 * @param {Node} element Button element
@@ -115,7 +115,7 @@ declare class Menu {
 	 */
 	_setMenuPosition(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, element: Node, menu: HTMLElement): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Reset the menu position.
 	 * @param {Node} element Button element
@@ -123,13 +123,13 @@ declare class Menu {
 	 */
 	_resetMenuPosition(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, element: Node, menu: HTMLElement): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Restore the last menu position using previously stored button and menu elements.
 	 */
 	_restoreMenuPosition(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Check if the element is part of a more layer
 	 * @param {Node} element The element to check
@@ -137,14 +137,14 @@ declare class Menu {
 	 */
 	_checkMoreLayer(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, element: Node): HTMLElement | null;
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Move the selected item in the dropdown menu
 	 * @param {number} num Direction and amount to move (-1 for up, 1 for down)
 	 */
 	_moveItem(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, num: number): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {MenuThis}
 	 * @description Remove global event listeners
 	 */

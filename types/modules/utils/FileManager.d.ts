@@ -109,16 +109,16 @@ declare class FileManager extends CoreInjector {
 	 */
 	getSize(): number;
 	/**
-	 * @private
+	 * @internal
 	 * @description Checke the file's information and modify the tag that does not fit the format.
 	 * @param {boolean} loaded Whether the editor is loaded
 	 */
-	private _checkInfo;
+	_checkInfo(loaded: boolean): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Reset info object and "infoList = []", "infoIndex = 0"
 	 */
-	private _resetInfo;
+	_resetInfo(): void;
 	#private;
 }
 import CoreInjector from '../../editorInjector/_core';

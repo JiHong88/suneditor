@@ -222,7 +222,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Calculates and compensates for the vertical gap between the rendered content (current page)
 	 * - and the mirrored preview page due to differences in width and layout.
 	 * @param {number} t - The initial top position value to be adjusted.
@@ -244,7 +244,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Initializes the cache for document elements.
 	 * @param {Array<HTMLElement>} mChr - List of mirrored elements.
 	 */
@@ -265,7 +265,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Retrieves the element at a given position.
 	 * @param {number} pageTop - The vertical position to check.
 	 * @param {HTMLElement[]} mChr - List of mirrored elements.
@@ -434,7 +434,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Displays the current page number.
 	 */
 	_displayCurrentPage() {
@@ -443,7 +443,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Retrieves the scroll position in WYSIWYG mode.
 	 * @returns {number} The current scroll position.
 	 */
@@ -453,7 +453,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Moves to a specific page and updates the view.
 	 * @param {number} pageNum - The target page number.
 	 */
@@ -480,7 +480,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Applies smooth scrolling for page navigation.
 	 */
 	_applyPageScroll(top, callback) {
@@ -499,7 +499,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Retrieves the global top offset of an element.
 	 * @returns {number} The top offset of the element.
 	 */
@@ -508,7 +508,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Finds an header element of innerHeaders element.
 	 * @param {Node} header - H tag element to find.
 	 * @returns {HTMLElement|null} The found element, or null if not found.
@@ -525,7 +525,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Finds the closest header element from a given line.
 	 * @param {Node} line - The "line" to check.
 	 * @returns {Node|null} The closest header element, or null if not found.
@@ -542,7 +542,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Checks if an element is a header.
 	 * @param {Node} element - The element to check.
 	 * @returns {boolean} True if the element is a header, otherwise false.
@@ -552,7 +552,7 @@ DocumentType.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Retrieves all headers in the document.
 	 * @returns {Array<HTMLElement>} An array of header elements.
 	 */
@@ -564,7 +564,6 @@ DocumentType.prototype = {
 };
 
 /**
- * @private
  * @param {HTMLElement} ww WYSIWYG element
  * @param {Event} e Event object
  */

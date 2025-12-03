@@ -2157,7 +2157,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the controller position for a cell.
 	 * @param {HTMLTableCellElement} tdElement - The target table cell.
 	 */
@@ -2177,7 +2177,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the position of the cell controller.
 	 * @param {HTMLTableCellElement} tdElement - The target table cell.
 	 * @param {boolean} reset - Whether to reset the controller position.
@@ -2188,7 +2188,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Adds a new entry to the history stack.
 	 */
 	_historyPush() {
@@ -2225,7 +2225,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Starts resizing a table cell.
 	 * @param {HTMLElement} col The column element.
 	 * @param {number} startX The starting X position.
@@ -2302,7 +2302,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Starts resizing a table row.
 	 * @param {HTMLElement} row The table row element.
 	 * @param {number} startY The starting Y position.
@@ -2345,7 +2345,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Starts resizing the table figure.
 	 * @param {number} startX The starting X position.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
@@ -2423,7 +2423,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Stops resizing the table.
 	 * @param {HTMLElement} target The target element.
 	 * @param {string} prevValue The previous style value.
@@ -2607,7 +2607,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Disables or enables border properties.
 	 * @param {boolean} disabled Whether to disable or enable border properties.
 	 */
@@ -2664,7 +2664,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Applies properties to table cells.
 	 * @param {HTMLButtonElement} target The target element.
 	 */
@@ -2900,7 +2900,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Selects multiple table cells and applies selection styles.
 	 * @param {Node} startCell The first cell in the selection.
 	 * @param {Node} endCell The last cell in the selection.
@@ -3101,7 +3101,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Clone a table element and map selected cells to the cloned table
 	 * @param {HTMLTableElement} table <table> element
 	 * @param {HTMLTableCellElement[]} selectedCells Selected cells array
@@ -3160,7 +3160,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Splits a table cell either vertically or horizontally.
 	 * @param {"vertical"|"horizontal"} direction The direction to split the cell.
 	 */
@@ -3346,7 +3346,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Handles column operations such as insert and delete.
 	 * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
 	 */
@@ -3366,7 +3366,7 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Handles row operations such as insert and delete.
 	 * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
 	 */
@@ -3551,7 +3551,6 @@ class Table extends PluginDropdownFree {
 }
 
 /**
- * @private
  * @description Checks if the given node is a resizable table element.
  * @param {Node} node The DOM node to check.
  * @returns {boolean} True if the node is a table-related resizable element.
@@ -3561,7 +3560,6 @@ function IsResizeEls(node) {
 }
 
 /**
- * @private
  * @description Checks if a table cell is at its edge based on the mouse event.
  * @param {MouseEvent} event The mouse event.
  * @param {Element} tableCell The table cell to check.
@@ -3583,7 +3581,6 @@ function CheckCellEdge(event, tableCell) {
 }
 
 /**
- * @private
  * @description Checks if a row is at its edge based on the mouse event.
  * @param {MouseEvent} event The mouse event.
  * @param {Element} tableCell The table row cell to check.
@@ -3602,7 +3599,6 @@ function CheckRowEdge(event, tableCell) {
 }
 
 /**
- * @private
  * @description Creates table cells as elements strings.
  * @param {string} nodeName The tag name of the cell (TD or TH).
  * @param {number} cnt The number of cells to create.
@@ -3614,7 +3610,6 @@ function CreateCellsString(nodeName, cnt) {
 }
 
 /**
- * @private
  * @description Creates table cells as element HTML.
  * @param {string} nodeName The tag name of the cell (TD or TH).
  * @returns {HTMLTableCellElement} The created cells.
@@ -3625,7 +3620,6 @@ function CreateCellsHTML(nodeName) {
 }
 
 /**
- * @private
  * @description Gets the maximum number of columns in a table.
  * @param {HTMLTableElement} table The table element.
  * @returns {number} The maximum number of columns in the table.
@@ -3649,7 +3643,6 @@ function GetMaxColumns(table) {
 }
 
 /**
- * @private
  * @description Handles border style changes in table properties.
  * @param {string} command The border style command.
  */
@@ -3660,7 +3653,6 @@ function OnPropsBorderEdit(command) {
 }
 
 /**
- * @private
  * @description Handles border format changes in table properties.
  * @param {string} defaultCommand The default border format command.
  * @param {string} command The new border format command.

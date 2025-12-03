@@ -113,7 +113,6 @@ function isUneditableNode(ports, range, isFront) {
 }
 
 /**
- * @private
  * @description Retrieves the sibling node of a selected node if it is uneditable. || component node.
  * - Used only in `_isUneditableNode`.
  * @param {EventPorts} ports - Reducer ports

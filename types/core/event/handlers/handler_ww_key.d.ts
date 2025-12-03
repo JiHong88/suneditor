@@ -3,7 +3,6 @@ import type {} from '../../../typedef';
  * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_key_input
  */
 /**
- * @private
  * @this {EventManagerThis_handler_ww_key_input}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {KeyboardEvent} e - Event object
@@ -14,17 +13,15 @@ export class OnKeyDown_wysiwyg {
 	 * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_key_input
 	 */
 	/**
-	 * @private
 	 * @this {EventManagerThis_handler_ww_key_input}
 	 * @param {SunEditor.FrameContext} fc - Frame context object
 	 * @param {KeyboardEvent} e - Event object
 	 */
-	private constructor();
+	constructor(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, fc: SunEditor.FrameContext, e: KeyboardEvent);
 	isComposing: boolean;
 	_onShortcutKey: boolean;
 }
 /**
- * @private
  * @this {EventManagerThis_handler_ww_key_input}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {KeyboardEvent} e - Event object
@@ -32,12 +29,11 @@ export class OnKeyDown_wysiwyg {
 export function OnKeyUp_wysiwyg(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, fc: SunEditor.FrameContext, e: KeyboardEvent): Promise<void>;
 export class OnKeyUp_wysiwyg {
 	/**
-	 * @private
 	 * @this {EventManagerThis_handler_ww_key_input}
 	 * @param {SunEditor.FrameContext} fc - Frame context object
 	 * @param {KeyboardEvent} e - Event object
 	 */
-	private constructor();
+	constructor(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, fc: SunEditor.FrameContext, e: KeyboardEvent);
 	_formatAttrsTemp: any;
 	__retainTimer: number | void;
 }

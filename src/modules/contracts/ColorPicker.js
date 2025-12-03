@@ -277,7 +277,6 @@ class ColorPicker extends CoreInjector {
 }
 
 /**
- * @private
  * @description Create a color picker element
  * @param {*} param0
  * @param {*} param1

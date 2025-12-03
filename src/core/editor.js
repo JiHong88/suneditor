@@ -1190,7 +1190,7 @@ Editor.prototype = {
 
 	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
 	/**
-	 * @private
+	 * @internal
 	 * @description Set frameContext, frameOptions
 	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
 	 */
@@ -1203,7 +1203,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Focus to wysiwyg area using "native focus function"
 	 */
 	_nativeFocus() {
@@ -1212,7 +1212,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Check the components such as image and video and modify them according to the format.
 	 * @param {boolean} loaded If true, the component is loaded.
 	 */
@@ -1223,7 +1223,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Initialize the information of the components.
 	 */
 	_resetComponents() {
@@ -1233,7 +1233,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Initializ wysiwyg area (Only called from core._init)
 	 * @param {SunEditor.FrameContext} e frameContext
 	 * @param {string} value initial html string
@@ -1265,7 +1265,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Called when there are changes to tags in the wysiwyg region.
 	 * @param {SunEditor.FrameContext} fc - Frame context object
 	 */
@@ -1280,7 +1280,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
 	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
 	 */
@@ -1310,7 +1310,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Call the "onResizeEditor" event
 	 * @param {SunEditor.FrameContext|FrameContextUtil} fc - Frame context object
 	 * @param {number} h - Height value
@@ -1335,7 +1335,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Set display property when there is placeholder.
 	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
 	 */
@@ -1358,7 +1358,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Initializ editor
 	 * @param {SunEditor.InitOptions} options Options
 	 */
@@ -1426,7 +1426,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Initializ core variable
 	 * @param {SunEditor.InitOptions} options Options
 	 */
@@ -1547,7 +1547,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Caching basic buttons to use
 	 */
 	__cachingButtons() {
@@ -1559,7 +1559,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Set the disabled button list
 	 * - this._codeViewDisabledButtons, this._controllerOnDisabledButtons
 	 */
@@ -1576,7 +1576,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Save the current buttons
 	 * @param {Map<string, Element>} cmdButtons Command button map
 	 * @param {?Element} tray Button tray
@@ -1602,7 +1602,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Caches custom(starts with "_") shortcut keys for commands.
 	 */
 	__cachingShortcuts() {
@@ -1617,7 +1617,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets command target elements.
 	 * @param {string} cmd - The command identifier.
 	 * @param {HTMLButtonElement} target - The associated command button.
@@ -1636,7 +1636,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Configures the document properties of an iframe editor.
 	 * @param {HTMLIFrameElement} frame - The editor iframe.
 	 * @param {Map<string, *>} originOptions - The original options.
@@ -1653,7 +1653,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Set the FrameContext parameters and options
 	 * @param {SunEditor.FrameContext} e - Frame context object
 	 */
@@ -1698,7 +1698,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Registers and initializes editor classes.
 	 */
 	__registerClass() {
@@ -1789,7 +1789,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Creates the editor instance and initializes components.
 	 * @param {SunEditor.InitOptions} originOptions - The initial editor options.
 	 * @returns {Promise<void>}

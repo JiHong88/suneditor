@@ -413,7 +413,7 @@ declare class Offset {
 		},
 	): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Sets the position of an element relative to the selection range in the editor.
 	 * - This method calculates the top and left offsets for the element, ensuring it
@@ -439,14 +439,14 @@ declare class Offset {
 		addTop?: number,
 	): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Get available space from page bottom
 	 * @returns {number} Available space
 	 */
 	_getPageBottomSpace(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>): number;
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Calculates the vertical margin offsets for the target element relative to the editor frame.
 	 * - This method determines the top and bottom margins based on various conditions such as
@@ -485,7 +485,7 @@ declare class Offset {
 		bMargin: number;
 	};
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Sets the visibility and direction of the arrow element.
 	 * - This method applies the appropriate class (`se-arrow-up` or `se-arrow-down`)
@@ -497,7 +497,7 @@ declare class Offset {
 	 */
 	_setArrow(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, arrow: HTMLElement, key: string): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {OffsetThis}
 	 * @description Retrieves the current window scroll position and viewport size.
 	 * - Returns an object containing the scroll offsets, viewport dimensions, and boundary rects.

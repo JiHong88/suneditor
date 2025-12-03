@@ -17,7 +17,6 @@ const _styleNodes = Object.preventExtensions({ value: [] });
  */
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_key_input}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {KeyboardEvent} e - Event object
@@ -92,7 +91,6 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_ww_key_input}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {KeyboardEvent} e - Event object

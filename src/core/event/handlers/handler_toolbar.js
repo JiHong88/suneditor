@@ -7,7 +7,6 @@ const { isMobile } = env;
  */
 
 /**
- * @private
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
@@ -100,7 +99,6 @@ export function ButtonsHandler(e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
@@ -125,7 +123,6 @@ export function OnClick_menuTray(e) {
 }
 
 /**
- * @private
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */

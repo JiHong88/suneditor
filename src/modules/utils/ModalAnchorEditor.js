@@ -553,7 +553,6 @@ class ModalAnchorEditor extends CoreInjector {
 }
 
 /**
- * @private
  * @param {SunEditor.Core} editor - Editor instance
  * @param {ModalAnchorEditorParams} params - ModalAnchorEditor options
  * @param {Array<string>} relList - REL attribute list

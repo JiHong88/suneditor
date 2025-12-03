@@ -3,7 +3,6 @@ import type {} from '../../../typedef';
  * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_dragDrop
  */
 /**
- * @private
  * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {HTMLElement} dragCursor - Drag cursor element
@@ -20,13 +19,11 @@ export function OnDragOver_wysiwyg(
 	e: DragEvent,
 ): void;
 /**
- * @private
  * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {HTMLElement} dragCursor - Drag cursor element
  */
 export function OnDragEnd_wysiwyg(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, dragCursor: HTMLElement): void;
 /**
- * @private
  * @this {EventManagerThis_handler_ww_dragDrop}
  * @param {SunEditor.FrameContext} fc - Frame context object
  * @param {HTMLElement} dragCursor - Drag cursor element

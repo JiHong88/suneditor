@@ -349,7 +349,7 @@ declare class HTML {
 	 */
 	compress(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, html: string): string;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description construct wysiwyg area element to html string
 	 * @param {Node|string} html WYSIWYG element (this.frameContext.get('wysiwyg')) or HTML string.
@@ -358,7 +358,7 @@ declare class HTML {
 	 */
 	_convertToCode(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, html: Node | string, comp: boolean): string;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Checks whether the given list item node should be removed and handles necessary clean-up.
 	 * @param {Node} item The list item node to be checked.
@@ -374,7 +374,7 @@ declare class HTML {
 		ec: Node;
 	} | null;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Recursive function  when used to place a node in "BrLine" in "html.insertNode"
 	 * @param {Node} oNode Node to be inserted
@@ -382,7 +382,7 @@ declare class HTML {
 	 */
 	_setIntoFreeFormat(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, oNode: Node): Node;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Returns HTML string according to tag type and configurati isExcludeFormat.
 	 * @param {Node} node Node
@@ -390,7 +390,7 @@ declare class HTML {
 	 */
 	_makeLine(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, node: Node, forceFormat: boolean): string;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Fix tags that do not fit the editor format.
 	 * @param {DocumentFragment} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
@@ -412,7 +412,7 @@ declare class HTML {
 		_freeCodeViewMode: boolean,
 	): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
 	 * @param {string} html HTML string
@@ -420,7 +420,7 @@ declare class HTML {
 	 */
 	_styleNodeConvertor(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, html: string): string;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Determines if formatting is required and returns a domTree
 	 * @param {DocumentFragment} domFrag documentFragment
@@ -428,7 +428,7 @@ declare class HTML {
 	 */
 	_editFormat(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, domFrag: DocumentFragment): DocumentFragment;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Converts a list of DOM nodes into an HTML list structure.
 	 * - If the node is already a list, its innerHTML is used. If it is a block element,
@@ -438,7 +438,7 @@ declare class HTML {
 	 */
 	_convertListCell(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, domTree: SunEditor.NodeCollection): string;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Checks whether the provided DOM nodes require formatting.
 	 * @param {NodeList} domTree List of DOM nodes to check.
@@ -446,7 +446,7 @@ declare class HTML {
 	 */
 	_isFormatData(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, domTree: NodeList): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Cleans the inline style attributes of an HTML element.
 	 * - Extracts allowed styles and removes disallowed ones based on editor settings.
@@ -457,7 +457,7 @@ declare class HTML {
 	 */
 	_cleanStyle(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, m: string, v: any[] | null, name: string): any[];
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Delete disallowed tags
 	 * @param {string} html HTML string
@@ -465,7 +465,7 @@ declare class HTML {
 	 */
 	_deleteDisallowedTags(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, html: string, whitelistRegExp: any, blacklistRegExp: any): string;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Recursively checks for duplicate text style nodes within a given parent node.
 	 * @param {Node} oNode The node to check for duplicate styles.
@@ -473,7 +473,7 @@ declare class HTML {
 	 */
 	_checkDuplicateNode(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, oNode: Node, parentNode: Node): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Recursively checks for duplicate text style nodes within a given parent node.
 	 * - If duplicate styles are found, redundant attributes are removed.
@@ -483,7 +483,7 @@ declare class HTML {
 	 */
 	_dupleCheck(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, oNode: Node, parentNode: Node): Node;
 	/**
-	 * @private
+	 * @internal
 	 * @this {HTMLThis}
 	 * @description Reset autoStyleify options.
 	 * @param {Array.<string>} autoStyleify Styles applied automatically on text input.

@@ -96,7 +96,6 @@ export function jsonToHtml(jsonData) {
  * @description Convert HTML string to HTML Entity
  * @param {string} content
  * @returns {string} Content string
- * @private
  */
 export function htmlToEntity(content) {
 	const ec = {
@@ -478,7 +477,6 @@ export function addUrlQuery(url, query) {
  * @param {Map<string, *>} fo editor.frameOptions
  * @param {string} cssText Style string
  * @returns {OptionStyleResult_converter}
- * @private
  */
 export function _setDefaultOptionStyle(fo, cssText) {
 	let optionStyle = '';

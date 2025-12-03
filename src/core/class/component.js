@@ -494,7 +494,7 @@ Component.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Checks if the given element is a file component by matching its tag name against the file manager's regular expressions.
 	 * - It also verifies whether the element has the required attributes based on the tag type.
@@ -507,7 +507,7 @@ Component.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Deselects the currently selected component, removing any selection effects and associated event listeners.
 	 * - This method resets the selection state and hides UI elements related to the component selection.
@@ -545,7 +545,7 @@ Component.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description
 	 * Attempts to move the cursor to a valid line after the given container.
@@ -570,7 +570,7 @@ Component.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Set line breaker of component
 	 * @param {HTMLElement} element Element tag
@@ -650,7 +650,7 @@ Component.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Adds global event listeners for component interactions such as copy, cut, and keydown events.
 	 */
@@ -662,7 +662,7 @@ Component.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Removes global event listeners that were previously added for component interactions.
 	 */
@@ -674,7 +674,7 @@ Component.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Adds global event listeners for non-file-related interactions such as mouse and touch events.
 	 */
@@ -684,7 +684,7 @@ Component.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Removes global event listeners related to non-file interactions.
 	 */
@@ -693,7 +693,7 @@ Component.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Removes drag-related events and resets drag-related states.
 	 */

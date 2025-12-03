@@ -579,7 +579,6 @@ class Browser extends CoreInjector {
 }
 
 /**
- * @private
  * @param {SunEditor.Core} editor - editor instance
  * @param {boolean} useSearch - Whether to use the search function
  * @returns {{ html: HTMLElement, header: HTMLElement, titleArea: HTMLElement, tagArea: HTMLElement, body: HTMLElement, list: HTMLElement, side: HTMLElement, wrapper: HTMLElement, _loading: HTMLElement }} HTML
@@ -638,7 +637,6 @@ function CreateHTMLInfos(editor, useSearch) {
 }
 
 /**
- * @private
  * @this {{ thumbnail: ((...args: *) => *), props: Array<*> }}
  * @description Define the HTML of the item to be put in "div.se-file-item-column".
  * - Format: [ { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" } ]

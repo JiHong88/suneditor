@@ -248,101 +248,107 @@ declare class Table extends PluginDropdownFree {
 	 */
 	toggleCaption(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the controller position for a cell.
 	 * @param {HTMLTableCellElement} tdElement - The target table cell.
 	 */
-	private _setController;
+	_setController(tdElement: HTMLTableCellElement): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the position of the cell controller.
 	 * @param {HTMLTableCellElement} tdElement - The target table cell.
 	 * @param {boolean} reset - Whether to reset the controller position.
 	 */
-	private _setCellControllerPosition;
+	_setCellControllerPosition(tdElement: HTMLTableCellElement, reset: boolean): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Adds a new entry to the history stack.
 	 */
-	private _historyPush;
+	_historyPush(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Starts resizing a table cell.
 	 * @param {HTMLElement} col The column element.
 	 * @param {number} startX The starting X position.
 	 * @param {number} startWidth The initial width of the column.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
-	private _startCellResizing;
+	_startCellResizing(col: HTMLElement, startX: number, startWidth: number, isLeftEdge: boolean): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Starts resizing a table row.
 	 * @param {HTMLElement} row The table row element.
 	 * @param {number} startY The starting Y position.
 	 * @param {number} startHeight The initial height of the row.
 	 */
-	private _startRowResizing;
+	_startRowResizing(row: HTMLElement, startY: number, startHeight: number): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Starts resizing the table figure.
 	 * @param {number} startX The starting X position.
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
-	private _startFigureResizing;
+	_startFigureResizing(startX: number, isLeftEdge: boolean): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Stops resizing the table.
 	 * @param {HTMLElement} target The target element.
 	 * @param {string} prevValue The previous style value.
 	 * @param {string} styleProp The CSS property being changed.
 	 * @param {KeyboardEvent} e The keyboard event.
 	 */
-	private _stopResize;
+	_stopResize(target: HTMLElement, prevValue: string, styleProp: string, e: KeyboardEvent): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Disables or enables border properties.
 	 * @param {boolean} disabled Whether to disable or enable border properties.
 	 */
-	private _disableBorderProps;
+	_disableBorderProps(disabled: boolean): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Applies properties to table cells.
 	 * @param {HTMLButtonElement} target The target element.
 	 */
-	private _submitProps;
+	_submitProps(target: HTMLButtonElement): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Selects multiple table cells and applies selection styles.
 	 * @param {Node} startCell The first cell in the selection.
 	 * @param {Node} endCell The last cell in the selection.
 	 */
-	private _setMultiCells;
+	_setMultiCells(startCell: Node, endCell: Node): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Clone a table element and map selected cells to the cloned table
 	 * @param {HTMLTableElement} table <table> element
 	 * @param {HTMLTableCellElement[]} selectedCells Selected cells array
 	 * @returns {{ cloneTable: HTMLTableElement, clonedSelectedCells: HTMLTableCellElement[] }}
 	 */
-	private _cloneTable;
+	_cloneTable(
+		table: HTMLTableElement,
+		selectedCells: HTMLTableCellElement[],
+	): {
+		cloneTable: HTMLTableElement;
+		clonedSelectedCells: HTMLTableCellElement[];
+	};
 	/**
-	 * @private
+	 * @internal
 	 * @description Splits a table cell either vertically or horizontally.
 	 * @param {"vertical"|"horizontal"} direction The direction to split the cell.
 	 */
-	private _OnSplitCells;
+	_OnSplitCells(direction: 'vertical' | 'horizontal'): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Handles column operations such as insert and delete.
 	 * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
 	 */
-	private _OnColumnEdit;
+	_OnColumnEdit(command: 'insert-left' | 'insert-right' | 'delete'): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Handles row operations such as insert and delete.
 	 * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
 	 */
-	private _OnRowEdit;
+	_OnRowEdit(command: 'insert-above' | 'insert-below' | 'delete'): void;
 	#private;
 }
 import { PluginDropdownFree } from '../../../interfaces';

@@ -3,7 +3,6 @@ import { isImportantDisabled } from './domCheck';
 
 // ----- iframe-safe type check [START] -----
 /**
- * @private
  * @description iframe-safe : Node type [HTMLCollection, NodeList, Array] check.
  * @param {*} element
  * @returns {element is HTMLCollection|NodeList|Array}
@@ -14,7 +13,6 @@ function IsElementArray(element) {
 }
 
 /**
- * @private
  * @description iframe-safe: check if element is an HTMLImageElement
  * @param {*} element
  * @returns {element is HTMLImageElement}
@@ -25,7 +23,6 @@ function IsHTMLImageElement(element) {
 }
 
 /**
- * @private
  * @description iframe-safe: check if element is an HTMLMediaElement (video or audio)
  * @param {*} element
  * @returns {element is HTMLMediaElement}
@@ -36,7 +33,6 @@ function IsHTMLMediaElement(element) {
 }
 
 /**
- * @private
  * @description iframe-safe: check if element is an HTMLIFrameElement
  * @param {*} element
  * @returns {element is HTMLIFrameElement}

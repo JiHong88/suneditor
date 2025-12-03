@@ -417,7 +417,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
 	 * @param {Node|string} element Element to check
@@ -431,7 +431,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Nodes that need to be added without modification when changing text nodes
 	 * @param {Node} element Element to check
@@ -442,7 +442,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description wraps text nodes of line selected text.
 	 * @param {Node} element The node of the line that contains the selected text node.
@@ -916,7 +916,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description wraps first line selected text.
 	 * @param {Node} element The node of the line that contains the selected text node.
@@ -1226,7 +1226,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description wraps mid lines selected text.
 	 * @param {HTMLElement} element The node of the line that contains the selected text node.
@@ -1365,7 +1365,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description wraps last line selected text.
 	 * @param {Node} element The node of the line that contains the selected text node.
@@ -1690,7 +1690,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Node with font-size style
 	 * @param {Node} element Element to check
@@ -1701,7 +1701,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Return the parent maintained tag. (bind and use a util object)
 	 * @param {boolean} _isRemove is remove anchor
@@ -1715,7 +1715,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Check if element is a tag that should be persisted. (bind and use a util object)
 	 * @param {boolean} _isRemove is remove anchor
@@ -1730,7 +1730,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
 	 * @param {Node} el List cell element. <li>
@@ -1782,7 +1782,7 @@ Inline.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {InlineThis}
 	 * @description Watch the applied text nodes and adjust the common styles of the list.
 	 * @param {Node} el "LI" element
@@ -1856,10 +1856,8 @@ Inline.prototype = {
 };
 
 /**
- * @private
  * @description Strip remove node
  * @param {Node} removeNode The remove node
- * @private
  */
 function SN_StripRemoveNode(removeNode) {
 	const element = removeNode.parentNode;

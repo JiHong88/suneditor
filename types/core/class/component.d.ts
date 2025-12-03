@@ -184,7 +184,7 @@ declare class Component {
 	 */
 	hoverSelect(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, target: Element): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Checks if the given element is a file component by matching its tag name against the file manager's regular expressions.
 	 * - It also verifies whether the element has the required attributes based on the tag type.
@@ -193,14 +193,14 @@ declare class Component {
 	 */
 	__isFiles(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Deselects the currently selected component, removing any selection effects and associated event listeners.
 	 * - This method resets the selection state and hides UI elements related to the component selection.
 	 */
 	__deselect(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description
 	 * Attempts to move the cursor to a valid line after the given container.
@@ -212,38 +212,38 @@ declare class Component {
 	 */
 	__moveToNextLineOrAdd(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Set line breaker of component
 	 * @param {HTMLElement} element Element tag
 	 */
 	_setComponentLineBreaker(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: HTMLElement): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Adds global event listeners for component interactions such as copy, cut, and keydown events.
 	 */
 	__addGlobalEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Removes global event listeners that were previously added for component interactions.
 	 */
 	__removeGlobalEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Adds global event listeners for non-file-related interactions such as mouse and touch events.
 	 */
 	__addNotFileGlobalEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Removes global event listeners related to non-file interactions.
 	 */
 	__removeNotFileGlobalEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {ComponentThis}
 	 * @description Removes drag-related events and resets drag-related states.
 	 */

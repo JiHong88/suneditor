@@ -483,52 +483,52 @@ declare class Figure extends CoreInjector {
 	 */
 	setTransform(node: Node, width: (string | number) | null, height: (string | number) | null, deg: number | null): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Displays or hides the resize handles of the figure component.
 	 * @param {boolean} display Whether to display resize handles.
 	 */
-	private _displayResizeHandles;
+	_displayResizeHandles(display: boolean): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Applies rotation transformation to the target element.
 	 * @param {HTMLElement} element Target element.
 	 * @param {number} r Rotation degree.
 	 * @param {number} x X-axis rotation value.
 	 * @param {number} y Y-axis rotation value.
 	 */
-	private _setRotate;
+	_setRotate(element: HTMLElement, r: number, x: number, y: number): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Applies size adjustments to the figure element.
 	 * @param {string|number} w Width value.
 	 * @param {string|number} h Height value.
 	 * @param {string} direction Resize direction.
 	 */
-	private _applySize;
+	_applySize(w: string | number, h: string | number, direction: string): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets padding-bottom for cover elements based on width and height.
 	 * @param {string} w Width value.
 	 * @param {string} h Height value.
 	 */
-	private __setCoverPaddingBottom;
+	__setCoverPaddingBottom(w: string, h: string): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the figure element to its auto size.
 	 */
-	private _setAutoSize;
+	_setAutoSize(): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the figure element's size in percentage.
 	 * @param {string|number} w Width percentage.
 	 * @param {string|number} h Height percentage.
 	 */
-	private _setPercentSize;
+	_setPercentSize(w: string | number, h: string | number): void;
 	/**
-	 * @private
+	 * @internal
 	 * @description Reverts the figure element to its previously saved size.
 	 */
-	private _setRevert;
+	_setRevert(): void;
 	#private;
 }
 import CoreInjector from '../../editorInjector/_core';

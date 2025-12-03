@@ -324,7 +324,7 @@ UI.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {UIThis}
 	 * @description visible controllers
 	 * @param {boolean} value hidden/show
@@ -345,7 +345,7 @@ UI.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {UIThis}
 	 * @description Off current controllers
 	 */
@@ -354,7 +354,7 @@ UI.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {UIThis}
 	 * @description Off controllers
 	 */
@@ -376,7 +376,7 @@ UI.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {UIThis}
 	 * @description Off current modal
 	 */
@@ -390,7 +390,6 @@ UI.prototype = {
 };
 
 /**
- * @private
  * @this {UIThis}
  * @param {MouseEvent} e - Event object
  */
@@ -402,7 +401,6 @@ function OnClick_alert(e) {
 }
 
 /**
- *  @private
  * @this {UIThis}
  * @param {KeyboardEvent} e - Event object
  */

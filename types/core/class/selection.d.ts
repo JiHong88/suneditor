@@ -176,7 +176,7 @@ declare class Selection_ {
 		},
 	): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Returns true if there is no valid selection.
 	 * @param {Range} range selection.getRange()
@@ -184,14 +184,14 @@ declare class Selection_ {
 	 */
 	_isNone(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: Range): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Return the range object of editor's first child node
 	 * @returns {Range}
 	 */
 	_createDefaultRange(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): Range;
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Set "range" and "selection" info.
 	 * @param {Range} range range object.
@@ -199,26 +199,26 @@ declare class Selection_ {
 	 */
 	_rangeInfo(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: Range, selection: Selection): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Saving the range object and the currently selected node of editor
 	 */
 	_init(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): HTMLInputElement;
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Sets focus to the editor's wysiwyg contenteditable area and restores the last selection range within iframe context.
 	 */
 	__focus(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Normalizes and resets the selection range to properly target text nodes instead of element nodes for accurate text editing.
 	 * @returns {boolean} Returns false if there is no valid selection.
 	 */
 	_resetRangeToTextNode(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): boolean;
 	/**
-	 * @private
+	 * @internal
 	 * @this {SelectionThis}
 	 * @description Initialize the scroll information when the editor first loads
 	 */

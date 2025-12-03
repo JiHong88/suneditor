@@ -50,7 +50,7 @@ InstanceCheck.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @returns {window}
 	 */
 	_getFrameWindow() {

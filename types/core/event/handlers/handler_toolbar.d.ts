@@ -3,7 +3,6 @@ import type {} from '../../../typedef';
  * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_toolbar
  */
 /**
- * @private
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
@@ -13,11 +12,10 @@ export class ButtonsHandler {
 	 * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_toolbar
 	 */
 	/**
-	 * @private
 	 * @this {EventManagerThis_handler_toolbar}
 	 * @param {MouseEvent} e - Event object
 	 */
-	private constructor();
+	constructor(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, e: MouseEvent);
 	_inputFocus: boolean;
 	__inputPlugin: {
 		obj: any;
@@ -28,13 +26,11 @@ export class ButtonsHandler {
 	__inputKeyEvent: SunEditor.Event.Info;
 }
 /**
- * @private
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
 export function OnClick_menuTray(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, e: MouseEvent): void;
 /**
- * @private
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */

@@ -184,7 +184,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Reset the common buttons info.
 	 */
@@ -207,7 +207,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Reset the sticky toolbar position based on the editor state.
 	 */
@@ -240,7 +240,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Enable sticky toolbar mode and adjust position.
 	 */
@@ -261,7 +261,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Get the viewport's top offset.
 	 * @returns {number}
@@ -274,7 +274,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Disable sticky toolbar mode.
 	 */
@@ -292,7 +292,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Set up responsive behavior for the toolbar buttons.
 	 */
@@ -320,7 +320,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Show the balloon toolbar based on the current selection.
 	 * @param {?Range} [rangeObj] - Selection range
@@ -351,7 +351,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Adjust the balloon toolbar's position.
 	 * @param {boolean} positionTop - Whether the toolbar should be positioned above the selection
@@ -394,7 +394,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Show the inline toolbar mode.
 	 */
@@ -419,7 +419,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Show a more options layer for toolbar buttons.
 	 * @param {Node} button - Button element
@@ -432,7 +432,7 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @private
+	 * @internal
 	 * @this {ToolbarThis}
 	 * @description Hide the currently active more options layer.
 	 */

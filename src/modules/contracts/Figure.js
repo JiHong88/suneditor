@@ -983,7 +983,7 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Displays or hides the resize handles of the figure component.
 	 * @param {boolean} display Whether to display resize handles.
 	 */
@@ -1041,7 +1041,7 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Applies rotation transformation to the target element.
 	 * @param {HTMLElement} element Target element.
 	 * @param {number} r Rotation degree.
@@ -1083,7 +1083,7 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Applies size adjustments to the figure element.
 	 * @param {string|number} w Width value.
 	 * @param {string|number} h Height value.
@@ -1119,7 +1119,7 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets padding-bottom for cover elements based on width and height.
 	 * @param {string} w Width value.
 	 * @param {string} h Height value.
@@ -1140,7 +1140,7 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the figure element to its auto size.
 	 */
 	_setAutoSize() {
@@ -1167,7 +1167,7 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Sets the figure element's size in percentage.
 	 * @param {string|number} w Width percentage.
 	 * @param {string|number} h Height percentage.
@@ -1225,7 +1225,7 @@ class Figure extends CoreInjector {
 	}
 
 	/**
-	 * @private
+	 * @internal
 	 * @description Reverts the figure element to its previously saved size.
 	 */
 	_setRevert() {
