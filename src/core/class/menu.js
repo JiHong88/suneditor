@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, converter } from '../../helper';
 
 /**
- * @typedef {Omit<Menu & Partial<SunEditor.Injector>, 'menu'>} MenuThis
+ * @typedef {Omit<Menu & Partial<SunEditor.Injector_Core>, 'menu'>} MenuThis
  */
 
 /**
@@ -53,6 +53,11 @@ function Menu(editor) {
 }
 
 Menu.prototype = {
+	/** @internal @type {SunEditor.Core['offset']} */
+	get offset() {
+		return this.editor.offset;
+	},
+
 	/**
 	 * @this {MenuThis}
 	 * @description Method for managing dropdown element.

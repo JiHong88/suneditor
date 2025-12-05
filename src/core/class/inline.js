@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, converter } from '../../helper';
 
 /**
- * @typedef {Omit<Inline & Partial<SunEditor.Injector>, 'inline'>} InlineThis
+ * @typedef {Omit<Inline & Partial<SunEditor.Injector_Core>, 'inline'>} InlineThis
  */
 
 /**
@@ -32,6 +32,31 @@ function Inline(editor) {
 }
 
 Inline.prototype = {
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection() {
+		return this.editor.selection;
+	},
+	/** @internal @type {SunEditor.Core['format']} */
+	get format() {
+		return this.editor.format;
+	},
+	/** @internal @type {SunEditor.Core['component']} */
+	get component() {
+		return this.editor.component;
+	},
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui() {
+		return this.editor.ui;
+	},
+	/** @internal @type {SunEditor.Core['history']} */
+	get history() {
+		return this.editor.history;
+	},
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform() {
+		return this.editor.nodeTransform;
+	},
+
 	/**
 	 * @this {InlineThis}
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).

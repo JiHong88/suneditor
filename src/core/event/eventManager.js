@@ -17,7 +17,7 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './handler
 const { _w, _d, isMobile, isTouchDevice } = env;
 
 /**
- * @typedef {Omit<EventManager & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis
+ * @typedef {Omit<EventManager & Partial<SunEditor.Injector_Core>, 'eventManager'>} EventManagerThis
  */
 
 /**
@@ -95,6 +95,55 @@ function EventManager(editor) {
 }
 
 EventManager.prototype = {
+	/** @internal @type {SunEditor.Core['char']} */
+	get char() {
+		return this.editor.char;
+	},
+	/** @internal @type {SunEditor.Core['component']} */
+	get component() {
+		return this.editor.component;
+	},
+	/** @internal @type {SunEditor.Core['format']} */
+	get format() {
+		return this.editor.format;
+	},
+	/** @internal @type {SunEditor.Core['listFormat']} */
+	get listFormat() {
+		return this.editor.listFormat;
+	},
+	/** @internal @type {SunEditor.Core['html']} */
+	get html() {
+		return this.editor.html;
+	},
+	/** @internal @type {SunEditor.Core['menu']} */
+	get menu() {
+		return this.editor.menu;
+	},
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform() {
+		return this.editor.nodeTransform;
+	},
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection() {
+		return this.editor.selection;
+	},
+	/** @internal @type {SunEditor.Core['subToolbar']} */
+	get subToolbar() {
+		return this.editor.subToolbar;
+	},
+	/** @internal @type {SunEditor.Core['toolbar']} */
+	get toolbar() {
+		return this.editor.toolbar;
+	},
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui() {
+		return this.editor.ui;
+	},
+	/** @internal @type {SunEditor.Core['viewer']} */
+	get viewer() {
+		return this.editor.viewer;
+	},
+
 	/**
 	 * @this {EventManagerThis}
 	 * @description Register for an event.

@@ -1,6 +1,6 @@
 import type {} from '../../typedef';
 export default Shortcuts;
-export type ShortcutsThis = Omit<Shortcuts & Partial<SunEditor.Injector>, 'shortcuts'>;
+export type ShortcutsThis = Omit<Shortcuts & Partial<SunEditor.Injector_Core>, 'shortcuts'>;
 export type ShortcutInfo = {
 	/**
 	 * - Whether the [Ctrl, Command] key is pressed.
@@ -60,7 +60,7 @@ export type ShortcutInfo = {
 	textTrigger: string;
 };
 /**
- * @typedef {Omit<Shortcuts & Partial<SunEditor.Injector>, 'shortcuts'>} ShortcutsThis
+ * @typedef {Omit<Shortcuts & Partial<SunEditor.Injector_Core>, 'shortcuts'>} ShortcutsThis
  */
 /**
  * @typedef {Object} ShortcutInfo
@@ -85,10 +85,10 @@ export type ShortcutInfo = {
  * @description Shortcuts class
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Shortcuts(this: Omit<Shortcuts & Partial<import('../../editorInjector').default>, 'shortcuts'>, editor: SunEditor.Core): void;
+declare function Shortcuts(this: Omit<Shortcuts & Partial<import('../../editorInjector/_core').default>, 'shortcuts'>, editor: SunEditor.Core): void;
 declare class Shortcuts {
 	/**
-	 * @typedef {Omit<Shortcuts & Partial<SunEditor.Injector>, 'shortcuts'>} ShortcutsThis
+	 * @typedef {Omit<Shortcuts & Partial<SunEditor.Injector_Core>, 'shortcuts'>} ShortcutsThis
 	 */
 	/**
 	 * @typedef {Object} ShortcutInfo
@@ -129,21 +129,31 @@ declare class Shortcuts {
 	 * @param {Range} range The current range object
 	 * @returns {boolean} Whether to execute shortcuts
 	 */
-	command(this: Omit<Shortcuts & Partial<import('../../editorInjector').default>, 'shortcuts'>, event: KeyboardEvent, ctrl: boolean, shift: boolean, keyCode: string, text: string, edge: boolean, line: HTMLElement, range: Range): boolean;
+	command(
+		this: Omit<Shortcuts & Partial<import('../../editorInjector/_core').default>, 'shortcuts'>,
+		event: KeyboardEvent,
+		ctrl: boolean,
+		shift: boolean,
+		keyCode: string,
+		text: string,
+		edge: boolean,
+		line: HTMLElement,
+		range: Range,
+	): boolean;
 	/**
 	 * @this {ShortcutsThis}
 	 * @description Disable the shortcut activation.
 	 */
-	disable(this: Omit<Shortcuts & Partial<import('../../editorInjector').default>, 'shortcuts'>): void;
+	disable(this: Omit<Shortcuts & Partial<import('../../editorInjector/_core').default>, 'shortcuts'>): void;
 	/**
 	 * @this {ShortcutsThis}
 	 * @description Enable the shortcut activation.
 	 */
-	enable(this: Omit<Shortcuts & Partial<import('../../editorInjector').default>, 'shortcuts'>): void;
+	enable(this: Omit<Shortcuts & Partial<import('../../editorInjector/_core').default>, 'shortcuts'>): void;
 	/**
 	 * @internal
 	 * @this {ShortcutsThis}
 	 * @description Destroy the Shortcuts instance and release memory
 	 */
-	_destroy(this: Omit<Shortcuts & Partial<import('../../editorInjector').default>, 'shortcuts'>): void;
+	_destroy(this: Omit<Shortcuts & Partial<import('../../editorInjector/_core').default>, 'shortcuts'>): void;
 }

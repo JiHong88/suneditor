@@ -10,7 +10,7 @@ import { numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
 /**
- * @typedef {Omit<Offset & Partial<SunEditor.Injector>, 'offset'>} OffsetThis
+ * @typedef {Omit<Offset & Partial<SunEditor.Injector_Core>, 'offset'>} OffsetThis
  */
 
 /**
@@ -88,6 +88,15 @@ function Offset(editor) {
 }
 
 Offset.prototype = {
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection() {
+		return this.editor.selection;
+	},
+	/** @internal @type {SunEditor.Core['toolbar']} */
+	get toolbar() {
+		return this.editor.toolbar;
+	},
+
 	/**
 	 * @this {OffsetThis}
 	 * @description Gets the position just outside the argument's internal editor (wysiwygFrame).

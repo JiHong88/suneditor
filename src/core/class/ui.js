@@ -7,7 +7,7 @@ import { dom, converter, keyCodeMap, env } from '../../helper';
 const { _w } = env;
 
 /**
- * @typedef {Omit<UI & Partial<SunEditor.Injector>, 'ui'>} UIThis
+ * @typedef {Omit<UI & Partial<SunEditor.Injector_Core>, 'ui'>} UIThis
  */
 
 /**
@@ -46,6 +46,27 @@ function UI(editor) {
 }
 
 UI.prototype = {
+	/** @internal @type {SunEditor.Core['toolbar']} */
+	get toolbar() {
+		return this.editor.toolbar;
+	},
+	/** @internal @type {SunEditor.Core['subToolbar']} */
+	get subToolbar() {
+		return this.editor.subToolbar;
+	},
+	/** @internal @type {SunEditor.Core['menu']} */
+	get menu() {
+		return this.editor.menu;
+	},
+	/** @internal @type {SunEditor.Core['component']} */
+	get component() {
+		return this.editor.component;
+	},
+	/** @internal @type {SunEditor.Core['viewer']} */
+	get viewer() {
+		return this.editor.viewer;
+	},
+
 	/**
 	 * @this {UIThis}
 	 * @description set editor frame styles.

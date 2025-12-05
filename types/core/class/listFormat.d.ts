@@ -1,8 +1,8 @@
 import type {} from '../../typedef';
 export default ListFormat;
-export type ListFormatThis = Omit<ListFormat & Partial<SunEditor.Injector>, 'ListFormat'>;
+export type ListFormatThis = Omit<ListFormat & Partial<SunEditor.Injector_Core>, 'ListFormat'>;
 /**
- * @typedef {Omit<ListFormat & Partial<SunEditor.Injector>, 'ListFormat'>} ListFormatThis
+ * @typedef {Omit<ListFormat & Partial<SunEditor.Injector_Core>, 'ListFormat'>} ListFormatThis
  */
 /**
  * @constructor
@@ -11,10 +11,10 @@ export type ListFormatThis = Omit<ListFormat & Partial<SunEditor.Injector>, 'Lis
  * - "list" is a special "line", "block" format.
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function ListFormat(this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>, editor: SunEditor.Core): void;
+declare function ListFormat(this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>, editor: SunEditor.Core): void;
 declare class ListFormat {
 	/**
-	 * @typedef {Omit<ListFormat & Partial<SunEditor.Injector>, 'ListFormat'>} ListFormatThis
+	 * @typedef {Omit<ListFormat & Partial<SunEditor.Injector_Core>, 'ListFormat'>} ListFormatThis
 	 */
 	/**
 	 * @constructor
@@ -24,6 +24,16 @@ declare class ListFormat {
 	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
 	constructor(editor: SunEditor.Core);
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection(): SunEditor.Core['selection'];
+	/** @internal @type {SunEditor.Core['format']} */
+	get format(): SunEditor.Core['format'];
+	/** @internal @type {SunEditor.Core['component']} */
+	get component(): SunEditor.Core['component'];
+	/** @internal @type {SunEditor.Core['inline']} */
+	get inline(): SunEditor.Core['inline'];
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform(): SunEditor.Core['nodeTransform'];
 	/**
 	 * @this {ListFormatThis}
 	 * @description Append all selected "line" element to the list and insert.
@@ -43,7 +53,7 @@ declare class ListFormat {
 	 * editor.listFormat.apply('ul', listItems, true);
 	 */
 	apply(
-		this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>,
+		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
 		type: string,
 		selectedCells: Array<Node>,
 		nested: boolean,
@@ -64,7 +74,7 @@ declare class ListFormat {
 	 * - ec: End container node
 	 */
 	remove(
-		this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>,
+		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
 		selectedCells: Array<Node>,
 		shouldDelete: boolean,
 	): {
@@ -89,7 +99,7 @@ declare class ListFormat {
 	 * editor.listFormat.applyNested(cells, true);
 	 */
 	applyNested(
-		this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>,
+		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
 		selectedCells: Array<HTMLElement>,
 		nested: boolean,
 	): {
@@ -117,7 +127,7 @@ declare class ListFormat {
 	 * const result = editor.listFormat.removeNested(nestedLi, false);
 	 * console.log(result); // parent list element
 	 */
-	removeNested(this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>, baseNode: HTMLElement, all: boolean): Node;
+	removeNested(this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>, baseNode: HTMLElement, all: boolean): Node;
 	/**
 	 * @internal
 	 * @this {ListFormatThis}
@@ -135,7 +145,7 @@ declare class ListFormat {
 	 * @returns {Node} The attached inner list.
 	 */
 	_attachNested(
-		this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>,
+		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
 		originList: Element,
 		innerList: Element,
 		prev: Element,
@@ -159,7 +169,7 @@ declare class ListFormat {
 	 * - ec : The last list item.
 	 */
 	_detachNested(
-		this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>,
+		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
 		cells: Array<HTMLElement>,
 	): {
 		cc: Node;
@@ -171,5 +181,6 @@ declare class ListFormat {
 	 * @this {ListFormatThis}
 	 * @description Destroy the ListFormat instance and release memory
 	 */
-	_destroy(this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>): void;
+	_destroy(this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

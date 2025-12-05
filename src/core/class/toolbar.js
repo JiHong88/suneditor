@@ -9,7 +9,7 @@ import { CreateToolBar, UpdateButton } from '../section/constructor';
 const { _w } = env;
 
 /**
- * @typedef {Omit<Toolbar & Partial<SunEditor.Injector>, 'toolbar' | 'subToolbar'>} ToolbarThis
+ * @typedef {Omit<Toolbar & Partial<SunEditor.Injector_Core>, 'toolbar' | 'subToolbar'>} ToolbarThis
  */
 
 /**
@@ -69,6 +69,31 @@ function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
 }
 
 Toolbar.prototype = {
+	/** @internal @type {SunEditor.Core['menu']} */
+	get menu() {
+		return this.editor.menu;
+	},
+	/** @internal @type {SunEditor.Core['history']} */
+	get history() {
+		return this.editor.history;
+	},
+	/** @internal @type {SunEditor.Core['viewer']} */
+	get viewer() {
+		return this.editor.viewer;
+	},
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui() {
+		return this.editor.ui;
+	},
+	/** @internal @type {SunEditor.Core['offset']} */
+	get offset() {
+		return this.editor.offset;
+	},
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection() {
+		return this.editor.selection;
+	},
+
 	/**
 	 * @this {ToolbarThis}
 	 * @description Disables all toolbar buttons.

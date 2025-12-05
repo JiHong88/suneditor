@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, numbers } from '../../helper';
 
 /**
- * @typedef {Omit<Format & Partial<SunEditor.Injector>, 'format'>} FormatThis
+ * @typedef {Omit<Format & Partial<SunEditor.Injector_Core>, 'format'>} FormatThis
  */
 
 /**
@@ -31,6 +31,27 @@ function Format(editor) {
 }
 
 Format.prototype = {
+	/** @internal @type {SunEditor.Core['component']} */
+	get component() {
+		return this.editor.component;
+	},
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection() {
+		return this.editor.selection;
+	},
+	/** @internal @type {SunEditor.Core['history']} */
+	get history() {
+		return this.editor.history;
+	},
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform() {
+		return this.editor.nodeTransform;
+	},
+	/** @internal @type {SunEditor.Core['listFormat']} */
+	get listFormat() {
+		return this.editor.listFormat;
+	},
+
 	/**
 	 * @this {FormatThis}
 	 * @description Replace the line tag of the current selection.

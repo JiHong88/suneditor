@@ -1,8 +1,8 @@
 import type {} from '../../typedef';
 export default NodeTransform;
-export type NodeTransformThis = Omit<NodeTransform & Partial<SunEditor.Injector>, 'nodeTransform'>;
+export type NodeTransformThis = Omit<NodeTransform & Partial<SunEditor.Injector_Core>, 'nodeTransform'>;
 /**
- * @typedef {Omit<NodeTransform & Partial<SunEditor.Injector>, 'nodeTransform'>} NodeTransformThis
+ * @typedef {Omit<NodeTransform & Partial<SunEditor.Injector_Core>, 'nodeTransform'>} NodeTransformThis
  */
 /**
  * @constructor
@@ -10,10 +10,10 @@ export type NodeTransformThis = Omit<NodeTransform & Partial<SunEditor.Injector>
  * @description Node utility class. split, merge, etc.
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function NodeTransform(this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>, editor: SunEditor.Core): void;
+declare function NodeTransform(this: Omit<NodeTransform & Partial<CoreInjector>, 'nodeTransform'>, editor: SunEditor.Core): void;
 declare class NodeTransform {
 	/**
-	 * @typedef {Omit<NodeTransform & Partial<SunEditor.Injector>, 'nodeTransform'>} NodeTransformThis
+	 * @typedef {Omit<NodeTransform & Partial<SunEditor.Injector_Core>, 'nodeTransform'>} NodeTransformThis
 	 */
 	/**
 	 * @constructor
@@ -22,6 +22,12 @@ declare class NodeTransform {
 	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
 	constructor(editor: SunEditor.Core);
+	/** @internal @type {SunEditor.Core['component']} */
+	get component(): SunEditor.Core['component'];
+	/** @internal @type {SunEditor.Core['format']} */
+	get format(): SunEditor.Core['format'];
+	/** @internal @type {SunEditor.Core['inline']} */
+	get inline(): SunEditor.Core['inline'];
 	/**
 	 * @this {NodeTransformThis}
 	 * @template {HTMLElement} T
@@ -42,7 +48,7 @@ declare class NodeTransform {
 	 * // Split by node reference
 	 * const splitResult = editor.nodeTransform.split(parentNode, childNode, 1);
 	 */
-	split<T extends HTMLElement>(this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>, baseNode: Node, offset: (number | Node) | null, depth?: number): T;
+	split<T extends HTMLElement>(this: Omit<NodeTransform & Partial<CoreInjector>, 'nodeTransform'>, baseNode: Node, offset: (number | Node) | null, depth?: number): T;
 	/**
 	 * @this {NodeTransformThis}
 	 * @description Use with "npdePath (dom-query-GetNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
@@ -65,14 +71,14 @@ declare class NodeTransform {
 	 * // Merge only text nodes
 	 * editor.nodeTransform.mergeSameTags(paragraph, null, true);
 	 */
-	mergeSameTags(this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>, element: Node, nodePathArray?: number[][] | null, onlyText?: boolean | null): Array<number>;
+	mergeSameTags(this: Omit<NodeTransform & Partial<CoreInjector>, 'nodeTransform'>, element: Node, nodePathArray?: number[][] | null, onlyText?: boolean | null): Array<number>;
 	/**
 	 * @this {NodeTransformThis}
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Node} element Element object
 	 * @param {?(((current: Node) => boolean)|string)} [validation] Validation function / String("tag1|tag2..") / If null, all tags are applicable.
 	 */
-	mergeNestedTags(this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>, element: Node, validation?: (((current: Node) => boolean) | string) | null): void;
+	mergeNestedTags(this: Omit<NodeTransform & Partial<CoreInjector>, 'nodeTransform'>, element: Node, validation?: (((current: Node) => boolean) | string) | null): void;
 	/**
 	 * @this {NodeTransformThis}
 	 * @description Delete itself and all parent nodes that match the condition.
@@ -96,7 +102,7 @@ declare class NodeTransform {
 	 * editor.nodeTransform.removeAllParents(childNode, null, stopAt);
 	 */
 	removeAllParents(
-		this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>,
+		this: Omit<NodeTransform & Partial<CoreInjector>, 'nodeTransform'>,
 		item: Node,
 		validation?: ((current: Node) => boolean) | null,
 		stopParent?: Node | null,
@@ -111,7 +117,7 @@ declare class NodeTransform {
 	 * @param {?Node} notRemoveNode Do not remove node
 	 * @param {boolean} forceDelete When all child nodes are deleted, the parent node is also deleted.
 	 */
-	removeEmptyNode(this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>, element: Node, notRemoveNode: Node | null, forceDelete: boolean): void;
+	removeEmptyNode(this: Omit<NodeTransform & Partial<CoreInjector>, 'nodeTransform'>, element: Node, notRemoveNode: Node | null, forceDelete: boolean): void;
 	/**
 	 * @this {NodeTransformThis}
 	 * @description Creates a nested node structure from the given array of nodes.
@@ -120,7 +126,7 @@ declare class NodeTransform {
 	 * @returns {{ parent: Node, inner: Node }} An object containing the top-level parent node and the innermost child node.
 	 */
 	createNestedNode(
-		this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>,
+		this: Omit<NodeTransform & Partial<CoreInjector>, 'nodeTransform'>,
 		nodeArray: SunEditor.NodeCollection,
 		validate?: ((current: Node) => boolean) | null,
 	): {
@@ -132,5 +138,6 @@ declare class NodeTransform {
 	 * @this {NodeTransformThis}
 	 * @description Destroy the NodeTransform instance and release memory
 	 */
-	_destroy(this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>): void;
+	_destroy(this: Omit<NodeTransform & Partial<CoreInjector>, 'nodeTransform'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

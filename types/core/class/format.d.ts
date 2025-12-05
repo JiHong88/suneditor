@@ -1,8 +1,8 @@
 import type {} from '../../typedef';
 export default Format;
-export type FormatThis = Omit<Format & Partial<SunEditor.Injector>, 'format'>;
+export type FormatThis = Omit<Format & Partial<SunEditor.Injector_Core>, 'format'>;
 /**
- * @typedef {Omit<Format & Partial<SunEditor.Injector>, 'format'>} FormatThis
+ * @typedef {Omit<Format & Partial<SunEditor.Injector_Core>, 'format'>} FormatThis
  */
 /**
  * @constructor
@@ -10,10 +10,10 @@ export type FormatThis = Omit<Format & Partial<SunEditor.Injector>, 'format'>;
  * @description Classes related to editor formats such as "line" and "block".
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Format(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, editor: SunEditor.Core): void;
+declare function Format(this: Omit<Format & Partial<CoreInjector>, 'format'>, editor: SunEditor.Core): void;
 declare class Format {
 	/**
-	 * @typedef {Omit<Format & Partial<SunEditor.Injector>, 'format'>} FormatThis
+	 * @typedef {Omit<Format & Partial<SunEditor.Injector_Core>, 'format'>} FormatThis
 	 */
 	/**
 	 * @constructor
@@ -29,12 +29,22 @@ declare class Format {
 	_formatClosureBrLineCheck: any;
 	_textStyleTagsCheck: RegExp;
 	_brLineBreak: boolean;
+	/** @internal @type {SunEditor.Core['component']} */
+	get component(): SunEditor.Core['component'];
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection(): SunEditor.Core['selection'];
+	/** @internal @type {SunEditor.Core['history']} */
+	get history(): SunEditor.Core['history'];
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform(): SunEditor.Core['nodeTransform'];
+	/** @internal @type {SunEditor.Core['listFormat']} */
+	get listFormat(): SunEditor.Core['listFormat'];
 	/**
 	 * @this {FormatThis}
 	 * @description Replace the line tag of the current selection.
 	 * @param {Node} element Line element (P, DIV..)
 	 */
-	setLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node): void;
+	setLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node): void;
 	/**
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
@@ -42,13 +52,13 @@ declare class Format {
 	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 */
-	getLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, node: Node, validation?: ((current: Node) => boolean) | null): HTMLElement | null;
+	getLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, node: Node, validation?: ((current: Node) => boolean) | null): HTMLElement | null;
 	/**
 	 * @this {FormatThis}
 	 * @description Replace the br-line tag of the current selection.
 	 * @param {Node} element BR-Line element (PRE..)
 	 */
-	setBrLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node): void;
+	setBrLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node): void;
 	/**
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a "brLine" (format.isBrLine), it returns that node.
@@ -56,7 +66,7 @@ declare class Format {
 	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLBRElement|null}
 	 */
-	getBrLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, validation?: ((current: Node) => boolean) | null): HTMLBRElement | null;
+	getBrLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node, validation?: ((current: Node) => boolean) | null): HTMLBRElement | null;
 	/**
 	 * @this {FormatThis}
 	 * @description Append "line" element to sibling node of argument element.
@@ -66,7 +76,7 @@ declare class Format {
 	 * @param {?(string|Node)} [lineNode] Node name or node obejct to be inserted
 	 * @returns {HTMLElement}
 	 */
-	addLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, lineNode?: (string | Node) | null): HTMLElement;
+	addLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node, lineNode?: (string | Node) | null): HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isBlock), it returns that node.
@@ -74,7 +84,7 @@ declare class Format {
 	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
 	 * @returns {HTMLElement|null}
 	 */
-	getBlock(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node, validation?: ((current: Node) => boolean) | null): HTMLElement | null;
+	getBlock(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node, validation?: ((current: Node) => boolean) | null): HTMLElement | null;
 	/**
 	 * @this {FormatThis}
 	 * @description Appended all selected "line" element to the argument element("block") and insert
@@ -84,7 +94,7 @@ declare class Format {
 	 * const blockquote = document.createElement('blockquote');
 	 * editor.format.applyBlock(blockquote);
 	 */
-	applyBlock(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, blockElement: Node): void;
+	applyBlock(this: Omit<Format & Partial<CoreInjector>, 'format'>, blockElement: Node): void;
 	/**
 	 * @this {FormatThis}
 	 * @description The elements of the "selectedFormats" array are detached from the "blockElement" element. ("LI" tags are converted to "P" tags)
@@ -118,7 +128,7 @@ declare class Format {
 	 * editor.format.removeBlock(blockquote, { newBlockElement: newDiv });
 	 */
 	removeBlock(
-		this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>,
+		this: Omit<Format & Partial<CoreInjector>, 'format'>,
 		blockElement: Node,
 		{
 			selectedFormats,
@@ -144,13 +154,13 @@ declare class Format {
 	 * @description Indent more the selected lines.
 	 * - margin size : 'status.indentSize'px
 	 */
-	indent(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>): void;
+	indent(this: Omit<Format & Partial<CoreInjector>, 'format'>): void;
 	/**
 	 * @this {FormatThis}
 	 * @description Indent less the selected lines.
 	 * - margin size - "status.indentSize"px
 	 */
-	outdent(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>): void;
+	outdent(this: Omit<Format & Partial<CoreInjector>, 'format'>): void;
 	/**
 	 * @this {FormatThis}
 	 * @description Check if the container and offset values are the edges of the "line"
@@ -159,14 +169,14 @@ declare class Format {
 	 * @param {"front"|"end"} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
 	 * @returns {node is HTMLElement}
 	 */
-	isEdgeLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, node: Node, offset: number, dir: 'front' | 'end'): node is HTMLElement;
+	isEdgeLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, node: Node, offset: number, dir: 'front' | 'end'): node is HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description It is judged whether it is a node related to the text style.
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
-	isTextStyleNode(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
+	isTextStyleNode(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node | string): element is HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description It is judged whether it is the "line" element.
@@ -175,14 +185,14 @@ declare class Format {
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
-	isLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
+	isLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node | string): element is HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description It is judged whether it is the only "line" element.
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
-	isNormalLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
+	isNormalLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node | string): element is HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description It is judged whether it is the "brLine" element.
@@ -193,7 +203,7 @@ declare class Format {
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
-	isBrLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
+	isBrLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node | string): element is HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description It is judged whether it is the "block" element.
@@ -202,7 +212,7 @@ declare class Format {
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
-	isBlock(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
+	isBlock(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node | string): element is HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description It is judged whether it is the "closureBlock" element.
@@ -214,7 +224,7 @@ declare class Format {
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
-	isClosureBlock(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
+	isClosureBlock(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node | string): element is HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description It is judged whether it is the "closureBrLine" element.
@@ -226,14 +236,14 @@ declare class Format {
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
-	isClosureBrLine(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): element is HTMLElement;
+	isClosureBrLine(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node | string): element is HTMLElement;
 	/**
 	 * @this {FormatThis}
 	 * @description Returns a "line" array from selected range.
 	 * @param {?(current: Node) => boolean} [validation] The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array<HTMLElement>}
 	 */
-	getLines(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, validation?: ((current: Node) => boolean) | null): Array<HTMLElement>;
+	getLines(this: Omit<Format & Partial<CoreInjector>, 'format'>, validation?: ((current: Node) => boolean) | null): Array<HTMLElement>;
 	/**
 	 * @this {FormatThis}
 	 * @description Get lines and components from the selected range. (P, DIV, H[1-6], OL, UL, TABLE..)
@@ -241,7 +251,7 @@ declare class Format {
 	 * @param {boolean} removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
 	 * @returns {Array<HTMLElement>}
 	 */
-	getLinesAndComponents(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, removeDuplicate: boolean): Array<HTMLElement>;
+	getLinesAndComponents(this: Omit<Format & Partial<CoreInjector>, 'format'>, removeDuplicate: boolean): Array<HTMLElement>;
 	/**
 	 * @internal
 	 * @this {FormatThis}
@@ -249,7 +259,7 @@ declare class Format {
 	 * @param {Node} element Element
 	 * @returns {boolean}
 	 */
-	_isExcludeSelectionElement(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node): boolean;
+	_isExcludeSelectionElement(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node): boolean;
 	/**
 	 * @internal
 	 * @this {FormatThis}
@@ -257,7 +267,7 @@ declare class Format {
 	 * @param {Node} element Element
 	 * @returns {boolean}
 	 */
-	_nonFormat(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node): boolean;
+	_nonFormat(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node): boolean;
 	/**
 	 * @internal
 	 * @this {FormatThis}
@@ -265,14 +275,14 @@ declare class Format {
 	 * @param {Node|string} element Element to check
 	 * @returns {boolean}
 	 */
-	_notTextNode(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, element: Node | string): boolean;
+	_notTextNode(this: Omit<Format & Partial<CoreInjector>, 'format'>, element: Node | string): boolean;
 	/**
 	 * @internal
 	 * @this {FormatThis}
 	 * @description Get current selected lines and selected node info.
 	 * @returns {{lines: Array<HTMLElement>, firstNode: Node,  lastNode: Node, firstPath: Array<number>, lastPath: Array<number>, startOffset: number, endOffset: number}}
 	 */
-	_lineWork(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>): {
+	_lineWork(this: Omit<Format & Partial<CoreInjector>, 'format'>): {
 		lines: Array<HTMLElement>;
 		firstNode: Node;
 		lastNode: Node;
@@ -287,11 +297,12 @@ declare class Format {
 	 * @description Reset the line break format.
 	 * @param {"line"|"br"} breakFormat options.get('defaultLineBreakFormat')
 	 */
-	__resetBrLineBreak(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, breakFormat: 'line' | 'br'): void;
+	__resetBrLineBreak(this: Omit<Format & Partial<CoreInjector>, 'format'>, breakFormat: 'line' | 'br'): void;
 	/**
 	 * @internal
 	 * @this {FormatThis}
 	 * @description Destroy the Format instance and release memory
 	 */
-	_destroy(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>): void;
+	_destroy(this: Omit<Format & Partial<CoreInjector>, 'format'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

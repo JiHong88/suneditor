@@ -1,8 +1,8 @@
 import type {} from '../../typedef';
 export default UI;
-export type UIThis = Omit<UI & Partial<SunEditor.Injector>, 'ui'>;
+export type UIThis = Omit<UI & Partial<SunEditor.Injector_Core>, 'ui'>;
 /**
- * @typedef {Omit<UI & Partial<SunEditor.Injector>, 'ui'>} UIThis
+ * @typedef {Omit<UI & Partial<SunEditor.Injector_Core>, 'ui'>} UIThis
  */
 /**
  * @constructor
@@ -11,10 +11,10 @@ export type UIThis = Omit<UI & Partial<SunEditor.Injector>, 'ui'>;
  * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function UI(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, editor: SunEditor.Core): void;
+declare function UI(this: Omit<UI & Partial<CoreInjector>, 'ui'>, editor: SunEditor.Core): void;
 declare class UI {
 	/**
-	 * @typedef {Omit<UI & Partial<SunEditor.Injector>, 'ui'>} UIThis
+	 * @typedef {Omit<UI & Partial<SunEditor.Injector_Core>, 'ui'>} UIThis
 	 */
 	/**
 	 * @constructor
@@ -37,6 +37,16 @@ declare class UI {
 	toastContainer: Element;
 	toastMessage: HTMLSpanElement;
 	_toastToggle: number;
+	/** @internal @type {SunEditor.Core['toolbar']} */
+	get toolbar(): SunEditor.Core['toolbar'];
+	/** @internal @type {SunEditor.Core['subToolbar']} */
+	get subToolbar(): SunEditor.Core['subToolbar'];
+	/** @internal @type {SunEditor.Core['menu']} */
+	get menu(): SunEditor.Core['menu'];
+	/** @internal @type {SunEditor.Core['component']} */
+	get component(): SunEditor.Core['component'];
+	/** @internal @type {SunEditor.Core['viewer']} */
+	get viewer(): SunEditor.Core['viewer'];
 	/**
 	 * @this {UIThis}
 	 * @description set editor frame styles.
@@ -45,86 +55,86 @@ declare class UI {
 	 * @param {string} style Style string
 	 * @param {?SunEditor.FrameContext} [fc] Frame context
 	 */
-	setEditorStyle(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, style: string, fc?: SunEditor.FrameContext | null): void;
+	setEditorStyle(this: Omit<UI & Partial<CoreInjector>, 'ui'>, style: string, fc?: SunEditor.FrameContext | null): void;
 	/**
 	 * @this {UIThis}
 	 * @description Set the theme to the editor
 	 * @param {string} theme Theme name
 	 */
-	setTheme(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, theme: string): void;
+	setTheme(this: Omit<UI & Partial<CoreInjector>, 'ui'>, theme: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Switch to or off "ReadOnly" mode.
 	 * @param {boolean} value "readOnly" boolean value.
 	 * @param {string} [rootKey] Root key
 	 */
-	readOnly(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, value: boolean, rootKey?: string): void;
+	readOnly(this: Omit<UI & Partial<CoreInjector>, 'ui'>, value: boolean, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Disables the editor.
 	 * @param {string} [rootKey] Root key
 	 */
-	disable(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
+	disable(this: Omit<UI & Partial<CoreInjector>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Enables the editor.
 	 * @param {string} [rootKey] Root key
 	 */
-	enable(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
+	enable(this: Omit<UI & Partial<CoreInjector>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Shows the editor interface.
 	 * @param {string} [rootKey] Root key
 	 */
-	show(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
+	show(this: Omit<UI & Partial<CoreInjector>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Hides the editor interface.
 	 * @param {string} [rootKey] Root key
 	 */
-	hide(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
+	hide(this: Omit<UI & Partial<CoreInjector>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Shows the loading spinner.
 	 * @param {string} [rootKey] Root key
 	 */
-	showLoading(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
+	showLoading(this: Omit<UI & Partial<CoreInjector>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Hides the loading spinner.
 	 * @param {string} [rootKey] Root key
 	 */
-	hideLoading(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, rootKey?: string): void;
+	hideLoading(this: Omit<UI & Partial<CoreInjector>, 'ui'>, rootKey?: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description This method disables or enables the toolbar buttons when the controller is activated or deactivated.
 	 * - When the controller is activated, the toolbar buttons are disabled; when the controller is deactivated, the buttons are enabled.
 	 * @param {boolean} active If `true`, the toolbar buttons will be disabled. If `false`, the toolbar buttons will be enabled.
 	 */
-	setControllerOnDisabledButtons(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, active: boolean): void;
+	setControllerOnDisabledButtons(this: Omit<UI & Partial<CoreInjector>, 'ui'>, active: boolean): void;
 	/**
 	 * @this {UIThis}
 	 * @description Activate the transparent background "div" so that other elements are not affected during resizing.
 	 * @param {string} cursor cursor css property
 	 */
-	enableBackWrapper(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, cursor: string): void;
+	enableBackWrapper(this: Omit<UI & Partial<CoreInjector>, 'ui'>, cursor: string): void;
 	/**
 	 * @this {UIThis}
 	 * @description Disabled background "div"
 	 */
-	disableBackWrapper(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
+	disableBackWrapper(this: Omit<UI & Partial<CoreInjector>, 'ui'>): void;
 	/**
 	 * @this {UIThis}
 	 * @description  Open the alert panel
 	 * @param {string} text alert message
 	 * @param {""|"error"|"success"} type alert type
 	 */
-	alertOpen(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, text: string, type: '' | 'error' | 'success'): void;
+	alertOpen(this: Omit<UI & Partial<CoreInjector>, 'ui'>, text: string, type: '' | 'error' | 'success'): void;
 	/**
 	 * @this {UIThis}
 	 * @description  Close the alert panel
 	 */
-	alertClose(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
+	alertClose(this: Omit<UI & Partial<CoreInjector>, 'ui'>): void;
 	/**
 	 * @description Show toast
 	 * @param {string} message toast message
@@ -143,29 +153,30 @@ declare class UI {
 	 * @param {boolean} value hidden/show
 	 * @param {?boolean} [lineBreakShow] Line break hidden/show (default: Follows the value "value".)
 	 */
-	_visibleControllers(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>, value: boolean, lineBreakShow?: boolean | null): void;
+	_visibleControllers(this: Omit<UI & Partial<CoreInjector>, 'ui'>, value: boolean, lineBreakShow?: boolean | null): void;
 	/**
 	 * @internal
 	 * @this {UIThis}
 	 * @description Off current controllers
 	 */
-	_offCurrentController(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
+	_offCurrentController(this: Omit<UI & Partial<CoreInjector>, 'ui'>): void;
 	/**
 	 * @internal
 	 * @this {UIThis}
 	 * @description Off controllers
 	 */
-	__offControllers(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
+	__offControllers(this: Omit<UI & Partial<CoreInjector>, 'ui'>): void;
 	/**
 	 * @internal
 	 * @this {UIThis}
 	 * @description Off current modal
 	 */
-	_offCurrentModal(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
+	_offCurrentModal(this: Omit<UI & Partial<CoreInjector>, 'ui'>): void;
 	/**
 	 * @internal
 	 * @this {UIThis}
 	 * @description Destroy the UI instance and release memory
 	 */
-	_destroy(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
+	_destroy(this: Omit<UI & Partial<CoreInjector>, 'ui'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

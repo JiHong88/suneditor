@@ -8,7 +8,7 @@ import { dom, env, converter, numbers } from '../../helper';
 const { _w, _d } = env;
 
 /**
- * @typedef {Omit<Viewer & Partial<SunEditor.Injector>, 'viewer'>} ViewerThis
+ * @typedef {Omit<Viewer & Partial<SunEditor.Injector_Core>, 'viewer'>} ViewerThis
  */
 
 /**
@@ -37,6 +37,31 @@ function Viewer(editor) {
 }
 
 Viewer.prototype = {
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui() {
+		return this.editor.ui;
+	},
+	/** @internal @type {SunEditor.Core['toolbar']} */
+	get toolbar() {
+		return this.editor.toolbar;
+	},
+	/** @internal @type {SunEditor.Core['subToolbar']} */
+	get subToolbar() {
+		return this.editor.subToolbar;
+	},
+	/** @internal @type {SunEditor.Core['history']} */
+	get history() {
+		return this.editor.history;
+	},
+	/** @internal @type {SunEditor.Core['html']} */
+	get html() {
+		return this.editor.html;
+	},
+	/** @internal @type {SunEditor.Core['menu']} */
+	get menu() {
+		return this.editor.menu;
+	},
+
 	/**
 	 * @this {ViewerThis}
 	 * @description Changes to code view or wysiwyg view

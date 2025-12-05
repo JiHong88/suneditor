@@ -1,8 +1,8 @@
 import type {} from '../../typedef';
 export default Selection_;
-export type SelectionThis = Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>;
+export type SelectionThis = Omit<Selection_ & Partial<SunEditor.Injector_Core>, 'selection'>;
 /**
- * @typedef {Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>} SelectionThis
+ * @typedef {Omit<Selection_ & Partial<SunEditor.Injector_Core>, 'selection'>} SelectionThis
  */
 /**
  * @constructor
@@ -10,10 +10,10 @@ export type SelectionThis = Omit<Selection_ & Partial<SunEditor.Injector>, 'sele
  * @description Selection, Range related class
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Selection_(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, editor: SunEditor.Core): void;
+declare function Selection_(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>, editor: SunEditor.Core): void;
 declare class Selection_ {
 	/**
-	 * @typedef {Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>} SelectionThis
+	 * @typedef {Omit<Selection_ & Partial<SunEditor.Injector_Core>, 'selection'>} SelectionThis
 	 */
 	/**
 	 * @constructor
@@ -29,25 +29,35 @@ declare class Selection_ {
 	__iframeFocus: boolean;
 	__hasScrollParents: boolean;
 	_scrollMargin: number;
+	/** @internal @type {SunEditor.Core['component']} */
+	get component(): SunEditor.Core['component'];
+	/** @internal @type {SunEditor.Core['format']} */
+	get format(): SunEditor.Core['format'];
+	/** @internal @type {SunEditor.Core['html']} */
+	get html(): SunEditor.Core['html'];
+	/** @internal @type {SunEditor.Core['offset']} */
+	get offset(): SunEditor.Core['offset'];
+	/** @internal @type {SunEditor.Core['toolbar']} */
+	get toolbar(): SunEditor.Core['toolbar'];
 	/**
 	 * @this {SelectionThis}
 	 * @description Get window selection obejct
 	 * @returns {Selection}
 	 */
-	get(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): Selection;
+	get(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): Selection;
 	/**
 	 * @this {SelectionThis}
 	 * @description Check if the range object is valid
 	 * @param {*} range Range object
 	 * @returns {range is Range}
 	 */
-	isRange(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: any): range is Range;
+	isRange(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>, range: any): range is Range;
 	/**
 	 * @this {SelectionThis}
 	 * @description Get current editor's range object
 	 * @returns {Range}
 	 */
-	getRange(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): Range;
+	getRange(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): Range;
 	/**
 	 * @this {SelectionThis}
 	 * @description Set current editor's range object and return.
@@ -69,12 +79,12 @@ declare class Selection_ {
 	 * // Collapse cursor to start of element
 	 * editor.selection.setRange(element, 0, element, 0);
 	 */
-	setRange(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, startCon: Node | Range, startOff?: number, endCon?: Node, endOff?: number): Range;
+	setRange(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>, startCon: Node | Range, startOff?: number, endCon?: Node, endOff?: number): Range;
 	/**
 	 * @this {SelectionThis}
 	 * @description Remove range object and button effect
 	 */
-	removeRange(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
+	removeRange(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): void;
 	/**
 	 * @this {SelectionThis}
 	 * @description Returns the range (container and offset) near the given target node.
@@ -84,7 +94,7 @@ declare class Selection_ {
 	 * @returns {{container: Node, offset: number}|null} An object containing the nearest container node and its offset.
 	 */
 	getNearRange(
-		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
+		this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>,
 		target: Node,
 	): {
 		container: Node;
@@ -97,13 +107,13 @@ declare class Selection_ {
 	 * @param {?Node} [container] If there is "container" argument, it creates a line in front of the container.
 	 * @returns {Range} a new "range" or argument "range".
 	 */
-	getRangeAndAddLine(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: Range, container?: Node | null): Range;
+	getRangeAndAddLine(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>, range: Range, container?: Node | null): Range;
 	/**
 	 * @this {SelectionThis}
 	 * @description Get current select node
 	 * @returns {HTMLElement|Text}
 	 */
-	getNode(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): HTMLElement | Text;
+	getNode(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): HTMLElement | Text;
 	/**
 	 * @this {SelectionThis}
 	 * @description Get the Rects object.
@@ -125,7 +135,7 @@ declare class Selection_ {
 	 * tooltip.style.top = rects.top + 'px';
 	 */
 	getRects(
-		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
+		this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>,
 		target: (Range | Node) | null,
 		position: 'start' | 'end',
 	): {
@@ -141,7 +151,7 @@ declare class Selection_ {
 	 * @returns {{sc: Node, so: number, ec: Node, eo: number}} {sc: startContainer, so: startOffset, ec: endContainer, eo: endOffset}
 	 */
 	getDragEventLocationRange(
-		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
+		this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>,
 		e: DragEvent,
 	): {
 		sc: Node;
@@ -169,7 +179,7 @@ declare class Selection_ {
 	 * });
 	 */
 	scrollTo(
-		this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>,
+		this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>,
 		ref: Selection | Range | Node,
 		scrollOption?: {
 			[x: string]: any;
@@ -182,14 +192,14 @@ declare class Selection_ {
 	 * @param {Range} range selection.getRange()
 	 * @returns {boolean}
 	 */
-	_isNone(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: Range): boolean;
+	_isNone(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>, range: Range): boolean;
 	/**
 	 * @internal
 	 * @this {SelectionThis}
 	 * @description Return the range object of editor's first child node
 	 * @returns {Range}
 	 */
-	_createDefaultRange(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): Range;
+	_createDefaultRange(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): Range;
 	/**
 	 * @internal
 	 * @this {SelectionThis}
@@ -197,36 +207,37 @@ declare class Selection_ {
 	 * @param {Range} range range object.
 	 * @param {Selection} selection selection object.
 	 */
-	_rangeInfo(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>, range: Range, selection: Selection): void;
+	_rangeInfo(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>, range: Range, selection: Selection): void;
 	/**
 	 * @internal
 	 * @this {SelectionThis}
 	 * @description Saving the range object and the currently selected node of editor
 	 */
-	_init(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): HTMLInputElement;
+	_init(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): HTMLInputElement;
 	/**
 	 * @internal
 	 * @this {SelectionThis}
 	 * @description Sets focus to the editor's wysiwyg contenteditable area and restores the last selection range within iframe context.
 	 */
-	__focus(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
+	__focus(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): void;
 	/**
 	 * @internal
 	 * @this {SelectionThis}
 	 * @description Normalizes and resets the selection range to properly target text nodes instead of element nodes for accurate text editing.
 	 * @returns {boolean} Returns false if there is no valid selection.
 	 */
-	_resetRangeToTextNode(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): boolean;
+	_resetRangeToTextNode(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): boolean;
 	/**
 	 * @internal
 	 * @this {SelectionThis}
 	 * @description Initialize the scroll information when the editor first loads
 	 */
-	__init(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
+	__init(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): void;
 	/**
 	 * @internal
 	 * @this {SelectionThis}
 	 * @description Destroy the Selection instance and release memory
 	 */
-	_destroy(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
+	_destroy(this: Omit<Selection_ & Partial<CoreInjector>, 'selection'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

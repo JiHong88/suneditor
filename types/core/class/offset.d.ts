@@ -1,6 +1,6 @@
 import type {} from '../../typedef';
 export default Offset;
-export type OffsetThis = Omit<Offset & Partial<SunEditor.Injector>, 'offset'>;
+export type OffsetThis = Omit<Offset & Partial<SunEditor.Injector_Core>, 'offset'>;
 /**
  * Bounding rectangle information of the selection range.
  */
@@ -177,7 +177,7 @@ export type OffsetWWScrollInfo = {
 	bottom: number;
 };
 /**
- * @typedef {Omit<Offset & Partial<SunEditor.Injector>, 'offset'>} OffsetThis
+ * @typedef {Omit<Offset & Partial<SunEditor.Injector_Core>, 'offset'>} OffsetThis
  */
 /**
  * @typedef {Object} RectsInfo Bounding rectangle information of the selection range.
@@ -243,10 +243,10 @@ export type OffsetWWScrollInfo = {
  * @description Offset class, get the position of the element
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Offset(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, editor: SunEditor.Core): void;
+declare function Offset(this: Omit<Offset & Partial<CoreInjector>, 'offset'>, editor: SunEditor.Core): void;
 declare class Offset {
 	/**
-	 * @typedef {Omit<Offset & Partial<SunEditor.Injector>, 'offset'>} OffsetThis
+	 * @typedef {Omit<Offset & Partial<SunEditor.Injector_Core>, 'offset'>} OffsetThis
 	 */
 	/**
 	 * @typedef {Object} RectsInfo Bounding rectangle information of the selection range.
@@ -313,20 +313,24 @@ declare class Offset {
 	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
 	constructor(editor: SunEditor.Core);
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection(): SunEditor.Core['selection'];
+	/** @internal @type {SunEditor.Core['toolbar']} */
+	get toolbar(): SunEditor.Core['toolbar'];
 	/**
 	 * @this {OffsetThis}
 	 * @description Gets the position just outside the argument's internal editor (wysiwygFrame).
 	 * @param {Node} node Target node.
 	 * @returns {OffsetInfo} Position relative to the editor frame.
 	 */
-	get(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, node: Node): OffsetInfo;
+	get(this: Omit<Offset & Partial<CoreInjector>, 'offset'>, node: Node): OffsetInfo;
 	/**
 	 * @this {OffsetThis}
 	 * @description Gets the position inside the internal editor of the argument.
 	 * @param {Node} node Target node.
 	 * @returns {OffsetLocalInfo} Position relative to the WYSIWYG editor.
 	 */
-	getLocal(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, node: Node): OffsetLocalInfo;
+	getLocal(this: Omit<Offset & Partial<CoreInjector>, 'offset'>, node: Node): OffsetLocalInfo;
 	/**
 	 * @this {OffsetThis}
 	 * @description Returns the position of the argument relative to the global document.
@@ -334,20 +338,20 @@ declare class Offset {
 	 * @param {?Node} [node] Target element.
 	 * @returns {OffsetGlobalInfo} Global position and scroll values.
 	 */
-	getGlobal(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, node?: Node | null): OffsetGlobalInfo;
+	getGlobal(this: Omit<Offset & Partial<CoreInjector>, 'offset'>, node?: Node | null): OffsetGlobalInfo;
 	/**
 	 * @this {OffsetThis}
 	 * @description Gets the current editor-relative scroll offset.
 	 * @param {?Node} [node] Target element.
 	 * @returns {OffsetGlobalScrollInfo} Global scroll information.
 	 */
-	getGlobalScroll(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, node?: Node | null): OffsetGlobalScrollInfo;
+	getGlobalScroll(this: Omit<Offset & Partial<CoreInjector>, 'offset'>, node?: Node | null): OffsetGlobalScrollInfo;
 	/**
 	 * @this {OffsetThis}
 	 * @description Get the scroll info of the WYSIWYG area.
 	 * @returns {OffsetWWScrollInfo} Scroll information within the editor.
 	 */
-	getWWScroll(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>): OffsetWWScrollInfo;
+	getWWScroll(this: Omit<Offset & Partial<CoreInjector>, 'offset'>): OffsetWWScrollInfo;
 	/**
 	 * @this {OffsetThis}
 	 * @description Sets the relative position of an element
@@ -356,7 +360,7 @@ declare class Offset {
 	 * @param {HTMLElement} target Target element to position against
 	 * @param {HTMLElement} t_container Target's root container
 	 */
-	setRelPosition(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, element: HTMLElement, e_container: HTMLElement, target: HTMLElement, t_container: HTMLElement): void;
+	setRelPosition(this: Omit<Offset & Partial<CoreInjector>, 'offset'>, element: HTMLElement, e_container: HTMLElement, target: HTMLElement, t_container: HTMLElement): void;
 	/**
 	 * @this {OffsetThis}
 	 * @description Sets the absolute position of an element
@@ -371,7 +375,7 @@ declare class Offset {
 	 * @returns {{position: "top" | "bottom"} | undefined} Success -> {position: current position}
 	 */
 	setAbsPosition(
-		this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>,
+		this: Omit<Offset & Partial<CoreInjector>, 'offset'>,
 		element: HTMLElement,
 		target: HTMLElement,
 		params: {
@@ -401,7 +405,7 @@ declare class Offset {
 	 * @returns {boolean} Success / Failure
 	 */
 	setRangePosition(
-		this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>,
+		this: Omit<Offset & Partial<CoreInjector>, 'offset'>,
 		element: HTMLElement,
 		range: Range | null,
 		{
@@ -427,24 +431,14 @@ declare class Offset {
 	 * @param {number} scrollTop - The vertical scroll offset.
 	 * @param {number} [addTop=0] - Additional top margin adjustment.
 	 */
-	_setOffsetOnRange(
-		this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>,
-		isDirTop: boolean,
-		rects: RectsInfo,
-		element: HTMLElement,
-		editorLeft: number,
-		editorWidth: number,
-		scrollLeft: number,
-		scrollTop: number,
-		addTop?: number,
-	): void;
+	_setOffsetOnRange(this: Omit<Offset & Partial<CoreInjector>, 'offset'>, isDirTop: boolean, rects: RectsInfo, element: HTMLElement, editorLeft: number, editorWidth: number, scrollLeft: number, scrollTop: number, addTop?: number): void;
 	/**
 	 * @internal
 	 * @this {OffsetThis}
 	 * @description Get available space from page bottom
 	 * @returns {number} Available space
 	 */
-	_getPageBottomSpace(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>): number;
+	_getPageBottomSpace(this: Omit<Offset & Partial<CoreInjector>, 'offset'>): number;
 	/**
 	 * @internal
 	 * @this {OffsetThis}
@@ -466,7 +460,7 @@ declare class Offset {
 	 * - bMargin: bottom margin
 	 */
 	_getVMargin(
-		this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>,
+		this: Omit<Offset & Partial<CoreInjector>, 'offset'>,
 		tmtw: number,
 		tmbw: number,
 		toolbarH: number,
@@ -495,7 +489,7 @@ declare class Offset {
 	 * - Accepts `'up'` for an upward arrow, `'down'` for a downward arrow,
 	 * - or any other value to hide the arrow.
 	 */
-	_setArrow(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>, arrow: HTMLElement, key: string): void;
+	_setArrow(this: Omit<Offset & Partial<CoreInjector>, 'offset'>, arrow: HTMLElement, key: string): void;
 	/**
 	 * @internal
 	 * @this {OffsetThis}
@@ -510,7 +504,7 @@ declare class Offset {
 	 *   rects: RectsInfo
 	 * }} An object with scroll and viewport information.
 	 */
-	_getWindowScroll(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>): {
+	_getWindowScroll(this: Omit<Offset & Partial<CoreInjector>, 'offset'>): {
 		top: number;
 		left: number;
 		width: number;
@@ -523,5 +517,6 @@ declare class Offset {
 	 * @this {OffsetThis}
 	 * @description Destroy the Offset instance and release memory
 	 */
-	_destroy(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>): void;
+	_destroy(this: Omit<Offset & Partial<CoreInjector>, 'offset'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

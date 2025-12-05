@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, numbers } from '../../helper';
 
 /**
- * @typedef {Omit<NodeTransform & Partial<SunEditor.Injector>, 'nodeTransform'>} NodeTransformThis
+ * @typedef {Omit<NodeTransform & Partial<SunEditor.Injector_Core>, 'nodeTransform'>} NodeTransformThis
  */
 
 /**
@@ -20,6 +20,19 @@ function NodeTransform(editor) {
 }
 
 NodeTransform.prototype = {
+	/** @internal @type {SunEditor.Core['component']} */
+	get component() {
+		return this.editor.component;
+	},
+	/** @internal @type {SunEditor.Core['format']} */
+	get format() {
+		return this.editor.format;
+	},
+	/** @internal @type {SunEditor.Core['inline']} */
+	get inline() {
+		return this.editor.inline;
+	},
+
 	/**
 	 * @this {NodeTransformThis}
 	 * @template {HTMLElement} T

@@ -12,7 +12,7 @@ const DIR_KEYCODE = /^Arrow(Left|Up|Right|Down)$/;
 const DIR_UP_KEYCODE = /^Arrow(Left|Up)$/;
 
 /**
- * @typedef {Omit<Component & Partial<SunEditor.Injector>, 'component'>} ComponentThis
+ * @typedef {Omit<Component & Partial<SunEditor.Injector_Core>, 'component'>} ComponentThis
  */
 
 /**
@@ -93,6 +93,39 @@ function Component(editor) {
 }
 
 Component.prototype = {
+	/** @internal @type {SunEditor.Core['char']} */
+	get char() {
+		return this.editor.char;
+	},
+	/** @internal @type {SunEditor.Core['html']} */
+	get html() {
+		return this.editor.html;
+	},
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection() {
+		return this.editor.selection;
+	},
+	/** @internal @type {SunEditor.Core['format']} */
+	get format() {
+		return this.editor.format;
+	},
+	/** @internal @type {SunEditor.Core['history']} */
+	get history() {
+		return this.editor.history;
+	},
+	/** @internal @type {SunEditor.Core['offset']} */
+	get offset() {
+		return this.editor.offset;
+	},
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui() {
+		return this.editor.ui;
+	},
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform() {
+		return this.editor.nodeTransform;
+	},
+
 	/**
 	 * @this {ComponentThis}
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)

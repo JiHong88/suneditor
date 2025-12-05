@@ -9,7 +9,7 @@ const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const V2_MIG_DATA_ATTRS = '|data-index|data-file-size|data-file-name|data-exp|data-font-size';
 
 /**
- * @typedef {Omit<HTML & Partial<SunEditor.Injector>, 'html'>} HTMLThis
+ * @typedef {Omit<HTML & Partial<SunEditor.Injector_Core>, 'html'>} HTMLThis
  */
 
 /**
@@ -156,6 +156,43 @@ function HTML(editor) {
 }
 
 HTML.prototype = {
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection() {
+		return this.editor.selection;
+	},
+	/** @internal @type {SunEditor.Core['format']} */
+	get format() {
+		return this.editor.format;
+	},
+	/** @internal @type {SunEditor.Core['component']} */
+	get component() {
+		return this.editor.component;
+	},
+	/** @internal @type {SunEditor.Core['char']} */
+	get char() {
+		return this.editor.char;
+	},
+	/** @internal @type {SunEditor.Core['history']} */
+	get history() {
+		return this.editor.history;
+	},
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui() {
+		return this.editor.ui;
+	},
+	/** @internal @type {SunEditor.Core['viewer']} */
+	get viewer() {
+		return this.editor.viewer;
+	},
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform() {
+		return this.editor.nodeTransform;
+	},
+	/** @internal @type {SunEditor.Core['inline']} */
+	get inline() {
+		return this.editor.inline;
+	},
+
 	/**
 	 * @this {HTMLThis}
 	 * @description Filters an HTML string based on allowed and disallowed tags, with optional custom validation.

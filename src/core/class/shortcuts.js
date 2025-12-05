@@ -5,7 +5,7 @@
 import { keyCodeMap } from '../../helper';
 
 /**
- * @typedef {Omit<Shortcuts & Partial<SunEditor.Injector>, 'shortcuts'>} ShortcutsThis
+ * @typedef {Omit<Shortcuts & Partial<SunEditor.Injector_Core>, 'shortcuts'>} ShortcutsThis
  */
 
 /**

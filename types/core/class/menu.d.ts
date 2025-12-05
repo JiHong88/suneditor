@@ -1,8 +1,8 @@
 import type {} from '../../typedef';
 export default Menu;
-export type MenuThis = Omit<Menu & Partial<SunEditor.Injector>, 'menu'>;
+export type MenuThis = Omit<Menu & Partial<SunEditor.Injector_Core>, 'menu'>;
 /**
- * @typedef {Omit<Menu & Partial<SunEditor.Injector>, 'menu'>} MenuThis
+ * @typedef {Omit<Menu & Partial<SunEditor.Injector_Core>, 'menu'>} MenuThis
  */
 /**
  * @constructor
@@ -10,10 +10,10 @@ export type MenuThis = Omit<Menu & Partial<SunEditor.Injector>, 'menu'>;
  * @description Dropdown and container menu management class
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Menu(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, editor: SunEditor.Core): void;
+declare function Menu(this: Omit<Menu & Partial<CoreInjector>, 'menu'>, editor: SunEditor.Core): void;
 declare class Menu {
 	/**
-	 * @typedef {Omit<Menu & Partial<SunEditor.Injector>, 'menu'>} MenuThis
+	 * @typedef {Omit<Menu & Partial<SunEditor.Injector_Core>, 'menu'>} MenuThis
 	 */
 	/**
 	 * @constructor
@@ -50,6 +50,8 @@ declare class Menu {
 	currentDropdownPlugin: any;
 	__menuBtn: Node;
 	__menuContainer: HTMLElement;
+	/** @internal @type {SunEditor.Core['offset']} */
+	get offset(): SunEditor.Core['offset'];
 	/**
 	 * @this {MenuThis}
 	 * @description Method for managing dropdown element.
@@ -58,7 +60,7 @@ declare class Menu {
 	 * @param {Node} menu Dropdown element
 	 */
 	initDropdownTarget(
-		this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>,
+		this: Omit<Menu & Partial<CoreInjector>, 'menu'>,
 		{
 			key,
 			type,
@@ -73,12 +75,12 @@ declare class Menu {
 	 * @description Opens the dropdown menu for the specified button.
 	 * @param {Node} button Dropdown's button element to call
 	 */
-	dropdownOn(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, button: Node): void;
+	dropdownOn(this: Omit<Menu & Partial<CoreInjector>, 'menu'>, button: Node): void;
 	/**
 	 * @this {MenuThis}
 	 * @description Closes the currently open dropdown menu.
 	 */
-	dropdownOff(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	dropdownOff(this: Omit<Menu & Partial<CoreInjector>, 'menu'>): void;
 	/**
 	 * @this {MenuThis}
 	 * @description Shows a previously hidden dropdown menu that is still in "on" state.
@@ -86,7 +88,7 @@ declare class Menu {
 	 * - Re-displays the dropdown that was hidden by dropdownHide()
 	 * - Recalculates menu position by calling dropdownOn() again
 	 */
-	dropdownShow(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	dropdownShow(this: Omit<Menu & Partial<CoreInjector>, 'menu'>): void;
 	/**
 	 * @this {MenuThis}
 	 * @description Temporarily hides the currently active dropdown menu without closing it.
@@ -94,18 +96,18 @@ declare class Menu {
 	 * - The dropdown remains "on" but visually hidden
 	 * - Use dropdownShow() to make it visible again
 	 */
-	dropdownHide(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	dropdownHide(this: Omit<Menu & Partial<CoreInjector>, 'menu'>): void;
 	/**
 	 * @this {MenuThis}
 	 * @description Opens the menu container for the specified button.
 	 * @param {Node} button Container's button element to call
 	 */
-	containerOn(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, button: Node): void;
+	containerOn(this: Omit<Menu & Partial<CoreInjector>, 'menu'>, button: Node): void;
 	/**
 	 * @this {MenuThis}
 	 * @description Closes the currently open menu container.
 	 */
-	containerOff(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	containerOff(this: Omit<Menu & Partial<CoreInjector>, 'menu'>): void;
 	/**
 	 * @internal
 	 * @this {MenuThis}
@@ -113,7 +115,7 @@ declare class Menu {
 	 * @param {Node} element Button element
 	 * @param {HTMLElement} menu Menu element
 	 */
-	_setMenuPosition(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, element: Node, menu: HTMLElement): void;
+	_setMenuPosition(this: Omit<Menu & Partial<CoreInjector>, 'menu'>, element: Node, menu: HTMLElement): void;
 	/**
 	 * @internal
 	 * @this {MenuThis}
@@ -121,13 +123,13 @@ declare class Menu {
 	 * @param {Node} element Button element
 	 * @param {HTMLElement} menu Menu element
 	 */
-	_resetMenuPosition(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, element: Node, menu: HTMLElement): void;
+	_resetMenuPosition(this: Omit<Menu & Partial<CoreInjector>, 'menu'>, element: Node, menu: HTMLElement): void;
 	/**
 	 * @internal
 	 * @this {MenuThis}
 	 * @description Restore the last menu position using previously stored button and menu elements.
 	 */
-	_restoreMenuPosition(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	_restoreMenuPosition(this: Omit<Menu & Partial<CoreInjector>, 'menu'>): void;
 	/**
 	 * @internal
 	 * @this {MenuThis}
@@ -135,24 +137,25 @@ declare class Menu {
 	 * @param {Node} element The element to check
 	 * @returns {HTMLElement|null} The more layer element or null
 	 */
-	_checkMoreLayer(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, element: Node): HTMLElement | null;
+	_checkMoreLayer(this: Omit<Menu & Partial<CoreInjector>, 'menu'>, element: Node): HTMLElement | null;
 	/**
 	 * @internal
 	 * @this {MenuThis}
 	 * @description Move the selected item in the dropdown menu
 	 * @param {number} num Direction and amount to move (-1 for up, 1 for down)
 	 */
-	_moveItem(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>, num: number): void;
+	_moveItem(this: Omit<Menu & Partial<CoreInjector>, 'menu'>, num: number): void;
 	/**
 	 * @internal
 	 * @this {MenuThis}
 	 * @description Remove global event listeners
 	 */
-	__removeGlobalEvent(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	__removeGlobalEvent(this: Omit<Menu & Partial<CoreInjector>, 'menu'>): void;
 	/**
 	 * @internal
 	 * @this {MenuThis}
 	 * @description Destroy the Menu instance and release memory
 	 */
-	_destroy(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	_destroy(this: Omit<Menu & Partial<CoreInjector>, 'menu'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

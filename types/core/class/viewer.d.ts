@@ -1,8 +1,8 @@
 import type {} from '../../typedef';
 export default Viewer;
-export type ViewerThis = Omit<Viewer & Partial<SunEditor.Injector>, 'viewer'>;
+export type ViewerThis = Omit<Viewer & Partial<SunEditor.Injector_Core>, 'viewer'>;
 /**
- * @typedef {Omit<Viewer & Partial<SunEditor.Injector>, 'viewer'>} ViewerThis
+ * @typedef {Omit<Viewer & Partial<SunEditor.Injector_Core>, 'viewer'>} ViewerThis
  */
 /**
  * @constructor
@@ -10,10 +10,10 @@ export type ViewerThis = Omit<Viewer & Partial<SunEditor.Injector>, 'viewer'>;
  * @description Viewer(codeView, fullScreen, showBlocks) class
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Viewer(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, editor: SunEditor.Core): void;
+declare function Viewer(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>, editor: SunEditor.Core): void;
 declare class Viewer {
 	/**
-	 * @typedef {Omit<Viewer & Partial<SunEditor.Injector>, 'viewer'>} ViewerThis
+	 * @typedef {Omit<Viewer & Partial<SunEditor.Injector_Core>, 'viewer'>} ViewerThis
 	 */
 	/**
 	 * @constructor
@@ -35,49 +35,61 @@ declare class Viewer {
 	fullScreenBalloon: boolean;
 	fullScreenInline: boolean;
 	toolbarParent: HTMLElement;
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui(): SunEditor.Core['ui'];
+	/** @internal @type {SunEditor.Core['toolbar']} */
+	get toolbar(): SunEditor.Core['toolbar'];
+	/** @internal @type {SunEditor.Core['subToolbar']} */
+	get subToolbar(): SunEditor.Core['subToolbar'];
+	/** @internal @type {SunEditor.Core['history']} */
+	get history(): SunEditor.Core['history'];
+	/** @internal @type {SunEditor.Core['html']} */
+	get html(): SunEditor.Core['html'];
+	/** @internal @type {SunEditor.Core['menu']} */
+	get menu(): SunEditor.Core['menu'];
 	/**
 	 * @this {ViewerThis}
 	 * @description Changes to code view or wysiwyg view
 	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
-	codeView(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean): void;
+	codeView(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>, value?: boolean): void;
 	/**
 	 * @this {ViewerThis}
 	 * @description Changes to full screen or default screen
 	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
-	fullScreen(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean): void;
+	fullScreen(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>, value?: boolean): void;
 	_originCssText: any;
 	/**
 	 * @this {ViewerThis}
 	 * @description Add or remove the class name of "body" so that the code block is visible
 	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
-	showBlocks(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value?: boolean): void;
+	showBlocks(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>, value?: boolean): void;
 	/**
 	 * @internal
 	 * @this {ViewerThis}
 	 * @description Set the active class to the button of the toolbar
 	 */
-	_setButtonsActive(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
+	_setButtonsActive(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>): void;
 	/**
 	 * @this {ViewerThis}
 	 * @description Prints the current content of the editor.
 	 * @throws {Error} Throws error if print operation fails.
 	 */
-	print(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
+	print(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>): void;
 	/**
 	 * @this {ViewerThis}
 	 * @description Open the preview window.
 	 */
-	preview(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
+	preview(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>): void;
 	/**
 	 * @internal
 	 * @this {ViewerThis}
 	 * @description Resets the full-screen height of the editor.
 	 * - Updates the editor's height dynamically when in full-screen mode.
 	 */
-	_resetFullScreenHeight(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): boolean;
+	_resetFullScreenHeight(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>): boolean;
 	/**
 	 * @internal
 	 * @this {ViewerThis}
@@ -86,32 +98,32 @@ declare class Viewer {
 	 * @param {*} value CodeMirror params
 	 * @param {string} [rootKey] Root key
 	 */
-	_codeMirrorEditor(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, key: 'set' | 'get' | 'readonly' | 'refresh', value: any, rootKey?: string): any;
+	_codeMirrorEditor(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>, key: 'set' | 'get' | 'readonly' | 'refresh', value: any, rootKey?: string): any;
 	/**
 	 * @internal
 	 * @this {ViewerThis}
 	 * @description Set method in the code view area
 	 * @param {string} value HTML string
 	 */
-	_setCodeView(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, value: string): void;
+	_setCodeView(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>, value: string): void;
 	/**
 	 * @internal
 	 * @this {ViewerThis}
 	 * @description Get method in the code view area
 	 */
-	_getCodeView(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): any;
+	_getCodeView(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>): any;
 	/**
 	 * @internal
 	 * @this {ViewerThis}
 	 * @description Convert the data of the code view and put it in the WYSIWYG area.
 	 */
-	_setCodeDataToEditor(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
+	_setCodeDataToEditor(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>): void;
 	/**
 	 * @internal
 	 * @this {ViewerThis}
 	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
 	 */
-	_setEditorDataToCodeView(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
+	_setEditorDataToCodeView(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>): void;
 	/**
 	 * @internal
 	 * @this {ViewerThis}
@@ -121,7 +133,7 @@ declare class Viewer {
 	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers area
 	 * @param {boolean} isAuto - Auto height option
 	 */
-	_codeViewAutoHeight(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, code: HTMLElement, codeNumbers: HTMLTextAreaElement, isAuto: boolean): void;
+	_codeViewAutoHeight(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>, code: HTMLElement, codeNumbers: HTMLTextAreaElement, isAuto: boolean): void;
 	/**
 	 * @internal
 	 * @this {ViewerThis}
@@ -130,7 +142,7 @@ declare class Viewer {
 	 * @param {HTMLTextAreaElement} lineNumbers - Code numbers area
 	 * @param {HTMLElement} code - Code area
 	 */
-	_updateLineNumbers(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>, lineNumbers: HTMLTextAreaElement, code: HTMLElement): void;
+	_updateLineNumbers(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>, lineNumbers: HTMLTextAreaElement, code: HTMLElement): void;
 	/**
 	 * @internal
 	 * @this {HTMLElement} Code numbers area
@@ -144,5 +156,6 @@ declare class Viewer {
 	 * @this {ViewerThis}
 	 * @description Destroy the Viewer instance and release memory
 	 */
-	_destroy(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
+	_destroy(this: Omit<Viewer & Partial<CoreInjector>, 'viewer'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

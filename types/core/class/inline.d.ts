@@ -1,6 +1,6 @@
 import type {} from '../../typedef';
 export default Inline;
-export type InlineThis = Omit<Inline & Partial<SunEditor.Injector>, 'inline'>;
+export type InlineThis = Omit<Inline & Partial<SunEditor.Injector_Core>, 'inline'>;
 export type NodeStyleContainerType = {
 	ancestor?: Node | null;
 	offset?: number | null;
@@ -8,7 +8,7 @@ export type NodeStyleContainerType = {
 	endContainer?: Node | null;
 };
 /**
- * @typedef {Omit<Inline & Partial<SunEditor.Injector>, 'inline'>} InlineThis
+ * @typedef {Omit<Inline & Partial<SunEditor.Injector_Core>, 'inline'>} InlineThis
  */
 /**
  * @typedef {Object} NodeStyleContainerType
@@ -23,10 +23,10 @@ export type NodeStyleContainerType = {
  * @description Classes related to editor inline formats such as style node like strong, span, etc.
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Inline(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, editor: SunEditor.Core): void;
+declare function Inline(this: Omit<Inline & Partial<CoreInjector>, 'inline'>, editor: SunEditor.Core): void;
 declare class Inline {
 	/**
-	 * @typedef {Omit<Inline & Partial<SunEditor.Injector>, 'inline'>} InlineThis
+	 * @typedef {Omit<Inline & Partial<SunEditor.Injector_Core>, 'inline'>} InlineThis
 	 */
 	/**
 	 * @typedef {Object} NodeStyleContainerType
@@ -44,6 +44,18 @@ declare class Inline {
 	constructor(editor: SunEditor.Core);
 	_listCamel: any;
 	_listKebab: any;
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection(): SunEditor.Core['selection'];
+	/** @internal @type {SunEditor.Core['format']} */
+	get format(): SunEditor.Core['format'];
+	/** @internal @type {SunEditor.Core['component']} */
+	get component(): SunEditor.Core['component'];
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui(): SunEditor.Core['ui'];
+	/** @internal @type {SunEditor.Core['history']} */
+	get history(): SunEditor.Core['history'];
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform(): SunEditor.Core['nodeTransform'];
 	/**
 	 * @this {InlineThis}
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
@@ -79,7 +91,7 @@ declare class Inline {
 	 * editor.inline.apply(null, { nodesToRemove: ['span'] });
 	 */
 	apply(
-		this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>,
+		this: Omit<Inline & Partial<CoreInjector>, 'inline'>,
 		styleNode: Node | null,
 		{
 			stylesToModify,
@@ -99,7 +111,7 @@ declare class Inline {
 	 * - Preserves only the plain text content
 	 * - Works on the current selection or collapsed cursor position
 	 */
-	remove(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>): void;
+	remove(this: Omit<Inline & Partial<CoreInjector>, 'inline'>): void;
 	/**
 	 * @internal
 	 * @this {InlineThis}
@@ -107,7 +119,7 @@ declare class Inline {
 	 * @param {Node|string} element Element to check
 	 * @returns {boolean}
 	 */
-	_isNonSplitNode(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, element: Node | string): boolean;
+	_isNonSplitNode(this: Omit<Inline & Partial<CoreInjector>, 'inline'>, element: Node | string): boolean;
 	/**
 	 * @internal
 	 * @this {InlineThis}
@@ -115,7 +127,7 @@ declare class Inline {
 	 * @param {Node} element Element to check
 	 * @returns {boolean}
 	 */
-	_isIgnoreNodeChange(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, element: Node): boolean;
+	_isIgnoreNodeChange(this: Omit<Inline & Partial<CoreInjector>, 'inline'>, element: Node): boolean;
 	/**
 	 * @internal
 	 * @this {InlineThis}
@@ -136,7 +148,7 @@ declare class Inline {
 	 * @returns {{ancestor: *, startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
 	 */
 	_setNode_oneLine(
-		this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>,
+		this: Omit<Inline & Partial<CoreInjector>, 'inline'>,
 		element: Node,
 		newInnerNode: Node,
 		validation: (current: Node) => Node | null,
@@ -175,7 +187,7 @@ declare class Inline {
 	 * @returns {NodeStyleContainerType} { ancestor, container, offset, endContainer }
 	 */
 	_setNode_startLine(
-		this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>,
+		this: Omit<Inline & Partial<CoreInjector>, 'inline'>,
 		element: Node,
 		newInnerNode: Node,
 		validation: (current: Node) => Node | null,
@@ -202,7 +214,7 @@ declare class Inline {
 	 * @returns {NodeStyleContainerType} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
 	 */
 	_setNode_middleLine(
-		this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>,
+		this: Omit<Inline & Partial<CoreInjector>, 'inline'>,
 		element: HTMLElement,
 		newInnerNode: Node,
 		validation: (current: Node) => Node | null,
@@ -228,7 +240,7 @@ declare class Inline {
 	 * @returns {NodeStyleContainerType} { ancestor, container, offset }
 	 */
 	_setNode_endLine(
-		this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>,
+		this: Omit<Inline & Partial<CoreInjector>, 'inline'>,
 		element: Node,
 		newInnerNode: Node,
 		validation: (current: Node) => Node | null,
@@ -247,7 +259,7 @@ declare class Inline {
 	 * @param {Node} element Element to check
 	 * @returns {boolean}
 	 */
-	_sn_isSizeNode(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, element: Node): boolean;
+	_sn_isSizeNode(this: Omit<Inline & Partial<CoreInjector>, 'inline'>, element: Node): boolean;
 	/**
 	 * @internal
 	 * @this {InlineThis}
@@ -257,7 +269,7 @@ declare class Inline {
 	 * @param {Node} element Element
 	 * @returns {Node|null}
 	 */
-	_sn_getMaintainedNode(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, _isRemove: boolean, _isSizeNode: boolean, element: Node): Node | null;
+	_sn_getMaintainedNode(this: Omit<Inline & Partial<CoreInjector>, 'inline'>, _isRemove: boolean, _isSizeNode: boolean, element: Node): Node | null;
 	/**
 	 * @internal
 	 * @this {InlineThis}
@@ -267,7 +279,7 @@ declare class Inline {
 	 * @param {Node} element Element
 	 * @returns {boolean}
 	 */
-	_sn_isMaintainedNode(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, _isRemove: boolean, _isSizeNode: boolean, element: Node): boolean;
+	_sn_isMaintainedNode(this: Omit<Inline & Partial<CoreInjector>, 'inline'>, _isRemove: boolean, _isSizeNode: boolean, element: Node): boolean;
 	/**
 	 * @internal
 	 * @this {InlineThis}
@@ -275,7 +287,7 @@ declare class Inline {
 	 * @param {Node} el List cell element. <li>
 	 * @param {?Node} child Variable for recursive call. ("null" on the first call)
 	 */
-	_sn_setCommonListStyle(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, el: Node, child: Node | null): void;
+	_sn_setCommonListStyle(this: Omit<Inline & Partial<CoreInjector>, 'inline'>, el: Node, child: Node | null): void;
 	/**
 	 * @internal
 	 * @this {InlineThis}
@@ -283,11 +295,12 @@ declare class Inline {
 	 * @param {Node} el "LI" element
 	 * @param {?Array} styleArray Refer style array
 	 */
-	_sn_resetCommonListCell(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, el: Node, styleArray: any[] | null): boolean;
+	_sn_resetCommonListCell(this: Omit<Inline & Partial<CoreInjector>, 'inline'>, el: Node, styleArray: any[] | null): boolean;
 	/**
 	 * @internal
 	 * @this {InlineThis}
 	 * @description Destroy the Inline instance and release memory
 	 */
-	_destroy(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>): void;
+	_destroy(this: Omit<Inline & Partial<CoreInjector>, 'inline'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

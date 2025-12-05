@@ -11,6 +11,7 @@ declare global {
 		type FrameContext = import('./core/config/frameContext').FrameContextUtil;
 		type FrameOptions = import('./core/config/options').FrameOptionsMap;
 		type Core = import('./core/editor').default;
+		type Injector_Core = import('./editorInjector/_core').default;
 		type Injector = import('./editorInjector').default;
 		/**
 		 * **Public Properties:**

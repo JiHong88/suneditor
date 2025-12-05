@@ -1,8 +1,8 @@
 import type {} from '../../typedef';
 export default HTML;
-export type HTMLThis = Omit<HTML & Partial<SunEditor.Injector>, 'html'>;
+export type HTMLThis = Omit<HTML & Partial<SunEditor.Injector_Core>, 'html'>;
 /**
- * @typedef {Omit<HTML & Partial<SunEditor.Injector>, 'html'>} HTMLThis
+ * @typedef {Omit<HTML & Partial<SunEditor.Injector_Core>, 'html'>} HTMLThis
  */
 /**
  * @constructor
@@ -10,10 +10,10 @@ export type HTMLThis = Omit<HTML & Partial<SunEditor.Injector>, 'html'>;
  * @description All HTML related classes involved in the editing area
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function HTML(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, editor: SunEditor.Core): void;
+declare function HTML(this: Omit<HTML & Partial<CoreInjector>, 'html'>, editor: SunEditor.Core): void;
 declare class HTML {
 	/**
-	 * @typedef {Omit<HTML & Partial<SunEditor.Injector>, 'html'>} HTMLThis
+	 * @typedef {Omit<HTML & Partial<SunEditor.Injector_Core>, 'html'>} HTMLThis
 	 */
 	/**
 	 * @constructor
@@ -50,6 +50,24 @@ declare class HTML {
 	__disallowedTagsRegExp: RegExp;
 	__disallowedTagNameRegExp: RegExp;
 	__allowedTagNameRegExp: RegExp;
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection(): SunEditor.Core['selection'];
+	/** @internal @type {SunEditor.Core['format']} */
+	get format(): SunEditor.Core['format'];
+	/** @internal @type {SunEditor.Core['component']} */
+	get component(): SunEditor.Core['component'];
+	/** @internal @type {SunEditor.Core['char']} */
+	get char(): SunEditor.Core['char'];
+	/** @internal @type {SunEditor.Core['history']} */
+	get history(): SunEditor.Core['history'];
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui(): SunEditor.Core['ui'];
+	/** @internal @type {SunEditor.Core['viewer']} */
+	get viewer(): SunEditor.Core['viewer'];
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform(): SunEditor.Core['nodeTransform'];
+	/** @internal @type {SunEditor.Core['inline']} */
+	get inline(): SunEditor.Core['inline'];
 	/**
 	 * @this {HTMLThis}
 	 * @description Filters an HTML string based on allowed and disallowed tags, with optional custom validation.
@@ -87,7 +105,7 @@ declare class HTML {
 	 * });
 	 */
 	filter(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: string,
 		{
 			tagWhitelist,
@@ -126,7 +144,7 @@ declare class HTML {
 	 * });
 	 */
 	clean(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: string,
 		{
 			forceFormat,
@@ -161,7 +179,7 @@ declare class HTML {
 	 * editor.html.insert('<div class="custom">Content</div>', { skipCleaning: true });
 	 */
 	insert(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: Node | string,
 		{
 			selectInserted,
@@ -198,7 +216,7 @@ declare class HTML {
 	 * editor.html.insertNode(largeContentNode, { skipCharCount: true });
 	 */
 	insertNode(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		oNode: Node,
 		{
 			afterNode,
@@ -217,7 +235,7 @@ declare class HTML {
 	 * - commonCon: "commonAncestorContainer"
 	 * - prevContainer: "previousElementSibling Of the deleted area"
 	 */
-	remove(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>): {
+	remove(this: Omit<HTML & Partial<CoreInjector>, 'html'>): {
 		container: Node;
 		offset: number;
 		commonCon?: Node | null;
@@ -234,7 +252,7 @@ declare class HTML {
 	 * @returns {string|Object<*, string>}
 	 */
 	get(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		{
 			withFrame,
 			includeFullPage,
@@ -253,7 +271,7 @@ declare class HTML {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	set(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: string,
 		{
 			rootKey,
@@ -269,7 +287,7 @@ declare class HTML {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	add(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: string,
 		{
 			rootKey,
@@ -286,7 +304,7 @@ declare class HTML {
 	 * @returns {Object<string, *>} JSON data
 	 */
 	getJson(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		{
 			withFrame,
 			rootKey,
@@ -305,7 +323,7 @@ declare class HTML {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	setJson(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		jsdonData: {
 			[x: string]: any;
 		},
@@ -321,7 +339,7 @@ declare class HTML {
 	 * @param {Node|Element|Text|string} content Content to be copied to the clipboard
 	 * @returns {Promise<boolean>} Success or failure
 	 */
-	copy(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, content: Node | Element | Text | string): Promise<boolean>;
+	copy(this: Omit<HTML & Partial<CoreInjector>, 'html'>, content: Node | Element | Text | string): Promise<boolean>;
 	/**
 	 * @this {HTMLThis}
 	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
@@ -330,7 +348,7 @@ declare class HTML {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	setFullPage(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		ctx: {
 			head: string;
 			body: string;
@@ -347,7 +365,7 @@ declare class HTML {
 	 * @param {string} html HTML string
 	 * @returns {string} HTML string
 	 */
-	compress(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, html: string): string;
+	compress(this: Omit<HTML & Partial<CoreInjector>, 'html'>, html: string): string;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -356,7 +374,7 @@ declare class HTML {
 	 * @param {boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
 	 */
-	_convertToCode(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, html: Node | string, comp: boolean): string;
+	_convertToCode(this: Omit<HTML & Partial<CoreInjector>, 'html'>, html: Node | string, comp: boolean): string;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -366,7 +384,7 @@ declare class HTML {
 	 * @returns {{sc:Node, ec:Node}|null} An object containing the start and end containers if any transformations were made, otherwise null.
 	 */
 	_nodeRemoveListItem(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		item: Node,
 		isSingleItem: boolean,
 	): {
@@ -380,7 +398,7 @@ declare class HTML {
 	 * @param {Node} oNode Node to be inserted
 	 * @returns {Node} "oNode"
 	 */
-	_setIntoFreeFormat(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, oNode: Node): Node;
+	_setIntoFreeFormat(this: Omit<HTML & Partial<CoreInjector>, 'html'>, oNode: Node): Node;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -388,7 +406,7 @@ declare class HTML {
 	 * @param {Node} node Node
 	 * @param {boolean} forceFormat If true, text nodes that do not have a format node is wrapped with the format tag.
 	 */
-	_makeLine(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, node: Node, forceFormat: boolean): string;
+	_makeLine(this: Omit<HTML & Partial<CoreInjector>, 'html'>, node: Node, forceFormat: boolean): string;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -402,7 +420,7 @@ declare class HTML {
 	 * @param {boolean} _freeCodeViewMode Enforces strict HTML validation based on the editor`s policy
 	 */
 	_consistencyCheckOfHTML(
-		this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>,
+		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		documentFragment: DocumentFragment,
 		htmlCheckWhitelistRegExp: RegExp,
 		htmlCheckBlacklistRegExp: RegExp,
@@ -418,7 +436,7 @@ declare class HTML {
 	 * @param {string} html HTML string
 	 * @returns {string} HTML string
 	 */
-	_styleNodeConvertor(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, html: string): string;
+	_styleNodeConvertor(this: Omit<HTML & Partial<CoreInjector>, 'html'>, html: string): string;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -426,7 +444,7 @@ declare class HTML {
 	 * @param {DocumentFragment} domFrag documentFragment
 	 * @returns {DocumentFragment}
 	 */
-	_editFormat(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, domFrag: DocumentFragment): DocumentFragment;
+	_editFormat(this: Omit<HTML & Partial<CoreInjector>, 'html'>, domFrag: DocumentFragment): DocumentFragment;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -436,7 +454,7 @@ declare class HTML {
 	 * @param {SunEditor.NodeCollection} domTree List of DOM nodes to be converted.
 	 * @returns {string} The generated HTML list.
 	 */
-	_convertListCell(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, domTree: SunEditor.NodeCollection): string;
+	_convertListCell(this: Omit<HTML & Partial<CoreInjector>, 'html'>, domTree: SunEditor.NodeCollection): string;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -444,7 +462,7 @@ declare class HTML {
 	 * @param {NodeList} domTree List of DOM nodes to check.
 	 * @returns {boolean} True if formatting is required, otherwise false.
 	 */
-	_isFormatData(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, domTree: NodeList): boolean;
+	_isFormatData(this: Omit<HTML & Partial<CoreInjector>, 'html'>, domTree: NodeList): boolean;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -455,7 +473,7 @@ declare class HTML {
 	 * @param {string} name The tag name of the element being cleaned.
 	 * @returns {Array} The updated list of allowed attributes including cleaned styles.
 	 */
-	_cleanStyle(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, m: string, v: any[] | null, name: string): any[];
+	_cleanStyle(this: Omit<HTML & Partial<CoreInjector>, 'html'>, m: string, v: any[] | null, name: string): any[];
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -463,7 +481,7 @@ declare class HTML {
 	 * @param {string} html HTML string
 	 * @returns {string}
 	 */
-	_deleteDisallowedTags(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, html: string, whitelistRegExp: any, blacklistRegExp: any): string;
+	_deleteDisallowedTags(this: Omit<HTML & Partial<CoreInjector>, 'html'>, html: string, whitelistRegExp: any, blacklistRegExp: any): string;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -471,7 +489,7 @@ declare class HTML {
 	 * @param {Node} oNode The node to check for duplicate styles.
 	 * @param {Node} parentNode The parent node where the duplicate check occurs.
 	 */
-	_checkDuplicateNode(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, oNode: Node, parentNode: Node): void;
+	_checkDuplicateNode(this: Omit<HTML & Partial<CoreInjector>, 'html'>, oNode: Node, parentNode: Node): void;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -481,7 +499,7 @@ declare class HTML {
 	 * @param {Node} parentNode The parent node where the duplicate check occurs.
 	 * @returns {Node} The cleaned node with redundant styles removed.
 	 */
-	_dupleCheck(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, oNode: Node, parentNode: Node): Node;
+	_dupleCheck(this: Omit<HTML & Partial<CoreInjector>, 'html'>, oNode: Node, parentNode: Node): Node;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
@@ -489,11 +507,12 @@ declare class HTML {
 	 * @param {Array.<string>} autoStyleify Styles applied automatically on text input.
 	 * - ex ["bold", "underline", "italic", "strike"]
 	 */
-	__resetAutoStyleify(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, autoStyleify: Array<string>): void;
+	__resetAutoStyleify(this: Omit<HTML & Partial<CoreInjector>, 'html'>, autoStyleify: Array<string>): void;
 	/**
 	 * @internal
 	 * @this {HTMLThis}
 	 * @description Destroy the HTML instance and release memory
 	 */
-	_destroy(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>): void;
+	_destroy(this: Omit<HTML & Partial<CoreInjector>, 'html'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

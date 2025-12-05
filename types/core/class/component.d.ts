@@ -1,8 +1,8 @@
 import type {} from '../../typedef';
 export default Component;
-export type ComponentThis = Omit<Component & Partial<SunEditor.Injector>, 'component'>;
+export type ComponentThis = Omit<Component & Partial<SunEditor.Injector_Core>, 'component'>;
 /**
- * @typedef {Omit<Component & Partial<SunEditor.Injector>, 'component'>} ComponentThis
+ * @typedef {Omit<Component & Partial<SunEditor.Injector_Core>, 'component'>} ComponentThis
  */
 /**
  * @constructor
@@ -10,10 +10,10 @@ export type ComponentThis = Omit<Component & Partial<SunEditor.Injector>, 'compo
  * @description Class for managing components such as images and tables that are not in line format
  * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function Component(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, editor: SunEditor.Core): void;
+declare function Component(this: Omit<Component & Partial<CoreInjector>, 'component'>, editor: SunEditor.Core): void;
 declare class Component {
 	/**
-	 * @typedef {Omit<Component & Partial<SunEditor.Injector>, 'component'>} ComponentThis
+	 * @typedef {Omit<Component & Partial<SunEditor.Injector_Core>, 'component'>} ComponentThis
 	 */
 	/**
 	 * @constructor
@@ -67,6 +67,22 @@ declare class Component {
 	/** @type {boolean} */
 	__selectionSelected: boolean;
 	__prevent: boolean;
+	/** @internal @type {SunEditor.Core['char']} */
+	get char(): SunEditor.Core['char'];
+	/** @internal @type {SunEditor.Core['html']} */
+	get html(): SunEditor.Core['html'];
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection(): SunEditor.Core['selection'];
+	/** @internal @type {SunEditor.Core['format']} */
+	get format(): SunEditor.Core['format'];
+	/** @internal @type {SunEditor.Core['history']} */
+	get history(): SunEditor.Core['history'];
+	/** @internal @type {SunEditor.Core['offset']} */
+	get offset(): SunEditor.Core['offset'];
+	/** @internal @type {SunEditor.Core['ui']} */
+	get ui(): SunEditor.Core['ui'];
+	/** @internal @type {SunEditor.Core['nodeTransform']} */
+	get nodeTransform(): SunEditor.Core['nodeTransform'];
 	/**
 	 * @this {ComponentThis}
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)
@@ -81,7 +97,7 @@ declare class Component {
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
 	insert(
-		this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>,
+		this: Omit<Component & Partial<CoreInjector>, 'component'>,
 		element: Node,
 		{
 			skipCharCount,
@@ -102,7 +118,7 @@ declare class Component {
 	 * @param {?Node} [oNode] Optional node to use for selection if the component cannot be selected.
 	 * @param {SunEditor.ComponentInsertType} [insertBehavior] Behavior mode after component insertion.
 	 */
-	applyInsertBehavior(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node, oNode?: Node | null, insertBehavior?: SunEditor.ComponentInsertType): void;
+	applyInsertBehavior(this: Omit<Component & Partial<CoreInjector>, 'component'>, container: Node, oNode?: Node | null, insertBehavior?: SunEditor.ComponentInsertType): void;
 	/**
 	 * @this {ComponentThis}
 	 * @description Gets the file component and that plugin name
@@ -110,7 +126,7 @@ declare class Component {
 	 * @param {Node} element Target element (figure tag, component div, file tag)
 	 * @returns {SunEditor.ComponentInfo|null}
 	 */
-	get(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): SunEditor.ComponentInfo | null;
+	get(this: Omit<Component & Partial<CoreInjector>, 'component'>, element: Node): SunEditor.ComponentInfo | null;
 	/**
 	 * @this {ComponentThis}
 	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.
@@ -120,7 +136,7 @@ declare class Component {
 	 * @param {boolean} [options.isInput=false] Whether the target is an input component.(table)
 	 */
 	select(
-		this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>,
+		this: Omit<Component & Partial<CoreInjector>, 'component'>,
 		element: Node,
 		pluginName: string,
 		{
@@ -133,7 +149,7 @@ declare class Component {
 	 * @this {ComponentThis}
 	 * @description Deselects the selected component.
 	 */
-	deselect(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	deselect(this: Omit<Component & Partial<CoreInjector>, 'component'>): void;
 	/**
 	 * @this {ComponentThis}
 	 * @description Determines if the specified node is a block component (e.g., img, iframe, video, audio, table) with the class "se-component"
@@ -142,7 +158,7 @@ declare class Component {
 	 * @param {Node} element The DOM node to check.
 	 * @returns {boolean} True if the node is a block component or part of it, otherwise false.
 	 */
-	is(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): boolean;
+	is(this: Omit<Component & Partial<CoreInjector>, 'component'>, element: Node): boolean;
 	/**
 	 * @this {ComponentThis}
 	 * @description Checks if the given node is an inline component (class "se-inline-component").
@@ -151,7 +167,7 @@ declare class Component {
 	 * @param {Node} element The DOM node to check.
 	 * @returns {boolean} True if the node is an inline component or part of it, otherwise false.
 	 */
-	isInline(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): boolean;
+	isInline(this: Omit<Component & Partial<CoreInjector>, 'component'>, element: Node): boolean;
 	/**
 	 * @this {ComponentThis}
 	 * @description Checks if the specified node qualifies as a basic component within the editor.
@@ -160,14 +176,14 @@ declare class Component {
 	 * @param {Node} element The DOM node to check.
 	 * @returns {boolean} True if the node is a basic (non-inline) component, otherwise false.
 	 */
-	isBasic(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): boolean;
+	isBasic(this: Omit<Component & Partial<CoreInjector>, 'component'>, element: Node): boolean;
 	/**
 	 * @this {ComponentThis}
 	 * @description Copies the specified component node to the clipboard.
 	 * - This function is different from the one called when the user presses the "Ctrl + C" key combination.
 	 * @param {Node} container The DOM node to check.
 	 */
-	copy(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node): Promise<void>;
+	copy(this: Omit<Component & Partial<CoreInjector>, 'component'>, container: Node): Promise<void>;
 	/**
 	 * @this {ComponentThis}
 	 * @description Temporarily selects a component without showing its controller.
@@ -182,7 +198,7 @@ declare class Component {
 	 *
 	 * @param {Element} target The element to hover-select
 	 */
-	hoverSelect(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, target: Element): void;
+	hoverSelect(this: Omit<Component & Partial<CoreInjector>, 'component'>, target: Element): void;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
@@ -191,14 +207,14 @@ declare class Component {
 	 * @param {Node} element The element to check.
 	 * @returns {boolean} Returns true if the element is a file component, otherwise false.
 	 */
-	__isFiles(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: Node): boolean;
+	__isFiles(this: Omit<Component & Partial<CoreInjector>, 'component'>, element: Node): boolean;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
 	 * @description Deselects the currently selected component, removing any selection effects and associated event listeners.
 	 * - This method resets the selection state and hides UI elements related to the component selection.
 	 */
-	__deselect(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	__deselect(this: Omit<Component & Partial<CoreInjector>, 'component'>): void;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
@@ -210,48 +226,49 @@ declare class Component {
 	 * @param {Node} container The component container element.
 	 * @returns {boolean} Returns true if the selection moved to a line (existing or newly created), otherwise false.
 	 */
-	__moveToNextLineOrAdd(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, container: Node): boolean;
+	__moveToNextLineOrAdd(this: Omit<Component & Partial<CoreInjector>, 'component'>, container: Node): boolean;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
 	 * @description Set line breaker of component
 	 * @param {HTMLElement} element Element tag
 	 */
-	_setComponentLineBreaker(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>, element: HTMLElement): void;
+	_setComponentLineBreaker(this: Omit<Component & Partial<CoreInjector>, 'component'>, element: HTMLElement): void;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
 	 * @description Adds global event listeners for component interactions such as copy, cut, and keydown events.
 	 */
-	__addGlobalEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	__addGlobalEvent(this: Omit<Component & Partial<CoreInjector>, 'component'>): void;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
 	 * @description Removes global event listeners that were previously added for component interactions.
 	 */
-	__removeGlobalEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	__removeGlobalEvent(this: Omit<Component & Partial<CoreInjector>, 'component'>): void;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
 	 * @description Adds global event listeners for non-file-related interactions such as mouse and touch events.
 	 */
-	__addNotFileGlobalEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	__addNotFileGlobalEvent(this: Omit<Component & Partial<CoreInjector>, 'component'>): void;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
 	 * @description Removes global event listeners related to non-file interactions.
 	 */
-	__removeNotFileGlobalEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	__removeNotFileGlobalEvent(this: Omit<Component & Partial<CoreInjector>, 'component'>): void;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
 	 * @description Removes drag-related events and resets drag-related states.
 	 */
-	_removeDragEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	_removeDragEvent(this: Omit<Component & Partial<CoreInjector>, 'component'>): void;
 	/**
 	 * @internal
 	 * @this {ComponentThis}
 	 * @description Destroy the Component instance and release memory
 	 */
-	_destroy(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	_destroy(this: Omit<Component & Partial<CoreInjector>, 'component'>): void;
 }
+import CoreInjector from '../../editorInjector/_core';

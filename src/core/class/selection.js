@@ -7,7 +7,7 @@ import { dom, unicode, env, numbers } from '../../helper';
 const { _w } = env;
 
 /**
- * @typedef {Omit<Selection_ & Partial<SunEditor.Injector>, 'selection'>} SelectionThis
+ * @typedef {Omit<Selection_ & Partial<SunEditor.Injector_Core>, 'selection'>} SelectionThis
  */
 
 /**
@@ -30,6 +30,27 @@ function Selection_(editor) {
 }
 
 Selection_.prototype = {
+	/** @internal @type {SunEditor.Core['component']} */
+	get component() {
+		return this.editor.component;
+	},
+	/** @internal @type {SunEditor.Core['format']} */
+	get format() {
+		return this.editor.format;
+	},
+	/** @internal @type {SunEditor.Core['html']} */
+	get html() {
+		return this.editor.html;
+	},
+	/** @internal @type {SunEditor.Core['offset']} */
+	get offset() {
+		return this.editor.offset;
+	},
+	/** @internal @type {SunEditor.Core['toolbar']} */
+	get toolbar() {
+		return this.editor.toolbar;
+	},
+
 	/**
 	 * @this {SelectionThis}
 	 * @description Get window selection obejct

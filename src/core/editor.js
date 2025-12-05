@@ -12,7 +12,7 @@ import DocumentType from './section/documentType';
 import InstanceCheck from './util/instanceCheck';
 
 // class injector
-import ClassInjector, { _getClassInjectorKeys } from '../editorInjector/_classes';
+import { _getClassInjectorKeys } from '../editorInjector/_classes';
 
 // classes
 import Char from './class/char';
@@ -1786,43 +1786,6 @@ Editor.prototype = {
 		this.char = new Char(this);
 		this.ui = new UI(this);
 		this.viewer = new Viewer(this);
-
-		// register classes to the eventManager
-		ClassInjector.call(this.eventManager, this);
-		// register main classes
-		ClassInjector.call(this.char, this);
-		ClassInjector.call(this.component, this);
-		ClassInjector.call(this.format, this);
-		ClassInjector.call(this.html, this);
-		ClassInjector.call(this.inline, this);
-		ClassInjector.call(this.listFormat, this);
-		ClassInjector.call(this.menu, this);
-		ClassInjector.call(this.nodeTransform, this);
-		ClassInjector.call(this.offset, this);
-		ClassInjector.call(this.selection, this);
-		ClassInjector.call(this.shortcuts, this);
-		ClassInjector.call(this.toolbar, this);
-		ClassInjector.call(this.ui, this);
-		ClassInjector.call(this.viewer, this);
-		if (this.options.has('_subMode')) ClassInjector.call(this.subToolbar, this);
-
-		// delete self reference
-		delete this.eventManager['eventManager'];
-		delete this.char['char'];
-		delete this.component['component'];
-		delete this.format['format'];
-		delete this.html['html'];
-		delete this.inline['inline'];
-		delete this.listFormat['listFormat'];
-		delete this.menu['menu'];
-		delete this.nodeTransform['nodeTransform'];
-		delete this.offset['offset'];
-		delete this.selection['selection'];
-		delete this.shortcuts['shortcuts'];
-		delete this.toolbar['toolbar'];
-		delete this.ui['ui'];
-		delete this.viewer['viewer'];
-		if (this.subToolbar) delete this.subToolbar['subToolbar'];
 
 		this._responsiveButtons = this._responsiveButtons_sub = null;
 	},

@@ -7,7 +7,7 @@ import { _w, isEdge } from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/dom/domUtils';
 
 /**
- * @typedef {Omit<Char & Partial<SunEditor.Injector>, 'char'>} CharThis
+ * @typedef {Omit<Char & Partial<SunEditor.Injector_Core>, 'char'>} CharThis
  */
 
 /**
@@ -21,6 +21,11 @@ function Char(editor) {
 }
 
 Char.prototype = {
+	/** @internal @type {SunEditor.Core['selection']} */
+	get selection() {
+		return this.editor.selection;
+	},
+
 	/**
 	 * @this {CharThis}
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "html" is added to the current editor.

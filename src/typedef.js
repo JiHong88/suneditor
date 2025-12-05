@@ -51,6 +51,7 @@
  */
 
 /**
+ * @typedef {import('./editorInjector/_core').default} SunEditor.Injector_Core
  * @typedef {import('./editorInjector').default} SunEditor.Injector
  */
 
