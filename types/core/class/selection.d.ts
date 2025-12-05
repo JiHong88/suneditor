@@ -223,4 +223,10 @@ declare class Selection_ {
 	 * @description Initialize the scroll information when the editor first loads
 	 */
 	__init(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
+	/**
+	 * @internal
+	 * @this {SelectionThis}
+	 * @description Destroy the Selection instance and release memory
+	 */
+	_destroy(this: Omit<Selection_ & Partial<import('../../editorInjector').default>, 'selection'>): void;
 }

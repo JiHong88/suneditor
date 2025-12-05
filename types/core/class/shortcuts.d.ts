@@ -140,4 +140,10 @@ declare class Shortcuts {
 	 * @description Enable the shortcut activation.
 	 */
 	enable(this: Omit<Shortcuts & Partial<import('../../editorInjector').default>, 'shortcuts'>): void;
+	/**
+	 * @internal
+	 * @this {ShortcutsThis}
+	 * @description Destroy the Shortcuts instance and release memory
+	 */
+	_destroy(this: Omit<Shortcuts & Partial<import('../../editorInjector').default>, 'shortcuts'>): void;
 }

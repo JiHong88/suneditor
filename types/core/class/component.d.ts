@@ -248,4 +248,10 @@ declare class Component {
 	 * @description Removes drag-related events and resets drag-related states.
 	 */
 	_removeDragEvent(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
+	/**
+	 * @internal
+	 * @this {ComponentThis}
+	 * @description Destroy the Component instance and release memory
+	 */
+	_destroy(this: Omit<Component & Partial<import('../../editorInjector').default>, 'component'>): void;
 }

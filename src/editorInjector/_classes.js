@@ -36,4 +36,15 @@ function ClassInjector(editor) {
 	this.viewer = editor.viewer;
 }
 
+/**
+ * @private
+ * @description Get keys injected by ClassInjector
+ * @returns {string[]}
+ */
+export function _getClassInjectorKeys() {
+	const dummy = {};
+	ClassInjector.call(dummy, {});
+	return Object.keys(dummy);
+}
+
 export default ClassInjector;

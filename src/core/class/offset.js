@@ -849,6 +849,15 @@ Offset.prototype = {
 		};
 	},
 
+	/**
+	 * @internal
+	 * @this {OffsetThis}
+	 * @description Destroy the Offset instance and release memory
+	 */
+	_destroy() {
+		// No internal state to clean up
+	},
+
 	constructor: Offset,
 };
 

@@ -186,4 +186,9 @@ declare class DocumentType {
 	 * @returns {Array<HTMLElement>} An array of header elements.
 	 */
 	_getHeaders(): Array<HTMLElement>;
+	/**
+	 * @internal
+	 * @description Destroy the DocumentType instance and release memory
+	 */
+	_destroy(): void;
 }

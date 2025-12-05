@@ -713,6 +713,16 @@ Component.prototype = {
 		_DragHandle.set('__overInfo', null);
 	},
 
+	/**
+	 * @internal
+	 * @this {ComponentThis}
+	 * @description Destroy the Component instance and release memory
+	 */
+	_destroy() {
+		this.__removeGlobalEvent();
+		this._removeDragEvent();
+	},
+
 	constructor: Component,
 };
 

@@ -144,6 +144,15 @@ Char.prototype = {
 		return true;
 	},
 
+	/**
+	 * @internal
+	 * @this {CharThis}
+	 * @description Destroy the Char instance and release memory
+	 */
+	_destroy() {
+		// No internal state to clean up
+	},
+
 	constructor: Char,
 };
 

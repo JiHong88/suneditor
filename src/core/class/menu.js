@@ -303,6 +303,15 @@ Menu.prototype = {
 		}
 	},
 
+	/**
+	 * @internal
+	 * @this {MenuThis}
+	 * @description Destroy the Menu instance and release memory
+	 */
+	_destroy() {
+		this.__removeGlobalEvent();
+	},
+
 	constructor: Menu,
 };
 

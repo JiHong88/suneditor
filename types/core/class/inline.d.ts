@@ -284,4 +284,10 @@ declare class Inline {
 	 * @param {?Array} styleArray Refer style array
 	 */
 	_sn_resetCommonListCell(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>, el: Node, styleArray: any[] | null): boolean;
+	/**
+	 * @internal
+	 * @this {InlineThis}
+	 * @description Destroy the Inline instance and release memory
+	 */
+	_destroy(this: Omit<Inline & Partial<import('../../editorInjector').default>, 'inline'>): void;
 }

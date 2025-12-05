@@ -1852,6 +1852,15 @@ Inline.prototype = {
 		return appliedEl;
 	},
 
+	/**
+	 * @internal
+	 * @this {InlineThis}
+	 * @description Destroy the Inline instance and release memory
+	 */
+	_destroy() {
+		// No cleanup needed - GC handles internal properties
+	},
+
 	constructor: Inline,
 };
 

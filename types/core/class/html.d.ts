@@ -490,4 +490,10 @@ declare class HTML {
 	 * - ex ["bold", "underline", "italic", "strike"]
 	 */
 	__resetAutoStyleify(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>, autoStyleify: Array<string>): void;
+	/**
+	 * @internal
+	 * @this {HTMLThis}
+	 * @description Destroy the HTML instance and release memory
+	 */
+	_destroy(this: Omit<HTML & Partial<import('../../editorInjector').default>, 'html'>): void;
 }

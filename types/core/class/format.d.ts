@@ -288,4 +288,10 @@ declare class Format {
 	 * @param {"line"|"br"} breakFormat options.get('defaultLineBreakFormat')
 	 */
 	__resetBrLineBreak(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>, breakFormat: 'line' | 'br'): void;
+	/**
+	 * @internal
+	 * @this {FormatThis}
+	 * @description Destroy the Format instance and release memory
+	 */
+	_destroy(this: Omit<Format & Partial<import('../../editorInjector').default>, 'format'>): void;
 }

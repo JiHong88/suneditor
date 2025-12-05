@@ -149,4 +149,10 @@ declare class Menu {
 	 * @description Remove global event listeners
 	 */
 	__removeGlobalEvent(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
+	/**
+	 * @internal
+	 * @this {MenuThis}
+	 * @description Destroy the Menu instance and release memory
+	 */
+	_destroy(this: Omit<Menu & Partial<import('../../editorInjector').default>, 'menu'>): void;
 }

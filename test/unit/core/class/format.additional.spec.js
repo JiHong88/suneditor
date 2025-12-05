@@ -21,7 +21,7 @@ describe('Format - Additional Coverage', () => {
     describe('documentType integration', () => {
         it('should call documentType reHeader when available', () => {
             // Mock documentType
-            const mockDocumentType = { reHeader: jest.fn() };
+            const mockDocumentType = { reHeader: jest.fn(), _destroy: jest.fn() };
             editor.frameContext.set('documentType_use_header', true);
             editor.frameContext.set('documentType', mockDocumentType);
 

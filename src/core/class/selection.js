@@ -754,6 +754,15 @@ Selection_.prototype = {
 			: (numbers.get(_w.getComputedStyle(this.frameContext.get('wysiwyg')).scrollMargin, 0) || 40) + numbers.get(_w.getComputedStyle(this.frameContext.get('wrapper')).paddingBottom, 0);
 	},
 
+	/**
+	 * @internal
+	 * @this {SelectionThis}
+	 * @description Destroy the Selection instance and release memory
+	 */
+	_destroy() {
+		// No cleanup needed - GC handles internal properties
+	},
+
 	constructor: Selection_,
 };
 

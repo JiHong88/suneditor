@@ -162,4 +162,10 @@ declare class UI {
 	 * @description Off current modal
 	 */
 	_offCurrentModal(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
+	/**
+	 * @internal
+	 * @this {UIThis}
+	 * @description Destroy the UI instance and release memory
+	 */
+	_destroy(this: Omit<UI & Partial<import('../../editorInjector').default>, 'ui'>): void;
 }

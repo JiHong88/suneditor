@@ -888,6 +888,35 @@ EventManager.prototype = {
 			this._toolbarObserver.disconnect();
 			this._toolbarObserver = null;
 		}
+
+		// clear timers
+		if (this._balloonDelay) {
+			_w.clearTimeout(this._balloonDelay);
+			this._balloonDelay = null;
+		}
+
+		if (this.__retainTimer) {
+			_w.clearTimeout(this.__retainTimer);
+			this.__retainTimer = null;
+		}
+
+		// remove global events
+		this.__geckoActiveEvent &&= this.removeGlobalEvent(this.__geckoActiveEvent);
+		this.__selectionSyncEvent &&= this.removeGlobalEvent(this.__selectionSyncEvent);
+		this.__resize_editor &&= this.removeGlobalEvent(this.__resize_editor);
+		this.__close_move &&= this.removeGlobalEvent(this.__close_move);
+
+		// clear cached references
+		this._formatAttrsTemp = null;
+		this.__cacheStyleNodes = null;
+		this.__inputPlugin = null;
+		this.__inputBlurEvent = null;
+		this.__inputKeyEvent = null;
+		this.__focusTemp = null;
+		this.__eventDoc = null;
+		this.__secopy = null;
+		this._lineBreakComp = null;
+		this.scrollparents = null;
 	},
 
 	/**

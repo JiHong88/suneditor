@@ -318,7 +318,7 @@ describe('Char API integration tests', () => {
 	});
 
 	describe('Edge cases', () => {
-		it('should handle very long content', () => {
+		it('should handle very long content', async () => {
 			// Create editor with high limit
 			destroyTestEditor(editor);
 			editor = createTestEditor({
@@ -326,6 +326,7 @@ describe('Char API integration tests', () => {
 				charCounter: true,
 				charCounter_max: 100000
 			});
+			await waitForEditorReady(editor);
 
 			const wysiwyg = editor.frameContext.get('wysiwyg');
 			const longText = 'A'.repeat(50000);

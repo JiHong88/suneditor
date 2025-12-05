@@ -571,6 +571,15 @@ ListFormat.prototype = {
 		};
 	},
 
+	/**
+	 * @internal
+	 * @this {ListFormatThis}
+	 * @description Destroy the ListFormat instance and release memory
+	 */
+	_destroy() {
+		// No internal state to clean up
+	},
+
 	constructor: ListFormat,
 };
 

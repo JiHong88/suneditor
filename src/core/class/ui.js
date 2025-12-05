@@ -386,6 +386,19 @@ UI.prototype = {
 		}
 	},
 
+	/**
+	 * @internal
+	 * @this {UIThis}
+	 * @description Destroy the UI instance and release memory
+	 */
+	_destroy() {
+		if (this._toastToggle) {
+			_w.clearTimeout(this._toastToggle);
+			this._toastToggle = null;
+		}
+		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
+	},
+
 	constructor: UI,
 };
 

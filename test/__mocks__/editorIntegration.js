@@ -274,6 +274,14 @@ export function waitForEditorReady(editor, timeout = 5000) {
 						if (editor.currentFrame && editor.currentFrame !== editor.context && !editor.currentFrame.get('wysiwygFrame')) {
 							editor.currentFrame.set('wysiwygFrame', createMockFrame());
 						}
+
+						// Add mock toolbar_main to prevent errors in editor initialization
+						if (!editor.context.get('toolbar_main')) {
+							const mockToolbar = document.createElement('div');
+							mockToolbar.style.visibility = 'hidden';
+							document.body.appendChild(mockToolbar);
+							editor.context.set('toolbar_main', mockToolbar);
+						}
 					}
 
 					// Ensure core object exists with essential properties

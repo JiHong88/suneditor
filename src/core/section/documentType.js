@@ -560,6 +560,41 @@ DocumentType.prototype = {
 		return (this._wwHeaders = this.ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));
 	},
 
+	/**
+	 * @internal
+	 * @description Destroy the DocumentType instance and release memory
+	 */
+	_destroy() {
+		if (this._rePageTimeout) {
+			_w.clearTimeout(this._rePageTimeout);
+			this._rePageTimeout = null;
+		}
+
+		if (this._positionCache) {
+			this._positionCache.clear();
+			this._positionCache = null;
+		}
+
+		this.editor = null;
+		this.status = null;
+		this.context = null;
+		this.selection = null;
+		this.offset = null;
+		this.fc = null;
+		this.ww = null;
+		this.wwFrame = null;
+		this.documentTypeInner = null;
+		this.inner = null;
+		this.page = null;
+		this.pages = null;
+		this.pages_line = null;
+		this.innerHeaders = null;
+		this._wwHeaders = null;
+		this.navigatorButtons = null;
+		this.pageNavigator = null;
+		this._mirror = null;
+	},
+
 	constructor: DocumentType,
 };
 

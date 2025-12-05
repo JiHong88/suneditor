@@ -200,4 +200,10 @@ declare class Toolbar {
 	 * @description Hide the currently active more options layer.
 	 */
 	_moreLayerOff(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
+	/**
+	 * @internal
+	 * @this {ToolbarThis}
+	 * @description Destroy the Toolbar instance and release memory
+	 */
+	_destroy(this: Omit<Toolbar & Partial<import('../../editorInjector').default>, 'toolbar' | 'subToolbar'>): void;
 }

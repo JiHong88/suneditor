@@ -92,6 +92,15 @@ Shortcuts.prototype = {
 		this.isDisabled = false;
 	},
 
+	/**
+	 * @internal
+	 * @this {ShortcutsThis}
+	 * @description Destroy the Shortcuts instance and release memory
+	 */
+	_destroy() {
+		// No internal state to clean up
+	},
+
 	constructor: Shortcuts,
 };
 

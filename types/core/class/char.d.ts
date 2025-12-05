@@ -60,4 +60,10 @@ declare class Char {
 	 * @returns {boolean}
 	 */
 	test(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>, inputText: string, _fromInputEvent: boolean): boolean;
+	/**
+	 * @internal
+	 * @this {CharThis}
+	 * @description Destroy the Char instance and release memory
+	 */
+	_destroy(this: Omit<Char & Partial<import('../../editorInjector').default>, 'char'>): void;
 }

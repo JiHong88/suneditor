@@ -1054,6 +1054,15 @@ Format.prototype = {
 		this._brLineBreak = breakFormat === 'br';
 	},
 
+	/**
+	 * @internal
+	 * @this {FormatThis}
+	 * @description Destroy the Format instance and release memory
+	 */
+	_destroy() {
+		// No cleanup needed - GC handles internal properties
+	},
+
 	constructor: Format,
 };
 

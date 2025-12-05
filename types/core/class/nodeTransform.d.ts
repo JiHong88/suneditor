@@ -127,4 +127,10 @@ declare class NodeTransform {
 		parent: Node;
 		inner: Node;
 	};
+	/**
+	 * @internal
+	 * @this {NodeTransformThis}
+	 * @description Destroy the NodeTransform instance and release memory
+	 */
+	_destroy(this: Omit<NodeTransform & Partial<import('../../editorInjector').default>, 'nodeTransform'>): void;
 }

@@ -1967,6 +1967,15 @@ HTML.prototype = {
 		}
 	},
 
+	/**
+	 * @internal
+	 * @this {HTMLThis}
+	 * @description Destroy the HTML instance and release memory
+	 */
+	_destroy() {
+		// No cleanup needed - GC handles internal properties
+	},
+
 	constructor: HTML,
 };
 

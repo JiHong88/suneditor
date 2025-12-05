@@ -12,7 +12,7 @@ import DocumentType from './section/documentType';
 import InstanceCheck from './util/instanceCheck';
 
 // class injector
-import ClassInjector from '../editorInjector/_classes';
+import ClassInjector, { _getClassInjectorKeys } from '../editorInjector/_classes';
 
 // classes
 import Char from './class/char';
@@ -33,6 +33,12 @@ import Viewer from './class/viewer';
 const COMMAND_BUTTONS = '.se-menu-list .se-toolbar-btn[data-command]';
 const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-enabled"]):not([data-type="MORE"])`;
 const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component-enabled"]):not([data-type="MORE"])`;
+
+/**
+ * @description Class instance keys that need circular reference cleanup in destroy().
+ * @type {readonly string[]}
+ */
+const EDITOR_CLASS_KEYS = Object.freeze(['eventManager', 'instanceCheck', ..._getClassInjectorKeys()]);
 
 /**
  * @constructor
@@ -1112,17 +1118,14 @@ Editor.prototype = {
 	 */
 	destroy() {
 		/** destroy plugins first (they may use editor references) */
-		let obj = this.plugins;
-		for (const k in obj) {
-			const p = obj[k];
+		const plugins = this.plugins;
+		for (const k in plugins) {
+			const p = plugins[k];
 			p._destroy?.();
-
-			for (const pk in p) {
-				delete p[pk];
-			}
-
-			delete obj[k];
+			// break circular reference: plugin.editor
+			p.editor = null;
 		}
+		this.plugins = null;
 
 		/** remove history */
 		this.history.destroy();
@@ -1143,6 +1146,12 @@ Editor.prototype = {
 
 		/** clear frame roots */
 		this.applyFrameRoots((e) => {
+			// destroy documentType instance
+			const docType = e.get('documentType');
+			if (docType) {
+				docType._destroy();
+				docType.editor = null;
+			}
 			dom.utils.removeItem(e.get('topArea'));
 			e.get('options').clear();
 			e.clear();
@@ -1165,25 +1174,55 @@ Editor.prototype = {
 		this.frameRoots.clear();
 
 		/** clear events */
-		obj = this.events;
-		for (const k in obj) {
-			delete obj[k];
+		for (const k in this.events) {
+			this.events[k] = null;
 		}
+		this.events = null;
 
-		/** clear class instances */
-		obj = ['eventManager', 'instanceCheck', 'char', 'component', 'format', 'html', 'inline', 'listFormat', 'menu', 'nodeTransform', 'offset', 'selection', 'shortcuts', 'ui', 'viewer', 'toolbar', 'subToolbar'];
-		for (let i = 0, len = obj.length, c; i < len; i++) {
-			c = this[obj[i]];
-			for (const k in c) {
-				delete c[k];
+		/** break circular references in class instances (instance.editor = this) */
+		for (let i = 0; i < EDITOR_CLASS_KEYS.length; i++) {
+			const key = EDITOR_CLASS_KEYS[i];
+			const instance = this[key];
+			if (instance) {
+				instance._destroy?.();
+				instance.editor = null;
+				this[key] = null;
 			}
 		}
-		obj = null;
 
-		/** clear all remaining properties */
-		for (const k in this) {
-			delete this[k];
+		/** clear status object */
+		if (this.status) {
+			this.status.currentNodes = null;
+			this.status.currentNodesMap = null;
+			this.status._range = null;
+			this.status = null;
 		}
+
+		/** clear remaining references */
+		this.carrierWrapper = null;
+		this.history = null;
+		this.rootKeys = null;
+		this._shadowRoot = null;
+		this._originOptions = null;
+		this._pluginCallButtons = null;
+		this._pluginCallButtons_sub = null;
+		this._responsiveButtons = null;
+		this._responsiveButtons_sub = null;
+		this._fileInfoPluginsCheck = null;
+		this._fileInfoPluginsReset = null;
+		this._fileManager = null;
+		this._componentManager = null;
+		this._controllerOnDisabledButtons = null;
+		this._codeViewDisabledButtons = null;
+		this.opendControllers = null;
+		this.activeCommands = null;
+		this._lineBreaker_t = null;
+		this._lineBreaker_b = null;
+		this._onCopyFormatInfo = null;
+		this._onCopyFormatInitMethod = null;
+		this.effectNode = null;
+		this.opendModal = null;
+		this.opendBrowser = null;
 
 		return null;
 	},

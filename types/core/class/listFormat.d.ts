@@ -166,4 +166,10 @@ declare class ListFormat {
 		sc: Node;
 		ec: Node;
 	};
+	/**
+	 * @internal
+	 * @this {ListFormatThis}
+	 * @description Destroy the ListFormat instance and release memory
+	 */
+	_destroy(this: Omit<ListFormat & Partial<import('../../editorInjector').default>, 'ListFormat'>): void;
 }

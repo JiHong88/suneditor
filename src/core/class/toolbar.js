@@ -446,6 +446,15 @@ Toolbar.prototype = {
 		}
 	},
 
+	/**
+	 * @internal
+	 * @this {ToolbarThis}
+	 * @description Destroy the Toolbar instance and release memory
+	 */
+	_destroy() {
+		this._moreLayerOff();
+	},
+
 	constructor: Toolbar,
 };
 

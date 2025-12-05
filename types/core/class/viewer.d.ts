@@ -139,4 +139,10 @@ declare class Viewer {
 	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers textarea
 	 */
 	_scrollLineNumbers(this: HTMLElement, codeNumbers: HTMLTextAreaElement): void;
+	/**
+	 * @internal
+	 * @this {ViewerThis}
+	 * @description Destroy the Viewer instance and release memory
+	 */
+	_destroy(this: Omit<Viewer & Partial<import('../../editorInjector').default>, 'viewer'>): void;
 }

@@ -703,6 +703,15 @@ Viewer.prototype = {
 		codeNumbers.scrollLeft = this.scrollLeft;
 	},
 
+	/**
+	 * @internal
+	 * @this {ViewerThis}
+	 * @description Destroy the Viewer instance and release memory
+	 */
+	_destroy() {
+		// No cleanup needed - GC handles internal properties
+	},
+
 	constructor: Viewer,
 };
 

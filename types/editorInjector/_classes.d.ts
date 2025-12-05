@@ -1,4 +1,10 @@
 import type {} from '../typedef';
+/**
+ * @private
+ * @description Get keys injected by ClassInjector
+ * @returns {string[]}
+ */
+export function _getClassInjectorKeys(): string[];
 export default ClassInjector;
 /**
  * @description Add all inner classes to the editor instance.

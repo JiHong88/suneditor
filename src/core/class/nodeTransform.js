@@ -449,6 +449,15 @@ NodeTransform.prototype = {
 		};
 	},
 
+	/**
+	 * @internal
+	 * @this {NodeTransformThis}
+	 * @description Destroy the NodeTransform instance and release memory
+	 */
+	_destroy() {
+		// No internal state to clean up
+	},
+
 	constructor: NodeTransform,
 };
 

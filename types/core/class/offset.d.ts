@@ -518,4 +518,10 @@ declare class Offset {
 		bottom: number;
 		rects: RectsInfo;
 	};
+	/**
+	 * @internal
+	 * @this {OffsetThis}
+	 * @description Destroy the Offset instance and release memory
+	 */
+	_destroy(this: Omit<Offset & Partial<import('../../editorInjector').default>, 'offset'>): void;
 }
