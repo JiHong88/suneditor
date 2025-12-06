@@ -41,8 +41,6 @@ declare class Viewer {
 	get toolbar(): SunEditor.Core['toolbar'];
 	/** @internal @type {SunEditor.Core['subToolbar']} */
 	get subToolbar(): SunEditor.Core['subToolbar'];
-	/** @internal @type {SunEditor.Core['history']} */
-	get history(): SunEditor.Core['history'];
 	/** @internal @type {SunEditor.Core['html']} */
 	get html(): SunEditor.Core['html'];
 	/** @internal @type {SunEditor.Core['menu']} */

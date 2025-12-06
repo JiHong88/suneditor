@@ -52,8 +52,6 @@ declare class Inline {
 	get component(): SunEditor.Core['component'];
 	/** @internal @type {SunEditor.Core['ui']} */
 	get ui(): SunEditor.Core['ui'];
-	/** @internal @type {SunEditor.Core['history']} */
-	get history(): SunEditor.Core['history'];
 	/** @internal @type {SunEditor.Core['nodeTransform']} */
 	get nodeTransform(): SunEditor.Core['nodeTransform'];
 	/**

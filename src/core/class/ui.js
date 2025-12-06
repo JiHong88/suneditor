@@ -413,11 +413,18 @@ UI.prototype = {
 	 * @description Destroy the UI instance and release memory
 	 */
 	_destroy() {
+		// Clear timer
 		if (this._toastToggle) {
 			_w.clearTimeout(this._toastToggle);
-			this._toastToggle = null;
 		}
+
+		// Remove global event
 		this._bindClose &&= this.eventManager.removeGlobalEvent(this._bindClose);
+
+		// Remove alert click event listener
+		if (this._closeSignal && this._alertInner) {
+			this._alertInner.removeEventListener('click', this._closeListener[1]);
+		}
 	},
 
 	constructor: UI,

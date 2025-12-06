@@ -48,10 +48,6 @@ Inline.prototype = {
 	get ui() {
 		return this.editor.ui;
 	},
-	/** @internal @type {SunEditor.Core['history']} */
-	get history() {
-		return this.editor.history;
-	},
 	/** @internal @type {SunEditor.Core['nodeTransform']} */
 	get nodeTransform() {
 		return this.editor.nodeTransform;

@@ -33,8 +33,6 @@ declare class Format {
 	get component(): SunEditor.Core['component'];
 	/** @internal @type {SunEditor.Core['selection']} */
 	get selection(): SunEditor.Core['selection'];
-	/** @internal @type {SunEditor.Core['history']} */
-	get history(): SunEditor.Core['history'];
 	/** @internal @type {SunEditor.Core['nodeTransform']} */
 	get nodeTransform(): SunEditor.Core['nodeTransform'];
 	/** @internal @type {SunEditor.Core['listFormat']} */

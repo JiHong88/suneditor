@@ -109,10 +109,6 @@ Component.prototype = {
 	get format() {
 		return this.editor.format;
 	},
-	/** @internal @type {SunEditor.Core['history']} */
-	get history() {
-		return this.editor.history;
-	},
 	/** @internal @type {SunEditor.Core['offset']} */
 	get offset() {
 		return this.editor.offset;

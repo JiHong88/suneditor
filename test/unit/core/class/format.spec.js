@@ -1,6 +1,5 @@
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../__mocks__/editorIntegration';
 import Format from '../../../../src/core/class/format';
-import ClassInjector from '../../../../src/editorInjector/_classes';
 import { dom } from '../../../../src/helper';
 
 describe('Core - Format', () => {
@@ -12,7 +11,6 @@ describe('Core - Format', () => {
 		editor = createTestEditor();
 		await waitForEditorReady(editor);
 		format = new Format(editor);
-		ClassInjector.call(format, editor);
 		wysiwyg = editor.frameContext.get('wysiwyg');
 	});
 

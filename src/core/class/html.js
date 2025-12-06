@@ -172,10 +172,6 @@ HTML.prototype = {
 	get char() {
 		return this.editor.char;
 	},
-	/** @internal @type {SunEditor.Core['history']} */
-	get history() {
-		return this.editor.history;
-	},
 	/** @internal @type {SunEditor.Core['ui']} */
 	get ui() {
 		return this.editor.ui;
@@ -2010,7 +2006,10 @@ HTML.prototype = {
 	 * @description Destroy the HTML instance and release memory
 	 */
 	_destroy() {
-		// No cleanup needed - GC handles internal properties
+		// Clear Map
+		if (this._cleanStyleRegExpMap) {
+			this._cleanStyleRegExpMap.clear();
+		}
 	},
 
 	constructor: HTML,

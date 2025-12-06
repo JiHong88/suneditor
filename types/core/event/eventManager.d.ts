@@ -94,12 +94,18 @@ declare class EventManager {
 	get listFormat(): SunEditor.Core['listFormat'];
 	/** @internal @type {SunEditor.Core['html']} */
 	get html(): SunEditor.Core['html'];
+	/** @internal @type {SunEditor.Core['inline']} */
+	get inline(): SunEditor.Core['inline'];
 	/** @internal @type {SunEditor.Core['menu']} */
 	get menu(): SunEditor.Core['menu'];
 	/** @internal @type {SunEditor.Core['nodeTransform']} */
 	get nodeTransform(): SunEditor.Core['nodeTransform'];
+	/** @internal @type {SunEditor.Core['offset']} */
+	get offset(): SunEditor.Core['offset'];
 	/** @internal @type {SunEditor.Core['selection']} */
 	get selection(): SunEditor.Core['selection'];
+	/** @internal @type {SunEditor.Core['shortcuts']} */
+	get shortcuts(): SunEditor.Core['shortcuts'];
 	/** @internal @type {SunEditor.Core['subToolbar']} */
 	get subToolbar(): SunEditor.Core['subToolbar'];
 	/** @internal @type {SunEditor.Core['toolbar']} */

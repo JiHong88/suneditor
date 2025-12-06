@@ -143,20 +143,16 @@ describe('Toolbar', () => {
 			isSubBalloon: false,
 			__cachingButtons: jest.fn(),
 			__cachingShortcuts: jest.fn(),
-		};
-
-		// Mock CoreInjector.call
-		CoreInjector.mockImplementation(function (editor) {
-			this.editor = editor;
-			this.context = mockContext;
-			this.frameContext = mockFrameContext;
-			this.offset = mockOffset;
-			this.menu = mockMenu;
-			this.options = mockOptions;
-			this.plugins = {};
-			this.icons = {};
-			this.lang = {};
-			this.selection = {
+			// Include all properties that getters will access via this.editor.xxx
+			context: mockContext,
+			frameContext: mockFrameContext,
+			offset: mockOffset,
+			menu: mockMenu,
+			options: mockOptions,
+			plugins: {},
+			icons: {},
+			lang: {},
+			selection: {
 				getRange: jest.fn().mockReturnValue({ collapsed: false }),
 				get: jest.fn().mockReturnValue({
 					focusNode: document.createTextNode(''),
@@ -164,23 +160,39 @@ describe('Toolbar', () => {
 					focusOffset: 0,
 					anchorOffset: 5,
 				}),
-			};
-			this.history = {
+			},
+			history: {
 				resetButtons: jest.fn(),
-			};
-			this.viewer = {
+			},
+			viewer: {
 				_setButtonsActive: jest.fn(),
-			};
-			this.ui = {
+			},
+			ui: {
 				setControllerOnDisabledButtons: jest.fn(),
-			};
-			this.eventManager = {
+			},
+			eventManager: {
 				applyTagEffect: jest.fn(),
-			};
-			this.status = {
+			},
+			status: {
 				hasFocus: false,
-			};
-			this.triggerEvent = jest.fn();
+			},
+			triggerEvent: jest.fn(),
+		};
+
+		// Mock CoreInjector.call - set editor reference and other properties that CoreInjector normally sets
+		CoreInjector.mockImplementation(function (editor) {
+			this.editor = editor;
+			// CoreInjector sets these directly (not via getters)
+			this.context = editor.context;
+			this.frameContext = editor.frameContext;
+			this.options = editor.options;
+			this.plugins = editor.plugins;
+			this.icons = editor.icons;
+			this.lang = editor.lang;
+			this.eventManager = editor.eventManager;
+			this.history = editor.history;
+			this.status = editor.status;
+			this.triggerEvent = editor.triggerEvent;
 		});
 
 		const options = {

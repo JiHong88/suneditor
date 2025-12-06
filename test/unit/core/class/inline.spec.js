@@ -1,6 +1,5 @@
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../__mocks__/editorIntegration';
 import Inline from '../../../../src/core/class/inline';
-import ClassInjector from '../../../../src/editorInjector/_classes';
 import { dom } from '../../../../src/helper';
 
 describe('Inline Class', () => {
@@ -12,7 +11,6 @@ describe('Inline Class', () => {
 		editor = createTestEditor();
 		await waitForEditorReady(editor);
 		inline = new Inline(editor);
-		ClassInjector.call(inline, editor);
 		wysiwyg = editor.frameContext.get('wysiwyg');
 	});
 

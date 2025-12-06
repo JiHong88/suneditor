@@ -98,8 +98,6 @@ declare class Toolbar {
 	};
 	/** @internal @type {SunEditor.Core['menu']} */
 	get menu(): SunEditor.Core['menu'];
-	/** @internal @type {SunEditor.Core['history']} */
-	get history(): SunEditor.Core['history'];
 	/** @internal @type {SunEditor.Core['viewer']} */
 	get viewer(): SunEditor.Core['viewer'];
 	/** @internal @type {SunEditor.Core['ui']} */

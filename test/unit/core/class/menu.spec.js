@@ -51,16 +51,22 @@ describe('Menu', () => {
 			runFromTarget: jest.fn(),
 			_preventBlur: false,
 			_notHideToolbar: false,
+			// Include all properties that getters will access via this.editor.xxx
+			context: mockContext,
+			eventManager: mockEventManager,
+			offset: mockOffset,
+			carrierWrapper: document.createElement('div'),
+			plugins: {},
 		};
 
-		// Mock CoreInjector.call
+		// Mock CoreInjector.call - set editor reference and other properties that CoreInjector normally sets
 		CoreInjector.mockImplementation(function (editor) {
 			this.editor = editor;
-			this.context = mockContext;
-			this.eventManager = mockEventManager;
-			this.offset = mockOffset;
-			this.carrierWrapper = document.createElement('div');
-			this.plugins = {};
+			// CoreInjector sets these directly (not via getters)
+			this.context = editor.context;
+			this.eventManager = editor.eventManager;
+			this.carrierWrapper = editor.carrierWrapper;
+			this.plugins = editor.plugins;
 		});
 
 		menu = new Menu(mockEditor);

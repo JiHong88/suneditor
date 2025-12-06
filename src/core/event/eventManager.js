@@ -115,6 +115,10 @@ EventManager.prototype = {
 	get html() {
 		return this.editor.html;
 	},
+	/** @internal @type {SunEditor.Core['inline']} */
+	get inline() {
+		return this.editor.inline;
+	},
 	/** @internal @type {SunEditor.Core['menu']} */
 	get menu() {
 		return this.editor.menu;
@@ -123,9 +127,17 @@ EventManager.prototype = {
 	get nodeTransform() {
 		return this.editor.nodeTransform;
 	},
+	/** @internal @type {SunEditor.Core['offset']} */
+	get offset() {
+		return this.editor.offset;
+	},
 	/** @internal @type {SunEditor.Core['selection']} */
 	get selection() {
 		return this.editor.selection;
+	},
+	/** @internal @type {SunEditor.Core['shortcuts']} */
+	get shortcuts() {
+		return this.editor.shortcuts;
 	},
 	/** @internal @type {SunEditor.Core['subToolbar']} */
 	get subToolbar() {

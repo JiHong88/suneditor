@@ -49,10 +49,6 @@ Viewer.prototype = {
 	get subToolbar() {
 		return this.editor.subToolbar;
 	},
-	/** @internal @type {SunEditor.Core['history']} */
-	get history() {
-		return this.editor.history;
-	},
 	/** @internal @type {SunEditor.Core['html']} */
 	get html() {
 		return this.editor.html;
@@ -734,7 +730,7 @@ Viewer.prototype = {
 	 * @description Destroy the Viewer instance and release memory
 	 */
 	_destroy() {
-		// No cleanup needed - GC handles internal properties
+		// No internal state to clean up
 	},
 
 	constructor: Viewer,

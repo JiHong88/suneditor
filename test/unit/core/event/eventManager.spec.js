@@ -10,17 +10,6 @@ describe('EventManager', () => {
 		mockEditor = createMockEditor();
 		eventManager = new EventManager(mockEditor);
 
-		// Simulate ClassInjector.call(this.eventManager, this) like the real editor does
-		// This injects component, selection, and other class properties into eventManager
-		eventManager.component = mockEditor.component;
-		eventManager.selection = mockEditor.selection;
-		eventManager.char = mockEditor.char;
-		eventManager.format = mockEditor.format;
-		eventManager.html = mockEditor.html;
-		eventManager.ui = mockEditor.ui;
-		eventManager.toolbar = mockEditor.toolbar;
-		eventManager.subToolbar = mockEditor.subToolbar;
-
 		// Initialize observers for tests
 		eventManager._wwFrameObserver = {
 			disconnect: jest.fn()

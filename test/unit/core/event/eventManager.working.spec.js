@@ -9,30 +9,6 @@ describe('EventManager - Working Tests', () => {
 	beforeEach(() => {
 		mockEditor = createMockEditor();
 		eventManager = new EventManager(mockEditor);
-
-		// Inject all dependencies properly
-		eventManager.component = mockEditor.component;
-		eventManager.selection = mockEditor.selection;
-		eventManager.char = mockEditor.char;
-		eventManager.format = mockEditor.format;
-		eventManager.html = mockEditor.html;
-		eventManager.ui = mockEditor.ui;
-		eventManager.toolbar = mockEditor.toolbar;
-		eventManager.subToolbar = mockEditor.subToolbar;
-		eventManager.menu = mockEditor.menu;
-		eventManager.history = mockEditor.history;
-		eventManager.viewer = mockEditor.viewer;
-		eventManager.nodeTransform = mockEditor.nodeTransform;
-		eventManager.triggerEvent = mockEditor.triggerEvent;
-		eventManager.carrierWrapper = mockEditor.carrierWrapper;
-		eventManager.context = mockEditor.context;
-		eventManager.frameContext = mockEditor.frameContext;
-		eventManager.frameOptions = mockEditor.frameOptions;
-		eventManager.frameRoots = mockEditor.frameRoots;
-		eventManager.options = mockEditor.options;
-		eventManager.plugins = mockEditor.plugins;
-		eventManager.status = mockEditor.status;
-		eventManager.editor = mockEditor;
 	});
 
 	describe('constructor', () => {

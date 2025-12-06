@@ -73,10 +73,6 @@ Toolbar.prototype = {
 	get menu() {
 		return this.editor.menu;
 	},
-	/** @internal @type {SunEditor.Core['history']} */
-	get history() {
-		return this.editor.history;
-	},
 	/** @internal @type {SunEditor.Core['viewer']} */
 	get viewer() {
 		return this.editor.viewer;

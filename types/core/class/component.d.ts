@@ -75,8 +75,6 @@ declare class Component {
 	get selection(): SunEditor.Core['selection'];
 	/** @internal @type {SunEditor.Core['format']} */
 	get format(): SunEditor.Core['format'];
-	/** @internal @type {SunEditor.Core['history']} */
-	get history(): SunEditor.Core['history'];
 	/** @internal @type {SunEditor.Core['offset']} */
 	get offset(): SunEditor.Core['offset'];
 	/** @internal @type {SunEditor.Core['ui']} */

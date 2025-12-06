@@ -1762,7 +1762,7 @@ Editor.prototype = {
 		// util
 		this.instanceCheck = new InstanceCheck(this);
 
-		// main classes
+		// ----- [core classes : editorInector/_classes] -------------------------------------
 		this.offset = new Offset(this);
 		this.shortcuts = new Shortcuts(this);
 		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
