@@ -10,13 +10,13 @@ describe('InstanceCheck', () => {
 			Node: window.Node,
 			Element: window.Element,
 			Range: window.Range,
-			Selection: window.Selection
+			Selection: window.Selection,
 		};
 
 		mockEditor = {
 			frameContext: {
-				get: jest.fn().mockReturnValue(mockWindow)
-			}
+				get: jest.fn().mockReturnValue(mockWindow),
+			},
 		};
 
 		instanceCheck = new InstanceCheck(mockEditor);
@@ -49,7 +49,6 @@ describe('InstanceCheck', () => {
 		it('should check nodeType first for cross-context compatibility', () => {
 			const div = document.createElement('div');
 			expect(instanceCheck.isNode(div)).toBe(true);
-			// Should not call _getFrameWindow since nodeType check succeeds
 			expect(mockEditor.frameContext.get).not.toHaveBeenCalled();
 		});
 
@@ -89,7 +88,6 @@ describe('InstanceCheck', () => {
 		it('should check nodeType === 1 first for cross-context compatibility', () => {
 			const div = document.createElement('div');
 			expect(instanceCheck.isElement(div)).toBe(true);
-			// Should not call _getFrameWindow since nodeType check succeeds
 			expect(mockEditor.frameContext.get).not.toHaveBeenCalled();
 		});
 
@@ -120,7 +118,6 @@ describe('InstanceCheck', () => {
 		it('should check constructor name first for cross-context compatibility', () => {
 			const range = document.createRange();
 			expect(instanceCheck.isRange(range)).toBe(true);
-			// Should not call _getFrameWindow since constructor.name check succeeds
 			expect(mockEditor.frameContext.get).not.toHaveBeenCalled();
 		});
 
@@ -152,7 +149,6 @@ describe('InstanceCheck', () => {
 		it('should check constructor name first for cross-context compatibility', () => {
 			const selection = window.getSelection();
 			expect(instanceCheck.isSelection(selection)).toBe(true);
-			// Should not call _getFrameWindow since constructor.name check succeeds
 			expect(mockEditor.frameContext.get).not.toHaveBeenCalled();
 		});
 
@@ -161,15 +157,6 @@ describe('InstanceCheck', () => {
 			const mockSelection = { constructor: { name: 'NotSelection' } };
 			instanceCheck.isSelection(mockSelection);
 			expect(mockEditor.frameContext.get).toHaveBeenCalledWith('_ww');
-		});
-	});
-
-	describe('_getFrameWindow', () => {
-		it('should call frameContext.get with "_ww" parameter', () => {
-			const result = instanceCheck._getFrameWindow();
-
-			expect(mockEditor.frameContext.get).toHaveBeenCalledWith('_ww');
-			expect(result).toBe(mockWindow);
 		});
 	});
 
@@ -184,8 +171,8 @@ describe('InstanceCheck', () => {
 
 			const iframeMockEditor = {
 				frameContext: {
-					get: jest.fn().mockReturnValue(iframeWindow)
-				}
+					get: jest.fn().mockReturnValue(iframeWindow),
+				},
 			};
 
 			iframeInstanceCheck = new InstanceCheck(iframeMockEditor);
@@ -236,7 +223,7 @@ describe('InstanceCheck', () => {
 	describe('edge cases', () => {
 		it('should handle null frameContext when nodeType check succeeds', () => {
 			const brokenEditor = {
-				frameContext: null
+				frameContext: null,
 			};
 			const brokenInstanceCheck = new InstanceCheck(brokenEditor);
 
@@ -248,7 +235,7 @@ describe('InstanceCheck', () => {
 
 		it('should throw when accessing frameContext for fallback check', () => {
 			const brokenEditor = {
-				frameContext: null
+				frameContext: null,
 			};
 			const brokenInstanceCheck = new InstanceCheck(brokenEditor);
 
@@ -259,8 +246,8 @@ describe('InstanceCheck', () => {
 		it('should handle missing _ww when nodeType check succeeds', () => {
 			const editorWithMissingWw = {
 				frameContext: {
-					get: jest.fn().mockReturnValue(null)
-				}
+					get: jest.fn().mockReturnValue(null),
+				},
 			};
 			const instanceCheckWithMissingWw = new InstanceCheck(editorWithMissingWw);
 
@@ -272,8 +259,8 @@ describe('InstanceCheck', () => {
 		it('should throw when using instanceof with missing _ww', () => {
 			const editorWithMissingWw = {
 				frameContext: {
-					get: jest.fn().mockReturnValue(null)
-				}
+					get: jest.fn().mockReturnValue(null),
+				},
 			};
 			const instanceCheckWithMissingWw = new InstanceCheck(editorWithMissingWw);
 

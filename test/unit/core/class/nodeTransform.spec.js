@@ -316,7 +316,7 @@ describe('NodeTransform', () => {
 			expect(p.querySelector('img')).toBeTruthy();
 		});
 
-		it('should not remove _notTextNode elements', () => {
+		it('should not remove _isNotTextNode elements', () => {
 			wysiwyg.innerHTML = '<div><br><img src="test.jpg"></div>';
 			const div = wysiwyg.firstChild;
 

@@ -83,7 +83,7 @@ describe('Modules - Modal', () => {
 			ui: {
 				showModal: jest.fn(),
 				hideModal: jest.fn(),
-				_offCurrentModal: jest.fn(),
+				offCurrentModal: jest.fn(),
 				showLoading: jest.fn(),
 				hideLoading: jest.fn(),
 				enableBackWrapper: jest.fn(),
@@ -301,7 +301,7 @@ describe('Modules - Modal', () => {
 		it('should open modal and call init', () => {
 			modal.open();
 
-			expect(mockEditor.ui._offCurrentModal).toHaveBeenCalled();
+			expect(mockEditor.ui.offCurrentModal).toHaveBeenCalled();
 			expect(mockEditor.eventManager.addGlobalEvent).toHaveBeenCalled();
 			expect(mockInst.modalInit).toHaveBeenCalled();
 			expect(mockInst.modalOn).toHaveBeenCalledWith(false);

@@ -10,7 +10,7 @@ function _offDownFn() {
 }
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_mouse
+ * @typedef {import('../eventManager').default} EventManagerThis_handler_ww_mouse
  */
 
 /**
@@ -33,7 +33,7 @@ export async function OnMouseDown_wysiwyg(fc, e) {
 
 	this._setSelectionSync();
 
-	this._w.setTimeout(this.selection._init.bind(this.selection), 0);
+	this._w.setTimeout(this.selection.init.bind(this.selection), 0);
 
 	// user event
 	if ((await this.triggerEvent('onMouseDown', { frameContext: fc, event: e })) === false) return;
@@ -93,13 +93,12 @@ export async function OnClick_wysiwyg(fc, e) {
 		return;
 	}
 
-	this.selection._init();
+	this.selection.init();
 
 	if (e.detail === 3) {
-		let range = this.selection.getRange();
+		const range = this.selection.getRange();
 		if (this.format.isLine(range.endContainer) && range.endOffset === 0) {
-			range = this.selection.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.textContent.length);
-			this.selection._rangeInfo(range, this.selection.get());
+			this.selection.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.textContent.length);
 		}
 	}
 

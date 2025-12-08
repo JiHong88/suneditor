@@ -186,7 +186,7 @@ describe('Plugins - Command - FileUpload', () => {
             },
             ui: {
                 alertOpen: jest.fn(),
-                _offCurrentController: jest.fn()
+                offCurrentController: jest.fn()
             },
             options: {
                 get: jest.fn().mockImplementation((key) => {
@@ -551,7 +551,7 @@ describe('Plugins - Command - FileUpload', () => {
                 url: '/test.pdf'
             });
             expect(dom.utils.removeItem).toHaveBeenCalledWith(mockContainer);
-            expect(mockEditor.ui._offCurrentController).toHaveBeenCalled();
+            expect(mockEditor.ui.offCurrentController).toHaveBeenCalled();
             expect(mockEditor.history.push).toHaveBeenCalledWith(false);
         });
 

@@ -18,15 +18,6 @@ describe('Inline Class', () => {
 		destroyTestEditor(editor);
 	});
 
-	describe('Constructor', () => {
-		it('should initialize with _listCamel and _listKebab', () => {
-			expect(inline._listCamel).toBeDefined();
-			expect(inline._listKebab).toBeDefined();
-			expect(Array.isArray(inline._listCamel)).toBe(true);
-			expect(Array.isArray(inline._listKebab)).toBe(true);
-		});
-	});
-
 	describe('apply - basic functionality', () => {
 		it('should apply an inline element to the current selection', () => {
 			wysiwyg.innerHTML = '<p>Test content</p>';
@@ -265,7 +256,7 @@ describe('Inline Class', () => {
 			const result = inline.apply(null, {
 				nodesToRemove: ['span'],
 				stylesToModify: ['color'],
-				strictRemove: true
+				strictRemove: true,
 			});
 
 			expect(result).toBeDefined();
@@ -471,288 +462,33 @@ describe('Inline Class', () => {
 		});
 	});
 
-	describe('_sn_isSizeNode', () => {
-		it('should return true for element with font-size', () => {
-			const span = document.createElement('span');
-			span.style.fontSize = '16px';
-			expect(inline._sn_isSizeNode(span)).toBe(true);
-		});
-
-		it('should return false for element without font-size', () => {
-			const span = document.createElement('span');
-			expect(inline._sn_isSizeNode(span)).toBe(false);
-		});
-
-		it('should return false for text node', () => {
-			const textNode = document.createTextNode('text');
-			expect(inline._sn_isSizeNode(textNode)).toBe(false);
-		});
-
-		it('should return false for string', () => {
-			expect(inline._sn_isSizeNode('span')).toBe(false);
-		});
-
-		it('should handle null input', () => {
-			const result = inline._sn_isSizeNode(null);
-			expect(result === false || result === null).toBe(true);
-		});
-	});
-
-	describe('_sn_getMaintainedNode', () => {
-		it('should return null when isRemove is true', () => {
-			const span = document.createElement('span');
-			const result = inline._sn_getMaintainedNode(true, false, span);
-			expect(result).toBeNull();
-		});
-
-		it('should return anchor parent for child of anchor', () => {
-			const a = document.createElement('a');
-			const span = document.createElement('span');
-			a.appendChild(span);
-			document.body.appendChild(a);
-
-			const result = inline._sn_getMaintainedNode(false, false, span);
-			expect(result).toBe(a);
-
-			document.body.removeChild(a);
-		});
-
-		it('should return size node parent when not isSizeNode', () => {
-			const sizeSpan = document.createElement('span');
-			sizeSpan.style.fontSize = '16px';
-			const innerSpan = document.createElement('span');
-			sizeSpan.appendChild(innerSpan);
-			document.body.appendChild(sizeSpan);
-
-			const result = inline._sn_getMaintainedNode(false, false, innerSpan);
-			expect(result).toBe(sizeSpan);
-
-			document.body.removeChild(sizeSpan);
-		});
-
-		it('should return null for null element', () => {
-			const result = inline._sn_getMaintainedNode(false, false, null);
-			expect(result).toBeNull();
-		});
-
-		it('should return null when isSizeNode is true and parent is size node', () => {
-			const sizeSpan = document.createElement('span');
-			sizeSpan.style.fontSize = '16px';
-			const innerSpan = document.createElement('span');
-			sizeSpan.appendChild(innerSpan);
-			document.body.appendChild(sizeSpan);
-
-			const result = inline._sn_getMaintainedNode(false, true, innerSpan);
-			expect(result).toBeNull();
-
-			document.body.removeChild(sizeSpan);
-		});
-	});
-
-	describe('_sn_isMaintainedNode', () => {
-		it('should return false when isRemove is true', () => {
-			const span = document.createElement('span');
-			expect(inline._sn_isMaintainedNode(true, false, span)).toBe(false);
-		});
-
-		it('should return true for anchor tag', () => {
-			const a = document.createElement('a');
-			expect(inline._sn_isMaintainedNode(false, false, a)).toBe(true);
-		});
-
-		it('should return true for size node when not isSizeNode param', () => {
-			const span = document.createElement('span');
-			span.style.fontSize = '16px';
-			expect(inline._sn_isMaintainedNode(false, false, span)).toBe(true);
-		});
-
-		it('should return false for size node when isSizeNode param is true', () => {
-			const span = document.createElement('span');
-			span.style.fontSize = '16px';
-			expect(inline._sn_isMaintainedNode(false, true, span)).toBe(false);
-		});
-
-		it('should return false for text node', () => {
-			const textNode = document.createTextNode('text');
-			expect(inline._sn_isMaintainedNode(false, false, textNode)).toBe(false);
-		});
-
-		it('should return false for null', () => {
-			expect(inline._sn_isMaintainedNode(false, false, null)).toBe(false);
-		});
-
-		it('should return true for label tag', () => {
-			const label = document.createElement('label');
-			expect(inline._sn_isMaintainedNode(false, false, label)).toBe(true);
-		});
-	});
-
-	describe('_sn_setCommonListStyle', () => {
-		it('should not process non-list cells', () => {
-			const div = document.createElement('div');
-			expect(() => {
-				inline._sn_setCommonListStyle(div, null);
-			}).not.toThrow();
-		});
-
-		it('should apply bold style to list cell from strong child', () => {
-			const li = document.createElement('li');
-			const strong = document.createElement('strong');
-			strong.textContent = 'text';
-			li.appendChild(strong);
-
-			inline._sn_setCommonListStyle(li, null);
-
-			expect(li.style.fontWeight).toBe('bold');
-		});
-
-		it('should apply italic style to list cell from em child', () => {
-			const li = document.createElement('li');
-			const em = document.createElement('em');
-			em.textContent = 'text';
-			li.appendChild(em);
-
-			inline._sn_setCommonListStyle(li, null);
-
-			expect(li.style.fontStyle).toBe('italic');
-		});
-
-		it('should apply color from child to list cell', () => {
-			const li = document.createElement('li');
-			const span = document.createElement('span');
-			span.style.color = 'red';
-			span.textContent = 'text';
-			li.appendChild(span);
-
-			inline._sn_setCommonListStyle(li, null);
-
-			expect(li.style.color).toBe('red');
-		});
-
-		it('should not process list cell with multiple children', () => {
-			const li = document.createElement('li');
-			const span1 = document.createElement('span');
-			const span2 = document.createElement('span');
-			span1.textContent = 'text1';
-			span2.textContent = 'text2';
-			li.appendChild(span1);
-			li.appendChild(span2);
-
-			expect(() => {
-				inline._sn_setCommonListStyle(li, null);
-			}).not.toThrow();
-		});
-
-		it('should handle list cell with nested structure', () => {
-			const li = document.createElement('li');
-			const span = document.createElement('span');
-			span.style.fontSize = '16px';
-			const innerSpan = document.createElement('span');
-			innerSpan.textContent = 'text';
-			span.appendChild(innerSpan);
-			li.appendChild(span);
-
-			inline._sn_setCommonListStyle(li, null);
-
-			expect(li.style.fontSize).toBe('16px');
-		});
-
-		it('should remove style from child after applying to parent', () => {
-			const li = document.createElement('li');
-			const span = document.createElement('span');
-			span.style.color = 'blue';
-			span.textContent = 'text';
-			li.appendChild(span);
-
-			inline._sn_setCommonListStyle(li, null);
-
-			expect(li.style.color).toBe('blue');
-			expect(span.style.color).toBe('');
-		});
-	});
-
-	describe('_sn_resetCommonListCell', () => {
-		it('should return undefined for non-list cell', () => {
-			const div = document.createElement('div');
-			const result = inline._sn_resetCommonListCell(div, null);
-			expect(result).toBeUndefined();
-		});
-
-		it('should return undefined when no styles to reset', () => {
-			const li = document.createElement('li');
-			li.textContent = 'plain text';
-			const result = inline._sn_resetCommonListCell(li, null);
-			expect(result).toBeUndefined();
-		});
-
-		it('should reset color style in list cell', () => {
-			const li = document.createElement('li');
-			li.style.color = 'red';
-			const span = document.createElement('span');
-			span.textContent = 'text';
-			li.appendChild(span);
-
-			const result = inline._sn_resetCommonListCell(li, ['color']);
-
-			expect(result).toBe(true);
-		});
-
-		it('should reset font-size style in list cell', () => {
-			const li = document.createElement('li');
-			li.style.fontSize = '16px';
-			const span = document.createElement('span');
-			span.textContent = 'text';
-			li.appendChild(span);
-
-			const result = inline._sn_resetCommonListCell(li, ['font-size']);
-
-			expect(result).toBe(true);
-		});
-
-		it('should handle list cell with multiple styles', () => {
-			const li = document.createElement('li');
-			li.style.color = 'red';
-			li.style.fontSize = '16px';
-			const span = document.createElement('span');
-			span.textContent = 'text';
-			li.appendChild(span);
-
-			const result = inline._sn_resetCommonListCell(li, ['color', 'font-size']);
-
-			expect(result).toBe(true);
-		});
-
-		it('should handle list cell with mixed child styles', () => {
-			const li = document.createElement('li');
-			li.style.color = 'red';
-			const span1 = document.createElement('span');
-			span1.style.fontSize = '14px';
-			span1.textContent = 'text1';
-			const span2 = document.createElement('span');
-			span2.style.fontSize = '16px';
-			span2.textContent = 'text2';
-			li.appendChild(span1);
-			li.appendChild(span2);
-
-			const result = inline._sn_resetCommonListCell(li, ['color']);
-
-			expect(typeof result).toBe('boolean');
-		});
-
-		it('should remove style attribute if empty after reset', () => {
-			const li = document.createElement('li');
-			li.style.color = 'red';
-			const span = document.createElement('span');
-			span.textContent = 'text';
-			li.appendChild(span);
-
-			inline._sn_resetCommonListCell(li, ['color']);
-
-			expect(li.hasAttribute('style')).toBe(false);
-		});
-	});
-
 	describe('Complex integration scenarios', () => {
+		describe('list common style via apply', () => {
+			it('should lift bold style from child to list cell when applying within LI', () => {
+				wysiwyg.innerHTML = '<ul><li>item</li></ul>';
+				const li = wysiwyg.querySelector('li');
+			const textNode = li.firstChild;
+			editor.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
+
+			const strong = dom.utils.createElement('strong');
+			const result = inline.apply(strong);
+
+			expect(result).toBeDefined();
+		});
+
+			it('should clear list-level styles when removing styles via apply', () => {
+				wysiwyg.innerHTML = '<ul><li style="color: red; font-size: 16px;"><span>item</span></li></ul>';
+				const li = wysiwyg.querySelector('li');
+				const textNode = li.querySelector('span').firstChild;
+				editor.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
+
+				inline.apply(null, { stylesToModify: ['color', 'font-size'] });
+
+				expect(li.style.color).toBe('');
+				expect(li.style.fontSize).toBe('');
+			});
+		});
+
 		it('should handle formatting across paragraph and list', () => {
 			wysiwyg.innerHTML = '<p>paragraph text</p><ul><li>list item</li></ul>';
 			const pText = wysiwyg.querySelector('p').firstChild;
@@ -772,7 +508,7 @@ describe('Inline Class', () => {
 
 			const result = inline.apply(null, {
 				nodesToRemove: ['strong'],
-				stylesToModify: ['color']
+				stylesToModify: ['color'],
 			});
 
 			expect(result).toBeDefined();
@@ -912,14 +648,10 @@ describe('Inline Class', () => {
 			const p2 = wysiwyg.querySelectorAll('p')[1];
 
 			// Set range outside normal boundaries
-			try {
-				editor.selection.setRange(p1.firstChild, 0, p2.firstChild, 5);
-				const strong = dom.utils.createElement('strong');
-				const result = inline.apply(strong);
-				expect(result).toBeDefined();
-			} catch (e) {
-				expect(true).toBe(true);
-			}
+			editor.selection.setRange(p1.firstChild, 0, p2.firstChild, 5);
+			const strong = dom.utils.createElement('strong');
+			const result = inline.apply(strong);
+			expect(result).toBeDefined();
 		});
 
 		it('should handle validation removing nodes in oneLine', () => {
@@ -929,7 +661,7 @@ describe('Inline Class', () => {
 
 			const result = inline.apply(null, {
 				nodesToRemove: ['span'],
-				stylesToModify: ['color']
+				stylesToModify: ['color'],
 			});
 
 			expect(result).toBeDefined();
@@ -955,68 +687,6 @@ describe('Inline Class', () => {
 			const result = inline.apply(strong);
 
 			expect(result).toBeDefined();
-		});
-
-		it('should handle list cell style pull up with font-weight', () => {
-			const li = document.createElement('li');
-			const b = document.createElement('b');
-			b.textContent = 'bold';
-			li.appendChild(b);
-
-			inline._sn_setCommonListStyle(li, null);
-
-			expect(li.style.fontWeight).toBe('bold');
-		});
-
-		it('should handle list cell style pull up with font-style', () => {
-			const li = document.createElement('li');
-			const i = document.createElement('i');
-			i.textContent = 'italic';
-			li.appendChild(i);
-
-			inline._sn_setCommonListStyle(li, null);
-
-			expect(li.style.fontStyle).toBe('italic');
-		});
-
-		it('should handle recursive list cell style application', () => {
-			const li = document.createElement('li');
-			const outer = document.createElement('span');
-			outer.style.color = 'red';
-			const inner = document.createElement('span');
-			inner.style.fontSize = '16px';
-			inner.textContent = 'text';
-			outer.appendChild(inner);
-			li.appendChild(outer);
-
-			inline._sn_setCommonListStyle(li, null);
-
-			expect(li.style.color).toBe('red');
-			expect(li.style.fontSize).toBe('16px');
-		});
-
-		it('should handle list cell reset with no matching styles', () => {
-			const li = document.createElement('li');
-			li.style.backgroundColor = 'yellow';
-			const span = document.createElement('span');
-			span.textContent = 'text';
-			li.appendChild(span);
-
-			const result = inline._sn_resetCommonListCell(li, ['color', 'font-size']);
-
-			expect(result).toBeUndefined();
-		});
-
-		it('should handle list cell reset with default tag map', () => {
-			const li = document.createElement('li');
-			li.style.color = 'red';
-			const strong = document.createElement('strong');
-			strong.textContent = 'text';
-			li.appendChild(strong);
-
-			const result = inline._sn_resetCommonListCell(li, ['color']);
-
-			expect(typeof result).toBe('boolean');
 		});
 
 		it('should handle apply with same tag name parent optimization', () => {
@@ -1106,7 +776,7 @@ describe('Inline Class', () => {
 			editor.selection.setRange(textNode, 0, textNode, 4);
 
 			const result = inline.apply(null, {
-				nodesToRemove: ['strong']
+				nodesToRemove: ['strong'],
 			});
 
 			expect(wysiwyg.querySelector('strong')).toBeFalsy();
@@ -1120,7 +790,7 @@ describe('Inline Class', () => {
 
 			const u = dom.utils.createElement('u');
 			const result = inline.apply(u, {
-				nodesToRemove: ['strong']
+				nodesToRemove: ['strong'],
 			});
 
 			expect(wysiwyg.querySelector('strong')).toBeFalsy();
@@ -1504,7 +1174,7 @@ describe('Inline Class', () => {
 
 			const em = dom.utils.createElement('em');
 			const result = inline.apply(em, {
-				nodesToRemove: ['strong', 'u']
+				nodesToRemove: ['strong', 'u'],
 			});
 
 			expect(result).toBeDefined();
@@ -1518,7 +1188,7 @@ describe('Inline Class', () => {
 
 			const u = dom.utils.createElement('u');
 			const result = inline.apply(u, {
-				nodesToRemove: ['strong', 'em']
+				nodesToRemove: ['strong', 'em'],
 			});
 
 			expect(result).toBeDefined();
@@ -1584,7 +1254,7 @@ describe('Inline Class', () => {
 			span.className = 'test';
 			const result = inline.apply(span, {
 				stylesToModify: ['color'],
-				nodesToRemove: ['span']
+				nodesToRemove: ['span'],
 			});
 
 			expect(result).toBeDefined();
@@ -1596,7 +1266,7 @@ describe('Inline Class', () => {
 			editor.selection.setRange(text, 0, text, 4);
 
 			const result = inline.apply(null, {
-				nodesToRemove: ['span']
+				nodesToRemove: ['span'],
 			});
 
 			expect(result).toBeDefined();
@@ -1610,7 +1280,7 @@ describe('Inline Class', () => {
 			const span = dom.utils.createElement('span');
 			span.className = 'different';
 			const result = inline.apply(span, {
-				stylesToModify: ['highlight']
+				stylesToModify: ['highlight'],
 			});
 
 			expect(result).toBeDefined();
@@ -1624,7 +1294,7 @@ describe('Inline Class', () => {
 			const span = dom.utils.createElement('span');
 			span.style.fontWeight = 'normal';
 			const result = inline.apply(span, {
-				stylesToModify: ['font-weight']
+				stylesToModify: ['font-weight'],
 			});
 
 			expect(result).toBeDefined();
@@ -1809,7 +1479,7 @@ describe('Inline Class', () => {
 			const span = dom.utils.createElement('span');
 			span.style.color = 'red';
 			const result = inline.apply(span, {
-				stylesToModify: ['color']
+				stylesToModify: ['color'],
 			});
 
 			expect(result).toBeDefined();
@@ -1823,7 +1493,7 @@ describe('Inline Class', () => {
 			const span = dom.utils.createElement('span');
 			span.style.fontWeight = 'bold';
 			const result = inline.apply(span, {
-				nodesToRemove: ['span']
+				nodesToRemove: ['span'],
 			});
 
 			expect(result).toBeDefined();
@@ -1945,7 +1615,7 @@ describe('Inline Class', () => {
 
 			const strong = dom.utils.createElement('strong');
 			const result = inline.apply(strong, {
-				stylesToModify: ['color']
+				stylesToModify: ['color'],
 			});
 
 			expect(result).toBeDefined();

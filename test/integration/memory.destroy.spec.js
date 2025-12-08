@@ -19,7 +19,7 @@ describe('Editor destroy() memory management', () => {
 			element: container,
 			buttonList: [['undo', 'redo', 'bold', 'italic']],
 			width: '100%',
-			height: 'auto'
+			height: 'auto',
 		});
 		await waitForEditorReady(editor);
 	});
@@ -130,7 +130,6 @@ describe('Editor destroy() memory management', () => {
 
 			// Objects should be nullified
 			expect(editor._fileManager).toBeNull();
-			expect(editor._originOptions).toBeNull();
 			expect(editor.activeCommands).toBeNull();
 			expect(editor.rootKeys).toBeNull();
 		});

@@ -206,8 +206,8 @@
 	padding: var(--se-edit-inner-padding-doc-type);
 }
 .sun-editor .se-wrapper.se-type-document.se-type-document-header .se-placeholder {
-	padding-left: var(--se-doc-info-width);
-	padding-right: var(--se-doc-info-width);
+	margin-left: max(var(--se-doc-info-min-width), var(--se-doc-info-width));
+	margin-right: max(var(--se-doc-info-min-width), var(--se-doc-info-width));
 }
 /** --- se-type-document end ---------------------------------------------------------- */
 

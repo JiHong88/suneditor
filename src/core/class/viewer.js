@@ -8,58 +8,70 @@ import { dom, env, converter, numbers } from '../../helper';
 const { _w, _d } = env;
 
 /**
- * @typedef {Omit<Viewer & Partial<SunEditor.Injector_Core>, 'viewer'>} ViewerThis
- */
-
-/**
- * @constructor
- * @this {ViewerThis}
  * @description Viewer(codeView, fullScreen, showBlocks) class
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function Viewer(editor) {
-	CoreInjector.call(this, editor);
-
-	// members
-	this.bodyOverflow = '';
-	this.editorAreaOriginCssText = '';
-	this.wysiwygOriginCssText = '';
-	this.codeWrapperOriginCssText = '';
-	this.codeOriginCssText = '';
-	this.codeNumberOriginCssText = '';
-	this.toolbarOriginCssText = '';
-	this.arrowOriginCssText = '';
-	this.fullScreenInnerHeight = 0;
-	this.fullScreenSticky = false;
-	this.fullScreenBalloon = false;
-	this.fullScreenInline = false;
-	this.toolbarParent = null;
-}
-
-Viewer.prototype = {
-	/** @internal @type {SunEditor.Core['ui']} */
-	get ui() {
-		return this.editor.ui;
-	},
-	/** @internal @type {SunEditor.Core['toolbar']} */
-	get toolbar() {
-		return this.editor.toolbar;
-	},
-	/** @internal @type {SunEditor.Core['subToolbar']} */
-	get subToolbar() {
-		return this.editor.subToolbar;
-	},
-	/** @internal @type {SunEditor.Core['html']} */
-	get html() {
-		return this.editor.html;
-	},
-	/** @internal @type {SunEditor.Core['menu']} */
-	get menu() {
-		return this.editor.menu;
-	},
+class Viewer extends CoreInjector {
+	#bodyOverflow;
+	#editorAreaOriginCssText;
+	#wysiwygOriginCssText;
+	#codeWrapperOriginCssText;
+	#codeOriginCssText;
+	#codeNumberOriginCssText;
+	#toolbarOriginCssText;
+	#arrowOriginCssText;
+	#fullScreenInnerHeight;
+	#fullScreenSticky;
+	#fullScreenBalloon;
+	#fullScreenInline;
+	#toolbarParent;
+	#disallowedTagNameRegExp;
 
 	/**
-	 * @this {ViewerThis}
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+
+		// members
+		this.#bodyOverflow = '';
+		this.#editorAreaOriginCssText = '';
+		this.#wysiwygOriginCssText = '';
+		this.#codeWrapperOriginCssText = '';
+		this.#codeOriginCssText = '';
+		this.#codeNumberOriginCssText = '';
+		this.#toolbarOriginCssText = '';
+		this.#arrowOriginCssText = '';
+		this.#fullScreenInnerHeight = 0;
+		this.#fullScreenSticky = false;
+		this.#fullScreenBalloon = false;
+		this.#fullScreenInline = false;
+		this.#toolbarParent = null;
+		this.#disallowedTagNameRegExp = new RegExp(`^(${this.options.get('_disallowedExtraTag')})$`, 'i');
+	}
+
+	/** @type {SunEditor.Core['ui']} */
+	get #ui() {
+		return this.editor.ui;
+	}
+	/** @type {SunEditor.Core['toolbar']} */
+	get #toolbar() {
+		return this.editor.toolbar;
+	}
+	/** @type {SunEditor.Core['subToolbar']} */
+	get #subToolbar() {
+		return this.editor.subToolbar;
+	}
+	/** @type {SunEditor.Core['html']} */
+	get #html() {
+		return this.editor.html;
+	}
+	/** @type {SunEditor.Core['menu']} */
+	get #menu() {
+		return this.editor.menu;
+	}
+
+	/**
 	 * @description Changes to code view or wysiwyg view
 	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
@@ -69,8 +81,8 @@ Viewer.prototype = {
 		if (value === fc.get('isCodeView')) return;
 
 		fc.set('isCodeView', value);
-		this.ui._offCurrentController();
-		this.ui._offCurrentModal();
+		this.#ui.offCurrentController();
+		this.#ui.offCurrentModal();
 
 		const codeWrapper = fc.get('codeWrapper');
 		const codeFrame = fc.get('code');
@@ -78,7 +90,7 @@ Viewer.prototype = {
 		const wrapper = fc.get('wrapper');
 
 		if (value) {
-			this._setEditorDataToCodeView();
+			this.#setEditorDataToCodeView();
 			codeWrapper.style.setProperty('display', 'flex', 'important');
 			wysiwygFrame.style.display = 'none';
 
@@ -97,14 +109,14 @@ Viewer.prototype = {
 				if (this.editor.isBalloon) {
 					this.context.get('toolbar_arrow').style.display = 'none';
 					this.context.get('toolbar_main').style.left = '';
-					this.editor.isInline = this.toolbar._isInline = true;
-					this.editor.isBalloon = this.toolbar._isBalloon = false;
-					this.toolbar._showInline();
+					this.editor.isInline = this.#toolbar.isInlineMode = true;
+					this.editor.isBalloon = this.#toolbar.isBalloonMode = false;
+					this.#toolbar._showInline();
 				}
 			}
 
 			if (this.editor.isSubBalloon) {
-				this.subToolbar.hide();
+				this.#subToolbar.hide();
 			}
 
 			CreateLineNumbers(fc);
@@ -114,7 +126,7 @@ Viewer.prototype = {
 			dom.utils.addClass(this.editor.commandTargets.get('codeView'), 'active');
 			dom.utils.addClass(wrapper, 'se-code-view-status');
 		} else {
-			if (!dom.check.isNonEditable(wysiwygFrame)) this._setCodeDataToEditor();
+			if (!dom.check.isNonEditable(wysiwygFrame)) this.#setCodeDataToEditor();
 			wysiwygFrame.scrollTop = 0;
 			codeWrapper.style.setProperty('display', 'none', 'important');
 			wysiwygFrame.style.display = 'block';
@@ -125,8 +137,8 @@ Viewer.prototype = {
 				this.editor._notHideToolbar = false;
 				if (/balloon/.test(this.options.get('mode'))) {
 					this.context.get('toolbar_arrow').style.display = '';
-					this.editor.isInline = this.toolbar._isInline = false;
-					this.editor.isBalloon = this.toolbar._isBalloon = true;
+					this.editor.isInline = this.#toolbar.isInlineMode = false;
+					this.editor.isBalloon = this.#toolbar.isBalloonMode = true;
 					this.eventManager._hideToolbar();
 				}
 			}
@@ -156,10 +168,9 @@ Viewer.prototype = {
 
 		// user event
 		this.triggerEvent('onToggleCodeView', { frameContext: fc, is: fc.get('isCodeView') });
-	},
+	}
 
 	/**
-	 * @this {ViewerThis}
 	 * @description Changes to full screen or default screen
 	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
@@ -179,29 +190,29 @@ Viewer.prototype = {
 		const isCodeView = this.frameContext.get('isCodeView');
 		const arrow = this.context.get('toolbar_arrow');
 
-		this.ui._offCurrentController();
-		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar._inlineToolbarAttr.isShow);
+		this.#ui.offCurrentController();
+		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.#toolbar.inlineToolbarAttr.isShow);
 
 		if (value) {
 			this._originCssText = topArea.style.cssText;
-			this.editorAreaOriginCssText = editorArea.style.cssText;
-			this.wysiwygOriginCssText = wysiwygFrame.style.cssText;
-			this.codeWrapperOriginCssText = codeWrapper.style.cssText;
-			this.codeOriginCssText = code.style.cssText;
-			this.codeNumberOriginCssText = codeNumbers?.style.cssText;
-			this.toolbarOriginCssText = toolbar.style.cssText;
-			if (arrow) this.arrowOriginCssText = arrow.style.cssText;
+			this.#editorAreaOriginCssText = editorArea.style.cssText;
+			this.#wysiwygOriginCssText = wysiwygFrame.style.cssText;
+			this.#codeWrapperOriginCssText = codeWrapper.style.cssText;
+			this.#codeOriginCssText = code.style.cssText;
+			this.#codeNumberOriginCssText = codeNumbers?.style.cssText;
+			this.#toolbarOriginCssText = toolbar.style.cssText;
+			if (arrow) this.#arrowOriginCssText = arrow.style.cssText;
 
 			if (this.editor.isBalloon || this.editor.isInline) {
 				if (arrow) arrow.style.display = 'none';
-				this.fullScreenInline = this.editor.isInline;
-				this.fullScreenBalloon = this.editor.isBalloon;
-				this.editor.isInline = this.toolbar._isInline = false;
-				this.editor.isBalloon = this.toolbar._isBalloon = false;
+				this.#fullScreenInline = this.editor.isInline;
+				this.#fullScreenBalloon = this.editor.isBalloon;
+				this.editor.isInline = this.#toolbar.isInlineMode = false;
+				this.editor.isBalloon = this.#toolbar.isBalloonMode = false;
 			}
 
 			if (this.options.get('toolbar_container')) {
-				this.toolbarParent = toolbar.parentElement;
+				this.#toolbarParent = toolbar.parentElement;
 				fc.get('container').insertBefore(toolbar, editorArea);
 			}
 
@@ -214,12 +225,12 @@ Viewer.prototype = {
 			topArea.style.zIndex = '2147483639';
 
 			if (fc.get('_stickyDummy').style.display !== 'none' && fc.get('_stickyDummy').style.display !== '') {
-				this.fullScreenSticky = true;
+				this.#fullScreenSticky = true;
 				fc.get('_stickyDummy').style.display = 'none';
 				dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			this.bodyOverflow = _d.body.style.overflow;
+			this.#bodyOverflow = _d.body.style.overflow;
 			_d.body.style.overflow = 'hidden';
 
 			// frame
@@ -239,8 +250,8 @@ Viewer.prototype = {
 			toolbar.style.position = 'relative';
 			toolbar.style.display = 'block';
 
-			this.fullScreenInnerHeight = _w.innerHeight - toolbar.offsetHeight;
-			editorArea.style.height = this.fullScreenInnerHeight - (fc.has('statusbar') ? fc.get('statusbar').offsetHeight : 0) - this.options.get('fullScreenOffset') + 'px';
+			this.#fullScreenInnerHeight = _w.innerHeight - toolbar.offsetHeight;
+			editorArea.style.height = this.#fullScreenInnerHeight - (fc.has('statusbar') ? fc.get('statusbar').offsetHeight : 0) - this.options.get('fullScreenOffset') + 'px';
 
 			if (this.frameOptions.get('iframe') && this.frameOptions.get('height') === 'auto') {
 				editorArea.style.overflow = 'auto';
@@ -256,47 +267,47 @@ Viewer.prototype = {
 			});
 		} else {
 			// frame
-			wysiwygFrame.style.cssText = this.wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView ? 'display: none;' : '');
+			wysiwygFrame.style.cssText = this.#wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView ? 'display: none;' : '');
 
 			// code wrapper
-			codeWrapper.style.cssText = this.codeWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
+			codeWrapper.style.cssText = this.#codeWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
 
 			// code
-			code.style.cssText = this.codeOriginCssText;
-			if (codeNumbers) codeNumbers.style.cssText = this.codeNumberOriginCssText;
+			code.style.cssText = this.#codeOriginCssText;
+			if (codeNumbers) codeNumbers.style.cssText = this.#codeNumberOriginCssText;
 
 			// toolbar, editor area
-			toolbar.style.cssText = this.toolbarOriginCssText;
-			editorArea.style.cssText = this.editorAreaOriginCssText;
+			toolbar.style.cssText = this.#toolbarOriginCssText;
+			editorArea.style.cssText = this.#editorAreaOriginCssText;
 			topArea.style.cssText = this._originCssText;
-			if (arrow) arrow.style.cssText = this.arrowOriginCssText;
-			_d.body.style.overflow = this.bodyOverflow;
+			if (arrow) arrow.style.cssText = this.#arrowOriginCssText;
+			_d.body.style.overflow = this.#bodyOverflow;
 
 			if (this.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight(fc.get('code'), fc.get('codeNumbers'), true);
 
-			if (this.toolbarParent) {
-				this.toolbarParent.appendChild(toolbar);
-				this.toolbarParent = null;
+			if (this.#toolbarParent) {
+				this.#toolbarParent.appendChild(toolbar);
+				this.#toolbarParent = null;
 			}
 
 			if (this.options.get('toolbar_sticky') > -1) {
 				dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			if (this.fullScreenSticky && !this.options.get('toolbar_container')) {
-				this.fullScreenSticky = false;
+			if (this.#fullScreenSticky && !this.options.get('toolbar_container')) {
+				this.#fullScreenSticky = false;
 				fc.get('_stickyDummy').style.display = 'block';
 				dom.utils.addClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			this.editor.isInline = this.toolbar._isInline = this.fullScreenInline;
-			this.editor.isBalloon = this.toolbar._isBalloon = this.fullScreenBalloon;
+			this.editor.isInline = this.#toolbar.isInlineMode = this.#fullScreenInline;
+			this.editor.isBalloon = this.#toolbar.isBalloonMode = this.#fullScreenBalloon;
 			if (!fc.get('isCodeView')) {
-				if (this.editor.isInline) this.toolbar._showInline();
-				else if (this.editor.isBalloon) this.toolbar._showBalloon();
+				if (this.editor.isInline) this.#toolbar._showInline();
+				else if (this.editor.isBalloon) this.#toolbar._showBalloon();
 			}
 
-			this.toolbar._resetSticky();
+			this.#toolbar._resetSticky();
 			fc.get('topArea').style.marginTop = '';
 
 			const expansionIcon = this.icons.expansion;
@@ -306,14 +317,13 @@ Viewer.prototype = {
 			});
 		}
 
-		if (wasToolbarHidden && !fc.get('isCodeView')) this.toolbar.hide();
+		if (wasToolbarHidden && !fc.get('isCodeView')) this.#toolbar.hide();
 
 		// user event
 		this.triggerEvent('onToggleFullScreen', { frameContext: fc, is: fc.get('isFullScreen') });
-	},
+	}
 
 	/**
-	 * @this {ViewerThis}
 	 * @description Add or remove the class name of "body" so that the code block is visible
 	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
@@ -331,11 +341,10 @@ Viewer.prototype = {
 		}
 
 		this.editor._resourcesStateChange(fc);
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ViewerThis}
 	 * @description Set the active class to the button of the toolbar
 	 */
 	_setButtonsActive() {
@@ -369,10 +378,9 @@ Viewer.prototype = {
 		} else {
 			dom.utils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		}
-	},
+	}
 
 	/**
-	 * @this {ViewerThis}
 	 * @description Prints the current content of the editor.
 	 * @throws {Error} Throws error if print operation fails.
 	 */
@@ -382,7 +390,7 @@ Viewer.prototype = {
 		_d.body.appendChild(iframe);
 
 		const innerPadding = _w.getComputedStyle(this.frameContext.get('wysiwyg')).padding;
-		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get()) : this.html.get();
+		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.#html.get()) : this.#html.get();
 		const printDocument = dom.query.getIframeDocument(iframe);
 		const wDoc = this.frameContext.get('_wd');
 		const rtlClass = this.options.get('_rtl') ? ' se-rtl' : '';
@@ -436,7 +444,7 @@ Viewer.prototype = {
 				</html>`);
 		}
 
-		this.ui.showLoading();
+		this.#ui.showLoading();
 		_w.setTimeout(() => {
 			try {
 				iframe.focus();
@@ -455,23 +463,22 @@ Viewer.prototype = {
 			} catch (error) {
 				throw Error(`[SUNEDITOR.print.fail] error: ${error.message}`);
 			} finally {
-				this.ui.hideLoading();
+				this.#ui.hideLoading();
 				dom.utils.removeItem(iframe);
 			}
 		}, 1000);
-	},
+	}
 
 	/**
-	 * @this {ViewerThis}
 	 * @description Open the preview window.
 	 */
 	preview() {
-		this.menu.dropdownOff();
-		this.menu.containerOff();
-		this.ui._offCurrentController();
-		this.ui._offCurrentModal();
+		this.#menu.dropdownOff();
+		this.#menu.containerOff();
+		this.#ui.offCurrentController();
+		this.#ui.offCurrentModal();
 
-		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.html.get({ withFrame: true })) : this.html.get({ withFrame: true });
+		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*contents\s*\}\}/i, this.#html.get({ withFrame: true })) : this.#html.get({ withFrame: true });
 		const windowObject = _w.open('', '_blank');
 		const wDoc = this.frameContext.get('_wd');
 		const rtlClass = this.options.get('_rtl') ? ' se-rtl' : '';
@@ -519,25 +526,23 @@ Viewer.prototype = {
 					</body>
 				</html>`);
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ViewerThis}
 	 * @description Resets the full-screen height of the editor.
 	 * - Updates the editor's height dynamically when in full-screen mode.
 	 */
 	_resetFullScreenHeight() {
 		if (this.frameContext.get('isFullScreen')) {
-			this.fullScreenInnerHeight += _w.innerHeight - this.context.get('toolbar_main').offsetHeight - (this.frameContext.has('statusbar') ? this.frameContext.get('statusbar').offsetHeight : 0) - this.fullScreenInnerHeight;
-			this.frameContext.get('wrapper').style.height = this.fullScreenInnerHeight + 'px';
+			this.#fullScreenInnerHeight += _w.innerHeight - this.context.get('toolbar_main').offsetHeight - (this.frameContext.has('statusbar') ? this.frameContext.get('statusbar').offsetHeight : 0) - this.#fullScreenInnerHeight;
+			this.frameContext.get('wrapper').style.height = this.#fullScreenInnerHeight + 'px';
 			return true;
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ViewerThis}
 	 * @description Run CodeMirror Editor
 	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
 	 * @param {*} value CodeMirror params
@@ -576,11 +581,10 @@ Viewer.prototype = {
 				}
 				break;
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ViewerThis}
 	 * @description Set method in the code view area
 	 * @param {string} value HTML string
 	 */
@@ -590,11 +594,10 @@ Viewer.prototype = {
 		} else {
 			this.frameContext.get('code').value = value;
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ViewerThis}
 	 * @description Get method in the code view area
 	 */
 	_getCodeView() {
@@ -603,21 +606,44 @@ Viewer.prototype = {
 		} else {
 			return this.frameContext.get('code').value;
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ViewerThis}
+	 * @description Adjusts the height of the code view area.
+	 * - Ensures the code block auto-resizes based on its content.
+	 * @param {HTMLElement} code - Code area
+	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers area
+	 * @param {boolean} isAuto - Auto height option
+	 */
+	_codeViewAutoHeight(code, codeNumbers, isAuto) {
+		if (isAuto) code.style.height = code.scrollHeight + 'px';
+		this.#updateLineNumbers(codeNumbers, code);
+	}
+
+	/**
+	 * @internal
+	 * @this {HTMLElement} Code numbers area
+	 * @description Synchronizes scrolling of line numbers with the code editor.
+	 * - Keeps the line numbers aligned with the text.
+	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers textarea
+	 */
+	_scrollLineNumbers(codeNumbers) {
+		codeNumbers.scrollTop = this.scrollTop;
+		codeNumbers.scrollLeft = this.scrollLeft;
+	}
+
+	/**
 	 * @description Convert the data of the code view and put it in the WYSIWYG area.
 	 */
-	_setCodeDataToEditor() {
+	#setCodeDataToEditor() {
 		const code_html = this._getCodeView();
 
 		if (this.frameOptions.get('iframe_fullPage')) {
 			const wDoc = this.frameContext.get('_wd');
 			const parseDocument = new DOMParser().parseFromString(code_html, 'text/html');
 
-			if (!this.html.__disallowedTagNameRegExp.test('script')) {
+			if (!this.#disallowedTagNameRegExp.test('script')) {
 				const headChildren = parseDocument.head.children;
 				for (let i = 0, len = headChildren.length; i < len; i++) {
 					if (/^script$/i.test(headChildren[i].tagName)) {
@@ -634,7 +660,7 @@ Viewer.prototype = {
 			}
 
 			wDoc.head.innerHTML = headers;
-			wDoc.body.innerHTML = this.html.clean(parseDocument.body.innerHTML, { forceFormat: true, whitelist: null, blacklist: null, _freeCodeViewMode: this.options.get('freeCodeViewMode') });
+			wDoc.body.innerHTML = this.#html.clean(parseDocument.body.innerHTML, { forceFormat: true, whitelist: null, blacklist: null, _freeCodeViewMode: this.options.get('freeCodeViewMode') });
 
 			const attrs = parseDocument.body.attributes;
 			for (let i = 0, len = attrs.length; i < len; i++) {
@@ -650,18 +676,16 @@ Viewer.prototype = {
 		} else {
 			this.frameContext.get('wysiwyg').innerHTML =
 				code_html.length > 0
-					? this.html.clean(code_html, { forceFormat: true, whitelist: null, blacklist: null, _freeCodeViewMode: this.options.get('freeCodeViewMode') })
+					? this.#html.clean(code_html, { forceFormat: true, whitelist: null, blacklist: null, _freeCodeViewMode: this.options.get('freeCodeViewMode') })
 					: '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 		}
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {ViewerThis}
 	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
 	 */
-	_setEditorDataToCodeView() {
-		const codeContent = this.html._convertToCode(this.frameContext.get('wysiwyg'), false);
+	#setEditorDataToCodeView() {
+		const codeContent = this.#html._convertToCode(this.frameContext.get('wysiwyg'), false);
 		let codeValue = '';
 
 		if (this.frameOptions.get('iframe_fullPage')) {
@@ -672,31 +696,15 @@ Viewer.prototype = {
 		}
 
 		this._setCodeView(codeValue);
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {ViewerThis}
-	 * @description Adjusts the height of the code view area.
-	 * - Ensures the code block auto-resizes based on its content.
-	 * @param {HTMLElement} code - Code area
-	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers area
-	 * @param {boolean} isAuto - Auto height option
-	 */
-	_codeViewAutoHeight(code, codeNumbers, isAuto) {
-		if (isAuto) code.style.height = code.scrollHeight + 'px';
-		this._updateLineNumbers(codeNumbers, code);
-	},
-
-	/**
-	 * @internal
-	 * @this {ViewerThis}
 	 * @description Updates the line numbers for the code editor.
 	 * - Dynamically adjusts line numbers as content grows.
 	 * @param {HTMLTextAreaElement} lineNumbers - Code numbers area
 	 * @param {HTMLElement} code - Code area
 	 */
-	_updateLineNumbers(lineNumbers, code) {
+	#updateLineNumbers(lineNumbers, code) {
 		if (!lineNumbers) return;
 
 		const lineHeight = GetLineHeight(lineNumbers);
@@ -710,31 +718,16 @@ Viewer.prototype = {
 			}
 			lineNumbers.value += n;
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {HTMLElement} Code numbers area
-	 * @description Synchronizes scrolling of line numbers with the code editor.
-	 * - Keeps the line numbers aligned with the text.
-	 * @param {HTMLTextAreaElement} codeNumbers - Code numbers textarea
-	 */
-	_scrollLineNumbers(codeNumbers) {
-		codeNumbers.scrollTop = this.scrollTop;
-		codeNumbers.scrollLeft = this.scrollLeft;
-	},
-
-	/**
-	 * @internal
-	 * @this {ViewerThis}
 	 * @description Destroy the Viewer instance and release memory
 	 */
 	_destroy() {
 		// No internal state to clean up
-	},
-
-	constructor: Viewer,
-};
+	}
+}
 
 /**
  * @description Create line numbers for the code view area

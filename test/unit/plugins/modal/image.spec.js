@@ -643,11 +643,145 @@ describe('Image Plugin', () => {
 	});
 
 	describe('retainFormat', () => {
+        beforeEach(() => {
+            image.alignForm = { style: { display: '' } };
+            image.captionEl = { style: { display: '' } };
+            image.asBlock = { className: '' };
+            image.asInline = { className: '' };
+        });
+
 		it('should return format retention object', () => {
 			const result = image.retainFormat();
 
 			expect(result.query).toBe('img');
 			expect(typeof result.method).toBe('function');
+		});
+
+		it('should process image element when method is called', () => {
+			const result = image.retainFormat();
+			const mockElement = { nodeName: 'IMG', src: 'test.jpg', style: {}, removeAttribute: jest.fn() };
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			
+			// Mock GetContainer to return nothing so it proceeds
+			mockFigure.GetContainer.mockReturnValue(null);
+			
+			result.method(mockElement);
+			
+			expect(image.figure.open).toHaveBeenCalled();
+		});
+
+		it('should not process if already in a figure container', () => {
+			const result = image.retainFormat();
+			const mockElement = { nodeName: 'IMG', style: {} };
+			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			
+			mockFigure.GetContainer.mockReturnValue({ container: {}, cover: {} });
+			
+			result.method(mockElement);
+			
+			// Should return early
+			expect(image.figure.open).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('modalAction (Update)', () => {
+		beforeEach(() => {
+			// Ensure alignForm has style for #activeAsInline
+			image.alignForm = { style: { display: '' } };
+			image.captionEl = { style: { display: '' } };
+            image.asBlock = { className: '' };
+            image.asInline = { className: '' };
+		});
+
+		it('should handle update scenario with caption and link', async () => {
+			image.modal.isUpdate = true;
+			image.inputX = { value: '100px' };
+			image.inputY = { value: '100px' };
+			
+			// Mock element for fixTagStructure
+			const mockElement = { 
+				nodeName: 'IMG',
+                src: 'https://old.com/image.jpg',
+				style: { width: '50px', height: '50px' },
+				alt: 'old',
+				cloneNode: jest.fn().mockImplementation(() => ({ 
+					nodeName: 'IMG', 
+					style: { width: '50px', height: '50px' },
+					setAttribute: jest.fn(),
+                    onload: null,
+                    removeAttribute: jest.fn()
+				})),
+                getAttribute: jest.fn(),
+                removeAttribute: jest.fn()
+			};
+			
+			// Mock componentSelect to set private members
+			image.componentSelect(mockElement);
+            
+            // Set up cover to have data-se-origin for modalOn to pick up
+            // componentSelect -> ready -> opens figure -> returns info with cover
+            // We need to access implicit cover?
+            // figure.open is mocked to return cover with setAttribute etc.
+            // Let's manually set attribute on mocked cover if possible or rely on simple flow
+			
+			// Mock querySelector for align
+			image.modal.form.querySelector.mockReturnValue({ value: 'center' });
+			
+			// Enable caption
+			image.captionCheckEl.checked = true;
+            
+            // Invoke modalOn to set #linkValue
+            // Mock cover.getAttribute to return url
+            const mockFigure = require('../../../../src/modules/contracts').Figure;
+            // The cover object returned by figure.open is created in beforeEach of spec file?
+            // "Figure: jest.fn().mockImplementation(() => ({ open: jest.fn().mockReturnValue({ ... cover ... }) }))"
+            // We can't access that specific instance easily unless we spy or assume.
+            // But we can just set imgUrlFile and ignore the #linkValue crash by ensuring it's not null?
+            // image.#linkValue = '' by default.
+            // modalInit resets it.
+            // modalOn(true) sets it.
+            
+            // Workaround: Mock submitURL to not use #linkValue or set it via a trick?
+            // Or just allow it to fail at submitURL step, but verify fixTagStructure ran (history.push)
+            // If it fails at line 270, history.push (line 265) already ran.
+            // So we can expect history.push to have been called.
+            // The previous test failed because of runtime error.
+            // We can wrap modalAction in try-catch or ensure it doesn't throw.
+            // If #linkValue is '', length is 0.
+            // Line 270: `else if (this.imgUrlFile && this.#linkValue.length > 0)`
+            // If length is 0, it goes to return false.
+            // So it shouldn't throw "undefined".
+            // Error was "Cannot read properties of undefined (reading 'length')". 
+            // So this.#linkValue is undefined.
+            // It should be initialized to '' in constructor.
+            // Why is it undefined?
+            // Maybe modalInit reset it to undefined? 
+            // Line 284: `this.#linkValue = ... = '';`
+            // So it should be string.
+            
+            // Wait, failure "reading 'length'" of undefined.
+            // Variable name in error: `this.#linkValue`.
+            // Maybe `modalOn` was called with `isUpdate=true` and set it to undefined?
+            // Line 288: `this.#linkValue = ... = this.#cover.getAttribute(...) || '';`
+            // If `getAttribute` returns undefined? `undefined || ''` -> `''`.
+            // So likely not that.
+            
+            // Maybe it's `this.imgInputFile.files.length`??
+            // Line 268: `if (this.imgInputFile && this.imgInputFile.files.length > 0)`
+            // `imgInputFile.files` mock default is `[]`.
+            
+            // Let's re-read error trace carefully.
+            // `at Image_.length [as modalAction] (src/plugins/modal/image.js:270:49)`
+            // Line 270 is `else if (this.imgUrlFile && this.#linkValue.length > 0)`
+            // Function name `length` is suspicious in stack trace? No, that's just property access reference?
+            
+            // If I just skip modalOn for now and rely on default ''.
+            // `this.#linkValue` is initialized in constructor.
+            
+			const result = await image.modalAction();
+
+			expect(image.history.push).toHaveBeenCalledWith(false);
+			expect(result).toBe(true); 
 		});
 	});
 

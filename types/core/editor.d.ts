@@ -1,19 +1,8 @@
 import type {} from '../typedef';
 export default Editor;
 /**
- * @constructor
- * @description SunEditor constructor function.
- * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} multiTargets Target element
- * @param {SunEditor.InitOptions} options options
+ * @description SunEditor class.
  */
-declare function Editor(
-	multiTargets: Array<{
-		target: Element;
-		key: any;
-		options: SunEditor.InitFrameOptions;
-	}>,
-	options: SunEditor.InitOptions,
-): void;
 declare class Editor {
 	/**
 	 * @constructor
@@ -55,6 +44,7 @@ declare class Editor {
 	 */
 	carrierWrapper: HTMLElement;
 	/**
+	 * @internal
 	 * @description Editor context object
 	 * @type {SunEditor.Context}
 	 */
@@ -66,6 +56,7 @@ declare class Editor {
 	 */
 	context: ContextUtil;
 	/**
+	 * @internal
 	 * @description Current focusing [frame] context
 	 * @type {import('./config/frameContext').FrameContextMap}
 	 */
@@ -77,6 +68,7 @@ declare class Editor {
 	 */
 	frameContext: FrameContextUtil;
 	/**
+	 * @internal
 	 * @description Current focusing [frame] context options
 	 * @type {SunEditor.FrameOptions}
 	 */
@@ -88,6 +80,7 @@ declare class Editor {
 	 */
 	frameOptions: FrameOptionsMap;
 	/**
+	 * @internal
 	 * @description Editor row options
 	 * @type {Map<string, *>}
 	 */
@@ -263,91 +256,12 @@ declare class Editor {
 	/** @description Viewer class instance @type {import('./class/viewer').default} */
 	viewer: import('./class/viewer').default;
 	/**
-	 * @description Line breaker (top)
-	 * @type {HTMLElement}
-	 */
-	_lineBreaker_t: HTMLElement;
-	/**
-	 * @description Line breaker (bottom)
-	 * @type {HTMLElement}
-	 */
-	_lineBreaker_b: HTMLElement;
-	/**
 	 * @description Closest ShadowRoot to editor if found
 	 * @type {ShadowRoot & { getSelection?: () => Selection }} - Chromium-based browsers (Chrome, Edge, etc.) has a getSelection method on the ShadowRoot
 	 */
-	_shadowRoot: ShadowRoot & {
+	shadowRoot: ShadowRoot & {
 		getSelection?: () => Selection;
 	};
-	/**
-	 * @description Plugin call event map
-	 * @type {Map<string, Array<((...args: *) => *) & { index: number }>>}
-	 */
-	_onPluginEvents: Map<
-		string,
-		Array<
-			((...args: any) => any) & {
-				index: number;
-			}
-		>
-	>;
-	/**
-	 * @description Copy format info
-	 * - eventManager.__cacheStyleNodes copied
-	 * @type {?Array<Node>}
-	 */
-	_onCopyFormatInfo: Array<Node> | null;
-	/**
-	 * @description Copy format init method
-	 * @type {?(...args: *) => *}
-	 */
-	_onCopyFormatInitMethod: ((...args: any) => any) | null;
-	/**
-	 * @description Controller target's frame div (editor.frameContext.get('topArea'))
-	 * @type {?HTMLElement}
-	 */
-	_controllerTargetContext: HTMLElement | null;
-	/**
-	 * @description List of buttons that are disabled when "controller" is opened
-	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
-	 */
-	_controllerOnDisabledButtons: Array<HTMLButtonElement | HTMLInputElement>;
-	/**
-	 * @description List of buttons that are disabled when "codeView" mode opened
-	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
-	 */
-	_codeViewDisabledButtons: Array<HTMLButtonElement | HTMLInputElement>;
-	/**
-	 * @description List of buttons to run plugins in the toolbar
-	 * @type {Object<string, Array<HTMLElement>>}
-	 */
-	_pluginCallButtons: {
-		[x: string]: HTMLElement[];
-	};
-	/**
-	 * @description List of buttons to run plugins in the Sub-Toolbar
-	 * @type {Object<string, Array<HTMLElement>>|[]}
-	 */
-	_pluginCallButtons_sub:
-		| {
-				[x: string]: Array<HTMLElement>;
-		  }
-		| [];
-	/**
-	 * @description Responsive Toolbar Button Structure array
-	 * @type {Array<*>}
-	 */
-	_responsiveButtons: Array<any>;
-	/**
-	 * @description Responsive Sub-Toolbar Button Structure array
-	 * @type {Array<*>}
-	 */
-	_responsiveButtons_sub: Array<any>;
-	/**
-	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
-	 * @type {boolean}
-	 */
-	_notHideToolbar: boolean;
 	/**
 	 * @description Variables for controlling blur events
 	 * @type {boolean}
@@ -363,16 +277,93 @@ declare class Editor {
 	 */
 	_preventSelection: boolean;
 	/**
+	 * @internal
+	 * @description Line breaker (top)
+	 * @type {HTMLElement}
+	 */
+	_lineBreaker_t: HTMLElement;
+	/**
+	 * @internal
+	 * @description Line breaker (bottom)
+	 * @type {HTMLElement}
+	 */
+	_lineBreaker_b: HTMLElement;
+	/**
+	 * @internal
+	 * @description Plugin call event map
+	 * @type {Map<string, Array<((...args: *) => *) & { index: number }>>}
+	 */
+	_onPluginEvents: Map<
+		string,
+		Array<
+			((...args: any) => any) & {
+				index: number;
+			}
+		>
+	>;
+	/**
+	 * @internal
+	 * @description Copy format info
+	 * - eventManager.__cacheStyleNodes copied
+	 * @type {?Array<Node>}
+	 */
+	_onCopyFormatInfo: Array<Node> | null;
+	/**
+	 * @internal
+	 * @description Copy format init method
+	 * @type {?(...args: *) => *}
+	 */
+	_onCopyFormatInitMethod: ((...args: any) => any) | null;
+	/**
+	 * @internal
+	 * @description Controller target's frame div (editor.frameContext.get('topArea'))
+	 * @type {?HTMLElement}
+	 */
+	_controllerTargetContext: HTMLElement | null;
+	/**
+	 * @internal
+	 * @description List of buttons that are disabled when "controller" is opened
+	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
+	 */
+	_controllerOnDisabledButtons: Array<HTMLButtonElement | HTMLInputElement>;
+	/**
+	 * @internal
+	 * @description List of buttons that are disabled when "codeView" mode opened
+	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
+	 */
+	_codeViewDisabledButtons: Array<HTMLButtonElement | HTMLInputElement>;
+	/**
+	 * @internal
+	 * @description Responsive Toolbar Button Structure array
+	 * @type {Array<*>}
+	 */
+	_responsiveButtons: Array<any>;
+	/**
+	 * @internal
+	 * @description Responsive Sub-Toolbar Button Structure array
+	 * @type {Array<*>}
+	 */
+	_responsiveButtons_sub: Array<any>;
+	/**
+	 * @internal
+	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
+	 * @type {boolean}
+	 */
+	_notHideToolbar: boolean;
+	/**
+	 * @internal
 	 * @description If true, initialize all indexes of image, video information
 	 * @type {boolean}
 	 */
 	_componentsInfoInit: boolean;
 	/**
+	 * @internal
 	 * @description If true, reset all indexes of image, video information
 	 * @type {boolean}
 	 */
 	_componentsInfoReset: boolean;
 	/**
+	 * @internal
 	 * @description plugin retainFormat info Map()
 	 * @type {Map<string, { key: string, method: (...args: *) => * }>}
 	 */
@@ -384,16 +375,7 @@ declare class Editor {
 		}
 	>;
 	/**
-	 * @description Properties for managing files in the "FileManager" module
-	 * @type {Array<*>}
-	 */
-	_fileInfoPluginsCheck: Array<any>;
-	/**
-	 * @description Properties for managing files in the "FileManager" module
-	 * @type {Array<*>}
-	 */
-	_fileInfoPluginsReset: Array<any>;
-	/**
+	 * @internal
 	 * @description Variables for file component management
 	 * @type {Object<string, *>}
 	 */
@@ -401,20 +383,17 @@ declare class Editor {
 		[x: string]: any;
 	};
 	/**
+	 * @internal
 	 * @description Variables for managing the components
 	 * @type {Array<*>}
 	 */
 	_componentManager: Array<any>;
 	/**
+	 * @internal
 	 * @description Current Figure container.
 	 * @type {?HTMLElement}
 	 */
 	_figureContainer: HTMLElement | null;
-	/**
-	 * @description Origin options
-	 * @type {SunEditor.InitOptions}
-	 */
-	_originOptions: SunEditor.InitOptions;
 	/**
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * - If the plugin is added call callBack function.
@@ -512,12 +491,6 @@ declare class Editor {
 	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
 	/**
 	 * @internal
-	 * @description Set frameContext, frameOptions
-	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
-	 */
-	_setFrameInfo(rt: SunEditor.FrameContext): void;
-	/**
-	 * @internal
 	 * @description Focus to wysiwyg area using "native focus function"
 	 */
 	_nativeFocus(): void;
@@ -534,11 +507,10 @@ declare class Editor {
 	_resetComponents(): void;
 	/**
 	 * @internal
-	 * @description Initializ wysiwyg area (Only called from core._init)
-	 * @param {SunEditor.FrameContext} e frameContext
-	 * @param {string} value initial html string
+	 * @description Set display property when there is placeholder.
+	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
 	 */
-	_initWysiwygArea(e: SunEditor.FrameContext, value: string): void;
+	_checkPlaceholder(fc?: SunEditor.FrameContext | null): void;
 	/**
 	 * @internal
 	 * @description Called when there are changes to tags in the wysiwyg region.
@@ -561,79 +533,15 @@ declare class Editor {
 	__callResizeFunction(fc: SunEditor.FrameContext | FrameContextUtil, h: number, resizeObserverEntry: ResizeObserverEntry): void;
 	/**
 	 * @internal
-	 * @description Set display property when there is placeholder.
-	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
-	 */
-	_checkPlaceholder(fc?: SunEditor.FrameContext | null): void;
-	/**
-	 * @internal
-	 * @description Initializ editor
-	 * @param {SunEditor.InitOptions} options Options
-	 */
-	__editorInit(options: SunEditor.InitOptions): void;
-	/**
-	 * @internal
-	 * @description Initializ core variable
-	 * @param {SunEditor.InitOptions} options Options
-	 */
-	__init(options: SunEditor.InitOptions): void;
-	/**
-	 * @internal
 	 * @description Caching basic buttons to use
 	 */
 	__cachingButtons(): void;
 	/**
 	 * @internal
-	 * @description Set the disabled button list
-	 * - this._codeViewDisabledButtons, this._controllerOnDisabledButtons
-	 */
-	__setDisabledButtons(): void;
-	/**
-	 * @internal
-	 * @description Save the current buttons
-	 * @param {Map<string, Element>} cmdButtons Command button map
-	 * @param {?Element} tray Button tray
-	 */
-	__saveCommandButtons(cmdButtons: Map<string, Element>, tray: Element | null): void;
-	/**
-	 * @internal
 	 * @description Caches custom(starts with "_") shortcut keys for commands.
 	 */
 	__cachingShortcuts(): void;
-	/**
-	 * @internal
-	 * @description Sets command target elements.
-	 * @param {string} cmd - The command identifier.
-	 * @param {HTMLButtonElement} target - The associated command button.
-	 */
-	__setCommandTargets(cmd: string, target: HTMLButtonElement): void;
-	/**
-	 * @internal
-	 * @description Configures the document properties of an iframe editor.
-	 * @param {HTMLIFrameElement} frame - The editor iframe.
-	 * @param {Map<string, *>} originOptions - The original options.
-	 * @param {SunEditor.FrameOptions} targetOptions - The new options.
-	 */
-	__setIframeDocument(frame: HTMLIFrameElement, originOptions: Map<string, any>, targetOptions: SunEditor.FrameOptions): void;
-	/**
-	 * @internal
-	 * @description Set the FrameContext parameters and options
-	 * @param {SunEditor.FrameContext} e - Frame context object
-	 */
-	__setEditorParams(e: SunEditor.FrameContext): void;
-	/**
-	 * @internal
-	 * @description Registers and initializes editor classes.
-	 */
-	__registerClass(): void;
-	/**
-	 * @internal
-	 * @description Creates the editor instance and initializes components.
-	 * @param {SunEditor.InitOptions} originOptions - The initial editor options.
-	 * @returns {Promise<void>}
-	 */
-	__Create(originOptions: SunEditor.InitOptions): Promise<void>;
-	Constructor: typeof Editor;
+	#private;
 }
 import { ContextUtil } from './config/context';
 import { FrameContextUtil } from './config/frameContext';

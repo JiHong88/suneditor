@@ -1,6 +1,6 @@
 import type {} from '../../typedef';
 /**
- * @typedef {import('./eventManager').EventManagerThis} EventManagerInstanceType
+ * @typedef {import('./eventManager').default} EventManagerInstanceType
  */
 /**
  * @typedef {import('../class/selection').default} Selection
@@ -176,7 +176,7 @@ export function makePorts(
 	 */
 	enterPrevent(e: Event): void;
 };
-export type EventManagerInstanceType = import('./eventManager').EventManagerThis;
+export type EventManagerInstanceType = import('./eventManager').default;
 export type Selection = import('../class/selection').default;
 export type Format = import('../class/format').default;
 export type ListFormat = import('../class/listFormat').default;

@@ -212,11 +212,7 @@ describe('Toolbar', () => {
 			expect(toolbar.keyName.main).toBe('toolbar_main');
 			expect(toolbar.keyName.buttonTray).toBe('toolbar_buttonTray');
 			expect(toolbar.keyName.width).toBe('toolbar_width');
-			expect(toolbar._isBalloon).toBe(false);
-			expect(toolbar._isInline).toBe(false);
-			expect(toolbar._isBalloonAlways).toBe(false);
 			expect(toolbar.isSticky).toBe(false);
-			expect(toolbar._responsiveCurrentSize).toBe('default');
 		});
 
 		it('should initialize sub toolbar correctly', () => {
@@ -234,18 +230,12 @@ describe('Toolbar', () => {
 			expect(subToolbar.keyName.main).toBe('toolbar_sub_main');
 			expect(subToolbar.keyName.buttonTray).toBe('toolbar_sub_buttonTray');
 			expect(subToolbar.keyName.width).toBe('toolbar_sub_width');
-			expect(subToolbar._isBalloon).toBe(true);
-			expect(subToolbar._isInline).toBe(true);
-			expect(subToolbar._isBalloonAlways).toBe(true);
 		});
 
 		it('should call CoreInjector constructor', () => {
 			expect(CoreInjector).toHaveBeenCalledWith(mockEditor);
 		});
 
-		it('should detect viewport size capability', () => {
-			expect(typeof toolbar._isViewPortSize).toBe('boolean');
-		});
 	});
 
 	describe('disable', () => {
@@ -271,21 +261,33 @@ describe('Toolbar', () => {
 
 	describe('show', () => {
 		it('should show inline toolbar', () => {
-			toolbar._isInline = true;
-			toolbar._showInline = jest.fn();
+			const inlineToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: true,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			inlineToolbar._showInline = jest.fn();
 
-			toolbar.show();
+			inlineToolbar.show();
 
-			expect(toolbar._showInline).toHaveBeenCalled();
+			expect(inlineToolbar._showInline).toHaveBeenCalled();
 		});
 
 		it('should show balloon toolbar', () => {
-			toolbar._isBalloon = true;
-			toolbar._showBalloon = jest.fn();
+			const balloonToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: true,
+				inline: false,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			balloonToolbar._showBalloon = jest.fn();
 
-			toolbar.show();
+			balloonToolbar.show();
 
-			expect(toolbar._showBalloon).toHaveBeenCalled();
+			expect(balloonToolbar._showBalloon).toHaveBeenCalled();
 		});
 
 		it('should show regular toolbar', () => {
@@ -310,23 +312,35 @@ describe('Toolbar', () => {
 
 	describe('hide', () => {
 		it('should hide inline toolbar', () => {
-			toolbar._isInline = true;
+			const inlineToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: true,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
 
-			toolbar.hide();
+			inlineToolbar.hide();
 
-			expect(mockContext.get('toolbar_main').style.display).toBe('none');
-			expect(mockContext.get('toolbar_main').style.top).toBe('0px');
-			expect(toolbar._inlineToolbarAttr.isShow).toBe(false);
+			expect(inlineToolbar.context.get(inlineToolbar.keyName.main).style.display).toBe('none');
+			expect(inlineToolbar.context.get(inlineToolbar.keyName.main).style.top).toBe('0px');
+			expect(inlineToolbar.inlineToolbarAttr.isShow).toBe(false);
 		});
 
 		it('should hide balloon toolbar', () => {
-			toolbar._isBalloon = true;
+			const balloonToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: true,
+				inline: false,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
 
-			toolbar.hide();
+			balloonToolbar.hide();
 
-			expect(mockContext.get('toolbar_main').style.display).toBe('none');
-			expect(mockFrameContext.get('_stickyDummy').style.display).toBe('none');
-			expect(toolbar._balloonOffset).toEqual({ top: 0, left: 0 });
+			expect(balloonToolbar.context.get(balloonToolbar.keyName.main).style.display).toBe('none');
+			expect(balloonToolbar.frameContext.get('_stickyDummy').style.display).toBe('none');
+			expect(balloonToolbar.balloonOffset).toEqual({ top: 0, left: 0 });
 		});
 
 		it('should hide regular toolbar', () => {
@@ -339,53 +353,56 @@ describe('Toolbar', () => {
 
 	describe('resetResponsiveToolbar', () => {
 		it('should reset responsive toolbar with default size', () => {
-			toolbar._rButtonsize = [768, 'default'];
-			toolbar._responsiveCurrentSize = 'default';
-			toolbar.setButtons = jest.fn();
+			const resetSpy = jest.spyOn(toolbar, 'setButtons').mockImplementation(() => {});
 
 			toolbar.resetResponsiveToolbar();
 
 			expect(mockMenu.containerOff).toHaveBeenCalled();
+			expect(resetSpy).not.toHaveBeenCalled();
+			resetSpy.mockRestore();
 		});
 
 		it('should update responsive size when needed', () => {
-			toolbar._rButtonsize = ['default', 768];
-			toolbar._rButtonsInfo = { default: [], 768: [] };
-			toolbar._responsiveCurrentSize = 'default';
-			toolbar.setButtons = jest.fn();
+			const setButtonsSpy = jest.spyOn(toolbar, 'setButtons').mockImplementation(() => {});
 
 			// Create a new mock toolbar with narrow width
 			const narrowToolbar = document.createElement('div');
 			Object.defineProperty(narrowToolbar, 'offsetWidth', { get: () => 500 });
-			mockContext.get.mockImplementation((key) => {
+			const originalGet = mockContext.get;
+			mockContext.get = jest.fn((key) => {
 				if (key === 'toolbar_main') return narrowToolbar;
-				return mockContext.get(key);
+				return originalGet(key);
 			});
 
 			toolbar.resetResponsiveToolbar();
 
-			expect(toolbar._responsiveCurrentSize).toBe('768');
-			expect(toolbar.setButtons).toHaveBeenCalledWith([]);
+			expect(setButtonsSpy).toHaveBeenCalledWith('mobile');
+			setButtonsSpy.mockRestore();
 		});
 
 		it('should handle balloon/inline auto width', () => {
-			toolbar._isBalloon = true;
-			toolbar._rButtonsize = ['default', 768];
-			toolbar._rButtonsInfo = { default: [], 768: [] };
-			toolbar._responsiveCurrentSize = 'default';
-			toolbar.setButtons = jest.fn();
+			const balloonToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: true,
+				inline: false,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			const setButtonsSpy = jest.spyOn(balloonToolbar, 'setButtons').mockImplementation(() => {});
 
 			// Mock narrow topArea width to trigger responsive change
 			const narrowTopArea = document.createElement('div');
 			Object.defineProperty(narrowTopArea, 'offsetWidth', { get: () => 500 });
-			mockFrameContext.get.mockImplementation((key) => {
+			const originalFrameGet = mockFrameContext.get;
+			balloonToolbar.frameContext.get = jest.fn((key) => {
 				if (key === 'topArea') return narrowTopArea;
-				return mockFrameContext.get(key);
+				return originalFrameGet(key);
 			});
 
-			toolbar.resetResponsiveToolbar();
+			balloonToolbar.resetResponsiveToolbar();
 
-			expect(toolbar.setButtons).toHaveBeenCalled();
+			expect(setButtonsSpy).toHaveBeenCalledWith('mobile');
+			setButtonsSpy.mockRestore();
 		});
 	});
 
@@ -400,7 +417,6 @@ describe('Toolbar', () => {
 
 			CreateToolBar.mockReturnValue(mockNewToolbar);
 			toolbar._moreLayerOff = jest.fn();
-			toolbar._resetButtonInfo = jest.fn();
 
 			// Mock replaceChild
 			const mockMain = mockContext.get('toolbar_main');
@@ -415,7 +431,8 @@ describe('Toolbar', () => {
 			expect(UpdateButton).toHaveBeenCalled();
 			expect(mockMain.replaceChild).toHaveBeenCalledWith(mockButtonTray, mockContext.get('toolbar_buttonTray'));
 			expect(mockContext.set).toHaveBeenCalledWith('toolbar_buttonTray', mockButtonTray);
-			expect(toolbar._resetButtonInfo).toHaveBeenCalled();
+			// Verify button info was reset (internal behavior)
+			expect(mockEditor.__cachingButtons).toHaveBeenCalled();
 			expect(toolbar.triggerEvent).toHaveBeenCalledWith('onSetToolbarButtons', {
 				buttonTray: mockButtonTray,
 				frameContext: mockFrameContext,
@@ -423,11 +440,21 @@ describe('Toolbar', () => {
 		});
 	});
 
-	describe('_resetButtonInfo', () => {
-		it('should reset all button info and apply effects', () => {
-			toolbar._resetSticky = jest.fn();
+	describe('setButtons - button info reset behavior', () => {
+		it('should reset all button info and apply effects when setButtons is called', () => {
+			const buttonList = [{ name: 'bold' }];
+			const mockButtonTray = document.createElement('div');
+			const mockNewToolbar = {
+				buttonTray: mockButtonTray,
+				updateButtons: [],
+			};
+			CreateToolBar.mockReturnValue(mockNewToolbar);
+			toolbar._moreLayerOff = jest.fn();
 
-			toolbar._resetButtonInfo();
+			const mockMain = mockContext.get('toolbar_main');
+			mockMain.replaceChild = jest.fn();
+
+			toolbar.setButtons(buttonList);
 
 			expect(mockEditor.allCommandButtons).toBeInstanceOf(Map);
 			expect(mockEditor.subAllCommandButtons).toBeInstanceOf(Map);
@@ -436,184 +463,214 @@ describe('Toolbar', () => {
 			expect(mockEditor.__cachingButtons).toHaveBeenCalled();
 			expect(mockEditor.__cachingShortcuts).toHaveBeenCalled();
 			expect(toolbar.history.resetButtons).toHaveBeenCalled();
-			expect(toolbar._resetSticky).toHaveBeenCalled();
 			expect(mockEditor.effectNode).toBeNull();
-			expect(toolbar.viewer._setButtonsActive).toHaveBeenCalled();
+			expect(mockEditor.viewer._setButtonsActive).toHaveBeenCalled();
 		});
 
-		it('should handle sub toolbar differently', () => {
-			toolbar.isSub = true;
-			toolbar._resetSticky = jest.fn();
-
-			toolbar._resetButtonInfo();
-
-			expect(mockEditor.__cachingButtons).toHaveBeenCalled();
-		});
-
-		it('should apply tag effect when focused', () => {
+		it('should apply tag effect when focused after setButtons', () => {
 			toolbar.status.hasFocus = true;
-			toolbar._resetSticky = jest.fn();
+			const buttonList = [{ name: 'bold' }];
+			const mockButtonTray = document.createElement('div');
+			CreateToolBar.mockReturnValue({
+				buttonTray: mockButtonTray,
+				updateButtons: [],
+			});
+			toolbar._moreLayerOff = jest.fn();
+			mockContext.get('toolbar_main').replaceChild = jest.fn();
 
-			toolbar._resetButtonInfo();
+			toolbar.setButtons(buttonList);
 
 			expect(toolbar.eventManager.applyTagEffect).toHaveBeenCalled();
 		});
 
-		it('should handle readonly state', () => {
+		it('should handle readonly state after setButtons', () => {
 			const originalGet = mockFrameContext.get;
 			mockFrameContext.get = jest.fn().mockImplementation((key) => {
 				if (key === 'isReadOnly') return true;
 				return originalGet.call(mockFrameContext, key);
 			});
-			toolbar._resetSticky = jest.fn();
+			const buttonList = [{ name: 'bold' }];
+			const mockButtonTray = document.createElement('div');
+			CreateToolBar.mockReturnValue({
+				buttonTray: mockButtonTray,
+				updateButtons: [],
+			});
+			toolbar._moreLayerOff = jest.fn();
+			mockContext.get('toolbar_main').replaceChild = jest.fn();
 
-			toolbar._resetButtonInfo();
+			toolbar.setButtons(buttonList);
 
-			expect(toolbar.ui.setControllerOnDisabledButtons).toHaveBeenCalledWith(true);
+			expect(mockEditor.ui.setControllerOnDisabledButtons).toHaveBeenCalledWith(true);
 		});
 	});
 
-	describe('_resetSticky', () => {
-		it('should return early when no wrapper', () => {
-			mockFrameContext.get.mockImplementation((key) => {
+	describe('sticky behavior via public API', () => {
+		it('should not enable sticky when no wrapper exists', () => {
+			const mockStickyDummy = mockFrameContext.get('_stickyDummy');
+			const mockTopArea = mockFrameContext.get('topArea');
+			const mockMinHeight = mockFrameContext.get('_minHeight');
+
+			mockFrameContext.get = jest.fn().mockImplementation((key) => {
 				if (key === 'wrapper') return null;
-				return mockFrameContext.get(key);
+				if (key === '_stickyDummy') return mockStickyDummy;
+				if (key === 'topArea') return mockTopArea;
+				if (key === '_minHeight') return mockMinHeight;
+				if (key === 'isFullScreen') return false;
+				if (key === 'isReadOnly') return false;
+				if (key === 'key') return 'main';
+				return null;
 			});
-			toolbar._onSticky = jest.fn();
-			toolbar._offSticky = jest.fn();
 
-			toolbar._resetSticky();
+			// Trigger sticky check via show() - should not throw
+			toolbar.show();
 
-			expect(toolbar._onSticky).not.toHaveBeenCalled();
-			expect(toolbar._offSticky).not.toHaveBeenCalled();
+			expect(toolbar.isSticky).toBe(false);
 		});
 
-		it('should return early when fullscreen', () => {
-			const originalGet = mockFrameContext.get;
+		it('should not enable sticky when in fullscreen mode', () => {
+			const mockWrapper = mockFrameContext.get('wrapper');
+			const mockStickyDummy = mockFrameContext.get('_stickyDummy');
+			const mockTopArea = mockFrameContext.get('topArea');
+			const mockMinHeight = mockFrameContext.get('_minHeight');
+
 			mockFrameContext.get = jest.fn().mockImplementation((key) => {
 				if (key === 'isFullScreen') return true;
-				return originalGet.call(mockFrameContext, key);
+				if (key === 'wrapper') return mockWrapper;
+				if (key === '_stickyDummy') return mockStickyDummy;
+				if (key === 'topArea') return mockTopArea;
+				if (key === '_minHeight') return mockMinHeight;
+				if (key === 'isReadOnly') return false;
+				if (key === 'key') return 'main';
+				return null;
 			});
-			toolbar._onSticky = jest.fn();
+
+			toolbar.show();
+
+			expect(toolbar.isSticky).toBe(false);
+		});
+
+		it('should enable sticky mode when scrolled past threshold', () => {
+			env._w.scrollY = 300;
+			mockOffset.getGlobal.mockReturnValue({ top: 0, left: 0 });
 
 			toolbar._resetSticky();
 
-			expect(toolbar._onSticky).not.toHaveBeenCalled();
+			expect(toolbar.isSticky).toBe(true);
+			expect(dom.utils.addClass).toHaveBeenCalledWith(mockContext.get('toolbar_main'), 'se-toolbar-sticky');
 		});
 
-		it('should call _offSticky when above threshold', () => {
-			toolbar._offSticky = jest.fn();
-			// The logic checks if y < t, where y = scrollY + sticky and t = editorOffset.top
-			// So to trigger _offSticky, we need y < t
+		it('should disable sticky mode when above threshold', () => {
 			env._w.scrollY = 0;
 			mockOptions.get.mockImplementation((key) => {
 				if (key === 'toolbar_sticky') return 0;
 				return null;
 			});
-			// Mock offset to return a higher top value
 			mockOffset.getGlobal.mockReturnValue({ top: 100, left: 0 });
 
 			toolbar._resetSticky();
 
-			expect(toolbar._offSticky).toHaveBeenCalled();
+			expect(toolbar.isSticky).toBe(false);
+			expect(dom.utils.removeClass).toHaveBeenCalledWith(mockContext.get('toolbar_main'), 'se-toolbar-sticky');
 		});
 
-		it('should call _onSticky when below threshold', () => {
-			toolbar._onSticky = jest.fn();
-			env._w.scrollY = 300; // Set scroll position below
+		it('should apply correct styles when sticky is enabled', () => {
+			env._w.scrollY = 300;
+			mockOffset.getGlobal.mockReturnValue({ top: 0, left: 0 });
 
 			toolbar._resetSticky();
 
-			expect(toolbar._onSticky).toHaveBeenCalled();
-		});
-	});
-
-	describe('_onSticky', () => {
-		it('should enable sticky mode', () => {
 			const mockToolbar = mockContext.get('toolbar_main');
 			const mockStickyDummy = mockFrameContext.get('_stickyDummy');
-			toolbar.__getViewportTop = jest.fn().mockReturnValue(0);
-
-			toolbar._onSticky(1);
-
 			expect(mockStickyDummy.style.height).toBe('40px');
 			expect(mockStickyDummy.style.display).toBe('block');
-			expect(mockToolbar.style.top).toBe('1px');
 			expect(mockToolbar.style.width).toBe('800px');
-			expect(dom.utils.addClass).toHaveBeenCalledWith(mockToolbar, 'se-toolbar-sticky');
-			expect(toolbar.isSticky).toBe(true);
 		});
 
-		it('should handle inline toolbar width', () => {
-			toolbar._isInline = true;
-			toolbar._inlineToolbarAttr.width = '500px';
-			toolbar.__getViewportTop = jest.fn().mockReturnValue(0);
+		it('should handle inline toolbar width when sticky', () => {
+			const inlineToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: true,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			inlineToolbar.inlineToolbarAttr.width = '500px';
+			env._w.scrollY = 300;
+			mockOffset.getGlobal.mockReturnValue({ top: 0, left: 0 });
 
-			const mockToolbar = mockContext.get('toolbar_main');
+			inlineToolbar._resetSticky();
 
-			toolbar._onSticky(1);
-
-			expect(mockToolbar.style.width).toBe('500px');
+			expect(mockContext.get('toolbar_main').style.width).toBe('500px');
 		});
 
-		it('should handle toolbar container', () => {
+		it('should restore inline toolbar attributes when sticky is disabled', () => {
+			const inlineToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: true,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			inlineToolbar.inlineToolbarAttr = { top: '10px', width: '500px' };
+			env._w.scrollY = 0;
 			mockOptions.get.mockImplementation((key) => {
-				if (key === 'toolbar_container') return document.createElement('div');
+				if (key === 'toolbar_sticky') return 0;
 				return null;
 			});
-			toolbar.__getViewportTop = jest.fn().mockReturnValue(0);
+			mockOffset.getGlobal.mockReturnValue({ top: 100, left: 0 });
 
-			toolbar._onSticky(1);
-
-			expect(toolbar.isSticky).toBe(true);
-		});
-	});
-
-	describe('__getViewportTop', () => {
-		it('should return viewport offset when available', () => {
-			toolbar._isViewPortSize = true;
-			env._w.visualViewport.offsetTop = 50;
-
-			const result = toolbar.__getViewportTop();
-
-			expect(result).toBe(50);
-		});
-
-		it('should return 0 when viewport not available', () => {
-			toolbar._isViewPortSize = false;
-
-			const result = toolbar.__getViewportTop();
-
-			expect(result).toBe(0);
-		});
-	});
-
-	describe('_offSticky', () => {
-		it('should disable sticky mode', () => {
-			const mockToolbar = mockContext.get('toolbar_main');
-			const mockStickyDummy = mockFrameContext.get('_stickyDummy');
-			const mockWrapper = mockFrameContext.get('wrapper');
-
-			toolbar._offSticky();
-
-			expect(mockStickyDummy.style.display).toBe('none');
-			expect(mockToolbar.style.top).toBe('');
-			expect(mockToolbar.style.width).toBe('');
-			expect(mockWrapper.style.marginTop).toBe('');
-			expect(dom.utils.removeClass).toHaveBeenCalledWith(mockToolbar, 'se-toolbar-sticky');
-			expect(toolbar.isSticky).toBe(false);
-		});
-
-		it('should handle inline toolbar attributes', () => {
-			toolbar._isInline = true;
-			toolbar._inlineToolbarAttr = { top: '10px', width: '500px' };
+			inlineToolbar._resetSticky();
 
 			const mockToolbar = mockContext.get('toolbar_main');
-
-			toolbar._offSticky();
-
 			expect(mockToolbar.style.top).toBe('10px');
 			expect(mockToolbar.style.width).toBe('500px');
+		});
+	});
+
+	describe('viewport top handling via sticky behavior', () => {
+		it('should use viewport offset when available during sticky', () => {
+			const originalViewport = env._w.visualViewport;
+			env._w.visualViewport = { offsetTop: 50, pageTop: 0 };
+			const viewToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: false,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			env._w.visualViewport.offsetTop = 50;
+			env._w.scrollY = 300;
+			mockOffset.getGlobal.mockReturnValue({ top: 0, left: 0 });
+
+			viewToolbar._resetSticky();
+
+			// Verify sticky is enabled with viewport offset applied
+			expect(viewToolbar.isSticky).toBe(true);
+			// The top position should include the viewport offset (50)
+			const mockToolbar = viewToolbar.context.get(viewToolbar.keyName.main);
+			expect(mockToolbar.style.top).toContain('px');
+
+			env._w.visualViewport = originalViewport;
+		});
+
+		it('should not use viewport offset when not available', () => {
+			const originalViewport = env._w.visualViewport;
+			delete env._w.visualViewport;
+			const viewToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: false,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			env._w.scrollY = 300;
+			mockOffset.getGlobal.mockReturnValue({ top: 0, left: 0 });
+
+			viewToolbar._resetSticky();
+
+			expect(viewToolbar.isSticky).toBe(true);
+
+			env._w.visualViewport = originalViewport;
 		});
 	});
 
@@ -629,12 +686,26 @@ describe('Toolbar', () => {
 
 			const responsiveToolbar = new Toolbar(mockEditor, options);
 
-			expect(responsiveToolbar._rButtonsize).toEqual(['default', 480, 768]);
-			expect(responsiveToolbar._rButtonsInfo).toEqual({
-				default: ['default'],
-				768: 'mobile',
-				480: 'small',
+			const setButtonsSpy = jest.spyOn(responsiveToolbar, 'setButtons').mockImplementation(() => {});
+
+			// Trigger responsive change for small width
+			const narrowToolbar = document.createElement('div');
+			Object.defineProperty(narrowToolbar, 'offsetWidth', { get: () => 470, configurable: true });
+			responsiveToolbar.context.get = jest.fn((key) => {
+				if (key === 'toolbar_main') return narrowToolbar;
+				return mockContext.get(key);
 			});
+
+			responsiveToolbar.resetResponsiveToolbar();
+
+			expect(setButtonsSpy).toHaveBeenCalledWith('small');
+
+			// Trigger change for medium width
+			Object.defineProperty(narrowToolbar, 'offsetWidth', { get: () => 700, configurable: true });
+			responsiveToolbar.resetResponsiveToolbar();
+
+			expect(setButtonsSpy).toHaveBeenCalledWith('mobile');
+			setButtonsSpy.mockRestore();
 		});
 
 		it('should handle empty responsive array', () => {
@@ -647,19 +718,28 @@ describe('Toolbar', () => {
 			};
 
 			const responsiveToolbar = new Toolbar(mockEditor, options);
+			const setButtonsSpy = jest.spyOn(responsiveToolbar, 'setButtons').mockImplementation(() => {});
 
-			expect(responsiveToolbar._rButtonArray).toBeNull();
+			expect(() => responsiveToolbar.resetResponsiveToolbar()).not.toThrow();
+			expect(setButtonsSpy).not.toHaveBeenCalled();
+			setButtonsSpy.mockRestore();
 		});
 	});
 
 	describe('_showBalloon', () => {
 		beforeEach(() => {
-			toolbar._isBalloon = true;
 			toolbar._setBalloonOffset = jest.fn();
 		});
 
 		it('should return early if not balloon mode', () => {
-			toolbar._isBalloon = false;
+			toolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: false,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			toolbar._setBalloonOffset = jest.fn();
 
 			toolbar._showBalloon();
 
@@ -667,8 +747,16 @@ describe('Toolbar', () => {
 		});
 
 		it('should show balloon with selection range', () => {
+			toolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: true,
+				inline: false,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			toolbar._setBalloonOffset = jest.fn();
 			const mockRange = { collapsed: false, commonAncestorContainer: document.createElement('div') };
-			toolbar.selection.getRange.mockReturnValue(mockRange);
+			mockEditor.selection.getRange.mockReturnValue(mockRange);
 
 			toolbar._showBalloon();
 
@@ -681,9 +769,16 @@ describe('Toolbar', () => {
 		});
 
 		it('should handle always balloon with collapsed range', () => {
-			toolbar._isBalloonAlways = true;
+			toolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: true,
+				inline: false,
+				balloonAlways: true,
+				res: [['default'], [768, 'mobile']],
+			});
+			toolbar._setBalloonOffset = jest.fn();
 			const mockRange = { collapsed: true };
-			toolbar.selection.getRange.mockReturnValue(mockRange);
+			mockEditor.selection.getRange.mockReturnValue(mockRange);
 
 			toolbar._showBalloon();
 
@@ -691,12 +786,19 @@ describe('Toolbar', () => {
 		});
 
 		it('should reset responsive toolbar for sub', () => {
-			toolbar.isSub = true;
-			toolbar.resetResponsiveToolbar = jest.fn();
+			const subToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar_sub',
+				balloon: true,
+				inline: false,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			subToolbar._setBalloonOffset = jest.fn();
+			subToolbar.resetResponsiveToolbar = jest.fn();
 
-			toolbar._showBalloon();
+			subToolbar._showBalloon();
 
-			expect(toolbar.resetResponsiveToolbar).toHaveBeenCalled();
+			expect(subToolbar.resetResponsiveToolbar).toHaveBeenCalled();
 		});
 	});
 
@@ -713,7 +815,7 @@ describe('Toolbar', () => {
 				position: 'top',
 				addTop: 0,
 			});
-			expect(toolbar._balloonOffset).toEqual({
+			expect(toolbar.balloonOffset).toEqual({
 				top: 100,
 				left: 50,
 				position: 'top',
@@ -766,37 +868,47 @@ describe('Toolbar', () => {
 
 	describe('_showInline', () => {
 		it('should return early if not inline mode', () => {
-			toolbar._isInline = false;
-			toolbar._offSticky = jest.fn();
+			const inlineToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: false,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
+			const mockToolbar = inlineToolbar.context.get(inlineToolbar.keyName.main);
+			const initialDisplay = mockToolbar.style.display;
 
-			toolbar._showInline();
+			inlineToolbar._showInline();
 
-			expect(toolbar._offSticky).not.toHaveBeenCalled();
+			// Should not change display since it returns early
+			expect(mockToolbar.style.display).toBe(initialDisplay);
 		});
 
 		it('should show inline toolbar', () => {
-			toolbar._isInline = true;
-			toolbar._offSticky = jest.fn();
-			toolbar._resetSticky = jest.fn();
+			const inlineToolbar = new Toolbar(mockEditor, {
+				keyName: 'toolbar',
+				balloon: false,
+				inline: true,
+				balloonAlways: false,
+				res: [['default'], [768, 'mobile']],
+			});
 
-			const mockToolbar = mockContext.get('toolbar_main');
-			mockOptions.get.mockImplementation((key) => {
+			const mockToolbar = inlineToolbar.context.get(inlineToolbar.keyName.main);
+			inlineToolbar.options.get = jest.fn((key) => {
 				if (key === 'toolbar_width') return '100%';
 				return null;
 			});
 
-			toolbar._showInline();
+			inlineToolbar._showInline();
 
 			expect(mockToolbar.style.visibility).toBe('');
 			expect(mockToolbar.style.display).toBe('block');
-			expect(toolbar._inlineToolbarAttr.width).toBe('100%');
-			expect(toolbar._inlineToolbarAttr.isShow).toBe(true);
-			expect(toolbar._offSticky).toHaveBeenCalled();
-			expect(toolbar._resetSticky).toHaveBeenCalled();
-			expect(toolbar.triggerEvent).toHaveBeenCalledWith('onShowToolbar', {
+			expect(inlineToolbar.inlineToolbarAttr.width).toBe('100%');
+			expect(inlineToolbar.inlineToolbarAttr.isShow).toBe(true);
+			expect(inlineToolbar.triggerEvent).toHaveBeenCalledWith('onShowToolbar', {
 				toolbar: mockToolbar,
 				mode: 'inline',
-				frameContext: mockFrameContext,
+				frameContext: inlineToolbar.frameContext,
 			});
 		});
 	});

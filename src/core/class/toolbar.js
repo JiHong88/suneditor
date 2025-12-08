@@ -9,115 +9,117 @@ import { CreateToolBar, UpdateButton } from '../section/constructor';
 const { _w } = env;
 
 /**
- * @typedef {Omit<Toolbar & Partial<SunEditor.Injector_Core>, 'toolbar' | 'subToolbar'>} ToolbarThis
- */
-
-/**
- * @constructor
- * @this {ToolbarThis}
  * @description Toolbar class
- * @param {SunEditor.Core} editor - The root editor instance
- * @param {Object} options - toolbar options
- * @param {"toolbar"|"toolbar_sub"} options.keyName - toolbar key name
- * @param {boolean} options.balloon - balloon toolbar
- * @param {boolean} options.inline - inline toolbar
- * @param {boolean} options.balloonAlways - balloon toolbar always show
- * @param {Array<Node>} options.res - responsive toolbar button list
  */
-function Toolbar(editor, { keyName, balloon, inline, balloonAlways, res }) {
-	CoreInjector.call(this, editor);
-
-	// members
-	this.isSub = keyName === 'toolbar_sub';
+class Toolbar extends CoreInjector {
+	#responsiveCurrentSize;
+	#originRes;
+	#rButtonArray;
+	#rButtonsInfo;
+	#rButtonsize;
+	#isViewPortSize;
 
 	/**
-	 * @type {Object}
-	 * @description Key names for the toolbar elements.
-	 * @property {"toolbar_sub_main"|"toolbar_main"} main - Main toolbar key name
-	 * @property {"toolbar_sub_buttonTray"|"toolbar_buttonTray"} buttonTray - Button tray key name
-	 * @property {"toolbar_sub_width"|"toolbar_width"} width - Toolbar width key name
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {Object} options - toolbar options
+	 * @param {"toolbar"|"toolbar_sub"} options.keyName - toolbar key name
+	 * @param {boolean} options.balloon - balloon toolbar
+	 * @param {boolean} options.inline - inline toolbar
+	 * @param {boolean} options.balloonAlways - balloon toolbar always show
+	 * @param {Array<Node>} options.res - responsive toolbar button list
 	 */
-	this.keyName = {
-		main: this.isSub ? 'toolbar_sub_main' : 'toolbar_main',
-		buttonTray: this.isSub ? 'toolbar_sub_buttonTray' : 'toolbar_buttonTray',
-		width: this.isSub ? 'toolbar_sub_width' : 'toolbar_width',
-	};
+	constructor(editor, { keyName, balloon, inline, balloonAlways, res }) {
+		super(editor);
 
-	this.currentMoreLayerActiveButton = null;
-	this.isSticky = false;
+		// members
+		this.isSub = keyName === 'toolbar_sub';
 
-	this._isBalloon = balloon;
-	this._isInline = inline;
-	this._isBalloonAlways = balloonAlways;
-	this._responsiveCurrentSize = 'default';
-	this._originRes = res;
-	this._rButtonArray = res;
-	this._rButtonsInfo = null;
-	this._rButtonsize = null;
-	this._isViewPortSize = 'visualViewport' in _w;
-	this._inlineToolbarAttr = {
-		top: '',
-		width: '',
-		isShow: false,
-	};
-	this._balloonOffset = {
-		top: 0,
-		left: 0,
-	};
+		/**
+		 * @type {Object}
+		 * @description Key names for the toolbar elements.
+		 * @property {"toolbar_sub_main"|"toolbar_main"} main - Main toolbar key name
+		 * @property {"toolbar_sub_buttonTray"|"toolbar_buttonTray"} buttonTray - Button tray key name
+		 * @property {"toolbar_sub_width"|"toolbar_width"} width - Toolbar width key name
+		 */
+		this.keyName = {
+			main: this.isSub ? 'toolbar_sub_main' : 'toolbar_main',
+			buttonTray: this.isSub ? 'toolbar_sub_buttonTray' : 'toolbar_buttonTray',
+			width: this.isSub ? 'toolbar_sub_width' : 'toolbar_width',
+		};
 
-	this._setResponsive();
-}
+		this.currentMoreLayerActiveButton = null;
+		this.isSticky = false;
+		this.isBalloonMode = balloon;
+		this.isInlineMode = inline;
+		this.isBalloonAlwaysMode = balloonAlways;
 
-Toolbar.prototype = {
-	/** @internal @type {SunEditor.Core['menu']} */
-	get menu() {
+		this.inlineToolbarAttr = {
+			top: '',
+			width: '',
+			isShow: false,
+		};
+		this.balloonOffset = {
+			top: 0,
+			left: 0,
+		};
+
+		this.#responsiveCurrentSize = 'default';
+		this.#originRes = res;
+		this.#rButtonArray = res;
+		this.#rButtonsInfo = null;
+		this.#rButtonsize = null;
+		this.#isViewPortSize = 'visualViewport' in _w;
+
+		this._setResponsive();
+	}
+
+	/** @type {SunEditor.Core['menu']} */
+	get #menu() {
 		return this.editor.menu;
-	},
-	/** @internal @type {SunEditor.Core['viewer']} */
-	get viewer() {
+	}
+	/** @type {SunEditor.Core['viewer']} */
+	get #viewer() {
 		return this.editor.viewer;
-	},
-	/** @internal @type {SunEditor.Core['ui']} */
-	get ui() {
+	}
+	/** @type {SunEditor.Core['ui']} */
+	get #ui() {
 		return this.editor.ui;
-	},
-	/** @internal @type {SunEditor.Core['offset']} */
-	get offset() {
+	}
+	/** @type {SunEditor.Core['offset']} */
+	get #offset() {
 		return this.editor.offset;
-	},
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection() {
+	}
+	/** @type {SunEditor.Core['selection']} */
+	get #selection() {
 		return this.editor.selection;
-	},
+	}
 
 	/**
-	 * @this {ToolbarThis}
 	 * @description Disables all toolbar buttons.
 	 */
 	disable() {
 		/** off menus */
 		this._moreLayerOff();
-		this.menu.dropdownOff();
-		this.menu.containerOff();
+		this.#menu.dropdownOff();
+		this.#menu.containerOff();
 		dom.utils.setDisabled(this.context.get(this.keyName.buttonTray).querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), true);
-	},
+	}
 
 	/**
-	 * @this {ToolbarThis}
 	 * @description Enables all toolbar buttons.
 	 */
 	enable() {
 		dom.utils.setDisabled(this.context.get(this.keyName.buttonTray).querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), false);
-	},
+	}
 
 	/**
-	 * @this {ToolbarThis}
 	 * @description Shows the toolbar.
 	 */
 	show() {
-		if (this._isInline) {
+		if (this.isInlineMode) {
 			this._showInline();
-		} else if (this._isBalloon) {
+		} else if (this.isBalloonMode) {
 			this._showBalloon();
 		} else {
 			this.context.get(this.keyName.main).style.display = '';
@@ -125,40 +127,38 @@ Toolbar.prototype = {
 		}
 
 		if (!this.isSub) this.resetResponsiveToolbar();
-	},
+	}
 
 	/**
-	 * @this {ToolbarThis}
 	 * @description Hides the toolbar.
 	 */
 	hide() {
-		if (this._isInline) {
+		if (this.isInlineMode) {
 			this.context.get(this.keyName.main).style.display = 'none';
 			this.context.get(this.keyName.main).style.top = '0px';
-			this._inlineToolbarAttr.isShow = false;
+			this.inlineToolbarAttr.isShow = false;
 		} else {
 			this.context.get(this.keyName.main).style.display = 'none';
 			if (!this.isSub) this.frameContext.get('_stickyDummy').style.display = 'none';
-			if (this._isBalloon) {
-				this._balloonOffset = {
+			if (this.isBalloonMode) {
+				this.balloonOffset = {
 					top: 0,
 					left: 0,
 				};
 			}
 		}
-	},
+	}
 
 	/**
-	 * @this {ToolbarThis}
 	 * @description Reset buttons of the responsive toolbar.
 	 */
 	resetResponsiveToolbar() {
-		this.menu.containerOff();
+		this.#menu.containerOff();
 
-		const responsiveSize = this._rButtonsize;
+		const responsiveSize = this.#rButtonsize;
 		if (responsiveSize) {
 			let w = 0;
-			if (((this._isBalloon || this._isInline) && this.options.get('toolbar_width') === 'auto') || (this.editor.isSubBalloon && this.options.get('toolbar_sub_width') === 'auto')) {
+			if (((this.isBalloonMode || this.isInlineMode) && this.options.get('toolbar_width') === 'auto') || (this.editor.isSubBalloon && this.options.get('toolbar_sub_width') === 'auto')) {
 				w = this.frameContext.get('topArea').offsetWidth;
 			} else {
 				w = this.context.get(this.keyName.main).offsetWidth;
@@ -172,24 +172,22 @@ Toolbar.prototype = {
 				}
 			}
 
-			if (this._responsiveCurrentSize !== responsiveWidth) {
-				this._responsiveCurrentSize = responsiveWidth;
-				this.setButtons(this._rButtonsInfo[responsiveWidth]);
-				// this.viewer._resetFullScreenHeight();
+			if (this.#responsiveCurrentSize !== responsiveWidth) {
+				this.#responsiveCurrentSize = responsiveWidth;
+				this.setButtons(this.#rButtonsInfo[responsiveWidth]);
 			}
 		}
-	},
+	}
 
 	/**
-	 * @this {ToolbarThis}
 	 * @description Reset the buttons on the toolbar. (Editor is not reloaded)
 	 * - You cannot set a new plugin for the button.
 	 * @param {Array} buttonList Button list
 	 */
 	setButtons(buttonList) {
 		this._moreLayerOff();
-		this.menu.dropdownOff();
-		this.menu.containerOff();
+		this.#menu.dropdownOff();
+		this.#menu.containerOff();
 
 		const { icons, lang } = this;
 		const newToolbar = CreateToolBar(buttonList, this.plugins, this.editor.__options, icons, lang, true);
@@ -199,17 +197,47 @@ Toolbar.prototype = {
 		this.context.get(this.keyName.main).replaceChild(newToolbar.buttonTray, this.context.get(this.keyName.buttonTray));
 		this.context.set(this.keyName.buttonTray, newToolbar.buttonTray);
 
-		this._resetButtonInfo();
+		this.#resetButtonInfo();
 
 		this.triggerEvent('onSetToolbarButtons', { buttonTray: newToolbar.buttonTray, frameContext: this.frameContext });
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ToolbarThis}
+	 * @description Reset the sticky toolbar position based on the editor state.
+	 */
+	_resetSticky() {
+		const wrapper = this.frameContext.get('wrapper');
+		if (!wrapper) return;
+
+		const toolbar = this.context.get(this.keyName.main);
+		const stickyTop = this.options.get('toolbar_sticky');
+		if (this.frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || stickyTop < 0) return;
+
+		const currentScrollY = this.#isViewPortSize ? _w.visualViewport.pageTop : _w.scrollY;
+
+		const minHeight = this.frameContext.get('_minHeight');
+		const editorHeight = wrapper.offsetHeight;
+		const editorOffset = this.#offset.getGlobal(this.frameContext.get('topArea'));
+		const y = currentScrollY + stickyTop;
+		const t = (this.isBalloonMode || this.isInlineMode ? editorOffset.top : this.#offset.getGlobal(this.options.get('toolbar_container')).top) - (this.isInlineMode ? toolbar.offsetHeight : 0);
+		const inlineOffset = 1;
+
+		const offSticky = !this.options.get('toolbar_container') ? editorHeight + t + stickyTop - y - minHeight : editorOffset.top - currentScrollY + editorHeight - minHeight - stickyTop - toolbar.offsetHeight;
+		if (y < t) {
+			this.#offSticky();
+		} else if (offSticky < 0) {
+			if (!this.isSticky) this.#onSticky(inlineOffset);
+			toolbar.style.top = inlineOffset + offSticky + this.#getViewportTop() + 'px';
+		} else {
+			this.#onSticky(inlineOffset);
+		}
+	}
+
+	/**
 	 * @description Reset the common buttons info.
 	 */
-	_resetButtonInfo() {
+	#resetButtonInfo() {
 		this.editor.allCommandButtons = new Map();
 		this.editor.subAllCommandButtons = new Map();
 		this.editor.commandTargets = new Map();
@@ -222,111 +250,25 @@ Toolbar.prototype = {
 		this._resetSticky();
 
 		this.editor.effectNode = null;
-		this.viewer._setButtonsActive();
+		this.#viewer._setButtonsActive();
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
-		if (this.frameContext.get('isReadOnly')) this.ui.setControllerOnDisabledButtons(true);
-	},
+		if (this.frameContext.get('isReadOnly')) this.#ui.setControllerOnDisabledButtons(true);
+	}
 
 	/**
 	 * @internal
-	 * @this {ToolbarThis}
-	 * @description Reset the sticky toolbar position based on the editor state.
-	 */
-	_resetSticky() {
-		const wrapper = this.frameContext.get('wrapper');
-		if (!wrapper) return;
-
-		const toolbar = this.context.get(this.keyName.main);
-		const stickyTop = this.options.get('toolbar_sticky');
-		if (this.frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || stickyTop < 0) return;
-
-		const currentScrollY = this._isViewPortSize ? _w.visualViewport.pageTop : _w.scrollY;
-
-		const minHeight = this.frameContext.get('_minHeight');
-		const editorHeight = wrapper.offsetHeight;
-		const editorOffset = this.offset.getGlobal(this.frameContext.get('topArea'));
-		const y = currentScrollY + stickyTop;
-		const t = (this._isBalloon || this._isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this._isInline ? toolbar.offsetHeight : 0);
-		const inlineOffset = 1;
-
-		const offSticky = !this.options.get('toolbar_container') ? editorHeight + t + stickyTop - y - minHeight : editorOffset.top - currentScrollY + editorHeight - minHeight - stickyTop - toolbar.offsetHeight;
-		if (y < t) {
-			this._offSticky();
-		} else if (offSticky < 0) {
-			if (!this.isSticky) this._onSticky(inlineOffset);
-			toolbar.style.top = inlineOffset + offSticky + this.__getViewportTop() + 'px';
-		} else {
-			this._onSticky(inlineOffset);
-		}
-	},
-
-	/**
-	 * @internal
-	 * @this {ToolbarThis}
-	 * @description Enable sticky toolbar mode and adjust position.
-	 */
-	_onSticky(inlineOffset) {
-		const toolbar = this.context.get(this.keyName.main);
-
-		if (!this._isInline) {
-			const stickyDummy = !this.options.get('toolbar_container') ? this.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
-			stickyDummy.style.height = toolbar.offsetHeight + 'px';
-			stickyDummy.style.display = 'block';
-		}
-
-		const toolbarTopPosition = this.options.get('toolbar_sticky') + inlineOffset + this.__getViewportTop();
-		toolbar.style.top = `${toolbarTopPosition}px`;
-		toolbar.style.width = this._isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
-		dom.utils.addClass(toolbar, 'se-toolbar-sticky');
-		this.isSticky = true;
-	},
-
-	/**
-	 * @internal
-	 * @this {ToolbarThis}
-	 * @description Get the viewport's top offset.
-	 * @returns {number}
-	 */
-	__getViewportTop() {
-		if (this._isViewPortSize) {
-			return _w.visualViewport.offsetTop;
-		}
-		return 0;
-	},
-
-	/**
-	 * @internal
-	 * @this {ToolbarThis}
-	 * @description Disable sticky toolbar mode.
-	 */
-	_offSticky() {
-		const stickyDummy = !this.options.get('toolbar_container') ? this.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
-		stickyDummy.style.display = 'none';
-
-		const toolbar = this.context.get(this.keyName.main);
-		toolbar.style.top = this._isInline ? this._inlineToolbarAttr.top : '';
-		toolbar.style.width = this._isInline ? this._inlineToolbarAttr.width : '';
-		this.frameContext.get('wrapper').style.marginTop = '';
-
-		dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
-		this.isSticky = false;
-	},
-
-	/**
-	 * @internal
-	 * @this {ToolbarThis}
 	 * @description Set up responsive behavior for the toolbar buttons.
 	 */
 	_setResponsive() {
-		if (this._rButtonArray?.length === 0) {
-			this._rButtonArray = null;
+		if (this.#rButtonArray?.length === 0) {
+			this.#rButtonArray = null;
 			return;
 		}
 
-		this._responsiveCurrentSize = 'default';
-		const _rButtonsize = (this._rButtonsize = []);
-		const _responsiveButtons = this._originRes;
-		const buttonsObj = (this._rButtonsInfo = {
+		this.#responsiveCurrentSize = 'default';
+		const _rButtonsize = (this.#rButtonsize = []);
+		const _responsiveButtons = this.#originRes;
+		const buttonsObj = (this.#rButtonsInfo = {
 			default: _responsiveButtons[0],
 		});
 
@@ -338,26 +280,25 @@ Toolbar.prototype = {
 		}
 
 		_rButtonsize.sort((a, b) => a - b).unshift('default');
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ToolbarThis}
 	 * @description Show the balloon toolbar based on the current selection.
 	 * @param {?Range} [rangeObj] - Selection range
 	 */
 	_showBalloon(rangeObj) {
-		if (!this._isBalloon) {
+		if (!this.isBalloonMode) {
 			return;
 		}
 		if (this.isSub) this.resetResponsiveToolbar();
 
-		const range = rangeObj || this.selection.getRange();
+		const range = rangeObj || this.#selection.getRange();
 		const toolbar = this.context.get(this.keyName.main);
-		const selection = this.selection.get();
+		const selection = this.#selection.get();
 
 		let isDirTop;
-		if (this._isBalloonAlways && range.collapsed) {
+		if (this.isBalloonAlwaysMode && range.collapsed) {
 			isDirTop = true;
 		} else if (selection.focusNode === selection.anchorNode) {
 			isDirTop = selection.focusOffset < selection.anchorOffset;
@@ -369,11 +310,10 @@ Toolbar.prototype = {
 		this._setBalloonOffset(isDirTop, range);
 
 		this.triggerEvent('onShowToolbar', { toolbar, mode: 'balloon', frameContext: this.frameContext });
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ToolbarThis}
 	 * @description Adjust the balloon toolbar's position.
 	 * @param {boolean} positionTop - Whether the toolbar should be positioned above the selection
 	 * @param {Range} [range] - Selection range
@@ -381,10 +321,10 @@ Toolbar.prototype = {
 	_setBalloonOffset(positionTop, range) {
 		const toolbar = this.context.get(this.keyName.main);
 		const topArea = this.frameContext.get('topArea');
-		const offsets = this.offset.getGlobal(topArea);
+		const offsets = this.#offset.getGlobal(topArea);
 		const stickyTop = offsets.top;
 
-		if (!this.offset.setRangePosition(toolbar, range, { position: positionTop ? 'top' : 'bottom', addTop: stickyTop })) {
+		if (!this.#offset.setRangePosition(toolbar, range, { position: positionTop ? 'top' : 'bottom', addTop: stickyTop })) {
 			this.hide();
 			return;
 		}
@@ -406,42 +346,40 @@ Toolbar.prototype = {
 			toolbar.style.top = toolbar.offsetTop - top + topArea.offsetTop + 'px';
 		}
 
-		const wwScroll = this.offset.getWWScroll();
-		this._balloonOffset = {
+		const wwScroll = this.#offset.getWWScroll();
+		this.balloonOffset = {
 			top: toolbar.offsetTop + wwScroll.top,
 			left: toolbar.offsetLeft + wwScroll.left,
 			position: positionTop ? 'top' : 'bottom',
 		};
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ToolbarThis}
 	 * @description Show the inline toolbar mode.
 	 */
 	_showInline() {
-		if (!this._isInline) return;
+		if (!this.isInlineMode) return;
 
 		const toolbar = this.context.get(this.keyName.main);
 		toolbar.style.visibility = 'hidden';
-		this._offSticky();
+		this.#offSticky();
 
 		toolbar.style.display = 'block';
 		toolbar.style.top = '0px';
-		this._inlineToolbarAttr.width = toolbar.style.width = this.options.get(this.keyName.width);
-		this._inlineToolbarAttr.top = toolbar.style.top = -1 + (this.offset.getGlobal(this.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) + 'px';
+		this.inlineToolbarAttr.width = toolbar.style.width = this.options.get(this.keyName.width);
+		this.inlineToolbarAttr.top = toolbar.style.top = -1 + (this.#offset.getGlobal(this.frameContext.get('topArea')).top - this.#offset.getGlobal(toolbar).top - toolbar.offsetHeight) + 'px';
 
 		this._resetSticky();
-		this._inlineToolbarAttr.isShow = true;
+		this.inlineToolbarAttr.isShow = true;
 
 		this.triggerEvent('onShowToolbar', { toolbar, mode: 'inline', frameContext: this.frameContext });
 
 		toolbar.style.visibility = '';
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ToolbarThis}
 	 * @description Show a more options layer for toolbar buttons.
 	 * @param {Node} button - Button element
 	 * @param {Node} layer - More options layer element
@@ -450,11 +388,10 @@ Toolbar.prototype = {
 		this._moreLayerOff();
 		this.currentMoreLayerActiveButton = /** @type {HTMLButtonElement} */ (button);
 		/** @type {HTMLElement} */ (layer).style.display = 'block';
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ToolbarThis}
 	 * @description Hide the currently active more options layer.
 	 */
 	_moreLayerOff() {
@@ -465,18 +402,61 @@ Toolbar.prototype = {
 			dom.utils.removeClass(this.currentMoreLayerActiveButton, 'on');
 			this.currentMoreLayerActiveButton = null;
 		}
-	},
+	}
+
+	/**
+	 * @description Enable sticky toolbar mode and adjust position.
+	 */
+	#onSticky(inlineOffset) {
+		const toolbar = this.context.get(this.keyName.main);
+
+		if (!this.isInlineMode) {
+			const stickyDummy = !this.options.get('toolbar_container') ? this.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
+			stickyDummy.style.height = toolbar.offsetHeight + 'px';
+			stickyDummy.style.display = 'block';
+		}
+
+		const toolbarTopPosition = this.options.get('toolbar_sticky') + inlineOffset + this.#getViewportTop();
+		toolbar.style.top = `${toolbarTopPosition}px`;
+		toolbar.style.width = this.isInlineMode ? this.inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
+		dom.utils.addClass(toolbar, 'se-toolbar-sticky');
+		this.isSticky = true;
+	}
+
+	/**
+	 * @description Get the viewport's top offset.
+	 * @returns {number}
+	 */
+	#getViewportTop() {
+		if (this.#isViewPortSize) {
+			return _w.visualViewport.offsetTop;
+		}
+		return 0;
+	}
+
+	/**
+	 * @description Disable sticky toolbar mode.
+	 */
+	#offSticky() {
+		const stickyDummy = !this.options.get('toolbar_container') ? this.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
+		stickyDummy.style.display = 'none';
+
+		const toolbar = this.context.get(this.keyName.main);
+		toolbar.style.top = this.isInlineMode ? this.inlineToolbarAttr.top : '';
+		toolbar.style.width = this.isInlineMode ? this.inlineToolbarAttr.width : '';
+		this.frameContext.get('wrapper').style.marginTop = '';
+
+		dom.utils.removeClass(toolbar, 'se-toolbar-sticky');
+		this.isSticky = false;
+	}
 
 	/**
 	 * @internal
-	 * @this {ToolbarThis}
 	 * @description Destroy the Toolbar instance and release memory
 	 */
 	_destroy() {
 		this._moreLayerOff();
-	},
-
-	constructor: Toolbar,
-};
+	}
+}
 
 export default Toolbar;

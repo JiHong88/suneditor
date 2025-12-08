@@ -366,7 +366,7 @@ class Figure extends CoreInjector {
 	close() {
 		this.editor._preventBlur = false;
 		dom.utils.removeClass(this._cover, 'se-figure-selected');
-		this.component._removeDragEvent();
+		this.component.__removeDragEvent();
 		this.#removeGlobalEvents();
 		this.controller?.close();
 	}
@@ -809,13 +809,14 @@ class Figure extends CoreInjector {
 						this.selection.setRange(captionText, 0, captionText, captionText.textContent.length);
 					}
 
+					this._caption = caption;
 					this.controller.close();
 				} else {
 					dom.utils.removeItem(this._caption);
 					_w.setTimeout(this.component.select.bind(this.component, element, this.kind), 0);
+					this._caption = null;
 				}
 
-				this._caption = !this._caption;
 				if (/\d+/.test(element.style.height) || (this.isVertical && this._caption)) {
 					if (/%$/.test(element.style.width) || /auto/.test(element.style.height)) {
 						this.deleteTransform();
@@ -1299,11 +1300,11 @@ class Figure extends CoreInjector {
 	 * @description Removes the resize event listeners.
 	 */
 	#offResizeEvent() {
-		this.component._removeDragEvent();
+		this.component.__removeDragEvent();
 		this.#removeGlobalEvents();
 
 		this._displayResizeHandles(true);
-		this.ui._offCurrentController();
+		this.ui.offCurrentController();
 		this.ui.disableBackWrapper();
 	}
 

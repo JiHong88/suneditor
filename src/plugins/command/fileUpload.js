@@ -209,7 +209,7 @@ class FileUpload extends PluginCommand {
 		const isInlineComp = this.component.isInline(containerTarget);
 		const focusEl = isInlineComp ? containerTarget.previousSibling || containerTarget.nextSibling : containerTarget.previousElementSibling || containerTarget.nextElementSibling;
 		dom.utils.removeItem(containerTarget);
-		this.ui._offCurrentController();
+		this.ui.offCurrentController();
 
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);

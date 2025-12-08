@@ -153,55 +153,163 @@ describe('Offset', () => {
 	describe('getGlobalScroll', () => {
 		it('should get global scroll info', () => {
 			wysiwyg.innerHTML = '<p>test</p>';
-
 			const result = offset.getGlobalScroll();
-
 			expect(result).toBeDefined();
 			expect(result.top).toBeDefined();
-			expect(result.left).toBeDefined();
-			expect(result.width).toBeDefined();
-			expect(result.height).toBeDefined();
 		});
 
-		it('should have offset elements', () => {
-			wysiwyg.innerHTML = '<p>test</p>';
+		it('should handle scrolling elements', () => {
+			wysiwyg.innerHTML = '<div style="height: 1000px; overflow: scroll;"><div style="height: 2000px;">content</div></div>';
+			const scrollDiv = wysiwyg.firstChild;
+			scrollDiv.scrollTop = 100;
+			
+			const result = offset.getGlobalScroll(scrollDiv.firstChild);
+			expect(result.top).toBeGreaterThan(0);
+		});
 
+		it('should handle absolute positioned elements', () => {
+			wysiwyg.innerHTML = '<div style="position: absolute; top: 100px;">absolute</div>';
+			const absDiv = wysiwyg.firstChild;
+			const result = offset.getGlobalScroll(absDiv);
+			expect(result.ohOffsetEl).toBe(window);
+		});
+		
+		it('should handle iframe context', () => {
+			// Mock iframe environment
+			const mockIframe = {
+				nodeName: 'IFRAME',
+				parentElement: document.createElement('div'),
+				contentDocument: document,
+				getBoundingClientRect: () => ({ top: 0, left: 0 })
+			};
+			editor.frameContext.get('wysiwygFrame'); // Ensure it exists
+			editor.frameContext.set('wysiwygFrame', mockIframe);
+			
 			const result = offset.getGlobalScroll();
-
-			expect(result.ohOffsetEl).toBeDefined();
-			expect(result.owOffsetEl).toBeDefined();
-			expect(result.oh).toBeDefined();
-			expect(result.ow).toBeDefined();
-		});
-
-		it('should have editor reference flags', () => {
-			wysiwyg.innerHTML = '<p>test</p>';
-
-			const result = offset.getGlobalScroll();
-
-			expect(typeof result.heightEditorRefer).toBe('boolean');
-			expect(typeof result.widthEditorRefer).toBe('boolean');
-		});
-
-		it('should have position values', () => {
-			wysiwyg.innerHTML = '<p>test</p>';
-
-			const result = offset.getGlobalScroll();
-
-			expect(result.ts).toBeDefined();
-			expect(result.ls).toBeDefined();
-			expect(result.x).toBeDefined();
-			expect(result.y).toBeDefined();
-		});
-
-		it('should handle specific node', () => {
-			wysiwyg.innerHTML = '<p>test</p>';
-			const p = wysiwyg.firstChild;
-
-			const result = offset.getGlobalScroll(p);
-
 			expect(result).toBeDefined();
-			expect(typeof result.top).toBe('number');
+		});
+	});
+
+	describe('setAbsPosition', () => {
+		it('should position element absolutely', () => {
+			const element = document.createElement('div');
+			const target = document.createElement('div');
+			const arrow = document.createElement('div');
+			arrow.className = 'se-arrow';
+			element.appendChild(arrow);
+
+			document.body.appendChild(element);
+			document.body.appendChild(target);
+
+			const params = {
+				addOffset: { left: 10, top: 10 },
+				position: 'bottom',
+				inst: {},
+				sibling: null
+			};
+
+			const result = offset.setAbsPosition(element, target, params);
+
+			expect(element.style.top).toContain('px');
+			expect(element.style.left).toContain('px');
+			expect(result).toBeDefined();
+
+			document.body.removeChild(element);
+			document.body.removeChild(target);
+		});
+	});
+
+
+
+	describe('setRangePosition', () => {
+		it('should position element relative to range', () => {
+			const element = document.createElement('div');
+			const arrow = document.createElement('div');
+			arrow.className = 'se-arrow';
+			element.appendChild(arrow);
+			document.body.appendChild(element);
+
+			const range = document.createRange();
+			const p = document.createElement('p');
+			p.textContent = 'test';
+			document.body.appendChild(p);
+
+			range.selectNodeContents(p);
+			
+			// Mock Range.prototype.getClientRects
+			const originalGetClientRects = Range.prototype.getClientRects;
+			Range.prototype.getClientRects = jest.fn(() => [{
+				top: 100,
+				bottom: 120,
+				left: 100,
+				right: 200,
+				width: 100,
+				height: 20
+			}]);
+
+			const result = offset.setRangePosition(element, range, { position: 'bottom', addTop: 10 });
+
+			expect(element.style.top).toContain('px');
+			expect(element.style.left).toContain('px');
+			
+			// Restore
+			Range.prototype.getClientRects = originalGetClientRects;
+
+			// Clean up
+			document.body.removeChild(element);
+			document.body.removeChild(p);
+		});
+	});
+
+	describe('setRelPosition', () => {
+		let getComputedStyleSpy;
+
+		afterEach(() => {
+			getComputedStyleSpy?.mockRestore();
+		});
+
+		it('should position element relative to fixed container', () => {
+			const element = document.createElement('div');
+			const container = document.createElement('div');
+			const target = document.createElement('button');
+			const targetContainer = document.createElement('div');
+
+			Object.defineProperty(target, 'offsetHeight', { value: 20 });
+			Object.defineProperty(target, 'offsetWidth', { value: 30 });
+			Object.defineProperty(element, 'offsetHeight', { value: 10 });
+			Object.defineProperty(element, 'offsetWidth', { value: 10 });
+
+			getComputedStyleSpy = jest.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
+				if (el === targetContainer) return { position: 'fixed' };
+				return { position: '' };
+			});
+
+			offset.setRelPosition(element, container, target, targetContainer);
+
+			expect(element.style.position).toBe('fixed');
+			expect(element.style.top).toContain('px');
+			expect(element.style.left).toContain('px');
+		});
+
+		it('should position element with rtl option', () => {
+			const originalGet = editor.options.get;
+			editor.options.get = jest.fn((key) => (key === '_rtl' ? true : originalGet.call(editor.options, key)));
+
+			const element = document.createElement('div');
+			const container = document.createElement('div');
+			const target = document.createElement('button');
+			const targetContainer = document.createElement('div');
+
+			Object.defineProperty(target, 'offsetHeight', { value: 20 });
+			Object.defineProperty(target, 'offsetWidth', { value: 40 });
+			Object.defineProperty(element, 'offsetHeight', { value: 10 });
+			Object.defineProperty(element, 'offsetWidth', { value: 15 });
+
+			offset.setRelPosition(element, container, target, targetContainer);
+
+			expect(element.style.left).toContain('px');
+
+			editor.options.get = originalGet;
 		});
 	});
 

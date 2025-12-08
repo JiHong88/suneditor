@@ -15,11 +15,8 @@ describe('EventManager - Working Tests', () => {
 		it('should initialize with required properties', () => {
 			expect(eventManager.isComposing).toBe(false);
 			expect(eventManager.scrollparents).toEqual([]);
-			expect(eventManager._events).toEqual([]);
-			expect(eventManager._onButtonsCheck).toBeInstanceOf(RegExp);
 			expect(eventManager._onShortcutKey).toBe(false);
 			expect(eventManager._handledInBefore).toBe(false);
-			expect(eventManager._balloonDelay).toBe(null);
 		});
 
 		it('should set up input plugin properties', () => {
@@ -33,6 +30,7 @@ describe('EventManager - Working Tests', () => {
 	describe('addEvent', () => {
 		it('should add event to single target', () => {
 			const target = document.createElement('div');
+			jest.spyOn(target, 'addEventListener');
 			const listener = jest.fn();
 
 			const eventInfo = eventManager.addEvent(target, 'click', listener);
@@ -41,19 +39,21 @@ describe('EventManager - Working Tests', () => {
 				target,
 				type: 'click',
 				listener,
-				useCapture: undefined
+				useCapture: undefined,
 			});
-			expect(eventManager._events).toHaveLength(1);
+			expect(target.addEventListener).toHaveBeenCalledWith('click', listener, undefined);
 		});
 
 		it('should add event to multiple targets', () => {
 			const targets = [document.createElement('div'), document.createElement('span')];
 			const listener = jest.fn();
+			targets.forEach((t) => jest.spyOn(t, 'addEventListener'));
 
 			const eventInfo = eventManager.addEvent(targets, 'click', listener);
 
 			expect(eventInfo.target).toEqual(targets);
-			expect(eventManager._events).toHaveLength(2);
+			expect(targets[0].addEventListener).toHaveBeenCalledWith('click', listener, undefined);
+			expect(targets[1].addEventListener).toHaveBeenCalledWith('click', listener, undefined);
 		});
 
 		it('should return null for null target', () => {
@@ -93,7 +93,7 @@ describe('EventManager - Working Tests', () => {
 		beforeEach(() => {
 			global.window = {
 				addEventListener: jest.fn(),
-				removeEventListener: jest.fn()
+				removeEventListener: jest.fn(),
 			};
 		});
 
@@ -105,7 +105,7 @@ describe('EventManager - Working Tests', () => {
 			expect(eventInfo).toEqual({
 				type: 'resize',
 				listener,
-				useCapture: undefined
+				useCapture: undefined,
 			});
 		});
 
@@ -125,7 +125,7 @@ describe('EventManager - Working Tests', () => {
 		beforeEach(() => {
 			global.window = {
 				addEventListener: jest.fn(),
-				removeEventListener: jest.fn()
+				removeEventListener: jest.fn(),
 			};
 		});
 
@@ -191,7 +191,7 @@ describe('EventManager - Working Tests', () => {
 			mockEditor.component.is.mockReturnValue(true);
 			mockEditor.component.get.mockReturnValue({
 				target: componentElement,
-				pluginName: 'test'
+				pluginName: 'test',
 			});
 
 			eventManager.applyTagEffect(componentElement);
@@ -218,11 +218,11 @@ describe('EventManager - Working Tests', () => {
 		it('should handle paste action successfully', async () => {
 			const mockClipboardData = {
 				getData: jest.fn().mockReturnValue('<p>test</p>'),
-				files: []
+				files: [],
 			};
 			const mockEvent = {
 				preventDefault: jest.fn(),
-				stopPropagation: jest.fn()
+				stopPropagation: jest.fn(),
 			};
 
 			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
@@ -236,11 +236,11 @@ describe('EventManager - Working Tests', () => {
 			const mockClipboardData = {
 				getData: jest.fn().mockImplementation(() => {
 					throw new Error('Test error');
-				})
+				}),
 			};
 			const mockEvent = {
 				preventDefault: jest.fn(),
-				stopPropagation: jest.fn()
+				stopPropagation: jest.fn(),
 			};
 
 			const consoleWarn = jest.spyOn(console, 'warn').mockImplementation();
@@ -257,22 +257,23 @@ describe('EventManager - Working Tests', () => {
 	describe('_removeAllEvents', () => {
 		it('should remove all registered events', () => {
 			const target = document.createElement('div');
+			jest.spyOn(target, 'addEventListener');
+			jest.spyOn(target, 'removeEventListener');
 			const listener = jest.fn();
 
 			eventManager.addEvent(target, 'click', listener);
-			expect(eventManager._events).toHaveLength(1);
 
 			eventManager._removeAllEvents();
 
-			expect(eventManager._events).toHaveLength(0);
+			expect(target.removeEventListener).toHaveBeenCalledWith('click', listener, undefined);
 		});
 
 		it('should disconnect observers', () => {
 			const mockWwFrameObserver = {
-				disconnect: jest.fn()
+				disconnect: jest.fn(),
 			};
 			const mockToolbarObserver = {
-				disconnect: jest.fn()
+				disconnect: jest.fn(),
 			};
 
 			eventManager._wwFrameObserver = mockWwFrameObserver;
@@ -287,38 +288,6 @@ describe('EventManager - Working Tests', () => {
 		});
 	});
 
-	describe('_moveContainer', () => {
-		it('should move balloon toolbar position', () => {
-			mockEditor.isBalloon = true;
-			eventManager.toolbar._balloonOffset = { top: 100, left: 100 };
-			const toolbar = document.createElement('div');
-			toolbar.style.position = 'absolute';
-			mockEditor.context.get.mockReturnValue(toolbar);
-
-			const scrollEvent = { scrollTop: 50, scrollLeft: 25 };
-
-			eventManager._moveContainer(scrollEvent);
-
-			expect(toolbar.style.top).toBe('50px');
-			expect(toolbar.style.left).toBe('75px');
-		});
-
-		it('should move sub-balloon toolbar position', () => {
-			mockEditor.isSubBalloon = true;
-			eventManager.subToolbar._balloonOffset = { top: 100, left: 100 };
-			const subToolbar = document.createElement('div');
-			subToolbar.style.position = 'absolute';
-			mockEditor.context.get.mockReturnValue(subToolbar);
-
-			const scrollEvent = { scrollTop: 30, scrollLeft: 15 };
-
-			eventManager._moveContainer(scrollEvent);
-
-			expect(subToolbar.style.top).toBe('70px');
-			expect(subToolbar.style.left).toBe('85px');
-		});
-	});
-
 	describe('clipboard data processing', () => {
 		let mockClipboardData;
 		let mockEvent;
@@ -326,11 +295,11 @@ describe('EventManager - Working Tests', () => {
 		beforeEach(() => {
 			mockClipboardData = {
 				getData: jest.fn(),
-				files: []
+				files: [],
 			};
 			mockEvent = {
 				preventDefault: jest.fn(),
-				stopPropagation: jest.fn()
+				stopPropagation: jest.fn(),
 			};
 			mockEditor.triggerEvent.mockResolvedValue(undefined);
 			mockEditor.html.clean.mockReturnValue('<p>cleaned</p>');
@@ -342,7 +311,7 @@ describe('EventManager - Working Tests', () => {
 			// Mock converter for text processing
 			const mockConverter = {
 				htmlToEntity: jest.fn((text) => text.replace(/</g, '&lt;').replace(/>/g, '&gt;')),
-				textToAnchor: jest.fn()
+				textToAnchor: jest.fn(),
 			};
 
 			// Mock dom.query.getListChildNodes
@@ -353,16 +322,16 @@ describe('EventManager - Working Tests', () => {
 				parseFromString: jest.fn().mockReturnValue({
 					body: {
 						innerHTML: '<p>parsed</p>',
-						childNodes: []
-					}
-				})
+						childNodes: [],
+					},
+				}),
 			}));
 
 			// Replace converter import with mock
 			jest.doMock('../../../../src/helper', () => ({
 				dom: dom,
 				unicode: unicode,
-				converter: mockConverter
+				converter: mockConverter,
 			}));
 		});
 
@@ -373,10 +342,7 @@ describe('EventManager - Working Tests', () => {
 				return '';
 			});
 
-			// Mock converter for plain text processing
-			const convertedText = 'plain text'.replace(/\n/g, '<br>');
-
-			const result = await eventManager._setClipboardData('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
 
 			expect(mockEditor.html.insert).toHaveBeenCalled();
 			expect(result).toBe(false);
@@ -389,7 +355,7 @@ describe('EventManager - Working Tests', () => {
 				return '';
 			});
 
-			const result = await eventManager._setClipboardData('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
 
 			expect(mockEditor.html.clean).toHaveBeenCalled();
 			expect(result).toBe(false);
@@ -400,7 +366,7 @@ describe('EventManager - Working Tests', () => {
 			mockClipboardData.getData.mockReturnValue('');
 			eventManager._callPluginEventAsync = jest.fn();
 
-			const result = await eventManager._setClipboardData('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
 
 			expect(eventManager._callPluginEventAsync).toHaveBeenCalledWith('onFilePasteAndDrop', expect.any(Object));
 			expect(result).toBe(false);
@@ -410,7 +376,7 @@ describe('EventManager - Working Tests', () => {
 			mockClipboardData.getData.mockReturnValue('<p>content</p>');
 			mockEditor.triggerEvent.mockResolvedValue(false);
 
-			const result = await eventManager._setClipboardData('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
 
 			expect(result).toBe(false);
 			expect(mockEditor.html.insert).not.toHaveBeenCalled();
@@ -427,7 +393,7 @@ describe('EventManager - Working Tests', () => {
 
 				mockEditor.nodeTransform.createNestedNode.mockReturnValue({
 					parent: document.createElement('strong'),
-					inner: document.createElement('em')
+					inner: document.createElement('em'),
 				});
 				dom.utils.createTextNode = jest.fn(() => document.createTextNode(unicode.zeroWidthSpace));
 
@@ -493,25 +459,19 @@ describe('EventManager - Working Tests', () => {
 			expect(() => eventManager.applyTagEffect()).not.toThrow();
 		});
 
-		it('should handle missing elements gracefully', () => {
-			mockEditor.context.get.mockReturnValue(null);
-
-			expect(() => eventManager._moveContainer({ scrollTop: 0, scrollLeft: 0 })).not.toThrow();
-		});
-
 		it('should handle missing clipboard data gracefully', async () => {
 			const mockClipboardData = {
 				getData: jest.fn().mockReturnValue(''),
-				files: []
+				files: [],
 			};
 			const mockEvent = {
 				preventDefault: jest.fn(),
-				stopPropagation: jest.fn()
+				stopPropagation: jest.fn(),
 			};
 
 			mockEditor.char.test.mockReturnValue(false);
 
-			const result = await eventManager._setClipboardData('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
+			const result = await eventManager._dataTransferAction('paste', mockEvent, mockClipboardData, mockEditor.frameContext);
 
 			expect(result).toBe(false);
 			expect(mockEditor.html.insert).not.toHaveBeenCalled();

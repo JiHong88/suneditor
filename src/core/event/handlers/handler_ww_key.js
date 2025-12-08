@@ -13,7 +13,7 @@ const keyState = {
 const _styleNodes = Object.preventExtensions({ value: [] });
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_key_input
+ * @typedef {import('../eventManager').default} EventManagerThis_handler_ww_key_input
  */
 
 /**
@@ -52,7 +52,7 @@ export async function OnKeyDown_wysiwyg(fc, e) {
 
 	/** default key action */
 	if (keyCodeMap.isEnter(keyCode) && this.format.isLine(this.selection.getRange()?.startContainer)) {
-		this.selection._resetRangeToTextNode();
+		this.selection.resetRangeToTextNode();
 		selectionNode = this.selection.getNode();
 	}
 

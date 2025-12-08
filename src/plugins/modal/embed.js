@@ -78,6 +78,15 @@ class Embed extends PluginModal {
 			src = target?.src || target?.href;
 		}
 
+		if (/^BLOCKQUOTE$/i.test(node?.nodeName)) {
+			const link = node.querySelector('a');
+			if (link && link.href) {
+				target = node;
+				src = link.href;
+				return this.checkContentType(src) ? target : null;
+			}
+		}
+
 		if (src) {
 			return this.checkContentType(src) ? target : null;
 		}
@@ -427,7 +436,12 @@ class Embed extends PluginModal {
 			const processUrl = this.findProcessUrl(src);
 			if (!processUrl) return false;
 			src = processUrl.url;
-			embedInfo = { url: src, ...this.#getInfo(), process: processUrl };
+
+			embedInfo = {
+				...this.#getInfo(),
+				url: src,
+				process: processUrl,
+			};
 		}
 
 		const handler = function (uploadCallback, infos, newInfos) {
@@ -465,6 +479,14 @@ class Embed extends PluginModal {
 		this.#container = figureInfo.container;
 		this._caption = figureInfo.caption;
 		this.#align = figureInfo.align;
+
+		if (!this.#cover?.getAttribute?.('data-se-origin')) {
+			const src = target?.getAttribute?.('src') || target?.querySelector?.('a')?.href;
+			if (src && this.checkContentType(src)) {
+				this.#cover.setAttribute('data-se-origin', src);
+			}
+		}
+
 		target.style.float = '';
 
 		this.#origin_w = String(figureInfo.originWidth || figureInfo.w || '');
@@ -566,12 +588,10 @@ class Embed extends PluginModal {
 				cover = figure.cover;
 				container = figure.container;
 
-				let chd = null;
-				let index = 0;
-				while ((chd = /** @type {Element} */ (children[index]))) {
+				const childNodes = Array.from(children);
+				for (const chd of childNodes) {
 					if (/^script$/i.test(chd.nodeName)) {
-						scriptTag = dom.utils.createElement('script', { src: chd.getAttribute('src'), async: 'true' }, null);
-						index++;
+						scriptTag = dom.utils.createElement('script', { src: /** @type {Element} */ (chd).getAttribute('src'), async: 'true' }, null);
 						continue;
 					}
 					cover.appendChild(chd);

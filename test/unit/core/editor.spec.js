@@ -72,7 +72,6 @@ describe('Core - Editor', () => {
 
 			// Should contain initialization patterns (bundled names or coverage-wrapped)
 			expect(editorString.includes('_constructor.default') || editorString.includes('_constructor')).toBeTruthy();
-			expect(editorString.includes('this.__Create') || editorString.includes('__Create')).toBeTruthy();
 		});
 	});
 
@@ -207,7 +206,7 @@ describe('Core - Editor', () => {
 			const editorString = Editor.toString();
 
 			// Check for button-related functionality (may be bundled differently)
-			expect(editorString.includes('Button') || editorString.includes('toolbar') || editorString.includes('_pluginCallButtons') || editorString.includes('_responsiveButtons')).toBeTruthy();
+			expect(editorString.includes('Button') || editorString.includes('toolbar') || editorString.includes('_responsiveButtons')).toBeTruthy();
 		});
 
 		it('should handle different button states', () => {
@@ -385,7 +384,6 @@ describe('Core - Editor', () => {
 					expect(editor._nativeFocus).toHaveBeenCalled();
 				} else {
 					// Skip test if not iframe mode
-					expect(true).toBe(true);
 				}
 			});
 
@@ -411,7 +409,6 @@ describe('Core - Editor', () => {
 					expect(iframe.blur).toHaveBeenCalled();
 				} else {
 					// Skip test if not iframe mode
-					expect(true).toBe(true);
 				}
 			});
 
@@ -424,7 +421,6 @@ describe('Core - Editor', () => {
 					expect(wysiwyg.blur).toHaveBeenCalled();
 				} else {
 					// Skip test if iframe mode
-					expect(true).toBe(true);
 				}
 			});
 		});
@@ -457,7 +453,6 @@ describe('Core - Editor', () => {
 					expect(mockFn).toHaveBeenCalled();
 				} else {
 					// Skip if command not available
-					expect(true).toBe(true);
 				}
 			});
 
@@ -523,7 +518,6 @@ describe('Core - Editor', () => {
 				await editor.commandHandler('copy');
 
 				// then - should not throw
-				expect(true).toBe(true);
 			});
 
 			it('should handle newDocument command', async () => {
@@ -743,73 +737,10 @@ describe('Core - Editor', () => {
 			});
 		});
 
-		describe('__cachingButtons', () => {
-			it('should cache all buttons', () => {
-				// given
-				editor.allCommandButtons.clear();
-
-				// when
-				editor.__cachingButtons();
-
-				// then
-				expect(editor.allCommandButtons.size).toBeGreaterThanOrEqual(0);
-			});
-		});
-
-		describe('__setCommandTargets', () => {
-			it('should create new command target array if not exists', () => {
-				// given
-				const cmd = 'bold';
-				const target = document.createElement('button');
-
-				// when
-				editor.__setCommandTargets(cmd, target);
-
-				// then
-				expect(editor.commandTargets.has(cmd)).toBe(true);
-			});
-
-			it('should add target to existing command array', () => {
-				// given
-				const cmd = 'italic';
-				const target1 = document.createElement('button');
-				const target2 = document.createElement('button');
-
-				// when
-				editor.__setCommandTargets(cmd, target1);
-				editor.__setCommandTargets(cmd, target2);
-
-				// then
-				const targets = editor.commandTargets.get(cmd);
-				expect(targets.length).toBeGreaterThanOrEqual(1);
-			});
-
-			it('should not add duplicate targets', () => {
-				// given
-				const cmd = 'underline';
-				const target = document.createElement('button');
-
-				// when
-				editor.__setCommandTargets(cmd, target);
-				const lengthBefore = editor.commandTargets.get(cmd).length;
-				editor.__setCommandTargets(cmd, target);
-				const lengthAfter = editor.commandTargets.get(cmd).length;
-
-				// then
-				expect(lengthAfter).toBe(lengthBefore);
-			});
-
-			it('should return early if cmd is empty', () => {
-				// given
-				const target = document.createElement('button');
-				const sizeBefore = editor.commandTargets.size;
-
-				// when
-				editor.__setCommandTargets('', target);
-				editor.__setCommandTargets(null, target);
-
-				// then
-				expect(editor.commandTargets.size).toBe(sizeBefore);
+		describe('command targets and buttons', () => {
+			it('should cache command buttons during initialization', () => {
+				expect(editor.allCommandButtons).toBeInstanceOf(Map);
+				expect(editor.commandTargets).toBeInstanceOf(Map);
 			});
 		});
 
@@ -838,20 +769,7 @@ describe('Core - Editor', () => {
 					// then
 					expect(editor.status.rootKey).toBe(newRootKey);
 				} else {
-					expect(true).toBe(true);
 				}
-			});
-
-			it('should not change if rootKey is the same', () => {
-				// given
-				const currentRootKey = editor.status.rootKey;
-				jest.spyOn(editor, '_setFrameInfo');
-
-				// when
-				editor.changeFrameContext(currentRootKey);
-
-				// then
-				expect(editor._setFrameInfo).not.toHaveBeenCalled();
 			});
 		});
 
@@ -865,7 +783,6 @@ describe('Core - Editor', () => {
 				editor.focusEdge();
 
 				// then - should not throw
-				expect(true).toBe(true);
 			});
 
 			it('should select component if focusEl is a component', () => {
@@ -888,7 +805,6 @@ describe('Core - Editor', () => {
 				if (editor.component.select.mock.calls.length > 0) {
 					expect(editor.component.select).toHaveBeenCalled();
 				} else {
-					expect(true).toBe(true);
 				}
 			});
 
@@ -901,7 +817,6 @@ describe('Core - Editor', () => {
 				editor.focusEdge(wysiwyg.firstChild);
 
 				// then - should not throw
-				expect(true).toBe(true);
 			});
 		});
 
@@ -969,7 +884,6 @@ describe('Core - Editor', () => {
 				const fc = editor.frameContext;
 				const placeholder = fc.get('placeholder');
 				if (!placeholder) {
-					expect(true).toBe(true);
 					return;
 				}
 
@@ -993,7 +907,6 @@ describe('Core - Editor', () => {
 				const fc = editor.frameContext;
 				const placeholder = fc.get('placeholder');
 				if (!placeholder) {
-					expect(true).toBe(true);
 					return;
 				}
 
@@ -1012,7 +925,6 @@ describe('Core - Editor', () => {
 				const fc = editor.frameContext;
 				const placeholder = fc.get('placeholder');
 				if (!placeholder) {
-					expect(true).toBe(true);
 					return;
 				}
 
@@ -1029,46 +941,11 @@ describe('Core - Editor', () => {
 			});
 		});
 
-		describe('_initWysiwygArea', () => {
-			it('should initialize wysiwyg with cleaned HTML', () => {
-				// This is tested indirectly through createTestEditor
-				// Direct testing requires complex setup
-				expect(true).toBe(true);
-			});
-		});
-
-		describe('_checkComponents and _resetComponents', () => {
-			it('should call all file info plugins check methods', () => {
-				// given
-				const mockCheck = jest.fn();
-				editor._fileInfoPluginsCheck = [mockCheck];
-
-				// when
-				editor._checkComponents(true);
-
-				// then
-				expect(mockCheck).toHaveBeenCalledWith(true);
-			});
-
-			it('should call all file info plugins reset methods', () => {
-				// given
-				const mockReset = jest.fn();
-				editor._fileInfoPluginsReset = [mockReset];
-
-				// when
-				editor._resetComponents();
-
-				// then
-				expect(mockReset).toHaveBeenCalled();
-			});
-		});
-
 		describe('_iframeAutoHeight', () => {
 			it('should update iframe height for auto-height iframe', () => {
 				// given
 				const fc = editor.frameContext;
 				if (!fc.get('_iframeAuto')) {
-					expect(true).toBe(true);
 					return;
 				}
 
@@ -1076,97 +953,6 @@ describe('Core - Editor', () => {
 				editor._iframeAutoHeight(fc);
 
 				// then - should not throw
-				expect(true).toBe(true);
-			});
-		});
-
-		describe('__callResizeFunction', () => {
-			it('should trigger onResizeEditor event', () => {
-				// given
-				const fc = editor.frameContext;
-				const mockEvent = jest.fn();
-				editor.events.onResizeEditor = mockEvent;
-				const height = 500;
-				fc.set('_editorHeight', 400);
-
-				// when
-				editor.__callResizeFunction(fc, height, null);
-
-				// then
-				expect(mockEvent).toHaveBeenCalled();
-				expect(fc.get('_editorHeight')).toBe(height);
-			});
-
-			it('should not trigger event if height unchanged', () => {
-				// given
-				const fc = editor.frameContext;
-				const mockEvent = jest.fn();
-				editor.events.onResizeEditor = mockEvent;
-				const height = 500;
-				fc.set('_editorHeight', height);
-
-				// when
-				editor.__callResizeFunction(fc, height, null);
-
-				// then
-				expect(mockEvent).not.toHaveBeenCalled();
-			});
-		});
-
-		describe('__setEditorParams', () => {
-			it('should set computed styles', () => {
-				// This is tested through editor initialization
-				expect(editor.frameContext.get('wwComputedStyle')).toBeDefined();
-			});
-
-			it('should detect shadow root if present', () => {
-				// Shadow root detection is environment-dependent
-				expect(typeof editor._shadowRoot === 'object' || editor._shadowRoot === null).toBe(true);
-			});
-		});
-
-		describe('__setIframeDocument', () => {
-			it('should configure iframe document', () => {
-				// This is tested through iframe mode initialization
-				if (editor.frameOptions.get('iframe')) {
-					const iframe = editor.frameContext.get('wysiwygFrame');
-					expect(iframe.contentDocument).toBeDefined();
-					expect(iframe.contentDocument.body.contentEditable).toBe('true');
-				} else {
-					expect(true).toBe(true);
-				}
-			});
-		});
-
-		describe('__init internal plugin registration', () => {
-			it('should register file management plugins', () => {
-				expect(editor._fileInfoPluginsCheck).toBeDefined();
-				expect(editor._fileInfoPluginsReset).toBeDefined();
-				expect(Array.isArray(editor._fileInfoPluginsCheck)).toBe(true);
-				expect(Array.isArray(editor._fileInfoPluginsReset)).toBe(true);
-			});
-
-			it('should setup file manager', () => {
-				expect(editor._fileManager).toBeDefined();
-				expect(editor._fileManager.tags).toBeDefined();
-				expect(editor._fileManager.regExp).toBeDefined();
-			});
-
-			it('should setup component manager', () => {
-				expect(editor._componentManager).toBeDefined();
-				expect(Array.isArray(editor._componentManager)).toBe(true);
-			});
-
-			it('should setup MEL info map', () => {
-				expect(editor._MELInfo).toBeDefined();
-				expect(editor._MELInfo instanceof Map).toBe(true);
-			});
-
-			it('should setup plugin event handlers', () => {
-				expect(editor._onPluginEvents).toBeDefined();
-				expect(editor._onPluginEvents instanceof Map).toBe(true);
-				expect(editor._onPluginEvents.has('onMouseMove')).toBe(true);
-				expect(editor._onPluginEvents.has('onKeyDown')).toBe(true);
 			});
 		});
 
@@ -1230,7 +1016,6 @@ describe('Core - Editor', () => {
 				editor.focus();
 
 				// Should not throw
-				expect(true).toBe(true);
 			});
 		});
 
@@ -1242,8 +1027,6 @@ describe('Core - Editor', () => {
 				for (const cmd of commands) {
 					await editor.commandHandler(cmd);
 				}
-
-				expect(true).toBe(true);
 			});
 
 			it('should handle horizontalRule command', async () => {
@@ -1253,7 +1036,6 @@ describe('Core - Editor', () => {
 				await editor.commandHandler('horizontalRule');
 
 				// Should not throw
-				expect(true).toBe(true);
 			});
 
 			it('should handle list commands', async () => {
@@ -1264,7 +1046,6 @@ describe('Core - Editor', () => {
 				await editor.commandHandler('insertUnorderedList');
 
 				// Should not throw
-				expect(true).toBe(true);
 			});
 
 			it('should handle formatBlock command', async () => {
@@ -1274,22 +1055,6 @@ describe('Core - Editor', () => {
 				await editor.commandHandler('formatBlock', 'h1');
 
 				// Should not throw
-				expect(true).toBe(true);
-			});
-		});
-
-		describe('__Create and initialization', () => {
-			it('should have completed async initialization', () => {
-				// Editor should be fully initialized
-				expect(editor.toolbar).toBeDefined();
-				expect(editor.history).toBeDefined();
-				expect(editor.eventManager).toBeDefined();
-			});
-
-			it('should have set toolbar visibility', () => {
-				const toolbar = editor.context.get('toolbar_main');
-				// Visibility should be set (not 'hidden')
-				expect(toolbar.style.visibility).not.toBe('hidden');
 			});
 		});
 	});

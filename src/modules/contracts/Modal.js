@@ -147,7 +147,7 @@ class Modal extends CoreInjector {
 	 * - The plugin's "init" method is called.
 	 */
 	open() {
-		this.ui._offCurrentModal();
+		this.ui.offCurrentModal();
 		this.#fixCurrentController(true);
 
 		if (this.#closeSignal) this.#modalInner.addEventListener('click', this.#closeListener[1]);

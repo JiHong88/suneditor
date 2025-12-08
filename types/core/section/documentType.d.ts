@@ -1,52 +1,17 @@
 import type {} from '../../typedef';
 export default DocumentType;
 /**
- * @constructor
  * @description DocumentType, page, header management class
- * @param {SunEditor.Core} editor - The root editor instance
- * @param {SunEditor.FrameContext} fc - frame context object
  */
-declare function DocumentType(editor: SunEditor.Core, fc: SunEditor.FrameContext): void;
-declare class DocumentType {
+declare class DocumentType extends CoreInjector {
 	/**
 	 * @constructor
-	 * @description DocumentType, page, header management class
 	 * @param {SunEditor.Core} editor - The root editor instance
 	 * @param {SunEditor.FrameContext} fc - frame context object
 	 */
 	constructor(editor: SunEditor.Core, fc: SunEditor.FrameContext);
-	editor: import('../editor').default;
-	status: SunEditor.Status;
-	context: import('../config/context').ContextUtil;
-	selection: import('../class/selection').default;
-	offset: import('../class/offset').default;
-	fc: import('../config/frameContext').FrameContextUtil;
-	ww: any;
-	wwFrame: any;
-	wwWidth: number;
-	wwHeight: number;
-	innerHeaders: any;
-	_wwHeaders: any[];
-	documentTypeInner: any;
-	inner: any;
-	page: any;
-	totalPages: number;
-	pageNum: number;
-	pageHeight: number;
-	pageBreaksCnt: number;
-	pages: any[];
-	pages_line: any[];
-	prevScrollTop: number;
 	useHeader: any;
 	usePage: any;
-	navigatorButtons: any[];
-	pageNavigator: any;
-	_mirror: any;
-	_mirrorCache: number;
-	_positionCache: Map<any, any>;
-	_rePageTimeout: number;
-	_paddingTop: number;
-	_paddingBottom: number;
 	/**
 	 * @description Refresh the document header area
 	 */
@@ -191,4 +156,6 @@ declare class DocumentType {
 	 * @description Destroy the DocumentType instance and release memory
 	 */
 	_destroy(): void;
+	#private;
 }
+import CoreInjector from '../../editorInjector/_core';

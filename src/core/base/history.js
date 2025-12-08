@@ -77,7 +77,7 @@ export default function History(editor) {
 		if (stackIndex < 0) stackIndex = 0;
 		else if (stackIndex >= stack.length) stackIndex = stack.length - 1;
 
-		editor.ui._offCurrentController();
+		editor.ui.offCurrentController();
 		editor._checkComponents(false);
 		editor.char.display();
 		editor._resourcesStateChange(fc);

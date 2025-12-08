@@ -18,21 +18,6 @@ describe('Core - Format', () => {
 		destroyTestEditor(editor);
 	});
 
-	describe('Constructor', () => {
-		it('should initialize format check regex patterns', () => {
-			expect(format._formatLineCheck).toBeDefined();
-			expect(format._formatBrLineCheck).toBeDefined();
-			expect(format._formatBlockCheck).toBeDefined();
-			expect(format._formatClosureBlockCheck).toBeDefined();
-			expect(format._formatClosureBrLineCheck).toBeDefined();
-			expect(format._textStyleTagsCheck).toBeDefined();
-		});
-
-		it('should initialize _brLineBreak', () => {
-			expect(format._brLineBreak).toBeDefined();
-		});
-	});
-
 	describe('setLine method', () => {
 		it('should throw error if element is not a line', () => {
 			const span = dom.utils.createElement('span');
@@ -104,8 +89,6 @@ describe('Core - Format', () => {
 				format.setLine(h1);
 
 				expect(docType.reHeader).toHaveBeenCalled();
-			} else {
-				expect(true).toBe(true);
 			}
 		});
 	});
@@ -670,7 +653,7 @@ describe('Core - Format', () => {
 			const result = format.removeBlock(blockquote, {
 				selectedFormats: [p],
 				shouldDelete: true,
-				skipHistory: true
+				skipHistory: true,
 			});
 
 			expect(result).toBeTruthy();
@@ -687,7 +670,7 @@ describe('Core - Format', () => {
 			const newBlock = dom.utils.createElement('div');
 			format.removeBlock(blockquote, {
 				newBlockElement: newBlock,
-				skipHistory: true
+				skipHistory: true,
 			});
 
 			expect(wysiwyg.querySelector('blockquote')).toBeFalsy();
@@ -727,7 +710,7 @@ describe('Core - Format', () => {
 
 			const result = format.removeBlock(blockquote, {
 				selectedFormats: [paragraphs[0], paragraphs[1]],
-				skipHistory: true
+				skipHistory: true,
 			});
 
 			expect(result).toBeTruthy();
@@ -944,211 +927,6 @@ describe('Core - Format', () => {
 			const lines = format.getLinesAndComponents(false);
 
 			expect(lines.length).toBeGreaterThan(0);
-		});
-	});
-
-	describe('private methods', () => {
-		describe('_isExcludeSelectionElement', () => {
-			it('should return true for FIGURE elements', () => {
-				const figure = dom.utils.createElement('figure');
-
-				const result = format._isExcludeSelectionElement(figure);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return false for FIGCAPTION elements', () => {
-				const figcaption = dom.utils.createElement('figcaption');
-
-				const result = format._isExcludeSelectionElement(figcaption);
-
-				expect(result).toBe(false);
-			});
-
-			it('should return false for regular elements', () => {
-				const p = dom.utils.createElement('p');
-
-				const result = format._isExcludeSelectionElement(p);
-
-				expect(result).toBe(false);
-			});
-		});
-
-		describe('_nonFormat', () => {
-			it('should return true for wysiwyg frame', () => {
-				const result = format._nonFormat(wysiwyg);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return false for regular format elements', () => {
-				const p = dom.utils.createElement('p');
-
-				const result = format._nonFormat(p);
-
-				expect(result).toBe(false);
-			});
-		});
-
-		describe('_notTextNode', () => {
-			it('should return true for BR element', () => {
-				const br = dom.utils.createElement('br');
-
-				const result = format._notTextNode(br);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return true for IMG element', () => {
-				const img = dom.utils.createElement('img');
-
-				const result = format._notTextNode(img);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return true for INPUT element', () => {
-				const input = dom.utils.createElement('input');
-
-				const result = format._notTextNode(input);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return true for VIDEO element', () => {
-				const video = dom.utils.createElement('video');
-
-				const result = format._notTextNode(video);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return true for AUDIO element', () => {
-				const audio = dom.utils.createElement('audio');
-
-				const result = format._notTextNode(audio);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return true for IFRAME element', () => {
-				const iframe = dom.utils.createElement('iframe');
-
-				const result = format._notTextNode(iframe);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return true for SELECT element', () => {
-				const select = dom.utils.createElement('select');
-
-				const result = format._notTextNode(select);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return true for CANVAS element', () => {
-				const canvas = dom.utils.createElement('canvas');
-
-				const result = format._notTextNode(canvas);
-
-				expect(result).toBe(true);
-			});
-
-			it('should return false for text containers', () => {
-				const p = dom.utils.createElement('p');
-
-				const result = format._notTextNode(p);
-
-				expect(result).toBe(false);
-			});
-
-			it('should return false for null', () => {
-				const result = format._notTextNode(null);
-
-				expect(result).toBe(false);
-			});
-
-			it('should handle string input for BR', () => {
-				const result = format._notTextNode('br');
-
-				expect(result).toBe(true);
-			});
-
-			it('should handle string input for IMG', () => {
-				const result = format._notTextNode('img');
-
-				expect(result).toBe(true);
-			});
-
-			it('should handle string input for P', () => {
-				const result = format._notTextNode('p');
-
-				expect(result).toBe(false);
-			});
-		});
-
-		describe('_lineWork', () => {
-			it('should return line work information', () => {
-				wysiwyg.innerHTML = '<p>text</p>';
-				const textNode = wysiwyg.querySelector('p').firstChild;
-				editor.selection.setRange(textNode, 0, textNode, 4);
-
-				const result = format._lineWork();
-
-				expect(result).toBeTruthy();
-				expect(result.lines).toBeTruthy();
-				expect(result.firstNode).toBeTruthy();
-				expect(result.lastNode).toBeTruthy();
-				expect(result.firstPath).toBeTruthy();
-				expect(result.lastPath).toBeTruthy();
-				expect(typeof result.startOffset).toBe('number');
-				expect(typeof result.endOffset).toBe('number');
-			});
-
-			it('should handle multiple lines', () => {
-				wysiwyg.innerHTML = '<p>line1</p><p>line2</p>';
-				const firstText = wysiwyg.querySelectorAll('p')[0].firstChild;
-				const lastText = wysiwyg.querySelectorAll('p')[1].firstChild;
-				editor.selection.setRange(firstText, 0, lastText, 5);
-
-				const result = format._lineWork();
-
-				expect(result.lines.length).toBeGreaterThan(0);
-			});
-
-			it('should handle list removal', () => {
-				wysiwyg.innerHTML = '<ul><li>item</li></ul>';
-				const li = wysiwyg.querySelector('li');
-				editor.selection.setRange(li.firstChild, 0, li.firstChild, 4);
-
-				const result = format._lineWork();
-
-				expect(result).toBeTruthy();
-			});
-		});
-
-		describe('__resetBrLineBreak', () => {
-			it('should set _brLineBreak to true for "br" format', () => {
-				format.__resetBrLineBreak('br');
-
-				expect(format._brLineBreak).toBe(true);
-			});
-
-			it('should set _brLineBreak to false for "line" format', () => {
-				format.__resetBrLineBreak('line');
-
-				expect(format._brLineBreak).toBe(false);
-			});
-
-			it('should affect isBrLine behavior', () => {
-				format.__resetBrLineBreak('br');
-				const p = dom.utils.createElement('p');
-
-				const result = format.isBrLine(p);
-
-				expect(result).toBe(true);
-			});
 		});
 	});
 

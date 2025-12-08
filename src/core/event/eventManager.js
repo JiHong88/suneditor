@@ -17,147 +17,151 @@ import { OnDragOver_wysiwyg, OnDragEnd_wysiwyg, OnDrop_wysiwyg } from './handler
 const { _w, _d, isMobile, isTouchDevice } = env;
 
 /**
- * @typedef {Omit<EventManager & Partial<SunEditor.Injector_Core>, 'eventManager'>} EventManagerThis
- */
-
-/**
- * @constructor
- * @this {EventManagerThis}
  * @description Event manager, editor's all event management class
- * @param {SunEditor.Core} editor - The root editor instance
- * @property {SunEditor.Core} editor - The root editor instance
  */
-function EventManager(editor) {
-	CoreInjector.call(this, editor);
-
-	/**
-	 * @description Old browsers: When there is no 'e.isComposing' in the keyup event
-	 * @type {boolean}
-	 */
-	this.isComposing = false;
-
-	/**
-	 * @description An array of parent containers that can be scrolled (in descending order)
-	 * @type {Array<Element>}
-	 */
-	this.scrollparents = [];
-
+class EventManager extends CoreInjector {
 	/** @type {Array<*>} */
-	this._events = [];
+	#events;
 	/** @type {RegExp} */
-	this._onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
-	/** @type {boolean} */
-	this._onShortcutKey = false;
-	/** @type {boolean} */
-	this._handledInBefore = false;
+	#onButtonsCheck;
 	/** @type {number} */
-	this._balloonDelay = null;
-	/** @type {ResizeObserver} */
-	this._wwFrameObserver = null;
-	/** @type {ResizeObserver} */
-	this._toolbarObserver = null;
-	/** @type {?Element} */
-	this._lineBreakComp = null;
-	/** @type {?Object<string, *>} */
-	this._formatAttrsTemp = null;
-	/** @type {number} */
-	this._resizeClientY = 0;
+	#balloonDelay;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	this.__resize_editor = null;
+	#close_move;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	this.__close_move = null;
+	#geckoActiveEvent;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	this.__geckoActiveEvent = null;
-	/** @type {Array<Node>} */
-	this.__cacheStyleNodes = [];
-	/** @type {?SunEditor.Event.GlobalInfo} */
-	this.__selectionSyncEvent = null;
+	#selectionSyncEvent;
+	/** @internal @type {?SunEditor.Event.GlobalInfo} */
+	#resize_editor;
 
-	// input plugins
-	/** @type {boolean} */
-	this._inputFocus = false;
-	/** @type {?Object<string, *>} */
-	this.__inputPlugin = null;
-	/** @type {?SunEditor.Event.Info=} */
-	this.__inputBlurEvent = null;
-	/** @type {?SunEditor.Event.Info=} */
-	this.__inputKeyEvent = null;
+	/**
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
 
-	// viewport
-	/** @type {HTMLInputElement} */
-	this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
-	/** @type {number|void} */
-	this.__retainTimer = null;
-	/** @type {Element} */
-	this.__eventDoc = null;
-	/** @type {string} */
-	this.__secopy = null;
-}
+		/**
+		 * @description Old browsers: When there is no 'e.isComposing' in the keyup event
+		 * @type {boolean}
+		 */
+		this.isComposing = false;
 
-EventManager.prototype = {
+		/**
+		 * @description An array of parent containers that can be scrolled (in descending order)
+		 * @type {Array<Element>}
+		 */
+		this.scrollparents = [];
+
+		/** @internal @type {boolean} */
+		this._onShortcutKey = false;
+		/** @internal @type {boolean} */
+		this._handledInBefore = false;
+		/** @internal @type {ResizeObserver} */
+		this._wwFrameObserver = null;
+		/** @internal @type {ResizeObserver} */
+		this._toolbarObserver = null;
+		/** @internal @type {?Element} */
+		this._lineBreakComp = null;
+		/** @internal @type {?Object<string, *>} */
+		this._formatAttrsTemp = null;
+		/** @internal @type {number} */
+		this._resizeClientY = 0;
+		/** @internal @type {Array<Node>} */
+		this.__cacheStyleNodes = [];
+
+		// input plugins
+		/** @internal @type {boolean} */
+		this._inputFocus = false;
+		/** @internal @type {?Object<string, *>} */
+		this.__inputPlugin = null;
+		/** @internal @type {?SunEditor.Event.Info=} */
+		this.__inputBlurEvent = null;
+		/** @internal @type {?SunEditor.Event.Info=} */
+		this.__inputKeyEvent = null;
+
+		// viewport
+		/** @type {HTMLInputElement} */
+		this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
+		/** @type {number|void} */
+		this.__retainTimer = null;
+		/** @type {Element} */
+		this.__eventDoc = null;
+		/** @type {string} */
+		this.__secopy = null;
+
+		this.#events = [];
+		this.#onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
+		this.#balloonDelay = null;
+		this.#close_move = null;
+		this.#geckoActiveEvent = null;
+		this.#selectionSyncEvent = null;
+		this.#resize_editor = null;
+	}
+
 	/** @internal @type {SunEditor.Core['char']} */
 	get char() {
 		return this.editor.char;
-	},
+	}
 	/** @internal @type {SunEditor.Core['component']} */
 	get component() {
 		return this.editor.component;
-	},
+	}
 	/** @internal @type {SunEditor.Core['format']} */
 	get format() {
 		return this.editor.format;
-	},
+	}
 	/** @internal @type {SunEditor.Core['listFormat']} */
 	get listFormat() {
 		return this.editor.listFormat;
-	},
+	}
 	/** @internal @type {SunEditor.Core['html']} */
 	get html() {
 		return this.editor.html;
-	},
+	}
 	/** @internal @type {SunEditor.Core['inline']} */
 	get inline() {
 		return this.editor.inline;
-	},
+	}
 	/** @internal @type {SunEditor.Core['menu']} */
 	get menu() {
 		return this.editor.menu;
-	},
+	}
 	/** @internal @type {SunEditor.Core['nodeTransform']} */
 	get nodeTransform() {
 		return this.editor.nodeTransform;
-	},
+	}
 	/** @internal @type {SunEditor.Core['offset']} */
 	get offset() {
 		return this.editor.offset;
-	},
+	}
 	/** @internal @type {SunEditor.Core['selection']} */
 	get selection() {
 		return this.editor.selection;
-	},
+	}
 	/** @internal @type {SunEditor.Core['shortcuts']} */
 	get shortcuts() {
 		return this.editor.shortcuts;
-	},
+	}
 	/** @internal @type {SunEditor.Core['subToolbar']} */
 	get subToolbar() {
 		return this.editor.subToolbar;
-	},
+	}
 	/** @internal @type {SunEditor.Core['toolbar']} */
 	get toolbar() {
 		return this.editor.toolbar;
-	},
+	}
 	/** @internal @type {SunEditor.Core['ui']} */
 	get ui() {
 		return this.editor.ui;
-	},
+	}
 	/** @internal @type {SunEditor.Core['viewer']} */
 	get viewer() {
 		return this.editor.viewer;
-	},
+	}
 
 	/**
-	 * @this {EventManagerThis}
 	 * @description Register for an event.
 	 * - Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
 	 * @param {*} target Target element
@@ -174,7 +178,7 @@ EventManager.prototype = {
 		const len = target.length;
 		for (let i = 0; i < len; i++) {
 			target[i].addEventListener(type, listener, useCapture);
-			this._events.push({
+			this.#events.push({
 				target: target[i],
 				type,
 				listener,
@@ -188,10 +192,9 @@ EventManager.prototype = {
 			listener,
 			useCapture,
 		};
-	},
+	}
 
 	/**
-	 * @this {EventManagerThis}
 	 * @description Remove event
 	 * @param {SunEditor.Event.Info} params event info = this.addEvent()
 	 * @returns {undefined|null} Success: null, Not found: undefined
@@ -213,10 +216,9 @@ EventManager.prototype = {
 		}
 
 		return null;
-	},
+	}
 
 	/**
-	 * @this {EventManagerThis}
 	 * @description Add an event to document.
 	 * - When created as an Iframe, the same event is added to the document in the Iframe.
 	 * @param {string} type Event type
@@ -234,10 +236,9 @@ EventManager.prototype = {
 			listener,
 			useCapture,
 		};
-	},
+	}
 
 	/**
-	 * @this {EventManagerThis}
 	 * @description Remove events from document.
 	 * - When created as an Iframe, the event of the document inside the Iframe is also removed.
 	 * @param {string|SunEditor.Event.GlobalInfo} type Event type or (Event info = this.addGlobalEvent())
@@ -259,10 +260,9 @@ EventManager.prototype = {
 		_w.removeEventListener(type, listener, useCapture);
 
 		return null;
-	},
+	}
 
 	/**
-	 * @this {EventManagerThis}
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * - such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
 	 * @param {?Node} [selectionNode] selectionNode
@@ -276,7 +276,7 @@ EventManager.prototype = {
 		const marginDir = this.options.get('_rtl') ? 'marginRight' : 'marginLeft';
 		const plugins = this.plugins;
 		const commandTargets = this.editor.commandTargets;
-		const classOnCheck = this._onButtonsCheck;
+		const classOnCheck = this.#onButtonsCheck;
 		const styleCommand = this.options.get('_styleCommandMap');
 		const commandMapNodes = [];
 		const currentNodes = [];
@@ -306,7 +306,7 @@ EventManager.prototype = {
 		for (let element = selectionNode; !dom.check.isWysiwygFrame(element); element = element.parentElement) {
 			if (!element) break;
 			if (element.nodeType !== 1 || dom.check.isBreak(element)) continue;
-			if (this._isNonFocusNode(element)) {
+			if (this.#isNonFocusNode(element)) {
 				this.editor.blur();
 				return;
 			}
@@ -390,25 +390,23 @@ EventManager.prototype = {
 		}
 
 		return selectionNode;
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is true)
 	 * @param {Node} target Target element
 	 */
 	_injectActiveEvent(target) {
 		dom.utils.addClass(target, '__se__active');
-		this.__geckoActiveEvent = this.addGlobalEvent('mouseup', () => {
+		this.#geckoActiveEvent = this.addGlobalEvent('mouseup', () => {
 			dom.utils.removeClass(target, '__se__active');
-			this.__geckoActiveEvent = this.removeGlobalEvent(this.__geckoActiveEvent);
+			this.#geckoActiveEvent = this.removeGlobalEvent(this.#geckoActiveEvent);
 		});
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description remove class, display text.
 	 * @param {Array<string>} ignoredList Igonred button list
 	 */
@@ -435,33 +433,31 @@ EventManager.prototype = {
 				}
 			}
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Show toolbar-balloon with delay.
 	 */
 	_showToolbarBalloonDelay() {
-		if (this._balloonDelay) {
-			_w.clearTimeout(this._balloonDelay);
+		if (this.#balloonDelay) {
+			_w.clearTimeout(this.#balloonDelay);
 		}
 
-		this._balloonDelay = _w.setTimeout(() => {
-			_w.clearTimeout(this._balloonDelay);
-			this._balloonDelay = null;
+		this.#balloonDelay = _w.setTimeout(() => {
+			_w.clearTimeout(this.#balloonDelay);
+			this.#balloonDelay = null;
 			if (this.editor.isSubBalloon) this.subToolbar._showBalloon();
 			else this.toolbar._showBalloon();
 		}, 250);
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Show or hide the toolbar-balloon.
 	 */
 	_toggleToolbarBalloon() {
-		this.selection._init();
+		this.selection.init();
 		const range = this.selection.getRange();
 		const hasSubMode = this.options.has('_subMode');
 
@@ -472,44 +468,30 @@ EventManager.prototype = {
 			if (hasSubMode) this.subToolbar._showBalloon(range);
 			else this.toolbar._showBalloon(range);
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Hide the toolbar.
 	 */
 	_hideToolbar() {
 		if (!this.editor._notHideToolbar && !this.frameContext.get('isFullScreen')) {
 			this.toolbar.hide();
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Hide the Sub-Toolbar.
 	 */
 	_hideToolbar_sub() {
 		if (this.subToolbar && !this.editor._notHideToolbar) {
 			this.subToolbar.hide();
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
-	 * @description Checks if a node is a non-focusable element(.data-se-non-focus). (e.g. fileUpload.component > span)
-	 * @param {Node} node Node to check
-	 * @returns {boolean} True if the node is non-focusable, otherwise false
-	 */
-	_isNonFocusNode(node) {
-		return dom.check.isElement(node) && node.getAttribute('data-se-non-focus') === 'true';
-	},
-
-	/**
-	 * @internal
-	 * @this {EventManagerThis}
 	 * @description If there is no default format, add a line and move 'selection'.
 	 * @param {?string} formatName Format tag name (default: 'P')
 	 */
@@ -602,7 +584,7 @@ EventManager.prototype = {
 		} catch {
 			this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
 			this.editor.effectNode = null;
-			this.selection._init();
+			this.selection.init();
 			return;
 		}
 
@@ -622,11 +604,10 @@ EventManager.prototype = {
 		} else {
 			this.editor._nativeFocus();
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Handles data transfer actions for paste and drop events.
 	 * - It processes clipboard data, triggers relevant events, and inserts cleaned data into the editor.
 	 * @param {"paste"|"drop"} type The type of event
@@ -638,7 +619,7 @@ EventManager.prototype = {
 	async _dataTransferAction(type, e, clipboardData, frameContext) {
 		try {
 			this.ui.showLoading();
-			await this._setClipboardData(type, e, clipboardData, frameContext);
+			await this.#setClipboardData(type, e, clipboardData, frameContext);
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
@@ -647,11 +628,10 @@ EventManager.prototype = {
 		} finally {
 			this.ui.hideLoading();
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Processes clipboard data for paste and drop events, handling text and HTML cleanup.
 	 * - Supports specific handling for content from Microsoft Office applications.
 	 * @param {"paste"|"drop"} type The type of event
@@ -660,7 +640,7 @@ EventManager.prototype = {
 	 * @param {SunEditor.FrameContext} frameContext The frame context
 	 * @returns {Promise<boolean>} Resolves to `false` if processing is complete, otherwise allows default behavior
 	 */
-	async _setClipboardData(type, e, clipboardData, frameContext) {
+	async #setClipboardData(type, e, clipboardData, frameContext) {
 		e.preventDefault();
 		e.stopPropagation();
 
@@ -746,11 +726,10 @@ EventManager.prototype = {
 			}
 			return false;
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Registers common UI events such as toolbar and menu interactions.
 	 * - Adds event listeners for various UI elements, sets up observers, and configures window events.
 	 */
@@ -797,7 +776,7 @@ EventManager.prototype = {
 				'click',
 				(e) => {
 					if (e.target === this.carrierWrapper.querySelector('.se-modal .se-modal-inner')) {
-						this.ui._offCurrentModal();
+						this.ui.offCurrentModal();
 					}
 				},
 				false,
@@ -805,17 +784,16 @@ EventManager.prototype = {
 		}
 
 		/** global event */
-		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
-		this.addEvent(_w.visualViewport, 'resize', OnResize_viewport.bind(this), false);
-		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
+		this.addEvent(_w, 'resize', this.#OnResize_window.bind(this), false);
+		this.addEvent(_w.visualViewport, 'resize', this.#OnResize_viewport.bind(this), false);
+		this.addEvent(_w, 'scroll', this.#OnScroll_window.bind(this), false);
 		if (isTouchDevice) {
-			this.addEvent(_w.visualViewport, 'scroll', OnMobileScroll_viewport.bind(this), false);
+			this.addEvent(_w.visualViewport, 'scroll', this.#OnMobileScroll_viewport.bind(this), false);
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Registers event listeners for the editor's frame, including text input, selection, and UI interactions.
 	 * - Handles events inside an iframe or within the standard wysiwyg editor.
 	 * @param {SunEditor.FrameContext} fc The frame context object
@@ -849,10 +827,10 @@ EventManager.prototype = {
 		);
 		this.addEvent(eventWysiwyg, 'dragend', OnDragEnd_wysiwyg.bind(this, dragCursor), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc, dragCursor), false);
-		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), { passive: true, capture: false });
-		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, fc), false);
-		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this, fc), false);
-		this.addEvent(codeArea, 'mousedown', OnFocus_code.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'scroll', this.#OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), { passive: true, capture: false });
+		this.addEvent(eventWysiwyg, 'focus', this.#OnFocus_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'blur', this.#OnBlur_wysiwyg.bind(this, fc), false);
+		this.addEvent(codeArea, 'mousedown', this.#OnFocus_code.bind(this, fc), false);
 
 		/** drag handle */
 		const dragHandle = fc.get('wrapper').querySelector('.se-drag-handle');
@@ -867,8 +845,8 @@ EventManager.prototype = {
 		);
 
 		/** line breaker */
-		this.addEvent(fc.get('lineBreaker_t'), 'pointerdown', DisplayLineBreak.bind(this, 't'), false);
-		this.addEvent(fc.get('lineBreaker_b'), 'pointerdown', DisplayLineBreak.bind(this, 'b'), false);
+		this.addEvent(fc.get('lineBreaker_t'), 'pointerdown', this.#DisplayLineBreak.bind(this, 't'), false);
+		this.addEvent(fc.get('lineBreaker_b'), 'pointerdown', this.#DisplayLineBreak.bind(this, 'b'), false);
 
 		/** Events are registered mobile. */
 		if (isTouchDevice) {
@@ -893,7 +871,7 @@ EventManager.prototype = {
 
 		if (fc.has('statusbar')) this.__addStatusbarEvent(fc, fc.get('options'));
 
-		const OnScrollAbs = OnScroll_Abs.bind(this);
+		const OnScrollAbs = this.#OnScroll_Abs.bind(this);
 		const scrollParents = dom.query.getScrollParents(fc.get('originElement'));
 		for (const parent of scrollParents) {
 			this.scrollparents.push(parent);
@@ -906,13 +884,12 @@ EventManager.prototype = {
 		/** document event */
 		if (this.__eventDoc !== fc.get('_wd')) {
 			this.__eventDoc = fc.get('_wd');
-			this.addEvent(this.__eventDoc, 'selectionchange', OnSelectionchange_document.bind(this, this.__eventDoc), false);
+			this.addEvent(this.__eventDoc, 'selectionchange', this.#OnSelectionchange_document.bind(this, this.__eventDoc), false);
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Adds event listeners for resizing the status bar if resizing is enabled.
 	 * - If resizing is not enabled, applies a non-resizable class.
 	 * @param {SunEditor.FrameContext} fc The frame context object
@@ -920,25 +897,24 @@ EventManager.prototype = {
 	 */
 	__addStatusbarEvent(fc, fo) {
 		if (/\d+/.test(fo.get('height')) && fo.get('statusbar_resizeEnable')) {
-			fo.set('__statusbarEvent', this.addEvent(fc.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false));
+			fo.set('__statusbarEvent', this.addEvent(fc.get('statusbar'), 'mousedown', this.#OnMouseDown_statusbar.bind(this), false));
 		} else {
 			dom.utils.addClass(fc.get('statusbar'), 'se-resizing-none');
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Removes all registered event listeners from the editor.
 	 * - Disconnects observers and clears stored event references.
 	 */
 	_removeAllEvents() {
-		for (let i = 0, len = this._events.length, e; i < len; i++) {
-			e = this._events[i];
+		for (let i = 0, len = this.#events.length, e; i < len; i++) {
+			e = this.#events[i];
 			e.target.removeEventListener(e.type, e.listener, e.useCapture);
 		}
 
-		this._events = [];
+		this.#events = [];
 
 		if (this._wwFrameObserver) {
 			this._wwFrameObserver.disconnect();
@@ -951,9 +927,9 @@ EventManager.prototype = {
 		}
 
 		// clear timers
-		if (this._balloonDelay) {
-			_w.clearTimeout(this._balloonDelay);
-			this._balloonDelay = null;
+		if (this.#balloonDelay) {
+			_w.clearTimeout(this.#balloonDelay);
+			this.#balloonDelay = null;
 		}
 
 		if (this.__retainTimer) {
@@ -962,10 +938,10 @@ EventManager.prototype = {
 		}
 
 		// remove global events
-		this.__geckoActiveEvent &&= this.removeGlobalEvent(this.__geckoActiveEvent);
-		this.__selectionSyncEvent &&= this.removeGlobalEvent(this.__selectionSyncEvent);
-		this.__resize_editor &&= this.removeGlobalEvent(this.__resize_editor);
-		this.__close_move &&= this.removeGlobalEvent(this.__close_move);
+		this.#geckoActiveEvent &&= this.removeGlobalEvent(this.#geckoActiveEvent);
+		this.#selectionSyncEvent &&= this.removeGlobalEvent(this.#selectionSyncEvent);
+		this.#resize_editor &&= this.removeGlobalEvent(this.#resize_editor);
+		this.#close_move &&= this.removeGlobalEvent(this.#close_move);
 
 		// clear cached references
 		this._formatAttrsTemp = null;
@@ -978,29 +954,173 @@ EventManager.prototype = {
 		this.__secopy = null;
 		this._lineBreakComp = null;
 		this.scrollparents = null;
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {EventManagerThis}
+	 * @description Synchronizes the selection state by resetting it on mouseup.
+	 * - Ensures selection updates correctly across different interactions.
+	 */
+	_setSelectionSync() {
+		this.removeGlobalEvent(this.#selectionSyncEvent);
+		this.#selectionSyncEvent = this.addGlobalEvent('mouseup', () => {
+			this.selection.init();
+			this.removeGlobalEvent(this.#selectionSyncEvent);
+		});
+	}
+
+	/**
+	 * @internal
+	 * @description Retains the style nodes for formatting consistency when applying styles.
+	 * - Preserves nested styling by cloning and restructuring the style nodes.
+	 * @param {HTMLElement} formatEl The format element where styles should be retained
+	 * @param {Array<Node>} _styleNodes The list of style nodes to retain
+	 */
+	_retainStyleNodes(formatEl, _styleNodes) {
+		const el = _styleNodes[0].cloneNode(false);
+		let n = el;
+		for (let i = 1, len = _styleNodes.length, t; i < len; i++) {
+			t = _styleNodes[i].cloneNode(false);
+			n.appendChild(t);
+			n = t;
+		}
+
+		const { parent, inner } = this.nodeTransform.createNestedNode(_styleNodes, null);
+		const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
+		inner.appendChild(zeroWidth);
+
+		formatEl.innerHTML = '';
+		formatEl.appendChild(parent);
+
+		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
+	}
+
+	/**
+	 * @internal
+	 * @description Clears retained style nodes by replacing content with a single line break.
+	 * - Resets the selection to the start of the cleared element.
+	 * @param {HTMLElement} formatEl The format element where styles should be cleared
+	 */
+	_clearRetainStyleNodes(formatEl) {
+		formatEl.innerHTML = '<br>';
+		this.selection.setRange(formatEl, 0, formatEl, 0);
+	}
+
+	/**
+	 * @internal
+	 * @description Calls a registered plugin event and executes associated handlers synchronously (fire-and-forget).
+	 * - Use this for performance-critical events like onMouseMove, onScroll
+	 * - If any handler returns `false`, the event propagation stops.
+	 * @param {string} name The name of the plugin event
+	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
+	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
+	 */
+	_callPluginEvent(name, e) {
+		const eventPlugins = this.editor._onPluginEvents.get(name);
+		for (let i = 0, r; i < eventPlugins.length; i++) {
+			r = eventPlugins[i](e);
+			if (typeof r === 'boolean') return r;
+		}
+	}
+
+	/**
+	 * @internal
+	 * @description Calls a registered plugin event and executes associated handlers asynchronously.
+	 * - Use this for events that need to check return values or ensure completion
+	 * - Waits for each handler to complete (including async handlers)
+	 * - If any handler returns `false`, the event propagation stops.
+	 * @param {string} name The name of the plugin event
+	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
+	 * @returns {Promise<boolean|undefined>} Returns `false` if any handler stops the event, otherwise `undefined`
+	 */
+	async _callPluginEventAsync(name, e) {
+		const eventPlugins = this.editor._onPluginEvents.get(name);
+		for (let i = 0, r; i < eventPlugins.length; i++) {
+			r = await eventPlugins[i](e);
+			if (typeof r === 'boolean') return r;
+		}
+	}
+
+	/**
+	 * @internal
+	 * @description Removes input event listeners and resets input-related properties.
+	 */
+	__removeInput() {
+		this._inputFocus = this.editor._preventBlur = false;
+		this.__inputBlurEvent = this.removeEvent(this.__inputBlurEvent);
+		this.__inputKeyEvent = this.removeEvent(this.__inputKeyEvent);
+		this.__inputPlugin = null;
+	}
+
+	/**
+	 * @internal
+	 * @description Focus Event Postprocessing
+	 * @param {SunEditor.FrameContext} frameContext - frame context object
+	 * @param {FocusEvent} event - Focus event object
+	 */
+	__postFocusEvent(frameContext, event) {
+		if (this.editor.isInline || this.editor.isBalloonAlways) this.toolbar.show();
+		if (this.editor.isSubBalloonAlways) this.subToolbar.show();
+
+		// user event
+		this.triggerEvent('onFocus', { frameContext, event });
+		// plugin event
+		this._callPluginEvent('onFocus', { frameContext, event });
+	}
+
+	/**
+	 * @internal
+	 * @description Blur Event Postprocessing
+	 * @param {SunEditor.FrameContext} frameContext - frame context object
+	 * @param {FocusEvent} event - Focus event object
+	 */
+	__postBlurEvent(frameContext, event) {
+		if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
+		if (this.editor.isSubBalloon) this._hideToolbar_sub();
+
+		// user event
+		this.triggerEvent('onBlur', { frameContext, event });
+		// plugin event
+		this._callPluginEvent('onBlur', { frameContext, event });
+	}
+
+	/**
+	 * @internal
+	 * @description Records the current viewport size.
+	 */
+	__setViewportSize() {
+		this.status.currentViewportHeight = numbers.get(_w.visualViewport.height, 0);
+		// dom.utils.setRootCssVar('--se-var-viewport-height', `${this.status.currentViewportHeight}px`);
+	}
+
+	/**
+	 * @description Checks if a node is a non-focusable element(.data-se-non-focus). (e.g. fileUpload.component > span)
+	 * @param {Node} node Node to check
+	 * @returns {boolean} True if the node is non-focusable, otherwise false
+	 */
+	#isNonFocusNode(node) {
+		return dom.check.isElement(node) && node.getAttribute('data-se-non-focus') === 'true';
+	}
+
+	/**
 	 * @description Adjusts the position of the editor's toolbar, controllers, and other floating elements based on scroll position.
 	 * - Ensures UI elements maintain their intended relative positions when scrolling.
 	 * @param {*} eventWysiwyg The wysiwyg event object containing scroll data (Window or element)
 	 */
-	_moveContainer(eventWysiwyg) {
+	#moveContainer(eventWysiwyg) {
 		const y = eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0;
 		const x = eventWysiwyg.scrollLeft || eventWysiwyg.scrollX || 0;
 
 		if (this.editor.isBalloon) {
-			this.context.get('toolbar_main').style.top = this.toolbar._balloonOffset.top - y + 'px';
-			this.context.get('toolbar_main').style.left = this.toolbar._balloonOffset.left - x + 'px';
+			this.context.get('toolbar_main').style.top = this.toolbar.balloonOffset.top - y + 'px';
+			this.context.get('toolbar_main').style.left = this.toolbar.balloonOffset.left - x + 'px';
 		} else if (this.editor.isSubBalloon) {
-			this.context.get('toolbar_sub_main').style.top = this.subToolbar._balloonOffset.top - y + 'px';
-			this.context.get('toolbar_sub_main').style.left = this.subToolbar._balloonOffset.left - x + 'px';
+			this.context.get('toolbar_sub_main').style.top = this.subToolbar.balloonOffset.top - y + 'px';
+			this.context.get('toolbar_sub_main').style.left = this.subToolbar.balloonOffset.left - x + 'px';
 		}
 
 		if (this.editor._controllerTargetContext !== this.frameContext.get('topArea')) {
-			this.ui._offCurrentController();
+			this.ui.offCurrentController();
 		}
 
 		if (this.editor._lineBreaker_t) {
@@ -1029,54 +1149,48 @@ EventManager.prototype = {
 			openCont[i].form.style.top = openCont[i].inst.__offset.top - y + 'px';
 			openCont[i].form.style.left = openCont[i].inst.__offset.left - x + 'px';
 		}
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Handles the scrolling of the editor container.
 	 * - Repositions open controllers if necessary.
 	 */
-	_scrollContainer() {
+	#scrollContainer() {
 		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
-			this.menu._resetMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
+			this.menu.__resetMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
 		}
 
 		const openCont = this.editor.opendControllers;
 		if (openCont.length === 0) return;
 
-		this.__rePositionController(openCont);
-	},
+		this.#rePositionController(openCont);
+	}
 
 	/**
-	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Repositions the currently open controllers within the editor.
 	 * - Ensures elements are displayed in their correct positions after scrolling.
 	 * @param {Array<object>} cont List of controllers to reposition
 	 */
-	__rePositionController(cont) {
+	#rePositionController(cont) {
 		if (_DragHandle.get('__dragMove')) _DragHandle.get('__dragMove')();
 		for (let i = 0; i < cont.length; i++) {
 			if (cont[i].notInCarrier) continue;
 			cont[i].inst?._scrollReposition();
 		}
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {EventManagerThis}
 	 * @description Resets the frame status, adjusting toolbar and UI elements based on the current state.
 	 * - Handles inline editor adjustments, fullscreen mode, and responsive toolbar updates.
 	 */
-	_resetFrameStatus() {
+	#resetFrameStatus() {
 		if (!env.isResizeObserverSupported) {
 			this.toolbar.resetResponsiveToolbar();
 			if (this.options.get('_subMode')) this.subToolbar.resetResponsiveToolbar();
 		}
 
 		const toolbar = this.context.get('toolbar_main');
-		const isToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar._inlineToolbarAttr.isShow);
+		const isToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar.inlineToolbarAttr.isShow);
 		if (toolbar.offsetWidth === 0 && !isToolbarHidden) return;
 
 		const opendBrowser = this.editor.opendBrowser;
@@ -1085,7 +1199,7 @@ EventManager.prototype = {
 		}
 
 		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
-			this.menu._resetMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
+			this.menu.__resetMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
 		}
 
 		if (this.viewer._resetFullScreenHeight()) return;
@@ -1102,417 +1216,243 @@ EventManager.prototype = {
 			this.context.get('toolbar_main').style.width = fc.get('topArea').offsetWidth - 2 + 'px';
 			this.toolbar._resetSticky();
 		}
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {EventManagerThis}
-	 * @description Synchronizes the selection state by resetting it on mouseup.
-	 * - Ensures selection updates correctly across different interactions.
-	 */
-	_setSelectionSync() {
-		this.removeGlobalEvent(this.__selectionSyncEvent);
-		this.__selectionSyncEvent = this.addGlobalEvent('mouseup', () => {
-			this.selection._init();
-			this.removeGlobalEvent(this.__selectionSyncEvent);
-		});
-	},
-
-	/**
-	 * @internal
-	 * @this {EventManagerThis}
-	 * @description Retains the style nodes for formatting consistency when applying styles.
-	 * - Preserves nested styling by cloning and restructuring the style nodes.
-	 * @param {HTMLElement} formatEl The format element where styles should be retained
-	 * @param {Array<Node>} _styleNodes The list of style nodes to retain
-	 */
-	_retainStyleNodes(formatEl, _styleNodes) {
-		const el = _styleNodes[0].cloneNode(false);
-		let n = el;
-		for (let i = 1, len = _styleNodes.length, t; i < len; i++) {
-			t = _styleNodes[i].cloneNode(false);
-			n.appendChild(t);
-			n = t;
-		}
-
-		const { parent, inner } = this.nodeTransform.createNestedNode(_styleNodes, null);
-		const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
-		inner.appendChild(zeroWidth);
-
-		formatEl.innerHTML = '';
-		formatEl.appendChild(parent);
-
-		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
-	},
-
-	/**
-	 * @internal
-	 * @this {EventManagerThis}
-	 * @description Clears retained style nodes by replacing content with a single line break.
-	 * - Resets the selection to the start of the cleared element.
-	 * @param {HTMLElement} formatEl The format element where styles should be cleared
-	 */
-	_clearRetainStyleNodes(formatEl) {
-		formatEl.innerHTML = '<br>';
-		this.selection.setRange(formatEl, 0, formatEl, 0);
-	},
-
-	/**
-	 * @internal
-	 * @this {EventManagerThis}
-	 * @description Calls a registered plugin event and executes associated handlers synchronously (fire-and-forget).
-	 * - Use this for performance-critical events like onMouseMove, onScroll
-	 * - If any handler returns `false`, the event propagation stops.
-	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
-	 * @returns {boolean|undefined} Returns `false` if any handler stops the event, otherwise `undefined`
-	 */
-	_callPluginEvent(name, e) {
-		const eventPlugins = this.editor._onPluginEvents.get(name);
-		for (let i = 0, r; i < eventPlugins.length; i++) {
-			r = eventPlugins[i](e);
-			if (typeof r === 'boolean') return r;
-		}
-	},
-
-	/**
-	 * @internal
-	 * @this {EventManagerThis}
-	 * @description Calls a registered plugin event and executes associated handlers asynchronously.
-	 * - Use this for events that need to check return values or ensure completion
-	 * - Waits for each handler to complete (including async handlers)
-	 * - If any handler returns `false`, the event propagation stops.
-	 * @param {string} name The name of the plugin event
-	 * @param {{ frameContext: SunEditor.FrameContext, event: Event, data?: string, line?: Node, range?: Range, file?: File, doc?: Document }} e The event object passed to the plugin event handler
-	 * @returns {Promise<boolean|undefined>} Returns `false` if any handler stops the event, otherwise `undefined`
-	 */
-	async _callPluginEventAsync(name, e) {
-		const eventPlugins = this.editor._onPluginEvents.get(name);
-		for (let i = 0, r; i < eventPlugins.length; i++) {
-			r = await eventPlugins[i](e);
-			if (typeof r === 'boolean') return r;
-		}
-	},
-
-	/**
-	 * @internal
-	 * @this {EventManagerThis}
-	 * @description Removes input event listeners and resets input-related properties.
-	 */
-	__removeInput() {
-		this._inputFocus = this.editor._preventBlur = false;
-		this.__inputBlurEvent = this.removeEvent(this.__inputBlurEvent);
-		this.__inputKeyEvent = this.removeEvent(this.__inputKeyEvent);
-		this.__inputPlugin = null;
-	},
-
-	/**
-	 * @internal
-	 * @description Focus Event Postprocessing
-	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
-	 * @param {FocusEvent} event - Focus event object
+	 * @param {Element|Window} eventWysiwyg - wysiwyg event object
+	 * @param {Event} e - Event object
 	 */
-	__postFocusEvent(frameContext, event) {
-		if (this.editor.isInline || this.editor.isBalloonAlways) this.toolbar.show();
-		if (this.editor.isSubBalloonAlways) this.subToolbar.show();
+	#OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
+		this.#moveContainer(eventWysiwyg);
+		this.#scrollContainer();
+
+		// plugin event
+		this._callPluginEvent('onScroll', { frameContext, event: e });
+
+		// document type page
+		if (frameContext.has('documentType_use_page')) {
+			frameContext.get('documentType').scrollPage();
+		}
 
 		// user event
-		this.triggerEvent('onFocus', { frameContext, event });
-		// plugin event
-		this._callPluginEvent('onFocus', { frameContext, event });
-	},
+		this.triggerEvent('onScroll', { frameContext, event: e });
+	}
 
 	/**
-	 * @internal
-	 * @description Blur Event Postprocessing
-	 * @this {EventManagerThis}
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
-	 * @param {FocusEvent} event - Focus event object
+	 * @param {FocusEvent} e - Focus event object
 	 */
-	__postBlurEvent(frameContext, event) {
-		if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
-		if (this.editor.isSubBalloon) this._hideToolbar_sub();
-
-		// user event
-		this.triggerEvent('onBlur', { frameContext, event });
-		// plugin event
-		this._callPluginEvent('onBlur', { frameContext, event });
-	},
-
-	/**
-	 * @internal
-	 * @description Records the current viewport size.
-	 * @this {EventManagerThis}
-	 */
-	__setViewportSize() {
-		this.status.currentViewportHeight = numbers.get(_w.visualViewport.height, 0);
-		// dom.utils.setRootCssVar('--se-var-viewport-height', `${this.status.currentViewportHeight}px`);
-	},
-
-	constructor: EventManager,
-};
-
-/**
- * @this {EventManagerThis}
- * @param {SunEditor.FrameContext} frameContext - frame context object
- * @param {Element|Window} eventWysiwyg - wysiwyg event object
- * @param {Event} e - Event object
- */
-function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
-	this._moveContainer(eventWysiwyg);
-	this._scrollContainer();
-
-	// plugin event
-	this._callPluginEvent('onScroll', { frameContext, event: e });
-
-	// document type page
-	if (frameContext.has('documentType_use_page')) {
-		frameContext.get('documentType').scrollPage();
-	}
-
-	// user event
-	this.triggerEvent('onScroll', { frameContext, event: e });
-}
-
-/**
- * @this {EventManagerThis}
- * @param {SunEditor.FrameContext} frameContext - frame context object
- * @param {FocusEvent} e - Focus event object
- */
-function OnFocus_wysiwyg(frameContext, e) {
-	if (this.selection.__iframeFocus || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
-		e.preventDefault();
-		return false;
-	}
-
-	this.status.hasFocus = true;
-	this.component.__prevent = false;
-	this.triggerEvent('onNativeFocus', { frameContext, event: e });
-
-	const rootKey = frameContext.get('key');
-
-	if (this._inputFocus) {
-		if (this.editor.isInline) {
-			_w.setTimeout(() => {
-				this.toolbar._showInline();
-			}, 0);
+	#OnFocus_wysiwyg(frameContext, e) {
+		if (this.selection.__iframeFocus || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
+			e.preventDefault();
+			return false;
 		}
-		return;
-	}
 
-	if ((this.status.rootKey === rootKey && this.editor._preventBlur) || this.editor._preventFocus) return;
-	this.editor._preventFocus = true;
+		this.status.hasFocus = true;
+		this.component.__prevent = false;
+		this.triggerEvent('onNativeFocus', { frameContext, event: e });
 
-	dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
-	dom.utils.setDisabled(this.editor._codeViewDisabledButtons, false);
+		const rootKey = frameContext.get('key');
 
-	this.editor.changeFrameContext(rootKey);
-	this.history.resetButtons(rootKey, null);
-
-	_w.setTimeout(() => {
-		this.__postFocusEvent(frameContext, e);
-	}, 0);
-}
-
-/**
- * @this {EventManagerThis}
- * @param {SunEditor.FrameContext} frameContext - frame context object
- * @param {FocusEvent} e - Focus event object
- */
-function OnBlur_wysiwyg(frameContext, e) {
-	if (frameContext.get('isCodeView') || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return;
-
-	this.status.hasFocus = false;
-	this.editor.effectNode = null;
-	this.triggerEvent('onNativeBlur', { frameContext, event: e });
-
-	if (this._inputFocus || this.editor._preventBlur) return;
-	this.editor._preventFocus = false;
-
-	this._setKeyEffect([]);
-
-	this.status.currentNodes = [];
-	this.status.currentNodesMap = [];
-
-	this.ui._offCurrentController();
-
-	this.editor.applyFrameRoots((root) => {
-		if (root.get('navigation')) root.get('navigation').textContent = '';
-	});
-
-	this.history.check(frameContext.get('key'), this.status._range);
-
-	this.__postBlurEvent(frameContext, e);
-}
-
-/**
- * @this {EventManagerThis}
- * @param {MouseEvent} e - Event object
- */
-function OnMouseDown_statusbar(e) {
-	e.stopPropagation();
-	this._resizeClientY = e.clientY;
-	this.ui.enableBackWrapper('ns-resize');
-	this.__resize_editor = this.addGlobalEvent('mousemove', __resizeEditor.bind(this));
-	this.__close_move = this.addGlobalEvent('mouseup', __closeMove.bind(this));
-}
-
-/**
- * @this {EventManagerThis}
- * @param {MouseEvent} e - Event object
- */
-function __resizeEditor(e) {
-	const fc = this.frameContext;
-	const resizeInterval = fc.get('wrapper').offsetHeight + (e.clientY - this._resizeClientY);
-	const h = resizeInterval < fc.get('_minHeight') ? fc.get('_minHeight') : resizeInterval;
-	fc.get('wysiwygFrame').style.height = fc.get('code').style.height = h + 'px';
-	this._resizeClientY = e.clientY;
-	if (!env.isResizeObserverSupported) this.editor.__callResizeFunction(fc, h, null);
-}
-
-/**
- * @this {EventManagerThis}
- */
-function __closeMove() {
-	this.ui.disableBackWrapper();
-	this.__resize_editor &&= this.removeGlobalEvent(this.__resize_editor);
-	this.__close_move &&= this.removeGlobalEvent(this.__close_move);
-}
-
-/**
- * @this {EventManagerThis}
- * @param {"t"|"b"} dir - Direction
- * @param {PointerEvent} e - Pointer event object
- */
-function DisplayLineBreak(dir, e) {
-	e.preventDefault();
-
-	const component = this._lineBreakComp;
-	if (!component) return;
-
-	const isList = dom.check.isListCell(component.parentElement);
-	const format = dom.utils.createElement(isList ? 'BR' : dom.check.isTableCell(component.parentElement) ? 'DIV' : this.options.get('defaultLine'));
-	if (!isList) format.innerHTML = '<br>';
-
-	if (this.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
-
-	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
-	this.component.deselect();
-
-	try {
-		const focusEl = isList ? format : format.firstChild;
-		this.selection.setRange(focusEl, 1, focusEl, 1);
-		this.history.push(false);
-	} catch (err) {
-		console.warn('[SUNEDITOR.lineBreaker.error]', err);
-	}
-}
-
-/**
- * @this {EventManagerThis}
- */
-function OnResize_window() {
-	this.status.initViewportHeight = _w.visualViewport.height;
-
-	if (!isMobile) {
-		this.ui._offCurrentController();
-	}
-
-	if (this.editor.isBalloon) this.toolbar.hide();
-	else if (this.editor.isSubBalloon) this.subToolbar.hide();
-
-	this._resetFrameStatus();
-}
-
-/**
- * @this {EventManagerThis}
- */
-function OnResize_viewport() {
-	if (isMobile && this.options.get('toolbar_sticky') > -1) {
-		this.toolbar._resetSticky();
-		this.editor.menu._restoreMenuPosition();
-	}
-
-	this._scrollContainer();
-	this.__setViewportSize();
-}
-
-/**
- * @this {EventManagerThis}
- */
-function OnScroll_window() {
-	if (this.options.get('toolbar_sticky') > -1) {
-		this.toolbar._resetSticky();
-	}
-
-	if (this.editor.isBalloon && this.context.get('toolbar_main').style.display === 'block') {
-		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
-	} else if (this.editor.isSubBalloon && this.context.get('toolbar_sub_main').style.display === 'block') {
-		this.subToolbar._setBalloonOffset(this.subToolbar._balloonOffset.position === 'top');
-	}
-
-	this._scrollContainer();
-
-	// document type page
-	if (this.frameContext.has('documentType_use_page')) {
-		this.frameContext.get('documentType').scrollWindow();
-	}
-}
-
-/**
- * @this {EventManagerThis}
- */
-function OnMobileScroll_viewport() {
-	if (this.options.get('toolbar_sticky') > -1) {
-		this.toolbar._resetSticky();
-		this.editor.menu._restoreMenuPosition();
-	}
-}
-
-/**
- * @this {EventManagerThis}
- * @param {Document} _wd - Wysiwyg document
- */
-function OnSelectionchange_document(_wd) {
-	if (this.editor._preventSelection) return;
-
-	const selection = _wd.getSelection();
-	let anchorNode = selection.anchorNode;
-
-	this.editor.applyFrameRoots((root) => {
-		if (anchorNode && root.get('wysiwyg').contains(anchorNode)) {
-			if (root.get('isReadOnly') || root.get('isDisabled')) return;
-
-			anchorNode = null;
-			this.selection._init();
-			this.applyTagEffect();
-
-			// document type
-			if (root.has('documentType_use_header')) {
-				const el = dom.query.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
-				root.get('documentType').on(el);
+		if (this._inputFocus) {
+			if (this.editor.isInline) {
+				_w.setTimeout(() => {
+					this.toolbar._showInline();
+				}, 0);
 			}
+			return;
 		}
-	});
-}
 
-/**
- * @this {EventManagerThis}
- */
-function OnScroll_Abs() {
-	this.menu.dropdownOff();
-	this._scrollContainer();
-}
+		if ((this.status.rootKey === rootKey && this.editor._preventBlur) || this.editor._preventFocus) return;
+		this.editor._preventFocus = true;
 
-/**
- * @this {EventManagerThis}
- * @param {SunEditor.FrameContext} frameContext - frame context object
- */
-function OnFocus_code(frameContext) {
-	this.editor.changeFrameContext(frameContext.get('key'));
-	dom.utils.addClass(this.editor.commandTargets.get('codeView'), 'active');
-	dom.utils.setDisabled(this.editor._codeViewDisabledButtons, true);
+		dom.utils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
+		dom.utils.setDisabled(this.editor._codeViewDisabledButtons, false);
+
+		this.editor.changeFrameContext(rootKey);
+		this.history.resetButtons(rootKey, null);
+
+		_w.setTimeout(() => {
+			this.__postFocusEvent(frameContext, e);
+		}, 0);
+	}
+
+	/**
+	 * @param {SunEditor.FrameContext} frameContext - frame context object
+	 * @param {FocusEvent} e - Focus event object
+	 */
+	#OnBlur_wysiwyg(frameContext, e) {
+		if (frameContext.get('isCodeView') || frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return;
+
+		this.status.hasFocus = false;
+		this.editor.effectNode = null;
+		this.triggerEvent('onNativeBlur', { frameContext, event: e });
+
+		if (this._inputFocus || this.editor._preventBlur) return;
+		this.editor._preventFocus = false;
+
+		this._setKeyEffect([]);
+
+		this.status.currentNodes = [];
+		this.status.currentNodesMap = [];
+
+		this.ui.offCurrentController();
+
+		this.editor.applyFrameRoots((root) => {
+			if (root.get('navigation')) root.get('navigation').textContent = '';
+		});
+
+		this.history.check(frameContext.get('key'), this.status._range);
+
+		this.__postBlurEvent(frameContext, e);
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnMouseDown_statusbar(e) {
+		e.stopPropagation();
+		this._resizeClientY = e.clientY;
+		this.ui.enableBackWrapper('ns-resize');
+		this.#resize_editor = this.addGlobalEvent('mousemove', this.#__resizeEditor.bind(this));
+		this.#close_move = this.addGlobalEvent('mouseup', this.#__closeMove.bind(this));
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#__resizeEditor(e) {
+		const fc = this.frameContext;
+		const resizeInterval = fc.get('wrapper').offsetHeight + (e.clientY - this._resizeClientY);
+		const h = resizeInterval < fc.get('_minHeight') ? fc.get('_minHeight') : resizeInterval;
+		fc.get('wysiwygFrame').style.height = fc.get('code').style.height = h + 'px';
+		this._resizeClientY = e.clientY;
+		if (!env.isResizeObserverSupported) this.editor.__callResizeFunction(fc, h, null);
+	}
+
+	#__closeMove() {
+		this.ui.disableBackWrapper();
+		this.#resize_editor &&= this.removeGlobalEvent(this.#resize_editor);
+		this.#close_move &&= this.removeGlobalEvent(this.#close_move);
+	}
+
+	/**
+	 * @param {"t"|"b"} dir - Direction
+	 * @param {PointerEvent} e - Pointer event object
+	 */
+	#DisplayLineBreak(dir, e) {
+		e.preventDefault();
+
+		const component = this._lineBreakComp;
+		if (!component) return;
+
+		const isList = dom.check.isListCell(component.parentElement);
+		const format = dom.utils.createElement(isList ? 'BR' : dom.check.isTableCell(component.parentElement) ? 'DIV' : this.options.get('defaultLine'));
+		if (!isList) format.innerHTML = '<br>';
+
+		if (this.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
+
+		component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
+		this.component.deselect();
+
+		try {
+			const focusEl = isList ? format : format.firstChild;
+			this.selection.setRange(focusEl, 1, focusEl, 1);
+			this.history.push(false);
+		} catch (err) {
+			console.warn('[SUNEDITOR.lineBreaker.error]', err);
+		}
+	}
+
+	#OnResize_window() {
+		this.status.initViewportHeight = _w.visualViewport.height;
+
+		if (!isMobile) {
+			this.ui.offCurrentController();
+		}
+
+		if (this.editor.isBalloon) this.toolbar.hide();
+		else if (this.editor.isSubBalloon) this.subToolbar.hide();
+
+		this.#resetFrameStatus();
+	}
+
+	#OnResize_viewport() {
+		if (isMobile && this.options.get('toolbar_sticky') > -1) {
+			this.toolbar._resetSticky();
+			this.menu.__restoreMenuPosition();
+		}
+
+		this.#scrollContainer();
+		this.__setViewportSize();
+	}
+
+	#OnScroll_window() {
+		if (this.options.get('toolbar_sticky') > -1) {
+			this.toolbar._resetSticky();
+		}
+
+		if (this.editor.isBalloon && this.context.get('toolbar_main').style.display === 'block') {
+			this.toolbar._setBalloonOffset(this.toolbar.balloonOffset.position === 'top');
+		} else if (this.editor.isSubBalloon && this.context.get('toolbar_sub_main').style.display === 'block') {
+			this.subToolbar._setBalloonOffset(this.subToolbar.balloonOffset.position === 'top');
+		}
+
+		this.#scrollContainer();
+
+		// document type page
+		if (this.frameContext.has('documentType_use_page')) {
+			this.frameContext.get('documentType').scrollWindow();
+		}
+	}
+
+	#OnMobileScroll_viewport() {
+		if (this.options.get('toolbar_sticky') > -1) {
+			this.toolbar._resetSticky();
+			this.menu.__restoreMenuPosition();
+		}
+	}
+
+	/**
+	 * @param {Document} _wd - Wysiwyg document
+	 */
+	#OnSelectionchange_document(_wd) {
+		if (this.editor._preventSelection) return;
+
+		const selection = _wd.getSelection();
+		let anchorNode = selection.anchorNode;
+
+		this.editor.applyFrameRoots((root) => {
+			if (anchorNode && root.get('wysiwyg').contains(anchorNode)) {
+				if (root.get('isReadOnly') || root.get('isDisabled')) return;
+
+				anchorNode = null;
+				this.selection.init();
+				this.applyTagEffect();
+
+				// document type
+				if (root.has('documentType_use_header')) {
+					const el = dom.query.getParentElement(this.selection.selectionNode, this.format.isLine.bind(this.format));
+					root.get('documentType').on(el);
+				}
+			}
+		});
+	}
+
+	#OnScroll_Abs() {
+		this.menu.dropdownOff();
+		this.#scrollContainer();
+	}
+
+	/**
+	 * @param {SunEditor.FrameContext} frameContext - frame context object
+	 */
+	#OnFocus_code(frameContext) {
+		this.editor.changeFrameContext(frameContext.get('key'));
+		dom.utils.addClass(this.editor.commandTargets.get('codeView'), 'active');
+		dom.utils.setDisabled(this.editor._codeViewDisabledButtons, true);
+	}
 }
 
 export default EventManager;

@@ -486,8 +486,8 @@ export function createMockEditor(customOptions = {}) {
 			currentDropdown: null,
 			currentDropdownName: null,
 			dropdownOff: jest.fn(),
-			_resetMenuPosition: jest.fn(),
-			_restoreMenuPosition: jest.fn(),
+			__resetMenuPosition: jest.fn(),
+			__restoreMenuPosition: jest.fn(),
 			_hideAllSubMenu: jest.fn(),
 			_getMenuButtonElement: jest.fn().mockReturnValue(null)
 		},
@@ -553,7 +553,6 @@ export function createMockEditor(customOptions = {}) {
 			deselect: jest.fn(),
 			hoverSelect: jest.fn(),
 			__deselect: jest.fn(),
-			__prevent: false,
 			__selectionSelected: false
 		},
 
@@ -575,11 +574,11 @@ export function createMockEditor(customOptions = {}) {
 		ui: {
 			showLoading: jest.fn(),
 			hideLoading: jest.fn(),
-			_offCurrentController: jest.fn(),
+			offCurrentController: jest.fn(),
 			_closeAlignMenu: jest.fn(),
 			enableBackWrapper: jest.fn(),
 			disableBackWrapper: jest.fn(),
-			_offCurrentModal: jest.fn()
+			offCurrentModal: jest.fn()
 		},
 
 		// Editor actions
@@ -734,7 +733,6 @@ export function createMockThis(editor = null, customProps = {}) {
 		_lineBreakComp: null,
 		_formatAttrsTemp: null,
 		_resizeClientY: 0,
-		__resize_editor: null,
 		__close_move: null,
 		__geckoActiveEvent: null,
 		__cacheStyleNodes: [],
@@ -756,17 +754,11 @@ export function createMockThis(editor = null, customProps = {}) {
 		applyTagEffect: jest.fn(),
 		triggerEvent: mockEditor.triggerEvent,
 		_dataTransferAction: jest.fn().mockResolvedValue(false),
-		_setClipboardData: jest.fn(),
 		_setDefaultLine: jest.fn(),
 		_toggleToolbarBalloon: jest.fn(),
 		_showToolbarBalloonDelay: jest.fn(),
 		_hideToolbar: jest.fn(),
 		_hideToolbar_sub: jest.fn(),
-		_isNonFocusNode: jest.fn().mockReturnValue(false),
-		_moveContainer: jest.fn(),
-		_scrollContainer: jest.fn(),
-		__rePositionController: jest.fn(),
-		_resetFrameStatus: jest.fn(),
 		_setSelectionSync: jest.fn(),
 		_retainStyleNodes: jest.fn(),
 		_clearRetainStyleNodes: jest.fn(),

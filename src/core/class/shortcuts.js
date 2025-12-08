@@ -27,19 +27,19 @@ import { keyCodeMap } from '../../helper';
  */
 
 /**
- * @constructor
- * @this {ShortcutsThis}
  * @description Shortcuts class
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function Shortcuts(editor) {
-	this.editor = editor;
-	this.isDisabled = false;
-}
-
-Shortcuts.prototype = {
+class Shortcuts {
 	/**
-	 * @this {ShortcutsThis}
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		this.editor = editor;
+		this.isDisabled = false;
+	}
+
+	/**
 	 * @description If there is a shortcut function, run it.
 	 * @param {KeyboardEvent} event Keyboard event object
 	 * @param {boolean} ctrl Whether the Ctrl key is pressed
@@ -74,34 +74,29 @@ Shortcuts.prototype = {
 		}
 
 		return true;
-	},
+	}
 
 	/**
-	 * @this {ShortcutsThis}
 	 * @description Disable the shortcut activation.
 	 */
 	disable() {
 		this.isDisabled = true;
-	},
+	}
 
 	/**
-	 * @this {ShortcutsThis}
 	 * @description Enable the shortcut activation.
 	 */
 	enable() {
 		this.isDisabled = false;
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ShortcutsThis}
 	 * @description Destroy the Shortcuts instance and release memory
 	 */
 	_destroy() {
 		// No internal state to clean up
-	},
-
-	constructor: Shortcuts,
-};
+	}
+}
 
 export default Shortcuts;

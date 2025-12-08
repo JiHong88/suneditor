@@ -18,7 +18,7 @@ describe('Core - Editor Advanced Features', () => {
 			editor = createTestEditor({
 				iframe: true,
 				iframe_cssFileName: [], // Provide empty array to avoid auto-detection
-				height: 'auto'
+				height: 'auto',
 			});
 			await waitForEditorReady(editor);
 
@@ -35,15 +35,13 @@ describe('Core - Editor Advanced Features', () => {
 				expect(editor.frameContext.get('_wd')).toBeDefined();
 				expect(editor.frameContext.get('_ww')).toBeDefined();
 			}
-
-			expect(true).toBe(true);
 		});
 
 		it('should handle iframe auto height', async () => {
 			editor = createTestEditor({
 				iframe: true,
 				iframe_cssFileName: [], // Provide empty array to avoid auto-detection
-				height: 'auto'
+				height: 'auto',
 			});
 			await waitForEditorReady(editor);
 
@@ -60,8 +58,6 @@ describe('Core - Editor Advanced Features', () => {
 			if (fc.get('_iframeAuto')) {
 				expect(fc.get('_iframeAuto')).toBeDefined();
 			}
-
-			expect(true).toBe(true);
 		});
 	});
 
@@ -80,7 +76,7 @@ describe('Core - Editor Advanced Features', () => {
 			}
 
 			// Shadow root detection
-			expect(typeof editor._shadowRoot === 'object' || editor._shadowRoot === null).toBe(true);
+			expect(typeof editor.shadowRoot === 'object' || editor.shadowRoot === null).toBe(true);
 		});
 	});
 
@@ -103,8 +99,6 @@ describe('Core - Editor Advanced Features', () => {
 				// Should have observer
 				expect(editor.eventManager._wwFrameObserver).toBeDefined();
 			}
-
-			expect(true).toBe(true);
 		});
 	});
 
@@ -126,8 +120,6 @@ describe('Core - Editor Advanced Features', () => {
 			if (env.isResizeObserverSupported) {
 				expect(editor.eventManager._toolbarObserver).toBeDefined();
 			}
-
-			expect(true).toBe(true);
 		});
 	});
 
@@ -167,23 +159,6 @@ describe('Core - Editor Advanced Features', () => {
 			// Check flags
 			expect(editor._componentsInfoInit).toBe(false);
 			expect(editor._componentsInfoReset).toBe(false);
-		});
-
-		it('should call checkComponents after initialization', async () => {
-			editor = createTestEditor();
-			await waitForEditorReady(editor);
-
-			// Mock UI
-			if (editor.ui) {
-				editor.ui.showLoading = jest.fn();
-				editor.ui.hideLoading = jest.fn();
-			}
-			if (editor.viewer) {
-				editor.viewer.print = jest.fn();
-			}
-
-			// Should have loaded components
-			expect(editor._fileInfoPluginsCheck).toBeDefined();
 		});
 	});
 
@@ -233,8 +208,8 @@ describe('Core - Editor Advanced Features', () => {
 
 			editor = createTestEditor({
 				events: {
-					onload: onloadSpy
-				}
+					onload: onloadSpy,
+				},
 			});
 			await waitForEditorReady(editor);
 

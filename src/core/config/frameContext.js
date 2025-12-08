@@ -148,9 +148,9 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 			// Runtime properties (set dynamically during editor lifecycle)
 			/*
 			['eventWysiwyg', null], // Set in eventManager.js during event initialization
-			['wwComputedStyle', null], // Set in editor.js (__setEditorParams) via getComputedStyle
-			['_ww', null], // Set in editor.js (__setEditorParams) - iframe window object
-			['_wd', null], // Set in editor.js (__setEditorParams) - iframe document object
+			['wwComputedStyle', null], // Set in editor.js (#setEditorParams) via getComputedStyle
+			['_ww', null], // Set in editor.js (#setEditorParams) - iframe window object
+			['_wd', null], // Set in editor.js (#setEditorParams) - iframe document object
 			['_iframeAuto', null], // Set in editor.js for iframe auto-resize mode
 			['_editorHeight', null], // Set during resize operations
 			['_figure', null], // Set when figure component (image/table) is active

@@ -38,8 +38,7 @@ describe('handler_ww_mouse', () => {
 		mockThis._toggleToolbarBalloon = jest.fn();
 
 		// Add missing selection methods
-		mockThis.selection._init = jest.fn();
-		mockThis.selection._rangeInfo = jest.fn();
+		mockThis.selection.init = jest.fn();
 		mockThis.selection.get = jest.fn().mockReturnValue(null);
 
 		// Add missing format/nodeTransform methods

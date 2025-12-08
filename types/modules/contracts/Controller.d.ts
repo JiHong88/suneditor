@@ -130,7 +130,7 @@ declare class Controller extends CoreInjector {
 	currentTarget: HTMLElement;
 	currentPositionTarget: Node | Range;
 	isWWTarget: boolean;
-	position: 'bottom' | 'top';
+	position: 'top' | 'bottom';
 	disabled: boolean;
 	parents: (HTMLElement | Controller)[];
 	parentsForm: any[];

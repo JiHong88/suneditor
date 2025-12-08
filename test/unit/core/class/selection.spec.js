@@ -9,15 +9,52 @@ describe('Selection', () => {
 	let editor;
 	let selection;
 	let wysiwyg;
+	let getClientRectsSpy;
+	let scrollIntoViewSpy;
 
 	beforeEach(async () => {
 		editor = createTestEditor();
 		await waitForEditorReady(editor);
 		selection = editor.selection;
 		wysiwyg = editor.frameContext.get('wysiwyg');
+
+		// jsdom stubs
+		const rectImpl = () => [{ top: 0, bottom: 10, left: 0, right: 10, width: 10, height: 10 }];
+		if (Element.prototype.getClientRects) {
+			getClientRectsSpy = jest.spyOn(Element.prototype, 'getClientRects').mockImplementation(rectImpl);
+		} else {
+			Object.defineProperty(Element.prototype, 'getClientRects', {
+				value: rectImpl,
+				writable: true,
+			});
+		}
+		if (!Node.prototype.getClientRects) {
+			Object.defineProperty(Node.prototype, 'getClientRects', {
+				value: rectImpl,
+				writable: true,
+			});
+		}
+		if (typeof Range !== 'undefined' && !Range.prototype.getClientRects) {
+			Object.defineProperty(Range.prototype, 'getClientRects', {
+				value: rectImpl,
+				writable: true,
+			});
+		}
+
+		const scrollImpl = () => {};
+		if (Element.prototype.scrollIntoView) {
+			scrollIntoViewSpy = jest.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(scrollImpl);
+		} else {
+			Object.defineProperty(Element.prototype, 'scrollIntoView', {
+				value: scrollImpl,
+				writable: true,
+			});
+		}
 	});
 
 	afterEach(() => {
+		getClientRectsSpy?.mockRestore();
+		scrollIntoViewSpy?.mockRestore();
 		destroyTestEditor(editor);
 	});
 
@@ -33,7 +70,7 @@ describe('Selection', () => {
 					if (key === '_ww') return { getSelection: () => null };
 					if (key === 'wysiwyg') return wysiwyg;
 					return null;
-				})
+				}),
 			};
 			const origContext = selection.frameContext;
 			selection.frameContext = mockContext;
@@ -109,7 +146,7 @@ describe('Selection', () => {
 
 			editor.component.is = jest.fn(() => true);
 			editor.component.get = jest.fn(() => ({
-				container: p
+				container: p,
 			}));
 
 			selection.setRange(img, 0, img, 0);
@@ -332,6 +369,20 @@ describe('Selection', () => {
 			const result = selection.getRangeAndAddLine(range, figure);
 
 			expect(result).toBeDefined();
+			expect(wysiwyg.children.length).toBe(childCountBefore + 1);
+		});
+
+		it('should add line when range targets wysiwyg root', () => {
+			const range = document.createRange();
+			range.setStart(wysiwyg, 0);
+			range.setEnd(wysiwyg, 0);
+
+			const childCountBefore = wysiwyg.children.length;
+
+			const result = selection.getRangeAndAddLine(range);
+
+			expect(result).toBe(selection.status._range);
+			expect(wysiwyg.children.length).toBe(childCountBefore + 1);
 		});
 	});
 
@@ -382,13 +433,9 @@ describe('Selection', () => {
 			const text = wysiwyg.firstChild.firstChild;
 			selection.setRange(text, 0, text, 4);
 
-			try {
-				const result = selection.getRects(null, 'start');
-				expect(result.rects).toBeDefined();
-				expect(result.position).toBe('start');
-			} catch (e) {
-				expect(true).toBe(true);
-			}
+			const result = selection.getRects(null, 'start');
+			expect(result.rects).toBeDefined();
+			expect(result.position).toBe('start');
 		});
 
 		it('should get rects for end position', () => {
@@ -396,12 +443,8 @@ describe('Selection', () => {
 			const text = wysiwyg.firstChild.firstChild;
 			selection.setRange(text, 0, text, 10);
 
-			try {
-				const result = selection.getRects(null, 'end');
-				expect(result.position).toBe('end');
-			} catch (e) {
-				expect(true).toBe(true);
-			}
+			const result = selection.getRects(null, 'end');
+			expect(result.position).toBe('end');
 		});
 
 		it('should handle no rects with line format node (lines 274-283)', () => {
@@ -410,12 +453,8 @@ describe('Selection', () => {
 			const br = p.firstChild;
 			selection.setRange(br, 0, br, 0);
 
-			try {
-				const result = selection.getRects(null, 'start');
-				expect(result).toBeDefined();
-			} catch (e) {
-				expect(true).toBe(true);
-			}
+			const result = selection.getRects(null, 'start');
+			expect(result).toBeDefined();
 		});
 
 		it('should handle text node target', () => {
@@ -423,12 +462,8 @@ describe('Selection', () => {
 			const text = wysiwyg.firstChild.firstChild;
 			selection.setRange(text, 0, text, 4);
 
-			try {
-				const result = selection.getRects(text, 'start');
-				expect(result).toBeDefined();
-			} catch (e) {
-				expect(true).toBe(true);
-			}
+			const result = selection.getRects(text, 'start');
+			expect(result).toBeDefined();
 		});
 	});
 
@@ -436,24 +471,25 @@ describe('Selection', () => {
 		it('should get range from drag event using caretRangeFromPoint (lines 335-341)', () => {
 			const mockEvent = {
 				clientX: 10,
-				clientY: 10
+				clientY: 10,
 			};
 
 			const mockRange = {
 				startContainer: wysiwyg.firstChild,
 				startOffset: 0,
 				endContainer: wysiwyg.firstChild,
-				endOffset: 0
+				endOffset: 0,
 			};
 
 			const origFrameContext = selection.frameContext;
 			selection.frameContext = {
 				get: (key) => {
-					if (key === '_wd') return {
-						caretRangeFromPoint: jest.fn(() => mockRange)
-					};
+					if (key === '_wd')
+						return {
+							caretRangeFromPoint: jest.fn(() => mockRange),
+						};
 					return origFrameContext.get(key);
-				}
+				},
 			};
 
 			const result = selection.getDragEventLocationRange(mockEvent);
@@ -467,22 +503,23 @@ describe('Selection', () => {
 		it('should get range using caretPositionFromPoint (lines 329-334)', () => {
 			const mockEvent = {
 				clientX: 10,
-				clientY: 10
+				clientY: 10,
 			};
 
 			const mockPosition = {
 				offsetNode: wysiwyg.firstChild,
-				offset: 0
+				offset: 0,
 			};
 
 			const origFrameContext = selection.frameContext;
 			selection.frameContext = {
 				get: (key) => {
-					if (key === '_wd') return {
-						caretPositionFromPoint: jest.fn(() => mockPosition)
-					};
+					if (key === '_wd')
+						return {
+							caretPositionFromPoint: jest.fn(() => mockPosition),
+						};
 					return origFrameContext.get(key);
-				}
+				},
 			};
 
 			const result = selection.getDragEventLocationRange(mockEvent);
@@ -502,12 +539,7 @@ describe('Selection', () => {
 			range.setStart(text, 0);
 			range.setEnd(text, 4);
 
-			try {
-				selection.scrollTo(range, { behavior: 'auto' });
-				expect(true).toBe(true);
-			} catch (e) {
-				expect(true).toBe(true);
-			}
+			expect(() => selection.scrollTo(range, { behavior: 'auto' })).not.toThrow();
 		});
 
 		it('should handle Selection object (lines 358-359)', () => {
@@ -517,24 +549,14 @@ describe('Selection', () => {
 
 			const sel = selection.get();
 
-			try {
-				selection.scrollTo(sel);
-				expect(true).toBe(true);
-			} catch (e) {
-				expect(true).toBe(true);
-			}
+			expect(() => selection.scrollTo(sel)).not.toThrow();
 		});
 
 		it('should handle Node object (lines 360-361)', () => {
 			wysiwyg.innerHTML = '<p>test</p>';
 			const p = wysiwyg.firstChild;
 
-			try {
-				selection.scrollTo(p);
-				expect(true).toBe(true);
-			} catch (e) {
-				expect(true).toBe(true);
-			}
+			expect(() => selection.scrollTo(p)).not.toThrow();
 		});
 
 		it('should warn for invalid ref (lines 362-364)', () => {
@@ -550,118 +572,37 @@ describe('Selection', () => {
 
 			warnSpy.mockRestore();
 		});
-
-		it('should handle __hasScrollParents path (lines 381-393)', () => {
-			selection.__hasScrollParents = true;
-
-			wysiwyg.innerHTML = '<p>test</p>';
-			const text = wysiwyg.firstChild.firstChild;
-			const range = document.createRange();
-			range.setStart(text, 0);
-			range.setEnd(text, 4);
-
-			try {
-				selection.scrollTo(range);
-				expect(true).toBe(true);
-			} catch (e) {
-				expect(true).toBe(true);
-			}
-
-			selection.__hasScrollParents = false;
-		});
 	});
 
-	describe('_isNone', () => {
-		it('should return true for wysiwyg frame range (lines 480-481)', () => {
-			const range = document.createRange();
-			range.setStart(wysiwyg, 0);
-			range.setEnd(wysiwyg, 0);
-
-			const result = selection._isNone(range);
-
-			expect(result).toBe(true);
-		});
-
-		it('should return true for FIGURE element (line 482)', () => {
-			wysiwyg.innerHTML = '<figure><img src="test.jpg"></figure>';
-			const figure = wysiwyg.firstChild;
-			const range = document.createRange();
-			range.setStart(figure, 0);
-			range.setEnd(figure, 1);
-
-			const result = selection._isNone(range);
-
-			expect(result).toBe(true);
-		});
-	});
-
-	describe('_createDefaultRange', () => {
-		it('should create default range with existing element', () => {
+	describe('default range creation', () => {
+		it('should provide range when element exists', () => {
 			wysiwyg.innerHTML = '<p>test</p>';
+			selection.status._range = null;
 
-			const range = selection._createDefaultRange();
+			const range = selection.getRange();
 
 			expect(range).toBeDefined();
+			expect(range.startContainer).toBe(wysiwyg.firstChild.firstChild);
 		});
 
-		it('should create default range with no existing element (lines 500-503)', () => {
+		it('should create default line when editor empty (lines 500-503)', () => {
 			wysiwyg.innerHTML = '';
+			selection.status._range = null;
 
-			const range = selection._createDefaultRange();
+			const range = selection.getRange();
 
 			expect(range).toBeDefined();
 			expect(wysiwyg.firstElementChild).toBeTruthy();
 		});
 
-		it('should create default range with element but no child (lines 505-509)', () => {
+		it('should add child to existing empty element (lines 505-509)', () => {
 			wysiwyg.innerHTML = '<p></p>';
+			selection.status._range = null;
 
-			const range = selection._createDefaultRange();
+			const range = selection.getRange();
 
 			expect(range).toBeDefined();
 			expect(wysiwyg.firstElementChild.firstChild).toBeTruthy();
-		});
-	});
-
-	describe('_rangeInfo', () => {
-		it('should set range info for collapsed range (lines 529-531)', () => {
-			wysiwyg.innerHTML = '<p>test</p>';
-			const text = wysiwyg.firstChild.firstChild;
-			const range = document.createRange();
-			range.setStart(text, 2);
-			range.setEnd(text, 2);
-			const sel = selection.get();
-
-			selection._rangeInfo(range, sel);
-
-			expect(selection.status._range).toBe(range);
-			expect(selection.selectionNode).toBeDefined();
-		});
-
-		it('should set range info for wysiwyg frame collapsed (line 530)', () => {
-			wysiwyg.innerHTML = '<p>test</p>';
-			const range = document.createRange();
-			range.setStart(wysiwyg, 0);
-			range.setEnd(wysiwyg, 0);
-			const sel = selection.get();
-
-			selection._rangeInfo(range, sel);
-
-			expect(selection.selectionNode).toBeDefined();
-		});
-
-		it('should set range info for non-collapsed range (lines 532-534)', () => {
-			wysiwyg.innerHTML = '<p>test</p>';
-			const text = wysiwyg.firstChild.firstChild;
-			const range = document.createRange();
-			range.setStart(text, 0);
-			range.setEnd(text, 4);
-			const sel = selection.get();
-
-			selection._rangeInfo(range, sel);
-
-			expect(selection.status._range).toBe(range);
-			expect(selection.selectionNode).toBe(sel.anchorNode);
 		});
 	});
 
@@ -671,7 +612,7 @@ describe('Selection', () => {
 			const text = wysiwyg.firstChild.firstChild;
 			selection.setRange(text, 0, text, 4);
 
-			selection._init();
+			selection.init();
 
 			expect(selection.selectionNode).toBeDefined();
 		});
@@ -682,7 +623,7 @@ describe('Selection', () => {
 			wysiwyg.appendChild(input);
 			input.focus();
 
-			const result = selection._init();
+			const result = selection.init();
 
 			expect(result).toBe(input);
 		});
@@ -691,13 +632,13 @@ describe('Selection', () => {
 			wysiwyg.innerHTML = '<p>test</p>';
 
 			const mockSel = {
-				rangeCount: 0
+				rangeCount: 0,
 			};
 
 			const origGet = selection.get;
 			selection.get = jest.fn(() => mockSel);
 
-			selection._init();
+			selection.init();
 
 			expect(selection.selectionNode).toBeDefined();
 
@@ -732,13 +673,13 @@ describe('Selection', () => {
 		});
 	});
 
-	describe('_resetRangeToTextNode', () => {
+	describe('resetRangeToTextNode', () => {
 		it('should reset range to text node', () => {
 			wysiwyg.innerHTML = '<p>test</p>';
 			const p = wysiwyg.firstChild;
 			selection.setRange(p, 0, p, 1);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -751,7 +692,7 @@ describe('Selection', () => {
 			range.setEnd(figure, 1);
 			selection.status._range = range;
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(false);
 		});
@@ -763,7 +704,7 @@ describe('Selection', () => {
 			range.setEnd(wysiwyg, 2);
 			selection.status._range = range;
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -773,7 +714,7 @@ describe('Selection', () => {
 			const p = wysiwyg.firstChild;
 			selection.setRange(p, 0, p, 1);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -783,7 +724,7 @@ describe('Selection', () => {
 			const p = wysiwyg.firstChild;
 			selection.setRange(p, 10, p, 10);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -793,7 +734,7 @@ describe('Selection', () => {
 			const p = wysiwyg.firstChild;
 			selection.setRange(p, 0, p, 1);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -804,7 +745,7 @@ describe('Selection', () => {
 			const text = p.firstChild.firstChild;
 			selection.setRange(text, 0, p, 2);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -814,7 +755,7 @@ describe('Selection', () => {
 			const p = wysiwyg.firstChild;
 			selection.setRange(p, 0, p, 0);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -825,7 +766,7 @@ describe('Selection', () => {
 			const br = p.firstChild;
 			selection.setRange(br, 0, br, 0);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -835,7 +776,7 @@ describe('Selection', () => {
 			const span = wysiwyg.querySelector('span');
 			selection.setRange(span, 0, span, 1);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -847,7 +788,7 @@ describe('Selection', () => {
 			const br = p.lastChild;
 			selection.setRange(text, 0, br, 0);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -859,7 +800,7 @@ describe('Selection', () => {
 			const text = span.querySelector('strong').firstChild;
 			selection.setRange(text, 0, span, 1);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -870,7 +811,7 @@ describe('Selection', () => {
 			const br = td.firstChild;
 			selection.setRange(br, 0, br, 0);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -882,7 +823,7 @@ describe('Selection', () => {
 			const br = p.lastChild;
 			selection.setRange(text, 0, br, 0);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -896,7 +837,7 @@ describe('Selection', () => {
 			editor.format.getLine = jest.fn(() => div);
 			editor.format.getBlock = jest.fn(() => div);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 		});
@@ -906,7 +847,7 @@ describe('Selection', () => {
 			const br = wysiwyg.querySelector('br');
 			selection.setRange(br, 0, br, 0);
 
-			const result = selection._resetRangeToTextNode();
+			const result = selection.resetRangeToTextNode();
 
 			expect(result).toBe(true);
 			expect(selection.getRange().startContainer).toBe(selection.getRange().endContainer);

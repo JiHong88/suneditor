@@ -41,15 +41,10 @@ describe('Core - Char', () => {
             const origType = char.frameOptions.get('charCounter_type');
             char.frameOptions.set('charCounter_type', 'byte');
 
-            try {
-                const length = char.getLength('hello');
-                expect(typeof length).toBe('number');
-            } catch (e) {
-                // TextEncoder may not be available
-                expect(true).toBe(true);
-            } finally {
-                char.frameOptions.set('charCounter_type', origType);
-            }
+            const length = char.getLength('hello');
+            expect(typeof length).toBe('number');
+
+            char.frameOptions.set('charCounter_type', origType);
         });
 
         it('should handle byte-html charCounter_type', () => {
@@ -58,15 +53,10 @@ describe('Core - Char', () => {
             wysiwyg.innerHTML = '<p>test</p>';
             char.frameOptions.set('charCounter_type', 'byte-html');
 
-            try {
-                const length = char.getLength();
-                expect(typeof length).toBe('number');
-            } catch (e) {
-                // TextEncoder may not be available
-                expect(true).toBe(true);
-            } finally {
-                char.frameOptions.set('charCounter_type', origType);
-            }
+            const length = char.getLength();
+            expect(typeof length).toBe('number');
+
+            char.frameOptions.set('charCounter_type', origType);
         });
     });
 
@@ -200,14 +190,14 @@ describe('Core - Char', () => {
         it('should blink charWrapper when limit exceeded', () => {
             const charWrapper = editor.frameContext.get('charWrapper');
             if (charWrapper) {
+                jest.useFakeTimers();
                 const longText = 'a'.repeat(200);
                 char.check(longText);
 
-                // After blink, class should be added then removed
-                // In test environment, we just verify it doesn't throw
-                expect(true).toBe(true);
-            } else {
-                expect(true).toBe(true);
+                expect(charWrapper.classList.contains('se-blink')).toBe(true);
+                jest.runAllTimers();
+                expect(charWrapper.classList.contains('se-blink')).toBe(false);
+                jest.useRealTimers();
             }
         });
     });
@@ -238,13 +228,8 @@ describe('Core - Char', () => {
             }
         });
 
-        it('should work with custom frame context', (done) => {
-            char.display(editor.frameContext);
-
-            setTimeout(() => {
-                expect(true).toBe(true);
-                done();
-            }, 10);
+        it('should work with custom frame context', () => {
+            expect(() => char.display(editor.frameContext)).not.toThrow();
         });
 
         it('should handle null charCounter gracefully', async () => {
@@ -293,13 +278,8 @@ describe('Core - Char', () => {
             const wysiwyg = editor.frameContext.get('wysiwyg');
             wysiwyg.innerHTML = '<p>test</p>';
 
-            try {
-                const result = char.test('', false);
-                expect(typeof result).toBe('boolean');
-            } catch (e) {
-                // May fail in test environment
-                expect(true).toBe(true);
-            }
+            const result = char.test('', false);
+            expect(typeof result).toBe('boolean');
         });
 
         it('should handle over limit without input text', () => {
@@ -365,7 +345,7 @@ describe('Core - Char', () => {
             range.setEnd(textNode, 25);
 
             // Mock selection methods
-            editor.selection._init = jest.fn();
+            editor.selection.init = jest.fn();
             editor.selection.getRange = jest.fn().mockReturnValue({
                 endOffset: 25,
                 endContainer: textNode

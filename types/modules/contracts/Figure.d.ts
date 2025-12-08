@@ -356,7 +356,7 @@ declare class Figure extends CoreInjector {
 	_cover: HTMLElement;
 	_inlineCover: HTMLElement;
 	_container: HTMLElement;
-	_caption: any;
+	_caption: HTMLElement;
 	_resizeClientX: number;
 	_resizeClientY: number;
 	_resize_direction: string;

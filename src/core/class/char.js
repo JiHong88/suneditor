@@ -7,27 +7,23 @@ import { _w, isEdge } from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/dom/domUtils';
 
 /**
- * @typedef {Omit<Char & Partial<SunEditor.Injector_Core>, 'char'>} CharThis
- */
-
-/**
- * @constructor
- * @this {CharThis}
  * @description character count, character limit, etc. management class
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function Char(editor) {
-	CoreInjector.call(this, editor);
-}
+class Char extends CoreInjector {
+	/**
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+	}
 
-Char.prototype = {
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection() {
+	/** @type {SunEditor.Core['selection']} */
+	get #selection() {
 		return this.editor.selection;
-	},
+	}
 
 	/**
-	 * @this {CharThis}
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "html" is added to the current editor.
 	 * @param {Node|string} html Element node or String.
 	 * @returns {boolean}
@@ -42,10 +38,9 @@ Char.prototype = {
 			}
 		}
 		return true;
-	},
+	}
 
 	/**
-	 * @this {CharThis}
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
 	 * - If [content] is undefined, get the current editor's number of characters or binary data size.
 	 * @param {string} [content] Content to count. (defalut: this.frameContext.get('wysiwyg'))
@@ -56,10 +51,9 @@ Char.prototype = {
 			content = this.frameOptions.get('charCounter_type') === 'byte-html' ? this.frameContext.get('wysiwyg').innerHTML : this.frameContext.get('wysiwyg').textContent;
 		}
 		return /byte/.test(this.frameOptions.get('charCounter_type')) ? this.getByteLength(content) : content.length;
-	},
+	}
 
 	/**
-	 * @this {CharThis}
 	 * @descriptionGets Get the length in bytes of a string.
 	 * @param {string} text String text
 	 * @returns {number}
@@ -88,10 +82,9 @@ Char.prototype = {
 
 			return cl + cr;
 		}
-	},
+	}
 
 	/**
-	 * @this {CharThis}
 	 * @description Set the char count to charCounter element textContent.
 	 * @param {?SunEditor.FrameContext} [fc] Frame context
 	 */
@@ -102,10 +95,9 @@ Char.prototype = {
 				charCounter.textContent = this.getLength();
 			}, 0);
 		}
-	},
+	}
 
 	/**
-	 * @this {CharThis}
 	 * @description Returns false if char count is greater than "frameOptions.get('charCounter_max')" when "inputText" is added to the current editor.
 	 * - If the current number of characters is greater than "charCounter_max", the excess characters are removed.
 	 * And call the char.display()
@@ -127,14 +119,14 @@ Char.prototype = {
 			if (count > maxCharCount) {
 				over = true;
 				if (nextCharCount > 0 && _fromInputEvent) {
-					this.selection._init();
-					const range = this.selection.getRange();
+					this.#selection.init();
+					const range = this.#selection.getRange();
 					const endOff = range.endOffset - 1;
-					const text = this.selection.getNode().textContent;
+					const text = this.#selection.getNode().textContent;
 					const slicePosition = range.endOffset - 1; // (count - maxCharCount);
 
-					this.selection.getNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
-					this.selection.setRange(range.endContainer, endOff, range.endContainer, endOff);
+					this.#selection.getNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
+					this.#selection.setRange(range.endContainer, endOff, range.endContainer, endOff);
 				}
 			} else if (count + nextCharCount > maxCharCount) {
 				over = true;
@@ -147,19 +139,16 @@ Char.prototype = {
 		}
 
 		return true;
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {CharThis}
 	 * @description Destroy the Char instance and release memory
 	 */
 	_destroy() {
 		// No internal state to clean up
-	},
-
-	constructor: Char,
-};
+	}
+}
 
 /**
  * @description The character counter blinks.

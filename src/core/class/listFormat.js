@@ -6,44 +6,40 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom } from '../../helper';
 
 /**
- * @typedef {Omit<ListFormat & Partial<SunEditor.Injector_Core>, 'ListFormat'>} ListFormatThis
- */
-
-/**
- * @constructor
- * @this {ListFormatThis}
  * @description Classes related to editor formats such as "list" (ol, ul, li)
  * - "list" is a special "line", "block" format.
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function ListFormat(editor) {
-	CoreInjector.call(this, editor);
-}
+class ListFormat extends CoreInjector {
+	/**
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+	}
 
-ListFormat.prototype = {
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection() {
+	/** @type {SunEditor.Core['selection']} */
+	get #selection() {
 		return this.editor.selection;
-	},
-	/** @internal @type {SunEditor.Core['format']} */
-	get format() {
+	}
+	/** @type {SunEditor.Core['format']} */
+	get #format() {
 		return this.editor.format;
-	},
-	/** @internal @type {SunEditor.Core['component']} */
-	get component() {
+	}
+	/** @type {SunEditor.Core['component']} */
+	get #component() {
 		return this.editor.component;
-	},
-	/** @internal @type {SunEditor.Core['inline']} */
-	get inline() {
+	}
+	/** @type {SunEditor.Core['inline']} */
+	get #inline() {
 		return this.editor.inline;
-	},
-	/** @internal @type {SunEditor.Core['nodeTransform']} */
-	get nodeTransform() {
+	}
+	/** @type {SunEditor.Core['nodeTransform']} */
+	get #nodeTransform() {
 		return this.editor.nodeTransform;
-	},
+	}
 
 	/**
-	 * @this {ListFormatThis}
 	 * @description Append all selected "line" element to the list and insert.
 	 * @param {string} type List type. (ol | ul):[listStyleType]
 	 * @param {Array<Node>} selectedCells "line" elements or list cells.
@@ -64,13 +60,13 @@ ListFormat.prototype = {
 		const listTag = (type.split(':')[0] || 'ol').toUpperCase();
 		const listStyle = type.split(':')[1] || '';
 
-		let range = this.selection.getRange();
-		let selectedFormats = /** @type {Array<HTMLElement>} */ (!selectedCells ? this.format.getLinesAndComponents(false) : selectedCells);
+		let range = this.#selection.getRange();
+		let selectedFormats = /** @type {Array<HTMLElement>} */ (!selectedCells ? this.#format.getLinesAndComponents(false) : selectedCells);
 
 		if (selectedFormats.length === 0) {
 			if (selectedCells) return;
-			range = this.selection.getRangeAndAddLine(range, null);
-			selectedFormats = this.format.getLinesAndComponents(false);
+			range = this.#selection.getRangeAndAddLine(range, null);
+			selectedFormats = this.#format.getLinesAndComponents(false);
 			if (selectedFormats.length === 0) return;
 		}
 
@@ -79,8 +75,8 @@ ListFormat.prototype = {
 		// merge
 		const firstSel = selectedFormats[0];
 		const lastSel = selectedFormats.at(-1);
-		let topEl = (dom.check.isListCell(firstSel) || this.component.is(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentElement.previousElementSibling : firstSel.previousElementSibling;
-		let bottomEl = (dom.check.isListCell(lastSel) || this.component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentElement.nextElementSibling : lastSel.nextElementSibling;
+		let topEl = (dom.check.isListCell(firstSel) || this.#component.is(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentElement.previousElementSibling : firstSel.previousElementSibling;
+		let bottomEl = (dom.check.isListCell(lastSel) || this.#component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentElement.nextElementSibling : lastSel.nextElementSibling;
 
 		const isCollapsed = range.collapsed;
 		const originRange = {
@@ -93,7 +89,7 @@ ListFormat.prototype = {
 		let isRemove = true;
 
 		for (let i = 0, len = selectedFormats.length; i < len; i++) {
-			if (!dom.check.isList(this.format.getBlock(selectedFormats[i], (current) => this.format.getBlock(current) && current !== selectedFormats[i]))) {
+			if (!dom.check.isList(this.#format.getBlock(selectedFormats[i], (current) => this.#format.getBlock(current) && current !== selectedFormats[i]))) {
 				isRemove = false;
 				break;
 			}
@@ -113,7 +109,7 @@ ListFormat.prototype = {
 				}
 			}
 
-			const currentFormat = this.format.getBlock(firstSel);
+			const currentFormat = this.#format.getBlock(firstSel);
 			const cancel = currentFormat?.tagName === listTag;
 			let rangeArr, tempList;
 			const passComponent = (current) => {
@@ -125,7 +121,7 @@ ListFormat.prototype = {
 			}
 
 			for (let i = 0, len = selectedFormats.length, r, o; i < len; i++) {
-				o = this.format.getBlock(selectedFormats[i], passComponent);
+				o = this.#format.getBlock(selectedFormats[i], passComponent);
 				if (!o || !dom.check.isList(o)) continue;
 
 				if (!r) {
@@ -137,9 +133,9 @@ ListFormat.prototype = {
 				} else {
 					if (r !== o) {
 						if (nested && dom.check.isListCell(o.parentNode)) {
-							this._detachNested(rangeArr.f);
+							this.#detachNested(rangeArr.f);
 						} else {
-							afterRange = this.format.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
+							afterRange = this.#format.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
 						}
 
 						o = selectedFormats[i].parentNode;
@@ -159,9 +155,9 @@ ListFormat.prototype = {
 
 				if (i === len - 1) {
 					if (nested && dom.check.isListCell(o.parentNode)) {
-						this._detachNested(rangeArr.f);
+						this.#detachNested(rangeArr.f);
 					} else {
-						afterRange = this.format.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
+						afterRange = this.#format.removeBlock(rangeArr.f[0].parentElement, { selectedFormats: rangeArr.f, newBlockElement: tempList, shouldDelete: false, skipHistory: true });
 					}
 				}
 			}
@@ -186,7 +182,7 @@ ListFormat.prototype = {
 
 			for (let i = 0, len = selectedFormats.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
 				fTag = selectedFormats[i];
-				if (fTag.childNodes.length === 0 && !this.inline._isIgnoreNodeChange(fTag)) {
+				if (fTag.childNodes.length === 0 && !this.#inline._isIgnoreNodeChange(fTag)) {
 					dom.utils.removeItem(fTag);
 					continue;
 				}
@@ -194,13 +190,13 @@ ListFormat.prototype = {
 				originParent = fTag.parentNode;
 				nextParent = next ? next.parentNode : null;
 				isCell = dom.check.isListCell(fTag);
-				rangeTag = this.format.isBlock(originParent) ? originParent : null;
+				rangeTag = this.#format.isBlock(originParent) ? originParent : null;
 				parentTag = isCell && !dom.check.isWysiwygFrame(originParent) ? originParent.parentNode : originParent;
 				siblingTag = isCell && !dom.check.isWysiwygFrame(originParent) ? (!next || dom.check.isListCell(parentTag) ? originParent : originParent.nextSibling) : fTag.nextSibling;
 
 				newCell = dom.utils.createElement('LI');
 
-				if (this.component.is(fTag)) {
+				if (this.#component.is(fTag)) {
 					const isHR = /^HR$/i.test(fTag.nodeName);
 					if (!isHR) newCell.innerHTML = '<br>';
 					newCell.innerHTML += fTag.outerHTML;
@@ -215,7 +211,7 @@ ListFormat.prototype = {
 				list.appendChild(newCell);
 
 				// if (!next) lastList = list;
-				if (!next || parentTag !== nextParent || this.format.isBlock(siblingTag)) {
+				if (!next || parentTag !== nextParent || this.#format.isBlock(siblingTag)) {
 					firstList ||= list;
 					if ((!mergeTop || !next || parentTag !== nextParent) && !(next && dom.check.isList(nextParent) && nextParent === originParent)) {
 						if (list.parentNode !== parentTag) parentTag.insertBefore(list, siblingTag);
@@ -226,7 +222,7 @@ ListFormat.prototype = {
 				if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
 				if (
 					next &&
-					(this.format.getBlock(nextParent, passComponent) !== this.format.getBlock(originParent, passComponent) ||
+					(this.#format.getBlock(nextParent, passComponent) !== this.#format.getBlock(originParent, passComponent) ||
 						(dom.check.isList(nextParent) && dom.check.isList(originParent) && dom.query.getNodeDepth(nextParent) !== dom.query.getNodeDepth(originParent)))
 				) {
 					list = dom.utils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
@@ -249,10 +245,9 @@ ListFormat.prototype = {
 
 		this.editor.effectNode = null;
 		return !isRemove || !isCollapsed ? originRange : afterRange || originRange;
-	},
+	}
 
 	/**
-	 * @this {ListFormatThis}
 	 * @description "selectedCells" array are detached from the list element.
 	 * - The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
 	 * @param {Array<Node>} selectedCells Array of ["line", li] elements(LI, P...) to remove.
@@ -273,7 +268,7 @@ ListFormat.prototype = {
 
 		for (let i = 0, len = selectedCells.length, r, o, lastIndex, isList; i < len; i++) {
 			lastIndex = i === len - 1;
-			o = this.format.getBlock(selectedCells[i], passComponent);
+			o = this.#format.getBlock(selectedCells[i], passComponent);
 			isList = dom.check.isList(o);
 			if (!r && isList) {
 				r = o;
@@ -284,7 +279,7 @@ ListFormat.prototype = {
 				if (i === 0) listFirst = true;
 			} else if (r && isList) {
 				if (r !== o) {
-					const edge = this.format.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: null, shouldDelete, skipHistory: true });
+					const edge = this.#format.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: null, shouldDelete, skipHistory: true });
 					o = selectedCells[i].parentNode;
 					if (listFirst) {
 						first = edge.sc;
@@ -309,7 +304,7 @@ ListFormat.prototype = {
 			}
 
 			if (lastIndex && dom.check.isList(r)) {
-				const edge = this.format.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: null, shouldDelete, skipHistory: true });
+				const edge = this.#format.removeBlock(rangeArr.f[0].parentNode, { selectedFormats: rangeArr.f, newBlockElement: null, shouldDelete, skipHistory: true });
 				if (listLast || len === 1) last = edge.ec;
 				if (listFirst) first = edge.sc || last;
 			}
@@ -319,10 +314,9 @@ ListFormat.prototype = {
 			sc: first,
 			ec: last,
 		};
-	},
+	}
 
 	/**
-	 * @this {ListFormatThis}
 	 * @description Nest list cells or cancel nested cells.
 	 * @param {Array<HTMLElement>} selectedCells List cells.
 	 * @param {boolean} nested Nested or cancel nested.
@@ -340,7 +334,7 @@ ListFormat.prototype = {
 	 */
 	applyNested(selectedCells, nested) {
 		selectedCells = !selectedCells
-			? this.format.getLines().filter(function (el) {
+			? this.#format.getLines().filter(function (el) {
 					return dom.check.isListCell(el);
 				})
 			: selectedCells;
@@ -378,11 +372,11 @@ ListFormat.prototype = {
 				el: originList,
 			};
 
-			const { startContainer, startOffset, endContainer, endOffset } = this.selection.getRange();
+			const { startContainer, startOffset, endContainer, endOffset } = this.#selection.getRange();
 			for (let i = 0, len = cellsLen, c; i < len; i++) {
 				c = selectedCells[i];
 				if (c.parentElement !== originList) {
-					this._attachNested(originList, innerList, prev, next, nodePath);
+					this.#attachNested(originList, innerList, prev, next, nodePath);
 					originList = c.parentElement;
 					innerList = dom.utils.createElement(originList.nodeName);
 				}
@@ -392,7 +386,7 @@ ListFormat.prototype = {
 				innerList.appendChild(c);
 			}
 
-			this._attachNested(originList, innerList, prev, next, nodePath);
+			this.#attachNested(originList, innerList, prev, next, nodePath);
 
 			if (cellsLen > 1) {
 				const sc = dom.query.getNodeFromPath(nodePath.s, nodePath.sl);
@@ -414,10 +408,9 @@ ListFormat.prototype = {
 		}
 
 		return range;
-	},
+	}
 
 	/**
-	 * @this {ListFormatThis}
 	 * @description Detach Nested all nested lists under the "baseNode".
 	 * - Returns a list with nested removed.
 	 * @param {HTMLElement} baseNode Element on which to base.
@@ -480,11 +473,9 @@ ListFormat.prototype = {
 		}
 
 		return rangeElement === baseNode ? rangeElement.parentNode : rangeElement;
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {ListFormatThis}
 	 * @description Attaches a nested list structure by merging adjacent lists if applicable.
 	 * - Ensures that the nested list is placed correctly in the document structure.
 	 * @param {Element} originList The original list element where the nested list is inserted.
@@ -498,7 +489,7 @@ ListFormat.prototype = {
 	 * - el : End node's parent element.
 	 * @returns {Node} The attached inner list.
 	 */
-	_attachNested(originList, innerList, prev, next, nodePath) {
+	#attachNested(originList, innerList, prev, next, nodePath) {
 		let insertPrev = false;
 
 		if (innerList.tagName === prev?.tagName) {
@@ -539,17 +530,15 @@ ListFormat.prototype = {
 			nodePath.e = dom.query.getNodePath(innerList.lastElementChild.firstChild, originList, null);
 			nodePath.el = originList;
 
-			this.nodeTransform.mergeSameTags(originList, [nodePath.s, nodePath.e, slPath], false);
-			this.nodeTransform.mergeNestedTags(originList);
+			this.#nodeTransform.mergeSameTags(originList, [nodePath.s, nodePath.e, slPath], false);
+			this.#nodeTransform.mergeNestedTags(originList);
 			if (slPath) nodePath.sl = dom.query.getNodeFromPath(slPath, originList);
 		}
 
 		return innerList;
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {ListFormatThis}
 	 * @description Detaches a nested list structure by extracting list items from their parent list.
 	 * - Ensures proper restructuring of the list elements.
 	 * @param {Array<HTMLElement>} cells The list items to be detached.
@@ -558,7 +547,7 @@ ListFormat.prototype = {
 	 * - sc : The first list item.
 	 * - ec : The last list item.
 	 */
-	_detachNested(cells) {
+	#detachNested(cells) {
 		const first = cells[0];
 		const last = cells.at(-1);
 		const next = last.nextElementSibling;
@@ -581,7 +570,7 @@ ListFormat.prototype = {
 		}
 
 		if (originList.children.length === 0) dom.utils.removeItem(originList);
-		this.nodeTransform.mergeSameTags(parentNode);
+		this.#nodeTransform.mergeSameTags(parentNode);
 
 		const edge = dom.query.getEdgeChildNodes(first, last);
 
@@ -590,19 +579,16 @@ ListFormat.prototype = {
 			sc: edge.sc,
 			ec: edge.ec,
 		};
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ListFormatThis}
 	 * @description Destroy the ListFormat instance and release memory
 	 */
 	_destroy() {
 		// No internal state to clean up
-	},
-
-	constructor: ListFormat,
-};
+	}
+}
 
 /**
  * @description Removes nested list structure by unwrapping child list elements and promoting their items to the parent level.

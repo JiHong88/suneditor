@@ -162,7 +162,7 @@ describe('Modules - Figure', () => {
                 showFigure: jest.fn(),
                 hideFigure: jest.fn(),
                 _visibleControllers: jest.fn(),
-                _offCurrentController: jest.fn(),
+                offCurrentController: jest.fn(),
                 disableBackWrapper: jest.fn(),
                 enableBackWrapper: jest.fn()
             },
@@ -173,7 +173,7 @@ describe('Modules - Figure', () => {
             },
             component: {
                 resetComponentInfo: jest.fn(),
-                _removeDragEvent: jest.fn(),
+                __removeDragEvent: jest.fn(),
                 select: jest.fn(),
                 copy: jest.fn(),
                 deselect: jest.fn(),

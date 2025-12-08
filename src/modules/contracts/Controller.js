@@ -349,7 +349,7 @@ class Controller extends CoreInjector {
 		if ((await this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.frameContext, info })) === false) return;
 
 		form.style.display = 'block';
-		if (this.editor._shadowRoot) {
+		if (this.editor.shadowRoot) {
 			this.#shadowRootEventForm = form;
 			this.#shadowRootEventListener = (e) => e.stopPropagation();
 			form.addEventListener('mousedown', this.#shadowRootEventListener);

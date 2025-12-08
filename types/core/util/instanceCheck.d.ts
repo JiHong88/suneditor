@@ -1,27 +1,14 @@
 import type {} from '../../typedef';
 export default InstanceCheck;
-export type InstanceCheckThis = InstanceCheck;
 /**
- * @typedef {InstanceCheck} InstanceCheckThis
- */
-/**
- * @constructor
- * @this {InstanceCheck}
  * @description iframe-safe instanceof check utility class
- * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function InstanceCheck(this: InstanceCheck, editor: SunEditor.Core): void;
 declare class InstanceCheck {
 	/**
-	 * @typedef {InstanceCheck} InstanceCheckThis
-	 */
-	/**
 	 * @constructor
-	 * @this {InstanceCheck}
-	 * @description iframe-safe instanceof check utility class
 	 * @param {SunEditor.Core} editor - The root editor instance
 	 */
-	constructor(this: InstanceCheck, editor: SunEditor.Core);
+	constructor(editor: SunEditor.Core);
 	editor: import('../editor').default;
 	/**
 	 * @param {*} obj
@@ -43,9 +30,5 @@ declare class InstanceCheck {
 	 * @returns {obj is Selection}
 	 */
 	isSelection(obj: any): obj is Selection;
-	/**
-	 * @internal
-	 * @returns {window}
-	 */
-	_getFrameWindow(): Window & typeof globalThis;
+	#private;
 }

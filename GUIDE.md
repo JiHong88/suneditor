@@ -113,13 +113,6 @@ suneditor/
 
 - **JavaScript**: ES2022+ (modern browsers only)
 - **Zero dependencies**: No external libraries in production bundle
-- **Legacy syntax**: The `src/core/` directory still uses constructor functions with prototype patterns
-- Originally kept for IE compatibility, but IE support has been dropped.
-    - All other directories have migrated to ES6+ class syntax, but the core remains as-is due to:
-    - A large, deeply interconnected codebase with high refactoring risk
-        - Stable and well-tested logic that gains little practical benefit from migration
-        - Development resources being more effectively spent on new features and improvements
-        - This is a decision based on the current cost–benefit trade-offs of a full migration
 
 **Development Environment:**
 
@@ -1460,19 +1453,19 @@ function Editor(multiTargets, options) {
 	this.plugins = product.plugins || {}; // Plugins are still classes, not instances
 
 	// Create editor
-	this.__Create(options);
+	this.#Create(options);
 }
 ```
 
-**4. Editor Initialization Flow** (`editor.__Create() → __registerClass() → __editorInit() → __init()`)
+**4. Editor Initialization Flow** (`editor.#Create() → #registerClass() → #editorInit() → #init()`)
 
 ```javascript
-__init(options) {
+#init(options) {
 	// Loop through all plugin keys
 	for (const key in plugins) {
 		// Register each plugin (this instantiates them)
-		this.registerPlugin(key, this._pluginCallButtons[key], options[key]);
-		this.registerPlugin(key, this._pluginCallButtons_sub[key], options[key]);
+		this.registerPlugin(key, this.#pluginCallButtons[key], options[key]);
+		this.registerPlugin(key, this.#pluginCallButtons_sub[key], options[key]);
 		plugin = this.plugins[key]; // Now it's an instance
 
 		// Register plugin events (onInput, onFilePasteAndDrop, etc.)
@@ -1552,7 +1545,7 @@ Different components call plugin methods at different lifecycle stages:
 **Key Points:**
 
 - Plugins start as **class references** in `product.plugins`
-- They are **instantiated** in `registerPlugin()` during `__init()`
+- They are **instantiated** in `registerPlugin()` during `#init()`
 - `registerPlugin()` can be called **multiple times** safely (checks if already instantiated)
 - Plugins stored in `this.plugins` object (not Map) with key as property name
 - Constructor must call `super(editor)` to receive dependency injection
@@ -1655,7 +1648,7 @@ Different components call plugin methods at different lifecycle stages:
 
 ### Why `onload` Exists
 
-SunEditor's initialization process completes asynchronously. While the editor instance is returned immediately from `suneditor.create()`, some critical initialization steps are deferred to a `setTimeout(..., 0)` callback in the `__editorInit` method ([editor.js:1364-1388](src/core/editor.js#L1364-L1388)).
+SunEditor's initialization process completes asynchronously. While the editor instance is returned immediately from `suneditor.create()`, some critical initialization steps are deferred to a `setTimeout(..., 0)` callback in the `#editorInit` method ([editor.js:1364-1388](src/core/editor.js#L1364-L1388)).
 
 **Initialization Timeline:**
 
@@ -1663,7 +1656,7 @@ SunEditor's initialization process completes asynchronously. While the editor in
 T=0ms:   suneditor.create() starts
 T=0ms:   Constructor builds DOM
 T=0ms:   Synchronous initialization (plugins, events, content)
-T=0ms:   __editorInit() queues setTimeout callback
+T=0ms:   #editorInit() queues setTimeout callback
 T=0ms:   User receives editor instance ← YOU HAVE THE INSTANCE
 T=1ms:   setTimeout callback executes:
          - Toolbar visibility set

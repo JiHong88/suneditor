@@ -77,7 +77,7 @@ export const BASIC_COMMANDS = ACTIVE_EVENT_COMMANDS.concat(['undo', 'redo', 'sav
  * @param {SunEditor.Core} editor - The root editor instance
  */
 export function SELECT_ALL(editor) {
-	editor.ui._offCurrentController();
+	editor.ui.offCurrentController();
 	editor.menu.containerOff();
 
 	// check all tags

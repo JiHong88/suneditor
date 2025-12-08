@@ -17,7 +17,6 @@ scripts/
 │   ├── gen-options-dts.cjs
 │   ├── gen-types-export.cjs
 │   ├── inject-typedef-import.cjs
-│   ├── remove-this-params.cjs
 │   ├── rename-index.cjs
 │   └── wrap-dts.cjs
 └── docs/               # 스크립트 사용 가이드 문서
@@ -86,7 +85,6 @@ npx tsc                                    # JSDoc → .d.ts 생성
 → fix-langs.cjs                            # 언어 파일 타입 정의
 → wrap-dts.cjs                             # typedef.d.ts 전역 래핑
 → rename-index.cjs                         # index.ts → index.d.ts
-→ remove-this-params.cjs                   # this 파라미터 제거
 → gen-options-dts.cjs                      # DEFAULTS 타입 생성
 → inject-typedef-import.cjs                # typedef import 주입
 → gen-types-export.cjs                     # types.d.ts 생성
@@ -167,23 +165,7 @@ const options: SunEditor.InitOptions = { ... };
 
 **이유**: 타입 선언 전용 파일로 명확히 구분
 
----
-
-#### remove-this-params.cjs
-
-`prototype` 기반 constructor의 잘못된 `this` 파라미터를 제거합니다.
-
-**대상**: `types/core/**/*.d.ts`
-
-**문제**:
-
-```typescript
-// TypeScript가 잘못 생성하는 경우
-constructor(this: any, options: Options);
-
-// 수정 후
-constructor(options: Options);
-```
+````
 
 ---
 
@@ -213,7 +195,7 @@ export namespace DEFAULTS {
     const BUTTON_LIST: [['undo', 'redo'], ...];
     const SIZE_UNITS: ['px', 'pt', 'em', 'rem'];
 }
-```
+````
 
 ---
 

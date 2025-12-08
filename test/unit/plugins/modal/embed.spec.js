@@ -18,27 +18,27 @@ jest.mock('../../../../src/editorInjector', () => {
 				basic: 'Basic',
 				left: 'Left',
 				center: 'Center',
-				right: 'Right'
+				right: 'Right',
 			};
 			this.icons = { cancel: '<svg>cancel</svg>', revert: '<svg>revert</svg>', embed: '<svg>embed</svg>' };
 			this.eventManager = { addEvent: jest.fn() };
 			this.editor = { focusEdge: jest.fn() };
 			this.format = {
 				getLine: jest.fn().mockReturnValue(null),
-				addLine: jest.fn().mockReturnValue({ nodeType: 1 })
+				addLine: jest.fn().mockReturnValue({ nodeType: 1 }),
 			};
 			this.history = { push: jest.fn(), pause: jest.fn(), resume: jest.fn() };
 			this.frameContext = new Map([['wysiwyg', { nodeType: 1 }]]);
 			this.nodeTransform = { removeAllParents: jest.fn() };
 			this.component = { select: jest.fn(), insert: jest.fn() };
 			this.selection = { setRange: jest.fn() };
-			this.triggerEvent = jest.fn().mockResolvedValue(undefined);
+			this.triggerEvent = jest.fn().mockResolvedValue(true);
 			this.options = {
 				get: jest.fn((key) => {
 					if (key === 'defaultUrlProtocol') return 'https://';
 					if (key === 'componentInsertBehavior') return null;
 					return null;
-				})
+				}),
 			};
 			this.plugins = {};
 		}
@@ -59,9 +59,9 @@ jest.mock('../../../../src/modules/contracts', () => ({
 				}
 				return { value: '', checked: false };
 			}),
-			appendChild: jest.fn()
+			appendChild: jest.fn(),
 		},
-		isUpdate: false
+		isUpdate: false,
 	})),
 	Figure: jest.fn().mockImplementation(() => ({
 		open: jest.fn().mockReturnValue({
@@ -73,15 +73,15 @@ jest.mock('../../../../src/modules/contracts', () => ({
 			h: '400px',
 			originWidth: '100%',
 			originHeight: '400px',
-			ratio: { w: 1, h: 1 }
+			ratio: { w: 1, h: 1 },
 		}),
 		getSize: jest.fn().mockReturnValue({ w: '100%', h: '400px', dw: '100%', dh: '400px' }),
 		setSize: jest.fn(),
 		setAlign: jest.fn(),
 		setTransform: jest.fn(),
 		retainFigureFormat: jest.fn(),
-		isVertical: false
-	}))
+		isVertical: false,
+	})),
 }));
 
 const mockModal = require('../../../../src/modules/contracts').Modal;
@@ -90,20 +90,20 @@ const mockFigure = require('../../../../src/modules/contracts').Figure;
 Object.assign(mockModal, {
 	OnChangeFile: jest.fn(),
 	CreateFileInput: jest.fn().mockReturnValue(''),
-	CreateGallery: jest.fn().mockReturnValue('')
+	CreateGallery: jest.fn().mockReturnValue(''),
 });
 
 Object.assign(mockFigure, {
 	CreateContainer: jest.fn().mockReturnValue({
 		container: { nodeType: 1, style: {}, appendChild: jest.fn() },
-		cover: { nodeType: 1, setAttribute: jest.fn(), appendChild: jest.fn() }
+		cover: { nodeType: 1, setAttribute: jest.fn(), appendChild: jest.fn() },
 	}),
 	GetContainer: jest.fn().mockReturnValue({
 		container: { nodeType: 1, style: {} },
-		cover: { nodeType: 1 }
+		cover: { nodeType: 1 },
 	}),
 	CalcRatio: jest.fn((w, h, unit, ratio) => ({ w: w, h: h })),
-	is: jest.fn((node) => node && node.nodeType === 1)
+	is: jest.fn((node) => node && node.nodeType === 1),
 });
 
 jest.mock('../../../../src/helper', () => ({
@@ -116,21 +116,31 @@ jest.mock('../../../../src/helper', () => ({
 				getAttribute: jest.fn(),
 				classList: { contains: jest.fn() },
 				style: {},
-				innerHTML: ''
+				innerHTML: '',
 			}),
 			removeItem: jest.fn(),
-			hasClass: jest.fn((el, className) => el?.classList?.contains(className))
+			hasClass: jest.fn((el, className) => el?.classList?.contains(className)),
 		},
 		check: {
-			isIFrame: jest.fn((node) => node && node.nodeName === 'IFRAME')
+			isIFrame: jest.fn((node) => node && node.nodeName === 'IFRAME'),
 		},
 		query: {
 			getParentElement: jest.fn((el, condition) => {
-				if (typeof condition === 'function' && el?.parentElement) {
-					let parent = el.parentElement;
-					while (parent) {
-						if (condition(parent)) return parent;
-						parent = parent.parentElement;
+				if (typeof condition === 'function') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (condition(parent)) return parent;
+							parent = parent.parentElement;
+						}
+					}
+				} else if (typeof condition === 'string') {
+					if (el?.parentElement) {
+						let parent = el.parentElement;
+						while (parent) {
+							if (parent.nodeName === condition) return parent;
+							parent = parent.parentElement;
+						}
 					}
 				}
 				return null;
@@ -143,26 +153,31 @@ jest.mock('../../../../src/helper', () => ({
 				}
 				return null;
 			}),
-			getEventTarget: jest.fn((e) => e?.target || e)
-		}
+			getEventTarget: jest.fn((e) => e?.target || e),
+		},
 	},
 	numbers: {
 		get: jest.fn((val, def) => {
 			const parsed = parseFloat(val);
 			return isNaN(parsed) ? def : parsed;
 		}),
-		is: jest.fn((val) => typeof val === 'number')
+		is: jest.fn((val) => typeof val === 'number'),
 	},
 	env: { _w: global, NO_EVENT: Symbol('NO_EVENT') },
 	keyCodeMap: {
 		key: { 13: 'Enter' },
-		isSpace: jest.fn((code) => code === 'Space')
-	}
+		isSpace: jest.fn((code) => code === 'Space'),
+	},
 }));
 
 describe('Embed Plugin', () => {
 	let mockEditor;
 	let embed;
+
+	afterEach(() => {
+		jest.clearAllMocks();
+		document.body.innerHTML = '';
+	});
 
 	beforeEach(() => {
 		mockEditor = {
@@ -180,18 +195,42 @@ describe('Embed Plugin', () => {
 				basic: 'Basic',
 				left: 'Left',
 				center: 'Center',
-				right: 'Right'
+				right: 'Right',
 			},
 			icons: { cancel: '<svg>cancel</svg>', revert: '<svg>revert</svg>', embed: '<svg>embed</svg>' },
-			plugins: {}
+			plugins: {},
+			eventManager: { addEvent: jest.fn() },
+			// Restore missing mocks
+			component: { select: jest.fn(), insert: jest.fn() },
+			history: { push: jest.fn(), pause: jest.fn(), resume: jest.fn() },
+			focusEdge: jest.fn(),
+			format: {
+				getLine: jest.fn().mockReturnValue(null),
+				addLine: jest.fn().mockReturnValue({ nodeType: 1 }),
+			},
+			context: {
+				element: { origin: { create: jest.fn() } },
+			},
+			frameContext: new Map([['wysiwyg', { nodeType: 1 }]]),
+			nodeTransform: { removeAllParents: jest.fn() },
+			selection: { setRange: jest.fn() },
+			triggerEvent: jest.fn().mockResolvedValue(true),
+			options: {
+				get: jest.fn((key) => {
+					if (key === 'defaultUrlProtocol') return 'https://';
+					if (key === 'componentInsertBehavior') return null;
+					return null;
+				}),
+			},
 		};
-		embed = new Embed(mockEditor, {});
+		embed = new Embed(mockEditor, { canResize: true });
 		// Mock DOM elements that would be created by CreateHTML_modal
-		embed.embedInput = { value: '', addEventListener: jest.fn(), dispatchEvent: jest.fn() };
-		embed.previewSrc = { textContent: '' };
-		embed.inputX = { value: '', disabled: false, placeholder: '', addEventListener: jest.fn(), dispatchEvent: jest.fn() };
-		embed.inputY = { value: '', disabled: false, placeholder: '', addEventListener: jest.fn(), dispatchEvent: jest.fn() };
-		embed.proportion = { checked: false, disabled: false };
+		// Use Object.assign to preserve references set in constructor
+		if (embed.embedInput) Object.assign(embed.embedInput, { addEventListener: jest.fn(), dispatchEvent: jest.fn() });
+		if (embed.previewSrc) Object.assign(embed.previewSrc, { textContent: '' });
+		if (embed.inputX) Object.assign(embed.inputX, { value: '', disabled: false, placeholder: '', addEventListener: jest.fn(), dispatchEvent: jest.fn() });
+		if (embed.inputY) Object.assign(embed.inputY, { value: '', disabled: false, placeholder: '', addEventListener: jest.fn(), dispatchEvent: jest.fn() });
+		if (embed.proportion) Object.assign(embed.proportion, { checked: false, disabled: false });
 		embed.fileModalWrapper = {};
 	});
 
@@ -213,7 +252,7 @@ describe('Embed Plugin', () => {
 				defaultHeight: '400px',
 				percentageOnlySize: true,
 				uploadUrl: 'https://example.com/upload',
-				uploadSizeLimit: 5000000
+				uploadSizeLimit: 5000000,
 			});
 			expect(customEmbed.pluginOptions.canResize).toBe(false);
 			expect(customEmbed.pluginOptions.showHeightInput).toBe(false);
@@ -233,6 +272,9 @@ describe('Embed Plugin', () => {
 	describe('Static component method', () => {
 		it('should return iframe element when node is iframe with valid src', () => {
 			const iframe = { nodeName: 'IFRAME', src: 'https://www.youtube.com/embed/test', style: {} };
+			// Mock checkContentType on the instance implicitly used if called with context
+            // But here we want to test if it works WITHOUT context or with correct context?
+            // The existing code uses .call(embed).
 			embed.checkContentType = jest.fn().mockReturnValue(true);
 			const result = Embed.component.call(embed, iframe);
 			expect(result).toBe(iframe);
@@ -244,6 +286,31 @@ describe('Embed Plugin', () => {
 			const result = Embed.component.call(embed, iframe);
 			expect(result).toBeNull();
 		});
+
+        it('should detect twitter blockquote (reproduction)', () => {
+             // Mock detecting a twitter blockquote that isn't an iframe and has no src
+             const mockChild = { nodeName: 'A', href: 'https://twitter.com/user/status/123' };
+             const mockBlockquote = {
+                nodeName: 'BLOCKQUOTE',
+                className: 'twitter-tweet',
+                children: [mockChild],
+                getAttribute: jest.fn(),
+                querySelector: jest.fn().mockReturnValue(mockChild) // If logic uses querySelector
+            };
+            
+            // Mock DOM util behavior if needed (Embed.component uses dom.check.isIFrame etc)
+            // But checking internal logic:
+            // It checks isIFrame (false), isDiv (false check for blockquote?).
+            // It currently returns null.
+            
+            // We use .call(embed) to be consistent with how the test suite assumes it works,
+            // assuming the framework binds it or something, or we just want to test logic.
+            embed.checkContentType = jest.fn().mockReturnValue(true);
+            
+            const result = Embed.component.call(embed, mockBlockquote);
+            // Expect failure currently
+            expect(result).toBe(mockBlockquote);
+        });
 	});
 
 	describe('checkContentType', () => {
@@ -394,12 +461,12 @@ describe('Embed Plugin', () => {
 					nodeType: 1,
 					setAttribute: jest.fn(),
 					getAttribute: jest.fn().mockReturnValue('https://example.com/video'),
-					appendChild: jest.fn()
+					appendChild: jest.fn(),
 				};
 				embed.figure.open = jest.fn().mockReturnValue({
 					cover: mockCover,
 					container: { nodeType: 1 },
-					align: 'center'
+					align: 'center',
 				});
 
 				const mockElement = { nodeName: 'IFRAME', src: 'https://example.com/embed', style: {} };
@@ -441,6 +508,10 @@ describe('Embed Plugin', () => {
 				const iframeCode = '<iframe src="https://example.com/embed"></iframe>';
 				const result = await embed.submitSRC(iframeCode);
 				expect(result).toBe(true);
+				// Verify #create flow
+				expect(mockFigure.CreateContainer).toHaveBeenCalled();
+				expect(embed.figure.open).toHaveBeenCalled();
+				expect(embed.component.insert).toHaveBeenCalled();
 			});
 
 			it('should process blockquote embed code', async () => {
@@ -486,18 +557,19 @@ describe('Embed Plugin', () => {
 				expect(embed.triggerEvent).toHaveBeenCalledWith('onEmbedDeleteBefore', expect.any(Object));
 			});
 
-		it('should not remove when event returns false', async () => {
-			const iframe = { nodeName: 'IFRAME', src: 'test', style: {} };
-			embed.triggerEvent = jest.fn().mockResolvedValue(false);
-			const { dom } = require('../../../../src/helper');
-			dom.utils.removeItem.mockClear();
+			it('should not remove when event returns false', async () => {
+				const iframe = { nodeName: 'IFRAME', src: 'test', style: {} };
+				embed.triggerEvent = jest.fn().mockResolvedValue(false);
+				const { dom } = require('../../../../src/helper');
+				dom.utils.removeItem.mockClear();
 
-			embed.componentSelect(iframe);
-			await embed.componentDestroy(iframe);
+				embed.componentSelect(iframe);
+				await embed.componentDestroy(iframe);
 
-			expect(embed.triggerEvent).toHaveBeenCalledWith('onEmbedDeleteBefore', expect.any(Object));
-			expect(dom.utils.removeItem).not.toHaveBeenCalled();
-		});		});
+				expect(embed.triggerEvent).toHaveBeenCalledWith('onEmbedDeleteBefore', expect.any(Object));
+				expect(dom.utils.removeItem).not.toHaveBeenCalled();
+			});
+		});
 
 		describe('retainFormat', () => {
 			it('should return format retention object', () => {
@@ -521,7 +593,7 @@ describe('Embed Plugin', () => {
 		it('should handle percentageOnlySize option', () => {
 			const percentEmbed = new Embed(mockEditor, {
 				percentageOnlySize: true,
-				canResize: true
+				canResize: true,
 			});
 			expect(percentEmbed.pluginOptions.percentageOnlySize).toBe(true);
 			expect(percentEmbed.sizeUnit).toBe('%');
@@ -532,7 +604,7 @@ describe('Embed Plugin', () => {
 				uploadUrl: 'https://example.com/upload',
 				uploadHeaders: { Authorization: 'Bearer token' },
 				uploadSizeLimit: 10000000,
-				uploadSingleSizeLimit: 5000000
+				uploadSingleSizeLimit: 5000000,
 			});
 			expect(uploadEmbed.pluginOptions.uploadUrl).toBe('https://example.com/upload');
 			expect(uploadEmbed.pluginOptions.uploadHeaders).toEqual({ Authorization: 'Bearer token' });
@@ -544,12 +616,12 @@ describe('Embed Plugin', () => {
 			const attrEmbed = new Embed(mockEditor, {
 				iframeTagAttributes: {
 					sandbox: 'allow-scripts',
-					loading: 'lazy'
-				}
+					loading: 'lazy',
+				},
 			});
 			expect(attrEmbed.pluginOptions.iframeTagAttributes).toEqual({
 				sandbox: 'allow-scripts',
-				loading: 'lazy'
+				loading: 'lazy',
 			});
 		});
 
@@ -559,9 +631,9 @@ describe('Embed Plugin', () => {
 					customService: {
 						pattern: /https:\/\/custom\.com\/(.+)/i,
 						action: (url) => `https://custom.com/embed/${url.match(/https:\/\/custom\.com\/(.+)/i)[1]}`,
-						tag: 'iframe'
-					}
-				}
+						tag: 'iframe',
+					},
+				},
 			});
 			expect(customEmbed.checkContentType('https://custom.com/video123')).toBe(true);
 			const result = customEmbed.findProcessUrl('https://custom.com/video123');

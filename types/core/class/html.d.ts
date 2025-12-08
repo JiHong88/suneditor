@@ -1,73 +1,10 @@
 import type {} from '../../typedef';
 export default HTML;
-export type HTMLThis = Omit<HTML & Partial<SunEditor.Injector_Core>, 'html'>;
 /**
- * @typedef {Omit<HTML & Partial<SunEditor.Injector_Core>, 'html'>} HTMLThis
- */
-/**
- * @constructor
- * @this {HTMLThis}
  * @description All HTML related classes involved in the editing area
- * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function HTML(this: Omit<HTML & Partial<CoreInjector>, 'html'>, editor: SunEditor.Core): void;
-declare class HTML {
+declare class HTML extends CoreInjector {
 	/**
-	 * @typedef {Omit<HTML & Partial<SunEditor.Injector_Core>, 'html'>} HTMLThis
-	 */
-	/**
-	 * @constructor
-	 * @this {HTMLThis}
-	 * @description All HTML related classes involved in the editing area
-	 * @param {SunEditor.Core} editor - The root editor instance
-	 */
-	constructor(editor: SunEditor.Core);
-	fontSizeUnitRegExp: RegExp;
-	_isAllowedClassName: any;
-	_allowHTMLComment: any;
-	_disallowedStyleNodesRegExp: RegExp;
-	_htmlCheckWhitelistRegExp: RegExp;
-	_htmlCheckBlacklistRegExp: RegExp;
-	_elementWhitelistRegExp: RegExp;
-	_elementBlacklistRegExp: RegExp;
-	/** @type {Object<string, RegExp>} */
-	_attributeWhitelist: {
-		[x: string]: RegExp;
-	};
-	/** @type {Object<string, RegExp>} */
-	_attributeBlacklist: {
-		[x: string]: RegExp;
-	};
-	_attributeWhitelistRegExp: RegExp;
-	_attributeBlacklistRegExp: RegExp;
-	_cleanStyleTagKeyRegExp: RegExp;
-	_cleanStyleRegExpMap: Map<any, any>;
-	_textStyleTags: any;
-	/** @type {Object<string, *>} */
-	_autoStyleify: {
-		[x: string]: any;
-	};
-	__disallowedTagsRegExp: RegExp;
-	__disallowedTagNameRegExp: RegExp;
-	__allowedTagNameRegExp: RegExp;
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection(): SunEditor.Core['selection'];
-	/** @internal @type {SunEditor.Core['format']} */
-	get format(): SunEditor.Core['format'];
-	/** @internal @type {SunEditor.Core['component']} */
-	get component(): SunEditor.Core['component'];
-	/** @internal @type {SunEditor.Core['char']} */
-	get char(): SunEditor.Core['char'];
-	/** @internal @type {SunEditor.Core['ui']} */
-	get ui(): SunEditor.Core['ui'];
-	/** @internal @type {SunEditor.Core['viewer']} */
-	get viewer(): SunEditor.Core['viewer'];
-	/** @internal @type {SunEditor.Core['nodeTransform']} */
-	get nodeTransform(): SunEditor.Core['nodeTransform'];
-	/** @internal @type {SunEditor.Core['inline']} */
-	get inline(): SunEditor.Core['inline'];
-	/**
-	 * @this {HTMLThis}
 	 * @description Filters an HTML string based on allowed and disallowed tags, with optional custom validation.
 	 * - Removes blacklisted tags and keeps only whitelisted tags.
 	 * - Allows custom validation functions to replace, modify, or remove elements.
@@ -103,7 +40,6 @@ declare class HTML {
 	 * });
 	 */
 	filter(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: string,
 		{
 			tagWhitelist,
@@ -118,7 +54,6 @@ declare class HTML {
 		},
 	): string;
 	/**
-	 * @this {HTMLThis}
 	 * @description Cleans and compresses HTML code to suit the editor format.
 	 * @param {string} html HTML string to clean and compress
 	 * @param {Object} [options] Cleaning options
@@ -142,7 +77,6 @@ declare class HTML {
 	 * });
 	 */
 	clean(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: string,
 		{
 			forceFormat,
@@ -157,7 +91,6 @@ declare class HTML {
 		},
 	): string;
 	/**
-	 * @this {HTMLThis}
 	 * @description Inserts an (HTML element / HTML string / plain string) at the selection range.
 	 * - If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
 	 * @param {Node|string} html HTML Element or HTML string or plain string
@@ -177,7 +110,6 @@ declare class HTML {
 	 * editor.html.insert('<div class="custom">Content</div>', { skipCleaning: true });
 	 */
 	insert(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: Node | string,
 		{
 			selectInserted,
@@ -190,7 +122,6 @@ declare class HTML {
 		},
 	): HTMLElement | null;
 	/**
-	 * @this {HTMLThis}
 	 * @description Delete selected node and insert argument value node and return.
 	 * - If the "afterNode" exists, it is inserted after the "afterNode"
 	 * - Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
@@ -214,7 +145,6 @@ declare class HTML {
 	 * editor.html.insertNode(largeContentNode, { skipCharCount: true });
 	 */
 	insertNode(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		oNode: Node,
 		{
 			afterNode,
@@ -225,7 +155,6 @@ declare class HTML {
 		},
 	): any | Node | null;
 	/**
-	 * @this {HTMLThis}
 	 * @description Delete the selected range.
 	 * @returns {{container: Node, offset: number, commonCon?: ?Node, prevContainer?: ?Node}}
 	 * - container: "the last element after deletion"
@@ -233,14 +162,13 @@ declare class HTML {
 	 * - commonCon: "commonAncestorContainer"
 	 * - prevContainer: "previousElementSibling Of the deleted area"
 	 */
-	remove(this: Omit<HTML & Partial<CoreInjector>, 'html'>): {
+	remove(): {
 		container: Node;
 		offset: number;
 		commonCon?: Node | null;
 		prevContainer?: Node | null;
 	};
 	/**
-	 * @this {HTMLThis}
 	 * @description Gets the current content
 	 * @param {Object} [options] Options
 	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
@@ -249,27 +177,14 @@ declare class HTML {
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 * @returns {string|Object<*, string>}
 	 */
-	get(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
-		{
-			withFrame,
-			includeFullPage,
-			rootKey,
-		}?: {
-			withFrame?: boolean;
-			includeFullPage?: boolean;
-			rootKey?: number | Array<number>;
-		},
-	): string | any;
+	get({ withFrame, includeFullPage, rootKey }?: { withFrame?: boolean; includeFullPage?: boolean; rootKey?: number | Array<number> }): string | any;
 	/**
-	 * @this {HTMLThis}
 	 * @description Sets the HTML string to the editor content
 	 * @param {string} html HTML string
 	 * @param {Object} [options] Options
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	set(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: string,
 		{
 			rootKey,
@@ -278,14 +193,12 @@ declare class HTML {
 		},
 	): void;
 	/**
-	 * @this {HTMLThis}
 	 * @description Add content to the end of content.
 	 * @param {string} html Content to Input
 	 * @param {Object} [options] Options
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	add(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		html: string,
 		{
 			rootKey,
@@ -294,34 +207,22 @@ declare class HTML {
 		},
 	): void;
 	/**
-	 * @this {HTMLThis}
 	 * @description Gets the current content to JSON data
 	 * @param {Object} [options] Options
 	 * @param {boolean} [options.withFrame=false] Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 * @returns {Object<string, *>} JSON data
 	 */
-	getJson(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
-		{
-			withFrame,
-			rootKey,
-		}?: {
-			withFrame?: boolean;
-			rootKey?: number | Array<number>;
-		},
-	): {
+	getJson({ withFrame, rootKey }?: { withFrame?: boolean; rootKey?: number | Array<number> }): {
 		[x: string]: any;
 	};
 	/**
-	 * @this {HTMLThis}
 	 * @description Sets the JSON data to the editor content
 	 * @param {Object<string, *>} jsdonData HTML string
 	 * @param {Object} [options] Options
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	setJson(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		jsdonData: {
 			[x: string]: any;
 		},
@@ -332,21 +233,18 @@ declare class HTML {
 		},
 	): void;
 	/**
-	 * @this {HTMLThis}
 	 * @description Call "clipboard.write" to copy the contents and display a success/failure toast message.
 	 * @param {Node|Element|Text|string} content Content to be copied to the clipboard
 	 * @returns {Promise<boolean>} Success or failure
 	 */
-	copy(this: Omit<HTML & Partial<CoreInjector>, 'html'>, content: Node | Element | Text | string): Promise<boolean>;
+	copy(content: Node | Element | Text | string): Promise<boolean>;
 	/**
-	 * @this {HTMLThis}
 	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
 	 * @param {{head: string, body: string}} ctx { head: HTML string, body: HTML string}
 	 * @param {Object} [options] Options
 	 * @param {number|Array<number>} [options.rootKey=null] Root index
 	 */
 	setFullPage(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
 		ctx: {
 			head: string;
 			body: string;
@@ -358,159 +256,31 @@ declare class HTML {
 		},
 	): boolean;
 	/**
-	 * @this {HTMLThis}
 	 * @description HTML code compression
 	 * @param {string} html HTML string
 	 * @returns {string} HTML string
 	 */
-	compress(this: Omit<HTML & Partial<CoreInjector>, 'html'>, html: string): string;
+	compress(html: string): string;
 	/**
 	 * @internal
-	 * @this {HTMLThis}
 	 * @description construct wysiwyg area element to html string
 	 * @param {Node|string} html WYSIWYG element (this.frameContext.get('wysiwyg')) or HTML string.
 	 * @param {boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
 	 */
-	_convertToCode(this: Omit<HTML & Partial<CoreInjector>, 'html'>, html: Node | string, comp: boolean): string;
+	_convertToCode(html: Node | string, comp: boolean): string;
 	/**
 	 * @internal
-	 * @this {HTMLThis}
-	 * @description Checks whether the given list item node should be removed and handles necessary clean-up.
-	 * @param {Node} item The list item node to be checked.
-	 * @param {boolean} isSingleItem Single item
-	 * @returns {{sc:Node, ec:Node}|null} An object containing the start and end containers if any transformations were made, otherwise null.
-	 */
-	_nodeRemoveListItem(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
-		item: Node,
-		isSingleItem: boolean,
-	): {
-		sc: Node;
-		ec: Node;
-	} | null;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Recursive function  when used to place a node in "BrLine" in "html.insertNode"
-	 * @param {Node} oNode Node to be inserted
-	 * @returns {Node} "oNode"
-	 */
-	_setIntoFreeFormat(this: Omit<HTML & Partial<CoreInjector>, 'html'>, oNode: Node): Node;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Returns HTML string according to tag type and configurati isExcludeFormat.
-	 * @param {Node} node Node
-	 * @param {boolean} forceFormat If true, text nodes that do not have a format node is wrapped with the format tag.
-	 */
-	_makeLine(this: Omit<HTML & Partial<CoreInjector>, 'html'>, node: Node, forceFormat: boolean): string;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Fix tags that do not fit the editor format.
-	 * @param {DocumentFragment} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
-	 * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist
-	 * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist
-	 * @param {boolean} tagFilter Tag filter option
-	 * @param {boolean} formatFilter Format filter option
-	 * @param {boolean} classFilter Class name filter option
-	 * @param {boolean} _freeCodeViewMode Enforces strict HTML validation based on the editor`s policy
-	 */
-	_consistencyCheckOfHTML(
-		this: Omit<HTML & Partial<CoreInjector>, 'html'>,
-		documentFragment: DocumentFragment,
-		htmlCheckWhitelistRegExp: RegExp,
-		htmlCheckBlacklistRegExp: RegExp,
-		tagFilter: boolean,
-		formatFilter: boolean,
-		classFilter: boolean,
-		_freeCodeViewMode: boolean,
-	): void;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
-	 * @param {string} html HTML string
-	 * @returns {string} HTML string
-	 */
-	_styleNodeConvertor(this: Omit<HTML & Partial<CoreInjector>, 'html'>, html: string): string;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Determines if formatting is required and returns a domTree
-	 * @param {DocumentFragment} domFrag documentFragment
-	 * @returns {DocumentFragment}
-	 */
-	_editFormat(this: Omit<HTML & Partial<CoreInjector>, 'html'>, domFrag: DocumentFragment): DocumentFragment;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Converts a list of DOM nodes into an HTML list structure.
-	 * - If the node is already a list, its innerHTML is used. If it is a block element,
-	 * - the function is called recursively.
-	 * @param {SunEditor.NodeCollection} domTree List of DOM nodes to be converted.
-	 * @returns {string} The generated HTML list.
-	 */
-	_convertListCell(this: Omit<HTML & Partial<CoreInjector>, 'html'>, domTree: SunEditor.NodeCollection): string;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Checks whether the provided DOM nodes require formatting.
-	 * @param {NodeList} domTree List of DOM nodes to check.
-	 * @returns {boolean} True if formatting is required, otherwise false.
-	 */
-	_isFormatData(this: Omit<HTML & Partial<CoreInjector>, 'html'>, domTree: NodeList): boolean;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Cleans the inline style attributes of an HTML element.
-	 * - Extracts allowed styles and removes disallowed ones based on editor settings.
-	 * @param {string} m The full matched string from a regular expression.
-	 * @param {?Array} v The list of allowed attributes.
-	 * @param {string} name The tag name of the element being cleaned.
-	 * @returns {Array} The updated list of allowed attributes including cleaned styles.
-	 */
-	_cleanStyle(this: Omit<HTML & Partial<CoreInjector>, 'html'>, m: string, v: any[] | null, name: string): any[];
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Delete disallowed tags
-	 * @param {string} html HTML string
-	 * @returns {string}
-	 */
-	_deleteDisallowedTags(this: Omit<HTML & Partial<CoreInjector>, 'html'>, html: string, whitelistRegExp: any, blacklistRegExp: any): string;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Recursively checks for duplicate text style nodes within a given parent node.
-	 * @param {Node} oNode The node to check for duplicate styles.
-	 * @param {Node} parentNode The parent node where the duplicate check occurs.
-	 */
-	_checkDuplicateNode(this: Omit<HTML & Partial<CoreInjector>, 'html'>, oNode: Node, parentNode: Node): void;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
-	 * @description Recursively checks for duplicate text style nodes within a given parent node.
-	 * - If duplicate styles are found, redundant attributes are removed.
-	 * @param {Node} oNode The node to check for duplicate styles.
-	 * @param {Node} parentNode The parent node where the duplicate check occurs.
-	 * @returns {Node} The cleaned node with redundant styles removed.
-	 */
-	_dupleCheck(this: Omit<HTML & Partial<CoreInjector>, 'html'>, oNode: Node, parentNode: Node): Node;
-	/**
-	 * @internal
-	 * @this {HTMLThis}
 	 * @description Reset autoStyleify options.
 	 * @param {Array.<string>} autoStyleify Styles applied automatically on text input.
 	 * - ex ["bold", "underline", "italic", "strike"]
 	 */
-	__resetAutoStyleify(this: Omit<HTML & Partial<CoreInjector>, 'html'>, autoStyleify: Array<string>): void;
+	__resetAutoStyleify(autoStyleify: Array<string>): void;
 	/**
 	 * @internal
-	 * @this {HTMLThis}
 	 * @description Destroy the HTML instance and release memory
 	 */
-	_destroy(this: Omit<HTML & Partial<CoreInjector>, 'html'>): void;
+	_destroy(): void;
+	#private;
 }
 import CoreInjector from '../../editorInjector/_core';

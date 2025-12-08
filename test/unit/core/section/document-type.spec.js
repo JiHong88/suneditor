@@ -31,12 +31,8 @@ describe('Core - Editor Document Type Features', () => {
 			}
 
 			// Should have documentType set
-			if (editor.options.get('type') === 'document') {
-				expect(editor.frameContext.has('documentType')).toBe(true);
-			} else {
-				// If document type not available, skip
-				expect(true).toBe(true);
-			}
+			if (editor.options.get('type') !== 'document') return;
+			expect(editor.frameContext.has('documentType')).toBe(true);
 		});
 
 		it('should set documentType_use_header when header is used', async () => {
@@ -55,16 +51,10 @@ describe('Core - Editor Document Type Features', () => {
 			}
 
 			const fc = editor.frameContext;
-			if (fc.has('documentType')) {
-				const docType = fc.get('documentType');
-				if (docType.useHeader) {
-					expect(fc.has('documentType_use_header')).toBe(true);
-				} else {
-					expect(true).toBe(true);
-				}
-			} else {
-				expect(true).toBe(true);
-			}
+			if (!fc.has('documentType')) return;
+			const docType = fc.get('documentType');
+			if (!docType.useHeader) return;
+			expect(fc.has('documentType_use_header')).toBe(true);
 		});
 
 		it('should set documentType_use_page when page is used', async () => {
@@ -83,17 +73,11 @@ describe('Core - Editor Document Type Features', () => {
 			}
 
 			const fc = editor.frameContext;
-			if (fc.has('documentType')) {
-				const docType = fc.get('documentType');
-				if (docType.usePage) {
-					expect(fc.has('documentType_use_page')).toBe(true);
-					expect(fc.get('documentTypePageMirror')).toBeDefined();
-				} else {
-					expect(true).toBe(true);
-				}
-			} else {
-				expect(true).toBe(true);
-			}
+			if (!fc.has('documentType')) return;
+			const docType = fc.get('documentType');
+			if (!docType.usePage) return;
+			expect(fc.has('documentType_use_page')).toBe(true);
+			expect(fc.get('documentTypePageMirror')).toBeDefined();
 		});
 	});
 
@@ -117,21 +101,19 @@ describe('Core - Editor Document Type Features', () => {
 		it('should update page mirror when documentType_use_page is set', () => {
 			const fc = editor.frameContext;
 
-			if (fc.has('documentType_use_page')) {
-				const wysiwyg = fc.get('wysiwyg');
-				const mirror = fc.get('documentTypePageMirror');
-				const docType = fc.get('documentType');
+			if (!fc.has('documentType_use_page')) return;
 
-				wysiwyg.innerHTML = '<p>Test document content</p>';
-				docType.rePage = jest.fn();
+			const wysiwyg = fc.get('wysiwyg');
+			const mirror = fc.get('documentTypePageMirror');
+			const docType = fc.get('documentType');
 
-				editor._resourcesStateChange(fc);
+			wysiwyg.innerHTML = '<p>Test document content</p>';
+			docType.rePage = jest.fn();
 
-				expect(mirror.innerHTML).toContain('Test document content');
-				expect(docType.rePage).toHaveBeenCalledWith(true);
-			} else {
-				expect(true).toBe(true);
-			}
+			editor._resourcesStateChange(fc);
+
+			expect(mirror.innerHTML).toContain('Test document content');
+			expect(docType.rePage).toHaveBeenCalledWith(true);
 		});
 
 		it('should handle _resourcesStateChange without errors', () => {
@@ -169,14 +151,7 @@ describe('Core - Editor Document Type Features', () => {
 			// Mock as not supported
 			require('../../../../src/helper/env').default.isResizeObserverSupported = false;
 
-			jest.spyOn(editor, '__callResizeFunction');
-
-			editor._iframeAutoHeight(fc);
-
-			// Wait for async execution
-			setTimeout(() => {
-				expect(editor.__callResizeFunction).toHaveBeenCalled();
-			}, 10);
+			expect(() => editor._iframeAutoHeight(fc)).not.toThrow();
 
 			// Restore
 			require('../../../../src/helper/env').default.isResizeObserverSupported = originalSupport;

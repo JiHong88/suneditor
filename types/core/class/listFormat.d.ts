@@ -1,41 +1,11 @@
 import type {} from '../../typedef';
 export default ListFormat;
-export type ListFormatThis = Omit<ListFormat & Partial<SunEditor.Injector_Core>, 'ListFormat'>;
 /**
- * @typedef {Omit<ListFormat & Partial<SunEditor.Injector_Core>, 'ListFormat'>} ListFormatThis
- */
-/**
- * @constructor
- * @this {ListFormatThis}
  * @description Classes related to editor formats such as "list" (ol, ul, li)
  * - "list" is a special "line", "block" format.
- * @param {SunEditor.Core} editor - The root editor instance
  */
-declare function ListFormat(this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>, editor: SunEditor.Core): void;
-declare class ListFormat {
+declare class ListFormat extends CoreInjector {
 	/**
-	 * @typedef {Omit<ListFormat & Partial<SunEditor.Injector_Core>, 'ListFormat'>} ListFormatThis
-	 */
-	/**
-	 * @constructor
-	 * @this {ListFormatThis}
-	 * @description Classes related to editor formats such as "list" (ol, ul, li)
-	 * - "list" is a special "line", "block" format.
-	 * @param {SunEditor.Core} editor - The root editor instance
-	 */
-	constructor(editor: SunEditor.Core);
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection(): SunEditor.Core['selection'];
-	/** @internal @type {SunEditor.Core['format']} */
-	get format(): SunEditor.Core['format'];
-	/** @internal @type {SunEditor.Core['component']} */
-	get component(): SunEditor.Core['component'];
-	/** @internal @type {SunEditor.Core['inline']} */
-	get inline(): SunEditor.Core['inline'];
-	/** @internal @type {SunEditor.Core['nodeTransform']} */
-	get nodeTransform(): SunEditor.Core['nodeTransform'];
-	/**
-	 * @this {ListFormatThis}
 	 * @description Append all selected "line" element to the list and insert.
 	 * @param {string} type List type. (ol | ul):[listStyleType]
 	 * @param {Array<Node>} selectedCells "line" elements or list cells.
@@ -53,7 +23,6 @@ declare class ListFormat {
 	 * editor.listFormat.apply('ul', listItems, true);
 	 */
 	apply(
-		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
 		type: string,
 		selectedCells: Array<Node>,
 		nested: boolean,
@@ -64,7 +33,6 @@ declare class ListFormat {
 		eo: number;
 	};
 	/**
-	 * @this {ListFormatThis}
 	 * @description "selectedCells" array are detached from the list element.
 	 * - The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
 	 * @param {Array<Node>} selectedCells Array of ["line", li] elements(LI, P...) to remove.
@@ -74,7 +42,6 @@ declare class ListFormat {
 	 * - ec: End container node
 	 */
 	remove(
-		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
 		selectedCells: Array<Node>,
 		shouldDelete: boolean,
 	): {
@@ -82,7 +49,6 @@ declare class ListFormat {
 		ec: Node;
 	};
 	/**
-	 * @this {ListFormatThis}
 	 * @description Nest list cells or cancel nested cells.
 	 * @param {Array<HTMLElement>} selectedCells List cells.
 	 * @param {boolean} nested Nested or cancel nested.
@@ -99,7 +65,6 @@ declare class ListFormat {
 	 * editor.listFormat.applyNested(cells, true);
 	 */
 	applyNested(
-		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
 		selectedCells: Array<HTMLElement>,
 		nested: boolean,
 	): {
@@ -109,7 +74,6 @@ declare class ListFormat {
 		eo: number;
 	};
 	/**
-	 * @this {ListFormatThis}
 	 * @description Detach Nested all nested lists under the "baseNode".
 	 * - Returns a list with nested removed.
 	 * @param {HTMLElement} baseNode Element on which to base.
@@ -127,60 +91,12 @@ declare class ListFormat {
 	 * const result = editor.listFormat.removeNested(nestedLi, false);
 	 * console.log(result); // parent list element
 	 */
-	removeNested(this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>, baseNode: HTMLElement, all: boolean): Node;
+	removeNested(baseNode: HTMLElement, all: boolean): Node;
 	/**
 	 * @internal
-	 * @this {ListFormatThis}
-	 * @description Attaches a nested list structure by merging adjacent lists if applicable.
-	 * - Ensures that the nested list is placed correctly in the document structure.
-	 * @param {Element} originList The original list element where the nested list is inserted.
-	 * @param {Element} innerList The nested list element.
-	 * @param {Element} prev The previous sibling element.
-	 * @param {Element} next The next sibling element.
-	 * @param {{s: Array<number> | null, e: Array<number> | null, sl: Node | null, el: Node | null}} nodePath Object storing the start and end node paths.
-	 * - s : Start node path.
-	 * - e : End node path.
-	 * - sl : Start node's parent element.
-	 * - el : End node's parent element.
-	 * @returns {Node} The attached inner list.
-	 */
-	_attachNested(
-		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
-		originList: Element,
-		innerList: Element,
-		prev: Element,
-		next: Element,
-		nodePath: {
-			s: Array<number> | null;
-			e: Array<number> | null;
-			sl: Node | null;
-			el: Node | null;
-		},
-	): Node;
-	/**
-	 * @internal
-	 * @this {ListFormatThis}
-	 * @description Detaches a nested list structure by extracting list items from their parent list.
-	 * - Ensures proper restructuring of the list elements.
-	 * @param {Array<HTMLElement>} cells The list items to be detached.
-	 * @returns {{cc: Node, sc: Node, ec: Node}} An object containing reference nodes for repositioning.
-	 * - cc : The parent node of the first list item.
-	 * - sc : The first list item.
-	 * - ec : The last list item.
-	 */
-	_detachNested(
-		this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>,
-		cells: Array<HTMLElement>,
-	): {
-		cc: Node;
-		sc: Node;
-		ec: Node;
-	};
-	/**
-	 * @internal
-	 * @this {ListFormatThis}
 	 * @description Destroy the ListFormat instance and release memory
 	 */
-	_destroy(this: Omit<ListFormat & Partial<CoreInjector>, 'ListFormat'>): void;
+	_destroy(): void;
+	#private;
 }
 import CoreInjector from '../../editorInjector/_core';

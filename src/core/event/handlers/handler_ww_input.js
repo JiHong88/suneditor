@@ -1,7 +1,7 @@
 import { dom, keyCodeMap } from '../../../helper';
 
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_input
+ * @typedef {import('../eventManager').default} EventManagerThis_handler_ww_input
  */
 
 /**
@@ -54,7 +54,7 @@ export async function OnInput_wysiwyg(fc, e) {
 		this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine'));
 	}
 
-	this.selection._init();
+	this.selection.init();
 
 	const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
 	if (!this._handledInBefore) {

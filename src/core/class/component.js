@@ -12,118 +12,121 @@ const DIR_KEYCODE = /^Arrow(Left|Up|Right|Down)$/;
 const DIR_UP_KEYCODE = /^Arrow(Left|Up)$/;
 
 /**
- * @typedef {Omit<Component & Partial<SunEditor.Injector_Core>, 'component'>} ComponentThis
- */
-
-/**
- * @constructor
- * @this {ComponentThis}
  * @description Class for managing components such as images and tables that are not in line format
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function Component(editor) {
-	CoreInjector.call(this, editor);
-
-	/**
-	 * @description The current component information, used copy, cut, and keydown events
-	 * @type {SunEditor.ComponentInfo}
-	 */
-	this.info = null;
-
-	/**
-	 * @description Component is selected
-	 * @type {boolean}
-	 */
-	this.isSelected = false;
-
-	/**
-	 * @description Currently selected component target
-	 * @type {?Node}
-	 */
-	this.currentTarget = null;
-
-	/**
-	 * @description Currently selected component plugin instance
-	 * @type {*}
-	 */
-	this.currentPlugin = null;
-
-	/**
-	 * @description Currently selected component plugin name
-	 * @type {*}
-	 */
-	this.currentPluginName = '';
-
-	/**
-	 * @description Currently selected component information
-	 * @type {?SunEditor.ComponentInfo}
-	 */
-	this.currentInfo = null;
-
+class Component extends CoreInjector {
 	/** @type {Object<string, (...args: *) => *>} */
-	this.__globalEvents = {
-		copy: OnCopy_component.bind(this),
-		cut: OnCut_component.bind(this),
-		keydown: OnKeyDown_component.bind(this),
-		mousedown: CloseListener_mousedown.bind(this),
-	};
+	#globalEvents;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	this._bindClose_copy = null;
+	#bindClose_copy;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	this._bindClose_cut = null;
+	#bindClose_cut;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	this._bindClose_keydown = null;
+	#bindClose_keydown;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	this._bindClose_mousedown = null;
-	/** @type {boolean} */
-	this.__selectionSelected = false;
-
-	this.__prevent = false;
-
-	this.editor.applyFrameRoots((e) => {
-		// drag
-		const dragHandle = dom.utils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true' }, this.icons.selection);
-		e.get('wrapper').appendChild(dragHandle);
-		this.eventManager.addEvent(dragHandle, 'mouseenter', OnDragEnter.bind(this));
-		this.eventManager.addEvent(dragHandle, 'mouseleave', OnDragLeave.bind(this));
-		this.eventManager.addEvent(dragHandle, 'dragstart', OnDragStart.bind(this));
-		this.eventManager.addEvent(dragHandle, 'dragend', OnDragEnd.bind(this));
-		this.eventManager.addEvent(dragHandle, 'click', OnDragClick.bind(this));
-	});
-}
-
-Component.prototype = {
-	/** @internal @type {SunEditor.Core['char']} */
-	get char() {
-		return this.editor.char;
-	},
-	/** @internal @type {SunEditor.Core['html']} */
-	get html() {
-		return this.editor.html;
-	},
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection() {
-		return this.editor.selection;
-	},
-	/** @internal @type {SunEditor.Core['format']} */
-	get format() {
-		return this.editor.format;
-	},
-	/** @internal @type {SunEditor.Core['offset']} */
-	get offset() {
-		return this.editor.offset;
-	},
-	/** @internal @type {SunEditor.Core['ui']} */
-	get ui() {
-		return this.editor.ui;
-	},
-	/** @internal @type {SunEditor.Core['nodeTransform']} */
-	get nodeTransform() {
-		return this.editor.nodeTransform;
-	},
+	#bindClose_mousedown;
 
 	/**
-	 * @this {ComponentThis}
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+
+		/**
+		 * @description The current component information, used copy, cut, and keydown events
+		 * @type {SunEditor.ComponentInfo}
+		 */
+		this.info = null;
+
+		/**
+		 * @description Component is selected
+		 * @type {boolean}
+		 */
+		this.isSelected = false;
+
+		/**
+		 * @description Currently selected component target
+		 * @type {?Node}
+		 */
+		this.currentTarget = null;
+
+		/**
+		 * @description Currently selected component plugin instance
+		 * @type {*}
+		 */
+		this.currentPlugin = null;
+
+		/**
+		 * @description Currently selected component plugin name
+		 * @type {*}
+		 */
+		this.currentPluginName = '';
+
+		/**
+		 * @description Currently selected component information
+		 * @type {?SunEditor.ComponentInfo}
+		 */
+		this.currentInfo = null;
+
+		this.#globalEvents = {
+			copy: this.#OnCopy_component.bind(this),
+			cut: this.#OnCut_component.bind(this),
+			keydown: this.#OnKeyDown_component.bind(this),
+			mousedown: this.#CloseListener_mousedown.bind(this),
+		};
+		this.#bindClose_copy = null;
+		this.#bindClose_cut = null;
+		this.#bindClose_keydown = null;
+		this.#bindClose_mousedown = null;
+
+		/** @internal */
+		this.__selectionSelected = false;
+		/** @internal */
+		this.__prevent = false;
+
+		this.editor.applyFrameRoots((e) => {
+			// drag
+			const dragHandle = dom.utils.createElement('DIV', { class: 'se-drag-handle', draggable: 'true' }, this.icons.selection);
+			e.get('wrapper').appendChild(dragHandle);
+			this.eventManager.addEvent(dragHandle, 'mouseenter', this.#OnDragEnter.bind(this));
+			this.eventManager.addEvent(dragHandle, 'mouseleave', this.#OnDragLeave.bind(this));
+			this.eventManager.addEvent(dragHandle, 'dragstart', this.#OnDragStart.bind(this));
+			this.eventManager.addEvent(dragHandle, 'dragend', this.#OnDragEnd.bind(this));
+			this.eventManager.addEvent(dragHandle, 'click', this.#OnDragClick.bind(this));
+		});
+	}
+
+	/** @type {SunEditor.Core['char']} */
+	get #char() {
+		return this.editor.char;
+	}
+	/** @type {SunEditor.Core['html']} */
+	get #html() {
+		return this.editor.html;
+	}
+	/** @type {SunEditor.Core['selection']} */
+	get #selection() {
+		return this.editor.selection;
+	}
+	/** @type {SunEditor.Core['format']} */
+	get #format() {
+		return this.editor.format;
+	}
+	/** @type {SunEditor.Core['offset']} */
+	get #offset() {
+		return this.editor.offset;
+	}
+	/** @type {SunEditor.Core['ui']} */
+	get #ui() {
+		return this.editor.ui;
+	}
+	/** @type {SunEditor.Core['nodeTransform']} */
+	get #nodeTransform() {
+		return this.editor.nodeTransform;
+	}
+
+	/**
 	 * @description Inserts an element and returns it. (Used for elements: table, hr, image, video)
 	 * - If "element" is "HR", inserts and returns the new line.
 	 * @param {Node} element Element to be inserted
@@ -136,30 +139,30 @@ Component.prototype = {
 	 * @returns {HTMLElement} The inserted element or new line (for HR)
 	 */
 	insert(element, { skipCharCount = false, skipHistory = false, scrollTo = true, insertBehavior } = {}) {
-		if (this.frameContext.get('isReadOnly') || (!skipCharCount && !this.char.check(element))) {
+		if (this.frameContext.get('isReadOnly') || (!skipCharCount && !this.#char.check(element))) {
 			return null;
 		}
 
 		if (insertBehavior === undefined) insertBehavior = this.options.get('componentInsertBehavior');
 
-		const r = this.html.remove();
+		const r = this.#html.remove();
 		const isInline = this.isInline(element);
-		this.selection.getRangeAndAddLine(this.selection.getRange(), r.container);
-		const selectionNode = this.selection.getNode();
+		this.#selection.getRangeAndAddLine(this.#selection.getRange(), r.container);
+		const selectionNode = this.#selection.getNode();
 		let oNode = null;
-		let formatEl = this.format.getLine(selectionNode, null);
+		let formatEl = this.#format.getLine(selectionNode, null);
 
 		try {
 			if (dom.check.isListCell(formatEl)) {
-				this.html.insertNode(element, { afterNode: isInline ? null : !dom.check.isZeroWidth(selectionNode) ? null : (selectionNode || r.container || {}).nextSibling, skipCharCount: true });
+				this.#html.insertNode(element, { afterNode: isInline ? null : !dom.check.isZeroWidth(selectionNode) ? null : (selectionNode || r.container || {}).nextSibling, skipCharCount: true });
 				if (!isInline && !element.nextSibling) element.parentNode.appendChild(dom.utils.createElement('BR'));
 			} else {
-				if (!isInline && this.selection.getRange().collapsed && (r.container?.nodeType === 3 || dom.check.isBreak(r.container))) {
-					const depthFormat = dom.query.getParentElement(r.container, this.format.isBlock.bind(this.format));
-					oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
+				if (!isInline && this.#selection.getRange().collapsed && (r.container?.nodeType === 3 || dom.check.isBreak(r.container))) {
+					const depthFormat = dom.query.getParentElement(r.container, this.#format.isBlock.bind(this.#format));
+					oNode = this.#nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
 					if (oNode) formatEl = /** @type {HTMLElement} */ (oNode.previousSibling);
 				}
-				this.html.insertNode(element, { afterNode: isInline ? null : this.format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
+				this.#html.insertNode(element, { afterNode: isInline ? null : this.#format.isBlock(formatEl) ? null : formatEl, skipCharCount: true });
 				if (!isInline && formatEl && dom.check.isZeroWidth(formatEl)) dom.utils.removeItem(formatEl);
 			}
 
@@ -180,14 +183,13 @@ Component.prototype = {
 
 		const targetElement = /** @type {HTMLElement} */ (oNode || element);
 
-		if (scrollTo) this.selection.scrollTo(targetElement, { behavior: 'auto' });
+		if (scrollTo) this.#selection.scrollTo(targetElement, { behavior: 'auto' });
 		if (insertBehavior !== null) this.applyInsertBehavior(element, oNode, insertBehavior);
 
 		return targetElement;
-	},
+	}
 
 	/**
-	 * @this {ComponentThis}
 	 * @description Handles post-insertion behavior for a newly created component based on the specified mode.
 	 * @param {Node} container The inserted component element.
 	 * @param {?Node} [oNode] Optional node to use for selection if the component cannot be selected.
@@ -197,9 +199,9 @@ Component.prototype = {
 		const cInfo = this.get(container);
 
 		if (this.isInline(container)) {
-			const nr = this.selection.getNearRange(container);
+			const nr = this.#selection.getNearRange(container);
 			if (nr) {
-				this.selection.setRange(nr.container, nr.offset, nr.container, nr.offset);
+				this.#selection.setRange(nr.container, nr.offset, nr.container, nr.offset);
 			} else {
 				this.select(cInfo.target, cInfo.pluginName);
 			}
@@ -208,27 +210,27 @@ Component.prototype = {
 
 		switch (insertBehavior) {
 			case 'auto': {
-				if (!this.__moveToNextLineOrAdd(container)) {
+				if (!this.#moveToNextLineOrAdd(container)) {
 					this.select(cInfo.target, cInfo.pluginName);
 				}
 
 				break;
 			}
 			case 'select': {
-				this.selection.setRange(container, 0, container, 0);
+				this.#selection.setRange(container, 0, container, 0);
 
 				if (cInfo) {
 					this.select(cInfo.target, cInfo.pluginName);
 				} else if (oNode) {
 					oNode = dom.query.getEdgeChildNodes(oNode, null).sc || oNode;
-					this.selection.setRange(oNode, 0, oNode, 0);
+					this.#selection.setRange(oNode, 0, oNode, 0);
 				}
 				break;
 			}
 			case 'line': {
-				if (!this.__moveToNextLineOrAdd(container)) {
-					const line = this.format.addLine(container, null);
-					if (line) this.selection.setRange(line, 0, line, 0);
+				if (!this.#moveToNextLineOrAdd(container)) {
+					const line = this.#format.addLine(container, null);
+					if (line) this.#selection.setRange(line, 0, line, 0);
 				}
 
 				break;
@@ -238,10 +240,9 @@ Component.prototype = {
 				break;
 			}
 		}
-	},
+	}
 
 	/**
-	 * @this {ComponentThis}
 	 * @description Gets the file component and that plugin name
 	 * - return: {target, component, pluginName} | null
 	 * @param {Node} element Target element (figure tag, component div, file tag)
@@ -270,7 +271,7 @@ Component.prototype = {
 		}
 
 		if (!target && element.nodeName) {
-			if (this.__isFiles(element)) {
+			if (this.#isFiles(element)) {
 				isFile = true;
 			}
 			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
@@ -299,10 +300,9 @@ Component.prototype = {
 			launcher,
 			isInputType: dom.utils.hasClass(container, 'se-input-component'),
 		});
-	},
+	}
 
 	/**
-	 * @this {ComponentThis}
 	 * @description The component(media, file component, table, etc) is selected and the resizing module is called.
 	 * @param {Node} element Target element
 	 * @param {string} pluginName The plugin name for the selected target.
@@ -323,7 +323,7 @@ Component.prototype = {
 			this.editor._preventBlur = true;
 			this.__selectionSelected = true;
 			if (this.isInline(info.container)) {
-				this.selection.setRange(info.container, 0, info.container, 0);
+				this.#selection.setRange(info.container, 0, info.container, 0);
 			}
 			this.editor.blur();
 			_w.setTimeout(() => {
@@ -350,8 +350,8 @@ Component.prototype = {
 		const __overInfo = _DragHandle.get('__overInfo');
 		_w.setTimeout(() => {
 			_DragHandle.set('__overInfo', __overInfo === ON_OVER_COMPONENT ? undefined : false);
-			if (__overInfo !== ON_OVER_COMPONENT) this.__addGlobalEvent();
-			if (!info.isFile) this.__addNotFileGlobalEvent();
+			if (__overInfo !== ON_OVER_COMPONENT) this.#addGlobalEvent();
+			if (!info.isFile) this.#addNotFileGlobalEvent();
 		}, 0);
 
 		converter.debounce(() => {
@@ -383,12 +383,12 @@ Component.prototype = {
 		} else if (isBreakComponent || !dom.utils.hasClass(info.container, 'se-input-component')) {
 			const dragHandle = this.frameContext.get('wrapper').querySelector('.se-drag-handle');
 			dom.utils.addClass(dragHandle, 'se-drag-handle-full');
-			this.ui._visibleControllers(false, false);
+			this.#ui._visibleControllers(false, false);
 
 			const sizeTarget = info.caption ? info.target : info.cover || info.container || info.target;
 			const w = sizeTarget.offsetWidth;
 			const h = sizeTarget.offsetHeight;
-			const { top, left } = this.offset.getLocal(sizeTarget);
+			const { top, left } = this.#offset.getLocal(sizeTarget);
 
 			dragHandle.style.opacity = 0;
 			dragHandle.style.width = w + 'px';
@@ -402,10 +402,9 @@ Component.prototype = {
 
 			dragHandle.style.display = 'block';
 		}
-	},
+	}
 
 	/**
-	 * @this {ComponentThis}
 	 * @description Deselects the selected component.
 	 */
 	deselect() {
@@ -413,16 +412,15 @@ Component.prototype = {
 			this.status.onSelected = false;
 		}, 0);
 		this.__deselect();
-		this.ui.setControllerOnDisabledButtons(false);
+		this.#ui.setControllerOnDisabledButtons(false);
 
 		if (this.editor._preventFocus && !this.status.hasFocus && !this.__prevent) {
 			this.eventManager.__postBlurEvent(this.frameContext, null);
 			this.editor._preventFocus = false;
 		}
-	},
+	}
 
 	/**
-	 * @this {ComponentThis}
 	 * @description Determines if the specified node is a block component (e.g., img, iframe, video, audio, table) with the class "se-component"
 	 * - or a direct FIGURE node. This function checks if the node itself is a component
 	 * - or if it belongs to any components identified by the component manager.
@@ -436,10 +434,9 @@ Component.prototype = {
 		if (this.editor._componentManager.find((f) => f(element))) return true;
 
 		return false;
-	},
+	}
 
 	/**
-	 * @this {ComponentThis}
 	 * @description Checks if the given node is an inline component (class "se-inline-component").
 	 * - If the node is a FIGURE, it checks the parent element instead.
 	 * - It also verifies whether the node is part of an inline component recognized by the component manager.
@@ -456,10 +453,9 @@ Component.prototype = {
 		if (comp && (dom.utils.hasClass(element, 'se-inline-component') || dom.utils.hasClass(element.parentElement, 'se-inline-component'))) return true;
 
 		return false;
-	},
+	}
 
 	/**
-	 * @this {ComponentThis}
 	 * @description Checks if the specified node qualifies as a basic component within the editor.
 	 * - This function verifies whether the node is recognized as a component by the `is` function, while also ensuring that it is not an inline component as determined by the `isInline` function.
 	 * - This is used to identify block-level elements or standalone components that are not part of the inline component classification.
@@ -468,10 +464,9 @@ Component.prototype = {
 	 */
 	isBasic(element) {
 		return this.is(element) && !this.isInline(element);
-	},
+	}
 
 	/**
-	 * @this {ComponentThis}
 	 * @description Copies the specified component node to the clipboard.
 	 * - This function is different from the one called when the user presses the "Ctrl + C" key combination.
 	 * @param {Node} container The DOM node to check.
@@ -486,14 +481,13 @@ Component.prototype = {
 		dom.utils.removeClass(cloneContainer.querySelector('.se-selected-cell-focus'), 'se-selected-cell-focus');
 
 		// copy to clipboard
-		if ((await this.html.copy(cloneContainer)) === false) return;
+		if ((await this.#html.copy(cloneContainer)) === false) return;
 
 		// copy effect
 		dom.utils.flashClass(container, 'se-copy');
-	},
+	}
 
 	/**
-	 * @this {ComponentThis}
 	 * @description Temporarily selects a component without showing its controller.
 	 * This is a lightweight selection mode used for:
 	 * - Mouse hover: Shows visual selection while hovering, auto-deselects on mouse out
@@ -512,7 +506,7 @@ Component.prototype = {
 		if (info || figure) {
 			info ||= this.get(figure);
 			if (info && !dom.utils.hasClass(info.container, 'se-component-selected')) {
-				this.ui._offCurrentController();
+				this.#ui.offCurrentController();
 				_DragHandle.set('__overInfo', ON_OVER_COMPONENT);
 				this.select(info.target, info.pluginName);
 			}
@@ -520,31 +514,17 @@ Component.prototype = {
 			this.__deselect();
 			_DragHandle.set('__overInfo', null);
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ComponentThis}
-	 * @description Checks if the given element is a file component by matching its tag name against the file manager's regular expressions.
-	 * - It also verifies whether the element has the required attributes based on the tag type.
-	 * @param {Node} element The element to check.
-	 * @returns {boolean} Returns true if the element is a file component, otherwise false.
-	 */
-	__isFiles(element) {
-		const nodeName = element.nodeName.toLowerCase();
-		return this.editor._fileManager.regExp.test(nodeName) && (!this.editor._fileManager.tagAttrs[nodeName] || this.editor._fileManager.tagAttrs[nodeName]?.every((v) => /** @type {HTMLElement} */ (element).hasAttribute(v)));
-	},
-
-	/**
-	 * @internal
-	 * @this {ComponentThis}
 	 * @description Deselects the currently selected component, removing any selection effects and associated event listeners.
 	 * - This method resets the selection state and hides UI elements related to the component selection.
 	 */
 	__deselect() {
 		this.editor._preventBlur = false;
 		_DragHandle.set('__overInfo', null);
-		this._removeDragEvent();
+		this.__removeDragEvent();
 
 		if (this.currentInfo) {
 			const infoContainer = this.currentInfo.container;
@@ -570,37 +550,11 @@ Component.prototype = {
 		this.currentPluginName = '';
 		this.currentInfo = null;
 		this.__removeGlobalEvent();
-		this.ui.__offControllers();
-	},
+		this.#ui.__offControllers();
+	}
 
 	/**
 	 * @internal
-	 * @this {ComponentThis}
-	 * @description
-	 * Attempts to move the cursor to a valid line after the given container.
-	 * - If a valid next sibling line exists, moves the selection there.
-	 * - If no next sibling exists, creates a new line after the container and moves the selection there.
-	 * - If the next sibling exists but is not a valid line element and cannot create a new line, returns false.
-	 * @param {Node} container The component container element.
-	 * @returns {boolean} Returns true if the selection moved to a line (existing or newly created), otherwise false.
-	 */
-	__moveToNextLineOrAdd(container) {
-		const nextSibling = /** @type {Element} */ (container).nextElementSibling;
-		if (!nextSibling) {
-			const line = this.format.addLine(container, null);
-			if (line) this.selection.setRange(line, 0, line, 0);
-			return true;
-		} else if (this.format.isLine(nextSibling)) {
-			this.selection.setRange(nextSibling, 0, nextSibling, 0);
-			return true;
-		}
-
-		return false;
-	},
-
-	/**
-	 * @internal
-	 * @this {ComponentThis}
 	 * @description Set line breaker of component
 	 * @param {HTMLElement} element Element tag
 	 */
@@ -625,10 +579,10 @@ Component.prototype = {
 		let componentTop, w;
 		const isRtl = this.options.get('_rtl');
 		const dir = isRtl ? ['right', 'left'] : ['left', 'right'];
-		const { top, left, right, scrollX, scrollY } = this.offset.getLocal(offsetTarget);
+		const { top, left, right, scrollX, scrollY } = this.#offset.getLocal(offsetTarget);
 		const sideOffset = isRtl ? right : left;
 
-		if (isList ? (!dom.check.isBreak(container.previousElementSibling) && !container.previousSibling?.textContent?.trim()) || this.is(container.previousElementSibling) : !this.format.isLine(container.previousElementSibling)) {
+		if (isList ? (!dom.check.isBreak(container.previousElementSibling) && !container.previousSibling?.textContent?.trim()) || this.is(container.previousElementSibling) : !this.#format.isLine(container.previousElementSibling)) {
 			const cStyle = _w.getComputedStyle(lb_t);
 			const cH = numbers.get(cStyle.height, 1);
 			const cW = numbers.get(cStyle.width, 1);
@@ -652,7 +606,7 @@ Component.prototype = {
 		}
 
 		// bottom
-		if (isList ? (!dom.check.isBreak(container.nextElementSibling) && !container.nextSibling?.textContent?.trim()) || this.is(container.nextElementSibling) : !this.format.isLine(container.nextElementSibling)) {
+		if (isList ? (!dom.check.isBreak(container.nextElementSibling) && !container.nextSibling?.textContent?.trim()) || this.is(container.nextElementSibling) : !this.#format.isLine(container.nextElementSibling)) {
 			const cStyle = _w.getComputedStyle(lb_b);
 			const cH = numbers.get(cStyle.height, 1);
 			const cW = numbers.get(cStyle.width, 1);
@@ -676,57 +630,24 @@ Component.prototype = {
 		} else {
 			b_style.display = 'none';
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {ComponentThis}
-	 * @description Adds global event listeners for component interactions such as copy, cut, and keydown events.
-	 */
-	__addGlobalEvent() {
-		this.__removeGlobalEvent();
-		this._bindClose_copy = this.eventManager.addGlobalEvent('copy', this.__globalEvents.copy);
-		this._bindClose_cut = this.eventManager.addGlobalEvent('cut', this.__globalEvents.cut);
-		this._bindClose_keydown = this.eventManager.addGlobalEvent('keydown', this.__globalEvents.keydown);
-	},
-
-	/**
-	 * @internal
-	 * @this {ComponentThis}
 	 * @description Removes global event listeners that were previously added for component interactions.
 	 */
 	__removeGlobalEvent() {
-		this.__removeNotFileGlobalEvent();
-		this._bindClose_copy &&= this.eventManager.removeGlobalEvent(this._bindClose_copy);
-		this._bindClose_cut &&= this.eventManager.removeGlobalEvent(this._bindClose_cut);
-		this._bindClose_keydown &&= this.eventManager.removeGlobalEvent(this._bindClose_keydown);
-	},
+		this.#removeNotFileGlobalEvent();
+		this.#bindClose_copy &&= this.eventManager.removeGlobalEvent(this.#bindClose_copy);
+		this.#bindClose_cut &&= this.eventManager.removeGlobalEvent(this.#bindClose_cut);
+		this.#bindClose_keydown &&= this.eventManager.removeGlobalEvent(this.#bindClose_keydown);
+	}
 
 	/**
 	 * @internal
-	 * @this {ComponentThis}
-	 * @description Adds global event listeners for non-file-related interactions such as mouse and touch events.
-	 */
-	__addNotFileGlobalEvent() {
-		this.__removeNotFileGlobalEvent();
-		this._bindClose_mousedown = this.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.__globalEvents.mousedown, true);
-	},
-
-	/**
-	 * @internal
-	 * @this {ComponentThis}
-	 * @description Removes global event listeners related to non-file interactions.
-	 */
-	__removeNotFileGlobalEvent() {
-		this._bindClose_mousedown &&= this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
-	},
-
-	/**
-	 * @internal
-	 * @this {ComponentThis}
 	 * @description Removes drag-related events and resets drag-related states.
 	 */
-	_removeDragEvent() {
+	__removeDragEvent() {
 		/** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-drag-cursor')).style.left = '-10000px';
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 
@@ -740,269 +661,311 @@ Component.prototype = {
 		_DragHandle.set('__dragCover', null);
 		_DragHandle.set('__dragMove', null);
 		_DragHandle.set('__overInfo', null);
-	},
+	}
+
+	/**
+	 * @description Adds global event listeners for component interactions such as copy, cut, and keydown events.
+	 */
+	#addGlobalEvent() {
+		this.__removeGlobalEvent();
+		this.#bindClose_copy = this.eventManager.addGlobalEvent('copy', this.#globalEvents.copy);
+		this.#bindClose_cut = this.eventManager.addGlobalEvent('cut', this.#globalEvents.cut);
+		this.#bindClose_keydown = this.eventManager.addGlobalEvent('keydown', this.#globalEvents.keydown);
+	}
+
+	/**
+	 * @description Adds global event listeners for non-file-related interactions such as mouse and touch events.
+	 */
+	#addNotFileGlobalEvent() {
+		this.#removeNotFileGlobalEvent();
+		this.#bindClose_mousedown = this.eventManager.addGlobalEvent(isMobile ? 'click' : 'mousedown', this.#globalEvents.mousedown, true);
+	}
 
 	/**
 	 * @internal
-	 * @this {ComponentThis}
-	 * @description Destroy the Component instance and release memory
+	 * @description Removes global event listeners related to non-file interactions.
 	 */
-	_destroy() {
-		this.__removeGlobalEvent();
-		this._removeDragEvent();
-	},
-
-	constructor: Component,
-};
-
-/**
- * @this {ComponentThis}
- */
-function OnDragEnter() {
-	this.editor._preventBlur = true;
-	this.ui._visibleControllers(false, dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
-	dom.utils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
-}
-
-/**
- * @this {ComponentThis}
- */
-function OnDragLeave() {
-	this.editor._preventBlur = false;
-	if (!dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.ui._visibleControllers(true, true);
-	dom.utils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
-}
-
-/**
- * @this {ComponentThis}
- * @param {DragEvent} e - Drag event
- */
-function OnDragStart(e) {
-	const cover = _DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer');
-
-	if (!cover) {
-		e.preventDefault();
-		return;
+	#removeNotFileGlobalEvent() {
+		this.#bindClose_mousedown &&= this.eventManager.removeGlobalEvent(this.#bindClose_mousedown);
 	}
 
-	this.editor._preventBlur = false;
-	dom.utils.addClass(_DragHandle.get('__dragHandler'), 'se-dragging');
-	dom.utils.addClass(_DragHandle.get('__dragContainer'), 'se-dragging');
-	e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
-}
+	/**
+	 * @description
+	 * Attempts to move the cursor to a valid line after the given container.
+	 * - If a valid next sibling line exists, moves the selection there.
+	 * - If no next sibling exists, creates a new line after the container and moves the selection there.
+	 * - If the next sibling exists but is not a valid line element and cannot create a new line, returns false.
+	 * @param {Node} container The component container element.
+	 * @returns {boolean} Returns true if the selection moved to a line (existing or newly created), otherwise false.
+	 */
+	#moveToNextLineOrAdd(container) {
+		const nextSibling = /** @type {Element} */ (container).nextElementSibling;
+		if (!nextSibling) {
+			const line = this.#format.addLine(container, null);
+			if (line) this.#selection.setRange(line, 0, line, 0);
+			return true;
+		} else if (this.#format.isLine(nextSibling)) {
+			this.#selection.setRange(nextSibling, 0, nextSibling, 0);
+			return true;
+		}
 
-/**
- * @this {ComponentThis}
- */
-function OnDragEnd() {
-	this.editor._preventBlur = false;
-	dom.utils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
-	this._removeDragEvent();
-}
-
-/**
- * @this {ComponentThis}
- * @param {MouseEvent} e - Mouse event
- */
-function OnDragClick(e) {
-	const target = dom.query.getEventTarget(e);
-	if (!dom.utils.hasClass(target, 'se-drag-handle-full')) return;
-
-	const dragInst = _DragHandle.get('__dragInst');
-	if (!dragInst) return;
-
-	this._removeDragEvent();
-	this.select(dragInst.currentTarget, dragInst.currentPluginName);
-}
-
-/**
- * @this {ComponentThis}
- * @param {MouseEvent} e - Mouse event
- */
-function CloseListener_mousedown(e) {
-	const target = dom.query.getEventTarget(e);
-	if (
-		this.currentTarget?.contains(target) ||
-		dom.query.getParentElement(target, '.se-controller') ||
-		dom.utils.hasClass(target, 'se-drag-handle') ||
-		(this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target)))
-	) {
-		return;
+		return false;
 	}
-	this.deselect();
-}
 
-/**
- * @this {ComponentThis}
- * @param {ClipboardEvent} e - Event object
- */
-function OnCopy_component(e) {
-	const target = dom.query.getEventTarget(e);
-	if (dom.check.isInputElement(target) && dom.query.getParentElement(target, '.se-modal')) return;
+	/**
+	 * @description Checks if the given element is a file component by matching its tag name against the file manager's regular expressions.
+	 * - It also verifies whether the element has the required attributes based on the tag type.
+	 * @param {Node} element The element to check.
+	 * @returns {boolean} Returns true if the element is a file component, otherwise false.
+	 */
+	#isFiles(element) {
+		const nodeName = element.nodeName.toLowerCase();
+		return this.editor._fileManager.regExp.test(nodeName) && (!this.editor._fileManager.tagAttrs[nodeName] || this.editor._fileManager.tagAttrs[nodeName]?.every((v) => /** @type {HTMLElement} */ (element).hasAttribute(v)));
+	}
 
-	const info = this.info;
-	if (!info) return;
+	#OnDragEnter() {
+		this.editor._preventBlur = true;
+		this.#ui._visibleControllers(false, dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full'));
+		dom.utils.addClass(_DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer'), 'se-drag-over');
+	}
 
-	const cloneContainer = info.container.cloneNode(true);
-	dom.utils.removeClass(cloneContainer, 'se-component-selected');
+	#OnDragLeave() {
+		this.editor._preventBlur = false;
+		if (!dom.utils.hasClass(_DragHandle.get('__dragHandler'), 'se-drag-handle-full')) this.#ui._visibleControllers(true, true);
+		dom.utils.removeClass([_DragHandle.get('__dragCover'), _DragHandle.get('__dragContainer')], 'se-drag-over');
+	}
 
-	if (typeof this.plugins[info.pluginName]?.componentCopy !== 'function' || this.plugins[info.pluginName].componentCopy({ event: e, cloneContainer, info }) === false) {
+	/**
+	 * @param {DragEvent} e - Drag event
+	 */
+	#OnDragStart(e) {
+		const cover = _DragHandle.get('__dragCover') || _DragHandle.get('__dragContainer');
+
+		if (!cover) {
+			e.preventDefault();
+			return;
+		}
+
+		this.editor._preventBlur = false;
+		dom.utils.addClass(_DragHandle.get('__dragHandler'), 'se-dragging');
+		dom.utils.addClass(_DragHandle.get('__dragContainer'), 'se-dragging');
+		e.dataTransfer.setDragImage(cover, this.options.get('_rtl') ? cover.offsetWidth : -5, -5);
+	}
+
+	#OnDragEnd() {
+		this.editor._preventBlur = false;
+		dom.utils.removeClass([_DragHandle.get('__dragHandler'), _DragHandle.get('__dragContainer')], 'se-dragging');
+		this.__removeDragEvent();
+	}
+
+	/**
+	 * @param {MouseEvent} e - Mouse event
+	 */
+	#OnDragClick(e) {
+		const target = dom.query.getEventTarget(e);
+		if (!dom.utils.hasClass(target, 'se-drag-handle-full')) return;
+
+		const dragInst = _DragHandle.get('__dragInst');
+		if (!dragInst) return;
+
+		this.__removeDragEvent();
+		this.select(dragInst.currentTarget, dragInst.currentPluginName);
+	}
+
+	/**
+	 * @param {MouseEvent} e - Mouse event
+	 */
+	#CloseListener_mousedown(e) {
+		const target = dom.query.getEventTarget(e);
+		if (
+			this.currentTarget?.contains(target) ||
+			dom.query.getParentElement(target, '.se-controller') ||
+			dom.utils.hasClass(target, 'se-drag-handle') ||
+			(this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target)))
+		) {
+			return;
+		}
+		this.deselect();
+	}
+
+	/**
+	 * @param {ClipboardEvent} e - Event object
+	 */
+	#OnCopy_component(e) {
+		const target = dom.query.getEventTarget(e);
+		if (dom.check.isInputElement(target) && dom.query.getParentElement(target, '.se-modal')) return;
+
+		const info = this.info;
+		if (!info) return;
+
+		const cloneContainer = info.container.cloneNode(true);
+		dom.utils.removeClass(cloneContainer, 'se-component-selected');
+
+		if (typeof this.plugins[info.pluginName]?.componentCopy !== 'function' || this.plugins[info.pluginName].componentCopy({ event: e, cloneContainer, info }) === false) {
+			SetClipboardComponent(e, cloneContainer, e.clipboardData);
+		}
+
+		// copy effect
+		dom.utils.flashClass(info.container, 'se-copy');
+	}
+
+	/**
+	 * @param {ClipboardEvent} e - Event object
+	 */
+	#OnCut_component(e) {
+		const info = this.info;
+		if (!info) return;
+
+		const cloneContainer = info.container.cloneNode(true);
+		dom.utils.removeClass(cloneContainer, 'se-component-selected');
+
 		SetClipboardComponent(e, cloneContainer, e.clipboardData);
+		this.deselect();
+		dom.utils.removeItem(info.container);
 	}
 
-	// copy effect
-	dom.utils.flashClass(info.container, 'se-copy');
-}
+	/**
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	async #OnKeyDown_component(e) {
+		if (this.editor.selectMenuOn) return;
 
-/**
- * @this {ComponentThis}
- * @param {ClipboardEvent} e - Event object
- */
-function OnCut_component(e) {
-	const info = this.info;
-	if (!info) return;
+		const keyCode = e.code;
+		const ctrl = keyCodeMap.isCtrl(e);
 
-	const cloneContainer = info.container.cloneNode(true);
-	dom.utils.removeClass(cloneContainer, 'se-component-selected');
+		// redo, undo
+		if (ctrl) {
+			if (keyCode !== 'ControlRight' && keyCode !== 'ControlLeft') {
+				const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? '1000' : ''));
+				if (/^(redo|undo)$/.test(info?.command)) {
+					e.preventDefault();
+					e.stopPropagation();
+					this.editor.run(info.command, info.type, info.button);
+				}
+			}
+			return;
+		}
 
-	SetClipboardComponent(e, cloneContainer, e.clipboardData);
-	this.deselect();
-	dom.utils.removeItem(info.container);
-}
+		// backspace key, delete key
+		if (keyCodeMap.isRemoveKey(keyCode)) {
+			e.preventDefault();
+			e.stopPropagation();
 
-/**
- * @this {ComponentThis}
- * @param {KeyboardEvent} e - Event object
- */
-async function OnKeyDown_component(e) {
-	if (this.editor.selectMenuOn) return;
-
-	const keyCode = e.code;
-	const ctrl = keyCodeMap.isCtrl(e);
-
-	// redo, undo
-	if (ctrl) {
-		if (keyCode !== 'ControlRight' && keyCode !== 'ControlLeft') {
-			const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? '1000' : ''));
-			if (/^(redo|undo)$/.test(info?.command)) {
-				e.preventDefault();
-				e.stopPropagation();
-				this.editor.run(info.command, info.type, info.button);
+			if (typeof this.currentPlugin?.componentDestroy === 'function' && (!this.info.isInputType || !this.status.hasFocus)) {
+				const focusNode = this.info.container.previousSibling;
+				await this.currentPlugin.componentDestroy(this.currentTarget);
+				this.deselect();
+				if (focusNode) {
+					const offset = focusNode.nodeType === 3 ? focusNode.textContent.length : 1;
+					this.#selection.setRange(focusNode, offset, focusNode, offset);
+				} else {
+					this.editor.focus();
+				}
+				return;
 			}
 		}
-		return;
-	}
 
-	// backspace key, delete key
-	if (keyCodeMap.isRemoveKey(keyCode)) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		if (typeof this.currentPlugin?.componentDestroy === 'function' && (!this.info.isInputType || !this.status.hasFocus)) {
-			const focusNode = this.info.container.previousSibling;
-			await this.currentPlugin.componentDestroy(this.currentTarget);
-			this.deselect();
-			if (focusNode) {
-				const offset = focusNode.nodeType === 3 ? focusNode.textContent.length : 1;
-				this.selection.setRange(focusNode, offset, focusNode, offset);
+		// enter key
+		if (keyCodeMap.isEnter(keyCode)) {
+			e.preventDefault();
+			const compContext = this.currentInfo || this.get(this.currentTarget);
+			const container = compContext.container || compContext.target;
+			const sibling = container.previousElementSibling || container.nextElementSibling;
+			let newEl = null;
+			if (dom.check.isListCell(container.parentNode)) {
+				newEl = dom.utils.createElement('BR');
 			} else {
-				this.editor.focus();
+				newEl = dom.utils.createElement(this.#format.isLine(sibling) ? sibling.nodeName : this.options.get('defaultLine'), null, '<br>');
 			}
+
+			const pluginName = this.currentPluginName;
+			this.deselect();
+			container.parentNode.insertBefore(newEl, container);
+			if (this.select(compContext.target, pluginName) === false) this.editor.blur();
+			this.history.push(false);
+
+			return;
+		}
+
+		// up down, left right
+		DIR_KEYCODE.lastIndex = 0;
+		if (DIR_KEYCODE.test(keyCode)) {
+			const { container } = this.get(this.currentTarget);
+			const isInline = this.isInline(container || this.currentTarget);
+
+			let el = null;
+			let offset = 1;
+			if (isInline) {
+				switch (keyCode) {
+					case 'ArrowLeft': // left
+						el = container.previousSibling;
+						offset = el?.nodeType === 3 ? el.textContent.length : 1;
+						break;
+					case 'ArrowRight': // right
+						el = container.nextSibling;
+						offset = 0;
+						break;
+					case 'ArrowUp': {
+						// up
+						const line = this.#format.getLine(container, null);
+						el = line?.previousElementSibling;
+						offset = 0;
+						break;
+					}
+					case 'ArrowDown': {
+						// down
+						const line = this.#format.getLine(container, null);
+						el = line?.nextElementSibling;
+						break;
+					}
+				}
+			} else {
+				DIR_UP_KEYCODE.lastIndex = 0;
+				if (DIR_UP_KEYCODE.test(keyCode)) {
+					el = container.previousElementSibling;
+				} else {
+					el = container.nextElementSibling;
+					offset = 0;
+				}
+			}
+
+			if (!el) return;
+
+			this.deselect();
+
+			const elComp = this.get(el);
+			if (elComp?.container) {
+				e.stopPropagation();
+				e.preventDefault();
+				this.select(elComp.target, elComp.pluginName);
+			} else {
+				try {
+					this.editor._preventBlur = true;
+					e.stopPropagation();
+					e.preventDefault();
+					this.#selection.setRange(el, offset, el, offset);
+				} finally {
+					this.editor._preventBlur = false;
+				}
+			}
+
+			return;
+		}
+
+		// ESC
+		if (keyCodeMap.isEsc(keyCode)) {
+			this.deselect();
 			return;
 		}
 	}
 
-	// enter key
-	if (keyCodeMap.isEnter(keyCode)) {
-		e.preventDefault();
-		const compContext = this.currentInfo || this.get(this.currentTarget);
-		const container = compContext.container || compContext.target;
-		const sibling = container.previousElementSibling || container.nextElementSibling;
-		let newEl = null;
-		if (dom.check.isListCell(container.parentNode)) {
-			newEl = dom.utils.createElement('BR');
-		} else {
-			newEl = dom.utils.createElement(this.format.isLine(sibling) ? sibling.nodeName : this.options.get('defaultLine'), null, '<br>');
-		}
-
-		const pluginName = this.currentPluginName;
-		this.deselect();
-		container.parentNode.insertBefore(newEl, container);
-		if (this.select(compContext.target, pluginName) === false) this.editor.blur();
-		this.history.push(false);
-
-		return;
-	}
-
-	// up down, left right
-	DIR_KEYCODE.lastIndex = 0;
-	if (DIR_KEYCODE.test(keyCode)) {
-		const { container } = this.get(this.currentTarget);
-		const isInline = this.isInline(container || this.currentTarget);
-
-		let el = null;
-		let offset = 1;
-		if (isInline) {
-			switch (keyCode) {
-				case 'ArrowLeft': // left
-					el = container.previousSibling;
-					offset = el?.nodeType === 3 ? el.textContent.length : 1;
-					break;
-				case 'ArrowRight': // right
-					el = container.nextSibling;
-					offset = 0;
-					break;
-				case 'ArrowUp': {
-					// up
-					const line = this.format.getLine(container, null);
-					el = line?.previousElementSibling;
-					offset = 0;
-					break;
-				}
-				case 'ArrowDown': {
-					// down
-					const line = this.format.getLine(container, null);
-					el = line?.nextElementSibling;
-					break;
-				}
-			}
-		} else {
-			DIR_UP_KEYCODE.lastIndex = 0;
-			if (DIR_UP_KEYCODE.test(keyCode)) {
-				el = container.previousElementSibling;
-			} else {
-				el = container.nextElementSibling;
-				offset = 0;
-			}
-		}
-
-		if (!el) return;
-
-		this.deselect();
-
-		const elComp = this.get(el);
-		if (elComp?.container) {
-			e.stopPropagation();
-			e.preventDefault();
-			this.select(elComp.target, elComp.pluginName);
-		} else {
-			try {
-				this.editor._preventBlur = true;
-				e.stopPropagation();
-				e.preventDefault();
-				this.selection.setRange(el, offset, el, offset);
-			} finally {
-				this.editor._preventBlur = false;
-			}
-		}
-
-		return;
-	}
-
-	// ESC
-	if (keyCodeMap.isEsc(keyCode)) {
-		this.deselect();
-		return;
+	/**
+	 * @internal
+	 * @description Destroy the Component instance and release memory
+	 */
+	_destroy() {
+		this.__removeGlobalEvent();
+		this.__removeDragEvent();
 	}
 }
 

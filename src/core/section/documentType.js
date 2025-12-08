@@ -2,6 +2,7 @@
  * @fileoverview DocumentType class
  */
 
+import CoreInjector from '../../editorInjector/_core';
 import { dom, numbers, converter, env } from '../../helper';
 
 const { _w } = env;
@@ -13,73 +14,109 @@ const A4_HEIGHT_MM = 297;
 const A4_PAGE_HEIGHT = Math.floor(A4_HEIGHT_MM * MM_TO_POINTS * POINTS_TO_PIXELS);
 
 /**
- * @constructor
  * @description DocumentType, page, header management class
- * @param {SunEditor.Core} editor - The root editor instance
- * @param {SunEditor.FrameContext} fc - frame context object
  */
-function DocumentType(editor, fc) {
-	// core members
-	this.editor = editor;
-	this.status = editor.status;
-	this.context = editor.context;
-	this.selection = editor.selection;
-	this.offset = editor.offset;
+class DocumentType extends CoreInjector {
+	#fc;
+	#ww;
+	#wwFrame;
+	#wwWidth;
+	#wwHeight;
+	#innerHeaders;
+	#wwHeaders;
+	#documentTypeInner;
+	#inner;
+	#page;
+	#totalPages;
+	#pageNum;
+	#pageHeight;
+	#pageBreaksCnt;
+	#pages;
+	#pagesLine;
+	#prevScrollTop;
+	useHeader;
+	usePage;
+	#pageNavigator;
+	#mirror;
+	#mirrorCache;
+	#positionCache;
+	#rePageTimeout;
+	#paddingTop;
+	#paddingBottom;
+	/**
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 * @param {SunEditor.FrameContext} fc - frame context object
+	 */
+	constructor(editor, fc) {
+		super(editor);
 
-	// members
-	this.fc = fc;
-	this.ww = fc.get('wysiwyg');
-	this.wwFrame = fc.get('wysiwygFrame');
-	this.wwWidth = -1;
-	this.wwHeight = -1;
-	this.innerHeaders = [];
-	this._wwHeaders = [];
-	this.documentTypeInner = fc.get('documentTypeInner');
-	this.inner = null;
-	this.page = null;
-	this.totalPages = 0;
-	this.pageNum = 0;
-	this.pageHeight = -1;
-	this.pageBreaksCnt = 0;
-	this.pages = [];
-	this.pages_line = [];
-	this.prevScrollTop = 0;
-	this.useHeader = editor.options.get('_type_options').includes('header');
-	this.usePage = editor.options.get('_type_options').includes('page');
-	this.navigatorButtons = [];
-	this.pageNavigator = null;
-	this._mirror = fc.get('documentTypePageMirror');
-	this._mirrorCache = 0;
-	this._positionCache = new Map();
-	this._rePageTimeout = null;
+		// members
+		this.useHeader = this.options.get('_type_options').includes('header');
+		this.usePage = this.options.get('_type_options').includes('page');
 
-	const mirrorStyles = _w.getComputedStyle(this._mirror);
-	this._paddingTop = numbers.get(mirrorStyles.paddingTop);
-	this._paddingBottom = numbers.get(mirrorStyles.paddingBottom);
+		this.#fc = fc;
+		this.#ww = fc.get('wysiwyg');
+		this.#wwFrame = fc.get('wysiwygFrame');
+		this.#wwWidth = -1;
+		this.#wwHeight = -1;
+		this.#innerHeaders = [];
+		this.#wwHeaders = [];
+		this.#documentTypeInner = fc.get('documentTypeInner');
+		this.#inner = null;
+		this.#page = null;
+		this.#totalPages = 0;
+		this.#pageNum = 0;
+		this.#pageHeight = -1;
+		this.#pageBreaksCnt = 0;
+		this.#pages = [];
+		this.#pagesLine = [];
+		this.#prevScrollTop = 0;
+		this.#pageNavigator = null;
+		this.#mirror = fc.get('documentTypePageMirror');
+		this.#mirrorCache = 0;
+		this.#positionCache = new Map();
+		this.#rePageTimeout = null;
 
-	// init header
-	if (this.useHeader) {
-		const headers = this._getHeaders();
-		const inner = (this.inner = this.documentTypeInner.querySelector('.se-document-lines-inner'));
-		let headerHTML = '';
-		for (let i = 0, len = headers.length, h; i < len; i++) {
-			h = headers[i];
-			headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}" title="${h.textContent}">${h.textContent}</div>`;
+		const mirrorStyles = _w.getComputedStyle(this.#mirror);
+		this.#paddingTop = numbers.get(mirrorStyles.paddingTop);
+		this.#paddingBottom = numbers.get(mirrorStyles.paddingBottom);
+
+		// init header
+		if (this.useHeader) {
+			const headers = this._getHeaders();
+			const inner = (this.#inner = this.#documentTypeInner.querySelector('.se-document-lines-inner'));
+			let headerHTML = '';
+			for (let i = 0, len = headers.length, h; i < len; i++) {
+				h = headers[i];
+				headerHTML += `<div class="se-doc-item se-doc-h${numbers.get(h.nodeName)}" title="${h.textContent}">${h.textContent}</div>`;
+			}
+			inner.innerHTML = headerHTML;
+			this.#innerHeaders = inner.querySelectorAll('div');
+
+			this.eventManager.addEvent(inner, 'click', this.#OnClickHeader.bind(this, this.#ww));
 		}
-		inner.innerHTML = headerHTML;
-		this.innerHeaders = inner.querySelectorAll('div');
 
-		this.editor.eventManager.addEvent(inner, 'click', OnClickHeader.bind(this, this.ww));
+		// init page
+		if (this.usePage) {
+			this.#page = fc.get('documentTypePage');
+			this.#pageNavigator = this.plugins.pageNavigator;
+		}
 	}
 
-	// init page
-	if (this.usePage) {
-		this.page = fc.get('documentTypePage');
-		this.pageNavigator = editor.plugins.pageNavigator;
+	/** @type {SunEditor.Core['offset']} */
+	get #offset() {
+		return this.editor.offset;
 	}
-}
+	/** @type {SunEditor.Core['selection']} */
+	get #selection() {
+		return this.editor.selection;
+	}
+	/** @type {SunEditor.Core['toolbar']} */
+	get #toolbar() {
+		return this.editor.toolbar;
+	}
 
-DocumentType.prototype = {
 	/**
 	 * @description Refresh the document header area
 	 */
@@ -87,8 +124,8 @@ DocumentType.prototype = {
 		if (!this.useHeader) return;
 
 		const headers = this._getHeaders();
-		const inner = this.inner;
-		const innerHeaders = this.innerHeaders;
+		const inner = this.#inner;
+		const innerHeaders = this.#innerHeaders;
 
 		// update or new headers
 		for (let i = 0, len = headers.length, h, hClass, innerH; i < len; i++) {
@@ -116,8 +153,8 @@ DocumentType.prototype = {
 			}
 		}
 
-		this.innerHeaders = inner.querySelectorAll('div');
-	},
+		this.#innerHeaders = inner.querySelectorAll('div');
+	}
 
 	/**
 	 * @description Refresh the document page
@@ -125,19 +162,19 @@ DocumentType.prototype = {
 	 * @returns {Promise<void>}
 	 */
 	async rePage(force) {
-		if (!this.page) return;
-		if (this._rePageTimeout) _w.clearTimeout(this._rePageTimeout);
+		if (!this.#page) return;
+		if (this.#rePageTimeout) _w.clearTimeout(this.#rePageTimeout);
 
-		this._rePageTimeout = _w.setTimeout(async () => {
-			await dom.utils.waitForMediaLoad(this._mirror, 1500);
+		this.#rePageTimeout = _w.setTimeout(async () => {
+			await dom.utils.waitForMediaLoad(this.#mirror, 1500);
 
-			const heightGap = this.ww.scrollHeight > this._mirror.scrollHeight ? this.ww.scrollHeight - this._mirror.scrollHeight : 0;
-			const mirrorHeight = this._mirror.scrollHeight + heightGap;
-			const pageBreaks = this.ww.querySelectorAll('.se-page-break');
-			if (!force && this.pageHeight === mirrorHeight && this.pageBreaksCnt === pageBreaks.length) return;
+			const heightGap = this.#ww.scrollHeight > this.#mirror.scrollHeight ? this.#ww.scrollHeight - this.#mirror.scrollHeight : 0;
+			const mirrorHeight = this.#mirror.scrollHeight + heightGap;
+			const pageBreaks = this.#ww.querySelectorAll('.se-page-break');
+			if (!force && this.#pageHeight === mirrorHeight && this.#pageBreaksCnt === pageBreaks.length) return;
 
-			this.pageHeight = mirrorHeight;
-			this.pageBreaksCnt = pageBreaks.length;
+			this.#pageHeight = mirrorHeight;
+			this.#pageBreaksCnt = pageBreaks.length;
 
 			// page break
 			let pageBreakHeight = 0;
@@ -156,24 +193,24 @@ DocumentType.prototype = {
 				if (lastSectionHeight > 0 && lastSectionHeight % A4_PAGE_HEIGHT !== 0) additionalPages++;
 			}
 
-			const scrollTop = !this.status.isScrollable(this.fc) ? 0 : this._getWWScrollTop();
+			const scrollTop = !this.status.isScrollable(this.#fc) ? 0 : this._getWWScrollTop();
 			const totalPages = Math.ceil(mirrorHeight / A4_PAGE_HEIGHT) + additionalPages;
-			const wwWidth = this.wwFrame.offsetWidth + 1;
+			const wwWidth = this.#wwFrame.offsetWidth + 1;
 			const pages = [];
 
 			for (let i = 0; i < pageBreaks.length; i++) {
 				pages.push({ number: i, top: pageBreaks[i].offsetTop + pageBreakHeight / 2 - scrollTop });
 			}
 
-			this._mirrorCache = 0;
-			const chr = this.ww.children;
-			const mChr = this._mirror.children;
+			this.#mirrorCache = 0;
+			const chr = this.#ww.children;
+			const mChr = this.#mirror.children;
 			this._initializeCache(mChr);
 
 			pages.push({ number: 0, top: 0 });
 
 			for (let i = 1, t = 0; i < totalPages; i++) {
-				t += A4_PAGE_HEIGHT + (i === 1 ? this._paddingTop + this._paddingBottom : this._paddingTop);
+				t += A4_PAGE_HEIGHT + (i === 1 ? this.#paddingTop + this.#paddingBottom : this.#paddingTop);
 				if (!pages.some((p) => Math.abs(p.top - t) < 3)) {
 					const top = this._calcPageBreakTop(t, chr, mChr);
 					if (top === null) break;
@@ -182,16 +219,16 @@ DocumentType.prototype = {
 			}
 
 			if (pages.length === 0) {
-				this.pages_line = [];
-				this.totalPages = 1;
+				this.#pagesLine = [];
+				this.#totalPages = 1;
 				this._displayCurrentPage();
 				return;
 			}
 
 			// numbering
 			pages.sort((a, b) => a.top - b.top);
-			this.page.innerHTML = '';
-			this.pages = [];
+			this.#page.innerHTML = '';
+			this.#pages = [];
 
 			for (let i = 0, t; i < totalPages; i++) {
 				if (!pages[i]) continue;
@@ -207,19 +244,19 @@ DocumentType.prototype = {
 					`<div class="se-document-page-line" style="width: ${wwWidth}px;"></div>${i + 1}`,
 				);
 
-				this.page.appendChild(pageNumber);
-				this.pages.push(pageNumber);
+				this.#page.appendChild(pageNumber);
+				this.#pages.push(pageNumber);
 			}
 
-			this.pages_line = this.page.querySelectorAll('.se-document-page-line');
-			this.totalPages = this.pages.length;
+			this.#pagesLine = this.#page.querySelectorAll('.se-document-page-line');
+			this.#totalPages = this.#pages.length;
 			this._displayCurrentPage();
 		}, 400);
-	},
+	}
 
 	_getDisplayPage() {
-		return !this.status.isScrollable(this.fc) ? _w : this.fc.get('wysiwyg');
-	},
+		return !this.status.isScrollable(this.#fc) ? _w : this.#fc.get('wysiwyg');
+	}
 
 	/**
 	 * @internal
@@ -241,7 +278,7 @@ DocumentType.prototype = {
 
 		const top = t + offsetDiff + heightDiff / 2;
 		return Math.round(top);
-	},
+	}
 
 	/**
 	 * @internal
@@ -249,20 +286,20 @@ DocumentType.prototype = {
 	 * @param {Array<HTMLElement>} mChr - List of mirrored elements.
 	 */
 	_initializeCache(mChr) {
-		this._positionCache.clear();
+		this.#positionCache.clear();
 		for (let i = 0, len = mChr.length; i < len; i++) {
 			const element = mChr[i];
 			const top = element.offsetTop;
 			const height = element.offsetHeight;
 			const bottom = top + height;
 
-			this._positionCache.set(i, {
+			this.#positionCache.set(i, {
 				top,
 				height,
 				bottom: bottom,
 			});
 		}
-	},
+	}
 
 	/**
 	 * @internal
@@ -275,15 +312,15 @@ DocumentType.prototype = {
 	 * - ch: The height of the closest element.
 	 */
 	_getElementAtPosition(pageTop, mChr) {
-		let start = this._mirrorCache;
+		let start = this.#mirrorCache;
 		let end = mChr.length - 1;
 
 		while (start <= end) {
 			const mid = Math.floor((start + end) / 2);
-			const { top, height, bottom } = this._positionCache.get(mid);
+			const { top, height, bottom } = this.#positionCache.get(mid);
 
 			if (pageTop >= top && pageTop <= bottom) {
-				this._mirrorCache = mid;
+				this.#mirrorCache = mid;
 				return { ci: mid, cm: pageTop - bottom, ch: height };
 			}
 
@@ -295,103 +332,103 @@ DocumentType.prototype = {
 		}
 
 		const closestIndex = mChr[start] ? start : end;
-		this._mirrorCache = closestIndex;
-		const iElement = this._positionCache.get(closestIndex);
+		this.#mirrorCache = closestIndex;
+		const iElement = this.#positionCache.get(closestIndex);
 		return { ci: closestIndex, cm: pageTop - iElement.bottom, ch: iElement.height };
-	},
+	}
 
 	/**
 	 * @description Resizes the document page dynamically.
 	 */
 	resizePage() {
-		const wwWidth = this.wwFrame.offsetWidth + 1;
-		const wwHeight = this.wwFrame.offsetHeight + 1;
+		const wwWidth = this.#wwFrame.offsetWidth + 1;
+		const wwHeight = this.#wwFrame.offsetHeight + 1;
 		let rh = false;
-		if (wwWidth === this.wwWidth && (rh = wwHeight === this.wwHeight)) return;
+		if (wwWidth === this.#wwWidth && (rh = wwHeight === this.#wwHeight)) return;
 
 		if (wwWidth > 800) {
-			dom.utils.removeClass(this.documentTypeInner, 'se-document-responsible');
+			dom.utils.removeClass(this.#documentTypeInner, 'se-document-responsible');
 		} else {
-			dom.utils.addClass(this.documentTypeInner, 'se-document-responsible');
+			dom.utils.addClass(this.#documentTypeInner, 'se-document-responsible');
 		}
 
-		this.wwWidth = wwWidth;
-		this.wwHeight = wwHeight;
-		const pages_line = this.pages_line;
+		this.#wwWidth = wwWidth;
+		this.#wwHeight = wwHeight;
+		const pages_line = this.#pagesLine;
 		for (let i = 0, len = pages_line.length; i < len; i++) {
 			pages_line[i].style.width = `${wwWidth}px`;
 		}
 
 		if (!rh) this.rePage(true);
 		this._displayCurrentPage();
-	},
+	}
 
 	/**
 	 * @description Scrolls the document page.
 	 */
 	scrollPage() {
-		const prevScrollTop = this.prevScrollTop;
+		const prevScrollTop = this.#prevScrollTop;
 		const scrollTop = this._getWWScrollTop();
 		if (prevScrollTop === scrollTop) return;
 
-		const pages = this.pages;
+		const pages = this.#pages;
 		for (let i = 0, len = pages.length; i < len; i++) {
 			pages[i].style.top = `${numbers.get(pages[i].style.top) - (scrollTop - prevScrollTop)}px`;
 		}
 
-		this.prevScrollTop = scrollTop;
+		this.#prevScrollTop = scrollTop;
 		this._displayCurrentPage();
-	},
+	}
 
 	/**
 	 * @description Scrolls the window to a specific position.
 	 */
 	scrollWindow() {
-		if (this.status.isScrollable(this.fc)) return;
+		if (this.status.isScrollable(this.#fc)) return;
 		this._displayCurrentPage();
-	},
+	}
 
 	/**
 	 * @description Retrieves the current page number.
 	 * @returns {number} The current page number.
 	 */
 	getCurrentPageNumber() {
-		if (this.totalPages <= 1) return 1;
+		if (this.#totalPages <= 1) return 1;
 
 		let targetPosition = 0;
-		if (!this.status.isScrollable(this.fc)) {
+		if (!this.status.isScrollable(this.#fc)) {
 			const globalTop = this._getGlobalTop();
 			targetPosition = _w.scrollY - globalTop + A4_PAGE_HEIGHT / 2;
 			if (targetPosition <= 0) return 1;
 		} else {
-			targetPosition = this.wwHeight / 2;
+			targetPosition = this.#wwHeight / 2;
 		}
 
-		const pages = this.pages;
+		const pages = this.#pages;
 		for (let i = 0, len = pages.length; i < len; i++) {
 			if (pages[i].offsetTop >= targetPosition) {
-				return (this.pageNum = i);
+				return (this.#pageNum = i);
 			}
 		}
 
-		return (this.pageNum = this.totalPages);
-	},
+		return (this.#pageNum = this.#totalPages);
+	}
 
 	/**
 	 * @description Moves to the previous page.
 	 */
 	pageUp() {
-		const pageNum = this.pageNum - 1 <= 1 ? 1 : this.pageNum - 1;
+		const pageNum = this.#pageNum - 1 <= 1 ? 1 : this.#pageNum - 1;
 		this._movePage(pageNum, false);
-	},
+	}
 
 	/**
 	 * @description Moves to the next page.
 	 */
 	pageDown() {
-		const pageNum = this.pageNum + 1 > this.pages.length ? this.pages.length : this.pageNum + 1;
+		const pageNum = this.#pageNum + 1 > this.#pages.length ? this.#pages.length : this.#pageNum + 1;
 		this._movePage(pageNum, false);
-	},
+	}
 
 	/**
 	 * @description Moves to a specific page.
@@ -399,10 +436,10 @@ DocumentType.prototype = {
 	 */
 	pageGo(pageNum) {
 		if (pageNum < 1) pageNum = 1;
-		else if (pageNum > this.pages.length) pageNum = this.pages.length;
+		else if (pageNum > this.#pages.length) pageNum = this.#pages.length;
 
 		this._movePage(pageNum, true);
-	},
+	}
 
 	/**
 	 * @description Highlights the header of the current line.
@@ -417,9 +454,9 @@ DocumentType.prototype = {
 		const item = this._findItem(line);
 		if (!item) return;
 
-		dom.utils.removeClass(this.innerHeaders, 'active');
+		dom.utils.removeClass(this.#innerHeaders, 'active');
 		dom.utils.addClass(item, 'active');
-	},
+	}
 
 	/**
 	 * @description Handles text changes in the document.
@@ -431,7 +468,7 @@ DocumentType.prototype = {
 		const item = this._findItem(header);
 		if (!item) return;
 		item.textContent = header.textContent;
-	},
+	}
 
 	/**
 	 * @internal
@@ -439,8 +476,8 @@ DocumentType.prototype = {
 	 */
 	_displayCurrentPage() {
 		const pageNum = this.getCurrentPageNumber();
-		this.pageNavigator?.display(pageNum, this.totalPages);
-	},
+		this.#pageNavigator?.display(pageNum, this.#totalPages);
+	}
 
 	/**
 	 * @internal
@@ -450,7 +487,7 @@ DocumentType.prototype = {
 	_getWWScrollTop() {
 		const displayPage = this._getDisplayPage();
 		return displayPage.scrollTop || displayPage.scrollY || 0;
-	},
+	}
 
 	/**
 	 * @internal
@@ -459,25 +496,25 @@ DocumentType.prototype = {
 	 */
 	_movePage(pageNum, force) {
 		const globalTop = this._getGlobalTop();
-		const isScrollable = this.status.isScrollable(this.fc);
-		const children = converter.nodeListToArray(this.ww.children);
-		const pageTop = this.page.offsetTop + numbers.get(this.pages[pageNum - 1].style.top) + (!isScrollable ? 0 : this._getWWScrollTop());
+		const isScrollable = this.status.isScrollable(this.#fc);
+		const children = converter.nodeListToArray(this.#ww.children);
+		const pageTop = this.#page.offsetTop + numbers.get(this.#pages[pageNum - 1].style.top) + (!isScrollable ? 0 : this._getWWScrollTop());
 		for (let i = 0, len = children.length, c; i < len; i++) {
 			c = children[i];
 			if (c.offsetTop >= pageTop) {
-				if (!force) this.selection.setRange(c, 0, c, 0);
-				const scrollTop = i === 0 && isScrollable ? 0 : c.offsetTop - this.page.offsetTop - c.offsetHeight + globalTop;
+				if (!force) this.#selection.setRange(c, 0, c, 0);
+				const scrollTop = i === 0 && isScrollable ? 0 : c.offsetTop - this.#page.offsetTop - c.offsetHeight + globalTop;
 				this._applyPageScroll(scrollTop, () => {
-					if (this.editor.toolbar.isSticky) {
+					if (this.#toolbar.isSticky) {
 						this._getDisplayPage().scrollTo({ top: scrollTop - this.context.get('toolbar_main').offsetHeight, behavior: 'smooth' });
 					}
 				});
 
-				this.pageNum = pageNum;
+				this.#pageNum = pageNum;
 				break;
 			}
 		}
-	},
+	}
 
 	/**
 	 * @internal
@@ -496,7 +533,7 @@ DocumentType.prototype = {
 		};
 
 		_w.requestAnimationFrame(checkScrollEnd);
-	},
+	}
 
 	/**
 	 * @internal
@@ -504,8 +541,8 @@ DocumentType.prototype = {
 	 * @returns {number} The top offset of the element.
 	 */
 	_getGlobalTop() {
-		return !this.status.isScrollable(this.fc) ? this.offset.getGlobal(this.wwFrame).top : 0;
-	},
+		return !this.status.isScrollable(this.#fc) ? this.#offset.getGlobal(this.#wwFrame).top : 0;
+	}
 
 	/**
 	 * @internal
@@ -514,15 +551,15 @@ DocumentType.prototype = {
 	 * @returns {HTMLElement|null} The found element, or null if not found.
 	 */
 	_findItem(header) {
-		const headers = this._wwHeaders;
+		const headers = this.#wwHeaders;
 		const index = Array.prototype.indexOf.call(headers, header);
 
-		if (index !== -1 && this.innerHeaders[index]) {
-			return this.innerHeaders[index];
+		if (index !== -1 && this.#innerHeaders[index]) {
+			return this.#innerHeaders[index];
 		}
 
 		return null;
-	},
+	}
 
 	/**
 	 * @internal
@@ -531,7 +568,7 @@ DocumentType.prototype = {
 	 * @returns {Node|null} The closest header element, or null if not found.
 	 */
 	_findLinesHeader(line) {
-		while (line && line !== this.ww) {
+		while (line && line !== this.#ww) {
 			if (this._is(line)) {
 				return line;
 			}
@@ -539,7 +576,7 @@ DocumentType.prototype = {
 		}
 
 		return null;
-	},
+	}
 
 	/**
 	 * @internal
@@ -549,7 +586,7 @@ DocumentType.prototype = {
 	 */
 	_is(element) {
 		return /^h[1-6]$/i.test(element?.nodeName);
-	},
+	}
 
 	/**
 	 * @internal
@@ -557,68 +594,60 @@ DocumentType.prototype = {
 	 * @returns {Array<HTMLElement>} An array of header elements.
 	 */
 	_getHeaders() {
-		return (this._wwHeaders = this.ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));
-	},
+		return (this.#wwHeaders = this.#ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+	}
+
+	/**
+	 * @param {HTMLElement} ww WYSIWYG element
+	 * @param {Event} e Event object
+	 */
+	#OnClickHeader(ww, e) {
+		e.preventDefault();
+
+		try {
+			this.editor._preventBlur = true;
+			const clickedHeader = dom.query.getEventTarget(e);
+			if (dom.utils.hasClass(clickedHeader, 'se-doc-item')) {
+				const innerIndex = Array.prototype.indexOf.call(this.#innerHeaders, clickedHeader);
+				if (innerIndex === -1) return;
+
+				const header = this.#wwHeaders[innerIndex];
+				if (header) {
+					this.#selection.scrollTo(header);
+				}
+			}
+		} finally {
+			this.editor._preventBlur = false;
+		}
+	}
 
 	/**
 	 * @internal
 	 * @description Destroy the DocumentType instance and release memory
 	 */
 	_destroy() {
-		if (this._rePageTimeout) {
-			_w.clearTimeout(this._rePageTimeout);
-			this._rePageTimeout = null;
+		if (this.#rePageTimeout) {
+			_w.clearTimeout(this.#rePageTimeout);
+			this.#rePageTimeout = null;
 		}
 
-		if (this._positionCache) {
-			this._positionCache.clear();
-			this._positionCache = null;
+		if (this.#positionCache) {
+			this.#positionCache.clear();
+			this.#positionCache = null;
 		}
 
-		this.editor = null;
-		this.status = null;
-		this.context = null;
-		this.selection = null;
-		this.offset = null;
-		this.fc = null;
-		this.ww = null;
-		this.wwFrame = null;
-		this.documentTypeInner = null;
-		this.inner = null;
-		this.page = null;
-		this.pages = null;
-		this.pages_line = null;
-		this.innerHeaders = null;
-		this._wwHeaders = null;
-		this.navigatorButtons = null;
-		this.pageNavigator = null;
-		this._mirror = null;
-	},
-
-	constructor: DocumentType,
-};
-
-/**
- * @param {HTMLElement} ww WYSIWYG element
- * @param {Event} e Event object
- */
-function OnClickHeader(ww, e) {
-	e.preventDefault();
-
-	try {
-		this.editor._preventBlur = true;
-		const clickedHeader = dom.query.getEventTarget(e);
-		if (dom.utils.hasClass(clickedHeader, 'se-doc-item')) {
-			const innerIndex = Array.prototype.indexOf.call(this.innerHeaders, clickedHeader);
-			if (innerIndex === -1) return;
-
-			const header = this._wwHeaders[innerIndex];
-			if (header) {
-				this.selection.scrollTo(header);
-			}
-		}
-	} finally {
-		this.editor._preventBlur = false;
+		this.#fc = null;
+		this.#ww = null;
+		this.#wwFrame = null;
+		this.#documentTypeInner = null;
+		this.#inner = null;
+		this.#page = null;
+		this.#pages = null;
+		this.#pagesLine = null;
+		this.#innerHeaders = null;
+		this.#wwHeaders = null;
+		this.#pageNavigator = null;
+		this.#mirror = null;
 	}
 }
 

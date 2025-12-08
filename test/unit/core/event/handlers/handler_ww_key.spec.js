@@ -30,7 +30,7 @@ describe('Key Handler', () => {
 					endOffset: 0,
 					collapsed: true
 				})),
-				_resetRangeToTextNode: jest.fn(),
+				resetRangeToTextNode: jest.fn(),
 				setRange: jest.fn(),
 				selectionNode: document.createTextNode('text')
 			},

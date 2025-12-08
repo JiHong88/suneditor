@@ -6,50 +6,54 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, numbers } from '../../helper';
 
 /**
- * @typedef {Omit<Format & Partial<SunEditor.Injector_Core>, 'format'>} FormatThis
- */
-
-/**
- * @constructor
- * @this {FormatThis}
  * @description Classes related to editor formats such as "line" and "block".
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function Format(editor) {
-	CoreInjector.call(this, editor);
-
-	// members
-	this._formatLineCheck = this.options.get('formatLine').reg;
-	this._formatBrLineCheck = this.options.get('formatBrLine').reg;
-	this._formatBlockCheck = this.options.get('formatBlock').reg;
-	this._formatClosureBlockCheck = this.options.get('formatClosureBlock').reg;
-	this._formatClosureBrLineCheck = this.options.get('formatClosureBrLine').reg;
-	this._textStyleTagsCheck = new RegExp('^(' + this.options.get('textStyleTags') + ')$', 'i');
-
-	this._brLineBreak = null;
-	this.__resetBrLineBreak(this.options.get('defaultLineBreakFormat'));
-}
-
-Format.prototype = {
-	/** @internal @type {SunEditor.Core['component']} */
-	get component() {
-		return this.editor.component;
-	},
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection() {
-		return this.editor.selection;
-	},
-	/** @internal @type {SunEditor.Core['nodeTransform']} */
-	get nodeTransform() {
-		return this.editor.nodeTransform;
-	},
-	/** @internal @type {SunEditor.Core['listFormat']} */
-	get listFormat() {
-		return this.editor.listFormat;
-	},
+class Format extends CoreInjector {
+	#formatLineCheck;
+	#formatBrLineCheck;
+	#formatBlockCheck;
+	#formatClosureBlockCheck;
+	#formatClosureBrLineCheck;
+	#textStyleTagsCheck;
+	#brLineBreak;
 
 	/**
-	 * @this {FormatThis}
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+
+		// members
+		this.#formatLineCheck = this.options.get('formatLine').reg;
+		this.#formatBrLineCheck = this.options.get('formatBrLine').reg;
+		this.#formatBlockCheck = this.options.get('formatBlock').reg;
+		this.#formatClosureBlockCheck = this.options.get('formatClosureBlock').reg;
+		this.#formatClosureBrLineCheck = this.options.get('formatClosureBrLine').reg;
+		this.#textStyleTagsCheck = new RegExp('^(' + this.options.get('textStyleTags') + ')$', 'i');
+		this.#brLineBreak = null;
+
+		this.__resetBrLineBreak(this.options.get('defaultLineBreakFormat'));
+	}
+
+	/** @type {SunEditor.Core['component']} */
+	get #component() {
+		return this.editor.component;
+	}
+	/** @type {SunEditor.Core['selection']} */
+	get #selection() {
+		return this.editor.selection;
+	}
+	/** @type {SunEditor.Core['nodeTransform']} */
+	get #nodeTransform() {
+		return this.editor.nodeTransform;
+	}
+	/** @type {SunEditor.Core['listFormat']} */
+	get #listFormat() {
+		return this.editor.listFormat;
+	}
+
+	/**
 	 * @description Replace the line tag of the current selection.
 	 * @param {Node} element Line element (P, DIV..)
 	 */
@@ -58,7 +62,7 @@ Format.prototype = {
 			throw new Error('[SUNEDITOR.format.setLine.fail] The "element" must satisfy "format.isLine()".');
 		}
 
-		const info = this._lineWork();
+		const info = this.#lineWork();
 		const lines = info.lines;
 		const className = element.className;
 		const value = element.nodeName;
@@ -68,7 +72,7 @@ Format.prototype = {
 		for (let i = 0, len = lines.length, node, newFormat; i < len; i++) {
 			node = lines[i];
 
-			if ((node.nodeName !== value || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.component.is(node)) {
+			if ((node.nodeName !== value || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.#component.is(node)) {
 				newFormat = /** @type {HTMLElement} */ (element.cloneNode(false));
 				dom.utils.copyFormatAttributes(newFormat, node);
 				newFormat.innerHTML = node.innerHTML;
@@ -81,17 +85,16 @@ Format.prototype = {
 			newFormat = null;
 		}
 
-		this.selection.setRange(dom.query.getNodeFromPath(info.firstPath, first), info.startOffset, dom.query.getNodeFromPath(info.lastPath, last), info.endOffset);
+		this.#selection.setRange(dom.query.getNodeFromPath(info.firstPath, first), info.startOffset, dom.query.getNodeFromPath(info.lastPath, last), info.endOffset);
 		this.history.push(false);
 
 		// document type
 		if (this.frameContext.has('documentType_use_header')) {
 			this.frameContext.get('documentType').reHeader();
 		}
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
 	 * @param {Node} node Reference node.
 	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
@@ -122,10 +125,9 @@ Format.prototype = {
 		}
 
 		return null;
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description Replace the br-line tag of the current selection.
 	 * @param {Node} element BR-Line element (PRE..)
 	 */
@@ -134,7 +136,7 @@ Format.prototype = {
 			throw new Error('[SUNEDITOR.format.setBrLine.fail] The "element" must satisfy "format.isBrLine()".');
 		}
 
-		const lines = this._lineWork().lines;
+		const lines = this.#lineWork().lines;
 		const len = lines.length - 1;
 		let parentNode = lines[len].parentNode;
 		let freeElement = /** @type {HTMLElement} */ (element.cloneNode(false));
@@ -144,7 +146,7 @@ Format.prototype = {
 			f = lines[i];
 			if (f === (!lines[i + 1] ? null : lines[i + 1].parentNode)) continue;
 
-			isComp = this.component.is(f);
+			isComp = this.#component.is(f);
 			html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
 			before = dom.query.getParentElement(f, (current) => current.parentNode === parentNode);
 
@@ -189,12 +191,11 @@ Format.prototype = {
 			if (html) first = false;
 		}
 
-		this.selection.setRange(focusElement, 0, focusElement, 0);
+		this.#selection.setRange(focusElement, 0, focusElement, 0);
 		this.history.push(false);
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a "brLine" (format.isBrLine), it returns that node.
 	 * @param {Node} element Reference node.
 	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
@@ -213,10 +214,9 @@ Format.prototype = {
 		}
 
 		return null;
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description Append "line" element to sibling node of argument element.
 	 * - If the "lineNode" argument value is present, the tag of that argument value is inserted,
 	 * - If not, the currently selected format tag is inserted.
@@ -227,9 +227,9 @@ Format.prototype = {
 	addLine(element, lineNode) {
 		if (!element || !element.parentNode) return null;
 
-		const currentFormatEl = this.getLine(this.selection.getNode(), null);
+		const currentFormatEl = this.getLine(this.#selection.getNode(), null);
 		let oFormat = null;
-		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode) && !this.component.is(element)) {
+		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode) && !this.#component.is(element)) {
 			oFormat = dom.utils.createElement('BR');
 		} else {
 			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isNormalLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLine');
@@ -243,10 +243,9 @@ Format.prototype = {
 		else element.parentNode.insertBefore(oFormat, /** @type {HTMLElement} */ (element).nextElementSibling);
 
 		return oFormat;
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description If a parent node that contains an argument node finds a format node (format.isBlock), it returns that node.
 	 * @param {Node} element Reference node.
 	 * @param {?(current: Node) => boolean} [validation] Additional validation function.
@@ -264,10 +263,9 @@ Format.prototype = {
 		}
 
 		return null;
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description Appended all selected "line" element to the argument element("block") and insert
 	 * @param {Node} blockElement Element of wrap the arguments (BLOCKQUOTE...)
 	 * @example
@@ -276,7 +274,7 @@ Format.prototype = {
 	 * editor.format.applyBlock(blockquote);
 	 */
 	applyBlock(blockElement) {
-		this.selection.getRangeAndAddLine(this.selection.getRange(), null);
+		this.#selection.getRangeAndAddLine(this.#selection.getRange(), null);
 		const rangeLines = /** @type {Element[]} */ (this.getLinesAndComponents(false));
 		if (!rangeLines || rangeLines.length === 0) return;
 
@@ -334,7 +332,7 @@ Format.prototype = {
 			let cc = null;
 			if (parent !== origin && !dom.check.isTableElements(origin)) {
 				if (origin && dom.query.getNodeDepth(parent) === dom.query.getNodeDepth(origin)) return before;
-				cc = this.nodeTransform.removeAllParents(origin, null, parent);
+				cc = this.#nodeTransform.removeAllParents(origin, null, parent);
 			}
 
 			return cc ? cc.ec : before;
@@ -419,13 +417,13 @@ Format.prototype = {
 		}
 
 		this.editor.effectNode = null;
-		this.nodeTransform.mergeSameTags(block, null, false);
-		this.nodeTransform.mergeNestedTags(block, (current) => dom.check.isList(current));
+		this.#nodeTransform.mergeSameTags(block, null, false);
+		this.#nodeTransform.mergeNestedTags(block, (current) => dom.check.isList(current));
 
 		// Nested list
 		if (beforeTag && dom.query.getNodeDepth(beforeTag) > 0 && (dom.check.isList(beforeTag.parentNode) || dom.check.isList(beforeTag.parentNode.parentNode))) {
 			const depthFormat = dom.query.getParentElement(beforeTag, (current) => this.isBlock(current) && !dom.check.isList(current));
-			const splitRange = this.nodeTransform.split(beforeTag, null, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
+			const splitRange = this.#nodeTransform.split(beforeTag, null, !depthFormat ? 0 : dom.query.getNodeDepth(depthFormat) + 1);
 			splitRange.parentNode.insertBefore(block, splitRange);
 		} else {
 			// basic
@@ -435,16 +433,15 @@ Format.prototype = {
 
 		const edge = dom.query.getEdgeChildNodes(block.firstElementChild, block.lastElementChild);
 		if (rangeLines.length > 1) {
-			this.selection.setRange(edge.sc, 0, edge.ec, edge.ec.textContent.length);
+			this.#selection.setRange(edge.sc, 0, edge.ec, edge.ec.textContent.length);
 		} else {
-			this.selection.setRange(edge.ec, edge.ec.textContent.length, edge.ec, edge.ec.textContent.length);
+			this.#selection.setRange(edge.ec, edge.ec.textContent.length, edge.ec, edge.ec.textContent.length);
 		}
 
 		this.history.push(false);
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description The elements of the "selectedFormats" array are detached from the "blockElement" element. ("LI" tags are converted to "P" tags)
 	 * - When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling, removeArray: [Array of removed elements]}.
 	 * @param {Node} blockElement "block" element (PRE, BLOCKQUOTE, OL, UL...)
@@ -476,7 +473,7 @@ Format.prototype = {
 	 * editor.format.removeBlock(blockquote, { newBlockElement: newDiv });
 	 */
 	removeBlock(blockElement, { selectedFormats, newBlockElement, shouldDelete, skipHistory } = {}) {
-		const range = this.selection.getRange();
+		const range = this.#selection.getRange();
 		let so = range.startOffset;
 		let eo = range.endOffset;
 
@@ -510,7 +507,7 @@ Format.prototype = {
 
 			while (insChildren[0]) {
 				c = insChildren[0];
-				if (this._notTextNode(c) && !dom.check.isBreak(c) && !dom.check.isListCell(format)) {
+				if (this._isNotTextNode(c) && !dom.check.isBreak(c) && !dom.check.isListCell(format)) {
 					if (format.childNodes.length > 0) {
 						first ||= format;
 						parentEl.insertBefore(format, sibling);
@@ -534,7 +531,7 @@ Format.prototype = {
 						parentEl.parentNode.insertBefore(format, parentEl.nextElementSibling);
 					} else {
 						const originNext = originNode.nextElementSibling;
-						const detachRange = this.listFormat.removeNested(originNode, false);
+						const detachRange = this.#listFormat.removeNested(originNode, false);
 						if (blockElement !== detachRange || originNext !== originNode.nextElementSibling) {
 							const fChildren = format.childNodes;
 							while (fChildren[0]) {
@@ -583,7 +580,7 @@ Format.prototype = {
 				if (!newList && dom.check.isListCell(insNode)) {
 					if (next && dom.query.getNodeDepth(insNode) !== dom.query.getNodeDepth(next) && (dom.check.isListCell(parent) || dom.utils.arrayFind(insNode.children, dom.check.isList))) {
 						const insNext = insNode.nextElementSibling;
-						const detachRange = this.listFormat.removeNested(insNode, false);
+						const detachRange = this.#listFormat.removeNested(insNode, false);
 						if (blockElement !== detachRange || insNext !== insNode.nextElementSibling) {
 							blockElement = detachRange;
 							reset = true;
@@ -663,7 +660,7 @@ Format.prototype = {
 		if (/** @type {HTMLElement} */ (blockElement).children.length === 0 || blockElement.textContent.length === 0) {
 			dom.utils.removeItem(blockElement);
 		} else {
-			this.nodeTransform.removeEmptyNode(blockElement, null, false);
+			this.#nodeTransform.removeEmptyNode(blockElement, null, false);
 		}
 
 		let edge = null;
@@ -700,22 +697,21 @@ Format.prototype = {
 
 		if (!shouldDelete && edge) {
 			if (!selectedFormats) {
-				this.selection.setRange(edge.sc, 0, edge.sc, 0);
+				this.#selection.setRange(edge.sc, 0, edge.sc, 0);
 			} else {
-				this.selection.setRange(edge.sc, so, edge.ec, eo);
+				this.#selection.setRange(edge.sc, so, edge.ec, eo);
 			}
 		}
 
 		this.history.push(false);
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description Indent more the selected lines.
 	 * - margin size : 'status.indentSize'px
 	 */
 	indent() {
-		const range = this.selection.getRange();
+		const range = this.#selection.getRange();
 		const sc = range.startContainer;
 		const ec = range.endContainer;
 		const so = range.startOffset;
@@ -726,21 +722,20 @@ Format.prototype = {
 
 		// list cells
 		if (cells.length > 0) {
-			this.listFormat.applyNested(cells, false);
+			this.#listFormat.applyNested(cells, false);
 		}
 
 		this.editor.effectNode = null;
-		this.selection.setRange(sc, so, ec, eo);
+		this.#selection.setRange(sc, so, ec, eo);
 		this.history.push(false);
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description Indent less the selected lines.
 	 * - margin size - "status.indentSize"px
 	 */
 	outdent() {
-		const range = this.selection.getRange();
+		const range = this.#selection.getRange();
 		const sc = range.startContainer;
 		const ec = range.endContainer;
 		const so = range.startOffset;
@@ -751,16 +746,15 @@ Format.prototype = {
 
 		// list cells
 		if (cells.length > 0) {
-			this.listFormat.applyNested(cells, true);
+			this.#listFormat.applyNested(cells, true);
 		}
 
 		this.editor.effectNode = null;
-		this.selection.setRange(sc, so, ec, eo);
+		this.#selection.setRange(sc, so, ec, eo);
 		this.history.push(false);
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description Check if the container and offset values are the edges of the "line"
 	 * @param {Node} node The node of the selection object. (range.startContainer..)
 	 * @param {number} offset The offset of the selection object. (selection.getRange().startOffset...)
@@ -782,20 +776,18 @@ Format.prototype = {
 		}
 
 		return result;
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description It is judged whether it is a node related to the text style.
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
 	isTextStyleNode(element) {
-		return typeof element === 'string' ? this._textStyleTagsCheck.test(element) : element?.nodeType === 1 && this._textStyleTagsCheck.test(element.nodeName);
-	},
+		return typeof element === 'string' ? this.#textStyleTagsCheck.test(element) : element?.nodeType === 1 && this.#textStyleTagsCheck.test(element.nodeName);
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description It is judged whether it is the "line" element.
 	 * - (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
 	 * - "line" element also contain "brLine" element
@@ -804,22 +796,20 @@ Format.prototype = {
 	 */
 	isLine(element) {
 		return typeof element === 'string'
-			? this._formatLineCheck.test(element)
-			: element?.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this._nonFormat(element);
-	},
+			? this.#formatLineCheck.test(element)
+			: element?.nodeType === 1 && (this.#formatLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__line_.+|__se__format__br_line_.+')) && !this.#nonFormat(element);
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description It is judged whether it is the only "line" element.
 	 * @param {Node|string} element The node to check
 	 * @returns {element is HTMLElement}
 	 */
 	isNormalLine(element) {
-		return this.isLine(element) && (this._brLineBreak || !this.isBrLine(element)) && !this.isBlock(element);
-	},
+		return this.isLine(element) && (this.#brLineBreak || !this.isBrLine(element)) && !this.isBlock(element);
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description It is judged whether it is the "brLine" element.
 	 * - (PRE | class="__se__format__br_line_xxx")
 	 * - "brLine" elements is included in the "line" element.
@@ -830,15 +820,14 @@ Format.prototype = {
 	 */
 	isBrLine(element) {
 		return (
-			(this._brLineBreak && this.isLine(element)) ||
+			(this.#brLineBreak && this.isLine(element)) ||
 			(typeof element === 'string'
-				? this._formatBrLineCheck.test(element)
-				: element?.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line_.+')) && !this._nonFormat(element))
+				? this.#formatBrLineCheck.test(element)
+				: element?.nodeType === 1 && (this.#formatBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line_.+')) && !this.#nonFormat(element))
 		);
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description It is judged whether it is the "block" element.
 	 * - (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
 	 * - "block" is wrap the "line" and "component"
@@ -847,12 +836,11 @@ Format.prototype = {
 	 */
 	isBlock(element) {
 		return typeof element === 'string'
-			? this._formatBlockCheck.test(element)
-			: element?.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_.+')) && !this._nonFormat(element);
-	},
+			? this.#formatBlockCheck.test(element)
+			: element?.nodeType === 1 && (this.#formatBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_.+')) && !this.#nonFormat(element);
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description It is judged whether it is the "closureBlock" element.
 	 * - (TH, TD | class="__se__format__block_closure_xxx")
 	 * - "closureBlock" elements is included in the "block".
@@ -864,12 +852,11 @@ Format.prototype = {
 	 */
 	isClosureBlock(element) {
 		return typeof element === 'string'
-			? this._formatClosureBlockCheck.test(element)
-			: element?.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_closure_.+')) && !this._nonFormat(element);
-	},
+			? this.#formatClosureBlockCheck.test(element)
+			: element?.nodeType === 1 && (this.#formatClosureBlockCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__block_closure_.+')) && !this.#nonFormat(element);
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description It is judged whether it is the "closureBrLine" element.
 	 * - (class="__se__format__br_line__closure_xxx")
 	 * - "closureBrLine" elements is included in the "brLine".
@@ -881,26 +868,25 @@ Format.prototype = {
 	 */
 	isClosureBrLine(element) {
 		return typeof element === 'string'
-			? this._formatClosureBrLineCheck.test(element)
-			: element?.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line__closure_.+')) && !this._nonFormat(element);
-	},
+			? this.#formatClosureBrLineCheck.test(element)
+			: element?.nodeType === 1 && (this.#formatClosureBrLineCheck.test(element.nodeName) || dom.utils.hasClass(element, '__se__format__br_line__closure_.+')) && !this.#nonFormat(element);
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description Returns a "line" array from selected range.
 	 * @param {?(current: Node) => boolean} [validation] The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array<HTMLElement>}
 	 */
 	getLines(validation) {
-		if (!this.selection._resetRangeToTextNode()) return [];
-		let range = this.selection.getRange();
+		if (!this.#selection.resetRangeToTextNode()) return [];
+		let range = this.#selection.getRange();
 
 		if (dom.check.isWysiwygFrame(range.startContainer)) {
 			const children = this.frameContext.get('wysiwyg').children;
 			if (children.length === 0) return [];
 
-			this.selection.setRange(children[0], 0, children.at(-1), children.at(-1).textContent.trim().length);
-			range = this.selection.getRange();
+			this.#selection.setRange(children[0], 0, children.at(-1), children.at(-1).textContent.trim().length);
+			range = this.#selection.getRange();
 		}
 
 		const startCon = range.startContainer;
@@ -947,22 +933,21 @@ Format.prototype = {
 		if (endIdx === null) endIdx = lineNodes.length - 1;
 
 		return lineNodes.slice(startIdx, endIdx + 1);
-	},
+	}
 
 	/**
-	 * @this {FormatThis}
 	 * @description Get lines and components from the selected range. (P, DIV, H[1-6], OL, UL, TABLE..)
 	 * - If some of the component are included in the selection, get the entire that component.
 	 * @param {boolean} removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
 	 * @returns {Array<HTMLElement>}
 	 */
 	getLinesAndComponents(removeDuplicate) {
-		const commonCon = this.selection.getRange().commonAncestorContainer;
-		const myComponent = dom.query.getParentElement(commonCon, this.component.is.bind(this.component));
+		const commonCon = this.#selection.getRange().commonAncestorContainer;
+		const myComponent = dom.query.getParentElement(commonCon, this.#component.is.bind(this.#component));
 		const selectedLines = dom.check.isTableElements(commonCon)
 			? this.getLines(null)
 			: this.getLines((current) => {
-					const component = dom.query.getParentElement(current, this.component.is.bind(this.component));
+					const component = dom.query.getParentElement(current, this.#component.is.bind(this.#component));
 					return (this.isLine(current) && (!component || component === myComponent)) || (dom.check.isComponentContainer(current) && !this.getLine(current));
 				});
 
@@ -980,56 +965,50 @@ Format.prototype = {
 		}
 
 		return selectedLines;
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {FormatThis}
+	 * @description Nodes without text
+	 * @param {Node|string} element Element to check
+	 * @returns {boolean}
+	 */
+	_isNotTextNode(element) {
+		if (!element) return false;
+		const checkRegExp = /^(br|input|select|canvas|img|iframe|audio|video)$/i;
+		if (typeof element === 'string') return checkRegExp.test(element);
+		return element.nodeType === 1 && (this.#component.is(element) || checkRegExp.test(element.nodeName));
+	}
+
+	/**
+	 * @internal
 	 * @description A function that distinguishes areas where "selection" should not be placed
 	 * @param {Node} element Element
 	 * @returns {boolean}
 	 */
 	_isExcludeSelectionElement(element) {
-		return !/FIGCAPTION/i.test(element.nodeName) && (this.component.is(element) || /FIGURE/i.test(element.nodeName));
-	},
+		return !/FIGCAPTION/i.test(element.nodeName) && (this.#component.is(element) || /FIGURE/i.test(element.nodeName));
+	}
 
 	/**
-	 * @internal
-	 * @this {FormatThis}
 	 * @description A function that distinguishes non-formatting HTML elements or tags from formatting ones.
 	 * @param {Node} element Element
 	 * @returns {boolean}
 	 */
-	_nonFormat(element) {
-		return dom.check.isExcludeFormat(element) || this.component.is(element) || dom.check.isWysiwygFrame(element);
-	},
+	#nonFormat(element) {
+		return dom.check.isExcludeFormat(element) || this.#component.is(element) || dom.check.isWysiwygFrame(element);
+	}
 
 	/**
-	 * @internal
-	 * @this {FormatThis}
-	 * @description Nodes without text
-	 * @param {Node|string} element Element to check
-	 * @returns {boolean}
-	 */
-	_notTextNode(element) {
-		if (!element) return false;
-		const checkRegExp = /^(br|input|select|canvas|img|iframe|audio|video)$/i;
-		if (typeof element === 'string') return checkRegExp.test(element);
-		return element.nodeType === 1 && (this.component.is(element) || checkRegExp.test(element.nodeName));
-	},
-
-	/**
-	 * @internal
-	 * @this {FormatThis}
 	 * @description Get current selected lines and selected node info.
 	 * @returns {{lines: Array<HTMLElement>, firstNode: Node,  lastNode: Node, firstPath: Array<number>, lastPath: Array<number>, startOffset: number, endOffset: number}}
 	 */
-	_lineWork() {
-		let range = this.selection.getRange();
+	#lineWork() {
+		let range = this.#selection.getRange();
 		let selectedFormsts = this.getLinesAndComponents(false);
 
 		if (selectedFormsts.length === 0) {
-			range = this.selection.getRangeAndAddLine(range, null);
+			range = this.#selection.getRangeAndAddLine(range, null);
 			selectedFormsts = this.getLinesAndComponents(false);
 			if (selectedFormsts.length === 0) return;
 		}
@@ -1043,12 +1022,12 @@ Format.prototype = {
 		const lastPath = dom.query.getNodePath(range.endContainer, last, null);
 
 		// remove selected list
-		const rlist = this.listFormat.remove(selectedFormsts, false);
+		const rlist = this.#listFormat.remove(selectedFormsts, false);
 		if (rlist.sc) first = rlist.sc;
 		if (rlist.ec) last = rlist.ec;
 
 		// change format tag
-		this.selection.setRange(dom.query.getNodeFromPath(firstPath, first), startOffset, dom.query.getNodeFromPath(lastPath, last), endOffset);
+		this.#selection.setRange(dom.query.getNodeFromPath(firstPath, first), startOffset, dom.query.getNodeFromPath(lastPath, last), endOffset);
 
 		return {
 			lines: this.getLinesAndComponents(false),
@@ -1059,29 +1038,26 @@ Format.prototype = {
 			startOffset: startOffset,
 			endOffset: endOffset,
 		};
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {FormatThis}
 	 * @description Reset the line break format.
 	 * @param {"line"|"br"} breakFormat options.get('defaultLineBreakFormat')
+	 * @returns {boolean}
 	 */
 	__resetBrLineBreak(breakFormat) {
-		this._brLineBreak = breakFormat === 'br';
-	},
+		return (this.#brLineBreak = breakFormat === 'br');
+	}
 
 	/**
 	 * @internal
-	 * @this {FormatThis}
 	 * @description Destroy the Format instance and release memory
 	 */
 	_destroy() {
 		// No cleanup needed - GC handles internal properties
-	},
-
-	constructor: Format,
-};
+	}
+}
 
 /**
  * @param {Array<HTMLElement>} lines - Line elements

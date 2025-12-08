@@ -3,6 +3,7 @@
  */
 
 import ModalAnchorEditor from '../../../src/modules/utils/ModalAnchorEditor.js';
+import { dom } from '../../../src/helper';
 
 // Mock SelectMenu
 jest.mock('../../../src/modules/utils/SelectMenu.js', () => {
@@ -469,6 +470,221 @@ describe('Modules - ModalAnchorEditor', () => {
             const result = modalAnchor.create(false);
 
             expect(result.hasAttribute('target')).toBe(false);
+        });
+    });
+    describe('File Upload', () => {
+        let modalAnchor;
+
+        beforeEach(() => {
+            const mockModalForm = document.createElement('form');
+            mockModalForm.innerHTML = '<div class="se-anchor-editor"><input type="file" class="se-input-file"></div>';
+            modalAnchor = new ModalAnchorEditor(mockInst, mockModalForm, { enableFileUpload: true, uploadUrl: 'http://upload.com' });
+        });
+
+        it('should handle file selection', async () => {
+            const file = new File(['content'], 'test.pdf', { type: 'application/pdf' });
+            
+            // Get the input element created in constructor
+            const input = modalAnchor.input;
+            // Define files property on input
+            Object.defineProperty(input, 'files', {
+                value: [file],
+                writable: false
+            });
+
+            // Find the change event handler registered via eventManager
+            // eventManager.addEvent(this.input, 'change', handler)
+            // Access eventManager via modalAnchor (inherited from CoreInjector)
+            const addEventSpy = modalAnchor.eventManager.addEvent;
+            
+            expect(addEventSpy).toHaveBeenCalledWith(input, 'change', expect.any(Function));
+
+            const changeHandler = addEventSpy.mock.calls.find(call => call[0] === input && call[1] === 'change')[2];
+
+            // Spy on triggerEvent
+            const triggerSpy = jest.spyOn(mockInst.editor, 'triggerEvent');
+            
+            // Simulate Event
+            const mockEvent = {
+                target: input,
+                currentTarget: input,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            // Call handler
+            await changeHandler(mockEvent);
+
+            expect(triggerSpy).toHaveBeenCalledWith('onFileUploadBefore', expect.objectContaining({
+                info: expect.objectContaining({
+                    files: expect.any(Array)
+                })
+            }));
+        });
+    });
+
+    describe('Bookmark Logic', () => {
+        let modalAnchor;
+
+        beforeEach(() => {
+            const mockModalForm = document.createElement('form');
+            mockModalForm.innerHTML = `
+                <div class="se-anchor-editor">
+                    <input class="se-input-form se-input-url" />
+                    <button class="se-btn se-tooltip se-modal-files-edge-button _se_bookmark_button"></button>
+                    <div class="se-anchor-preview-form">
+                        <span class="se-svg se-anchor-preview-icon _se_anchor_bookmark_icon" style="display:none;"></span>
+                        <span class="se-svg se-anchor-preview-icon _se_anchor_download_icon" style="display:none;"></span>
+                        <pre class="se-link-preview"></pre>
+                    </div>
+                </div>
+            `;
+            
+            // Re-instantiate to attach events
+            modalAnchor = new ModalAnchorEditor(mockInst, mockModalForm, {});
+        });
+
+        it('should toggle bookmark button active state', async () => {
+             // Mock elements
+             const button = modalAnchor.bookmarkButton;
+             const urlInput = modalAnchor.urlInput;
+             
+             // Setup dom helper mock for getListChildren if needed (called inside bookmark logic)
+             // But valid toggle logic calls createBookmarkList
+             dom.query.getListChildren.mockReturnValue([
+                { nodeName: 'H1', textContent: 'Header 1', id: 'h1', style: {} }
+             ]);
+             // Also need check.isAnchor
+             dom.check.isAnchor.mockReturnValue(false);
+
+             // Get handler
+             const addEventSpy = modalAnchor.eventManager.addEvent;
+             const clickHandler = addEventSpy.mock.calls.find(call => call[0] === button && call[1] === 'click')[2];
+             
+             urlInput.value = ''; // Not a bookmark
+             
+             await clickHandler();
+             
+             // Should switch to bookmark mode -> value starts with #
+             expect(urlInput.value).toBe('#');
+             // expect(modalAnchor.bookmarkButton.classList.contains('active')).toBe(true); // Fails because dom.utils.addClass is mocked
+             expect(dom.utils.addClass).toHaveBeenCalledWith(modalAnchor.bookmarkButton, 'active');
+             
+             // Click again -> switch back
+             await clickHandler();
+             expect(urlInput.value).toBe('');
+             // expect(modalAnchor.bookmarkButton.classList.contains('active')).toBe(false);
+             expect(dom.utils.removeClass).toHaveBeenCalledWith(modalAnchor.bookmarkButton, 'active');
+        });
+    });
+
+    describe('Rel Attribute Logic', () => {
+        let modalAnchor;
+
+        beforeEach(() => {
+            const mockModalForm = document.createElement('form');
+            mockModalForm.innerHTML = `
+                <div class="se-anchor-editor">
+                    <button class="se-anchor-rel-btn"></button>
+                    <div class="se-anchor-rel-preview"></div>
+                </div>
+            `;
+            // Need to mock SelectMenu to capture the callback
+            modalAnchor = new ModalAnchorEditor(mockInst, mockModalForm, {
+                relList: ['nofollow', 'noopener', 'noreferrer']
+            });
+        });
+
+        it('should initialize rel list', () => {
+            expect(modalAnchor.relList).toEqual(['nofollow', 'noopener', 'noreferrer']);
+        });
+    });
+
+    describe('Link Preview and Event Handlers', () => {
+        let modalAnchor;
+        let mockModalForm;
+
+        beforeEach(() => {
+            mockModalForm = document.createElement('form');
+            mockModalForm.innerHTML = `
+                <div class="se-anchor-editor">
+                    <input class="se-input-form se-input-url se-input-url" />
+                    <input class="se-input-form _se_display_text" />
+                    <input class="se-modal-btn-check _se_anchor_download" type="checkbox" />
+                    <button class="_se_bookmark_button"></button>
+                    <div class="se-anchor-preview-form">
+                        <span class="_se_anchor_bookmark_icon" style="display:none;"></span>
+                        <span class="_se_anchor_download_icon" style="display:none;"></span>
+                        <pre class="se-link-preview"></pre>
+                    </div>
+                </div>
+            `;
+            modalAnchor = new ModalAnchorEditor(mockInst, mockModalForm, {});
+        });
+
+        it('should update preview on url input change', async () => {
+             const input = modalAnchor.urlInput;
+             input.value = 'http://google.com';
+             
+             const addEventSpy = modalAnchor.eventManager.addEvent;
+             // Find 'input' event handler
+             const inputHandler = addEventSpy.mock.calls.find(call => call[0] === input && call[1] === 'input')[2];
+             
+             await inputHandler({ target: input });
+             
+             expect(modalAnchor.preview.textContent).toBe('http://google.com');
+        });
+
+        it('should auto-prefix http if missing protocol', async () => {
+             const input = modalAnchor.urlInput;
+             input.value = 'www.google.com';
+             
+             const addEventSpy = modalAnchor.eventManager.addEvent;
+             const inputHandler = addEventSpy.mock.calls.find(call => call[0] === input && call[1] === 'input')[2];
+             
+             await inputHandler({ target: input });
+             
+             // The logic adds protocol if starting with www and default protocol is set (mocked to https://)
+             expect(modalAnchor.preview.textContent).toBe('https://www.google.com');
+        });
+
+        it('should handle download checkbox change', async () => {
+             const checkbox = modalAnchor.downloadCheck;
+             const urlInput = modalAnchor.urlInput;
+             urlInput.value = 'http://test.com/file.zip';
+
+             const addEventSpy = modalAnchor.eventManager.addEvent;
+             const changeHandler = addEventSpy.mock.calls.find(call => call[0] === checkbox && call[1] === 'change')[2];
+             
+             checkbox.checked = true;
+             await changeHandler({ target: checkbox });
+             
+             expect(modalAnchor.download.style.display).toBe('block');
+             
+             checkbox.checked = false;
+             await changeHandler({ target: checkbox });
+             
+             expect(modalAnchor.download.style.display).toBe('none');
+        });
+        
+        it('should trigger list creation on focus if valid bookmark', async () => {
+            const input = modalAnchor.urlInput;
+            input.value = '#header1';
+            
+            // Mock selfPathBookmark to return true (logic depends on mockEnv or url)
+            // The method logic: return path.indexOf('#') === 0 ...
+            // So '#header1' returns true.
+            
+            // Should call _createBookmarkList
+            // Which uses dom.query.getListChildren
+            dom.query.getListChildren.mockReturnValue([]);
+            
+            const addEventSpy = modalAnchor.eventManager.addEvent;
+            const focusHandler = addEventSpy.mock.calls.find(call => call[0] === input && call[1] === 'focus')[2];
+            
+            await focusHandler();
+            
+            expect(dom.query.getListChildren).toHaveBeenCalled();
         });
     });
 });

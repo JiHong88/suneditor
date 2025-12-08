@@ -1,21 +1,21 @@
 import type {} from '../../../typedef';
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_toolbar
+ * @typedef {import('../eventManager').default} EventManagerThis_handler_toolbar
  */
 /**
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
-export function ButtonsHandler(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, e: MouseEvent): void;
+export function ButtonsHandler(this: import('../eventManager').default, e: MouseEvent): void;
 export class ButtonsHandler {
 	/**
-	 * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_toolbar
+	 * @typedef {import('../eventManager').default} EventManagerThis_handler_toolbar
 	 */
 	/**
 	 * @this {EventManagerThis_handler_toolbar}
 	 * @param {MouseEvent} e - Event object
 	 */
-	constructor(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, e: MouseEvent);
+	constructor(this: import('../eventManager').default, e: MouseEvent);
 	_inputFocus: boolean;
 	__inputPlugin: {
 		obj: any;
@@ -29,10 +29,10 @@ export class ButtonsHandler {
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
-export function OnClick_menuTray(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, e: MouseEvent): void;
+export function OnClick_menuTray(this: import('../eventManager').default, e: MouseEvent): void;
 /**
  * @this {EventManagerThis_handler_toolbar}
  * @param {MouseEvent} e - Event object
  */
-export function OnClick_toolbar(this: Omit<import('../eventManager').default & Partial<import('../../../editorInjector').default>, 'eventManager'>, e: MouseEvent): void;
-export type EventManagerThis_handler_toolbar = Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>;
+export function OnClick_toolbar(this: import('../eventManager').default, e: MouseEvent): void;
+export type EventManagerThis_handler_toolbar = import('../eventManager').default;

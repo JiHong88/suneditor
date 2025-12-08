@@ -2,7 +2,8 @@
  * @fileoverview Unit tests for keydown effects registry (sample tests)
  */
 
-import keydownEffects from '../../../../../src/core/event/effects/keydown.registry';
+import keydownEffects, { LineDelete_next, LineDelete_prev } from '../../../../../src/core/event/effects/keydown.registry';
+import { dom } from '../../../../../src/helper';
 
 describe('Keydown Effects Registry', () => {
 	let mockPorts;
@@ -604,6 +605,144 @@ describe('Keydown Effects Registry', () => {
 			expect(() => {
 				keydownEffects['enter.scrollTo'](effContext, { range });
 			}).not.toThrow();
+		});
+	});
+	describe('Helper functions', () => {
+		it('LineDelete_next should remove next element if zero width', () => {
+			const formatEl = document.createElement('p');
+			const nextEl = document.createElement('p');
+			nextEl.textContent = '\u200B'; // Zero width space
+			formatEl.appendChild(document.createTextNode('text'));
+			const parent = document.createElement('div');
+			parent.appendChild(formatEl);
+			parent.appendChild(nextEl);
+
+			// Mock utils
+			dom.check.isZeroWidth = jest.fn().mockReturnValue(true);
+			dom.utils.removeItem = jest.fn();
+
+			LineDelete_next(formatEl);
+
+			expect(dom.utils.removeItem).toHaveBeenCalledWith(nextEl);
+		});
+
+		it('LineDelete_next should move children from next element', () => {
+			const formatEl = document.createElement('p');
+			const nextEl = document.createElement('p');
+			const child = document.createTextNode('moved');
+			nextEl.appendChild(child);
+			
+			const parent = document.createElement('div');
+			parent.appendChild(formatEl);
+			parent.appendChild(nextEl);
+
+			dom.check.isZeroWidth = jest.fn().mockReturnValue(false);
+			dom.utils.removeItem = jest.fn();
+
+			LineDelete_next(formatEl);
+
+			expect(formatEl.contains(child)).toBe(true);
+			expect(dom.utils.removeItem).toHaveBeenCalledWith(nextEl);
+		});
+
+		it('LineDelete_prev should remove previous element if zero width', () => {
+			const formatEl = document.createElement('p');
+			const prevEl = document.createElement('p');
+			prevEl.textContent = '\u200B';
+			const parent = document.createElement('div');
+			parent.appendChild(prevEl);
+			parent.appendChild(formatEl);
+
+			dom.check.isZeroWidth = jest.fn().mockReturnValue(true);
+			dom.utils.removeItem = jest.fn();
+
+			LineDelete_prev(formatEl);
+
+			expect(dom.utils.removeItem).toHaveBeenCalledWith(prevEl);
+		});
+	});
+
+	describe('Complex logic tests', () => {
+		describe('enter.format.breakWithSelection', () => {
+			it('should handle multiline selection', () => {
+				const formatEl = document.createElement('p');
+				formatEl.appendChild(document.createTextNode('start'));
+				const endEl = document.createElement('p');
+				endEl.appendChild(document.createTextNode('end'));
+				
+				const parent = document.createElement('div');
+				parent.appendChild(formatEl);
+				parent.appendChild(endEl);
+
+				const range = document.createRange();
+				range.setStart(formatEl.firstChild, 0);
+				range.setEnd(endEl.firstChild, 1);
+
+				// Ensure getLine returns elements consistently
+				mockPorts.format.getLine.mockImplementation((node) => {
+					if (formatEl.contains(node)) return formatEl;
+					if (endEl.contains(node)) return endEl;
+					return formatEl; // Default fallback for rcon.container
+				});
+				mockPorts.format.getBlock.mockReturnValue(null);
+				mockPorts.html.remove.mockReturnValue({
+					container: formatEl,
+					offset: 0,
+					prevContainer: null
+				});
+				
+				// Mock cloneNode
+				formatEl.cloneNode = jest.fn().mockReturnValue(document.createElement('p'));
+
+				keydownEffects['enter.format.breakWithSelection'](effContext, {
+					formatEl,
+					range,
+					formatStartEdge: false,
+					formatEndEdge: false
+				});
+
+				expect(mockPorts.selection.setRange).toHaveBeenCalled();
+			});
+		});
+
+		describe('tab.format.indent', () => {
+			it('should handle syncTabIndent', () => {
+				const line = document.createElement('p');
+				const text = document.createTextNode('    text');
+				line.appendChild(text);
+				
+				const prevLine = document.createElement('p');
+				prevLine.textContent = '        prev'; // 8 spaces
+				
+				const parent = document.createElement('div');
+				parent.appendChild(prevLine);
+				parent.appendChild(line);
+
+				const range = document.createRange();
+				range.setStart(text, 4);
+				range.setEnd(text, 4);
+
+				mockCtx.options.set('syncTabIndent', true);
+				mockCtx.status = { tabSize: 4 };
+				mockPorts.format.getLines.mockReturnValue([line]);
+				mockPorts.format.isLine.mockReturnValue(true);
+				
+				// Mock DOM query helpers
+				dom.query.findTextIndexOnLine = jest.fn().mockReturnValue(4);
+				dom.query.findTabEndIndex = jest.fn().mockReturnValue(8);
+				
+				// Ensure insertNode returns the node
+				mockPorts.html.insertNode.mockReturnValue(document.createTextNode('    '));
+
+				keydownEffects['tab.format.indent'](effContext, {
+					range,
+					formatEl: line,
+					shift: false
+				});
+
+				expect(dom.query.findTabEndIndex).toHaveBeenCalled();
+				expect(mockPorts.selection.setRange).toHaveBeenCalled();
+			});
 		});
 	});
 });

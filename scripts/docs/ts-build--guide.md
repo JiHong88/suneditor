@@ -17,7 +17,7 @@ npm run ts-build
 ```
 
 ```json
-"ts-build": "npm run check:inject && (npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/ts-build/format-index.cjs && node scripts/ts-build/fix-langs.cjs && node scripts/ts-build/wrap-dts.cjs && node scripts/ts-build/rename-index.cjs && node scripts/ts-build/remove-this-params.cjs && node scripts/ts-build/interfaces-convert.cjs && node scripts/ts-build/gen-options-dts.cjs && node scripts/ts-build/gen-css-dts.cjs && node scripts/ts-build/inject-typedef-import.cjs && npm run lint:fix-ts"
+"ts-build": "npm run check:inject && (npx tsc || true) && barrelsby --config .barrelsby.json && node scripts/ts-build/format-index.cjs && node scripts/ts-build/fix-langs.cjs && node scripts/ts-build/wrap-dts.cjs && node scripts/ts-build/rename-index.cjs && node scripts/ts-build/interfaces-convert.cjs && node scripts/ts-build/gen-options-dts.cjs && node scripts/ts-build/gen-css-dts.cjs && node scripts/ts-build/inject-typedef-import.cjs && npm run lint:fix-ts"
 ```
 
 ---
@@ -52,29 +52,25 @@ npm run ts-build
     - `format-index.cjs`가 생성한 `index.ts` 파일을 `index.d.ts`로 이름 변경
     - 타입 선언 전용 파일로 구분
 
-7. **`remove-this-params.cjs`**
-    - **`core/`** 디렉터리는 `prototype` 기반 구조이므로 `constructor`에 `this: any` 파라미터가 잘못 생성됨
-    - 이를 찾아 제거해주는 후처리 스크립트
-
-8. **`interfaces-convert.cjs`**
+7. **`interfaces-convert.cjs`**
     - `types/interfaces/*.d.ts` 파일들을 후처리
     - `contracts.d.ts`의 `class` → `interface`로 변환 (plugin.d.ts는 extends를 위해 class 유지)
     - `@optional` JSDoc이 붙은 메서드를 optional 메서드(`?`)로 변환
 
-9. **`gen-options-dts.cjs`**
+8. **`gen-options-dts.cjs`**
     - `core/config/options.js > DEFAULTS` 객체의 실제 값들을 기반으로 `options.d.ts` 내 `export namespace DEFAULTS` 타입 정의를 덮어씀
     - 문자열, 배열, 객체 등의 값을 정확히 리터럴 타입으로 유지하여 자동으로 타입 갱신
 
-10. **`gen-css-dts.cjs`**
+9. **`gen-css-dts.cjs`**
     - CSS 파일들(`suneditor.css`, `suneditor-contents.css`)에 대한 TypeScript 선언 파일 생성
     - 타입 안전성을 위해 CSS import를 위한 `.d.ts` 파일 자동 생성
 
-11. **`inject-typedef-import.cjs`**
+10. **`inject-typedef-import.cjs`**
     - `types/` 폴더의 모든 `.d.ts` 파일에 `typedef.d.ts`의 전역 타입 import를 자동 주입
     - `typedef.d.ts`와 `index.d.ts`를 제외한 모든 파일에 `import type {} from './relative/path/typedef';` 추가
     - `SunEditor` namespace의 타입들을 모든 타입 파일에서 사용 가능하게 만듦 (예: `SunEditor.Core`, `SunEditor.Context`)
 
-12. **`lint:fix-ts`**
+11. **`lint:fix-ts`**
     - 최종 `.d.ts` 파일에 대해 ESLint를 적용하여 포맷팅 및 스타일 정리 수행
 
 ---
@@ -110,7 +106,6 @@ types/
 | `fix-langs.cjs`             | UMD 스타일 `langs/*.js` → TypeScript 형식으로 `export` 구조 변환                                      |
 | `wrap-dts.cjs`              | `typedef.d.ts`에 `declare global { namespace SunEditor {} }` 래핑 추가                                |
 | `rename-index.cjs`          | `index.ts` → `index.d.ts` 이름 변경                                                                   |
-| `remove-this-params.cjs`    | `prototype` 기반 constructor의 잘못된 `this` 파라미터 제거                                            |
 | `interfaces-convert.cjs`    | `contracts.d.ts`의 class→interface 변환, `@optional` 메서드를 optional(`?`)로 변환                    |
 | `gen-options-dts.cjs`       | `DEFAULTS` 객체 기반으로 `options.d.ts` 타입 정의 자동 갱신                                           |
 | `gen-css-dts.cjs`           | CSS 파일들에 대한 TypeScript 선언 파일 생성                                                           |

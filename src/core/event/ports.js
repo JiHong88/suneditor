@@ -1,7 +1,7 @@
 import { isMobile } from '../../helper/env';
 
 /**
- * @typedef {import('./eventManager').EventManagerThis} EventManagerInstanceType
+ * @typedef {import('./eventManager').default} EventManagerInstanceType
  */
 
 /**

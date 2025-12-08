@@ -18,43 +18,46 @@ import { dom, unicode, converter } from '../../helper';
  */
 
 /**
- * @constructor
- * @this {InlineThis}
  * @description Classes related to editor inline formats such as style node like strong, span, etc.
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function Inline(editor) {
-	CoreInjector.call(this, editor);
-
-	// members
-	this._listCamel = this.options.get('__listCommonStyle');
-	this._listKebab = converter.camelToKebabCase(this.options.get('__listCommonStyle'));
-}
-
-Inline.prototype = {
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection() {
-		return this.editor.selection;
-	},
-	/** @internal @type {SunEditor.Core['format']} */
-	get format() {
-		return this.editor.format;
-	},
-	/** @internal @type {SunEditor.Core['component']} */
-	get component() {
-		return this.editor.component;
-	},
-	/** @internal @type {SunEditor.Core['ui']} */
-	get ui() {
-		return this.editor.ui;
-	},
-	/** @internal @type {SunEditor.Core['nodeTransform']} */
-	get nodeTransform() {
-		return this.editor.nodeTransform;
-	},
+class Inline extends CoreInjector {
+	#listCamel;
+	#listKebab;
 
 	/**
-	 * @this {InlineThis}
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+
+		// members
+		this.#listCamel = this.options.get('__listCommonStyle');
+		this.#listKebab = converter.camelToKebabCase(this.options.get('__listCommonStyle'));
+	}
+
+	/** @type {SunEditor.Core['selection']} */
+	get #selection() {
+		return this.editor.selection;
+	}
+	/** @type {SunEditor.Core['format']} */
+	get #format() {
+		return this.editor.format;
+	}
+	/** @type {SunEditor.Core['component']} */
+	get #component() {
+		return this.editor.component;
+	}
+	/** @type {SunEditor.Core['ui']} */
+	get #ui() {
+		return this.editor.ui;
+	}
+	/** @type {SunEditor.Core['nodeTransform']} */
+	get #nodeTransform() {
+		return this.editor.nodeTransform;
+	}
+
+	/**
 	 * @description Adds, updates, or deletes style nodes from selected text (a, span, strong, etc.).
 	 * - 1. If styleNode is provided, a node with the same tags and attributes is added to the selected text.
 	 * - 2. If the same tag already exists, only its attributes are updated.
@@ -88,10 +91,10 @@ Inline.prototype = {
 	 * editor.inline.apply(null, { nodesToRemove: ['span'] });
 	 */
 	apply(styleNode, { stylesToModify, nodesToRemove, strictRemove } = {}) {
-		if (dom.query.getParentElement(this.selection.getNode(), dom.check.isNonEditable)) return;
+		if (dom.query.getParentElement(this.#selection.getNode(), dom.check.isNonEditable)) return;
 
-		this.selection._resetRangeToTextNode();
-		let range = this.selection.getRangeAndAddLine(this.selection.getRange(), null);
+		this.#selection.resetRangeToTextNode();
+		let range = this.#selection.getRangeAndAddLine(this.#selection.getRange(), null);
 		stylesToModify = stylesToModify?.length > 0 ? stylesToModify : null;
 		nodesToRemove = nodesToRemove?.length > 0 ? nodesToRemove : null;
 
@@ -102,15 +105,15 @@ Inline.prototype = {
 		let endCon = range.endContainer;
 		let endOff = range.endOffset;
 
-		if ((isRemoveFormat && range.collapsed && this.format.isLine(startCon.parentNode) && this.format.isLine(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && dom.check.isNonEditable(startCon))) {
+		if ((isRemoveFormat && range.collapsed && this.#format.isLine(startCon.parentNode) && this.#format.isLine(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && dom.check.isNonEditable(startCon))) {
 			const format = startCon.parentNode;
-			if (!dom.check.isListCell(format) || !converter.getValues(format.style).some((k) => this._listKebab.includes(k))) {
+			if (!dom.check.isListCell(format) || !converter.getValues(format.style).some((k) => this.#listKebab.includes(k))) {
 				return;
 			}
 		}
 
 		if (range.collapsed && !isRemoveFormat) {
-			if (startCon.nodeType === 1 && !dom.check.isBreak(startCon) && !this.component.is(startCon)) {
+			if (startCon.nodeType === 1 && !dom.check.isBreak(startCon) && !this.#component.is(startCon)) {
 				let afterNode = null;
 				const focusNode = startCon.childNodes[startOff];
 
@@ -124,9 +127,9 @@ Inline.prototype = {
 
 				const zeroWidth = dom.utils.createTextNode(unicode.zeroWidthSpace);
 				startCon.insertBefore(zeroWidth, afterNode);
-				this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
+				this.#selection.setRange(zeroWidth, 1, zeroWidth, 1);
 
-				range = this.selection.getRange();
+				range = this.#selection.getRange();
 				startCon = range.startContainer;
 				startOff = range.startOffset;
 				endCon = range.endContainer;
@@ -134,11 +137,11 @@ Inline.prototype = {
 			}
 		}
 
-		if (this.format.isLine(startCon)) {
+		if (this.#format.isLine(startCon)) {
 			startCon = startCon.childNodes[startOff] || startCon.firstChild;
 			startOff = 0;
 		}
-		if (this.format.isLine(endCon)) {
+		if (this.#format.isLine(endCon)) {
 			endCon = endCon.childNodes[endOff] || endCon.lastChild;
 			endOff = endCon.textContent.length;
 		}
@@ -168,7 +171,7 @@ Inline.prototype = {
 			}
 
 			if (checkAttrs.length > 0) {
-				while (!this.format.isLine(sNode) && !dom.check.isWysiwygFrame(sNode)) {
+				while (!this.#format.isLine(sNode) && !dom.check.isWysiwygFrame(sNode)) {
 					for (let i = 0; i < checkAttrs.length; i++) {
 						if (sNode.nodeType === 1) {
 							const s = checkAttrs[i];
@@ -303,19 +306,19 @@ Inline.prototype = {
 		};
 
 		// get line nodes
-		const lineNodes = this.format.getLines(null);
+		const lineNodes = this.#format.getLines(null);
 		if (lineNodes.length === 0) {
 			console.warn('[SUNEDITOR.inline.apply.warn] There is no line to apply.');
 			return;
 		}
 
-		range = this.selection.getRange();
+		range = this.#selection.getRange();
 		startCon = range.startContainer;
 		startOff = range.startOffset;
 		endCon = range.endContainer;
 		endOff = range.endOffset;
 
-		if (!this.format.getLine(startCon, null)) {
+		if (!this.#format.getLine(startCon, null)) {
 			startCon = dom.query.getEdgeChild(
 				lineNodes[0],
 				function (current) {
@@ -326,7 +329,7 @@ Inline.prototype = {
 			startOff = 0;
 		}
 
-		if (!this.format.getLine(endCon, null)) {
+		if (!this.#format.getLine(endCon, null)) {
 			endCon = dom.query.getEdgeChild(
 				lineNodes.at(-1),
 				function (current) {
@@ -337,7 +340,7 @@ Inline.prototype = {
 			endOff = endCon.textContent.length;
 		}
 
-		const oneLine = this.format.getLine(startCon, null) === this.format.getLine(endCon, null);
+		const oneLine = this.#format.getLine(startCon, null) === this.#format.getLine(endCon, null);
 		const endLength = lineNodes.length - (oneLine ? 0 : 1);
 
 		// node Changes
@@ -346,22 +349,22 @@ Inline.prototype = {
 		const isRemoveAnchor =
 			isRemoveFormat ||
 			(isRemoveNode &&
-				(function (inst, arr) {
-					for (let n = 0, len = arr.length; n < len; n++) {
-						if (inst._isNonSplitNode(arr[n])) return true;
+				((arr) => {
+					for (let n = 0, len = arr?.length; n < len; n++) {
+						if (this._isNonSplitNode(arr[n])) return true;
 					}
 					return false;
-				})(this, nodesToRemove));
+				})(nodesToRemove));
 
-		const isSizeNode = isRemoveNode || this._sn_isSizeNode(newNode);
-		const _getMaintainedNode = this._sn_getMaintainedNode.bind(this, isRemoveAnchor, isSizeNode);
-		const _isMaintainedNode = this._sn_isMaintainedNode.bind(this, isRemoveAnchor, isSizeNode);
+		const isSizeNode = isRemoveNode || this.#sn_isSizeNode(newNode);
+		const _getMaintainedNode = this.#sn_getMaintainedNode.bind(this, isRemoveAnchor, isSizeNode);
+		const _isMaintainedNode = this.#sn_isMaintainedNode.bind(this, isRemoveAnchor, isSizeNode);
 
 		// one line
 		if (oneLine) {
-			if (this._sn_resetCommonListCell(lineNodes[0], stylesToModify)) range = this.selection.setRange(startCon, startOff, endCon, endOff);
+			if (this.#sn_resetCommonListCell(lineNodes[0], stylesToModify)) range = this.#selection.setRange(startCon, startOff, endCon, endOff);
 
-			const newRange = this._setNode_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
+			const newRange = this.#setNode_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
 			start.container = newRange.startContainer;
 			start.offset = newRange.startOffset;
 			end.container = newRange.endContainer;
@@ -370,35 +373,35 @@ Inline.prototype = {
 			if (start.container === end.container && dom.check.isZeroWidth(start.container)) {
 				start.offset = end.offset = 1;
 			}
-			this._sn_setCommonListStyle(newRange.ancestor, null);
+			this.#sn_setCommonListStyle(newRange.ancestor, null);
 		} else {
 			// multi line
 			let appliedCommonList = false;
-			if (endLength > 0 && this._sn_resetCommonListCell(lineNodes[endLength], stylesToModify)) appliedCommonList = true;
-			if (this._sn_resetCommonListCell(lineNodes[0], stylesToModify)) appliedCommonList = true;
-			if (appliedCommonList) this.selection.setRange(startCon, startOff, endCon, endOff);
+			if (endLength > 0 && this.#sn_resetCommonListCell(lineNodes[endLength], stylesToModify)) appliedCommonList = true;
+			if (this.#sn_resetCommonListCell(lineNodes[0], stylesToModify)) appliedCommonList = true;
+			if (appliedCommonList) this.#selection.setRange(startCon, startOff, endCon, endOff);
 
 			// end
 			if (endLength > 0) {
 				newNode = styleNode.cloneNode(false);
-				end = this._setNode_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
+				end = this.#setNode_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
 			}
 
 			// mid
 			for (let i = endLength - 1, newRange; i > 0; i--) {
-				this._sn_resetCommonListCell(lineNodes[i], stylesToModify);
+				this.#sn_resetCommonListCell(lineNodes[i], stylesToModify);
 				newNode = styleNode.cloneNode(false);
-				newRange = this._setNode_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
+				newRange = this.#setNode_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
 				if (newRange.endContainer && newRange.ancestor.contains(newRange.endContainer)) {
 					end.ancestor = null;
 					end.container = newRange.endContainer;
 				}
-				this._sn_setCommonListStyle(newRange.ancestor, null);
+				this.#sn_setCommonListStyle(newRange.ancestor, null);
 			}
 
 			// start
 			newNode = styleNode.cloneNode(false);
-			start = this._setNode_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
+			start = this.#setNode_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
 
 			if (start.endContainer) {
 				end.ancestor = null;
@@ -413,20 +416,19 @@ Inline.prototype = {
 				end.offset = start.container.textContent.length;
 			}
 
-			this._sn_setCommonListStyle(start.ancestor, null);
-			this._sn_setCommonListStyle(end.ancestor || this.format.getLine(end.container), null);
+			this.#sn_setCommonListStyle(start.ancestor, null);
+			this.#sn_setCommonListStyle(end.ancestor || this.#format.getLine(end.container), null);
 		}
 
 		// set range
-		this.ui._offCurrentController();
-		this.selection.setRange(start.container, start.offset, end.container, end.offset);
+		this.#ui.offCurrentController();
+		this.#selection.setRange(start.container, start.offset, end.container, end.offset);
 		this.history.push(false);
 
 		return /** @type {HTMLElement} */ (newNode);
-	},
+	}
 
 	/**
-	 * @this {InlineThis}
 	 * @description Remove all inline formats (styles and tags) from the currently selected text.
 	 * - This is a convenience method that calls apply() with null parameters to strip all formatting.
 	 * - Removes all inline style nodes (span, strong, em, a, etc.)
@@ -435,11 +437,10 @@ Inline.prototype = {
 	 */
 	remove() {
 		this.apply(null, { stylesToModify: null, nodesToRemove: null, strictRemove: null });
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {InlineThis}
 	 * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
 	 * @param {Node|string} element Element to check
 	 * @returns {boolean}
@@ -449,22 +450,19 @@ Inline.prototype = {
 		const checkRegExp = /^(a|label|code|summary)$/i;
 		if (typeof element === 'string') return checkRegExp.test(element);
 		return element.nodeType === 1 && checkRegExp.test(element.nodeName);
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {InlineThis}
 	 * @description Nodes that need to be added without modification when changing text nodes
 	 * @param {Node} element Element to check
 	 * @returns {boolean}
 	 */
 	_isIgnoreNodeChange(element) {
-		return element && element.nodeType === 1 && (dom.check.isNonEditable(element) || !this.format.isTextStyleNode(element) || this.component.is(element));
-	},
+		return element && element.nodeType === 1 && (dom.check.isNonEditable(element) || !this.#format.isTextStyleNode(element) || this.#component.is(element));
+	}
 
 	/**
-	 * @internal
-	 * @this {InlineThis}
 	 * @description wraps text nodes of line selected text.
 	 * @param {Node} element The node of the line that contains the selected text node.
 	 * @param {Node} newInnerNode The dom that will wrap the selected text area
@@ -481,10 +479,10 @@ Inline.prototype = {
 	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
 	 * @returns {{ancestor: *, startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
 	 */
-	_setNode_oneLine(element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
+	#setNode_oneLine(element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
 		// not add tag
 		let parentCon = startCon.parentNode;
-		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.format.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
+		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.#format.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
 			parentCon = parentCon.parentNode;
 		}
@@ -885,7 +883,7 @@ Inline.prototype = {
 			}
 		}
 
-		this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
+		this.#nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
 		if (collapsed) {
 			startOffset = startContainer.textContent.length;
@@ -920,7 +918,7 @@ Inline.prototype = {
 		endOffset = collapsed ? startOffset : mergeEndCon ? startContainer.textContent.length : endConReset ? endOffset + newStartOffset.s : endOffset + newEndOffset.s;
 
 		// tag merge
-		const newOffsets = this.nodeTransform.mergeSameTags(pNode, [startPath, endPath], true);
+		const newOffsets = this.#nodeTransform.mergeSameTags(pNode, [startPath, endPath], true);
 
 		element.parentNode.replaceChild(pNode, element);
 
@@ -934,11 +932,9 @@ Inline.prototype = {
 			endContainer: endContainer,
 			endOffset: endOffset + newOffsets[1],
 		};
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {InlineThis}
 	 * @description wraps first line selected text.
 	 * @param {Node} element The node of the line that contains the selected text node.
 	 * @param {Node} newInnerNode The dom that will wrap the selected text area
@@ -953,15 +949,15 @@ Inline.prototype = {
 	 * @param {Node} _endContainer End container node.
 	 * @returns {NodeStyleContainerType} { ancestor, container, offset, endContainer }
 	 */
-	_setNode_startLine(element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
+	#setNode_startLine(element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
 		// not add tag
 		let parentCon = startCon.parentNode;
-		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.format.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
+		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.#format.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.format.isLine(parentCon) && !parentCon.nextSibling && dom.check.isZeroWidth(startCon.textContent.slice(0, startOff))) {
+		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.#format.isLine(parentCon) && !parentCon.nextSibling && dom.check.isZeroWidth(startCon.textContent.slice(0, startOff))) {
 			let sameTag = false;
 			let s = startCon.previousSibling;
 			while (s) {
@@ -1214,7 +1210,7 @@ Inline.prototype = {
 				element.appendChild(container);
 			}
 		} else {
-			this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
+			this.#nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
 			if (dom.check.isZeroWidth(pNode.textContent)) {
 				container = pNode.firstChild;
@@ -1230,7 +1226,7 @@ Inline.prototype = {
 			offset += offsets.s;
 
 			// tag merge
-			const newOffsets = this.nodeTransform.mergeSameTags(pNode, [path], true);
+			const newOffsets = this.#nodeTransform.mergeSameTags(pNode, [path], true);
 
 			element.parentNode.replaceChild(pNode, element);
 
@@ -1244,11 +1240,9 @@ Inline.prototype = {
 			offset: offset,
 			endContainer: _endContainer,
 		};
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {InlineThis}
 	 * @description wraps mid lines selected text.
 	 * @param {HTMLElement} element The node of the line that contains the selected text node.
 	 * @param {Node} newInnerNode The dom that will wrap the selected text area
@@ -1259,7 +1253,7 @@ Inline.prototype = {
 	 * @param {Node} _endContainer Offset node of last line already modified (end.container)
 	 * @returns {NodeStyleContainerType} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
 	 */
-	_setNode_middleLine(element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
+	#setNode_middleLine(element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
 		// not add tag
 		if (!isRemoveNode) {
 			// end container path
@@ -1374,8 +1368,8 @@ Inline.prototype = {
 			}
 		}
 
-		this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
-		this.nodeTransform.mergeSameTags(pNode, null, true);
+		this.#nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
+		this.#nodeTransform.mergeSameTags(pNode, null, true);
 
 		// node change
 		element.parentNode.replaceChild(pNode, element);
@@ -1383,11 +1377,9 @@ Inline.prototype = {
 			ancestor: pNode,
 			endContainer: _endContainer,
 		};
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {InlineThis}
 	 * @description wraps last line selected text.
 	 * @param {Node} element The node of the line that contains the selected text node.
 	 * @param {Node} newInnerNode The dom that will wrap the selected text area
@@ -1401,15 +1393,15 @@ Inline.prototype = {
 	 * @param {(element: Node) => boolean} _isMaintainedNode Function to check if node should be maintained.
 	 * @returns {NodeStyleContainerType} { ancestor, container, offset }
 	 */
-	_setNode_endLine(element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
+	#setNode_endLine(element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
 		// not add tag
 		let parentCon = endCon.parentNode;
-		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.format.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
+		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.#format.isLine(parentCon.parentNode) && !dom.check.isWysiwygFrame(parentCon.parentNode)) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.format.isLine(parentCon) && !parentCon.previousSibling && dom.check.isZeroWidth(endCon.textContent.slice(endOff))) {
+		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.#format.isLine(parentCon) && !parentCon.previousSibling && dom.check.isZeroWidth(endCon.textContent.slice(endOff))) {
 			let sameTag = false;
 			let e = endCon.nextSibling;
 			while (e) {
@@ -1668,7 +1660,7 @@ Inline.prototype = {
 			}
 		} else {
 			if (!isRemoveNode && newInnerNode.textContent.length === 0) {
-				this.nodeTransform.removeEmptyNode(pNode, null, false);
+				this.#nodeTransform.removeEmptyNode(pNode, null, false);
 				return {
 					ancestor: null,
 					container: null,
@@ -1676,7 +1668,7 @@ Inline.prototype = {
 				};
 			}
 
-			this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
+			this.#nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
 			if (dom.check.isZeroWidth(pNode.textContent)) {
 				container = pNode.firstChild;
@@ -1695,7 +1687,7 @@ Inline.prototype = {
 			offset += offsets.s;
 
 			// tag merge
-			const newOffsets = this.nodeTransform.mergeSameTags(pNode, [path], true);
+			const newOffsets = this.#nodeTransform.mergeSameTags(pNode, [path], true);
 
 			element.parentNode.replaceChild(pNode, element);
 
@@ -1708,56 +1700,48 @@ Inline.prototype = {
 			container: container,
 			offset: container.nodeType === 1 && offset === 1 ? container.childNodes.length : offset,
 		};
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {InlineThis}
 	 * @description Node with font-size style
 	 * @param {Node} element Element to check
 	 * @returns {boolean}
 	 */
-	_sn_isSizeNode(element) {
-		return element && typeof element !== 'string' && element.nodeType !== 3 && this.format.isTextStyleNode(element) && !!element.style.fontSize;
-	},
+	#sn_isSizeNode(element) {
+		return element && typeof element !== 'string' && element.nodeType !== 3 && this.#format.isTextStyleNode(element) && !!element.style.fontSize;
+	}
 
 	/**
-	 * @internal
-	 * @this {InlineThis}
 	 * @description Return the parent maintained tag. (bind and use a util object)
 	 * @param {boolean} _isRemove is remove anchor
 	 * @param {boolean} _isSizeNode is size span node
 	 * @param {Node} element Element
 	 * @returns {Node|null}
 	 */
-	_sn_getMaintainedNode(_isRemove, _isSizeNode, element) {
+	#sn_getMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove) return null;
-		return dom.query.getParentElement(element, this._isNonSplitNode.bind(this)) || (!_isSizeNode ? dom.query.getParentElement(element, this._sn_isSizeNode.bind(this)) : null);
-	},
+		return dom.query.getParentElement(element, this._isNonSplitNode.bind(this)) || (!_isSizeNode ? dom.query.getParentElement(element, this.#sn_isSizeNode.bind(this)) : null);
+	}
 
 	/**
-	 * @internal
-	 * @this {InlineThis}
 	 * @description Check if element is a tag that should be persisted. (bind and use a util object)
 	 * @param {boolean} _isRemove is remove anchor
 	 * @param {boolean} _isSizeNode is size span node
 	 * @param {Node} element Element
 	 * @returns {boolean}
 	 */
-	_sn_isMaintainedNode(_isRemove, _isSizeNode, element) {
+	#sn_isMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
 		const anchor = this._isNonSplitNode(element);
-		return dom.query.getParentElement(element, this._isNonSplitNode.bind(this)) ? anchor : anchor || (!_isSizeNode ? this._sn_isSizeNode(element) : false);
-	},
+		return dom.query.getParentElement(element, this._isNonSplitNode.bind(this)) ? anchor : anchor || (!_isSizeNode ? this.#sn_isSizeNode(element) : false);
+	}
 
 	/**
-	 * @internal
-	 * @this {InlineThis}
 	 * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
 	 * @param {Node} el List cell element. <li>
 	 * @param {?Node} child Variable for recursive call. ("null" on the first call)
 	 */
-	_sn_setCommonListStyle(el, child) {
+	#sn_setCommonListStyle(el, child) {
 		if (!dom.check.isListCell(el)) return;
 
 		const children = dom.utils.arrayFilter((child || el).childNodes, (current) => !dom.check.isBreak(current));
@@ -1778,16 +1762,16 @@ Inline.prototype = {
 		// styles
 		const cKeys = converter.getValues(childStyle);
 		if (cKeys.length > 0) {
-			for (let i = 0, len = this._listCamel.length; i < len; i++) {
-				if (cKeys.includes(this._listKebab[i])) {
-					elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
-					childStyle.removeProperty(this._listKebab[i]);
+			for (let i = 0, len = this.#listCamel.length; i < len; i++) {
+				if (cKeys.includes(this.#listKebab[i])) {
+					elStyle[this.#listCamel[i]] = childStyle[this.#listCamel[i]];
+					childStyle.removeProperty(this.#listKebab[i]);
 					appliedEl = true;
 				}
 			}
 		}
 
-		this._sn_setCommonListStyle(el, child);
+		this.#sn_setCommonListStyle(el, child);
 		if (!appliedEl) return;
 
 		// common style
@@ -1800,18 +1784,16 @@ Inline.prototype = {
 			}
 			dom.utils.removeItem(child);
 		}
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {InlineThis}
 	 * @description Watch the applied text nodes and adjust the common styles of the list.
 	 * @param {Node} el "LI" element
 	 * @param {?Array} styleArray Refer style array
 	 */
-	_sn_resetCommonListCell(el, styleArray) {
+	#sn_resetCommonListCell(el, styleArray) {
 		if (!dom.check.isListCell(el)) return;
-		styleArray ||= this._listKebab;
+		styleArray ||= this.#listKebab;
 
 		const children = dom.utils.arrayFilter(el.childNodes, (current) => !dom.check.isBreak(current));
 		const elStyles = el.style;
@@ -1819,10 +1801,10 @@ Inline.prototype = {
 		const ec = [],
 			ek = [],
 			elKeys = converter.getValues(elStyles);
-		for (let i = 0, len = this._listKebab.length; i < len; i++) {
-			if (elKeys.includes(this._listKebab[i]) && styleArray.includes(this._listKebab[i])) {
-				ec.push(this._listCamel[i]);
-				ek.push(this._listKebab[i]);
+		for (let i = 0, len = this.#listKebab.length; i < len; i++) {
+			if (elKeys.includes(this.#listKebab[i]) && styleArray.includes(this.#listKebab[i])) {
+				ec.push(this.#listCamel[i]);
+				ek.push(this.#listKebab[i]);
 			}
 		}
 
@@ -1871,19 +1853,16 @@ Inline.prototype = {
 		}
 
 		return appliedEl;
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {InlineThis}
 	 * @description Destroy the Inline instance and release memory
 	 */
 	_destroy() {
 		// No cleanup needed - GC handles internal properties
-	},
-
-	constructor: Inline,
-};
+	}
+}
 
 /**
  * @description Strip remove node

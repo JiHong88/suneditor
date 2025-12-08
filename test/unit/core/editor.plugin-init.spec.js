@@ -94,8 +94,6 @@ describe('Core - Editor Plugin Initialization', () => {
 				const initialLength = editor._componentManager.length;
 				expect(initialLength).toBeGreaterThan(0);
 			}
-
-			expect(true).toBe(true);
 		});
 	});
 

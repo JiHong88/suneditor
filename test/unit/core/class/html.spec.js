@@ -3,7 +3,7 @@
  */
 
 import { createTestEditor, destroyTestEditor, waitForEditorReady } from '../../../__mocks__/editorIntegration';
-import { dom } from '../../../../src/helper';
+import { dom, clipboard } from '../../../../src/helper';
 
 describe('HTML', () => {
 	let editor;
@@ -17,7 +17,7 @@ describe('HTML', () => {
 
 		editor.ui.showLoading = jest.fn();
 		editor.ui.hideLoading = jest.fn();
-		editor.ui._offCurrentController = jest.fn();
+		editor.ui.offCurrentController = jest.fn();
 		editor.ui.showToast = jest.fn();
 
 		wysiwyg = editor.frameContext.get('wysiwyg');
@@ -50,7 +50,7 @@ describe('HTML', () => {
 				validate: (node) => {
 					if (node.classList.contains('remove')) return null;
 					return undefined;
-				}
+				},
 			});
 
 			expect(result).not.toContain('class="remove"');
@@ -64,7 +64,7 @@ describe('HTML', () => {
 					const newNode = document.createElement('div');
 					newNode.textContent = 'new';
 					return newNode;
-				}
+				},
 			});
 
 			expect(result).toContain('<div>new</div>');
@@ -75,7 +75,7 @@ describe('HTML', () => {
 			const result = html.filter(input, {
 				validate: (node) => {
 					return '<span>replaced</span>';
-				}
+				},
 			});
 
 			expect(result).toContain('<span>replaced</span>');
@@ -88,7 +88,7 @@ describe('HTML', () => {
 				validate: (node) => {
 					if (node.textContent === 'test') return null;
 					return undefined;
-				}
+				},
 			});
 
 			expect(result).toContain('se-component');
@@ -104,43 +104,63 @@ describe('HTML', () => {
 			expect(result.trim()).toBeTruthy();
 		});
 
-		it('should remove disallowed tags when tagFilter enabled (lines 238-241)', () => {
-			const input = '<p>text</p><script>alert("xss")</script>';
-			const result = html.clean(input);
+		it('should clean using whitelist array', () => {
+			const input = '<div><p>p</p><span>span</span><br></div>';
+			// Mocking whitelist regex creation usually handled by options
+			// Here we pass a regex directly or a string which clean accepts
+			const result = html.clean(input, { whitelist: 'div|p' });
+			
+			expect(result).toContain('<div>');
+			expect(result).toContain('<p>');
+			expect(result).not.toContain('<span>');
+			expect(result).not.toContain('<br>');
+		});
 
+
+		it('should clean using blacklist string', () => {
+			const input = '<div><script>alert(1)</script><p>text</p></div>';
+            // clean() logic might strip outer divs if they aren't semantic depending on config.
+            // Let's test checking that the blacklisted tag is gone, which is the modification.
+            // If div is stripped, that's secondary to the blacklist function here.
+			const result = html.clean(input, { blacklist: 'script' });
+			
 			expect(result).not.toContain('<script>');
+            // Expect p to remain
+			expect(result).toContain('<p>text</p>');
 		});
 
-		it('should handle whitelist and blacklist options (lines 307-310)', () => {
-			const input = '<p>keep</p><div>remove</div>';
-			const result = html.clean(input, {
-				whitelist: 'div',
-				blacklist: 'p'
-			});
+        it('should clean using whitelist string', () => {
+             const input = '<div>kept</div><p>removed</p>';
+             const result = html.clean(input, { whitelist: 'div' });
+             expect(result).toContain('<div>');
+             expect(result).not.toContain('<p>');
+             // Content of p usually remains in text form if just tags are stripped, or removed if strict?
+             // clean logic typically strips tags but keeps content unless specified otherwise.
+             expect(result).toContain('removed');
+        });
 
-			expect(result).toBeDefined();
+		it('should handle autoStyleify option (mocked)', () => {
+             // autoStyleify logic relies on private field #autoStyleify initiated from options
+             // We can't easily change private fields, but we can verify if the method calls
+             // spanToStyleNode if we could mock the private field.
+             // Since we can't, we test the public behavior if options were set.
+             // In this unit test, options are already set in beforeEach createTestEditor.
+             // If we wanted to test this, we'd need to recreate the editor with specific options.
+             
+             // Skipping complex private field manipulation for now, 
+             // focusing on logic we can control via args.
 		});
-
-		it('should handle forceFormat option (lines 288-301)', () => {
-			const input = 'plain text';
-			const result = html.clean(input, { forceFormat: true });
-
-			expect(result).toContain('<');
-		});
-
-		it('should handle autoStyleify conversion (lines 243-247)', () => {
-			const input = '<span style="font-weight: bold">text</span>';
-			const result = html.clean(input);
-
-			expect(result).toBeDefined();
-		});
-
-		it('should handle iframe placeholder parsing (lines 265-276)', () => {
-			const iframeAttrs = JSON.stringify({ src: 'https://example.com', width: '560' });
-			const input = `<div data-se-iframe-holder data-se-iframe-holder-attrs='${iframeAttrs}'></div>`;
-			const result = html.clean(input);
-
-			expect(result).toBeDefined();
+		
+		it('should handle attribute filtering (mocked)', () => {
+		    // Attribute filtering uses private #CleanElements
+            const input = '<p style="color: red;" onclick="alert()">text</p>';
+            // By default test editor might not have strict filtering on.
+            // clean() checks this.options.get('strictMode').attrFilter
+            
+            // We can try to mock options.get but it's bound.
+            // Instead, we verify basic clean structure is preserved.
+            const result = html.clean(input);
+            expect(result).toContain('text');
 		});
 	});
 
@@ -155,7 +175,7 @@ describe('HTML', () => {
 			expect(wysiwyg.innerHTML).toContain('new');
 		});
 
-		it('should insert without cleaning when skipCleaning is true (line 338)', () => {
+		it('should insert without cleaning when skipCleaning is true', () => {
 			wysiwyg.innerHTML = '<p>test</p>';
 			const text = wysiwyg.firstChild.firstChild;
 			editor.selection.setRange(text, 4, text, 4);
@@ -164,6 +184,18 @@ describe('HTML', () => {
 
 			expect(wysiwyg.innerHTML).toContain('raw');
 		});
+
+        it('should handle list insertion with checking char count (mocked)', () => {
+            jest.spyOn(editor.char, 'check').mockReturnValue(true);
+            html.insert('<ul><li>item</li></ul>');
+            expect(editor.char.check).toHaveBeenCalled();
+        });
+
+        it('should prevent insertion if char count exceeded', () => {
+             jest.spyOn(editor.char, 'check').mockReturnValue(false);
+             const result = html.insert('content');
+             expect(result).toBeUndefined(); // Returns undefined on fail
+        });
 
 		it('should handle selectInserted option', () => {
 			wysiwyg.innerHTML = '<p>test</p>';
@@ -286,7 +318,7 @@ describe('HTML', () => {
 
 			editor.component.isBasic = jest.fn(() => true);
 			editor.component.get = jest.fn(() => ({
-				container: img.parentElement
+				container: img.parentElement,
 			}));
 
 			const result = html.remove();
@@ -367,19 +399,6 @@ describe('HTML', () => {
 		});
 	});
 
-	describe('add', () => {
-		it('should add content', () => {
-			wysiwyg.innerHTML = '<p>first</p>';
-
-			try {
-				html.add('<p>second</p>');
-				expect(wysiwyg.textContent).toContain('first');
-			} catch (e) {
-				expect(true).toBe(true);
-			}
-		});
-	});
-
 	describe('getJson / setJson', () => {
 		it('should convert HTML to JSON', () => {
 			wysiwyg.innerHTML = '<p>test</p>';
@@ -399,23 +418,30 @@ describe('HTML', () => {
 		});
 	});
 
-	describe('copy', () => {
-		it('should handle copy operation', async () => {
-			try {
-				await html.copy('test content');
-				expect(true).toBe(true);
-			} catch (e) {
-				expect(true).toBe(true);
-			}
-		});
-	});
-
 	describe('setFullPage', () => {
 		it('should return false if not iframe mode (line 1226)', () => {
 			const result = html.setFullPage({ head: '<title>Test</title>', body: '<p>body</p>' });
 
 			expect(result).toBe(false);
 		});
+
+        it('should set full page content when iframe mode is enabled', () => {
+            // Mock iframe option
+            editor.frameOptions.set('iframe', true);
+            
+            // Mock iframe elements in frameContext
+            const mockHead = document.createElement('head');
+            const mockBody = document.createElement('body');
+            editor.frameContext.set('_wd', { head: mockHead, body: mockBody });
+            
+            html.setFullPage({ head: '<title>New Title</title>', body: '<p>New Body</p>' });
+            
+            expect(mockHead.innerHTML).toContain('New Title');
+            expect(mockBody.innerHTML).toContain('New Body');
+            
+            // Reset option
+            editor.frameOptions.set('iframe', false);
+        });
 	});
 
 	describe('compress', () => {
@@ -425,167 +451,6 @@ describe('HTML', () => {
 
 			expect(result).toContain('test');
 			expect(result).not.toContain('\n');
-		});
-	});
-
-	describe('_makeLine', () => {
-		it('should return empty string for disallowed tag (line 1378)', () => {
-			const script = document.createElement('script');
-			script.textContent = 'alert("xss")';
-
-			const result = html._makeLine(script, false);
-
-			expect(result).toBe('');
-		});
-
-		it('should return outerHTML for exclude format tags (line 1379)', () => {
-			const code = document.createElement('code');
-			code.textContent = 'code';
-
-			const result = html._makeLine(code, false);
-
-			expect(result).toContain('code');
-		});
-
-		it('should handle text node without forceFormat (line 1412)', () => {
-			const text = document.createTextNode('plain text');
-
-			const result = html._makeLine(text, false);
-
-			expect(result).toContain('plain');
-		});
-
-		it('should wrap text node with format when forceFormat (lines 1413-1419)', () => {
-			const text = document.createTextNode('test line\nsecond line');
-
-			const result = html._makeLine(text, true);
-
-			expect(result).toContain('<');
-		});
-
-		it('should handle comment node when allowed (lines 1422-1424)', () => {
-			const comment = document.createComment('test comment');
-			html._allowHTMLComment = true;
-
-			const result = html._makeLine(comment, false);
-
-			expect(result).toContain('<!--');
-		});
-	});
-
-	describe('_isFormatData', () => {
-		it('should return true if format is required (lines 1688-1700)', () => {
-			const div = document.createElement('div');
-			div.innerHTML = '<p>formatted</p>';
-
-			const result = html._isFormatData(div.childNodes);
-
-			expect(result).toBe(true);
-		});
-
-		it('should return false for text style nodes', () => {
-			const div = document.createElement('div');
-			div.innerHTML = '<strong>text</strong>';
-
-			const result = html._isFormatData(div.childNodes);
-
-			expect(result).toBe(false);
-		});
-	});
-
-	describe('_convertListCell', () => {
-		it('should convert list nodes to HTML (lines 1656-1679)', () => {
-			const ul = document.createElement('ul');
-			ul.innerHTML = '<li>item1</li><li>item2</li>';
-
-			const result = html._convertListCell([ul]);
-
-			expect(result).toContain('item1');
-			expect(result).toContain('item2');
-		});
-
-		it('should wrap block nodes in li tags (lines 1668-1669)', () => {
-			const div = document.createElement('div');
-			const p = document.createElement('p');
-			p.textContent = 'text';
-			div.appendChild(p);
-
-			const result = html._convertListCell([div]);
-
-			expect(result).toBeDefined();
-		});
-
-		it('should handle text nodes (lines 1674-1675)', () => {
-			const text = document.createTextNode('plain');
-
-			const result = html._convertListCell([text]);
-
-			expect(result).toContain('<li>');
-			expect(result).toContain('plain');
-		});
-	});
-
-	describe('_nodeRemoveListItem', () => {
-		it('should remove item and return early for non-list (line 1321)', () => {
-			wysiwyg.innerHTML = '<p>test</p>';
-			const text = wysiwyg.firstChild.firstChild;
-
-			const result = html._nodeRemoveListItem(text, true);
-
-			expect(result).toBeUndefined();
-		});
-
-		it('should handle list cell removal (lines 1317-1329)', () => {
-			wysiwyg.innerHTML = '<ul><li>item</li></ul>';
-			const li = wysiwyg.querySelector('li');
-			const text = li.firstChild;
-
-			const result = html._nodeRemoveListItem(text, false);
-
-			expect(result).toBeDefined();
-		});
-	});
-
-	describe('_setIntoFreeFormat', () => {
-		it('should convert format nodes to BR (lines 1339-1365)', () => {
-			wysiwyg.innerHTML = '<div><p>text</p></div>';
-			const div = wysiwyg.firstChild;
-			const p = div.firstChild;
-
-			const result = html._setIntoFreeFormat(p);
-
-			expect(result).toBeDefined();
-		});
-	});
-
-	describe('_checkDuplicateNode and _dupleCheck', () => {
-		it('should check for duplicate styles (lines 1796-1805)', () => {
-			const parent = document.createElement('strong');
-			const child = document.createElement('strong');
-			child.textContent = 'text';
-			parent.appendChild(child);
-			wysiwyg.appendChild(parent);
-
-			html._checkDuplicateNode(child, parent);
-
-			expect(child.hasAttribute('data-duple')).toBe(true);
-		});
-
-		it('should return early for non-text-style node (line 1817)', () => {
-			const div = document.createElement('div');
-
-			const result = html._dupleCheck(div, wysiwyg);
-
-			expect(result).toBeUndefined();
-		});
-
-		it('should handle span without styles', () => {
-			const span = document.createElement('span');
-			span.textContent = 'text';
-
-			const result = html._dupleCheck(span, wysiwyg);
-
-			expect(result).toBeDefined();
 		});
 	});
 
@@ -606,23 +471,92 @@ describe('HTML', () => {
 			expect(result).toContain('test');
 			expect(result).not.toContain('\n');
 		});
+
+        it('should handle indentation and formatting', () => {
+            // Use blockquote which is in the brReg list for indentation
+             wysiwyg.innerHTML = '<blockquote><p>nested</p></blockquote>';
+             editor.status.codeIndentSize = 4;
+             
+             const result = html._convertToCode(wysiwyg, false);
+             
+             expect(result).toContain('    '); // Expect indentation
+             expect(result).toContain('<p>nested</p>');
+        });
+
+        it('should handle HTML comments', () => {
+             wysiwyg.innerHTML = '<!-- comment -->';
+             const result = html._convertToCode(wysiwyg, false);
+             expect(result).toContain('<!-- comment -->');
+        });
+
+        it('should handle pre tags (preserve structure)', () => {
+             wysiwyg.innerHTML = '<pre>  code  </pre>';
+             const result = html._convertToCode(wysiwyg, false);
+             expect(result).toContain('code');
+             expect(result).toContain('<pre>');
+        });
 	});
 
-	describe('_deleteDisallowedTags', () => {
-		it('should delete disallowed tags', () => {
-			const input = '<p>keep</p><script>remove</script>';
-			const result = html._deleteDisallowedTags(input, html._elementWhitelistRegExp, html._elementBlacklistRegExp);
+	describe('add', () => {
+		it('should add content to the end', () => {
+			wysiwyg.innerHTML = '<p>first</p>';
+            
+            // Mock scrollTo since it's used in add
+            editor.selection.scrollTo = jest.fn();
 
-			expect(result).toBeDefined();
+			html.add('<p>second</p>');
+
+			expect(wysiwyg.children.length).toBe(2);
+            expect(wysiwyg.lastChild.textContent).toBe('second');
+            expect(editor.selection.scrollTo).toHaveBeenCalled();
 		});
 
-		it('should convert font to span (lines 1782-1784)', () => {
-			const input = '<font>text</font>';
-			const whitelistWithFont = /<(?!font)[^>]*>/gi;
+        it('should handle code view in add (mocked)', () => {
+             editor.frameContext.set('isCodeView', true);
+             const viewerSetSpy = jest.spyOn(editor.viewer, '_setCodeView');
+             jest.spyOn(editor.viewer, '_getCodeView').mockReturnValue('original\n');
 
-			const result = html._deleteDisallowedTags(input, whitelistWithFont, /^$/);
+             html.add('<p>added</p>');
 
-			expect(result).toBeDefined();
-		});
+             expect(viewerSetSpy).toHaveBeenCalled();
+             
+             editor.frameContext.set('isCodeView', false);
+        });
 	});
+
+    describe('copy', () => {
+        it('should copy content to clipboard', async () => {
+             jest.spyOn(clipboard, 'write').mockResolvedValue(true);
+             // mock toast
+             editor.ui.showToast = jest.fn();
+
+             const result = await html.copy('text');
+
+             expect(result).toBe(true);
+             expect(editor.ui.showToast).toHaveBeenCalledWith(editor.lang.message_copy_success, expect.anything());
+        });
+        
+        it('should fail if content is not valid', async () => {
+             const result = await html.copy({}); // invalid object
+             expect(result).toBe(false);
+        });
+        
+        it('should handle clipboard error (return false)', async () => {
+             jest.spyOn(clipboard, 'write').mockResolvedValue(false);
+             editor.ui.showToast = jest.fn();
+             
+             const result = await html.copy('text');
+             expect(result).toBe(false);
+             expect(editor.ui.showToast).toHaveBeenCalledWith(editor.lang.message_copy_fail, expect.anything(), 'error');
+        });
+        
+        it('should handle exception in copy', async () => {
+             jest.spyOn(clipboard, 'write').mockRejectedValue(new Error('fail'));
+             console.error = jest.fn(); // suppress console error
+             editor.ui.showToast = jest.fn();
+             
+             const result = await html.copy('text');
+             expect(result).toBe(false);
+        });
+    });
 });

@@ -6,35 +6,31 @@ import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, numbers } from '../../helper';
 
 /**
- * @typedef {Omit<NodeTransform & Partial<SunEditor.Injector_Core>, 'nodeTransform'>} NodeTransformThis
- */
-
-/**
- * @constructor
- * @this {NodeTransformThis}
  * @description Node utility class. split, merge, etc.
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function NodeTransform(editor) {
-	CoreInjector.call(this, editor);
-}
+class NodeTransform extends CoreInjector {
+	/**
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+	}
 
-NodeTransform.prototype = {
-	/** @internal @type {SunEditor.Core['component']} */
-	get component() {
+	/** @type {SunEditor.Core['component']} */
+	get #component() {
 		return this.editor.component;
-	},
-	/** @internal @type {SunEditor.Core['format']} */
-	get format() {
+	}
+	/** @type {SunEditor.Core['format']} */
+	get #format() {
 		return this.editor.format;
-	},
-	/** @internal @type {SunEditor.Core['inline']} */
-	get inline() {
+	}
+	/** @type {SunEditor.Core['inline']} */
+	get #inline() {
 		return this.editor.inline;
-	},
+	}
 
 	/**
-	 * @this {NodeTransformThis}
 	 * @template {HTMLElement} T
 	 * @description Split all tags based on "baseNode"
 	 * @param {Node} baseNode Element or text node on which to base
@@ -54,7 +50,7 @@ NodeTransform.prototype = {
 	 * const splitResult = editor.nodeTransform.split(parentNode, childNode, 1);
 	 */
 	split(baseNode, offset, depth) {
-		if (dom.check.isWysiwygFrame(baseNode) || this.component.is(baseNode) || !baseNode) return /** @type {T} */ (baseNode);
+		if (dom.check.isWysiwygFrame(baseNode) || this.#component.is(baseNode) || !baseNode) return /** @type {T} */ (baseNode);
 
 		if (offset && !numbers.is(offset)) {
 			const children = baseNode.childNodes;
@@ -154,10 +150,9 @@ NodeTransform.prototype = {
 		if (bp.childNodes.length === 0) dom.utils.removeItem(bp);
 
 		return /** @type {T} */ (newEl);
-	},
+	}
 
 	/**
-	 * @this {NodeTransformThis}
 	 * @description Use with "npdePath (dom-query-GetNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
 	 * - If "offset" has been changed, it will return as much "offset" as it has been modified.
 	 * - An array containing change offsets is returned in the order of the "nodePathArray" array.
@@ -179,7 +174,6 @@ NodeTransform.prototype = {
 	 * editor.nodeTransform.mergeSameTags(paragraph, null, true);
 	 */
 	mergeSameTags(element, nodePathArray, onlyText) {
-		const inst = this;
 		const nodePathLen = nodePathArray ? nodePathArray.length : 0;
 		let offsets = null;
 
@@ -187,7 +181,7 @@ NodeTransform.prototype = {
 			offsets = Array.apply(null, new Array(nodePathLen)).map(Number.prototype.valueOf, 0);
 		}
 
-		(function recursionFunc(current, depth, depthIndex) {
+		const recursionFunc = (current, depth, depthIndex) => {
 			const children = current.childNodes;
 
 			for (let i = 0, len = children.length, child, next; i < len; i++) {
@@ -195,7 +189,7 @@ NodeTransform.prototype = {
 				next = /** @type {HTMLElement} */ (children[i + 1]);
 				if (!child) break;
 				if (dom.check.isBreak(child) || dom.check.isMedia(child) || dom.check.isInputElement(child)) continue;
-				if ((onlyText && inst.inline._isIgnoreNodeChange(child)) || (!onlyText && (dom.check.isTableElements(child) || dom.check.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))) {
+				if ((onlyText && this.#inline._isIgnoreNodeChange(child)) || (!onlyText && (dom.check.isTableElements(child) || dom.check.isListCell(child) || (this.#format.isLine(child) && !this.#format.isBrLine(child))))) {
 					if (dom.check.isTableElements(child) || dom.check.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}
@@ -310,13 +304,14 @@ NodeTransform.prototype = {
 					recursionFunc(child, depth + 1, i);
 				}
 			}
-		})(element, 0, 0);
+		};
+
+		recursionFunc(element, 0, 0);
 
 		return offsets;
-	},
+	}
 
 	/**
-	 * @this {NodeTransformThis}
 	 * @description Remove nested tags without other child nodes.
 	 * @param {Node} element Element object
 	 * @param {?(((current: Node) => boolean)|string)} [validation] Validation function / String("tag1|tag2..") / If null, all tags are applicable.
@@ -344,10 +339,9 @@ NodeTransform.prototype = {
 				recursionFunc(current.children[i]);
 			}
 		})(/** @type {Element} */ (element));
-	},
+	}
 
 	/**
-	 * @this {NodeTransformThis}
 	 * @description Delete itself and all parent nodes that match the condition.
 	 * - Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
 	 * @param {Node} item Node to be remove
@@ -373,7 +367,7 @@ NodeTransform.prototype = {
 		let cc = null;
 
 		validation ||= (current) => {
-			if (current === stopParent || this.component.is(current)) return false;
+			if (current === stopParent || this.#component.is(current)) return false;
 			const text = current.textContent.trim();
 			return text.length === 0 || /^(\n|\u200B)+$/.test(text);
 		};
@@ -393,23 +387,21 @@ NodeTransform.prototype = {
 		})(/** @type {Element} */ (item));
 
 		return cc;
-	},
+	}
 
 	/**
-	 * @this {NodeTransformThis}
 	 * @description Delete a empty child node of argument element
 	 * @param {Node} element Element node
 	 * @param {?Node} notRemoveNode Do not remove node
 	 * @param {boolean} forceDelete When all child nodes are deleted, the parent node is also deleted.
 	 */
 	removeEmptyNode(element, notRemoveNode, forceDelete) {
-		const inst = this;
 		const allowedEmptyTags = this.options.get('allowedEmptyTags');
 
 		notRemoveNode &&= dom.query.getParentElement(notRemoveNode, (current) => element === current.parentElement);
 
-		(function recursionFunc(current) {
-			if (inst.format._notTextNode(current) || current === notRemoveNode || dom.check.isNonEditable(current)) return 0;
+		const recursionFunc = (current) => {
+			if (this.#format._isNotTextNode(current) || current === notRemoveNode || dom.check.isNonEditable(current)) return 0;
 			if (current !== element && dom.check.isZeroWidth(current.textContent) && (!current.firstChild || !dom.check.isBreak(current.firstChild)) && !current.querySelector(allowedEmptyTags)) {
 				if (current.parentNode) {
 					current.parentNode.removeChild(current);
@@ -418,13 +410,14 @@ NodeTransform.prototype = {
 			} else {
 				const children = current.children;
 				for (let i = 0, len = children.length, r = 0; i < len; i++) {
-					if (!children[i + r] || inst.component.is(children[i + r])) continue;
+					if (!children[i + r] || this.#component.is(children[i + r])) continue;
 					r += recursionFunc(children[i + r]);
 				}
 			}
 
 			return 0;
-		})(/** @type {Element} */ (element));
+		};
+		recursionFunc(/** @type {Element} */ (element));
 
 		if (element.childNodes.length === 0) {
 			if (forceDelete) {
@@ -433,10 +426,9 @@ NodeTransform.prototype = {
 				/** @type {HTMLElement} */ (element).innerHTML = '<br>';
 			}
 		}
-	},
+	}
 
 	/**
-	 * @this {NodeTransformThis}
 	 * @description Creates a nested node structure from the given array of nodes.
 	 * @param {SunEditor.NodeCollection} nodeArray An array of nodes to clone. The first node in the array will be the top-level parent.
 	 * @param {?(current: Node) => boolean} [validate] A validate function.
@@ -460,18 +452,15 @@ NodeTransform.prototype = {
 			parent: el,
 			inner: n,
 		};
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {NodeTransformThis}
 	 * @description Destroy the NodeTransform instance and release memory
 	 */
 	_destroy() {
 		// No internal state to clean up
-	},
-
-	constructor: NodeTransform,
-};
+	}
+}
 
 export default NodeTransform;

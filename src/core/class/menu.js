@@ -10,56 +10,65 @@ import { dom, converter } from '../../helper';
  */
 
 /**
- * @constructor
- * @this {MenuThis}
  * @description Dropdown and container menu management class
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function Menu(editor) {
-	CoreInjector.call(this, editor);
-
-	// members
-	/** @type {Object<string, HTMLElement>} */
-	this.targetMap = {};
-	this.index = -1;
-	this.menus = [];
-	// dropdown
-	this.currentButton = null;
-	this.currentDropdown = null;
-	this.currentDropdownActiveButton = null;
-	this.currentDropdownName = '';
-	this.currentDropdownType = '';
-	// container
-	this.currentContainer = null;
-	this.currentContainerActiveButton = null;
-	this.currentContainerName = '';
-	// event
-	this._dropdownCommands = [];
-	this.__globalEventHandler = {
-		mousedown: OnMouseDown_dropdown.bind(this),
-		containerDown: this.containerOff.bind(this),
-		keydown: OnKeyDown_dropdown.bind(this),
-		mousemove: OnMousemove_dropdown.bind(this),
-		mouseout: OnMouseout_dropdown.bind(this),
-	};
-	this._bindClose_dropdown_mouse = null;
-	this._bindClose_dropdown_key = null;
-	this._bindClose_cons_mouse = null;
-	this.currentDropdownPlugin = null;
-
-	// eventManager member (viewport)
-	this.__menuBtn = null;
-	this.__menuContainer = null;
-}
-
-Menu.prototype = {
-	/** @internal @type {SunEditor.Core['offset']} */
-	get offset() {
-		return this.editor.offset;
-	},
+class Menu extends CoreInjector {
+	#dropdownCommands;
+	#globalEventHandler;
+	#bindClose_dropdown_mouse;
+	#bindClose_dropdown_key;
+	#bindClose_cons_mouse;
+	#menuBtn;
+	#menuContainer;
 
 	/**
-	 * @this {MenuThis}
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+
+		// members
+		/** @type {Object<string, HTMLElement>} */
+		this.targetMap = {};
+		this.index = -1;
+		this.menus = [];
+		// dropdown
+		this.currentButton = null;
+		this.currentDropdown = null;
+		this.currentDropdownActiveButton = null;
+		this.currentDropdownName = '';
+		this.currentDropdownType = '';
+		// container
+		this.currentContainer = null;
+		this.currentContainerActiveButton = null;
+		this.currentContainerName = '';
+		this.currentDropdownPlugin = null;
+
+		// event
+		this.#dropdownCommands = [];
+		this.#globalEventHandler = {
+			mousedown: this.#OnMouseDown_dropdown.bind(this),
+			containerDown: this.containerOff.bind(this),
+			keydown: this.#OnKeyDown_dropdown.bind(this),
+			mousemove: this.#OnMousemove_dropdown.bind(this),
+			mouseout: this.#OnMouseout_dropdown.bind(this),
+		};
+		this.#bindClose_dropdown_mouse = null;
+		this.#bindClose_dropdown_key = null;
+		this.#bindClose_cons_mouse = null;
+
+		// eventManager member (viewport)
+		this.#menuBtn = null;
+		this.#menuContainer = null;
+	}
+
+	/** @type {SunEditor.Core['offset']} */
+	get #offset() {
+		return this.editor.offset;
+	}
+
+	/**
 	 * @description Method for managing dropdown element.
 	 * - You must add the "dropdown" element using the this method at custom plugin.
 	 * @param {{key: string, type: string}} classObj Class object
@@ -69,23 +78,22 @@ Menu.prototype = {
 		if (key) {
 			if (!IsFree(type)) {
 				/** @type {HTMLElement} */ (menu).setAttribute('data-key', key);
-				this._dropdownCommands.push(key);
+				this.#dropdownCommands.push(key);
 			}
 			this.context.get('menuTray').appendChild(menu);
 			this.targetMap[key] = /** @type {HTMLElement} */ (menu);
 		} else {
 			throw Error("[SUNEDITOR.init.fail] The plugin's key is not added.");
 		}
-	},
+	}
 
 	/**
-	 * @this {MenuThis}
 	 * @description Opens the dropdown menu for the specified button.
 	 * @param {Node} button Dropdown's button element to call
 	 */
 	dropdownOn(button) {
-		this.__removeGlobalEvent();
-		const moreBtn = this._checkMoreLayer(button);
+		this.#removeGlobalEvent();
+		const moreBtn = this.#checkMoreLayer(button);
 		if (moreBtn) {
 			const target = dom.query.getParentElement(moreBtn, '.se-btn-tray').querySelector('[data-command="' + moreBtn.getAttribute('data-ref') + '"]');
 			if (target) {
@@ -100,15 +108,15 @@ Menu.prototype = {
 		this.currentDropdownType = btnEl.getAttribute('data-type');
 		const menu = (this.currentDropdown = this.targetMap[dropdownName]);
 		this.currentDropdownActiveButton = btnEl;
-		this._setMenuPosition(btnEl, menu);
+		this.#setMenuPosition(btnEl, menu);
 
-		this._bindClose_dropdown_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler.mousedown, false);
-		if (this._dropdownCommands.includes(dropdownName)) {
+		this.#bindClose_dropdown_mouse = this.eventManager.addGlobalEvent('mousedown', this.#globalEventHandler.mousedown, false);
+		if (this.#dropdownCommands.includes(dropdownName)) {
 			this.menus = converter.nodeListToArray(menu.querySelectorAll('[data-command]'));
 			if (this.menus.length > 0) {
-				this._bindClose_dropdown_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler.keydown, false);
-				menu.addEventListener('mousemove', this.__globalEventHandler.mousemove, false);
-				menu.addEventListener('mouseout', this.__globalEventHandler.mouseout, false);
+				this.#bindClose_dropdown_key = this.eventManager.addGlobalEvent('keydown', this.#globalEventHandler.keydown, false);
+				menu.addEventListener('mousemove', this.#globalEventHandler.mousemove, false);
+				menu.addEventListener('mouseout', this.#globalEventHandler.mouseout, false);
 			}
 		}
 
@@ -116,20 +124,19 @@ Menu.prototype = {
 		this.currentDropdownPlugin?.on(btnEl);
 
 		this.editor._preventBlur = true;
-	},
+	}
 
 	/**
-	 * @this {MenuThis}
 	 * @description Closes the currently open dropdown menu.
 	 */
 	dropdownOff() {
-		this.__removeGlobalEvent();
+		this.#removeGlobalEvent();
 		if (IsFree(this.currentDropdownType)) this.currentDropdownPlugin?.off?.();
 
 		this.index = -1;
 		this.menus = [];
-		this.__menuBtn = null;
-		this.__menuContainer = null;
+		this.#menuBtn = null;
+		this.#menuContainer = null;
 		this.currentButton = null;
 
 		if (this.currentDropdown) {
@@ -146,10 +153,9 @@ Menu.prototype = {
 
 		this.editor._preventBlur = false;
 		this.currentDropdownPlugin = null;
-	},
+	}
 
 	/**
-	 * @this {MenuThis}
 	 * @description Shows a previously hidden dropdown menu that is still in "on" state.
 	 * - Only works when a dropdown is active (currentButton exists)
 	 * - Re-displays the dropdown that was hidden by dropdownHide()
@@ -159,10 +165,9 @@ Menu.prototype = {
 		if (this.currentButton) {
 			this.dropdownOn(this.currentButton);
 		}
-	},
+	}
 
 	/**
-	 * @this {MenuThis}
 	 * @description Temporarily hides the currently active dropdown menu without closing it.
 	 * - Unlike dropdownOff(), this does not clear the dropdown state or event listeners
 	 * - The dropdown remains "on" but visually hidden
@@ -172,32 +177,30 @@ Menu.prototype = {
 		if (this.currentDropdown) {
 			this.currentDropdown.style.display = 'none';
 		}
-	},
+	}
 
 	/**
-	 * @this {MenuThis}
 	 * @description Opens the menu container for the specified button.
 	 * @param {Node} button Container's button element to call
 	 */
 	containerOn(button) {
-		this.__removeGlobalEvent();
+		this.#removeGlobalEvent();
 
 		this.currentContainerActiveButton = /** @type {HTMLButtonElement} */ (button);
 		const containerName = (this.currentContainerName = this.currentContainerActiveButton.getAttribute('data-command'));
-		this._setMenuPosition(button, (this.currentContainer = this.targetMap[containerName]));
+		this.#setMenuPosition(button, (this.currentContainer = this.targetMap[containerName]));
 
-		this._bindClose_cons_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler.containerDown, false);
+		this.#bindClose_cons_mouse = this.eventManager.addGlobalEvent('mousedown', this.#globalEventHandler.containerDown, false);
 
 		if (this.plugins[containerName].on) this.plugins[containerName].on(button);
 		this.editor._preventBlur = true;
-	},
+	}
 
 	/**
-	 * @this {MenuThis}
 	 * @description Closes the currently open menu container.
 	 */
 	containerOff() {
-		this.__removeGlobalEvent();
+		this.#removeGlobalEvent();
 
 		if (this.currentContainer) {
 			this.currentContainerName = '';
@@ -209,73 +212,65 @@ Menu.prototype = {
 		}
 
 		this.editor._preventBlur = false;
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {MenuThis}
+	 * @description Reset the menu position.
+	 * @param {Node} element Button element
+	 * @param {HTMLElement} menu Menu element
+	 */
+	__resetMenuPosition(element, menu) {
+		this.#offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'));
+	}
+
+	/**
+	 * @internal
+	 * @description Restore the last menu position using previously stored button and menu elements.
+	 */
+	__restoreMenuPosition() {
+		if (!this.#menuBtn || !this.#menuContainer) return;
+		this.#setMenuPosition(this.#menuBtn, this.#menuContainer);
+	}
+
+	/**
 	 * @description Set the menu position.
 	 * @param {Node} element Button element
 	 * @param {HTMLElement} menu Menu element
 	 */
-	_setMenuPosition(element, menu) {
+	#setMenuPosition(element, menu) {
 		menu.style.visibility = 'hidden';
 		menu.style.display = 'block';
 		menu.style.height = '';
 		dom.utils.addClass(element.parentElement.children, 'on');
 
-		this.offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'));
+		this.#offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'));
 
 		menu.style.visibility = '';
 
-		this.__menuBtn = element;
-		this.__menuContainer = menu;
-	},
+		this.#menuBtn = element;
+		this.#menuContainer = menu;
+	}
 
 	/**
-	 * @internal
-	 * @this {MenuThis}
-	 * @description Reset the menu position.
-	 * @param {Node} element Button element
-	 * @param {HTMLElement} menu Menu element
-	 */
-	_resetMenuPosition(element, menu) {
-		this.offset.setRelPosition(menu, this.carrierWrapper, element.parentElement, dom.query.getParentElement(element, '.se-toolbar'));
-	},
-
-	/**
-	 * @internal
-	 * @this {MenuThis}
-	 * @description Restore the last menu position using previously stored button and menu elements.
-	 */
-	_restoreMenuPosition() {
-		if (!this.__menuBtn || !this.__menuContainer) return;
-		this._setMenuPosition(this.__menuBtn, this.__menuContainer);
-	},
-
-	/**
-	 * @internal
-	 * @this {MenuThis}
 	 * @description Check if the element is part of a more layer
 	 * @param {Node} element The element to check
 	 * @returns {HTMLElement|null} The more layer element or null
 	 */
-	_checkMoreLayer(element) {
+	#checkMoreLayer(element) {
 		const more = dom.query.getParentElement(element, '.se-more-layer');
 		if (more && more.style.display !== 'block') {
 			return more.getAttribute('data-ref') ? more : null;
 		} else {
 			return null;
 		}
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {MenuThis}
 	 * @description Move the selected item in the dropdown menu
 	 * @param {number} num Direction and amount to move (-1 for up, 1 for down)
 	 */
-	_moveItem(num) {
+	#moveItem(num) {
 		dom.utils.removeClass(this.currentDropdown, 'se-select-menu-mouse-move');
 		dom.utils.addClass(this.currentDropdown, 'se-select-menu-key-action');
 		num = this.index + num;
@@ -289,108 +284,99 @@ Menu.prototype = {
 				dom.utils.removeClass(this.menus[i], 'on');
 			}
 		}
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {MenuThis}
 	 * @description Remove global event listeners
 	 */
-	__removeGlobalEvent() {
-		this._bindClose_dropdown_mouse &&= this.eventManager.removeGlobalEvent(this._bindClose_dropdown_mouse);
-		this._bindClose_cons_mouse &&= this.eventManager.removeGlobalEvent(this._bindClose_cons_mouse);
-		if (this._bindClose_dropdown_key) {
-			this._bindClose_dropdown_key = this.eventManager.removeGlobalEvent(this._bindClose_dropdown_key);
+	#removeGlobalEvent() {
+		this.#bindClose_dropdown_mouse &&= this.eventManager.removeGlobalEvent(this.#bindClose_dropdown_mouse);
+		this.#bindClose_cons_mouse &&= this.eventManager.removeGlobalEvent(this.#bindClose_cons_mouse);
+		if (this.#bindClose_dropdown_key) {
+			this.#bindClose_dropdown_key = this.eventManager.removeGlobalEvent(this.#bindClose_dropdown_key);
 			dom.utils.removeClass(this.menus, 'on');
 			dom.utils.removeClass(this.currentDropdown, 'se-select-menu-key-action|se-select-menu-mouse-move');
-			this.currentDropdown.removeEventListener('mousemove', this.__globalEventHandler.mousemove, false);
-			this.currentDropdown.removeEventListener('mouseout', this.__globalEventHandler.mouseout, false);
+			this.currentDropdown.removeEventListener('mousemove', this.#globalEventHandler.mousemove, false);
+			this.currentDropdown.removeEventListener('mouseout', this.#globalEventHandler.mouseout, false);
 		}
-	},
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnMouseDown_dropdown(e) {
+		const eventTarget = dom.query.getEventTarget(e);
+		if (dom.query.getParentElement(eventTarget, '.se-dropdown')) return;
+		this.dropdownOff();
+	}
+
+	/**
+	 */
+	#OnMouseout_dropdown() {
+		this.index = -1;
+	}
+
+	/**
+	 * @param {KeyboardEvent} e - Event object
+	 */
+	#OnKeyDown_dropdown(e) {
+		const keyCode = e.code;
+		switch (keyCode) {
+			case 'ArrowUp': // up
+				e.preventDefault();
+				e.stopPropagation();
+				this.#moveItem(-1);
+				break;
+			case 'ArrowDown': // down
+				e.preventDefault();
+				e.stopPropagation();
+				this.#moveItem(1);
+				break;
+			case 'ArrowLeft': // left
+				e.preventDefault();
+				e.stopPropagation();
+				this.#moveItem(-1);
+				break;
+			case 'ArrowRight': //right
+				e.preventDefault();
+				e.stopPropagation();
+				this.#moveItem(1);
+				break;
+			case 'Enter':
+			case 'Space': /* enter, space */ {
+				if (this.index < 0) break;
+
+				const target = this.menus[this.index];
+				if (!target || typeof this.plugins[this.currentDropdownName].action !== 'function') return;
+
+				e.preventDefault();
+				e.stopPropagation();
+				this.plugins[this.currentDropdownName].action(target);
+				this.dropdownOff();
+				break;
+			}
+		}
+	}
+
+	/**
+	 * @param {MouseEvent} e - Event object
+	 */
+	#OnMousemove_dropdown(e) {
+		dom.utils.addClass(this.currentDropdown, 'se-select-menu-mouse-move');
+		dom.utils.removeClass(this.currentDropdown, 'se-select-menu-key-action');
+
+		const index = this.menus.indexOf(e.target);
+		if (index === -1) return;
+		this.index = index * 1;
+	}
 
 	/**
 	 * @internal
-	 * @this {MenuThis}
 	 * @description Destroy the Menu instance and release memory
 	 */
 	_destroy() {
-		this.__removeGlobalEvent();
-	},
-
-	constructor: Menu,
-};
-
-/**
- * @this {MenuThis}
- * @param {MouseEvent} e - Event object
- */
-function OnMouseDown_dropdown(e) {
-	const eventTarget = dom.query.getEventTarget(e);
-	if (dom.query.getParentElement(eventTarget, '.se-dropdown')) return;
-	this.dropdownOff();
-}
-
-/**
- * @this {MenuThis}
- */
-function OnMouseout_dropdown() {
-	this.index = -1;
-}
-
-/**
- * @this {MenuThis}
- * @param {KeyboardEvent} e - Event object
- */
-function OnKeyDown_dropdown(e) {
-	const keyCode = e.code;
-	switch (keyCode) {
-		case 'ArrowUp': // up
-			e.preventDefault();
-			e.stopPropagation();
-			this._moveItem(-1);
-			break;
-		case 'ArrowDown': // down
-			e.preventDefault();
-			e.stopPropagation();
-			this._moveItem(1);
-			break;
-		case 'ArrowLeft': // left
-			e.preventDefault();
-			e.stopPropagation();
-			this._moveItem(-1);
-			break;
-		case 'ArrowRight': //right
-			e.preventDefault();
-			e.stopPropagation();
-			this._moveItem(1);
-			break;
-		case 'Enter':
-		case 'Space': /* enter, space */ {
-			if (this.index < 0) break;
-
-			const target = this.menus[this.index];
-			if (!target || typeof this.plugins[this.currentDropdownName].action !== 'function') return;
-
-			e.preventDefault();
-			e.stopPropagation();
-			this.plugins[this.currentDropdownName].action(target);
-			this.dropdownOff();
-			break;
-		}
+		this.#removeGlobalEvent();
 	}
-}
-
-/**
- * @this {MenuThis}
- * @param {MouseEvent} e - Event object
- */
-function OnMousemove_dropdown(e) {
-	dom.utils.addClass(this.currentDropdown, 'se-select-menu-mouse-move');
-	dom.utils.removeClass(this.currentDropdown, 'se-select-menu-key-action');
-
-	const index = this.menus.indexOf(e.target);
-	if (index === -1) return;
-	this.index = index * 1;
 }
 
 /**

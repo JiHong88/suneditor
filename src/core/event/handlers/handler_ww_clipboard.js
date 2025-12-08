@@ -1,5 +1,5 @@
 /**
- * @typedef {Omit<import('../eventManager').default & Partial<SunEditor.Injector>, 'eventManager'>} EventManagerThis_handler_ww_clipboard
+ * @typedef {import('../eventManager').default} EventManagerThis_handler_ww_clipboard
  */
 
 /**

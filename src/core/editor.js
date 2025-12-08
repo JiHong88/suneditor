@@ -41,488 +41,518 @@ const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-component
 const EDITOR_CLASS_KEYS = Object.freeze(['eventManager', 'instanceCheck', ..._getClassInjectorKeys()]);
 
 /**
- * @constructor
- * @description SunEditor constructor function.
- * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} multiTargets Target element
- * @param {SunEditor.InitOptions} options options
+ * @description SunEditor class.
  */
-function Editor(multiTargets, options) {
-	const _d = multiTargets[0].target.ownerDocument || env._d;
-	const _w = _d.defaultView || env._w;
-	const product = Constructor(multiTargets, options);
+class Editor {
+	#pluginCallButtons;
+	#pluginCallButtons_sub;
+	#fileInfoPluginsCheck;
+	#fileInfoPluginsReset;
+	#originOptions;
 
 	/**
-	 * @description Frame root key array
-	 * @type {Array<*>}
+	 * @constructor
+	 * @description SunEditor constructor function.
+	 * @param {Array<{target: Element, key: *, options: SunEditor.InitFrameOptions}>} multiTargets Target element
+	 * @param {SunEditor.InitOptions} options options
 	 */
-	this.rootKeys = product.rootKeys;
-
-	/**
-	 * @description Frame root map
-	 * @type {Map<*, SunEditor.FrameContext>}
-	 */
-	this.frameRoots = product.frameRoots;
-
-	/**
-	 * @description Document object
-	 * @type {Document}
-	 */
-	this._d = _d;
-
-	/**
-	 * @description Window object
-	 * @type {Window}
-	 */
-	this._w = _w;
-
-	/**
-	 * @description Controllers carrier
-	 * @type {HTMLElement}
-	 */
-	this.carrierWrapper = product.carrierWrapper;
-
-	/**
-	 * @description Editor context object
-	 * @type {SunEditor.Context}
-	 */
-	this.__context = product.context;
-
-	/**
-	 * @description Utility object that manages the editor's runtime context.
-	 * Provides methods to get, set, and inspect internal context.
-	 * @type {ContextUtil}
-	 */
-	this.context = ContextUtil(this);
-
-	/**
-	 * @description Current focusing [frame] context
-	 * @type {import('./config/frameContext').FrameContextMap}
-	 */
-	this.__frameContext = new Map();
-
-	/**
-	 * @description Utility object that manages the editor's runtime [frame] context.
-	 * Provides methods to get, set, and inspect internal context.
-	 * @type {FrameContextUtil}
-	 */
-	this.frameContext = FrameContextUtil(this);
-
-	/**
-	 * @description Current focusing [frame] context options
-	 * @type {SunEditor.FrameOptions}
-	 */
-	this.__frameOptions = new Map();
-
-	/**
-	 * @description Utility object that manages the editor's runtime [frame] options.
-	 * Provides methods to get, set, and inspect internal [frame] options.
-	 * @type {FrameOptionsMap}
-	 */
-	this.frameOptions = FrameOptionsMap(this);
-
-	/**
-	 * @description Editor row options
-	 * @type {Map<string, *>}
-	 */
-	this.__options = product.options;
-
-	/**
-	 * @description Utility object that manages the editor's runtime options.
-	 * Provides methods to get, set, and inspect internal editor options.
-	 * @type {BaseOptionsMap}
-	 */
-	this.options = BaseOptionsMap(this);
-
-	/**
-	 * @description Plugins
-	 * @type {Object<string, *>}
-	 */
-	this.plugins = product.plugins || {};
-
-	/**
-	 * @description Events object, call by triggerEvent function
-	 * @type {SunEditor.Event.Handlers}
-	 */
-	this.events = null;
-
-	/**
-	 * @description Call the event function by injecting self: this.
-	 * @type {(eventName: string, ...args: *) => Promise<*>}
-	 */
-	this.triggerEvent = null;
-
-	/**
-	 * @description Default icons object
-	 * @type {Object<string, string>}
-	 */
-	this.icons = product.icons;
-
-	/**
-	 * @description loaded language
-	 * @type {Object<string, *>}
-	 */
-	this.lang = product.lang;
-
-	/**
-	 * @description Variables used internally in editor operation
-	 * @type {SunEditor.Status}
-	 */
-	this.status = {
-		hasFocus: false,
-		tabSize: 4,
-		indentSize: 25,
-		codeIndentSize: 2,
-		currentNodes: [],
-		currentNodesMap: [],
-		initViewportHeight: 0,
-		currentViewportHeight: 0,
-		onSelected: false,
-		rootKey: product.rootId,
-		isScrollable: (fc) => {
-			fc ||= this.frameContext;
-			const fo = fc.get('options');
-			const height = fo.get('height');
-			const maxHeight = fo.get('maxHeight');
-
-			if (height !== 'auto') {
-				return true;
-			}
-
-			if (!maxHeight) {
-				return false;
-			}
-
-			// height === 'auto' && maxHeight
-			return fc.get('wysiwyg').offsetHeight >= numbers.get(maxHeight);
-		},
-		_range: null,
-		_onMousedown: false,
-	};
-
-	/**
-	 * @description Is classic mode?
-	 * @type {boolean}
-	 */
-	this.isClassic = false;
-
-	/**
-	 * @description Is inline mode?
-	 * @type {boolean}
-	 */
-	this.isInline = false;
-
-	/**
-	 * @description Is balloon|balloon-always mode?
-	 * @type {boolean}
-	 */
-	this.isBalloon = false;
-
-	/**
-	 * @description Is balloon-always mode?
-	 * @type {boolean}
-	 */
-	this.isBalloonAlways = false;
-
-	/**
-	 * @description Is subToolbar balloon|balloon-always mode?
-	 * @type {boolean}
-	 */
-	this.isSubBalloon = false;
-
-	/**
-	 * @description Is subToolbar balloon-always mode?
-	 * @type {boolean}
-	 */
-	this.isSubBalloonAlways = false;
-
-	/**
-	 * @description All command buttons map
-	 * @type {Map<string, HTMLElement>}
-	 */
-	this.allCommandButtons = new Map();
-
-	/**
-	 * @description All command buttons map
-	 * @type {Map<string, HTMLElement>}
-	 */
-	this.subAllCommandButtons = new Map();
-
-	/**
-	 * @description Shoutcuts key map
-	 * @type {Map<string, *>}
-	 */
-	this.shortcutsKeyMap = new Map();
-
-	/**
-	 * @description Shoutcuts reverse key array
-	 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
-	 * @type {Set<string>}
-	 */
-	this.reverseKeys = new Set();
-
-	/**
-	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
-	 * - Each button is contained in an array.
-	 * @type {Map<string, Array<HTMLButtonElement>>}
-	 */
-	this.commandTargets = new Map();
-
-	/**
-	 * @description Plugins array with "active" method.
-	 * - "activeCommands" runs the "add" method when creating the editor.
-	 * @type {Array<string>}
-	 */
-	this.activeCommands = null;
-
-	/**
-	 * @description The selection node (selection.getNode()) to which the effect was last applied
-	 * @type {?Node}
-	 */
-	this.effectNode = null;
-
-	/**
-	 * @description Currently open "Modal" instance
-	 * @type {*}
-	 */
-	this.opendModal = null;
-
-	/**
-	 * @description Currently open "Controller" info array
-	 * @type {Array<SunEditor.Module.Controller.Info>}
-	 */
-	this.opendControllers = [];
-
-	/**
-	 * @description Currently open "Controller" caller plugin name
-	 */
-	this.currentControllerName = '';
-
-	/**
-	 * @description Currently open "Browser" instance
-	 * @type {*}
-	 */
-	this.opendBrowser = null;
-
-	/**
-	 * @description Whether "SelectMenu" is open
-	 * @type {boolean}
-	 */
-	this.selectMenuOn = false;
-
-	// ------ base ------
-	/** @description History class instance @type {ReturnType<typeof import('./base/history').default>} */
-	this.history = null;
-	/** @description EventManager class instance @type {import('./event/eventManager').default} */
-	this.eventManager = null;
-
-	//  ----- util -----
-	/** @description iframe-safe instanceof check utility class @type {import('./util/instanceCheck').default} */
-	this.instanceCheck = null;
-
-	// ------ class ------
-	/** @description Toolbar class instance @type {import('./class/toolbar').default} */
-	this.toolbar = null;
-	/** @description Sub-Toolbar class instance @type {?import('./class/toolbar').default} */
-	this.subToolbar = null;
-	/** @description Char class instance @type {import('./class/char').default} */
-	this.char = null;
-	/** @description Component class instance @type {import('./class/component').default} */
-	this.component = null;
-	/** @description Format class instance @type {import('./class/format').default} */
-	this.format = null;
-	/** @description HTML class instance @type {import('./class/html').default} */
-	this.html = null;
-	/** @description Inline format class instance @type {import('./class/inline').default} */
-	this.inline = null;
-	/** @description List format class instance @type {import('./class/listFormat').default} */
-	this.listFormat = null;
-	/** @description Menu class instance @type {import('./class/menu').default} */
-	this.menu = null;
-	/** @description NodeTransform class instance @type {import('./class/nodeTransform').default} */
-	this.nodeTransform = null;
-	/** @description Offset class instance @type {import('./class/offset').default} */
-	this.offset = null;
-	/** @description Selection class instance @type {import('./class/selection').default} */
-	this.selection = null;
-	/** @description Shortcuts class instance @type {import('./class/shortcuts').default} */
-	this.shortcuts = null;
-	/** @description UI class instance @type {import('./class/ui').default} */
-	this.ui = null;
-	/** @description Viewer class instance @type {import('./class/viewer').default} */
-	this.viewer = null;
-
-	// ------------------------------------------------------- private properties -------------------------------------------------------
-	/**
-	 * @description Line breaker (top)
-	 * @type {HTMLElement}
-	 */
-	this._lineBreaker_t = null;
-
-	/**
-	 * @description Line breaker (bottom)
-	 * @type {HTMLElement}
-	 */
-	this._lineBreaker_b = null;
-
-	/**
-	 * @description Closest ShadowRoot to editor if found
-	 * @type {ShadowRoot & { getSelection?: () => Selection }} - Chromium-based browsers (Chrome, Edge, etc.) has a getSelection method on the ShadowRoot
-	 */
-	this._shadowRoot = null;
-
-	/**
-	 * @description Plugin call event map
-	 * @type {Map<string, Array<((...args: *) => *) & { index: number }>>}
-	 */
-	this._onPluginEvents = null;
-
-	/**
-	 * @description Copy format info
-	 * - eventManager.__cacheStyleNodes copied
-	 * @type {?Array<Node>}
-	 */
-	this._onCopyFormatInfo = null;
-
-	/**
-	 * @description Copy format init method
-	 * @type {?(...args: *) => *}
-	 */
-	this._onCopyFormatInitMethod = null;
-
-	/**
-	 * @description Controller target's frame div (editor.frameContext.get('topArea'))
-	 * @type {?HTMLElement}
-	 */
-	this._controllerTargetContext = null;
-
-	/**
-	 * @description List of buttons that are disabled when "controller" is opened
-	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
-	 */
-	this._controllerOnDisabledButtons = [];
-
-	/**
-	 * @description List of buttons that are disabled when "codeView" mode opened
-	 * @type {Array<HTMLButtonElement|HTMLInputElement>}
-	 */
-	this._codeViewDisabledButtons = [];
-
-	/**
-	 * @description List of buttons to run plugins in the toolbar
-	 * @type {Object<string, Array<HTMLElement>>}
-	 */
-	this._pluginCallButtons = product.pluginCallButtons;
-
-	/**
-	 * @description List of buttons to run plugins in the Sub-Toolbar
-	 * @type {Object<string, Array<HTMLElement>>|[]}
-	 */
-	this._pluginCallButtons_sub = product.pluginCallButtons_sub;
-
-	/**
-	 * @description Responsive Toolbar Button Structure array
-	 * @type {Array<*>}
-	 */
-	this._responsiveButtons = product.responsiveButtons;
-
-	/**
-	 * @description Responsive Sub-Toolbar Button Structure array
-	 * @type {Array<*>}
-	 */
-	this._responsiveButtons_sub = product.responsiveButtons_sub;
-
-	/**
-	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
-	 * @type {boolean}
-	 */
-	this._notHideToolbar = false;
-
-	/**
-	 * @description Variables for controlling blur events
-	 * @type {boolean}
-	 */
-	this._preventBlur = false;
-
-	/**
-	 * @description Variables for controlling focus events
-	 * @type {boolean}
-	 */
-	this._preventFocus = false;
-
-	/**
-	 * @description Variables for controlling selection change events
-	 */
-	this._preventSelection = false;
-
-	/**
-	 * @description If true, initialize all indexes of image, video information
-	 * @type {boolean}
-	 */
-	this._componentsInfoInit = true;
-
-	/**
-	 * @description If true, reset all indexes of image, video information
-	 * @type {boolean}
-	 */
-	this._componentsInfoReset = false;
-
-	/**
-	 * @description plugin retainFormat info Map()
-	 * @type {Map<string, { key: string, method: (...args: *) => * }>}
-	 */
-	this._MELInfo = null;
-
-	/**
-	 * @description Properties for managing files in the "FileManager" module
-	 * @type {Array<*>}
-	 */
-	this._fileInfoPluginsCheck = null;
-
-	/**
-	 * @description Properties for managing files in the "FileManager" module
-	 * @type {Array<*>}
-	 */
-	this._fileInfoPluginsReset = null;
-
-	/**
-	 * @description Variables for file component management
-	 * @type {Object<string, *>}
-	 */
-	this._fileManager = {
-		tags: null,
-		regExp: null,
-		pluginRegExp: null,
-		pluginMap: null,
-	};
-
-	/**
-	 * @description Variables for managing the components
-	 * @type {Array<*>}
-	 */
-	this._componentManager = [];
-
-	/**
-	 * @description Current Figure container.
-	 * @type {?HTMLElement}
-	 */
-	this._figureContainer = null;
-
-	/**
-	 * @description Origin options
-	 * @type {SunEditor.InitOptions}
-	 */
-	this._originOptions = options;
-
-	/** ----- Create editor ------------------------------------------------------------ */
-	try {
-		this.__Create(options);
-	} catch (e) {
-		console.error('[SUNEDITOR:E_CREATE_FAIL] Failed to create editor instance.', e);
-		throw e;
+	constructor(multiTargets, options) {
+		const _d = multiTargets[0].target.ownerDocument || env._d;
+		const _w = _d.defaultView || env._w;
+		const product = Constructor(multiTargets, options);
+
+		/**
+		 * @description Frame root key array
+		 * @type {Array<*>}
+		 */
+		this.rootKeys = product.rootKeys;
+
+		/**
+		 * @description Frame root map
+		 * @type {Map<*, SunEditor.FrameContext>}
+		 */
+		this.frameRoots = product.frameRoots;
+
+		/**
+		 * @description Document object
+		 * @type {Document}
+		 */
+		this._d = _d;
+
+		/**
+		 * @description Window object
+		 * @type {Window}
+		 */
+		this._w = _w;
+
+		/**
+		 * @description Controllers carrier
+		 * @type {HTMLElement}
+		 */
+		this.carrierWrapper = product.carrierWrapper;
+
+		/**
+		 * @internal
+		 * @description Editor context object
+		 * @type {SunEditor.Context}
+		 */
+		this.__context = product.context;
+
+		/**
+		 * @description Utility object that manages the editor's runtime context.
+		 * Provides methods to get, set, and inspect internal context.
+		 * @type {ContextUtil}
+		 */
+		this.context = ContextUtil(this);
+
+		/**
+		 * @internal
+		 * @description Current focusing [frame] context
+		 * @type {import('./config/frameContext').FrameContextMap}
+		 */
+		this.__frameContext = new Map();
+
+		/**
+		 * @description Utility object that manages the editor's runtime [frame] context.
+		 * Provides methods to get, set, and inspect internal context.
+		 * @type {FrameContextUtil}
+		 */
+		this.frameContext = FrameContextUtil(this);
+
+		/**
+		 * @internal
+		 * @description Current focusing [frame] context options
+		 * @type {SunEditor.FrameOptions}
+		 */
+		this.__frameOptions = new Map();
+
+		/**
+		 * @description Utility object that manages the editor's runtime [frame] options.
+		 * Provides methods to get, set, and inspect internal [frame] options.
+		 * @type {FrameOptionsMap}
+		 */
+		this.frameOptions = FrameOptionsMap(this);
+
+		/**
+		 * @internal
+		 * @description Editor row options
+		 * @type {Map<string, *>}
+		 */
+		this.__options = product.options;
+
+		/**
+		 * @description Utility object that manages the editor's runtime options.
+		 * Provides methods to get, set, and inspect internal editor options.
+		 * @type {BaseOptionsMap}
+		 */
+		this.options = BaseOptionsMap(this);
+
+		/**
+		 * @description Plugins
+		 * @type {Object<string, *>}
+		 */
+		this.plugins = product.plugins || {};
+
+		/**
+		 * @description Events object, call by triggerEvent function
+		 * @type {SunEditor.Event.Handlers}
+		 */
+		this.events = null;
+
+		/**
+		 * @description Call the event function by injecting self: this.
+		 * @type {(eventName: string, ...args: *) => Promise<*>}
+		 */
+		this.triggerEvent = null;
+
+		/**
+		 * @description Default icons object
+		 * @type {Object<string, string>}
+		 */
+		this.icons = product.icons;
+
+		/**
+		 * @description loaded language
+		 * @type {Object<string, *>}
+		 */
+		this.lang = product.lang;
+
+		/**
+		 * @description Variables used internally in editor operation
+		 * @type {SunEditor.Status}
+		 */
+		this.status = {
+			hasFocus: false,
+			tabSize: 4,
+			indentSize: 25,
+			codeIndentSize: 2,
+			currentNodes: [],
+			currentNodesMap: [],
+			initViewportHeight: 0,
+			currentViewportHeight: 0,
+			onSelected: false,
+			rootKey: product.rootId,
+			isScrollable: (fc) => {
+				fc ||= this.frameContext;
+				const fo = fc.get('options');
+				const height = fo.get('height');
+				const maxHeight = fo.get('maxHeight');
+
+				if (height !== 'auto') {
+					return true;
+				}
+
+				if (!maxHeight) {
+					return false;
+				}
+
+				// height === 'auto' && maxHeight
+				return fc.get('wysiwyg').offsetHeight >= numbers.get(maxHeight);
+			},
+			_range: null,
+			_onMousedown: false,
+		};
+
+		/**
+		 * @description Is classic mode?
+		 * @type {boolean}
+		 */
+		this.isClassic = false;
+
+		/**
+		 * @description Is inline mode?
+		 * @type {boolean}
+		 */
+		this.isInline = false;
+
+		/**
+		 * @description Is balloon|balloon-always mode?
+		 * @type {boolean}
+		 */
+		this.isBalloon = false;
+
+		/**
+		 * @description Is balloon-always mode?
+		 * @type {boolean}
+		 */
+		this.isBalloonAlways = false;
+
+		/**
+		 * @description Is subToolbar balloon|balloon-always mode?
+		 * @type {boolean}
+		 */
+		this.isSubBalloon = false;
+
+		/**
+		 * @description Is subToolbar balloon-always mode?
+		 * @type {boolean}
+		 */
+		this.isSubBalloonAlways = false;
+
+		/**
+		 * @description All command buttons map
+		 * @type {Map<string, HTMLElement>}
+		 */
+		this.allCommandButtons = new Map();
+
+		/**
+		 * @description All command buttons map
+		 * @type {Map<string, HTMLElement>}
+		 */
+		this.subAllCommandButtons = new Map();
+
+		/**
+		 * @description Shoutcuts key map
+		 * @type {Map<string, *>}
+		 */
+		this.shortcutsKeyMap = new Map();
+
+		/**
+		 * @description Shoutcuts reverse key array
+		 * - An array of key codes generated with the reverseButtons option, used to reverse the action for a specific key combination.
+		 * @type {Set<string>}
+		 */
+		this.reverseKeys = new Set();
+
+		/**
+		 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
+		 * - Each button is contained in an array.
+		 * @type {Map<string, Array<HTMLButtonElement>>}
+		 */
+		this.commandTargets = new Map();
+
+		/**
+		 * @description Plugins array with "active" method.
+		 * - "activeCommands" runs the "add" method when creating the editor.
+		 * @type {Array<string>}
+		 */
+		this.activeCommands = null;
+
+		/**
+		 * @description The selection node (selection.getNode()) to which the effect was last applied
+		 * @type {?Node}
+		 */
+		this.effectNode = null;
+
+		/**
+		 * @description Currently open "Modal" instance
+		 * @type {*}
+		 */
+		this.opendModal = null;
+
+		/**
+		 * @description Currently open "Controller" info array
+		 * @type {Array<SunEditor.Module.Controller.Info>}
+		 */
+		this.opendControllers = [];
+
+		/**
+		 * @description Currently open "Controller" caller plugin name
+		 */
+		this.currentControllerName = '';
+
+		/**
+		 * @description Currently open "Browser" instance
+		 * @type {*}
+		 */
+		this.opendBrowser = null;
+
+		/**
+		 * @description Whether "SelectMenu" is open
+		 * @type {boolean}
+		 */
+		this.selectMenuOn = false;
+
+		// ------ base ------
+		/** @description History class instance @type {ReturnType<typeof import('./base/history').default>} */
+		this.history = null;
+		/** @description EventManager class instance @type {import('./event/eventManager').default} */
+		this.eventManager = null;
+
+		//  ----- util -----
+		/** @description iframe-safe instanceof check utility class @type {import('./util/instanceCheck').default} */
+		this.instanceCheck = null;
+
+		// ------ class ------
+		/** @description Toolbar class instance @type {import('./class/toolbar').default} */
+		this.toolbar = null;
+		/** @description Sub-Toolbar class instance @type {?import('./class/toolbar').default} */
+		this.subToolbar = null;
+		/** @description Char class instance @type {import('./class/char').default} */
+		this.char = null;
+		/** @description Component class instance @type {import('./class/component').default} */
+		this.component = null;
+		/** @description Format class instance @type {import('./class/format').default} */
+		this.format = null;
+		/** @description HTML class instance @type {import('./class/html').default} */
+		this.html = null;
+		/** @description Inline format class instance @type {import('./class/inline').default} */
+		this.inline = null;
+		/** @description List format class instance @type {import('./class/listFormat').default} */
+		this.listFormat = null;
+		/** @description Menu class instance @type {import('./class/menu').default} */
+		this.menu = null;
+		/** @description NodeTransform class instance @type {import('./class/nodeTransform').default} */
+		this.nodeTransform = null;
+		/** @description Offset class instance @type {import('./class/offset').default} */
+		this.offset = null;
+		/** @description Selection class instance @type {import('./class/selection').default} */
+		this.selection = null;
+		/** @description Shortcuts class instance @type {import('./class/shortcuts').default} */
+		this.shortcuts = null;
+		/** @description UI class instance @type {import('./class/ui').default} */
+		this.ui = null;
+		/** @description Viewer class instance @type {import('./class/viewer').default} */
+		this.viewer = null;
+
+		/**
+		 * @description Closest ShadowRoot to editor if found
+		 * @type {ShadowRoot & { getSelection?: () => Selection }} - Chromium-based browsers (Chrome, Edge, etc.) has a getSelection method on the ShadowRoot
+		 */
+		this.shadowRoot = null;
+
+		/**
+		 * @description Variables for controlling blur events
+		 * @type {boolean}
+		 */
+		this._preventBlur = false;
+
+		/**
+		 * @description Variables for controlling focus events
+		 * @type {boolean}
+		 */
+		this._preventFocus = false;
+
+		/**
+		 * @description Variables for controlling selection change events
+		 */
+		this._preventSelection = false;
+
+		// ------------------------------------------------------- internal properties -------------------------------------------------------
+		/**
+		 * @internal
+		 * @description Line breaker (top)
+		 * @type {HTMLElement}
+		 */
+		this._lineBreaker_t = null;
+
+		/**
+		 * @internal
+		 * @description Line breaker (bottom)
+		 * @type {HTMLElement}
+		 */
+		this._lineBreaker_b = null;
+
+		/**
+		 * @internal
+		 * @description Plugin call event map
+		 * @type {Map<string, Array<((...args: *) => *) & { index: number }>>}
+		 */
+		this._onPluginEvents = null;
+
+		/**
+		 * @internal
+		 * @description Copy format info
+		 * - eventManager.__cacheStyleNodes copied
+		 * @type {?Array<Node>}
+		 */
+		this._onCopyFormatInfo = null;
+
+		/**
+		 * @internal
+		 * @description Copy format init method
+		 * @type {?(...args: *) => *}
+		 */
+		this._onCopyFormatInitMethod = null;
+
+		/**
+		 * @internal
+		 * @description Controller target's frame div (editor.frameContext.get('topArea'))
+		 * @type {?HTMLElement}
+		 */
+		this._controllerTargetContext = null;
+
+		/**
+		 * @internal
+		 * @description List of buttons that are disabled when "controller" is opened
+		 * @type {Array<HTMLButtonElement|HTMLInputElement>}
+		 */
+		this._controllerOnDisabledButtons = [];
+
+		/**
+		 * @internal
+		 * @description List of buttons that are disabled when "codeView" mode opened
+		 * @type {Array<HTMLButtonElement|HTMLInputElement>}
+		 */
+		this._codeViewDisabledButtons = [];
+
+		/**
+		 * @internal
+		 * @description Responsive Toolbar Button Structure array
+		 * @type {Array<*>}
+		 */
+		this._responsiveButtons = product.responsiveButtons;
+
+		/**
+		 * @internal
+		 * @description Responsive Sub-Toolbar Button Structure array
+		 * @type {Array<*>}
+		 */
+		this._responsiveButtons_sub = product.responsiveButtons_sub;
+
+		/**
+		 * @internal
+		 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
+		 * @type {boolean}
+		 */
+		this._notHideToolbar = false;
+
+		/**
+		 * @internal
+		 * @description If true, initialize all indexes of image, video information
+		 * @type {boolean}
+		 */
+		this._componentsInfoInit = true;
+
+		/**
+		 * @internal
+		 * @description If true, reset all indexes of image, video information
+		 * @type {boolean}
+		 */
+		this._componentsInfoReset = false;
+
+		/**
+		 * @internal
+		 * @description plugin retainFormat info Map()
+		 * @type {Map<string, { key: string, method: (...args: *) => * }>}
+		 */
+		this._MELInfo = null;
+
+		/**
+		 * @internal
+		 * @description Variables for file component management
+		 * @type {Object<string, *>}
+		 */
+		this._fileManager = {
+			tags: null,
+			regExp: null,
+			pluginRegExp: null,
+			pluginMap: null,
+		};
+
+		/**
+		 * @internal
+		 * @description Variables for managing the components
+		 * @type {Array<*>}
+		 */
+		this._componentManager = [];
+
+		/**
+		 * @internal
+		 * @description Current Figure container.
+		 * @type {?HTMLElement}
+		 */
+		this._figureContainer = null;
+
+		/**
+		 * @description List of buttons to run plugins in the toolbar
+		 * @type {Object<string, Array<HTMLElement>>}
+		 */
+		this.#pluginCallButtons = product.pluginCallButtons;
+
+		/**
+		 * @description List of buttons to run plugins in the Sub-Toolbar
+		 * @type {Object<string, Array<HTMLElement>>|[]}
+		 */
+		this.#pluginCallButtons_sub = product.pluginCallButtons_sub;
+
+		/**
+		 * @description Properties for managing files in the "FileManager" module
+		 * @type {Array<*>}
+		 */
+		this.#fileInfoPluginsCheck = null;
+
+		/**
+		 * @description Properties for managing files in the "FileManager" module
+		 * @type {Array<*>}
+		 */
+		this.#fileInfoPluginsReset = null;
+
+		/**
+		 * @description Origin options
+		 * @type {SunEditor.InitOptions}
+		 */
+		this.#originOptions = options;
+
+		/** ----- Create editor ------------------------------------------------------------ */
+		try {
+			this.#Create(options);
+		} catch (e) {
+			console.error('[SUNEDITOR:E_CREATE_FAIL] Failed to create editor instance.', e);
+			throw e;
+		}
 	}
-}
 
-Editor.prototype = {
 	/**
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * - If the plugin is added call callBack function.
@@ -547,7 +577,7 @@ Editor.prototype = {
 				this.activeCommands.push(pluginName);
 			}
 		}
-	},
+	}
 
 	/**
 	 * @description Run plugin calls and basic commands.
@@ -608,7 +638,7 @@ Editor.prototype = {
 			this.menu.dropdownOff();
 			this.menu.containerOff();
 		}
-	},
+	}
 
 	/**
 	 * @description Execute default command of command button
@@ -700,7 +730,7 @@ Editor.prototype = {
 			default:
 				FONT_STYLE(this, command);
 		}
-	},
+	}
 
 	/**
 	 * @description Execute "editor.run" with command button.
@@ -719,7 +749,7 @@ Editor.prototype = {
 		if (targetBtn.disabled) return;
 
 		this.run(command, type, target);
-	},
+	}
 
 	/**
 	 * @description It is executed by inserting the button of commandTargets as the argument value of the "f" function.
@@ -731,7 +761,7 @@ Editor.prototype = {
 		if (this.commandTargets.has(cmd)) {
 			this.commandTargets.get(cmd).forEach(func);
 		}
-	},
+	}
 
 	/**
 	 * @description Execute a function by traversing all root targets.
@@ -739,7 +769,7 @@ Editor.prototype = {
 	 */
 	applyFrameRoots(f) {
 		this.frameRoots.forEach(f);
-	},
+	}
 
 	/**
 	 * @description Checks if the content of the editor is empty.
@@ -750,7 +780,7 @@ Editor.prototype = {
 	isEmpty(fc) {
 		const wysiwyg = (fc || this.frameContext).get('wysiwyg');
 		return dom.check.isZeroWidth(wysiwyg.textContent) && !wysiwyg.querySelector(this.options.get('allowedEmptyTags')) && (wysiwyg.innerText.match(/\n/g) || '').length <= 1;
-	},
+	}
 
 	/**
 	 * @description Set direction to "rtl" or "ltr".
@@ -762,7 +792,7 @@ Editor.prototype = {
 
 		try {
 			this.options.set('_rtl', rtl);
-			this.ui._offCurrentController();
+			this.ui.offCurrentController();
 
 			const fc = this.frameContext;
 			const plugins = this.plugins;
@@ -828,7 +858,7 @@ Editor.prototype = {
 
 		this.effectNode = null;
 		this.eventManager.applyTagEffect();
-	},
+	}
 
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
@@ -856,7 +886,7 @@ Editor.prototype = {
 
 		// check reoption validation
 		const newOptionKeys = Object.keys(newOptions);
-		CheckResetKeys(newOptionKeys, this.plugins, '');
+		this.#CheckResetKeys(newOptionKeys, this.plugins, '');
 		if (newOptionKeys.length === 0) return;
 
 		if (frameRoots.size === 1) {
@@ -864,10 +894,10 @@ Editor.prototype = {
 		}
 
 		// option merge
-		const _originOptions = [this._originOptions, newOptions].reduce((init, option) => {
+		const _originOptions = [this.#originOptions, newOptions].reduce((init, option) => {
 			for (const key in option) {
 				if (frameRoots.has(key || null)) {
-					RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots);
+					this.#RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots);
 				} else {
 					init[key] = option[key];
 				}
@@ -986,7 +1016,7 @@ Editor.prototype = {
 
 		/** apply options */
 		// _origin
-		this._originOptions = _originOptions;
+		this.#originOptions = _originOptions;
 
 		// --- [toolbar] ---
 		const toolbar = this.context.get('toolbar_main');
@@ -1008,13 +1038,13 @@ Editor.prototype = {
 		}
 
 		this.effectNode = null;
-		this._setFrameInfo(this.frameRoots.get(this.status.rootKey));
+		this.#setFrameInfo(this.frameRoots.get(this.status.rootKey));
 
 		// plugin hook
 		for (const plugin of Object.values(this.plugins)) {
 			plugin.init?.();
 		}
-	},
+	}
 
 	/**
 	 * @description Change the current root index.
@@ -1024,9 +1054,9 @@ Editor.prototype = {
 		if (rootKey === this.status.rootKey) return;
 
 		this.status.rootKey = rootKey;
-		this._setFrameInfo(this.frameRoots.get(rootKey));
+		this.#setFrameInfo(this.frameRoots.get(rootKey));
 		this.toolbar._resetSticky();
-	},
+	}
 
 	/**
 	 * @description javascript execCommand
@@ -1037,7 +1067,7 @@ Editor.prototype = {
 	execCommand(command, showDefaultUI, value) {
 		this.frameContext.get('_wd').execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
 		this.history.push(true);
-	},
+	}
 
 	/**
 	 * @description Focus to wysiwyg area
@@ -1071,7 +1101,7 @@ Editor.prototype = {
 		}
 
 		if (this.isBalloon) this.eventManager._toggleToolbarBalloon();
-	},
+	}
 
 	/**
 	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
@@ -1100,7 +1130,7 @@ Editor.prototype = {
 		} else {
 			this.focus();
 		}
-	},
+	}
 
 	/**
 	 * @description Focusout to wysiwyg area (.blur())
@@ -1111,7 +1141,7 @@ Editor.prototype = {
 		} else {
 			this.frameContext.get('wysiwyg').blur();
 		}
-	},
+	}
 
 	/**
 	 * @description Destroy the suneditor
@@ -1202,44 +1232,32 @@ Editor.prototype = {
 		this.carrierWrapper = null;
 		this.history = null;
 		this.rootKeys = null;
-		this._shadowRoot = null;
-		this._originOptions = null;
-		this._pluginCallButtons = null;
-		this._pluginCallButtons_sub = null;
+		this.effectNode = null;
+		this.opendModal = null;
+		this.opendBrowser = null;
+		this.opendControllers = null;
+		this.activeCommands = null;
+		this.shadowRoot = null;
 		this._responsiveButtons = null;
 		this._responsiveButtons_sub = null;
-		this._fileInfoPluginsCheck = null;
-		this._fileInfoPluginsReset = null;
 		this._fileManager = null;
 		this._componentManager = null;
 		this._controllerOnDisabledButtons = null;
 		this._codeViewDisabledButtons = null;
-		this.opendControllers = null;
-		this.activeCommands = null;
 		this._lineBreaker_t = null;
 		this._lineBreaker_b = null;
 		this._onCopyFormatInfo = null;
 		this._onCopyFormatInitMethod = null;
-		this.effectNode = null;
-		this.opendModal = null;
-		this.opendBrowser = null;
+		this.#originOptions = null;
+		this.#pluginCallButtons = null;
+		this.#pluginCallButtons_sub = null;
+		this.#fileInfoPluginsCheck = null;
+		this.#fileInfoPluginsReset = null;
 
 		return null;
-	},
+	}
 
 	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
-	/**
-	 * @internal
-	 * @description Set frameContext, frameOptions
-	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
-	 */
-	_setFrameInfo(rt) {
-		this.frameContext.reset(rt);
-		this.frameOptions.reset(rt.get('options'));
-		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
-		this._lineBreaker_t = rt.get('lineBreaker_t');
-		this._lineBreaker_b = rt.get('lineBreaker_b');
-	},
 
 	/**
 	 * @internal
@@ -1247,8 +1265,8 @@ Editor.prototype = {
 	 */
 	_nativeFocus() {
 		this.selection.__focus();
-		this.selection._init();
-	},
+		this.selection.init();
+	}
 
 	/**
 	 * @internal
@@ -1256,52 +1274,43 @@ Editor.prototype = {
 	 * @param {boolean} loaded If true, the component is loaded.
 	 */
 	_checkComponents(loaded) {
-		for (let i = 0, len = this._fileInfoPluginsCheck.length; i < len; i++) {
-			this._fileInfoPluginsCheck[i](loaded);
+		for (let i = 0, len = this.#fileInfoPluginsCheck.length; i < len; i++) {
+			this.#fileInfoPluginsCheck[i](loaded);
 		}
-	},
+	}
 
 	/**
 	 * @internal
 	 * @description Initialize the information of the components.
 	 */
 	_resetComponents() {
-		for (let i = 0, len = this._fileInfoPluginsReset.length; i < len; i++) {
-			this._fileInfoPluginsReset[i]();
+		for (let i = 0, len = this.#fileInfoPluginsReset.length; i < len; i++) {
+			this.#fileInfoPluginsReset[i]();
 		}
-	},
+	}
 
 	/**
 	 * @internal
-	 * @description Initializ wysiwyg area (Only called from core._init)
-	 * @param {SunEditor.FrameContext} e frameContext
-	 * @param {string} value initial html string
+	 * @description Set display property when there is placeholder.
+	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
 	 */
-	_initWysiwygArea(e, value) {
-		// set content
-		e.get('wysiwyg').innerHTML =
-			this.html.clean(typeof value === 'string' ? value : (/^TEXTAREA$/i.test(e.get('originElement').nodeName) ? e.get('originElement').value : e.get('originElement').innerHTML) || '', {
-				forceFormat: true,
-				whitelist: null,
-				blacklist: null,
-				_freeCodeViewMode: this.options.get('freeCodeViewMode'),
-			}) || '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
+	_checkPlaceholder(fc) {
+		fc ||= /** @type {SunEditor.FrameContext} */ (this.frameContext);
+		const placeholder = fc.get('placeholder');
 
-		// char counter
-		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
-
-		// document type init
-		if (this.options.get('type') === 'document') {
-			e.set('documentType', new DocumentType(this, e));
-			if (e.get('documentType').useHeader) {
-				e.set('documentType_use_header', true);
+		if (placeholder) {
+			if (fc.get('isCodeView')) {
+				placeholder.style.display = 'none';
+				return;
 			}
-			if (e.get('documentType').usePage) {
-				e.set('documentType_use_page', true);
-				e.get('documentTypePageMirror').innerHTML = e.get('wysiwyg').innerHTML;
+
+			if (this.isEmpty(fc)) {
+				placeholder.style.display = 'block';
+			} else {
+				placeholder.style.display = 'none';
 			}
 		}
-	},
+	}
 
 	/**
 	 * @internal
@@ -1316,7 +1325,7 @@ Editor.prototype = {
 			fc.get('documentTypePageMirror').innerHTML = fc.get('wysiwyg').innerHTML;
 			fc.get('documentType').rePage(true);
 		}
-	},
+	}
 
 	/**
 	 * @internal
@@ -1346,7 +1355,7 @@ Editor.prototype = {
 		} else if (!env.isResizeObserverSupported) {
 			this.__callResizeFunction(fc, fc.get('wysiwygFrame').offsetHeight, null);
 		}
-	},
+	}
 
 	/**
 	 * @internal
@@ -1371,54 +1380,42 @@ Editor.prototype = {
 		if (fc.has('documentType_use_page')) {
 			fc.get('documentType').resizePage();
 		}
-	},
+	}
 
 	/**
-	 * @internal
-	 * @description Set display property when there is placeholder.
-	 * @param {?SunEditor.FrameContext} [fc] - Frame context object, If null fc is this.frameContext
+	 * @description Set frameContext, frameOptions
+	 * @param {SunEditor.FrameContext} rt Root target[key] FrameContext
 	 */
-	_checkPlaceholder(fc) {
-		fc ||= /** @type {SunEditor.FrameContext} */ (this.frameContext);
-		const placeholder = fc.get('placeholder');
-
-		if (placeholder) {
-			if (fc.get('isCodeView')) {
-				placeholder.style.display = 'none';
-				return;
-			}
-
-			if (this.isEmpty(fc)) {
-				placeholder.style.display = 'block';
-			} else {
-				placeholder.style.display = 'none';
-			}
-		}
-	},
+	#setFrameInfo(rt) {
+		this.frameContext.reset(rt);
+		this.frameOptions.reset(rt.get('options'));
+		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
+		this._lineBreaker_t = rt.get('lineBreaker_t');
+		this._lineBreaker_b = rt.get('lineBreaker_b');
+	}
 
 	/**
-	 * @internal
 	 * @description Initializ editor
 	 * @param {SunEditor.InitOptions} options Options
 	 */
-	__editorInit(options) {
+	#editorInit(options) {
 		this.status.initViewportHeight = this._w.visualViewport.height;
 		this.eventManager.__setViewportSize();
 
 		this.applyFrameRoots((e) => {
-			this.__setEditorParams(e);
+			this.#setEditorParams(e);
 		});
 
 		// initialize core and add event listeners
-		this._setFrameInfo(this.frameRoots.get(this.status.rootKey));
-		this.__init(options);
+		this.#setFrameInfo(this.frameRoots.get(this.status.rootKey));
+		this.#init(options);
 		for (const v of this._onPluginEvents.values()) {
 			v.sort((a, b) => a.index - b.index);
 		}
 
 		this.applyFrameRoots((e) => {
 			this.eventManager._addFrameEvents(e);
-			this._initWysiwygArea(e, e.get('options').get('value'));
+			this.#initWysiwygArea(e, e.get('options').get('value'));
 			if (e.get('options').get('iframe') && e.get('options').get('height') === 'auto') {
 				this.__callResizeFunction(e, e.get('wysiwygFrame').offsetHeight, null);
 			}
@@ -1462,17 +1459,47 @@ Editor.prototype = {
 			}.bind(this),
 			0,
 		);
-	},
+	}
 
 	/**
-	 * @internal
+	 * @description Initializ wysiwyg area (Only called from core._init)
+	 * @param {SunEditor.FrameContext} e frameContext
+	 * @param {string} value initial html string
+	 */
+	#initWysiwygArea(e, value) {
+		// set content
+		e.get('wysiwyg').innerHTML =
+			this.html.clean(typeof value === 'string' ? value : (/^TEXTAREA$/i.test(e.get('originElement').nodeName) ? e.get('originElement').value : e.get('originElement').innerHTML) || '', {
+				forceFormat: true,
+				whitelist: null,
+				blacklist: null,
+				_freeCodeViewMode: this.options.get('freeCodeViewMode'),
+			}) || '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
+
+		// char counter
+		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
+
+		// document type init
+		if (this.options.get('type') === 'document') {
+			e.set('documentType', new DocumentType(this, e));
+			if (e.get('documentType').useHeader) {
+				e.set('documentType_use_header', true);
+			}
+			if (e.get('documentType').usePage) {
+				e.set('documentType_use_page', true);
+				e.get('documentTypePageMirror').innerHTML = e.get('wysiwyg').innerHTML;
+			}
+		}
+	}
+
+	/**
 	 * @description Initializ core variable
 	 * @param {SunEditor.InitOptions} options Options
 	 */
-	__init(options) {
+	#init(options) {
 		// file components
-		this._fileInfoPluginsCheck = [];
-		this._fileInfoPluginsReset = [];
+		this.#fileInfoPluginsCheck = [];
+		this.#fileInfoPluginsReset = [];
 
 		// text components
 		this._MELInfo = new Map();
@@ -1503,15 +1530,15 @@ Editor.prototype = {
 		const filePluginRegExp = [];
 		let plugin;
 		for (const key in plugins) {
-			this.registerPlugin(key, this._pluginCallButtons[key], options[key]);
-			this.registerPlugin(key, this._pluginCallButtons_sub[key], options[key]);
+			this.registerPlugin(key, this.#pluginCallButtons[key], options[key]);
+			this.registerPlugin(key, this.#pluginCallButtons_sub[key], options[key]);
 			plugin = this.plugins[key];
 
 			// Filemanager
 			if (typeof plugin.__fileManagement === 'object') {
 				const fm = plugin.__fileManagement;
-				this._fileInfoPluginsCheck.push(fm._checkInfo.bind(fm));
-				this._fileInfoPluginsReset.push(fm._resetInfo.bind(fm));
+				this.#fileInfoPluginsCheck.push(fm._checkInfo.bind(fm));
+				this.#fileInfoPluginsReset.push(fm._resetInfo.bind(fm));
 				if (Array.isArray(fm.tagNames)) {
 					const tagNames = fm.tagNames;
 					this._fileManager.tags = this._fileManager.tags.concat(tagNames);
@@ -1578,12 +1605,12 @@ Editor.prototype = {
 		this._fileManager.regExp = new RegExp(`^(${this._fileManager.tags.join('|') || '\\^'})$`, 'i');
 		this._fileManager.pluginRegExp = new RegExp(`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`, 'i');
 
-		delete this._pluginCallButtons;
-		delete this._pluginCallButtons_sub;
+		this.#pluginCallButtons = null;
+		this.#pluginCallButtons_sub = null;
 
 		this.__cachingButtons();
 		this.__cachingShortcuts();
-	},
+	}
 
 	/**
 	 * @internal
@@ -1591,54 +1618,11 @@ Editor.prototype = {
 	 */
 	__cachingButtons() {
 		const ctx = this.context;
-		this.__setDisabledButtons();
+		this.#setDisabledButtons();
 
-		this.__saveCommandButtons(this.allCommandButtons, ctx.get('toolbar_buttonTray'));
-		this.__saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar_sub_buttonTray'));
-	},
-
-	/**
-	 * @internal
-	 * @description Set the disabled button list
-	 * - this._codeViewDisabledButtons, this._controllerOnDisabledButtons
-	 */
-	__setDisabledButtons() {
-		const ctx = this.context;
-
-		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW));
-		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER));
-
-		if (this.options.has('_subMode')) {
-			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)));
-			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER)));
-		}
-	},
-
-	/**
-	 * @internal
-	 * @description Save the current buttons
-	 * @param {Map<string, Element>} cmdButtons Command button map
-	 * @param {?Element} tray Button tray
-	 */
-	__saveCommandButtons(cmdButtons, tray) {
-		if (!tray) return;
-
-		const currentButtons = tray.querySelectorAll(COMMAND_BUTTONS);
-		const shortcuts = this.options.get('shortcuts');
-		const reverseCommandArray = this.options.get('_reverseCommandArray');
-		const keyMap = this.shortcutsKeyMap;
-		const reverseKeys = this.reverseKeys;
-
-		for (let i = 0, len = currentButtons.length, e, c; i < len; i++) {
-			e = /** @type {HTMLButtonElement} */ (currentButtons[i]);
-			c = e.getAttribute('data-command');
-			// command set
-			cmdButtons.set(c, e);
-			this.__setCommandTargets(c, e);
-			// shortcuts
-			CreateShortcuts(c, e, shortcuts[c], keyMap, reverseCommandArray, reverseKeys);
-		}
-	},
+		this.#saveCommandButtons(this.allCommandButtons, ctx.get('toolbar_buttonTray'));
+		this.#saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar_sub_buttonTray'));
+	}
 
 	/**
 	 * @internal
@@ -1653,15 +1637,55 @@ Editor.prototype = {
 			if (!key.startsWith('_')) continue;
 			CreateShortcuts('', null, shortcuts[key], keyMap, reverseCommandArray, reverseKeys);
 		}
-	},
+	}
 
 	/**
-	 * @internal
+	 * @description Set the disabled button list
+	 * - this._codeViewDisabledButtons, this._controllerOnDisabledButtons
+	 */
+	#setDisabledButtons() {
+		const ctx = this.context;
+
+		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW));
+		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER));
+
+		if (this.options.has('_subMode')) {
+			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)));
+			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar_sub_buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER)));
+		}
+	}
+
+	/**
+	 * @description Save the current buttons
+	 * @param {Map<string, Element>} cmdButtons Command button map
+	 * @param {?Element} tray Button tray
+	 */
+	#saveCommandButtons(cmdButtons, tray) {
+		if (!tray) return;
+
+		const currentButtons = tray.querySelectorAll(COMMAND_BUTTONS);
+		const shortcuts = this.options.get('shortcuts');
+		const reverseCommandArray = this.options.get('_reverseCommandArray');
+		const keyMap = this.shortcutsKeyMap;
+		const reverseKeys = this.reverseKeys;
+
+		for (let i = 0, len = currentButtons.length, e, c; i < len; i++) {
+			e = /** @type {HTMLButtonElement} */ (currentButtons[i]);
+			c = e.getAttribute('data-command');
+			// command set
+			cmdButtons.set(c, e);
+			this.#setCommandTargets(c, e);
+			// shortcuts
+			CreateShortcuts(c, e, shortcuts[c], keyMap, reverseCommandArray, reverseKeys);
+		}
+	}
+
+	/**
 	 * @description Sets command target elements.
 	 * @param {string} cmd - The command identifier.
 	 * @param {HTMLButtonElement} target - The associated command button.
 	 */
-	__setCommandTargets(cmd, target) {
+	#setCommandTargets(cmd, target) {
 		if (!cmd || !target) return;
 
 		const isBasicCmd = BASIC_COMMANDS.includes(cmd);
@@ -1672,16 +1696,15 @@ Editor.prototype = {
 		} else if (!this.commandTargets.get(cmd).includes(target)) {
 			this.commandTargets.get(cmd).push(target);
 		}
-	},
+	}
 
 	/**
-	 * @internal
 	 * @description Configures the document properties of an iframe editor.
 	 * @param {HTMLIFrameElement} frame - The editor iframe.
 	 * @param {Map<string, *>} originOptions - The original options.
 	 * @param {SunEditor.FrameOptions} targetOptions - The new options.
 	 */
-	__setIframeDocument(frame, originOptions, targetOptions) {
+	#setIframeDocument(frame, originOptions, targetOptions) {
 		frame.contentDocument.documentElement.className = 'sun-editor';
 		frame.contentDocument.head.innerHTML =
 			'<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
@@ -1689,14 +1712,13 @@ Editor.prototype = {
 			converter._setAutoHeightStyle(targetOptions.get('height'));
 		frame.contentDocument.body.className = originOptions.get('_editableClass');
 		frame.contentDocument.body.setAttribute('contenteditable', 'true');
-	},
+	}
 
 	/**
-	 * @internal
 	 * @description Set the FrameContext parameters and options
 	 * @param {SunEditor.FrameContext} e - Frame context object
 	 */
-	__setEditorParams(e) {
+	#setEditorParams(e) {
 		const frameOptions = e.get('options');
 		const _w = this._w;
 
@@ -1706,10 +1728,10 @@ Editor.prototype = {
 			let child = e.get('wysiwygFrame');
 			while (child) {
 				if (child.shadowRoot) {
-					this._shadowRoot = child.shadowRoot;
+					this.shadowRoot = child.shadowRoot;
 					break;
 				} else if (child instanceof ShadowRoot) {
-					this._shadowRoot = child;
+					this.shadowRoot = child;
 					break;
 				}
 				child = child.parentNode;
@@ -1734,13 +1756,12 @@ Editor.prototype = {
 		for (const k in attr) {
 			e.get('wysiwyg').setAttribute(k, attr[k]);
 		}
-	},
+	}
 
 	/**
-	 * @internal
 	 * @description Registers and initializes editor classes.
 	 */
-	__registerClass() {
+	#registerClass() {
 		// use events
 		this.events = this.options.get('events') || {};
 		this.triggerEvent = async (eventName, eventData) => {
@@ -1788,15 +1809,14 @@ Editor.prototype = {
 		this.viewer = new Viewer(this);
 
 		this._responsiveButtons = this._responsiveButtons_sub = null;
-	},
+	}
 
 	/**
-	 * @internal
 	 * @description Creates the editor instance and initializes components.
 	 * @param {SunEditor.InitOptions} originOptions - The initial editor options.
 	 * @returns {Promise<void>}
 	 */
-	async __Create(originOptions) {
+	async #Create(originOptions) {
 		// set modes
 		this.isInline = /inline/i.test(this.options.get('mode'));
 		this.isBalloon = /balloon/i.test(this.options.get('mode'));
@@ -1807,7 +1827,7 @@ Editor.prototype = {
 		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('_subMode'));
 
 		// register class
-		this.__registerClass();
+		this.#registerClass();
 
 		// common events
 		this.eventManager._addCommonEvents();
@@ -1824,7 +1844,7 @@ Editor.prototype = {
 			if (e.get('options').get('iframe')) {
 				const iframeLoaded = new Promise((resolve) => {
 					this.eventManager.addEvent(e.get('wysiwygFrame'), 'load', ({ target }) => {
-						this.__setIframeDocument(target, this.__options, e.get('options'));
+						this.#setIframeDocument(target, this.__options, e.get('options'));
 						resolve();
 					});
 				});
@@ -1852,49 +1872,47 @@ Editor.prototype = {
 			await Promise.all(iframePromises);
 		}
 
-		this.__editorInit(originOptions);
-	},
-
-	Constructor: Editor,
-};
-
-function RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots) {
-	const nro = option[key];
-	const newKeys = Object.keys(nro);
-	CheckResetKeys(newKeys, null, key + '.');
-	if (newKeys.length === 0) return false;
-
-	const rootKey = key || null;
-	rootDiff.set(rootKey, new Map());
-
-	const o = frameRoots.get(rootKey).get('options').get('_origin');
-	const no = {};
-	const hasOwn = Object.prototype.hasOwnProperty;
-	for (const rk in nro) {
-		if (!hasOwn.call(OPTION_FRAME_FIXED_FLAG, rk)) continue;
-		const roV = nro[rk];
-		if (!newKeys.includes(rk) || o[rk] === roV) continue;
-		rootDiff.get(rootKey).set(GetResetDiffKey(rk), true);
-		no[rk] = roV;
+		this.#editorInit(originOptions);
 	}
 
-	const newO = { ...o, ...no };
-	newRootKeys.set(rootKey, new Map(Object.entries(newO)));
-	newRoots.push({ key: rootKey, options: newO });
-}
+	#RestoreFrameOptions(key, option, frameRoots, rootDiff, newRootKeys, newRoots) {
+		const nro = option[key];
+		const newKeys = Object.keys(nro);
+		this.#CheckResetKeys(newKeys, null, key + '.');
+		if (newKeys.length === 0) return false;
 
-function GetResetDiffKey(key) {
-	if (/^statusbar|^charCounter/.test(key)) return 'statusbar-changed';
-	return key;
-}
+		const rootKey = key || null;
+		rootDiff.set(rootKey, new Map());
 
-function CheckResetKeys(keys, plugins, root) {
-	for (let i = 0, len = keys.length, k; i < len; i++) {
-		k = keys[i];
-		if (OPTION_FIXED_FLAG[k] === 'fixed' || OPTION_FRAME_FIXED_FLAG[k] === 'fixed' || (plugins && plugins[k])) {
-			console.warn(`[SUNEDITOR.warn.resetOptions] The "[${root + k}]" option cannot be changed after the editor is created.`);
-			keys.splice(i--, 1);
-			len--;
+		const o = frameRoots.get(rootKey).get('options').get('_origin');
+		const no = {};
+		const hasOwn = Object.prototype.hasOwnProperty;
+		for (const rk in nro) {
+			if (!hasOwn.call(OPTION_FRAME_FIXED_FLAG, rk)) continue;
+			const roV = nro[rk];
+			if (!newKeys.includes(rk) || o[rk] === roV) continue;
+			rootDiff.get(rootKey).set(this.#GetResetDiffKey(rk), true);
+			no[rk] = roV;
+		}
+
+		const newO = { ...o, ...no };
+		newRootKeys.set(rootKey, new Map(Object.entries(newO)));
+		newRoots.push({ key: rootKey, options: newO });
+	}
+
+	#GetResetDiffKey(key) {
+		if (/^statusbar|^charCounter/.test(key)) return 'statusbar-changed';
+		return key;
+	}
+
+	#CheckResetKeys(keys, plugins, root) {
+		for (let i = 0, len = keys.length, k; i < len; i++) {
+			k = keys[i];
+			if (OPTION_FIXED_FLAG[k] === 'fixed' || OPTION_FRAME_FIXED_FLAG[k] === 'fixed' || (plugins && plugins[k])) {
+				console.warn(`[SUNEDITOR.warn.resetOptions] The "[${root + k}]" option cannot be changed after the editor is created.`);
+				keys.splice(i--, 1);
+				len--;
+			}
 		}
 	}
 }

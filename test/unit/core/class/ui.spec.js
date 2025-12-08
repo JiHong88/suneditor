@@ -18,29 +18,6 @@ describe('UI', () => {
 		destroyTestEditor(editor);
 	});
 
-	describe('Constructor', () => {
-		it('should initialize UI with default properties', () => {
-			expect(ui._controllerOnBtnDisabled).toBe(false);
-			expect(ui.alertModal).toBeDefined();
-			expect(ui.alertMessage).toBeDefined();
-			expect(ui.toastPopup).toBeDefined();
-			expect(ui.toastContainer).toBeDefined();
-			expect(ui.toastMessage).toBeDefined();
-		});
-
-		it('should have required methods', () => {
-			expect(typeof ui.setEditorStyle).toBe('function');
-			expect(typeof ui.setTheme).toBe('function');
-			expect(typeof ui.readOnly).toBe('function');
-			expect(typeof ui.disable).toBe('function');
-			expect(typeof ui.enable).toBe('function');
-			expect(typeof ui.show).toBe('function');
-			expect(typeof ui.hide).toBe('function');
-			expect(typeof ui.showLoading).toBe('function');
-			expect(typeof ui.hideLoading).toBe('function');
-		});
-	});
-
 	describe('setEditorStyle', () => {
 		it('should set editor style without error', () => {
 			expect(() => {
@@ -127,17 +104,17 @@ describe('UI', () => {
 	});
 
 	describe('setControllerOnDisabledButtons', () => {
+		let result;
 		it('should handle activation', () => {
 			expect(() => {
-				ui.setControllerOnDisabledButtons(true);
+				result = ui.setControllerOnDisabledButtons(true);
 			}).not.toThrow();
-			expect(ui._controllerOnBtnDisabled).toBe(true);
+			expect(result).toBe(true);
 		});
 
 		it('should handle deactivation', () => {
-			ui.setControllerOnDisabledButtons(true);
-			ui.setControllerOnDisabledButtons(false);
-			expect(ui._controllerOnBtnDisabled).toBe(false);
+			result = ui.setControllerOnDisabledButtons(false);
+			expect(result).toBe(false);
 		});
 	});
 
@@ -205,26 +182,26 @@ describe('UI', () => {
 		});
 	});
 
-	describe('_offCurrentController', () => {
-		it('should have _offCurrentController method', () => {
-			expect(typeof ui._offCurrentController).toBe('function');
+	describe('offCurrentController', () => {
+		it('should have offCurrentController method', () => {
+			expect(typeof ui.offCurrentController).toBe('function');
 		});
 
 		it('should call without error', () => {
 			expect(() => {
-				ui._offCurrentController();
+				ui.offCurrentController();
 			}).not.toThrow();
 		});
 	});
 
-	describe('_offCurrentModal', () => {
-		it('should have _offCurrentModal method', () => {
-			expect(typeof ui._offCurrentModal).toBe('function');
+	describe('offCurrentModal', () => {
+		it('should have offCurrentModal method', () => {
+			expect(typeof ui.offCurrentModal).toBe('function');
 		});
 
 		it('should call without error', () => {
 			expect(() => {
-				ui._offCurrentModal();
+				ui.offCurrentModal();
 			}).not.toThrow();
 		});
 	});

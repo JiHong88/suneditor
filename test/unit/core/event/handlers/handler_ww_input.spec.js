@@ -25,7 +25,7 @@ describe('Input Handler', () => {
 					collapsed: true
 				})),
 				getNode: jest.fn(() => document.createTextNode('text')),
-				_init: jest.fn()
+				init: jest.fn()
 			},
 			format: {
 				getLine: jest.fn(() => document.createElement('p')),
@@ -268,10 +268,10 @@ describe('Input Handler', () => {
 		});
 
 		describe('Selection initialization', () => {
-			it('should call selection._init', async () => {
+			it('should call selection.init', async () => {
 				await OnInput_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
 
-				expect(mockThis.selection._init).toHaveBeenCalled();
+				expect(mockThis.selection.init).toHaveBeenCalled();
 			});
 		});
 

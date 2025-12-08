@@ -10,10 +10,6 @@ import { numbers } from '../../helper';
 import { _w, _d } from '../../helper/env';
 
 /**
- * @typedef {Omit<Offset & Partial<SunEditor.Injector_Core>, 'offset'>} OffsetThis
- */
-
-/**
  * @typedef {Object} RectsInfo Bounding rectangle information of the selection range.
  * @property {number} rects.left - The left position of the selection.
  * @property {number} rects.right - The right position of the selection.
@@ -78,27 +74,27 @@ import { _w, _d } from '../../helper/env';
  */
 
 /**
- * @constructor
- * @this {OffsetThis}
  * @description Offset class, get the position of the element
- * @param {SunEditor.Core} editor - The root editor instance
  */
-function Offset(editor) {
-	CoreInjector.call(this, editor);
-}
+class Offset extends CoreInjector {
+	/**
+	 * @constructor
+	 * @param {SunEditor.Core} editor - The root editor instance
+	 */
+	constructor(editor) {
+		super(editor);
+	}
 
-Offset.prototype = {
-	/** @internal @type {SunEditor.Core['selection']} */
-	get selection() {
+	/** @type {SunEditor.Core['selection']} */
+	get #selection() {
 		return this.editor.selection;
-	},
-	/** @internal @type {SunEditor.Core['toolbar']} */
-	get toolbar() {
+	}
+	/** @type {SunEditor.Core['toolbar']} */
+	get #toolbar() {
 		return this.editor.toolbar;
-	},
+	}
 
 	/**
-	 * @this {OffsetThis}
 	 * @description Gets the position just outside the argument's internal editor (wysiwygFrame).
 	 * @param {Node} node Target node.
 	 * @returns {OffsetInfo} Position relative to the editor frame.
@@ -112,10 +108,9 @@ Offset.prototype = {
 			left: off.left + (iframe ? wFrame.parentElement.offsetLeft : 0),
 			top: off.top + (iframe ? wFrame.parentElement.offsetTop : 0),
 		};
-	},
+	}
 
 	/**
-	 * @this {OffsetThis}
 	 * @description Gets the position inside the internal editor of the argument.
 	 * @param {Node} node Target node.
 	 * @returns {OffsetLocalInfo} Position relative to the WYSIWYG editor.
@@ -156,10 +151,9 @@ Offset.prototype = {
 			scrollY: eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0,
 			scrollH: this.frameContext.get('wysiwyg').scrollHeight || 0,
 		};
-	},
+	}
 
 	/**
-	 * @this {OffsetThis}
 	 * @description Returns the position of the argument relative to the global document.
 	 * This is a refactored version using getBoundingClientRect for better performance and accuracy.
 	 * @param {?Node} [node] Target element.
@@ -204,10 +198,9 @@ Offset.prototype = {
 			width: element.offsetWidth,
 			height: element.offsetHeight,
 		};
-	},
+	}
 
 	/**
-	 * @this {OffsetThis}
 	 * @description Gets the current editor-relative scroll offset.
 	 * @param {?Node} [node] Target element.
 	 * @returns {OffsetGlobalScrollInfo} Global scroll information.
@@ -287,7 +280,7 @@ Offset.prototype = {
 			}
 		}
 
-		el = /** @type {HTMLElement} */ (this.editor._shadowRoot?.host);
+		el = /** @type {HTMLElement} */ (this.editor.shadowRoot?.host);
 		if (el) ohOffsetEl = owOffsetEl = topArea;
 		while (el) {
 			t += el.scrollTop;
@@ -338,10 +331,9 @@ Offset.prototype = {
 			heightEditorRefer: heightEditorRefer,
 			widthEditorRefer: widthEditorRefer,
 		};
-	},
+	}
 
 	/**
-	 * @this {OffsetThis}
 	 * @description Get the scroll info of the WYSIWYG area.
 	 * @returns {OffsetWWScrollInfo} Scroll information within the editor.
 	 */
@@ -357,10 +349,9 @@ Offset.prototype = {
 			height,
 			bottom: top + height,
 		};
-	},
+	}
 
 	/**
-	 * @this {OffsetThis}
 	 * @description Sets the relative position of an element
 	 * @param {HTMLElement} element Element to position
 	 * @param {HTMLElement} e_container Element's root container
@@ -426,10 +417,9 @@ Offset.prototype = {
 				element.style.left = `${tl}px`;
 			}
 		}
-	},
+	}
 
 	/**
-	 * @this {OffsetThis}
 	 * @description Sets the absolute position of an element
 	 * @param {HTMLElement} element Element to position
 	 * @param {HTMLElement} target Target element
@@ -463,8 +453,8 @@ Offset.prototype = {
 		const isTextSelection = isWWTarget && !isElTarget;
 		const isInlineTarget = isElTarget && /inline/.test(_w.getComputedStyle(target).display);
 		const clientSize = getClientSize(_d);
-		const wwScroll = isTextSelection ? this.getWWScroll() : this._getWindowScroll();
-		const targetRect = !isWWTarget || (!isIframe && isElTarget) ? target.getBoundingClientRect() : this.selection.getRects(target, 'start').rects;
+		const wwScroll = isTextSelection ? this.getWWScroll() : this.#getWindowScroll();
+		const targetRect = !isWWTarget || (!isIframe && isElTarget) ? target.getBoundingClientRect() : this.#selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
 		const arrow = /** @type {HTMLElement} */ (hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null);
 
@@ -481,14 +471,14 @@ Offset.prototype = {
 		const th = this.context.get('toolbar_main').offsetHeight;
 		const containerToolbar = this.options.get('toolbar_container');
 		const headLess = this.editor.isBalloon || this.editor.isInline || containerToolbar;
-		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.toolbar.isSticky && headLess) ? 0 : th + (this.toolbar.isSticky ? this.options.get('toolbar_sticky') : 0);
+		const toolbarH = (containerToolbar && globalTop - wScrollY - th > 0) || (!this.#toolbar.isSticky && headLess) ? 0 : th + (this.#toolbar.isSticky ? this.options.get('toolbar_sticky') : 0);
 		const statusBarH = this.frameContext.get('statusbar')?.offsetHeight || 0;
 
 		// check margin
-		const { rmt, rmb, bMargin, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTextSelection, isToolbarTarget);
-		if ((isWWTarget && (rmb - statusBarH + targetH <= 0 || rmt + rt + targetH - (this.toolbar.isSticky && isInlineTarget ? toolbarH : 0) <= 0)) || rmt + targetH < 0) return;
+		const { rmt, rmb, bMargin, rt } = this.#getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTextSelection, isToolbarTarget);
+		if ((isWWTarget && (rmb - statusBarH + targetH <= 0 || rmt + rt + targetH - (this.#toolbar.isSticky && isInlineTarget ? toolbarH : 0) <= 0)) || rmt + targetH < 0) return;
 
-		const isSticky = this.toolbar.isSticky && this.context.get('toolbar_main').style.display !== 'none' && (!headLess || this.frameContext.get('topArea').getBoundingClientRect().top <= th);
+		const isSticky = this.#toolbar.isSticky && this.context.get('toolbar_main').style.display !== 'none' && (!headLess || this.frameContext.get('topArea').getBoundingClientRect().top <= th);
 		let t = addOffset.top;
 		let y = 0;
 		let arrowDir = '';
@@ -528,7 +518,7 @@ Offset.prototype = {
 			}
 		}
 
-		this._setArrow(arrow, arrowDir);
+		this.#setArrow(arrow, arrowDir);
 		element.style.top = `${t}px`;
 
 		// left ----------------------------------------------------------------------------------------------------
@@ -598,10 +588,9 @@ Offset.prototype = {
 		};
 
 		return { position: arrowDir === 'up' ? 'bottom' : 'top' };
-	},
+	}
 
 	/**
-	 * @this {OffsetThis}
 	 * @description Sets the position of an element relative to a range
 	 * @param {HTMLElement} element Element to position
 	 * @param {?Range} range Range to position against.
@@ -617,8 +606,8 @@ Offset.prototype = {
 		element.style.display = 'block';
 
 		let positionTop = position === 'top';
-		range ||= this.selection.getRange();
-		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
+		range ||= this.#selection.getRange();
+		const rectsObj = this.#selection.getRects(range, positionTop ? 'start' : 'end');
 		positionTop = rectsObj.position === 'start';
 
 		const isFullScreen = this.frameContext.get('isFullScreen');
@@ -632,14 +621,14 @@ Offset.prototype = {
 		const toolbarWidth = element.offsetWidth;
 		const toolbarHeight = element.offsetHeight;
 
-		this._setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
+		this.#setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
 		if (this.getGlobal(element).top - offsets.top < 0) {
 			positionTop = !positionTop;
-			this._setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
+			this.#setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
 		}
 
 		if (toolbarWidth !== element.offsetWidth || toolbarHeight !== element.offsetHeight) {
-			this._setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
+			this.#setOffsetOnRange(positionTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop);
 		}
 
 		// check margin
@@ -648,19 +637,17 @@ Offset.prototype = {
 		const targetH = rects.height;
 		const tmtw = rects.top;
 		const tmbw = clientSize.h - rects.bottom;
-		const toolbarH = !this.toolbar.isSticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar_main').offsetHeight;
+		const toolbarH = !this.#toolbar.isSticky && (this.editor.isBalloon || this.editor.isInline) ? 0 : this.context.get('toolbar_main').offsetHeight;
 
-		const { rmt, rmb, rt } = this._getVMargin(tmtw, tmbw, toolbarH, clientSize, rects, isTextSelection, false);
+		const { rmt, rmb, rt } = this.#getVMargin(tmtw, tmbw, toolbarH, clientSize, rects, isTextSelection, false);
 		if (rmb + targetH <= 0 || rmt + rt + targetH <= 0) return;
 
 		element.style.visibility = '';
 
 		return true;
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {OffsetThis}
 	 * @description Sets the position of an element relative to the selection range in the editor.
 	 * - This method calculates the top and left offsets for the element, ensuring it
 	 * - does not overflow the editor boundaries and adjusts the arrow positioning accordingly.
@@ -673,7 +660,7 @@ Offset.prototype = {
 	 * @param {number} scrollTop - The vertical scroll offset.
 	 * @param {number} [addTop=0] - Additional top margin adjustment.
 	 */
-	_setOffsetOnRange(isDirTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop = 0) {
+	#setOffsetOnRange(isDirTop, rects, element, editorLeft, editorWidth, scrollLeft, scrollTop, addTop = 0) {
 		const padding = 1;
 		const arrow = /** @type  {HTMLElement} */ (element.querySelector('.se-arrow '));
 		const arrowMargin = Math.round(arrow.offsetWidth / 2);
@@ -688,7 +675,7 @@ Offset.prototype = {
 
 		let resetTop = false;
 		const space = t + (isDirTop ? this.getGlobal(this.frameContext.get('topArea')).top : element.offsetHeight - this.frameContext.get('wysiwyg').offsetHeight);
-		if (!isDirTop && space > 0 && this._getPageBottomSpace() < space) {
+		if (!isDirTop && space > 0 && this.#getPageBottomSpace() < space) {
 			isDirTop = true;
 			resetTop = true;
 		} else if (isDirTop && _d.documentElement.offsetTop > space) {
@@ -711,22 +698,18 @@ Offset.prototype = {
 
 		const arrow_left = Math.floor(elW / 2 + (absoluteLeft - l));
 		arrow.style.left = (arrow_left + arrowMargin > element.offsetWidth ? element.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {OffsetThis}
 	 * @description Get available space from page bottom
 	 * @returns {number} Available space
 	 */
-	_getPageBottomSpace() {
+	#getPageBottomSpace() {
 		const topArea = this.frameContext.get('topArea');
 		return _d.documentElement.scrollHeight - (this.getGlobal(topArea).top + topArea.offsetHeight);
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {OffsetThis}
 	 * @description Calculates the vertical margin offsets for the target element relative to the editor frame.
 	 * - This method determines the top and bottom margins based on various conditions such as
 	 * - fullscreen mode, iframe usage, toolbar height, and scroll positions.
@@ -744,8 +727,8 @@ Offset.prototype = {
 	 * - tMargin: top margin
 	 * - bMargin: bottom margin
 	 */
-	_getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTextSelection, isToolbarTarget) {
-		const wwRects = this.selection.getRects(this.frameContext.get('wysiwyg'), 'start').rects;
+	#getVMargin(tmtw, tmbw, toolbarH, clientSize, targetRect, isTextSelection, isToolbarTarget) {
+		const wwRects = this.#selection.getRects(this.frameContext.get('wysiwyg'), 'start').rects;
 
 		let rmt = 0;
 		let rmb = 0;
@@ -765,21 +748,21 @@ Offset.prototype = {
 			if (!isTextSelection) {
 				const emt = editorOffset.fixedTop > 0 ? editorOffset.fixedTop : 0;
 				const emb = _w.innerHeight - (editorOffset.fixedTop + editorOffset.height);
-				rt = !isToolbarTarget && (this.toolbar.isSticky || !this.toolbar._isBalloon) ? toolbarH : 0;
+				rt = !isToolbarTarget && (this.#toolbar.isSticky || !this.#toolbar.isBalloonMode) ? toolbarH : 0;
 				rmt = tMargin - (!isToolbarTarget ? emt : 0) - rt;
 				rmb = bMargin - (emb > 0 ? emb : 0);
 			} else {
-				rt = !isToolbarTarget && !this.toolbar.isSticky && !this.options.get('toolbar_container') ? toolbarH : 0;
+				rt = !isToolbarTarget && !this.#toolbar.isSticky && !this.options.get('toolbar_container') ? toolbarH : 0;
 				const wst = !isIframe ? editorOffset.top - _w.scrollY + rt : 0;
 				const wsb = !isIframe ? this.status.currentViewportHeight - (editorOffset.top + editorOffset.height - _w.scrollY) : 0;
 				let st = wst;
 				if (toolbarH > wst) {
-					if (this.toolbar.isSticky) {
+					if (this.#toolbar.isSticky) {
 						st = toolbarH;
 					} else {
 						st = wst + toolbarH;
 					}
-				} else if (this.options.get('toolbar_container') && !this.toolbar.isSticky) {
+				} else if (this.options.get('toolbar_container') && !this.#toolbar.isSticky) {
 					toolbarH = 0;
 				} else {
 					st = wst + toolbarH;
@@ -799,11 +782,9 @@ Offset.prototype = {
 			tMargin,
 			bMargin,
 		};
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {OffsetThis}
 	 * @description Sets the visibility and direction of the arrow element.
 	 * - This method applies the appropriate class (`se-arrow-up` or `se-arrow-down`)
 	 * - based on the specified direction key and adjusts the visibility of the arrow.
@@ -812,7 +793,7 @@ Offset.prototype = {
 	 * - Accepts `'up'` for an upward arrow, `'down'` for a downward arrow,
 	 * - or any other value to hide the arrow.
 	 */
-	_setArrow(arrow, key) {
+	#setArrow(arrow, key) {
 		if (key === 'up') {
 			if (arrow) arrow.style.visibility = '';
 			addClass(arrow, 'se-arrow-up');
@@ -824,11 +805,9 @@ Offset.prototype = {
 		} else {
 			if (arrow) arrow.style.visibility = 'hidden';
 		}
-	},
+	}
 
 	/**
-	 * @internal
-	 * @this {OffsetThis}
 	 * @description Retrieves the current window scroll position and viewport size.
 	 * - Returns an object containing the scroll offsets, viewport dimensions, and boundary rects.
 	 * @returns {{
@@ -840,7 +819,7 @@ Offset.prototype = {
 	 *   rects: RectsInfo
 	 * }} An object with scroll and viewport information.
 	 */
-	_getWindowScroll() {
+	#getWindowScroll() {
 		const viewPort = getClientSize(_d);
 		return {
 			top: _w.scrollY,
@@ -856,18 +835,15 @@ Offset.prototype = {
 				noText: true,
 			},
 		};
-	},
+	}
 
 	/**
 	 * @internal
-	 * @this {OffsetThis}
 	 * @description Destroy the Offset instance and release memory
 	 */
 	_destroy() {
 		// No internal state to clean up
-	},
-
-	constructor: Offset,
-};
+	}
+}
 
 export default Offset;
