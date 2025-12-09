@@ -40,7 +40,7 @@ class FileUpload extends PluginCommand {
 	}
 
 	#acceptedCheck;
-	#element;
+	#element = null;
 
 	/**
 	 * @constructor
@@ -70,7 +70,6 @@ class FileUpload extends PluginCommand {
 		}
 
 		this.#acceptedCheck = this.acceptedFormats.split(', ');
-		this.#element = null;
 
 		// figure
 		const customItems = {

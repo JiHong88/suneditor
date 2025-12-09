@@ -51,21 +51,22 @@ class Image_ extends PluginModal {
 		return /^IMG$/i.test(compNode?.nodeName) ? compNode : dom.check.isAnchor(compNode) && /^IMG$/i.test(compNode?.firstElementChild?.nodeName) ? compNode?.firstElementChild : null;
 	}
 
-	#produceIndex;
-	#linkElement;
-	#linkValue;
-	#align;
-	#svgDefaultSize;
-	#element;
-	#cover;
-	#container;
-	#caption;
-	#ratio;
 	#origin_w;
 	#origin_h;
 	#resizing;
 	#onlyPercentage;
 	#nonResizing;
+
+	#produceIndex = 0;
+	#linkElement = null;
+	#linkValue = '';
+	#align = 'none';
+	#svgDefaultSize = '30%';
+	#element = null;
+	#cover = null;
+	#container = null;
+	#caption = null;
+	#ratio = { w: 0, h: 0 };
 
 	/**
 	 * @constructor
@@ -148,16 +149,6 @@ class Image_ extends PluginModal {
 		this.inputY = null;
 		this._base64RenderIndex = 0;
 
-		this.#produceIndex = 0;
-		this.#linkElement = null;
-		this.#linkValue = '';
-		this.#align = 'none';
-		this.#svgDefaultSize = '30%';
-		this.#element = null;
-		this.#cover = null;
-		this.#container = null;
-		this.#caption = null;
-		this.#ratio = { w: 0, h: 0 };
 		this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
 		this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 		this.#resizing = this.pluginOptions.canResize;

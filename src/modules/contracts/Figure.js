@@ -113,18 +113,19 @@ let __resizing_sw = 0;
  * @see EditorComponent for `inst._element` requirement
  */
 class Figure extends CoreInjector {
-	#width;
-	#height;
-	#resize_w;
-	#resize_h;
-	#element_w;
-	#element_h;
-	#floatClassStr;
-	#preventSizechange;
-	#revertSize;
 	#offContainer;
 	#containerResizingESC;
-	#onResizeESCEvent;
+
+	#width = '';
+	#height = '';
+	#resize_w = 0;
+	#resize_h = 0;
+	#element_w = 0;
+	#element_h = 0;
+	#floatClassStr = '__se__float-none|__se__float-left|__se__float-center|__se__float-right';
+	#preventSizechange = false;
+	#revertSize = { w: '', h: '' };
+	#onResizeESCEvent = null;
 
 	/**
 	 * @constructor
@@ -209,18 +210,8 @@ class Figure extends CoreInjector {
 		this.__onContainerEvent = null;
 		this.__offContainerEvent = null;
 
-		this.#width = '';
-		this.#height = '';
-		this.#resize_w = 0;
-		this.#resize_h = 0;
-		this.#element_w = 0;
-		this.#element_h = 0;
-		this.#floatClassStr = '__se__float-none|__se__float-left|__se__float-center|__se__float-right';
-		this.#preventSizechange = false;
-		this.#revertSize = { w: '', h: '' };
 		this.#offContainer = this.#OffFigureContainer.bind(this);
 		this.#containerResizingESC = this.#ContainerResizingESC.bind(this);
-		this.#onResizeESCEvent = null;
 
 		// init
 		this.eventManager.addEvent(this.alignButton, 'click', this.#OnClick_alignButton.bind(this));

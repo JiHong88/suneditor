@@ -22,15 +22,16 @@ class SelectMenu extends CoreInjector {
 	#dirPosition;
 	#dirSubPosition;
 	#textDirDiff;
-	#refer;
-	#keydownTarget;
-	#selectMethod;
-	#bindClose_key;
-	#bindClose_mousedown;
-	#bindClose_click;
-	#events;
 	#eventHandlers;
 	#globalEventHandlers;
+
+	#refer = null;
+	#keydownTarget = null;
+	#selectMethod = null;
+	#bindClose_key = null;
+	#bindClose_mousedown = null;
+	#bindClose_click = null;
+	#events = null;
 
 	/**
 	 * @constructor
@@ -66,13 +67,7 @@ class SelectMenu extends CoreInjector {
 		this.#dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
 		this.#dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
 		this.#textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
-		this.#refer = null;
-		this.#keydownTarget = null;
-		this.#selectMethod = null;
-		this.#bindClose_key = null;
-		this.#bindClose_mousedown = null;
-		this.#bindClose_click = null;
-		this.#events = null;
+
 		this.#eventHandlers = {
 			mousedown: this.#OnMousedown_list.bind(this),
 			mousemove: this.#OnMouseMove_list.bind(this),

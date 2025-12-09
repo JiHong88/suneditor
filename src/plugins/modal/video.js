@@ -60,21 +60,22 @@ class Video extends PluginModal {
 		return null;
 	}
 
-	#linkValue;
-	#align;
 	#frameRatio;
 	#defaultRatio;
 	#defaultSizeX;
 	#defaultSizeY;
-	#element;
-	#container;
-	#ratio;
 	#origin_w;
 	#origin_h;
 	#resizing;
 	#onlyPercentage;
 	#nonResizing;
-	#initRatioValue;
+
+	#linkValue = '';
+	#align = 'none';
+	#element = null;
+	#container = null;
+	#ratio = { w: 0, h: 0 };
+	#initRatioValue = null;
 
 	/**
 	 * @constructor
@@ -142,15 +143,11 @@ class Video extends PluginModal {
 		this.inputX = null;
 		this.inputY = null;
 
-		this.#linkValue = '';
-		this.#align = 'none';
 		this.#frameRatio = defaultRatio;
 		this.#defaultRatio = defaultRatio;
 		this.#defaultSizeX = '100%';
 		this.#defaultSizeY = this.pluginOptions.defaultRatio * 100 + '%';
-		this.#element = null;
-		this.#container = null;
-		this.#ratio = { w: 0, h: 0 };
+
 		this.#origin_w = this.pluginOptions.defaultWidth === '100%' ? '' : this.pluginOptions.defaultWidth;
 		this.#origin_h = this.pluginOptions.defaultHeight === defaultRatio ? '' : this.pluginOptions.defaultHeight;
 		this.#resizing = this.pluginOptions.canResize;
@@ -211,7 +208,6 @@ class Video extends PluginModal {
 		if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
 
 		if (this.#resizing) {
-			this.#initRatioValue = null;
 			this.proportion = modalEl.proportion;
 			this.frameRatioOption = modalEl.frameRatioOption;
 			this.inputX = modalEl.inputX;

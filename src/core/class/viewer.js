@@ -11,20 +11,21 @@ const { _w, _d } = env;
  * @description Viewer(codeView, fullScreen, showBlocks) class
  */
 class Viewer extends CoreInjector {
-	#bodyOverflow;
-	#editorAreaOriginCssText;
-	#wysiwygOriginCssText;
-	#codeWrapperOriginCssText;
-	#codeOriginCssText;
-	#codeNumberOriginCssText;
-	#toolbarOriginCssText;
-	#arrowOriginCssText;
-	#fullScreenInnerHeight;
-	#fullScreenSticky;
-	#fullScreenBalloon;
-	#fullScreenInline;
-	#toolbarParent;
 	#disallowedTagNameRegExp;
+
+	#bodyOverflow = '';
+	#editorAreaOriginCssText = '';
+	#wysiwygOriginCssText = '';
+	#codeWrapperOriginCssText = '';
+	#codeOriginCssText = '';
+	#codeNumberOriginCssText = '';
+	#toolbarOriginCssText = '';
+	#arrowOriginCssText = '';
+	#fullScreenInnerHeight = 0;
+	#fullScreenSticky = false;
+	#fullScreenBalloon = false;
+	#fullScreenInline = false;
+	#toolbarParent = null;
 
 	/**
 	 * @constructor
@@ -34,19 +35,6 @@ class Viewer extends CoreInjector {
 		super(editor);
 
 		// members
-		this.#bodyOverflow = '';
-		this.#editorAreaOriginCssText = '';
-		this.#wysiwygOriginCssText = '';
-		this.#codeWrapperOriginCssText = '';
-		this.#codeOriginCssText = '';
-		this.#codeNumberOriginCssText = '';
-		this.#toolbarOriginCssText = '';
-		this.#arrowOriginCssText = '';
-		this.#fullScreenInnerHeight = 0;
-		this.#fullScreenSticky = false;
-		this.#fullScreenBalloon = false;
-		this.#fullScreenInline = false;
-		this.#toolbarParent = null;
 		this.#disallowedTagNameRegExp = new RegExp(`^(${this.options.get('_disallowedExtraTag')})$`, 'i');
 	}
 

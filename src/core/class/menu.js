@@ -13,13 +13,14 @@ import { dom, converter } from '../../helper';
  * @description Dropdown and container menu management class
  */
 class Menu extends CoreInjector {
-	#dropdownCommands;
 	#globalEventHandler;
-	#bindClose_dropdown_mouse;
-	#bindClose_dropdown_key;
-	#bindClose_cons_mouse;
-	#menuBtn;
-	#menuContainer;
+
+	#dropdownCommands = [];
+	#bindClose_dropdown_mouse = null;
+	#bindClose_dropdown_key = null;
+	#bindClose_cons_mouse = null;
+	#menuBtn = null;
+	#menuContainer = null;
 
 	/**
 	 * @constructor
@@ -46,7 +47,6 @@ class Menu extends CoreInjector {
 		this.currentDropdownPlugin = null;
 
 		// event
-		this.#dropdownCommands = [];
 		this.#globalEventHandler = {
 			mousedown: this.#OnMouseDown_dropdown.bind(this),
 			containerDown: this.containerOff.bind(this),

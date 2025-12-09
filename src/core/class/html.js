@@ -20,17 +20,21 @@ class HTML extends CoreInjector {
 	#htmlCheckBlacklistRegExp;
 	#elementWhitelistRegExp;
 	#elementBlacklistRegExp;
-	#attributeWhitelist;
-	#attributeBlacklist;
 	#attributeWhitelistRegExp;
 	#attributeBlacklistRegExp;
 	#cleanStyleTagKeyRegExp;
 	#cleanStyleRegExpMap;
 	#textStyleTags;
-	#autoStyleify;
 	#disallowedTagsRegExp;
 	#disallowedTagNameRegExp;
 	#allowedTagNameRegExp;
+
+	/** @type {Object<string, RegExp>} */
+	#attributeWhitelist;
+	/** @type {Object<string, RegExp>} */
+	#attributeBlacklist;
+	/** @type {Object<string, *>} */
+	#autoStyleify;
 
 	/**
 	 * @constructor
@@ -41,30 +45,11 @@ class HTML extends CoreInjector {
 		const options = this.options;
 
 		// members
-		this.#fontSizeUnitRegExp = null;
 		this.#isAllowedClassName = function (v) {
 			return this.test(v) ? v : '';
 		}.bind(options.get('allowedClassName'));
-		this.#allowHTMLComment = null;
-		this.#disallowedStyleNodesRegExp = null;
-		this.#htmlCheckWhitelistRegExp = null;
-		this.#htmlCheckBlacklistRegExp = null;
-		this.#elementWhitelistRegExp = null;
-		this.#elementBlacklistRegExp = null;
-		/** @type {Object<string, RegExp>} */
-		this.#attributeWhitelist = null;
-		/** @type {Object<string, RegExp>} */
-		this.#attributeBlacklist = null;
-		this.#attributeWhitelistRegExp = null;
-		this.#attributeBlacklistRegExp = null;
-		this.#cleanStyleTagKeyRegExp = null;
-		this.#cleanStyleRegExpMap = null;
+
 		this.#textStyleTags = options.get('_textStyleTags');
-		/** @type {Object<string, *>} */
-		this.#autoStyleify = null;
-		this.#disallowedTagsRegExp = null;
-		this.#disallowedTagNameRegExp = null;
-		this.#allowedTagNameRegExp = null;
 
 		// clean styles
 		const tagStyles = options.get('tagStyles');

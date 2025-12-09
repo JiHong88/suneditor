@@ -20,29 +20,29 @@ class DocumentType extends CoreInjector {
 	#fc;
 	#ww;
 	#wwFrame;
-	#wwWidth;
-	#wwHeight;
-	#innerHeaders;
-	#wwHeaders;
 	#documentTypeInner;
 	#inner;
 	#page;
-	#totalPages;
-	#pageNum;
-	#pageHeight;
-	#pageBreaksCnt;
-	#pages;
-	#pagesLine;
-	#prevScrollTop;
-	useHeader;
-	usePage;
 	#pageNavigator;
 	#mirror;
-	#mirrorCache;
-	#positionCache;
-	#rePageTimeout;
 	#paddingTop;
 	#paddingBottom;
+
+	#wwWidth = -1;
+	#wwHeight = -1;
+	#innerHeaders = [];
+	#wwHeaders = [];
+	#totalPages = 0;
+	#pageNum = 0;
+	#pageHeight = -1;
+	#pageBreaksCnt = 0;
+	#pages = [];
+	#pagesLine = [];
+	#prevScrollTop = 0;
+	#mirrorCache = 0;
+	#positionCache = new Map();
+	#rePageTimeout = null;
+
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -58,25 +58,8 @@ class DocumentType extends CoreInjector {
 		this.#fc = fc;
 		this.#ww = fc.get('wysiwyg');
 		this.#wwFrame = fc.get('wysiwygFrame');
-		this.#wwWidth = -1;
-		this.#wwHeight = -1;
-		this.#innerHeaders = [];
-		this.#wwHeaders = [];
 		this.#documentTypeInner = fc.get('documentTypeInner');
-		this.#inner = null;
-		this.#page = null;
-		this.#totalPages = 0;
-		this.#pageNum = 0;
-		this.#pageHeight = -1;
-		this.#pageBreaksCnt = 0;
-		this.#pages = [];
-		this.#pagesLine = [];
-		this.#prevScrollTop = 0;
-		this.#pageNavigator = null;
 		this.#mirror = fc.get('documentTypePageMirror');
-		this.#mirrorCache = 0;
-		this.#positionCache = new Map();
-		this.#rePageTimeout = null;
 
 		const mirrorStyles = _w.getComputedStyle(this.#mirror);
 		this.#paddingTop = numbers.get(mirrorStyles.paddingTop);

@@ -46,9 +46,19 @@ const EDITOR_CLASS_KEYS = Object.freeze(['eventManager', 'instanceCheck', ..._ge
 class Editor {
 	#pluginCallButtons;
 	#pluginCallButtons_sub;
-	#fileInfoPluginsCheck;
-	#fileInfoPluginsReset;
 	#originOptions;
+
+	/**
+	 * @description Properties for managing files in the "FileManager" module
+	 * @type {Array<*>}
+	 */
+	#fileInfoPluginsCheck = null;
+
+	/**
+	 * @description Properties for managing files in the "FileManager" module
+	 * @type {Array<*>}
+	 */
+	#fileInfoPluginsReset = null;
 
 	/**
 	 * @constructor
@@ -525,18 +535,6 @@ class Editor {
 		 * @type {Object<string, Array<HTMLElement>>|[]}
 		 */
 		this.#pluginCallButtons_sub = product.pluginCallButtons_sub;
-
-		/**
-		 * @description Properties for managing files in the "FileManager" module
-		 * @type {Array<*>}
-		 */
-		this.#fileInfoPluginsCheck = null;
-
-		/**
-		 * @description Properties for managing files in the "FileManager" module
-		 * @type {Array<*>}
-		 */
-		this.#fileInfoPluginsReset = null;
 
 		/**
 		 * @description Origin options

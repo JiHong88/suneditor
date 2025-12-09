@@ -17,14 +17,15 @@ const DIR_UP_KEYCODE = /^Arrow(Left|Up)$/;
 class Component extends CoreInjector {
 	/** @type {Object<string, (...args: *) => *>} */
 	#globalEvents;
+
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	#bindClose_copy;
+	#bindClose_copy = null;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	#bindClose_cut;
+	#bindClose_cut = null;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	#bindClose_keydown;
+	#bindClose_keydown = null;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	#bindClose_mousedown;
+	#bindClose_mousedown = null;
 
 	/**
 	 * @constructor
@@ -75,10 +76,6 @@ class Component extends CoreInjector {
 			keydown: this.#OnKeyDown_component.bind(this),
 			mousedown: this.#CloseListener_mousedown.bind(this),
 		};
-		this.#bindClose_copy = null;
-		this.#bindClose_cut = null;
-		this.#bindClose_keydown = null;
-		this.#bindClose_mousedown = null;
 
 		/** @internal */
 		this.__selectionSelected = false;

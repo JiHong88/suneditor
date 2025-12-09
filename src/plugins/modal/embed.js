@@ -94,19 +94,20 @@ class Embed extends PluginModal {
 		return target;
 	}
 
-	#linkValue;
-	#align;
 	#defaultSizeX;
 	#defaultSizeY;
-	#element;
-	#cover;
-	#container;
-	#ratio;
 	#origin_w;
 	#origin_h;
 	#resizing;
 	#onlyPercentage;
 	#nonResizing;
+
+	#linkValue = '';
+	#align = 'none';
+	#element = null;
+	#cover = null;
+	#container = null;
+	#ratio = { w: 0, h: 0 };
 
 	/**
 	 * @constructor
@@ -158,14 +159,8 @@ class Embed extends PluginModal {
 		this.inputX = null;
 		this.inputY = null;
 
-		this.#linkValue = '';
-		this.#align = 'none';
 		this.#defaultSizeX = this.pluginOptions.defaultWidth;
 		this.#defaultSizeY = this.pluginOptions.defaultHeight;
-		this.#element = null;
-		this.#cover = null;
-		this.#container = null;
-		this.#ratio = { w: 0, h: 0 };
 		this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
 		this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 		this.#resizing = this.pluginOptions.canResize;

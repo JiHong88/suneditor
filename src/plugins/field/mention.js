@@ -30,9 +30,9 @@ class Mention extends PluginField {
 	static key = 'mention';
 	static className = '';
 
-	#lastAtPos;
-	#anchorOffset;
-	#anchorNode;
+	#lastAtPos = 0;
+	#anchorOffset = 0;
+	#anchorNode = null;
 
 	/**
 	 * @constructor
@@ -56,10 +56,6 @@ class Mention extends PluginField {
 		this.apiManager = new ApiManager(this, { headers: pluginOptions.apiHeaders });
 		this.cachingData = (pluginOptions.useCachingData ?? true) ? new Map() : null;
 		this.cachingFieldData = (pluginOptions.useCachingFieldData ?? true) ? [] : null;
-
-		this.#lastAtPos = 0;
-		this.#anchorOffset = 0;
-		this.#anchorNode = null;
 
 		// controller
 		const controllerEl = CreateHTML_controller();

@@ -12,12 +12,13 @@ const { _w } = env;
  * @description Toolbar class
  */
 class Toolbar extends CoreInjector {
-	#responsiveCurrentSize;
 	#originRes;
 	#rButtonArray;
-	#rButtonsInfo;
-	#rButtonsize;
 	#isViewPortSize;
+
+	#responsiveCurrentSize = 'default';
+	#rButtonsInfo = null;
+	#rButtonsize = null;
 
 	/**
 	 * @constructor
@@ -64,11 +65,8 @@ class Toolbar extends CoreInjector {
 			left: 0,
 		};
 
-		this.#responsiveCurrentSize = 'default';
 		this.#originRes = res;
 		this.#rButtonArray = res;
-		this.#rButtonsInfo = null;
-		this.#rButtonsize = null;
 		this.#isViewPortSize = 'visualViewport' in _w;
 
 		this._setResponsive();

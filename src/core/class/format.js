@@ -15,7 +15,8 @@ class Format extends CoreInjector {
 	#formatClosureBlockCheck;
 	#formatClosureBrLineCheck;
 	#textStyleTagsCheck;
-	#brLineBreak;
+
+	#brLineBreak = null;
 
 	/**
 	 * @constructor
@@ -31,7 +32,6 @@ class Format extends CoreInjector {
 		this.#formatClosureBlockCheck = this.options.get('formatClosureBlock').reg;
 		this.#formatClosureBrLineCheck = this.options.get('formatClosureBrLine').reg;
 		this.#textStyleTagsCheck = new RegExp('^(' + this.options.get('textStyleTags') + ')$', 'i');
-		this.#brLineBreak = null;
 
 		this.__resetBrLineBreak(this.options.get('defaultLineBreakFormat'));
 	}

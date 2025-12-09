@@ -21,8 +21,8 @@ class Anchor extends PluginPopup {
 		return dom.check.isAnchor(node) && node.hasAttribute('id') && node.hasAttribute('data-se-anchor') ? node : null;
 	}
 
-	#element;
-	#range;
+	#element = null;
+	#range = null;
 
 	/**
 	 * @constructor
@@ -47,9 +47,6 @@ class Anchor extends PluginPopup {
 		const controllerEl = CreateHTML_controller(this);
 		this.inputEl = controllerEl.querySelector('input');
 		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true, parents: [this.controllerSelect.form], parentsHide: true }, Anchor.key);
-
-		this.#element = null;
-		this.#range = null;
 	}
 
 	/**

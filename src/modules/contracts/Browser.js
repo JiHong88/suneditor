@@ -42,9 +42,10 @@ import ApiManager from '../utils/ApiManager';
  */
 class Browser extends CoreInjector {
 	#loading;
-	#closeSignal;
-	#bindClose;
 	#globalEventHandler;
+
+	#closeSignal = false;
+	#bindClose = null;
 
 	/**
 	 * @constructor
@@ -108,8 +109,6 @@ class Browser extends CoreInjector {
 		// api manager
 		this.apiManager = new ApiManager(this, { method: 'GET' });
 
-		this.#closeSignal = false;
-		this.#bindClose = null;
 		this.#globalEventHandler = (e) => {
 			if (!keyCodeMap.isEsc(e.code)) return;
 			this.close();

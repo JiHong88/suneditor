@@ -20,20 +20,21 @@ const { _w, _d, isMobile, isTouchDevice } = env;
  * @description Event manager, editor's all event management class
  */
 class EventManager extends CoreInjector {
-	/** @type {Array<*>} */
-	#events;
 	/** @type {RegExp} */
 	#onButtonsCheck;
+
+	/** @type {Array<*>} */
+	#events = [];
 	/** @type {number} */
-	#balloonDelay;
+	#balloonDelay = null;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	#close_move;
+	#close_move = null;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	#geckoActiveEvent;
+	#geckoActiveEvent = null;
 	/** @type {?SunEditor.Event.GlobalInfo} */
-	#selectionSyncEvent;
-	/** @internal @type {?SunEditor.Event.GlobalInfo} */
-	#resize_editor;
+	#selectionSyncEvent = null;
+	/**  @type {?SunEditor.Event.GlobalInfo} */
+	#resize_editor = null;
 
 	/**
 	 * @constructor
@@ -91,13 +92,7 @@ class EventManager extends CoreInjector {
 		/** @type {string} */
 		this.__secopy = null;
 
-		this.#events = [];
 		this.#onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
-		this.#balloonDelay = null;
-		this.#close_move = null;
-		this.#geckoActiveEvent = null;
-		this.#selectionSyncEvent = null;
-		this.#resize_editor = null;
 	}
 
 	/** @internal @type {SunEditor.Core['char']} */

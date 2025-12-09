@@ -16,15 +16,16 @@ class Modal extends CoreInjector {
 	/** @type {HTMLElement} */
 	#resizeBody;
 	#closeListener;
-	#bindClose;
-	#closeSignal;
-	#currentHandle;
-	#resizeDir;
-	#offetTop;
-	#offetLeft;
 	#globalEventHandlers;
-	#bindClose_mousemove;
-	#bindClose_mouseup;
+
+	#bindClose = null;
+	#closeSignal = false;
+	#currentHandle = null;
+	#resizeDir = '';
+	#offetTop = 0;
+	#offetLeft = 0;
+	#bindClose_mousemove = null;
+	#bindClose_mouseup = null;
 
 	/**
 	 * @description Modal window module
@@ -50,9 +51,6 @@ class Modal extends CoreInjector {
 		this.#modalArea = this.carrierWrapper.querySelector('.se-modal');
 		this.#modalInner = this.carrierWrapper.querySelector('.se-modal .se-modal-inner');
 		this.#closeListener = [this.#CloseListener.bind(this), this.#OnClick_dialog.bind(this)];
-		this.#bindClose = null;
-		this.#closeSignal = false;
-		this.#resizeBody = null;
 
 		// add element
 		this.#modalInner.appendChild(element);
@@ -68,16 +66,10 @@ class Modal extends CoreInjector {
 				this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-h'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'h'));
 				this.eventManager.addEvent(element.querySelector('.se-modal-resize-handle-c'), 'mousedown', this.#OnResizeMouseDown.bind(this, 'c'));
 
-				this.#currentHandle = null;
-				this.#resizeDir = '';
-				this.#offetTop = 0;
-				this.#offetLeft = 0;
 				this.#globalEventHandlers = {
 					mousemove: this.#OnResize.bind(this),
 					mouseup: this.#OnResizeMouseUp.bind(this),
 				};
-				this.#bindClose_mousemove = null;
-				this.#bindClose_mouseup = null;
 			}
 		}
 	}

@@ -37,7 +37,7 @@ class Math_ extends PluginModal {
 		return dom.utils.hasClass(node, 'se-math|katex') && dom.check.isComponentContainer(node) ? node : null;
 	}
 
-	#element;
+	#element = null;
 
 	/**
 	 * @constructor
@@ -115,7 +115,6 @@ class Math_ extends PluginModal {
 		this.fontSizeElement = modalEl.querySelector('.se-math-size');
 
 		this.isUpdateState = false;
-		this.#element = null;
 
 		// init
 		this.previewElement.style.fontSize = this.defaultFontSize;

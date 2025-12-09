@@ -42,17 +42,27 @@ const INDEX_1 = '2147483641';
  * @see EditorComponent for `inst._element` requirement
  */
 class Controller extends CoreInjector {
-	#reserveIndex;
 	#initMethod;
 	#globalEventHandlers;
-	#bindClose_key;
-	#bindClose_mouse;
-	#addOffset;
-	#shadowRootEventForm;
-	#shadowRootEventListener;
-	#preventClose;
-	#__childrenControllers__;
-	#__hiddenByParents__;
+
+	#addOffset = { left: 0, top: 0 };
+	#reserveIndex = false;
+	#preventClose = false;
+	#shadowRootEventForm = null;
+	#shadowRootEventListener = null;
+	#bindClose_key = null;
+	#bindClose_mouse = null;
+
+	/**
+	 * @type {Array<Controller>}
+	 * @description Child controllers opened by this controller
+	 */
+	#__childrenControllers__ = [];
+	/**
+	 * @type {Map<Controller, boolean>}
+	 * @description Track each parent's desired visibility state: true = wants hidden, false = wants visible
+	 */
+	#__hiddenByParents__ = new Map();
 
 	/**
 	 * @constructor
@@ -93,26 +103,8 @@ class Controller extends CoreInjector {
 		/** @type {{left?: number, top?: number, addOfffset?: {left?: number, top?: number}}} */
 		this.__offset = {};
 
-		this.#reserveIndex = false;
 		this.#initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
 		this.#globalEventHandlers = { keydown: this.#CloseListener_keydown.bind(this), mousedown: this.#CloseListener_mousedown.bind(this) };
-		this.#bindClose_key = null;
-		this.#bindClose_mouse = null;
-		this.#addOffset = { left: 0, top: 0 };
-		this.#shadowRootEventForm = null;
-		this.#shadowRootEventListener = null;
-		this.#preventClose = false;
-
-		/**
-		 * @type {Array<Controller>}
-		 * @description Child controllers opened by this controller
-		 */
-		this.#__childrenControllers__ = [];
-		/**
-		 * @type {Map<Controller, boolean>}
-		 * @description Track each parent's desired visibility state: true = wants hidden, false = wants visible
-		 */
-		this.#__hiddenByParents__ = new Map();
 
 		for (const parent of this.parents) {
 			if (dom.check.isElement(parent)) {

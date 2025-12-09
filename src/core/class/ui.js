@@ -11,15 +11,15 @@ const { _w } = env;
  * - This class sets the editor's style, theme, editor mode, etc., and controls the state of various UI elements.
  */
 class UI extends CoreInjector {
-	#controllerOnBtnDisabled;
 	#alertArea;
 	#alertInner;
 	#closeListener;
 	#closeSignal;
-	#bindClose;
 	#backWrapper;
-	#toastToggle;
 
+	#controllerOnBtnDisabled = false;
+	#bindClose = null;
+	#toastToggle = null;
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -40,17 +40,12 @@ class UI extends CoreInjector {
 		this.carrierWrapper.appendChild(toastPopup);
 
 		// private
-		this.#controllerOnBtnDisabled = false;
-		// private - modal
 		this.#alertArea = /** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-alert'));
 		this.#alertInner = /** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-alert .se-modal-inner'));
 		this.#alertInner.appendChild(alertModal);
 		this.#closeListener = [CloseListener.bind(this), OnClick_alert.bind(this)];
 		this.#closeSignal = !this.eventManager.addEvent(alertModal.querySelector('[data-command="close"]'), 'click', this.alertClose.bind(this));
-		this.#bindClose = null;
 		this.#backWrapper = /** @type {HTMLElement} */ (this.carrierWrapper.querySelector('.se-back-wrapper'));
-		// private - toast
-		this.#toastToggle = null;
 	}
 
 	/** @type {SunEditor.Core['toolbar']} */

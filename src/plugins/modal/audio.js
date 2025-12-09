@@ -40,10 +40,10 @@ class Audio_ extends PluginModal {
 		return /^AUDIO$/i.test(node?.nodeName) ? node : null;
 	}
 
-	#element;
 	#defaultWidth;
 	#defaultHeight;
-	#urlValue;
+	#urlValue = '';
+	#element = null;
 
 	/**
 	 * @constructor
@@ -98,10 +98,8 @@ class Audio_ extends PluginModal {
 		this.preview = modalEl.querySelector('.se-link-preview');
 
 		/** @type {HTMLAudioElement} */
-		this.#element = null;
 		this.#defaultWidth = this.pluginOptions.defaultWidth;
 		this.#defaultHeight = this.pluginOptions.defaultHeight;
-		this.#urlValue = '';
 
 		const galleryButton = modalEl.querySelector('.__se__gallery');
 		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));

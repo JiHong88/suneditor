@@ -10,8 +10,8 @@ const { _w } = env;
  * @description Selection, Range related class
  */
 class Selection_ extends CoreInjector {
-	#scrollMargin;
-	#hasScrollParents;
+	#scrollMargin = 0;
+	#hasScrollParents = false;
 
 	/**
 	 * @constructor
@@ -28,9 +28,6 @@ class Selection_ extends CoreInjector {
 
 		/** @internal */
 		this.__iframeFocus = false;
-
-		this.#hasScrollParents = false;
-		this.#scrollMargin = 0;
 	}
 
 	/** @type {SunEditor.Core['component']} */
