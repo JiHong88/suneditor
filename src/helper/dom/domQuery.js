@@ -247,6 +247,25 @@ export function sortNodeByDepth(array, des) {
 export function compareElements(a, b) {
 	let aNode = a,
 		bNode = b;
+
+	// Equalize depth
+	const aDepth = getNodeDepth(a);
+	const bDepth = getNodeDepth(b);
+
+	if (aDepth > bDepth) {
+		let diff = aDepth - bDepth;
+		while (diff > 0 && aNode) {
+			aNode = aNode.parentElement;
+			diff--;
+		}
+	} else if (bDepth > aDepth) {
+		let diff = bDepth - aDepth;
+		while (diff > 0 && bNode) {
+			bNode = bNode.parentElement;
+			diff--;
+		}
+	}
+
 	while (aNode && bNode && aNode.parentElement !== bNode.parentElement) {
 		aNode = aNode.parentElement;
 		bNode = bNode.parentElement;

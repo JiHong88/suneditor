@@ -263,11 +263,9 @@ export function isSameAttributes(a, b) {
 
 	const class_a = aEl.classList;
 	const class_b = bEl.classList;
-	const wRegExp = RegExp;
 	let compClass = 0;
-
 	for (let i = 0, len = class_a.length; i < len; i++) {
-		if (wRegExp('(s|^)' + class_a[i] + '(s|$)').test(class_b.value)) compClass++;
+		if (class_b.contains(class_a[i])) compClass++;
 	}
 
 	return compStyle === style_b.length && compStyle === style_a.length && compClass === class_b.length && compClass === class_a.length;

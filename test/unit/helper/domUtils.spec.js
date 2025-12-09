@@ -247,6 +247,18 @@ describe('dom.utils helper', () => {
 		it('should handle null element gracefully', () => {
 			expect(() => dom.utils.removeItem(null)).not.toThrow();
 		});
+
+        it('should fallback to parentNode.removeChild if remove is not available', () => {
+            const parent = document.createElement('div');
+            const child = document.createElement('span');
+            parent.appendChild(child);
+            
+            // Mock removing 'remove' method
+            child.remove = undefined;
+            
+            dom.utils.removeItem(child);
+            expect(parent.children.length).toBe(0);
+        });
 	});
 
 	describe('changeElement', () => {
@@ -359,4 +371,223 @@ describe('dom.utils helper', () => {
 			expect(button.disabled).toBe(true);
 		});
 	});
+
+	describe('copyTagAttributes', () => {
+		it('should copy attributes and styles to another element', () => {
+			const source = document.createElement('div');
+			source.id = 'src';
+			source.className = 'my-class';
+			source.style.color = 'red';
+			source.setAttribute('data-test', '123');
+
+			const target = document.createElement('p');
+
+			dom.utils.copyTagAttributes(target, source);
+
+			expect(target.id).toBe('src');
+			expect(target.className).toBe('my-class');
+			expect(target.style.color).toBe('red');
+			expect(target.getAttribute('data-test')).toBe('123');
+		});
+
+		it('should respect blacklist and not copy those attributes', () => {
+			const source = document.createElement('div');
+			source.id = 'src';
+			source.className = 'my-class';
+			source.setAttribute('data-ignore', 'true');
+
+			const target = document.createElement('p');
+
+			dom.utils.copyTagAttributes(target, source, ['id', 'data-ignore']);
+
+			expect(target.id).not.toBe('src'); // should not copy
+			expect(target.className).toBe('my-class');
+			expect(target.hasAttribute('data-ignore')).toBe(false);
+		});
+	});
+
+	describe('copyFormatAttributes', () => {
+		it('should copy format attributes but exclude __se__format__ classes', () => {
+			const source = document.createElement('div');
+			source.className = 'my-class __se__format__bold';
+			source.style.fontWeight = 'bold';
+
+			const target = document.createElement('p');
+
+			dom.utils.copyFormatAttributes(target, source);
+
+			expect(target.className.trim()).toBe('my-class'); // __se__format__ removed
+			expect(target.style.fontWeight).toBe('bold');
+		});
+	});
+
+	describe('Class Manipulation', () => {
+		const div = document.createElement('div');
+
+		beforeEach(() => {
+			div.className = '';
+		});
+
+		it('addClass should add single and multiple classes', () => {
+			dom.utils.addClass(div, 'class1');
+			expect(div.classList.contains('class1')).toBe(true);
+
+			dom.utils.addClass(div, 'class2|class3');
+			expect(div.classList.contains('class2')).toBe(true);
+			expect(div.classList.contains('class3')).toBe(true);
+		});
+
+		it('removeClass should remove single and multiple classes', () => {
+			div.className = 'class1 class2 class3';
+			dom.utils.removeClass(div, 'class1');
+			expect(div.classList.contains('class1')).toBe(false);
+			expect(div.classList.contains('class2')).toBe(true);
+
+			dom.utils.removeClass(div, 'class2|class3');
+			expect(div.classList.contains('class2')).toBe(false);
+			expect(div.classList.contains('class3')).toBe(false);
+		});
+
+		it('toggleClass should toggle classes', () => {
+			dom.utils.toggleClass(div, 'active');
+			expect(div.classList.contains('active')).toBe(true);
+
+			dom.utils.toggleClass(div, 'active');
+			expect(div.classList.contains('active')).toBe(false);
+		});
+
+		it('hasClass should check class existence', () => {
+			div.className = 'foo bar';
+			expect(dom.utils.hasClass(div, 'foo')).toBe(true);
+			expect(dom.utils.hasClass(div, 'baz')).toBe(false);
+		});
+
+		it('flashClass should add and remove class after duration', (done) => {
+			dom.utils.flashClass(div, 'flash', 10);
+			expect(div.classList.contains('flash')).toBe(true);
+
+			setTimeout(() => {
+				expect(div.classList.contains('flash')).toBe(false);
+				done();
+			}, 20);
+		});
+	});
+
+	describe('applyInlineStylesAll', () => {
+		it('should apply computed styles to element and children', () => {
+			const container = document.createElement('div');
+			container.style.color = 'red';
+			const child = document.createElement('p');
+			child.style.fontSize = '20px';
+			container.appendChild(child);
+			document.body.appendChild(container); // Needs to be in DOM for computed styles
+
+			const processed = dom.utils.applyInlineStylesAll(container, true, ['color', 'font-size']);
+
+			// It returns a cloned node.
+			expect(processed).not.toBe(container);
+			// Computed style converts 'red' to 'rgb(255, 0, 0)'
+			expect(processed.style.color).toBe('rgb(255, 0, 0)');
+			expect(processed.firstElementChild.style.fontSize).toBe('20px');
+
+			document.body.removeChild(container);
+		});
+
+        it('should handle body element copying', () => {
+             const body = document.createElement('body');
+             body.style.backgroundColor = 'white';
+             document.body.appendChild(body);
+             
+             const processed = dom.utils.applyInlineStylesAll(body, true, ['background-color']);
+             // Should return a DIV wrapping content
+             expect(processed.tagName).toBe('DIV');
+             expect(processed.style.backgroundColor).toBe('rgb(255, 255, 255)');
+             
+             document.body.removeChild(body);
+        });
+	});
+
+	describe('waitForMediaLoad', () => {
+		it('should resolve immediately if no media elements', async () => {
+			const div = document.createElement('div');
+			await expect(dom.utils.waitForMediaLoad(div)).resolves.not.toThrow();
+		});
+
+		it('should resolve when images are loaded', async () => {
+			const div = document.createElement('div');
+			const img = document.createElement('img');
+			// Mock complete
+			Object.defineProperty(img, 'complete', { value: true });
+			div.appendChild(img);
+
+			await expect(dom.utils.waitForMediaLoad(div)).resolves.not.toThrow();
+		});
+        
+        it('should resolve when iframes are loaded', async () => {
+            const div = document.createElement('div');
+            const iframe = document.createElement('iframe');
+            // Mock contentDocument readyState
+            const mockDoc = { readyState: 'complete' };
+            Object.defineProperty(iframe, 'contentDocument', { value: mockDoc });
+            div.appendChild(iframe);
+            
+            await expect(dom.utils.waitForMediaLoad(div)).resolves.not.toThrow();
+        });
+
+		// Complex Async Test: Real load event simulation
+		it('should wait for load event if not complete', (done) => {
+			const div = document.createElement('div');
+			const img = document.createElement('img');
+			// Mock complete = false
+			Object.defineProperty(img, 'complete', { value: false });
+			div.appendChild(img);
+
+			let resolved = false;
+			dom.utils.waitForMediaLoad(div).then(() => {
+				resolved = true;
+				expect(resolved).toBe(true);
+				done();
+			});
+
+			// Simulate load
+			setTimeout(() => {
+				img.dispatchEvent(new Event('load'));
+			}, 50);
+		});
+	});
+    
+    describe('CSS Variables', () => {
+        it('should get and set root CSS variables', () => {
+            const key = '--test-var';
+            const value = '10px';
+            
+            dom.utils.setRootCssVar(key, value);
+            // JSDOM might not fully support CSS variables inheritance but style property should be set
+            expect(dom.utils.getRootCssVar(key)).toBe(value);
+        });
+    });
+    
+    describe('createTooltipInner', () => {
+        it('should create tooltip html structure', () => {
+             const html = dom.utils.createTooltipInner('Test');
+             expect(html).toContain('se-tooltip-inner');
+             expect(html).toContain('se-tooltip-text');
+             expect(html).toContain('Test');
+        });
+    });
+    
+    describe('utils misc', () => {
+        it('getClientSize should return width/height', () => {
+            const size = dom.utils.getClientSize();
+            expect(size.w).toBeDefined();
+            expect(size.h).toBeDefined();
+        });
+        
+        it('getViewportSize should return viewport dimensions', () => {
+            const size = dom.utils.getViewportSize();
+            expect(size.top).toBeDefined();
+            expect(size.left).toBeDefined();
+            expect(size.scale).toBeDefined();
+        });
+    });
 });

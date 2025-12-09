@@ -230,7 +230,7 @@ export function kebabToCamelCase(param) {
 		return param.replace(/-[a-zA-Z]/g, (letter) => letter.replace('-', '').toUpperCase());
 	} else {
 		return param.map(function (str) {
-			return camelToKebabCase(str);
+			return kebabToCamelCase(str);
 		});
 	}
 }
@@ -439,10 +439,6 @@ export function spanToStyleNode(styleToTag, node) {
 				const nextNode = currentNode.nextSibling;
 				parent.appendChild(currentNode);
 				currentNode = nextNode;
-			}
-
-			while (node.firstChild) {
-				node.removeChild(node.firstChild);
 			}
 
 			node.appendChild(temp);

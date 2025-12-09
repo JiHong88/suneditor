@@ -127,7 +127,11 @@ export async function OnKeyUp_wysiwyg(fc, e) {
 
 		selectionNode.innerHTML = '';
 
-		const oFormatTag = dom.utils.createElement(this.format.isLine(this.status.currentNodes[0]) && !dom.check.isListCell(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.get('defaultLine'), null, '<br>');
+		const oFormatTag = dom.utils.createElement(
+			this.format.isLine(this.status.currentNodes[0]) && !dom.check.isListCell(this.status.currentNodes[0]) ? this.status.currentNodes[0].nodeName : this.options.get('defaultLine'),
+			null,
+			'<br>',
+		);
 		selectionNode.appendChild(oFormatTag);
 		this.selection.setRange(oFormatTag, 0, oFormatTag, 0);
 		this.applyTagEffect();

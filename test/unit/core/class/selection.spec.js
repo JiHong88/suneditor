@@ -165,6 +165,94 @@ describe('Selection', () => {
 
 			expect(range).toBeDefined();
 		});
+
+        it('should correctly order range based on compareElements (getRange logic)', () => {
+            // Setup two nodes at different depths
+            // Node A (depth 2): <p><b>TextA</b></p>
+            // Node B (depth 1): <p>TextB</p>
+            wysiwyg.innerHTML = '<p><b>TextA</b></p><p>TextB</p>';
+            const bTag = wysiwyg.querySelector('b');
+            const textA = bTag.firstChild;
+            const p2 = wysiwyg.children[1];
+            const textB = p2.firstChild;
+            
+            // Native selection can be created in reverse order (focus before anchor)
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            
+            // Create a selection where Anchor is TextB (later in document) and Focus is TextA (earlier)
+            // This is a "backwards" selection user might make
+            const range = document.createRange();
+            range.setStart(textA, 0);
+            range.setEnd(textB, 1);
+            sel.addRange(range);
+            
+            // Mock selection properties to simulate backward direction if needed, 
+            // but JSDOM selection behavior is limited.
+            // Selection.extend() usually creates backwards, but here we manually mock properties if we want to confirm reversal logic
+            // core.selection.getRange() checks: 
+            // if (selection.rangeCount > 0) return ...
+            // else use anchorNode/focusNode + compareElements
+            
+            // To trigger the compareElements block (lines 110-117), we need rangeCount to be 0 or force the logic?
+            // Actually getRange checks selection.rangeCount > 0 first.
+            // If we want to test lines 110-117, we must ensure the first condition fails or we simulate a state where current range is invalid?
+            // The code says: if (selection.rangeCount > 0) { this.status._range = selection.getRangeAt(0); return ... }
+            // So to test the else block (fallback logic with compareElements), we need selection.rangeCount === 0 BUT selection.anchorNode to be defined?
+            // This happens in some browsers or edge cases where a range exists but isn't exposed in rangeCount properly or we mock it.
+            
+            // Let's mock the selection object returned by selection.get()
+            const mockSel = {
+                rangeCount: 0,
+                anchorNode: textB,
+                anchorOffset: 1,
+                focusNode: textA,
+                focusOffset: 0,
+                isCollapsed: false,
+                getRangeAt: jest.fn(),
+                removeAllRanges: jest.fn(),
+                addRange: jest.fn()
+            };
+            
+            jest.spyOn(selection, 'get').mockReturnValue(mockSel);
+            
+            // Now call getRange. It should fall through to the else block
+            // textB is AFTER textA.
+            // compareElements(textB, textA) -> textB is after -> result should reflect B > A
+            // If result > 1 (meaning A follows B? or B follows A?)
+            // compareElements return: { result: 1 (a > b), -1 (a < b) } usually.
+            // Wait, standard compareDocumentPosition:
+            // Node.DOCUMENT_POSITION_FOLLOWING (4) -> a follows b
+            // Node.DOCUMENT_POSITION_PRECEDING (2) -> a precedes b
+            
+            // dom.query.compareElements returns:
+            // a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
+            // (If b follows a, a comes before b -> -1)
+            // (If a follows b, a comes after b -> 1)
+            
+            // In our case: anchor=TextB, focus=TextA.
+            // compareElements(TextB, TextA). 
+            // TextA precedes TextB. So TextB follows TextA.
+            // TextB.compareDocumentPosition(TextA) & PRECEDING is true.
+            // result should be 1 (TextB > TextA i.e. TextB comes after TextA).
+            
+            // Logic in selection.js:
+            // const compareValue = dom.query.compareElements(sc, ec); // sc=B, ec=A
+            // result should be 1.
+            // const rightDir = compareValue.ancestor && (compareValue.result === 0 ? so <= eo : compareValue.result > 1 ? true : false);
+            // Wait, compareElements in domQuery returns -1, 0, 1.
+            // If sc is after ec, result is 1.
+            // rightDir calculation:
+            // if result === 1, result > 1 is false. Match fails. rightDir = false.
+            // setRange(rightDir ? sc : ec, ...) -> rightDir false -> ec (TextA), eo (0), sc (TextB), so (1)
+            // Range(Start: TextA 0, End: TextB 1). Correct order!
+            
+            const resultRange = selection.getRange();
+            
+            // It calls setRange which sets internal _range
+            expect(resultRange.startContainer).toBe(textA);
+            expect(resultRange.endContainer).toBe(textB);
+        });
 	});
 
 	describe('setRange', () => {

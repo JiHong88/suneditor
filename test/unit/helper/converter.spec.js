@@ -44,6 +44,27 @@ describe('converter helper', () => {
 			const div = result.children[0];
 			expect(div.children).toEqual([]);
 		});
+
+		it('should skip empty text nodes (converage line 19)', () => {
+			const html = '<div>   </div>';
+			const result = converter.htmlToJson(html);
+			// text content is empty after trim, so it returns null/empty
+			// htmlToJson parses '<div>   </div>'. Doc body has div.
+			// div has one text node "   ". NodeToJson -> trim -> empty -> null.
+			// children array in element json only pushes if childJson is valid.
+			const div = result.children[0]; // <div>
+			expect(div.children.length).toBe(0);
+		});
+
+		it('should return null for non-element non-text nodes (coverage line 45)', () => {
+			// Difficult to invoke NodeToJson indirectly with comment node via htmlToJson potentially,
+			// dependent on DOMParser behavior.
+			// Let's try input with comment: '<!-- comment -->'
+			const html = '<div><!-- comment --></div>';
+			const result = converter.htmlToJson(html);
+			const div = result.children[0];
+			expect(div.children.length).toBe(0);
+		});
 	});
 
 	describe('jsonToHtml', () => {
@@ -92,9 +113,14 @@ describe('converter helper', () => {
 			const result = converter.jsonToHtml(jsonData);
 			expect(result).toContain('title="Test &amp; example &quot;quotes&quot;"');
 		});
+		it('should handle invalid or unknown types', () => {
+			const jsonData = { type: 'unknown', content: 'test' };
+			expect(converter.jsonToHtml(jsonData)).toBe('');
+		});
 	});
 
 	describe('htmlToEntity', () => {
+        // ... (existing htmlToEntity tests)
 		it('should convert HTML special characters to entities', () => {
 			const testCases = [
 				{ input: '&', expected: '&amp;' },
@@ -135,6 +161,7 @@ describe('converter helper', () => {
 	});
 
 	describe('debounce', () => {
+        // ...
 		it('should delay function execution', (done) => {
 			let callCount = 0;
 			const func = () => callCount++;
@@ -167,6 +194,7 @@ describe('converter helper', () => {
 	});
 
 	describe('syncMaps', () => {
+        // ...
 		it('should sync two maps correctly', () => {
 			const targetMap = new Map([['a', 1], ['b', 2], ['c', 3]]);
 			const referenceMap = new Map([['a', 10], ['d', 4]]);
@@ -181,6 +209,7 @@ describe('converter helper', () => {
 	});
 
 	describe('mergeMaps', () => {
+        // ...
 		it('should merge multiple maps', () => {
 			const map1 = new Map([['a', 1], ['b', 2]]);
 			const map2 = new Map([['c', 3], ['d', 4]]);
@@ -209,6 +238,7 @@ describe('converter helper', () => {
 	});
 
 	describe('getValues', () => {
+        // ...
 		it('should return array of object values', () => {
 			const obj = { a: 1, b: '2', c: true };
 			const result = converter.getValues(obj);
@@ -222,6 +252,7 @@ describe('converter helper', () => {
 	});
 
 	describe('camelToKebabCase', () => {
+        // ...
 		it('should convert camelCase to kebab-case', () => {
 			expect(converter.camelToKebabCase('camelCase')).toBe('camel-case');
 			expect(converter.camelToKebabCase('backgroundColor')).toBe('background-color');
@@ -241,6 +272,12 @@ describe('converter helper', () => {
 			expect(converter.kebabToCamelCase('background-color')).toBe('backgroundColor');
 			expect(converter.kebabToCamelCase('font-size')).toBe('fontSize');
 		});
+
+		it('should handle array of strings', () => {
+			const input = ['kebab-case', 'background-color'];
+			const result = converter.kebabToCamelCase(input);
+			expect(result).toEqual(['kebabCase', 'backgroundColor']);
+		});
 	});
 
 	describe('toFontUnit', () => {
@@ -256,6 +293,9 @@ describe('converter helper', () => {
 
 			// pt to other units
 			expect(converter.toFontUnit('px', '12pt')).toBe('16px');
+
+			// % to other units
+			expect(converter.toFontUnit('px', '100%')).toBe('1px');
 		});
 
 		it('should handle named font sizes', () => {
@@ -421,6 +461,170 @@ describe('converter helper', () => {
 		it('should return empty string for non-auto height', () => {
 			expect(converter._setAutoHeightStyle('400px')).toBe('');
 			expect(converter._setAutoHeightStyle('100%')).toBe('');
+		});
+	});
+
+	describe('getWidthInPercentage', () => {
+		it('should calculate width percentage based on parent', () => {
+			const parent = document.createElement('div');
+			jest.spyOn(parent, 'offsetWidth', 'get').mockReturnValue(1000);
+			jest.spyOn(parent, 'clientWidth', 'get').mockReturnValue(1000); // no scrollbar
+			window.getComputedStyle = jest.fn().mockReturnValue({ paddingLeft: '0', paddingRight: '0' });
+
+			const target = document.createElement('div');
+			jest.spyOn(target, 'offsetWidth', 'get').mockReturnValue(500);
+			parent.appendChild(target);
+
+			const result = converter.getWidthInPercentage(target, parent);
+			expect(result).toBe(50);
+		});
+
+		it('should account for padding and scrollbar', () => {
+			const parent = document.createElement('div');
+			jest.spyOn(parent, 'offsetWidth', 'get').mockReturnValue(1020); // 20px scrollbar included in valid width? or just width
+			jest.spyOn(parent, 'clientWidth', 'get').mockReturnValue(1000); // 20px diff = scrollbar
+			window.getComputedStyle = jest.fn().mockReturnValue({ paddingLeft: '10px', paddingRight: '10px' });
+			
+			// Available width = 1020 - 10 - 10 - (1020-1000) = 1000 - 20 = 980
+			
+			const target = document.createElement('div');
+			jest.spyOn(target, 'offsetWidth', 'get').mockReturnValue(490);
+			parent.appendChild(target);
+
+			const result = converter.getWidthInPercentage(target, parent);
+			// 490 / 980 * 100 = 50
+			expect(result).toBe(50);
+		});
+		
+		it('should use parentElement if parentTarget not provided (line 362)', () => {
+			const parent = document.createElement('div');
+			jest.spyOn(parent, 'offsetWidth', 'get').mockReturnValue(100);
+			jest.spyOn(parent, 'clientWidth', 'get').mockReturnValue(100);
+			window.getComputedStyle = jest.fn().mockReturnValue({ paddingLeft: '0', paddingRight: '0' });
+			
+			const target = document.createElement('div');
+			jest.spyOn(target, 'offsetWidth', 'get').mockReturnValue(50);
+			parent.appendChild(target);
+			
+			const result = converter.getWidthInPercentage(target);
+			expect(result).toBe(50);
+		});
+	});
+
+	describe('spanToStyleNode', () => {
+		it('should convert span with style to corresponding tags', () => {
+			const styleToTag = {
+				bold: { regex: /font-weight\s*:\s*bold/i, tag: 'strong' },
+				italic: { regex: /font-style\s*:\s*italic/i, tag: 'em' }
+			};
+			
+			const span = document.createElement('span');
+			span.style.fontWeight = 'bold';
+			span.style.fontStyle = 'italic';
+			span.textContent = 'Text';
+			
+			// DOM style attribute might not be reliably set via style property in all JSDOM versions or test check
+			// Force attribute
+			span.setAttribute('style', 'font-weight: bold; font-style: italic;');
+			
+			converter.spanToStyleNode(styleToTag, span);
+			
+			// Result should be <span><strong><em>Text</em></strong></span> or similar wrapping structure inside the span, 
+			// Wait, implementation: 
+			// creates new 'temp' span.
+			// wraps tags inside temp.
+			// moves children of original span to inner-most tag.
+			// clears original span children.
+			// appends temp to original span.
+			// So: <span original><span temp><strong><em>Text</em></strong></span></span>
+			
+			expect(span.querySelector('strong')).toBeTruthy();
+			expect(span.querySelector('em')).toBeTruthy();
+			expect(span.textContent).toBe('Text');
+		});
+
+		it('should handle complex structure inside span', () => {
+			const styleToTag = {
+				underline: { regex: /text-decoration\s*:\s*underline/i, tag: 'u' }
+			};
+			
+			const span = document.createElement('span');
+			span.setAttribute('style', 'text-decoration: underline');
+			span.innerHTML = 'Start <b>Bold</b> End';
+			
+			converter.spanToStyleNode(styleToTag, span);
+			
+			// <span original><span temp><u>Start <b>Bold</b> End</u></span></span>
+			const u = span.querySelector('u');
+			expect(u).toBeTruthy();
+			expect(u.innerHTML).toContain('Start');
+			expect(u.innerHTML).toContain('<b>Bold</b>');
+		});
+	});
+	
+	describe('_setDefaultOptionStyle extra coverage', () => {
+		it('should handle height: auto option (line 504)', () => {
+			const fo = new Map();
+			// height: auto input in cssText
+			const cssText = 'height: auto; width: 100px;';
+			
+			const result = converter._setDefaultOptionStyle(fo, cssText);
+			
+			expect(fo.get('height')).toBe('auto');
+		});
+	});
+
+	describe('_setIframeStyleLinks', () => {
+		beforeEach(() => {
+			// clean up links
+			document.head.innerHTML = '';
+		});
+
+		it('should create link tags for given names', () => {
+			const links = ['http://example.com/style.css', 'data:text/css,.foo{}'];
+			const result = converter._setIframeStyleLinks(links);
+			
+			expect(result).toContain('href="http://example.com/style.css"');
+			expect(result).toContain('href="data:text/css,.foo{}"');
+		});
+
+		it('should find matching link tags from document when regex used', () => {
+			// Mock existing links in document
+			const link = document.createElement('link');
+			link.rel = 'stylesheet';
+			link.href = 'http://localhost/css/suneditor.min.css';
+			document.head.appendChild(link);
+			
+			// Input: ['suneditor'] -> should wildcard match suneditor.min.css
+			const result = converter._setIframeStyleLinks(['suneditor']);
+			expect(result).toContain(link.href);
+		});
+		
+		it('should support wildcard check (*)', () => {
+			const link1 = document.createElement('link');
+			link1.rel = 'stylesheet';
+			link1.href = 'style1.css';
+			document.head.appendChild(link1);
+			
+			const link2 = document.createElement('link');
+			link2.rel = 'stylesheet';
+			link2.href = 'style2.css';
+			document.head.appendChild(link2);
+			
+			const result = converter._setIframeStyleLinks(['*']);
+			expect(result).toContain('style1.css');
+			expect(result).toContain('style2.css');
+		});
+
+		it('should throw error if style file not found', () => {
+			expect(() => {
+				converter._setIframeStyleLinks(['nonexistent']);
+			}).toThrow(/suneditor CSS files installation path could not be automatically detected/);
+		});
+		
+		it('should return empty string if no links provided', () => {
+			expect(converter._setIframeStyleLinks(null)).toBe('');
+			expect(converter._setIframeStyleLinks([])).toBe('');
 		});
 	});
 });
