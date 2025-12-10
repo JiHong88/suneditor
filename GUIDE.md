@@ -439,11 +439,10 @@ The `strictMode` option controls how strictly SunEditor validates and cleans HTM
 
 ```javascript
 SUNEDITOR.create('editor', {
-	// Boolean mode (all filters on/off)
-	strictMode: true, // default - all filters enabled
-	strictMode: false, // disable all filters
+	// Enable all filters (default)
+	strictMode: true,
 
-	// Granular control
+	// Granular control - selectively disable specific filters
 	strictMode: {
 		tagFilter: true, // Filter disallowed HTML tags
 		formatFilter: true, // Enforce line/block/component structure
@@ -454,6 +453,8 @@ SUNEDITOR.create('editor', {
 	},
 });
 ```
+
+> **Note:** Setting `strictMode: false` is not supported. To disable filtering, use the object form and set individual filters to `false`. However, disabling all filters is strongly discouraged as it may cause unpredictable behavior, especially with `formatFilter`.
 
 **Filter Types:**
 

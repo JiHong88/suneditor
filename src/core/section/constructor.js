@@ -385,14 +385,13 @@ export function InitOptions(options, editorTargets, plugins) {
 
 	/** Base */
 	o.set('buttons', new Set(buttonList.toString().split(',')));
-	const modeValue = options.strictMode !== false;
 	o.set('strictMode', {
-		tagFilter: modeValue,
-		formatFilter: modeValue,
-		classFilter: modeValue,
-		textStyleTagFilter: modeValue,
-		attrFilter: modeValue,
-		styleFilter: modeValue,
+		tagFilter: true,
+		formatFilter: true,
+		classFilter: true,
+		textStyleTagFilter: true,
+		attrFilter: true,
+		styleFilter: true,
 		...(typeof options.strictMode === 'boolean' ? {} : options.strictMode),
 	});
 	o.set('freeCodeViewMode', !!options.freeCodeViewMode);

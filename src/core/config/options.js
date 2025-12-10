@@ -240,14 +240,16 @@ export const DEFAULTS = {
  * ///
  *
  * === Strict & Advanced Filtering ===
- * @property {boolean | {
+ * @property {true | {
  * 		tagFilter: boolean,
  * 		formatFilter: boolean,
  * 		classFilter: boolean,
  * 		textStyleTagFilter: boolean,
  * 		attrFilter: boolean,
  * 		styleFilter: boolean
- * 	}} [strictMode=true] - Enables strict filtering of tags, attributes, and styles.
+ * 	}} [strictMode=true]  - Enables strict filtering of tags, attributes, and styles.
+ * - Use `true` to enable all filters (default), or an object to control individual filters.
+ * - Setting `false` is not supported; use the object form to disable specific filters instead.
  * @property {Array<string>} [scopeSelectionTags=CONSTANTS.SCOPE_SELECTION_TAGS] - Tags treated as whole units when selecting all content.
  * - The default follows {@link DEFAULTS.SCOPE_SELECTION_TAGS}
  * ///
