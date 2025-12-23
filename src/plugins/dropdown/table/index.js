@@ -25,6 +25,10 @@ const { _w, ON_OVER_COMPONENT } = env;
  */
 
 /**
+ * @typedef {import('./shared/table.constants').TableState} TableState
+ */
+
+/**
  * @class
  * @description Table Plugin
  */
@@ -109,37 +113,8 @@ class Table extends PluginDropdownFree {
 		 */
 		this._element = null;
 
-		// member - elements
-		/** @type {HTMLElement} */
-		this.figureElement = null;
-		/** @type {HTMLTableCellElement} */
-		this.tdElement = null;
-		/** @type {HTMLTableRowElement} */
-		this.trElement = null;
-		/** @type {HTMLTableRowElement[]|HTMLCollectionOf<HTMLTableRowElement>} */
-		this.trElements = null;
-		/** @type {HTMLTableElement} */
-		this.selectedTable = null;
-		/** @type {HTMLTableCellElement} */
-		this.fixedCell = null;
-		/** @type {HTMLTableCellElement} */
-		this.selectedCell = null;
-		/** @type {HTMLTableCellElement[]} */
-		this.selectedCells = null;
-
 		// member - state
-		this.physical_cellCnt = 0;
-		this.logical_cellCnt = 0;
-		this.cellCnt = 0;
-		this.rowCnt = 0;
-		this.rowIndex = 0;
-		this.physical_cellIndex = 0;
-		this.logical_cellIndex = 0;
-		this.current_colSpan = 0;
-		this.current_rowSpan = 0;
-
-		this._shiftKey = false;
-		this._ref = null;
+		this.state = Constants.INITIAL_STATE;
 
 		// ------------------------------------------------ INIT ------------------------------------------------
 		// members - private
@@ -167,6 +142,19 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
+	 * @template {keyof import('./shared/table.constants').TableState} K
+	 * @param {K} key
+	 * @param {import('./shared/table.constants').TableState[K]} value
+	 */
+	setState(key, value) {
+		this.state[key] = value;
+	}
+
+	#initState() {
+		Object.assign(this.state, Constants.INITIAL_STATE);
+	}
+
+	/**
 	 * @override
 	 * @type {PluginDropdownFree['off']}
 	 */
@@ -180,26 +168,26 @@ class Table extends PluginDropdownFree {
 	 */
 	componentSelect(target) {
 		this.#figureOpen(target);
-		if (!this.figureElement) this.setTableInfo(target);
+		if (!this.state.figureElement) this.setTableInfo(target);
 
-		this.#maxWidth = this.figureElement?.style.width === '100%';
+		this.#maxWidth = this.state.figureElement?.style.width === '100%';
 		this.#fixedColumn = dom.utils.hasClass(target, 'se-table-layout-fixed') || target.style.tableLayout === 'fixed';
 		this.styleService.setTableLayout(this.#maxWidth ? 'width|column' : 'width', this.#maxWidth, this.#fixedColumn, true);
 
 		if (_DragHandle.get('__overInfo') === ON_OVER_COMPONENT) return;
 
-		if (!this.tdElement) return;
-		this.setCellInfo(this.tdElement, true);
+		if (!this.state.tdElement) return;
+		this.setCellInfo(this.state.tdElement, true);
 
 		// controller open
-		const btnDisabled = this.selectedCells?.length > 1;
+		const btnDisabled = this.state.selectedCells?.length > 1;
 		const figureEl = dom.query.getParentElement(target, dom.check.isFigure);
 		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
 
-		if (!this.fixedCell) return;
+		if (!this.state.fixedCell) return;
 
 		this.cellService.setUnMergeButton();
-		this.controller_cell.open(this.tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
+		this.controller_cell.open(this.state.tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: null, disabled: btnDisabled });
 	}
 
 	/**
@@ -269,10 +257,10 @@ class Table extends PluginDropdownFree {
 
 		// select cell
 		const { fixedCell, selectedCell } = this.selectionService.selectCells(selectedCells);
-		this.selectedCells = selectedCells;
-		this.fixedCell = fixedCell;
-		this.selectedCell = selectedCell;
-		this.selectedTable = dom.query.getParentElement(fixedCell, 'TABLE');
+		this.setState('selectedCells', selectedCells);
+		this.setState('fixedCell', fixedCell);
+		this.setState('selectedCell', selectedCell);
+		this.setState('selectedTable', dom.query.getParentElement(fixedCell, 'TABLE'));
 
 		return false;
 	}
@@ -419,7 +407,8 @@ class Table extends PluginDropdownFree {
 	 * @type {SunEditor.Hook.Event.OnMouseDown}
 	 */
 	onMouseDown({ event }) {
-		this._ref = this.selectedCell = null;
+		this.setState('ref', null);
+		this.setState('selectedCell', null);
 		const eventTarget = dom.query.getEventTarget(event);
 		const target = /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(eventTarget, IsResizeEls));
 		if (!target) return;
@@ -430,7 +419,7 @@ class Table extends PluginDropdownFree {
 
 		if (this.resizeService.readyResizeFromEdge(event, target) === false) return;
 
-		if (this._shiftKey && target !== this.fixedCell) return;
+		if (this.state.isShiftPressed && target !== this.state.fixedCell) return;
 
 		this.selectionService.deleteStyleSelectedCells();
 		if (/^TR$/i.test(target.nodeName)) return;
@@ -444,7 +433,7 @@ class Table extends PluginDropdownFree {
 	 * @type {SunEditor.Hook.Event.OnMouseUp}
 	 */
 	onMouseUp() {
-		this._shiftKey = false;
+		this.setState('isShiftPressed', false);
 	}
 
 	/**
@@ -460,7 +449,7 @@ class Table extends PluginDropdownFree {
 	 * @type {SunEditor.Hook.Event.OnKeyDown}
 	 */
 	onKeyDown({ event, range, line }) {
-		this._ref = null;
+		this.setState('ref', null);
 
 		const keyCode = event.code;
 		const isTab = keyCodeMap.isTab(keyCode);
@@ -480,7 +469,7 @@ class Table extends PluginDropdownFree {
 				this._closeController();
 
 				const shift = this.#_s;
-				this._shiftKey = this.#_s = false;
+				this.setState('isShiftPressed', (this.#_s = false));
 
 				/** @type {HTMLTableElement} */
 				const table = dom.query.getParentElement(tableCell, 'table');
@@ -491,7 +480,7 @@ class Table extends PluginDropdownFree {
 				if (idx === cells.length && !shift) {
 					if (!dom.query.getParentElement(tableCell, 'thead')) {
 						const rows = table.rows;
-						const newRow = this.gridService.insertBodyRow(table, rows.length, this.cellCnt);
+						const newRow = this.gridService.insertBodyRow(table, rows.length, this.state.cellCnt);
 						const firstTd = newRow.querySelector('td div');
 						this.selection.setRange(firstTd, 0, firstTd, 0);
 					}
@@ -530,12 +519,12 @@ class Table extends PluginDropdownFree {
 			return;
 		}
 
-		if (this._shiftKey || this._ref) return;
+		if (this.state.isShiftPressed || this.state.ref) return;
 
 		cell ||= /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(line, dom.check.isTableCell));
 		if (cell) {
 			this.#_s = event.shiftKey;
-			this.fixedCell = cell;
+			this.setState('fixedCell', cell);
 			this._closeController();
 			this.selectionService.initCellSelection(cell, this.#_s);
 			return false;
@@ -548,12 +537,12 @@ class Table extends PluginDropdownFree {
 	 */
 	onKeyUp({ line }) {
 		this.#_s = false;
-		if (this._shiftKey && dom.query.getParentElement(line, dom.check.isTableCell) === this.fixedCell) {
+		if (this.state.isShiftPressed && dom.query.getParentElement(line, dom.check.isTableCell) === this.state.fixedCell) {
 			this.selectionService.deleteStyleSelectedCells();
 			this._editorEnable(true);
 			this.#initService();
 		}
-		this._shiftKey = false;
+		this.setState('isShiftPressed', false);
 	}
 
 	/**
@@ -632,10 +621,10 @@ class Table extends PluginDropdownFree {
 				this.styleService.setVerticalAlignProps(target.getAttribute('data-value'));
 				break;
 			case 'merge':
-				this.cellService.mergeCells(this.selectedCells);
+				this.cellService.mergeCells(this.state.selectedCells);
 				break;
 			case 'unmerge':
-				this.cellService.unmergeCells(this.selectedCells);
+				this.cellService.unmergeCells(this.state.selectedCells);
 				break;
 			case 'resize':
 				this.#maxWidth = !this.#maxWidth;
@@ -654,10 +643,10 @@ class Table extends PluginDropdownFree {
 				}, 0);
 				break;
 			case 'copy':
-				this.component.copy(this.figureElement);
+				this.component.copy(this.state.figureElement);
 				break;
 			case 'remove': {
-				this.componentDestroy(this.figureElement);
+				this.componentDestroy(this.state.figureElement);
 			}
 		}
 
@@ -667,7 +656,7 @@ class Table extends PluginDropdownFree {
 		}
 
 		if (!/^(remove|props_|on|open|merge)/.test(command)) {
-			this._setCellControllerPosition(this.tdElement, this._shiftKey);
+			this._setCellControllerPosition(this.state.tdElement, this.state.isShiftPressed);
 		}
 	}
 
@@ -679,8 +668,9 @@ class Table extends PluginDropdownFree {
 	setCellInfo(tdElement, reset) {
 		const table = this.setTableInfo(tdElement);
 		if (!table) return;
-		this.fixedCell = tdElement;
-		this.trElement = /** @type {HTMLTableRowElement} */ (tdElement.parentNode);
+
+		this.setState('fixedCell', tdElement);
+		this.setState('trElement', /** @type {HTMLTableRowElement} */ (tdElement.parentNode));
 
 		// hedaer
 		this.styleService.resetHeaderButton(table);
@@ -689,15 +679,15 @@ class Table extends PluginDropdownFree {
 		this.styleService.resetCaptionButton(table);
 
 		// set cell info
-		if (reset || this.physical_cellCnt === 0) {
-			if (this.tdElement !== tdElement) {
-				this.tdElement = tdElement;
-				this.trElement = /** @type {HTMLTableRowElement} */ (tdElement.parentNode);
+		if (reset || this.state.physical_cellCnt === 0) {
+			if (this.state.tdElement !== tdElement) {
+				this.setState('tdElement', tdElement);
 			}
 
-			if (!this.selectedCells?.length) this.selectedCells = [tdElement];
+			if (!this.state.selectedCells?.length) this.setState('selectedCells', [tdElement]);
 
-			const rows = (this.trElements = table.rows);
+			const rows = table.rows;
+			this.setState('trElements', rows);
 			const cellIndex = tdElement.cellIndex;
 
 			let cellCnt = 0;
@@ -706,17 +696,19 @@ class Table extends PluginDropdownFree {
 			}
 
 			// row cnt, row index
-			const rowIndex = (this.rowIndex = this.trElement.rowIndex);
-			this.rowCnt = rows.length;
+			const rowIndex = this.state.trElement.rowIndex;
+			this.setState('rowIndex', rowIndex);
+			this.setState('rowCnt', rows.length);
 
 			// cell cnt, physical cell index
-			this.physical_cellCnt = this.trElement.cells.length;
-			this.logical_cellCnt = this.cellCnt = cellCnt;
-			this.physical_cellIndex = cellIndex;
+			this.setState('physical_cellCnt', this.state.trElement.cells.length);
+			this.setState('logical_cellCnt', cellCnt);
+			this.setState('cellCnt', cellCnt);
+			this.setState('physical_cellIndex', cellIndex);
 
 			// span
-			this.current_colSpan = this.tdElement.colSpan - 1;
-			this.current_rowSpan = this.trElement.cells[cellIndex].rowSpan - 1;
+			this.setState('current_colSpan', this.state.tdElement.colSpan - 1);
+			this.setState('current_rowSpan', this.state.trElement.cells[cellIndex].rowSpan - 1);
 
 			// find logcal cell index
 			let rowSpanArr = [];
@@ -756,7 +748,7 @@ class Table extends PluginDropdownFree {
 
 					// logcal cell index
 					if (i === rowIndex && c === cellIndex) {
-						this.logical_cellIndex = logcalIndex;
+						this.setState('logical_cellIndex', logcalIndex);
 						break;
 					}
 
@@ -789,9 +781,10 @@ class Table extends PluginDropdownFree {
 	 */
 	setRowInfo(trElement) {
 		const table = this.setTableInfo(trElement);
-		const rows = (this.trElements = table.rows);
-		this.rowCnt = rows.length;
-		this.rowIndex = trElement.rowIndex;
+		const rows = table.rows;
+		this.setState('trElements', rows);
+		this.setState('rowCnt', rows.length);
+		this.setState('rowIndex', trElement.rowIndex);
 	}
 
 	/**
@@ -800,8 +793,9 @@ class Table extends PluginDropdownFree {
 	 * @returns {HTMLTableElement} The `<table>` element that is the parent of the provided `element`.
 	 */
 	setTableInfo(element) {
-		const table = (this._element = this.selectedTable = dom.query.getParentElement(element, 'TABLE'));
-		this.figureElement = dom.query.getParentElement(table, dom.check.isFigure) || table;
+		const table = (this._element = dom.query.getParentElement(element, 'TABLE'));
+		this.setState('selectedTable', table);
+		this.setState('figureElement', dom.query.getParentElement(table, dom.check.isFigure) || table);
 		return /** @type {HTMLTableElement} */ (table);
 	}
 
@@ -815,28 +809,11 @@ class Table extends PluginDropdownFree {
 		this._editorEnable(true);
 
 		this._element = null;
-		this.figureElement = null;
-		this.trElement = null;
-		this.trElements = null;
+		this.#initState();
+
 		this.#tableXY = [];
 		this.#maxWidth = false;
 		this.#fixedColumn = false;
-		this.physical_cellCnt = 0;
-		this.logical_cellCnt = 0;
-		this.rowCnt = 0;
-		this.rowIndex = 0;
-		this.physical_cellIndex = 0;
-		this.logical_cellIndex = 0;
-		this.current_colSpan = 0;
-		this.current_rowSpan = 0;
-
-		this._shiftKey = false;
-		this.selectedCells = null;
-		this.selectedTable = null;
-		this._ref = null;
-
-		this.fixedCell = null;
-		this.selectedCell = null;
 	}
 
 	/**
@@ -845,17 +822,17 @@ class Table extends PluginDropdownFree {
 	 * @param {HTMLTableCellElement} tdElement - The target table cell.
 	 */
 	_setController(tdElement) {
-		if (!this.selection.get().isCollapsed && !this.selectedCell) {
+		if (!this.selection.get().isCollapsed && !this.state.selectedCell) {
 			this.selectionService.deleteStyleSelectedCells();
 			return;
 		}
 
 		this.cellService.setUnMergeButton();
 
-		this.tdElement = tdElement;
-		if (this.fixedCell === tdElement) dom.utils.addClass(tdElement, 'se-selected-cell-focus');
-		if (!this.selectedCells?.length) this.selectedCells = [tdElement];
-		const tableElement = this.selectedTable || this._element || dom.query.getParentElement(tdElement, 'TABLE');
+		this.setState('tdElement', tdElement);
+		if (this.state.fixedCell === tdElement) dom.utils.addClass(tdElement, 'se-selected-cell-focus');
+		if (!this.state.selectedCells?.length) this.setState('selectedCells', [tdElement]);
+		const tableElement = this.state.selectedTable || this._element || dom.query.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, { isInput: true });
 	}
 

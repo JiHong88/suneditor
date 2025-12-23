@@ -6,6 +6,7 @@ import { CreateColumnMenu, CreateRowMenu } from '../render/table.menu';
 
 export class TableGridService {
 	#main;
+	#state;
 
 	/**
 	 * @param {import('../index').default} main Table index
@@ -18,6 +19,7 @@ export class TableGridService {
 	 */
 	constructor(main, { columnButton, rowButton, openCellMenuFunc, closeCellMenuFunc }) {
 		this.#main = main;
+		this.#state = main.state;
 
 		// members - SelectMenu - column
 		const columnMenu = CreateColumnMenu(this.#main.lang, this.#main.icons);
@@ -41,7 +43,7 @@ export class TableGridService {
 	}
 
 	openRowMenu() {
-		this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(this.#main.tdElement?.nodeName) ? 'none' : '';
+		this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(this.#state.tdElement?.nodeName) ? 'none' : '';
 		this.selectMenu_row.open();
 	}
 
@@ -55,16 +57,16 @@ export class TableGridService {
 		const isRow = type === 'row';
 
 		if (isRow) {
-			const tableAttr = this.#main.trElement.parentElement;
+			const tableAttr = this.#state.trElement.parentElement;
 			if (/^THEAD$/i.test(tableAttr.nodeName)) {
 				if (option === 'up') {
 					return;
 				} else if (!tableAttr.nextElementSibling || !/^TBODY$/i.test(tableAttr.nextElementSibling.nodeName)) {
 					if (!option) {
-						dom.utils.removeItem(this.#main.figureElement);
+						dom.utils.removeItem(this.#state.figureElement);
 						this.#main._closeTableSelectInfo();
 					} else {
-						table.innerHTML += '<tbody><tr>' + CreateCellsString('td', this.#main.logical_cellCnt) + '</tr></tbody>';
+						table.innerHTML += '<tbody><tr>' + CreateCellsString('td', this.#state.logical_cellCnt) + '</tr></tbody>';
 					}
 					return;
 				}
@@ -72,9 +74,9 @@ export class TableGridService {
 		}
 
 		// multi
-		if (this.#main._ref) {
-			const positionCell = this.#main.tdElement;
-			const selectedCells = this.#main.selectedCells;
+		if (this.#state.ref) {
+			const positionCell = this.#state.tdElement;
+			const selectedCells = this.#state.selectedCells;
 			// multi - row
 			if (isRow) {
 				// remove row
@@ -170,10 +172,10 @@ export class TableGridService {
 
 		const remove = !option;
 		const left = option === 'left';
-		const colSpan = this.#main.current_colSpan;
-		const cellIndex = remove || left ? this.#main.logical_cellIndex : this.#main.logical_cellIndex + colSpan + 1;
+		const colSpan = this.#state.current_colSpan;
+		const cellIndex = this.#state.logical_cellIndex + (remove || left ? 0 : colSpan + 1);
 
-		const rows = this.#main.trElements;
+		const rows = this.#state.trElements;
 		let rowSpanArr = [];
 		let spanIndex = [];
 		let passCell = 0;
@@ -181,7 +183,7 @@ export class TableGridService {
 		const removeCell = [];
 		const removeSpanArr = [];
 
-		for (let i = 0, len = this.#main.rowCnt, row, cells, newCell, applySpan, cellColSpan; i < len; i++) {
+		for (let i = 0, len = this.#state.rowCnt, row, cells, newCell, applySpan, cellColSpan; i < len; i++) {
 			row = rows[i];
 			insertIndex = cellIndex;
 			applySpan = false;
@@ -329,10 +331,10 @@ export class TableGridService {
 
 			this.#main._closeController();
 		} else {
-			this.#main._setCellControllerPosition(positionResetElement || this.#main.tdElement, true);
+			this.#main._setCellControllerPosition(positionResetElement || this.#state.tdElement, true);
 		}
 
-		return positionResetElement || this.#main.tdElement;
+		return positionResetElement || this.#state.tdElement;
 	}
 
 	/**
@@ -350,12 +352,12 @@ export class TableGridService {
 
 		const remove = !option;
 		const up = option === 'up';
-		const originRowIndex = this.#main.rowIndex;
-		const rowIndex = remove || up ? originRowIndex : originRowIndex + this.#main.current_rowSpan + 1;
+		const originRowIndex = this.#state.rowIndex;
+		const rowIndex = remove || up ? originRowIndex : originRowIndex + this.#state.current_rowSpan + 1;
 		const sign = remove ? -1 : 1;
 
-		const rows = this.#main.trElements;
-		let cellCnt = this.#main.logical_cellCnt;
+		const rows = this.#state.trElements;
+		let cellCnt = this.#state.logical_cellCnt;
 
 		for (let i = 0, len = originRowIndex + (remove ? -1 : 0), cell; i <= len; i++) {
 			cell = rows[i].cells;
@@ -426,7 +428,7 @@ export class TableGridService {
 		}
 
 		if (!remove) {
-			this.#main._setCellControllerPosition(positionResetElement || this.#main.tdElement, true);
+			this.#main._setCellControllerPosition(positionResetElement || this.#state.tdElement, true);
 		} else {
 			this.#main._closeController();
 		}

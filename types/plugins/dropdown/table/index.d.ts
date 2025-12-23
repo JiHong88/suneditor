@@ -83,7 +83,7 @@ declare class Table extends PluginDropdownFree {
 	logical_cellIndex: number;
 	current_colSpan: number;
 	current_rowSpan: number;
-	_shiftKey: boolean;
+	isShiftPressed: boolean;
 	_ref: any;
 	cellService: TableCellService;
 	clipboardService: TableClipboardService;

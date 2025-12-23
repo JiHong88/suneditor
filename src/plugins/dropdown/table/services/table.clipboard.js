@@ -6,12 +6,14 @@ import { CloneTable } from '../shared/table.utils';
  */
 export class TableClipboardService {
 	#main;
+	#state;
 
 	/**
 	 * @param {import('../index').default} main Table index
 	 */
 	constructor(main) {
 		this.#main = main;
+		this.#state = main.state;
 	}
 
 	get #selectionService() {
@@ -172,18 +174,18 @@ export class TableClipboardService {
 		this.#main.setCellInfo(targetTD, true);
 
 		const targetInfo = {
-			physicalCellCnt: this.#main.physical_cellCnt,
-			logicalCellCnt: this.#main.logical_cellCnt,
-			rowCnt: this.#main.rowCnt,
-			rowInex: this.#main.rowIndex,
-			physicalCellIndex: this.#main.physical_cellIndex,
-			logicalCellIndex: this.#main.logical_cellIndex,
-			currentColSpan: this.#main.current_colSpan,
-			currentRowSpan: this.#main.current_rowSpan,
+			physicalCellCnt: this.#state.physical_cellCnt,
+			logicalCellCnt: this.#state.logical_cellCnt,
+			rowCnt: this.#state.rowCnt,
+			rowIndex: this.#state.rowIndex,
+			physicalCellIndex: this.#state.physical_cellIndex,
+			logicalCellIndex: this.#state.logical_cellIndex,
+			currentColSpan: this.#state.current_colSpan,
+			currentRowSpan: this.#state.current_rowSpan,
 		};
 
 		// --- [expand] target table ---
-		const addRowCnt = copyInfo.rowCnt - (targetInfo.rowCnt - (targetInfo.rowInex + 1)) - 1;
+		const addRowCnt = copyInfo.rowCnt - (targetInfo.rowCnt - (targetInfo.rowIndex + 1)) - 1;
 		const addColCnt = copyInfo.logicalCellCnt - (targetInfo.logicalCellCnt - (targetInfo.logicalCellIndex + 1)) - 1;
 		targetInfo.rowCnt += addRowCnt;
 		targetInfo.logicalCellCnt += addColCnt;
@@ -198,11 +200,12 @@ export class TableClipboardService {
 			for (let i = 0; i < addColCnt; i++) {
 				this.#gridService.editColumn('right', lastCell);
 			}
-			targetRows = this.#main.trElements = targetTable.rows;
+
+			this.#main.setState('trElements', (targetRows = targetTable.rows));
 		}
 
 		// --- [Un_merge] cells ---
-		const startRowIndex = targetInfo.rowInex;
+		const startRowIndex = targetInfo.rowIndex;
 		const cellIndex = targetInfo.logicalCellIndex;
 		const cellEndIndex = cellIndex + copyInfo.logicalCellCnt - 1;
 		const unmergeCells = [];
@@ -250,7 +253,7 @@ export class TableClipboardService {
 
 		if (unmergeCells.length > 0) {
 			this.#cellService.unmergeCells(unmergeCells, true);
-			targetRows = this.#main.trElements = targetTable.rows;
+			this.#main.setState('trElements', (targetRows = targetTable.rows));
 		}
 
 		// --- [merge] cells ---
@@ -288,7 +291,7 @@ export class TableClipboardService {
 				const cEnd = cStart + cs - 1;
 				const mergeCells = [];
 
-				for (let targetR = targetInfo.rowInex + r, tRowCnt = targetR + rs, rowOffset = 0; targetR < tRowCnt; targetR++, rowOffset++) {
+				for (let targetR = targetInfo.rowIndex + r, tRowCnt = targetR + rs, rowOffset = 0; targetR < tRowCnt; targetR++, rowOffset++) {
 					const targetRow = targetRows[targetR];
 					const targetCells = targetRow.cells;
 
@@ -335,18 +338,18 @@ export class TableClipboardService {
 
 		if (mergeGroups.length > 0) {
 			for (const mc of mergeGroups) {
-				this.#main._ref = null;
-				this.#main.trElements = targetTable.rows;
+				this.#main.setState('ref', null);
+				this.#main.setState('trElements', targetTable.rows);
 				this.#cellService.mergeCells(mc, true);
 			}
-			targetRows = this.#main.trElements = targetTable.rows;
+			this.#main.setState('trElements', (targetRows = targetTable.rows));
 		}
 
 		// --- [result] paste cell data ---
 		const selectedCells = [];
 		const rowSpanMap = [];
 		for (let r = 0; r < copyInfo.rowCnt; r++) {
-			const tr = targetRows[targetInfo.rowInex + r];
+			const tr = targetRows[targetInfo.rowIndex + r];
 			const cr = copyRows[r];
 			if (!tr || !cr) break;
 

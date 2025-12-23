@@ -6,6 +6,7 @@ import { CreateSplitMenu } from '../render/table.menu';
 
 export class TableCellService {
 	#main;
+	#state;
 
 	/**
 	 * @param {import('../index').default} main Table index
@@ -19,6 +20,7 @@ export class TableCellService {
 	 */
 	constructor(main, { mergeButton, unmergeButton, splitButton, openCellMenuFunc, closeCellMenuFunc }) {
 		this.#main = main;
+		this.#state = main.state;
 
 		this.mergeButton = mergeButton;
 		this.unmergeButton = unmergeButton;
@@ -51,10 +53,10 @@ export class TableCellService {
 
 		this.#main.setTableInfo(clonedTable);
 		selectedCells = clonedSelectedCells;
-		this.#main._ref = null;
+		this.#main.setState('ref', null);
 		this.#selectionService._setMultiCells(selectedCells[0], dom.query.findVisualLastCell(selectedCells));
 
-		const ref = this.#main._ref;
+		const ref = this.#state.ref;
 		const mergeCell = selectedCells[0];
 
 		let emptyRowFirst = null;
@@ -86,7 +88,7 @@ export class TableCellService {
 		}
 
 		if (emptyRowFirst) {
-			const rows = this.#main.trElements;
+			const rows = this.#state.trElements;
 			const rowIndexFirst = dom.utils.getArrayIndex(rows, emptyRowFirst);
 			const rowIndexLast = dom.utils.getArrayIndex(rows, emptyRowLast || emptyRowFirst);
 			const removeRows = [];
@@ -142,7 +144,7 @@ export class TableCellService {
 		const originTable = selectedCells[0].closest('table');
 		const { clonedTable, clonedSelectedCells } = skipPostProcess ? { clonedTable: originTable, clonedSelectedCells: selectedCells } : CloneTable(originTable, selectedCells);
 
-		this.#main._ref = null;
+		this.#main.setState('ref', null);
 		this.#main.setTableInfo(clonedTable);
 		selectedCells = clonedSelectedCells;
 
@@ -186,7 +188,7 @@ export class TableCellService {
 			}
 		}
 
-		this.#main.selectedCells = null;
+		this.#main.setState('selectedCells', null);
 
 		if (skipPostProcess) return;
 
@@ -199,13 +201,13 @@ export class TableCellService {
 		if (firstCell !== lastCell) {
 			lastCell = !newLastCell || lastCell.closest('tr').rowIndex > newLastCell.closest('tr').rowIndex || lastCell.cellIndex > newLastCell.cellIndex ? lastCell : newLastCell;
 			this.#selectionService._setMultiCells(firstCell, lastCell);
-			this.#main.selectedCells = Array.from(table.querySelectorAll('.se-selected-table-cell'));
+			this.#main.setState('selectedCells', Array.from(table.querySelectorAll('.se-selected-table-cell')));
 		} else {
 			this.#main.setCellInfo(lastCell, true);
 		}
 
-		this.#main.fixedCell = firstCell;
-		this.#main.selectedCell = lastCell;
+		this.#main.setState('fixedCell', firstCell);
+		this.#main.setState('selectedCell', lastCell);
 		dom.utils.addClass(lastCell, 'se-selected-cell-focus');
 
 		this.setUnMergeButton();
@@ -233,7 +235,7 @@ export class TableCellService {
 	 * @description Sets the merge/split button visibility.
 	 */
 	setMergeSplitButton() {
-		if (!this.#main._ref) {
+		if (!this.#state.ref) {
 			this.splitButton.style.display = 'block';
 			this.mergeButton.style.display = 'none';
 		} else {
@@ -246,7 +248,7 @@ export class TableCellService {
 	 * @description Sets the unmerge button visibility.
 	 */
 	setUnMergeButton() {
-		if (this.findMergedCells(!this.#main.selectedCells?.length ? [this.#main.fixedCell] : this.#main.selectedCells).length > 0) {
+		if (this.findMergedCells(!this.#state.selectedCells?.length ? [this.#state.fixedCell] : this.#state.selectedCells).length > 0) {
 			this.unmergeButton.disabled = false;
 		} else {
 			this.unmergeButton.disabled = true;
@@ -260,11 +262,11 @@ export class TableCellService {
 	 */
 	_OnSplitCells(direction) {
 		const vertical = direction === 'vertical';
-		const currentCell = this.#main.tdElement;
-		const rows = this.#main.trElements;
-		const currentRow = this.#main.trElement;
-		const index = this.#main.logical_cellIndex;
-		const rowIndex = this.#main.rowIndex;
+		const currentCell = this.#state.tdElement;
+		const rows = this.#state.trElements;
+		const currentRow = this.#state.trElement;
+		const index = this.#state.logical_cellIndex;
+		const rowIndex = this.#state.rowIndex;
 		const newCell = CreateCellsHTML(currentCell.nodeName);
 
 		// vertical
@@ -282,7 +284,7 @@ export class TableCellService {
 				let rowSpanArr = [];
 				let spanIndex = [];
 
-				for (let i = 0, len = this.#main.rowCnt, cells, colSpan; i < len; i++) {
+				for (let i = 0, len = this.#state.rowCnt, cells, colSpan; i < len; i++) {
 					cells = rows[i].cells;
 					colSpan = 0;
 					for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
@@ -416,7 +418,7 @@ export class TableCellService {
 					}
 				}
 
-				const physicalIndex = this.#main.physical_cellIndex;
+				const physicalIndex = this.#state.physical_cellIndex;
 				const cells = currentRow.cells;
 
 				for (let c = 0, cLen = cells.length; c < cLen; c++) {
@@ -435,8 +437,9 @@ export class TableCellService {
 		this.#main.history.push(false);
 
 		this.#main._setController(currentCell);
-		this.#main.selectedCell = this.#main.fixedCell = currentCell;
-		if (!this.#main.selectedCells?.length) this.#main.selectedCells = [currentCell];
+		this.#main.setState('selectedCell', currentCell);
+		this.#main.setState('fixedCell', currentCell);
+		if (!this.#state.selectedCells?.length) this.#main.setState('selectedCells', [currentCell]);
 	}
 }
 

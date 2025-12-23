@@ -8,6 +8,7 @@ const { _w } = env;
 
 export class TableResizeService {
 	#main;
+	#state;
 
 	#globalEvents;
 
@@ -20,6 +21,7 @@ export class TableResizeService {
 	 */
 	constructor(main) {
 		this.#main = main;
+		this.#state = main.state;
 
 		// member - global events
 		this.#globalEvents = {
@@ -76,7 +78,7 @@ export class TableResizeService {
 			try {
 				this.#selectionService.deleteStyleSelectedCells();
 				this.#main.setCellInfo(target, true);
-				const colIndex = this.#main.logical_cellIndex + this.#main.current_colSpan - (cellEdge.isLeft ? 1 : 0);
+				const colIndex = this.#state.logical_cellIndex + this.#state.current_colSpan - (cellEdge.isLeft ? 1 : 0);
 
 				// ready
 				this.#main.ui.enableBackWrapper('ew-resize');
@@ -84,7 +86,7 @@ export class TableResizeService {
 				this.#resizeLinePrev = this.#main.frameContext.get('wrapper').querySelector(Constants.RESIZE_CELL_PREV_CLASS);
 
 				// select figure
-				if (colIndex < 0 || colIndex === this.#main.logical_cellCnt - 1) {
+				if (colIndex < 0 || colIndex === this.#state.logical_cellCnt - 1) {
 					this._startFigureResizing(cellEdge.startX, colIndex < 0);
 					this.#main._editorEnable(false);
 					return false;
@@ -98,7 +100,8 @@ export class TableResizeService {
 				this.#main._editorEnable(true);
 				this.#removeGlobalEvents();
 			} finally {
-				this.#main.fixedCell = this.#main.selectedCell = null;
+				this.#main.setState('fixedCell', null);
+				this.#main.setState('selectedCell', null);
 				this.#main.controller_table.hide();
 				this.#main.controller_cell.hide();
 			}
@@ -134,7 +137,8 @@ export class TableResizeService {
 				this.#main._editorEnable(true);
 				this.#removeGlobalEvents();
 			} finally {
-				this.#main.fixedCell = this.#main.selectedCell = null;
+				this.#main.setState('fixedCell', null);
+				this.#main.setState('selectedCell', null);
 				this.#main.controller_table.hide();
 				this.#main.controller_cell.hide();
 			}
@@ -171,10 +175,11 @@ export class TableResizeService {
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
-		dom.utils.removeClass(this.#main.figureElement, 'se-component-selected');
+		const figureElement = this.#state.figureElement;
+		dom.utils.removeClass(figureElement, 'se-component-selected');
 
 		this.#resizePercentCol(this.#main._element);
-		this.#setResizeLinePosition(this.#main.figureElement, this.#main.tdElement, this.#resizeLinePrev, isLeftEdge);
+		this.#setResizeLinePosition(figureElement, this.#state.tdElement, this.#resizeLinePrev, isLeftEdge);
 		this.#resizeLinePrev.style.display = 'block';
 		const prevValue = col.style.width;
 		const nextCol = /** @type {HTMLElement} */ (col.nextElementSibling);
@@ -187,8 +192,8 @@ export class TableResizeService {
 				this,
 				col,
 				nextCol,
-				this.#main.figureElement,
-				this.#main.tdElement,
+				figureElement,
+				this.#state.tdElement,
 				this.#resizeLine,
 				isLeftEdge,
 				startX,
@@ -247,15 +252,16 @@ export class TableResizeService {
 	 * @param {number} startHeight The initial height of the row.
 	 */
 	_startRowResizing(row, startY, startHeight) {
-		dom.utils.removeClass(this.#main.figureElement, 'se-component-selected');
+		const figureElement = this.#state.figureElement;
+		dom.utils.removeClass(figureElement, 'se-component-selected');
 
-		this.#setResizeRowPosition(this.#main.figureElement, row, this.#resizeLinePrev);
+		this.#setResizeRowPosition(figureElement, row, this.#resizeLinePrev);
 		this.#resizeLinePrev.style.display = 'block';
 		const prevValue = row.style.height;
 
 		if (_DragHandle.get('__dragHandler')) _DragHandle.get('__dragHandler').style.display = 'none';
 		this.#addResizeGlobalEvents(
-			this.#rowResize.bind(this, row, this.#main.figureElement, this.#resizeLine, startY, startHeight),
+			this.#rowResize.bind(this, row, figureElement, this.#resizeLine, startY, startHeight),
 			() => {
 				this.#removeGlobalEvents();
 				this.#main.history.push(true);
@@ -289,7 +295,7 @@ export class TableResizeService {
 	 * @param {boolean} isLeftEdge Whether the resizing is on the left edge.
 	 */
 	_startFigureResizing(startX, isLeftEdge) {
-		const figure = this.#main.figureElement;
+		const figure = this.#state.figureElement;
 		dom.utils.removeClass(figure, 'se-component-selected');
 
 		this.#setResizeLinePosition(figure, figure, this.#resizeLinePrev, isLeftEdge);

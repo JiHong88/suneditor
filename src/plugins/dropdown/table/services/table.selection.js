@@ -2,6 +2,7 @@ import { dom, numbers, env } from '../../../../helper';
 
 export class TableSelectionService {
 	#main;
+	#state;
 
 	#bindMultiOn;
 	#bindMultiOff;
@@ -16,6 +17,7 @@ export class TableSelectionService {
 	 */
 	constructor(main) {
 		this.#main = main;
+		this.#state = main.state;
 
 		// member - global events
 		this.#bindMultiOn = this.#OnCellMultiSelect.bind(this);
@@ -63,19 +65,20 @@ export class TableSelectionService {
 	 * @param {Node} endCell The last cell in the selection.
 	 */
 	_setMultiCells(startCell, endCell) {
-		const rows = this.#main.selectedTable.rows;
+		const rows = this.#state.selectedTable.rows;
 		this.deleteStyleSelectedCells();
 
 		dom.utils.addClass(startCell, 'se-selected-table-cell');
 
-		if (startCell === endCell && !this.#main._shiftKey) {
+		if (startCell === endCell && !this.#state.isShiftPressed) {
 			return;
 		}
 
 		let findSelectedCell = true;
 		let spanIndex = [];
 		let rowSpanArr = [];
-		const ref = (this.#main._ref = { _i: 0, cs: null, ce: null, rs: null, re: null });
+		const ref = { _i: 0, cs: null, ce: null, rs: null, re: null };
+		this.#main.setState('ref', ref);
 
 		for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
 			cells = rows[i].cells;
@@ -174,13 +177,13 @@ export class TableSelectionService {
 	 * If `true`, the selection will extend to include adjacent cells, otherwise it selects only the provided cell.
 	 */
 	initCellSelection(tdElement, shift) {
-		if (!this.#main._shiftKey && !this.#main._ref) this.#removeGlobalEvents();
+		if (!this.#state.isShiftPressed && !this.#state.ref) this.#removeGlobalEvents();
 
-		this.#main._shiftKey = shift;
-		this.#main.fixedCell = tdElement;
-		if (!this.#main.selectedCells?.length) this.#main.selectedCells = [tdElement];
+		this.#main.setState('isShiftPressed', shift);
+		this.#main.setState('fixedCell', tdElement);
+		if (!this.#state.selectedCells?.length) this.#main.setState('selectedCells', [tdElement]);
 		this.#fixedCellName = tdElement.nodeName;
-		this.#main.selectedTable = dom.query.getParentElement(tdElement, 'TABLE');
+		this.#main.setState('selectedTable', dom.query.getParentElement(tdElement, 'TABLE'));
 
 		this.deleteStyleSelectedCells();
 		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
@@ -200,8 +203,8 @@ export class TableSelectionService {
 	 * @description Deletes styles from selected table cells.
 	 */
 	deleteStyleSelectedCells() {
-		dom.utils.removeClass([this.#main.fixedCell, this.#main.selectedCell], 'se-selected-cell-focus');
-		const table = this.#main.fixedCell?.closest('table');
+		dom.utils.removeClass([this.#state.fixedCell, this.#state.selectedCell], 'se-selected-cell-focus');
+		const table = this.#state.fixedCell?.closest('table');
 		if (table) {
 			const selectedCells = table.querySelectorAll('.se-selected-table-cell');
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
@@ -214,8 +217,8 @@ export class TableSelectionService {
 	 * @description Restores styles for selected table cells.
 	 */
 	recallStyleSelectedCells() {
-		if (this.#main.selectedCells) {
-			const selectedCells = this.#main.selectedCells;
+		if (this.#state.selectedCells) {
+			const selectedCells = this.#state.selectedCells;
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
 				dom.utils.addClass(selectedCells[i], 'se-selected-table-cell');
 			}
@@ -238,9 +241,9 @@ export class TableSelectionService {
 		this.#main.editor._preventBlur = true;
 		const target = /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(dom.query.getEventTarget(e), dom.check.isTableCell));
 
-		if (this.#main._shiftKey) {
-			if (target === this.#main.fixedCell) {
-				this.#main._shiftKey = false;
+		if (this.#state.isShiftPressed) {
+			if (target === this.#state.fixedCell) {
+				this.#main.setState('isShiftPressed', false);
 				this.deleteStyleSelectedCells();
 				this.#main._editorEnable(true);
 				this.#removeGlobalEvents();
@@ -248,16 +251,17 @@ export class TableSelectionService {
 			} else {
 				this.#main._editorEnable(false);
 			}
-		} else if (!this.#main._ref) {
-			if (target === this.#main.fixedCell) return;
+		} else if (!this.#state.ref) {
+			if (target === this.#state.fixedCell) return;
 			else this.#main._editorEnable(false);
 		}
 
-		if (!target || target === this.#main.selectedCell || this.#fixedCellName !== target.nodeName || this.#main.selectedTable !== dom.query.getParentElement(target, 'TABLE')) {
+		if (!target || target === this.#state.selectedCell || this.#fixedCellName !== target.nodeName || this.#state.selectedTable !== dom.query.getParentElement(target, 'TABLE')) {
 			return;
 		}
 
-		this._setMultiCells(this.#main.fixedCell, (this.#main.selectedCell = target));
+		this.#main.setState('selectedCell', target);
+		this._setMultiCells(this.#state.fixedCell, this.#state.selectedCell);
 	}
 
 	/**
@@ -267,28 +271,29 @@ export class TableSelectionService {
 	#OffCellMultiSelect(e) {
 		e.stopPropagation();
 
-		if (!this.#main._shiftKey) {
+		if (!this.#state.isShiftPressed) {
 			this.#main._editorEnable(true);
 			this.#removeGlobalEvents();
 		} else {
 			this.#globalEvents.touchOff &&= this.#main.eventManager.removeGlobalEvent(this.#globalEvents.touchOff);
 		}
 
-		if (!this.#main.fixedCell || !this.#main.selectedTable) return;
+		const fixedCell = this.#state.fixedCell;
+		if (!fixedCell || !this.#state.selectedTable) return;
 
 		this.#cellService.setMergeSplitButton();
-		this.#main.selectedCells = Array.from(this.#main.selectedTable.querySelectorAll('.se-selected-table-cell'));
+		this.#main.setState('selectedCells', Array.from(this.#state.selectedTable.querySelectorAll('.se-selected-table-cell')));
 
-		if (this.#main._shiftKey) return;
+		if (this.#state.isShiftPressed) return;
 
-		if (this.#main.fixedCell && this.#main.selectedCell) {
-			this._focusEdge(this.#main.fixedCell);
-			if (this.#main.fixedCell === this.#main.selectedCell) {
-				dom.utils.removeClass(this.#main.fixedCell, 'se-selected-table-cell');
+		if (fixedCell && this.#state.selectedCell) {
+			this._focusEdge(fixedCell);
+			if (fixedCell === this.#state.selectedCell) {
+				dom.utils.removeClass(fixedCell, 'se-selected-table-cell');
 			}
 		}
 
-		const displayCell = this.#main.selectedCells?.length > 0 ? this.#main.selectedCell : this.#main.fixedCell;
+		const displayCell = this.#state.selectedCells?.length > 0 ? this.#state.selectedCell : fixedCell;
 		this.#main._setController(displayCell);
 	}
 
@@ -296,15 +301,15 @@ export class TableSelectionService {
 	 * @description Handles the removal of shift-based selection.
 	 */
 	#OffCellShift() {
-		if (!this.#main._ref) {
+		if (!this.#state.ref) {
 			this.#main._closeController();
 		} else {
 			this.#removeGlobalEvents();
 			this.#main._editorEnable(true);
 
-			this._focusEdge(this.#main.fixedCell);
+			this._focusEdge(this.#state.fixedCell);
 
-			const displayCell = this.#main.selectedCells?.length > 0 ? this.#main.selectedCell : this.#main.fixedCell;
+			const displayCell = this.#state.selectedCells?.length > 0 ? this.#state.selectedCell : this.#state.fixedCell;
 			this.#main._setController(displayCell);
 		}
 	}

@@ -11,6 +11,7 @@ const { _w } = env;
 
 export class TableStyleService {
 	#main;
+	#state;
 
 	/**
 	 * @constructor
@@ -21,6 +22,7 @@ export class TableStyleService {
 	 */
 	constructor(main, { pluginOptions, controller_table }) {
 		this.#main = main;
+		this.#state = main.state;
 
 		this.sliderType = '';
 		/** @type {HTMLButtonElement} */
@@ -177,7 +179,7 @@ export class TableStyleService {
 
 		if (!active) {
 			const header = dom.utils.createElement('THEAD');
-			header.innerHTML = '<tr>' + CreateCellsString('th', this.#main.logical_cellCnt) + '</tr>';
+			header.innerHTML = '<tr>' + CreateCellsString('th', this.#state.logical_cellCnt) + '</tr>';
 			table.insertBefore(header, table.querySelector('tbody'));
 		} else {
 			dom.utils.removeItem(table.querySelector('thead'));
@@ -185,10 +187,10 @@ export class TableStyleService {
 
 		dom.utils.toggleClass(btn, 'active');
 
-		if (/TH/i.test(this.#main.tdElement.nodeName)) {
+		if (/TH/i.test(this.#state.tdElement.nodeName)) {
 			this.#main._closeController();
 		} else {
-			this.#main._setCellControllerPosition(this.#main.tdElement, false);
+			this.#main._setCellControllerPosition(this.#state.tdElement, false);
 		}
 	}
 
@@ -209,7 +211,7 @@ export class TableStyleService {
 		}
 
 		dom.utils.toggleClass(btn, 'active');
-		this.#main._setCellControllerPosition(this.#main.tdElement, false);
+		this.#main._setCellControllerPosition(this.#state.tdElement, false);
 	}
 
 	resetHeaderButton(table) {
@@ -243,8 +245,8 @@ export class TableStyleService {
 		// alignment
 		this.#setAlignProps(this.propTargets.cell_alignment, this._propsAlignCache, true);
 		this.#setAlignProps(this.propTargets.cell_alignment_vertical, this._propsVerticalAlignCache, true);
-		if (dom.check.isTable(propsCache[0][0]) && this.#main.figureElement) {
-			this.#main.figureElement.style.float = this._propsAlignCache;
+		if (dom.check.isTable(propsCache[0][0]) && this.#state.figureElement) {
+			this.#state.figureElement.style.float = this._propsAlignCache;
 		}
 	}
 
@@ -271,7 +273,7 @@ export class TableStyleService {
 	 */
 	setTableLayout(styles, isMaxWidth, isFixedColumn, ondisplay) {
 		if (styles.includes('width')) {
-			const targets = this.#main.figureElement;
+			const targets = this.#state.figureElement;
 			if (!targets) return;
 
 			let sizeIcon, text;
@@ -311,7 +313,7 @@ export class TableStyleService {
 			target.disabled = true;
 
 			const isTable = this.#main.controller_table.form.contains(this.controller_props.currentTarget);
-			const targets = isTable ? [this.#main._element] : this.#main.selectedCells;
+			const targets = isTable ? [this.#main._element] : this.#state.selectedCells;
 			const tr = /** @type {HTMLTableCellElement} */ (targets[0]);
 			const trStyles = _w.getComputedStyle(tr);
 			const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical } = this.propTargets;
@@ -342,7 +344,7 @@ export class TableStyleService {
 			if (!isTable) {
 				const trRow = /** @type {HTMLTableRowElement} */ (tr.parentElement);
 				// --- target cells roof
-				let { rs, re, cs, ce } = this.#main._ref || {
+				let { rs, re, cs, ce } = this.#state.ref || {
 					rs: trRow.rowIndex || 0,
 					re: trRow.rowIndex || 0,
 					cs: tr.cellIndex || 0,
@@ -421,9 +423,9 @@ export class TableStyleService {
 				// -- table styles
 				const es = tr.style;
 				// alignment
-				if (this.#main.figureElement) {
-					this.#main.figureElement.style.float = cellAlignment;
-					this.#main.figureElement.style.verticalAlign = cellAlignmentVertical;
+				if (this.#state.figureElement) {
+					this.#state.figureElement.style.float = cellAlignment;
+					this.#state.figureElement.style.verticalAlign = cellAlignmentVertical;
 				}
 				// back
 				es.backgroundColor = backColor;
@@ -455,10 +457,10 @@ export class TableStyleService {
 
 			// set cells style
 			this.controller_props.close();
-			if (this.#main.tdElement) {
+			if (this.#state.tdElement) {
 				this.#selectionService.recallStyleSelectedCells();
-				this.#main.setCellInfo(this.#main.tdElement, true);
-				dom.utils.addClass(this.#main.tdElement, 'se-selected-cell-focus');
+				this.#main.setCellInfo(this.#state.tdElement, true);
+				dom.utils.addClass(this.#state.tdElement, 'se-selected-cell-focus');
 			}
 		} catch (err) {
 			console.warn('[SUNEDITOR.plugins.table.setProps.error]', err);
@@ -479,7 +481,7 @@ export class TableStyleService {
 	#setCtrlProps(type) {
 		this._typeCache = type;
 		const isTable = type === 'table';
-		const targets = isTable ? [this.#main._element] : this.#main.selectedCells;
+		const targets = isTable ? [this.#main._element] : this.#state.selectedCells;
 		if (!targets?.[0]) return;
 
 		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, cell_alignment_table_text, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
@@ -500,7 +502,7 @@ export class TableStyleService {
 			underline = /underline/i.test(textDecoration),
 			strike = /line-through/i.test(textDecoration),
 			italic = /italic/i.test(fontStyle),
-			align = isTable ? this.#main.figureElement?.style.float : textAlign,
+			align = isTable ? this.#state.figureElement?.style.float : textAlign,
 			align_v = verticalAlign;
 		this._propsCache = [];
 
@@ -530,7 +532,7 @@ export class TableStyleService {
 			if (b_width && cellBorder.w !== w) b_width = '';
 			if (backColor !== converter.rgb2hex(hexBackColor)) backColor = '';
 			if (fontColor !== converter.rgb2hex(hexColor)) fontColor = '';
-			if (align !== (isTable ? this.#main.figureElement?.style.float : textAlign)) align = '';
+			if (align !== (isTable ? this.#state.figureElement?.style.float : textAlign)) align = '';
 			if (align_v && align_v !== verticalAlign) align_v = '';
 			if (bold && bold !== /.+/.test(fontWeight)) bold = false;
 			if (underline && underline !== /underline/i.test(textDecoration)) underline = false;
