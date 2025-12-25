@@ -87,7 +87,7 @@ class EventManager extends CoreInjector {
 		this.__focusTemp = this.carrierWrapper.querySelector('.__se__focus__temp__');
 		/** @type {number|void} */
 		this.__retainTimer = null;
-		/** @type {Element} */
+		/** @type {Document} */
 		this.__eventDoc = null;
 		/** @type {string} */
 		this.__secopy = null;
@@ -796,7 +796,7 @@ class EventManager extends CoreInjector {
 	_addFrameEvents(fc) {
 		const isIframe = fc.get('options').get('iframe');
 		const eventWysiwyg = isIframe ? fc.get('_ww') : fc.get('wysiwyg');
-		fc.set('eventWysiwyg', eventWysiwyg);
+		fc.set('eventWysiwyg', /** @type {SunEditor.EventWysiwyg} */ (eventWysiwyg));
 		const codeArea = fc.get('code');
 		const dragCursor = this.editor.carrierWrapper.querySelector('.se-drag-cursor');
 
@@ -1215,7 +1215,7 @@ class EventManager extends CoreInjector {
 
 	/**
 	 * @param {SunEditor.FrameContext} frameContext - frame context object
-	 * @param {Element|Window} eventWysiwyg - wysiwyg event object
+	 * @param {SunEditor.EventWysiwyg} eventWysiwyg - wysiwyg event object
 	 * @param {Event} e - Event object
 	 */
 	#OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {

@@ -22,8 +22,8 @@ export function getIncludePath(nameArray: Array<string>, extension: string): str
 /**
  * @fileoverview Environment  helper functions
  */
-/** @type {Window} */
-export const _w: Window;
+/** @type {SunEditor.GlobalWindow} */
+export const _w: SunEditor.GlobalWindow;
 /** @type {Document} */
 export const _d: Document;
 /**

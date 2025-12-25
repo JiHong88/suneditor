@@ -22,28 +22,28 @@ declare class DocumentType extends CoreInjector {
 	 * @returns {Promise<void>}
 	 */
 	rePage(force: boolean): Promise<void>;
-	_getDisplayPage(): any;
+	_getDisplayPage(): SunEditor.EventWysiwyg;
 	/**
 	 * @internal
 	 * @description Calculates and compensates for the vertical gap between the rendered content (current page)
 	 * - and the mirrored preview page due to differences in width and layout.
 	 * @param {number} t - The initial top position value to be adjusted.
-	 * @param {HTMLElement[]} chr - The elements array in the current (main) page.
-	 * @param {HTMLElement[]} mChr - The elements array in the mirrored page.
+	 * @param {HTMLCollection} chr - The elements array in the current (main) page.
+	 * @param {HTMLCollection} mChr - The elements array in the mirrored page.
 	 * @returns {number|null} - The adjusted top value.
 	 */
-	_calcPageBreakTop(t: number, chr: HTMLElement[], mChr: HTMLElement[]): number | null;
+	_calcPageBreakTop(t: number, chr: HTMLCollection, mChr: HTMLCollection): number | null;
 	/**
 	 * @internal
 	 * @description Initializes the cache for document elements.
-	 * @param {Array<HTMLElement>} mChr - List of mirrored elements.
+	 * @param {HTMLCollection} mChr - List of mirrored elements.
 	 */
-	_initializeCache(mChr: Array<HTMLElement>): void;
+	_initializeCache(mChr: HTMLCollection): void;
 	/**
 	 * @internal
 	 * @description Retrieves the element at a given position.
 	 * @param {number} pageTop - The vertical position to check.
-	 * @param {HTMLElement[]} mChr - List of mirrored elements.
+	 * @param {HTMLCollection} mChr - List of mirrored elements.
 	 * @returns {{ci: number, cm: number, ch: number}} The closest element and its related data.
 	 * - ci: The index of the closest element.
 	 * - cm: The distance between the top of the closest element and the given position.
@@ -51,7 +51,7 @@ declare class DocumentType extends CoreInjector {
 	 */
 	_getElementAtPosition(
 		pageTop: number,
-		mChr: HTMLElement[],
+		mChr: HTMLCollection,
 	): {
 		ci: number;
 		cm: number;
@@ -148,9 +148,9 @@ declare class DocumentType extends CoreInjector {
 	/**
 	 * @internal
 	 * @description Retrieves all headers in the document.
-	 * @returns {Array<HTMLElement>} An array of header elements.
+	 * @returns {NodeListOf<Element>} An array of header elements.
 	 */
-	_getHeaders(): Array<HTMLElement>;
+	_getHeaders(): NodeListOf<Element>;
 	/**
 	 * @internal
 	 * @description Destroy the DocumentType instance and release memory

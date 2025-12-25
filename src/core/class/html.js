@@ -725,7 +725,7 @@ class HTML extends CoreInjector {
 				}
 
 				if (isFormats && !freeFormat && !this.#format.isBlock(parentNode) && !dom.check.isListCell(parentNode) && !dom.check.isWysiwygFrame(parentNode)) {
-					afterNode = parentNode.nextElementSibling;
+					afterNode = /** @type {HTMLElement} */ (parentNode).nextElementSibling;
 					parentNode = parentNode.parentNode;
 				}
 
@@ -792,7 +792,7 @@ class HTML extends CoreInjector {
 		} finally {
 			if (fNode) oNode = fNode;
 
-			const dupleNodes = parentNode.querySelectorAll('[data-duple]');
+			const dupleNodes = /** @type {HTMLElement} */ (parentNode).querySelectorAll('[data-duple]');
 			if (dupleNodes.length > 0) {
 				for (let i = 0, len = dupleNodes.length, d, c, ch, parent; i < len; i++) {
 					d = dupleNodes[i];

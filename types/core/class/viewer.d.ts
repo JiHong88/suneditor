@@ -14,7 +14,7 @@ declare class Viewer extends CoreInjector {
 	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.
 	 */
 	fullScreen(value?: boolean): void;
-	_originCssText: any;
+	_originCssText: string;
 	/**
 	 * @description Add or remove the class name of "body" so that the code block is visible
 	 * @param {boolean} [value] true/false, If undefined toggle the codeView mode.

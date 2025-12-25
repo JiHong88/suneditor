@@ -44,6 +44,12 @@
  *
  */
 
+/**
+ * @typedef {HTMLElement & Window} SunEditor.EventWysiwyg
+ * @typedef {HTMLElement & HTMLIFrameElement} SunEditor.WysiwygFrame
+ * @typedef {Window & typeof globalThis} SunEditor.GlobalWindow
+ */
+
 // --------------------------------------------------------- [Internal Core Types] ---------------------------------------------------------------------------------------------------
 /**
  * @typedef {import('./core/editor').default} SunEditor.Core

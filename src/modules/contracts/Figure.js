@@ -1313,7 +1313,7 @@ class Figure extends CoreInjector {
 	 * @param {Node} figureMain The main figure container element.
 	 */
 	#setDragEvent(figureMain) {
-		const dragHandle = this.frameContext.get('wrapper').querySelector('.se-drag-handle');
+		const dragHandle = /** @type {HTMLElement} */ (this.frameContext.get('wrapper').querySelector('.se-drag-handle'));
 		dom.utils.removeClass(dragHandle, 'se-drag-handle-full');
 
 		dragHandle.style.opacity = '';

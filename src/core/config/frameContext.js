@@ -27,15 +27,15 @@ import { get as getNumber } from '../../helper/numbers';
  * @property {SunEditor.FrameOptions} options - Frame-specific options (toolbar, plugins, behaviors, etc.).
  *
  * === Core DOM References ===
- * @property {Element} originElement - The original source element (usually a <textarea> or target element).
+ * @property {HTMLElement & HTMLTextAreaElement} originElement - The original source element (usually a <textarea> or target element).
  * @property {HTMLElement} topArea - The outermost container wrapping the entire editor (toolbar + editor + status bar).
  * @property {HTMLElement} container - The `.se-container` element that holds the editor's UI.
  * @property {HTMLElement} wrapper - The `.se-wrapper` element containing the editable area and internal components.
- * @property {HTMLElement} wysiwygFrame - The WYSIWYG frame element (either an <iframe> or a div in inline mode).
+ * @property {SunEditor.WysiwygFrame} wysiwygFrame - The WYSIWYG frame element (either an <iframe> or a div in inline mode).
  * @property {HTMLElement} wysiwyg - The actual editable content area (usually the iframe’s <body> or a contentEditable div).
- * @property {HTMLElement} eventWysiwyg - Internal reference for wysiwyg events (set on initialization).
+ * @property {SunEditor.EventWysiwyg} eventWysiwyg - Internal reference for wysiwyg events (set on initialization).
  * @property {HTMLElement} codeWrapper - Wrapper element for the code-view mode.
- * @property {HTMLElement} code - Code view editing element (a <textarea> or <pre>).
+ * @property {HTMLElement & HTMLTextAreaElement} code - Code view editing element (a <textarea> or <pre>).
  * @property {HTMLTextAreaElement} codeNumbers - Element displaying line numbers in code view mode.
  * @property {HTMLElement} placeholder - Placeholder element shown when the editor is empty.
  * @property {HTMLElement} statusbar - Editor status bar element (for resizing, info, etc.).
@@ -50,7 +50,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @property {HTMLElement} lineBreaker_b - Bottom floating line-breaker UI element (for line insertion).
  * @property {HTMLElement} [_stickyDummy] - Placeholder element used for sticky toolbar behavior.
  * @property {HTMLElement} [_toolbarShadow] - Shadow element below the toolbar for visual effects.
- * @property {HTMLElement} [_figure] - Current active figure component (image, table, etc.).
+ * @property {{main: HTMLElement, border: HTMLElement, display: HTMLElement, handles: HTMLElement[]}} [_figure] - Current active figure component (image, table, etc.).
  *
  * === State Flags ===
  * @property {boolean} isCodeView - Whether the editor is currently in code view mode.
@@ -58,7 +58,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @property {boolean} isReadOnly - Whether the editor is set to readonly mode.
  * @property {boolean} isDisabled - Whether the editor is currently disabled.
  * @property {boolean} [isShowBlocks] - Whether block structure visualization is enabled.
- * @property {number} isChanged - Whether the content has been changed (-1 means initial state).
+ * @property {boolean} isChanged - Whether the content has been changed (-1 means initial state).
  *
  * === History Tracking ===
  * @property {number} historyIndex - Current index in the history stack (undo/redo).
@@ -78,7 +78,7 @@ import { get as getNumber } from '../../helper/numbers';
  *   - Set during editor initialization via `window.getComputedStyle(wysiwyg)`.
  *   - Used for retrieving runtime CSS values (padding, margins, font-family, etc.).
  *   - Improves performance by avoiding repeated `getComputedStyle()` calls.
- * @property {HTMLIFrameElement} [_iframeAuto] - Auto-resizing helper iframe (used for dynamic sizing).
+ * @property {HTMLElement} [_iframeAuto] - Auto-resizing helper iframe (used for dynamic sizing).
  * @property {number} [_editorHeight] - Current height of the editor.
  * ================================================================================================================================
  */
@@ -95,10 +95,10 @@ import { get as getNumber } from '../../helper/numbers';
 
 /**
  * @typedef {Object} FrameContextUtil
- * @property {(k: keyof FrameContextStore) => *} get - Get a DOM element from the context by key.
- * @property {(k: keyof FrameContextStore, v: *) => void} set - Set a DOM element in the context by key.
- * @property {(k: keyof FrameContextStore) => boolean} has - Check if a key exists in the context.
- * @property {(k: keyof FrameContextStore) => boolean} delete - Delete a key from the context.
+ * @property {<K extends keyof FrameContextStore>(k: K) => FrameContextStore[K]} get - Get a DOM element from the context by key.
+ * @property {<K extends keyof FrameContextStore>(k: K, v: FrameContextStore[K]) => void} set - Set a DOM element in the context by key.
+ * @property {<K extends keyof FrameContextStore>(k: K) => boolean} has - Check if a key exists in the context.
+ * @property {<K extends keyof FrameContextStore>(k: K) => boolean} delete - Delete a key from the context.
  * @property {() => Object<keyof FrameContextStore, *>} [getAll] - Get all DOM elements in the context as an object.
  * @property {(newMap: *) => void} [reset] - Reset the context with a new Map.
  * @property {() => void} clear - Clear all elements in the context.
@@ -139,7 +139,7 @@ export function CreateFrameContext(editorTarget, top, wwFrame, codeWrapper, code
 			['isFullScreen', false],
 			['isReadOnly', false],
 			['isDisabled', false],
-			['isChanged', -1],
+			['isChanged', false],
 			['historyIndex', -1],
 			['savedIndex', -1],
 			['documentTypeInner', documentTypeInner.inner],
@@ -195,21 +195,42 @@ export function FrameContextUtil(editor) {
 	let store = editor.__frameContext;
 
 	return {
+		/**
+		 * @template {keyof FrameContextStore} K
+		 * @param {K} k
+		 * @returns {FrameContextStore[K]}
+		 */
 		get(k) {
 			return store.get(k);
 		},
+		/**
+		 * @template {keyof FrameContextStore} K
+		 * @param {K} k
+		 * @param {FrameContextStore[K]} v
+		 */
 		set(k, v) {
 			return store.set(k, v);
 		},
+		/**
+		 * @template {keyof FrameContextStore} K
+		 * @param {K} k
+		 * @returns {boolean}
+		 */
 		has(k) {
 			return store.has(k);
 		},
+		/**
+		 * @template {keyof FrameContextStore} K
+		 * @param {K} k
+		 * @returns {boolean}
+		 */
 		delete(k) {
 			return store.delete(k);
 		},
 		getAll() {
 			return Object.fromEntries(store.entries());
 		},
+		/** @param {*} newMap */
 		reset(newMap) {
 			store = editor.__options = newMap;
 		},

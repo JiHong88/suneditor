@@ -173,7 +173,7 @@ class UI extends CoreInjector {
 		this.offCurrentController();
 		this.offCurrentModal();
 
-		fc.get('wysiwyg').setAttribute('contenteditable', false);
+		fc.get('wysiwyg').setAttribute('contenteditable', 'false');
 		fc.set('isDisabled', true);
 
 		if (this.options.get('hasCodeMirror')) {
@@ -191,7 +191,7 @@ class UI extends CoreInjector {
 		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 
 		this.#toolbar.enable();
-		fc.get('wysiwyg').setAttribute('contenteditable', true);
+		fc.get('wysiwyg').setAttribute('contenteditable', 'true');
 		fc.set('isDisabled', false);
 
 		if (this.options.get('hasCodeMirror')) {
@@ -225,7 +225,7 @@ class UI extends CoreInjector {
 	 * @param {string} [rootKey] Root key
 	 */
 	showLoading(rootKey) {
-		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'block';
+		/** @type {HTMLElement} */ ((rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box')).style.display = 'block';
 	}
 
 	/**
@@ -233,7 +233,7 @@ class UI extends CoreInjector {
 	 * @param {string} [rootKey] Root key
 	 */
 	hideLoading(rootKey) {
-		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'none';
+		/** @type {HTMLElement} */ ((rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box')).style.display = 'none';
 	}
 
 	/**

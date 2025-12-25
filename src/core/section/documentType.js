@@ -30,14 +30,14 @@ class DocumentType extends CoreInjector {
 
 	#wwWidth = -1;
 	#wwHeight = -1;
-	#innerHeaders = [];
-	#wwHeaders = [];
+	#innerHeaders = null;
+	#wwHeaders = null;
 	#totalPages = 0;
 	#pageNum = 0;
 	#pageHeight = -1;
 	#pageBreaksCnt = 0;
 	#pages = [];
-	#pagesLine = [];
+	#pagesLine = null;
 	#prevScrollTop = 0;
 	#mirrorCache = 0;
 	#positionCache = new Map();
@@ -153,7 +153,7 @@ class DocumentType extends CoreInjector {
 
 			const heightGap = this.#ww.scrollHeight > this.#mirror.scrollHeight ? this.#ww.scrollHeight - this.#mirror.scrollHeight : 0;
 			const mirrorHeight = this.#mirror.scrollHeight + heightGap;
-			const pageBreaks = this.#ww.querySelectorAll('.se-page-break');
+			const pageBreaks = /** @type { NodeListOf<HTMLElement>} */ (this.#ww.querySelectorAll('.se-page-break'));
 			if (!force && this.#pageHeight === mirrorHeight && this.#pageBreaksCnt === pageBreaks.length) return;
 
 			this.#pageHeight = mirrorHeight;
@@ -202,7 +202,7 @@ class DocumentType extends CoreInjector {
 			}
 
 			if (pages.length === 0) {
-				this.#pagesLine = [];
+				this.#pagesLine = null;
 				this.#totalPages = 1;
 				this._displayCurrentPage();
 				return;
@@ -238,7 +238,7 @@ class DocumentType extends CoreInjector {
 	}
 
 	_getDisplayPage() {
-		return !this.status.isScrollable(this.#fc) ? _w : this.#fc.get('wysiwyg');
+		return /** @type {SunEditor.EventWysiwyg} */ (!this.status.isScrollable(this.#fc) ? _w : this.#fc.get('wysiwyg'));
 	}
 
 	/**
@@ -246,14 +246,14 @@ class DocumentType extends CoreInjector {
 	 * @description Calculates and compensates for the vertical gap between the rendered content (current page)
 	 * - and the mirrored preview page due to differences in width and layout.
 	 * @param {number} t - The initial top position value to be adjusted.
-	 * @param {HTMLElement[]} chr - The elements array in the current (main) page.
-	 * @param {HTMLElement[]} mChr - The elements array in the mirrored page.
+	 * @param {HTMLCollection} chr - The elements array in the current (main) page.
+	 * @param {HTMLCollection} mChr - The elements array in the mirrored page.
 	 * @returns {number|null} - The adjusted top value.
 	 */
 	_calcPageBreakTop(t, chr, mChr) {
 		const { ci } = this._getElementAtPosition(t, mChr);
-		const mel = mChr[ci];
-		const el = chr[ci];
+		const mel = /** @type {HTMLElement} */ (mChr[ci]);
+		const el = /** @type {HTMLElement} */ (chr[ci]);
 		if (!mel || !el) return null;
 
 		const offsetDiff = el.offsetTop - mel.offsetTop;
@@ -266,12 +266,12 @@ class DocumentType extends CoreInjector {
 	/**
 	 * @internal
 	 * @description Initializes the cache for document elements.
-	 * @param {Array<HTMLElement>} mChr - List of mirrored elements.
+	 * @param {HTMLCollection} mChr - List of mirrored elements.
 	 */
 	_initializeCache(mChr) {
 		this.#positionCache.clear();
 		for (let i = 0, len = mChr.length; i < len; i++) {
-			const element = mChr[i];
+			const element = /** @type {HTMLElement} */ (mChr[i]);
 			const top = element.offsetTop;
 			const height = element.offsetHeight;
 			const bottom = top + height;
@@ -288,7 +288,7 @@ class DocumentType extends CoreInjector {
 	 * @internal
 	 * @description Retrieves the element at a given position.
 	 * @param {number} pageTop - The vertical position to check.
-	 * @param {HTMLElement[]} mChr - List of mirrored elements.
+	 * @param {HTMLCollection} mChr - List of mirrored elements.
 	 * @returns {{ci: number, cm: number, ch: number}} The closest element and its related data.
 	 * - ci: The index of the closest element.
 	 * - cm: The distance between the top of the closest element and the given position.
@@ -338,7 +338,7 @@ class DocumentType extends CoreInjector {
 		this.#wwWidth = wwWidth;
 		this.#wwHeight = wwHeight;
 		const pages_line = this.#pagesLine;
-		for (let i = 0, len = pages_line.length; i < len; i++) {
+		for (let i = 0, len = pages_line?.length; i < len; i++) {
 			pages_line[i].style.width = `${wwWidth}px`;
 		}
 
@@ -574,7 +574,7 @@ class DocumentType extends CoreInjector {
 	/**
 	 * @internal
 	 * @description Retrieves all headers in the document.
-	 * @returns {Array<HTMLElement>} An array of header elements.
+	 * @returns {NodeListOf<Element>} An array of header elements.
 	 */
 	_getHeaders() {
 		return (this.#wwHeaders = this.#ww.querySelectorAll('h1, h2, h3, h4, h5, h6'));

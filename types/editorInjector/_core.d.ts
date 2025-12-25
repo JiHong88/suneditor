@@ -92,9 +92,9 @@ export default class CoreInjector {
 	frameRoots: SunEditor.Core['frameRoots'];
 	/**
 	 * @description The window object.
-	 * @type {Window}
+	 * @type {SunEditor.GlobalWindow}
 	 */
-	_w: Window;
+	_w: SunEditor.GlobalWindow;
 	/**
 	 * @description The document object.
 	 * @type {Document}

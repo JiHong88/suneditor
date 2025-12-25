@@ -91,9 +91,9 @@ export default function CoreInjector(editor) {
 	// window, document, shadowRoot
 	/**
 	 * @description The window object.
-	 * @type {Window}
+	 * @type {SunEditor.GlobalWindow}
 	 */
-	this._w = editor._w;
+	this._w = /** @type {SunEditor.GlobalWindow} */ (editor._w);
 	/**
 	 * @description The document object.
 	 * @type {Document}

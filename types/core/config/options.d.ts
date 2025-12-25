@@ -11,11 +11,11 @@ import type {} from '../../typedef';
  * - Keys are option names (string)
  * - Values depend on the specific option (see {@link AllBaseOptions} for details)
  *
- * @property {(k: keyof AllBaseOptions) => *} get - Retrieves the value of a specific option.
- * @property {(k: keyof AllBaseOptions, v: *) => void} set - Sets the value of a specific option.
- * @property {(k: keyof AllBaseOptions) => boolean} has - Checks if a specific option exists.
+ * @property {<K extends keyof AllBaseOptions>(k: K) => AllBaseOptions[K]} get - Retrieves the value of a specific option.
+ * @property {<K extends keyof AllBaseOptions>(k: K, v: AllBaseOptions[K]) => void} set - Sets the value of a specific option.
+ * @property {<K extends keyof AllBaseOptions>(k: K) => boolean} has - Checks if a specific option exists.
  * @property {() => Object<keyof AllBaseOptions, *>} getAll - Retrieves all options as an object.
- * @property {(options: Object<keyof AllBaseOptions, *>) => void} setMany - Sets multiple options at once.
+ * @property {(options: Partial<AllBaseOptions>) => void} setMany - Sets multiple options at once.
  * @property {(newMap: Map<string, *>) => void} reset - Replaces all options with a new Map.
  * @property {() => void} clear - Clears all stored options.
  */
@@ -26,11 +26,11 @@ import type {} from '../../typedef';
  * - Keys are option names (string)
  * - Values depend on the specific option (see {@link AllFrameOptions} for details)
  *
- * @property {(k: keyof AllFrameOptions) => *} get - Retrieves the value of a specific option.
- * @property {(k: keyof AllFrameOptions, v: *) => void} set - Sets the value of a specific option.
- * @property {(k: keyof AllFrameOptions) => boolean} has - Checks if a specific option exists.
+ * @property {<K extends keyof AllFrameOptions>(k: K) => AllFrameOptions[K]} get - Retrieves the value of a specific option.
+ * @property {<K extends keyof AllFrameOptions>(k: K, v: AllFrameOptions[K]) => void} set - Sets the value of a specific option.
+ * @property {<K extends keyof AllFrameOptions>(k: K) => boolean} has - Checks if a specific option exists.
  * @property {() => Object<keyof AllFrameOptions, *>} getAll - Retrieves all options as an object.
- * @property {(options: Object<keyof AllFrameOptions, *>) => void} setMany - Sets multiple options at once.
+ * @property {(options: Partial<AllFrameOptions>) => void} setMany - Sets multiple options at once.
  * @property {(newMap: Map<string, *>) => void} reset - Replaces all options with a new Map.
  * @property {() => void} clear - Clears all stored options.
  */

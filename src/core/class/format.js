@@ -883,9 +883,10 @@ class Format extends CoreInjector {
 
 		if (dom.check.isWysiwygFrame(range.startContainer)) {
 			const children = this.frameContext.get('wysiwyg').children;
-			if (children.length === 0) return [];
+			const childrenLen = children.length;
+			if (childrenLen === 0) return [];
 
-			this.#selection.setRange(children[0], 0, children.at(-1), children.at(-1).textContent.trim().length);
+			this.#selection.setRange(children[0], 0, children[childrenLen - 1], children[childrenLen - 1].textContent.trim().length);
 			range = this.#selection.getRange();
 		}
 

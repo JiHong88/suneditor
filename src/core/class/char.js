@@ -92,7 +92,7 @@ class Char extends CoreInjector {
 		const charCounter = (fc || this.frameContext).get('charCounter');
 		if (charCounter) {
 			_w.setTimeout(() => {
-				charCounter.textContent = this.getLength();
+				charCounter.textContent = String(this.getLength());
 			}, 0);
 		}
 	}

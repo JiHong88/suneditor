@@ -19,6 +19,7 @@
 - [Modules](#modules-srcmodules)
 - [Essential Commands](#essential-commands)
 - [Testing Strategy](#testing-strategy)
+- [Advanced: Core Optimization Guidelines](#advanced-core-optimization-guidelines)
 - Supplementary Guides
     - [External Libraries](./guide/external-libraries.md) - CodeMirror, KaTeX, MathJax
 
@@ -1076,17 +1077,17 @@ class MyModalPlugin extends PluginModal {
 
 **Helper Modules:**
 
-| Module                | Category     | Key Functions                                                     | Purpose                        |
-| --------------------- | ------------ | ----------------------------------------------------------------- | ------------------------------ |
-| **`converter.js`**    | Transform    | `htmlToEntity`, `htmlToJson`, `debounce`, `toFontUnit`, `rgb2hex` | String/HTML conversion         |
-| **`env.js`**          | Detection    | `isMobile`, `isOSX_IOS`, `isClipboardSupported`, `_w`, `_d`       | Browser/device capabilities    |
-| **`keyCodeMap.js`**   | Event        | `isEnter`, `isCtrl`, `isArrow`, `isComposing`                     | Keyboard event checking        |
-| **`numbers.js`**      | Parsing      | `is`, `get`, `isEven`, `isOdd`                                    | Number validation              |
-| **`unicode.js`**      | Unicode      | `zeroWidthSpace`, `escapeStringRegexp`                            | Special characters             |
-| **`clipboard.js`**    | API          | `write`                                                           | Clipboard with iframe handling |
-| **`dom/domCheck.js`** | Validation   | `isElement`, `isText`, `isWysiwygFrame`, `isComponentContainer`   | Node type checking             |
-| **`dom/domQuery.js`** | Traversal    | `getParentElement`, `getChildNode`, `getNodePath`                 | DOM tree navigation            |
-| **`dom/domUtils.js`** | Manipulation | `addClass`, `createElement`, `setStyle`, `removeItem`             | DOM operations                 |
+| Module                | Category     | Key Functions                                                     | Purpose                                                  |
+| --------------------- | ------------ | ----------------------------------------------------------------- | -------------------------------------------------------- |
+| **`converter.js`**    | Transform    | `htmlToEntity`, `htmlToJson`, `debounce`, `toFontUnit`, `rgb2hex` | String/HTML conversion                                   |
+| **`env.js`**          | Detection    | `isMobile`, `isOSX_IOS`, `isClipboardSupported`, `_w`, `_d`       | Browser/device detection (Chrome, Safari, Firefox, Edge) |
+| **`keyCodeMap.js`**   | Event        | `isEnter`, `isCtrl`, `isArrow`, `isComposing`                     | Keyboard event checking                                  |
+| **`numbers.js`**      | Parsing      | `is`, `get`, `isEven`, `isOdd`                                    | Number validation                                        |
+| **`unicode.js`**      | Unicode      | `zeroWidthSpace`, `escapeStringRegexp`                            | Special characters                                       |
+| **`clipboard.js`**    | API          | `write`                                                           | Clipboard with iframe handling                           |
+| **`dom/domCheck.js`** | Validation   | `isElement`, `isText`, `isWysiwygFrame`, `isComponentContainer`   | Node type checking                                       |
+| **`dom/domQuery.js`** | Traversal    | `getParentElement`, `getChildNode`, `getNodePath`                 | DOM tree navigation                                      |
+| **`dom/domUtils.js`** | Manipulation | `addClass`, `createElement`, `setStyle`, `removeItem`             | DOM operations                                           |
 
 **Key Characteristics:**
 
@@ -1246,6 +1247,8 @@ These are defined in `src/suneditor.js` and re-exported from `types/index.d.ts`.
 
 ---
 
+---
+
 ## Essential Commands
 
 ### Development
@@ -1366,6 +1369,9 @@ npm run check:inject    # Inject plugin JSDoc types into options.js
     this.eventManager.addEvent(element, 'click', handler);
     ```
 
+- ❌ Use `document.execCommand`
+    - SunEditor avoids deprecated `execCommand`. Use `this.html` or `this.format` or `inline.apply` methods instead.
+
 - ❌ Create new plugin without extending plugin base classes
 
     ```javascript
@@ -1403,6 +1409,7 @@ npm run check:inject    # Inject plugin JSDoc types into options.js
 - ✅ Check element types with `dom.check` methods (iframe-safe)
 - ✅ Use helper functions from `src/helper/` for common operations
 - ✅ Follow the Redux pattern for event handling (Reducer → Actions → Effects)
+- ✅ **Type Safety**: Use specific JSDoc types (e.g., `HTMLElement`, `SunEditor.Core`) instead of `*` or `Object` to ensure accurate TypeScript definition generation.
 
 **Common Mistakes:**
 
@@ -1550,6 +1557,9 @@ Different components call plugin methods at different lifecycle stages:
 - `registerPlugin()` can be called **multiple times** safely (checks if already instantiated)
 - Plugins stored in `this.plugins` object (not Map) with key as property name
 - Constructor must call `super(editor)` to receive dependency injection
+- **Pattern**: SunEditor uses a "Class Reference" pattern, not "Instance Injection".
+    - **Don't**: `plugins: [new MyPlugin()]` (Instance) - Editor cannot manage lifecycle.
+    - **Do**: `plugins: [MyPlugin]` (Class Definition) - Editor calls `new MyPlugin(this)` internally to inject dependencies.
 
 ---
 
@@ -1895,6 +1905,49 @@ const range = this.selection.getRange();
 // ... modify DOM ...
 this.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
 ```
+
+---
+
+## Advanced: Core Optimization Guidelines
+
+> **NOTE for Contributors:**
+> This section is intended for developers working on the **Core Engine** (`src/core`).
+
+### 1. Off-DOM Manipulation (Virtual Tree)
+
+- **Concept**: Minimize direct DOM manipulation to prevent Layout Thrashing.
+- **Pattern**: Most complex operations (like `inline.js:apply` or `html.js:clean`) construct a disjoint DOM tree (often called `pNode` or `docFragment`) in memory.
+- **Rule**:
+    - **Do NOT** manipulate `element.innerHTML` or `append/insert` on live nodes inside a loop.
+    - **DO** perform all structural changes on the `cloneNode` or `DocumentFragment`.
+    - **DO** replace the live node with the processed fragment in a **single operation** at the very end.
+
+### 2. Single Reflow Policy
+
+- **Concept**: Ensure that complex formatting actions trigger exactly **one reflow/repaint**.
+- **Implementation**: The `apply` method calculates hundreds of potential DOM changes (merging tags, splitting nodes, removing styles) but applies them via `element.parentNode.replaceChild(pNode, element)` only once.
+- **Warning**: breaking this pattern by adding intermediate DOM updates will severely degrade performance on large documents.
+
+### 3. JavaScript Engine Optimization (V8)
+
+- **Concept**: Write code that is friendly to JIT compilers (Hidden Classes, Inline Caching).
+- **Guidelines**:
+    - **Object Shapes**: Initialize all properties in the `constructor` in the same order. Avoid adding properties dynamically later.
+    - **Avoid `delete`**: Do not use the `delete` keyword on high-frequency objects (like Context or Nodes). Set them to `null` instead to preserve the Hidden Class.
+    - **Monomorphic Calls**: Try to keep function argument types consistent. Passing different types to the same function deoptimizes inline caching.
+
+### 4. Regex Safety & Maintenance
+
+- **Warning**: The Regex patterns in `html.js` are complex and safety-critical.
+- **Rule**: Do NOT modify whitelist/blacklist Regex unless absolutely necessary.
+- **Verification**: Always verify new Regex against ReDoS (Regular Expression Denial of Service) vulnerabilities and ensuring it handles Unicode/multiline inputs correctly.
+
+### 5. Critical Regression Testing
+
+- **Risk**: The high complexity of `inline.js` and `html.js` means even small changes can introduce subtle structural bugs.
+- **Requirement**: Any changes to `src/core` **MUST** pass all unit tests (`npm test`) and E2E tests (`npm run test:e2e`). Do not bypass tests for "simple" fixes in these files.
+
+---
 
 ## Build System
 

@@ -338,7 +338,7 @@ class Offset extends CoreInjector {
 	 * @returns {OffsetWWScrollInfo} Scroll information within the editor.
 	 */
 	getWWScroll() {
-		const eventWysiwyg = this.frameContext.get('wysiwyg');
+		const eventWysiwyg = this.frameContext.get('eventWysiwyg');
 		const top = eventWysiwyg.scrollTop || eventWysiwyg.scrollY || 0;
 		const height = eventWysiwyg.scrollHeight || eventWysiwyg.document?.documentElement.scrollHeight || 0;
 

@@ -52,7 +52,7 @@ class Align extends PluginDropdown {
 			dom.utils.changeElement(targetChild, this.alignIcons[this.defaultDir]);
 			target.removeAttribute('data-focus');
 		} else if (this.format.isLine(element)) {
-			const textAlign = /** @type {HTMLElement} */ (element).style.textAlign;
+			const textAlign = element.style.textAlign;
 			if (textAlign) {
 				dom.utils.changeElement(targetChild, this.alignIcons[textAlign] || this.alignIcons[this.defaultDir]);
 				target.setAttribute('data-focus', textAlign);

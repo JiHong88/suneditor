@@ -1,6 +1,6 @@
 import type {} from '../typedef';
 export const env: {
-	_w: Window;
+	_w: SunEditor.GlobalWindow;
 	_d: Document;
 	NO_EVENT: symbol;
 	ON_OVER_COMPONENT: symbol;

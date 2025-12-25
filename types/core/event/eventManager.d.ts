@@ -46,8 +46,8 @@ declare class EventManager extends CoreInjector {
 	__focusTemp: HTMLInputElement;
 	/** @type {number|void} */
 	__retainTimer: number | void;
-	/** @type {Element} */
-	__eventDoc: Element;
+	/** @type {Document} */
+	__eventDoc: Document;
 	/** @type {string} */
 	__secopy: string;
 	/** @internal @type {SunEditor.Core['char']} */

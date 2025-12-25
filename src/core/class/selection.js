@@ -564,7 +564,8 @@ class Selection_ extends CoreInjector {
 				while (tempCon && !dom.check.isBreak(tempCon) && tempCon.nodeType === 1) {
 					tempChild = tempCon.childNodes;
 					if (tempChild.length === 0) break;
-					tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : tempCon.previousElementSibling || tempCon.previousSibling || startCon;
+					tempCon =
+						tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : /** @type {HTMLElement} */ (tempCon).previousElementSibling || tempCon.previousSibling || startCon;
 					tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
 				}
 
@@ -604,7 +605,8 @@ class Selection_ extends CoreInjector {
 				while (tempCon && !dom.check.isBreak(tempCon) && tempCon.nodeType === 1) {
 					tempChild = tempCon.childNodes;
 					if (tempChild.length === 0) break;
-					tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : tempCon.previousElementSibling || tempCon.previousSibling || startCon;
+					tempCon =
+						tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : /** @type {HTMLElement} */ (tempCon).previousElementSibling || tempCon.previousSibling || startCon;
 					tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
 				}
 

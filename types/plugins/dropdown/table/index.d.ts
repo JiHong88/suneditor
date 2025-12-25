@@ -18,12 +18,16 @@ export type TablePluginOptions = {
 	 */
 	colorList?: any[];
 };
+export type TableState = import('./shared/table.constants').TableState;
 /**
  * @typedef {Object} TablePluginOptions
  * @property {"x"|"y"|"xy"} [scrollType='x'] - Scroll type ('x', 'y', 'xy')
  * @property {"top"|"bottom"} [captionPosition='bottom'] - Caption position ('top', 'bottom')
  * @property {"cell"|"table"} [cellControllerPosition='cell'] - Cell controller position ('cell', 'table')
  * @property {Array} [colorList] - Color list, used in cell color picker
+ */
+/**
+ * @typedef {import('./shared/table.constants').TableState} TableState
  */
 /**
  * @class
@@ -58,39 +62,19 @@ declare class Table extends PluginDropdownFree {
 	 * @type {HTMLTableElement}
 	 */
 	_element: HTMLTableElement;
-	/** @type {HTMLElement} */
-	figureElement: HTMLElement;
-	/** @type {HTMLTableCellElement} */
-	tdElement: HTMLTableCellElement;
-	/** @type {HTMLTableRowElement} */
-	trElement: HTMLTableRowElement;
-	/** @type {HTMLTableRowElement[]|HTMLCollectionOf<HTMLTableRowElement>} */
-	trElements: HTMLTableRowElement[] | HTMLCollectionOf<HTMLTableRowElement>;
-	/** @type {HTMLTableElement} */
-	selectedTable: HTMLTableElement;
-	/** @type {HTMLTableCellElement} */
-	fixedCell: HTMLTableCellElement;
-	/** @type {HTMLTableCellElement} */
-	selectedCell: HTMLTableCellElement;
-	/** @type {HTMLTableCellElement[]} */
-	selectedCells: HTMLTableCellElement[];
-	physical_cellCnt: number;
-	logical_cellCnt: number;
-	cellCnt: number;
-	rowCnt: number;
-	rowIndex: number;
-	physical_cellIndex: number;
-	logical_cellIndex: number;
-	current_colSpan: number;
-	current_rowSpan: number;
-	isShiftPressed: boolean;
-	_ref: any;
+	state: Constants.TableState;
 	cellService: TableCellService;
 	clipboardService: TableClipboardService;
 	gridService: TableGridService;
 	resizeService: TableResizeService;
 	selectionService: TableSelectionService;
 	styleService: TableStyleService;
+	/**
+	 * @template {keyof import('./shared/table.constants').TableState} K
+	 * @param {K} key
+	 * @param {import('./shared/table.constants').TableState[K]} value
+	 */
+	setState<K extends keyof import('./shared/table.constants').TableState>(key: K, value: import('./shared/table.constants').TableState[K]): void;
 	componentSelect(target: HTMLElement): void | boolean;
 	componentDeselect(target: HTMLElement): void;
 	componentDestroy(target: HTMLElement): Promise<void>;
@@ -174,3 +158,4 @@ import TableGridService from './services/table.grid';
 import TableResizeService from './services/table.resize';
 import TableSelectionService from './services/table.selection';
 import TableStyleService from './services/table.style';
+import * as Constants from './shared/table.constants';

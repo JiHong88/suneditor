@@ -47,10 +47,10 @@ class InstanceCheck {
 	}
 
 	/**
-	 * @returns {window}
+	 * @returns {SunEditor.GlobalWindow}
 	 */
 	#getFrameWindow() {
-		return this.editor.frameContext.get('_ww');
+		return /** @type {SunEditor.GlobalWindow} */ (this.editor.frameContext.get('_ww'));
 	}
 }
 

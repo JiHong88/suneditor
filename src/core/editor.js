@@ -946,7 +946,7 @@ class Editor {
 					const frame = fc.get('wysiwygFrame');
 					const originAttr = originOptions.get('iframe_attributes');
 					const newAttr = newRootOptions.get('iframe_attributes');
-					for (const origin_k in originAttr) frame.removeAttribute(origin_k, originAttr[origin_k]);
+					for (const origin_k in originAttr) frame.removeAttribute(origin_k);
 					for (const new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
 				}
 
@@ -971,7 +971,7 @@ class Editor {
 				const frame = fc.get('wysiwyg');
 				const originAttr = originOptions.get('editableFrameAttributes');
 				const newAttr = newRootOptions.get('editableFrameAttributes');
-				for (const origin_k in originAttr) frame.removeAttribute(origin_k, originAttr[origin_k]);
+				for (const origin_k in originAttr) frame.removeAttribute(origin_k);
 				for (const new_k in newAttr) frame.setAttribute(new_k, newAttr[new_k]);
 
 				continue;
@@ -1475,7 +1475,7 @@ class Editor {
 			}) || '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 
 		// char counter
-		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
+		if (e.has('charCounter')) e.get('charCounter').textContent = String(this.char.getLength());
 
 		// document type init
 		if (this.options.get('type') === 'document') {
@@ -1732,7 +1732,7 @@ class Editor {
 					this.shadowRoot = child;
 					break;
 				}
-				child = child.parentNode;
+				child = /** @type {SunEditor.WysiwygFrame} */ (child.parentNode);
 			}
 		}
 

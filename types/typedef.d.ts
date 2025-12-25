@@ -10,6 +10,9 @@ declare global {
 		type Options = import('./core/config/options').BaseOptionsMap;
 		type FrameContext = import('./core/config/frameContext').FrameContextUtil;
 		type FrameOptions = import('./core/config/options').FrameOptionsMap;
+		type EventWysiwyg = HTMLElement & Window;
+		type WysiwygFrame = HTMLElement & HTMLIFrameElement;
+		type GlobalWindow = Window & typeof globalThis;
 		type Core = import('./core/editor').default;
 		type Injector_Core = import('./editorInjector/_core').default;
 		type Injector = import('./editorInjector').default;

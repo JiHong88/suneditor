@@ -378,7 +378,7 @@ class Component extends CoreInjector {
 
 			this.status.onSelected = true;
 		} else if (isBreakComponent || !dom.utils.hasClass(info.container, 'se-input-component')) {
-			const dragHandle = this.frameContext.get('wrapper').querySelector('.se-drag-handle');
+			const dragHandle = /** @type {HTMLElement} */ (this.frameContext.get('wrapper').querySelector('.se-drag-handle'));
 			dom.utils.addClass(dragHandle, 'se-drag-handle-full');
 			this.#ui._visibleControllers(false, false);
 
@@ -387,7 +387,7 @@ class Component extends CoreInjector {
 			const h = sizeTarget.offsetHeight;
 			const { top, left } = this.#offset.getLocal(sizeTarget);
 
-			dragHandle.style.opacity = 0;
+			dragHandle.style.opacity = '0';
 			dragHandle.style.width = w + 'px';
 			dragHandle.style.height = h + 'px';
 			dragHandle.style.top = top + 'px';

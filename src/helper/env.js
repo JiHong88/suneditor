@@ -2,8 +2,8 @@
  * @fileoverview Environment  helper functions
  */
 
-/** @type {Window} */
-export const _w = window;
+/** @type {SunEditor.GlobalWindow} */
+export const _w = /** @type {SunEditor.GlobalWindow} */ (window);
 /** @type {Document} */
 export const _d = document;
 
@@ -158,7 +158,7 @@ export const isGecko = (() => {
  * @type {boolean}
  */
 export const isChromium = (() => {
-	return !!(/** @type {Window & { chrome: any }} */ (_w).chrome);
+	return !!(/** @type {window & { chrome: any }} */ (_w).chrome);
 })();
 
 /**
