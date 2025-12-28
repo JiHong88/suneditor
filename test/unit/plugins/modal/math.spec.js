@@ -60,7 +60,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
 	Modal: jest.fn().mockImplementation((plugin, modalEl) => ({
 		open: jest.fn(),
 		close: jest.fn(),

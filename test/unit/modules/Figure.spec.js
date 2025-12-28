@@ -2,10 +2,10 @@
  * @fileoverview Unit tests for modules/Figure.js
  */
 
-import Figure from '../../../src/modules/contracts/Figure.js';
+import Figure from '../../../src/modules/contract/Figure.js';
 
 // Mock Controller directly since Figure imports it from './Controller'
-jest.mock('../../../src/modules/contracts/Controller.js', () => {
+jest.mock('../../../src/modules/contract/Controller.js', () => {
     return jest.fn().mockImplementation(function(inst, form, options) {
         this.open = jest.fn();
         this.close = jest.fn();
@@ -22,7 +22,7 @@ jest.mock('../../../src/modules/contracts/Controller.js', () => {
 });
 
 // Mock other dependencies
-jest.mock('../../../src/modules/utils/SelectMenu.js', () => {
+jest.mock('../../../src/modules/ui/SelectMenu.js', () => {
     return jest.fn().mockImplementation(() => ({
         on: jest.fn(),
         create: jest.fn(),
@@ -31,7 +31,7 @@ jest.mock('../../../src/modules/utils/SelectMenu.js', () => {
     }));
 });
 
-jest.mock('../../../src/modules/utils/_DragHandle.js', () => ({
+jest.mock('../../../src/modules/ui/_DragHandle.js', () => ({
     _DragHandle: {
         get: jest.fn().mockReturnValue(null),
         set: jest.fn()

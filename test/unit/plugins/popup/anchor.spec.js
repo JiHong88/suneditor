@@ -25,7 +25,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
 	Controller: jest.fn().mockImplementation((plugin, element, options, key) => ({
 		open: jest.fn(),
 		close: jest.fn(),

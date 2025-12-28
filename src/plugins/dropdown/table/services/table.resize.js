@@ -1,5 +1,5 @@
 import { dom, numbers, converter, env, keyCodeMap } from '../../../../helper';
-import { _DragHandle } from '../../../../modules/utils';
+import { _DragHandle } from '../../../../modules/ui';
 
 import * as Constants from '../shared/table.constants';
 import { CheckCellEdge, CheckRowEdge } from '../shared/table.utils';

@@ -45,7 +45,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -84,8 +84,8 @@ jest.mock('../../../../src/modules/contracts', () => ({
 	})),
 }));
 
-const mockModal = require('../../../../src/modules/contracts').Modal;
-const mockFigure = require('../../../../src/modules/contracts').Figure;
+const mockModal = require('../../../../src/modules/contract').Modal;
+const mockFigure = require('../../../../src/modules/contract').Figure;
 
 Object.assign(mockModal, {
 	OnChangeFile: jest.fn(),

@@ -62,18 +62,6 @@ export class TableGridService {
 	 * @returns {HTMLTableRowElement} The newly inserted row element.
 	 */
 	insertBodyRow(table: HTMLTableElement, rowIndex: number, cellCnt: number): HTMLTableRowElement;
-	/**
-	 * @internal
-	 * @description Handles column operations such as insert and delete.
-	 * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
-	 */
-	_OnColumnEdit(command: 'insert-left' | 'insert-right' | 'delete'): void;
-	/**
-	 * @internal
-	 * @description Handles row operations such as insert and delete.
-	 * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
-	 */
-	_OnRowEdit(command: 'insert-above' | 'insert-below' | 'delete'): void;
 	#private;
 }
 export default TableGridService;

@@ -1,7 +1,7 @@
 import { dom, numbers } from '../../../../helper';
-import { SelectMenu } from '../../../../modules/utils';
+import { SelectMenu } from '../../../../modules/ui';
 
-import { CreateCellsHTML, CreateCellsString } from '../shared/table.utils';
+import { CreateCellsHTML, CreateCellsString, InvalidateTableCache } from '../shared/table.utils';
 import { CreateColumnMenu, CreateRowMenu } from '../render/table.menu';
 
 export class TableGridService {
@@ -23,14 +23,14 @@ export class TableGridService {
 
 		// members - SelectMenu - column
 		const columnMenu = CreateColumnMenu(this.#main.lang, this.#main.icons);
-		this.selectMenu_column = new SelectMenu({ editor: this.#main.editor }, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
-		this.selectMenu_column.on(columnButton, this._OnColumnEdit.bind(this));
+		this.selectMenu_column = new SelectMenu(main.editor, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
+		this.selectMenu_column.on(columnButton, this.#OnColumnEdit.bind(this));
 		this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
 
 		// members - SelectMenu - row
 		const rownMenu = CreateRowMenu(this.#main.lang, this.#main.icons);
-		this.selectMenu_row = new SelectMenu({ editor: this.#main.editor }, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
-		this.selectMenu_row.on(rowButton, this._OnRowEdit.bind(this));
+		this.selectMenu_row = new SelectMenu(main.editor, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
+		this.selectMenu_row.on(rowButton, this.#OnRowEdit.bind(this));
 		this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 	}
 
@@ -389,7 +389,7 @@ export class TableGridService {
 
 					if (cell.rowSpan > 1) {
 						cell.rowSpan -= 1;
-						spanCells.push({ cell: /** @type {HTMLTableCellElement} */ (cell.cloneNode(false)), index: logcalIndex });
+						spanCells.push({ cell: /** @type {HTMLTableCellElement} */ (cell.cloneNode(true)), index: logcalIndex });
 					}
 				}
 
@@ -448,11 +448,12 @@ export class TableGridService {
 	}
 
 	/**
-	 * @internal
 	 * @description Handles column operations such as insert and delete.
 	 * @param {"insert-left"|"insert-right"|"delete"} command The column operation to perform.
 	 */
-	_OnColumnEdit(command) {
+	#OnColumnEdit(command) {
+		InvalidateTableCache(this.#main._element);
+
 		switch (command) {
 			case 'insert-left':
 				this.editTable('cell', 'left');
@@ -464,15 +465,16 @@ export class TableGridService {
 				this.editTable('cell', null);
 		}
 
-		this.#main._historyPush();
+		this.#main.historyPush();
 	}
 
 	/**
-	 * @internal
 	 * @description Handles row operations such as insert and delete.
 	 * @param {"insert-above"|"insert-below"|"delete"} command The row operation to perform.
 	 */
-	_OnRowEdit(command) {
+	#OnRowEdit(command) {
+		InvalidateTableCache(this.#main._element);
+
 		switch (command) {
 			case 'insert-above':
 				this.editTable('row', 'up');
@@ -484,7 +486,7 @@ export class TableGridService {
 				this.editTable('row', null);
 		}
 
-		this.#main._historyPush();
+		this.#main.historyPush();
 	}
 }
 

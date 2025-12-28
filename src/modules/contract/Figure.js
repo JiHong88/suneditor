@@ -1,7 +1,7 @@
 import CoreInjector from '../../editorInjector/_core';
-import Controller from '../contracts/Controller';
-import SelectMenu from '../utils/SelectMenu';
-import { _DragHandle } from '../utils/_DragHandle';
+import Controller from './Controller';
+import SelectMenu from '../ui/SelectMenu';
+import { _DragHandle } from '../ui/_DragHandle';
 import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
 
 const { _w, ON_OVER_COMPONENT } = env;
@@ -164,7 +164,7 @@ class Figure extends CoreInjector {
 			this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
 			const alignMenus = CreateAlign(this, this.alignButton);
 			if (alignMenus) {
-				this.selectMenu_align = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+				this.selectMenu_align = new SelectMenu(this.editor, { checkList: false, position: 'bottom-center' });
 				this.selectMenu_align.on(this.alignButton, this.#SetMenuAlign.bind(this), { class: 'se-figure-select-list' });
 				this.selectMenu_align.create(alignMenus.items, alignMenus.html);
 			}
@@ -172,7 +172,7 @@ class Figure extends CoreInjector {
 			this.asButton = controllerEl.querySelector('[data-command="onas"]');
 			const asMenus = CreateAs(this, this.asButton);
 			if (asMenus) {
-				this.selectMenu_as = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+				this.selectMenu_as = new SelectMenu(this.editor, { checkList: false, position: 'bottom-center' });
 				this.selectMenu_as.on(this.asButton, this.#SetMenuAs.bind(this), { class: 'se-figure-select-list' });
 				this.selectMenu_as.create(asMenus.items, asMenus.html);
 			}
@@ -180,7 +180,7 @@ class Figure extends CoreInjector {
 			this.resizeButton = controllerEl.querySelector('[data-command="onresize"]');
 			const resizeMenus = CreateResize(this, this.resizeButton);
 			if (resizeMenus) {
-				this.selectMenu_resize = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
+				this.selectMenu_resize = new SelectMenu(this.editor, { checkList: false, position: 'bottom-left', dir: 'ltr' });
 				this.selectMenu_resize.on(this.resizeButton, this.#SetResize.bind(this));
 				this.selectMenu_resize.create(resizeMenus.items, resizeMenus.html);
 			}
@@ -854,7 +854,7 @@ class Figure extends CoreInjector {
 	 * @param {Node} container - The container element of the figure component.
 	 * @param {Node} originEl - The original element of the figure component.
 	 * @param {Node} anchorCover - The anchor cover element of the figure component.
-	 * @param {import('../utils/FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
+	 * @param {import('../manager/FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
 	 */
 	retainFigureFormat(container, originEl, anchorCover, fileManagerInst) {
 		const isInline = this.component.isInline(container);

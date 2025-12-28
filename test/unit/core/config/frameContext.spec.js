@@ -155,7 +155,7 @@ describe('Core Config - Frame Context', () => {
             expect(context.get('isFullScreen')).toBe(false);
             expect(context.get('isReadOnly')).toBe(false);
             expect(context.get('isDisabled')).toBe(false);
-            expect(context.get('isChanged')).toBe(-1);
+            expect(context.get('isChanged')).toBe(false);
 
             // Check history tracking
             expect(context.get('historyIndex')).toBe(-1);

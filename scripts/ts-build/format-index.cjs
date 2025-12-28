@@ -1,3 +1,7 @@
+/**
+ * @warning "suneditor.js", "cdn-builder.js", "format-index.cjs" must be modified together.
+ */
+
 const fs = require('fs');
 const path = require('path');
 
@@ -30,12 +34,14 @@ ${defaultExportModules.map((mod) => `export { default as ${mod} } from './${mod}
 
 // Re-export modules (no default export in these)
 import * as interfaces from './interfaces';
-import * as moduleContracts from './modules/contracts';
-import * as moduleUtils from './modules/utils';
+import * as moduleContract from './modules/contract';
+import * as moduleManager from './modules/manager';
+import * as moduleUI from './modules/ui';
 export { interfaces };
 export namespace modules {
-\texport { moduleContracts as contracts };
-\texport { moduleUtils as utils };
+\texport { moduleContract as contract };
+\texport { moduleManager as manager };
+\texport { moduleUI as ui };
 }
 
 // Main default export

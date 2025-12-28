@@ -5,7 +5,7 @@
 import BackgroundColor from '../../../../src/plugins/dropdown/backgroundColor.js';
 
 // Mock HueSlider module to prevent canvas initialization errors
-jest.mock('../../../../src/modules/contracts/HueSlider.js', () => {
+jest.mock('../../../../src/modules/contract/HueSlider.js', () => {
     return jest.fn().mockImplementation(() => ({}));
 });
 
@@ -19,7 +19,7 @@ const mockColorPicker = {
     hueSliderClose: jest.fn()
 };
 
-jest.mock('../../../../src/modules/contracts/ColorPicker.js', () => {
+jest.mock('../../../../src/modules/contract/ColorPicker.js', () => {
     return jest.fn().mockImplementation((plugin, type, options) => {
         mockColorPicker.plugin = plugin;
         mockColorPicker.type = type;
@@ -120,7 +120,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
     describe('Constructor', () => {
 
         it('should initialize ColorPicker with correct options', () => {
-            const MockColorPicker = require('../../../../src/modules/contracts/ColorPicker.js');
+            const MockColorPicker = require('../../../../src/modules/contract/ColorPicker.js');
 
             expect(MockColorPicker).toHaveBeenCalledWith(backgroundColor, 'backgroundColor', {
                 form: expect.any(Object), // Added in commit 9f43ca04
@@ -141,7 +141,7 @@ describe('Plugins - Dropdown - BackgroundColor', () => {
         });
 
         it('should pass menu as form to ColorPicker', () => {
-            const MockColorPicker = require('../../../../src/modules/contracts/ColorPicker.js');
+            const MockColorPicker = require('../../../../src/modules/contract/ColorPicker.js');
 
             const callArgs = MockColorPicker.mock.calls[MockColorPicker.mock.calls.length - 1];
             const passedOptions = callArgs[2];

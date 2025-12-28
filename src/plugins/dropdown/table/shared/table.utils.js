@@ -1,8 +1,17 @@
 import { dom, numbers, env } from '../../../../helper';
-import { _DragHandle } from '../../../../modules/utils';
+import { _DragHandle } from '../../../../modules/ui';
 import * as Constants from './table.constants';
 
 const { _w } = env;
+
+/** @type {WeakMap<HTMLTableElement, number>} */
+const maxColumnsCache = new WeakMap();
+
+/** @type {WeakMap<HTMLTableElement, WeakMap<HTMLTableCellElement, number>>} */
+const cellIndexCache = new WeakMap();
+
+/** @type {WeakMap<HTMLTableElement, Map<string, {cs: number, ce: number, rs: number, re: number}>>} */
+export const refCache = new WeakMap();
 
 /**
  * @description Checks if the given node is a resizable table element.
@@ -11,6 +20,15 @@ const { _w } = env;
  */
 export function IsResizeEls(node) {
 	return /^(TD|TH|TR)$/i.test(node?.nodeName);
+}
+
+/**
+ * @description Check table caption
+ * @param {Node} node The DOM node to check.
+ * @returns {boolean}
+ */
+export function IsTableCaption(node) {
+	return /^CAPTION$/i.test(node.nodeName);
 }
 
 /**
@@ -74,11 +92,14 @@ export function CreateCellsHTML(nodeName) {
 }
 
 /**
- * @description Gets the maximum number of columns in a table.
+ * @description Gets the maximum number of columns in a table (memoized).
  * @param {HTMLTableElement} table The table element.
  * @returns {number} The maximum number of columns in the table.
  */
 export function GetMaxColumns(table) {
+	const cached = maxColumnsCache.get(table);
+	if (cached !== undefined) return cached;
+
 	const rows = table.rows;
 	let maxColumns = 0;
 
@@ -93,7 +114,119 @@ export function GetMaxColumns(table) {
 		maxColumns = Math.max(maxColumns, columnCount);
 	}
 
+	maxColumnsCache.set(table, maxColumns);
 	return maxColumns;
+}
+
+/**
+ * @description Invalidates the max columns cache for a table.
+ * Call this when table structure changes (add/remove column, merge/split cells).
+ * @param {HTMLTableElement} table The table element.
+ */
+export function InvalidateMaxColumnsCache(table) {
+	maxColumnsCache.delete(table);
+}
+
+/**
+ * @description Gets the logical cell index for a cell in a table (memoized).
+ * @param {HTMLTableElement} table The table element.
+ * @param {HTMLTableCellElement} cell The cell element.
+ * @param {number} rowIndex The row index of the cell.
+ * @param {number} cellIndex The physical cell index.
+ * @returns {number} The logical cell index.
+ */
+export function GetLogicalCellIndex(table, cell, rowIndex, cellIndex) {
+	const tableCached = cellIndexCache.get(table);
+	if (tableCached) {
+		const cached = tableCached.get(cell);
+		if (cached !== undefined) return cached;
+	}
+
+	const tableCache = new WeakMap();
+	cellIndexCache.set(table, tableCache);
+
+	const rows = table.rows;
+	let rowSpanArr = [];
+	let spanIndex = [];
+	let logicalIndex = 0;
+
+	for (let i = 0, cells, colSpan; i <= rowIndex; i++) {
+		cells = rows[i].cells;
+		colSpan = 0;
+
+		for (let c = 0, cLen = cells.length, currentCell, cs, rs, logcalIndex; c < cLen; c++) {
+			currentCell = cells[c];
+			cs = currentCell.colSpan - 1;
+			rs = currentCell.rowSpan - 1;
+			logcalIndex = c + colSpan;
+
+			if (spanIndex.length > 0) {
+				for (let r = 0, arr; r < spanIndex.length; r++) {
+					arr = spanIndex[r];
+					if (arr.row > i) continue;
+					if (logcalIndex >= arr.index) {
+						colSpan += arr.cs;
+						logcalIndex += arr.cs;
+						arr.rs -= 1;
+						arr.row = i + 1;
+						if (arr.rs < 1) {
+							spanIndex.splice(r, 1);
+							r--;
+						}
+					} else if (c === cLen - 1) {
+						arr.rs -= 1;
+						arr.row = i + 1;
+						if (arr.rs < 1) {
+							spanIndex.splice(r, 1);
+							r--;
+						}
+					}
+				}
+			}
+
+			if (i === rowIndex && c === cellIndex) {
+				logicalIndex = logcalIndex;
+				break;
+			}
+
+			if (rs > 0) {
+				rowSpanArr.push({
+					index: logcalIndex,
+					cs: cs + 1,
+					rs: rs,
+					row: -1,
+				});
+			}
+
+			colSpan += cs;
+		}
+
+		spanIndex = spanIndex.concat(rowSpanArr).sort((a, b) => a.index - b.index);
+		rowSpanArr = [];
+	}
+
+	tableCache.set(cell, logicalIndex);
+	return logicalIndex;
+}
+
+/**
+ * @description Invalidates the cell index cache for a table.
+ * @param {HTMLTableElement} table The table element.
+ */
+export function InvalidateCellIndexCache(table) {
+	cellIndexCache.delete(table);
+}
+
+/**
+ * @description Invalidates all table-related caches for a table.
+ * Call this when table structure changes (add/remove row/column, merge/split cells).
+ * @param {HTMLTableElement} table The table element.
+ */
+export function InvalidateTableCache(table) {
+	if (!table) return;
+	maxColumnsCache.delete(table);
+	cellIndexCache.delete(table);
+	refCache.delete(table);
 }
 
 /**

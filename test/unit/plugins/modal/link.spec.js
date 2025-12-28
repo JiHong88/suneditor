@@ -43,7 +43,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn()
@@ -63,7 +63,7 @@ jest.mock('../../../../src/modules/contracts', () => ({
 	}))
 }));
 
-jest.mock('../../../../src/modules/utils', () => ({
+jest.mock('../../../../src/modules/ui', () => ({
 	ModalAnchorEditor: jest.fn().mockImplementation(() => ({
 		on: jest.fn(),
 		set: jest.fn(),

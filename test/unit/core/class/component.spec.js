@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-jest.mock('../../../../src/modules/utils', () => ({
+jest.mock('../../../../src/modules/ui', () => ({
     _DragHandle: {
         get: jest.fn(),
         set: jest.fn()
@@ -821,14 +821,6 @@ describe('Component', () => {
             // Mock format for isLine - return false so breaker is shown
             editor.format.isLine = jest.fn().mockReturnValue(false);
 
-            // Mock DragHandle
-            const dragHandleMock = {
-                 get: jest.fn((k) => k === '__overInfo' ? 'ON_OVER_COMPONENT' : null)
-            };
-            // Note: We mocked modules/utils at top of file, so we rely on that or use helper if accessible.
-            // The file uses: jest.mock('../../../../src/modules/utils', ... )
-            // So we need to ensure the mock checks out.
-            
             component._setComponentLineBreaker(container);
             
             expect(lb_t.style.display).not.toBe('none');

@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for modules/FileManager.js
  */
 
-import FileManager from '../../../src/modules/utils/FileManager.js';
+import FileManager from '../../../src/modules/manager/FileManager.js';
 
 // Mock CoreInjector
 jest.mock('../../../src/editorInjector/_core.js', () => {
@@ -16,7 +16,7 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
 });
 
 // Mock ApiManager
-jest.mock('../../../src/modules/utils/ApiManager.js', () => {
+jest.mock('../../../src/modules/manager/ApiManager.js', () => {
     return jest.fn().mockImplementation(() => ({
         call: jest.fn(),
         asyncCall: jest.fn().mockResolvedValue({ status: 200 })

@@ -1,7 +1,7 @@
 import Mention from '../../../../src/plugins/field/mention';
 
 // Mock HueSlider module to prevent canvas initialization errors
-jest.mock('../../../../src/modules/contracts/HueSlider.js', () => {
+jest.mock('../../../../src/modules/contract/HueSlider.js', () => {
 	return jest.fn().mockImplementation(() => ({}));
 });
 import { createMockThis } from '../../../__mocks__/editorMock';
@@ -16,14 +16,14 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
 	Controller: jest.fn().mockImplementation((plugin, element, options, additional) => ({
 		open: jest.fn(),
 		close: jest.fn(),
 	})),
 }));
 
-jest.mock('../../../../src/modules/utils', () => ({
+jest.mock('../../../../src/modules/manager', () => ({
 	ApiManager: jest.fn().mockImplementation((plugin, options) => ({
 		cancel: jest.fn(),
 		asyncCall: jest.fn().mockResolvedValue({
@@ -32,7 +32,10 @@ jest.mock('../../../../src/modules/utils', () => ({
 				{ key: 'user2', name: 'User Two', url: '/user2' },
 			]),
 		}),
-	})),
+	}))
+}));
+
+jest.mock('../../../../src/modules/ui', () => ({
 	SelectMenu: jest.fn().mockImplementation((plugin, options) => ({
 		on: jest.fn(),
 		close: jest.fn(),

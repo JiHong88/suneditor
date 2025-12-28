@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for modules/Modal.js
  */
 
-import Modal from '../../../src/modules/contracts/Modal.js';
+import Modal from '../../../src/modules/contract/Modal.js';
 
 // Mock dependencies
 jest.mock('../../../src/editorInjector/_core.js', () => {

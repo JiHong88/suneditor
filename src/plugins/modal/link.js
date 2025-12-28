@@ -1,6 +1,6 @@
 import { PluginModal } from '../../interfaces';
-import { Modal, Controller } from '../../modules/contracts';
-import { ModalAnchorEditor } from '../../modules/utils';
+import { Modal, Controller } from '../../modules/contract';
+import { ModalAnchorEditor } from '../../modules/ui';
 import { dom, numbers } from '../../helper';
 
 /**
@@ -13,7 +13,7 @@ import { dom, numbers } from '../../helper';
  */
 
 /**
- * @typedef {Omit<LinkOptions & import('../../modules/utils/ModalAnchorEditor').ModalAnchorEditorParams, ''>} LinkPluginOptions
+ * @typedef {Omit<LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, ''>} LinkPluginOptions
  */
 
 /**
@@ -62,7 +62,7 @@ class Link extends PluginModal {
 		};
 
 		// modules
-		this.anchor = new ModalAnchorEditor(this, modalEl, this.pluginOptions);
+		this.anchor = new ModalAnchorEditor(this.editor, modalEl, this.pluginOptions);
 		this.modal = new Modal(this, modalEl);
 		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: false });
 

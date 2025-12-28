@@ -4,8 +4,8 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { dom, env, numbers, unicode, keyCodeMap, converter } from '../../helper';
-import { Figure } from '../../modules/contracts';
-import { _DragHandle } from '../../modules/utils';
+import { Figure } from '../../modules/contract';
+import { _DragHandle } from '../../modules/ui';
 
 const { _w, ON_OVER_COMPONENT, isMobile } = env;
 const DIR_KEYCODE = /^Arrow(Left|Up|Right|Down)$/;

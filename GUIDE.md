@@ -64,18 +64,19 @@ suneditor/
 │   │   ├── input/           # Toolbar inputs (fontSize, pageNavigator)
 │   │   └── popup/           # Inline controllers (anchor)
 │   ├── modules/             # UI components
-│   │   ├── contracts/       # Module contracts (required hooks)
+│   │   ├── contract/        # Module contracts (required hooks)
 │   │   │   ├── Modal.js     # Modal contract (modalAction, modalOn, modalOff, etc.)
 │   │   │   ├── Controller.js # Controller contract (controllerAction, controllerClose, etc.)
 │   │   │   ├── Figure.js    # Figure wrapper (component resize/align)
 │   │   │   ├── Browser.js   # Browser contract (browserInit)
 │   │   │   ├── ColorPicker.js # ColorPicker contract (colorPickerAction, etc.)
 │   │   │   └── HueSlider.js # HueSlider contract (hueSliderAction, etc.)
-│   │   └── utils/           # Module utilities (no required hooks)
+│   │   ├── manager/         # Manager utilities
+│   │   │   ├── FileManager.js # File upload handler
+│   │   │   └── ApiManager.js # XHR request helper
+│   │   └── ui/              # UI utilities
 │   │       ├── ModalAnchorEditor.js # Link form helper
 │   │       ├── SelectMenu.js # Custom dropdown menu
-│   │       ├── FileManager.js # File upload handler
-│   │       ├── ApiManager.js # XHR request helper
 │   │       └── _DragHandle.js # Drag state manager
 │   ├── hooks/               # Hook interface definitions
 │   │   ├── base.js          # Base hooks (Event, Component, Core)
@@ -196,7 +197,7 @@ suneditor/
    │     ┌────────────────────────────────────┐
    │     │ Modules                            │
    │     ├────────────────────────────────────┤
-   │     │ contracts/                         │
+   │     │ contract/                          │
    │     │  • Modal      ← modal plugins      │
    │     │  • Controller ← component plugins  │
    │     │  • Figure     ← image/video/audio  │
@@ -204,11 +205,13 @@ suneditor/
    │     │  • ColorPicker ← color plugins     │
    │     │  • HueSlider  ← color plugins      │
    │     │                                    │
-   │     │ utils/                             │
-   │     │  • SelectMenu     ← dropdowns      │
-   │     │  • ModalAnchorEditor ← link plugin │
+   │     │ manager/                           │
    │     │  • FileManager    ← file uploads   │
    │     │  • ApiManager     ← external APIs  │
+   │     │                                    │
+   │     │ ui/                                │
+   │     │  • SelectMenu     ← dropdowns      │
+   │     │  • ModalAnchorEditor ← link plugin │
    │     └────────────────────────────────────┘
    │
    ▼ (all extend EditorInjector)
@@ -997,21 +1000,27 @@ All hook parameter types are fully documented with JSDoc in [`src/hooks/params.j
 
 **Module Classes:**
 
-| Module                  | Purpose              | Pattern                   | Used By                    |
-| ----------------------- | -------------------- | ------------------------- | -------------------------- |
-| **`Modal`**             | Dialog windows       | Instance + callbacks      | modal plugins              |
-| **`Controller`**        | Floating tooltips    | Instance + positioning    | component plugins          |
-| **`Figure`**            | Resize/align wrapper | Instance + static helpers | image, video, audio        |
-| **`SelectMenu`**        | Custom dropdowns     | Instance + items          | font, blockStyle           |
-| **`ColorPicker`**       | Color palette        | Instance + callbacks      | fontColor, backgroundColor |
-| **`HueSlider`**         | HSL color wheel      | Instance + attach         | ColorPicker                |
-| **`FileManager`**       | File uploads         | Instance + async          | image, video, audio        |
-| **`ApiManager`**        | XHR requests         | Static only               | Browser, mention           |
-| **`ModalAnchorEditor`** | Link form            | Instance + form           | link, image                |
-| **`Browser`**           | Gallery UI           | Instance + API            | imageGallery, videoGallery |
-| **`_DragHandle`**       | Drag state           | Map (not class)           | component.js               |
+| Module                  | Folder      | Purpose              | Pattern                   | Used By                    |
+| ----------------------- | ----------- | -------------------- | ------------------------- | -------------------------- |
+| **`Modal`**             | `contract/` | Dialog windows       | Instance + callbacks      | modal plugins              |
+| **`Controller`**        | `contract/` | Floating tooltips    | Instance + positioning    | component plugins          |
+| **`Figure`**            | `contract/` | Resize/align wrapper | Instance + static helpers | image, video, audio        |
+| **`ColorPicker`**       | `contract/` | Color palette        | Instance + callbacks      | fontColor, backgroundColor |
+| **`HueSlider`**         | `contract/` | HSL color wheel      | Instance + attach         | ColorPicker                |
+| **`Browser`**           | `contract/` | Gallery UI           | Instance + API            | imageGallery, videoGallery |
+| **`FileManager`**       | `manager/`  | File uploads         | Instance + async          | image, video, audio        |
+| **`ApiManager`**        | `manager/`  | XHR requests         | Static only               | Browser, mention           |
+| **`SelectMenu`**        | `ui/`       | Custom dropdowns     | Instance + items          | font, blockStyle           |
+| **`ModalAnchorEditor`** | `ui/`       | Link form            | Instance + form           | link, image                |
+| **`_DragHandle`**       | `ui/`       | Drag state           | Map (not class)           | component.js               |
 
-#### Module Contracts (`src/modules/contracts/`)
+#### Module Contracts (`src/modules/contract/`)
+
+> **Note:** The `modules/` directory is organized into three subdirectories:
+>
+> - `contract/` - Module contracts with required hooks (Modal, Controller, Figure, Browser, ColorPicker, HueSlider)
+> - `manager/` - Manager utilities (FileManager, ApiManager)
+> - `ui/` - UI utilities (SelectMenu, ModalAnchorEditor, \_DragHandle)
 
 Module contracts are interfaces that define plugin hooks called by specific modules. Plugins using these modules **must implement required hooks** and may optionally implement optional hooks.
 
@@ -1059,7 +1068,7 @@ class MyModalPlugin extends PluginModal {
 - **Required hooks** will cause errors if not implemented (modules call them directly)
 - **Optional hooks** are called with optional chaining (`?.()`) - safe to omit
 - **Async hooks** (like `modalAction`) must return `Promise<boolean>`
-- Module contracts are defined in `src/modules/contracts/` for type inference and documentation
+- Module contracts are defined in `src/modules/contract/` for type inference and documentation
 
 **Key Differences:**
 

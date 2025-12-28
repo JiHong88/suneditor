@@ -1,5 +1,5 @@
 import { PluginBrowser } from '../../interfaces';
-import { Browser } from '../../modules/contracts';
+import { Browser } from '../../modules/contract';
 
 /**
  * @typedef {Object} FileBrowserPluginOptions

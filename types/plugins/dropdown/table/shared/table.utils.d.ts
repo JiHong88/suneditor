@@ -33,11 +33,17 @@ export function CreateCellsString(nodeName: string, cnt: number): string;
  */
 export function CreateCellsHTML(nodeName: string): HTMLTableCellElement;
 /**
- * @description Gets the maximum number of columns in a table.
+ * @description Gets the maximum number of columns in a table (memoized).
  * @param {HTMLTableElement} table The table element.
  * @returns {number} The maximum number of columns in the table.
  */
 export function GetMaxColumns(table: HTMLTableElement): number;
+/**
+ * @description Invalidates the max columns cache for a table.
+ * Call this when table structure changes (add/remove column, merge/split cells).
+ * @param {HTMLTableElement} table The table element.
+ */
+export function InvalidateMaxColumnsCache(table: HTMLTableElement): void;
 /**
  * @description Clone a table element and map selected cells to the cloned table
  * @param {HTMLTableElement} table <table> element

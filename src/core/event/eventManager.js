@@ -4,7 +4,7 @@
 
 import CoreInjector from '../../editorInjector/_core';
 import { dom, unicode, numbers, env, converter } from '../../helper';
-import { _DragHandle } from '../../modules/utils';
+import { _DragHandle } from '../../modules/ui';
 
 // event handlers
 import { ButtonsHandler, OnClick_menuTray, OnClick_toolbar } from './handlers/handler_toolbar';

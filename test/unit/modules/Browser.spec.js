@@ -2,10 +2,10 @@
  * @fileoverview Unit tests for modules/Browser.js
  */
 
-import Browser from '../../../src/modules/contracts/Browser.js';
+import Browser from '../../../src/modules/contract/Browser.js';
 
 // Mock ApiManager
-jest.mock('../../../src/modules/utils/ApiManager.js', () => {
+jest.mock('../../../src/modules/manager/ApiManager.js', () => {
     return jest.fn().mockImplementation(function() {
         this.call = jest.fn();
         this.cancel = jest.fn();

@@ -1,6 +1,6 @@
 import { dom } from '../../../../src/helper';
 // We need dynamic import for HueSlider to support resetModules
-// import HueSlider from '../../../../src/modules/contracts/HueSlider';
+// import HueSlider from '../../../../src/modules/contract/HueSlider';
 
 describe('HueSlider', () => {
     let HueSlider, Controller, editor, inst, hueSlider, contextMock;
@@ -33,8 +33,8 @@ describe('HueSlider', () => {
         jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => contextMock);
 
         // Mock dependencies
-        jest.mock('../../../../src/modules/contracts/Controller');
-        jest.mock('../../../../src/modules/utils/_DragHandle', () => ({
+        jest.mock('../../../../src/modules/contract/Controller');
+        jest.mock('../../../../src/modules/ui/_DragHandle', () => ({
             _DragHandle: {
                 get: jest.fn().mockReturnValue(() => {}),
                 set: jest.fn()
@@ -42,8 +42,8 @@ describe('HueSlider', () => {
         }));
 
         // Import module after setup
-        HueSlider = (await import('../../../../src/modules/contracts/HueSlider')).default;
-        Controller = (await import('../../../../src/modules/contracts/Controller')).default;
+        HueSlider = (await import('../../../../src/modules/contract/HueSlider')).default;
+        Controller = (await import('../../../../src/modules/contract/Controller')).default;
 
         const carrierWrapper = document.createElement('div');
         

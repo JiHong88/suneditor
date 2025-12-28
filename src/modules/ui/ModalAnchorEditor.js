@@ -1,6 +1,6 @@
 import CoreInjector from '../../editorInjector/_core';
 import SelectMenu from './SelectMenu';
-import FileManager from './FileManager';
+import FileManager from '../manager/FileManager';
 import { dom, numbers, env, unicode } from '../../helper';
 const { _w, NO_EVENT } = env;
 
@@ -33,12 +33,10 @@ class ModalAnchorEditor extends CoreInjector {
 
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
-	 * @param {Node} modalForm The modal form element
-	 * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
+	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
 	 */
-	constructor(inst, modalForm, params) {
-		super(inst.editor);
+	constructor(editor, modalForm, params) {
+		super(editor);
 
 		// editor class
 		this.selection = this.editor.selection;
@@ -66,11 +64,9 @@ class ModalAnchorEditor extends CoreInjector {
 		}
 
 		// create HTML
-		const forms = CreatetModalForm(inst.editor, params, this.relList);
+		const forms = CreatetModalForm(this.editor, params, this.relList);
 
 		// members
-		this.kink = inst.constructor.key || inst.constructor.name;
-		this.inst = inst;
 		this.host = (_w.location.origin + _w.location.pathname).replace(/\/$/, '');
 
 		/** @type {HTMLInputElement} */
@@ -123,7 +119,7 @@ class ModalAnchorEditor extends CoreInjector {
 					),
 				);
 			}
-			this.#selectMenu_rel = new SelectMenu(this, { checkList: true, position: 'right-middle', dir: 'ltr' });
+			this.#selectMenu_rel = new SelectMenu(this.editor, { checkList: true, position: 'right-middle', dir: 'ltr' });
 			this.#selectMenu_rel.on(this.relButton, this.#SetRelItem.bind(this));
 			this.#selectMenu_rel.create(list);
 			this.eventManager.addEvent(this.relButton, 'click', this.#OnClick_relbutton.bind(this));
@@ -132,7 +128,7 @@ class ModalAnchorEditor extends CoreInjector {
 		// init
 		this.#modalForm = /** @type {HTMLElement} */ (modalForm);
 		this.#modalForm.querySelector('.se-anchor-editor').appendChild(forms);
-		this.#selectMenu_bookmark = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
+		this.#selectMenu_bookmark = new SelectMenu(this.editor, { checkList: false, position: 'bottom-left', dir: 'ltr' });
 		this.#selectMenu_bookmark.on(this.urlInput, this.#SetHeaderBookmark.bind(this));
 		this.eventManager.addEvent(this.newWindowCheck, 'change', this.#OnChange_newWindowCheck.bind(this));
 		this.eventManager.addEvent(this.downloadCheck, 'change', this.#OnChange_downloadCheck.bind(this));

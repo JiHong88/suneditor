@@ -19,7 +19,7 @@ export class TableSelectionService {
 	 * @param {Node} startCell The first cell in the selection.
 	 * @param {Node} endCell The last cell in the selection.
 	 */
-	_setMultiCells(startCell: Node, endCell: Node): void;
+	setMultiCells(startCell: Node, endCell: Node): void;
 	/**
 	 * @description Selects cells in a table, handling single and multi-cell selection, and managing shift key behavior for extended selection.
 	 * @param {HTMLTableCellElement} tdElement The target table cell (`<td>`) element that is being selected.
@@ -39,7 +39,7 @@ export class TableSelectionService {
 	 * @description Focus cell
 	 * @param {HTMLElement} cell Target node
 	 */
-	_focusEdge(cell: HTMLElement): void;
+	focusCellEdge(cell: HTMLElement): void;
 	init(): void;
 	#private;
 }

@@ -1,13 +1,12 @@
-import Figure from '../../../../src/modules/contracts/Figure';
-import Controller from '../../../../src/modules/contracts/Controller';
-import SelectMenu from '../../../../src/modules/utils/SelectMenu';
-import { _DragHandle } from '../../../../src/modules/utils/_DragHandle';
+import Figure from '../../../../src/modules/contract/Figure';
+import Controller from '../../../../src/modules/contract/Controller';
+import { _DragHandle } from '../../../../src/modules/ui/_DragHandle';
 import { dom } from '../../../../src/helper';
 
 // Mock dependencies
-jest.mock('../../../../src/modules/contracts/Controller');
-jest.mock('../../../../src/modules/utils/SelectMenu');
-jest.mock('../../../../src/modules/utils/_DragHandle', () => ({
+jest.mock('../../../../src/modules/contract/Controller');
+jest.mock('../../../../src/modules/ui/SelectMenu');
+jest.mock('../../../../src/modules/ui/_DragHandle', () => ({
     _DragHandle: {
         get: jest.fn().mockReturnValue(() => {}),
         set: jest.fn()
@@ -487,11 +486,6 @@ describe('Figure', () => {
                  get: jest.fn(),
                  set: jest.fn()
              };
-             // We need to re-mock the module or use the existing mock structure
-             // The module mock at top of file:
-             // jest.mock('../../../../src/modules/utils/_DragHandle', () => ({ _DragHandle: { get: ..., set: ... } }));
-             // We can access it via import.
-             // import { _DragHandle } from ...
              
              _DragHandle.get.mockImplementation((key) => {
                  if (key === '__figureInst') return figure;

@@ -1,7 +1,7 @@
 import CoreInjector from '../../editorInjector/_core';
 import { dom, keyCodeMap } from '../../helper';
 import { _w } from '../../helper/env';
-import ApiManager from '../utils/ApiManager';
+import ApiManager from '../manager/ApiManager';
 
 /**
  * Browser file item structure

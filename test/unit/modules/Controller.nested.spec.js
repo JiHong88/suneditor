@@ -5,7 +5,7 @@
  * - parentsForm separation from parents array
  */
 
-import Controller from '../../../src/modules/contracts/Controller.js';
+import Controller from '../../../src/modules/contract/Controller.js';
 
 // Mock dependencies
 jest.mock('../../../src/editorInjector/_core.js', () => {

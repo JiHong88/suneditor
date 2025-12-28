@@ -1,5 +1,5 @@
 import { PluginDropdownFree } from '../../interfaces';
-import { ColorPicker } from '../../modules/contracts';
+import { ColorPicker } from '../../modules/contract';
 import { dom } from '../../helper';
 
 /**

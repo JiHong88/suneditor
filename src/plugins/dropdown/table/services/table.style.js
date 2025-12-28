@@ -1,10 +1,10 @@
 import { dom, numbers, converter, env } from '../../../../helper';
-import { SelectMenu } from '../../../../modules/utils';
+import { SelectMenu } from '../../../../modules/ui';
 
 import * as Constants from '../shared/table.constants';
 import { CreateBorderMenu, CreateBorderFormatMenu } from '../render/table.menu';
 import { CreateHTML_controller_properties } from '../render/table.html';
-import { ColorPicker, Controller } from '../../../../modules/contracts';
+import { ColorPicker, Controller } from '../../../../modules/contract';
 import { CreateCellsString } from '../shared/table.utils';
 
 const { _w } = env;
@@ -23,6 +23,7 @@ export class TableStyleService {
 	constructor(main, { pluginOptions, controller_table }) {
 		this.#main = main;
 		this.#state = main.state;
+		this.editor = main.editor;
 
 		this.sliderType = '';
 		/** @type {HTMLButtonElement} */
@@ -36,17 +37,15 @@ export class TableStyleService {
 		/** @type {HTMLButtonElement} */
 		this.captionButton = controller_table.querySelector('._se_table_caption');
 
-		const thisInst = { editor: this.#main.editor };
-
 		// props
 		const controller_props = CreateHTML_controller_properties(this.#main.editor);
 		const propsTargets = [this.#main.controller_table, this.#main.controller_cell];
-		this.controller_props = new Controller(thisInst, controller_props.html, { position: 'bottom', parents: propsTargets, isInsideForm: true });
+		this.controller_props = new Controller(this, controller_props.html, { position: 'bottom', parents: propsTargets, isInsideForm: true });
 		this.controller_props_title = controller_props.controller_props_title;
 
 		// color picker
 		const colorForm = dom.utils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
-		this.controller_colorPicker = new Controller(thisInst, colorForm, {
+		this.controller_colorPicker = new Controller(this, colorForm, {
 			position: 'bottom',
 			parents: [this.controller_props].concat(propsTargets),
 			isInsideForm: true,
@@ -57,7 +56,7 @@ export class TableStyleService {
 			},
 		});
 
-		this.colorPicker = new ColorPicker(thisInst, '', {
+		this.colorPicker = new ColorPicker(this, '', {
 			form: colorForm,
 			colorList: pluginOptions.colorList || Constants.DEFAULT_COLOR_LIST,
 			splitNum: 5,
@@ -68,19 +67,19 @@ export class TableStyleService {
 		// members - SelectMenu - properties - border style
 		const borderMenu = CreateBorderMenu();
 		const borderButton = controller_props.borderButton;
-		this.selectMenu_props_border = new SelectMenu(thisInst, { checkList: false, position: 'bottom-center' });
+		this.selectMenu_props_border = new SelectMenu(main.editor, { checkList: false, position: 'bottom-center' });
 		this.selectMenu_props_border.on(borderButton, this.#OnPropsBorderEdit.bind(this));
 		this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
 
 		// members - SelectMenu - properties - border format
 		const borderFormatMenu = CreateBorderFormatMenu(this.#main.lang, this.#main.icons, []);
 		const borderFormatButton = controller_props.borderFormatButton;
-		this.selectMenu_props_border_format = new SelectMenu(thisInst, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
+		this.selectMenu_props_border_format = new SelectMenu(main.editor, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
 		this.selectMenu_props_border_format.on(borderFormatButton, this.#OnPropsBorderFormatEdit.bind(this, 'all'));
 		this.selectMenu_props_border_format.create(borderFormatMenu.items, borderFormatMenu.menus);
 
 		const borderFormatMenu_oneCell = CreateBorderFormatMenu(this.#main.lang, this.#main.icons, Constants.BORDER_FORMAT_INSIDE);
-		this.selectMenu_props_border_format_oneCell = new SelectMenu(thisInst, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 6 });
+		this.selectMenu_props_border_format_oneCell = new SelectMenu(main.editor, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 6 });
 		this.selectMenu_props_border_format_oneCell.on(borderFormatButton, this.#OnPropsBorderFormatEdit.bind(this, 'outside'));
 		this.selectMenu_props_border_format_oneCell.create(borderFormatMenu_oneCell.items, borderFormatMenu_oneCell.menus);
 
@@ -112,6 +111,49 @@ export class TableStyleService {
 
 	get #selectionService() {
 		return this.#main.selectionService;
+	}
+
+	/**
+	 * @hook Modules.ColorPicker
+	 * @type {SunEditor.Hook.ColorPicker.Action}
+	 */
+	colorPickerAction(color) {
+		this.applyColorPicker(color);
+	}
+
+	/**
+	 * @hook Modules.Controller
+	 * @type {SunEditor.Hook.Controller.Action}
+	 */
+	controllerAction(target) {
+		const command = target.getAttribute('data-command');
+		if (!command) return;
+
+		const value = target.getAttribute('data-value');
+
+		switch (command) {
+			case 'props_onborder_format':
+				this.openBorderFormatMenu();
+				break;
+			case 'props_onborder_style':
+				this.openBorderStyleMenu();
+				break;
+			case 'props_onpalette':
+				this.openColorPalette(target, value);
+				break;
+			case 'props_font_style':
+				this.toggleFontStyle(value);
+				break;
+			case 'props_submit':
+				this.submitProps(target);
+				break;
+			case 'props_align':
+				this.setAlignProps(target.getAttribute('data-value'));
+				break;
+			case 'props_align_vertical':
+				this.setVerticalAlignProps(target.getAttribute('data-value'));
+				break;
+		}
 	}
 
 	openTableProps(target) {
@@ -453,7 +495,7 @@ export class TableStyleService {
 				this.#setBorderStyles(cells, borderFormat, borderCss);
 			}
 
-			this.#main._historyPush();
+			this.#main.historyPush();
 
 			// set cells style
 			this.controller_props.close();

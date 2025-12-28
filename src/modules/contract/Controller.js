@@ -1,6 +1,6 @@
 import CoreInjector from '../../editorInjector/_core';
 import { dom, env, keyCodeMap } from '../../helper';
-import { _DragHandle } from '../utils/_DragHandle';
+import { _DragHandle } from '../ui/_DragHandle';
 
 const { _w, isMobile, ON_OVER_COMPONENT } = env;
 const INDEX_00 = '2147483646';

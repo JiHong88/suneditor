@@ -1,7 +1,7 @@
 import { dom, numbers } from '../../../../helper';
-import { SelectMenu } from '../../../../modules/utils';
+import { SelectMenu } from '../../../../modules/ui';
 
-import { CloneTable, CreateCellsHTML } from '../shared/table.utils';
+import { CloneTable, CreateCellsHTML, InvalidateTableCache } from '../shared/table.utils';
 import { CreateSplitMenu } from '../render/table.menu';
 
 export class TableCellService {
@@ -28,7 +28,7 @@ export class TableCellService {
 
 		// members - SelectMenu - split
 		const splitMenu = CreateSplitMenu(this.#main.lang);
-		this.selectMenu_split = new SelectMenu({ editor: this.#main.editor }, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
+		this.selectMenu_split = new SelectMenu(main.editor, { checkList: false, position: 'bottom-center', openMethod: openCellMenuFunc, closeMethod: closeCellMenuFunc });
 		this.selectMenu_split.on(this.splitButton, this._OnSplitCells.bind(this));
 		this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 	}
@@ -49,12 +49,13 @@ export class TableCellService {
 	 */
 	mergeCells(selectedCells, skipPostProcess = false) {
 		const originTable = selectedCells[0].closest('table');
+		InvalidateTableCache(originTable);
 		const { clonedTable, clonedSelectedCells } = skipPostProcess ? { clonedTable: originTable, clonedSelectedCells: selectedCells } : CloneTable(originTable, selectedCells);
 
 		this.#main.setTableInfo(clonedTable);
 		selectedCells = clonedSelectedCells;
 		this.#main.setState('ref', null);
-		this.#selectionService._setMultiCells(selectedCells[0], dom.query.findVisualLastCell(selectedCells));
+		this.#selectionService.setMultiCells(selectedCells[0], dom.query.findVisualLastCell(selectedCells));
 
 		const ref = this.#state.ref;
 		const mergeCell = selectedCells[0];
@@ -127,10 +128,13 @@ export class TableCellService {
 		this.setMergeSplitButton();
 		this.#main._setController(mergeCell);
 
-		this.#selectionService._focusEdge(mergeCell);
+		this.#selectionService.focusCellEdge(mergeCell);
+		this.#selectionService.initCellSelection(mergeCell, false);
+
+		this.#main.setCellInfo(mergeCell, true);
 
 		// history push
-		this.#main._historyPush();
+		this.#main.historyPush();
 	}
 
 	/**
@@ -142,6 +146,7 @@ export class TableCellService {
 		if (!selectedCells?.length) return;
 
 		const originTable = selectedCells[0].closest('table');
+		InvalidateTableCache(originTable);
 		const { clonedTable, clonedSelectedCells } = skipPostProcess ? { clonedTable: originTable, clonedSelectedCells: selectedCells } : CloneTable(originTable, selectedCells);
 
 		this.#main.setState('ref', null);
@@ -200,7 +205,7 @@ export class TableCellService {
 		// set info
 		if (firstCell !== lastCell) {
 			lastCell = !newLastCell || lastCell.closest('tr').rowIndex > newLastCell.closest('tr').rowIndex || lastCell.cellIndex > newLastCell.cellIndex ? lastCell : newLastCell;
-			this.#selectionService._setMultiCells(firstCell, lastCell);
+			this.#selectionService.setMultiCells(firstCell, lastCell);
 			this.#main.setState('selectedCells', Array.from(table.querySelectorAll('.se-selected-table-cell')));
 		} else {
 			this.#main.setCellInfo(lastCell, true);
@@ -214,7 +219,7 @@ export class TableCellService {
 		this.#main.controller_cell.resetPosition(lastCell);
 
 		// history push
-		this.#main._historyPush();
+		this.#main.historyPush();
 	}
 
 	/**
@@ -261,6 +266,8 @@ export class TableCellService {
 	 * @param {"vertical"|"horizontal"} direction The direction to split the cell.
 	 */
 	_OnSplitCells(direction) {
+		InvalidateTableCache(this.#main._element);
+
 		const vertical = direction === 'vertical';
 		const currentCell = this.#state.tdElement;
 		const rows = this.#state.trElements;
@@ -431,7 +438,7 @@ export class TableCellService {
 		}
 
 		this.selectMenu_split.close();
-		this.#selectionService._focusEdge(currentCell);
+		this.#selectionService.focusCellEdge(currentCell);
 
 		this.#selectionService.deleteStyleSelectedCells();
 		this.#main.history.push(false);

@@ -1,5 +1,5 @@
 import { PluginModal } from '../../interfaces';
-import { Modal, Figure } from '../../modules/contracts';
+import { Modal, Figure } from '../../modules/contract';
 import { dom, numbers, env, keyCodeMap } from '../../helper';
 const { _w, NO_EVENT } = env;
 

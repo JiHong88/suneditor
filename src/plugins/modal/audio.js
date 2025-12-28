@@ -1,6 +1,7 @@
 import { PluginModal } from '../../interfaces';
-import { Modal, Controller, Figure } from '../../modules/contracts';
-import { FileManager, _DragHandle } from '../../modules/utils';
+import { Modal, Controller, Figure } from '../../modules/contract';
+import { FileManager } from '../../modules/manager';
+import { _DragHandle } from '../../modules/ui';
 import { dom, numbers, env } from '../../helper';
 const { NO_EVENT, ON_OVER_COMPONENT } = env;
 

@@ -1,5 +1,5 @@
 import { PluginPopup } from '../../interfaces';
-import { Controller } from '../../modules/contracts';
+import { Controller } from '../../modules/contract';
 import { dom, env } from '../../helper';
 
 const { _w } = env;

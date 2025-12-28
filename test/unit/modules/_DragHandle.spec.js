@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for modules/_DragHandle.js
  */
 
-import { _DragHandle } from '../../../src/modules/utils/_DragHandle.js';
+import { _DragHandle } from '../../../src/modules/ui/_DragHandle.js';
 
 describe('Modules - _DragHandle', () => {
     describe('_DragHandle Map', () => {

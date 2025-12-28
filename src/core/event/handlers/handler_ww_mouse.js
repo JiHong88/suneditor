@@ -1,5 +1,5 @@
 import { dom, env } from '../../../helper';
-import { _DragHandle } from '../../../modules/utils';
+import { _DragHandle } from '../../../modules/ui';
 
 const { _w } = env;
 

@@ -10,7 +10,7 @@ const mockBrowser = {
     close: jest.fn()
 };
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
     Browser: jest.fn().mockImplementation(() => mockBrowser)
 }));
 
@@ -109,7 +109,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
             new FileBrowser(mockEditor, pluginOptions);
 
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
 
             expect(browserOptions.thumbnail).toBe(thumbnailFn);
@@ -118,7 +118,7 @@ describe('Plugins - Browser - FileBrowser', () => {
         it('should use default thumbnail mapping when no thumbnail function provided', () => {
             new FileBrowser(mockEditor, {});
 
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
 
             // Test thumbnail mapping
@@ -135,7 +135,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
             new FileBrowser(mockEditor, pluginOptions);
 
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
 
             expect(browserOptions.props).toEqual(expect.arrayContaining(['custom1', 'custom2', 'frame']));
@@ -144,7 +144,7 @@ describe('Plugins - Browser - FileBrowser', () => {
         it('should handle empty props', () => {
             new FileBrowser(mockEditor, {});
 
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const browserOptions = Browser.mock.calls[Browser.mock.calls.length - 1][1];
 
             expect(browserOptions.props).toEqual(['frame']);
@@ -195,7 +195,7 @@ describe('Plugins - Browser - FileBrowser', () => {
                 fileBrowser.open(customHandler);
 
                 // Get the selectorHandler from Browser constructor
-                const browserConstructorCall = require('../../../../src/modules/contracts').Browser.mock.calls[0];
+                const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
                 const browserOptions = browserConstructorCall[1];
                 const selectorHandler = browserOptions.selectorHandler;
 
@@ -211,7 +211,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
             beforeEach(() => {
                 fileBrowser.open();
-                const browserConstructorCall = require('../../../../src/modules/contracts').Browser.mock.calls[0];
+                const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
                 const browserOptions = browserConstructorCall[1];
                 selectorHandler = browserOptions.selectorHandler;
             });
@@ -286,7 +286,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
     describe('Browser integration', () => {
         it('should create Browser with correct options', () => {
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const constructorCall = Browser.mock.calls[0];
 
             expect(constructorCall[0]).toBe(fileBrowser); // instance
@@ -309,7 +309,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
             new FileBrowser(mockEditor, pluginOptions);
 
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const lastCall = Browser.mock.calls[Browser.mock.calls.length - 1];
             const browserOptions = lastCall[1];
 
@@ -342,7 +342,7 @@ describe('Plugins - Browser - FileBrowser', () => {
 
             fileBrowser.open();
 
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const browserOptions = Browser.mock.calls[0][1];
             const selectorHandler = browserOptions.selectorHandler;
 

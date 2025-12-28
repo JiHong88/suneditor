@@ -10,7 +10,7 @@ const mockBrowser = {
     close: jest.fn()
 };
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
     Browser: jest.fn().mockImplementation(() => mockBrowser)
 }));
 
@@ -143,7 +143,7 @@ describe('Plugins - Browser - ImageGallery', () => {
 
                 // Simulate item selection by calling the internal handler
                 // We need to access the private method indirectly
-                const browserConstructorCall = require('../../../../src/modules/contracts').Browser.mock.calls[0];
+                const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
                 const browserOptions = browserConstructorCall[1];
                 const selectorHandler = browserOptions.selectorHandler;
 
@@ -168,7 +168,7 @@ describe('Plugins - Browser - ImageGallery', () => {
                 imageGallery.open();
 
                 // Get the selectorHandler from Browser constructor
-                const browserConstructorCall = require('../../../../src/modules/contracts').Browser.mock.calls[0];
+                const browserConstructorCall = require('../../../../src/modules/contract').Browser.mock.calls[0];
                 const browserOptions = browserConstructorCall[1];
                 const selectorHandler = browserOptions.selectorHandler;
 
@@ -191,7 +191,7 @@ describe('Plugins - Browser - ImageGallery', () => {
 
     describe('Browser integration', () => {
         it('should create Browser with correct options', () => {
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const constructorCall = Browser.mock.calls[0];
 
             expect(constructorCall[0]).toBe(imageGallery); // instance
@@ -212,7 +212,7 @@ describe('Plugins - Browser - ImageGallery', () => {
 
             new ImageGallery(mockEditor, pluginOptions);
 
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const lastCall = Browser.mock.calls[Browser.mock.calls.length - 1];
             const browserOptions = lastCall[1];
 
@@ -250,7 +250,7 @@ describe('Plugins - Browser - ImageGallery', () => {
 
             imageGallery.open();
 
-            const { Browser } = require('../../../../src/modules/contracts');
+            const { Browser } = require('../../../../src/modules/contract');
             const browserOptions = Browser.mock.calls[0][1];
             const selectorHandler = browserOptions.selectorHandler;
 

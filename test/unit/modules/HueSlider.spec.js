@@ -42,7 +42,7 @@ jest.mock('../../../src/editorInjector/_core.js', () => {
 });
 
 // Mock Controller
-jest.mock('../../../src/modules/contracts/Controller.js', () => {
+jest.mock('../../../src/modules/contract/Controller.js', () => {
 	return jest.fn().mockImplementation(function(inst, form, options) {
 		this.open = jest.fn();
 		this.close = jest.fn();
@@ -138,7 +138,7 @@ jest.mock('../../../src/helper', () => {
 	};
 });
 
-import HueSlider, { CreateSliderCtx } from '../../../src/modules/contracts/HueSlider.js';
+import HueSlider, { CreateSliderCtx } from '../../../src/modules/contract/HueSlider.js';
 
 describe('Modules - HueSlider', () => {
 	let mockInst;

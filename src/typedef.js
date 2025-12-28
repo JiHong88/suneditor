@@ -120,18 +120,18 @@
 
 // --------------------------------------------------------- [Module Types - Cross-module Public API] ---------------------------------------------------------------------------------------------------
 /**
- * @typedef {import('./modules/contracts/Controller').ControllerInfo} SunEditor.Module.Controller.Info
+ * @typedef {import('./modules/contract/Controller').ControllerInfo} SunEditor.Module.Controller.Info
  *
- * @typedef {import('./modules/contracts/Figure').FigureInfo} SunEditor.Module.Figure.Info
- * @typedef {import('./modules/contracts/Figure').FigureTargetInfo} SunEditor.Module.Figure.TargetInfo
- * @typedef {import('./modules/contracts/Figure').FigureControlButton} SunEditor.Module.Figure.ControlButton
- * @typedef {import('./modules/contracts/Figure').FigureControlResize} SunEditor.Module.Figure.ControlResize
- * @typedef {import('./modules/contracts/Figure').ControlCustomAction} SunEditor.Module.Figure.ControlCustomAction
- * @typedef {import('./modules/contracts/Figure').FigureControls} SunEditor.Module.Figure.Controls
+ * @typedef {import('./modules/contract/Figure').FigureInfo} SunEditor.Module.Figure.Info
+ * @typedef {import('./modules/contract/Figure').FigureTargetInfo} SunEditor.Module.Figure.TargetInfo
+ * @typedef {import('./modules/contract/Figure').FigureControlButton} SunEditor.Module.Figure.ControlButton
+ * @typedef {import('./modules/contract/Figure').FigureControlResize} SunEditor.Module.Figure.ControlResize
+ * @typedef {import('./modules/contract/Figure').ControlCustomAction} SunEditor.Module.Figure.ControlCustomAction
+ * @typedef {import('./modules/contract/Figure').FigureControls} SunEditor.Module.Figure.Controls
  *
- * @typedef {import('./modules/contracts/Browser').BrowserFile} SunEditor.Module.Browser.File
+ * @typedef {import('./modules/contract/Browser').BrowserFile} SunEditor.Module.Browser.File
  *
- * @typedef {import('./modules/contracts/HueSlider').HueSliderColor} SunEditor.Module.HueSlider.Color
+ * @typedef {import('./modules/contract/HueSlider').HueSliderColor} SunEditor.Module.HueSlider.Color
  */
 
 // --------------------------------------------------------- [Plugin Hook Types] ---------------------------------------------------------------------------------------------------

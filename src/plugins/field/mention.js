@@ -1,6 +1,7 @@
 import { PluginField } from '../../interfaces';
-import { Controller } from '../../modules/contracts';
-import { ApiManager, SelectMenu } from '../../modules/utils';
+import { Controller } from '../../modules/contract';
+import { ApiManager } from '../../modules/manager';
+import { SelectMenu } from '../../modules/ui';
 import { dom, converter } from '../../helper';
 
 const { debounce } = converter;
@@ -59,7 +60,7 @@ class Mention extends PluginField {
 
 		// controller
 		const controllerEl = CreateHTML_controller();
-		this.selectMenu = new SelectMenu(this, { position: 'right-bottom', dir: 'ltr', closeMethod: () => this.controller.close() });
+		this.selectMenu = new SelectMenu(this.editor, { position: 'right-bottom', dir: 'ltr', closeMethod: () => this.controller.close() });
 		this.controller = new Controller(
 			this,
 			controllerEl,

@@ -42,7 +42,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -69,18 +69,21 @@ jest.mock('../../../../src/modules/contracts', () => ({
 	}))
 }));
 
-jest.mock('../../../../src/modules/utils', () => ({
+jest.mock('../../../../src/modules/manager', () => ({
 	FileManager: jest.fn().mockImplementation(() => ({
 		getSize: jest.fn().mockReturnValue(0),
 		upload: jest.fn(),
 		setFileData: jest.fn()
-	})),
+	}))
+}));
+
+jest.mock('../../../../src/modules/ui', () => ({
 	_DragHandle: { get: jest.fn().mockReturnValue({ style: {} }) }
 }));
 
 // Add static methods to modules
-const mockModal = require('../../../../src/modules/contracts').Modal;
-const mockFigure = require('../../../../src/modules/contracts').Figure;
+const mockModal = require('../../../../src/modules/contract').Modal;
+const mockFigure = require('../../../../src/modules/contract').Figure;
 
 // Add static methods to Modal
 Object.assign(mockModal, {
@@ -430,7 +433,7 @@ describe('Audio Plugin', () => {
 
 		it('should handle copy command', () => {
 			mockTarget.getAttribute.mockReturnValue('copy');
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 			mockFigure.GetContainer.mockReturnValue({
 				container: { nodeType: 1 }
 			});
@@ -600,7 +603,7 @@ describe('Audio Plugin', () => {
 			audio.selection = {
 				setRange: jest.fn()
 			};
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 			mockFigure.CreateContainer.mockReturnValue({
 				container: { nodeType: 1 }
 			});
@@ -670,7 +673,7 @@ describe('Audio Plugin', () => {
 		});
 
 		it('should process element without valid container', () => {
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 			mockFigure.GetContainer.mockReturnValue({ container: null, cover: null });
 			mockFigure.CreateContainer.mockReturnValue({
 				container: { nodeType: 1 }
@@ -693,7 +696,7 @@ describe('Audio Plugin', () => {
 		});
 
 		it('should skip processing for already contained element', () => {
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 			mockFigure.GetContainer.mockReturnValue({
 				container: { nodeType: 1 },
 				cover: { nodeType: 1 }

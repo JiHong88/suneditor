@@ -176,7 +176,7 @@ jest.mock('../../../src/helper', () => {
     };
 });
 
-jest.mock('../../../src/modules/contracts', () => ({
+jest.mock('../../../src/modules/contract', () => ({
     HueSlider: jest.fn().mockImplementation(function() {
         this.get = jest.fn().mockReturnValue({ hex: '#ff0000', r: 255, g: 0, b: 0 });
         this.open = jest.fn();
@@ -186,7 +186,7 @@ jest.mock('../../../src/modules/contracts', () => ({
     })
 }));
 
-import ColorPicker from '../../../src/modules/contracts/ColorPicker.js';
+import ColorPicker from '../../../src/modules/contract/ColorPicker.js';
 
 describe('Modules - ColorPicker', () => {
     let mockInst;

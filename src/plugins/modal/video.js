@@ -1,6 +1,6 @@
 import { PluginModal } from '../../interfaces';
-import { Modal, Figure } from '../../modules/contracts';
-import { FileManager } from '../../modules/utils';
+import { Modal, Figure } from '../../modules/contract';
+import { FileManager } from '../../modules/manager';
 import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
 const { _w, NO_EVENT } = env;
 

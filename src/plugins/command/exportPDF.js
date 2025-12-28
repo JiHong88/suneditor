@@ -1,6 +1,6 @@
 import { PluginCommand } from '../../interfaces';
 import { dom, env } from '../../helper';
-import { ApiManager } from '../../modules/utils';
+import { ApiManager } from '../../modules/manager';
 
 const { _w, _d } = env;
 

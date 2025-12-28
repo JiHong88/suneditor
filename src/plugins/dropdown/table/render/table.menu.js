@@ -1,5 +1,5 @@
 import { dom } from '../../../../helper';
-import { _DragHandle } from '../../../../modules/utils';
+import { _DragHandle } from '../../../../modules/ui';
 import { BORDER_LIST, BORDER_FORMATS } from '../shared/table.constants';
 
 export function CreateSplitMenu(lang) {

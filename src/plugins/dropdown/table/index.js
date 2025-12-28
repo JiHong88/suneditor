@@ -1,10 +1,10 @@
 import { PluginDropdownFree } from '../../../interfaces';
 import { dom, numbers, env, keyCodeMap } from '../../../helper';
-import { Controller, Figure } from '../../../modules/contracts';
-import { _DragHandle } from '../../../modules/utils';
+import { Controller, Figure } from '../../../modules/contract';
+import { _DragHandle } from '../../../modules/ui';
 
 import * as Constants from './shared/table.constants';
-import { CreateCellsString, GetMaxColumns, IsResizeEls } from './shared/table.utils';
+import { CreateCellsString, GetMaxColumns, IsResizeEls, IsTableCaption, GetLogicalCellIndex } from './shared/table.utils';
 import { CreateHTML, CreateHTML_controller_table, CreateHTML_controller_cell } from './render/table.html';
 
 import TableCellService from './services/table.cell';
@@ -409,7 +409,14 @@ class Table extends PluginDropdownFree {
 	onMouseDown({ event }) {
 		this.setState('ref', null);
 		this.setState('selectedCell', null);
+
 		const eventTarget = dom.query.getEventTarget(event);
+
+		if (this._element && dom.query.getParentElement(eventTarget, IsTableCaption)) {
+			this._closeController();
+			return;
+		}
+
 		const target = /** @type {HTMLTableCellElement} */ (dom.query.getParentElement(eventTarget, IsResizeEls));
 		if (!target) return;
 
@@ -554,14 +561,6 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @hook Modules.ColorPicker
-	 * @type {SunEditor.Hook.ColorPicker.Action}
-	 */
-	colorPickerAction(color) {
-		this.styleService.applyColorPicker(color);
-	}
-
-	/**
 	 * @hook Modules.Controller
 	 * @type {SunEditor.Hook.Controller.Action}
 	 */
@@ -569,16 +568,14 @@ class Table extends PluginDropdownFree {
 		const command = target.getAttribute('data-command');
 		if (!command) return;
 
-		const value = target.getAttribute('data-value');
-
 		switch (command) {
 			case 'header':
 				this.styleService.toggleHeader();
-				this._historyPush();
+				this.historyPush();
 				break;
 			case 'caption':
 				this.styleService.toggleCaption();
-				this._historyPush();
+				this.historyPush();
 				break;
 			case 'onsplit':
 				this.cellService.openSplitMenu();
@@ -595,31 +592,10 @@ class Table extends PluginDropdownFree {
 			case 'openCellProperties':
 				this.styleService.openCellProps(target);
 				break;
-			case 'props_onborder_format':
-				this.styleService.openBorderFormatMenu();
-				break;
-			case 'props_onborder_style':
-				this.styleService.openBorderStyleMenu();
-				break;
-			case 'props_onpalette':
-				this.styleService.openColorPalette(target, value);
-				break;
-			case 'props_font_style':
-				this.styleService.toggleFontStyle(value);
-				break;
-			case 'props_submit':
-				this.styleService.submitProps(target);
-				break;
 			case 'revert': {
 				this.styleService.revertProps();
 				break;
 			}
-			case 'props_align':
-				this.styleService.setAlignProps(target.getAttribute('data-value'));
-				break;
-			case 'props_align_vertical':
-				this.styleService.setVerticalAlignProps(target.getAttribute('data-value'));
-				break;
 			case 'merge':
 				this.cellService.mergeCells(this.state.selectedCells);
 				break;
@@ -629,7 +605,7 @@ class Table extends PluginDropdownFree {
 			case 'resize':
 				this.#maxWidth = !this.#maxWidth;
 				this.styleService.setTableLayout('width', this.#maxWidth, this.#fixedColumn, false);
-				this._historyPush();
+				this.historyPush();
 				_w.setTimeout(() => {
 					this.component.select(this._element, Table.key, { isInput: true });
 				}, 0);
@@ -637,7 +613,7 @@ class Table extends PluginDropdownFree {
 			case 'layout':
 				this.#fixedColumn = !this.#fixedColumn;
 				this.styleService.setTableLayout('column', this.#maxWidth, this.#fixedColumn, false);
-				this._historyPush();
+				this.historyPush();
 				_w.setTimeout(() => {
 					this.component.select(this._element, Table.key, { isInput: true });
 				}, 0);
@@ -651,11 +627,11 @@ class Table extends PluginDropdownFree {
 		}
 
 		// [close_props]
-		if (!/(^props_|^revert|Properties$)/.test(command)) {
+		if (!/(^revert|Properties$)/.test(command)) {
 			this.styleService.closeProps();
 		}
 
-		if (!/^(remove|props_|on|open|merge)/.test(command)) {
+		if (!/^(remove|on|open|merge)/.test(command)) {
 			this._setCellControllerPosition(this.state.tdElement, this.state.isShiftPressed);
 		}
 	}
@@ -710,68 +686,9 @@ class Table extends PluginDropdownFree {
 			this.setState('current_colSpan', this.state.tdElement.colSpan - 1);
 			this.setState('current_rowSpan', this.state.trElement.cells[cellIndex].rowSpan - 1);
 
-			// find logcal cell index
-			let rowSpanArr = [];
-			let spanIndex = [];
-			for (let i = 0, cells, colSpan; i <= rowIndex; i++) {
-				cells = rows[i].cells;
-				colSpan = 0;
-				for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
-					cell = cells[c];
-					cs = cell.colSpan - 1;
-					rs = cell.rowSpan - 1;
-					logcalIndex = c + colSpan;
-
-					if (spanIndex.length > 0) {
-						for (let r = 0, arr; r < spanIndex.length; r++) {
-							arr = spanIndex[r];
-							if (arr.row > i) continue;
-							if (logcalIndex >= arr.index) {
-								colSpan += arr.cs;
-								logcalIndex += arr.cs;
-								arr.rs -= 1;
-								arr.row = i + 1;
-								if (arr.rs < 1) {
-									spanIndex.splice(r, 1);
-									r--;
-								}
-							} else if (c === cLen - 1) {
-								arr.rs -= 1;
-								arr.row = i + 1;
-								if (arr.rs < 1) {
-									spanIndex.splice(r, 1);
-									r--;
-								}
-							}
-						}
-					}
-
-					// logcal cell index
-					if (i === rowIndex && c === cellIndex) {
-						this.setState('logical_cellIndex', logcalIndex);
-						break;
-					}
-
-					if (rs > 0) {
-						rowSpanArr.push({
-							index: logcalIndex,
-							cs: cs + 1,
-							rs: rs,
-							row: -1,
-						});
-					}
-
-					colSpan += cs;
-				}
-
-				spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {
-					return a.index - b.index;
-				});
-				rowSpanArr = [];
-			}
-
-			rowSpanArr = null;
-			spanIndex = null;
+			// find logcal cell index (memoized)
+			const logicalIndex = GetLogicalCellIndex(table, tdElement, rowIndex, cellIndex);
+			this.setState('logical_cellIndex', logicalIndex);
 		}
 	}
 
@@ -817,6 +734,15 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
+	 * @description Adds a new entry to the history stack.
+	 */
+	historyPush() {
+		this.selectionService.deleteStyleSelectedCells();
+		this.history.push(false);
+		this.selectionService.recallStyleSelectedCells();
+	}
+
+	/**
 	 * @internal
 	 * @description Sets the controller position for a cell.
 	 * @param {HTMLTableCellElement} tdElement - The target table cell.
@@ -848,16 +774,6 @@ class Table extends PluginDropdownFree {
 	}
 
 	/**
-	 * @internal
-	 * @description Adds a new entry to the history stack.
-	 */
-	_historyPush() {
-		this.selectionService.deleteStyleSelectedCells();
-		this.history.push(false);
-		this.selectionService.recallStyleSelectedCells();
-	}
-
-	/**
 	 * @description Enables or disables editor mode.
 	 * @param {boolean} enabled Whether to enable or disable the editor.
 	 */
@@ -872,8 +788,8 @@ class Table extends PluginDropdownFree {
 	 * @description Closes table-related controllers.
 	 */
 	_closeController() {
-		this.controller_table.close();
-		this.controller_cell.close();
+		this.controller_table.close(true);
+		this.controller_cell.close(true);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 import { dom } from '../../../../helper';
-import { CloneTable } from '../shared/table.utils';
+import { CloneTable, InvalidateTableCache } from '../shared/table.utils';
 
 /**
  * @description Table clipboard service for handling copy and paste operations within tables.
@@ -116,6 +116,8 @@ export class TableClipboardService {
 	 */
 	pasteTableCellMatrix(copyTable, targetTD) {
 		if (!copyTable || !targetTD) return;
+
+		InvalidateTableCache(targetTD.closest('table'));
 
 		// --- copy info ---
 		const copyRows = copyTable.rows;
@@ -401,10 +403,10 @@ export class TableClipboardService {
 		// update button state
 		this.#cellService.setMergeSplitButton();
 		this.#cellService.setUnMergeButton();
-		this.#selectionService._focusEdge(selectedCells[0]);
+		this.#selectionService.focusCellEdge(selectedCells[0]);
 
 		// history push
-		this.#main._historyPush();
+		this.#main.historyPush();
 
 		return selectedCells;
 	}

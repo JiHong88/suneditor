@@ -1,4 +1,4 @@
-import Controller from '../../../../src/modules/contracts/Controller';
+import Controller from '../../../../src/modules/contract/Controller';
 import { dom } from '../../../../src/helper';
 
 describe('Controller', () => {

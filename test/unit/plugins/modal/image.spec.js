@@ -47,7 +47,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -83,12 +83,15 @@ jest.mock('../../../../src/modules/contracts', () => ({
 	}))
 }));
 
-jest.mock('../../../../src/modules/utils', () => ({
+jest.mock('../../../../src/modules/manager', () => ({
 	FileManager: jest.fn().mockImplementation(() => ({
 		getSize: jest.fn().mockReturnValue(0),
 		upload: jest.fn(),
 		setFileData: jest.fn()
-	})),
+	}))
+}));
+
+jest.mock('../../../../src/modules/ui', () => ({
 	ModalAnchorEditor: jest.fn().mockImplementation(() => ({
 		on: jest.fn(),
 		init: jest.fn(),
@@ -101,8 +104,8 @@ jest.mock('../../../../src/modules/utils', () => ({
 }));
 
 // Add static methods to modules
-const mockModal = require('../../../../src/modules/contracts').Modal;
-const mockFigure = require('../../../../src/modules/contracts').Figure;
+const mockModal = require('../../../../src/modules/contract').Modal;
+const mockFigure = require('../../../../src/modules/contract').Figure;
 
 // Add static methods to Modal
 Object.assign(mockModal, {
@@ -588,7 +591,7 @@ describe('Image Plugin', () => {
 			image.captionCheckEl = { checked: false };
 			image.inputX = { value: '300px' };
 			image.inputY = { value: '200px' };
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 			mockFigure.CreateContainer.mockReturnValue({
 				container: { nodeType: 1 },
 				cover: { nodeType: 1, appendChild: jest.fn(), insertBefore: jest.fn() }
@@ -608,7 +611,7 @@ describe('Image Plugin', () => {
 		it('should create image with caption when checked', () => {
 			image.captionCheckEl.checked = true;
 			const file = { name: 'test.jpg', size: 1000 };
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 
 			image.create('https://example.com/image.jpg', null, '300px', '200px', 'center', file, 'Test image', true);
 
@@ -626,7 +629,7 @@ describe('Image Plugin', () => {
 			};
 			image.inputX = { value: '300px' };
 			image.inputY = { value: '200px' };
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 			mockFigure.CreateInlineContainer.mockReturnValue({
 				container: { nodeType: 1 }
 			});
@@ -660,7 +663,7 @@ describe('Image Plugin', () => {
 		it('should process image element when method is called', () => {
 			const result = image.retainFormat();
 			const mockElement = { nodeName: 'IMG', src: 'test.jpg', style: {}, removeAttribute: jest.fn() };
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 			
 			// Mock GetContainer to return nothing so it proceeds
 			mockFigure.GetContainer.mockReturnValue(null);
@@ -673,7 +676,7 @@ describe('Image Plugin', () => {
 		it('should not process if already in a figure container', () => {
 			const result = image.retainFormat();
 			const mockElement = { nodeName: 'IMG', style: {} };
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 			
 			mockFigure.GetContainer.mockReturnValue({ container: {}, cover: {} });
 			
@@ -732,7 +735,7 @@ describe('Image Plugin', () => {
             
             // Invoke modalOn to set #linkValue
             // Mock cover.getAttribute to return url
-            const mockFigure = require('../../../../src/modules/contracts').Figure;
+            const mockFigure = require('../../../../src/modules/contract').Figure;
             // The cover object returned by figure.open is created in beforeEach of spec file?
             // "Figure: jest.fn().mockImplementation(() => ({ open: jest.fn().mockReturnValue({ ... cover ... }) }))"
             // We can't access that specific instance easily unless we spy or assume.

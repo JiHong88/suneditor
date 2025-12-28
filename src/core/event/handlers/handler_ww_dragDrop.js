@@ -1,5 +1,5 @@
 import { dom } from '../../../helper';
-import { _DragHandle } from '../../../modules/utils';
+import { _DragHandle } from '../../../modules/ui';
 
 /**
  * @typedef {import('../eventManager').default} EventManagerThis_handler_ww_dragDrop

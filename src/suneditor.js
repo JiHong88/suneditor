@@ -1,15 +1,21 @@
+/**
+ * @warning "suneditor.js", "cdn-builder.js", "format-index.cjs" must be modified together.
+ */
+
 import Editor from './core/editor';
 
 import plugins from './plugins';
-import * as moduleContracts from './modules/contracts';
-import * as moduleUtils from './modules/utils';
+import * as moduleContract from './modules/contract';
+import * as moduleManager from './modules/manager';
+import * as moduleUI from './modules/ui';
 import helper from './helper';
 import langs from './langs';
 import * as interfaces from './interfaces';
 
 const modules = {
-	contracts: moduleContracts,
-	utils: moduleUtils,
+	contract: moduleContract,
+	manager: moduleManager,
+	ui: moduleUI,
 };
 
 /**

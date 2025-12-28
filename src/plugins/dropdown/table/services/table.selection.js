@@ -1,4 +1,16 @@
 import { dom, numbers, env } from '../../../../helper';
+import { refCache } from '../shared/table.utils';
+
+/**
+ * @param {HTMLTableCellElement} startCell
+ * @param {HTMLTableCellElement} endCell
+ * @returns {string}
+ */
+function getCacheKey(startCell, endCell) {
+	const startRow = /** @type {HTMLTableRowElement} */ (startCell.parentNode);
+	const endRow = /** @type {HTMLTableRowElement} */ (endCell.parentNode);
+	return `${startRow.rowIndex},${startCell.cellIndex}-${endRow.rowIndex},${endCell.cellIndex}`;
+}
 
 export class TableSelectionService {
 	#main;
@@ -50,7 +62,7 @@ export class TableSelectionService {
 
 		this.#fixedCellName = firstCell.nodeName;
 
-		this._setMultiCells(firstCell, lastCell);
+		this.setMultiCells(firstCell, lastCell);
 
 		return {
 			fixedCell: firstCell,
@@ -64,8 +76,9 @@ export class TableSelectionService {
 	 * @param {Node} startCell The first cell in the selection.
 	 * @param {Node} endCell The last cell in the selection.
 	 */
-	_setMultiCells(startCell, endCell) {
-		const rows = this.#state.selectedTable.rows;
+	setMultiCells(startCell, endCell) {
+		const table = this.#state.selectedTable;
+		const rows = table.rows;
 		this.deleteStyleSelectedCells();
 
 		dom.utils.addClass(startCell, 'se-selected-table-cell');
@@ -74,11 +87,43 @@ export class TableSelectionService {
 			return;
 		}
 
+		// try cache
+		const cacheKey = getCacheKey(/** @type {HTMLTableCellElement} */ (startCell), /** @type {HTMLTableCellElement} */ (endCell));
+		let tableCache = refCache.get(table);
+		const cachedRef = tableCache?.get(cacheKey);
+
+		if (cachedRef) {
+			this.#main.setState('ref', cachedRef);
+			this.#applySelectionStyles(rows, cachedRef);
+			return;
+		}
+
+		// calculate ref
+		const ref = this.#calculateRef(rows, startCell, endCell);
+		this.#main.setState('ref', ref);
+
+		// cache ref
+		if (!tableCache) {
+			tableCache = new Map();
+			refCache.set(table, tableCache);
+		}
+		tableCache.set(cacheKey, ref);
+
+		// apply styles
+		this.#applySelectionStyles(rows, ref);
+	}
+
+	/**
+	 * @param {HTMLCollectionOf<HTMLTableRowElement>} rows
+	 * @param {Node} startCell
+	 * @param {Node} endCell
+	 * @returns {{_i: number, cs: number|null, ce: number|null, rs: number|null, re: number|null}}
+	 */
+	#calculateRef(rows, startCell, endCell) {
 		let findSelectedCell = true;
 		let spanIndex = [];
 		let rowSpanArr = [];
 		const ref = { _i: 0, cs: null, ce: null, rs: null, re: null };
-		this.#main.setState('ref', ref);
 
 		for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
 			cells = rows[i].cells;
@@ -130,24 +175,89 @@ export class TableSelectionService {
 						i = -1;
 						break;
 					}
-				} else if (numbers.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) && numbers.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)) {
+				} else {
 					const newCs = ref.cs < logcalIndex ? ref.cs : logcalIndex;
 					const newCe = ref.ce > logcalIndex + cs ? ref.ce : logcalIndex + cs;
 					const newRs = ref.rs < i ? ref.rs : i;
 					const newRe = ref.re > i + rs ? ref.re : i + rs;
 
-					if (ref.cs !== newCs || ref.ce !== newCe || ref.rs !== newRs || ref.re !== newRe) {
-						ref.cs = newCs;
-						ref.ce = newCe;
-						ref.rs = newRs;
-						ref.re = newRe;
-						i = -1;
+					if (numbers.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) && numbers.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)) {
+						if (ref.cs !== newCs || ref.ce !== newCe || ref.rs !== newRs || ref.re !== newRe) {
+							ref.cs = newCs;
+							ref.ce = newCe;
+							ref.rs = newRs;
+							ref.re = newRe;
+							i = -1;
 
-						spanIndex = [];
-						rowSpanArr = [];
-						break;
+							spanIndex = [];
+							rowSpanArr = [];
+							break;
+						}
 					}
+				}
 
+				if (rs > 0) {
+					rowSpanArr.push({
+						index: logcalIndex,
+						cs: cs + 1,
+						rs: rs,
+						row: -1,
+					});
+				}
+
+				colSpan += cell.colSpan - 1;
+			}
+
+			spanIndex = spanIndex.concat(rowSpanArr).sort((a, b) => a.index - b.index);
+			rowSpanArr = [];
+		}
+
+		return ref;
+	}
+
+	/**
+	 * @param {HTMLCollectionOf<HTMLTableRowElement>} rows
+	 * @param {{cs: number|null, ce: number|null, rs: number|null, re: number|null}} ref
+	 */
+	#applySelectionStyles(rows, ref) {
+		let spanIndex = [];
+		let rowSpanArr = [];
+
+		for (let i = 0, len = rows.length, cells, colSpan; i < len; i++) {
+			cells = rows[i].cells;
+			colSpan = 0;
+
+			for (let c = 0, cLen = cells.length, cell, logcalIndex, cs, rs; c < cLen; c++) {
+				cell = cells[c];
+				cs = cell.colSpan - 1;
+				rs = cell.rowSpan - 1;
+				logcalIndex = c + colSpan;
+
+				if (spanIndex.length > 0) {
+					for (let r = 0, arr; r < spanIndex.length; r++) {
+						arr = spanIndex[r];
+						if (arr.row > i) continue;
+						if (logcalIndex >= arr.index) {
+							colSpan += arr.cs;
+							logcalIndex += arr.cs;
+							arr.rs -= 1;
+							arr.row = i + 1;
+							if (arr.rs < 1) {
+								spanIndex.splice(r, 1);
+								r--;
+							}
+						} else if (c === cLen - 1) {
+							arr.rs -= 1;
+							arr.row = i + 1;
+							if (arr.rs < 1) {
+								spanIndex.splice(r, 1);
+								r--;
+							}
+						}
+					}
+				}
+
+				if (numbers.getOverlapRangeAtIndex(ref.cs, ref.ce, logcalIndex, logcalIndex + cs) && numbers.getOverlapRangeAtIndex(ref.rs, ref.re, i, i + rs)) {
 					dom.utils.addClass(cell, 'se-selected-table-cell');
 				}
 
@@ -163,9 +273,7 @@ export class TableSelectionService {
 				colSpan += cell.colSpan - 1;
 			}
 
-			spanIndex = spanIndex.concat(rowSpanArr).sort((a, b) => {
-				return a.index - b.index;
-			});
+			spanIndex = spanIndex.concat(rowSpanArr).sort((a, b) => a.index - b.index);
 			rowSpanArr = [];
 		}
 	}
@@ -229,7 +337,7 @@ export class TableSelectionService {
 	 * @description Focus cell
 	 * @param {HTMLElement} cell Target node
 	 */
-	_focusEdge(cell) {
+	focusCellEdge(cell) {
 		if (!env.isMobile) this.#main.editor.focusEdge(cell);
 	}
 
@@ -261,7 +369,7 @@ export class TableSelectionService {
 		}
 
 		this.#main.setState('selectedCell', target);
-		this._setMultiCells(this.#state.fixedCell, this.#state.selectedCell);
+		this.setMultiCells(this.#state.fixedCell, this.#state.selectedCell);
 	}
 
 	/**
@@ -287,7 +395,7 @@ export class TableSelectionService {
 		if (this.#state.isShiftPressed) return;
 
 		if (fixedCell && this.#state.selectedCell) {
-			this._focusEdge(fixedCell);
+			this.focusCellEdge(fixedCell);
 			if (fixedCell === this.#state.selectedCell) {
 				dom.utils.removeClass(fixedCell, 'se-selected-table-cell');
 			}
@@ -307,7 +415,7 @@ export class TableSelectionService {
 			this.#removeGlobalEvents();
 			this.#main._editorEnable(true);
 
-			this._focusEdge(this.#state.fixedCell);
+			this.focusCellEdge(this.#state.fixedCell);
 
 			const displayCell = this.#state.selectedCells?.length > 0 ? this.#state.selectedCell : this.#state.fixedCell;
 			this.#main._setController(displayCell);

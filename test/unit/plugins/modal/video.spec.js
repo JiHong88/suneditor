@@ -41,7 +41,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
 	Modal: jest.fn().mockImplementation(() => ({
 		open: jest.fn(),
 		close: jest.fn(),
@@ -92,7 +92,7 @@ jest.mock('../../../../src/modules/contracts', () => ({
 	}))
 }));
 
-jest.mock('../../../../src/modules/utils', () => ({
+jest.mock('../../../../src/modules/manager', () => ({
 	FileManager: jest.fn().mockImplementation(() => ({
 		getSize: jest.fn().mockReturnValue(0),
 		upload: jest.fn().mockResolvedValue(true),
@@ -101,8 +101,8 @@ jest.mock('../../../../src/modules/utils', () => ({
 }));
 
 // Add static methods to modules
-const mockModal = require('../../../../src/modules/contracts').Modal;
-const mockFigure = require('../../../../src/modules/contracts').Figure;
+const mockModal = require('../../../../src/modules/contract').Modal;
+const mockFigure = require('../../../../src/modules/contract').Figure;
 
 // Mock Figure static methods
 Object.assign(mockFigure, {
@@ -683,7 +683,7 @@ describe('Video Plugin', () => {
 			};
 			video.inputX = { value: '100%' };
 			video.inputY = { value: '56.25%' };
-			const mockFigure = require('../../../../src/modules/contracts').Figure;
+			const mockFigure = require('../../../../src/modules/contract').Figure;
 			mockFigure.CreateContainer.mockReturnValue({
 				container: { nodeType: 1 }
 			});

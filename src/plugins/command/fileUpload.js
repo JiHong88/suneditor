@@ -1,7 +1,7 @@
 import { PluginCommand } from '../../interfaces';
 import { dom, env, numbers } from '../../helper';
-import { Controller, Figure } from '../../modules/contracts';
-import { FileManager } from '../../modules/utils';
+import { Controller, Figure } from '../../modules/contract';
+import { FileManager } from '../../modules/manager';
 
 const { NO_EVENT } = env;
 

@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for modules/ApiManager.js
  */
 
-import ApiManager from '../../../src/modules/utils/ApiManager.js';
+import ApiManager from '../../../src/modules/manager/ApiManager.js';
 
 // Mock XMLHttpRequest
 class MockXMLHttpRequest {

@@ -1,5 +1,5 @@
 import { PluginModal } from '../../interfaces';
-import { Modal } from '../../modules/contracts';
+import { Modal } from '../../modules/contract';
 import { dom, env } from '../../helper';
 
 const { _w } = env;

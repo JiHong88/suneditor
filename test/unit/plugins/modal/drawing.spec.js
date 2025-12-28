@@ -34,7 +34,7 @@ jest.mock('../../../../src/editorInjector', () => {
 	};
 });
 
-jest.mock('../../../../src/modules/contracts', () => ({
+jest.mock('../../../../src/modules/contract', () => ({
 	Modal: jest.fn().mockImplementation((plugin, modalEl) => {
 		// Setup proper querySelector support for modal
 		if (!modalEl.querySelector) {

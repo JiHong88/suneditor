@@ -35,18 +35,15 @@ class SelectMenu extends CoreInjector {
 
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
-	 * @param {SelectMenuParams} params Select menu options
+	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
 	 */
-	constructor(inst, params) {
-		super(inst.editor);
+	constructor(editor, params) {
+		super(editor);
 
 		// editor class
 		this.offset = this.editor.offset;
 
 		// members
-		this.kink = inst.constructor.key || inst.constructor.name;
-		this.inst = inst;
 		const positionItems = params.position.split('-');
 		this.form = null;
 		this.items = [];

@@ -2,7 +2,7 @@
  * @fileoverview Unit tests for modules/SelectMenu.js
  */
 
-import SelectMenu from '../../../src/modules/utils/SelectMenu.js';
+import SelectMenu from '../../../src/modules/ui/SelectMenu.js';
 
 // Mock dependencies
 jest.mock('../../../src/editorInjector/_core.js', () => {
@@ -87,33 +87,22 @@ describe('Modules - SelectMenu', () => {
 	});
 
 	describe('Constructor', () => {
-		it('should use constructor name as fallback', () => {
-			const instWithoutKey = {
-				editor: mockEditor,
-				constructor: { name: 'FallbackSelectMenu' }
-			};
-			const params = { position: 'bottom-left' };
-
-			const selectMenu = new SelectMenu(instWithoutKey, params);
-			expect(selectMenu.kink).toBe('FallbackSelectMenu');
-		});
-
 		it('should initialize with checkList parameter', () => {
 			const params = { position: 'top-center', checkList: true };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 			expect(selectMenu.checkList).toBe(true);
 		});
 
 		it('should initialize with splitNum for horizontal layout', () => {
 			const params = { position: 'top-center', splitNum: 5 };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 			expect(selectMenu.splitNum).toBe(5);
 			expect(selectMenu.horizontal).toBe(true);
 		});
 
 		it('should initialize with dir parameter', () => {
 			const params = { position: 'top-center', dir: 'rtl' };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 			expect(selectMenu).toBeDefined();
 		});
 
@@ -121,20 +110,20 @@ describe('Modules - SelectMenu', () => {
 			const openMethod = jest.fn();
 			const closeMethod = jest.fn();
 			const params = { position: 'top-center', openMethod, closeMethod };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 			expect(selectMenu.openMethod).toBe(openMethod);
 			expect(selectMenu.closeMethod).toBe(closeMethod);
 		});
 
 		it('should initialize isOpen to false', () => {
 			const params = { position: 'top-center' };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 			expect(selectMenu.isOpen).toBe(false);
 		});
 
 		it('should initialize index to -1', () => {
 			const params = { position: 'top-center' };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 			expect(selectMenu.index).toBe(-1);
 		});
 	});
@@ -145,7 +134,7 @@ describe('Modules - SelectMenu', () => {
 
 		beforeEach(() => {
 			const params = { position: 'top-center' };
-			selectMenu = new SelectMenu(mockInst, params);
+			selectMenu = new SelectMenu(mockEditor, params);
 
 			// Create a proper DOM structure
 			const parent = document.createElement('div');
@@ -178,7 +167,7 @@ describe('Modules - SelectMenu', () => {
 
 		beforeEach(() => {
 			const params = { position: 'top-center' };
-			selectMenu = new SelectMenu(mockInst, params);
+			selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			referElement = document.createElement('button');
@@ -209,7 +198,7 @@ describe('Modules - SelectMenu', () => {
 
 		it('should handle horizontal layout with splitNum', () => {
 			const params = { position: 'top-center', splitNum: 2 };
-			const horizontalMenu = new SelectMenu(mockInst, params);
+			const horizontalMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');
@@ -240,7 +229,7 @@ describe('Modules - SelectMenu', () => {
 
 		beforeEach(() => {
 			const params = { position: 'top-center' };
-			selectMenu = new SelectMenu(mockInst, params);
+			selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const referElement = document.createElement('button');
@@ -275,7 +264,7 @@ describe('Modules - SelectMenu', () => {
 
 		beforeEach(() => {
 			const params = { position: 'top-center' };
-			selectMenu = new SelectMenu(mockInst, params);
+			selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			parent.style.position = 'relative';
@@ -314,7 +303,7 @@ describe('Modules - SelectMenu', () => {
 		it('should call openMethod if provided', () => {
 			const openMethod = jest.fn();
 			const params = { position: 'top-center', openMethod };
-			const menuWithCallback = new SelectMenu(mockInst, params);
+			const menuWithCallback = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');
@@ -343,7 +332,7 @@ describe('Modules - SelectMenu', () => {
 
 		beforeEach(() => {
 			const params = { position: 'top-center' };
-			selectMenu = new SelectMenu(mockInst, params);
+			selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const referElement = document.createElement('button');
@@ -367,7 +356,7 @@ describe('Modules - SelectMenu', () => {
 		it('should call closeMethod if provided', () => {
 			const closeMethod = jest.fn();
 			const params = { position: 'top-center', closeMethod };
-			const menuWithCallback = new SelectMenu(mockInst, params);
+			const menuWithCallback = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');
@@ -404,7 +393,7 @@ describe('Modules - SelectMenu', () => {
 
 		beforeEach(() => {
 			const params = { position: 'top-center' };
-			selectMenu = new SelectMenu(mockInst, params);
+			selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			referElement = document.createElement('button');
@@ -467,14 +456,14 @@ describe('Modules - SelectMenu', () => {
 			positions.forEach((pos) => {
 				expect(() => {
 					const params = { position: pos };
-					new SelectMenu(mockInst, params);
+					new SelectMenu(mockEditor, params);
 				}).not.toThrow();
 			});
 		});
 
 		it('should handle zero items', () => {
 			const params = { position: 'top-center' };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');
@@ -487,7 +476,7 @@ describe('Modules - SelectMenu', () => {
 
 		it('should handle checkList toggle', () => {
 			const params = { position: 'top-center', checkList: true };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');
@@ -500,7 +489,7 @@ describe('Modules - SelectMenu', () => {
 
 		it('should handle left position', () => {
 			const params = { position: 'left-middle' };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');
@@ -526,7 +515,7 @@ describe('Modules - SelectMenu', () => {
 
 		it('should handle right position', () => {
 			const params = { position: 'right-middle' };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');
@@ -552,7 +541,7 @@ describe('Modules - SelectMenu', () => {
 
 		it('should handle bottom-right position', () => {
 			const params = { position: 'bottom-right' };
-			const selectMenu = new SelectMenu(mockInst, params);
+			const selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');
@@ -585,7 +574,7 @@ describe('Modules - SelectMenu', () => {
 
 		beforeEach(() => {
 			const params = { position: 'top-center' };
-			selectMenu = new SelectMenu(mockInst, params);
+			selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			referElement = document.createElement('button');
@@ -687,7 +676,7 @@ describe('Modules - SelectMenu', () => {
 
 		beforeEach(() => {
 			const params = { position: 'top-center', splitNum: 2 };
-			selectMenu = new SelectMenu(mockInst, params);
+			selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');
@@ -740,7 +729,7 @@ describe('Modules - SelectMenu', () => {
 
 		beforeEach(() => {
 			const params = { position: 'top-center', checkList: true };
-			selectMenu = new SelectMenu(mockInst, params);
+			selectMenu = new SelectMenu(mockEditor, params);
 
 			const parent = document.createElement('div');
 			const ref = document.createElement('button');

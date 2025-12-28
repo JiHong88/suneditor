@@ -133,7 +133,7 @@ declare class Table extends PluginDropdownFree {
 	 * @internal
 	 * @description Adds a new entry to the history stack.
 	 */
-	_historyPush(): void;
+	historyPush(): void;
 	/**
 	 * @description Enables or disables editor mode.
 	 * @param {boolean} enabled Whether to enable or disable the editor.
