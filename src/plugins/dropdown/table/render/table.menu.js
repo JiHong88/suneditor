@@ -2,6 +2,11 @@ import { dom } from '../../../../helper';
 import { _DragHandle } from '../../../../modules/ui';
 import { BORDER_LIST, BORDER_FORMATS } from '../shared/table.constants';
 
+/**
+ * @description Creates the split menu items.
+ * @param {Object} lang - Language object.
+ * @returns {{items: string[], menus: NodeListOf<Element>}}
+ */
 export function CreateSplitMenu(lang) {
 	const menus = dom.utils.createElement(
 		'DIV',
@@ -18,6 +23,12 @@ export function CreateSplitMenu(lang) {
 	return { items: ['vertical', 'horizontal'], menus: menus.querySelectorAll('div') };
 }
 
+/**
+ * @description Creates the column menu items.
+ * @param {Object} lang - Language object.
+ * @param {Object} icons - Icons object.
+ * @returns {{items: string[], menus: NodeListOf<Element>}}
+ */
 export function CreateColumnMenu(lang, icons) {
 	const menus = dom.utils.createElement(
 		'DIV',
@@ -37,6 +48,12 @@ export function CreateColumnMenu(lang, icons) {
 	return { items: ['insert-left', 'insert-right', 'delete'], menus: menus.querySelectorAll('div') };
 }
 
+/**
+ * @description Creates the row menu items.
+ * @param {Object} lang - Language object.
+ * @param {Object} icons - Icons object.
+ * @returns {{items: string[], menus: NodeListOf<Element>}}
+ */
 export function CreateRowMenu(lang, icons) {
 	const menus = dom.utils.createElement(
 		'DIV',
@@ -56,6 +73,10 @@ export function CreateRowMenu(lang, icons) {
 	return { items: ['insert-above', 'insert-below', 'delete'], menus: menus.querySelectorAll('div') };
 }
 
+/**
+ * @description Creates the border style menu items.
+ * @returns {{items: string[], menus: NodeListOf<Element>}}
+ */
 export function CreateBorderMenu() {
 	let html = '';
 
@@ -71,6 +92,13 @@ export function CreateBorderMenu() {
 	return { items: BORDER_LIST, menus: menus.querySelectorAll('div') };
 }
 
+/**
+ * @description Creates the border format menu items.
+ * @param {Object} langs - Language object.
+ * @param {Object} icons - Icons object.
+ * @param {string[]} indideFormats - Formats to exclude.
+ * @returns {{items: string[], menus: NodeListOf<Element>}}
+ */
 export function CreateBorderFormatMenu(langs, icons, indideFormats) {
 	const items = [];
 	let html = '';

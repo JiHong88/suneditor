@@ -38,10 +38,16 @@ export class TableGridService {
 		return this.#main.selectionService;
 	}
 
+	/**
+	 * @description Opens the column menu.
+	 */
 	openColumnMenu() {
 		this.selectMenu_column.open();
 	}
 
+	/**
+	 * @description Opens the row menu.
+	 */
 	openRowMenu() {
 		this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(this.#state.tdElement?.nodeName) ? 'none' : '';
 		this.selectMenu_row.open();

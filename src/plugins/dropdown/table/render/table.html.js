@@ -3,6 +3,10 @@ import { _DragHandle } from '../../../../modules/ui';
 
 import { BORDER_FORMATS } from '../shared/table.constants';
 
+/**
+ * @description Creates the initial HTML structure for the table plugin.
+ * @returns {HTMLDivElement}
+ */
 export function CreateHTML() {
 	const html = /*html*/ `
 	<div class="se-table-size">
@@ -15,6 +19,13 @@ export function CreateHTML() {
 	return dom.utils.createElement('DIV', { class: 'se-dropdown se-selector-table' }, html);
 }
 
+/**
+ * @description Creates the table controller HTML.
+ * @param {Object} options - Options containing language and icons.
+ * @param {Object} options.lang - Language object.
+ * @param {Object} options.icons - Icons object.
+ * @returns {HTMLDivElement}
+ */
 export function CreateHTML_controller_table({ lang, icons }) {
 	const html = /*html*/ `
 	<div class="se-arrow se-arrow-down se-visible-hidden"></div>

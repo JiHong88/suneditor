@@ -1,7 +1,14 @@
-import { PluginModal } from '../../interfaces';
-import { Modal, Figure } from '../../modules/contracts';
-import { FileManager, ModalAnchorEditor } from '../../modules/utils';
-import { dom, numbers, env, keyCodeMap } from '../../helper';
+import { PluginModal } from '../../../interfaces';
+import { Modal, Figure } from '../../../modules/contract';
+import { FileManager } from '../../../modules/manager';
+import { ModalAnchorEditor } from '../../../modules/ui';
+import { dom, numbers, env } from '../../../helper';
+
+import { DEFAULT_ACCEPTED_FORMATS, DEFAULT_SVG_SIZE, FORMAT_TYPE, SIZE_UNIT } from './shared/image.constants';
+import { CreateHTML_modal } from './render/image.html';
+import ImageSizeService from './services/image.size';
+import ImageUploadService from './services/image.upload';
+
 const { NO_EVENT } = env;
 
 /**
@@ -20,7 +27,7 @@ const { NO_EVENT } = env;
  * @property {boolean} [allowMultiple=false] - Whether multiple image uploads are allowed.
  * @property {string} [acceptedFormats="image/*"] - The accepted file formats for image uploads.
  * @property {boolean} [useFormatType=true] - Whether to enable format type selection (block or inline).
- * @property {string} [defaultFormatType="block"] - The default image format type ("block" or "inline").
+ * @property {'block'|'inline'} [defaultFormatType="block"] - The default image format type ("block" or "inline").
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
@@ -31,6 +38,13 @@ const { NO_EVENT } = env;
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
  * - `none`: Do nothing.
+ */
+
+/**
+ * @typedef {Object} ImageState
+ * @property {string} sizeUnit - Size unit ('px' or '%')
+ * @property {boolean} onlyPercentage - Whether only percentage sizing is allowed
+ * @property {number} produceIndex - Image production index for batch operations
  */
 
 /**
@@ -51,22 +65,17 @@ class Image_ extends PluginModal {
 		return /^IMG$/i.test(compNode?.nodeName) ? compNode : dom.check.isAnchor(compNode) && /^IMG$/i.test(compNode?.firstElementChild?.nodeName) ? compNode?.firstElementChild : null;
 	}
 
-	#origin_w;
-	#origin_h;
-	#resizing;
-	#onlyPercentage;
+	resizing;
 	#nonResizing;
 
-	#produceIndex = 0;
 	#linkElement = null;
 	#linkValue = '';
 	#align = 'none';
-	#svgDefaultSize = '30%';
+	#svgDefaultSize = DEFAULT_SVG_SIZE;
 	#element = null;
 	#cover = null;
 	#container = null;
 	#caption = null;
-	#ratio = { w: 0, h: 0 };
 
 	/**
 	 * @constructor
@@ -82,8 +91,8 @@ class Image_ extends PluginModal {
 		this.pluginOptions = {
 			canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
 			showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
-			defaultWidth: !pluginOptions.defaultWidth ? 'auto' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
-			defaultHeight: !pluginOptions.defaultHeight ? 'auto' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
+			defaultWidth: !pluginOptions.defaultWidth ? 'auto' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + SIZE_UNIT.PIXEL : pluginOptions.defaultWidth,
+			defaultHeight: !pluginOptions.defaultHeight ? 'auto' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + SIZE_UNIT.PIXEL : pluginOptions.defaultHeight,
 			percentageOnlySize: !!pluginOptions.percentageOnlySize,
 			createFileInput: pluginOptions.createFileInput === undefined ? true : pluginOptions.createFileInput,
 			createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
@@ -92,15 +101,15 @@ class Image_ extends PluginModal {
 			uploadSizeLimit: numbers.get(pluginOptions.uploadSizeLimit, 0),
 			uploadSingleSizeLimit: numbers.get(pluginOptions.uploadSingleSizeLimit, 0),
 			allowMultiple: !!pluginOptions.allowMultiple,
-			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*',
+			acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? DEFAULT_ACCEPTED_FORMATS : pluginOptions.acceptedFormats.trim() || DEFAULT_ACCEPTED_FORMATS,
 			useFormatType: pluginOptions.useFormatType ?? true,
-			defaultFormatType: ['block', 'inline'].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : 'block',
+			defaultFormatType: [FORMAT_TYPE.BLOCK, FORMAT_TYPE.INLINE].includes(pluginOptions.defaultFormatType) ? pluginOptions.defaultFormatType : FORMAT_TYPE.BLOCK,
 			keepFormatType: pluginOptions.keepFormatType ?? false,
 			insertBehavior: pluginOptions.insertBehavior,
 		};
 
 		// create HTML
-		const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
+		const sizeUnit = this.pluginOptions.percentageOnlySize ? SIZE_UNIT.PERCENTAGE : SIZE_UNIT.PIXEL;
 		const modalEl = CreateHTML_modal(editor, this.pluginOptions);
 		const ctrlAs = this.pluginOptions.useFormatType ? 'as' : '';
 		const figureControls =
@@ -118,15 +127,18 @@ class Image_ extends PluginModal {
 
 		// modules
 		const Link = this.plugins.link ? this.plugins.link.pluginOptions : {};
-		this.anchor = new ModalAnchorEditor(this, modalEl.html, {
+		this.anchor = new ModalAnchorEditor(this.editor, modalEl.html, {
 			...Link,
 			textToDisplay: false,
 			title: true,
 		});
+
 		this.modal = new Modal(this, modalEl.html);
+
 		this.figure = new Figure(this, figureControls, {
 			sizeUnit: sizeUnit,
 		});
+
 		this.fileManager = new FileManager(this, {
 			query: 'img',
 			loadEventName: 'onImageLoad',
@@ -134,6 +146,13 @@ class Image_ extends PluginModal {
 		});
 
 		// members
+		/** @type {ImageState} */
+		this.state = {
+			sizeUnit: sizeUnit,
+			onlyPercentage: this.pluginOptions.percentageOnlySize,
+			produceIndex: 0,
+		};
+
 		this.fileModalWrapper = modalEl.fileModalWrapper;
 		this.imgInputFile = modalEl.imgInputFile;
 		this.imgUrlFile = modalEl.imgUrlFile;
@@ -142,18 +161,13 @@ class Image_ extends PluginModal {
 		this.captionCheckEl = modalEl.captionCheckEl;
 		this.captionEl = this.captionCheckEl?.parentElement;
 		this.previewSrc = modalEl.previewSrc;
-		this.sizeUnit = sizeUnit;
-		this.as = 'block';
-		this.proportion = null;
-		this.inputX = null;
-		this.inputY = null;
-		this._base64RenderIndex = 0;
 
-		this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-		this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
-		this.#resizing = this.pluginOptions.canResize;
-		this.#onlyPercentage = this.pluginOptions.percentageOnlySize;
-		this.#nonResizing = !this.#resizing || !this.pluginOptions.showHeightInput || this.#onlyPercentage;
+		this.as = FORMAT_TYPE.BLOCK;
+		this.resizing = this.pluginOptions.canResize;
+		this.#nonResizing = !this.resizing || !this.pluginOptions.showHeightInput || this.pluginOptions.percentageOnlySize;
+
+		this.sizeService = new ImageSizeService(this, modalEl);
+		this.uploadService = new ImageUploadService(this);
 
 		// init
 		this.eventManager.addEvent(modalEl.tabs, 'click', this.#OpenTab.bind(this));
@@ -164,22 +178,6 @@ class Image_ extends PluginModal {
 		const galleryButton = modalEl.galleryButton;
 		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
-		if (this.#resizing) {
-			this.proportion = modalEl.proportion;
-			this.inputX = modalEl.inputX;
-			this.inputY = modalEl.inputY;
-			this.inputX.value = this.pluginOptions.defaultWidth;
-			this.inputY.value = this.pluginOptions.defaultHeight;
-
-			const ratioChange = this.#OnChangeRatio.bind(this);
-			this.eventManager.addEvent(this.inputX, 'keyup', this.#OnInputSize.bind(this, 'x'));
-			this.eventManager.addEvent(this.inputY, 'keyup', this.#OnInputSize.bind(this, 'y'));
-			this.eventManager.addEvent(this.inputX, 'change', ratioChange);
-			this.eventManager.addEvent(this.inputY, 'change', ratioChange);
-			this.eventManager.addEvent(this.proportion, 'change', ratioChange);
-			this.eventManager.addEvent(modalEl.revertBtn, 'click', this.#OnClickRevert.bind(this));
-		}
-
 		if (this.pluginOptions.useFormatType) {
 			this.as = this.pluginOptions.defaultFormatType;
 			this.asBlock = modalEl.asBlock;
@@ -189,11 +187,20 @@ class Image_ extends PluginModal {
 	}
 
 	/**
+	 * @template {keyof ImageState} K
+	 * @param {K} key
+	 * @param {ImageState[K]} value
+	 */
+	setState(key, value) {
+		this.state[key] = value;
+	}
+
+	/**
 	 * @override
 	 * @type {PluginModal['open']}
 	 */
 	open() {
-		this.#produceIndex = 0;
+		this.state.produceIndex = 0;
 		this.modal.open();
 	}
 
@@ -232,9 +239,11 @@ class Image_ extends PluginModal {
 	 */
 	modalOn(isUpdate) {
 		if (!isUpdate) {
-			if (this.#resizing) {
-				this.inputX.value = this.#origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-				this.inputY.value = this.#origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+			if (this.resizing) {
+				const x = this.pluginOptions.defaultWidth;
+				const y = this.pluginOptions.defaultHeight;
+				this.sizeService.setInputSize(x, y);
+				this.sizeService.setOriginSize(x, y);
 			}
 			if (this.imgInputFile && this.pluginOptions.allowMultiple) this.imgInputFile.setAttribute('multiple', 'multiple');
 		} else {
@@ -252,7 +261,7 @@ class Image_ extends PluginModal {
 		this.#align = /** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked')).value;
 
 		if (this.modal.isUpdate) {
-			this.#fixTagStructure(this.inputX?.value, this.inputY?.value);
+			this.#fixTagStructure();
 			this.history.push(false);
 		}
 
@@ -282,20 +291,12 @@ class Image_ extends PluginModal {
 		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
 		this.captionCheckEl.checked = false;
 		this.#element = null;
-		this.#ratio = {
-			w: 0,
-			h: 0,
-		};
 		this.#OpenTab('init');
 
-		if (this.#resizing) {
-			this.inputX.value = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
-			this.proportion.checked = true;
-		}
+		this.sizeService.init();
 
 		if (this.pluginOptions.useFormatType) {
-			this.#activeAsInline((this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === 'inline');
+			this.#activeAsInline((this.pluginOptions.keepFormatType ? this.as : this.pluginOptions.defaultFormatType) === FORMAT_TYPE.INLINE);
 		}
 
 		this.anchor.init();
@@ -401,8 +402,8 @@ class Image_ extends PluginModal {
 		const imgInfo = { files, ...this.#getInfo() };
 		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
-			uploadCallback(infos, infos.files);
-		}.bind(this, this.#serverUpload.bind(this), imgInfo);
+			uploadCallback(infos);
+		}.bind(this, this.uploadService.serverUpload.bind(this.uploadService), imgInfo);
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
 			info: imgInfo,
@@ -434,7 +435,7 @@ class Image_ extends PluginModal {
 		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
 			uploadCallback(infos);
-		}.bind(this, this.#urlUpload.bind(this), imgInfo);
+		}.bind(this, this.uploadService.urlUpload.bind(this.uploadService), imgInfo);
 
 		const result = await this.triggerEvent('onImageUploadBefore', {
 			info: imgInfo,
@@ -484,14 +485,14 @@ class Image_ extends PluginModal {
 		this.figure.open(oImg, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 
 		// set size
-		this.#applySize(width, height);
+		this.sizeService.applySize(width, height);
 
 		// align
 		this.figure.setAlign(oImg, align);
 
 		this.fileManager.setFileData(oImg, file);
 
-		this.#produceIndex++;
+		this.setState('produceIndex', this.state.produceIndex + 1);
 		oImg.onload = this.#OnloadImg.bind(this, oImg, this.#svgDefaultSize, container);
 		this.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? null : 'line' });
 	}
@@ -522,11 +523,11 @@ class Image_ extends PluginModal {
 		this.figure.open(oImg, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 
 		// set size
-		this.#applySize(width, height);
+		this.sizeService.applySize(width, height);
 
 		this.fileManager.setFileData(oImg, file);
 
-		this.#produceIndex++;
+		this.setState('produceIndex', this.state.produceIndex + 1);
 		oImg.onload = this.#OnloadImg.bind(this, oImg, this.#svgDefaultSize, container);
 		this.component.insert(container, { scrollTo: isLast ? true : false, insertBehavior: isLast ? null : 'line' });
 	}
@@ -552,8 +553,7 @@ class Image_ extends PluginModal {
 		this.#align = figureInfo.align;
 		target.style.float = '';
 
-		this.#origin_w = String(figureInfo.originWidth || figureInfo.w || '');
-		this.#origin_h = String(figureInfo.originHeight || figureInfo.h || '');
+		this.sizeService.setOriginSize(String(figureInfo.originWidth || figureInfo.w || ''), String(figureInfo.originHeight || figureInfo.h || ''));
 		this.altText.value = this.#element.alt;
 
 		if (this.imgUrlFile) this.#linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this.#element.src;
@@ -565,23 +565,9 @@ class Image_ extends PluginModal {
 
 		const { dw, dh } = this.figure.getSize(target);
 
-		if (!this.#resizing) return { w: dw, h: dh };
+		if (!this.resizing) return { w: dw, h: dh };
 
-		this.inputX.value = dw === 'auto' ? '' : dw;
-		this.inputY.value = dh === 'auto' ? '' : dh;
-
-		const percentageRotation = this.#onlyPercentage && this.figure.isVertical;
-		this.proportion.checked = true;
-		this.inputX.disabled = percentageRotation ? true : false;
-		this.inputY.disabled = percentageRotation ? true : false;
-		this.proportion.disabled = percentageRotation ? true : false;
-
-		this.#ratio = this.proportion.checked
-			? figureInfo.ratio
-			: {
-					w: 0,
-					h: 0,
-				};
+		this.sizeService.ready(figureInfo, dw, dh);
 
 		if (this.pluginOptions.useFormatType) {
 			this.#activeAsInline(this.component.isInline(figureInfo.container));
@@ -595,11 +581,12 @@ class Image_ extends PluginModal {
 	 * @returns {*} - The image data.
 	 */
 	#getInfo() {
+		const { w, h } = this.sizeService.getInputSize();
 		return {
 			element: this.#element,
 			anchor: this.anchor.create(true),
-			inputWidth: this.inputX?.value || '',
-			inputHeight: this.inputY?.value || '',
+			inputWidth: w,
+			inputHeight: h,
 			align: this.#align,
 			isUpdate: this.modal.isUpdate,
 			alt: this.altText.value,
@@ -614,7 +601,7 @@ class Image_ extends PluginModal {
 		if (isInline) {
 			dom.utils.addClass(this.asInline, 'on');
 			dom.utils.removeClass(this.asBlock, 'on');
-			this.as = 'inline';
+			this.as = FORMAT_TYPE.INLINE;
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = 'none';
 			// caption
@@ -622,7 +609,7 @@ class Image_ extends PluginModal {
 		} else {
 			dom.utils.addClass(this.asBlock, 'on');
 			dom.utils.removeClass(this.asInline, 'on');
-			this.as = 'block';
+			this.as = FORMAT_TYPE.BLOCK;
 			// buttns
 			if (this.alignForm) this.alignForm.style.display = '';
 			// caption
@@ -632,17 +619,16 @@ class Image_ extends PluginModal {
 
 	/**
 	 * @description Updates the selected image size, alt text, and caption.
-	 * @param {string} width - New image width.
-	 * @param {string} height - New image height.
 	 */
-	#fixTagStructure(width, height) {
-		width ||= this.inputX?.value || 'auto';
-		height ||= this.inputY?.value || 'auto';
+	#fixTagStructure() {
+		const { w, h } = this.sizeService.getInputSize();
+		const width = w || 'auto';
+		const height = h || 'auto';
 
 		let imageEl = this.#element;
 
 		// as (block | inline)
-		if ((this.as === 'block' && !this.#cover) || (this.as === 'inline' && this.#cover)) {
+		if ((this.as === FORMAT_TYPE.BLOCK && !this.#cover) || (this.as === FORMAT_TYPE.INLINE && this.#cover)) {
 			imageEl = this.figure.convertAsFormat(imageEl, this.as);
 		}
 
@@ -652,8 +638,8 @@ class Image_ extends PluginModal {
 
 		// check size
 		let changeSize;
-		const x = numbers.is(width) ? width + this.sizeUnit : width;
-		const y = numbers.is(height) ? height + this.sizeUnit : height;
+		const x = numbers.is(width) ? width + this.state.sizeUnit : width;
+		const y = numbers.is(height) ? height + this.state.sizeUnit : height;
 		if (/%$/.test(imageEl.style.width)) {
 			changeSize = x !== container.style.width || y !== container.style.height;
 		} else {
@@ -701,16 +687,16 @@ class Image_ extends PluginModal {
 		}
 
 		// size
-		if (this.#resizing && changeSize) {
-			this.#applySize(width, height);
+		if (this.resizing && changeSize) {
+			this.sizeService.applySize(width, height);
 		}
 
 		// transform
-		if (modifiedCaption || (!this.#onlyPercentage && changeSize)) {
+		if (modifiedCaption || (!this.state.onlyPercentage && changeSize)) {
 			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
 				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
 					this.figure.deleteTransform(imageEl);
-				} else if (!this.#resizing || !changeSize || !this.figure.isVertical) {
+				} else if (!this.resizing || !changeSize || !this.figure.isVertical) {
 					this.figure.setTransform(imageEl, width, height, 0);
 				}
 			}
@@ -731,8 +717,9 @@ class Image_ extends PluginModal {
 	 * @param {string} height - The height of the image.
 	 */
 	#fileCheck(width, height) {
-		width ||= this.inputX?.value || 'auto';
-		height ||= this.inputY?.value || 'auto';
+		const { w, h } = this.sizeService.getInputSize();
+		width ||= w || 'auto';
+		height ||= h || 'auto';
 
 		let imageEl = this.#element;
 		let cover = this.#cover;
@@ -804,7 +791,7 @@ class Image_ extends PluginModal {
 		imageEl.style.height = '';
 		imageEl.removeAttribute('width');
 		imageEl.removeAttribute('height');
-		this.#applySize(width, height);
+		this.sizeService.applySize(width, height);
 
 		if (isNewAnchor) {
 			if (!isNewContainer) {
@@ -818,7 +805,7 @@ class Image_ extends PluginModal {
 		}
 
 		// transform
-		if (modifiedCaption || !this.#onlyPercentage) {
+		if (modifiedCaption || !this.state.onlyPercentage) {
 			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
 				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
 					this.figure.deleteTransform(imageEl);
@@ -830,183 +817,6 @@ class Image_ extends PluginModal {
 
 		// align
 		this.figure.setAlign(imageEl, this.#align);
-	}
-
-	/**
-	 * @description Creates a new image component based on provided parameters.
-	 * @param {string} src - The image source URL.
-	 * @param {?Node} anchor - Optional anchor wrapping the image.
-	 * @param {string} width - Image width.
-	 * @param {string} height - Image height.
-	 * @param {string} align - Image alignment.
-	 * @param {{name: string, size: number}} file - File metadata.
-	 * @param {string} alt - Alternative text.
-	 * @param {boolean} isLast - Indicates if this is the last image in a batch (for scroll and insert behavior).
-	 */
-	#produce(src, anchor, width, height, align, file, alt, isLast) {
-		if (this.as !== 'inline') {
-			this.create(src, anchor, width, height, align, file, alt, isLast);
-		} else {
-			this.createInline(src, anchor, width, height, file, alt, isLast);
-		}
-	}
-
-	/**
-	 * @description Applies the specified width and height to the image.
-	 * @param {string} w - Image width.
-	 * @param {string} h - Image height.
-	 */
-	#applySize(w, h) {
-		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
-		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
-
-		if (this.#onlyPercentage) {
-			if (!w) w = '100%';
-			else if (/%$/.test(w)) w += '%';
-		}
-		this.figure.setSize(w, h);
-	}
-
-	/**
-	 * @description Updates the image source URL.
-	 * @param {string} src - The new image source.
-	 * @param {HTMLImageElement} element - The image element.
-	 * @param {{ name: string, size: number }} file - File metadata.
-	 */
-	#updateSrc(src, element, file) {
-		element.src = src;
-		this.fileManager.setFileData(element, file);
-		this.component.select(element, Image_.key);
-	}
-
-	/**
-	 * @description Registers the uploaded image and inserts it into the editor.
-	 * @param {SunEditor.EventParams.ImageInfo} info - Image info.
-	 * @param {Object<string, *>} response - Server response data.
-	 */
-	#register(info, response) {
-		this.#produceIndex = 0;
-		const fileList = response.result;
-
-		for (let i = 0, len = fileList.length, file; i < len; i++) {
-			file = {
-				name: fileList[i].name,
-				size: fileList[i].size,
-			};
-			if (info.isUpdate) {
-				this.#updateSrc(fileList[i].url, info.element, file);
-				break;
-			} else {
-				this.#produce(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt, i === len - 1);
-			}
-		}
-	}
-
-	/**
-	 * @description Uploads the image to the server.
-	 * @param {SunEditor.EventParams.ImageInfo} info - Image upload info.
-	 * @param {FileList} files - List of image files.
-	 */
-	#serverUpload(info, files) {
-		if (!files) return;
-
-		// server upload
-		const imageUploadUrl = this.pluginOptions.uploadUrl;
-		if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
-			this.fileManager.upload(imageUploadUrl, this.pluginOptions.uploadHeaders, files, this.#UploadCallBack.bind(this, info), this.#error.bind(this));
-		} else {
-			this.#setBase64(files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, info.isUpdate);
-		}
-	}
-
-	/**
-	 * @description Handles image upload via URL.
-	 * @param {*} info - Image information.
-	 */
-	#urlUpload(info) {
-		this.#produceIndex = 0;
-		const infoUrl = info.url;
-
-		if (this.modal.isUpdate) this.#updateSrc(infoUrl, info.element, info.files);
-		else this.#produce(infoUrl, info.anchor, info.inputWidth, info.inputHeight, info.align, info.files, info.alt, true);
-	}
-
-	/**
-	 * @description Converts an image file to Base64 and inserts it into the editor.
-	 * @param {FileList|File[]} files - List of image files.
-	 * @param {?Node} anchor - Optional anchor wrapping the image.
-	 * @param {string} width - Image width.
-	 * @param {string} height - Image height.
-	 * @param {string} align - Image alignment.
-	 * @param {string} alt - Alternative text.
-	 * @param {boolean} isUpdate - Whether the image is being updated.
-	 * @throws {Error} Throws error if base64 conversion fails.
-	 */
-	#setBase64(files, anchor, width, height, align, alt, isUpdate) {
-		try {
-			const filesLen = this.modal.isUpdate ? 1 : files.length;
-
-			if (filesLen === 0) {
-				this.ui.hideLoading();
-				console.warn('[SUNEDITOR.image.base64.fail] cause : No applicable files');
-				return;
-			}
-
-			this._base64RenderIndex = filesLen;
-			const filesStack = new Array(filesLen);
-
-			if (this.#resizing) {
-				this.inputX.value = width;
-				this.inputY.value = height;
-			}
-
-			for (let i = 0, renderFunc = this.#onRenderBase64.bind(this), reader, file; i < filesLen; i++) {
-				reader = new FileReader();
-				file = files[i];
-
-				reader.onload = function (loadCallback, on_reader, update, updateElement, on_file, index) {
-					filesStack[index] = {
-						result: on_reader.result,
-						file: on_file,
-					};
-
-					if (--this._base64RenderIndex === 0) {
-						loadCallback(update, filesStack, updateElement, anchor, width, height, align, alt);
-						this.ui.hideLoading();
-					}
-				}.bind(this, renderFunc, reader, isUpdate, this.#element, file, i);
-
-				reader.readAsDataURL(file);
-			}
-		} catch (error) {
-			this.ui.hideLoading();
-			throw Error(`[SUNEDITOR.plugins.image._setBase64.fail] ${error.message}`);
-		}
-	}
-
-	/**
-	 * @description Inserts an image using a Base64-encoded string.
-	 * @param {boolean} update - Whether the image is being updated.
-	 * @param {Array<{result: string, file: { name: string, size: number }}>} filesStack - Stack of Base64-encoded files.
-	 * - result: Image url or Base64-encoded string
-	 * - file: File metadata ({ name: string, size: number })
-	 * @param {HTMLImageElement} updateElement - The image element being updated.
-	 * @param {?HTMLAnchorElement} anchor - Optional anchor wrapping the image.
-	 * @param {string} width - Image width.
-	 * @param {string} height - Image height.
-	 * @param {string} align - Image alignment.
-	 * @param {string} alt - Alternative text.
-	 */
-	#onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt) {
-		this.#produceIndex = 0;
-
-		for (let i = 0, len = filesStack.length; i < len; i++) {
-			if (update) {
-				this.#updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
-			} else {
-				this.#produce(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt, i === len - 1);
-			}
-		}
 	}
 
 	/**
@@ -1022,34 +832,6 @@ class Image_ extends PluginModal {
 		}
 
 		return imgTag;
-	}
-
-	/**
-	 * @description Handles errors during image upload and displays appropriate messages.
-	 * @param {Object<string, *>} response - The error response from the server.
-	 * @returns {Promise<void>}
-	 */
-	async #error(response) {
-		const message = await this.triggerEvent('onImageUploadError', { error: response });
-		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.ui.alertOpen(err, 'error');
-		console.error('[SUNEDITOR.plugin.image.error]', err);
-	}
-
-	/**
-	 * @description Handles the callback function for image upload completion.
-	 * @param {SunEditor.EventParams.ImageInfo} info - Image information.
-	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
-	 */
-	async #UploadCallBack(info, xmlHttp) {
-		if ((await this.triggerEvent('imageUploadHandler', { xmlHttp, info })) === NO_EVENT) {
-			const response = JSON.parse(xmlHttp.responseText);
-			if (response.errorMessage) {
-				this.#error(response);
-			} else {
-				this.#register(info, response);
-			}
-		}
 	}
 
 	/**
@@ -1108,37 +890,6 @@ class Image_ extends PluginModal {
 		Modal.OnChangeFile(this.fileModalWrapper, []);
 	}
 
-	#OnInputSize(xy, e) {
-		if (keyCodeMap.isSpace(e.code)) {
-			e.preventDefault();
-			return;
-		}
-
-		if (xy === 'x' && this.#onlyPercentage && e.target.value > 100) {
-			e.target.value = 100;
-		} else if (this.proportion.checked) {
-			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this.#ratio);
-			if (xy === 'x') {
-				this.inputY.value = String(ratioSize.h);
-			} else {
-				this.inputX.value = String(ratioSize.w);
-			}
-		}
-	}
-
-	#OnChangeRatio() {
-		this.#ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 0, h: 0 };
-	}
-
-	#OnClickRevert() {
-		if (this.#onlyPercentage) {
-			this.inputX.value = Number(this.#origin_w) > 100 ? '100' : this.#origin_w;
-		} else {
-			this.inputX.value = this.#origin_w;
-			this.inputY.value = this.#origin_h;
-		}
-	}
-
 	#OnClickAsButton({ target }) {
 		this.#activeAsInline(target.getAttribute('data-command') === 'asInline');
 	}
@@ -1178,167 +929,19 @@ class Image_ extends PluginModal {
 	}
 
 	#OnloadImg(oImg, _svgDefaultSize, container) {
-		this.#produceIndex--;
+		this.setState('produceIndex', this.state.produceIndex - 1);
 		delete oImg.onload;
 
 		// svg exception handling
-		if (oImg.offsetWidth === 0) this.#applySize(_svgDefaultSize, '');
+		if (oImg.offsetWidth === 0) this.sizeService.applySize(_svgDefaultSize, '');
 
-		if (this.#produceIndex === 0) {
+		if (this.state.produceIndex === 0) {
 			this.component.applyInsertBehavior(container, null, this.pluginOptions.insertBehavior || this.options.get('componentInsertBehavior'));
 
 			this.editor._iframeAutoHeight(this.frameContext);
 			this.history.push(false);
 		}
 	}
-}
-
-/**
- * @typedef {Object} ModalReturns_image
- * @property {HTMLElement} html
- * @property {HTMLElement} alignForm
- * @property {HTMLElement} fileModalWrapper
- * @property {HTMLInputElement} imgInputFile
- * @property {HTMLInputElement} imgUrlFile
- * @property {HTMLInputElement} altText
- * @property {HTMLInputElement} captionCheckEl
- * @property {HTMLElement} previewSrc
- * @property {HTMLElement} tabs
- * @property {HTMLButtonElement} galleryButton
- * @property {HTMLInputElement} proportion
- * @property {HTMLInputElement} inputX
- * @property {HTMLInputElement} inputY
- * @property {HTMLButtonElement} revertBtn
- * @property {HTMLButtonElement} asBlock
- * @property {HTMLButtonElement} asInline
- * @property {HTMLButtonElement} fileRemoveBtn
- *
- * @param {SunEditor.Core} editor
- * @param {*} pluginOptions
- * @returns {ModalReturns_image}
- */
-function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
-	const createFileInputHtml = !pluginOptions.createFileInput
-		? ''
-		: /*html*/ `
-		<div class="se-modal-form">
-			<label>${lang.image_modal_file}</label>
-			${Modal.CreateFileInput({ icons, lang }, pluginOptions)}
-		</div>`;
-
-	const createUrlInputHtml = !pluginOptions.createUrlInput
-		? ''
-		: /*html*/ `
-		<div class="se-modal-form">
-			<label>${lang.image_modal_url}</label>
-			<div class="se-modal-form-files">
-				<input class="se-input-form se-input-url" data-focus type="text" />
-				${
-					plugins.imageGallery
-						? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button __se__gallery" aria-label="${lang.imageGallery}">
-							${icons.image_gallery}
-							${dom.utils.createTooltipInner(lang.imageGallery)}
-							</button>`
-						: ''
-				}
-			</div>
-			<pre class="se-link-preview"></pre>
-		</div>`;
-
-	const canResizeHtml = !pluginOptions.canResize
-		? ''
-		: /*html*/ `
-		<div class="se-modal-form">
-			<div class="se-modal-size-text">
-				<label class="size-w">${lang.width}</label>
-				<label class="se-modal-size-x">&nbsp;</label>
-				<label class="size-h">${lang.height}</label>
-			</div>
-			<input class="se-input-control _se_size_x" placeholder="auto" type="text" />
-			<label class="se-modal-size-x">x</label>
-			<input type="text" class="se-input-control _se_size_y" placeholder="auto" />
-			<label><input type="checkbox" class="se-modal-btn-check _se_check_proportion" checked/>&nbsp;${lang.proportion}</label>
-			<button type="button" aria-label="${lang.revert}" class="se-btn se-tooltip se-modal-btn-revert">
-				${icons.revert}
-				${dom.utils.createTooltipInner(lang.revert)}
-			</button>
-		</div>`;
-
-	const useFormatTypeHtml = !pluginOptions.useFormatType
-		? ''
-		: /*html*/ `
-		<div class="se-modal-form">
-			<div class="se-modal-flex-form">
-				<button type="button" data-command="asBlock" class="se-btn se-tooltip" aria-label="${lang.inlineStyle}">
-					${icons.as_block}
-					${dom.utils.createTooltipInner(lang.blockStyle)}
-				</button>
-				<button type="button" data-command="asInline" class="se-btn se-tooltip" aria-label="${lang.inlineStyle}">
-					${icons.as_inline}
-					${dom.utils.createTooltipInner(lang.inlineStyle)}
-				</button>
-			</div>
-		</div>`;
-
-	const html = /*html*/ `
-		<div class="se-modal-header">
-			<button type="button" data-command="close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
-			<span class="se-modal-title">${lang.image_modal_title}</span>
-		</div>
-		<div class="se-modal-tabs">
-			<button type="button" class="_se_tab_link active" data-tab-link="image">${lang.image}</button>
-			<button type="button" class="_se_tab_link" data-tab-link="url">${lang.link}</button>
-		</div>
-		<form method="post" enctype="multipart/form-data">
-			<div class="_se_tab_content _se_tab_content_image">
-				<div class="se-modal-body">
-					${createFileInputHtml}
-					${createUrlInputHtml}
-					<div style="border-bottom: 1px dashed #ccc;"></div>
-					<div class="se-modal-form">
-						<label>${lang.image_modal_altText}</label><input class="se-input-form _se_image_alt" type="text" />
-					</div>
-					${canResizeHtml}
-					${useFormatTypeHtml}
-					<div class="se-modal-form se-modal-form-footer">
-						<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;${lang.caption}</label>
-					</div>
-				</div>
-			</div>
-			<div class="se-anchor-editor _se_tab_content _se_tab_content_url" style="display: none;">
-			</div>
-			<div class="se-modal-footer">
-				<div class="se-figure-align">
-					<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="none" checked>${lang.basic}</label>
-					<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="left">${lang.left}</label>
-					<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="center">${lang.center}</label>
-					<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="right">${lang.right}</label>
-				</div>
-				<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}"><span>${lang.submitButton}</span></button>
-			</div>
-		</form>`;
-
-	const content = dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
-
-	return {
-		html: content,
-		alignForm: content.querySelector('.se-figure-align'),
-		fileModalWrapper: content.querySelector('.se-flex-input-wrapper'),
-		imgInputFile: content.querySelector('.__se__file_input'),
-		imgUrlFile: content.querySelector('.se-input-url'),
-		altText: content.querySelector('._se_image_alt'),
-		captionCheckEl: content.querySelector('._se_image_check_caption'),
-		previewSrc: content.querySelector('._se_tab_content_image .se-link-preview'),
-		tabs: content.querySelector('.se-modal-tabs'),
-		galleryButton: content.querySelector('.__se__gallery'),
-		proportion: content.querySelector('._se_check_proportion'),
-		inputX: content.querySelector('._se_size_x'),
-		inputY: content.querySelector('._se_size_y'),
-		revertBtn: content.querySelector('.se-modal-btn-revert'),
-		asBlock: content.querySelector('[data-command="asBlock"]'),
-		asInline: content.querySelector('[data-command="asInline"]'),
-		fileRemoveBtn: content.querySelector('.se-file-remove'),
-	};
 }
 
 export default Image_;

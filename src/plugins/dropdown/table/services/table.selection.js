@@ -440,6 +440,9 @@ export class TableSelectionService {
 		}
 	}
 
+	/**
+	 * @description Initialize the selection service (remove global events).
+	 */
 	init() {
 		this.#removeGlobalEvents();
 	}

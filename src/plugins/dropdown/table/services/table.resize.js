@@ -43,6 +43,12 @@ export class TableResizeService {
 		return this.#resizing;
 	}
 
+	/**
+	 * @description Display a guide line during resize operations logic.
+	 * @param {MouseEvent} event - Mouse event
+	 * @param {HTMLElement} target - Target element (table cell or row)
+	 * @returns {boolean|undefined} Returns false if resizing started, otherwise undefined.
+	 */
 	onResizeGuide(event, target) {
 		const cellEdge = CheckCellEdge(event, target);
 		if (cellEdge.is) {
@@ -68,10 +74,19 @@ export class TableResizeService {
 		}
 	}
 
+	/**
+	 * @description Hides the resize guide line.
+	 */
 	offResizeGuide() {
 		this.#hideResizeLine();
 	}
 
+	/**
+	 * @description Prepares for resizing from the edge of a cell or row.
+	 * @param {MouseEvent} event - Mouse event
+	 * @param {HTMLTableCellElement} target - Target element
+	 * @returns {boolean|undefined} Returns false if resizing started.
+	 */
 	readyResizeFromEdge(event, target) {
 		const cellEdge = CheckCellEdge(event, target);
 		if (cellEdge.is) {
@@ -432,6 +447,9 @@ export class TableResizeService {
 		}
 	}
 
+	/**
+	 * @description Initialize the resize service (remove global events).
+	 */
 	init() {
 		this.#removeGlobalEvents();
 	}

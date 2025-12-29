@@ -895,6 +895,9 @@ class Table extends PluginDropdownFree {
 		}
 	}
 
+	/**
+	 * @description Initializes services by calling their init methods.
+	 */
 	#initService() {
 		this.resizeService.init();
 		this.selectionService.init();
@@ -902,6 +905,10 @@ class Table extends PluginDropdownFree {
 	}
 }
 
+/**
+ * @description Adjusts the z-index of the cell controller form.
+ * @param {boolean} value - If true, brings to top; otherwise resets.
+ */
 function _CellFormZIndex(value) {
 	this.controller_cell.bringToTop(value);
 }

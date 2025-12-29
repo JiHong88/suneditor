@@ -37,6 +37,9 @@ export class TableCellService {
 		return this.#main.selectionService;
 	}
 
+	/**
+	 * @description Opens the split menu.
+	 */
 	openSplitMenu() {
 		this.selectMenu_split.open();
 	}

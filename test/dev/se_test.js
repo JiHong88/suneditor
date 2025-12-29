@@ -606,7 +606,7 @@ const options1 = {
 	// charCounter_max: 1400,
 	// buttonList: [['bold', 'newDocument', 'selectAll', 'undo', 'redo']],
 	buttonList: bl,
-	tableCellControllerPosition: 'cell',
+	// tableCellControllerPosition: 'cell',
 	// buttonList: [
 	// 	['newDocument', 'selectAll', 'undo', 'redo', '|', 'pageUp', 'pageDown', 'pageNavigator', 'pageBreak'],
 	// 	'|',
@@ -836,7 +836,7 @@ const options1 = {
 	},
 	image: {
 		// canResize: false,
-		// uploadUrl: 'http://localhost:3000/editor/upload',
+		uploadUrl: 'http://localhost:3000/editor/upload',
 		linkEnableFileUpload: true,
 		allowMultiple: true,
 		useFormatType: true,
@@ -859,7 +859,7 @@ const options1 = {
 	},
 	table: {
 		scrollType: 'x',
-		cellControllerPosition: 'cell',
+		// cellControllerPosition: 'cell',
 	},
 	fontColor: {
 		// disableHEXInput: true,
@@ -1811,6 +1811,7 @@ const options_test = {
 		imageRotation: true,
 		imageRatio: 0.5625,
 		imageSizeOnlyPercentage: false,
+		uploadUrl: 'http://localhost:3000/editor/upload'
 	},
 	imageGallery: {
 		title: 'Image Gallery',

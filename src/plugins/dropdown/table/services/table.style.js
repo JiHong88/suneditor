@@ -156,6 +156,10 @@ export class TableStyleService {
 		}
 	}
 
+	/**
+	 * @description Opens the table properties dialog.
+	 * @param {HTMLElement} target - The target element (usually the table).
+	 */
 	openTableProps(target) {
 		if (this.controller_props.currentTarget === target && this.controller_props.form?.style.display === 'block') {
 			this.controller_props.close();
@@ -166,6 +170,10 @@ export class TableStyleService {
 		}
 	}
 
+	/**
+	 * @description Opens the cell properties dialog.
+	 * @param {HTMLElement} target - The target element (usually the table cell).
+	 */
 	openCellProps(target) {
 		if (this.controller_props.currentTarget === target && this.controller_props.form?.style.display === 'block') {
 			this.controller_props.close();
@@ -176,6 +184,9 @@ export class TableStyleService {
 		}
 	}
 
+	/**
+	 * @description Opens the border format menu.
+	 */
 	openBorderFormatMenu() {
 		if (this._propsCache.length === 1) {
 			this.selectMenu_props_border_format_oneCell.open();
@@ -184,6 +195,9 @@ export class TableStyleService {
 		}
 	}
 
+	/**
+	 * @description Opens the border style menu.
+	 */
 	openBorderStyleMenu() {
 		this.selectMenu_props_border.open();
 	}
@@ -207,6 +221,10 @@ export class TableStyleService {
 		}
 	}
 
+	/**
+	 * @description Toggles the font style.
+	 * @param {string} value - The style to toggle ("bold"|"underline"|"italic"|"strike").
+	 */
 	toggleFontStyle(value) {
 		dom.utils.toggleClass(this.propTargets[`font_${value}`], 'on');
 	}
@@ -256,11 +274,19 @@ export class TableStyleService {
 		this.#main._setCellControllerPosition(this.#state.tdElement, false);
 	}
 
+	/**
+	 * @description Resets the header button state.
+	 * @param {HTMLTableElement} table - The table element.
+	 */
 	resetHeaderButton(table) {
 		if (table.querySelector('thead')) dom.utils.addClass(this.headerButton, 'active');
 		else dom.utils.removeClass(this.headerButton, 'active');
 	}
 
+	/**
+	 * @description Resets the caption button state.
+	 * @param {HTMLTableElement} table - The table element.
+	 */
 	resetCaptionButton(table) {
 		if (table.querySelector('caption')) dom.utils.addClass(this.captionButton, 'active');
 		else dom.utils.removeClass(this.captionButton, 'active');
@@ -279,6 +305,9 @@ export class TableStyleService {
 		r_parent.appendChild(left);
 	}
 
+	/**
+	 * @description Reverts the properties to their previous state.
+	 */
 	revertProps() {
 		const propsCache = this._propsCache;
 		for (let i = 0, len = propsCache.length; i < len; i++) {
@@ -292,16 +321,28 @@ export class TableStyleService {
 		}
 	}
 
+	/**
+	 * @description Applies the color from the color picker.
+	 * @param {any} color - The color string or object.
+	 */
 	applyColorPicker(color) {
 		const target = this.propTargets[`${this.sliderType}_color`];
 		target.style.borderColor = target.value = color;
 		this.controller_colorPicker.close();
 	}
 
+	/**
+	 * @description Sets the alignment properties.
+	 * @param {string} value - The alignment value.
+	 */
 	setAlignProps(value) {
 		this.#setAlignProps(this.propTargets.cell_alignment, value, false);
 	}
 
+	/**
+	 * @description Sets the vertical alignment properties.
+	 * @param {string} value - The vertical alignment value.
+	 */
 	setVerticalAlignProps(value) {
 		this.#setAlignProps(this.propTargets.cell_alignment_vertical, value, false);
 	}
@@ -511,6 +552,9 @@ export class TableStyleService {
 		}
 	}
 
+	/**
+	 * @description Closes the properties dialog.
+	 */
 	closeProps() {
 		this.controller_props.close();
 		this.controller_colorPicker.close();
@@ -783,6 +827,9 @@ export class TableStyleService {
 		this.selectMenu_props_border_format_oneCell.close();
 	}
 
+	/**
+	 * @description Initialize the style service (resets properties).
+	 */
 	init() {
 		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
 		dom.utils.removeClass([border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, cell_alignment_vertical, font_bold, font_underline, font_italic, font_strike], 'on');
