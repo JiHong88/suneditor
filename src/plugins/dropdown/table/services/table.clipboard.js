@@ -1,5 +1,5 @@
 import { dom } from '../../../../helper';
-import { CloneTable, InvalidateTableCache } from '../shared/table.utils';
+import { CloneTable, GetLogicalCellIndex, InvalidateTableCache } from '../shared/table.utils';
 
 /**
  * @description Table clipboard service for handling copy and paste operations within tables.
@@ -54,19 +54,18 @@ export class TableClipboardService {
 		const matrix = Array.from({ length: rowCount }, () => Array(colCount).fill(null));
 
 		// build matrix
-		for (let r = 0, realRow = 0; r < rowCount; r++, realRow++) {
+		for (let r = 0; r < rowCount; r++) {
 			const cells = rows[r].cells;
-			for (let c = 0, realCol = 0, cLen = cells.length; c < cLen; c++) {
-				while (matrix[realRow][realCol]) realCol++;
+			for (let c = 0, cLen = cells.length; c < cLen; c++) {
+				const realCol = GetLogicalCellIndex(originalTable, r, c);
 				const cell = cells[c];
 				const rowspan = cell.rowSpan || 1;
 				const colspan = cell.colSpan || 1;
 				for (let i = 0; i < rowspan; i++) {
 					for (let j = 0; j < colspan; j++) {
-						matrix[realRow + i][realCol + j] = cell;
+						matrix[r + i][realCol + j] = cell;
 					}
 				}
-				realCol += colspan;
 			}
 		}
 

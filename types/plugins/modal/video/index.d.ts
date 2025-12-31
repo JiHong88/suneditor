@@ -168,9 +168,6 @@ export type VideoState = {
  * - It also supports embedding from popular video services
  */
 declare class Video extends PluginModal {
-	static get defaultExtensions(): string[];
-	static get defaultUrlPatterns(): RegExp[];
-	static checkContentType(url: any): boolean;
 	/**
 	 * @this {Video}
 	 * @param {HTMLElement} node - The node to check.

@@ -5,7 +5,7 @@ import * as Constants from '../shared/table.constants';
 import { CreateBorderMenu, CreateBorderFormatMenu } from '../render/table.menu';
 import { CreateHTML_controller_properties } from '../render/table.html';
 import { ColorPicker, Controller } from '../../../../modules/contract';
-import { CreateCellsString } from '../shared/table.utils';
+import { CreateCellsString, InvalidateTableCache } from '../shared/table.utils';
 
 const { _w } = env;
 
@@ -236,6 +236,7 @@ export class TableStyleService {
 		const btn = this.headerButton;
 		const active = dom.utils.hasClass(btn, 'active');
 		const table = this.#main._element;
+		InvalidateTableCache(table);
 
 		if (!active) {
 			const header = dom.utils.createElement('THEAD');

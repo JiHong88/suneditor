@@ -94,7 +94,7 @@ export class ImageSizeService {
 
 		if (this.#state.onlyPercentage) {
 			if (!w) w = '100%';
-			else if (/%$/.test(w)) w += SIZE_UNIT.PERCENTAGE;
+			else if (!/%$/.test(w)) w += SIZE_UNIT.PERCENTAGE;
 		}
 		this.#main.figure.setSize(w, h);
 	}

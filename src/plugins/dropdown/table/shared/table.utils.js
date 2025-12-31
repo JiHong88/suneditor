@@ -3,8 +3,63 @@ import * as Constants from './table.constants';
 
 const { _w } = env;
 
-/** @type {WeakMap<HTMLTableElement, Map<string, {cs: number, ce: number, rs: number, re: number}>>} */
+/**
+ * @description Cache for selected cell range references. (Use drag cells)
+ * - Stores the calculated logical start/end positions (row, col) for a given selection.
+ * @type {WeakMap<HTMLTableElement, Map<string, {cs: number, ce: number, rs: number, re: number, _i: number}>>}
+ */
 export const refCache = new WeakMap();
+
+/**
+ * @description Cache for mapping a table’s physical coordinates (row, cellIndex) to a logical column index
+ * @type {WeakMap<HTMLTableElement, number[][]>}
+ */
+const logicalIndexMapCache = new WeakMap();
+
+/**
+ * @description Builds a matrix of logical indices for the table.
+ * @param {HTMLTableElement} table The table element.
+ * @returns {number[][]} A 2D array where matrix[row][cell] = logicalColumnIndex.
+ */
+function BuildMatrix(table) {
+	const matrix = [];
+
+	const rows = table.rows;
+	const rowSpanMap = [];
+	for (let r = 0, rLen = rows.length; r < rLen; r++) {
+		const cells = rows[r].cells;
+		matrix[r] = [];
+
+		let logicalCol = 0;
+		for (let c = 0, cLen = cells.length; c < cLen; c++) {
+			while (rowSpanMap[r]?.[logicalCol]) {
+				logicalCol++;
+			}
+
+			matrix[r][c] = logicalCol;
+
+			// span calc
+			const cell = cells[c];
+			const colspan = cell.colSpan || 1;
+			const rowspan = cell.rowSpan || 1;
+
+			if (rowspan > 1) {
+				for (let rs = 1; rs < rowspan; rs++) {
+					if (!rowSpanMap[r + rs]) rowSpanMap[r + rs] = [];
+					for (let cs = 0; cs < colspan; cs++) {
+						rowSpanMap[r + rs][logicalCol + cs] = true;
+					}
+				}
+			}
+
+			logicalCol += colspan;
+		}
+	}
+
+	return matrix;
+}
+
+/** ================================================================================================================================ */
 
 /**
  * @description Checks if the given node is a resizable table element.
@@ -110,72 +165,19 @@ export function GetMaxColumns(table) {
 /**
  * @description Gets the logical cell index for a cell in a table.
  * @param {HTMLTableElement} table The table element.
- * @param {number} rowIndex The row index of the cell.
+ * @param {number} rowIndex The physical row index.
  * @param {number} cellIndex The physical cell index.
  * @returns {number} The logical cell index.
  */
 export function GetLogicalCellIndex(table, rowIndex, cellIndex) {
-	const rows = table.rows;
-	let rowSpanArr = [];
-	let spanIndex = [];
-	let logicalIndex = 0;
+	let indexMap = logicalIndexMapCache.get(table);
 
-	for (let i = 0, cells, colSpan; i <= rowIndex; i++) {
-		cells = rows[i].cells;
-		colSpan = 0;
-
-		for (let c = 0, cLen = cells.length, currentCell, cs, rs, logcalIndex; c < cLen; c++) {
-			currentCell = cells[c];
-			cs = currentCell.colSpan - 1;
-			rs = currentCell.rowSpan - 1;
-			logcalIndex = c + colSpan;
-
-			if (spanIndex.length > 0) {
-				for (let r = 0, arr; r < spanIndex.length; r++) {
-					arr = spanIndex[r];
-					if (arr.row > i) continue;
-					if (logcalIndex >= arr.index) {
-						colSpan += arr.cs;
-						logcalIndex += arr.cs;
-						arr.rs -= 1;
-						arr.row = i + 1;
-						if (arr.rs < 1) {
-							spanIndex.splice(r, 1);
-							r--;
-						}
-					} else if (c === cLen - 1) {
-						arr.rs -= 1;
-						arr.row = i + 1;
-						if (arr.rs < 1) {
-							spanIndex.splice(r, 1);
-							r--;
-						}
-					}
-				}
-			}
-
-			if (i === rowIndex && c === cellIndex) {
-				logicalIndex = logcalIndex;
-				break;
-			}
-
-			if (rs > 0) {
-				rowSpanArr.push({
-					index: logcalIndex,
-					cs: cs + 1,
-					rs: rs,
-					row: -1,
-				});
-			}
-
-			colSpan += cs;
-		}
-
-		spanIndex = spanIndex.concat(rowSpanArr).sort((a, b) => a.index - b.index);
-		rowSpanArr = [];
+	if (!indexMap) {
+		indexMap = BuildMatrix(table);
+		logicalIndexMapCache.set(table, indexMap);
 	}
 
-	return logicalIndex;
+	return indexMap[rowIndex]?.[cellIndex] ?? 0;
 }
 
 /**
@@ -213,4 +215,5 @@ export function CloneTable(table, selectedCells) {
 export function InvalidateTableCache(table) {
 	if (!table) return;
 	refCache.delete(table);
+	logicalIndexMapCache.delete(table);
 }

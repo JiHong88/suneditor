@@ -1,4 +1,5 @@
 import type {} from '../../../../typedef';
+/** ================================================================================================================================ */
 /**
  * @description Checks if the given node is a resizable table element.
  * @param {Node} node The DOM node to check.
@@ -47,17 +48,11 @@ export function GetMaxColumns(table: HTMLTableElement): number;
 /**
  * @description Gets the logical cell index for a cell in a table.
  * @param {HTMLTableElement} table The table element.
- * @param {number} rowIndex The row index of the cell.
+ * @param {number} rowIndex The physical row index.
  * @param {number} cellIndex The physical cell index.
  * @returns {number} The logical cell index.
  */
 export function GetLogicalCellIndex(table: HTMLTableElement, rowIndex: number, cellIndex: number): number;
-/**
- * @description Invalidates all table-related caches for a table.
- * Call this when table structure changes (add/remove row/column, merge/split cells).
- * @param {HTMLTableElement} table The table element.
- */
-export function InvalidateTableCache(table: HTMLTableElement): void;
 /**
  * @description Clone a table element and map selected cells to the cloned table
  * @param {HTMLTableElement} table <table> element
@@ -71,7 +66,16 @@ export function CloneTable(
 	clonedTable: HTMLTableElement;
 	clonedSelectedCells: HTMLTableCellElement[];
 };
-/** @type {WeakMap<HTMLTableElement, Map<string, {cs: number, ce: number, rs: number, re: number}>>} */
+/**
+ * @description Clear table cache
+ * @param {HTMLTableElement} table The table element.
+ */
+export function InvalidateTableCache(table: HTMLTableElement): void;
+/**
+ * @description Cache for selected cell range references. (Use drag cells)
+ * - Stores the calculated logical start/end positions (row, col) for a given selection.
+ * @type {WeakMap<HTMLTableElement, Map<string, {cs: number, ce: number, rs: number, re: number, _i: number}>>}
+ */
 export const refCache: WeakMap<
 	HTMLTableElement,
 	Map<
@@ -81,6 +85,7 @@ export const refCache: WeakMap<
 			ce: number;
 			rs: number;
 			re: number;
+			_i: number;
 		}
 	>
 >;
