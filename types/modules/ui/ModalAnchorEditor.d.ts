@@ -79,31 +79,21 @@ export type ModalAnchorEditorParams = {
 declare class ModalAnchorEditor extends CoreInjector {
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
-	 * @param {Node} modalForm The modal form element
-	 * @param {ModalAnchorEditorParams} params ModalAnchorEditor options
+	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
 	 */
-	constructor(inst: any, modalForm: Node, params: ModalAnchorEditorParams);
+	constructor(editor: SunEditor.Instance, modalForm: any, params: any);
 	selection: import('../../core/class/selection').default;
 	ui: import('../../core/class/ui').default;
 	openNewWindow: boolean;
-	relList: string[];
-	defaultRel: {
-		default?: string;
-		check_new_window?: string;
-		check_bookmark?: string;
-	};
+	relList: any;
+	defaultRel: any;
 	noAutoPrefix: boolean;
-	uploadUrl: string;
-	uploadHeaders: {
-		[x: string]: string;
-	};
+	uploadUrl: any;
+	uploadHeaders: any;
 	uploadSizeLimit: number;
 	uploadSingleSizeLimit: number;
 	input: HTMLElement;
 	fileManager: FileManager;
-	kink: any;
-	inst: any;
 	host: string;
 	/** @type {HTMLInputElement} */
 	urlInput: HTMLInputElement;
@@ -154,4 +144,4 @@ declare class ModalAnchorEditor extends CoreInjector {
 	#private;
 }
 import CoreInjector from '../../editorInjector/_core';
-import FileManager from './FileManager';
+import FileManager from '../manager/FileManager';

@@ -25,7 +25,13 @@ export class TableGridService {
 	);
 	selectMenu_column: SelectMenu;
 	selectMenu_row: SelectMenu;
+	/**
+	 * @description Opens the column menu.
+	 */
 	openColumnMenu(): void;
+	/**
+	 * @description Opens the row menu.
+	 */
 	openRowMenu(): void;
 	/**
 	 * @description Edits the table by adding, removing, or modifying rows and cells, based on the provided options. Supports both single and multi-cell/row editing.
@@ -65,4 +71,4 @@ export class TableGridService {
 	#private;
 }
 export default TableGridService;
-import { SelectMenu } from '../../../../modules/utils';
+import { SelectMenu } from '../../../../modules/ui';

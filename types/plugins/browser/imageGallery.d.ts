@@ -41,4 +41,4 @@ declare class ImageGallery extends PluginBrowser {
 	#private;
 }
 import { PluginBrowser } from '../../interfaces';
-import { Browser } from '../../modules/contracts';
+import { Browser } from '../../modules/contract';

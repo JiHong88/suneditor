@@ -126,21 +126,21 @@ declare global {
 		type NodeCollection = Array<Node> | HTMLCollection | NodeList;
 		export namespace Module {
 			namespace Controller {
-				type Info = import('./modules/contracts/Controller').ControllerInfo;
+				type Info = import('./modules/contract/Controller').ControllerInfo;
 			}
 			namespace Figure {
-				type Info = import('./modules/contracts/Figure').FigureInfo;
-				type TargetInfo = import('./modules/contracts/Figure').FigureTargetInfo;
-				type ControlButton = import('./modules/contracts/Figure').FigureControlButton;
-				type ControlResize = import('./modules/contracts/Figure').FigureControlResize;
-				type ControlCustomAction = import('./modules/contracts/Figure').ControlCustomAction;
-				type Controls = import('./modules/contracts/Figure').FigureControls;
+				type Info = import('./modules/contract/Figure').FigureInfo;
+				type TargetInfo = import('./modules/contract/Figure').FigureTargetInfo;
+				type ControlButton = import('./modules/contract/Figure').FigureControlButton;
+				type ControlResize = import('./modules/contract/Figure').FigureControlResize;
+				type ControlCustomAction = import('./modules/contract/Figure').ControlCustomAction;
+				type Controls = import('./modules/contract/Figure').FigureControls;
 			}
 			namespace Browser {
-				type File = import('./modules/contracts/Browser').BrowserFile;
+				type File = import('./modules/contract/Browser').BrowserFile;
 			}
 			namespace HueSlider {
-				type Color = import('./modules/contracts/HueSlider').HueSliderColor;
+				type Color = import('./modules/contract/HueSlider').HueSliderColor;
 			}
 		}
 		export namespace Hook {

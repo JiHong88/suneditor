@@ -10,8 +10,8 @@ export class ImageSizeService {
 	#main;
 	#state;
 	#pluginOptions;
-	#resizing;
 
+	#resizing;
 	#origin_w;
 	#origin_h;
 
@@ -28,12 +28,12 @@ export class ImageSizeService {
 		this.#main = main;
 		this.#state = main.state;
 		this.#pluginOptions = main.pluginOptions;
-		this.#resizing = main.resizing;
 
+		this.#resizing = this.#pluginOptions.canResize;
 		this.#origin_w = this.#pluginOptions.defaultWidth === 'auto' ? '' : this.#pluginOptions.defaultWidth;
 		this.#origin_h = this.#pluginOptions.defaultHeight === 'auto' ? '' : this.#pluginOptions.defaultHeight;
 
-		if (main.resizing) {
+		if (this.#resizing) {
 			this.#proportion = modalEl.proportion;
 			this.#inputX = modalEl.inputX;
 			this.#inputY = modalEl.inputY;
@@ -50,6 +50,11 @@ export class ImageSizeService {
 		}
 	}
 
+	/**
+	 * @description Sets the width and height input values.
+	 * @param {string} w - Width value
+	 * @param {string} h - Height value
+	 */
 	setInputSize(w, h) {
 		this.#inputX.value = w === 'auto' ? '' : w;
 
@@ -57,6 +62,10 @@ export class ImageSizeService {
 		this.#inputY.value = h === 'auto' ? '' : h;
 	}
 
+	/**
+	 * @description Gets the current width and height input values.
+	 * @returns {{w: string, h: string}}
+	 */
 	getInputSize() {
 		return {
 			w: this.#inputX?.value || '',
@@ -64,6 +73,11 @@ export class ImageSizeService {
 		};
 	}
 
+	/**
+	 * @description Sets the original width and height of the image.
+	 * @param {string} w - Original width
+	 * @param {string} h - Original height
+	 */
 	setOriginSize(w, h) {
 		this.#origin_w = w;
 		this.#origin_h = h;
@@ -85,6 +99,24 @@ export class ImageSizeService {
 		this.#main.figure.setSize(w, h);
 	}
 
+	/**
+	 * @description Called when the modal is opened. Resets size inputs to default.
+	 */
+	on() {
+		if (!this.#resizing) return;
+
+		const x = this.#pluginOptions.defaultWidth;
+		const y = this.#pluginOptions.defaultHeight;
+		this.setInputSize(x, y);
+		this.setOriginSize(x, y);
+	}
+
+	/**
+	 * @description Prepares the size inputs and proportion state when an image is selected.
+	 * @param {SunEditor.Module.Figure.TargetInfo} figureInfo - Figure size information
+	 * @param {string} w - Current width
+	 * @param {string} h - Current height
+	 */
 	ready(figureInfo, w, h) {
 		this.setInputSize(w, h);
 
@@ -102,6 +134,9 @@ export class ImageSizeService {
 				};
 	}
 
+	/**
+	 * @description Initializes the size service state.
+	 */
 	init() {
 		this.#ratio = {
 			w: 0,
@@ -114,14 +149,20 @@ export class ImageSizeService {
 		}
 	}
 
+	/**
+	 * @description Handles keyup events on size inputs to calculate proportion.
+	 * @param {'x'|'y'} xy - Axis ('x' for width, 'y' for height)
+	 * @param {KeyboardEvent} e - Event object
+	 */
 	#OnInputSize(xy, e) {
 		if (keyCodeMap.isSpace(e.code)) {
 			e.preventDefault();
 			return;
 		}
 
-		if (xy === 'x' && this.#state.onlyPercentage && e.target.value > 100) {
-			e.target.value = 100;
+		const target = /** @type {HTMLInputElement} */ (e.target);
+		if (xy === 'x' && this.#state.onlyPercentage && Number(target.value) > 100) {
+			target.value = '100';
 		} else if (this.#proportion.checked) {
 			const ratioSize = Figure.CalcRatio(this.#inputX.value, this.#inputY.value, this.#state.sizeUnit, this.#ratio);
 			if (xy === 'x') {
@@ -132,10 +173,16 @@ export class ImageSizeService {
 		}
 	}
 
+	/**
+	 * @description Updates the ratio based on current input values.
+	 */
 	#OnChangeRatio() {
 		this.#ratio = this.#proportion.checked ? Figure.GetRatio(this.#inputX.value, this.#inputY.value, this.#state.sizeUnit) : { w: 0, h: 0 };
 	}
 
+	/**
+	 * @description Reverts the size inputs to the original image size.
+	 */
 	#OnClickRevert() {
 		if (this.#state.onlyPercentage) {
 			this.#inputX.value = Number(this.#origin_w) > 100 ? '100' : this.#origin_w;

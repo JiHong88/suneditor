@@ -141,4 +141,4 @@ declare class Drawing extends PluginModal {
 	#private;
 }
 import { PluginModal } from '../../interfaces';
-import { Modal } from '../../modules/contracts';
+import { Modal } from '../../modules/contract';

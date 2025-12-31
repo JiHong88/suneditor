@@ -24,4 +24,4 @@ declare class Anchor extends PluginPopup {
 	#private;
 }
 import { PluginPopup } from '../../interfaces';
-import { Controller } from '../../modules/contracts';
+import { Controller } from '../../modules/contract';

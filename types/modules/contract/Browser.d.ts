@@ -260,4 +260,4 @@ declare class Browser extends CoreInjector {
 	#private;
 }
 import CoreInjector from '../../editorInjector/_core';
-import ApiManager from '../utils/ApiManager';
+import ApiManager from '../manager/ApiManager';

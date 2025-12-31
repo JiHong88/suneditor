@@ -1,8 +1,12 @@
-import { PluginModal } from '../../interfaces';
-import { Modal, Figure } from '../../modules/contract';
-import { FileManager } from '../../modules/manager';
-import { dom, numbers, env, converter, keyCodeMap } from '../../helper';
+import { PluginModal } from '../../../interfaces';
+import { Modal, Figure } from '../../../modules/contract';
+import { FileManager } from '../../../modules/manager';
+import { dom, numbers, env, converter } from '../../../helper';
 const { _w, NO_EVENT } = env;
+
+import VideoSizeService from './services/video.size';
+import VideoUploadService from './services/video.upload';
+import { CreateHTML_modal } from './render/video.html';
 
 /**
  * @typedef {Object} VideoPluginOptions
@@ -38,6 +42,13 @@ const { _w, NO_EVENT } = env;
  */
 
 /**
+ * @typedef {Object} VideoState
+ * @property {string} sizeUnit
+ * @property {boolean} onlyPercentage
+ * @property {string} defaultRatio
+ */
+
+/**
  * @class
  * @description Video plugin.
  * - This plugin provides video embedding functionality within the editor.
@@ -60,22 +71,13 @@ class Video extends PluginModal {
 		return null;
 	}
 
-	#frameRatio;
-	#defaultRatio;
-	#defaultSizeX;
-	#defaultSizeY;
-	#origin_w;
-	#origin_h;
 	#resizing;
-	#onlyPercentage;
 	#nonResizing;
 
 	#linkValue = '';
 	#align = 'none';
 	#element = null;
 	#container = null;
-	#ratio = { w: 0, h: 0 };
-	#initRatioValue = null;
 
 	/**
 	 * @constructor
@@ -137,22 +139,9 @@ class Video extends PluginModal {
 		this.videoUrlFile = modalEl.videoUrlFile;
 		this.focusElement = this.videoUrlFile || this.videoInputFile;
 		this.previewSrc = modalEl.previewSrc;
-		this.sizeUnit = sizeUnit;
-		this.proportion = null;
-		this.frameRatioOption = null;
-		this.inputX = null;
-		this.inputY = null;
 
-		this.#frameRatio = defaultRatio;
-		this.#defaultRatio = defaultRatio;
-		this.#defaultSizeX = '100%';
-		this.#defaultSizeY = this.pluginOptions.defaultRatio * 100 + '%';
-
-		this.#origin_w = this.pluginOptions.defaultWidth === '100%' ? '' : this.pluginOptions.defaultWidth;
-		this.#origin_h = this.pluginOptions.defaultHeight === defaultRatio ? '' : this.pluginOptions.defaultHeight;
 		this.#resizing = this.pluginOptions.canResize;
-		this.#onlyPercentage = this.pluginOptions.percentageOnlySize;
-		this.#nonResizing = !this.#resizing || !this.pluginOptions.showHeightInput || this.#onlyPercentage;
+		this.#nonResizing = !this.#resizing || !this.pluginOptions.showHeightInput || this.pluginOptions.percentageOnlySize;
 
 		this.query = {
 			youtube: {
@@ -199,31 +188,32 @@ class Video extends PluginModal {
 			])
 			.concat(pluginOptions.urlPatterns || []);
 
+		/** @type {VideoState} */
+		this.state = {
+			onlyPercentage: this.pluginOptions.percentageOnlySize,
+			sizeUnit: sizeUnit,
+			defaultRatio: this.pluginOptions.defaultRatio * 100 + '%',
+		};
+
+		this.sizeService = new VideoSizeService(this, modalEl);
+		this.uploadService = new VideoUploadService(this);
+
+		// init
 		const galleryButton = modalEl.galleryButton;
 		if (galleryButton) this.eventManager.addEvent(galleryButton, 'click', this.#OpenGallery.bind(this));
 
-		// init
 		if (this.videoInputFile) this.eventManager.addEvent(modalEl.fileRemoveBtn, 'click', this.#RemoveSelectedFiles.bind(this));
 		if (this.videoUrlFile) this.eventManager.addEvent(this.videoUrlFile, 'input', this.#OnLinkPreview.bind(this));
 		if (this.videoInputFile && this.videoUrlFile) this.eventManager.addEvent(this.videoInputFile, 'change', this.#OnfileInputChange.bind(this));
+	}
 
-		if (this.#resizing) {
-			this.proportion = modalEl.proportion;
-			this.frameRatioOption = modalEl.frameRatioOption;
-			this.inputX = modalEl.inputX;
-			this.inputY = modalEl.inputY;
-			this.inputX.value = this.pluginOptions.defaultWidth;
-			this.inputY.value = this.pluginOptions.defaultHeight;
-
-			const ratioChange = this.#OnChangeRatio.bind(this);
-			this.eventManager.addEvent(this.inputX, 'keyup', this.#OnInputSize.bind(this, 'x'));
-			this.eventManager.addEvent(this.inputY, 'keyup', this.#OnInputSize.bind(this, 'y'));
-			this.eventManager.addEvent(this.inputX, 'change', ratioChange);
-			this.eventManager.addEvent(this.inputY, 'change', ratioChange);
-			this.eventManager.addEvent(this.proportion, 'change', ratioChange);
-			this.eventManager.addEvent(this.frameRatioOption, 'change', this.#SetRatio.bind(this));
-			this.eventManager.addEvent(modalEl.revertBtn, 'click', this.#OnClickRevert.bind(this));
-		}
+	/**
+	 * @template {keyof VideoState} K
+	 * @param {K} key
+	 * @param {VideoState[K]} value
+	 */
+	setState(key, value) {
+		this.state[key] = value;
 	}
 
 	/**
@@ -276,20 +266,12 @@ class Video extends PluginModal {
 	 */
 	modalOn(isUpdate) {
 		if (!isUpdate) {
-			if (this.#resizing) {
-				this.inputX.value = this.#origin_w = this.pluginOptions.defaultWidth === this.#defaultSizeX ? '' : this.pluginOptions.defaultWidth;
-				this.inputY.value = this.#origin_h = this.pluginOptions.defaultHeight === this.#defaultSizeY ? '' : this.pluginOptions.defaultHeight;
-				this.proportion.disabled = true;
-			}
 			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.setAttribute('multiple', 'multiple');
 		} else {
 			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.removeAttribute('multiple');
 		}
 
-		if (this.#resizing) {
-			this.#setRatioSelect(this.figure.isVertical ? '' : this.#origin_h || this.#defaultRatio);
-			this.#initRatioValue = this.frameRatioOption?.value;
-		}
+		this.sizeService.on(isUpdate);
 	}
 
 	/**
@@ -325,16 +307,9 @@ class Video extends PluginModal {
 		}
 
 		/** @type {HTMLInputElement} */ (this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
-		this.#ratio = { w: 0, h: 0 };
 		this.#nonResizing = false;
 
-		if (this.#resizing) {
-			this.inputX.value = this.pluginOptions.defaultWidth === this.#defaultSizeX ? '' : this.pluginOptions.defaultWidth;
-			this.inputY.value = this.pluginOptions.defaultHeight === this.#defaultSizeY ? '' : this.pluginOptions.defaultHeight;
-			this.proportion.checked = false;
-			this.proportion.disabled = true;
-			this.#setRatioSelect(this.#defaultRatio);
-		}
+		this.sizeService.init();
 	}
 
 	/**
@@ -518,18 +493,10 @@ class Video extends PluginModal {
 		this.#container = container;
 		this.figure.open(oFrame, { nonResizing: this.#nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, infoOnly: true });
 
-		width ||= this.#defaultSizeX;
-		height ||= this.#frameRatio;
-
-		const size = this.figure.getSize(oFrame);
-		const inputUpdate = size.w !== width || size.h !== height;
-		const changeSize = !isUpdate || inputUpdate;
-
 		// set size
-		if (changeSize) {
-			if (this.#initRatioValue !== this.frameRatioOption?.value) this.figure.deleteTransform();
-			this.#applySize(width, height);
-		}
+		const resolved = this.sizeService.resolveSize(width, height, oFrame, isUpdate);
+		width = resolved.width;
+		height = resolved.height;
 
 		// align
 		this.figure.setAlign(oFrame, align);
@@ -543,7 +510,7 @@ class Video extends PluginModal {
 			return;
 		}
 
-		if (!this.#resizing || !changeSize || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
+		if (!this.#resizing || !resolved.isChanged || !this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
 		this.history.push(false);
 	}
 
@@ -637,7 +604,7 @@ class Video extends PluginModal {
 		const handler = function (uploadCallback, infos, newInfos) {
 			infos = newInfos || infos;
 			uploadCallback(infos, infos.files);
-		}.bind(this, this.#serverUpload.bind(this), videoInfo);
+		}.bind(this, this.uploadService.serverUpload.bind(this.uploadService), videoInfo);
 
 		const result = await this.triggerEvent('onVideoUploadBefore', {
 			info: videoInfo,
@@ -709,10 +676,9 @@ class Video extends PluginModal {
 		this.#align = figureInfo.align;
 		target.style.float = '';
 
-		this.#origin_w = String(figureInfo.width || figureInfo.originWidth || figureInfo.w || '');
-		this.#origin_h = String(figureInfo.height || figureInfo.originHeight || figureInfo.h || '');
-
-		const h = figureInfo.height || figureInfo.h || this.#origin_h || '';
+		const originWidth = String(figureInfo.width || figureInfo.originWidth || figureInfo.w || '');
+		const originHeight = String(figureInfo.height || figureInfo.originHeight || figureInfo.h || '');
+		this.sizeService.setOriginSize(originWidth, originHeight);
 
 		if (this.videoUrlFile) this.#linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this.#element.src || this.#element.querySelector('source')?.src || '';
 
@@ -722,39 +688,7 @@ class Video extends PluginModal {
 
 		if (!this.#resizing) return;
 
-		const percentageRotation = this.#onlyPercentage && this.figure.isVertical;
-		const { dw, dh } = this.figure.getSize(target);
-		this.inputX.value = dw === 'auto' ? '' : dw;
-		this.inputY.value = dh === 'auto' ? '' : dh;
-
-		if (!this.#setRatioSelect(h)) this.inputY.value = String(this.#onlyPercentage ? numbers.get(h, 2) : h);
-
-		this.proportion.checked = true;
-		this.inputX.disabled = percentageRotation ? true : false;
-		this.inputY.disabled = percentageRotation ? true : false;
-		this.proportion.disabled = percentageRotation ? true : false;
-
-		if (figureInfo.isVertical) {
-			this.proportion.checked = false;
-		}
-
-		this.#ratio = this.proportion.checked ? figureInfo.ratio : { w: 0, h: 0 };
-	}
-
-	/**
-	 * @description Sets the size of the video element.
-	 * @param {string|number} w - The width of the video.
-	 * @param {string|number} h - The height of the video.
-	 */
-	#applySize(w, h) {
-		w ||= this.inputX?.value || this.pluginOptions.defaultWidth;
-		h ||= this.inputY?.value || this.pluginOptions.defaultHeight;
-
-		if (this.#onlyPercentage) {
-			if (!w) w = '100%';
-			else if (/%$/.test(w + '')) w += '%';
-		}
-		this.figure.setSize(w, h);
+		this.sizeService.ready(figureInfo, target);
 	}
 
 	/**
@@ -762,9 +696,10 @@ class Video extends PluginModal {
 	 * @returns {*} Video information object.
 	 */
 	#getInfo() {
+		const { w, h } = this.sizeService.getInputSize();
 		return {
-			inputWidth: this.inputX?.value || '',
-			inputHeight: this.inputY?.value || '',
+			inputWidth: w,
+			inputHeight: h,
 			align: this.#align,
 			isUpdate: this.modal.isUpdate,
 			element: this.#element,
@@ -804,8 +739,8 @@ class Video extends PluginModal {
 		const size = (cloneFrame.getAttribute('data-se-size') || ',').split(',');
 
 		const width = size[0] || prevFrame.width || '';
-		const height = size[1] || prevFrame.height || this.#defaultRatio || '';
-		this.#applySize(width, height);
+		const height = size[1] || prevFrame.height || this.state.defaultRatio || '';
+		this.sizeService.applySize(width, height);
 
 		// align
 		const format = this.format.getLine(prevFrame);
@@ -815,47 +750,6 @@ class Video extends PluginModal {
 		this.figure.retainFigureFormat(container, this.#element, null, this.fileManager);
 
 		return cloneFrame;
-	}
-
-	/**
-	 * @description Registers the uploaded video in the editor.
-	 * @param {SunEditor.EventParams.VideoInfo} info - Video information object.
-	 * @param {Object<string, *>} response - Server response containing video data.
-	 */
-	#register(info, response) {
-		const fileList = response.result;
-		const videoTag = this.createVideoTag();
-
-		for (let i = 0, len = fileList.length; i < len; i++) {
-			const ctag = info.isUpdate ? info.element : /** @type {HTMLIFrameElement|HTMLVideoElement} */ (videoTag.cloneNode(false));
-			this.create(
-				ctag,
-				fileList[i].url,
-				info.inputWidth,
-				info.inputHeight,
-				info.align,
-				info.isUpdate,
-				{
-					name: fileList[i].name,
-					size: fileList[i].size,
-				},
-				i === len - 1,
-			);
-		}
-	}
-
-	/**
-	 * @description Uploads a video to the server using an external upload handler.
-	 * @param {SunEditor.EventParams.VideoInfo} info - Video information object.
-	 * @param {FileList} files - The video files to upload.
-	 */
-	#serverUpload(info, files) {
-		if (!files) return;
-
-		const videoUploadUrl = this.pluginOptions.uploadUrl;
-		if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
-			this.fileManager.upload(videoUploadUrl, this.pluginOptions.uploadHeaders, files, this.#UploadCallBack.bind(this, info), this.#error.bind(this));
-		}
 	}
 
 	/**
@@ -886,61 +780,6 @@ class Video extends PluginModal {
 
 		for (const key in attrs) {
 			element.setAttribute(key, attrs[key]);
-		}
-	}
-
-	/**
-	 * @description Selects a ratio option in the ratio dropdown.
-	 * @param {string|number} value - The selected ratio value.
-	 * @returns {boolean} Returns true if a ratio was selected.
-	 */
-	#setRatioSelect(value) {
-		if (!this.frameRatioOption) return;
-
-		let ratioSelected = false;
-		const ratioOption = this.frameRatioOption.options;
-
-		if (/%$/.test(value + '') || this.#onlyPercentage) value = numbers.get(value, 2) / 100 + '';
-		else if (!numbers.is(value) || Number(value) >= 1) value = '';
-
-		this.inputY.placeholder = '';
-		for (let i = 0, len = ratioOption.length; i < len; i++) {
-			if (ratioOption[i].value === value) {
-				ratioSelected = ratioOption[i].selected = true;
-				this.inputY.placeholder = !value ? '' : Number(value) * 100 + '%';
-			} else {
-				ratioOption[i].selected = false;
-			}
-		}
-
-		return ratioSelected;
-	}
-
-	/**
-	 * @description Handles video upload errors.
-	 * @param {Object<string, *>} response - The error response object.
-	 * @returns {Promise<void>}
-	 */
-	async #error(response) {
-		const message = await this.triggerEvent('onVideoUploadError', { error: response });
-		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
-		this.ui.alertOpen(err, 'error');
-		console.error('[SUNEDITOR.plugin.video.error]', message);
-	}
-
-	/**
-	 * @description Handles the callback function for video upload completion.
-	 * @param {SunEditor.EventParams.VideoInfo} info - Video information.
-	 * @param {XMLHttpRequest} xmlHttp - The XMLHttpRequest object.
-	 */
-	async #UploadCallBack(info, xmlHttp) {
-		if ((await this.triggerEvent('videoUploadHandler', { xmlHttp, info })) === NO_EVENT) {
-			const response = JSON.parse(xmlHttp.responseText);
-			if (response.errorMessage) {
-				this.#error(response);
-			} else {
-				this.#register(info, response);
-			}
 		}
 	}
 
@@ -1013,188 +852,6 @@ class Video extends PluginModal {
 		const eventTarget = dom.query.getEventTarget(e);
 		Modal.OnChangeFile(this.fileModalWrapper, eventTarget.files);
 	}
-
-	#OnClickRevert() {
-		if (this.#onlyPercentage) {
-			this.inputX.value = Number(this.#origin_w) > 100 ? '100' : this.#origin_w;
-		} else {
-			this.inputX.value = this.#origin_w;
-			this.inputY.value = this.#origin_h;
-		}
-	}
-
-	/**
-	 * @param {InputEvent} e - Event object
-	 */
-	#SetRatio(e) {
-		/** @type {HTMLSelectElement} */
-		const eventTarget = dom.query.getEventTarget(e);
-		const value = eventTarget.options[eventTarget.selectedIndex].value;
-		this.#defaultSizeY = this.figure.autoRatio.current = this.#frameRatio = !value ? this.#defaultSizeY : Number(value) * 100 + '%';
-		this.inputY.placeholder = !value ? '' : Number(value) * 100 + '%';
-		this.inputY.value = '';
-	}
-
-	#OnChangeRatio() {
-		this.#ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 0, h: 0 };
-	}
-
-	/**
-	 * @param {"x"|"y"} xy - x or y
-	 * @param {KeyboardEvent} e - Event object
-	 */
-	#OnInputSize(xy, e) {
-		if (keyCodeMap.isSpace(e.code)) {
-			e.preventDefault();
-			return;
-		}
-
-		/** @type {HTMLInputElement} */
-		const eventTarget = dom.query.getEventTarget(e);
-		if (xy === 'x' && this.#onlyPercentage && Number(eventTarget.value) > 100) {
-			eventTarget.value = '100';
-		} else if (this.proportion.checked && !this.frameRatioOption?.value) {
-			const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this.#ratio);
-			if (xy === 'x') {
-				this.inputY.value = String(ratioSize.h);
-			} else {
-				this.inputX.value = String(ratioSize.w);
-			}
-		}
-
-		if (xy === 'y') {
-			this.#setRatioSelect(eventTarget.value || this.#defaultRatio);
-		}
-	}
-}
-
-/**
- * @typedef {object} ModalReturns_video
- * @property {HTMLElement} html
- * @property {HTMLElement} alignForm
- * @property {HTMLElement} fileModalWrapper
- * @property {HTMLInputElement} videoInputFile
- * @property {HTMLInputElement} videoUrlFile
- * @property {HTMLElement} previewSrc
- * @property {HTMLButtonElement} galleryButton
- * @property {HTMLInputElement} proportion
- * @property {HTMLSelectElement} frameRatioOption
- * @property {HTMLInputElement} inputX
- * @property {HTMLInputElement} inputY
- * @property {HTMLButtonElement} revertBtn
- * @property {HTMLButtonElement} fileRemoveBtn
- *
- * @param {SunEditor.Core} editor
- * @param {*} pluginOptions
- * @returns {ModalReturns_video}
- */
-function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
-	let html = /*html*/ `
-	<form method="post" enctype="multipart/form-data">
-		<div class="se-modal-header">
-			<button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
-			${icons.cancel}
-			</button>
-			<span class="se-modal-title">${lang.video_modal_title}</span>
-		</div>
-		<div class="se-modal-body">`;
-
-	if (pluginOptions.createFileInput) {
-		html += /*html*/ `
-			<div class="se-modal-form">
-				<label>${lang.video_modal_file}</label>
-				${Modal.CreateFileInput({ lang, icons }, pluginOptions)}
-			</div>`;
-	}
-
-	if (pluginOptions.createUrlInput) {
-		html += /*html*/ `
-			<div class="se-modal-form">
-				<label>${lang.video_modal_url}</label>
-				<div class="se-modal-form-files">
-					<input class="se-input-form se-input-url" type="text" data-focus />
-					${
-						plugins.videoGallery
-							? `<button type="button" class="se-btn se-tooltip se-modal-files-edge-button __se__gallery" aria-label="${lang.videoGallery}">
-								${icons.video_gallery}
-								${dom.utils.createTooltipInner(lang.videoGallery)}
-								</button>`
-							: ''
-					}
-				</div>
-				<pre class="se-link-preview"></pre>
-			</div>`;
-	}
-
-	if (pluginOptions.canResize) {
-		const ratioList = pluginOptions.ratioOptions || [
-			{ name: '16:9', value: 0.5625 },
-			{ name: '4:3', value: 0.75 },
-			{ name: '21:9', value: 0.4285 },
-			{ name: '9:16', value: 1.78 },
-		];
-		const ratio = pluginOptions.defaultRatio;
-		const onlyPercentage = pluginOptions.percentageOnlySize;
-		const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
-		const heightDisplay = !pluginOptions.showHeightInput ? ' style="display: none !important;"' : '';
-		const ratioDisplay = !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
-		const onlyWidthDisplay = !onlyPercentage && !pluginOptions.showHeightInput && !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
-		html += /*html*/ `
-			<div class="se-modal-form">
-				<div class="se-modal-size-text">
-					<label class="size-w">${lang.width}</label>
-					<label class="se-modal-size-x">&nbsp;</label>
-					<label class="size-h"${heightDisplay}>${lang.height}</label>
-					<label class="size-h"${ratioDisplay}>(${lang.ratio})</label>
-				</div>
-				<input class="se-input-control _se_size_x" placeholder="100%"${onlyPercentage ? ' type="number" min="1"' : 'type="text"'}${onlyPercentage ? ' max="100"' : ''}/>
-				<label class="se-modal-size-x"${onlyWidthDisplay}>${onlyPercentage ? '%' : 'x'}</label>
-				<input class="se-input-control _se_size_y" placeholder="${pluginOptions.defaultRatio * 100}%"
-				${onlyPercentage ? ' type="number" min="1"' : 'type="text"'}${onlyPercentage ? ' max="100"' : ''}${heightDisplay}/>
-				<select class="se-input-select se-modal-ratio" title="${lang.ratio}" aria-label="${lang.ratio}"${ratioDisplay}>
-					${!heightDisplay ? '<option value=""> - </option>' : ''} 
-					${ratioList.map((ratioOption) => `<option value="${ratioOption.value}"${ratio.toString() === ratioOption.value.toString() ? ' selected' : ''}>${ratioOption.name}</option>`).join('')}
-				</select>
-				<button type="button" title="${lang.revert}" aria-label="${lang.revert}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
-			</div>
-			<div class="se-modal-form se-modal-form-footer"${onlyPercentDisplay}${onlyWidthDisplay}>
-				<label>
-					<input type="checkbox" class="se-modal-btn-check _se_check_proportion" />&nbsp;
-					<span>${lang.proportion}</span>
-				</label>
-			</div>`;
-	}
-
-	html += /*html*/ `
-		</div>
-		<div class="se-modal-footer">
-			<div class="se-figure-align">
-				<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="none" checked>${lang.basic}</label>
-				<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="left">${lang.left}</label>
-				<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="center">${lang.center}</label>
-				<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="right">${lang.right}</label>
-			</div>
-			<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}"><span>${lang.submitButton}</span></button>
-		</div>
-	</form>`;
-
-	const content = dom.utils.createElement('DIV', { class: 'se-modal-content' }, html);
-
-	return {
-		html: content,
-		alignForm: content.querySelector('.se-figure-align'),
-		fileModalWrapper: content.querySelector('.se-flex-input-wrapper'),
-		videoInputFile: content.querySelector('.__se__file_input'),
-		videoUrlFile: content.querySelector('.se-input-url'),
-		previewSrc: content.querySelector('.se-link-preview'),
-		galleryButton: content.querySelector('.__se__gallery'),
-		proportion: content.querySelector('._se_check_proportion'),
-		frameRatioOption: content.querySelector('.se-modal-ratio'),
-		inputX: content.querySelector('._se_size_x'),
-		inputY: content.querySelector('._se_size_y'),
-		revertBtn: content.querySelector('.se-modal-btn-revert'),
-		fileRemoveBtn: content.querySelector('.se-file-remove'),
-	};
 }
 
 export default Video;

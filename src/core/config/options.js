@@ -396,7 +396,7 @@ export const DEFAULTS = {
  * @property {import('../../plugins/dropdown/fontColor.js').FontColorPluginOptions} [fontColor]
  * @property {import('../../plugins/input/fontSize.js').FontSizePluginOptions} [fontSize]
  * @property {import('../../plugins/dropdown/hr.js').HRPluginOptions} [hr]
- * @property {import('../../plugins/modal/image.js').ImagePluginOptions} [image]
+ * @property {import('../../plugins/modal/image/index.js').ImagePluginOptions} [image]
  * @property {import('../../plugins/browser/imageGallery.js').ImageGalleryPluginOptions} [imageGallery]
  * @property {import('../../plugins/dropdown/layout.js').LayoutPluginOptions} [layout]
  * @property {import('../../plugins/dropdown/lineHeight.js').LineHeightPluginOptions} [lineHeight]
@@ -407,7 +407,7 @@ export const DEFAULTS = {
  * @property {import('../../plugins/dropdown/table/index.js').TablePluginOptions} [table]
  * @property {import('../../plugins/dropdown/template.js').TemplatePluginOptions} [template]
  * @property {import('../../plugins/dropdown/textStyle.js').TextStylePluginOptions} [textStyle]
- * @property {import('../../plugins/modal/video.js').VideoPluginOptions} [video]
+ * @property {import('../../plugins/modal/video/index.js').VideoPluginOptions} [video]
  * @property {import('../../plugins/browser/videoGallery.js').VideoGalleryPluginOptions} [videoGallery]
  * ///
  * ---[ End of auto-generated plugin options ]---

@@ -279,15 +279,11 @@ export class TableSelectionService {
 	}
 
 	/**
-	 * @description Selects cells in a table, handling single and multi-cell selection, and managing shift key behavior for extended selection.
-	 * @param {HTMLTableCellElement} tdElement The target table cell (`<td>`) element that is being selected.
-	 * @param {boolean} shift A flag indicating whether the shift key is held down for multi-cell selection.
-	 * If `true`, the selection will extend to include adjacent cells, otherwise it selects only the provided cell.
+	 * @description Initializes cell selection state and applies visual styles.
+	 * Sets up the fixed cell, selected cells array, and table reference.
+	 * @param {HTMLTableCellElement} tdElement The target table cell element.
 	 */
-	initCellSelection(tdElement, shift) {
-		if (!this.#state.isShiftPressed && !this.#state.ref) this.#removeGlobalEvents();
-
-		this.#main.setState('isShiftPressed', shift);
+	initCellSelection(tdElement) {
 		this.#main.setState('fixedCell', tdElement);
 		if (!this.#state.selectedCells?.length) this.#main.setState('selectedCells', [tdElement]);
 		this.#fixedCellName = tdElement.nodeName;
@@ -295,6 +291,20 @@ export class TableSelectionService {
 
 		this.deleteStyleSelectedCells();
 		dom.utils.addClass(tdElement, 'se-selected-cell-focus');
+	}
+
+	/**
+	 * @description Starts cell selection with global event listeners for drag/shift selection.
+	 * **WARNING**: Registers global events (mousemove/mousedown, mouseup, touchmove).
+	 * These events are auto-removed on mouseup/touchmove, or call `#removeGlobalEvents()` manually.
+	 * @param {HTMLTableCellElement} tdElement The target table cell element.
+	 * @param {boolean} shift If true, enables shift+click range selection mode.
+	 */
+	startCellSelection(tdElement, shift) {
+		if (!this.#state.isShiftPressed && !this.#state.ref) this.#removeGlobalEvents();
+
+		this.#main.setState('isShiftPressed', shift);
+		this.initCellSelection(tdElement);
 
 		if (!shift) {
 			this.#globalEvents.on = this.#main.eventManager.addGlobalEvent('mousemove', this.#bindMultiOn, false);

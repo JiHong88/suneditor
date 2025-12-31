@@ -30,6 +30,9 @@ export class TableCellService {
 	unmergeButton: HTMLButtonElement;
 	splitButton: HTMLButtonElement;
 	selectMenu_split: SelectMenu;
+	/**
+	 * @description Opens the split menu.
+	 */
 	openSplitMenu(): void;
 	/**
 	 * @description Merges the selected table cells into one cell by combining their contents and adjusting their row and column spans.
@@ -66,4 +69,4 @@ export class TableCellService {
 	#private;
 }
 export default TableCellService;
-import { SelectMenu } from '../../../../modules/utils';
+import { SelectMenu } from '../../../../modules/ui';

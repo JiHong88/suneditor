@@ -1,6 +1,17 @@
 import type {} from '../../../../typedef';
-export function CreateHTML(): HTMLElement;
-export function CreateHTML_controller_table({ lang, icons }: { lang: any; icons: any }): HTMLElement;
+/**
+ * @description Creates the initial HTML structure for the table plugin.
+ * @returns {HTMLDivElement}
+ */
+export function CreateHTML(): HTMLDivElement;
+/**
+ * @description Creates the table controller HTML.
+ * @param {Object} options - Options containing language and icons.
+ * @param {Object} options.lang - Language object.
+ * @param {Object} options.icons - Icons object.
+ * @returns {HTMLDivElement}
+ */
+export function CreateHTML_controller_table({ lang, icons }: { lang: any; icons: any }): HTMLDivElement;
 /**
  * @param {SunEditor.Core} editor
  * @returns {{ html: HTMLElement, splitButton: HTMLButtonElement, columnButton: HTMLButtonElement, rowButton: HTMLButtonElement, mergeButton: HTMLButtonElement, unmergeButton: HTMLButtonElement }}

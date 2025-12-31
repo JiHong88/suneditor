@@ -10,12 +10,16 @@ export class ImageUploadService {
 	#main;
 	#pluginOptions;
 
+	#resizing;
+
 	/**
 	 * @param {import('../index').default} main - The main Image_ plugin instance.
 	 */
 	constructor(main) {
 		this.#main = main;
 		this.#pluginOptions = main.pluginOptions;
+
+		this.#resizing = this.#pluginOptions.canResize;
 
 		this._base64RenderIndex = 0;
 	}
@@ -125,7 +129,7 @@ export class ImageUploadService {
 			this._base64RenderIndex = filesLen;
 			const filesStack = new Array(filesLen);
 
-			if (this.#main.resizing) {
+			if (this.#resizing) {
 				this.#sizeService.setInputSize(inputWidth, inputHeight);
 			}
 

@@ -1,24 +1,5 @@
-import type {} from '../../typedef';
+import type {} from '../../../typedef';
 export default Image_;
-export type ModalReturns_image = {
-	html: HTMLElement;
-	alignForm: HTMLElement;
-	fileModalWrapper: HTMLElement;
-	imgInputFile: HTMLInputElement;
-	imgUrlFile: HTMLInputElement;
-	altText: HTMLInputElement;
-	captionCheckEl: HTMLInputElement;
-	previewSrc: HTMLElement;
-	tabs: HTMLElement;
-	galleryButton: HTMLButtonElement;
-	proportion: HTMLInputElement;
-	inputX: HTMLInputElement;
-	inputY: HTMLInputElement;
-	revertBtn: HTMLButtonElement;
-	asBlock: HTMLButtonElement;
-	asInline: HTMLButtonElement;
-	fileRemoveBtn: HTMLButtonElement;
-};
 export type ImagePluginOptions = {
 	/**
 	 * - Whether the image element can be resized.
@@ -81,7 +62,7 @@ export type ImagePluginOptions = {
 	/**
 	 * - The default image format type ("block" or "inline").
 	 */
-	defaultFormatType?: string;
+	defaultFormatType?: 'block' | 'inline';
 	/**
 	 * - Whether to retain the chosen format type after image insertion.
 	 */
@@ -105,6 +86,20 @@ export type ImagePluginOptions = {
 	 */
 	insertBehavior?: SunEditor.ComponentInsertType;
 };
+export type ImageState = {
+	/**
+	 * - Size unit ('px' or '%')
+	 */
+	sizeUnit: string;
+	/**
+	 * - Whether only percentage sizing is allowed
+	 */
+	onlyPercentage: boolean;
+	/**
+	 * - Image production index for batch operations
+	 */
+	produceIndex: number;
+};
 /**
  * @typedef {Object} ImagePluginOptions
  * @property {boolean} [canResize=true] - Whether the image element can be resized.
@@ -121,7 +116,7 @@ export type ImagePluginOptions = {
  * @property {boolean} [allowMultiple=false] - Whether multiple image uploads are allowed.
  * @property {string} [acceptedFormats="image/*"] - The accepted file formats for image uploads.
  * @property {boolean} [useFormatType=true] - Whether to enable format type selection (block or inline).
- * @property {string} [defaultFormatType="block"] - The default image format type ("block" or "inline").
+ * @property {'block'|'inline'} [defaultFormatType="block"] - The default image format type ("block" or "inline").
  * @property {boolean} [keepFormatType=false] - Whether to retain the chosen format type after image insertion.
  * @property {boolean} [linkEnableFileUpload] - Whether to enable file uploads for linked images.
  * @property {SunEditor.Module.Figure.Controls} [controls] - Figure controls.
@@ -132,6 +127,12 @@ export type ImagePluginOptions = {
  * - `select`: Always select the inserted component.
  * - `line`: Move cursor to the next line if possible, or create a new line and move there.
  * - `none`: Do nothing.
+ */
+/**
+ * @typedef {Object} ImageState
+ * @property {string} sizeUnit - Size unit ('px' or '%')
+ * @property {boolean} onlyPercentage - Whether only percentage sizing is allowed
+ * @property {number} produceIndex - Image production index for batch operations
  */
 /**
  * @class
@@ -169,7 +170,7 @@ declare class Image_ extends PluginModal {
 		allowMultiple: boolean;
 		acceptedFormats: string;
 		useFormatType: boolean;
-		defaultFormatType: string;
+		defaultFormatType: 'inline' | 'block';
 		keepFormatType: boolean;
 		insertBehavior: SunEditor.ComponentInsertType;
 	};
@@ -178,6 +179,8 @@ declare class Image_ extends PluginModal {
 	modal: Modal;
 	figure: Figure;
 	fileManager: FileManager;
+	/** @type {ImageState} */
+	state: ImageState;
 	fileModalWrapper: HTMLElement;
 	imgInputFile: HTMLInputElement;
 	imgUrlFile: HTMLInputElement;
@@ -186,14 +189,17 @@ declare class Image_ extends PluginModal {
 	captionCheckEl: HTMLInputElement;
 	captionEl: HTMLElement;
 	previewSrc: HTMLElement;
-	sizeUnit: string;
-	as: string;
-	proportion: HTMLInputElement;
-	inputX: HTMLInputElement;
-	inputY: HTMLInputElement;
-	_base64RenderIndex: number;
+	as: 'inline' | 'block';
+	sizeService: ImageSizeService;
+	uploadService: ImageUploadService;
 	asBlock: HTMLButtonElement;
 	asInline: HTMLButtonElement;
+	/**
+	 * @template {keyof ImageState} K
+	 * @param {K} key
+	 * @param {ImageState[K]} value
+	 */
+	setState<K extends keyof ImageState>(key: K, value: ImageState[K]): void;
 	retainFormat(): {
 		query: string;
 		method: (element: HTMLElement) => void;
@@ -267,8 +273,10 @@ declare class Image_ extends PluginModal {
 	): void;
 	#private;
 }
-import { PluginModal } from '../../interfaces';
-import { Modal } from '../../modules/contracts';
-import { Figure } from '../../modules/contracts';
-import { ModalAnchorEditor } from '../../modules/utils';
-import { FileManager } from '../../modules/utils';
+import { PluginModal } from '../../../interfaces';
+import { Modal } from '../../../modules/contract';
+import { Figure } from '../../../modules/contract';
+import { FileManager } from '../../../modules/manager';
+import { ModalAnchorEditor } from '../../../modules/ui';
+import ImageSizeService from './services/image.size';
+import ImageUploadService from './services/image.upload';

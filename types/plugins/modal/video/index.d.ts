@@ -1,20 +1,5 @@
-import type {} from '../../typedef';
+import type {} from '../../../typedef';
 export default Video;
-export type ModalReturns_video = {
-	html: HTMLElement;
-	alignForm: HTMLElement;
-	fileModalWrapper: HTMLElement;
-	videoInputFile: HTMLInputElement;
-	videoUrlFile: HTMLInputElement;
-	previewSrc: HTMLElement;
-	galleryButton: HTMLButtonElement;
-	proportion: HTMLInputElement;
-	frameRatioOption: HTMLSelectElement;
-	inputX: HTMLInputElement;
-	inputY: HTMLInputElement;
-	revertBtn: HTMLButtonElement;
-	fileRemoveBtn: HTMLButtonElement;
-};
 export type VideoPluginOptions = {
 	/**
 	 * - Whether the video element can be resized.
@@ -133,6 +118,11 @@ export type VideoPluginOptions = {
 	 */
 	insertBehavior?: SunEditor.ComponentInsertType;
 };
+export type VideoState = {
+	sizeUnit: string;
+	onlyPercentage: boolean;
+	defaultRatio: string;
+};
 /**
  * @typedef {Object} VideoPluginOptions
  * @property {boolean} [canResize=true] - Whether the video element can be resized.
@@ -166,12 +156,21 @@ export type VideoPluginOptions = {
  * - `none`: Do nothing.
  */
 /**
+ * @typedef {Object} VideoState
+ * @property {string} sizeUnit
+ * @property {boolean} onlyPercentage
+ * @property {string} defaultRatio
+ */
+/**
  * @class
  * @description Video plugin.
  * - This plugin provides video embedding functionality within the editor.
  * - It also supports embedding from popular video services
  */
 declare class Video extends PluginModal {
+	static get defaultExtensions(): string[];
+	static get defaultUrlPatterns(): RegExp[];
+	static checkContentType(url: any): boolean;
 	/**
 	 * @this {Video}
 	 * @param {HTMLElement} node - The node to check.
@@ -222,11 +221,6 @@ declare class Video extends PluginModal {
 	videoUrlFile: HTMLInputElement;
 	focusElement: HTMLInputElement;
 	previewSrc: HTMLElement;
-	sizeUnit: string;
-	proportion: HTMLInputElement;
-	frameRatioOption: HTMLSelectElement;
-	inputX: HTMLInputElement;
-	inputY: HTMLInputElement;
 	query: {
 		youtube: {
 			pattern: RegExp;
@@ -241,6 +235,16 @@ declare class Video extends PluginModal {
 	};
 	extensions: string[];
 	urlPatterns: RegExp[];
+	/** @type {VideoState} */
+	state: VideoState;
+	sizeService: VideoSizeService;
+	uploadService: VideoUploadService;
+	/**
+	 * @template {keyof VideoState} K
+	 * @param {K} key
+	 * @param {VideoState[K]} value
+	 */
+	setState<K extends keyof VideoState>(key: K, value: VideoState[K]): void;
 	retainFormat(): {
 		query: string;
 		method: (element: HTMLElement) => void;
@@ -345,7 +349,9 @@ declare class Video extends PluginModal {
 	submitURL(url: string): Promise<boolean>;
 	#private;
 }
-import { PluginModal } from '../../interfaces';
-import { Modal } from '../../modules/contracts';
-import { Figure } from '../../modules/contracts';
-import { FileManager } from '../../modules/utils';
+import { PluginModal } from '../../../interfaces';
+import { Modal } from '../../../modules/contract';
+import { Figure } from '../../../modules/contract';
+import { FileManager } from '../../../modules/manager';
+import VideoSizeService from './services/video.size';
+import VideoUploadService from './services/video.upload';

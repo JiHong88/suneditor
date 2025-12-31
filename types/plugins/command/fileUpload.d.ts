@@ -132,6 +132,6 @@ declare class FileUpload extends PluginCommand {
 	#private;
 }
 import { PluginCommand } from '../../interfaces';
-import { Figure } from '../../modules/contracts';
-import { Controller } from '../../modules/contracts';
-import { FileManager } from '../../modules/utils';
+import { Figure } from '../../modules/contract';
+import { Controller } from '../../modules/contract';
+import { FileManager } from '../../modules/manager';

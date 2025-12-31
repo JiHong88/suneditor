@@ -263,5 +263,5 @@ declare class Embed extends PluginModal {
 	#private;
 }
 import { PluginModal } from '../../interfaces';
-import { Modal } from '../../modules/contracts';
-import { Figure } from '../../modules/contracts';
+import { Modal } from '../../modules/contract';
+import { Figure } from '../../modules/contract';

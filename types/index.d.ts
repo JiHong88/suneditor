@@ -9,12 +9,14 @@ export { default as plugins } from './plugins';
 
 // Re-export modules (no default export in these)
 import * as interfaces from './interfaces';
-import * as moduleContracts from './modules/contracts';
-import * as moduleUtils from './modules/utils';
+import * as moduleContract from './modules/contract';
+import * as moduleManager from './modules/manager';
+import * as moduleUI from './modules/ui';
 export { interfaces };
 export namespace modules {
-	export { moduleContracts as contracts };
-	export { moduleUtils as utils };
+	export { moduleContract as contract };
+	export { moduleManager as manager };
+	export { moduleUI as ui };
 }
 
 // Main default export

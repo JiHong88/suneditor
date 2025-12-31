@@ -121,5 +121,5 @@ declare class Math_ extends PluginModal {
 	#private;
 }
 import { PluginModal } from '../../interfaces';
-import { Modal } from '../../modules/contracts';
-import { Controller } from '../../modules/contracts';
+import { Modal } from '../../modules/contract';
+import { Controller } from '../../modules/contract';

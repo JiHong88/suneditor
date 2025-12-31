@@ -466,9 +466,9 @@ declare class Figure extends CoreInjector {
 	 * @param {Node} container - The container element of the figure component.
 	 * @param {Node} originEl - The original element of the figure component.
 	 * @param {Node} anchorCover - The anchor cover element of the figure component.
-	 * @param {import('../utils/FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
+	 * @param {import('../manager/FileManager').default} [fileManagerInst=null] - FileManager module instance, if used.
 	 */
-	retainFigureFormat(container: Node, originEl: Node, anchorCover: Node, fileManagerInst?: import('../utils/FileManager').default): void;
+	retainFigureFormat(container: Node, originEl: Node, anchorCover: Node, fileManagerInst?: import('../manager/FileManager').default): void;
 	/**
 	 * @description Initialize the transform style (rotation) of the element.
 	 * @param {?Node} [node] Target element, default is the current element
@@ -532,5 +532,5 @@ declare class Figure extends CoreInjector {
 	#private;
 }
 import CoreInjector from '../../editorInjector/_core';
-import Controller from '../contracts/Controller';
-import SelectMenu from '../utils/SelectMenu';
+import SelectMenu from '../ui/SelectMenu';
+import Controller from './Controller';

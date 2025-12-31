@@ -65,7 +65,7 @@ class Image_ extends PluginModal {
 		return /^IMG$/i.test(compNode?.nodeName) ? compNode : dom.check.isAnchor(compNode) && /^IMG$/i.test(compNode?.firstElementChild?.nodeName) ? compNode?.firstElementChild : null;
 	}
 
-	resizing;
+	#resizing;
 	#nonResizing;
 
 	#linkElement = null;
@@ -163,8 +163,8 @@ class Image_ extends PluginModal {
 		this.previewSrc = modalEl.previewSrc;
 
 		this.as = FORMAT_TYPE.BLOCK;
-		this.resizing = this.pluginOptions.canResize;
-		this.#nonResizing = !this.resizing || !this.pluginOptions.showHeightInput || this.pluginOptions.percentageOnlySize;
+		this.#resizing = this.pluginOptions.canResize;
+		this.#nonResizing = !this.#resizing || !this.pluginOptions.showHeightInput || this.pluginOptions.percentageOnlySize;
 
 		this.sizeService = new ImageSizeService(this, modalEl);
 		this.uploadService = new ImageUploadService(this);
@@ -239,12 +239,7 @@ class Image_ extends PluginModal {
 	 */
 	modalOn(isUpdate) {
 		if (!isUpdate) {
-			if (this.resizing) {
-				const x = this.pluginOptions.defaultWidth;
-				const y = this.pluginOptions.defaultHeight;
-				this.sizeService.setInputSize(x, y);
-				this.sizeService.setOriginSize(x, y);
-			}
+			this.sizeService.on();
 			if (this.imgInputFile && this.pluginOptions.allowMultiple) this.imgInputFile.setAttribute('multiple', 'multiple');
 		} else {
 			if (this.imgInputFile && this.pluginOptions.allowMultiple) this.imgInputFile.removeAttribute('multiple');
@@ -565,7 +560,7 @@ class Image_ extends PluginModal {
 
 		const { dw, dh } = this.figure.getSize(target);
 
-		if (!this.resizing) return { w: dw, h: dh };
+		if (!this.#resizing) return { w: dw, h: dh };
 
 		this.sizeService.ready(figureInfo, dw, dh);
 
@@ -687,7 +682,7 @@ class Image_ extends PluginModal {
 		}
 
 		// size
-		if (this.resizing && changeSize) {
+		if (this.#resizing && changeSize) {
 			this.sizeService.applySize(width, height);
 		}
 
@@ -696,7 +691,7 @@ class Image_ extends PluginModal {
 			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
 				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
 					this.figure.deleteTransform(imageEl);
-				} else if (!this.resizing || !changeSize || !this.figure.isVertical) {
+				} else if (!this.#resizing || !changeSize || !this.figure.isVertical) {
 					this.figure.setTransform(imageEl, width, height, 0);
 				}
 			}

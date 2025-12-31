@@ -91,6 +91,6 @@ declare class Mention extends PluginField {
 	#private;
 }
 import { PluginField } from '../../interfaces';
-import { Controller } from '../../modules/contracts';
-import { ApiManager } from '../../modules/utils';
-import { SelectMenu } from '../../modules/utils';
+import { Controller } from '../../modules/contract';
+import { ApiManager } from '../../modules/manager';
+import { SelectMenu } from '../../modules/ui';

@@ -43,4 +43,4 @@ declare class FontColor extends PluginDropdownFree {
 	colorPickerAction(color: SunEditor.Module.HueSlider.Color): void;
 }
 import { PluginDropdownFree } from '../../interfaces';
-import { ColorPicker } from '../../modules/contracts';
+import { ColorPicker } from '../../modules/contract';

@@ -8,7 +8,7 @@ export class TableClipboardService {
 	 */
 	constructor(main: import('../index').default);
 	/**
-	 * @description Creates the table properties controller.
+	 * @description Copies the selected table cells to the clipboard.
 	 * @param {ClipboardEvent} e - Event object
 	 * @param {HTMLElement} container - The container element
 	 * @param {NodeListOf<HTMLTableCellElement>} selectedCells - The selected table cells

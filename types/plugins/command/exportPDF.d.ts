@@ -33,4 +33,4 @@ declare class ExportPDF extends PluginCommand {
 	#private;
 }
 import { PluginCommand } from '../../interfaces';
-import { ApiManager } from '../../modules/utils';
+import { ApiManager } from '../../modules/manager';

@@ -432,7 +432,7 @@ class Table extends PluginDropdownFree {
 		if (/^TR$/i.test(target.nodeName)) return;
 
 		this.#_s = false;
-		this.selectionService.initCellSelection(target, false);
+		this.selectionService.startCellSelection(target, false);
 	}
 
 	/**
@@ -533,7 +533,7 @@ class Table extends PluginDropdownFree {
 			this.#_s = event.shiftKey;
 			this.setState('fixedCell', cell);
 			this._closeController();
-			this.selectionService.initCellSelection(cell, this.#_s);
+			this.selectionService.startCellSelection(cell, this.#_s);
 			return false;
 		}
 	}
@@ -592,10 +592,9 @@ class Table extends PluginDropdownFree {
 			case 'openCellProperties':
 				this.styleService.openCellProps(target);
 				break;
-			case 'revert': {
+			case 'revert':
 				this.styleService.revertProps();
 				break;
-			}
 			case 'merge':
 				this.cellService.mergeCells(this.state.selectedCells);
 				break;
@@ -631,7 +630,7 @@ class Table extends PluginDropdownFree {
 			this.styleService.closeProps();
 		}
 
-		if (!/^(remove|on|open|merge)/.test(command)) {
+		if (!/^(remove|on|open)/.test(command)) {
 			this._setCellControllerPosition(this.state.tdElement, this.state.isShiftPressed);
 		}
 	}
@@ -686,8 +685,8 @@ class Table extends PluginDropdownFree {
 			this.setState('current_colSpan', this.state.tdElement.colSpan - 1);
 			this.setState('current_rowSpan', this.state.trElement.cells[cellIndex].rowSpan - 1);
 
-			// find logcal cell index (memoized)
-			const logicalIndex = GetLogicalCellIndex(table, tdElement, rowIndex, cellIndex);
+			// find logical cell index
+			const logicalIndex = GetLogicalCellIndex(table, rowIndex, cellIndex);
 			this.setState('logical_cellIndex', logicalIndex);
 		}
 	}

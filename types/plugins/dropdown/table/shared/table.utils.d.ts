@@ -6,6 +6,12 @@ import type {} from '../../../../typedef';
  */
 export function IsResizeEls(node: Node): boolean;
 /**
+ * @description Check table caption
+ * @param {Node} node The DOM node to check.
+ * @returns {boolean}
+ */
+export function IsTableCaption(node: Node): boolean;
+/**
  * @description Checks if a table cell is at its edge based on the mouse event.
  * @param {MouseEvent} event The mouse event.
  * @param {Element} tableCell The table cell to check.
@@ -33,17 +39,25 @@ export function CreateCellsString(nodeName: string, cnt: number): string;
  */
 export function CreateCellsHTML(nodeName: string): HTMLTableCellElement;
 /**
- * @description Gets the maximum number of columns in a table (memoized).
+ * @description Gets the maximum number of columns in a table.
  * @param {HTMLTableElement} table The table element.
  * @returns {number} The maximum number of columns in the table.
  */
 export function GetMaxColumns(table: HTMLTableElement): number;
 /**
- * @description Invalidates the max columns cache for a table.
- * Call this when table structure changes (add/remove column, merge/split cells).
+ * @description Gets the logical cell index for a cell in a table.
+ * @param {HTMLTableElement} table The table element.
+ * @param {number} rowIndex The row index of the cell.
+ * @param {number} cellIndex The physical cell index.
+ * @returns {number} The logical cell index.
+ */
+export function GetLogicalCellIndex(table: HTMLTableElement, rowIndex: number, cellIndex: number): number;
+/**
+ * @description Invalidates all table-related caches for a table.
+ * Call this when table structure changes (add/remove row/column, merge/split cells).
  * @param {HTMLTableElement} table The table element.
  */
-export function InvalidateMaxColumnsCache(table: HTMLTableElement): void;
+export function InvalidateTableCache(table: HTMLTableElement): void;
 /**
  * @description Clone a table element and map selected cells to the cloned table
  * @param {HTMLTableElement} table <table> element
@@ -57,3 +71,16 @@ export function CloneTable(
 	clonedTable: HTMLTableElement;
 	clonedSelectedCells: HTMLTableCellElement[];
 };
+/** @type {WeakMap<HTMLTableElement, Map<string, {cs: number, ce: number, rs: number, re: number}>>} */
+export const refCache: WeakMap<
+	HTMLTableElement,
+	Map<
+		string,
+		{
+			cs: number;
+			ce: number;
+			rs: number;
+			re: number;
+		}
+	>
+>;

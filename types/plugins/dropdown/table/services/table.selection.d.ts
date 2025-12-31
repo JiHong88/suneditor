@@ -40,6 +40,9 @@ export class TableSelectionService {
 	 * @param {HTMLElement} cell Target node
 	 */
 	focusCellEdge(cell: HTMLElement): void;
+	/**
+	 * @description Initialize the selection service (remove global events).
+	 */
 	init(): void;
 	#private;
 }

@@ -128,13 +128,17 @@ export class TableCellService {
 		originTable.replaceWith(clonedTable);
 		this.#main._closeTableSelectInfo();
 
-		this.setMergeSplitButton();
 		this.#main._setController(mergeCell);
 
 		this.#selectionService.focusCellEdge(mergeCell);
-		this.#selectionService.initCellSelection(mergeCell, false);
+		this.#selectionService.initCellSelection(mergeCell);
 
+		this.#main.setState('ref', null);
+		this.#main.setState('selectedCells', [mergeCell]);
 		this.#main.setCellInfo(mergeCell, true);
+
+		this.setUnMergeButton();
+		this.setMergeSplitButton();
 
 		// history push
 		this.#main.historyPush();
@@ -214,9 +218,8 @@ export class TableCellService {
 			this.#main.setCellInfo(lastCell, true);
 		}
 
-		this.#main.setState('fixedCell', firstCell);
+		this.#selectionService.initCellSelection(firstCell);
 		this.#main.setState('selectedCell', lastCell);
-		dom.utils.addClass(lastCell, 'se-selected-cell-focus');
 
 		this.setUnMergeButton();
 		this.#main.controller_cell.resetPosition(lastCell);

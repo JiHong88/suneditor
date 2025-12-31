@@ -17,6 +17,7 @@ export class TableStyleService {
 			controller_table: HTMLElement;
 		},
 	);
+	editor: import('../../../../core/editor').default;
 	sliderType: string;
 	/** @type {HTMLButtonElement} */
 	resizeButton: HTMLButtonElement;
@@ -58,9 +59,25 @@ export class TableStyleService {
 	_propsAlignCache: string;
 	_propsVerticalAlignCache: string;
 	_typeCache: string;
-	openTableProps(target: any): void;
-	openCellProps(target: any): void;
+	colorPickerAction(color: SunEditor.Module.HueSlider.Color): void;
+	controllerAction(target: HTMLButtonElement): void;
+	/**
+	 * @description Opens the table properties dialog.
+	 * @param {HTMLElement} target - The target element (usually the table).
+	 */
+	openTableProps(target: HTMLElement): void;
+	/**
+	 * @description Opens the cell properties dialog.
+	 * @param {HTMLElement} target - The target element (usually the table cell).
+	 */
+	openCellProps(target: HTMLElement): void;
+	/**
+	 * @description Opens the border format menu.
+	 */
 	openBorderFormatMenu(): void;
+	/**
+	 * @description Opens the border style menu.
+	 */
 	openBorderStyleMenu(): void;
 	/**
 	 * @description Handles color selection from the color palette.
@@ -68,7 +85,11 @@ export class TableStyleService {
 	 * @param {string} type The type of color selection.
 	 */
 	openColorPalette(button: Node, type: string): void;
-	toggleFontStyle(value: any): void;
+	/**
+	 * @description Toggles the font style.
+	 * @param {string} value - The style to toggle ("bold"|"underline"|"italic"|"strike").
+	 */
+	toggleFontStyle(value: string): void;
 	/**
 	 * @description Toggles the visibility of the table header (`<thead>`). If the header is present, it is removed; if absent, it is added.
 	 */
@@ -77,16 +98,39 @@ export class TableStyleService {
 	 * @description Toggles the visibility of the table caption (`<caption>`). If the caption is present, it is removed; if absent, it is added.
 	 */
 	toggleCaption(): void;
-	resetHeaderButton(table: any): void;
-	resetCaptionButton(table: any): void;
+	/**
+	 * @description Resets the header button state.
+	 * @param {HTMLTableElement} table - The table element.
+	 */
+	resetHeaderButton(table: HTMLTableElement): void;
+	/**
+	 * @description Resets the caption button state.
+	 * @param {HTMLTableElement} table - The table element.
+	 */
+	resetCaptionButton(table: HTMLTableElement): void;
 	/**
 	 * @description Resets the alignment properties for table cells.
 	 */
 	resetPropsAlign(): void;
+	/**
+	 * @description Reverts the properties to their previous state.
+	 */
 	revertProps(): void;
+	/**
+	 * @description Applies the color from the color picker.
+	 * @param {any} color - The color string or object.
+	 */
 	applyColorPicker(color: any): void;
-	setAlignProps(value: any): void;
-	setVerticalAlignProps(value: any): void;
+	/**
+	 * @description Sets the alignment properties.
+	 * @param {string} value - The alignment value.
+	 */
+	setAlignProps(value: string): void;
+	/**
+	 * @description Sets the vertical alignment properties.
+	 * @param {string} value - The vertical alignment value.
+	 */
+	setVerticalAlignProps(value: string): void;
 	/**
 	 * @description Updates table layout styles.
 	 * @param {string} styles - Styles to update.
@@ -100,11 +144,17 @@ export class TableStyleService {
 	 * @param {HTMLButtonElement} target The target element.
 	 */
 	submitProps(target: HTMLButtonElement): void;
+	/**
+	 * @description Closes the properties dialog.
+	 */
 	closeProps(): void;
+	/**
+	 * @description Initialize the style service (resets properties).
+	 */
 	init(): void;
 	#private;
 }
 export default TableStyleService;
-import { Controller } from '../../../../modules/contracts';
-import { ColorPicker } from '../../../../modules/contracts';
-import { SelectMenu } from '../../../../modules/utils';
+import { Controller } from '../../../../modules/contract';
+import { ColorPicker } from '../../../../modules/contract';
+import { SelectMenu } from '../../../../modules/ui';

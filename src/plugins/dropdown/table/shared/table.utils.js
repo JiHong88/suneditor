@@ -1,14 +1,7 @@
 import { dom, numbers, env } from '../../../../helper';
-import { _DragHandle } from '../../../../modules/ui';
 import * as Constants from './table.constants';
 
 const { _w } = env;
-
-/** @type {WeakMap<HTMLTableElement, number>} */
-const maxColumnsCache = new WeakMap();
-
-/** @type {WeakMap<HTMLTableElement, WeakMap<HTMLTableCellElement, number>>} */
-const cellIndexCache = new WeakMap();
 
 /** @type {WeakMap<HTMLTableElement, Map<string, {cs: number, ce: number, rs: number, re: number}>>} */
 export const refCache = new WeakMap();
@@ -92,14 +85,11 @@ export function CreateCellsHTML(nodeName) {
 }
 
 /**
- * @description Gets the maximum number of columns in a table (memoized).
+ * @description Gets the maximum number of columns in a table.
  * @param {HTMLTableElement} table The table element.
  * @returns {number} The maximum number of columns in the table.
  */
 export function GetMaxColumns(table) {
-	const cached = maxColumnsCache.get(table);
-	if (cached !== undefined) return cached;
-
 	const rows = table.rows;
 	let maxColumns = 0;
 
@@ -114,37 +104,17 @@ export function GetMaxColumns(table) {
 		maxColumns = Math.max(maxColumns, columnCount);
 	}
 
-	maxColumnsCache.set(table, maxColumns);
 	return maxColumns;
 }
 
 /**
- * @description Invalidates the max columns cache for a table.
- * Call this when table structure changes (add/remove column, merge/split cells).
+ * @description Gets the logical cell index for a cell in a table.
  * @param {HTMLTableElement} table The table element.
- */
-export function InvalidateMaxColumnsCache(table) {
-	maxColumnsCache.delete(table);
-}
-
-/**
- * @description Gets the logical cell index for a cell in a table (memoized).
- * @param {HTMLTableElement} table The table element.
- * @param {HTMLTableCellElement} cell The cell element.
  * @param {number} rowIndex The row index of the cell.
  * @param {number} cellIndex The physical cell index.
  * @returns {number} The logical cell index.
  */
-export function GetLogicalCellIndex(table, cell, rowIndex, cellIndex) {
-	const tableCached = cellIndexCache.get(table);
-	if (tableCached) {
-		const cached = tableCached.get(cell);
-		if (cached !== undefined) return cached;
-	}
-
-	const tableCache = new WeakMap();
-	cellIndexCache.set(table, tableCache);
-
+export function GetLogicalCellIndex(table, rowIndex, cellIndex) {
 	const rows = table.rows;
 	let rowSpanArr = [];
 	let spanIndex = [];
@@ -205,28 +175,7 @@ export function GetLogicalCellIndex(table, cell, rowIndex, cellIndex) {
 		rowSpanArr = [];
 	}
 
-	tableCache.set(cell, logicalIndex);
 	return logicalIndex;
-}
-
-/**
- * @description Invalidates the cell index cache for a table.
- * @param {HTMLTableElement} table The table element.
- */
-export function InvalidateCellIndexCache(table) {
-	cellIndexCache.delete(table);
-}
-
-/**
- * @description Invalidates all table-related caches for a table.
- * Call this when table structure changes (add/remove row/column, merge/split cells).
- * @param {HTMLTableElement} table The table element.
- */
-export function InvalidateTableCache(table) {
-	if (!table) return;
-	maxColumnsCache.delete(table);
-	cellIndexCache.delete(table);
-	refCache.delete(table);
 }
 
 /**
@@ -255,4 +204,13 @@ export function CloneTable(table, selectedCells) {
 		clonedTable,
 		clonedSelectedCells,
 	};
+}
+
+/**
+ * @description Clear table cache
+ * @param {HTMLTableElement} table The table element.
+ */
+export function InvalidateTableCache(table) {
+	if (!table) return;
+	refCache.delete(table);
 }

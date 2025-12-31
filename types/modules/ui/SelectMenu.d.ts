@@ -42,13 +42,10 @@ export type SelectMenuParams = {
 declare class SelectMenu extends CoreInjector {
 	/**
 	 * @constructor
-	 * @param {*} inst The instance object that called the constructor.
-	 * @param {SelectMenuParams} params Select menu options
+	 * @param {SunEditor.Instance} editor The instance object that called the constructor.
 	 */
-	constructor(inst: any, params: SelectMenuParams);
+	constructor(editor: SunEditor.Instance, params: any);
 	offset: import('../../core/class/offset').default;
-	kink: any;
-	inst: any;
 	form: HTMLElement;
 	items: any[];
 	/** @type {HTMLLIElement[]} */
@@ -58,12 +55,12 @@ declare class SelectMenu extends CoreInjector {
 	item: any;
 	isOpen: boolean;
 	checkList: boolean;
-	position: string;
-	subPosition: string;
-	splitNum: number;
+	position: any;
+	subPosition: any;
+	splitNum: any;
 	horizontal: boolean;
-	openMethod: () => void;
-	closeMethod: () => void;
+	openMethod: any;
+	closeMethod: any;
 	/**
 	 * @description Creates the select menu items.
 	 * @param {Array<string>|SunEditor.NodeCollection} items - Command list of selectable items.

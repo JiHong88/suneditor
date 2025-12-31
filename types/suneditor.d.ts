@@ -47,12 +47,14 @@ declare namespace _default {
 export default _default;
 import plugins from './plugins';
 export namespace modules {
-	export { moduleContracts as contracts };
-	export { moduleUtils as utils };
+	export { moduleContract as contract };
+	export { moduleManager as manager };
+	export { moduleUI as ui };
 }
 import helper from './helper';
 import * as interfaces from './interfaces';
 import langs from './langs';
-import * as moduleContracts from './modules/contracts';
-import * as moduleUtils from './modules/utils';
+import * as moduleContract from './modules/contract';
+import * as moduleManager from './modules/manager';
+import * as moduleUI from './modules/ui';
 export { helper, interfaces, langs, plugins };

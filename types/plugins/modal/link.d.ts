@@ -24,7 +24,7 @@ export type LinkOptions = {
 	 */
 	acceptedFormats?: string;
 };
-export type LinkPluginOptions = Omit<LinkOptions & import('../../modules/utils/ModalAnchorEditor').ModalAnchorEditorParams, ''>;
+export type LinkPluginOptions = Omit<LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, ''>;
 /**
  * @typedef {Object} LinkOptions
  * @property {string} [uploadUrl] - The URL endpoint for file uploads.
@@ -34,7 +34,7 @@ export type LinkPluginOptions = Omit<LinkOptions & import('../../modules/utils/M
  * @property {string} [acceptedFormats] - Accepted file formats for link uploads.
  */
 /**
- * @typedef {Omit<LinkOptions & import('../../modules/utils/ModalAnchorEditor').ModalAnchorEditorParams, ''>} LinkPluginOptions
+ * @typedef {Omit<LinkOptions & import('../../modules/ui/ModalAnchorEditor').ModalAnchorEditorParams, ''>} LinkPluginOptions
  */
 /**
  * @class
@@ -104,6 +104,6 @@ declare class Link extends PluginModal {
 	#private;
 }
 import { PluginModal } from '../../interfaces';
-import { Modal } from '../../modules/contracts';
-import { Controller } from '../../modules/contracts';
-import { ModalAnchorEditor } from '../../modules/utils';
+import { Modal } from '../../modules/contract';
+import { Controller } from '../../modules/contract';
+import { ModalAnchorEditor } from '../../modules/ui';

@@ -92,7 +92,6 @@ declare class Table extends PluginDropdownFree {
 	onKeyDown(params: SunEditor.HookParams.KeyEvent): void | boolean;
 	onKeyUp(params: SunEditor.HookParams.KeyEvent): void | boolean;
 	onScroll(params: SunEditor.HookParams.Scroll): void;
-	colorPickerAction(color: SunEditor.Module.HueSlider.Color): void;
 	controllerAction(target: HTMLButtonElement): void;
 	/**
 	 * @description Sets various table-related information based on the provided table cell element (`<td>`). This includes updating cell, row, and table attributes, handling spanning cells, and adjusting the UI for elements like headers and captions.
@@ -117,6 +116,10 @@ declare class Table extends PluginDropdownFree {
 	 */
 	resetInfo(): void;
 	/**
+	 * @description Adds a new entry to the history stack.
+	 */
+	historyPush(): void;
+	/**
 	 * @internal
 	 * @description Sets the controller position for a cell.
 	 * @param {HTMLTableCellElement} tdElement - The target table cell.
@@ -129,11 +132,6 @@ declare class Table extends PluginDropdownFree {
 	 * @param {boolean} reset - Whether to reset the controller position.
 	 */
 	_setCellControllerPosition(tdElement: HTMLTableCellElement, reset: boolean): void;
-	/**
-	 * @internal
-	 * @description Adds a new entry to the history stack.
-	 */
-	historyPush(): void;
 	/**
 	 * @description Enables or disables editor mode.
 	 * @param {boolean} enabled Whether to enable or disable the editor.
@@ -150,8 +148,8 @@ declare class Table extends PluginDropdownFree {
 	#private;
 }
 import { PluginDropdownFree } from '../../../interfaces';
-import { Controller } from '../../../modules/contracts';
-import { Figure } from '../../../modules/contracts';
+import { Controller } from '../../../modules/contract';
+import { Figure } from '../../../modules/contract';
 import TableCellService from './services/table.cell';
 import TableClipboardService from './services/table.clipboard';
 import TableGridService from './services/table.grid';

@@ -398,7 +398,7 @@ export namespace DEFAULTS {
  * @property {import('../../plugins/dropdown/fontColor.js').FontColorPluginOptions} [fontColor]
  * @property {import('../../plugins/input/fontSize.js').FontSizePluginOptions} [fontSize]
  * @property {import('../../plugins/dropdown/hr.js').HRPluginOptions} [hr]
- * @property {import('../../plugins/modal/image.js').ImagePluginOptions} [image]
+ * @property {import('../../plugins/modal/image/index.js').ImagePluginOptions} [image]
  * @property {import('../../plugins/browser/imageGallery.js').ImageGalleryPluginOptions} [imageGallery]
  * @property {import('../../plugins/dropdown/layout.js').LayoutPluginOptions} [layout]
  * @property {import('../../plugins/dropdown/lineHeight.js').LineHeightPluginOptions} [lineHeight]
@@ -409,7 +409,7 @@ export namespace DEFAULTS {
  * @property {import('../../plugins/dropdown/table/index.js').TablePluginOptions} [table]
  * @property {import('../../plugins/dropdown/template.js').TemplatePluginOptions} [template]
  * @property {import('../../plugins/dropdown/textStyle.js').TextStylePluginOptions} [textStyle]
- * @property {import('../../plugins/modal/video.js').VideoPluginOptions} [video]
+ * @property {import('../../plugins/modal/video/index.js').VideoPluginOptions} [video]
  * @property {import('../../plugins/browser/videoGallery.js').VideoGalleryPluginOptions} [videoGallery]
  * ///
  * ---[ End of auto-generated plugin options ]---
@@ -1088,7 +1088,7 @@ export type EditorBaseOptions = {
 	fontColor?: import('../../plugins/dropdown/fontColor.js').FontColorPluginOptions;
 	fontSize?: import('../../plugins/input/fontSize.js').FontSizePluginOptions;
 	hr?: import('../../plugins/dropdown/hr.js').HRPluginOptions;
-	image?: import('../../plugins/modal/image.js').ImagePluginOptions;
+	image?: import('../../plugins/modal/image/index.js').ImagePluginOptions;
 	imageGallery?: import('../../plugins/browser/imageGallery.js').ImageGalleryPluginOptions;
 	layout?: import('../../plugins/dropdown/layout.js').LayoutPluginOptions;
 	lineHeight?: import('../../plugins/dropdown/lineHeight.js').LineHeightPluginOptions;
@@ -1099,7 +1099,7 @@ export type EditorBaseOptions = {
 	table?: import('../../plugins/dropdown/table/index.js').TablePluginOptions;
 	template?: import('../../plugins/dropdown/template.js').TemplatePluginOptions;
 	textStyle?: import('../../plugins/dropdown/textStyle.js').TextStylePluginOptions;
-	video?: import('../../plugins/modal/video.js').VideoPluginOptions;
+	video?: import('../../plugins/modal/video/index.js').VideoPluginOptions;
 	/**
 	 * ///
 	 * ---[ End of auto-generated plugin options ]---
