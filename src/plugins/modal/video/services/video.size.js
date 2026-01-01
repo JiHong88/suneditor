@@ -102,7 +102,7 @@ export class VideoSizeService {
 
 		if (this.#state.onlyPercentage) {
 			if (!w) w = '100%';
-			else if (/%$/.test(w + '')) w += '%';
+			else if (!/%$/.test(w + '')) w += '%';
 		}
 		this.#main.figure.setSize(w, h);
 	}

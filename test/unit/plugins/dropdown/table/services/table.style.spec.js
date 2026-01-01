@@ -99,6 +99,7 @@ jest.mock('../../../../../../src/plugins/dropdown/table/render/table.html', () =
 
 jest.mock('../../../../../../src/plugins/dropdown/table/shared/table.utils', () => ({
 	CreateCellsString: jest.fn().mockReturnValue('<td></td>'),
+	InvalidateTableCache: jest.fn(),
 }));
 
 describe('TableStyleService', () => {

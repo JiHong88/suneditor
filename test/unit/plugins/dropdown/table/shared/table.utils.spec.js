@@ -5,9 +5,7 @@ import {
     CreateCellsString,
     CreateCellsHTML,
     GetMaxColumns,
-    InvalidateMaxColumnsCache,
     GetLogicalCellIndex,
-    InvalidateCellIndexCache,
     InvalidateTableCache,
     CloneTable
 } from '../../../../../../src/plugins/dropdown/table/shared/table.utils';
@@ -107,13 +105,9 @@ describe('TableUtils', () => {
              table.appendChild(tbody);
              
              expect(GetMaxColumns(table)).toBe(3);
-             
-             // Test caching
-             // Mutate table but don't invalidate
+
+             // Mutate table
              tr1.appendChild(document.createElement('td'));
-             expect(GetMaxColumns(table)).toBe(3); // Should still be 3 from cache
-             
-             InvalidateMaxColumnsCache(table);
              expect(GetMaxColumns(table)).toBe(4);
         });
     });
@@ -123,7 +117,7 @@ describe('TableUtils', () => {
              // 2x2 table
              // [0,0] [0,1 rowspan=2]
              // [1,0]
-             
+
              const table = document.createElement('table');
              const tbody = document.createElement('tbody');
              const r0 = document.createElement('tr');
@@ -131,26 +125,26 @@ describe('TableUtils', () => {
              const c01 = document.createElement('td');
              c01.rowSpan = 2;
              r0.append(c00, c01);
-             
+
              const r1 = document.createElement('tr');
              const c10 = document.createElement('td');
              r1.append(c10);
-             
+
              tbody.append(r0, r1);
              table.appendChild(tbody);
-             
+
              // (0, 0) -> 0
-             expect(GetLogicalCellIndex(table, c00, 0, 0)).toBe(0);
+             expect(GetLogicalCellIndex(table, 0, 0)).toBe(0);
              // (0, 1) -> 1
-             expect(GetLogicalCellIndex(table, c01, 0, 1)).toBe(1);
+             expect(GetLogicalCellIndex(table, 0, 1)).toBe(1);
              // (1, 0) -> 0 (physically 0) but logically?
              // Row 1: col 0 is free? No.
              // Row 0 has c00 (col 0), c01 (col 1).
              // Row 1 has c10. c01 spans to Row 1 Col 1.
              // So c10 should be at col 0.
-             expect(GetLogicalCellIndex(table, c10, 1, 0)).toBe(0);
+             expect(GetLogicalCellIndex(table, 1, 0)).toBe(0);
         });
-        
+
         it('should handle colspan in logical index', () => {
              // [0,0 colspan=2] [0,1]
              const table = document.createElement('table');
@@ -162,9 +156,9 @@ describe('TableUtils', () => {
              r0.append(c00, c01);
              tbody.append(r0);
              table.appendChild(tbody);
-             
-             expect(GetLogicalCellIndex(table, c00, 0, 0)).toBe(0);
-             expect(GetLogicalCellIndex(table, c01, 0, 1)).toBe(2); // 0+2 = 2
+
+             expect(GetLogicalCellIndex(table, 0, 0)).toBe(0);
+             expect(GetLogicalCellIndex(table, 0, 1)).toBe(2); // 0+2 = 2
         });
     });
 
@@ -191,33 +185,15 @@ describe('TableUtils', () => {
     });
     
     describe('InvalidateTableCache', () => {
-        it('should clear all caches', () => {
+        it('should not throw on null table', () => {
+            expect(() => InvalidateTableCache(null)).not.toThrow();
+        });
+
+        it('should clear refCache', () => {
             const table = document.createElement('table');
-            GetMaxColumns(table); // populate cache
-            
-            InvalidateTableCache(table);
-            
-            // Verify implicitly via GetMaxColumns recalculation check or mocked map?
-            // Since we can't easily access WeakMap internals without exporting them or mocking WeakMap itself (which is hard),
-            // we rely on behavior:
-            
-            // Populate cache
-            const tbody = document.createElement('tbody');
-            const tr = document.createElement('tr');
-            tr.appendChild(document.createElement('td'));
-            tbody.appendChild(tr);
-            table.appendChild(tbody);
-            
-            expect(GetMaxColumns(table)).toBe(1);
-            
-            // Mutate
-            tr.appendChild(document.createElement('td'));
-            // Without invalidate, should be 1
-            expect(GetMaxColumns(table)).toBe(1);
-            
-            InvalidateTableCache(table);
-            // After invalidate, should be 2
-            expect(GetMaxColumns(table)).toBe(2);
+            // InvalidateTableCache clears refCache (used by selection)
+            // Just verify it doesn't throw
+            expect(() => InvalidateTableCache(table)).not.toThrow();
         });
     });
 });

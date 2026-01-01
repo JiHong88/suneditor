@@ -32,8 +32,8 @@ const { NO_EVENT, ON_OVER_COMPONENT } = env;
 class Audio_ extends PluginModal {
 	static key = 'audio';
 	static className = '';
+
 	/**
-	 * @this {Audio_}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */

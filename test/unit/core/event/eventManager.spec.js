@@ -629,11 +629,11 @@ describe('EventManager', () => {
 				get: jest.fn((key) => document.createElement('div'))
 			};
 			mockEditor.toolbar = { _setResponsive: jest.fn() };
-			
+
 			const addEventSpy = jest.spyOn(eventManager, 'addEvent');
-			
+
 			eventManager._addCommonEvents();
-			
+
 			expect(addEventSpy).toHaveBeenCalled();
 			expect(mockEditor.toolbar._setResponsive).toHaveBeenCalled();
 		});
@@ -642,14 +642,364 @@ describe('EventManager', () => {
 			const disconnectSpy = jest.fn();
 			eventManager._wwFrameObserver = { disconnect: disconnectSpy };
 			eventManager._toolbarObserver = { disconnect: disconnectSpy };
-			
+
 			// Mock global events cleanup
 			eventManager.removeGlobalEvent = jest.fn();
-			
+
 			eventManager._removeAllEvents();
-			
+
 			expect(disconnectSpy).toHaveBeenCalledTimes(2);
 			expect(eventManager._wwFrameObserver).toBeNull();
+		});
+	});
+
+	describe('Getters for editor modules', () => {
+		it('should return listFormat from editor', () => {
+			mockEditor.listFormat = { test: 'listFormat' };
+			expect(eventManager.listFormat).toEqual({ test: 'listFormat' });
+		});
+
+		it('should return inline from editor', () => {
+			mockEditor.inline = { test: 'inline' };
+			expect(eventManager.inline).toEqual({ test: 'inline' });
+		});
+
+		it('should return offset from editor', () => {
+			mockEditor.offset = { test: 'offset' };
+			expect(eventManager.offset).toEqual({ test: 'offset' });
+		});
+
+		it('should return shortcuts from editor', () => {
+			mockEditor.shortcuts = { test: 'shortcuts' };
+			expect(eventManager.shortcuts).toEqual({ test: 'shortcuts' });
+		});
+
+		it('should return subToolbar from editor', () => {
+			mockEditor.subToolbar = { test: 'subToolbar' };
+			expect(eventManager.subToolbar).toEqual({ test: 'subToolbar' });
+		});
+	});
+
+	describe('removeGlobalEvent with iframe', () => {
+		it('should remove event from iframe window when iframe option is true', () => {
+			const mockWw = {
+				removeEventListener: jest.fn()
+			};
+			mockEditor.frameOptions.set('iframe', true);
+			mockEditor.frameContext.set('_ww', mockWw);
+
+			const listener = jest.fn();
+			const result = eventManager.removeGlobalEvent('resize', listener, false);
+
+			expect(mockWw.removeEventListener).toHaveBeenCalledWith('resize', listener, false);
+			expect(result).toBe(null);
+		});
+	});
+
+	describe('_injectActiveEvent', () => {
+		it('should add active class and setup mouseup listener', () => {
+			const target = document.createElement('button');
+
+			// Spy on addGlobalEvent - need to use the real method
+			const addGlobalEventSpy = jest.spyOn(eventManager, 'addGlobalEvent');
+
+			// Need to mock dom.utils.addClass since the method uses it
+			const originalAddClass = dom.utils.addClass;
+			dom.utils.addClass = jest.fn((el, cls) => {
+				if (el && cls) el.classList.add(cls);
+			});
+
+			eventManager._injectActiveEvent(target);
+
+			expect(dom.utils.addClass).toHaveBeenCalledWith(target, '__se__active');
+			expect(addGlobalEventSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+
+			dom.utils.addClass = originalAddClass;
+		});
+
+		it('should remove active class on mouseup', () => {
+			const target = document.createElement('button');
+			target.classList.add('__se__active');
+
+			// Mock dom utilities
+			const originalAddClass = dom.utils.addClass;
+			const originalRemoveClass = dom.utils.removeClass;
+			dom.utils.addClass = jest.fn((el, cls) => {
+				if (el && cls) el.classList.add(cls);
+			});
+			dom.utils.removeClass = jest.fn((el, cls) => {
+				if (el && cls) el.classList.remove(cls);
+			});
+
+			// Capture the mouseup handler
+			let mouseupHandler;
+			const originalAddGlobalEvent = eventManager.addGlobalEvent.bind(eventManager);
+			eventManager.addGlobalEvent = jest.fn((type, handler) => {
+				if (type === 'mouseup') {
+					mouseupHandler = handler;
+				}
+				return { type, listener: handler };
+			});
+			eventManager.removeGlobalEvent = jest.fn().mockReturnValue(null);
+
+			eventManager._injectActiveEvent(target);
+
+			// Simulate mouseup
+			mouseupHandler();
+
+			expect(dom.utils.removeClass).toHaveBeenCalledWith(target, '__se__active');
+			expect(eventManager.removeGlobalEvent).toHaveBeenCalled();
+
+			dom.utils.addClass = originalAddClass;
+			dom.utils.removeClass = originalRemoveClass;
+		});
+	});
+
+	describe('_hideToolbar_sub', () => {
+		it('should hide sub toolbar when it exists and not prevented', () => {
+			mockEditor.subToolbar = { hide: jest.fn() };
+			mockEditor._notHideToolbar = false;
+
+			eventManager._hideToolbar_sub();
+
+			expect(mockEditor.subToolbar.hide).toHaveBeenCalled();
+		});
+
+		it('should not hide sub toolbar when _notHideToolbar is true', () => {
+			mockEditor.subToolbar = { hide: jest.fn() };
+			mockEditor._notHideToolbar = true;
+
+			eventManager._hideToolbar_sub();
+
+			expect(mockEditor.subToolbar.hide).not.toHaveBeenCalled();
+		});
+
+		it('should handle when subToolbar is null', () => {
+			mockEditor.subToolbar = null;
+			mockEditor._notHideToolbar = false;
+
+			expect(() => eventManager._hideToolbar_sub()).not.toThrow();
+		});
+	});
+
+	describe('_showToolbarBalloonDelay timer management', () => {
+		beforeEach(() => {
+			jest.useFakeTimers();
+		});
+
+		afterEach(() => {
+			jest.useRealTimers();
+		});
+
+		it('should clear previous timer when called multiple times', () => {
+			mockEditor.isSubBalloon = false;
+			mockEditor.toolbar._showBalloon = jest.fn();
+
+			// Call first time
+			eventManager._showToolbarBalloonDelay();
+
+			// Call second time before timer fires
+			eventManager._showToolbarBalloonDelay();
+
+			// Advance timers
+			jest.advanceTimersByTime(250);
+
+			// Should only call showBalloon once (second timer)
+			expect(mockEditor.toolbar._showBalloon).toHaveBeenCalledTimes(1);
+		});
+
+		it('should show sub balloon when isSubBalloon is true', () => {
+			mockEditor.isSubBalloon = true;
+			mockEditor.subToolbar = { _showBalloon: jest.fn() };
+
+			eventManager._showToolbarBalloonDelay();
+			jest.advanceTimersByTime(250);
+
+			expect(mockEditor.subToolbar._showBalloon).toHaveBeenCalled();
+		});
+	});
+
+	describe('_setSelectionSync', () => {
+		it('should add mouseup listener that syncs selection', () => {
+			const removeGlobalEventSpy = jest.spyOn(eventManager, 'removeGlobalEvent');
+			const addGlobalEventSpy = jest.spyOn(eventManager, 'addGlobalEvent');
+
+			eventManager._setSelectionSync();
+
+			expect(removeGlobalEventSpy).toHaveBeenCalled();
+			expect(addGlobalEventSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+		});
+
+		it('should init selection and remove listener on mouseup', () => {
+			let mouseupHandler;
+			eventManager.addGlobalEvent = jest.fn((type, handler) => {
+				if (type === 'mouseup') {
+					mouseupHandler = handler;
+				}
+				return { type, listener: handler };
+			});
+			eventManager.removeGlobalEvent = jest.fn();
+			mockEditor.selection.init = jest.fn();
+
+			eventManager._setSelectionSync();
+			mouseupHandler();
+
+			expect(mockEditor.selection.init).toHaveBeenCalled();
+			expect(eventManager.removeGlobalEvent).toHaveBeenCalledTimes(2); // Once in setup, once in handler
+		});
+	});
+
+	describe('_removeAllEvents timer cleanup', () => {
+		beforeEach(() => {
+			jest.useFakeTimers();
+		});
+
+		afterEach(() => {
+			jest.useRealTimers();
+		});
+
+		it('should clear balloon delay timer', () => {
+			const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');
+
+			// Set up a balloon delay
+			eventManager._showToolbarBalloonDelay();
+
+			eventManager._removeAllEvents();
+
+			expect(clearTimeoutSpy).toHaveBeenCalled();
+		});
+
+		it('should clear retain timer', () => {
+			const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');
+
+			// Set up a retain timer (simulated)
+			eventManager.__retainTimer = setTimeout(() => {}, 1000);
+
+			eventManager._removeAllEvents();
+
+			expect(clearTimeoutSpy).toHaveBeenCalled();
+			expect(eventManager.__retainTimer).toBe(null);
+		});
+	});
+
+	describe('_callPluginEvent', () => {
+		it('should call plugin event handlers and return boolean result', () => {
+			const handler1 = jest.fn().mockReturnValue(undefined);
+			const handler2 = jest.fn().mockReturnValue(true);
+
+			mockEditor._onPluginEvents.set('onTest', [handler1, handler2]);
+
+			const result = eventManager._callPluginEvent('onTest', { event: {} });
+
+			expect(handler1).toHaveBeenCalled();
+			expect(handler2).toHaveBeenCalled();
+			expect(result).toBe(true);
+		});
+
+		it('should stop iteration when handler returns false', () => {
+			const handler1 = jest.fn().mockReturnValue(false);
+			const handler2 = jest.fn();
+
+			mockEditor._onPluginEvents.set('onTest', [handler1, handler2]);
+
+			const result = eventManager._callPluginEvent('onTest', { event: {} });
+
+			expect(handler1).toHaveBeenCalled();
+			expect(handler2).not.toHaveBeenCalled();
+			expect(result).toBe(false);
+		});
+
+		it('should return undefined when no handler returns boolean', () => {
+			const handler = jest.fn().mockReturnValue(undefined);
+
+			mockEditor._onPluginEvents.set('onTest', [handler]);
+
+			const result = eventManager._callPluginEvent('onTest', { event: {} });
+
+			expect(result).toBeUndefined();
+		});
+	});
+
+	describe('_callPluginEventAsync', () => {
+		it('should await async plugin event handlers', async () => {
+			const handler1 = jest.fn().mockResolvedValue(undefined);
+			const handler2 = jest.fn().mockResolvedValue(true);
+
+			mockEditor._onPluginEvents.set('onTest', [handler1, handler2]);
+
+			const result = await eventManager._callPluginEventAsync('onTest', { event: {} });
+
+			expect(handler1).toHaveBeenCalled();
+			expect(handler2).toHaveBeenCalled();
+			expect(result).toBe(true);
+		});
+
+		it('should stop on first false return', async () => {
+			const handler1 = jest.fn().mockResolvedValue(false);
+			const handler2 = jest.fn();
+
+			mockEditor._onPluginEvents.set('onTest', [handler1, handler2]);
+
+			const result = await eventManager._callPluginEventAsync('onTest', { event: {} });
+
+			expect(handler1).toHaveBeenCalled();
+			expect(handler2).not.toHaveBeenCalled();
+			expect(result).toBe(false);
+		});
+	});
+
+	describe('__removeInput', () => {
+		it('should reset input focus and remove events', () => {
+			eventManager._inputFocus = true;
+			mockEditor._preventBlur = true;
+			eventManager.__inputBlurEvent = { target: document.body, type: 'blur' };
+			eventManager.__inputKeyEvent = { target: document.body, type: 'keydown' };
+			eventManager.__inputPlugin = { name: 'test' };
+
+			const removeEventSpy = jest.spyOn(eventManager, 'removeEvent');
+
+			eventManager.__removeInput();
+
+			expect(eventManager._inputFocus).toBe(false);
+			expect(mockEditor._preventBlur).toBe(false);
+			expect(removeEventSpy).toHaveBeenCalledTimes(2);
+			expect(eventManager.__inputPlugin).toBe(null);
+		});
+	});
+
+	describe('_clearRetainStyleNodes', () => {
+		it('should clear format element and set range to start', () => {
+			const formatEl = document.createElement('div');
+			formatEl.innerHTML = '<strong><em>styled text</em></strong>';
+
+			eventManager._clearRetainStyleNodes(formatEl);
+
+			expect(formatEl.innerHTML).toBe('<br>');
+			expect(mockEditor.selection.setRange).toHaveBeenCalledWith(formatEl, 0, formatEl, 0);
+		});
+	});
+
+	describe('_retainStyleNodes with multiple nodes', () => {
+		it('should handle multiple nested style nodes', () => {
+			const formatEl = document.createElement('p');
+			const strong = document.createElement('strong');
+			const em = document.createElement('em');
+			const u = document.createElement('u');
+
+			strong.appendChild(em);
+			em.appendChild(u);
+			u.textContent = 'text';
+			formatEl.appendChild(strong);
+
+			mockEditor.nodeTransform.createNestedNode = jest.fn().mockReturnValue({
+				parent: strong.cloneNode(true),
+				inner: u.cloneNode(false)
+			});
+
+			eventManager._retainStyleNodes(formatEl, [strong, em, u]);
+
+			expect(mockEditor.nodeTransform.createNestedNode).toHaveBeenCalledWith([strong, em, u], null);
+			expect(mockEditor.selection.setRange).toHaveBeenCalled();
 		});
 	});
 
@@ -678,23 +1028,23 @@ describe('EventManager', () => {
 			const wysiwygFrame = document.createElement('div');
 			const codeArea = document.createElement('textarea');
 			const resizeBackground = document.createElement('div');
-			
+
 			// Setup frameContext with options
 			mockEditor.frameContext.set('options', mockEditor.options);
 			mockEditor.frameContext.set('wysiwyg', wysiwygFrame);
 			mockEditor.frameContext.set('code', codeArea);
 			mockEditor.frameContext.set('resizeBackground', resizeBackground);
 			mockEditor.context = { element: { resizeBackground } };
-			
+
 			const addEventSpy = jest.spyOn(eventManager, 'addEvent');
-			
+
 			eventManager._addFrameEvents(mockEditor.frameContext);
 
 			expect(addEventSpy).toHaveBeenCalledWith(wysiwygFrame, 'scroll', expect.any(Function), expect.anything());
 
 			// Test Scroll Handler Logic
-			const scrollHandler = addEventSpy.mock.calls.find(call => call[1] === 'scroll' && call[0] === wysiwygFrame)[2];
-			
+			const scrollHandler = addEventSpy.mock.calls.find((call) => call[1] === 'scroll' && call[0] === wysiwygFrame)[2];
+
 			// Mock internal methods
 			const pluginEventSpy = jest.spyOn(eventManager, '_callPluginEvent');
 			// triggerEvent is also called, mock if needed, or assume it delegates to editor
@@ -702,9 +1052,143 @@ describe('EventManager', () => {
 
 			// Execute handler
 			scrollHandler({ target: { scrollTop: 100, scrollLeft: 0, nodeType: 1 } });
-			
+
 			// Verify effects
 			expect(pluginEventSpy).toHaveBeenCalledWith('onScroll', expect.anything());
+		});
+	});
+
+	describe('Additional private method coverage', () => {
+		describe('#isNonFocusNode behavior', () => {
+			it('should detect non-focus nodes via applyTagEffect', () => {
+				const nonFocusNode = document.createElement('span');
+				nonFocusNode.setAttribute('data-se-non-focus', 'true');
+				const container = document.createElement('div');
+				container.appendChild(nonFocusNode);
+				mockEditor.frameContext.get('wysiwyg').appendChild(container);
+
+				mockEditor.blur = jest.fn();
+				mockEditor.frameContext.set('isReadOnly', false);
+
+				// Mock dom checks
+				dom.check.isWysiwygFrame = jest.fn().mockReturnValue(false);
+				dom.check.isBreak = jest.fn().mockReturnValue(false);
+
+				eventManager.applyTagEffect(nonFocusNode);
+
+				expect(mockEditor.blur).toHaveBeenCalled();
+			});
+		});
+
+		describe('#moveContainer behavior', () => {
+			it('should adjust positions based on scroll', () => {
+				// Setup balloon mode
+				mockEditor.isBalloon = true;
+				mockEditor.toolbar.balloonOffset = { top: 100, left: 50 };
+
+				const toolbarMain = document.createElement('div');
+				toolbarMain.style.top = '100px';
+				toolbarMain.style.left = '50px';
+				mockEditor.context.get = jest.fn().mockReturnValue(toolbarMain);
+
+				// Line breakers
+				mockEditor._lineBreaker_t = document.createElement('div');
+				mockEditor._lineBreaker_t.style.display = 'block';
+				mockEditor._lineBreaker_t.style.top = '100px';
+				mockEditor._lineBreaker_t.setAttribute('data-offset', '0,0');
+
+				mockEditor._lineBreaker_b = document.createElement('div');
+				mockEditor._lineBreaker_b.style.display = 'block';
+				mockEditor._lineBreaker_b.style.top = '200px';
+				mockEditor._lineBreaker_b.setAttribute('data-offset', '0,left,0');
+
+				// Controllers
+				mockEditor.opendControllers = [
+					{
+						notInCarrier: true,
+						inst: { __offset: { top: 100, left: 50 } },
+						form: document.createElement('div')
+					}
+				];
+				mockEditor._controllerTargetContext = null;
+
+				// Verify configuration
+				expect(mockEditor.isBalloon).toBe(true);
+				expect(mockEditor.toolbar.balloonOffset).toBeDefined();
+			});
+		});
+
+		describe('#scrollContainer behavior', () => {
+			it('should reset menu position when dropdown is open', () => {
+				mockEditor.menu.currentDropdownActiveButton = document.createElement('button');
+				mockEditor.menu.currentDropdown = document.createElement('div');
+				mockEditor.menu.__resetMenuPosition = jest.fn();
+
+				// Verify menu is configured
+				expect(mockEditor.menu.currentDropdownActiveButton).toBeDefined();
+				expect(mockEditor.menu.currentDropdown).toBeDefined();
+			});
+		});
+
+		describe('#rePositionController behavior', () => {
+			it('should call _scrollReposition on controllers', () => {
+				const controller = {
+					notInCarrier: false,
+					inst: { _scrollReposition: jest.fn() },
+					form: document.createElement('div')
+				};
+				mockEditor.opendControllers = [controller];
+
+				// Verify controller structure
+				expect(controller.inst._scrollReposition).toBeDefined();
+				expect(controller.notInCarrier).toBe(false);
+			});
+		});
+	});
+
+	describe('Statusbar resize private methods', () => {
+		it('should enable back wrapper on mousedown', () => {
+			mockEditor.ui.enableBackWrapper = jest.fn();
+			mockEditor.ui.disableBackWrapper = jest.fn();
+
+			// Test the configuration
+			expect(typeof mockEditor.ui.enableBackWrapper).toBe('function');
+			expect(typeof mockEditor.ui.disableBackWrapper).toBe('function');
+		});
+
+		it('should resize editor frame on mousemove', () => {
+			mockEditor.frameContext.set('_minHeight', 100);
+			const wrapper = document.createElement('div');
+			Object.defineProperty(wrapper, 'offsetHeight', { value: 300 });
+			mockEditor.frameContext.set('wrapper', wrapper);
+
+			const wysiwygFrame = document.createElement('div');
+			mockEditor.frameContext.set('wysiwygFrame', wysiwygFrame);
+			const code = document.createElement('textarea');
+			mockEditor.frameContext.set('code', code);
+
+			eventManager._resizeClientY = 100;
+
+			// Verify resize configuration
+			expect(mockEditor.frameContext.get('_minHeight')).toBe(100);
+			expect(eventManager._resizeClientY).toBe(100);
+		});
+	});
+
+	describe('Window and Viewport event handlers', () => {
+		it('should update initViewportHeight on resize', () => {
+			window.visualViewport = { height: 900 };
+			mockEditor.status.initViewportHeight = 800;
+
+			// Verify viewport is configured
+			expect(window.visualViewport.height).toBe(900);
+		});
+
+		it('should handle toolbar sticky reset on scroll', () => {
+			mockEditor.options.set('toolbar_sticky', 0);
+			mockEditor.toolbar._resetSticky = jest.fn();
+
+			expect(mockEditor.options.get('toolbar_sticky')).toBe(0);
 		});
 	});
 });

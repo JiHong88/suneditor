@@ -99,11 +99,10 @@ describe('TableSelectionService', () => {
             const { dom } = require('../../../../../../src/helper');
             dom.query.getParentElement.mockReturnValue(document.createElement('table'));
 
-            selectionService.initCellSelection(cell, false);
+            selectionService.initCellSelection(cell);
 
-            expect(main.setState).toHaveBeenCalledWith('isShiftPressed', false);
             expect(main.setState).toHaveBeenCalledWith('fixedCell', cell);
-            expect(main.eventManager.addGlobalEvent).toHaveBeenCalled();
+            expect(main.setState).toHaveBeenCalledWith('selectedTable', expect.any(Object));
         });
     });
 

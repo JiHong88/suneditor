@@ -19,11 +19,10 @@ export type HRPluginOptions = {
  */
 declare class HR extends PluginDropdown {
 	/**
-	 * @this {HR}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
-	static component(this: HR, node: HTMLElement): HTMLElement | null;
+	static component(node: HTMLElement): HTMLElement | null;
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance

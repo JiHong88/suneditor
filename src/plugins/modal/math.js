@@ -28,8 +28,8 @@ const { _w, _d } = env;
 class Math_ extends PluginModal {
 	static key = 'math';
 	static className = '';
+
 	/**
-	 * @this {Math_}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */

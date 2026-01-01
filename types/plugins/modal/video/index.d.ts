@@ -169,11 +169,18 @@ export type VideoState = {
  */
 declare class Video extends PluginModal {
 	/**
-	 * @this {Video}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
-	static component(this: Video, node: HTMLElement): HTMLElement | null;
+	static component(node: HTMLElement): HTMLElement | null;
+	/**
+	 * @description Checks if the given URL matches any of the defined URL patterns.
+	 * @param {string} url - The URL to check.
+	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
+	 */
+	static #checkContentType(url: string): boolean;
+	static #extensions: string[];
+	static #urlPatterns: RegExp[];
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -230,8 +237,6 @@ declare class Video extends PluginModal {
 			tag: string;
 		};
 	};
-	extensions: string[];
-	urlPatterns: RegExp[];
 	/** @type {VideoState} */
 	state: VideoState;
 	sizeService: VideoSizeService;
@@ -253,12 +258,6 @@ declare class Video extends PluginModal {
 	componentSelect(target: HTMLElement): void | boolean;
 	componentEdit(target: HTMLElement): void;
 	componentDestroy(target: HTMLElement): Promise<void>;
-	/**
-	 * @description Checks if the given URL matches any of the defined URL patterns.
-	 * @param {string} url - The URL to check.
-	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
-	 */
-	checkContentType(url: string): boolean;
 	/**
 	 * @description Finds and processes the URL for video by matching it against known service patterns.
 	 * @param {string} url - The original URL.

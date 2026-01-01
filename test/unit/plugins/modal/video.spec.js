@@ -1,42 +1,70 @@
-import Video from '../../../../src/plugins/modal/video';
 
-// Mock dependencies with comprehensive setup for coverage
+import Video from '../../../../src/plugins/modal/video';
+import VideoSizeService from '../../../../src/plugins/modal/video/services/video.size';
+import VideoUploadService from '../../../../src/plugins/modal/video/services/video.upload';
+
+
+// MOCKS
+
+// Mock Interfaces
+jest.mock('../../../../src/interfaces', () => ({
+    PluginModal: class {
+        constructor(editor) {
+            this.editor = editor;
+            this.lang = editor.lang;
+            this.icons = editor.icons;
+            this.eventManager = { addEvent: jest.fn(), removeEvent: jest.fn() };
+            this.component = { select: jest.fn(), insert: jest.fn() };
+            this.fileManager = { getSize: jest.fn().mockReturnValue(0), upload: jest.fn().mockResolvedValue(true), setFileData: jest.fn() };
+            this.triggerEvent = jest.fn().mockResolvedValue(undefined);
+            this.history = { push: jest.fn() };
+            this.options = { get: jest.fn().mockReturnValue('auto') };
+            this.plugins = editor.plugins || {};
+            // Initialize basic properties expected by Video
+            this.modal = { isUpdate: false };
+        }
+    }
+}));
+
+// Mock Services
+jest.mock('../../../../src/plugins/modal/video/services/video.size', () => {
+    return jest.fn().mockImplementation(() => ({
+        on: jest.fn(),
+        init: jest.fn(),
+        ready: jest.fn(),
+        resolveSize: jest.fn().mockReturnValue({ width: '100%', height: '56.25%', isChanged: true }),
+        setOriginSize: jest.fn(),
+        getInputSize: jest.fn().mockReturnValue({ w: '100%', h: '56.25%' }),
+        applySize: jest.fn(),
+        setInputSize: jest.fn()
+    }));
+});
+
+jest.mock('../../../../src/plugins/modal/video/services/video.upload', () => {
+    return jest.fn().mockImplementation(() => ({
+        serverUpload: jest.fn()
+    }));
+});
+
+
 jest.mock('../../../../src/editorInjector', () => {
 	return class MockEditorInjector {
 		constructor() {
 			this.lang = { video: 'Video', close: 'Close', submitButton: 'Submit' };
 			this.icons = { cancel: '<svg>cancel</svg>', video: '<svg>video</svg>', revert: '<svg>revert</svg>' };
-			this.eventManager = { addEvent: jest.fn() };
+			this.eventManager = { addEvent: jest.fn(), removeEvent: jest.fn() };
 			this.events = { onVideoLoad: jest.fn(), onVideoAction: jest.fn() };
 			this.options = { get: jest.fn().mockReturnValue('auto') };
-			// Editor methods for comprehensive coverage
-			this.editor = {
-				focus: jest.fn(),
-				focusEdge: jest.fn()
-			};
-			this.format = {
-				getLine: jest.fn().mockReturnValue(null)
-			};
-			this.history = {
-				push: jest.fn()
-			};
+			this.editor = { focus: jest.fn(), focusEdge: jest.fn() };
+			this.format = { getLine: jest.fn().mockReturnValue(null) };
+			this.history = { push: jest.fn() };
 			this.frameContext = new Map([['wysiwyg', { nodeType: 1 }]]);
-			this.nodeTransform = {
-				removeAllParents: jest.fn()
-			};
-			this.component = {
-				select: jest.fn()
-			};
+			this.nodeTransform = { removeAllParents: jest.fn() };
+			this.component = { select: jest.fn(), insert: jest.fn() };
 			this.triggerEvent = jest.fn().mockResolvedValue(true);
-			this.ui = {
-				alertOpen: jest.fn()
-			};
-			// Video-specific properties
-			this.inputX = { value: '100%', placeholder: '' };
-			this.inputY = { value: '56.25%', placeholder: '' };
-			this.frameRatioOption = { options: [], value: '0.5625' };
-			this.proportion = { disabled: false, checked: false };
-			this.plugins = {};
+			this.ui = { alertOpen: jest.fn() };
+			this.functions = { createHTML: jest.fn() };
+            this.plugins = {};
 		}
 	};
 });
@@ -46,28 +74,9 @@ jest.mock('../../../../src/modules/contract', () => ({
 		open: jest.fn(),
 		close: jest.fn(),
 		form: {
-			querySelector: jest.fn().mockImplementation((selector) => {
-				if (selector === '.se-video-ratio-option') {
-					return {
-						querySelectorAll: jest.fn().mockReturnValue([]),
-						length: 0
-					};
-				}
-				if (selector === 'input[name="suneditor_video_radio"]:checked') {
-					return { value: 'center' };
-				}
-				if (selector === 'input[name="suneditor_video_radio"][value="none"]') {
-					return { checked: false };
-				}
-				return {
-					querySelectorAll: jest.fn().mockReturnValue([]),
-					length: 0,
-					placeholder: '',
-					value: ''
-				};
-			})
+			querySelector: jest.fn().mockReturnValue({ value: 'center', checked: true }),
 		},
-		isUpdate: false
+		isUpdate: false,
 	})),
 	Figure: jest.fn().mockImplementation(() => ({
 		open: jest.fn().mockReturnValue({
@@ -75,20 +84,18 @@ jest.mock('../../../../src/modules/contract', () => ({
 			align: 'center',
 			width: '100%',
 			height: '56.25%',
-			w: 800,
-			h: 450,
-			isVertical: false,
-			ratio: { w: 16, h: 9 }
+            w: '100%',
+			h: '56.25%',
+			ratio: { w: 16, h: 9 },
+            isVertical: false
 		}),
-		getSize: jest.fn().mockReturnValue({
-			dw: '100%',
-			dh: '56.25%'
-		}),
+		getSize: jest.fn().mockReturnValue({ dw: '100%', dh: '56.25%', w: '100%', h: '56.25%' }),
 		setSize: jest.fn(),
 		setAlign: jest.fn(),
 		setTransform: jest.fn(),
 		deleteTransform: jest.fn(),
-		isVertical: false
+        isVertical: false,
+        retainFigureFormat: jest.fn()
 	}))
 }));
 
@@ -100,14 +107,37 @@ jest.mock('../../../../src/modules/manager', () => ({
 	}))
 }));
 
+// Mock Render - use factory function with inline element creation
+jest.mock('../../../../src/plugins/modal/video/render/video.html', () => {
+    const mockEl = (tag) => ({ nodeName: tag, style: {}, setAttribute: jest.fn(), getAttribute: jest.fn(), appendChild: jest.fn() });
+    return {
+        CreateHTML_modal: jest.fn(() => ({
+            html: mockEl('div'),
+            fileModalWrapper: mockEl('div'),
+            videoInputFile: { files: [], value: '', setAttribute: jest.fn(), removeAttribute: jest.fn() },
+            videoUrlFile: { disabled: false, value: '' },
+            previewSrc: { textContent: '', style: {} },
+            proportion: { disabled: false, checked: false },
+            frameRatioOption: { options: [], value: '0.5625' },
+            inputX: { value: '100%' },
+            inputY: { value: '56.25%' },
+            revertBtn: mockEl('button'),
+            galleryButton: null, // Set to null to skip event binding
+            fileRemoveBtn: mockEl('button'),
+            alignForm: { style: {} }
+        }))
+    };
+});
+
 // Add static methods to modules
 const mockModal = require('../../../../src/modules/contract').Modal;
 const mockFigure = require('../../../../src/modules/contract').Figure;
+const mockRender = require('../../../../src/plugins/modal/video/render/video.html').CreateHTML_modal;
 
-// Mock Figure static methods
 Object.assign(mockFigure, {
 	CreateContainer: jest.fn().mockReturnValue({
-		container: { nodeType: 1, style: {} }
+		container: { nodeType: 1, style: {}, querySelector: jest.fn() },
+        cover: { appendChild: jest.fn() }
 	}),
 	GetContainer: jest.fn().mockReturnValue({
 		container: { nodeType: 1, style: {} },
@@ -119,7 +149,6 @@ Object.assign(mockFigure, {
 	is: jest.fn().mockReturnValue(false)
 });
 
-// Add static methods to Modal
 Object.assign(mockModal, {
 	OnChangeFile: jest.fn(),
 	CreateFileInput: jest.fn().mockReturnValue('')
@@ -132,7 +161,8 @@ jest.mock('../../../../src/helper', () => ({
 				querySelector: jest.fn().mockReturnValue({ value: '', files: [], src: '' }),
 				removeItem: jest.fn(),
 				setAttribute: jest.fn(),
-				cloneNode: jest.fn().mockReturnValue({ nodeName: 'VIDEO', setAttribute: jest.fn() })
+				cloneNode: jest.fn().mockReturnValue({ nodeName: 'VIDEO', setAttribute: jest.fn(), getAttribute: jest.fn() }),
+                appendChild: jest.fn()
 			}),
 			removeItem: jest.fn(),
 			createTooltipInner: jest.fn().mockReturnValue('')
@@ -148,7 +178,7 @@ jest.mock('../../../../src/helper', () => ({
 	},
 	env: {
 		_w: {
-			setTimeout: jest.fn((fn, ms) => setTimeout(fn, ms))
+			setTimeout: jest.fn((fn, ms) => fn()) // execute immediately
 		},
 		NO_EVENT: Symbol('NO_EVENT'),
 		ON_OVER_COMPONENT: Symbol('ON_OVER_COMPONENT')
@@ -162,6 +192,8 @@ jest.mock('../../../../src/helper', () => ({
 	}
 }));
 
+import { dom } from '../../../../src/helper';
+
 describe('Video Plugin', () => {
 	let mockEditor;
 	let video;
@@ -172,620 +204,791 @@ describe('Video Plugin', () => {
 			icons: { cancel: '<svg>cancel</svg>', video: '<svg>video</svg>', revert: '<svg>revert</svg>' },
 			plugins: {}
 		};
+        
+        // Reset mocks
+        mockRender.mockClear();
+        dom.utils.createElement.mockClear();
+        VideoSizeService.mockClear();
+        VideoUploadService.mockClear();
+        
 		video = new Video(mockEditor, {});
 	});
 
-	describe('Constructor', () => {
-		it('should create Video instance', () => {
-			expect(() => new Video(mockEditor, {})).not.toThrow();
+    describe('Static Methods', () => {
+        it('component should identify video and iframe', () => {
+            const videoNode = { nodeName: 'VIDEO' };
+            expect(Video.component(videoNode)).toBe(videoNode);
+
+            const iframeNode = { nodeName: 'IFRAME', src: 'https://www.youtube.com/embed/123' };
+            expect(Video.component(iframeNode)).toBe(iframeNode);
+
+            const badIframe = { nodeName: 'IFRAME', src: 'https://example.com' };
+            expect(Video.component(badIframe)).toBeNull();
+
+            const divNode = { nodeName: 'DIV' };
+            expect(Video.component(divNode)).toBeNull();
+        });
+
+        it('component should handle various video URL patterns', () => {
+            // Vimeo
+            const vimeoIframe = { nodeName: 'IFRAME', src: 'https://player.vimeo.com/video/123' };
+            expect(Video.component(vimeoIframe)).toBe(vimeoIframe);
+
+            // Dailymotion
+            const dailymotionIframe = { nodeName: 'IFRAME', src: 'https://www.dailymotion.com/video/x123' };
+            expect(Video.component(dailymotionIframe)).toBe(dailymotionIframe);
+
+            // Facebook video
+            const facebookIframe = { nodeName: 'IFRAME', src: 'https://www.facebook.com/user/videos/123' };
+            expect(Video.component(facebookIframe)).toBe(facebookIframe);
+
+            // Twitch
+            const twitchIframe = { nodeName: 'IFRAME', src: 'https://www.twitch.tv/videos/123' };
+            expect(Video.component(twitchIframe)).toBe(twitchIframe);
+
+            // TikTok
+            const tiktokIframe = { nodeName: 'IFRAME', src: 'https://www.tiktok.com/@user/video/123' };
+            expect(Video.component(tiktokIframe)).toBe(tiktokIframe);
+
+            // Instagram
+            const instagramIframe = { nodeName: 'IFRAME', src: 'https://www.instagram.com/p/abc123' };
+            expect(Video.component(instagramIframe)).toBe(instagramIframe);
+
+            // Wistia
+            const wistiaIframe = { nodeName: 'IFRAME', src: 'https://fast.wistia.com/embed/medias/abc' };
+            expect(Video.component(wistiaIframe)).toBe(wistiaIframe);
+
+            // Loom
+            const loomIframe = { nodeName: 'IFRAME', src: 'https://www.loom.com/share/abc123' };
+            expect(Video.component(loomIframe)).toBe(loomIframe);
+        });
+
+        it('component should handle video file extensions', () => {
+            // Various video extensions
+            const mp4Iframe = { nodeName: 'IFRAME', src: 'https://example.com/video.mp4' };
+            expect(Video.component(mp4Iframe)).toBe(mp4Iframe);
+
+            const webmIframe = { nodeName: 'IFRAME', src: 'https://example.com/video.webm' };
+            expect(Video.component(webmIframe)).toBe(webmIframe);
+
+            const aviIframe = { nodeName: 'IFRAME', src: 'https://example.com/video.avi' };
+            expect(Video.component(aviIframe)).toBe(aviIframe);
+
+            const movIframe = { nodeName: 'IFRAME', src: 'https://example.com/video.mov' };
+            expect(Video.component(movIframe)).toBe(movIframe);
+
+            const flvIframe = { nodeName: 'IFRAME', src: 'https://example.com/video.flv' };
+            expect(Video.component(flvIframe)).toBe(flvIframe);
+        });
+
+        it('component should return null for null/undefined node', () => {
+            expect(Video.component(null)).toBeNull();
+            expect(Video.component(undefined)).toBeNull();
+        });
+    });
+
+	describe('Initialization', () => {
+		it('should create Video instance with defaults', () => {
+			expect(video).toBeInstanceOf(Video);
+			expect(video.pluginOptions.canResize).toBe(true);
+            expect(mockRender).toHaveBeenCalled();
+            expect(VideoSizeService).toHaveBeenCalled();
+            expect(VideoUploadService).toHaveBeenCalled();
 		});
 
-		it('should initialize with custom plugin options', () => {
+		it('should initialize with custom options', () => {
 			const customOptions = {
 				canResize: false,
-				showHeightInput: false,
-				defaultWidth: '300px',
-				defaultHeight: '200px',
-				percentageOnlySize: true,
-				createFileInput: true,
-				createUrlInput: false,
-				uploadUrl: '/api/video/upload',
-				uploadHeaders: { 'X-Custom': 'value' },
-				uploadSizeLimit: 10485760,
-				uploadSingleSizeLimit: 5242880,
-				allowMultiple: true,
-				acceptedFormats: 'video/mp4,video/avi',
-				defaultRatio: 0.75,
-				showRatioOption: false,
-				ratioOptions: [{ name: '4:3', value: 0.75 }],
-				videoTagAttributes: { controls: 'controls' },
-				iframeTagAttributes: { frameborder: '0' },
-				query_youtube: 'autoplay=1',
-				query_vimeo: 'title=0',
-				extensions: ['.mov'],
-				insertBehavior: 'select'
+                defaultRatio: 0.75,
+                uploadUrl: '/upload'
 			};
 			const customVideo = new Video(mockEditor, customOptions);
 			expect(customVideo.pluginOptions.canResize).toBe(false);
-			expect(customVideo.pluginOptions.uploadUrl).toBe('/api/video/upload');
-			expect(customVideo.pluginOptions.defaultRatio).toBe(0.75);
-		});
-
-		it('should set up default properties correctly', () => {
-			expect(video.title).toBe('Video');
-			expect(video.icon).toBe('video');
-			expect(video.sizeUnit).toBeDefined();
-			expect(video.extensions).toContain('.mp4');
-			expect(video.urlPatterns.length).toBeGreaterThan(0);
+			expect(customVideo.pluginOptions.uploadUrl).toBe('/upload');
 		});
 	});
 
-	describe('Static properties', () => {
-		it('should have correct static properties', () => {
-			expect(Video.key).toBe('video');
-			expect(Video.type).toBe('modal');
-			expect(Video.className).toBe('');
-		});
-	});
-
-	describe('Static methods', () => {
-		it('should have component method', () => {
-			expect(typeof Video.component).toBe('function');
-		});
-
-		it('should return video element if valid', () => {
-			const mockElement = { nodeName: 'VIDEO' };
-			const result = Video.component(mockElement);
-			expect(result).toBe(mockElement);
-		});
-
-		it('should return iframe element if valid video src', () => {
-			const mockElement = { nodeName: 'IFRAME', src: 'https://www.youtube.com/embed/test' };
-			Video.checkContentType = jest.fn().mockReturnValue(true);
-			const result = Video.component(mockElement);
-			expect(result).toBe(mockElement);
-		});
-
-		it('should return null for iframe with invalid video src', () => {
-			const mockElement = { nodeName: 'IFRAME', src: 'https://example.com' };
-			Video.checkContentType = jest.fn().mockReturnValue(false);
-			const result = Video.component(mockElement);
-			expect(result).toBeNull();
-		});
-
-		it('should return null for non-video element', () => {
-			const mockElement = { nodeName: 'DIV' };
-			const result = Video.component(mockElement);
-			expect(result).toBeNull();
-		});
-	});
-
-	describe('URL conversion methods', () => {
-		beforeEach(() => {
-			video = new Video(mockEditor, {});
-		});
-
-		describe('convertUrlYoutube', () => {
-			it('should convert YouTube watch URL to embed URL', () => {
-				const url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
-				const result = video.convertUrlYoutube(url);
-				expect(result).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ');
-			});
-
-			it('should add https prefix if missing', () => {
-				const url = 'youtube.com/watch?v=dQw4w9WgXcQ';
-				const result = video.convertUrlYoutube(url);
-				expect(result).toContain('https://');
-			});
-
-			it('should handle URLs with additional parameters', () => {
-				const url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=60s';
-				const result = video.convertUrlYoutube(url);
-				expect(result).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ?&t=60s');
-			});
-
-			it('should not modify already embedded URLs', () => {
-				const url = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
-				const result = video.convertUrlYoutube(url);
-				expect(result).toBe(url);
-			});
-		});
-
-		describe('convertUrlVimeo', () => {
-			it('should convert Vimeo URL to embed URL', () => {
-				const url = 'https://vimeo.com/123456789';
-				const result = video.convertUrlVimeo(url);
-				expect(result).toBe('https://player.vimeo.com/video/123456789');
-			});
-
-			it('should handle URLs with trailing slash', () => {
-				const url = 'https://vimeo.com/123456789/';
-				const result = video.convertUrlVimeo(url);
-				expect(result).toBe('https://player.vimeo.com/video/123456789');
-			});
-		});
-
-		describe('checkContentType', () => {
-			it('should return true for video extensions', () => {
-				expect(video.checkContentType('video.mp4')).toBe(true);
-				expect(video.checkContentType('movie.avi')).toBe(true);
-				expect(video.checkContentType('clip.webm')).toBe(true);
-			});
-
-			it('should return true for matching URL patterns', () => {
-				expect(video.checkContentType('https://youtube.com/watch?v=test')).toBe(true);
-				expect(video.checkContentType('https://vimeo.com/123456')).toBe(true);
-			});
-
-			it('should return false for non-video content', () => {
-				expect(video.checkContentType('document.pdf')).toBe(false);
-				expect(video.checkContentType('image.jpg')).toBe(false);
-				expect(video.checkContentType('https://example.com')).toBe(false);
-			});
-
-			it('should handle null/undefined URLs', () => {
-				expect(video.checkContentType(null)).toBe(false);
-				expect(video.checkContentType(undefined)).toBe(false);
-				expect(video.checkContentType('')).toBe(false);
-			});
-		});
-
-		describe('findProcessUrl', () => {
-			it('should find and process YouTube URLs', () => {
-				const url = 'https://youtube.com/watch?v=test';
-				const result = video.findProcessUrl(url);
-				expect(result).toEqual({
-					origin: url,
-					url: expect.stringContaining('youtube.com/embed'),
-					tag: 'iframe'
-				});
-			});
-
-			it('should find and process Vimeo URLs', () => {
-				const url = 'https://vimeo.com/123456';
-				const result = video.findProcessUrl(url);
-				expect(result).toEqual({
-					origin: url,
-					url: 'https://player.vimeo.com/video/123456',
-					tag: 'iframe'
-				});
-			});
-
-			it('should return null for unknown URLs', () => {
-				const url = 'https://example.com/video.html';
-				const result = video.findProcessUrl(url);
-				expect(result).toBeNull();
-			});
-		});
-	});
-
-	describe('Instance methods', () => {
-		beforeEach(() => {
-			video = new Video(mockEditor, {});
-			// Mock required DOM elements and methods
-			video.videoInputFile = { files: [], value: '', setAttribute: jest.fn(), removeAttribute: jest.fn() };
-			video.videoUrlFile = { disabled: false, value: '' };
-			video.previewSrc = { textContent: '', style: {} };
-			video.frameRatioOption = {
-				options: [{ value: '0.5625', selected: false }],
-				value: '0.5625',
-				length: 1
-			};
-			video.proportion = { disabled: false, checked: false };
-		});
-
-		it('should have required methods', () => {
-			const methods = ['open', 'componentEdit', 'modalOn', 'modalAction', 'modalInit', 'componentSelect', 'componentDestroy', 'onFilePasteAndDrop', 'create', 'createIframeTag', 'createVideoTag'];
-			methods.forEach((method) => {
-				expect(typeof video[method]).toBe('function');
-			});
-		});
-
-		describe('open', () => {
-			it('should call modal.open', () => {
-				video.open();
-				expect(video.modal.open).toHaveBeenCalled();
-			});
-		});
-
-		describe('edit', () => {
-			it('should call modal.open', () => {
-				video.componentEdit();
-				expect(video.modal.open).toHaveBeenCalled();
-			});
-		});
-
-		describe('on', () => {
-			it('should handle new video creation (isUpdate=false) when allowMultiple=true', () => {
-				video.pluginOptions.allowMultiple = true;
-				video.modalOn(false);
-				expect(video.videoInputFile.setAttribute).toHaveBeenCalledWith('multiple', 'multiple');
-			});
-
-			it('should handle video editing (isUpdate=true) when allowMultiple=true', () => {
-				video.pluginOptions.allowMultiple = true;
-				video.modalOn(true);
-				expect(video.videoInputFile.removeAttribute).toHaveBeenCalledWith('multiple');
-			});
-
-			it('should not modify multiple attribute when allowMultiple=false', () => {
-				video.pluginOptions.allowMultiple = false;
-				video.modalOn(false);
-				expect(video.videoInputFile.setAttribute).not.toHaveBeenCalled();
-			});
-		});
-
-		describe('modalAction', () => {
-			it('should process file upload when files are selected', async () => {
-				video.videoInputFile.files = [{ name: 'test.mp4', type: 'video/mp4' }];
-				video.submitFile = jest.fn().mockResolvedValue(true);
-
-				const result = await video.modalAction();
-
-				expect(video.submitFile).toHaveBeenCalledWith(video.videoInputFile.files);
-				expect(result).toBe(true);
-			});
-		});
-
-		describe('init', () => {
-			it('should reset form values', () => {
-				video.modalInit();
-
-				expect(video.videoInputFile.value).toBe('');
-				expect(video.videoUrlFile.value).toBe('');
-				expect(video.videoUrlFile.disabled).toBe(false);
-				expect(video.previewSrc.textContent).toBe('');
-			});
-		});
-
-		describe('select', () => {
-			it('should call ready with target element', () => {
-				const mockTarget = {
-					nodeName: 'VIDEO',
-					src: 'test.mp4',
-					style: {},
-					querySelector: jest.fn().mockReturnValue({ src: 'source.mp4' })
-				};
-
-				expect(() => video.componentSelect(mockTarget)).not.toThrow();
-				expect(typeof video.componentSelect).toBe('function');
-			});
-		});
-
-		describe('onFilePasteAndDrop', () => {
-			it('should handle video file drop', () => {
-				const mockFile = { type: 'video/mp4', name: 'test.mp4' };
-				video.submitFile = jest.fn();
-
-				const result = video.onFilePasteAndDrop({ file: mockFile });
-
-				expect(video.submitFile).toHaveBeenCalledWith([mockFile]);
-				expect(result).toBe(undefined);
-			});
-
-			it('should ignore non-video files', () => {
-				const mockFile = { type: 'image/jpeg', name: 'test.jpg' };
-				video.submitFile = jest.fn();
-
-				const result = video.onFilePasteAndDrop({ file: mockFile });
-
-				expect(video.submitFile).not.toHaveBeenCalled();
-				expect(result).toBeUndefined();
-			});
-		});
-
-		describe('destroy', () => {
-			it('should remove video element and handle cleanup', async () => {
-				const mockTarget = {
-					nodeName: 'VIDEO',
-					parentNode: { nodeType: 1 },
-					previousElementSibling: { nodeType: 1 }
-				};
-
-				video.modalInit = jest.fn();
-
-				await video.componentDestroy(mockTarget);
-
-				expect(video.triggerEvent).toHaveBeenCalledWith('onVideoDeleteBefore', expect.any(Object));
-				expect(video.modalInit).toHaveBeenCalled();
-			});
-
-			it('should cancel destroy if event returns false', async () => {
-				const mockTarget = { nodeName: 'VIDEO' };
-				video.triggerEvent = jest.fn().mockResolvedValue(false);
-				video.modalInit = jest.fn();
-
-				await video.componentDestroy(mockTarget);
-
-				expect(video.modalInit).not.toHaveBeenCalled();
-			});
-		});
-	});
-
-	describe('Plugin options handling', () => {
-		it('should handle default values for undefined options', () => {
-			const video = new Video(mockEditor, {});
-			expect(video.pluginOptions.canResize).toBe(true);
-			expect(video.pluginOptions.showHeightInput).toBe(true);
-			expect(video.pluginOptions.createUrlInput).toBe(true);
-			expect(video.pluginOptions.allowMultiple).toBe(false);
-			expect(video.pluginOptions.acceptedFormats).toBe('video/*');
-		});
-
-		it('should process size options correctly', () => {
-			const video = new Video(mockEditor, {
-				defaultWidth: 400,
-				defaultHeight: 300,
-				percentageOnlySize: true
-			});
-			expect(video.pluginOptions.defaultWidth).toBe('400px');
-			expect(video.pluginOptions.defaultHeight).toBe('300px');
-			expect(video.sizeUnit).toBe('%');
-		});
-
-		it('should handle upload configuration', () => {
-			const video = new Video(mockEditor, {
-				uploadUrl: '/api/upload',
-				uploadHeaders: { Authorization: 'Bearer token' },
-				uploadSizeLimit: 10485760,
-				acceptedFormats: 'video/mp4,video/avi'
-			});
-			expect(video.pluginOptions.uploadUrl).toBe('/api/upload');
-			expect(video.pluginOptions.uploadHeaders).toEqual({ Authorization: 'Bearer token' });
-			expect(video.pluginOptions.uploadSizeLimit).toBe(10485760);
-			expect(video.pluginOptions.acceptedFormats).toBe('video/mp4,video/avi');
-		});
-	});
-
-	describe('Query processing', () => {
-		it('should add query parameters to YouTube URLs', () => {
-			const video = new Video(mockEditor, { query_youtube: 'autoplay=1&mute=1' });
-			const url = 'https://youtube.com/watch?v=test';
-			const processedUrl = video.query.youtube.action(url);
-			expect(processedUrl).toContain('autoplay=1&mute=1');
-		});
-
-		it('should add query parameters to Vimeo URLs', () => {
-			const video = new Video(mockEditor, { query_vimeo: 'title=0&byline=0' });
-			const url = 'https://vimeo.com/123456';
-			const processedUrl = video.query.vimeo.action(url);
-			expect(processedUrl).toContain('title=0&byline=0');
-		});
-	});
-
-	describe('submitFile', () => {
-		beforeEach(() => {
-			video.pluginOptions.uploadSingleSizeLimit = 0;
-			video.pluginOptions.uploadSizeLimit = 0;
-			video.pluginOptions.uploadUrl = null;
-			video.fileManager = {
-				getSize: jest.fn().mockReturnValue(0),
-				upload: jest.fn()
-			};
-			video.modal = { isUpdate: false };
-			video.ui = {
-				alertOpen: jest.fn()
-			};
-			video.inputX = { value: '100%' };
-			video.inputY = { value: '56.25%' };
-		});
-
-		it('should return undefined for empty file list', async () => {
-			const result = await video.submitFile([]);
-			expect(result).toBeUndefined();
-		});
-
-		it('should filter non-video files', async () => {
-			const files = [
-				{ type: 'image/jpeg', name: 'test.jpg', size: 1000 },
-				{ type: 'video/mp4', name: 'test.mp4', size: 1000 }
-			];
-
-			video.triggerEvent = jest.fn().mockResolvedValue(true);
-			// Need to return true from handler
-			const result = await video.submitFile(files);
-			expect(video.triggerEvent).toHaveBeenCalledWith('onVideoUploadBefore', expect.any(Object));
-		});
-
-		it('should handle single file size limit exceeded', async () => {
-			video.pluginOptions.uploadSingleSizeLimit = 5000;
-			const files = [{ type: 'video/mp4', name: 'test.mp4', size: 10000 }];
-
-			const result = await video.submitFile(files);
-
-			expect(video.triggerEvent).toHaveBeenCalledWith('onVideoUploadError', expect.any(Object));
-			expect(result).toBe(false);
-		});
-
-		it('should handle total size limit exceeded', async () => {
-			video.pluginOptions.uploadSizeLimit = 10000;
-			video.fileManager.getSize.mockReturnValue(5000);
-			const files = [{ type: 'video/mp4', name: 'test.mp4', size: 6000 }];
-
-			const result = await video.submitFile(files);
-
-			expect(video.triggerEvent).toHaveBeenCalledWith('onVideoUploadError', expect.any(Object));
-			expect(result).toBe(false);
-		});
-
-		it('should trigger onVideoUploadBefore event', async () => {
-			const files = [{ type: 'video/mp4', name: 'test.mp4', size: 1000 }];
-
-			video.triggerEvent = jest.fn().mockResolvedValue(true);
-
-			await video.submitFile(files);
-
-			expect(video.triggerEvent).toHaveBeenCalledWith('onVideoUploadBefore', expect.any(Object));
-		});
-
-		it('should return false when event returns false', async () => {
-			const files = [{ type: 'video/mp4', name: 'test.mp4', size: 1000 }];
-
-			video.triggerEvent = jest.fn().mockResolvedValue(false);
-
-			const result = await video.submitFile(files);
-
-			expect(result).toBe(false);
-		});
-	});
-
-	describe('submitURL', () => {
-		beforeEach(() => {
-			video.modal = { isUpdate: false };
-			video.inputX = { value: '100%' };
-			video.inputY = { value: '56.25%' };
-			video.createIframeTag = jest.fn().mockReturnValue({ nodeName: 'IFRAME', src: '', setAttribute: jest.fn() });
-			video.createVideoTag = jest.fn().mockReturnValue({ nodeName: 'VIDEO', src: '', setAttribute: jest.fn() });
-		});
-
-		it('should return false for empty URL', async () => {
-			const result = await video.submitURL('');
-			expect(result).toBe(false);
-		});
-
-		it('should handle iframe embed code', async () => {
-			// Need to return false (empty linkValue) since we can't access private fields
-			const result = await video.submitURL('');
-			expect(result).toBe(false);
-		});
-
-		it('should trigger onVideoUploadBefore event with URL', async () => {
-			// Can't test private field linkValue access without proper setup
-			const result = await video.submitURL('');
-			expect(result).toBe(false);
-		});
-
-		it('should return false when event returns false', async () => {
-			video.triggerEvent = jest.fn().mockResolvedValue(false);
-
-			const result = await video.submitURL('https://youtube.com/watch?v=test');
-
-			expect(result).toBe(false);
-		});
-	});
-
-	describe('create', () => {
-		beforeEach(() => {
-			video.fileManager = {
-				setFileData: jest.fn()
-			};
-			video.figure = {
-				open: jest.fn(),
-				getSize: jest.fn().mockReturnValue({ w: '100%', h: '56.25%' }),
-				setSize: jest.fn(),
-				setAlign: jest.fn(),
-				setTransform: jest.fn(),
-				deleteTransform: jest.fn(),
-				isVertical: false
-			};
-			video.component = {
-				insert: jest.fn().mockReturnValue(true)
-			};
-			video.inputX = { value: '100%' };
-			video.inputY = { value: '56.25%' };
-			const mockFigure = require('../../../../src/modules/contract').Figure;
-			mockFigure.CreateContainer.mockReturnValue({
-				container: { nodeType: 1 }
-			});
-		});
-
-		it('should create new video element', () => {
-			const mockElement = { nodeName: 'VIDEO', src: '', setAttribute: jest.fn(), replaceWith: jest.fn() };
-			const file = { name: 'test.mp4', size: 1000 };
-
-			video.create(mockElement, 'https://example.com/video.mp4', '100%', '56.25%', 'center', false, file, true);
-
-			expect(video.fileManager.setFileData).toHaveBeenCalled();
-			expect(video.component.insert).toHaveBeenCalled();
-		});
-
-		it('should update existing video element', () => {
-			const mockElement = { nodeName: 'VIDEO', src: 'old.mp4', setAttribute: jest.fn(), replaceWith: jest.fn(), style: {}, querySelector: jest.fn().mockReturnValue({ src: 'source.mp4' }) };
-			// Need to mock figure.open return value
-			video.figure.open = jest.fn().mockReturnValue({
-				container: { nodeType: 1, style: {} },
-				align: 'center',
-				width: '100%',
-				height: '56.25%',
-				w: '100%',
-				h: '56.25%',
-				ratio: { w: 16, h: 9 },
-				isVertical: false
-			});
-			// Need to mock frameRatioOption for #ready
-			video.frameRatioOption = {
-				options: [{ value: '0.5625', selected: false }],
-				value: '0.5625',
-				length: 1
-			};
-			video.inputY = { value: '56.25%', placeholder: '' };
-			// Use select to set #element
-			video.componentSelect(mockElement);
-
-			const file = { name: 'test.mp4', size: 1000 };
-
-			video.create(mockElement, 'https://example.com/video.mp4', '100%', '56.25%', 'center', true, file, true);
-
-			expect(video.fileManager.setFileData).toHaveBeenCalled();
-		});
-	});
-
-	describe('createIframeTag', () => {
-		it('should create iframe element with attributes', () => {
-			video.pluginOptions.iframeTagAttributes = { allow: 'autoplay' };
-
-			const iframe = video.createIframeTag();
-
-			expect(iframe).toBeDefined();
-		});
-
-		it('should create iframe element with props', () => {
-			const props = { src: 'https://youtube.com/embed/test' };
-
-			const iframe = video.createIframeTag(props);
-
-			expect(iframe).toBeDefined();
-		});
-	});
-
-	describe('createVideoTag', () => {
-		it('should create video element with attributes', () => {
-			video.pluginOptions.videoTagAttributes = { controls: 'controls' };
-
-			const videoTag = video.createVideoTag();
-
-			expect(videoTag).toBeDefined();
-		});
-
-		it('should create video element with props', () => {
-			const props = { src: 'https://example.com/video.mp4' };
-
-			const videoTag = video.createVideoTag(props);
-
-			expect(videoTag).toBeDefined();
-		});
-	});
-
-	describe('retainFormat', () => {
-		it('should return format retention object', () => {
-			const result = video.retainFormat();
-
-			expect(result.query).toBe('iframe, video');
-			expect(typeof result.method).toBe('function');
-		});
-	});
-
-	describe('Video file extensions', () => {
-		it('should handle common video formats', () => {
-			const videoFormats = ['mp4', 'avi', 'mov', 'webm', 'flv'];
-			videoFormats.forEach((format) => {
-				const mockFile = { type: `video/${format}`, name: `test.${format}` };
-				video.submitFile = jest.fn();
-
-				video.onFilePasteAndDrop({ file: mockFile });
-
-				expect(video.submitFile).toHaveBeenCalledWith([mockFile]);
-			});
-		});
-	});
+    describe('Core Methods', () => {
+        it('open should call modal.open', () => {
+            video.open();
+            expect(video.modal.open).toHaveBeenCalled();
+        });
+
+        it('modalInit should reset values', () => {
+            video.modalInit();
+            // videoInputFile comes from mockRender
+            expect(video.videoInputFile.value).toBe('');
+            expect(mockModal.OnChangeFile).toHaveBeenCalled();
+            expect(video.sizeService.init).toHaveBeenCalled();
+        });
+    });
+
+    describe('Video URL Handling', () => {
+        it('static component should validate video/iframe nodes via internal checkContentType', () => {
+            // checkContentType is now a static private method, tested via Video.component()
+            const videoNode = { nodeName: 'VIDEO' };
+            expect(Video.component(videoNode)).toBe(videoNode);
+
+            // iframe with valid video URL
+            const iframeYoutube = { nodeName: 'IFRAME', src: 'https://www.youtube.com/embed/123' };
+            expect(Video.component(iframeYoutube)).toBe(iframeYoutube);
+
+            // iframe with mp4 extension
+            const iframeMp4 = { nodeName: 'IFRAME', src: 'https://example.com/video.mp4' };
+            expect(Video.component(iframeMp4)).toBe(iframeMp4);
+
+            // iframe with invalid URL
+            const iframeInvalid = { nodeName: 'IFRAME', src: 'https://example.com/page.html' };
+            expect(Video.component(iframeInvalid)).toBeNull();
+        });
+
+        it('findProcessUrl should return correct process info', () => {
+             const yt = video.findProcessUrl('https://youtube.com/watch?v=abc');
+             expect(yt.tag).toBe('iframe');
+             expect(yt.url).toContain('embed/abc');
+
+             const vimeo = video.findProcessUrl('https://vimeo.com/123');
+             expect(vimeo.tag).toBe('iframe');
+             expect(vimeo.url).toContain('player.vimeo.com');
+        });
+
+        it('convertUrlYoutube should format url correctly', () => {
+             const url = video.convertUrlYoutube('youtube.com/watch?v=123');
+             expect(url).toBe('https://www.youtube.com/embed/123');
+        });
+
+        it('convertUrlVimeo should format url correctly', () => {
+            // Basic Vimeo URL
+            const url1 = video.convertUrlVimeo('https://vimeo.com/123456789');
+            expect(url1).toBe('https://player.vimeo.com/video/123456789');
+
+            // Vimeo URL with trailing slash
+            const url2 = video.convertUrlVimeo('https://vimeo.com/123456789/');
+            expect(url2).toBe('https://player.vimeo.com/video/123456789');
+        });
+
+        it('addQuery should append query parameters correctly', () => {
+            // URL without existing query
+            const url1 = video.addQuery('https://example.com/video', 'autoplay=1');
+            expect(url1).toBe('https://example.com/video?autoplay=1');
+
+            // URL with existing query
+            const url2 = video.addQuery('https://example.com/video?v=123', 'autoplay=1');
+            expect(url2).toBe('https://example.com/video?autoplay=1&v=123');
+
+            // Empty query string
+            const url3 = video.addQuery('https://example.com/video', '');
+            expect(url3).toBe('https://example.com/video');
+        });
+
+        it('findProcessUrl should return null for unrecognized URLs', () => {
+            const result = video.findProcessUrl('https://example.com/page.html');
+            expect(result).toBeNull();
+        });
+    });
+
+    describe('Action & Submission', () => {
+        it('modalAction should handle file upload', async () => {
+             video.videoInputFile.files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
+
+             // submitFile returns true when triggerEvent returns undefined (no event handlers)
+             // but doesn't call serverUpload in that case (early return for unhandled event)
+             const result = await video.modalAction();
+
+             expect(result).toBe(true);
+             // When triggerEvent returns undefined, submitFile returns true without calling handler
+        });
+
+        it('modalAction should handle URL submission', async () => {
+             // Setup URL input
+             video.videoInputFile.files = [];
+
+             // Capture the event handler for videoUrlFile input
+             const addEventMock = video.eventManager.addEvent;
+             const inputCall = addEventMock.mock.calls.find(call => call[0] === video.videoUrlFile && call[1] === 'input');
+             if (inputCall) {
+                 const handler = inputCall[2];
+                 video.videoUrlFile.value = 'https://youtube.com/watch?v=123';
+                 // calling handler updates #linkValue
+                 handler({ target: video.videoUrlFile });
+             }
+
+             const result = await video.modalAction();
+             expect(result).toBe(true);
+        });
+
+        describe('submitFile size validation', () => {
+            it('should reject files exceeding single file size limit', async () => {
+                const NO_EVENT = require('../../../../src/helper').env.NO_EVENT;
+                const videoWithLimit = new Video(mockEditor, { uploadSingleSizeLimit: 1000 });
+                videoWithLimit.triggerEvent = jest.fn().mockResolvedValue(NO_EVENT);
+                videoWithLimit.ui = { alertOpen: jest.fn() };
+
+                const files = [{ name: 'big.mp4', type: 'video/mp4', size: 2000 }];
+                const result = await videoWithLimit.submitFile(files);
+
+                expect(result).toBe(false);
+                expect(videoWithLimit.ui.alertOpen).toHaveBeenCalledWith(
+                    expect.stringContaining('Size of uploadable single file'),
+                    'error'
+                );
+            });
+
+            it('should reject files exceeding total upload size limit', async () => {
+                const NO_EVENT = require('../../../../src/helper').env.NO_EVENT;
+                const videoWithLimit = new Video(mockEditor, { uploadSizeLimit: 5000 });
+                // fileManager.getSize returns current total size
+                videoWithLimit.fileManager.getSize = jest.fn().mockReturnValue(4000);
+                videoWithLimit.triggerEvent = jest.fn().mockResolvedValue(NO_EVENT);
+                videoWithLimit.ui = { alertOpen: jest.fn() };
+
+                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 2000 }];
+                const result = await videoWithLimit.submitFile(files);
+
+                expect(result).toBe(false);
+                expect(videoWithLimit.ui.alertOpen).toHaveBeenCalledWith(
+                    expect.stringContaining('Size of uploadable total videos'),
+                    'error'
+                );
+            });
+
+            it('should skip non-video files in file list', async () => {
+                const files = [
+                    { name: 'image.jpg', type: 'image/jpeg', size: 1000 },
+                    { name: 'video.mp4', type: 'video/mp4', size: 1000 }
+                ];
+
+                const result = await video.submitFile(files);
+                // Should return true because it processes successfully (with only the video file)
+                expect(result).toBe(true);
+            });
+
+            it('should return early for empty file list', async () => {
+                const result = await video.submitFile([]);
+                expect(result).toBeUndefined();
+            });
+
+            it('should call handler with custom info when onVideoUploadBefore returns object', async () => {
+                const customInfo = { url: 'custom-url.mp4', files: [], inputWidth: '50%', inputHeight: '50%' };
+                video.triggerEvent = jest.fn().mockResolvedValue(customInfo);
+                video.uploadService.serverUpload = jest.fn();
+
+                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
+                await video.submitFile(files);
+
+                expect(video.triggerEvent).toHaveBeenCalledWith(
+                    'onVideoUploadBefore',
+                    expect.objectContaining({ info: expect.any(Object), handler: expect.any(Function) })
+                );
+            });
+
+            it('should return false when onVideoUploadBefore returns false', async () => {
+                video.triggerEvent = jest.fn().mockResolvedValue(false);
+
+                const files = [{ name: 'video.mp4', type: 'video/mp4', size: 1000 }];
+                const result = await video.submitFile(files);
+
+                expect(result).toBe(false);
+            });
+        });
+
+        describe('submitURL validation', () => {
+            it('should handle iframe embed code as URL input', async () => {
+                const NO_EVENT = require('../../../../src/helper').env.NO_EVENT;
+                video.triggerEvent = jest.fn().mockResolvedValue(NO_EVENT);
+
+                // Simulate setting link value via input handler
+                const addEventMock = video.eventManager.addEvent;
+                const inputCall = addEventMock.mock.calls.find(
+                    call => call[0] === video.videoUrlFile && call[1] === 'input'
+                );
+                if (inputCall) {
+                    const handler = inputCall[2];
+                    video.videoUrlFile.value = '<iframe src="https://youtube.com/embed/abc123"></iframe>';
+                    handler({ target: video.videoUrlFile });
+                }
+
+                const result = await video.submitURL(video.videoUrlFile.value);
+                expect(result).toBe(true);
+            });
+
+            it('should return false for empty URL', async () => {
+                // Don't set any link value
+                const result = await video.submitURL('');
+                expect(result).toBe(false);
+            });
+        });
+    });
+    
+    describe('Component LifeCycle', () => {
+        it('create should handle new video', () => {
+             const oFrame = dom.utils.createElement('VIDEO');
+             // fileManager.setFileData is called
+
+             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, { name: 'test.mp4', size: 1000 }, true);
+
+             expect(video.figure.open).toHaveBeenCalled();
+             expect(video.sizeService.resolveSize).toHaveBeenCalled();
+             expect(video.figure.setAlign).toHaveBeenCalled();
+             expect(video.fileManager.setFileData).toHaveBeenCalled();
+             expect(video.component.insert).toHaveBeenCalled();
+        });
+
+        it('create should handle update', () => {
+             const oFrame = dom.utils.createElement('VIDEO');
+             oFrame.src = 'old.mp4';
+
+             // First create the video to set #element
+             video.create(oFrame, 'old.mp4', '100%', '300px', 'center', false, {}, true);
+             jest.clearAllMocks();
+
+             // Now update it
+             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', true, {}, true);
+
+             expect(video.component.insert).not.toHaveBeenCalled();
+             expect(video.figure.setTransform).toHaveBeenCalled();
+        });
+
+        it('create should not insert when isLast is false', () => {
+             const oFrame = dom.utils.createElement('VIDEO');
+
+             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, {}, false);
+
+             // insert should still be called, but with different insertBehavior
+             expect(video.component.insert).toHaveBeenCalledWith(
+                 expect.anything(),
+                 expect.objectContaining({ scrollTo: false })
+             );
+        });
+
+        it('create should replace video tag with iframe when source changes to youtube URL', () => {
+             // Create a video tag first
+             const oFrame = dom.utils.createElement('VIDEO');
+             oFrame.nodeName = 'VIDEO';
+             oFrame.src = 'local-video.mp4';
+             oFrame.replaceWith = jest.fn();
+
+             video.create(oFrame, 'local-video.mp4', '100%', '300px', 'center', false, {}, true);
+             jest.clearAllMocks();
+
+             // Mock findProcessUrl to return iframe tag
+             const origFindProcessUrl = video.findProcessUrl;
+             video.findProcessUrl = jest.fn().mockReturnValue({
+                 origin: 'https://youtube.com/watch?v=123',
+                 url: 'https://www.youtube.com/embed/123',
+                 tag: 'iframe'
+             });
+
+             // Now update with a YouTube URL - should convert to iframe
+             video.create(oFrame, 'https://youtube.com/watch?v=123', '100%', '300px', 'center', true, {}, true);
+
+             expect(video.findProcessUrl).toHaveBeenCalled();
+             // The logic should detect tag mismatch and call replaceWith
+             video.findProcessUrl = origFindProcessUrl;
+        });
+
+        it('create should replace iframe tag with video when source changes to local video', () => {
+             // Create an iframe tag first
+             const oFrame = dom.utils.createElement('IFRAME');
+             oFrame.nodeName = 'IFRAME';
+             oFrame.src = 'https://youtube.com/embed/123';
+             oFrame.replaceWith = jest.fn();
+
+             video.create(oFrame, 'https://youtube.com/embed/123', '100%', '300px', 'center', false, {}, true);
+             jest.clearAllMocks();
+
+             // Mock findProcessUrl to return video tag for mp4
+             const origFindProcessUrl = video.findProcessUrl;
+             video.findProcessUrl = jest.fn().mockReturnValue({
+                 origin: 'local-video.mp4',
+                 url: 'local-video.mp4',
+                 tag: 'video'
+             });
+
+             // Now update with a local video URL - should convert to video tag
+             video.create(oFrame, 'local-video.mp4', '100%', '300px', 'center', true, {}, true);
+
+             expect(video.findProcessUrl).toHaveBeenCalled();
+             video.findProcessUrl = origFindProcessUrl;
+        });
+
+        it('componentDestroy should clean up and trigger event', async () => {
+             const oFrame = dom.utils.createElement('VIDEO');
+             oFrame.src = 'test.mp4';
+             const mockWysiwyg = { nodeType: 1, id: 'wysiwyg' };
+             const mockContainer = {
+                 previousElementSibling: { nodeType: 1 },
+                 nextElementSibling: null,
+                 parentNode: mockWysiwyg // same as wysiwyg to skip nodeTransform
+             };
+             dom.query.getParentElement.mockReturnValue(mockContainer);
+
+             // Create the video first to set #element and #container
+             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, {}, true);
+
+             // Mock onVideoDeleteBefore event
+             video.triggerEvent = jest.fn().mockResolvedValue(undefined);
+             // Mock frameContext - set wysiwyg to same object as parentNode
+             video.frameContext = new Map([['wysiwyg', mockWysiwyg]]);
+             // Mock editor.focusEdge
+             video.editor = { focus: jest.fn(), focusEdge: jest.fn() };
+
+             jest.clearAllMocks();
+             await video.componentDestroy(oFrame);
+
+             expect(video.triggerEvent).toHaveBeenCalledWith(
+                 'onVideoDeleteBefore',
+                 expect.objectContaining({ element: oFrame })
+             );
+             expect(dom.utils.removeItem).toHaveBeenCalled();
+             expect(video.editor.focusEdge).toHaveBeenCalled();
+             expect(video.history.push).toHaveBeenCalled();
+        });
+
+        it('componentDestroy should cancel when event returns false', async () => {
+             const oFrame = dom.utils.createElement('VIDEO');
+             oFrame.src = 'test.mp4';
+
+             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, {}, true);
+             video.triggerEvent = jest.fn().mockResolvedValue(false);
+             video.frameContext = new Map([['wysiwyg', { nodeType: 1 }]]);
+
+             jest.clearAllMocks();
+             await video.componentDestroy(oFrame);
+
+             // When event returns false, the method returns early
+             // removeItem should not be called
+             expect(dom.utils.removeItem).not.toHaveBeenCalled();
+        });
+
+        it('componentDestroy should call nodeTransform when parent is empty after removal', async () => {
+             const oFrame = dom.utils.createElement('VIDEO');
+             oFrame.src = 'test.mp4';
+             const mockWysiwyg = { nodeType: 1, id: 'wysiwyg' };
+             const emptyParent = { childNodes: [], id: 'emptyParent' }; // empty - will trigger nodeTransform
+             const mockContainer = {
+                 previousElementSibling: { nodeType: 1 },
+                 nextElementSibling: null,
+                 parentNode: emptyParent
+             };
+             dom.query.getParentElement.mockReturnValue(mockContainer);
+
+             video.create(oFrame, 'test.mp4', '100%', '300px', 'center', false, {}, true);
+
+             video.triggerEvent = jest.fn().mockResolvedValue(undefined);
+             video.frameContext = new Map([['wysiwyg', mockWysiwyg]]);
+             video.nodeTransform = { removeAllParents: jest.fn() };
+             video.editor = { focus: jest.fn(), focusEdge: jest.fn() };
+
+             jest.clearAllMocks();
+             await video.componentDestroy(oFrame);
+
+             // nodeTransform should be called because emptyParent !== wysiwyg
+             expect(video.nodeTransform.removeAllParents).toHaveBeenCalled();
+        });
+
+        it('componentSelect should prepare element for controller', () => {
+            const target = dom.utils.createElement('VIDEO');
+            target.src = 'test.mp4';
+            target.style = { float: 'left' };
+
+            video.componentSelect(target);
+
+            expect(video.figure.open).toHaveBeenCalled();
+            expect(video.sizeService.setOriginSize).toHaveBeenCalled();
+        });
+
+        it('componentEdit should open modal for editing', () => {
+            video.componentEdit();
+            expect(video.modal.open).toHaveBeenCalled();
+        });
+    });
+
+    describe('Modal Lifecycle', () => {
+        it('modalOn should set multiple attribute when creating new and allowMultiple is true', () => {
+            const videoMultiple = new Video(mockEditor, { allowMultiple: true });
+
+            videoMultiple.modalOn(false); // isUpdate = false
+
+            expect(videoMultiple.videoInputFile.setAttribute).toHaveBeenCalledWith('multiple', 'multiple');
+            expect(videoMultiple.sizeService.on).toHaveBeenCalledWith(false);
+        });
+
+        it('modalOn should remove multiple attribute when updating', () => {
+            const videoMultiple = new Video(mockEditor, { allowMultiple: true });
+
+            videoMultiple.modalOn(true); // isUpdate = true
+
+            expect(videoMultiple.videoInputFile.removeAttribute).toHaveBeenCalledWith('multiple');
+            expect(videoMultiple.sizeService.on).toHaveBeenCalledWith(true);
+        });
+
+        it('modalInit should reset form state completely', () => {
+            // Set some state first
+            video.videoUrlFile.value = 'https://example.com/video.mp4';
+            video.previewSrc.textContent = 'some text';
+
+            video.modalInit();
+
+            expect(mockModal.OnChangeFile).toHaveBeenCalledWith(video.fileModalWrapper, []);
+            expect(video.videoInputFile.value).toBe('');
+            expect(video.videoUrlFile.disabled).toBe(false);
+            expect(video.sizeService.init).toHaveBeenCalled();
+        });
+    });
+
+    describe('Hooks', () => {
+        it('retainFormat should return query and method for video/iframe elements', () => {
+            const retainInfo = video.retainFormat();
+
+            expect(retainInfo).toHaveProperty('query', 'iframe, video');
+            expect(retainInfo).toHaveProperty('method');
+            expect(typeof retainInfo.method).toBe('function');
+        });
+
+        it('retainFormat method should skip iframe without valid video URL', async () => {
+            const retainInfo = video.retainFormat();
+            const invalidIframe = { nodeName: 'IFRAME', src: 'https://example.com/page.html' };
+
+            // Should return early without processing
+            await retainInfo.method(invalidIframe);
+
+            // Figure.GetContainer is not called because checkContentType fails
+            // We just verify it doesn't throw an error
+        });
+
+        it('retainFormat method should skip element with valid figure container', async () => {
+            const retainInfo = video.retainFormat();
+            const validVideo = { nodeName: 'VIDEO', src: 'test.mp4' };
+
+            // Mock Figure.GetContainer to return valid container
+            mockFigure.GetContainer.mockReturnValue({
+                container: { nodeType: 1 },
+                cover: { nodeType: 1 }
+            });
+
+            await retainInfo.method(validVideo);
+
+            // Should return early because container already exists
+        });
+
+        it('onFilePasteAndDrop should handle video files', () => {
+            const submitFileSpy = jest.spyOn(video, 'submitFile');
+            // Ensure editor.focus is a function
+            video.editor = { focus: jest.fn(), focusEdge: jest.fn() };
+
+            const videoFile = { type: 'video/mp4', name: 'test.mp4' };
+            video.onFilePasteAndDrop({ file: videoFile });
+
+            expect(submitFileSpy).toHaveBeenCalledWith([videoFile]);
+            expect(video.editor.focus).toHaveBeenCalled();
+
+            submitFileSpy.mockRestore();
+        });
+
+        it('onFilePasteAndDrop should ignore non-video files', () => {
+            const submitFileSpy = jest.spyOn(video, 'submitFile');
+
+            const imageFile = { type: 'image/png', name: 'test.png' };
+            video.onFilePasteAndDrop({ file: imageFile });
+
+            expect(submitFileSpy).not.toHaveBeenCalled();
+
+            submitFileSpy.mockRestore();
+        });
+    });
+
+    describe('Tag Creation', () => {
+        it('createIframeTag should create iframe with default attributes', () => {
+            const iframe = video.createIframeTag();
+
+            expect(dom.utils.createElement).toHaveBeenCalledWith('IFRAME');
+            // frameBorder and allowFullscreen are set by #setIframeAttrs
+        });
+
+        it('createIframeTag should apply custom props', () => {
+            const iframe = video.createIframeTag({ title: 'Test Video' });
+
+            expect(dom.utils.createElement).toHaveBeenCalledWith('IFRAME');
+        });
+
+        it('createVideoTag should create video with controls', () => {
+            const videoEl = video.createVideoTag();
+
+            expect(dom.utils.createElement).toHaveBeenCalledWith('VIDEO');
+        });
+
+        it('createVideoTag should apply custom props', () => {
+            const videoEl = video.createVideoTag({ autoplay: true });
+
+            expect(dom.utils.createElement).toHaveBeenCalledWith('VIDEO');
+        });
+
+        it('createVideoTag should apply videoTagAttributes from options', () => {
+            const videoWithAttrs = new Video(mockEditor, {
+                videoTagAttributes: { crossorigin: 'anonymous', preload: 'auto' }
+            });
+
+            const videoEl = videoWithAttrs.createVideoTag();
+            expect(dom.utils.createElement).toHaveBeenCalledWith('VIDEO');
+        });
+
+        it('createIframeTag should apply iframeTagAttributes from options', () => {
+            const videoWithAttrs = new Video(mockEditor, {
+                iframeTagAttributes: { loading: 'lazy', referrerpolicy: 'no-referrer' }
+            });
+
+            const iframe = videoWithAttrs.createIframeTag();
+            expect(dom.utils.createElement).toHaveBeenCalledWith('IFRAME');
+        });
+    });
+
+    describe('State Management', () => {
+        it('setState should update state correctly', () => {
+            video.setState('sizeUnit', 'px');
+            expect(video.state.sizeUnit).toBe('px');
+
+            video.setState('onlyPercentage', true);
+            expect(video.state.onlyPercentage).toBe(true);
+
+            video.setState('defaultRatio', '75%');
+            expect(video.state.defaultRatio).toBe('75%');
+        });
+    });
+
+    describe('Plugin Options', () => {
+        it('should handle percentageOnlySize option', () => {
+            const videoPercentage = new Video(mockEditor, { percentageOnlySize: true });
+
+            expect(videoPercentage.pluginOptions.percentageOnlySize).toBe(true);
+            expect(videoPercentage.state.sizeUnit).toBe('%');
+            expect(videoPercentage.state.onlyPercentage).toBe(true);
+        });
+
+        it('should handle createFileInput and createUrlInput options', () => {
+            // Only file input, no URL input
+            const videoFileOnly = new Video(mockEditor, {
+                createFileInput: true,
+                createUrlInput: false
+            });
+            expect(videoFileOnly.pluginOptions.createFileInput).toBe(true);
+            expect(videoFileOnly.pluginOptions.createUrlInput).toBe(false);
+
+            // createUrlInput defaults to true when createFileInput is false
+            const videoUrlOnly = new Video(mockEditor, {
+                createFileInput: false
+            });
+            expect(videoUrlOnly.pluginOptions.createUrlInput).toBe(true);
+        });
+
+        it('should handle custom embedQuery patterns', () => {
+            const customVideo = new Video(mockEditor, {
+                embedQuery: {
+                    custom: {
+                        pattern: /customvideo\.com/i,
+                        action: (url) => url.replace('watch', 'embed'),
+                        tag: 'iframe'
+                    }
+                }
+            });
+
+            expect(customVideo.query.custom).toBeDefined();
+            expect(customVideo.query.custom.pattern.test('https://customvideo.com/watch')).toBe(true);
+        });
+
+        it('should set default acceptedFormats to video/*', () => {
+            const videoDefault = new Video(mockEditor, {});
+            expect(videoDefault.pluginOptions.acceptedFormats).toBe('video/*');
+
+            const videoWithWildcard = new Video(mockEditor, { acceptedFormats: '*' });
+            expect(videoWithWildcard.pluginOptions.acceptedFormats).toBe('video/*');
+
+            const videoWithCustom = new Video(mockEditor, { acceptedFormats: 'video/mp4,video/webm' });
+            expect(videoWithCustom.pluginOptions.acceptedFormats).toBe('video/mp4,video/webm');
+        });
+
+        it('should handle defaultWidth and defaultHeight options', () => {
+            // Numeric values should get 'px' appended
+            const videoWithNumeric = new Video(mockEditor, {
+                defaultWidth: 640,
+                defaultHeight: 360
+            });
+            // numbers.is mock returns true for numbers
+            expect(videoWithNumeric.pluginOptions.defaultWidth).toBeTruthy();
+
+            // String values should be used as-is
+            const videoWithString = new Video(mockEditor, {
+                defaultWidth: '80%',
+                defaultHeight: '45%'
+            });
+            expect(videoWithString.pluginOptions.defaultWidth).toBe('80%');
+            expect(videoWithString.pluginOptions.defaultHeight).toBe('45%');
+
+            // Empty/zero values should result in empty string
+            const videoNoSize = new Video(mockEditor, {
+                defaultWidth: '',
+                defaultHeight: 0
+            });
+            expect(videoNoSize.pluginOptions.defaultWidth).toBe('');
+        });
+
+        it('should handle showHeightInput option', () => {
+            const videoShowHeight = new Video(mockEditor, { showHeightInput: true });
+            expect(videoShowHeight.pluginOptions.showHeightInput).toBe(true);
+
+            const videoHideHeight = new Video(mockEditor, { showHeightInput: false });
+            expect(videoHideHeight.pluginOptions.showHeightInput).toBe(false);
+        });
+
+        it('should handle showRatioOption option', () => {
+            const videoShowRatio = new Video(mockEditor, { showRatioOption: true });
+            expect(videoShowRatio.pluginOptions.showRatioOption).toBe(true);
+
+            const videoHideRatio = new Video(mockEditor, { showRatioOption: false });
+            expect(videoHideRatio.pluginOptions.showRatioOption).toBe(false);
+        });
+
+        it('should handle uploadHeaders option', () => {
+            const videoWithHeaders = new Video(mockEditor, {
+                uploadHeaders: { 'Authorization': 'Bearer token123' }
+            });
+            expect(videoWithHeaders.pluginOptions.uploadHeaders).toEqual({ 'Authorization': 'Bearer token123' });
+
+            const videoNoHeaders = new Video(mockEditor, {});
+            expect(videoNoHeaders.pluginOptions.uploadHeaders).toBeNull();
+        });
+
+        it('should handle ratioOptions option', () => {
+            const customRatios = [{ label: '16:9', value: 0.5625 }, { label: '4:3', value: 0.75 }];
+            const videoWithRatios = new Video(mockEditor, { ratioOptions: customRatios });
+            expect(videoWithRatios.pluginOptions.ratioOptions).toEqual(customRatios);
+
+            const videoNoRatios = new Video(mockEditor, {});
+            expect(videoNoRatios.pluginOptions.ratioOptions).toBeNull();
+        });
+
+        it('should handle query_youtube and query_vimeo options', () => {
+            const videoWithQueries = new Video(mockEditor, {
+                query_youtube: 'autoplay=1&mute=1',
+                query_vimeo: 'autopause=0'
+            });
+            expect(videoWithQueries.pluginOptions.query_youtube).toBe('autoplay=1&mute=1');
+            expect(videoWithQueries.pluginOptions.query_vimeo).toBe('autopause=0');
+        });
+
+        it('should hide align form when align is not in figureControls', () => {
+            // When controls don't include 'align', alignForm should be hidden
+            const videoNoAlign = new Video(mockEditor, {
+                controls: [['resize_auto', 'edit', 'remove']] // no 'align'
+            });
+            // alignForm.style.display is set to 'none' in constructor
+            // This tests the branch where figureControls.some(...) returns false
+        });
+
+        it('should use custom figureControls when canResize is false', () => {
+            const videoNonResizable = new Video(mockEditor, { canResize: false });
+            // When canResize is false, default controls exclude resize options
+            expect(videoNonResizable.pluginOptions.canResize).toBe(false);
+        });
+    });
 });

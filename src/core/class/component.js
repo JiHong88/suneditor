@@ -521,6 +521,7 @@ class Component extends CoreInjector {
 	__deselect() {
 		this.editor._preventBlur = false;
 		_DragHandle.set('__overInfo', null);
+		dom.utils.removeClass(this.currentInfo?.cover, 'se-figure-selected');
 		this.__removeDragEvent();
 
 		if (this.currentInfo) {

@@ -326,7 +326,7 @@ describe('Table Plugin Main Class', () => {
             tablePlugin.onMouseDown({ event: mockEvent });
 
             expect(tablePlugin.resizeService.readyResizeFromEdge).toHaveBeenCalled();
-            expect(tablePlugin.selectionService.initCellSelection).toHaveBeenCalled();
+            expect(tablePlugin.selectionService.startCellSelection).toHaveBeenCalled();
         });
 
         it('should delegate mouse move to resize service', () => {
@@ -684,11 +684,11 @@ describe('Table Plugin Main Class', () => {
              dom.check.isTableCell.mockReturnValue(true);
              dom.query.getParentElement.mockReturnValue(cell);
              
-             tablePlugin.selectionService.initCellSelection = jest.fn();
-             
+             tablePlugin.selectionService.startCellSelection = jest.fn();
+
              const result = tablePlugin.onKeyDown({ event: mockEvent, range: {}, line: cell });
-             
-             expect(tablePlugin.selectionService.initCellSelection).toHaveBeenCalled();
+
+             expect(tablePlugin.selectionService.startCellSelection).toHaveBeenCalled();
              expect(tablePlugin.state.fixedCell).toBe(cell);
              expect(result).toBe(false);
         });
@@ -876,11 +876,11 @@ describe('Table Plugin Main Class', () => {
               // However, dom.query.getParentElement mock receives it.
               
               tablePlugin.resizeService.readyResizeFromEdge = jest.fn().mockReturnValue(true);
-              tablePlugin.selectionService.initCellSelection = jest.fn();
-              
+              tablePlugin.selectionService.startCellSelection = jest.fn();
+
               tablePlugin.onMouseDown({ event: mockEvent });
-              
-              expect(tablePlugin.selectionService.initCellSelection).toHaveBeenCalled();
+
+              expect(tablePlugin.selectionService.startCellSelection).toHaveBeenCalled();
          });
 
          it('should handle mouse up/leave', () => {

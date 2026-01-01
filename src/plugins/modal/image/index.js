@@ -55,8 +55,8 @@ const { NO_EVENT } = env;
 class Image_ extends PluginModal {
 	static key = 'image';
 	static className = '';
+
 	/**
-	 * @this {Image_}
 	 * @param {Element} node - The node to check.
 	 * @returns {Element|null} Returns a node if the node is a valid component.
 	 */

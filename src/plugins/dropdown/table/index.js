@@ -36,8 +36,8 @@ class Table extends PluginDropdownFree {
 	static key = 'table';
 	static className = '';
 	static options = { isInputComponent: true };
+
 	/**
-	 * @this {Table}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */

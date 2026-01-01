@@ -57,8 +57,8 @@ import { CreateHTML_modal } from './render/video.html';
 class Video extends PluginModal {
 	static key = 'video';
 	static className = '';
+
 	/**
-	 * @this {Video}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
@@ -66,10 +66,43 @@ class Video extends PluginModal {
 		if (/^(VIDEO)$/i.test(node?.nodeName)) {
 			return node;
 		} else if (/^(IFRAME)$/i.test(node?.nodeName)) {
-			return this.checkContentType(/** @type {HTMLIFrameElement} */ (node).src) ? node : null;
+			return this.#checkContentType(/** @type {HTMLIFrameElement} */ (node).src) ? node : null;
 		}
 		return null;
 	}
+
+	/**
+	 * @description Checks if the given URL matches any of the defined URL patterns.
+	 * @param {string} url - The URL to check.
+	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
+	 */
+	static #checkContentType(url) {
+		url = url?.toLowerCase() || '';
+		if (this.#extensions.some((ext) => url.endsWith(ext)) || this.#urlPatterns.some((pattern) => pattern.test(url))) {
+			return true;
+		}
+
+		return false;
+	}
+
+	static #extensions = ['.mp4', '.avi', '.mov', '.webm', '.flv', '.mkv', '.m4v', '.ogv'];
+	static #urlPatterns = [
+		/youtu\.?be/,
+		/vimeo\.com\//,
+		/dailymotion\.com\/video\//,
+		/facebook\.com\/.+\/videos\//,
+		/facebook\.com\/watch\/\?v=/,
+		/twitter\.com\/.+\/status\//,
+		/twitch\.tv\/videos\//,
+		/twitch\.tv\/[^/]+$/,
+		/tiktok\.com\/@[^/]+\/video\//,
+		/instagram\.com\/p\//,
+		/instagram\.com\/tv\//,
+		/instagram\.com\/reel\//,
+		/linkedin\.com\/posts\//,
+		/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
+		/loom\.com\/share\//,
+	];
 
 	#resizing;
 	#nonResizing;
@@ -167,26 +200,8 @@ class Video extends PluginModal {
 		for (const key in this.query) {
 			urlPatterns.push(this.query[key].pattern);
 		}
-		this.extensions = ['.mp4', '.avi', '.mov', '.webm', '.flv', '.mkv', '.m4v', '.ogv'].concat(this.pluginOptions.extensions || []);
-		this.urlPatterns = urlPatterns
-			.concat([
-				/youtu\.?be/,
-				/vimeo\.com\//,
-				/dailymotion\.com\/video\//,
-				/facebook\.com\/.+\/videos\//,
-				/facebook\.com\/watch\/\?v=/,
-				/twitter\.com\/.+\/status\//,
-				/twitch\.tv\/videos\//,
-				/twitch\.tv\/[^/]+$/,
-				/tiktok\.com\/@[^/]+\/video\//,
-				/instagram\.com\/p\//,
-				/instagram\.com\/tv\//,
-				/instagram\.com\/reel\//,
-				/linkedin\.com\/posts\//,
-				/\.(wistia\.com|wi\.st)\/(medias|embed)\//,
-				/loom\.com\/share\//,
-			])
-			.concat(pluginOptions.urlPatterns || []);
+		Video.#extensions = Video.#extensions.concat(this.pluginOptions.extensions || []);
+		Video.#urlPatterns = Video.#urlPatterns.concat(pluginOptions.urlPatterns || []);
 
 		/** @type {VideoState} */
 		this.state = {
@@ -234,7 +249,7 @@ class Video extends PluginModal {
 			/** @param {HTMLIFrameElement|HTMLVideoElement} element */
 			method: async (element) => {
 				if (/^(iframe)$/i.test(element?.nodeName)) {
-					if (!this.checkContentType(element.src)) return;
+					if (!Video.#checkContentType(element.src)) return;
 				}
 
 				const figureInfo = Figure.GetContainer(element);
@@ -358,20 +373,6 @@ class Video extends PluginModal {
 		// focus
 		this.editor.focusEdge(focusEl);
 		this.history.push(false);
-	}
-
-	/**
-	 * @description Checks if the given URL matches any of the defined URL patterns.
-	 * @param {string} url - The URL to check.
-	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
-	 */
-	checkContentType(url) {
-		url = url?.toLowerCase() || '';
-		if (this.extensions.some((ext) => url.endsWith(ext)) || this.urlPatterns.some((pattern) => pattern.test(url))) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**

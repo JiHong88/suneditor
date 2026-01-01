@@ -34,7 +34,8 @@ describe('ImageUploadService', () => {
         mockMain = {
             pluginOptions: {
                 uploadUrl: 'http://localhost/upload',
-                uploadHeaders: { 'Authorization': 'token' }
+                uploadHeaders: { 'Authorization': 'token' },
+                canResize: true
             },
             fileManager: mockFileManager,
             ui: mockUi,

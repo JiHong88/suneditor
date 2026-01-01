@@ -13,8 +13,8 @@ import { dom } from '../../helper';
 class HR extends PluginDropdown {
 	static key = 'hr';
 	static className = '';
+
 	/**
-	 * @this {HR}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */

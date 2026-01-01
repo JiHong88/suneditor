@@ -30,8 +30,8 @@ class FileUpload extends PluginCommand {
 	static key = 'fileUpload';
 	static className = '';
 	static options = { eventIndex: 10000 };
+
 	/**
-	 * @this {FileUpload}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */

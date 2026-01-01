@@ -45,7 +45,8 @@ describe('ImageSizeService', () => {
             state: { onlyPercentage: false, sizeUnit: 'px' },
             pluginOptions: {
                 defaultWidth: '300px',
-                defaultHeight: '150px'
+                defaultHeight: '150px',
+                canResize: true
             },
             resizing: true,
             eventManager: {
@@ -71,7 +72,7 @@ describe('ImageSizeService', () => {
         });
 
         it('should not initialize inputs if resizing is false', () => {
-            mockMain.resizing = false;
+            mockMain.pluginOptions.canResize = false;
             service = new ImageSizeService(mockMain, mockModalEl);
              // Should not add events
              expect(mockMain.eventManager.addEvent).not.toHaveBeenCalled();
@@ -120,6 +121,20 @@ describe('ImageSizeService', () => {
             mockInputY.value = ''; // default mockMain defaults are 300px, 150px
             service.applySize();
             expect(mockMain.figure.setSize).toHaveBeenCalledWith('300px', '150px');
+        });
+
+        it('should append percentage unit if missing when onlyPercentage is true', () => {
+            mockMain.state.onlyPercentage = true;
+            mockInputX.value = '50';
+            service.applySize();
+            expect(mockMain.figure.setSize).toHaveBeenCalledWith('50%', '150px');
+        });
+
+        it('should not append percentage unit if present when onlyPercentage is true', () => {
+            mockMain.state.onlyPercentage = true;
+            mockInputX.value = '50%';
+            service.applySize();
+            expect(mockMain.figure.setSize).toHaveBeenCalledWith('50%', '150px');
         });
     });
 

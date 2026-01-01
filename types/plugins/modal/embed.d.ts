@@ -146,11 +146,18 @@ export type EmbedPluginOptions = {
  */
 declare class Embed extends PluginModal {
 	/**
-	 * @this {Embed}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
-	static component(this: Embed, node: HTMLElement): HTMLElement | null;
+	static component(node: HTMLElement): HTMLElement | null;
+	/**
+	 * @description Checks if the given URL matches any of the defined URL patterns.
+	 * @param {string} url - The URL to check.
+	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
+	 */
+	static #checkContentType(url: string): boolean;
+	/** @type {Array<RegExp>} */
+	static #urlPatterns: Array<RegExp>;
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance
@@ -224,7 +231,6 @@ declare class Embed extends PluginModal {
 			tag: string;
 		};
 	};
-	urlPatterns: RegExp[];
 	retainFormat(): {
 		query: string;
 		method: (element: HTMLElement) => void;
@@ -235,12 +241,6 @@ declare class Embed extends PluginModal {
 	componentSelect(target: HTMLElement): void | boolean;
 	componentEdit(target: HTMLElement): void;
 	componentDestroy(target: HTMLElement): Promise<void>;
-	/**
-	 * @description Checks if the given URL matches any of the defined URL patterns.
-	 * @param {string} url - The URL to check.
-	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
-	 */
-	checkContentType(url: string): boolean;
 	/**
 	 * @description Finds and processes the URL for embedding by matching it against known service patterns.
 	 * @param {string} url - The original URL.

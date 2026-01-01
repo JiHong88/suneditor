@@ -53,8 +53,8 @@ const { _w, NO_EVENT } = env;
 class Embed extends PluginModal {
 	static key = 'embed';
 	static className = '';
+
 	/**
-	 * @this {Embed}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
@@ -83,16 +83,33 @@ class Embed extends PluginModal {
 			if (link && link.href) {
 				target = node;
 				src = link.href;
-				return this.checkContentType(src) ? target : null;
+				return this.#checkContentType(src) ? target : null;
 			}
 		}
 
 		if (src) {
-			return this.checkContentType(src) ? target : null;
+			return this.#checkContentType(src) ? target : null;
 		}
 
 		return target;
 	}
+
+	/**
+	 * @description Checks if the given URL matches any of the defined URL patterns.
+	 * @param {string} url - The URL to check.
+	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
+	 */
+	static #checkContentType(url) {
+		url = url?.toLowerCase() || '';
+		if (this.#urlPatterns.some((pattern) => pattern.test(url))) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/** @type {Array<RegExp>} */
+	static #urlPatterns = null;
 
 	#defaultSizeX;
 	#defaultSizeY;
@@ -230,7 +247,7 @@ class Embed extends PluginModal {
 		for (const key in this.query) {
 			urlPatterns.push(this.query[key].pattern);
 		}
-		this.urlPatterns = urlPatterns.concat(pluginOptions.urlPatterns || []);
+		Embed.#urlPatterns = urlPatterns.concat(pluginOptions.urlPatterns || []);
 
 		// init
 		this.eventManager.addEvent(this.embedInput, 'input', this.#OnLinkPreview.bind(this));
@@ -265,7 +282,7 @@ class Embed extends PluginModal {
 			query: 'iframe',
 			/** @param {HTMLIFrameElement} element */
 			method: async (element) => {
-				if (!this.checkContentType(element.src)) return;
+				if (!Embed.#checkContentType(element.src)) return;
 
 				const figureInfo = Figure.GetContainer(element);
 				if (figureInfo && figureInfo.container && figureInfo.cover) return;
@@ -378,20 +395,6 @@ class Embed extends PluginModal {
 	}
 
 	/**
-	 * @description Checks if the given URL matches any of the defined URL patterns.
-	 * @param {string} url - The URL to check.
-	 * @returns {boolean} True if the URL matches a known pattern; otherwise, false.
-	 */
-	checkContentType(url) {
-		url = url?.toLowerCase() || '';
-		if (this.urlPatterns.some((pattern) => pattern.test(url))) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * @description Finds and processes the URL for embedding by matching it against known service patterns.
 	 * @param {string} url - The original URL.
 	 * @returns {{origin: string, url: string, tag: string}|null} An object containing the original URL, the processed URL, and the tag type (e.g., 'iframe'),
@@ -477,7 +480,7 @@ class Embed extends PluginModal {
 
 		if (!this.#cover?.getAttribute?.('data-se-origin')) {
 			const src = target?.getAttribute?.('src') || target?.querySelector?.('a')?.href;
-			if (src && this.checkContentType(src)) {
+			if (src && Embed.#checkContentType(src)) {
 				this.#cover.setAttribute('data-se-origin', src);
 			}
 		}
@@ -708,7 +711,7 @@ class Embed extends PluginModal {
 
 		if (this.#onlyPercentage) {
 			if (!w) w = '100%';
-			else if (/%$/.test(w + '')) w += '%';
+			else if (!/%$/.test(w + '')) w += '%';
 		}
 		this.figure.setSize(w, h);
 	}

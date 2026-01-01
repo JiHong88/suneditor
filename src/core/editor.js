@@ -1555,13 +1555,13 @@ class Editor {
 			if (typeof plugin.constructor.component === 'function') {
 				this._componentManager.push(
 					function (launcher, element) {
-						if (!element || !(element = launcher.component?.call(this, element))) return null;
+						if (!element || !(element = launcher.component?.(element))) return null;
 						return {
 							target: element,
 							pluginName: launcher.key,
 							options: launcher.options,
 						};
-					}.bind(plugin, plugin.constructor),
+					}.bind(null, plugin.constructor),
 				);
 			}
 

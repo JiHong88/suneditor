@@ -7,11 +7,10 @@ export default Anchor;
  */
 declare class Anchor extends PluginPopup {
 	/**
-	 * @this {Anchor}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */
-	static component(this: Anchor, node: HTMLElement): HTMLElement | null;
+	static component(node: HTMLElement): HTMLElement | null;
 	title: any;
 	bookmarkIcon: HTMLElement;
 	displayId: Element;

@@ -12,8 +12,8 @@ const { _w } = env;
 class Anchor extends PluginPopup {
 	static key = 'anchor';
 	static className = '';
+
 	/**
-	 * @this {Anchor}
 	 * @param {HTMLElement} node - The node to check.
 	 * @returns {HTMLElement|null} Returns a node if the node is a valid component.
 	 */

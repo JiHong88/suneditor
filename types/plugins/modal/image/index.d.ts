@@ -141,11 +141,10 @@ export type ImageState = {
  */
 declare class Image_ extends PluginModal {
 	/**
-	 * @this {Image_}
 	 * @param {Element} node - The node to check.
 	 * @returns {Element|null} Returns a node if the node is a valid component.
 	 */
-	static component(this: Image_, node: Element): Element | null;
+	static component(node: Element): Element | null;
 	/**
 	 * @constructor
 	 * @param {SunEditor.Core} editor - The root editor instance

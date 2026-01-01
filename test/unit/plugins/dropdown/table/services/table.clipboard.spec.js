@@ -17,7 +17,8 @@ jest.mock('../../../../../../src/helper', () => ({
 
 jest.mock('../../../../../../src/plugins/dropdown/table/shared/table.utils', () => ({
     CloneTable: jest.fn(),
-    InvalidateTableCache: jest.fn()
+    InvalidateTableCache: jest.fn(),
+    GetLogicalCellIndex: jest.fn().mockReturnValue(0)
 }));
 
 describe('TableClipboardService', () => {
