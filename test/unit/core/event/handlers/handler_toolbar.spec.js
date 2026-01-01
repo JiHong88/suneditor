@@ -384,4 +384,464 @@ describe('handler_toolbar', () => {
 			expect(() => ButtonsHandler.call(mockThis, mockEvent)).not.toThrow();
 		});
 	});
+
+	describe('ButtonsHandler balloon mode', () => {
+		it('should handle balloon mode without errors', () => {
+			mockThis.editor.isBalloon = true;
+			mockThis.context.get.mockReturnValue(null);
+
+			// Mock wysiwyg contains to avoid the focus path
+			const wysiwyg = document.createElement('div');
+			wysiwyg.contains = jest.fn().mockReturnValue(true);
+			mockThis.frameContext.set('wysiwyg', wysiwyg);
+
+			expect(() => ButtonsHandler.call(mockThis, mockEvent)).not.toThrow();
+		});
+
+		it('should handle sub-balloon mode without errors', () => {
+			mockThis.editor.isSubBalloon = true;
+			const toolbar = document.createElement('div');
+			toolbar.className = 'se-toolbar';
+			mockThis.context.get.mockReturnValue(toolbar);
+
+			// Mock wysiwyg contains to return true
+			const wysiwyg = document.createElement('div');
+			wysiwyg.contains = jest.fn().mockReturnValue(true);
+			mockThis.frameContext.set('wysiwyg', wysiwyg);
+
+			expect(() => ButtonsHandler.call(mockThis, mockEvent)).not.toThrow();
+		});
+	});
+
+	describe('ButtonsHandler more layer', () => {
+		it('should handle more layer button click without errors', () => {
+			mockTarget.setAttribute('data-type', 'more');
+			mockTarget.setAttribute('data-ref', 'moreButtons');
+
+			const moreLayer = document.createElement('div');
+			moreLayer.className = 'se-more-layer';
+			moreLayer.setAttribute('data-ref', 'moreButtons');
+			moreLayer.style.display = 'none';
+
+			// Mock context.get to return toolbar with more layer
+			const toolbar = document.createElement('div');
+			toolbar.className = 'se-toolbar';
+			toolbar.appendChild(moreLayer);
+			mockThis.context.get.mockReturnValue(toolbar);
+
+			// Mock wysiwyg contains to return true
+			const wysiwyg = document.createElement('div');
+			wysiwyg.contains = jest.fn().mockReturnValue(true);
+			mockThis.frameContext.set('wysiwyg', wysiwyg);
+
+			dom.utils.hasClass.mockImplementation((el, className) => {
+				if (className === 'on' && el === mockTarget) return false;
+				return false;
+			});
+
+			expect(() => ButtonsHandler.call(mockThis, mockEvent)).not.toThrow();
+		});
+	});
+
+	describe('OnClick_menuTray action dispatch', () => {
+		it('should dispatch action with event target value', () => {
+			const menuTrayDiv = document.createElement('div');
+			menuTrayDiv.className = 'se-menu-tray';
+			menuTrayDiv.setAttribute('data-key', 'fontColor');
+
+			mockTarget.setAttribute('data-value', '#ff0000');
+			mockTarget.setAttribute('data-command', 'fontColor');
+			menuTrayDiv.appendChild(mockTarget);
+			document.body.appendChild(menuTrayDiv);
+
+			dom.query.getEventTarget.mockReturnValue(mockTarget);
+
+			mockThis.plugins.fontColor = {
+				action: jest.fn()
+			};
+
+			OnClick_menuTray.call(mockThis, mockEvent);
+
+			expect(mockThis.plugins.fontColor.action).toHaveBeenCalledWith(mockTarget);
+
+			document.body.removeChild(menuTrayDiv);
+		});
+
+		it('should handle data-command attribute on parent', () => {
+			const menuTrayDiv = document.createElement('div');
+			menuTrayDiv.className = 'se-menu-tray';
+			menuTrayDiv.setAttribute('data-key', 'fontSize');
+
+			const innerSpan = document.createElement('span');
+			innerSpan.textContent = '16px';
+
+			const button = document.createElement('button');
+			button.setAttribute('data-value', '16px');
+			button.setAttribute('data-command', 'fontSize');
+			button.appendChild(innerSpan);
+			menuTrayDiv.appendChild(button);
+			document.body.appendChild(menuTrayDiv);
+
+			mockEvent.target = innerSpan;
+			dom.query.getEventTarget.mockReturnValue(innerSpan);
+			dom.query.getCommandTarget.mockReturnValue(innerSpan);
+
+			mockThis.plugins.fontSize = {
+				action: jest.fn()
+			};
+
+			OnClick_menuTray.call(mockThis, mockEvent);
+
+			expect(mockThis.plugins.fontSize.action).toHaveBeenCalled();
+
+			document.body.removeChild(menuTrayDiv);
+		});
+	});
+
+	describe('OnClick_toolbar with different button types', () => {
+		it('should handle dropdown button type', () => {
+			mockTarget.setAttribute('data-type', 'dropdown');
+			mockTarget.setAttribute('data-command', 'align');
+
+			OnClick_toolbar.call(mockThis, mockEvent);
+
+			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+		});
+
+		it('should handle container button type', () => {
+			mockTarget.setAttribute('data-type', 'container');
+			mockTarget.setAttribute('data-command', 'table');
+
+			OnClick_toolbar.call(mockThis, mockEvent);
+
+			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+		});
+
+		it('should handle modal button type', () => {
+			mockTarget.setAttribute('data-type', 'modal');
+			mockTarget.setAttribute('data-command', 'link');
+
+			OnClick_toolbar.call(mockThis, mockEvent);
+
+			expect(mockThis.editor.runFromTarget).toHaveBeenCalledWith(mockTarget);
+		});
+	});
+
+	describe('toolbar input plugin handling', () => {
+		let inputElement;
+
+		beforeEach(() => {
+			inputElement = document.createElement('input');
+			inputElement.setAttribute('data-command', 'fontSize');
+			inputElement.setAttribute('data-type', 'INPUT');
+			inputElement.value = '16px';
+
+			dom.query.getEventTarget.mockReturnValue(inputElement);
+			dom.check.isInputElement.mockReturnValue(true);
+
+			const wysiwyg = document.createElement('div');
+			wysiwyg.contains = jest.fn().mockReturnValue(true);
+			mockThis.frameContext.set('wysiwyg', wysiwyg);
+
+			mockThis.plugins.fontSize = {
+				action: jest.fn(),
+				toolbarInputChange: jest.fn(),
+				toolbarInputKeyDown: jest.fn(),
+				isInputActive: false
+			};
+
+			mockThis.__inputBlurEvent = null;
+			mockThis.__inputPlugin = null;
+			mockThis.__inputKeyEvent = null;
+		});
+
+		it('should register blur event handler for input plugin with toolbarInputChange', () => {
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			expect(mockThis.addEvent).toHaveBeenCalledWith(inputElement, 'blur', expect.any(Function));
+			expect(mockThis.__inputPlugin).toEqual({
+				obj: mockThis.plugins.fontSize,
+				target: inputElement,
+				value: '16px'
+			});
+		});
+
+		it('should register keydown event handler for input plugin with toolbarInputKeyDown', () => {
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			expect(mockThis.addEvent).toHaveBeenCalledWith(inputElement, 'keydown', expect.any(Function));
+		});
+
+		it('should call toolbarInputChange on blur when value changed', () => {
+			// First, register the blur handler
+			let blurHandler;
+			mockThis.addEvent.mockImplementation((el, eventType, handler) => {
+				if (eventType === 'blur') {
+					blurHandler = handler;
+				}
+				return 'event-id';
+			});
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			// Simulate value change and blur
+			inputElement.value = '20px';
+			const blurEvent = { target: inputElement };
+			blurHandler(blurEvent);
+
+			expect(mockThis.plugins.fontSize.toolbarInputChange).toHaveBeenCalledWith({
+				target: inputElement,
+				value: '20px',
+				event: blurEvent
+			});
+		});
+
+		it('should not call toolbarInputChange on blur when value unchanged', () => {
+			let blurHandler;
+			mockThis.addEvent.mockImplementation((el, eventType, handler) => {
+				if (eventType === 'blur') {
+					blurHandler = handler;
+				}
+				return 'event-id';
+			});
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			// Blur without changing value
+			const blurEvent = { target: inputElement };
+			blurHandler(blurEvent);
+
+			expect(mockThis.plugins.fontSize.toolbarInputChange).not.toHaveBeenCalled();
+		});
+
+		it('should not trigger blur handler when isInputActive is true', () => {
+			let blurHandler;
+			mockThis.addEvent.mockImplementation((el, eventType, handler) => {
+				if (eventType === 'blur') {
+					blurHandler = handler;
+				}
+				return 'event-id';
+			});
+
+			mockThis.plugins.fontSize.isInputActive = true;
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			inputElement.value = '20px';
+			const blurEvent = { target: inputElement };
+			blurHandler(blurEvent);
+
+			expect(mockThis.plugins.fontSize.toolbarInputChange).not.toHaveBeenCalled();
+		});
+
+		it('should call toolbarInputKeyDown on keydown', () => {
+			let keydownHandler;
+			mockThis.addEvent.mockImplementation((el, eventType, handler) => {
+				if (eventType === 'keydown') {
+					keydownHandler = handler;
+				}
+				return 'event-id';
+			});
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			const keydownEvent = { key: 'Enter', target: inputElement };
+			keydownHandler(keydownEvent);
+
+			expect(mockThis.plugins.fontSize.toolbarInputKeyDown).toHaveBeenCalledWith({
+				target: inputElement,
+				event: keydownEvent
+			});
+		});
+
+		it('should remove existing input events before registering new ones', () => {
+			mockThis.__inputBlurEvent = 'existing-blur-event';
+			mockThis.__removeInput = jest.fn();
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			expect(mockThis.__removeInput).toHaveBeenCalled();
+		});
+
+		it('should handle existing inputBlurEvent and inputPlugin when clicking elsewhere', () => {
+			// Set up existing input state
+			const existingInput = document.createElement('input');
+			existingInput.value = '24px';
+			mockThis.__inputBlurEvent = 'existing-event';
+			mockThis.__inputPlugin = {
+				obj: mockThis.plugins.fontSize,
+				target: existingInput,
+				value: '16px'
+			};
+			mockThis.__removeInput = jest.fn();
+
+			// Now click on a non-input element
+			const buttonTarget = document.createElement('button');
+			buttonTarget.setAttribute('data-command', 'bold');
+			dom.query.getEventTarget.mockReturnValue(buttonTarget);
+			dom.check.isInputElement.mockReturnValue(false);
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			expect(mockThis.plugins.fontSize.toolbarInputChange).toHaveBeenCalledWith({
+				target: existingInput,
+				value: '24px',
+				event: mockEvent
+			});
+			expect(mockThis.__removeInput).toHaveBeenCalled();
+		});
+
+		it('should not call toolbarInputChange when clicking elsewhere with unchanged value', () => {
+			const existingInput = document.createElement('input');
+			existingInput.value = '16px'; // Same as initial value
+			mockThis.__inputBlurEvent = 'existing-event';
+			mockThis.__inputPlugin = {
+				obj: mockThis.plugins.fontSize,
+				target: existingInput,
+				value: '16px'
+			};
+			mockThis.__removeInput = jest.fn();
+
+			const buttonTarget = document.createElement('button');
+			buttonTarget.setAttribute('data-command', 'bold');
+			dom.query.getEventTarget.mockReturnValue(buttonTarget);
+			dom.check.isInputElement.mockReturnValue(false);
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			expect(mockThis.plugins.fontSize.toolbarInputChange).not.toHaveBeenCalled();
+			expect(mockThis.__removeInput).toHaveBeenCalled();
+		});
+	});
+
+	describe('non-codeView handling', () => {
+		beforeEach(() => {
+			const wysiwyg = document.createElement('div');
+			wysiwyg.contains = jest.fn().mockReturnValue(true);
+			mockThis.frameContext.set('wysiwyg', wysiwyg);
+			mockThis.frameContext.set('isCodeView', false);
+		});
+
+		it('should call preventDefault when not in codeView mode', () => {
+			mockTarget.setAttribute('data-command', 'bold');
+			dom.check.isInputElement.mockReturnValue(false);
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			expect(mockEvent.preventDefault).toHaveBeenCalled();
+		});
+
+		it('should not call preventDefault when in codeView mode', () => {
+			mockThis.frameContext.set('isCodeView', true);
+			mockTarget.setAttribute('data-command', 'bold');
+			dom.check.isInputElement.mockReturnValue(false);
+
+			// Reset mock
+			mockEvent.preventDefault.mockClear();
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			// When isCodeView is true, the else-if block is not entered
+			// so preventDefault should not be called from that branch
+		});
+	});
+
+	describe('dropdown and container menu stopPropagation', () => {
+		beforeEach(() => {
+			const wysiwyg = document.createElement('div');
+			wysiwyg.contains = jest.fn().mockReturnValue(true);
+			mockThis.frameContext.set('wysiwyg', wysiwyg);
+		});
+
+		it('should stopPropagation when command matches currentDropdownName', () => {
+			mockThis.menu.currentDropdownName = 'bold';
+			mockTarget.setAttribute('data-command', 'bold');
+			dom.check.isInputElement.mockReturnValue(false);
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			expect(mockEvent.stopPropagation).toHaveBeenCalled();
+		});
+
+		it('should stopPropagation when command matches currentContainerName', () => {
+			mockThis.menu.currentContainerName = 'table';
+			mockTarget.setAttribute('data-command', 'table');
+			dom.check.isInputElement.mockReturnValue(false);
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			expect(mockEvent.stopPropagation).toHaveBeenCalled();
+		});
+
+		it('should not stopPropagation when command does not match', () => {
+			mockThis.menu.currentDropdownName = 'align';
+			mockThis.menu.currentContainerName = 'table';
+			mockTarget.setAttribute('data-command', 'bold');
+			dom.check.isInputElement.mockReturnValue(false);
+
+			// Reset the mock to track only this test
+			mockEvent.stopPropagation.mockClear();
+
+			ButtonsHandler.call(mockThis, mockEvent);
+
+			// stopPropagation should not be called for command matching
+			// (it might be called for other reasons, so we check it wasn't called at all in this path)
+			expect(mockEvent.stopPropagation).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('OnClick_menuTray edge cases', () => {
+		it('should return early when target is null', () => {
+			dom.query.getCommandTarget.mockReturnValue(null);
+
+			OnClick_menuTray.call(mockThis, mockEvent);
+
+			expect(mockEvent.stopPropagation).not.toHaveBeenCalled();
+		});
+
+		it('should return early when no data-key found in parent hierarchy', () => {
+			const orphanElement = document.createElement('div');
+			dom.query.getEventTarget.mockReturnValue(orphanElement);
+			dom.query.getCommandTarget.mockReturnValue(orphanElement);
+
+			OnClick_menuTray.call(mockThis, mockEvent);
+
+			expect(mockEvent.stopPropagation).not.toHaveBeenCalled();
+		});
+
+		it('should return early when plugin has no action method', () => {
+			const menuTrayDiv = document.createElement('div');
+			menuTrayDiv.className = 'se-menu-tray';
+			menuTrayDiv.setAttribute('data-key', 'noActionPlugin');
+			menuTrayDiv.appendChild(mockTarget);
+			document.body.appendChild(menuTrayDiv);
+
+			mockThis.plugins.noActionPlugin = {
+				// No action method
+			};
+
+			OnClick_menuTray.call(mockThis, mockEvent);
+
+			expect(mockEvent.stopPropagation).not.toHaveBeenCalled();
+
+			document.body.removeChild(menuTrayDiv);
+		});
+
+		it('should return early when plugin does not exist', () => {
+			const menuTrayDiv = document.createElement('div');
+			menuTrayDiv.className = 'se-menu-tray';
+			menuTrayDiv.setAttribute('data-key', 'nonExistentPlugin');
+			menuTrayDiv.appendChild(mockTarget);
+			document.body.appendChild(menuTrayDiv);
+
+			// Plugin doesn't exist
+			delete mockThis.plugins.nonExistentPlugin;
+
+			OnClick_menuTray.call(mockThis, mockEvent);
+
+			expect(mockEvent.stopPropagation).not.toHaveBeenCalled();
+
+			document.body.removeChild(menuTrayDiv);
+		});
+	});
 });

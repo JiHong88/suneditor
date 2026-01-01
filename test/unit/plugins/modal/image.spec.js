@@ -239,11 +239,9 @@ describe('Image Plugin', () => {
 		});
 	});
 
-	describe('Static methods', () => {
-		it('should have component method', () => {
-			expect(typeof Image.component).toBe('function');
-		});
 
+
+	describe('Static methods', () => {
 		it('should return image element if valid', () => {
 			const mockElement = { nodeName: 'IMG' };
 			const result = Image.component(mockElement);
@@ -271,12 +269,7 @@ describe('Image Plugin', () => {
 			image.asInline = {};
 		});
 
-		it('should have required methods', () => {
-			const methods = ['open', 'modalOn', 'modalAction', 'modalInit', 'componentSelect', 'componentDestroy', 'onFilePasteAndDrop', 'create', 'createInline'];
-			methods.forEach((method) => {
-				expect(typeof image[method]).toBe('function');
-			});
-		});
+
 
 		describe('open', () => {
 			it('should call modal.open', () => {

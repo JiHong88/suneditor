@@ -64,7 +64,7 @@ class ModalAnchorEditor extends CoreInjector {
 		}
 
 		// create HTML
-		const forms = CreatetModalForm(this.editor, params, this.relList);
+		const forms = CreateModalForm(this.editor, params, this.relList);
 
 		// members
 		this.host = (_w.location.origin + _w.location.pathname).replace(/\/$/, '');
@@ -554,7 +554,7 @@ class ModalAnchorEditor extends CoreInjector {
  * @param {Array<string>} relList - REL attribute list
  * @returns {HTMLElement} - Modal form element
  */
-function CreatetModalForm(editor, params, relList) {
+function CreateModalForm(editor, params, relList) {
 	const lang = editor.lang;
 	const icons = editor.icons;
 	const textDisplayShow = params.textToDisplay ? '' : 'style="display: none;"';

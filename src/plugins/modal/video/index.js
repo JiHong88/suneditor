@@ -118,7 +118,7 @@ class Video extends PluginModal {
 	 * @param {VideoPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
-		// plugin bisic properties
+		// plugin basic properties
 		super(editor);
 		this.title = this.lang.video;
 		this.icon = 'video';
@@ -561,17 +561,17 @@ class Video extends PluginModal {
 
 		let fileSize = 0;
 		const files = [];
-		const slngleSizeLimit = this.pluginOptions.uploadSingleSizeLimit;
+		const singleSizeLimit = this.pluginOptions.uploadSingleSizeLimit;
 		for (let i = 0, len = fileList.length, f, s; i < len; i++) {
 			f = fileList[i];
 			if (!/video/i.test(f.type)) continue;
 
 			s = f.size;
-			if (slngleSizeLimit > 0 && s > slngleSizeLimit) {
-				const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
+			if (singleSizeLimit > 0 && s > singleSizeLimit) {
+				const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
 				const message = await this.triggerEvent('onVideoUploadError', {
 					error: err,
-					limitSize: slngleSizeLimit,
+					limitSize: singleSizeLimit,
 					uploadSize: s,
 					file: f,
 				});
@@ -684,8 +684,8 @@ class Video extends PluginModal {
 		if (this.videoUrlFile) this.#linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this.#element.src || this.#element.querySelector('source')?.src || '';
 
 		/** @type {HTMLInputElement} */
-		const activeAlgin = this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this.#align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]');
-		activeAlgin.checked = true;
+		const activeAlign = this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this.#align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]');
+		activeAlign.checked = true;
 
 		if (!this.#resizing) return;
 

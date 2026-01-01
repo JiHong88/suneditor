@@ -154,6 +154,40 @@ describe('TableResizeService', () => {
           });
     });
 
+    describe('isResizing', () => {
+        it('should return false initially', () => {
+            expect(resizeService.isResizing()).toBe(false);
+        });
+    });
+
+    describe('offResizeGuide', () => {
+        it('should hide resize line', () => {
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            CheckCellEdge.mockReturnValue({ is: true, isLeft: false });
+
+            const { dom } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(mockTable);
+
+            // First show guide
+            resizeService.onResizeGuide({}, document.createElement('td'));
+
+            // Then hide it
+            resizeService.offResizeGuide();
+
+            // Verify _element cursor is reset
+            expect(mockTable.style.cursor).toBe('');
+        });
+    });
+
+    describe('init', () => {
+        it('should reset resize state and remove global events', () => {
+            resizeService.init();
+
+            expect(resizeService.isResizing()).toBe(false);
+            expect(main.ui.disableBackWrapper).toHaveBeenCalled();
+        });
+    });
+
     describe('Resize Events', () => {
          let capturedHandlers = {};
 
@@ -255,24 +289,381 @@ describe('TableResizeService', () => {
               const { CheckCellEdge, CheckRowEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
               CheckCellEdge.mockReturnValue({ is: false });
               CheckRowEdge.mockReturnValue({ is: true, startY: 10 });
-              
+
               const row = document.createElement('tr');
               row.style.height = '20px';
-              
+
               const { dom } = require('../../../../../../src/helper');
               dom.query.getParentElement.mockReturnValue(row);
               dom.check.isTableRow.mockReturnValue(true);
-              
+
               const { env } = require('../../../../../../src/helper');
               env._w.getComputedStyle.mockReturnValue({ height: '20px', width: '100px' });
 
               resizeService.readyResizeFromEdge({}, document.createElement('td'));
-              
+
               expect(capturedHandlers['mousemove']).toBeDefined();
-              
+
               capturedHandlers['mousemove']({ clientY: 30 });
-              
+
               expect(row.style.height).not.toBe('20px');
          });
+
+         it('should not cancel resize if non-Esc key pressed', () => {
+             const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+             CheckCellEdge.mockReturnValue({ is: true, startX: 10, isLeft: false });
+
+             const colgroup = document.createElement('colgroup');
+             const col = document.createElement('col');
+             col.style.width = '50%';
+             colgroup.appendChild(col);
+             colgroup.appendChild(document.createElement('col'));
+             mockTable.appendChild(colgroup);
+
+             const { dom, keyCodeMap } = require('../../../../../../src/helper');
+             dom.query.getParentElement.mockReturnValue(mockTable);
+             keyCodeMap.isEsc.mockReturnValue(false);
+
+             resizeService.readyResizeFromEdge({}, document.createElement('td'));
+
+             // Press non-Esc key
+             capturedHandlers['keydown']({ code: 'Enter' });
+
+             // Should not call removeGlobalEvent since Esc was not pressed
+             expect(main.component.hoverSelect).not.toHaveBeenCalled();
+         });
+    });
+
+    describe('Figure Resizing', () => {
+        let capturedHandlers = {};
+
+        beforeEach(() => {
+            main.eventManager.addGlobalEvent.mockImplementation((type, handler) => {
+                capturedHandlers[type] = handler;
+                return handler;
+            });
+            capturedHandlers = {};
+        });
+
+        it('should start figure resizing when at left edge (colIndex < 0)', () => {
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            // colIndex = logical_cellIndex + current_colSpan - (isLeft ? 1 : 0)
+            // colIndex = 0 + 1 - 1 = 0 → but we need < 0, so set logical_cellIndex = -1
+            // Actually, for left edge: colIndex = 0 + 1 - 1 = 0
+            // For figure resize: colIndex < 0 OR colIndex === logical_cellCnt - 1
+            // Set isLeft=true and logical_cellIndex=0, current_colSpan=1: colIndex = 0 + 1 - 1 = 0
+            // For colIndex < 0: logical_cellIndex=0, current_colSpan=0, isLeft=true: 0 + 0 - 1 = -1
+            mainState.logical_cellIndex = 0;
+            mainState.current_colSpan = 0;
+            CheckCellEdge.mockReturnValue({ is: true, startX: 100, isLeft: true });
+
+            const colgroup = document.createElement('colgroup');
+            const col = document.createElement('col');
+            col.style.width = '50%';
+            colgroup.appendChild(col);
+            mockTable.appendChild(colgroup);
+
+            const { dom } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(mockTable);
+
+            Object.defineProperty(mainState.figureElement, 'offsetWidth', {
+                configurable: true,
+                value: 500
+            });
+            Object.defineProperty(mainState.figureElement, 'offsetHeight', {
+                configurable: true,
+                value: 300
+            });
+
+            resizeService.readyResizeFromEdge({}, document.createElement('td'));
+
+            expect(main.ui.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
+            expect(capturedHandlers['mousemove']).toBeDefined();
+        });
+
+        it('should start figure resizing when at right edge (colIndex === logical_cellCnt - 1)', () => {
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            // colIndex = logical_cellIndex + current_colSpan - (isLeft ? 1 : 0)
+            // For right edge: colIndex = 0 + 2 - 0 = 2
+            // logical_cellCnt = 3, so colIndex === 2 === logical_cellCnt - 1
+            mainState.logical_cellIndex = 0;
+            mainState.current_colSpan = 2;
+            mainState.logical_cellCnt = 3;
+            CheckCellEdge.mockReturnValue({ is: true, startX: 100, isLeft: false });
+
+            const colgroup = document.createElement('colgroup');
+            for (let i = 0; i < 3; i++) {
+                const col = document.createElement('col');
+                col.style.width = '33%';
+                colgroup.appendChild(col);
+            }
+            mockTable.appendChild(colgroup);
+
+            const { dom } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(mockTable);
+
+            Object.defineProperty(mainState.figureElement, 'offsetWidth', {
+                configurable: true,
+                value: 500
+            });
+            Object.defineProperty(mainState.figureElement, 'offsetHeight', {
+                configurable: true,
+                value: 300
+            });
+
+            resizeService.readyResizeFromEdge({}, document.createElement('td'));
+
+            expect(main.ui.enableBackWrapper).toHaveBeenCalledWith('ew-resize');
+        });
+
+        it('should resize figure on mousemove', () => {
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            mainState.logical_cellIndex = 0;
+            mainState.current_colSpan = 0;
+            CheckCellEdge.mockReturnValue({ is: true, startX: 100, isLeft: true });
+
+            const colgroup = document.createElement('colgroup');
+            colgroup.appendChild(document.createElement('col'));
+            mockTable.appendChild(colgroup);
+
+            const { dom, numbers, converter } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(mockTable);
+            numbers.get.mockReturnValue(50);
+            converter.getWidthInPercentage.mockReturnValue('50%');
+
+            Object.defineProperty(mainState.figureElement, 'offsetWidth', {
+                configurable: true,
+                value: 500
+            });
+            Object.defineProperty(mainState.figureElement, 'offsetHeight', {
+                configurable: true,
+                value: 300
+            });
+
+            resizeService.readyResizeFromEdge({}, document.createElement('td'));
+
+            // Simulate mousemove (left edge: deltaX = startX - e.clientX = 100 - 80 = 20)
+            capturedHandlers['mousemove']({ clientX: 80 });
+
+            expect(mainState.figureElement.style.width).toBeDefined();
+        });
+
+        it('should stop figure resize on mouseup and check width limit', () => {
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            mainState.logical_cellIndex = 0;
+            mainState.current_colSpan = 0;
+            CheckCellEdge.mockReturnValue({ is: true, startX: 100, isLeft: true });
+
+            const colgroup = document.createElement('colgroup');
+            colgroup.appendChild(document.createElement('col'));
+            mockTable.appendChild(colgroup);
+
+            const { dom, numbers, converter } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(mockTable);
+            numbers.get.mockImplementation((val, def) => {
+                if (typeof val === 'string' && val.includes('%')) return 150; // > 100%
+                return 50;
+            });
+            converter.getWidthInPercentage.mockReturnValue('50%');
+
+            Object.defineProperty(mainState.figureElement, 'offsetWidth', {
+                configurable: true,
+                value: 500
+            });
+            Object.defineProperty(mainState.figureElement, 'offsetHeight', {
+                configurable: true,
+                value: 300
+            });
+
+            mainState.figureElement.style.width = '150%';
+
+            resizeService.readyResizeFromEdge({}, document.createElement('td'));
+
+            // Stop resize
+            capturedHandlers['mouseup']();
+
+            expect(main.history.push).toHaveBeenCalledWith(true);
+            // Width should be limited to 100% if > 100
+            expect(mainState.figureElement.style.width).toBe('100%');
+        });
+
+        it('should cancel figure resize and reopen on Esc key', () => {
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            mainState.logical_cellIndex = 0;
+            mainState.current_colSpan = 0;
+            CheckCellEdge.mockReturnValue({ is: true, startX: 100, isLeft: true });
+
+            const colgroup = document.createElement('colgroup');
+            colgroup.appendChild(document.createElement('col'));
+            mockTable.appendChild(colgroup);
+
+            const { dom, keyCodeMap, converter } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(mockTable);
+            keyCodeMap.isEsc.mockReturnValue(true);
+            converter.getWidthInPercentage.mockReturnValue('50%');
+
+            Object.defineProperty(mainState.figureElement, 'offsetWidth', {
+                configurable: true,
+                value: 500
+            });
+            Object.defineProperty(mainState.figureElement, 'offsetHeight', {
+                configurable: true,
+                value: 300
+            });
+
+            mainState.figureElement.style.width = '50%';
+
+            resizeService.readyResizeFromEdge({}, document.createElement('td'));
+
+            // Esc key
+            capturedHandlers['keydown']({ code: 'Escape' });
+
+            expect(main.component.select).toHaveBeenCalled();
+            expect(mainState.figureElement.style.width).toBe('50%');
+        });
+    });
+
+    describe('Row resize with rowspan', () => {
+        let capturedHandlers = {};
+
+        beforeEach(() => {
+            main.eventManager.addGlobalEvent.mockImplementation((type, handler) => {
+                capturedHandlers[type] = handler;
+                return handler;
+            });
+            capturedHandlers = {};
+        });
+
+        it('should handle cell with rowspan > 1', () => {
+            const { CheckCellEdge, CheckRowEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            CheckCellEdge.mockReturnValue({ is: false });
+            CheckRowEdge.mockReturnValue({ is: true, startY: 10 });
+
+            const row1 = document.createElement('tr');
+            const row2 = document.createElement('tr');
+            const td = document.createElement('td');
+            td.rowSpan = 2;
+            row1.appendChild(td);
+
+            const { dom } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(row1);
+            dom.check.isTableRow.mockImplementation((el) => el === row1 || el === row2);
+
+            // Set nextElementSibling
+            Object.defineProperty(row1, 'nextElementSibling', {
+                configurable: true,
+                value: row2
+            });
+
+            resizeService.readyResizeFromEdge({}, td);
+
+            expect(main.ui.enableBackWrapper).toHaveBeenCalledWith('ns-resize');
+        });
+
+        it('should stop row resize on Esc key', () => {
+            const { CheckCellEdge, CheckRowEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            CheckCellEdge.mockReturnValue({ is: false });
+            CheckRowEdge.mockReturnValue({ is: true, startY: 10 });
+
+            const row = document.createElement('tr');
+            row.style.height = '30px';
+
+            const { dom, keyCodeMap } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(row);
+            dom.check.isTableRow.mockReturnValue(true);
+            keyCodeMap.isEsc.mockReturnValue(true);
+
+            resizeService.readyResizeFromEdge({}, document.createElement('td'));
+
+            capturedHandlers['keydown']({ code: 'Escape' });
+
+            expect(row.style.height).toBe('30px');
+        });
+    });
+
+    describe('Error handling', () => {
+        it('should handle errors in readyResizeFromEdge for row resize', () => {
+            const { CheckCellEdge, CheckRowEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            CheckCellEdge.mockReturnValue({ is: false });
+            CheckRowEdge.mockReturnValue({ is: true, startY: 10 });
+
+            const { dom } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(null); // This will cause error
+
+            const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
+            resizeService.readyResizeFromEdge({}, document.createElement('td'));
+
+            expect(consoleSpy).toHaveBeenCalled();
+            expect(main._editorEnable).toHaveBeenCalledWith(true);
+            consoleSpy.mockRestore();
+        });
+    });
+
+    describe('DragHandle visibility', () => {
+        let capturedHandlers = {};
+
+        beforeEach(() => {
+            main.eventManager.addGlobalEvent.mockImplementation((type, handler) => {
+                capturedHandlers[type] = handler;
+                return handler;
+            });
+            capturedHandlers = {};
+        });
+
+        it('should hide DragHandle when starting cell resize', () => {
+            const { _DragHandle } = require('../../../../../../src/modules/ui');
+            const mockHandler = { style: { display: 'block' } };
+            _DragHandle.get.mockReturnValue(mockHandler);
+
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            CheckCellEdge.mockReturnValue({ is: true, startX: 10, isLeft: false });
+
+            const colgroup = document.createElement('colgroup');
+            colgroup.appendChild(document.createElement('col'));
+            colgroup.appendChild(document.createElement('col'));
+            mockTable.appendChild(colgroup);
+
+            const { dom } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(mockTable);
+
+            resizeService.readyResizeFromEdge({}, document.createElement('td'));
+
+            expect(mockHandler.style.display).toBe('none');
+        });
+    });
+
+    describe('onResizeGuide edge cases', () => {
+        it('should hide existing resize line before showing new one', () => {
+            const { CheckCellEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+
+            const mockResizeLine = document.createElement('div');
+            mockResizeLine.style.display = 'block';
+
+            main.frameContext.get.mockReturnValue({
+                querySelector: jest.fn().mockReturnValue(mockResizeLine)
+            });
+
+            CheckCellEdge.mockReturnValue({ is: true, isLeft: false });
+
+            const { dom } = require('../../../../../../src/helper');
+            dom.query.getParentElement.mockReturnValue(mockTable);
+
+            // Call twice to trigger hide of existing line
+            resizeService.onResizeGuide({}, document.createElement('td'));
+            resizeService.onResizeGuide({}, document.createElement('td'));
+
+            expect(main.frameContext.get).toHaveBeenCalled();
+        });
+
+        it('should return undefined when no edge detected', () => {
+            const { CheckCellEdge, CheckRowEdge } = require('../../../../../../src/plugins/dropdown/table/shared/table.utils');
+            CheckCellEdge.mockReturnValue({ is: false });
+            CheckRowEdge.mockReturnValue({ is: false });
+
+            const result = resizeService.onResizeGuide({}, document.createElement('td'));
+
+            expect(result).toBeUndefined();
+        });
     });
 });

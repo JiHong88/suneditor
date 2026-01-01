@@ -941,4 +941,93 @@ describe('Selection', () => {
 			expect(selection.getRange().startContainer).toBe(selection.getRange().endContainer);
 		});
 	});
+
+	describe('setRange error recovery', () => {
+		it('should return early when startContainer is null', () => {
+			// setRange with null should return undefined and not throw
+			const result = selection.setRange(null, 0, null, 0);
+			expect(result).toBeUndefined();
+		});
+
+		it('should return early when endContainer is null', () => {
+			wysiwyg.innerHTML = '<p>test</p>';
+			const text = wysiwyg.firstChild.firstChild;
+
+			// setRange with null endContainer should return undefined
+			const result = selection.setRange(text, 0, null, 0);
+			expect(result).toBeUndefined();
+		});
+
+		it('should handle setRange with orphaned node gracefully', () => {
+			wysiwyg.innerHTML = '<p>test</p>';
+			const text = wysiwyg.firstChild.firstChild;
+
+			// Remove the node from DOM before setRange
+			wysiwyg.innerHTML = '';
+
+			const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+			// Text node is now orphaned - this simulates DOM mutation during undo/redo
+			// Should handle gracefully (not throw)
+			expect(() => selection.setRange(text, 0, text, 4)).not.toThrow();
+
+			warnSpy.mockRestore();
+		});
+
+		it('should clamp offset values to valid range', () => {
+			wysiwyg.innerHTML = '<p>test</p>';
+			const text = wysiwyg.firstChild.firstChild;
+
+			// Large offset should be clamped
+			const range = selection.setRange(text, 0, text, 1000);
+
+			expect(range).toBeDefined();
+			expect(range.endOffset).toBeLessThanOrEqual(text.textContent.length);
+		});
+	});
+
+	describe('selection restoration after DOM changes', () => {
+		it('should handle selection when startContainer is removed', () => {
+			wysiwyg.innerHTML = '<p>first</p><p>second</p>';
+			const firstP = wysiwyg.firstChild;
+			selection.setRange(firstP.firstChild, 0, firstP.firstChild, 5);
+
+			// Simulate DOM mutation (like undo operation)
+			wysiwyg.removeChild(firstP);
+
+			// getRange should not throw, should return valid range or create new one
+			expect(() => selection.getRange()).not.toThrow();
+		});
+
+		it('should handle getNode when selectionNode is removed from DOM', () => {
+			wysiwyg.innerHTML = '<p>test</p>';
+			const text = wysiwyg.firstChild.firstChild;
+			selection.setRange(text, 0, text, 4);
+
+			// Store current selectionNode
+			selection.selectionNode = text;
+
+			// Remove node
+			wysiwyg.innerHTML = '<p>new content</p>';
+
+			// getNode should reinitialize, not return stale node
+			const node = selection.getNode();
+			expect(wysiwyg.contains(node) || node === wysiwyg).toBe(true);
+		});
+
+		it('should create default range when wysiwyg becomes empty', () => {
+			wysiwyg.innerHTML = '<p>test</p>';
+			const text = wysiwyg.firstChild.firstChild;
+			selection.setRange(text, 0, text, 4);
+
+			// Clear wysiwyg content
+			wysiwyg.innerHTML = '';
+			selection.status._range = null;
+
+			// getRange should create a new default line and range
+			const range = selection.getRange();
+			expect(range).toBeDefined();
+			expect(wysiwyg.firstElementChild).toBeTruthy();
+		});
+	});
 });

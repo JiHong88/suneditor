@@ -1690,4 +1690,282 @@ describe('Inline Class', () => {
 		});
 	});
 
+	describe('_destroy method', () => {
+		it('should not throw when called', () => {
+			expect(() => {
+				inline._destroy();
+			}).not.toThrow();
+		});
+
+		it('should be callable multiple times', () => {
+			expect(() => {
+				inline._destroy();
+				inline._destroy();
+			}).not.toThrow();
+		});
+	});
+
+	describe('apply with nodesToRemove', () => {
+		it('should remove specified nodes from selection', () => {
+			wysiwyg.innerHTML = '<p><strong><em>text</em></strong></p>';
+			const textNode = wysiwyg.querySelector('em').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const result = inline.apply(null, { nodesToRemove: ['STRONG'] });
+			expect(result).toBeDefined();
+		});
+
+		it('should remove nodes with specific class using stylesToModify', () => {
+			wysiwyg.innerHTML = '<p><span class="highlight">text</span></p>';
+			const textNode = wysiwyg.querySelector('span').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const result = inline.apply(null, { stylesToModify: ['.highlight'], nodesToRemove: ['SPAN'] });
+			expect(result).toBeDefined();
+		});
+
+		it('should return early for non-editable content', () => {
+			wysiwyg.innerHTML = '<div contenteditable="false"><p>test</p></div>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const result = inline.apply(null, { nodesToRemove: ['STRONG'] });
+			expect(result).toBeUndefined();
+		});
+	});
+
+	describe('node insertion and removal', () => {
+		it('should handle insertNode for inline elements', () => {
+			wysiwyg.innerHTML = '<p>text</p>';
+			const textNode = wysiwyg.querySelector('p').firstChild;
+			editor.selection.setRange(textNode, 2, textNode, 2);
+
+			const span = dom.utils.createElement('span');
+			span.textContent = 'inserted';
+
+			expect(() => {
+				editor.html.insertNode(span);
+			}).not.toThrow();
+		});
+
+		it('should handle removeNode for inline elements', () => {
+			wysiwyg.innerHTML = '<p><strong>text</strong></p>';
+			const strong = wysiwyg.querySelector('strong');
+
+			expect(() => {
+				dom.utils.removeItem(strong);
+			}).not.toThrow();
+
+			expect(wysiwyg.querySelector('strong')).toBeNull();
+		});
+	});
+
+	describe('format preservation', () => {
+		it('should preserve formats when applying new format', () => {
+			wysiwyg.innerHTML = '<p><strong>bold</strong></p>';
+			const textNode = wysiwyg.querySelector('strong').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const em = dom.utils.createElement('em');
+			inline.apply(em);
+
+			expect(wysiwyg.querySelector('strong')).toBeTruthy();
+			expect(wysiwyg.querySelector('em')).toBeTruthy();
+		});
+
+		it('should handle applying same format twice', () => {
+			wysiwyg.innerHTML = '<p><strong>bold</strong></p>';
+			const textNode = wysiwyg.querySelector('strong').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const strong = dom.utils.createElement('strong');
+			const result = inline.apply(strong);
+
+			expect(result).toBeDefined();
+		});
+	});
+
+	describe('remove method', () => {
+		it('should remove all formats from selection', () => {
+			wysiwyg.innerHTML = '<p><strong><em>text</em></strong></p>';
+			const textNode = wysiwyg.querySelector('em').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			inline.remove();
+
+			expect(wysiwyg.querySelector('strong')).toBeFalsy();
+			expect(wysiwyg.querySelector('em')).toBeFalsy();
+		});
+
+		it('should work with collapsed selection', () => {
+			wysiwyg.innerHTML = '<p><strong>text</strong></p>';
+			const textNode = wysiwyg.querySelector('strong').firstChild;
+			editor.selection.setRange(textNode, 2, textNode, 2);
+
+			expect(() => {
+				inline.remove();
+			}).not.toThrow();
+		});
+	});
+
+	describe('_isNonSplitNode method', () => {
+		it('should return true for anchor element', () => {
+			const anchor = document.createElement('a');
+			const result = inline._isNonSplitNode(anchor);
+			expect(result).toBe(true);
+		});
+
+		it('should return true for label element', () => {
+			const label = document.createElement('label');
+			const result = inline._isNonSplitNode(label);
+			expect(result).toBe(true);
+		});
+
+		it('should return true for code element', () => {
+			const code = document.createElement('code');
+			const result = inline._isNonSplitNode(code);
+			expect(result).toBe(true);
+		});
+
+		it('should return true for summary element', () => {
+			const summary = document.createElement('summary');
+			const result = inline._isNonSplitNode(summary);
+			expect(result).toBe(true);
+		});
+
+		it('should return false for span element', () => {
+			const span = document.createElement('span');
+			const result = inline._isNonSplitNode(span);
+			expect(result).toBe(false);
+		});
+
+		it('should return false for null', () => {
+			const result = inline._isNonSplitNode(null);
+			expect(result).toBe(false);
+		});
+
+		it('should handle string input "a"', () => {
+			const result = inline._isNonSplitNode('a');
+			expect(result).toBe(true);
+		});
+
+		it('should handle string input "code"', () => {
+			const result = inline._isNonSplitNode('code');
+			expect(result).toBe(true);
+		});
+
+		it('should handle string input "div"', () => {
+			const result = inline._isNonSplitNode('div');
+			expect(result).toBe(false);
+		});
+	});
+
+	describe('_isIgnoreNodeChange method', () => {
+		it('should return true for non-editable element', () => {
+			const div = document.createElement('div');
+			div.setAttribute('contenteditable', 'false');
+			const result = inline._isIgnoreNodeChange(div);
+			expect(result).toBe(true);
+		});
+
+		it('should return falsy for null', () => {
+			const result = inline._isIgnoreNodeChange(null);
+			expect(result).toBeFalsy();
+		});
+
+		it('should return false for text node', () => {
+			const textNode = document.createTextNode('test');
+			const result = inline._isIgnoreNodeChange(textNode);
+			expect(result).toBe(false);
+		});
+
+		it('should return false for normal span', () => {
+			const span = document.createElement('span');
+			const result = inline._isIgnoreNodeChange(span);
+			expect(typeof result).toBe('boolean');
+		});
+	});
+
+	describe('apply with strictRemove option', () => {
+		it('should handle strictRemove true', () => {
+			wysiwyg.innerHTML = '<p><span style="color: red;">text</span></p>';
+			const textNode = wysiwyg.querySelector('span').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const result = inline.apply(null, {
+				stylesToModify: ['color'],
+				nodesToRemove: ['SPAN'],
+				strictRemove: true
+			});
+
+			expect(result).toBeDefined();
+		});
+
+		it('should handle strictRemove false', () => {
+			wysiwyg.innerHTML = '<p><span style="color: red; font-size: 16px;">text</span></p>';
+			const textNode = wysiwyg.querySelector('span').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const result = inline.apply(null, {
+				stylesToModify: ['color'],
+				nodesToRemove: ['SPAN'],
+				strictRemove: false
+			});
+
+			expect(result).toBeDefined();
+		});
+	});
+
+	describe('apply with multi-line selection', () => {
+		it('should handle selection across multiple paragraphs', () => {
+			wysiwyg.innerHTML = '<p>first paragraph</p><p>second paragraph</p>';
+			const firstP = wysiwyg.querySelector('p').firstChild;
+			const secondP = wysiwyg.querySelectorAll('p')[1].firstChild;
+			editor.selection.setRange(firstP, 6, secondP, 6);
+
+			const strong = dom.utils.createElement('strong');
+			const result = inline.apply(strong);
+
+			expect(result).toBeDefined();
+		});
+
+		it('should handle selection starting in formatted and ending in unformatted', () => {
+			wysiwyg.innerHTML = '<p><strong>formatted</strong> plain</p>';
+			const strongText = wysiwyg.querySelector('strong').firstChild;
+			const plainText = wysiwyg.querySelector('p').lastChild;
+			editor.selection.setRange(strongText, 4, plainText, 3);
+
+			const em = dom.utils.createElement('em');
+			const result = inline.apply(em);
+
+			expect(result).toBeDefined();
+		});
+	});
+
+	describe('apply with code element', () => {
+		it('should handle code element as non-split node', () => {
+			wysiwyg.innerHTML = '<p><code>code text</code></p>';
+			const textNode = wysiwyg.querySelector('code').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const strong = dom.utils.createElement('strong');
+			const result = inline.apply(strong);
+
+			expect(result).toBeDefined();
+		});
+	});
+
+	describe('apply with anchor element', () => {
+		it('should preserve anchor when applying inline format', () => {
+			wysiwyg.innerHTML = '<p><a href="http://example.com">link text</a></p>';
+			const textNode = wysiwyg.querySelector('a').firstChild;
+			editor.selection.setRange(textNode, 0, textNode, 4);
+
+			const strong = dom.utils.createElement('strong');
+			const result = inline.apply(strong);
+
+			expect(result).toBeDefined();
+			expect(wysiwyg.querySelector('a')).toBeTruthy();
+		});
+	});
 });

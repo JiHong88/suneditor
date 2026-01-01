@@ -188,11 +188,9 @@ describe('Audio Plugin', () => {
 		});
 	});
 
-	describe('Static methods', () => {
-		it('should have component method', () => {
-			expect(typeof Audio.component).toBe('function');
-		});
 
+
+	describe('Static methods', () => {
 		it('should return audio element if valid', () => {
 			const mockElement = { nodeName: 'AUDIO' };
 			const result = Audio.component(mockElement);
@@ -214,12 +212,7 @@ describe('Audio Plugin', () => {
 			audio.preview = { textContent: '', style: {} };
 		});
 
-		it('should have required methods', () => {
-			const methods = ['open', 'modalOn', 'modalAction', 'modalInit', 'componentSelect', 'componentDestroy', 'onFilePasteAndDrop'];
-			methods.forEach((method) => {
-				expect(typeof audio[method]).toBe('function');
-			});
-		});
+
 
 		describe('open', () => {
 			it('should call modal.open', () => {

@@ -643,4 +643,385 @@ describe('TableStyleService', () => {
 			expect(styleService.controller_props.close).toHaveBeenCalled();
 		});
 	});
+
+	describe('Controller initMethod callback', () => {
+		it('should close hueSlider and remove "on" class', () => {
+			const { dom } = require('../../../../../../src/helper');
+
+			// Access the Controller mock to get the initMethod option
+			const { Controller } = require('../../../../../../src/modules/contract');
+			const controllerCalls = Controller.mock.calls;
+
+			// Find the colorPicker controller call (the one with initMethod)
+			const colorPickerCall = controllerCalls.find((call) => call[2]?.initMethod);
+			if (colorPickerCall) {
+				const initMethod = colorPickerCall[2].initMethod;
+				styleService.controller_colorPicker.currentTarget = document.createElement('button');
+
+				initMethod();
+
+				expect(styleService.colorPicker.hueSlider.close).toHaveBeenCalled();
+				expect(dom.utils.removeClass).toHaveBeenCalledWith(styleService.controller_colorPicker.currentTarget, 'on');
+			}
+		});
+	});
+
+	describe('colorPickerAction hook', () => {
+		it('should call applyColorPicker with color', () => {
+			styleService.applyColorPicker = jest.fn();
+			styleService.colorPickerAction('#ff0000');
+			expect(styleService.applyColorPicker).toHaveBeenCalledWith('#ff0000');
+		});
+	});
+
+	describe('controllerAction return early', () => {
+		it('should return early when no command', () => {
+			const target = document.createElement('button');
+			// No data-command attribute
+			const result = styleService.controllerAction(target);
+			expect(result).toBeUndefined();
+		});
+	});
+
+	describe('openTableProps - close when already open', () => {
+		it('should close controller when same target and visible', () => {
+			const target = document.createElement('button');
+
+			styleService.controller_props.currentTarget = target;
+			styleService.controller_props.form = { style: { display: 'block' } };
+
+			styleService.openTableProps(target);
+
+			expect(styleService.controller_props.close).toHaveBeenCalled();
+		});
+	});
+
+	describe('openCellProps - close when already open', () => {
+		it('should close controller when same target and visible', () => {
+			const target = document.createElement('button');
+
+			styleService.controller_props.currentTarget = target;
+			styleService.controller_props.form = { style: { display: 'block' } };
+
+			styleService.openCellProps(target);
+
+			expect(styleService.controller_props.close).toHaveBeenCalled();
+		});
+	});
+
+	describe('openBorderStyleMenu', () => {
+		it('should open border style menu', () => {
+			styleService.openBorderStyleMenu();
+			expect(styleService.selectMenu_props_border.open).toHaveBeenCalled();
+		});
+	});
+
+	describe('toggleHeader - close controller when TH element', () => {
+		it('should close controller when current element is TH', () => {
+			const table = document.createElement('table');
+			const tbody = document.createElement('tbody');
+			table.appendChild(tbody);
+			main._element = table;
+
+			// Create a TH element (nodeName is automatically 'TH')
+			mainState.tdElement = document.createElement('th');
+
+			const { dom } = require('../../../../../../src/helper');
+			dom.utils.hasClass.mockReturnValue(true); // Button is active, remove header
+
+			styleService.toggleHeader();
+
+			expect(main._closeController).toHaveBeenCalled();
+		});
+	});
+
+	describe('revertProps with table element', () => {
+		it('should revert figure element float when isTable', () => {
+			const table = document.createElement('table');
+			const figureElement = document.createElement('figure');
+			figureElement.style.float = 'right';
+
+			mainState.figureElement = figureElement;
+
+			styleService._propsCache = [[table, 'background: red;']];
+			styleService._propsAlignCache = 'left';
+			styleService._propsVerticalAlignCache = 'middle';
+
+			const { dom } = require('../../../../../../src/helper');
+			dom.check.isTable.mockReturnValue(true);
+
+			styleService.revertProps();
+
+			expect(figureElement.style.float).toBe('left');
+		});
+	});
+
+	describe('setVerticalAlignProps', () => {
+		it('should set vertical alignment', () => {
+			const { dom } = require('../../../../../../src/helper');
+			const btn = document.createElement('button');
+			btn.setAttribute('data-value', 'top');
+
+			styleService.propTargets.cell_alignment_vertical.querySelector.mockReturnValue(btn);
+			styleService.propTargets.cell_alignment_vertical.querySelectorAll.mockReturnValue([btn]);
+
+			styleService.setVerticalAlignProps('top');
+
+			expect(dom.utils.removeClass).toHaveBeenCalled();
+		});
+	});
+
+	describe('setTableLayout - column styles', () => {
+		it('should handle column fixed styles', () => {
+			const { dom } = require('../../../../../../src/helper');
+			const table = document.createElement('table');
+			main._element = table;
+
+			// Test fixed column
+			styleService.setTableLayout('column', false, true, false);
+
+			expect(dom.utils.removeClass).toHaveBeenCalledWith(table, 'se-table-layout-auto');
+			expect(dom.utils.addClass).toHaveBeenCalledWith(table, 'se-table-layout-fixed');
+
+			// Test auto column
+			styleService.setTableLayout('column', false, false, false);
+
+			expect(dom.utils.removeClass).toHaveBeenCalledWith(table, 'se-table-layout-fixed');
+			expect(dom.utils.addClass).toHaveBeenCalledWith(table, 'se-table-layout-auto');
+		});
+	});
+
+	describe('setTableLayout - return early when no figureElement', () => {
+		it('should return early when figureElement is null', () => {
+			mainState.figureElement = null;
+
+			// Should not throw
+			expect(() => styleService.setTableLayout('width', true, false, false)).not.toThrow();
+		});
+	});
+
+	describe('submitProps with border formats', () => {
+		it('should handle "inside" border format', () => {
+			const c1 = document.createElement('td');
+			const c2 = document.createElement('td');
+			const c3 = document.createElement('td');
+			const c4 = document.createElement('td');
+
+			const r1 = document.createElement('tr');
+			r1.append(c1, c2);
+			const r2 = document.createElement('tr');
+			r2.append(c3, c4);
+			const tbody = document.createElement('tbody');
+			tbody.append(r1, r2);
+			const table = document.createElement('table');
+			table.append(tbody);
+
+			mainState.selectedCells = [c1, c2, c3, c4];
+			mainState.ref = { rs: 0, re: 1, cs: 0, ce: 1 };
+
+			styleService.controller_props.currentTarget = document.createElement('button');
+
+			let currentFormat = 'inside';
+			styleService.propTargets.border_format.getAttribute = jest.fn(() => currentFormat);
+			styleService.propTargets.border_style.textContent = 'solid';
+			styleService.propTargets.border_width.value = '1';
+			styleService.propTargets.border_color.value = '#000000';
+
+			const targetBtn = document.createElement('button');
+			styleService.submitProps(targetBtn);
+
+			// Inside border: c1 and c3 should have right border, c1 and c2 should have bottom border
+			expect(c1.style.borderRight).toContain('1px solid');
+			expect(c1.style.borderBottom).toContain('1px solid');
+		});
+
+		it('should handle "horizon" border format', () => {
+			const c1 = document.createElement('td');
+			const c2 = document.createElement('td');
+
+			const r1 = document.createElement('tr');
+			r1.append(c1);
+			const r2 = document.createElement('tr');
+			r2.append(c2);
+			const tbody = document.createElement('tbody');
+			tbody.append(r1, r2);
+			const table = document.createElement('table');
+			table.append(tbody);
+
+			mainState.selectedCells = [c1, c2];
+			mainState.ref = { rs: 0, re: 1, cs: 0, ce: 0 };
+
+			styleService.controller_props.currentTarget = document.createElement('button');
+
+			styleService.propTargets.border_format.getAttribute = jest.fn(() => 'horizon');
+			styleService.propTargets.border_style.textContent = 'dashed';
+			styleService.propTargets.border_width.value = '2';
+			styleService.propTargets.border_color.value = '#ff0000';
+
+			const targetBtn = document.createElement('button');
+			styleService.submitProps(targetBtn);
+
+			// c1 is not bottom, so it should have bottom border
+			expect(c1.style.borderBottom).toContain('2px dashed');
+		});
+
+		it('should handle "vertical" border format', () => {
+			const c1 = document.createElement('td');
+			const c2 = document.createElement('td');
+
+			const r1 = document.createElement('tr');
+			r1.append(c1, c2);
+			const tbody = document.createElement('tbody');
+			tbody.append(r1);
+			const table = document.createElement('table');
+			table.append(tbody);
+
+			mainState.selectedCells = [c1, c2];
+			mainState.ref = { rs: 0, re: 0, cs: 0, ce: 1 };
+
+			styleService.controller_props.currentTarget = document.createElement('button');
+
+			styleService.propTargets.border_format.getAttribute = jest.fn(() => 'vertical');
+			styleService.propTargets.border_style.textContent = 'solid';
+			styleService.propTargets.border_width.value = '1';
+			styleService.propTargets.border_color.value = '#00ff00';
+
+			const targetBtn = document.createElement('button');
+			styleService.submitProps(targetBtn);
+
+			// c1 is not right, so it should have right border
+			expect(c1.style.borderRight).toContain('1px solid');
+		});
+
+		it('should handle individual border formats (left, top, right, bottom)', () => {
+			const cell = document.createElement('td');
+			const row = document.createElement('tr');
+			row.appendChild(cell);
+			const tbody = document.createElement('tbody');
+			tbody.appendChild(row);
+			const table = document.createElement('table');
+			table.appendChild(tbody);
+
+			mainState.selectedCells = [cell];
+			mainState.ref = { rs: 0, re: 0, cs: 0, ce: 0 };
+
+			styleService.controller_props.currentTarget = document.createElement('button');
+
+			const formats = ['left', 'top', 'right', 'bottom'];
+
+			for (const format of formats) {
+				cell.style.cssText = '';
+				styleService.propTargets.border_format.getAttribute = jest.fn(() => format);
+				styleService.propTargets.border_style.textContent = 'solid';
+				styleService.propTargets.border_width.value = '1';
+				styleService.propTargets.border_color.value = '#000000';
+
+				const targetBtn = document.createElement('button');
+				styleService.submitProps(targetBtn);
+
+				const borderProp = `border${format.charAt(0).toUpperCase() + format.slice(1)}`;
+				expect(cell.style[borderProp]).toContain('1px solid');
+			}
+		});
+	});
+
+	describe('submitProps with "none" border format', () => {
+		it('should clear all borders when border format is none', () => {
+			const cell = document.createElement('td');
+			cell.style.border = '1px solid black';
+			const row = document.createElement('tr');
+			row.appendChild(cell);
+			const tbody = document.createElement('tbody');
+			tbody.appendChild(row);
+			const table = document.createElement('table');
+			table.appendChild(tbody);
+
+			mainState.selectedCells = [cell];
+			mainState.ref = { rs: 0, re: 0, cs: 0, ce: 0 };
+
+			styleService.controller_props.currentTarget = document.createElement('button');
+
+			styleService.propTargets.border_format.getAttribute = jest.fn(() => 'none');
+			styleService.propTargets.border_style.textContent = 'none';
+
+			const targetBtn = document.createElement('button');
+			styleService.submitProps(targetBtn);
+
+			expect(cell.style.border).toBe('');
+		});
+	});
+
+	describe('submitProps with colspan cells', () => {
+		it('should handle cells with colspan', () => {
+			const c1 = document.createElement('td');
+			c1.colSpan = 2;
+			const c2 = document.createElement('td');
+
+			const r1 = document.createElement('tr');
+			r1.append(c1);
+			const r2 = document.createElement('tr');
+			r2.append(document.createElement('td'), c2);
+			const tbody = document.createElement('tbody');
+			tbody.append(r1, r2);
+			const table = document.createElement('table');
+			table.append(tbody);
+
+			mainState.selectedCells = [c1, c2];
+			mainState.ref = { rs: 0, re: 1, cs: 0, ce: 1 };
+
+			styleService.controller_props.currentTarget = document.createElement('button');
+			styleService.propTargets.back_color.value = '#cccccc';
+
+			const targetBtn = document.createElement('button');
+			styleService.submitProps(targetBtn);
+
+			expect(c1.style.backgroundColor).toBe('rgb(204, 204, 204)');
+		});
+	});
+
+	describe('#getBorderStyle parsing', () => {
+		it('should parse border style correctly for different formats', () => {
+			// This tests the private method indirectly through setCtrlProps
+			const table = document.createElement('table');
+			table.style.border = '2px dashed rgb(255, 0, 0)';
+			main._element = table;
+
+			const { env } = require('../../../../../../src/helper');
+			env._w.getComputedStyle.mockReturnValue({
+				border: '2px dashed rgb(255, 0, 0)',
+				backgroundColor: 'transparent',
+				color: 'black',
+				textAlign: 'left',
+				verticalAlign: 'middle',
+				fontWeight: 'normal',
+				textDecoration: 'none',
+				fontStyle: 'normal',
+			});
+
+			styleService.openTableProps(document.createElement('button'));
+
+			expect(styleService.propTargets.border_style.textContent).toBe('dashed');
+			expect(styleService.propTargets.border_width.value).toBe('2px');
+		});
+	});
+
+	describe('#setAlignProps toggle behavior', () => {
+		it('should toggle off alignment when clicking same value', () => {
+			const btn = document.createElement('button');
+			btn.setAttribute('data-value', 'center');
+			const parent = document.createElement('div');
+			parent.appendChild(btn);
+
+			// Mock current alignment
+			styleService.propTargets.cell_alignment.getAttribute = jest.fn(() => 'center');
+			styleService.propTargets.cell_alignment.setAttribute = jest.fn();
+			styleService.propTargets.cell_alignment.querySelector = jest.fn().mockReturnValue(btn);
+			styleService.propTargets.cell_alignment.querySelectorAll = jest.fn().mockReturnValue([btn]);
+
+			styleService.setAlignProps('center');
+
+			// Should set to empty string (toggle off)
+			expect(styleService.propTargets.cell_alignment.setAttribute).toHaveBeenCalledWith('se-cell-align', '');
+		});
+	});
 });

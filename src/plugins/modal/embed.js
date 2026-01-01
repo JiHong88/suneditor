@@ -132,7 +132,7 @@ class Embed extends PluginModal {
 	 * @param {EmbedPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
-		// plugin bisic properties
+		// plugin basic properties
 		super(editor);
 		this.title = this.lang.embed;
 		this.icon = 'embed';

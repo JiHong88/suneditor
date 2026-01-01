@@ -409,4 +409,133 @@ describe('handler_ww_dragDrop', () => {
 			expect(mockThis._dataTransferAction).toHaveBeenCalled();
 		});
 	});
+
+	describe('OnDragOver_wysiwyg edge cases', () => {
+		it('should return early if sc is null', () => {
+			mockThis.selection.getDragEventLocationRange.mockReturnValue({
+				sc: null,
+				so: 0,
+				ec: null,
+				eo: 0
+			});
+
+			OnDragOver_wysiwyg.call(mockThis, mockFrameContext, mockDragCursor, null, null, mockEvent);
+
+			expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+		});
+
+		it('should hide cursor when rect height is 0', () => {
+			mockDocument.createRange = jest.fn(() => ({
+				setStart: jest.fn(),
+				setEnd: jest.fn(),
+				getBoundingClientRect: jest.fn().mockReturnValue({
+					top: 0,
+					left: 0,
+					bottom: 0,
+					right: 0,
+					height: 0,
+					width: 0
+				})
+			}));
+
+			OnDragOver_wysiwyg.call(mockThis, mockFrameContext, mockDragCursor, null, null, mockEvent);
+
+			expect(mockDragCursor.style.display).toBe('none');
+		});
+
+		it('should calculate offset with iframe top area and inner toolbar', () => {
+			const topArea = document.createElement('div');
+			const innerToolbar = document.createElement('div');
+
+			mockThis.offset.getGlobal.mockReturnValue({ top: 100, left: 50 });
+			mockThis.context.get.mockReturnValue({ offsetHeight: 40 });
+
+			OnDragOver_wysiwyg.call(mockThis, mockFrameContext, mockDragCursor, topArea, innerToolbar, mockEvent);
+
+			expect(mockThis.offset.getGlobal).toHaveBeenCalledWith(topArea);
+			expect(mockDragCursor.style.display).toBe('block');
+		});
+
+		it('should handle iframe wysiwyg frame', () => {
+			const iframeWysiwyg = document.createElement('iframe');
+			// Mock offsetLeft/Top since they are read-only
+			Object.defineProperty(iframeWysiwyg, 'offsetLeft', { value: 10 });
+			Object.defineProperty(iframeWysiwyg, 'offsetTop', { value: 20 });
+			mockFrameContext.set('wysiwygFrame', iframeWysiwyg);
+
+			OnDragOver_wysiwyg.call(mockThis, mockFrameContext, mockDragCursor, null, null, mockEvent);
+
+			expect(mockDragCursor.style.display).toBe('block');
+		});
+	});
+
+	describe('OnDrop_wysiwyg edge cases', () => {
+		it('should return early if sc is null', async () => {
+			mockThis.selection.getDragEventLocationRange.mockReturnValue({
+				sc: null,
+				so: 0,
+				ec: null,
+				eo: 0
+			});
+
+			await OnDrop_wysiwyg.call(mockThis, mockFrameContext, mockDragCursor, mockEvent);
+
+			expect(mockThis._dataTransferAction).not.toHaveBeenCalled();
+			expect(mockDragCursor.style.display).toBe('none');
+		});
+
+		it('should handle drop on disable-pointer element', async () => {
+			const disablePointerEl = document.createElement('div');
+			disablePointerEl.className = 'se-disable-pointer';
+
+			// Mock getParentElement to return the disable-pointer element
+			const originalGetParentElement = mockThis.selection.getDragEventLocationRange;
+			mockThis.selection.getDragEventLocationRange.mockReturnValue({
+				sc: disablePointerEl,
+				so: 0,
+				ec: disablePointerEl,
+				eo: 0
+			});
+
+			// Import and mock dom.query.getParentElement to simulate finding disable-pointer
+			const { dom } = require('../../../../../src/helper');
+			jest.spyOn(dom.query, 'getParentElement').mockReturnValue(disablePointerEl);
+
+			await OnDrop_wysiwyg.call(mockThis, mockFrameContext, mockDragCursor, mockEvent);
+
+			expect(mockEvent.preventDefault).toHaveBeenCalled();
+			expect(mockDragCursor.style.display).toBe('none');
+		});
+
+		it('should handle normal drop without errors', async () => {
+			// This tests the normal drop flow
+			mockThis.html = {
+				insertNode: jest.fn(),
+				remove: jest.fn()
+			};
+
+			await OnDrop_wysiwyg.call(mockThis, mockFrameContext, mockDragCursor, mockEvent);
+
+			// Drag cursor should be hidden in finally block
+			expect(mockDragCursor.style.display).toBe('none');
+		});
+	});
+
+	describe('finally block behavior', () => {
+		it('should hide drag cursor even when error occurs', async () => {
+			mockThis._dataTransferAction.mockImplementation(() => {
+				throw new Error('Test error');
+			});
+
+			mockDragCursor.style.display = 'block';
+
+			try {
+				await OnDrop_wysiwyg.call(mockThis, mockFrameContext, mockDragCursor, mockEvent);
+			} catch (e) {
+				// Expected error
+			}
+
+			expect(mockDragCursor.style.display).toBe('none');
+		});
+	});
 });

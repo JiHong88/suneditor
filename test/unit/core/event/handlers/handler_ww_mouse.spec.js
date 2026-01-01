@@ -488,4 +488,176 @@ describe('handler_ww_mouse', () => {
 			expect(mockThis.triggerEvent).toHaveBeenCalled();
 		});
 	});
+
+	describe('copy format feature', () => {
+		beforeEach(() => {
+			mockThis.triggerEvent.mockResolvedValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
+			mockThis.component.get.mockReturnValue(null);
+			mockThis.nodeTransform = {
+				createNestedNode: jest.fn().mockReturnValue({
+					parent: document.createElement('span'),
+					inner: document.createElement('span')
+				})
+			};
+			mockThis.inline.remove = jest.fn();
+			mockThis.inline.apply = jest.fn().mockReturnValue(document.createElement('span'));
+		});
+
+		it('should apply copy format when _onCopyFormatInfo is set', async () => {
+			const styleNode = document.createElement('strong');
+			mockThis.editor._onCopyFormatInfo = [styleNode];
+			mockThis.editor._onCopyFormatInitMethod = jest.fn().mockReturnValue(true);
+			mockThis.options.set('copyFormatKeepOn', false);
+
+			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+			expect(mockThis.inline.remove).toHaveBeenCalled();
+			expect(mockThis.inline.apply).toHaveBeenCalled();
+			expect(mockThis.editor._onCopyFormatInitMethod).toHaveBeenCalled();
+		});
+
+		it('should keep copy format on when copyFormatKeepOn option is true', async () => {
+			const styleNode = document.createElement('strong');
+			mockThis.editor._onCopyFormatInfo = [styleNode];
+			mockThis.editor._onCopyFormatInitMethod = null;
+			mockThis.options.set('copyFormatKeepOn', true);
+
+			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+			expect(mockThis.inline.remove).toHaveBeenCalled();
+			// When copyFormatKeepOn is true, _onCopyFormatInitMethod is not called
+		});
+
+		it('should handle copy format with empty style nodes', async () => {
+			mockThis.editor._onCopyFormatInfo = [];
+			mockThis.editor._onCopyFormatInitMethod = jest.fn();
+			mockThis.options.set('copyFormatKeepOn', false);
+
+			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+			expect(mockThis.inline.remove).toHaveBeenCalled();
+			// pop() on empty array returns undefined, so inline.apply should not be called
+			expect(mockThis.inline.apply).not.toHaveBeenCalled();
+		});
+
+		it('should handle copy format error gracefully', async () => {
+			const styleNode = document.createElement('strong');
+			mockThis.editor._onCopyFormatInfo = [styleNode];
+			mockThis.editor._onCopyFormatInitMethod = jest.fn().mockReturnValue(false);
+			mockThis.inline.remove.mockImplementation(() => {
+				throw new Error('Test error');
+			});
+
+			// Spy on console.warn
+			const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+			expect(warnSpy).toHaveBeenCalledWith('[SUNEDITOR.copyFormat.error] ', expect.any(Error));
+			expect(mockThis.editor._onCopyFormatInfo).toBeNull();
+			expect(mockThis.editor._onCopyFormatInitMethod).toBeNull();
+
+			warnSpy.mockRestore();
+		});
+
+		it('should handle copy format error with successful init method', async () => {
+			const styleNode = document.createElement('strong');
+			mockThis.editor._onCopyFormatInfo = [styleNode];
+			mockThis.editor._onCopyFormatInitMethod = jest.fn().mockReturnValue(true);
+			mockThis.inline.remove.mockImplementation(() => {
+				throw new Error('Test error');
+			});
+
+			const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+			expect(warnSpy).toHaveBeenCalled();
+			// Should not reset _onCopyFormatInfo since init method returned true
+			expect(mockThis.editor._onCopyFormatInitMethod).toHaveBeenCalled();
+
+			warnSpy.mockRestore();
+		});
+	});
+
+	describe('format line handling', () => {
+		beforeEach(() => {
+			mockThis.triggerEvent.mockResolvedValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
+			mockThis.component.get.mockReturnValue(null);
+		});
+
+		it('should create LI element when in list context', async () => {
+			mockThis.format.getLine.mockReturnValue(null);
+			const selectionNode = document.createTextNode('text');
+			const listElement = document.createElement('ul');
+			listElement.appendChild(document.createElement('li'));
+
+			mockThis.selection.getNode.mockReturnValue(selectionNode);
+			mockThis.format.getBlock.mockReturnValue(listElement);
+			mockThis.selection.getRange.mockReturnValue({
+				startContainer: selectionNode,
+				endContainer: selectionNode,
+				startOffset: 0,
+				endOffset: 0,
+				collapsed: true
+			});
+
+			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+			// Verification that no error occurs
+			expect(mockThis.selection.init).toHaveBeenCalled();
+		});
+
+		it('should set default line when format element is missing and not in list', async () => {
+			mockThis.format.getLine.mockReturnValue(null);
+			const selectionNode = document.createTextNode('text');
+			const rangeEl = document.createElement('div');
+
+			mockThis.selection.getNode.mockReturnValue(selectionNode);
+			mockThis.format.getBlock.mockReturnValue(rangeEl);
+			mockThis.format.isBlock.mockReturnValue(false);
+			mockThis._setDefaultLine.mockReturnValue(document.createElement('p'));
+			mockThis.selection.getRange.mockReturnValue({
+				startContainer: selectionNode,
+				endContainer: selectionNode,
+				startOffset: 0,
+				endOffset: 0,
+				collapsed: true
+			});
+
+			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+			expect(mockThis._setDefaultLine).toHaveBeenCalled();
+		});
+	});
+
+	describe('triple click selection adjustment', () => {
+		beforeEach(() => {
+			mockThis.triggerEvent.mockResolvedValue(undefined);
+			mockThis._callPluginEventAsync.mockResolvedValue(undefined);
+			mockThis.component.get.mockReturnValue(null);
+		});
+
+		it('should adjust selection range when endOffset is 0 on line element', async () => {
+			mockEvent.detail = 3;
+			const textNode = document.createTextNode('test text');
+			const lineElement = document.createElement('p');
+			lineElement.appendChild(textNode);
+
+			mockThis.format.isLine.mockReturnValue(true);
+			mockThis.selection.getRange.mockReturnValue({
+				startContainer: textNode,
+				startOffset: 0,
+				endContainer: lineElement,
+				endOffset: 0,
+				collapsed: false
+			});
+
+			await OnClick_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+			expect(mockThis.selection.setRange).toHaveBeenCalled();
+		});
+	});
 });

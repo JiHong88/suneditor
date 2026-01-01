@@ -505,6 +505,13 @@ export function createMockEditor(customOptions = {}) {
 			})
 		},
 
+		inline: {
+			apply: jest.fn().mockReturnValue(document.createElement('span')),
+			remove: jest.fn(),
+			is: jest.fn().mockReturnValue(false),
+			_isNonSplitNode: jest.fn().mockReturnValue(false)
+		},
+
 		// Event system
 		eventManager: null, // Will be set after mockEditor is complete
 
@@ -680,6 +687,7 @@ export function createMockEditor(customOptions = {}) {
 		shortcuts: mockEditor.shortcuts,
 		ui: mockEditor.ui,
 		viewer: mockEditor.viewer,
+		inline: mockEditor.inline,
 
 		// EventManager specific properties
 		scrollparents: []
@@ -716,6 +724,7 @@ export function createMockThis(editor = null, customProps = {}) {
 		menu: mockEditor.menu,
 		viewer: mockEditor.viewer,
 		nodeTransform: mockEditor.nodeTransform,
+		inline: mockEditor.inline,
 		context: mockEditor.context,
 		status: mockEditor.status,
 		plugins: mockEditor.plugins,

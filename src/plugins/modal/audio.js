@@ -52,7 +52,7 @@ class Audio_ extends PluginModal {
 	 * @param {AudioPluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
-		// plugin bisic properties
+		// plugin basic properties
 		super(editor);
 		this.title = this.lang.audio;
 		this.icon = 'audio';
@@ -269,17 +269,17 @@ class Audio_ extends PluginModal {
 
 		let fileSize = 0;
 		const files = [];
-		const slngleSizeLimit = this.pluginOptions.uploadSingleSizeLimit;
+		const singleSizeLimit = this.pluginOptions.uploadSingleSizeLimit;
 		for (let i = 0, len = fileList.length, f, s; i < len; i++) {
 			f = fileList[i];
 			if (!/audio/i.test(f.type)) continue;
 
 			s = f.size;
-			if (slngleSizeLimit > 0 && s > slngleSizeLimit) {
-				const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
+			if (singleSizeLimit > 0 && s > singleSizeLimit) {
+				const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
 				const message = await this.triggerEvent('onAudioUploadError', {
 					error: err,
-					limitSize: slngleSizeLimit,
+					limitSize: singleSizeLimit,
 					uploadSize: s,
 					file: f,
 				});

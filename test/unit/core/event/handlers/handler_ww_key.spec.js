@@ -509,5 +509,104 @@ describe('Key Handler', () => {
 				expect(mockThis.history.push).not.toHaveBeenCalled();
 			});
 		});
+
+		describe('Retain style nodes', () => {
+			beforeEach(() => {
+				jest.spyOn(keyCodeMap, 'isRemoveKey').mockReturnValue(true);
+				mockThis.options.set('retainStyleMode', 'repeat');
+
+				const formatEl = document.createElement('p');
+				formatEl.innerHTML = '\u200B'; // zero width space
+				mockThis.format.getLine.mockReturnValue(formatEl);
+			});
+
+			it('should retain style nodes on remove key with repeat mode', async () => {
+				// This tests the retainStyleMode 'repeat' path
+				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+				// Function should complete without errors
+				expect(mockThis.triggerEvent).toHaveBeenCalled();
+			});
+
+			it('should clear retain style nodes when timer exists', async () => {
+				mockThis.__retainTimer = setTimeout(() => {}, 1000);
+
+				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+				// Should clear the timer
+				expect(mockThis._clearRetainStyleNodes).toHaveBeenCalled();
+				clearTimeout(mockThis.__retainTimer);
+			});
+
+			it('should retain style nodes with always mode', async () => {
+				mockThis.options.set('retainStyleMode', 'always');
+
+				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+				expect(mockThis.triggerEvent).toHaveBeenCalled();
+			});
+
+			it('should clear retain style nodes when mode is none', async () => {
+				mockThis.options.set('retainStyleMode', 'none');
+
+				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+				expect(mockThis._clearRetainStyleNodes).toHaveBeenCalled();
+			});
+		});
+
+		describe('Document type header', () => {
+			it('should call reHeader when document type is enabled and key is observer key', async () => {
+				jest.spyOn(keyCodeMap, 'isDocumentTypeObserverKey').mockReturnValue(true);
+				const mockDocumentType = {
+					reHeader: jest.fn(),
+					on: jest.fn()
+				};
+				mockFrameContext.set('documentType_use_header', true);
+				mockFrameContext.set('documentType', mockDocumentType);
+				mockFrameContext.has = jest.fn().mockReturnValue(true);
+
+				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+				expect(mockDocumentType.reHeader).toHaveBeenCalled();
+				expect(mockDocumentType.on).toHaveBeenCalled();
+			});
+
+			it('should call onChangeText when key is not observer key', async () => {
+				jest.spyOn(keyCodeMap, 'isDocumentTypeObserverKey').mockReturnValue(false);
+				const mockDocumentType = {
+					reHeader: jest.fn(),
+					on: jest.fn(),
+					onChangeText: jest.fn()
+				};
+				mockFrameContext.set('documentType_use_header', true);
+				mockFrameContext.set('documentType', mockDocumentType);
+				mockFrameContext.has = jest.fn().mockReturnValue(true);
+
+				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+				expect(mockDocumentType.onChangeText).toHaveBeenCalled();
+			});
+		});
+
+		describe('Balloon toolbar show for selection', () => {
+			it('should show balloon when isBalloon and selection is not collapsed', async () => {
+				mockThis.editor.isBalloon = true;
+				mockThis.selection.getRange.mockReturnValue({ collapsed: false });
+
+				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+				expect(mockThis.toolbar._showBalloon).toHaveBeenCalled();
+			});
+
+			it('should show sub-balloon always with delay', async () => {
+				mockThis.editor.isSubBalloon = true;
+				mockThis.editor.isSubBalloonAlways = true;
+
+				await OnKeyUp_wysiwyg.call(mockThis, mockFrameContext, mockEvent);
+
+				expect(mockThis._showToolbarBalloonDelay).toHaveBeenCalled();
+			});
+		});
 	});
 });

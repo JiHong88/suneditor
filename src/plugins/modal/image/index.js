@@ -83,7 +83,7 @@ class Image_ extends PluginModal {
 	 * @param {ImagePluginOptions} pluginOptions
 	 */
 	constructor(editor, pluginOptions) {
-		// plugin bisic properties
+		// plugin basic properties
 		super(editor);
 		this.title = this.lang.image;
 		this.icon = 'image';
@@ -354,17 +354,17 @@ class Image_ extends PluginModal {
 
 		let fileSize = 0;
 		const files = [];
-		const slngleSizeLimit = this.pluginOptions.uploadSingleSizeLimit;
+		const singleSizeLimit = this.pluginOptions.uploadSingleSizeLimit;
 		for (let i = 0, len = fileList.length, f, s; i < len; i++) {
 			f = fileList[i];
 			if (!/image/i.test(f.type)) continue;
 
 			s = f.size;
-			if (slngleSizeLimit > 0 && s > slngleSizeLimit) {
-				const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable single file: ' + slngleSizeLimit / 1000 + 'KB';
+			if (singleSizeLimit > 0 && s > singleSizeLimit) {
+				const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable single file: ' + singleSizeLimit / 1000 + 'KB';
 				const message = await this.triggerEvent('onImageUploadError', {
 					error: err,
-					limitSize: slngleSizeLimit,
+					limitSize: singleSizeLimit,
 					uploadSize: s,
 					file: f,
 				});

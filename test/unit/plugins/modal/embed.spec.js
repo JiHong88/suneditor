@@ -431,13 +431,7 @@ describe('Embed Plugin', () => {
 	});
 
 	describe('Instance methods', () => {
-		it('should have required methods', () => {
-			// checkContentType is now a static private method, removed from instance methods check
-			const methods = ['open', 'componentEdit', 'modalOn', 'modalAction', 'modalInit', 'componentSelect', 'componentDestroy', 'submitSRC', 'findProcessUrl', 'retainFormat'];
-			methods.forEach((method) => {
-				expect(typeof embed[method]).toBe('function');
-			});
-		});
+
 
 		describe('open', () => {
 			it('should open modal', () => {

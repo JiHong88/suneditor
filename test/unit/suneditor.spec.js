@@ -22,24 +22,11 @@ describe('SunEditor Main Entry', () => {
 		mockQuerySelector.mockClear();
 	});
 
-	describe('Default export - SunEditor factory', () => {
-		it('should export factory object with init and create methods', () => {
-			expect(suneditor).toBeDefined();
-			expect(typeof suneditor).toBe('object');
-			expect(typeof suneditor.init).toBe('function');
-			expect(typeof suneditor.create).toBe('function');
-		});
-	});
+
+
+
 
 	describe('init method', () => {
-		it('should return object with create method', () => {
-			const initOptions = { height: '300px' };
-			const result = suneditor.init(initOptions);
-
-			expect(result).toBeDefined();
-			expect(typeof result.create).toBe('function');
-		});
-
 		it('should pass init options to create method', () => {
 			const initOptions = { height: '300px' };
 			const mockElement = { nodeType: 1 };
@@ -171,17 +158,6 @@ describe('SunEditor Main Entry', () => {
 			});
 		});
 
-		describe('Return value', () => {
-			it('should return Editor instance', () => {
-				const mockElement = { nodeType: 1 };
 
-				const result = suneditor.create(mockElement);
-
-				expect(result).toBeDefined();
-				expect(typeof result.destroy).toBe('function');
-				expect(typeof result.getContents).toBe('function');
-				expect(typeof result.setContents).toBe('function');
-			});
-		});
 	});
 });

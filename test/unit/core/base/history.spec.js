@@ -307,4 +307,110 @@ describe('History', () => {
 			expect(() => history.push(false, 'second-frame')).not.toThrow();
 		});
 	});
+
+	describe('undo/redo boundary conditions', () => {
+		it('should handle undo at stack boundary (index = 0)', () => {
+			// Push one change to have something to undo
+			mockEditor.frameContext.get('wysiwyg').innerHTML = '<p>Change 1</p>';
+			history.push(false, 'test-frame');
+
+			// Undo once to get to index 0
+			history.undo();
+
+			// Try to undo again at boundary - should not throw
+			expect(() => history.undo()).not.toThrow();
+
+			// Verify we're still at boundary
+			const rootStack = history.getRootStack();
+			expect(rootStack['test-frame'].index).toBe(0);
+		});
+
+		it('should handle redo at stack end boundary', () => {
+			mockEditor.frameContext.get('wysiwyg').innerHTML = '<p>Change 1</p>';
+			history.push(false, 'test-frame');
+
+			// Try to redo without prior undo - should be at end of stack
+			expect(() => history.redo()).not.toThrow();
+		});
+
+		it('should handle rapid undo/redo sequence', () => {
+			// Push multiple changes
+			mockEditor.frameContext.get('wysiwyg').innerHTML = '<p>Change 1</p>';
+			history.push(false, 'test-frame');
+			mockEditor.frameContext.get('wysiwyg').innerHTML = '<p>Change 2</p>';
+			history.push(false, 'test-frame');
+			mockEditor.frameContext.get('wysiwyg').innerHTML = '<p>Change 3</p>';
+			history.push(false, 'test-frame');
+
+			// Rapid undo/redo
+			expect(() => {
+				history.undo();
+				history.undo();
+				history.redo();
+				history.undo();
+				history.redo();
+				history.redo();
+			}).not.toThrow();
+		});
+
+		it('should truncate redo stack when new change is pushed after undo', () => {
+			mockEditor.frameContext.get('wysiwyg').innerHTML = '<p>Change 1</p>';
+			history.push(false, 'test-frame');
+			mockEditor.frameContext.get('wysiwyg').innerHTML = '<p>Change 2</p>';
+			history.push(false, 'test-frame');
+
+			// Undo
+			history.undo();
+
+			// Push new change - should truncate redo history
+			mockEditor.frameContext.get('wysiwyg').innerHTML = '<p>New Change</p>';
+			history.push(false, 'test-frame');
+
+			// Redo should have nothing to redo
+			const rootStack = history.getRootStack();
+			const currentIndex = rootStack['test-frame'].index;
+
+			history.redo();
+
+			// Index should not have changed (nothing to redo)
+			expect(rootStack['test-frame'].index).toBe(currentIndex);
+		});
+	});
+
+	describe('DOM mutation during history restore', () => {
+		it('should handle selection restoration when DOM structure changes', () => {
+			const wysiwyg = mockEditor.frameContext.get('wysiwyg');
+			wysiwyg.innerHTML = '<p>Original content</p>';
+
+			// Push with valid range
+			const textNode = wysiwyg.firstChild.firstChild;
+			const mockRange = document.createRange();
+			mockRange.setStart(textNode, 0);
+			mockRange.setEnd(textNode, 5);
+			mockEditor.status._range = mockRange;
+
+			history.push(false, 'test-frame');
+
+			// Change content
+			wysiwyg.innerHTML = '<p>Modified content</p>';
+			history.push(false, 'test-frame');
+
+			// Undo should not throw even if selection restoration fails
+			expect(() => history.undo()).not.toThrow();
+		});
+
+		it('should handle history push when selection range is null', () => {
+			mockEditor.status._range = null;
+			mockEditor.frameContext.get('wysiwyg').innerHTML = '<p>No range content</p>';
+
+			// Should not throw and should use default path
+			expect(() => history.push(false, 'test-frame')).not.toThrow();
+
+			const rootStack = history.getRootStack();
+			const lastEntry = rootStack['test-frame'].value[rootStack['test-frame'].index];
+
+			// Should have default path when range is null
+			expect(lastEntry.s.path).toBeDefined();
+		});
+	});
 });

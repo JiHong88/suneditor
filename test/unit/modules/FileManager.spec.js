@@ -402,4 +402,229 @@ describe('Modules - FileManager', () => {
         });
     });
 
+    describe('_checkInfo with componentsInfoReset', () => {
+        let fileManager;
+
+        beforeEach(() => {
+            fileManager = new FileManager(mockInst, {
+                query: 'img',
+                loadEventName: 'onImageLoad',
+                actionEventName: 'onImageAction'
+            });
+        });
+
+        it('should reset component info when _componentsInfoReset is true', () => {
+            mockEditor._componentsInfoReset = true;
+
+            const mockTag = document.createElement('img');
+            mockTag.setAttribute('data-se-index', '1');
+            mockTag.setAttribute('data-se-file-name', 'test.jpg');
+            mockTag.setAttribute('data-se-file-size', '1024');
+            mockTag.src = 'test.jpg';
+
+            mockWysiwyg.querySelectorAll.mockReturnValue([mockTag]);
+
+            fileManager.infoList = [
+                { index: 1, src: 'test.jpg', name: 'test.jpg', size: 1024 }
+            ];
+
+            fileManager._checkInfo(false);
+
+            // Should have processed the tag
+            expect(mockWysiwyg.querySelectorAll).toHaveBeenCalled();
+        });
+
+        it('should trigger onFileManagerAction when deleting info', () => {
+            const mockTag = document.createElement('img');
+            mockTag.setAttribute('data-se-index', '1');
+            mockTag.src = 'image1.jpg';
+
+            mockWysiwyg.querySelectorAll.mockReturnValue([mockTag]);
+
+            fileManager.infoList = [
+                { index: 1, src: 'image1.jpg' },
+                { index: 2, src: 'image2.jpg' } // This one is missing from tags
+            ];
+
+            fileManager._checkInfo(false);
+
+            // Should have triggered delete events
+            expect(mockEditor.triggerEvent).toHaveBeenCalled();
+        });
+
+        it('should skip if tag count matches and src matches', () => {
+            const mockTag = document.createElement('img');
+            mockTag.setAttribute('data-se-index', '1');
+            mockTag.src = 'image1.jpg';
+
+            mockWysiwyg.querySelectorAll.mockReturnValue([mockTag]);
+
+            fileManager.infoList = [
+                { index: 1, src: 'image1.jpg' }
+            ];
+
+            fileManager._checkInfo(false);
+
+            // Should return early without processing
+            expect(fileManager.infoList.length).toBe(1);
+        });
+    });
+
+    describe('info.delete and info.select methods', () => {
+        let fileManager;
+        let mockElement;
+
+        beforeEach(() => {
+            mockInst.componentDestroy = jest.fn();
+            mockInst.componentSelect = jest.fn();
+
+            mockEditor.component = {
+                get: jest.fn(),
+                select: jest.fn()
+            };
+
+            fileManager = new FileManager(mockInst, {
+                query: 'img',
+                actionEventName: 'onImageAction'
+            });
+
+            mockElement = document.createElement('img');
+            mockElement.setAttribute('data-se-index', '0');
+            mockElement.setAttribute('data-se-file-name', 'test.jpg');
+            mockElement.setAttribute('data-se-file-size', '1024');
+            mockElement.src = 'http://example.com/test.jpg';
+            mockElement.scrollIntoView = jest.fn();
+
+            mockWysiwyg.querySelectorAll.mockReturnValue([mockElement]);
+        });
+
+        it('should create info with delete and select methods', () => {
+            mockEditor._componentsInfoInit = true;
+
+            fileManager._checkInfo(false);
+
+            expect(fileManager.infoList.length).toBe(1);
+            expect(typeof fileManager.infoList[0].delete).toBe('function');
+            expect(typeof fileManager.infoList[0].select).toBe('function');
+        });
+
+        it('should call info.delete to remove element', () => {
+            mockEditor._componentsInfoInit = true;
+
+            fileManager._checkInfo(false);
+
+            const info = fileManager.infoList[0];
+            info.delete();
+
+            expect(mockInst.componentDestroy).toHaveBeenCalledWith(mockElement);
+        });
+
+        it('should call info.select to select element', () => {
+            mockEditor._componentsInfoInit = true;
+            mockEditor.component.get.mockReturnValue(null);
+
+            fileManager._checkInfo(false);
+
+            const info = fileManager.infoList[0];
+            info.select();
+
+            expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'nearest'
+            });
+            expect(mockInst.componentSelect).toHaveBeenCalledWith(mockElement);
+        });
+
+        it('should call component.select when component exists', () => {
+            mockEditor._componentsInfoInit = true;
+            mockEditor.component.get.mockReturnValue({
+                target: mockElement,
+                pluginName: 'image'
+            });
+
+            fileManager._checkInfo(false);
+
+            const info = fileManager.infoList[0];
+            info.select();
+
+            expect(mockEditor.component.select).toHaveBeenCalledWith(mockElement, 'image');
+        });
+    });
+
+    describe('info update scenarios', () => {
+        let fileManager;
+
+        beforeEach(() => {
+            fileManager = new FileManager(mockInst, {
+                query: 'img',
+                actionEventName: 'onImageAction'
+            });
+        });
+
+        it('should preserve existing info when tag count matches and sources match', () => {
+            const mockElement = document.createElement('img');
+            mockElement.setAttribute('data-se-index', '1');
+            mockElement.setAttribute('data-se-file-name', 'original.jpg');
+            mockElement.setAttribute('data-se-file-size', '1024');
+            mockElement.src = 'http://example.com/original.jpg';
+
+            mockWysiwyg.querySelectorAll.mockReturnValue([mockElement]);
+
+            fileManager.infoList = [
+                { index: 1, src: 'http://example.com/original.jpg', name: 'original.jpg', size: 1024 }
+            ];
+            fileManager.infoIndex = 2;
+
+            fileManager._checkInfo(false);
+
+            // Info should remain unchanged when sources match
+            expect(fileManager.infoList.length).toBe(1);
+            expect(fileManager.infoList[0].src).toBe('http://example.com/original.jpg');
+        });
+
+        it('should handle tag with non-matching index', () => {
+            const mockElement = document.createElement('img');
+            mockElement.setAttribute('data-se-index', '999');
+            mockElement.setAttribute('data-se-file-name', 'new.jpg');
+            mockElement.setAttribute('data-se-file-size', '3072');
+            mockElement.src = 'http://example.com/new.jpg';
+
+            mockWysiwyg.querySelectorAll.mockReturnValue([mockElement]);
+
+            fileManager.infoList = [
+                { index: 1, src: 'http://example.com/old.jpg' }
+            ];
+            fileManager.infoIndex = 2;
+
+            fileManager._checkInfo(false);
+
+            // Should handle the case where index doesn't match
+            expect(fileManager.infoList.length).toBeGreaterThanOrEqual(1);
+        });
+    });
+
+    describe('GetAttr v2 migration', () => {
+        let fileManager;
+
+        beforeEach(() => {
+            fileManager = new FileManager(mockInst, { query: 'img' });
+        });
+
+        it('should migrate v2 data attributes to se format', () => {
+            const mockElement = document.createElement('img');
+            mockElement.setAttribute('data-index', '5');
+            mockElement.src = 'http://example.com/test.jpg';
+
+            mockWysiwyg.querySelectorAll.mockReturnValue([mockElement]);
+            mockEditor._componentsInfoInit = true;
+
+            fileManager._checkInfo(false);
+
+            // Should have migrated the attribute
+            expect(mockElement.hasAttribute('data-se-index')).toBe(true);
+            expect(mockElement.hasAttribute('data-index')).toBe(false);
+        });
+    });
+
 });

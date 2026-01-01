@@ -357,4 +357,98 @@ describe('Core - Char', () => {
             expect(typeof result).toBe('boolean');
         });
     });
+
+    describe('_destroy method', () => {
+        it('should not throw when called', () => {
+            expect(() => {
+                char._destroy();
+            }).not.toThrow();
+        });
+
+        it('should be callable multiple times', () => {
+            expect(() => {
+                char._destroy();
+                char._destroy();
+            }).not.toThrow();
+        });
+    });
+
+    describe('edge cases', () => {
+        it('should handle undefined input in getByteLength', () => {
+            const length = char.getByteLength(undefined);
+            expect(length).toBe(0);
+        });
+
+        it('should handle empty object in getByteLength', () => {
+            const obj = {};
+            const length = char.getByteLength(obj);
+            expect(length).toBeGreaterThan(0); // "[object Object]"
+        });
+
+        it('should handle number input in getByteLength', () => {
+            const length = char.getByteLength(12345);
+            expect(length).toBe(5); // "12345"
+        });
+
+        it('should handle array input in getByteLength', () => {
+            const length = char.getByteLength([1, 2, 3]);
+            expect(length).toBeGreaterThan(0); // "1,2,3"
+        });
+    });
+
+    describe('check with various node types', () => {
+        it('should handle text node', () => {
+            const textNode = document.createTextNode('hello world');
+            const result = char.check(textNode);
+            expect(typeof result).toBe('boolean');
+        });
+
+        it('should handle comment node', () => {
+            const commentNode = document.createComment('comment');
+            const result = char.check(commentNode);
+            expect(typeof result).toBe('boolean');
+        });
+
+        it('should handle document fragment', () => {
+            const fragment = document.createDocumentFragment();
+            fragment.appendChild(document.createTextNode('test'));
+            const result = char.check(fragment);
+            expect(typeof result).toBe('boolean');
+        });
+    });
+
+    describe('display with different frame contexts', () => {
+        it('should handle display with undefined frame context', () => {
+            expect(() => {
+                char.display(undefined);
+            }).not.toThrow();
+        });
+
+        it('should handle display when charCounter is null', () => {
+            const fc = new Map();
+            fc.get = jest.fn().mockReturnValue(null);
+
+            expect(() => {
+                char.display(fc);
+            }).not.toThrow();
+        });
+    });
+
+    describe('test with complex scenarios', () => {
+        it('should handle test with empty wysiwyg', async () => {
+            const wysiwyg = editor.frameContext.get('wysiwyg');
+            wysiwyg.innerHTML = '';
+
+            const result = char.test('test');
+            expect(typeof result).toBe('boolean');
+        });
+
+        it('should handle test with only whitespace content', async () => {
+            const wysiwyg = editor.frameContext.get('wysiwyg');
+            wysiwyg.innerHTML = '<p>   </p>';
+
+            const result = char.test('test');
+            expect(typeof result).toBe('boolean');
+        });
+    });
 });
